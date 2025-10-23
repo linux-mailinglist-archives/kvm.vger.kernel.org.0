@@ -1,159 +1,251 @@
-Return-Path: <kvm+bounces-60867-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60868-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD05EBFE960
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 01:35:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DB8FBFED42
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 03:22:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 69F9C35756C
-	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 23:35:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBCC13A26A2
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 01:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C23D30ACEA;
-	Wed, 22 Oct 2025 23:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86211ACEAF;
+	Thu, 23 Oct 2025 01:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="StTRIB3i"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="MpdTQTdo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B29B309DAF
-	for <kvm@vger.kernel.org>; Wed, 22 Oct 2025 23:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC0C17A305;
+	Thu, 23 Oct 2025 01:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761175854; cv=none; b=KMdOt3fCms9jyZfqmorayS79U/AZCbwFjNFAoQBsn5kctRASb9WPtbFqTPg9Aedcmyqhq8koo91hoLwrVnEsXdv3M7xtvmrwG2ve3/KRwI7lo4DWUZJBDBN0enhdCEMfKY4gK/YhW3qj3cW+5nnJ5L5UUSt3EChY662UfWGfAlE=
+	t=1761182506; cv=none; b=hc7z3x1MdhfrS+XnvZE4TUNGbIwYWISxZKQ8T+DfKTxZYn2sfaxf0h9Bhk6Rn6mkz6CXNt6FEblmrCgiaGgkSmPxGEpRD+SkG0vCi7bPcdlyUOt9qD+TRtI6etamr4qMvySnJDnvXVOoAC602ftB+SNzBFaZEjpta2QhEVZjsGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761175854; c=relaxed/simple;
-	bh=FJ5dPWeuTDRG2VX7FLyUJF0mD0hnFePTCkWS6C5Q3EA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JdXv3tVDicZ5RL/UqQ0UjZdNEFomY5SlC/cAOkdzVEhbnkV9ZmA5Cr9W8rYMoPfRzpoIeZSsh8laIB04lzhD1cPpnmr9IjcFJOUJyfcBUKNsO6a79wGxFGHSkjWY12WxVBbdeHeaTZ5r2pQDxcfAel2s3Sgn0xIYARghQEuy9qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=StTRIB3i; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b6cf40b2c2bso311768a12.0
-        for <kvm@vger.kernel.org>; Wed, 22 Oct 2025 16:30:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761175851; x=1761780651; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3jEiO6iBxzy6fxnsgwrsRYGtWZsrwu6A5X9ZJxUc05s=;
-        b=StTRIB3ia4VotH0oNfRldoeYZy7DFSoBOunCAH3g3FV7Z3yvRspTKvfuj7IksqTWM0
-         R0IGmqesgalhEVemC6wY0/JcqcHSCrVBcdV27rgotEr/LL5jPQmnubqvILp06jqVzMkP
-         P+aBREszcp1bnHDr7+/rtkyO1qHtbSDdJ9O4+d5lvjOF/AoISE8PaTDxYhB+A1t2XLqa
-         hsUhjohqIeoIO4W2CenPOOkeusZFMnDYxB/RCpKwCXevQ1om0P+6YrwQBuJFqIwZZ6Ze
-         RavicgAg0YBneomDyrLWdIZZFVDGKwPcbwbJ1IzZBqTsOOPFnRTm6e3kui9aNwTZ6Sct
-         Sqqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761175851; x=1761780651;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3jEiO6iBxzy6fxnsgwrsRYGtWZsrwu6A5X9ZJxUc05s=;
-        b=oe46Ya2ZNYbATXbccYEvqibZzI7jaZEWbRAzuhFHId4EkRM+Ad+SLzCHXcFxDlC7iP
-         pbtK+hSdnbAkylds9e//j9zkCs6jC78X33vDlG/4KlYH8CTO33mehPgDBoQJ7i2KbLIL
-         b2jkUmDBVSmoSvtqJxBnIJBQfN2uuHOCTCR3Ev6/X9dVAYrkWMumK9ftDKLWnJjrlGLa
-         o2vDKyZ6Vu4iCRv1gMvzEDp86DcIcn1EqbC9npmT1Th78hSOoThb0rzYU6LZPpB3FUn4
-         cCAJtQ1asG0uqmxKL/rlu3l9QtviqkKRtzlBqlY5ze4dyI0TSrBLUo2aRU2G+YhFPyWE
-         ZZww==
-X-Forwarded-Encrypted: i=1; AJvYcCWuYqxJCb/OzHHHOx6nm3TY7GV+u+1WUuDoFMw2f4CaVbm5TstOaTBo358otl4qX8mj0Kw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxg6c2dlntg0JaYsuVZVtAojieqq6qD+O12LHEyXJxlFU2uT9lM
-	A9EQeVy/uLXfq1P9aSO9taG9ZkWn7JeucATHlXDTz9qgWn1gixPmlEhp7VGFSfBlWAjic45gtUw
-	+JabGeg==
-X-Google-Smtp-Source: AGHT+IFg265zLGl2bQmWCvkKPU4u2q3qfh913c9juw3tQPbolW7ChzJ4nSIfXk8wuAQ4jQwhmqRekZFnQlI=
-X-Received: from pjnj13.prod.google.com ([2002:a17:90a:840d:b0:329:7261:93b6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d84:b0:2f9:39b0:fd88
- with SMTP id adf61e73a8af0-334a84da4b1mr29081038637.21.1761175851395; Wed, 22
- Oct 2025 16:30:51 -0700 (PDT)
-Date: Wed, 22 Oct 2025 16:30:49 -0700
-In-Reply-To: <diqzy0p2eet3.fsf@google.com>
+	s=arc-20240116; t=1761182506; c=relaxed/simple;
+	bh=Cs26bGL6gNj5ycTNgxztit3bcAxl7FrFqDQSQ5lmzXg=;
+	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
+	 Cc:In-Reply-To:To; b=Kp8q+vpkRMeBVsloyz/g+U11CANZ3OkCXEGb2j5fzIyvSZf8w9nKtF8UAQnMFzw/MUSpXh7dQy+QCiCtqhsOBWhpr31jRQfz4VLXImb/PSgDLAgaZA2gfIyUm1L8ChD8C9rGpGMMaiiSyz1AUt0PaKR+BO/Ne6WNpBnYd0Axkwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=MpdTQTdo; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from smtpclient.apple ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 59N1KrWM2539646
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
+	Wed, 22 Oct 2025 18:20:54 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 59N1KrWM2539646
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025092201; t=1761182455;
+	bh=ZLUQ1JiNvlWhkPedHh+yb6CE80AdTaykCyDusRDhtkQ=;
+	h=From:Subject:Date:References:Cc:In-Reply-To:To:From;
+	b=MpdTQTdoe9MfSH9nzvYLcxz2vAPOoqDD2H4PKD4R46mf2YdM7mx6xYN4sOFT4fv74
+	 e+zNPD3GDVGzv1dm3RzmqHmPl00ojskaYqAdjSlHJWvxNL1NF+h2k+om2lkbgA75F+
+	 PP846aVH3U2MOoWSVPxOG7O30+eXw0mS6LW6n3p4NSQEdUxQnQ8Pf+6IjLghToPe8f
+	 DlcSqLB4lgDwZ/zhbTLQhxYlC3yyCdpYokpuuGsRnQ/QAIBLqP69NqO+n34uuS94B4
+	 RvCOsP1gp4jGv8L49W90L+qR7DID+b6nHefKqlP2d7JYPL6IoTQLoPiQb1sbgDYs2B
+	 LCf38gVLXtxWQ==
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: Xin Li <xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1760731772.git.ackerleytng@google.com> <8ee16fbf254115b0fd72cc2b5c06d2ccef66eca9.1760731772.git.ackerleytng@google.com>
- <2457cb3b-5dde-4ca1-b75d-174b5daee28a@arm.com> <diqz4irqg9qy.fsf@google.com> <diqzy0p2eet3.fsf@google.com>
-Message-ID: <aPlpKbHGea90IebS@google.com>
-Subject: Re: [RFC PATCH v1 07/37] KVM: Introduce KVM_SET_MEMORY_ATTRIBUTES2
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Steven Price <steven.price@arm.com>, cgroups@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, x86@kernel.org, 
-	akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de, 
-	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com, 
-	david@redhat.com, dmatlack@google.com, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, 
-	hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com, 
-	keirf@google.com, kent.overstreet@linux.dev, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, 
-	maobibo@loongson.cn, mathieu.desnoyers@efficios.com, maz@kernel.org, 
-	mhiramat@kernel.org, mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, 
-	mingo@redhat.com, mlevitsk@redhat.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, peterx@redhat.com, 
-	pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, qperret@google.com, 
-	richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com, 
-	rostedt@goodmis.org, roypat@amazon.co.uk, rppt@kernel.org, 
-	shakeel.butt@linux.dev, shuah@kernel.org, suzuki.poulose@arm.com, 
-	tabba@google.com, tglx@linutronix.de, thomas.lendacky@amd.com, 
-	vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
-	vkuznets@redhat.com, will@kernel.org, willy@infradead.org, wyihan@google.com, 
-	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com
-Content-Type: text/plain; charset="us-ascii"
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH v8 05/21] x86/cea: Export API for per-CPU exception stacks for KVM
+Date: Wed, 22 Oct 2025 18:20:43 -0700
+Message-Id: <6596E9D7-E0B9-4AEA-BC39-2A637B401DC1@zytor.com>
+References: <20251014010950.1568389-6-xin@zytor.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com,
+        chao.gao@intel.com, hch@infradead.org
+In-Reply-To: <20251014010950.1568389-6-xin@zytor.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, Dave Hansen <dave.hansen@linux.intel.com>
+X-Mailer: iPhone Mail (23A355)
 
-On Wed, Oct 22, 2025, Ackerley Tng wrote:
-> Ackerley Tng <ackerleytng@google.com> writes:
-> 
-> Found another issue with KVM_CAP_MEMORY_ATTRIBUTES2.
-> 
-> KVM_CAP_MEMORY_ATTRIBUTES2 was defined to do the same thing as
-> KVM_CAP_MEMORY_ATTRIBUTES, but that's wrong since
-> KVM_CAP_MEMORY_ATTRIBUTES2 should indicate the presence of
-> KVM_SET_MEMORY_ATTRIBUTES2 and struct kvm_memory_attributes2.
 
-No?  If no attributes are supported, whether or not KVM_SET_MEMORY_ATTRIBUTES2
-exists is largely irrelevant.  We can even provide the same -ENOTTY errno by
-checking that _any_ attributes are supported, i.e. so that doing
-KVM_SET_MEMORY_ATTRIBUTES2 on KVM without any support whatsoever fails in the
-same way that KVM with code support but no attributes fails.
+> =EF=BB=BFConvert the __this_cpu_ist_{top,bottom}_va() macros into proper f=
+unctions,
+> and export __this_cpu_ist_top_va() to allow KVM to retrieve the top of the=
 
-In other words, I don't see why it can't do both.  Even if we can't massage the
-right errno, I would much rather KVM_SET_MEMORY_ATTRIBUTES2 enumerate the set of
-supported attributes than simply '1'.  E.g. we have no plans to support
-KVM_SET_MEMORY_ATTRIBUTES on guest_memfd, and so returning simply '1' creates an
-unwanted and unnecessary dependency.
+> per-CPU exception stack.
+>=20
+> FRED introduced new fields in the host-state area of the VMCS for stack
+> levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively corresponding to
+> per-CPU exception stacks for #DB, NMI and #DF.  KVM must populate these
+> fields each time a vCPU is loaded onto a CPU.
+>=20
+> To simplify access to the exception stacks in struct cea_exception_stacks,=
 
-> @@ -1617,4 +1618,15 @@ struct kvm_pre_fault_memory {
->  	__u64 padding[5];
->  };
->  
-> +/* Available with KVM_CAP_MEMORY_ATTRIBUTES2 */
-> +#define KVM_SET_MEMORY_ATTRIBUTES2              _IOWR(KVMIO,  0xd6, struct kvm_memory_attributes2)
+> a union is used to create an array alias, enabling array-style indexing of=
 
-Please use the same literal number, 0xd2, as
+> the stack entries.
+>=20
+> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 
-  #define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd2, struct kvm_memory_attributes)
+Dave, can you please help to review patch 4 & 5?
 
-The "final" ioctl number that userspace sees incorporates the directionality and
-the size of the struct, i.e. KVM_SET_MEMORY_ATTRIBUTES and KVM_SET_MEMORY_ATTRIBUTES2
-are guaranteed to be distinct even if they both use 0xd2 as the "minor" number.
+Thanks!
+Xin
 
+> ---
+>=20
+> Change in v7:
+> * Remove Suggested-bys (Dave Hansen).
+> * Move rename code in a separate patch (Dave Hansen).
+> * Access cea_exception_stacks using array indexing (Dave Hansen).
+> * Use BUILD_BUG_ON(ESTACK_DF !=3D 0) to ensure the starting index is 0
+>  (Dave Hansen).
+>=20
+> Change in v5:
+> * Export accessor instead of data (Christoph Hellwig).
+> * Add TB from Xuelian Guo.
+>=20
+> Change in v4:
+> * Rewrite the change log and add comments to the export (Dave Hansen).
+> ---
+> arch/x86/include/asm/cpu_entry_area.h | 51 +++++++++++++--------------
+> arch/x86/mm/cpu_entry_area.c          | 25 +++++++++++++
+> 2 files changed, 50 insertions(+), 26 deletions(-)
+>=20
+> diff --git a/arch/x86/include/asm/cpu_entry_area.h b/arch/x86/include/asm/=
+cpu_entry_area.h
+> index d0f884c28178..58cd71144e5e 100644
+> --- a/arch/x86/include/asm/cpu_entry_area.h
+> +++ b/arch/x86/include/asm/cpu_entry_area.h
+> @@ -16,6 +16,19 @@
+> #define VC_EXCEPTION_STKSZ    0
+> #endif
+>=20
+> +/*
+> + * The exception stack ordering in [cea_]exception_stacks
+> + */
+> +enum exception_stack_ordering {
+> +    ESTACK_DF,
+> +    ESTACK_NMI,
+> +    ESTACK_DB,
+> +    ESTACK_MCE,
+> +    ESTACK_VC,
+> +    ESTACK_VC2,
+> +    N_EXCEPTION_STACKS
+> +};
 > +
-> +struct kvm_memory_attributes2 {
-> +	__u64 address;
-> +	__u64 size;
-> +	__u64 attributes;
-> +	__u64 flags;
-> +	__u64 reserved[4];
+> /* Macro to enforce the same ordering and stack sizes */
+> #define ESTACKS_MEMBERS(guardsize, optional_stack_size)        \
+>    char    ESTACK_DF_stack_guard[guardsize];        \
+> @@ -39,37 +52,29 @@ struct exception_stacks {
+>=20
+> /* The effective cpu entry area mapping with guard pages. */
+> struct cea_exception_stacks {
+> -    ESTACKS_MEMBERS(PAGE_SIZE, EXCEPTION_STKSZ)
+> -};
+> -
+> -/*
+> - * The exception stack ordering in [cea_]exception_stacks
+> - */
+> -enum exception_stack_ordering {
+> -    ESTACK_DF,
+> -    ESTACK_NMI,
+> -    ESTACK_DB,
+> -    ESTACK_MCE,
+> -    ESTACK_VC,
+> -    ESTACK_VC2,
+> -    N_EXCEPTION_STACKS
+> +    union{
+> +        struct {
+> +            ESTACKS_MEMBERS(PAGE_SIZE, EXCEPTION_STKSZ)
+> +        };
+> +        struct {
+> +            char stack_guard[PAGE_SIZE];
+> +            char stack[EXCEPTION_STKSZ];
+> +        } event_stacks[N_EXCEPTION_STACKS];
+> +    };
+> };
+>=20
+> #define CEA_ESTACK_SIZE(st)                    \
+>    sizeof(((struct cea_exception_stacks *)0)->st## _stack)
+>=20
+> -#define CEA_ESTACK_BOT(ceastp, st)                \
+> -    ((unsigned long)&(ceastp)->st## _stack)
+> -
+> -#define CEA_ESTACK_TOP(ceastp, st)                \
+> -    (CEA_ESTACK_BOT(ceastp, st) + CEA_ESTACK_SIZE(st))
+> -
+> #define CEA_ESTACK_OFFS(st)                    \
+>    offsetof(struct cea_exception_stacks, st## _stack)
+>=20
+> #define CEA_ESTACK_PAGES                    \
+>    (sizeof(struct cea_exception_stacks) / PAGE_SIZE)
+>=20
+> +extern unsigned long __this_cpu_ist_top_va(enum exception_stack_ordering s=
+tack);
+> +extern unsigned long __this_cpu_ist_bottom_va(enum exception_stack_orderi=
+ng stack);
+> +
+> #endif
+>=20
+> #ifdef CONFIG_X86_32
+> @@ -144,10 +149,4 @@ static __always_inline struct entry_stack *cpu_entry_=
+stack(int cpu)
+>    return &get_cpu_entry_area(cpu)->entry_stack_page.stack;
+> }
+>=20
+> -#define __this_cpu_ist_top_va(name)                    \
+> -    CEA_ESTACK_TOP(__this_cpu_read(cea_exception_stacks), name)
+> -
+> -#define __this_cpu_ist_bottom_va(name)                    \
+> -    CEA_ESTACK_BOT(__this_cpu_read(cea_exception_stacks), name)
+> -
+> #endif
+> diff --git a/arch/x86/mm/cpu_entry_area.c b/arch/x86/mm/cpu_entry_area.c
+> index 9fa371af8abc..595c2e03ddd5 100644
+> --- a/arch/x86/mm/cpu_entry_area.c
+> +++ b/arch/x86/mm/cpu_entry_area.c
+> @@ -18,6 +18,31 @@ static DEFINE_PER_CPU_PAGE_ALIGNED(struct entry_stack_p=
+age, entry_stack_storage)
+> static DEFINE_PER_CPU_PAGE_ALIGNED(struct exception_stacks, exception_stac=
+ks);
+> DEFINE_PER_CPU(struct cea_exception_stacks*, cea_exception_stacks);
+>=20
+> +/*
+> + * FRED introduced new fields in the host-state area of the VMCS for
+> + * stack levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively
+> + * corresponding to per CPU stacks for #DB, NMI and #DF.  KVM must
+> + * populate these each time a vCPU is loaded onto a CPU.
+> + *
+> + * Called from entry code, so must be noinstr.
+> + */
+> +noinstr unsigned long __this_cpu_ist_bottom_va(enum exception_stack_order=
+ing stack)
+> +{
+> +    struct cea_exception_stacks *s;
+> +
+> +    BUILD_BUG_ON(ESTACK_DF !=3D 0);
+> +
+> +    s =3D __this_cpu_read(cea_exception_stacks);
+> +
+> +    return (unsigned long)&s->event_stacks[stack].stack;
+> +}
+> +
+> +noinstr unsigned long __this_cpu_ist_top_va(enum exception_stack_ordering=
+ stack)
+> +{
+> +    return __this_cpu_ist_bottom_va(stack) + EXCEPTION_STKSZ;
+> +}
+> +EXPORT_SYMBOL(__this_cpu_ist_top_va);
+> +
+> static DEFINE_PER_CPU_READ_MOSTLY(unsigned long, _cea_offset);
+>=20
+> static __always_inline unsigned int cea_offset(unsigned int cpu)
+> --
+> 2.51.0
+>=20
+>=20
 
-Maybe be paranoid and reserve 12 u64s?
 
