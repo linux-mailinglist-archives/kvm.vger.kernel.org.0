@@ -1,108 +1,139 @@
-Return-Path: <kvm+bounces-60887-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60888-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1E5EC01B29
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 16:16:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E8C5C01C2C
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 16:28:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D512518825D4
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 14:16:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 277D13B8C44
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 14:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B9A329C6A;
-	Thu, 23 Oct 2025 14:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F28632ABC3;
+	Thu, 23 Oct 2025 14:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QTgeDPgE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WlxHAt0E"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF848328B5F;
-	Thu, 23 Oct 2025 14:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D362C08BA;
+	Thu, 23 Oct 2025 14:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761228973; cv=none; b=YEBZMo7y0EWPnluFeMxGwMlkZFdfXQK4gHS8xFfoq9Uik+jbnopt40NqHnRnfRFh1775bO+aKfqNurSSmhzsy8qDyuW+MEanLCrf+pu4PsQkWrRWZTaMMJXZNLDPQrfOz5wuByXzhXn4/6RkzVoj9JQucysCUv8uyS0VisVWlMA=
+	t=1761229261; cv=none; b=mbvcXErvcHN7x5fR0NVIQbdV5eynlEmZUYlZhXk/nAp0p5bIKrr5NV3LLhe8hdqt5w0/Yt5G4Ff+bgQRoURLT2E3krZl8UH/nE658/xUBo374j8i9byLjw26AopTKPvxWsjTFIGHvIUN9gYwedjvMGsKCH9tuOz4mvCSNdtmiF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761228973; c=relaxed/simple;
-	bh=t5oB8u6KOBHxdh8uj3il37PAEyxoN25MKxzOJAmB3Vk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mx4SUawmZAvyXxuLk0mlckfAjymOFx/dQ8g0ZgOqzP4oskzQgCtHgW80EqJlDt6S4Rerqk12NOsJKfYZ8Rh6itVtKIE0vdwt5ojyhwLhxxcF+16nNv69yeUehwLaIsX3IHonAMy5UcOM8KrPF9AEbbOWLvqSwvhEYqj+zLm5DXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QTgeDPgE; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=uQSt7hl0x/heUJPTydNKzraeSQQOcHq+GQp+Qtdpe+s=; b=QTgeDPgEJ1OJ0mwomA/hngBZUw
-	fmlS9WzhTA9qfGd9KIAkwXefVgOd0BNCGUqQ3rvC4CfK5bBEppHW+QDM5a03ACNAIarBHLwThqbm8
-	YdTUMQ9ZOG6Pxi+vZjKDzqXOMrxNimGMLAtZOsO6l6bpABn/ABV6Nx5DHrcdc9TlZ6w5CSvshybQ5
-	5kHE/oON7+n8qB94yW4fNr44eO5kNJlP58V9ohvVYTofmFuxpaWPls/FUUYJVQOrUOkdHCNTJA5LR
-	A4pNlYYxF7hyhUN9ZRXbx0B1lyP5CvgoRNtqR0eCx79qRNTjmYT1/wVyeeG0DFaCCChDLB6aE5S4A
-	+2D7GC1w==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vBw6b-00000004vem-04lr;
-	Thu, 23 Oct 2025 14:15:54 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id EF70630039F; Thu, 23 Oct 2025 16:15:52 +0200 (CEST)
-Date: Thu, 23 Oct 2025 16:15:52 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org, pbonzini@redhat.com,
-	corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	luto@kernel.org, andrew.cooper3@citrix.com, chao.gao@intel.com,
-	hch@infradead.org
-Subject: Re: [PATCH v8 05/21] x86/cea: Export API for per-CPU exception
- stacks for KVM
-Message-ID: <20251023141552.GA3245006@noisy.programming.kicks-ass.net>
-References: <20251023080627.GV3245006@noisy.programming.kicks-ass.net>
- <C28589B9-F758-4851-A6FD-41001C99137D@zytor.com>
- <aPo2xlsq0PFdx31u@google.com>
+	s=arc-20240116; t=1761229261; c=relaxed/simple;
+	bh=MoezKNfdkUtsNKTPQI5tJ50Aziu4yWWFWjvh13jJ15s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lq5Hsng8cTWitbycGWxUIq0sPo2nu9tiSgqHJXO5Wtn+NhGhFKm2hElb/tkSVSdaREidBkpr93lM/6VdhQ1is5ySrfFCFB/oVwb56Drsa8LSZ+HihGsOpTfdfggHDOrLN6fHO83uVR/Ub8AWNUsAszplq2N/ib0Uku5XEK38/EE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WlxHAt0E; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761229260; x=1792765260;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=MoezKNfdkUtsNKTPQI5tJ50Aziu4yWWFWjvh13jJ15s=;
+  b=WlxHAt0EW1qO450Qbl+Nhnw7JEO+Faj+bBwWxnj9uhtnP9UACovr9a4M
+   61dR+bXVC7cFTOuWT8xvBL/UbaHIDAuIV1rxJeDg6EM/9g7z+fFheokyu
+   FwwmqOnH1l7ugjnCadrWg700ZKobEdjhD4SzIUtgXFQSpc1dWoH+6HyUB
+   8Z6xACqGmN/k8wFLP6xFDVdLNA+33oG77VsQ/7l4vc0rM7zHFZXOsv+Uf
+   ViuJYUGfRSLW6cx4mgCcVH2bIq53T/GAYS4bspZWpyURqjMtd/C9awOHt
+   UHZSKZfKOH/cNxherPJht3EWGiY+Lxd7GW5mDOi/Rfh7KqDrp0aXhn3xt
+   Q==;
+X-CSE-ConnectionGUID: 7HNTnkIPSQ6xcrMtTlhhbA==
+X-CSE-MsgGUID: ZKBdrPrGTm2v0A+wbI+Z/w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="50978285"
+X-IronPort-AV: E=Sophos;i="6.19,249,1754982000"; 
+   d="scan'208";a="50978285"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 07:20:49 -0700
+X-CSE-ConnectionGUID: dJ3OQvWoRwWd3Mh0vvxkFQ==
+X-CSE-MsgGUID: ozqvHb8fRxCQL1BurpHtPA==
+X-ExtLoop1: 1
+Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.125.108.251]) ([10.125.108.251])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 07:20:48 -0700
+Message-ID: <bd629133-0ddc-47fe-b6e1-24ec8adbea67@intel.com>
+Date: Thu, 23 Oct 2025 07:20:48 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aPo2xlsq0PFdx31u@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 04/21] x86/cea: Prefix event stack names with ESTACK_
+To: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org
+Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+ peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com,
+ hch@infradead.org
+References: <20251014010950.1568389-1-xin@zytor.com>
+ <20251014010950.1568389-5-xin@zytor.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20251014010950.1568389-5-xin@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 23, 2025 at 07:08:06AM -0700, Sean Christopherson wrote:
-> On Thu, Oct 23, 2025, Xin Li wrote:
-> > 
-> > >> FRED introduced new fields in the host-state area of the VMCS for stack
-> > >> levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively corresponding to
-> > >> per-CPU exception stacks for #DB, NMI and #DF.  KVM must populate these
-> > >> fields each time a vCPU is loaded onto a CPU.
-> > > 
-> > >> +noinstr unsigned long __this_cpu_ist_top_va(enum exception_stack_ordering stack)
-> > >> +{
-> > >> +    return __this_cpu_ist_bottom_va(stack) + EXCEPTION_STKSZ;
-> > >> +}
-> > >> +EXPORT_SYMBOL(__this_cpu_ist_top_va);
-> > > 
-> > > This has no business being a !GPL export. But please use:
-> > > 
-> > > EXPORT_SYMBOL_FOR_MODULES(__this_cpu_ist_top_val, "kvm");
-> > > 
-> > > (or "kvm-intel", depending on which actual module ends up needing this
-> > > symbol).
-> > 
-> > Will do “kvm-intel” because that is the only module uses the APIs.
+On 10/13/25 18:09, Xin Li (Intel) wrote:
+> Add the ESTACK_ prefix to event stack names to improve clarity and
+> readability.  Without the prefix, names like DF, NMI, and DB are too
+> brief and potentially ambiguous.
 > 
-> Alternatively, what about a slightly more automated approach, at the cost of some
-> precision?  The below adds EXPORT_SYMBOL_FOR_KVM and only generates exports for
-> pieces of KVM that will be build as a module.  The loss of precision is that a
-> symbol that's used by one KVM module would get exported for all KVM modules, but
-> IMO the ease of maintenance would be worth a few "unnecessary" exports.  We could
-> also add e.g. EXPORT_SYMBOL_FOR_KVM_{AMD,INTEL}, but I don't think that adds much
-> value over having just EXPORT_SYMBOL_FOR_KVM().
+> This renaming also prepares for converting __this_cpu_ist_top_va from
+> a macro into a function that accepts an enum exception_stack_ordering
+> argument, without requiring changes to existing callsites.
 
-Works for me.
+Yup, the rename looks good.
+
+Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
 
