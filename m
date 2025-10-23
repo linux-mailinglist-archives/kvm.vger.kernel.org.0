@@ -1,425 +1,346 @@
-Return-Path: <kvm+bounces-60901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E1C9C02C10
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 19:38:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F8E9C02EFC
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 20:28:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B45FE1A015B5
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 17:38:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5AF33B094D
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 18:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12AB934A76E;
-	Thu, 23 Oct 2025 17:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EEFF34CFC5;
+	Thu, 23 Oct 2025 18:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="clt6I3it"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cpL9n6XP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D5B236453;
-	Thu, 23 Oct 2025 17:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761241082; cv=fail; b=HFZqDxuJZYmAF24C3NFLyU4IN/jCFtPDeGc+eiwoLJVE8L67UGobFsG9HlTTQ05zBKWyqcZV084eCarnH4DV/Nfqh3Ii4NAvpVygaq/+Aa7p9Fbi9UolxEwnOdO5sGCpRWyMHvcXm0gSY3MIYKH5ztQg7xHiernTrWGUUDhAoe0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761241082; c=relaxed/simple;
-	bh=BWltu0/2nTjb032X/G1Z7VnHbXl11yhTm9aMyIL0gbY=;
-	h=Message-ID:Date:From:Subject:To:CC:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NDGB6Et0hmHBnRFQYsRQ7N/ZjPW5xtFoi3JNmVbhSaGMPCXahUjz5MLUn5+Jvagl3D/osCdL/gbOAbNCRF+jVnbfL9DCcWoeGFokA5UkQ2FJsbJYjsDgWZtjT8CfjLDhLjY1VEoTaUhK9td8r8qIzDIV9wywFXKXjhksYsuxzGs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=clt6I3it; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761241081; x=1792777081;
-  h=message-id:date:from:subject:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=BWltu0/2nTjb032X/G1Z7VnHbXl11yhTm9aMyIL0gbY=;
-  b=clt6I3it/ETyy9qgOjS8iZmaVz4yDD3SmvRKI8I9ggAwxMtCcb675/5h
-   NWFAy2Z9yUyY1hggaSpBk0cb7/ru1AVRIWbq3pk53WgP5vP4VzHv1u9bg
-   +JOY2ULoQ8AjQ6DIJyUuqAcXSLdUHGXlcZnRGhT+qcDkAGT0CbycVL+1L
-   cC6iaZyzXQiGauYzgB41ZlDUEcs0bcVzO2impkyz8Wg3sMSZzz99Vd7Z6
-   YNbSlShWOmZLqSBGSaChhW1JrUutZ7w/Zw6Irzt06wm+tRoi3rY0F7z35
-   Q175eSXqUrjwlBfZ4Y7S2tJLZhRvN5pwTF+aSPmGNKRIWGib1u6d9SALR
-   g==;
-X-CSE-ConnectionGUID: w3YC3reiQlmyAniJ0aWlFA==
-X-CSE-MsgGUID: bpf+v+aGT6uSYlRNruHM6Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="73710197"
-X-IronPort-AV: E=Sophos;i="6.19,250,1754982000"; 
-   d="scan'208";a="73710197"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 10:38:00 -0700
-X-CSE-ConnectionGUID: DXkr89KdTkmpcJkK6IHqEw==
-X-CSE-MsgGUID: xAf8R4vCTMKLZWa7c+/lvg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,250,1754982000"; 
-   d="scan'208";a="188510585"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 10:38:00 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 23 Oct 2025 10:37:59 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Thu, 23 Oct 2025 10:37:59 -0700
-Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.58) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 23 Oct 2025 10:37:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZLlP4DD+F5To2EHDpC8o5yASvGQkFuYtdS+7UuJBcZoJGyDF4uDhQRfa7uKIzS8DQJkw5NYKdcBfjkziXLF5ge3Bm9m41Vl55/AktxDWx/QnDWgROApvvhWKVca4H3Ax3mWnJ83uuiDSIclXYmccBnq3fdYq6I5B3lvV+Es4+lx8e3KYs+BeVrfZs6/gnoqmsgoeLmEpnFkl3f+n+AY2v9Hb9mgAlNoGMQaO4qJuavD/WLh1+hsaqippUn+V92lhSmrDNWqbEqtLcRJ4gOAiXRDCizt1kAsIpg2jnbSTO2u8bZwh+zTWv9vkYaDeb59tkisM07cZ91WN4/siuk1EjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TrgbKWTMRz3tDCSXj/GysUStWFEQAFHlbXh1VzLoi/4=;
- b=wnGXRBrOp7gfm2MP2K1TFq9/qnLgd2ktoQ3c54i49tbL6DeeR6VxbW4eMgghnKCMa6zn1g0otf3LKudaowol6Gbb0x+gu88Tq0hLbHsFa/SXBOkjmZF3SNAxrV3b2yu28MaWN1c8+YSVxCCiKmxR7OM2aK0hoHlYIZLfAbhMafhdpV88hlGe5JU4Q0CM0GbIAtXWxLVJlpKwQTYAL2/wRWDnKWVqxwubgugDB8lWY2Ze7B1mj3y7VURhKnRiy4NZhRRFyRNCH0eklBqnoVzvDYn4jaBxXfkNTfxwgA/mz7ZsXT/RFSaBsCK9umstKX/bvHYeqyn2+854kaJZWQWecQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN0PR11MB6011.namprd11.prod.outlook.com (2603:10b6:208:372::6)
- by SA1PR11MB6944.namprd11.prod.outlook.com (2603:10b6:806:2bb::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.12; Thu, 23 Oct
- 2025 17:37:57 +0000
-Received: from MN0PR11MB6011.namprd11.prod.outlook.com
- ([fe80::bbbc:5368:4433:4267]) by MN0PR11MB6011.namprd11.prod.outlook.com
- ([fe80::bbbc:5368:4433:4267%6]) with mapi id 15.20.9253.011; Thu, 23 Oct 2025
- 17:37:56 +0000
-Message-ID: <687d4d54-09d6-4e30-921b-66c0e9bd0d51@intel.com>
-Date: Thu, 23 Oct 2025 19:37:48 +0200
-User-Agent: Mozilla Thunderbird
-From: Michal Wajdeczko <michal.wajdeczko@intel.com>
-Subject: Re: [PATCH v2 11/26] drm/xe/pf: Increase PF GuC Buffer Cache size and
- use it for VF migration
-To: =?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>, "Alex
- Williamson" <alex.williamson@redhat.com>, Lucas De Marchi
-	<lucas.demarchi@intel.com>, =?UTF-8?Q?Thomas_Hellstr=C3=B6m?=
-	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
-	<kevin.tian@intel.com>, <intel-xe@lists.freedesktop.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
-	<matthew.brost@intel.com>
-CC: <dri-devel@lists.freedesktop.org>, Jani Nikula
-	<jani.nikula@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
- Laguna" <lukasz.laguna@intel.com>
-References: <20251021224133.577765-1-michal.winiarski@intel.com>
- <20251021224133.577765-12-michal.winiarski@intel.com>
-Content-Language: en-US
-In-Reply-To: <20251021224133.577765-12-michal.winiarski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: VIYP296CA0001.AUTP296.PROD.OUTLOOK.COM
- (2603:10a6:800:29d::17) To MN0PR11MB6011.namprd11.prod.outlook.com
- (2603:10b6:208:372::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C18134A3C5
+	for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 18:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761244088; cv=none; b=pJ5UfsAK1K25T9OZu/BSSAH+kwhNgbfiKtTdEVSmjbuGw5tnWUgx8DdkXzXopZMIxvhn7750R80tQ3UGbuMscej+ZzuAdAyr49FdH22tGryx9P+l3ftdbb9xZQ+KUi8F+p7Kq1QctPn+QBj2ntiOaGs7iQTTQv/3j0VAY3dAuek=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761244088; c=relaxed/simple;
+	bh=E8zs7SOpm1dhtUHfmzGbH/EMBHlnGgv32b4JqVbEuLo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=WZqZJR+DA70nMMG8hshZNcAS16ky+eTz9ZkLmjRg1SBE1V3WFLReygUiZCY2wUN9AJD556pCvlCTzk7+VlMrvDc0BgliQOwNo6Ejaz4FrC5d6ivV00WA6XqHW7z7ZPTSZ04T8Sw9ze8Okhk8J8g236EjFFfa0UQsp8551BGZtok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cpL9n6XP; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-27ee41e0798so15366705ad.1
+        for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 11:28:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761244084; x=1761848884; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vvFV8E+b7v3LABJUzfm2F4mViB8B92hiY0bikMbHgrc=;
+        b=cpL9n6XPkpWoQrAj2zkqUCOnEhjcEV7P5ZJupYA9kCmeg63KUffKuynNSgxitpycG7
+         qIR7bxTCFgvkb84o606oCKlsjWj/fgqqYs/QFa32AcVUi2108fTTl5259A5moFJIWXB9
+         iKiMwPsKd6QuRyGyAyNWwR+K8Tq0PXltxb8thmwqnc5BLXLYCU63UG3zeUFzspWsCpfZ
+         gsnoxyqWLucvcjoir316L/4/ndm1tZat6TRUrm0KpsIPwKEoR48893/noYkWPsM//+Ms
+         AGO/bLXlBo6AHuGxUYMieF/xLiy77a5S4x+uwZFhXu8+gdd9AGgI8meIR0vqoUN46xil
+         b6tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761244084; x=1761848884;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vvFV8E+b7v3LABJUzfm2F4mViB8B92hiY0bikMbHgrc=;
+        b=ihtrZgYK59WkDQhjnjYowYBA1E09gnGqC/8aHMsk0xEHRLub/Mkwcn2D0HWcO73GSQ
+         JDjmYXQV6AiZIDKTgYKNcG3tFByQkLxgJCA0901t14iGjxAsQyLoNLirowTdxq5d9gU6
+         2xN9iZ4fw00Vu0MoYmr3sWiIdtMPspLUSr/yMF3H0dIeEtjnptm/W/LHepxGjMSY34XL
+         4Rn/Mh3Vsp6JY0Hv5Yc4tVwsbaZ1RRzWUF2LOaVt5UpB+SDDWfarud7DFpj5XaHhfZtl
+         DPXUQB9Yw5kVmvvU4XPVr0up2auKWvFvY4h/LKZzOtYnUiVWu0HWkXNuZI69M6O8N4Ic
+         iYKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDnTwCpGn+LQeJ/Aplvrc9+7u1j05jz6ue6VB2Qyj0Yvgxoy5G/qWXW+y82ggqYqM/iMo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQUL+I/+GPeOQfp3AKPMx0mmqaa+z7XOIIMrIt6JAcQHUSCFDO
+	M6KPqC32vFlNvBybUgRa4m4axjP68UXU4mh+54ntwIRwE9/OcDR8b/E7L8rGb4PR
+X-Gm-Gg: ASbGnctRH+e3QsTvHAdoIhsOor7Ip891GSR0lF1TGlR90WjU3JlBVlhOq+cADMzAiy4
+	JomUMNrsGl0YYExdemGwCbNgVnL6cJOH72RYdBc5AyUC8+evt1DEyB0m52CUfCt22r27grVDbbk
+	t6DzbhtZ6XLYlV8Yff7PAhswX/lO8zoTsiFPASpOL7wELNc3bvvV+w1cDrH3LaJBCo+ItwiCykG
+	/qyOLmjSmL1gVl+NCga/enNQ/NBTAW+B2EXY3YOXROUbhuOMqkkBbxkfR/V1dWGxM/JjytymbRb
+	6bSjsA17hjbinbPWPJsUTKIutKCorWzI9JxeOC/vi8S2gtO2TIrWlJHKE+27keG+IkE+7cozuby
+	bxw3D3J9TIrFw5eJCIr4mmgKjx0Q+kVLNNeRKftCaOy7vp1uHSuaoIZ2HnK4JOBS2MD7DimeZ8Y
+	vwtSrHjk9M
+X-Google-Smtp-Source: AGHT+IGVmTvJcaaeium/CjIOh4QxM0abBhdJ4Oh9ByAkPzM+Q8M0uXOXPNdLcRH+7a1HhSHbc6Gzaw==
+X-Received: by 2002:a17:903:3546:b0:267:e097:7a9c with SMTP id d9443c01a7336-290cc6d4ba8mr332311835ad.53.1761244083585;
+        Thu, 23 Oct 2025 11:28:03 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:74::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2946e0f64f9sm30846755ad.86.2025.10.23.11.28.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Oct 2025 11:28:03 -0700 (PDT)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: [PATCH net-next v8 00/14] vsock: add namespace support to
+ vhost-vsock
+Date: Thu, 23 Oct 2025 11:27:39 -0700
+Message-Id: <20251023-vsock-vmtest-v8-0-dea984d02bb0@meta.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR11MB6011:EE_|SA1PR11MB6944:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2008c787-5e0f-4dc4-0f68-08de125ae68c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?bDJaUFNJYm9XK3RONVc0MUVEdVo1Z0xhdmdCSzR0eUZVNmJrc2tXdDFoUEJM?=
- =?utf-8?B?K3lrb0VYTXhid2w3ZllUQTBocXNMK0ZQQWNQNjZta0RrUTkxWHlSSjF3VnJ6?=
- =?utf-8?B?TmhXVktkajBhc25ldEZaSG05SUdxVFJjSmRmeXBsT244cjBybncya0ZjcFNK?=
- =?utf-8?B?c2MxdzZOek1reFQ2cTlVcFppQ0lDbmtGWTJ4MkY3dmNIUkl1NER6YUpWNGtp?=
- =?utf-8?B?ckErMGNJZTcySkE4Sk1jT1VLc3d4RXVDRXBEWGJPWVlxTDNPWWxIa3NMUTJz?=
- =?utf-8?B?OEd1clVPUXRxR2ovUHFhREYwN29JamZkY0R6YzZDSzg2RVIxRlg1YytBcnBU?=
- =?utf-8?B?WVBqNXZxY25HMUx5YTNTcDFGY2x3SHFxSGZIWHA1VXRzZjBCckdHUlFUY2lO?=
- =?utf-8?B?T2JQWlR3Ni9VM1RLNHY1b0FVU0V4QXN0NW9VdjRGV1FCMEZpRVBGdXpmVVFq?=
- =?utf-8?B?SGcwSUNDRVdVVmRZN3dJc3ZTb0JBRjNqY0phN28zenA3aVNxVjVXdkthTnRW?=
- =?utf-8?B?b0xMR29wdXAxY1JhYlB1a2tScXJpV1VNdXk2dW1vNmplcGgxWEhVS1gyakpF?=
- =?utf-8?B?RmRkQkdrZHZJY2tLMGo1Rm9HQTZLSW9Id3gzTFJic1Y0dUhYaUFRSjNGeWlV?=
- =?utf-8?B?WDRrdHFxMk9rS2IvbHRvNjIrc3hHVGJkTURYZzhNMEIzb1JFTGpqOGk1NnVr?=
- =?utf-8?B?Z09oUkdqbTYreXZOcktuVDZXQjJ2T1VMc0lTWmJrNzA0L2pMbHM3ZUhINzVV?=
- =?utf-8?B?bW01VlBCMlhHMlV2Qlk5amVpSUd0dlEwTWRWUHpQd0ZydW0wOVRWcFQ1SXpv?=
- =?utf-8?B?aUxTRW12dFphMHJwd21hZno4WS9PWldPbW1FM21FTTlTaXNxbWdYLzhJa0or?=
- =?utf-8?B?UHpGQ1RLY0lZNk15WjlvSG1xNGVrR1BhMC84S0h6Qzc2aDVSb2YvOWk3ZFN2?=
- =?utf-8?B?eVJSUlJ0eUxqdXQ0OXVSRFViUjUvc3J3cUk0WXV3bmdoY2dGL0laT2Q4R3pz?=
- =?utf-8?B?RkkxNVptcytITVovZUVQdldqR0EwMEtwOVRjbkNPb0hCanV0T0lkamRzQUYr?=
- =?utf-8?B?TjRoZDZlelNVTkRzZUs4N2xzdzNWUU5jTEkvdnFoSWNhSC9QcjFLWmVyanlw?=
- =?utf-8?B?SHFUQ2tSZFhLMzRZZitCek5aYmlqVkdtY20vZDBlcTVycTR3K3hnOStmOWRW?=
- =?utf-8?B?TlMrYTgxWDBoN1Q0dUZaWjdxVWNBUWY4OXk1WUhFQisvaHNGSUFWcy90Ynl0?=
- =?utf-8?B?Q1A4MThZZmw1UU1LY2EwUFBJWEJyYzRHQjBPTDFlNlJ6Ykd2TUFtTFJwa0E1?=
- =?utf-8?B?RHhZWGVTU2ZFS2dGaXk0MXBpK3JZZHdqR290VW1hTWdadUlHSmpUUTNJRjFr?=
- =?utf-8?B?eHNBbXNSRXhlaWhHUDVBVSsxZXBDWEVhaThkazR4eFhrT2paaC9VT0hWdlZN?=
- =?utf-8?B?dHZvRWM0YUkxSWdhK0IvR29IS3pBTEl1M3h3M2h0TjAxK0xwUGJ0MGJHZjY2?=
- =?utf-8?B?algxdExxakhZYkF6U2ErNTNDY1AvMGFOeVEvdkxBUzhhWU1PWkFTVWtrTlA1?=
- =?utf-8?B?N1hZM2VyS21KbUJrWWI3Ylhpd3o1NjJSSEJHRzlxa0pjcHJhTXNSTVl6ek5J?=
- =?utf-8?B?d1IvRVkweHNac0JRUG9Dd0w2SDR2VitGOWVrUVpIWWlXaFJPbmhhREI5cE51?=
- =?utf-8?B?bTc1cW5UVnliV0VyeTZ2RVdOMENuSHY2VE5jN3ZGaVJtOUhkNEc0VHhjY0dJ?=
- =?utf-8?B?WXNJWVdVRWdjVkxhYWVSeFk1bkJoc0pqZHhaR3NlWDBRWGhwZ0h1NUl6aW83?=
- =?utf-8?B?WXQwQjFHOTFINzJFWHkyeGpFaXp6eWwwcFpvNnVFcGZQejRKME4vSU5kU2Z4?=
- =?utf-8?B?aFNhYVFBTG1TdHRSNzU1NFlmV25xV1hoQ2ZqbytqSFRlTnA1N0JBcFgrdUVp?=
- =?utf-8?B?TlZjZEdzZ3M2eGVuRFlhZVRidGRKeXFldjRLd1pRWFdGanI4MEQrdlVFQkcz?=
- =?utf-8?Q?hepX9UZSHgUlwhuIT0/M0s4Msfe0Xo=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB6011.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R1A4U2NuVVJnV0s4TmxkQ1lHRWdTSXNyTzYxQzJVdUs5K0M4em5LZnVraWhm?=
- =?utf-8?B?ZjBzc2JIWk5KVGgvWnByL2tmTlg3UHpTUFpWd3pRcVhyUW1tcllKV3lhRzdi?=
- =?utf-8?B?UXUzNkpBUStOakdUWCtWd2hFTlhCUGxkWmgyaTlaS2ExTHNoL0VFa080L2hE?=
- =?utf-8?B?alJDdXRXZXZpWHlGelZISGZUcXBnb3QrTnhmdjc4NUlSQVNaeFQ1OUlRcEk2?=
- =?utf-8?B?bXlCZU95QklQUkhyNnFJSC92eHhLR3UwSWJYTkdTcFN6TTcwNStWSUpzMG9D?=
- =?utf-8?B?eDlWdmFHRUhNQVozMDFZMjgzTFlMWVNJd09GbW05UVVHU254cmZ1R3UwTjNa?=
- =?utf-8?B?eVhQcFFRaGMvdzNzcThoL3pBSThJVENkdTgxUWQydmhDME1QWFYzQTFuRDFW?=
- =?utf-8?B?S3ozYzlkV1VnbEJjcjNxb1h6a2gwU1FLU09ZQm1uMjgvdzgxMk1qMmdkN1Bv?=
- =?utf-8?B?VFRZYmY0dTFCc0QyNHp3WHphU0prV3JmU2NPN0xvY2d5M014MzFqQVpTRUxo?=
- =?utf-8?B?K2VTL2UwSDFaSURuUERDdWZETVVOQUQ3a1pIMkdJblFwSnM5eUJ4cjA4OHk0?=
- =?utf-8?B?bDByZUM0QWgzYUg4NVVLZDQ3N2U3czRya2lxS2QyNjZEQ3YyWktmRllKejI3?=
- =?utf-8?B?cDQxZnF6MGxBa25idVlJUUtJTEE2YXNKbEhwSWNsUHR1NFB5Uno3OEsza0c5?=
- =?utf-8?B?N0M4R0xmb1NDdW53SE9KSWd1WWJGekRQMUtPbzJ1Qnhrank4djc3NDdKWUJl?=
- =?utf-8?B?citrcDlRblVxTkduSTN0VGhOTTN4NDJzK1V5OXJCeUhUNzMzQjVKOGJxVHFC?=
- =?utf-8?B?Q1Z1Wkc2YzkvZHZQcGNxa2w0Wk8xdDhqb1VocFBjRkJzV2huWUV4YTAzNkV1?=
- =?utf-8?B?YUVwOFN6TW5YVzZtZkhIeUgrRDY5cEUzY0FLUnRXcWxKbkcwUk9YSWhCRVJU?=
- =?utf-8?B?cHNXcnlQOHlMMGdVbGxXS1F0MG1OUU5YRzFvbkdDTnlOOXhOajZZR1dhYk9v?=
- =?utf-8?B?YjhPek5LT2wrT0NiT0U3Z2svanNYSzIyYmlNcUxOcHF4M1N4WXRaMEV6U2M1?=
- =?utf-8?B?WnVyQ0d2UUtSaVVDUi9WN2JzOEJUN2JBT0RORHhYNkxTNWtHNjFZZGE2M1VQ?=
- =?utf-8?B?dHdNd3kvS1RqS2F0UVVVK1piTWpWWktKV29ZL0NZVElpR2tGbEFYbGJEUWd4?=
- =?utf-8?B?M0QySWNFZlRTUmNsWUI3Zlk4SWd5YlJFYlZuanErWGcwQ1J1YlMyL1A2NnNT?=
- =?utf-8?B?ME9OZkZIYzRaNldLOUVDc2NFZ2xkU1BuejFFRldjR0lYUUZjWlVzL2M5bnJr?=
- =?utf-8?B?S2VDUlVFK0xTeklzbDU2YjAzU2I5dmloRWJZWG5vbUNqdHFWdlpMVWJlYWRL?=
- =?utf-8?B?VENwS2ZZU1pvVVliQzBhSCtZQnBnOXJ3RWdTRHlGaDZUQUo5cS9QT0h0WVUw?=
- =?utf-8?B?VFk5QUJIaEdqSGRBUzQ1UG1xcVNtNGhTMHhrMi9kRjRXSFZKOXNvR3RKWTVa?=
- =?utf-8?B?R1RZZGhQWGN5SHRZc3lsZCtacVE4bVlyVm04S1J2anlLdFB1VWZHNnV4Q29h?=
- =?utf-8?B?dG03UkFKWjV2L3JFYTF0SEswUEJrY3p0WlZhK2kzL0VwWkxtWEhVTjR1OFZv?=
- =?utf-8?B?MWM5ekpMWEs5NXpIOWpINGdiZnJYcW1tTzdVZUtEMjhNYlhoSzArN1Zqdi9K?=
- =?utf-8?B?dXh4MWkrWXBzY09oTHlCWVFIV1BPNzhCQjU2TS8yL2h5eHBlVVNoN0pveEJT?=
- =?utf-8?B?VGtOTUdFb1BYbEQ4TlN3eEd2N1BuUCtNYjIyOXgwV2VONjVhc0Z0OGN5RXNq?=
- =?utf-8?B?TStDQUhKWDJmdEFMTEFhTU52RWpuWHhxc0tBRE50RzZoUkNJRmR5Zzg4dmw1?=
- =?utf-8?B?NHhITmhSeGhWYUdXbU9nbjBJVWNwMzNUYTJxTjFLSlAwa052QnEwMFV4VUVZ?=
- =?utf-8?B?aUFXL0xsS290MWlMZUlONFJEQkdybFlpbGVjRHc3ZW5PWUVYZGlzZDhWU2NW?=
- =?utf-8?B?SFFoNDREWVh3c3BPTDVEcVRrd0cxcFFhZ3p6QVVRYmh6WjJaait4SE1sbTBW?=
- =?utf-8?B?UXVJWlM1Z296eEtaMm9OejFPV0pRRjZWQXE2QUJNVjFnbVdLbzV1dWxLN1Jo?=
- =?utf-8?B?TmJKM1RNRHQrZ0lvWEIzV3VNZHhMNWR3eGlRNWdBcXRqek1sdzZhQzJlaW5i?=
- =?utf-8?B?d0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2008c787-5e0f-4dc4-0f68-08de125ae68c
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB6011.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2025 17:37:56.8450
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aTIxMdhywJFrtd/cfKycpAlpM30mQodWjU58Lu5MoCasLRb50ttUEEHtcYOb2s8rgxqQOYAFOxipvrNiD3CChghEEyDCdscnDmQFGdAihN0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6944
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAJxz+mgC/5WS3WrbQBBGX0XstafMzP5pTSl5j+KL/RklopGUa
+ lWREvzuxapJXDk3vV7OOcPyvakqcy9VHZs3Ncva134a1bFpD43KT3F8FOiLOjaKkS1qtrDWKf+
+ AdVikLpB0ZCpMyJnVoVEvs3T966b7rkZZYJTXRZ0OjXrq6zLNv7fOStv7pjSE/ypXAoJO29hSi
+ Sm0+eFxiP3zlzwNm2jlW9jvYAYCHZAie61J2j2sb2Bud7AGAmopdo6c7rTsYfMBW9yXDRA44Rg
+ 8O87F3cCH6/e1aO8gBLRBsqWYiOhhkCV+BO1NkPSOtUBgxNtsorFZ0mdB9ncQAqZoW0xSxKZd0
+ N0G98c6IAixo5yRdUD8JBjI3UEI6ExhSZjbUHZB/x4kZNqxfmMdJZ9ch+3N71x7/8Wczn8HOsv
+ PX33tl+tKB6k1bjM/Nl+vUr5Kqzx3F22FbdUQxwL98DJPqwwyLvUyVgQpksiH4ozT77lvlxtTr
+ AJ5GoZ+OTbBccw2xxCizVq8cYHJps5469kYNMilKzao0/n8B79To5yXAwAA
+X-Change-ID: 20250325-vsock-vmtest-b3a21d2102c2
+To: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ "K. Y. Srinivasan" <kys@microsoft.com>, 
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+ Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
+ Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, berrange@redhat.com, 
+ Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.14.3
 
+This series adds namespace support to vhost-vsock and loopback. It does
+not add namespaces to any of the other guest transports (virtio-vsock,
+hyperv, or vmci).
 
+The current revision supports two modes: local and global. Local
+mode is complete isolation of namespaces, while global mode is complete
+sharing between namespaces of CIDs (the original behavior).
 
-On 10/22/2025 12:41 AM, Michał Winiarski wrote:
-> Contiguous PF GGTT VMAs can be scarce after creating VFs.
-> Increase the GuC buffer cache size to 4M for PF so that we can fit GuC
-> migration data (which currently maxes out at just under 4M) and use the
+The mode is set using /proc/sys/net/vsock/ns_mode.
 
-but the code below still uses 8M
+Modes are per-netns and write-once. This allows a system to configure
+namespaces independently (some may share CIDs, others are completely
+isolated). This also supports future possible mixed use cases, where
+there may be namespaces in global mode spinning up VMs while there are
+mixed mode namespaces that provide services to the VMs, but are not
+allowed to allocate from the global CID pool (this mode not implemented
+in this series).
 
-> cache instead of allocating fresh BOs.
-> 
-> Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
-> ---
->  drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c | 46 ++++++-------------
->  drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.h |  3 ++
->  drivers/gpu/drm/xe/xe_guc.c                   | 12 ++++-
->  3 files changed, 28 insertions(+), 33 deletions(-)
-> 
-> diff --git a/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c b/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c
-> index 4e26feb9c267f..04fad3126865c 100644
-> --- a/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c
-> +++ b/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c
-> @@ -11,7 +11,7 @@
->  #include "xe_gt_sriov_pf_helpers.h"
->  #include "xe_gt_sriov_pf_migration.h"
->  #include "xe_gt_sriov_printk.h"
-> -#include "xe_guc.h"
-> +#include "xe_guc_buf.h"
->  #include "xe_guc_ct.h"
->  #include "xe_sriov.h"
->  #include "xe_sriov_migration_data.h"
-> @@ -57,73 +57,55 @@ static int pf_send_guc_query_vf_state_size(struct xe_gt *gt, unsigned int vfid)
->  
->  /* Return: number of state dwords saved or a negative error code on failure */
->  static int pf_send_guc_save_vf_state(struct xe_gt *gt, unsigned int vfid,
-> -				     void *buff, size_t size)
-> +				     void *dst, size_t size)
->  {
->  	const int ndwords = size / sizeof(u32);
-> -	struct xe_tile *tile = gt_to_tile(gt);
-> -	struct xe_device *xe = tile_to_xe(tile);
->  	struct xe_guc *guc = &gt->uc.guc;
-> -	struct xe_bo *bo;
-> +	CLASS(xe_guc_buf, buf)(&guc->buf, ndwords);
->  	int ret;
->  
->  	xe_gt_assert(gt, size % sizeof(u32) == 0);
->  	xe_gt_assert(gt, size == ndwords * sizeof(u32));
->  
-> -	bo = xe_bo_create_pin_map_novm(xe, tile,
-> -				       ALIGN(size, PAGE_SIZE),
-> -				       ttm_bo_type_kernel,
-> -				       XE_BO_FLAG_SYSTEM |
-> -				       XE_BO_FLAG_GGTT |
-> -				       XE_BO_FLAG_GGTT_INVALIDATE, false);
-> -	if (IS_ERR(bo))
-> -		return PTR_ERR(bo);
-> +	if (!xe_guc_buf_is_valid(buf))
-> +		return -ENOBUFS;
-> +
-> +	memset(xe_guc_buf_cpu_ptr(buf), 0, size);
+If a socket or VM is created when a namespace is global but the
+namespace changes to local, the socket or VM will continue working
+normally. That is, the socket or VM assumes the mode behavior of the
+namespace at the time the socket/VM was created. The original mode is
+captured in vsock_create() and so occurs at the time of socket(2) and
+accept(2) for sockets and open(2) on /dev/vhost-vsock for VMs. This
+prevents a socket/VM connection from suddenly breaking due to a
+namespace mode change. Any new sockets/VMs created after the mode change
+will adopt the new mode's behavior.
 
-hmm, I didn't find in the GuC spec that this buffer must be zeroed, so why bother?
+Additionally, added tests for the new namespace features:
 
->  
->  	ret = guc_action_vf_save_restore(guc, vfid, GUC_PF_OPCODE_VF_SAVE,
-> -					 xe_bo_ggtt_addr(bo), ndwords);
-> +					 xe_guc_buf_flush(buf), ndwords);
->  	if (!ret)
->  		ret = -ENODATA;
->  	else if (ret > ndwords)
->  		ret = -EPROTO;
->  	else if (ret > 0)
-> -		xe_map_memcpy_from(xe, buff, &bo->vmap, 0, ret * sizeof(u32));
-> +		memcpy(dst, xe_guc_buf_sync_read(buf), ret * sizeof(u32));
+tools/testing/selftests/vsock/vmtest.sh
+1..30
+ok 1 vm_server_host_client
+ok 2 vm_client_host_server
+ok 3 vm_loopback
+ok 4 ns_host_vsock_ns_mode_ok
+ok 5 ns_host_vsock_ns_mode_write_once_ok
+ok 6 ns_global_same_cid_fails
+ok 7 ns_local_same_cid_ok
+ok 8 ns_global_local_same_cid_ok
+ok 9 ns_local_global_same_cid_ok
+ok 10 ns_diff_global_host_connect_to_global_vm_ok
+ok 11 ns_diff_global_host_connect_to_local_vm_fails
+ok 12 ns_diff_global_vm_connect_to_global_host_ok
+ok 13 ns_diff_global_vm_connect_to_local_host_fails
+ok 14 ns_diff_local_host_connect_to_local_vm_fails
+ok 15 ns_diff_local_vm_connect_to_local_host_fails
+ok 16 ns_diff_global_to_local_loopback_local_fails
+ok 17 ns_diff_local_to_global_loopback_fails
+ok 18 ns_diff_local_to_local_loopback_fails
+ok 19 ns_diff_global_to_global_loopback_ok
+ok 20 ns_same_local_loopback_ok
+ok 21 ns_same_local_host_connect_to_local_vm_ok
+ok 22 ns_same_local_vm_connect_to_local_host_ok
+ok 23 ns_mode_change_connection_continue_vm_ok
+ok 24 ns_mode_change_connection_continue_host_ok
+ok 25 ns_mode_change_connection_continue_both_ok
+ok 26 ns_delete_vm_ok
+ok 27 ns_delete_host_ok
+ok 28 ns_delete_both_ok
+ok 29 ns_loopback_global_global_late_module_load_ok
+ok 30 ns_loopback_local_local_late_module_load_fails
+SUMMARY: PASS=30 SKIP=0 FAIL=0
 
-nit: given this usage, maybe one day we should add optimized variant that copies directly to dst?
+Dependent on series:
+https://lore.kernel.org/all/20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com/
 
-	xe_guc_buf_sync_into(buf, dst, size);
+Thanks again for everyone's help and reviews!
 
->  
-> -	xe_bo_unpin_map_no_vm(bo);
->  	return ret;
->  }
->  
->  /* Return: number of state dwords restored or a negative error code on failure */
->  static int pf_send_guc_restore_vf_state(struct xe_gt *gt, unsigned int vfid,
-> -					const void *buff, size_t size)
-> +					const void *src, size_t size)
->  {
->  	const int ndwords = size / sizeof(u32);
-> -	struct xe_tile *tile = gt_to_tile(gt);
-> -	struct xe_device *xe = tile_to_xe(tile);
->  	struct xe_guc *guc = &gt->uc.guc;
-> -	struct xe_bo *bo;
-> +	CLASS(xe_guc_buf_from_data, buf)(&guc->buf, src, size);
->  	int ret;
->  
->  	xe_gt_assert(gt, size % sizeof(u32) == 0);
->  	xe_gt_assert(gt, size == ndwords * sizeof(u32));
->  
-> -	bo = xe_bo_create_pin_map_novm(xe, tile,
-> -				       ALIGN(size, PAGE_SIZE),
-> -				       ttm_bo_type_kernel,
-> -				       XE_BO_FLAG_SYSTEM |
-> -				       XE_BO_FLAG_GGTT |
-> -				       XE_BO_FLAG_GGTT_INVALIDATE, false);
-> -	if (IS_ERR(bo))
-> -		return PTR_ERR(bo);
-> -
-> -	xe_map_memcpy_to(xe, &bo->vmap, 0, buff, size);
-> +	if (!xe_guc_buf_is_valid(buf))
-> +		return -ENOBUFS;
->  
->  	ret = guc_action_vf_save_restore(guc, vfid, GUC_PF_OPCODE_VF_RESTORE,
-> -					 xe_bo_ggtt_addr(bo), ndwords);
-> +					 xe_guc_buf_flush(buf), ndwords);
->  	if (!ret)
->  		ret = -ENODATA;
->  	else if (ret > ndwords)
->  		ret = -EPROTO;
->  
-> -	xe_bo_unpin_map_no_vm(bo);
->  	return ret;
->  }
->  
-> diff --git a/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.h b/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.h
-> index e2d41750f863c..4f2f2783339c3 100644
-> --- a/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.h
-> +++ b/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.h
-> @@ -11,6 +11,9 @@
->  struct xe_gt;
->  struct xe_sriov_migration_data;
->  
-> +/* TODO: get this information by querying GuC in the future */
-> +#define XE_GT_SRIOV_PF_MIGRATION_GUC_DATA_MAX_SIZE SZ_8M
+Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+To: Shuah Khan <shuah@kernel.org>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Simon Horman <horms@kernel.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+To: Michael S. Tsirkin <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Eugenio Pérez <eperezma@redhat.com>
+To: K. Y. Srinivasan <kys@microsoft.com>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+To: Wei Liu <wei.liu@kernel.org>
+To: Dexuan Cui <decui@microsoft.com>
+To: Bryan Tan <bryan-bt.tan@broadcom.com>
+To: Vishnu Dasa <vishnu.dasa@broadcom.com>
+To: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
+Cc: virtualization@lists.linux.dev
+Cc: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linux-hyperv@vger.kernel.org
+Cc: berrange@redhat.com
 
-so it's 8M or 4M ?
+Changes in v8:
+- Break generic cleanup/refactoring patches into standalone series,
+  remove those from this series
+- Link to dependency: https://lore.kernel.org/all/20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com/
+- Link to v7: https://lore.kernel.org/r/20251021-vsock-vmtest-v7-0-0661b7b6f081@meta.com
 
-maybe wrap that into function now
+Changes in v7:
+- fix hv_sock build
+- break out vmtest patches into distinct, more well-scoped patches
+- change `orig_net_mode` to `net_mode`
+- many fixes and style changes in per-patch change sets (see individual
+  patches for specific changes)
+- optimize `virtio_vsock_skb_cb` layout
+- update commit messages with more useful descriptions
+- vsock_loopback: use orig_net_mode instead of current net mode
+- add tests for edge cases (ns deletion, mode changing, loopback module
+  load ordering)
+- Link to v6: https://lore.kernel.org/r/20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com
 
-  u32 xe_gt_sriov_pf_migration_guc_data_size(struct xe_gt *gt)
-  {
-        if (xe_sriov_pf_migration_supported(gt_to_xe))
-		return SZ_4M; /* TODO: ... */
-	return 0;
-  }
+Changes in v6:
+- define behavior when mode changes to local while socket/VM is alive
+- af_vsock: clarify description of CID behavior
+- af_vsock: use stronger langauge around CID rules (dont use "may")
+- af_vsock: improve naming of buf/buffer
+- af_vsock: improve string length checking on proc writes
+- vsock_loopback: add space in struct to clarify lock protection
+- vsock_loopback: do proper cleanup/unregister on vsock_loopback_exit()
+- vsock_loopback: use virtio_vsock_skb_net() instead of sock_net()
+- vsock_loopback: set loopback to NULL after kfree()
+- vsock_loopback: use pernet_operations and remove callback mechanism
+- vsock_loopback: add macros for "global" and "local"
+- vsock_loopback: fix length checking
+- vmtest.sh: check for namespace support in vmtest.sh
+- Link to v5: https://lore.kernel.org/r/20250827-vsock-vmtest-v5-0-0ba580bede5b@meta.com
 
-> +
->  int xe_gt_sriov_pf_migration_init(struct xe_gt *gt);
->  int xe_gt_sriov_pf_migration_save_guc_state(struct xe_gt *gt, unsigned int vfid);
->  int xe_gt_sriov_pf_migration_restore_guc_state(struct xe_gt *gt, unsigned int vfid);
-> diff --git a/drivers/gpu/drm/xe/xe_guc.c b/drivers/gpu/drm/xe/xe_guc.c
-> index 7c65528859ecb..cd6ab277a7876 100644
-> --- a/drivers/gpu/drm/xe/xe_guc.c
-> +++ b/drivers/gpu/drm/xe/xe_guc.c
-> @@ -24,6 +24,7 @@
->  #include "xe_gt_printk.h"
->  #include "xe_gt_sriov_vf.h"
->  #include "xe_gt_throttle.h"
-> +#include "xe_gt_sriov_pf_migration.h"
->  #include "xe_guc_ads.h"
->  #include "xe_guc_buf.h"
->  #include "xe_guc_capture.h"
-> @@ -40,6 +41,7 @@
->  #include "xe_mmio.h"
->  #include "xe_platform_types.h"
->  #include "xe_sriov.h"
-> +#include "xe_sriov_pf_migration.h"
->  #include "xe_uc.h"
->  #include "xe_uc_fw.h"
->  #include "xe_wa.h"
-> @@ -821,6 +823,14 @@ static int vf_guc_init_post_hwconfig(struct xe_guc *guc)
->  	return 0;
->  }
->  
-> +static u32 guc_buf_cache_size(struct xe_guc *guc)
-> +{
-> +	if (IS_SRIOV_PF(guc_to_xe(guc)) && xe_sriov_pf_migration_supported(guc_to_xe(guc)))
-> +		return XE_GT_SRIOV_PF_MIGRATION_GUC_DATA_MAX_SIZE;
+Changes in v5:
+- /proc/net/vsock_ns_mode -> /proc/sys/net/vsock/ns_mode
+- vsock_global_net -> vsock_global_dummy_net
+- fix netns lookup in vhost_vsock to respect pid namespaces
+- add callbacks for vsock_loopback to avoid circular dependency
+- vmtest.sh loads vsock_loopback module
+- remove vsock_net_mode_can_set()
+- change vsock_net_write_mode() to return true/false based on success
+- make vsock_net_mode enum instead of u8
+- Link to v4: https://lore.kernel.org/r/20250805-vsock-vmtest-v4-0-059ec51ab111@meta.com
 
-then
-	u32 size = XE_GUC_BUF_CACHE_DEFAULT_SIZE;
+Changes in v4:
+- removed RFC tag
+- implemented loopback support
+- renamed new tests to better reflect behavior
+- completed suite of tests with permutations of ns modes and vsock_test
+  as guest/host
+- simplified socat bridging with unix socket instead of tcp + veth
+- only use vsock_test for success case, socat for failure case (context
+  in commit message)
+- lots of cleanup
 
-	if (IS_SRIOV_PF(guc_to_xe(guc)))
-		size += xe_gt_sriov_pf_migration_guc_data_size(guc_to_gt(guc));
+Changes in v3:
+- add notion of "modes"
+- add procfs /proc/net/vsock_ns_mode
+- local and global modes only
+- no /dev/vhost-vsock-netns
+- vmtest.sh already merged, so new patch just adds new tests for NS
+- Link to v2:
+  https://lore.kernel.org/kvm/20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com
 
-	return size;
+Changes in v2:
+- only support vhost-vsock namespaces
+- all g2h namespaces retain old behavior, only common API changes
+  impacted by vhost-vsock changes
+- add /dev/vhost-vsock-netns for "opt-in"
+- leave /dev/vhost-vsock to old behavior
+- removed netns module param
+- Link to v1:
+  https://lore.kernel.org/r/20200116172428.311437-1-sgarzare@redhat.com
 
-> +	else
-> +		return XE_GUC_BUF_CACHE_DEFAULT_SIZE;
-> +}
-> +
->  /**
->   * xe_guc_init_post_hwconfig - initialize GuC post hwconfig load
->   * @guc: The GuC object
-> @@ -860,7 +870,7 @@ int xe_guc_init_post_hwconfig(struct xe_guc *guc)
->  	if (ret)
->  		return ret;
->  
-> -	ret = xe_guc_buf_cache_init(&guc->buf, XE_GUC_BUF_CACHE_DEFAULT_SIZE);
-> +	ret = xe_guc_buf_cache_init(&guc->buf, guc_buf_cache_size(guc));
->  	if (ret)
->  		return ret;
->  
+Changes in v1:
+- added 'netns' module param to vsock.ko to enable the
+  network namespace support (disabled by default)
+- added 'vsock_net_eq()' to check the "net" assigned to a socket
+  only when 'netns' support is enabled
+- Link to RFC: https://patchwork.ozlabs.org/cover/1202235/
+
+---
+Bobby Eshleman (14):
+      vsock: a per-net vsock NS mode state
+      vsock/virtio: pack struct virtio_vsock_skb_cb
+      vsock: add netns to vsock skb cb
+      vsock: add netns to vsock core
+      vsock/loopback: add netns support
+      vsock/virtio: add netns to virtio transport common
+      vhost/vsock: add netns support
+      selftests/vsock: add namespace helpers to vmtest.sh
+      selftests/vsock: prepare vm management helpers for namespaces
+      selftests/vsock: add tests for proc sys vsock ns_mode
+      selftests/vsock: add namespace tests for CID collisions
+      selftests/vsock: add tests for host <-> vm connectivity with namespaces
+      selftests/vsock: add tests for namespace deletion and mode changes
+      selftests/vsock: add tests for module loading order
+
+ MAINTAINERS                             |    1 +
+ drivers/vhost/vsock.c                   |   48 +-
+ include/linux/virtio_vsock.h            |   47 +-
+ include/net/af_vsock.h                  |   70 ++-
+ include/net/net_namespace.h             |    4 +
+ include/net/netns/vsock.h               |   22 +
+ net/vmw_vsock/af_vsock.c                |  264 +++++++-
+ net/vmw_vsock/virtio_transport.c        |    7 +-
+ net/vmw_vsock/virtio_transport_common.c |   21 +-
+ net/vmw_vsock/vsock_loopback.c          |   89 ++-
+ tools/testing/selftests/vsock/vmtest.sh | 1044 ++++++++++++++++++++++++++++++-
+ 11 files changed, 1532 insertions(+), 85 deletions(-)
+---
+base-commit: 962ac5ca99a5c3e7469215bf47572440402dfd59
+change-id: 20250325-vsock-vmtest-b3a21d2102c2
+prerequisite-message-id: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
+prerequisite-patch-id: a2eecc3851f2509ed40009a7cab6990c6d7cfff5
+prerequisite-patch-id: 501db2100636b9c8fcb3b64b8b1df797ccbede85
+prerequisite-patch-id: ba1a2f07398a035bc48ef72edda41888614be449
+prerequisite-patch-id: fd5cc5445aca9355ce678e6d2bfa89fab8a57e61
+prerequisite-patch-id: 795ab4432ffb0843e22b580374782e7e0d99b909
+prerequisite-patch-id: 1499d263dc933e75366c09e045d2125ca39f7ddd
+prerequisite-patch-id: f92d99bb1d35d99b063f818a19dcda999152d74c
+prerequisite-patch-id: e3296f38cdba6d903e061cff2bbb3e7615e8e671
+prerequisite-patch-id: bc4662b4710d302d4893f58708820fc2a0624325
+prerequisite-patch-id: f8991f2e98c2661a706183fde6b35e2b8d9aedcf
+prerequisite-patch-id: 44bf9ed69353586d284e5ee63d6fffa30439a698
+prerequisite-patch-id: d50621bc630eeaf608bbaf260370c8dabf6326df
+
+Best regards,
+-- 
+Bobby Eshleman <bobbyeshleman@meta.com>
 
 
