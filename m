@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-61054-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61055-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8450C07DA1
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 21:10:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2687FC07DB0
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 21:12:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5C343354380
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 19:10:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA1EA3BAD49
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 19:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B44357A49;
-	Fri, 24 Oct 2025 19:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFAA357A44;
+	Fri, 24 Oct 2025 19:12:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="YvjFzXO0"
+	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="djkYqlQ2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B6A357A24
-	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 19:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20871357A24
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 19:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761333005; cv=none; b=LSxLOhu2K1DFY5zZ+rifVNUBcYhDvXTCNm91sT9ZM936QW33zhgQFhgrCe7jQRo1jOwVNGdZhytUWR/dYi6A923DEv2Dmc/YP49sxmZK7jxL47tnroGcgJP8vaXWGU62qXKF2iH7WOW5wBBDBqlPEBZfCnVxz1Mtmaz58ujjx4s=
+	t=1761333134; cv=none; b=geY+estTwabSJv31gZqjN60Cl5YyxjBfqkW/ljD8or87kKVvL4ULVPmR/ZVmL1Fk/MWE7T0ida+s4Tofzg0u9sfoKl/90gnNcgYzv8ukXp4WZh2Hpv/VBoBFVhPgkq5EzbLAbe4p3hKRnzb1hUrQ53jE6HVnIbYUIp4hldM587c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761333005; c=relaxed/simple;
-	bh=eOV8n3GyeI7NGmNQOPYmpec1MI+qOKDL2up+UvX3whg=;
+	s=arc-20240116; t=1761333134; c=relaxed/simple;
+	bh=1HPzzMYQqxXuYn0hH8eWdbKEvenGvJhB7Md6BvkK5BU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lv6Ypx8TMLDygflNN/H9lBdtD7RLaAef6Pa/2sowIst3aGz/A2KG8b17ktTS0D5k5zH/BL6WM7V/W4iTd08z5MVpp1LoYEijX7bxpcAglmad1eXbwn1HLr8nz2cLoPO0XkrRmioxHTYLwODoS89gipmPUJXc/YDalVohA+Qev2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=YvjFzXO0; arc=none smtp.client-ip=209.85.222.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=HSxFnF8hiTUWdhjEtHswDQepfmLyboyLr7TfQvktHdTU/Nyw9wq2Lp6m4EEQpB+E6eOzHR8kaR5wbighVhwMTJOX5QoanMlIRRDUk00O8hy5o937ENuvg9s7nhx2m2deq9pah4Vn71rEND/JZ7tTeddHB+wfYukyfjahE/ksYL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=djkYqlQ2; arc=none smtp.client-ip=209.85.222.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8906eb94264so261912185a.0
-        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 12:10:01 -0700 (PDT)
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8901a7d171bso237676585a.1
+        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 12:12:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gourry.net; s=google; t=1761333000; x=1761937800; darn=vger.kernel.org;
+        d=gourry.net; s=google; t=1761333132; x=1761937932; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=r4YhT6UkULx0zY0BI31WYEg/XWXtKp76n8KPsV3vFlM=;
-        b=YvjFzXO0J6h2ss5Sjx0x/YOHwNaZ4Tm+e+WqDpFH9ACMNz46aWXSiaQsQwolqekzQO
-         2buiBh7TWFig/XGHuU8xyyyCnwtmRTYFFY45EsAZmWULSomAfW1N2sgkiqXHUoHo6QTR
-         7CZ5LqV7OgWZGlcGb5jecQPrBWfpBrrsKfEN6nhZgnr0/mzyWb95v2Aoqltu98hD3TZk
-         IOG5fzcgJua53NNBnVpecM0fDkXU6wkdxKPJBexBF6Z3DCRjfkWDwMDZqWSMFu5PvSkZ
-         K75yKN3CZw31D88pNNMrUcdvvRHb3zV1rkpRutMPmDiSN1YLdM+henQF42C8jPnce2uU
-         k2Zw==
+        bh=BCR40IXSwb8+XBgjln+OQr+nWcDb8wZGch2v8uE7uTg=;
+        b=djkYqlQ2uBE1MVPYP1auCvtzMJ0Wu2EtdfpvkXLGD90SupS9f9s9/4rdKlaMhfEJox
+         DX/90A+NeF8nW1jkcJ3QJFRXNWojxQIuy6d97DSYvgLqJLVlDYpn0GN6Fo0WgvyM4pH8
+         Do0eRekndgYnh3AbtIMo0dTPH5EaHXWzEFzHMt3jiqHF5oFC2dS27VmhFEggEA5KM5xM
+         B5BT2gQH81z4fIfWm8uW8m/1Id4k3mjfbTaD9gvQUr+TESeom1DF+ui2wUjr/CgaY4+P
+         T16BZt1efnbfpsmkhUb4PW6+F3Fh55DVIgQNJJeehyKgzH6KB2UkkUuOSU0AjqDlm1V6
+         ebqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761333000; x=1761937800;
+        d=1e100.net; s=20230601; t=1761333132; x=1761937932;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r4YhT6UkULx0zY0BI31WYEg/XWXtKp76n8KPsV3vFlM=;
-        b=PieSyPORrIfCKfze4jaNNpJe3ez44dy6HCNombxqYeibWcaabdh0DHWuoe+kHd0VoP
-         Cp0cRrBwVMWTRtOUNpi3PpoP2b0uNGuAkooPbJWNROQINEAIe/1S5vaCSa/U+ghXEem6
-         ssx8rOSIvYZcZYNN/6fq8B4hPyJ0BgF1KaRBoEwVGgOA+gYdeg/S5qcEH/kumEVsXVky
-         lAFlgxldoA32GNZNQVgCCNeKs/W3EZQlSg4QO3CNNgHLUh+VdFfPQJ+Uf26YC2fE6puV
-         9jbaHZ8vxg4DyyLh2bC0a9B6rB8ALedsMwi1/mj9WECF3sal+EXaDBsJXGRC3Le7M58F
-         bEQw==
-X-Forwarded-Encrypted: i=1; AJvYcCX+1HjYeqgkuz2rxu27Qhyg+n3Gfdnzjy+bGoCd9o6tS0/ww1L/XkyjkRShshVxYFMPtJk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQ96aWKNBQcjZUpz42BrVPmAwuzfJQwohn1fmlRameol20Oeh9
-	9SOrjEfVT0aS3EuRzqfcHKnUbQFuvPhOAo1rK7Dr0/LhOGmg7FcuNYhZfvmjn+5Njak=
-X-Gm-Gg: ASbGnctWzPIx1ikhDyt4GI2QR4Ah0+i3mhu+vNoZNIUkIRaPPVC0FJnI/+3kOEFE62W
-	CjnsgsR6BirAmdkGdnoKnh3y0jPL7syChMcGZct6AeRFzp4nuORx7kosB0w2kJNEpWlZihRpPsL
-	q1S+lCgVGivc4wxcqRu6NYIMZdBcvfpO0eDJuBfQrV1GWFX1YWMNbubcoteb5OfRTM9Tm0If+nn
-	kzqEamsNnSG1734WN1by2JCJaT7jsZxY67/qWMHVcIe1xu3SKhx6x1xtBhfHBxklcmJatI+6p8A
-	WOPjNFBUDMhf1EKbr/JIx1FPJaSr3c/406IJpEQr0R8G5H3FLu9lVRWov3KXOB03F3e4ITt+QGl
-	wIE1qBKJd3HLpwC+GJNB8N4YxACvNo/b6ZZuBhbbgQb5WIYGnww0Pj4XMvRV6asI2DrhHSpAy1z
-	ySUqWizq6LKrAelILTH//UXrdarn6sBez7v6Fd54FDuMRBU+8+/ryfIO85+xI=
-X-Google-Smtp-Source: AGHT+IHrkcPaJLyTM5pJbJ/XVcfel+4u6gv+3P752b0IEbbyKeVVUPlOZ4xL4VMnAte1FxD358/CqA==
-X-Received: by 2002:a05:620a:40c4:b0:85f:82c1:c8b1 with SMTP id af79cd13be357-8907011583dmr3539276185a.46.1761333000331;
-        Fri, 24 Oct 2025 12:10:00 -0700 (PDT)
+        bh=BCR40IXSwb8+XBgjln+OQr+nWcDb8wZGch2v8uE7uTg=;
+        b=p12XfUatOPSD3tEQLYi3Pf+aqVcxmJdq2IjpJ3jIw9WSAFE29ZmpngAuKR/m17fa4L
+         z1HdKJeFlFqpAllkREWsHKHrFOPrCXiLAWiyEAqyfrxoOTi97p/NCsp9R2jCYtftSukB
+         k5wS5/RYaeyrbndLlBQXZkQL/PE/vrG+u+oSB6ae/en61ML8055Ybc1rdyNZte58GKu+
+         fpICe3cdAZcAEMuMZ7zhsbEfhdYWI9wg2xsRLY+njnnsTLAFvGEjEt6Npfo0F4hfUAyG
+         ta1dJFqHL1V4Z2+TacCIOz4OkVygS/D2O8M7plkrlzWiRj5JyJ5k8htZzQrwt556ZK9G
+         z2og==
+X-Forwarded-Encrypted: i=1; AJvYcCXXfUWRzpkNv+eauWfjj2D6zcPAslZ6KqLWLFZQpNnR1KowryrlOqZgsOLNUZKebCGqHe4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyp5DX2y+m1ao5NmpJaRBJ8hl00zj4DFpdM231JKcKsTtuSG0Oc
+	U20KgpRp4/VQDNswRXT7SXhiZhKNKvpaEzcHjz+vx8z2I+UTxGqVwVEabf9gvPd0/bc=
+X-Gm-Gg: ASbGncu0z6YJcegCV0TeMw6bfpbnNg74SajYglSu8zKCSb5gYrU9ih8h0kJy068g/u8
+	ac2GOjz+jp7Qq6ubfhSv87KNMEh1tvkCD030Zk6c2WkNGbYTFiGwKDiR1EDM6xfJq66p30EHgeQ
+	HbleGGWrN7NawNJcPG/NzrpOBUPAVmTcUJbJvQx8KOwUScsvNeIh7EYM14iFrVdVGeP1nIDWsTt
+	qoz0fYsz6nwVBse2cN74U1+YcWT5HCCmlIY/Au/MtOYR6rq0nCDWmNVPKOmylJRYeNzLXPuHpIS
+	PCwWXr33K5H2bOZ/yG0NRBdMBPwNjaztNwVyQaUg5FbjALo0L0uHg4i3Zd5QsWv3bDekhFjJlua
+	Iw6IzzXXuibr8Td9Mk6PQDeO9698Wmf1aiqex8cYOsxGTPRMDxJPAw+P2GzzeejJcwONADjdb2a
+	wm1/IYboQMwV7GpHRjSMe/7L+SNpfT5cOAYcGUKCSbt9HiBy3FvznGVkH87LE=
+X-Google-Smtp-Source: AGHT+IE/iLPq0l1+7yrz/BbyhVyC9k5N0OQCI/Q9HFSHISzKMdQEsDIOj6nKXRkCdZrjDczCxThRnw==
+X-Received: by 2002:a05:620a:178c:b0:892:eb85:53cd with SMTP id af79cd13be357-892eb855743mr2482012485a.42.1761333131934;
+        Fri, 24 Oct 2025 12:12:11 -0700 (PDT)
 Received: from gourry-fedora-PF4VCD3F (pool-96-255-20-138.washdc.ftas.verizon.net. [96.255.20.138])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-89c11e631e4sm442634485a.44.2025.10.24.12.09.58
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4eb805e0869sm40330861cf.1.2025.10.24.12.12.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 12:09:59 -0700 (PDT)
-Date: Fri, 24 Oct 2025 15:09:57 -0400
+        Fri, 24 Oct 2025 12:12:11 -0700 (PDT)
+Date: Fri, 24 Oct 2025 15:12:08 -0400
 From: Gregory Price <gourry@gourry.net>
 To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -112,13 +112,12 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	kvm@vger.kernel.org, linux-s390@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org
-Subject: Re: [RFC PATCH 09/12] mm/huge_memory: refactor change_huge_pmd()
- non-present logic
-Message-ID: <aPvPBS5H0E9OXEo1@gourry-fedora-PF4VCD3F>
+Subject: Re: [RFC PATCH 05/12] fs/proc/task_mmu: refactor pagemap_pmd_range()
+Message-ID: <aPvPiI4BxTIzasq1@gourry-fedora-PF4VCD3F>
 References: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
- <282c5f993e61ca57a764a84d0abb96e355dee852.1761288179.git.lorenzo.stoakes@oracle.com>
- <aPvIPqEfnxxQ7duJ@gourry-fedora-PF4VCD3F>
- <2563f7e1-347c-4e62-9c03-98805c6aa446@lucifer.local>
+ <2ce1da8c64bf2f831938d711b047b2eba0fa9f32.1761288179.git.lorenzo.stoakes@oracle.com>
+ <aPu4LWGdGSQR_xY0@gourry-fedora-PF4VCD3F>
+ <76348b1f-2626-4010-8269-edd74a936982@lucifer.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -127,18 +126,22 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2563f7e1-347c-4e62-9c03-98805c6aa446@lucifer.local>
+In-Reply-To: <76348b1f-2626-4010-8269-edd74a936982@lucifer.local>
 
-On Fri, Oct 24, 2025 at 07:44:41PM +0100, Lorenzo Stoakes wrote:
-> On Fri, Oct 24, 2025 at 02:41:02PM -0400, Gregory Price wrote:
+On Fri, Oct 24, 2025 at 07:19:11PM +0100, Lorenzo Stoakes wrote:
+> On Fri, Oct 24, 2025 at 01:32:29PM -0400, Gregory Price wrote:
 > 
-> You can see it's equivalent except we rely on compiler removing dead code when
-> we use thp_migration_supported() obviously (which is fine)
-> 
+> A next step will be to at least rename swp_entry_t to something else, because
+> every last remnant of this 'swap entries but not really' needs to be dealt
+> with...
+>
 
-derp - disregard.  End of the day friday is probably not the time to
-be doing core patch reviews :P.
+hah, was just complaining about this on the other patch.
 
-Cheers,
+ptleaf_entry_t?
+
+:shrug:
+
+keep fighting the good fight
 ~Gregory
 
