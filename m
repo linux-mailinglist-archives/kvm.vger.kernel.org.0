@@ -1,164 +1,178 @@
-Return-Path: <kvm+bounces-61006-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC30C0578F
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 12:04:07 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8C3C05786
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 12:03:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 64C315008A8
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 10:03:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CB79735AF26
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 10:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A1A30E0E9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9A230E0D2;
 	Fri, 24 Oct 2025 10:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="TtWTR0/g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UkDYfGaP"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD1524729A;
-	Fri, 24 Oct 2025 10:03:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16BC2FE047
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 10:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761300219; cv=none; b=A55Tb5QCoGk6DUCWqchVlLe+Gbozu3KKWR5AGLQSRDuQKjV8iloNNtKbTV2kcJ1Clf0N090c91qdvJUve4ydW8MxLZV8NW0cGhS+Gad5jlOuB8Iq61wLLOGDJulT+tzD/0zfu1GhiUUXGJfQxQ9mVyjxOFn8WG6VCS/Ap1h36r4=
+	t=1761300218; cv=none; b=Rf1YTIX/Btfst96KmmizS3e2E0kC/uXis5Fb3T9tEAZ6PfuifKcyny+QZKmYAV1GC/qps8XRqWJjTW5PFMb6yXBTT60l9wYFC30yRPPt/GPUDT1eKm950bOdU7wgbZ08oD4G6QWOinjc1EaVzPopQM45CfEMxrmVYdD4MnKepu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761300219; c=relaxed/simple;
-	bh=bWFy3RfLl5gkL1nl2EiI/96beBie205E3ojhHV5cdkk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nEyLHfj7255IWl5AvZwIAlq1nLLx3y7H/myYWFSV1YLre4Q8/eMhz16+4ra1+Ml4UgSnOEi5rS4zJO43CLx3IzKfTiDQqwZdVqsaOwSKXpDVwc5QWW39evPCqvR0iQq/jnMdBixdLzR644H1hDW0tw2rirYrRp4dj370cVcbUyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=TtWTR0/g; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1761300206; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=n+A2uFbKQefkDojLPPcK70ocgcvIwvNmJfoecA4EhpE=;
-	b=TtWTR0/gomv86HpWrvXd6AXug+ACswu6NxbFi6pQB+ssw6+lfOd+NrANz7uB5pcA62aGDT8U3/kIG9/tan2S1W9+qoLDlBucbfVq72jvuirGumypVVj9O7LIFCTck7KIg89IlJJ5rIgDIimMSxUbO8WNHLo7z+N/rBbD7RaeWKQ=
-Received: from 30.246.161.241(mailfrom:xueshuai@linux.alibaba.com fp:SMTPD_---0Wqu2Tm1_1761300202 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 24 Oct 2025 18:03:24 +0800
-Message-ID: <134e43f7-583c-48c1-8ccc-dddc18700d3b@linux.alibaba.com>
-Date: Fri, 24 Oct 2025 18:03:22 +0800
+	s=arc-20240116; t=1761300218; c=relaxed/simple;
+	bh=OvBlFaevsT1aA4REwFPwyDUpfGwB/p8ycFjHvvBC4PM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XJmoWi9uVfyiIsOV50dCp12sImlbcngIFDYkSXBzEQClQD8GRhunmCY+lWap4ohQLbc7NGv7p5AeVoYs8egaJT+RvNPziphYvzN2XVqaJdbzLkM+uFwXZsaVOoAFFD2wA7fvuR/wqcx3Zz1kmBJBgTdwrpa6n0eyY9/U9jwA0dQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UkDYfGaP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57486C113D0
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 10:03:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761300218;
+	bh=OvBlFaevsT1aA4REwFPwyDUpfGwB/p8ycFjHvvBC4PM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=UkDYfGaPl3QeT3lzukEEpYg3j7WqD67FkrFiw0qXNJ1OngbZ0ue7Z+oth7PF4a19e
+	 6c4wW6rYWMOO3kGSqHqjs0gf2mZW3mpXB+go1zxx94lOAEG4QTcPJfgMqvwsgPaIdK
+	 BGuApr7nzn9bW0K8lCpMUfc/MJQgyd8waGbSQlnbRLbpClBx+pBGPF2EJATb4y4zo2
+	 5jJ3gXFhhuOnedfLTooQbJGt/cSwqO6xnxDjcnwBlBLjjt8yGJJNIvTqzknmd/Bi1h
+	 5GPkIuPtWR7tRkNzHlBzI01FFlc8TU3KeX1lEFwfumePMr6CCvr55zSZdhFui7G3QY
+	 Xpx0E3GuJ4KJA==
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3ece1102998so1247806f8f.2
+        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 03:03:38 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUjh22wnJICRSIxERLq1dOVLjKayNHGZEQHmpXJJJ8G3NfPjXbc/oo2FLUJ87h5eB6P1MI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yya4xOHHGUZ0VYgFd31QaXW1ndXzIcnf7524bNpUX3ojCzzKdsO
+	o+AB0fB5AdAt9JtgZ8iJSuBoI829adgmg0exnZ69nRie4AQj9QfDlPESNJqKHiB3lDGKx+py9od
+	UY5pSvwYvvbQfYDnBueLonU0E5gmBOnI=
+X-Google-Smtp-Source: AGHT+IHLVMglfM02a482Z0S013OS339/r6JWMeLQ6qF2S7OgbygGhNbTGwvWCNz8euYcwQmbbn1WPiA92/Bwgk0PmhM=
+X-Received: by 2002:a5d:5f93:0:b0:427:4b0:b3f9 with SMTP id
+ ffacd0b85a97d-4298a04071bmr4218935f8f.3.1761300216861; Fri, 24 Oct 2025
+ 03:03:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/3] mm: Change ghes code to allow poison of non-struct
- pfn
-To: Ira Weiny <ira.weiny@intel.com>, "Luck, Tony" <tony.luck@intel.com>,
- "ankita@nvidia.com" <ankita@nvidia.com>,
- "aniketa@nvidia.com" <aniketa@nvidia.com>, "Sethi, Vikram"
- <vsethi@nvidia.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
- "mochs@nvidia.com" <mochs@nvidia.com>,
- "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
- "linmiaohe@huawei.com" <linmiaohe@huawei.com>,
- "nao.horiguchi@gmail.com" <nao.horiguchi@gmail.com>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "david@redhat.com" <david@redhat.com>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
- "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
- <mhocko@suse.com>, "bp@alien8.de" <bp@alien8.de>,
- "rafael@kernel.org" <rafael@kernel.org>,
- "guohanjun@huawei.com" <guohanjun@huawei.com>,
- "mchehab@kernel.org" <mchehab@kernel.org>, "lenb@kernel.org"
- <lenb@kernel.org>, "Tian, Kevin" <kevin.tian@intel.com>,
- "alex@shazbot.org" <alex@shazbot.org>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
- "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
- "targupta@nvidia.com" <targupta@nvidia.com>,
- "zhiw@nvidia.com" <zhiw@nvidia.com>, "dnigam@nvidia.com"
- <dnigam@nvidia.com>, "kjaju@nvidia.com" <kjaju@nvidia.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
- "Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>,
- "Smita.KoralahalliChannabasappa@amd.com"
- <Smita.KoralahalliChannabasappa@amd.com>,
- "u.kleine-koenig@baylibre.com" <u.kleine-koenig@baylibre.com>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <20251021102327.199099-1-ankita@nvidia.com>
- <20251021102327.199099-3-ankita@nvidia.com>
- <68f7bf2d6d591_1668f310061@iweiny-mobl.notmuch>
- <SJ1PR11MB6083BF0885BC19E715C1A96EFCF2A@SJ1PR11MB6083.namprd11.prod.outlook.com>
- <81b1f1c6-4308-41bb-9f65-f158d30f27bd@linux.alibaba.com>
- <68f8f254b53dc_17217e10069@iweiny-mobl.notmuch>
-From: Shuai Xue <xueshuai@linux.alibaba.com>
-In-Reply-To: <68f8f254b53dc_17217e10069@iweiny-mobl.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20251020130801.68356-1-fangyu.yu@linux.alibaba.com>
+ <CAJF2gTRwHJsA7jFvAXbqy-6LyfaVTqfsFXgHfAeOZ8M3JNsikg@mail.gmail.com> <CAAhSdy1j4HZ86V6VsSF80LuNoxB3L3fmYYtvT7LU93fhbgCuug@mail.gmail.com>
+In-Reply-To: <CAAhSdy1j4HZ86V6VsSF80LuNoxB3L3fmYYtvT7LU93fhbgCuug@mail.gmail.com>
+From: Guo Ren <guoren@kernel.org>
+Date: Fri, 24 Oct 2025 03:03:23 -0700
+X-Gmail-Original-Message-ID: <CAJF2gTS-qZDgxsqxr7OjZijwxc4GY2MKCabMbE3wvtzx0TDixQ@mail.gmail.com>
+X-Gm-Features: AWmQ_blhM55OVCZL-ZLmRVyNahAkanXv0XqjK7NIOuPTDZ21CIGaNvU6roof5hI
+Message-ID: <CAJF2gTS-qZDgxsqxr7OjZijwxc4GY2MKCabMbE3wvtzx0TDixQ@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP
+To: Anup Patel <anup@brainfault.org>
+Cc: fangyu.yu@linux.alibaba.com, atish.patra@linux.dev, pjw@kernel.org, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, pbonzini@redhat.com, 
+	jiangyifei@huawei.com, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, jgg@nvidia.com, 
+	alex.williamson@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Oct 24, 2025 at 12:32=E2=80=AFAM Anup Patel <anup@brainfault.org> w=
+rote:
+>
+> On Tue, Oct 21, 2025 at 8:58=E2=80=AFPM Guo Ren <guoren@kernel.org> wrote=
+:
+> >
+> > On Mon, Oct 20, 2025 at 6:08=E2=80=AFAM <fangyu.yu@linux.alibaba.com> w=
+rote:
+> > >
+> > > From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+> > >
+> > > As of commit aac6db75a9fc ("vfio/pci: Use unmap_mapping_range()"),
+> > > vm_pgoff may no longer guaranteed to hold the PFN for VM_PFNMAP
+> > > regions. Using vma->vm_pgoff to derive the HPA here may therefore
+> > > produce incorrect mappings.
+> > >
+> > > Instead, I/O mappings for such regions can be established on-demand
+> > > during g-stage page faults, making the upfront ioremap in this path
+> > > is unnecessary.
+> > >
+> > > Fixes: 9d05c1fee837 ("RISC-V: KVM: Implement stage2 page table progra=
+mming")
+> > The Fixes tag should be 'commit aac6db75a9fc ("vfio/pci: Use
+> > unmap_mapping_range()")'.
+> >
+> > A stable tree necessitates minimizing the "Fixes tag" interference.
+> >
+> > We also need to
+> > Cc: Jason Gunthorpe <jgg@nvidia.com>
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > For review.
+> >
+> > > Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+> > > ---
+> > >  arch/riscv/kvm/mmu.c | 20 +-------------------
+> > >  1 file changed, 1 insertion(+), 19 deletions(-)
+> > >
+> > > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> > > index 525fb5a330c0..84c04c8f0892 100644
+> > > --- a/arch/riscv/kvm/mmu.c
+> > > +++ b/arch/riscv/kvm/mmu.c
+> > > @@ -197,8 +197,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kv=
+m,
+> > >
+> > >         /*
+> > >          * A memory region could potentially cover multiple VMAs, and
+> > > -        * any holes between them, so iterate over all of them to fin=
+d
+> > > -        * out if we can map any of them right now.
+> > > +        * any holes between them, so iterate over all of them.
+> > >          *
+> > >          *     +--------------------------------------------+
+> > >          * +---------------+----------------+   +----------------+
+> > > @@ -229,32 +228,15 @@ int kvm_arch_prepare_memory_region(struct kvm *=
+kvm,
+> > >                 vm_end =3D min(reg_end, vma->vm_end);
+> > >
+> > >                 if (vma->vm_flags & VM_PFNMAP) {
+> > > -                       gpa_t gpa =3D base_gpa + (vm_start - hva);
+> > > -                       phys_addr_t pa;
+> > > -
+> > > -                       pa =3D (phys_addr_t)vma->vm_pgoff << PAGE_SHI=
+FT;
+> > > -                       pa +=3D vm_start - vma->vm_start;
+> > > -
+> > >                         /* IO region dirty page logging not allowed *=
+/
+> > >                         if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+> > >                                 ret =3D -EINVAL;
+> > >                                 goto out;
+> > >                         }
+> > > -
+> > > -                       ret =3D kvm_riscv_mmu_ioremap(kvm, gpa, pa, v=
+m_end - vm_start,
+> > > -                                                   writable, false);
+> > > -                       if (ret)
+> > > -                               break;
+> > Defering the ioremap to the g-stage page fault looks good to me, as it
+> > simplifies the implementation here.
+> >
+> > Acked-by: Guo Ren <guoren@kernel.org>
+>
+> I think you meant Reviewed-by and not Acked-by.
+Yes,
+
+Reviewed-by: Guo Ren <guoren@kernel.org>
+
+>
+> I have updated the Fixes tag at the time of merging.
+Okay.
+
+>
+> Regards,
+> Anup
 
 
 
-在 2025/10/22 23:03, Ira Weiny 写道:
-> Shuai Xue wrote:
->>
->>
->> 在 2025/10/22 01:19, Luck, Tony 写道:
->>>>>       pfn = PHYS_PFN(physical_addr);
->>>>> -   if (!pfn_valid(pfn) && !arch_is_platform_page(physical_addr)) {
->>>>
->>>> Tony,
->>>>
->>>> I'm not an SGX expert but does this break SGX by removing
->>>> arch_is_platform_page()?
->>>>
->>>> See:
->>>>
->>>> 40e0e7843e23 ("x86/sgx: Add infrastructure to identify SGX EPC pages")
->>>> Cc: Tony Luck <tony.luck@intel.com>
->>>>
->>> Ira,
->>>
->>> I think this deletion makes the GHES code always call memory_failure()
->>> instead of bailing out here on "bad" page frame numbers.
->>>
->>> That centralizes the checks for different types of memory into
->>> memory_failure().
->>>
->>> -Tony
->>
->> Hi, Tony, Ankit and Ira,
->>
->> Finally, we're seeing other use cases that need to handle errors for
->> non-struct page PFNs :)
->>
->> IMHO, non-struct page PFNs are common in production environments.
->> Besides NVIDIA Grace GPU device memory, we also use reserved DRAM memory
->> managed by a separate VMEM allocator.
-> 
-> Can you elaborate on this more?
-
-We reserve a significant portion of DRAM memory at boot time using
-kernel command line parameters. This reserved memory is then managed by
-our internal VMEM allocator, which handles memory allocation and
-deallocation for virtual machines.
-
-To minimize memory overhead, we intentionally avoid creating struct
-pages for this reserved memory region. Instead, we've implemented the
-following approach:
-
-- Our VMEM allocator directly manages the physical memory without the
-   overhead of struct page metadata.
-- Error Handling: We register custom RAS operations (ras_ops) with the
-   memory failure infrastructure. When poisoned memory is accessed within
-   this region, our registered handler: Tags the affected memory area as
-   poisoned Isolates the memory to prevent further access Terminates any
-   tasks that were using the poisoned memory
-
-This approach allows us to handle memory errors effectively while
-maintaining minimal memory overhead for large reserved regions. It's
-similar in concept to how device memory (like NVIDIA Grace GPU memory
-mentioned earlier) needs error handling without struct page backing.
-
-Thanks.
-Shuai
+--=20
+Best Regards
+ Guo Ren
 
