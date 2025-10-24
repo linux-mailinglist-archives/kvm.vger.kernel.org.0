@@ -1,125 +1,95 @@
-Return-Path: <kvm+bounces-61077-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61080-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52774C08143
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 22:38:10 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC1B2C08574
+	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 01:44:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F82A3B2099
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 20:37:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C0D8F35260A
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 23:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECBD32F7443;
-	Fri, 24 Oct 2025 20:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F3230E848;
+	Fri, 24 Oct 2025 23:43:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="qgjWqiQg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FbCXMJ03"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD1329993E
-	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 20:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D632730E83E
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 23:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761338245; cv=none; b=aiHNbj/dOSHLYKvhlPanRzAczmp1iGzg4YHMKintoiGzbFRIsRNPwcIQ7a8bRwbxabAofgisecK7KT7D7EWR7BnzYC8lBgSj9E1IotKmqvzVLA28gZIaRfihee2vY0r4RIscjVpOrJZjq3h1cWgjTZO6i0KybYHzi9ozHJv8H/A=
+	t=1761349434; cv=none; b=cZ19ge9hgKOT46ymOqwiwxaJhG5HF7DCllTogIafBg/kg1TmwxR7It+HxIBtJsel2iNmMHGD5t0uUATNNrh93PRUHrkom/iWjtQcTGXPQZZFGthi5wIQGD5kvXMjCYZZJs+2LQTm7+vTMxRCGCsjZodSZPdTCNwJ5COkX/4eh8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761338245; c=relaxed/simple;
-	bh=brPT+lM2XPdvJ0J0zQqzP3FRuejOJIrYJjvdheDJC0A=;
+	s=arc-20240116; t=1761349434; c=relaxed/simple;
+	bh=+NEftr7VWmliQcXUqkaO9sJG2DgzF/Yaw8WY6cHdu/c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A3pe3L7AobZwj/vCd21VCL+lAG3Ti9gmxOtO4aUM0MIe8vgCylT4D6y1Hw7K/5UTvfO0ZPXKj54Rueur+MI0VjLLyAWGRyAvq9DubSoEoPj76v45S+WR68iJeeuXDZZBZWRJY1amoFOiApgmf8wL5BzVnVtrhSkilPJaIA3x+1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=qgjWqiQg; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4e89e689ec7so15626241cf.2
-        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 13:37:22 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=fcpGs+PSp0FmjHaRJIbJ6trluby/Nljroc/CDQ/JvyM3FWc8E5F9g06W6rHTFbf1hHe9spvUDH6DTF+Z12EvdJgbafZVbsY4SdIBBTqsGr1dAxtQdL8viK/BqUVMIKTyEOIz1M+UOjkGKtJp4al55Z8Bctm0s6QZJvqiclco88k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FbCXMJ03; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-63c4b41b38cso5599152a12.3
+        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 16:43:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gourry.net; s=google; t=1761338241; x=1761943041; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761349431; x=1761954231; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vn4hQEcGul2fUa7R/OzGXx8vWTt9TjtrdGmgBs4cZEg=;
-        b=qgjWqiQg7Mw0bd6Y7P3gb+spLRaKxWc55mXCg5lTEioPzr2WALPNAO9coZW5YwSU/Q
-         CutOTbPQFirUB6W23YGRV/4n3KJAwDc2HuZ1vmW9vsHfhTQE1lFOzrT1zKthKJ1vN7w8
-         J99nIJOu6f1vbKH/VbY6iGK7SaV9bmoiquLKjhFMYlujpJGyyVA8Y6ikqLPzjJZE3K4u
-         OZgIq3WLWE0V48aNTFEFsT8fugi2BJ4QfjAxzSnSHsv/2yqeA/JFfFAvF5Jn45VPjnM2
-         VbQo5z+uEOp/ZfIDudxeAtIZujmHqqIYhpz5spR8VsG3LNndPL57lSFQQ4mQS3eRwY0J
-         boJQ==
+        bh=4qshgmZlkIM4+vcn2er+R5ZwtdRF9Gko5Hx8ZyCDhMI=;
+        b=FbCXMJ030EbhJhkpIwtakUyhoHz7FsOTvmpRnnq60Srd2g+7vcUmIEBluZlGWYa2dg
+         N6nD8vjZT/TGfJYYmn1ZXgCZNVoc+9TXQTu7rhw/z8PVN5Car3t93KlbCvSrwyYxliAV
+         8CipqswpJ1TM8B3FiThJSDotIC5D+gSa2phaBk9+c0W155LNckKU9SV6c+8kB8HDrc/l
+         /ZASOzO5UfrY3SWNibX9k+auz6P61Uhbf5QFPos3FFXN/5WsPIHdkrjKm8Wyc1fqM7Tf
+         4Od620M5Qo13mwx5ZcTU2i9ONX+d6MiGt45hTd/ONLwycLJnDbtq9PPESypfEnDnqAQE
+         tlKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761338241; x=1761943041;
+        d=1e100.net; s=20230601; t=1761349431; x=1761954231;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Vn4hQEcGul2fUa7R/OzGXx8vWTt9TjtrdGmgBs4cZEg=;
-        b=wf92oOh/4BauytpcJVyj4Bx8CT6ZF8/Lfck86TtcRObDI3RyvrPgfJRcikAjifWGnW
-         IinHGBNhor/a8bNQcsN7Z9vBKUCF7oI8QhqRHUSMqJJ+IaeAgtS2S4gKKWHYqaUbSkGR
-         zbx/X469KAixUMvf9fp5QVHSJfHx0bjDnirfVAYaW7viuEL7qCp1zESg6737+QkRuhgB
-         9QfAW+ZoeE5KZ0cn344WZoij0fYdXP+1kv+GigGB3uD+h/9PnUPrJnVkERKY3U1ofczd
-         S2Vv6W1iRdn5NtCFMvIjzWYIlFSIMakVlUWxYTWL38WU0gDPlPrOf9BpGmwxC5QdOjKL
-         Vfig==
-X-Forwarded-Encrypted: i=1; AJvYcCVSKj7LlmEqi6Toat7oyBl9L61uf8k+oTyIm/+N42R4HyGFFltemE1+6/CWZlyOpsqpt70=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzit5/GOQg60QiwfzMlPYP1fX4dMH+wp5ktXe3w5l/YGYajSFoR
-	QaK6iTCa+XJoeD8uySsPa9dpTpS8/LgJrL+lzifVpDjN5PwKnNn8WIXnn1iKVMr6fRE=
-X-Gm-Gg: ASbGncvfaJPEmI7uz22IDd8XxM1NwqGDY1/PHFUJ9/r3agttmYkAXPxXM/X5k7o8con
-	/Z+iqENAkaqS9MU71U9bcVw51zD89Deo9jdVc+91rGchziOldgVPYk0iFzKQivlM1o1Ive+c2Lc
-	aiwst7itHjDN+sawMR2DSkN6169RCZCpzuWtnS84wg4CIxbRKLiJPGT4Jfd02vZlsFOcwjWxZCW
-	pcqRzbB9/MmZ4OOKBEHYFkB9tQpR6c3tPdARMX6TrHPxSJ9i8vow5p3H1MEhuCT1SSJU9Evle5Z
-	mKxE+C0b2ISXA4Zz5uDLlwB5h5lqPJqS5kNsPPRepj9RrzfLGhNzq2HVkXAZfJtW6KXYif21Zbp
-	qQp6oyos2UVaQ2pU+rSh9D3bNA+ZEYTB13PuPgqqbmxYLvWWe2UzBhMpzEGim/apkgL6/MvNzzu
-	AkBSkA8FqS4ZGAFy1H3eyqLs0JmYhH7KR/Yovu6YeqzdBBu58nJKy+P7R0WJvIgunJ/ek7Rg==
-X-Google-Smtp-Source: AGHT+IEizsVD5MWKlpznZSR+oUAoDamQsr5IFux8tgX6jFrLAoh3hAikSuRK1/9hfCiWycXsqW7SdA==
-X-Received: by 2002:ac8:58d6:0:b0:4e8:8ed7:da6a with SMTP id d75a77b69052e-4e89d20680bmr359946041cf.8.1761338241380;
-        Fri, 24 Oct 2025 13:37:21 -0700 (PDT)
-Received: from gourry-fedora-PF4VCD3F (pool-96-255-20-138.washdc.ftas.verizon.net. [96.255.20.138])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4eba37b96d0sm861481cf.6.2025.10.24.13.37.19
+        bh=4qshgmZlkIM4+vcn2er+R5ZwtdRF9Gko5Hx8ZyCDhMI=;
+        b=kyhx5b2XFxSxW2syTQDGdgikyYNpjOkYc5dE0G4nBQKbw79JGbgKqVXnhiZSRLSWeu
+         lFpqrsLUcy2h/4Ud9H1pUoi6VtIaOc2Zyla9nN7f5DkD+kVoORPld/CP1cwBxRQZJbiI
+         KhAGqgOq6C3DSZtCV9Yy3+hDVnXkezniUSAF3d8wsfVnbu1aWzuSecI4/wJnfRzFFyE+
+         lgzz3b3KiZpu7n07XBZL4XKWDqupeNDXYYraIZfekkexav226hwieOCuapvILMnoJxGc
+         WATAKFIZ6mOQmurHyFUSL+/ESzcRfiMBgXfd024VP7cuF3ie9SEB98Cwg7VtWBJv//4e
+         sDwA==
+X-Forwarded-Encrypted: i=1; AJvYcCWNZvsQvoTqVGO6q+CeDfj04LF3D+ZMMXLaiEgoYMYYdBvWQAMBpwpX/7OBV7a8F1awWNc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwER5tA0Eh0GLGYgYvm70CSKyjVgYjLttQ++Ml43vrncym923on
+	2T0bF21XUbgdV0CQLCfcVs/RhMa75c2CtTLmBG0M/aRK+zmUIf4yN9Qy
+X-Gm-Gg: ASbGncun4t7sVrp6yDxCBVBf4edpfoWLeiGVk/jrI/N12y5lDfDb5igo6691ydDkAfD
+	dYby/OulniIyzp3ZDZDjc60Uv7jOHV+CVw/3fUYINOPmnODbSqgF6jGK+8Y2qeteImV2ODutIDn
+	/UdHIrEnESpGo9ewipaRJ2C6u12zeSEoFnw6eb9qAtLYS7LfZ8lDx+Cq9FV7QixkYGiK5LZtJvT
+	Y0mL69aR88NhJBedCe0I6WY0KIGbMp5IdZ6NsCqgTgNOoQ2BvFM364JtPWeqKQ8DFpE9WOv3nh0
+	R6Kwg516UXwJpcbUu62SF2auG+GlZDrWfhNpzz5i20iQCFjIzxxqmxLiiAw1LRI8mISTD+l2kn2
+	3nYH1js9P5Bt0xdk6F6qTGoGW493vSk04JF2H4SP4dkwNeC6TwvtQDMYqWQ1FxYTGMA/qveumZA
+	E9i9l2cw==
+X-Google-Smtp-Source: AGHT+IEQw0TA1CC7no4fMAMA9oQRoUt9Lgbn+Uft1azRKrTnyGz7lCiyNuO6p2GHKFOC05VVJ/iKvw==
+X-Received: by 2002:a05:600c:4f89:b0:471:a98:99a6 with SMTP id 5b1f17b1804b1-475cafae164mr64272055e9.11.1761342429974;
+        Fri, 24 Oct 2025 14:47:09 -0700 (PDT)
+Received: from andrea ([31.189.53.175])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47496d4b923sm89676705e9.14.2025.10.24.14.47.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 13:37:20 -0700 (PDT)
-Date: Fri, 24 Oct 2025 16:37:18 -0400
-From: Gregory Price <gourry@gourry.net>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>, Zi Yan <ziy@nvidia.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
-	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
-	Lance Yang <lance.yang@linux.dev>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
-	Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
-	Peter Xu <peterx@redhat.com>, Matthew Wilcox <willy@infradead.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
-	Byungchul Park <byungchul@sk.com>,
-	Ying Huang <ying.huang@linux.alibaba.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Pedro Falcato <pfalcato@suse.de>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
-	kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [RFC PATCH 05/12] fs/proc/task_mmu: refactor pagemap_pmd_range()
-Message-ID: <aPvjfo1hVlb_WBcz@gourry-fedora-PF4VCD3F>
-References: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
- <2ce1da8c64bf2f831938d711b047b2eba0fa9f32.1761288179.git.lorenzo.stoakes@oracle.com>
- <aPu4LWGdGSQR_xY0@gourry-fedora-PF4VCD3F>
- <76348b1f-2626-4010-8269-edd74a936982@lucifer.local>
- <aPvPiI4BxTIzasq1@gourry-fedora-PF4VCD3F>
- <3f3e5582-d707-41d0-99a7-4e9c25f1224d@lucifer.local>
+        Fri, 24 Oct 2025 14:47:09 -0700 (PDT)
+Date: Fri, 24 Oct 2025 23:47:04 +0200
+From: Andrea Parri <parri.andrea@gmail.com>
+To: Xu Lu <luxu.kernel@bytedance.com>
+Cc: corbet@lwn.net, paul.walmsley@sifive.com, palmer@dabbelt.com,
+	aou@eecs.berkeley.edu, alex@ghiti.fr, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, will@kernel.org,
+	peterz@infradead.org, boqun.feng@gmail.com, mark.rutland@arm.com,
+	anup@brainfault.org, atish.patra@linux.dev, pbonzini@redhat.com,
+	shuah@kernel.org, ajones@ventanamicro.com, brs@rivosinc.com,
+	guoren@kernel.org, linux-doc@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
+	apw@canonical.com, joe@perches.com, lukas.bulwahn@gmail.com
+Subject: Re: [PATCH v4 00/10] riscv: Add Zalasr ISA extension support
+Message-ID: <aPvz2Pb6RuWnw9Ht@andrea>
+References: <20251020042056.30283-1-luxu.kernel@bytedance.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -128,34 +98,86 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3f3e5582-d707-41d0-99a7-4e9c25f1224d@lucifer.local>
+In-Reply-To: <20251020042056.30283-1-luxu.kernel@bytedance.com>
 
-On Fri, Oct 24, 2025 at 09:15:59PM +0100, Lorenzo Stoakes wrote:
-> On Fri, Oct 24, 2025 at 03:12:08PM -0400, Gregory Price wrote:
+On Mon, Oct 20, 2025 at 12:20:46PM +0800, Xu Lu wrote:
+> This patch adds support for the Zalasr ISA extension, which supplies the
+> real load acquire/store release instructions.
 > 
-> So maybe actually that isn't too bad of an idea...
+> The specification can be found here:
+> https://github.com/riscv/riscv-zalasr/blob/main/chapter2.adoc
 > 
-> Could also be
+> This patch seires has been tested with ltp on Qemu with Brensan's zalasr
+> support patch[1].
 > 
-> nonpresent_or_swap_t but that's kinda icky...
+> Some false positive spacing error happens during patch checking. Thus I
+> CCed maintainers of checkpatch.pl as well.
+> 
+> [1] https://lore.kernel.org/all/CAGPSXwJEdtqW=nx71oufZp64nK6tK=0rytVEcz4F-gfvCOXk2w@mail.gmail.com/
+> 
+> v4:
+>  - Apply acquire/release semantics to arch_atomic operations. Thanks
+>  to Andrea.
 
-clearly we need:
+Perhaps I wasn't clear enough, sorry, but I did mean my suggestion
+(specifically, the use of .aq/.rl annotations) to be conditional on
+zalasr.  Same observation for xchg/cmpxchg below.  IOW, I really
+expected this series to introduce _no changes_ to our lowerings when
+!zalasr.  If any !zalasr-changes are needed, I'd suggest isolating
+/submitting them in dedicated patches.
 
-union {
-	swp_entry_t swap;
-	nonpresent_entry_t np;
-	pony_entry_t pony;
-	plum_emtry_t beer;
-} leaf_entry_t;
+But other than that, this looks pretty good to me.  Perhaps something
+else to consider for zalasr is our lowering of smp_cond_load_acquire()
+(can't spot an actual bug now, but recall the principle "zalasr -> use
+.aq/.rl annotations ..."): riscv currently uses the "generic", fence-
+based implementation from include/asm-generic/barrier.h; compare that
+with e.g. the implementation from arch/arm64/include/asm/barrier.h .
 
-with
+  Andrea
 
-leaf_type whats_that_pte(leaf_entry_t);
 
-with 20 more new functions about how to manage leaf_entries ;]
-
-no not seriously, please have a good weekend!
-
-and thanks again for doing this!
-~Gregory
+> v3:
+>  - Apply acquire/release semantics to arch_xchg/arch_cmpxchg operations
+>  so as to ensure FENCE.TSO ordering between operations which precede the
+>  UNLOCK+LOCK sequence and operations which follow the sequence. Thanks
+>  to Andrea.
+>  - Support hwprobe of Zalasr.
+>  - Allow Zalasr extensions for Guest/VM.
+> 
+> v2:
+>  - Adjust the order of Zalasr and Zalrsc in dt-bindings. Thanks to
+>  Conor.
+> 
+> Xu Lu (10):
+>   riscv: Add ISA extension parsing for Zalasr
+>   dt-bindings: riscv: Add Zalasr ISA extension description
+>   riscv: hwprobe: Export Zalasr extension
+>   riscv: Introduce Zalasr instructions
+>   riscv: Apply Zalasr to smp_load_acquire/smp_store_release
+>   riscv: Apply acquire/release semantics to arch_xchg/arch_cmpxchg
+>     operations
+>   riscv: Apply acquire/release semantics to arch_atomic operations
+>   riscv: Remove arch specific __atomic_acquire/release_fence
+>   RISC-V: KVM: Allow Zalasr extensions for Guest/VM
+>   RISC-V: KVM: selftests: Add Zalasr extensions to get-reg-list test
+> 
+>  Documentation/arch/riscv/hwprobe.rst          |   5 +-
+>  .../devicetree/bindings/riscv/extensions.yaml |   5 +
+>  arch/riscv/include/asm/atomic.h               |  70 ++++++++-
+>  arch/riscv/include/asm/barrier.h              |  91 +++++++++--
+>  arch/riscv/include/asm/cmpxchg.h              | 144 +++++++++---------
+>  arch/riscv/include/asm/fence.h                |   4 -
+>  arch/riscv/include/asm/hwcap.h                |   1 +
+>  arch/riscv/include/asm/insn-def.h             |  79 ++++++++++
+>  arch/riscv/include/uapi/asm/hwprobe.h         |   1 +
+>  arch/riscv/include/uapi/asm/kvm.h             |   1 +
+>  arch/riscv/kernel/cpufeature.c                |   1 +
+>  arch/riscv/kernel/sys_hwprobe.c               |   1 +
+>  arch/riscv/kvm/vcpu_onereg.c                  |   2 +
+>  .../selftests/kvm/riscv/get-reg-list.c        |   4 +
+>  14 files changed, 314 insertions(+), 95 deletions(-)
+> 
+> -- 
+> 2.20.1
+> 
 
