@@ -1,174 +1,177 @@
-Return-Path: <kvm+bounces-61040-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61042-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E009CC07875
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 19:24:17 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9503C078DB
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 19:32:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACEE01C250AC
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 17:24:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7EEB54F32A4
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 17:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1396343202;
-	Fri, 24 Oct 2025 17:24:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB93B345CAC;
+	Fri, 24 Oct 2025 17:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K4Iqd2Mm"
+	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="YIxKOjvZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AADB1990A7
-	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 17:24:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14D0324B34
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 17:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761326650; cv=none; b=ctQCenL7nGmxAL99UCqvYBxj4bNkw8finimekulOwxNWZGgRhfp/q8Y564GLAXUQ2hJQ1IUlxzFEeOGgPtAUqzmlMtTr3NK2xYwEhfc2Q9gaBfRH3U3u69vaUVZa36QCvi3bbIP2HuUC1ykDRzk0i2209YxrkFOefSdBt3Sx4q4=
+	t=1761327155; cv=none; b=DY2ve++hHPU3JhBLMzWZazsGrSR+PM7N7NpHoCvJTkxvM/xQQ7pSkmC0eYSaJeWfZ1nW9/I7VXvrze/O5vIrTOiHdjgAUM1rsYX8XqmQr5q9MWF6aiMJfn+69TtzkoJ2krvCME+r+6lhlwEFzRi/+pwj2m6ssP2xDwOGKbhbDvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761326650; c=relaxed/simple;
-	bh=eSVXjWvufq5wlXV/uRQ71AATlF89iNraJnuNs0WQoSQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BJa93878VjdqLoe1SIek3HPtDtMeO0OV2ARexKDpp/k2H75uWhHOKqy4jHXQ5G0ojHQJLu/Ta3s1owheXXZjIIvbmfM3duolDC+Kx5LnbbiKuinuJM5ccsQ3mVKFy+3H3f4O7GVmMkUT8w2sFd8rQHMDSYrnQywT9Vq2xbmsfL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K4Iqd2Mm; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b6ce25bea3eso1661057a12.2
-        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 10:24:08 -0700 (PDT)
+	s=arc-20240116; t=1761327155; c=relaxed/simple;
+	bh=UpAvej523gjBWiVNLg/BeJTlpEBeruOMQsLrtxPGcjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zwh626us30fdL4EzGSG6XthgmJgFvmz1O6HZ2os27peIgjoP6SHtsC/Cr5iuOFLKcfTixG8tBHjiOHGvlHo/4mcOe+Ngiw9jmFCj7xAqS/xOpmLPbj1GvScwFxR5Azvs6vtofuFd9v+kUPMmrJEr9ulWLSpxnJHwGRMhp7Ke3QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=YIxKOjvZ; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-89ed2ee36b0so25548585a.2
+        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 10:32:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761326648; x=1761931448; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7FLP5WkTh+VRhKc08YfB2VDRV9fkYbRqP1RoJ7oLnhA=;
-        b=K4Iqd2MmssquLsSI3+ynC5W+W9KudxoIIYNy5GGAUohuBWtEkZTANUhZbwze8cz42K
-         MijQTgM0Jbn1shXxiFKH0DitMxFQQbzArnQreOfmXYy6mQS/XAWDVZ56+nSleZWcHGr0
-         lFeX7VXQFZg9hOKVAFRo/aWnNG3lFO/rwmX13cARKg3MzYssUtpDFfbset0JOlm4YPTz
-         kRHl5jIG3mfrBtOg6rYM+I6iWIKJ8cTzixps3IOuXUpZ8YjeOYQUw7zvfWBFnad15uKw
-         lCuTP/0PiKCJNki5bkrSi2Wc59P8yLfX+6cdETW/zkkULQoZWCGY6XyTin5n+9SZu3oM
-         sHow==
+        d=gourry.net; s=google; t=1761327152; x=1761931952; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=68b/g5DOQEfyTkIlrk7BVq23q9O97J8PIirLY9E/558=;
+        b=YIxKOjvZzvpj/k7qXRAnRBWIDBkC/oznFiyvfaOIcKDF07U4AepP8Nw5JcmEvUqde0
+         EpwUflB25Mqv2Qcmi2nBiaTOMRSWH0j/9ytlAAZvOj8G10xETo30J0fsc/Ufxr4Qq5Lw
+         ss3WOe/xkm9fpVGq7mxny2WXlW0I+zqosNr/aoTeggYRJcNxwWQiUA55f2kLuKroABjY
+         QpHt014/fVwnwiuMxCtbU40diHYDYXIyk3cXX7XI4lABcUbrJmR33t80rayU5kdJS3tW
+         Mcmn6LcPyc0L9Wlsn+bH40VQHBM2oHPU+p11Liq2TsD0eV4DmWnJdI6TDpfN1idM27fP
+         WmAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761326648; x=1761931448;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7FLP5WkTh+VRhKc08YfB2VDRV9fkYbRqP1RoJ7oLnhA=;
-        b=ADxjWq32bK+EzymP1HwlRJVf6olp64pMgEQEO/8A+DMFoJ3wqf8HSTBbDmR5Ao20Xh
-         YbRiYKcOJ257408VA7hIEDZHujLeiCxGtsAJLpIhmXCN2q+9xLVl+Va/n6k8cCG5qaDr
-         dOjeVWhSx7zyxMXh5yJ8vnUZwFYP02yoFbagxcvVf/yL8hVUEDHW6S0r7iR1bqS5fCqo
-         eXKBVZ4/Au1E90637dC3Mh9nE4Kg9BliT5JQ8dnSt2+7RiZqR6i6qehI2i0rH4RhluUQ
-         bMQq+jWMSaIpw+wEVtrDqpRoXs+iwZcvfjAq48c8lb7tZRn8Zm4RDMqpzSSees31IXZ5
-         HWLg==
-X-Forwarded-Encrypted: i=1; AJvYcCXvEmnnn+tX7+2b6F9qRfDQgzmj+96Vl2BwlXGmEnWavaSTnkBz+i7C2EThCFREub2z1ys=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywp4n0rnwjYfr85BQUpmLCbXKDtpTeXB4UN9PkjwL+NLpsyXOLC
-	XsBbvckMJbKeSfEL8sxkR1nWF4rZH9AFK+TxG1GFvQzFIZ8+iZrANlku/MmTTEHJIbFdnGYQ3D2
-	77jFc4Q==
-X-Google-Smtp-Source: AGHT+IEIm9NIN92smmhmaW4iWKKJb1V67wupHKKcMMvqTgE7x+LAyO/si8uIpWAx2DZBg/t9wHtaIrchfoA=
-X-Received: from pjbsd7.prod.google.com ([2002:a17:90b:5147:b0:33b:b3b8:216b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:244d:b0:24d:1f99:713a
- with SMTP id d9443c01a7336-2948ba0d8f8mr43813095ad.31.1761326647757; Fri, 24
- Oct 2025 10:24:07 -0700 (PDT)
-Date: Fri, 24 Oct 2025 10:24:06 -0700
-In-Reply-To: <CAAhR5DFJKTTY3tN7AU=BXDRJAGjuortmK0ruQWU8RB_Z6jVugQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1761327152; x=1761931952;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=68b/g5DOQEfyTkIlrk7BVq23q9O97J8PIirLY9E/558=;
+        b=M/7ChwmK+NKSrEP7YlbRSVfYH99i6RJXHvOkSrJvGAGzR/Ye46xXrg4JfD/yhlcxrb
+         N4tU0rWWcOiThXRjLuG6j1lHmc5EmyfVshZkCsQP2OwHU+cXyJQ3kKqRb6zlex6BVeP3
+         fZg/yfcwzHCD2uLuNrdb+mF6MAOG9UAVvc1XWTp9Npqi9pCnzshIKqK6SDpcT8yJtwwG
+         1JXh/oZF2cz4LGKfhdv9Tbs2XspSH+bdsH2nieIF1VN+3ih9nW3ws5xN6jFEDc2so+FZ
+         7Mf957eVazgDcWZ7/giH5XW7tufRbjlhznG69yJWashNh+P6L68CkS6QRHWdvbRh+Xne
+         CpvA==
+X-Forwarded-Encrypted: i=1; AJvYcCW7Gstd8hsFmggS1PdDZKabjDeWmnoYrm4VeQPhCus6yCWEpxYA83Vd+3QsLB46mGi2R94=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLAku356m+dA2DW1ZC5D7TiPCicgqxLNQxVQAPckT4ekT5NNR8
+	jIhna+IZ9cZCiOxHs+zUmtkVflEo+6HMd8QQThpNdrlYuyBUx8EiDsjz2kZ3wilShMo=
+X-Gm-Gg: ASbGnctVtNytYM9jyVi4+CFpYWRSrsDgLsVey/lvzdo3z2XiKBWNitb+pcQcjs2Ou9W
+	tmdd2nPlIsqS1BjmFxcWyhf6OGd3IGgUDdfROZApJkZqAeOjHo2DahOLm8/OOzjRDS6HHBzG0TJ
+	nQfy3IykLCAVpApbWeryEs42PSKJY/IIASkTwsT39dEwFk+Qc2agYbVXh2/8jlTOi2QE28Wqi3Q
+	gJfUA1kbG9HtC2X/m2LVurAbjdF09TEit+e1Jt+2FWj9qXC4BzCvaO08R7NxMiaSAPrYFkWIfCO
+	qICPXBaBuplM1IzvvNsJIMiIcc6jSP5q6W9F7rsUU5gAtedlDTaX4kA7Tlg5dh+5qIoVqbJ3KnK
+	2DhZfdHM9HIWXRMbaMIMY904PYlztvCqP4xPiJfSWZDWhhyfUgb3HvlrS/yG2D/1U2PnMow6r57
+	dP+fgAA9+ZFpQxi2W7b5XaiC0CVASQqh8kWzM+VR4NfbEIEXCcZ1d6ilUJ3VrZWQ7s8VkZ+A==
+X-Google-Smtp-Source: AGHT+IHmBN0+9+r5KY4AyoghUj0jEXWjqZKGqzuPjvXeVNzt6iAcmzIlgz93IE1ZHjH55zZ3g6T32Q==
+X-Received: by 2002:a05:620a:2950:b0:88e:aae4:9599 with SMTP id af79cd13be357-89dbfc9f46cmr377281085a.10.1761327152303;
+        Fri, 24 Oct 2025 10:32:32 -0700 (PDT)
+Received: from gourry-fedora-PF4VCD3F (pool-96-255-20-138.washdc.ftas.verizon.net. [96.255.20.138])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-89eadc0ab82sm58312485a.53.2025.10.24.10.32.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Oct 2025 10:32:31 -0700 (PDT)
+Date: Fri, 24 Oct 2025 13:32:29 -0400
+From: Gregory Price <gourry@gourry.net>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>, Zi Yan <ziy@nvidia.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+	Lance Yang <lance.yang@linux.dev>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+	Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+	Peter Xu <peterx@redhat.com>, Matthew Wilcox <willy@infradead.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+	Byungchul Park <byungchul@sk.com>,
+	Ying Huang <ying.huang@linux.alibaba.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	Pedro Falcato <pfalcato@suse.de>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
+	kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [RFC PATCH 05/12] fs/proc/task_mmu: refactor pagemap_pmd_range()
+Message-ID: <aPu4LWGdGSQR_xY0@gourry-fedora-PF4VCD3F>
+References: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
+ <2ce1da8c64bf2f831938d711b047b2eba0fa9f32.1761288179.git.lorenzo.stoakes@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250925172851.606193-1-sagis@google.com> <20250925172851.606193-14-sagis@google.com>
- <68efcb7ee33e5_cab031002e@iweiny-mobl.notmuch> <CAAhR5DGcz-2=a6Q2zZS_eP2ZjNNPs65jNG+K50tdVAQfC6AbbA@mail.gmail.com>
- <aPui50JMEcuIl7-8@google.com> <CAAhR5DFJKTTY3tN7AU=BXDRJAGjuortmK0ruQWU8RB_Z6jVugQ@mail.gmail.com>
-Message-ID: <aPu2NsDuU08UQ5N4@google.com>
-Subject: Re: [PATCH v11 13/21] KVM: selftests: Add helpers to init TDX memory
- and finalize VM
-From: Sean Christopherson <seanjc@google.com>
-To: Sagi Shahar <sagis@google.com>
-Cc: Ira Weiny <ira.weiny@intel.com>, linux-kselftest@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Roger Wang <runanwang@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2ce1da8c64bf2f831938d711b047b2eba0fa9f32.1761288179.git.lorenzo.stoakes@oracle.com>
 
-On Fri, Oct 24, 2025, Sagi Shahar wrote:
-> On Fri, Oct 24, 2025 at 11:02=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> >
-> > On Thu, Oct 23, 2025, Sagi Shahar wrote:
-> > > On Wed, Oct 15, 2025 at 11:25=E2=80=AFAM Ira Weiny <ira.weiny@intel.c=
-om> wrote:
-> > > >
-> > > > Sagi Shahar wrote:
-> > > > > From: Ackerley Tng <ackerleytng@google.com>
-> > > > >
-> > > >
-> > > > [snip]
-> > > >
-> > > > > diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b=
-/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-> > > > > index 2551b3eac8f8..53cfadeff8de 100644
-> > > > > --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-> > > > > +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-> > > > > @@ -270,3 +270,61 @@ void vm_tdx_init_vm(struct kvm_vm *vm, uint6=
-4_t attributes)
-> > > > >
-> > > > >       free(init_vm);
-> > > > >  }
-> > > > > +
-> > > >
-> > > > [snip]
-> > > >
-> > > > > +
-> > > > > +void vm_tdx_finalize(struct kvm_vm *vm)
-> > > >
-> > > > Why is this not a new kvm_arch_vm_finalize_vcpu() call?
-> > >
-> > > What do you mean?
-> >
-> > Ira is pointing out that upstream now has kvm_arch_vm_finalize_vcpus(),=
- so you
-> > can (and I agree, should) implement that for x86.c, and do vm_tdx_final=
-ize() from
-> > there (based on the VM shape) instead of requiring the caller to manual=
-ly finalize
-> > the TD.
-> >
-> > Unlike SEV, where userspace can manipulate guest state prior to LAUNCH,=
- TDX guest
-> > state is unreachable from time zero, i.e. there is unlikely to be many =
-(any?) use
-> > cases where a selftest wants to do something between creating vCPUs and=
- finalizing
-> > the TD.
->=20
-> There are actually a few use cases for calling vm_tdx_finalize
-> seperately from the create phase. One such case is when a user wants
-> to add additional memslots for testing shared memory conversions.
+On Fri, Oct 24, 2025 at 08:41:21AM +0100, Lorenzo Stoakes wrote:
+> Separate out THP logic so we can drop an indentation level and reduce the
+> amount of noise in this function.
+> 
+> We add pagemap_pmd_range_thp() for this purpose.
+> 
+> While we're here, convert the VM_BUG_ON() to a VM_WARN_ON_ONCE() at the
+> same time.
+> 
+> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+... >8
+> +static int pagemap_pmd_range(pmd_t *pmdp, unsigned long addr, unsigned long end,
+> +			     struct mm_walk *walk)
+> +{
+> +	struct vm_area_struct *vma = walk->vma;
+> +	struct pagemapread *pm = walk->private;
+> +	spinlock_t *ptl;
+> +	pte_t *pte, *orig_pte;
+> +	int err = 0;
+> +
+> +#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+> +	ptl = pmd_trans_huge_lock(pmdp, vma);
+> +	if (ptl)
+> +		return pagemap_pmd_range_thp(pmdp, addr, end, vma, pm, ptl);
+> +#endif
 
-Why does creating memslots need to be done before finalizing the TD?  The e=
-xtra
-memslots shouldn't _need_ to be included in the initial image, and I don't =
-recall
-anything in the kernel that prevents adding a memslot after the TD is initi=
-alized.
+Maybe something like...
 
-> Another one is installing interrupt handlers. But these are probably
-> rare enough that they can call __vm_create() and vm_vcpu_add()
-> manually instead of using the wrapper
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+ptl = pmd_trans_huge_lock(pmdp, vma);
+if (ptl) {
+	err = pagemap_pmd_range_thp(pmdp, addr, end, vma, pm, ptl);
+	spin_unlock(ptl);
+	return err;
+}
+#endif
 
-Hmm, for installing interrupt handlers, we could handle that by adding a gu=
-est
-variant, e.g. so that the guest can install/remove exception handlers after
-the initial image is finalized.  We probably want that anyways, otherwise t=
-ests
-would be unable to manipulate handlers throughout a test.
+and drop the spin_unlock(ptl) calls from pagemap_pmd_range_thp?
 
-In fact, it's tempting to kill off vm_install_exception_handler() in x86 en=
-tirely,
-but that's probably not worth the churn (and some tests would be made more =
-complex).
+Makes it easier to understand the locking semantics.
+
+Might be worth adding a comment to pagemap_pmd_range_thp that callers
+must hold the ptl lock.
+
+~Gregory
+
+P.S. This patch set made my day, the whole non-swap-swap thing has
+always broken my brain.  <3
 
