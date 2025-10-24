@@ -1,257 +1,445 @@
-Return-Path: <kvm+bounces-61010-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61011-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F8CBC05870
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 12:12:10 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9BB2C0588B
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 12:13:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0975F189BF2D
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 10:12:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 14E55507CC6
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 10:12:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 103A330EF84;
-	Fri, 24 Oct 2025 10:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879B930EF8B;
+	Fri, 24 Oct 2025 10:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TMlG7429"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eNGIJm7A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CC8263F36;
-	Fri, 24 Oct 2025 10:11:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761300719; cv=fail; b=po+OTWTMtF/tPYWyXlyV7fMpqQ1/r4aZn+Mk2gg5o5Xy0oe7ukS43XzkMco4BuPegnkr6ZvjsmENRKtooXUj89kkmzync0KTyPttnJG6LXpl/fMPsGwUgCzWU+O1eS3mJtHbEc8U2YESBK8Wy1dpE8KwLaoKZ2zXthCesvPZmD4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761300719; c=relaxed/simple;
-	bh=Mt0dYBJ5XwglNznseNq0Im6YWBjS4wvoWu43UdoDPlU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=N8gGUgPrsfhhmFlzsGbs1VUbikyi0lO4eMcAypmzj3YjF3QvbS6/X+Yvl91h6vostUsSy+os9OmByeNE5YWzFQvK+VenFONFH+/KjRYzAx89Wb85WhEOMw2lVRNxxjtusB+f4q+URegBn98pdQOP5ZBiFJLrHgcBbLGMkk8ZAlc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TMlG7429; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1729930E0E0;
+	Fri, 24 Oct 2025 10:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761300764; cv=none; b=i2Lsk9vn/7DJTDfdNPAQT/pZsRXbkc96WJk7qsVjHMZt0Di8jSDLSYjFmbLg5365oC0xJQYjT/sXOhOm9T9ZCg6v73TlSCKIvbYTThYMcl0c7Wvc96onL+4J9h4bAU85EDPHIfUqkpjiWgXRZbWDGUHMoSVWpJkFbK302TYZ2z4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761300764; c=relaxed/simple;
+	bh=xlFYDG2bQlVTloS05eCO9qDMzMthfcITU9mwgsQzjDk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=u7lGLfNdduDGi/gSmQUmuM8vf1JX9HEjp1XKkl5UCnm9uyhIdHJt/dcDA5TglonY+x1Tj/INY6l3T+STOvUDcOHlKV7iaak/qhwNDa2EQbZWh90FSfUbyso1v2mL/68jdLrpPwBV3Vav/fEckzoubHr3T4WWxtfmV16x+uryQrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eNGIJm7A; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761300717; x=1792836717;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=Mt0dYBJ5XwglNznseNq0Im6YWBjS4wvoWu43UdoDPlU=;
-  b=TMlG7429NE1uNpvFhNKH9HjWO1/BJXHyo6iNVHienlUO/7GuOuxlXyJw
-   JN+e9AwGpoZxNsbkMTQxSi4VUAejh0tS6cvQlx/BO3I423tkev/zpQ1V7
-   dsac50mkYFwizoakgVKRvuGih5slQCI4GxcmjVPk9Y7KUF/JTo05X+SPh
-   xSv2wuJepKy36dzNRHIMAE2SDc3/dmQljgZj5jeK1MDJwtn+axXuUkxLX
-   d+NWqhT6e0g70Tw+dUBGs4iXvHzVodiQlyIxHx5PlRF5cqXeSbeyET1fj
-   ufWNYMCjmB2dOXkdiMrOw71nGxPoRbl7Ph3cy/HpyPb6JdltLsba4YIQN
-   g==;
-X-CSE-ConnectionGUID: SRlEXD/pS16clflHqyAb/w==
-X-CSE-MsgGUID: bXVa9A0iTySXGwIn+NOwFg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63518596"
+  t=1761300762; x=1792836762;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=xlFYDG2bQlVTloS05eCO9qDMzMthfcITU9mwgsQzjDk=;
+  b=eNGIJm7AN7UlVokllgHjFBz5m43Sw5zshgu0bzexnF2+eb9ZPouuSB3P
+   gQHR+xKYE2s2Gy5b2Q99Ie0rydQPkBqlmwdhpankG0U+9tlfT1HKx6k0e
+   0L6adnMa1FDRbTjmSg+RttFe45XdmRjH3GUUVF5oaUHSuLZlWYAvoycH0
+   i1xk93TCuRWDZPNeBQaO/u46zya7AmOWQE0OZ0SHu3eTQbBaCszUxDuB+
+   2v6uJR5pPWcDgG0VS3wu+E1+XEHaiG0tjEfmM1n2vFlUxBeI664154MbC
+   aA/09nvNP+rMrubt265fzlxV+q+eOgv3habUFACQGw1FdfNUcbDVNu2vR
+   Q==;
+X-CSE-ConnectionGUID: H+x17JegQDao8VujjAQpIg==
+X-CSE-MsgGUID: 5w17pZfdSXOG8HhPLW7HXQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="67347159"
 X-IronPort-AV: E=Sophos;i="6.19,252,1754982000"; 
-   d="scan'208";a="63518596"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2025 03:11:57 -0700
-X-CSE-ConnectionGUID: E19r0EvHTXil6ErEJuEOyQ==
-X-CSE-MsgGUID: +Ya7FPI4Qk2vla0hCqGtog==
+   d="scan'208";a="67347159"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2025 03:12:41 -0700
+X-CSE-ConnectionGUID: A7yLYNKyQ0Ws/5qhPckICQ==
+X-CSE-MsgGUID: aVukQjuxQOaWBvcBdIAMQA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,252,1754982000"; 
-   d="scan'208";a="184774062"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2025 03:11:56 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 24 Oct 2025 03:11:56 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Fri, 24 Oct 2025 03:11:56 -0700
-Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.26) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 24 Oct 2025 03:11:55 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hnz7ic4UIaGiNqZaHFKlsZyc021DdSMYWJA06gzpc0B7xNb1aAPsvgXFy0710GJRipfNDN1JVuPz+uCtizfd2jb+z6cmOAlNGKoc/0t5P5kK/CH6NbNMajnW8+1iDe99OoDZWq9mFmGQp9QB81rDV7RCFGYdDulMMsSAwK9633Ie1oG6CBPcKMxDEV9cDZ+tCPNKQHTX7SI5q8jNRPbpCMztOFLRlaMt0Xs0i8TCjxsBx47MHox73teeLXUc4fDL/rooL+3J/7tOXl8+7HBdg+to8cOaga2DAQk6Yh6aIWPp/cGS4/PhBNWAbTjPnRMuHKkJqOnj6TxvlB5WbLJQLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Mt0dYBJ5XwglNznseNq0Im6YWBjS4wvoWu43UdoDPlU=;
- b=IXA+MvFqqEr2oNuv+EDz8woGgvd9M+NlPeB3AdhuLNpTA83egd4gI33Tp1Eh3rIVu+uKcral6sn/viIv+A/sPk5Ojpaib3OLdV2rprbY0uQ3NuB6G6MIBFE+AwfP9wUKn9ibPOyhAOZWX6v4332F5+K2J9LrAFj29zR/ZJAIuZ0JWmp2L0ziQ24aOKIN24KJceSiTwPWKjnc59ASEmjmZGwhjRUW5OwVxQ43cek7m8hU8CGk78hEvD7JjZlqewOIOIvqMosP0FDPWrAZFUpT0a9kxnMH3WNzYDVtTpIc0n/WLugHFhoo40ocTiilCXd+bwo0vmQAjfzGWyff/boniA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com (2603:10b6:208:31f::10)
- by CY8PR11MB6939.namprd11.prod.outlook.com (2603:10b6:930:59::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.13; Fri, 24 Oct
- 2025 10:11:52 +0000
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66]) by BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66%6]) with mapi id 15.20.9253.011; Fri, 24 Oct 2025
- 10:11:52 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "frankja@linux.ibm.com"
-	<frankja@linux.ibm.com>, "maz@kernel.org" <maz@kernel.org>,
-	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "pjw@kernel.org"
-	<pjw@kernel.org>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"kas@kernel.org" <kas@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"maobibo@loongson.cn" <maobibo@loongson.cn>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "maddy@linux.ibm.com" <maddy@linux.ibm.com>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "imbrenda@linux.ibm.com"
-	<imbrenda@linux.ibm.com>, "zhaotianrui@loongson.cn"
-	<zhaotianrui@loongson.cn>, "anup@brainfault.org" <anup@brainfault.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
-	<linux-coco@lists.linux.dev>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-	"michael.roth@amd.com" <michael.roth@amd.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "Weiny, Ira" <ira.weiny@intel.com>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-	"ackerleytng@google.com" <ackerleytng@google.com>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm-riscv@lists.infradead.org"
-	<kvm-riscv@lists.infradead.org>, "Annapurve, Vishal" <vannapurve@google.com>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, "Edgecombe,
- Rick P" <rick.p.edgecombe@intel.com>, "linux-mips@vger.kernel.org"
-	<linux-mips@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH v3 21/25] KVM: TDX: Add tdx_get_cmd() helper to get and
- validate sub-ioctl command
-Thread-Topic: [PATCH v3 21/25] KVM: TDX: Add tdx_get_cmd() helper to get and
- validate sub-ioctl command
-Thread-Index: AQHcPv2utspTzLCJqEqfJJNzotAjoLTRHz2A
-Date: Fri, 24 Oct 2025 10:11:51 +0000
-Message-ID: <9b15e66856fc1fda2bbb849afddddc5c05e2741d.camel@intel.com>
-References: <20251017003244.186495-1-seanjc@google.com>
-	 <20251017003244.186495-22-seanjc@google.com>
-In-Reply-To: <20251017003244.186495-22-seanjc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.56.2 (3.56.2-2.fc42) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5525:EE_|CY8PR11MB6939:EE_
-x-ms-office365-filtering-correlation-id: 549e4384-f76d-4b46-2c63-08de12e5c085
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|921020|38070700021;
-x-microsoft-antispam-message-info: =?utf-8?B?QUdIS3U2dXJCNGd1Q2pGQXcrUFBzMFNrR2FsVzc0SmlvbS8rbUg5YzRnZXhN?=
- =?utf-8?B?S0pBSkdyTDhZenhDVFQ3cUxjOVZPdEo3bklOc0tRYStUTE1wZ3JVbUUzNWlx?=
- =?utf-8?B?SG94cmFsVUIxNkJnUGJOUkUwNFJ1TWNLcjYyYlllOWwrWitWOVpDVlcvSFly?=
- =?utf-8?B?RHIrOE1mY1cxb0RTSXhTNmtSdVYzWmQyb0JsQTdaV1ArL1ZoM1BIeXplNHNY?=
- =?utf-8?B?dnY0dklCSUtNNXVTckJIZS9UdHlFSXdBbTZYNXl3a1A5U2pudDN4U2hTN1Bm?=
- =?utf-8?B?NzVSbEpHNFBLNDhTZTFaaDdNUDAyUzRWUWpjRWZlS3RrNGZkMmE0NTJqL0Rl?=
- =?utf-8?B?TjFtNUY3V20wWllXN0lUT3hNci9ZRVMwZUlVYXV2ZmhJMUk4SnQ1YndRNUxq?=
- =?utf-8?B?aGU2NVVIT2QzNS95YUJSb1Y4K25oS3puZ29Lbkl1YXdZNVhnVHBiMEc1bTZ0?=
- =?utf-8?B?Mmp3dTBrR1Rnb1phbVpXRVVCbzBPemxSd0x3V3MxSm1FaEkxZ3Q3QWhCQ2Y4?=
- =?utf-8?B?Q0xhVDVEcVg0ZWpHSFluQ25pelBOY1VrZWdFTjM0UmphdjNKMTIwZFI0S211?=
- =?utf-8?B?MWM0Wm5VQno3R0tTZGVpTTZETkFEN2FRRUw3U0FFR0FUWGJnaWcxaTVBYmRh?=
- =?utf-8?B?QzY4Wmp2cE0xM3ZDUnpMUlN1b1pJS0taaTdwY0F6dlpGbUs4elg0WURaM3RW?=
- =?utf-8?B?aldNWTlBemcvaUNhcjVKUmNYaDRMVGowOWpHTUNTZjRLUXVFalBPZnFObEN5?=
- =?utf-8?B?QXhDdEJyQk1ZQkVoQ2R1MFhaSmJkY011SmNzcWIzNmRBc3k4ZnJZUCsveElT?=
- =?utf-8?B?VEZ6TDY4NWl0TGZWSE8reDZNcTNPWUU0QWRkRk9HcEZYQ3RscVBVYzdVTUZS?=
- =?utf-8?B?cnVwRnNWTDFRcU93NDZoVHRYV1JnTDdsaFJQVlFyZm9USTc3RkpTY1cwb2Rn?=
- =?utf-8?B?eUVhWU5hS1VPY2hKOTNHZzZkdjdGOXdWb2R1eE1RdVNhM1FDKzhIbm9jaUNy?=
- =?utf-8?B?ZTRadDlrZVlZYkVucWNqTWFFUzVqdU01TUtveDZZZHRLSVZMbmp1Rjk5dkxx?=
- =?utf-8?B?aVZieWs1SWd4QWJmNlFZdG41SVE3NXVocFhRWkRLSmgrakg1WEFGQ0pIMm5W?=
- =?utf-8?B?UWR2QWN3ZkFnQmNEQ0ZFOVBtNXlPSE5Nc3cxRWFrSGNTL3h0c2ppWmpWbjlk?=
- =?utf-8?B?ZUNCdXQzL09EZE03YW45aXVMKzdGK2lKSVN6ajhUcUcrckdFNDBzd1BRUG9u?=
- =?utf-8?B?TXNRNE9vZVhleW9ENWpyVld6VXpwT2hvTmFEcEozZk96SVFCaTlaU1pFUXJB?=
- =?utf-8?B?QUMvazJLNnZ0QkR0SkZBcFhERE1RQnNLMVpQUFQrWFhvWXNERnNJWGgrRVBl?=
- =?utf-8?B?eTlRcmg2UHhZUnlXZStFdlRZc0RGNnZyTkoyalY3M2cwN1IzbGp4RXlPWEQr?=
- =?utf-8?B?MjRCVHdYWUVCSGttN3lDZFJpeVlFS0k2KzBpaUJPaUlPOUhVbiswdklENXY0?=
- =?utf-8?B?ODJJd2lNN2g3U0c0V3lGLzhNeU9PTjRKU0UyelVyQlZzU2hUakFOUGdOSmtn?=
- =?utf-8?B?SEVXdWRHcjNsamtrNHF5ZlZ0MTVpKzlyTFNDZ25iL1RGTDNvSUxzYVJMM1Fy?=
- =?utf-8?B?SHVrSFZIYkxVM2FDaGJ6MXgwLzFveEEzQTBZNGp0alllUVpHQlhVUmdrcHVt?=
- =?utf-8?B?c3JpaDlWTWp3YUF1YWJXZU5vNGNJWFB4TWVLTkN6Yy9SV2lueXJITkMxYW9v?=
- =?utf-8?B?MEdCMG51OTVRaHh4Q2x4Qjh4NEplZDBObFNWMnFWcTE2TFhxVzJQajJJYVUx?=
- =?utf-8?B?djBNQ2t6eHNnbE9HeDAvbzE5ODJLMEY3d3BuUkhYQkI1K0ViVWlGRXFxeHVE?=
- =?utf-8?B?c2g5NkNmdzQ4aUVaQWpXWmd5dzlkRi9OcU1zUGxTeERlN0RYMFR2YnkvV3Vj?=
- =?utf-8?B?NHY4UXorUDVFVWhZOW80ZmNlLzVCYzhuanBYQXJlTncrTXU5ODNWWjM4MENR?=
- =?utf-8?B?dXBEMHFhKzAvamhDcVdKbWlkbnJzcFEzcWJhc01MTE9WZkR1RGVmd0NLRHkx?=
- =?utf-8?B?MDdqN0R0b1IyVG5xQ1EzbjB3Y1M3VFVTYzA5QT09?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5525.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(921020)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?V29sZzRrYk4wZ2p1cUtpZXZRS1YzWWpadU5hNXRIU1MzQ3JuanNyaDN1WXEy?=
- =?utf-8?B?U0hINy9SYTNXSkYrdGN6aHZsSmJ6Wk03QlQzREduQm0vamhubWlMclpDaUJU?=
- =?utf-8?B?RjVtTW1FSVhWbjhxS1lqazVKRXVPTXI4WnNLZndQc1NuVFR4SmVrbC9kRUk4?=
- =?utf-8?B?TEV3VGpYYjdKQWJBM0s4ZGRJL2NVNXcvOVZJbTYyV3lkbkxNazBmbERhODNE?=
- =?utf-8?B?a2ZOVEJsVlRrbmpPb01OUzNUdDhLaGJLUkFlZHJKT1NwRThOM2xsa1VmSlFs?=
- =?utf-8?B?TU5ka1FsN0dZd1R6WFlmVUZqNU1NSXdmMXlHYnY5U24xSG54TWljTk9KVlA1?=
- =?utf-8?B?anprbzk0NTE4aWpKSGV3bmxQOHQvV2pvRmN4TC9ISEQzZzZtc3BNUG1iZCt1?=
- =?utf-8?B?S01lb29zcUFXRkc2cnNyU3dpWndjV3c3ZXZlTFo0aG10UkVyWE5CL0tiZ25h?=
- =?utf-8?B?L2k2VUM0dGJzZ0hVdTg4aUNPeXB1ZWxCMDkybzFMbGpaWDJNTkVkU0UwYytw?=
- =?utf-8?B?VVhGeldCd0YrcmFmNjdCUmtBZElGTmZteEJvSWN4UXB3eHFhbTdFZk1GVC83?=
- =?utf-8?B?VHRibDBtRkJjditBY0dvY3Z2emhkMzFpOFg2TTJZTHExVW1VNDltUDBQK3lY?=
- =?utf-8?B?eG04NkhORkpuUm9HeFVGNU5hTEtPSU9veFRxbTRFenA4OHAvTktQSVpzazl4?=
- =?utf-8?B?akh5SlZNK0kyWkFJbnpST09EWUpLZ280aHVOU0RTcTlMQ3NFVExubW5QUHdI?=
- =?utf-8?B?MG1yU3JOWU9tWis3aGFWV0d6QkwyMlRiYnhWcDdIR2tickpmR1JDYkdCZ0Ra?=
- =?utf-8?B?OWFEektMK25tQmRDM0ZaOXYyaG00VUs2bXNCVWVsVnh2eU5HcDJiYjc2V20w?=
- =?utf-8?B?U2lMbWRlWFYrREpmRG1nSVAzbnRFSGF5U3cvZVd4UjBqalNKbWdPalFqUllY?=
- =?utf-8?B?NXRaWXZFcFJpQUo2TGU1V1E1OWZtOXRyemVUVWx6T2hYOVFhQ0o4M0I2WmVD?=
- =?utf-8?B?cmdXR284Nmp3cjJLTDhRb1VoaHdWenduM2ViMDZGM2lkSFVUQkhhUTdMZmxM?=
- =?utf-8?B?RWFvNStKWVVwdzdNY2FrQkVWRVFwRWM2bTByOEZjMUI0bUZ1OTdsaGx4aGJs?=
- =?utf-8?B?T1haZlczYVVRRGlEbUVwRTJnSjIyckYyR09VT0VnV1U5N1BxTlJnNXNPcmhv?=
- =?utf-8?B?NHZTVVU5blFoMDRrLzJxZGQzSU54TXhYU0lrTW13RzJrYU95OTcvWHkrTldy?=
- =?utf-8?B?dkdtakVmd1d5bDVyM1E4OGoydWU0aHhUdlM0M0s0RGRLR0dudUpkR3FEaUZy?=
- =?utf-8?B?SnMyRTVJK1FwVHhGUWdtd2l4REtYUzVva1N2QXQwNml6ZzN3SmVUM2ppeWFB?=
- =?utf-8?B?TXlEeTN6Q3B3WTlPR3BTbUhCbkxEUzZaTzVmRGtoZml4U2FNYWZBay8vUFo2?=
- =?utf-8?B?dU5KMEtXcUFwbFgzS2JkRjFXTS9TdHFkcnpycjA3U2dJeUFGeFErM3ZSRFI0?=
- =?utf-8?B?S29YYjFINmtkdUlZd3hxZ09NUmVaTU1pczNKdHJIYkRiNlBWaVRpRmttaUdP?=
- =?utf-8?B?NlNtZDdDSWJKR0RkUkU1OWppdDFrc3pQdDJuMDBaOTJSSnpXelRlU2xvbFZx?=
- =?utf-8?B?VHE4SlU0TWpPMkozNUdYL1ZYUVlLQzVmazVsNWhPVW1nNXh5NllFK1V4cTBK?=
- =?utf-8?B?YUpNRjExc0svMFc0NHZKTUhEVjBlbkUvWTFyd2VUemhJVGFLTjFkTlFlVlFr?=
- =?utf-8?B?UXA2eUplVVdXcTVERXhWVlVCazRiMFRhRHlyMkYxczVEcFBObXNiMTE1L0dY?=
- =?utf-8?B?d2RjL0V6UUVaaW16QitvV0NibkI0YkJPM1dwa2VKbUEwcktzYnVIc09jYWFD?=
- =?utf-8?B?aktkZW9pNjlaRkZITVJtMnFDb0FGUVJIN0dZcTNYUW9HY0Fmc1pjQklXRThO?=
- =?utf-8?B?QUlHREpjd3B4QnFBNTB0S1JBb3ZiSk90R0VHRmVDNGdQSHozeE1CNDNtTGR4?=
- =?utf-8?B?Y3d3UnRtRytTZFZOWnN6a3I4bmtwOFNzV1M4TlVhSzBXNnNJR2NSN2RzNHpK?=
- =?utf-8?B?d2FJbjZTQWZtOU5kRkh2enBnSitLekx4aEZnTzdTNFpuTm1JN1ozY0J1b3ZM?=
- =?utf-8?Q?Iwr/fGYWMdv1KikakH+tHSEL+?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FB3C6B9E58CE344E875EEDB6A95588D7@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+   d="scan'208";a="184109635"
+Received: from dhhellew-desk2.ger.corp.intel.com (HELO localhost) ([10.245.246.230])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2025 03:12:31 -0700
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, David Airlie <airlied@gmail.com>, Alex
+ Williamson <alex.williamson@redhat.com>, Ankit Agrawal
+ <ankita@nvidia.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Brett Creeley <brett.creeley@amd.com>, dri-devel@lists.freedesktop.org,
+ Eric Auger <eric.auger@redhat.com>, Eric Farman <farman@linux.ibm.com>,
+ Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Vasily Gorbik
+ <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ intel-gfx@lists.freedesktop.org, Joonas Lahtinen
+ <joonas.lahtinen@linux.intel.com>, Kevin Tian <kevin.tian@intel.com>,
+ kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+ linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>, Matthew
+ Rosato <mjrosato@linux.ibm.com>, Nikhil Agarwal <nikhil.agarwal@amd.com>,
+ Nipun Gupta <nipun.gupta@amd.com>, Peter Oberparleiter
+ <oberpar@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pranjal
+ Shrivastava <praan@google.com>, qat-linux@intel.com, Rodrigo Vivi
+ <rodrigo.vivi@intel.com>, Simona Vetter <simona@ffwll.ch>, Shameer
+ Kolothum <skolothumtho@nvidia.com>, Mostafa Saleh <smostafa@google.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, virtualization@lists.linux.dev, Vineeth Vijayan
+ <vneethv@linux.ibm.com>, Yishai Hadas <yishaih@nvidia.com>, Zhenyu Wang
+ <zhenyuw.linux@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>
+Cc: patches@lists.linux.dev
+Subject: Re: [PATCH 13/22] vfio/gvt: Provide a get_region_info op
+In-Reply-To: <13-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <13-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
+Date: Fri, 24 Oct 2025 13:12:28 +0300
+Message-ID: <c30b38456cc11ced5b74d9d38900cf8544a1978e@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5525.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 549e4384-f76d-4b46-2c63-08de12e5c085
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Oct 2025 10:11:51.9404
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BjhShBLmE9d7PRb/riiNVhSSgyrerSZDvo6uqZTmeM17BcLYKf/4pXaezZP0JdDBNESFIGKbpmBMWzuyTRLnBg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6939
-X-OriginatorOrg: intel.com
+Content-Type: text/plain
 
-T24gVGh1LCAyMDI1LTEwLTE2IGF0IDE3OjMyIC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBBZGQgYSBoZWxwZXIgdG8gY29weSBhIGt2bV90ZHhfY21kIHN0cnVjdHVyZSBmcm9t
-IHVzZXJzcGFjZSBhbmQgdmVyaWZ5DQo+IHRoYXQgbXVzdC1iZS16ZXJvIGZpZWxkcyBhcmUgaW5k
-ZWVkIHplcm8uDQo+IA0KPiBObyBmdW5jdGlvbmFsIGNoYW5nZSBpbnRlbmRlZC4NCj4gDQo+IFNp
-Z25lZC1vZmYtYnk6IFNlYW4gQ2hyaXN0b3BoZXJzb24gPHNlYW5qY0Bnb29nbGUuY29tPg0KDQpS
-ZXZpZXdlZC1ieTogS2FpIEh1YW5nIDxrYWkuaHVhbmdAaW50ZWwuY29tPg0KDQo+IC0tLQ0KPiAg
-YXJjaC94ODYva3ZtL3ZteC90ZHguYyB8IDMxICsrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0t
-LS0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxNyBpbnNlcnRpb25zKCspLCAxNCBkZWxldGlvbnMoLSkN
-Cj4gDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vdm14L3RkeC5jIGIvYXJjaC94ODYva3Zt
-L3ZteC90ZHguYw0KPiBpbmRleCAyZTJkYWI4OWM5OGYuLmQ1ZjgxMDQzNWYzNCAxMDA2NDQNCj4g
-LS0tIGEvYXJjaC94ODYva3ZtL3ZteC90ZHguYw0KPiArKysgYi9hcmNoL3g4Ni9rdm0vdm14L3Rk
-eC5jDQo+IEBAIC0yNzYxLDIwICsyNzYxLDI1IEBAIHN0YXRpYyBpbnQgdGR4X3RkX2ZpbmFsaXpl
-KHN0cnVjdCBrdm0gKmt2bSwgc3RydWN0IGt2bV90ZHhfY21kICpjbWQpDQo+ICAJcmV0dXJuIDA7
-DQo+ICB9DQo+ICANCj4gK3N0YXRpYyBpbnQgdGR4X2dldF9jbWQodm9pZCBfX3VzZXIgKmFyZ3As
-IHN0cnVjdCBrdm1fdGR4X2NtZCAqY21kKQ0KPiArew0KPiArCWlmIChjb3B5X2Zyb21fdXNlcihj
-bWQsIGFyZ3AsIHNpemVvZigqY21kKSkpDQo+ICsJCXJldHVybiAtRUZBVUxUOw0KPiArDQo+ICsJ
-aWYgKGNtZC0+aHdfZXJyb3IpDQo+ICsJCXJldHVybiAtRUlOVkFMOw0KDQpOaXQ6IHRvIG1lIGl0
-J3MgYSBsaXR0bGUgYml0IHBpdHkgdG8gbG9zZSB0aGUgYmVsb3cgY29tbWVudDoNCg0KCS8qDQoJ
-ICogVXNlcnNwYWNlIHNob3VsZCBuZXZlciBzZXQgaHdfZXJyb3IuIEl0IGlzIHVzZWQgdG8gZmls
-bA0KCSAqIGhhcmR3YXJlLWRlZmluZWQgZXJyb3IgYnkgdGhlIGtlcm5lbC4NCgkgKi8NCg0K
+On Thu, 23 Oct 2025, Jason Gunthorpe <jgg@nvidia.com> wrote:
+> Move it out of intel_vgpu_ioctl() and re-indent it.
+
+Not a huge deal, but this will conflict with 69b4d367fff6
+("drm/i915/gvt: Simplify case switch in intel_vgpu_ioctl") in
+drm-intel-next.
+
+BR,
+Jani.
+
+
+>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/gpu/drm/i915/gvt/kvmgt.c | 301 +++++++++++++++----------------
+>  1 file changed, 150 insertions(+), 151 deletions(-)
+>
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> index 69830a5c49d3fd..6b47e33078eb52 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -1140,6 +1140,155 @@ static int intel_vgpu_set_irqs(struct intel_vgpu *vgpu, u32 flags,
+>  	return func(vgpu, index, start, count, flags, data);
+>  }
+>  
+> +static int intel_vgpu_get_region_info(struct vfio_device *vfio_dev,
+> +				      struct vfio_region_info __user *arg)
+> +{
+> +	struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
+> +	struct vfio_region_info_cap_sparse_mmap *sparse = NULL;
+> +	struct intel_vgpu *vgpu = vfio_dev_to_vgpu(vfio_dev);
+> +	struct vfio_region_info info;
+> +	unsigned long minsz;
+> +	int nr_areas = 1;
+> +	int cap_type_id;
+> +	unsigned int i;
+> +	int ret;
+> +
+> +	minsz = offsetofend(struct vfio_region_info, offset);
+> +
+> +	if (copy_from_user(&info, arg, minsz))
+> +		return -EFAULT;
+> +
+> +	if (info.argsz < minsz)
+> +		return -EINVAL;
+> +
+> +	switch (info.index) {
+> +	case VFIO_PCI_CONFIG_REGION_INDEX:
+> +		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> +		info.size = vgpu->gvt->device_info.cfg_space_size;
+> +		info.flags = VFIO_REGION_INFO_FLAG_READ |
+> +			     VFIO_REGION_INFO_FLAG_WRITE;
+> +		break;
+> +	case VFIO_PCI_BAR0_REGION_INDEX:
+> +		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> +		info.size = vgpu->cfg_space.bar[info.index].size;
+> +		if (!info.size) {
+> +			info.flags = 0;
+> +			break;
+> +		}
+> +
+> +		info.flags = VFIO_REGION_INFO_FLAG_READ |
+> +			     VFIO_REGION_INFO_FLAG_WRITE;
+> +		break;
+> +	case VFIO_PCI_BAR1_REGION_INDEX:
+> +		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> +		info.size = 0;
+> +		info.flags = 0;
+> +		break;
+> +	case VFIO_PCI_BAR2_REGION_INDEX:
+> +		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> +		info.flags = VFIO_REGION_INFO_FLAG_CAPS |
+> +			     VFIO_REGION_INFO_FLAG_MMAP |
+> +			     VFIO_REGION_INFO_FLAG_READ |
+> +			     VFIO_REGION_INFO_FLAG_WRITE;
+> +		info.size = gvt_aperture_sz(vgpu->gvt);
+> +
+> +		sparse = kzalloc(struct_size(sparse, areas, nr_areas),
+> +				 GFP_KERNEL);
+> +		if (!sparse)
+> +			return -ENOMEM;
+> +
+> +		sparse->header.id = VFIO_REGION_INFO_CAP_SPARSE_MMAP;
+> +		sparse->header.version = 1;
+> +		sparse->nr_areas = nr_areas;
+> +		cap_type_id = VFIO_REGION_INFO_CAP_SPARSE_MMAP;
+> +		sparse->areas[0].offset =
+> +			PAGE_ALIGN(vgpu_aperture_offset(vgpu));
+> +		sparse->areas[0].size = vgpu_aperture_sz(vgpu);
+> +		break;
+> +
+> +	case VFIO_PCI_BAR3_REGION_INDEX ... VFIO_PCI_BAR5_REGION_INDEX:
+> +		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> +		info.size = 0;
+> +		info.flags = 0;
+> +
+> +		gvt_dbg_core("get region info bar:%d\n", info.index);
+> +		break;
+> +
+> +	case VFIO_PCI_ROM_REGION_INDEX:
+> +	case VFIO_PCI_VGA_REGION_INDEX:
+> +		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> +		info.size = 0;
+> +		info.flags = 0;
+> +
+> +		gvt_dbg_core("get region info index:%d\n", info.index);
+> +		break;
+> +	default: {
+> +		struct vfio_region_info_cap_type cap_type = {
+> +			.header.id = VFIO_REGION_INFO_CAP_TYPE,
+> +			.header.version = 1
+> +		};
+> +
+> +		if (info.index >= VFIO_PCI_NUM_REGIONS + vgpu->num_regions)
+> +			return -EINVAL;
+> +		info.index = array_index_nospec(
+> +			info.index, VFIO_PCI_NUM_REGIONS + vgpu->num_regions);
+> +
+> +		i = info.index - VFIO_PCI_NUM_REGIONS;
+> +
+> +		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> +		info.size = vgpu->region[i].size;
+> +		info.flags = vgpu->region[i].flags;
+> +
+> +		cap_type.type = vgpu->region[i].type;
+> +		cap_type.subtype = vgpu->region[i].subtype;
+> +
+> +		ret = vfio_info_add_capability(&caps, &cap_type.header,
+> +					       sizeof(cap_type));
+> +		if (ret)
+> +			return ret;
+> +	}
+> +	}
+> +
+> +	if ((info.flags & VFIO_REGION_INFO_FLAG_CAPS) && sparse) {
+> +		switch (cap_type_id) {
+> +		case VFIO_REGION_INFO_CAP_SPARSE_MMAP:
+> +			ret = vfio_info_add_capability(
+> +				&caps, &sparse->header,
+> +				struct_size(sparse, areas, sparse->nr_areas));
+> +			if (ret) {
+> +				kfree(sparse);
+> +				return ret;
+> +			}
+> +			break;
+> +		default:
+> +			kfree(sparse);
+> +			return -EINVAL;
+> +		}
+> +	}
+> +
+> +	if (caps.size) {
+> +		info.flags |= VFIO_REGION_INFO_FLAG_CAPS;
+> +		if (info.argsz < sizeof(info) + caps.size) {
+> +			info.argsz = sizeof(info) + caps.size;
+> +			info.cap_offset = 0;
+> +		} else {
+> +			vfio_info_cap_shift(&caps, sizeof(info));
+> +			if (copy_to_user((void __user *)arg + sizeof(info),
+> +					 caps.buf, caps.size)) {
+> +				kfree(caps.buf);
+> +				kfree(sparse);
+> +				return -EFAULT;
+> +			}
+> +			info.cap_offset = sizeof(info);
+> +		}
+> +
+> +		kfree(caps.buf);
+> +	}
+> +
+> +	kfree(sparse);
+> +	return copy_to_user(arg, &info, minsz) ? -EFAULT : 0;
+> +}
+> +
+>  static long intel_vgpu_ioctl(struct vfio_device *vfio_dev, unsigned int cmd,
+>  			     unsigned long arg)
+>  {
+> @@ -1168,157 +1317,6 @@ static long intel_vgpu_ioctl(struct vfio_device *vfio_dev, unsigned int cmd,
+>  		return copy_to_user((void __user *)arg, &info, minsz) ?
+>  			-EFAULT : 0;
+>  
+> -	} else if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
+> -		struct vfio_region_info info;
+> -		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
+> -		unsigned int i;
+> -		int ret;
+> -		struct vfio_region_info_cap_sparse_mmap *sparse = NULL;
+> -		int nr_areas = 1;
+> -		int cap_type_id;
+> -
+> -		minsz = offsetofend(struct vfio_region_info, offset);
+> -
+> -		if (copy_from_user(&info, (void __user *)arg, minsz))
+> -			return -EFAULT;
+> -
+> -		if (info.argsz < minsz)
+> -			return -EINVAL;
+> -
+> -		switch (info.index) {
+> -		case VFIO_PCI_CONFIG_REGION_INDEX:
+> -			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> -			info.size = vgpu->gvt->device_info.cfg_space_size;
+> -			info.flags = VFIO_REGION_INFO_FLAG_READ |
+> -				     VFIO_REGION_INFO_FLAG_WRITE;
+> -			break;
+> -		case VFIO_PCI_BAR0_REGION_INDEX:
+> -			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> -			info.size = vgpu->cfg_space.bar[info.index].size;
+> -			if (!info.size) {
+> -				info.flags = 0;
+> -				break;
+> -			}
+> -
+> -			info.flags = VFIO_REGION_INFO_FLAG_READ |
+> -				     VFIO_REGION_INFO_FLAG_WRITE;
+> -			break;
+> -		case VFIO_PCI_BAR1_REGION_INDEX:
+> -			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> -			info.size = 0;
+> -			info.flags = 0;
+> -			break;
+> -		case VFIO_PCI_BAR2_REGION_INDEX:
+> -			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> -			info.flags = VFIO_REGION_INFO_FLAG_CAPS |
+> -					VFIO_REGION_INFO_FLAG_MMAP |
+> -					VFIO_REGION_INFO_FLAG_READ |
+> -					VFIO_REGION_INFO_FLAG_WRITE;
+> -			info.size = gvt_aperture_sz(vgpu->gvt);
+> -
+> -			sparse = kzalloc(struct_size(sparse, areas, nr_areas),
+> -					 GFP_KERNEL);
+> -			if (!sparse)
+> -				return -ENOMEM;
+> -
+> -			sparse->header.id = VFIO_REGION_INFO_CAP_SPARSE_MMAP;
+> -			sparse->header.version = 1;
+> -			sparse->nr_areas = nr_areas;
+> -			cap_type_id = VFIO_REGION_INFO_CAP_SPARSE_MMAP;
+> -			sparse->areas[0].offset =
+> -					PAGE_ALIGN(vgpu_aperture_offset(vgpu));
+> -			sparse->areas[0].size = vgpu_aperture_sz(vgpu);
+> -			break;
+> -
+> -		case VFIO_PCI_BAR3_REGION_INDEX ... VFIO_PCI_BAR5_REGION_INDEX:
+> -			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> -			info.size = 0;
+> -			info.flags = 0;
+> -
+> -			gvt_dbg_core("get region info bar:%d\n", info.index);
+> -			break;
+> -
+> -		case VFIO_PCI_ROM_REGION_INDEX:
+> -		case VFIO_PCI_VGA_REGION_INDEX:
+> -			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> -			info.size = 0;
+> -			info.flags = 0;
+> -
+> -			gvt_dbg_core("get region info index:%d\n", info.index);
+> -			break;
+> -		default:
+> -			{
+> -				struct vfio_region_info_cap_type cap_type = {
+> -					.header.id = VFIO_REGION_INFO_CAP_TYPE,
+> -					.header.version = 1 };
+> -
+> -				if (info.index >= VFIO_PCI_NUM_REGIONS +
+> -						vgpu->num_regions)
+> -					return -EINVAL;
+> -				info.index =
+> -					array_index_nospec(info.index,
+> -							VFIO_PCI_NUM_REGIONS +
+> -							vgpu->num_regions);
+> -
+> -				i = info.index - VFIO_PCI_NUM_REGIONS;
+> -
+> -				info.offset =
+> -					VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> -				info.size = vgpu->region[i].size;
+> -				info.flags = vgpu->region[i].flags;
+> -
+> -				cap_type.type = vgpu->region[i].type;
+> -				cap_type.subtype = vgpu->region[i].subtype;
+> -
+> -				ret = vfio_info_add_capability(&caps,
+> -							&cap_type.header,
+> -							sizeof(cap_type));
+> -				if (ret)
+> -					return ret;
+> -			}
+> -		}
+> -
+> -		if ((info.flags & VFIO_REGION_INFO_FLAG_CAPS) && sparse) {
+> -			switch (cap_type_id) {
+> -			case VFIO_REGION_INFO_CAP_SPARSE_MMAP:
+> -				ret = vfio_info_add_capability(&caps,
+> -					&sparse->header,
+> -					struct_size(sparse, areas,
+> -						    sparse->nr_areas));
+> -				if (ret) {
+> -					kfree(sparse);
+> -					return ret;
+> -				}
+> -				break;
+> -			default:
+> -				kfree(sparse);
+> -				return -EINVAL;
+> -			}
+> -		}
+> -
+> -		if (caps.size) {
+> -			info.flags |= VFIO_REGION_INFO_FLAG_CAPS;
+> -			if (info.argsz < sizeof(info) + caps.size) {
+> -				info.argsz = sizeof(info) + caps.size;
+> -				info.cap_offset = 0;
+> -			} else {
+> -				vfio_info_cap_shift(&caps, sizeof(info));
+> -				if (copy_to_user((void __user *)arg +
+> -						  sizeof(info), caps.buf,
+> -						  caps.size)) {
+> -					kfree(caps.buf);
+> -					kfree(sparse);
+> -					return -EFAULT;
+> -				}
+> -				info.cap_offset = sizeof(info);
+> -			}
+> -
+> -			kfree(caps.buf);
+> -		}
+> -
+> -		kfree(sparse);
+> -		return copy_to_user((void __user *)arg, &info, minsz) ?
+> -			-EFAULT : 0;
+>  	} else if (cmd == VFIO_DEVICE_GET_IRQ_INFO) {
+>  		struct vfio_irq_info info;
+>  
+> @@ -1475,6 +1473,7 @@ static const struct vfio_device_ops intel_vgpu_dev_ops = {
+>  	.write		= intel_vgpu_write,
+>  	.mmap		= intel_vgpu_mmap,
+>  	.ioctl		= intel_vgpu_ioctl,
+> +	.get_region_info = intel_vgpu_get_region_info,
+>  	.dma_unmap	= intel_vgpu_dma_unmap,
+>  	.bind_iommufd	= vfio_iommufd_emulated_bind,
+>  	.unbind_iommufd = vfio_iommufd_emulated_unbind,
+
+-- 
+Jani Nikula, Intel
 
