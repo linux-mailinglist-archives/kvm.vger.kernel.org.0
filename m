@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-60971-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60972-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C253C04830
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 08:35:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18C4CC04833
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 08:35:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B0DD3BA4D9
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 06:35:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D10E1A0613B
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 06:36:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AF072749E6;
-	Fri, 24 Oct 2025 06:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C5A5276049;
+	Fri, 24 Oct 2025 06:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="By965o7D"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZEzeB63G"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CD425F7A5
-	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 06:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C16271446
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 06:35:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761287718; cv=none; b=Y9gYII3p6/Q7BZ00GUkB/WqA48Re7x1zisYeiGIY0MpaLcbcDzaXTmw77g7wnNMb0m7nxhzN/ZfTKpvjUKmlt8yKJLb/sV2sh+l6LvJr5MzUXFoz8MWQ0keUYBeRWJj//fk/LhBKwOZmDE+cxazW9woxVPD9UXUGR3G6amil/SA=
+	t=1761287722; cv=none; b=CP0ZYodaB/pw60jPKqwm8pqMH96SBIQ+YCeg5b6k3vAIHOmu4TuIgUFZUcz93DrkCwWWPSORhh8QWOl1ObYYh/Div7hc24cGbQsSGpFjCJrCjWHXiNP2iPHjNKrquWrixGwyyoBgat23OQpwsS8+aUELq/3fwGEOXT7WxAgWloc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761287718; c=relaxed/simple;
-	bh=q1llAB51wlYD8DExeRchjbchwIbqPcgnJ8aGmhooIHs=;
+	s=arc-20240116; t=1761287722; c=relaxed/simple;
+	bh=qU5Tj18SBAmRCCj3RrNgLtsm8wwe6XuagVR52Qb/xRo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aqiNIB0+xW/mlv8uAFGGk9vpPA0ZvpBIsPdpOzeUnIm4G4sDRC8S7KSvA/IoLt3dIBbQ3p3t43wqThk1KhiH6XmkocupT0vHCftZ9ssbBcmyWkJ1nexId4zwie8mNY3EdrkbksSiG22zJkcr3MMmuwlCP25frcYJARgLvdUUoi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=By965o7D; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=B1lu9wtZGm304DjBrEiW5JBnWP2nPv5PgksMhMTvymsf7stitddUFngQ9MsySwnjL9SxRJBRQU9/o5hJobfDyf3QWRqxlKSOnJ+sM+DhZJTqpvmZe2CXvf1Qhl0775k3x/ELUPaCzoIIkMTMYuXZ97qnTEvB6/UbmY98Y7H6K68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZEzeB63G; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761287717; x=1792823717;
+  t=1761287721; x=1792823721;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=q1llAB51wlYD8DExeRchjbchwIbqPcgnJ8aGmhooIHs=;
-  b=By965o7DuvBgMG7lNCDnN96JwA8X67cTSlUpv4cY7C/8UD1ga60SZ9fp
-   NmAMUnZF5BYnQWt7PPPvwEl9Srlm9YV3OZCSFg1NRTvmwpEhnXC3GBNt5
-   7QMQc889PC2u/ZEBBuFwkixk3BY+5eIHajLUheQbQWGUme6St0abk0OMi
-   dqMTTv/l+q+3BnQwRn9AGHqnuPP6c6PkVZZGRSmP1nPrAVjA84GrXC99S
-   0P5ekR2dBcKQEk3rTuuWG0bZxTIFzhlBt2TEpBigAUn2AJpm6WICXeKIZ
-   N0aLE1QgGIe/dbgm78ce9EC+Mdgevap9DOVL2KSmHFnBwQz30S1pU/ANx
-   Q==;
-X-CSE-ConnectionGUID: C7KhEXQYTEy472lX9OI3DA==
-X-CSE-MsgGUID: BkC3i5VvTYW3nrJrShjVug==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="86095587"
+  bh=qU5Tj18SBAmRCCj3RrNgLtsm8wwe6XuagVR52Qb/xRo=;
+  b=ZEzeB63G+0GxUiE0oJqhoLCQ2NjAaeoOJ33QzBGpvrI2eNuMXOnKCInl
+   l6ER3gaPgMkLoTVjMIKeKSEUi1mE91OYhnjjLHsJjGIbNI7SGM4xNvGAC
+   XhoFg/hvFLsfbOJjEAB43UCm8wzsH01Q1mKd8rf2qhqQtDw4HAKZ/MH7U
+   8fU5DuMG6ODciSbkw9DVbDyAahyuhJmi256COG8cOPcLXB3LpBFjjERKj
+   OCIxkIv/cfUyV4BvSOaxleHiN1i9QuGCOI4cvSIvEwdcCQxmKfaxIfp8v
+   IwXzNOcmxB+8fQs2K+PBS6xy+z7YXFo6DEI4QnGlWwOI7WI2jAj3N0O7A
+   A==;
+X-CSE-ConnectionGUID: C5mWa8yxTte8PJZ76vxI4Q==
+X-CSE-MsgGUID: EWBgjeYtTfWupxWrS7jwwQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="86095593"
 X-IronPort-AV: E=Sophos;i="6.19,251,1754982000"; 
-   d="scan'208";a="86095587"
+   d="scan'208";a="86095593"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 23:35:17 -0700
-X-CSE-ConnectionGUID: zdda8MoeRuaoDINh3c/nxA==
-X-CSE-MsgGUID: mKBG2dchQsOb/9ZT/rM9Xg==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 23:35:21 -0700
+X-CSE-ConnectionGUID: XxIr8PBlTo+gR5ef38s0JQ==
+X-CSE-MsgGUID: kTyIiDalRs+xYRGXLFAcxw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,251,1754982000"; 
-   d="scan'208";a="184276073"
+   d="scan'208";a="184276083"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by fmviesa006.fm.intel.com with ESMTP; 23 Oct 2025 23:35:14 -0700
+  by fmviesa006.fm.intel.com with ESMTP; 23 Oct 2025 23:35:17 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>
@@ -72,10 +72,11 @@ Cc: qemu-devel@nongnu.org,
 	Chenyi Qiang <chenyi.qiang@intel.com>,
 	Xiaoyao Li <xiaoyao.li@intel.com>,
 	Farrah Chen <farrah.chen@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v3 10/20] i386/cpu: Add missing migratable xsave features
-Date: Fri, 24 Oct 2025 14:56:22 +0800
-Message-Id: <20251024065632.1448606-11-zhao1.liu@intel.com>
+	Zhao Liu <zhao1.liu@intel.com>,
+	Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v3 11/20] i386/cpu: Enable xsave support for CET states
+Date: Fri, 24 Oct 2025 14:56:23 +0800
+Message-Id: <20251024065632.1448606-12-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251024065632.1448606-1-zhao1.liu@intel.com>
 References: <20251024065632.1448606-1-zhao1.liu@intel.com>
@@ -87,39 +88,142 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Xtile-cfg & xtile-data are both user xstates. Their xstates are cached
-in X86CPUState, and there's a related vmsd "vmstate_amx_xtile", so that
-it's safe to mark them as migratable.
+From: Yang Weijiang <weijiang.yang@intel.com>
 
-Arch lbr xstate is a supervisor xstate, and it is save & load by saving
-& loading related arch lbr MSRs, which are cached in X86CPUState, and
-there's a related vmsd "vmstate_arch_lbr". So it's also safe to mark it
-as migratable (even though KVM hasn't supported it - its migration
-support is completed in QEMU).
+Add CET_U/S bits in xstate area and report support in xstate
+feature mask.
+MSR_XSS[bit 11] corresponds to CET user mode states.
+MSR_XSS[bit 12] corresponds to CET supervisor mode states.
 
-PT is still unmigratable since KVM disabled it and there's no vmsd and
-no other emulation/simulation support.
+CET Shadow Stack(SHSTK) and Indirect Branch Tracking(IBT) features
+are enumerated via CPUID.(EAX=07H,ECX=0H):ECX[7] and EDX[20]
+respectively, two features share the same state bits in XSS, so
+if either of the features is enabled, set CET_U and CET_S bits
+together.
 
 Tested-by: Farrah Chen <farrah.chen@intel.com>
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+Co-developed-by: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Chao Gao <chao.gao@intel.com>
+Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- target/i386/cpu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Changes Since v2:
+ - Rename XSavesCETU/XSavesCETS to XSaveCETU/XSaveCETS.
+ - Refine the comments.
+ - Drop ".offset = 0" and its comment.
+ - Re-describe xstate dependencies via features array.
+ - Drop "cet-u" & "cet-s" enumeration from FEAT_XSAVE_XSS_LO's
+   feat_name array sicne currently xsave doesn't use named features.
+---
+ target/i386/cpu.c | 14 ++++++++++++++
+ target/i386/cpu.h | 26 +++++++++++++++++++++++++-
+ 2 files changed, 39 insertions(+), 1 deletion(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 1917376dbea9..b01729ad36d2 100644
+index b01729ad36d2..0bb65e8c5321 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -1522,7 +1522,8 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         .migratable_flags = XSTATE_FP_MASK | XSTATE_SSE_MASK |
-             XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK | XSTATE_BNDCSR_MASK |
-             XSTATE_OPMASK_MASK | XSTATE_ZMM_Hi256_MASK | XSTATE_Hi16_ZMM_MASK |
--            XSTATE_PKRU_MASK,
-+            XSTATE_PKRU_MASK | XSTATE_ARCH_LBR_MASK | XSTATE_XTILE_CFG_MASK |
-+            XSTATE_XTILE_DATA_MASK,
+@@ -2078,6 +2078,20 @@ ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
+             { FEAT_7_0_ECX,         CPUID_7_0_ECX_PKU },
+         },
      },
-     [FEAT_XSAVE_XCR0_HI] = {
-         .type = CPUID_FEATURE_WORD,
++    [XSTATE_CET_U_BIT] = {
++        .size = sizeof(XSaveCETU),
++        .features = {
++            { FEAT_7_0_ECX,         CPUID_7_0_ECX_CET_SHSTK },
++            { FEAT_7_0_EDX,         CPUID_7_0_EDX_CET_IBT },
++        },
++    },
++    [XSTATE_CET_S_BIT] = {
++        .size = sizeof(XSaveCETS),
++        .features = {
++            { FEAT_7_0_ECX,         CPUID_7_0_ECX_CET_SHSTK },
++            { FEAT_7_0_EDX,         CPUID_7_0_EDX_CET_IBT },
++        },
++    },
+     [XSTATE_ARCH_LBR_BIT] = {
+         .size = sizeof(XSaveArchLBR),
+         .features = {
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 6537affcf067..7584cddb5917 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -589,6 +589,8 @@ typedef enum X86Seg {
+ #define XSTATE_Hi16_ZMM_BIT             7
+ #define XSTATE_PT_BIT                   8
+ #define XSTATE_PKRU_BIT                 9
++#define XSTATE_CET_U_BIT                11
++#define XSTATE_CET_S_BIT                12
+ #define XSTATE_ARCH_LBR_BIT             15
+ #define XSTATE_XTILE_CFG_BIT            17
+ #define XSTATE_XTILE_DATA_BIT           18
+@@ -603,6 +605,8 @@ typedef enum X86Seg {
+ #define XSTATE_Hi16_ZMM_MASK            (1ULL << XSTATE_Hi16_ZMM_BIT)
+ #define XSTATE_PT_MASK                  (1ULL << XSTATE_PT_BIT)
+ #define XSTATE_PKRU_MASK                (1ULL << XSTATE_PKRU_BIT)
++#define XSTATE_CET_U_MASK               (1ULL << XSTATE_CET_U_BIT)
++#define XSTATE_CET_S_MASK               (1ULL << XSTATE_CET_S_BIT)
+ #define XSTATE_ARCH_LBR_MASK            (1ULL << XSTATE_ARCH_LBR_BIT)
+ #define XSTATE_XTILE_CFG_MASK           (1ULL << XSTATE_XTILE_CFG_BIT)
+ #define XSTATE_XTILE_DATA_MASK          (1ULL << XSTATE_XTILE_DATA_BIT)
+@@ -625,7 +629,8 @@ typedef enum X86Seg {
+                                  XSTATE_XTILE_CFG_MASK | XSTATE_XTILE_DATA_MASK)
+ 
+ /* CPUID feature bits available in XSS */
+-#define CPUID_XSTATE_XSS_MASK    (XSTATE_ARCH_LBR_MASK)
++#define CPUID_XSTATE_XSS_MASK   (XSTATE_ARCH_LBR_MASK | XSTATE_CET_U_MASK | \
++                                 XSTATE_CET_S_MASK)
+ 
+ #define CPUID_XSTATE_MASK       (CPUID_XSTATE_XCR0_MASK | CPUID_XSTATE_XSS_MASK)
+ 
+@@ -904,6 +909,8 @@ uint64_t x86_cpu_get_supported_feature_word(X86CPU *cpu, FeatureWord w);
+ #define CPUID_7_0_ECX_WAITPKG           (1U << 5)
+ /* Additional AVX-512 Vector Byte Manipulation Instruction */
+ #define CPUID_7_0_ECX_AVX512_VBMI2      (1U << 6)
++/* Control-flow enforcement technology: shadow stack */
++#define CPUID_7_0_ECX_CET_SHSTK         (1U << 7)
+ /* Galois Field New Instructions */
+ #define CPUID_7_0_ECX_GFNI              (1U << 8)
+ /* Vector AES Instructions */
+@@ -951,6 +958,8 @@ uint64_t x86_cpu_get_supported_feature_word(X86CPU *cpu, FeatureWord w);
+ #define CPUID_7_0_EDX_TSX_LDTRK         (1U << 16)
+ /* Architectural LBRs */
+ #define CPUID_7_0_EDX_ARCH_LBR          (1U << 19)
++/* Control-flow enforcement technology: indirect branch tracking */
++#define CPUID_7_0_EDX_CET_IBT           (1U << 20)
+ /* AMX_BF16 instruction */
+ #define CPUID_7_0_EDX_AMX_BF16          (1U << 22)
+ /* AVX512_FP16 instruction */
+@@ -1737,6 +1746,19 @@ typedef struct XSavePKRU {
+     uint32_t padding;
+ } XSavePKRU;
+ 
++/* Ext. save area 11: CET_U state */
++typedef struct XSaveCETU {
++    uint64_t u_cet;
++    uint64_t pl3_ssp;
++} XSaveCETU;
++
++/* Ext. save area 12: CET_S state */
++typedef struct XSaveCETS {
++    uint64_t pl0_ssp;
++    uint64_t pl1_ssp;
++    uint64_t pl2_ssp;
++} XSaveCETS;
++
+ /* Ext. save area 15: Arch LBR state */
+ typedef struct XSaveArchLBR {
+     uint64_t lbr_ctl;
+@@ -1764,6 +1786,8 @@ QEMU_BUILD_BUG_ON(sizeof(XSaveOpmask) != 0x40);
+ QEMU_BUILD_BUG_ON(sizeof(XSaveZMM_Hi256) != 0x200);
+ QEMU_BUILD_BUG_ON(sizeof(XSaveHi16_ZMM) != 0x400);
+ QEMU_BUILD_BUG_ON(sizeof(XSavePKRU) != 0x8);
++QEMU_BUILD_BUG_ON(sizeof(XSaveCETU) != 0x10);
++QEMU_BUILD_BUG_ON(sizeof(XSaveCETS) != 0x18);
+ QEMU_BUILD_BUG_ON(sizeof(XSaveArchLBR) != 0x328);
+ QEMU_BUILD_BUG_ON(sizeof(XSaveXTILECFG) != 0x40);
+ QEMU_BUILD_BUG_ON(sizeof(XSaveXTILEDATA) != 0x2000);
 -- 
 2.34.1
 
