@@ -1,201 +1,166 @@
-Return-Path: <kvm+bounces-61038-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61039-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 812CAC07643
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 18:48:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF7DC076A0
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 18:57:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66BD53AD48B
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 16:48:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C88201C27305
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 16:58:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46D9338922;
-	Fri, 24 Oct 2025 16:48:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F6033C527;
+	Fri, 24 Oct 2025 16:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3kE1an0p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hKhw31zy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36552DCF5D
-	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 16:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C22633A02D
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 16:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761324498; cv=none; b=bfh0LaAfamA5HU9eKJZak+Wc4m53wu+m5w01LlCtcCMOPvU/6gtzFH8ukG54caBXKlHKKClnbu4cy49EgGuYTgj0OI65+T7DSL2VWkLKpVYUVhokvgijPvJMlrhw9jQS6DSAJQ6XtlFGcJIl0Z40hV1XXo3bGHHsMQs+husQAug=
+	t=1761325044; cv=none; b=L32wc+nmDwsrHH4Y5ODJj2UWaQKsuBVJ3b/V5Euko7nDukQdAlHX3xStL1RGR1niBokcxAAzpswqgvpVeIcsdM2fNkVWo1E/tlUNDPevGnxlxiIzwXXXXlJ3UwUf0hUvZDbFGxAy/sPeXcAXzS7v5nPhVK0+EOjFe81du9SjDRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761324498; c=relaxed/simple;
-	bh=f2a3PKTXtxiqGjxZTh9T4s+dCE9zdgxrYpNNXCt4lP4=;
+	s=arc-20240116; t=1761325044; c=relaxed/simple;
+	bh=znxPntvSK0iLuvDlLrIc6oUoFoqXWddOvlpeLWfjD/8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PMY3WjLBZBrH86phrfdd7EfoVhFVVh8fTiE6+cY1JsruHF4t34ASvrO109bU/oBdTsVK7y21x4J6j7iYCkcEnjpLVNbRgyu65OV/Gfiv1fHRkaQ14K0UlrLAQ5MUNkby0CnYW90PWzwQWitl/sj8dgR9/nJ+B6uMhJlpwHqoaxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3kE1an0p; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=APrPzk8PtUlf8j//O869PiNC5oeygFTvED1eoH5oYcYGNiPIg9OoF5l7wdbo/4wuifZblvZBXs476jvnkUPMLHW9X6gDy3r4FTsCIO+2tfbSCAR8dRK3fGB0jYufKz8D+Lx9BrNaJWf+TMgg4Zp38isROWq4CNWysdw6pk+DnIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hKhw31zy; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b6ceeea4addso1909379a12.1
-        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 09:48:14 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33bcb779733so2075941a91.3
+        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 09:57:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761324494; x=1761929294; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761325041; x=1761929841; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N0ZqooCPaM4r88VkiqaSJuwNdNXDKXHQHEd4a0Vhrkk=;
-        b=3kE1an0pZPerDXVZT/Eryt9uJLK3d3syqHXqx2U9sE68vp+cA0k//igGNp03uLI6v0
-         bWU0BPVXcZnbk5Cp1wLp0ziT+rVR2R+VT3VF9WQSRVuPO1rEDSDxx10EIkOV2bBqF29i
-         vO9SoLzY3B9//15oc0CnGQia/eN+qYvIaGyyg0xJN5PC6Ro7mmgEFr7rdnazQFjyfylC
-         V8Z/K65gdxDsiJOn7zA2L/fiI7N9ow9FzNYJmItwiEzsnpk9PBme5+h18wyva85Il8xv
-         DXn4xNKhzPIeDLEm07oce/QTQ1rLUINZ6X0qMvPgfRna8f7azAG05IzBLssyFwAa6ZfA
-         udoA==
+        bh=kCSFoTED+bN9czctrBnViFjaUxjZI+PzjY/BcjiPyhU=;
+        b=hKhw31zyrAbgqsXNoWbtQ3K4Q5NQkmPMhTqiLcUwwNDWTKJgc/p527KT7Prdtijhlk
+         TymHKg62C+q0vryN6ELJrmV1MP2MdGyLe3ofkLmyEVzmA3GXDV2/1FexHUwi9FWnxPRM
+         jUXc+5FeS6BYh8J0t5QUU6QXpOoQRDFUkQNZpAsqr6oRoc4SF29INiz95pkFsS4lMVc+
+         pL0fPLBRbihVQcw1voYIETiCGbacIIyy/xrAD8/U/kX4SER5Mm9+1CNC0Mkf4xYwTPtE
+         GqsNbkanHvwbztdQ/5wIU86NIoZJzBlicVxqq3RF0mFJ5kHvx1oQJzkDXnUOm+aI37qi
+         DeOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761324494; x=1761929294;
+        d=1e100.net; s=20230601; t=1761325041; x=1761929841;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N0ZqooCPaM4r88VkiqaSJuwNdNXDKXHQHEd4a0Vhrkk=;
-        b=wWotVbNtdn4TpYD36bn3KMeyUnb5GB9P6mY9C1Y8ZLEFjVs4dEBQJJvxhgbYJhCtMM
-         3ZZn/VK9+LFidiJuuwCb1uTI4oyBihkWsyQyNKZ9XqovDmqtga+S22zKPyqj3ddRArQW
-         QOCLX+XR8+6ennMFz8xLy1sZEyfcWCKdqB4hBCzVzRelQpY8xIcEShVS3DYJkFQMb08U
-         20A21u2jf2ZfeNfsA7KocljQk5sMAgrL+IzZnw5OjJXv1KmJR07s/Ws34DMkE4ShlmeE
-         p/sURBZFg6Vtogu60uc6Pt/d1t49FBiB5VgQ45y3PEIir9h/vABYqK9FoHy0nbc1Az1p
-         hgoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXczgAjzItkD/VIOWObaO6TVIgMRFFzUqsUgBWCf9Sq6wbJ9Zo0EtpE37fqP/DWqcMug3w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxedHerMqbuSyfTEQ4nf9NFFghBGbIAVYDzA+KaTuuCgVtcRxpf
-	JQztU9unJAGex1hZlrI21x1E6h76m5ceoupTfWETwqnk7qe1jDJA8bPzLICf65OG9/ahFqXC/C+
-	6a3hfImuu5+6cgUAicqVxatVHmQ==
-X-Google-Smtp-Source: AGHT+IEK36TdUsL0vlOCqmspe4caiObjbOIOsGdu4QEVuayy/5SWQrXbR3hmNgi0EJY8rePbH10nOdC3ZkaAHHoKBw==
-X-Received: from pjyj23.prod.google.com ([2002:a17:90a:e617:b0:339:ae3b:2bc7])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:9988:b0:334:b8bb:b11d with SMTP id adf61e73a8af0-33dead4c65cmr3868140637.31.1761324494100;
- Fri, 24 Oct 2025 09:48:14 -0700 (PDT)
-Date: Fri, 24 Oct 2025 09:48:12 -0700
-In-Reply-To: <727482ec42baa50cb1488ad89d02e732defda3db.1760731772.git.ackerleytng@google.com>
+        bh=kCSFoTED+bN9czctrBnViFjaUxjZI+PzjY/BcjiPyhU=;
+        b=wsk2LkAN61VsYJ7nw6kgZnCq1xq0mISNNOKxi6W2RIzfcDyoHFvRSJWO4Qr+0QgtFQ
+         RMt3jLNdeUp8EWUEKlXOCMPyNOFJdUQegLyWDGNah+JPs3VKTA5JyPpdv43A35N89kgg
+         LDlIJ203LQXWWP8dcvKsGFkTKkPYo75k7HFUrAh8E6rcc3q+0EMcN3sY9ZqOUWc45VB5
+         R/DI7wGbUtys5eFf5YXVdcmRWffL5CqsoBxMx4yOcXDTGvUrQpG1s9knCzH7e2hMMw2E
+         KsGLD+oo8iUPeTo9HoA4uyroW0t9IbA023nLDSQsu1ydv5wHhRu72Gc0N+vNvG6sHNUA
+         /mAw==
+X-Forwarded-Encrypted: i=1; AJvYcCV3HK/jM6Hb+7RNbqe8zK1aamBUk3P4dP7ZATW+hluTHWeYii5uwGU6aKrbnAYdZiY1cK4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRlWqy7r28W9ZEAYjVKWgv87W/DeenWIVruUcgPVG3cRfctVLu
+	BqT8BvCjkhj99Dw8j3fO7oPnHgeb6uVWcLwOFHkIRXUw83ntmiugizohJmwbck805YhoRcqt7iP
+	zi4zDgg==
+X-Google-Smtp-Source: AGHT+IHXmSeD3kNK6POSE1hGR7Jvio0RnirzUH7WSrLaKZ09lPaFZJIUb09S/aBT/hnx0ZxmJITFzdMKVRo=
+X-Received: from pjnu4.prod.google.com ([2002:a17:90a:8904:b0:339:dc19:ae5d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:48c8:b0:33b:ba55:f5dd
+ with SMTP id 98e67ed59e1d1-33bcf93ab88mr32766320a91.37.1761325041555; Fri, 24
+ Oct 2025 09:57:21 -0700 (PDT)
+Date: Fri, 24 Oct 2025 09:57:20 -0700
+In-Reply-To: <aPtOtzGLigbY0Vqw@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1760731772.git.ackerleytng@google.com> <727482ec42baa50cb1488ad89d02e732defda3db.1760731772.git.ackerleytng@google.com>
-Message-ID: <diqzldl0dz5f.fsf@google.com>
-Subject: Re: [RFC PATCH v1 16/37] KVM: selftests: Add support for mmap() on
- guest_memfd in core library
-From: Ackerley Tng <ackerleytng@google.com>
-To: cgroups@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, 
-	linux-trace-kernel@vger.kernel.org, x86@kernel.org
-Cc: akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de, 
-	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com, 
-	david@redhat.com, dmatlack@google.com, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, 
-	hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com, 
-	mail@maciej.szmigiero.name, maobibo@loongson.cn, 
-	mathieu.desnoyers@efficios.com, maz@kernel.org, mhiramat@kernel.org, 
-	mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, mingo@redhat.com, 
-	mlevitsk@redhat.com, mpe@ellerman.id.au, muchun.song@linux.dev, 
-	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
-	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
-	peterx@redhat.com, pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, 
-	qperret@google.com, richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, 
-	rientjes@google.com, rostedt@goodmis.org, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shakeel.butt@linux.dev, shuah@kernel.org, 
-	steven.price@arm.com, steven.sistare@oracle.com, suzuki.poulose@arm.com, 
-	tabba@google.com, tglx@linutronix.de, thomas.lendacky@amd.com, 
-	vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
-	willy@infradead.org, wyihan@google.com, xiaoyao.li@intel.com, 
-	yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com, 
-	zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
+References: <20251017003244.186495-1-seanjc@google.com> <20251017003244.186495-25-seanjc@google.com>
+ <aPtOtzGLigbY0Vqw@yzhao56-desk.sh.intel.com>
+Message-ID: <aPuv8F8iDp3SLb9q@google.com>
+Subject: Re: [PATCH v3 24/25] KVM: TDX: Guard VM state transitions with "all"
+ the locks
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"Kirill A. Shutemov" <kas@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Ackerley Tng <ackerleytng@google.com> writes:
+On Fri, Oct 24, 2025, Yan Zhao wrote:
+> On Thu, Oct 16, 2025 at 05:32:42PM -0700, Sean Christopherson wrote:
+> > Acquire kvm->lock, kvm->slots_lock, and all vcpu->mutex locks when
+> > servicing ioctls that (a) transition the TD to a new state, i.e. when
+> > doing INIT or FINALIZE or (b) are only valid if the TD is in a specific
+> > state, i.e. when initializing a vCPU or memory region.  Acquiring "all"
+> > the locks fixes several KVM_BUG_ON() situations where a SEAMCALL can fail
+> > due to racing actions, e.g. if tdh_vp_create() contends with either
+> > tdh_mr_extend() or tdh_mr_finalize().
+> > 
+> > For all intents and purposes, the paths in question are fully serialized,
+> > i.e. there's no reason to try and allow anything remotely interesting to
+> > happen.  Smack 'em with a big hammer instead of trying to be "nice".
+> > 
+> > Acquire kvm->lock to prevent VM-wide things from happening, slots_lock to
+> > prevent kvm_mmu_zap_all_fast(), and _all_ vCPU mutexes to prevent vCPUs
+> slots_lock to prevent kvm_mmu_zap_memslot()?
+> kvm_mmu_zap_all_fast() does not operate on the mirror root.
 
-> From: Sean Christopherson <seanjc@google.com>
->
-> Accept gmem_flags in vm_mem_add() to be able to create a guest_memfd within
-> vm_mem_add().
->
-> When vm_mem_add() is used to set up a guest_memfd for a memslot, set up the
-> provided (or created) gmem_fd as the fd for the user memory region. This
-> makes it available to be mmap()-ed from just like fds from other memory
-> sources. mmap() from guest_memfd using the provided gmem_flags and
-> gmem_offset.
->
-> Add a kvm_slot_to_fd() helper to provide convenient access to the file
-> descriptor of a memslot.
->
-> Update existing callers of vm_mem_add() to pass 0 for gmem_flags to
-> preserve existing behavior.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> [For guest_memfds, mmap() using gmem_offset instead of 0 all the time.]
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> ---
->  tools/testing/selftests/kvm/include/kvm_util.h |  7 ++++++-
->  tools/testing/selftests/kvm/lib/kvm_util.c     | 18 ++++++++++--------
->  .../kvm/x86/private_mem_conversions_test.c     |  2 +-
->  3 files changed, 17 insertions(+), 10 deletions(-)
->
+Oh, right.
+
+> We may have missed a zap in the guest_memfd punch hole path:
 > 
-> [...snip...]
+> The SEAMCALLs tdh_mem_range_block(), tdh_mem_track() tdh_mem_page_remove()
+> in the guest_memfd punch hole path are only protected by the filemap invaliate
+> lock and mmu_lock, so they could contend with v1 version of tdh_vp_init().
+>
+> (I'm writing a selftest to verify this, haven't been able to reproduce
+> tdh_vp_init(v1) returning BUSY yet. However, this race condition should be
+> theoretically possible.)
 > 
-> @@ -1050,13 +1049,16 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
->  	}
->  
->  	region->fd = -1;
-> -	if (backing_src_is_shared(src_type))
-> +	if (flags & KVM_MEM_GUEST_MEMFD && gmem_flags & GUEST_MEMFD_FLAG_MMAP)
-> +		region->fd = kvm_dup(gmem_fd);
-> +	else if (backing_src_is_shared(src_type))
->  		region->fd = kvm_memfd_alloc(region->mmap_size,
->  					     src_type == VM_MEM_SRC_SHARED_HUGETLB);
->  
+> Resources              SHARED  users              EXCLUSIVE users
+> ------------------------------------------------------------------------
+> (1) TDR                tdh_mng_rdwr               tdh_mng_create
+>                        tdh_vp_create              tdh_mng_add_cx
+>                        tdh_vp_addcx               tdh_mng_init
+>                        tdh_vp_init(v0)            tdh_mng_vpflushdone
+>                        tdh_vp_enter               tdh_mng_key_config
+>                        tdh_vp_flush               tdh_mng_key_freeid
+>                        tdh_vp_rd_wr               tdh_mr_extend
+>                        tdh_mem_sept_add           tdh_mr_finalize
+>                        tdh_mem_sept_remove        tdh_vp_init(v1)
+>                        tdh_mem_page_aug           tdh_mem_page_add
+>                        tdh_mem_page_remove
+>                        tdh_mem_range_block
+>                        tdh_mem_track
+>                        tdh_mem_range_unblock
+>                        tdh_phymem_page_reclaim
+> 
+> Do you think we can acquire the mmu_lock for cmd KVM_TDX_INIT_VCPU?
 
-Doing this makes it hard to test the legacy dual-backing case.
+Ugh, I'd rather not?  Refresh me, what's the story with "v1"?  Are we now on v2?
+If this is effectively limited to deprecated TDX modules, my vote would be to
+ignore the flaw and avoid even more complexity in KVM.
 
-It actually broke x86/private_mem_conversions_test for the legacy
-dual-backing case because there's no way to mmap or provide a
-userspace_address from the memory provider that is not guest_memfd, as
-determined by src_type.
+> > @@ -3155,12 +3198,13 @@ int tdx_vcpu_unlocked_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+> >  	if (r)
+> >  		return r;
+> >  
+> > +	CLASS(tdx_vm_state_guard, guard)(kvm);
+> Should we move the guard to inside each cmd? Then there's no need to acquire the
+> locks in the default cases. 
 
-I didn't test the legacy dual-backing case before posting this RFC and
-probably should have.
-
-> -	region->mmap_start = kvm_mmap(region->mmap_size, PROT_READ | PROT_WRITE,
-> -				      vm_mem_backing_src_alias(src_type)->flag,
-> -				      region->fd);
-> +	mmap_offset = flags & KVM_MEM_GUEST_MEMFD ? gmem_offset : 0;
-> +	region->mmap_start = __kvm_mmap(region->mmap_size, PROT_READ | PROT_WRITE,
-> +					vm_mem_backing_src_alias(src_type)->flag,
-> +					region->fd, mmap_offset);
->  
->  	TEST_ASSERT(!is_backing_src_hugetlb(src_type) ||
->  		    region->mmap_start == align_ptr_up(region->mmap_start, backing_src_pagesz),
-> @@ -1117,7 +1119,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
->  				 uint64_t gpa, uint32_t slot, uint64_t npages,
->  				 uint32_t flags)
->  {
-> -	vm_mem_add(vm, src_type, gpa, slot, npages, flags, -1, 0);
-> +	vm_mem_add(vm, src_type, gpa, slot, npages, flags, -1, 0, 0);
->  }
->  
->  /*
-> diff --git a/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c b/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c
-> index 1969f4ab9b280..41f6b38f04071 100644
-> --- a/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c
-> +++ b/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c
-> @@ -399,7 +399,7 @@ static void test_mem_conversions(enum vm_mem_backing_src_type src_type, uint32_t
->  	for (i = 0; i < nr_memslots; i++)
->  		vm_mem_add(vm, src_type, BASE_DATA_GPA + slot_size * i,
->  			   BASE_DATA_SLOT + i, slot_size / vm->page_size,
-> -			   KVM_MEM_GUEST_MEMFD, memfd, slot_size * i);
-> +			   KVM_MEM_GUEST_MEMFD, memfd, slot_size * i, 0);
->  
->  	for (i = 0; i < nr_vcpus; i++) {
->  		uint64_t gpa =  BASE_DATA_GPA + i * per_cpu_size;
-> -- 
-> 2.51.0.858.gf9c4a03a3a-goog
+No, I don't think it's a good tradeoff.  We'd also need to move vcpu_{load,put}()
+into the cmd helpers, and theoretically slowing down a bad ioctl invocation due
+to taking extra locks is a complete non-issue.
 
