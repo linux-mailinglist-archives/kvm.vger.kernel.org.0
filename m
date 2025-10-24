@@ -1,166 +1,121 @@
-Return-Path: <kvm+bounces-61039-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61041-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEF7DC076A0
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 18:57:54 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96D48C07887
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 19:25:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C88201C27305
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 16:58:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6B40F4F2201
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 17:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F6033C527;
-	Fri, 24 Oct 2025 16:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF76E3431EA;
+	Fri, 24 Oct 2025 17:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hKhw31zy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zntnr1aC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C22633A02D
-	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 16:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29001990A7
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 17:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761325044; cv=none; b=L32wc+nmDwsrHH4Y5ODJj2UWaQKsuBVJ3b/V5Euko7nDukQdAlHX3xStL1RGR1niBokcxAAzpswqgvpVeIcsdM2fNkVWo1E/tlUNDPevGnxlxiIzwXXXXlJ3UwUf0hUvZDbFGxAy/sPeXcAXzS7v5nPhVK0+EOjFe81du9SjDRU=
+	t=1761326743; cv=none; b=I5HxwlDSsxrYeXWTzFNShRzANSxNNZMObOySnDKOXYNVY6ChNFlilyvIQxpjYzOU762PhHp6EM5fkvKNxIJstYxRCSy57PL9nuqesDZi9Qdf9lG21s/FS26+vAq50zp7cYvQ8YGpm3+L2CCv4pFqMWbmNRuNorvrjOG0sG9tKYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761325044; c=relaxed/simple;
-	bh=znxPntvSK0iLuvDlLrIc6oUoFoqXWddOvlpeLWfjD/8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=APrPzk8PtUlf8j//O869PiNC5oeygFTvED1eoH5oYcYGNiPIg9OoF5l7wdbo/4wuifZblvZBXs476jvnkUPMLHW9X6gDy3r4FTsCIO+2tfbSCAR8dRK3fGB0jYufKz8D+Lx9BrNaJWf+TMgg4Zp38isROWq4CNWysdw6pk+DnIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hKhw31zy; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33bcb779733so2075941a91.3
-        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 09:57:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761325041; x=1761929841; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kCSFoTED+bN9czctrBnViFjaUxjZI+PzjY/BcjiPyhU=;
-        b=hKhw31zyrAbgqsXNoWbtQ3K4Q5NQkmPMhTqiLcUwwNDWTKJgc/p527KT7Prdtijhlk
-         TymHKg62C+q0vryN6ELJrmV1MP2MdGyLe3ofkLmyEVzmA3GXDV2/1FexHUwi9FWnxPRM
-         jUXc+5FeS6BYh8J0t5QUU6QXpOoQRDFUkQNZpAsqr6oRoc4SF29INiz95pkFsS4lMVc+
-         pL0fPLBRbihVQcw1voYIETiCGbacIIyy/xrAD8/U/kX4SER5Mm9+1CNC0Mkf4xYwTPtE
-         GqsNbkanHvwbztdQ/5wIU86NIoZJzBlicVxqq3RF0mFJ5kHvx1oQJzkDXnUOm+aI37qi
-         DeOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761325041; x=1761929841;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kCSFoTED+bN9czctrBnViFjaUxjZI+PzjY/BcjiPyhU=;
-        b=wsk2LkAN61VsYJ7nw6kgZnCq1xq0mISNNOKxi6W2RIzfcDyoHFvRSJWO4Qr+0QgtFQ
-         RMt3jLNdeUp8EWUEKlXOCMPyNOFJdUQegLyWDGNah+JPs3VKTA5JyPpdv43A35N89kgg
-         LDlIJ203LQXWWP8dcvKsGFkTKkPYo75k7HFUrAh8E6rcc3q+0EMcN3sY9ZqOUWc45VB5
-         R/DI7wGbUtys5eFf5YXVdcmRWffL5CqsoBxMx4yOcXDTGvUrQpG1s9knCzH7e2hMMw2E
-         KsGLD+oo8iUPeTo9HoA4uyroW0t9IbA023nLDSQsu1ydv5wHhRu72Gc0N+vNvG6sHNUA
-         /mAw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3HK/jM6Hb+7RNbqe8zK1aamBUk3P4dP7ZATW+hluTHWeYii5uwGU6aKrbnAYdZiY1cK4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRlWqy7r28W9ZEAYjVKWgv87W/DeenWIVruUcgPVG3cRfctVLu
-	BqT8BvCjkhj99Dw8j3fO7oPnHgeb6uVWcLwOFHkIRXUw83ntmiugizohJmwbck805YhoRcqt7iP
-	zi4zDgg==
-X-Google-Smtp-Source: AGHT+IHXmSeD3kNK6POSE1hGR7Jvio0RnirzUH7WSrLaKZ09lPaFZJIUb09S/aBT/hnx0ZxmJITFzdMKVRo=
-X-Received: from pjnu4.prod.google.com ([2002:a17:90a:8904:b0:339:dc19:ae5d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:48c8:b0:33b:ba55:f5dd
- with SMTP id 98e67ed59e1d1-33bcf93ab88mr32766320a91.37.1761325041555; Fri, 24
- Oct 2025 09:57:21 -0700 (PDT)
-Date: Fri, 24 Oct 2025 09:57:20 -0700
-In-Reply-To: <aPtOtzGLigbY0Vqw@yzhao56-desk.sh.intel.com>
+	s=arc-20240116; t=1761326743; c=relaxed/simple;
+	bh=whe1EgFnKNzU49GGbQWXa7d8Iw0DdHK2jOM6pT46VoM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VOTKvCZ7l833iqg8TpW53h/vrZgH63rtSDV9A0PZtF5oULnMuziKYbfdtB3EB0Sog5WDCYelsbZmyq2xMsDM/al2+UksYTV24MUBhSWXAuxk6VREhs6ZITcpG3flfbzeb0T1d37w2FcyKhA7H8o/lmkZ9eAp72s6uYcwWK/qbaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zntnr1aC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3475C4CEF1;
+	Fri, 24 Oct 2025 17:25:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761326743;
+	bh=whe1EgFnKNzU49GGbQWXa7d8Iw0DdHK2jOM6pT46VoM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Zntnr1aCVUG/d5vY3i7gDibOEN38IWE+AYb//5q4eSLKSwwDp9uAnww0yT2Wsr/qk
+	 QEq6u3AfTJB88X/uLA2zjE3Q4pwOEG32e/Q0jE3X58VZz1MnMV2RnxAcYyqR95xMAt
+	 BMmw2hOV2n+O/s/BBp7CSrqiLrPc1bvni8JNi+Q7EC/UXQ9gsPefZ2YS/YsarQ67WB
+	 91fZL64VVmdDFOCQeAv+AcnJZOOkEp51/PedDU6aCIxQvJr0NBfN76IHie7TiI3YA5
+	 fW8LwloSrckfdUiVqEgd7iy0mV2rFOxCxGn/gB4r43RGcueLjjU7B+2KFQJTI23NmI
+	 +Xd9hPTGUZFIw==
+Date: Fri, 24 Oct 2025 22:46:48 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, 
+	Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, 
+	qemu-devel <qemu-devel@nongnu.org>, kvm@vger.kernel.org, Nikunj A Dadhania <nikunj@amd.com>, 
+	"Daniel P. Berrange" <berrange@redhat.com>, Eduardo Habkost <eduardo@habkost.net>, 
+	Zhao Liu <zhao1.liu@intel.com>, Michael Roth <michael.roth@amd.com>, 
+	Roy Hopkins <roy.hopkins@randomman.co.uk>
+Subject: Re: [PATCH v2 8/9] target/i386: SEV: Add support for setting TSC
+ frequency for Secure TSC
+Message-ID: <boyf3kr7uo7jnlratgmgaklm2a4leg37hsgfno5ywsl6qvbcvo@5dwlbncvaogv>
+References: <cover.1758794556.git.naveen@kernel.org>
+ <65400881e426aa0e412eb431099626dceb145ddd.1758794556.git.naveen@kernel.org>
+ <6a9ce7bb-5c69-ad8b-8bfd-638122619c71@amd.com>
+ <uzfmnzzhz7a7lghdpazb2sphtctphmsj2nyfqnu6erjt44h577@bjj57um7n2ze>
+ <a8a324ba-e474-4733-b998-7d36be06b7f7@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251017003244.186495-1-seanjc@google.com> <20251017003244.186495-25-seanjc@google.com>
- <aPtOtzGLigbY0Vqw@yzhao56-desk.sh.intel.com>
-Message-ID: <aPuv8F8iDp3SLb9q@google.com>
-Subject: Re: [PATCH v3 24/25] KVM: TDX: Guard VM state transitions with "all"
- the locks
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"Kirill A. Shutemov" <kas@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
-	Michael Roth <michael.roth@amd.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a8a324ba-e474-4733-b998-7d36be06b7f7@amd.com>
 
-On Fri, Oct 24, 2025, Yan Zhao wrote:
-> On Thu, Oct 16, 2025 at 05:32:42PM -0700, Sean Christopherson wrote:
-> > Acquire kvm->lock, kvm->slots_lock, and all vcpu->mutex locks when
-> > servicing ioctls that (a) transition the TD to a new state, i.e. when
-> > doing INIT or FINALIZE or (b) are only valid if the TD is in a specific
-> > state, i.e. when initializing a vCPU or memory region.  Acquiring "all"
-> > the locks fixes several KVM_BUG_ON() situations where a SEAMCALL can fail
-> > due to racing actions, e.g. if tdh_vp_create() contends with either
-> > tdh_mr_extend() or tdh_mr_finalize().
+On Fri, Oct 24, 2025 at 10:00:08AM -0500, Tom Lendacky wrote:
+> On 10/8/25 04:52, Naveen N Rao wrote:
+> > On Tue, Oct 07, 2025 at 08:31:47AM -0500, Tom Lendacky wrote:
+> >> On 9/25/25 05:17, Naveen N Rao (AMD) wrote:
 > > 
-> > For all intents and purposes, the paths in question are fully serialized,
-> > i.e. there's no reason to try and allow anything remotely interesting to
-> > happen.  Smack 'em with a big hammer instead of trying to be "nice".
+> > ...
 > > 
-> > Acquire kvm->lock to prevent VM-wide things from happening, slots_lock to
-> > prevent kvm_mmu_zap_all_fast(), and _all_ vCPU mutexes to prevent vCPUs
-> slots_lock to prevent kvm_mmu_zap_memslot()?
-> kvm_mmu_zap_all_fast() does not operate on the mirror root.
-
-Oh, right.
-
-> We may have missed a zap in the guest_memfd punch hole path:
+> >>> +
+> >>> +static void
+> >>> +sev_snp_guest_set_tsc_frequency(Object *obj, Visitor *v, const char *name,
+> >>> +                                void *opaque, Error **errp)
+> >>> +{
+> >>> +    uint32_t value;
+> >>> +
+> >>> +    if (!visit_type_uint32(v, name, &value, errp)) {
+> >>> +        return;
+> >>> +    }
+> >>> +
+> >>> +    SEV_SNP_GUEST(obj)->tsc_khz = value / 1000;
+> >>
+> >> This will cause a value that isn't evenly divisible by 1000 to be
+> >> rounded down, e.g.: tsc-frequency=2500000999. Should this name instead
+> >> just be tsc-khz or secure-tsc-khz (to show it is truly associated with
+> >> Secure TSC)?
+> > 
+> > I modeled this after the existing tsc-frequency parameter on the cpu 
+> > object to keep it simple (parameter is the same, just where it is 
+> > specified differs). This also aligns with TDX which re-uses the 
+> > tsc-frequency parameter on the cpu object.
 > 
-> The SEAMCALLs tdh_mem_range_block(), tdh_mem_track() tdh_mem_page_remove()
-> in the guest_memfd punch hole path are only protected by the filemap invaliate
-> lock and mmu_lock, so they could contend with v1 version of tdh_vp_init().
->
-> (I'm writing a selftest to verify this, haven't been able to reproduce
-> tdh_vp_init(v1) returning BUSY yet. However, this race condition should be
-> theoretically possible.)
-> 
-> Resources              SHARED  users              EXCLUSIVE users
-> ------------------------------------------------------------------------
-> (1) TDR                tdh_mng_rdwr               tdh_mng_create
->                        tdh_vp_create              tdh_mng_add_cx
->                        tdh_vp_addcx               tdh_mng_init
->                        tdh_vp_init(v0)            tdh_mng_vpflushdone
->                        tdh_vp_enter               tdh_mng_key_config
->                        tdh_vp_flush               tdh_mng_key_freeid
->                        tdh_vp_rd_wr               tdh_mr_extend
->                        tdh_mem_sept_add           tdh_mr_finalize
->                        tdh_mem_sept_remove        tdh_vp_init(v1)
->                        tdh_mem_page_aug           tdh_mem_page_add
->                        tdh_mem_page_remove
->                        tdh_mem_range_block
->                        tdh_mem_track
->                        tdh_mem_range_unblock
->                        tdh_phymem_page_reclaim
-> 
-> Do you think we can acquire the mmu_lock for cmd KVM_TDX_INIT_VCPU?
+> So why aren't we using the one on the cpu object instead of creating a
+> duplicate parameter? There should be some way to get that value, no?
 
-Ugh, I'd rather not?  Refresh me, what's the story with "v1"?  Are we now on v2?
-If this is effectively limited to deprecated TDX modules, my vote would be to
-ignore the flaw and avoid even more complexity in KVM.
+I had spent some time on this, but I couldn't figure out a simple way to 
+make that work.
 
-> > @@ -3155,12 +3198,13 @@ int tdx_vcpu_unlocked_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
-> >  	if (r)
-> >  		return r;
-> >  
-> > +	CLASS(tdx_vm_state_guard, guard)(kvm);
-> Should we move the guard to inside each cmd? Then there's no need to acquire the
-> locks in the default cases. 
+TDX uses a vcpu pre-create hook (similar to KVM) to get access to and 
+set the TSC value from the cpu object. For SEV-SNP, we need the TSC 
+frequency during SNP_LAUNCH_START which is quite early and we don't have 
+access to the cpu object there.
 
-No, I don't think it's a good tradeoff.  We'd also need to move vcpu_{load,put}()
-into the cmd helpers, and theoretically slowing down a bad ioctl invocation due
-to taking extra locks is a complete non-issue.
+Admittedly, my qemu understanding is limited. If there is a way to 
+re-use the cpu tsc-frequency field, then that would be ideal.
+
+Any ideas/suggestions?
+
+
+Thanks,
+Naveen
+
 
