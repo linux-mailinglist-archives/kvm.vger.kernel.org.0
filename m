@@ -1,251 +1,158 @@
-Return-Path: <kvm+bounces-61036-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61037-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA0FC075D4
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 18:42:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19E70C0761C
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 18:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E85A54FEE7D
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 16:42:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEF3C1B830A3
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 16:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B9B03277B8;
-	Fri, 24 Oct 2025 16:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A792531D74E;
+	Fri, 24 Oct 2025 16:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tsctTBNU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lzJoDO81"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB41280037
-	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 16:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4AE283FC8
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 16:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761324119; cv=none; b=T5IKjQGKTtGf/lNTOW1HIuj3VfbeGpIUw4/aJKSN5XHIGIk/0sLofLYylEbmH+Zmc+Oq7mIGbu/0IAByWde2chzBXlGvs20QNsvS63d29at/BBeQH38/XjRZYQF05yQxK9QgGiIEMyIdH7H11sc7NvXEfhjHV7W7Ko3aPSaAvK8=
+	t=1761324350; cv=none; b=Y3MnX0kbhNigM/28CHrSlahAPMhgl0ScAN96gPdGmAX+oDBUTyOQTshZLeUXvyrnNArBTcmcJNKlLRljZl1wct3E4/V0MPBdgSvWpHyUXPgZtAoz4lCrxLtXwOuH+x+cY/ICxZVeDP3d/DqO5Q0RkUov/ApCrsHlkLPDb3iJzrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761324119; c=relaxed/simple;
-	bh=McfDafsoKZ0Qc/ftfxMbpecU+5qms1ggNuFPRrlly10=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CNZXCtebDIZNSojHDiyH/b4XaIZVlMojnVo6jFyHdrH+YRouAM3+l/5TG2Kzwy2oZcPHhLwt/yuoMOJ5M+Cx2KtxtTMFCdopNMM1l7lsYgwxn3gLFnPTi6hmrmAO1G2x8RttML6xaULNIwNOobXIzRenmVmovkSfPlanyTN/T8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tsctTBNU; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1761324350; c=relaxed/simple;
+	bh=l8fHPPkC4JRlA1R9eBG/HBWLmHeZAxOGw9dz4ZOhCvs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kcbJ6AHlmGKOF1vjtPVvNmefJIf+0VfuTjYopWWU/29SLoBT947rjleQkThAj6WPkHRXyMHe10+rifIwK+t6lRc0C1b0xHEinPMa+HSNXUTu9gdTCMjizz/25DoPwA/zZOYukjpdL7v64lSQxru1FtsPwn5JPXcYk4Y8M2OAXac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lzJoDO81; arc=none smtp.client-ip=209.85.160.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-290d860acbcso43870445ad.1
-        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 09:41:55 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4e6ec0d1683so7021cf.0
+        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 09:45:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761324115; x=1761928915; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t1RHFoPTdDvcwb/qkIe5JmQx1A2yObnl5+zva5BuXpw=;
-        b=tsctTBNUSZLhJdLijABuCYbdLPgyibjJHwSemEN+RLADY9F8zDG3CtohhrbugCEnqr
-         TwzkCU9u2J+GHaMYa+tqD4lvZWe6aB1dd5wTlWtA1ghCxpJclHAEon7ii+YbdJo78d1A
-         Ww+U3RfxAGKk539AN8Ks0MR88xu2nTmpK7AfEjOlRxtrfZTRtmCSzRKVjGddiPUaxIJM
-         qZgn5eqMIDTEjmTG9Ee12SlpR8ng8BfeDwndOaSBHwKMC4qETtX1Sx2MUN28tTQkz/T5
-         NkKuk0pjiAJjaH5K1nsW8GNMzHAcfOD1eaj/6vw4+laSEZaFJH21swpVvBz+ub52AZJS
-         gIgA==
+        d=google.com; s=20230601; t=1761324348; x=1761929148; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tp94m+0iT2dB2E8reOhXroB6plr+CCHWM/+pbCZUMQM=;
+        b=lzJoDO81WHJOg9h67mGvL06kNlZ4CSMFA88zLpAkZ7wWpR4UB2Um3IBz0+KpUotgaR
+         qYiqh50/oLerda2L8fg8Y5NoHeJlbvwe/WKoKZBy62InUQCWjKz+1P2ANipd8iqRqvvu
+         kOiqMGBvBg/SWno4KzMxRLE+HZyh+WmwVzQS7jc/MDx0HLbS7Tge5y/6ZZ8y0C2FxdoP
+         9c46Sg2hdpajGsJQzAyZC4HnbHJjF5ILMvg1RxMNuyum1x5BhXrKLWwD6GvqjyEB5VMy
+         T5MsMMYQjUtTNGuVOLWPhm9mRb83F3PhGxtre+EEYfgFBKh3Fej8DwPZSkGKtFBd0TOD
+         GbuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761324115; x=1761928915;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t1RHFoPTdDvcwb/qkIe5JmQx1A2yObnl5+zva5BuXpw=;
-        b=DyMsFQLN07FCDeX8wRy6hmBqv38BCsT18qucbguz4qsuBZj6iTj24PMmnhN78KD1vC
-         1XsBhZ9rMpD2U8x+8byVTD2lMEmN9gFkZESsl0aL4qZR7EeCEmUqqqcsaFP4OT2s+/GD
-         CMxyLSYzL6yU9ADbbk/B1Oa2fKd6nxjia+iQFVOXY0+DBpK3soqCXakomoddc2zheoJS
-         kyRpnHjM/W7RUsNuWb7ZFlMUtIy4UN1OpAu0wiJeQkphXfYcm/of1JpoHibbOzT/p2hC
-         FtayYtn/xrCBuvKX99vfFoMLcrJX+d6tP6ML64uzTsYczwylwSPfLjBmCrZxZaM8NaHR
-         6+tg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTzZxPw1Rv3eb1gjsoXWxyGC1llkF+2Pu3dIg4Zve1omCP/A2uln+rKjaIvIvA+0IOKhU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFvpxZMzl6XK2ogroQx0EQOnDZHYEsPCYi1Jtt2n0xrOI3OgYx
-	KiF+l7PsGy06u62goisIb+bhlb+l2UxH/0zglf7BTkIC7cJ0q9A9uCyouh2CNK3Zj+6IMe5qKXX
-	kcjAqZiZamfvUfgZKfZqPwtCDQQ==
-X-Google-Smtp-Source: AGHT+IEPuBDuGNsrppGmcrNT5qFipxZMZW83jV/EN44QaRv4+wQ0X1ZUm0/OOFjwazq9d0SG+iIXrpEvGj5fqDDiKg==
-X-Received: from pjn8.prod.google.com ([2002:a17:90b:5708:b0:31f:2a78:943])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:ea01:b0:267:d2f9:2327 with SMTP id d9443c01a7336-290c9cf2d88mr421610105ad.27.1761324115016;
- Fri, 24 Oct 2025 09:41:55 -0700 (PDT)
-Date: Fri, 24 Oct 2025 09:41:53 -0700
-In-Reply-To: <aPuXCV0Aof0zihW9@google.com>
+        d=1e100.net; s=20230601; t=1761324348; x=1761929148;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tp94m+0iT2dB2E8reOhXroB6plr+CCHWM/+pbCZUMQM=;
+        b=PpAOXzDk87Qh5/xpkygf5B2zrR87SntyTqqIq8EvoCA/tQIgawH5aHUMjp1ZhrWvxJ
+         U5HFTgoFef6SWsDEp9B/uExv7VF1MGEiV8M+NQz76XUHhgXIAmgK99T3jAOwEqOpCXF8
+         fQBaB2PkyRZPFkbQgdUHuoyBpTtWvnaYREif0meDSf0E9jadxQP0Nh7OJBoHkoe/CDSR
+         Hjq1OHvmXhYwje8fYoO7fbudnYnjvVb9VdsFQiPCzCr8/kRWJ1ogGoFspqbmfX7t/wRF
+         BFslvtIZ/CEEAUIdVMQzZ/+FmIrSjFlNMk+axPqnB1lsJQTrM9W+SXo0lbIAjmqKdlr1
+         DNVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVKgEdoKZTn7hfcVfqsio1zTWyBpeU1M/58toK0/jiBnyMDRALcC4F3HNrYWPcb70fiwRE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzyGcZkbZjtHPieZBJY9fCPFwojVZeMh4aGzxdj8tc6KGjES0M
+	yBiMKlSRQeT9Mbf6tZ2yRxlx3wQkVRdpX3vvJwv5B3ksUEFXT+H6HiBYt6b0GoN65TBFVSUuX4w
+	ITsQylosu2qOmovOcsTkzvgaGGGrjukLdWRgXoN8q
+X-Gm-Gg: ASbGncvKSRsukoJKmwd9jWKrsYtoHdyNbtk8jDDEa+b141bzWNp2GZMCUIuxqz6u7uv
+	gX7KU9CNOBdYmFTCQSjSW8ahtkPQKAAs/rpAIHltceGR8hj1DQcrIW/dvNhUVfr6GNaXQuuuORy
+	KvbOo9BsqlpExyYWdz1kM16ldUU5ECAg/XvVVipB1nKfkNoiEHyTtGJnS/1v4pmzt5JeydMHWgf
+	3fDNXYF+M9yogqSjp3ceN4YTsGcaEQRXMpGk+cgKEypBvueJBvblpcTdLb0KV4TYkL0vskLn04r
+	qAJ53zSc0i+5qwTh3Q==
+X-Google-Smtp-Source: AGHT+IHj9jJsKJWJhcz77Qoyqqh2QgHDB/OktV5aMTXEGJP/cspOjR+15VD0ZBgbsEKzvzwaFG7Jo2NnWVJOzgywjrg=
+X-Received: by 2002:a05:622a:cb:b0:4e6:e07f:dc98 with SMTP id
+ d75a77b69052e-4eb93730b28mr5610111cf.9.1761324347845; Fri, 24 Oct 2025
+ 09:45:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1760731772.git.ackerleytng@google.com> <8ee16fbf254115b0fd72cc2b5c06d2ccef66eca9.1760731772.git.ackerleytng@google.com>
- <2457cb3b-5dde-4ca1-b75d-174b5daee28a@arm.com> <diqz4irqg9qy.fsf@google.com>
- <diqzy0p2eet3.fsf@google.com> <aPlpKbHGea90IebS@google.com>
- <diqzv7k5emza.fsf@google.com> <aPpEPZ4YfrRHIkal@google.com>
- <diqzqzuse58c.fsf@google.com> <aPuXCV0Aof0zihW9@google.com>
-Message-ID: <diqzo6pwdzfy.fsf@google.com>
-Subject: Re: [RFC PATCH v1 07/37] KVM: Introduce KVM_SET_MEMORY_ATTRIBUTES2
-From: Ackerley Tng <ackerleytng@google.com>
+MIME-Version: 1.0
+References: <20250925172851.606193-1-sagis@google.com> <20250925172851.606193-14-sagis@google.com>
+ <68efcb7ee33e5_cab031002e@iweiny-mobl.notmuch> <CAAhR5DGcz-2=a6Q2zZS_eP2ZjNNPs65jNG+K50tdVAQfC6AbbA@mail.gmail.com>
+ <aPui50JMEcuIl7-8@google.com>
+In-Reply-To: <aPui50JMEcuIl7-8@google.com>
+From: Sagi Shahar <sagis@google.com>
+Date: Fri, 24 Oct 2025 11:45:36 -0500
+X-Gm-Features: AS18NWBLOljVToQUAT57VvW_ehimBaX2k2m0jrXQCZpfD9mmAYUsGAZUGeqHF5Q
+Message-ID: <CAAhR5DFJKTTY3tN7AU=BXDRJAGjuortmK0ruQWU8RB_Z6jVugQ@mail.gmail.com>
+Subject: Re: [PATCH v11 13/21] KVM: selftests: Add helpers to init TDX memory
+ and finalize VM
 To: Sean Christopherson <seanjc@google.com>
-Cc: Steven Price <steven.price@arm.com>, cgroups@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, x86@kernel.org, 
-	akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de, 
-	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com, 
-	david@redhat.com, dmatlack@google.com, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, 
-	hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com, 
-	keirf@google.com, kent.overstreet@linux.dev, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, 
-	maobibo@loongson.cn, mathieu.desnoyers@efficios.com, maz@kernel.org, 
-	mhiramat@kernel.org, mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, 
-	mingo@redhat.com, mlevitsk@redhat.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, peterx@redhat.com, 
-	pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, qperret@google.com, 
-	richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com, 
-	rostedt@goodmis.org, roypat@amazon.co.uk, rppt@kernel.org, 
-	shakeel.butt@linux.dev, shuah@kernel.org, suzuki.poulose@arm.com, 
-	tabba@google.com, tglx@linutronix.de, thomas.lendacky@amd.com, 
-	vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
-	vkuznets@redhat.com, will@kernel.org, willy@infradead.org, wyihan@google.com, 
-	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com
+Cc: Ira Weiny <ira.weiny@intel.com>, linux-kselftest@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Roger Wang <runanwang@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Sean Christopherson <seanjc@google.com> writes:
+On Fri, Oct 24, 2025 at 11:02=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Thu, Oct 23, 2025, Sagi Shahar wrote:
+> > On Wed, Oct 15, 2025 at 11:25=E2=80=AFAM Ira Weiny <ira.weiny@intel.com=
+> wrote:
+> > >
+> > > Sagi Shahar wrote:
+> > > > From: Ackerley Tng <ackerleytng@google.com>
+> > > >
+> > >
+> > > [snip]
+> > >
+> > > > diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b/t=
+ools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> > > > index 2551b3eac8f8..53cfadeff8de 100644
+> > > > --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> > > > +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> > > > @@ -270,3 +270,61 @@ void vm_tdx_init_vm(struct kvm_vm *vm, uint64_=
+t attributes)
+> > > >
+> > > >       free(init_vm);
+> > > >  }
+> > > > +
+> > >
+> > > [snip]
+> > >
+> > > > +
+> > > > +void vm_tdx_finalize(struct kvm_vm *vm)
+> > >
+> > > Why is this not a new kvm_arch_vm_finalize_vcpu() call?
+> >
+> > What do you mean?
+>
+> Ira is pointing out that upstream now has kvm_arch_vm_finalize_vcpus(), s=
+o you
+> can (and I agree, should) implement that for x86.c, and do vm_tdx_finaliz=
+e() from
+> there (based on the VM shape) instead of requiring the caller to manually=
+ finalize
+> the TD.
+>
+> Unlike SEV, where userspace can manipulate guest state prior to LAUNCH, T=
+DX guest
+> state is unreachable from time zero, i.e. there is unlikely to be many (a=
+ny?) use
+> cases where a selftest wants to do something between creating vCPUs and f=
+inalizing
+> the TD.
 
-> On Fri, Oct 24, 2025, Ackerley Tng wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> >> 
->> >> [...snip...]
->> >> 
->> 
->> I've been thinking more about this:
->> 
->>   #ifdef CONFIG_KVM_VM_MEMORY_ATTRIBUTES
->>   	case KVM_CAP_MEMORY_ATTRIBUTES2:
->>   	case KVM_CAP_MEMORY_ATTRIBUTES:
->>   		if (!vm_memory_attributes)
->>   			return 0;
->>   
->>   		return kvm_supported_mem_attributes(kvm);
->>   #endif
->> 
->> And the purpose of adding KVM_CAP_MEMORY_ATTRIBUTES2 is that
->> KVM_CAP_MEMORY_ATTRIBUTES2 tells userspace that
->> KVM_SET_MEMORY_ATTRIBUTES2 is available iff there are valid
->> attributes.
->> 
->> (So there's still a purpose)
->> 
->> Without valid attributes, userspace can't tell if it should use
->> KVM_SET_MEMORY_ATTRIBUTES or the 2 version.
->
-> To do what?  If there are no attributes, userspace can't do anything useful anyways.
->
->> I also added KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES, which tells
->> userspace the valid attributes when calling KVM_SET_MEMORY_ATTRIBUTES2
->> on a guest_memfd:
->
-> Ya, and that KVM_SET_MEMORY_ATTRIBUTES2 is supported on guest_memfd.
->
->>   #ifdef CONFIG_KVM_GUEST_MEMFD
->>   	case KVM_CAP_GUEST_MEMFD:
->>   		return 1;
->>   	case KVM_CAP_GUEST_MEMFD_FLAGS:
->>   		return kvm_gmem_get_supported_flags(kvm);
->>   	case KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES:
->>   		if (vm_memory_attributes)
->>   			return 0;
->>   
->>   		return kvm_supported_mem_attributes(kvm);
->>   #endif
->>   
->> So to set memory attributes, userspace should
->
-> Userspace *can*.  User could also decide it only wants to support guest_memfd
-> attributes, e.g. because the platform admins controls the entire stack and built
-> their entire operation around in-place conversion.
->
->>   if (kvm_check_cap(KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES) > 0)
->> 	use KVM_SET_MEMORY_ATTRIBUTES2 with guest_memfd
->>   else if (kvm_check_cap(KVM_CAP_MEMORY_ATTRIBUTES2) > 0)
->>         use KVM_SET_MEMORY_ATTRIBUTES2 with VM fd
->>   else if (kvm_check_cap(KVM_CAP_MEMORY_ATTRIBUTES) > 0)
->> 	use KVM_SET_MEMORY_ATTRIBUTES with VM fd
->>   else
->> 	can't set memory attributes
->> 
->> Something like that?
->
-> More or else, ya.
->
->> In selftests there's this, when KVM_SET_USER_MEMORY_REGION2 was
->> introduced:
->> 
->>   #define TEST_REQUIRE_SET_USER_MEMORY_REGION2()			\
->> 	__TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),	\
->> 		       "KVM selftests now require KVM_SET_USER_MEMORY_REGION2 (introduced in v6.8)")
->> 
->> But looks like there's no direct equivalent for the introduction of
->> KVM_SET_MEMORY_ATTRIBUTES2?
->
-> KVM_CAP_USER_MEMORY2 is the equivalent.
->
-> There's was no need to enumerate anything beyond yes/no, because
-> SET_USER_MEMORY_REGION2 didn't introduce new flags, it expanded the size of the
-> structure passed in from userspace so that KVM_CAP_GUEST_MEMFD could be introduced
-> without breaking backwards compatibility.
->
->> The closest would be to add a TEST_REQUIRE_VALID_ATTRIBUTES() which
->> checks KVM_CAP_MEMORY_ATTRIBUTES2 or
->> KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES before making the vm or
->> guest_memfd ioctl respsectively.
->
-> Yes.  This is what I did in my (never posted, but functional) version:
->
-> @@ -486,6 +488,7 @@ struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
->         }
->         guest_rng = new_guest_random_state(guest_random_seed);
->         sync_global_to_guest(vm, guest_rng);
-> +       sync_global_to_guest(vm, kvm_has_gmem_attributes);
-
-I ported this [1] except for syncing this value to the guest, because I
-think the guest shouldn't need to know this information, the host should
-decide what to do. I think, if the guests really need to know this, the
-test itself can do the syncing.
-
-[1] https://lore.kernel.org/all/5656d432df1217c08da0cc2694fd79948bfd686f.1760731772.git.ackerleytng@google.com/
-
->  
->         kvm_arch_vm_post_create(vm, nr_runnable_vcpus);
->  
-> @@ -2319,6 +2333,8 @@ void __attribute((constructor)) kvm_selftest_init(void)
->         guest_random_seed = last_guest_seed = random();
->         pr_info("Random seed: 0x%x\n", guest_random_seed);
->  
-> +       kvm_has_gmem_attributes = kvm_has_cap(KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES);
-> +
->         kvm_selftest_arch_init();
->  }
->  
-> That way the core library code can pivot on gmem vs. VM attributes without having
-> to rely on tests to define anything.  E.g.
->
-> static inline void vm_mem_set_memory_attributes(struct kvm_vm *vm, uint64_t gpa,
-> 						uint64_t size, uint64_t attrs)
-> {
-> 	if (kvm_has_gmem_attributes) {
-> 		off_t fd_offset;
-> 		uint64_t len;
-> 		int fd;
->
-> 		fd = kvm_gpa_to_guest_memfd(vm, gpa, &fd_offset, &len);
-> 		TEST_ASSERT(len >= size, "Setting attributes beyond the length of a guest_memfd");
-> 		gmem_set_memory_attributes(fd, fd_offset, size, attrs);
-> 	} else {
-> 		vm_set_memory_attributes(vm, gpa, size, attrs);
-> 	}
-> }
+There are actually a few use cases for calling vm_tdx_finalize
+seperately from the create phase. One such case is when a user wants
+to add additional memslots for testing shared memory conversions.
+Another one is installing interrupt handlers. But these are probably
+rare enough that they can call __vm_create() and vm_vcpu_add()
+manually instead of using the wrapper
 
