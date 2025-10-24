@@ -1,198 +1,92 @@
-Return-Path: <kvm+bounces-61071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61072-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2950EC07FAA
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 22:06:16 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A206EC07FFE
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 22:11:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 54F5A4ED217
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 20:06:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B77E256526D
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 20:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072712DAFA2;
-	Fri, 24 Oct 2025 20:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Exbd5bsf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C3C32E62AF;
+	Fri, 24 Oct 2025 20:10:05 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645D22DA76D
-	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 20:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF982E2EF8
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 20:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761336361; cv=none; b=fHCTFUksQUeWzEnkL8MjBlsWLw9zZ6s5NBfEn3dEhr5DjeQvAIu8f9WrgpdgDElcWlK4d5UaIsoQdDGc0Y5STAwLdD31y7FV75mSlY5qnTef3ZnCYts1urMrtcberiGq9AS95OzkJf7nXQwrcJeFtlyaQe0a8CgakTqT3/sX1hI=
+	t=1761336604; cv=none; b=p0Ml16A93VqxepZJUdSP6Omg9Ei2k/ZbgSFolDC1LfwiG0YV4dsxrMHx+kf0S4Z6fv7aJWBqCCaq0V2ePgEk8nGnIWlwRSMHx9fxK+hpNJKpZDwX4WZDF4yysOoEyAgwuwvhTmzbeGJch1Rkue6VeMtGOdFNvQ/1ZJUaJIFo74U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761336361; c=relaxed/simple;
-	bh=zB12qLiW048+bzj+QWo/Yh48JJX7bRhXlhLPyLUgRT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jn7+FndYWXAa13CRqoGevP0NPyomaUQrxYhX+wkjpr498Bk3uObM8pfswl45DATu5qHYzW+ZngaeiZ+EDtKw6SINegf6bz8z6AtKzOrjULkXb3qDTp7i8X/L9RjpwrmdXfLj8UT0Q1PW+MZn8CDwCph/6aBshtjAwXNn+7gwfsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Exbd5bsf; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 24 Oct 2025 20:05:33 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761336347;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K5kibUrhGEIh1wdjnl8ZsspLMeFM7U2onbljFtVXAgg=;
-	b=Exbd5bsf/Tm5LIy+8QoVhG42/C0IUQp5OSAWxcboh4tanMCzpIkUQ79onbMEOK4YPdqCxs
-	RjiNuyVFWKVgZL4lbRM0JP7q7nY9JQ3TVoH9vTDnZdiRfZFmye8OrvBUrGHwzOHyEGFvdP
-	PEQs8k/CqVsM8cf4HYazoKCaJGZJVOw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
-	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, 
-	Barry Song <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>, 
-	Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>, Peter Xu <peterx@redhat.com>, 
-	Matthew Wilcox <willy@infradead.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
-	Oscar Salvador <osalvador@suse.de>, Vlastimil Babka <vbabka@suse.cz>, 
-	Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
-	Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
-	Matthew Brost <matthew.brost@intel.com>, Joshua Hahn <joshua.hahnjy@gmail.com>, 
-	Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Pedro Falcato <pfalcato@suse.de>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>, 
-	Harry Yoo <harry.yoo@oracle.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH 00/12] remove is_swap_[pte, pmd]() + non-swap
- confusion
-Message-ID: <7tjpibvbt2nwkkrzcbrsw3t3ehxckjrro6vxqukh4ld4memodx@cxfpmwbr3fo6>
-References: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
+	s=arc-20240116; t=1761336604; c=relaxed/simple;
+	bh=5e1z4X0GXfz+sXjtmG8f7llpCLE6qws2zHAV//pxovg=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=EBxolDRjK5TKTLRcuHbMFljjVh9O62WoN/Hmhb2ixbq0xdQNbc2ZbRiLtGWaDMgPjG2uYwKYSrDwtXM127EyboBjURae+wXVFcwIRd/XzimjMi/NCZk3INDbUWN2CD+YxfniPuomHg+BS9VCntCsnW/1PrHPke4cZHMLeJ4edd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-430db5635d6so32446585ab.3
+        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 13:10:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761336602; x=1761941402;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pD5EQC3sKQgvZOVzVKbz3HY4CWX0jjmoHtrgq7Vyt5g=;
+        b=VZYxVE1hckK3DwAkMln64HXeZS/FfHaRNJlOwVKnqIb6kVG9jsFQThWPAvrCpgZfR4
+         GEU8jva/mgKSp/MNTKTT2WiOa05lhIxnGD50Jfh9Y5NoFYPREuZKhz8BDsEaeyRQbeRH
+         KOhTzlacfADhkxNTJKgOgxBIc+IN3qY/3CDBUlrythAEVHji3LMPfiHckVyFXYSGBi9L
+         omlmsWV2n1oPvhMz2+4yL9a/2QL3sTdKb6sfwTr0Nw/Azwj/YeeiDwuHu0+s0Nmc+sOy
+         TtWaxRzCYiX4aTPK9G0W/ETABxJtZI/YWiYY+HmuHt33kxhEL3T7S3lLImLBBeojjlAp
+         XEiA==
+X-Forwarded-Encrypted: i=1; AJvYcCU94VrzLi9qp47xSkdhsR9hoj2E0KFR32MOmEhw4OuHV8//k/ZewXl165/4q0wmL91lbZs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzd9ui1wEc1a3UGGIbHhRQQcZpRbSvrpvRTUFvV8eCOU1KxHG+H
+	04hXLS5OQaQDqsHSVcDnVTBfkwsWxaID0W+PXXnuy8GIyyRrA9N2gqKmhE8LwUmQnVIMA/pHkQ3
+	NVfjOhPu4YsFEWdo8/6dhDVBC4EdXRCh13CojhxTNfW5Xs6rFN/fvJA8jAmg=
+X-Google-Smtp-Source: AGHT+IGlUpe7cydcYsCSWlW6XihJFInJ5PrrM/WDK2B5vlav5c+q5ILM6EBm0u8n69E78Yxpsybu0+hW5MT50ZjVBupDnAav8Nfe
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a92:cda3:0:b0:3f3:4562:ca92 with SMTP id
+ e9e14a558f8ab-430c525f520mr220412755ab.10.1761336602321; Fri, 24 Oct 2025
+ 13:10:02 -0700 (PDT)
+Date: Fri, 24 Oct 2025 13:10:02 -0700
+In-Reply-To: <aPvQHxLIVpMykkG5@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68fbdd1a.a00a0220.9662e.000c.GAE@google.com>
+Subject: Re: [syzbot] [kvm?] KASAN: slab-use-after-free Write in kvm_gmem_release
+From: syzbot <syzbot+2479e53d0db9b32ae2aa@syzkaller.appspotmail.com>
+To: david@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	pbonzini@redhat.com, seanjc@google.com, syzkaller-bugs@googlegroups.com, 
+	tabba@google.com, xiaoyao.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Oct 24, 2025 at 08:41:16AM +0100, Lorenzo Stoakes wrote:
-> There's an established convention in the kernel that we treat leaf page
-> tables (so far at the PTE, PMD level) as containing 'swap entries' should
-> they be neither empty (i.e. p**_none() evaluating true) nor present
-> (i.e. p**_present() evaluating true).
-> 
-> However, at the same time we also have helper predicates - is_swap_pte(),
-> is_swap_pmd() - which are inconsistently used.
-> 
-> This is problematic, as it is logical to assume that should somebody wish
-> to operate upon a page table swap entry they should first check to see if
-> it is in fact one.
-> 
-> It also implies that perhaps, in future, we might introduce a non-present,
-> none page table entry that is not a swap entry.
-> 
-> This series resolves this issue by systematically eliminating all use of
-> the is_swap_pte() and is swap_pmd() predicates so we retain only the
-> convention that should a leaf page table entry be neither none nor present
-> it is a swap entry.
-> 
-> We also have the further issue that 'swap entry' is unfortunately a really
-> rather overloaded term and in fact refers to both entries for swap and for
-> other information such as migration entries, page table markers, and device
-> private entries.
-> 
-> We therefore have the rather 'unique' concept of a 'non-swap' swap entry.
-> 
-> This is deeply confusing, so this series goes further and eliminates the
-> non_swap_entry() predicate, replacing it with is_non_present_entry() - with
-> an eye to a new convention of referring to these non-swap 'swap entries' as
-> non-present.
+Hello,
 
-I just wanted to say THANK YOU for doing this. It is indeed a very
-annoying and confusing convention, and I wanted to do something about it
-in the past but never got around to it..
+syzbot tried to test the proposed patch but the build/boot failed:
 
-> 
-> It also introduces the is_swap_entry() predicate to explicitly and
-> logically refer to actual 'true' swap entries, improving code readibility,
-> avoiding the hideous convention of:
-> 
-> 	if (!non_swap_entry(entry)) {
-> 		...
-> 	}
-> 
-> As part of these changes we also introduce a few other new predicates:
-> 
-> * pte_to_swp_entry_or_zero() - allows for convenient conversion from a PTE
->   to a swap entry if present, or an empty swap entry if none. This is
->   useful as many swap entry conversions are simply checking for flags for
->   which this suffices.
-> 
-> * get_pte_swap_entry() - Retrieves a PTE swap entry if it truly is a swap
->   entry (i.e. not a non-present entry), returning true if so, otherwise
->   returns false. This simplifies a lot of logic that previously open-coded
->   this.
-> 
-> * is_huge_pmd() - Determines if a PMD contains either a present transparent
->   huge page entry or a huge non-present entry. This again simplifies a lot
->   of logic that simply open-coded this.
-> 
-> REVIEWERS NOTE:
-> 
-> This series applies against mm-unstable as there are currently conflicts
-> with mm-new. Should the series receive community assent I will resolve
-> these at the point the RFC tag is removed.
-> 
-> I also intend to use this as a foundation for further work to add higher
-> order page table markers.
-> 
-> Lorenzo Stoakes (12):
->   mm: introduce and use pte_to_swp_entry_or_zero()
->   mm: avoid unnecessary uses of is_swap_pte()
->   mm: introduce get_pte_swap_entry() and use it
->   mm: use get_pte_swap_entry() in debug pgtable + remove is_swap_pte()
->   fs/proc/task_mmu: refactor pagemap_pmd_range()
->   mm: avoid unnecessary use of is_swap_pmd()
->   mm: introduce is_huge_pmd() and use where appropriate
->   mm/huge_memory: refactor copy_huge_pmd() non-present logic
->   mm/huge_memory: refactor change_huge_pmd() non-present logic
->   mm: remove remaining is_swap_pmd() users and is_swap_pmd()
->   mm: rename non_swap_entry() to is_non_present_entry()
->   mm: provide is_swap_entry() and use it
-> 
->  arch/s390/mm/gmap_helpers.c   |   2 +-
->  arch/s390/mm/pgtable.c        |   2 +-
->  fs/proc/task_mmu.c            | 214 ++++++++++++++++++++--------------
->  include/linux/huge_mm.h       |  49 +++++---
->  include/linux/swapops.h       |  99 ++++++++++++++--
->  include/linux/userfaultfd_k.h |  16 +--
->  mm/debug_vm_pgtable.c         |  43 ++++---
->  mm/filemap.c                  |   2 +-
->  mm/hmm.c                      |   2 +-
->  mm/huge_memory.c              | 189 ++++++++++++++++--------------
->  mm/hugetlb.c                  |   6 +-
->  mm/internal.h                 |  12 +-
->  mm/khugepaged.c               |  29 ++---
->  mm/madvise.c                  |  14 +--
->  mm/memory.c                   |  62 +++++-----
->  mm/migrate.c                  |   2 +-
->  mm/mincore.c                  |   2 +-
->  mm/mprotect.c                 |  45 ++++---
->  mm/mremap.c                   |   9 +-
->  mm/page_table_check.c         |  25 ++--
->  mm/page_vma_mapped.c          |  30 +++--
->  mm/swap_state.c               |   5 +-
->  mm/swapfile.c                 |   3 +-
->  mm/userfaultfd.c              |   2 +-
->  24 files changed, 511 insertions(+), 353 deletions(-)
-> 
-> --
-> 2.51.0
+failed to apply patch:
+checking file virt/kvm/guest_memfd.c
+Hunk #1 FAILED at 708.
+Hunk #2 succeeded at 648 with fuzz 2 (offset -84 lines).
+1 out of 2 hunks FAILED
+
+
+
+Tested on:
+
+commit:         2e590d67 Merge tag 'devicetree-fixes-for-6.18-2' of gi..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=67b63a24f3c26fca
+dashboard link: https://syzkaller.appspot.com/bug?extid=2479e53d0db9b32ae2aa
+compiler:       
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=15343b04580000
+
 
