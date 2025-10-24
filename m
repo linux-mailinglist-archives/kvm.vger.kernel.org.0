@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-60974-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60975-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2760FC04845
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 08:35:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E13A5C04848
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 08:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2C5E1A07D57
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 06:36:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A64B3BA593
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 06:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39001273D6C;
-	Fri, 24 Oct 2025 06:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7345277C98;
+	Fri, 24 Oct 2025 06:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EGapQkRe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YckYsp03"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84A223F422
-	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 06:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D843022370D
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 06:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761287735; cv=none; b=pyjh+XFFSUQ8ZSwDCBn01bdyaa3kxA8zsGcXKkDNCEyP6wEgPVh6NUh7zbbl4VjFgW74p3EJPJ+zl6rp0wShhCmYdrfH8mMjkXLvdf7uIfqOM8S1gUehex7ZazyXcHsTOm733LGBFUaq2L+iu6dbCzUw9bWFkEbyHA8AsWncvnM=
+	t=1761287736; cv=none; b=JqFIob2j0jvKHyzrK9sshzLGlvJySXQu72UVsbhy0p2xBVXgtWhT5PctNf0lfFfcxHs1AwYgQsB26nxiBGu02vRPGP2mmgSPW/Oqgdkbc774xOgOGzfSL1H4bvJjHVfaoGV9VyJqk/J+vEuxkSlyUe5W7ZBOF3Etc8zP65+++OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761287735; c=relaxed/simple;
-	bh=J041AyqDu393CENrSjsYGiKHkAgugONGgNt6ugUkk3A=;
+	s=arc-20240116; t=1761287736; c=relaxed/simple;
+	bh=X9mZMY7GCwdN4r2ezl65+y+sTCP8LT+K5xyesugEdsI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZFFdBKeFDgu1yh4WJTUlrVdxd1sjbwv6tw8FWQgpxUHURx3gHK9OLGBN8+Vf7r20xNizF0h3VbJgDxPzAj5IEutr/ssmxiEhNUqhL/zLHookr2gAQqV1uaH+6pwo0Fbrhc6mAmIxqHTkkBHYaQ5Nrf7fDhwwGsw4cqAt5qEg54w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EGapQkRe; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=hTF3WQxBU292tUqeHRMC21I4+llS7ecO+LDkbG2+YJ0TbNYWfSpRjQo0/WB6NykixCmcX/GMC0Pe+e9nebNuFA6C2URg0uiMCtY5gDW4DqHtMhswiAs0oUTFbALB8qfogipPwAsCNeO9VRuD8AtjxbVxWq69qGLGEIyaEw+oN/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YckYsp03; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,28 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1761287734; x=1792823734;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=J041AyqDu393CENrSjsYGiKHkAgugONGgNt6ugUkk3A=;
-  b=EGapQkReXCKGSgKdhdxae47ogMQFBtfI3fNjBt1z6GKTl9h9pJKGbOUi
-   ZaC1bKwT9ktQhaB+eEATqpqW/PGyD+PFku1pqu3tidbOVWXLOaRh73hxq
-   wA1XAKpIWyoV4cw4/TgTxqoKzynd7DQ/MbqURtiDXrfqQwDatkF4jkfw+
-   KTY0Sl0TWQ0tiL7E2TUeh/wGNSfXBs1N6tcYNCLJj3N6D1ZRQsTh0StRD
-   b0Tiw1BNOPiD6G8LjUeqQ/cr4C3qJywNTytNitqop4+3qtEpLj7I1IR0k
-   emPi6OFGR/z84TNx7K6U1xvAOGHCjWldIl8gVYVzWHNHSdjmCXEweOQdy
+  bh=X9mZMY7GCwdN4r2ezl65+y+sTCP8LT+K5xyesugEdsI=;
+  b=YckYsp03lCCBcEVS60KnO4g5UZzmyjOh2j4PffyhzSAcW99z+6GnjYH+
+   j6HS6hgs+5qL0praCePeK65s57qfKBfUVvhv4lG07veXzgy+YKdbISEAI
+   0SrNoIQ6Wg+L2CdjlRuX7pY//SBybrOg3KrPnJslmSrg+ggFKV+ZD46Lk
+   Vz5ghqkgpHJ10o3fP07Igyg3pJUKN/q4LWBstkvhGx+ZL39fCoZ4e+0XB
+   CkbWI/MiCBdFbTCkhKnCFHh/nPx17iM/gDQ+SbwKr+HuDSzOlAxts2YJk
+   T5EDLtii2iUyBtAdtgjwRXEVYfNt6LNAWMUEg5bqxr1Kg8BFHyAXQQLYX
    w==;
-X-CSE-ConnectionGUID: HI2R+O4aTvqFKL9bH2hOwg==
-X-CSE-MsgGUID: /FLAE9meT2mwSOd0BUGafg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="62675693"
+X-CSE-ConnectionGUID: xZBGDiJ1TZKCSwixZdPkRg==
+X-CSE-MsgGUID: kQgovwCRS8yADkw/tJZiiQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="62675694"
 X-IronPort-AV: E=Sophos;i="6.19,251,1754982000"; 
-   d="scan'208";a="62675693"
+   d="scan'208";a="62675694"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 23:35:32 -0700
-X-CSE-ConnectionGUID: Ha6JoebcTaezDh11zjjpDA==
-X-CSE-MsgGUID: aNZv1DHrSRy9ZHsUbcgWgg==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 23:35:33 -0700
+X-CSE-ConnectionGUID: jD+M9+PjSPOEKLdIgJOBeA==
+X-CSE-MsgGUID: KF/E+hlwSPGCQTCB+6H/cA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,251,1754982000"; 
-   d="scan'208";a="184276097"
+   d="scan'208";a="184276104"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by fmviesa006.fm.intel.com with ESMTP; 23 Oct 2025 23:35:24 -0700
+  by fmviesa006.fm.intel.com with ESMTP; 23 Oct 2025 23:35:30 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>
@@ -74,9 +74,9 @@ Cc: qemu-devel@nongnu.org,
 	Farrah Chen <farrah.chen@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>,
 	Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v3 13/20] i386/kvm: Add save/load support for CET MSRs
-Date: Fri, 24 Oct 2025 14:56:25 +0800
-Message-Id: <20251024065632.1448606-14-zhao1.liu@intel.com>
+Subject: [PATCH v3 14/20] i386/kvm: Add save/load support for KVM_REG_GUEST_SSP
+Date: Fri, 24 Oct 2025 14:56:26 +0800
+Message-Id: <20251024065632.1448606-15-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251024065632.1448606-1-zhao1.liu@intel.com>
 References: <20251024065632.1448606-1-zhao1.liu@intel.com>
@@ -90,11 +90,17 @@ Content-Transfer-Encoding: 8bit
 
 From: Yang Weijiang <weijiang.yang@intel.com>
 
-CET (architectural) MSRs include:
-MSR_IA32_U_CET - user mode CET control bits.
-MSR_IA32_S_CET - supervisor mode CET control bits.
-MSR_IA32_PL{0,1,2,3}_SSP - linear addresses of SSPs for user/kernel modes.
-MSR_IA32_SSP_TBL_ADDR - linear address of interrupt SSP table
+CET provides a new architectural register, shadow stack pointer (SSP),
+which cannot be directly encoded as a source, destination or memory
+operand in instructions. But Intel VMCS & VMCB provide fields to
+save/load guest & host's ssp.
+
+It's necessary to save & load Guest's ssp before & after migration. To
+support this, KVM implements Guest's SSP as a special KVM internal
+register - KVM_REG_GUEST_SSP, and allows QEMU to save & load it via
+KVM_GET_ONE_REG/KVM_SET_ONE_REG.
+
+Cache KVM_REG_GUEST_SSP in X86CPUState.
 
 Tested-by: Farrah Chen <farrah.chen@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
@@ -103,140 +109,86 @@ Signed-off-by: Chao Gao <chao.gao@intel.com>
 Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-Changes Since v2:
- - Rename MSR_IA32_SSP_TBL_ADDR to MSR_IA32_INT_SSP_TAB.
- - Rename X86CPUState.ssp_table_addr to X86CPUState.int_ssp_table.
- - Drop X86CPUStete.guest_ssp since it is not used in current commit.
- - Do not check CET-S & CET-U xtates when get/set MSTs since CET
-   is XSAVE-managed feature but is not XSAVE-enabled.
----
- target/i386/cpu.h     | 16 +++++++++++
- target/i386/kvm/kvm.c | 64 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 80 insertions(+)
+ target/i386/cpu.h     |  1 +
+ target/i386/kvm/kvm.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
 
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 86fbfd5e4023..4edb977575e2 100644
+index 4edb977575e2..ad4287822831 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -580,6 +580,14 @@ typedef enum X86Seg {
- #define MSR_APIC_START                  0x00000800
- #define MSR_APIC_END                    0x000008ff
+@@ -2105,6 +2105,7 @@ typedef struct CPUArchState {
+     uint64_t pl2_ssp;
+     uint64_t pl3_ssp;
+     uint64_t int_ssp_table;
++    uint64_t guest_ssp;
  
-+#define MSR_IA32_U_CET                  0x000006a0       /* user mode cet */
-+#define MSR_IA32_S_CET                  0x000006a2       /* kernel mode cet */
-+#define MSR_IA32_PL0_SSP                0x000006a4       /* ring-0 shadow stack pointer */
-+#define MSR_IA32_PL1_SSP                0x000006a5       /* ring-1 shadow stack pointer */
-+#define MSR_IA32_PL2_SSP                0x000006a6       /* ring-2 shadow stack pointer */
-+#define MSR_IA32_PL3_SSP                0x000006a7       /* ring-3 shadow stack pointer */
-+#define MSR_IA32_INT_SSP_TAB            0x000006a8       /* exception shadow stack table */
-+
- #define XSTATE_FP_BIT                   0
- #define XSTATE_SSE_BIT                  1
- #define XSTATE_YMM_BIT                  2
-@@ -2090,6 +2098,14 @@ typedef struct CPUArchState {
-     uint64_t msr_rapl_power_unit;
-     uint64_t msr_pkg_energy_status;
- 
-+    uint64_t u_cet;
-+    uint64_t s_cet;
-+    uint64_t pl0_ssp;
-+    uint64_t pl1_ssp;
-+    uint64_t pl2_ssp;
-+    uint64_t pl3_ssp;
-+    uint64_t int_ssp_table;
-+
      /* Fields up to this point are cleared by a CPU reset */
      struct {} end_reset_fields;
- 
 diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index f7a6ef650af7..92c2fd6d6aee 100644
+index 92c2fd6d6aee..412e99ba5b53 100644
 --- a/target/i386/kvm/kvm.c
 +++ b/target/i386/kvm/kvm.c
-@@ -4255,6 +4255,28 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
-         }
-     }
- 
-+    if (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK ||
-+        env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_U_CET, env->u_cet);
-+        kvm_msr_entry_add(cpu, MSR_IA32_S_CET, env->s_cet);
-+
-+        if (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK) {
-+            kvm_msr_entry_add(cpu, MSR_IA32_PL0_SSP, env->pl0_ssp);
-+            kvm_msr_entry_add(cpu, MSR_IA32_PL1_SSP, env->pl1_ssp);
-+            kvm_msr_entry_add(cpu, MSR_IA32_PL2_SSP, env->pl2_ssp);
-+            kvm_msr_entry_add(cpu, MSR_IA32_PL3_SSP, env->pl3_ssp);
-+
-+            /*
-+             * This MSR is not present on processors that do not support
-+             * Intel 64 architecture.
-+             */
-+            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
-+                kvm_msr_entry_add(cpu, MSR_IA32_INT_SSP_TAB,
-+                                  env->int_ssp_table);
-+            }
-+        }
-+    }
-+
+@@ -4280,6 +4280,35 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
      return kvm_buf_set_msrs(cpu);
  }
  
-@@ -4646,6 +4668,27 @@ static int kvm_get_msrs(X86CPU *cpu)
-         }
-     }
- 
-+    if (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK ||
-+        env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_U_CET, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_S_CET, 0);
++static int kvm_put_kvm_regs(X86CPU *cpu)
++{
++    CPUX86State *env = &cpu->env;
++    int ret;
 +
-+        if (env->features[FEAT_7_0_EDX] & CPUID_7_0_ECX_CET_SHSTK) {
-+            kvm_msr_entry_add(cpu, MSR_IA32_PL0_SSP, 0);
-+            kvm_msr_entry_add(cpu, MSR_IA32_PL1_SSP, 0);
-+            kvm_msr_entry_add(cpu, MSR_IA32_PL2_SSP, 0);
-+            kvm_msr_entry_add(cpu, MSR_IA32_PL3_SSP, 0);
-+
-+            /*
-+             * This MSR is not present on processors that do not support
-+             * Intel 64 architecture.
-+             */
-+            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
-+                kvm_msr_entry_add(cpu, MSR_IA32_INT_SSP_TAB, 0);
-+            }
++    if ((env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK)) {
++        ret = kvm_set_one_reg(CPU(cpu), KVM_X86_REG_KVM(KVM_REG_GUEST_SSP),
++                              &env->guest_ssp);
++        if (ret) {
++            return ret;
 +        }
 +    }
++    return 0;
++}
 +
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
-     if (ret < 0) {
++static int kvm_get_kvm_regs(X86CPU *cpu)
++{
++    CPUX86State *env = &cpu->env;
++    int ret;
++
++    if ((env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK)) {
++        ret = kvm_get_one_reg(CPU(cpu), KVM_X86_REG_KVM(KVM_REG_GUEST_SSP),
++                              &env->guest_ssp);
++        if (ret) {
++            return ret;
++        }
++    }
++    return 0;
++}
+ 
+ static int kvm_get_xsave(X86CPU *cpu)
+ {
+@@ -5425,6 +5454,11 @@ int kvm_arch_put_registers(CPUState *cpu, KvmPutState level, Error **errp)
+         error_setg_errno(errp, -ret, "Failed to set MSRs");
          return ret;
-@@ -4993,6 +5036,27 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
-             env->lbr_records[index - MSR_ARCH_LBR_INFO_0].info = msrs[i].data;
-             break;
-+        case MSR_IA32_U_CET:
-+            env->u_cet = msrs[i].data;
-+            break;
-+        case MSR_IA32_S_CET:
-+            env->s_cet = msrs[i].data;
-+            break;
-+        case MSR_IA32_PL0_SSP:
-+            env->pl0_ssp = msrs[i].data;
-+            break;
-+        case MSR_IA32_PL1_SSP:
-+            env->pl1_ssp = msrs[i].data;
-+            break;
-+        case MSR_IA32_PL2_SSP:
-+            env->pl2_ssp = msrs[i].data;
-+            break;
-+        case MSR_IA32_PL3_SSP:
-+            env->pl3_ssp = msrs[i].data;
-+            break;
-+        case MSR_IA32_INT_SSP_TAB:
-+            env->int_ssp_table = msrs[i].data;
-+            break;
-         case MSR_K7_HWCR:
-             env->msr_hwcr = msrs[i].data;
-             break;
+     }
++    ret = kvm_put_kvm_regs(x86_cpu);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Failed to set KVM type registers");
++        return ret;
++    }
+     ret = kvm_put_vcpu_events(x86_cpu, level);
+     if (ret < 0) {
+         error_setg_errno(errp, -ret, "Failed to set vCPU events");
+@@ -5497,6 +5531,11 @@ int kvm_arch_get_registers(CPUState *cs, Error **errp)
+         error_setg_errno(errp, -ret, "Failed to get MSRs");
+         goto out;
+     }
++    ret = kvm_get_kvm_regs(cpu);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Failed to get KVM type registers");
++        goto out;
++    }
+     ret = kvm_get_apic(cpu);
+     if (ret < 0) {
+         error_setg_errno(errp, -ret, "Failed to get APIC");
 -- 
 2.34.1
 
