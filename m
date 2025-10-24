@@ -1,183 +1,161 @@
-Return-Path: <kvm+bounces-61076-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61077-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1284C08077
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 22:22:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52774C08143
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 22:38:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A09DD4E025A
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 20:22:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F82A3B2099
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 20:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF272F0C45;
-	Fri, 24 Oct 2025 20:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECBD32F7443;
+	Fri, 24 Oct 2025 20:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WF7LjC75"
+	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="qgjWqiQg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253D41F5846
-	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 20:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD1329993E
+	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 20:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761337321; cv=none; b=t7NvA/KPTLAc9vPODRKhMndR5fqNDzg4teXy37NgSluNArMrf3xQpSgK7MTS7/Di5NutlhotpHnyvr1Z5wTkV8RVeY6DhUwXNyTUCDUzrDWAkT4gJzdc8H0Mp+9FZKAipBHspo/hlmczqSSJ/g8ma0Yv9lB6qUYD8PvAMArjVJY=
+	t=1761338245; cv=none; b=aiHNbj/dOSHLYKvhlPanRzAczmp1iGzg4YHMKintoiGzbFRIsRNPwcIQ7a8bRwbxabAofgisecK7KT7D7EWR7BnzYC8lBgSj9E1IotKmqvzVLA28gZIaRfihee2vY0r4RIscjVpOrJZjq3h1cWgjTZO6i0KybYHzi9ozHJv8H/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761337321; c=relaxed/simple;
-	bh=HY8nu1msWSv3vWsJlzaBnXdb3YfJe10Pi+fsj+Y2l9Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LGndvUk6lEnAolmetXLXaOm/3MTgFbyskhhh7sLtK4W1YHWswYAq4Lft1YUEOyliYFIxvmJwu9ZtoSzRAFg4vjc+fOjaD6plVIEwo+muUbYDOIVy6KEICRDLejpUJL/wgDYlqFxqa7TNLBNlULa5s2bVebpQtJnGw8UvZX9ilsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WF7LjC75; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33428befbbaso2710403a91.0
-        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 13:22:00 -0700 (PDT)
+	s=arc-20240116; t=1761338245; c=relaxed/simple;
+	bh=brPT+lM2XPdvJ0J0zQqzP3FRuejOJIrYJjvdheDJC0A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A3pe3L7AobZwj/vCd21VCL+lAG3Ti9gmxOtO4aUM0MIe8vgCylT4D6y1Hw7K/5UTvfO0ZPXKj54Rueur+MI0VjLLyAWGRyAvq9DubSoEoPj76v45S+WR68iJeeuXDZZBZWRJY1amoFOiApgmf8wL5BzVnVtrhSkilPJaIA3x+1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=qgjWqiQg; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4e89e689ec7so15626241cf.2
+        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 13:37:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761337319; x=1761942119; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5zHb6xopGDOUshixziaB00gh3wd9KLy6Lm4iKOPdoOQ=;
-        b=WF7LjC75SoJmh4K72LWIgGjuN8o9UG3MBUiR7pPfapIAqsCHRwrDZ2itfQA2+x911m
-         V0qR38M7aRYasgASja9VVew/R/E4f+wtL+mHJCWOgjGc6zTWr6XAas0b/3sFxI7cLU+o
-         y8QlnHJEi1SrIMkgHuNL9mb2tHDLYooQnqVQetm3Qjk2Ujvm4Rgx9eskGckpPqJSAZOc
-         BKokRErN+QVGyMfsnfhfG/uBAMBznnx118arW8KjllcgCLFaEtHruWO690bG2MhCCI50
-         AXuiKw1hCYzQf9h3SaYLAKlzFK4s2/UL1zbLIILgBH3NjMAzJTFNY/UNMRU0p6HQXOw4
-         U6VQ==
+        d=gourry.net; s=google; t=1761338241; x=1761943041; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vn4hQEcGul2fUa7R/OzGXx8vWTt9TjtrdGmgBs4cZEg=;
+        b=qgjWqiQg7Mw0bd6Y7P3gb+spLRaKxWc55mXCg5lTEioPzr2WALPNAO9coZW5YwSU/Q
+         CutOTbPQFirUB6W23YGRV/4n3KJAwDc2HuZ1vmW9vsHfhTQE1lFOzrT1zKthKJ1vN7w8
+         J99nIJOu6f1vbKH/VbY6iGK7SaV9bmoiquLKjhFMYlujpJGyyVA8Y6ikqLPzjJZE3K4u
+         OZgIq3WLWE0V48aNTFEFsT8fugi2BJ4QfjAxzSnSHsv/2yqeA/JFfFAvF5Jn45VPjnM2
+         VbQo5z+uEOp/ZfIDudxeAtIZujmHqqIYhpz5spR8VsG3LNndPL57lSFQQ4mQS3eRwY0J
+         boJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761337319; x=1761942119;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5zHb6xopGDOUshixziaB00gh3wd9KLy6Lm4iKOPdoOQ=;
-        b=D1WmjPZrUCVaFht0oz5e4NtRXVTkjvPiTxdkNP3/w0IRQEakHSI0TUVX61BdWh+4Gq
-         W8rAKVNvEgtRpHkgOoikHpkhJ7qKk3+FUgM2kPggrpfnijt1XSDJNfPY068CvwGrPoLH
-         wbvbzZbQwgP+oHGvYctoYp1gSYKEmlHK9YEbak6x2qZ8qEG7CtFJRPdLQ/mq5XP3gJXU
-         IT5xJ+1c5iwnvkYAYmJp5njhC7kpL9elRMLqN846ea/1fSEA+CQFUjKkLRf/ISzSq7j8
-         T455XwmCmgx0e/3x47qtEmju6e45aawy0CkPjkMpJgcO10reFrgQi8SW7tcAcOKKRZrh
-         MAGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWAJfycIdpq1YA2G1nql4AwOGiSs6VTfwgz1zCN8BA0OfXdU9vxesOPBo3oVWQ3m10ltmI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8GQ0EHnEOPFPb7Cmog/VSocckUQ47LdWFr5YiRNTp0NkJnUGc
-	NqfAFI4D3cR+Vy0VSE0iQ8U7j/iAQDSI0OApefGMoWRdWWPqxae0pizAioB0tWXmZajz1hiYHCt
-	pRTAHBQ==
-X-Google-Smtp-Source: AGHT+IHmB/qAZY3JsYu7ONzAV1pNq7phirOTwfp9G6z952oHz03ayW0CdVlMOUoKTMDG6oVTUHYpNDRc+9w=
-X-Received: from pjbrs15.prod.google.com ([2002:a17:90b:2b8f:b0:33b:51fe:1a73])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3e43:b0:339:cece:a99
- with SMTP id 98e67ed59e1d1-33bcf86c699mr42532689a91.13.1761337319524; Fri, 24
- Oct 2025 13:21:59 -0700 (PDT)
-Date: Fri, 24 Oct 2025 13:21:57 -0700
-In-Reply-To: <B116CE75-43FD-41C4-BB3A-9B0A52FFD06B@nutanix.com>
+        d=1e100.net; s=20230601; t=1761338241; x=1761943041;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vn4hQEcGul2fUa7R/OzGXx8vWTt9TjtrdGmgBs4cZEg=;
+        b=wf92oOh/4BauytpcJVyj4Bx8CT6ZF8/Lfck86TtcRObDI3RyvrPgfJRcikAjifWGnW
+         IinHGBNhor/a8bNQcsN7Z9vBKUCF7oI8QhqRHUSMqJJ+IaeAgtS2S4gKKWHYqaUbSkGR
+         zbx/X469KAixUMvf9fp5QVHSJfHx0bjDnirfVAYaW7viuEL7qCp1zESg6737+QkRuhgB
+         9QfAW+ZoeE5KZ0cn344WZoij0fYdXP+1kv+GigGB3uD+h/9PnUPrJnVkERKY3U1ofczd
+         S2Vv6W1iRdn5NtCFMvIjzWYIlFSIMakVlUWxYTWL38WU0gDPlPrOf9BpGmwxC5QdOjKL
+         Vfig==
+X-Forwarded-Encrypted: i=1; AJvYcCVSKj7LlmEqi6Toat7oyBl9L61uf8k+oTyIm/+N42R4HyGFFltemE1+6/CWZlyOpsqpt70=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzit5/GOQg60QiwfzMlPYP1fX4dMH+wp5ktXe3w5l/YGYajSFoR
+	QaK6iTCa+XJoeD8uySsPa9dpTpS8/LgJrL+lzifVpDjN5PwKnNn8WIXnn1iKVMr6fRE=
+X-Gm-Gg: ASbGncvfaJPEmI7uz22IDd8XxM1NwqGDY1/PHFUJ9/r3agttmYkAXPxXM/X5k7o8con
+	/Z+iqENAkaqS9MU71U9bcVw51zD89Deo9jdVc+91rGchziOldgVPYk0iFzKQivlM1o1Ive+c2Lc
+	aiwst7itHjDN+sawMR2DSkN6169RCZCpzuWtnS84wg4CIxbRKLiJPGT4Jfd02vZlsFOcwjWxZCW
+	pcqRzbB9/MmZ4OOKBEHYFkB9tQpR6c3tPdARMX6TrHPxSJ9i8vow5p3H1MEhuCT1SSJU9Evle5Z
+	mKxE+C0b2ISXA4Zz5uDLlwB5h5lqPJqS5kNsPPRepj9RrzfLGhNzq2HVkXAZfJtW6KXYif21Zbp
+	qQp6oyos2UVaQ2pU+rSh9D3bNA+ZEYTB13PuPgqqbmxYLvWWe2UzBhMpzEGim/apkgL6/MvNzzu
+	AkBSkA8FqS4ZGAFy1H3eyqLs0JmYhH7KR/Yovu6YeqzdBBu58nJKy+P7R0WJvIgunJ/ek7Rg==
+X-Google-Smtp-Source: AGHT+IEizsVD5MWKlpznZSR+oUAoDamQsr5IFux8tgX6jFrLAoh3hAikSuRK1/9hfCiWycXsqW7SdA==
+X-Received: by 2002:ac8:58d6:0:b0:4e8:8ed7:da6a with SMTP id d75a77b69052e-4e89d20680bmr359946041cf.8.1761338241380;
+        Fri, 24 Oct 2025 13:37:21 -0700 (PDT)
+Received: from gourry-fedora-PF4VCD3F (pool-96-255-20-138.washdc.ftas.verizon.net. [96.255.20.138])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4eba37b96d0sm861481cf.6.2025.10.24.13.37.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Oct 2025 13:37:20 -0700 (PDT)
+Date: Fri, 24 Oct 2025 16:37:18 -0400
+From: Gregory Price <gourry@gourry.net>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>, Zi Yan <ziy@nvidia.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+	Lance Yang <lance.yang@linux.dev>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+	Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+	Peter Xu <peterx@redhat.com>, Matthew Wilcox <willy@infradead.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+	Byungchul Park <byungchul@sk.com>,
+	Ying Huang <ying.huang@linux.alibaba.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	Pedro Falcato <pfalcato@suse.de>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
+	kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [RFC PATCH 05/12] fs/proc/task_mmu: refactor pagemap_pmd_range()
+Message-ID: <aPvjfo1hVlb_WBcz@gourry-fedora-PF4VCD3F>
+References: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
+ <2ce1da8c64bf2f831938d711b047b2eba0fa9f32.1761288179.git.lorenzo.stoakes@oracle.com>
+ <aPu4LWGdGSQR_xY0@gourry-fedora-PF4VCD3F>
+ <76348b1f-2626-4010-8269-edd74a936982@lucifer.local>
+ <aPvPiI4BxTIzasq1@gourry-fedora-PF4VCD3F>
+ <3f3e5582-d707-41d0-99a7-4e9c25f1224d@lucifer.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250918162529.640943-1-jon@nutanix.com> <aNHE0U3qxEOniXqO@google.com>
- <7F944F65-4473-440A-9A2C-235C88672E36@nutanix.com> <B116CE75-43FD-41C4-BB3A-9B0A52FFD06B@nutanix.com>
-Message-ID: <aPvf5Y7qjewSVCom@google.com>
-Subject: Re: [PATCH] KVM: x86: skip userspace IOAPIC EOI exit when Directed
- EOI is enabled
-From: Sean Christopherson <seanjc@google.com>
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: Jon Kohler <jon@nutanix.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3f3e5582-d707-41d0-99a7-4e9c25f1224d@lucifer.local>
 
-On Fri, Oct 03, 2025, Khushit Shah wrote:
-> Hi Sean,
+On Fri, Oct 24, 2025 at 09:15:59PM +0100, Lorenzo Stoakes wrote:
+> On Fri, Oct 24, 2025 at 03:12:08PM -0400, Gregory Price wrote:
 > 
-> Any updates on this?
-
-Sorry, fell into the classic pattern of "I'll do that one tomorrow...".
-
-> I suggest adding a new KVM capability that disables advertising support for EOI
-> broadcast suppression when using split-irqchip. It is similar in spirit to
-> KVM_CAP_X2APIC_API for x2APIC quirks.
+> So maybe actually that isn't too bad of an idea...
 > 
-> By default, we still assume the userspace I/O APIC implements the EOI register.
-> If it does not, userspace can set a flag before vCPU creation (after selecting
-> split-irqchip mode) to disable EOI broadcast suppression. This should be a
-> per-VM flag, as all APICs will share the same behavior. I am sharing a
-> preliminary diff for discussion. The earlier fix can sit on top of this. This just 
-> allows disabling EOI broadcast suppression under split-irqchip.
+> Could also be
 > 
-> What are your thoughts on this? If this seems reasonable, I can send a proper
-> patch.
+> nonpresent_or_swap_t but that's kinda icky...
 
-Make it a quirk instead of a capability.  This is definitely a KVM bug, it's just
-unfortunately one that we can't fix without breaking userspace :-/
+clearly we need:
 
-And I'm pretty sure we want to quirk the exit to userspace, not the enumeration
-of and support for the feature, e.g. so that an updated userspace VMM can disable
-the quirk on a live update/migration and take advantage of the fanciness without
-having to wait for guests to reboot.
+union {
+	swp_entry_t swap;
+	nonpresent_entry_t np;
+	pony_entry_t pony;
+	plum_emtry_t beer;
+} leaf_entry_t;
 
-Can you also start with the below changelog+comment?  I massaged  in anticipation
-of applying v1 before I realized it would break userespace :-)
+with
 
-E.g. with the quirk stubbed in (obviously not tested in any capacity):
+leaf_type whats_that_pte(leaf_entry_t);
 
---
-From: Khushit Shah <khushit.shah@nutanix.com>
-Date: Thu, 18 Sep 2025 09:25:28 -0700
-Subject: [PATCH] KVM: x86: Suppress EOI broadcasts with split IRQCHIP if
- Directed EOI is enabled
+with 20 more new functions about how to manage leaf_entries ;]
 
-Do not generate a KVM_EXIT_IOAPIC_EOI exit to userspace when handling EOIs
-for a split IRQCHIP and the vCPU has enabled Directed EOIs in its local
-APIC, i.e. if the guest has set "Suppress EOI Broadcasts" in Intel
-parlance.
+no not seriously, please have a good weekend!
 
-Incorrectly broadcasting EOIs can lead to a potentially fatal interrupt
-storm if the IRQ line is still asserted and userspace reacts to the EOI by
-re-injecting the IRQ.  E.g. Windows with Hyper-V enabled gets stuck during
-boot when running under QEMU with a split IRQCHIP.
-
-Note, Suppress EOI Broadcasts is defined only in Intel's SDM, not in AMD's
-APM.  But the bit is writable on some AMD CPUs, e.g. Turin, and KVM's ABI
-is to support Directed EOI (KVM's name) irrespective of guest CPU vendor.
-
-Note #2, KVM doesn't support Directed EOIs for its in-kernel I/O APIC.
-See commit 0bcc3fb95b97 ("KVM: lapic: stop advertising DIRECTED_EOI when
-in-kernel IOAPIC is in use").
-
-Fixes: 7543a635aa09 ("KVM: x86: Add KVM exit for IOAPIC EOIs")
-Cc: stable@vger.kernel.org
-Closes: https://lore.kernel.org/kvm/7D497EF1-607D-4D37-98E7-DAF95F099342@nutanix.com
-Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
-Link: https://lore.kernel.org/r/20250918162529.640943-1-jon@nutanix.com
-[sean: rewrite changelog and comment]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/lapic.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 5fc437341e03..56542239cc6b 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1429,6 +1429,17 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
- 
- 	/* Request a KVM exit to inform the userspace IOAPIC. */
- 	if (irqchip_split(apic->vcpu->kvm)) {
-+		/*
-+		 * Don't exit to userspace if the guest has enabled Directed
-+		 * EOI, a.k.a. Suppress EOI Broadcasts, in which case the local
-+		 * APIC doesn't broadcast EOIs (the the guest must EOI the
-+		 * target I/O APIC(s) directly).
-+		 */
-+		if ((kvm_lapic_get_reg(apic, APIC_SPIV) & APIC_SPIV_DIRECTED_EOI) &&
-+		    !kvm_check_has_quirk(vcpu->kvm,
-+					 KVM_X86_QUIRK_IGNORE_SUPPRESS_EOI_BROADCAST))
-+			return;
-+
- 		apic->vcpu->arch.pending_ioapic_eoi = vector;
- 		kvm_make_request(KVM_REQ_IOAPIC_EOI_EXIT, apic->vcpu);
- 		return;
-
-base-commit: 07e27ad16399afcd693be20211b0dfae63e0615f
--- 
+and thanks again for doing this!
+~Gregory
 
