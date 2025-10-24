@@ -1,126 +1,343 @@
-Return-Path: <kvm+bounces-61023-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61024-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A55F5C069C2
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 16:05:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41922C06B96
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 16:36:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 681421C20689
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 14:06:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D12B188BE9B
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 14:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33F731D36A;
-	Fri, 24 Oct 2025 14:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D10316187;
+	Fri, 24 Oct 2025 14:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gLLrpYfY"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="iDxjXFPG"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fra-out-012.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-012.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.57.120.243])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A4D2D47F3
-	for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 14:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1759F233D9E;
+	Fri, 24 Oct 2025 14:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.57.120.243
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761314744; cv=none; b=RDmEVZeQGYoLjSLzKr67sJNVObGp0JPPdd8Z5urtsP7S+eIo4qHmrKQbTNyhwnskcsVqk0HMcSgwkvT+lyT83ewapx8eoDw6313pxCUx3KoYKqswJf+m3d1i/+x/3ITHuxDGZTdnFwvkzFSuHYVDGX1kt4+q8IVte/ya+boOSV4=
+	t=1761316576; cv=none; b=o5yEAof/j8HZvOmvXz8TJQNbqcGjRwU2K+lIuE+ejDwFKyAdLJ+7Y5dK683GUe9lUE/h3ZRZpSRkaHmLUe/j8ZTftGJ5KyPo5DM1OSeayMgsmoLNAfnGa+0ZnLYwOiHqqg0e3H7HG8B+vbGM9mz5iHOwRKl5YSUA7g9zt+9rlSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761314744; c=relaxed/simple;
-	bh=kEPbTDZac7CjluEtE5j18ISVJGK6g6nGBRg4GbTVTXw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LveMH9/Oa9ZLUZsRa5Ju5yXyAic1Oj/gjL8gkwYN3p2jAOlGw0xt/bUKDGuQis/rqXslNjVyOwtuUJS0okCRLJgXdMujsbZB3QGXlNyynOSBrAMjZ18L9dCO/lrc+tjCHq+aLUcmiBJiAZGoVye89sC4ZP84qWjOqtLUfs8zF+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gLLrpYfY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 078E3C4CEF1;
-	Fri, 24 Oct 2025 14:05:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761314743;
-	bh=kEPbTDZac7CjluEtE5j18ISVJGK6g6nGBRg4GbTVTXw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gLLrpYfYY+N8x2bnVbq/kQ4p3chpY7BnLHMvtGumF3h8HRl8eVqyWRcU+EmcHioQe
-	 crgRy0hCv9eZTpp1z8PuHIJPDPmWtI0VslXA12NzWqAICWUx5AquXcNiybjNAfUdOS
-	 KKuaz5t5WXPbMfXAKs9EEHWQy07XKse3D4gq0GloinbaWYlSTapWV7mxS5UKgucidW
-	 AxsSGlztFyXCzEHLbpmHJb/aAOFnXOgcYPrw56D/1FmmtShIFnioWdn0ZwGvq50Ztd
-	 IYcdN5uNDFyZvKnUWUj29x/RPAZQ9i2NZOaQkKQvidq79mm+H6v9sPrNGl7Qm8mS4p
-	 9gjFHC3i2fQ/Q==
-Date: Fri, 24 Oct 2025 19:29:01 +0530
-From: Naveen N Rao <naveen@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, 
-	Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, kvm@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Nikunj A Dadhania <nikunj@amd.com>, 
-	"Daniel P. Berrange" <berrange@redhat.com>, Eduardo Habkost <eduardo@habkost.net>, 
-	Zhao Liu <zhao1.liu@intel.com>, Michael Roth <michael.roth@amd.com>, 
-	Roy Hopkins <roy.hopkins@randomman.co.uk>
-Subject: Re: [PATCH v2 0/9] target/i386: SEV: Add support for enabling VMSA
- SEV features
-Message-ID: <tu7zyirbskj7gfr3mrwt6wlezslthrzbzvvmuszubvfvclcdhc@oxsy3cjmicoz>
-References: <cover.1758794556.git.naveen@kernel.org>
+	s=arc-20240116; t=1761316576; c=relaxed/simple;
+	bh=nzQF0MiiBQiu5ky7w7PrGFrUlAnMNsaAvg/nOWMF8Fo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=JiCn95f4klvoG2daqnkapACFWwoWzIkJ70/UzY2hbLvzUD8Wa6boigracoahlh4EVvPlPjsK9Jv5N8wTmMo1rm7xgLKJ6HMkP7n+w0hf5ipFRhTaHO88WvGlSyxcjOvG/k+28QXxGMZzec8pSgpLEXrgAAZAPu69auZ0lMKya08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=iDxjXFPG; arc=none smtp.client-ip=52.57.120.243
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1761316574; x=1792852574;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=Qxk7463vFM1P5dU1IXgB3lSRX3aE4phUbxwzBEtbrPI=;
+  b=iDxjXFPGkg9xXIBW6blys1sxKLlhXkErD5Pa+Lus7nMi3OAeghk/2Bc1
+   OfgSBEq/773MaSG3+tOfNbmvKtVZ6SPaogN/cWwTpFVkoTIB+5W06ddU0
+   GIbLIhF15+UPJ4gEj49odX157APArHR0FdUi4AKXwG9Xk+mgy8CRwhwMB
+   J8lg3KY0KpP4iUK9ZUtgns7V75tv28g7JMWccCQrtdoxlEL8hXxsFJZYf
+   7UhZ5NrC0MTVxBugKBS8royuPaJyjqN4wzayW60bo7GtkRiFesHyJ4SMH
+   kj3ThX3e57aMckVDH56OdSMoxWKwNkCYJ+dwrICs06wfej8w1Nj75ozBP
+   w==;
+X-CSE-ConnectionGUID: wFrkUWdsQhyApZmscs2aBg==
+X-CSE-MsgGUID: d0QitL61TKq0bWUjo6ZXUw==
+X-IronPort-AV: E=Sophos;i="6.19,252,1754956800"; 
+   d="scan'208";a="4074722"
+Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
+  by internal-fra-out-012.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2025 14:36:04 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.224:21718]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.3.26:2525] with esmtp (Farcaster)
+ id cfc190ed-a8d4-4eb6-b322-cbc2b4eabf12; Fri, 24 Oct 2025 14:36:04 +0000 (UTC)
+X-Farcaster-Flow-ID: cfc190ed-a8d4-4eb6-b322-cbc2b4eabf12
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Fri, 24 Oct 2025 14:35:40 +0000
+Received: from [192.168.3.241] (10.106.82.14) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Fri, 24 Oct 2025
+ 14:35:39 +0000
+Message-ID: <8a28ddea-35c0-490e-a7d2-7fb612fdd008@amazon.com>
+Date: Fri, 24 Oct 2025 15:35:34 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1758794556.git.naveen@kernel.org>
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v6 1/2] KVM: guest_memfd: add generic population via write
+To: Sean Christopherson <seanjc@google.com>, Nikita Kalyazin
+	<kalyazin@amazon.co.uk>
+CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "shuah@kernel.org"
+	<shuah@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"david@redhat.com" <david@redhat.com>, "jthoughton@google.com"
+	<jthoughton@google.com>, "patrick.roy@linux.dev" <patrick.roy@linux.dev>,
+	Jack Thomson <jackabt@amazon.co.uk>, Derek Manwaring <derekmn@amazon.com>,
+	Marco Cali <xmarcalx@amazon.co.uk>, <ackerleytng@google.com>, "Vishal
+ Annapurve" <vannapurve@google.com>
+References: <20251020161352.69257-1-kalyazin@amazon.com>
+ <20251020161352.69257-2-kalyazin@amazon.com> <aPpS2aqdobVTk_ed@google.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <aPpS2aqdobVTk_ed@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D008EUC002.ant.amazon.com (10.252.51.146) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-On Thu, Sep 25, 2025 at 03:47:29PM +0530, Naveen N Rao (AMD) wrote:
-> This series adds support for enabling VMSA SEV features for SEV-ES and
-> SEV-SNP guests. Since that is already supported for IGVM files, some of
-> that code is moved to generic path and reused.
+
+
+On 23/10/2025 17:07, Sean Christopherson wrote:
+> On Mon, Oct 20, 2025, Nikita Kalyazin wrote:
+>> From: Nikita Kalyazin <kalyazin@amazon.com>
+
++ Vishal and Ackerley
+
+>>
+>> write syscall populates guest_memfd with user-supplied data in a generic
+>> way, ie no vendor-specific preparation is performed.  If the request is
+>> not page-aligned, the remaining bytes are initialised to 0.
+>>
+>> write is only supported for non-CoCo setups where guest memory is not
+>> hardware-encrypted.
 > 
-> Debug-swap is already supported in KVM today, while patches for enabling
-> Secure TSC have been accepted for the upcoming kernel release.
+> Please include all of the "why".  The code mostly communicates the "what", but
+> it doesn't capture why write() support is at all interesting, nor does it explain
+> why read() isn't supported.
 
-Any other comments on this series?
+Hi Sean,
 
-So far, the only minor change I have on top of this series is the change 
-suggested by Markus:
+Thanks for the review.
 
-diff --git a/qapi/qom.json b/qapi/qom.json
-index 5b830a9ba000..a2b9ccdfe43e 100644
---- a/qapi/qom.json
-+++ b/qapi/qom.json
-@@ -1010,7 +1010,8 @@
- #     designated guest firmware page for measured boot with -kernel
- #     (default: false) (since 6.2)
- #
--# @debug-swap: enable virtualization of debug registers
-+# @debug-swap: enable virtualization of debug registers. This is only
-+#     supported on SEV-ES/SEV-SNP guests
- #     (default: false) (since 10.2)
- #
- # Since: 9.1
-
-Otherwise, this series still applies cleanly to current master.
+Do you think including the explanation from the cover letter would be 
+sufficient?  Shall I additionally say that read() isn't supported 
+because there is no use case for it as of now or would it be obvious?
 
 > 
-> Roy,
-> I haven't been able to test IGVM, so would be great if that is tested to 
-> confirm there are no unintended changes there.
+>> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
+>> ---
+>>   virt/kvm/guest_memfd.c | 48 ++++++++++++++++++++++++++++++++++++++++++
+> 
+> There's a notable lack of uAPI and Documentation chanegs.  I.e. this needs a
+> GUEST_MEMFD_FLAG_xxx along with proper documentation.
 
-I took a stab at this with the buildigvm tool from Roy. I am able to 
-boot a Linux guest with an IGVM file generated from that using qemu 
-built with this series applied. In addition, with the below change to 
-buildigvm, I am able to see Secure TSC being enabled in the guest:
+Would the following be ok in the doc?
 
-diff --git a/src/vmsa.rs b/src/vmsa.rs
-index 3d67a953055e..ac150264c244 100644
---- a/src/vmsa.rs
-+++ b/src/vmsa.rs
-@@ -70,6 +70,7 @@ fn construct_vmsa(reset_addr: u32, platform: Platform) -> Result<Box<SevVmsa>, B
+When the capability KVM_CAP_GUEST_MEMFD_WRITE is supported, the 'flags' 
+field
+supports GUEST_MEMFD_FLAG_WRITE. Setting this flag on guest_memfd creation
+enables write() syscall operations to populate guest_memfd memory from host
+userspace.
 
-     if let Platform::SevSnp = platform {
-         vmsa.sev_features.set_snp(true);
-+        vmsa.sev_features.set_secure_tsc(true);
-     }
+When a write() operation is performed on a guest_memfd file descriptor 
+with the
+GUEST_MEMFD_FLAG_WRITE set, the syscall will populate the guest memory with
+user-supplied data in a generic way, without any vendor-specific 
+preparation.
+The write operation is only supported for non-CoCo (Confidential Computing)
+setups where guest memory is not hardware-encrypted. If the write request is
+not page-aligned, any remaining bytes within the page are initialized to 
+zero.
 
-     Ok(vmsa_box)
+> 
+> And while it's definitely it's a-ok to land .write() in advance of the direct map
+> changes, we do need to at least map out how we want the two to interact, e.g. so
+> that we don't end up with constraints that are impossible to satisfy.
+> 
 
-I couldn't get it to work with > 1 vCPUs though (I'm possibly missing 
-OVMF changes or such).
+write() shall not attempt to access a page that is not in the direct 
+map, which I believe can be achieved via kvm_kmem_gmem_write_begin() 
+consulting the KVM_GMEM_FOLIO_NO_DIRECT_MAP in folio->private 
+(introduced in [1]).
 
+Do you think we should mention it in the commit message in some way? 
+What particular constraint are you cautious about?
 
-- Naveen
+[1] https://lore.kernel.org/kvm/20250924152214.7292-2-roypat@amazon.co.uk/
+
+>>   1 file changed, 48 insertions(+)
+>>
+>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>> index 94bafd6c558c..f4e218049afa 100644
+>> --- a/virt/kvm/guest_memfd.c
+>> +++ b/virt/kvm/guest_memfd.c
+>> @@ -380,6 +380,8 @@ static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+>>
+>>   static struct file_operations kvm_gmem_fops = {
+>>        .mmap           = kvm_gmem_mmap,
+>> +     .llseek         = default_llseek,
+>> +     .write_iter     = generic_perform_write,
+>>        .open           = generic_file_open,
+>>        .release        = kvm_gmem_release,
+>>        .fallocate      = kvm_gmem_fallocate,
+>> @@ -390,6 +392,49 @@ void kvm_gmem_init(struct module *module)
+>>        kvm_gmem_fops.owner = module;
+>>   }
+>>
+>> +static int kvm_kmem_gmem_write_begin(const struct kiocb *kiocb,
+>> +                                  struct address_space *mapping,
+>> +                                  loff_t pos, unsigned int len,
+>> +                                  struct folio **foliop,
+>> +                                  void **fsdata)
+> 
+> Over-aggressive wrapping, this can be
+> 
+> 
+> static int kvm_kmem_gmem_write_begin(const struct kiocb *kiocb,
+>                                       struct address_space *mapping, loff_t pos,
+>                                       unsigned int len, struct folio **folio,
+>                                       void **fsdata)
+> 
+> or
+> 
+> static int kvm_kmem_gmem_write_begin(const struct kiocb *kiocb,
+>                                       struct address_space *mapping,
+>                                       loff_t pos, unsigned int len,
+>                                       struct folio **folio, void **fsdata)
+> 
+> if we want to bundle pos+len.
+
+Ack.
+
+> 
+>> +{
+>> +     struct file *file = kiocb->ki_filp;
+> 
+> ki_filp is already a file, and even if it were a "void *", there's no need for a
+> local variable.
+
+Ack.
+
+> 
+>> +     struct inode *inode = file_inode(file);
+>> +     pgoff_t index = pos >> PAGE_SHIFT;
+>> +     struct folio *folio;
+>> +
+>> +     if (!kvm_gmem_supports_mmap(inode))
+> 
+> Checking for MMAP is neither sufficient nor strictly necessary.  MMAP doesn't
+> imply SHARED, and it's not clear to me that mmap() support should be in any way
+> tied to WRITE support.
+
+As in my reply to the comment about doc, I plan to introduce 
+KVM_CAP_GUEST_MEMFD_WRITE and GUEST_MEMFD_FLAG_WRITE.  The 
+kvm_arch_supports_gmem_write() will be a weak symbol and relying on 
+!kvm_arch_has_private_mem() on x86, similar to 
+kvm_arch_supports_gmem_mmap().  Does it look right?
+
+> 
+>> +             return -ENODEV;
+>> +
+>> +     if (pos + len > i_size_read(inode))
+>> +             return -EINVAL;
+>> +
+>> +     folio = kvm_gmem_get_folio(inode, index);
+> 
+> Eh, since "index" is only used once, my vote is to use "pos" and do the shift
+> here, so that it's obvious that the input to kvm_gmem_get_folio() is being checked.
+
+Ack.
+
+> 
+>> +     if (IS_ERR(folio))
+>> +             return -EFAULT;
+> 
+> Why EFAULT?
+
+Will propagate the error like you suggest below.
+
+> 
+>> +
+>> +     *foliop = folio;
+> 
+> There shouldn't be any need for a local "folio".  What about having the "out"
+> param be just "folio"?
+> 
+> E.g.
+> 
+> static int kvm_kmem_gmem_write_begin(const struct kiocb *kiocb,
+>                                       struct address_space *mapping,
+>                                       loff_t pos, unsigned int len,
+>                                       struct folio **folio, void **fsdata)
+> {
+>          struct inode *inode = file_inode(kiocb->ki_filp);
+> 
+>          if (!kvm_gmem_supports_write(inode))
+>                  return -ENODEV;
+> 
+>          if (pos + len > i_size_read(inode))
+>                  return -EINVAL;
+> 
+>          *folio = kvm_gmem_get_folio(inode, pos >> PAGE_SHIFT);
+>          if (IS_ERR(*folio))
+>                  return PTR_ERR(*folio);
+> 
+>          return 0;
+> }
+
+Ack.
+
+> 
+> 
+>> +     return 0;
+>> +}
+>> +
+>> +static int kvm_kmem_gmem_write_end(const struct kiocb *kiocb,
+>> +                                struct address_space *mapping,
+>> +                                loff_t pos, unsigned int len,
+>> +                                unsigned int copied,
+>> +                                struct folio *folio, void *fsdata)
+>> +{
+>> +     if (copied && copied < len) {
+> 
+> Why check if "copied" is non-zero?  I don't see why KVM should behave differently
+> with respect to unwritten bytes if copy_folio_from_iter_atomic() fails on the
+> first byte or the Nth byte.
+
+No, I don't think there is a need for this check indeed.  It looks like 
+a leftover from my previous changes.
+
+> 
+>> +             unsigned int from = pos & ((1UL << folio_order(folio)) - 1);
+> 
+> Uh, isn't this just offset_in_folio()?
+> 
+>> +
+>> +             folio_zero_range(folio, from + copied, len - copied);
+> 
+> I'd probably be in favor of omitting "from" entirely, e.g.
+> 
+>          if (copied < len)
+>                  folio_zero_range(folio, offset_in_folio(pos) + copied,
+>                                   len - copied);
+> 
+
+Ack.
+
+>> +     }
+>> +
+>> +     folio_unlock(folio);
+>> +     folio_put(folio);
+>> +
+>> +     return copied;
+>> +}
 
 
