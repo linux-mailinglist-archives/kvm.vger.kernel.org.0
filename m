@@ -1,89 +1,132 @@
-Return-Path: <kvm+bounces-61084-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61085-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68A0FC08A84
-	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 05:45:43 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E564C08EF0
+	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 12:15:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE50A1C263A5
-	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 03:42:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BC6C14EEB98
+	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 10:14:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8898D253B71;
-	Sat, 25 Oct 2025 03:42:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 006CA2EA724;
+	Sat, 25 Oct 2025 10:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="ojNwwH4Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79359220F38
-	for <kvm@vger.kernel.org>; Sat, 25 Oct 2025 03:42:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D9B2D8363
+	for <kvm@vger.kernel.org>; Sat, 25 Oct 2025 10:14:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761363727; cv=none; b=OaEw7oRn9XiETKSF7Wt5Srtg5DxO7O8QOXTWA+gAlp4GWmFf7hcr4dKucxT0mBYH00DTO2WHzoRx3u6qqMphojyW/cU79Vp8eRghzZEVVBBOjhVpT/kJTKWqsCkdhK5rHfivdEhWEuTTeh1ong0Dn7HP9QxuQ16jI6IYl9Bn75g=
+	t=1761387253; cv=none; b=AdmCTMx+2DdpIDxoZI+yaI2TjFdHYqM9b4x2xlVwGe6m3288pdtZ8YY/3ydma/F7JgTkgZ4xvSEJGYotcTBuOn/5j/M0lwOcvVgUvepgvVr0YMKjzVzki0AP9nQFyyJGZp1Qt/aw6k/pBmzXnuG/v/qmPrd+d5jj9l8YgjEzkN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761363727; c=relaxed/simple;
-	bh=SzP+ivXKYs1J2Q2yZCagZUFPpailgNKQgiqUjWShWdc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=bkNfPNw9U/mDOBX3QTJIEKHzk4gKCLrL5WJbP+DSVw+bW5HjbQy8GGhbOTQzdvPzOAAci8LBbrXpyAlHvcWRqSjs5Y3SyLHqvVrd6nSfERxcw22D9wQXBRpbMsexfMQk92dXOQFAVNc5L8uVN7CStcQM83/wpjZkrw06CxvhVUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-9374627bb7eso483373239f.1
-        for <kvm@vger.kernel.org>; Fri, 24 Oct 2025 20:42:05 -0700 (PDT)
+	s=arc-20240116; t=1761387253; c=relaxed/simple;
+	bh=S8rJn35FaHheeba6IKtIhLBkHvArKY05pNobCQBVRrM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=NFGmG1pHf0rZAqk54Dg8XMuCTw6DhZp/GL/cWZZhaT4quayeJxniAyF0f7+QhXNdNvGFHyITELF7QyclGC3aG9qTd7XSWXsNHB9xqqJv6ogq4jlQ2XVDAbtAn2SZrtst9gEZlH6JVfJVMzQiuGtdojPkl8NL3kFmS+RDLBgiKZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=ojNwwH4Z; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-940dbb1e343so192018539f.0
+        for <kvm@vger.kernel.org>; Sat, 25 Oct 2025 03:14:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1761387250; x=1761992050; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wN5MsaqKfRbeYqcIv/KVHd41EL8Y3jzy/bgpR/o5GyI=;
+        b=ojNwwH4Z8wHoY5anRaqcPJSn9wmERz9ipfhGgFYgTjQG2vTrymI//i2MGcbKlHWhiC
+         gJSiWnjs/2iYcuz8JSJt0IujOyHjnQajch5RQN8Fss0s6wtHWVQZjVnyRLxtnWL29WPh
+         zTrbQ8/PlS2Z0pMYGNq3GYwOK0xAIC9LF0U6o99dyBK9xdBMV7sZlzoIuLs9SfxvdeTl
+         fvZPsFDfT4jo/oAnxRwu2vcbrFyvFNL27fyrKvF5D0ATopcH0HfO909QFQsBI/8/WYNN
+         PXbWly/93IR1nalyfStpGvOCu1uRZ0bEFF+OvFRvlCMyE3fk1q50J8LCCpt//1lwMdts
+         QO9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761363724; x=1761968524;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C1gAk8yaTaRK74hcvRqkvBNHoM4DeFcCFZCfbuJzKtg=;
-        b=CbxmQ5igUMtgiWJc5vIWuIlwX2pTWZnutf8JBA4VYesq4B/uTSN4RO057RXDbeTT1x
-         3Xobxx52BnyCb3lMkuSU4b/jNVErs36/H65iMv1uBgJdnWYOZreVquigdrYf6q4CrnKG
-         tW0aAwajiDiG6J4UJTqkt+4Pbszum8eou282IPI5ILBChXyRjHRuP1JZ6sc+0+KTdOvD
-         2uDUvCjokKDhP69lFnzXM30xwKRSdYEzbS+AMkq1Hs0i6NBIda5Grs1YrtXDOzlwlnG9
-         aGfpzOsb8DG54bL82XLXxTVdCNijT+4SDoAWCCmjeNdwvTop2rTrwydcjLqt2xE/+h3J
-         ezpg==
-X-Forwarded-Encrypted: i=1; AJvYcCXNnfP1yYjsIPWetD7Ys0s5sJr3iUaHaTIBLF/q2PyuvnD6W2k0BSuDogMZLNd4Hk5MHCU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwH+C36Ja8DB3OFxXrSALcDsOtftKROBsRq28tRufDaGjRbT1+a
-	0ka4clkxMYe3nNSdLADKNd4Tvsr8u/ZsOiRVna0euLrbx+CaAPX4Et7Zesjt9KHmqkfdvpfDSP1
-	NKMxHXCs9t72IgUTmwb2T2o0FjG1iNrIhr2nX4nnHcrOw6dRnGt3emh8L41E=
-X-Google-Smtp-Source: AGHT+IGAAPxD6J7kBArbJnHS+iLGIEgMqqB2QN7CguVVoXBr8Cvn62ylon9Mf5kewthZfsCshsRxEjwe2AI0Kl0jZ9L69IrYjT9X
+        d=1e100.net; s=20230601; t=1761387250; x=1761992050;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wN5MsaqKfRbeYqcIv/KVHd41EL8Y3jzy/bgpR/o5GyI=;
+        b=jtaWJ+bnkkgtz7pM9nXZG65kHT3fo0uPI681r1I4iKXS285XtYnMmA9BJLckAb0/vn
+         BYTgx4D2G0Wj2cYFCkA79N90lgc/hGUGAXUsWRfNOPNh5I5vc78QAp7e9nNbQ4lLAPKr
+         Ctn2xoD9TKSWElCActuUdHp+uP5EPr4cZ5IjsL8wZKRmRae2q0MVqek8iTc5uRqeI8wK
+         x9Hs2HWFDu6QeFNEOUJIgZbIeEE1okTaO7sNWyVWta1Vx0YyrNpzb8/T5nZQfSZ3VQ0q
+         uSl3vA0pEYTYYZP6prnYZLXcZh5gxPHql4jr1Scu/qcppKaDFjnL/NzdB7gru8o8QXan
+         6qng==
+X-Forwarded-Encrypted: i=1; AJvYcCX0VwgjQZgk6vnDUVP/5I25QamBj6skhwjVz7slSpu3THo93twsTpDQTeSbflS0KaljiV0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwT4jXx0CEQD0T2aB2CuCFVAV625zB4nJXWk12WOEipAV4AwTXh
+	wS9EVO5MsRJekujumyj0TkUMCb8CGkWMi6yaCXsznHAPvf70ZTaLf4E4FKIJMSRo4JolAO82O2i
+	sJ4vdER0lqcGjbvvHbUVuDGNNWwovRpCEg+aJ856rQ+vpAyKSRDogx9lUAg==
+X-Gm-Gg: ASbGncudFHLX21s/LrqQ/6S1XXbEM/itThN1uy99muN6qJVMG7YI6HMipGCoEnug77N
+	Lt1Rk8PnUyVdulcKQM7gLIlKBuhVton2Zber9L2Y77/a9T7dHo8gZ0INSfWTXx1cb7/tH8XUkvO
+	mHNkFHhII09S2YBuHQa0uY8ZEU0dSKASpv3oJvAEpPPC7BTptjTDmwDhP0gFlnc1vxRcANgBT9a
+	e7NtrnHhwCH/gzoFqNyWbAvgXL9lzjpj11L5JLoDoXM5fANBRUN8RvDFxOVt4hJbM6GlDyt3KhW
+	fkZKxc4uhadcC347cUMgzjVoQEZj
+X-Google-Smtp-Source: AGHT+IFpWZVjRCuwhb4DtOufiG7BXJsKl5vIHXR0e6zokP9kahb0yrltoaSSXtmlHhJhQihxphgaQ1Awrp0N48kr/R0=
+X-Received: by 2002:a05:6e02:1786:b0:430:bf84:e94c with SMTP id
+ e9e14a558f8ab-431eb67c444mr59866215ab.13.1761387250503; Sat, 25 Oct 2025
+ 03:14:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c242:0:b0:431:da98:3519 with SMTP id
- e9e14a558f8ab-431eb54cf37mr61562235ab.0.1761363724676; Fri, 24 Oct 2025
- 20:42:04 -0700 (PDT)
-Date: Fri, 24 Oct 2025 20:42:04 -0700
-In-Reply-To: <20251025015852.8771-1-hdanton@sina.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68fc470c.a00a0220.9662e.0012.GAE@google.com>
-Subject: Re: [syzbot] [kvm?] KASAN: slab-use-after-free Write in kvm_gmem_release
-From: syzbot <syzbot+2479e53d0db9b32ae2aa@syzkaller.appspotmail.com>
-To: hdanton@sina.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	seanjc@google.com, syzkaller-bugs@googlegroups.com, tabba@google.com, 
-	xiaoyao.li@intel.com
+From: Anup Patel <anup@brainfault.org>
+Date: Sat, 25 Oct 2025 15:43:58 +0530
+X-Gm-Features: AWmQ_bmwq2oGHjBSLEnWv7bNvD-fJRrO3lgDsBq83C5kNERHDGX9jLhLgFP3WlI
+Message-ID: <CAAhSdy1jcXypH3yCUBaci2EbOy2cbr2qNtdYriKa-vcyFFeCzg@mail.gmail.com>
+Subject: [GIT PULL v2] KVM/riscv fixes for 6.18 take #2
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, 
+	Atish Patra <atish.patra@linux.dev>, Andrew Jones <ajones@ventanamicro.com>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+Hi Paolo,
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+We have three fixes for the 6.18 kernel. Two of these
+are related to checking pending interrupts whereas
+the third one removes automatic I/O mapping from
+kvm_arch_prepare_memory_region().
 
-Reported-by: syzbot+2479e53d0db9b32ae2aa@syzkaller.appspotmail.com
-Tested-by: syzbot+2479e53d0db9b32ae2aa@syzkaller.appspotmail.com
+Please pull.
 
-Tested on:
+Regards,
+Anup
 
-commit:         72fb0170 Add linux-next specific files for 20251024
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=15da53e2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bcaf4aad77308158
-dashboard link: https://syzkaller.appspot.com/bug?extid=2479e53d0db9b32ae2aa
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=161c4258580000
+The following changes since commit 3a8660878839faadb4f1a6dd72c3179c1df56787:
 
-Note: testing is done by a robot and is best-effort only.
+  Linux 6.18-rc1 (2025-10-12 13:42:36 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.18-2
+
+for you to fetch changes up to 8c5fa3764facaad6d38336e90f406c2c11d69733:
+
+  RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP (2025-10-24
+21:24:36 +0530)
+
+----------------------------------------------------------------
+KVM/riscv fixes for 6.18, take #2
+
+- Fix check for local interrupts on riscv32
+- Read HGEIP CSR on the correct cpu when checking for IMSIC interrupts
+- Remove automatic I/O mapping from kvm_arch_prepare_memory_region()
+
+----------------------------------------------------------------
+Fangyu Yu (2):
+      RISC-V: KVM: Read HGEIP CSR on the correct cpu
+      RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP
+
+Samuel Holland (1):
+      RISC-V: KVM: Fix check for local interrupts on riscv32
+
+ arch/riscv/kvm/aia_imsic.c | 16 ++++++++++++++--
+ arch/riscv/kvm/mmu.c       | 25 ++-----------------------
+ arch/riscv/kvm/vcpu.c      |  2 +-
+ 3 files changed, 17 insertions(+), 26 deletions(-)
 
