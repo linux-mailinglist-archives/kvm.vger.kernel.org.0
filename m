@@ -1,132 +1,123 @@
-Return-Path: <kvm+bounces-61085-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61086-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E564C08EF0
-	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 12:15:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2538C094EA
+	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 18:19:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BC6C14EEB98
-	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 10:14:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 235E74F717D
+	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 16:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 006CA2EA724;
-	Sat, 25 Oct 2025 10:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29692304BD5;
+	Sat, 25 Oct 2025 16:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="ojNwwH4Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XP6jtp7j"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D9B2D8363
-	for <kvm@vger.kernel.org>; Sat, 25 Oct 2025 10:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B18E302CB8;
+	Sat, 25 Oct 2025 16:13:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761387253; cv=none; b=AdmCTMx+2DdpIDxoZI+yaI2TjFdHYqM9b4x2xlVwGe6m3288pdtZ8YY/3ydma/F7JgTkgZ4xvSEJGYotcTBuOn/5j/M0lwOcvVgUvepgvVr0YMKjzVzki0AP9nQFyyJGZp1Qt/aw6k/pBmzXnuG/v/qmPrd+d5jj9l8YgjEzkN0=
+	t=1761408795; cv=none; b=OKruf21fAEUW2k3NwPd0+iYgZU8NzUUZuvfwm0ZVBjqEKe4guAv1thSMGY+V39TGMcD4owd2jWRTEdYBoHKXKWc3ln1NzhfSYmuMWL51ylZC5L61WASyAZcjXX2rxPdtggErqKPv5Uti3lzgi4mmXuezQgHh/mPtnbXsfr+NRwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761387253; c=relaxed/simple;
-	bh=S8rJn35FaHheeba6IKtIhLBkHvArKY05pNobCQBVRrM=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=NFGmG1pHf0rZAqk54Dg8XMuCTw6DhZp/GL/cWZZhaT4quayeJxniAyF0f7+QhXNdNvGFHyITELF7QyclGC3aG9qTd7XSWXsNHB9xqqJv6ogq4jlQ2XVDAbtAn2SZrtst9gEZlH6JVfJVMzQiuGtdojPkl8NL3kFmS+RDLBgiKZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=ojNwwH4Z; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-940dbb1e343so192018539f.0
-        for <kvm@vger.kernel.org>; Sat, 25 Oct 2025 03:14:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1761387250; x=1761992050; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=wN5MsaqKfRbeYqcIv/KVHd41EL8Y3jzy/bgpR/o5GyI=;
-        b=ojNwwH4Z8wHoY5anRaqcPJSn9wmERz9ipfhGgFYgTjQG2vTrymI//i2MGcbKlHWhiC
-         gJSiWnjs/2iYcuz8JSJt0IujOyHjnQajch5RQN8Fss0s6wtHWVQZjVnyRLxtnWL29WPh
-         zTrbQ8/PlS2Z0pMYGNq3GYwOK0xAIC9LF0U6o99dyBK9xdBMV7sZlzoIuLs9SfxvdeTl
-         fvZPsFDfT4jo/oAnxRwu2vcbrFyvFNL27fyrKvF5D0ATopcH0HfO909QFQsBI/8/WYNN
-         PXbWly/93IR1nalyfStpGvOCu1uRZ0bEFF+OvFRvlCMyE3fk1q50J8LCCpt//1lwMdts
-         QO9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761387250; x=1761992050;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wN5MsaqKfRbeYqcIv/KVHd41EL8Y3jzy/bgpR/o5GyI=;
-        b=jtaWJ+bnkkgtz7pM9nXZG65kHT3fo0uPI681r1I4iKXS285XtYnMmA9BJLckAb0/vn
-         BYTgx4D2G0Wj2cYFCkA79N90lgc/hGUGAXUsWRfNOPNh5I5vc78QAp7e9nNbQ4lLAPKr
-         Ctn2xoD9TKSWElCActuUdHp+uP5EPr4cZ5IjsL8wZKRmRae2q0MVqek8iTc5uRqeI8wK
-         x9Hs2HWFDu6QeFNEOUJIgZbIeEE1okTaO7sNWyVWta1Vx0YyrNpzb8/T5nZQfSZ3VQ0q
-         uSl3vA0pEYTYYZP6prnYZLXcZh5gxPHql4jr1Scu/qcppKaDFjnL/NzdB7gru8o8QXan
-         6qng==
-X-Forwarded-Encrypted: i=1; AJvYcCX0VwgjQZgk6vnDUVP/5I25QamBj6skhwjVz7slSpu3THo93twsTpDQTeSbflS0KaljiV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwT4jXx0CEQD0T2aB2CuCFVAV625zB4nJXWk12WOEipAV4AwTXh
-	wS9EVO5MsRJekujumyj0TkUMCb8CGkWMi6yaCXsznHAPvf70ZTaLf4E4FKIJMSRo4JolAO82O2i
-	sJ4vdER0lqcGjbvvHbUVuDGNNWwovRpCEg+aJ856rQ+vpAyKSRDogx9lUAg==
-X-Gm-Gg: ASbGncudFHLX21s/LrqQ/6S1XXbEM/itThN1uy99muN6qJVMG7YI6HMipGCoEnug77N
-	Lt1Rk8PnUyVdulcKQM7gLIlKBuhVton2Zber9L2Y77/a9T7dHo8gZ0INSfWTXx1cb7/tH8XUkvO
-	mHNkFHhII09S2YBuHQa0uY8ZEU0dSKASpv3oJvAEpPPC7BTptjTDmwDhP0gFlnc1vxRcANgBT9a
-	e7NtrnHhwCH/gzoFqNyWbAvgXL9lzjpj11L5JLoDoXM5fANBRUN8RvDFxOVt4hJbM6GlDyt3KhW
-	fkZKxc4uhadcC347cUMgzjVoQEZj
-X-Google-Smtp-Source: AGHT+IFpWZVjRCuwhb4DtOufiG7BXJsKl5vIHXR0e6zokP9kahb0yrltoaSSXtmlHhJhQihxphgaQ1Awrp0N48kr/R0=
-X-Received: by 2002:a05:6e02:1786:b0:430:bf84:e94c with SMTP id
- e9e14a558f8ab-431eb67c444mr59866215ab.13.1761387250503; Sat, 25 Oct 2025
- 03:14:10 -0700 (PDT)
+	s=arc-20240116; t=1761408795; c=relaxed/simple;
+	bh=ivrdJ2btdt9xrMh317ivI6Gjg3kgkSKoUwpUb3TaghE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n+rUpfkwzk6FAX7oYvbEueVvNVZyKK9IguOL3BMx4DwxZl+0LibKvwyHL4hYG3gc7rPJoL7HmTHf8av8VuFwVQgJkF/33I64buKl2qW1qqhUoNoVFGp7aWjM2ZvLVYmlzG2uBubdrlKh92gA/bhd5GyVStPWePbe5BuCbMvE1ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XP6jtp7j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57AABC113D0;
+	Sat, 25 Oct 2025 16:13:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761408795;
+	bh=ivrdJ2btdt9xrMh317ivI6Gjg3kgkSKoUwpUb3TaghE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=XP6jtp7jfD2hs2wDBQ5qYsqkI8Aj+Qxf6Ai/X4HMUvmRLHxSOauubOMw5GsQmRtC2
+	 31mZCU+eqZzYSn0X2MiC0shYArgelhsKU/4OzRNztqCLZixUEPJDE5bNtz/nuXhutD
+	 u04U/jGTFI/59nN1EqLc/iAwt/CYo7ZGxSWLKNY7FiTrCY/X6pi3zMi8qs9uSirsV/
+	 LnfRQDYNYCwP0KDM2JNjw6UdJjJg4aY3klVBc/oP3/bQ/4a7tFP9Qs0B5TxZvpgA5M
+	 oZhhGP0HjirXKiGD01FvNHyv3nMyVNdhByInf90bzXeyjJDzI5wP7AvoEhs7ZYRw9W
+	 QES2Js+LvKfFw==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Tushar Dave <tdave@nvidia.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.17] vfio/nvgrace-gpu: Add GB300 SKU to the devid table
+Date: Sat, 25 Oct 2025 11:55:05 -0400
+Message-ID: <20251025160905.3857885-74-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
+References: <20251025160905.3857885-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Anup Patel <anup@brainfault.org>
-Date: Sat, 25 Oct 2025 15:43:58 +0530
-X-Gm-Features: AWmQ_bmwq2oGHjBSLEnWv7bNvD-fJRrO3lgDsBq83C5kNERHDGX9jLhLgFP3WlI
-Message-ID: <CAAhSdy1jcXypH3yCUBaci2EbOy2cbr2qNtdYriKa-vcyFFeCzg@mail.gmail.com>
-Subject: [GIT PULL v2] KVM/riscv fixes for 6.18 take #2
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, 
-	Atish Patra <atish.patra@linux.dev>, Andrew Jones <ajones@ventanamicro.com>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.17.5
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Paolo,
+From: Tushar Dave <tdave@nvidia.com>
 
-We have three fixes for the 6.18 kernel. Two of these
-are related to checking pending interrupts whereas
-the third one removes automatic I/O mapping from
-kvm_arch_prepare_memory_region().
+[ Upstream commit 407aa63018d15c35a34938633868e61174d2ef6e ]
 
-Please pull.
+GB300 is NVIDIA's Grace Blackwell Ultra Superchip.
 
-Regards,
-Anup
+Add the GB300 SKU device-id to nvgrace_gpu_vfio_pci_table.
 
-The following changes since commit 3a8660878839faadb4f1a6dd72c3179c1df56787:
+Signed-off-by: Tushar Dave <tdave@nvidia.com>
+Reviewed-by: Ankit Agrawal <ankita@nvidia.com>
+Link: https://lore.kernel.org/r/20250925170935.121587-1-tdave@nvidia.com
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
 
-  Linux 6.18-rc1 (2025-10-12 13:42:36 -0700)
+LLM Generated explanations, may be completely bogus:
 
-are available in the Git repository at:
+YES – this backports cleanly and only extends the VFIO NVGrace device-id
+table (`drivers/vfio/pci/nvgrace-gpu/main.c:998-1000`) with the GB300
+identifier `0x31C2`, mirroring prior entries for GH200/GB200 SKUs.
+Without the entry, the GB300 parts simply fail to bind to
+`nvgrace_gpu_vfio_pci_driver`, blocking VFIO passthrough for shipped
+hardware and forcing users to carry out-of-tree patches; adding the ID
+fixes that functional gap without touching probe/remove logic
+(`…/main.c:934-979`) or altering any other code paths. I found no
+auxiliary references to `0x31C2`, so the existing mature infrastructure
+for Grace/Blackwell devices automatically handles the new SKU. The
+change is self-contained, risk-free to existing platforms, and aligns
+with the stable policy of accepting simple device-id updates that enable
+supported hardware.
 
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.18-2
+Next step: run a brief VFIO probe bind test on GB300 hardware to confirm
+the new table entry succeeds.
 
-for you to fetch changes up to 8c5fa3764facaad6d38336e90f406c2c11d69733:
+ drivers/vfio/pci/nvgrace-gpu/main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-  RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP (2025-10-24
-21:24:36 +0530)
+diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+index d95761dcdd58c..36b79713fd5a5 100644
+--- a/drivers/vfio/pci/nvgrace-gpu/main.c
++++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+@@ -995,6 +995,8 @@ static const struct pci_device_id nvgrace_gpu_vfio_pci_table[] = {
+ 	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_NVIDIA, 0x2348) },
+ 	/* GB200 SKU */
+ 	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_NVIDIA, 0x2941) },
++	/* GB300 SKU */
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_NVIDIA, 0x31C2) },
+ 	{}
+ };
+ 
+-- 
+2.51.0
 
-----------------------------------------------------------------
-KVM/riscv fixes for 6.18, take #2
-
-- Fix check for local interrupts on riscv32
-- Read HGEIP CSR on the correct cpu when checking for IMSIC interrupts
-- Remove automatic I/O mapping from kvm_arch_prepare_memory_region()
-
-----------------------------------------------------------------
-Fangyu Yu (2):
-      RISC-V: KVM: Read HGEIP CSR on the correct cpu
-      RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP
-
-Samuel Holland (1):
-      RISC-V: KVM: Fix check for local interrupts on riscv32
-
- arch/riscv/kvm/aia_imsic.c | 16 ++++++++++++++--
- arch/riscv/kvm/mmu.c       | 25 ++-----------------------
- arch/riscv/kvm/vcpu.c      |  2 +-
- 3 files changed, 17 insertions(+), 26 deletions(-)
 
