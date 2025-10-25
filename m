@@ -1,69 +1,68 @@
-Return-Path: <kvm+bounces-61088-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61089-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3372EC09AE5
-	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 18:45:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1344C099C5
+	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 18:41:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C948D4F3C8F
-	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 16:28:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A07BD424991
+	for <lists+kvm@lfdr.de>; Sat, 25 Oct 2025 16:31:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3E130C356;
-	Sat, 25 Oct 2025 16:22:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456B630E824;
+	Sat, 25 Oct 2025 16:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UirOREv9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sKZNpQP1"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9882F7ADB;
-	Sat, 25 Oct 2025 16:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6711A3090CB;
+	Sat, 25 Oct 2025 16:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409356; cv=none; b=D36BNAUYSqu0zAaTUZy451G0o1EJNOwKfX24XhJ2rI5Fq7ZcY+3szgC98Gqf2EU/BWQxtBYmQvYw4ZT+FcT/ctEJxxP+O7hBCKwWdNKG7G4ij/MFtmNCc8wt1UP6auBVmE8/wSOPGWPJg9LGarbTJsLhMWN60/2bbLcdNh26Zgo=
+	t=1761409445; cv=none; b=bEIP5RopOswToi+a8NwbgLmce607aeUbaT8CkoincyPH0EdkDmuFYOfvdk2G2KFxUzCiEBoMeTdWw9HEV7qMpFYMFKIfC787RlNM0Uy1j0PmSb46l9YfNB532wDmgewRGthpifCXW01aDi1fKBDA7BFVbPXFtHD7503xxDXbMHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409356; c=relaxed/simple;
-	bh=Scyd5qEDWJqJQEzt5obIOadjeCJCp5CBwuOwu4LwHsc=;
+	s=arc-20240116; t=1761409445; c=relaxed/simple;
+	bh=mIzmgwyZLuHoMCkfF8ACP+1cuYslvilvOq7youLoTu0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NcW7sY4tTc2chMN7H+2q0GhmV7RrxGq7+nuQ+70XUawwusararwkRX/JjZGmRK33lyQw+cC1uH2YNgyt2+O669Aw9KwbiIb4sCNb/CEoavGYhUOkdoeT4BIXHk5MRMAGffoqugRIJ3pnvoLVyhanHExx1CAKokodr+rPh+C6Y68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UirOREv9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F706C4CEFB;
-	Sat, 25 Oct 2025 16:22:34 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UFkrIDJfLIj88cyTrlcQhefUhPH6KXLlaL3GTlwC5DxsllgpmDkOkur33HIYO2aqEVBh7puLRvUZcaSMJtGsSLkhNmlkkcRhHzV58s+BDEc40VqEagTENwBD7coRimPSXmBTftUL8eyNtcwgtzS3fT0phJ7cP+nYmdCduzM7HmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sKZNpQP1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FD9BC113D0;
+	Sat, 25 Oct 2025 16:24:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409356;
-	bh=Scyd5qEDWJqJQEzt5obIOadjeCJCp5CBwuOwu4LwHsc=;
+	s=k20201202; t=1761409445;
+	bh=mIzmgwyZLuHoMCkfF8ACP+1cuYslvilvOq7youLoTu0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UirOREv9sYR8FYy4at1GfAVYjMzSo5NJOhpIzdhF0yOhFCzQVn5hQO5QRKZgai+Tx
-	 qWDFi4xJsYnwAdptGQFnPKlhNiXZmXfZ6HYOHIX/isfX8ECymfyN02d5OhNC4rZ3tR
-	 OZ4D36dXf9ogcmLbUZvfvV/XnerBfEIP4oWOVHVXTL96dLfYawmt6Qj3s7hEHpGLD7
-	 2IJCVidxoVTnnCGnbynDeRN/65wpJZ9bh7gvFEtwcZVSHVabpr1p5I7YRwTAc2jYuG
-	 JbBuaffdmOY0qwBMDxrZPMMk4zh/BGldwLGooti+QaXFYikX/qLlql2m7U0patgZGK
-	 3wol22IpvaeTw==
+	b=sKZNpQP1GelEK2viat3FtrtVpCWnkBJVQLkLJhKZvVfqYL3dPQzS9idz2DnWNe5ED
+	 ObPgiajVNwMpz04c75V6uQN3ECF6+EbRYoZsdEGOweKvtbNG3ez0J21FmamvwwzCaD
+	 ZbFtfTv08ahryxyFjc/COf3J0xdqv1msQBss6vKvGvKQyko1FbZKkx5nSbfosvc6z2
+	 BzXTSyM8uYf7kkUGMZUPP3b8bWrusqXMVJFN/KUepN/WXDBK0h5Jn3+V6IwQ+WRUPI
+	 aZLax2DCxr7gTUEP+4fbDFymbf9Vx1Eml9NpMNduH+aTMohNhdhs1xJ3+Mkr6zgjIC
+	 JWwSNvZqRkUtQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
 Cc: Kai Huang <kai.huang@intel.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
+	Chao Gao <chao.gao@intel.com>,
 	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Binbin Wu <binbin.wu@linux.intel.com>,
 	Farrah Chen <farrah.chen@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	kas@kernel.org,
-	dwmw@amazon.co.uk,
-	mingo@kernel.org,
-	bp@alien8.de,
+	isaku.yamahata@intel.com,
 	alexandre.f.demers@gmail.com,
-	coxu@redhat.com,
-	peterz@infradead.org,
+	thuth@redhat.com,
+	vannapurve@google.com,
+	adrian.hunter@intel.com,
 	x86@kernel.org,
 	linux-coco@lists.linux.dev,
 	kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17] x86/kexec: Disable kexec/kdump on platforms with TDX partial write erratum
-Date: Sat, 25 Oct 2025 11:58:39 -0400
-Message-ID: <20251025160905.3857885-288-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17] x86/virt/tdx: Mark memory cache state incoherent when making SEAMCALL
+Date: Sat, 25 Oct 2025 11:59:19 -0400
+Message-ID: <20251025160905.3857885-328-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -81,51 +80,49 @@ Content-Transfer-Encoding: 8bit
 
 From: Kai Huang <kai.huang@intel.com>
 
-[ Upstream commit b18651f70ce0e45d52b9e66d9065b831b3f30784 ]
+[ Upstream commit 10df8607bf1a22249d21859f56eeb61e9a033313 ]
 
-Some early TDX-capable platforms have an erratum: A kernel partial
-write (a write transaction of less than cacheline lands at memory
-controller) to TDX private memory poisons that memory, and a subsequent
-read triggers a machine check.
+On TDX platforms, dirty cacheline aliases with and without encryption
+bits can coexist, and the cpu can flush them back to memory in random
+order.  During kexec, the caches must be flushed before jumping to the
+new kernel otherwise the dirty cachelines could silently corrupt the
+memory used by the new kernel due to different encryption property.
 
-On those platforms, the old kernel must reset TDX private memory before
-jumping to the new kernel, otherwise the new kernel may see unexpected
-machine check.  Currently the kernel doesn't track which page is a TDX
-private page.  For simplicity just fail kexec/kdump for those platforms.
+A percpu boolean is used to mark whether the cache of a given CPU may be
+in an incoherent state, and the kexec performs WBINVD on the CPUs with
+that boolean turned on.
 
-Leverage the existing machine_kexec_prepare() to fail kexec/kdump by
-adding the check of the presence of the TDX erratum (which is only
-checked for if the kernel is built with TDX host support).  This rejects
-kexec/kdump when the kernel is loading the kexec/kdump kernel image.
+For TDX, only the TDX module or the TDX guests can generate dirty
+cachelines of TDX private memory, i.e., they are only generated when the
+kernel does a SEAMCALL.
 
-The alternative is to reject kexec/kdump when the kernel is jumping to
-the new kernel.  But for kexec this requires adding a new check (e.g.,
-arch_kexec_allowed()) in the common code to fail kernel_kexec() at early
-stage.  Kdump (crash_kexec()) needs similar check, but it's hard to
-justify because crash_kexec() is not supposed to abort.
+Set that boolean when the kernel does SEAMCALL so that kexec can flush
+the cache correctly.
 
-It's feasible to further relax this limitation, i.e., only fail kexec
-when TDX is actually enabled by the kernel.  But this is still a half
-measure compared to resetting TDX private memory so just do the simplest
-thing for now.
+The kernel provides both the __seamcall*() assembly functions and the
+seamcall*() wrapper ones which additionally handle running out of
+entropy error in a loop.  Most of the SEAMCALLs are called using the
+seamcall*(), except TDH.VP.ENTER and TDH.PHYMEM.PAGE.RDMD which are
+called using __seamcall*() variant directly.
 
-The impact to userspace is the users will get an error when loading the
-kexec/kdump kernel image:
+To cover the two special cases, add a new __seamcall_dirty_cache()
+helper which only sets the percpu boolean and calls the __seamcall*(),
+and change the special cases to use the new helper.  To cover all other
+SEAMCALLs, change seamcall*() to call the new helper.
 
-  kexec_load failed: Operation not supported
-
-This might be confusing to the users, thus also print the reason in the
-dmesg:
-
-  [..] kexec: Not allowed on platform with tdx_pw_mce bug.
+For the SEAMCALLs invoked via seamcall*(), they can be made from both
+task context and IRQ disabled context.  Given SEAMCALL is just a lengthy
+instruction (e.g., thousands of cycles) from kernel's point of view and
+preempt_{disable|enable}() is cheap compared to it, just unconditionally
+disable preemption during setting the boolean and making SEAMCALL.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+Reviewed-by: Chao Gao <chao.gao@intel.com>
 Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 Tested-by: Farrah Chen <farrah.chen@intel.com>
-Link: https://lore.kernel.org/all/20250901160930.1785244-5-pbonzini%40redhat.com
+Link: https://lore.kernel.org/all/20250901160930.1785244-4-pbonzini%40redhat.com
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
@@ -133,101 +130,146 @@ LLM Generated explanations, may be completely bogus:
 
 YES
 
-**Why This Fix Matters**
-- Prevents machine checks during kexec/kdump on early TDX-capable
-  platforms with the “partial write to TDX private memory” erratum.
-  Without this, the new kernel may hit an MCE after the old kernel
-  jumps, which is a hard failure affecting users.
+Why this fixes a real bug
+- TDX can leave dirty cachelines for private memory with different
+  encryption attributes (C-bit aliases). If kexec interrupts a CPU
+  during a SEAMCALL, its dirty private cachelines can later be flushed
+  in the wrong order and silently corrupt the new kernel’s memory.
+  Marking the CPU’s cache state as “incoherent” before executing
+  SEAMCALL ensures kexec will WBINVD on that CPU and avoid corruption.
 
-**What Changed**
-- Adds an early guard in the kexec image load path to reject kexec/kdump
-  if the CPU bug is present:
-  - `arch/x86/kernel/machine_kexec_64.c:361`: `if
-    (boot_cpu_has_bug(X86_BUG_TDX_PW_MCE)) { ... return -EOPNOTSUPP; }`
-  - `arch/x86/kernel/machine_kexec_64.c:362`: Prints a one-time reason:
-    “Not allowed on platform with tdx_pw_mce bug”
-  - The check runs before page table setup and other preparation,
-    minimizing side effects.
+What changed (key points with code references)
+- New helper marks per-CPU cache incoherent before any SEAMCALL:
+  - arch/x86/include/asm/tdx.h:111 sets
+    `this_cpu_write(cache_state_incoherent, true)` in
+    `__seamcall_dirty_cache()` and asserts preemption is disabled (lines
+    111–128).
+- Wrap all `seamcall*()` paths with preemption-disabled critical
+  section:
+  - arch/x86/include/asm/tdx.h:130–147 uses
+    `preempt_disable()/preempt_enable()` in `sc_retry()` so the same CPU
+    that sets the flag executes the SEAMCALL, avoiding migration races.
+- Convert special direct callers to use the new helper:
+  - arch/x86/virt/vmx/tdx/tdx.c:1271 changes `paddr_is_tdx_private()` to
+    call `__seamcall_dirty_cache(__seamcall_ret, TDH_PHYMEM_PAGE_RDMD,
+    ...)`.
+  - arch/x86/virt/vmx/tdx/tdx.c:1522 changes `tdh_vp_enter()` to call
+    `__seamcall_dirty_cache(__seamcall_saved_ret, TDH_VP_ENTER, ...)`.
+- Consumers of the per-CPU flag during kexec/CPU stop:
+  - arch/x86/kernel/process.c:99 defines `cache_state_incoherent` and
+    uses it in `stop_this_cpu()` to WBINVD if set
+    (arch/x86/kernel/process.c:840).
+  - arch/x86/kernel/machine_kexec_64.c:449 sets
+    `RELOC_KERNEL_CACHE_INCOHERENT` when the per-CPU flag is set so
+    `relocate_kernel_64.S` executes WBINVD (relocate path).
+  - The TDX-specific flush routine will WBINVD and clear the flag if
+    needed (arch/x86/virt/vmx/tdx/tdx.c:1872–1887).
 
-**Where the Bug Flag Comes From**
-- Bug flag definition: `arch/x86/include/asm/cpufeatures.h:543` defines
-  `X86_BUG_TDX_PW_MCE`.
-- Detection/enablement on TDX host platforms:
-  - `arch/x86/kernel/cpu/common.c:2124`: Calls `tdx_init()` during boot
-    CPU identification.
-  - `arch/x86/virt/vmx/tdx/tdx.c:1465`: `tdx_init()` calls
-    `check_tdx_erratum()`.
-  - `arch/x86/virt/vmx/tdx/tdx.c:1396`: `check_tdx_erratum()` sets the
-    bug via `setup_force_cpu_bug(X86_BUG_TDX_PW_MCE)` for affected
-    models (`:1407`).
-- If TDX host support is not built, `tdx_init()` is a stub and the bug
-  bit is never set (guard becomes a no-op). This scopes the behavior to
-  kernels configured with TDX host support as intended.
+Why it’s safe to backport
+- Scope-limited: touches only TDX host paths and the seamcall wrappers;
+  no ABI or architectural changes.
+- Minimal risk: setting a per-CPU boolean and wrapping SEAMCALLs with
+  preempt disable. SEAMCALLs are long; added preemption control is
+  negligible overhead and avoids CPU migration races.
+- Correctness across contexts: SEAMCALLs can happen with IRQs disabled;
+  the helper asserts preemption is off, and the wrappers explicitly
+  ensure it. The two special direct-call sites run in contexts where
+  IRQs are off or preemption is already disabled.
+- Aligns with existing kexec logic: Stable trees already check
+  `cache_state_incoherent` during CPU stop and relocation
+  (arch/x86/kernel/process.c:840,
+  arch/x86/kernel/machine_kexec_64.c:449).
 
-**Effect on Callers**
-- kexec fast-fails when loading the image:
-  - `kernel/kexec.c:142`: `ret = machine_kexec_prepare(image);`
-  - `kernel/kexec_file.c:416`: `ret = machine_kexec_prepare(image);`
-- Userspace sees `EOPNOTSUPP` and dmesg logs the rationale, avoiding a
-  crash later at handoff.
+Dependencies/assumptions for stable trees
+- Requires the per-CPU `cache_state_incoherent` infrastructure and kexec
+  consumers:
+  - Declaration: arch/x86/include/asm/processor.h:734
+  - Definition/usage: arch/x86/kernel/process.c:99,
+    arch/x86/kernel/process.c:840
+  - Kexec integration: arch/x86/kernel/machine_kexec_64.c:449 and
+    arch/x86/kernel/relocate_kernel_64.S (WBINVD when
+    `RELOC_KERNEL_CACHE_INCOHERENT` set)
 
-**Scope and Risk**
-- Small, localized change; no architectural refactor.
-- Only affects x86-64 kexec/kdump on systems where the bug flag is set;
-  no behavioral change for others.
-- Conservative by design: disallows kexec/kdump to prevent hard machine
-  checks.
-- Reuse of existing CPU-bug infrastructure ensures correctness and
-  stability.
+Summary
+- This is a focused, low-risk bugfix preventing silent memory corruption
+  on TDX hosts during kexec by correctly marking and subsequently
+  flushing CPUs that might have generated dirty private cachelines
+  during SEAMCALLs. It satisfies stable backport criteria (user-visible
+  correctness fix, minimal change, localized impact).
 
-**Dependencies/Backport Notes**
-- Requires `X86_BUG_TDX_PW_MCE` to exist and be set on affected hardware
-  (see cpufeatures and TDX init paths). If a target stable branch lacks
-  this bug flag or `tdx_init()` path, the guard must be adapted or
-  prerequisite patches included.
+ arch/x86/include/asm/tdx.h  | 25 ++++++++++++++++++++++++-
+ arch/x86/virt/vmx/tdx/tdx.c |  4 ++--
+ 2 files changed, 26 insertions(+), 3 deletions(-)
 
-**Stable Criteria**
-- Fixes a real user-visible reliability issue (hard MCE on reboot-to-
-  crash kernel).
-- Minimal and contained change with low regression risk.
-- No new features or architectural changes; limited to x86 kexec path.
-- Behavior matches stable policy: prefer preventing fatal errors over
-  risky runtime mitigation.
-
-Given the above, this is a good candidate for backporting to stable
-trees that include TDX host infrastructure and the corresponding bug
-flag.
-
- arch/x86/kernel/machine_kexec_64.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/arch/x86/kernel/machine_kexec_64.c b/arch/x86/kernel/machine_kexec_64.c
-index 697fb99406e6b..754e95285b910 100644
---- a/arch/x86/kernel/machine_kexec_64.c
-+++ b/arch/x86/kernel/machine_kexec_64.c
-@@ -346,6 +346,22 @@ int machine_kexec_prepare(struct kimage *image)
- 	unsigned long reloc_end = (unsigned long)__relocate_kernel_end;
- 	int result;
+diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+index 7ddef3a698668..0922265c6bdcb 100644
+--- a/arch/x86/include/asm/tdx.h
++++ b/arch/x86/include/asm/tdx.h
+@@ -102,10 +102,31 @@ u64 __seamcall_ret(u64 fn, struct tdx_module_args *args);
+ u64 __seamcall_saved_ret(u64 fn, struct tdx_module_args *args);
+ void tdx_init(void);
  
-+	/*
-+	 * Some early TDX-capable platforms have an erratum.  A kernel
-+	 * partial write (a write transaction of less than cacheline
-+	 * lands at memory controller) to TDX private memory poisons that
-+	 * memory, and a subsequent read triggers a machine check.
-+	 *
-+	 * On those platforms the old kernel must reset TDX private
-+	 * memory before jumping to the new kernel otherwise the new
-+	 * kernel may see unexpected machine check.  For simplicity
-+	 * just fail kexec/kdump on those platforms.
-+	 */
-+	if (boot_cpu_has_bug(X86_BUG_TDX_PW_MCE)) {
-+		pr_info_once("Not allowed on platform with tdx_pw_mce bug\n");
-+		return -EOPNOTSUPP;
-+	}
++#include <linux/preempt.h>
+ #include <asm/archrandom.h>
++#include <asm/processor.h>
+ 
+ typedef u64 (*sc_func_t)(u64 fn, struct tdx_module_args *args);
+ 
++static __always_inline u64 __seamcall_dirty_cache(sc_func_t func, u64 fn,
++						  struct tdx_module_args *args)
++{
++	lockdep_assert_preemption_disabled();
 +
- 	/* Setup the identity mapped 64bit page table */
- 	result = init_pgtable(image, __pa(control_page));
- 	if (result)
++	/*
++	 * SEAMCALLs are made to the TDX module and can generate dirty
++	 * cachelines of TDX private memory.  Mark cache state incoherent
++	 * so that the cache can be flushed during kexec.
++	 *
++	 * This needs to be done before actually making the SEAMCALL,
++	 * because kexec-ing CPU could send NMI to stop remote CPUs,
++	 * in which case even disabling IRQ won't help here.
++	 */
++	this_cpu_write(cache_state_incoherent, true);
++
++	return func(fn, args);
++}
++
+ static __always_inline u64 sc_retry(sc_func_t func, u64 fn,
+ 			   struct tdx_module_args *args)
+ {
+@@ -113,7 +134,9 @@ static __always_inline u64 sc_retry(sc_func_t func, u64 fn,
+ 	u64 ret;
+ 
+ 	do {
+-		ret = func(fn, args);
++		preempt_disable();
++		ret = __seamcall_dirty_cache(func, fn, args);
++		preempt_enable();
+ 	} while (ret == TDX_RND_NO_ENTROPY && --retry);
+ 
+ 	return ret;
+diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+index c7a9a087ccaf5..3ea6f587c81a3 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.c
++++ b/arch/x86/virt/vmx/tdx/tdx.c
+@@ -1266,7 +1266,7 @@ static bool paddr_is_tdx_private(unsigned long phys)
+ 		return false;
+ 
+ 	/* Get page type from the TDX module */
+-	sret = __seamcall_ret(TDH_PHYMEM_PAGE_RDMD, &args);
++	sret = __seamcall_dirty_cache(__seamcall_ret, TDH_PHYMEM_PAGE_RDMD, &args);
+ 
+ 	/*
+ 	 * The SEAMCALL will not return success unless there is a
+@@ -1522,7 +1522,7 @@ noinstr __flatten u64 tdh_vp_enter(struct tdx_vp *td, struct tdx_module_args *ar
+ {
+ 	args->rcx = tdx_tdvpr_pa(td);
+ 
+-	return __seamcall_saved_ret(TDH_VP_ENTER, args);
++	return __seamcall_dirty_cache(__seamcall_saved_ret, TDH_VP_ENTER, args);
+ }
+ EXPORT_SYMBOL_GPL(tdh_vp_enter);
+ 
 -- 
 2.51.0
 
