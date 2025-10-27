@@ -1,191 +1,197 @@
-Return-Path: <kvm+bounces-61216-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61217-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EFEDC10FB5
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 20:28:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3683C112DC
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 20:39:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E644568058
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 19:21:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF3D819A2B1D
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 19:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56E4274FD0;
-	Mon, 27 Oct 2025 19:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BF6327783;
+	Mon, 27 Oct 2025 19:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qhi4iDs3"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WxhEThY2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010051.outbound.protection.outlook.com [52.101.46.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AAD2E7F05
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 19:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761592815; cv=none; b=mDk822Y9gpNU1p2zE0cdyOEh1KuyNW+juKWShdRj3bLyxnVGSHjXOX13oocKa6PqVO35vTSd89Dje9FOERYL1twrALoHSNtGTZIGz6p959woW3bzX1TBiDJDaw4fhTV/l0/cWUixq7cJ6x9WX8U6zMek5lSDctAiY/uRlZ/Xq+M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761592815; c=relaxed/simple;
-	bh=VJkG8MUTQ0ibSOiw5y5AGTqWzk7c71W2hsTJzLp4sxo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PStisOYyKAkVbQO7t+/Zk8CeHWUvoty0qHXz2uxb1EtfdMebvw91c+wBp75pYzHqyCn5EI7hKjslkdKsoqduyw7iqRvw9DreRZfGQZpiMpAMybxjSWLoP1jNU6q587guPsAhaTr8ZEjrb78QLO22yEe/C9ru4TSJSR/omgxkAlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qhi4iDs3; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-28c58e009d1so108170565ad.3
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 12:20:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761592812; x=1762197612; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GJ/ihzhnBg2h+OIog5s51f1nDJzu1yBHwy2SCCUQ1bo=;
-        b=Qhi4iDs3Myf7H67dWp307gfFjDizFJCEizyOsUEySFxshjwcSeehuNjbPejwImqCWd
-         jzUlvlknzkXQhBXzZZcaeuYP+0OU5UnTI4zxVrDIjfyyFgmq5gBhla+VLLnUA3Hf4LPH
-         NJx6jGnhvDJ0sgsodj3jWbNYA8xDXNCXn/I3uJDMW1Kd2+I6VvIfz+LhUPSH7lx91wON
-         P0WGzlbhTW6izGpmxd3x5XT3BGVm5TgGDpi+H25OfQwgpdU69LtZdQglplOsQAbMl3ma
-         9X1S1r2LBTZlm1FxhaeTAu9kEOVzXMaBtFDmea6TVnVrOf0G6b5Wm6VYiM1vONQP4qXa
-         SgOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761592812; x=1762197612;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GJ/ihzhnBg2h+OIog5s51f1nDJzu1yBHwy2SCCUQ1bo=;
-        b=CnX0nYCRNZFiZgMPqYe2pO5RnpS8FvUn41KGkAjK0GFLDLyvamMUfMkvJvW58TsrY8
-         K5RiOpPl0v9124NLsK4JroCgRyuGqMQ3QzhAT5pN55EpJtSsTE7YBwmcjppHjptQ0xC3
-         PfvV2mDk+GRDIJRKrR9jkxevOkjU7ZQ1aBlp29XQRani1xpKsEPnh4kMWuGMvVQgmY5r
-         i9c4sksxD5fLqQpxKSIZ5haJVR5EamY7kj+hadEaNlvLPytXjyiojHEY6x8lmDC/SCSg
-         y8s3R/oXQVq4AYAJmzPUyhtInWkqI2OR6ec11q/v5pmEn+PTctJ/96do0XWR0qYQo6AP
-         gR+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUs7Y1o7xwkSJSahx874IOTSHGVbgi85TJZ9sM6jbjKsbq7hgOdBk/RgTTNsyFrcOqdGbY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzddSAmgpzFbZSEjzJApPC5DlitMeO4cJB1vWuSWt7DbCQfe5MB
-	XzzdABuGrfnMz0d9wNU0MjT5sGBI55bItubagYwFKrAiUtbd8jOzP4DW76GLSN/i9pdrjLJugJZ
-	he+J2bQ==
-X-Google-Smtp-Source: AGHT+IGEzxKOsu0TIx9JeJ8jo0iJqVMcVQCTPniC3ps1TgJ3BGzDUda18OgqbILlA0+mvKP7+G2jd9/+Iec=
-X-Received: from pjbrs15.prod.google.com ([2002:a17:90b:2b8f:b0:33b:51fe:1a73])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e5c4:b0:25d:1640:1d59
- with SMTP id d9443c01a7336-294cb378610mr8002455ad.8.1761592811798; Mon, 27
- Oct 2025 12:20:11 -0700 (PDT)
-Date: Mon, 27 Oct 2025 12:20:10 -0700
-In-Reply-To: <4809644b0ba02d0987ac56f4be7c426d0724cdef.camel@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5C62D8372;
+	Mon, 27 Oct 2025 19:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761593654; cv=fail; b=rSe6rs0JHqOtm5yfU6q1DJH7m94XEYaaK9isdNTaJnOKQuj7+/x9BN13J3uE9krIggsEsj8dxAaZRP7yttLXpIT1x7pAMBdJXJLqtpch/toa1KgXoTibqrdgcZtNcaUafHxP4yEkQGuZo5fWSc25DTrASR6CsUnEdiSClher3/Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761593654; c=relaxed/simple;
+	bh=Qq3mdicbTmmVjCbssR4ZSr7ZtW5UwdHwvxN3L6W93Fw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mgexm0kswh/XRXeRIkzaj+vbxv6lT3PsD7lDl/NQI6TIkunairK1bMRGNKo15R2c2cXXqcGBXrIb5QAIpiEY+BsG77A0IJ35/MZUznmlOIgQ3FgUyMAysto6ZSIJfA9cyKsFiYyRPciOak54LdBZxPE08QhuIGHbiL0UwF1qSYw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WxhEThY2; arc=fail smtp.client-ip=52.101.46.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NTqUzuxgGCS3NWyElsM2q3Vhu3pKseuwgerATzmcpLjd9SqnkNOogtBbchcATDYhtvCXLWUn+WucOvywkyGxlFpqpTmQ9tYmS3MDv8u/3ZgX77AhaK/11MDEcKAZS+pLlzaXqPGqRgW+ia7D+CS4s72hxlnfJshpJk4MO/sIyxffSwJiI3m+tOb7XELGg8/KK19Z2XypTctgCCdLgKtOUUYubutbTcGjKnNDD6jFB9zFyIi+/sWTQBWIEmfT64hRVgOGpqR1xEYXVsBoqQDvJz9vY36zLxqEkww34R5uoY7yIcqx7Gdz3i06dFSpKDU5KUzYTpai8MrsaYG74fZDSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Q1u46BiZ5gKHh80LFQ5m+WZFM0PNwJEsrfHNbg/YJmQ=;
+ b=N8HS22H4FjPcqntdidXcZTxLo7rmMx78/xO6Vta0DLHEF3o7xwz1yjWmH4wCQtqu/x5a7N9MkNyFlvtzwMxOyXjwvDmKP2OYFu2kY4jIe4WiLTjEV0KQ4XQZdhkQ7Sp++cLbjxd0bJKl39JM7CiOFawbj+GeG8gFbzVhdHphlmK9CUxXyPapee+K3OPINEpQ83Tx3vfgFUG0ROY+t0jHq0zDoczZ1Zp+mK2Q/ODlHka6ARKRI4PaSM4iyYuXjLi0Xto0QbKRVa83JIEqQk8CYQeCvJXY3mG7tb8BgDoW6XNlNaOn/tjdxPpXjA/MkWV8DkLSKhIZwUCDtru3TPNO8Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q1u46BiZ5gKHh80LFQ5m+WZFM0PNwJEsrfHNbg/YJmQ=;
+ b=WxhEThY2dusAKojXqg0YN4hw+Ky9Ado8laPo44f2OTGeTNVugkj3MOa566bl+4+eDM0GqopXdeTWIKf0MY/ZtC+iO7MyUUL5c3mYCEqif+b9XH39EoYwroEXrY7FLcZFkLFds2U0jfto5l6T7ndTg9GVNFm3OP1AXwRt6c6tir4=
+Received: from MN2PR08CA0010.namprd08.prod.outlook.com (2603:10b6:208:239::15)
+ by DM6PR12MB4331.namprd12.prod.outlook.com (2603:10b6:5:21a::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.19; Mon, 27 Oct
+ 2025 19:34:08 +0000
+Received: from BL6PEPF0001AB52.namprd02.prod.outlook.com
+ (2603:10b6:208:239:cafe::28) by MN2PR08CA0010.outlook.office365.com
+ (2603:10b6:208:239::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9253.18 via Frontend Transport; Mon,
+ 27 Oct 2025 19:34:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BL6PEPF0001AB52.mail.protection.outlook.com (10.167.241.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9253.7 via Frontend Transport; Mon, 27 Oct 2025 19:34:07 +0000
+Received: from tlendack-t1.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 27 Oct
+ 2025 12:34:05 -0700
+From: Tom Lendacky <thomas.lendacky@amd.com>
+To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+	<linux-crypto@vger.kernel.org>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+	<seanjc@google.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>, "Thomas
+ Gleixner" <tglx@linutronix.de>, Michael Roth <michael.roth@amd.com>, "Ashish
+ Kalra" <ashish.kalra@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David Miller" <davem@davemloft.net>
+Subject: [PATCH v4 0/4] SEV-SNP guest policy bit support updates
+Date: Mon, 27 Oct 2025 14:33:48 -0500
+Message-ID: <cover.1761593631.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251017003244.186495-1-seanjc@google.com> <20251017003244.186495-21-seanjc@google.com>
- <4809644b0ba02d0987ac56f4be7c426d0724cdef.camel@intel.com>
-Message-ID: <aP_F6tmzomRtdbpU@google.com>
-Subject: Re: [PATCH v3 20/25] KVM: TDX: Add macro to retry SEAMCALLs when
- forcing vCPUs out of guest
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, 
-	"pjw@kernel.org" <pjw@kernel.org>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
-	"kas@kernel.org" <kas@kernel.org>, "maobibo@loongson.cn" <maobibo@loongson.cn>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "maddy@linux.ibm.com" <maddy@linux.ibm.com>, 
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>, 
-	"zhaotianrui@loongson.cn" <zhaotianrui@loongson.cn>, "anup@brainfault.org" <anup@brainfault.org>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"michael.roth@amd.com" <michael.roth@amd.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ira Weiny <ira.weiny@intel.com>, 
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, Vishal Annapurve <vannapurve@google.com>, 
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, 
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, "x86@kernel.org" <x86@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB52:EE_|DM6PR12MB4331:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1f635d4e-bcfa-4e7d-dbf8-08de158fcb83
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|7416014|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?NwQViuZMZdU+K6gi305iZ+VWGDz5EN/ZE4WmVVM5OBfVsxQ0gMA1INh0RREu?=
+ =?us-ascii?Q?wvgjgIEjwrBNKQL4sLWveWQMnK2HhOfgkivBrzygErMxvWqaLBWYLNsss8PY?=
+ =?us-ascii?Q?AEz6x863Jrg1vux/a/OckWEaMYUrX9Kn7elej3k+lfbyfhG/w2AirR2yErQY?=
+ =?us-ascii?Q?InfGXqz1PdE1P8F1kpKTKA/uZUib3xscpZVQ+QyXwVFByB9Ap4hUC2pjfmHI?=
+ =?us-ascii?Q?mZ/68cZ+dk9I4oGDY2l+mfg+QS4OcLq6wD8CqQ36/yEe0YuYOhe8kQAKBRZV?=
+ =?us-ascii?Q?JisxoRwpN5ARJDmhh3DJx1adTzMfwAIN+e7ierbAPs0yhLZ9ukxCHs2LJlZt?=
+ =?us-ascii?Q?LIhbvkfGCotw80jCNPge2p+KjHUTFl9bX8PtOn5WXR5/zS/nfYdsoO4vU+WB?=
+ =?us-ascii?Q?TSKxJln/AnjF5FBjzkm8b5LctgacsjK7J0rqtMRujSv0wXI/ocRE4KbtsrQo?=
+ =?us-ascii?Q?k37LK+0xLcMqMka5+2sJyD+t+VEDnMOURSgTLqps9EJTR9HMSTYZA81F2Y1N?=
+ =?us-ascii?Q?MoFWFB0FG3Ar+W/Q937xJD90xveMJxZY08LlzMZwHm6ugUAfmHJKPqQYuYT/?=
+ =?us-ascii?Q?8R26Gli5mYE+1NOF1AvQeS+M9Q3FEWK5rbggRWVCNB58fwBZXK/WYGA4s/e2?=
+ =?us-ascii?Q?50tvjJuxLXiUJXd7VdF2OFg/rp3rM4CFO91mdQeREQW+KQXsoZacifT+Vm2G?=
+ =?us-ascii?Q?YSdW1/8Zzp4PpYcr5+iqz7jufaqow6CX3QhZXe/wBX4QSNLfv8QwdxiKCZFo?=
+ =?us-ascii?Q?JCfYs9OgR3cj+8otD2cC3a0EiLQW0VUBGafClBBWmOY6tSR1p3cuAe8u+hYw?=
+ =?us-ascii?Q?bW6BmFuFlPp+isX+hxV8W5TQcWRcG4uDKD/JWlzoZo/dF2HcCsIkfn1tlNIK?=
+ =?us-ascii?Q?U5b+ZVRKsSaLC9FJJvNnh6XZpzXNic0ZGJlU5touKapnCsll2DEk43nyiKPV?=
+ =?us-ascii?Q?wfCuDoBJmTNCU7LxEJ/z5ZSXxFF03More4ltwPpEVfk3uBrdq08buGEZThmt?=
+ =?us-ascii?Q?S7eEwTXBqk0IHH5CqW4k2dD+QZRwiGdmF+i18JIx9FQehf6SY3Ep7t/IqHmn?=
+ =?us-ascii?Q?eNlQ5+oR2Xh34ib1eaEXqgQkQIAdSM+qJv0+rQa7WTljbsczB4RpDRXZIJRv?=
+ =?us-ascii?Q?B6Jaat6p3XMDI/TK+q8DiU7UAUwyg/w1UCc7iY0jmxgaUgdnMwoepaVOVYQq?=
+ =?us-ascii?Q?b55Mq0/AAr4LEmVk9jTwyv7RHDIO8eIfBT0NlXHuEIsXsczmB+1x0eY3VK2D?=
+ =?us-ascii?Q?+Qccn4IM4tUrhXZm122AMRd8CRo5VrkHiTaSh2/r4R6ggJngGi04iX5wc6be?=
+ =?us-ascii?Q?+iJNF93S3cqggxycJwrk6vVzUHYPpt4yoCgBf/JIpDvAGTL9bDh/mkUhX7vd?=
+ =?us-ascii?Q?+dLmA/ao/tA4gHJ5dS7dCUTKzGzX2Jxo1ieKiXMeh7117uo92u4CaJmKpjuM?=
+ =?us-ascii?Q?ivjqTEcYyVfLwuzsz0YilGhEBFsqq/pN9GDiI4Jcv+zYZMefXvUNfIeqQPU7?=
+ =?us-ascii?Q?43kGHWe7cbcZc3fOQn5HSvUN6n+GR6xI0deDGqoyryhDxRszQCSSLZxNpLNw?=
+ =?us-ascii?Q?tbrh8Az+LTsTx2FurFM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(7416014)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2025 19:34:07.1676
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f635d4e-bcfa-4e7d-dbf8-08de158fcb83
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB52.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4331
 
-On Fri, Oct 24, 2025, Kai Huang wrote:
-> On Thu, 2025-10-16 at 17:32 -0700, Sean Christopherson wrote:
-> > Add a macro to handle kicking vCPUs out of the guest and retrying
-> > SEAMCALLs on -EBUSY instead of providing small helpers to be used by each
-> > SEAMCALL.  Wrapping the SEAMCALLs in a macro makes it a little harder to
-> > tease out which SEAMCALL is being made, but significantly reduces the
-> > amount of copy+paste code and makes it all but impossible to leave an
-> > elevated wait_for_sept_zap.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/tdx.c | 72 ++++++++++++++----------------------------
-> >  1 file changed, 23 insertions(+), 49 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index f6782b0ffa98..2e2dab89c98f 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -294,25 +294,24 @@ static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
-> >  	vcpu->cpu = -1;
-> >  }
-> >  
-> > -static void tdx_no_vcpus_enter_start(struct kvm *kvm)
-> > -{
-> > -	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> > -
-> > -	lockdep_assert_held_write(&kvm->mmu_lock);
-> > -
-> > -	WRITE_ONCE(kvm_tdx->wait_for_sept_zap, true);
-> > -
-> > -	kvm_make_all_cpus_request(kvm, KVM_REQ_OUTSIDE_GUEST_MODE);
-> > -}
-> > -
-> > -static void tdx_no_vcpus_enter_stop(struct kvm *kvm)
-> > -{
-> > -	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> > -
-> > -	lockdep_assert_held_write(&kvm->mmu_lock);
-> > -
-> > -	WRITE_ONCE(kvm_tdx->wait_for_sept_zap, false);
-> > -}
-> > +#define tdh_do_no_vcpus(tdh_func, kvm, args...)					\
-> > +({										\
-> > +	struct kvm_tdx *__kvm_tdx = to_kvm_tdx(kvm);				\
-> > +	u64 __err;								\
-> > +										\
-> > +	lockdep_assert_held_write(&kvm->mmu_lock);				\
-> > +										\
-> > +	__err = tdh_func(args);							\
-> > +	if (unlikely(tdx_operand_busy(__err))) {				\
-> > +		WRITE_ONCE(__kvm_tdx->wait_for_sept_zap, true);			\
-> > +		kvm_make_all_cpus_request(kvm, KVM_REQ_OUTSIDE_GUEST_MODE);	\
-> > +										\
-> > +		__err = tdh_func(args);						\
-> > +										\
-> > +		WRITE_ONCE(__kvm_tdx->wait_for_sept_zap, false);		\
-> > +	}									\
-> > +	__err;									\
-> > +})
-> 
-> The comment which says "the second retry should succeed" is lost, could we
-> add it to tdh_do_no_vcpus()?
+This series aims to allow more flexibility in specifying SEV-SNP policy
+bits by improving discoverability of supported policy bits from userspace
+and enabling support for newer policy bits.
 
-+1, definitely needs a comment.
+- The first patch consolidates the policy definitions into a single header
+  file.
 
-/*
- * Execute a SEAMCALL related to removing/blocking S-EPT entries, with a single
- * retry (if necessary) after forcing vCPUs to exit and wait for the operation
- * to complete.  All flows that remove/block S-EPT entries run with mmu_lock
- * held for write, i.e. are mutually exlusive with each other, but they aren't
- * mutually exclusive with vCPUs running (because that would be overkill), and
- * so can fail with "operand busy" if a vCPU acquires a required lock in the
- * TDX-Module.
- *
- * Note, the retry is guaranteed to succeed, absent KVM and/or TDX-Module bugs.
- */
- 
-> Also, perhaps we can just TDX_BUG_ON() inside tdh_do_no_vcpus() when the
-> second call of tdh_func() fails?
+- The second patch adds a CCP driver API to return the supported policy
+  bits. Policy bit support is dependent on the version of SEV firmware.
 
-Heh, this also caught my eye when typing up the comment.  Unfortunately, I don't
-think it's worth doing the TDX_BUG_ON() inside the macro as that would require
-plumbing in the UPPERCASE name, and doesn't work well with the variadic arguments,
-e.g. TRACK wants TDX_BUG_ON(), but REMOVE and BLOCK want TDX_BUG_ON_2().
+- The third patch adds a new KVM_X86_GRP_SEV attribute group,
+  KVM_X86_SNP_POLICY_BITS, that can be used to return the supported
+  SEV-SNP policy bits. The initial support for this attribute will use
+  the new CCP driver API to return the firmware supported policy bits
+  ANDed with the KVM supported policy bits.
 
-Given that REMOVE and BLOCK need to check the return value, getting the TDX_BUG_ON()
-call into the macro wouldn't buy that much.
+- The fourth patch expands the number of policy bits that KVM supports.
+
+The series is based off of:
+  git://git.kernel.org/pub/scm/virt/kvm/kvm.git master
+
+---
+
+Changes for v4:
+  - Swizzle the patch order in order to preserve ABI.
+  - Use the new CCP API from the start for the KVM_X86_SNP_POLICY_BITS
+    attribute.
+
+Changes for v3:
+  - Remove RFC tag.
+
+Changes for v2:
+  - Marked the KVM supported policy bits as read-only after init.
+
+Tom Lendacky (4):
+  KVM: SEV: Consolidate the SEV policy bits in a single header file
+  crypto: ccp - Add an API to return the supported SEV-SNP policy bits
+  KVM: SEV: Publish supported SEV-SNP policy bits
+  KVM: SEV: Add known supported SEV-SNP policy bits
+
+ arch/x86/include/uapi/asm/kvm.h |  1 +
+ arch/x86/kvm/svm/sev.c          | 45 ++++++++++++++++++++-------------
+ arch/x86/kvm/svm/svm.h          |  3 ---
+ drivers/crypto/ccp/sev-dev.c    | 37 +++++++++++++++++++++++++++
+ include/linux/psp-sev.h         | 39 ++++++++++++++++++++++++++++
+ 5 files changed, 105 insertions(+), 20 deletions(-)
+
+
+base-commit: 4361f5aa8bfcecbab3fc8db987482b9e08115a6a
+-- 
+2.51.1
+
 
