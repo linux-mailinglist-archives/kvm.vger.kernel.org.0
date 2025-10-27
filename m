@@ -1,185 +1,194 @@
-Return-Path: <kvm+bounces-61181-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61182-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E4EAC0F246
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:03:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1C5BC0F3C2
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:22:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 117A9341DEB
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 16:03:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7694442520B
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 16:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C333101B7;
-	Mon, 27 Oct 2025 16:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D325A30C37A;
+	Mon, 27 Oct 2025 16:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="X/D86aVm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q7jVh1hI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D781D30F532
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B03830BF60
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:03:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761580990; cv=none; b=eQkcSZtJtyYg8i9NvZ7EiFTz1MfEeBIpWDt4pWisMjjsprXmqlvyLOogQnYnATgZjQktuiH42kMtP8AIqBVtGYfMboUywbpnXUbsaMjX+Vwa7P4S8ZR/7w2uOb/B3oFo3j5C7BEGmIb9QajL0WkuAcEiDLs0xyFUYRofV8/PvQ4=
+	t=1761581015; cv=none; b=u8rtFLCnie4bIRdD1U4F7oLgGJnoPASs3QxbiMLDbnitickObYowK1szZ30LmwN3PogiXscJVIyuqmLcW3NHDHP3YtoM8ig+O2lqmnflX+Rw6IHOsjGlsF3nXWRbPVMBVfQe5DJ0SXm6Ya4+gQOdP8EoE3/h9Rl4AntqAcU9SPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761580990; c=relaxed/simple;
-	bh=05oV4QgWlrICz8v8LWqrCddNcBhrbTFx9f/clrOypts=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=scE7pHVDZSclMYPFmTNQr9OO3e6vW3emxs3y/pFSNRcav47GEocui+gnCzSe1ek1ZNX+AACSgi+9jCYizG50v/Y+dgrTCOkEOy+5F0eQkPRQtEz9AxVOnR3ElVHWATV2QWV47VvmkC5wiKbiwBm0hrBIc1o3JvO9zgDYTAphE7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=X/D86aVm; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59RBhuc71218971
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:03:05 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=Nq/Ni+MDbBxIJTDqDTi0
-	lg+krZJe34pBBkitBlxWWts=; b=X/D86aVms8Om9gwJhnL5NvmUlZfNIhJzF1hC
-	nkrcV8Yb85VjHS07HAg2Rb1Y1sEeC5U6/M9uV7zFx7hHARxkF15sDhGXI2zqWoRt
-	PLiYv8OqMniCUhZQElpBXZMZgofeTPMxYbej/4rTGq9igC3NIQ9s0vXeF7OkYOCi
-	LrrFwk/vUXYmKGcpmtiW0nPOFHTNNIlp2O4D/O3SU8mwkW0cpwoMjtWtIIHuh+eb
-	LtDz6Gj1IE1J6b4oR/8UQZpZKubVPrHRwdkNg0R+Ot+BTJhs+val3NroEefBZxt/
-	Vc2fGVb4EVkt5H4nz78Pmz9HDvjELf/f/ntJGal5qD/clCMxCA==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4a284et1fn-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:03:05 -0700 (PDT)
-Received: from twshared28390.17.frc2.facebook.com (2620:10d:c085:108::150d) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Mon, 27 Oct 2025 16:03:03 +0000
-Received: by devgpu012.nha5.facebook.com (Postfix, from userid 28580)
-	id 91AE442FC2D; Mon, 27 Oct 2025 09:02:55 -0700 (PDT)
-Date: Mon, 27 Oct 2025 09:02:55 -0700
-From: Alex Mastro <amastro@fb.com>
-To: Alex Williamson <alex@shazbot.org>
-CC: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        Jason Gunthorpe
-	<jgg@ziepe.ca>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, David
- Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v4 0/3] vfio: handle DMA map/unmap up to the addressable
- limit
-Message-ID: <aP+Xr1DrNM7gYD8v@devgpu012.nha5.facebook.com>
-References: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
- <20251015132452.321477fa@shazbot.org>
- <3308406e-2e64-4d53-8bcc-bac84575c1d9@oracle.com>
- <aPFheZru+U+C4jT7@devgpu015.cco6.facebook.com>
- <20251016160138.374c8cfb@shazbot.org>
- <aPJu5sXw6v3DI8w8@devgpu012.nha5.facebook.com>
- <20251020153633.33bf6de4@shazbot.org>
- <aPe0E6Jj9BJA2Bd5@devgpu012.nha5.facebook.com>
+	s=arc-20240116; t=1761581015; c=relaxed/simple;
+	bh=ZVvaHiYxclFoP0ltljuT+zJ+LK5kjIQ4V1Qoeu7vlhk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Jydas8wzT+TsEWOyo3Im6Wcy6KWPBd7+S3IzZJ3+moHckxMdsQBevvHMNPUG8AVn4GWtEo5tZ6Y2nc6cMrxud6+VvKB0vG4Di2rcJ2GHvaaNKYrP2N2bfEuScAw4aDxlfaZQwVZhw/toxWOq1BSyRDwXLkxM9hfiSv4ZKyRLvPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Q7jVh1hI; arc=none smtp.client-ip=74.125.224.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-63e17c0fefbso5202624d50.1
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:03:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1761581012; x=1762185812; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RR5BznuAUZ5//5K4fKsbv/PX3i2neLhRixVpX04AB5M=;
+        b=Q7jVh1hI5kWY6RECPSudlgRLBj1xNQy5pZMKZpS1C+Q+UtRYWK+76GxuicYAHa/CZ3
+         gWImCbQcET/LArfrRAMxJM9s14slYgk3ShgelSG4aLK980Y6QsQa6S682zhS8ARAhKdJ
+         Q+I/4NQLVBybFVLDlgSEhOrG3439+BjmVNOlgTetoRQTAxPWbQku9PA+iAPgquiXgCx1
+         79CdhRkzLPASKezHY04Wg0LpeTDnJfSNn3jRTDCoi5sIGRNK3uwcmw+g67MwUG6wLxyu
+         ox+bo1Wplv8h5PtSQi+NK+RO1aH2n/dzRmpPqaMHuVLreuu3kC8Npc0PurteV6waf1Lb
+         yeOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761581012; x=1762185812;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RR5BznuAUZ5//5K4fKsbv/PX3i2neLhRixVpX04AB5M=;
+        b=WY/Hk2pnJN+Iy3M+BSiKx+Alv9DetTQH3bto89rHhNiY3huMpP8cToP1kZ75hN7VJ8
+         9O4OsSIGnjmFDKZuu2pvoPvQXy4jtRMMYQXVnOtJHQIhoVIxzSxMeiTGGfHR/gkumoBF
+         IZ+PYgke5lWdv5DPdw3GRl2NHeqKjybIrXMQbYyRwUx7zaEyTXvX22pIL/8Uj1QFHMa8
+         d8QLaP+L85ToRbb9bOUBQgFoM4nNBlQFM+mcK1IN/1CYjyzAwAW94ggeuhDGBGyZp46J
+         mzU89zm60vjNXaQto4zTvfZlW/2M805rnoNPgmYI3aBZflTddRXBMs+asrrGcQV27f3q
+         y8sw==
+X-Forwarded-Encrypted: i=1; AJvYcCV2nblEuvN1zniOsHXhgdaecvNyIMpYf+40WcbZIYAHvcpKl1plRbb9XfmQnmJ3B5tDpC4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAP6wXi3kPQABrh7mAB/OaPKj7A5En2diQVcDdf0AsuPnxGP+4
+	Xjm1q7qUmTHpk+8CQ7X6z6ZUk7Dknolyx7zXRl0vrrOgCjs9lqhaTJz0RXEn6BWn/on7aISdG1P
+	K35T+6u9gdnzs724MKRC9/OLSdGagLaWQsWjx1zSO3A==
+X-Gm-Gg: ASbGnct6d76WmyD3tt6fhvSRaCZpbwfYnK64cKs6EV8yQClEFyRWIbqmC1rtfh8nH0d
+	T8griC25FoDQgBXzhRD0dHpxTNTQSlFchUefCvPaTVMnicue+2TyjfP8xabtLwfJPoOvBKA6fFM
+	5jkoECwR9GGpXEL8RK2K3u01yltSTxA8fE8I+2Dj5E55TT7EXbjwaTMu71g1WfBcsvJqHdqldA+
+	UKJ871GHfyqNMxAtIss58afshe5oTYrTZiaMnVVNpXVI6weqeWz20UB9lwtGOVoVybkg8aK
+X-Google-Smtp-Source: AGHT+IEUrN/EysgI2nB2F9WdFzaJ1hhJHQ7VjfW/gyaI669aRQl1+Q6hp6c/yY+VSNAPuRW0/bPat1D3KnOCnNmBZY0=
+X-Received: by 2002:a05:690e:c4f:b0:612:891a:9ecc with SMTP id
+ 956f58d0204a3-63f6b9b05b7mr479893d50.9.1761581011690; Mon, 27 Oct 2025
+ 09:03:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aPe0E6Jj9BJA2Bd5@devgpu012.nha5.facebook.com>
-X-FB-Internal: Safe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI3MDE0OSBTYWx0ZWRfX25HVSvrPP9Y2
- t72MzycnCUCDmRoAtTSYCOsBhmVCueu/JTvpBxJPMDkNWJGtRI7zouLhqZcUMycNU2JSN19a1On
- u1ufO8w9LZqsZ82IjjDU2pV/JlKFuvbFS4mZry8tdSkEfNu2TEb3T4mZZAVZvy5Q3YDk7hNxlI8
- 7+dE+joWlQV+IufSNKYFzYU0qWfxTaDbpGUk8SUM7yhQg/T4Cmx5z1J8haGvozoWiTdE1WrTw9S
- cgDOiChyVp6mvyGyrvISR76WTizantBMefyy5p7K+A6FaMIlpIaEeLAP8sxIiS6sH97keelbiRw
- VcjLTJ30dugs52lWPyRpykbQFR42Fn8UyrUficQhLFxr27wzsGJEsRhfi5BSXausTCZvdaLBsZ2
- Ufqd8htIwHtlZRPzqaawGmI0unfC3w==
-X-Proofpoint-ORIG-GUID: NNbcj6IC09jubSPvJKSdz7-dDTtzF1lD
-X-Proofpoint-GUID: NNbcj6IC09jubSPvJKSdz7-dDTtzF1lD
-X-Authority-Analysis: v=2.4 cv=OaWVzxTY c=1 sm=1 tr=0 ts=68ff97b9 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=g2ih4RM_o3xvLBDMwOgA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-27_06,2025-10-22_01,2025-03-28_01
+References: <20250920140124.63046-1-mohamed@unpredictable.fr>
+ <20250920140124.63046-4-mohamed@unpredictable.fr> <CAFEAcA-398ZMeLUbHWyUw4np81mLikEn2PkQnFQMY4oY_iWRFA@mail.gmail.com>
+ <29E39B1C-40D3-4BBA-8B0B-C39594BA9B29@unpredictable.fr>
+In-Reply-To: <29E39B1C-40D3-4BBA-8B0B-C39594BA9B29@unpredictable.fr>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Oct 2025 16:03:19 +0000
+X-Gm-Features: AWmQ_bky_gDkaMRbeQ688zuYHzvCneYcGVItHtc3zS3XRWMV3shJhZg-0iZCeos
+Message-ID: <CAFEAcA93e6GL9agaCBZ2AabB21JrS6KS6MsbRHGPwdc_vj7xDQ@mail.gmail.com>
+Subject: Re: [PATCH v6 03/23] hw/arm: virt: add GICv2m for the case when ITS
+ is not available
+To: Mohamed Mediouni <mohamed@unpredictable.fr>
+Cc: qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, 
+	Yanan Wang <wangyanan55@huawei.com>, Phil Dennis-Jordan <phil@philjordan.eu>, 
+	=?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
+	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
+	Mads Ynddal <mads@ynddal.dk>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	Cameron Esfahani <dirty@apple.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhao Liu <zhao1.liu@intel.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Igor Mammedov <imammedo@redhat.com>, 
+	qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, 
+	Roman Bolshakov <rbolshakov@ddn.com>, Pedro Barbuda <pbarbuda@microsoft.com>, 
+	Alexander Graf <agraf@csgraf.de>, Sunil Muthuswamy <sunilmut@microsoft.com>, 
+	Eduardo Habkost <eduardo@habkost.net>, Ani Sinha <anisinha@redhat.com>, 
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 21, 2025 at 09:25:55AM -0700, Alex Mastro wrote:
-> On Mon, Oct 20, 2025 at 03:36:33PM -0600, Alex Williamson wrote:
-> > I do note that we're missing a Fixes: tag.  I think we've had hints of
-> > this issue all the way back to the original implementation, so perhaps
-> > the last commit should include:
-> > 
-> > Fixes: 73fa0d10d077 ("vfio: Type1 IOMMU implementation")
-> 
-> SGTM
-> 
-> > Unless you've identified a more specific target.
-> 
-> I have not.
-> 
-> > Along with the tag, it would probably be useful in that same commit to
-> > expand on the scope of the issue in the commit log.  I believe we allow
-> > mappings to be created at the top of the address space that cannot be
-> > removed via ioctl, but such inconsistency should result in an
-> > application error due to the failed ioctl and does not affect cleanup
-> > on release.
+On Thu, 2 Oct 2025 at 05:30, Mohamed Mediouni <mohamed@unpredictable.fr> wr=
+ote:
+>
+>
+>
+> > On 25. Sep 2025, at 18:24, Peter Maydell <peter.maydell@linaro.org> wro=
+te:
+> >
+> > On Sat, 20 Sept 2025 at 15:02, Mohamed Mediouni
+> > <mohamed@unpredictable.fr> wrote:
+> >>
+> >> On Hypervisor.framework for macOS and WHPX for Windows, the provided e=
+nvironment is a GICv3 without ITS.
+> >>
+> >> As such, support a GICv3 w/ GICv2m for that scenario.
+> >>
+> >> Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
+> >>
+> >> Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+> >> ---
+> >> hw/arm/virt-acpi-build.c | 4 +++-
+> >> hw/arm/virt.c            | 8 ++++++++
+> >> include/hw/arm/virt.h    | 2 ++
+> >> 3 files changed, 13 insertions(+), 1 deletion(-)
+> >
+> > Looking at this I find myself wondering whether we need the
+> > old-version back compat handling. The cases I think we have
+> > at the moment are:
+> >
+> > (1) TCG, virt-6.1 and earlier: no_tcg_its is set
+> >   -- you can have a gicv2 (always with a gicv2m)
+> >   -- if you specify gic-version=3D3 you get a GICv3 without ITS
+> > (2) TCG, virt-6.2 and later:
+> >   -- gic-version=3D2 still has gicv2m
+> >   -- gic-version=3D3 by default gives you an ITS; if you also
+> >      say its=3Doff you get GICv3 with no ITS
+> >   -- there is no case where we provide a GICv3 and are
+> >      unable to provide an ITS for it
+> > (3) KVM (any version):
+> >   -- gic-version=3D2 has a gicv2m
+> >   -- gic-version=3D3 gives you an ITS by default; its=3Doff
+> >      will remove it
+> >   -- there is no case where we provide a GICv3 and are
+> >      unable to provide an ITS for it
+> > (4) HVF:
+> >   -- only gic-version=3D2 works, you get a gicv2m
+> >
+> > and I think what we want is:
+> > (a) if you explicitly disable the ITS (with its=3Doff or via
+> >     no_tcg_its) you get no ITS (and no gicv2m)
+> > (b) if you explicitly enable the ITS you should get an
+> >     actual ITS or an error message
+> > (c) the default should be its=3Dauto which gives
+> >     you "ITS if we can, gicv2m if we can't".
+> >     This is repurposing the its=3D property as "message signaled
+> >     interrupt support", which is a little bit of a hack
+> >     but I think OK if we're clear about it in the docs.
+> >     (We could rename the property to "msi=3D(off,its,gicv2m,auto)"
+> >     with back-compat support for "its=3D" but I don't know if
+> >     that's worth the effort.)
+> >
+> > And then that doesn't need any back-compat handling for pre-10.2
+> > machine types or a "no_gicv3_with_gicv2m" flag, because for
+> > 10.1 and earlier there is no case that currently works and
+> > which falls into category (c) and which doesn't give you an ITS.
+> > (because we don't yet have hvf gicv3 implemented: that's a new
+> > feature that never worked in 10.1.)
+> >
+> > What do you think?
+>
+> Would it be wanted to provide MSI-X support in all scenarios
+> even with its=3Doff?
 
-I want to make sure I understand the cleanup on release path. Is my supposition
-below correct?
+We should prefer to provide MSI-X support. If the user
+explicitly asks for a config that doesn't give MSI-X
+support, that's their choice to make.
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 916cad80941c..7f8d23b06680 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1127,6 +1127,7 @@ static size_t unmap_unpin_slow(struct vfio_domain *domain,
- static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 			     bool do_accounting)
- {
-+	// end == 0 due to overflow
- 	dma_addr_t iova = dma->iova, end = dma->iova + dma->size;
- 	struct vfio_domain *domain, *d;
- 	LIST_HEAD(unmapped_region_list);
-@@ -1156,6 +1157,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	}
- 
- 	iommu_iotlb_gather_init(&iotlb_gather);
-+	// doesn't enter the loop, never calls iommu_unmap
- 	while (iova < end) {
- 		size_t unmapped, len;
- 		phys_addr_t phys, next;
-@@ -1210,6 +1212,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
- {
- 	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
-+	// go here
- 	vfio_unmap_unpin(iommu, dma, true);
- 	vfio_unlink_dma(iommu, dma);
- 	put_task_struct(dma->task);
-@@ -2394,6 +2397,8 @@ static void vfio_iommu_unmap_unpin_all(struct vfio_iommu *iommu)
- 	struct rb_node *node;
- 
- 	while ((node = rb_first(&iommu->dma_list)))
-+		// eventually, we attempt to remove the end of address space
-+		// mapping
- 		vfio_remove_dma(iommu, rb_entry(node, struct vfio_dma, node));
- }
- 
-@@ -2628,6 +2633,8 @@ static void vfio_release_domain(struct vfio_domain *domain)
- 		kfree(group);
- 	}
- 
-+	// Is this backstop what saves us? Even though we didn't do individual
-+	// unmaps, the "leaked" end of address space mappings get freed here?
- 	iommu_domain_free(domain->domain);
- }
- 
-@@ -2643,10 +2650,12 @@ static void vfio_iommu_type1_release(void *iommu_data)
- 		kfree(group);
- 	}
- 
-+	// start here
- 	vfio_iommu_unmap_unpin_all(iommu);
- 
- 	list_for_each_entry_safe(domain, domain_tmp,
- 				 &iommu->domain_list, next) {
-+		// eventually...
- 		vfio_release_domain(domain);
- 		list_del(&domain->next);
- 		kfree(domain);
+> And there=E2=80=99s the consequence of that making GICv3 + GICv2m only
+> testable with auto and not with TCG or kvm, which doesn=E2=80=99t sound i=
+deal.
+
+I guess that would be an argument for the "give the property
+the right name so we can say "msi=3D(off,its,gicv2m,auto)". Then
+you could say
+ -accel tcg -machine gic-version=3D3,msi=3Dgicv2m
+
+to test that setup.
+
+thanks
+-- PMM
 
