@@ -1,123 +1,89 @@
-Return-Path: <kvm+bounces-61235-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61236-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD84FC1211E
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 00:36:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0316C12127
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 00:37:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA3ED3B0328
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 23:33:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C85A31A2216E
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 23:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBED32ED3F;
-	Mon, 27 Oct 2025 23:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E1C32E74C;
+	Mon, 27 Oct 2025 23:37:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="XPfEVKpA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m7JaOIIl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824C732D0FA
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 23:33:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D31314A84
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 23:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761607984; cv=none; b=bSLWRJCreww6+VE6YJ7hwbNEqAT+Rm9riZEAEYSbHdfAQIQzw8aoH32EXn+mULc0bv+6J3jSCQFleWkTuEXrcsnGVH6b2qfbHVo7KUI+wBTG7Z/nj/a6reE/YRY5xluCRgL2g9+hStCuv+oFLinYUxloxbJNoVFPfc8u41HUvQM=
+	t=1761608238; cv=none; b=Ou7tTlKI2jx9B366j/5GplBsnjnOignw7zwOmMliyr/yAFGaD88eBxLxhs9FdW7nxJtnJYHDy6R0UvV6q/QrOtp86LQuaSH4u4JNHOxmHtiBgIeIc+8Eadjvg8fCytSwD1uOXDP1IxiQVSF8nwhPScP6yVLodhb6bh1/iyM4L1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761607984; c=relaxed/simple;
-	bh=ya34dnXBkVMZ4acUVB749ZaVXuLYyX25Ei5hDiCldOk=;
+	s=arc-20240116; t=1761608238; c=relaxed/simple;
+	bh=5fxdEJqLRN1tb+ss8xTO6a1FlGbLgSxQYup7sfAznOQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y8U5RxEX2hNy+nhxccupXOPEjfphmu5Ea+i9qV+cZCKk/o6THrSIoCYMNRrbcpB1dO1uMC5/ZFaUX1DnkcMVxUETofXLtsBAvPW8y52JaTfezVueLe2HuoxJxPa+kLZe4qChjSGvR9wh3M/4BJ+hjawk2kYdh1mHjfaFK6kxopU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=XPfEVKpA; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-78ea15d3489so47147856d6.3
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:33:02 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=XfM6LE8FcUC2vRyXyCeOR68JH7kKTjmYtVzEZAmZp1jYr6BKsTFtfj+xKOf8KdiOf5TBk6kiaSegWHFUkU1GfIfjRPue0esS+bGRfwTS+MrhSmfx5XSLW5QSCRkqLsSkHqchKMwqM6Jc3luWwUWDN0uSiW94de78dRuOZ6jwcAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m7JaOIIl; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-33ff5149ae8so1894631a91.3
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:37:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gourry.net; s=google; t=1761607981; x=1762212781; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761608236; x=1762213036; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SeBkBGZ09M3QB76OpujQtXgjWBBtrpYzqcpEmFvCTi4=;
-        b=XPfEVKpAkz0EqqJlblUgrQ2PbfAJJwC+FFil/Vd5htXfHTtIAt0AcJCsl4NmBxKXRJ
-         eIW5UeA7107giYfaQifJ5a/gcKAR8VZ9z0golFJy5Hb23kycJSDDiGo9zpEv9kL7Qk7s
-         w7zRqTxUMrIW23T1nvKpH2c36Y7Gmc+zKGLLJpUtGCt5fPfRM1WTsbfA/tTdW9nn2aUs
-         ftNj7HpeKguvAOHG0jEjFwpWYouZrm59oAzF2CNPOw8w7oeCkLSrBScDF73Fz4cxKAC8
-         hjTanLd8/LkCYdg+DpDtdHCnEdUb1gxr4DzFdHDnJdW+eZ6Z/hxItchsfPdz1TLQ2R8w
-         4aIA==
+        bh=Y25RVEc5uqdT77E62cdiRIe7zTZsno+Zu/0KbIShg9A=;
+        b=m7JaOIIlQm+eKJYwobgLwOcOTA0ZD7WCnE9bwrhCdmJDTZ9zga2Jy9w7UPHVwTGWIY
+         swWt2dWlH6+XSnffAMJnNnsC0FNi57A4mwQheMPq4KqZEqLDP+QXPj075aUYBQa66vZE
+         o7xRjOwaBJ3KcdmqwjPK3luN1t5m5eArnXISeiE78Gy9GTYv2/XQZIWaGTvYNKoksCva
+         WtY/+sLfWH/ehuVOVulmlZxQPd9SWw1K+1Z6LAdo3Kz0F0joyyUG+eFIbT5SECxLxX1v
+         DL/bHJfX+NBKfDq9hPJ200jBYBY5GNEMoJ0H1O2FODsldLDe87s4rjSUXEtV7aUitrhw
+         HATg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761607981; x=1762212781;
+        d=1e100.net; s=20230601; t=1761608236; x=1762213036;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SeBkBGZ09M3QB76OpujQtXgjWBBtrpYzqcpEmFvCTi4=;
-        b=dyvVi16PHX7uyNFuCVSJFP6nv/gxkqcygBnC+aF25z4nwA/oRnvOn9sd1nM5oc+p8C
-         3M1yYzlKgidnTz4lz1GTmh65h4IZ6WhS5Setirw8bU436K6ziP7jl2uySo8j1BPQ+OCx
-         BGYt78z4Z7Sdsj/TuVPB7ErqnZb3g521YWSp87+vxMsQBoLW+O49qCzgi2yYkIfrfySB
-         iAdy/hP4uGzQQex1Fsaj2hRoJdG1+ANbUEA99rWE2iheBdTWpYVO6WAMKCwmOFH2AFhY
-         N1uWY3RRKKRg2mYioai6UUSQEghOSBCS3dwZvyZTe5tM1VswP6V60/1MpwXjdo8m94Nh
-         nmqw==
-X-Forwarded-Encrypted: i=1; AJvYcCWGWnajspQFbTr1Q/HIsvh+1SYuDd+LHdiancw3s4A+b/jZvKe3p6hvXtH4xeZyJs5MiJk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvMO7kv5KYePp2ZAQZrBZAi0zjiDqhl2VSc7bhrzBYDEVPYWcE
-	OytVGq1j73Ur+PVMDaTEwzJF1MUTGqRwmaHySQPzU7/oDyNlQYDNBmVlqpqXIVA03MI=
-X-Gm-Gg: ASbGncsoVzU0f5SBbZfnhgpJ+rewrD0nhEGDkUh1wb84HZrJa13MwuqdmuIp1Pwe38g
-	ZXCFUJ6o7FMMQZrhXUhfzwWZVYpu+i3eCr5L8BGkF2/vejgiRocbRlKuReNL+/B2OlxtAQX01hN
-	8pSwV97t845f9T49t3q1Yjw9529M4TuhC6o2on+cM7e4LqPA9G3P1tPCos8KSJKGC2LkosroUbE
-	KHsSVpLNgPOe72xhoLunlUfzzsCuKl1tVY4y8dmPuM/PbR4K7cRoZ4eEmn3e2St0KHo1FkM0GCj
-	UT9htovxOjIF/RvJS2uYtsND1eJzhe1UqmHs7v29OWMJPWZp1PCl7sEg7007RvlAtF/xbaWCPLn
-	Vh6MVQOz9pLs2M5Yz9l80nKqZ7z0+RQItHbsxSZoM6e23qTFKkiQ3sQMGE5rCpp+j3ymcE2ssfe
-	tYNf9cJ5KxDZPaK01AIlIIClEHR3bD3mgFjlGTn5G6872DH00h+ceH0IuxEyk=
-X-Google-Smtp-Source: AGHT+IGY0mnN3CFDP7vaLRad7aeAt7RbVIUmDhfxoFPsiCMHR/zS0q6YLuuynQuqtuF/1igQEZd8Tg==
-X-Received: by 2002:ad4:5cad:0:b0:87c:2b03:c776 with SMTP id 6a1803df08f44-87ffb0f3094mr20891046d6.47.1761607981318;
-        Mon, 27 Oct 2025 16:33:01 -0700 (PDT)
-Received: from gourry-fedora-PF4VCD3F (pool-96-255-20-138.washdc.ftas.verizon.net. [96.255.20.138])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87fc48ea92fsm64277606d6.24.2025.10.27.16.32.59
+        bh=Y25RVEc5uqdT77E62cdiRIe7zTZsno+Zu/0KbIShg9A=;
+        b=myIYR8c6npMIqFs+ahDTXHjLaXrSYw5gt3woE9pEjkrYIOsVGQyTIBCEiEAFYk/HMI
+         1y99gH/2sCnvp/ahqGnnjum3WQ2MIG/bNCn3bK4R/McHTRVGdfkt3MiA+GUpnRtgAkv0
+         4GGzqaYuDjQWIcMou3Z7hHxfFsil9Rfi/hxMx1KrqvrCZK1VdR12CXEFcpeuA+HYrP6y
+         /6A7s+LUMj+ajrU2a8LeKMx7uiBO67id+CmD8ZQb0UF3R7edabcx63fitZBNCXKfWZvs
+         6UhZ5lF29bszmBO+L9F1YD8AKUtDzo8dCXfkovFIGkLdQvQhUlsyqtwA0hVrzs+sn9TO
+         C93g==
+X-Forwarded-Encrypted: i=1; AJvYcCX7S1wRwp0hYLwe2Ebt8U2Udo8I5UhEKT4EV0kgCheq2c8NUP8kZquXZtr7IAckCxUprwY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhmfYbctZrXwZuMG1Z2JG7OKw45SCbpvzYuaR/IrjWq8pcbw2d
+	VNSTsSVVjYBMYIs4+uYlHFPM9aQXmmczWtkPn9BGSHbrnsdsla5YvD9jCIqJWv6/Zg==
+X-Gm-Gg: ASbGncsdfYPudlcnkgXPK8UjQ8fiL5U0/lwAXXpE+L2IgOfTzAIB71QiOYQIjr5mZNR
+	eAID7SCc0MOZZUl3qbLG3rCFyvOtjCpwU5ZCsuRcb8OVGNnqrE0HRuXY21fOjwxox9ADsmRfqTH
+	PXYcMoM0kuRJJpVCRfe54ziYR9KevXnzhgreYDsjRKxdtTDga/kCoXcUbwP83a3+A9qC+5J2Ntn
+	nm2N7l4NiCDtRjIp2XAEjevnSiKlYF/nR3xFPSpwtZ9R+s94Wvijdhix/JltD2aIwM8SFd8CAK4
+	0Y6156OmKnXzFUXusgU1eD63ujc3652EEcaOBxztIBwgQS9WM3riM2u3nQ9CEY/17DPjiAmVUfY
+	bXO70IZ1KVFcdP1cwUfD3+uKwL+tZNWN3X/O9EJNBZXeQ7W7Yn2kS0cUUPVNbnGBnyd2BukikUr
+	3Dy8APCaTZVHZfXgCUSMZ9qbDpLRGG6vuRRGm1N5urd5WI2nBTpE0AcFTwTLsxRKA=
+X-Google-Smtp-Source: AGHT+IGmKX74epTI3A/iK0KHRQ0gJ5rV+oqAQAXmFZTOi70Jf1LkFq+8kZDCItWUYfvqvUNhL5cm4Q==
+X-Received: by 2002:a17:90b:4d0c:b0:32b:9774:d340 with SMTP id 98e67ed59e1d1-34027ab36bcmr1685369a91.33.1761608235576;
+        Mon, 27 Oct 2025 16:37:15 -0700 (PDT)
+Received: from google.com (132.200.185.35.bc.googleusercontent.com. [35.185.200.132])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33fed80aa48sm9919097a91.13.2025.10.27.16.37.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 16:33:00 -0700 (PDT)
-Date: Mon, 27 Oct 2025 19:32:58 -0400
-From: Gregory Price <gourry@gourry.net>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>, Zi Yan <ziy@nvidia.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
-	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
-	Lance Yang <lance.yang@linux.dev>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
-	Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
-	Peter Xu <peterx@redhat.com>, Matthew Wilcox <willy@infradead.org>,
-	Leon Romanovsky <leon@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
-	Byungchul Park <byungchul@sk.com>,
-	Ying Huang <ying.huang@linux.alibaba.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Pedro Falcato <pfalcato@suse.de>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
-	kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [RFC PATCH 00/12] remove is_swap_[pte, pmd]() + non-swap
- confusion
-Message-ID: <aQABKgQYfVkO7n9m@gourry-fedora-PF4VCD3F>
-References: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
- <20251027160923.GF760669@ziepe.ca>
+        Mon, 27 Oct 2025 16:37:14 -0700 (PDT)
+Date: Mon, 27 Oct 2025 23:37:10 +0000
+From: David Matlack <dmatlack@google.com>
+To: Alex Mastro <amastro@fb.com>
+Cc: Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 4/5] vfio: selftests: update DMA map/unmap helpers to
+ support more test kinds
+Message-ID: <aQACJucKne4DRv06@google.com>
+References: <20251027-fix-unmap-v5-0-4f0fcf8ffb7d@fb.com>
+ <20251027-fix-unmap-v5-4-4f0fcf8ffb7d@fb.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -126,20 +92,66 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251027160923.GF760669@ziepe.ca>
+In-Reply-To: <20251027-fix-unmap-v5-4-4f0fcf8ffb7d@fb.com>
 
-On Mon, Oct 27, 2025 at 01:09:23PM -0300, Jason Gunthorpe wrote:
+On 2025-10-27 10:33 AM, Alex Mastro wrote:
+> Add __vfio_pci_dma_* helpers which return -errno from the underlying
+> ioctls.
 > 
-> I'm not keen on is_non_present_entry(), it seems confusing again.
+> Add __vfio_pci_dma_unmap_all to test more unmapping code paths. Add an
+> out unmapped arg to report the unmapped byte size.
+
+nit: Please append () to function names in commit messages and comments
+(e.g. "Add __vfio_pci_dma_unmap_all() to test ..."). It helps make it
+obvious you are referring to a function.
+
+> The existing vfio_pci_dma_* functions, which are intended for happy-path
+> usage (assert on failure) are now thin wrappers on top of the
+> double-underscore helpers.
 > 
+> Signed-off-by: Alex Mastro <amastro@fb.com>
 
-The confusion stems from `present` referring to the state of the hardware
-PTE bits, instead of referring to the state of the entry.
+Aside from the commit message and the braces nits,
 
-But even if we're stuck with "non-present entry", it's still infinitely
-more understandable (and teachable) than "non_swap_swap_entry".
+  Reviewed-by: David Matlack <dmatlack@google.com>
 
-So even if we never get to the point of replacing swp_entry_t, this is a
-clear and obvious improvement.
-~Gregory
+> @@ -152,10 +153,13 @@ static void vfio_iommu_dma_map(struct vfio_pci_device *device,
+>  		.size = region->size,
+>  	};
+>  
+> -	ioctl_assert(device->container_fd, VFIO_IOMMU_MAP_DMA, &args);
+> +	if (ioctl(device->container_fd, VFIO_IOMMU_MAP_DMA, &args))
+> +		return -errno;
+
+Interesting. I was imagining this would would return whatever ioctl()
+returned and then the caller could check errno if it wanted to. But I
+actually like this better, since it simplifies the assertions at the
+caller (like in your next patch).
+
+> +int __vfio_pci_dma_unmap_all(struct vfio_pci_device *device, u64 *unmapped)
+> +{
+> +	int ret;
+> +	struct vfio_dma_region *curr, *next;
+> +
+> +	if (device->iommufd)
+> +		ret = iommufd_dma_unmap(device->iommufd, 0, UINT64_MAX,
+> +					device->ioas_id, unmapped);
+
+This reminds me, I need to get rid of INVALID_IOVA in vfio_util.h.
+
+__to_iova() can just return int for success/error and pass the iova up
+to the caller via parameter.
+
+> +	else
+> +		ret = vfio_iommu_dma_unmap(device->container_fd, 0, 0,
+> +					   VFIO_DMA_UNMAP_FLAG_ALL, unmapped);
+> +
+> +	if (ret)
+> +		return ret;
+> +
+> +	list_for_each_entry_safe(curr, next, &device->dma_regions, link) {
+> +		list_del_init(&curr->link);
+> +	}
+
+nit: No need for {} for single-line loop.
 
