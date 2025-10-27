@@ -1,209 +1,147 @@
-Return-Path: <kvm+bounces-61232-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61233-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B646C11EE9
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 00:06:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52E04C11F28
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 00:14:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id ACF46353ED8
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 23:06:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9105189F49F
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 23:14:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA94232AADC;
-	Mon, 27 Oct 2025 23:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B204332D450;
+	Mon, 27 Oct 2025 23:13:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20230601.gappssmtp.com header.i=@osandov-com.20230601.gappssmtp.com header.b="s1rlMNAs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o4thHGD1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E24230BEC
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 23:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B1A32AADC
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 23:13:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761606392; cv=none; b=dXoc3u9VhL5tDjAiYUQktENqlhKM8pOlZGSyTMGV1JoY5Edn7tK0f5WGWwcVZKAfy4hT/hsClFNdvWqgr8sMNvE7cPaT6AG5aDWfvzDEhSWv26agn3CNTqxLIbWFbrjowUKMmyOPLMtUhkPP62YyUoARqtAirHEQECROrOeK/Tg=
+	t=1761606817; cv=none; b=b61DUR2RpY/ChSuGduutLKw/QsgVftcpAg1YGinm5TvrCUQss9NlCGYFVG0fECLLE4XUbWWTqUJLMIuyIcs7ktOl+/0iBbvXHTZoXxevjvlbtOLS4U3wexvtl/eIa0UMTkwIFfwvtKhysFH07+/ezdcDvw6DKHkmk4yGJUG8FNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761606392; c=relaxed/simple;
-	bh=5+cC9rUGp+Qhc2isTMc45JlQ4CdwvIYA47KTGZq28Lw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VWcYNyNfsT5Itfc2A7xLxHebIhb4Gm863pmgS8ZN7Vv1PsLxVS5jMUn41ohm95gpHuhYMheM7ZXZOVRpbl6Kh4B9OK0Q/fotiEorQJlvOPJJ/9B2C2KMP0lSIUhlXbXE2Q95HNxrgAeXc7kjrtXNOIof1fIXRwd1e6wFUbDV0Ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com; spf=none smtp.mailfrom=osandov.com; dkim=pass (2048-bit key) header.d=osandov-com.20230601.gappssmtp.com header.i=@osandov-com.20230601.gappssmtp.com header.b=s1rlMNAs; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=osandov.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-33fc9550f68so955178a91.2
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:06:30 -0700 (PDT)
+	s=arc-20240116; t=1761606817; c=relaxed/simple;
+	bh=Mox7WVrx2nsqFbNnAMpCHXjsIB1mhexPun4YkmTSVd8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zqd8aumsNiFObzBSG71NJIp/g8UFSBsOiesNZhsyLIOr5QmU1XaXYS49ppPMl8SnpsQz4qZEQrerAf9OI1CZAZAE5xwuQCmAR6dXhbqyU7no01o60PI83wowoC5T3BMBP1vRV9dxPtOWFG01At4NehabbBqG22wFn3UHciexuyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o4thHGD1; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-592f9400b04so4589365e87.3
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:13:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20230601.gappssmtp.com; s=20230601; t=1761606390; x=1762211190; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FujRXKxtyB3paNujZd/CaQKsqivexQIWIeYXymH5QZc=;
-        b=s1rlMNAsgMpVJlRDn3zMrY4oX5/kCVHvDR+9+iFjtDfMeiW1C2Dtpdttj1O0y/7UbY
-         0IoALiDBs5qnoNixkn+LNpndvqWyT0w+LnxQhPEvVKqpzTKifZTJk7Uh6wRPPiHyEBFb
-         AIvw2UiX8xZvKsMvDPlrMNBgXRa7ot7pfwTR92tOf9uuwQGoUne7n0JVzWMZnsGYvGHT
-         bwRcNZbaYRDzD+rKdgKCdyPvOX5Q7ZWJMi0FgTNlUF2qetTQp6bqviNQ8QebzY92smk5
-         vKYEtsaDilOFHqZQheYypIGfOmWLhPIMOVvBBLz7OWA2NQsy1Lf4kIEiaVgFNBMY9EsZ
-         zfXg==
+        d=google.com; s=20230601; t=1761606814; x=1762211614; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cVb3sBQg3S7kfhJuRLHfxPiQ08+Bc1FaH34bvysQgyo=;
+        b=o4thHGD1/OUIjggnndqTnwnlW10eAEpX/HB4h+bHLKvOx8B1TxlHznc4je/pXuHVJb
+         KUWtUQR1veipMr2Rmi2ifY0nHaQJE4SOZsgGUYvgroxjQaBNPA4fc8tIJjVWU+P5ydbN
+         NMUJ0wQsP36BKbBPsDSPRE7pBO2mpYQgI0W6TZleqsHMtObXMIq70gyxPDxYUJwNLxh8
+         XlEkLw2+Qf2apLB06O5B0unQU9dZVLF2iZhswvxbkKJ9L9OijIDYQO/dP7G6zUwDGVKX
+         XkCJBuLbYSDWcFoYhBoM28SI/CUXMs1s/NHilUSaIj2p9npeD+I+8mm5i9UUiERiMfDH
+         VQCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761606390; x=1762211190;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FujRXKxtyB3paNujZd/CaQKsqivexQIWIeYXymH5QZc=;
-        b=iwX+pehO9ypjcAqHNwfHZU/OWkpxqDFB6bX1IXWNX0rWArkG3KlDcgqNum7GARTwVW
-         2o7l/fp7yozCoPmor0U5cBHg29eD4ytCD3KDKKQFWarRqBn8KHa6SWjyGBk4uboLODjE
-         MEVsXksuYM/nONxUqE8v8YUQ24ocSIdFA0N3jFNBSrYV5BbnNyTVgc2rm6X1RVRwEUy5
-         Fi74dj16PMa5q2GTKQH6v6uV+io3pUxGNnMboft5lxjR+a29IlCnLwSl67NfFG8NGZh4
-         J4Y8ZpjFM5IDsq/xJ+/7D5JdWWMI0auvAUcIL9MaKAOsH3znKRtIDtUEZUzma4xUqDuy
-         Uj1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWUTLemdZdrNBtb2a+WQrm2fRCzBsbRkJYNTJO0LdxBwk/HY8NRXf9dCbXaRn1GS0ebXfU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8laLBwu7Hhg1Vx8b1kLhHmAG6ojZnZNEzj2CfMjagUl4eeADF
-	Dw7dBHbVk1A9xtj4BznlIlgM+FLmHXFsZvlb8V8cLucD2Cq48iQZb+C9ZdH7CQSdnvk=
-X-Gm-Gg: ASbGncvPgzGEGKaChda9s6YalF0zDmBKle+9HXKa/dOyanF0/RfxSv7Xkpv8q1+kcW3
-	OGOlCZ4E70h6n7tYjyVTL/VZV1Y63BrqmiUQvh7i37V704p9657FDpa7h/j6MBo9OjnKFj8/ZJo
-	tklA1e8h2TPyweot2RSIsZ+iSoGr5qf7yVvXoBvEpuFl4X8QgHRcaMq+OKMeSJHx72vFdxMfWlD
-	IVPEm6HeClYJ/hLmr4emOlL1IIM4/vGY+xiinmIZmDpLrUMBbAD21i3dCOfxN1WHtBSmUW0zUZX
-	vt34l27N+fIqHeaZuGQYjFFxKcc3NNHjG+pVGY4luO7WRDcLd+yISY5wdOdqy+kZAN3okZwIBY2
-	2Tbmi0YNXINRmJaElgUrthhBcKSq6xeszKwWCYYuNJbuNaNw5+9JEjYS9Sj6ohjdJXp1JHrTBNa
-	spvnh0vSEm064r
-X-Google-Smtp-Source: AGHT+IHBmy/5J1pJb4D3bLqg0o9qFMfOGw69b9Acs08VWjqmeB97MwOKAbhCbKjcC/zmXUGkL4nAEg==
-X-Received: by 2002:a17:902:ebc6:b0:290:ab25:29a7 with SMTP id d9443c01a7336-294cb3945f2mr9579945ad.5.1761606390229;
-        Mon, 27 Oct 2025 16:06:30 -0700 (PDT)
-Received: from telecaster.thefacebook.com ([2620:10d:c090:500::4:c4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498d0a60fsm93789725ad.39.2025.10.27.16.06.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 16:06:29 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org
-Cc: Gregory Price <gourry@gourry.net>,
-	kernel-team@fb.com
-Subject: [PATCH] KVM: SVM: Don't skip unrelated instruction if INT3 is replaced
-Date: Mon, 27 Oct 2025 16:06:21 -0700
-Message-ID: <71043b76fc073af0fb27493a8e8d7f38c3c782c0.1761606191.git.osandov@fb.com>
-X-Mailer: git-send-email 2.51.0
+        d=1e100.net; s=20230601; t=1761606814; x=1762211614;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cVb3sBQg3S7kfhJuRLHfxPiQ08+Bc1FaH34bvysQgyo=;
+        b=tkgmLkaNTcvSJoNdOQrORMo62wto2//dYSvgQ6qi4HCFzkttvZ9r8MmWhUfE9PiFBS
+         0A69a3ONeJmKi8L0YGMxRKzOnzgQ8W0QNC1lf4+r9M1/6AeFAJ6lFXn4Yq7pVGWZome+
+         hD4rF2KQUNEU6weEBFbaxIFwwdYNEry+KhQ33cVpr/9wrnP03ZtU4QwdLB7WT/ekyY7K
+         wnSzlquebPLGUqzjwK7W2bHBE6syy5HWntPW9o5Kdf7OHV68+LBPLRRQpfyoCHsB7bBU
+         dRGpz2JChixnEPzJtiTDRaP6ECyo4Z1aKsPvpDXi4vd8tX5gTeifAKed/QnfnH+4XGpu
+         Cbeg==
+X-Forwarded-Encrypted: i=1; AJvYcCV/QJv4KcCHnsAdLujUheSEbKe31M5V949zLbvbu4CECWSOGX6+l3olimswP+HRY9g1GVM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRH51sXDl5Gx3Cfz1rUK8NucU1vq3RW7rLA1naj1w179y4+Z59
+	8+B+kQgtGs7CldRVao7+Mne340do9uqFxBueOXb9JwabLAUV6cts1u2xeqeReocdQJ9CePocUtK
+	Qzv4s7kxQjdB6UEfen2S+WgDKH3HQuOJ0+oPR3Dqg
+X-Gm-Gg: ASbGncv4LTnDKyfHrO+t4MRYP5buFrHVZnLW/kZ5EfLDHf8gtdFu7YKo1nhs0UilIYo
+	oXmtvPEj7QuEA6a1Lgs0Pk7o3qVL+0EE4QdywXOlIeV6Hv90xynXWzwsz4YmNwUr+3G1bfLkRCS
+	DjazwNrIyGg8fOaq4CBK/kWXLSUZXvrQ+pdTPTZ0L2npHfsmXy+KTjmEwNnvqb2AuDGvok1/7CB
+	BAqDsRZz0v4q7aaD4ogcxWGBxlDOLc8GdA4wue53AJCptlNfi3U0HXCXnj0Xm3DA37pqT8=
+X-Google-Smtp-Source: AGHT+IGl3ca765JSYQeeeNWnOc4ez61Rh9cYHuTu2Z8wbfu4++aeMX3ejm6+mpCGbnxLweY96XJw4Qd/Jsw/gJioL2Q=
+X-Received: by 2002:a05:6512:39ce:b0:585:c51e:e99d with SMTP id
+ 2adb3069b0e04-5930e98f2bbmr555951e87.3.1761606813913; Mon, 27 Oct 2025
+ 16:13:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1760368250.git.leon@kernel.org> <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
+In-Reply-To: <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 27 Oct 2025 16:13:05 -0700
+X-Gm-Features: AWmQ_blG76O58dB2_ktM5H7ZDlww5WUOcPernLo2oZm94nuYAfy2S9NihsUA1rg
+Message-ID: <CALzav=cj_g8ndvbWdm=dukW+37cDh04k1n7ssFrDG+dN3D+cbw@mail.gmail.com>
+Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO regions
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Leon Romanovsky <leonro@nvidia.com>, 
+	Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, 
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org, 
+	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-mm@kvack.org, 
+	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, Vivek Kasireddy <vivek.kasireddy@intel.com>, 
+	Will Deacon <will@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Omar Sandoval <osandov@fb.com>
+On Mon, Oct 13, 2025 at 8:44=E2=80=AFAM Leon Romanovsky <leon@kernel.org> w=
+rote:
+>
+> From: Leon Romanovsky <leonro@nvidia.com>
+>
+> Add support for exporting PCI device MMIO regions through dma-buf,
+> enabling safe sharing of non-struct page memory with controlled
+> lifetime management. This allows RDMA and other subsystems to import
+> dma-buf FDs and build them into memory regions for PCI P2P operations.
 
-We've been seeing guest VM kernel panics with "Oops: int3" coming from
-static branch checks. I found that the reported RIP is one instruction
-after where it's supposed to be, and I determined that when this
-happens, the RIP was injected by __svm_skip_emulated_instruction() on
-the host when a nested page fault was hit while vectoring an int3.
+> +/**
+> + * Upon VFIO_DEVICE_FEATURE_GET create a dma_buf fd for the
+> + * regions selected.
+> + *
+> + * open_flags are the typical flags passed to open(2), eg O_RDWR, O_CLOE=
+XEC,
+> + * etc. offset/length specify a slice of the region to create the dmabuf=
+ from.
+> + * nr_ranges is the total number of (P2P DMA) ranges that comprise the d=
+mabuf.
+> + *
+> + * Return: The fd number on success, -1 and errno is set on failure.
+> + */
+> +#define VFIO_DEVICE_FEATURE_DMA_BUF 11
+> +
+> +struct vfio_region_dma_range {
+> +       __u64 offset;
+> +       __u64 length;
+> +};
+> +
+> +struct vfio_device_feature_dma_buf {
+> +       __u32   region_index;
+> +       __u32   open_flags;
+> +       __u32   flags;
+> +       __u32   nr_ranges;
+> +       struct vfio_region_dma_range dma_ranges[];
+> +};
 
-Static branches use the smp_text_poke mechanism, which works by
-temporarily inserting an int3, then overwriting it. In the meantime,
-smp_text_poke_int3_handler() relies on getting an accurate RIP.
+This uAPI would be a good candidate for a VFIO selftest. You can test
+that it returns an error when it's supposed to, and a valid fd when
+it's supposed to. And once the iommufd importer side is ready, we can
+extend the test and verify that the fd can be mapped into iommufd.
 
-This temporary int3 from smp_text_poke is triggering the exact scenario
-described in the fixes commit: "if the guest executes INTn (no KVM
-injection), an exit occurs while vectoring the INTn, and the guest
-modifies the code stream while the exit is being handled, KVM will
-compute the incorrect next_rip due to "skipping" the wrong instruction."
-
-I'm able to reproduce this almost instantly by patching the guest kernel
-to hammer on a static branch [1] while a drgn script [2] on the host
-constantly swaps out the memory containing the guest's Task State
-Segment.
-
-The fixes commit also suggests a workaround: "A future enhancement to
-make this less awful would be for KVM to detect that the decoded
-instruction is not the correct INTn and drop the to-be-injected soft
-event." This implements that workaround.
-
-[1]: https://gist.github.com/osandov/44d17c51c28c0ac998ea0334edf90b5a
-[2]: https://gist.github.com/osandov/10e45e45afa29b11e0c7209247afc00b
-
-Fixes: 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
-Based on Linus's current tree.
-
- arch/x86/kvm/svm/svm.c | 40 ++++++++++++++++++++++++++++++++++++----
- 1 file changed, 36 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 153c12dbf3eb..4d72c308b50b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -271,8 +271,29 @@ static void svm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
- 
- }
- 
-+static bool emulated_instruction_matches_vector(struct kvm_vcpu *vcpu,
-+						unsigned int vector)
-+{
-+	switch (vector) {
-+	case BP_VECTOR:
-+		return vcpu->arch.emulate_ctxt->b == 0xcc ||
-+		       (vcpu->arch.emulate_ctxt->b == 0xcd &&
-+			vcpu->arch.emulate_ctxt->src.val == BP_VECTOR);
-+	case OF_VECTOR:
-+		return vcpu->arch.emulate_ctxt->b == 0xce;
-+	default:
-+		return false;
-+	}
-+}
-+
-+/*
-+ * If vector != 0, then this skips the instruction only if the instruction could
-+ * generate an interrupt with that vector. If not, then it fails, indicating
-+ * that the instruction should be retried.
-+ */
- static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
--					   bool commit_side_effects)
-+					   bool commit_side_effects,
-+					   unsigned int vector)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 	unsigned long old_rflags;
-@@ -293,8 +314,18 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
- 		if (unlikely(!commit_side_effects))
- 			old_rflags = svm->vmcb->save.rflags;
- 
--		if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
-+		if (vector == 0) {
-+			if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
-+				return 0;
-+		} else if (x86_decode_emulated_instruction(vcpu, EMULTYPE_SKIP,
-+							   NULL,
-+							   0) != EMULATION_OK ||
-+			   !emulated_instruction_matches_vector(vcpu, vector) ||
-+			   !kvm_emulate_instruction(vcpu,
-+						    EMULTYPE_SKIP |
-+						    EMULTYPE_NO_DECODE)) {
- 			return 0;
-+		}
- 
- 		if (unlikely(!commit_side_effects))
- 			svm->vmcb->save.rflags = old_rflags;
-@@ -311,7 +342,7 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
- 
- static int svm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
- {
--	return __svm_skip_emulated_instruction(vcpu, true);
-+	return __svm_skip_emulated_instruction(vcpu, true, 0);
- }
- 
- static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
-@@ -331,7 +362,8 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
- 	 * in use, the skip must not commit any side effects such as clearing
- 	 * the interrupt shadow or RFLAGS.RF.
- 	 */
--	if (!__svm_skip_emulated_instruction(vcpu, !nrips))
-+	if (!__svm_skip_emulated_instruction(vcpu, !nrips,
-+					     vcpu->arch.exception.vector))
- 		return -EIO;
- 
- 	rip = kvm_rip_read(vcpu);
--- 
-2.51.0
-
+It will probably be challenging to meaningfully exercise device P2P
+through a selftest, I haven't thought about how to extend the driver
+framework for that yet... But you can at least test that all the
+ioctls behave like they should.
 
