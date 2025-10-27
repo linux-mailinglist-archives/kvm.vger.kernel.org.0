@@ -1,206 +1,141 @@
-Return-Path: <kvm+bounces-61200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61199-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0379DC0F8AE
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 18:10:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4491CC0F8A5
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 18:10:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB5E040733B
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:07:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B202400499
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62D90315765;
-	Mon, 27 Oct 2025 17:07:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8065D313552;
+	Mon, 27 Oct 2025 17:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VpzI92Hu"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dCWMGFx3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAD6311C2D;
-	Mon, 27 Oct 2025 17:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CF92745E
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 17:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761584851; cv=none; b=dIdKCqOYXzSD05cMWHcUfv7bUGH4tY9ReAB/pcMtSTL3pR+kdMn50xUGZ+oQba9XwT35sn2TO5LwExH/dnFNrENkSppD7jOwi/PGJEyYsYrvmgPgD89Wkyj/iCz31Ajsgk0kR1aeyuF+tVpdao5+tyCICnHAruEKJM0NQpHOTsU=
+	t=1761584849; cv=none; b=eR1iTFglD14qv1ed6SqCa0rG37NPedtU0B25GIFf1sX0G8HJjLX57NLYd8u7J0PDaxNkuDDzYHWGBDWNv9sna5qMiO+52WFtxwaL1ZH7DdDuoiBVlCJYFq8hSMmRDZBw1D/djPnTu5eK9KoIxMWgq4J1glmplshq202Nc44Kgbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761584851; c=relaxed/simple;
-	bh=ucM7fRjoKoYUxznSURIg0AaZ/8S8CI4eHh5vkRbca48=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VflWnyV+R3Yp0n6GNBpF+1CNbYcLrKThXH79vl8ZGogBguHSE1Fx1xBOYHx1LgY+56FDDjzV7j99VnlZfKCmleptDiHgOk3jx5djayjQE3/uGrrTVF2pEap5RyINJQxIRGfJCHvV6GoLogB1IqYb6Kcy3ZdmYm/z+DPTzjYBj0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VpzI92Hu; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59RA70wc020576;
-	Mon, 27 Oct 2025 17:07:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=uLKyjT
-	8M3k/3o9glefxJgDuOwAZQD7YNtpBoB/AX1a0=; b=VpzI92HunhVJDXeN+0r72U
-	CyprHH8CjAHe+V+Ts/v5A9ASyy2fnbOcTYOUGCzTOD7UJ6kkCPkmIByg38V4wVZ3
-	sg9PHYawfeAkZljtTZAiSu9r0zTfyT9bQdNJ+M/zKosMwwmnSww4opFmJNe7KAfu
-	tVgixzWHERqN/PiwEpWR6Q45YEnfdDFQKlzXIDqcixl+elQt+pawl1syPABgKJIw
-	nngABrl3Gk1bbBCwosB7w6/e6zhP6p/wFamka+cFidjb/m4RsTETxhc5W/fvue2e
-	7U2idyaC4+LbQqcxIjDsi3p4L3vf1tNkkyyBM+YB9oVHZaaZ9N7KyCtMCPgOsYCQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a0p98yxvw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 27 Oct 2025 17:07:05 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 59RH3AUj003786;
-	Mon, 27 Oct 2025 17:07:04 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a0p98yxvq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 27 Oct 2025 17:07:04 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59RFJMVi030075;
-	Mon, 27 Oct 2025 17:07:03 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4a19vmepph-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 27 Oct 2025 17:07:03 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59RH6xWt53084528
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 27 Oct 2025 17:06:59 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 221052004B;
-	Mon, 27 Oct 2025 17:06:59 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5FD2D20040;
-	Mon, 27 Oct 2025 17:06:57 +0000 (GMT)
-Received: from [9.111.6.91] (unknown [9.111.6.91])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 27 Oct 2025 17:06:57 +0000 (GMT)
-Message-ID: <d4a09cc8-84b2-42a8-bd03-7fa3adee4a99@linux.ibm.com>
-Date: Mon, 27 Oct 2025 18:06:56 +0100
+	s=arc-20240116; t=1761584849; c=relaxed/simple;
+	bh=9a3+v5SSQm9CFNXUiTCelKARraMR9+J5h+medQHzgkI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=czqU4CNtwEN3cA3XXELw/Y66bHQL8QoBJg4CG+WPDQ8NyZ5lA4KqpJ8Ai2rg8/o925/VifB4J+w/HK7t6/62GjMWJJ6k1vsRjZOCnU9Ugst1Vokpzn3aAGAk6VNHa4SXmWwHVaIroqe384uRtbu4+GqDiyacxu+Qk4ggRiD2ubg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dCWMGFx3; arc=none smtp.client-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-63e393c4a8aso5870329d50.2
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 10:07:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1761584846; x=1762189646; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9a3+v5SSQm9CFNXUiTCelKARraMR9+J5h+medQHzgkI=;
+        b=dCWMGFx32wpjsXFX6hS318deWHwzY/2KXq/PHvQmPqHPCz17NxkzLjlHD/3da0/bKM
+         FGTPqWGhuE7hwTfAa6YbZinjWIYP/YpijU9EDgEtyYFlA9WgCncRkNBgGMkY6D0SGnZ5
+         O2CgmJgoK6yFCHUnIjxabzQRix667NqH6/Z/oGXEx9/F26SjQ5lmEN4lc90UTBb1BYUi
+         Vj7+gT6X2EPm2/z663mmytqpuEwEsfM8UY3Z7beMMjkrMQIOTckwufe0OTaVjPgV6Z73
+         bse0eyY0ACURbMrKhNht24/nLeOOLU3DbNKyiLWihgo+PGccSUByYGAq8pk1gXu69W/X
+         ht6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761584846; x=1762189646;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9a3+v5SSQm9CFNXUiTCelKARraMR9+J5h+medQHzgkI=;
+        b=UOkLgNoGiiHRegLp469rPKN+3sWWXn6BawwhXmabBmJxgsWleq/CoNvYxUlOubp/Gw
+         LC14NbFtHy8R4aLQHY7+dN8IjCemaWEv6tJuxALGtR8QjuxeOFJiGnGRExCuQNF40BG1
+         mSsD5soDewLZ2gfGyYfsdzMCzGGY1R6Lj6CY6bBxK2GL8BIU51/cJyZWHGvX0/ON6tH4
+         t8mmoZ+zpPSZU3eQk9pr2GuPOhwTELb9h1DrOkAYeP0SzbnPv9ZLCe9kiNs+1t0aNKDC
+         jMACrcav/82e02dBW8M1QhzPHZ2hCS1c5CcoF7V8waERIcIkl4wgxBXsRYfHCWgD9bUV
+         nHFw==
+X-Forwarded-Encrypted: i=1; AJvYcCWZvA95MoiH0q7AXOOhuEO6HfnsXdfaYIl5CqeFHcSY2xxjKAcHMuM8tvcvOcyJh5mew7g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwLUwe8yXIgjJUmgaDD86xDvwQEacBS2E53nwaqgCHLfqJn8a2
+	5FrHVR6dmUoLQG+aPvhYjcWJvoRQI/b8YYVMeOi00E43UfnZJVcyALqphcbWIaWU4H3wcj6fXtP
+	St3medRCB16DIQK8U7P3JX+bBql7m5hfO7VXRAlZNvQ==
+X-Gm-Gg: ASbGncsLUGfStSj7K0RFQ+ffES5tw683WvYIpxBX5fUJQRY8+U6/EgoqipY/ViSmJXJ
+	KcsEWwpAr5mH8quzys1emY4C+q2iOecDmBcDSEG5LbAjWKR6rD7yzpB6eW4RR8FDhSOxR0ycCXK
+	Y5bBxoUE6jSakxNKMEQ+9dVWLC2XO1GtSt+swPiSVxvR991l/BV3vu18zeDSAfWliOhoLZUqsQj
+	12NJq0UanJ7fE6aMBgS6E601MGlXpWDLBhlMXqWqWLitD1ngFF9VT5qUr8fgg==
+X-Google-Smtp-Source: AGHT+IGaTaPWC/WOrfEqNVYhpfV9r0OjkR1NtUO5NaJbkPQpnMmVRGjIDGUpgnQjORUQZ+ZZt7Q98zHS0ED+M4U4bI0=
+X-Received: by 2002:a05:690e:2c7:b0:63e:1031:9a2b with SMTP id
+ 956f58d0204a3-63f6ba40150mr496652d50.40.1761584844928; Mon, 27 Oct 2025
+ 10:07:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: linux-next: KVM/s390x regression
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Cc: Balbir Singh <balbirs@nvidia.com>, Liam.Howlett@oracle.com,
-        airlied@gmail.com, akpm@linux-foundation.org, apopple@nvidia.com,
-        baohua@kernel.org, baolin.wang@linux.alibaba.com, byungchul@sk.com,
-        dakr@kernel.org, dev.jain@arm.com, dri-devel@lists.freedesktop.org,
-        francois.dugast@intel.com, gourry@gourry.net, joshua.hahnjy@gmail.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        lorenzo.stoakes@oracle.com, lyude@redhat.com, matthew.brost@intel.com,
-        mpenttil@redhat.com, npache@redhat.com, osalvador@suse.de,
-        rakie.kim@sk.com, rcampbell@nvidia.com, ryan.roberts@arm.com,
-        simona@ffwll.ch, ying.huang@linux.alibaba.com, ziy@nvidia.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-next@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-References: <20251001065707.920170-4-balbirs@nvidia.com>
- <20251017144924.10034-1-borntraeger@linux.ibm.com>
- <9beff9d6-47c7-4a65-b320-43efd1e12687@redhat.com>
- <c67386be-5278-411d-97e7-43fc34bf7c98@linux.ibm.com>
- <8c778cd0-5608-4852-9840-4d98828d7b33@redhat.com>
- <74272098-cfb7-424b-a55e-55e94f04524e@linux.ibm.com>
- <84349344-b127-41f6-99f1-10f907c2bd07@redhat.com>
- <c9f28d0c-6b06-47a2-884d-7533f7b49c45@nvidia.com>
- <f5debf87-0477-4d6a-8280-0cd95cd09412@linux.ibm.com>
- <748cdc18-e32d-41bd-90d1-a102b1c51e06@redhat.com>
- <20251027174726.5d8fcce7@p-imbrenda>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20251027174726.5d8fcce7@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=JqL8bc4C c=1 sm=1 tr=0 ts=68ffa6b9 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8 a=msJL1EFK9IJUNjeMVdoA:9 a=QEXdDO2ut3YA:10
- a=nl4s5V0KI7Kw-pW0DWrs:22 a=pHzHmUro8NiASowvMSCR:22 a=xoEH_sTeL_Rfw54TyV31:22
-X-Proofpoint-GUID: MOGZH8ccG6tAEu5_hBx4-eegLHC9lfEW
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI1MDAxOSBTYWx0ZWRfXwpspLYoyGC4+
- qsI0n+NSKZgi2CbdZ86s6swgxKXBUX6FUOCYnyJuTIaEIQTzZxGUZXbv11Qv99Q3jDEEQPSV/Hv
- cRJKZ9kbiUug8UrRmGxUnNW3X8Nn0VEk9L+Lw4TX2zS6MfHVWFxq2Ou9vPcFgm4ZVdYdHv3Fx9g
- mELAbHjLJMQR4dMSJGTeZCMgNTj0M8g/W1DPWrYTmv7LUsZrITgfioTkX6BzH9Pm5VJTO3KJ3k1
- 6IfYKsIOcUdgS/rZglHitQeCEaUU3lDhb8Ol/tFbNpeGZ9IkF4TVgMMhzNRa3n1qRRnHjWPsoXQ
- dmqQ6ElJco+pM3CsyDTZII1pgXxT2gTjVluCpZYRMoIw/4XdoPmF/uJA+NjBJzOEyDbP3DByT0y
- p6rQ0kgUriDFhIPWChquqz4pnEmaHQ==
-X-Proofpoint-ORIG-GUID: dUb5HY34K2zBB1zAL-pOCzz2ztjXwk1X
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-27_06,2025-10-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 clxscore=1015 lowpriorityscore=0 malwarescore=0 bulkscore=0
- priorityscore=1501 spamscore=0 adultscore=0 phishscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510250019
+References: <20250920140124.63046-1-mohamed@unpredictable.fr>
+ <20250920140124.63046-4-mohamed@unpredictable.fr> <CAFEAcA-398ZMeLUbHWyUw4np81mLikEn2PkQnFQMY4oY_iWRFA@mail.gmail.com>
+ <29E39B1C-40D3-4BBA-8B0B-C39594BA9B29@unpredictable.fr> <CAFEAcA93e6GL9agaCBZ2AabB21JrS6KS6MsbRHGPwdc_vj7xDQ@mail.gmail.com>
+ <890B1091-0ADB-459F-B1C9-173EC32DDADA@unpredictable.fr>
+In-Reply-To: <890B1091-0ADB-459F-B1C9-173EC32DDADA@unpredictable.fr>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Oct 2025 17:07:13 +0000
+X-Gm-Features: AWmQ_bkJ5wc1isPc1iZpVsJRHdyiMm-ivEfqxZwcgJGUfHx4zKryr8V0lPngkKg
+Message-ID: <CAFEAcA85m9FPGfm_tqfM6zsLC2C2+0fi+VWSBk-bojtaP_LYTA@mail.gmail.com>
+Subject: Re: [PATCH v6 03/23] hw/arm: virt: add GICv2m for the case when ITS
+ is not available
+To: Mohamed Mediouni <mohamed@unpredictable.fr>
+Cc: qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, 
+	Yanan Wang <wangyanan55@huawei.com>, Phil Dennis-Jordan <phil@philjordan.eu>, 
+	=?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
+	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
+	Mads Ynddal <mads@ynddal.dk>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	Cameron Esfahani <dirty@apple.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhao Liu <zhao1.liu@intel.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Igor Mammedov <imammedo@redhat.com>, 
+	qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, 
+	Roman Bolshakov <rbolshakov@ddn.com>, Pedro Barbuda <pbarbuda@microsoft.com>, 
+	Alexander Graf <agraf@csgraf.de>, Sunil Muthuswamy <sunilmut@microsoft.com>, 
+	Eduardo Habkost <eduardo@habkost.net>, Ani Sinha <anisinha@redhat.com>, 
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Am 27.10.25 um 17:47 schrieb Claudio Imbrenda:
-> On Mon, 20 Oct 2025 10:41:28 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 20.10.25 09:00, Christian Borntraeger wrote:
->>> Am 17.10.25 um 23:56 schrieb Balbir Singh:
->>>    
->>>> In the meanwhile, does this fix/workaround work?
->>>>
->>>> diff --git a/mm/pgtable-generic.c b/mm/pgtable-generic.c
->>>> index 0c847cdf4fd3..31c1754d5bd4 100644
->>>> --- a/mm/pgtable-generic.c
->>>> +++ b/mm/pgtable-generic.c
->>>> @@ -290,7 +290,7 @@ pte_t *___pte_offset_map(pmd_t *pmd, unsigned long addr, pmd_t *pmdvalp)
->>>>     
->>>>     	if (pmdvalp)
->>>>     		*pmdvalp = pmdval;
->>>> -	if (unlikely(pmd_none(pmdval) || !pmd_present(pmdval)))
->>>> +	if (unlikely(pmd_none(pmdval) || is_pmd_non_present_folio_entry(pmdval)))
->>>>     		goto nomap;
->>>>     	if (unlikely(pmd_trans_huge(pmdval)))
->>>>     		goto nomap;
->>>>   
->>>
->>> Yes, this seems to work.
->>
->> Right, but that's not what we will want here. We'll have to adjust s390x
->> gmap code (which is getting redesigned either way) to only take the page
->> lock.
->>
->> In the end, we'll want here later a single
->>
->> if (!pmd_present(pmdval))
->> 	goto nomap;
->>
-> 
-> this seems to do the trick:
-> 
-> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-> index 8ff6bba107e8..22c448b32340 100644
-> --- a/arch/s390/mm/gmap.c
-> +++ b/arch/s390/mm/gmap.c
-> @@ -599,8 +599,9 @@ int __gmap_link(struct gmap *gmap, unsigned long
-> gaddr, unsigned long vmaddr) | _SEGMENT_ENTRY_GMAP_UC
->                                          | _SEGMENT_ENTRY;
->                          } else
-> -                               *table = pmd_val(*pmd) &
-> -                                       _SEGMENT_ENTRY_HARDWARE_BITS;
-> +                               *table = (pmd_val(*pmd) &
-> +                                       _SEGMENT_ENTRY_HARDWARE_BITS)
-> +                                       | _SEGMENT_ENTRY;
->                  }
->          } else if (*table & _SEGMENT_ENTRY_PROTECT &&
->                     !(pmd_val(*pmd) & _SEGMENT_ENTRY_PROTECT)) {
-> 
-> 
+On Mon, 27 Oct 2025 at 16:53, Mohamed Mediouni <mohamed@unpredictable.fr> wrote:
+> > On 27. Oct 2025, at 17:03, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > I guess that would be an argument for the "give the property
+> > the right name so we can say "msi=(off,its,gicv2m,auto)". Then
+> > you could say
+> > -accel tcg -machine gic-version=3,msi=gicv2m
+> >
+> > to test that setup.
+>
+> Is there guidance around renaming properties?
 
-Tested-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+I'm not sure if there is. So the below is just my
+initial suggestion.
 
-can you send a proper patch? I guess we should add it to Andrews mm true to keep it close to the patch that uncovered the issue.
-s390 maintainers cced.
+> Would it be proper to do:
+> - if its=auto, consider the new msi property
+> - otherwise, use the its property
+
+I think we should write the code in a way that looks ahead
+to marking the its property as deprecated and eventually
+removing it. So the handling for the new "msi" property
+should be done in a way that doesn't need changes if/when we
+drop the "its" property.
+
+We don't currently attempt to detect oddball user
+commandlines like "-M virt,its=on,its=off", so I don't
+think we need to go to any particular effort to diagnose
+the equivalently odd "-M virt,its=on,msi=off" etc.
+
+We can implement the two options as essentially
+independent, where "its=on" is equivalent to "msi=auto"
+and "its=off" is equivalent to "msi=off" (i.e. what
+we currently have as a bool turns into an enum, and the
+set/get functions for "its" and "msi" both operate on
+the same underlying struct field.)
+
+thanks
+-- PMM
 
