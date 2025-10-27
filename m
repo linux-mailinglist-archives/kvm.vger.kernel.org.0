@@ -1,134 +1,241 @@
-Return-Path: <kvm+bounces-61183-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61184-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEBA3C0F2B2
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:08:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECA64C0F2E8
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:11:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B556519C0C88
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 16:04:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D256119C213A
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 16:10:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD382877D2;
-	Mon, 27 Oct 2025 16:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A63311942;
+	Mon, 27 Oct 2025 16:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ww4P3DE7"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="kC9k2C1i"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1B630C37A
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264283115A1
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761581054; cv=none; b=gOqILSpZc6346GKOv50emnuoTFd6NaVbhZ0y0hsCdUBJFmVLxyzCXvwpJ98JlQoLK/JuW3CvOgoux3E2Hx9QKNC8eMsRkO36QCc6SdDsK71mGiadfpDF9fkhdlegnHTDtdKAFPAJPjs5VArAcxYHHriHMPNgo9HCW2oG9ZUjYVs=
+	t=1761581367; cv=none; b=KdW4krnZVdK5iqrcjEZr1xmmszRB4sj6qvURIsF8xCyQoJC+GM1JJanuR4bTcAZpMkAOGi29onXpv5Y2kwBJ28Phu48z7Y5hFosbrB8Beu37JRSW5dD0kqw0KASHlgC44As8cLoMkf0BpQaE7aIzUiuDr/UsE9ExLq4Bs6HVCj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761581054; c=relaxed/simple;
-	bh=DYNT/VChXtqrA2sDhHO3vFbenRYCP9kylJFBh2XvWzw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uYhOcT+PYjEBzz8/oQmtUClFjNy24+jAFqZWmSoN/p7t4ZfZAUEbHeOQaV7Zk6uwb604eXeLvHi2nEd/rXvJ6xvW6koGcKlJIwt7e+Ck1yHG7Q7gtn2cjOGUDquHFJ9iktfTfJxHqvLNh1d1g4SmPjv5mDFJfIH8V/AsS1Q2pXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ww4P3DE7; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-378cfd75fb0so51896261fa.1
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:04:12 -0700 (PDT)
+	s=arc-20240116; t=1761581367; c=relaxed/simple;
+	bh=Ip6risDW9tTbsO2jqPpdXFWuol17OZMU9AeN0DDZC0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=laLS/4oOFJXc3KcHdAVlPLZpY8QHMiQvrKbE4RCCAcavSh5RANF0TzKSM555+2cPgpaJ3QX68E8BHjcZnm/qR09jTPJI10RUqlJWjyQgy+/MWIMFH/yKczWPKDGbrn+AfkGJmIvXyBe81HE4gxzq2pYioLfjiMLhI/Kc1ZDyNns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=kC9k2C1i; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-893c373500cso493734385a.0
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:09:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761581051; x=1762185851; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zpFhVdVLgSZYYPYkv9Xm+ppo7V2oCjM7bP0bHDIGOyQ=;
-        b=ww4P3DE7nlxkXwimf803r5KuGrtcr9I8YBO4BjBHZGIUdG9ORfyxPgbbFAS9Wg2xcb
-         +MTX3PGI46Bob64+S7ccqkBAUnE4YQSS0MTmQiaPfaH+jUq514H3IRW98wambuAAKj9G
-         uM0TxE6ErPmaVkcKhzTr60lTnikKoYh1X2r2VBH14q23HsW2Ne9QaxRbEOeWm0Tt/mH4
-         BHaJuSwHtGPwpeYhFmCK1aYqb5WWlTiffaJcf0G/6ZCboZZ2/RbGkDtcUhT8K88Sw25M
-         EXDzNxeOmEm3gjVnuU8Yyh2ueQNQSR+geh1OF9GjBwdcMABZseMUfSvU7FtVxFYKeTxy
-         B+kA==
+        d=ziepe.ca; s=google; t=1761581365; x=1762186165; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=anSGbOUh9PRDsyCb0fgwZTMvbpzdcHnK6psdZLJfHyQ=;
+        b=kC9k2C1ipB0+8n0nDWV75bFcRvL16rGr//zO4g2ezNYzc8ibboc9Zs5rmRW7okfp9v
+         KopeJr+kws+jhfq0fZmMCiBiRti6OMf9RdiPLOcmUZAqpS63TxOtRtGWXWE8Q5lqfpE0
+         NrM673GKnBk5KHQAuN4kS1BmUvuiUs47eQ2Zvtzi1vK3bAzGm8xeKcwwhe0L/5uQmQER
+         QA/S9+XxULInuMBS0xIGXOZDPwhZDsE59jnGgg7KSs5iete7eY5t0xIHXWJWXUi9kWg0
+         aJyKPS7GRYfHJS9hlMnkVvENbtR/hTzMszY4O/KuBknMNAg0XqetkaokiwRVA98WqbgI
+         dK4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761581051; x=1762185851;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zpFhVdVLgSZYYPYkv9Xm+ppo7V2oCjM7bP0bHDIGOyQ=;
-        b=TwmGzzHbDV6RwuBCY/Bjhx+9QLhkXa0ualnEcNmWIrHJv52WkAkMF/BD8npUxuHdeT
-         7tCYu/QY39p0191Qzm7w/h4RQeusT9RHeSP9iMKeikCURS9K+FuBhv4GyPF/8159+CCX
-         zKCyjvyi8c2OQxPr8MpOabnkgYoBJalxE/DUsW/XKR9DIwfnnk9rdI+qNAstH16V+6we
-         Hdj0x+GIrQ3dj012HNHuF1eMpqDvAN2wDRiqFiKVW3MJwqjOUJInlsjD09/uXGCMFMVh
-         DwrVOOorBMHgQ3U7Vo7gAC2ypQK4GzJBjIMvz33ZEMYCZeAaH/8yzjlEPiBDyWmbmtrZ
-         kGeA==
-X-Forwarded-Encrypted: i=1; AJvYcCVgYVqYTCPjqR48kpZzVUFnHpf/esDCicOjz9L+c/1qyhjQ/zABM6209YI7dF8DLQrQbe4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3ttvdgGstfK/D6rU4pZnJGPsRS8IrStogrTX7IZn4XpyHrLE9
-	Cl7HtpLEv7aEhG9lgLGqb5scsLNpRCS5nWaNwYvgJpV2+egh8ZCSMCVVv1RGLDNikl/6NqdcE6l
-	q1+yzwdzZbkTcxxyTJzYXbCPy0tutOefaqxT6PXknrArJyTrUIXWP2XOT
-X-Gm-Gg: ASbGnct309t/pPvJuXptUeiWCLSeO2UV8TbqldIqEQTAY29tH9nBAJfso1HywFI/hXc
-	yr319W3ylalXp03WCX6xNBMrSJHb/25ca1sD+5n+ch1wecExeu8FPMW1djwqFhU7uvNcGpfCA7t
-	qh32P3QzqsXqWxpSwGO9XJnxXDL+nYf7Rvp3Ttmg663aAJ/oAJ4lkZJoljEimf64o1WCXdYAHLl
-	g0yMj4w1a57BTa2CGAp8QKOURJMubguAMdpgXMsQIs5MWBhbvc8HPmmQeMI
-X-Google-Smtp-Source: AGHT+IGoyTJm1oNUabEtAi7wxqKURcM0enDsqYKsw16P6RtMS3jkqu5ZA5d/yjT+nSCfooYWA3/HvqAjzrQjRYaNIg4=
-X-Received: by 2002:a05:651c:3248:20b0:378:df5b:fbb8 with SMTP id
- 38308e7fff4ca-379076dadb1mr459301fa.19.1761581050530; Mon, 27 Oct 2025
- 09:04:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761581365; x=1762186165;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=anSGbOUh9PRDsyCb0fgwZTMvbpzdcHnK6psdZLJfHyQ=;
+        b=nYMdo6VN6q9xneGMvslxsWhY0ajMSpDSFwmv3CHaRHlNeFWbCvE3sSQqV6Txf4SCz2
+         YNPG9L845rJXCjSpISli5ANO24npJnqjHK4FMnhaNwNW/jME2Zuhz5QgZm7xN6o8Pj0E
+         snO5d7pwf5MrCL9a2+NutDush33QPr65Gz/3g1vV0RaXWtwI2WZT/3y+jaxMyZSEnVD4
+         K/p18/5C+X6Zgnan33Ppgr32a/LVpzjOhSZpQHKl66F2JW3xZLYBMg39rkrLQAAWIeSh
+         fZV+p5JlU9ThroSqmbH+R0H6s0gD5jirl5d7Ngu675PldV2FaaVs4GsBuJmeim5RDnj8
+         LOiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwfb68kBAl2gW6JvVEBWrwt6pRbNQBQNvJZwXIYQ4DvnAfAhETg9I3FVzbkIr6bAaEddo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRFyxZtxEdYCsd7yQ1Vx+T+/2+1UW/pWOdzSChYYD/YuVow1Fa
+	nfkpu+JdF4/bYLZjBxf6PugdQY1u4s8jJYSjjj96hMRY7z5BK1JEktcftEI7iJcmyY4=
+X-Gm-Gg: ASbGncvcMdh51hdacqV8gV/qfJB2+vlV2LI4B7fq7CMBsYi98JWptp7jfJHtGsU5vN9
+	8hyjm/Io7e2xYk/lHII2lqokPPx+aJEngsLn+sRsfu4gfafQTp12CDCKS0ErcZVg5oJcO4jlc38
+	0pUbagUOTT7TAypTRIfPefWEqdhdRd3VUB+BnwhVinSUsjZdf4nfuTjs1TfBUso+EcKdFp+VhrD
+	x74Ir83XqFzNBKHhWLsHvX+qAoPF84gux7o8BzYqJbtC1KK5WioygSqph7MSlyzIx5TsR2OwXHS
+	vkEMX9CaeeZqSULurvOrNJcFdWQrvL0NQFlGsHPKLKYdXWqyGltz83P7vtYcOfTAOKI16TNaQPl
+	TWW1JZyN0yxakCG5cjRGtYefxajLr+X0661WtJ8mWqR+BXubzLytYDvHzgsDgzhomwXp6iKDDFi
+	zXQc4PqlkGee1SjAaDlObMw+1P97RtWkLU3a3oOg8fKYrx8MluW+uszozq
+X-Google-Smtp-Source: AGHT+IHlNcX7M4ho1Hgm07pKSXRDLSWwAqfcPM4p2At44BY4PwXR6XnbKFaciXa2MkD0JUoTO3ORTg==
+X-Received: by 2002:a05:620a:1aa1:b0:8a3:9a05:ec15 with SMTP id af79cd13be357-8a6d072570emr95429085a.19.1761581364508;
+        Mon, 27 Oct 2025 09:09:24 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-89f25c8a34dsm624408985a.48.2025.10.27.09.09.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Oct 2025 09:09:23 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vDPmd-00000004HT9-1p2Z;
+	Mon, 27 Oct 2025 13:09:23 -0300
+Date: Mon, 27 Oct 2025 13:09:23 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>, Zi Yan <ziy@nvidia.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+	Lance Yang <lance.yang@linux.dev>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+	Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+	Peter Xu <peterx@redhat.com>, Matthew Wilcox <willy@infradead.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+	Byungchul Park <byungchul@sk.com>,
+	Gregory Price <gourry@gourry.net>,
+	Ying Huang <ying.huang@linux.alibaba.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	Pedro Falcato <pfalcato@suse.de>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
+	kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [RFC PATCH 00/12] remove is_swap_[pte, pmd]() + non-swap
+ confusion
+Message-ID: <20251027160923.GF760669@ziepe.ca>
+References: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250912222525.2515416-1-dmatlack@google.com> <aP-ULL69aQfCOwCb@google.com>
-In-Reply-To: <aP-ULL69aQfCOwCb@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 27 Oct 2025 09:03:41 -0700
-X-Gm-Features: AWmQ_bm4QqK0xoOsZ6a7g1Ai6-HjU7xmmVDri0NNObOO-yyk5EMmALHZgIe_pdk
-Message-ID: <CALzav=dTcRmF3UAYJNGNoG0D5e2GPmwavt8hM_ovfZrKXjO3vA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] KVM: selftests: Link with VFIO selftests lib and test
- device interrupts
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
 
-On Mon, Oct 27, 2025 at 8:47=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, Sep 12, 2025, David Matlack wrote:
-> > This series can be found on GitHub:
-> >
-> >   https://github.com/dmatlack/linux/tree/kvm/selftests/vfio_pci_irq_tes=
-t/v1
->
-> ...
->
-> > David Matlack (2):
-> >   KVM: selftests: Build and link sefltests/vfio/lib into KVM selftests
-> >   KVM: selftests: Add a test for vfio-pci device IRQ delivery to vCPUs
-> >
-> >  tools/testing/selftests/kvm/Makefile.kvm      |   6 +-
-> >  .../testing/selftests/kvm/vfio_pci_irq_test.c | 507 ++++++++++++++++++
-> >  2 files changed, 512 insertions(+), 1 deletion(-)
-> >  create mode 100644 tools/testing/selftests/kvm/vfio_pci_irq_test.c
-> >
-> >
-> > base-commit: 093458c58f830d0a713fab0de037df5f0ce24fef
-> > prerequisite-patch-id: 72dce9cd586ac36ea378354735d9fabe2f3c445e
-> > prerequisite-patch-id: a8c7ccfd91ce3208f328e8af7b25c83bff8d464d
->
-> Please don't base series on prerequisite patches unless there is a hard d=
-ependency.
->
->   ffdc6a9d6d9eb20c855404e2c09b6b2ea25b4a04 KVM: selftests: Rename $(ARCH_=
-DIR) to $(SRCARCH)
->   9dc0c1189dfa1f4eef3856445fa72c9fb1e14d1c Revert "KVM: selftests: Overri=
-de ARCH for x86_64 instead of using ARCH_DIR"
->
-> By all means, do testing on top of such patches if that's what your envir=
-onment
-> effectively dictates, but rebase/drop such prereqs before posting, as the=
-y add
-> noise and friction.  E.g. these patches don't apply cleanly on kvm-x86/ne=
-xt due
-> to the prereqs.
+On Fri, Oct 24, 2025 at 08:41:16AM +0100, Lorenzo Stoakes wrote:
+> There's an established convention in the kernel that we treat leaf page
+> tables (so far at the PTE, PMD level) as containing 'swap entries' should
+> they be neither empty (i.e. p**_none() evaluating true) nor present
+> (i.e. p**_present() evaluating true).
 
-Makes sense. I will send patches applied without prereqs specific to
-my environment next time.
+I have to say I've never liked the none-vs-present naming either.
+
+> This is deeply confusing, so this series goes further and eliminates the
+> non_swap_entry() predicate, replacing it with is_non_present_entry() - with
+> an eye to a new convention of referring to these non-swap 'swap entries' as
+> non-present.
+
+I'm not keen on is_non_present_entry(), it seems confusing again.
+
+It looks like we are stuck with swp_entry_t as the being the handle
+for a non-present pte. Oh well, not a great name, but fine..
+
+So we think of that swp_entry_t having multiple types: swap, migration,
+device private, etc, etc
+
+Then I'd think the general pattern should be to get a swp_entry_t:
+
+    if (pte_present(pte))
+        return;
+    swpent = pte_to_swp_entry(pte);
+
+And then evaluate the type:
+
+    if (swpent_is_swap()) {
+    }
+
+
+If you keep the naming as "swp_entry" indicates the multi-type value,
+then "swap" can mean a swp_entry which is used by the swap subsystem.
+
+That suggests functions like this:
+
+swpent_is_swap()
+swpent_is_migration()
+..
+
+and your higher level helpers like:
+
+/* True if the pte is a swpent_is_swap() */
+static inline bool swpent_get_swap_pte(pte_t pte, swp_entry_t *entryp)
+{
+   if (pte_present(pte))
+        return false;
+   *swpent = pte_to_swp_entry(pte);
+   return swpent_is_swap(*swpent);
+}
+
+I also think it will be more readable to keep all these things under a
+swpent namespace instead of using unstructured english names.
+
+> * pte_to_swp_entry_or_zero() - allows for convenient conversion from a PTE
+>   to a swap entry if present, or an empty swap entry if none. This is
+>   useful as many swap entry conversions are simply checking for flags for
+>   which this suffices.
+
+I'd expect a safe function should be more like
+
+   *swpent = pte_to_swp_entry_safe(pte);
+   return swpent_is_swap(*swpent);
+
+Where "safe" means that if the PTE is None or Present then
+swpent_is_XX() == false. Ie it returns a 0 swpent and 0 swpent is
+always nothing.
+
+> * get_pte_swap_entry() - Retrieves a PTE swap entry if it truly is a swap
+>   entry (i.e. not a non-present entry), returning true if so, otherwise
+>   returns false. This simplifies a lot of logic that previously open-coded
+>   this.
+
+Like this is still a tortured function:
+
++static inline bool get_pte_swap_entry(pte_t pte, swp_entry_t *entryp)
++{
++       if (pte_present(pte))
++               return false;
++       if (pte_none(pte))
++               return false;
++
++       *entryp = pte_to_swp_entry(pte);
++       if (non_swap_entry(*entryp))
++               return false;
++
++       return true;
++}
++
+
+static inline bool get_pte_swap_entry(pte_t pte, swp_entry_t *entryp)
+{
+   return swpent_is_swap(*swpent = pte_to_swp_entry_safe(pte));
+}
+
+Maybe it doesn't even need an inline at that point?
+
+> * is_huge_pmd() - Determines if a PMD contains either a present transparent
+>   huge page entry or a huge non-present entry. This again simplifies a lot
+>   of logic that simply open-coded this.
+
+is_huge_or_swpent_pmd() would be nicer, IMHO. I think it is surprising
+when any of these APIs accept swap entries without being explicit
+
+Jason
 
