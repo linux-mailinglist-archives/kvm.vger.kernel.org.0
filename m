@@ -1,252 +1,287 @@
-Return-Path: <kvm+bounces-61230-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61231-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ABEEC11B75
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 23:31:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91901C11EB4
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 23:58:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D8D41A640B3
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 22:31:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E26663B8DD0
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 22:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB05D32C326;
-	Mon, 27 Oct 2025 22:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4453A32C944;
+	Mon, 27 Oct 2025 22:56:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bK+S7cqf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UP95p7b3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684F82E092D;
-	Mon, 27 Oct 2025 22:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761604234; cv=none; b=YCAa64ghOeYtasgi4BxvVj0js6DLwcoT9Mo0bTGocE+EX3jIT7Dl2fs16As/o2YuBCfwTUfH6H6/4bZUwahe+M65rgGOK18GBUxxZ6k9beVjAdDLATA0ns9NnnLAAc2TS+ZIMYMzr2qA4ND3sY4E8dvwhqJ8oDJqKJ5Uv7QkLKk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761604234; c=relaxed/simple;
-	bh=PUExZlzelglFJnu5PzrDtAcNO1FsDeFqop202nIj9Ms=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nyj1RDAfUNxOqiJUKloRlV7a3ADSZ3Xst6v93dYdmlq92rY5G9Rt3KYBjLtEi4yN49uP2oxNwjYKDbpC0PpJhnNPnB8lX9Zf+dyEO5gukmcd94Q1tR1Xjqnr0B1ZSRmEpQCkNSszv3eL0vMmHPB7TI4iJejwKvsg2hjHUO1Nemg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bK+S7cqf; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BDF2F692C;
+	Mon, 27 Oct 2025 22:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761605815; cv=fail; b=XuuKU7Vk53Y2U58eRJ8hHCq+83CO/opx3gB4lCmIwyedmwl40mBTW2BThiAPszvDfdSLoRD1on2AmbSxOMFw1s3lVxkFLGOEO7Q0+zAT2OvEjqZZV5/dCuZvKbyxzDKDZ8iKLqdoBdm4aYiJRXn44K6z1c5hFvjV/UVw+SkqiN8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761605815; c=relaxed/simple;
+	bh=KoXDkdLv5ADDOuQKr7zrQUDzAO1r14QHuCGq6JzFj9w=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=mUjZvTlgJ5ABff0M83DzRMFCD7tTo0M5ywokS3nJCv98IWKKT0SndkJRF/FDT9OywBGVNdQv7yY9nDhpZ23G1hnoLkVD7IsCW7PznsCI4XdFtQ3x6WJ9H8BZk0P2FY+L9Rc9cUPtZhBNrZ+ZCAWhVpCTiVuUN2rA67fE4hekBtY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UP95p7b3; arc=fail smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761604232; x=1793140232;
+  t=1761605814; x=1793141814;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PUExZlzelglFJnu5PzrDtAcNO1FsDeFqop202nIj9Ms=;
-  b=bK+S7cqfhOj0ZdfYCFo2OCqxbHJJrIDFJcaX2iXTdest5IgokESWO5tw
-   vy91dJJ4AcR3NbLMMGCQ+7nQ2Gn+G3DuE8QNTYwZXjJhlxmfsGuIjs6Zm
-   rtIoZ9/a8F64A/zfqp+W212sI0zULYxfrGxh7NGj6iOUnCn2WcsR95U6c
-   siHEQO9TbVTx4XIFqTqNd5au0HfklCJwt7BS1o66FOXFgA+FS8VvG8qXt
-   wCrjBQodLC59f7Xbdhvhx5bNqDdNUuVi8NtA5ciRHS0FiqWeftssSGzFB
-   aeFchReCWZuESFywB6K0hZo5nt9Gz6y0/WPpCDNlF8B5DVUPMIrP4tsb0
-   A==;
-X-CSE-ConnectionGUID: Rpo9Deg+TcaFx+Ibruc7rQ==
-X-CSE-MsgGUID: QpuVQpymSwWSwrfY0wLOXw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63733661"
-X-IronPort-AV: E=Sophos;i="6.19,259,1754982000"; 
-   d="scan'208";a="63733661"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 15:30:32 -0700
-X-CSE-ConnectionGUID: PZO6RrJGQQqqhiaIGvhGog==
-X-CSE-MsgGUID: 9pRK8rJ5TIOUDoUppIYEYg==
+   in-reply-to:mime-version;
+  bh=KoXDkdLv5ADDOuQKr7zrQUDzAO1r14QHuCGq6JzFj9w=;
+  b=UP95p7b3vNkm69DWHYz5RNZ1gtiGf4sZJGRP2uMZvDl7JzKPKYI2+pU5
+   TcwAUb1YG7fpjTfzEWYxMYZ61HNYcZvQ15bbW6rsiTZ9iR6gEaM//exns
+   ycWbgslXogS7WgYUWRvu7HXjBg05WxGViNmrU3F2DFgP7D2JnsMOzWGI+
+   5BGK1NUhei0kwMASmo6MzMj3V4alD3mnpXga1Cc2SNRfGYdVrj/zLqetp
+   azzHlWysXe2lfn9p89yyy3r9QbWGeO6He7WbDNO8ofC9P+aHpe/Nmy0Xp
+   NuCed3R4VXM2CCRBtaVWtmzmS2YgLM/Xytj3fSPlG8P10nv/ofAnbs3EY
+   Q==;
+X-CSE-ConnectionGUID: SpU8xs7PSM+wrzaZWQl/ow==
+X-CSE-MsgGUID: XRbuyr9CTqm3L77ud6UwLQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="63624828"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="63624828"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 15:56:53 -0700
+X-CSE-ConnectionGUID: MKBgEyQiQ8ugjgxbndTl6A==
+X-CSE-MsgGUID: DiXvWZoKSNaWn0ZlazGRzQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,259,1754982000"; 
-   d="scan'208";a="222378959"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by orviesa001.jf.intel.com with ESMTP; 27 Oct 2025 15:30:29 -0700
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vDVjO-000IWr-1x;
-	Mon, 27 Oct 2025 22:30:26 +0000
-Date: Tue, 28 Oct 2025 06:27:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: Nick Hudson <nhudson@akamai.com>, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, Nick Hudson <nhudson@akamai.com>,
-	Max Tottenham <mtottenh@akamai.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost: add a new ioctl VHOST_GET_VRING_WORKER_INFO and
- use in net.c
-Message-ID: <202510280631.i6odx2RJ-lkp@intel.com>
-References: <20251027102644.622305-1-nhudson@akamai.com>
+   d="scan'208";a="185075692"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 15:56:52 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 27 Oct 2025 15:56:52 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Mon, 27 Oct 2025 15:56:52 -0700
+Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.68) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 27 Oct 2025 15:56:52 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pdW40sOWdFfcwp7qpjz6q/CwI5QrtPQLNnTI3dI0V+uRoKqodTK1FsBgwfvr50yucXZjdubg6dG3gC2Uof1Fppzh11CY6lnbW7NF8QO798UwxcSCeeN34WR+B4RdtuJejAxOroNJpn9UuLiimpZg65qiPj5i+sifSOvgKBNom31K/L+5Fe9gRb2ZjYuNC51tPmUAn1WgzR4cTl92fhfSoFlUUBnFAe50ady3OWXPJaxGDZPSYyxyJm6NmMmX1Ao+a8782+75Eo0n9x3pWMqxhobopgkWp4YspYzs6j2q+HwzD5Nu3kR8+sa5gyWOgmmWPzXMlMOA4aMFdVmeFqWA+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nVjlu9942mdjQ9jbNqtb1grWscVdcY9KTfE+R1sbOmc=;
+ b=fKkvxGd4p9mNgNr7fb8mQKrmtvsTQZvJTFOHcDOO5SnjiDJNb80TV147nfxCQLGsfry88h5LXDzy+dWm23O0kkmjDEcwPgvDGarEHUEExj4fyEWj1fudpLWC56jUDY+1OZJY1Br4QfK8pC37VdLhG3bjI/N2jgaN+37Oy+5UvfJ1Ipktb8AjW681bmS6OcDDyFbhaVnzU3HhvNJP//dDqAz+suNEwxl7DhPBYMYZoKugSLWjbz+Dp92gwGSYv9/kipBFDLQwVo1Wpw/mz8yYCuMA43HWNU8HJRxX2LaMR59MPLxsjh290sARX47IpiiBw6+6tdTBBFarPcGd39XSVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH3PPF9E162731D.namprd11.prod.outlook.com
+ (2603:10b6:518:1::d3c) by SA2PR11MB5196.namprd11.prod.outlook.com
+ (2603:10b6:806:119::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.18; Mon, 27 Oct
+ 2025 22:56:39 +0000
+Received: from PH3PPF9E162731D.namprd11.prod.outlook.com
+ ([fe80::8289:cecc:ea5b:f0c]) by PH3PPF9E162731D.namprd11.prod.outlook.com
+ ([fe80::8289:cecc:ea5b:f0c%8]) with mapi id 15.20.9253.013; Mon, 27 Oct 2025
+ 22:56:39 +0000
+Date: Mon, 27 Oct 2025 17:58:58 -0500
+From: Ira Weiny <ira.weiny@intel.com>
+To: Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>
+CC: <linux-kselftest@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Ackerley Tng <ackerleytng@google.com>, "Ryan
+ Afranji" <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>, "Isaku
+ Yamahata" <isaku.yamahata@intel.com>, Erdem Aktas <erdemaktas@google.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Roger Wang
+	<runanwang@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton
+	<oliver.upton@linux.dev>, "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
+	Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny <ira.weiny@intel.com>,
+	Chao Gao <chao.gao@intel.com>, Chenyi Qiang <chenyi.qiang@intel.com>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v11 21/21] KVM: selftests: Add TDX lifecycle test
+Message-ID: <68fff9328b74_1ffdeb100d8@iweiny-mobl.notmuch>
+References: <20250925172851.606193-1-sagis@google.com>
+ <20250925172851.606193-22-sagis@google.com>
+ <aPum5qJjFH49YVyy@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aPum5qJjFH49YVyy@google.com>
+X-ClientProxiedBy: BYAPR21CA0019.namprd21.prod.outlook.com
+ (2603:10b6:a03:114::29) To PH3PPF9E162731D.namprd11.prod.outlook.com
+ (2603:10b6:518:1::d3c)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251027102644.622305-1-nhudson@akamai.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH3PPF9E162731D:EE_|SA2PR11MB5196:EE_
+X-MS-Office365-Filtering-Correlation-Id: 25cdd386-17e3-4e93-52a1-08de15ac1694
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Ovcvt21j1F/S/wH4aImXvEpNffv70u48PPNs0SU/oAvXmcAbO6cYXaPKrIUF?=
+ =?us-ascii?Q?dTeSUdkctZRCm2JxDNnxDpKRJHCk2TAPGewLXjEN69KZNEiSDQHFE7uLLQSA?=
+ =?us-ascii?Q?0WtgXc7p6h8/bqXiDkMPx3DYJsmMvjL5u4lZKeA1nd7jpXoCq2VYSPdTxU6P?=
+ =?us-ascii?Q?qg1SqSF97d8fhO1zewIK/37wkBLoZ/U49Qe6WC2x66gBdR9Id9E11O6e47aW?=
+ =?us-ascii?Q?tiXc2x6KAjyHeNvQi3rUQL4FxLFH9e1CCt3hAWPkyi9nVI0h84LAnzm7k/2v?=
+ =?us-ascii?Q?X+d4KZAH1RbgaBwId/+2aljIJC6d/FQow06ABV/yhtP5c6iFmSZnUZI9vjiZ?=
+ =?us-ascii?Q?FNGHjIX6Fjku6T3poJMdnajXGtVdU1TeHBwVjilu/eknnv+jDduGTFCpiYJD?=
+ =?us-ascii?Q?s++oTDX2FT6kqKXIWtEp8Tw/FMhmhLgdFlF/biMuhX1jBLi8a41wEPTDU0Cn?=
+ =?us-ascii?Q?J0igQK2xu3793dRzGXEYFY96iUl6Qvz41c4u7IM45BN32MLFa3FBaBv1++Wa?=
+ =?us-ascii?Q?ZAjhZowOZWRln/q6quBUgIbMdgNLz9oTBSCZECIWVkmDJZHKyHTLGhXK5ffF?=
+ =?us-ascii?Q?IiKBSbRpUoJTqDwJjoRyvR6Lnha+s5car0AsoPgMEH0ArMp7WhTgWtBSL2N/?=
+ =?us-ascii?Q?95MksEIedTM75ANHfpZRTBiknYKEauxup6wfX/TzzI8DTWTxojMuOdWRxPHe?=
+ =?us-ascii?Q?IJiDCjqc6cTDE02xcCr/yDvZPvxlunlF7rzgROzKDCuPtxhRbxwB2bLjvZn4?=
+ =?us-ascii?Q?ky0oKqThAy4B5qE6DaNcFHDc59IW7LJuwhlXJyhP0ARfGKWg59Rihp1IJPhK?=
+ =?us-ascii?Q?Qds0DXW3VKPgCuWytgtZsuxM1B2VVcPc5WgC3qPxMuoAB6R9o6nYJQivrDa0?=
+ =?us-ascii?Q?/+wQ5KNouqrK5bIqRCv+dkndYnaFjEX/23ZaTgmh5G66o46rYrRqv5Ue8oXy?=
+ =?us-ascii?Q?G/hQIDHgL/2odC3+5HxW3ArUDsXW5Rdmgn7sioTnkoKMoGkW+kPMCv8QG7EX?=
+ =?us-ascii?Q?hsMIgFFJFM+9/OR/dJ6fSOEVVFiW2YOHT5xrvXGnXx1vebEhWIj7PGUKSmmt?=
+ =?us-ascii?Q?1o7Bz/BISdKlnd/hZ8Ff8Uz3CAzAeHAa3l4Fv0yYCBHYwh1gU2rIcCGzanbD?=
+ =?us-ascii?Q?dF/WVqe/Y3IuSbfVnCMxCgMdjG7E1DzGAIKqFVmXE4954XAbqCwZhzTk/bY9?=
+ =?us-ascii?Q?t84z0UH+MyEvW8uHiuWLA9HOfzQoS7T9klIbu+GEuugwhAzs7oMd0yhQ+nGr?=
+ =?us-ascii?Q?NOMa2F3EFxOxxJ22CfnQqsC6Fvi/lW2Q/ljRSHDxEQTQfgMplnl79fvyIq5e?=
+ =?us-ascii?Q?MDfsJusXGktIxEMVW/3JzLwBF7s3q7LUM3TUhhHo+l9StJKaRVOogT5EgvUp?=
+ =?us-ascii?Q?oaR67pd7394g14akO7Sy/rWn8o2GczYSrM/sAzOQgHx3Blk9T8aG46HV52vv?=
+ =?us-ascii?Q?C/Qzy697bn84eZyR4CJH+J26IwV0dPav?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH3PPF9E162731D.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6sQ7WVfzwcIEVRVP/zGq4CBfn3VBK9HE/5Q7dWEclMyHmM62eia27EiPAzog?=
+ =?us-ascii?Q?Rb0R93GvZqnIJGSfn4StUlS7nIPMQeIAVvSXKssShUI49SrbrOSxILri+7w/?=
+ =?us-ascii?Q?+aqL7AZpiMUe3aLu7AkfrP9/phpLQw760I1KwHDIpGl2LlyJcNOhkMHl9Gtu?=
+ =?us-ascii?Q?aidjA+rL5b4S7VGFMtvBTsbr4WnC3Cs+RP/OuZO6J4YTtwttdDaopTI663FP?=
+ =?us-ascii?Q?KJ1AQBlHcPlhbJ7p8AvjwT34vUBy0KotTaM5oDCJjRZKCznmBmBiOLS4Vtza?=
+ =?us-ascii?Q?86lV5wBI3i+hCDRrCRJ5Ncf3qYZHsfmhUc/qZFjA2LNMYeHJb/cfq5uCNzJA?=
+ =?us-ascii?Q?xt8ORzlh7a0x/4TiMiP3kh9nYmqgC1qkPnlcOZDI67OmSwDsKDxZKZh4OR5S?=
+ =?us-ascii?Q?xVjEx1iE2HVOWKe5MFY0/fd8rqvJqqNNEPpFi7eFswQASUNMBhUcjqlAOE8l?=
+ =?us-ascii?Q?vqMFJdoTP20fqux271ca/tdkeSbtOlqqDlAvMyC1AwnucB6sVWqh+Ngv/tOl?=
+ =?us-ascii?Q?ktMrIS1HKQ6HXKIVHhcwicNIGwMD5IVPJCnNQShC64RIvxmbtSMYcAbAdqSj?=
+ =?us-ascii?Q?tkOH0LPql4W67pkJ40R8dk52Rs14VfaREF0Vtak7eU3RDNTtAF23Sy/bcJlW?=
+ =?us-ascii?Q?MsBQyrHVySee5xyvw4L0KGbtVEw2VYJDV02hDgaR5cy0SPFWIwN3V6wOWIXV?=
+ =?us-ascii?Q?eE8ATJzgjnlz4b9eD1WZvSqYXsocn9dVeN+uSuK4Quti+m/7EfLkdjsuFXyA?=
+ =?us-ascii?Q?wK1/fD6/ilZ8DJW60OfSfFTWA9wfAdOrIv1kHb6MzpPoD6ENkauE1eyqNRg2?=
+ =?us-ascii?Q?nFENQYeSk91YxWIajvEWf09eXUAWL0NA6glWWXu2kcB5HvRV6Kez+c9QB214?=
+ =?us-ascii?Q?ZurWBvqKKLptNwX+4Mej0O8sapzOh9p0ofZqeEF4dxWFvvnhUkU+WSmpw6UP?=
+ =?us-ascii?Q?OtL6jeyybbNX4cOI/y6wV4yjfz4R673sEPzRqjByuh0BnLxbuBSs+LyZLmz7?=
+ =?us-ascii?Q?zxOVWpDYbMVR+xTNGHJWoeSHs7fAz6ZD8Fg5Aabx2yu2IA+1bY+B/LvXfSm4?=
+ =?us-ascii?Q?2KMQ2auVWZcsu724yCm3y648l3sEdxDkpcIbyCZo10HPkV3tbnHklDSHmJhr?=
+ =?us-ascii?Q?aVDOgzxFGKeG5F+MCf0BUEE44g35wlaPRTmya4Q0n0xCBRA+QSm+/i6l9Reh?=
+ =?us-ascii?Q?WpAWu2DWbN3s2APyjS2fEk0XfjEssgJ7uZvgQSRnlOgqhcTXkgMmpv/eecX+?=
+ =?us-ascii?Q?QPh7hpC5/FEc5qL2g7n4bVxE0EVbjBTENO5+JAZnSE2rzo5lK0oGR53DWWuM?=
+ =?us-ascii?Q?6JtLRQ8crfh9mgpzmgaiv0RR9Ionm/eJpuL9z6B4V+H8SmLv6jBMmyrsgAm0?=
+ =?us-ascii?Q?TOLAUQ2Ll/VfzbdymC6f3iOAd1H5AR+3uTEjTYMsPMyt2SLCQJPCXmsY09XI?=
+ =?us-ascii?Q?JesthM3wxHmV+vA/4ORadI9qEOHzhZhN+PkHI1Xx9YagS/mSTuDYlalIK7EB?=
+ =?us-ascii?Q?UWMNQazyJzoylnBBNXZxmBZ6xlROU1f/nw/3mhpg0u8IxaY2Dh6o34ZR4fUX?=
+ =?us-ascii?Q?pXX/LO6m7zxjOTV+GPentmpYJCPc6yBbc6UvI5yc?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 25cdd386-17e3-4e93-52a1-08de15ac1694
+X-MS-Exchange-CrossTenant-AuthSource: PH3PPF9E162731D.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2025 22:56:39.3555
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yEu3pYspsATt9lcUTcUQglqPQ6tvafG/YRRjYhc0z6bxhddIH9JX80Ig417EraUKAsJgEFoNIl5Waa8BZkjggQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5196
+X-OriginatorOrg: intel.com
 
-Hi Nick,
+Sean Christopherson wrote:
+> On Thu, Sep 25, 2025, Sagi Shahar wrote:
+> > diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> > index 53cfadeff8de..714413e062fd 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> > @@ -328,3 +328,21 @@ void vm_tdx_finalize(struct kvm_vm *vm)
+> >  	load_td_private_memory(vm);
+> >  	vm_tdx_vm_ioctl(vm, KVM_TDX_FINALIZE_VM, 0, NULL);
+> >  }
+> > +
+> > +struct kvm_vm *vm_tdx_create_with_one_vcpu(void *guest_code,
+> > +					   struct kvm_vcpu **vcpu)
+> > +{
+> > +	struct vm_shape shape = {
+> > +		.mode = VM_MODE_DEFAULT,
+> > +		.type = KVM_X86_TDX_VM,
+> > +	};
+> > +	struct kvm_vm *vm;
+> > +	struct kvm_vcpu *vcpus[1];
+> > +
+> > +	vm = __vm_create_with_vcpus(shape, 1, 0, guest_code, vcpus);
+> > +	*vcpu = vcpus[0];
+> > +
+> > +	vm_tdx_finalize(vm);
+> > +
+> > +	return vm;
+> > +}
+> 
+> Rather than add a full wrapper, and duplicate all of vm_sev_create_with_one_vcpu(),
+> we should just add macros to convert a type to a shape.
+> 
+> E.g. with this, you can simply add:
+> 
+>   #define VM_SHAPE_TDX	VM_TYPE(KVM_X86_TDX_VM)
+> 
+> And coupled with Ira's suggestion regarding vm_tdx_finalize(), there should be
+> no need for vm_tdx_create_with_one_vcpu().
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on mst-vhost/linux-next]
-[also build test ERROR on linus/master v6.18-rc3 next-20251027]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Nick-Hudson/vhost-add-a-new-ioctl-VHOST_GET_VRING_WORKER_INFO-and-use-in-net-c/20251027-182919
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-patch link:    https://lore.kernel.org/r/20251027102644.622305-1-nhudson%40akamai.com
-patch subject: [PATCH] vhost: add a new ioctl VHOST_GET_VRING_WORKER_INFO and use in net.c
-config: csky-randconfig-002-20251028 (https://download.01.org/0day-ci/archive/20251028/202510280631.i6odx2RJ-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251028/202510280631.i6odx2RJ-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510280631.i6odx2RJ-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/vhost/vhost.c: In function 'vhost_dev_ioctl':
->> drivers/vhost/vhost.c:2403:17: error: 'worker' undeclared (first use in this function)
-    2403 |                 worker = rcu_dereference_check(vq->worker,
-         |                 ^~~~~~
-   drivers/vhost/vhost.c:2403:17: note: each undeclared identifier is reported only once for each function it appears in
-   In file included from include/linux/rbtree.h:24,
-                    from include/linux/mm_types.h:11,
-                    from include/linux/mmzone.h:22,
-                    from include/linux/gfp.h:7,
-                    from include/linux/mm.h:7,
-                    from include/linux/scatterlist.h:8,
-                    from include/linux/virtio.h:7,
-                    from include/linux/virtio_config.h:7,
-                    from include/uapi/linux/vhost_types.h:16,
-                    from include/uapi/linux/vhost.h:14,
-                    from drivers/vhost/vhost.c:14:
->> drivers/vhost/vhost.c:2403:48: error: 'vq' undeclared (first use in this function); did you mean 'rq'?
-    2403 |                 worker = rcu_dereference_check(vq->worker,
-         |                                                ^~
-   include/linux/rcupdate.h:532:17: note: in definition of macro '__rcu_dereference_check'
-     532 |         typeof(*p) *local = (typeof(*p) *__force)READ_ONCE(p); \
-         |                 ^
-   drivers/vhost/vhost.c:2403:26: note: in expansion of macro 'rcu_dereference_check'
-    2403 |                 worker = rcu_dereference_check(vq->worker,
-         |                          ^~~~~~~~~~~~~~~~~~~~~
->> drivers/vhost/vhost.c:2404:65: error: 'dev' undeclared (first use in this function); did you mean 'cdev'?
-    2404 |                                                lockdep_is_held(&dev->mutex));
-         |                                                                 ^~~
-   include/linux/rcupdate.h:483:52: note: in definition of macro 'RCU_LOCKDEP_WARN'
-     483 | #define RCU_LOCKDEP_WARN(c, s) do { } while (0 && (c))
-         |                                                    ^
-   include/linux/rcupdate.h:680:9: note: in expansion of macro '__rcu_dereference_check'
-     680 |         __rcu_dereference_check((p), __UNIQUE_ID(rcu), \
-         |         ^~~~~~~~~~~~~~~~~~~~~~~
-   drivers/vhost/vhost.c:2403:26: note: in expansion of macro 'rcu_dereference_check'
-    2403 |                 worker = rcu_dereference_check(vq->worker,
-         |                          ^~~~~~~~~~~~~~~~~~~~~
-   drivers/vhost/vhost.c:2404:48: note: in expansion of macro 'lockdep_is_held'
-    2404 |                                                lockdep_is_held(&dev->mutex));
-         |                                                ^~~~~~~~~~~~~~~
->> drivers/vhost/vhost.c:2406:25: error: 'ret' undeclared (first use in this function); did you mean 'net'?
-    2406 |                         ret = -EINVAL;
-         |                         ^~~
-         |                         net
->> drivers/vhost/vhost.c:2410:25: error: 'ring_worker_info' undeclared (first use in this function); did you mean 'print_worker_info'?
-    2410 |                 memset(&ring_worker_info, 0, sizeof(ring_worker_info));
-         |                         ^~~~~~~~~~~~~~~~
-         |                         print_worker_info
->> drivers/vhost/vhost.c:2411:42: error: 'idx' undeclared (first use in this function); did you mean 'ida'?
-    2411 |                 ring_worker_info.index = idx;
-         |                                          ^~~
-         |                                          ida
->> drivers/vhost/vhost.c:2413:60: error: implicit declaration of function 'vhost_get_task'; did you mean 'vhost_get_desc'? [-Wimplicit-function-declaration]
-    2413 |                 ring_worker_info.worker_pid = task_pid_vnr(vhost_get_task(worker->vtsk));
-         |                                                            ^~~~~~~~~~~~~~
-         |                                                            vhost_get_desc
+All sounds reasonable to me but some questions/comments below.
 
 
-vim +/worker +2403 drivers/vhost/vhost.c
+[snip]
 
-  2352	
-  2353		/* You must be the owner to do anything else */
-  2354		r = vhost_dev_check_owner(d);
-  2355		if (r)
-  2356			goto done;
-  2357	
-  2358		switch (ioctl) {
-  2359		case VHOST_SET_MEM_TABLE:
-  2360			r = vhost_set_memory(d, argp);
-  2361			break;
-  2362		case VHOST_SET_LOG_BASE:
-  2363			if (copy_from_user(&p, argp, sizeof p)) {
-  2364				r = -EFAULT;
-  2365				break;
-  2366			}
-  2367			if ((u64)(unsigned long)p != p) {
-  2368				r = -EFAULT;
-  2369				break;
-  2370			}
-  2371			for (i = 0; i < d->nvqs; ++i) {
-  2372				struct vhost_virtqueue *vq;
-  2373				void __user *base = (void __user *)(unsigned long)p;
-  2374				vq = d->vqs[i];
-  2375				mutex_lock(&vq->mutex);
-  2376				/* If ring is inactive, will check when it's enabled. */
-  2377				if (vq->private_data && !vq_log_access_ok(vq, base))
-  2378					r = -EFAULT;
-  2379				else
-  2380					vq->log_base = base;
-  2381				mutex_unlock(&vq->mutex);
-  2382			}
-  2383			break;
-  2384		case VHOST_SET_LOG_FD:
-  2385			r = get_user(fd, (int __user *)argp);
-  2386			if (r < 0)
-  2387				break;
-  2388			ctx = fd == VHOST_FILE_UNBIND ? NULL : eventfd_ctx_fdget(fd);
-  2389			if (IS_ERR(ctx)) {
-  2390				r = PTR_ERR(ctx);
-  2391				break;
-  2392			}
-  2393			swap(ctx, d->log_ctx);
-  2394			for (i = 0; i < d->nvqs; ++i) {
-  2395				mutex_lock(&d->vqs[i]->mutex);
-  2396				d->vqs[i]->log_ctx = d->log_ctx;
-  2397				mutex_unlock(&d->vqs[i]->mutex);
-  2398			}
-  2399			if (ctx)
-  2400				eventfd_ctx_put(ctx);
-  2401			break;
-  2402		case VHOST_GET_VRING_WORKER_INFO:
-> 2403			worker = rcu_dereference_check(vq->worker,
-> 2404						       lockdep_is_held(&dev->mutex));
-  2405			if (!worker) {
-> 2406				ret = -EINVAL;
-  2407				break;
-  2408			}
-  2409	
-> 2410			memset(&ring_worker_info, 0, sizeof(ring_worker_info));
-> 2411			ring_worker_info.index = idx;
-  2412			ring_worker_info.worker_id = worker->id;
-> 2413			ring_worker_info.worker_pid = task_pid_vnr(vhost_get_task(worker->vtsk));
-  2414	
-  2415			if (copy_to_user(argp, &ring_worker_info, sizeof(ring_worker_info)))
-  2416				ret = -EFAULT;
-  2417			break;
-  2418		default:
-  2419			r = -ENOIOCTLCMD;
-  2420			break;
-  2421		}
-  2422	done:
-  2423		return r;
-  2424	}
-  2425	EXPORT_SYMBOL_GPL(vhost_dev_ioctl);
-  2426	
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index af52cd938b50..af0b53987c06 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -210,6 +210,20 @@ kvm_static_assert(sizeof(struct vm_shape) == sizeof(uint64_t));
+>  	shape;					\
+>  })
+>  
+> +#define __VM_TYPE(__mode, __type)		\
+> +({						\
+> +	struct vm_shape shape = {		\
+> +		.mode = (__mode),		\
+> +		.type = (__type)		\
+> +	};					\
+> +						\
+> +	shape;					\
+> +})
+> +
+> +#define VM_TYPE(__type)				\
+> +	__VM_TYPE(VM_MODE_DEFAULT, __type)
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+We already have VM_SHAPE()?  Why do we need this as well?
+
+> +
+> +
+>  #if defined(__aarch64__)
+>  
+>  extern enum vm_guest_mode vm_mode_default;
+> diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
+> index 51cd84b9ca66..dd21e11e1908 100644
+> --- a/tools/testing/selftests/kvm/include/x86/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86/processor.h
+> @@ -362,6 +362,10 @@ static inline unsigned int x86_model(unsigned int eax)
+>  	return ((eax >> 12) & 0xf0) | ((eax >> 4) & 0x0f);
+>  }
+>  
+> +#define VM_SHAPE_SEV		VM_TYPE(KVM_X86_SEV_VM)
+> +#define VM_SHAPE_SEV_ES		VM_TYPE(KVM_X86_SEV_ES_VM)
+> +#define VM_SHAPE_SNP		VM_TYPE(KVM_X86_SNP_VM)
+
+FWIW I think the SEV bits should be pulled apart from the TDX bits and the
+TDX bits squashed back into this series with the SEV as a per-cursor patch.
+
+Ira
+
+[snip]
 
