@@ -1,65 +1,81 @@
-Return-Path: <kvm+bounces-61141-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61142-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0979DC0C34B
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 08:55:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15182C0C35D
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 08:57:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B78173A6379
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 07:55:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3836E4EF129
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 07:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45B32E3B19;
-	Mon, 27 Oct 2025 07:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E93A2E4279;
+	Mon, 27 Oct 2025 07:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gma5N9Fh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KeEf6Nmp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF662DF149
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 07:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EB32DF3EA
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 07:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761551741; cv=none; b=Ib11eP2YgHGDOqK7ZSLCYFWm+jXV7rUL/geoEgN/UXUksItgRo6uaX7o5+oKbszKiomPxo63eKEJtQrQ7a7Phq+qOh2kqDbrOJFWAq1lzOC6lXYbI5nB6K1jZdBqzpuFb12TTog6Yf5uXEiCBT9NRv6j1Qch8pQo7ef4FYkXXDg=
+	t=1761551765; cv=none; b=rLADlvTYNsr0bskulYcqZbciZ+pI/acthgzMwI/sz27VclsPW0zDIPckgtS3pE/k0B156Jv3C2VUIBUmZy6Nm/4a1oVCwA8gCK1gkQcx3cMY9r+sac968RplMUEMrKL3Z+OeIp3aoLPJ/3P8NhXxTV6jzrQeC5VCxZdbnJ2hu/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761551741; c=relaxed/simple;
-	bh=+DmA6Q7WFPzw9l5wvDnH1+6RV6lxoIKWZ+xLgKgY3Lk=;
+	s=arc-20240116; t=1761551765; c=relaxed/simple;
+	bh=UuWTyC0YdKe/fv6JFmSpSrVM634YBLyHMn3GeG5yC1s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kd7+4nmA7m7x68NMgbfxdV0VkokbYK3EKGzg5P4SszxcZl/GjsALiwIlMbxvF52VzSKFt5b9/y+aJQ/e/G08qNv58Fw96pLJzMgN8bcx1GeWVdRDArAZ/JZHksd4EBRNI7V5UOU5jKcPdC9qXl0OpvjvJYZacL3jYQeBnD1DxS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gma5N9Fh; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761551740; x=1793087740;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+DmA6Q7WFPzw9l5wvDnH1+6RV6lxoIKWZ+xLgKgY3Lk=;
-  b=Gma5N9FhMvpzk1DlGVrZG15nA76AkH+3gi11dVx0fXcU7OwVyTYFs8gL
-   /hJS4wUWQsssphwX9hWqlB3MX20CJPOKlslq+m0F09wR0Y2pW7kYoa30m
-   ZkK+MyhzC94fwcjAgB2kvSaa5zje90CADPpXTukiS4wHrz4CNSlK7kwf7
-   khNhflXh4qX2WOBApSyHWFCgwQ8sjLCEOPJxBniRCKj2gSiLeqi2MheOf
-   vtXFTXQiOj7M8//ajCuGKCHV6fFX+slv+Z/d/EipexEQWXve6L54XNoUJ
-   YKl9SxmHpxGSsZFdXSiiV8FW3c9HK3+SVtWEi4QR9gFsCBELrbkaUc8cZ
-   A==;
-X-CSE-ConnectionGUID: i+OKOL03SyWY4R+uPtW6Qw==
-X-CSE-MsgGUID: jKGaWKCXTMWzohazHuT+DA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="66240768"
-X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
-   d="scan'208";a="66240768"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 00:55:39 -0700
-X-CSE-ConnectionGUID: ddJKyeCHRxy8nq5AQvFdmw==
-X-CSE-MsgGUID: L6Go9rnpTFCKeoqysnorHg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
-   d="scan'208";a="184594393"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 00:55:35 -0700
-Message-ID: <5d501d23-74d3-45aa-a51e-52ef59002e1a@intel.com>
-Date: Mon, 27 Oct 2025 15:55:30 +0800
+	 In-Reply-To:Content-Type; b=joXcnzx9ZjcWTQgC/YlEQVqAJRvALZ6wc/EelCkSJsaMRpqa9nRpwMB62OG6Tpc2/e/oAzwobte8jo+3YNR02v3FlryLS2f2V7xzB7/1LUkIx823bh3t0XSj+yYYatDfJmi6nTSyW6UT6X081sJelg5OOyTpuV6CKCntbjDVlTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KeEf6Nmp; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-426f1574a14so2794213f8f.3
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 00:56:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1761551761; x=1762156561; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SQl+NisJFxZKOAs0wWeJ4+Zx/WhIYmpfXNRhIe2eUS0=;
+        b=KeEf6Nmp4LXY5njgBWNO56hcyIGzSesZslvXNTTZGK4l5pA/iV0P+2492nconXEtnR
+         75wGdDCziP93hLB2hefBB2jCZ6SdYWsK4JscmEiExp+G0E18rZRKAjw7v7kTxlZ6DBB0
+         WTU0iReld/qwCO4H8y8EemoxNhUWnsg4Liw2DPpeJlpWMhvRmlIMsDEtQSp9/KA3Zz07
+         QZIjC4AVnjL8AaL/WeH94L+ibxVG6sOF+Eib7uY7LWytee9mmJhV9o51Ye4vGdv7fKu0
+         uaMm8YcevNofAaaIJagItS8Y9jr8MRWuDuvy/q91W3f9Nlx7GijLU9iJC1UYPYActREW
+         D1FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761551761; x=1762156561;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SQl+NisJFxZKOAs0wWeJ4+Zx/WhIYmpfXNRhIe2eUS0=;
+        b=fvzJ2j2YOri6n2PtQqWhbH4l4gtVbnAvLv/LoT1+ULCHxj3fffWVklXoCiqEORgaLP
+         OecLe0zT3StLm52s3Wk/tym6F/zZNxeMS3m5hubcZciOAr3e4PkrcGiZU+8tcq+RDF7r
+         +OOqnK13al4VRXUA3iTCnJPAvpgGTwro9L8YWt2i7+QE8jkVHeH1wziu5Dk5bnmuKZ9a
+         xpQGFKQx3aMwZA+6p6x1pn4EX5fALX8S/WihoveRzcvA0MKJfWEXQrlob1yASyVoxLLE
+         k83OoO8NxkFSzGetvOEnCOX6Os99dZLdPxHjT4yca7UL/rRWu2rpXj6HxEYtA7hjWVyl
+         /iYA==
+X-Forwarded-Encrypted: i=1; AJvYcCX/M3vFLbtQkx2dTLNYoRnW9/ndvfE0TfuS05SwMuhCH8z26mR2sSuUWA1T7wpoRcvq860=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtwSzjf0JpqakVieT6lGUtlABZesnUT7C+BVCdHx/i9ESDDB21
+	7z8vHREhXdrz2rvP8k0Z9G1gALmMvpeBy5LVMqMQyRSUU3ahChXTZrIOd3tbWh8NleM=
+X-Gm-Gg: ASbGnctM6Fsi/jbZSeXHAaNVe/Sj3xSI9ZXqc4eEBzmOeKGBrslNFN06XtInHy2TVDu
+	E9zSSP7/8V/UTr7Q8RC2XVriMZhe8yQ+yXZEa2Li6EXpqBWO7qqQgpismK4GEgiCbH0YyL69+jP
+	2g0jC90ZiY9tdgahLNagGY6P1v5IBVMolLbi6K/Pb2uBJ6nArAA+x9Ji5indcQcSyDjULwEK27g
+	oUVpP5B/9bV8rzKLEMzibIgdbdHP46FN2RWLzfbiYuQ7brEM48ml3HH/VOOauoaW+XUDhz5XXB/
+	iW9qhRQpD+ZMZYU0Q6hRBNatjkKrF3GhLzVUj39LzUd5Mc5R/xyrqdDVOTTHbQlWIy5opEpDP+e
+	yV5wEs8AQpE8/2ZdB6/R90iuiftYo+Cf7nQhyub+qZG0zBUJ1E5wBaQZ1+EZ4a7P8q9cSu8Kr+J
+	SnbrMCwiEvAUvvusxB0saOO0UQXc8UtWuGh4dWv8rEvfovloNmevZYfkOx3jTteA38fA==
+X-Google-Smtp-Source: AGHT+IEoa7YoqXjwVsW1lLWBoPF6gggZOI6+XF3bY9ecPa74D9gFf4/xAH6v1KQ7ZxIhD5F1vKXGuw==
+X-Received: by 2002:a05:6000:2508:b0:427:9d7:8720 with SMTP id ffacd0b85a97d-4298a04e95fmr10995412f8f.24.1761551760763;
+        Mon, 27 Oct 2025 00:56:00 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:404:4d10:9f16:e9b1:dc97:28e6? ([2a01:e0a:404:4d10:9f16:e9b1:dc97:28e6])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952cb7dcsm13127131f8f.11.2025.10.27.00.55.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Oct 2025 00:56:00 -0700 (PDT)
+Message-ID: <05a6fb35-a2ad-45f1-9a84-79477560442c@linaro.org>
+Date: Mon, 27 Oct 2025 08:55:55 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,79 +83,86 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/20] i386/cpu: Fix supervisor xstate initialization
-To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Chao Gao
- <chao.gao@intel.com>, John Allen <john.allen@amd.com>,
- Babu Moger <babu.moger@amd.com>, Mathias Krause <minipli@grsecurity.net>,
- Dapeng Mi <dapeng1.mi@intel.com>, Zide Chen <zide.chen@intel.com>,
- Chenyi Qiang <chenyi.qiang@intel.com>, Farrah Chen <farrah.chen@intel.com>
-References: <20251024065632.1448606-1-zhao1.liu@intel.com>
- <20251024065632.1448606-10-zhao1.liu@intel.com>
+Subject: Re: [PATCH v7 24/24] whpx: apic: use non-deprecated APIs to control
+ interrupt controller state
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20251024065632.1448606-10-zhao1.liu@intel.com>
+To: Bernhard Beschow <shentey@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org, Mohamed Mediouni <mohamed@unpredictable.fr>
+Cc: Alexander Graf <agraf@csgraf.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Cameron Esfahani <dirty@apple.com>, Mads Ynddal <mads@ynddal.dk>,
+ qemu-arm@nongnu.org, Ani Sinha <anisinha@redhat.com>,
+ Phil Dennis-Jordan <phil@philjordan.eu>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Yanan Wang <wangyanan55@huawei.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, kvm@vger.kernel.org,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Pedro Barbuda <pbarbuda@microsoft.com>, Zhao Liu <zhao1.liu@intel.com>,
+ Roman Bolshakov <rbolshakov@ddn.com>
+References: <20251016165520.62532-1-mohamed@unpredictable.fr>
+ <20251016165520.62532-25-mohamed@unpredictable.fr>
+ <2cbd9feb-2c20-46e0-af40-0bd64060dfba@linaro.org>
+ <6982BC4E-1F59-47AD-B6E6-9FFF4212C627@gmail.com>
+ <60cd413d-d901-4da7-acb6-c9d47a198c9c@linaro.org>
+ <0C41CA0E-C523-4C00-AD07-71F6A7890C0E@gmail.com>
+ <4F98A2AD-02A7-4A7F-91B8-269E9EC8E5B1@gmail.com>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <4F98A2AD-02A7-4A7F-91B8-269E9EC8E5B1@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/24/2025 2:56 PM, Zhao Liu wrote:
-> From: Chao Gao <chao.gao@intel.com>
+On 2025-10-23 19:02, Bernhard Beschow wrote:
 > 
-> Arch lbr is a supervisor xstate, but its area is not covered in
-> x86_cpu_init_xsave().
 > 
-> Fix it by checking supported xss bitmap.
+> Am 23. Oktober 2025 09:23:58 UTC schrieb Bernhard Beschow <shentey@gmail.com>:
+>>
+>>
+>> Am 23. Oktober 2025 06:33:18 UTC schrieb "Philippe Mathieu-Daudé" <philmd@linaro.org>:
+>>> On 20/10/25 12:27, Bernhard Beschow wrote:
+>>>>
+>>>>
+>>>> Am 16. Oktober 2025 17:15:42 UTC schrieb Pierrick Bouvier <pierrick.bouvier@linaro.org>:
+>>>>> On 10/16/25 9:55 AM, Mohamed Mediouni wrote:
+>>>>>> WHvGetVirtualProcessorInterruptControllerState2 and
+>>>>>> WHvSetVirtualProcessorInterruptControllerState2 are
+>>>>>> deprecated since Windows 10 version 2004.
+>>>>>>
+>>>>>> Use the non-deprecated WHvGetVirtualProcessorState and
+>>>>>> WHvSetVirtualProcessorState when available.
+>>>>>>
+>>>>>> Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
+>>>>>> ---
+>>>>>>     include/system/whpx-internal.h |  9 +++++++
+>>>>>>     target/i386/whpx/whpx-apic.c   | 46 +++++++++++++++++++++++++---------
+>>>>>>     2 files changed, 43 insertions(+), 12 deletions(-)
+>>>>>
+>>>>> Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+>>>>
+>>>> Couldn't we merge this patch already until the rest of the series is figured out?
+>>>
+>>> OK if you provide your Tested-by tag (:
+>>
+>> Oh, I did for an older version of the series w/o this patch: <https://lore.kernel.org/qemu-devel/5758AEBA-9E33-4DCA-9B08-0AF91FD03B0E@gmail.com/>
+>>
+>> I'll retest.
 > 
-> In addition, drop the (uint64_t) type casts for supported_xcr0 since
-> x86_cpu_get_supported_feature_word() returns uint64_t so that the cast
-> is not needed. Then ensure line length is within 90 characters.
+> Unfortunately I get:
 > 
-> Tested-by: Farrah Chen <farrah.chen@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> ---
->   target/i386/cpu.c | 9 ++++++---
->   1 file changed, 6 insertions(+), 3 deletions(-)
+> WHvSetVirtualProcessorInterruptControllerState failed: c0350005
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 5cd335bb5574..1917376dbea9 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -9707,20 +9707,23 @@ static void x86_cpu_post_initfn(Object *obj)
->   static void x86_cpu_init_xsave(void)
->   {
->       static bool first = true;
-> -    uint64_t supported_xcr0;
-> +    uint64_t supported_xcr0, supported_xss;
->       int i;
->   
->       if (first) {
->           first = false;
->   
->           supported_xcr0 =
-> -            ((uint64_t) x86_cpu_get_supported_feature_word(NULL, FEAT_XSAVE_XCR0_HI) << 32) |
-> +            x86_cpu_get_supported_feature_word(NULL, FEAT_XSAVE_XCR0_HI) |
+> and the VM terminates. Reverting the patch resolves the problem.
+> 
+> Best regards,
+> Bernhard
 
-missing the "<< 32" here,
+Thanks for testing it Bernhard.
+I didn't have time to run latest versions Mohamed posted.
 
-with it fixed,
-
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-
->               x86_cpu_get_supported_feature_word(NULL, FEAT_XSAVE_XCR0_LO);
-> +        supported_xss =
-> +            x86_cpu_get_supported_feature_word(NULL, FEAT_XSAVE_XSS_HI) << 32 |
-> +            x86_cpu_get_supported_feature_word(NULL, FEAT_XSAVE_XSS_LO);
->   
->           for (i = XSTATE_SSE_BIT + 1; i < XSAVE_STATE_AREA_COUNT; i++) {
->               ExtSaveArea *esa = &x86_ext_save_areas[i];
->   
-> -            if (!(supported_xcr0 & (1 << i))) {
-> +            if (!((supported_xcr0 | supported_xss) & (1 << i))) {
->                   esa->size = 0;
->               }
->           }
-
+Pierrick
 
