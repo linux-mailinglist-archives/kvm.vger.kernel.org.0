@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-61205-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61208-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5A2AC0FAF3
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 18:34:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05C73C0FB05
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 18:36:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AF0FE4ED835
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:34:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 985BB4286D9
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66813319843;
-	Mon, 27 Oct 2025 17:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8723164DB;
+	Mon, 27 Oct 2025 17:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="7Pzu/Moe"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="FIcn9Eca"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC5F31815D
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 17:34:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A8A31A55B
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 17:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761586447; cv=none; b=d0Ypxc9DUz2Hoe3gDB0ZQdcw6Vmjm2UKEAKqih7ftVxIe9HdS+zL/5M4b+z9FMCKCf3fZrdEIwTJJuLQ2tDPasXbsx7/qLlQ2zJ5kZ7nYsc78PePybqTzlh9e6wNiETV1eHS04sNSblgD41wAMEH/ZgMoVWQtYIvsnKwExdvfWU=
+	t=1761586466; cv=none; b=kljr7SLg+l00UxeP0NEx39USVa+sVKuETR7Jxx1Id0QDmpIkqPeqeYItGw+1FfFAC51jHDCTBuHNExvGpFt2FIhLC95mjh9svh9+42mkfbOvZ3CQ2W/n02uiDiI90E5/Fyxia7c9g0pPULgm0sJ9hWyElRsggNZsEZhMStehduo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761586447; c=relaxed/simple;
-	bh=fsUficWSSEw++WUiZPDFihQGx2cEpjBhzsmEvpxHOpY=;
+	s=arc-20240116; t=1761586466; c=relaxed/simple;
+	bh=G24kXUl2/1TAts5Q0ehohqPvN68Ye7VZyo+zXcJ3lsA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=Cc5YVRIurlgjAIUk5QIeFCv4urPyURXK0esZbK1KYem7QHZWanhR0vDgKcW91l0qgUeaHbEBUcEo17RuT4ScyU9VRSOxujK7Z0Vk+HkhnZD0cdyVSaaghoA7wKhQtd4JgLn3CT0oVMS/Zkrt0YtotiTPZeZCa2N/gpv5J188/Vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=7Pzu/Moe; arc=none smtp.client-ip=67.231.153.30
+	 In-Reply-To:To:CC; b=lFnUT5Pe/eDkFPM8v1TMast8bk7y0wDbvwlLyhgWvKa4za08DOSGGFSqPsZOsFVTgCjn99L5idbqu4nw4OXFLMRm+mQDzM9uH2J361Vp26jIuX8lmongssW0xlMgY3sG89KPK21Qj3J/7XmTPgmyD9Fefg91HY3NIn/kpVNrH2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=FIcn9Eca; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59RF6vYu975897
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 10:34:04 -0700
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59RFrudJ1234687
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 10:34:23 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=17DrIKvHY+S2FDBbrn4h28hnqtK9RN4gXAhW5actuwA=; b=7Pzu/MoeiXGS
-	yCt2LxAVBFstfR4JIJQmKCnHhSqyO2M6F3+P+l9kspcA03pE42L2wppbtw3rKf3v
-	tKKodZE+Id7mZA5JU2Xd0gl3ck0v/V3dqvd4zsuMTeowhrL+LFoBFsw6OqQDodCC
-	KC7OmGpewUNSyERbBW6ICu7HUbMZXM3RIxXYzRkTjBOfiSsQ8lXU7u/CtERSuNAb
-	iCne7g2+NTHQrPr/K4ACXsZos2KUVaJ8159W2oNL4cqjfaj4/+CFfkDnZrrnNG8U
-	AT3URQ/b6Ymj3rcvsxLNHtKwlNNRwG/2vNW0UnRea3KgUSp4MSgRwRbu3HsVllVR
-	7vrWMxRXvQ==
+	 bh=/MbEWdUFJbcP82cLDLSYjE8slJtu9iBACdeQFA1CSI8=; b=FIcn9EcaygkA
+	PhfiNhs33GddbMmYIAvpRSQjxOpmEznTa8EUepxfOlV6HJTUic/11mQBkB2B7a4s
+	qiTGaU5SGitHf+YpCAwD8x3wkykDrR+vPl2ZoDLwfAQZthGkjI239xrzWc5Wlfn7
+	fNkIsr0A/5CEJHgwx3TU/whPkD7aYvxYq9OC6p9JYYC/o02TQkbkf6UgujVOrjx/
+	QRln7xLHEzodT7I/mzG08YvLmRzMatqpmm/CiwgVGhqU5nuYV4/LwW7k6By7y5kt
+	uZ8Zu4Vq124/6u8rX058Wl6LwbR1/EI3PWWOduK9XGWlZO/TJ667cp6kNA9gk2vm
+	05oMGGSrMw==
 Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4a2b3j9dfc-11
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4a2bsd11em-18
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 10:34:04 -0700 (PDT)
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 10:34:23 -0700 (PDT)
 Received: from twshared28390.17.frc2.facebook.com (2620:10d:c0a8:1b::8e35) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.2.2562.20; Mon, 27 Oct 2025 17:34:03 +0000
 Received: by devgpu012.nha5.facebook.com (Postfix, from userid 28580)
-	id 7E05743E098; Mon, 27 Oct 2025 10:33:57 -0700 (PDT)
+	id 8012F43E09A; Mon, 27 Oct 2025 10:33:57 -0700 (PDT)
 From: Alex Mastro <amastro@fb.com>
-Date: Mon, 27 Oct 2025 10:33:43 -0700
-Subject: [PATCH v5 3/5] vfio/type1: handle DMA map/unmap up to the
- addressable limit
+Date: Mon, 27 Oct 2025 10:33:44 -0700
+Subject: [PATCH v5 4/5] vfio: selftests: update DMA map/unmap helpers to
+ support more test kinds
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,7 +66,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20251027-fix-unmap-v5-3-4f0fcf8ffb7d@fb.com>
+Message-ID: <20251027-fix-unmap-v5-4-4f0fcf8ffb7d@fb.com>
 References: <20251027-fix-unmap-v5-0-4f0fcf8ffb7d@fb.com>
 In-Reply-To: <20251027-fix-unmap-v5-0-4f0fcf8ffb7d@fb.com>
 To: Alex Williamson <alex@shazbot.org>
@@ -75,326 +75,271 @@ CC: Jason Gunthorpe <jgg@ziepe.ca>,
 	<alejandro.j.jimenez@oracle.com>,
         David Matlack <dmatlack@google.com>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, Alex Mastro
-	<amastro@fb.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
+	<amastro@fb.com>
 X-Mailer: b4 0.13.0
 X-FB-Internal: Safe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI3MDE2MyBTYWx0ZWRfX+AoJ/ZuwhS7O
- Tt2n+Potjsnc0sV6SKZwWRlo4PPzN1uTy4PIOmniiH4sDqtJPn1TEJG5/mm7caGLh3xX8XOWZrK
- 7DBirEdbfKA5orUqWn545xpP2rLJssgOZB7poCC0B8u3LOyGSimSDdNKTbLxh6NUxyLcvRmBU+C
- u/w7NvuuxIdKwAqkIE6+iY4oqy5RkGYH4bkl2r0YXL7jFLxMXQVubqKBaKV7z04VJ5gssB06q8g
- TE7what0EF3dk109vzGjz73FR2koBFg/VN7bP22L1LAMUX6JX9CyFQQ9GWELHX7nCqj6GLV+5fh
- KuVPHnn+EyDVdxohuu91/rDeUB6kxJGY1kpV5w7SyeoArlhFeCv9aa6vo4x7tj3Llg8hG8bLwVi
- 0Y4b0mziW+IA2nMPfEr9TpYoihAIug==
-X-Authority-Analysis: v=2.4 cv=H87WAuYi c=1 sm=1 tr=0 ts=68ffad0c cx=c_pps
+X-Authority-Analysis: v=2.4 cv=LrifC3dc c=1 sm=1 tr=0 ts=68ffad1f cx=c_pps
  a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
  a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=yPCof4ZbAAAA:8 a=Ikd4Dj_1AAAA:8 a=FOH2dFAWAAAA:8 a=8P58oYQow4jR27pd84AA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 9QDnvGqSFeYXbbLOe-DFR_hxkBsslGi3
-X-Proofpoint-GUID: 9QDnvGqSFeYXbbLOe-DFR_hxkBsslGi3
+ a=FOH2dFAWAAAA:8 a=mN9a-mZmZOQI0s6eON8A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: oJT_HXPR907fSW8_CoHa7V-ad2jCiMDg
+X-Proofpoint-GUID: oJT_HXPR907fSW8_CoHa7V-ad2jCiMDg
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI3MDE2MyBTYWx0ZWRfXxJ9NVIhgoyYm
+ eaE/U3PoDK/uK3PfhPtGex/N3sZUBpFxdARNDQz6RYLBW/Ahjl6Ypc1SBH9nhtjkIeKQ+vD2DE4
+ AJ2yhW9uzTbXMemX1Ow+LIgfqOp8D04vb09Ym0ZAaTFNRNFEG0kzYAQRtZOHOT3eX7BevZ8VX/9
+ anYwfsFXTsVWu+gUlGT8kAqHfX19NRDxZDydmmGWVzywcX7bhd2LnIfYF1RC4OYTKVPU4209F8o
+ lgbDMue39CesXWGJaG8Joh+bBdzTpX2W7nqaf+i9uhKe1JW0qZeSVVNGnkt5Mrv47cKNxunQbMV
+ oJwLNP8SCF2jB/VqUTgtij5Tj3UCbBY8yIqiQHbIBAQWi5c0WTByROZl8u4QV2v7wNune1IPP70
+ ZqYsg8BnRwZaiU3p80VhxoN/T0dI6w==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-10-27_07,2025-10-22_01,2025-03-28_01
 
-Before this commit, it was possible to create end of address space
-mappings, but unmapping them via VFIO_IOMMU_UNMAP_DMA, replaying them
-for newly added iommu domains, and querying their dirty pages via
-VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP was broken due to bugs caused by
-comparisons against (iova + size) expressions, which overflow to zero.
+Add __vfio_pci_dma_* helpers which return -errno from the underlying
+ioctls.
 
-This commit handles DMA map/unmap operations up to the addressable
-limit by comparing against inclusive end-of-range limits, and changing
-iteration to perform relative traversals across range sizes, rather than
-absolute traversals across addresses.
+Add __vfio_pci_dma_unmap_all to test more unmapping code paths. Add an
+out unmapped arg to report the unmapped byte size.
 
-vfio_link_dma inserts a zero-sized vfio_dma into the rb-tree, and is
-only used for that purpose, so discard the size from consideration for
-the insertion point.
+The existing vfio_pci_dma_* functions, which are intended for happy-path
+usage (assert on failure) are now thin wrappers on top of the
+double-underscore helpers.
 
-Tested-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-Fixes: 73fa0d10d077 ("vfio: Type1 IOMMU implementation")
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
 Signed-off-by: Alex Mastro <amastro@fb.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 77 ++++++++++++++++++++++-------------------
- 1 file changed, 42 insertions(+), 35 deletions(-)
+ .../testing/selftests/vfio/lib/include/vfio_util.h |  27 +++++-
+ tools/testing/selftests/vfio/lib/vfio_pci_device.c | 105 ++++++++++++++++-----
+ .../testing/selftests/vfio/vfio_dma_mapping_test.c |   5 +-
+ 3 files changed, 109 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 48bcc0633d44..5167bec14e36 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -168,12 +168,14 @@ static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
- {
- 	struct rb_node *node = iommu->dma_list.rb_node;
+diff --git a/tools/testing/selftests/vfio/lib/include/vfio_util.h b/tools/testing/selftests/vfio/lib/include/vfio_util.h
+index ed31606e01b7..240409bf5f8a 100644
+--- a/tools/testing/selftests/vfio/lib/include/vfio_util.h
++++ b/tools/testing/selftests/vfio/lib/include/vfio_util.h
+@@ -206,10 +206,29 @@ struct vfio_pci_device *vfio_pci_device_init(const char *bdf, const char *iommu_
+ void vfio_pci_device_cleanup(struct vfio_pci_device *device);
+ void vfio_pci_device_reset(struct vfio_pci_device *device);
  
-+	WARN_ON(!size);
+-void vfio_pci_dma_map(struct vfio_pci_device *device,
+-		      struct vfio_dma_region *region);
+-void vfio_pci_dma_unmap(struct vfio_pci_device *device,
+-			struct vfio_dma_region *region);
++int __vfio_pci_dma_map(struct vfio_pci_device *device,
++		       struct vfio_dma_region *region);
++int __vfio_pci_dma_unmap(struct vfio_pci_device *device,
++			 struct vfio_dma_region *region,
++			 u64 *unmapped);
++int __vfio_pci_dma_unmap_all(struct vfio_pci_device *device, u64 *unmapped);
 +
- 	while (node) {
- 		struct vfio_dma *dma = rb_entry(node, struct vfio_dma, node);
++static inline void vfio_pci_dma_map(struct vfio_pci_device *device,
++				    struct vfio_dma_region *region)
++{
++	VFIO_ASSERT_EQ(__vfio_pci_dma_map(device, region), 0);
++}
++
++static inline void vfio_pci_dma_unmap(struct vfio_pci_device *device,
++				      struct vfio_dma_region *region)
++{
++	VFIO_ASSERT_EQ(__vfio_pci_dma_unmap(device, region, NULL), 0);
++}
++
++static inline void vfio_pci_dma_unmap_all(struct vfio_pci_device *device)
++{
++	VFIO_ASSERT_EQ(__vfio_pci_dma_unmap_all(device, NULL), 0);
++}
  
--		if (start + size <= dma->iova)
-+		if (start + size - 1 < dma->iova)
- 			node = node->rb_left;
--		else if (start >= dma->iova + dma->size)
-+		else if (start > dma->iova + dma->size - 1)
- 			node = node->rb_right;
- 		else
- 			return dma;
-@@ -183,16 +185,19 @@ static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
+ void vfio_pci_config_access(struct vfio_pci_device *device, bool write,
+ 			    size_t config, size_t size, void *data);
+diff --git a/tools/testing/selftests/vfio/lib/vfio_pci_device.c b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
+index 0921b2451ba5..af43d8c07199 100644
+--- a/tools/testing/selftests/vfio/lib/vfio_pci_device.c
++++ b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
+@@ -2,6 +2,7 @@
+ #include <dirent.h>
+ #include <fcntl.h>
+ #include <libgen.h>
++#include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+@@ -141,7 +142,7 @@ static void vfio_pci_irq_get(struct vfio_pci_device *device, u32 index,
+ 	ioctl_assert(device->fd, VFIO_DEVICE_GET_IRQ_INFO, irq_info);
  }
  
- static struct rb_node *vfio_find_dma_first_node(struct vfio_iommu *iommu,
--						dma_addr_t start, size_t size)
-+						dma_addr_t start,
-+						dma_addr_t end)
+-static void vfio_iommu_dma_map(struct vfio_pci_device *device,
++static int vfio_iommu_dma_map(struct vfio_pci_device *device,
+ 			       struct vfio_dma_region *region)
  {
- 	struct rb_node *res = NULL;
- 	struct rb_node *node = iommu->dma_list.rb_node;
- 	struct vfio_dma *dma_res = NULL;
+ 	struct vfio_iommu_type1_dma_map args = {
+@@ -152,10 +153,13 @@ static void vfio_iommu_dma_map(struct vfio_pci_device *device,
+ 		.size = region->size,
+ 	};
  
-+	WARN_ON(end < start);
+-	ioctl_assert(device->container_fd, VFIO_IOMMU_MAP_DMA, &args);
++	if (ioctl(device->container_fd, VFIO_IOMMU_MAP_DMA, &args))
++		return -errno;
 +
- 	while (node) {
- 		struct vfio_dma *dma = rb_entry(node, struct vfio_dma, node);
- 
--		if (start < dma->iova + dma->size) {
-+		if (start <= dma->iova + dma->size - 1) {
- 			res = node;
- 			dma_res = dma;
- 			if (start >= dma->iova)
-@@ -202,7 +207,7 @@ static struct rb_node *vfio_find_dma_first_node(struct vfio_iommu *iommu,
- 			node = node->rb_right;
- 		}
- 	}
--	if (res && size && dma_res->iova >= start + size)
-+	if (res && dma_res->iova > end)
- 		res = NULL;
- 	return res;
- }
-@@ -212,11 +217,13 @@ static void vfio_link_dma(struct vfio_iommu *iommu, struct vfio_dma *new)
- 	struct rb_node **link = &iommu->dma_list.rb_node, *parent = NULL;
- 	struct vfio_dma *dma;
- 
-+	WARN_ON(new->size != 0);
-+
- 	while (*link) {
- 		parent = *link;
- 		dma = rb_entry(parent, struct vfio_dma, node);
- 
--		if (new->iova + new->size <= dma->iova)
-+		if (new->iova <= dma->iova)
- 			link = &(*link)->rb_left;
- 		else
- 			link = &(*link)->rb_right;
-@@ -1141,12 +1148,12 @@ static size_t unmap_unpin_slow(struct vfio_domain *domain,
- static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 			     bool do_accounting)
- {
--	dma_addr_t iova = dma->iova, end = dma->iova + dma->size;
- 	struct vfio_domain *domain, *d;
- 	LIST_HEAD(unmapped_region_list);
- 	struct iommu_iotlb_gather iotlb_gather;
- 	int unmapped_region_cnt = 0;
- 	long unlocked = 0;
-+	size_t pos = 0;
- 
- 	if (!dma->size)
- 		return 0;
-@@ -1170,13 +1177,14 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	}
- 
- 	iommu_iotlb_gather_init(&iotlb_gather);
--	while (iova < end) {
-+	while (pos < dma->size) {
- 		size_t unmapped, len;
- 		phys_addr_t phys, next;
-+		dma_addr_t iova = dma->iova + pos;
- 
- 		phys = iommu_iova_to_phys(domain->domain, iova);
- 		if (WARN_ON(!phys)) {
--			iova += PAGE_SIZE;
-+			pos += PAGE_SIZE;
- 			continue;
- 		}
- 
-@@ -1185,7 +1193,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 		 * may require hardware cache flushing, try to find the
- 		 * largest contiguous physical memory chunk to unmap.
- 		 */
--		for (len = PAGE_SIZE; iova + len < end; len += PAGE_SIZE) {
-+		for (len = PAGE_SIZE; pos + len < dma->size; len += PAGE_SIZE) {
- 			next = iommu_iova_to_phys(domain->domain, iova + len);
- 			if (next != phys + len)
- 				break;
-@@ -1206,7 +1214,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 				break;
- 		}
- 
--		iova += unmapped;
-+		pos += unmapped;
- 	}
- 
- 	dma->iommu_mapped = false;
-@@ -1298,7 +1306,7 @@ static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
++	return 0;
  }
  
- static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
--				  dma_addr_t iova, size_t size, size_t pgsize)
-+				  dma_addr_t iova, dma_addr_t iova_end, size_t pgsize)
+-static void iommufd_dma_map(struct vfio_pci_device *device,
++static int iommufd_dma_map(struct vfio_pci_device *device,
+ 			    struct vfio_dma_region *region)
  {
- 	struct vfio_dma *dma;
- 	struct rb_node *n;
-@@ -1315,8 +1323,8 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
- 	if (dma && dma->iova != iova)
- 		return -EINVAL;
+ 	struct iommu_ioas_map args = {
+@@ -169,54 +173,109 @@ static void iommufd_dma_map(struct vfio_pci_device *device,
+ 		.ioas_id = device->ioas_id,
+ 	};
  
--	dma = vfio_find_dma(iommu, iova + size - 1, 0);
--	if (dma && dma->iova + dma->size != iova + size)
-+	dma = vfio_find_dma(iommu, iova_end, 1);
-+	if (dma && dma->iova + dma->size - 1 != iova_end)
- 		return -EINVAL;
+-	ioctl_assert(device->iommufd, IOMMU_IOAS_MAP, &args);
++	if (ioctl(device->iommufd, IOMMU_IOAS_MAP, &args))
++		return -errno;
++
++	return 0;
+ }
  
- 	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-@@ -1325,7 +1333,7 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
- 		if (dma->iova < iova)
- 			continue;
+-void vfio_pci_dma_map(struct vfio_pci_device *device,
++int __vfio_pci_dma_map(struct vfio_pci_device *device,
+ 		      struct vfio_dma_region *region)
+ {
++	int ret;
++
+ 	if (device->iommufd)
+-		iommufd_dma_map(device, region);
++		ret = iommufd_dma_map(device, region);
+ 	else
+-		vfio_iommu_dma_map(device, region);
++		ret = vfio_iommu_dma_map(device, region);
++
++	if (ret)
++		return ret;
  
--		if (dma->iova > iova + size - 1)
-+		if (dma->iova > iova_end)
- 			break;
+ 	list_add(&region->link, &device->dma_regions);
++
++	return 0;
+ }
  
- 		ret = update_user_bitmap(bitmap, iommu, dma, iova, pgsize);
-@@ -1418,7 +1426,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 	if (unmap_all) {
- 		if (iova || size)
- 			goto unlock;
--		size = SIZE_MAX;
-+		iova_end = ~(dma_addr_t)0;
- 	} else {
- 		if (!size || size & (pgsize - 1))
- 			goto unlock;
-@@ -1473,17 +1481,17 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 		if (dma && dma->iova != iova)
- 			goto unlock;
+-static void vfio_iommu_dma_unmap(struct vfio_pci_device *device,
+-				 struct vfio_dma_region *region)
++static int vfio_iommu_dma_unmap(int fd, u64 iova, u64 size, u32 flags,
++				u64 *unmapped)
+ {
+ 	struct vfio_iommu_type1_dma_unmap args = {
+ 		.argsz = sizeof(args),
+-		.iova = region->iova,
+-		.size = region->size,
++		.iova = iova,
++		.size = size,
++		.flags = flags,
+ 	};
  
--		dma = vfio_find_dma(iommu, iova_end, 0);
--		if (dma && dma->iova + dma->size != iova + size)
-+		dma = vfio_find_dma(iommu, iova_end, 1);
-+		if (dma && dma->iova + dma->size - 1 != iova_end)
- 			goto unlock;
+-	ioctl_assert(device->container_fd, VFIO_IOMMU_UNMAP_DMA, &args);
++	if (ioctl(fd, VFIO_IOMMU_UNMAP_DMA, &args))
++		return -errno;
++
++	if (unmapped)
++		*unmapped = args.size;
++
++	return 0;
+ }
+ 
+-static void iommufd_dma_unmap(struct vfio_pci_device *device,
+-			      struct vfio_dma_region *region)
++static int iommufd_dma_unmap(int fd, u64 iova, u64 length, u32 ioas_id,
++			     u64 *unmapped)
+ {
+ 	struct iommu_ioas_unmap args = {
+ 		.size = sizeof(args),
+-		.iova = region->iova,
+-		.length = region->size,
+-		.ioas_id = device->ioas_id,
++		.iova = iova,
++		.length = length,
++		.ioas_id = ioas_id,
+ 	};
+ 
+-	ioctl_assert(device->iommufd, IOMMU_IOAS_UNMAP, &args);
++	if (ioctl(fd, IOMMU_IOAS_UNMAP, &args))
++		return -errno;
++
++	if (unmapped)
++		*unmapped = args.length;
++
++	return 0;
+ }
+ 
+-void vfio_pci_dma_unmap(struct vfio_pci_device *device,
+-			struct vfio_dma_region *region)
++int __vfio_pci_dma_unmap(struct vfio_pci_device *device,
++			 struct vfio_dma_region *region, u64 *unmapped)
+ {
++	int ret;
++
+ 	if (device->iommufd)
+-		iommufd_dma_unmap(device, region);
++		ret = iommufd_dma_unmap(device->iommufd, region->iova,
++					region->size, device->ioas_id,
++					unmapped);
+ 	else
+-		vfio_iommu_dma_unmap(device, region);
++		ret = vfio_iommu_dma_unmap(device->container_fd, region->iova,
++					   region->size, 0, unmapped);
++
++	if (ret)
++		return ret;
++
++	list_del_init(&region->link);
++
++	return 0;
++}
++
++int __vfio_pci_dma_unmap_all(struct vfio_pci_device *device, u64 *unmapped)
++{
++	int ret;
++	struct vfio_dma_region *curr, *next;
++
++	if (device->iommufd)
++		ret = iommufd_dma_unmap(device->iommufd, 0, UINT64_MAX,
++					device->ioas_id, unmapped);
++	else
++		ret = vfio_iommu_dma_unmap(device->container_fd, 0, 0,
++					   VFIO_DMA_UNMAP_FLAG_ALL, unmapped);
++
++	if (ret)
++		return ret;
++
++	list_for_each_entry_safe(curr, next, &device->dma_regions, link) {
++		list_del_init(&curr->link);
++	}
+ 
+-	list_del(&region->link);
++	return 0;
+ }
+ 
+ static void vfio_pci_region_get(struct vfio_pci_device *device, int index,
+diff --git a/tools/testing/selftests/vfio/vfio_dma_mapping_test.c b/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
+index ab19c54a774d..a38966e8e5a6 100644
+--- a/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
++++ b/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
+@@ -129,6 +129,7 @@ TEST_F(vfio_dma_mapping_test, dma_map_unmap)
+ 	struct vfio_dma_region region;
+ 	struct iommu_mapping mapping;
+ 	u64 mapping_size = size;
++	u64 unmapped;
+ 	int rc;
+ 
+ 	region.vaddr = mmap(NULL, size, PROT_READ | PROT_WRITE, flags, -1, 0);
+@@ -184,7 +185,9 @@ TEST_F(vfio_dma_mapping_test, dma_map_unmap)
  	}
  
- 	ret = 0;
--	n = first_n = vfio_find_dma_first_node(iommu, iova, size);
-+	n = first_n = vfio_find_dma_first_node(iommu, iova, iova_end);
- 
- 	while (n) {
- 		dma = rb_entry(n, struct vfio_dma, node);
--		if (dma->iova >= iova + size)
-+		if (dma->iova > iova_end)
- 			break;
- 
- 		if (!iommu->v2 && iova > dma->iova)
-@@ -1813,12 +1821,12 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 
- 	for (; n; n = rb_next(n)) {
- 		struct vfio_dma *dma;
--		dma_addr_t iova;
-+		size_t pos = 0;
- 
- 		dma = rb_entry(n, struct vfio_dma, node);
--		iova = dma->iova;
- 
--		while (iova < dma->iova + dma->size) {
-+		while (pos < dma->size) {
-+			dma_addr_t iova = dma->iova + pos;
- 			phys_addr_t phys;
- 			size_t size;
- 
-@@ -1834,14 +1842,14 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 				phys = iommu_iova_to_phys(d->domain, iova);
- 
- 				if (WARN_ON(!phys)) {
--					iova += PAGE_SIZE;
-+					pos += PAGE_SIZE;
- 					continue;
- 				}
- 
- 				size = PAGE_SIZE;
- 				p = phys + size;
- 				i = iova + size;
--				while (i < dma->iova + dma->size &&
-+				while (pos + size < dma->size &&
- 				       p == iommu_iova_to_phys(d->domain, i)) {
- 					size += PAGE_SIZE;
- 					p += PAGE_SIZE;
-@@ -1849,9 +1857,8 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 				}
- 			} else {
- 				unsigned long pfn;
--				unsigned long vaddr = dma->vaddr +
--						     (iova - dma->iova);
--				size_t n = dma->iova + dma->size - iova;
-+				unsigned long vaddr = dma->vaddr + pos;
-+				size_t n = dma->size - pos;
- 				long npage;
- 
- 				npage = vfio_pin_pages_remote(dma, vaddr,
-@@ -1882,7 +1889,7 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 				goto unwind;
- 			}
- 
--			iova += size;
-+			pos += size;
- 		}
- 	}
- 
-@@ -1899,29 +1906,29 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- unwind:
- 	for (; n; n = rb_prev(n)) {
- 		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
--		dma_addr_t iova;
-+		size_t pos = 0;
- 
- 		if (dma->iommu_mapped) {
- 			iommu_unmap(domain->domain, dma->iova, dma->size);
- 			continue;
- 		}
- 
--		iova = dma->iova;
--		while (iova < dma->iova + dma->size) {
-+		while (pos < dma->size) {
-+			dma_addr_t iova = dma->iova + pos;
- 			phys_addr_t phys, p;
- 			size_t size;
- 			dma_addr_t i;
- 
- 			phys = iommu_iova_to_phys(domain->domain, iova);
- 			if (!phys) {
--				iova += PAGE_SIZE;
-+				pos += PAGE_SIZE;
- 				continue;
- 			}
- 
- 			size = PAGE_SIZE;
- 			p = phys + size;
- 			i = iova + size;
--			while (i < dma->iova + dma->size &&
-+			while (pos + size < dma->size &&
- 			       p == iommu_iova_to_phys(domain->domain, i)) {
- 				size += PAGE_SIZE;
- 				p += PAGE_SIZE;
-@@ -3059,7 +3066,7 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
- 
- 		if (iommu->dirty_page_tracking)
- 			ret = vfio_iova_dirty_bitmap(range.bitmap.data,
--						     iommu, iova, size,
-+						     iommu, iova, iova_end,
- 						     range.bitmap.pgsize);
- 		else
- 			ret = -EINVAL;
+ unmap:
+-	vfio_pci_dma_unmap(self->device, &region);
++	rc = __vfio_pci_dma_unmap(self->device, &region, &unmapped);
++	ASSERT_EQ(rc, 0);
++	ASSERT_EQ(unmapped, region.size);
+ 	printf("Unmapped IOVA 0x%lx\n", region.iova);
+ 	ASSERT_EQ(INVALID_IOVA, __to_iova(self->device, region.vaddr));
+ 	ASSERT_NE(0, iommu_mapping_get(device_bdf, region.iova, &mapping));
 
 -- 
 2.47.3
