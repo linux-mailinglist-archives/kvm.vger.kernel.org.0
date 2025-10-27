@@ -1,270 +1,503 @@
-Return-Path: <kvm+bounces-61210-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61211-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54C3BC0FBEC
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 18:46:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D11DBC0FBEF
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 18:46:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 324FF42542E
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:46:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAB28422080
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 782222D640D;
-	Mon, 27 Oct 2025 17:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87312BE647;
+	Mon, 27 Oct 2025 17:46:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dLMxV1Q4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YYf/7TlC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203401E2614;
-	Mon, 27 Oct 2025 17:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761587172; cv=fail; b=MIKsxOVtT86p/q+sscR1YhUlQxHVC9uPDzasLaONeo5IP0zc1/ORshtJyS/8iDkToC378UxGOHwLpBfNlQJZaNSeLbRXoxDeG9PXynuC6JQkVfV1fP4Rtfs35/ZkltkH9cuw3iARD66BTdDE4Sh3vwO653UbqunsD1fonyHvLXs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761587172; c=relaxed/simple;
-	bh=Mp1iuvKHe4V619dMUpC9CWwsWWkKcia9U2+OntVFvlM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=h2fCXSxLTWV9dHGviQRhBUC5IKdA8AqpktZGBHLf9/Dj6nYezISzO4Q3C4Kxg/FPRGQ5tr5wGXF3BeVcfL+V5x6qWLEwtXQ1KJ3pvDa1PKQJBoLbD8Q7+sR8TKqmLCmCK5Clw1a/RCT955xbSOsohDnt2jtJQGxh9W8ynWrt9rc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dLMxV1Q4; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761587171; x=1793123171;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=Mp1iuvKHe4V619dMUpC9CWwsWWkKcia9U2+OntVFvlM=;
-  b=dLMxV1Q43ciRdrvLiK6HMFxCxsTgiePetfCNu1ukAfO3fK9gWpkO1Msx
-   C3eDfT44nZteaeAp4OGMxlrqncQ8iw2TwhRfnm2qPQ1/JHbJjiGhnnh8C
-   wzreZLPMwQ81oXLOZrmSEKL/dbmpmvI4xDMyPbDoaEb/Idu23p+P0hy5e
-   DSEjIEHsD5kXdxFovAj+Kr8b3jsr0CYtqJB/BBuvxB3Vh0XRWKHTSoJ1z
-   AZxsLHM95qKwF1V4BTHe0na9HHKnktBFoM9zkJqxhwVSRE32454GaV9Xn
-   eKUn9wffQb06agNdnfi1bJ7cEzx9oM9omJR0jTEy8OxMGJsPGC5hcTVeR
-   g==;
-X-CSE-ConnectionGUID: uSA2iEj1Sle4NJ7E2TMNzg==
-X-CSE-MsgGUID: yLSx0foRSu+3CLFt19L1Ew==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="63574256"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="63574256"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 10:46:11 -0700
-X-CSE-ConnectionGUID: eVV39gGuRz6oIGW4Xe8Tgg==
-X-CSE-MsgGUID: SYLLQZlIQISYWZG1kT6LAQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,259,1754982000"; 
-   d="scan'208";a="215762901"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 10:46:11 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 27 Oct 2025 10:46:10 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Mon, 27 Oct 2025 10:46:10 -0700
-Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.18) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 27 Oct 2025 10:46:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vJuqLjo1uOKpXYP2FS7IQ3kWXe11SWHrMvPi2DQTuludpKNoQBMuTsQtmX5eR+RqvCoCeFWZOedEbCpdoby8ea2jSUlJLqK5VaZUs0izy2NUlRYcrpjiW5T7SQzw8bboX5UGUItP2JD4HEFsxd3pKWiP46eZN01tFMRRo9wkC6UZQQjvuyvkKdTH0DnfH5JvV7d0YPJM74IeD1HVnEu20pq2+WvXcuuHg/J3f/o4dGCl7GGZZIzcz5WVjImWG9DJCS1G/eUrbGhK6V7Q3u2grxlJAiOsu0bB+CSc7EKealc284FTkWLtlK4FyoWILOPZT/MuhvpQPGtJMj3FfGL5UA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Mp1iuvKHe4V619dMUpC9CWwsWWkKcia9U2+OntVFvlM=;
- b=tlpiks8IUlGwmTeR4b8+hIhLfZrI8ZnICRc9oBAWOiNOHA2fgzWIiEstvERB+0Y9i3D8/GCPSOXWS7U4+8fgnzYp2NnzchFLjUNrmiNSbsYiNXIv0TBl7eh7mAngoq6J2rCJuy9+N1EKAFlYFnt8J0xExy2ukS3vDMFVU8wmi9h96NyHBwgyJupFGvqo6Nw9XMibYnxoaVX/NU3PW8G/JQc7Iyf5Gj4XpMKIjg0t8HEyDEwuL04G3jXfAlaEPMX4tIJ0vpurNV2JpFBq7joAM7tTruZV3Wr74E8rE20mjaa64Nptt4mgy8lsjgZlbJvJUBilI3BE5/Q/D5o+LHgtgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by BL3PR11MB6481.namprd11.prod.outlook.com (2603:10b6:208:3bc::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.18; Mon, 27 Oct
- 2025 17:46:03 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.9253.017; Mon, 27 Oct 2025
- 17:46:03 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "seanjc@google.com" <seanjc@google.com>, "Zhao, Yan Y"
-	<yan.y.zhao@intel.com>
-CC: "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "linux-mips@vger.kernel.org"
-	<linux-mips@vger.kernel.org>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "linuxppc-dev@lists.ozlabs.org"
-	<linuxppc-dev@lists.ozlabs.org>, "michael.roth@amd.com"
-	<michael.roth@amd.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "palmer@dabbelt.com"
-	<palmer@dabbelt.com>, "x86@kernel.org" <x86@kernel.org>,
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, "aou@eecs.berkeley.edu"
-	<aou@eecs.berkeley.edu>, "Annapurve, Vishal" <vannapurve@google.com>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-	"maddy@linux.ibm.com" <maddy@linux.ibm.com>, "maobibo@loongson.cn"
-	<maobibo@loongson.cn>, "maz@kernel.org" <maz@kernel.org>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	"anup@brainfault.org" <anup@brainfault.org>, "Huang, Kai"
-	<kai.huang@intel.com>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
-	"pjw@kernel.org" <pjw@kernel.org>, "zhaotianrui@loongson.cn"
-	<zhaotianrui@loongson.cn>, "ackerleytng@google.com" <ackerleytng@google.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "Weiny, Ira" <ira.weiny@intel.com>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-	"imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>, "kas@kernel.org"
-	<kas@kernel.org>
-Subject: Re: [PATCH v3 24/25] KVM: TDX: Guard VM state transitions with "all"
- the locks
-Thread-Topic: [PATCH v3 24/25] KVM: TDX: Guard VM state transitions with "all"
- the locks
-Thread-Index: AQHcPv2w81uMmlMzI0yEAMgtbEXDh7TRHKOAgABz5gCABDjwgIAAi6mA
-Date: Mon, 27 Oct 2025 17:46:03 +0000
-Message-ID: <77d8a0d9541ce3fc2b2c76b58add50d152b52e39.camel@intel.com>
-References: <20251017003244.186495-1-seanjc@google.com>
-	 <20251017003244.186495-25-seanjc@google.com>
-	 <aPtOtzGLigbY0Vqw@yzhao56-desk.sh.intel.com> <aPuv8F8iDp3SLb9q@google.com>
-	 <aP86sdBZxXm5I17f@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aP86sdBZxXm5I17f@yzhao56-desk.sh.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|BL3PR11MB6481:EE_
-x-ms-office365-filtering-correlation-id: f8821a0e-0fcf-40c1-7f9d-08de1580b2c2
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700021;
-x-microsoft-antispam-message-info: =?utf-8?B?dXk5ZEtxdlBmK0pnOFF3RHJ1TmJvbUNIRWlob1l6WWorOFdVQTY4enZkMnJI?=
- =?utf-8?B?Zy81aVpMYzNiNHV6OXFKYWx5V1lxZ01EN0hoalkxR3VwakwyV2xKbEFKbUlk?=
- =?utf-8?B?L2lScC9lNXMyQXY5dTNvUExRR2V0ZExVWWlEc3diSVh2b3EzTUliWFdKSzVp?=
- =?utf-8?B?YVdhRGxqdWtoa3poRlF1M2dKZ01sR3lLVE9zc3VMU1ZGN0J0ZzdjakZjblBu?=
- =?utf-8?B?Nk5kN0s2VVVZaEMxbldGTk1oUDMzSnN0V1UraEJ3SS81cnR2ZlpJdEhETEpP?=
- =?utf-8?B?UGtDNS9LQzVpenRaZU5ZWXcvT3Avb0pSczhJc2xlNDFQbDRwSkR1UXBSZDdC?=
- =?utf-8?B?UGlqbXR6T3F2U0NwaHpqVW4vamF5eWlQb0Q4Nkh4b3N6c3V3Tk9EdFJ3TnBB?=
- =?utf-8?B?T3A1dHV5UENOMU91aTFCVUQ5OGtBQ3NES25LN0N2Y0JkOFQvL3kvYnYrNWQ4?=
- =?utf-8?B?UVFkZHF6S2RxTzdib2l3VHY0U0tDWENmR29uMU9DRlMvdk8vZFhoZW9NOW1t?=
- =?utf-8?B?Y3g2ckhiL0l1Z0FwbW1mWGsyTnkzcHQyM08wRUVSZGkzMjI4T0xxdFNPYVRs?=
- =?utf-8?B?QnFiK2dQRlZUWHJMZ2txbmsxNSt5QmpzWU9YSTFPZ1gwVnlNRDJXQWpJZXBR?=
- =?utf-8?B?Y3pMN2FJOGliOW16ZERaaEJ2ZlgzTldlM0JKbndRTTVXZW1wdFVucmxtamZ1?=
- =?utf-8?B?bGdjbFZMRUhwM09VcGo1RkU4bVl6WmhUM2VGbktIRHJOaTNBNm5sdkJpUGRQ?=
- =?utf-8?B?UUVxRENKS1Rta3BVbmtBTW1NRnRJUFgwUzE3d2FHL0VRUjFjYko5QjRQeHIz?=
- =?utf-8?B?WUZlN0p5MmwwUVVQSmtUQmsxeUxtQ0dkUWhzTndxNW1wcnAvbzNpK0U1YjFF?=
- =?utf-8?B?QlpBSXN4Y3p6SmRLY2xmOXlDTXdTWkdvbzFObWsyaUZ1M3haNGtETVFlYTVt?=
- =?utf-8?B?MVU2aWJsTW5nQVBCMVM0bTNqaEtlYi8xWjRPUHNYR3o5QlNjN0F1Nm9VeHBl?=
- =?utf-8?B?MW9iQ0M1RG1xV2txNmVPdzRPaS82YnZNNlpKYmVXVEZQeENTMVZublRBdm9i?=
- =?utf-8?B?SWlDc25SbVV0eTd4SkNtK3dFYTFXeHVTY0NqdUNINmFTNFpabGdvUDNGeWhJ?=
- =?utf-8?B?ZWsxdVNyclA5RmdxemFPTVBIaUx3ZFdhMTRXR1gzblRoUDUyM0R4UEl5bHhI?=
- =?utf-8?B?TFBtb09MWWV3U3owK3B1bkhvT2lQRHVIWWxQejYzLytQRGQ5V1lnWWVoZUxz?=
- =?utf-8?B?QlV5KzMvTHpIMERWYVc5bzV3Z3lSQjRnMmxyLzRFWjZlaGpKUlMxZEJ3dmRN?=
- =?utf-8?B?YkJxN05SVWpPOThaNy80RWlnZ3pPRjN6NjFKYWIvWStEcWI3czhMbDcwNDlC?=
- =?utf-8?B?eUN0NTMvM08wTERHYXJyWldSa2praTlPUm5ROWZZQlFGMy83blRGRzFLRjhp?=
- =?utf-8?B?aW4vL3gzYmI4c0EzZ3VHU052QUZRcmdqVmJDRWNVNXVoeXpkL2Q3QThrcERC?=
- =?utf-8?B?dHd3V1NSVlVwc05rbTM5Z3d0Q0VRaEZ1RUxLRDZITTFiT01LaXppTmlOb1Yx?=
- =?utf-8?B?TC96cC9STTJYaEJNR1FwaUtsdGh5d0tYUjM0SnJFVnl1dUpqRXp4dmNFcVVO?=
- =?utf-8?B?b3o0bUMxaHdaWFpQc3RBRjdRMFc3UG1Ebk41SEdhRmx5T3VJajFLT2RVanNh?=
- =?utf-8?B?TGtCZXYrSS9PK2VGSU8wOHpDQnRwYXRjbnFVNWNEZVpoM0tIUVZIYXN4dkRp?=
- =?utf-8?B?MHJDVkJFT1VpakRCd3IvY3NQYlJTbFNSWHU3TENUY2xYYmYxVCtXUFVBMzVq?=
- =?utf-8?B?eUVMYjkxUSt6WVE0YWRuNUIyTTF4YjVRVk5sVkIrYUdZWkgrL3MzTnZVZTk5?=
- =?utf-8?B?VnNJd0ZqMEZnM09hekFjNWRpYS9jTFFNNk9WZ3doeEhrVUx1dVNJUU84MEYv?=
- =?utf-8?B?L2RZalpjRnVJaDFiR0h2Q0tPY1pEenJ6SXgyN3YvZEVXRmdLYmhBam1qWVNJ?=
- =?utf-8?B?eEducjQ0NGowZytESHRmeFVXWlhnZzZrMmZ0bThEblRqMWcxVVFPQkt3YjV0?=
- =?utf-8?Q?p+fhFx?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?N3c2TWhkM1pkSVZ5MmI4SXdFSjFFN043SkhLdnp6V2kwR09uL09OYlJmcEk0?=
- =?utf-8?B?b0dMcTAzekNsU0NGb2lMWE9zU3VSTWhZOGFFNTYvYXNLd2VLTWhFMlUwOVl0?=
- =?utf-8?B?MGY0dGt6V29uSUtnQndOdVR0VEdBS29hdmxTbWNYa0s0UEtobXgxYU82Y29T?=
- =?utf-8?B?dTZuNStkYUFiVmMySkY1a2RJSHJYeFhFYWhFMVF4WklmdHV5emNMWFNtQncw?=
- =?utf-8?B?b0FnUnFpazM3b3IxYlBoam1GQjIrZFM5ajdHRU9INUp4S2t2UWRpWWFnTzVQ?=
- =?utf-8?B?eFBkaUpzUGJCR1Yxb3VpcDg4NTl5bDZpZ2VJY0RWSkhwR0dJMXppUWJKSlpT?=
- =?utf-8?B?OUY3eU5uR3FlOVgxN2tVUFI4eUtLaFJ4Z3poc0JUSEJQdHcxQVhhcUZHSzdQ?=
- =?utf-8?B?Sk5BS0d5ZkNpb0IxTGV5RUhobjBXYVRSZGVhZTZhSTlvcnZTN0lscGFaZ2U0?=
- =?utf-8?B?M2VPN3ZpL0c3Vi82U210bmpEUDJKU0ROT2lXU1NhU1dMU3BTbTZoeHBiK0R1?=
- =?utf-8?B?akxpcDVQU3ZnT3hrRU5YUUd3VGo1YzJrVUVUcmFVWC9HVXRFblEwelRUNUZE?=
- =?utf-8?B?YXgzajZLQXdQWnZwRjlFdEcxUnBESk4wRGdaejlZS2U1OXpwd2MxTy96bkdW?=
- =?utf-8?B?d3p4UzRMSlViNUV5UVpQQXcrUVNTNjVLRkduUWVHd3l1UUlySE16MmFQaTRY?=
- =?utf-8?B?ekpXYW1CVFUybEZpYWlkL2ZhZ3IwSHBMR3ErSkxkbjRoM0xIaGlzRkd4eStk?=
- =?utf-8?B?OHlMb3hXTFBuQ3d1V0NGQkNsMFVBakxMZXpSY2x0dVJEKzdpdE9jUStFVmVV?=
- =?utf-8?B?M0VRa3AxYTQ0Ny9Weit5RFZvTkpQSnRkKzh4ZVlpenluNEFRWkN0RGxUbDhR?=
- =?utf-8?B?dzErVmw4Z25uTU1OM0Jsb0k1U3piMUdISHV0SWJNYktzRHl5Uy9vTlkzYndw?=
- =?utf-8?B?Q080WDU1dHduV09BY0tFMC9BUXlvenBGY2gzajNBUW5jckVQeXF3cTNteVNU?=
- =?utf-8?B?Z2wyRUtDVUxieE1iNEZ2U2NMNFAvS05OTFp5eWFiTVFGYmw2OHErQndIOGRO?=
- =?utf-8?B?QTdQWkQrTVZaSEdXSnU1YmQ5bUtQTURERmJyTlluK3JuVVVIN1U5Y01hWmdx?=
- =?utf-8?B?Y2Z2Qk9yZ2J6ZWt3VnhJVGRKQzFwMmtzRlRXNDF6Tnl0VFlCZFVLVGg3bmhV?=
- =?utf-8?B?Tis0b2hNK2FJZSs4TlJrbDNrTzhSYnd5Q3VyWHFreGRUUm9vT2xqd1E5Z2FE?=
- =?utf-8?B?MUp6eEhhc3A5aVhqZ3g0T3JqZnFHYnBkV0VNTFdRWmdwWEhyNDZrK1k1czVl?=
- =?utf-8?B?NkRSY3hUeUpvK3FSTHJBM0QwSG1oWVJHT1NOVXFmOTBpWmh5clRNdDhDUWpS?=
- =?utf-8?B?Uk1CY3dnU2Q0YWhzdjdWQ0VScTBBRW1RMjJlSEZmVnl0RkxCekRtSjdtcTFH?=
- =?utf-8?B?L0JyeGVydGR6RWJXbWFtSG1xOWRabjJQQkVQSlIvTDhJLys0Wng0WlAzNlFP?=
- =?utf-8?B?V0x3YStBSHZjYi9oM1B4djZUcFN0ZjV3MVZESlA1b2FmQUVsRGRsaWMybitx?=
- =?utf-8?B?bTR3cGt3Z2RUN0g3azNZQWo4M1RRTVZrTGFPWlhKWURjcC9wMnBvRGp5Sy9s?=
- =?utf-8?B?Y2IrNzMzOURjenZlWnh5NjMzeTJiNUlKUU15ZXd4M2hKTHV6dS9IU2RUYWJT?=
- =?utf-8?B?YlYvcEZ4a2NFblB1YW4vSmk1M01aKy9lQzd0dTBXQ1BLMHlxc3phbG9kSm1j?=
- =?utf-8?B?djZuZHFpZjRZUWZPRm44ZGZqeTdpUThYKzlQTWI5bFJWcjFuVDJtUHhRRE9V?=
- =?utf-8?B?dEJZaVdiN3lwM1NhNjYvRFBsemV5clR2S0tJYkpBTlVvTEdIVHNzRmh6TVNm?=
- =?utf-8?B?VUdTMmdFTys0OGhYaWw5TFRpdHZEa2dlNDU4TXFsaE55WmlUQlRXMUtUTjhV?=
- =?utf-8?B?S3B2SDN4RVRaN1NJV1FSQUI3bkFTZkRtaFJZLzlGY3htSjZXTGJRRHRPQU5x?=
- =?utf-8?B?UVJIcVdKWmRhZnNlVlNsQmVmVkx1YkxsdTBqSnN6M1FJTEhEbVhZOFBPMGNu?=
- =?utf-8?B?YzJJMUxjYVRWUE9OeVlnczlDVWJCZTRMZGUxR3pYdGVBTUV3T2JGRmpPcXFI?=
- =?utf-8?B?LzRBQUc4Y2oremdZMk5EQWI1d3dqbVR4TklQN0pFeUtvam9xaVpJOEQ4MUFR?=
- =?utf-8?B?M3c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7E74CACA40C74B4496811EE9A1AEB7E0@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C8221DF26A
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 17:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761587206; cv=none; b=ahaY+bxbjWQSi5zJOW0Ffhrk3IcSVTW9TGp++UVXiLn3LYfiI+TagB00KGxKxF1L625KBtk2BzdRm4vU99964daAH/W6HUkGWJEfVqcQTJHkLX5wzaLzMdH4U7HY+5qFcAvVvOe+kebd9RuVuQrUWn/yGH3FQ8FbEfyXYMx+oAQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761587206; c=relaxed/simple;
+	bh=VcG5+XrvrT1sRlh00mVu9cyDAkrQ1aMhBFqFLZQAOQI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ucQlyWxbAOPpHRENBGbreiqcPSdmhIP28dXf4l5wxxdtuyqRvQpWufSRBMFS3RBaVqhz9I3ojn89ZNDLREbsOoebuKyIBZR/QH8ULcXpR1THpTKadNF8JVDFZxs7GJltQ9hL63VJxpqx4j7Lq9T9T/oKecwd3poagyxzo/fsfAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YYf/7TlC; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-3717780ea70so64914871fa.1
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 10:46:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761587202; x=1762192002; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c/OxAieWT1IlZT6K7vEkuqxMdOaiR3DM/O5Sopg8BcA=;
+        b=YYf/7TlCNLYSIMdr1QJTpZcYoXLRc5EZdz6CAlHgWOWXWhWXFg2FSeYPu4SMmjwzzZ
+         9uVHXi2RjLoFVDM4fGoYMVkt+hbwCyX/wZLqk9F+Qmj1OAtL3Mc4NJVkF5VqhE91ulNa
+         hJ17Pnq3+1Nf7w20HTAyrw/krmrhoWtf+Rzy1EYg7rDU+6Jx6bn+4fWhQxEaUtnQWyi5
+         8GvCJBX/qTG/2PwjxK5FqVPriIsT3Wv49xIDHRI7D8a+ss9sR4CKoq6duYSm8UygRRmP
+         wnRAGGsKW4NUNI70zs39D7OA17SVGztI6p8LqqHQFA+aFpIBUFKiSqMeCSz5x6WqEQo5
+         jkEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761587202; x=1762192002;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c/OxAieWT1IlZT6K7vEkuqxMdOaiR3DM/O5Sopg8BcA=;
+        b=YoBsEZULVt9lOjvs8BfUOMlUQhszNJlU6N3GEQsngSgpaDfud4+JQ5PGG2qfuqG4E3
+         2gCRa+2aHNnt1bhxs8Kve4aVyUZWAdQP8Kh9tj2KruU5mJ6o0/BbZPmmvFwklSI9Q4wc
+         ObrTkdr8tQPq7qhWjA3Qrz/NJX1UqrvgzJb4/itpAWfe/GruAyamA81JRWyFQYgV7mfg
+         OLL6ML0+B4QbhwRsS0DizHq4yBlGNVMgs8jifOXFzI/z3EHFKEGk23Xh9Q8IeuyZLicX
+         kXZjDh9J+W6J3TlHpkiU8ZojwzfwLHLcaenlDGttBle4WAHwBZ4qzWkDShsRlPzM+929
+         O2Ww==
+X-Forwarded-Encrypted: i=1; AJvYcCWDnkyhNZNE2NCBPH+qQcHtY5AVprrhNUTr2CT17GN2/lc6Gdh65f9OX2jCMD/9NfC5aqU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWsaT4IhMkmqnFKZyEa0OloEXJx+VH0dQBXuHom2lEZZBOFxnL
+	H+s4Is+qPOO02k/TeFx4HKuozDS7TeOq1Q4myQfGfBKtxwf5n4u5CmhqMxV38HcM17ae1y+eqrB
+	i4IncKmpp8Gu3bFhnGOYWyJKbJ3QvyKTJ+JRfNRap
+X-Gm-Gg: ASbGnctZGjrQ+yfgaEmw6Ieb7LmD2cphw2F1uRZDDYX6ASRec9tN2Cbkjyj1ogIW3Z4
+	Q1Jj4siX8DAS9hyEdSe3mY/4Agt5+nfMa10XwNt8FiYy+YumxlT2NKYS7KfwHw7tEpt/qlXWEiA
+	k6b4/lcKTnMbv9+tC4kOTOLyGyFtxdWK6zRQ6su7F3v6/C0/SIIjVnIG5zRJBfd7N4GTDMhvRyy
+	/Tx19QREbOVKgftiyK6plHPZ0Jh5u+pxZTe+EDcdNN6YQcGXyF0y6fF70/3XLZZWzpZqhA=
+X-Google-Smtp-Source: AGHT+IHkh278KwfUHPTzc5VicZripZvZrUk0vB++mCtwjLhz+uh7rj9RS70YXfJyBQCKh3CzASqgCkSwgmM2v4er/sU=
+X-Received: by 2002:a05:651c:2450:10b0:373:a537:6a00 with SMTP id
+ 38308e7fff4ca-3790773be31mr1223281fa.30.1761587202208; Mon, 27 Oct 2025
+ 10:46:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8821a0e-0fcf-40c1-7f9d-08de1580b2c2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Oct 2025 17:46:03.1926
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1E5E2DSGU9EI1M2zDmZ3E1l9Iw742vEDZwLlfYEUrGxZPQtiGwFyYLcSvwCoGiOrFEGeSxnfjgMHgT0L/v/5FLmP/V3pW0Iayy2dqb/zhXA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6481
-X-OriginatorOrg: intel.com
+References: <20250912222525.2515416-1-dmatlack@google.com> <20250912222525.2515416-3-dmatlack@google.com>
+ <aP-jZOVdrIVB_qaV@google.com>
+In-Reply-To: <aP-jZOVdrIVB_qaV@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 27 Oct 2025 10:46:14 -0700
+X-Gm-Features: AWmQ_bl-uhT1aNzDhVn581PsXGZQcal3BydVSD19tHZW9f1erZWj44XAaoDjX2Y
+Message-ID: <CALzav=eV6OQXSkL-AF7LoOzQ4gsWpfn395UdU2=P7NGChZWX8g@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: selftests: Add a test for vfio-pci device IRQ
+ delivery to vCPUs
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gTW9uLCAyMDI1LTEwLTI3IGF0IDE3OjI2ICswODAwLCBZYW4gWmhhbyB3cm90ZToNCj4gPiBV
-Z2gsIEknZCByYXRoZXIgbm90P8KgIFJlZnJlc2ggbWUsIHdoYXQncyB0aGUgc3Rvcnkgd2l0aCAi
-djEiP8KgIEFyZSB3ZSBub3cgb24NCj4gPiB2Mj8NCj4gTm8uLi4gV2UgYXJlIG5vdyBvbiB2MS4N
-Cj4gQXMgaW4gWzFdLCBJIGZvdW5kIHRoYXQgVERYIG1vZHVsZSBjaGFuZ2VkIFNFQU1DQUxMIFRE
-SF9WUF9JTklUIGJlaGF2aW9yIHRvDQo+IHJlcXVpcmUgZXhjbHVzaXZlIGxvY2sgb24gcmVzb3Vy
-Y2UgVERSIHdoZW4gbGVhZl9vcGNvZGUudmVyc2lvbiA+IDAuDQo+IA0KPiBUaGVyZWZvcmUsIHdl
-IG1vdmVkIEtWTV9URFhfSU5JVF9WQ1BVIHRvIHRkeF92Y3B1X3VubG9ja2VkX2lvY3RsKCkgaW4g
-cGF0Y2gNCj4gMjIuDQo+IA0KPiBbMV0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxsL2FMYTM0
-UUNKQ1hHTGslMkZmbEB5emhhbzU2LWRlc2suc2guaW50ZWwuY29tLw0KDQpMb29raW5nIGF0IHRo
-ZSBQREYgZG9jcywgVERSIGV4Y2x1c2l2ZSBsb2NraW5nIGluIHZlcnNpb24gPT0gMSBpcyBjYWxs
-ZWQgb3V0IGF0DQpsZWFzdCBiYWNrIHRvIHRoZSBvbGRlc3QgQUJJIGRvY3MgSSBoYXZlIChNYXJj
-aCAyMDI0KS4gTm90IHN1cmUgYWJvdXQgdGhlDQphc3NlcnRpb24gdGhhdCB0aGUgYmVoYXZpb3Ig
-Y2hhbmdlZCwgYnV0IGlmIGluZGVlZCB0aGlzIHdhcyBkb2N1bWVudGVkLCBpdCdzIGENCmxpdHRs
-ZSBiaXQgb3VyIGJhZC4gV2UgbWlnaHQgY29uc2lkZXIgYmVpbmcgZmxleGlibGUgYXJvdW5kIGNh
-bGxpbmcgaXQgYSBURFggQUJJDQpicmVhaz8NCg0KU2VhbiwgY2FuIHlvdSBlbGFib3JhdGUgd2h5
-IHRha2luZyBtbXVfbG9jayBpcyBvYmplY3Rpb25hYmxlIGhlcmUsIHRob3VnaD8NCg0KTm90ZSwg
-bXlzZWxmIChhbmQgSSB0aGluayBZYW4/KSBkZXRlcm1pbmVkIHRoZSBsb2NraW5nIGJ5IGV4YW1p
-bmluZyBURFggbW9kdWxlDQpzb3VyY2UuIEZvciBteXNlbGYsIGl0J3MgcG9zc2libGUgSSBtaXNy
-ZWFkIHRoZSBsb2NraW5nIG9yaWdpbmFsbHkuDQoNCkFsc28sIEknbSBub3Qgc3VyZSBhYm91dCBz
-d2l0Y2hpbmcgZ2VhcnMgYXQgdGhpcyBwb2ludCwgYnV0IGl0IG1ha2VzIG1lIHdvbmRlcg0KYWJv
-dXQgdGhlIHByZXZpb3VzbHkgZGlzY3Vzc2VkIG9wdGlvbiBvZiB0cnlpbmcgdG8ganVzdCBkdXBs
-aWNhdGUgdGhlIFREWCBsb2Nrcw0Kb24gdGhlIGtlcm5lbCBzaWRlLiBPciBwZXJoYXBzIG1ha2Ug
-c29tZSBraW5kIG9mIGRlYnVnIHRpbWUgbG9ja2RlcCB0eXBlIHRoaW5nDQp0byBkb2N1bWVudC9j
-aGVjayB0aGUgYXNzdW1wdGlvbnMgaW4gdGhlIGtlcm5lbC4gU29tZXRoaW5nIGFsb25nIHRoZSBs
-aW5lcyBvZg0KdGhpcyBwYXRjaCwgYnV0IHRvIG1hcCB0aGUgVERYIGxvY2tzIHRvIEtWTSBsb2Nr
-cyBvciBzb21ldGhpbmcuIEFzIHdlIGFkZCBtb3JlDQp0aGluZ3MgKERQQU1ULCBldGMpLCBpdCBk
-b2Vzbid0IHNlZW0gbGlrZSB0aGUgVERYIGxvY2tpbmcgaXMgZ2V0dGluZyB0YW1lci4uLg0KDQo=
+On Mon, Oct 27, 2025 at 9:52=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+
+Thank you for the feedback!
+
+> On Fri, Sep 12, 2025, David Matlack wrote:
+> >
+> > This test only supports x86_64 for now, but can be ported to other
+> > architectures in the future.
+>
+> Can it though?  There are bits and pieces that can be reused, but this te=
+st is
+> x86 through and through.
+
+Delivering MSIs from a vfio-pci device into a guest is not an
+x86-specific thing. But I think you could make the argument that it
+will be simpler for each architecture to have their own version of
+this test, with some shared code, rather than the other way around.
+
+> >  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+> >  .../testing/selftests/kvm/vfio_pci_irq_test.c | 507 ++++++++++++++++++
+>
+> Please break this into multiple patches, e.g. a "basic" patch and and the=
+n roughly
+> one per "advanced" command line option.
+
+Will do.
+
+> > +static pid_t vcpu_tids[KVM_MAX_VCPUS];
+>
+> s/tids/pids?
+
+This stores output from gettid(), so tids felt more appropriate.
+
+> > +#define TIMEOUT_NS (2ULL * 1000 * 1000 * 1000)
+>
+> The timeout should be configurable via command line.
+
+Will do.
+
+> > +#define READ_FROM_GUEST(_vm, _variable) ({           \
+> > +     sync_global_from_guest(_vm, _variable);         \
+> > +     READ_ONCE(_variable);                           \
+> > +})
+> > +
+> > +#define WRITE_TO_GUEST(_vm, _variable, _value) do {  \
+> > +     WRITE_ONCE(_variable, _value);                  \
+> > +     sync_global_to_guest(_vm, _variable);           \
+> > +} while (0)
+>
+> These belong in a separate patch, and in tools/testing/selftests/kvm/incl=
+ude/kvm_util.h.
+
+Will do.
+
+> > +static void guest_enable_interrupts(void)
+>
+> This is a misleading name, e.g. I would expect it to _just_ be sti_nop().=
+  If the
+> intent is to provide a hook for a potential non-x86 implementation, then =
+it should
+> probably be split into guest_arch_test_setup() and guest_arch_irq_enable(=
+) or so
+> (to align with the kernel's local_irq_{dis,en}able()).
+>
+> As is, I would just omit the helper.
+
+Will do.
+
+> > +static void guest_irq_handler(struct ex_regs *regs)
+> > +{
+> > +     WRITE_ONCE(guest_received_irq[guest_get_vcpu_id()], true);
+>
+> Hmm, using APID ID works, but I don't like the hidden dependency on the l=
+ibrary
+> using ascending IDs starting from '0'.  This would also be a good opportu=
+nity to
+> improve the core infrastructure.
+
+What dependency are you referring to? I think the only requirement is
+vcpu->id =3D=3D APIC ID. Are you saying tests should not make that
+assumption?
+
+> > +     WRITE_ONCE(vcpu_tids[vcpu->id], syscall(__NR_gettid));
+>
+> Please add wrapper in tools/testing/selftests/kvm/include/kvm_syscalls.h.
+
+Will do.
+
+> > +static void pin_vcpu_threads(int nr_vcpus, int start_cpu, cpu_set_t *a=
+vailable_cpus)
+> > +{
+> > +     const size_t size =3D sizeof(cpu_set_t);
+> > +     int nr_cpus, cpu, vcpu_index =3D 0;
+> > +     cpu_set_t target_cpu;
+> > +     int r;
+> > +
+> > +     nr_cpus =3D get_nprocs();
+>
+> Generally speaking, KVM selftests try to avoid affining tasks to CPUs tha=
+t are
+> outside of the original affinity list.  See various usage of sched_getaff=
+inity().
+
+available_cpus is initialized by calling sched_getaffinity().
+
+> > +static FILE *open_proc_interrupts(void)
+> > +{
+> > +     FILE *fp;
+> > +
+> > +     fp =3D fopen("/proc/interrupts", "r");
+> > +     TEST_ASSERT(fp, "fopen(/proc/interrupts) failed");
+>
+> open_path_or_exit()?
+
+I guess I'll have to rework this code to use fds instead of FILE?
+
+>
+> > +
+> > +     return fp;
+> > +}
+>
+> And all of these /proc helpers belong in library code.
+
+Will do.
+
+> > +static int setup_msi(struct vfio_pci_device *device, bool use_device_m=
+si)
+> > +{
+> > +     const int flags =3D MAP_SHARED | MAP_ANONYMOUS;
+> > +     const int prot =3D PROT_READ | PROT_WRITE;
+> > +     struct vfio_dma_region *region;
+> > +
+> > +     if (use_device_msi) {
+> > +             /* A driver is required to generate an MSI. */
+> > +             TEST_REQUIRE(device->driver.ops);
+> > +
+> > +             /* Set up a DMA-able region for the driver to use. */
+>
+> Why?
+
+I will extend the comment to explain.
+
+Each driver needs DMA-able memory so that it can post commands to the
+device to get the device to perform actions like sending an MSI and
+doing a memcpy.
+
+You might wonder why tests have to worry about setting up this region
+and why the driver doesn't just do it automatically. That is because
+some tests will want to control how the memory is mapped in the host
+(e.g. Live Update tests want to use memfds so it can persist them
+across Live Update) and how it is mapped into the IOMMU.
+
+That being said, I think it would be worth adding a helper to set up a
+default mapping for drivers for tests that don't care.
+
+>
+> > +             region =3D &device->driver.region;
+> > +             region->iova =3D 0;
+> > +             region->size =3D SZ_2M;
+> > +             region->vaddr =3D mmap(NULL, region->size, prot, flags, -=
+1, 0);
+>
+> kvm_mmap()
+
+Will do.
+
+> > +static void send_msi(struct vfio_pci_device *device, bool use_device_m=
+si, int msi)
+>
+> IMO, this helper does more harm than good.  There is only one real user, =
+the
+> second call unconditionally passes %false for @use_device_msi.
+>
+> If you drop the helper, than there should be no need to assert that the M=
+SI is
+> the device MSI on *every* send via device.
+
+Will do.
+
+> > +int main(int argc, char **argv)
+> > +{
+> > +     /* Random non-reserved vector and GSI to use for the device IRQ *=
+/
+> > +     const u8 vector =3D 0xe0;
+>
+> s/random/arbitrary
+>
+> Why not make it truly random?
+
+Only because there's already a lot going on in this test. Do you think
+it's worth randomizing these?
+
+> > +     irq_count =3D get_irq_count(irq);
+> > +     pin_count =3D __get_irq_count("PIN:");
+> > +     piw_count =3D __get_irq_count("PIW:");
+>
+> This is obviously very Intel specific information.  If you're going to pr=
+int the
+> posted IRQ info, then the test should also print e.g. AMD GALogIntr event=
+s.
+
+I saw PIN and PIW in /proc/interrupts when I tested on AMD hosts,
+that's why I included them both by default.
+
+I can look into adding GALogIntr if you want.
+
+> > +     if (pin_vcpus) {
+> > +             ret =3D sched_getaffinity(vcpu_tids[0], sizeof(available_=
+cpus), &available_cpus);
+> > +             TEST_ASSERT(ret =3D=3D 0, "sched_getaffinity() failed");
+>
+> !ret
+>
+> Though this is another syscall that deserves a wrapper in kvm_syscalls.h.
+
+Will do.
+
+> > +             if (nr_vcpus > CPU_COUNT(&available_cpus)) {
+> > +                     printf("There are more vCPUs than pCPUs; refusing=
+ to pin.\n");
+> > +                     pin_vcpus =3D false;
+>
+> Why is this not an assertion?  Alternatively, why not double/triple/quadr=
+uple up
+> as needed?
+
+I don't recall why I added this... I can probably just drop it in the
+next version. I'll report back here if I remember why when working on
+v2.
+
+> > +     if (irq_affinity) {
+> > +             char path[PATH_MAX];
+> > +
+> > +             snprintf(path, sizeof(path), "/proc/irq/%d/smp_affinity_l=
+ist", irq);
+> > +             irq_affinity_fp =3D fopen(path, "w");
+> > +             TEST_ASSERT(irq_affinity_fp, "fopen(%s) failed", path);
+>
+> More code that belongs in the library.
+
+Will do.
+
+> > +     /* Set a consistent seed so that test are repeatable. */
+> > +     srand(0);
+>
+> We should really figure out a solution for reproducible random numbers in=
+ the
+> host.  Ah, and kvm_selftest_init()'s handling of guest random seeds is fl=
+awed,
+> because it does random() without srand() and so AFAICT, gets the same see=
+d every
+> time.  E.g. seems like we want something like this, but with a way to ove=
+rride
+> "random_seed" from a test.
+>
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
+elftests/kvm/lib/kvm_util.c
+> index 5744643d9ec3..0118fd2ba56b 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -2310,6 +2310,7 @@ void __attribute((constructor)) kvm_selftest_init(v=
+oid)
+>         struct sigaction sig_sa =3D {
+>                 .sa_handler =3D report_unexpected_signal,
+>         };
+> +       int random_seed;
+>
+>         /* Tell stdout not to buffer its content. */
+>         setbuf(stdout, NULL);
+> @@ -2319,8 +2320,13 @@ void __attribute((constructor)) kvm_selftest_init(=
+void)
+>         sigaction(SIGILL, &sig_sa, NULL);
+>         sigaction(SIGFPE, &sig_sa, NULL);
+>
+> +       random_seed =3D time(NULL);
+> +       srand(random_seed);
+> +
+>         guest_random_seed =3D last_guest_seed =3D random();
+> -       pr_info("Random seed: 0x%x\n", guest_random_seed);
+> +
+> +       pr_info("Guest random seed: 0x%x (srand: 0x%x)\n",
+> +               guest_random_seed, random_seed);
+>
+>         kvm_selftest_arch_init();
+>  }
+
+Just to make sure I understand: You are proposing using the current
+time as the seed and printing it to the console. That way each run
+uses a different random seed and we get broader test coverage. Then if
+someone wants to reproduce a test result, there would be some way for
+them to override the seed via cmdline? That sounds reasonable to me, I
+can take a look at adding that in the next version.
+
+> > +             if (irq_affinity && vcpu->id =3D=3D 0) {
+>
+> Please add comments explaining why affinity related stuff is only applied=
+ to
+> vCPU0.  I could probably figure it out, but I really shouldn't have to.
+
+Will do.
+
+> > +             for (j =3D 0; j < nr_vcpus; j++) {
+> > +                     TEST_ASSERT_EQ(READ_FROM_GUEST(vm, guest_received=
+_irq[vcpu->id]), false);
+> > +                     TEST_ASSERT_EQ(READ_FROM_GUEST(vm, guest_received=
+_nmi[vcpu->id]), false);
+>
+> These won't generate helpful assert messages.
+
+Good point. I'll improve these in the next version.
+
+> > +             for (;;) {
+> > +                     if (do_nmi && READ_FROM_GUEST(vm, guest_received_=
+nmi[vcpu->id]))
+> > +                             break;
+> > +
+> > +                     if (!do_nmi && READ_FROM_GUEST(vm, guest_received=
+_irq[vcpu->id]))
+> > +                             break;
+>
+>                 received_irq =3D do_nmi ? &guest_received_nmi[vcpu->id] :
+>                                         &guest_received_irq[vcpu->id];
+>                 while (!READ_FROM_GUEST(vm, *received_irq))
+>                         if (timespec_to_ns(timespec_elapsed(start)) > TIM=
+EOUT_NS) {
+>                                 ...
+>                         }
+>
+>                         cpu_relax();
+>                 }
+
+LGTM
+
+> > +
+> > +                     if (timespec_to_ns(timespec_elapsed(start)) > TIM=
+EOUT_NS) {
+> > +                             printf("Timeout waiting for interrupt!\n"=
+);
+> > +                             printf("  vCPU: %d\n", vcpu->id);
+> > +                             printf("  do_nmi: %d\n", do_nmi);
+> > +                             printf("  do_empty: %d\n", do_empty);
+> > +                             if (irq_affinity)
+> > +                                     printf("  irq_cpu: %d\n", irq_cpu=
+>
+> > +             if (do_nmi)
+> > +                     WRITE_TO_GUEST(vm, guest_received_nmi[vcpu->id], =
+false);
+> > +             else
+> > +                     WRITE_TO_GUEST(vm, guest_received_irq[vcpu->id], =
+false);
+> > +     }
+> > +
+> > +     WRITE_TO_GUEST(vm, done, true);
+> > +
+> > +     for (i =3D 0; i < nr_vcpus; i++) {
+> > +             if (block) {
+> > +                     kvm_route_msi(vm, gsi, vcpus[i], vector, false);
+> > +                     send_msi(device, false, msi);
+> > +             }
+> > +
+> > +             pthread_join(vcpu_threads[i], NULL);
+> > +     }
+> > +
+> > +     if (irq_affinity)
+> > +             fclose(irq_affinity_fp);
+> > +
+> > +     printf("Host interrupts handled:\n");
+> > +     printf("  IRQ-%d: %lu\n", irq, get_irq_count(irq) - irq_count);
+> > +     printf("  Posted-interrupt notification events: %lu\n",
+> > +            __get_irq_count("PIN:") - pin_count);
+> > +     printf("  Posted-interrupt wakeup events: %lu\n",
+> > +            __get_irq_count("PIW:") - piw_count);
+> > +
+> > +     vfio_pci_device_cleanup(device);
+> > +
+> > +     return 0;
+> > +}
+> > --
+> > 2.51.0.384.g4c02a37b29-goog
+> >);
+>
+> vfio_pci_irq_test.c: In function =E2=80=98main=E2=80=99:
+> vfio_pci_irq_test.c:469:41: error: =E2=80=98irq_cpu=E2=80=99 may be used =
+uninitialized [-Werror=3Dmaybe-uninitialized]
+>   469 |                                         printf("  irq_cpu: %d\n",=
+ irq_cpu);
+>       |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~~~
+> vfio_pci_irq_test.c:332:13: note: =E2=80=98irq_cpu=E2=80=99 was declared =
+here
+>   332 |         int irq_cpu;
+>       |             ^~~~~~~
+
+Ack, will fix.
+
+> > +                             if (pin_vcpus)
+> > +                                     printf("  vcpu_cpu: %d\n", get_cp=
+u(vcpu));
+> > +
+> > +                             TEST_FAIL("vCPU never received IRQ!\n");
+> > +                     }
+> > +             }
+>
+>                 TEST_ASSERT(guest_received_irq[vcpu->id] !=3D
+>                             guest_received_nmi[vcpu->id],
+>                             "blah blah blah");
+>
+>                 WRITE_TO_GUEST(vm, *received_irq, false);
+
+LGTM
 
