@@ -1,145 +1,166 @@
-Return-Path: <kvm+bounces-61243-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61244-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05F51C121E4
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 00:58:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14282C121E8
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 00:59:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21D181A259D5
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 23:59:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1EDD1A25894
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 23:59:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A0D32C323;
-	Mon, 27 Oct 2025 23:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7C0330B1C;
+	Mon, 27 Oct 2025 23:58:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JKkpqAPF"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="ypygDytn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C14F19D08F
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 23:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF25930AAA9
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 23:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761609506; cv=none; b=C8c91vSk0JvpyxIyQFqJHPM9LmE3lmzHtbcq0rsuSNnxNSdo30hL+yDda5TIxV6FWINDBvx7WKwRkd+zxNguRPFSm8O5FOMnIHhJ8MkDWa5wA3FQ/IYdpHZtYW2bSPbWu9qAvi5T0ZR25yS2h1/YwH8BNNyW2WPLayRhfA3Mq+E=
+	t=1761609512; cv=none; b=QjWEBZW0I7QnciODJ42Wbss+2GOyBbPAwmTWqsWBN4SsRrViZdwyDFNERddEtcLLbWXu4iVbahGQDfK6FeOP02fp43g1Sa3PkGS2kn8KXy9JniijJpN0sNwbBfXGTELArfkEIKK07v6EJcY6ZytLfYD84nNl97QrmY0jH7ghp5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761609506; c=relaxed/simple;
-	bh=B3mpFVAR6ZmcNWLBi88Xta8WGYLy+I86D02flIVttrI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XGSwvriTsrzPJ/G33GtJDCJD02sXJUM+NvVjLNUENb7iyeyzwE2vnjz49Er1DLwf7H5wcwED8DO7/ESUgnOfIuHTDT6hFaZxA5h3Thaw7g+Mywz0attfSYB+SYizL0mECuUV5Vr58ytUVksRVTP7NaEBpuhM1WzVXJ/D6fOIzx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JKkpqAPF; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-63c44ea68f6so4722a12.0
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:58:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761609503; x=1762214303; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k9F1wSsSxhw2D505fXHUdjLY9NdHqh0zXhSCGVR/itg=;
-        b=JKkpqAPF2K0zQPqB6mLPQdzCvXG3z9KleGjfprAjVFPvnTyU79PccWGIckYtl5eqPt
-         WBhZcrTWIFxDBax5bhpNbLvNk/lDuwE0T14uiLre4McmpbHnY8bi9aKyMwbrYcj3KQLR
-         Jq+yez/2IUM5pK/4HBqeHyBDEnEnLDuDehTQLfp+vtQSXoQ2KBDu/MecyHYzXUAFBmsm
-         MCm1kOv59mrPEweqLxUhqLs2yee+6r8K/ts7JL0CaW4Aw2/IZ2cMBvB1yVk1gNsO29BD
-         RhSV2uuoDIB1AiyWqoWPRyxD5BLXbmNqpP1EpGSHA4SH5kcCM8S/cV+FjRP5fyX1Ur4W
-         B/hA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761609503; x=1762214303;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k9F1wSsSxhw2D505fXHUdjLY9NdHqh0zXhSCGVR/itg=;
-        b=vIUP8SgatpMLGwKzI5fu2k++3uZ1fCNAqYpXBws28oC9kMQpFYarETtCYVyZEoxDEY
-         OBP7AKuD+RPgDh1WvjP71wmjGRjIqQNNiAWk5aGYRL7PxtEjRnxyH6vd1Guw8mZOx7cA
-         cg6/MST6Y3Uisz3wFE1Th1lT9YsOyypVvubB+jo41SSo6g9N6Or3/djWnoukZOeopuGr
-         e1g+k2sqNIVxmGfFkb1/IraMLl4Md83S051+JEFE2HB1fTB9SFms+tTOuVDJY86Pfcr5
-         jcSmvAK3K7V+PfOcLm4XF6HYcScLo9lNOm0JCUjEQ376URRKCOxF53vXHRuzgf/jmt3K
-         y1TQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVCRW9JkHHcw9tXhpxCf/GhKkfWwmnYy9XKEwS7O7Q6ExA3PATLB2gT9BGc3O3/Y+9axTQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuTCVfkauRTDoXyccISzNvrRBHTTPLOyKLMfHeEzZekJt+wk11
-	VDlk51atoA8s2OKq6zrrrF75tVC7bXLU565YnRc1hbYn0ZOKQN5HU5a0dRnxMmLPyd555art+xh
-	umeiDvOrKq1RuTHHqP9fJvYhcx56sDgiRCPWkTBD/
-X-Gm-Gg: ASbGnctYlJk35vYPXCydi1xj5m6d9tjXGUohd+MR1NNIape7RXXgndpWSuq65CApDjy
-	BpeQponjCsRzTqorM+4t4NhyKwKxg0cMuz99tk0Rs6Zgi9pGVXAbkccFVmq1LVHtvxa29tlcTN/
-	mysC0UE/A91G39Q9ACYpl1eubT+jawu//tegQK2SuAV7wIrl6naD5w6m5KFFkv/4FiOhc+Rn34u
-	6Cuex7XfqUA937qDE9+B+UgcsmI84JN58jCXE1wTjcaMbakMQ7mWeAtIKmnVmMkgkjbO2E=
-X-Google-Smtp-Source: AGHT+IFI7RbCRSrkZ+26mAjogVrTWudlWrC8fSNj8O9PmlVdQ7Csv0X4ZvVnTgaBHpL6T+OSCphRK3ecNFW9+faxMrM=
-X-Received: by 2002:a05:6402:206:b0:634:b4b5:896f with SMTP id
- 4fb4d7f45d1cf-63f6f88db75mr39252a12.4.1761609502550; Mon, 27 Oct 2025
- 16:58:22 -0700 (PDT)
+	s=arc-20240116; t=1761609512; c=relaxed/simple;
+	bh=NkRPhIpUL0KWyN8WDV3xMQy976SyIF1Lzif54tBlA3c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=urfjtP4GAcTIpRrscF52j4Gig8nXwPvO9EAcbwCqfYx0fUVLtkNIYKqlY52+qFU/r5Q68dnlnZDM5FraUbFWbORo3c80vsjsVjWPMQFd5K0AEcEFh480p1vHVj3UWsDa8O8NJEoYJRbJyprsG1OAxEa7mfuuqAd2AEBM2DNcigk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=ypygDytn; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59RNCb9A638686
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:58:29 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=s2048-2025-q2; bh=K64EqhXoumfbF6yiKLa3
+	ujcAskeWcVn5aoQ4CYMOTJE=; b=ypygDytnJdRpsdaNmXklVNoq9zmgG+7h9Lwd
+	s30WiwTI5bo+5Lk0wJQUnslvCLD/7z7dv9apxwbw0m1w4B0A+CZEBlS5bxBEKx6v
+	2xkhRoF7EaPI+rDiJhG9bScanI620U0VQkSNL9mDAyKxqJzWPPYS53XNrYJPlIZY
+	aQyHT4cSkWgmCJzh8U4LQXGQ2qoQGdZ32tP5FjblO6GEQpupt4dmBb71se3/KBPC
+	WNFZK/ePOrAmUKizqLplb4l2gfFGflAVDLo5zrZpo0kaLQwvPnWwNgimFBVkqSyM
+	15lM0U8iFSjBVOaAdke56kBpq5a744ibHF2/qk2IheVU244FTA==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4a2j788870-4
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:58:29 -0700 (PDT)
+Received: from twshared0973.10.ash9.facebook.com (2620:10d:c085:208::7cb7) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Mon, 27 Oct 2025 23:58:27 +0000
+Received: by devgpu012.nha5.facebook.com (Postfix, from userid 28580)
+	id 3B4A147C147; Mon, 27 Oct 2025 16:58:16 -0700 (PDT)
+Date: Mon, 27 Oct 2025 16:58:16 -0700
+From: Alex Mastro <amastro@fb.com>
+To: David Matlack <dmatlack@google.com>
+CC: Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v5 4/5] vfio: selftests: update DMA map/unmap helpers to
+ support more test kinds
+Message-ID: <aQAHGCAF9Wj5oGUY@devgpu012.nha5.facebook.com>
+References: <20251027-fix-unmap-v5-0-4f0fcf8ffb7d@fb.com>
+ <20251027-fix-unmap-v5-4-4f0fcf8ffb7d@fb.com>
+ <aQACJucKne4DRv06@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251016200417.97003-1-seanjc@google.com> <20251016200417.97003-2-seanjc@google.com>
- <DDO1FFOJKSTK.3LSOUFU5RM6PD@google.com> <aPe5XpjqItip9KbP@google.com>
- <20251021233012.2k5scwldd3jzt2vb@desk> <20251022012021.sbymuvzzvx4qeztf@desk>
- <CALMp9eRpP0LvMJ=aYf45xxz1fRrx5Sf9ZrqRE8yKRcMX-+f4+A@mail.gmail.com> <20251027231721.irprdsyqd2klt4bf@desk>
-In-Reply-To: <20251027231721.irprdsyqd2klt4bf@desk>
-From: Jim Mattson <jmattson@google.com>
-Date: Mon, 27 Oct 2025 16:58:10 -0700
-X-Gm-Features: AWmQ_bk2eMNKxzyzah9DPVxHOoXxsYy6Xljo8QBDtIqM98MaTcgTmbgiB2zzshM
-Message-ID: <CALMp9eSVt22PW+WyfNvnGcOciDQ8MkX9vDmDZ+-Q2QJUH_EvHw@mail.gmail.com>
-Subject: Re: [PATCH v3 1/4] KVM: VMX: Flush CPU buffers as needed if L1D cache
- flush is skipped
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, Brendan Jackman <jackmanb@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aQACJucKne4DRv06@google.com>
+X-FB-Internal: Safe
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI3MDIxOSBTYWx0ZWRfX3krWmBC+xt2Y
+ r5XYm1WgN+JH+jFUjYZdVJalOTyQyQ2JmpMEnpYFBA5ioMFdntjaI1hJ9uQuSZLzArYB4xv1w2W
+ Kap2MrvHhVx5Gd3ZwPWKg1+hHBjp4gRBy8zFIwPn/fUJrbT/cd3G6X60BOSWI1vGoeLL+TSywIW
+ 7beeT9YlT1NtD/j+5uWFuQn+XrqxpgHMMcrALclxGXEMC9uDjUFTBm5xNgIuzlpFjRIdBVAWWKk
+ /XyIMIyDPAzNMOxEJ9RMcPnXraNq+TTheA8JcUqrjNQeCeEDQL7edLAwM+xx2g2QzK04cSiQGhV
+ z1KoMbk/ecN/hN30vLb7+m8Z77j/2v7UAu7SkJIyptNiuwDrFQKB3n9qRgwEfj72NlGdXz+Q9ED
+ tKaIBcu64MY+S5Kp8w7D0i9PIR72xQ==
+X-Authority-Analysis: v=2.4 cv=S9HUAYsP c=1 sm=1 tr=0 ts=69000725 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=FOH2dFAWAAAA:8 a=1XWaLZrsAAAA:8 a=qtSfAhGtrGOdXbEVq08A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: L2FM9bDkau7CNQjwMR2KiwRHaJyV6E-h
+X-Proofpoint-GUID: L2FM9bDkau7CNQjwMR2KiwRHaJyV6E-h
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-27_09,2025-10-22_01,2025-03-28_01
 
-On Mon, Oct 27, 2025 at 4:17=E2=80=AFPM Pawan Gupta
-<pawan.kumar.gupta@linux.intel.com> wrote:
->
-> On Mon, Oct 27, 2025 at 03:03:23PM -0700, Jim Mattson wrote:
-> > On Tue, Oct 21, 2025 at 6:20=E2=80=AFPM Pawan Gupta
-> > <pawan.kumar.gupta@linux.intel.com> wrote:
-> > >
-> > > ...
-> > > Thinking more on this, the software sequence is only invoked when the
-> > > system doesn't have the L1D flushing feature added by a microcode upd=
-ate.
-> > > In such a case system is not expected to have a flushing VERW either,=
- which
-> > > was introduced after L1TF. Also, the admin needs to have a very good =
-reason
-> > > for not updating the microcode for 5+ years :-)
-> >
-> > KVM started reporting MD_CLEAR to userspace in Linux v5.2, but it
-> > didn't report L1D_FLUSH to userspace until Linux v6.4, so there are
-> > plenty of virtual CPUs with a flushing VERW that don't have the L1D
-> > flushing feature.
->
-> Shouldn't only the L0 hypervisor be doing the L1D_FLUSH?
->
-> kvm_get_arch_capabilities()
-> {
-> ...
->         /*
->          * If we're doing cache flushes (either "always" or "cond")
->          * we will do one whenever the guest does a vmlaunch/vmresume.
->          * If an outer hypervisor is doing the cache flush for us
->          * (ARCH_CAP_SKIP_VMENTRY_L1DFLUSH), we can safely pass that
->          * capability to the guest too, and if EPT is disabled we're not
->          * vulnerable.  Overall, only VMENTER_L1D_FLUSH_NEVER will
->          * require a nested hypervisor to do a flush of its own.
->          */
->         if (l1tf_vmx_mitigation !=3D VMENTER_L1D_FLUSH_NEVER)
->                 data |=3D ARCH_CAP_SKIP_VMENTRY_L1DFLUSH;
->
+On Mon, Oct 27, 2025 at 11:37:10PM +0000, David Matlack wrote:
+> On 2025-10-27 10:33 AM, Alex Mastro wrote:
+> > Add __vfio_pci_dma_* helpers which return -errno from the underlying
+> > ioctls.
+> > 
+> > Add __vfio_pci_dma_unmap_all to test more unmapping code paths. Add an
+> > out unmapped arg to report the unmapped byte size.
+> 
+> nit: Please append () to function names in commit messages and comments
+> (e.g. "Add __vfio_pci_dma_unmap_all() to test ..."). It helps make it
+> obvious you are referring to a function.
 
-Unless L0 has chosen L1D_FLUSH_NEVER. :)
+Ack
 
-On GCE's L1TF-vulnerable hosts, we actually do an L1D flush at ASI
-entry rather than VM-entry. ASI entries are two orders of magnitude
-less frequent than VM-entries, so we get comparable protection to
-L1D_FLUSH_ALWAYS at a fraction of the cost.
+> > The existing vfio_pci_dma_* functions, which are intended for happy-path
+> > usage (assert on failure) are now thin wrappers on top of the
+> > double-underscore helpers.
+> > 
+> > Signed-off-by: Alex Mastro <amastro@fb.com>
+> 
+> Aside from the commit message and the braces nits,
 
-At the moment, we still do an L1D flush on emulated VM-entry, but
-that's just because we have historically advertised
-IA32_ARCH_CAPABILITIES.SKIP_L1DFL_VMENTRY to L1.
+Thanks David. The nits are easy enough to fix.
+
+>   Reviewed-by: David Matlack <dmatlack@google.com>
+> 
+> > @@ -152,10 +153,13 @@ static void vfio_iommu_dma_map(struct vfio_pci_device *device,
+> >  		.size = region->size,
+> >  	};
+> >  
+> > -	ioctl_assert(device->container_fd, VFIO_IOMMU_MAP_DMA, &args);
+> > +	if (ioctl(device->container_fd, VFIO_IOMMU_MAP_DMA, &args))
+> > +		return -errno;
+> 
+> Interesting. I was imagining this would would return whatever ioctl()
+> returned and then the caller could check errno if it wanted to. But I
+> actually like this better, since it simplifies the assertions at the
+> caller (like in your next patch).
+
+Yea, I was also worried about errno clobbering up the stack from the ioctl.
+The reason for -errno was to keep error values out of band of >= 0 ioctl return
+values (e.g. if we ever need to do similar for ioctls which return fds)
+
+> > +int __vfio_pci_dma_unmap_all(struct vfio_pci_device *device, u64 *unmapped)
+> > +{
+> > +	int ret;
+> > +	struct vfio_dma_region *curr, *next;
+> > +
+> > +	if (device->iommufd)
+> > +		ret = iommufd_dma_unmap(device->iommufd, 0, UINT64_MAX,
+> > +					device->ioas_id, unmapped);
+> 
+> This reminds me, I need to get rid of INVALID_IOVA in vfio_util.h.
+> 
+> __to_iova() can just return int for success/error and pass the iova up
+> to the caller via parameter.
+> 
+> > +	else
+> > +		ret = vfio_iommu_dma_unmap(device->container_fd, 0, 0,
+> > +					   VFIO_DMA_UNMAP_FLAG_ALL, unmapped);
+> > +
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	list_for_each_entry_safe(curr, next, &device->dma_regions, link) {
+> > +		list_del_init(&curr->link);
+> > +	}
+> 
+> nit: No need for {} for single-line loop.
+
+Ack
 
