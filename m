@@ -1,183 +1,205 @@
-Return-Path: <kvm+bounces-61192-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61194-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8290C0F6D1
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:47:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDD9CC0F66B
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:43:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19926485494
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 16:39:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9404F18857A0
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 16:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9AB313283;
-	Mon, 27 Oct 2025 16:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC67311C32;
+	Mon, 27 Oct 2025 16:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="BSCrR+pG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WZ3AN6gk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27F01E49F
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708D930CD9D
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761583134; cv=none; b=Utomm7ECkePFJd9/TFDLoQGUgL3JnRkx+6h1+wB6U/5/yFsdjZm/Azu+FFaJBc1yJizLCKG2PuwoEceN9rG6ePPSPBjrVsLVv56RxCMps8rBblXYK9lVPp0D3OMGuxcr2JzseyrSGWdcRtKyIsVmbkWuO5/xFk4VHcmnoWgHRcY=
+	t=1761583373; cv=none; b=F+pDkv+mIlv7iwcZ1o0UWlBhJfNHnu/QgktrvzRkOkU2ZpaIT+hNsYmZ/TVcUsRk+694NRYuIBPlRdDEtRn591UoB2JFuItVtOLlQWHT+rYPcy4Vi4hHVQ28oguZNQBcXsd+KXIckf3+61d3dEIyaqu/OpZklmnGqa2mk+Nvbng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761583134; c=relaxed/simple;
-	bh=nAhmUlr/hO6AGJs14F5PTgWNTU6mEzb9QsSufy3So/Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZLdFE/msjNfVMgOE1/ZESClD6Bm6KaHLXDnsSMj0Yo8XuDZPcuMlBb5Lb1ghgFt7E2m6gGE7qWA9H4k6Gq1GOsm1fCJUSlNP2wIJjoZC6pZuv4dRrqOez2CPUoX5of71VDONoVhlK6LLB8Lq+ZS2mqmMhMFunUydYbUr0fODjZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=BSCrR+pG; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-89ec3d9c773so521581285a.2
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:38:52 -0700 (PDT)
+	s=arc-20240116; t=1761583373; c=relaxed/simple;
+	bh=UUysKEeNz7Tgg2dxFbmWl3NmClv4oF03ZgJirQL/j1U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PlErfAhFgxmKa+2/5433AIWOTbUx4sjGpj56+LGnQcqE/jerKzAh19uDRuoVHNgffKBhv/5SsEBE/XzXtR6G/dDpZH6vkLRXBTr5AXJ1NNkMAiLFo6T9zZUDiwllAa0/1+NmhZngiCkTFo8rNICAukXhNZLTS6y5EB62eLCTxEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WZ3AN6gk; arc=none smtp.client-ip=74.125.224.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-63bbf5f77daso5401234d50.3
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:42:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gourry.net; s=google; t=1761583132; x=1762187932; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f2HGwzd/4lzqDYF3XkN+FOghRP60HTqO9KJmTXVpNDU=;
-        b=BSCrR+pG+Y7/saGJaQX20uzc1Qo1+qKSDQNhfe3Jq5mp2ZVIuA1AfXqrkKMasdFzmW
-         7Qx+hR79rqhMBQVyg3XVENRsHeiXAbOlGwuG8YjTI4x6f+K86y+AUpDV6/Dwg0/i7ua4
-         dtX3BNjxD8vykbbF2cTq0jAEukuu2uPSRi4AnTxPKyd/oeBEMaEjFTSYhZWoGLnpeRyS
-         RilIGepkRXt83NIzS1lFthelm2vYj9pSCBbeq7bWvbUbmksj5tBICCrCnngGIpRRkGPd
-         xDPc57+tG5kSN+8jOfsZ+gwtFsIILrsnYXvwMFI43BJ1Ux4gumpj4AIgWoy/kGuTDcHp
-         lqGQ==
+        d=linaro.org; s=google; t=1761583370; x=1762188170; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=iIqSimi39klofHZtZnL5Vj2K3y0rXxrFl3z6jktwTZo=;
+        b=WZ3AN6gkIk8/oqHC88KSniHSTxG1OTCbYnboXbMuj6sH82324Iq0mZKwSVbwmYY+IM
+         7ozLDAN26NnQVjMJPR2En97iL2X5/+fJ9HXjshePD9ZhoI7d9m+/DWPuODS4YUwbZ3gH
+         6sHXl+7LDEuUIubpcfjqIFKoJuhwMiu1GdfLW9NmSK3J+gQ1m3fiw0G3bRva0O9hvgpv
+         ROw4lIicmg91yQkS7wxQBmeWKwBcfuJIF2sXiu50VIgavWEx/I1BqdwTfBHJxQMk5pHA
+         h9uxRfHQczs47EUFu37SbwspsPLWqGk3YpVo8N3NgDIZMbKCtXDw9rxLGa+dQOHmrAOZ
+         Qt9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761583132; x=1762187932;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f2HGwzd/4lzqDYF3XkN+FOghRP60HTqO9KJmTXVpNDU=;
-        b=jMA5RASk4eEyG+uIC+x/3Iw2jDGdhrCUuYRS2jDmBrKCN+ZamvU2zIm9TmdLZd0dQv
-         I7v0rRbpBvbu7MQ9JBOp16tJifNqe+sFmvCHu9xlO+zHiFQ2pY13o4OBPUBdwTd6OkW9
-         KPHYhQPVKih9Tt8mYjFxveeouy0LBuT1Rq/0mo7c8rBaWB0ohALMsuiKe9aN3ADFdcgL
-         TzGcoqFJx/cDcv5NEVQjC9PPlUnS66KaIFW0G9vH7qRr+RjPjU1RQII/UTTMLGqwOIRy
-         7uQxTOMdfVIWaH5gUHUCTdwXM0NuIFKhHEvPy8nZUfSC+GoZKmVvZF4GSDtagcD4VU2G
-         45Sg==
-X-Forwarded-Encrypted: i=1; AJvYcCWXf6i2wljOSJGaVr4YpHxGTs6WieMQU7Bs4anIj5Hh/UiYghc/CeITGOmx+EF0We5vNQo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZWyBYp+asOaH4wdocQFlvO/GJ7Oq9TeUJhZVet2Ixy1o4Vg9j
-	4+HOHKDNFqZLvUEfowWgFMNNJ9NxJnBCMC/vhuXGjxIjhI9+jHany5o24MuprM961E8=
-X-Gm-Gg: ASbGncv0DuOKyBLo1/FOv/DZ+Znfua8COglhcHrGObndU73CQf6gcKiFyWDnn1GxejJ
-	OMsMZc+L8sxT5BdWwAs9Oh72Lkj/YeKP+HpeM+2GerkxHcepEraUXZXKdlzmlzJTNhS/YQwQZnE
-	yaTE3Z6EE82LGRKOsKz2aWgz+b3QsR+Pyr4hmR9n1qMKrSQJOyLhXeThg9heoyz9PlBWtyv2cQM
-	uoMvl929GxS+Sr7+iKSpoaqKN/w6eLqUSUyOXlPnz1QmX31wj8eLM276V8hBljUojP1FIwOEzIe
-	zAtl5w8Asm7ArrOY3TKPwkBLw52d9hm4Uxjg0oJtl6fY64oeUpx59A/bgdmk2mQ5+BLhognvXmX
-	s3BVSv2ldgW8QZgSRl/lmvwGyo3hW6BHp9HuNs3z/4JC0g7HuFJ0apyP+0F+OSXp5AUhkmzTsGx
-	0Hp2qfj01Oli2fldWplROwPReAImtWSB2VJ/2tYMCARh8ni78E0lWtMAnZhJyHmLteAO7YTQ==
-X-Google-Smtp-Source: AGHT+IE8OFT35MTx0jxBdZigqHGpIP25NqCfl0+l6c8fCefLdIH0hfSup7UdNhOGnYzqPJc4qxyLmA==
-X-Received: by 2002:a05:620a:711c:b0:892:636a:5675 with SMTP id af79cd13be357-8a6f704a25amr58519385a.58.1761583131221;
-        Mon, 27 Oct 2025 09:38:51 -0700 (PDT)
-Received: from gourry-fedora-PF4VCD3F (pool-96-255-20-138.washdc.ftas.verizon.net. [96.255.20.138])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-89f25798afesm626595985a.37.2025.10.27.09.38.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 09:38:50 -0700 (PDT)
-Date: Mon, 27 Oct 2025 12:38:48 -0400
-From: Gregory Price <gourry@gourry.net>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>, Zi Yan <ziy@nvidia.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
-	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
-	Lance Yang <lance.yang@linux.dev>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
-	Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
-	Peter Xu <peterx@redhat.com>, Matthew Wilcox <willy@infradead.org>,
-	Leon Romanovsky <leon@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
-	Byungchul Park <byungchul@sk.com>,
-	Ying Huang <ying.huang@linux.alibaba.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Pedro Falcato <pfalcato@suse.de>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
-	kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [RFC PATCH 05/12] fs/proc/task_mmu: refactor pagemap_pmd_range()
-Message-ID: <aP-gGKMa6Rcw6ZWH@gourry-fedora-PF4VCD3F>
-References: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
- <2ce1da8c64bf2f831938d711b047b2eba0fa9f32.1761288179.git.lorenzo.stoakes@oracle.com>
- <aPu4LWGdGSQR_xY0@gourry-fedora-PF4VCD3F>
- <76348b1f-2626-4010-8269-edd74a936982@lucifer.local>
- <aPvPiI4BxTIzasq1@gourry-fedora-PF4VCD3F>
- <3f3e5582-d707-41d0-99a7-4e9c25f1224d@lucifer.local>
- <aPvjfo1hVlb_WBcz@gourry-fedora-PF4VCD3F>
- <20251027161146.GG760669@ziepe.ca>
- <27a5ea4e-155c-40d1-87d7-e27e98b4871d@lucifer.local>
+        d=1e100.net; s=20230601; t=1761583370; x=1762188170;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iIqSimi39klofHZtZnL5Vj2K3y0rXxrFl3z6jktwTZo=;
+        b=dnhffxr7e6WPye7J28aOkx56pA9lU6bZhbO+ru1A0psE23N1YrlD9qOG7RPwT3NYqv
+         wZ1jTAtVNkItCgVGs6IlOaDgwZZdZ4WTbIjXhMxbsPa3i3ovza8XFEmR6SlAQxmh6KW5
+         06x64cT/GNCRsxb7MelpeMWF0+PyPdh16T/t/PJn+hRAbw8DfOb/4zL07v5vMJ49J1iz
+         7HV5XKC6zsY27zQdGrYpXwV4J/IEhgSkcVl91/n8d7z4iGL5a115rB9j+VuwoM4bohEG
+         8nM9RRdpV7OfdayofMnOG8oB7X1UHtCbbR01YqnUoCTqZ7a00kCvIqhokLUXqh3a1CqL
+         mWVA==
+X-Forwarded-Encrypted: i=1; AJvYcCUyyZwbZv+3yXQZPFclnidR0qMnYYrLtmLbkGC6+JgN35HoXvoyYu5xcXkUA+dGxWaIDoU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnYaRxgfaVcIGavL6P7CNeO36l7FU+rxXqpSDrqarRasvfhPu5
+	IV0PU6xVGG9pjklAamcIxgnZ/z7c2pVIJOzWpwie3fACsn30uSYgxmdJLJdbdHY3GWLhoyilVPD
+	rj1i7zzeTcM4krK9mNEs8KkHwKW2qDZB18BNPBzfXmQ==
+X-Gm-Gg: ASbGnct2i+aTqX/KHiSBT+5EUz8Bh9lANNyR5KUQEV7ZvUp8jhlA2Nhcjf2lP+2ABjN
+	NMMAVx1Eh46pEKvxdIg3wQtJbSw60LiYcQDCYW0QXRg22cIdrBBau5MEDgyc8EASN9YTIynrwfC
+	NE+aoEiPblYdre/x3z3tlqvp8hiPenEskGiu0vEyeftN9iMMiXvu+CHbVA19gbPK4PcAfQaP0o3
+	SVxrI2IKjUbvR2cJoImikpBR9O8WV5r97sX9vbjHApOBoEQaQSXVszCHj/lJA==
+X-Google-Smtp-Source: AGHT+IFnTy4GuL39gQqo5cO5/AtjK3ueLANt8SL8mKD6Wd3Al0HmUJPCwVFv88tqthud15vc4T2fVPU5v7ZGG0ZTM0s=
+X-Received: by 2002:a05:690c:a90:b0:784:a6d4:dc21 with SMTP id
+ 00721157ae682-7861838ccc5mr3677497b3.52.1761583370329; Mon, 27 Oct 2025
+ 09:42:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <27a5ea4e-155c-40d1-87d7-e27e98b4871d@lucifer.local>
+References: <20250911144923.24259-1-sebott@redhat.com> <20250911144923.24259-3-sebott@redhat.com>
+In-Reply-To: <20250911144923.24259-3-sebott@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Oct 2025 16:42:39 +0000
+X-Gm-Features: AWmQ_bnGFe7efhNQOt02HzPY7w4uzHv-6KQOwTPx1B30MSJa7HImhr0NK5nCCdw
+Message-ID: <CAFEAcA-urFX=V7kuRA3cRik7PifFQER5eoXC_CZ2jKg7OZz9iA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] target/arm/kvm: add kvm-psci-version vcpu property
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Oct 27, 2025 at 04:26:54PM +0000, Lorenzo Stoakes wrote:
-> On Mon, Oct 27, 2025 at 01:11:46PM -0300, Jason Gunthorpe wrote:
-> > On Fri, Oct 24, 2025 at 04:37:18PM -0400, Gregory Price wrote:
-> > > On Fri, Oct 24, 2025 at 09:15:59PM +0100, Lorenzo Stoakes wrote:
-> > > > On Fri, Oct 24, 2025 at 03:12:08PM -0400, Gregory Price wrote:
-> > > >
-> > > > So maybe actually that isn't too bad of an idea...
-> > > >
-> > > > Could also be
-> > > >
-> > > > nonpresent_or_swap_t but that's kinda icky...
-> > >
-> > > clearly we need:
-> > >
-> > > union {
-> > > 	swp_entry_t swap;
-> > > 	nonpresent_entry_t np;
-> > > 	pony_entry_t pony;
-> > > 	plum_emtry_t beer;
-> > > } leaf_entry_t;
-> 
-> I think Greg meant this as a joke [correct me if wrong] :) that was my
-> impression anyway (see original end of email...)
+On Thu, 11 Sept 2025 at 15:49, Sebastian Ott <sebott@redhat.com> wrote:
 >
-> I like leaf_entry_t name-wise.
-> 
-> I don't love the union.
+> Provide a kvm specific vcpu property to override the default
+> (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
+> by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
 >
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> ---
+>  docs/system/arm/cpu-features.rst |  5 +++
+>  target/arm/cpu.h                 |  6 +++
+>  target/arm/kvm.c                 | 70 +++++++++++++++++++++++++++++++-
+>  3 files changed, 80 insertions(+), 1 deletion(-)
+>
+> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+> index 37d5dfd15b..1d32ce0fee 100644
+> --- a/docs/system/arm/cpu-features.rst
+> +++ b/docs/system/arm/cpu-features.rst
+> @@ -204,6 +204,11 @@ the list of KVM VCPU features and their descriptions.
+>    the guest scheduler behavior and/or be exposed to the guest
+>    userspace.
+>
+> +``kvm-psci-version``
+> +  Override the default (as of kernel v6.13 that would be PSCI v1.3)
+> +  PSCI version emulated by the kernel. Current valid values are:
+> +  0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+> +
+>  TCG VCPU Features
+>  =================
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index c15d79a106..44292aab32 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -974,6 +974,12 @@ struct ArchCPU {
+>       */
+>      uint32_t psci_version;
+>
+> +    /*
+> +     * Intermediate value used during property parsing.
+> +     * Once finalized, the value should be read from psci_version.
+> +     */
+> +    uint32_t prop_psci_version;
+> +
+>      /* Current power state, access guarded by BQL */
+>      ARMPSCIState power_state;
+>
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 6672344855..bc6073f395 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -483,6 +483,59 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
+>      ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+>  }
+>
+> +static char *kvm_get_psci_version(Object *obj, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +    const char *val;
+> +
+> +    switch (cpu->prop_psci_version) {
+> +    case QEMU_PSCI_VERSION_0_1:
+> +        val = "0.1";
+> +        break;
+> +    case QEMU_PSCI_VERSION_0_2:
+> +        val = "0.2";
+> +        break;
+> +    case QEMU_PSCI_VERSION_1_0:
+> +        val = "1.0";
+> +        break;
+> +    case QEMU_PSCI_VERSION_1_1:
+> +        val = "1.1";
+> +        break;
+> +    case QEMU_PSCI_VERSION_1_2:
+> +        val = "1.2";
+> +        break;
+> +    case QEMU_PSCI_VERSION_1_3:
+> +        val = "1.3";
+> +        break;
+> +    default:
+> +        val = "0.2";
+> +        break;
+> +    }
+> +    return g_strdup(val);
+> +}
+> +
+> +static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +
+> +    if (!strcmp(value, "0.1")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_0_1;
+> +    } else if (!strcmp(value, "0.2")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_0_2;
+> +    } else if (!strcmp(value, "1.0")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_0;
+> +    } else if (!strcmp(value, "1.1")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_1;
+> +    } else if (!strcmp(value, "1.2")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_2;
+> +    } else if (!strcmp(value, "1.3")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_3;
 
-The union was definitely a joke - see `plum_entry_t beer`
+We already have six values here and it's not implausible
+we might end up with more in future; maybe we should make the
+mapping between string and constant data-driven rather
+than having code written out longhand in the get and set
+functions?
 
-There definitely shouldn't be enough extensions to warrant a union here,
-that seems like negative value.
+> +    } else {
+> +        error_setg(errp, "Invalid PSCI-version value");
+> +        error_append_hint(errp, "Valid values are 0.1, 0.2, 1.0, 1.1, 1.2, 1.3\n");
+> +    }
+> +}
 
-leaf_entry_t naming replacing swp_entry_t seems reasonable since that's
-basically all swp_entry_t is in its current form - even according to the
-this set's cover letter:
-
-```
-  There's an established convention in the kernel that we treat leaf page
-  tables (so far at the PTE, PMD level) as containing 'swap entries' should
-  they be neither empty (i.e. p**_none() evaluating true) nor present
-  (i.e. p**_present() evaluating true).
-```
-
-~Gregory
+thanks
+-- PMM
 
