@@ -1,86 +1,87 @@
-Return-Path: <kvm+bounces-61184-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61185-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA64C0F2E8
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:11:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE64FC0F34E
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:16:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D256119C213A
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 16:10:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 639F44FCCF5
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 16:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A63311942;
-	Mon, 27 Oct 2025 16:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA6631196F;
+	Mon, 27 Oct 2025 16:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="kC9k2C1i"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Ohx/7NO4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264283115A1
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86CCB31158A
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761581367; cv=none; b=KdW4krnZVdK5iqrcjEZr1xmmszRB4sj6qvURIsF8xCyQoJC+GM1JJanuR4bTcAZpMkAOGi29onXpv5Y2kwBJ28Phu48z7Y5hFosbrB8Beu37JRSW5dD0kqw0KASHlgC44As8cLoMkf0BpQaE7aIzUiuDr/UsE9ExLq4Bs6HVCj0=
+	t=1761581511; cv=none; b=twModxG9h0l6XR5mmNbD4PncfOaMShFVb1B9sRWbeU27R+iWbuYl7V3PlZBFRP92MVCYFtFC4Cv7IGGgd3OB/PcCNMSkVR+zFKcGxQuZliV4j5Vck0LyHDEyx89qrO5ZR2jnRqgy01raRt0T0WuGppDFuThMV1z+74luE0IpmeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761581367; c=relaxed/simple;
-	bh=Ip6risDW9tTbsO2jqPpdXFWuol17OZMU9AeN0DDZC0s=;
+	s=arc-20240116; t=1761581511; c=relaxed/simple;
+	bh=QASK2aUkAxKfkFOMA/cYGhoLhloD9yCkGn3YMzpW+18=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=laLS/4oOFJXc3KcHdAVlPLZpY8QHMiQvrKbE4RCCAcavSh5RANF0TzKSM555+2cPgpaJ3QX68E8BHjcZnm/qR09jTPJI10RUqlJWjyQgy+/MWIMFH/yKczWPKDGbrn+AfkGJmIvXyBe81HE4gxzq2pYioLfjiMLhI/Kc1ZDyNns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=kC9k2C1i; arc=none smtp.client-ip=209.85.222.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=B3ZxF5VBa9Hca/uFYXRZmG3oNPLd7j5LQVXOztu5yQkIwAI9QakB+Cu5TzJrEF1TmoYwHxhMuk9T/hwObQollGY6pkt3a1CkyWsdbY84GPBtEUekrFkDfU/upVst1d1XAilJ9rWYkgOWtZ/U/E1OWgdOIkrk3nvqe6HMjhGkaIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Ohx/7NO4; arc=none smtp.client-ip=209.85.222.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-893c373500cso493734385a.0
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:09:25 -0700 (PDT)
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8a479c772cfso68958785a.0
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:11:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1761581365; x=1762186165; darn=vger.kernel.org;
+        d=ziepe.ca; s=google; t=1761581508; x=1762186308; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=anSGbOUh9PRDsyCb0fgwZTMvbpzdcHnK6psdZLJfHyQ=;
-        b=kC9k2C1ipB0+8n0nDWV75bFcRvL16rGr//zO4g2ezNYzc8ibboc9Zs5rmRW7okfp9v
-         KopeJr+kws+jhfq0fZmMCiBiRti6OMf9RdiPLOcmUZAqpS63TxOtRtGWXWE8Q5lqfpE0
-         NrM673GKnBk5KHQAuN4kS1BmUvuiUs47eQ2Zvtzi1vK3bAzGm8xeKcwwhe0L/5uQmQER
-         QA/S9+XxULInuMBS0xIGXOZDPwhZDsE59jnGgg7KSs5iete7eY5t0xIHXWJWXUi9kWg0
-         aJyKPS7GRYfHJS9hlMnkVvENbtR/hTzMszY4O/KuBknMNAg0XqetkaokiwRVA98WqbgI
-         dK4g==
+        bh=YUcoeTWEWXvPiJKMdWmX3nawwIDQdRa9/4C7h6Fu0G0=;
+        b=Ohx/7NO4ciCWHNL73Cns7VAJ1PwwArjUkkOkpZszVRjDT/J1ZHSrYFfu6AeFhiv9hy
+         rfv6DKkzI8zzm/s7UbRRFKdYqrEEHcVxOo+x/By7F5iTQ5J7uGND1htBgXYn/B7WCcfE
+         RFrAJAvyaWQ7jSp5JtYVoOQ2fCyiCPhCT/vT/n8Xymi+ShqmJ43M2EEVpiFEiMQ6/K4y
+         nZIXxOiiIFj/97EJczGs+oUlgG57l8e6hACg3+pJOPl5W9ijwpOHIU6x0FjUXG2R+cow
+         PKCE/wfleDyFf38YFwiBxDNFxNYPEG9IjLiwd26ygh30jWHQZzcZ8eL9mbeLpTpEYd6Q
+         5BWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761581365; x=1762186165;
+        d=1e100.net; s=20230601; t=1761581508; x=1762186308;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=anSGbOUh9PRDsyCb0fgwZTMvbpzdcHnK6psdZLJfHyQ=;
-        b=nYMdo6VN6q9xneGMvslxsWhY0ajMSpDSFwmv3CHaRHlNeFWbCvE3sSQqV6Txf4SCz2
-         YNPG9L845rJXCjSpISli5ANO24npJnqjHK4FMnhaNwNW/jME2Zuhz5QgZm7xN6o8Pj0E
-         snO5d7pwf5MrCL9a2+NutDush33QPr65Gz/3g1vV0RaXWtwI2WZT/3y+jaxMyZSEnVD4
-         K/p18/5C+X6Zgnan33Ppgr32a/LVpzjOhSZpQHKl66F2JW3xZLYBMg39rkrLQAAWIeSh
-         fZV+p5JlU9ThroSqmbH+R0H6s0gD5jirl5d7Ngu675PldV2FaaVs4GsBuJmeim5RDnj8
-         LOiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUwfb68kBAl2gW6JvVEBWrwt6pRbNQBQNvJZwXIYQ4DvnAfAhETg9I3FVzbkIr6bAaEddo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRFyxZtxEdYCsd7yQ1Vx+T+/2+1UW/pWOdzSChYYD/YuVow1Fa
-	nfkpu+JdF4/bYLZjBxf6PugdQY1u4s8jJYSjjj96hMRY7z5BK1JEktcftEI7iJcmyY4=
-X-Gm-Gg: ASbGncvcMdh51hdacqV8gV/qfJB2+vlV2LI4B7fq7CMBsYi98JWptp7jfJHtGsU5vN9
-	8hyjm/Io7e2xYk/lHII2lqokPPx+aJEngsLn+sRsfu4gfafQTp12CDCKS0ErcZVg5oJcO4jlc38
-	0pUbagUOTT7TAypTRIfPefWEqdhdRd3VUB+BnwhVinSUsjZdf4nfuTjs1TfBUso+EcKdFp+VhrD
-	x74Ir83XqFzNBKHhWLsHvX+qAoPF84gux7o8BzYqJbtC1KK5WioygSqph7MSlyzIx5TsR2OwXHS
-	vkEMX9CaeeZqSULurvOrNJcFdWQrvL0NQFlGsHPKLKYdXWqyGltz83P7vtYcOfTAOKI16TNaQPl
-	TWW1JZyN0yxakCG5cjRGtYefxajLr+X0661WtJ8mWqR+BXubzLytYDvHzgsDgzhomwXp6iKDDFi
-	zXQc4PqlkGee1SjAaDlObMw+1P97RtWkLU3a3oOg8fKYrx8MluW+uszozq
-X-Google-Smtp-Source: AGHT+IHlNcX7M4ho1Hgm07pKSXRDLSWwAqfcPM4p2At44BY4PwXR6XnbKFaciXa2MkD0JUoTO3ORTg==
-X-Received: by 2002:a05:620a:1aa1:b0:8a3:9a05:ec15 with SMTP id af79cd13be357-8a6d072570emr95429085a.19.1761581364508;
-        Mon, 27 Oct 2025 09:09:24 -0700 (PDT)
+        bh=YUcoeTWEWXvPiJKMdWmX3nawwIDQdRa9/4C7h6Fu0G0=;
+        b=TCw3XBomw43euIREaQAqzfpiGtXVC3zmffiGeMqn4sWoai37TmIqnSkpBNxRiAaHZU
+         urHwlkrQPTfzem+pHpsLyAlSS/1aQzJACtmRIsmKrgJv29YcmcEWnldq1Yd7z167jT8A
+         C2F+mmUy09EZYgRvod7P10sLMNGeqfLkTipkycj9nvnw6kJlx4civmwsnP+/msKG1EFf
+         SuZYZOqijxroTUw0RFEAT5BES/z7PPR9XnuUwcRTWsq1qWwjhK4hjNBLAtLdRFxUTkGA
+         ttCvAzKogGjNbLrw+l5QdPxt798kk6+6rKm0/doqwXFdSt9R2IgKGD+cBgHAhex3Mxh5
+         7HKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUgDp4+IQnro1+BbuyyrY8Zya0214jv9G50YatyxMgcUE02S9huqncTuaW5v6iMbC/uvRs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxeZI0YQxvTwO96twYFQty7crV1HRJ9651ytNBdHToCUNXdpF+
+	fd2nfjj6BQHOqcb/9urQY3/dCqfthBtyRM4kjafL/S7o2ZZR0E31aZY4EGShy6ar5qw=
+X-Gm-Gg: ASbGncsJRVyzKg2D/PuyVrt+L5EoGglMv1B2sk7Jm8Z72eEgFQbKBlByXiQdGz3INAr
+	R8sCkLoTyzn7vVZl81m5y/UPnTaZHSdv5VvMXYbF0apUtJJLEApsme4VXnOLnmOliwm7YFldXfi
+	sBZ4trRauzCZ+vR3gLzHeoB8O6UH2RkiWRsFw7pLgFcK/l8B2I0q9GvlheH64oz777puH8Ezt6m
+	n13KVo4XNFC9g4qKQSoHf4HAZ+m4H4mz7BGdNFzimn0/KCF43+AJI5hXovb8TZT20ifjIIcRHxy
+	o4/r+TgTeAFSpKZoaZjReKq//wqAGn2voAugU731uIvgLY4phkG9O11H8QocmxVvrvgZyfROQ0i
+	SL/EqJkaqhXwqGWiAZxiE664Y1oZyhKyPHqDYHCi4iJCexL0WQnONliwlFglvEkEAdWA64jcAUe
+	Ur98eA+ulQEI8Z1dETZDi9VC/FCt0es/Ucp0LFywbHYzjNzLrdmwRxjE7n
+X-Google-Smtp-Source: AGHT+IFJf0BibtsNlfavgV+F1phwUBGZobfoErAK4Dl+j0mvBEo1idyt8ArsRwOA8zB/HM5HTcYQOw==
+X-Received: by 2002:a05:620a:4627:b0:8a2:2233:c151 with SMTP id af79cd13be357-8a70118c82fmr40354785a.75.1761581507673;
+        Mon, 27 Oct 2025 09:11:47 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-89f25c8a34dsm624408985a.48.2025.10.27.09.09.23
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-89f25c8b517sm628453785a.45.2025.10.27.09.11.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 09:09:23 -0700 (PDT)
+        Mon, 27 Oct 2025 09:11:47 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1vDPmd-00000004HT9-1p2Z;
-	Mon, 27 Oct 2025 13:09:23 -0300
-Date: Mon, 27 Oct 2025 13:09:23 -0300
+	id 1vDPow-00000004HUZ-2jWh;
+	Mon, 27 Oct 2025 13:11:46 -0300
+Date: Mon, 27 Oct 2025 13:11:46 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
+To: Gregory Price <gourry@gourry.net>
+Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	Christian Borntraeger <borntraeger@linux.ibm.com>,
 	Janosch Frank <frankja@linux.ibm.com>,
 	Claudio Imbrenda <imbrenda@linux.ibm.com>,
@@ -108,7 +109,6 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Matthew Brost <matthew.brost@intel.com>,
 	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
 	Byungchul Park <byungchul@sk.com>,
-	Gregory Price <gourry@gourry.net>,
 	Ying Huang <ying.huang@linux.alibaba.com>,
 	Alistair Popple <apopple@nvidia.com>,
 	Pedro Falcato <pfalcato@suse.de>,
@@ -117,10 +117,15 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	kvm@vger.kernel.org, linux-s390@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org
-Subject: Re: [RFC PATCH 00/12] remove is_swap_[pte, pmd]() + non-swap
- confusion
-Message-ID: <20251027160923.GF760669@ziepe.ca>
+Subject: Re: [RFC PATCH 05/12] fs/proc/task_mmu: refactor pagemap_pmd_range()
+Message-ID: <20251027161146.GG760669@ziepe.ca>
 References: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
+ <2ce1da8c64bf2f831938d711b047b2eba0fa9f32.1761288179.git.lorenzo.stoakes@oracle.com>
+ <aPu4LWGdGSQR_xY0@gourry-fedora-PF4VCD3F>
+ <76348b1f-2626-4010-8269-edd74a936982@lucifer.local>
+ <aPvPiI4BxTIzasq1@gourry-fedora-PF4VCD3F>
+ <3f3e5582-d707-41d0-99a7-4e9c25f1224d@lucifer.local>
+ <aPvjfo1hVlb_WBcz@gourry-fedora-PF4VCD3F>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -129,113 +134,35 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
+In-Reply-To: <aPvjfo1hVlb_WBcz@gourry-fedora-PF4VCD3F>
 
-On Fri, Oct 24, 2025 at 08:41:16AM +0100, Lorenzo Stoakes wrote:
-> There's an established convention in the kernel that we treat leaf page
-> tables (so far at the PTE, PMD level) as containing 'swap entries' should
-> they be neither empty (i.e. p**_none() evaluating true) nor present
-> (i.e. p**_present() evaluating true).
+On Fri, Oct 24, 2025 at 04:37:18PM -0400, Gregory Price wrote:
+> On Fri, Oct 24, 2025 at 09:15:59PM +0100, Lorenzo Stoakes wrote:
+> > On Fri, Oct 24, 2025 at 03:12:08PM -0400, Gregory Price wrote:
+> > 
+> > So maybe actually that isn't too bad of an idea...
+> > 
+> > Could also be
+> > 
+> > nonpresent_or_swap_t but that's kinda icky...
+> 
+> clearly we need:
+> 
+> union {
+> 	swp_entry_t swap;
+> 	nonpresent_entry_t np;
+> 	pony_entry_t pony;
+> 	plum_emtry_t beer;
+> } leaf_entry_t;
+> 
+> with
+> 
+> leaf_type whats_that_pte(leaf_entry_t);
 
-I have to say I've never liked the none-vs-present naming either.
-
-> This is deeply confusing, so this series goes further and eliminates the
-> non_swap_entry() predicate, replacing it with is_non_present_entry() - with
-> an eye to a new convention of referring to these non-swap 'swap entries' as
-> non-present.
-
-I'm not keen on is_non_present_entry(), it seems confusing again.
-
-It looks like we are stuck with swp_entry_t as the being the handle
-for a non-present pte. Oh well, not a great name, but fine..
-
-So we think of that swp_entry_t having multiple types: swap, migration,
-device private, etc, etc
-
-Then I'd think the general pattern should be to get a swp_entry_t:
-
-    if (pte_present(pte))
-        return;
-    swpent = pte_to_swp_entry(pte);
-
-And then evaluate the type:
-
-    if (swpent_is_swap()) {
-    }
-
-
-If you keep the naming as "swp_entry" indicates the multi-type value,
-then "swap" can mean a swp_entry which is used by the swap subsystem.
-
-That suggests functions like this:
-
-swpent_is_swap()
-swpent_is_migration()
-..
-
-and your higher level helpers like:
-
-/* True if the pte is a swpent_is_swap() */
-static inline bool swpent_get_swap_pte(pte_t pte, swp_entry_t *entryp)
-{
-   if (pte_present(pte))
-        return false;
-   *swpent = pte_to_swp_entry(pte);
-   return swpent_is_swap(*swpent);
-}
-
-I also think it will be more readable to keep all these things under a
-swpent namespace instead of using unstructured english names.
-
-> * pte_to_swp_entry_or_zero() - allows for convenient conversion from a PTE
->   to a swap entry if present, or an empty swap entry if none. This is
->   useful as many swap entry conversions are simply checking for flags for
->   which this suffices.
-
-I'd expect a safe function should be more like
-
-   *swpent = pte_to_swp_entry_safe(pte);
-   return swpent_is_swap(*swpent);
-
-Where "safe" means that if the PTE is None or Present then
-swpent_is_XX() == false. Ie it returns a 0 swpent and 0 swpent is
-always nothing.
-
-> * get_pte_swap_entry() - Retrieves a PTE swap entry if it truly is a swap
->   entry (i.e. not a non-present entry), returning true if so, otherwise
->   returns false. This simplifies a lot of logic that previously open-coded
->   this.
-
-Like this is still a tortured function:
-
-+static inline bool get_pte_swap_entry(pte_t pte, swp_entry_t *entryp)
-+{
-+       if (pte_present(pte))
-+               return false;
-+       if (pte_none(pte))
-+               return false;
-+
-+       *entryp = pte_to_swp_entry(pte);
-+       if (non_swap_entry(*entryp))
-+               return false;
-+
-+       return true;
-+}
-+
-
-static inline bool get_pte_swap_entry(pte_t pte, swp_entry_t *entryp)
-{
-   return swpent_is_swap(*swpent = pte_to_swp_entry_safe(pte));
-}
-
-Maybe it doesn't even need an inline at that point?
-
-> * is_huge_pmd() - Determines if a PMD contains either a present transparent
->   huge page entry or a huge non-present entry. This again simplifies a lot
->   of logic that simply open-coded this.
-
-is_huge_or_swpent_pmd() would be nicer, IMHO. I think it is surprising
-when any of these APIs accept swap entries without being explicit
+I think if you are going to try to rename swp_entry_t that is a pretty
+good idea. Maybe swleaf_entry_t to pace emphasis that it is not used
+by the HW page table walker would be a good compromise to the ugly
+'non-present entry' term.
 
 Jason
 
