@@ -1,856 +1,446 @@
-Return-Path: <kvm+bounces-61167-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61166-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F06C0E045
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 14:28:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D13C8C0E036
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 14:27:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 338CA18949B6
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 13:28:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B9C2189473E
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 13:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A114E2D8783;
-	Mon, 27 Oct 2025 13:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128E92C158D;
+	Mon, 27 Oct 2025 13:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HHwDbRhi"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="TM9vO7Jc";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="85Ixpc4J";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Neqw/yzt";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="N5zhOPEQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF842D3750;
-	Mon, 27 Oct 2025 13:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761571660; cv=fail; b=UjuFRwp7UTSTRxxORjfwgVhSeYh35SK7w7Zdopyy2QTqK4ANlOk9YlQWo38bu7Pkypne7k/13OjJzPvA42DinIhZZSzt+rx8Oz4HWpYOxgQmk49C4sw4rDKZdJzaUYBkEF1eD7kliTjKY2uffdYYR8Ts4C/atetIN+8FzXtlr6E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761571660; c=relaxed/simple;
-	bh=CO8Cna6fVZz/p/iCnhMfQAItLuq66vzTjiTrzC29KOY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=qWNcJhknXCbMtW2uraPlRyzEqfWSBEKcBWJWGM/FbzWYCxZjKhWk4+Ais6C7j+lc7M9LMfcCTiQLvQiBmge/swooVIF8ddYJ1NCTHMqIzWJ1yDHX1wKEt8+saKB3YaS5VeZ1imIabV2cWGrhq1sADIuAS4i4G70PHxR0SpTX8/E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HHwDbRhi; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761571658; x=1793107658;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=CO8Cna6fVZz/p/iCnhMfQAItLuq66vzTjiTrzC29KOY=;
-  b=HHwDbRhiLmDpVj7Yv5u2mXYSbiWkCKBGjmJFBtfSS8epSw973Z/pFGCt
-   j1Z4krNP0GLv32OTyblt3AbfvKZZV4JW/CViPfGO8x0SRwvuon6H2ba7a
-   T1ajEN+Tq9TzSuekH1E5qP+L1Y71BBMnPXfWX8E0c/LETvvq6eG62/Zu1
-   22w9dd7piZmKH6/tAYmP4WrMQ6WA6xY0KZJzBU8shWYzOmnibLZvSNQx3
-   H8ka0HW0fkMtqE9pooPkC4d4Gla7QluHyaOnVWn8HolYFloW2B2g26dGc
-   qBVT4zyJN6hXZw3aecAK9ZPrcXDWnUjSDdy+LYGP5+EGipPA6vH9mxE1n
-   A==;
-X-CSE-ConnectionGUID: FXF3ULgSRXi+TDHecfyAkg==
-X-CSE-MsgGUID: 3grh1nX5SqiG7pHWIyww6g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="74993038"
-X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
-   d="scan'208";a="74993038"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 06:27:37 -0700
-X-CSE-ConnectionGUID: 7d1oqXSwR02BWN5VPp+dJA==
-X-CSE-MsgGUID: 8DT0hgtKT/qY4+d+DVZCXQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
-   d="scan'208";a="185510173"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 06:27:37 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 27 Oct 2025 06:27:37 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Mon, 27 Oct 2025 06:27:37 -0700
-Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.5) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 27 Oct 2025 06:27:37 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DuDDVsOQsSmDejXXpB/wlFdjd6oEQbzI2vVKQfINuicfiInKlGUi/8FxpdU2+EAmdgaJqOukZiOcD3MHmpi1gfh9Okf6fejJsS0iA8fCeI7HGQPNn4DFwQglwdpGB/TafrXM4rZbvhNsw1MCj/g9y3+p/pNpd6Wo3B/dnXevjjZCpzYUR3uziGiF7500wGVzvB3/La/VC8AHgxu739PWqUHPdrWon+WVg4O1mjN1NKBrGWbftn9Xkxfd6vbwF6aUNRiuZL+W3HFIRLPyOep7XFLQ+hZGMxJFVtsLaLbO/Xz4NYu+8whiWmKvQOpxpR33ELEC//XezOWhOpquWCRG+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VzpD7/wKPTd8FUHr8V/JoT6ZMNSg5XnDYpSWbcplGJQ=;
- b=JBn3aZBjVySdbNywEZk+8wkiUQOot7HwDTl+U0DWYxCKQk+sl60fYLzNEgzywGjO9Qjvqn0mPt5ENpBhAzbEYLs7T998Re4ObHXKOlEN648sFXKlBQ9ra3RexoEJFBmV4sPi6qu2r/B7q7iLtVppUynusQ/rhmcjqYJYHYV5Q2FD9aaXZ8HKcnsZ+btUF2Wk8oqD2cACvjqXOXvG3JB6SYdBDZ93PthLK8emkYu19Ngjan0uF97120Rhd/OmQYg2z3fxmsP7cxgiX14PcYZiaRw6ALRHEfxM9AuZTxwqn8jPVVH3vtY+7vHO3m+WXGz7fOjL5y0eHPTddr5n0tihwg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB5373.namprd11.prod.outlook.com (2603:10b6:5:394::7) by
- PH7PR11MB7449.namprd11.prod.outlook.com (2603:10b6:510:27a::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.12; Mon, 27 Oct
- 2025 13:27:34 +0000
-Received: from DM4PR11MB5373.namprd11.prod.outlook.com
- ([fe80::927a:9c08:26f7:5b39]) by DM4PR11MB5373.namprd11.prod.outlook.com
- ([fe80::927a:9c08:26f7:5b39%5]) with mapi id 15.20.9253.017; Mon, 27 Oct 2025
- 13:27:33 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCEB62874FB
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 13:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761571656; cv=none; b=iJ4IZWFQRR6fplc5qMuWg3R0zwp67JY6JqT9Zw8yx13Ok5VQoqB9xs8NbFCZHbqJ2C/uPJwlPqNRPNwqkKOElzW63AVtyBnu1ogd0WfotP0EEGH895UUCRqvaek0AKAcRcnJGny5SbFThE6jULRGZWX6ZX5aj8myLZJ++ntRzq0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761571656; c=relaxed/simple;
+	bh=o5Ho7ZZ2WaFp0JzdWDL0uVeZ8dGhvbT/ojp1hVOm93I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lEYJF2PkVwmImX8F/XRJsTXC4kuSO9/c75OhNkDs7448KcvQgVIZhU3rbOvPj8Kifvc/s7WOC9WjFRSGTD8l1PRYIQBvAjRNSEQzqJn6p0HPSG9v1BjwmC9Zka4M9dyku8iZ29m5PsDrEInFYdtTa+kwXXHw0NdJY5Yk7ksKmB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=TM9vO7Jc; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=85Ixpc4J; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Neqw/yzt; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=N5zhOPEQ; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id CF540219E4;
+	Mon, 27 Oct 2025 13:27:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761571651; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=5XpAc/wnKhW7u09JNrLPt9PaFPUwXBy6MclCMVEFG2c=;
+	b=TM9vO7Jc61kw+VXUhOQ+PGjaEbab7kI7IqQsWiI8Becj2jWF0T18ysXykCJva50100qZiV
+	KxZS/IYk5nxsFp6WBXD0QGjZtXB7J+QsgAyu4CLo+QaJKwPfCZmam4WTXqa6eI4ABpLRp5
+	VFCL6kLowFxDpMiOc6vWqgGf19tN7GU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761571651;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=5XpAc/wnKhW7u09JNrLPt9PaFPUwXBy6MclCMVEFG2c=;
+	b=85Ixpc4JK9GwDRQJK1w6m0apKLDqjn/tLJKiqOW/a2SWTiwaaxcoQIeZxANpbukVMYAZUC
+	Cq9BrhPHp0AEVPBQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b="Neqw/yzt";
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=N5zhOPEQ
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761571650; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=5XpAc/wnKhW7u09JNrLPt9PaFPUwXBy6MclCMVEFG2c=;
+	b=Neqw/yzt5jkjQeyE88ZObAB5rNiQRIMgkO1G/L0izC2JO31t3R8ruwVCycwb9ObjVlA3lC
+	NTdrolCFr07dGsBUvQQI10lxfPW+Paamqcryxl8G5O7pUW/xYZi2+FFmEIEyYZWKoN7Pm8
+	FuVlvhMX17+Qxsh8z81l6vY52dMCbA8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761571650;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=5XpAc/wnKhW7u09JNrLPt9PaFPUwXBy6MclCMVEFG2c=;
+	b=N5zhOPEQviM9fOW+4dNYU4eUhqEyCo0EbRr9vYHizE0xAZESli17qpj+4h+HXMWzK0upNn
+	dbhf1I3lAqr0C5Bg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 38112136CF;
+	Mon, 27 Oct 2025 13:27:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id /r5bDUJz/2gfTwAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 27 Oct 2025 13:27:30 +0000
+Message-ID: <33d350d9-b247-4181-b8c8-5e879acd35fe@suse.cz>
 Date: Mon, 27 Oct 2025 14:27:29 +0100
-From: =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>
-To: Michal Wajdeczko <michal.wajdeczko@intel.com>
-CC: Alex Williamson <alex.williamson@redhat.com>, Lucas De Marchi
-	<lucas.demarchi@intel.com>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
-	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
-	<kevin.tian@intel.com>, <intel-xe@lists.freedesktop.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
-	<matthew.brost@intel.com>, <dri-devel@lists.freedesktop.org>, Jani Nikula
-	<jani.nikula@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
- Laguna" <lukasz.laguna@intel.com>
-Subject: Re: [PATCH v2 06/26] drm/xe/pf: Add support for encap/decap of
- bitstream to/from packet
-Message-ID: <bu3iz5igoi3uv3b46n5h4o3hcd5cbqza2idcaa3d3by4ewegjf@5to3q4tltv3m>
-References: <20251021224133.577765-1-michal.winiarski@intel.com>
- <20251021224133.577765-7-michal.winiarski@intel.com>
- <0c76e7a9-c6db-4148-bd9e-a96fcd01247f@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0c76e7a9-c6db-4148-bd9e-a96fcd01247f@intel.com>
-X-ClientProxiedBy: BE1P281CA0195.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:8d::12) To DM4PR11MB5373.namprd11.prod.outlook.com
- (2603:10b6:5:394::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB5373:EE_|PH7PR11MB7449:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6e0a3422-aae3-49d3-bee8-08de155c95e6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Ujc0cmpsUUc5VjQybDlpVXZ5SHBMamtsaUswdDR4aVB5bWFCU1FlcXBSSEVB?=
- =?utf-8?B?VkhkTURBeVZxbUdPdEJ2YzhOS1k3OGo1OFhQZEcrdTlOSnVaSkdNaDFFRFJs?=
- =?utf-8?B?K20vWU9PcXM5VnZ3ZDc3WVQrRFBkMWNZSDNRaXFXekh2bjA0T2p2SUwyNjhs?=
- =?utf-8?B?WmdFYnpOSVZZUUJFdkY3YzVqeG80U25nMXM2c0p4c2sxSFRoemFvTFcycVFY?=
- =?utf-8?B?QWt4L0VZQjR5bWFRRXI3bHBTajRqeFh3Q0xYRmZkbHkzWllRVnJMc3RVV0x6?=
- =?utf-8?B?UncvMGlvWGZ5L2hsTEhJNndQTFRqKzJTam1xd2Z2blFsNXJzTWFzQ2pNVDdw?=
- =?utf-8?B?dEpkK1Jud2kzZk5uV2lPTnQ1dkJoL01EUHlOOVVwRDkxT0dHeHRVU2hNN1NI?=
- =?utf-8?B?b3Jxa0Qxck41NkdpL0xWcUdjeFZyNkJqczBhNHBzSWNudEVaMEQ1T3NtMmpW?=
- =?utf-8?B?Mi8rUlpycEpUSVdZY2xrVmE5S0NHUlNmSkZya0JqRVYyK0Y4QTNpV1ZmeHUx?=
- =?utf-8?B?SjVaZVRmODhwZEZLN1JjMjRXczdIRlMzc0VCYkNzejE5QXBCOHlKVTBHdUtQ?=
- =?utf-8?B?eVZnU3F0SFVQWUNkeDJjNHMzY2c2Qy9HUitJL0FuK0c3bmVmcThyT0x3UzVi?=
- =?utf-8?B?TEpZK0NpTjBmQVRBbWtlYVlKdjlSSGk5Misrb3FOYjAvUCtUL003VWJLeHl2?=
- =?utf-8?B?VEI1TG54SjFtZzdnc0pDMC90a2tBdlR5L1h6ZVNlZW0zSEQ0TFFHL2lic3JB?=
- =?utf-8?B?QkZxQ3IwMzBtMDBDVVlNZE5KTzJuQ0RlNSsyd2JiZm1rUVRtODZCQmdPbVUr?=
- =?utf-8?B?cHVhbWV1OVpjRU9jYUUySVV1SFlSb2JmUWJxL1doM0RZZzRKbFFHRTAvTVVt?=
- =?utf-8?B?YkVldHdWWVRaQW96SU9iRG51dFl0TVprNE9LV2p0YzNOcFl0T2NxMjljQStt?=
- =?utf-8?B?aUpYSnJZMVFXZFM0cXNibG1XKzk0UGIvYWtwd1VENWdLUWJHdnIraHBjSlZt?=
- =?utf-8?B?UUZ5bTdoa1Q0N2p6azlZc3FpYjFtaFNxcVV3azlPeUNQZUp4dUEvbStDUEI1?=
- =?utf-8?B?ZTlsaVB6RmQvZ2tmTVNkTDhSVVNNb0RJcHkwcWpmWkpISlZLeTJvaHpYREto?=
- =?utf-8?B?OVpuZEZ2VnhISHZoWXdKRHZDZkdlanhINTlBWXhwVlpQVkxseWtDc25uZ1Nx?=
- =?utf-8?B?dHIwV2xuZk9HZGlSQ0duOGNRc2piMXNENXpGRkIrTGkwdEZiZlc2WHN5aXRS?=
- =?utf-8?B?SWRiTXVKUitrZUhlMDM1UkZ3Z3M2K1dwM1BFRVdWdmtZeVRHL2J5dzdSU1VM?=
- =?utf-8?B?NElvdFl2R1UrOEJhZzh6MnZaZXUydjBWRlpyVm1NYm93TUZhOThTV2xEaHRv?=
- =?utf-8?B?OXJrcGsvYUhZNElKaFNWbzZjY0RMeVNocUpab0dTMnVUOTZqaUtMTGxiUENZ?=
- =?utf-8?B?dVBwWUNQajVyTUR5c0pLRHV1Nms5aWM1UDdqVkprdFlET29FM3pDSXRRenY3?=
- =?utf-8?B?VEw5KzRNL1E4ZXhvRVRBOEdEejUzQThQcnY4MmxRbHI1UTdPVS9mcGxaRElY?=
- =?utf-8?B?S1hKM3pLUGRJWXRSREppY0RMRktqaHJhRm81ZXJPSnlKZDVUYU9renR3OHpV?=
- =?utf-8?B?c2FReFpvcHE1alhtVmtZeThvM3BoQTc1YXZFNlJOQkJXQ2pwY1Q5MjAzY0dK?=
- =?utf-8?B?bkN0NWd4eVY4TGVQSGd4bTJKM2NyenAxWm9rS0ZyTHJmMjNXZnlxbStZaGxO?=
- =?utf-8?B?Z2xJMnpQaVVTcVRuY3M2Wjd3eStoUmFnZlBIRlkwMkJGL3RUOThZQjcvWEI0?=
- =?utf-8?B?LzZ1WEgyQ3BVNmFjeVRWcHhSWHhHSFZaZ0RwR01UR3o4U2NUM3lSbUcxeUlQ?=
- =?utf-8?B?eERYdUxWUVI0eGUvNlVvMk9rbHRHYU92U1ZMaDVGeWdETDhJenlvMWI0MElY?=
- =?utf-8?Q?4BmCd+8WqVu/WRaBZW0ne1wPDRx2PsPe?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bWo3djdnM09EaDVRMXc4cWFOZmN0RFlkVFZDcVpUMXlLR3ZEdXpsZU1NS0lQ?=
- =?utf-8?B?dmlHczgvSVpoV1lDNVJuVTRIb2ZGTncyZVIvaWZvcEswWHYzZWJNMmJFaDA5?=
- =?utf-8?B?aks0QU8xMmthQXBPZG9SZDFFZnYzMzU5MVBlOHNPamRxU0d0TWRXb0huU1Ft?=
- =?utf-8?B?VVJJSyt2UGRjMkdybjlicDRJSUdsbWwyWUxBUiszYzV5Vm4xTUtsT0hudmxQ?=
- =?utf-8?B?QXptYjY5MWhLV28wK29vclM5UHJ4Y2hJM1FTNUEybjFLMjd5Y0hRRFVWamJW?=
- =?utf-8?B?d1QxWSt6SW92eEpKS2VpcXprZDUzanBDSmNIVzAwQ1k2WUduSzhaN3lyOEJl?=
- =?utf-8?B?OUViVzE3WnlSYy9La0UvNFhBNFlPNGhFTnl6THFCNjRsbnVUeVdmN0k0c1Ey?=
- =?utf-8?B?dVlkZjgvakpJd1ZoWHF2cy96S21DNTlIcEZJRHJvK2Vnczk1NlU5K253c0F5?=
- =?utf-8?B?MDMwWlpTNFJTcG5rUUhBcTJ0ZFlRYWJDSjhKQ1hiNGNVcW9DTUo0bHVEYXJ4?=
- =?utf-8?B?UTZwZlpBc25BbjYzT2M5SmhRUGNmM250Snl5UTFCNU42akhqWlZMbHRUNjYw?=
- =?utf-8?B?Q2N5VFdlNTNhMUxDcVg0WE9hL2ZiNkp3ZzR6TStOWGw5UDNtT2VwdUthbStu?=
- =?utf-8?B?MUZUaE9kcVA3dy91ZVVxNGNQSWd1eldIVjUrZnZnbENvMjRpZDBKQTJPMjc5?=
- =?utf-8?B?bGNOb0huWExhZW9OL2M0WUNhb0JqbHF2dVREeXFpVTVKUityT0FYc1Qwa1p4?=
- =?utf-8?B?eEhEZjJHTzk3cEthWnZnQzU4dlREelhrRmRyUUZRRnVpUlVTcFZEdy9aVzdE?=
- =?utf-8?B?RGhXbklSZUVUazlYRStxZm5jdm1CUTdEcnkzVHdMNThjZjhzOXI0cmhtcE9C?=
- =?utf-8?B?UjI4Qm9CNEFlY1Z0WlIrODZCWE9PWTI1bUZGanhCb010c3JEYXpORVBwRlZj?=
- =?utf-8?B?QnBDUkpNR0I0QmZ6V2tJazdpUWk5VVUwempUQ2hlNHhxZ1Fra3F0U1FkZnRK?=
- =?utf-8?B?cVVKeTJGMWl6dHMzU0Fmb3lTVDNnSExBTWNucXozWGc4T1J2VHd5ZzRGSFN6?=
- =?utf-8?B?SE1RcnVrTmZkR2xYOGhTQUpsZE1jMmdoc21hOXFmbThnMFNWdTdEdjJva1ZD?=
- =?utf-8?B?dENnUG1YaVRsb2lxTDAvcC8wRnhEM05OcXFBM05IRWNRTnByNGxmSWRJOURj?=
- =?utf-8?B?TENUanhaZE94R0tFT3RhSXFkYjFQcFMwNnBPNkpxdTZhblhxOVFOWDVaZ3Vm?=
- =?utf-8?B?eCtJR3FWNVFZUTh4Zk5ydVl6cU9PRVNSb3cvNUJjblRCb3B3SGxnSW1DUEcv?=
- =?utf-8?B?QXZOdTV2U0orWXpoc3lSUkJkY1hGMlQ4MDZJWXBGUGJUNUs2UXB3LzRmWFow?=
- =?utf-8?B?bXFBVVZzcVVnSGZySFJxUitMa2hzNUlBRVNjbjBmdGNFNlZhbG14WllWRVdP?=
- =?utf-8?B?MTZ5b0hqUm1ZRWdsYjBTZ1Y0TStCQjIvNEpYcDBRUjhyZU9ueHhjZnRHWnF1?=
- =?utf-8?B?MFE2Yi9HclU4ZEN1MUE4ZVVlOVlXQWZraW1ZbDEvRGZiWnVHa2k3KzMyZGdS?=
- =?utf-8?B?ZkRhK3FmemFnRVNNSS80WW5wWjB6Q2pxVCtmdUNjZTJid3NYZjUrdERuMVR2?=
- =?utf-8?B?cUtoQTEvb0hyLzZPUjJJVUZpZGJDdXNablFFWVdmWVpGZWxwalNHc2VrN3pP?=
- =?utf-8?B?TWxDZHpwN2MvVmtlL0g5U0RrM2xNN3M0NXI3SkdwbFZvYWJPZ2tTbnZUN1pE?=
- =?utf-8?B?emVpc1p1eUhmYS9ZaVRoL2RYeWVvQWVkb3dEODVVZmR1RUJYSmxYZ3ltYXJ2?=
- =?utf-8?B?Zk9UTjBRYTkyVGt1SW5Ccm8vekpFTitrbEkvUStnV1lHRWU4OHFTVXBNTDhS?=
- =?utf-8?B?bFdnZmNFZzFUdjMyUGNGRU9YQUxLWS9JbTY4Z25DN3BHYUdqY2FuYlNvbHdv?=
- =?utf-8?B?STlKSTk3TzcrZnNBVFNBcU1FQ0d1SllzdUJYbUhZbWhmTDF6dVdpVWhKa01n?=
- =?utf-8?B?dTRoZjFZZ01FYVFNYWE1ZzJiQzBLbUE4YitUbW96ZEtnYmlKS1BNOS9OUzRJ?=
- =?utf-8?B?alVLenVUVUtoem5NMjB1c3BQYW9uMlJIbWwwaTVUbmR2QWVXSWhxOW1YbHZ0?=
- =?utf-8?B?ODBTdWFhVXRYWVJRN2tJbmZUbWtEL3JtTTIrR1NRd1QyemVZc0FTZDgvREF3?=
- =?utf-8?B?L1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e0a3422-aae3-49d3-bee8-08de155c95e6
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5373.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2025 13:27:33.8684
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: junSteOedzeC+exb9V3NOKKUHdmrHi1nVj/5+sVSHNpvvpS7GrkAufRA9XaWr0gjfOgmI9J/s8PZFhuftYOgb5NOirM7CMyOPU9KhlsoXos=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7449
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 01/37] KVM: guest_memfd: Introduce per-gmem
+ attributes, use to guard user mappings
+Content-Language: en-US
+To: Ackerley Tng <ackerleytng@google.com>, cgroups@vger.kernel.org,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-mm@kvack.org,
+ linux-trace-kernel@vger.kernel.org, x86@kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ "maple-tree@lists.infradead.org" <maple-tree@lists.infradead.org>
+Cc: akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de,
+ brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org,
+ corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com,
+ david@redhat.com, dmatlack@google.com, erdemaktas@google.com,
+ fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org,
+ hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com,
+ isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com,
+ jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com,
+ jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com,
+ kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev,
+ liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
+ mail@maciej.szmigiero.name, maobibo@loongson.cn,
+ mathieu.desnoyers@efficios.com, maz@kernel.org, mhiramat@kernel.org,
+ mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, mingo@redhat.com,
+ mlevitsk@redhat.com, mpe@ellerman.id.au, muchun.song@linux.dev,
+ nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
+ palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
+ pbonzini@redhat.com, peterx@redhat.com, pgonda@google.com, prsampat@amd.com,
+ pvorel@suse.cz, qperret@google.com, richard.weiyang@gmail.com,
+ rick.p.edgecombe@intel.com, rientjes@google.com, rostedt@goodmis.org,
+ roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com,
+ shakeel.butt@linux.dev, shuah@kernel.org, steven.price@arm.com,
+ steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com,
+ tglx@linutronix.de, thomas.lendacky@amd.com, vannapurve@google.com,
+ viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com,
+ will@kernel.org, willy@infradead.org, wyihan@google.com,
+ xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com,
+ yuzenghui@huawei.com, zhiquan1.li@intel.com
+References: <cover.1760731772.git.ackerleytng@google.com>
+ <638600e19c6e23959bad60cf61582f387dff6445.1760731772.git.ackerleytng@google.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <638600e19c6e23959bad60cf61582f387dff6445.1760731772.git.ackerleytng@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: CF540219E4
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[linux-foundation.org,linux.intel.com,alien8.de,kernel.org,intel.com,lwn.net,redhat.com,google.com,cmpxchg.org,infradead.org,zytor.com,suse.cz,arm.com,ziepe.ca,amazon.com,nvidia.com,suse.de,linux.dev,oracle.com,maciej.szmigiero.name,loongson.cn,efficios.com,digikod.net,amd.com,ellerman.id.au,amazon.es,dabbelt.com,sifive.com,gmail.com,goodmis.org,amazon.co.uk,linutronix.de,zeniv.linux.org.uk,huawei.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[98];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	R_RATELIMIT(0.00)[to_ip_from(RLit8ednp7j3q8s7mp5dsi7bwe)];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:mid,suse.cz:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
 
-On Thu, Oct 23, 2025 at 12:34:50AM +0200, Michal Wajdeczko wrote:
+On 10/17/25 22:11, Ackerley Tng wrote:
+> From: Sean Christopherson <seanjc@google.com>
 > 
+> Start plumbing in guest_memfd support for in-place private<=>shared
+> conversions by tracking attributes via a maple tree.  KVM currently tracks
+> private vs. shared attributes on a per-VM basis, which made sense when a
+> guest_memfd _only_ supported private memory, but tracking per-VM simply
+> can't work for in-place conversions as the shareability of a given page
+> needs to be per-gmem_inode, not per-VM.
 > 
-> On 10/22/2025 12:41 AM, Michał Winiarski wrote:
-> > Add debugfs handlers for migration state and handle bitstream
-> > .read()/.write() to convert from bitstream to/from migration data
-> > packets.
-> > As descriptor/trailer are handled at this layer - add handling for both
-> > save and restore side.
-> > 
-> > Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
-> > ---
-> >  drivers/gpu/drm/xe/xe_sriov_migration_data.c  | 336 ++++++++++++++++++
-> >  drivers/gpu/drm/xe/xe_sriov_migration_data.h  |   5 +
-> >  drivers/gpu/drm/xe/xe_sriov_pf_control.c      |   5 +
-> >  drivers/gpu/drm/xe/xe_sriov_pf_debugfs.c      |  35 ++
-> >  drivers/gpu/drm/xe/xe_sriov_pf_migration.c    |  54 +++
-> >  .../gpu/drm/xe/xe_sriov_pf_migration_types.h  |   9 +
-> >  6 files changed, 444 insertions(+)
-> > 
-> > diff --git a/drivers/gpu/drm/xe/xe_sriov_migration_data.c b/drivers/gpu/drm/xe/xe_sriov_migration_data.c
-> > index b04f9be3b7fed..4cd6c6fc9ba18 100644
-> > --- a/drivers/gpu/drm/xe/xe_sriov_migration_data.c
-> > +++ b/drivers/gpu/drm/xe/xe_sriov_migration_data.c
-> > @@ -6,6 +6,44 @@
-> >  #include "xe_bo.h"
-> >  #include "xe_device.h"
-> >  #include "xe_sriov_migration_data.h"
-> > +#include "xe_sriov_pf_helpers.h"
-> > +#include "xe_sriov_pf_migration.h"
-> > +#include "xe_sriov_printk.h"
-> > +
-> > +static struct mutex *pf_migration_mutex(struct xe_device *xe, unsigned int vfid)
-> > +{
-> > +	xe_assert(xe, IS_SRIOV_PF(xe));
-> > +	xe_assert(xe, vfid <= xe_sriov_pf_get_totalvfs(xe));
-> 
-> other helpers have sep line here 
+> Use the filemap invalidation lock to protect the maple tree, as taking the
+> lock for read when faulting in memory (for userspace or the guest) isn't
+> expected to result in meaningful contention, and using a separate lock
+> would add significant complexity (avoid deadlock is quite difficult).
 
-Ok.
++Cc Liam and maple-tree list, especially for this part.
 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Co-developed-by: Vishal Annapurve <vannapurve@google.com>
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> Co-developed-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  virt/kvm/guest_memfd.c | 119 +++++++++++++++++++++++++++++++++++------
+>  1 file changed, 103 insertions(+), 16 deletions(-)
 > 
-> > +	return &xe->sriov.pf.vfs[vfid].migration.lock;
-> > +}
-> > +
-> > +static struct xe_sriov_migration_data **pf_pick_pending(struct xe_device *xe, unsigned int vfid)
-> > +{
-> > +	xe_assert(xe, IS_SRIOV_PF(xe));
-> > +	xe_assert(xe, vfid <= xe_sriov_pf_get_totalvfs(xe));
-> > +	lockdep_assert_held(pf_migration_mutex(xe, vfid));
-> > +
-> > +	return &xe->sriov.pf.vfs[vfid].migration.pending;
-> > +}
-> > +
-> > +static struct xe_sriov_migration_data **
-> > +pf_pick_descriptor(struct xe_device *xe, unsigned int vfid)
-> > +{
-> > +	xe_assert(xe, IS_SRIOV_PF(xe));
-> > +	xe_assert(xe, vfid <= xe_sriov_pf_get_totalvfs(xe));
-> > +	lockdep_assert_held(pf_migration_mutex(xe, vfid));
-> > +
-> > +	return &xe->sriov.pf.vfs[vfid].migration.descriptor;
-> > +}
-> > +
-> > +static struct xe_sriov_migration_data **pf_pick_trailer(struct xe_device *xe, unsigned int vfid)
-> > +{
-> > +	xe_assert(xe, IS_SRIOV_PF(xe));
-> > +	xe_assert(xe, vfid <= xe_sriov_pf_get_totalvfs(xe));
-> > +	lockdep_assert_held(pf_migration_mutex(xe, vfid));
-> > +
-> > +	return &xe->sriov.pf.vfs[vfid].migration.trailer;
-> > +}
-> >  
-> >  static bool data_needs_bo(struct xe_sriov_migration_data *data)
-> >  {
-> > @@ -43,6 +81,9 @@ xe_sriov_migration_data_alloc(struct xe_device *xe)
-> >   */
-> >  void xe_sriov_migration_data_free(struct xe_sriov_migration_data *data)
-> >  {
-> > +	if (IS_ERR_OR_NULL(data))
-> > +		return;
-> > +
-> >  	if (data_needs_bo(data))
-> >  		xe_bo_unpin_map_no_vm(data->bo);
-> >  	else
-> > @@ -125,3 +166,298 @@ int xe_sriov_migration_data_init_from_hdr(struct xe_sriov_migration_data *data)
-> >  
-> >  	return mig_data_init(data);
-> >  }
-> > +
-> > +static ssize_t vf_mig_data_hdr_read(struct xe_sriov_migration_data *data,
-> > +				    char __user *buf, size_t len)
-> > +{
-> > +	loff_t offset = sizeof(data->hdr) - data->hdr_remaining;
-> > +
-> > +	if (!data->hdr_remaining)
-> > +		return -EINVAL;
-> > +
-> > +	if (len > data->hdr_remaining)
-> > +		len = data->hdr_remaining;
-> > +
-> > +	if (copy_to_user(buf, (void *)&data->hdr + offset, len))
-> > +		return -EFAULT;
-> > +
-> > +	data->hdr_remaining -= len;
-> > +
-> > +	return len;
-> > +}
-> > +
-> > +static ssize_t vf_mig_data_read(struct xe_sriov_migration_data *data,
-> > +				char __user *buf, size_t len)
-> > +{
-> > +	if (len > data->remaining)
-> > +		len = data->remaining;
-> > +
-> > +	if (copy_to_user(buf, data->vaddr + (data->size - data->remaining), len))
-> > +		return -EFAULT;
-> > +
-> > +	data->remaining -= len;
-> > +
-> > +	return len;
-> > +}
-> > +
-> > +static ssize_t __vf_mig_data_read_single(struct xe_sriov_migration_data **data,
-> > +					 unsigned int vfid, char __user *buf, size_t len)
-> > +{
-> > +	ssize_t copied = 0;
-> > +
-> > +	if ((*data)->hdr_remaining)
-> > +		copied = vf_mig_data_hdr_read(*data, buf, len);
-> > +	else
-> > +		copied = vf_mig_data_read(*data, buf, len);
-> > +
-> > +	if ((*data)->remaining == 0 && (*data)->hdr_remaining == 0) {
-> > +		xe_sriov_migration_data_free(*data);
-> > +		*data = NULL;
-> > +	}
-> > +
-> > +	return copied;
-> > +}
-> > +
-> > +static struct xe_sriov_migration_data **vf_mig_pick_data(struct xe_device *xe, unsigned int vfid)
-> > +{
-> > +	struct xe_sriov_migration_data **data;
-> > +
-> > +	data = pf_pick_descriptor(xe, vfid);
-> > +	if (*data)
-> > +		return data;
-> > +
-> > +	data = pf_pick_pending(xe, vfid);
-> > +	if (!*data)
-> > +		*data = xe_sriov_pf_migration_save_consume(xe, vfid);
-> > +	if (*data)
-> > +		return data;
-> > +
-> > +	data = pf_pick_trailer(xe, vfid);
-> > +	if (*data)
-> > +		return data;
-> > +
-> > +	return ERR_PTR(-ENODATA);
-> > +}
-> > +
-> > +static ssize_t vf_mig_data_read_single(struct xe_device *xe, unsigned int vfid,
-> > +				       char __user *buf, size_t len)
-> > +{
-> > +	struct xe_sriov_migration_data **data = vf_mig_pick_data(xe, vfid);
-> > +
-> > +	if (IS_ERR_OR_NULL(data))
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index b22caa8b530ab..26cec833766c3 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -4,6 +4,7 @@
+>  #include <linux/falloc.h>
+>  #include <linux/fs.h>
+>  #include <linux/kvm_host.h>
+> +#include <linux/maple_tree.h>
+>  #include <linux/mempolicy.h>
+>  #include <linux/pseudo_fs.h>
+>  #include <linux/pagemap.h>
+> @@ -32,6 +33,7 @@ struct gmem_inode {
+>  	struct inode vfs_inode;
 > 
-> vf_mig_pick_data() seems to never return NULL, so maybe just IS_ERR() ?
+>  	u64 flags;
+> +	struct maple_tree attributes;
+>  };
+> 
+>  static __always_inline struct gmem_inode *GMEM_I(struct inode *inode)
+> @@ -54,6 +56,23 @@ static inline kvm_pfn_t folio_file_pfn(struct folio *folio, pgoff_t index)
+>  	return folio_pfn(folio) + (index & (folio_nr_pages(folio) - 1));
+>  }
+> 
+> +static u64 kvm_gmem_get_attributes(struct inode *inode, pgoff_t index)
+> +{
+> +	void *entry = mtree_load(&GMEM_I(inode)->attributes, index);
+> +
+> +	return WARN_ON_ONCE(!entry) ? 0 : xa_to_value(entry);
+> +}
+> +
+> +static bool kvm_gmem_is_private_mem(struct inode *inode, pgoff_t index)
+> +{
+> +	return kvm_gmem_get_attributes(inode, index) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+> +}
+> +
+> +static bool kvm_gmem_is_shared_mem(struct inode *inode, pgoff_t index)
+> +{
+> +	return !kvm_gmem_is_private_mem(inode, index);
+> +}
+> +
+>  static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>  				    pgoff_t index, struct folio *folio)
+>  {
+> @@ -415,10 +434,13 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
+>  	if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
+>  		return VM_FAULT_SIGBUS;
+> 
+> -	if (!(GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_INIT_SHARED))
+> -		return VM_FAULT_SIGBUS;
+> +	filemap_invalidate_lock_shared(inode->i_mapping);
+> +	if (kvm_gmem_is_shared_mem(inode, vmf->pgoff))
+> +		folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> +	else
+> +		folio = ERR_PTR(-EACCES);
+> +	filemap_invalidate_unlock_shared(inode->i_mapping);
+> 
+> -	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+>  	if (IS_ERR(folio)) {
+>  		if (PTR_ERR(folio) == -EAGAIN)
+>  			return VM_FAULT_RETRY;
+> @@ -572,6 +594,46 @@ bool __weak kvm_arch_supports_gmem_init_shared(struct kvm *kvm)
+>  	return true;
+>  }
+> 
+> +static int kvm_gmem_init_inode(struct inode *inode, loff_t size, u64 flags)
+> +{
+> +	struct gmem_inode *gi = GMEM_I(inode);
+> +	MA_STATE(mas, &gi->attributes, 0, (size >> PAGE_SHIFT) - 1);
+> +	u64 attrs;
+> +	int r;
+> +
+> +	inode->i_op = &kvm_gmem_iops;
+> +	inode->i_mapping->a_ops = &kvm_gmem_aops;
+> +	inode->i_mode |= S_IFREG;
+> +	inode->i_size = size;
+> +	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
+> +	mapping_set_inaccessible(inode->i_mapping);
+> +	/* Unmovable mappings are supposed to be marked unevictable as well. */
+> +	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+> +
+> +	gi->flags = flags;
+> +
+> +	mt_set_external_lock(&gi->attributes,
+> +			     &inode->i_mapping->invalidate_lock);
+> +
+> +	/*
+> +	 * Store default attributes for the entire gmem instance. Ensuring every
+> +	 * index is represented in the maple tree at all times simplifies the
+> +	 * conversion and merging logic.
+> +	 */
+> +	attrs = gi->flags & GUEST_MEMFD_FLAG_INIT_SHARED ? 0 : KVM_MEMORY_ATTRIBUTE_PRIVATE;
+> +
+> +	/*
+> +	 * Acquire the invalidation lock purely to make lockdep happy. There
+> +	 * should be no races at this time since the inode hasn't yet been fully
+> +	 * created.
+> +	 */
+> +	filemap_invalidate_lock(inode->i_mapping);
+> +	r = mas_store_gfp(&mas, xa_mk_value(attrs), GFP_KERNEL);
+> +	filemap_invalidate_unlock(inode->i_mapping);
+> +
+> +	return r;
+> +}
+> +
+>  static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+>  {
+>  	static const char *name = "[kvm-gmem]";
+> @@ -602,16 +664,9 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+>  		goto err_fops;
+>  	}
+> 
+> -	inode->i_op = &kvm_gmem_iops;
+> -	inode->i_mapping->a_ops = &kvm_gmem_aops;
+> -	inode->i_mode |= S_IFREG;
+> -	inode->i_size = size;
+> -	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
+> -	mapping_set_inaccessible(inode->i_mapping);
+> -	/* Unmovable mappings are supposed to be marked unevictable as well. */
+> -	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+> -
+> -	GMEM_I(inode)->flags = flags;
+> +	err = kvm_gmem_init_inode(inode, size, flags);
+> +	if (err)
+> +		goto err_inode;
+> 
+>  	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR, &kvm_gmem_fops);
+>  	if (IS_ERR(file)) {
+> @@ -798,9 +853,13 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+>  	if (!file)
+>  		return -EFAULT;
+> 
+> +	filemap_invalidate_lock_shared(file_inode(file)->i_mapping);
+> +
+>  	folio = __kvm_gmem_get_pfn(file, slot, index, pfn, &is_prepared, max_order);
+> -	if (IS_ERR(folio))
+> -		return PTR_ERR(folio);
+> +	if (IS_ERR(folio)) {
+> +		r = PTR_ERR(folio);
+> +		goto out;
+> +	}
+> 
+>  	if (!is_prepared)
+>  		r = kvm_gmem_prepare_folio(kvm, slot, gfn, folio);
+> @@ -812,6 +871,8 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+>  	else
+>  		folio_put(folio);
+> 
+> +out:
+> +	filemap_invalidate_unlock_shared(file_inode(file)->i_mapping);
+>  	return r;
+>  }
+>  EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_gmem_get_pfn);
+> @@ -925,13 +986,39 @@ static struct inode *kvm_gmem_alloc_inode(struct super_block *sb)
+> 
+>  	mpol_shared_policy_init(&gi->policy, NULL);
+> 
+> +	/*
+> +	 * Memory attributes are protected the filemap invalidation lock, but
+> +	 * the lock structure isn't available at this time.  Immediately mark
+> +	 * maple tree as using external locking so that accessing the tree
+> +	 * before its fully initialized results in NULL pointer dereferences
+> +	 * and not more subtle bugs.
+> +	 */
+> +	mt_init_flags(&gi->attributes, MT_FLAGS_LOCK_EXTERN);
+> +
+>  	gi->flags = 0;
+>  	return &gi->vfs_inode;
+>  }
+> 
+>  static void kvm_gmem_destroy_inode(struct inode *inode)
+>  {
+> -	mpol_free_shared_policy(&GMEM_I(inode)->policy);
+> +	struct gmem_inode *gi = GMEM_I(inode);
+> +
+> +	mpol_free_shared_policy(&gi->policy);
+> +
+> +	/*
+> +	 * Note!  Checking for an empty tree is functionally necessary to avoid
+> +	 * explosions if the tree hasn't been initialized, i.e. if the inode is
+> +	 * being destroyed before guest_memfd can set the external lock.
+> +	 */
+> +	if (!mtree_empty(&gi->attributes)) {
+> +		/*
+> +		 * Acquire the invalidation lock purely to make lockdep happy,
+> +		 * the inode is unreachable at this point.
+> +		 */
+> +		filemap_invalidate_lock(inode->i_mapping);
+> +		__mt_destroy(&gi->attributes);
+> +		filemap_invalidate_unlock(inode->i_mapping);
+> +	}
+>  }
+> 
+>  static void kvm_gmem_free_inode(struct inode *inode)
+> --
+> 2.51.0.858.gf9c4a03a3a-goog
 
-Ok.
-
-> 
-> > +		return PTR_ERR(data);
-> > +
-> > +	return __vf_mig_data_read_single(data, vfid, buf, len);
-> > +}
-> > +
-> > +/**
-> > + * xe_sriov_migration_data_read() - Read migration data from the device.
-> > + * @xe: the &xe_device
-> > + * @vfid: the VF identifier
-> > + * @buf: start address of userspace buffer
-> > + * @len: requested read size from userspace
-> > + *
-> > + * Return: number of bytes that has been successfully read,
-> > + *	   0 if no more migration data is available,
-> > + *	   -errno on failure.
-> > + */
-> > +ssize_t xe_sriov_migration_data_read(struct xe_device *xe, unsigned int vfid,
-> > +				     char __user *buf, size_t len)
-> > +{
-> > +	ssize_t ret, consumed = 0;
-> > +
-> > +	xe_assert(xe, IS_SRIOV_PF(xe));
-> > +
-> > +	scoped_cond_guard(mutex_intr, return -EINTR, pf_migration_mutex(xe, vfid)) {
-> > +		while (consumed < len) {
-> > +			ret = vf_mig_data_read_single(xe, vfid, buf, len - consumed);
-> > +			if (ret == -ENODATA)
-> > +				break;
-> > +			if (ret < 0)
-> > +				return ret;
-> > +
-> > +			consumed += ret;
-> > +			buf += ret;
-> > +		}
-> > +	}
-> > +
-> > +	return consumed;
-> > +}
-> > +
-> > +static ssize_t vf_mig_hdr_write(struct xe_sriov_migration_data *data,
-> > +				const char __user *buf, size_t len)
-> > +{
-> > +	loff_t offset = sizeof(data->hdr) - data->hdr_remaining;
-> > +	int ret;
-> > +
-> > +	if (len > data->hdr_remaining)
-> > +		len = data->hdr_remaining;
-> > +
-> > +	if (copy_from_user((void *)&data->hdr + offset, buf, len))
-> > +		return -EFAULT;
-> > +
-> > +	data->hdr_remaining -= len;
-> > +
-> > +	if (!data->hdr_remaining) {
-> > +		ret = xe_sriov_migration_data_init_from_hdr(data);
-> > +		if (ret)
-> > +			return ret;
-> > +	}
-> > +
-> > +	return len;
-> > +}
-> > +
-> > +static ssize_t vf_mig_data_write(struct xe_sriov_migration_data *data,
-> > +				 const char __user *buf, size_t len)
-> > +{
-> > +	if (len > data->remaining)
-> > +		len = data->remaining;
-> > +
-> > +	if (copy_from_user(data->vaddr + (data->size - data->remaining), buf, len))
-> > +		return -EFAULT;
-> > +
-> > +	data->remaining -= len;
-> > +
-> > +	return len;
-> > +}
-> > +
-> > +static ssize_t vf_mig_data_write_single(struct xe_device *xe, unsigned int vfid,
-> > +					const char __user *buf, size_t len)
-> > +{
-> > +	struct xe_sriov_migration_data **data = pf_pick_pending(xe, vfid);
-> > +	int ret;
-> > +	ssize_t copied;
-> > +
-> > +	if (IS_ERR_OR_NULL(*data)) {
-> > +		*data = xe_sriov_migration_data_alloc(xe);
-> > +		if (!*data)
-> > +			return -ENOMEM;
-> > +	}
-> > +
-> > +	if ((*data)->hdr_remaining)
-> > +		copied = vf_mig_hdr_write(*data, buf, len);
-> > +	else
-> > +		copied = vf_mig_data_write(*data, buf, len);
-> > +
-> > +	if ((*data)->hdr_remaining == 0 && (*data)->remaining == 0) {
-> > +		ret = xe_sriov_pf_migration_restore_produce(xe, vfid, *data);
-> > +		if (ret) {
-> > +			xe_sriov_migration_data_free(*data);
-> > +			return ret;
-> > +		}
-> > +
-> > +		*data = NULL;
-> > +	}
-> > +
-> > +	return copied;
-> > +}
-> > +
-> > +/**
-> > + * xe_sriov_migration_data_write() - Write migration data to the device.
-> > + * @xe: the &xe_device
-> > + * @vfid: the VF identifier
-> > + * @buf: start address of userspace buffer
-> > + * @len: requested write size from userspace
-> > + *
-> > + * Return: number of bytes that has been successfully written,
-> > + *	   -errno on failure.
-> > + */
-> > +ssize_t xe_sriov_migration_data_write(struct xe_device *xe, unsigned int vfid,
-> > +				      const char __user *buf, size_t len)
-> > +{
-> > +	ssize_t ret, produced = 0;
-> > +
-> > +	xe_assert(xe, IS_SRIOV_PF(xe));
-> > +
-> > +	scoped_cond_guard(mutex_intr, return -EINTR, pf_migration_mutex(xe, vfid)) {
-> > +		while (produced < len) {
-> > +			ret = vf_mig_data_write_single(xe, vfid, buf, len - produced);
-> > +			if (ret < 0)
-> > +				return ret;
-> > +
-> > +			produced += ret;
-> > +			buf += ret;
-> > +		}
-> > +	}
-> > +
-> > +	return produced;
-> > +}
-> > +
-> > +#define MIGRATION_DESCRIPTOR_DWORDS 0
-> > +static size_t pf_descriptor_init(struct xe_device *xe, unsigned int vfid)
-> > +{
-> > +	struct xe_sriov_migration_data **desc = pf_pick_descriptor(xe, vfid);
-> > +	struct xe_sriov_migration_data *data;
-> > +	int ret;
-> > +
-> > +	data = xe_sriov_migration_data_alloc(xe);
-> > +	if (!data)
-> > +		return -ENOMEM;
-> > +
-> > +	ret = xe_sriov_migration_data_init(data, 0, 0, XE_SRIOV_MIGRATION_DATA_TYPE_DESCRIPTOR,
-> > +					   0, MIGRATION_DESCRIPTOR_DWORDS * sizeof(u32));
-> > +	if (ret) {
-> > +		xe_sriov_migration_data_free(data);
-> > +		return ret;
-> > +	}
-> > +
-> > +	*desc = data;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static void pf_pending_init(struct xe_device *xe, unsigned int vfid)
-> > +{
-> > +	struct xe_sriov_migration_data **data = pf_pick_pending(xe, vfid);
-> > +
-> > +	*data = NULL;
-> > +}
-> > +
-> > +#define MIGRATION_TRAILER_SIZE 0
-> > +static int pf_trailer_init(struct xe_device *xe, unsigned int vfid)
-> > +{
-> > +	struct xe_sriov_migration_data **trailer = pf_pick_trailer(xe, vfid);
-> > +	struct xe_sriov_migration_data *data;
-> > +	int ret;
-> > +
-> > +	data = xe_sriov_migration_data_alloc(xe);
-> > +	if (!data)
-> > +		return -ENOMEM;
-> > +
-> > +	ret = xe_sriov_migration_data_init(data, 0, 0, XE_SRIOV_MIGRATION_DATA_TYPE_TRAILER,
-> > +					   0, MIGRATION_TRAILER_SIZE);
-> > +	if (ret) {
-> > +		xe_sriov_migration_data_free(data);
-> > +		return ret;
-> > +	}
-> > +
-> > +	*trailer = data;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +/**
-> > + * xe_sriov_migration_data_save_init() - Initialize the pending save migration data.
-> > + * @xe: the &xe_device
-> > + * @vfid: the VF identifier
-> > + *
-> > + * Return: 0 on success, -errno on failure.
-> > + */
-> > +int xe_sriov_migration_data_save_init(struct xe_device *xe, unsigned int vfid)
-> > +{
-> > +	int ret;
-> > +
-> > +	scoped_cond_guard(mutex_intr, return -EINTR, pf_migration_mutex(xe, vfid)) {
-> > +		ret = pf_descriptor_init(xe, vfid);
-> > +		if (ret)
-> > +			return ret;
-> > +
-> > +		ret = pf_trailer_init(xe, vfid);
-> > +		if (ret)
-> > +			return ret;
-> > +
-> > +		pf_pending_init(xe, vfid);
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > diff --git a/drivers/gpu/drm/xe/xe_sriov_migration_data.h b/drivers/gpu/drm/xe/xe_sriov_migration_data.h
-> > index ef65dccddc035..5cde6e9439677 100644
-> > --- a/drivers/gpu/drm/xe/xe_sriov_migration_data.h
-> > +++ b/drivers/gpu/drm/xe/xe_sriov_migration_data.h
-> > @@ -27,5 +27,10 @@ void xe_sriov_migration_data_free(struct xe_sriov_migration_data *snapshot);
-> >  int xe_sriov_migration_data_init(struct xe_sriov_migration_data *data, u8 tile_id, u8 gt_id,
-> >  				 enum xe_sriov_migration_data_type, loff_t offset, size_t size);
-> >  int xe_sriov_migration_data_init_from_hdr(struct xe_sriov_migration_data *snapshot);
-> > +ssize_t xe_sriov_migration_data_read(struct xe_device *xe, unsigned int vfid,
-> > +				     char __user *buf, size_t len);
-> > +ssize_t xe_sriov_migration_data_write(struct xe_device *xe, unsigned int vfid,
-> > +				      const char __user *buf, size_t len);
-> > +int xe_sriov_migration_data_save_init(struct xe_device *xe, unsigned int vfid);
-> >  
-> >  #endif
-> > diff --git a/drivers/gpu/drm/xe/xe_sriov_pf_control.c b/drivers/gpu/drm/xe/xe_sriov_pf_control.c
-> > index 8d8a01faf5291..c2768848daba1 100644
-> > --- a/drivers/gpu/drm/xe/xe_sriov_pf_control.c
-> > +++ b/drivers/gpu/drm/xe/xe_sriov_pf_control.c
-> > @@ -5,6 +5,7 @@
-> >  
-> >  #include "xe_device.h"
-> >  #include "xe_gt_sriov_pf_control.h"
-> > +#include "xe_sriov_migration_data.h"
-> >  #include "xe_sriov_pf_control.h"
-> >  #include "xe_sriov_printk.h"
-> >  
-> > @@ -165,6 +166,10 @@ int xe_sriov_pf_control_trigger_save_vf(struct xe_device *xe, unsigned int vfid)
-> >  	unsigned int id;
-> >  	int ret;
-> >  
-> > +	ret = xe_sriov_migration_data_save_init(xe, vfid);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> >  	for_each_gt(gt, xe, id) {
-> >  		ret = xe_gt_sriov_pf_control_trigger_save_vf(gt, vfid);
-> >  		if (ret)
-> > diff --git a/drivers/gpu/drm/xe/xe_sriov_pf_debugfs.c b/drivers/gpu/drm/xe/xe_sriov_pf_debugfs.c
-> > index e0e6340c49106..a9a28aec22421 100644
-> > --- a/drivers/gpu/drm/xe/xe_sriov_pf_debugfs.c
-> > +++ b/drivers/gpu/drm/xe/xe_sriov_pf_debugfs.c
-> > @@ -9,6 +9,7 @@
-> >  #include "xe_device.h"
-> >  #include "xe_device_types.h"
-> >  #include "xe_pm.h"
-> > +#include "xe_sriov_migration_data.h"
-> >  #include "xe_sriov_pf.h"
-> >  #include "xe_sriov_pf_control.h"
-> >  #include "xe_sriov_pf_debugfs.h"
-> > @@ -132,6 +133,7 @@ static void pf_populate_pf(struct xe_device *xe, struct dentry *pfdent)
-> >   *      /sys/kernel/debug/dri/BDF/
-> >   *      ├── sriov
-> >   *      │   ├── vf1
-> > + *      │   │   ├── migration_data
-> >   *      │   │   ├── pause
-> >   *      │   │   ├── reset
-> >   *      │   │   ├── resume
-> > @@ -220,6 +222,38 @@ DEFINE_VF_CONTROL_ATTRIBUTE(reset_vf);
-> >  DEFINE_VF_CONTROL_ATTRIBUTE_RW(save_vf);
-> >  DEFINE_VF_CONTROL_ATTRIBUTE_RW(restore_vf);
-> >  
-> > +static ssize_t data_write(struct file *file, const char __user *buf, size_t count, loff_t *pos)
-> > +{
-> > +	struct dentry *dent = file_dentry(file)->d_parent;
-> > +	struct xe_device *xe = extract_xe(dent);
-> > +	unsigned int vfid = extract_vfid(dent);
-> > +
-> > +	if (*pos)
-> > +		return -ESPIPE;
-> > +
-> > +	return xe_sriov_migration_data_write(xe, vfid, buf, count);
-> > +}
-> > +
-> > +static ssize_t data_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
-> > +{
-> > +	struct dentry *dent = file_dentry(file)->d_parent;
-> > +	struct xe_device *xe = extract_xe(dent);
-> > +	unsigned int vfid = extract_vfid(dent);
-> > +
-> > +	if (*ppos)
-> > +		return -ESPIPE;
-> > +
-> > +	return xe_sriov_migration_data_read(xe, vfid, buf, count);
-> > +}
-> > +
-> > +static const struct file_operations data_vf_fops = {
-> > +	.owner		= THIS_MODULE,
-> > +	.open		= simple_open,
-> > +	.write		= data_write,
-> > +	.read		= data_read,
-> > +	.llseek		= default_llseek,
-> > +};
-> > +
-> >  static void pf_populate_vf(struct xe_device *xe, struct dentry *vfdent)
-> >  {
-> >  	debugfs_create_file("pause", 0200, vfdent, xe, &pause_vf_fops);
-> > @@ -228,6 +262,7 @@ static void pf_populate_vf(struct xe_device *xe, struct dentry *vfdent)
-> >  	debugfs_create_file("reset", 0200, vfdent, xe, &reset_vf_fops);
-> >  	debugfs_create_file("save", 0600, vfdent, xe, &save_vf_fops);
-> >  	debugfs_create_file("restore", 0600, vfdent, xe, &restore_vf_fops);
-> > +	debugfs_create_file("migration_data", 0600, vfdent, xe, &data_vf_fops);
-> >  }
-> >  
-> >  static void pf_populate_with_tiles(struct xe_device *xe, struct dentry *dent, unsigned int vfid)
-> > diff --git a/drivers/gpu/drm/xe/xe_sriov_pf_migration.c b/drivers/gpu/drm/xe/xe_sriov_pf_migration.c
-> > index eaf581317bdef..029e14f1ffa74 100644
-> > --- a/drivers/gpu/drm/xe/xe_sriov_pf_migration.c
-> > +++ b/drivers/gpu/drm/xe/xe_sriov_pf_migration.c
-> > @@ -10,6 +10,7 @@
-> >  #include "xe_gt_sriov_pf_migration.h"
-> >  #include "xe_pm.h"
-> >  #include "xe_sriov.h"
-> > +#include "xe_sriov_migration_data.h"
-> >  #include "xe_sriov_pf_helpers.h"
-> >  #include "xe_sriov_pf_migration.h"
-> >  #include "xe_sriov_printk.h"
-> > @@ -53,6 +54,15 @@ static bool pf_check_migration_support(struct xe_device *xe)
-> >  	return IS_ENABLED(CONFIG_DRM_XE_DEBUG);
-> >  }
-> >  
-> > +static void pf_migration_cleanup(struct drm_device *dev, void *arg)
-> > +{
-> > +	struct xe_sriov_pf_migration *migration = arg;
-> > +
-> > +	xe_sriov_migration_data_free(migration->pending);
-> > +	xe_sriov_migration_data_free(migration->trailer);
-> > +	xe_sriov_migration_data_free(migration->descriptor);
-> > +}
-> > +
-> >  /**
-> >   * xe_sriov_pf_migration_init() - Initialize support for SR-IOV VF migration.
-> >   * @xe: the &xe_device
-> > @@ -62,6 +72,7 @@ static bool pf_check_migration_support(struct xe_device *xe)
-> >  int xe_sriov_pf_migration_init(struct xe_device *xe)
-> >  {
-> >  	unsigned int n, totalvfs;
-> > +	int err;
-> >  
-> >  	xe_assert(xe, IS_SRIOV_PF(xe));
-> >  
-> > @@ -73,7 +84,15 @@ int xe_sriov_pf_migration_init(struct xe_device *xe)
-> >  	for (n = 1; n <= totalvfs; n++) {
-> >  		struct xe_sriov_pf_migration *migration = pf_pick_migration(xe, n);
-> >  
-> > +		err = drmm_mutex_init(&xe->drm, &migration->lock);
-> > +		if (err)
-> > +			return err;
-> > +
-> >  		init_waitqueue_head(&migration->wq);
-> > +
-> > +		err = drmm_add_action_or_reset(&xe->drm, pf_migration_cleanup, migration);
-> 
-> shouldn't we use devm instead here ?
-
-I'll switch it to devm.
-
-> 
-> > +		if (err)
-> > +			return err;
-> >  	}
-> >  
-> >  	return 0;
-> > @@ -154,6 +173,36 @@ xe_sriov_pf_migration_save_consume(struct xe_device *xe, unsigned int vfid)
-> >  	return data;
-> >  }
-> >  
-> > +static int pf_handle_descriptor(struct xe_device *xe, unsigned int vfid,
-> > +				struct xe_sriov_migration_data *data)
-> > +{
-> > +	if (data->tile != 0 || data->gt != 0)
-> > +		return -EINVAL;
-> > +
-> > +	xe_sriov_migration_data_free(data);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int pf_handle_trailer(struct xe_device *xe, unsigned int vfid,
-> > +			     struct xe_sriov_migration_data *data)
-> > +{
-> > +	struct xe_gt *gt;
-> > +	u8 gt_id;
-> > +
-> > +	if (data->tile != 0 || data->gt != 0)
-> > +		return -EINVAL;
-> > +	if (data->offset != 0 || data->size != 0 || data->buff || data->bo)
-> > +		return -EINVAL;
-> > +
-> > +	xe_sriov_migration_data_free(data);
-> > +
-> > +	for_each_gt(gt, xe, gt_id)
-> > +		xe_gt_sriov_pf_control_restore_data_done(gt, vfid);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  /**
-> >   * xe_sriov_pf_migration_restore_produce() - Produce a VF migration data packet to the device.
-> >   * @xe: the &xe_device
-> > @@ -173,6 +222,11 @@ int xe_sriov_pf_migration_restore_produce(struct xe_device *xe, unsigned int vfi
-> >  
-> >  	xe_assert(xe, IS_SRIOV_PF(xe));
-> >  
-> > +	if (data->type == XE_SRIOV_MIGRATION_DATA_TYPE_DESCRIPTOR)
-> > +		return pf_handle_descriptor(xe, vfid, data);
-> > +	else if (data->type == XE_SRIOV_MIGRATION_DATA_TYPE_TRAILER)
-> 
-> no need for "else" here
-
-Ok.
-
-Thanks,
--Michał
-
-> 
-> > +		return pf_handle_trailer(xe, vfid, data);
-> > +
-> >  	gt = xe_device_get_gt(xe, data->gt);
-> >  	if (!gt || data->tile != gt->tile->id) {
-> >  		xe_sriov_err_ratelimited(xe, "VF%d Invalid GT - tile:%u, GT:%u\n",
-> > diff --git a/drivers/gpu/drm/xe/xe_sriov_pf_migration_types.h b/drivers/gpu/drm/xe/xe_sriov_pf_migration_types.h
-> > index 2a45ee4e3ece8..8468e5eeb6d66 100644
-> > --- a/drivers/gpu/drm/xe/xe_sriov_pf_migration_types.h
-> > +++ b/drivers/gpu/drm/xe/xe_sriov_pf_migration_types.h
-> > @@ -7,6 +7,7 @@
-> >  #define _XE_SRIOV_PF_MIGRATION_TYPES_H_
-> >  
-> >  #include <linux/types.h>
-> > +#include <linux/mutex_types.h>
-> >  #include <linux/wait.h>
-> >  
-> >  /**
-> > @@ -53,6 +54,14 @@ struct xe_sriov_migration_data {
-> >  struct xe_sriov_pf_migration {
-> >  	/** @wq: waitqueue used to avoid busy-waiting for snapshot production/consumption */
-> >  	wait_queue_head_t wq;
-> > +	/** @lock: Mutex protecting the migration data */
-> > +	struct mutex lock;
-> > +	/** @pending: currently processed data packet of VF resource */
-> > +	struct xe_sriov_migration_data *pending;
-> > +	/** @trailer: data packet used to indicate the end of stream */
-> > +	struct xe_sriov_migration_data *trailer;
-> > +	/** @descriptor: data packet containing the metadata describing the device */
-> > +	struct xe_sriov_migration_data *descriptor;
-> >  };
-> >  
-> >  #endif
-> 
 
