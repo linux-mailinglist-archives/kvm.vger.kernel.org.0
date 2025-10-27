@@ -1,139 +1,185 @@
-Return-Path: <kvm+bounces-61180-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61181-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C17AC0F25E
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:04:40 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E4EAC0F246
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:03:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 215AA403B33
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 15:57:13 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 117A9341DEB
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 16:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C61314A63;
-	Mon, 27 Oct 2025 15:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C333101B7;
+	Mon, 27 Oct 2025 16:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C5T6yDX2"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="X/D86aVm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C73630F959;
-	Mon, 27 Oct 2025 15:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D781D30F532
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761580205; cv=none; b=ZEXnnIm11RSzhvMVRWDcUzKDfdBtgIe+lt3+gn6gdrYbp3qrkgwZout5jWj/UYHtp2RUy49hFcys61QKQ3e/PITFsQeodI7RUmMX2Q26h6oddAnSXYmcvAHceCPRoEJQhWm+WIrSsNkmyNzqkeee2ASdAOyRjUfUs7XTSnydgJo=
+	t=1761580990; cv=none; b=eQkcSZtJtyYg8i9NvZ7EiFTz1MfEeBIpWDt4pWisMjjsprXmqlvyLOogQnYnATgZjQktuiH42kMtP8AIqBVtGYfMboUywbpnXUbsaMjX+Vwa7P4S8ZR/7w2uOb/B3oFo3j5C7BEGmIb9QajL0WkuAcEiDLs0xyFUYRofV8/PvQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761580205; c=relaxed/simple;
-	bh=RdygzJT2XsrdTbtmQzSWCPJAunS+teSOMTJJuISCOZA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o/21QEXDqHeXAPXqqI4Ih/m1UbIG++09LJgozwArYohXe0/C0dsk9c0b/8wnd0ObCU9ckUXcZPQA8mQs7LvWm8kkxcYN7dciT74XFhXq6Z7/GGKj+phQ86poY5/IigdsGeHOxzO2IHFBh2lLK7XApw8wKp4EYfpxbNwtBi9t5rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C5T6yDX2; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761580203; x=1793116203;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=RdygzJT2XsrdTbtmQzSWCPJAunS+teSOMTJJuISCOZA=;
-  b=C5T6yDX2rqiH17VCoHwNFH6URWl2JieiJ71bDNQgcjGvNVxzpGNV54UD
-   Fjbkljy+rJ0NDWjjRLUWp0wvcsOsM/hq11Yae3a3r6iEtDLtgv03w+ewe
-   mraBmOv7wzjYj9hsjluMRNsi4iRnYqe77QBlYcwXaLKEH34vVkg9L05hC
-   e8kABoPSnCjnESieOqepxmBmU7nEjsLdfQAWxsNnLO/qgYn12ZQysBMXs
-   t2+jalyQwDh8Jxib/HLf4syGNnxHmdh1cna6b1fvIVUcv5jhGDuwg7zTk
-   s2WxK3Cnpob5INOnGgDswaxlAe+sUXZaZZ6ovFS7jilNKyR6N60lIDN52
-   g==;
-X-CSE-ConnectionGUID: 348FZAcJSfOv3l+ULUpX0w==
-X-CSE-MsgGUID: tVezxVxsQZSFuVDfIk6f4A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="74263407"
-X-IronPort-AV: E=Sophos;i="6.19,259,1754982000"; 
-   d="scan'208";a="74263407"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 08:50:03 -0700
-X-CSE-ConnectionGUID: lS/Zz6CmQuCe+yil2nnJ5A==
-X-CSE-MsgGUID: 2sdsPN4IRkmQJG6oOxEFng==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,259,1754982000"; 
-   d="scan'208";a="190288043"
-Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.109.112]) ([10.125.109.112])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 08:50:02 -0700
-Message-ID: <c6a006dd-1ad4-4bd7-a21e-5ae9b1aa688f@intel.com>
-Date: Mon, 27 Oct 2025 08:50:01 -0700
+	s=arc-20240116; t=1761580990; c=relaxed/simple;
+	bh=05oV4QgWlrICz8v8LWqrCddNcBhrbTFx9f/clrOypts=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=scE7pHVDZSclMYPFmTNQr9OO3e6vW3emxs3y/pFSNRcav47GEocui+gnCzSe1ek1ZNX+AACSgi+9jCYizG50v/Y+dgrTCOkEOy+5F0eQkPRQtEz9AxVOnR3ElVHWATV2QWV47VvmkC5wiKbiwBm0hrBIc1o3JvO9zgDYTAphE7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=X/D86aVm; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59RBhuc71218971
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:03:05 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=s2048-2025-q2; bh=Nq/Ni+MDbBxIJTDqDTi0
+	lg+krZJe34pBBkitBlxWWts=; b=X/D86aVms8Om9gwJhnL5NvmUlZfNIhJzF1hC
+	nkrcV8Yb85VjHS07HAg2Rb1Y1sEeC5U6/M9uV7zFx7hHARxkF15sDhGXI2zqWoRt
+	PLiYv8OqMniCUhZQElpBXZMZgofeTPMxYbej/4rTGq9igC3NIQ9s0vXeF7OkYOCi
+	LrrFwk/vUXYmKGcpmtiW0nPOFHTNNIlp2O4D/O3SU8mwkW0cpwoMjtWtIIHuh+eb
+	LtDz6Gj1IE1J6b4oR/8UQZpZKubVPrHRwdkNg0R+Ot+BTJhs+val3NroEefBZxt/
+	Vc2fGVb4EVkt5H4nz78Pmz9HDvjELf/f/ntJGal5qD/clCMxCA==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4a284et1fn-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:03:05 -0700 (PDT)
+Received: from twshared28390.17.frc2.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Mon, 27 Oct 2025 16:03:03 +0000
+Received: by devgpu012.nha5.facebook.com (Postfix, from userid 28580)
+	id 91AE442FC2D; Mon, 27 Oct 2025 09:02:55 -0700 (PDT)
+Date: Mon, 27 Oct 2025 09:02:55 -0700
+From: Alex Mastro <amastro@fb.com>
+To: Alex Williamson <alex@shazbot.org>
+CC: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        Jason Gunthorpe
+	<jgg@ziepe.ca>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, David
+ Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v4 0/3] vfio: handle DMA map/unmap up to the addressable
+ limit
+Message-ID: <aP+Xr1DrNM7gYD8v@devgpu012.nha5.facebook.com>
+References: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
+ <20251015132452.321477fa@shazbot.org>
+ <3308406e-2e64-4d53-8bcc-bac84575c1d9@oracle.com>
+ <aPFheZru+U+C4jT7@devgpu015.cco6.facebook.com>
+ <20251016160138.374c8cfb@shazbot.org>
+ <aPJu5sXw6v3DI8w8@devgpu012.nha5.facebook.com>
+ <20251020153633.33bf6de4@shazbot.org>
+ <aPe0E6Jj9BJA2Bd5@devgpu012.nha5.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 06/22] x86/cea: Export __this_cpu_ist_top_va() to KVM
-To: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org
-Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org,
- peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com,
- hch@infradead.org, sohil.mehta@intel.com
-References: <20251026201911.505204-1-xin@zytor.com>
- <20251026201911.505204-7-xin@zytor.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzUVEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
- LmNvbT7CwXgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
- lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
- MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
- IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
- aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
- I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
- E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
- F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
- CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
- P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
- 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lczsFNBFRjzmoBEACyAxbvUEhd
- GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
- MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
- Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
- lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
- 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
- qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
- BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
- 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
- vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
- FCRl0Bvyj1YZUql+ZkptgGjikQARAQABwsFfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
- l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
- yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
- +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
- asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
- WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
- sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
- KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
- MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
- hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
- vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20251026201911.505204-7-xin@zytor.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aPe0E6Jj9BJA2Bd5@devgpu012.nha5.facebook.com>
+X-FB-Internal: Safe
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI3MDE0OSBTYWx0ZWRfX25HVSvrPP9Y2
+ t72MzycnCUCDmRoAtTSYCOsBhmVCueu/JTvpBxJPMDkNWJGtRI7zouLhqZcUMycNU2JSN19a1On
+ u1ufO8w9LZqsZ82IjjDU2pV/JlKFuvbFS4mZry8tdSkEfNu2TEb3T4mZZAVZvy5Q3YDk7hNxlI8
+ 7+dE+joWlQV+IufSNKYFzYU0qWfxTaDbpGUk8SUM7yhQg/T4Cmx5z1J8haGvozoWiTdE1WrTw9S
+ cgDOiChyVp6mvyGyrvISR76WTizantBMefyy5p7K+A6FaMIlpIaEeLAP8sxIiS6sH97keelbiRw
+ VcjLTJ30dugs52lWPyRpykbQFR42Fn8UyrUficQhLFxr27wzsGJEsRhfi5BSXausTCZvdaLBsZ2
+ Ufqd8htIwHtlZRPzqaawGmI0unfC3w==
+X-Proofpoint-ORIG-GUID: NNbcj6IC09jubSPvJKSdz7-dDTtzF1lD
+X-Proofpoint-GUID: NNbcj6IC09jubSPvJKSdz7-dDTtzF1lD
+X-Authority-Analysis: v=2.4 cv=OaWVzxTY c=1 sm=1 tr=0 ts=68ff97b9 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=g2ih4RM_o3xvLBDMwOgA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-27_06,2025-10-22_01,2025-03-28_01
 
-On 10/26/25 13:18, Xin Li (Intel) wrote:
-> Export __this_cpu_ist_top_va() to allow KVM to retrieve the per-CPU
-> exception stack top.
+On Tue, Oct 21, 2025 at 09:25:55AM -0700, Alex Mastro wrote:
+> On Mon, Oct 20, 2025 at 03:36:33PM -0600, Alex Williamson wrote:
+> > I do note that we're missing a Fixes: tag.  I think we've had hints of
+> > this issue all the way back to the original implementation, so perhaps
+> > the last commit should include:
+> > 
+> > Fixes: 73fa0d10d077 ("vfio: Type1 IOMMU implementation")
 > 
-> FRED introduced new fields in the host-state area of the VMCS for stack
-> levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively corresponding to
-> per-CPU exception stacks for #DB, NMI and #DF.  KVM must populate these
-> fields each time a vCPU is loaded onto a CPU.
+> SGTM
+> 
+> > Unless you've identified a more specific target.
+> 
+> I have not.
+> 
+> > Along with the tag, it would probably be useful in that same commit to
+> > expand on the scope of the issue in the commit log.  I believe we allow
+> > mappings to be created at the top of the address space that cannot be
+> > removed via ioctl, but such inconsistency should result in an
+> > application error due to the failed ioctl and does not affect cleanup
+> > on release.
 
-Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+I want to make sure I understand the cleanup on release path. Is my supposition
+below correct?
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 916cad80941c..7f8d23b06680 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1127,6 +1127,7 @@ static size_t unmap_unpin_slow(struct vfio_domain *domain,
+ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 			     bool do_accounting)
+ {
++	// end == 0 due to overflow
+ 	dma_addr_t iova = dma->iova, end = dma->iova + dma->size;
+ 	struct vfio_domain *domain, *d;
+ 	LIST_HEAD(unmapped_region_list);
+@@ -1156,6 +1157,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 	}
+ 
+ 	iommu_iotlb_gather_init(&iotlb_gather);
++	// doesn't enter the loop, never calls iommu_unmap
+ 	while (iova < end) {
+ 		size_t unmapped, len;
+ 		phys_addr_t phys, next;
+@@ -1210,6 +1212,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+ {
+ 	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
++	// go here
+ 	vfio_unmap_unpin(iommu, dma, true);
+ 	vfio_unlink_dma(iommu, dma);
+ 	put_task_struct(dma->task);
+@@ -2394,6 +2397,8 @@ static void vfio_iommu_unmap_unpin_all(struct vfio_iommu *iommu)
+ 	struct rb_node *node;
+ 
+ 	while ((node = rb_first(&iommu->dma_list)))
++		// eventually, we attempt to remove the end of address space
++		// mapping
+ 		vfio_remove_dma(iommu, rb_entry(node, struct vfio_dma, node));
+ }
+ 
+@@ -2628,6 +2633,8 @@ static void vfio_release_domain(struct vfio_domain *domain)
+ 		kfree(group);
+ 	}
+ 
++	// Is this backstop what saves us? Even though we didn't do individual
++	// unmaps, the "leaked" end of address space mappings get freed here?
+ 	iommu_domain_free(domain->domain);
+ }
+ 
+@@ -2643,10 +2650,12 @@ static void vfio_iommu_type1_release(void *iommu_data)
+ 		kfree(group);
+ 	}
+ 
++	// start here
+ 	vfio_iommu_unmap_unpin_all(iommu);
+ 
+ 	list_for_each_entry_safe(domain, domain_tmp,
+ 				 &iommu->domain_list, next) {
++		// eventually...
+ 		vfio_release_domain(domain);
+ 		list_del(&domain->next);
+ 		kfree(domain);
 
