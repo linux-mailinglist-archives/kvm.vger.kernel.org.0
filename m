@@ -1,503 +1,282 @@
-Return-Path: <kvm+bounces-61211-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61212-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11DBC0FBEF
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 18:46:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23A3EC0FD1B
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 19:01:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAB28422080
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:46:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F335119C7944
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 18:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87312BE647;
-	Mon, 27 Oct 2025 17:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B752D6E4B;
+	Mon, 27 Oct 2025 18:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YYf/7TlC"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XYwLgVZc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C8221DF26A
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 17:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69498195FE8;
+	Mon, 27 Oct 2025 18:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761587206; cv=none; b=ahaY+bxbjWQSi5zJOW0Ffhrk3IcSVTW9TGp++UVXiLn3LYfiI+TagB00KGxKxF1L625KBtk2BzdRm4vU99964daAH/W6HUkGWJEfVqcQTJHkLX5wzaLzMdH4U7HY+5qFcAvVvOe+kebd9RuVuQrUWn/yGH3FQ8FbEfyXYMx+oAQ=
+	t=1761588069; cv=none; b=hcBZ6v3hK9vBA5qMTD6zFJ+SMbEcagBoLHXU6cBD4sDJ5F2HDe+4t3Qxwtk2pCMNMhEoLzj1pqXMxVIT/XNtXxKt79WTOWlMx0EvwST2GK0+IwVJghQ2ApQOc1iXVQ5inwYGyujWB/MXzQLApzlfDYABGO9OgeRqA3MqDPsZDzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761587206; c=relaxed/simple;
-	bh=VcG5+XrvrT1sRlh00mVu9cyDAkrQ1aMhBFqFLZQAOQI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ucQlyWxbAOPpHRENBGbreiqcPSdmhIP28dXf4l5wxxdtuyqRvQpWufSRBMFS3RBaVqhz9I3ojn89ZNDLREbsOoebuKyIBZR/QH8ULcXpR1THpTKadNF8JVDFZxs7GJltQ9hL63VJxpqx4j7Lq9T9T/oKecwd3poagyxzo/fsfAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YYf/7TlC; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-3717780ea70so64914871fa.1
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 10:46:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761587202; x=1762192002; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c/OxAieWT1IlZT6K7vEkuqxMdOaiR3DM/O5Sopg8BcA=;
-        b=YYf/7TlCNLYSIMdr1QJTpZcYoXLRc5EZdz6CAlHgWOWXWhWXFg2FSeYPu4SMmjwzzZ
-         9uVHXi2RjLoFVDM4fGoYMVkt+hbwCyX/wZLqk9F+Qmj1OAtL3Mc4NJVkF5VqhE91ulNa
-         hJ17Pnq3+1Nf7w20HTAyrw/krmrhoWtf+Rzy1EYg7rDU+6Jx6bn+4fWhQxEaUtnQWyi5
-         8GvCJBX/qTG/2PwjxK5FqVPriIsT3Wv49xIDHRI7D8a+ss9sR4CKoq6duYSm8UygRRmP
-         wnRAGGsKW4NUNI70zs39D7OA17SVGztI6p8LqqHQFA+aFpIBUFKiSqMeCSz5x6WqEQo5
-         jkEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761587202; x=1762192002;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c/OxAieWT1IlZT6K7vEkuqxMdOaiR3DM/O5Sopg8BcA=;
-        b=YoBsEZULVt9lOjvs8BfUOMlUQhszNJlU6N3GEQsngSgpaDfud4+JQ5PGG2qfuqG4E3
-         2gCRa+2aHNnt1bhxs8Kve4aVyUZWAdQP8Kh9tj2KruU5mJ6o0/BbZPmmvFwklSI9Q4wc
-         ObrTkdr8tQPq7qhWjA3Qrz/NJX1UqrvgzJb4/itpAWfe/GruAyamA81JRWyFQYgV7mfg
-         OLL6ML0+B4QbhwRsS0DizHq4yBlGNVMgs8jifOXFzI/z3EHFKEGk23Xh9Q8IeuyZLicX
-         kXZjDh9J+W6J3TlHpkiU8ZojwzfwLHLcaenlDGttBle4WAHwBZ4qzWkDShsRlPzM+929
-         O2Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCWDnkyhNZNE2NCBPH+qQcHtY5AVprrhNUTr2CT17GN2/lc6Gdh65f9OX2jCMD/9NfC5aqU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWsaT4IhMkmqnFKZyEa0OloEXJx+VH0dQBXuHom2lEZZBOFxnL
-	H+s4Is+qPOO02k/TeFx4HKuozDS7TeOq1Q4myQfGfBKtxwf5n4u5CmhqMxV38HcM17ae1y+eqrB
-	i4IncKmpp8Gu3bFhnGOYWyJKbJ3QvyKTJ+JRfNRap
-X-Gm-Gg: ASbGnctZGjrQ+yfgaEmw6Ieb7LmD2cphw2F1uRZDDYX6ASRec9tN2Cbkjyj1ogIW3Z4
-	Q1Jj4siX8DAS9hyEdSe3mY/4Agt5+nfMa10XwNt8FiYy+YumxlT2NKYS7KfwHw7tEpt/qlXWEiA
-	k6b4/lcKTnMbv9+tC4kOTOLyGyFtxdWK6zRQ6su7F3v6/C0/SIIjVnIG5zRJBfd7N4GTDMhvRyy
-	/Tx19QREbOVKgftiyK6plHPZ0Jh5u+pxZTe+EDcdNN6YQcGXyF0y6fF70/3XLZZWzpZqhA=
-X-Google-Smtp-Source: AGHT+IHkh278KwfUHPTzc5VicZripZvZrUk0vB++mCtwjLhz+uh7rj9RS70YXfJyBQCKh3CzASqgCkSwgmM2v4er/sU=
-X-Received: by 2002:a05:651c:2450:10b0:373:a537:6a00 with SMTP id
- 38308e7fff4ca-3790773be31mr1223281fa.30.1761587202208; Mon, 27 Oct 2025
- 10:46:42 -0700 (PDT)
+	s=arc-20240116; t=1761588069; c=relaxed/simple;
+	bh=9aOcg1vbKI7PBU73QuoyR/WmuERyo+h3GXdaWJTIjmI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=qkpd8k/3aglazHkI52eiOXxZfKIVqVbzuQEQYGJgCTsyok0B+fFzEVAmTZ4jWTUN2bvOZVi9JBFPLs1wkOqnIDcTBTwrr6evCdrBiWqL1BHZE4uuk3wQDmWTUx1+XnmbN6OJoeoWf6S9TsuovJkLE35+JM/JmjPUL+ere4BrJfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XYwLgVZc; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59RDLCaX001054;
+	Mon, 27 Oct 2025 18:01:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=b5qwh9
+	L6C6fmvWd7okpW2IknesMw1cOqK+AvkIuKa/s=; b=XYwLgVZcpZ42SOLq56uszw
+	dqTz1f2N7oTZzNi+eD9qFzGNY1I4VVjm3X58uiO57UKp/BS117EoprjU+CtR26eT
+	MsbEm8J7PdEcJjRcqMG9SfC+i0K9T3EPrJLj+YVwFHTY6jaCaUnPa3CstU6H8lNI
+	i4m3cZULWTlpMn5JaHopdG4YsirSxpFpQ7zaWmMSysk8FAC33+CWnwmnKDz4aoEo
+	41V+1BDH3J7/7ps1hr8qhkENaX0JKN7gMVldDZpOVJHx/q3/RNZwdbavJJlL8+c8
+	5bKDeadT9K6WwUrgXpBcCx+XXAGeAW4OvTpQRd+Ji9yWgVtJ6yHkmwJImMwE8X6w
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a0p9905v7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 27 Oct 2025 18:01:01 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59RFBuBd030454;
+	Mon, 27 Oct 2025 18:01:00 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4a1acjpv03-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 27 Oct 2025 18:00:59 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59RI0uN750004476
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 27 Oct 2025 18:00:56 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0CE8F2004B;
+	Mon, 27 Oct 2025 18:00:56 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7ADB020040;
+	Mon, 27 Oct 2025 18:00:55 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.111.6.137])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 27 Oct 2025 18:00:55 +0000 (GMT)
+Message-ID: <af9c7f4aedf71896dd2a9dd80837aae8f3428f93.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 03/20] KVM: s390: Add gmap_helper_set_unused()
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, nrb@linux.ibm.com, seiden@linux.ibm.com,
+        schlameuss@linux.ibm.com, hca@linux.ibm.com, svens@linux.ibm.com,
+        agordeev@linux.ibm.com, david@redhat.com,
+        gerald.schaefer@linux.ibm.com
+Date: Mon, 27 Oct 2025 19:00:15 +0100
+In-Reply-To: <20250915133340.5b7c7d55@p-imbrenda>
+References: <20250910180746.125776-1-imbrenda@linux.ibm.com>
+		<20250910180746.125776-4-imbrenda@linux.ibm.com>
+		<267557ab6a061d55e4961312f4dc756bd4e0eaec.camel@linux.ibm.com>
+	 <20250915133340.5b7c7d55@p-imbrenda>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250912222525.2515416-1-dmatlack@google.com> <20250912222525.2515416-3-dmatlack@google.com>
- <aP-jZOVdrIVB_qaV@google.com>
-In-Reply-To: <aP-jZOVdrIVB_qaV@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 27 Oct 2025 10:46:14 -0700
-X-Gm-Features: AWmQ_bl-uhT1aNzDhVn581PsXGZQcal3BydVSD19tHZW9f1erZWj44XAaoDjX2Y
-Message-ID: <CALzav=eV6OQXSkL-AF7LoOzQ4gsWpfn395UdU2=P7NGChZWX8g@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Add a test for vfio-pci device IRQ
- delivery to vCPUs
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=JqL8bc4C c=1 sm=1 tr=0 ts=68ffb35d cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VnNF1IyMAAAA:8 a=8VGQ8kbb1ftBDG4DREYA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: 5N0wipb3_2nGq-XPGIzXfOSEEKDwk7Fl
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI1MDAxOSBTYWx0ZWRfX2pk2kDco+Krr
+ lli0zEmhll3XJyNXjv1tURfAlW7SW1MShJuAw12POKjiD0rUtxWgsfVgpRFLjJHJaEp6Hx/fMOB
+ 9F/VrkMl/KAXVKf8gUweHO02a/cJEfH4SXC6BqvAH3ipdjfztovQJ2iAvZixrFdmg2ch1PD6y9F
+ h89Fp0HfytBuUY0boMdnwp5KddcnNMxt+mAzHrz7ua8uIEf6i9psMqNxV0X4cySfnw7JjM/QHW1
+ E6azJd9hS3Nu94wORxrEi1vQQqxEXWUy9+BXdCkOpncMz4NJQl/Fj3wxEM4FhSRICCms/yQKbn+
+ ABejSE1l1Px2XwdN6EqJ8oD9LYq93YS/Toa0DZriFl6aMqIUbz3BmNjwBWLwzT5sSAAaoiP+nDh
+ WhA3vJQA5fv7B0k4K0te1BxJjg0NXg==
+X-Proofpoint-ORIG-GUID: 5N0wipb3_2nGq-XPGIzXfOSEEKDwk7Fl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-27_07,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 clxscore=1015 lowpriorityscore=0 malwarescore=0 bulkscore=0
+ priorityscore=1501 spamscore=0 adultscore=0 phishscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510250019
 
-On Mon, Oct 27, 2025 at 9:52=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Mon, 2025-09-15 at 13:33 +0200, Claudio Imbrenda wrote:
+> On Fri, 12 Sep 2025 11:17:02 +0200
+> Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
+>=20
+> > On Wed, 2025-09-10 at 20:07 +0200, Claudio Imbrenda wrote:
+> > > Add gmap_helper_set_unused() to mark userspace ptes as unused.
+> > >=20
+> > > Core mm code will use that information to discard unused pages instea=
+d
+> > > of attempting to swap them.
+> > >=20
+> > > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com> =20
+> >=20
+> > LGTM
+> > > ---
+> > >  arch/s390/include/asm/gmap_helpers.h |  1 +
+> > >  arch/s390/mm/gmap_helpers.c          | 64 ++++++++++++++++++++++++++=
+++
+> > >  2 files changed, 65 insertions(+)
+> > >=20
+> > > diff --git a/arch/s390/include/asm/gmap_helpers.h b/arch/s390/include=
+/asm/gmap_helpers.h
+> > > index 5356446a61c4..459bd39d0887 100644
+> > > --- a/arch/s390/include/asm/gmap_helpers.h
+> > > +++ b/arch/s390/include/asm/gmap_helpers.h
+> > > @@ -11,5 +11,6 @@
+> > >  void gmap_helper_zap_one_page(struct mm_struct *mm, unsigned long vm=
+addr);
+> > >  void gmap_helper_discard(struct mm_struct *mm, unsigned long vmaddr,=
+ unsigned long end);
+> > >  int gmap_helper_disable_cow_sharing(void);
+> > > +void gmap_helper_set_unused(struct mm_struct *mm, unsigned long vmad=
+dr);
+> > > =20
+> > >  #endif /* _ASM_S390_GMAP_HELPERS_H */
+> > > diff --git a/arch/s390/mm/gmap_helpers.c b/arch/s390/mm/gmap_helpers.=
+c
+> > > index a45d417ad951..69ffc0c6b654 100644
+> > > --- a/arch/s390/mm/gmap_helpers.c
+> > > +++ b/arch/s390/mm/gmap_helpers.c
+> > > @@ -91,6 +91,70 @@ void gmap_helper_discard(struct mm_struct *mm, uns=
+igned long vmaddr, unsigned lo
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(gmap_helper_discard);
+> > > =20
+> > > +/**
+> > > + * gmap_helper_set_unused() - mark a pte entry as unused
+> > > + * @mm: the mm
+> > > + * @vmaddr: the userspace address whose pte is to be marked
+> > > + *
+> > > + * Mark the pte corresponding the given address as unused. This will=
+ cause
+> > > + * core mm code to just drop this page instead of swapping it.
+> > > + *
+> > > + * This function needs to be called with interrupts disabled (for ex=
+ample
+> > > + * while holding a spinlock), or while holding the mmap lock. Normal=
+ly this
+> > > + * function is called as a result of an unmap operation, and thus KV=
+M common
+> > > + * code will already hold kvm->mmu_lock in write mode.
+> > > + *
+> > > + * Context: Needs to be called while holding the mmap lock or with i=
+nterrupts
+> > > + *          disabled.
+> > > + */
+> > > +void gmap_helper_set_unused(struct mm_struct *mm, unsigned long vmad=
+dr) =20
+> >=20
+> > Can you give this a better name? E.g. gmap_helper_try_set_pte_unused
+>=20
+> yes
+>=20
+> >=20
+> > > +{
+> > > +	pmd_t *pmdp, pmd, pmdval;
+> > > +	pud_t *pudp, pud;
+> > > +	p4d_t *p4dp, p4d;
+> > > +	pgd_t *pgdp, pgd;
+> > > +	spinlock_t *ptl;
+> > > +	pte_t *ptep;
+> > > +
+> > > +	pgdp =3D pgd_offset(mm, vmaddr);
+> > > +	pgd =3D pgdp_get(pgdp);
+> > > +	if (pgd_none(pgd) || !pgd_present(pgd))
+> > > +		return;
+> > > +
+> > > +	p4dp =3D p4d_offset(pgdp, vmaddr);
+> > > +	p4d =3D p4dp_get(p4dp);
+> > > +	if (p4d_none(p4d) || !p4d_present(p4d))
+> > > +		return;
+> > > +
+> > > +	pudp =3D pud_offset(p4dp, vmaddr);
+> > > +	pud =3D pudp_get(pudp);
+> > > +	if (pud_none(pud) || pud_leaf(pud) || !pud_present(pud))
+> > > +		return;
+> > > +
+> > > +	pmdp =3D pmd_offset(pudp, vmaddr);
+> > > +	pmd =3D pmdp_get_lockless(pmdp);
+> > > +	if (pmd_none(pmd) || pmd_leaf(pmd) || !pmd_present(pmd))
+> > > +		return;
+> > > +
+> > > +	ptep =3D pte_offset_map_rw_nolock(mm, pmdp, vmaddr, &pmdval, &ptl);
+> > > +	if (!ptep)
+> > > +		return;
+> > > +
+> > > +	if (spin_trylock(ptl)) { =20
+> >=20
+> > Missing the comment you promised :) about deadlock prevention.
+>=20
+> Ooops! will fix
+>=20
+> >=20
+> > > +		/*
+> > > +		 * Make sure the pte we are touching is still the correct
+> > > +		 * one. In theory this check should not be needed, but =20
+> >=20
+> > Why should it not be needed? I.e. why should we be protected against mo=
+dification?
+>=20
+> I will add this in a comment:
+>=20
+> a pmd pointing to a page table can change in only very few cases, and
+> all cases will take the mm->mmap_lock in write mode and require IPC
+> synchronization, which means that as long as interrupts are disabled or
+> we are holding the mmap_lock, the pmd cannot change under our feet.
+>=20
+> by keeping interrupts disabled, we are basically stalling any remote
+> CPUs that might want to change the pmd, as the IPC will not complete
+> until we re-enable them.
+>=20
+> in our case, we call this function after calling pgste_get_lock(),
+> which will disable interrupts until pgste_set_unlock() is called.
+>=20
+> > > +		 * better safe than sorry.
+> > > +		 */
+> > > +		if (likely(pmd_same(pmdval, pmdp_get_lockless(pmdp))))
+> > > +			__atomic64_or(_PAGE_UNUSED, (long *)ptep);
 
-Thank you for the feedback!
+Should we do a WARN_ONCE? Would we be notified if it shows up in CI?
+Is the "if" even meaningful? That is, if the pmd is not the same for what
+ever reason, are we guaranteed to see it here.
+Does taking the page table lock also lock the pmd table? (I assume not)
+What are the consequences of the or if the pmd is not the same, arbitrary m=
+emory corruption?
 
-> On Fri, Sep 12, 2025, David Matlack wrote:
-> >
-> > This test only supports x86_64 for now, but can be ported to other
-> > architectures in the future.
->
-> Can it though?  There are bits and pieces that can be reused, but this te=
-st is
-> x86 through and through.
+> > > +		spin_unlock(ptl);
+> > > +	}
+> > > +
+> > > +	pte_unmap(ptep);
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(gmap_helper_set_unused);
+> > > +
+> > >  static int find_zeropage_pte_entry(pte_t *pte, unsigned long addr,
+> > >  				   unsigned long end, struct mm_walk *walk)
+> > >  { =20
+> >=20
 
-Delivering MSIs from a vfio-pci device into a guest is not an
-x86-specific thing. But I think you could make the argument that it
-will be simpler for each architecture to have their own version of
-this test, with some shared code, rather than the other way around.
-
-> >  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
-> >  .../testing/selftests/kvm/vfio_pci_irq_test.c | 507 ++++++++++++++++++
->
-> Please break this into multiple patches, e.g. a "basic" patch and and the=
-n roughly
-> one per "advanced" command line option.
-
-Will do.
-
-> > +static pid_t vcpu_tids[KVM_MAX_VCPUS];
->
-> s/tids/pids?
-
-This stores output from gettid(), so tids felt more appropriate.
-
-> > +#define TIMEOUT_NS (2ULL * 1000 * 1000 * 1000)
->
-> The timeout should be configurable via command line.
-
-Will do.
-
-> > +#define READ_FROM_GUEST(_vm, _variable) ({           \
-> > +     sync_global_from_guest(_vm, _variable);         \
-> > +     READ_ONCE(_variable);                           \
-> > +})
-> > +
-> > +#define WRITE_TO_GUEST(_vm, _variable, _value) do {  \
-> > +     WRITE_ONCE(_variable, _value);                  \
-> > +     sync_global_to_guest(_vm, _variable);           \
-> > +} while (0)
->
-> These belong in a separate patch, and in tools/testing/selftests/kvm/incl=
-ude/kvm_util.h.
-
-Will do.
-
-> > +static void guest_enable_interrupts(void)
->
-> This is a misleading name, e.g. I would expect it to _just_ be sti_nop().=
-  If the
-> intent is to provide a hook for a potential non-x86 implementation, then =
-it should
-> probably be split into guest_arch_test_setup() and guest_arch_irq_enable(=
-) or so
-> (to align with the kernel's local_irq_{dis,en}able()).
->
-> As is, I would just omit the helper.
-
-Will do.
-
-> > +static void guest_irq_handler(struct ex_regs *regs)
-> > +{
-> > +     WRITE_ONCE(guest_received_irq[guest_get_vcpu_id()], true);
->
-> Hmm, using APID ID works, but I don't like the hidden dependency on the l=
-ibrary
-> using ascending IDs starting from '0'.  This would also be a good opportu=
-nity to
-> improve the core infrastructure.
-
-What dependency are you referring to? I think the only requirement is
-vcpu->id =3D=3D APIC ID. Are you saying tests should not make that
-assumption?
-
-> > +     WRITE_ONCE(vcpu_tids[vcpu->id], syscall(__NR_gettid));
->
-> Please add wrapper in tools/testing/selftests/kvm/include/kvm_syscalls.h.
-
-Will do.
-
-> > +static void pin_vcpu_threads(int nr_vcpus, int start_cpu, cpu_set_t *a=
-vailable_cpus)
-> > +{
-> > +     const size_t size =3D sizeof(cpu_set_t);
-> > +     int nr_cpus, cpu, vcpu_index =3D 0;
-> > +     cpu_set_t target_cpu;
-> > +     int r;
-> > +
-> > +     nr_cpus =3D get_nprocs();
->
-> Generally speaking, KVM selftests try to avoid affining tasks to CPUs tha=
-t are
-> outside of the original affinity list.  See various usage of sched_getaff=
-inity().
-
-available_cpus is initialized by calling sched_getaffinity().
-
-> > +static FILE *open_proc_interrupts(void)
-> > +{
-> > +     FILE *fp;
-> > +
-> > +     fp =3D fopen("/proc/interrupts", "r");
-> > +     TEST_ASSERT(fp, "fopen(/proc/interrupts) failed");
->
-> open_path_or_exit()?
-
-I guess I'll have to rework this code to use fds instead of FILE?
-
->
-> > +
-> > +     return fp;
-> > +}
->
-> And all of these /proc helpers belong in library code.
-
-Will do.
-
-> > +static int setup_msi(struct vfio_pci_device *device, bool use_device_m=
-si)
-> > +{
-> > +     const int flags =3D MAP_SHARED | MAP_ANONYMOUS;
-> > +     const int prot =3D PROT_READ | PROT_WRITE;
-> > +     struct vfio_dma_region *region;
-> > +
-> > +     if (use_device_msi) {
-> > +             /* A driver is required to generate an MSI. */
-> > +             TEST_REQUIRE(device->driver.ops);
-> > +
-> > +             /* Set up a DMA-able region for the driver to use. */
->
-> Why?
-
-I will extend the comment to explain.
-
-Each driver needs DMA-able memory so that it can post commands to the
-device to get the device to perform actions like sending an MSI and
-doing a memcpy.
-
-You might wonder why tests have to worry about setting up this region
-and why the driver doesn't just do it automatically. That is because
-some tests will want to control how the memory is mapped in the host
-(e.g. Live Update tests want to use memfds so it can persist them
-across Live Update) and how it is mapped into the IOMMU.
-
-That being said, I think it would be worth adding a helper to set up a
-default mapping for drivers for tests that don't care.
-
->
-> > +             region =3D &device->driver.region;
-> > +             region->iova =3D 0;
-> > +             region->size =3D SZ_2M;
-> > +             region->vaddr =3D mmap(NULL, region->size, prot, flags, -=
-1, 0);
->
-> kvm_mmap()
-
-Will do.
-
-> > +static void send_msi(struct vfio_pci_device *device, bool use_device_m=
-si, int msi)
->
-> IMO, this helper does more harm than good.  There is only one real user, =
-the
-> second call unconditionally passes %false for @use_device_msi.
->
-> If you drop the helper, than there should be no need to assert that the M=
-SI is
-> the device MSI on *every* send via device.
-
-Will do.
-
-> > +int main(int argc, char **argv)
-> > +{
-> > +     /* Random non-reserved vector and GSI to use for the device IRQ *=
-/
-> > +     const u8 vector =3D 0xe0;
->
-> s/random/arbitrary
->
-> Why not make it truly random?
-
-Only because there's already a lot going on in this test. Do you think
-it's worth randomizing these?
-
-> > +     irq_count =3D get_irq_count(irq);
-> > +     pin_count =3D __get_irq_count("PIN:");
-> > +     piw_count =3D __get_irq_count("PIW:");
->
-> This is obviously very Intel specific information.  If you're going to pr=
-int the
-> posted IRQ info, then the test should also print e.g. AMD GALogIntr event=
-s.
-
-I saw PIN and PIW in /proc/interrupts when I tested on AMD hosts,
-that's why I included them both by default.
-
-I can look into adding GALogIntr if you want.
-
-> > +     if (pin_vcpus) {
-> > +             ret =3D sched_getaffinity(vcpu_tids[0], sizeof(available_=
-cpus), &available_cpus);
-> > +             TEST_ASSERT(ret =3D=3D 0, "sched_getaffinity() failed");
->
-> !ret
->
-> Though this is another syscall that deserves a wrapper in kvm_syscalls.h.
-
-Will do.
-
-> > +             if (nr_vcpus > CPU_COUNT(&available_cpus)) {
-> > +                     printf("There are more vCPUs than pCPUs; refusing=
- to pin.\n");
-> > +                     pin_vcpus =3D false;
->
-> Why is this not an assertion?  Alternatively, why not double/triple/quadr=
-uple up
-> as needed?
-
-I don't recall why I added this... I can probably just drop it in the
-next version. I'll report back here if I remember why when working on
-v2.
-
-> > +     if (irq_affinity) {
-> > +             char path[PATH_MAX];
-> > +
-> > +             snprintf(path, sizeof(path), "/proc/irq/%d/smp_affinity_l=
-ist", irq);
-> > +             irq_affinity_fp =3D fopen(path, "w");
-> > +             TEST_ASSERT(irq_affinity_fp, "fopen(%s) failed", path);
->
-> More code that belongs in the library.
-
-Will do.
-
-> > +     /* Set a consistent seed so that test are repeatable. */
-> > +     srand(0);
->
-> We should really figure out a solution for reproducible random numbers in=
- the
-> host.  Ah, and kvm_selftest_init()'s handling of guest random seeds is fl=
-awed,
-> because it does random() without srand() and so AFAICT, gets the same see=
-d every
-> time.  E.g. seems like we want something like this, but with a way to ove=
-rride
-> "random_seed" from a test.
->
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
-elftests/kvm/lib/kvm_util.c
-> index 5744643d9ec3..0118fd2ba56b 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -2310,6 +2310,7 @@ void __attribute((constructor)) kvm_selftest_init(v=
-oid)
->         struct sigaction sig_sa =3D {
->                 .sa_handler =3D report_unexpected_signal,
->         };
-> +       int random_seed;
->
->         /* Tell stdout not to buffer its content. */
->         setbuf(stdout, NULL);
-> @@ -2319,8 +2320,13 @@ void __attribute((constructor)) kvm_selftest_init(=
-void)
->         sigaction(SIGILL, &sig_sa, NULL);
->         sigaction(SIGFPE, &sig_sa, NULL);
->
-> +       random_seed =3D time(NULL);
-> +       srand(random_seed);
-> +
->         guest_random_seed =3D last_guest_seed =3D random();
-> -       pr_info("Random seed: 0x%x\n", guest_random_seed);
-> +
-> +       pr_info("Guest random seed: 0x%x (srand: 0x%x)\n",
-> +               guest_random_seed, random_seed);
->
->         kvm_selftest_arch_init();
->  }
-
-Just to make sure I understand: You are proposing using the current
-time as the seed and printing it to the console. That way each run
-uses a different random seed and we get broader test coverage. Then if
-someone wants to reproduce a test result, there would be some way for
-them to override the seed via cmdline? That sounds reasonable to me, I
-can take a look at adding that in the next version.
-
-> > +             if (irq_affinity && vcpu->id =3D=3D 0) {
->
-> Please add comments explaining why affinity related stuff is only applied=
- to
-> vCPU0.  I could probably figure it out, but I really shouldn't have to.
-
-Will do.
-
-> > +             for (j =3D 0; j < nr_vcpus; j++) {
-> > +                     TEST_ASSERT_EQ(READ_FROM_GUEST(vm, guest_received=
-_irq[vcpu->id]), false);
-> > +                     TEST_ASSERT_EQ(READ_FROM_GUEST(vm, guest_received=
-_nmi[vcpu->id]), false);
->
-> These won't generate helpful assert messages.
-
-Good point. I'll improve these in the next version.
-
-> > +             for (;;) {
-> > +                     if (do_nmi && READ_FROM_GUEST(vm, guest_received_=
-nmi[vcpu->id]))
-> > +                             break;
-> > +
-> > +                     if (!do_nmi && READ_FROM_GUEST(vm, guest_received=
-_irq[vcpu->id]))
-> > +                             break;
->
->                 received_irq =3D do_nmi ? &guest_received_nmi[vcpu->id] :
->                                         &guest_received_irq[vcpu->id];
->                 while (!READ_FROM_GUEST(vm, *received_irq))
->                         if (timespec_to_ns(timespec_elapsed(start)) > TIM=
-EOUT_NS) {
->                                 ...
->                         }
->
->                         cpu_relax();
->                 }
-
-LGTM
-
-> > +
-> > +                     if (timespec_to_ns(timespec_elapsed(start)) > TIM=
-EOUT_NS) {
-> > +                             printf("Timeout waiting for interrupt!\n"=
-);
-> > +                             printf("  vCPU: %d\n", vcpu->id);
-> > +                             printf("  do_nmi: %d\n", do_nmi);
-> > +                             printf("  do_empty: %d\n", do_empty);
-> > +                             if (irq_affinity)
-> > +                                     printf("  irq_cpu: %d\n", irq_cpu=
->
-> > +             if (do_nmi)
-> > +                     WRITE_TO_GUEST(vm, guest_received_nmi[vcpu->id], =
-false);
-> > +             else
-> > +                     WRITE_TO_GUEST(vm, guest_received_irq[vcpu->id], =
-false);
-> > +     }
-> > +
-> > +     WRITE_TO_GUEST(vm, done, true);
-> > +
-> > +     for (i =3D 0; i < nr_vcpus; i++) {
-> > +             if (block) {
-> > +                     kvm_route_msi(vm, gsi, vcpus[i], vector, false);
-> > +                     send_msi(device, false, msi);
-> > +             }
-> > +
-> > +             pthread_join(vcpu_threads[i], NULL);
-> > +     }
-> > +
-> > +     if (irq_affinity)
-> > +             fclose(irq_affinity_fp);
-> > +
-> > +     printf("Host interrupts handled:\n");
-> > +     printf("  IRQ-%d: %lu\n", irq, get_irq_count(irq) - irq_count);
-> > +     printf("  Posted-interrupt notification events: %lu\n",
-> > +            __get_irq_count("PIN:") - pin_count);
-> > +     printf("  Posted-interrupt wakeup events: %lu\n",
-> > +            __get_irq_count("PIW:") - piw_count);
-> > +
-> > +     vfio_pci_device_cleanup(device);
-> > +
-> > +     return 0;
-> > +}
-> > --
-> > 2.51.0.384.g4c02a37b29-goog
-> >);
->
-> vfio_pci_irq_test.c: In function =E2=80=98main=E2=80=99:
-> vfio_pci_irq_test.c:469:41: error: =E2=80=98irq_cpu=E2=80=99 may be used =
-uninitialized [-Werror=3Dmaybe-uninitialized]
->   469 |                                         printf("  irq_cpu: %d\n",=
- irq_cpu);
->       |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~
-> vfio_pci_irq_test.c:332:13: note: =E2=80=98irq_cpu=E2=80=99 was declared =
-here
->   332 |         int irq_cpu;
->       |             ^~~~~~~
-
-Ack, will fix.
-
-> > +                             if (pin_vcpus)
-> > +                                     printf("  vcpu_cpu: %d\n", get_cp=
-u(vcpu));
-> > +
-> > +                             TEST_FAIL("vCPU never received IRQ!\n");
-> > +                     }
-> > +             }
->
->                 TEST_ASSERT(guest_received_irq[vcpu->id] !=3D
->                             guest_received_nmi[vcpu->id],
->                             "blah blah blah");
->
->                 WRITE_TO_GUEST(vm, *received_irq, false);
-
-LGTM
+--=20
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Wolfgang Wendt
+Gesch=C3=A4ftsf=C3=BChrung: David Faller
+Sitz der Gesellschaft: B=C3=B6blingen / Registergericht: Amtsgericht Stuttg=
+art, HRB 243294
 
