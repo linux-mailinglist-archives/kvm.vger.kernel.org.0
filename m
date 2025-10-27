@@ -1,194 +1,134 @@
-Return-Path: <kvm+bounces-61182-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61183-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1C5BC0F3C2
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:22:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEBA3C0F2B2
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:08:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7694442520B
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 16:03:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B556519C0C88
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 16:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D325A30C37A;
-	Mon, 27 Oct 2025 16:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD382877D2;
+	Mon, 27 Oct 2025 16:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q7jVh1hI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ww4P3DE7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B03830BF60
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1B630C37A
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 16:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761581015; cv=none; b=u8rtFLCnie4bIRdD1U4F7oLgGJnoPASs3QxbiMLDbnitickObYowK1szZ30LmwN3PogiXscJVIyuqmLcW3NHDHP3YtoM8ig+O2lqmnflX+Rw6IHOsjGlsF3nXWRbPVMBVfQe5DJ0SXm6Ya4+gQOdP8EoE3/h9Rl4AntqAcU9SPM=
+	t=1761581054; cv=none; b=gOqILSpZc6346GKOv50emnuoTFd6NaVbhZ0y0hsCdUBJFmVLxyzCXvwpJ98JlQoLK/JuW3CvOgoux3E2Hx9QKNC8eMsRkO36QCc6SdDsK71mGiadfpDF9fkhdlegnHTDtdKAFPAJPjs5VArAcxYHHriHMPNgo9HCW2oG9ZUjYVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761581015; c=relaxed/simple;
-	bh=ZVvaHiYxclFoP0ltljuT+zJ+LK5kjIQ4V1Qoeu7vlhk=;
+	s=arc-20240116; t=1761581054; c=relaxed/simple;
+	bh=DYNT/VChXtqrA2sDhHO3vFbenRYCP9kylJFBh2XvWzw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jydas8wzT+TsEWOyo3Im6Wcy6KWPBd7+S3IzZJ3+moHckxMdsQBevvHMNPUG8AVn4GWtEo5tZ6Y2nc6cMrxud6+VvKB0vG4Di2rcJ2GHvaaNKYrP2N2bfEuScAw4aDxlfaZQwVZhw/toxWOq1BSyRDwXLkxM9hfiSv4ZKyRLvPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Q7jVh1hI; arc=none smtp.client-ip=74.125.224.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-63e17c0fefbso5202624d50.1
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:03:32 -0700 (PDT)
+	 To:Cc:Content-Type; b=uYhOcT+PYjEBzz8/oQmtUClFjNy24+jAFqZWmSoN/p7t4ZfZAUEbHeOQaV7Zk6uwb604eXeLvHi2nEd/rXvJ6xvW6koGcKlJIwt7e+Ck1yHG7Q7gtn2cjOGUDquHFJ9iktfTfJxHqvLNh1d1g4SmPjv5mDFJfIH8V/AsS1Q2pXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ww4P3DE7; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-378cfd75fb0so51896261fa.1
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 09:04:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1761581012; x=1762185812; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761581051; x=1762185851; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RR5BznuAUZ5//5K4fKsbv/PX3i2neLhRixVpX04AB5M=;
-        b=Q7jVh1hI5kWY6RECPSudlgRLBj1xNQy5pZMKZpS1C+Q+UtRYWK+76GxuicYAHa/CZ3
-         gWImCbQcET/LArfrRAMxJM9s14slYgk3ShgelSG4aLK980Y6QsQa6S682zhS8ARAhKdJ
-         Q+I/4NQLVBybFVLDlgSEhOrG3439+BjmVNOlgTetoRQTAxPWbQku9PA+iAPgquiXgCx1
-         79CdhRkzLPASKezHY04Wg0LpeTDnJfSNn3jRTDCoi5sIGRNK3uwcmw+g67MwUG6wLxyu
-         ox+bo1Wplv8h5PtSQi+NK+RO1aH2n/dzRmpPqaMHuVLreuu3kC8Npc0PurteV6waf1Lb
-         yeOA==
+        bh=zpFhVdVLgSZYYPYkv9Xm+ppo7V2oCjM7bP0bHDIGOyQ=;
+        b=ww4P3DE7nlxkXwimf803r5KuGrtcr9I8YBO4BjBHZGIUdG9ORfyxPgbbFAS9Wg2xcb
+         +MTX3PGI46Bob64+S7ccqkBAUnE4YQSS0MTmQiaPfaH+jUq514H3IRW98wambuAAKj9G
+         uM0TxE6ErPmaVkcKhzTr60lTnikKoYh1X2r2VBH14q23HsW2Ne9QaxRbEOeWm0Tt/mH4
+         BHaJuSwHtGPwpeYhFmCK1aYqb5WWlTiffaJcf0G/6ZCboZZ2/RbGkDtcUhT8K88Sw25M
+         EXDzNxeOmEm3gjVnuU8Yyh2ueQNQSR+geh1OF9GjBwdcMABZseMUfSvU7FtVxFYKeTxy
+         B+kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761581012; x=1762185812;
+        d=1e100.net; s=20230601; t=1761581051; x=1762185851;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RR5BznuAUZ5//5K4fKsbv/PX3i2neLhRixVpX04AB5M=;
-        b=WY/Hk2pnJN+Iy3M+BSiKx+Alv9DetTQH3bto89rHhNiY3huMpP8cToP1kZ75hN7VJ8
-         9O4OsSIGnjmFDKZuu2pvoPvQXy4jtRMMYQXVnOtJHQIhoVIxzSxMeiTGGfHR/gkumoBF
-         IZ+PYgke5lWdv5DPdw3GRl2NHeqKjybIrXMQbYyRwUx7zaEyTXvX22pIL/8Uj1QFHMa8
-         d8QLaP+L85ToRbb9bOUBQgFoM4nNBlQFM+mcK1IN/1CYjyzAwAW94ggeuhDGBGyZp46J
-         mzU89zm60vjNXaQto4zTvfZlW/2M805rnoNPgmYI3aBZflTddRXBMs+asrrGcQV27f3q
-         y8sw==
-X-Forwarded-Encrypted: i=1; AJvYcCV2nblEuvN1zniOsHXhgdaecvNyIMpYf+40WcbZIYAHvcpKl1plRbb9XfmQnmJ3B5tDpC4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAP6wXi3kPQABrh7mAB/OaPKj7A5En2diQVcDdf0AsuPnxGP+4
-	Xjm1q7qUmTHpk+8CQ7X6z6ZUk7Dknolyx7zXRl0vrrOgCjs9lqhaTJz0RXEn6BWn/on7aISdG1P
-	K35T+6u9gdnzs724MKRC9/OLSdGagLaWQsWjx1zSO3A==
-X-Gm-Gg: ASbGnct6d76WmyD3tt6fhvSRaCZpbwfYnK64cKs6EV8yQClEFyRWIbqmC1rtfh8nH0d
-	T8griC25FoDQgBXzhRD0dHpxTNTQSlFchUefCvPaTVMnicue+2TyjfP8xabtLwfJPoOvBKA6fFM
-	5jkoECwR9GGpXEL8RK2K3u01yltSTxA8fE8I+2Dj5E55TT7EXbjwaTMu71g1WfBcsvJqHdqldA+
-	UKJ871GHfyqNMxAtIss58afshe5oTYrTZiaMnVVNpXVI6weqeWz20UB9lwtGOVoVybkg8aK
-X-Google-Smtp-Source: AGHT+IEUrN/EysgI2nB2F9WdFzaJ1hhJHQ7VjfW/gyaI669aRQl1+Q6hp6c/yY+VSNAPuRW0/bPat1D3KnOCnNmBZY0=
-X-Received: by 2002:a05:690e:c4f:b0:612:891a:9ecc with SMTP id
- 956f58d0204a3-63f6b9b05b7mr479893d50.9.1761581011690; Mon, 27 Oct 2025
- 09:03:31 -0700 (PDT)
+        bh=zpFhVdVLgSZYYPYkv9Xm+ppo7V2oCjM7bP0bHDIGOyQ=;
+        b=TwmGzzHbDV6RwuBCY/Bjhx+9QLhkXa0ualnEcNmWIrHJv52WkAkMF/BD8npUxuHdeT
+         7tCYu/QY39p0191Qzm7w/h4RQeusT9RHeSP9iMKeikCURS9K+FuBhv4GyPF/8159+CCX
+         zKCyjvyi8c2OQxPr8MpOabnkgYoBJalxE/DUsW/XKR9DIwfnnk9rdI+qNAstH16V+6we
+         Hdj0x+GIrQ3dj012HNHuF1eMpqDvAN2wDRiqFiKVW3MJwqjOUJInlsjD09/uXGCMFMVh
+         DwrVOOorBMHgQ3U7Vo7gAC2ypQK4GzJBjIMvz33ZEMYCZeAaH/8yzjlEPiBDyWmbmtrZ
+         kGeA==
+X-Forwarded-Encrypted: i=1; AJvYcCVgYVqYTCPjqR48kpZzVUFnHpf/esDCicOjz9L+c/1qyhjQ/zABM6209YI7dF8DLQrQbe4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3ttvdgGstfK/D6rU4pZnJGPsRS8IrStogrTX7IZn4XpyHrLE9
+	Cl7HtpLEv7aEhG9lgLGqb5scsLNpRCS5nWaNwYvgJpV2+egh8ZCSMCVVv1RGLDNikl/6NqdcE6l
+	q1+yzwdzZbkTcxxyTJzYXbCPy0tutOefaqxT6PXknrArJyTrUIXWP2XOT
+X-Gm-Gg: ASbGnct309t/pPvJuXptUeiWCLSeO2UV8TbqldIqEQTAY29tH9nBAJfso1HywFI/hXc
+	yr319W3ylalXp03WCX6xNBMrSJHb/25ca1sD+5n+ch1wecExeu8FPMW1djwqFhU7uvNcGpfCA7t
+	qh32P3QzqsXqWxpSwGO9XJnxXDL+nYf7Rvp3Ttmg663aAJ/oAJ4lkZJoljEimf64o1WCXdYAHLl
+	g0yMj4w1a57BTa2CGAp8QKOURJMubguAMdpgXMsQIs5MWBhbvc8HPmmQeMI
+X-Google-Smtp-Source: AGHT+IGoyTJm1oNUabEtAi7wxqKURcM0enDsqYKsw16P6RtMS3jkqu5ZA5d/yjT+nSCfooYWA3/HvqAjzrQjRYaNIg4=
+X-Received: by 2002:a05:651c:3248:20b0:378:df5b:fbb8 with SMTP id
+ 38308e7fff4ca-379076dadb1mr459301fa.19.1761581050530; Mon, 27 Oct 2025
+ 09:04:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250920140124.63046-1-mohamed@unpredictable.fr>
- <20250920140124.63046-4-mohamed@unpredictable.fr> <CAFEAcA-398ZMeLUbHWyUw4np81mLikEn2PkQnFQMY4oY_iWRFA@mail.gmail.com>
- <29E39B1C-40D3-4BBA-8B0B-C39594BA9B29@unpredictable.fr>
-In-Reply-To: <29E39B1C-40D3-4BBA-8B0B-C39594BA9B29@unpredictable.fr>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Oct 2025 16:03:19 +0000
-X-Gm-Features: AWmQ_bky_gDkaMRbeQ688zuYHzvCneYcGVItHtc3zS3XRWMV3shJhZg-0iZCeos
-Message-ID: <CAFEAcA93e6GL9agaCBZ2AabB21JrS6KS6MsbRHGPwdc_vj7xDQ@mail.gmail.com>
-Subject: Re: [PATCH v6 03/23] hw/arm: virt: add GICv2m for the case when ITS
- is not available
-To: Mohamed Mediouni <mohamed@unpredictable.fr>
-Cc: qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, 
-	Yanan Wang <wangyanan55@huawei.com>, Phil Dennis-Jordan <phil@philjordan.eu>, 
-	=?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
-	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
-	Mads Ynddal <mads@ynddal.dk>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	Cameron Esfahani <dirty@apple.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhao Liu <zhao1.liu@intel.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Igor Mammedov <imammedo@redhat.com>, 
-	qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, 
-	Roman Bolshakov <rbolshakov@ddn.com>, Pedro Barbuda <pbarbuda@microsoft.com>, 
-	Alexander Graf <agraf@csgraf.de>, Sunil Muthuswamy <sunilmut@microsoft.com>, 
-	Eduardo Habkost <eduardo@habkost.net>, Ani Sinha <anisinha@redhat.com>, 
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Pierrick Bouvier <pierrick.bouvier@linaro.org>
+References: <20250912222525.2515416-1-dmatlack@google.com> <aP-ULL69aQfCOwCb@google.com>
+In-Reply-To: <aP-ULL69aQfCOwCb@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 27 Oct 2025 09:03:41 -0700
+X-Gm-Features: AWmQ_bm4QqK0xoOsZ6a7g1Ai6-HjU7xmmVDri0NNObOO-yyk5EMmALHZgIe_pdk
+Message-ID: <CALzav=dTcRmF3UAYJNGNoG0D5e2GPmwavt8hM_ovfZrKXjO3vA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] KVM: selftests: Link with VFIO selftests lib and test
+ device interrupts
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2 Oct 2025 at 05:30, Mohamed Mediouni <mohamed@unpredictable.fr> wr=
-ote:
+On Mon, Oct 27, 2025 at 8:47=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
+> On Fri, Sep 12, 2025, David Matlack wrote:
+> > This series can be found on GitHub:
+> >
+> >   https://github.com/dmatlack/linux/tree/kvm/selftests/vfio_pci_irq_tes=
+t/v1
 >
+> ...
 >
-> > On 25. Sep 2025, at 18:24, Peter Maydell <peter.maydell@linaro.org> wro=
-te:
+> > David Matlack (2):
+> >   KVM: selftests: Build and link sefltests/vfio/lib into KVM selftests
+> >   KVM: selftests: Add a test for vfio-pci device IRQ delivery to vCPUs
 > >
-> > On Sat, 20 Sept 2025 at 15:02, Mohamed Mediouni
-> > <mohamed@unpredictable.fr> wrote:
-> >>
-> >> On Hypervisor.framework for macOS and WHPX for Windows, the provided e=
-nvironment is a GICv3 without ITS.
-> >>
-> >> As such, support a GICv3 w/ GICv2m for that scenario.
-> >>
-> >> Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
-> >>
-> >> Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-> >> ---
-> >> hw/arm/virt-acpi-build.c | 4 +++-
-> >> hw/arm/virt.c            | 8 ++++++++
-> >> include/hw/arm/virt.h    | 2 ++
-> >> 3 files changed, 13 insertions(+), 1 deletion(-)
+> >  tools/testing/selftests/kvm/Makefile.kvm      |   6 +-
+> >  .../testing/selftests/kvm/vfio_pci_irq_test.c | 507 ++++++++++++++++++
+> >  2 files changed, 512 insertions(+), 1 deletion(-)
+> >  create mode 100644 tools/testing/selftests/kvm/vfio_pci_irq_test.c
 > >
-> > Looking at this I find myself wondering whether we need the
-> > old-version back compat handling. The cases I think we have
-> > at the moment are:
 > >
-> > (1) TCG, virt-6.1 and earlier: no_tcg_its is set
-> >   -- you can have a gicv2 (always with a gicv2m)
-> >   -- if you specify gic-version=3D3 you get a GICv3 without ITS
-> > (2) TCG, virt-6.2 and later:
-> >   -- gic-version=3D2 still has gicv2m
-> >   -- gic-version=3D3 by default gives you an ITS; if you also
-> >      say its=3Doff you get GICv3 with no ITS
-> >   -- there is no case where we provide a GICv3 and are
-> >      unable to provide an ITS for it
-> > (3) KVM (any version):
-> >   -- gic-version=3D2 has a gicv2m
-> >   -- gic-version=3D3 gives you an ITS by default; its=3Doff
-> >      will remove it
-> >   -- there is no case where we provide a GICv3 and are
-> >      unable to provide an ITS for it
-> > (4) HVF:
-> >   -- only gic-version=3D2 works, you get a gicv2m
-> >
-> > and I think what we want is:
-> > (a) if you explicitly disable the ITS (with its=3Doff or via
-> >     no_tcg_its) you get no ITS (and no gicv2m)
-> > (b) if you explicitly enable the ITS you should get an
-> >     actual ITS or an error message
-> > (c) the default should be its=3Dauto which gives
-> >     you "ITS if we can, gicv2m if we can't".
-> >     This is repurposing the its=3D property as "message signaled
-> >     interrupt support", which is a little bit of a hack
-> >     but I think OK if we're clear about it in the docs.
-> >     (We could rename the property to "msi=3D(off,its,gicv2m,auto)"
-> >     with back-compat support for "its=3D" but I don't know if
-> >     that's worth the effort.)
-> >
-> > And then that doesn't need any back-compat handling for pre-10.2
-> > machine types or a "no_gicv3_with_gicv2m" flag, because for
-> > 10.1 and earlier there is no case that currently works and
-> > which falls into category (c) and which doesn't give you an ITS.
-> > (because we don't yet have hvf gicv3 implemented: that's a new
-> > feature that never worked in 10.1.)
-> >
-> > What do you think?
+> > base-commit: 093458c58f830d0a713fab0de037df5f0ce24fef
+> > prerequisite-patch-id: 72dce9cd586ac36ea378354735d9fabe2f3c445e
+> > prerequisite-patch-id: a8c7ccfd91ce3208f328e8af7b25c83bff8d464d
 >
-> Would it be wanted to provide MSI-X support in all scenarios
-> even with its=3Doff?
+> Please don't base series on prerequisite patches unless there is a hard d=
+ependency.
+>
+>   ffdc6a9d6d9eb20c855404e2c09b6b2ea25b4a04 KVM: selftests: Rename $(ARCH_=
+DIR) to $(SRCARCH)
+>   9dc0c1189dfa1f4eef3856445fa72c9fb1e14d1c Revert "KVM: selftests: Overri=
+de ARCH for x86_64 instead of using ARCH_DIR"
+>
+> By all means, do testing on top of such patches if that's what your envir=
+onment
+> effectively dictates, but rebase/drop such prereqs before posting, as the=
+y add
+> noise and friction.  E.g. these patches don't apply cleanly on kvm-x86/ne=
+xt due
+> to the prereqs.
 
-We should prefer to provide MSI-X support. If the user
-explicitly asks for a config that doesn't give MSI-X
-support, that's their choice to make.
-
-> And there=E2=80=99s the consequence of that making GICv3 + GICv2m only
-> testable with auto and not with TCG or kvm, which doesn=E2=80=99t sound i=
-deal.
-
-I guess that would be an argument for the "give the property
-the right name so we can say "msi=3D(off,its,gicv2m,auto)". Then
-you could say
- -accel tcg -machine gic-version=3D3,msi=3Dgicv2m
-
-to test that setup.
-
-thanks
--- PMM
+Makes sense. I will send patches applied without prereqs specific to
+my environment next time.
 
