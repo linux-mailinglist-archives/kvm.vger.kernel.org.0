@@ -1,189 +1,137 @@
-Return-Path: <kvm+bounces-61222-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61223-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0A40C116E8
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 21:44:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BC40C117B8
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 22:10:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1B6256604C
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 20:44:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1ED2D4E15AC
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 21:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F7C321F48;
-	Mon, 27 Oct 2025 20:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD6232861E;
+	Mon, 27 Oct 2025 21:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="SkM+8bQ6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D/R5h7Gq"
 X-Original-To: kvm@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201112D739D;
-	Mon, 27 Oct 2025 20:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459AD28935A;
+	Mon, 27 Oct 2025 21:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761597874; cv=none; b=EOWrnBoB7GkZN8bzKvxjlJf7cud0TpLrU0q0mauc5Fo7JGA2w7zSxvWbYlPnwiR5t9t6g9SCYlSjyiQfjQveCGwpA9FMWk8p/G//zaVjwYsEIWS3hpTI80RySgX+37Lb+SqyrK8xbRRlHhFgCze9RWUIGhmcQEbeyXt+uzK7IP4=
+	t=1761599388; cv=none; b=M7ol5HPISRRcq62FKEuJOU+P/8RE2T4OcraZNnTKM8tf0aA5/fLKitgfiXSPuKRdEeU5OURybn6dP5Dqh75RpvPakSUZcpXiDrj8TYKcAQoC2jfPUqbQzIxSvLBw7/edMeZdC9b+xjAaqCONI0LUAHZz1RpmAzM24jVEdgEZaok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761597874; c=relaxed/simple;
-	bh=qlgYcDP3wPNQcYNQoPgAxQlQpIKroMyhIMV31tcTFB8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qk9Oynw2wudLMot2lvcIWQcdxgPFOAImo30JgurfT7cJs8V7C59wsm9IEz/am5+Pq24yIso1EkyDdb37Vpg27TWM4nzFZIsBSsxcYggWpfYYqPi9BZMDo9eS24gF08WM8UO5c5OFshw3BuVW6FJ6tQjfd0hxOA0c2yRV8DqW0Mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=SkM+8bQ6; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from localhost (unknown [52.148.138.235])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 6625E200FE48;
-	Mon, 27 Oct 2025 13:44:31 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6625E200FE48
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1761597872;
-	bh=O55qdQEOty0YMJyCMjA7a55Zsy7WOextVLJ/m8n7aNc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SkM+8bQ6HvDK3JCyAa3H5XwZhgsBqyi2+LZ6YFbx7CCgLp7y7ik+goeWx+YNH0OE0
-	 Y84Iuea7wlo7sdzrMRzH/9NOZopwGxxQ6Sfdcx3HS9sGE5kHt4+oAu70GqW/PyaftN
-	 z/yZVMGkRGY/+t7ME6Jzffzb4DhwJ1iCVs5H8U80=
-Date: Mon, 27 Oct 2025 13:44:30 -0700
-From: Jacob Pan <jacob.pan@linux.microsoft.com>
-To: Vipin Sharma <vipinsh@google.com>
-Cc: bhelgaas@google.com, alex.williamson@redhat.com,
- pasha.tatashin@soleen.com, dmatlack@google.com, jgg@ziepe.ca,
- graf@amazon.com, pratyush@kernel.org, gregkh@linuxfoundation.org,
- chrisl@kernel.org, rppt@kernel.org, skhawaja@google.com, parav@nvidia.com,
- saeedm@nvidia.com, kevin.tian@intel.com, jrhilke@google.com,
- david@redhat.com, jgowans@amazon.com, dwmw2@infradead.org,
- epetron@amazon.de, junaids@google.com, linux-kernel@vger.kernel.org,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Jacob Pan <jacob.pan@linux.microsoft.com>
-Subject: Re: [RFC PATCH 06/21] vfio/pci: Accept live update preservation
- request for VFIO cdev
-Message-ID: <20251027134430.00007e46@linux.microsoft.com>
-In-Reply-To: <20251018000713.677779-7-vipinsh@google.com>
-References: <20251018000713.677779-1-vipinsh@google.com>
-	<20251018000713.677779-7-vipinsh@google.com>
-Organization: LSG
-X-Mailer: Claws Mail 3.21.0 (GTK+ 2.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1761599388; c=relaxed/simple;
+	bh=jiJc43oKsUwQXXTUSjasJzpDSd7ISfaLkcwQgh9XI2o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kk8xmKRkqrL2zHXizfhN714NbZZjxTlJypoAWagLU8B+BfeVVFPdw4FfsdmMFtyGt1L7DAEBQW3w5HcQGLDK4hA0geVsvUIp77Y/VW+V/GNlg1JPcCYo/z5dlZY++EKZKIpIIXBHgPtfeA7G3fobJ2U+63016CJU39mj1TjuBc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D/R5h7Gq; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761599386; x=1793135386;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jiJc43oKsUwQXXTUSjasJzpDSd7ISfaLkcwQgh9XI2o=;
+  b=D/R5h7Gqgu2NWtJbdZH2pJ/EhyrTz0SYcBIqG5Y7MKvWGZg9QDLVy8DZ
+   hmoE5+/C94wCQexNaDspa0jjTo99+cXIxShfEjXIGbfKk5j3DSw1B1lbX
+   FZufJlcnbdApOk06LEo4U/sRopyPe4Dxzw3KBtT/Eldb2r6RfLzXDY8xB
+   +KQGrt0NeKogD0jRkvUhSez7vj/ISi8SpAIUXTPJAV9TbykZ4SP4w2SI/
+   7mvWK9VroQh/N1iTnzxJ7mhj5ps8hTIHX9nIUzhZ+M6aJdMrmMelTB24d
+   /Wa+MzkQJa8dk+/OpwWpVPTqPjMLXEvckYR64E9msWC0V1h1sPAFbuIvr
+   Q==;
+X-CSE-ConnectionGUID: qJY4cX67QAulo7zNe7mbCQ==
+X-CSE-MsgGUID: HJw1p+5ZRwmQLM26R6IUGw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="67555734"
+X-IronPort-AV: E=Sophos;i="6.19,259,1754982000"; 
+   d="scan'208";a="67555734"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 14:09:45 -0700
+X-CSE-ConnectionGUID: BUa17DKbSuumsIqrZc9wkQ==
+X-CSE-MsgGUID: w2lESQ+hTLq/TaN9RzO4vA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,259,1754982000"; 
+   d="scan'208";a="185914189"
+Received: from jjgreens-desk15.amr.corp.intel.com (HELO desk) ([10.124.222.186])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 14:09:45 -0700
+Date: Mon, 27 Oct 2025 14:09:39 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Brendan Jackman <jackmanb@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/4] KVM: VMX: Flush CPU buffers as needed if L1D
+ cache flush is skipped
+Message-ID: <20251027210939.53e4ippuz7c6qo4b@desk>
+References: <20251016200417.97003-1-seanjc@google.com>
+ <20251016200417.97003-2-seanjc@google.com>
+ <DDO1FFOJKSTK.3LSOUFU5RM6PD@google.com>
+ <aPe5XpjqItip9KbP@google.com>
+ <20251021233012.2k5scwldd3jzt2vb@desk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251021233012.2k5scwldd3jzt2vb@desk>
 
-On Fri, 17 Oct 2025 17:06:58 -0700
-Vipin Sharma <vipinsh@google.com> wrote:
+On Tue, Oct 21, 2025 at 04:30:12PM -0700, Pawan Gupta wrote:
+> On Tue, Oct 21, 2025 at 09:48:30AM -0700, Sean Christopherson wrote:
+> > On Tue, Oct 21, 2025, Brendan Jackman wrote:
+> > > On Thu Oct 16, 2025 at 8:04 PM UTC, Sean Christopherson wrote:
+> > > > If the L1D flush for L1TF is conditionally enabled, flush CPU buffers to
+> > > > mitigate MMIO Stale Data as needed if KVM skips the L1D flush, e.g.
+> > > > because none of the "heavy" paths that trigger an L1D flush were tripped
+> > > > since the last VM-Enter.
+> > > 
+> > > Presumably the assumption here was that the L1TF conditionality is good
+> > > enough for the MMIO stale data vuln too? I'm not qualified to assess if
+> > > that assumption is true, but also even if it's a good one it's
+> > > definitely not obvious to users that the mitigation you pick for L1TF
+> > > has this side-effect. So I think I'm on board with calling this a bug.
+> > 
+> > Yeah, that's where I'm at as well.
+> > 
+> > > If anyone turns out to be depending on the current behaviour for
+> > > performance I think they should probably add it back as a separate flag.
+> > 
+> > ...
+> > 
+> > > > @@ -6722,6 +6722,7 @@ static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
+> > > >  		:: [flush_pages] "r" (vmx_l1d_flush_pages),
+> > > >  		    [size] "r" (size)
+> > > >  		: "eax", "ebx", "ecx", "edx");
+> > > > +	return true;
+> > > 
+> > > The comment in the caller says the L1D flush "includes CPU buffer clear
+> > > to mitigate MDS" - do we actually know that this software sequence
+> > > mitigates the MMIO stale data vuln like the verw does? (Do we even know if
+> > > it mitigates MDS?)
+> > > 
+> > > Anyway, if this is an issue, it's orthogonal to this patch.
+> > 
+> > Pawan, any idea?
+> 
+> I want to say yes, but let me first confirm this internally and get back to
+> you.
 
-> Return true in can_preserve() callback of live update file handler, if
-> VFIO can preserve the passed VFIO cdev file. Return -EOPNOTSUPP from
-> prepare() callback for now to fail any attempt to preserve VFIO cdev
-> in live update.
->=20
-> The VFIO cdev opened check ensures that the file is actually used for
-> VFIO cdev and not for VFIO device FD which can be obtained from the
-> VFIO group.
->=20
-> Returning true from can_preserve() tells Live Update Orchestrator that
-> VFIO can try to preserve the given file during live update. Actual
-> preservation logic will be added in future patches, therefore, for
-> now, prepare call will fail.
->=20
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  drivers/vfio/pci/vfio_pci_liveupdate.c | 16 +++++++++++++++-
->  drivers/vfio/vfio_main.c               |  3 ++-
->  include/linux/vfio.h                   |  2 ++
->  3 files changed, 19 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/vfio/pci/vfio_pci_liveupdate.c
-> b/drivers/vfio/pci/vfio_pci_liveupdate.c index
-> 088f7698a72c..2ce2c11cb51c 100644 ---
-> a/drivers/vfio/pci/vfio_pci_liveupdate.c +++
-> b/drivers/vfio/pci/vfio_pci_liveupdate.c @@ -8,10 +8,17 @@
->   */
-> =20
->  #include <linux/liveupdate.h>
-> +#include <linux/vfio.h>
->  #include <linux/errno.h>
-> =20
->  #include "vfio_pci_priv.h"
-> =20
-> +static int vfio_pci_liveupdate_prepare(struct
-> liveupdate_file_handler *handler,
-> +				       struct file *file, u64 *data)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
->  static int vfio_pci_liveupdate_retrieve(struct
-> liveupdate_file_handler *handler, u64 data, struct file **file)
->  {
-> @@ -21,10 +28,17 @@ static int vfio_pci_liveupdate_retrieve(struct
-> liveupdate_file_handler *handler, static bool
-> vfio_pci_liveupdate_can_preserve(struct liveupdate_file_handler
-> *handler, struct file *file) {
-> -	return -EOPNOTSUPP;
-> +	struct vfio_device *device =3D vfio_device_from_file(file);
-> +
-> +	if (!device)
-> +		return false;
-> +
-> +	guard(mutex)(&device->dev_set->lock);
-> +	return vfio_device_cdev_opened(device);
-IIUC, vfio_device_cdev_opened(device) will only return true after
-vfio_df_ioctl_bind_iommufd(). Where it does:
-	device->cdev_opened =3D true;
+The software sequence for L1D flush was not validated to mitigate MMIO
+Stale Data. To be on safer side, it is better to not rely on the sequence.
 
-Does this imply that devices not bound to an iommufd cannot be
-preserved?
+OTOH, if a user has not updated the microcode to mitigate L1TF, the system
+will not have the microcode to mitigate MMIO Stale Data either, because the
+microcode for MMIO Stale Data was released after L1TF. Also I am not aware
+of any CPUs that are vulnerable to L1TF and vulnerable to MMIO Stale Data
+only(not MDS).
 
-If so, I am confused about your cover letter step #15
-> 15. It makes usual bind iommufd and attach page table calls.
-
-Does it mean after restoration, we have to bind iommufd again?
-
-I have a separate question regarding noiommu devices. I=E2=80=99m currently
-working on adding noiommu mode support for VFIO cdev under iommufd.
-=46rom my understanding, these devices should naturally be included in
-your patchset, provided that I ensure the noiommu cdev follows the same
-open/bind process. Is that correct?
-
->  }
-> =20
->  static const struct liveupdate_file_ops vfio_pci_luo_fops =3D {
-> +	.prepare =3D vfio_pci_liveupdate_prepare,
->  	.retrieve =3D vfio_pci_liveupdate_retrieve,
->  	.can_preserve =3D vfio_pci_liveupdate_can_preserve,
->  	.owner =3D THIS_MODULE,
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 38c8e9350a60..4cb47c1564f4 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -1386,7 +1386,7 @@ const struct file_operations vfio_device_fops =3D
-> { #endif
->  };
-> =20
-> -static struct vfio_device *vfio_device_from_file(struct file *file)
-> +struct vfio_device *vfio_device_from_file(struct file *file)
->  {
->  	struct vfio_device_file *df =3D file->private_data;
-> =20
-> @@ -1394,6 +1394,7 @@ static struct vfio_device
-> *vfio_device_from_file(struct file *file) return NULL;
->  	return df->device;
->  }
-> +EXPORT_SYMBOL_GPL(vfio_device_from_file);
-> =20
->  /**
->   * vfio_file_is_valid - True if the file is valid vfio file
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index eb563f538dee..2443d24aa237 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -385,4 +385,6 @@ int vfio_virqfd_enable(void *opaque, int
-> (*handler)(void *, void *), void vfio_virqfd_disable(struct virqfd
-> **pvirqfd); void vfio_virqfd_flush_thread(struct virqfd **pvirqfd);
-> =20
-> +struct vfio_device *vfio_device_from_file(struct file *file);
-> +
->  #endif /* VFIO_H */
-
+So in practice, decoupling L1D flush and MMIO Stale Data won't have any
+practical impact on functionality, and makes MMIO Stale Data mitigation
+consistent with MDS mitigation. I hope that makes things clear.
 
