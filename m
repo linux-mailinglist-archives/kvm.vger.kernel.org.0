@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-61131-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61132-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9C01C0BDA1
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 06:48:10 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED9C5C0BE88
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 07:08:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A540D18912E5
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 05:48:34 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2A1743424BD
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 06:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26FBB2D4B71;
-	Mon, 27 Oct 2025 05:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0697C2DAFBB;
+	Mon, 27 Oct 2025 06:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nAwNL5Uy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bE0PYOmP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7BB200BAE
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 05:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744032DA740
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 06:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761544084; cv=none; b=NwZBDodUmZsCItmGICJrvWJ+Z4ywON5M9+Qc+tar3gugwb4kfnSILYDNYGDzlcrGngC/4OhMIeBQyvoBUCFWYHRDzX17PDwOVePkvo2Dmb/erfthF/NL4agwTWMuHwsDepNqQT6A4X7/A0+qtb2f/toLNb6xCMAooY9k9AC83mE=
+	t=1761545304; cv=none; b=u2Zo4h71caOh8vT9GvAI9tM60FTcAdyIN3RRh+vNCvrJQvhlsH7N5Vjd7cYVcRKnVuKnKjt6tNtHel1qUKPufEzTjQKg7sj9jvEDxhGYnX8jDH7sNfPjtb6C+v5HvXz8QRHn3UltJkL5KykoV/SeLeocCMecFaA9fiXwXMElyl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761544084; c=relaxed/simple;
-	bh=24zEWJ2BhHyTK1Z3gf/A4Z3jWdwL2s4O/5Gno5jTRLU=;
+	s=arc-20240116; t=1761545304; c=relaxed/simple;
+	bh=9aPOXXMZhxckm5IZ7JpMj9IGhEIB7o2FEzlDFbTBEoU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NX4+jo/Q6emyMhjZlUv6F+b3DnNeNf82piGneuqLEF1iH0VL/6woZgbGqnu36q1ZjxlEmpYPJnzyb5uMJ4jQgEV+pP9EYXBY25buvQB45Q9Vq8s48HG4pjZgmcUCepIZxmCHztn3KmiiQRSe0RE8pRYwmnISOBPrZ91TecH8DfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nAwNL5Uy; arc=none smtp.client-ip=192.198.163.15
+	 In-Reply-To:Content-Type; b=On4UHIrDs3C4C2y0nwLQlsrpc+Pz163YJrv/qSw1XxsfuaIcqViq8yirXBRppTtsNZvgZQ7tl4ulVt2/cvdz0ACkb7Y96vk8wKDcxni7UBY9/OOvYWpPJudfUzzT5W8wgKgsDlvc/g+3vMkx2aKyHPJYyCd75KA1izvpNYf+YjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bE0PYOmP; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761544082; x=1793080082;
+  t=1761545302; x=1793081302;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=24zEWJ2BhHyTK1Z3gf/A4Z3jWdwL2s4O/5Gno5jTRLU=;
-  b=nAwNL5Uy0AiyR8U+4k5JnjWLOekr5WXQZVMyzhM2OFFW7H4+sA8ibLD6
-   3Pvp/XRZcX4w6wXFPJfA4PMWfPiXUhtyuyuAzfr+0YNFgYY/5UaDv30Xa
-   JY+d8ShS2swp5wCVfMDnrw6TtT977FkClcZRFdyJ4vnFqy6S2KEiakAEj
-   E4PLUdB39Dlovc1lB1DP4pA/iyFj5muCRwlbty/fI9Y75ISp5UdMDbnxa
-   6eDwbiFejXF2Tcxon/ESYm0F6IrovCfeh+I/f8Clt2helOEZ9ezYdpEZa
-   fJnEd3KxMkhq/AOuNL/0tpWGqpqA5JiYbFPb23Arxig32DUZvMYqR0LY5
-   A==;
-X-CSE-ConnectionGUID: RD1v3RC3Qj+aP8X65jyhmQ==
-X-CSE-MsgGUID: D/9i+XS9SoacvhMGPEV4TQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63711861"
+  bh=9aPOXXMZhxckm5IZ7JpMj9IGhEIB7o2FEzlDFbTBEoU=;
+  b=bE0PYOmPqtxfVwZftVbF3jdcKZgpG2xRb14h0K12tQxXT7Cb/MBsCn3W
+   84a7v/TmWbQd2Pp5Y7iWQslfN20MfTB7r3pHszYHreb/UtZtbUPotCOY4
+   vg1DRbAdODHkMUR8XP2Slb6GbSfcbd4vxQWt5MSS9wtZevUjZxz2NRopt
+   bbAxNEvOLpModeHsp+l1bd3T38kARRgd37IV0odYSvIOI86sNR/6KYELp
+   AygbIWnF/1lpLh/5zHalF7FtDcYm02rftgiKNwXGdkV/SbXVrwYodHssj
+   6VXHfevYuP910857MatG9LcUi5DrgfNb2FExLTfoa9h0+LgFavklm1AEQ
+   Q==;
+X-CSE-ConnectionGUID: UXQKxtG+T0mlXcCPzT+Xqg==
+X-CSE-MsgGUID: x0Sq3I9fS1GuOGu96w63xw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63524745"
 X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
-   d="scan'208";a="63711861"
+   d="scan'208";a="63524745"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2025 22:48:01 -0700
-X-CSE-ConnectionGUID: /SnmDoMzTvOFq7mwUpzN/Q==
-X-CSE-MsgGUID: b6cy4JhCSIe4bWzQbH9gHQ==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2025 23:08:22 -0700
+X-CSE-ConnectionGUID: lhf6TAAkRSe+kOxDaTi8jA==
+X-CSE-MsgGUID: IV3fH1M7RyWUH2aTni8zmw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
-   d="scan'208";a="184566973"
+   d="scan'208";a="184571603"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2025 22:47:57 -0700
-Message-ID: <94d254b3-3d0f-4fe8-b6aa-da5df2b9c0e6@intel.com>
-Date: Mon, 27 Oct 2025 13:47:53 +0800
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2025 23:08:18 -0700
+Message-ID: <9d72b723-aeef-474c-8e46-3b8dc027774d@intel.com>
+Date: Mon, 27 Oct 2025 14:08:13 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/20] i386/cpu: Clean up indent style of
- x86_ext_save_areas[]
+Subject: Re: [PATCH v3 03/20] i386/cpu: Clean up arch lbr xsave struct and
+ comment
 To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Marcelo Tosatti <mtosatti@redhat.com>
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Chao Gao
@@ -77,101 +77,85 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Chao Gao
  Dapeng Mi <dapeng1.mi@intel.com>, Zide Chen <zide.chen@intel.com>,
  Chenyi Qiang <chenyi.qiang@intel.com>, Farrah Chen <farrah.chen@intel.com>
 References: <20251024065632.1448606-1-zhao1.liu@intel.com>
- <20251024065632.1448606-3-zhao1.liu@intel.com>
+ <20251024065632.1448606-4-zhao1.liu@intel.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20251024065632.1448606-3-zhao1.liu@intel.com>
+In-Reply-To: <20251024065632.1448606-4-zhao1.liu@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 10/24/2025 2:56 PM, Zhao Liu wrote:
-
-<empty commit message> isn't good.
-
+> Arch LBR state is area 15, not 19. Fix this comment. And considerring
+> other areas don't mention user or supervisor state, for consistent
+> style, remove "Supervisor mode" from its comment.
+> 
+> Moreover, rename XSavesArchLBR to XSaveArchLBR since there's no need to
+> emphasize XSAVES in naming; the XSAVE related structure is mainly
+> used to represent memory layout.
+> 
+> In addition, arch lbr specifies its offset of xsave component as 0. But
+> this cannot help on anything. The offset of ExtSaveArea is initialized
+> by accelerators (e.g., hvf_cpu_xsave_init(), kvm_cpu_xsave_init() and
+> x86_tcg_cpu_xsave_init()), so explicitly setting the offset doesn't
+> work and CPUID 0xD encoding has already ensure supervisor states won't
+> have non-zero offsets. Drop the offset initialization and its comment
+> from the xsave area of arch lbr.
+> 
 > Tested-by: Farrah Chen <farrah.chen@intel.com>
 > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 
 Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
 > ---
->   target/i386/cpu.c | 58 +++++++++++++++++++++++++++--------------------
->   1 file changed, 33 insertions(+), 25 deletions(-)
+>   target/i386/cpu.c | 3 +--
+>   target/i386/cpu.h | 8 ++++----
+>   2 files changed, 5 insertions(+), 6 deletions(-)
 > 
 > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 0a66e1fec939..f0e179c2d235 100644
+> index f0e179c2d235..b9a5a0400dea 100644
 > --- a/target/i386/cpu.c
 > +++ b/target/i386/cpu.c
-> @@ -2028,38 +2028,46 @@ ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
->           .feature = FEAT_1_ECX, .bits = CPUID_EXT_XSAVE,
->           .size = sizeof(X86LegacyXSaveArea) + sizeof(X86XSaveHeader),
+> @@ -2058,8 +2058,7 @@ ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
 >       },
-> -    [XSTATE_YMM_BIT] =
-> -          { .feature = FEAT_1_ECX, .bits = CPUID_EXT_AVX,
-> -            .size = sizeof(XSaveAVX) },
-> -    [XSTATE_BNDREGS_BIT] =
-> -          { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_MPX,
-> -            .size = sizeof(XSaveBNDREG)  },
-> -    [XSTATE_BNDCSR_BIT] =
-> -          { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_MPX,
-> -            .size = sizeof(XSaveBNDCSR)  },
-> -    [XSTATE_OPMASK_BIT] =
-> -          { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
-> -            .size = sizeof(XSaveOpmask) },
-> -    [XSTATE_ZMM_Hi256_BIT] =
-> -          { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
-> -            .size = sizeof(XSaveZMM_Hi256) },
-> -    [XSTATE_Hi16_ZMM_BIT] =
-> -          { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
-> -            .size = sizeof(XSaveHi16_ZMM) },
-> -    [XSTATE_PKRU_BIT] =
-> -          { .feature = FEAT_7_0_ECX, .bits = CPUID_7_0_ECX_PKU,
-> -            .size = sizeof(XSavePKRU) },
-> +    [XSTATE_YMM_BIT] = {
-> +        .feature = FEAT_1_ECX, .bits = CPUID_EXT_AVX,
-> +        .size = sizeof(XSaveAVX),
-> +    },
-> +    [XSTATE_BNDREGS_BIT] = {
-> +        .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_MPX,
-> +        .size = sizeof(XSaveBNDREG),
-> +    },
-> +    [XSTATE_BNDCSR_BIT] = {
-> +        .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_MPX,
-> +        .size = sizeof(XSaveBNDCSR),
-> +    },
-> +    [XSTATE_OPMASK_BIT] = {
-> +        .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
-> +        .size = sizeof(XSaveOpmask),
-> +    },
-> +    [XSTATE_ZMM_Hi256_BIT] = {
-> +        .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
-> +        .size = sizeof(XSaveZMM_Hi256),
-> +    },
-> +    [XSTATE_Hi16_ZMM_BIT] = {
-> +        .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
-> +        .size = sizeof(XSaveHi16_ZMM),
-> +    },
-> +    [XSTATE_PKRU_BIT] = {
-> +        .feature = FEAT_7_0_ECX, .bits = CPUID_7_0_ECX_PKU,
-> +        .size = sizeof(XSavePKRU),
-> +    },
 >       [XSTATE_ARCH_LBR_BIT] = {
-> -            .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_ARCH_LBR,
-> -            .offset = 0 /*supervisor mode component, offset = 0 */,
-> -            .size = sizeof(XSavesArchLBR) },
-> +        .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_ARCH_LBR,
-> +        .offset = 0 /*supervisor mode component, offset = 0 */,
-> +        .size = sizeof(XSavesArchLBR),
-> +    },
+>           .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_ARCH_LBR,
+> -        .offset = 0 /*supervisor mode component, offset = 0 */,
+> -        .size = sizeof(XSavesArchLBR),
+> +        .size = sizeof(XSaveArchLBR),
+>       },
 >       [XSTATE_XTILE_CFG_BIT] = {
 >           .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_AMX_TILE,
->           .size = sizeof(XSaveXTILECFG),
->       },
->       [XSTATE_XTILE_DATA_BIT] = {
->           .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_AMX_TILE,
-> -        .size = sizeof(XSaveXTILEDATA)
-> +        .size = sizeof(XSaveXTILEDATA),
->       },
->   };
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index d0da9bfe58ce..886a941e481c 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1747,15 +1747,15 @@ typedef struct {
 >   
+>   #define ARCH_LBR_NR_ENTRIES            32
+>   
+> -/* Ext. save area 19: Supervisor mode Arch LBR state */
+> -typedef struct XSavesArchLBR {
+> +/* Ext. save area 15: Arch LBR state */
+> +typedef struct XSaveArchLBR {
+>       uint64_t lbr_ctl;
+>       uint64_t lbr_depth;
+>       uint64_t ler_from;
+>       uint64_t ler_to;
+>       uint64_t ler_info;
+>       LBREntry lbr_records[ARCH_LBR_NR_ENTRIES];
+> -} XSavesArchLBR;
+> +} XSaveArchLBR;
+>   
+>   QEMU_BUILD_BUG_ON(sizeof(XSaveAVX) != 0x100);
+>   QEMU_BUILD_BUG_ON(sizeof(XSaveBNDREG) != 0x40);
+> @@ -1766,7 +1766,7 @@ QEMU_BUILD_BUG_ON(sizeof(XSaveHi16_ZMM) != 0x400);
+>   QEMU_BUILD_BUG_ON(sizeof(XSavePKRU) != 0x8);
+>   QEMU_BUILD_BUG_ON(sizeof(XSaveXTILECFG) != 0x40);
+>   QEMU_BUILD_BUG_ON(sizeof(XSaveXTILEDATA) != 0x2000);
+> -QEMU_BUILD_BUG_ON(sizeof(XSavesArchLBR) != 0x328);
+> +QEMU_BUILD_BUG_ON(sizeof(XSaveArchLBR) != 0x328);
+>   
+>   typedef struct ExtSaveArea {
+>       uint32_t feature, bits;
 
 
