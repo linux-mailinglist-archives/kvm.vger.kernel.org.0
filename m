@@ -1,135 +1,202 @@
-Return-Path: <kvm+bounces-61202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DFD0C0F9F4
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 18:25:55 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC9D4C0FAE7
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 18:34:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 017A84EBC50
-	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:25:50 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6638A4EF07E
+	for <lists+kvm@lfdr.de>; Mon, 27 Oct 2025 17:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 163703164D2;
-	Mon, 27 Oct 2025 17:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 722B8318144;
+	Mon, 27 Oct 2025 17:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UypOm19P"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="0OO3IY7p"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCD0311C38
-	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 17:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E739E30F7F8
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 17:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761585937; cv=none; b=pbI/CSVTuaNwGViHh34szqHWN1S6X7voFMOxh0JX+kHMPgJRFLrVF61lakpPJXQNY+pLk9nPMNUOfJfE8002fHp5I5o3DExks7l3DykFg3mzadCaKdrhcaMQmU/TgMiu70iUeHLZROm+bHWJe6RdjWxJPwUCbzMhq7YbUVxqJ0o=
+	t=1761586444; cv=none; b=DO+iQPAyYowfFU3ENcfC1QG8zVIk1M/uQrEFh2jPvOwOPqo5fF8gnbl0SVAfUnC/fb0tJ/4H2Li53lBRwGXLyh4PKdnmGegp7bnSCWIRvPBrKixEdAkLOeOnptd/OZW0bZovV5SRpgpdDcWytRaDoBlcPU13Mb06rVu74YSX6UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761585937; c=relaxed/simple;
-	bh=HAqDcgGMjKKzyDltuxO03NIXefnszZjB7wdrs046Gys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gjWQOrppTZTeYTVn3IFUCpE5gBHQf952YmY7+NDNJ/JHHxu6aVCz7A/DWuHFjmUjX3nDq6YSqohWz7TWid0c5ckSw+HL2CBVNQ7WzIh7Vn/+4vJjmOme7Wr16+Lh81GyWCRGpt8sQUu+Mzsiph2SR3fgrcpFB4aFi2spuw8hYI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UypOm19P; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-784826b775aso54939417b3.2
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 10:25:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761585934; x=1762190734; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rJ/ydtqR65wkobsTKCpney8zjIjx42CMb/k/gju9QlM=;
-        b=UypOm19PIaJXT77Hrr6pWAUNTOqddsoLus5KTq1conazITUnHnyPeEubbTWMTL5CEZ
-         oZgZQZYcB7xEbAVXGmD7ci7W6P1F69Bv9w+uC53x8yXeB2z0ecWnIp+3UI5DWCwKr5bQ
-         z66vb99ZeW2530AG0GGcastxAQ0Fr/AoQ7Qr4z+fmpX7ixscRod1ZP2/6UPM0PUXk2Og
-         BpEAeSZI1kBQXMPcKX3fRGep94r0IQjhp6L4Prj3FvdparUhGQUjwp1W+PrMZm6zEAzT
-         5RQx0Qy1G/1HT2Sg/atd5PsL6srvd/VGxqvZWz0h4xWYOEm53Wbz333h1eKbaO///0si
-         mv1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761585934; x=1762190734;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rJ/ydtqR65wkobsTKCpney8zjIjx42CMb/k/gju9QlM=;
-        b=Eb8qoFiLRbyou4BwQ6kpF3n6Q1aW9rOcmaPJX1GZNgrCu4Ecn4OxqfKM8QGsK0qXOw
-         45jnb+3cH0ITesyeKWY5Dmeqm2lOw2RxOvviJnvZKTXO3fmihUiDKXDJAWsZPIf4iANl
-         WWYdtjl9pMZC8EhAnnBuxDRKfntmY3gu2VMMrMkWAN8yN46z3GFhuAPptRrOELGDFDMz
-         wlLM4eJFgpWGKh/8CeokkpGnu1MtbLc/KWP1q7tY1EL9QekSrJyUqv8BTXHVBHOmedZJ
-         sK6US6JcgcXBMa1BAvgAN4nGtUhHqKsLDomwSAHWhiU0nc7DxySYF7+GNO5urpjgMn95
-         qSlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVVCQrPYVRwdYcC43SCyRxh6QUuoayU7jI+brivhMpp4HQZiCki2RVQy2JewvTdHEXGu1A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXJDbP4Ck+fH6OhFlxIsLIHP3pSy1TAjfa13dqPSbFxcfP/oqC
-	FW4woElGB5W+QVxolKDePUqCQndfNTm1WOAWDkQG/eJZUZuR9pcRDKwx
-X-Gm-Gg: ASbGncss3HBPoT1xrwY+HLIN/TNkOYj0t/leFYO7hZy+Lgb7zQq5aSMxNiAhQOHJBmc
-	wFz2tiyLlqBqbPWwNHzIiiGKTf/N+RF01abUshdUDx9S5jxnJKGyI31qKDvzVhIlnUbn7nU6CcN
-	zi0+vVMZaxtX7J92zfJ5rqNzxnqNRgG+Ou5BJmYZQ1nfbTFrvWsuK4rg5xHEJ6wzJ1YIPlbxsqx
-	pZ97L3dJXLoleedUJKy9jl7thMoO+y7L+Ys1eQ5HLYnejZ4400HqqsS3CIHcHwVkVXDi/V/ZyVV
-	noRndtfzP3KbpPDrt0z4Nzz5iiMuNWlMiJLbxlqrybQCahIagbIIgnWAI1U4wbR/QBZDFYCz+qu
-	lDLlTbUehHD8rwwOARsXmbh6O3EZc2rvSQ5fklYZHwyNt++lRSbTYnjc+G/qix7LP3hQcOKVswp
-	cJWHzkjTdG/LKFhxm23ZmKQy/AVUyPqFgLGKk=
-X-Google-Smtp-Source: AGHT+IGHTF9vBtn+seygObOHlL96iKi+OVb+7MtjlE9jx6wEi+MY/OkA96sVfPPxkYnPfsaXOqXkAw==
-X-Received: by 2002:a05:690c:338b:b0:723:bf47:96f8 with SMTP id 00721157ae682-786183ab057mr5505517b3.53.1761585934504;
-        Mon, 27 Oct 2025 10:25:34 -0700 (PDT)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:9::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-785ed1423f5sm20564397b3.5.2025.10.27.10.25.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 10:25:33 -0700 (PDT)
-Date: Mon, 27 Oct 2025 10:25:29 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v8 00/14] vsock: add namespace support to
- vhost-vsock
-Message-ID: <aP+rCQih4YMm1OAp@devvm11784.nha0.facebook.com>
-References: <20251023-vsock-vmtest-v8-0-dea984d02bb0@meta.com>
- <k4tqyp7wlnbmcntmvzp7oawacfofnnzdi5cjwlj6djxtlo6xai@44ivtv4kgjz2>
+	s=arc-20240116; t=1761586444; c=relaxed/simple;
+	bh=vmF6nvWxqNbXFzu69/Gksni33FeNVvm0wJ/1HODXH5M=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=ZAjNevzrAAo207xejH4mgMPrjltVF0gtnMDJ7xjUpn/yeXbGBD7xKy1nWUnLkxtPiwLP14uMQ7W5JoBCldNiV3gPc0LX7bf+WDxnkZ3gH7ZbTgBKqU+g5lOWWltQQkJD2det4nNB31g+6QjoubWLukMXy9/rjwb8BKgs8RgNp8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=0OO3IY7p; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59RF6vYn975897
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 10:34:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=3EdQbghvl5q4gACZWD
+	GwMFiEEzphPFRQ0iXTsVAXJ60=; b=0OO3IY7puz+NlSbyT4XpMgSskhafpsl44U
+	5aGSO0xQPUQIq2eki1tO88OsF9igvGzYaq5rUCHNVWmf22UrIEJy1k7BDYkblYdO
+	YrKvqcyuJljkrAYqXLuS7/mtJugcfb0FAtJBoixgwWIkCSdplC8jhCwgDCcEzUGu
+	ZXG9qCTqDebz7eYPhV2RqvahxbnYLxllshUhov8YHGp692WMxmH5DC6p3vm6lWKP
+	9TXzSqGSDvOiri3+zGs+oKyVJrMTavEo1vF5pLyaQKIeQoItYc48A/AUYCa+xnXP
+	KS7uzmi8SlZ/cEOgRN0wlS+vqI8LCjWz+5a92/1HcMgQU53qrSoA==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4a2b3j9dfc-4
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 10:34:01 -0700 (PDT)
+Received: from twshared13080.31.frc3.facebook.com (2620:10d:c0a8:1b::8e35) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Mon, 27 Oct 2025 17:33:59 +0000
+Received: by devgpu012.nha5.facebook.com (Postfix, from userid 28580)
+	id 7915243E092; Mon, 27 Oct 2025 10:33:57 -0700 (PDT)
+From: Alex Mastro <amastro@fb.com>
+Subject: [PATCH v5 0/5] vfio: handle DMA map/unmap up to the addressable
+ limit
+Date: Mon, 27 Oct 2025 10:33:40 -0700
+Message-ID: <20251027-fix-unmap-v5-0-4f0fcf8ffb7d@fb.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <k4tqyp7wlnbmcntmvzp7oawacfofnnzdi5cjwlj6djxtlo6xai@44ivtv4kgjz2>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPSs/2gC/23MSw6CMBSF4a2Qjr2mLyh15D6MA2hvpQMeaZVoC
+ Hu3MDAlcXja+/0LiRg8RnIpFhJw9tGPQxrlqSCma4YHgrdpE055ySgtwfk3vIa+mcAIJ7BWtml
+ dQ9L9FDB97q3bPe3Ox+cYPnt6Ztvrv8rMgEFV1UoJjlZKvLr2bMaebImZ50zljAMFVerWYKuV5
+ kcmMsZozkRiglZGcWkrresDkznjOZOJaURnNEXLpPmxdV2/1cG8bEQBAAA=
+To: Alex Williamson <alex@shazbot.org>
+CC: Jason Gunthorpe <jgg@ziepe.ca>,
+        Alejandro Jimenez
+	<alejandro.j.jimenez@oracle.com>,
+        David Matlack <dmatlack@google.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Alex Mastro
+	<amastro@fb.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+X-Mailer: b4 0.13.0
+X-FB-Internal: Safe
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI3MDE2MyBTYWx0ZWRfX5Z0DjyrmbyC5
+ 2Mplwa/8Bc/pZ6q059xda+2Gkps6ofyMG6NTYFLWSa5ypg7yCTEl6G26YDU4Lox5FChpQNbVVXG
+ Hv8cvhpJy48gFxjHGtDZU2ULPVEPJSOkIcG+wljInCNvDsWAdHSc4eTFWrL0AQv+nxRnzxj1Agv
+ 1IkgLzq9cIq/aQco5akP39Z5eGEgr+GGF5law01zpwSXBHkWM70FLLPJEsH3FyLmizEkYjNaqxw
+ zPupG+s/+bDfwIHBIvPivMEnS8WpzXBhIAF3P5Kr9LmUzZdJhQsBCg+N0AXheSxD6m98AKUk4tJ
+ H3igWWc8+2z+9OAvpHH4nYtecQ3BaXo+FbEqsAt7beJwsEmFMKg/syjhNoX7pGMrb0X8UCMLH/a
+ 6Dbssn4zJKCoh7dOPCf6F40l1Wog8Q==
+X-Authority-Analysis: v=2.4 cv=H87WAuYi c=1 sm=1 tr=0 ts=68ffad09 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=FOH2dFAWAAAA:8 a=p-BkhTxdxz5vkaSxPgcA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: oHRcomtjqaxnSBWEMNuBHgC8Pkac8hEy
+X-Proofpoint-GUID: oHRcomtjqaxnSBWEMNuBHgC8Pkac8hEy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-27_07,2025-10-22_01,2025-03-28_01
 
-On Mon, Oct 27, 2025 at 02:28:31PM +0100, Stefano Garzarella wrote:
-> Hi Bobby,
-> 
-> > 
-> > Changes in v8:
-> > - Break generic cleanup/refactoring patches into standalone series,
-> >  remove those from this series
-> 
-> Yep, thanks for splitting the series. I'll review it ASAP since it's a
-> dependency.
-> 
-> I was at GSoC mentor summit last week, so I'm bit busy with the backlog, but
-> I'll do my best to review both series this week.
-> 
-> Thanks,
-> Stefano
-> 
+This patch series aims to fix vfio_iommu_type.c to support
+VFIO_IOMMU_MAP_DMA and VFIO_IOMMU_UNMAP_DMA operations targeting IOVA
+ranges which lie against the addressable limit. i.e. ranges where
+iova_start + iova_size would overflow to exactly zero.
 
-Thanks for the heads up!
+Today, the VFIO UAPI has an inconsistency: The
+VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE capability of VFIO_IOMMU_GET_INFO
+reports that ranges up to the end of the address space are available
+for use, but are not really due to bugs in handling boundary conditions.
 
-Best,
-Bobby
+For example:
+
+vfio_find_dma_first_node is called to find the first dma node to unmap
+given an unmap range of [iova..iova+size). The check at the end of the
+function intends to test if the dma result lies beyond the end of the
+unmap range. The condition is incorrectly satisfied when iova+size
+overflows to zero, causing the function to return NULL.
+
+The same issue happens inside vfio_dma_do_unmap's while loop.
+
+This bug was also reported by Alejandro Jimenez in [1][2].
+
+Of primary concern are locations in the current code which perform
+comparisons against (iova + size) expressions, where overflow to zero
+is possible.
+
+The initial list of candidate locations to audit was taken from the
+following:
+
+$ rg 'iova.*\+.*size' -n drivers/vfio/vfio_iommu_type1.c | rg -v '\- 1'
+173:            else if (start >= dma->iova + dma->size)
+192:            if (start < dma->iova + dma->size) {
+216:            if (new->iova + new->size <= dma->iova)
+1060:   dma_addr_t iova = dma->iova, end = dma->iova + dma->size;
+1233:   if (dma && dma->iova + dma->size != iova + size)
+1380:           if (dma && dma->iova + dma->size != iova + size)
+1501:           ret = vfio_iommu_map(iommu, iova + dma->size, pfn, npage,
+1504:                   vfio_unpin_pages_remote(dma, iova + dma->size, pfn,
+1721:           while (iova < dma->iova + dma->size) {
+1743:                           i = iova + size;
+1744:                           while (i < dma->iova + dma->size &&
+1754:                           size_t n = dma->iova + dma->size - iova;
+1785:                   iova += size;
+1810:           while (iova < dma->iova + dma->size) {
+1823:                   i = iova + size;
+1824:                   while (i < dma->iova + dma->size &&
+2919:           if (range.iova + range.size < range.iova)
+
+This series spend the first couple commits making mechanical preparations
+before the fix lands in the third commit. Selftests are added in the last
+two commits.
+
+[1] https://lore.kernel.org/qemu-devel/20250919213515.917111-1-alejandro.j.jimenez@oracle.com/
+[2] https://lore.kernel.org/all/68e18f2c-79ad-45ec-99b9-99ff68ba5438@oracle.com/
+
+Signed-off-by: Alex Mastro <amastro@fb.com>
+
+---
+Changes in v5:
+- Add vfio selftests
+- Clarify commit message
+- Link to v4: https://lore.kernel.org/r/20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com
+
+Changes in v4:
+- Fix type assigned to iova_end
+- Clarify overflow checking, add checks to vfio_iommu_type1_dirty_pages
+- Consider npage==0 an error for vfio_iommu_type1_pin_pages
+- Link to v3: https://lore.kernel.org/r/20251010-fix-unmap-v3-0-306c724d6998@fb.com
+
+Changes in v3:
+- Fix handling of unmap_all in vfio_dma_do_unmap
+- Fix !range.size to return -EINVAL for VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP
+  - Dedup !range.size checking
+- Return -EOVERFLOW on check_*_overflow
+- Link to v2: https://lore.kernel.org/r/20251007-fix-unmap-v2-0-759bceb9792e@fb.com
+
+Changes in v2:
+- Change to patch series rather than single commit
+- Expand scope to fix more than just the unmap discovery path
+- Link to v1: https://lore.kernel.org/r/20251005-fix-unmap-v1-1-6687732ed44e@fb.com
+
+---
+Alex Mastro (5):
+      vfio/type1: sanitize for overflow using check_*_overflow
+      vfio/type1: move iova increment to unmap_unpin_* caller
+      vfio/type1: handle DMA map/unmap up to the addressable limit
+      vfio: selftests: update DMA map/unmap helpers to support more test kinds
+      vfio: selftests: add end of address space DMA map/unmap tests
+
+ drivers/vfio/vfio_iommu_type1.c                    | 173 +++++++++++++--------
+ .../testing/selftests/vfio/lib/include/vfio_util.h |  27 +++-
+ tools/testing/selftests/vfio/lib/vfio_pci_device.c | 105 ++++++++++---
+ .../testing/selftests/vfio/vfio_dma_mapping_test.c |  94 ++++++++++-
+ 4 files changed, 308 insertions(+), 91 deletions(-)
+---
+base-commit: 451bb96328981808463405d436bd58de16dd967d
+change-id: 20251005-fix-unmap-c3f3e87dabfa
+
+Best regards,
+-- 
+Alex Mastro <amastro@fb.com>
+
 
