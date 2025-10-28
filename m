@@ -1,140 +1,361 @@
-Return-Path: <kvm+bounces-61271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61272-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 622C9C130CE
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 07:02:31 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90CA6C13324
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 07:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A75521A663E7
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 06:02:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 398224E42A6
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 06:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91EE829BDA0;
-	Tue, 28 Oct 2025 06:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5CF2C0294;
+	Tue, 28 Oct 2025 06:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MH9QRqll"
+	dkim=pass (2048-bit key) header.d=osandov-com.20230601.gappssmtp.com header.i=@osandov-com.20230601.gappssmtp.com header.b="NPjAbHiG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B1222339;
-	Tue, 28 Oct 2025 06:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206AA1C5D46
+	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 06:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761631306; cv=none; b=oCzm/jv3tQW4wcA2PXfy57qKb9rScMIFGNkIsTejcV+tBHfuAF3SF9+Y0ZoiFFQOCgxTkPFZidl5YSEkYtT4chWhdn0wCmwpqzjTuTbindJy9iqf4Qg1n81Hd8hCwZlPgdglYH0cVNvDjtAIc9iZwI/S08/DRoO4llDE1E3aD9g=
+	t=1761633845; cv=none; b=uu1lGNSuRhICgB1MqWd42vVM2lj+/E++JCgeTcbX4wZMlNjOp2paZStYl5OA/VO5tU/MQrCZoExEIpLjSf+6vAvXADlmf288SbkZRacCKu7FKfQbf38IFUR54BbEI3wJmhVLYPzQbVWbqMz8EKCYTz4TgFBs8WkrV0yyTZrLwlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761631306; c=relaxed/simple;
-	bh=o/MtvnoZFtcEhS+9uTxnucBzOOd7NnBtyKSzDQPcmCY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=k4tN0pl6sbpgxphJ4OW43uVa2uN74XN17JUZabLuqV9wVGwTzqIzIg+jdaua9PINLFWSyjZw12ZdpEBM1oy/J31/OTFWsnJ+AVXcubz6X06DGEZMXXkpXD82mkHHPcamltUvd16gNgmQeMXFKYHZHGTmTac4vBSBmW5NXSyXEjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MH9QRqll; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761631305; x=1793167305;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=o/MtvnoZFtcEhS+9uTxnucBzOOd7NnBtyKSzDQPcmCY=;
-  b=MH9QRqllmmh/TmusTd2RAHtHxIuCvyS7Pl13z0hBki2Hh1Fjm5lxT/yU
-   dyNiGGaB3VgdmoJX3KVPzRvwtOrCrcG3ObwQ09HS/6SC3sIY10PZEmIne
-   KpH8KeYwEMZK+f45b1p5EbKFqypfdu3cBFGbYALV4n4Thvksx3OtOk/s0
-   aGvPo+46zoFntUjttYt0gqOuFlArTu71qVamMHBujSeT10BNo7OUqROgb
-   efe9WOjtE1Sz0TLxVzYo8QoXSW8jrn7H/OrSXk1v3Z1PfkCBVPYzqjDMQ
-   /XnjInp0Q7PhqPVcux92rUKNe67g1XHqEKq20kHI1fPljboUpgu2sYXIM
-   w==;
-X-CSE-ConnectionGUID: Pt3gaPIsR0yvEtxUayYwtg==
-X-CSE-MsgGUID: j64LI0z5RnecR5sKx4euaQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="74397445"
-X-IronPort-AV: E=Sophos;i="6.19,260,1754982000"; 
-   d="scan'208";a="74397445"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 23:01:44 -0700
-X-CSE-ConnectionGUID: vsoPQOoFRw+VMm9FRVsW4A==
-X-CSE-MsgGUID: A2QLi0tkT9ijc6FbIDtLEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,260,1754982000"; 
-   d="scan'208";a="185146997"
-Received: from 984fee019967.jf.intel.com ([10.165.54.94])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 23:01:44 -0700
-From: Chao Gao <chao.gao@intel.com>
-To: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Chao Gao <chao.gao@intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Binbin Wu <binbin.wu@linux.intel.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [PATCH] KVM: x86: Call out MSR_IA32_S_CET is not handled by XSAVES
-Date: Mon, 27 Oct 2025 23:01:41 -0700
-Message-ID: <20251028060142.29830-1-chao.gao@intel.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1761633845; c=relaxed/simple;
+	bh=zDF/Y9XBJA9RVlnGEARbuvgklIvOOmTItV9BhF1FT8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jV3bvtq5UOjKJ+BK8WiBYxeLLN9h1TiMj/uP+/d41gdqFpzJJaXAgQE7Hsd1HI9M9dqit11msp1rAl99G6HhSY9avLFZEPLwjviILbFbweUCbSuaA2b5fFmFuGSU0Fjf9d3uZlv3teZ5hmjMtTnaew20s7JG7lXvYypYRWoojbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com; spf=none smtp.mailfrom=osandov.com; dkim=pass (2048-bit key) header.d=osandov-com.20230601.gappssmtp.com header.i=@osandov-com.20230601.gappssmtp.com header.b=NPjAbHiG; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=osandov.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7a27f2469b8so427317b3a.0
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 23:44:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20230601.gappssmtp.com; s=20230601; t=1761633842; x=1762238642; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dukmnIaQsneJf8PdY7kP8xyXxID9jl8eMskGfgfqgQ4=;
+        b=NPjAbHiG3NliJ1pwL1waMAAf8Ro40fW8kA9y/B2mrZzD5Ac4d9gMsO123u2kPHOHWl
+         kGqmfoE936fFrNCdnh1Bj6P4I1Tjj8IfrzmuOUdqptZqkM7Fgk0m2cL+F36mGJnSCaAe
+         nwvAGGKhruyWConbo3FTOQNwSCDH9kzPa/HNMpEeq2aaxG4P3f4qUw+xqMOGaeOVQaQI
+         um/cceWMXJtXQ/+DILUQWs/knKTa9YRj5b3SeHBMDuWLc+hwhCdgqSsvA3fZNqM/bw30
+         tKPtH/URvBCpfkZqqAYIvve+AT2GS+N0NiljtxTo5w0+qaqsxNkZJbe1yBdz5ulYfPHu
+         wcog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761633842; x=1762238642;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dukmnIaQsneJf8PdY7kP8xyXxID9jl8eMskGfgfqgQ4=;
+        b=F3LAhDPrBAOwxl3JTRuktKTy6nnxXy8DreGmx9At03ZekyHBc1DAo15VYbNQS19BEy
+         Y3hESphg0OAO75/l67VEVHLsJSFLPF8aDmwODdzpCEPropSQBS2ZifIlp/SSRajEiZ4T
+         Ns9LM7OpypGjQHwUG9njqFIBaaF7Z2JpFX5VH2lyjCI2ISooFKfLtSTszZbJ55qEjYQn
+         tziaLz6JO6/PxXWuyFJbFFcP1GKaeH8uwcyak6hmdsJAP12N/viImdABLwIeYvP4JibL
+         FTLxTqjTC20zfFmVWTfUwf0o0TCGykfq4X9rzyIpZduez1GPNCLVrfyVr4GRBS3iNeNJ
+         X0Gg==
+X-Forwarded-Encrypted: i=1; AJvYcCWvDnf9oKvHNa4RyRGIncBG7lUBq7dN5Cm/fx5UMmvFxTb5sasRutNWwJwWUWmm8oVH+pQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBRSshY0+KYRXCb/ZW+oJhDTDqzNHPgiVhujNXD2JG8X2jYoQd
+	sHamiSiFh86CPmngGjpAgyqDSSjSMXBfZhkMAqLsN9kqk3oFbNIxCz1cqS5z/uGGCx0=
+X-Gm-Gg: ASbGnctoiWfOjQaDye9ldUS1eArODI0Aq+43xH9Mawry2Zl7PRRWAtLZDSzmiLWYzp8
+	Au+3wzXgIA6PT7eR6tsCiAdQOdnfo4TrI7Blc/89WnGQtpVTIQaqmQ9pUfxBQL7O40SWZ4BFrhB
+	3ixLbN3y+8bo+PE6npK10WV9XH+ZJkS2qoM2g/erFRFLrrJW8DfmVpFMReEeassWJ2inGMAxk6R
+	L6Fh80Nox3rlCR2fAa+6JzPjHHa7hhKumthpTH5dplacVrX8afQ6HGh7RGsr4GyNKtRv2LEf1BZ
+	A/S9ezrUkq/LF1HMwjw8JKM5G677emrWqk0+miJ1SjY5g+8W37g3APv4UpvL1xulqQTTWat3d03
+	z/w12hIEigZ4z0mDGDp6RVyMR9JUfbHYnyXCp+6a64H3EBwOpy4dSxMfA9w==
+X-Google-Smtp-Source: AGHT+IH9dLRnTDwqIBGOhTLlI8reFrNWC2bubrxKI8j9aumrWpki3wiUkYg+1I5B7yWm2IZ7ePZhZQ==
+X-Received: by 2002:a05:6a20:5484:b0:341:730a:ef54 with SMTP id adf61e73a8af0-344d19b7a43mr1643572637.1.1761633842225;
+        Mon, 27 Oct 2025 23:44:02 -0700 (PDT)
+Received: from telecaster ([2620:10d:c090:400::5:1183])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a41404987esm10175301b3a.36.2025.10.27.23.44.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Oct 2025 23:44:01 -0700 (PDT)
+Date: Mon, 27 Oct 2025 23:44:00 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	Gregory Price <gourry@gourry.net>, kernel-team@fb.com
+Subject: Re: [PATCH] KVM: SVM: Don't skip unrelated instruction if INT3 is
+ replaced
+Message-ID: <aQBmME40vhf-lh7R@telecaster>
+References: <71043b76fc073af0fb27493a8e8d7f38c3c782c0.1761606191.git.osandov@fb.com>
+ <aQANT9rvO9FMmmkG@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aQANT9rvO9FMmmkG@google.com>
 
-Update the comment above is_xstate_managed_msr() to note that
-MSR_IA32_S_CET isn't saved/restored by XSAVES/XRSTORS.
+On Mon, Oct 27, 2025 at 05:24:47PM -0700, Sean Christopherson wrote:
+> "INT3/INTO", because the code handles both.
+> 
+> On Mon, Oct 27, 2025, Omar Sandoval wrote:
+> > From: Omar Sandoval <osandov@fb.com>
+> > 
+> > We've been seeing guest VM kernel panics with "Oops: int3" coming from
+> 
+> No pronouns please, "we" relies too much on context and that context can be lost
+> over time, or might be interpreted differently by readers, etc.
+> 
+> > static branch checks. I found that the reported RIP is one instruction
+> > after where it's supposed to be, and I determined that when this
+> > happens, the RIP was injected by __svm_skip_emulated_instruction() on
+> > the host when a nested page fault was hit while vectoring an int3.
+> 
+> I definitely appreciate the gory details, but please capture just the technical
+> details of the bug and fix.  A play-by-play of the debugging process is useful
+> (and interesting!) for bug reports and cover letters, but it's mostly noise for
+> future readers that usually care about what was changed and/or what the code is
+> doing.
+> 
+> > Static branches use the smp_text_poke mechanism, which works by
+> > temporarily inserting an int3, then overwriting it. In the meantime,
+> > smp_text_poke_int3_handler() relies on getting an accurate RIP.
+> > 
+> > This temporary int3 from smp_text_poke is triggering the exact scenario
+> > described in the fixes commit: "if the guest executes INTn (no KVM
+> > injection), an exit occurs while vectoring the INTn, and the guest
+> > modifies the code stream while the exit is being handled, KVM will
+> > compute the incorrect next_rip due to "skipping" the wrong instruction."
+> > 
+> > I'm able to reproduce this almost instantly by patching the guest kernel
+> > to hammer on a static branch [1] while a drgn script [2] on the host
+> > constantly swaps out the memory containing the guest's Task State
+> > Segment.
+> 
+> I would actually just say "TSS".  Normally I'm all for spelling out acronyms on
+> their first use, but in this case I think TSS is more obviously a "thing" than
+> Task State Segment, e.g. I had a momentary brain fart and was wondering what you
+> meant by swapping out a segment :-).
+> 
+> > The fixes commit also suggests a workaround: "A future enhancement to
+> > make this less awful would be for KVM to detect that the decoded
+> > instruction is not the correct INTn and drop the to-be-injected soft
+> > event." This implements that workaround.
+> 
+> Please focus on the actual change.  Again, I love the detail, but that was a _lot_
+> to get through just to see "Sorry, but the princess is in another castle." :-D
 
-MSR_IA32_S_CET isn't part of CET_U/S state as the SDM states:
-  The register state used by Control-Flow Enforcement Technology (CET)
-  comprises the two 64-bit MSRs (IA32_U_CET and IA32_PL3_SSP) that manage
-  CET when CPL = 3 (CET_U state); and the three 64-bit MSRs
-  (IA32_PL0_SSP–IA32_PL2_SSP) that manage CET when CPL < 3 (CET_S state).
+Fair enough.
 
-Fixes: e44eb58334bb ("KVM: x86: Load guest FPU state when access XSAVE-managed MSRs")
-Signed-off-by: Chao Gao <chao.gao@intel.com>
----
-I didn't check the SDM when Xin asked [1] why MSR_IA32_S_CET isn't
-xstate-managed. It looks like my reply (and my sample code) misled
-everyone into thinking MSR_IA32_S_CET was part of the CET_S state.
-I realized this issue when reviewing the QEMU patch [2].
+> E.g. I think this captures everything in about the same word count, but with a
+> stronger focus on what the patch is actually doing.
+> 
+>   When re-injecting an soft interrupt from an INT3, INT0, or (select) INTn
+>   instruction, discard the exception and retry the instruction if the code
+>   stream is changed (e.g. by a different vCPU) between when the CPU executes
+>   the instruction and when KVM decodes the instruction to get the next RIP.
+> 
+>   As effectively predicted by commit 6ef88d6e36c2 ("KVM: SVM: Re-inject
+>   INT3/INTO instead of retrying the instruction"), failure to verify the
+>   correct INTn instruction was decoded can effectively clobber guest state
+>   due to decoding the wrong instruction and thus specifying the wrong next
+>   RIP.
+> 
+>   The bug most often manifests as "Oops: int3" panics on static branch
+>   checks when running Linux guests.  Linux's static branch patching uses
+>   he kernel's "text poke" code patching   mechanism.  To modify code while
+>   other CPUs may be executing said code, Linux (temporarily) replaces the
+>   first byte of the original instruction with an int3 (opcode 0xcc), then
+>   patches in the new code stream except for the first byte, and finally
+>   replaces the int3 the first byte of the new code stream.  If a CPU hits
+>   the int3, i.e. executes the code while it's being modified, the guest
+>   kernel will gracefully handle the resulting #BP, e.g. by looping until
+>   the int3 is replaced, by emulating the new instruction, etc.
+> 
+>   E.g. the bug reproduces almost instantly by hacking the guest kernel to
+>   provide a convenient static branch[1], while running a drgn script[2] on
+>   the host to constantly swap out the memory containing the guest's TSS.
+> 
+> > [1]: https://gist.github.com/osandov/44d17c51c28c0ac998ea0334edf90b5a
+> > [2]: https://gist.github.com/osandov/10e45e45afa29b11e0c7209247afc00b
+> > 
+> > Fixes: 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
+> 
+> Cc: stable@vger.kernel.org
+> 
+> > Signed-off-by: Omar Sandoval <osandov@fb.com>
+> > ---
+> > Based on Linus's current tree.
+> > 
+> >  arch/x86/kvm/svm/svm.c | 40 ++++++++++++++++++++++++++++++++++++----
+> >  1 file changed, 36 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index 153c12dbf3eb..4d72c308b50b 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -271,8 +271,29 @@ static void svm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
+> >  
+> >  }
+> >  
+> > +static bool emulated_instruction_matches_vector(struct kvm_vcpu *vcpu,
+> > +						unsigned int vector)
+> > +{
+> > +	switch (vector) {
+> > +	case BP_VECTOR:
+> > +		return vcpu->arch.emulate_ctxt->b == 0xcc ||
+> > +		       (vcpu->arch.emulate_ctxt->b == 0xcd &&
+> > +			vcpu->arch.emulate_ctxt->src.val == BP_VECTOR);
+> > +	case OF_VECTOR:
+> > +		return vcpu->arch.emulate_ctxt->b == 0xce;
+> 
+> Hmm, unless I'm missing something, this should handle 0xcd for both.
 
-[1]: https://lore.kernel.org/kvm/aKvP2AHKYeQCPm0x@intel.com/
-[2]: https://lore.kernel.org/kvm/20251024065632.1448606-12-zhao1.liu@intel.com/
----
- arch/x86/kvm/x86.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+Yup, I forgot about int 4.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9cfed304035f..c7592ac8f443 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3877,15 +3877,13 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
- 
- /*
-  * Returns true if the MSR in question is managed via XSTATE, i.e. is context
-- * switched with the rest of guest FPU state.  Note!  S_CET is _not_ context
-- * switched via XSTATE even though it _is_ saved/restored via XSAVES/XRSTORS.
-- * Because S_CET is loaded on VM-Enter and VM-Exit via dedicated VMCS fields,
-- * the value saved/restored via XSTATE is always the host's value.  That detail
-- * is _extremely_ important, as the guest's S_CET must _never_ be resident in
-- * hardware while executing in the host.  Loading guest values for U_CET and
-- * PL[0-3]_SSP while executing in the kernel is safe, as U_CET is specific to
-- * userspace, and PL[0-3]_SSP are only consumed when transitioning to lower
-- * privilege levels, i.e. are effectively only consumed by userspace as well.
-+ * switched with the rest of guest FPU state.
-+ *
-+ * Note, S_CET is _not_ saved/restored via XSAVES/XRSTORS. Also note, loading
-+ * guest values for U_CET and PL[0-3]_SSP while executing in the kernel is
-+ * safe, as U_CET is specific to userspace, and PL[0-3]_SSP are only consumed
-+ * when transitioning to lower privilege levels, i.e. are effectively only
-+ * consumed by userspace as well.
-  */
- static bool is_xstate_managed_msr(struct kvm_vcpu *vcpu, u32 msr)
- {
--- 
-2.47.3
+> > +	default:
+> > +		return false;
+> > +	}
+> > +}
+> > +
+> > +/*
+> > + * If vector != 0, then this skips the instruction only if the instruction could
+> > + * generate an interrupt with that vector. If not, then it fails, indicating
+> > + * that the instruction should be retried.
+> > + */
+> >  static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+> > -					   bool commit_side_effects)
+> > +					   bool commit_side_effects,
+> > +					   unsigned int vector)
+> >  {
+> >  	struct vcpu_svm *svm = to_svm(vcpu);
+> >  	unsigned long old_rflags;
+> > @@ -293,8 +314,18 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+> >  		if (unlikely(!commit_side_effects))
+> >  			old_rflags = svm->vmcb->save.rflags;
+> >  
+> > -		if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
+> > +		if (vector == 0) {
+> > +			if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
+> > +				return 0;
+> > +		} else if (x86_decode_emulated_instruction(vcpu, EMULTYPE_SKIP,
+> > +							   NULL,
+> > +							   0) != EMULATION_OK ||
+> 
+> I think I would rather handle this in kvm_emulate_instruction(), not in the SVM
+> code.  x86_decode_emulated_instruction() really shouldn't be exposed outside of
+> x86.c, the use in gp_interception() is all kinds of gross. :-/
+> 
+> The best idea I can come up with is to add an EMULTYPE_SKIP_SOFT_INT, and use that
+> to communicate to the kvm_emulate_instruction() that it should verify the
+> to-be-skipped instruction.  I don't love the implicit passing of the vector via
+> vcpu->arch.exception.vector, but all of this code is quite heinous, so I won't
+> loose sleep over it.
+> 
+> Compile-tested only, but something like this?
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 2bfae1cfa514..eca4704e3934 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -2154,6 +2154,7 @@ u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
+>  #define EMULTYPE_PF                (1 << 6)
+>  #define EMULTYPE_COMPLETE_USER_EXIT (1 << 7)
+>  #define EMULTYPE_WRITE_PF_TO_SP            (1 << 8)
+> +#define EMULTYPE_SKIP_SOFT_INT     ((1 << 9) | EMULTYPE_SKIP)
+>  
+>  static inline bool kvm_can_emulate_event_vectoring(int emul_type)
+>  {
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index f14709a511aa..82e97f2f8635 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -272,6 +272,7 @@ static void svm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
+>  }
+>  
+>  static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+> +                                          int emul_type,
+>                                            bool commit_side_effects)
+>  {
+>         struct vcpu_svm *svm = to_svm(vcpu);
+> @@ -293,7 +294,7 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+>                 if (unlikely(!commit_side_effects))
+>                         old_rflags = svm->vmcb->save.rflags;
+>  
+> -               if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
+> +               if (!kvm_emulate_instruction(vcpu, emul_type))
+>                         return 0;
+>  
+>                 if (unlikely(!commit_side_effects))
+> @@ -311,7 +312,7 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+>  
+>  static int svm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+>  {
+> -       return __svm_skip_emulated_instruction(vcpu, true);
+> +       return __svm_skip_emulated_instruction(vcpu, EMULTYPE_SKIP, true);
+>  }
+>  
+>  static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
+> @@ -331,7 +332,7 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
+>          * in use, the skip must not commit any side effects such as clearing
+>          * the interrupt shadow or RFLAGS.RF.
+>          */
+> -       if (!__svm_skip_emulated_instruction(vcpu, !nrips))
+> +       if (!__svm_skip_emulated_instruction(vcpu, EMULTYPE_SKIP_SOFT_INT, !nrips))
+>                 return -EIO;
+>  
+>         rip = kvm_rip_read(vcpu);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 593fccc9cf1c..500f9b7f564e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9351,6 +9351,23 @@ static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
+>         return false;
+>  }
+>  
+> +static bool is_soft_int_instruction(struct x86_emulate_ctxt *ctxt, u8 vector)
+> +{
+> +       if (WARN_ON_ONCE(vector != BP_VECTOR && vector != OF_VECTOR))
+> +               return false;
 
+This warning triggers when called from the svm_inject_irq() path since
+that case uses vcpu->arch.interrupt.nr. I can't tell whether it'd be
+okay to set vcpu->arch.exception.vector = vcpu->arch.interrupt.nr in
+that case, or if we need yet another emultype. (I believe my patch had
+the same problem, but silently.)
+
+> +       switch (ctxt->b) {
+> +       case 0xcc:
+> +               return vector == BP_VECTOR;
+> +       case 0xcd:
+> +               return vector == ctxt->src.val;
+> +       case 0xce:
+> +               return vector == OF_VECTOR;
+> +       default:
+> +               return false;
+> +       }
+> +}
+> +
+>  /*
+>   * Decode an instruction for emulation.  The caller is responsible for handling
+>   * code breakpoints.  Note, manually detecting code breakpoints is unnecessary
+> @@ -9461,6 +9478,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>          * injecting single-step #DBs.
+>          */
+>         if (emulation_type & EMULTYPE_SKIP) {
+> +               if ((emulation_type & EMULTYPE_SKIP_SOFT_INT) &&
+
+This needs to be (emulation_type & EMULTYPE_SKIP_SOFT_INT) == EMULTYPE_SKIP_SOFT_INT
+(either that or making EMULTYPE_SKIP_SOFT_INT not include
+EMULTYPE_SKIP).
+
+Did you intend to send this out as a patch, or should I send a v2 based
+on this?
+
+Thanks,
+Omar
+
+> +                   !is_soft_int_instruction(ctxt, vcpu->arch.exception.vector))
+> +                       return 0;
+> +
+>                 if (ctxt->mode != X86EMUL_MODE_PROT64)
+>                         ctxt->eip = (u32)ctxt->_eip;
+>                 else
 
