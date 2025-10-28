@@ -1,328 +1,266 @@
-Return-Path: <kvm+bounces-61247-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61248-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0288C12281
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 01:24:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E090C1228A
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 01:26:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 709344EA699
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 00:24:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA23F4E85D5
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 00:26:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7505C1DE3AC;
-	Tue, 28 Oct 2025 00:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F04E61E1A17;
+	Tue, 28 Oct 2025 00:26:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="opHDT9iy"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="HVHUBUje"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFA01D130E
-	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 00:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF63149C41;
+	Tue, 28 Oct 2025 00:26:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761611091; cv=none; b=B+OUDyVz9wNTxb3rfR/QmmuZD6s50zyMBl42/uBz7vembFCbVBFpdkAE5L2Wa1dL/yZmDHSaMZsZRzYRK/2yG97M8I/5coUZ1sSSwi6UjbXRRIlMfRUZUwKqALkkLnmFjWAotBvyHQJbBSp6R80pQXW5VBBNyFIItLLVURiLTVk=
+	t=1761611183; cv=none; b=egiuZ88ca1rUQNUhrKzHo8P+IZMGneM8QNe1WnuYQyfNVf7tDOndJnl88EmW+/fnU8WyAgDigHOb6+PBpL+HIjzt1IFfDOaUYj/V9l+/O1VuEKowb3ngAUW6B8RwKfb+JVvcBEbEqvU6sL8oO8x30AbLL57oFkzhZjUFq0lYZzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761611091; c=relaxed/simple;
-	bh=atAI6y76jJfrPd92qsZ3/Jh+Tjki2McZ31Qx30kvvN4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rZTXLyO2eYLPIN5MxYs7T0e/3lQPoSNJt2EMo3xz9E/sD8hyQrIG0F8Sq4Bl8SQ+hbEHVxdHmOsujimI5lrmsC//85i9ppatJHAYPODFuj1Y7t8ApsnnRbb8PY1eM5647pHyrlDDUmQLeT4RCq2qSRWQFgGEt1IR9HNE+i4vjxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=opHDT9iy; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33bbbb41a84so12116184a91.1
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 17:24:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761611089; x=1762215889; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yxsHXELdqyxJojPRQnigfV5qRDfj6h3fT9Q5pk8hxSk=;
-        b=opHDT9iyBaUTo88eQe2YD40CyPYVeZHYcRJdEMhMXRWuUQHgXqLpnoOwFOcVsKeq6A
-         afrIyky346Y0THfc5YcodMRPC7Tpidunb9zutBd83m06pxz2wuZBePTJAqaxlIQCbF5k
-         nLdhmVPnQaysxOUGCRbV+HYoho7smokabivL6fJrxmyHTrzdpEf9++k2Fc4bcYCRMm44
-         /BwxICkweykThB9PvFYJdpLVO9NZUJ+zIh+z0ibalmkUrJrual+GUpeX1striWlEt4rb
-         lO+ZL8ZKe7txWMyYxI44Vx4hppedCWPsUBzV4JpugWLexkGhxCBOMTqhvR7aH896XMOb
-         ofLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761611089; x=1762215889;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yxsHXELdqyxJojPRQnigfV5qRDfj6h3fT9Q5pk8hxSk=;
-        b=k53Hux8h9Yk+k8H2Rgc8O3SjRGGJKhjosxBM+FGMjeMnalnmkRuvtbfYOm82tijgLp
-         PYPFqg6QfXeejuav3XSfQ9boxDoJrQh/lMlCovjk2MNvL/84WEbSwnONMYR07MRQq+VJ
-         x2UntXmjdJIu2N18jpKa89XpYWUl8NYVcwH0b0GmDMgFihTAfpiJR+yBTbgoa83kTcyo
-         yUgnc3wz3KibIqAT3cADB6yi9rL4qfWTDltNib4l0V24hseiHLwN4CgGiqb9HqIoZJvn
-         0JSLApuuvBRLcGrRc9lq3vmW6mew/v4+LNzmhaxedLpf0pnNwcYttdgv85hjPlUFS5/h
-         es1A==
-X-Forwarded-Encrypted: i=1; AJvYcCUZHgBAyukw6Bg83RqfIjOnWVpVrJ41WgtFBepSDszhlnR5m5Hn34sTX+PH5g2GoZI5hzI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdtT9u2ksUoDP8eYZeeTOe5AJex52vBu8puBEw3GkB4B/X+6BG
-	QuNOEACstOw1W5qlNccNSKdrVzi6j6uj9v3j9SW2MX7qqLf7v/ljIP+T2VQ2LxRmPqmZVbJHY2k
-	bD5m8dA==
-X-Google-Smtp-Source: AGHT+IFpMn97Za4SpK3cWhd+eILnGdcKWrPEoax0ckLz8nifzOnGOLK/4bRjAJ22FW6F3RlIfFK/8TaM56U=
-X-Received: from pjyj23.prod.google.com ([2002:a17:90a:e617:b0:339:ae3b:2bc7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f48:b0:32e:9281:7c7b
- with SMTP id 98e67ed59e1d1-340279e5095mr1785783a91.3.1761611089180; Mon, 27
- Oct 2025 17:24:49 -0700 (PDT)
-Date: Mon, 27 Oct 2025 17:24:47 -0700
-In-Reply-To: <71043b76fc073af0fb27493a8e8d7f38c3c782c0.1761606191.git.osandov@fb.com>
+	s=arc-20240116; t=1761611183; c=relaxed/simple;
+	bh=03OjAGrl9Ce/K7jq0kNHfmZRLQY0iB8bbCx2CK6fD4s=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=EHFN9J3PaL1Lu2vavaYrpYH2z+v6W3FXkG2RyRkwH80/TwZ5uNtVjvHTAixp55IfIoE9ULgzvRxl6ZiMWiYBeD0upTlNSi3liBgeGY/CciWjoOvlmHfdvHF1yY2zKHRRwGYUEFfB9a2WBLFSomEpocXKyMlCcQT6e6mPME6ZW6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=HVHUBUje; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE4EC4CEF1;
+	Tue, 28 Oct 2025 00:26:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1761611182;
+	bh=03OjAGrl9Ce/K7jq0kNHfmZRLQY0iB8bbCx2CK6fD4s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HVHUBUjezRvJcZmKT1mk7OhneauH29p/qrVO4e2mCpCeGowlb7n+7PIoWHCmgPwVp
+	 cGWdtpvpmgPv8LCLCDA+/sQBYoVF8rwrHZBJUczjUqqrFJ3YEU94X0MniJ2Zuwlaod
+	 uf2xiA/fC7qtULW2v3xM5g7PPCDVdKpuqd4Xx2qE=
+Date: Mon, 27 Oct 2025 17:26:20 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: <ankita@nvidia.com>
+Cc: <aniketa@nvidia.com>, <vsethi@nvidia.com>, <jgg@nvidia.com>,
+ <mochs@nvidia.com>, <skolothumtho@nvidia.com>, <linmiaohe@huawei.com>,
+ <nao.horiguchi@gmail.com>, <david@redhat.com>,
+ <lorenzo.stoakes@oracle.com>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
+ <rppt@kernel.org>, <surenb@google.com>, <mhocko@suse.com>,
+ <tony.luck@intel.com>, <bp@alien8.de>, <rafael@kernel.org>,
+ <guohanjun@huawei.com>, <mchehab@kernel.org>, <lenb@kernel.org>,
+ <kevin.tian@intel.com>, <alex@shazbot.org>, <cjia@nvidia.com>,
+ <kwankhede@nvidia.com>, <targupta@nvidia.com>, <zhiw@nvidia.com>,
+ <dnigam@nvidia.com>, <kjaju@nvidia.com>, <linux-kernel@vger.kernel.org>,
+ <linux-mm@kvack.org>, <linux-edac@vger.kernel.org>,
+ <Jonathan.Cameron@huawei.com>, <ira.weiny@intel.com>,
+ <Smita.KoralahalliChannabasappa@amd.com>, <u.kleine-koenig@baylibre.com>,
+ <peterz@infradead.org>, <linux-acpi@vger.kernel.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 2/3] mm: handle poisoning of pfn without struct pages
+Message-Id: <20251027172620.d764b8e0eab34abd427d7945@linux-foundation.org>
+In-Reply-To: <20251026141919.2261-3-ankita@nvidia.com>
+References: <20251026141919.2261-1-ankita@nvidia.com>
+	<20251026141919.2261-3-ankita@nvidia.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <71043b76fc073af0fb27493a8e8d7f38c3c782c0.1761606191.git.osandov@fb.com>
-Message-ID: <aQANT9rvO9FMmmkG@google.com>
-Subject: Re: [PATCH] KVM: SVM: Don't skip unrelated instruction if INT3 is replaced
-From: Sean Christopherson <seanjc@google.com>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	Gregory Price <gourry@gourry.net>, kernel-team@fb.com
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-"INT3/INTO", because the code handles both.
+On Sun, 26 Oct 2025 14:19:18 +0000 <ankita@nvidia.com> wrote:
 
-On Mon, Oct 27, 2025, Omar Sandoval wrote:
-> From: Omar Sandoval <osandov@fb.com>
+> From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> We've been seeing guest VM kernel panics with "Oops: int3" coming from
-
-No pronouns please, "we" relies too much on context and that context can be lost
-over time, or might be interpreted differently by readers, etc.
-
-> static branch checks. I found that the reported RIP is one instruction
-> after where it's supposed to be, and I determined that when this
-> happens, the RIP was injected by __svm_skip_emulated_instruction() on
-> the host when a nested page fault was hit while vectoring an int3.
-
-I definitely appreciate the gory details, but please capture just the technical
-details of the bug and fix.  A play-by-play of the debugging process is useful
-(and interesting!) for bug reports and cover letters, but it's mostly noise for
-future readers that usually care about what was changed and/or what the code is
-doing.
-
-> Static branches use the smp_text_poke mechanism, which works by
-> temporarily inserting an int3, then overwriting it. In the meantime,
-> smp_text_poke_int3_handler() relies on getting an accurate RIP.
+> Poison (or ECC) errors can be very common on a large size cluster.
+> The kernel MM currently does not handle ECC errors / poison on a memory
+> region that is not backed by struct pages. If a memory region mapped
+> using remap_pfn_range() for example, but not added to the kernel, MM
+> will not have associated struct pages. Add a new mechanism to handle
+> memory failure on such memory.
 > 
-> This temporary int3 from smp_text_poke is triggering the exact scenario
-> described in the fixes commit: "if the guest executes INTn (no KVM
-> injection), an exit occurs while vectoring the INTn, and the guest
-> modifies the code stream while the exit is being handled, KVM will
-> compute the incorrect next_rip due to "skipping" the wrong instruction."
+> Make kernel MM expose a function to allow modules managing the device
+> memory to register the device memory SPA and the address space associated
+> it. MM maintains this information as an interval tree. On poison, MM can
+> search for the range that the poisoned PFN belong and use the address_space
+> to determine the mapping VMA.
 > 
-> I'm able to reproduce this almost instantly by patching the guest kernel
-> to hammer on a static branch [1] while a drgn script [2] on the host
-> constantly swaps out the memory containing the guest's Task State
-> Segment.
-
-I would actually just say "TSS".  Normally I'm all for spelling out acronyms on
-their first use, but in this case I think TSS is more obviously a "thing" than
-Task State Segment, e.g. I had a momentary brain fart and was wondering what you
-meant by swapping out a segment :-).
-
-> The fixes commit also suggests a workaround: "A future enhancement to
-> make this less awful would be for KVM to detect that the decoded
-> instruction is not the correct INTn and drop the to-be-injected soft
-> event." This implements that workaround.
-
-Please focus on the actual change.  Again, I love the detail, but that was a _lot_
-to get through just to see "Sorry, but the princess is in another castle." :-D
-
-E.g. I think this captures everything in about the same word count, but with a
-stronger focus on what the patch is actually doing.
-
-  When re-injecting an soft interrupt from an INT3, INT0, or (select) INTn
-  instruction, discard the exception and retry the instruction if the code
-  stream is changed (e.g. by a different vCPU) between when the CPU executes
-  the instruction and when KVM decodes the instruction to get the next RIP.
-
-  As effectively predicted by commit 6ef88d6e36c2 ("KVM: SVM: Re-inject
-  INT3/INTO instead of retrying the instruction"), failure to verify the
-  correct INTn instruction was decoded can effectively clobber guest state
-  due to decoding the wrong instruction and thus specifying the wrong next
-  RIP.
-
-  The bug most often manifests as "Oops: int3" panics on static branch
-  checks when running Linux guests.  Linux's static branch patching uses
-  he kernel's "text poke" code patching   mechanism.  To modify code while
-  other CPUs may be executing said code, Linux (temporarily) replaces the
-  first byte of the original instruction with an int3 (opcode 0xcc), then
-  patches in the new code stream except for the first byte, and finally
-  replaces the int3 the first byte of the new code stream.  If a CPU hits
-  the int3, i.e. executes the code while it's being modified, the guest
-  kernel will gracefully handle the resulting #BP, e.g. by looping until
-  the int3 is replaced, by emulating the new instruction, etc.
-
-  E.g. the bug reproduces almost instantly by hacking the guest kernel to
-  provide a convenient static branch[1], while running a drgn script[2] on
-  the host to constantly swap out the memory containing the guest's TSS.
-
-> [1]: https://gist.github.com/osandov/44d17c51c28c0ac998ea0334edf90b5a
-> [2]: https://gist.github.com/osandov/10e45e45afa29b11e0c7209247afc00b
+> In this implementation, kernel MM follows the following sequence that is
+> largely similar to the memory_failure() handler for struct page backed
+> memory:
+> 1. memory_failure() is triggered on reception of a poison error. An
+> absence of struct page is detected and consequently memory_failure_pfn()
+> is executed.
+> 2. memory_failure_pfn() collects the processes mapped to the PFN.
+> 3. memory_failure_pfn() sends SIGBUS to all the processes mapping the
+> faulty PFN using kill_procs().
 > 
-> Fixes: 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
-
-Cc: stable@vger.kernel.org
-
-> Signed-off-by: Omar Sandoval <osandov@fb.com>
-> ---
-> Based on Linus's current tree.
+> Note that there is one primary difference versus the handling of the
+> poison on struct pages, which is to skip unmapping to the faulty PFN.
+> This is done to handle the huge PFNMAP support added recently [1] that
+> enables VM_PFNMAP vmas to map at PMD or PUD level. A poison to a PFN
+> mapped in such as way would need breaking the PMD/PUD mapping into PTEs
+> that will get mirrored into the S2. This can greatly increase the cost
+> of table walks and have a major performance impact.
 > 
->  arch/x86/kvm/svm/svm.c | 40 ++++++++++++++++++++++++++++++++++++----
->  1 file changed, 36 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 153c12dbf3eb..4d72c308b50b 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -271,8 +271,29 @@ static void svm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
->  
+> ...
+>
+> @@ -2216,6 +2222,136 @@ static void kill_procs_now(struct page *p, unsigned long pfn, int flags,
+>  	kill_procs(&tokill, true, pfn, flags);
 >  }
 >  
-> +static bool emulated_instruction_matches_vector(struct kvm_vcpu *vcpu,
-> +						unsigned int vector)
+> +int register_pfn_address_space(struct pfn_address_space *pfn_space)
 > +{
-> +	switch (vector) {
-> +	case BP_VECTOR:
-> +		return vcpu->arch.emulate_ctxt->b == 0xcc ||
-> +		       (vcpu->arch.emulate_ctxt->b == 0xcd &&
-> +			vcpu->arch.emulate_ctxt->src.val == BP_VECTOR);
-> +	case OF_VECTOR:
-> +		return vcpu->arch.emulate_ctxt->b == 0xce;
+> +	if (!pfn_space)
+> +		return -EINVAL;
 
-Hmm, unless I'm missing something, this should handle 0xcd for both.
+I suggest this be removed - make register_pfn_address_space(NULL)
+illegal and let the punishment be an oops.
 
-> +	default:
-> +		return false;
+> +	scoped_guard(mutex, &pfn_space_lock) {
+> +		if (interval_tree_iter_first(&pfn_space_itree,
+> +					     pfn_space->node.start,
+> +					     pfn_space->node.last))
+> +			return -EBUSY;
+> +
+> +		interval_tree_insert(&pfn_space->node, &pfn_space_itree);
 > +	}
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(register_pfn_address_space);
+> +
+> +void unregister_pfn_address_space(struct pfn_address_space *pfn_space)
+> +{
+> +	guard(mutex)(&pfn_space_lock);
+> +
+> +	if (pfn_space &&
+> +	    interval_tree_iter_first(&pfn_space_itree,
+> +				     pfn_space->node.start,
+> +				     pfn_space->node.last))
+> +		interval_tree_remove(&pfn_space->node, &pfn_space_itree);
+> +}
+> +EXPORT_SYMBOL_GPL(unregister_pfn_address_space);
+> +
+> +static void add_to_kill_pfn(struct task_struct *tsk,
+> +			    struct vm_area_struct *vma,
+> +			    struct list_head *to_kill,
+> +			    unsigned long pfn)
+> +{
+> +	struct to_kill *tk;
+> +
+> +	tk = kmalloc(sizeof(*tk), GFP_ATOMIC);
+> +	if (!tk)
+> +		return;
+
+This is unfortunate.  GFP_ATOMIC is unreliable and we silently behave
+as if it worked OK.
+
+> +	/* Check for pgoff not backed by struct page */
+> +	tk->addr = vma_address(vma, pfn, 1);
+> +	tk->size_shift = PAGE_SHIFT;
+> +
+> +	if (tk->addr == -EFAULT)
+> +		pr_info("Unable to find address %lx in %s\n",
+> +			pfn, tsk->comm);
+> +
+> +	get_task_struct(tsk);
+> +	tk->tsk = tsk;
+> +	list_add_tail(&tk->nd, to_kill);
 > +}
 > +
 > +/*
-> + * If vector != 0, then this skips the instruction only if the instruction could
-> + * generate an interrupt with that vector. If not, then it fails, indicating
-> + * that the instruction should be retried.
+> + * Collect processes when the error hit a PFN not backed by struct page.
 > + */
->  static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
-> -					   bool commit_side_effects)
-> +					   bool commit_side_effects,
-> +					   unsigned int vector)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  	unsigned long old_rflags;
-> @@ -293,8 +314,18 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
->  		if (unlikely(!commit_side_effects))
->  			old_rflags = svm->vmcb->save.rflags;
->  
-> -		if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
-> +		if (vector == 0) {
-> +			if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
-> +				return 0;
-> +		} else if (x86_decode_emulated_instruction(vcpu, EMULTYPE_SKIP,
-> +							   NULL,
-> +							   0) != EMULATION_OK ||
+> +static void collect_procs_pfn(struct address_space *mapping,
+> +			      unsigned long pfn, struct list_head *to_kill)
+> +{
+> +	struct vm_area_struct *vma;
+> +	struct task_struct *tsk;
+> +
+> +	i_mmap_lock_read(mapping);
+> +	rcu_read_lock();
+> +	for_each_process(tsk) {
+> +		struct task_struct *t = tsk;
+> +
+> +		t = task_early_kill(tsk, true);
+> +		if (!t)
+> +			continue;
+> +		vma_interval_tree_foreach(vma, &mapping->i_mmap, pfn, pfn) {
+> +			if (vma->vm_mm == t->mm)
+> +				add_to_kill_pfn(t, vma, to_kill, pfn);
+> +		}
+> +	}
+> +	rcu_read_unlock();
 
-I think I would rather handle this in kvm_emulate_instruction(), not in the SVM
-code.  x86_decode_emulated_instruction() really shouldn't be exposed outside of
-x86.c, the use in gp_interception() is all kinds of gross. :-/
+We could play games here to make the GFP_ATOMIC allocation unnecessary,
+but nasty.  Allocate the to_kill* outside the rcu_read_lock, pass that
+pointer into add_to_kill_pfn().  If add_to_kill_pfn()'s
+kmalloc(GFP_ATOMIC) failed, add_to_kill_pfn() can then consume the
+caller's to_kill*.  Then the caller can drop the lock, allocate a new
+to_kill* then restart the scan.  And teach add_to_kill_pfn() to not
+re-add tasks which are already on the list.  Ugh.
 
-The best idea I can come up with is to add an EMULTYPE_SKIP_SOFT_INT, and use that
-to communicate to the kvm_emulate_instruction() that it should verify the
-to-be-skipped instruction.  I don't love the implicit passing of the vector via
-vcpu->arch.exception.vector, but all of this code is quite heinous, so I won't
-loose sleep over it.
+At the very very least we should tell the user that the kernel goofed
+and that one of their processes won't be getting killed.
 
-Compile-tested only, but something like this?
+> +	i_mmap_unlock_read(mapping);
+> +}
+> +
+> +/**
+> + * memory_failure_pfn - Handle memory failure on a page not backed by
+> + *                      struct page.
+> + * @pfn: Page Number of the corrupted page
+> + * @flags: fine tune action taken
+> + *
+> + * Return:
+> + *   0             - success,
+> + *   -EBUSY        - Page PFN does not belong to any address space mapping.
+> + */
+> +static int memory_failure_pfn(unsigned long pfn, int flags)
+> +{
+> +	struct interval_tree_node *node;
+> +	LIST_HEAD(tokill);
+> +
+> +	scoped_guard(mutex, &pfn_space_lock) {
+> +		bool mf_handled = false;
+> +
+> +		/*
+> +		 * Modules registers with MM the address space mapping to the device memory they
+> +		 * manage. Iterate to identify exactly which address space has mapped to this
+> +		 * failing PFN.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 2bfae1cfa514..eca4704e3934 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2154,6 +2154,7 @@ u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
- #define EMULTYPE_PF                (1 << 6)
- #define EMULTYPE_COMPLETE_USER_EXIT (1 << 7)
- #define EMULTYPE_WRITE_PF_TO_SP            (1 << 8)
-+#define EMULTYPE_SKIP_SOFT_INT     ((1 << 9) | EMULTYPE_SKIP)
- 
- static inline bool kvm_can_emulate_event_vectoring(int emul_type)
- {
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f14709a511aa..82e97f2f8635 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -272,6 +272,7 @@ static void svm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
- }
- 
- static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
-+                                          int emul_type,
-                                           bool commit_side_effects)
- {
-        struct vcpu_svm *svm = to_svm(vcpu);
-@@ -293,7 +294,7 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
-                if (unlikely(!commit_side_effects))
-                        old_rflags = svm->vmcb->save.rflags;
- 
--               if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
-+               if (!kvm_emulate_instruction(vcpu, emul_type))
-                        return 0;
- 
-                if (unlikely(!commit_side_effects))
-@@ -311,7 +312,7 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
- 
- static int svm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
- {
--       return __svm_skip_emulated_instruction(vcpu, true);
-+       return __svm_skip_emulated_instruction(vcpu, EMULTYPE_SKIP, true);
- }
- 
- static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
-@@ -331,7 +332,7 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
-         * in use, the skip must not commit any side effects such as clearing
-         * the interrupt shadow or RFLAGS.RF.
-         */
--       if (!__svm_skip_emulated_instruction(vcpu, !nrips))
-+       if (!__svm_skip_emulated_instruction(vcpu, EMULTYPE_SKIP_SOFT_INT, !nrips))
-                return -EIO;
- 
-        rip = kvm_rip_read(vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 593fccc9cf1c..500f9b7f564e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9351,6 +9351,23 @@ static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
-        return false;
- }
- 
-+static bool is_soft_int_instruction(struct x86_emulate_ctxt *ctxt, u8 vector)
-+{
-+       if (WARN_ON_ONCE(vector != BP_VECTOR && vector != OF_VECTOR))
-+               return false;
-+
-+       switch (ctxt->b) {
-+       case 0xcc:
-+               return vector == BP_VECTOR;
-+       case 0xcd:
-+               return vector == ctxt->src.val;
-+       case 0xce:
-+               return vector == OF_VECTOR;
-+       default:
-+               return false;
-+       }
-+}
-+
- /*
-  * Decode an instruction for emulation.  The caller is responsible for handling
-  * code breakpoints.  Note, manually detecting code breakpoints is unnecessary
-@@ -9461,6 +9478,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-         * injecting single-step #DBs.
-         */
-        if (emulation_type & EMULTYPE_SKIP) {
-+               if ((emulation_type & EMULTYPE_SKIP_SOFT_INT) &&
-+                   !is_soft_int_instruction(ctxt, vcpu->arch.exception.vector))
-+                       return 0;
-+
-                if (ctxt->mode != X86EMUL_MODE_PROT64)
-                        ctxt->eip = (u32)ctxt->_eip;
-                else
+We're quite lenient about >80 columns nowadays, but overflowing 80 for
+a block comment is rather needless.
+
+> +		for (node = interval_tree_iter_first(&pfn_space_itree, pfn, pfn); node;
+> +		     node = interval_tree_iter_next(node, pfn, pfn)) {
+> +			struct pfn_address_space *pfn_space =
+> +				container_of(node, struct pfn_address_space, node);
+>
+> +			collect_procs_pfn(pfn_space->mapping, pfn, &tokill);
+> +
+> +			mf_handled = true;
+> +		}
+> +
+> +		if (!mf_handled)
+> +			return action_result(pfn, MF_MSG_PFN_MAP, MF_IGNORED);
+> +	}
+> +
+> +	/*
+> +	 * Unlike System-RAM there is no possibility to swap in a different
+> +	 * physical page at a given virtual address, so all userspace
+> +	 * consumption of direct PFN memory necessitates SIGBUS (i.e.
+> +	 * MF_MUST_KILL)
+> +	 */
+> +	flags |= MF_ACTION_REQUIRED | MF_MUST_KILL;
+> +
+> +	kill_procs(&tokill, true, pfn, flags);
+> +
+> +	return action_result(pfn, MF_MSG_PFN_MAP, MF_RECOVERED);
+> +}
+> +
+
 
