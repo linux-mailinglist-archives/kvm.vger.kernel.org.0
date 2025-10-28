@@ -1,45 +1,47 @@
-Return-Path: <kvm+bounces-61350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58DC0C1727F
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 23:15:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19CD9C17282
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 23:16:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20D6A1C27692
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 22:16:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC2364058E7
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 22:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0ECC3570CC;
-	Tue, 28 Oct 2025 22:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0229735770F;
+	Tue, 28 Oct 2025 22:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pXaYqF7A"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="StekrSeU"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60623570AB
-	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 22:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F2A355806
+	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 22:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761689564; cv=none; b=Wk6qx81dnQHCgrSJqQ5ggAJW6SIIs9U2zal+vqQJmAfV9u142+U6zsVmDkyHAz1BZ02GoS1mP3RLN31gDjOi0oB4WMdxoqFTr7ZkZTHphTrOzPI7NXubiYl9nuH/YUxMJBnOcW9DnXSB0KBDsooJkEjUgYGRH/mgnLMTyZS3Q/Q=
+	t=1761689565; cv=none; b=LkAMs6r6+/nxxQeKs9DavVEKC4OE0eNkk/6CPhOrIkV9bIntMvZjZJnPCfqiXafyPwgpFuLAFDESAPZy/AbaKsWuRM/SVFFFkyA/YJnV7bH/p2jjpII9Sf2uRpEpnLLhkQXbR07evd/PUwyH9UjJ4iLKv/x8bDTRlXnJwOQXGlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761689564; c=relaxed/simple;
-	bh=l2PQw5Hv2eOE5O363SYubMk7NbCSY5T7zULwb/ikJPI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hi8BtvTav1obixTHo7jL9ac/zDjwsfAnt1UGcQJOxAACjmU2vz15WTk/uMn1aH/uwT+MitpJEgwIW9Wzr58UlChuEBkpKp9aXX/6/lHKtrfKi3VKpaB1D44XzzhonQHc3EQ9WwOfYv98CVt+NtkxrcKyBr79CmwEPH56G/uqb94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pXaYqF7A; arc=none smtp.client-ip=91.218.175.182
+	s=arc-20240116; t=1761689565; c=relaxed/simple;
+	bh=xxeKlF8mwwnlrrgJ5iUG+Sr9g1freJAFqFCx5sFfPto=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=T5tB1sFp9cAZtEt8CZMh9JtFQ5SlR1TyNoHOgGspfRDGaJ5Q7CurHPqox5pOtR/63DhP3JIPTMPGNWSchnjGHogqdErEl9yW+g6+3uHsj0KNVYZ2eHKVzYxs36ml2Sr8Hno0E6/JHMlAPua1VB9M8GnI136/qF6s7cIITnpopq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=StekrSeU; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761689559;
+	t=1761689561;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=9NxYqxq//cG7DUHVJ627vLUFqaJqYlS/x/rr2zF0eAk=;
-	b=pXaYqF7AtVd7UPKeM072PB600qibhD7sgAvW+OFN6NsoRYrA9p6Vh3Nb3H6xtvKtjEQao4
-	aanXlJMN5r75mWVmGrwjPo8BXgz6fclvvpzvgEPwvL8T6pUdNtQ44p6UmpgF5Ks/iUDnLN
-	fw/qIJwVD1bMU8ZkAMfyDRgiUOHPmhY=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1Peddc7Q36WMJTpzb2qo2jbZSMjh5dJyVyT5u+gHEIs=;
+	b=StekrSeUZvXHyXuPrkb3ATeaqN/iQxe8KQqTsltCdgUXGfOz6F4laz22aypepTdqxelqTG
+	Reef7DZTx+uzJW1SzUwAlI+4p1ej7E89S9kZlRWfIIXBM7pNdEbv0BDNVKiBnAFUJBF6cV
+	vVJszKBS+6Fm48VkAnyslWxIAx3dORU=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -47,9 +49,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [kvm-unit-tests v2 0/8] More tests for selective CR0 intercept
-Date: Tue, 28 Oct 2025 22:12:05 +0000
-Message-ID: <20251028221213.1937120-1-yosry.ahmed@linux.dev>
+Subject: [kvm-unit-tests v2 1/8] scripts: Always return '2' when skipping tests
+Date: Tue, 28 Oct 2025 22:12:06 +0000
+Message-ID: <20251028221213.1937120-2-yosry.ahmed@linux.dev>
+In-Reply-To: <20251028221213.1937120-1-yosry.ahmed@linux.dev>
+References: <20251028221213.1937120-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -59,34 +63,34 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Add more test cases for the selective CR0 write intercept, covering bugs
-fixed by
-https://lore.kernel.org/kvm/20251024192918.3191141-1-yosry.ahmed@linux.dev/.
+runtime.bash always returns 2 (or 77 in one case) when a test is
+skipped. But two cases are missed and return 0. Fix them.
 
-Patches 1-6 are cleanups and prep work. Patch 7 generalizes the existing
-test to make it easy to extend, and patch 8 adds the actual tests.
+Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+---
+ scripts/runtime.bash | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-v1 -> v2:
-- Fixed author and Signed-off-by.
-- Added fix for skip return codes.
-
-Yosry Ahmed (8):
-  scripts: Always return '2' when skipping tests
-  x86/svm: Cleanup selective cr0 write intercept test
-  x86/svm: Move CR0 selective write intercept test near CR3 intercept
-  x86/svm: Add FEP helpers for SVM tests
-  x86/svm: Report unsupported SVM tests
-  x86/svm: Move report_svm_guest() to the top of svm_tests.c
-  x86/svm: Generalize and improve selective CR0 write intercept test
-  x86/svm: Add more selective CR0 write and LMSW test cases
-
- lib/x86/desc.h       |   8 ++
- scripts/runtime.bash |   4 +-
- x86/svm.c            |   9 ++-
- x86/svm.h            |   1 +
- x86/svm_tests.c      | 178 ++++++++++++++++++++++++++++++-------------
- 5 files changed, 146 insertions(+), 54 deletions(-)
-
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index 6805e97f90c8f..0cbe2695948b8 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -103,13 +103,13 @@ function run()
+ 
+     if [ -z "$GEN_SE_HEADER" ] && find_word "pv-host" "$groups"; then
+         print_result "SKIP" $testname "" "no gen-se-header available for pv-host test"
+-        return
++        return 2
+     fi
+ 
+     if [ -z "$only_group" ] && find_word nodefault "$groups" &&
+             skip_nodefault; then
+         print_result "SKIP" $testname "" "test marked as manual run only"
+-        return;
++        return 2
+     fi
+ 
+     if [ -n "$arch" ] && [ "$arch" != "$ARCH" ]; then
 -- 
 2.51.1.851.g4ebd6896fd-goog
 
