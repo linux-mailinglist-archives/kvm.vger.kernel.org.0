@@ -1,158 +1,125 @@
-Return-Path: <kvm+bounces-61359-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61361-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B498C172EF
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 23:24:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C61DCC1741D
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 23:59:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BC7A3A9010
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 22:23:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2B25F4F164D
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 22:59:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D2335580B;
-	Tue, 28 Oct 2025 22:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4E136A5F6;
+	Tue, 28 Oct 2025 22:58:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HrlHnl8w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rg5BM50R"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482F124C068
-	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 22:23:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882DD36A5E4
+	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 22:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761690194; cv=none; b=JAXCDpIfYNBj8ALSd+8CHDH/yKSV4/xrH+AMZxjbZqLiWAEtBGGS9UZ/QlGNwVkmbQZpavaGeaqQhp+XZ2svt8ZhsC9Y4dTMVgZ7uCjYfgJnNU/mrdd1LJeUbnSfkwC2LdI1Q+iCK+Z9GF1hMHVQY5p80HwDnmRJKFbb1BMJWiQ=
+	t=1761692334; cv=none; b=b/SkdJIXAMVKC6qe9v+5b9BmlO4NfAtJONc2r9iG1UcK6WHP2vSUGwe3L/SbTAOBDUIU2c2gLgAJwKbPZO8uXPW1uE4BlFY932odEwemZ1hs6hil+iVdsdZc4/dbNkrjKV2rGpeyStgZPKopgWqZMHA/kSarEYnphKR9mMcYCYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761690194; c=relaxed/simple;
-	bh=L7K9HnqH2KFb1xTVC1XCnk3NZKxonWlqyMM1iA1YmCE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VVoTQb0biKc5KTnjYpf1slldg5RhMrx3o4cEB03fgnbcI8EdVtQAVZKgp7qK54fBceHE9avEK3Uha6F+oKn1kjs9pe/N+ax1L//pVFwHEBj+ob7QK0jlXF6maOy4mMg7yfKI6zxTymiA41GcyLLN6SytW2QdcF/2JgdKh8VLSY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HrlHnl8w; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 28 Oct 2025 22:23:02 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761690189;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W8qPfg69aH85hJK/2NIrynP1wda3Qv85XlTue8Hsfnw=;
-	b=HrlHnl8wcOt30G4U6CIKp2eObmki4ed/Ly9TLL1vLd0cXjurfQy0W/nPlEekzldFR8nCSh
-	t3Yxc8JeYfc4T2cmVOjZSAY4WoyZcCmFkGzCNhXh3UmYeDWhzAEYG1aWeRg8Tv0y8lCjCm
-	Q5kL2bUAuLWPOKbkmyehr6PVf17K8Kg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
-Subject: Re: [PATCH v16 36/51] KVM: nSVM: Save/load CET Shadow Stack state
- to/from vmcb12/vmcb02
-Message-ID: <ngbxelfw4lvipsvnoykqo4sonuyjqhuyoh5yogvc6btqj4w6cr@y2jpmnyjphmc>
-References: <20250919223258.1604852-1-seanjc@google.com>
- <20250919223258.1604852-37-seanjc@google.com>
+	s=arc-20240116; t=1761692334; c=relaxed/simple;
+	bh=NmfTEh2w90Vx1EUJhCoQ1DnPlLs96QxCb3TH8vg/crY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Content-Type; b=fBmj/JSuTW7oIMyZ5KMhD1eT5PgWzENJt/YJNrzDkhprp/45eeCunspxtJWJrMhBwVudh5fMKnVUssWiyu+72XjBr0u0dj31V/G78RG05wGZgsQJTetwEvB/8YkZsK57Q7lENYiIVv991hihqz0NdK0K+pyTXWoy2SzCBKfkiKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rg5BM50R; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-290c9724deeso58322975ad.2
+        for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 15:58:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761692332; x=1762297132; darn=vger.kernel.org;
+        h=to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bafyIACgjKK14wqI7+UpK/XBf9Tl8hwNLLXvm7vBUiQ=;
+        b=rg5BM50RbDfzDUoax+0Rg/P1gDZJHGNwZo+CuD7g5t4F0GRiwLg66Hy4/obTCnfM/8
+         p2i1WBzwE5OR1dfm9erzIPV4PNgQzq0Z9+/OYVJQDGnYZYCiLOfqArpB4iTke4edxBOi
+         /GWhXs8sa5RITns1Pu4+qo+eUpC3LKSKKHlJnFigfjyOqW4oYELByesmYjOzfYLQwYMp
+         D0YyQO//FfiiHS52u/zh+LmI8o1Dnjg+jqUGYRGgG3olOFyGc/ONGVPLm2/No/FAzdqK
+         Zyuxrnp4/oxOQ7E4Qb1tQXUWFdyBVK57loc9EY/y01FOGGRAfWQ76UFE+Yuef6xEg2dJ
+         Op1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761692332; x=1762297132;
+        h=to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bafyIACgjKK14wqI7+UpK/XBf9Tl8hwNLLXvm7vBUiQ=;
+        b=dMTkCHbB72wXC9BguU/floVK78yJXFAN8lXCVR1mNjfTxU14K6Bn2d0Ac3O1kGTjuv
+         OGIQfpoVv8Wf3LuHqLCQ1eMdbsBBWbbzKMLExD85zABsXvUmdQgSbCFI61IM7r0wYUwE
+         eqH8VWOZsdLxrC4wRHYMd/BIR/khnXSiDybn4lmf7kQY3Km3r+5xx8SCadKWN4ZADWx5
+         eZRTY9g9IOIQO5GZ8lIM0pr02vFTF8lYvL1rQ+8NTRCwTJgWNtJJ4/9WmpzE66WR+rOw
+         RYXNzE8EV9n/c7snPHFeKS/Bgw95KlqEtcXnkw0OH3jgFkA7PC7HRehRLDAHRrABi+Cf
+         ztMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUxyF9JgmyDPaYMbtOLssbMYd7K6WTbiYQjQrp3m6ket0NJ+fZo03l8KK57rcLHqaP+Z2k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/fyzBqJ8cjZ4z8Viqt67GoiL4EHZ786P8TmEgJ+hSoT9nbi/A
+	BzpjHGGkj2JhpackGkr0I4hl6M6jtDk2Flw53nfCzAc8B0lbs+s9qMJlR21bPh6mpAJ58frnVmm
+	3/ANwVI6J9/QusA==
+X-Google-Smtp-Source: AGHT+IHKY2pClvohg4IWDjCOvNKT01DkzF2lTStYT3sIYIsj1O8Psfszn4vksBsANMyqzlJojr3dGZ1p5DLaig==
+X-Received: from pjbgq17.prod.google.com ([2002:a17:90b:1051:b0:33d:acf4:5aac])
+ (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:902:e847:b0:293:e5f:85d7 with SMTP id d9443c01a7336-294def69091mr8641645ad.55.1761692331928;
+ Tue, 28 Oct 2025 15:58:51 -0700 (PDT)
+Date: Tue, 28 Oct 2025 15:30:38 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250919223258.1604852-37-seanjc@google.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
+Message-ID: <20251028225827.2269128-1-jmattson@google.com>
+Subject: [PATCH v2 0/4] KVM: selftests: Test SET_NESTED_STATE with 48-bit L2
+ on 57-bit L1
+From: Jim Mattson <jmattson@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	Bibo Mao <maobibo@loongson.cn>, Jim Mattson <jmattson@google.com>, 
+	"Pratik R. Sampat" <prsampat@amd.com>, James Houghton <jthoughton@google.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Sep 19, 2025 at 03:32:43PM -0700, Sean Christopherson wrote:
-> Transfer the three CET Shadow Stack VMCB fields (S_CET, ISST_ADDR, and
-> SSP) on VMRUN, #VMEXIT, and loading nested state (saving nested state
-> simply copies the entire save area).  SVM doesn't provide a way to
-> disallow L1 from enabling Shadow Stacks for L2, i.e. KVM *must* provide
-> nested support before advertising SHSTK to userspace.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/nested.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 826473f2d7c7..a6443feab252 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -636,6 +636,14 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
->  		vmcb_mark_dirty(vmcb02, VMCB_DT);
->  	}
->  
-> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK) &&
-> +	    (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_CET)))) {
-> +		vmcb02->save.s_cet  = vmcb12->save.s_cet;
-> +		vmcb02->save.isst_addr = vmcb12->save.isst_addr;
-> +		vmcb02->save.ssp = vmcb12->save.ssp;
-> +		vmcb_mark_dirty(vmcb02, VMCB_CET);
-> +	}
-> +
+Prior to commit 9245fd6b8531 ("KVM: x86: model canonical checks more
+precisely"), KVM_SET_NESTED_STATE would fail if the state was captured
+with L2 active, L1 had CR4.LA57 set, L2 did not, and the
+VMCS12.HOST_GSBASE (or other host-state field checked for canonicality)
+had an address greater than 48 bits wide.
 
-According to the APM, there are some consistency checks that should be
-done on CET related fields in the VMCB12. Specifically from
-"Canonicalization and Consistency Checks. " in 15.5.1 in the APM Volume
-2 (24593—Rev. 3.42—March 2024):
+Add a regression test that reproduces the KVM_SET_NESTED_STATE failure
+conditions. To do so, the first three patches add support for 5-level
+paging in the selftest L1 VM.
 
-• Any reserved bit is set in S_CET
-• CR4.CET=1 when CR0.WP=0
-• CR4.CET=1 and U_CET.SS=1 when EFLAGS.VM=1
-• Any reserved bit set in U_CET (SEV-ES only):
-  - VMRUN results in VMEXIT(INVALID)
-  - VMEXIT forces reserved bits to 0
+v1 -> v2
+  Ended the page walking loops before visiting 4K mappings [Yosry]
+  Changed VM_MODE_PXXV48_4K into VM_MODE_PXXVYY_4K;
+    use 5-level paging when possible                       [Sean] 
+  Removed the check for non-NULL vmx_pages in guest_code() [Yosry]
 
-Most consistency checks are done in __nested_vmcb_check_save(), but it
-only operates on the cached save area, which does not have everything
-you need. You'll probably need to add the needed fields to the cached
-save area, or move the consistency checks elsewhere.
+Jim Mattson (4):
+  KVM: selftests: Use a loop to create guest page tables
+  KVM: selftests: Use a loop to walk guest page tables
+  KVM: selftests: Change VM_MODE_PXXV48_4K to VM_MODE_PXXVYY_4K
+  KVM: selftests: Add a VMX test for LA57 nested state
 
-Related to this, I am working on patches to copy everything we use from
-vmcb12->save to the cache area to minimize directly accessing vmcb12
-from the guest memory as much as possible. So I already intend to add
-other fields to the cached save area.
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   4 +-
+ .../selftests/kvm/include/x86/processor.h     |   2 +-
+ .../selftests/kvm/lib/arm64/processor.c       |   2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  30 ++--
+ .../testing/selftests/kvm/lib/x86/processor.c |  80 +++++------
+ tools/testing/selftests/kvm/lib/x86/vmx.c     |   6 +-
+ .../kvm/x86/vmx_la57_nested_state_test.c      | 134 ++++++++++++++++++
+ 8 files changed, 197 insertions(+), 62 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
 
-There's also a couple of other missing consistency checks that I will
-send patches for, which also need fields currently not in the cached
-save area.
+-- 
+2.51.1.851.g4ebd6896fd-goog
 
->  	kvm_set_rflags(vcpu, vmcb12->save.rflags | X86_EFLAGS_FIXED);
->  
->  	svm_set_efer(vcpu, svm->nested.save.efer);
-> @@ -1044,6 +1052,12 @@ void svm_copy_vmrun_state(struct vmcb_save_area *to_save,
->  	to_save->rsp = from_save->rsp;
->  	to_save->rip = from_save->rip;
->  	to_save->cpl = 0;
-> +
-> +	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK)) {
-> +		to_save->s_cet  = from_save->s_cet;
-> +		to_save->isst_addr = from_save->isst_addr;
-> +		to_save->ssp = from_save->ssp;
-> +	}
->  }
->  
->  void svm_copy_vmloadsave_state(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
-> @@ -1111,6 +1125,12 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->  	vmcb12->save.dr6    = svm->vcpu.arch.dr6;
->  	vmcb12->save.cpl    = vmcb02->save.cpl;
->  
-> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK)) {
-> +		vmcb12->save.s_cet	= vmcb02->save.s_cet;
-> +		vmcb12->save.isst_addr	= vmcb02->save.isst_addr;
-> +		vmcb12->save.ssp	= vmcb02->save.ssp;
-> +	}
-> +
->  	vmcb12->control.int_state         = vmcb02->control.int_state;
->  	vmcb12->control.exit_code         = vmcb02->control.exit_code;
->  	vmcb12->control.exit_code_hi      = vmcb02->control.exit_code_hi;
-> -- 
-> 2.51.0.470.ga7dc726c21-goog
-> 
 
