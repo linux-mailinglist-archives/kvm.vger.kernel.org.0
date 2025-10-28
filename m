@@ -1,361 +1,486 @@
-Return-Path: <kvm+bounces-61272-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61273-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90CA6C13324
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 07:44:13 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1FA2C133BB
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 08:05:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 398224E42A6
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 06:44:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4617B4EE78A
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 07:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5CF2C0294;
-	Tue, 28 Oct 2025 06:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651EB2C158F;
+	Tue, 28 Oct 2025 07:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20230601.gappssmtp.com header.i=@osandov-com.20230601.gappssmtp.com header.b="NPjAbHiG"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="oNAg1ASs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206AA1C5D46
-	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 06:44:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF696286D5C;
+	Tue, 28 Oct 2025 07:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761633845; cv=none; b=uu1lGNSuRhICgB1MqWd42vVM2lj+/E++JCgeTcbX4wZMlNjOp2paZStYl5OA/VO5tU/MQrCZoExEIpLjSf+6vAvXADlmf288SbkZRacCKu7FKfQbf38IFUR54BbEI3wJmhVLYPzQbVWbqMz8EKCYTz4TgFBs8WkrV0yyTZrLwlM=
+	t=1761635090; cv=none; b=BMFYBj7Me5LJO50T0QDMuewucofetQp64VqHHXqNUZ4BQTpur0B7A3B02apHm0DBdZxVT4NjnshNoDsf8rG4vzM9KT2RGeyB6m6xwKJVEcbemdjl89j72LexkghMu+HJs5+zKpvHMblZsb4DrhtqXly2f+YJNb7l7zWVVGJtCBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761633845; c=relaxed/simple;
-	bh=zDF/Y9XBJA9RVlnGEARbuvgklIvOOmTItV9BhF1FT8c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jV3bvtq5UOjKJ+BK8WiBYxeLLN9h1TiMj/uP+/d41gdqFpzJJaXAgQE7Hsd1HI9M9dqit11msp1rAl99G6HhSY9avLFZEPLwjviILbFbweUCbSuaA2b5fFmFuGSU0Fjf9d3uZlv3teZ5hmjMtTnaew20s7JG7lXvYypYRWoojbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com; spf=none smtp.mailfrom=osandov.com; dkim=pass (2048-bit key) header.d=osandov-com.20230601.gappssmtp.com header.i=@osandov-com.20230601.gappssmtp.com header.b=NPjAbHiG; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=osandov.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7a27f2469b8so427317b3a.0
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 23:44:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20230601.gappssmtp.com; s=20230601; t=1761633842; x=1762238642; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dukmnIaQsneJf8PdY7kP8xyXxID9jl8eMskGfgfqgQ4=;
-        b=NPjAbHiG3NliJ1pwL1waMAAf8Ro40fW8kA9y/B2mrZzD5Ac4d9gMsO123u2kPHOHWl
-         kGqmfoE936fFrNCdnh1Bj6P4I1Tjj8IfrzmuOUdqptZqkM7Fgk0m2cL+F36mGJnSCaAe
-         nwvAGGKhruyWConbo3FTOQNwSCDH9kzPa/HNMpEeq2aaxG4P3f4qUw+xqMOGaeOVQaQI
-         um/cceWMXJtXQ/+DILUQWs/knKTa9YRj5b3SeHBMDuWLc+hwhCdgqSsvA3fZNqM/bw30
-         tKPtH/URvBCpfkZqqAYIvve+AT2GS+N0NiljtxTo5w0+qaqsxNkZJbe1yBdz5ulYfPHu
-         wcog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761633842; x=1762238642;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dukmnIaQsneJf8PdY7kP8xyXxID9jl8eMskGfgfqgQ4=;
-        b=F3LAhDPrBAOwxl3JTRuktKTy6nnxXy8DreGmx9At03ZekyHBc1DAo15VYbNQS19BEy
-         Y3hESphg0OAO75/l67VEVHLsJSFLPF8aDmwODdzpCEPropSQBS2ZifIlp/SSRajEiZ4T
-         Ns9LM7OpypGjQHwUG9njqFIBaaF7Z2JpFX5VH2lyjCI2ISooFKfLtSTszZbJ55qEjYQn
-         tziaLz6JO6/PxXWuyFJbFFcP1GKaeH8uwcyak6hmdsJAP12N/viImdABLwIeYvP4JibL
-         FTLxTqjTC20zfFmVWTfUwf0o0TCGykfq4X9rzyIpZduez1GPNCLVrfyVr4GRBS3iNeNJ
-         X0Gg==
-X-Forwarded-Encrypted: i=1; AJvYcCWvDnf9oKvHNa4RyRGIncBG7lUBq7dN5Cm/fx5UMmvFxTb5sasRutNWwJwWUWmm8oVH+pQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBRSshY0+KYRXCb/ZW+oJhDTDqzNHPgiVhujNXD2JG8X2jYoQd
-	sHamiSiFh86CPmngGjpAgyqDSSjSMXBfZhkMAqLsN9kqk3oFbNIxCz1cqS5z/uGGCx0=
-X-Gm-Gg: ASbGnctoiWfOjQaDye9ldUS1eArODI0Aq+43xH9Mawry2Zl7PRRWAtLZDSzmiLWYzp8
-	Au+3wzXgIA6PT7eR6tsCiAdQOdnfo4TrI7Blc/89WnGQtpVTIQaqmQ9pUfxBQL7O40SWZ4BFrhB
-	3ixLbN3y+8bo+PE6npK10WV9XH+ZJkS2qoM2g/erFRFLrrJW8DfmVpFMReEeassWJ2inGMAxk6R
-	L6Fh80Nox3rlCR2fAa+6JzPjHHa7hhKumthpTH5dplacVrX8afQ6HGh7RGsr4GyNKtRv2LEf1BZ
-	A/S9ezrUkq/LF1HMwjw8JKM5G677emrWqk0+miJ1SjY5g+8W37g3APv4UpvL1xulqQTTWat3d03
-	z/w12hIEigZ4z0mDGDp6RVyMR9JUfbHYnyXCp+6a64H3EBwOpy4dSxMfA9w==
-X-Google-Smtp-Source: AGHT+IH9dLRnTDwqIBGOhTLlI8reFrNWC2bubrxKI8j9aumrWpki3wiUkYg+1I5B7yWm2IZ7ePZhZQ==
-X-Received: by 2002:a05:6a20:5484:b0:341:730a:ef54 with SMTP id adf61e73a8af0-344d19b7a43mr1643572637.1.1761633842225;
-        Mon, 27 Oct 2025 23:44:02 -0700 (PDT)
-Received: from telecaster ([2620:10d:c090:400::5:1183])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a41404987esm10175301b3a.36.2025.10.27.23.44.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 23:44:01 -0700 (PDT)
-Date: Mon, 27 Oct 2025 23:44:00 -0700
-From: Omar Sandoval <osandov@osandov.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	Gregory Price <gourry@gourry.net>, kernel-team@fb.com
-Subject: Re: [PATCH] KVM: SVM: Don't skip unrelated instruction if INT3 is
- replaced
-Message-ID: <aQBmME40vhf-lh7R@telecaster>
-References: <71043b76fc073af0fb27493a8e8d7f38c3c782c0.1761606191.git.osandov@fb.com>
- <aQANT9rvO9FMmmkG@google.com>
+	s=arc-20240116; t=1761635090; c=relaxed/simple;
+	bh=nGkM12nvXNhOgvIKtqMH28gqlh04JWpLiGAj10BoOKQ=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=gF6lSvI8bNWtro4uDaq4bsKY5ELoVBCoSNCxquWKU3lf3kE2qohnZq7arM+XOXtr3Uk/y9Cec8FFEIkT/cd66tkPQWhLBETTq4L6QLMosJFWR91YMjYTSqrVx4mq+bd8VhNImu0xgYMoPc8S7GlGYtNToBVPg6tjJ5hCxFW6YNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=oNAg1ASs; arc=none smtp.client-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=EidUy3fn2h9Jd2vZFLEhj7aVLDGNg739ptn+7Sao1kI=;
+	b=oNAg1ASs4rWlVXEJ703vli3+hOV/p0YoA2Mv7WxDoL2hlkmATcgaeLPRESBOwoKej9/lLsYhx
+	RtuY84UKsSuOwGnjVyRk/sNapKlUTynxuCbwbjJmvGnuhWvg8NagC4CLJZavnO63tOqKJoat3Ed
+	bLu9zHq8E2ju132P/PzIth0=
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4cwhF639C5zRhRJ;
+	Tue, 28 Oct 2025 15:04:10 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id DF52D18007F;
+	Tue, 28 Oct 2025 15:04:38 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 28 Oct 2025 15:04:38 +0800
+Subject: Re: [PATCH v10 2/2] hisi_acc_vfio_pci: adapt to new migration
+ configuration
+To: Alex Williamson <alex@shazbot.org>
+CC: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
+	<jonathan.cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linuxarm@openeuler.org>
+References: <20251017091057.3770403-1-liulongfang@huawei.com>
+ <20251017091057.3770403-3-liulongfang@huawei.com>
+ <20251027222007.5e176e42@shazbot.org>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <734cd156-26c1-50f7-f0fa-db76beaab745@huawei.com>
+Date: Tue, 28 Oct 2025 15:04:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aQANT9rvO9FMmmkG@google.com>
+In-Reply-To: <20251027222007.5e176e42@shazbot.org>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
-On Mon, Oct 27, 2025 at 05:24:47PM -0700, Sean Christopherson wrote:
-> "INT3/INTO", because the code handles both.
+On 2025/10/28 12:20, Alex Williamson wrote:
+> On Fri, 17 Oct 2025 17:10:57 +0800
+> Longfang Liu <liulongfang@huawei.com> wrote:
 > 
-> On Mon, Oct 27, 2025, Omar Sandoval wrote:
-> > From: Omar Sandoval <osandov@fb.com>
-> > 
-> > We've been seeing guest VM kernel panics with "Oops: int3" coming from
+>> On new platforms greater than QM_HW_V3, the migration region has been
+>> relocated from the VF to the PF. The VF's own configuration space is
+>> restored to the complete 64KB, and there is no need to divide the
+>> size of the BAR configuration space equally. The driver should be
+>> modified accordingly to adapt to the new hardware device.
+>>
+>> On the older hardware platform QM_HW_V3, the live migration configuration
+>> region is placed in the latter 32K portion of the VF's BAR2 configuration
+>> space. On the new hardware platform QM_HW_V4, the live migration
+>> configuration region also exists in the same 32K area immediately following
+>> the VF's BAR2, just like on QM_HW_V3.
+>>
+>> However, access to this region is now controlled by hardware. Additionally,
+>> a copy of the live migration configuration region is present in the PF's
+>> BAR2 configuration space. On the new hardware platform QM_HW_V4, when an
+>> older version of the driver is loaded, it behaves like QM_HW_V3 and uses
+>> the configuration region in the VF, ensuring that the live migration
+>> function continues to work normally. When the new version of the driver is
+>> loaded, it directly uses the configuration region in the PF. Meanwhile,
+>> hardware configuration disables the live migration configuration region
+>> in the VF's BAR2: reads return all 0xF values, and writes are silently
+>> ignored.
+>>
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>> Reviewed-by: Shameer Kolothum <shameerkolothum@gmail.com>
+>> ---
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 205 ++++++++++++------
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  21 ++
+>>  2 files changed, 165 insertions(+), 61 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> index fde33f54e99e..55233e62cb1d 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> @@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
+>>  	return 0;
+>>  }
+>>  
+>> +static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>> +			   struct acc_vf_data *vf_data)
+>> +{
+>> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+>> +	struct device *dev = &qm->pdev->dev;
+>> +	u32 eqc_addr, aeqc_addr;
+>> +	int ret;
+>> +
+>> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL) {
+>> +		eqc_addr = QM_EQC_DW0;
+>> +		aeqc_addr = QM_AEQC_DW0;
+>> +	} else {
+>> +		eqc_addr = QM_EQC_PF_DW0;
+>> +		aeqc_addr = QM_AEQC_PF_DW0;
+>> +	}
+>> +
+>> +	/* QM_EQC_DW has 7 regs */
+>> +	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+>> +	if (ret) {
+>> +		dev_err(dev, "failed to read QM_EQC_DW\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	/* QM_AEQC_DW has 7 regs */
+>> +	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+>> +	if (ret) {
+>> +		dev_err(dev, "failed to read QM_AEQC_DW\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>> +			   struct acc_vf_data *vf_data)
+>> +{
+>> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+>> +	struct device *dev = &qm->pdev->dev;
+>> +	u32 eqc_addr, aeqc_addr;
+>> +	int ret;
+>> +
+>> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL) {
+>> +		eqc_addr = QM_EQC_DW0;
+>> +		aeqc_addr = QM_AEQC_DW0;
+>> +	} else {
+>> +		eqc_addr = QM_EQC_PF_DW0;
+>> +		aeqc_addr = QM_AEQC_PF_DW0;
+>> +	}
+>> +
+>> +	/* QM_EQC_DW has 7 regs */
+>> +	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+>> +	if (ret) {
+>> +		dev_err(dev, "failed to write QM_EQC_DW\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	/* QM_AEQC_DW has 7 regs */
+>> +	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+>> +	if (ret) {
+>> +		dev_err(dev, "failed to write QM_AEQC_DW\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>>  {
+>>  	struct device *dev = &qm->pdev->dev;
+>> @@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>>  		return ret;
+>>  	}
+>>  
+>> -	/* QM_EQC_DW has 7 regs */
+>> -	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+>> -	if (ret) {
+>> -		dev_err(dev, "failed to read QM_EQC_DW\n");
+>> -		return ret;
+>> -	}
+>> -
+>> -	/* QM_AEQC_DW has 7 regs */
+>> -	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+>> -	if (ret) {
+>> -		dev_err(dev, "failed to read QM_AEQC_DW\n");
+>> -		return ret;
+>> -	}
+>> -
+>>  	return 0;
+>>  }
+>>  
+>> @@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>>  		return ret;
+>>  	}
+>>  
+>> -	/* QM_EQC_DW has 7 regs */
+>> -	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+>> -	if (ret) {
+>> -		dev_err(dev, "failed to write QM_EQC_DW\n");
+>> -		return ret;
+>> -	}
+>> -
+>> -	/* QM_AEQC_DW has 7 regs */
+>> -	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+>> -	if (ret) {
+>> -		dev_err(dev, "failed to write QM_AEQC_DW\n");
+>> -		return ret;
+>> -	}
+>> -
+>>  	return 0;
+>>  }
+>>  
+>> @@ -522,6 +560,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  		return ret;
+>>  	}
+>>  
+>> +	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>>  	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
+>>  	if (ret) {
+>>  		dev_err(dev, "set sqc failed\n");
+>> @@ -589,6 +631,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  	vf_data->vf_qm_state = QM_READY;
+>>  	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+>>  
+>> +	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
+>> +	if (ret)
+>> +		return ret;
+>> +
 > 
-> No pronouns please, "we" relies too much on context and that context can be lost
-> over time, or might be interpreted differently by readers, etc.
-> 
-> > static branch checks. I found that the reported RIP is one instruction
-> > after where it's supposed to be, and I determined that when this
-> > happens, the RIP was injected by __svm_skip_emulated_instruction() on
-> > the host when a nested page fault was hit while vectoring an int3.
-> 
-> I definitely appreciate the gory details, but please capture just the technical
-> details of the bug and fix.  A play-by-play of the debugging process is useful
-> (and interesting!) for bug reports and cover letters, but it's mostly noise for
-> future readers that usually care about what was changed and/or what the code is
-> doing.
-> 
-> > Static branches use the smp_text_poke mechanism, which works by
-> > temporarily inserting an int3, then overwriting it. In the meantime,
-> > smp_text_poke_int3_handler() relies on getting an accurate RIP.
-> > 
-> > This temporary int3 from smp_text_poke is triggering the exact scenario
-> > described in the fixes commit: "if the guest executes INTn (no KVM
-> > injection), an exit occurs while vectoring the INTn, and the guest
-> > modifies the code stream while the exit is being handled, KVM will
-> > compute the incorrect next_rip due to "skipping" the wrong instruction."
-> > 
-> > I'm able to reproduce this almost instantly by patching the guest kernel
-> > to hammer on a static branch [1] while a drgn script [2] on the host
-> > constantly swaps out the memory containing the guest's Task State
-> > Segment.
-> 
-> I would actually just say "TSS".  Normally I'm all for spelling out acronyms on
-> their first use, but in this case I think TSS is more obviously a "thing" than
-> Task State Segment, e.g. I had a momentary brain fart and was wondering what you
-> meant by swapping out a segment :-).
-> 
-> > The fixes commit also suggests a workaround: "A future enhancement to
-> > make this less awful would be for KVM to detect that the decoded
-> > instruction is not the correct INTn and drop the to-be-injected soft
-> > event." This implements that workaround.
-> 
-> Please focus on the actual change.  Again, I love the detail, but that was a _lot_
-> to get through just to see "Sorry, but the princess is in another castle." :-D
+> I'd have thought it'd still make sense that qm_{get,set}_regs() would
+> handle this subset of registers even though it's split out into helper
+> functions, now we have the dev_data debugfs failing to fill these
+> registers.  It's not clear it was worthwhile to split out the xqc
+> helpers at all here.
 
-Fair enough.
+Moving the differentiated handling of eqc and aeqc, which results from different drv_mode values,
+into the helper functions can keep the main business logic code for live migration
+clean and concise.
 
-> E.g. I think this captures everything in about the same word count, but with a
-> stronger focus on what the patch is actually doing.
 > 
->   When re-injecting an soft interrupt from an INT3, INT0, or (select) INTn
->   instruction, discard the exception and retry the instruction if the code
->   stream is changed (e.g. by a different vCPU) between when the CPU executes
->   the instruction and when KVM decodes the instruction to get the next RIP.
+>>  	ret = vf_qm_read_data(vf_qm, vf_data);
+>>  	if (ret)
+>>  		return ret;
+>> @@ -1186,34 +1232,52 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+>>  {
+>>  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
+>>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>> +	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
+>>  	struct pci_dev *vf_dev = vdev->pdev;
+>> +	u32 val;
+>>  
+>> -	/*
+>> -	 * ACC VF dev BAR2 region consists of both functional register space
+>> -	 * and migration control register space. For migration to work, we
+>> -	 * need access to both. Hence, we map the entire BAR2 region here.
+>> -	 * But unnecessarily exposing the migration BAR region to the Guest
+>> -	 * has the potential to prevent/corrupt the Guest migration. Hence,
+>> -	 * we restrict access to the migration control space from
+>> -	 * Guest(Please see mmap/ioctl/read/write override functions).
+>> -	 *
+>> -	 * Please note that it is OK to expose the entire VF BAR if migration
+>> -	 * is not supported or required as this cannot affect the ACC PF
+>> -	 * configurations.
+>> -	 *
+>> -	 * Also the HiSilicon ACC VF devices supported by this driver on
+>> -	 * HiSilicon hardware platforms are integrated end point devices
+>> -	 * and the platform lacks the capability to perform any PCIe P2P
+>> -	 * between these devices.
+>> -	 */
+>> +	val = readl(pf_qm->io_base + QM_MIG_REGION_SEL);
+>> +	if (pf_qm->ver > QM_HW_V3 && (val & QM_MIG_REGION_EN))
+>> +		hisi_acc_vdev->drv_mode = HW_ACC_MIG_PF_CTRL;
+>> +	else
+>> +		hisi_acc_vdev->drv_mode = HW_ACC_MIG_VF_CTRL;
+>>  
+>> -	vf_qm->io_base =
+>> -		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+>> -			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+>> -	if (!vf_qm->io_base)
+>> -		return -EIO;
+>> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_PF_CTRL) {
+>> +		/*
+>> +		 * On hardware platforms greater than QM_HW_V3, the migration function
+>> +		 * register is placed in the BAR2 configuration region of the PF,
+>> +		 * and each VF device occupies 8KB of configuration space.
+>> +		 */
+>> +		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
+>> +				 hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
+>> +	} else {
+>> +		/*
+>> +		 * ACC VF dev BAR2 region consists of both functional register space
+>> +		 * and migration control register space. For migration to work, we
+>> +		 * need access to both. Hence, we map the entire BAR2 region here.
+>> +		 * But unnecessarily exposing the migration BAR region to the Guest
+>> +		 * has the potential to prevent/corrupt the Guest migration. Hence,
+>> +		 * we restrict access to the migration control space from
+>> +		 * Guest(Please see mmap/ioctl/read/write override functions).
+>> +		 *
+>> +		 * Please note that it is OK to expose the entire VF BAR if migration
+>> +		 * is not supported or required as this cannot affect the ACC PF
+>> +		 * configurations.
+>> +		 *
+>> +		 * Also the HiSilicon ACC VF devices supported by this driver on
+>> +		 * HiSilicon hardware platforms are integrated end point devices
+>> +		 * and the platform lacks the capability to perform any PCIe P2P
+>> +		 * between these devices.
+>> +		 */
+>>  
+>> +		vf_qm->io_base =
+>> +			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+>> +				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+>> +		if (!vf_qm->io_base)
+>> +			return -EIO;
+>> +	}
+>>  	vf_qm->fun_type = QM_HW_VF;
+>> +	vf_qm->ver = pf_qm->ver;
+>>  	vf_qm->pdev = vf_dev;
+>>  	mutex_init(&vf_qm->mailbox_lock);
+>>  
+>> @@ -1250,6 +1314,28 @@ static struct hisi_qm *hisi_acc_get_pf_qm(struct pci_dev *pdev)
+>>  	return !IS_ERR(pf_qm) ? pf_qm : NULL;
+>>  }
+>>  
+>> +static size_t hisi_acc_get_resource_len(struct vfio_pci_core_device *vdev,
+>> +					unsigned int index)
+>> +{
+>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
+>> +			hisi_acc_drvdata(vdev->pdev);
+>> +
+>> +	/*
+>> +	 * On the old HW_ACC_MIG_VF_CTRL mode device, the ACC VF device
+>> +	 * BAR2 region encompasses both functional register space
+>> +	 * and migration control register space.
+>> +	 * only the functional region should be report to Guest.
+>> +	 */
+>> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL)
+>> +		return (pci_resource_len(vdev->pdev, index) >> 1);
+>> +	/*
+>> +	 * On the new HW device, the migration control register
+>> +	 * has been moved to the PF device BAR2 region.
+>> +	 * The VF device BAR2 is entirely functional register space.
+>> +	 */
+>> +	return pci_resource_len(vdev->pdev, index);
+>> +}
+>> +
+>>  static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
+>>  					size_t count, loff_t *ppos,
+>>  					size_t *new_count)
+>> @@ -1260,8 +1346,9 @@ static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
+>>  
+>>  	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+>>  		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+>> -		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
+>> +		resource_size_t end;
+>>  
+>> +		end = hisi_acc_get_resource_len(vdev, index);
+>>  		/* Check if access is for migration control region */
+>>  		if (pos >= end)
+>>  			return -EINVAL;
+>> @@ -1282,8 +1369,9 @@ static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
+>>  	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+>>  	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+>>  		u64 req_len, pgoff, req_start;
+>> -		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
+>> +		resource_size_t end;
+>>  
+>> +		end = hisi_acc_get_resource_len(vdev, index);
+>>  		req_len = vma->vm_end - vma->vm_start;
+>>  		pgoff = vma->vm_pgoff &
+>>  			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+>> @@ -1330,7 +1418,6 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
+>>  	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
+>>  		struct vfio_pci_core_device *vdev =
+>>  			container_of(core_vdev, struct vfio_pci_core_device, vdev);
+>> -		struct pci_dev *pdev = vdev->pdev;
+>>  		struct vfio_region_info info;
+>>  		unsigned long minsz;
+>>  
+>> @@ -1345,12 +1432,7 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
+>>  		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
+>>  			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+>>  
+>> -			/*
+>> -			 * ACC VF dev BAR2 region consists of both functional
+>> -			 * register space and migration control register space.
+>> -			 * Report only the functional region to Guest.
+>> -			 */
+>> -			info.size = pci_resource_len(pdev, info.index) / 2;
+>> +			info.size = hisi_acc_get_resource_len(vdev, info.index);
+>>  
+>>  			info.flags = VFIO_REGION_INFO_FLAG_READ |
+>>  					VFIO_REGION_INFO_FLAG_WRITE |
+>> @@ -1521,7 +1603,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+>>  	hisi_acc_vf_disable_fds(hisi_acc_vdev);
+>>  	mutex_lock(&hisi_acc_vdev->open_mutex);
+>>  	hisi_acc_vdev->dev_opened = false;
+>> -	iounmap(vf_qm->io_base);
+>> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL)
+>> +		iounmap(vf_qm->io_base);
+>>  	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>  	vfio_pci_core_close_device(core_vdev);
+>>  }
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> index 91002ceeebc1..d287abe3dd31 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> @@ -59,6 +59,26 @@
+>>  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
+>>  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
+>>  
+>> +#define QM_MIG_REGION_OFFSET		0x180000
+>> +#define QM_MIG_REGION_SIZE		0x2000
+>> +
+>> +#define QM_SUB_VERSION_ID		0x100210
 > 
->   As effectively predicted by commit 6ef88d6e36c2 ("KVM: SVM: Re-inject
->   INT3/INTO instead of retrying the instruction"), failure to verify the
->   correct INTn instruction was decoded can effectively clobber guest state
->   due to decoding the wrong instruction and thus specifying the wrong next
->   RIP.
-> 
->   The bug most often manifests as "Oops: int3" panics on static branch
->   checks when running Linux guests.  Linux's static branch patching uses
->   he kernel's "text poke" code patching   mechanism.  To modify code while
->   other CPUs may be executing said code, Linux (temporarily) replaces the
->   first byte of the original instruction with an int3 (opcode 0xcc), then
->   patches in the new code stream except for the first byte, and finally
->   replaces the int3 the first byte of the new code stream.  If a CPU hits
->   the int3, i.e. executes the code while it's being modified, the guest
->   kernel will gracefully handle the resulting #BP, e.g. by looping until
->   the int3 is replaced, by emulating the new instruction, etc.
-> 
->   E.g. the bug reproduces almost instantly by hacking the guest kernel to
->   provide a convenient static branch[1], while running a drgn script[2] on
->   the host to constantly swap out the memory containing the guest's TSS.
-> 
-> > [1]: https://gist.github.com/osandov/44d17c51c28c0ac998ea0334edf90b5a
-> > [2]: https://gist.github.com/osandov/10e45e45afa29b11e0c7209247afc00b
-> > 
-> > Fixes: 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
-> 
-> Cc: stable@vger.kernel.org
-> 
-> > Signed-off-by: Omar Sandoval <osandov@fb.com>
-> > ---
-> > Based on Linus's current tree.
-> > 
-> >  arch/x86/kvm/svm/svm.c | 40 ++++++++++++++++++++++++++++++++++++----
-> >  1 file changed, 36 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 153c12dbf3eb..4d72c308b50b 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -271,8 +271,29 @@ static void svm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
-> >  
-> >  }
-> >  
-> > +static bool emulated_instruction_matches_vector(struct kvm_vcpu *vcpu,
-> > +						unsigned int vector)
-> > +{
-> > +	switch (vector) {
-> > +	case BP_VECTOR:
-> > +		return vcpu->arch.emulate_ctxt->b == 0xcc ||
-> > +		       (vcpu->arch.emulate_ctxt->b == 0xcd &&
-> > +			vcpu->arch.emulate_ctxt->src.val == BP_VECTOR);
-> > +	case OF_VECTOR:
-> > +		return vcpu->arch.emulate_ctxt->b == 0xce;
-> 
-> Hmm, unless I'm missing something, this should handle 0xcd for both.
+> Above SUB_VERSION_ID isn't used.
 
-Yup, I forgot about int 4.
+Yes, this macro variable needs to be removed.
 
-> > +	default:
-> > +		return false;
-> > +	}
-> > +}
-> > +
-> > +/*
-> > + * If vector != 0, then this skips the instruction only if the instruction could
-> > + * generate an interrupt with that vector. If not, then it fails, indicating
-> > + * that the instruction should be retried.
-> > + */
-> >  static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
-> > -					   bool commit_side_effects)
-> > +					   bool commit_side_effects,
-> > +					   unsigned int vector)
-> >  {
-> >  	struct vcpu_svm *svm = to_svm(vcpu);
-> >  	unsigned long old_rflags;
-> > @@ -293,8 +314,18 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
-> >  		if (unlikely(!commit_side_effects))
-> >  			old_rflags = svm->vmcb->save.rflags;
-> >  
-> > -		if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
-> > +		if (vector == 0) {
-> > +			if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
-> > +				return 0;
-> > +		} else if (x86_decode_emulated_instruction(vcpu, EMULTYPE_SKIP,
-> > +							   NULL,
-> > +							   0) != EMULATION_OK ||
 > 
-> I think I would rather handle this in kvm_emulate_instruction(), not in the SVM
-> code.  x86_decode_emulated_instruction() really shouldn't be exposed outside of
-> x86.c, the use in gp_interception() is all kinds of gross. :-/
+>> +#define QM_EQC_PF_DW0			0x1c00
+>> +#define QM_AEQC_PF_DW0			0x1c20
 > 
-> The best idea I can come up with is to add an EMULTYPE_SKIP_SOFT_INT, and use that
-> to communicate to the kvm_emulate_instruction() that it should verify the
-> to-be-skipped instruction.  I don't love the implicit passing of the vector via
-> vcpu->arch.exception.vector, but all of this code is quite heinous, so I won't
-> loose sleep over it.
-> 
-> Compile-tested only, but something like this?
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 2bfae1cfa514..eca4704e3934 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2154,6 +2154,7 @@ u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
->  #define EMULTYPE_PF                (1 << 6)
->  #define EMULTYPE_COMPLETE_USER_EXIT (1 << 7)
->  #define EMULTYPE_WRITE_PF_TO_SP            (1 << 8)
-> +#define EMULTYPE_SKIP_SOFT_INT     ((1 << 9) | EMULTYPE_SKIP)
->  
->  static inline bool kvm_can_emulate_event_vectoring(int emul_type)
->  {
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index f14709a511aa..82e97f2f8635 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -272,6 +272,7 @@ static void svm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
->  }
->  
->  static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
-> +                                          int emul_type,
->                                            bool commit_side_effects)
->  {
->         struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -293,7 +294,7 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
->                 if (unlikely(!commit_side_effects))
->                         old_rflags = svm->vmcb->save.rflags;
->  
-> -               if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
-> +               if (!kvm_emulate_instruction(vcpu, emul_type))
->                         return 0;
->  
->                 if (unlikely(!commit_side_effects))
-> @@ -311,7 +312,7 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
->  
->  static int svm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
->  {
-> -       return __svm_skip_emulated_instruction(vcpu, true);
-> +       return __svm_skip_emulated_instruction(vcpu, EMULTYPE_SKIP, true);
->  }
->  
->  static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
-> @@ -331,7 +332,7 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
->          * in use, the skip must not commit any side effects such as clearing
->          * the interrupt shadow or RFLAGS.RF.
->          */
-> -       if (!__svm_skip_emulated_instruction(vcpu, !nrips))
-> +       if (!__svm_skip_emulated_instruction(vcpu, EMULTYPE_SKIP_SOFT_INT, !nrips))
->                 return -EIO;
->  
->         rip = kvm_rip_read(vcpu);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 593fccc9cf1c..500f9b7f564e 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9351,6 +9351,23 @@ static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
->         return false;
->  }
->  
-> +static bool is_soft_int_instruction(struct x86_emulate_ctxt *ctxt, u8 vector)
-> +{
-> +       if (WARN_ON_ONCE(vector != BP_VECTOR && vector != OF_VECTOR))
-> +               return false;
+> Seems like it'd make sense to define these next to the VF offsets and
+> perhaps even add "VF" to the existing macros for consistency.  Thanks,
+>
 
-This warning triggers when called from the svm_inject_irq() path since
-that case uses vcpu->arch.interrupt.nr. I can't tell whether it'd be
-okay to set vcpu->arch.exception.vector = vcpu->arch.interrupt.nr in
-that case, or if we need yet another emultype. (I believe my patch had
-the same problem, but silently.)
-
-> +       switch (ctxt->b) {
-> +       case 0xcc:
-> +               return vector == BP_VECTOR;
-> +       case 0xcd:
-> +               return vector == ctxt->src.val;
-> +       case 0xce:
-> +               return vector == OF_VECTOR;
-> +       default:
-> +               return false;
-> +       }
-> +}
-> +
->  /*
->   * Decode an instruction for emulation.  The caller is responsible for handling
->   * code breakpoints.  Note, manually detecting code breakpoints is unnecessary
-> @@ -9461,6 +9478,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->          * injecting single-step #DBs.
->          */
->         if (emulation_type & EMULTYPE_SKIP) {
-> +               if ((emulation_type & EMULTYPE_SKIP_SOFT_INT) &&
-
-This needs to be (emulation_type & EMULTYPE_SKIP_SOFT_INT) == EMULTYPE_SKIP_SOFT_INT
-(either that or making EMULTYPE_SKIP_SOFT_INT not include
-EMULTYPE_SKIP).
-
-Did you intend to send this out as a patch, or should I send a v2 based
-on this?
+OK, it's better to distinguish between the old offset variable names with "VF"
+and the newly added PF offset addresses for clarity
 
 Thanks,
-Omar
+Longfang.
 
-> +                   !is_soft_int_instruction(ctxt, vcpu->arch.exception.vector))
-> +                       return 0;
-> +
->                 if (ctxt->mode != X86EMUL_MODE_PROT64)
->                         ctxt->eip = (u32)ctxt->_eip;
->                 else
+> Alex
+> 
+>> +
+>> +/**
+>> + * On HW_ACC_MIG_VF_CTRL mode, the configuration domain supporting live
+>> + * migration functionality is located in the latter 32KB of the VF's BAR2.
+>> + * The Guest is only provided with the first 32KB of the VF's BAR2.
+>> + * On HW_ACC_MIG_PF_CTRL mode, the configuration domain supporting live
+>> + * migration functionality is located in the PF's BAR2, and the entire 64KB
+>> + * of the VF's BAR2 is allocated to the Guest.
+>> + */
+>> +enum hw_drv_mode {
+>> +	HW_ACC_MIG_VF_CTRL = 0,
+>> +	HW_ACC_MIG_PF_CTRL,
+>> +};
+>> +
+>>  struct acc_vf_data {
+>>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+>>  	/* QM match information */
+>> @@ -125,6 +145,7 @@ struct hisi_acc_vf_core_device {
+>>  	struct pci_dev *vf_dev;
+>>  	struct hisi_qm *pf_qm;
+>>  	struct hisi_qm vf_qm;
+>> +	int drv_mode;
+>>  	/*
+>>  	 * vf_qm_state represents the QM_VF_STATE register value.
+>>  	 * It is set by Guest driver for the ACC VF dev indicating
+> 
+> .
+> 
 
