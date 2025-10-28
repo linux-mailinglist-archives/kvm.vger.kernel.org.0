@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-61343-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61344-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F21C16F82
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 22:26:48 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA4D0C16F55
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 22:25:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B4C33A450B
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 21:25:21 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2E6EF3569E0
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 21:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5007935971D;
-	Tue, 28 Oct 2025 21:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31AE351FD9;
+	Tue, 28 Oct 2025 21:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RBgOfSXk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P9kagRqz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
+Received: from mail-oa1-f73.google.com (mail-oa1-f73.google.com [209.85.160.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C648350D62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107BB3590B0
 	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 21:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761686476; cv=none; b=tYEWAG7abDPmD6zlKE0TgXGwSA+WxgIG+o57c4q0vIz7GbiQCixuhmaEtuyX1/0YvVCrd8blZsM8ScRcIxgvq+OwdyJRGdBKKjfOQtQqeyrmAOrx4oBv+qs5wdds3CR4ZsVh1AxDyqHxB1zPq1D4CI08Bh1AHg5+jT7arnvve/k=
+	t=1761686477; cv=none; b=TpK6f7I2/sTZ5S8TNJ6uKtaIeHYCtBRXXeAV+X5GNO4Uz5sqSmh0sX3Jh24QN0jPo86pmd1qPRpyQQpHBVbl5xLth2LgwBrTk/0G1TO3AjEvxXtA234/oUI8tK9WhXiMAgqJNhRrndBxasTMXw9Kx02Lai8Sok7G+Zd2uBE5Ccg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761686476; c=relaxed/simple;
-	bh=Z4cEH/EyFJtC+7YubXLF9stWj6X2tJBOoSAojvblL2I=;
+	s=arc-20240116; t=1761686477; c=relaxed/simple;
+	bh=L0y6R+WsPKPBtxIntBUSrAiKk0vPEfUYjXqWnMLuwBk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=S3k7xvBj+zaF3FVb0r9azdv0fghopwPqD8b+tPvrZm3FKK5xWqTyGy/D4HTY7SyH/DK3fajkMsF8ntp5P5cTsAuK8joW0IC3GDXB7LzVH3NaEDVnsKk9+DLx70SQGdpLyFHeYqvqA6UYFOc6P/mI1eovUOHI9s4tOeazcsWsLVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RBgOfSXk; arc=none smtp.client-ip=209.85.210.74
+	 To:Cc:Content-Type; b=Ct/xpDOmnnQ7Tm/WJQL+KekRjiMALU9GmMAcYPSEMjeMFPbsdR5YbGpoHbIXpW3hKYI8vDPhg90J8x5e0FLbZ2QNxApVGb+LYgP6yVcoNzAjKchO6yyY36zb+d8UuJFwJNx+5ZXLQMS3rVjVgDqA43P56T1ly/gVOXaJhNvuZ+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P9kagRqz; arc=none smtp.client-ip=209.85.160.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-7c5311ee244so2154779a34.0
-        for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 14:21:13 -0700 (PDT)
+Received: by mail-oa1-f73.google.com with SMTP id 586e51a60fabf-3d28b320e76so6995103fac.3
+        for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 14:21:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761686473; x=1762291273; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761686474; x=1762291274; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tG66zI1+tyqk2y+i/GC8wCSgfETT28ZitF9FwVU9vh4=;
-        b=RBgOfSXknObZks+7DWFnq7bbTk1tHiWSXMyvz62RxHxcmGnkY/FFM7JQogFf4JVWMT
-         Dy8ko3kpnLlLw0wtKv6Q/23ZqYHAmQWqE1lIddp6VZ1lzposKCEy+j/7bK352AuplSzi
-         Xv5mMpOP2VnFlTIeP0H8qRQz6v0inh5NkJm9dv9Hz4hmhTMwt1cJ+Ondm7RoOyX6g+23
-         qZc7SQdxuJyeYm577Ryv+cnectIa6Zu8tcT+67bQOWYU2jmuYKGplYdpfsrAf2ggp2ot
-         KV3N43Npc1m5WhmCGw4XcWL6pUhqEldDPIcuWoU5AbuqPFkbHD+wOt3CgHBfxdS/PtCG
-         WpBg==
+        bh=RWiSKMHsCsObY85cOPgN5ZCBinR8ehpel+IU1V2UPag=;
+        b=P9kagRqzlj36Yu6Aa8vNTMXrsz/bkMAlMMtwpdJ5gjdoHcQZRglBvjpR1l9LPrfDkE
+         aQGDRUM9DM8al6bowtZJI7Nr7aubbb94W70EyV5aENcRCXda4Q7Nlk4uCxUaVcYjq1Ew
+         L3D4sRBMTLjdC/nstj4YIAduO2SJ8tRd+ZfU6chmJ+SQz5ZM3mn6LjaBq8iOsxrufOzV
+         nD0dy9frd7hIIyUcMvqWoO6McaoGIfsy4BRJpb401a1hxeM6MgZQRrC+gwdKFggK3ELI
+         If5mQsFVoENseY3yXWQxGg8Q1agiRWP1Tjb1co7XqOaNE3SwfOrEs06wG2HBrOU2wnAR
+         kzcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761686473; x=1762291273;
+        d=1e100.net; s=20230601; t=1761686474; x=1762291274;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tG66zI1+tyqk2y+i/GC8wCSgfETT28ZitF9FwVU9vh4=;
-        b=qCFs0BmubDEP7Qkkj72FV7DWHu003yOf+jpavlnms7IddWVdHrh4ud2oCTs/7v+rxN
-         naaHbqJy+YBpEnS9uN9HJdTuP+4zylu9ugk6MTKf/MbhRuQU/isBQiTNTd9OJGUqMv67
-         u4I98aEJGkeeDDO4i6rKubpVM4dVdJNo8OocI6Z98brp1FqM0j1nmDfOrD58FZXg1sIQ
-         vQ8IevDH8zFSZ3PFCxpOdxyiHww+JaloQaIzJ4j59z/Yl55G2IIt7brkFP3jyI5apXZH
-         dKbDdY09pGyIS1tY1DSyIeqoZK3lIHuOTJhZU4HxrarUST2167EwpKRPRBsI62KhMBuH
-         BYng==
-X-Forwarded-Encrypted: i=1; AJvYcCWCyLH1I/0y5wlVh0/hYea/Uzx6vIdREWq1nJZMzZsnd83KtwZ5EgKIRIpNocV+HpYpZ6s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBUP8Cz4KZaJ1tJMVp5JbBMabVhnBMeBXMKpfKNgXBtP/CmU8J
-	zM34WGdZdzTfq1AkGinMYuzNGwLeEjIIbSdoIyNRpQ+GRpMgf6dtkZrqKpV2VXMNI72MG7dMFGS
-	dXA==
-X-Google-Smtp-Source: AGHT+IEfjTcwiq0iGyeXz+L4N8OFRtJMWuG/A0eLPmPx9/8CzxaM1HhxaEpsbWAoy+R/iYIcBip4gWY4ZQ==
-X-Received: from oibfc3.prod.google.com ([2002:a05:6808:2a83:b0:443:a4fe:d05c])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6808:2f1b:b0:44d:ad7e:384b
- with SMTP id 5614622812f47-44f7a458e56mr434238b6e.22.1761686473114; Tue, 28
- Oct 2025 14:21:13 -0700 (PDT)
-Date: Tue, 28 Oct 2025 21:20:45 +0000
+        bh=RWiSKMHsCsObY85cOPgN5ZCBinR8ehpel+IU1V2UPag=;
+        b=iWJ1uGpBR8S4wLjiXIqf+TH6Lf6FtEQjhgf9IDBetPYUVkZYc1tPrud/vXdbwTYdBi
+         rERecBWbTx+NI7Q80dA43vbpnCimCXNDK7Mf0hwNgm+OIolDRzet66EV0onFIVbJV8RD
+         D2YKNxW4GIuzh03AO3xYWTcyYLJYm23aGuQQxOFHBQf1ZruMk4qi952wdX/sLPAcXc9v
+         uehpTvLbL85/sc/sNT8k41VLpQQa6egWooH/Js9rq2tbR19DYnFb2nUZb3dO8YxEuMDf
+         2QSuUFi/TRRfyJUG5SXIzQLvrV59h1gySl4nPbEz2whrQfKlz8RfgrsGfSbZEoHZMPw4
+         JEmA==
+X-Forwarded-Encrypted: i=1; AJvYcCVglYql40htdJnCc13nCduvYa69olIrSt1vp878sxFh+5DVQE/R5zsLE8lTfJcY7LOIHgg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB5ai5g64LId+EnPlssxZWAnLJxQfjFirI9bR1GaG4nVuZeO6X
+	LtTCvoQUKl1vLePcQ3X9CvbXFgi1Oo/c/MBrk4bYhOlQnqZA3vxrf+d6Lmr/T168SsFpph46n4p
+	DhQ==
+X-Google-Smtp-Source: AGHT+IEQmyMt4li1I5sjcaDw4Fuaj+3Ib9FdsdVQWkSD+9K6fkIrYbGFhTwCWgRZCpr4/Hz6JzHHsM049Q==
+X-Received: from oabkw32.prod.google.com ([2002:a05:6870:ac20:b0:3d1:c19b:7c01])
+ (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6870:b419:b0:3d2:c44b:4d23
+ with SMTP id 586e51a60fabf-3d745d993e1mr460823fac.6.1761686474093; Tue, 28
+ Oct 2025 14:21:14 -0700 (PDT)
+Date: Tue, 28 Oct 2025 21:20:46 +0000
 In-Reply-To: <20251028212052.200523-1-sagis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251028212052.200523-1-sagis@google.com>
 X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
-Message-ID: <20251028212052.200523-20-sagis@google.com>
-Subject: [PATCH v12 19/23] KVM: selftests: Finalize TD memory as part of kvm_arch_vm_finalize_vcpus
+Message-ID: <20251028212052.200523-21-sagis@google.com>
+Subject: [PATCH v12 20/23] KVM: selftests: Add support for TDX TDCALL from guest
 From: Sagi Shahar <sagis@google.com>
 To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
 	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
@@ -90,27 +90,217 @@ To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Call vm_tdx_finalize() as part of kvm_arch_vm_finalize_vcpus if this is
-a TDX vm
+From: Erdem Aktas <erdemaktas@google.com>
 
+Add support for TDX guests to issue TDCALLs to the TDX module.
+
+Signed-off-by: Erdem Aktas <erdemaktas@google.com>
+Co-developed-by: Sagi Shahar <sagis@google.com>
 Signed-off-by: Sagi Shahar <sagis@google.com>
 ---
- tools/testing/selftests/kvm/lib/x86/processor.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ tools/testing/selftests/kvm/Makefile.kvm      |  8 ++
+ .../selftests/kvm/include/x86/tdx/tdcall.h    | 34 +++++++
+ .../selftests/kvm/lib/x86/tdx/tdcall.S        | 93 +++++++++++++++++++
+ .../kvm/lib/x86/tdx/tdcall_offsets.c          | 16 ++++
+ 4 files changed, 151 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/tdcall.h
+ create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S
+ create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/tdcall_offsets.c
 
-diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-index 17f5a381fe43..09cc75ae8d26 100644
---- a/tools/testing/selftests/kvm/lib/x86/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-@@ -1360,3 +1360,9 @@ bool kvm_arch_has_default_irqchip(void)
- {
- 	return true;
- }
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 86fe629f2e81..969338b66592 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -20,6 +20,7 @@ LIBKVM += lib/userfaultfd_util.c
+ LIBKVM_STRING += lib/string_override.c
+ 
+ LIBKVM_ASM_DEFS += lib/x86/tdx/td_boot_offsets.c
++LIBKVM_ASM_DEFS += lib/x86/tdx/tdcall_offsets.c
+ 
+ LIBKVM_x86 += lib/x86/apic.c
+ LIBKVM_x86 += lib/x86/handlers.S
+@@ -33,6 +34,7 @@ LIBKVM_x86 += lib/x86/ucall.c
+ LIBKVM_x86 += lib/x86/vmx.c
+ LIBKVM_x86 += lib/x86/tdx/tdx_util.c
+ LIBKVM_x86 += lib/x86/tdx/td_boot.S
++LIBKVM_x86 += lib/x86/tdx/tdcall.S
+ 
+ LIBKVM_arm64 += lib/arm64/gic.c
+ LIBKVM_arm64 += lib/arm64/gic_v3.c
+@@ -352,7 +354,13 @@ $(OUTPUT)/lib/x86/tdx/td_boot.o: $(OUTPUT)/include/x86/tdx/td_boot_offsets.h
+ $(OUTPUT)/include/x86/tdx/td_boot_offsets.h: $(OUTPUT)/lib/x86/tdx/td_boot_offsets.s FORCE
+ 	$(call filechk,offsets,__TDX_BOOT_OFFSETS_H__)
+ 
++$(OUTPUT)/lib/x86/tdx/tdcall.o: $(OUTPUT)/include/x86/tdx/tdcall_offsets.h
 +
-+void kvm_arch_vm_finalize_vcpus(struct kvm_vm *vm)
++$(OUTPUT)/include/x86/tdx/tdcall_offsets.h: $(OUTPUT)/lib/x86/tdx/tdcall_offsets.s FORCE
++	$(call filechk,offsets,__TDCALL__OFFSETS_H__)
++
+ EXTRA_CLEAN += $(OUTPUT)/include/x86/tdx/td_boot_offsets.h
++EXTRA_CLEAN += $(OUTPUT)/include/x86/tdx/tdcall_offsets.h
+ 
+ $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+ $(SPLIT_TEST_GEN_OBJ): $(GEN_HDRS)
+diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdcall.h b/tools/testing/selftests/kvm/include/x86/tdx/tdcall.h
+new file mode 100644
+index 000000000000..60c70646f876
+--- /dev/null
++++ b/tools/testing/selftests/kvm/include/x86/tdx/tdcall.h
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Adapted from arch/x86/include/asm/shared/tdx.h */
++
++#ifndef SELFTESTS_TDX_TDCALL_H
++#define SELFTESTS_TDX_TDCALL_H
++
++#include <linux/bits.h>
++
++#define TDX_TDCALL_HAS_OUTPUT BIT(0)
++
++#ifndef __ASSEMBLY__
++
++#include <linux/types.h>
++
++/*
++ * Used in __tdx_tdcall() to pass down and get back registers' values of
++ * the TDCALL instruction when requesting services from the VMM.
++ *
++ * This is a software only structure and not part of the TDX module/VMM ABI.
++ */
++struct tdx_tdcall_args {
++	u64 r10;
++	u64 r11;
++	u64 r12;
++	u64 r13;
++	u64 r14;
++	u64 r15;
++};
++
++/* Used to request services from the VMM */
++u64 __tdx_tdcall(struct tdx_tdcall_args *args, unsigned long flags);
++
++#endif // __ASSEMBLY__
++#endif // SELFTESTS_TDX_TDCALL_H
+diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S b/tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S
+new file mode 100644
+index 000000000000..05869e86b9d8
+--- /dev/null
++++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S
+@@ -0,0 +1,93 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Adapted from arch/x86/virt/vmx/tdx/tdxcall.S */
++
++#ifndef __ASSEMBLY__
++#define __ASSEMBLY__
++#endif
++
++#include <linux/bits.h>
++#include "tdx/tdcall.h"
++#include "tdx/tdcall_offsets.h"
++
++/*
++ * TDCALL is supported in Binutils >= 2.36, add it for older version.
++ */
++#define tdcall		.byte 0x66,0x0f,0x01,0xcc
++
++/*
++ * Bitmasks of exposed registers (with VMM).
++ */
++#define TDX_R10		BIT(10)
++#define TDX_R11		BIT(11)
++#define TDX_R12		BIT(12)
++#define TDX_R13		BIT(13)
++#define TDX_R14		BIT(14)
++#define TDX_R15		BIT(15)
++
++/*
++ * These registers are clobbered to hold arguments for each
++ * TDVMCALL. They are safe to expose to the VMM.
++ * Each bit in this mask represents a register ID. Bit field
++ * details can be found in TDX GHCI specification, section
++ * titled "TDCALL [TDG.VP.VMCALL] leaf".
++ */
++#define TDVMCALL_EXPOSE_REGS_MASK    \
++         (TDX_R10 | TDX_R11 | TDX_R12 | TDX_R13 | TDX_R14 | TDX_R15)
++
++.code64
++.section .text
++
++.globl __tdx_tdcall
++.type __tdx_tdcall, @function
++__tdx_tdcall:
++	/* Set up stack frame */
++	push %rbp
++	movq %rsp, %rbp
++
++	/* Save callee-saved GPRs as mandated by the x86_64 ABI */
++	push %r15
++	push %r14
++	push %r13
++	push %r12
++
++	/* Mangle function call ABI into TDCALL ABI: */
++	/* Set TDCALL leaf ID (TDVMCALL (0)) in RAX */
++	xor %eax, %eax
++
++	/* Copy tdcall registers from arg struct: */
++	movq TDX_TDCALL_R10(%rdi), %r10
++	movq TDX_TDCALL_R11(%rdi), %r11
++	movq TDX_TDCALL_R12(%rdi), %r12
++	movq TDX_TDCALL_R13(%rdi), %r13
++	movq TDX_TDCALL_R14(%rdi), %r14
++	movq TDX_TDCALL_R15(%rdi), %r15
++
++	movl $TDVMCALL_EXPOSE_REGS_MASK, %ecx
++
++	tdcall
++
++	/* TDVMCALL leaf return code is in R10 */
++	movq %r10, %rax
++
++	/* Copy tdcall result registers to arg struct if needed */
++	testq $TDX_TDCALL_HAS_OUTPUT, %rsi
++	jz .Lout
++
++	movq %r10, TDX_TDCALL_R10(%rdi)
++	movq %r11, TDX_TDCALL_R11(%rdi)
++	movq %r12, TDX_TDCALL_R12(%rdi)
++	movq %r13, TDX_TDCALL_R13(%rdi)
++	movq %r14, TDX_TDCALL_R14(%rdi)
++	movq %r15, TDX_TDCALL_R15(%rdi)
++.Lout:
++	/* Restore callee-saved GPRs as mandated by the x86_64 ABI */
++	pop %r12
++	pop %r13
++	pop %r14
++	pop %r15
++
++	pop %rbp
++	ret
++
++/* Disable executable stack */
++.section .note.GNU-stack,"",%progbits
+diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdcall_offsets.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdcall_offsets.c
+new file mode 100644
+index 000000000000..dcd4457be6e5
+--- /dev/null
++++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdcall_offsets.c
+@@ -0,0 +1,16 @@
++// SPDX-License-Identifier: GPL-2.0
++#define COMPILE_OFFSETS
++
++#include <linux/kbuild.h>
++
++#include "tdx/tdcall.h"
++
++static void __attribute__((used)) common(void)
 +{
-+	if (is_tdx_vm(vm))
-+		vm_tdx_finalize(vm);
++	OFFSET(TDX_TDCALL_R10, tdx_tdcall_args, r10);
++	OFFSET(TDX_TDCALL_R11, tdx_tdcall_args, r11);
++	OFFSET(TDX_TDCALL_R12, tdx_tdcall_args, r12);
++	OFFSET(TDX_TDCALL_R13, tdx_tdcall_args, r13);
++	OFFSET(TDX_TDCALL_R14, tdx_tdcall_args, r14);
++	OFFSET(TDX_TDCALL_R15, tdx_tdcall_args, r15);
 +}
 -- 
 2.51.1.851.g4ebd6896fd-goog
