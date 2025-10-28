@@ -1,203 +1,455 @@
-Return-Path: <kvm+bounces-61259-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61260-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97E83C129AF
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 02:57:55 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C34C9C129B8
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 02:59:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1ADD1A224D1
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 01:58:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 077044F31A4
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 01:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFECF265281;
-	Tue, 28 Oct 2025 01:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA2D2690EC;
+	Tue, 28 Oct 2025 01:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="fMCPwrKW";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="CkhFTCz5"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ExXtKnF4"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04BF54652;
-	Tue, 28 Oct 2025 01:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1E91E5724;
+	Tue, 28 Oct 2025 01:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761616661; cv=none; b=FSHonAlC/7nHB+nTsh57WPXRWZaa/W3fTivUVCK2CY4kkuCQyvdt8nFahlzAdq5+Ca7dArAoMoTwyIvNAi9hWfGsIcrGOnj3mSfyejgm4Np9LyzpYo/HYRvryQ5vKAGWnpj2u8pnDFcHR2ZKOnj2VQgp1DLnh7AcdQ7JnrWb9kM=
+	t=1761616735; cv=none; b=BIsi51vBQqXCq6T0C4t1Nga2YHuUNEwF888gcWCXTXoIWE4eU4DiVbmz94zntKP0pnJMI3vSb/UrnH7FQmiYVlZRzJzrKCkrFa2DYXPEUZJSy9ZuknM/7ZnPKP0A0SF0K+9C7JYPuRR6cTD5KebOM9wkxvK49lMO9Sda7bqv3As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761616661; c=relaxed/simple;
-	bh=8fcf2xi8Tp6koExwjk5eGsIG6oSBBq2uYlg7ArkbYRg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lemVE5UouAUqGcYRa6T6d6eEid8FUqCREzK7Scd8Pmbx0oW9Qr+vOX1w7sSdIqsnyLELkiid6qBfLYdzkHmh4CuRYVIPCz6hY9BaoHlpgZKG9KyWJEMFuyb7jPabGqv/294++yDKvqqS4wo0L6XiVtZ8n+P8hsVhS7eS7D5DoZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=fMCPwrKW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=CkhFTCz5; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailfout.phl.internal (Postfix) with ESMTP id B6727EC0406;
-	Mon, 27 Oct 2025 21:57:36 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Mon, 27 Oct 2025 21:57:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1761616656;
-	 x=1761703056; bh=XBjHA7L9P0wzKRSxKX3F3G/r6tzRjlUTprVSDB/LgG4=; b=
-	fMCPwrKWS4rMUBQ4nT0/2jFBfkpOWqzGMZs6rE5XKj6UWPLzzc8FHCabwMqleGB4
-	wlT9M5Wexu/oQZB8OExQGUyywmdPCNbbVp9+bKGx7qMOuJad1HPh8FTnBi/cJh/Q
-	HYZNM6ywm9sVze+cCLp4AiOqlxx3QIhWxd7gglTsx6P/Y/Or0V6o1EB0qus6qgVQ
-	YkbjVQqbhj69cfnJv5P4ROw9P5aoAugkVPPNLpd8WIJRyBLoLZHAo07iEI6tVSur
-	tMyHkp8fn5JUEWdmH1+Z2kIDm/sM3v3TyLjgUNPRPtldjINO2fIwI228Yfs2MgvT
-	00tnPc9aiZpX2Pydk82xFg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1761616656; x=
-	1761703056; bh=XBjHA7L9P0wzKRSxKX3F3G/r6tzRjlUTprVSDB/LgG4=; b=C
-	khFTCz5HE7AsKaqVXHC1iTjZAr4ucmXRyG6CkHqYHxW03BlivgzPMpIlcE3XHoIt
-	iiM3fl3aJ0iboDivzhlLLKS9MsE03e9V15BE3UBMLs+WnJGhyG2kXtisrbE+DnH8
-	zMSfpRCia4FA3u9bijZGNk2eANPy1uTF3I7cQMdRMvhmlnNNZEHJ0cNlwJjwXOlP
-	hrkB7ygt9TX5nr+KABfv3Dt4KfOF9tLFnUvbegCfyJrhzpDT3jjfLAeEO4WcAuhr
-	TUD+Su9WixNSgKf44YWoFjkvhEW09bULcF7r7lXQNjNGZMx8c4xdOx2C/rEX7Tfs
-	CSO4g01RF4MK9gos9kSbg==
-X-ME-Sender: <xms:DyMAaaGeUoBAQHHsIvDr5l2a0qM61NXO1ly9e_IbON_1z9Mr8xvXrg>
-    <xme:DyMAaUqgC5wmQO6YB7WiueT46RIX0eIrA_2DFH26SOFzoP2mYCX2Pd4uXucsJK1pJ
-    eJgZat4jjui7RsXy80jVb52sDr1iJ0DOPUqa-jHBOIJXd2KyhMQVQ>
-X-ME-Received: <xmr:DyMAabaKozkE-aiN5CyAOcfGce3-BH501DN0QbH4P4oTCedl9ziH-hsO1Vc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduheelheelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
-    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
-    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
-    hffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopeeipdhmohguvgepshhm
-    thhpohhuthdprhgtphhtthhopegrmhgrshhtrhhosehfsgdrtghomhdprhgtphhtthhope
-    grlhgvjhgrnhgurhhordhjrdhjihhmvghnvgiisehorhgrtghlvgdrtghomhdprhgtphht
-    thhopehjghhgseiiihgvphgvrdgtrgdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrh
-    hnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohepughmrghtlhgrtghksehgohhoghhlvgdrtghomh
-X-ME-Proxy: <xmx:DyMAaVWyObzMWBMDLNjQbYK6v1tCWgVYwg2FX5-_wYHaFGWtSV7q-g>
-    <xmx:DyMAac_CLSUgKQ_nbyf4IYopgYeJ4ygCtQYqVx_S4PQMX76U-UOKUw>
-    <xmx:DyMAaW_wIwmhHHRjmbWEzsl6hbkKDhe5kJGJS2OQIBFk3IVAHKVtUg>
-    <xmx:DyMAaUT16AGKI_s2d_WpjUBmGkBGUJ29zspdlPqMLtqAVcRNveWzKA>
-    <xmx:ECMAaRJYfQ_doyWOfakKQj4p0wvG2dLTZU6X4Fg3Cb-3U9Kp80930WoL>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 27 Oct 2025 21:57:35 -0400 (EDT)
-Date: Mon, 27 Oct 2025 19:57:32 -0600
-From: Alex Williamson <alex@shazbot.org>
-To: Alex Mastro <amastro@fb.com>
-Cc: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, Jason Gunthorpe
- <jgg@ziepe.ca>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v4 0/3] vfio: handle DMA map/unmap up to the addressable
- limit
-Message-ID: <20251027195732.2b7d1d3f@shazbot.org>
-In-Reply-To: <aP+Xr1DrNM7gYD8v@devgpu012.nha5.facebook.com>
-References: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
-	<20251015132452.321477fa@shazbot.org>
-	<3308406e-2e64-4d53-8bcc-bac84575c1d9@oracle.com>
-	<aPFheZru+U+C4jT7@devgpu015.cco6.facebook.com>
-	<20251016160138.374c8cfb@shazbot.org>
-	<aPJu5sXw6v3DI8w8@devgpu012.nha5.facebook.com>
-	<20251020153633.33bf6de4@shazbot.org>
-	<aPe0E6Jj9BJA2Bd5@devgpu012.nha5.facebook.com>
-	<aP+Xr1DrNM7gYD8v@devgpu012.nha5.facebook.com>
+	s=arc-20240116; t=1761616735; c=relaxed/simple;
+	bh=4NqtOroGMdWvkpdSPaNjRBnpSQapxVYKlKtcvx7tKcc=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=R7tEAAi3RPol2bw8I81+6iE+0508e14zFHFbQbTPBRiYK1/fnh55RsKLIiYx/Gr/ieqXM3I8MhozAGS6/Q85gqfrzqrdPvkzUnZguJB/4D2Gjao6vwwCr/y9JNdWpjYkqX+ZHIq49aRIc2naAPlT9zKpaQhEjYm+hGWO8DV6ApY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ExXtKnF4; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=KHOUpXHjal8YuCB+IlsQ+Bw37AmAL2Nch+hc/9k2doM=;
+	b=ExXtKnF4eKiKvd4ez4uMi71II+rHmFkxPahroG9mgmDV+ZOWcFxdR3ec/87SC0wG9+OgOEqCM
+	PNKSdzK3PBVfMm6OhbtLFgYz/Ve37cmfVsii41vUbvR8TMGPuLC56FwXZSRqlKD2JQMu0s4iUo2
+	wNNl4czZullNdKNRnDxTFZU=
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4cwYS44kHqz12LFQ;
+	Tue, 28 Oct 2025 09:58:12 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9EC7C1402C4;
+	Tue, 28 Oct 2025 09:58:50 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 28 Oct 2025 09:58:49 +0800
+Subject: Re: [PATCH v10 2/2] hisi_acc_vfio_pci: adapt to new migration
+ configuration
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
+	<jonathan.cameron@huawei.com>
+CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+References: <20251017091057.3770403-1-liulongfang@huawei.com>
+ <20251017091057.3770403-3-liulongfang@huawei.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <5ceaf17e-9ae6-901b-7074-5971ee782f32@huawei.com>
+Date: Tue, 28 Oct 2025 09:58:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20251017091057.3770403-3-liulongfang@huawei.com>
+Content-Type: text/plain; charset="gbk"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
-On Mon, 27 Oct 2025 09:02:55 -0700
-Alex Mastro <amastro@fb.com> wrote:
-
-> On Tue, Oct 21, 2025 at 09:25:55AM -0700, Alex Mastro wrote:
-> > On Mon, Oct 20, 2025 at 03:36:33PM -0600, Alex Williamson wrote:     
-> > > Along with the tag, it would probably be useful in that same commit to
-> > > expand on the scope of the issue in the commit log.  I believe we allow
-> > > mappings to be created at the top of the address space that cannot be
-> > > removed via ioctl, but such inconsistency should result in an
-> > > application error due to the failed ioctl and does not affect cleanup
-> > > on release.  
+On 2025/10/17 17:10, Longfang Liu wrote:
+> On new platforms greater than QM_HW_V3, the migration region has been
+> relocated from the VF to the PF. The VF's own configuration space is
+> restored to the complete 64KB, and there is no need to divide the
+> size of the BAR configuration space equally. The driver should be
+> modified accordingly to adapt to the new hardware device.
 > 
-> I want to make sure I understand the cleanup on release path. Is my supposition
-> below correct?
+> On the older hardware platform QM_HW_V3, the live migration configuration
+> region is placed in the latter 32K portion of the VF's BAR2 configuration
+> space. On the new hardware platform QM_HW_V4, the live migration
+> configuration region also exists in the same 32K area immediately following
+> the VF's BAR2, just like on QM_HW_V3.
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 916cad80941c..7f8d23b06680 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -1127,6 +1127,7 @@ static size_t unmap_unpin_slow(struct vfio_domain *domain,
->  static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
->  			     bool do_accounting)
->  {
-> +	// end == 0 due to overflow
->  	dma_addr_t iova = dma->iova, end = dma->iova + dma->size;
->  	struct vfio_domain *domain, *d;
->  	LIST_HEAD(unmapped_region_list);
-> @@ -1156,6 +1157,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
->  	}
->  
->  	iommu_iotlb_gather_init(&iotlb_gather);
-> +	// doesn't enter the loop, never calls iommu_unmap
-
-If it were only that, I think the iommu_domain_free() would be
-sufficient, but it looks like we're also missing the unpin.  Freeing
-the IOMMU domain isn't going to resolve that.  So it actually appears
-we're leaking those pinned pages and this isn't as self-resolving as I
-had thought.  I imagine if you ran your new unit test to the point where
-we'd pinned and failed to unpin the majority of memory you'd start to
-see system-wide problems.  Thanks,
-
-Alex
-
->  	while (iova < end) {
->  		size_t unmapped, len;
->  		phys_addr_t phys, next;
-> @@ -1210,6 +1212,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
->  static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->  {
->  	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
-> +	// go here
->  	vfio_unmap_unpin(iommu, dma, true);
->  	vfio_unlink_dma(iommu, dma);
->  	put_task_struct(dma->task);
-> @@ -2394,6 +2397,8 @@ static void vfio_iommu_unmap_unpin_all(struct vfio_iommu *iommu)
->  	struct rb_node *node;
->  
->  	while ((node = rb_first(&iommu->dma_list)))
-> +		// eventually, we attempt to remove the end of address space
-> +		// mapping
->  		vfio_remove_dma(iommu, rb_entry(node, struct vfio_dma, node));
+> However, access to this region is now controlled by hardware. Additionally,
+> a copy of the live migration configuration region is present in the PF's
+> BAR2 configuration space. On the new hardware platform QM_HW_V4, when an
+> older version of the driver is loaded, it behaves like QM_HW_V3 and uses
+> the configuration region in the VF, ensuring that the live migration
+> function continues to work normally. When the new version of the driver is
+> loaded, it directly uses the configuration region in the PF. Meanwhile,
+> hardware configuration disables the live migration configuration region
+> in the VF's BAR2: reads return all 0xF values, and writes are silently
+> ignored.
+> 
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> Reviewed-by: Shameer Kolothum <shameerkolothum@gmail.com>
+> ---
+>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 205 ++++++++++++------
+>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  21 ++
+>  2 files changed, 165 insertions(+), 61 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> index fde33f54e99e..55233e62cb1d 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> @@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
+>  	return 0;
 >  }
 >  
-> @@ -2628,6 +2633,8 @@ static void vfio_release_domain(struct vfio_domain *domain)
->  		kfree(group);
+> +static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> +			   struct acc_vf_data *vf_data)
+> +{
+> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+> +	struct device *dev = &qm->pdev->dev;
+> +	u32 eqc_addr, aeqc_addr;
+> +	int ret;
+> +
+> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL) {
+> +		eqc_addr = QM_EQC_DW0;
+> +		aeqc_addr = QM_AEQC_DW0;
+> +	} else {
+> +		eqc_addr = QM_EQC_PF_DW0;
+> +		aeqc_addr = QM_AEQC_PF_DW0;
+> +	}
+> +
+> +	/* QM_EQC_DW has 7 regs */
+> +	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to read QM_EQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	/* QM_AEQC_DW has 7 regs */
+> +	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> +			   struct acc_vf_data *vf_data)
+> +{
+> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+> +	struct device *dev = &qm->pdev->dev;
+> +	u32 eqc_addr, aeqc_addr;
+> +	int ret;
+> +
+> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL) {
+> +		eqc_addr = QM_EQC_DW0;
+> +		aeqc_addr = QM_AEQC_DW0;
+> +	} else {
+> +		eqc_addr = QM_EQC_PF_DW0;
+> +		aeqc_addr = QM_AEQC_PF_DW0;
+> +	}
+> +
+> +	/* QM_EQC_DW has 7 regs */
+> +	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to write QM_EQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	/* QM_AEQC_DW has 7 regs */
+> +	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>  {
+>  	struct device *dev = &qm->pdev->dev;
+> @@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>  		return ret;
 >  	}
 >  
-> +	// Is this backstop what saves us? Even though we didn't do individual
-> +	// unmaps, the "leaked" end of address space mappings get freed here?
->  	iommu_domain_free(domain->domain);
+> -	/* QM_EQC_DW has 7 regs */
+> -	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to read QM_EQC_DW\n");
+> -		return ret;
+> -	}
+> -
+> -	/* QM_AEQC_DW has 7 regs */
+> -	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> -		return ret;
+> -	}
+> -
+>  	return 0;
 >  }
 >  
-> @@ -2643,10 +2650,12 @@ static void vfio_iommu_type1_release(void *iommu_data)
->  		kfree(group);
+> @@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>  		return ret;
 >  	}
 >  
-> +	// start here
->  	vfio_iommu_unmap_unpin_all(iommu);
+> -	/* QM_EQC_DW has 7 regs */
+> -	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to write QM_EQC_DW\n");
+> -		return ret;
+> -	}
+> -
+> -	/* QM_AEQC_DW has 7 regs */
+> -	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> -		return ret;
+> -	}
+> -
+>  	return 0;
+>  }
 >  
->  	list_for_each_entry_safe(domain, domain_tmp,
->  				 &iommu->domain_list, next) {
-> +		// eventually...
->  		vfio_release_domain(domain);
->  		list_del(&domain->next);
->  		kfree(domain);
+> @@ -522,6 +560,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>  		return ret;
+>  	}
+>  
+> +	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
+>  	if (ret) {
+>  		dev_err(dev, "set sqc failed\n");
+> @@ -589,6 +631,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>  	vf_data->vf_qm_state = QM_READY;
+>  	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+>  
+> +	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ret = vf_qm_read_data(vf_qm, vf_data);
+>  	if (ret)
+>  		return ret;
+> @@ -1186,34 +1232,52 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+>  {
+>  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
+>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+> +	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
+>  	struct pci_dev *vf_dev = vdev->pdev;
+> +	u32 val;
+>  
+> -	/*
+> -	 * ACC VF dev BAR2 region consists of both functional register space
+> -	 * and migration control register space. For migration to work, we
+> -	 * need access to both. Hence, we map the entire BAR2 region here.
+> -	 * But unnecessarily exposing the migration BAR region to the Guest
+> -	 * has the potential to prevent/corrupt the Guest migration. Hence,
+> -	 * we restrict access to the migration control space from
+> -	 * Guest(Please see mmap/ioctl/read/write override functions).
+> -	 *
+> -	 * Please note that it is OK to expose the entire VF BAR if migration
+> -	 * is not supported or required as this cannot affect the ACC PF
+> -	 * configurations.
+> -	 *
+> -	 * Also the HiSilicon ACC VF devices supported by this driver on
+> -	 * HiSilicon hardware platforms are integrated end point devices
+> -	 * and the platform lacks the capability to perform any PCIe P2P
+> -	 * between these devices.
+> -	 */
+> +	val = readl(pf_qm->io_base + QM_MIG_REGION_SEL);
+> +	if (pf_qm->ver > QM_HW_V3 && (val & QM_MIG_REGION_EN))
+> +		hisi_acc_vdev->drv_mode = HW_ACC_MIG_PF_CTRL;
+> +	else
+> +		hisi_acc_vdev->drv_mode = HW_ACC_MIG_VF_CTRL;
+>  
+> -	vf_qm->io_base =
+> -		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+> -			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+> -	if (!vf_qm->io_base)
+> -		return -EIO;
+> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_PF_CTRL) {
+> +		/*
+> +		 * On hardware platforms greater than QM_HW_V3, the migration function
+> +		 * register is placed in the BAR2 configuration region of the PF,
+> +		 * and each VF device occupies 8KB of configuration space.
+> +		 */
+> +		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
+> +				 hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
+> +	} else {
+> +		/*
+> +		 * ACC VF dev BAR2 region consists of both functional register space
+> +		 * and migration control register space. For migration to work, we
+> +		 * need access to both. Hence, we map the entire BAR2 region here.
+> +		 * But unnecessarily exposing the migration BAR region to the Guest
+> +		 * has the potential to prevent/corrupt the Guest migration. Hence,
+> +		 * we restrict access to the migration control space from
+> +		 * Guest(Please see mmap/ioctl/read/write override functions).
+> +		 *
+> +		 * Please note that it is OK to expose the entire VF BAR if migration
+> +		 * is not supported or required as this cannot affect the ACC PF
+> +		 * configurations.
+> +		 *
+> +		 * Also the HiSilicon ACC VF devices supported by this driver on
+> +		 * HiSilicon hardware platforms are integrated end point devices
+> +		 * and the platform lacks the capability to perform any PCIe P2P
+> +		 * between these devices.
+> +		 */
+>  
+> +		vf_qm->io_base =
+> +			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+> +				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+> +		if (!vf_qm->io_base)
+> +			return -EIO;
+> +	}
+>  	vf_qm->fun_type = QM_HW_VF;
+> +	vf_qm->ver = pf_qm->ver;
+>  	vf_qm->pdev = vf_dev;
+>  	mutex_init(&vf_qm->mailbox_lock);
+>  
+> @@ -1250,6 +1314,28 @@ static struct hisi_qm *hisi_acc_get_pf_qm(struct pci_dev *pdev)
+>  	return !IS_ERR(pf_qm) ? pf_qm : NULL;
+>  }
+>  
+> +static size_t hisi_acc_get_resource_len(struct vfio_pci_core_device *vdev,
+> +					unsigned int index)
+> +{
+> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
+> +			hisi_acc_drvdata(vdev->pdev);
+> +
+> +	/*
+> +	 * On the old HW_ACC_MIG_VF_CTRL mode device, the ACC VF device
+> +	 * BAR2 region encompasses both functional register space
+> +	 * and migration control register space.
+> +	 * only the functional region should be report to Guest.
+> +	 */
+> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL)
+> +		return (pci_resource_len(vdev->pdev, index) >> 1);
+> +	/*
+> +	 * On the new HW device, the migration control register
+> +	 * has been moved to the PF device BAR2 region.
+> +	 * The VF device BAR2 is entirely functional register space.
+> +	 */
+> +	return pci_resource_len(vdev->pdev, index);
+> +}
+> +
+>  static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
+>  					size_t count, loff_t *ppos,
+>  					size_t *new_count)
+> @@ -1260,8 +1346,9 @@ static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
+>  
+>  	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+>  		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> -		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
+> +		resource_size_t end;
+>  
+> +		end = hisi_acc_get_resource_len(vdev, index);
+>  		/* Check if access is for migration control region */
+>  		if (pos >= end)
+>  			return -EINVAL;
+> @@ -1282,8 +1369,9 @@ static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
+>  	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+>  	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+>  		u64 req_len, pgoff, req_start;
+> -		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
+> +		resource_size_t end;
+>  
+> +		end = hisi_acc_get_resource_len(vdev, index);
+>  		req_len = vma->vm_end - vma->vm_start;
+>  		pgoff = vma->vm_pgoff &
+>  			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+> @@ -1330,7 +1418,6 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
+>  	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
+>  		struct vfio_pci_core_device *vdev =
+>  			container_of(core_vdev, struct vfio_pci_core_device, vdev);
+> -		struct pci_dev *pdev = vdev->pdev;
+>  		struct vfio_region_info info;
+>  		unsigned long minsz;
+>  
+> @@ -1345,12 +1432,7 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
+>  		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
+>  			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+>  
+> -			/*
+> -			 * ACC VF dev BAR2 region consists of both functional
+> -			 * register space and migration control register space.
+> -			 * Report only the functional region to Guest.
+> -			 */
+> -			info.size = pci_resource_len(pdev, info.index) / 2;
+> +			info.size = hisi_acc_get_resource_len(vdev, info.index);
+>  
+>  			info.flags = VFIO_REGION_INFO_FLAG_READ |
+>  					VFIO_REGION_INFO_FLAG_WRITE |
+> @@ -1521,7 +1603,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+>  	hisi_acc_vf_disable_fds(hisi_acc_vdev);
+>  	mutex_lock(&hisi_acc_vdev->open_mutex);
+>  	hisi_acc_vdev->dev_opened = false;
+> -	iounmap(vf_qm->io_base);
+> +	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL)
+> +		iounmap(vf_qm->io_base);
+>  	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>  	vfio_pci_core_close_device(core_vdev);
+>  }
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> index 91002ceeebc1..d287abe3dd31 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> @@ -59,6 +59,26 @@
+>  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
+>  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
+>  
+> +#define QM_MIG_REGION_OFFSET		0x180000
+> +#define QM_MIG_REGION_SIZE		0x2000
+> +
+> +#define QM_SUB_VERSION_ID		0x100210
+> +#define QM_EQC_PF_DW0			0x1c00
+> +#define QM_AEQC_PF_DW0			0x1c20
+> +
+> +/**
+> + * On HW_ACC_MIG_VF_CTRL mode, the configuration domain supporting live
+> + * migration functionality is located in the latter 32KB of the VF's BAR2.
+> + * The Guest is only provided with the first 32KB of the VF's BAR2.
+> + * On HW_ACC_MIG_PF_CTRL mode, the configuration domain supporting live
+> + * migration functionality is located in the PF's BAR2, and the entire 64KB
+> + * of the VF's BAR2 is allocated to the Guest.
+> + */
+> +enum hw_drv_mode {
+> +	HW_ACC_MIG_VF_CTRL = 0,
+> +	HW_ACC_MIG_PF_CTRL,
+> +};
+> +
+>  struct acc_vf_data {
+>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+>  	/* QM match information */
+> @@ -125,6 +145,7 @@ struct hisi_acc_vf_core_device {
+>  	struct pci_dev *vf_dev;
+>  	struct hisi_qm *pf_qm;
+>  	struct hisi_qm vf_qm;
+> +	int drv_mode;
+>  	/*
+>  	 * vf_qm_state represents the QM_VF_STATE register value.
+>  	 * It is set by Guest driver for the ACC VF dev indicating
+> 
+
+Hi Alex:
+Could you please take a moment to review this patch?
+
+Thanks.
+Longfang.
 
 
