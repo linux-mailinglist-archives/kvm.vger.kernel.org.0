@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-61355-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61356-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32B29C172B7
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 23:19:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A027BC1729B
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 23:17:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E629B3A6A9D
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 22:17:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFE741C27B83
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 22:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF2A3590C8;
-	Tue, 28 Oct 2025 22:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5D23596E3;
+	Tue, 28 Oct 2025 22:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mVZDqsZ0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="G6bN35oQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D835D3587C6
-	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 22:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784A1358D1F;
+	Tue, 28 Oct 2025 22:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761689572; cv=none; b=jsJnOe+bdSzxOI+wLQtCz73ttPjnPn1FHRYa2ZCw0gh46srAHbh1RG6Py5DyisTm5g6kdC6TIj0aoYYZkGwkVjJ31dVHwk3brC7vY41XI3CoclVD0WGWJMzynx5NurZqKtX8EwTmxs8HSTQUcOZqFWjKU9AqEhy4hkyeUvHbtbw=
+	t=1761689573; cv=none; b=CATtMKOHH1H+pGEpxwWW4NDEtdYKEoApeIzMKVtgUaSDzB2pCtjDSlyE1FxvCSru1vYUNHGZa8kGDM1e5IK8DP4Fpn7Z9iWYZ7n1/mpXdLAj7O8dP4cLKnusVcZ0utu0BvEk3EBeWhN4XvklzRNWN1nKYsLS7dd/KzhJxR8xj0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761689572; c=relaxed/simple;
-	bh=9WJOVfUVt6JAy1/UQov7Gl5mNjlNFcOn/orYhjsBu8s=;
+	s=arc-20240116; t=1761689573; c=relaxed/simple;
+	bh=4LtXR1MFrLpUgKdjFe2eFpVq+CsdRnoldBQt2gwLI2o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RmtL5bQ3PttKOcyOHkXyX7mDtySWe4QRcMBf031jEM2vfjJFetgisJ+EVxEeUBf0nIkes23cVJ/u/RUomzrXfTNhZf/1UO7lhtbscQiLUmDQvSxBliZ6l7viQYWf/Y2qLS2PfELBO2fDIp6XUoiOQSaNR/P53dfeDd8ZnJF0ifw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mVZDqsZ0; arc=none smtp.client-ip=91.218.175.177
+	 MIME-Version; b=HbF7EanfdPTEpjyXpz9JHTSmYzVHztAIZ8Nor8mZ6doG0hY/Sczi9LYIbO6xgTG4FyqxsW5MpRS6VLqPL4UXRSKAr3yKQnaWhbzBwoTCUJLFOR+2TL0zPI33HfhHA5F9Qnz+8cmQ/tt1Do4RUtuYFmXATbNtyM5+a0O9f+ZXfzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=G6bN35oQ; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761689568;
+	t=1761689569;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pghCsaBoSG4WPtJyc67VHSNRWgOinnAutbnbmUGrr2A=;
-	b=mVZDqsZ0MItI0fecjzUjLd9vzB5MALq7VxBkc+C8PpRZSkxnKgHFLyAgRWOotQcdKkE91J
-	IyYYdKZlM536l4jtEIuaAFreIUKffsaP/geDWTJbRvu36EMzWYv/RGIQDLXnaJ6IKtxG5W
-	Axv/H7mErzgAdQ7A0npYN7Mkx2OusRs=
+	bh=kV7XKkm5h17HxE9fn8bhOfc3i9LVxpvvTJ47xHYqFec=;
+	b=G6bN35oQPMUMoBQyQn5HGfAQ6UD71mTQ4Hn9EzjUyt6l6LiqsjQUyR9/3zOVZOZnXeLB37
+	laKlrPITSFdkYzK4dCd0x8mQ23kiZ9ztqa51t2HAr1J2dwvye7oQ6TawY0tZJhJBNZx6L5
+	jpks3PKVllA1lvSPH2nK3NULTRMUdKs=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,9 +49,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [kvm-unit-tests v2 5/8] x86/svm: Report unsupported SVM tests
-Date: Tue, 28 Oct 2025 22:12:10 +0000
-Message-ID: <20251028221213.1937120-6-yosry.ahmed@linux.dev>
+Subject: [kvm-unit-tests v2 6/8] x86/svm: Move report_svm_guest() to the top of svm_tests.c
+Date: Tue, 28 Oct 2025 22:12:11 +0000
+Message-ID: <20251028221213.1937120-7-yosry.ahmed@linux.dev>
 In-Reply-To: <20251028221213.1937120-1-yosry.ahmed@linux.dev>
 References: <20251028221213.1937120-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -63,30 +63,61 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Print a message when a test is skipped due to being unsupported for
-better visibility.
+Move the macro ahead of other tests that will start using it.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- x86/svm.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ x86/svm_tests.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/x86/svm.c b/x86/svm.c
-index 035367a1e90cf..5015339ddb657 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -403,8 +403,10 @@ int run_svm_tests(int ac, char **av, struct svm_test *svm_tests)
- 	for (; svm_tests[i].name != NULL; i++) {
- 		if (!test_wanted(svm_tests[i].name, av, ac))
- 			continue;
--		if (svm_tests[i].supported && !svm_tests[i].supported())
-+		if (svm_tests[i].supported && !svm_tests[i].supported()) {
-+			report_skip("%s (not supported)", svm_tests[i].name);
- 			continue;
-+		}
- 		if (svm_tests[i].v2 == NULL) {
- 			if (svm_tests[i].on_vcpu) {
- 				if (cpu_count() <= svm_tests[i].on_vcpu)
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index feeb27d61435b..61ab63db462dc 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -37,6 +37,21 @@ u64 latclgi_max;
+ u64 latclgi_min;
+ u64 runs;
+ 
++/*
++ * Report failures from SVM guest code, and on failure, set the stage to -1 and
++ * do VMMCALL to terminate the test (host side must treat -1 as "finished").
++ * TODO: fix the tests that don't play nice with a straight report, e.g. the
++ * V_TPR test fails if report() is invoked.
++ */
++#define report_svm_guest(cond, test, fmt, args...)	\
++do {							\
++	if (!(cond)) {					\
++		report_fail(fmt, ##args);		\
++		set_test_stage(test, -1);		\
++		vmmcall();				\
++	}						\
++} while (0)
++
+ static void null_test(struct svm_test *test)
+ {
+ }
+@@ -1074,21 +1089,6 @@ static bool lat_svm_insn_check(struct svm_test *test)
+ 	return true;
+ }
+ 
+-/*
+- * Report failures from SVM guest code, and on failure, set the stage to -1 and
+- * do VMMCALL to terminate the test (host side must treat -1 as "finished").
+- * TODO: fix the tests that don't play nice with a straight report, e.g. the
+- * V_TPR test fails if report() is invoked.
+- */
+-#define report_svm_guest(cond, test, fmt, args...)	\
+-do {							\
+-	if (!(cond)) {					\
+-		report_fail(fmt, ##args);		\
+-		set_test_stage(test, -1);		\
+-		vmmcall();				\
+-	}						\
+-} while (0)
+-
+ bool pending_event_ipi_fired;
+ bool pending_event_guest_run;
+ 
 -- 
 2.51.1.851.g4ebd6896fd-goog
 
