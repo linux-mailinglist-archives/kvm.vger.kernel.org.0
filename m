@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-61351-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61352-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19CD9C17282
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B64CC17285
 	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 23:16:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC2364058E7
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 22:15:48 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 09490352210
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 22:16:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0229735770F;
-	Tue, 28 Oct 2025 22:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCC8357A5D;
+	Tue, 28 Oct 2025 22:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="StekrSeU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ni25ZmVj"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F2A355806
-	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 22:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296FB3570D4
+	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 22:12:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761689565; cv=none; b=LkAMs6r6+/nxxQeKs9DavVEKC4OE0eNkk/6CPhOrIkV9bIntMvZjZJnPCfqiXafyPwgpFuLAFDESAPZy/AbaKsWuRM/SVFFFkyA/YJnV7bH/p2jjpII9Sf2uRpEpnLLhkQXbR07evd/PUwyH9UjJ4iLKv/x8bDTRlXnJwOQXGlM=
+	t=1761689566; cv=none; b=Nb+1JMiSORt87T2aWNYnp5kpLGi/Rta0F7pNlIz5CFk4ooYg7h6cSQ9bY5lRThdQlwxQMAQDQ/q/jc6vKCguYplQ7JtF37QGtEAuZKUXlEt+VbD+/SnKZxHyTiIOMDXLIY83j9gwufO8jYeRxaGbF5wIUWaZHNm3fFzqWncps/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761689565; c=relaxed/simple;
-	bh=xxeKlF8mwwnlrrgJ5iUG+Sr9g1freJAFqFCx5sFfPto=;
+	s=arc-20240116; t=1761689566; c=relaxed/simple;
+	bh=vJh+S3CgEPIc6Aa6El12XCOuqGg4J1P9NaFdpLOjBXI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T5tB1sFp9cAZtEt8CZMh9JtFQ5SlR1TyNoHOgGspfRDGaJ5Q7CurHPqox5pOtR/63DhP3JIPTMPGNWSchnjGHogqdErEl9yW+g6+3uHsj0KNVYZ2eHKVzYxs36ml2Sr8Hno0E6/JHMlAPua1VB9M8GnI136/qF6s7cIITnpopq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=StekrSeU; arc=none smtp.client-ip=91.218.175.178
+	 MIME-Version; b=Ny14vQnuPxm990Xa0eucloWJaZ3D9uw3J/RrK6zyISy0RxF+XSUbQyhz8MIbWIiaiUYcNwxcGfXT9GUz/4CbHL4muGAcfLcqFoVhFAZYUzDld1OCGVsZOfaBp3cAMIqyJ+2wsnGLhzrM5b7UEoXjodBdgvDO21LuvQK3T808/B0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ni25ZmVj; arc=none smtp.client-ip=91.218.175.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761689561;
+	t=1761689563;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1Peddc7Q36WMJTpzb2qo2jbZSMjh5dJyVyT5u+gHEIs=;
-	b=StekrSeUZvXHyXuPrkb3ATeaqN/iQxe8KQqTsltCdgUXGfOz6F4laz22aypepTdqxelqTG
-	Reef7DZTx+uzJW1SzUwAlI+4p1ej7E89S9kZlRWfIIXBM7pNdEbv0BDNVKiBnAFUJBF6cV
-	vVJszKBS+6Fm48VkAnyslWxIAx3dORU=
+	bh=1kVP3FxBT54Ty/cM/5sjNG3Lv4LKxVmh1cwe5DD5L7w=;
+	b=Ni25ZmVj6fZoxDElrOQFIS2aUbwBOJMhb6EYORMWCMoTee/RIggEnSFBZKwKpYG3hOqKmi
+	mreesfxOpbtwXB3iJuLRvSX3H6odJuLkzpJZmVjaCUbGZWHjeRc29lf0D9KdzysPwpFpCe
+	ltBFF7fqb3ZVaaOqg8+EzICZQoQtl5g=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,9 +49,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [kvm-unit-tests v2 1/8] scripts: Always return '2' when skipping tests
-Date: Tue, 28 Oct 2025 22:12:06 +0000
-Message-ID: <20251028221213.1937120-2-yosry.ahmed@linux.dev>
+Subject: [kvm-unit-tests v2 2/8] x86/svm: Cleanup selective cr0 write intercept test
+Date: Tue, 28 Oct 2025 22:12:07 +0000
+Message-ID: <20251028221213.1937120-3-yosry.ahmed@linux.dev>
 In-Reply-To: <20251028221213.1937120-1-yosry.ahmed@linux.dev>
 References: <20251028221213.1937120-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -63,34 +63,71 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-runtime.bash always returns 2 (or 77 in one case) when a test is
-skipped. But two cases are missed and return 0. Fix them.
+Rename the test and functions to more general names describing the test
+more accurately. Use X86_CR0_CD instead of hardcoding the bitmask, and
+explicitly clear the bit in the prepare() function to make it clearer
+that it would only be set by the test.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- scripts/runtime.bash | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ x86/svm_tests.c | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 6805e97f90c8f..0cbe2695948b8 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -103,13 +103,13 @@ function run()
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 80d5aeb108650..e911659194b3d 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -793,23 +793,19 @@ static bool check_asid_zero(struct svm_test *test)
+ 	return vmcb->control.exit_code == SVM_EXIT_ERR;
+ }
  
-     if [ -z "$GEN_SE_HEADER" ] && find_word "pv-host" "$groups"; then
-         print_result "SKIP" $testname "" "no gen-se-header available for pv-host test"
--        return
-+        return 2
-     fi
+-static void sel_cr0_bug_prepare(struct svm_test *test)
++static void prepare_sel_cr0_intercept(struct svm_test *test)
+ {
++	vmcb->save.cr0 &= ~X86_CR0_CD;
+ 	vmcb->control.intercept |= (1ULL << INTERCEPT_SELECTIVE_CR0);
+ }
  
-     if [ -z "$only_group" ] && find_word nodefault "$groups" &&
-             skip_nodefault; then
-         print_result "SKIP" $testname "" "test marked as manual run only"
--        return;
-+        return 2
-     fi
+-static bool sel_cr0_bug_finished(struct svm_test *test)
+-{
+-	return true;
+-}
+-
+-static void sel_cr0_bug_test(struct svm_test *test)
++static void test_sel_cr0_write_intercept(struct svm_test *test)
+ {
+ 	unsigned long cr0;
  
-     if [ -n "$arch" ] && [ "$arch" != "$ARCH" ]; then
+-	/* read cr0, clear CD, and write back */
++	/* read cr0, set CD, and write back */
+ 	cr0  = read_cr0();
+-	cr0 |= (1UL << 30);
++	cr0 |= X86_CR0_CD;
+ 	write_cr0(cr0);
+ 
+ 	/*
+@@ -821,7 +817,7 @@ static void sel_cr0_bug_test(struct svm_test *test)
+ 	exit(report_summary());
+ }
+ 
+-static bool sel_cr0_bug_check(struct svm_test *test)
++static bool check_sel_cr0_intercept(struct svm_test *test)
+ {
+ 	return vmcb->control.exit_code == SVM_EXIT_CR0_SEL_WRITE;
+ }
+@@ -3486,9 +3482,9 @@ struct svm_test svm_tests[] = {
+ 	{ "asid_zero", default_supported, prepare_asid_zero,
+ 	  default_prepare_gif_clear, test_asid_zero,
+ 	  default_finished, check_asid_zero },
+-	{ "sel_cr0_bug", default_supported, sel_cr0_bug_prepare,
+-	  default_prepare_gif_clear, sel_cr0_bug_test,
+-	  sel_cr0_bug_finished, sel_cr0_bug_check },
++	{ "sel cr0 write intercept", default_supported,
++	  prepare_sel_cr0_intercept, default_prepare_gif_clear,
++	  test_sel_cr0_write_intercept, default_finished, check_sel_cr0_intercept},
+ 	{ "tsc_adjust", tsc_adjust_supported, tsc_adjust_prepare,
+ 	  default_prepare_gif_clear, tsc_adjust_test,
+ 	  default_finished, tsc_adjust_check },
 -- 
 2.51.1.851.g4ebd6896fd-goog
 
