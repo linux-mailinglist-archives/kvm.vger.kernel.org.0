@@ -1,138 +1,112 @@
-Return-Path: <kvm+bounces-61262-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61263-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC7EAC12A6E
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 03:19:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2834DC12ABC
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 03:33:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1B3A3AB588
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 02:17:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 272891A67238
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 02:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5414223D291;
-	Tue, 28 Oct 2025 02:17:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA88271446;
+	Tue, 28 Oct 2025 02:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="ECGS85me";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XM2xZzIx"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="W9iZNDKV"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3FA23185D;
-	Tue, 28 Oct 2025 02:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D44E23C38C;
+	Tue, 28 Oct 2025 02:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761617837; cv=none; b=hCTfxmTADNiod7XTy0zJ9on7ct14W+cGcQeOJaVUQ3k25isuru3XIaN1mGv7dDIPVaqZC5L9hSknpgyoBcOJuseYDqEyzdaVzEtWvXZ37zGD5sywL/3j8txCkOx7MwYX/xKYat4pxhS8OqAlUXig/9+0XAFoO2cbRpgvkgm7gBU=
+	t=1761618777; cv=none; b=oOm4yCefwFRrOX5fCUZ97UC2JuIUncDTsxCLAOGlVGyOryugVaAsHID8EGko8oBcTwiKgAY9QsRtn3/sQgysZC3IipOQYBmznUWgR57L9ePr54ICSQ3tR9f4N+F6GXJQOIGyhkolrxpXScA41/f0ALl+EwRHQNL+GJa4IDQ/EgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761617837; c=relaxed/simple;
-	bh=1YjmE2ecglQFqCri2IKUwNIAwJKetSmtlnaYwJm4OhE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YYIg88R/SoDf5YVj559Y3+vNHTwOn1Me6gA9Gby/mHud+pR/njlKVQ29jrm2W9DTZrydainkCE5c40KSAHyuiDRAEhqlVfjqyUhWRNSDQyGynI17JIvrJWNZregtsLPi024qaNGL9GagkVwCTt/Iyw5qoJNUldqbz5taRGKMd34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=ECGS85me; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XM2xZzIx; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id DD2D5EC0452;
-	Mon, 27 Oct 2025 22:17:13 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Mon, 27 Oct 2025 22:17:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1761617833;
-	 x=1761704233; bh=7YbNRixEWi4PKn88O3ejOZxwF3GldVBmeOtlnBdESxU=; b=
-	ECGS85metNzCUo6KeQtW0zjnm2b0zGjOlSS1eC7bapEDAFqC9YV6rU1BGKCWbVt0
-	vVP5h1MeaDThT6dqYVwHN+0YPzOHmgIE8cWlsDW8RRWnXT2KnUF1mV5e/Fgq+Umz
-	T9qbvLFEGHHsMFNhlwwAj+i4MY1vM8fgZNmVWlexOzsj7i4B/CEL0aZgAHeX6G9J
-	D2l0jLgamEBJNf4q6wlMMbqwnNOHyaLsd+iB073FfhofKNlSjjOsTyJlUu15BaLn
-	NR9xrSu+wjOFcAQhJ34mXpXFJZaSE8LFYJqx281QbjVoT+fyVEi3m6iPxF7JYZUd
-	N59xK9RLeCCllFv/ghi2bw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1761617833; x=
-	1761704233; bh=7YbNRixEWi4PKn88O3ejOZxwF3GldVBmeOtlnBdESxU=; b=X
-	M2xZzIxU4vGppvkfB2NvH3gqaW76yU4EiKw27v6T3ZbalU74KWol0HO0q86kJ3/l
-	8kGlF3HMlxVfaL27yj1oBGNvJEMtww1/8vzVEzu0YPwb0nTbcs8ZBAizsgVpp/bm
-	qgyZYYwctjDPhJHYdN3vLpJDnT4rK5TGT+uERZ3RKBUKj6bFp/6/ZfKzZQaWSFxY
-	5Utz9P3q1crvtTWy4AnKeGyBFxWAxZHOazwKnt3KFjPRHg0q0sezWEgldCWUFA3q
-	GGq+StvzWPrHtXbE6thqCOuWaHh5ptDKWnNwiArBHDBs0K+qh1tu7hs4+WcvvA7q
-	NxlmVQJbUgujKGfwuSfxg==
-X-ME-Sender: <xms:qScAaUhmNLAV1gYHeW5u53oidOebwhYFGE0FirCqBm1AdYYv6pUW_Q>
-    <xme:qScAacE3_WLK1GSqqafxAmaXAr47ctl74NL20VxvSlLGDAOZhHXKsPriNiOz0yN_0
-    ROBYypzn9XlpoIkYxWibiOVNhMVuKu2hX0eWweCZNdZndD2BzTElg>
-X-ME-Received: <xmr:qScAaSThYP21U9dVoIc1mCr7rrIKu1ymR7LjWR2VDbVtuDBZOWB5iV_7ACk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduheeliedvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhggtgfgsehtjeertd
-    dttddvnecuhfhrohhmpeetlhgvgicuhghilhhlihgrmhhsohhnuceorghlvgigsehshhgr
-    iigsohhtrdhorhhgqeenucggtffrrghtthgvrhhnpeetteduleegkeeigedugeeluedvff
-    egheeliedvtdefkedtkeekheffhedutefhhfenucevlhhushhtvghrufhiiigvpedtnecu
-    rfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgspg
-    hrtghpthhtohepjedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepmhhrrghthhho
-    rheslhhinhhugidrmhhitghrohhsohhfthdrtghomhdprhgtphhtthhopegrlhgvgidrfi
-    hilhhlihgrmhhsohhnsehrvgguhhgrthdrtghomhdprhgtphhtthhopehjohgvsehpvghr
-    tghhvghsrdgtohhmpdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-    dprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehlihhnuhigqdhhhihpvghrvhesvhhgvghrrdhkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopeifvghirdhlihhusehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:qScAaRxSnyantMaOmFGY0_eq9JoHkY8KXbhgluq3eF1Vj-QmGJqoDw>
-    <xmx:qScAaWesqbfldIhK4o3cL94fpHVo8COFDCKQt_6elfEfCg5_kIrDUw>
-    <xmx:qScAacPvzsVskerSNgmmi1JsrhRUqqXF4xJhrjWPQKxqUNQ9Bef82g>
-    <xmx:qScAaZuYDMl8kyDGIW_iRW7ed3fwxJ0SJ7AUjvB3km43MTrBSpSUVA>
-    <xmx:qScAaaIfblwsUiJadpkQ0WdU24thQkz5Ux15FeXUFCPlfhrDy-bqD6Ju>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 27 Oct 2025 22:17:12 -0400 (EDT)
-Date: Mon, 27 Oct 2025 20:17:11 -0600
-From: Alex Williamson <alex@shazbot.org>
-To: Mukesh R <mrathor@linux.microsoft.com>
-Cc: alex.williamson@redhat.com, joe@perches.com, kvm@vger.kernel.org,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "wei.liu@kernel.org" <wei.liu@kernel.org>
-Subject: Re: [RFC] Making vma_to_pfn() public (due to vm_pgoff change)
-Message-ID: <20251027201711.65e82a4f@shazbot.org>
-In-Reply-To: <a9b8a3ee-b35b-5c45-5042-2466607abcd0@linux.microsoft.com>
-References: <a9b8a3ee-b35b-5c45-5042-2466607abcd0@linux.microsoft.com>
+	s=arc-20240116; t=1761618777; c=relaxed/simple;
+	bh=5j4peJvmjdKmlcEE+4pWVsaPDl8SMVjVPzw/TO6vOZI=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=stkun0Xo1xjCm6WK+WfsT+C/3j4XYxEffUaTMfaaAAigR6BjfRghWfaASFi9B+qVypC14llDsEfHDoPhT6RYStJcfcvn6qA9Y3fhkREtAn1wgo1jwQ68B9vx37slO3DknARcBgCe7hujHyDs6XxetYktiJcUPMOdlKTmdjYjSHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=W9iZNDKV; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from smtpclient.apple ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 59S2VZQv1211668
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 27 Oct 2025 19:31:36 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 59S2VZQv1211668
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025102301; t=1761618697;
+	bh=5j4peJvmjdKmlcEE+4pWVsaPDl8SMVjVPzw/TO6vOZI=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
+	b=W9iZNDKVt/IH+COV/XQ0LMM5CuZvKI+YGNoNiwbh9KfTlC5iN49OnaRdR68AsXJdg
+	 QFjMCVpYd0iUPWEoAcVSrh5OYDpIQfjHWlVevX2ExknG2KH52GX/d4PLLll6U7l5JU
+	 RQMkiQyNR1T4yAfef4hkkGsN5/B1gF6Fc4vGUa5qDypGGhtDKxwgkZuZvzxdS+PzMt
+	 DDXSYH+tHr8LwKBjUdjQez8SLvwCb/ufFU3yaayYyUe1R36poLhtUbwfzXBh8/fwNQ
+	 tZ27CWDj6TpeTTHT1PEwLTfddhrmdyb3JuTWAniWRJyrhIltb5rTkMAbMuuo8tSHEF
+	 d2oBkG5L2zQSw==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.100.1.1.5\))
+Subject: Re: [PATCH v9 05/22] x86/cea: Use array indexing to simplify
+ exception stack access
+From: Xin Li <xin@zytor.com>
+In-Reply-To: <c65a332e-93e7-4329-a694-c9791ab589b2@intel.com>
+Date: Mon, 27 Oct 2025 19:31:25 -0700
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com,
+        chao.gao@intel.com, hch@infradead.org, sohil.mehta@intel.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <3F67131F-BD5D-4A4D-AAFD-81993A448D42@zytor.com>
+References: <20251026201911.505204-1-xin@zytor.com>
+ <20251026201911.505204-6-xin@zytor.com>
+ <c65a332e-93e7-4329-a694-c9791ab589b2@intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+X-Mailer: Apple Mail (2.3864.100.1.1.5)
 
-On Mon, 27 Oct 2025 14:21:56 -0700
-Mukesh R <mrathor@linux.microsoft.com> wrote:
 
-> Hi Alex,
-> 
-> This regards vfio passthru support on hyperv running linux as dom0 aka
-> root. At a high level, cloud hypervisor uses vfio for set up as usual,
-> then maps the mmio ranges via the hyperv linux driver ioctls.
-> 
-> Over a year ago, when working on this I had used vm_pgoff to get the pfn
-> for the mmio, that was 5.15 and early 6.x kernels. Now that I am porting
-> to 6.18 for upstreaming, I noticed:
-> 
-> commit aac6db75a9fc
-> Author: Alex Williamson <alex.williamson@redhat.com>
->     vfio/pci: Use unmap_mapping_range()
-> 
-> changed the behavior and vm_pgoff is no longer holding the pfn. In light
-> of that, I wondered if the following minor change, making vma_to_pfn() 
-> public (after renaming it), would be acceptable to you.
 
-How do you know the device is using vfio_pci_core_mmap() with these
-semantics for vm_pgoff versus something like nvgrace_gpu_mmap() that
-uses vm_pgoff more like you're expecting?  vma_to_pfn() is specific to
-the vfio-pci-core semantics, it's not portable to expose for other use
-cases.  Thanks,
+> On Oct 27, 2025, at 8:49=E2=80=AFAM, Dave Hansen =
+<dave.hansen@intel.com> wrote:
+>=20
+> On 10/26/25 13:18, Xin Li (Intel) wrote:
+>> Refactor struct cea_exception_stacks to leverage array indexing for
+>> exception stack access, improving code clarity and eliminating the
+>> need for the ESTACKS_MEMBERS() macro.
+>>=20
+>> Convert __this_cpu_ist_{bottom,top}_va() from macros to functions,
+>> allowing removal of the now-obsolete CEA_ESTACK_BOT and =
+CEA_ESTACK_TOP
+>> macros.
+>>=20
+>> Also drop CEA_ESTACK_SIZE, which just duplicated EXCEPTION_STKSZ.
+>>=20
+>> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
+>> ---
+>>=20
+>> Change in v9:
+>> * Refactor first and then export in a separate patch (Dave Hansen).
+>=20
+> Thanks for the changes. This also removes the extra union{} that was =
+in
+> the last version for padding.
 
-Alex
+I would say you foresaw it because you suggested to use array indexing:
+
+=
+https://lore.kernel.org/lkml/720bc7ac-7e81-4ad9-8cc5-29ac540be283@intel.co=
+m/
+
+Thanks a lot for making it much cleaner.
+Xin=
 
