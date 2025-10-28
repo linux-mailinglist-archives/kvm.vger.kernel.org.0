@@ -1,180 +1,244 @@
-Return-Path: <kvm+bounces-61252-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61253-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 866C1C122FC
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 01:39:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF217C123B0
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 01:44:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BAF056560B
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 00:37:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AD773B46CE
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 00:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19672036E9;
-	Tue, 28 Oct 2025 00:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2EF20DD72;
+	Tue, 28 Oct 2025 00:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fgGyZuxZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gzVAMpHp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044DD1F4606
-	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 00:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDA11F4281
+	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 00:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761611827; cv=none; b=RaZ5Cq49HYht31n5I0LcPucPJv7FPYDhxoauzFUBOQf9abdkl9wFd0BFrY6DZIRhwgb5o/LJv1LP6aER1coyGJtiBzQavq764myE00xKJYc7LGXFgOcVH46VLN66nE6ASE4MCAAiZbB9PtEHXylWp94ma4/y8o37zMPyfAx1p+Y=
+	t=1761612170; cv=none; b=H5lAGc/DLPovDwWWl3iR99bsyAk/1AOuSRV73zX26z93FcnJfilIhrk81vvxH4CWdPJGRICPJMGz+FEKsekhyK5AXbUer6zHjPFFwsrHmCTB69MdQCJbBQdd/AdG9DT5tbgVCoxfCADuQ7MQ9oiy5Qx/KGdOA5tswbLg8v+rn6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761611827; c=relaxed/simple;
-	bh=QdkEAMsGYBzU3fN0cne5qZg46IOFvPzz9xbD2HV7VAQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=D5Ty51yS1V3Vz+p6iC7VOrpnFRLFheV0/QMvnz1FNZ6fFlPei0G3F/NAgzxp+fuYzu2M3LkLR+fKSN69rGBSaqscocGoNS6yxDrDBQi1lYpySqtWzdPCxR2SRXIsn4t8kGfIWTnDDua5cvqn44dSHF5EiQL5xoqKxO1YOk0CW6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fgGyZuxZ; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33da21394adso5095045a91.1
-        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 17:37:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761611825; x=1762216625; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=J3mxOKer4OGfyDxlfqvGDsZ/A3KYgtdet3LczK0ONqE=;
-        b=fgGyZuxZxoFhZUStZEOkgSnMD24ZyWXS2V3OZAAoEIpZKU8UWL7ea7jebGj8oXRZvS
-         ptJemZcBakmkJS9N0IfXOYbmFs227noHivg6R3O20yPkmSfN6CO3Z+ztmApH78+V4wmt
-         05pOWnwPEevb+e4h2Kj2Wd6JDa9GkI1IV2nTOjdHOibYwC0gFwibdcoXY05UV62Pw4Jt
-         R0EnzB+vHuohh8eubyLliqqfKvzIt796M3KNC4/Nk9AWUG+hg0xldQGNUzvRsLXI1D5d
-         xlbZ9Aet7yAYgIk9a05o0KkrC2b3Kd/i7/JMRWGgCcPAqXVm8r1nF3ed8R5ApIm/AU0E
-         O50Q==
+	s=arc-20240116; t=1761612170; c=relaxed/simple;
+	bh=Oaec4CMUKIqFFDe8IlwQUNfn1sis7V34LfNDLJjhz+M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M5cCKlmFhjFGtQOfLIZL73jWy0bqBp3iYU52muj20GsW4L2FH20e7cbVgNoQi4qMWWD1nxBqkPQ3bE4YQR+9WChOa/FNxpXMEp7C/L329HoMga6HxAyN1uOFgKsD5RQZ9mn2I5Qz0ympm5cMBdiSjnUjzn/oNiJ0rBvlIqDIVbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gzVAMpHp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761612166;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4S4XxcpkkVefNpOn6q/1PCcyZWnz2c3jb89kMwD+Dak=;
+	b=gzVAMpHpeSrI5EGcG+s/qHABSdX1q3UI2E5wTBlosIM+AZ0bxmORWn9xttDvTnLvtE/+lR
+	O1shjJrRKGULEbQ1jHOJx6ThQn3e2yMZL5VS7gAU7ecFUh3VhB4Fhqy+7oA4Ih81vWoZwG
+	ma4ryLDn2fZQqWC3XK8/ycB/J8CsdLA=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-466-Qv37OXjQOVuwTAn1juDxKw-1; Mon, 27 Oct 2025 20:42:45 -0400
+X-MC-Unique: Qv37OXjQOVuwTAn1juDxKw-1
+X-Mimecast-MFC-AGG-ID: Qv37OXjQOVuwTAn1juDxKw_1761612164
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-340299fd99dso314411a91.0
+        for <kvm@vger.kernel.org>; Mon, 27 Oct 2025 17:42:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761611825; x=1762216625;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=J3mxOKer4OGfyDxlfqvGDsZ/A3KYgtdet3LczK0ONqE=;
-        b=lIowBTUbN7kmdtp9PVFsu1MvuM2EZB9UXHXDMfzxfbOajackxov664nCy8Qh+r9ljj
-         KH48zKvhVkDfVv/77qwlE/KfJxSL6dOHkbYgVXhHMwQhyNak+4UV6sJDstdVF9AzbU48
-         cRcSMsku3fj7MV3QnvVnva4AQGfPLLzJqojGiBxh/Tq4QUmm8Uf6pcSCrox3cAL7ygWV
-         6QIvQ6XAznO5dY/mCrBJpG9jMPoR9O9mkauoSmftEkBYEsz7o8oLnC2VT/XuDdVeG33t
-         E0EdRFDUlOqenmWAJrYOzxd9SjcljYUEkb+tJf82DnqLkfYOBuRxSzLECuJPcqC7jtoA
-         nTtg==
-X-Forwarded-Encrypted: i=1; AJvYcCXqKiLQ1MvX/1ThQ+xq2D8REYxEWyX7Ck2vu/WFaVdxcR4Qa1zt6C1wgLhrC7VxBj1W3Ms=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5JHsXjUsew8CR/P1YBG1Afi1FNeJe8AUvVln5dmyInDTN/esT
-	vgv8q861GfbTne47OcW2NHyP8D072kzDStZ1EBgu8kMRZ6agibBcUWsMl54UgdSzgyCoZ7dJfQd
-	/Y/4+0A==
-X-Google-Smtp-Source: AGHT+IGoxyiEdJHjsguM4HhfYAa3a3WGl9IwGzua+OMwKu3+3dxnKcX9NeqRP2yYPcwFhiCcHGTefjSDvqI=
-X-Received: from pjcc13.prod.google.com ([2002:a17:90b:574d:b0:33d:813f:6829])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5241:b0:329:cb75:fef2
- with SMTP id 98e67ed59e1d1-340279e5c84mr1590788a91.3.1761611825209; Mon, 27
- Oct 2025 17:37:05 -0700 (PDT)
-Date: Mon, 27 Oct 2025 17:37:03 -0700
-In-Reply-To: <55461c549803e08db97528127c29e092c597adc5.camel@intel.com>
+        d=1e100.net; s=20230601; t=1761612164; x=1762216964;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4S4XxcpkkVefNpOn6q/1PCcyZWnz2c3jb89kMwD+Dak=;
+        b=D7XlgI23Nf3AcIaOYku0XGryZJU/lWZr/RjPs4XciWSJV06eNW48d2vyNEI263/ZZv
+         NHwDhnHbt07Ip/Sm25cRlN3/V7Dxv8JPLzOP0kMlEK95aJfu8VtRQ9uthAuDICd/FVwu
+         +0HvYRQARf3XcoVVKy7ofzteu6jCKAmuX5eauGK3pt6imCHUps9r6Lvtb9NZntRW68US
+         wl2EWgQ9R5NCs/4VQ0d1T6fEwaUNzyHKLyYxpxmSMCbiHX4uXa9uvRJ9CKdN7xgTKUYp
+         F41FTDTlKCnA2M0JNkFKLGwqeNyMXjTHbEIEoqOJf8+pSIprvuvKMY8oNiDh0EyLsSZi
+         vbdw==
+X-Forwarded-Encrypted: i=1; AJvYcCUVP0ECdh1iNHWUtGANVbbnbp+OEL5L5ecsnR8ANREyEPorxh8mjWcD//Y734VlVXqMG5U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeV+Xo8z/C/ZwsHFaY4X7jdIVblYuY1/A+OgYA0/X+GVyt5FGc
+	tjL9Ki14tKRStWANENTAwHQS8m4qr9wGiJvn+Fv7wM3Hp6LJ/KGvo4bvmcIDTbjqPCceR2EvrSj
+	+feEk+/2AwnmAY5GLhQq1ZhQt/Yq/RZ8G56Mmw06e7Ly8cHR+o7I+NsmZkuapXFljzid7QllpAy
+	em07cV/UQFqsqiuAIHnkNYD8sMXVgP
+X-Gm-Gg: ASbGncvacZB7+hap8fkKeno93MAE8+VPMWAGkqoFR5dbdeO9ph2kT5c6ctJI5C6rUjx
+	bh7FDfYh5xXdUyqSeGIiZwtofRkfEDW+cAyoWWUMte5TAR2Oi5n8xJwg0bFSmB2hgO13OCnn0CY
+	/nyVXahArqT0LZpO/JLvcCfMlGilDlpWOmDFPpPjTCmQZSraIUrpfnRI76
+X-Received: by 2002:a17:90b:56cc:b0:330:6d2f:1b5d with SMTP id 98e67ed59e1d1-34027aac137mr1890126a91.26.1761612163813;
+        Mon, 27 Oct 2025 17:42:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGeNHCkzvcBmGGrJKaZzXODCr5cxEfASlCJa7QDO1rQohJ+NiOJXFwAxYkL7H35SEY2hZXkIcNLNUTEFlIZH4E=
+X-Received: by 2002:a17:90b:56cc:b0:330:6d2f:1b5d with SMTP id
+ 98e67ed59e1d1-34027aac137mr1890105a91.26.1761612163245; Mon, 27 Oct 2025
+ 17:42:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251017003244.186495-1-seanjc@google.com> <20251017003244.186495-25-seanjc@google.com>
- <55461c549803e08db97528127c29e092c597adc5.camel@intel.com>
-Message-ID: <aQAQLzxyGFooGtNV@google.com>
-Subject: Re: [PATCH v3 24/25] KVM: TDX: Guard VM state transitions with "all"
- the locks
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, 
-	"pjw@kernel.org" <pjw@kernel.org>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
-	"kas@kernel.org" <kas@kernel.org>, "maobibo@loongson.cn" <maobibo@loongson.cn>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "maddy@linux.ibm.com" <maddy@linux.ibm.com>, 
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>, 
-	"zhaotianrui@loongson.cn" <zhaotianrui@loongson.cn>, "anup@brainfault.org" <anup@brainfault.org>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"michael.roth@amd.com" <michael.roth@amd.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ira Weiny <ira.weiny@intel.com>, 
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, Vishal Annapurve <vannapurve@google.com>, 
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, 
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, "x86@kernel.org" <x86@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20251027102644.622305-1-nhudson@akamai.com>
+In-Reply-To: <20251027102644.622305-1-nhudson@akamai.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 28 Oct 2025 08:42:32 +0800
+X-Gm-Features: AWmQ_bklpkUHU7-3U6X8wKJFt2zjBDUD0EycaiSZymIdh7dZBD-GL8V0CTdBW5Y
+Message-ID: <CACGkMEtyX6n9uLMmo7X08tFS-V6QZoDVTxhE53h9sLDPNBKnKw@mail.gmail.com>
+Subject: Re: [PATCH] vhost: add a new ioctl VHOST_GET_VRING_WORKER_INFO and
+ use in net.c
+To: Nick Hudson <nhudson@akamai.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Max Tottenham <mtottenh@akamai.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 28, 2025, Kai Huang wrote:
-> On Thu, 2025-10-16 at 17:32 -0700, Sean Christopherson wrote:
-> > @@ -2781,8 +2827,6 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *ar=
-gp)
-> > =C2=A0	if (r)
-> > =C2=A0		return r;
-> > =C2=A0
-> > -	guard(mutex)(&kvm->lock);
-> > -
-> > =C2=A0	switch (tdx_cmd.id) {
-> > =C2=A0	case KVM_TDX_CAPABILITIES:
-> > =C2=A0		r =3D tdx_get_capabilities(&tdx_cmd);
->=20
-> IIRC, this patch removes grabbing the kvm->lock in tdx_vm_ioctl() but onl=
-y
-> adds the "big hammer" to tdx_td_init() and tdx_td_finalize(), so the
-> tdx_get_capabilities() lost holding the kvm->lock.
+On Mon, Oct 27, 2025 at 6:27=E2=80=AFPM Nick Hudson <nhudson@akamai.com> wr=
+ote:
+>
+> The vhost_net (and vhost_sock) drivers create worker tasks to handle
+> the virtual queues. Provide a new ioctl VHOST_GET_VRING_WORKER_INFO that
+> can be used to determine the PID of these tasks so that, for example,
+> they can be pinned to specific CPU(s).
+>
+> Signed-off-by: Nick Hudson <nhudson@akamai.com>
+> Reviewed-by: Max Tottenham <mtottenh@akamai.com>
+> ---
+>  drivers/vhost/net.c              |  5 +++++
+>  drivers/vhost/vhost.c            | 16 ++++++++++++++++
+>  include/uapi/linux/vhost.h       |  3 +++
+>  include/uapi/linux/vhost_types.h | 13 +++++++++++++
+>  kernel/vhost_task.c              | 12 ++++++++++++
+>  5 files changed, 49 insertions(+)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 35ded4330431..e86bd5d7d202 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -1804,6 +1804,11 @@ static long vhost_net_ioctl(struct file *f, unsign=
+ed int ioctl,
+>                 return vhost_net_reset_owner(n);
+>         case VHOST_SET_OWNER:
+>                 return vhost_net_set_owner(n);
+> +       case VHOST_GET_VRING_WORKER_INFO:
+> +               mutex_lock(&n->dev.mutex);
+> +               r =3D vhost_worker_ioctl(&n->dev, ioctl, argp);
+> +               mutex_unlock(&n->dev.mutex);
+> +               return r;
+>         default:
+>                 mutex_lock(&n->dev.mutex);
+>                 r =3D vhost_dev_ioctl(&n->dev, ioctl, argp);
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 8570fdf2e14a..8b52fd5723c3 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -2399,6 +2399,22 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned=
+ int ioctl, void __user *argp)
+>                 if (ctx)
+>                         eventfd_ctx_put(ctx);
+>                 break;
+> +       case VHOST_GET_VRING_WORKER_INFO:
+> +               worker =3D rcu_dereference_check(vq->worker,
+> +                                              lockdep_is_held(&dev->mute=
+x));
+> +               if (!worker) {
+> +                       ret =3D -EINVAL;
+> +                       break;
+> +               }
+> +
+> +               memset(&ring_worker_info, 0, sizeof(ring_worker_info));
+> +               ring_worker_info.index =3D idx;
+> +               ring_worker_info.worker_id =3D worker->id;
+> +               ring_worker_info.worker_pid =3D task_pid_vnr(vhost_get_ta=
+sk(worker->vtsk));
+> +
+> +               if (copy_to_user(argp, &ring_worker_info, sizeof(ring_wor=
+ker_info)))
+> +                       ret =3D -EFAULT;
+> +               break;
+>         default:
+>                 r =3D -ENOIOCTLCMD;
+>                 break;
+> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> index c57674a6aa0d..c32aa8c71952 100644
+> --- a/include/uapi/linux/vhost.h
+> +++ b/include/uapi/linux/vhost.h
+> @@ -101,6 +101,9 @@
+>  /* Return the vring worker's ID */
+>  #define VHOST_GET_VRING_WORKER _IOWR(VHOST_VIRTIO, 0x16,               \
+>                                      struct vhost_vring_worker)
+> +/* Return the vring worker's ID and PID */
+> +#define VHOST_GET_VRING_WORKER_INFO _IOWR(VHOST_VIRTIO, 0x17,  \
+> +                                    struct vhost_vring_worker_info)
+>
+>  /* The following ioctls use eventfd file descriptors to signal and poll
+>   * for events. */
+> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_=
+types.h
+> index 1c39cc5f5a31..28e00f8ade85 100644
+> --- a/include/uapi/linux/vhost_types.h
+> +++ b/include/uapi/linux/vhost_types.h
+> @@ -63,6 +63,19 @@ struct vhost_vring_worker {
+>         unsigned int worker_id;
+>  };
+>
+> +/* Per-virtqueue worker mapping entry */
+> +struct vhost_vring_worker_info {
+> +       /* vring index */
+> +       unsigned int index;
+> +       /*
+> +        * The id of the vhost_worker returned from VHOST_NEW_WORKER or
+> +        * allocated as part of vhost_dev_set_owner.
+> +        */
+> +       unsigned int worker_id;
 
-Ooh, yeah, nice catch, that is indeed silly and unnecessary churn.
+I'm not sure the above two are a must and exposing internal workd_id
+seems not like a good idea.
 
-> As replied earlier, I think we can just hold the "big hammer" in
-> tdx_vm_ioctl()?
+> +
+> +       __kernel_pid_t worker_pid;  /* PID/TID of worker thread, -1 if no=
+ne */
 
-Actually, I think we can have our cake and eat it too.  With this slotted i=
-n as
-a prep patch, the big hammer can land directly in tdx_vm_ioctl(), without a=
-ny
-change in functionality for KVM_TDX_CAPABILITIES.
+Instead of exposing the worker PID, I wonder if it's simple to just
+having a better naming of the worker instead of a simple:
 
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Mon, 27 Oct 2025 17:32:34 -0700
-Subject: [PATCH] KVM: TDX: Don't copy "cmd" back to userspace for
- KVM_TDX_CAPABILITIES
+        snprintf(name, sizeof(name), "vhost-%d", current->pid);
 
-Don't copy the kvm_tdx_cmd structure back to userspace when handling
-KVM_TDX_CAPABILITIES, as tdx_get_capabilities() doesn't modify hw_error or
-any other fields.
+> +};
+> +
+>  /* no alignment requirement */
+>  struct vhost_iotlb_msg {
+>         __u64 iova;
+> diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
+> index 27107dcc1cbf..aa87a7f0c98a 100644
+> --- a/kernel/vhost_task.c
+> +++ b/kernel/vhost_task.c
+> @@ -67,6 +67,18 @@ static int vhost_task_fn(void *data)
+>         do_exit(0);
+>  }
+>
+> +/**
+> + * vhost_get_task - get a pointer to the vhost_task's task_struct
+> + * @vtsk: vhost_task to return the task for
+> + *
+> + * return the vhost_task's task.
+> + */
+> +struct task_struct *vhost_get_task(struct vhost_task *vtsk)
+> +{
+> +       return vtsk->task;
+> +}
+> +EXPORT_SYMBOL_GPL(vhost_get_task);
+> +
+>  /**
+>   * vhost_task_wake - wakeup the vhost_task
+>   * @vtsk: vhost_task to wake
+> --
+> 2.34.1
+>
 
-Opportunistically hoist the call to tdx_get_capabilities() outside of the
-kvm->lock critical section, as getting the capabilities doesn't touch the
-VM in any way, e.g. doesn't even take @kvm.
+Thanks
 
-Suggested-by: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/tdx.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 1642da9c1fa9..43c0c3f6a8c0 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -2807,12 +2807,12 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp=
-)
- 	if (r)
- 		return r;
-=20
-+	if (tdx_cmd.id =3D=3D KVM_TDX_CAPABILITIES)
-+		return tdx_get_capabilities(&tdx_cmd);
-+
- 	guard(mutex)(&kvm->lock);
-=20
- 	switch (tdx_cmd.id) {
--	case KVM_TDX_CAPABILITIES:
--		r =3D tdx_get_capabilities(&tdx_cmd);
--		break;
- 	case KVM_TDX_INIT_VM:
- 		r =3D tdx_td_init(kvm, &tdx_cmd);
- 		break;
-
-base-commit: 672537233b8da2c29dca7154bf3a3211af7f6128
---
 
