@@ -1,129 +1,147 @@
-Return-Path: <kvm+bounces-61299-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61300-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F9DAC14DBC
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 14:32:33 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA23FC14F99
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 14:51:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBC3F5E6632
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 13:29:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CD9D3507299
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 13:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6047332EC5;
-	Tue, 28 Oct 2025 13:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A4123496F;
+	Tue, 28 Oct 2025 13:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="K95auNhv"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="a4QvicBh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625712DAFD2
-	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 13:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E931F4606;
+	Tue, 28 Oct 2025 13:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761658140; cv=none; b=tawX4KBnCS0jpANwBypRdgxPvJ1XhYuv1ZmF1pgGTVxfBTwa/kgihBrnAWrepoYj4HqCUU6vdO6ZhUrlGb5soyJ0UAcDjfKXEf6q0iKzgdWKlnun5gSbWmeOS6t2UaK2JXXPdVh2ZbT9M4VwpDUY0hKxfAxYNw0n9VTRMzcDGFM=
+	t=1761659222; cv=none; b=kl0vNYLq2wrJ6qf0mlAUa9dBdh1ZNRDYTWjlXBj2HrhPaZInt+sijamOD8QkFxAxEAekrd7sWlegZCPyh/tCirPRFbm3uFLeoAdm9MDhlQ4Xj4PZ2Ko7Lv1/JhoSIz0ATNlabLPWA2sPyc27NUvcj9ugAFeULe/JsyiesuENP6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761658140; c=relaxed/simple;
-	bh=dtsFeSDKqGyLml+fTdEtUCa8bBm3GwmPyBM2/lNmOXI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B1ehZdP+RKCK2a5RVcJO+Uv7p6Gw2D/7IuVnplJV+hfxuoXJCUUqxoINnh2PcF6pAyJVz8L5Bxgkdt0m5DkvEWO27h6NZyvS4a5JkO5wAZsDw8NrwvpXH8uVS3PNABFIttW3gyj8fPwYilbRj0/i2/VcYZukfbv6Aw/2I+XQcc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=K95auNhv; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-89e8a3fa70fso354464885a.0
-        for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 06:28:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1761658137; x=1762262937; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dtsFeSDKqGyLml+fTdEtUCa8bBm3GwmPyBM2/lNmOXI=;
-        b=K95auNhvrSFR6PPDg2ibB+mdTp2motrPFwy4va//VFphBGbf/4LZapakAXGoOkez92
-         +AhFNhjlkgSbj2HMewM0Dat39X0k7WeXiUlhUIX+BSs49FIoqxxs1QjxEt2dQLPv6SCQ
-         bLvy0Rbo8HeAM+TxfWfHlBGlE8Xhouu3jsMCc6LWd8NVW8c00G/buUgePHr4ZjTt4WGE
-         B8vDDf7tawyGnwMDnI9CpypUocmYloFMI3NlNOA4sQnCmqD+G094F+7MFS9BHtgWdh0T
-         9FscgUMGPE9hiPXfDsLqc85DmN3rfWgzEcOekZ3IQne1k/cWy4aDNSWFfIGosHxZ2gOD
-         RAlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761658137; x=1762262937;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dtsFeSDKqGyLml+fTdEtUCa8bBm3GwmPyBM2/lNmOXI=;
-        b=RSAxbZ/0yt1wbcKqEOD5TUHGrrpkoVxA2ck1XOuecn7ir40w9Hki5p2qdyVdlX5yrg
-         qXZjNmFPtoicbVI+66VqZI3n+U15YFN04ygcI6cDEkE9Zx53FCcELHAbJAT8yaUWExGy
-         uoqFi6iimq/0oM5dq+x6VwDU8lAZPSfA1Z20ylggslyBTW6TR/vzota1jr3/Wff94m2H
-         UZ4rCU5YmXgRLcGUFeqJIZP0X5/LwDKJcu9FDsBejHvROiufUZBj8+IG4JZXUwKyh9qd
-         Y9pCtM2TYuRJoKqGKMTDxhHN6MOcgZ6ZWIKo2n3vwT+8b13XyU94XIja8pvhH4xlUtYK
-         h57g==
-X-Forwarded-Encrypted: i=1; AJvYcCXiNXKk7m2FyslyrN/jv9YdySl1Ouhk1fdVT+nFMA0bnKk3OwqZkv+s1biJ9zE3l/iuMaE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiYiikb3RnOhUQcK/K8rkICA/b4NNiaZTg/f/FrY4KTNtr+1wm
-	iH4HvnG1rZwQuZ622vXEbGpo+jxVM9CbItOYLyvBaqaGDnX+o9TnItm+Wi9UjEp0cdg=
-X-Gm-Gg: ASbGncufQPQlhPXJCsGLTN3RWlCM0KbySVYI+j1KnsSskdb93eruHnKgAuJ4/sUmYr9
-	pdmgvg8A5qT3CSEGFGGEpWS1wWNDT2KpYlFnRizIYJSC3iUnaEMZWWJZwLdqVbTu3aaTQJZ5VTf
-	kVfJmSHlh+iSOJPrDCaF+AbzvdvKNlJb23DuN6soQqujqte0k/yEomQ2b1dBT6rRUtAL7BHpKsm
-	tDDxKx7ATxtV2v9pVUQY1dnqAz93i2Ss+kQ8lqalUhF+EyrHW51t1irr80Rey3Am4iBGpaQsWql
-	8MqPlr8RW7i/dkBP+h/jKvkoOeWQAhlnWF8Usux4aHGlHHYOB+zlQC+r53nqASvJFYgTIAFqyP8
-	encwy6I1rRBaNdRKb/jZog8C/Ww+4sVM1jEi2ZcKYCyIF6GAKb8RR2L3KVC5F3Yey128JgO0VUC
-	Vk4tpINzXeaMAZK/uQMPnfSdL2CF1DZWgtgrboBIyZ1r2uWHxWwWq0McPc
-X-Google-Smtp-Source: AGHT+IGShJMC1iBLkVMVTtmAgFjNgDYF2kS2KrAPaxSmW4rJSZvLRhN0tZlnppqE/frY25q7IEUPHg==
-X-Received: by 2002:a05:620a:462a:b0:8a5:6ca3:d56 with SMTP id af79cd13be357-8a6f63c48a7mr436299885a.39.1761658137149;
-        Tue, 28 Oct 2025 06:28:57 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-89f24cd5617sm829595185a.19.2025.10.28.06.28.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 06:28:55 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vDjkt-00000004PA5-0Sy6;
-	Tue, 28 Oct 2025 10:28:55 -0300
-Date: Tue, 28 Oct 2025 10:28:55 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Jacob Pan <jacob.pan@linux.microsoft.com>
-Cc: Vipin Sharma <vipinsh@google.com>, bhelgaas@google.com,
-	alex.williamson@redhat.com, pasha.tatashin@soleen.com,
-	dmatlack@google.com, graf@amazon.com, pratyush@kernel.org,
-	gregkh@linuxfoundation.org, chrisl@kernel.org, rppt@kernel.org,
-	skhawaja@google.com, parav@nvidia.com, saeedm@nvidia.com,
-	kevin.tian@intel.com, jrhilke@google.com, david@redhat.com,
-	jgowans@amazon.com, dwmw2@infradead.org, epetron@amazon.de,
-	junaids@google.com, linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [RFC PATCH 06/21] vfio/pci: Accept live update preservation
- request for VFIO cdev
-Message-ID: <20251028132855.GJ760669@ziepe.ca>
-References: <20251018000713.677779-1-vipinsh@google.com>
- <20251018000713.677779-7-vipinsh@google.com>
- <20251027134430.00007e46@linux.microsoft.com>
+	s=arc-20240116; t=1761659222; c=relaxed/simple;
+	bh=3Wa50ZqGT8eSNTFPzwHcDHhGPw3XmeC01Xuy33bOsgE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HSDTWOvKslA8vkCQIO0iunDV0jNxi9Jy/alTiHUVHDcZcEuaYdzSEGq0VoCsODdmlNHCuD8QzjR817synYkG+On4hbAyC8wpAFWZzf12j878koTLL98vW/qGmD7/II8eHBVdMWQdloeoOCenhQ9FqNMrL0l59MyyM/47T1F6PwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=a4QvicBh; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1761659214; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=SdP4P384sbs4h39646JsReKLjr8gZ9zv4XENPQNf9Lk=;
+	b=a4QvicBhKu7BrMaOW0kT0Dwui2BH/axotYbjhhLYIK2f0FBvkiEDY2yEy8ETyM1e0v8cCfuLtZjtug6WX2uf2MiFe/zsUPCh7z65Ya3IwctJcsOVQ/Vzv2uZ+PNN+K5lO3xGanvNfN6P+SppfRgGYeYswq1hgVZOuu47NKZdoxM=
+Received: from 30.246.176.102(mailfrom:xueshuai@linux.alibaba.com fp:SMTPD_---0WrCJu3H_1761659211 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 28 Oct 2025 21:46:52 +0800
+Message-ID: <0d95b8af-97e4-43b6-a35a-aa3ce153f0ee@linux.alibaba.com>
+Date: Tue, 28 Oct 2025 21:46:51 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
+ regions
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Leon Romanovsky <leonro@nvidia.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+ Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+ kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Logan Gunthorpe <logang@deltatee.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+References: <cover.1760368250.git.leon@kernel.org>
+ <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
+ <20251022125012.GB244727@nvidia.com>
+ <3db524e7-b6ce-4652-8420-fdb4639ac73a@linux.alibaba.com>
+ <20251027120904.GA896317@nvidia.com>
+From: Shuai Xue <xueshuai@linux.alibaba.com>
+In-Reply-To: <20251027120904.GA896317@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251027134430.00007e46@linux.microsoft.com>
 
-On Mon, Oct 27, 2025 at 01:44:30PM -0700, Jacob Pan wrote:
-> I have a separate question regarding noiommu devices. I’m currently
-> working on adding noiommu mode support for VFIO cdev under iommufd.
 
-Oh how is that going? I was just thinking about that again..
 
-After writing the generic pt self test it occured to me we now have
-enough infrastructure for iommufd to internally create its own
-iommu_domain with a AMDv1 page table for the noiommu devices. It would
-then be so easy to feed that through the existing machinery and have
-all the pinning/etc work.
+在 2025/10/27 20:09, Jason Gunthorpe 写道:
+> On Sun, Oct 26, 2025 at 03:55:04PM +0800, Shuai Xue wrote:
+>>
+>>
+>> 在 2025/10/22 20:50, Jason Gunthorpe 写道:
+>>> On Mon, Oct 13, 2025 at 06:26:11PM +0300, Leon Romanovsky wrote:
+>>>> From: Leon Romanovsky <leonro@nvidia.com>
+>>>>
+>>>> Add support for exporting PCI device MMIO regions through dma-buf,
+>>>> enabling safe sharing of non-struct page memory with controlled
+>>>> lifetime management. This allows RDMA and other subsystems to import
+>>>> dma-buf FDs and build them into memory regions for PCI P2P operations.
+>>>>
+>>>> The implementation provides a revocable attachment mechanism using
+>>>> dma-buf move operations. MMIO regions are normally pinned as BARs
+>>>> don't change physical addresses, but access is revoked when the VFIO
+>>>> device is closed or a PCI reset is issued. This ensures kernel
+>>>> self-defense against potentially hostile userspace.
+>>>
+>>> Let's enhance this:
+>>>
+>>> Currently VFIO can take MMIO regions from the device's BAR and map
+>>> them into a PFNMAP VMA with special PTEs. This mapping type ensures
+>>> the memory cannot be used with things like pin_user_pages(), hmm, and
+>>> so on. In practice only the user process CPU and KVM can safely make
+>>> use of these VMA. When VFIO shuts down these VMAs are cleaned by
+>>> unmap_mapping_range() to prevent any UAF of the MMIO beyond driver
+>>> unbind.
+>>>
+>>> However, VFIO type 1 has an insecure behavior where it uses
+>>> follow_pfnmap_*() to fish a MMIO PFN out of a VMA and program it back
+>>> into the IOMMU. This has a long history of enabling P2P DMA inside
+>>> VMs, but has serious lifetime problems by allowing a UAF of the MMIO
+>>> after the VFIO driver has been unbound.
+>>
+>> Hi, Jason,
+>>
+>> Can you elaborate on this more?
+>>
+>>  From my understanding of the VFIO type 1 implementation:
+>>
+>> - When a device is opened through VFIO type 1, it increments the
+>>    device->refcount
+>> - During unbind, the driver waits for this refcount to drop to zero via
+>>    wait_for_completion(&device->comp)
+>> - This should prevent the unbind() from completing while the device is
+>>    still in use
+>>
+>> Given this refcount mechanism, I do not figure out how the UAF can
+>> occur.
+> 
+> A second vfio device can be opened and then use follow_pfnmap_*() to
+> read the first vfio device's PTEs. There is no relationship betweent
+> the first and second VFIO devices, so once the first is unbound it
+> sails through the device->comp while the second device retains the PFN
+> in its type1 iommu_domain.
+> 
+> Jason
 
-Then only an ioctl to read back the physical addresses from this
-special domain would be needed
+I see.
 
-It actually sort of feels pretty easy..
+Thanks.
 
-Jason
+Best Regard,
+Shuai
+
 
