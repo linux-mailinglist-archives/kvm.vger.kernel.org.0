@@ -1,220 +1,193 @@
-Return-Path: <kvm+bounces-61309-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61311-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D845CC15C62
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 17:24:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DDC8C15CF1
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 17:30:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4F0C1C23CAB
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 16:18:32 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D0822354A38
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 16:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78DA2848BE;
-	Tue, 28 Oct 2025 16:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8497F2882AF;
+	Tue, 28 Oct 2025 16:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="HOKKYZtr"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="2aHdX4Jr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D67283FF8
-	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 16:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6DC232D440
+	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 16:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761668123; cv=none; b=dGjFeYcsUnEs+8JjzORv2eiIyVNcUJe6CFJcmQkkrerhSYP83ZYK/Y8SABN4+bLsl7jdH2mn/fOCWHWc4F/JV/2VpDVmOLMmoaDDdwyfyTRlvGIihZkBMqL/oZf59puRTkCCVvSzcPzeITFdxTUhqznElF4XmGWChIvLI4BjMlk=
+	t=1761668987; cv=none; b=qfTsfICalfBa16G+0tqN5A6rTFJYIlARmAKzWch4NfgBqn5X4SXfK7k4Eb/X2p8tMsncduXzub469f227lNN3UAijWti45I5qBldPNAnpFMxVtQqhYA1NcJDYnyH6lh/IffgWx3aotFdUJA2XNK3FJ3oVxQIED7wWloPDURMKxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761668123; c=relaxed/simple;
-	bh=tzggaxR9FZMIzBPQS8Uhk5DQQIJ5mAFzxbGJIArHuc4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=hrVmcLjO52N9gHgL9sQy6XdmlZ3I1OKLb2aUm1GfTJZfX3vTMKP4idx0jPLLuHTgZY1KgQXiIj7K9g/1ZCz01RDSs9+iJ/eSqWdVhoXJj2jSHW6yn39KHHaT0BReRUptASHADBZ2xRIM9ywKEwT86jln7rbm6CwsiPqsvEEVriI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=HOKKYZtr; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59SDI1Qp471239
-	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 09:15:18 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=jL27jaMKNMd3868BGcN8P3oHAzLxge4Xak38+P/R528=; b=HOKKYZtrgrl4
-	TqOmQtT1fJ7qYwIMUqejfa+hMZWFT2/r+0YdM5IzfY2RBNSJ9DlQVqI4XQgRMc36
-	S2c1E3KCdvyar50lqlSKk7oWPFMyoJKUxfF0RS2/hB0SHnxiq8OmGiDy6Z4l8+yV
-	xheMDaYD3YUP3P5Cl8Nf/K63Z79ixNnyR6jEAAm0/GBSP43FrYBXPrd+lZYBZl/T
-	mTir10MOmaKkycV87BEdwfouqVFxmCpzURfTawcEhNXIciJEPmamly1Jo3O3NEIw
-	IxtCIw1+dWgvcDke4ADhvVICa8Uhn5J6Ojjmo79dP3//FBIdkcg5m5EFnwPZNR/r
-	YkgZs5YC+A==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4a2xkhhq1h-20
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 09:15:18 -0700 (PDT)
-Received: from twshared15465.32.frc3.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Tue, 28 Oct 2025 16:15:11 +0000
-Received: by devgpu012.nha5.facebook.com (Postfix, from userid 28580)
-	id 0778E51293D; Tue, 28 Oct 2025 09:15:05 -0700 (PDT)
-From: Alex Mastro <amastro@fb.com>
-Date: Tue, 28 Oct 2025 09:15:04 -0700
-Subject: [PATCH v6 5/5] vfio: selftests: add end of address space DMA
- map/unmap tests
+	s=arc-20240116; t=1761668987; c=relaxed/simple;
+	bh=xQ0DSL8vGlaPGQU9Hp7y9CcwdlTXKyRGe5V82OocB5w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qhrnvOEdkTTVimWozKgBPIcIxhcmqzyVfi753FEtLT7XNLVQ3pfF0X4XbFcYWH8o8SbLCpWkpsUnc202PbaGJyTKq1rZWiIqA9iIvaOMFxesvfoiC/BiJP6dY9C1K8VS1rqfgs2AP9TIWYiaNDf6/U4qtge3XsHBQwxlpEgk09k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=2aHdX4Jr; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-430d098121cso27097885ab.0
+        for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 09:29:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1761668985; x=1762273785; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vU+TdivIUQqN8kZ5z+UlMDP2EK04JqI3D0gfCEED62A=;
+        b=2aHdX4JrMmiQeCqQefDdTvXXrjSCVX/dfkXE/gznbAtx5/jO01zA+l/CJNEQuvLnWX
+         o6v0/DoyzWNPt3oSO++UjGjCslc+BXZ4FJRnCzp5YOexCvA8Asa+ArKqnVhScY+mdZ3J
+         b+TaWGvrrE4HNPF0lpgE6FLcnHdu4KGY3RCYkbyKDT6aMEMPpfTyhFU6nar7FOh+DC2e
+         CWAEehGAl5V6gCaence0ZgaXdHvFofgWbmqiEP/QK9zD9iUosgZbKlSmfIK7Z5Gf9Zf+
+         KsXV64UgSzgZr/yAvzoe2fLOfJ2xEwnlH2cRsuRzhqeIuQfwLDSd6Qv1Fz7KGXJaJJzY
+         nGdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761668985; x=1762273785;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vU+TdivIUQqN8kZ5z+UlMDP2EK04JqI3D0gfCEED62A=;
+        b=j6F8IsYJZ3XdRuzuhAI6il6N7sMLD/o1h5dGCTaWZQaQM0eO5pR8Jz8WURF3ioiIGa
+         WNFMLmlS57HBUBr3/goS203a5BDC9s5BB35sJQ0AoaxNz4ghTiRgWYYypADfA/TwAGBZ
+         U85vK0gUFFB8ENAvkbfNgrjRkAaQOkHx6EhVbTm92/pTgHSF/M2M87f3Sq7wiJM3C7rJ
+         oVntavQTIKjVLihJ9dNpSGijuNIP2uSSZZKY/DS7/+PsYe9Ng3ElSKR4yL1PvthA+yDu
+         9ZbmQuVCXkL3bYYvQra0dBzSe1D1FxMvH6otQS0urQoRfMXKX/CP73UeiuhgGD6+DX/W
+         eryA==
+X-Forwarded-Encrypted: i=1; AJvYcCWA8S6bdJlFp+7gLvgHjbeBPiU3HFia8G+yVLwbAuZZOMp176QL+bgKUckxRtrue+xGe8M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5Vqu+BkGLe7rcAU3w7tA6p6RraNqLtyM1y8ZA0DbaZMekjBD3
+	0Jdc1zClEs2JwR3XRnPZrEm7DYI0l3RRw8HYW1XCz+McRIIT153RX5wMfCX20QGv7EM0sIkGWtr
+	YtI7CJSXfcmIZDT82Emu9Z8jaYAnYrUHwkw7Z7gvang==
+X-Gm-Gg: ASbGncsTAHyONBtpwROz3oV24VqWF+4QarmSrPARTDwM8k9WxVOvpmdYQzyL6KLxaY7
+	pZXuepqCNxAOQ70zd/N3TpQDDOq9KtmyoK6BTkQEcZQDG4iLT6tjgU/oyoPe6wHMtQ+9gM4MgrP
+	WK33eLrgYF56lfEN7hauykCxVlE3mq7oH0zKv9CnvdW0qnMHyutoUHXRlqgjRIxGhEL4ozcvy5O
+	j2eoEA2n0RhyYeLDzR+NFdYJAyOasTq3S1Q3jw3FHqt/BgWrhdywXJfgD3ZyXaYqlLq4MOBKvMO
+	bQwOgxR41uAhhWtm3w==
+X-Google-Smtp-Source: AGHT+IErAS74fWZIiI+tq2UyEDPXnXxNVCopnwSSqDNelEK9r7LFhgamKfvM6HVy6byU9ivOLNYx10ZFvWOtH8QctNI=
+X-Received: by 2002:a05:6e02:97:b0:3f3:4562:ca92 with SMTP id
+ e9e14a558f8ab-432f82bbd0dmr6242035ab.10.1761668984856; Tue, 28 Oct 2025
+ 09:29:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20251028-fix-unmap-v6-5-2542b96bcc8e@fb.com>
-References: <20251028-fix-unmap-v6-0-2542b96bcc8e@fb.com>
-In-Reply-To: <20251028-fix-unmap-v6-0-2542b96bcc8e@fb.com>
-To: Alex Williamson <alex@shazbot.org>
-CC: Jason Gunthorpe <jgg@ziepe.ca>,
-        Alejandro Jimenez
-	<alejandro.j.jimenez@oracle.com>,
-        David Matlack <dmatlack@google.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Alex Mastro
-	<amastro@fb.com>
-X-Mailer: b4 0.13.0
-X-FB-Internal: Safe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI4MDEzNyBTYWx0ZWRfXy2kDZIpycgqT
- OLtdl2IEmenACp9QYiqvaSeFXob04cM31mUSG2PObyEmZ/T4PBPO9o+NMfXMRD5tRmN1kksr8pR
- XMTdzoApwPbFqzkdKgUJXoVCmBqnIGaXALFh6rThJuQB7EigtiSfTlURmcKDP0yQvgEAtejKSrv
- VhEp+oYNyZcue9SBfDSoI0DnAGL3f9oARmQIMsazW7oAAGBjWeL5mphvQkR2p1+bxrmJiXvoQf7
- Zkpa1OhIW+XmOpKaFk6ralos5yhtWebzbQDqHqwSY6hm0TNpy9uDDHe5/znJy0eZJX79eFenGO4
- FymjbxZqqqu5uepAJNRaoOMnRtxpsmOzDpn/pYm1tJoaY6k/Y1k4SOKyMabNAMVuAWH6c/nGS3W
- WYwfHnCe5c3bmihKjDPEadJGCW2Crg==
-X-Proofpoint-GUID: k0T45pGA6VPHuiGKJ7zB-w5Gihfrs63u
-X-Authority-Analysis: v=2.4 cv=Uspu9uwB c=1 sm=1 tr=0 ts=6900ec16 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=1XWaLZrsAAAA:8 a=FOH2dFAWAAAA:8 a=wf1ge7rc0ZxdfOmzxhAA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: k0T45pGA6VPHuiGKJ7zB-w5Gihfrs63u
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-28_06,2025-10-22_01,2025-03-28_01
+References: <20251023032517.2527193-1-minachou@andestech.com>
+In-Reply-To: <20251023032517.2527193-1-minachou@andestech.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Tue, 28 Oct 2025 21:59:34 +0530
+X-Gm-Features: AWmQ_blNGqcbnB8O5PtfaRq8QkAGM6_aeGo0IUFrD9sil21TuzEIfSgTnICVsec
+Message-ID: <CAAhSdy285QMVghHZv0He8-YOdBdK71_UXtQcy7_nf=3jaPxWsg@mail.gmail.com>
+Subject: Re: [PATCH v3] RISC-V: KVM: flush VS-stage TLB after VCPU migration
+ to prevent stale entries
+To: Hui Min Mina Chou <minachou@andestech.com>
+Cc: atish.patra@linux.dev, pjw@kernel.org, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, alex@ghiti.fr, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, tim609@andestech.com, ben717@andestech.com, 
+	az70021@gmail.com, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add tests which validate dma map/unmap at the end of address space. Add
-negative test cases for checking that overflowing ioctl args fail with
-the expected errno.
+On Thu, Oct 23, 2025 at 8:59=E2=80=AFAM Hui Min Mina Chou
+<minachou@andestech.com> wrote:
+>
+> From: Hui Min Mina Chou <minachou@andestech.com>
+>
+> If multiple VCPUs of the same Guest/VM run on the same Host CPU,
+> hfence.vvma only flushes that Host CPU=E2=80=99s VS-stage TLB. Other Host=
+ CPUs
+> may retain stale VS-stage entries. When a VCPU later migrates to a
+> different Host CPU, it can hit these stale GVA to GPA mappings, causing
+> unexpected faults in the Guest.
+>
+> To fix this, kvm_riscv_gstage_vmid_sanitize() is extended to flush both
+> G-stage and VS-stage TLBs whenever a VCPU migrates to a different Host CP=
+U.
+> This ensures that no stale VS-stage mappings remain after VCPU migration.
+>
+> Fixes: 92e450507d56 ("RISC-V: KVM: Cleanup stale TLB entries when host CP=
+U changes")
+> Signed-off-by: Hui Min Mina Chou <minachou@andestech.com>
+> Signed-off-by: Ben Zong-You Xie <ben717@andestech.com>
+> Reviewed-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@ventanamicro.com>
 
-Reviewed-by: David Matlack <dmatlack@google.com>
-Signed-off-by: Alex Mastro <amastro@fb.com>
----
- .../testing/selftests/vfio/vfio_dma_mapping_test.c | 90 ++++++++++++++++++++++
- 1 file changed, 90 insertions(+)
+My comments on v2 are not addressed.
 
-diff --git a/tools/testing/selftests/vfio/vfio_dma_mapping_test.c b/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
-index a38966e8e5a6..4f1ea79a200c 100644
---- a/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
-+++ b/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
-@@ -112,6 +112,8 @@ FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(anonymous, 0, 0);
- FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(anonymous_hugetlb_2mb, SZ_2M, MAP_HUGETLB | MAP_HUGE_2MB);
- FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(anonymous_hugetlb_1gb, SZ_1G, MAP_HUGETLB | MAP_HUGE_1GB);
- 
-+#undef FIXTURE_VARIANT_ADD_IOMMU_MODE
-+
- FIXTURE_SETUP(vfio_dma_mapping_test)
- {
- 	self->device = vfio_pci_device_init(device_bdf, variant->iommu_mode);
-@@ -195,6 +197,94 @@ TEST_F(vfio_dma_mapping_test, dma_map_unmap)
- 	ASSERT_TRUE(!munmap(region.vaddr, size));
- }
- 
-+FIXTURE(vfio_dma_map_limit_test) {
-+	struct vfio_pci_device *device;
-+	struct vfio_dma_region region;
-+	size_t mmap_size;
-+};
-+
-+FIXTURE_VARIANT(vfio_dma_map_limit_test) {
-+	const char *iommu_mode;
-+};
-+
-+#define FIXTURE_VARIANT_ADD_IOMMU_MODE(_iommu_mode)			       \
-+FIXTURE_VARIANT_ADD(vfio_dma_map_limit_test, _iommu_mode) {		       \
-+	.iommu_mode = #_iommu_mode,					       \
-+}
-+
-+FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES();
-+
-+#undef FIXTURE_VARIANT_ADD_IOMMU_MODE
-+
-+FIXTURE_SETUP(vfio_dma_map_limit_test)
-+{
-+	struct vfio_dma_region *region = &self->region;
-+	u64 region_size = getpagesize();
-+
-+	/*
-+	 * Over-allocate mmap by double the size to provide enough backing vaddr
-+	 * for overflow tests
-+	 */
-+	self->mmap_size = 2 * region_size;
-+
-+	self->device = vfio_pci_device_init(device_bdf, variant->iommu_mode);
-+	region->vaddr = mmap(NULL, self->mmap_size, PROT_READ | PROT_WRITE,
-+			     MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-+	ASSERT_NE(region->vaddr, MAP_FAILED);
-+
-+	/* One page prior to the end of address space */
-+	region->iova = ~(iova_t)0 & ~(region_size - 1);
-+	region->size = region_size;
-+}
-+
-+FIXTURE_TEARDOWN(vfio_dma_map_limit_test)
-+{
-+	vfio_pci_device_cleanup(self->device);
-+	ASSERT_EQ(munmap(self->region.vaddr, self->mmap_size), 0);
-+}
-+
-+TEST_F(vfio_dma_map_limit_test, unmap_range)
-+{
-+	struct vfio_dma_region *region = &self->region;
-+	u64 unmapped;
-+	int rc;
-+
-+	vfio_pci_dma_map(self->device, region);
-+	ASSERT_EQ(region->iova, to_iova(self->device, region->vaddr));
-+
-+	rc = __vfio_pci_dma_unmap(self->device, region, &unmapped);
-+	ASSERT_EQ(rc, 0);
-+	ASSERT_EQ(unmapped, region->size);
-+}
-+
-+TEST_F(vfio_dma_map_limit_test, unmap_all)
-+{
-+	struct vfio_dma_region *region = &self->region;
-+	u64 unmapped;
-+	int rc;
-+
-+	vfio_pci_dma_map(self->device, region);
-+	ASSERT_EQ(region->iova, to_iova(self->device, region->vaddr));
-+
-+	rc = __vfio_pci_dma_unmap_all(self->device, &unmapped);
-+	ASSERT_EQ(rc, 0);
-+	ASSERT_EQ(unmapped, region->size);
-+}
-+
-+TEST_F(vfio_dma_map_limit_test, overflow)
-+{
-+	struct vfio_dma_region *region = &self->region;
-+	int rc;
-+
-+	region->size = self->mmap_size;
-+
-+	rc = __vfio_pci_dma_map(self->device, region);
-+	ASSERT_EQ(rc, -EOVERFLOW);
-+
-+	rc = __vfio_pci_dma_unmap(self->device, region, NULL);
-+	ASSERT_EQ(rc, -EOVERFLOW);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	device_bdf = vfio_selftests_get_bdf(&argc, argv);
+Regards,
+Anup
 
--- 
-2.47.3
-
+> ---
+> v3:
+> - Resolved build warning; updated header declaration and call side to
+>   kvm_riscv_local_tlb_sanitize
+>
+> v2:
+> - Updated Fixes commit to 92e450507d56
+> - Renamed function to kvm_riscv_local_tlb_sanitize
+>
+>  arch/riscv/include/asm/kvm_vmid.h | 2 +-
+>  arch/riscv/kvm/vcpu.c             | 2 +-
+>  arch/riscv/kvm/vmid.c             | 8 +++++++-
+>  3 files changed, 9 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/kvm_vmid.h b/arch/riscv/include/asm/k=
+vm_vmid.h
+> index ab98e1434fb7..75fb6e872ccd 100644
+> --- a/arch/riscv/include/asm/kvm_vmid.h
+> +++ b/arch/riscv/include/asm/kvm_vmid.h
+> @@ -22,6 +22,6 @@ unsigned long kvm_riscv_gstage_vmid_bits(void);
+>  int kvm_riscv_gstage_vmid_init(struct kvm *kvm);
+>  bool kvm_riscv_gstage_vmid_ver_changed(struct kvm_vmid *vmid);
+>  void kvm_riscv_gstage_vmid_update(struct kvm_vcpu *vcpu);
+> -void kvm_riscv_gstage_vmid_sanitize(struct kvm_vcpu *vcpu);
+> +void kvm_riscv_local_tlb_sanitize(struct kvm_vcpu *vcpu);
+>
+>  #endif
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 3ebcfffaa978..796218e4a462 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -968,7 +968,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>                  * Note: This should be done after G-stage VMID has been
+>                  * updated using kvm_riscv_gstage_vmid_ver_changed()
+>                  */
+> -               kvm_riscv_gstage_vmid_sanitize(vcpu);
+> +               kvm_riscv_local_tlb_sanitize(vcpu);
+>
+>                 trace_kvm_entry(vcpu);
+>
+> diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+> index 3b426c800480..6323f5383d36 100644
+> --- a/arch/riscv/kvm/vmid.c
+> +++ b/arch/riscv/kvm/vmid.c
+> @@ -125,7 +125,7 @@ void kvm_riscv_gstage_vmid_update(struct kvm_vcpu *vc=
+pu)
+>                 kvm_make_request(KVM_REQ_UPDATE_HGATP, v);
+>  }
+>
+> -void kvm_riscv_gstage_vmid_sanitize(struct kvm_vcpu *vcpu)
+> +void kvm_riscv_local_tlb_sanitize(struct kvm_vcpu *vcpu)
+>  {
+>         unsigned long vmid;
+>
+> @@ -146,4 +146,10 @@ void kvm_riscv_gstage_vmid_sanitize(struct kvm_vcpu =
+*vcpu)
+>
+>         vmid =3D READ_ONCE(vcpu->kvm->arch.vmid.vmid);
+>         kvm_riscv_local_hfence_gvma_vmid_all(vmid);
+> +
+> +       /*
+> +        * Flush VS-stage TLBs entry after VCPU migration to avoid using
+> +        * stale entries.
+> +        */
+> +       kvm_riscv_local_hfence_vvma_all(vmid);
+>  }
+> --
+> 2.34.1
+>
 
