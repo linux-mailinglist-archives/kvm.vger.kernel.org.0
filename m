@@ -1,179 +1,387 @@
-Return-Path: <kvm+bounces-61366-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61367-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3820C17443
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 00:03:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED10FC17617
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 00:38:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4BD9D4F7840
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 23:02:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1522A1A27796
+	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 23:38:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84FAB369996;
-	Tue, 28 Oct 2025 23:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F288436B960;
+	Tue, 28 Oct 2025 23:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="Q6goO9JB";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FbV3PhcN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hfGu2gaI"
 X-Original-To: kvm@vger.kernel.org
-Received: from flow-a3-smtp.messagingengine.com (flow-a3-smtp.messagingengine.com [103.168.172.138])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9AD2DCF58;
-	Tue, 28 Oct 2025 23:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.138
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761692512; cv=none; b=T/sVBOICKs4gGxinEm07HKqgjTt5pQJpzr/gRMoAVbDkLwJ9E0QLpAnlyfnXN25aSMm+tMc1DYsugbMWnjWh9S5L19bVXONOkTKSQWGSvJWafLC1Q680iu3gQdCk3sxF9+NG9NOqp/33Bwh/Wr76ncpfwTnHDhVmW00XSrM74pI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761692512; c=relaxed/simple;
-	bh=GEmVIyvcZswex1xK/L5E5FO8yRYC8c1DtcVExW6fUv4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DYwEUKqKmD7MOjv6gqxbsecJ0NNqskx6Zn2YJ7JLQBCYDZyalC8vCB4ur1bZv2jkslrltrXGipnDrPND7HJeBZwrfuy3ezSTGi4FDvJcowr6jZijLICr8n+Ah6uDd77Y9w6J5HCUH0Wkj/xPetZeH/i0s7oBD5rW2u0EQ8cIUdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=Q6goO9JB; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FbV3PhcN; arc=none smtp.client-ip=103.168.172.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailflow.phl.internal (Postfix) with ESMTP id 0E92213800E5;
-	Tue, 28 Oct 2025 19:01:47 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Tue, 28 Oct 2025 19:01:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1761692507;
-	 x=1761699707; bh=5900kUawE28awK0nhR2lAl8X3tlct7jD5QZ76Kkfoxg=; b=
-	Q6goO9JBM0VI8q0yGzpov1QTjO4aPNn6+zMXI5gX0RFuy0hAPRE1Ae5qMxRmuqON
-	vo8jgaJTQSvSAv9nzXoo6tALCt/1NkEPViAybKsMPFHGq6TLdZhI8WCNwrJ6VFVy
-	JZpvJdHoc3iNIerc6Hf+3B0Feg+dsSdP1ZhigW7llHwSMpm0HLJLFHcPNA4G1+sP
-	JIt07vtZiOByQDr895lZYO1weWpbo18gbPYTj/G6CMA7did2LvTp01Se3ODbUpPx
-	hnu8wi6RuB4/zAht0Tm3TMiERxdfrpzJ1WJmL2ygzYKIUzZzBrTkgTLKiqrEzj3R
-	zLgJmEJs7JZ+JnDcDO52Gw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1761692507; x=
-	1761699707; bh=5900kUawE28awK0nhR2lAl8X3tlct7jD5QZ76Kkfoxg=; b=F
-	bV3PhcNkw5F5hzW52DtPdYk+A2XkInHxkOTkj6kiZtyn1Wf7Dfi/yZw1MyOKkgxB
-	d254NSy8E5IS4hVV/Bo+IQNiTkoSXsX1Z14YZ2+7HTl+5uEqmeyAirh+JTWn51f9
-	cno+M6isQ/H1OXRiK2Coa3b8ap7Avg6+qj1Wkje87773rrPO4OXbHaOOWCkDdGMi
-	67q9Vp6Ep1i+PrYHWA0dkXU//yBbcrxkwxAY0MH4doMEmxO0LYWDb16rN1GYrXYu
-	x531igJA3rAndVgTJ2MrGQPerBrJ3Ow6s2kZfJs0VC53otKcTwY3IlJEVb9O3qiA
-	9VCb/W1K38haxxyOSUHeQ==
-X-ME-Sender: <xms:WksBaXtj3PQsy_8xvUya1nJELrY0cxi3jKHTym_XrVECWMJJlS80vg>
-    <xme:WksBaRxNiIYjA8cxVJrr2ldyKvR4dnsediEPqbxUiXT9PW3EwXW5rXSU8BJvXVFMN
-    LpQ35GoDeIHfZ2PfhyT4df2Cid8VouWNw3MxNARZQgnE7jA_24fSOs>
-X-ME-Received: <xmr:WksBaSDMlYFhw6kCUFmwMr2mqv5jestBGrjxLfLR8oazA-7NW3V8FgdtxSs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduiedvuddvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucfrhhhishhhihhnghdqkffkrfgprhhtucdliedtjedmne
-    cujfgurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgig
-    ucghihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrf
-    grthhtvghrnhephedvtdeuveejudffjeefudfhueefjedvtefgffdtieeiudfhjeejhffh
-    feeuvedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhr
-    ghdpnhgspghrtghpthhtohepiedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprg
-    hmrghsthhrohesfhgsrdgtohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhr
-    tghpthhtoheprghlvghjrghnughrohdrjhdrjhhimhgvnhgviiesohhrrggtlhgvrdgtoh
-    hmpdhrtghpthhtohepughmrghtlhgrtghksehgohhoghhlvgdrtghomhdprhgtphhtthho
-    pehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkh
-    gvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:WksBaXfI3D4xGjhbiOaxmrswB8-UJZby7RaPUv7zKgkDUcC4qlgx_Q>
-    <xmx:WksBaUm72C19mZFKW6K9fB4cQXAclw0KuDduIkISCSYG9IkMBqZUFw>
-    <xmx:WksBaWFYpTE3xf96BspHeAbPdNXJlJmeAA8s1ttu0M2V_yX8carLGw>
-    <xmx:WksBaU6jfTP3DLrerwZx4e_itdI2TumrpK3tRxbAfblmRL-f-Lw1Kw>
-    <xmx:W0sBaYR4nzu425PvkDZ_V5d46SD_hhMibMDoaRaX7yxPa6EYq5IQZhFY>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 28 Oct 2025 19:01:45 -0400 (EDT)
-Date: Tue, 28 Oct 2025 17:01:44 -0600
-From: Alex Williamson <alex@shazbot.org>
-To: Alex Mastro <amastro@fb.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Alejandro Jimenez
- <alejandro.j.jimenez@oracle.com>, David Matlack <dmatlack@google.com>,
- <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v6 0/5] vfio: handle DMA map/unmap up to the addressable
- limit
-Message-ID: <20251028170144.6a33a107@shazbot.org>
-In-Reply-To: <20251028-fix-unmap-v6-0-2542b96bcc8e@fb.com>
-References: <20251028-fix-unmap-v6-0-2542b96bcc8e@fb.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4BF2C15A8;
+	Tue, 28 Oct 2025 23:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761694676; cv=fail; b=dVkG8G6lKaa/xzHomclV6BftfBdC0qmFh2ohpXAtV/ioEGDY5zrOIbqa7dGoA17l7xLje05MwnEZ14u8FsWqorfZXZjpRVSp9PfAdOgeCxascy4hf0TrpvdUnxrLWesSFdOllkhg2iLuNWCV+ILINWImuw8r9LMgx3ku832RIgg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761694676; c=relaxed/simple;
+	bh=PP+6Rm+YpdqU4zhjI2wcTBSd4FRSsyMf0rWnOBNKxVI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=b7gkwFEZPPPXPPSoicT1K0+CjrPtOmIzkn3tAqG4HqA4trao263CeDSKJp839TaBWIRJxvWROY4cxsofHkpSU2E2U494W/bCwqM/fdvczJblZN9tsTGkqDf+IUuz1xNg1V5Ye4MiCHGdcd41QyCc5L3cim4u+ZvBWyJmzlMFP1Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hfGu2gaI; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761694674; x=1793230674;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=PP+6Rm+YpdqU4zhjI2wcTBSd4FRSsyMf0rWnOBNKxVI=;
+  b=hfGu2gaI7Ulx8eMnYa//s70TamlODehMXzw9Cbtu+dq5DBhlrko5sUHe
+   CiZZWKcCEZ57O+eHbBUE2cPp0BjS6ZN18kRe5NxpleM7el3Vw02fURWjG
+   3ppPOMehdXLzzX28xUPIP3UsRuit6yxH9AXfPaIW3I3bmqRXZPHmqA0wm
+   GRDrG/EzyN9A2InoTwRUhTluXVD9wRuiNZ92hfLJg/2VM0X3PsyqBXAk6
+   +T//sISAzyW7rIg4nY8cfaeB6qn9+svLB8MqMDpl3rPRXR4P91MI1Ix6h
+   QLJt/lpiiKZBS++2PggTn8Z7kdsnEKECo/uI1FA11YNIj/WA5hwp5mzlz
+   w==;
+X-CSE-ConnectionGUID: 9+/USTciRBGuTFLivfxVwA==
+X-CSE-MsgGUID: LubAthzrTIaERJQZ/HlrdA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="63735442"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="63735442"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 16:37:53 -0700
+X-CSE-ConnectionGUID: GqvBb2zrSyCbFIGdE8rUdw==
+X-CSE-MsgGUID: OArcWxVYStKeq+Jh1Qad5w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,262,1754982000"; 
+   d="scan'208";a="189844891"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 16:37:53 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 28 Oct 2025 16:37:52 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Tue, 28 Oct 2025 16:37:52 -0700
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.4) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 28 Oct 2025 16:37:52 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LWR9kxQ3eejb2qhpO+pfqNuRqhiXs5uVI/0UJx6ByEX1c6uujV3SZ4ySDe8B70748DV+U8BbmHoY9jlwxi6g7j8z1sxFEghruxpDR/kYTAkVNENf/bXlnlmHphrdqNi/eg5qSjVw0Ld2jXt4ZXJzPw8RWcEyfgpFWI+TZE30cFILUjtwPIDZ8UzGfFb5A5WD2UUggUQ/evEjoosFnjRrtNPAwSgmpFzQB4yrgL5Z3VrOYb1XYncaykTycRf/4dD6ps24AYVoOyVHn/Xt5K6f0fLj/dmJnZWLunI8oZrcV/ziTblI6KDAIFhJd/BRfq0reVX6HHDCU2LnNYB4vUCbJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wUObr7BsXF9L81Sz8FqzVh4vV5b7hkrlk1QVwLFctuA=;
+ b=lUsB7aDOqXhAO/4bBhmTomJnHzJs0jxr+rX3YxvTxbJicab2aQNc5tAwmq5UlRZghFHC0WCDNlxiQFtllqG6U44mkRCrUI7NUM1K1cnoHzjYnJhjjSolbW4+Foc8FSe7BUynhuCWFwNhkat0lxSSLZ0QABVUwp162RfCmKDSIqg96cJnTAHwjcKZCxa7Gx8Gu8cM9ydXczQumtsFm9ew8bY2nkmyNzGwN92x2yRk7kcLXyqPQSDdieqhlw46RDYyMytOX6/osylEASy4/5a1RH243xtCgNBZuG8fpXPdu3tpyGyuLs1DvV89kOW6B8HwBamWTvubMabH/oUPt2tzIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB5373.namprd11.prod.outlook.com (2603:10b6:5:394::7) by
+ LV3PR11MB8726.namprd11.prod.outlook.com (2603:10b6:408:21a::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Tue, 28 Oct
+ 2025 23:37:44 +0000
+Received: from DM4PR11MB5373.namprd11.prod.outlook.com
+ ([fe80::927a:9c08:26f7:5b39]) by DM4PR11MB5373.namprd11.prod.outlook.com
+ ([fe80::927a:9c08:26f7:5b39%5]) with mapi id 15.20.9275.011; Tue, 28 Oct 2025
+ 23:37:44 +0000
+Date: Wed, 29 Oct 2025 00:37:39 +0100
+From: =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>
+To: Michal Wajdeczko <michal.wajdeczko@intel.com>
+CC: Alex Williamson <alex.williamson@redhat.com>, Lucas De Marchi
+	<lucas.demarchi@intel.com>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
+	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
+	<kevin.tian@intel.com>, <intel-xe@lists.freedesktop.org>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
+	<matthew.brost@intel.com>, <dri-devel@lists.freedesktop.org>, Jani Nikula
+	<jani.nikula@linux.intel.com>, Joonas Lahtinen
+	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
+ Laguna" <lukasz.laguna@intel.com>
+Subject: Re: [PATCH v2 18/26] drm/xe/pf: Add helpers for VF MMIO migration
+ data handling
+Message-ID: <zh4olea5hdmfrrj62jhcuff3fqqoimt7incrhylqusdvy6bkko@inf4ufj4qhei>
+References: <20251021224133.577765-1-michal.winiarski@intel.com>
+ <20251021224133.577765-19-michal.winiarski@intel.com>
+ <b523664f-50ce-4de6-8d02-90b6938089c1@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b523664f-50ce-4de6-8d02-90b6938089c1@intel.com>
+X-ClientProxiedBy: VI1PR0102CA0067.eurprd01.prod.exchangelabs.com
+ (2603:10a6:803::44) To DM4PR11MB5373.namprd11.prod.outlook.com
+ (2603:10b6:5:394::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5373:EE_|LV3PR11MB8726:EE_
+X-MS-Office365-Filtering-Correlation-Id: 923ff029-5ab7-4b78-319f-08de167afd76
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Um9RVXg3TERFRmJKWHUvZDBxaVAzVGY1U1JweDZEdG9OSk1NLzFOMkhmSEFJ?=
+ =?utf-8?B?eFFVRVpQaU4zMDVJYU5qUmJFSDBtMUZVNi9RNDhpRVJjcFRydzRNVkk0Zmcx?=
+ =?utf-8?B?UUNQQVVIWkpteGMyT1VQQTl0WGJ4N0lGWGRoMWZXeFJZdWNMU3dLbzZRMnhh?=
+ =?utf-8?B?WFNCdGtOZ2tNRVpqK3NxRkhncmdyL0hFZHlnVi9UdDMrZmVraGVUN0tkWC9O?=
+ =?utf-8?B?bkFmMWNjL0ZnR2lwdHdSVDNKZkEyLzlIT3h3NVdKWWhsVlc0ck14UnVmbndW?=
+ =?utf-8?B?ZXlXb3FlZXJub21vTmc5aTYzN2NKZjM2NThGM2dsTURBeFVxWGgyS2Y1ZFNR?=
+ =?utf-8?B?V0lJV1VjVTBDZSsxbzJaVW5uVVQvTTRjS0xNWENYVGlIdXNCd2xhd3B4Nk1t?=
+ =?utf-8?B?MmsrbC8zZjZ0K1k4cFprVmlLNkpOUzNaaVljU1h0alRZczh5N2dFRkJDQll0?=
+ =?utf-8?B?a3ZxVWQrbVI4VWdTWGRhQlg3LzNWWHRlTUNnSTMwbmNvQ3pSM3FGUmVaeXdl?=
+ =?utf-8?B?dURXWmVjb1BKUGtFRVhpYThkSm8zajFqdm5wcHFNOUk1RHpoYmIyRjhNY0Nh?=
+ =?utf-8?B?Y1lRSC9NS1doWk9ITnU1dDJKS3plb0M2VGdqUno5ZHRQSmRBTFg5VTFtWWxz?=
+ =?utf-8?B?Zkhiakh6U1piNStYWlVzV29COUdLTDlVRWZ5cXJ0b3BSM1VnMkxzRUtubWN6?=
+ =?utf-8?B?ZEZBelJyTUl3YUZyMGJPeXRjYWxrNU9NTFc3Y2JyS0VZZGRYU1hVV0hxblVw?=
+ =?utf-8?B?ZDNiMVVCUTFJcFk5YTdtQmlYUWc5dXBCa1EyclM1Nk9VQ3VxaDVSQnI1aEVN?=
+ =?utf-8?B?ZU5Gd3d3K0hETnpMdVVobzNZaGY2d1czczJiSE1hRnVTT0pBQTg0Ryttc2dG?=
+ =?utf-8?B?dWx5UmI1dWx5U2xmb0tOZ1hDRThWaWlMWENYa0lPOFM3eFAxUkszckw0L2tU?=
+ =?utf-8?B?aW9KYmIzSkgydHlJcURacUc4bDZuSkR1aEZ6ejBPbjJzSkoyNW45UmNrajJu?=
+ =?utf-8?B?UkRXOVp0OCtFMFRrMWRSMjZIQlNkREREVTdYM3ArbmZwalpRVVpyVEVOb1Rs?=
+ =?utf-8?B?SjQrL0o1amUrV1I5aVc0TUtuVUtxejhGMnVlMUF6ZlBBVnZQbzhLMkVjMmlr?=
+ =?utf-8?B?b1NiM3A0RHM5d24razdoMVpveDN6UkpTWDlRLzhQcVF2NzVnTVNRejB4ZHpW?=
+ =?utf-8?B?QXpaSWdwMjJxMVNKemJwVDl3TG9zcUlwcU9lK2xueDM1cnRZUm9zMzd6ZktF?=
+ =?utf-8?B?QWVkcWZScDFGMG9mZ25rQk1BdFNWdDJleVVDS255QmJ1KzMwQ25ZTFZCWnJl?=
+ =?utf-8?B?eGZqMkU1N1ZONjNQODZuZUN2S3RZVVdRNkovUmUzb3lia0t6b09TWjB6b2J3?=
+ =?utf-8?B?d1N6MnZjOW5kS1JDNmFWQUI0dlpranRjSnJsYjNLS3FEanZyeTFMK25YcTlV?=
+ =?utf-8?B?d012aWF3dSt3M2VDUUJkaHl0WlA3VnVjeG4yMURJM3QrRnQzY1ArL1JTY01s?=
+ =?utf-8?B?SGdHOG0xSHhNVGFnaGIvNUtVY0c4d1gwcjl1ZDlUR1ZzWVB5Q0ZMQW56WDNH?=
+ =?utf-8?B?WlJDSnF1b1VlVWR5UlJkeGJzWVEyMmFIN3YwbjlUa0hZSjZxMEUwMEx3WFVr?=
+ =?utf-8?B?UFY1NGQyeFdTK0JRcFlOcHdPQm5ROGlTaTJEQ3JFVXFMVk5CVTVWQTRSOWUy?=
+ =?utf-8?B?Z3JwM09uYW9WSjdEVUZkQzhVRmtxcHY4WTVsaW1vczNZbDNwZEMrS1ZvOEhQ?=
+ =?utf-8?B?WG1nblEyVDFBK1hSNStlczVlcU5jcDFNRUFYR0NUQlEzU3FKUEpYcGZFRXBa?=
+ =?utf-8?B?UE5kRVdiYnExSnk4Y3AydDU4TG9EaWxLUkZRSmNSSHplaGFPUHRONFFsSFQz?=
+ =?utf-8?B?NExGNXZiRkNZSnZpNmZiZTFsR3Rldmk0elJ2UGgwTWUrOE9XNE9PZFlmWUl3?=
+ =?utf-8?Q?1GrZwFyBK8Q16aELIWTP5Z3BSLJ5lH7u?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZldGQ3RFcWlHT1paTnJ2Q3l4alJkODJsQWdqbGlpV2d4bWZYS1lPUjhFR2VQ?=
+ =?utf-8?B?VVlNeTlSQXd2cUxLTmpCM1hxd0V1SVJ5ZkVZdHJRSDlWTElqdTg0RzlBYkhW?=
+ =?utf-8?B?YzZBNTFNZ3JHQlNLb2w5cTUxT1RQU3BhbkJIY3QxcVFkTnZkYVlZb1pnblFt?=
+ =?utf-8?B?U2hxT2k3Smx5RzBJV2svdExDTm9lUGsrTHJ6c2VBdWJpcXlwTWNBYStWVGZt?=
+ =?utf-8?B?c0VsTkR5N2JBaEIxVCtCV0RJQWdJb3JXeTNuZ3pwT1FpSjgrb29lK204bDN3?=
+ =?utf-8?B?SVR4UHE2VlZCQkoyZm10K3ZTUEVSUXdROEZabFRFMzh4b1hETUtORzBTamRs?=
+ =?utf-8?B?ZFhXbktDYnZ3dlNOVWFkemlqVnl2RHk0cU5sMnQ2TFQ5MHFkeFRWQkxtZXZB?=
+ =?utf-8?B?Q0Z5azh2Rlo4LzlzS01lTk9ycmFpdU9rbmZaVjVVUEhxZXpIMjVsK21CY1Aw?=
+ =?utf-8?B?bUN2N1R3MzRoSSt5dWExZWRVa1JYbHJYaEtTM1I0eEJXck1EdlAzMlduUXBy?=
+ =?utf-8?B?WlNYWHlPWVFsOFFmRFlDeVRMRTFJZ1Q4ZFBtL0xnb28xVm9oekEwOUhLcHUy?=
+ =?utf-8?B?b2Nqb0JGN3lCNWJIajBpUnErZHZSWlprOCtDWlNPNTVTSFJMM3RTUHdWNnQz?=
+ =?utf-8?B?cTc3azRYOVZ5OTBvSFhtcjJ6Y2NUSmgzRjVsZjY1TXBERndCOGZOZXgrRmw0?=
+ =?utf-8?B?d2h4eEFQQ2hKWkgrNXNnR2dxZFZJOGFLbVg1ZjBCNWN1RXJCTElVRktzTk9a?=
+ =?utf-8?B?T3JhUmRaV1ZMWE0vMk1KMVRMNFdleDFiMHFvQVRIa1d6Umd5bXdoRC9sSUJn?=
+ =?utf-8?B?MGhCWEJZdEtpRnlsdDVjOHluVisvK2lqNGxRS1pJU0Q5QUJRZ1VVaGNCZUpT?=
+ =?utf-8?B?WHo0RlRUWXRtTGJJRFJKaThvNzNMRTNRaGYwU0g1TzhMbTRXWUdWMVpyU1lF?=
+ =?utf-8?B?N25SUXFwYmp2ODdRZnMwVkRVVDFOTW1XYjVHUUNyd2xDWitOMmk2dmlaNWlT?=
+ =?utf-8?B?cVRuZURCa3hic01QWnN5VG13d1hjanpmU0VHck9WU1ExZFRTbHJGU1VuYjNk?=
+ =?utf-8?B?TVZVcTMyQjBreG52ZnNDNlNUY3RjbXp6MjVDdnhmc1dMVFhnc3l2aDVod2Ex?=
+ =?utf-8?B?eUVNTXBGcDZpcHFTLzYyWVYzbEVwcjNHdzExdEV6Z25xa3RyZ295OU1VQUVz?=
+ =?utf-8?B?NjVJcklWN3Z4RGptbEwzMDcwTkNRWXRKc3R2Uk1ITGZoWUZ5T0Vsa3c1QTFl?=
+ =?utf-8?B?VVc4Mk5keEh0cTFOUCtvdnh1VzBPNFp4VDB6cmJDb1VmcTA1SHFUTE5haS9K?=
+ =?utf-8?B?ZFc1R2lqV0NSK3dJVkZyQk8zWDFPVVlSNU1TbWFxR3A5eUxlRkJmOVIwN1RF?=
+ =?utf-8?B?bHFUcDBMNWVXZWI4ZHM5d3VGcU9lZTVFNTR2OFRlTFRDcGRFQVVmM3dVczVE?=
+ =?utf-8?B?S0RXMktSa0RFMy95NjZSVGd3elQzZUpnZkxFdGtSMVZHMUlEWWhBamU1eVYz?=
+ =?utf-8?B?VE05aFVUWHpwM0cyS0FpRjNKb0RIaStaMHdQSkpmZFUxSzFlOTJlMXZicGU3?=
+ =?utf-8?B?c0FVTXRTWU5SS3JjZHVlNURoTFhDTFFzdGVvdW5ENnpuQS94UXRDQmd1MGVs?=
+ =?utf-8?B?YkVwV1RsTEJ4ckhvM3pBVDd0a1dWMTZMaDcwM3k0eGJzTXkxK1ViSUZWRFYz?=
+ =?utf-8?B?QnREdnZ2Tko5U1puMzFXQWNrVHFZNnRTVWdzV052V2srVHhQK2RXWmJOUWI1?=
+ =?utf-8?B?M3YxQVQyb01Od1UzdDZUeldnRnZNd216dHNYdGFUL2QzN3Z4eTJPUnFzdThk?=
+ =?utf-8?B?Q00vdmUrVDI0K0NJTUlWRUFOM3QxR2s3cHdGVGNsVEJpQms1TFl6RnE4Q2I1?=
+ =?utf-8?B?S2tMZk5heDVoWmZUclFRK085Vk4ybzRBRFRKSDNIMk8vV3BuZ2RuR1RKWllZ?=
+ =?utf-8?B?MHhVdHllWWZxYVU3WE9xN2FvUk9BOS9mT1ptUElZMCtaZmkxWEJWT2FUd3NU?=
+ =?utf-8?B?ZytVUG5HamN4UzlTL0h2bWZia05RLzNkVWMrV3gxc1V1Nk4vTlNZazhMTTRo?=
+ =?utf-8?B?bmliVDBsNTRHRlhSNFE3SjVsK0NQQjVwU1VVVmdwQ0RxNlZRWHR0T1YyVWIw?=
+ =?utf-8?B?ZlVjNzArbmdmbERxN0FZOEpNK1k3N2JBR28vRlhzeVIwMDcvakI1dEV2NHE5?=
+ =?utf-8?B?K0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 923ff029-5ab7-4b78-319f-08de167afd76
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5373.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2025 23:37:44.3850
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +A/EVCWqyhf5JLPmFKRk/dGpfLsl4ojBXcpvjT9LPnMn8n1Dr3tNl2yFumOBFgk7XiO4LSIV2yVnBdEmLA1QF5GEeNhr/5vjRc7MJfdhl1g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8726
+X-OriginatorOrg: intel.com
 
-On Tue, 28 Oct 2025 09:14:59 -0700
-Alex Mastro <amastro@fb.com> wrote:
+On Fri, Oct 24, 2025 at 12:10:31AM +0200, Michal Wajdeczko wrote:
+> 
+> 
+> On 10/22/2025 12:41 AM, Michał Winiarski wrote:
+> > In an upcoming change, the VF MMIO migration data will be handled as
+> > part of VF control state machine. Add the necessary helpers to allow the
+> > migration data transfer to/from the VF MMIO registers.
+> > 
+> > Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
+> > ---
+> >  drivers/gpu/drm/xe/xe_gt_sriov_pf.c | 88 +++++++++++++++++++++++++++++
+> >  drivers/gpu/drm/xe/xe_gt_sriov_pf.h |  6 ++
+> 
+> wrong place for those helpers
+> 
+> just promote xe_reg_vf_to_pf()
+> 
+> or maybe it can be done like this:
+> 
+> 	void xe_mmio_init_vf(struct xe_mmio *vf, const struct xe_mmio *pf, vfid);
+> 
+> then
+> 
+> 	struct xe_mmio mmio_vf;
+> 
+> 	xe_mmio_init_vf(&mmio_vf, &gt->mmio, vfid);
+> 	val = xe_mmio_read32(&mmio_vf, REG);
+> 	xe_mmio_write32(&mmio_vf, val, REG);
+> 
+> let me try check this out
 
-> This patch series aims to fix vfio_iommu_type.c to support
-> VFIO_IOMMU_MAP_DMA and VFIO_IOMMU_UNMAP_DMA operations targeting IOVA
-> ranges which lie against the addressable limit. i.e. ranges where
-> iova_start + iova_size would overflow to exactly zero.
-> 
-> Today, the VFIO UAPI has an inconsistency: The
-> VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE capability of VFIO_IOMMU_GET_INFO
-> reports that ranges up to the end of the address space are available
-> for use, but are not really due to bugs in handling boundary conditions.
-> 
-> For example:
-> 
-> vfio_find_dma_first_node() is called to find the first dma node to unmap
-> given an unmap range of [iova..iova+size). The check at the end of the
-> function intends to test if the dma result lies beyond the end of the
-> unmap range. The condition is incorrectly satisfied when iova+size
-> overflows to zero, causing the function to return NULL.
-> 
-> The same issue happens inside vfio_dma_do_unmap()'s while loop.
-> 
-> This bug was also reported by Alejandro Jimenez in [1][2].
-> 
-> Of primary concern are locations in the current code which perform
-> comparisons against (iova + size) expressions, where overflow to zero
-> is possible.
-> 
-> The initial list of candidate locations to audit was taken from the
-> following:
-> 
-> $ rg 'iova.*\+.*size' -n drivers/vfio/vfio_iommu_type1.c | rg -v '\- 1'
-> 173:            else if (start >= dma->iova + dma->size)
-> 192:            if (start < dma->iova + dma->size) {
-> 216:            if (new->iova + new->size <= dma->iova)
-> 1060:   dma_addr_t iova = dma->iova, end = dma->iova + dma->size;
-> 1233:   if (dma && dma->iova + dma->size != iova + size)
-> 1380:           if (dma && dma->iova + dma->size != iova + size)
-> 1501:           ret = vfio_iommu_map(iommu, iova + dma->size, pfn, npage,
-> 1504:                   vfio_unpin_pages_remote(dma, iova + dma->size, pfn,
-> 1721:           while (iova < dma->iova + dma->size) {
-> 1743:                           i = iova + size;
-> 1744:                           while (i < dma->iova + dma->size &&
-> 1754:                           size_t n = dma->iova + dma->size - iova;
-> 1785:                   iova += size;
-> 1810:           while (iova < dma->iova + dma->size) {
-> 1823:                   i = iova + size;
-> 1824:                   while (i < dma->iova + dma->size &&
-> 2919:           if (range.iova + range.size < range.iova)
-> 
-> This series spends the first couple commits making mechanical
-> preparations before the fix lands in the third commit. Selftests are
-> added in the last two commits.
-> 
-> [1] https://lore.kernel.org/qemu-devel/20250919213515.917111-1-alejandro.j.jimenez@oracle.com/
-> [2] https://lore.kernel.org/all/68e18f2c-79ad-45ec-99b9-99ff68ba5438@oracle.com/
-> 
-> Signed-off-by: Alex Mastro <amastro@fb.com>
-> 
-> ---
-> Changes in v6:
-> - Fix nits in selftests
-> - Clarify function calls with '()' in commit messages
-> - Link to v5: https://lore.kernel.org/r/20251027-fix-unmap-v5-0-4f0fcf8ffb7d@fb.com
+With:
+4504e78068924 ("drm/xe/pf: Access VF's register using dedicated MMIO view")
 
-Applied to vfio for-linus branch for v6.18.  Thanks!
+The helpers are somewhat no longer necessary.
+I'll move the logic to xe_gt_sriov_pf_migration.c and drop this patch
+completely, moving everything into:
+drm/xe/pf: Handle MMIO migration data as part of PF control
 
-Alex
+Thanks,
+-Michał
+
+> 
+> 
+> >  2 files changed, 94 insertions(+)
+> > 
+> > diff --git a/drivers/gpu/drm/xe/xe_gt_sriov_pf.c b/drivers/gpu/drm/xe/xe_gt_sriov_pf.c
+> > index c4dda87b47cc8..31ee86166dfd0 100644
+> > --- a/drivers/gpu/drm/xe/xe_gt_sriov_pf.c
+> > +++ b/drivers/gpu/drm/xe/xe_gt_sriov_pf.c
+> > @@ -194,6 +194,94 @@ static void pf_clear_vf_scratch_regs(struct xe_gt *gt, unsigned int vfid)
+> >  	}
+> >  }
+> >  
+> > +/**
+> > + * xe_gt_sriov_pf_mmio_vf_size - Get the size of VF MMIO register data.
+> > + * @gt: the &xe_gt
+> > + * @vfid: VF identifier
+> > + *
+> > + * Return: size in bytes.
+> > + */
+> > +size_t xe_gt_sriov_pf_mmio_vf_size(struct xe_gt *gt, unsigned int vfid)
+> > +{
+> > +	if (xe_gt_is_media_type(gt))
+> > +		return MED_VF_SW_FLAG_COUNT * sizeof(u32);
+> > +	else
+> > +		return VF_SW_FLAG_COUNT * sizeof(u32);
+> > +}
+> > +
+> > +/**
+> > + * xe_gt_sriov_pf_mmio_vf_save - Save VF MMIO register values to a buffer.
+> > + * @gt: the &xe_gt
+> > + * @vfid: VF identifier
+> > + * @buf: destination buffer
+> > + * @size: destination buffer size in bytes
+> > + *
+> > + * Return: 0 on success or a negative error code on failure.
+> > + */
+> > +int xe_gt_sriov_pf_mmio_vf_save(struct xe_gt *gt, unsigned int vfid, void *buf, size_t size)
+> > +{
+> > +	u32 stride = pf_get_vf_regs_stride(gt_to_xe(gt));
+> > +	struct xe_reg scratch;
+> > +	u32 *regs = buf;
+> > +	int n, count;
+> > +
+> > +	if (size != xe_gt_sriov_pf_mmio_vf_size(gt, vfid))
+> > +		return -EINVAL;
+> > +
+> > +	if (xe_gt_is_media_type(gt)) {
+> > +		count = MED_VF_SW_FLAG_COUNT;
+> > +		for (n = 0; n < count; n++) {
+> > +			scratch = xe_reg_vf_to_pf(MED_VF_SW_FLAG(n), vfid, stride);
+> > +			regs[n] = xe_mmio_read32(&gt->mmio, scratch);
+> > +		}
+> > +	} else {
+> > +		count = VF_SW_FLAG_COUNT;
+> > +		for (n = 0; n < count; n++) {
+> > +			scratch = xe_reg_vf_to_pf(VF_SW_FLAG(n), vfid, stride);
+> > +			regs[n] = xe_mmio_read32(&gt->mmio, scratch);
+> > +		}
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +/**
+> > + * xe_gt_sriov_pf_mmio_vf_restore - Restore VF MMIO register values from a buffer.
+> > + * @gt: the &xe_gt
+> > + * @vfid: VF identifier
+> > + * @buf: source buffer
+> > + * @size: source buffer size in bytes
+> > + *
+> > + * Return: 0 on success or a negative error code on failure.
+> > + */
+> > +int xe_gt_sriov_pf_mmio_vf_restore(struct xe_gt *gt, unsigned int vfid,
+> > +				   const void *buf, size_t size)
+> > +{
+> > +	u32 stride = pf_get_vf_regs_stride(gt_to_xe(gt));
+> > +	const u32 *regs = buf;
+> > +	struct xe_reg scratch;
+> > +	int n, count;
+> > +
+> > +	if (size != xe_gt_sriov_pf_mmio_vf_size(gt, vfid))
+> > +		return -EINVAL;
+> > +
+> > +	if (xe_gt_is_media_type(gt)) {
+> > +		count = MED_VF_SW_FLAG_COUNT;
+> > +		for (n = 0; n < count; n++) {
+> > +			scratch = xe_reg_vf_to_pf(MED_VF_SW_FLAG(n), vfid, stride);
+> > +			xe_mmio_write32(&gt->mmio, scratch, regs[n]);
+> > +		}
+> > +	} else {
+> > +		count = VF_SW_FLAG_COUNT;
+> > +		for (n = 0; n < count; n++) {
+> > +			scratch = xe_reg_vf_to_pf(VF_SW_FLAG(n), vfid, stride);
+> > +			xe_mmio_write32(&gt->mmio, scratch, regs[n]);
+> > +		}
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  /**
+> >   * xe_gt_sriov_pf_sanitize_hw() - Reset hardware state related to a VF.
+> >   * @gt: the &xe_gt
+> > diff --git a/drivers/gpu/drm/xe/xe_gt_sriov_pf.h b/drivers/gpu/drm/xe/xe_gt_sriov_pf.h
+> > index e7fde3f9937af..7f4f1fda5f77a 100644
+> > --- a/drivers/gpu/drm/xe/xe_gt_sriov_pf.h
+> > +++ b/drivers/gpu/drm/xe/xe_gt_sriov_pf.h
+> > @@ -6,6 +6,8 @@
+> >  #ifndef _XE_GT_SRIOV_PF_H_
+> >  #define _XE_GT_SRIOV_PF_H_
+> >  
+> > +#include <linux/types.h>
+> > +
+> >  struct xe_gt;
+> >  
+> >  #ifdef CONFIG_PCI_IOV
+> > @@ -16,6 +18,10 @@ void xe_gt_sriov_pf_init_hw(struct xe_gt *gt);
+> >  void xe_gt_sriov_pf_sanitize_hw(struct xe_gt *gt, unsigned int vfid);
+> >  void xe_gt_sriov_pf_stop_prepare(struct xe_gt *gt);
+> >  void xe_gt_sriov_pf_restart(struct xe_gt *gt);
+> > +size_t xe_gt_sriov_pf_mmio_vf_size(struct xe_gt *gt, unsigned int vfid);
+> > +int xe_gt_sriov_pf_mmio_vf_save(struct xe_gt *gt, unsigned int vfid, void *buf, size_t size);
+> > +int xe_gt_sriov_pf_mmio_vf_restore(struct xe_gt *gt, unsigned int vfid,
+> > +				   const void *buf, size_t size);
+> >  #else
+> >  static inline int xe_gt_sriov_pf_init_early(struct xe_gt *gt)
+> >  {
+> 
 
