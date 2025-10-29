@@ -1,392 +1,288 @@
-Return-Path: <kvm+bounces-61391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C510C1AA8A
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 14:26:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 824DDC1AC90
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 14:39:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9F1D561E28
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 13:12:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E47D660FF1
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 13:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D91F2D8398;
-	Wed, 29 Oct 2025 13:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19F433B6CC;
+	Wed, 29 Oct 2025 13:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jN4F5gdT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LIX0jxzc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72B52D23BC;
-	Wed, 29 Oct 2025 13:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761743315; cv=none; b=EBzy4fF7WBrxDxw/geAbkgsijm56ioPV3ld66JW+H3CLFX8L5ZTRK3eFoMlU6D7O6FlFy6UKcB+HacBwUkrbFruHeSN5s+tpwwNVXZXxMojaN3R41hQhyYxP4NtRcmitAKmLjiJEGSMtFm58FDzEwXwcuaTKgGF6uz1bxgpA1/U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761743315; c=relaxed/simple;
-	bh=tDMkOiHrA3eT74QLyYSrwUUima+EcBylwbkvubbTnd4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KhLUrpiIbqxNvdkXBM2la37+LW3YsirRMjZT4HGXeHhYr74p2JU42CX4q9d1tMMxObuo9ttKCEIW6Usxfi8GJmh+22We3uwu2EUHI5YWeFWOMkupOOXKrp/0jQd+SO+LtR3XjyvTcBkv1JzZ2uGec9323+aHrWNxMkI5fRAv4mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jN4F5gdT; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59TApkTp025816;
-	Wed, 29 Oct 2025 13:08:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=yDOnppx9B6iPjPkweVjzeGhNFNR0KwdHKQ8WJGxje
-	bI=; b=jN4F5gdTRi8qL103RM/LvaAHSk7Hzpv5OCJfU/stG/30yooFBFctenQG8
-	KtY2iBExeHYcGaQd+8cd9lsEPzHtTenV+lFFdLiFhAmKEybtxM4SszilrMaHB8GQ
-	U/tgWqIDswddR9fiujVAPRUtYRxvXMa+tn4HzvyAOf0lqIckHedO09vXiehkSbA+
-	Z6Whl7HAmM3kf2D2krzuIddlZsGfeP4PWoSDLCaQUkjKY5UE5wsC/87U19inqWpm
-	30p+4KIHpOmuNY4cLwckjHcmEQvFzkzURzK48uWBgpC579nSUS1LDuMkBYaBOZY0
-	WcXcUQhUEhmnNxXvKaUjTnIT0tyjg==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a34ackcaq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Oct 2025 13:08:31 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59T9r9ok027546;
-	Wed, 29 Oct 2025 13:08:30 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a33w2kcrm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Oct 2025 13:08:30 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59TD8RPv51118338
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 29 Oct 2025 13:08:27 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 223D920043;
-	Wed, 29 Oct 2025 13:08:27 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 00E8320040;
-	Wed, 29 Oct 2025 13:08:27 +0000 (GMT)
-Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 29 Oct 2025 13:08:26 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        borntraeger@linux.ibm.com
-Subject: [PATCH] KVM: s390: Add capability that forwards operation exceptions
-Date: Wed, 29 Oct 2025 13:04:11 +0000
-Message-ID: <20251029130744.6422-1-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620631EF09D;
+	Wed, 29 Oct 2025 13:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761743767; cv=fail; b=lNgPFrBDnVZbt+OOD2CDTHhGh+LFoAgchQwm+ADDD8v73hfenADkLD0kKmDyNUkDK/G0VLeG7n71HKFCApK/qZTPIPTR9cbdHzYcUBDHxC9f8jww93q3G36tY06HucMNkb6I1ZeitN2BEioco5zBw6AHh/IdeEb2Lnpdf8w+brw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761743767; c=relaxed/simple;
+	bh=Y5Ud/WmWKndXTYeWK8CyzocUou2sPcGjlEDAyPU0coQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ReLWj8xXvWGQVZ1uE8TA0BXDVmfbfz9v4ZojDn7qKHIwY8hM9B0BXQPL8UOuUph0XP9V19bk8jEXfbotsiWbdJKpIyjW7Pu7nq0IJkXNBfPPW4EOS0Txvpv31Z184mJBHV/VZ5ltYL+Lkr8fgK/ddF4eBp0W3+bhAL9ERCkWo9k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LIX0jxzc; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761743762; x=1793279762;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=Y5Ud/WmWKndXTYeWK8CyzocUou2sPcGjlEDAyPU0coQ=;
+  b=LIX0jxzc5UHSd3oq2Y9ylyAlYoC9MY/Yx1jcxZzrTyKHv+72HLefxaPC
+   oEU5MwQP7pZeBjUxlmgpEJkgQ3L24HgqeG5hmmIsrF6evTnvb3CdoOfDN
+   QeCG3pUbleEYM/nDH8woI8zN/6CtZjEQRs97o1ah5iod3r92mG5sZ2Wu3
+   R4jzFP1QV5hyUX+8jHD57rNa7kUFHcT1Ad7R3VEkSdtlTir4wKzIgktkF
+   PM/180MlJooPD1vL+tKdLEPy+x6jhrDS6PRp4LiZ67N8zMNSA2g2OSA4f
+   3W3aGO0KLDfy5TT0sSXcOwHAOR+V3CQlOgCmJJkCVvxKPbbb6J3LGTQKf
+   w==;
+X-CSE-ConnectionGUID: qwdKPkVHTZKi+9sqQH+9aw==
+X-CSE-MsgGUID: iV2hyYFwRFeEALt/WWpDmQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11596"; a="51437933"
+X-IronPort-AV: E=Sophos;i="6.19,264,1754982000"; 
+   d="scan'208";a="51437933"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 06:16:01 -0700
+X-CSE-ConnectionGUID: klCA6QWdSZWpZxer+scjxw==
+X-CSE-MsgGUID: +zSv7eB+TGG1L+jP6s7rUA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,264,1754982000"; 
+   d="scan'208";a="222882393"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 06:16:02 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 29 Oct 2025 06:16:00 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Wed, 29 Oct 2025 06:16:00 -0700
+Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.24) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 29 Oct 2025 06:16:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=s1LyZ9MfAoLMy7YVQj6MJhKfeEOc7LCpj40VWY0jjL3Mc8TGft92vyHcw2k6cAwo0XwObsvOepwXK+zfOcLh7AgROk/CoR6PY3AETt7XJ9k2dznJozywucOGMuShvi4gDM1GGB+sj1Ktj0wvvURrMpa+ZwZCiWln/j2xBh+umxNtlV8wAvoXzPfKXwp2h10bjLFXNal9BkPyW/L+w8ZtMF8ozQjGG9OF20RcoCeOOjn8ahr1nq82k3CLEm7s1XOtm96FIKAYfYh/PRko7sLPiVQyG6riVBUtPmddofA7H2Tn8eHgWsgZxUoxoRe2+eP3fL8lZa6xFvscsecigB6WoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dR6nL1mPtaRJDs6IEg7mSR+7wWn7z7nQ5y8z2wmndhM=;
+ b=YLFItN9Xlxep04qqN5CSHX2wvx2yUEhMvslK2+vkcwjXyo5opY0ZslWF5jEEZf92vvQL0x9QkKAFKsTseIZpzXfx2AYGUaSYaGq+FYc0W9KRV+9eD8uL/jvSRVdmTPIbJZ7IRSLJaic4rlRJcQUlLIMkrWUSaghgbv0uHmKhXMjRGhnWSj8G29tl5mNm/nLCqgcSNKgNWQQ3fMe9th4/2/iLMODUhX+XFAsbrptnrcvgSV6PqC/sMu8mYBhLvqHFd/NYAEdqnW9o3WYgLp3CJoZ0lfcfBldfwt/szWmnAZC7SZuJ2njgUqv8kiAYONixBrrDCNYENd1G7Hyv3Kdg1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH3PPF9E162731D.namprd11.prod.outlook.com
+ (2603:10b6:518:1::d3c) by PH7PR11MB7570.namprd11.prod.outlook.com
+ (2603:10b6:510:27a::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.16; Wed, 29 Oct
+ 2025 13:15:54 +0000
+Received: from PH3PPF9E162731D.namprd11.prod.outlook.com
+ ([fe80::8289:cecc:ea5b:f0c]) by PH3PPF9E162731D.namprd11.prod.outlook.com
+ ([fe80::8289:cecc:ea5b:f0c%8]) with mapi id 15.20.9275.011; Wed, 29 Oct 2025
+ 13:15:54 +0000
+Date: Wed, 29 Oct 2025 08:18:14 -0500
+From: Ira Weiny <ira.weiny@intel.com>
+To: Sagi Shahar <sagis@google.com>, <linux-kselftest@vger.kernel.org>, "Paolo
+ Bonzini" <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, "Sean
+ Christopherson" <seanjc@google.com>, Ackerley Tng <ackerleytng@google.com>,
+	Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>, Erdem Aktas
+	<erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, "Roger
+ Wang" <runanwang@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, "Oliver
+ Upton" <oliver.upton@linux.dev>, "Pratik R. Sampat"
+	<pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>, Chenyi Qiang
+	<chenyi.qiang@intel.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v12 16/23] KVM: selftests: Setup memory regions for TDX
+ on vm creation
+Message-ID: <6902141659442_20bb411003c@iweiny-mobl.notmuch>
+References: <20251028212052.200523-1-sagis@google.com>
+ <20251028212052.200523-17-sagis@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20251028212052.200523-17-sagis@google.com>
+X-ClientProxiedBy: SJ0PR03CA0291.namprd03.prod.outlook.com
+ (2603:10b6:a03:39e::26) To PH3PPF9E162731D.namprd11.prod.outlook.com
+ (2603:10b6:518:1::d3c)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=XbuEDY55 c=1 sm=1 tr=0 ts=690211cf cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=2J_RzahkHEl8vmpqG00A:9
-X-Proofpoint-ORIG-GUID: 94MvI6_RQSdsbD-AUyT1iTYSfF6e8W64
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI4MDE2NiBTYWx0ZWRfXzmub4T8MWIEI
- jgXuHbz0R8wvFjf17j7UGDAqe27m5kPgsOlIArJYB77KV1jSKhwQVWmnAdvmJ+9RWydqKbN6kpB
- +Nx//Q2gAGHwklRi0G+f9XKU1Z3WRttN90DewFLbau6ONOw3pfwAlue9QyhTFgvZwhTFDwfPUUh
- MWUL2/x1IHT79VXJDcmr21FvoVKyiGEEbFieUCs3VGXWpceO8e7ix5KfOP3Wn7A8Qcg2n5HiBip
- I4zewVqZlo2Q1UUYhr7oI/5i6I4IYIN40x1KRDE7r1xxS3LHtALxm/hJD4oySEw0RsCWfVdl420
- s8x4k6OOwC8F5RlJkboPpXsAEyzPba/9+MKQnBLl8aio6NOQTIKBSv3+OB5KdrpB3Md/hdYC51N
- BWe+KKUAIP9qalan3ceYs9dA6WBINg==
-X-Proofpoint-GUID: 94MvI6_RQSdsbD-AUyT1iTYSfF6e8W64
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-10-29_05,2025-10-29_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 suspectscore=0 bulkscore=0 spamscore=0
- impostorscore=0 phishscore=0 priorityscore=1501 clxscore=1015
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
- definitions=main-2510280166
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH3PPF9E162731D:EE_|PH7PR11MB7570:EE_
+X-MS-Office365-Filtering-Correlation-Id: be8a4ac6-56dd-4ddf-e563-08de16ed49fc
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024|921020|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?a6oOA++5z+C0gGXhgUaubPa9OmcSRxOrnzOZBHbMtU3zctxYnh7sZhvULFK/?=
+ =?us-ascii?Q?mehLggWbQaWkcko2cj6zfUUGWag+2YwAQi8rt3K3Ls4/eHssPxbUEoLu2Nh0?=
+ =?us-ascii?Q?FqRH4iaOfM3nhoH1LTU9kq1kx8sWUkzojT2UEp4dryvjQ7ROrY3vdqGlRxuh?=
+ =?us-ascii?Q?elbWaDed9TTzAXdAXHGz+1YoqOZpZiLOO9V84SL1n+VhJZj+m6/pFms0bVh7?=
+ =?us-ascii?Q?K8LmoI6hsYijVF4+2TOy+Mjwfx6+TTIoEP0NEhdHQAgRZkQ1NUkpyqJ1CzN5?=
+ =?us-ascii?Q?s8FUcAMajGeUaftdOkO5YTkfq0Y+y/fwEaN55sgGXyxDTBuZ5cKyHEklAG+5?=
+ =?us-ascii?Q?sepkWmw7+/okyx9nE2ZphQcyJFpmr9jWef2mnd0pFSDdwizbGC8iBd7mrZuS?=
+ =?us-ascii?Q?MHc7HJ0foxPaObAraoY9xSPtEHwG0Ys+UOa53btizQdxdSIK8WVkaU6vSJno?=
+ =?us-ascii?Q?wuK3ApPw5FYcBniOPjP0eT+DiOy/MnifKUY0hMvKuARwJ5nUXoxtsj7ESHKd?=
+ =?us-ascii?Q?lZjt/KJlHj8REUvH/3bEJlNDBX0zqfT/XZD1iEHT9yFmAr/L30jd1IcRMYn2?=
+ =?us-ascii?Q?2WMjvazboOiblQsAmS4CJgjlde3uro0xT1uagWBu/wwXySKhzVCl1CCt2QdO?=
+ =?us-ascii?Q?7NFYOUdjOJsdfWM9q56EcL4MPh0OcmDiMKkrw/1gUg5afaP3dxtzxHc5t0d1?=
+ =?us-ascii?Q?eL3ojnCYF2b/6tk9DSc5yxiLQpP63mYKcvwYdeyU1l/ImaapyZXUIW6irkvg?=
+ =?us-ascii?Q?3DASKVjyh7g9aEQhF+k03DIuR5faP/CY2dwtGI+s1rViWFB1YWE36UjUYx6S?=
+ =?us-ascii?Q?5OIUts9SIi7fBR+29CFqjkyUW5C6Z9H3uo8Tks0h0eXFYoENObfg8i9yi7zG?=
+ =?us-ascii?Q?XLw1hLQqrrlHGq0GA8mkR4q5GnUEOjxwRZDapshy50IiPhUyzmgYmVJbqtDL?=
+ =?us-ascii?Q?MeyGtOOdd3DImbtzubmi/pKnf+RRCghzxP7SZpC4KDzxMkpP+B1oAeAihRQV?=
+ =?us-ascii?Q?yGboXmbdq+hKBSdGflJ67AwQijrKGOSF70HEEgTKWcPmhWLkiJGy+lymirqT?=
+ =?us-ascii?Q?3S6fn0lBoTBt4ugnnQaoZAFu2tn/rMWhNHRzK5jSCfH4kUPwHWyLvqVezD15?=
+ =?us-ascii?Q?9VoCbtV5obbADslQZfzmmPx9UrTUZoYMp3Ffxif+bg/eBbkWPLXZBC3PdxYT?=
+ =?us-ascii?Q?k1FIIVEVOpPBeUoi53hsDnpL/8GjKi3fWdbMxRzUCJ+elYK2F4D3OaE+jjNQ?=
+ =?us-ascii?Q?GRzgx6hHdbxbJo4lEZpf3CBW1wbC3JA1lOJHfTqrz43CTQXkJkjpIGQmS+uL?=
+ =?us-ascii?Q?SSlGvM2OGywheqFmByRaSs1WCRq0mLXVME7pEnsPBAXP5eQJxIbauPGeIh2T?=
+ =?us-ascii?Q?orDM2d9yiDTw8oXrqq7Z2vy4UBaIw4vdBi6p5A/40cX0XnBE/oLSoIx6jtHt?=
+ =?us-ascii?Q?4baNiBM9JvorrclwTcNDM1EBHz2nPLY4YCJXX/CTuJFwgBBLCnajTeVm40WM?=
+ =?us-ascii?Q?QaX0nFvjUbqYqB4=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH3PPF9E162731D.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(921020)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WK+0YLFWq2WOBVzQwGMfWTaGynLE6Jqsy7EDZW3W94+O179ntl+LVhbkuBgS?=
+ =?us-ascii?Q?bOsDUWFZWaiCWDyRAjoNLt2vW9MuBcFFmFFgJLQQin/9j3MvJgEAgtjRv7pO?=
+ =?us-ascii?Q?sCdJw4JGvWrMis00e1KqKdh76T/lQdtUylSsY+zKIWvF1PZKggLjhvp8bdY+?=
+ =?us-ascii?Q?h8+wES2ZbgLg7ZtTiF7K/tZtu469AukaJavFcmp89/HAwy5p4cqiTdOzN5mx?=
+ =?us-ascii?Q?Dm9Ku95Z/Eo2YB6eYIr6hDfJVoqfmS6jplHmNrkxbThZBN6HqzAlcIAqB/5g?=
+ =?us-ascii?Q?zMuTgc+IaIyclCQBEVLcufuo2tNU7gKle93cbO42ItTshp56P+4v4PyAxD0D?=
+ =?us-ascii?Q?kPialw64OrrpbFRwQg88LKslPQGWmNP2bb0c1Vx/WNm7P30bMfAGCI1zOrKg?=
+ =?us-ascii?Q?nm+wXvNhgBUl8kTSxtk2g5k6b8DxSBKt6ko/FWNxAviQ/8Z0dPa55Mz6Pwu1?=
+ =?us-ascii?Q?8Nd/Nq/Ri6f44rqK7zXy0CDwti2jzpSe3O6mR9bPxnOkIdUQj6woJ48+UoYd?=
+ =?us-ascii?Q?6cliAJ9kjfcNdG3mUb24Sz7/NmBqilvsgcqk7kPH7RHc0g28KCSs2y1vznCi?=
+ =?us-ascii?Q?wLmBj3mwjLr47woA02u3IrlrTtsaeU1x+gxANBLWec5xG26OtrJYlSzubZGG?=
+ =?us-ascii?Q?VOooWhM4reElxBbnCZa5glrJg6usswvYPhGTqc2OZJw82Ov9Y7fQF73m9kMJ?=
+ =?us-ascii?Q?HaicHsakplS8bOJpVrHu4z6gXJdG47tnZTADIRFnQoPXNjaEV/xZrBmhfM5M?=
+ =?us-ascii?Q?1rcYJ4XY2Cxysh6ysggrymxMQiWHutaGdtoix37w05xIS4HpX033cY38dJg0?=
+ =?us-ascii?Q?p8Vn5vL0MOv0/C1aA+pSp4S8G0nD+WE4It+Yk/dGKueXbvodt3meO9t/i9qa?=
+ =?us-ascii?Q?/Gbh7caT3QFW6Dr8FQRccKPRp4U31GL3Ut/mYE0VHnD+WYzy32sQrMFYt/Ae?=
+ =?us-ascii?Q?WwKKUAp9ABG+5TprzX8VbSH7319O4LjrQw1hwJMveddlZ72F/EA5z82t9U3S?=
+ =?us-ascii?Q?WUmNafjmYQqqoESUxuatKcSUD1L1hDTCdOAgXp9otltp6FuQf5qM1zP2SYg5?=
+ =?us-ascii?Q?67bP2+3oNHRaxS0qrOdtcEcgIYTwLX7gFyRMxF9RElQqlaCHwewf38ZZOnSV?=
+ =?us-ascii?Q?zmHG+hS0coa3pb6RakrYP5zTZvs3LtYPmaoDgze8G4a1IenTNqzQJB/9FzUE?=
+ =?us-ascii?Q?aJv8rUp68gIWec+Os2KYxUisEhiRCGkvIY2jJWEijFkvLmrn2zjHP+tVEDts?=
+ =?us-ascii?Q?gwNzX4tclhF2s7pyYQA6qVuxPSNJkdCdmARTSdqjLmu/gxtNNPb/HNOpwXzU?=
+ =?us-ascii?Q?3G+mfCqE/AgWQUKsMwXZ2v4QG8Vf37XFoyBCzZR5B2DppA2tj4wShKcdxAeC?=
+ =?us-ascii?Q?SBkRpsRGO+01hp852yHGIILMKZ0LsZPd7+0lgETkM19SH+gJMzYaItbGOqZG?=
+ =?us-ascii?Q?heZEr178DYRp/y1kjaffHo7WkrrhGolunSMNs3TaGfq01WBEVmSKwYgvGalx?=
+ =?us-ascii?Q?aLdFcvDyo/WlZ8kTe81iDnx29MWazn6xzPzHx4152ocpMBpQgdx0UuXEZlNS?=
+ =?us-ascii?Q?ssy5oVeBKAe56lfiwLDYssAiMasj/OX7h5rE4nL8?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: be8a4ac6-56dd-4ddf-e563-08de16ed49fc
+X-MS-Exchange-CrossTenant-AuthSource: PH3PPF9E162731D.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2025 13:15:54.1870
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9sjqZcBenKGTKo0CKjdEq+4UnaDwyWwRJM2epBNj0R/pReNc3g1KvTmmI8hJfAwMGWtI4uKSsN38/PZqUO12cQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7570
+X-OriginatorOrg: intel.com
 
-Setting KVM_CAP_S390_USER_OPEREXEC will forward all operation
-exceptions to user space. This also includes the 0x0000 instructions
-managed by KVM_CAP_S390_USER_INSTR0. It's helpful if user space wants
-to emulate instructions which do not (yet) have an opcode.
+Sagi Shahar wrote:
+> Guest registers are inaccessible to kvm for TDX VMs. In order to set
+> register values for TDX we use a special boot code which loads the
 
-While we're at it refine the documentation for
-KVM_CAP_S390_USER_INSTR0.
+NIT: who is 'we'?
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
+> register values from memory and write them into the appropriate
+> registers.
+> 
+> This patch sets up the memory regions used for the boot code and the
+> boot parameters for TDX.
 
-This is based on the api documentation ordering fix that's in our next
-branch.
+NIT: This is not needed.  Use imperative mood.
 
----
- Documentation/virt/kvm/api.rst                |  17 ++-
- arch/s390/include/asm/kvm_host.h              |   1 +
- arch/s390/kvm/intercept.c                     |   3 +
- arch/s390/kvm/kvm-s390.c                      |   7 +
- include/uapi/linux/kvm.h                      |   1 +
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/s390/user_operexec.c        | 140 ++++++++++++++++++
- 7 files changed, 169 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/kvm/s390/user_operexec.c
+> 
+> Signed-off-by: Sagi Shahar <sagis@google.com>
+> ---
+>  tools/testing/selftests/kvm/lib/kvm_util.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 0e6a487ca7a4..086e8a2a4d99 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -4,6 +4,7 @@
+>   *
+>   * Copyright (C) 2018, Google LLC.
+>   */
+> +#include "tdx/tdx_util.h"
+>  #include "test_util.h"
+>  #include "kvm_util.h"
+>  #include "processor.h"
+> @@ -435,7 +436,7 @@ void kvm_set_files_rlimit(uint32_t nr_vcpus)
+>  static bool is_guest_memfd_required(struct vm_shape shape)
+>  {
+>  #ifdef __x86_64__
+> -	return shape.type == KVM_X86_SNP_VM;
+> +	return (shape.type == KVM_X86_SNP_VM || shape.type == KVM_X86_TDX_VM);
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 72b2fae99a83..67837207dc9b 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7820,7 +7820,7 @@ where 0xff represents CPUs 0-7 in cluster 0.
- :Architectures: s390
- :Parameters: none
- 
--With this capability enabled, all illegal instructions 0x0000 (2 bytes) will
-+With this capability enabled, the illegal instruction 0x0000 (2 bytes) will
- be intercepted and forwarded to user space. User space can use this
- mechanism e.g. to realize 2-byte software breakpoints. The kernel will
- not inject an operating exception for these instructions, user space has
-@@ -8703,6 +8703,21 @@ This capability indicate to the userspace whether a PFNMAP memory region
- can be safely mapped as cacheable. This relies on the presence of
- force write back (FWB) feature support on the hardware.
- 
-+7.45 KVM_CAP_S390_USER_OPEREXEC
-+----------------------------
-+
-+:Architectures: s390
-+:Parameters: none
-+
-+When this capability is enabled KVM forwards all operation exceptions
-+that it doesn't handle itself to user space. This also includes the
-+0x0000 instructions managed by KVM_CAP_S390_USER_INSTR0. This is
-+helpful if user space wants to emulate instructions which do not (yet)
-+have an opcode.
-+
-+This capability can be enabled dynamically even if VCPUs were already
-+created and are running.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index 22cedcaea475..1e4829c70216 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -648,6 +648,7 @@ struct kvm_arch {
- 	int user_sigp;
- 	int user_stsi;
- 	int user_instr0;
-+	int user_operexec;
- 	struct s390_io_adapter *adapters[MAX_S390_IO_ADAPTERS];
- 	wait_queue_head_t ipte_wq;
- 	int ipte_lock_count;
-diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-index c7908950c1f4..420ae62977e2 100644
---- a/arch/s390/kvm/intercept.c
-+++ b/arch/s390/kvm/intercept.c
-@@ -471,6 +471,9 @@ static int handle_operexc(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.sie_block->ipa == 0xb256)
- 		return handle_sthyi(vcpu);
- 
-+	if (vcpu->kvm->arch.user_operexec)
-+		return -EOPNOTSUPP;
-+
- 	if (vcpu->arch.sie_block->ipa == 0 && vcpu->kvm->arch.user_instr0)
- 		return -EOPNOTSUPP;
- 	rc = read_guest_lc(vcpu, __LC_PGM_NEW_PSW, &newpsw, sizeof(psw_t));
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 70ebc54b1bb1..56d4730b7c41 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -606,6 +606,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_S390_DIAG318:
- 	case KVM_CAP_IRQFD_RESAMPLE:
-+	case KVM_CAP_S390_USER_OPEREXEC:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-@@ -921,6 +922,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- 		VM_EVENT(kvm, 3, "ENABLE: CAP_S390_CPU_TOPOLOGY %s",
- 			 r ? "(not available)" : "(success)");
- 		break;
-+	case KVM_CAP_S390_USER_OPEREXEC:
-+		VM_EVENT(kvm, 3, "%s", "ENABLE: CAP_S390_USER_OPEREXEC");
-+		kvm->arch.user_operexec = 1;
-+		icpt_operexc_on_all_vcpus(kvm);
-+		r = 0;
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 52f6000ab020..8ab07396ce3b 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -963,6 +963,7 @@ struct kvm_enable_cap {
- #define KVM_CAP_RISCV_MP_STATE_RESET 242
- #define KVM_CAP_ARM_CACHEABLE_PFNMAP_SUPPORTED 243
- #define KVM_CAP_GUEST_MEMFD_FLAGS 244
-+#define KVM_CAP_S390_USER_OPEREXEC 245
- 
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 148d427ff24b..87e429206bb8 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -194,6 +194,7 @@ TEST_GEN_PROGS_s390 += s390/debug_test
- TEST_GEN_PROGS_s390 += s390/cpumodel_subfuncs_test
- TEST_GEN_PROGS_s390 += s390/shared_zeropage_test
- TEST_GEN_PROGS_s390 += s390/ucontrol_test
-+TEST_GEN_PROGS_s390 += s390/user_operexec
- TEST_GEN_PROGS_s390 += rseq_test
- 
- TEST_GEN_PROGS_riscv = $(TEST_GEN_PROGS_COMMON)
-diff --git a/tools/testing/selftests/kvm/s390/user_operexec.c b/tools/testing/selftests/kvm/s390/user_operexec.c
-new file mode 100644
-index 000000000000..714906c1d12a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/s390/user_operexec.c
-@@ -0,0 +1,140 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Test operation exception forwarding.
-+ *
-+ * Copyright IBM Corp. 2025
-+ *
-+ * Authors:
-+ *  Janosch Frank <frankja@linux.ibm.com>
-+ */
-+#include "kselftest.h"
-+#include "kvm_util.h"
-+#include "test_util.h"
-+#include "sie.h"
-+
-+#include <linux/kvm.h>
-+
-+static void guest_code_instr0(void)
-+{
-+	asm(".word 0x0000");
-+}
-+
-+static void test_user_instr0(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int rc;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_instr0);
-+	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_INSTR0, 0);
-+	TEST_ASSERT_EQ(0, rc);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
-+	TEST_ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_OPEREXC);
-+	TEST_ASSERT_EQ(vcpu->run->s390_sieic.ipa, 0);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void guest_code_user_operexec(void)
-+{
-+	asm(".word 0x0807");
-+}
-+
-+static void test_user_operexec(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int rc;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_user_operexec);
-+	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_OPEREXEC, 0);
-+	TEST_ASSERT_EQ(0, rc);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
-+	TEST_ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_OPEREXC);
-+	TEST_ASSERT_EQ(vcpu->run->s390_sieic.ipa, 0x0807);
-+
-+	kvm_vm_free(vm);
-+
-+	/*
-+	 * Since user_operexec is the superset it can be used for the
-+	 * 0 instruction.
-+	 */
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_instr0);
-+	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_OPEREXEC, 0);
-+	TEST_ASSERT_EQ(0, rc);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
-+	TEST_ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_OPEREXC);
-+	TEST_ASSERT_EQ(vcpu->run->s390_sieic.ipa, 0);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+/* combine user_instr0 and user_operexec */
-+static void test_user_operexec_combined(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int rc;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_user_operexec);
-+	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_INSTR0, 0);
-+	TEST_ASSERT_EQ(0, rc);
-+	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_OPEREXEC, 0);
-+	TEST_ASSERT_EQ(0, rc);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
-+	TEST_ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_OPEREXC);
-+	TEST_ASSERT_EQ(vcpu->run->s390_sieic.ipa, 0x0807);
-+
-+	kvm_vm_free(vm);
-+
-+	/* Reverse enablement order */
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_user_operexec);
-+	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_OPEREXEC, 0);
-+	TEST_ASSERT_EQ(0, rc);
-+	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_INSTR0, 0);
-+	TEST_ASSERT_EQ(0, rc);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
-+	TEST_ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_OPEREXC);
-+	TEST_ASSERT_EQ(vcpu->run->s390_sieic.ipa, 0x0807);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+/*
-+ * Run all tests above.
-+ *
-+ * Enablement after VCPU has been added is automatically tested since
-+ * we enable the capability after VCPU creation.
-+ */
-+static struct testdef {
-+	const char *name;
-+	void (*test)(void);
-+} testlist[] = {
-+	{ "instr0", test_user_instr0 },
-+	{ "operexec", test_user_operexec },
-+	{ "operexec_combined", test_user_operexec_combined},
-+};
-+
-+int main(int argc, char *argv[])
-+{
-+	int idx;
-+
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_S390_USER_INSTR0));
-+
-+	ksft_print_header();
-+	ksft_set_plan(ARRAY_SIZE(testlist));
-+	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
-+		testlist[idx].test();
-+		ksft_test_result_pass("%s\n", testlist[idx].name);
-+	}
-+	ksft_finished();
-+}
--- 
-2.48.1
+This caused me to dig a bit to understand why this hunk was needed given
+the commit message only discusses guest registers.  I did not recall any
+use of is_guest_memfd_required() in the vm_tdx_setup_*() calls so I was a
+bit confused.
+
+With this hunk considered the changelog should read something like:
+
+<commit message>
+
+Guest memfd is required for the primary memory region of TDX VMs.
+
+Furthermore, guest registers are inaccessible to kvm for TDX VMs.  TDX
+must use use special boot code which loads the register values from memory
+and writes them into the appropriate registers.
+
+Use guest_memfd for the primary memory regions and call the TDX boot code
+functions for TDX VMs.
+
+</commit message>
+
+This clearly explains why the change to is_guest_memfd_required() is
+needed.
+
+In addition, the structure of this series is a bit odd to me.  I assume
+this patch exists after the setup calls were added to ensure
+bisect-ability?
+
+Ira
+
+>  #else
+>  	return false;
+>  #endif
+> @@ -469,6 +470,12 @@ struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
+>  	for (i = 0; i < NR_MEM_REGIONS; i++)
+>  		vm->memslots[i] = 0;
+>  
+> +	if (is_tdx_vm(vm)) {
+> +		/* Setup additional mem regions for TDX. */
+> +		vm_tdx_setup_boot_code_region(vm);
+> +		vm_tdx_setup_boot_parameters_region(vm, nr_runnable_vcpus);
+> +	}
+> +
+>  	kvm_vm_elf_load(vm, program_invocation_name);
+>  
+>  	/*
+> -- 
+> 2.51.1.851.g4ebd6896fd-goog
+> 
+
 
 
