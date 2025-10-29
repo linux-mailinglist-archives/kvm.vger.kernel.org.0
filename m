@@ -1,256 +1,203 @@
-Return-Path: <kvm+bounces-61373-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61374-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EABE9C18264
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 04:15:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A363CC18354
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 04:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 768A43BD521
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 03:15:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F8313AB7AB
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 03:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3FC23B61E;
-	Wed, 29 Oct 2025 03:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Q2kDYBUv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BF92EF662;
+	Wed, 29 Oct 2025 03:53:14 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012014.outbound.protection.outlook.com [40.93.195.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BE6194098;
-	Wed, 29 Oct 2025 03:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761707714; cv=fail; b=YwKoWnL4xk7LjZJ12TCnBQwZPQYskauy2Q0WlntPOf8uzJj4K8SPRWpvKMXrEFjfBzR93/IT8ESIhMy1S2LadOQ4NYPno8vPMXpI2KSY9Y8QTNxy/lCCw7tMHdACrlYlmJ8zN8LMY7tr7816zq4nnNO/6Ix5Y6F64XQKJiVONvM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761707714; c=relaxed/simple;
-	bh=Odh/FuQYrLExuI6tmD7gnBfgtMk2mgaP1sGnsWSs0Ps=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=U6bTVCKarkUvog9RSw2/Z89/hERO29YuUPhTiLB9cwYpy6D18CmetvXI+5YHUMSPXsaXDvfSY4SNSbh7Hm25JC1a1R8iIrD6KiG6NjefK9BDLY6YWCfwr5G9BMSDvIBr3CqiYbXrnyr5+UcRRcBofB/dAE/wl8WnzDd20oBaj+U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Q2kDYBUv; arc=fail smtp.client-ip=40.93.195.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dr7f2NPZwHF/YkHEVXKsEs3cb+OUrITrMFhE63xnoA8CfBJHiwKPbylpV8a+oI18dCOK7VpdH75wtrWhCigkExitd1eBmSrSlCGXyQsdnSEC8hrfddc1mffJvXgf69d1MbOvy0t/ooIRobe9OWs9LL76lwFc54tMgJ8ZrwWToOiBTeFwgREoAL5Odpmk6MGbX2KpM8n2ayAoSqoPnAJDsRWMh0yVyO1ewYLKvToeW5RTXw29BJWXIQ3AFF6WufUzKftWEFf+s9iRR91G9sI3AQ+ZWX7SI9FBJJU8rNi3jEKD+zwkS4Bob79DOdFB4pAlercauKEGEIxluFYVGpRNIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Odh/FuQYrLExuI6tmD7gnBfgtMk2mgaP1sGnsWSs0Ps=;
- b=UX/Dsq3/8fmRrTAq1BijkX6+l4nQXUKxdlLyvHutCawZP0UuUL8ASKE8kShO4/sJTukiYN40UX4WmaubXi+OtvuueEVJvUYvt54lAycIxbXtHeMMYzwKGJhyLcmG3vQ0s+R4HD01tghkk1eoXt+T6Qy3Yo/x8JJgcrjFCSWnp+N1ZGJKxmzXvyvATml9ayXtUQ3aQFb8mmxGBFrf/5yswkAz6y9ApAJ0TqF5ev2Vk07yrHkn7HA4H+Lgw4wA2hsWe1HI5Ze6cykD0ZtbNfKAa2+FRq3BKSWL6vtMFsD2pTLtN7bC1N/k86jqV5Xu28qfCVZvy+AqNn2487YpIQdM5g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Odh/FuQYrLExuI6tmD7gnBfgtMk2mgaP1sGnsWSs0Ps=;
- b=Q2kDYBUvboJuG1Q6IxXWKhDufwF/tJlEKiaM8hCJo9NhUaIcrZIrYHKDu7+K2HFv/jISQXx7dQJEcVY/SzX8uo9NgwN5pGdVlaCSs/dQYdkIHGD6VbfGekiJhmTTiruUaJB8gkaxgJ12dwBzLYhr+JK0TD+nVAiaQYZrvm+PleWuePzD6YyvvKaQwE3bOu4I+W7lex0761qjK1NAzcppcR8Ggc/EwXFIpQBIip1xf4E3UcjLFmTbOML3qLmxOP+uuXsfgcepaQLyUJNMj7mhblKN5Q+Tqw6IiV5GPQVCSZa+yE+BYxDvj62e9JpBEHkwNEuqn8UScNdNWVRoOAS28w==
-Received: from MW4PR12MB7213.namprd12.prod.outlook.com (2603:10b6:303:22a::18)
- by LV3PR12MB9215.namprd12.prod.outlook.com (2603:10b6:408:1a0::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Wed, 29 Oct
- 2025 03:15:08 +0000
-Received: from MW4PR12MB7213.namprd12.prod.outlook.com
- ([fe80::b049:8074:780:73f]) by MW4PR12MB7213.namprd12.prod.outlook.com
- ([fe80::b049:8074:780:73f%5]) with mapi id 15.20.9253.017; Wed, 29 Oct 2025
- 03:15:08 +0000
-From: Ankit Agrawal <ankita@nvidia.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-CC: Aniket Agashe <aniketa@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Matt Ochs <mochs@nvidia.com>, Shameer
- Kolothum <skolothumtho@nvidia.com>, "linmiaohe@huawei.com"
-	<linmiaohe@huawei.com>, "nao.horiguchi@gmail.com" <nao.horiguchi@gmail.com>,
-	"david@redhat.com" <david@redhat.com>, "lorenzo.stoakes@oracle.com"
-	<lorenzo.stoakes@oracle.com>, "Liam.Howlett@oracle.com"
-	<Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
-	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>,
-	"mhocko@suse.com" <mhocko@suse.com>, "tony.luck@intel.com"
-	<tony.luck@intel.com>, "bp@alien8.de" <bp@alien8.de>, "rafael@kernel.org"
-	<rafael@kernel.org>, "guohanjun@huawei.com" <guohanjun@huawei.com>,
-	"mchehab@kernel.org" <mchehab@kernel.org>, "lenb@kernel.org"
-	<lenb@kernel.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"alex@shazbot.org" <alex@shazbot.org>, Neo Jia <cjia@nvidia.com>, Kirti
- Wankhede <kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)"
-	<targupta@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, Dheeraj Nigam
-	<dnigam@nvidia.com>, Krishnakant Jaju <kjaju@nvidia.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-edac@vger.kernel.org"
-	<linux-edac@vger.kernel.org>, "Jonathan.Cameron@huawei.com"
-	<Jonathan.Cameron@huawei.com>, "ira.weiny@intel.com" <ira.weiny@intel.com>,
-	"Smita.KoralahalliChannabasappa@amd.com"
-	<Smita.KoralahalliChannabasappa@amd.com>, "u.kleine-koenig@baylibre.com"
-	<u.kleine-koenig@baylibre.com>, "peterz@infradead.org"
-	<peterz@infradead.org>, "linux-acpi@vger.kernel.org"
-	<linux-acpi@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v4 2/3] mm: handle poisoning of pfn without struct pages
-Thread-Topic: [PATCH v4 2/3] mm: handle poisoning of pfn without struct pages
-Thread-Index: AQHcRoOUWJnftWewAUixSPYj9sJbdrTWte8AgAHBIgM=
-Date: Wed, 29 Oct 2025 03:15:08 +0000
-Message-ID:
- <MW4PR12MB7213976611F767842380FB56B0FAA@MW4PR12MB7213.namprd12.prod.outlook.com>
-References: <20251026141919.2261-1-ankita@nvidia.com>
-	<20251026141919.2261-3-ankita@nvidia.com>
- <20251027172620.d764b8e0eab34abd427d7945@linux-foundation.org>
-In-Reply-To: <20251027172620.d764b8e0eab34abd427d7945@linux-foundation.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW4PR12MB7213:EE_|LV3PR12MB9215:EE_
-x-ms-office365-filtering-correlation-id: e64c2b95-514b-4383-73f5-08de16995d59
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700021;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?fxzb6hLN/X33IF7vCwlQPHlH1+W8YSy7g5lTr+HFOH9Q2PcOBcb8Un0/7F?=
- =?iso-8859-1?Q?3ue22+vBLuiGQF7TLEv6Znsl+lB5hpxKDANyEQzbRKy2Bh8ZMfNtsc3fF4?=
- =?iso-8859-1?Q?iPWDdUTIF/Gg2H84ERjAA0gw8C5V8CKaWAgBZa76KN55lrIOpXRFktf+qQ?=
- =?iso-8859-1?Q?2A2FjvQBx9G3bRPqJDCrl8tZwpLXUGwEoIKct0nBIMf/K12+nk9q8JP9DO?=
- =?iso-8859-1?Q?qZMQN8rtbVW4XbM0fzBFl20ASXzqOwOn9C0qZ9hyPcOpGOIcA5I7LAbv14?=
- =?iso-8859-1?Q?wBCNu4Gq9rKc5c3D0ujcfVBJXzeIk5SRj1MOZLdWcbsxH9awIvSz0YcqPQ?=
- =?iso-8859-1?Q?Vtc8Ds3+qpqIlSBCoOZv4+UADCIZoP3VAFpo2JZgA1I6qrFrw/1eh4ZMH9?=
- =?iso-8859-1?Q?XghTDO/wrGdqeDMCMJcyanubMqwwBiWOAS0Tkqb0e0xS4HSTEDoPhmqifW?=
- =?iso-8859-1?Q?4e/VhvPm8Z9XBO3d5Lx2lJqhYnpH9AL6hWoyx7wTM6tm8qyF8trgZTCiJX?=
- =?iso-8859-1?Q?rbwY8oasdS9+rIAJdopzUcx95WrLlSqpiUsVCm2tp1n5DLq3pFxPfEMNR+?=
- =?iso-8859-1?Q?5rUS9gkEC6H4pVzqrI4bD/P9i8FWdeZkmp0MJqUrHuFQGwIc5PcyceEtA3?=
- =?iso-8859-1?Q?/ZnVGVa8Md5pPyWK/k+3c4G15OdmrHD8wahiq+C4O6U8fJwjSLz5HrSBzY?=
- =?iso-8859-1?Q?zGgR/8CgigBev5ER72PJs0mA10Mors/1VXIMsaq7JByHl9WyRG8U4yOYLp?=
- =?iso-8859-1?Q?b3Fz4Qxb4SlGPrdGEgzrs56zAFGLhsjSr8WQ660OpumAvDWok3x+nCytqp?=
- =?iso-8859-1?Q?Fw8EqWTSLHWM1jX97WMobjjWlK+TyyCao+qyrMWvePv1RG/SZ49S5RP+Lz?=
- =?iso-8859-1?Q?NN95jN/RETm6gsTD2gk5t+j4X5eOfhnjnH72lvmnZlUzs12J5x9FbtSiaA?=
- =?iso-8859-1?Q?DAtN0hPN9jxXRWZcWYGe9u2sEkRMTEYGrMw3lu/BnLTcI6+BdQrZIepgF5?=
- =?iso-8859-1?Q?tcNWU0t45IzyghBazw3SBJoduK1T209lKHnnEyH1z3FAQ9zBOHzCUT1cGV?=
- =?iso-8859-1?Q?bI6btkGQIEnDo7mfBaXisZr6gXRy0igNL5I/ku9jlDpFJVkWYA34+U4sOI?=
- =?iso-8859-1?Q?BUXPJVWJqwmoIEVht4RNSAsnYtusm2mbEUVYMfGca7jwwZ7IeVX+nK1JJQ?=
- =?iso-8859-1?Q?GbVXsJytfZMEBlTh0fDKof69+NMLxBFoE7iVkA/+N1Ra7EivKoukq7n5RW?=
- =?iso-8859-1?Q?+XEhxbhLF+f0+/s3vULVlUx3j9SedIgJe2CsHdhF3mVBdjs0Iwk93/z8ef?=
- =?iso-8859-1?Q?huG4id0f0jRNRmD7WKo0dO504aa5tysR3cwlvrv+iPCpiu9ZZFJ9b0jRS9?=
- =?iso-8859-1?Q?9J5CUDM7y3etwsSq06sn9nwtgajxw+nzMiu1UX2Oe0ltcAIXn3Fa8gs9qC?=
- =?iso-8859-1?Q?K/xT0C/oj6PEKuNu9YntFI0VEfH4uFIFkCQtv/rjxF6fgR+0YdKoEAwByM?=
- =?iso-8859-1?Q?6uSPslSKeh3VF5tf2hStSLmWBCGbww6M2ayPeLFNaFDGZ9rBAtDUNCRflQ?=
- =?iso-8859-1?Q?dsShLZr7b+qsOEl2vf/dPp8egKkp?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7213.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?ZU6aly9yW4tpgo6d1N2hvw4HzK+s5p0GzsNz+3Quk6kT3rNcGz+N1AMP/k?=
- =?iso-8859-1?Q?d5Teob8fYfIe85iSe9uSMt1c10ToB7pV7d22AsAQaX8hyOM1zJ6PFaDV9R?=
- =?iso-8859-1?Q?J/4GTt5c1KIaDagP/TZ2NcWD8ibQ/q5p3BbzgLRMsaw6zjs85PrQpwcg/L?=
- =?iso-8859-1?Q?PU3QTEEuGnBF8pGe/z+1blu57O98iOZZZetmrvnDML+jw69svBsoyeO4Vn?=
- =?iso-8859-1?Q?Iolsheo10I/a4ZiJbE/tq7AI36lVP4DJJlbtzizDf0TWWwMdmghmny2J6g?=
- =?iso-8859-1?Q?RsghWfVBcJhHMsHmTzIY5qmuZTwm9vb4WtEOtBHfG8VR7VaLARl1Bo83/I?=
- =?iso-8859-1?Q?G7dhaxAVX1Rz9rdx5y5EA1hz97dWoUQ9z2Oci3QY0A6w5XsNKA3ChC0F+z?=
- =?iso-8859-1?Q?tn53JFFvgwbEeWp58Yk4Wu+k+KSKLvD8UqmQjTuVqiITkg8dodGTi2nY/+?=
- =?iso-8859-1?Q?Cp0Dx6iwNYNnDpSzP07sdeVQzz6i8JWmzvyfQSznPYf+Odhx77LlN5ubDY?=
- =?iso-8859-1?Q?KfnFOK9jPiIEkNOPDkpcpTBYvi3ihUbKqELYJ4ic00NsEDHi7ofYrBlXoY?=
- =?iso-8859-1?Q?7+W4Ef6UEQoyUJmGSP2pSAAq2B18atRSamOMKMOJDwnO21zmLl1w/vUk0x?=
- =?iso-8859-1?Q?SSDtwHWX07bXPNgSVxHif56rXoUa4bI9xzdeZEPlYBVoNIejYx+3OagGS3?=
- =?iso-8859-1?Q?jZ9aQHcBcYYvOCjtNFzjkIF+Z7DIEbYg//ekr9VoUflrnebALZNuMt0Bli?=
- =?iso-8859-1?Q?kf9tAlpk+TTZKP2Jkch5HzPeXY67bXqyaUoh+USmWtSN5aQKVoJZ/rz0sc?=
- =?iso-8859-1?Q?8PcLSa2RNLQAPY2tNKixIOKu5pSaXZfyr3Nk/VeWAv+YYGelepu3o9KQa+?=
- =?iso-8859-1?Q?+55dtm2lb2Kmyv2xXHtgq8Lf0Awla9wnFTVhp3Ip37ZiyM/9MfpZm0l+3i?=
- =?iso-8859-1?Q?rkULce6BZHXtIFyvBQkyhjpXGy01iyLb0ArwplGaQBfUS2doRBFXhgLC4w?=
- =?iso-8859-1?Q?hf/mxqY8A012S29co0nnOWyuZs1DXtXVdMkN5STQrgsFLssBuvS/5VNidu?=
- =?iso-8859-1?Q?CFGNzVQyT5Eg+eeH0+Z33V32WMzFQNiEDq+bSczKWT1L46U4R5nG77AVG/?=
- =?iso-8859-1?Q?05oa3VmBCV8nM4fml1i7e2n34+fl7c9Mv/DVnvhm8Jd3piixqhJzT3bISm?=
- =?iso-8859-1?Q?gUA+JaIhIjhP2BFgD3JyEnqNrww0W03QeouLTyt7ImSIA0/gIXT+SbLaaj?=
- =?iso-8859-1?Q?iGYqZ77bMJ+BND53tieWCkPsAS2w2TJH/DHJEHMY1FeeVhmscC57UWWk7J?=
- =?iso-8859-1?Q?JWqhIh0hkUeOuFRchPk+YtZLEI7/AgBVz0hRKZcvKW/ZGmEKfiox6nDJzW?=
- =?iso-8859-1?Q?mLxpHYYu1ETTWtlm3V3RSYVySITukfiSWLL3wh/xnqdklmtlQiZCUKNXj/?=
- =?iso-8859-1?Q?6mf3WrTQXzzqKCYz7/3DaTmkTSTqyzXLxduh6b0dlY8mKySqWkvUvKIOGS?=
- =?iso-8859-1?Q?Kf0Qv9ISmB4sBDbKrhVlmIvyCsBWwYsetoKUiEIz/9bz1w350XkM7DzBoF?=
- =?iso-8859-1?Q?3fTi5JR+hNan02OtqfpZ7xo+pKc+rf6KbzhGgUtRnBa3GEmrE0Q8LgbMIZ?=
- =?iso-8859-1?Q?uP7fy29kn+XnM=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293E82EDD50
+	for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 03:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761709993; cv=none; b=ezh62uH24q5zMROc9WcwmfeL0lWqiK5qtxZrnT6Lrcdvl+AMoOG3Uyn16H3gmLirWlBdaIdZ9WFG9iawiD8fWniKM+OgvqHjO+jWk/YgIH6OVmXhkqMjagGwOL0nhgAfghGitcyrGesn94X+Z7bmB1p+Vznu7nxna5wS0J4aM1E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761709993; c=relaxed/simple;
+	bh=Gdlu0ByZSbOHCTnXc/mg06u3ILf1lH1lZvwQolA8RKQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=MTHLaxnwz9xARuC9OQneSyBnmoCE+IfD0uzesibXS0Ck8V10SkqtJUJTN07FkrSpHC6q3O7ELEL+Q6qQtVTD5G9nG1I58RJTi2z6CpFQ6QqAAjRSMBamvOFy28W5WDV0xzdPebwQeHytZms5nnGboGernXUH61zAwrodLiIs6GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.239])
+	by gateway (Coremail) with SMTP id _____8DxP9OjjwFpquAbAA--.59099S3;
+	Wed, 29 Oct 2025 11:53:07 +0800 (CST)
+Received: from [10.20.42.239] (unknown [10.20.42.239])
+	by front1 (Coremail) with SMTP id qMiowJDxrcGgjwFp_gwYAQ--.61919S3;
+	Wed, 29 Oct 2025 11:53:06 +0800 (CST)
+Subject: Re: [PATCH v2 2/2] target/loongarch: Add PTW feature support in KVM
+ mode
+To: Bibo Mao <maobibo@loongson.cn>, "Michael S . Tsirkin" <mst@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20251027024347.3315592-1-maobibo@loongson.cn>
+ <20251027024347.3315592-3-maobibo@loongson.cn>
+From: gaosong <gaosong@loongson.cn>
+Message-ID: <91a72c0a-4e4d-08f8-623c-50dbb1c98f26@loongson.cn>
+Date: Wed, 29 Oct 2025 11:53:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7213.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e64c2b95-514b-4383-73f5-08de16995d59
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Oct 2025 03:15:08.5046
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: z/gfYyXRtDdKK5WAmHsurhYHyxc6xmeW74LliUHj8JqHV7ldOfadFGDQ1FWwJfadg3Mr2evTTnACLNHC/dFgJA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9215
+In-Reply-To: <20251027024347.3315592-3-maobibo@loongson.cn>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowJDxrcGgjwFp_gwYAQ--.61919S3
+X-CM-SenderInfo: 5jdr20tqj6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxAF48uw1kCw45ZFyDGF4Utrc_yoWrXFWrpr
+	W7AFs09rWUtrZxA3ZxXas09r45Jr4xGrW2va43Cry8AFn8WFyUXFykKFsIqF98A34rXFyI
+	vF4rZFs8ua17twbCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27wAqx4
+	xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v2
+	6r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67
+	vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc4
+	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
+	xVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
+	1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU24SoDUUU
+	U
 
-Thanks Andrew for the comments.=0A=
-=0A=
->> +int register_pfn_address_space(struct pfn_address_space *pfn_space)=0A=
->> +{=0A=
->> +=A0=A0=A0=A0 if (!pfn_space)=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;=0A=
->=0A=
-> I suggest this be removed - make register_pfn_address_space(NULL)=0A=
-> illegal and let the punishment be an oops.=0A=
-=0A=
-Yes, will remove it.=0A=
-=0A=
->> +static void add_to_kill_pfn(struct task_struct *tsk,=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 struct vm_area_struct *vma,=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 struct list_head *to_kill,=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 unsigned long pfn)=0A=
->> +{=0A=
->> +=A0=A0=A0=A0 struct to_kill *tk;=0A=
->> +=0A=
->> +=A0=A0=A0=A0 tk =3D kmalloc(sizeof(*tk), GFP_ATOMIC);=0A=
->> +=A0=A0=A0=A0 if (!tk)=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return;=0A=
->=0A=
-> This is unfortunate.=A0 GFP_ATOMIC is unreliable and we silently behave=
-=0A=
-> as if it worked OK.=0A=
-=0A=
-Got it. I'll mark this as a failure case.=0A=
-=0A=
-=0A=
-> We could play games here to make the GFP_ATOMIC allocation unnecessary,=
-=0A=
-> but nasty.=A0 Allocate the to_kill* outside the rcu_read_lock, pass that=
-=0A=
-> pointer into add_to_kill_pfn().=A0 If add_to_kill_pfn()'s=0A=
-> kmalloc(GFP_ATOMIC) failed, add_to_kill_pfn() can then consume the=0A=
-> caller's to_kill*.=A0 Then the caller can drop the lock, allocate a new=
-=0A=
-> to_kill* then restart the scan.=A0 And teach add_to_kill_pfn() to not=0A=
-> re-add tasks which are already on the list.=A0 Ugh.=0A=
->=0A=
-> At the very very least we should tell the user that the kernel goofed=0A=
-> and that one of their processes won't be getting killed.=0A=
-=0A=
-Thanks for the suggestion. As mentioned above I'll mark the kmalloc=0A=
-allocation error as a failure and can put a log message there.=0A=
-=0A=
->> +=A0=A0=A0=A0 scoped_guard(mutex, &pfn_space_lock) {=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bool mf_handled =3D false;=0A=
->> +=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /*=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 * Modules registers with MM the=
- address space mapping to the device memory they=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 * manage. Iterate to identify e=
-xactly which address space has mapped to this=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 * failing PFN.=0A=
->=0A=
-> We're quite lenient about >80 columns nowadays, but overflowing 80 for=0A=
-> a block comment is rather needless.=0A=
-=0A=
-Yes. Since it passed through the strict checkpatch.pl check, I didn't notic=
-e.=0A=
-I'll fix it.=
+ÔÚ 2025/10/27 ÉÏÎç10:43, Bibo Mao Ð´µÀ:
+> Implement Hardware page table walker(PTW for short) feature in KVM mode.
+> Use OnOffAuto type variable ptw to check the PTW feature. If the PTW
+> feature is not supported on KVM host, there is error reported with ptw=on
+> option.
+>
+> By default PTW feature is disabled on la464 CPU type, and auto detected
+> on max CPU type.
+>
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+>   target/loongarch/cpu.c     |  6 +++---
+>   target/loongarch/cpu.h     |  1 +
+>   target/loongarch/kvm/kvm.c | 35 +++++++++++++++++++++++++++++++++++
+>   3 files changed, 39 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/loongarch/cpu.c b/target/loongarch/cpu.c
+> index e80a92fb2e..d74c3c3766 100644
+> --- a/target/loongarch/cpu.c
+> +++ b/target/loongarch/cpu.c
+> @@ -236,7 +236,7 @@ static void loongarch_set_ptw(Object *obj, bool value, Error **errp)
+>       cpu->ptw = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+>   
+>       if (kvm_enabled()) {
+> -        /* PTW feature is only support in TCG mode now */
+> +        /* kvm feature detection in function kvm_arch_init_vcpu */
+>           return;
+>       }
+>   
+> @@ -406,14 +406,14 @@ static void loongarch_la132_initfn(Object *obj)
+>   static void loongarch_max_initfn(Object *obj)
+>   {
+>       LoongArchCPU *cpu = LOONGARCH_CPU(obj);
+> -    /* '-cpu max' for TCG: we use cpu la464. */
+> +    /* '-cpu max': use it for max supported CPU features */
+>       loongarch_la464_initfn(obj);
+>   
+> +    cpu->ptw = ON_OFF_AUTO_AUTO;
+>       if (tcg_enabled()) {
+>           cpu->env.cpucfg[1] = FIELD_DP32(cpu->env.cpucfg[1], CPUCFG1, MSG_INT, 1);
+>           cpu->msgint = ON_OFF_AUTO_AUTO;
+>           cpu->env.cpucfg[2] = FIELD_DP32(cpu->env.cpucfg[2], CPUCFG2, HPTW, 1);
+> -        cpu->ptw = ON_OFF_AUTO_AUTO;
+>       }
+>   }
+>   
+> diff --git a/target/loongarch/cpu.h b/target/loongarch/cpu.h
+> index b1d6799222..1a14469b3b 100644
+> --- a/target/loongarch/cpu.h
+> +++ b/target/loongarch/cpu.h
+> @@ -279,6 +279,7 @@ enum loongarch_features {
+>       LOONGARCH_FEATURE_PMU,
+>       LOONGARCH_FEATURE_PV_IPI,
+>       LOONGARCH_FEATURE_STEALTIME,
+> +    LOONGARCH_FEATURE_PTW,
+>   };
+>   
+>   typedef struct  LoongArchBT {
+> diff --git a/target/loongarch/kvm/kvm.c b/target/loongarch/kvm/kvm.c
+> index 4e4f4e79f6..26e40c9bdc 100644
+> --- a/target/loongarch/kvm/kvm.c
+> +++ b/target/loongarch/kvm/kvm.c
+> @@ -931,6 +931,12 @@ static bool kvm_feature_supported(CPUState *cs, enum loongarch_features feature)
+>           ret = kvm_vm_ioctl(kvm_state, KVM_HAS_DEVICE_ATTR, &attr);
+>           return (ret == 0);
+>   
+> +    case LOONGARCH_FEATURE_PTW:
+> +        attr.group = KVM_LOONGARCH_VM_FEAT_CTRL;
+> +        attr.attr = KVM_LOONGARCH_VM_FEAT_PTW;
+> +        ret = kvm_vm_ioctl(kvm_state, KVM_HAS_DEVICE_ATTR, &attr);
+> +        return (ret == 0);
+> +
+>       default:
+>           return false;
+>       }
+> @@ -1029,6 +1035,29 @@ static int kvm_cpu_check_pmu(CPUState *cs, Error **errp)
+>       return 0;
+>   }
+>   
+> +static int kvm_cpu_check_ptw(CPUState *cs, Error **errp)
+> +{
+> +    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
+> +    CPULoongArchState *env = cpu_env(cs);
+> +    bool kvm_supported;
+> +
+> +    kvm_supported = kvm_feature_supported(cs, LOONGARCH_FEATURE_PTW);
+> +    if (cpu->ptw == ON_OFF_AUTO_ON) {
+> +        if (!kvm_supported) {
+> +            error_setg(errp, "'ptw' feature not supported by KVM on the host");
+> +            return -ENOTSUP;
+> +        }
+> +    } else if (cpu->ptw != ON_OFF_AUTO_AUTO) {
+> +        /* disable pmu if ON_OFF_AUTO_OFF is set */
+it shoud be 'disable ptw'.
+
+Reviewed-by: Song Gao <gaosong@loongson.cn>
+
+Thanks.
+Song Gao
+> +        kvm_supported = false;
+> +    }
+> +
+> +    if (kvm_supported) {
+> +        env->cpucfg[2] = FIELD_DP32(env->cpucfg[2], CPUCFG2, HPTW, 1);
+> +    }
+> +    return 0;
+> +}
+> +
+>   static int kvm_cpu_check_pv_features(CPUState *cs, Error **errp)
+>   {
+>       MachineState *ms = MACHINE(qdev_get_machine());
+> @@ -1123,6 +1152,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>           return ret;
+>       }
+>   
+> +    ret = kvm_cpu_check_ptw(cs, &local_err);
+> +    if (ret < 0) {
+> +        error_report_err(local_err);
+> +        return ret;
+> +    }
+> +
+>       return 0;
+>   }
+>   
+
 
