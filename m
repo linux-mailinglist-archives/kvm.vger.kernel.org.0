@@ -1,117 +1,186 @@
-Return-Path: <kvm+bounces-61409-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61410-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF5CDC1C402
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 17:52:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED31CC1C735
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 18:32:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7B80B34B9FE
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 16:52:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CBFC1882687
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 17:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38252F5484;
-	Wed, 29 Oct 2025 16:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D7BB34D92D;
+	Wed, 29 Oct 2025 17:31:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GNnaS3Dr"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Bp3wWLe4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC991A9F84
-	for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 16:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2062E6127
+	for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 17:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761756760; cv=none; b=Ac8GehG081rONCe7oxZu4SmAUfFpVmNTXI2MDAHX6gqdLRKnppmKOwLxNdbK1R419MO4fERDNOdYjdlQ4MB6QzQW6douj0HY1Sd6yt0VdzjsFU9UMRL/KTMVe4C+VpX2zQDYFRxBTtEZ9fwYGRNeVeBmGHrMmLcnANQlhTV/d9U=
+	t=1761759084; cv=none; b=qBCh/zhzctVS+4Mc1XfXxR3P1k8iK6aeN9UTLNxaLOpFCzhgZc5ZfN4JFEt6RClOP2/XKjRarkCvsozbqpVPRjFmHkFXilXea6yz7pSdzeb64FRbwOh0HxOnWXMmlMFRvvYPFsHMxGGQyDfOpCIKMBZESzjTjggJ5HSTF33PX4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761756760; c=relaxed/simple;
-	bh=E+mHz391F1PKa0dHF1fPVCJltjtoUNF5ywFNqc8qzdE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=imOYCafeieZQQ30U/i+T0zAxJZTvsIa0bzuyr/IhXvbPv61jyb+RNsJJ1KVb8HkG+iz1as3Uc+IxYAb7lR+3ES0E9NJcxP0T/ds+m14Kr5NeHFCrgLdtxTFv5CoK9yiUMAboJrDlpH8k35gi+lUBAx6ywspBw+TzNzGIGg6wLmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GNnaS3Dr; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-336b646768eso80985a91.1
-        for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 09:52:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761756758; x=1762361558; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pJaZ6v3LnnDXyCDb6O2FHtrylN6ssw7lLK2BEb22MyI=;
-        b=GNnaS3DrDcjWEfDx0LOHpD7PvMWQvS622vyDWsYQFyW27Q1UrH2nydf87A2dGs4dUj
-         CtlhDVyO+4vyDWq4PHZb/Ojo5QTm8rc8Nbz7Ts1a6/YkZ0PkXXBGaWtxiwfmDnA4GrLz
-         ctym0A8fB9tI/XqMBUPWmn85I3hmodjchilt/wB3iR4RPkXg1YzmMf3vDUPoHtEVj6MR
-         0pQACWQfZdw3vIlIBIiZwCwLB3VVkUE0wgROsOz8lJwXmCGLaaxYifZH0oKsj8vzp9Eq
-         5fLglw9qoerTX1b4/sArFKFDnm7qszX6LODLQHvbUY2NGNVkFzkNYtCjFUDbdTSSBHxA
-         17KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761756758; x=1762361558;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pJaZ6v3LnnDXyCDb6O2FHtrylN6ssw7lLK2BEb22MyI=;
-        b=wddXiS8t3t1LdbIiXvdGFygu6ijOwNZww7kNG3b6KSnCnQpTwPz8Kw35LMztTqW0HO
-         kCP+3nnQRrmPE2lYICKuKKd2n5puME8Vfa5HvCnOy+8Mj4uXS/OcCCARz7wRU9MPd+D5
-         pZ26toyFOtPY8JUhGGdBmn8XLfkbaxbSk/UJ6NfOYoetT9P+YOwOStRlcXDJuOhj/DUm
-         OJxcTNsGns6SnLswGV5cGj5+bFlhbCXXkvaKF8ht4YBwVEfKZ6WPTpWSxezVMOlS8Urh
-         fUuRk39f2B83gSUF8QKN8CGUB4LJHDh3xrovJB4TsR8ASt+dGtYGjbUOtNrqBHr7b882
-         DOYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUPtjPz3GK5KGl7t5fJcJOsWGD5Q8t+w6Zik3jZyDpyAwe8x09zxcO9zTwID1ztH19gkWs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwknbymIMqeKeVjVonetVDiSSJIV5UYQyT97ZqqU5yTWOr9uYcQ
-	+OPcd+l/AIunVMikTxvt8PJbGzFfHhRs3jywJ7tTPBtfHUcD/C8HzvzXT1pjiLGaZM9mjvCUop7
-	jkfLDkw==
-X-Google-Smtp-Source: AGHT+IEmYwXdXNcwE/12EZu7TdnOXWTJBAUGBEQ2ODPWawgLQu8EBueu2LQM0rkCqaX+3inPNPOfUM6gFyM=
-X-Received: from pjbbt5.prod.google.com ([2002:a17:90a:f005:b0:33b:e0b5:6112])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:288a:b0:32e:7270:94aa
- with SMTP id 98e67ed59e1d1-3403a2a1f3amr3825350a91.19.1761756757889; Wed, 29
- Oct 2025 09:52:37 -0700 (PDT)
-Date: Wed, 29 Oct 2025 09:52:36 -0700
-In-Reply-To: <0a327c8d-c8a2-4b73-9231-bc5201e36e1e@amd.com>
+	s=arc-20240116; t=1761759084; c=relaxed/simple;
+	bh=JTM/bw9V9jdnNET4x4Xrt5peRxOtpao8qtV5oUmhLas=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s8hg+r54jV64G6De6UvIWvwbtG2IE2uryIH/crNCTI24GyAcmAOdqzf1/BCEB2mxMiFE9/UJu3WuzFg79c7BULMYO8nZqixQAnF1aysSDqIiCTLaQVqJ0vipEqbdtIufJMNk3gYcXYCaqrzW6SkPGKeTJaUqBda5i23n3/UPxFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Bp3wWLe4; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59TC6kVm025645;
+	Wed, 29 Oct 2025 17:30:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=4gFkqj
+	BO3ir5S3IoEaEdkpnJb4+vml9MAqUFNDsQcFo=; b=Bp3wWLe4PdsB80QJv+yjWx
+	XTXz8JrKdVpSikhfpfk2vGd1yF1p8WOxSRRt8MVGSbGH2EfmzxnanoyFhyUU2d8F
+	P98nhn30ccxvN3btrbqerjMSo9hdN9dzsDIucMeUzrx6SOWON9xrAJj8zSk6tM/X
+	A2lT4GAd5T35PF8g4bYkXLtds0Lg6YJ14DwnB550LqWgtpbKl1ZqtjJF61UD/cyx
+	/qlaQ1C50DufyQBniJL+lyCnextvugIlwJ0qDolQFcZjX+kv8JHsngbT8s9mZHS3
+	cQ7rQ1uOOM8PQFBlsnn1YvwWy/jV7ksis0L4wu/k6pkjBHUk4OopsY+jAC5I55Qw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a34acmpne-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Oct 2025 17:30:27 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 59THPuf7017089;
+	Wed, 29 Oct 2025 17:30:27 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a34acmpnb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Oct 2025 17:30:27 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59TGdDp3030759;
+	Wed, 29 Oct 2025 17:30:25 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4a33wwmmjs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Oct 2025 17:30:25 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59THUL6a36503908
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 29 Oct 2025 17:30:21 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A00302004E;
+	Wed, 29 Oct 2025 17:30:21 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D1F9F20040;
+	Wed, 29 Oct 2025 17:30:19 +0000 (GMT)
+Received: from [9.39.29.62] (unknown [9.39.29.62])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 29 Oct 2025 17:30:19 +0000 (GMT)
+Message-ID: <1f952d10-9630-42d6-8d24-b7461f90aa9f@linux.ibm.com>
+Date: Wed, 29 Oct 2025 23:00:18 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251029055753.5742-1-nikunj@amd.com> <aQIdgeaeQ0wzGUz7@google.com>
- <0a327c8d-c8a2-4b73-9231-bc5201e36e1e@amd.com>
-Message-ID: <aQJGVDSQruEooAE5@google.com>
-Subject: Re: [PATCH] KVM: SVM: Add module parameter to control SEV-SNP Secure
- TSC feature
-From: Sean Christopherson <seanjc@google.com>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Nikunj A Dadhania <nikunj@amd.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	santosh.shukla@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/11] hw/ppc/spapr: Remove deprecated pseries-3.0 ->
+ pseries-4.2 machines
+To: =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, Chinmay Rath <rathc@linux.ibm.com>,
+        qemu-ppc@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Harsh Prateek Bora <harshpb@linux.ibm.com>,
+        =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
+ <clg@redhat.com>
+References: <20251021084346.73671-1-philmd@linaro.org>
+ <aPdpjysqFBAMTvG-@kitsune.suse.cz>
+Content-Language: en-US
+From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+In-Reply-To: <aPdpjysqFBAMTvG-@kitsune.suse.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=XbuEDY55 c=1 sm=1 tr=0 ts=69024f33 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=25UEqmkVfaNy5ATf4DkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22 a=HhbK4dLum7pmb74im6QT:22 a=pHzHmUro8NiASowvMSCR:22
+ a=Ew2E2A-JSTLzCXPT_086:22
+X-Proofpoint-ORIG-GUID: 83c93mqdpwgkSsb4ljr_LNVBPhkayISp
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI4MDE2NiBTYWx0ZWRfX4zi2Y13/kLCP
+ qk5Bpv0P+JNYuWTkRGXHpHO07ebf5v6o3/+UvkWzpnq3i7ZqCLHuhxYADDRGypRYac0+Lp/iMr9
+ oWCPA1rS5MwN4+Ebnr0g+lUL0O4sUoD5N9f5Muxh3dx1oHDjYZC7qlL3yKE8000gSNmEmxxd9gl
+ ZqhBmoU094o/sNLdhoLqUL5RZH704bT/iXRaCTBOD+6AMBlJaV6TtHljSboYT3+IDfJ47bcmEJY
+ jXnoi9kKWKDabskFzi1qodgO+gpqh0WMR9IzTxiLtPDhBUolZml16CiYHH0InuMPHDfS3dgoONk
+ KjuzPW37tZoC+/TIx1Q6qM9wV+LKSrcKQ2CAGRNatdnjaWRmgD5wi75k1tq1+rrKQpLlEWi/SjA
+ GAoCCT4F8+Rgbmy6mEwimMW31ARd8g==
+X-Proofpoint-GUID: ytzy4QqTsGuIddlfdj5jRmqBe9iBFKzY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-10-29_07,2025-10-29_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 adultscore=0 suspectscore=0 bulkscore=0 spamscore=0
+ impostorscore=0 phishscore=0 priorityscore=1501 clxscore=1011
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2510280166
 
-On Wed, Oct 29, 2025, Tom Lendacky wrote:
-> On 10/29/25 08:58, Sean Christopherson wrote:
-> > On Wed, Oct 29, 2025, Nikunj A Dadhania wrote:
-> >> Add a module parameter secure_tsc to allow control of the SEV-SNP Secure
-> >> TSC feature at module load time, providing administrators with the ability
-> >> to disable Secure TSC support even when the hardware and kernel support it.
-> > 
-> > Why?
-> 
-> That's on me. Based on the debug_swap parameter I thought we wanted to
-> be able to control all SEV features that are advertised and thought this
-> was just missed for Secure TSC. I'm good with not adding it we don't
-> need to do that.
+Hi Michal,
 
-DebugSwap was one big mistake.  At this point, I think we can and should rip out
-its module param.
 
-Commit d1f85fbe836e ("KVM: SEV: Enable data breakpoints in SEV-ES") goofed by not
-adding a way for the userspace VMM to control the feature.  Functionally, that was
-fine, but it broke attestation signatures because SEV_FEATURES are included in the
-signature.
+On 10/21/25 4:37 PM, Michal Suchánek wrote:
+> Hello,
+>
+> I noticed removal of old pSeries revisions.
+>
+> FTR to boot Linux 3.0 I need pSeries-2.7 (already removed earlier).
+>
+> The thing that broke booting linux 3.0 for me is
+> 357d1e3bc7d2d80e5271bc4f3ac8537e30dc8046 spapr: Improved placement of
+> PCI host bridges in guest memory map
+>
+> I do not use Linux 3.0 anymore which is the reason I did not notice this
+> breakage due to old platform revision removal.
 
-Commit 5abf6dceb066 ("SEV: disable SEV-ES DebugSwap by default") fixed that issue,
-but the underlying flaw of userspace not having a way to control SEV_FEATURES was
-still there.
+I tried booting linux kernel 3.13.0-170-generic from ubuntu 14.04.6 LTS 
+with the oldest supported machine pseries-5.0 as of now.
 
-That flaw was addressed by commit 4f5defae7089 ("KVM: SEV: introduce KVM_SEV_INIT2
-operation"), and so then 4dd5ecacb9a4 ("KVM: SEV: allow SEV-ES DebugSwap again")
-re-enabled DebugSwap by default.
+It worked fine.
 
-Now that the dust is settled, the module param doesn't serve any meaningful purpose.
+
+qemu-system-ppc64 -machine pseries-5.0 -accel tcg -nographic -m size=12G 
+-cpu power8 -smp 1 -drive 
+file=/root/images/ubuntu16.04.qcow2,format=qcow2,if=none,id=drive-virtio-disk0 
+-device virtio-blk-pci,drive=drive-virtio-disk0,id=virtio-disk0 -serial 
+mon:stdio -kernel /root/images/vmlinux-3.13.0-170-generic -initrd 
+/root/images/initrd.img-3.13.0-170-generic -append 
+"BOOT_IMAGE=/boot/vmlinux-4.4.0-142-generic 
+root=UUID=94fba90c-dbb0-4f8d-bc3e-acd5f2e54749 ro vt.handoff=7"
+
+
+shiva@ubuntu:~$ uname -a
+Linux ubuntu 3.13.0-170-generic #220-Ubuntu SMP Thu May 9 12:44:25 UTC 
+2019 ppc64le ppc64le ppc64le GNU/Linux
+shiva@ubuntu:~$ cat /proc/cpuinfo
+processor    : 0
+cpu        : POWER8 (architected), altivec supported
+clock        : 1000.000000MHz
+revision    : 2.0 (pvr 004d 0200)
+
+timebase    : 512000000
+platform    : pSeries
+model        : IBM pSeries (emulated by qemu)
+machine        : CHRP IBM pSeries (emulated by qemu)
+
+
+Hope that helps.
+
+
+Thanks,
+
+Shivaprasad
+
+
 
