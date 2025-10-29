@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-61382-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61383-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297D7C18BD4
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 08:44:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40CA0C19400
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 09:59:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5E6D74F22F8
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 07:44:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 533321884B4D
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 08:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C976E3101C4;
-	Wed, 29 Oct 2025 07:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113D6329C4C;
+	Wed, 29 Oct 2025 08:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jZgEHj9r"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EPB/SkcY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B44819E82A;
-	Wed, 29 Oct 2025 07:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C6C328B41;
+	Wed, 29 Oct 2025 08:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761723836; cv=none; b=AyYFT4eOA4APD8oJzv/v4J9VtMWo5m3SnGAO7w+kuiXbq/v09sL/hKDUq9aeA0OGPjANrJBmT10dSJhGX/UUoUZQNUIcvTrY7WioCDSNkEUTI8E5cHV8m9ejWCIeNqy1U0mw5o4hRhymvky43yiJruCdgiCpZq3q+fnLnkYxNgQ=
+	t=1761727951; cv=none; b=U5yR0ZiDfK8oO6bDlE/xRjzElGoBH/7SmH5XnX8qzo1H+djvCooVUcz6AXdZLFYZaBxYUDOPgoJzDMbMl6ihbt05KYdVipGdsU8txNlhGyFcyKZMeeIrmWvGRhp0YVBFnb6KoPzKWxi+6weEHT2I4LhwY6HnNY0bzWPf+LBCPLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761723836; c=relaxed/simple;
-	bh=sTpZ09xOIKuyu7EF0yjjz0CspP8pKuAhf+0WKJX54ok=;
+	s=arc-20240116; t=1761727951; c=relaxed/simple;
+	bh=b+vH4TPLsjMlSc4jKLKZuG97OYGHj3aFTo9Q2fN/cQI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h6Y9shHuwvwb4aTJSHt3UCwNbyijZHb3eSz1+/NgmFXqzzaJep9yKhVoIwQOphenj4IwNuGs3g5crf7Pmj28uWcTg8Ix6QRSDqxWtNn0mwtii/nEt+BWLSMd0SfSFMKgX3jv04LnkmHYywEFFrkQ0CRxDTiyBxmsMW5wdzRhk/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jZgEHj9r; arc=none smtp.client-ip=198.175.65.18
+	 In-Reply-To:Content-Type; b=DkVkfAG/3ERTJ+QfAtfBdjTOzwjUyMq+pL9H5goj+9kSwR9UU9nYWwF6DvdiguBf9Tc7/Y1dbv6lQB1SQHzORt6mFsdXz40sRUG6VVrrx0Bjs0wor8Kt6LHtAdeQdUmYqi/nN5iWTiyzVAoKb0JdLiT1dYOMIfPLfE6u7GkfXGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EPB/SkcY; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761723834; x=1793259834;
+  t=1761727949; x=1793263949;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=sTpZ09xOIKuyu7EF0yjjz0CspP8pKuAhf+0WKJX54ok=;
-  b=jZgEHj9r3ICs38VaAHjBN/qI6FJNvadMDUYrpt5/p/JA2bVr6HQT8UnX
-   GKE0AtpPAw7Ndw9LIUp7yXggbFvtSdDiJVDmOOfUWEXVL1LqXQfYsht6Z
-   M5vV7SQuxCWmmT+kXrIgi2ycNlSIWajIfXkBi01GotGH4fIPS+wCl8TK3
-   cTIlezzvpS2igVmXroeO3uaAIowqx9PkT0yXpcuVR8j/iu9sVMG7I5GAK
-   gJFI/BB6cPwz6pzlE7DH60wjhSr3Mn7oEFYaXWpzPD0EabRLtpXmLUGLi
-   AOmZGlPjJLxF+h7nT7uXZ636OcfIV24tnjPuenM75pWx8I6bsr/1hSw1u
-   w==;
-X-CSE-ConnectionGUID: bm+HaResQU2g/2n/hvzRdQ==
-X-CSE-MsgGUID: n33UqjX/Rk+36QCrxsdzUg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63877668"
+  bh=b+vH4TPLsjMlSc4jKLKZuG97OYGHj3aFTo9Q2fN/cQI=;
+  b=EPB/SkcYbVUJyeK/nEbT1/AS9FyxyNnvd18N4ZHi6mIRfOStzngKOAXp
+   XZokmy+FuGVa5ZaEPx/byQI5+v19SHEe3x1/auX9/+HotyVJYgG1SqXJ5
+   tKKwz9xMKJIFpqqnb01f1T5a2jNNkZ4FBLedP0vCdEJHkDO7wRZmtqKvL
+   iohAip3eG8IoOdS0Tpt8x3r0nAmlZgXxyv9a7iU3BM9zqZ1tXHwsGrNYY
+   IetfGgWEjO9O+VvtKYiOiHQq2i6nrm9Wc79/MsJAO6E0kMf+g4iUTwENC
+   F4Vo5WRWkdEmPD+8VaEhkkZlauvvNu3UVsf1HOkZrulgjie2wP7hYRmFV
+   g==;
+X-CSE-ConnectionGUID: zt34xR9FQdGsPu20+p2ufQ==
+X-CSE-MsgGUID: IDTQAGcgR4u3Xd6auzixCQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="67484477"
 X-IronPort-AV: E=Sophos;i="6.19,263,1754982000"; 
-   d="scan'208";a="63877668"
+   d="scan'208";a="67484477"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 00:43:54 -0700
-X-CSE-ConnectionGUID: MOOesLzBQS2mZvLZEi3LMA==
-X-CSE-MsgGUID: 2OJBIwZaQR+54NOfGgrlMg==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 01:52:29 -0700
+X-CSE-ConnectionGUID: tzvfsyAfQ7e6LquTSO71SQ==
+X-CSE-MsgGUID: A2LrplNxTxqAPHAY8EG0PQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,263,1754982000"; 
-   d="scan'208";a="190714282"
+   d="scan'208";a="190729293"
 Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 00:43:48 -0700
-Message-ID: <4a8c783a-e930-44ca-9222-ce6d8ce26463@linux.intel.com>
-Date: Wed, 29 Oct 2025 15:43:46 +0800
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 01:52:24 -0700
+Message-ID: <f3ef6575-0907-4549-9573-48407f13a45b@linux.intel.com>
+Date: Wed, 29 Oct 2025 16:52:21 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,7 +67,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 07/23] KVM: selftests: Add kbuild definitons
+Subject: Re: [PATCH v12 11/23] KVM: selftests: Set up TDX boot parameters
+ region
 To: Sagi Shahar <sagis@google.com>
 Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
  Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>,
@@ -83,58 +84,54 @@ Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
  Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org
 References: <20251028212052.200523-1-sagis@google.com>
- <20251028212052.200523-8-sagis@google.com>
+ <20251028212052.200523-12-sagis@google.com>
 Content-Language: en-US
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20251028212052.200523-8-sagis@google.com>
+In-Reply-To: <20251028212052.200523-12-sagis@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 10/29/2025 5:20 AM, Sagi Shahar wrote:
-> Add kbuild.h that can be used by files under tools/
->
-> Definitions are taken from the original definitions at
-> include/linux/kbuild.h
->
-> This is needed to expose values from c code to assembly code.
->
-> Signed-off-by: Sagi Shahar <sagis@google.com>
-> ---
->   tools/include/linux/kbuild.h | 18 ++++++++++++++++++
->   1 file changed, 18 insertions(+)
->   create mode 100644 tools/include/linux/kbuild.h
->
-> diff --git a/tools/include/linux/kbuild.h b/tools/include/linux/kbuild.h
-> new file mode 100644
-> index 000000000000..62e20ba9380e
-> --- /dev/null
-> +++ b/tools/include/linux/kbuild.h
-> @@ -0,0 +1,18 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef __TOOLS_LINUX_KBUILD_H
-> +#define __TOOLS_LINUX_KBUILD_H
-> +
-> +#include <stddef.h>
 
-This is not in kernel's version.
-Instead, consumers of kbuild.h include the necessary header.
+[...]
+> +
+> +void vm_tdx_load_common_boot_parameters(struct kvm_vm *vm)
+> +{
+> +	struct td_boot_parameters *params =
+> +		addr_gpa2hva(vm, TD_BOOT_PARAMETERS_GPA);
+> +	uint32_t cr4;
+> +
+> +	TEST_ASSERT_EQ(vm->mode, VM_MODE_PXXV48_4K);
+> +
+> +	cr4 = kvm_get_default_cr4();
+> +
+> +	/* TDX spec 11.6.2: CR4 bit MCE is fixed to 1 */
+> +	cr4 |= X86_CR4_MCE;
+> +
+> +	/* TDX spec 11.6.2: CR4 bit VMXE and SMXE are fixed to 0 */
+> +	cr4 &= ~(X86_CR4_VMXE | X86_CR4_SMXE);
+> +
+> +	/* Set parameters! */
+> +	params->cr0 = kvm_get_default_cr0();
+> +	params->cr3 = vm->pgd;
+Since TDX guest code starts from 32-bit, is it better to check that vm->pgd is
+not beyond 32-bit?
 
-Maybe it can follow kernel's style?
 
+> +	params->cr4 = cr4;
+> +	params->idtr.base = vm->arch.idt;
+> +	params->idtr.limit = kvm_get_default_idt_limit();
+> +	params->gdtr.base = vm->arch.gdt;
+> +	params->gdtr.limit = kvm_get_default_gdt_limit();
 > +
-> +#define DEFINE(sym, val) \
-> +	asm volatile("\n.ascii \"->" #sym " %0 " #val "\"" : : "i" (val))
+> +	TEST_ASSERT(params->cr0 != 0, "cr0 should not be 0");
+> +	TEST_ASSERT(params->cr3 != 0, "cr3 should not be 0");
+> +	TEST_ASSERT(params->cr4 != 0, "cr4 should not be 0");
+> +	TEST_ASSERT(params->gdtr.base != 0, "gdt base address should not be 0");
+> +	TEST_ASSERT(params->idtr.base != 0, "idt base address should not be 0");
+> +}
 > +
-> +#define BLANK() asm volatile("\n.ascii \"->\"" : : )
-> +
-> +#define OFFSET(sym, str, mem) \
-> +	DEFINE(sym, offsetof(struct str, mem))
-> +
-> +#define COMMENT(x) \
-> +	asm volatile("\n.ascii \"->#" x "\"")
-> +
-> +#endif /* __TOOLS_LINUX_KBUILD_H */
-
+[...]
 
