@@ -1,128 +1,82 @@
-Return-Path: <kvm+bounces-61428-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61430-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCABAC1D6B6
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 22:24:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 451AEC1D6D4
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 22:26:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFB504248DA
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 21:24:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 548384215DD
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 21:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C23D31AF2D;
-	Wed, 29 Oct 2025 21:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92300319855;
+	Wed, 29 Oct 2025 21:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="kapBewHb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AuVrNRHI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39E531A577
-	for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 21:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9D954763;
+	Wed, 29 Oct 2025 21:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761773025; cv=none; b=bo4sPRTIOFbURbztJBzJy7WnGbxXllV4UvFmAcKqtDsoSJF2Yx3T5Ag/eqOQEeAwSl8jDbT1akf8KKgFKkgJ5hC+0pbOvApdRE0Tu3BaaBTriBE5+EGCUO8CHG3YafeSoqdEUFkWBrPp1PFa1lzeHsiVxGbBb6Q2tMSB0BU4GDY=
+	t=1761773175; cv=none; b=lG5RCHLVYO/geShZOsxDP7rNSlRczYUdM84EZWcwTy058j54hOh73ih1rN9BL9uUc7KZjkIuBP+fCQWkGE+x7YaZgStrpLmUh+9INBNr+0qM+gCiAM0fI03zfSjeRrgtgdV/3+wUXWpdrz8oXT8EI5v5zohulC3n7fw1F5PSr+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761773025; c=relaxed/simple;
-	bh=ehgfTYPPDlsusZMBOPSQ1VgmMj1ez7+siAFBL0GrCb8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jfrk9mRwAz1SyHZ/82u4rALW7i58NQDuYytg2ho3JzVDdscF/gA5aqCW+DCiHtwy7rpS5afto6CkhRtWkspkH373JWVw2zMc+KKXPUxvmx3tli9nBpUnw3av0dMh/fVFauCQC9ayVyjbBXKC5cXWJag30ykHa0PH2sE7GmVqwH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=kapBewHb; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-89ec7919a62so28724785a.2
-        for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 14:23:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gourry.net; s=google; t=1761773022; x=1762377822; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aRjtLU1r2HfZv4PRAYf6oYIopT/Rmxw6gRmhQBXOWjA=;
-        b=kapBewHb6dSh/ptT//a51gk1TGTcazKjTHRFueGiQDPd5O7n6qW3dv9oomw74wvDu6
-         JwYB8vB5m/h/8osiroNMK8oqsJGSJbxHw2r5tPRWPxSRi4ed7TDcZPDwMiFPi+ELtkNQ
-         hGjxmHj10dNk1CPOz2oob7bZ47ae6s7lqo+bIJpq5uhqyV/7xPA8LpTdNo/VW/o4p4AF
-         745l4hmuH8wAWXPzhAwqEj3qOZaz7EMepbM6t/AGf4pcBVchWbXqKUgDHmHCf+rbG8IS
-         hPhJ+/petaX3RoL500AKYSltpyxcY+iIMEAusD9wC6LPCd93eskVGzsnE7hDeKpAb05y
-         752g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761773023; x=1762377823;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aRjtLU1r2HfZv4PRAYf6oYIopT/Rmxw6gRmhQBXOWjA=;
-        b=NE592x+qIZfNPpO+KnyNQoEInQcq8Oz13e9tKwJ7IWHu/rx9+zudueNjfWBCsB0CnI
-         oprV8uYhRxiIVOpJfhLYgwHpDrRU/IjXt5ujFX4yaovKxvISvRigaElOg8PXr9MIzuL+
-         ngJeyPsu8fCXUZuUHEBDdrhjx/+ZIBP8Z2drfpiiCLcdgLKOJYvoFjjo/bRVolMgl/no
-         YrFXU9dAtMS55T/IkiQQnTLXWZDqlGcahnICDeMJ260jEZCCC3ygUtY/CSntL48N46R1
-         lBpFAJjPB7wPa043unTrGvyRv+B1pPhth+HBlKdCgSvizliJxCwq+0JDQpAcBOCCz9Tl
-         mApA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5YYQdJ6NEzubCJ2eFClbuBGEJmnZKv+O3uN/rGbcONNAee4jHDW7m2u0LDBcLjJylJ+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySfZjMtwmQjEf7n3Dto31hXX4CP9ExRGjvEBPwRzBKIKNCTN9/
-	hGMjBlHumRmFrh1HnYKly3XTbtppFVR+blcr1iWooyxeQb8q9ob5KSOgc+dlQ+o4hlg=
-X-Gm-Gg: ASbGnctHKdR7jINm22l6YkVC+t6CTmCovfXf8mRFy3IeT6hWslZB7v5yfL6eUUGjL1x
-	Ym94jzMyPEB/YTv0NsyGguzmZMJOK12LTxJz27K048Ht4ebCdjCh2q2uMCuk1OkxLUPHUZkGV8B
-	nASLowkNeDkLaICUB7TcEvdVbPM5t8cWPAcZziR8BiKBhtaaoqxPRHSwyUsdqHIkOMel7lZpXIR
-	4imiC37f0TnweHs88t4J1S6cYH0l1c35jJuUjOoQG44IiyjKuJiWtZiKULIMfaer3xb2jaW+O6c
-	rVRvE9kId5NP2nNckDM89avJ+dWiIF1U/Hm2HCRafNIX8bjpb03Tx+ZqTVUqnXp4D41gvrGp5yC
-	kw6VdM79PJ0GG3+h7x/wOoMdCiNcbsmqrQmBLDXyj8J5JHaPTO26P5EWo/GzPnEVc9vpv/g6JyN
-	VZMIXRwu2NJf2srCW6U86LtBbKFXbv8H/4plXOwpDxth3zzzenfNL0YjurlfY=
-X-Google-Smtp-Source: AGHT+IHIvemppeW4VU2bcQtfcjjrB/a+ZhJ9fpfDcYpqh7YEbBY+IwMLRkdQTC8NbNXnWXScRwyJQw==
-X-Received: by 2002:a05:620a:29c4:b0:82e:ce61:f840 with SMTP id af79cd13be357-8aa2ea07948mr164184685a.84.1761773022583;
-        Wed, 29 Oct 2025 14:23:42 -0700 (PDT)
-Received: from gourry-fedora-PF4VCD3F (pool-96-255-20-138.washdc.ftas.verizon.net. [96.255.20.138])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-89f2421fc6fsm1114391785a.9.2025.10.29.14.23.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Oct 2025 14:23:42 -0700 (PDT)
-Date: Wed, 29 Oct 2025 17:23:39 -0400
-From: Gregory Price <gourry@gourry.net>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>, Zi Yan <ziy@nvidia.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
-	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
-	Lance Yang <lance.yang@linux.dev>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
-	Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
-	Peter Xu <peterx@redhat.com>, Matthew Wilcox <willy@infradead.org>,
-	Leon Romanovsky <leon@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
-	Byungchul Park <byungchul@sk.com>,
-	Ying Huang <ying.huang@linux.alibaba.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Pedro Falcato <pfalcato@suse.de>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
-	kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [RFC PATCH 00/12] remove is_swap_[pte, pmd]() + non-swap
- confusion
-Message-ID: <aQKF2y7YI9SUBLKo@gourry-fedora-PF4VCD3F>
-References: <cover.1761288179.git.lorenzo.stoakes@oracle.com>
- <20251027160923.GF760669@ziepe.ca>
- <8d4da271-472b-4a32-9e51-3ff4d8c2e232@lucifer.local>
- <20251028124817.GH760669@ziepe.ca>
- <ce71f42f-e80d-4bae-9b8d-d09fe8bd1527@lucifer.local>
- <20251029141048.GN760669@ziepe.ca>
- <4fd565b5-1540-40bc-9cbb-29724f93a4d2@lucifer.local>
+	s=arc-20240116; t=1761773175; c=relaxed/simple;
+	bh=IGB37qvB9T4vmHfJISA/2oS5kdVJPeAyRTPqjRCt9B8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=r8IQ0+54Hb3Uv7fjqYiy9GUsrq9IDMVlZ87mHeh2nrBPMyGhsePOhQFNpjIT5FA46dMuYEwnlVSBIyZ14NbHq8LBQ3WQQ4wrcJ/1CngMT0UqlJcoqiVxtFkYHW8PwbGbcnQQaV/IRDlUEI5O2eOTSlamw1DZ8HB4dpkiMeiWqQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AuVrNRHI; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761773173; x=1793309173;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=IGB37qvB9T4vmHfJISA/2oS5kdVJPeAyRTPqjRCt9B8=;
+  b=AuVrNRHICWVvnmE/93Vo4SrJscDDCr+mxKxwCK3eHVZ2YxGpDZrTro0z
+   4b1fMKf4N6iRNk2XrvSeu9GLLg7wsT16okTcKOn7EhayVQ20n+1QhXUsr
+   AaqmkbsbXW4PvE4gsFGnDOctxvIQ+ziKfFtF6EZBgqaXcnbRix0Qlrvc1
+   O5m/BTd7661LGlnVZ3NhEV8cbOZwbZWO5dxlo/2+6D/OSMQFNOzD6hOUL
+   bILMqO8GRqwDsSpHzSW5GxQM43/0BrJLC7Rty//J/BI3M8xC/NKM5PmaL
+   HHkAKU7p+1aQB4tzrJdWYB40gvANqKc5uONRnrO7XFr9wRa4Kj0FLSzMO
+   g==;
+X-CSE-ConnectionGUID: qfvqsAJ6SxmTLm919IWKMw==
+X-CSE-MsgGUID: Wdp8oBFaQEit493r7ZPeVA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="75252306"
+X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
+   d="scan'208";a="75252306"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 14:26:12 -0700
+X-CSE-ConnectionGUID: 20s/SqlSRiagrk0d28hd6A==
+X-CSE-MsgGUID: rDSB8zy7QCaNscbZNFNPOA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
+   d="scan'208";a="185024806"
+Received: from vverma7-desk1.amr.corp.intel.com (HELO desk) ([10.124.223.151])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 14:26:11 -0700
+Date: Wed, 29 Oct 2025 14:26:10 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Tao Zhang <tao1.zhang@intel.com>, Jim Mattson <jmattson@google.com>,
+	Brendan Jackman <jackmanb@google.com>
+Subject: [PATCH 0/3] Unify VERW mitigation for guests
+Message-ID: <20251029-verw-vm-v1-0-babf9b961519@linux.intel.com>
+X-B4-Tracking: v=1; b=H4sIABSGAmkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1NDAyML3bLUonLdslxdsyRLIyNLQ4NEoyRjJaDqgqLUtMwKsEnRsbW1ACX
+ Yq1JZAAAA
+X-Change-ID: 20251028-verw-vm-6b922910a2b3
+X-Mailer: b4 0.14.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -131,26 +85,59 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4fd565b5-1540-40bc-9cbb-29724f93a4d2@lucifer.local>
 
-On Wed, Oct 29, 2025 at 07:09:59PM +0000, Lorenzo Stoakes wrote:
-> >
-> > pmd_is_leaf_or_leafent()
-> >
-> > In the PTE API we are calling present entries that are address, not
-> > tables, leafs.
-> 
-> Hmm I think pmd_is_present_or_leafent() is clearer actually on second
-> thoughts :)
-> 
+This series unifies the VERW execution sites in KVM, specifically
+addressing inconsistencies in how MMIO Stale Data mitigation is handled
+compared to other data sampling attacks (MDS/TAA/RFDS).
 
-apologies if misunderstanding, but I like short names :]
+Problem
+=======
+Currently, MMIO Stale Data mitigation is handled differently from other
+VERW-based mitigations. While MDS/TAA/RFDS perform VERW clearing in
+assembly code, MMIO Stale Data mitigation uses a separate code path with
+x86_clear_cpu_buffer() calls. This inconsistency exists because MMIO Stale
+Data mitigation only needs to be applied when guests can access host MMIO,
+which was previously difficult to check in assembly. The other
+inconsistency is VERW execution MMIO Stale Data dependency on L1TF
+mitigation.
 
-#define pmd_exists(entry) (pmd_is_present() || pmd_is_leafent())
+Solution
+========
+Remove the VERW mitigation for MMIO in C, and use the asm VERW callsite for
+all VERW mitigations in KVM. Also decoupling MMIO mitigation from L1TF
+mitigation.
 
-If you care about what that entry is, you'll have to spell out these
-checks in your code anyway, so no need to explode the naming to include
-everything that might be there.
+Roadmap:
 
-~Gregory
+Patch 1: Switch to VM_CLEAR_CPU_BUFFERS usage in VMX to align Intel
+	 mitigations with AMD's TSA mitigation.
+
+Patch 2: Renames cpu_buf_vm_clear to cpu_buf_vm_clear_mmio_only to
+	 avoid confusion with the broader X86_FEATURE_CLEAR_CPU_BUF_VM.
+
+Patch 3: Unifies MMIO Stale Data mitigation with other VERW-based
+         mitigations.
+
+---
+Pawan Gupta (3):
+      x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
+      x86/mmio: Rename cpu_buf_vm_clear to cpu_buf_vm_clear_mmio_only
+      x86/mmio: Unify VERW mitigation for guests
+
+ arch/x86/include/asm/nospec-branch.h |  2 +-
+ arch/x86/kernel/cpu/bugs.c           | 17 +++++++++++------
+ arch/x86/kvm/mmu/spte.c              |  2 +-
+ arch/x86/kvm/vmx/run_flags.h         | 12 ++++++------
+ arch/x86/kvm/vmx/vmenter.S           |  8 +++++++-
+ arch/x86/kvm/vmx/vmx.c               | 26 ++++++++++----------------
+ 6 files changed, 36 insertions(+), 31 deletions(-)
+---
+base-commit: dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa
+change-id: 20251028-verw-vm-6b922910a2b3
+
+Best regards,
+-- 
+Pawan
+
+
 
