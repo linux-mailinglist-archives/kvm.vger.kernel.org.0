@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-61381-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61382-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E6DEC18916
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 07:59:22 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 297D7C18BD4
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 08:44:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89D8B1C6443D
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 06:58:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5E6D74F22F8
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 07:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69D1830BBA0;
-	Wed, 29 Oct 2025 06:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C976E3101C4;
+	Wed, 29 Oct 2025 07:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LVi7hKHx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jZgEHj9r"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550B91F4606;
-	Wed, 29 Oct 2025 06:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B44819E82A;
+	Wed, 29 Oct 2025 07:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761721076; cv=none; b=BmhG5y1if+FYrUeopjtHKX+8KhjaQ9yJWk+nozxTeJ0YfiwUWRtsdHqEMqB9mkJu+6yTZ16fQp2eGKAzwSdoUWrt007QugyH7k2ebxfD/Tlfv0oPA5RIrfjXwsBoZi4w+TX50VmQbmVKoVFkgz43g5/ubgsEy3+4izCLL7CK2l0=
+	t=1761723836; cv=none; b=AyYFT4eOA4APD8oJzv/v4J9VtMWo5m3SnGAO7w+kuiXbq/v09sL/hKDUq9aeA0OGPjANrJBmT10dSJhGX/UUoUZQNUIcvTrY7WioCDSNkEUTI8E5cHV8m9ejWCIeNqy1U0mw5o4hRhymvky43yiJruCdgiCpZq3q+fnLnkYxNgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761721076; c=relaxed/simple;
-	bh=GRPJ23z2L3uMq7YCt/UEA/ttP3KePbP/XYQFWN9kbOU=;
+	s=arc-20240116; t=1761723836; c=relaxed/simple;
+	bh=sTpZ09xOIKuyu7EF0yjjz0CspP8pKuAhf+0WKJX54ok=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VfaLYeCA4aClrUjK8qboFNUmjLUr7WSYdeRUxG+r3Eav3icpZs9S55RXqdtYgejl89yWGnt0N9W7VZ54uYkLVygtigZLSq7LVfYc2Hm6qPv2d4Cu5pkGHQ80mZVrdYu/a6f/8KWe0t1CiQeVHttANuCL0BxuO0RSUVwLeDBC0fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LVi7hKHx; arc=none smtp.client-ip=192.198.163.16
+	 In-Reply-To:Content-Type; b=h6Y9shHuwvwb4aTJSHt3UCwNbyijZHb3eSz1+/NgmFXqzzaJep9yKhVoIwQOphenj4IwNuGs3g5crf7Pmj28uWcTg8Ix6QRSDqxWtNn0mwtii/nEt+BWLSMd0SfSFMKgX3jv04LnkmHYywEFFrkQ0CRxDTiyBxmsMW5wdzRhk/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jZgEHj9r; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761721074; x=1793257074;
+  t=1761723834; x=1793259834;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=GRPJ23z2L3uMq7YCt/UEA/ttP3KePbP/XYQFWN9kbOU=;
-  b=LVi7hKHxz3qUjAzn+Zz+H6awRY8AFeFXbEoBQkjjkekO9O8CplBjBUva
-   tFh29RcNyrv2YLUEf9/BFpcC711kX6H6IvW2c+HjHp0aSHulPyHsSUkzn
-   P42Bsj/OGliGwjz4+Inrr+h5cTnQ4/dmk1FtdnQHJCFGzRlq6OBnZzoCO
-   DIBgEgboANR+2/GmLSirqqlafg/1qzXu7PZ4d9oZsCnJbbzn5Bo+sFzS8
-   tY1/18ZE6kj8pPaVDzgds91L2avp7pe/aFjXM6DNyw4fUArWjSQ8Hona7
-   QUiDteUlLbNrNcS/vTdlYFlc6PjmvY33kbyuG1Evbu4Z96fZw6zFz4OXO
+  bh=sTpZ09xOIKuyu7EF0yjjz0CspP8pKuAhf+0WKJX54ok=;
+  b=jZgEHj9r3ICs38VaAHjBN/qI6FJNvadMDUYrpt5/p/JA2bVr6HQT8UnX
+   GKE0AtpPAw7Ndw9LIUp7yXggbFvtSdDiJVDmOOfUWEXVL1LqXQfYsht6Z
+   M5vV7SQuxCWmmT+kXrIgi2ycNlSIWajIfXkBi01GotGH4fIPS+wCl8TK3
+   cTIlezzvpS2igVmXroeO3uaAIowqx9PkT0yXpcuVR8j/iu9sVMG7I5GAK
+   gJFI/BB6cPwz6pzlE7DH60wjhSr3Mn7oEFYaXWpzPD0EabRLtpXmLUGLi
+   AOmZGlPjJLxF+h7nT7uXZ636OcfIV24tnjPuenM75pWx8I6bsr/1hSw1u
    w==;
-X-CSE-ConnectionGUID: I+dJraKlQ+OAoxpEsA9ckw==
-X-CSE-MsgGUID: oTN/HKKBSFWhGmxMs/A8DA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="51405926"
+X-CSE-ConnectionGUID: bm+HaResQU2g/2n/hvzRdQ==
+X-CSE-MsgGUID: n33UqjX/Rk+36QCrxsdzUg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63877668"
 X-IronPort-AV: E=Sophos;i="6.19,263,1754982000"; 
-   d="scan'208";a="51405926"
+   d="scan'208";a="63877668"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 23:57:53 -0700
-X-CSE-ConnectionGUID: RhYMO8kASxy1El5X2eLAvw==
-X-CSE-MsgGUID: crDPbSVAQqmlx50EFFQecA==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 00:43:54 -0700
+X-CSE-ConnectionGUID: MOOesLzBQS2mZvLZEi3LMA==
+X-CSE-MsgGUID: 2OJBIwZaQR+54NOfGgrlMg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,263,1754982000"; 
-   d="scan'208";a="190705190"
+   d="scan'208";a="190714282"
 Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 23:57:49 -0700
-Message-ID: <43e36e8a-5875-489c-8baa-9a9b589c000a@linux.intel.com>
-Date: Wed, 29 Oct 2025 14:57:46 +0800
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 00:43:48 -0700
+Message-ID: <4a8c783a-e930-44ca-9222-ce6d8ce26463@linux.intel.com>
+Date: Wed, 29 Oct 2025 15:43:46 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 01/23] KVM: selftests: Add macros so simplify creating
- VM shapes for non-default types
+Subject: Re: [PATCH v12 07/23] KVM: selftests: Add kbuild definitons
 To: Sagi Shahar <sagis@google.com>
 Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
  Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>,
@@ -84,30 +83,58 @@ Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
  Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org
 References: <20251028212052.200523-1-sagis@google.com>
- <20251028212052.200523-2-sagis@google.com>
+ <20251028212052.200523-8-sagis@google.com>
 Content-Language: en-US
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20251028212052.200523-2-sagis@google.com>
+In-Reply-To: <20251028212052.200523-8-sagis@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 10/29/2025 5:20 AM, Sagi Shahar wrote:
-> From: Sean Christopherson <seanjc@google.com>
+> Add kbuild.h that can be used by files under tools/
 >
-> Add VM_TYPE() and __VM_TYPE() macros to create a vm_shape structure given
-> a type (and mode), and use the macros to define VM_SHAPE_{SEV,SEV_ES,SNP}
-> shapes for x86's SEV family of VM shapes.  Providing common infrastructure
-> will avoid having to copy+paste vm_sev_create_with_one_vcpu() for TDX.
+> Definitions are taken from the original definitions at
+> include/linux/kbuild.h
 >
-> Use the new SEV+ shapes and drop vm_sev_create_with_one_vcpu().
+> This is needed to expose values from c code to assembly code.
 >
-> No functional change intended.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Sagi Shahar <sagis@google.com>
+> ---
+>   tools/include/linux/kbuild.h | 18 ++++++++++++++++++
+>   1 file changed, 18 insertions(+)
+>   create mode 100644 tools/include/linux/kbuild.h
+>
+> diff --git a/tools/include/linux/kbuild.h b/tools/include/linux/kbuild.h
+> new file mode 100644
+> index 000000000000..62e20ba9380e
+> --- /dev/null
+> +++ b/tools/include/linux/kbuild.h
+> @@ -0,0 +1,18 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __TOOLS_LINUX_KBUILD_H
+> +#define __TOOLS_LINUX_KBUILD_H
+> +
+> +#include <stddef.h>
 
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+This is not in kernel's version.
+Instead, consumers of kbuild.h include the necessary header.
+
+Maybe it can follow kernel's style?
+
+> +
+> +#define DEFINE(sym, val) \
+> +	asm volatile("\n.ascii \"->" #sym " %0 " #val "\"" : : "i" (val))
+> +
+> +#define BLANK() asm volatile("\n.ascii \"->\"" : : )
+> +
+> +#define OFFSET(sym, str, mem) \
+> +	DEFINE(sym, offsetof(struct str, mem))
+> +
+> +#define COMMENT(x) \
+> +	asm volatile("\n.ascii \"->#" x "\"")
+> +
+> +#endif /* __TOOLS_LINUX_KBUILD_H */
 
 
