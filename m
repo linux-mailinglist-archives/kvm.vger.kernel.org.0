@@ -1,197 +1,127 @@
-Return-Path: <kvm+bounces-61417-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61418-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F061C1D0FF
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 20:54:00 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB5AAC1D423
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 21:44:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07BD83AC07E
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 19:53:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 77B704E2508
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 20:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0C735A14F;
-	Wed, 29 Oct 2025 19:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D536F35BDC4;
+	Wed, 29 Oct 2025 20:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="C7Q3gOI6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kyU4Om3r";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="C7Q3gOI6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kyU4Om3r"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NdZ6LFnT"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA9419CD03
-	for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 19:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496403596EC
+	for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 20:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761767631; cv=none; b=f/EQ3ONLs1SUB1vqSCodgaewPQ7FgPw8BGSs9zmMjylTtu4scHHUFafl/1DDAn/Jjv9+Hc4ZKuJIm3pflP3l/w5BmyYwFE/IWOQ20SfkcaifN+peOwu3nRQ6btnSU4sk5yW1KsoKQDMyuoaWx+bCTBCBQEECvQ9JE9l/4nvi3WY=
+	t=1761770656; cv=none; b=p+sPgB9JylDk5Djs4k6EkJ2WRQN3ZI8jfTmadD8mJ12AmzgoQFJf0K7v9pfVjS7LQ4gnotlkRIcOUKossmHU4jQj5a1xw2Y7/dSFhIXVWdPFUfjItIL03AfHxVxXJ1MLIxw2oi+IzAs3Fd+chn1IQJVlWyOASE2mOOXNEag4bDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761767631; c=relaxed/simple;
-	bh=NYvovgAj7zt8GDEAG7ywAu9miawDzsAFbj86c/i3NWc=;
+	s=arc-20240116; t=1761770656; c=relaxed/simple;
+	bh=PpaAnelvP90qNut+ZwW7vK2RK0H4rH7vlQYQGs2uXZI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jGmQceU4dhEItvt9x/VJmkp+LRsyS8OJcMeG1vUWTJSl3yMecfDCWoHrBYI0xWhSZ43LJclXw+XGOyQk2IzJfurdF4cIXKKzfcTAbTCYEzbmVHJCar/2kpuJjUDTW0enY6rUhZbb5pPKWfALqFMiW89QQ1wPwnX2qI9EmzV/u2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=C7Q3gOI6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kyU4Om3r; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=C7Q3gOI6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kyU4Om3r; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from kitsune.suse.cz (unknown [10.100.12.127])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 4BF0C5C551;
-	Wed, 29 Oct 2025 19:53:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1761767627; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NPKuRCtRL+cGFEISJPZpkrApshhoy8kZay3T7ph1BY8=;
-	b=C7Q3gOI6kmERxvs74t0egUwH7m7NezGuwT1J8o/PcJPPL6MKdjSIgcZIsAmfTdNIITqqvu
-	FnBH6dVl6r+/dOMLyFKEOh3G9Kbikdp+ncGrAmWy5b/aY4TBhHMmVhv2iCZFYhupdis9SX
-	0c70YYQ0Xk++ZtO+Ctxt2vRKDpzSB4k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1761767627;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NPKuRCtRL+cGFEISJPZpkrApshhoy8kZay3T7ph1BY8=;
-	b=kyU4Om3rTn7cn6qiWi1M4P34MvfF4+0iO51SR/7z+QznWZgOMXPbj3WZRU/r3ZuN+dMwzu
-	gELeh4jqtdreaECQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1761767627; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NPKuRCtRL+cGFEISJPZpkrApshhoy8kZay3T7ph1BY8=;
-	b=C7Q3gOI6kmERxvs74t0egUwH7m7NezGuwT1J8o/PcJPPL6MKdjSIgcZIsAmfTdNIITqqvu
-	FnBH6dVl6r+/dOMLyFKEOh3G9Kbikdp+ncGrAmWy5b/aY4TBhHMmVhv2iCZFYhupdis9SX
-	0c70YYQ0Xk++ZtO+Ctxt2vRKDpzSB4k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1761767627;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NPKuRCtRL+cGFEISJPZpkrApshhoy8kZay3T7ph1BY8=;
-	b=kyU4Om3rTn7cn6qiWi1M4P34MvfF4+0iO51SR/7z+QznWZgOMXPbj3WZRU/r3ZuN+dMwzu
-	gELeh4jqtdreaECQ==
-Date: Wed, 29 Oct 2025 20:53:46 +0100
-From: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-To: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	qemu-devel@nongnu.org, Chinmay Rath <rathc@linux.ibm.com>,
-	qemu-ppc@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
-	kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Harsh Prateek Bora <harshpb@linux.ibm.com>,
-	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@redhat.com>
-Subject: Re: [PATCH v2 00/11] hw/ppc/spapr: Remove deprecated pseries-3.0 ->
- pseries-4.2 machines
-Message-ID: <aQJwyoC-BclJRdXE@kitsune.suse.cz>
-References: <20251021084346.73671-1-philmd@linaro.org>
- <aPdpjysqFBAMTvG-@kitsune.suse.cz>
- <1f952d10-9630-42d6-8d24-b7461f90aa9f@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OqJhnoBu9c3mxMs9mrXgu19Cw1Vaae66AiA0PbcmsbLxFZaVEMqfPtde5DUs5lkgO2iTHmjPZMOMjqWX1YGoSQbBveOdMNvAwU83X6AnrnDvDTBPEHbWhQDzauXYwIRLngFZVW77JqOZ8ZDMC4WiIGj1O7Fv6EdbRMRpVKrIGm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=NdZ6LFnT; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-89f4779fe03so24110485a.3
+        for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 13:44:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1761770653; x=1762375453; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RXmwII94RIU4hvYvWVxvISL3Cf6KBQEXeyuNCmaeDUA=;
+        b=NdZ6LFnTI6zrhukv2ioDeAyjWqg6+j1Uuru17kHskflsn1LWBlkItFGc7c7FM3RljP
+         yNnibcKgqCu4WjAaGG6c4isZ79B+uilkmI9YEZJa5qx+ybSZK9nMRJzxRxRCeRNIhWuA
+         fTXGFnp5F91EUwy76Gnlay+5vEK4F2az4C8WttulzlsB+VDrq0c2hnsoL6VsfwMR+Y+p
+         PhVmLtEGWeulzW9Db67U4hK+aj3aJ1qGkROJRfSu1jJQJU4aqAgfMG41/l8kdySPdb4L
+         QZM08T8laY4cKBaz+Szz9g5zNkE5YbReJwaZ1Ni1yy/UtV3JwhBwR2m6yfNwWiNQ3pJp
+         LU5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761770653; x=1762375453;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RXmwII94RIU4hvYvWVxvISL3Cf6KBQEXeyuNCmaeDUA=;
+        b=i4mrRkkPI24WYByOaRisE2ms/n3Nbr/Ym1gch1p8cfVW6qzuD8e9nCWYsKu8qaJ/yL
+         aK3ZenrFqCt1yI7EjsYrkSNGKHaDDEZzNIAanJrccM/FDrzFDJOisd3rqo3jvHVzQNo0
+         KsBK9Fjor54EJ5vke2hhNukMG2tOYvrIo6lNDdYdDOGMFO8Bm53sr/kBRmqtIGlmD14/
+         u70RK1ol6/p8znpR1TausXa0T5Jq5pOQC97gJfitjhOu5khlrX5iCl6RiXHSx/Pc8Wfc
+         6ESNwfLWb6D/XqHwRJAmaVogvbiZgvAWHF+9GQJEvsFwRHUHv6xW8rBC2dLF2C978HMA
+         P52Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXy6k9yEjh5Hx+2ixTbse2Scoghbrnl1n4LOENS4GwdZFXMCF7xlnM9vTGHcv8V32niNMs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoskVPdqzuq7dq0J2W1IO2zfrujQ3o2vF1WwGp53YHhwYRFxKZ
+	TG9V5e5ApyGWvATmUGmqyS6auNOLfTLsafLiFaypohI8I0akAyxlFkMWOFYqtDqE4Ew=
+X-Gm-Gg: ASbGnctg2Wl1xQyDFPEZujXn2+KbvluzhJDCMVytsidpE5BZmC6DF1z+BtvcTTVlfpy
+	tQ2IN+dT0DVioM5hDq97fVeydePryaK7gSdC5n5p0Pi4XkmbpLZNUGNzC141XlNQls6Z5s2eSe1
+	pNlbh6pcxXJyDNkPTTnwd46nbNx1HgbYjSFhNrQLs5n4MVJ6hH2mFEG7B0aHYlcJV3Bn7QNwId2
+	W2iV7o4QfQ7XfxuSSBshHnjBJe5KcR0wuUH48cQR0u5LyTi0mrRSs4o02aVTR6TdOyKcf0TvcOt
+	vHOSgUB+aJdLJH6eHbUFRZzuOa1r/bieaQS9FEwF4pvLIdlC+JuxvrgtUe8wzkhAbtZEcWCe+MK
+	/v7zGjm3B93vRru0zyOotAo5rP3yoJ546CVVF/L2MSwrxF21+Hbz1Bqp2pD8cXdRfu+6XKDazxc
+	8ARJoBygf8tBTnNSABCnkVh5kuIUIiyb9YFzhTWLO+gDSbtQ==
+X-Google-Smtp-Source: AGHT+IGATc8r8DQBwuLiAP3r8TNXYtoAaZC4C/pNuGjsCGGzvT3LRAi9w0bLz5mbYMTI7xxUZ0KOWQ==
+X-Received: by 2002:a05:620a:4496:b0:892:9838:b17a with SMTP id af79cd13be357-8a8e407c6d6mr467678485a.3.1761770653172;
+        Wed, 29 Oct 2025 13:44:13 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-89f24ecbc11sm1141931785a.24.2025.10.29.13.44.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Oct 2025 13:44:12 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vED1g-000000053O5-0MFV;
+	Wed, 29 Oct 2025 17:44:12 -0300
+Date: Wed, 29 Oct 2025 17:44:12 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mukesh R <mrathor@linux.microsoft.com>
+Cc: alex.williamson@redhat.com, joe@perches.com, kvm@vger.kernel.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>
+Subject: Re: [RFC] Making vma_to_pfn() public (due to vm_pgoff change)
+Message-ID: <20251029204412.GU760669@ziepe.ca>
+References: <a9b8a3ee-b35b-5c45-5042-2466607abcd0@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1f952d10-9630-42d6-8d24-b7461f90aa9f@linux.ibm.com>
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_COUNT_ZERO(0.00)[0];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_CC(0.00)[linaro.org,nongnu.org,linux.ibm.com,gmail.com,vger.kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
+In-Reply-To: <a9b8a3ee-b35b-5c45-5042-2466607abcd0@linux.microsoft.com>
 
-On Wed, Oct 29, 2025 at 11:00:18PM +0530, Shivaprasad G Bhat wrote:
-> Hi Michal,
+On Mon, Oct 27, 2025 at 02:21:56PM -0700, Mukesh R wrote:
+> Hi Alex,
 > 
-> On 10/21/25 4:37 PM, Michal Suchánek wrote:
-> > Hello,
-> > 
-> > I noticed removal of old pSeries revisions.
-> > 
-> > FTR to boot Linux 3.0 I need pSeries-2.7 (already removed earlier).
-> > 
-> > The thing that broke booting linux 3.0 for me is
-> > 357d1e3bc7d2d80e5271bc4f3ac8537e30dc8046 spapr: Improved placement of
-> > PCI host bridges in guest memory map
-> > 
-> > I do not use Linux 3.0 anymore which is the reason I did not notice this
-> > breakage due to old platform revision removal.
+> This regards vfio passthru support on hyperv running linux as dom0 aka
+> root. At a high level, cloud hypervisor uses vfio for set up as usual,
+> then maps the mmio ranges via the hyperv linux driver ioctls.
 > 
-> I tried booting linux kernel 3.13.0-170-generic from ubuntu 14.04.6 LTS with
-> the oldest supported machine pseries-5.0 as of now.
+> Over a year ago, when working on this I had used vm_pgoff to get the pfn
+> for the mmio, that was 5.15 and early 6.x kernels. Now that I am porting
+> to 6.18 for upstreaming, I noticed:
 > 
-> It worked fine.
+> commit aac6db75a9fc
+> Author: Alex Williamson <alex.williamson@redhat.com>
+>     vfio/pci: Use unmap_mapping_range()
 > 
-> 
-> qemu-system-ppc64 -machine pseries-5.0 -accel tcg -nographic -m size=12G
-> -cpu power8 -smp 1 -drive file=/root/images/ubuntu16.04.qcow2,format=qcow2,if=none,id=drive-virtio-disk0
-> -device virtio-blk-pci,drive=drive-virtio-disk0,id=virtio-disk0 -serial
-> mon:stdio -kernel /root/images/vmlinux-3.13.0-170-generic -initrd
-> /root/images/initrd.img-3.13.0-170-generic -append
-> "BOOT_IMAGE=/boot/vmlinux-4.4.0-142-generic
-> root=UUID=94fba90c-dbb0-4f8d-bc3e-acd5f2e54749 ro vt.handoff=7"
-> 
-> 
-> shiva@ubuntu:~$ uname -a
-> Linux ubuntu 3.13.0-170-generic #220-Ubuntu SMP Thu May 9 12:44:25 UTC 2019
-> ppc64le ppc64le ppc64le GNU/Linux
-> shiva@ubuntu:~$ cat /proc/cpuinfo
-> processor    : 0
-> cpu        : POWER8 (architected), altivec supported
-> clock        : 1000.000000MHz
-> revision    : 2.0 (pvr 004d 0200)
-> 
-> timebase    : 512000000
-> platform    : pSeries
-> model        : IBM pSeries (emulated by qemu)
-> machine        : CHRP IBM pSeries (emulated by qemu)
-> 
-> 
-> Hope that helps.
+> changed the behavior and vm_pgoff is no longer holding the pfn. In light
+> of that, I wondered if the following minor change, making vma_to_pfn() 
+> public (after renaming it), would be acceptable to you.
 
-How does that help?
+No way, no driver should be looking into VMAs like this - it is
+already a known security problem.
 
-Of course newer kernels do work.
+Is this "hyperv linux driver ioctls" upstream?
 
-However, distributions using Linux 3.0 don't anymore, at least that
-particular Linux 3.0 build.
+You should probably be looking to use the coming DMABUF stuff instead.
 
-I am not particularly concerned, only noting that the qemu pSeries
-emulation is not suitable for running very old distributions because
-they are not compatible with newer qemu.
-
-It can be a bug in the old kernel but it's not triggered by actual
-hardware nor older qemu. Or it may bee a bug with that new qemu PCI bus
-organization that is not triggered by newer kernel. I don't know and
-since nobody cared enough to diagnose it so far we will probably never
-know.
-
-Thanks
-
-Michal
+Jason
 
