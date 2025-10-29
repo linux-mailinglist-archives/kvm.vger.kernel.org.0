@@ -1,240 +1,298 @@
-Return-Path: <kvm+bounces-61429-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61434-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5848C1D6CE
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 22:25:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 968FAC1D839
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 22:50:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9BC0C4E3439
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 21:25:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECF104043E6
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 21:50:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50FC331986E;
-	Wed, 29 Oct 2025 21:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B0F2DCF78;
+	Wed, 29 Oct 2025 21:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ntwdh9jE"
+	dkim=pass (2048-bit key) header.d=osandov-com.20230601.gappssmtp.com header.i=@osandov-com.20230601.gappssmtp.com header.b="YB2SZvlX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A2C299A8F;
-	Wed, 29 Oct 2025 21:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761773091; cv=fail; b=Q3/Th/5Argkr70G/HWDow+i9bM4JNjZ4Js5RyNxwVVq4CeWgG74zMK0VSbqZrsIZ4NTpri7dHdsFY1CnozLPV4oyV/eEYKmobgg+fsGSyyPo08T6CUxQRg9vkcZzlcxVglepZka01Oot4TwaXAY9g+68Zs0sFWLiLfIWzneQW/4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761773091; c=relaxed/simple;
-	bh=2xAVKTig7kHT/VekESm8nSW0uJ0zTxE2Ha/ITdfpfqo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=DGEd6EgxaNeOftHSLExeXyNQF0Y38vnQkXYhYVvarNs1g4dCF1sYVq3tGiBKEOdQr66aXfcBAeZZYGBcwkBdNwYCVSALPneq10Td61jAa/p2AYuJBvQcj9XniEUS5PCAVkdVV6I7qalxWIJ/tqHRffbUmYtN1eurvoMblynFio0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ntwdh9jE; arc=fail smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761773090; x=1793309090;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=2xAVKTig7kHT/VekESm8nSW0uJ0zTxE2Ha/ITdfpfqo=;
-  b=Ntwdh9jE/5N006E0ZAzVPJJJEYloAwzYc8WuZYe6pUehP6XLyOIcb0h5
-   TlhYndYK+X4ijmuja1NoufHFUbKmPg1NxNRsLShn5dXH1+deXZoHCGHlF
-   EIXRKgOqX/evlws4j4KUv8JODgemvuC72fLJgbDEuy/GdbCBskRwMsjQ7
-   oTfL0l6YBpDGo3FSGXCTQejl8l8EJLXYZHp6rkXF3YzCF2FCHmPgNIDZ1
-   yg3g3V3h/iRDsZ6WiuHjkjbmvzwqXznOS1PxdC24qoUwBDqXrmJtsF7Hp
-   uRqzEBCn95Sqlbt+AES3xCeeOxo3ryVSb/T39pTW68yhWv5y91XBMc2mt
-   Q==;
-X-CSE-ConnectionGUID: 3gsAGVBbTFujM9B9PySIGw==
-X-CSE-MsgGUID: xWgv4oBnQLy/LB7zhtY64Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="63791194"
-X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="63791194"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 14:24:48 -0700
-X-CSE-ConnectionGUID: 2eWB77pNRmm31CbYXN+uMg==
-X-CSE-MsgGUID: g2nPNuCfRWOMsml/B2qopQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="185653315"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 14:24:47 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 29 Oct 2025 14:24:46 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Wed, 29 Oct 2025 14:24:46 -0700
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.28)
- by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 29 Oct 2025 14:24:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bDwlbjHDjZm/A7gKAdmTLigeNhScNLgFcw5pGTuPVp/9yWi9AFkvm/XfgFnq/UNIEAtSuFWv6zJ3CUwEyG8B4P2u5Nn62LnH68GyiafBvbDvH4OuZHuBAhdd2m0HMpcJdKxUfDKGCRVLyCHxkUPwAcl/9mIKDtZF0YPDInEI+25e/N4rK8xJtge37Lmp4t65dg9lOPgwCa0KbBoWyXaWG4tBJ+YzfV6yH+OzeIClkQH9xzU3ZGVSqV8JEtrp2kaQVVheXIL4We3mhSZT2/f8uqlAbqq1E+DmsBlUaUjzY8kinkLa4JLdhAAKf5Xm8LvYl+spWznn9HDQm9IQYHsgzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rxwrHKSHjUX/nfJLGSPLUXRRFwH+gz+pZYc2hUmI3ZI=;
- b=wnA7FHnscg76mIzAluhWSAESa1gJkF3MMnT39WU0BvZcBvYhpNCtApy4sVf/whtQZCY8d46YbAmyZKGYTOxC7g8+JuJ7/BwtxNEorDuA1BkdkWhI0hOlTWbHOgCyIls/5Rg6d9aZ1AfCWjqZ3341Yp95YjcpmbE0AhEK2+Owehfj0+fU8pfyQ8OW9vRtKnT5qdivmLOZjKxfqDswMBQNk0MqhBNy+s4fiEulEM3+Fb+Wem8D2qm6q8Da0IR1Bt1afmb95s4qfC1JuUMQTp+v90iVQwP8mxK8huNX42MO2/JnlIicETC27wnjqgTbY+IaBJ87uLm2Ec3wG1rOwL9vrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH3PPF9E162731D.namprd11.prod.outlook.com
- (2603:10b6:518:1::d3c) by CY8PR11MB6937.namprd11.prod.outlook.com
- (2603:10b6:930:5b::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.18; Wed, 29 Oct
- 2025 21:24:43 +0000
-Received: from PH3PPF9E162731D.namprd11.prod.outlook.com
- ([fe80::8289:cecc:ea5b:f0c]) by PH3PPF9E162731D.namprd11.prod.outlook.com
- ([fe80::8289:cecc:ea5b:f0c%8]) with mapi id 15.20.9275.011; Wed, 29 Oct 2025
- 21:24:43 +0000
-Date: Wed, 29 Oct 2025 16:27:04 -0500
-From: Ira Weiny <ira.weiny@intel.com>
-To: Sagi Shahar <sagis@google.com>, <linux-kselftest@vger.kernel.org>, "Paolo
- Bonzini" <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, "Sean
- Christopherson" <seanjc@google.com>, Ackerley Tng <ackerleytng@google.com>,
-	Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>, Erdem Aktas
-	<erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, "Roger
- Wang" <runanwang@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, "Oliver
- Upton" <oliver.upton@linux.dev>, "Pratik R. Sampat"
-	<pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>, Chenyi Qiang
-	<chenyi.qiang@intel.com>
-CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v12 14/23] KVM: selftests: Add helpers to init TDX memory
- and finalize VM
-Message-ID: <690286a88f75_21ab52100de@iweiny-mobl.notmuch>
-References: <20251028212052.200523-1-sagis@google.com>
- <20251028212052.200523-15-sagis@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251028212052.200523-15-sagis@google.com>
-X-ClientProxiedBy: BY3PR04CA0019.namprd04.prod.outlook.com
- (2603:10b6:a03:217::24) To PH3PPF9E162731D.namprd11.prod.outlook.com
- (2603:10b6:518:1::d3c)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B299274FE8
+	for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 21:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761774637; cv=none; b=W5w4FwgIKGzghk5COeYA3usUUwaMjVGzqsI4d9dF/KRoxqhmSL8dmP/4QdvolnfO9flYjNEc4hhWcU6kpn5o8RHdWunG7thrMUliPZUen7iD+9loZ4NakFOlCOY7YUzWQ5cG8YtkJ3eIndhTJa0LiAjNQq67Ra0BrvqDqPNjBTg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761774637; c=relaxed/simple;
+	bh=iq0AGFyihtsKqgio62MQ8z5/NVAcZT0ULl3xYzwqCq8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ex/jwVhjtACeC4kgKpeHYauR/vmUOzVC8rL+G+Av2dSPkpEQ3qPcwK/ywa4HRPzZVRtdh8QSfjZwxgj7OqEwsakKqpIDRnFF/oDQ5DA5OqLz4rNX5mSjHbWqtXpd013rH0dTdI3vFfgFHqPMbbI8hQdS+XucVlKjKVpl3+o9wt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com; spf=none smtp.mailfrom=osandov.com; dkim=pass (2048-bit key) header.d=osandov-com.20230601.gappssmtp.com header.i=@osandov-com.20230601.gappssmtp.com header.b=YB2SZvlX; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=osandov.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7a27f2469b8so48585b3a.0
+        for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 14:50:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20230601.gappssmtp.com; s=20230601; t=1761774634; x=1762379434; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oA/Fe1afu+0GIgAA+IsjNXNHdyIgEcFgCjgbpF+EbPI=;
+        b=YB2SZvlXzhmdfOemk+bLwyUp5/AvqkR98nA6tcTOXA+sUfq/jzssLTWkN4vLDXXgSM
+         Zpu8cdhChFHohz6FUUd9vE4Cl1+NcOYFhq8Ob+4Ppn6qxCDyWK996uz7NIMIcrJSt8WZ
+         GNdVCZ/yWGaJOOYK7LYUf/KgrjrkFZjS4N5okUzeok4ejGtBiCV5k8LJNG33U3BCClkr
+         Qa/lofBzes2ho/2QVQZKI9ooYq+J1McflkEo5mrTm8Jk3Rb3dYNNs2xBscLQGAmWoNtI
+         IiA1cLbs81WFmFNKGVRuaXQVXDBPthr6OMBVGOXLuBJd9GCSeUCfQcvPByTrgs8KuXea
+         SShA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761774634; x=1762379434;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oA/Fe1afu+0GIgAA+IsjNXNHdyIgEcFgCjgbpF+EbPI=;
+        b=hWFtJqiKjz86E5gpCm452IEzEAyTk7H5zBJLQw9MvtSJlQqi7iJjhLyp/JQgBQ4s5s
+         z1p5570gCn2oWL242qnz/M1bfimqfOiWUSxdAvtyjl5Hns/Coy/kRf8+uXPOcyFUwyf8
+         pvrKSAjQ4vppfh1CDUMdL12GxjgUaFMlUXstojSpBDl8x1yv8oNjrq6Ap+h9djWr92jq
+         LIjJto6kTFDGQn9b0kuU6ltgp+/Q857tM+PsBYVJbHFno62/tPtrOCx0eWwBbpWHGv0D
+         cg9MBc+wK8yDzzhxJjF6Rw/UpU2NzaIIRjL/5bbnibUoDAkR2E9NspcP2BIxxiZT0Lmn
+         BRRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWP1kO6zPcGIdDeolOiVkeepf8mrJvnuKjXvDGI8AH8u+/vYTpw32XYwpppqkJ1GclfTq0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwV8gcaOp2ctaNbBIm8O+vR3RN2T+5zmokTjZ5CYj+n9vMK/LUP
+	3+Fs7RUG6mnAUHI4qQVxoE1D3JQSfXz6jlzHpneTFPTci7sk/ap9NibwsE28dhMg6Ts=
+X-Gm-Gg: ASbGncsmgn5AUxwNc09PX0Ny8Wl4UU+B6U8ti2GcLva9ug3wKF7UWyBMTwpRmlGqIsI
+	1j8zgfZIhpbIHE3Up1Cgdr2osTMTANNtnRmezzxhrxCWcsinkskoNMiIiVUSEG2UXnDObHcB3Hf
+	7X13jOnpwCtE+PexM2lFGzsI8u2uqVrpioWmhoXYERPUQU0EXu1TAJU+Vs0fxWzisUXHbFWX8Hf
+	Btoci5a1g5eIYUOG5kWN+yRt987dmoq7ndhVFpxeGEy2RzI4JbDUfQNz2SE2rGISqzTPbfXPPFB
+	3Y5HfD9pTTLkRWyh5tc7TdcuXjPN63U7AUbiPLqCd8ZOAbk6vLh/o8XM89RTsaaPhqIb/IocN/D
+	Fvs7aPRT1Aa1P64e+3gNLktBORWNEUyKdpgXw1CwpFUaDjDPI9suX8TrFQdsR7dAJlhko54yUrd
+	vbXrzx6Dk+lTi9gig=
+X-Google-Smtp-Source: AGHT+IGylPmTHWHLa2BFTUS6DAfKab8BgXiLAHtpcxLzxuNKsvAhckaKHkzU64p+lv3EmlrhWf1wBg==
+X-Received: by 2002:a05:6a00:1404:b0:783:bb38:82f6 with SMTP id d2e1a72fcca58-7a4e0009473mr2830004b3a.0.1761774634381;
+        Wed, 29 Oct 2025 14:50:34 -0700 (PDT)
+Received: from telecaster.thefacebook.com ([2620:10d:c090:500::6:36f8])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a41402e554sm16182145b3a.18.2025.10.29.14.50.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Oct 2025 14:50:33 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org
+Cc: Gregory Price <gourry@gourry.net>,
+	kernel-team@fb.com
+Subject: [PATCH v2] KVM: SVM: Don't skip unrelated instruction if INT3/INTO is replaced
+Date: Wed, 29 Oct 2025 14:50:26 -0700
+Message-ID: <6ab4e8e5c5d6ea95f568a1ff8044779137dce428.1761774582.git.osandov@fb.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH3PPF9E162731D:EE_|CY8PR11MB6937:EE_
-X-MS-Office365-Filtering-Correlation-Id: 811e9f67-d37e-4353-f55f-08de1731939e
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|921020|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?5F+UZp4GuT8axN3M9jCCeVkSuhyh5edfPiZize5BBn8O5NlM4XkeV9cVlK1c?=
- =?us-ascii?Q?vkd5kwAiRlmvsTFGGHtSFPov1LQ+nBOQMbt9jY1qZPrI3TyaZ4Y9HS6xPWPV?=
- =?us-ascii?Q?zB43UGd3o0prLCUwXYTaCCzdjuchNbG0nw3q6m8n8sDKAsElygBBuVsnr35/?=
- =?us-ascii?Q?UH+T55VmQQJlcQqdxAe876xd3nW9QmKx66ZDb7Pm6/tQXVRO43OzILcQksiH?=
- =?us-ascii?Q?T+qJ59SkUqC8VCkEs+rL+CzZ8xGP64XPlg+b860vGE9FIfqx24Ae8cfiRDjm?=
- =?us-ascii?Q?DxaHTbIThZ2d0MAFaMsAhn5Th8kZD6XV7SmaqH62blstNSo2hSnwjIaGG2nZ?=
- =?us-ascii?Q?y26pmM6P+sc1wdK2rBZioxQkkITgAHF+Y8O5nDjfiN54o3pLXKeW11ohQqUg?=
- =?us-ascii?Q?VBj00rnXLBVJ7noiFKMKfd4DZ0PEqILjFGvTwK1uv90nd3HZgJjFmw1nCgyQ?=
- =?us-ascii?Q?L5QSJZcCe6wCfFJTfYGHtLeuq67ejDUmiJaDQbre9PpdI9hERdfje2r8HRfP?=
- =?us-ascii?Q?iEDhEAWHsgWVQNHtsqWfAGtX/Y4ztPuBJlrnwEhe8Fug2PpQD1cC2ecTwaaO?=
- =?us-ascii?Q?YxRy3A9CiC6lkRczkKQsYxPaD0g2RL8LaLSeEJX3I5b32qbBOe6ToMclApNt?=
- =?us-ascii?Q?pLRsci/tJaSrQFcs6ly1020amtEQgzqyllRoyznJh7g8URoB+8NGKAGzwTQo?=
- =?us-ascii?Q?O9oOYljNk6Qq1/AFOmWkFQt6CrPdWv1Ba7U2k5Z+rk9JZCgCbLkrMt4NHYTB?=
- =?us-ascii?Q?vhh9moTX2ZhyveIUOufYdE7k0vxhG+mvuVOqfMnUhOE/h9hzdC6+Qt7QMHU2?=
- =?us-ascii?Q?61Hw0Zun930FjnIdTsjMPsgngNg0ZazCtaIa6DvYPTxriJCeEAaeflTx1/4Q?=
- =?us-ascii?Q?xO/KNNiN9Osw5YTHtcLv/m5cMTyKWwEsYKK4AnffsqrZbyuzuXLF0WKbPtC0?=
- =?us-ascii?Q?+BAPKceDBnZfnSeMx370maPiA7ObVuleSMhNG0HCszTLhQw+OBgPHKmv9Hqn?=
- =?us-ascii?Q?8sHfdZKKtm6jCTKfUdveqf8BLRsZcqasM0Jjm/VAzi2TtT4iuurrmpAE6c26?=
- =?us-ascii?Q?sH6wB8Sf2ehhsPTLQKhmI5jpEtslOEtTRhBAWaxdYCgB9jdjPCkapP2AKBtJ?=
- =?us-ascii?Q?Ul/EvPYG8Knw7hVR2p+J9HafEWf2YolZ+1e7bdg2fvPBzWXG/qkDv7gUfLj6?=
- =?us-ascii?Q?2JMvggZYeCkSI/ouDC1WRBRzidVvkDICMa9BOZ8/gmkENp9IfE93ayrob3qN?=
- =?us-ascii?Q?mtCxYiDLbZuqLvF7POq3MrASfXZFAvR61/mgKtC82tbiq2BaIBdoAJeUmgHo?=
- =?us-ascii?Q?rOXa+yDgsOqfTkvkh8uIehGv395S7Y/xJ/oZhY0phJt6OF00/plaEfoavQLk?=
- =?us-ascii?Q?8T1lFRxPMak3x1Izy8hHnPBisgIIZeFIIOzsn7kqNzTCdbN1FIySUuuGb7PA?=
- =?us-ascii?Q?B094eYk8xHX2CnMsIZXedo6b22wL+DPn3R70KxP2I4fN3/kRwVvOnjZn7Huq?=
- =?us-ascii?Q?5z4gAtJl1mYvKJc=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH3PPF9E162731D.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(921020)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TuxkrzSdXeiW8EtsjBLJ09uUFwYz4jWjR46Hbpl5oCycmtHcn3rNwa361uXP?=
- =?us-ascii?Q?YoNYaTWVxMDNN/eHbb8fhgQWH9Y4PX4E1X46MjKQ7K+YFIxmNLAbqyJXrmAS?=
- =?us-ascii?Q?G5afwfDmDNrB+OsFyGiwotqJSa8fBnrL/Aw5tN8PxqgZg7JnPuCj6P5mUal4?=
- =?us-ascii?Q?1cqOKqwXWti4rKnsw1wY9p34cAsCw6ks5XMFyYbas0YwJpKnlCXcqzOa/RzF?=
- =?us-ascii?Q?pRLalwI3+fMD/6/LR+bxtRsQ1MXHKgIGPBAxHmENUW7BNe1PL5nte8fL6Q0l?=
- =?us-ascii?Q?UJsVTwEDu3WyDHnn/Xm4AjYRmw0eu2R910odnslNVPyoWgW6wtCMuzF9ysXB?=
- =?us-ascii?Q?SWhWz41YBHZrbZC/gzUBH+jrMI/xogebGWzaUhatZJQQ7GUGR8ZzpeURbXgP?=
- =?us-ascii?Q?uUw//OhamRu0Iigz1PJb7dhmGbw+AQWNebiBx/Q1RYo0Guo53UdD4J3K90jq?=
- =?us-ascii?Q?ye93W6V/Nramg3y2ZxdkqXnh30hBbzRvtRT/XfhU/Eq2KmI72OopOzkp2GJ3?=
- =?us-ascii?Q?XIaPSIctaXf+G9QLRPhFojt4inQfSPQrd/mN5zfiCc4P7dZoCSIPJah7nB+x?=
- =?us-ascii?Q?trpaGO2CkJ1CpNg1yiQ4DfxM/G0P2YvWfeUVsyAN6eKCHWvsZRTMcz89SoJE?=
- =?us-ascii?Q?CokXA1DCaBUAavDBeMbYl2TancaMnECTxNWhlHDEXOfu4U4Zrt0/I5H8Mj6t?=
- =?us-ascii?Q?bWjcD6V9O6nOMokahl43ETgm9btisRVFl+dn27uX59w95ILEu+cT/YAW46HD?=
- =?us-ascii?Q?NynxssGAJbcqop9MdIyGlZq5fqW18IzMAutsDnlXw9mOkVsGo+QYhkncwKV5?=
- =?us-ascii?Q?UZGme9yiRHd1M1fMjnEIJUPUKzY/Q/NNVKIX0L5tcH+mI5QCa7jrsIEXvgqn?=
- =?us-ascii?Q?PyiUZz48wvGRkLru46JRfpPadOgH2VH1tlL7DnSxMqmIEnGKcAXanG5xID/D?=
- =?us-ascii?Q?cIPmgHfdJe56A88dsg08UQKK2iB6OQUSskqpaKagE/7+K0Un9oFXpn8UmAAa?=
- =?us-ascii?Q?eGfS4E2EP4uwdAl6zrQW6q8YjKgWo9/9gqpv1ywRUfRq8z/0ZqioH6q1hC2m?=
- =?us-ascii?Q?GRvlFwcS/y4VIL8IomWqPIQrAFxafZrFPea4qWkwNYsLB3FsvIJhE2p+BSxz?=
- =?us-ascii?Q?lJKHuMNfFP6WIUrKgtZ7czt37+IinOvJf5Obp9an2batEo2xwXxrOlYbeBs2?=
- =?us-ascii?Q?rSCPowoWkRDHuK983HBTh7M0ZctfQn5r7QCbTYSKN5rRMMKS0TI39i0cdo2/?=
- =?us-ascii?Q?CG7Go6k5hB9SlXxRwPXcPQ6PMBk5/V59VqgTnXi+Zw9bvg505bvUKY2Z2rc5?=
- =?us-ascii?Q?nl02+cclz6BBYdnZJbaxkPrWR7hHxtfAuBq+o2DUlPbprgC6xE1OL0IYO2lm?=
- =?us-ascii?Q?RkZcP25b3cDdsoE39ODFUNT7zNKOqB1evxZcYMW7AP8kmG3gyUOt0QbndjCx?=
- =?us-ascii?Q?6YKVpe5xVzgcWVndvXdKsEI8hI3TAHpE128oGrUuKI4L1ifR2dmBzfyhuHcb?=
- =?us-ascii?Q?vlmKbZHlJE9CDevSWcHTZTVtDUv/eNNRfh+h4eVfmwgZIvzIITKWfmld5nrN?=
- =?us-ascii?Q?neTQRV9FWtnM2vwq4UJQ1S0NTUgWHp6JBpyzkUVa?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 811e9f67-d37e-4353-f55f-08de1731939e
-X-MS-Exchange-CrossTenant-AuthSource: PH3PPF9E162731D.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2025 21:24:43.2355
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T4gkhiY20OpA6oz+BRdGbJehpG8HxtSA2ZBtxJ1mjOxMfqAoDLl5R5BQseu3PfK/i50xDs3sjNIgZqCycBx2eg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6937
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-Sagi Shahar wrote:
-> From: Ackerley Tng <ackerleytng@google.com>
-> 
-> TDX protected memory needs to be measured and encrypted before it can be
-> used by the guest. Traverse the VM's memory regions and initialize all
-> the protected ranges by calling KVM_TDX_INIT_MEM_REGION.
-> 
-> Once all the memory is initialized, the VM can be finalized by calling
-> KVM_TDX_FINALIZE_VM.
-> 
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> Co-developed-by: Erdem Aktas <erdemaktas@google.com>
-> Signed-off-by: Erdem Aktas <erdemaktas@google.com>
-> Co-developed-by: Sagi Shahar <sagis@google.com>
-> Signed-off-by: Sagi Shahar <sagis@google.com>
-> ---
->  .../selftests/kvm/include/x86/tdx/tdx_util.h  |  2 +
->  .../selftests/kvm/lib/x86/tdx/tdx_util.c      | 58 +++++++++++++++++++
->  2 files changed, 60 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h b/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-> index a2509959c7ce..2467b6c35557 100644
-> --- a/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-> +++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-> @@ -71,4 +71,6 @@ void vm_tdx_load_common_boot_parameters(struct kvm_vm *vm);
->  void vm_tdx_load_vcpu_boot_parameters(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
->  void vm_tdx_set_vcpu_entry_point(struct kvm_vcpu *vcpu, void *guest_code);
->  
-> +void vm_tdx_finalize(struct kvm_vm *vm);
+From: Omar Sandoval <osandov@fb.com>
 
-FWIW this is not what I was expecting to see based on the previous
-discussion.  Knowing that this call is needed later I'm inclined to let it
-go but generally it would have been better to separate out this call
-when/if the follow on tests require it; rather than defining this call
-here without context.
+When re-injecting a soft interrupt from an INT3, INT0, or (select) INTn
+instruction, discard the exception and retry the instruction if the code
+stream is changed (e.g. by a different vCPU) between when the CPU
+executes the instruction and when KVM decodes the instruction to get the
+next RIP.
 
-That said:
+As effectively predicted by commit 6ef88d6e36c2 ("KVM: SVM: Re-inject
+INT3/INTO instead of retrying the instruction"), failure to verify that
+the correct INTn instruction was decoded can effectively clobber guest
+state due to decoding the wrong instruction and thus specifying the
+wrong next RIP.
 
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+The bug most often manifests as "Oops: int3" panics on static branch
+checks in Linux guests.  Enabling or disabling a static branch in Linux
+uses the kernel's "text poke" code patching mechanism.  To modify code
+while other CPUs may be executing that code, Linux (temporarily)
+replaces the first byte of the original instruction with an int3 (opcode
+0xcc), then patches in the new code stream except for the first byte,
+and finally replaces the int3 with the first byte of the new code
+stream.  If a CPU hits the int3, i.e. executes the code while it's being
+modified, then the guest kernel must look up the RIP to determine how to
+handle the #BP, e.g. by emulating the new instruction.  If the RIP is
+incorrect, then this lookup fails and the guest kernel panics.
 
-[snip]
+The bug reproduces almost instantly by hacking the guest kernel to
+repeatedly check a static branch[1] while running a drgn script[2] on
+the host to constantly swap out the memory containing the guest's TSS.
+
+[1]: https://gist.github.com/osandov/44d17c51c28c0ac998ea0334edf90b5a
+[2]: https://gist.github.com/osandov/10e45e45afa29b11e0c7209247afc00b
+
+Fixes: 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
+Cc: stable@vger.kernel.org
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+Changes from v1 (https://lore.kernel.org/all/71043b76fc073af0fb27493a8e8d7f38c3c782c0.1761606191.git.osandov@fb.com/):
+
+- Incorporated Sean's suggested commit message (with some edits) and
+  approach for implementing this in the generic KVM code instead (adding
+  a comment for EMULTYPE_SKIP_SOFT_INT).
+- Rebased on Linus's tree as of e53642b87a4f4b03a8d7e5f8507fc3cd0c595ea6.
+
+ arch/x86/include/asm/kvm_host.h |  9 +++++++++
+ arch/x86/kvm/svm/svm.c          | 24 +++++++++++++-----------
+ arch/x86/kvm/x86.c              | 21 +++++++++++++++++++++
+ 3 files changed, 43 insertions(+), 11 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 48598d017d6f..f0a61615b67b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2143,6 +2143,11 @@ u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
+  *			     the gfn, i.e. retrying the instruction will hit a
+  *			     !PRESENT fault, which results in a new shadow page
+  *			     and sends KVM back to square one.
++ *
++ * EMULTYPE_SKIP_SOFT_INT - Set in combination with EMULTYPE_SKIP to only skip
++ *                          an instruction if it could generate a given software
++ *                          interrupt, which must be encoded via
++ *                          EMULTYPE_SET_SOFT_INT_VECTOR().
+  */
+ #define EMULTYPE_NO_DECODE	    (1 << 0)
+ #define EMULTYPE_TRAP_UD	    (1 << 1)
+@@ -2153,6 +2158,10 @@ u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
+ #define EMULTYPE_PF		    (1 << 6)
+ #define EMULTYPE_COMPLETE_USER_EXIT (1 << 7)
+ #define EMULTYPE_WRITE_PF_TO_SP	    (1 << 8)
++#define EMULTYPE_SKIP_SOFT_INT	    (1 << 9)
++
++#define EMULTYPE_SET_SOFT_INT_VECTOR(v)	(((v) & 0xff) << 16)
++#define EMULTYPE_GET_SOFT_INT_VECTOR(e)	(((e) >> 16) & 0xff)
+ 
+ static inline bool kvm_can_emulate_event_vectoring(int emul_type)
+ {
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 153c12dbf3eb..a675585e6b1d 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -272,6 +272,7 @@ static void svm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
+ }
+ 
+ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
++					   int emul_type,
+ 					   bool commit_side_effects)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -293,7 +294,7 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+ 		if (unlikely(!commit_side_effects))
+ 			old_rflags = svm->vmcb->save.rflags;
+ 
+-		if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
++		if (!kvm_emulate_instruction(vcpu, emul_type))
+ 			return 0;
+ 
+ 		if (unlikely(!commit_side_effects))
+@@ -311,11 +312,13 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+ 
+ static int svm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+ {
+-	return __svm_skip_emulated_instruction(vcpu, true);
++	return __svm_skip_emulated_instruction(vcpu, EMULTYPE_SKIP, true);
+ }
+ 
+-static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
++static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu, u8 vector)
+ {
++	const int emul_type = EMULTYPE_SKIP | EMULTYPE_SKIP_SOFT_INT |
++			      EMULTYPE_GET_SOFT_INT_VECTOR(vector);
+ 	unsigned long rip, old_rip = kvm_rip_read(vcpu);
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -331,7 +334,7 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
+ 	 * in use, the skip must not commit any side effects such as clearing
+ 	 * the interrupt shadow or RFLAGS.RF.
+ 	 */
+-	if (!__svm_skip_emulated_instruction(vcpu, !nrips))
++	if (!__svm_skip_emulated_instruction(vcpu, emul_type, !nrips))
+ 		return -EIO;
+ 
+ 	rip = kvm_rip_read(vcpu);
+@@ -367,7 +370,7 @@ static void svm_inject_exception(struct kvm_vcpu *vcpu)
+ 	kvm_deliver_exception_payload(vcpu, ex);
+ 
+ 	if (kvm_exception_is_soft(ex->vector) &&
+-	    svm_update_soft_interrupt_rip(vcpu))
++	    svm_update_soft_interrupt_rip(vcpu, ex->vector))
+ 		return;
+ 
+ 	svm->vmcb->control.event_inj = ex->vector
+@@ -3637,11 +3640,12 @@ static bool svm_set_vnmi_pending(struct kvm_vcpu *vcpu)
+ 
+ static void svm_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
+ {
++	struct kvm_queued_interrupt *intr = &vcpu->arch.interrupt;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	u32 type;
+ 
+-	if (vcpu->arch.interrupt.soft) {
+-		if (svm_update_soft_interrupt_rip(vcpu))
++	if (intr->soft) {
++		if (svm_update_soft_interrupt_rip(vcpu, intr->nr))
+ 			return;
+ 
+ 		type = SVM_EVTINJ_TYPE_SOFT;
+@@ -3649,12 +3653,10 @@ static void svm_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
+ 		type = SVM_EVTINJ_TYPE_INTR;
+ 	}
+ 
+-	trace_kvm_inj_virq(vcpu->arch.interrupt.nr,
+-			   vcpu->arch.interrupt.soft, reinjected);
++	trace_kvm_inj_virq(intr->nr, intr->soft, reinjected);
+ 	++vcpu->stat.irq_injections;
+ 
+-	svm->vmcb->control.event_inj = vcpu->arch.interrupt.nr |
+-				       SVM_EVTINJ_VALID | type;
++	svm->vmcb->control.event_inj = intr->nr | SVM_EVTINJ_VALID | type;
+ }
+ 
+ void svm_complete_interrupt_delivery(struct kvm_vcpu *vcpu, int delivery_mode,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b4b5d2d09634..9dc66cca154d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9338,6 +9338,23 @@ static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
+ 	return false;
+ }
+ 
++static bool is_soft_int_instruction(struct x86_emulate_ctxt *ctxt,
++				    int emulation_type)
++{
++	u8 vector = EMULTYPE_GET_SOFT_INT_VECTOR(emulation_type);
++
++	switch (ctxt->b) {
++	case 0xcc:
++		return vector == BP_VECTOR;
++	case 0xcd:
++		return vector == ctxt->src.val;
++	case 0xce:
++		return vector == OF_VECTOR;
++	default:
++		return false;
++	}
++}
++
+ /*
+  * Decode an instruction for emulation.  The caller is responsible for handling
+  * code breakpoints.  Note, manually detecting code breakpoints is unnecessary
+@@ -9448,6 +9465,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	 * injecting single-step #DBs.
+ 	 */
+ 	if (emulation_type & EMULTYPE_SKIP) {
++		if (emulation_type & EMULTYPE_SKIP_SOFT_INT &&
++		    !is_soft_int_instruction(ctxt, emulation_type))
++			return 0;
++
+ 		if (ctxt->mode != X86EMUL_MODE_PROT64)
+ 			ctxt->eip = (u32)ctxt->_eip;
+ 		else
+-- 
+2.51.0
+
 
