@@ -1,66 +1,79 @@
-Return-Path: <kvm+bounces-61390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92FACC1A6BA
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 13:55:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C510C1AA8A
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 14:26:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B2A44582196
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 12:48:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9F1D561E28
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 13:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A2E3644BA;
-	Wed, 29 Oct 2025 12:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D91F2D8398;
+	Wed, 29 Oct 2025 13:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="m13q6ii/"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jN4F5gdT"
 X-Original-To: kvm@vger.kernel.org
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A360036449D;
-	Wed, 29 Oct 2025 12:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72B52D23BC;
+	Wed, 29 Oct 2025 13:08:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761740752; cv=none; b=nOh+BK7k5S/+Ad/23a9iJ2H8eUKsuyFKt++XTZ6ZU3OLQjmTbYmjMWn6N4MRcDRU0LtStRlRhATJcfpwz4AFeon7IqvPD1OonHec/TVADQVAHsAMJZM4HXMSMtU9gYE3asS0HOerfXEPAdWNCk6X18z7sBVe0SyTH1MNI7kAHH4=
+	t=1761743315; cv=none; b=EBzy4fF7WBrxDxw/geAbkgsijm56ioPV3ld66JW+H3CLFX8L5ZTRK3eFoMlU6D7O6FlFy6UKcB+HacBwUkrbFruHeSN5s+tpwwNVXZXxMojaN3R41hQhyYxP4NtRcmitAKmLjiJEGSMtFm58FDzEwXwcuaTKgGF6uz1bxgpA1/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761740752; c=relaxed/simple;
-	bh=PtupePlo8OMYijM47FMUPpaeBCPL3qNmrhyukyehrP8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ICTM7VwsFaKCGvaXU+lB6NzBJPGTAq8THa5ioMVBKYMZnAIMfay3uPbrEX7nqANcwvYaup7gf0c7caiF3fcCP27mLHwDNojaLmlqoaC7r4lEqhv8nFJSmHusubxK5q3fqOkUBZyQPAdCzmqoChcC9xYwCGD6PVFTmsjU5HxVGIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=m13q6ii/; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=lSjBVyPWQ1aQpf9+1QsVhcNZ8+OyV4cyPdLCxMIC7Ls=;
-	b=m13q6ii/xTQ+jk3zRXepaxdZCpPtBCOOGkjPiUkSV6xcb+7Fn7bPSxvObn3dDY99AJV7xvFMs
-	XdVD8UPq+NUQQrg28MA8VOoQu+SPgVX/t3nPQNxcenwRxnHiQECPRN9jTMRAKD7YHbKAvkzCzT2
-	ZFphqeY74xB7VqsSQK/k2S4=
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4cxRK01dPCz12LJn;
-	Wed, 29 Oct 2025 20:25:08 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 641941402C4;
-	Wed, 29 Oct 2025 20:25:45 +0800 (CST)
-Received: from huawei.com (10.90.31.46) by dggpemf500015.china.huawei.com
- (7.185.36.143) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 29 Oct
- 2025 20:25:44 +0800
-From: Longfang Liu <liulongfang@huawei.com>
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
-	<jonathan.cameron@huawei.com>
-CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>,
-	<liulongfang@huawei.com>
-Subject: [PATCH v11 2/2] hisi_acc_vfio_pci: adapt to new migration configuration
-Date: Wed, 29 Oct 2025 20:24:41 +0800
-Message-ID: <20251029122441.3063127-3-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20251029122441.3063127-1-liulongfang@huawei.com>
-References: <20251029122441.3063127-1-liulongfang@huawei.com>
+	s=arc-20240116; t=1761743315; c=relaxed/simple;
+	bh=tDMkOiHrA3eT74QLyYSrwUUima+EcBylwbkvubbTnd4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KhLUrpiIbqxNvdkXBM2la37+LW3YsirRMjZT4HGXeHhYr74p2JU42CX4q9d1tMMxObuo9ttKCEIW6Usxfi8GJmh+22We3uwu2EUHI5YWeFWOMkupOOXKrp/0jQd+SO+LtR3XjyvTcBkv1JzZ2uGec9323+aHrWNxMkI5fRAv4mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jN4F5gdT; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59TApkTp025816;
+	Wed, 29 Oct 2025 13:08:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=yDOnppx9B6iPjPkweVjzeGhNFNR0KwdHKQ8WJGxje
+	bI=; b=jN4F5gdTRi8qL103RM/LvaAHSk7Hzpv5OCJfU/stG/30yooFBFctenQG8
+	KtY2iBExeHYcGaQd+8cd9lsEPzHtTenV+lFFdLiFhAmKEybtxM4SszilrMaHB8GQ
+	U/tgWqIDswddR9fiujVAPRUtYRxvXMa+tn4HzvyAOf0lqIckHedO09vXiehkSbA+
+	Z6Whl7HAmM3kf2D2krzuIddlZsGfeP4PWoSDLCaQUkjKY5UE5wsC/87U19inqWpm
+	30p+4KIHpOmuNY4cLwckjHcmEQvFzkzURzK48uWBgpC579nSUS1LDuMkBYaBOZY0
+	WcXcUQhUEhmnNxXvKaUjTnIT0tyjg==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a34ackcaq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Oct 2025 13:08:31 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59T9r9ok027546;
+	Wed, 29 Oct 2025 13:08:30 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a33w2kcrm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Oct 2025 13:08:30 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59TD8RPv51118338
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 29 Oct 2025 13:08:27 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 223D920043;
+	Wed, 29 Oct 2025 13:08:27 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 00E8320040;
+	Wed, 29 Oct 2025 13:08:27 +0000 (GMT)
+Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 29 Oct 2025 13:08:26 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        borntraeger@linux.ibm.com
+Subject: [PATCH] KVM: s390: Add capability that forwards operation exceptions
+Date: Wed, 29 Oct 2025 13:04:11 +0000
+Message-ID: <20251029130744.6422-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,324 +81,312 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=XbuEDY55 c=1 sm=1 tr=0 ts=690211cf cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
+ a=2J_RzahkHEl8vmpqG00A:9
+X-Proofpoint-ORIG-GUID: 94MvI6_RQSdsbD-AUyT1iTYSfF6e8W64
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI4MDE2NiBTYWx0ZWRfXzmub4T8MWIEI
+ jgXuHbz0R8wvFjf17j7UGDAqe27m5kPgsOlIArJYB77KV1jSKhwQVWmnAdvmJ+9RWydqKbN6kpB
+ +Nx//Q2gAGHwklRi0G+f9XKU1Z3WRttN90DewFLbau6ONOw3pfwAlue9QyhTFgvZwhTFDwfPUUh
+ MWUL2/x1IHT79VXJDcmr21FvoVKyiGEEbFieUCs3VGXWpceO8e7ix5KfOP3Wn7A8Qcg2n5HiBip
+ I4zewVqZlo2Q1UUYhr7oI/5i6I4IYIN40x1KRDE7r1xxS3LHtALxm/hJD4oySEw0RsCWfVdl420
+ s8x4k6OOwC8F5RlJkboPpXsAEyzPba/9+MKQnBLl8aio6NOQTIKBSv3+OB5KdrpB3Md/hdYC51N
+ BWe+KKUAIP9qalan3ceYs9dA6WBINg==
+X-Proofpoint-GUID: 94MvI6_RQSdsbD-AUyT1iTYSfF6e8W64
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-10-29_05,2025-10-29_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 adultscore=0 suspectscore=0 bulkscore=0 spamscore=0
+ impostorscore=0 phishscore=0 priorityscore=1501 clxscore=1015
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2510280166
 
-On new platforms greater than QM_HW_V3, the migration region has been
-relocated from the VF to the PF. The VF's own configuration space is
-restored to the complete 64KB, and there is no need to divide the
-size of the BAR configuration space equally. The driver should be
-modified accordingly to adapt to the new hardware device.
+Setting KVM_CAP_S390_USER_OPEREXEC will forward all operation
+exceptions to user space. This also includes the 0x0000 instructions
+managed by KVM_CAP_S390_USER_INSTR0. It's helpful if user space wants
+to emulate instructions which do not (yet) have an opcode.
 
-On the older hardware platform QM_HW_V3, the live migration configuration
-region is placed in the latter 32K portion of the VF's BAR2 configuration
-space. On the new hardware platform QM_HW_V4, the live migration
-configuration region also exists in the same 32K area immediately following
-the VF's BAR2, just like on QM_HW_V3.
+While we're at it refine the documentation for
+KVM_CAP_S390_USER_INSTR0.
 
-However, access to this region is now controlled by hardware. Additionally,
-a copy of the live migration configuration region is present in the PF's
-BAR2 configuration space. On the new hardware platform QM_HW_V4, when an
-older version of the driver is loaded, it behaves like QM_HW_V3 and uses
-the configuration region in the VF, ensuring that the live migration
-function continues to work normally. When the new version of the driver is
-loaded, it directly uses the configuration region in the PF. Meanwhile,
-hardware configuration disables the live migration configuration region
-in the VF's BAR2: reads return all 0xF values, and writes are silently
-ignored.
-
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-Reviewed-by: Shameer Kolothum <shameerkolothum@gmail.com>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 130 +++++++++++++-----
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  23 +++-
- 2 files changed, 114 insertions(+), 39 deletions(-)
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index fde33f54e99e..498cb7d1c9e5 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -125,9 +125,25 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
- 	return 0;
- }
+This is based on the api documentation ordering fix that's in our next
+branch.
+
+---
+ Documentation/virt/kvm/api.rst                |  17 ++-
+ arch/s390/include/asm/kvm_host.h              |   1 +
+ arch/s390/kvm/intercept.c                     |   3 +
+ arch/s390/kvm/kvm-s390.c                      |   7 +
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/s390/user_operexec.c        | 140 ++++++++++++++++++
+ 7 files changed, 169 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/s390/user_operexec.c
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 72b2fae99a83..67837207dc9b 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -7820,7 +7820,7 @@ where 0xff represents CPUs 0-7 in cluster 0.
+ :Architectures: s390
+ :Parameters: none
  
-+static void qm_xqc_reg_offsets(struct hisi_qm *qm,
-+			       u32 *eqc_addr, u32 *aeqc_addr)
-+{
-+	struct hisi_acc_vf_core_device *hisi_acc_vdev =
-+		container_of(qm, struct hisi_acc_vf_core_device, vf_qm);
+-With this capability enabled, all illegal instructions 0x0000 (2 bytes) will
++With this capability enabled, the illegal instruction 0x0000 (2 bytes) will
+ be intercepted and forwarded to user space. User space can use this
+ mechanism e.g. to realize 2-byte software breakpoints. The kernel will
+ not inject an operating exception for these instructions, user space has
+@@ -8703,6 +8703,21 @@ This capability indicate to the userspace whether a PFNMAP memory region
+ can be safely mapped as cacheable. This relies on the presence of
+ force write back (FWB) feature support on the hardware.
+ 
++7.45 KVM_CAP_S390_USER_OPEREXEC
++----------------------------
 +
-+	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL) {
-+		*eqc_addr = QM_EQC_VF_DW0;
-+		*aeqc_addr = QM_AEQC_VF_DW0;
-+	} else {
-+		*eqc_addr = QM_EQC_PF_DW0;
-+		*aeqc_addr = QM_AEQC_PF_DW0;
-+	}
-+}
++:Architectures: s390
++:Parameters: none
 +
- static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- {
- 	struct device *dev = &qm->pdev->dev;
-+	u32 eqc_addr, aeqc_addr;
- 	int ret;
- 
- 	ret = qm_read_regs(qm, QM_VF_AEQ_INT_MASK, &vf_data->aeq_int_mask, 1);
-@@ -167,15 +183,16 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- 		return ret;
- 	}
- 
-+	qm_xqc_reg_offsets(qm, &eqc_addr, &aeqc_addr);
- 	/* QM_EQC_DW has 7 regs */
--	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
-+	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
- 	if (ret) {
- 		dev_err(dev, "failed to read QM_EQC_DW\n");
- 		return ret;
- 	}
- 
- 	/* QM_AEQC_DW has 7 regs */
--	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
-+	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
- 	if (ret) {
- 		dev_err(dev, "failed to read QM_AEQC_DW\n");
- 		return ret;
-@@ -187,6 +204,7 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- {
- 	struct device *dev = &qm->pdev->dev;
-+	u32 eqc_addr, aeqc_addr;
- 	int ret;
- 
- 	/* Check VF state */
-@@ -239,15 +257,16 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- 		return ret;
- 	}
- 
-+	qm_xqc_reg_offsets(qm, &eqc_addr, &aeqc_addr);
- 	/* QM_EQC_DW has 7 regs */
--	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
-+	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
- 	if (ret) {
- 		dev_err(dev, "failed to write QM_EQC_DW\n");
- 		return ret;
- 	}
- 
- 	/* QM_AEQC_DW has 7 regs */
--	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
-+	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
- 	if (ret) {
- 		dev_err(dev, "failed to write QM_AEQC_DW\n");
- 		return ret;
-@@ -1186,34 +1205,52 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
- 	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
- 	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-+	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
- 	struct pci_dev *vf_dev = vdev->pdev;
-+	u32 val;
- 
--	/*
--	 * ACC VF dev BAR2 region consists of both functional register space
--	 * and migration control register space. For migration to work, we
--	 * need access to both. Hence, we map the entire BAR2 region here.
--	 * But unnecessarily exposing the migration BAR region to the Guest
--	 * has the potential to prevent/corrupt the Guest migration. Hence,
--	 * we restrict access to the migration control space from
--	 * Guest(Please see mmap/ioctl/read/write override functions).
--	 *
--	 * Please note that it is OK to expose the entire VF BAR if migration
--	 * is not supported or required as this cannot affect the ACC PF
--	 * configurations.
--	 *
--	 * Also the HiSilicon ACC VF devices supported by this driver on
--	 * HiSilicon hardware platforms are integrated end point devices
--	 * and the platform lacks the capability to perform any PCIe P2P
--	 * between these devices.
--	 */
-+	val = readl(pf_qm->io_base + QM_MIG_REGION_SEL);
-+	if (pf_qm->ver > QM_HW_V3 && (val & QM_MIG_REGION_EN))
-+		hisi_acc_vdev->drv_mode = HW_ACC_MIG_PF_CTRL;
-+	else
-+		hisi_acc_vdev->drv_mode = HW_ACC_MIG_VF_CTRL;
- 
--	vf_qm->io_base =
--		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
--			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
--	if (!vf_qm->io_base)
--		return -EIO;
-+	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_PF_CTRL) {
-+		/*
-+		 * On hardware platforms greater than QM_HW_V3, the migration function
-+		 * register is placed in the BAR2 configuration region of the PF,
-+		 * and each VF device occupies 8KB of configuration space.
-+		 */
-+		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
-+				 hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
-+	} else {
-+		/*
-+		 * ACC VF dev BAR2 region consists of both functional register space
-+		 * and migration control register space. For migration to work, we
-+		 * need access to both. Hence, we map the entire BAR2 region here.
-+		 * But unnecessarily exposing the migration BAR region to the Guest
-+		 * has the potential to prevent/corrupt the Guest migration. Hence,
-+		 * we restrict access to the migration control space from
-+		 * Guest(Please see mmap/ioctl/read/write override functions).
-+		 *
-+		 * Please note that it is OK to expose the entire VF BAR if migration
-+		 * is not supported or required as this cannot affect the ACC PF
-+		 * configurations.
-+		 *
-+		 * Also the HiSilicon ACC VF devices supported by this driver on
-+		 * HiSilicon hardware platforms are integrated end point devices
-+		 * and the platform lacks the capability to perform any PCIe P2P
-+		 * between these devices.
-+		 */
- 
-+		vf_qm->io_base =
-+			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
-+				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
-+		if (!vf_qm->io_base)
-+			return -EIO;
-+	}
- 	vf_qm->fun_type = QM_HW_VF;
-+	vf_qm->ver = pf_qm->ver;
- 	vf_qm->pdev = vf_dev;
- 	mutex_init(&vf_qm->mailbox_lock);
- 
-@@ -1250,6 +1287,28 @@ static struct hisi_qm *hisi_acc_get_pf_qm(struct pci_dev *pdev)
- 	return !IS_ERR(pf_qm) ? pf_qm : NULL;
- }
- 
-+static size_t hisi_acc_get_resource_len(struct vfio_pci_core_device *vdev,
-+					unsigned int index)
-+{
-+	struct hisi_acc_vf_core_device *hisi_acc_vdev =
-+			hisi_acc_drvdata(vdev->pdev);
++When this capability is enabled KVM forwards all operation exceptions
++that it doesn't handle itself to user space. This also includes the
++0x0000 instructions managed by KVM_CAP_S390_USER_INSTR0. This is
++helpful if user space wants to emulate instructions which do not (yet)
++have an opcode.
 +
-+	/*
-+	 * On the old HW_ACC_MIG_VF_CTRL mode device, the ACC VF device
-+	 * BAR2 region encompasses both functional register space
-+	 * and migration control register space.
-+	 * only the functional region should be report to Guest.
-+	 */
-+	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL)
-+		return (pci_resource_len(vdev->pdev, index) >> 1);
-+	/*
-+	 * On the new HW device, the migration control register
-+	 * has been moved to the PF device BAR2 region.
-+	 * The VF device BAR2 is entirely functional register space.
-+	 */
-+	return pci_resource_len(vdev->pdev, index);
-+}
++This capability can be enabled dynamically even if VCPUs were already
++created and are running.
 +
- static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
- 					size_t count, loff_t *ppos,
- 					size_t *new_count)
-@@ -1260,8 +1319,9 @@ static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
+ 8. Other capabilities.
+ ======================
  
- 	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
- 		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
--		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
-+		resource_size_t end;
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 22cedcaea475..1e4829c70216 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -648,6 +648,7 @@ struct kvm_arch {
+ 	int user_sigp;
+ 	int user_stsi;
+ 	int user_instr0;
++	int user_operexec;
+ 	struct s390_io_adapter *adapters[MAX_S390_IO_ADAPTERS];
+ 	wait_queue_head_t ipte_wq;
+ 	int ipte_lock_count;
+diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+index c7908950c1f4..420ae62977e2 100644
+--- a/arch/s390/kvm/intercept.c
++++ b/arch/s390/kvm/intercept.c
+@@ -471,6 +471,9 @@ static int handle_operexc(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.sie_block->ipa == 0xb256)
+ 		return handle_sthyi(vcpu);
  
-+		end = hisi_acc_get_resource_len(vdev, index);
- 		/* Check if access is for migration control region */
- 		if (pos >= end)
- 			return -EINVAL;
-@@ -1282,8 +1342,9 @@ static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
- 	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
- 	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
- 		u64 req_len, pgoff, req_start;
--		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
-+		resource_size_t end;
- 
-+		end = hisi_acc_get_resource_len(vdev, index);
- 		req_len = vma->vm_end - vma->vm_start;
- 		pgoff = vma->vm_pgoff &
- 			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
-@@ -1330,7 +1391,6 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
- 	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
- 		struct vfio_pci_core_device *vdev =
- 			container_of(core_vdev, struct vfio_pci_core_device, vdev);
--		struct pci_dev *pdev = vdev->pdev;
- 		struct vfio_region_info info;
- 		unsigned long minsz;
- 
-@@ -1345,12 +1405,7 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
- 		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
- 			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
- 
--			/*
--			 * ACC VF dev BAR2 region consists of both functional
--			 * register space and migration control register space.
--			 * Report only the functional region to Guest.
--			 */
--			info.size = pci_resource_len(pdev, info.index) / 2;
-+			info.size = hisi_acc_get_resource_len(vdev, info.index);
- 
- 			info.flags = VFIO_REGION_INFO_FLAG_READ |
- 					VFIO_REGION_INFO_FLAG_WRITE |
-@@ -1521,7 +1576,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
- 	hisi_acc_vf_disable_fds(hisi_acc_vdev);
- 	mutex_lock(&hisi_acc_vdev->open_mutex);
- 	hisi_acc_vdev->dev_opened = false;
--	iounmap(vf_qm->io_base);
-+	if (hisi_acc_vdev->drv_mode == HW_ACC_MIG_VF_CTRL)
-+		iounmap(vf_qm->io_base);
- 	mutex_unlock(&hisi_acc_vdev->open_mutex);
- 	vfio_pci_core_close_device(core_vdev);
- }
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-index 91002ceeebc1..419a378c3d1d 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-@@ -50,8 +50,10 @@
- #define QM_QUE_ISO_CFG_V	0x0030
- #define QM_PAGE_SIZE		0x0034
- 
--#define QM_EQC_DW0		0X8000
--#define QM_AEQC_DW0		0X8020
-+#define QM_EQC_VF_DW0		0X8000
-+#define QM_AEQC_VF_DW0		0X8020
-+#define QM_EQC_PF_DW0		0x1c00
-+#define QM_AEQC_PF_DW0		0x1c20
- 
- #define ACC_DRV_MAJOR_VER 1
- #define ACC_DRV_MINOR_VER 0
-@@ -59,6 +61,22 @@
- #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
- #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
- 
-+#define QM_MIG_REGION_OFFSET		0x180000
-+#define QM_MIG_REGION_SIZE		0x2000
++	if (vcpu->kvm->arch.user_operexec)
++		return -EOPNOTSUPP;
 +
-+/**
-+ * On HW_ACC_MIG_VF_CTRL mode, the configuration domain supporting live
-+ * migration functionality is located in the latter 32KB of the VF's BAR2.
-+ * The Guest is only provided with the first 32KB of the VF's BAR2.
-+ * On HW_ACC_MIG_PF_CTRL mode, the configuration domain supporting live
-+ * migration functionality is located in the PF's BAR2, and the entire 64KB
-+ * of the VF's BAR2 is allocated to the Guest.
+ 	if (vcpu->arch.sie_block->ipa == 0 && vcpu->kvm->arch.user_instr0)
+ 		return -EOPNOTSUPP;
+ 	rc = read_guest_lc(vcpu, __LC_PGM_NEW_PSW, &newpsw, sizeof(psw_t));
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 70ebc54b1bb1..56d4730b7c41 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -606,6 +606,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_S390_DIAG318:
+ 	case KVM_CAP_IRQFD_RESAMPLE:
++	case KVM_CAP_S390_USER_OPEREXEC:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+@@ -921,6 +922,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+ 		VM_EVENT(kvm, 3, "ENABLE: CAP_S390_CPU_TOPOLOGY %s",
+ 			 r ? "(not available)" : "(success)");
+ 		break;
++	case KVM_CAP_S390_USER_OPEREXEC:
++		VM_EVENT(kvm, 3, "%s", "ENABLE: CAP_S390_USER_OPEREXEC");
++		kvm->arch.user_operexec = 1;
++		icpt_operexc_on_all_vcpus(kvm);
++		r = 0;
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 52f6000ab020..8ab07396ce3b 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -963,6 +963,7 @@ struct kvm_enable_cap {
+ #define KVM_CAP_RISCV_MP_STATE_RESET 242
+ #define KVM_CAP_ARM_CACHEABLE_PFNMAP_SUPPORTED 243
+ #define KVM_CAP_GUEST_MEMFD_FLAGS 244
++#define KVM_CAP_S390_USER_OPEREXEC 245
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 148d427ff24b..87e429206bb8 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -194,6 +194,7 @@ TEST_GEN_PROGS_s390 += s390/debug_test
+ TEST_GEN_PROGS_s390 += s390/cpumodel_subfuncs_test
+ TEST_GEN_PROGS_s390 += s390/shared_zeropage_test
+ TEST_GEN_PROGS_s390 += s390/ucontrol_test
++TEST_GEN_PROGS_s390 += s390/user_operexec
+ TEST_GEN_PROGS_s390 += rseq_test
+ 
+ TEST_GEN_PROGS_riscv = $(TEST_GEN_PROGS_COMMON)
+diff --git a/tools/testing/selftests/kvm/s390/user_operexec.c b/tools/testing/selftests/kvm/s390/user_operexec.c
+new file mode 100644
+index 000000000000..714906c1d12a
+--- /dev/null
++++ b/tools/testing/selftests/kvm/s390/user_operexec.c
+@@ -0,0 +1,140 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Test operation exception forwarding.
++ *
++ * Copyright IBM Corp. 2025
++ *
++ * Authors:
++ *  Janosch Frank <frankja@linux.ibm.com>
 + */
-+enum hw_drv_mode {
-+	HW_ACC_MIG_VF_CTRL = 0,
-+	HW_ACC_MIG_PF_CTRL,
++#include "kselftest.h"
++#include "kvm_util.h"
++#include "test_util.h"
++#include "sie.h"
++
++#include <linux/kvm.h>
++
++static void guest_code_instr0(void)
++{
++	asm(".word 0x0000");
++}
++
++static void test_user_instr0(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	int rc;
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code_instr0);
++	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_INSTR0, 0);
++	TEST_ASSERT_EQ(0, rc);
++
++	vcpu_run(vcpu);
++	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
++	TEST_ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_OPEREXC);
++	TEST_ASSERT_EQ(vcpu->run->s390_sieic.ipa, 0);
++
++	kvm_vm_free(vm);
++}
++
++static void guest_code_user_operexec(void)
++{
++	asm(".word 0x0807");
++}
++
++static void test_user_operexec(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	int rc;
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code_user_operexec);
++	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_OPEREXEC, 0);
++	TEST_ASSERT_EQ(0, rc);
++
++	vcpu_run(vcpu);
++	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
++	TEST_ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_OPEREXC);
++	TEST_ASSERT_EQ(vcpu->run->s390_sieic.ipa, 0x0807);
++
++	kvm_vm_free(vm);
++
++	/*
++	 * Since user_operexec is the superset it can be used for the
++	 * 0 instruction.
++	 */
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code_instr0);
++	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_OPEREXEC, 0);
++	TEST_ASSERT_EQ(0, rc);
++
++	vcpu_run(vcpu);
++	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
++	TEST_ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_OPEREXC);
++	TEST_ASSERT_EQ(vcpu->run->s390_sieic.ipa, 0);
++
++	kvm_vm_free(vm);
++}
++
++/* combine user_instr0 and user_operexec */
++static void test_user_operexec_combined(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	int rc;
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code_user_operexec);
++	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_INSTR0, 0);
++	TEST_ASSERT_EQ(0, rc);
++	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_OPEREXEC, 0);
++	TEST_ASSERT_EQ(0, rc);
++
++	vcpu_run(vcpu);
++	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
++	TEST_ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_OPEREXC);
++	TEST_ASSERT_EQ(vcpu->run->s390_sieic.ipa, 0x0807);
++
++	kvm_vm_free(vm);
++
++	/* Reverse enablement order */
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code_user_operexec);
++	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_OPEREXEC, 0);
++	TEST_ASSERT_EQ(0, rc);
++	rc = __vm_enable_cap(vm, KVM_CAP_S390_USER_INSTR0, 0);
++	TEST_ASSERT_EQ(0, rc);
++
++	vcpu_run(vcpu);
++	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
++	TEST_ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_OPEREXC);
++	TEST_ASSERT_EQ(vcpu->run->s390_sieic.ipa, 0x0807);
++
++	kvm_vm_free(vm);
++}
++
++/*
++ * Run all tests above.
++ *
++ * Enablement after VCPU has been added is automatically tested since
++ * we enable the capability after VCPU creation.
++ */
++static struct testdef {
++	const char *name;
++	void (*test)(void);
++} testlist[] = {
++	{ "instr0", test_user_instr0 },
++	{ "operexec", test_user_operexec },
++	{ "operexec_combined", test_user_operexec_combined},
 +};
 +
- struct acc_vf_data {
- #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
- 	/* QM match information */
-@@ -125,6 +143,7 @@ struct hisi_acc_vf_core_device {
- 	struct pci_dev *vf_dev;
- 	struct hisi_qm *pf_qm;
- 	struct hisi_qm vf_qm;
-+	int drv_mode;
- 	/*
- 	 * vf_qm_state represents the QM_VF_STATE register value.
- 	 * It is set by Guest driver for the ACC VF dev indicating
++int main(int argc, char *argv[])
++{
++	int idx;
++
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_S390_USER_INSTR0));
++
++	ksft_print_header();
++	ksft_set_plan(ARRAY_SIZE(testlist));
++	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
++		testlist[idx].test();
++		ksft_test_result_pass("%s\n", testlist[idx].name);
++	}
++	ksft_finished();
++}
 -- 
-2.33.0
+2.48.1
 
 
