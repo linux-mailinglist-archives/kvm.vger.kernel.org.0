@@ -1,325 +1,340 @@
-Return-Path: <kvm+bounces-61368-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61369-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73BA7C17632
-	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 00:41:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9066AC1782E
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 01:20:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A5DE403E05
-	for <lists+kvm@lfdr.de>; Tue, 28 Oct 2025 23:41:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6B94950449C
+	for <lists+kvm@lfdr.de>; Wed, 29 Oct 2025 00:19:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2F5036B981;
-	Tue, 28 Oct 2025 23:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7E124DCEB;
+	Wed, 29 Oct 2025 00:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YxY3naHG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y7GXAFqX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4C634DCF4;
-	Tue, 28 Oct 2025 23:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761694858; cv=fail; b=n7Y0uexGdsfAzBCkd5vp7CC+nCr7MQz4KLismVrpytdJCtCmyEnc+wJxrvKhabxkhMQDm0qogtF8UwLD/rHZj5BVrwnWHtkRbuJ1qp+Dh3ttibdZgUX66vTeiCD+guwFkD1MeL1g5KkcTuETTMPe/dak4ai2qpkE69QSUMNxN44=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761694858; c=relaxed/simple;
-	bh=ufog7xXYMd2Poe31oBJuDctJbGlHzCXVpt2E07QH29c=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Ml+xO6HDAXwaurAxcLZDeeLYyaa76uZIb4k0PlUAE4yIWGqXunLb5oEDkcFowkfFcp2to1DgWd19BZ5bFIALKqQk1njgKg9427o4jAlY8JqOGr047A+HKYT6/FccNQI5e5dBtUh5qmmadZhVAxHbrTPeTNN+gud0WkTO8JoMp6w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YxY3naHG; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761694856; x=1793230856;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=ufog7xXYMd2Poe31oBJuDctJbGlHzCXVpt2E07QH29c=;
-  b=YxY3naHGxRcV/jpwqw2LLQOFf5i4TvkhJMUNg75F46qqyxdGN7mHThC/
-   ZYTrgcJD0G9lnAWALEGTJGExOewEZe3cyo6Dls9RkIqqVB7Lb9jGaJS4F
-   0bM+LSdsyDfADdmn8FG9kZBmBBTrs9iL20bIw/WM+OzdYkYnY4MDqb+8z
-   /msljVHGaUHKakkyK8QE5ez61zOQ4tzlJcNpZsFBUm9goT7qkLprs43cJ
-   oBhVTeqLfNOwInmVJf+N0GLBiKQUfuDfeLmxLq1cgds7GlpcbYM+rk8/B
-   RA9zfKym4Of/avzflFuN5yS/7gjNpxH1thEpOr3sQ8KmRzKItz9zg8Gti
-   A==;
-X-CSE-ConnectionGUID: m8f4KopRQ7OiCup4Wov4cQ==
-X-CSE-MsgGUID: 3HWExc7fSiKEt0ua6kwJLg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63715857"
-X-IronPort-AV: E=Sophos;i="6.19,262,1754982000"; 
-   d="scan'208";a="63715857"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 16:40:55 -0700
-X-CSE-ConnectionGUID: 5W1pgdGXSZym0kZXaGuAIQ==
-X-CSE-MsgGUID: CB6NK0T0T5ez3G2ooNUwBQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,262,1754982000"; 
-   d="scan'208";a="189845392"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 16:40:55 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 28 Oct 2025 16:40:54 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Tue, 28 Oct 2025 16:40:54 -0700
-Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.60) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 28 Oct 2025 16:40:54 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EMWjexCaT3CexjGaq93/cpX1eYmzeSadwHYxel4PxwqMokhS6D5CKY0kY8r/Ufp+qkVHa8L0YDZRs3T1+eIeJeUy6ozdUNPp7omNef7kKHuICRD1q8amzW5YYQBGE8TBC4XWZBM4stcTg37Q3+pfHQXzoZuGgsx01iGwb0w+H7xz7nE5M8W1xeiNPkZkTKFN66wwP54XXkBSSv3my7voxfFuVQi2rMDfj5cVItmbVGIiE/uribr145zUK2+P40ttH6GZsxEhryabYI+BTfm0Syl9k86ib63tgK32k5dsA5TRtvHkvdYKAIYmOomqfbtksIRZI37a4VEp9h6sh5X+gQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k7uhXJkMjh7YudgbaxmbRyIHq/0XY8AopE0zBLeNEvo=;
- b=Nhf6Wtea/YqrfqKs0WUDKqyHmJ8TtZnlZ84v+0uVJPkHv4ME8OeMAGLN72aOeXfI7cWlTifFqYm7mVd7d0KZryC5kMM8paxijr+Jz2FxLBVqe2Wu6RqF4Qog8ByfCmso3xXc4ncuui581FD520iEXjZwgSqMqqGG3/M4khO6aKFC8+lCHo90wzoXCIfTlyQQMhpGVolzFEITQscTqRHjH/Cs7YN/+oT5VQvk6BGAd1F8CfTi2rBvZv/TiaKxLsIS8UI9wvuNQzkGeKzejb4UAWE5MHup8R9NMTIjE6sxPH2Go39HSkij/FL1TxjOHEN1HTBhQtb5ZzJHT3+wevHtEA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB5373.namprd11.prod.outlook.com (2603:10b6:5:394::7) by
- LV3PR11MB8726.namprd11.prod.outlook.com (2603:10b6:408:21a::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Tue, 28 Oct
- 2025 23:40:53 +0000
-Received: from DM4PR11MB5373.namprd11.prod.outlook.com
- ([fe80::927a:9c08:26f7:5b39]) by DM4PR11MB5373.namprd11.prod.outlook.com
- ([fe80::927a:9c08:26f7:5b39%5]) with mapi id 15.20.9275.011; Tue, 28 Oct 2025
- 23:40:53 +0000
-Date: Wed, 29 Oct 2025 00:40:49 +0100
-From: =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>
-To: Michal Wajdeczko <michal.wajdeczko@intel.com>
-CC: Alex Williamson <alex.williamson@redhat.com>, Lucas De Marchi
-	<lucas.demarchi@intel.com>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
-	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
-	<kevin.tian@intel.com>, <intel-xe@lists.freedesktop.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
-	<matthew.brost@intel.com>, <dri-devel@lists.freedesktop.org>, Jani Nikula
-	<jani.nikula@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
- Laguna" <lukasz.laguna@intel.com>
-Subject: Re: [PATCH v2 20/26] drm/xe/pf: Add helper to retrieve VF's LMEM
- object
-Message-ID: <qq4byit4dn7dd4skalc3oatkn6dwcjo27uah46nn5eo64byho4@s4wwacdsgfc7>
-References: <20251021224133.577765-1-michal.winiarski@intel.com>
- <20251021224133.577765-21-michal.winiarski@intel.com>
- <db1669c3-a1d8-47cd-a321-b6cecffd8c6f@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <db1669c3-a1d8-47cd-a321-b6cecffd8c6f@intel.com>
-X-ClientProxiedBy: BE1P281CA0193.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:8d::13) To DM4PR11MB5373.namprd11.prod.outlook.com
- (2603:10b6:5:394::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75914231A41
+	for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 00:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761697102; cv=none; b=gy7MePvm7NZyGZxizpv/4vOK6Rpaopr49pn+hxK/mZ17AJayEZRauwMa2xsBkTai6ZuOKH/5LvuO8swtCBRUDwATBYI6enaJmxxgRfRbVrVSkNzFx0tn8h4YJBQAtyz7NhVunQcG2tksWpAJ0/VAZmp1jpvL3Tbq3QZ0Cgi21jU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761697102; c=relaxed/simple;
+	bh=22/nznoWxrr1M4DyGKwTP7a2kVlwm2rr2jC9dcrWhcs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=tZjaVl2vH8mwsI2jpQuktgUu8tIJ0k0m5wpxT3OeKNQjUzaq1gpeV4NQi+q94MCQIbDfMAwLParrygy+ktrVygQrQKKbFvNMZbd7wI4kuHdaWQcp2BqN1sPHRlRWaJjpbYNQqZN6wofYoIjYdgQLwduP8GcZh4GNXXts1BOc+UA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y7GXAFqX; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2904e9e0ef9so122248715ad.3
+        for <kvm@vger.kernel.org>; Tue, 28 Oct 2025 17:18:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761697100; x=1762301900; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qy2qXVOYw07i2SUD7z+JY9/nqRL+5ts2SDInMchoxOI=;
+        b=y7GXAFqX/a5dWzggLnNzwI0KQvubltHafzQaz5kvFmIxi9Z9SUMAQXDLFoY/hOnt3p
+         NLCYdabuFX62l5G57hVWkg0dkXDHDHou7vF7q9w9FVWr0SVPa090TCZ+e01tRGV8PcLr
+         78WTqPc0vt3f1Y4tjM3Z6E1Wj9MRssjmOhdVQoVxfl43v44ZndHLGIH2CIb9aeVCE5pX
+         EGCvU1UvZ375DFnV/2dk85jxQqh9Rwu4HFb/2XQ7GZBJQyt8q4/rfuhC+BDtcTfWYMZl
+         5xxMvzReNvKSQGDkad9AbC8ZHhsQywSXU5BjqIAbQtZ/7lBMEGVQl2QZQO6HnJF39usd
+         NoRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761697100; x=1762301900;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qy2qXVOYw07i2SUD7z+JY9/nqRL+5ts2SDInMchoxOI=;
+        b=WzVssqPvkAPZrcHiguWSkaWmZJ/FmmIDDxOS82P1m+H4V+fBGq1AowB4s6Gk81fQ1o
+         iFRy3He1N0QxFi503Xx/ZrMzUEXgUdzPFJ5AKPXkhhtN5UEIe4IdfqJ/yqi+fTiPW3Qk
+         G+D0kdznAPvgyJEfa/z8pbpl2H3JXh0C13b81O6YBycWGGq73bDRSWXBfd51VJK0E7XA
+         I7ISB0k6y0+B7QLxls3JnCW71wq0x2/plpLCxWigdQ5CMyOc74hsBgF9k2+nDcm2/7P4
+         ijSX8y2PAVe1t/dhieSo8AL0820UZHwAdCnhXrb2etURmapSRKAvtkm2tSEHkiZ8s9LD
+         fZ/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWeU6b8ic4t7kPAR+GZ/NHN0hyVavGxSvy+NjgAfd16g/pAlZK7Fw6r46O6iE3NsJOwYbE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdzzC511V2F3q0LNlWI6iq+9O+mUtK7JJezyKeDM3nIC+RR5Hh
+	1BErRySXWy7y7dwnsZEWXiVcgIEskI5HftbyZUll0tO1nsTclVWL7eABrxr98ygMhSkowYU8p2k
+	dA4tNEg==
+X-Google-Smtp-Source: AGHT+IEmIeoh8oylkl0P3Y0Ro5ZGOZkHHEfj3tw0WwaV3db7iM3hKqb44CM5SLy2kyTf7DJrc+4+zvtYX70=
+X-Received: from plld6.prod.google.com ([2002:a17:902:7286:b0:26a:23c7:68d3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2301:b0:272:a900:c42b
+ with SMTP id d9443c01a7336-294dee996f7mr13719855ad.31.1761697099721; Tue, 28
+ Oct 2025 17:18:19 -0700 (PDT)
+Date: Tue, 28 Oct 2025 17:18:18 -0700
+In-Reply-To: <aQBmME40vhf-lh7R@telecaster>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB5373:EE_|LV3PR11MB8726:EE_
-X-MS-Office365-Filtering-Correlation-Id: f39c71b5-04a0-4423-1ce7-08de167b6e9e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?QWF3LzBoZlFhUGNyaDhVRXRxUjhuaU5qMDBualdNVVF3SmU1RlU0NDdLZDNU?=
- =?utf-8?B?K0Jjd294TmZpR3QvNndXVGVsa0hpemJOa2twRmQ1UjhnbkUxMWw5T2ZiS0pr?=
- =?utf-8?B?a0xQRy9ZamxDc2lFK1JCR1JHVFkvamdrRWcxaVN6Y0MvMHlrcW9uSHh1ZGJH?=
- =?utf-8?B?dXFZM0VqR1BBcm1PM1pSTGNwa0cvZHczWjFQbnFTelZjZzFSTlJYTWlnYU1D?=
- =?utf-8?B?Q0tVL1R4WWhEMGp1WDBCd2ZZWG1MaDdjS2VWMjF5UUh4VTZxZnFVRWIzbTRo?=
- =?utf-8?B?Wm01cGNQalc2WGpLR2hmd2lUOGdUYVMwWGVwV1djNCtDRWZFOWZWSFdwV2dS?=
- =?utf-8?B?dFpNcGczNGxZTUEvazVQQStqRzlHUysrdFl0N2ZPRmIxay81d3VGYkF0VkdR?=
- =?utf-8?B?MVRJQ0hUM0tHeWdpN0pPdTFwenJnVWxJUTJlNWFTK2lCb3BXVEN5WkEwY1Nt?=
- =?utf-8?B?V2x5UGtVQk1FSnI1NGdNZzZMWjlWMGN3VkdLUmpuWWdYaHVWaCt1TjkremE2?=
- =?utf-8?B?YkRxVmMwU3FPSktxNHpWK00vRlg3L0c0NVAxdVRSdDZQdDZ3bzk3UzYzNXpF?=
- =?utf-8?B?UlNZMFJTNjUycGhCNmw0TVpJbjN3UnducHdCSSs0RHNNcWtjTHN5NjFhNS94?=
- =?utf-8?B?YnlnZnpPamhENTdiZS9LNklFTWw1L1FWUUg5TVh0WktISEJsK0VrYi9hMlk4?=
- =?utf-8?B?NjdRTVdIYkx0OUowcUNKUVhqcjB0OUJINldPZ2ROVFBGMVNmOEhxN2hycktw?=
- =?utf-8?B?NHlVazNuUWQ1Z0VaYVZ3a1JRK2NWNHcyQzJYbTdBUUJzbW84SEl3TXhMMzVE?=
- =?utf-8?B?OTRVbldWa3N6Z1lFamQya1VGcjBwQUJ1ekU1ckRJNVV0dEd0dWxpZEk0Mjlo?=
- =?utf-8?B?NUgxYTVPVUJERHhjMkZuTlFGdVFkMDVzamZQekVkazUwTW5TYlJNOWdZMUkr?=
- =?utf-8?B?anBpeDd2U282M2pVaE16cm9TeFZ1TlFWb2RnOWtvVWRrMlIrMDdLRmxYRGVY?=
- =?utf-8?B?QVIrTXNmcHJRWVBsVHVmcnhaSEJKSitjejllZ01ZUWtvcnpXRFAyWjZDUXVE?=
- =?utf-8?B?MUw2WldRT291b1FTQ2lOVkFQK3VDb0dBNUFFMnZYUFNpVVNpc2dGQ2lhQ3Iw?=
- =?utf-8?B?TW5MeDNFMWp4a2Zxc1g3UkdyazJObnBMa2UxUzI5T3VGRlExNzN0RUZGOHR4?=
- =?utf-8?B?U0NteHgyUS9QZEV4eUJJd09RdTZTZmVBdzV2S2c4S2Yya3o2QzkwNVRvamVB?=
- =?utf-8?B?b0FLSlIyeFB4azluSGtGUUxYdUNrTFFreWtvN3pxMHNkZU9lS21qeC9mTE1F?=
- =?utf-8?B?cnhSSzlkMFZsZ2ZSeXg0SzBNeEpnb0hoeC9CZlpuTmhOOS95dWFiZDlnVjRG?=
- =?utf-8?B?ZnJjQjdwTStsbUdTdWE4c3NWeXlUSzA4RjRUWm40UEd4QmZKaXRubGxiSmJI?=
- =?utf-8?B?bDlReVNsdkFsdUtwT1BZMVhSSThScmVFZEZzdGkrN3NaNktVU25ETWlRbmJE?=
- =?utf-8?B?aWRDT1YzWTJuRkJ6aFEyTDhUZFBEWG5JcXNkUU40WVNkcFVyRGpnNEF3Zmpn?=
- =?utf-8?B?aEhzT2dwQWRDRVpNSU5UT0FmcENqUXh3L0xzZFhsR284dWM3VVNCOUpxZTR2?=
- =?utf-8?B?aFBCdFpqQlpQQkxmLysyb1dFblphRnpaa3Q4VGZJbzMwc1ZDWThtdkNZV1JR?=
- =?utf-8?B?WEYwU0c2MnVnNVpDWTZTK084M3h0a0lnMkQ1QWVEYlV1NWF2aHpmS0hNY1Fz?=
- =?utf-8?B?d0xnVHl5aGJ6TnhmdjJOa1FmU3NzODdTWWhTbnB4emJiWWk5OWFXOUlEOU8r?=
- =?utf-8?B?WEFjNC9VcGc2OEsvalMwSUwvWFJXSkxxdTJvL3YxUkxhaldUemVHdWZzZlhX?=
- =?utf-8?B?NUs5bTVCcmFUOG9FWjhUcFBwUk1ZNUxiQzluSnhEMTNwR3hTNmMrWlFUWDRl?=
- =?utf-8?Q?AY29kB45sxXuMN8a/Q0eEWc4pQ1yhCrY?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UHdaWUNoQktxMDRRQTBaT1N1NGt5UXdGQkVMaTR0VElFMThMSXpHR1RFZE9N?=
- =?utf-8?B?alBrQzJsQWNpREdBazBMRi95QlRjVnY2Y050U28rWUxocmJZTGpvbW5TWjV3?=
- =?utf-8?B?NzdsS24xeEwyTnVtOXZUMC9KM25FR0RUeDYzTVRBTGgvYVZxUlowb1ZTd0cv?=
- =?utf-8?B?YURvUUVlM2g4WENkMjQ5cWpJelgzMlZNbzFwa2FBY2IrbTBXdFBGaW5tWk42?=
- =?utf-8?B?Q3ZKdmJ1TXJhUFhISUFxYTNJd1MyeG5MMXFWaWlBMGdiT05pUGxjR09wU1Ax?=
- =?utf-8?B?REdPaklYRlFWbUxsS1JVTVI5eXl6TStsa1ZmVkI5Z0oxeEp5emVEVklsMktx?=
- =?utf-8?B?aWc0cUtZa0dxT3hBVzR2aTltaDZCTGJGUGM4K0s1MWJTcytOSmxmbG5NNEUw?=
- =?utf-8?B?cFRsNSs0dDNJVkdnVGUycUd2b3E5NDF6V3B5YXhMbS81N3JyNmJMbWVOZGNG?=
- =?utf-8?B?blY0TWlNNVNFc2NFaGl2em5wcStUbWRHemFUMEJzWjdRc3RKL3lSRVlLb3NC?=
- =?utf-8?B?cCtteFlnZm1TSzc1Um4vcERzQnQ2Y2ZTNnljMXJuY3lBME96Z0JLQnZoS2hi?=
- =?utf-8?B?U3lUQ1E2V3Q2b0FuNVVOQ2d6eEJYM2hqY2pJdStlMDh1akk1RzFlZ1dYRnhm?=
- =?utf-8?B?NUdKbG1NZmtPaTFtNzBYd2toWlhmOHVydE9aMjdSci9zTjVvUkNPUlFDb0dX?=
- =?utf-8?B?WlFIOHFOY25uSXhZaHIxYytCTGJCbWZqaVh3bGMzdFdLalRHc1RKa2xLZGlF?=
- =?utf-8?B?SVJxWnhUdGtIUHdrTy80VE1BN21CWDdCVFFOb2NWeDZ3a0piUlFaRnJwL2R1?=
- =?utf-8?B?Y3YrdytGK3E5UlA4ZzM0Yy9xblE1YVZDaE5jZEpNZFVoUWw5bUlqZFVCS1Fn?=
- =?utf-8?B?c0dnNEFoU1REeU9OR3g4OTRONWlITlAxZFZRMGJDeUZaUVAwZUV4Zy8weWtJ?=
- =?utf-8?B?MVlHNll4ckdpMWZwOFVSemdaOGZ6UmFrUkV4NUtmVmY4STdWcUtZb3lDNmxY?=
- =?utf-8?B?VUlCT1pLU0hWYit3bWtHVitYdUJGRDEwY3pWdG1jQVNpWFgwT1ZHMlZOdWV5?=
- =?utf-8?B?bmhqMWJDeW1URGJwdm9tbC9HV2VhTFo4VzMrbmVDTFNqWW94c21KK01hNjVL?=
- =?utf-8?B?ZGFES3E4Q1FaUzZCSTV6eWJ1QS94ZjlKSGg2eTVlMTg4L2N3cHNpQ2JlWkRN?=
- =?utf-8?B?T2VpVmlialJSdHE4VW5zQ2tGakpWZEFqQWxPOTlTYnZpRHZ5S0NVR2swQkc5?=
- =?utf-8?B?RDREaGwzRjlxRDNQa0cxQ1R0MXZsUWpMV0FQTGhmdHo0c1BkYU5IQ3grOXB1?=
- =?utf-8?B?YWg2ejZJTUQ3Z2F0dDh2ZUJHQk10WTgwbytkOGtwRzBzdnByUW92ckVLVTZh?=
- =?utf-8?B?dFYwM1Rud004aVpPZHFzUVhFQlNaaitpcnVMcjdnS1l3OEpjQWhPbWxHMUhI?=
- =?utf-8?B?ZHZIVEpjTSt4WlBldkMraVVkSnhCOTRQRk8ybEJmdmlLbE5iYzZsbERDTlVh?=
- =?utf-8?B?RThhWjNJaEcyOTU3ZXFWaWl5bWJxVm9iektBbVhOL05sdjJtdnl4TzZiaG9M?=
- =?utf-8?B?R1VGdlNkTVJNRHVkUUlJQWROTy9NSGxFdFFidWtYd1NYSTJJTkRXdDFDQXo0?=
- =?utf-8?B?ZjlLK0ZXWUZ1bjhaYU0zeXY5NG45dFk1WExTSFpOQkZyMW43eENIdE5INHha?=
- =?utf-8?B?czRacHdtN3ZVS29CaCtDOTJ4dmtGU0Jibm5naERVZlZySW5oL05vYm9GekFo?=
- =?utf-8?B?bDhBcGNieTFwR1d2amx0NERsMGluQy9TUk1NQkpzY0F1cDNZams0Yzh3NGVk?=
- =?utf-8?B?cnpIMFFDMTErR20wSFd2NWt0YkZ1RUg5WFlxN0hJT2QrY3ZaRkdRQXVybzUy?=
- =?utf-8?B?RnNzaXBMZHVmT1ROY09mUHlrKzRxVDNXRzRUM3FoUHZEQ1JYbnlvclpobWpQ?=
- =?utf-8?B?QVNORDdvYTZ3OXZhcG5vSUZ5MTRmVU4vK2htaXk5b200dGxqbUorbFU1MElW?=
- =?utf-8?B?WkZRYTZoeVJDV0g1MEMxT1N6dERtbkR4eDhmK0h1Y01rdS8yVEw0QzdNWTZY?=
- =?utf-8?B?RTZLSytreGlmUHBSdHpSTSt1d3lEQ3FmOUVIZzBsNFFjdE8zRVl0dDlpNEF1?=
- =?utf-8?B?aVlzY2xvaWVNVDJmSEZGaFFWaDU0MGxXSmdPekpaZGRKTmJMc25zZi8rSlFO?=
- =?utf-8?B?ZGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f39c71b5-04a0-4423-1ce7-08de167b6e9e
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5373.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2025 23:40:52.9593
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SHFRkws+Y+iUHoagGm8yIevZnNlWtJBguWcvu9yK3L5E364vRpllVnIgj3WJ8XBm/ncX5MvI8tW4mgtUNENKG/qiYBs5bLLJEdXqhTo29go=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8726
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+References: <71043b76fc073af0fb27493a8e8d7f38c3c782c0.1761606191.git.osandov@fb.com>
+ <aQANT9rvO9FMmmkG@google.com> <aQBmME40vhf-lh7R@telecaster>
+Message-ID: <aQFdSkjj1vYmL53a@google.com>
+Subject: Re: [PATCH] KVM: SVM: Don't skip unrelated instruction if INT3 is replaced
+From: Sean Christopherson <seanjc@google.com>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	Gregory Price <gourry@gourry.net>, kernel-team@fb.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Oct 23, 2025 at 10:25:08PM +0200, Michal Wajdeczko wrote:
-> 
-> 
-> On 10/22/2025 12:41 AM, Michał Winiarski wrote:
-> > From: Lukasz Laguna <lukasz.laguna@intel.com>
-> > 
-> > Instead of accessing VF's lmem_obj directly, introduce a helper function
-> > to make the access more convenient.
-> > 
-> > Signed-off-by: Lukasz Laguna <lukasz.laguna@intel.com>
-> > Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
-> > ---
-> >  drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c | 31 ++++++++++++++++++++++
-> >  drivers/gpu/drm/xe/xe_gt_sriov_pf_config.h |  1 +
-> >  2 files changed, 32 insertions(+)
-> > 
-> > diff --git a/drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c b/drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c
-> > index c857879e28fe5..28d648c386487 100644
-> > --- a/drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c
-> > +++ b/drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c
-> > @@ -1643,6 +1643,37 @@ int xe_gt_sriov_pf_config_bulk_set_lmem(struct xe_gt *gt, unsigned int vfid,
-> >  					   "LMEM", n, err);
+On Mon, Oct 27, 2025, Omar Sandoval wrote:
+> On Mon, Oct 27, 2025 at 05:24:47PM -0700, Sean Christopherson wrote:
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 593fccc9cf1c..500f9b7f564e 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -9351,6 +9351,23 @@ static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
+> >         return false;
 > >  }
 > >  
-> > +static struct xe_bo *pf_get_vf_config_lmem_obj(struct xe_gt *gt, unsigned int vfid)
+> > +static bool is_soft_int_instruction(struct x86_emulate_ctxt *ctxt, u8 vector)
 > > +{
-> > +	struct xe_gt_sriov_config *config = pf_pick_vf_config(gt, vfid);
-> > +
-> > +	return config->lmem_obj;
+> > +       if (WARN_ON_ONCE(vector != BP_VECTOR && vector != OF_VECTOR))
+> > +               return false;
+> 
+> This warning triggers when called from the svm_inject_irq() path since
+> that case uses vcpu->arch.interrupt.nr. I can't tell whether it'd be
+> okay to set vcpu->arch.exception.vector = vcpu->arch.interrupt.nr in
+> that case
+
+It's not, they are two separate things/concepts.  Even if we can somehow squeak
+by (an exception can't/shouldn't be pending), that crosses over the "acceptable
+hack" threshold for me.
+
+> or if we need yet another emultype.
+
+We have enough EMULTYPE bits available, we can just shove the vector into bits
+23:16.  That definitely makes me question whether or not handling this in the
+emulator is actually better than dealing with it entirely in svm.c, but after
+looking at your original patch again, my vote is still to handle it in the
+emulator, as there are subtle flaws in the original patch.
+
+-               if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
++               if (vector == 0) {
+
+This actually needs to be "vector < 0", with @vector being an "int", as I'm
+pretty sure that generating a #DE with INTn is legal.
+
++                       if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
++                               return 0;
++               } else if (x86_decode_emulated_instruction(vcpu, EMULTYPE_SKIP,
++                                                          NULL,
++                                                          0) != EMULATION_OK ||
++                          !emulated_instruction_matches_vector(vcpu, vector) ||
++                          !kvm_emulate_instruction(vcpu,
++                                                   EMULTYPE_SKIP |
++                                                   EMULTYPE_NO_DECODE)) {
+                        return 0;
+
+And this early return is flawed because it doesn't unwind save.rflags, which
+somewhat confusingly would need to be done irrespective of the value of
+@commit_side_effects.  That's easy enough to fix, though the code would be ugly.
+All in all, I think dealing with this in SVM would be harder to follow, even
+though it would be nice to contain the SVM insanity to SVM :-/
+
++               }
+
+                if (unlikely(!commit_side_effects))
+                        svm->vmcb->save.rflags = old_rflags;
+
+> (I believe my patch had the same problem, but silently.)
+
+Gah, I was looking for that path and couldn't find it.  Hrm, the entire WARN is
+somewhat bogus as the INTn case means vector can be anything architecturally
+legal.  Side note, that also the "vector == ctxt->src.val" check for 0xcd is
+meaningful.
+
+> > +       switch (ctxt->b) {
+> > +       case 0xcc:
+> > +               return vector == BP_VECTOR;
+> > +       case 0xcd:
+> > +               return vector == ctxt->src.val;
+> > +       case 0xce:
+> > +               return vector == OF_VECTOR;
+> > +       default:
+> > +               return false;
+> > +       }
 > > +}
 > > +
-> > +/**
-> > + * xe_gt_sriov_pf_config_get_lmem_obj - Take a reference to the struct &xe_bo backing VF LMEM.
+> >  /*
+> >   * Decode an instruction for emulation.  The caller is responsible for handling
+> >   * code breakpoints.  Note, manually detecting code breakpoints is unnecessary
+> > @@ -9461,6 +9478,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+> >          * injecting single-step #DBs.
+> >          */
+> >         if (emulation_type & EMULTYPE_SKIP) {
+> > +               if ((emulation_type & EMULTYPE_SKIP_SOFT_INT) &&
 > 
->     * xe_gt_sriov_pf_config_get_lmem_obj() - Take ...
+> This needs to be (emulation_type & EMULTYPE_SKIP_SOFT_INT) == EMULTYPE_SKIP_SOFT_INT
+> (either that or making EMULTYPE_SKIP_SOFT_INT not include
+> EMULTYPE_SKIP).
 
-Ok.
+Hrm, for consistency with the other EMULTYPE flags, probably best to make it
+separate.
 
-> 
-> > + * @gt: the &xe_gt
-> > + * @vfid: the VF identifier
-> 
-> since you assert vfid below, add "(can't be 0)"
+> Did you intend to send this out as a patch, or should I send a v2 based
+> on this?
 
-Ok.
+Your choice.  I'm happy to send a formal patch, but I'm just as happy to let you
+do the testing and take all the credit :-).  If you want, you can also throw a
+Co-developed-by: my way, but that's entirely optional.
 
-> 
-> > + *
-> > + * This function can only be called on PF.
-> > + * The caller is responsible for calling xe_bo_put() on the returned object.
-> > + *
-> > + * Return: pointer to struct &xe_bo backing VF LMEM (if any).
-> > + */
-> > +struct xe_bo *xe_gt_sriov_pf_config_get_lmem_obj(struct xe_gt *gt, unsigned int vfid)
-> > +{
-> > +	struct xe_bo *lmem_obj;
-> > +
-> > +	xe_gt_assert(gt, vfid);
-> > +
-> > +	mutex_lock(xe_gt_sriov_pf_master_mutex(gt));
-> > +	lmem_obj = pf_get_vf_config_lmem_obj(gt, vfid);
-> > +	xe_bo_get(lmem_obj);
-> > +	mutex_unlock(xe_gt_sriov_pf_master_mutex(gt));
-> > +
-> > +	return lmem_obj;
-> 
-> or just
-> 
-> {
-> 	guard(mutex)(xe_gt_sriov_pf_master_mutex(gt));
-> 
-> 	return xe_bo_get(pf_get_vf_config_lmem_obj(gt, vfid));
-> }
+Roughly this?  In the end, it doesn't look too awful.
 
-Ok.
+---
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-> 
-> > +}
-> > +
-> >  static u64 pf_query_free_lmem(struct xe_gt *gt)
-> >  {
-> >  	struct xe_tile *tile = gt->tile;
-> > diff --git a/drivers/gpu/drm/xe/xe_gt_sriov_pf_config.h b/drivers/gpu/drm/xe/xe_gt_sriov_pf_config.h
-> > index 6916b8f58ebf2..03c5dc0cd5fef 100644
-> > --- a/drivers/gpu/drm/xe/xe_gt_sriov_pf_config.h
-> > +++ b/drivers/gpu/drm/xe/xe_gt_sriov_pf_config.h
-> > @@ -36,6 +36,7 @@ int xe_gt_sriov_pf_config_set_lmem(struct xe_gt *gt, unsigned int vfid, u64 size
-> >  int xe_gt_sriov_pf_config_set_fair_lmem(struct xe_gt *gt, unsigned int vfid, unsigned int num_vfs);
-> >  int xe_gt_sriov_pf_config_bulk_set_lmem(struct xe_gt *gt, unsigned int vfid, unsigned int num_vfs,
-> >  					u64 size);
-> > +struct xe_bo *xe_gt_sriov_pf_config_get_lmem_obj(struct xe_gt *gt, unsigned int vfid);
-> >  
-> >  u32 xe_gt_sriov_pf_config_get_exec_quantum(struct xe_gt *gt, unsigned int vfid);
-> >  int xe_gt_sriov_pf_config_set_exec_quantum(struct xe_gt *gt, unsigned int vfid, u32 exec_quantum);
-> 
-> probably we should block VF's reprovisioning during the SAVE/RESTORE,
-> but that could be done later as follow up
+---
+ arch/x86/include/asm/kvm_host.h |  4 ++++
+ arch/x86/kvm/svm/svm.c          | 24 +++++++++++++-----------
+ arch/x86/kvm/x86.c              | 21 +++++++++++++++++++++
+ 3 files changed, 38 insertions(+), 11 deletions(-)
 
-Yeah - I ended up leaving it out of this series.
-But the general work-in-progress idea was to block provisioning access
-from userspace if we're in any WIP state.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 48598d017d6f..e6c242d89869 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2153,6 +2153,10 @@ u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
+ #define EMULTYPE_PF		    (1 << 6)
+ #define EMULTYPE_COMPLETE_USER_EXIT (1 << 7)
+ #define EMULTYPE_WRITE_PF_TO_SP	    (1 << 8)
++#define EMULTYPE_SKIP_SOFT_INT	    (1 << 9)
++
++#define EMULTYPE_SET_SOFT_INT_VECTOR(v)	(((v) & 0xff) << 16)
++#define EMULTYPE_GET_SOFT_INT_VECTOR(e)	(((e) >> 16) & 0xff)
+ 
+ static inline bool kvm_can_emulate_event_vectoring(int emul_type)
+ {
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index f14709a511aa..625f51890e29 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -272,6 +272,7 @@ static void svm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
+ }
+ 
+ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
++					   int emul_type,
+ 					   bool commit_side_effects)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -293,7 +294,7 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+ 		if (unlikely(!commit_side_effects))
+ 			old_rflags = svm->vmcb->save.rflags;
+ 
+-		if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
++		if (!kvm_emulate_instruction(vcpu, emul_type))
+ 			return 0;
+ 
+ 		if (unlikely(!commit_side_effects))
+@@ -311,11 +312,13 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+ 
+ static int svm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+ {
+-	return __svm_skip_emulated_instruction(vcpu, true);
++	return __svm_skip_emulated_instruction(vcpu, EMULTYPE_SKIP, true);
+ }
+ 
+-static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
++static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu, u8 vector)
+ {
++	const int emul_type = EMULTYPE_SKIP | EMULTYPE_SKIP_SOFT_INT |
++			      EMULTYPE_GET_SOFT_INT_VECTOR(vector);
+ 	unsigned long rip, old_rip = kvm_rip_read(vcpu);
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -331,7 +334,7 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
+ 	 * in use, the skip must not commit any side effects such as clearing
+ 	 * the interrupt shadow or RFLAGS.RF.
+ 	 */
+-	if (!__svm_skip_emulated_instruction(vcpu, !nrips))
++	if (!__svm_skip_emulated_instruction(vcpu, emul_type, !nrips))
+ 		return -EIO;
+ 
+ 	rip = kvm_rip_read(vcpu);
+@@ -367,7 +370,7 @@ static void svm_inject_exception(struct kvm_vcpu *vcpu)
+ 	kvm_deliver_exception_payload(vcpu, ex);
+ 
+ 	if (kvm_exception_is_soft(ex->vector) &&
+-	    svm_update_soft_interrupt_rip(vcpu))
++	    svm_update_soft_interrupt_rip(vcpu, ex->vector))
+ 		return;
+ 
+ 	svm->vmcb->control.event_inj = ex->vector
+@@ -3642,11 +3645,12 @@ static bool svm_set_vnmi_pending(struct kvm_vcpu *vcpu)
+ 
+ static void svm_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
+ {
++	struct kvm_queued_interrupt *intr = &vcpu->arch.interrupt;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	u32 type;
+ 
+-	if (vcpu->arch.interrupt.soft) {
+-		if (svm_update_soft_interrupt_rip(vcpu))
++	if (intr->soft) {
++		if (svm_update_soft_interrupt_rip(vcpu, intr->nr))
+ 			return;
+ 
+ 		type = SVM_EVTINJ_TYPE_SOFT;
+@@ -3654,12 +3658,10 @@ static void svm_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
+ 		type = SVM_EVTINJ_TYPE_INTR;
+ 	}
+ 
+-	trace_kvm_inj_virq(vcpu->arch.interrupt.nr,
+-			   vcpu->arch.interrupt.soft, reinjected);
++	trace_kvm_inj_virq(intr->nr, intr->soft, reinjected);
+ 	++vcpu->stat.irq_injections;
+ 
+-	svm->vmcb->control.event_inj = vcpu->arch.interrupt.nr |
+-				       SVM_EVTINJ_VALID | type;
++	svm->vmcb->control.event_inj = intr->nr | SVM_EVTINJ_VALID | type;
+ }
+ 
+ void svm_complete_interrupt_delivery(struct kvm_vcpu *vcpu, int delivery_mode,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b4b5d2d09634..9dc66cca154d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9338,6 +9338,23 @@ static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
+ 	return false;
+ }
+ 
++static bool is_soft_int_instruction(struct x86_emulate_ctxt *ctxt,
++				    int emulation_type)
++{
++	u8 vector = EMULTYPE_GET_SOFT_INT_VECTOR(emulation_type);
++
++	switch (ctxt->b) {
++	case 0xcc:
++		return vector == BP_VECTOR;
++	case 0xcd:
++		return vector == ctxt->src.val;
++	case 0xce:
++		return vector == OF_VECTOR;
++	default:
++		return false;
++	}
++}
++
+ /*
+  * Decode an instruction for emulation.  The caller is responsible for handling
+  * code breakpoints.  Note, manually detecting code breakpoints is unnecessary
+@@ -9448,6 +9465,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	 * injecting single-step #DBs.
+ 	 */
+ 	if (emulation_type & EMULTYPE_SKIP) {
++		if (emulation_type & EMULTYPE_SKIP_SOFT_INT &&
++		    !is_soft_int_instruction(ctxt, emulation_type))
++			return 0;
++
+ 		if (ctxt->mode != X86EMUL_MODE_PROT64)
+ 			ctxt->eip = (u32)ctxt->_eip;
+ 		else
 
-> 
-> Reviewed-by: Michal Wajdeczko <michal.wajdeczko@intel.com>
-> 
-
-Thanks,
--Michał
+base-commit: 4cc167c50eb19d44ac7e204938724e685e3d8057
+--
 
