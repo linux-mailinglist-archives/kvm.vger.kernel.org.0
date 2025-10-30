@@ -1,203 +1,212 @@
-Return-Path: <kvm+bounces-61482-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4366C20234
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 14:02:47 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C010C208E4
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 15:21:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3DF5560312
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 12:57:56 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A4FC734F263
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 14:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A8E350D52;
-	Thu, 30 Oct 2025 12:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47626263C8C;
+	Thu, 30 Oct 2025 14:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QQpGO16V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xA99Q17e"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010053.outbound.protection.outlook.com [52.101.193.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B012DEA7D;
-	Thu, 30 Oct 2025 12:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761829061; cv=fail; b=E+8N8ChAKrSdA1n98LfZceFbW9fEL6TUd9GOtD/GG5m21f29jlbgVpPBycb3m/6wDPnJ/PycCq6GPCbDQ44fUhl22+c4L1tvcA1DYkPvXNQo1jNdC9yspv/b5UVnfJRCRf0UQP+khRx/gtt+Yez/19c+QgtMtqt3tp6HNHhJpfc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761829061; c=relaxed/simple;
-	bh=dvRUX3XRc0TfPKu3ONnDy9AW+cctxiXMT92PocSzPpo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=iI5yHICaqyYKcxPnAI0ZfYhkv8UeXG1LcSgcsYivmZekMMiMxHD8xVD4wUjJK6LSWxrMqzoEMZsUBAyLjzqfL5ZW5f68t9Vc7N8u5WlOUIMM3ekPzFlV2VnQlfg+lq9GYxWTsu2sE5aiqvGVvlX3JnBvlSVG4SomSAgxRK5dSfw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QQpGO16V; arc=fail smtp.client-ip=52.101.193.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hCcckS5POJtplmiIdWv5LEuni2NRoZ/x9k406dQ671XUaNyZj0j0aKaG1bSB08gP57BI8k6Fx0Pdwd+EbSpX2Pgty0LV0J1422ONLp7a7KzOHOW3tLOOTWQ9l2khFlNcSqan41v4XyNcajBjS/37v4G2IQy3k+BJokljSZOSbX+hy9LydA8e+y/GCVyElcHa7VUdMNMQJtgWLn0uuyxI80kbfkrKEyNVbRA39tZ1FMJ2JAQtVYSIQ9AM85PNdcg6AWxsDWkwhPfIryiv5WYvxb8lc/0etnbLzTksgfOHKj+JXZLv2HRn17YgNXKenRO4Fm2l5FuTAIg3tttFSdVzcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UAn9FBNZzS1aqHjjo/zdfJFq2Dkyl+CesaEN3VsR990=;
- b=VBN3BIuSIAsK9HNtBl9Yj9UXnm71Y6GazhnxVtc3azlHT7XVKxtQHGsIgFPxS7phhYXiwv73q/Ugq2jeny4Q7B8kZRMkPJw7+ctzVPgMspTjZGiG8N/5ia2JyByBkPKFncabTX23BZeKJIloJ7m/h7AOrUWXQTrHkUPoHQPz+vZOuh73q4pNXJMIcFrWtLZaLN8DZIWLnKk+8naink+PQz/1GTuJCPosQ1dewnHN6i2aFj6knwUlNPZisrORqacokYI0nheS2c3WVrfVmP7Q1P1ti0YjtiTr8az4nBLcFhPOwsyzrnZKIjvQobFrqTxbHBcooa74rEtOBJFrXD1FBA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UAn9FBNZzS1aqHjjo/zdfJFq2Dkyl+CesaEN3VsR990=;
- b=QQpGO16VjGUXmD27Ngs599tizEztGRQ3ocsOn/ioaAJ3W6u0mXvahh3MuMDH6QJQ4mCaq7yi6R+j0HlGvgB8/04Z4Kh/a3QChLLyO0JgRQKqqUjjHOP3m+zOG5wUV3BdqAJnwqCBngqIpyyBfSldEHFEM62iE6/4P8UdGTk1wfSgFKNXh2RXiRq/I7qTncvfPwNVBhZ7Gw8AVzb3T8XkINwOznXUyc2zjTP0t798OA/ibPJQzPkhYzXuvnAgnMionHncb8RQNzkJZzMLPlTuBT0mcWd8XeENCT5ALGFnNyc7ziLEXFJrlQXSyagFq4EHEBaxqQjnD+TYtuksvOEipg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
- by IA0PR12MB7650.namprd12.prod.outlook.com (2603:10b6:208:436::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.14; Thu, 30 Oct
- 2025 12:57:37 +0000
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9275.011; Thu, 30 Oct 2025
- 12:57:36 +0000
-Date: Thu, 30 Oct 2025 09:57:35 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Samiullah Khawaja <skhawaja@google.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251030125735.GO1018328@nvidia.com>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
- <CAAywjhRb6Nwmzy+QWFPH9Zkn-xvtvOktNjAZ8HMpM2wmVw2rjw@mail.gmail.com>
- <20251030064818.GA60090@unreal>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251030064818.GA60090@unreal>
-X-ClientProxiedBy: BLAPR03CA0172.namprd03.prod.outlook.com
- (2603:10b6:208:32f::12) To MN2PR12MB3613.namprd12.prod.outlook.com
- (2603:10b6:208:c1::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA202528FD
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 14:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761834055; cv=none; b=TIQjMufIJ6adA2/D217RYOrCcP4Q6M5Ww5ru7xp97U/GUGhdoNxe/EK+pHBdCn7kLNb5HlyjjcpXCM3hLUB8Vt/xaiWsHCNnG1k22t1yeWtxV7qciRmmWO+sR4I8sqQQeR6mLRqxlhOkIj5mRSa+fCrxchuo1Saz52XU6fLWhRg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761834055; c=relaxed/simple;
+	bh=PWVawbmccAgRpDWZViUQAyTtW2FplbcNS/xcuKfad04=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iDEWoZvPcv1fEUaMdnWLl0MLPcE3WPqIfXPFSLF5xBq1mqJP1h7QBjNiZlkKEOQpbXTPDDe2H4j6pyev/JLOjG/14eP1yQ1mSqjym6TOVm/TX6EfvWzBOPIsDetaSPr13+rs5Q0S12maK2E0auO4DnOKpBloBP20F4t38oHxXUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xA99Q17e; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33dadf7c5beso1076290a91.0
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 07:20:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761834053; x=1762438853; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0qr3+qnNJL9IhzJUu4YrvRUubcnt/JnNTBv+5uafE+8=;
+        b=xA99Q17eRfbRsTwnnAgG3Jy5tFLXOpUcRITUfRZqAJOzHxwlZNKrDD6YQa4TF9IeC6
+         yhh0nSsX9x7HhE7+v+nz1FSkCh6F1npuaEtvp5ysxHNHU7qQU3g7aQx68LYpcWoAo2jF
+         AY5snZnzN4ibv1KjUHQ3Q6DH5skeLpRq0bhI2wnDke1NmW/DbZ3Rjwqa5/AsYQUYdPz4
+         VMFrIVaRw3/dJhZmtlvkM7Tr+fsWQF2eiK/2WGbMXdsUZ32iwvml4lOg+ZzIf3vXai5d
+         TEO4j2CyHVI7vDLFoME6WocuNoAhl6AsNrXms0cx4v6NQJrPgHbq9kl1QUjTS0V0nd85
+         94qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761834053; x=1762438853;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0qr3+qnNJL9IhzJUu4YrvRUubcnt/JnNTBv+5uafE+8=;
+        b=BeQaNc6XRV8UwrGpiXgjoEJNYregFSMy1CGoOSbMROxg6cPlUJKtPioFM0RFMYl3iw
+         joq1xqhOxxIEFhL/l/3+Mz3VZ8+bHMMKNJF6nhzkUzkxNfoJOr6jXR0nyG61mOob++us
+         ozmY1373RS8DOHLYyBlwnaf42RhjdOplsGccEXISwnagsvMiMOG3vXIgZZSYx1B9tSj5
+         848P5ULnEFl3vyWy0VevmEM9lwuNs2KMHQ3M5SOejsodKizSg8pv0CsFN34o2s9SaiWa
+         e6+7y2aRZL5HWvHbyVybAdzgZbyLctoDMP+/B8FfxnBLw8IBzonoO8XSl2vQpQvmY+19
+         0XeA==
+X-Forwarded-Encrypted: i=1; AJvYcCX5vsEVps3MQj+HqZjB5WRrGinRNEKQqv2Q0Roogz85DzpIG9egaic/+9fJmrpNEE1zKII=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuoL2MKlwc8UTZtJjeZmowUD46SeYYdArGC8UVy3k2Z98XZfyb
+	b+QpwWe7qvFdJEfsOtXPtfHsnYGgHi7+/wusSM4Qh9YRGrea3m4mCmYYHW8ao16isvbasEsEa6b
+	4Nroq8Q==
+X-Google-Smtp-Source: AGHT+IEAmG4oREjTJHt0o3RFqvoNyEFntIEpiDXbSgHJz3ZUTt/xpLVWZ3YHlSoxUWhhX4tuZP6rztrMhfY=
+X-Received: from pjbfh6.prod.google.com ([2002:a17:90b:346:b0:33b:52d6:e13e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1810:b0:32e:b36b:3711
+ with SMTP id 98e67ed59e1d1-3404c58bd21mr3676839a91.28.1761834053119; Thu, 30
+ Oct 2025 07:20:53 -0700 (PDT)
+Date: Thu, 30 Oct 2025 07:20:50 -0700
+In-Reply-To: <d4813147-920e-40a4-a7f7-e93666c77cc1@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|IA0PR12MB7650:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2e1e564e-a984-4cce-30c4-08de17b3e60f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?YbPPKEkFTwhCdB9779zYYOHgYvPtqxsgP9S2JTCKW38Cy+yEULjxgoCg7EFD?=
- =?us-ascii?Q?pWQ6eDn0a5LNHQv1vb2fbA8w+//B8Enc9yf8StNSYNH1C32zmpmCYGEX7m97?=
- =?us-ascii?Q?kcfvCpVI0r5DU2EAcwej+IQjA8Vdjf4hq9MN2JC8OxDO7v/Ov78khkp4A7yd?=
- =?us-ascii?Q?CPWSD2fJTp5aaMVaNYFJiwOVbP0AqFdDvMw89yZFzad9Nf75k9doRIGTJwfH?=
- =?us-ascii?Q?tneF4pMxxF3Wc4l+ytwzBzbEP+wTSysLs3cND5XAawkWSykiGPchUMcblN1s?=
- =?us-ascii?Q?Iy39/P4EWGyPNGn6EKc0vYCnaX2nwmsJpsclJhBs36YqyqicEGfTNs1nSFx+?=
- =?us-ascii?Q?SuWeyGxEZ8eYexCedWq6chz0IwTzblAU5RCltDh5r86YQg2ot0xBGuktUWfe?=
- =?us-ascii?Q?FzXyhj7wy7TPXz5jL8XYFPKt17QEb67RCEAryNT5rPakqaQVrwW1cQCH2Skc?=
- =?us-ascii?Q?cVbp76g5UVxNqp8y+sztG/F+053cNKvpYWB+1WpA3Uvl+eC0nqdy9fMDM/34?=
- =?us-ascii?Q?pX5Pg7r1hlMF/fjcu3dzn03rdN8nb00+YxQiN/Vh5YVTq0B/ZYlecJfmwzeY?=
- =?us-ascii?Q?M8/FIzBKkxcl6jRidNyYfPE2J+GQmMa481/lARU1JMFu25bz5u1XrM7RAY+4?=
- =?us-ascii?Q?B07USLWhwCz+PaI2ogdvfTx0AdC2xsb+hjvfDb73jSrekHBmFA7VB5CV3col?=
- =?us-ascii?Q?1VGGxVx9d/PmvzWs5B+hJ0G3k4CIPFgsvAhSnNYpgK/uYgyeVN1wdRJzT/qe?=
- =?us-ascii?Q?VRcKpdic+EyU7Lt+QyVDrbUFgpveLKyVOIkG9fh23++8vFltatHxKRQp9vbY?=
- =?us-ascii?Q?cYQDsjQWwxl7+f5JZq6TN13C+gMT6kiBw8m7m9WDKt9N06Svj5KKiGz/EyFy?=
- =?us-ascii?Q?zgL+1lTselU+Lqlp4gSo3iVUqmY5ExlC44fauk+8Lnbc5b5x6vehb0UWicpa?=
- =?us-ascii?Q?dmNs1kIHzPiwGEgrQm3g6iLjge55aOLAQlf75MgBTnwZ2WZyHR39aUciSuag?=
- =?us-ascii?Q?vtcxn2vvFJSquTESIejcIBj651q9/PGNXbMN/ZIRcSrgaF1xUr/RA01MSLln?=
- =?us-ascii?Q?qT0M0+OH1mINOm+IavzDIimoBe+rQvAE1kuz4XaMErXsZiQG5vu9XZAKiBkC?=
- =?us-ascii?Q?+dqmRJAYdchavT2mA58R4jXXJfEKGDsGBS4vUh9+D0bCGLgp0/HpfCjY1R0X?=
- =?us-ascii?Q?7NAy0ChsTEC9UtqoxbEZ8lErbzjWDZKCstsrZQggWLe0LLLneJ+m9eDBu/Cd?=
- =?us-ascii?Q?Z4msVIuXqyn9E8TbcG5iePZpuyFxd/3BDJkCmNbYcfjycKlbRsxEj5o0WHnc?=
- =?us-ascii?Q?4nXvX8rG4h7Hl3DeS+S8ZqMsfiD9ySZ9Cseu12MciJ1wcewvpG1rgDkInlDX?=
- =?us-ascii?Q?XoVPvESXT5eY/cbHHSKBH907p2eSgu+4jFkJO4FKzr/hwlLQMDIdUtcER1oB?=
- =?us-ascii?Q?uE3douNJaQ4IV6TGdh5mLZoB/N/bgLDM?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?hOQW+g7t7ouLaItZ/w7egQ8eRlTxEeO3/seSGdPepyWF3N8EA9souRk4Od8L?=
- =?us-ascii?Q?jU8F8UE+U4o10sctnhF7CT4fF8b4w+JrHvU3mivO12bcw3wwNS9cL0OFuCtR?=
- =?us-ascii?Q?+sy+6b1dJvL2yfjKSWRhJXSKABf04qNr/9AmScQL6b3e8s2e3bn/8mXImypl?=
- =?us-ascii?Q?juI2Sc6wC1I7PC3wBMvFv+C3SprJxmWKjcBgEL3v81fX755RrQAgEdzCiCtd?=
- =?us-ascii?Q?DFuZMRKUD0gW2LpePEdKmJ1udgNgyVioqcQAiSzDL/oqw2JeYNbrLUaV91P7?=
- =?us-ascii?Q?JAlWoKEeQk3np8PaqgOK685M0H0S9ahQQUpQRVHbxMolu8pdNTQ1swUYut8o?=
- =?us-ascii?Q?dddmSZT1Yw01qrg03/NYweoypfo30ylrDcLIFzw+eBJgFwpntQYu/gUzdsek?=
- =?us-ascii?Q?GPolZTS/hfC43GLExOF1nEwZVRWI5I35hLUSTTpA20MvvlKFUwlmNs6pIks9?=
- =?us-ascii?Q?7FuJ54V3EpK+dpQjZuO7Rc5VhOQdUF2caaI4ST5HMroiFVp0cFBWyIB3aF/C?=
- =?us-ascii?Q?NXEMWRonZf22pDSx5CvAEmHj8enDP41qvczTWaVu3Y7StjZORlFqIpC6rChc?=
- =?us-ascii?Q?YGS/Kz6T3O51NitpctyzVfyXX+xHySfXP0i8bftQscscQ1FFM4g29URLXrcf?=
- =?us-ascii?Q?uP4RO1eaW0Qmf9o9OdcS2zUJxZrO5Zveb2RHSNNQapwrnhU6vNXTBtLJS8gn?=
- =?us-ascii?Q?UC2Mg1LpIX6qFOmfW/2stYDje8Lm625S0a6WYY/gwNsQwYf7mj/Oi3xAefju?=
- =?us-ascii?Q?9BrNQc0pJf56P1lwyPJxXIVBsAZ4SXlgtxdmxP+aLwNBHZDK9JqMJVUjSdEz?=
- =?us-ascii?Q?eoE3Sas6oZD+h67MthSLfQgRja72OZ7fVfQLvpJzgldFln0qDVRDILonCu6z?=
- =?us-ascii?Q?9kLaq4x6OG7vZ9Gi5fnxf1igZtqppm+VzbF4T3cslec2VTDQNo+c0GdHXLBs?=
- =?us-ascii?Q?EGs63oFRCaHIEzTaiRnnL6Qv2YkgWinYHoMCPmvOR3oDrMc2NAmXVhQCUezJ?=
- =?us-ascii?Q?96E1SU50mSjc4QEZVQFfWVQMI03eGrBZrmEv1kOK6mJz6y3Jdhz6clsw1hJ8?=
- =?us-ascii?Q?iG3UCHT4zPCrJ+FkUU23PbAwCy7JHBZ6tHoe1mA6iSVtdxvWH9XbPHINr/la?=
- =?us-ascii?Q?Qui7HFYQlsrU+tzwIRtp1VeqIpCxhH3/Pn4/qLJx0BS90ljG8GdXCxdujFyB?=
- =?us-ascii?Q?BCka79c8CABff7MoanrXdpel+4BqTKmHOwc6Nut30MAhhJM9xbZ4Ogj/zzNj?=
- =?us-ascii?Q?a1wIlnMNF64/J61iGJ4qEZyB2Xtypppp39fEr7JQjS0VPRwmaq+YYKt1EJlK?=
- =?us-ascii?Q?029o5+RybfIAblA9MYwNsOaUp17tGdSaDcdTVKvTHEzosoVNAhfunDjZOj6Q?=
- =?us-ascii?Q?S0LPEzyQMs1Qr7Louxa9Yt3AT2Za77OUiHnwFq2eYJ03HIVHd+s+Hds5M+x4?=
- =?us-ascii?Q?xBagGrh9vFrBlL0iWa1Y+kxN3BjsJBOGewImD+HNLviIHMSAob8PSq/47ilh?=
- =?us-ascii?Q?S+oJLjW5h8fdodbNNOfOkbO2h8lAoqQ7uEwRojcH21TEPjWjtKk8mpiPczm9?=
- =?us-ascii?Q?jnqIIkKcC7/nh8xN7sw=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e1e564e-a984-4cce-30c4-08de17b3e60f
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2025 12:57:36.1523
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: O4/NoY/baI8hySY8ZiIWOimHvOYvb48Jqc2lgAZZVl6nY+/aM4xrp2y3LpCmEw7C
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7650
+Mime-Version: 1.0
+References: <20251028212052.200523-1-sagis@google.com> <20251028212052.200523-9-sagis@google.com>
+ <d4813147-920e-40a4-a7f7-e93666c77cc1@intel.com>
+Message-ID: <aQN0Qg24tMQ9ckUT@google.com>
+Subject: Re: [PATCH v12 08/23] KVM: selftests: Define structs to pass
+ parameters to TDX boot code
+From: Sean Christopherson <seanjc@google.com>
+To: Reinette Chatre <reinette.chatre@intel.com>
+Cc: Sagi Shahar <sagis@google.com>, linux-kselftest@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Roger Wang <runanwang@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Oct 30, 2025 at 08:48:18AM +0200, Leon Romanovsky wrote:
-> > > +void vfio_pci_dma_buf_move(struct vfio_pci_core_device *vdev, bool revoked)
-> > > +{
-> > > +       struct vfio_pci_dma_buf *priv;
-> > > +       struct vfio_pci_dma_buf *tmp;
-> > > +
-> > > +       lockdep_assert_held_write(&vdev->memory_lock);
-> > > +
-> > > +       list_for_each_entry_safe(priv, tmp, &vdev->dmabufs, dmabufs_elm) {
-> > > +               if (!get_file_active(&priv->dmabuf->file))
-> > > +                       continue;
-> > > +
-> > > +               if (priv->revoked != revoked) {
-> > > +                       dma_resv_lock(priv->dmabuf->resv, NULL);
-> > > +                       priv->revoked = revoked;
-> > > +                       dma_buf_move_notify(priv->dmabuf);
-> > 
-> > I think this should only be called when revoked is true, otherwise
-> > this will be calling move_notify on the already revoked dmabuf
-> > attachments.
+On Wed, Oct 29, 2025, Reinette Chatre wrote:
+> Hi Sagi,
 > 
-> This case is protected by "if (priv->revoked)" check both in
-> vfio_pci_dma_buf_map and vfio_pci_dma_buf_attach. They will prevent
-> DMABUF recreation if revoked is false.
+> On 10/28/25 2:20 PM, Sagi Shahar wrote:
+> > TDX registers are inaccessible to KVM. Therefore we need a different
+> > mechanism to load boot parameters for TDX code. TDX boot code will read
+> > the registers values from memory and set the registers manually.
+> > 
+> > This patch defines the data structures used to communicate between c
+> > code and the TDX assembly boot code which will be added in a later
+> > patch.
+> > 
+> 
+> (sidenote: I do not know what the bar for this work is so I'll defer
+> comments related to local customs like using "we" and "this patch" in
+> changelog)
 
-The point was to call it when revoked becomes false as well, as that
-gives the importing driver an opportunity to restore any mapping it
-had.
+The same as KVM x86, which follows the same rules as the tip tree, with a few
+intentional differences.  By all means, call out those things, it'll save me the
+effort :-)
 
-Jason
+Documentation/process/maintainer-kvm-x86.rst
+
+> 
+> > Use kbuild.h to expose the offsets into the structs from c code to
+> > assembly code.
+> > 
+> 
+> 
+> > diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> > index 148d427ff24b..5e809064ff1c 100644
+> > --- a/tools/testing/selftests/kvm/Makefile.kvm
+> > +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> 
+> ...
+> 
+> > @@ -328,18 +336,28 @@ $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c $(GEN_HDRS)
+> >  $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S $(GEN_HDRS)
+> >  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+> >  
+> > +$(LIBKVM_ASM_DEFS_OBJ): $(OUTPUT)/%.s: %.c FORCE
+> > +	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -S $< -o $@
+> > +
+> >  # Compile the string overrides as freestanding to prevent the compiler from
+> >  # generating self-referential code, e.g. without "freestanding" the compiler may
+> >  # "optimize" memcmp() by invoking memcmp(), thus causing infinite recursion.
+> >  $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+> >  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -o $@
+> >  
+> > +$(OUTPUT)/include/x86/tdx/td_boot_offsets.h: $(OUTPUT)/lib/x86/tdx/td_boot_offsets.s FORCE
+> > +	$(call filechk,offsets,__TDX_BOOT_OFFSETS_H__)
+
+Presumably this needs to be guarded so that it's x86-only.  I can't tell for sure
+as there are other problems in this series of a similar nature that prevent me from
+getting far enough to see.  Please build test on at least one other architecture
+before sending the next version.
+
+lib/kvm_util.c:7:10: fatal error: tdx/tdx_util.h: No such file or directory
+    7 | #include "tdx/tdx_util.h"
+      |          ^~~~~~~~~~~~~~~~
+compilation terminated.
+
+
+If possible, I would also really like to see these programatically defined, e.g.
+something like (I have no idea if this is remotely valid syntax):
+
+  $(OUTPUT)/$(TEST_GEN_HEADERS): $(OUTPUT)/%.s FORCE
+     $(call filechk,offsets,__%_h__)
+
+
+> Some folks prefer to keep build output separate and may build tests using a command
+> line like:
+> 	make O=<output dir> TARGETS=kvm -C tools/testing/selftests
+
+Ya, I exclusively build that way.
+
+> This is a valid usage and will result in td_boot_offsets.h placed in <output dir> that
+> is not covered by current include path. A build with above command line thus fails:
+> 
+> lib/x86/tdx/td_boot.S:4:10: fatal error: tdx/td_boot_offsets.h: No such file or directory
+>     4 | #include "tdx/td_boot_offsets.h"
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~
+> compilation terminated.
+> 
+> 
+> Something like below may be needed to add the output directory to the include path:
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index 2f49c8965df9..98bc40a7f069 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -262,7 +262,7 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+>  	-fno-stack-protector -fno-PIE -fno-strict-aliasing \
+>  	-I$(LINUX_TOOL_INCLUDE) -I$(LINUX_TOOL_ARCH_INCLUDE) \
+>  	-I$(LINUX_HDR_PATH) -Iinclude -I$(<D) -Iinclude/$(ARCH) \
+> -	-I ../rseq -I.. $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
+> +	-I ../rseq -I.. -I$(OUTPUT)/include/$(ARCH) $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
+
+Hrm, ya, though I assume we want to define e.g. KVM_GEN_HDRS so that they can be
+added to the csope.  Note, ARM already has some generated header stuff, but the
+generated code comes from outside of KVM selftests, so we'll want to make sure to
+avoid a collision with GEN_HDRS, thus the KVM_ prefix.
+
+	ifeq ($(ARCH),arm64)
+	tools_dir := $(top_srcdir)/tools
+	arm64_tools_dir := $(tools_dir)/arch/arm64/tools/
+
+	ifneq ($(abs_objdir),)
+	arm64_hdr_outdir := $(abs_objdir)/tools/
+	else
+	arm64_hdr_outdir := $(tools_dir)/
+	endif
+
+	GEN_HDRS := $(arm64_hdr_outdir)arch/arm64/include/generated/
+	CFLAGS += -I$(GEN_HDRS)
+
+	$(GEN_HDRS): $(wildcard $(arm64_tools_dir)/*)
+		$(MAKE) -C $(arm64_tools_dir) OUTPUT=$(arm64_hdr_outdir)
+	endif
 
