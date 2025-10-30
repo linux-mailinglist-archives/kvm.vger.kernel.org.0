@@ -1,198 +1,163 @@
-Return-Path: <kvm+bounces-61489-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61496-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A479C21006
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 16:44:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 926E7C2117A
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 17:07:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 74A354ECD43
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 15:42:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF82D3B1909
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 16:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 833DF3655F2;
-	Thu, 30 Oct 2025 15:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2BB43655EB;
+	Thu, 30 Oct 2025 16:05:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I3C8cnKH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CDvt75El"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A903655E2
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 15:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33598262FF3
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 16:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761838944; cv=none; b=QkzHPYUApkEONkTTBm4KOZ+6zmBsj0VZGFpA1EA3oAFciE6tUctikoEfUBYr2RDHwjljtxYHLSlk5gtAnmpvuio5aRc6FVWxITSx2ZYoYU8YbcP9WcUQ22ZH/5DJa+clAS+EaPKk7Tu15jnms1K3HvX+jKt81k8rgMteGF2QutE=
+	t=1761840310; cv=none; b=qdN0EAHL1OTwAODlvRtm0+cKEDpigeDrPx1WNLMopDOlYVstvhVaHrmsIuOiD/jOIaZTw2TFtP85igngXO2hoaBFN1WoZYmdJZVcXzcvYyek9drrwr1GOwCtBLPvkF2/y/OOQ0wEFpzLS0DixjtwdyKF8NRkt8SElG66NnDqInU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761838944; c=relaxed/simple;
-	bh=G82bnRITGyqKjw4vCwsGZ99kE0549Ia3SE8bIF8kwK0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YNGKRoWONFldA3nQiKTlLuM0lkJoKy9hHlusxuhs72oKHn+rj7Kc+ms/5Bor/OkPIol2rO3LE0FgHoklsq/++0xGJ1qHG7fEYoSzt2QWmPhImtaYOIfxfBN4Juv/yLgnCmtXtxoNg+x5gWtMz5htHdlg3uZCb7ryeRgnGMMJtjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I3C8cnKH; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761838943; x=1793374943;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=G82bnRITGyqKjw4vCwsGZ99kE0549Ia3SE8bIF8kwK0=;
-  b=I3C8cnKH/iUyu132PwMN6KUXLjf7j2QWvtsrVgNAzUifF9U0yJunRdsz
-   o8fEwYf44pXPJ9aCStSOf3WNMGaZ20Gd5fpilLGfc6B3u7WkE/3v0Ne2t
-   8yXc3q6obuPz3tHx3VSGe2HSqM8vzkxfbrV8sjTiqqD+5WfhHbU4ZfyJ9
-   dcOshL68cQtAEeYcDewQtqxisX/pfNo4TEFbGPprXsEx2xqYMiFTBWOFF
-   d3l29ow504m8SZrXlR3BYOar3nINxlmwG16PmPtJSLb8SFzTtRru9OgLZ
-   sh36Z/M8Yn0vhdm1ChXgvYnYuoETWuF/VOdjzhsLXeTXCqC7vQs+ss5cc
-   g==;
-X-CSE-ConnectionGUID: fQfTRa2MQIOhnehCSpBBbg==
-X-CSE-MsgGUID: GK0AU3UMT1a7eGspuGVKFA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11598"; a="63684838"
-X-IronPort-AV: E=Sophos;i="6.19,267,1754982000"; 
-   d="scan'208";a="63684838"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2025 08:42:23 -0700
-X-CSE-ConnectionGUID: LzuJ36b8QLq7/qznGsTrwA==
-X-CSE-MsgGUID: G6SewhZcS8q1HQtR95fX1A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,267,1754982000"; 
-   d="scan'208";a="185678709"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa007.fm.intel.com with ESMTP; 30 Oct 2025 08:42:18 -0700
-Date: Fri, 31 Oct 2025 00:04:30 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>,
-	John Allen <john.allen@amd.com>, Babu Moger <babu.moger@amd.com>,
-	Mathias Krause <minipli@grsecurity.net>,
-	Dapeng Mi <dapeng1.mi@intel.com>, Zide Chen <zide.chen@intel.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>,
-	Farrah Chen <farrah.chen@intel.com>,
-	Yang Weijiang <weijiang.yang@intel.com>
-Subject: Re: [PATCH v3 15/20] i386/machine: Add vmstate for cet-ss and cet-ibt
-Message-ID: <aQOMjlHnjgwdYfFX@intel.com>
-References: <20251024065632.1448606-1-zhao1.liu@intel.com>
- <20251024065632.1448606-16-zhao1.liu@intel.com>
- <445462e9-22e5-4e8b-999e-7be468731752@intel.com>
+	s=arc-20240116; t=1761840310; c=relaxed/simple;
+	bh=c9b8XC/fH65U9UHUGq3SmXgvpJYhZ/Lo5B2qlcSERQ0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uxMbpZZaaqA1thAVxH2D2CSYq8xw/QOcZWn951gr318A6lmpJHhVHcw5v7WbdojSXo5UpenSvtxcYkxJBHjtSQNtWqtbGXDwe6ZzdrWgrstEL5A8VQzOBTGUtdqzAWgi0GaGYuSL/sMTHrqyvlhLdWXN4AqD9NMbL5Euiiu3xoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CDvt75El; arc=none smtp.client-ip=209.85.221.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-40cfb98eddbso1114914f8f.0
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 09:05:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761840306; x=1762445106; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c9b8XC/fH65U9UHUGq3SmXgvpJYhZ/Lo5B2qlcSERQ0=;
+        b=CDvt75ElY3hdyLEZnu5e1h6J5sMfYbfZLViMq0FtvdBo6f3AztmUt90lVbhofK72EK
+         b745wROqFofANCzBlhNHxm2KN+pTzU7kvyPTuPbvqLi1LG6nKhZqILpjkBgZPRq3kQuZ
+         eyaOBe6qbuD9b0wvX7pcUmBDcYD2CI22Sy3ewlxtzOTvkRQlq2xVjXPpNff1VPHu7hCt
+         ohJUvsZxnM6hRmARijIiA/iL77tvS5Cr/S5iPd0vUw9HVrbfAcdYfOiY0/wb2ZB398fe
+         i0MBwZqx3tS3Cn0LlwnHMPfjgclAImjU3fkpRYKslFfi8jX2Sc0EZmrHnTIGFrth8N0S
+         fUZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761840306; x=1762445106;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c9b8XC/fH65U9UHUGq3SmXgvpJYhZ/Lo5B2qlcSERQ0=;
+        b=vYEtSs6T7uLHUoxy4A3PykiNPQtur1pquqxqTMDnm9sboz3B54i2WPEAuoPKUqHPRT
+         T8LCyB6lvRyD63E00NYvUz+Jrs53umFJu4wK6YWa3qu2yBmr2R2TWuZtAnSUbs4fdydl
+         ICK1HjKPtbT37Zqmvx+7nzrpazExxQou/l1QatX2WTibJUAA8PZAQwLHXxRtrFK+/9N9
+         TfMKkfWyGh9vjD+II3QcOhpNAjKryJaZ8I9QDIw0nth7Wwh8JChitmygyAIgnvZlrefA
+         Fhk82zgNnj9DwAA3bzS/C98RBBVoPOFnlWbaeOg5aTTTKFjEw1u56yD1HsIYge9thmH7
+         XGqA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIFs9jJtkjaPa0/6mMDondYG3T2vI+Uwx7wgtkgoJMxnYtPZBedCfkC8PE6DFL60ol6jI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9lzydrxdEx+DnsioeXXMeESfodag2BTWYLvncbhVsHuKh3pvf
+	i6t3tNwJn1MUXqTk9yVNXUcT/5N3W1bkNgtQOVqgg/kTjMltI4Va8iHJuxcDOJ9zoQUWShhj9PS
+	68PW8RosxCEBDyQ==
+X-Google-Smtp-Source: AGHT+IHjMaURNuY5ADspjcwjcl/WRoZFYO9bioemMflpQGaxNDVvaG4JDdR/nXAPdbz/Yfz+Utvfc7Y4KaunSA==
+X-Received: from wmbz6.prod.google.com ([2002:a05:600c:c086:b0:471:6089:1622])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:2408:b0:429:8b8a:c32b with SMTP id ffacd0b85a97d-429b4c83176mr3266075f8f.22.1761840306279;
+ Thu, 30 Oct 2025 09:05:06 -0700 (PDT)
+Date: Thu, 30 Oct 2025 16:05:05 +0000
+In-Reply-To: <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <445462e9-22e5-4e8b-999e-7be468731752@intel.com>
+Mime-Version: 1.0
+References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
+ <20250924152214.7292-1-roypat@amazon.co.uk> <20250924152214.7292-3-roypat@amazon.co.uk>
+ <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
+X-Mailer: aerc 0.21.0
+Message-ID: <DDVS9ITBCE2Z.RSTLCU79EX8G@google.com>
+Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
+ TLB flushing
+From: Brendan Jackman <jackmanb@google.com>
+To: Dave Hansen <dave.hansen@intel.com>, "Roy, Patrick" <roypat@amazon.co.uk>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
+	"maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"joey.gouly@arm.com" <joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
+	"will@kernel.org" <will@kernel.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>, 
+	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@redhat.com" <david@redhat.com>, 
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, 
+	"song@kernel.org" <song@kernel.org>, "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
+	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>, 
+	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
+	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>, "tabba@google.com" <tabba@google.com>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Oct 28, 2025 at 04:29:58PM +0800, Xiaoyao Li wrote:
-> Date: Tue, 28 Oct 2025 16:29:58 +0800
-> From: Xiaoyao Li <xiaoyao.li@intel.com>
-> Subject: Re: [PATCH v3 15/20] i386/machine: Add vmstate for cet-ss and
->  cet-ibt
-> 
-> On 10/24/2025 2:56 PM, Zhao Liu wrote:
-> > From: Yang Weijiang <weijiang.yang@intel.com>
-> > 
-> > Add vmstates for cet-ss and cet-ibt
-> > 
-> > Tested-by: Farrah Chen <farrah.chen@intel.com>
-> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > Co-developed-by: Chao Gao <chao.gao@intel.com>
-> > Signed-off-by: Chao Gao <chao.gao@intel.com>
-> > Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
-> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> > ---
-> > Changes Since v2:
-> >   - Split a subsection "vmstate_ss" since shstk is user-configurable.
-> > ---
-> >   target/i386/machine.c | 53 +++++++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 53 insertions(+)
-> > 
-> > diff --git a/target/i386/machine.c b/target/i386/machine.c
-> > index 45b7cea80aa7..3ad07ec82428 100644
-> > --- a/target/i386/machine.c
-> > +++ b/target/i386/machine.c
-> > @@ -1668,6 +1668,58 @@ static const VMStateDescription vmstate_triple_fault = {
-> >       }
-> >   };
-> > +static bool shstk_needed(void *opaque)
-> > +{
-> > +    X86CPU *cpu = opaque;
-> > +    CPUX86State *env = &cpu->env;
-> > +
-> > +    return !!(env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK);
-> > +}
-> > +
-> > +static const VMStateDescription vmstate_ss = {
-> > +    .name = "cpu/cet_ss",
-> > +    .version_id = 1,
-> > +    .minimum_version_id = 1,
-> > +    .needed = shstk_needed,
-> > +    .fields = (VMStateField[]) {
-> > +        VMSTATE_UINT64(env.pl0_ssp, X86CPU),
-> > +        VMSTATE_UINT64(env.pl1_ssp, X86CPU),
-> > +        VMSTATE_UINT64(env.pl2_ssp, X86CPU),
-> > +        VMSTATE_UINT64(env.pl3_ssp, X86CPU),
-> > +#ifdef TARGET_X86_64
-> > +        /* This MSR is only present on Intel 64 architecture. */
-> > +        VMSTATE_UINT64(env.int_ssp_table, X86CPU),
-> > +#endif
-> 
-> It seems we need to split int_ssp_table into a separate vmstate_*
-> 
-> Its .needed function needs to check both  CPUID_7_0_ECX_CET_SHSTK &&
-> CPUID_EXT2_LM.
+On Thu Sep 25, 2025 at 6:27 PM UTC, Dave Hansen wrote:
+> On 9/24/25 08:22, Roy, Patrick wrote:
+>> Add an option to not perform TLB flushes after direct map manipulations.
+>
+> I'd really prefer this be left out for now. It's a massive can of worms.
+> Let's agree on something that works and has well-defined behavior before
+> we go breaking it on purpose.
 
-Ok, will split this entry into a subsection. Thanks.
+As David pointed out in the MM Alignment Session yesterday, I might be
+able to help here. In [0] I've proposed a way to break up the direct map
+by ASI's "sensitivity" concept, which is weaker than the "totally absent
+from the direct map" being proposed here, but it has kinda similar
+implementation challenges.
 
-> > +        VMSTATE_UINT64(env.guest_ssp, X86CPU),
-> > +        VMSTATE_END_OF_LIST()
-> > +    }
-> > +};
-> > +
-> > +static bool cet_needed(void *opaque)
-> > +{
-> > +    X86CPU *cpu = opaque;
-> > +    CPUX86State *env = &cpu->env;
-> > +
-> > +    return !!((env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK) ||
-> > +              (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT));
-> > +}
-> > +
-> > +static const VMStateDescription vmstate_cet = {
-> > +    .name = "cpu/cet",
-> > +    .version_id = 1,
-> > +    .minimum_version_id = 1,
-> > +    .needed = cet_needed,
-> > +    .fields = (VMStateField[]) {
-> > +        VMSTATE_UINT64(env.u_cet, X86CPU),
-> > +        VMSTATE_UINT64(env.s_cet, X86CPU),
-> > +        VMSTATE_END_OF_LIST()
-> > +    },
-> > +    .subsections = (const VMStateDescription * const []) {
-> > +        &vmstate_ss,
+Basically it introduces a thing called a "freetype" that extends the
+idea of migratetype. Like the existing idea of migratetype, it's used to
+physically group pages when allocating, and you can index free pages by
+it, i.e. each freetype gets its own freelist. But it can also encode
+other information than mobility (and the other stuff that's encoded in
+migratetype...).
 
-here:       ^^^^^^^^^^^^^
+Could it make sense to use that logic to just have entire pageblocks
+that are absent from the direct map? Then when allocating memory for the
+guest_memfd we get it from one of those pageblocks. Then we only have to
+flush the TLB if there's no memory left in pageblocks of this freetype
+(so the allocator has to flip another pageblock over to the "no direct
+map" freetype, after removing it from the direct map).
 
-> > +        NULL,
-> > +    },
-> > +};
-> > +
-> >   const VMStateDescription vmstate_x86_cpu = {
-> >       .name = "cpu",
-> >       .version_id = 12,
-> > @@ -1817,6 +1869,7 @@ const VMStateDescription vmstate_x86_cpu = {
-> >   #endif
-> >           &vmstate_arch_lbr,
-> >           &vmstate_triple_fault,
-> > +        &vmstate_cet,
-> 
-> missing &vmstate_ss
+I haven't yet investigated this properly, I'll start doing that now.
+But I thought I'd immediately drop this note in case anyone can
+immediately see a reason why this doesn't work.
 
-I made vmstate_ss as a subsection in vmstate_cet
+[0] https://lore.kernel.org/all/20250924-b4-asi-page-alloc-v1-0-2d861768041f@google.com/T/#t
 
-Regards,
-Zhao
+BTW, I think if the skip-flush flag is the only thing blocking this
+patchset, it would be great to merge it without it. Even if that means
+it's no use for Firecracker usecases that doesn't mean the underlying
+feature isn't valuable for _someone_. Then we can figure out how to make
+it work for Firecracker afterwards, one way or another.
 
+(Just to be transparent: my nefarious ulterior motive is that it would
+give me an angle to start merging code that will eventually support ASI.
+But, I'm serious that there are probably users who would like this
+feature even if it's slow!)
 
