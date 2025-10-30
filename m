@@ -1,364 +1,185 @@
-Return-Path: <kvm+bounces-61588-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61589-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D9E2C22549
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 21:49:10 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41DB6C22582
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 21:51:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 238E81AA413D
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:42:00 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 854DC34EBCA
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C15833BBC1;
-	Thu, 30 Oct 2025 20:38:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B688335076;
+	Thu, 30 Oct 2025 20:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="DsC38lET";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="yWVHoBY1"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="p4kS23KL"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+Received: from mout.web.de (mout.web.de [217.72.192.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A1E3271F8;
-	Thu, 30 Oct 2025 20:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71C35329E7E;
+	Thu, 30 Oct 2025 20:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761856724; cv=none; b=Ov73VzzqTfXZqbqHftEvaZF+5Y97CisqJh1q4EERtOheK2NU5OT/dy7VBOwMp3QtqSWozHoC6CRWLzlwiSX6IOgWydbURRFmlVXVpnPIcoHdOxFyggLtJk4ilbOU7cJyMGwLsOwMwHB00F/mpH+R1AfliT+1Nm1nJtTpAFQh9s0=
+	t=1761857469; cv=none; b=rScoKYeejiCctuob/NxMQWI2oVXK78me1n93fQJKRkHDxn8q1XZtmsH+aytnz1AnOVS9uY2Qcemqcpz5S+TsbfhRdZTPaLH/ps/f99feQjJSHz0TePEGjY0V5JxXhSDkOVooMnZmF0mDDd/y6Av1N344wRuh9SlbuIURxa6em9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761856724; c=relaxed/simple;
-	bh=Otc/CbhHm7gxjIcqJPP+5I/QV+QqqLRp7pDOdr60Iuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wq3hD2Nl5aQaSYo7/b/R7x5wWVAA4vA0lCwTt6kV57ewuFDhzxb1F///LbMIyV5RE4boMBlSae/dmz5P3IMDq+YyCpJdx1x1Coa7GQIyjgmkVHc825THfxn4vWsXPESlsdj+xcUuQX1y+Jcjuxdzi/9QH2E5bayumX4Hf0QxyeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=DsC38lET; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=yWVHoBY1; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 8C9A014001DA;
-	Thu, 30 Oct 2025 16:38:41 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Thu, 30 Oct 2025 16:38:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1761856721;
-	 x=1761943121; bh=p/8nyxWirOj4W+hYeRtMTG+81adajTiGVYuh/z6LXOE=; b=
-	DsC38lETCmk/UCR0NCEwSG/uMsWXv3KF8nqtv5mXrxnOSNXAuNpeCuWFpcBvb+Rd
-	qJBjT5+eedr1G7iNzvqfrWIs8YRmqr2Wn21vsB0Emgw2ammXeAjJNTKT8X3CRF7f
-	sgThj4w6Go/EWjZJV5hnPtkmvfi6+pv64RwRGY8broPbxr/l47tuMqaHoojfoTlR
-	x8NDbZZySjAGPtlXTOwEeVtGqPiFwdzOMit5oo4Jlrg3Xiv12ZeKHlQsjJ2dfLoo
-	Dd4zchU1KSWfT+xErx3Qp84XfWS++Q21slSUIXTr2Vf+w51bpou71HnP2egRiZFl
-	JYynwj6jAFgGlfam/THdRQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1761856721; x=
-	1761943121; bh=p/8nyxWirOj4W+hYeRtMTG+81adajTiGVYuh/z6LXOE=; b=y
-	WVHoBY1ck0fhOfaNyfXlK3MsltrJ16L4JMUjk4/8F1vhiZvK9+ByZAPE2Fr+lDEn
-	31wuiMAdQO9JUckxnFimEg9qgiR7Buz2VVu3gcL2K4BISNU112JvnuEfmtkVFPU/
-	WkKn9wiMCn/ibulsR45YnPo3Fgmy6RI+6Fk3aMG8co7oZG18ttXuQ58m649z8toG
-	uT5IEDW7hMQMIpoPYi22aGzWDJxfD1aqI4Iw7ZnDH3Ltcib06o+rASeKq7T4jlRO
-	a3slUeUe0CCl0KdMKPV16WqcZAYF7H/sqwJXPOUxsj0SzU4xV0yEV9o7Tp0CRH3k
-	UOAJNTt/tx/Lco0qxnstA==
-X-ME-Sender: <xms:z8wDaZLo5dD7ZxDV6II0FqH4O7jccYwOPy06udjLAl4RXkxI_trqqw>
-    <xme:z8wDaW3NyxbzGjLL5VL8Xo8PzYRVFCOzMbstflMQqva5Wle0FjF3VlMyKQrzHC5El
-    q3grRf5LAMq5wsIJswOZBD4TQxX7zoQ86zYjcR_77WmesqtyRs2M7A>
-X-ME-Received: <xmr:z8wDaVIW0bK32xwhEPjPTrLSw9kl2duIIdiJN2tr1QWnNDZ4iA2BxWRaG40>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduieejheelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
-    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
-    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
-    hffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopedvgedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtoheplhgvohhnsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopegrlhgvgidrfihilhhlihgrmhhsohhnsehrvgguhhgrthdrtghomhdprhgtphhtthho
-    pehlvghonhhrohesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhgghesnhhvihguih
-    grrdgtohhmpdhrtghpthhtoheprghkphhmsehlihhnuhigqdhfohhunhgurghtihhonhdr
-    ohhrghdprhgtphhtthhopegshhgvlhhgrggrshesghhoohhglhgvrdgtohhmpdhrtghpth
-    htoheptghhrhhishhtihgrnhdrkhhovghnihhgsegrmhgurdgtohhmpdhrtghpthhtohep
-    ughrihdquggvvhgvlheslhhishhtshdrfhhrvggvuggvshhkthhophdrohhrghdprhgtph
-    htthhopehiohhmmhhusehlihhsthhsrdhlihhnuhigrdguvghv
-X-ME-Proxy: <xmx:z8wDaaMiGwbWX7czDe5iiad6EIpQFwJ1yQIteZ0s-dAUbUDysgOuAQ>
-    <xmx:z8wDaWyOXEdvkv2nByzkDyCMSCs83bIcsse_dM2y2-1KvLiBXmR81Q>
-    <xmx:z8wDaSIr0J6kFZz5NMvG-wATtPZO5nIJ7XYS0F5DucQqhu-KLzZWag>
-    <xmx:z8wDaVrwkjuhIMeJQEscr9oJy00Glt_Gj0UMB1ES18qD9i2fTKlcuQ>
-    <xmx:0cwDacSuknghBUpyXTe85wMhy52PcPg_FWLjbD2hGGkyV4h7HjHD1dZT>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 30 Oct 2025 16:38:37 -0400 (EDT)
-Date: Thu, 30 Oct 2025 14:38:36 -0600
-From: Alex Williamson <alex@shazbot.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Leon Romanovsky
- <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton
- <akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, Christian
- =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, Jens Axboe
- <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org, Logan Gunthorpe
- <logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin
- Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251030143836.66cdf116@shazbot.org>
-In-Reply-To: <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
-References: <cover.1760368250.git.leon@kernel.org>
-	<72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
+	s=arc-20240116; t=1761857469; c=relaxed/simple;
+	bh=4TnDzFARb/hHkBWc55xRoXAP0oqfEr2SQqlingyQbz0=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Hz3FzT74zdm+LpvRnwoPa67fgSHhDmOZr05yvtDeIpNH9l8WBx0FMpg8W7uy43bqEXiQ0FyEsznZfMWB6NeHbs/Uc0VuMxVQlMZcmgO0rx+iXVFmkKMQEA7d9mMWgBJg/5qKy1ksUb6nuVwmCWKIU543HGf0VuRaMN+Zj27Bifc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=p4kS23KL; arc=none smtp.client-ip=217.72.192.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1761857463; x=1762462263; i=markus.elfring@web.de;
+	bh=UX+za681ZLF+H9xjQXJpwgYS36XQPi3DvT8rFDYYswI=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
+	 Subject:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=p4kS23KL3NHnIT3dQkJrWgZjv7az7eFapfcM2629V+KaGNRGKil4dORsQ3ngU54s
+	 hAjzr3xe6NXX9C9JGrENt3m23vXa2adnjFyfu59oMmXFbLA39C7S9iqm5sLa80JBc
+	 Y2W4jfhflofzM8QizoST3mRVJSValm419+7s5H0P1kfMAtnzjx7tDr70VI37XNQFW
+	 k2458k/ddv5FfYGuoF4xQQHra+ByvTz2KgtpYqu+kMrHi44/rr1B8U/LMGSzQNMkk
+	 PVu3h7c6HyPPonD6SDXERqiQWGMUzt0EUPKhRXCBGuWYQP19b0D2xOk+7Nx9CYYgt
+	 Rk184HtCMr26zo+PPg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.248]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1N8n4G-1wIxQP1FRu-00zGZd; Thu, 30
+ Oct 2025 21:51:03 +0100
+Message-ID: <ad42871b-22a6-4819-b5db-835e7044b3f1@web.de>
+Date: Thu, 30 Oct 2025 21:51:00 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ Alexander Graf <agraf@suse.de>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
+Content-Language: en-GB, de-DE
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
+ Miaoqian Lin <linmq006@gmail.com>
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] KVM: PPC: Use pointer from memcpy() call for assignment in
+ kvmppc_kvm_pv()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:6XSDec5DYQ+59fbNP5IzsgzWfTdFXyH3eZ1ElapDgQ1U38Km2Fb
+ lMfJ4kuLtgIN6aFggUBKLyFCYAzuJQZci0K75dhp3kAV19AWcDXgS2OMc9oLGBgSI7SwJde
+ srQxqcV1IGyWylwgYLAOd19hXIraxJsyV9LrvvmRvhYyStvPakJGltqUYsTaPo3J5eWDbXL
+ DnM5dTpiPGDj+36DuZTgg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:wc1zTz28d0g=;JqI+53ybK2zx2j4VKpxKpNGsLHp
+ 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
+ gg2uznPjKj0EvhViw+kjLCXNek=
 
-On Mon, 13 Oct 2025 18:26:11 +0300
-Leon Romanovsky <leon@kernel.org> wrote:
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index fe247d0e2831..56b1320238a9 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1511,6 +1520,19 @@ int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
->  		return vfio_pci_core_pm_exit(vdev, flags, arg, argsz);
->  	case VFIO_DEVICE_FEATURE_PCI_VF_TOKEN:
->  		return vfio_pci_core_feature_token(vdev, flags, arg, argsz);
-> +	case VFIO_DEVICE_FEATURE_DMA_BUF:
-> +		if (device->ops->ioctl != vfio_pci_core_ioctl)
-> +			/*
-> +			 * Devices that overwrite general .ioctl() callback
-> +			 * usually do it to implement their own
-> +			 * VFIO_DEVICE_GET_REGION_INFO handlerm and they present
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Thu, 30 Oct 2025 21:43:20 +0100
+Subject: [PATCH] KVM: PPC: Use pointer from memcpy() call for assignment i=
+n kvmppc_kvm_pv()
 
-Typo, "handlerm"
+A pointer was assigned to a variable. The same pointer was used for
+the destination parameter of a memcpy() call.
+This function is documented in the way that the same value is returned.
+Thus convert two separate statements into a direct variable assignment for
+the return value from a memory copy action.
 
-> +			 * different BAR information from the real PCI.
-> +			 *
-> +			 * DMABUF relies on real PCI information.
-> +			 */
-> +			return -EOPNOTSUPP;
-> +
-> +		return vfio_pci_core_feature_dma_buf(vdev, flags, arg, argsz);
->  	default:
->  		return -ENOTTY;
->  	}
-...
-> @@ -2459,6 +2482,7 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
->  			break;
->  		}
->  
-> +		vfio_pci_dma_buf_move(vdev, true);
->  		vfio_pci_zap_bars(vdev);
->  	}
->  
-> @@ -2482,6 +2506,10 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
->  
->  	ret = pci_reset_bus(pdev);
->  
-> +	list_for_each_entry(vdev, &dev_set->device_list, vdev.dev_set_list)
-> +		if (__vfio_pci_memory_enabled(vdev))
-> +			vfio_pci_dma_buf_move(vdev, false);
-> +
->  	vdev = list_last_entry(&dev_set->device_list,
->  			       struct vfio_pci_core_device, vdev.dev_set_list);
->  
+The source code was transformed by using the Coccinelle software.
 
-This needs to be placed in the existing undo loop with the up_write(),
-otherwise it can be missed in the error case.
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ arch/powerpc/kvm/powerpc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> new file mode 100644
-> index 000000000000..eaba010777f3
-> --- /dev/null
-> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> +static unsigned int calc_sg_nents(struct vfio_pci_dma_buf *priv,
-> +				  struct dma_iova_state *state)
-> +{
-> +	struct phys_vec *phys_vec = priv->phys_vec;
-> +	unsigned int nents = 0;
-> +	u32 i;
-> +
-> +	if (!state || !dma_use_iova(state))
-> +		for (i = 0; i < priv->nr_ranges; i++)
-> +			nents += DIV_ROUND_UP(phys_vec[i].len, UINT_MAX);
-> +	else
-> +		/*
-> +		 * In IOVA case, there is only one SG entry which spans
-> +		 * for whole IOVA address space, but we need to make sure
-> +		 * that it fits sg->length, maybe we need more.
-> +		 */
-> +		nents = DIV_ROUND_UP(priv->size, UINT_MAX);
-
-I think we're arguably running afoul of the coding style standard here
-that this is not a single simple statement and should use braces.
-
-> +
-> +	return nents;
-> +}
-> +
-> +static struct sg_table *
-> +vfio_pci_dma_buf_map(struct dma_buf_attachment *attachment,
-> +		     enum dma_data_direction dir)
-> +{
-> +	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
-> +	struct dma_iova_state *state = attachment->priv;
-> +	struct phys_vec *phys_vec = priv->phys_vec;
-> +	unsigned long attrs = DMA_ATTR_MMIO;
-> +	unsigned int nents, mapped_len = 0;
-> +	struct scatterlist *sgl;
-> +	struct sg_table *sgt;
-> +	dma_addr_t addr;
-> +	int ret;
-> +	u32 i;
-> +
-> +	dma_resv_assert_held(priv->dmabuf->resv);
-> +
-> +	if (priv->revoked)
-> +		return ERR_PTR(-ENODEV);
-> +
-> +	sgt = kzalloc(sizeof(*sgt), GFP_KERNEL);
-> +	if (!sgt)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	nents = calc_sg_nents(priv, state);
-> +	ret = sg_alloc_table(sgt, nents, GFP_KERNEL | __GFP_ZERO);
-> +	if (ret)
-> +		goto err_kfree_sgt;
-> +
-> +	sgl = sgt->sgl;
-> +
-> +	for (i = 0; i < priv->nr_ranges; i++) {
-> +		if (!state) {
-> +			addr = pci_p2pdma_bus_addr_map(priv->provider,
-> +						       phys_vec[i].paddr);
-> +		} else if (dma_use_iova(state)) {
-> +			ret = dma_iova_link(attachment->dev, state,
-> +					    phys_vec[i].paddr, 0,
-> +					    phys_vec[i].len, dir, attrs);
-> +			if (ret)
-> +				goto err_unmap_dma;
-> +
-> +			mapped_len += phys_vec[i].len;
-> +		} else {
-> +			addr = dma_map_phys(attachment->dev, phys_vec[i].paddr,
-> +					    phys_vec[i].len, dir, attrs);
-> +			ret = dma_mapping_error(attachment->dev, addr);
-> +			if (ret)
-> +				goto err_unmap_dma;
-> +		}
-> +
-> +		if (!state || !dma_use_iova(state))
-> +			sgl = fill_sg_entry(sgl, phys_vec[i].len, addr);
-> +	}
-> +
-> +	if (state && dma_use_iova(state)) {
-> +		WARN_ON_ONCE(mapped_len != priv->size);
-> +		ret = dma_iova_sync(attachment->dev, state, 0, mapped_len);
-> +		if (ret)
-> +			goto err_unmap_dma;
-> +		sgl = fill_sg_entry(sgl, mapped_len, state->addr);
-> +	}
-> +
-> +	/*
-> +	 * SGL must be NULL to indicate that SGL is the last one
-> +	 * and we allocated correct number of entries in sg_alloc_table()
-> +	 */
-> +	WARN_ON_ONCE(sgl);
-> +	return sgt;
-> +
-> +err_unmap_dma:
-> +	if (!i || !state)
-> +		; /* Do nothing */
-> +	else if (dma_use_iova(state))
-> +		dma_iova_destroy(attachment->dev, state, mapped_len, dir,
-> +				 attrs);
-> +	else
-> +		for_each_sgtable_dma_sg(sgt, sgl, i)
-> +			dma_unmap_phys(attachment->dev, sg_dma_address(sgl),
-> +					sg_dma_len(sgl), dir, attrs);
-
-Same, here for braces.
-
-> +	sg_free_table(sgt);
-> +err_kfree_sgt:
-> +	kfree(sgt);
-> +	return ERR_PTR(ret);
-> +}
-> +
-> +static void vfio_pci_dma_buf_unmap(struct dma_buf_attachment *attachment,
-> +				   struct sg_table *sgt,
-> +				   enum dma_data_direction dir)
-> +{
-> +	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
-> +	struct dma_iova_state *state = attachment->priv;
-> +	unsigned long attrs = DMA_ATTR_MMIO;
-> +	struct scatterlist *sgl;
-> +	int i;
-> +
-> +	if (!state)
-> +		; /* Do nothing */
-> +	else if (dma_use_iova(state))
-> +		dma_iova_destroy(attachment->dev, state, priv->size, dir,
-> +				 attrs);
-> +	else
-> +		for_each_sgtable_dma_sg(sgt, sgl, i)
-> +			dma_unmap_phys(attachment->dev, sg_dma_address(sgl),
-> +				       sg_dma_len(sgl), dir, attrs);
-> +
-
-Here too.
-
-> +	sg_free_table(sgt);
-> +	kfree(sgt);
-> +}
-...
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 75100bf009ba..63214467c875 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -1478,6 +1478,31 @@ struct vfio_device_feature_bus_master {
->  };
->  #define VFIO_DEVICE_FEATURE_BUS_MASTER 10
->  
-> +/**
-> + * Upon VFIO_DEVICE_FEATURE_GET create a dma_buf fd for the
-> + * regions selected.
-> + *
-> + * open_flags are the typical flags passed to open(2), eg O_RDWR, O_CLOEXEC,
-> + * etc. offset/length specify a slice of the region to create the dmabuf from.
-> + * nr_ranges is the total number of (P2P DMA) ranges that comprise the dmabuf.
-> + *
-
-Probably worth noting that .flags should be zero, I see we enforce
-that.  Thanks,
-
-Alex
-
-> + * Return: The fd number on success, -1 and errno is set on failure.
-> + */
-> +#define VFIO_DEVICE_FEATURE_DMA_BUF 11
-> +
-> +struct vfio_region_dma_range {
-> +	__u64 offset;
-> +	__u64 length;
-> +};
-> +
-> +struct vfio_device_feature_dma_buf {
-> +	__u32	region_index;
-> +	__u32	open_flags;
-> +	__u32   flags;
-> +	__u32   nr_ranges;
-> +	struct vfio_region_dma_range dma_ranges[];
-> +};
-> +
->  /* -------- API for Type1 VFIO IOMMU -------- */
->  
->  /**
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 2ba057171ebe..ae28447b3e04 100644
+=2D-- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -216,8 +216,7 @@ int kvmppc_kvm_pv(struct kvm_vcpu *vcpu)
+=20
+ 			shared &=3D PAGE_MASK;
+ 			shared |=3D vcpu->arch.magic_page_pa & 0xf000;
+-			new_shared =3D (void*)shared;
+-			memcpy(new_shared, old_shared, 0x1000);
++			new_shared =3D memcpy(shared, old_shared, 0x1000);
+ 			vcpu->arch.shared =3D new_shared;
+ 		}
+ #endif
+=2D-=20
+2.51.1
 
 
