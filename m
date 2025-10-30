@@ -1,150 +1,121 @@
-Return-Path: <kvm+bounces-61450-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61451-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC904C1E080
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 02:35:27 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14E65C1E122
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 02:58:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ABCC44E475A
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 01:35:26 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7335D347587
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 01:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279E41F3BA2;
-	Thu, 30 Oct 2025 01:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E690D2E264C;
+	Thu, 30 Oct 2025 01:57:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nNII6Rx3"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="a3T3SSZo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D03D286D63;
-	Thu, 30 Oct 2025 01:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6232DBF69;
+	Thu, 30 Oct 2025 01:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761788116; cv=none; b=sPXW/WD20pgoecDM0j534tIHJGOnWAABzWjdY2w5RPlkMvtQbR9dO+p5A6JASy//HYuJD98Jjb65Mk1B5roKBfz/eZCLu8iWls9xJBn5+NZmWiblWxzX2/EGSWLgmeybAXZV7P5XDkddRzDRQqImSuA8/vzA//iAKX/KNMdGArA=
+	t=1761789478; cv=none; b=dC6IxQw4UEgJW2ICbWSomjte99RXs3vH7/baYLyOE/3pyY0/DJInpZlaDwZrTQgTQBO4RcooAzRs7IYV8TBXVG3S+Mc3Bn1kXi8/WKHhADsTgdNnL/AJdRD3pduyS6BmoPDa5OUxm5rf4uWwn1vRF4UPotUDjcx9VDvER4h+P9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761788116; c=relaxed/simple;
-	bh=h5HItmxxtllaa4qYDcONQvigJygCAvXadjZ6K1zn5fY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sUbjweMPSw5W1qRwXnb5Fc5caOLly9UJ+kg9w8pFrnwpabQrCe/2wRSrcVYCR6+A2OHeQH2UybnXWzeoqBb2w04ax18e9IRvQbB/KsQza8UKeVKGF1BSyfPzZ3vcdCPoCQY52LtVmKWb9dcYr6qAp17NfPjf7bL/H3M57UnJc8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nNII6Rx3; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761788112; x=1793324112;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=h5HItmxxtllaa4qYDcONQvigJygCAvXadjZ6K1zn5fY=;
-  b=nNII6Rx3SNi3Q3iBTdkwKg2H0pUiZhF+0lhXb4HlS75ypfAwoUXt6Z0a
-   SxiHuCfPRzWTfhH+FOAXPj76KjSPn4MPw2bZVqdlF38HvCa4iT293lfpe
-   XhSY3eInL02dtqzTSeCscvOUzGkPHSJyMQyL/Vl5wXt+7Dq9UTxK5tq3S
-   j8/mMWL8sT8HkejUYzQbMnBz0KRrqRUQECT/6mZspaHRdoT6H4sSFazIh
-   vriR2B/OETV4fdaRdxeaaJI6p+D0WQVscMMiO1KYdBevnZCcqNeRo1obp
-   T+9r8iEDoBZPL1n0UlpLgEU8a+AvgSouGygoz/beIM7PiEl4n+3Aqq3bR
-   w==;
-X-CSE-ConnectionGUID: as8z8MheT7ecwESeW1fpmw==
-X-CSE-MsgGUID: ljvtp64pRLeFsbpsNTHjUA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="75371548"
-X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="75371548"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 18:35:12 -0700
-X-CSE-ConnectionGUID: RC5MJzwKQhCcmrUa93TuXA==
-X-CSE-MsgGUID: 2O29+gOkRDGwcrhrp2Ga4A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="185075296"
-Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 18:35:07 -0700
-Message-ID: <d5b23bf0-aa77-4f11-9026-e664a8257a16@linux.intel.com>
-Date: Thu, 30 Oct 2025 09:35:05 +0800
+	s=arc-20240116; t=1761789478; c=relaxed/simple;
+	bh=2uOKnW0pKvL26iNvB7GQ4XEPhUn2FEw/gkksgunO5Mg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rVJGVXYou9FyaEnQzj0nSKewgfZTGbO1b98O2eqNzZKFfp6PT3/hQkObFAGrLzWYrwW2iG7/S7QLMRgs4b+gOwBISoASpvSmRxdYdQohAWZMRFl7MAzxbwfVPGWiDDPJifuuCc9eKnvzxYy9XS/tloq9uKKtuxDDlqswGVFMecc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=a3T3SSZo; arc=none smtp.client-ip=113.46.200.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=zwnuXeBVQqXvOjZRpTPcmO5rmI6DRWb7MeDjk6XU674=;
+	b=a3T3SSZoGQtcn7VlXgrjgbMWfl5cPqMnb7IygPHgln+PsbQCt+F1/SPpQg/9q7g/WiNG8rsy4
+	XiSfb+rLvA9v5lkzblMPwZVOHoJrYti5lvZ1t2/0co8jTBK9GUmCPh2NaydRazEjOkDNnYr+tp5
+	V/WPLb7MR7mtO6GBsxAgR20=
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4cxnK03HKnzcb0v;
+	Thu, 30 Oct 2025 09:56:20 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id 923B9180B62;
+	Thu, 30 Oct 2025 09:57:45 +0800 (CST)
+Received: from huawei.com (10.90.31.46) by dggpemf500015.china.huawei.com
+ (7.185.36.143) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 30 Oct
+ 2025 09:57:44 +0800
+From: Longfang Liu <liulongfang@huawei.com>
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
+	<jonathan.cameron@huawei.com>
+CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <liulongfang@huawei.com>
+Subject: [PATCH v12 0/2] update live migration configuration region
+Date: Thu, 30 Oct 2025 09:57:42 +0800
+Message-ID: <20251030015744.131771-1-liulongfang@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 13/23] KVM: selftests: TDX: Use KVM_TDX_CAPABILITIES
- to validate TDs' attribute configuration
-To: Sagi Shahar <sagis@google.com>
-Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
- Andrew Jones <ajones@ventanamicro.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Erdem Aktas <erdemaktas@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
- "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
- <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>,
- Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-References: <20251028212052.200523-1-sagis@google.com>
- <20251028212052.200523-14-sagis@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20251028212052.200523-14-sagis@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
+On the new hardware platform, the configuration register space
+of the live migration function is set on the PF, while on the
+old platform, this part is placed on the VF.
 
+Change v11 -> v12
+	Standardize register BIT operations
 
-On 10/29/2025 5:20 AM, Sagi Shahar wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> Make sure that all the attributes enabled by the test are reported as
-> supported by the TDX module.
-More accurately, supported by both the TDX module and KVM.
-KVM filters out the attributes not supported by itself.
+Change v10 -> v11
+	Remove redundant register read/write helper functions
 
-Otherwise,
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+Change v9 -> v10
+	Update the name of the configuration mode
 
->
-> This also exercises the KVM_TDX_CAPABILITIES ioctl.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Co-developed-by: Sagi Shahar <sagis@google.com>
-> Signed-off-by: Sagi Shahar <sagis@google.com>
-> ---
->   tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c | 14 ++++++++++++++
->   1 file changed, 14 insertions(+)
->
-> diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-> index 7a622b4810b1..2551b3eac8f8 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-> @@ -231,6 +231,18 @@ static void vm_tdx_filter_cpuid(struct kvm_vm *vm,
->   	free(tdx_cap);
->   }
->   
-> +static void tdx_check_attributes(struct kvm_vm *vm, uint64_t attributes)
-> +{
-> +	struct kvm_tdx_capabilities *tdx_cap;
-> +
-> +	tdx_cap = tdx_read_capabilities(vm);
-> +
-> +	/* Make sure all the attributes are reported as supported */
-> +	TEST_ASSERT_EQ(attributes & tdx_cap->supported_attrs, attributes);
-> +
-> +	free(tdx_cap);
-> +}
-> +
->   void vm_tdx_init_vm(struct kvm_vm *vm, uint64_t attributes)
->   {
->   	struct kvm_tdx_init_vm *init_vm;
-> @@ -250,6 +262,8 @@ void vm_tdx_init_vm(struct kvm_vm *vm, uint64_t attributes)
->   	memcpy(&init_vm->cpuid, cpuid, kvm_cpuid2_size(cpuid->nent));
->   	free(cpuid);
->   
-> +	tdx_check_attributes(vm, attributes);
-> +
->   	init_vm->attributes = attributes;
->   
->   	vm_tdx_vm_ioctl(vm, KVM_TDX_INIT_VM, 0, init_vm);
+Change v8 -> v9
+	Update the version name for driver matching
+
+Change v7 -> v8
+	Resolve hardware compatibility issues.
+
+Change v6 -> v7
+	Update the comment of the live migration configuration scheme.
+
+Change v5 -> v6
+	Update VF device properties
+
+Change v4 -> v5
+	Remove BAR length alignment
+
+Change v3 -> v4
+	Rebase on kernel 6.15
+
+Change v2 -> v3
+	Put the changes of Pre_Copy into another bugfix patchset.
+
+Change v1 -> v2
+	Delete the vf_qm_state read operation in Pre_Copy
+
+Longfang Liu (2):
+  crypto: hisilicon - qm updates BAR configuration
+  hisi_acc_vfio_pci: adapt to new migration configuration
+
+ drivers/crypto/hisilicon/qm.c                 |  27 ++++
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 130 +++++++++++++-----
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  23 +++-
+ include/linux/hisi_acc_qm.h                   |   3 +
+ 4 files changed, 144 insertions(+), 39 deletions(-)
+
+-- 
+2.33.0
 
 
