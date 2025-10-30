@@ -1,105 +1,110 @@
-Return-Path: <kvm+bounces-61473-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61474-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5664BC1FCC1
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 12:25:30 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1665DC1FDD2
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 12:42:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CCC43B47FF
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 11:25:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B7EBA3434C2
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 11:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31B2351FCA;
-	Thu, 30 Oct 2025 11:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F9433F370;
+	Thu, 30 Oct 2025 11:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OK/iWfsG"
+	dkim=pass (1024-bit key) header.d=mail.yodel.dev header.i=@mail.yodel.dev header.b="BR9/mlZc"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from pc232-55.mailgun.net (pc232-55.mailgun.net [143.55.232.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1A533F365;
-	Thu, 30 Oct 2025 11:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C0132D437
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 11:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.55.232.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761823520; cv=none; b=KA34WsAmpkb0qpJ0u6WPtE+WbAl5fOc8K3IV8abNws3tvBwt9+f0r9iGbuhUC6XTWINeGuv2rOXnG23jdGHxsJ3TBpPM9msLSemMKqLIB4aSIDs1Yb/IpjtY63wBsyVWLatRZiKQGVVV8hyqpN6MIJC8P5YkCeiXJwxd0Evahkc=
+	t=1761824568; cv=none; b=lFG0uYCWw8nOoYrcfBnP3/ygKltCWv4gSo+L9oq7ygFSU79V0vTIH/ijmyQhgDXsZFabGEnUyfWKcnOBTUq/OJJ8x0xg1Scxl1NiIGtia8qkzxx24PnY4dTbVX0hoAI2ygfCR+BmqdccTwhnOma2sZBqbIXJOgmttjzDphC+kpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761823520; c=relaxed/simple;
-	bh=6pRLhXQTg48LccghaYa5grB/ldAS7xutWQXqYeaONAI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OPSBqlKPZZ8xF01HgIIFprk/jLJ2NnD/hWenzUwRNuFl/r82dq21hgdE3xL8HmCDEefwtSQDg5eMi63MRSfkUFe4gH9c233SECWF/EyAJBLkHWe5YzelLwPwiGuZDM/0soCMW3YBDyNHCfYz8WxSa+fPKdpxaWk32i56t+i4Mno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OK/iWfsG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F4D9C4CEF8;
-	Thu, 30 Oct 2025 11:25:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761823520;
-	bh=6pRLhXQTg48LccghaYa5grB/ldAS7xutWQXqYeaONAI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OK/iWfsGKPH76eTFnRmfEgmrgWV+XlSP07CDbXrbXrT5kabli0le+L3nLFvZyLmg3
-	 uDtdKVLtBAJQDlhIdZDjbKkD+O9erGphWHpSUwXCKM9IwBRGDUms4h4NQfFswyZmhP
-	 SqGFIHJ4BGbAUAQk2Z81nCkGtGd4wFoTkbcJFbzPuKQsO/WxoOgtIpcMQXqDTdZaiY
-	 4UZtYM1KAgwl5L56fuUCkhFk5NWPCLZG3YAWpaT1zfVqau8wKZc6t66BbWzNC6k/Gz
-	 mf2OQrEKHAjd0eTObb7YTHD981blAirH/sop1L0IU1eDwAfY0FwExedoSdbDeCk1oE
-	 m62/WGvW+HHUg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vEQmM-00000000xUk-0abm;
-	Thu, 30 Oct 2025 11:25:18 +0000
-Date: Thu, 30 Oct 2025 11:25:17 +0000
-Message-ID: <86tszgvdgi.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: arm64: Make ID_PFR1_EL1.GIC writable
-In-Reply-To: <aPiBH1_WZicoE7Od@linux.dev>
-References: <20251013083207.518998-1-maz@kernel.org>
-	<20251013083207.518998-2-maz@kernel.org>
-	<aPiBH1_WZicoE7Od@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1761824568; c=relaxed/simple;
+	bh=yZoChXLznwSscAm+JJJt2BYR/avxL8jDXJ0N3C+Wfi4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SSYsTwoHZzXS/hn459M06LjQBqgT3NGvLrfaksTtR1PhsPECLn4C+xmIje47cu5FOiIrB4sKaqv97PtWZ2W0bPIq8iEwzNcl/FnwK9pYTTH3lEGjAdtCIcFP3/mZtFKW+XsWbZeCYRClLYzHDFSmmy0brwPyoVBOrpfwbwiCUD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yodel.dev; spf=pass smtp.mailfrom=mail.yodel.dev; dkim=pass (1024-bit key) header.d=mail.yodel.dev header.i=@mail.yodel.dev header.b=BR9/mlZc; arc=none smtp.client-ip=143.55.232.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yodel.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.yodel.dev
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mail.yodel.dev; q=dns/txt; s=dkim; t=1761824563; x=1761831763;
+ h=Content-Transfer-Encoding: Content-Type: In-Reply-To: From: From: References: Cc: To: To: Subject: Subject: MIME-Version: Date: Message-ID: Sender: Sender;
+ bh=BX8WMM54/X2z4JKKterrQ+u3+tKia/gkKKQAUuSGQIw=;
+ b=BR9/mlZcGJOgzJb9C5XSJSqttREsKlgcbgvKqjAs3SPCxp5hoFCR5MAVUXL4FFT6MLi5Q318/y3y4cWHIoTIzt8mRR/z6qqWSOd13xPSYf5mkUPXzODliEMGOMsAB93HYj+QD+3GmICuQyvQaKXd2y2JERaVYXVmsG/zg/0bGCU=
+X-Mailgun-Sid: WyI1YzlhMSIsImt2bUB2Z2VyLmtlcm5lbC5vcmciLCIzM2U5MjAiXQ==
+Received: from mail.yodel.dev (mail.yodel.dev [35.209.39.246]) by
+ 82b7b0aa6a9490e1d37f90288d42dfc2781b07d0e3a3464ca437034ccc894751 with SMTP id
+ 69034f33e4319a89b6306c09; Thu, 30 Oct 2025 11:42:43 GMT
+X-Mailgun-Sending-Ip: 143.55.232.55
+Sender: yodel.eldar=yodel.dev@mail.yodel.dev
+Message-ID: <f1a0f03f-54b8-4fa8-8e03-b00a617bd462@yodel.dev>
+Date: Thu, 30 Oct 2025 06:42:41 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Subject: Re: [PATCH 0/7] cpus: Constify some CPUState arguments
+To: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ Kyle Evans <kevans@freebsd.org>, Warner Losh <imp@bsdimp.com>,
+ kvm@vger.kernel.org, Laurent Vivier <laurent@vivier.eu>
+References: <20250120061310.81368-1-philmd@linaro.org>
+ <395c7c86-08b1-4af4-a5ca-012a9aa89339@linaro.org>
+ <CAAjaMXZSkxCgzdC6w-onUxVxU_ZW5fiBtW5-ioeKaXwD_7tJeQ@mail.gmail.com>
+Content-Language: en-US
+From: Yodel Eldar <yodel.eldar@yodel.dev>
+Autocrypt: addr=yodel.eldar@yodel.dev; keydata=
+ xjMEZxqXdhYJKwYBBAHaRw8BAQdAkletQdG3CLyANZyuf2t7Z9PK4b6HiT+DdSPUB2mHzmPN
+ I1lvZGVsIEVsZGFyIDx5b2RlbC5lbGRhckB5b2RlbC5kZXY+wpkEExYKAEECGwMFCQOcG00F
+ CwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQTTzRjNQG27imap+N+V7k+3NmVNrAUCaNWASwIZ
+ AQAKCRCV7k+3NmVNrNnSAPoDjQXa6v7ZzdQSaLdRfAQy/5SsUucv+zp3WAP4pXdgJQEAzMMC
+ Ctx4l6b13Fs2hZdRXEnF/4BZ9t1K68nwzZOV3QnOOARnGpd2EgorBgEEAZdVAQUBAQdAKPIy
+ 3W/DKFsm1e+31zoqmOY0pqz8vjIM846wM6lEY2QDAQgHwn4EGBYIACYCGwwWIQTTzRjNQG27
+ imap+N+V7k+3NmVNrAUCaNWG7QUJA5wi9wAKCRCV7k+3NmVNrPusAQCQDQwETy7VT6UhHPho
+ TkrQnsNqQfFU3tXqCTiViToktQD7B/U2/to97hQIJCWbK6yd3T+KPZJPMcHMg2XRyedUvgA=
+In-Reply-To: <CAAjaMXZSkxCgzdC6w-onUxVxU_ZW5fiBtW5-ioeKaXwD_7tJeQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, 22 Oct 2025 08:00:47 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+
+On 30/10/2025 01:59, Manos Pitsidianakis wrote:
+> On Wed, Oct 29, 2025 at 7:59 PM Philippe Mathieu-Daudé
+> <philmd@linaro.org> wrote:
+>>
+>> On 20/1/25 07:13, Philippe Mathieu-Daudé wrote:
+>>> This is in preparation of making various CPUClass handlers
+>>> take a const CPUState argument.
+>>>
+>>> Philippe Mathieu-Daudé (7):
+>>>     qemu/thread: Constify qemu_thread_get_affinity() 'thread' argument
+>>>     qemu/thread: Constify qemu_thread_is_self() argument
+>>>     cpus: Constify qemu_cpu_is_self() argument
+>>>     cpus: Constify cpu_get_address_space() 'cpu' argument
+>>>     cpus: Constify cpu_is_stopped() argument
+>>>     cpus: Constify cpu_work_list_empty() argument
+>>>     accels: Constify AccelOpsClass::cpu_thread_is_idle() argument
+>>
+>> ping?
+>>
 > 
-> Hey,
+> Hi Philippe, I can't find this series in my mailbox and it's not on
+> lore.kernel.org/patchew/lists.gnu.org either. Resend?
 > 
-> On Mon, Oct 13, 2025 at 09:32:05AM +0100, Marc Zyngier wrote:
-> > Similarly to ID_AA64PFR0_EL1.GIC, relax ID_PFR1_EL1.GIC to be writable.
-> 
-> This looks fine to me, although I do wonder if we should just allow
-> userspace to write whatever value it wants to the 32-bit ID registers
-> and be done with it.
 
-That's a good point. Nobody really cares about 32bit anyway, and I'd
-be happy to just let the VMM write whatever it wants. Might be a bit
-harder to backport, but whoever is interested in AArch32 will be able
-to do it.
+Hi,
 
-Thanks,
+Looks like it landed on the kvm mailing list via Cc but was left out of
+qemu-devel, despite the seemingly correct To header:
 
-	M.
+https://lore.kernel.org/kvm/20250120061310.81368-1-philmd@linaro.org/
 
--- 
-Without deviation from the norm, progress is not possible.
+Regards,
+Yodel
 
