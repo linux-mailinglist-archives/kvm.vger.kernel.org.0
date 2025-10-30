@@ -1,117 +1,112 @@
-Return-Path: <kvm+bounces-61442-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61443-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAA6BC1DDCB
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 01:09:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A98B5C1DE1A
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 01:18:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 38C224E44C8
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 00:09:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5F91A4E18B1
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 00:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD197D07D;
-	Thu, 30 Oct 2025 00:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15811D5CD1;
+	Thu, 30 Oct 2025 00:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dr93NecO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U1tQa/lU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DFE3D544;
-	Thu, 30 Oct 2025 00:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5CC5464D
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 00:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761782949; cv=none; b=ICfnQWRAxSStdKxuxLxvd4fYAeS+wDhlaILJF+9ilKF3/QGg4nClrk+nQTcvNU4k4nAEeIPWiz/504ALd0onN4ZHb5W6TFvUSouCkFqUl6W2FJ9F0jkvmDZUeKkOuiKYbgvcBVxeoAfOzRTjKX44fypa53qgsL4nZgQDb6EA68M=
+	t=1761783503; cv=none; b=SrmkszD29Uph96MLZbyGC+L+sazf5fy9KngTAkp1TVxDzWJlaXoKTKKF2D+adpmAF6N1pPqr3GIC7xTduPnZYQlXCLcF4AuX8jND8MvGRBHhv7wzTVV7sMOrc2oM4g8TbL8K8AWSpWUH8pyw4pPyAYxXD1cVP4s23gmn+YbtfWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761782949; c=relaxed/simple;
-	bh=9T3qGIWLqPgTfWSC6HYyKLfuop6Z7yPxOThtSja9JWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lwsqgz6+6/nsm47w6GFrJ1GgTRbbFSByCscrYLWMBl5md+HlpqdXU1cQAfnKq8mkqnCqLhuw1fF24BOmuRugNhC2ky8RqBQSQTyLL1EoUVfSUU12Z6SeZSa6tGrf9TmlwxldmdK12oarGrPpHiQpbiOnxm+Xi4m0I4Z1n0OYlIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dr93NecO; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761782948; x=1793318948;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9T3qGIWLqPgTfWSC6HYyKLfuop6Z7yPxOThtSja9JWc=;
-  b=Dr93NecOroHdd+im00NOtlWpPL/hbln54AFGxcDyE1avXyolm1ddm5LM
-   4DiW+7dSysHuru+LrhvynX8vu/1EYg0YoZERTqsAg+gB91FpY0gy7skOi
-   e2P8H1mX/PvldNKsEKo6ojuzRGO2Ma93lAmxJhaXFnvys61LjwMzjmog5
-   GM+PuTvqTVnQOKH1BEP2lKxIBJoZEGIQZTEvtkJ7tbRPOfRhL5MIbmwKj
-   LZkQHpu668FklmORoQfkUCQlFhA1HUaH4OKjjz7Ys7kaCkLeM7VzozfuV
-   KeMt7hzQmtTRtY+eNrOGLswOX0rY45DK5NzJHxQqpcJDpToYlhhyANiZs
-   A==;
-X-CSE-ConnectionGUID: 0YTVX4llQgakmqj7LMhggg==
-X-CSE-MsgGUID: 9YEl4qqARICIW9B8o3Wn6g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="62941541"
-X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="62941541"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 17:09:07 -0700
-X-CSE-ConnectionGUID: p0oyC4B0TC6zgDV+fX2N5A==
-X-CSE-MsgGUID: /CwW2YkrQrKtby4WMSOmyw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="185462529"
-Received: from vverma7-desk1.amr.corp.intel.com (HELO desk) ([10.124.223.151])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 17:09:07 -0700
-Date: Wed, 29 Oct 2025 17:08:59 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>
-Subject: Re: [PATCH v3 2/3] x86/vmscape: Replace IBPB with branch history
- clear on exit to userspace
-Message-ID: <20251030000859.ufyrqzyhvro44mol@desk>
-References: <20251027-vmscape-bhb-v3-0-5793c2534e93@linux.intel.com>
- <20251027-vmscape-bhb-v3-2-5793c2534e93@linux.intel.com>
- <aQKZmoabW0M9STCa@google.com>
+	s=arc-20240116; t=1761783503; c=relaxed/simple;
+	bh=JB2LEI4A5f74efQFX9e5urcPJQDPxTpuN3kVdrHIaT0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=G53nObXuyCOnl7UTMo1WV5kcRGgnIw3gNeXadwRlOGoOSNOyVvTTeCdSoISAwDop2vqqdL94Sl4TKiSA5jyffIeVqPPr9ZLGGnbChuo8hieskGwgh9d662HnfaiuKnVCDz7mvn/SlQ1Dtk9ZcOh+6EO6+8Ih1xlkvsYsTzStS0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U1tQa/lU; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-340410b11b8so371150a91.2
+        for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 17:18:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761783501; x=1762388301; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/APfDoAjvMMG72cPIAEX8+eFsFzG2tjZbjY4ARPdXLk=;
+        b=U1tQa/lUxRET/55TrDwLmrrNvr9F3S3XMubLthBkpb2ZVAYLBQOCwH42i+swheWPsn
+         K+9IM79yaiW1SshvqUOj3Gv7CSszZphZ5rtr3urSrTUZrDuMjhKTrZkIN/KrWKzVXVm2
+         BdvJK8q/D0unbnJQu82djqqZmMr8JzIbctJogNwm6Rj8xWfOk/Sfe04XA7/4CLxVcqce
+         N3r+DBdQaX4YI/vdjzMwl2q5uSi9ef+SpQAfV6PSga6RXpYutCR32U3g7V5TNzMF0zgY
+         i5+FZxJNd0VCzXjMrhwFtwz/9R1QYWeDlqbbb6ZNOGpwOa6wZzVt59lNdqSk074d7FCi
+         rRRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761783501; x=1762388301;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/APfDoAjvMMG72cPIAEX8+eFsFzG2tjZbjY4ARPdXLk=;
+        b=CV+fdraiN1zfhFqpOZTzAFuZRxNhPnUKEZKD9LnmfHy5eNt93sYQ4R6FM5/AGXJGE8
+         WlZXZ+pqcSjibZ0Rb7QOaaDOWLtmDZk4O5lKEgzhVOrcm15BNvqJPINBdSfqzRpufDG9
+         ZeBmq/48w93YdVSBGrkAl5Yy0mUDdQukj/WfE5QMBSk3xlo6DWjksi+171MlX1TTz5BV
+         8q9/c8rdNDJ+68KNqst0B155qz9DzLMZ7TFYTIFPlBENCNkvMgHFHD1moBHds0AX/KHA
+         YrxFrmoxvHg/S7k3/R4N7njoRBo9PGINz6B/NBgF4MIjQs59APJXLsoR9X5I2GQ7HHIM
+         ZMVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQRKDJ+2JU5nNcB9s1a8E4/KGPkNhTbGzz6xaN/Qz0zzbc2l+HxZqeRHEciIiTh36Ti6w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxuDTWUoFh2+S8AB2rubEVtLaarsPDPKo0nTcz6s6iefdZXALE
+	dTM7iRBVyIh1IEgrNIlHAlAf6YxIQ36rBJvMpg43Y+2w8IYNNFjG2WXFrpBW64jTGmITex97/Cz
+	dke1bJA==
+X-Google-Smtp-Source: AGHT+IGgocyQQIi5AG23kjZirIFz98FRrrSK1VO35VHRCnkojOzL21/TedfvF0EX8P2/KGVYsS95rTUFxFY=
+X-Received: from pjsj7.prod.google.com ([2002:a17:90a:7347:b0:33d:61e3:893])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3912:b0:340:299f:e244
+ with SMTP id 98e67ed59e1d1-3404c41b811mr1502709a91.12.1761783500906; Wed, 29
+ Oct 2025 17:18:20 -0700 (PDT)
+Date: Wed, 29 Oct 2025 17:18:19 -0700
+In-Reply-To: <20251029-verw-vm-v1-2-babf9b961519@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aQKZmoabW0M9STCa@google.com>
+Mime-Version: 1.0
+References: <20251029-verw-vm-v1-0-babf9b961519@linux.intel.com> <20251029-verw-vm-v1-2-babf9b961519@linux.intel.com>
+Message-ID: <aQKuy34wmCWvXcMS@google.com>
+Subject: Re: [PATCH 2/3] x86/mmio: Rename cpu_buf_vm_clear to cpu_buf_vm_clear_mmio_only
+From: Sean Christopherson <seanjc@google.com>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
+	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Tao Zhang <tao1.zhang@intel.com>, 
+	Jim Mattson <jmattson@google.com>, Brendan Jackman <jackmanb@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Oct 29, 2025 at 03:47:54PM -0700, Sean Christopherson wrote:
-> On Mon, Oct 27, 2025, Pawan Gupta wrote:
-> > IBPB mitigation for VMSCAPE is an overkill for CPUs that are only affected
-> > by the BHI variant of VMSCAPE. On such CPUs, eIBRS already provides
-> > indirect branch isolation between guest and host userspace. But, a guest
-> > could still poison the branch history.
-> > 
-> > To mitigate that, use the recently added clear_bhb_long_loop() to isolate
-> > the branch history between guest and userspace. Add cmdline option
-> > 'vmscape=on' that automatically selects the appropriate mitigation based
-> > on the CPU.
-> > 
-> > Acked-by: David Kaplan <david.kaplan@amd.com>
-> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> > ---
-> >  Documentation/admin-guide/hw-vuln/vmscape.rst   |  8 ++++
-> >  Documentation/admin-guide/kernel-parameters.txt |  4 +-
-> >  arch/x86/include/asm/cpufeatures.h              |  1 +
-> >  arch/x86/include/asm/entry-common.h             | 12 +++---
-> >  arch/x86/include/asm/nospec-branch.h            |  2 +-
-> >  arch/x86/kernel/cpu/bugs.c                      | 53 ++++++++++++++++++-------
-> >  arch/x86/kvm/x86.c                              |  5 ++-
-> >  7 files changed, 61 insertions(+), 24 deletions(-)
+On Wed, Oct 29, 2025, Pawan Gupta wrote:
+> cpu_buf_vm_clear static key is only used by the MMIO Stale Data mitigation.
+> Rename it to avoid mixing it up with X86_FEATURE_CLEAR_CPU_BUF_VM.
 > 
-> For the KVM changes,
-> 
-> Acked-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> ---
 
-Thank you.
+...
+
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index f87c216d976d7d344c924aa4cc18fe1bf8f9b731..451be757b3d1b2fec6b2b79157f26dd43bc368b8 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -903,7 +903,7 @@ unsigned int __vmx_vcpu_run_flags(struct vcpu_vmx *vmx)
+>  	if (!msr_write_intercepted(vmx, MSR_IA32_SPEC_CTRL))
+>  		flags |= VMX_RUN_SAVE_SPEC_CTRL;
+>  
+> -	if (static_branch_unlikely(&cpu_buf_vm_clear) &&
+> +	if (static_branch_unlikely(&cpu_buf_vm_clear_mmio_only) &&
+>  	    kvm_vcpu_can_access_host_mmio(&vmx->vcpu))
+>  		flags |= VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO;
+
+The use in vmx_vcpu_enter_exit() needs to be renamed as well.  The code gets
+dropped in patch 3, but intermediate builds will fail.
 
