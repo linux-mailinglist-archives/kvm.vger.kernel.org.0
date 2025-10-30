@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-61600-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61601-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25389C2297A
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 23:45:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D3D3C22989
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 23:46:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A00741A62513
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 22:44:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3086B42549C
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 22:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA420340A5A;
-	Thu, 30 Oct 2025 22:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55631344045;
+	Thu, 30 Oct 2025 22:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w2CQc3uT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m4xpH9Pv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF9F33E350
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 22:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA12633E36F
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 22:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761864177; cv=none; b=qaiZabOO8zbKH9mX9K0dZevFz33Qq1hHZkOHzQz2M5y5hMO/3ZdPumGYy+aO15t1XkH9ffcPYh1PLDF0ndz/de48FHnXdU5cFG6NUOsXJyu7d5dmTYG5UxgUdwZFQMjz8CrTNyz8KL5zDMBzYezEryddAYT0uAV0UGe6B7P4sBY=
+	t=1761864178; cv=none; b=gsDoad7NlBYci/0/e+M//PkWm6ezGL7TKdX6BhIxPGtehyeUtYcTD1rrJz7DqbJ9QyplZcvL0TnwGA+QDNBZyk465ewj482LKImBYaUaVOYWfoYgZQixO1MUUpvZk4G1p8+S9bRLp4Ve+6bi2h/lJ2N36v/x56r/u0gL8krBcJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761864177; c=relaxed/simple;
-	bh=MchINskavBlkrWKmsZW/V/NyWaLoR3Fo1XQuVOdWnzU=;
+	s=arc-20240116; t=1761864178; c=relaxed/simple;
+	bh=Q3IKaU0lMVaiZZtzfDXHVnugKiDbrXd1PBIzSA/5k2Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=T6pw/Bvh1nmOc0dtl6uTUHkkChjIWZi4ZBv2RbA6mOBncmcWGlqmE/ym3SN0H3iHGefzka0/q0+ruX9vcfDHOtExNk1l0xGJDtZjk+prYV2aqtWqvkjqNmckk5hAAQZ3Bfpm2cahmmSFKbioR2lDpWyKexAgwRWPVJSXEmN5djQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w2CQc3uT; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=idcowSLuixj8EpSXdi4Eha7lhD9jA6HcFFbOn1VQ6ce5ywPFRzAXUhc7IT+4Gw7YUZg5YYRcEvdcKm63/HvWWjsClPLKGXT6fOMI9v3rN3fb8i4VVEkuITIvLohhBwuN/iiKZh2qB5kHFohVY+H45+0jCS4nwTQ3tVocpHbtFgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m4xpH9Pv; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3407734d98bso719170a91.3
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 15:42:55 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33baef12edaso1903407a91.0
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 15:42:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761864175; x=1762468975; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761864176; x=1762468976; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=RzJXvA2qL3oBmeCAhgbR20GHWytyM2jCig5eMpHPXQk=;
-        b=w2CQc3uTqtONunN+PyPkmQVUtI4sYB0GQvZuT5HOPb8mKxngdl/Vtu3uazHidjJ0eR
-         2jsMsdcHEJqe1JiDbvXiY1+yi47xpqPAA+SC0DQCBFI2FGcJETZNSzfvfXDymP4iMitP
-         aIHqyRt9qI9JOaC0qu1cabzTBxWQPSU32Ao9ah5iQ8nSxZ9EB0vqUDart3uozN+47deD
-         6hQu2MX2GFNWNWTWI57R5LZ0VF3Gc5bQHvO8rhGbfcKfIhU+IwJOEHasFEwK1ayH74Of
-         MJN4WmUpmFH2RhpxO0BY3zzLujhVJMFQkoitpLSiCDhg3pdgxOU2a30j/MVcH22TnQ6M
-         Awfg==
+        bh=EKedIzwMn7SF7dUWNz3EO5Nos8XGVIVqeHXtZTPKpE4=;
+        b=m4xpH9Pvhr5Bq+S60YsTvi3JSYZtqb+2IotLFTAyH74l31jyYPGfbYDyOHGgCW/gw2
+         GVLD6jrUcHFaLP97T+41BOIhJTI0np5kpB0Ukx28YYTn+kDOSbS0CEgTppLjlWLxGcn4
+         la/12cMMM1I2sTPiQBYdhnV1AfsNMSlFZachWcjdnNHjTMzlDY4XRs1ASa8YSKz4HkhG
+         w+/UXiVXFQ6cK4n/MO0+7fwpHXfnVPeQqj3R2kWDAAif4rzMOZEc0iWlx0v6Vdlu5Ntr
+         IhizjCPGm3iQp9EIOWzyQ93+oTlQnT9fJGHLtfbHjAFJFa0cvgvfgHnUgwH+HwJClddl
+         Mzyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761864175; x=1762468975;
+        d=1e100.net; s=20230601; t=1761864176; x=1762468976;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RzJXvA2qL3oBmeCAhgbR20GHWytyM2jCig5eMpHPXQk=;
-        b=uZi4Rm6cST47MPDu5J7AhtR4cLCHR9hF/hmkMSrU4DXtotaBUHMeIC7uIZmautwt7/
-         J8c4FRFg4UO4cD1BABte69btWxN6JJ3DM4MFFRsotvduXxVtAoMkmPZSqC//vS+cElLw
-         XBwPdLXcTyQapFJYF5dBGRLjXJtnypwByL8GNE2J6QLj412r2EG+H7KQw7ch+D0iYkZi
-         6PZFyOr5u0yrA8RY1WMGLYl0UA1MbPyAUCZJroSAeT9ASiZdRliDBUDPZdbSPmTQsDoz
-         5GC2jFgT5VyAXp/cQS0+pxImpWmy2fvcqp6bkuasGzSZMHqYui9QkJ+fqNM0dSIr69pt
-         Li5Q==
-X-Gm-Message-State: AOJu0Ywo/sd7glyNnfxsrBXT9LfBCb1bBLQJ/46pk+wpEGpiazaJFfbJ
-	pM0SLmHi6MniFhfBVz6jeM5DetqBMYEV4lLVx1v0sNSWyvnfwYdqITh7xTmlEE/3CUpTqsKQdVl
-	1yO4X+w==
-X-Google-Smtp-Source: AGHT+IGTW7/+BlUHW51xmkfkplp3sSIcQ+cUhORPp1pYopyj5vl7hP44CWO33PujFVasNhIynwLieXXQRjA=
-X-Received: from pjbms9.prod.google.com ([2002:a17:90b:2349:b0:33d:69cf:1f82])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2f87:b0:33e:30e8:81cb
- with SMTP id 98e67ed59e1d1-34082fd8a5emr1932559a91.13.1761864174630; Thu, 30
- Oct 2025 15:42:54 -0700 (PDT)
+        bh=EKedIzwMn7SF7dUWNz3EO5Nos8XGVIVqeHXtZTPKpE4=;
+        b=n6+wM1fnLGPoL0+a8uOdyccA2yxX7CETYTFJOZcVMm13IojoFBieN+cy1yLS/4YTYD
+         55vxFAnQ9CXg6gkmxqPNrTcbR+/ZErJ/NGMaoqcdJJSaRP+oT/Yr/RZZ6tFTxnGoatGu
+         KxYea87hTWLi5eV+FBz8W8IsIcHITZy8dHQ8/aTHhxIJPeQXYruuilRI5qxKqxy7ixN3
+         wAtjEgYwf9LnsoTifiTjrE7J0kaPOJ1Lbxj+IVqLvnSWbyDROvwRz4cl+Vkh0Xmt7EjT
+         PDsq328oTGCc+1AyJvMzl6bPsm8TnGhVPbtZOg2IMaRB8Nw3UgeuGfFsWsG4iQwsA/6A
+         lfaw==
+X-Gm-Message-State: AOJu0YzSA40X0T479klzLaWaYuhKibA9hWReN5LbW1Mc9QUIKk/dKolR
+	TSgb+ZZ45IwDZuZiOgWLBSD5nQsjrhudMfc2nyPUDJLZJUBPkC15XTiU1ofIS/qXAgZ6BjczjNq
+	vo1EoKg==
+X-Google-Smtp-Source: AGHT+IG4IgkymewPfuyJcyHNn1i9KmPd0vhF5+MonWf9o3DNjWm26PdP041NcqMLXgTt3a2SPoDdFxsfTZo=
+X-Received: from pjm14.prod.google.com ([2002:a17:90b:2fce:b0:340:6b70:821e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f8b:b0:31e:d4e3:4002
+ with SMTP id 98e67ed59e1d1-34082fab62emr1907294a91.2.1761864176204; Thu, 30
+ Oct 2025 15:42:56 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 15:42:44 -0700
+Date: Thu, 30 Oct 2025 15:42:45 -0700
 In-Reply-To: <20251030224246.3456492-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,93 +75,150 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251030224246.3456492-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251030224246.3456492-3-seanjc@google.com>
-Subject: [PATCH 2/4] KVM: VMX: Handle #MCs on VM-Enter/TD-Enter outside of the fastpath
+Message-ID: <20251030224246.3456492-4-seanjc@google.com>
+Subject: [PATCH 3/4] KVM: x86: Load guest/host XCR0 and XSS outside of the
+ fastpath run loop
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Jon Kohler <jon@nutanix.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Handle Machine Checks (#MC) that happen on VM-Enter (VMX or TDX) outside
-of KVM's fastpath so that as much host state as possible is re-loaded
-before invoking the kernel's #MC handler.  The only requirement is that
-KVM invokes the #MC handler before enabling IRQs (and even that could
-_probably_ be related to handling #MCs before enabling preemption).
+Move KVM's swapping of XFEATURE masks, i.e. XCR0 and XSS, out of the
+fastpath loop now that the guts of the #MC handler runs in task context,
+i.e. won't invoke schedule() with preemption disabled and clobber state
+(or crash the kernel) due to trying to context switch XSTATE with a mix
+of host and guest state.
 
-Waiting to handle #MCs until "more" host state is loaded hardens KVM
-against flaws in the #MC handler, which has historically been quite
-brittle. E.g. prior to commit 5567d11c21a1 ("x86/mce: Send #MC singal from
-task work"), the #MC code could trigger a schedule() with IRQs and
-preemption disabled.  That led to a KVM hack-a-fix in commit 1811d979c716
-("x86/kvm: move kvm_load/put_guest_xcr0 into atomic context").
+For all intents and purposes, this reverts commit 1811d979c716 ("x86/kvm:
+move kvm_load/put_guest_xcr0 into atomic context"), which papered over an
+egregious bug/flaw in the #MC handler where it would do schedule() even
+though IRQs are disabled.  E.g. the call stack from the commit:
 
+  kvm_load_guest_xcr0
+  ...
+  kvm_x86_ops->run(vcpu)
+    vmx_vcpu_run
+      vmx_complete_atomic_exit
+        kvm_machine_check
+          do_machine_check
+            do_memory_failure
+              memory_failure
+                lock_page
+
+Commit 1811d979c716 "fixed" the immediate issue of XRSTORS exploding, but
+completely ignored that scheduling out a vCPU task while IRQs and
+preemption is wildly broken.  Thankfully, commit 5567d11c21a1 ("x86/mce:
+Send #MC singal from task work") (somewhat incidentally?) fixed that flaw
+by pushing the meat of the work to the user-return path, i.e. to task
+context.
+
+KVM has also hardened itself against #MC goofs by moving #MC forwarding to
+kvm_x86_ops.handle_exit_irqoff(), i.e. out of the fastpath.  While that's
+by no means a robust fix, restoring as much state as possible before
+handling the #MC will hopefully provide some measure of protection in the
+event that #MC handling goes off the rails again.
+
+Note, KVM always intercepts XCR0 writes for vCPUs without protected state,
+e.g. there's no risk of consuming a stale XCR0 when determining if a PKRU
+update is needed; kvm_load_host_xfeatures() only reads, and never writes,
+vcpu->arch.xcr0.
+
+Deferring the XCR0 and XSS loads shaves ~300 cycles off the fastpath for
+Intel, and ~500 cycles for AMD.  E.g. using INVD in KVM-Unit-Test's
+vmexit.c, which an extra hack to enable CR4.OXSAVE, latency numbers for
+AMD Turin go from ~2000 => 1500, and for Intel Emerald Rapids, go from
+~1300 => ~1000.
+
+Cc: Jon Kohler <jon@nutanix.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/main.c | 13 ++++++++++++-
- arch/x86/kvm/vmx/tdx.c  |  3 ---
- arch/x86/kvm/vmx/vmx.c  |  3 ---
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ arch/x86/kvm/x86.c | 39 ++++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 0eb2773b2ae2..1beaec5b9727 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -608,6 +608,17 @@ static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 	vmx_load_mmu_pgd(vcpu, root_hpa, pgd_level);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b4b5d2d09634..b5c2879e3330 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1203,13 +1203,12 @@ void kvm_lmsw(struct kvm_vcpu *vcpu, unsigned long msw)
  }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_lmsw);
  
-+static void vt_handle_exit_irqoff(struct kvm_vcpu *vcpu)
-+{
-+	if (unlikely((u16)vmx_get_exit_reason(vcpu).basic == EXIT_REASON_MCE_DURING_VMENTRY))
-+		kvm_machine_check();
-+
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	return vmx_handle_exit_irqoff(vcpu);
+-void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
++static void kvm_load_guest_xfeatures(struct kvm_vcpu *vcpu)
+ {
+ 	if (vcpu->arch.guest_state_protected)
+ 		return;
+ 
+ 	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
+-
+ 		if (vcpu->arch.xcr0 != kvm_host.xcr0)
+ 			xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
+ 
+@@ -1217,6 +1216,27 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
+ 		    vcpu->arch.ia32_xss != kvm_host.xss)
+ 			wrmsrq(MSR_IA32_XSS, vcpu->arch.ia32_xss);
+ 	}
 +}
 +
- static void vt_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
- {
- 	if (is_td_vcpu(vcpu))
-@@ -969,7 +980,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.load_mmu_pgd = vt_op(load_mmu_pgd),
++static void kvm_load_host_xfeatures(struct kvm_vcpu *vcpu)
++{
++	if (vcpu->arch.guest_state_protected)
++		return;
++
++	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
++		if (vcpu->arch.xcr0 != kvm_host.xcr0)
++			xsetbv(XCR_XFEATURE_ENABLED_MASK, kvm_host.xcr0);
++
++		if (guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVES) &&
++		    vcpu->arch.ia32_xss != kvm_host.xss)
++			wrmsrq(MSR_IA32_XSS, kvm_host.xss);
++	}
++}
++
++void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
++{
++	if (vcpu->arch.guest_state_protected)
++		return;
  
- 	.check_intercept = vmx_check_intercept,
--	.handle_exit_irqoff = vmx_handle_exit_irqoff,
-+	.handle_exit_irqoff = vt_op(handle_exit_irqoff),
- 
- 	.update_cpu_dirty_logging = vt_op(update_cpu_dirty_logging),
- 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 326db9b9c567..a2f6ba3268d1 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1069,9 +1069,6 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
- 	if (unlikely((tdx->vp_enter_ret & TDX_SW_ERROR) == TDX_SW_ERROR))
- 		return EXIT_FASTPATH_NONE;
- 
--	if (unlikely(vmx_get_exit_reason(vcpu).basic == EXIT_REASON_MCE_DURING_VMENTRY))
--		kvm_machine_check();
+ 	if (cpu_feature_enabled(X86_FEATURE_PKU) &&
+ 	    vcpu->arch.pkru != vcpu->arch.host_pkru &&
+@@ -1238,17 +1258,6 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
+ 		if (vcpu->arch.pkru != vcpu->arch.host_pkru)
+ 			wrpkru(vcpu->arch.host_pkru);
+ 	}
 -
- 	trace_kvm_exit(vcpu, KVM_ISA_VMX);
- 
- 	if (unlikely(tdx_failed_vmentry(vcpu)))
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 1021d3b65ea0..123dae8cf46b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7527,9 +7527,6 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
- 	if (unlikely(vmx->fail))
- 		return EXIT_FASTPATH_NONE;
- 
--	if (unlikely((u16)vmx_get_exit_reason(vcpu).basic == EXIT_REASON_MCE_DURING_VMENTRY))
--		kvm_machine_check();
+-	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
 -
- 	trace_kvm_exit(vcpu, KVM_ISA_VMX);
+-		if (vcpu->arch.xcr0 != kvm_host.xcr0)
+-			xsetbv(XCR_XFEATURE_ENABLED_MASK, kvm_host.xcr0);
+-
+-		if (guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVES) &&
+-		    vcpu->arch.ia32_xss != kvm_host.xss)
+-			wrmsrq(MSR_IA32_XSS, kvm_host.xss);
+-	}
+-
+ }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_load_host_xsave_state);
  
- 	if (unlikely(vmx_get_exit_reason(vcpu).failed_vmentry))
+@@ -11292,6 +11301,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.guest_fpu.xfd_err)
+ 		wrmsrq(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
+ 
++	kvm_load_guest_xfeatures(vcpu);
++
+ 	if (unlikely(vcpu->arch.switch_db_regs &&
+ 		     !(vcpu->arch.switch_db_regs & KVM_DEBUGREG_AUTO_SWITCH))) {
+ 		set_debugreg(DR7_FIXED_1, 7);
+@@ -11378,6 +11389,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	vcpu->mode = OUTSIDE_GUEST_MODE;
+ 	smp_wmb();
+ 
++	kvm_load_host_xfeatures(vcpu);
++
+ 	/*
+ 	 * Sync xfd before calling handle_exit_irqoff() which may
+ 	 * rely on the fact that guest_fpu::xfd is up-to-date (e.g.
 -- 
 2.51.1.930.gacf6e81ea2-goog
 
