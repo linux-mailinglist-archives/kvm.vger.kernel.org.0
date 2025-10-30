@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-61524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CECE9C21E61
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:17:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8BFFC21E64
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:17:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A6AA54EE529
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 19:16:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A58B31882CDA
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 19:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623422EC084;
-	Thu, 30 Oct 2025 19:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0710C2FE06D;
+	Thu, 30 Oct 2025 19:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QvOi3wiS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q0p8a6bX"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF97628727B
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 19:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6CE2ECE9F
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 19:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761851738; cv=none; b=oLB83Ktqa2haY02yVMRMjlgvMEnds0+FoYXeCHfG2Xuj4AUUq+eijH1z0hCYWpo6yxIUpcS8cNHVZs4Ljia++I+WRmXRyGDLbJ/rWixuILNfPaPDnryDDt0+6FkC5UR249qdS+l+NCFWuSeCKjckLCzsPsYljHFuCdqy2gLGkaE=
+	t=1761851741; cv=none; b=sg7TeTUQMOLLc265vQ8aecKYRXPfLu7A9oR1Ck290KJ8oGvWHLdkHJoLTlM4NIQU16A57Ae/ImYwR4BIxd3fpSIu3gvmaK71JjG1NujymEjGaDbrYKzng6kmZlxhpgshTEla96tQrvjDhzLd+ipOwpnJDmoNOJoQCK15y7wWB2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761851738; c=relaxed/simple;
-	bh=s/j8oAqk1LO8lywmGIHCOU69Wyo7ZAJOhkz5KhrFPe0=;
+	s=arc-20240116; t=1761851741; c=relaxed/simple;
+	bh=njD7vVo3RY8sZ4uT4oO36OjUKcILGJX+/8k/St9xxG0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ecAVd2pjHhu6wP18IHBbkuC4zhwYuTUl22E+XVnjRZ842acK1exLk2yPbT0eCae99/ctGZF15mgEUgieoP0sC4j+1Ie0sxdwUxgK4pazjxZ8Ud8hdefFUSz6hJ/H3uIzTj7wz+JFzkWm/mK9YlhQoFMRAQ6Uk1eYPLHe56qz22c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QvOi3wiS; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=OsMiqnBg/ErQ5/VsRLkE2Ks9tGb1qqBkkHPPpIBPz4/e7mBpGJwJHeQoKEFJOBoGZyvfLJup06Nbd0MDQgqkqmNyodpc53BLJ/iAKz49Y4BW0aV07nleVA7xo7HbYSPtTmegW/h5PLqO/sZkXxHZuyiMAW6HAR19QeAynMYAjhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q0p8a6bX; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2909daa65f2so25865215ad.0
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 12:15:36 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-290cd61855eso14947745ad.1
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 12:15:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761851736; x=1762456536; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761851738; x=1762456538; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=RIfvvqyC4pkF2mzEqWw3TYRNyqKqrDE0HW5h0ZeeWLw=;
-        b=QvOi3wiSyX2oZDUQQtajyIpmScwDOYHzW09zf6MIXwWH60ueOiP9naeWrpICmdH5wn
-         WJqqb7/r9+hkEpmRUCGkURLCvh9NPfk8uQFIabk3i5IBmP4LHfkp+Az3bZWtSFu7wEwv
-         XNLbJcQ7zw2kuTrThRHV1R6cXkUdmZ/bO+LpUClA5hX4mDZx48tFjSX/I6YhNthuKYaV
-         O0SZJKPuPUrSOkXtQyxbb76zpq4Z20adGFMiQBi+TpQCV7Es0oCxIJBWszE3XC0oBAzl
-         OA880YzLf8uf3IJ8QKoOCz2er7nEwze4HrVDuurY7++s9nMx4qsa7etNHAJOSxgmSiL9
-         kl4g==
+        bh=FNqfEfJoqSYUvF/W9hXgR/MQkgj3qF/GVzyQVpyWACQ=;
+        b=Q0p8a6bX6FhCDfnRiY+kedgbEYtJoMDcd5rTgLIPOUO8GIzgV62l4O/v1YN7HAiNr0
+         FjqqLR524t6rCgPBM1uaRYsXo5QGxfMrthq87BcmMklmxPAgORCUCLbwkoNVFkNZEV/7
+         S+ME7ugHnm2910Xnt8WCFnyfkyjVPalZASDfxsfNPkj/AWzdXaxNo+OwQklH+X4bohMf
+         rbKwGjbatc0vYevb2SspE/+QEwsYmFoY64YO66nWMUuH94C9BZVHnxrQSlnvMOBfHQVj
+         WGmuTKgd2q7cL2orj2r7znJ+HnngeO+E5vFs0B777F/plIKTsPd+O5UagXAXLcmCfee/
+         qdBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761851736; x=1762456536;
+        d=1e100.net; s=20230601; t=1761851738; x=1762456538;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RIfvvqyC4pkF2mzEqWw3TYRNyqKqrDE0HW5h0ZeeWLw=;
-        b=jO8l9Au44hHtKvAx4/MBfQQf2swKR2t57W+b1n5QzWvMQJF96HXUroctnJPpQEM9jP
-         k0LFgZ/wSZueLpJYp+Ui1h9fc0JifxE8M5CH+cxr5yRq/T9RMRnQpuwCJxKtCAk2ZaI2
-         yp/WE3F6o66VP6+2QNrBJIhEiNs5Y4RXN4vlrIyd4OFY19nvA5N0jk0RbLXS3It3IZdH
-         aagWJX6hG3n/+UkBC7BdAmrfz67vtG5bL4Ns1lnfcVeZdUz4K/9mARlRDtY+O7aYWnQk
-         3EKAf5mk1H5bmWvDbyayaKT101ZRt/KoOAIf3MYneyiySb6wIepG55F1NQfqcQJPsIaE
-         Bh5Q==
-X-Gm-Message-State: AOJu0Ywceswwr6X7BKK/H7ODhi3u2jgYHklyLBvnQ+qy2G5/mE4lbbKG
-	Caetu4lUmi5wjHwcG1ETmF/vR9/6ijnICjjsXvud7dVk3PkmvaJ6h2tyo9K6C9owBZ+wqgJygCc
-	5utRcDw==
-X-Google-Smtp-Source: AGHT+IH+436+sxPArkYZcKYPQII9ttXJyIOB3pB5LOkXSlNMmSPGsaxPPxQ7B5IoTdJPom2cUmt179+6PuE=
-X-Received: from plbjy16.prod.google.com ([2002:a17:903:42d0:b0:290:28e2:ce5c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d505:b0:290:b10f:9aec
- with SMTP id d9443c01a7336-294ed2c61c2mr47900205ad.26.1761851736057; Thu, 30
- Oct 2025 12:15:36 -0700 (PDT)
+        bh=FNqfEfJoqSYUvF/W9hXgR/MQkgj3qF/GVzyQVpyWACQ=;
+        b=BSem7c2FO0S7Pmr9fvPk43vBInBVtOsnato0hbRW+g3O8x92NYc+fhreGZilQfRHTv
+         vtQgeVhOfTCIcWOFBmgcY90OvTh+65Bc1xqDt1bJLkNI7p0MKUD+qt+FFtxawUOy5Ja3
+         YM6JLXITSXvYiMqEJSb86iazqUHyQ+0aDwDJSZovYV0JvIPVmo83QayyiryGRgohmvqC
+         5AhaDWyI9JTm5oSgeL/PRQJgewA8tw+oHkWg+e3alP19Mxu/lJDjA6OeXpTGjFIjrzk8
+         DnHU2t/eUPFmAMNEmAdmu0Ua0CDkjP3rr3xuUNsGFVO/K0MV7HKiSLTdwKaeAyiJJvTt
+         RmwA==
+X-Gm-Message-State: AOJu0YzRz0Q0hFcU7Gq10Qm53B+pkojzuIdUlORJD81QB6Bu/o4FR6N0
+	IoSV5VtLuKC2SxKJcyThBFbZbkPp+AXQOX7VtdhS3l3ZUg+bQDHhgMxd/JpAMajTUFH6k8W1POd
+	VkeK7Qg==
+X-Google-Smtp-Source: AGHT+IFBdKayTTHDRLc1XeLTBMS4cU/1mdOhxtVsleqZOp+VTYxxaZOIKtrD0iyEKzZHky8RcgnIOTS6Ng8=
+X-Received: from plch11.prod.google.com ([2002:a17:902:f2cb:b0:290:be3d:aff6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3202:b0:294:b758:76b2
+ with SMTP id d9443c01a7336-2951a58890cmr12319815ad.43.1761851737922; Thu, 30
+ Oct 2025 12:15:37 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 12:15:26 -0700
+Date: Thu, 30 Oct 2025 12:15:27 -0700
 In-Reply-To: <20251030191528.3380553-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251030191528.3380553-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251030191528.3380553-3-seanjc@google.com>
-Subject: [PATCH v5 2/4] KVM: x86: WARN if user-return MSR notifier is
- registered on exit
+Message-ID: <20251030191528.3380553-4-seanjc@google.com>
+Subject: [PATCH v5 3/4] KVM: x86: Leave user-return notifier registered on reboot/shutdown
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	"Kirill A. Shutemov" <kas@kernel.org>
@@ -87,105 +86,69 @@ Cc: kvm@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev,
 	Hou Wenlong <houwenlong.hwl@antgroup.com>
 Content-Type: text/plain; charset="UTF-8"
 
-When freeing the per-CPU user-return MSRs structures, WARN if any CPU has
-a registered notifier to help detect and/or debug potential use-after-free
-issues.  The lifecycle of the notifiers is rather convoluted, and has
-several non-obvious paths where notifiers are unregistered, i.e. isn't
-exactly the most robust code possible.
+Leave KVM's user-return notifier registered in the unlikely case that the
+notifier is registered when disabling virtualization via IPI callback in
+response to reboot/shutdown.  On reboot/shutdown, keeping the notifier
+registered is ok as far as MSR state is concerned (arguably better then
+restoring MSRs at an unknown point in time), as the callback will run
+cleanly and restore host MSRs if the CPU manages to return to userspace
+before the system goes down.
 
-The notifiers they are registered on-demand in KVM, on the first WRMSR to
-a tracked register.  _Usually_ the notifier is unregistered whenever the
-CPU returns to userspace.  But because any given CPU isn't guaranteed to
-return to userspace, e.g. the CPU could be offlined before doing so, KVM
-also "drops", a.k.a. unregisters, the notifiers when virtualization is
-disabled on the CPU.
+The only wrinkle is that if kvm.ko module unload manages to race with
+reboot/shutdown, then leaving the notifier registered could lead to
+use-after-free due to calling into unloaded kvm.ko module code.  But such
+a race is only possible on --forced reboot/shutdown, because otherwise
+userspace tasks would be frozen before kvm_shutdown() is called, i.e. on a
+"normal" reboot/shutdown, it should be impossible for the CPU to return to
+userspace after kvm_shutdown().
 
-Further complicating the unregister path is the fact that the calls to
-disable virtualization come from common KVM, and the per-CPU calls are
-guarded by a per-CPU flag (to harden _that_ code against bugs, e.g. due to
-mishandling reboot).  Reboot/shutdown in particular is problematic, as KVM
-disables virtualization via IPI function call, i.e. from IRQ context,
-instead of using the cpuhp framework, which runs in task context.  I.e. on
-reboot/shutdown, drop_user_return_notifiers() is called asynchronously.
+Furthermore, on a --forced reboot/shutdown, unregistering the user-return
+hook from IRQ context doesn't fully guard against use-after-free, because
+KVM could immediately re-register the hook, e.g. if the IRQ arrives before
+kvm_user_return_register_notifier() is called.
 
-Forced reboot/shutdown is the most problematic scenario, as userspace tasks
-are not frozen before kvm_shutdown() is invoked, i.e. KVM could be actively
-manipulating the user-return MSR lists and/or notifiers when the IPI
-arrives.  To a certain extent, all bets are off when userspace forces a
-reboot/shutdown, but KVM should at least avoid a use-after-free, e.g. to
-avoid crashing the kernel when trying to reboot.
+Rather than trying to guard against the IPI in the "normal" user-return
+code, which is difficult and noisy, simply leave the user-return notifier
+registered on a reboot, and bump the kvm.ko module refcount to defend
+against a use-after-free due to kvm.ko unload racing against reboot.
+
+Alternatively, KVM could allow kvm.ko and try to drop the notifiers during
+kvm_x86_exit(), but that's also a can of worms as registration is per-CPU,
+and so KVM would need to blast an IPI, and doing so while a reboot/shutdown
+is in-progress is far risky than preventing userspace from unloading KVM.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 33 +++++++++++++++++++++++++--------
- 1 file changed, 25 insertions(+), 8 deletions(-)
+ arch/x86/kvm/x86.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 639589af7cbe..bb7a7515f280 100644
+index bb7a7515f280..c927326344b1 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -575,6 +575,27 @@ static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
- 		vcpu->arch.apf.gfns[i] = ~0;
+@@ -13086,7 +13086,21 @@ int kvm_arch_enable_virtualization_cpu(void)
+ void kvm_arch_disable_virtualization_cpu(void)
+ {
+ 	kvm_x86_call(disable_virtualization_cpu)();
+-	drop_user_return_notifiers();
++
++	/*
++	 * Leave the user-return notifiers as-is when disabling virtualization
++	 * for reboot, i.e. when disabling via IPI function call, and instead
++	 * pin kvm.ko (if it's a module) to defend against use-after-free (in
++	 * the *very* unlikely scenario module unload is racing with reboot).
++	 * On a forced reboot, tasks aren't frozen before shutdown, and so KVM
++	 * could be actively modifying user-return MSR state when the IPI to
++	 * disable virtualization arrives.  Handle the extreme edge case here
++	 * instead of trying to account for it in the normal flows.
++	 */
++	if (in_task() || WARN_ON_ONCE(!kvm_rebooting))
++		drop_user_return_notifiers();
++	else
++		__module_get(THIS_MODULE);
  }
  
-+static int kvm_init_user_return_msrs(void)
-+{
-+	user_return_msrs = alloc_percpu(struct kvm_user_return_msrs);
-+	if (!user_return_msrs) {
-+		pr_err("failed to allocate percpu user_return_msrs\n");
-+		return -ENOMEM;
-+	}
-+	kvm_nr_uret_msrs = 0;
-+	return 0;
-+}
-+
-+static void kvm_free_user_return_msrs(void)
-+{
-+	int cpu;
-+
-+	for_each_possible_cpu(cpu)
-+		WARN_ON_ONCE(per_cpu_ptr(user_return_msrs, cpu)->registered);
-+
-+	free_percpu(user_return_msrs);
-+}
-+
- static void kvm_on_user_return(struct user_return_notifier *urn)
- {
- 	unsigned slot;
-@@ -10023,13 +10044,9 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
- 		return -ENOMEM;
- 	}
- 
--	user_return_msrs = alloc_percpu(struct kvm_user_return_msrs);
--	if (!user_return_msrs) {
--		pr_err("failed to allocate percpu kvm_user_return_msrs\n");
--		r = -ENOMEM;
-+	r = kvm_init_user_return_msrs();
-+	if (r)
- 		goto out_free_x86_emulator_cache;
--	}
--	kvm_nr_uret_msrs = 0;
- 
- 	r = kvm_mmu_vendor_module_init();
- 	if (r)
-@@ -10132,7 +10149,7 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
- out_mmu_exit:
- 	kvm_mmu_vendor_module_exit();
- out_free_percpu:
--	free_percpu(user_return_msrs);
-+	kvm_free_user_return_msrs();
- out_free_x86_emulator_cache:
- 	kmem_cache_destroy(x86_emulator_cache);
- 	return r;
-@@ -10161,7 +10178,7 @@ void kvm_x86_vendor_exit(void)
- #endif
- 	kvm_x86_call(hardware_unsetup)();
- 	kvm_mmu_vendor_module_exit();
--	free_percpu(user_return_msrs);
-+	kvm_free_user_return_msrs();
- 	kmem_cache_destroy(x86_emulator_cache);
- #ifdef CONFIG_KVM_XEN
- 	static_key_deferred_flush(&kvm_xen_enabled);
+ bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
 -- 
 2.51.1.930.gacf6e81ea2-goog
 
