@@ -1,131 +1,145 @@
-Return-Path: <kvm+bounces-61615-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61616-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7BC8C22B67
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:32:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C407C22B97
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:40:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 74F1E34E243
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 23:32:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F1F314E2127
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 23:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED0E33E34A;
-	Thu, 30 Oct 2025 23:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237F233E378;
+	Thu, 30 Oct 2025 23:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rQ6PPSjh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LNWX650V"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014BF337B9C
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 23:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FB033E356
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 23:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761867158; cv=none; b=UCPNFFQTQNPDafRrizW5XJVEKlcfmpFWJAYpHwvL0ocWTwe6+P9jrl9vyGKaFTevTSsBSI2mQ+cveKLuMenmGD4PDipPDdJ2vsSubZTLiX3iDALySrrMZkpreQJN1SJOCbc9Tg3za9nOGwbMzWXNf2mLeTDYT+go2hHleUsgFpQ=
+	t=1761867644; cv=none; b=TKs976ouyhAqGGSajzX/10ft+arZyn8awLSu+9NRArcmMxV/xiI5ujEWgnuSLF8wlyYDdAECrwF6M9EEPkxP8Z1VJ4plAda7IQ5FHL6fIcwGosCtGF5dB0Fc/Rjq8TsV0Osq6GEo0JmfanC35RxPB/0JVbX0neQwtKdGz8iBiyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761867158; c=relaxed/simple;
-	bh=N66E8WvZbIxl8GlqKaNOQVKQ95sFYhZSLa57vzmvMHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pc7+VJyAO7N08MBcYo8ulELzRfmfYiLSczntjJAblgiizaONIOMgLgby8S/iRpsGYwkECN1kOjBP6SC40QHcOSTXxjmYQmdxZGklf48RkGiCqWRjbNDi8M5gYmSD3YllReS2jyQKoAAkaDkw4L5/p6krykXs6gZuUdbBLPBgGCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rQ6PPSjh; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 30 Oct 2025 23:32:16 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761867142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EPvbQ1EtJTgqqcXXxrcD3sjibKtkouuLrt2fwvBKuCo=;
-	b=rQ6PPSjhqmg2IdFK5aV+HVTbe4voW0+TLPTF2k0+kL9UXz0NxzSOMtaLbhOcnZo0DErK5+
-	WMp28hIY8amm9bTPluU0f78HJKiNnMG39vPrpA9pNO+BHu0lfFFWQjPqSP+fPUULlpVtLM
-	KoCThdhoN7HfUwOodX7i2BEaD6MCinI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Jim Mattson <jmattson@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Bibo Mao <maobibo@loongson.cn>, "Pratik R. Sampat" <prsampat@amd.com>, 
-	James Houghton <jthoughton@google.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 2/4] KVM: selftests: Use a loop to walk guest page
- tables
-Message-ID: <6ya5ya2bzl5mvpc25fj5o62hvmubi4egs246pbj6z2oocff3tv@b3pkl6ckflpt>
-References: <20251028225827.2269128-1-jmattson@google.com>
- <20251028225827.2269128-3-jmattson@google.com>
+	s=arc-20240116; t=1761867644; c=relaxed/simple;
+	bh=eUlRvGsTDsOghmrMBild//Vvtgn5Z9S+p8wIvknhN0Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UbDllee8eVGyjY03obT+PQY6EqSs08HNpm3p4rHjxnVNbCAuPaKD7/eHhI5MN8G+7VZiLhJ8YZ+Jidn6OIxCOBp2JmdHf3ZYyyUrqbhBbc+rH3z+p6tB6SiH7or6kxCjqE2NIGVens8/kmfwkRLevJqVoUfbYi5vhxDUaEOiKz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LNWX650V; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-792722e4ebeso1604388b3a.3
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 16:40:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761867642; x=1762472442; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hANv7xEJBy7S5lh8h/UQF87h23G6mY0gbFBLav72O2Q=;
+        b=LNWX650VW7tHQNQnj4IWOW6VMCQLlPemGs7QajRKIzNpaKp0vl3fEWZcdp4Ls+MH74
+         tBfSq73CaaIgj+dNyGgZKtOtiacb2G5/40vQwjw+rmkhRFZ92QI4Jo5HuzuaQLp/CMGE
+         B9IXAIyxgPcPCwaNoX7UMi6Sl9C8AXP/tlgaxoFJfgYrvout7QvNnliiBvx7NVq85Rcq
+         R0cziLkrvm6GwOiC77h70HwpBMeLTW8loNJWZernZqoQDjXB6NmmqasFoJLz+SNAJESI
+         5l1TNl5dIQ/cUzczfTfM6SQL1kX5vVo8oEH33LpBmICpVHvaWyK77vzr2A9nl8HQ7heE
+         faFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761867642; x=1762472442;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hANv7xEJBy7S5lh8h/UQF87h23G6mY0gbFBLav72O2Q=;
+        b=rmuzkR/QBle1y8fE1MpACUQlS+zE+lkRrR/cq8dXKFCRhpINBChnsMf9kmxYFCBZAn
+         SV10419uTusdMMLtuguLHwS6jtSXXMRQkF6r9lGB+JPaKlmMNGdZ3DMftUOD1iTjzPXX
+         IaS+OOYjx74S6l19nPkW6AJl7Lb7qa0mgiNCREGpzj240+6yLmbz7Os9FVvef236R/U+
+         RwlfjUTpS1MVbYTs7vS55iOllcwNcW0jxXmACAcs38dns9g3nt8tU+mGzxlZFJmzeNd/
+         /GfVHwfX7uWe0ecE1VaflqfmYaqNQ2RDGJR1LW7sXAH+Y4CAPMHzw5/cG4YDmkTDZRSP
+         0n9w==
+X-Forwarded-Encrypted: i=1; AJvYcCXeKJdv40viPuTSRwglIOpb9WBlPA9H+oJ09w43Viq1nrv5dVeHPVHOjt2SCWlYt/HWtJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3DrgqWmdGcIwZczlONsKflXQaM7HFCg2Ow7cXEy2uT+V3wtu8
+	RSjuFajxvhzn7D+71b4IJ0AAxaT7dGZ2RNPO5Kregw3dQugRIXH9Pw6S2h/ODQPbVz/1pAD8isD
+	i+YprdQ==
+X-Google-Smtp-Source: AGHT+IH6kktSpJB8uW8dOccHej0bRJlF9t4mdGsOdXoLRdKSPbgGpCfMdKkfH5SPES5/Onbr9IfT7/Ky4i8=
+X-Received: from pfbhm7.prod.google.com ([2002:a05:6a00:6707:b0:77e:40c7:d12e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3996:b0:7a4:460e:f86a
+ with SMTP id d2e1a72fcca58-7a7796c8a99mr1645968b3a.25.1761867642073; Thu, 30
+ Oct 2025 16:40:42 -0700 (PDT)
+Date: Thu, 30 Oct 2025 16:40:40 -0700
+In-Reply-To: <6572689b28a76bd95bc653b1fc1131fa57ed7669.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251028225827.2269128-3-jmattson@google.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20251030200951.3402865-1-seanjc@google.com> <20251030200951.3402865-13-seanjc@google.com>
+ <6572689b28a76bd95bc653b1fc1131fa57ed7669.camel@intel.com>
+Message-ID: <aQP3eJmLTHscDoI4@google.com>
+Subject: Re: [PATCH v4 12/28] KVM: TDX: WARN if mirror SPTE doesn't have full
+ RWX when creating S-EPT mapping
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>, 
+	"maz@kernel.org" <maz@kernel.org>, "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, 
+	"pjw@kernel.org" <pjw@kernel.org>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
+	"kas@kernel.org" <kas@kernel.org>, "maobibo@loongson.cn" <maobibo@loongson.cn>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "maddy@linux.ibm.com" <maddy@linux.ibm.com>, 
+	"palmer@dabbelt.com" <palmer@dabbelt.com>, "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>, 
+	"zhaotianrui@loongson.cn" <zhaotianrui@loongson.cn>, "anup@brainfault.org" <anup@brainfault.org>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"michael.roth@amd.com" <michael.roth@amd.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, Vishal Annapurve <vannapurve@google.com>, 
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, "x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 28, 2025 at 03:30:40PM -0700, Jim Mattson wrote:
-> Walk the guest page tables via a loop when searching for a PTE,
-> instead of using unique variables for each level of the page tables.
-> 
-> This simplifies the code and makes it easier to support 5-level paging
-> in the future.
-> 
-> Signed-off-by: Jim Mattson <jmattson@google.com>
+On Thu, Oct 30, 2025, Kai Huang wrote:
+> On Thu, 2025-10-30 at 13:09 -0700, Sean Christopherson wrote:
+> > Pass in the mirror_spte to kvm_x86_ops.set_external_spte() to provide
+> > symmetry with .remove_external_spte(), and assert in TDX that the mirro=
+r
+> > SPTE is shadow-present with full RWX permissions (the TDX-Module doesn'=
+t
+> > allow the hypervisor to control protections).
+> >=20
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+>=20
+> Reviewed-by: Kai Huang <kai.huang@intel.com>
+>=20
+> [...]
+>=20
+> >  static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+> > -				     enum pg_level level, kvm_pfn_t pfn)
+> > +				     enum pg_level level, u64 mirror_spte)
+> >  {
+> >  	struct kvm_tdx *kvm_tdx =3D to_kvm_tdx(kvm);
+> > +	kvm_pfn_t pfn =3D spte_to_pfn(mirror_spte);
+> > =20
+> >  	/* TODO: handle large pages. */
+> >  	if (KVM_BUG_ON(level !=3D PG_LEVEL_4K, kvm))
+> >  		return -EIO;
+> > =20
+> > +	WARN_ON_ONCE(!is_shadow_present_pte(mirror_spte) ||
+> > +		     (mirror_spte & VMX_EPT_RWX_MASK) !=3D VMX_EPT_RWX_MASK);
+> > +
+>=20
+> Nit:=C2=A0
+>=20
+> I am a little bit confused about when to use WARN_ON_ONCE() and
+> KVM_BUG_ON(). :-)
 
-Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-
-> ---
->  .../testing/selftests/kvm/lib/x86/processor.c | 23 ++++++++-----------
->  1 file changed, 10 insertions(+), 13 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-> index 738f2a44083f..720c678187b5 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-> @@ -307,7 +307,8 @@ static bool vm_is_target_pte(uint64_t *pte, int *level, int current_level)
->  uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr,
->  				    int *level)
->  {
-> -	uint64_t *pml4e, *pdpe, *pde;
-> +	uint64_t *pte = &vm->pgd;
-> +	int current_level;
->  
->  	TEST_ASSERT(!vm->arch.is_pt_protected,
->  		    "Walking page tables of protected guests is impossible");
-> @@ -328,19 +329,15 @@ uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr,
->  	TEST_ASSERT(vaddr == (((int64_t)vaddr << 16) >> 16),
->  		"Canonical check failed.  The virtual address is invalid.");
->  
-> -	pml4e = virt_get_pte(vm, &vm->pgd, vaddr, PG_LEVEL_512G);
-> -	if (vm_is_target_pte(pml4e, level, PG_LEVEL_512G))
-> -		return pml4e;
-> -
-> -	pdpe = virt_get_pte(vm, pml4e, vaddr, PG_LEVEL_1G);
-> -	if (vm_is_target_pte(pdpe, level, PG_LEVEL_1G))
-> -		return pdpe;
-> -
-> -	pde = virt_get_pte(vm, pdpe, vaddr, PG_LEVEL_2M);
-> -	if (vm_is_target_pte(pde, level, PG_LEVEL_2M))
-> -		return pde;
-> +	for (current_level = vm->pgtable_levels;
-> +	     current_level > PG_LEVEL_4K;
-> +	     current_level--) {
-> +		pte = virt_get_pte(vm, pte, vaddr, current_level);
-> +		if (vm_is_target_pte(pte, level, current_level))
-> +			return pte;
-> +	}
->  
-> -	return virt_get_pte(vm, pde, vaddr, PG_LEVEL_4K);
-> +	return virt_get_pte(vm, pte, vaddr, PG_LEVEL_4K);
->  }
->  
->  uint64_t *vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr)
-> -- 
-> 2.51.1.851.g4ebd6896fd-goog
-> 
+Very loosely: WARN if there's a decent chance carrying on might be fine,
+KVM_BUG_ON() if there's a good chance carrying on will crash the host and/o=
+r
+corrupt the guest, e.g. if KVM suspects a hardware/TDX-Module issue.
 
