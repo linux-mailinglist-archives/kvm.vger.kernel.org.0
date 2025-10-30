@@ -1,212 +1,138 @@
-Return-Path: <kvm+bounces-61590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61591-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5D29C226F7
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 22:39:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33175C22721
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 22:42:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C37661892EFF
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 21:37:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F28EE1889748
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 21:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DFD311C3C;
-	Thu, 30 Oct 2025 21:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8159329E63;
+	Thu, 30 Oct 2025 21:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RnENy23/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jkBrdBPj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E66D307AFB
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 21:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EDD314D24
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 21:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761860244; cv=none; b=kMjOlnPtB+dt0YxlUUrqwlzS3WliafaNoNqooTCecpP+8uyFFE4HUDbUblnQ+6ClmeBEf8cdA9OeDHiVWuD/I8KHk+lPwJvbZ//NqCk8UNjI8dx1wDZEwCTN/uAsj5BWZJgvXnNJOmS1fHCiBh+8CH8ILlYSz3KFePbAKZ7WGuI=
+	t=1761860490; cv=none; b=rBh0BkebYX6+oA8pkItWMJOedCeim7tliYzp0Ep3NTcpxooeNhIKmEL6uGmexLJCPx16cXRfwSZCCThGbs0f0iltUcXj/JS8gLOYrwOBy71NjBfBOWqNCSY/qF1XkLas2mdLc5jCY6qI/FqUlb5C+cYFlahkFoMMdYU7l7cRqE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761860244; c=relaxed/simple;
-	bh=VAui8AWn8copQhC4kZGHA0swzDjJZpFxDyviY8QdSiU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ls3WSwT6HeU36agsdMUIO01B2sfAlD9Thjuir7xE7WMXQS5w5fwn5Ti1pf0kq3SHZ6OwQztcGV+4ZMSsjRKdOzU1i4FTi/qnf9UC3SvaOmXozX0M0DaURAhMa8qufgG0APdqmhdxFIiffayZTS5RKy/zQR2uWGEeNkWFTDXCL60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RnENy23/; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7a27837ead0so1248178b3a.3
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 14:37:23 -0700 (PDT)
+	s=arc-20240116; t=1761860490; c=relaxed/simple;
+	bh=5AQCSF/N5fYZh1DKG8zQeN+QbCB3F/STERKQmGHnv+U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ckOrFBk+6m8PojmWp1nuqs4cU/AgvZCEjs0KWCBwEmFZh//vFZfebOaX7K5wv8SlK+PvruXN588segBc0E2IBxp7bKIPyMNievqz6bW5y367Kdhz1Jvrw6INY8Knz3wwcnUaQpohwo1B2BuBvNvxiy/ot3csbqdeBxvPwmDAlZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jkBrdBPj; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47112edf9f7so12806485e9.0
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 14:41:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761860242; x=1762465042; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FjqH9fMyxc9+P0OjDrNByGI1LC2bpJVWLzcv83ocI04=;
-        b=RnENy23/e4lgXVayIyLNA7exwHRTKb4fJksMUWcVHeSosYHvOy/61GaUfOpPSrtqS8
-         NtOWnvTnxh2A54220FlAFteLRgXmeSkwSDndrNSl6Mm/zwBerLqhDcUPCri7kuWSsCDU
-         N1Gd5RpAXD90I9M/DhfzSikpavNSghllNeYcehp+lrg3r1PTm9/2or+RTA6cngCMYWaN
-         ljYoWz0q0cOPcoXAJbyVn6ORrvuzzAL+Go+/ItQmJdKOoMo22qh0AQDiKM9a+8UjXKVz
-         2+FNT8a38emNKBq4SeKUrSKW7jDnYlgdPl1s+fnQH1ASC2JfZkdsc5JqYS95Q6vQua/7
-         JSJg==
+        d=gmail.com; s=20230601; t=1761860487; x=1762465287; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2XBvCSEn0ZeigCB7NPjyaiTdYT+8OHxru1xjOb5u250=;
+        b=jkBrdBPjhFq4qnHNWQDqOoUR62ROVRh6gLbxo71ZpSnE4/Tj5++SnjHBSyHiC7o1IS
+         44Sfc4pH34i0RrLOpyjrw0BMz3yCbWFIY7AWuEYKN7Y74zU+3UCcw38jKqMi/E05vxSS
+         yI5MZ3kngDwAu/OL97fV/sHQqa5k+tagY/TJy2w+gykm7qFktbByFzLbdCUDAShXZjv9
+         ig8fOdaE4eI11TOBaozVZyzlKrt+1Dp1VARSiROdsALCmz9lh0OpnUx1L4XR33+0/Rl7
+         cje58JxoepufmmemzCZLrYZJAe8A4/sRJ6658DvMwqo7UDIjsQnFXx2/azvj/iF0epm3
+         W6OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761860242; x=1762465042;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FjqH9fMyxc9+P0OjDrNByGI1LC2bpJVWLzcv83ocI04=;
-        b=tzBkpqaTs5Edd4HQGeJhxdxhqebJ8eOXBUHSC66GB0J8mBhywysHXw5gi+A9FO1QAA
-         sEJrr8KohpdV/AHN9A3MYZ2fjjKwY1/j6edM3KqWjJmg2YcYxo7VMP8k00Lpw8Mb9Ea8
-         U+q0xjsLOzFnXZdqdGFzhH4b+81vy652ONacz8pPP49IG4uiRCJTng35L7Rf/JXT9TJX
-         uiyT7GJvVCUQ9My732qkluYLZwAQSnTQO2eTZQ45WkRP5rNzgelgrd0+iAgT2STktX2K
-         FQZS5do+yLzPQBt6EWpQ76dB6kvu7lttJPMz+9Vehew/kAlAOtzxUeaHscTkEXxR2zNh
-         8mZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVLPtYNir7c+X7FmYmsPOJ4pAwfurs4KyjhbcbBdvY49jJeVAMZkSCkxm18bhpVqrZIR70=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe6cWiquiTQK42EVbUDXtm44JewXk8DL/2Olbjg6dHeSkflZKI
-	WnuTFw1Kve1lYe0SWz7A8R4Z3shgSPWv4rBPf8dMD75JOh7yPmtSkaNulmWtzZNEeBP60NYit5B
-	TXqB3MQ==
-X-Google-Smtp-Source: AGHT+IHQXCkASO98UAVSO9VjI2IZVkmCZ27+eNAxxCZJeBSQ6f5kJjB6Vk2Jfqs7FpDmqPvWjbxdho5Wjic=
-X-Received: from pjbbt5.prod.google.com ([2002:a17:90a:f005:b0:33b:e0b5:6112])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:1595:b0:341:5935:e209
- with SMTP id adf61e73a8af0-348cb9a0c1fmr1707096637.38.1761860242517; Thu, 30
- Oct 2025 14:37:22 -0700 (PDT)
-Date: Thu, 30 Oct 2025 14:37:20 -0700
-In-Reply-To: <8a28ddea-35c0-490e-a7d2-7fb612fdd008@amazon.com>
+        d=1e100.net; s=20230601; t=1761860487; x=1762465287;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2XBvCSEn0ZeigCB7NPjyaiTdYT+8OHxru1xjOb5u250=;
+        b=QwS+fyaxFna/xAdGG942UG62BlETlkzlGVSQJ9fNNOtrtyUH9PNVBy53BP5x/2MgIO
+         vi3PdUlyybZZ37l1S/hcXWQ6A7IVy+pdXHu1o8W1OWuu0TYKmNBICmftfviEj2FNRfjp
+         SKdu/Nq9H+mlWdjb171mOpMCunZl/7ASbbt6OOVoD38dPZf96uVLWxnG7ok+QNqvnZPy
+         lXh59jRwnrWiV9FJ4ke+rIhC+8brEmDFIZnt3bZsXx27YZVTfjdR8dwVjdbd8j4JBgm5
+         ORr56D7ti6VmsEp/Gy+vTQqkaaJzjfOSA6whyo15KkOIxTGeY0JbuXr+ocy+Y9AgvzSd
+         yTlw==
+X-Forwarded-Encrypted: i=1; AJvYcCXNcZLLsdZSubIDbS4JkUH2Lzzvrn9G2MZrNrWYOrRq0GfDtpnd87q+M50c3y+ZYtc6Om4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGRU9sK5eR8QWs0o1xAIUhfty5SZgFVNZS17MeS0iUtxg+qqhU
+	gotuuyl3bsAPNh1J47tUtq38VzB8dU7UlV8EZGtTHs5cdBscLSJG4Zps
+X-Gm-Gg: ASbGncujo3LCqZQVTcpYqCFfUYKjrmtBdeQa+No7tMX8HV+B3lmqs053iENmlbtm8bX
+	626phulCiUk4A01m7D+YtKItBsVIw5bH/xpJ3kAMCv3w4/yngKCqHVxnfvQcxpDzvnUqsTdgZAg
+	FCUv4gyRM5Key5dRRyw158e1Z5erY9f0bWeH8aBkTlDlZ6JF5rFUUBqehj+9fbK6CTGOYgOt0QH
+	KMmt8eFikQKuM5PjGIJGYne11f3Hd3RxsBqgh+9XuPXEnd1Uy7jpUJWWIaU5s6Fce0nyuWi2DXt
+	j7nwcnCIEqXLN2lCj//IL3tRdeKMfuYyXxcAhp9uVLC4K0ETVJWDAPZg+xrofwZ88li6Xs+hcwL
+	x2/pCofNuzh1HQ92HkRzGZLzBoisIF9pmHEjGDpZZInaQ+eNpkI4DK20cGz1hylqz/apaklkOlE
+	1u4AOcPHYw12JXNcWWS9SkG8epURewrAQ90VU154YtAQ==
+X-Google-Smtp-Source: AGHT+IF2+gC67dgVdnAW7HO5oobqLFRQy+U6kHEZPTDvGE8zU4sHMYcN9fuccg5Lwqg5j25NgQTe4w==
+X-Received: by 2002:a05:600c:6215:b0:477:f1f:5c65 with SMTP id 5b1f17b1804b1-477308abf3dmr11142745e9.23.1761860486746;
+        Thu, 30 Oct 2025 14:41:26 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952b79cbsm34210623f8f.4.2025.10.30.14.41.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Oct 2025 14:41:26 -0700 (PDT)
+Date: Thu, 30 Oct 2025 21:41:25 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, Alexander Graf
+ <agraf@suse.de>, Christophe Leroy <christophe.leroy@csgroup.eu>, Madhavan
+ Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ Nicholas Piggin <npiggin@gmail.com>, LKML <linux-kernel@vger.kernel.org>,
+ kernel-janitors@vger.kernel.org, Miaoqian Lin <linmq006@gmail.com>
+Subject: Re: [PATCH] KVM: PPC: Use pointer from memcpy() call for assignment
+ in kvmppc_kvm_pv()
+Message-ID: <20251030214125.33379ed2@pumpkin>
+In-Reply-To: <ad42871b-22a6-4819-b5db-835e7044b3f1@web.de>
+References: <ad42871b-22a6-4819-b5db-835e7044b3f1@web.de>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251020161352.69257-1-kalyazin@amazon.com> <20251020161352.69257-2-kalyazin@amazon.com>
- <aPpS2aqdobVTk_ed@google.com> <8a28ddea-35c0-490e-a7d2-7fb612fdd008@amazon.com>
-Message-ID: <aQPakDuteQkg0hTu@google.com>
-Subject: Re: [PATCH v6 1/2] KVM: guest_memfd: add generic population via write
-From: Sean Christopherson <seanjc@google.com>
-To: Nikita Kalyazin <kalyazin@amazon.com>
-Cc: Nikita Kalyazin <kalyazin@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "david@redhat.com" <david@redhat.com>, 
-	"jthoughton@google.com" <jthoughton@google.com>, "patrick.roy@linux.dev" <patrick.roy@linux.dev>, 
-	Jack Thomson <jackabt@amazon.co.uk>, Derek Manwaring <derekmn@amazon.com>, 
-	Marco Cali <xmarcalx@amazon.co.uk>, ackerleytng@google.com, 
-	Vishal Annapurve <vannapurve@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 24, 2025, Nikita Kalyazin wrote:
+On Thu, 30 Oct 2025 21:51:00 +0100
+Markus Elfring <Markus.Elfring@web.de> wrote:
+
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Thu, 30 Oct 2025 21:43:20 +0100
+> Subject: [PATCH] KVM: PPC: Use pointer from memcpy() call for assignment in kvmppc_kvm_pv()
 > 
+> A pointer was assigned to a variable. The same pointer was used for
+> the destination parameter of a memcpy() call.
+> This function is documented in the way that the same value is returned.
+> Thus convert two separate statements into a direct variable assignment for
+> the return value from a memory copy action.
 > 
-> On 23/10/2025 17:07, Sean Christopherson wrote:
-> > On Mon, Oct 20, 2025, Nikita Kalyazin wrote:
-> > > From: Nikita Kalyazin <kalyazin@amazon.com>
+> The source code was transformed by using the Coccinelle software.
 > 
-> + Vishal and Ackerley
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> ---
+>  arch/powerpc/kvm/powerpc.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> > > 
-> > > write syscall populates guest_memfd with user-supplied data in a generic
-> > > way, ie no vendor-specific preparation is performed.  If the request is
-> > > not page-aligned, the remaining bytes are initialised to 0.
-> > > 
-> > > write is only supported for non-CoCo setups where guest memory is not
-> > > hardware-encrypted.
-> > 
-> > Please include all of the "why".  The code mostly communicates the "what", but
-> > it doesn't capture why write() support is at all interesting, nor does it explain
-> > why read() isn't supported.
-> 
-> Hi Sean,
-> 
-> Thanks for the review.
-> 
-> Do you think including the explanation from the cover letter would be
-> sufficient?
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index 2ba057171ebe..ae28447b3e04 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -216,8 +216,7 @@ int kvmppc_kvm_pv(struct kvm_vcpu *vcpu)
+>  
+>  			shared &= PAGE_MASK;
+>  			shared |= vcpu->arch.magic_page_pa & 0xf000;
+> -			new_shared = (void*)shared;
+> -			memcpy(new_shared, old_shared, 0x1000);
+> +			new_shared = memcpy(shared, old_shared, 0x1000);
 
-It's pretty close.  A few more details would be helpful, e.g. to explain that VMMs
-may use write() to populate the initial image
+Did you even try to compile this??
 
-> Shall I additionally say that read() isn't supported because there is no use
-> case for it as of now or would it be obvious?
+>  			vcpu->arch.shared = new_shared;
+>  		}
+>  #endif
 
-Hmm, I think if you want to exclude read() support, the changelog should explicitly
-state why.  E.g. "there's no use case" is quite different from "deliberately
-don't support read() for security reasons".
-
-> > > Signed-off-by: Nikitia Kalyazin <kalyazin@amazon.com>
-> > > ---
-> > >   virt/kvm/guest_memfd.c | 48 ++++++++++++++++++++++++++++++++++++++++++
-> > 
-> > There's a notable lack of uAPI and Documentation chanegs.  I.e. this needs a
-> > GUEST_MEMFD_FLAG_xxx along with proper documentation.
-> 
-> Would the following be ok in the doc?
-> 
-> When the capability KVM_CAP_GUEST_MEMFD_WRITE is supported, the 'flags'
-
-No capability is necessary, see d2042d8f96dd ("KVM: Rework KVM_CAP_GUEST_MEMFD_MMAP
-into KVM_CAP_GUEST_MEMFD_FLAGS").
-
-> field
-> supports GUEST_MEMFD_FLAG_WRITE. Setting this flag on guest_memfd creation
-> enables write() syscall operations to populate guest_memfd memory from host
-> userspace.
-> 
-> When a write() operation is performed on a guest_memfd file descriptor with
-> the
-> GUEST_MEMFD_FLAG_WRITE set, the syscall will populate the guest memory with
-> user-supplied data in a generic way, without any vendor-specific
-> preparation.
-> The write operation is only supported for non-CoCo (Confidential Computing)
-> setups where guest memory is not hardware-encrypted. 
-
-The restriction should be that guest memory must be SHARED, i.e. not PRIVATE.
-Strictly speaking, guest memory can be encrypted, e.g. with SME and TME (I think
-TME is still a thing?), but with a shared key and thus accessible from the host.
-
-Even if that weren't the case, we want to support this for CoCo VMs.
-
-> If the write request is not page-aligned, any remaining bytes within the page
-> are initialized to zero.
-
-Why?  (Honest question, e.g. is that standard file semantics?)
-
-> > And while it's definitely it's a-ok to land .write() in advance of the direct map
-> > changes, we do need to at least map out how we want the two to interact, e.g. so
-> > that we don't end up with constraints that are impossible to satisfy.
-> > 
-> 
-> write() shall not attempt to access a page that is not in the direct map,
-> which I believe can be achieved via kvm_kmem_gmem_write_begin() consulting
-> the KVM_GMEM_FOLIO_NO_DIRECT_MAP in folio->private (introduced in [1]).
-> 
-> Do you think we should mention it in the commit message in some way? What
-> particular constraint are you cautious about?
-
-I want to be cautious with respect to the ABI/uAPI.  Patrick's series also adds
-a flag, and guest_memfd doesn't currently provide a way to toggle flags after the
-file is created.  That begs the question of how GUEST_MEMFD_FLAG_NO_DIRECT_MAP
-will co-exist with GUEST_MEMFD_FLAG_WRITE.  Presumably the goal is to use write()
-to initialize memory, and _then_ nuke the direct map.
-
-I want line of sight to understanding the exact semantics/flows.  E.g. will KVM
-require userspace to clear GUEST_MEMFD_FLAG_WRITE before allowing
-NO_DIRECT_MAP?  Or will the write() simply fail?  How will the sequencing be
-achieved?
-
-> > > +     struct inode *inode = file_inode(file);
-> > > +     pgoff_t index = pos >> PAGE_SHIFT;
-> > > +     struct folio *folio;
-> > > +
-> > > +     if (!kvm_gmem_supports_mmap(inode))
-> > 
-> > Checking for MMAP is neither sufficient nor strictly necessary.  MMAP doesn't
-> > imply SHARED, and it's not clear to me that mmap() support should be in any way
-> > tied to WRITE support.
-> 
-> As in my reply to the comment about doc, I plan to introduce
-> KVM_CAP_GUEST_MEMFD_WRITE and GUEST_MEMFD_FLAG_WRITE.  The
-> kvm_arch_supports_gmem_write() will be a weak symbol and relying on
-> !kvm_arch_has_private_mem() on x86, similar to
-> kvm_arch_supports_gmem_mmap().  Does it look right?
-
-No.  As above, write() should be allowed iff memory is SHARED.  Relevant commits
-that are now in Linus' tree:
-
-  44c6cb9fe9888b371e31165b2854bd0f4e2787d4 KVM: guest_memfd: Allow mmap() on guest_memfd for x86 VMs with private memory
-  9aef71c892a55e004419923ba7129abe3e58d9f1 KVM: Explicitly mark KVM_GUEST_MEMFD as depending on KVM_GENERIC_MMU_NOTIFIER
-  5d3341d684be80892d8f6f9812f90f9274b81177 KVM: guest_memfd: Invalidate SHARED GPAs if gmem supports INIT_SHARED
 
