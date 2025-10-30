@@ -1,108 +1,105 @@
-Return-Path: <kvm+bounces-61472-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61473-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C280C1F8CF
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 11:30:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5664BC1FCC1
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 12:25:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CD04134DFD6
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 10:30:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CCC43B47FF
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 11:25:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D1D535580A;
-	Thu, 30 Oct 2025 10:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31B2351FCA;
+	Thu, 30 Oct 2025 11:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="hzmzDqAZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OK/iWfsG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C781C350D79;
-	Thu, 30 Oct 2025 10:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1A533F365;
+	Thu, 30 Oct 2025 11:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761820139; cv=none; b=glWoAQUHFzXxNGHb9RL4Pn3XRGZPjI4hsigQrfY4LLOWThWZieOojnrxQWBB8Di2ygMeoxDnRDLVDM+YtsBbS5PqHkQLfx5L43FJuVHisq7it8QmwMVYx4VqrxkcW6HKdP6cZQAx2+Y7aqJlLmYhcblnXlc3kwjA1v3Y/bvy/Ms=
+	t=1761823520; cv=none; b=KA34WsAmpkb0qpJ0u6WPtE+WbAl5fOc8K3IV8abNws3tvBwt9+f0r9iGbuhUC6XTWINeGuv2rOXnG23jdGHxsJ3TBpPM9msLSemMKqLIB4aSIDs1Yb/IpjtY63wBsyVWLatRZiKQGVVV8hyqpN6MIJC8P5YkCeiXJwxd0Evahkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761820139; c=relaxed/simple;
-	bh=AifIUuNwhTe15u6vhAo7fW9AvS5TadottclufhTDVFQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UNvcCdABwEDE1ly3oEabSoXwbDSn8q++prBPKqbkF2bdG6mCid7+1nvY7RYwX40G8nc3fl/Lmikm4EpMcH4IScQSN/GWhOgik/Tdr+Mn7+cJdXXmA91WnsEScVew38gcen+TxjpCarEjhr2Y6Y3vzAWzyy7jQeisriGSWHm37As=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=hzmzDqAZ; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 2E9CC40E021B;
-	Thu, 30 Oct 2025 10:28:53 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id UymOqoxP1A1F; Thu, 30 Oct 2025 10:28:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1761820129; bh=WZZ6N+wcXa37HBzA5ts6flFieqWk4sP4JA+15EAS45U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hzmzDqAZcDuVVdcb/zrFbu80QwFEgGX4v5eZRvHiSEmvpa45Ciu5FGZzZtHPexp7a
-	 yLP8XMmG4L3tDQgeNfI+jQv/+DI1ilDPEhPuzPlpSWXn4zVXGpkKb1gfwhMWjv0+67
-	 Fjv0RuEQEysYiqkl8FkmTZndM+B5pvlLDvJ4AQ7RnqIDmkrnc80D03NyUauqJHf6jv
-	 4FLURMd39H5SAsYB8/F4bps8aVtv4X0Yt72zsfEqNFU3mV+FzTN6UNmhUM9Z6JvJ55
-	 ZqTcdheAk/cTUHWJzx/opM/IGN2uuFqlaeiKlGYSs9K8PvfPhhPVWgS05IrOC8U3tu
-	 hOvbvT0p7AxmX61qfgl9w1XzgfOtUOdSYOK32iTR+qtaZMrA9FguevLwQQWp9644l5
-	 V+690Bj7iltdneXdDS79cgRuC5fTgBNgxLURKZpq56oDI/TBLxajEnuJXLxedi6lY8
-	 ljDOUkKo5t/kFDCd0Za6ZrCd40ODw/nHBdJKr3ulDZfUlV/0qWIP5QJkzYucbP0DQe
-	 CZfLmyAUI50X8aiKj2H9ok2ONspMDtLqid3pAaTadGzVPnLP0X3EGK0KyHmdgUU/Ij
-	 NTYYNCI42eEBkjHr4//ZWpIdoCj28hT8lK4vYH899nKArqPZYics89IATtNG06WXKX
-	 isYNjdM7JaLaz5vNi6QWAUnA=
-Received: from zn.tnic (pd9530da1.dip0.t-ipconnect.de [217.83.13.161])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id B831140E015B;
-	Thu, 30 Oct 2025 10:28:33 +0000 (UTC)
-Date: Thu, 30 Oct 2025 11:28:26 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Tao Zhang <tao1.zhang@intel.com>,
-	Jim Mattson <jmattson@google.com>,
-	Brendan Jackman <jackmanb@google.com>
-Subject: Re: [PATCH 0/3] Unify VERW mitigation for guests
-Message-ID: <20251030102826.GAaQM9ykytR9Dm3yEb@fat_crate.local>
-References: <20251029-verw-vm-v1-0-babf9b961519@linux.intel.com>
- <aQKxVLoS2MzBiSIm@google.com>
+	s=arc-20240116; t=1761823520; c=relaxed/simple;
+	bh=6pRLhXQTg48LccghaYa5grB/ldAS7xutWQXqYeaONAI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OPSBqlKPZZ8xF01HgIIFprk/jLJ2NnD/hWenzUwRNuFl/r82dq21hgdE3xL8HmCDEefwtSQDg5eMi63MRSfkUFe4gH9c233SECWF/EyAJBLkHWe5YzelLwPwiGuZDM/0soCMW3YBDyNHCfYz8WxSa+fPKdpxaWk32i56t+i4Mno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OK/iWfsG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F4D9C4CEF8;
+	Thu, 30 Oct 2025 11:25:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761823520;
+	bh=6pRLhXQTg48LccghaYa5grB/ldAS7xutWQXqYeaONAI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OK/iWfsGKPH76eTFnRmfEgmrgWV+XlSP07CDbXrbXrT5kabli0le+L3nLFvZyLmg3
+	 uDtdKVLtBAJQDlhIdZDjbKkD+O9erGphWHpSUwXCKM9IwBRGDUms4h4NQfFswyZmhP
+	 SqGFIHJ4BGbAUAQk2Z81nCkGtGd4wFoTkbcJFbzPuKQsO/WxoOgtIpcMQXqDTdZaiY
+	 4UZtYM1KAgwl5L56fuUCkhFk5NWPCLZG3YAWpaT1zfVqau8wKZc6t66BbWzNC6k/Gz
+	 mf2OQrEKHAjd0eTObb7YTHD981blAirH/sop1L0IU1eDwAfY0FwExedoSdbDeCk1oE
+	 m62/WGvW+HHUg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vEQmM-00000000xUk-0abm;
+	Thu, 30 Oct 2025 11:25:18 +0000
+Date: Thu, 30 Oct 2025 11:25:17 +0000
+Message-ID: <86tszgvdgi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: arm64: Make ID_PFR1_EL1.GIC writable
+In-Reply-To: <aPiBH1_WZicoE7Od@linux.dev>
+References: <20251013083207.518998-1-maz@kernel.org>
+	<20251013083207.518998-2-maz@kernel.org>
+	<aPiBH1_WZicoE7Od@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aQKxVLoS2MzBiSIm@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Oct 29, 2025 at 05:29:08PM -0700, Sean Christopherson wrote:
-> Any objection to taking these through the KVM tree when they're ready?  There
-> will be a conflict in vmx.c with an L1TF related cleanup, and that conflict is
-> actually helpful in that the two series feed off each other a little bit.
+On Wed, 22 Oct 2025 08:00:47 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hey,
+> 
+> On Mon, Oct 13, 2025 at 09:32:05AM +0100, Marc Zyngier wrote:
+> > Similarly to ID_AA64PFR0_EL1.GIC, relax ID_PFR1_EL1.GIC to be writable.
+> 
+> This looks fine to me, although I do wonder if we should just allow
+> userspace to write whatever value it wants to the 32-bit ID registers
+> and be done with it.
 
-I don't see why not.
+That's a good point. Nobody really cares about 32bit anyway, and I'd
+be happy to just let the VMM write whatever it wants. Might be a bit
+harder to backport, but whoever is interested in AArch32 will be able
+to do it.
 
-At the moment, we don't have a whole lot in tip touching that area and if it
-ends up appearing, I'd ping you for an immutable branch I could use.
+Thanks,
 
-Thx.
+	M.
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Without deviation from the norm, progress is not possible.
 
