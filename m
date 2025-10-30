@@ -1,119 +1,117 @@
-Return-Path: <kvm+bounces-61455-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61456-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B459C1E58E
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 05:30:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE388C1E729
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 06:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0344B400CB4
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 04:30:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 169AA400671
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 05:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AC02FABE0;
-	Thu, 30 Oct 2025 04:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDD62F618C;
+	Thu, 30 Oct 2025 05:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eZBsmjJZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PI+AP8BB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DCF2F60A3
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 04:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642B2286419;
+	Thu, 30 Oct 2025 05:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761798604; cv=none; b=PZ/NvYDP/UhmAFWPJC8qN4iCkv1NkQbhuq2vnGBBP5gYnc+qwxVIdO7w5iJ0MDk7YpIeEPXsHbKIUOx+OMS/6dfsEycddnoYmIGsEO1r7lLDSGyoG9lyvOSepAw+7/CNgErE5rbOnfrRfQr87Xk6VKM0S/b49tE9Y+A+wvsBzxI=
+	t=1761802825; cv=none; b=cWQ1M/z7/GqqYkwrbcx8z2u2095GLgEAS8eY4406MI7vf3cMTmbu1olCmhfuNEcDkCemHccTXJC3VdmEVtNn2rRIgY8SfMonDKpmpEu65SwPOz7qmPoBN2JZYjXDO1vjPse7TNJkqAUhktjsZB3Hwg1EkOYet3icEYL16Ekwq2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761798604; c=relaxed/simple;
-	bh=u7PuITfx4IeFAa8s+tPsssN46kIRp4aS74VUU7N6W48=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dSrQ9itYPNHtLE1tzuXVj29+InxUUg4rVCrJY3EKRiHD0i6stZO0Admj8giS1gije09JOSsghAzXdj3uE7P9zbvJK9gmilzzOgHl9hMf2Gk0oKHqwvkt7l0lY5C/vsqlbuY3s+Rme5oLDMm2Wv7QL35KdblVb01i3tc3zPKkWrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eZBsmjJZ; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1761802825; c=relaxed/simple;
+	bh=jHCNvinaOkYM655G2d10JGOUEvs4HKvUSGzoQaDdvPo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sfc7y2tgh1EcHv5QxYu6+VBYioSM1tBnv2gOt9CMt2EYwKcDWzcuY9yC4IE1IGGP3S5SEBYqaLk+r+3HXTMQFvm9Dn0XCD7sKNNd/Qu/NFf7AEflM9U68Nn4Mf8j++FZ1zSrhTEUDeBKJbwGiygtuYWB6mktQcdIm7ndYfNOGio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PI+AP8BB; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761798603; x=1793334603;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=u7PuITfx4IeFAa8s+tPsssN46kIRp4aS74VUU7N6W48=;
-  b=eZBsmjJZOWU390hyYzJYgnNkvdw+FczLyYxHNKCXPBg2J4ifxTxj9u04
-   jdOaxn3WlLrivn2ihpAL5164a3ctUigtnNi4yr8sb07OJTxmVA01orzc9
-   LV9nQFq+DCYlFAzQFM/ogx1rWILt58KqlvqOpUIxBOjZT5o1d3wvKACzN
-   lYI9QiL/xXu4aFBZbxDJseen8++9R5/WiblTTD8nQxClKgdbQU+A+0Oq2
-   OexFgpcWvRKmik36fQ7mC4KbYL0KUj0IHhcM7Ubb4zm/a/AYWX4J4cz8I
-   OgGXVslolWuY+THRzNhlv9dbj+K2vChCAQ7fJpHm4YlZMv6mg4q3yPlxj
+  t=1761802823; x=1793338823;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jHCNvinaOkYM655G2d10JGOUEvs4HKvUSGzoQaDdvPo=;
+  b=PI+AP8BBEXt5ghpf/S969bZ35x6EGR7QjfR5N006adLJMduzU0atW+jY
+   SmK8LfnlAjqxgdvIJABNsoTVy4kt+oZsHx3uDwFKmF0xR8VIBUbpbw5Sw
+   2OHb07jO1Zc26CJklh6OPxGn8326CEIMpKniXeSpVxTRWHPp7ipJLhJ2j
+   7Bp0SRzDwk0icHq0mEjhtccp9IpiWo8SWimNINBiyaNoLw/AiLI9cEnel
+   JUEyUb1rXP8Yjr97U8+sdI6K4oIZGx1d4Fe9ysO7RlnyytaAINHIYPijT
+   oJu6Cj5sIuORjbuVshv4jsROKwm+ZyOGtsasK6FGXjIpTw5+q+Z9mTxUn
    w==;
-X-CSE-ConnectionGUID: cRabA/G3RKWjrCgU1Ppm0A==
-X-CSE-MsgGUID: uUxKx2csTAuSB6whtdPanQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="63834263"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="63834263"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 21:30:01 -0700
-X-CSE-ConnectionGUID: iS6zRn3IRu2hIWFWiaXczw==
-X-CSE-MsgGUID: 0JqmzqhuRoihmN4bC/MmsA==
+X-CSE-ConnectionGUID: 51seY/GUTa2EHiIpJI2hJA==
+X-CSE-MsgGUID: xwVhIhrTSW6DPACO0QBfCQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="62958413"
+X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
+   d="scan'208";a="62958413"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 22:40:23 -0700
+X-CSE-ConnectionGUID: AMlTHf/dSe+VWVWA/3K/gw==
+X-CSE-MsgGUID: 3PFZ2nniREmq9C9A9U69zg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="191018131"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 21:29:57 -0700
-Message-ID: <4806bc74-e4c2-4aa1-b003-e72895a11f11@intel.com>
-Date: Thu, 30 Oct 2025 12:29:54 +0800
+   d="scan'208";a="190193623"
+Received: from vverma7-desk1.amr.corp.intel.com (HELO desk) ([10.124.223.151])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 22:40:22 -0700
+Date: Wed, 29 Oct 2025 22:40:14 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Tao Zhang <tao1.zhang@intel.com>,
+	Jim Mattson <jmattson@google.com>,
+	Brendan Jackman <jackmanb@google.com>
+Subject: Re: [PATCH 2/3] x86/mmio: Rename cpu_buf_vm_clear to
+ cpu_buf_vm_clear_mmio_only
+Message-ID: <20251030054014.ev7caj7ejrl5hpgv@desk>
+References: <20251029-verw-vm-v1-0-babf9b961519@linux.intel.com>
+ <20251029-verw-vm-v1-2-babf9b961519@linux.intel.com>
+ <aQKuy34wmCWvXcMS@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 11/20] i386/cpu: Enable xsave support for CET states
-To: Chao Gao <chao.gao@intel.com>, Zhao Liu <zhao1.liu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
- <mtosatti@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org,
- John Allen <john.allen@amd.com>, Babu Moger <babu.moger@amd.com>,
- Mathias Krause <minipli@grsecurity.net>, Dapeng Mi <dapeng1.mi@intel.com>,
- Zide Chen <zide.chen@intel.com>, Chenyi Qiang <chenyi.qiang@intel.com>,
- Farrah Chen <farrah.chen@intel.com>, Yang Weijiang <weijiang.yang@intel.com>
-References: <20251024065632.1448606-1-zhao1.liu@intel.com>
- <20251024065632.1448606-12-zhao1.liu@intel.com> <aQGe66NsIm7AglKb@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <aQGe66NsIm7AglKb@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aQKuy34wmCWvXcMS@google.com>
 
-On 10/29/2025 12:58 PM, Chao Gao wrote:
-> On Fri, Oct 24, 2025 at 02:56:23PM +0800, Zhao Liu wrote:
->> From: Yang Weijiang <weijiang.yang@intel.com>
->>
->> Add CET_U/S bits in xstate area and report support in xstate
->> feature mask.
->> MSR_XSS[bit 11] corresponds to CET user mode states.
->> MSR_XSS[bit 12] corresponds to CET supervisor mode states.
->>
->> CET Shadow Stack(SHSTK) and Indirect Branch Tracking(IBT) features
->> are enumerated via CPUID.(EAX=07H,ECX=0H):ECX[7] and EDX[20]
->> respectively, two features share the same state bits in XSS, so
->> if either of the features is enabled, set CET_U and CET_S bits
->> together.
->>
->> Tested-by: Farrah Chen <farrah.chen@intel.com>
->> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
->> Co-developed-by: Chao Gao <chao.gao@intel.com>
->> Signed-off-by: Chao Gao <chao.gao@intel.com>
->> Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
->> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+On Wed, Oct 29, 2025 at 05:18:19PM -0700, Sean Christopherson wrote:
+> On Wed, Oct 29, 2025, Pawan Gupta wrote:
+> > cpu_buf_vm_clear static key is only used by the MMIO Stale Data mitigation.
+> > Rename it to avoid mixing it up with X86_FEATURE_CLEAR_CPU_BUF_VM.
+> > 
+> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> > ---
 > 
-> It just occurred to me that KVM_GET/SET_XSAVE don't save/restore supervisor
-> states. Supervisor states need to be saved/restored via MSR APIs. So, there
-> is no need to add supervisor states (including ARCH_LBR states) to
-> x86_ext_save_areas[].
+> ...
+> 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index f87c216d976d7d344c924aa4cc18fe1bf8f9b731..451be757b3d1b2fec6b2b79157f26dd43bc368b8 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -903,7 +903,7 @@ unsigned int __vmx_vcpu_run_flags(struct vcpu_vmx *vmx)
+> >  	if (!msr_write_intercepted(vmx, MSR_IA32_SPEC_CTRL))
+> >  		flags |= VMX_RUN_SAVE_SPEC_CTRL;
+> >  
+> > -	if (static_branch_unlikely(&cpu_buf_vm_clear) &&
+> > +	if (static_branch_unlikely(&cpu_buf_vm_clear_mmio_only) &&
+> >  	    kvm_vcpu_can_access_host_mmio(&vmx->vcpu))
+> >  		flags |= VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO;
+> 
+> The use in vmx_vcpu_enter_exit() needs to be renamed as well.  The code gets
+> dropped in patch 3, but intermediate builds will fail.
 
-x86_ext_save_areas[] is not used only for xsave state, it's also used 
-for the setup of xsave features, i.e., CPUID leaf 0xD.
-
-And you did catch the missing part of this series, it lacks the 
-save/restore of CET XSAVE state in 
-x86_cpu_xsave_all_areas()/x86_cpu_xrstor_all_areas()
+Ya, thanks for catching it.
 
