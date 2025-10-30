@@ -1,147 +1,113 @@
-Return-Path: <kvm+bounces-61463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B009C1E9F4
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 07:49:05 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 024BEC1EA7B
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 07:59:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2116B19C15D2
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 06:49:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BA83E4E6B66
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 06:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6127832572A;
-	Thu, 30 Oct 2025 06:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FBF6332EB5;
+	Thu, 30 Oct 2025 06:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jvaq5XNT"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lp+dX3yh"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6939317B43F;
-	Thu, 30 Oct 2025 06:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C65332908
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 06:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761806904; cv=none; b=ICD1nYZD23eoxUGKJ0n+lCSLz1EAaY2wIOJcTt2L5tilFKzmqN3iVhgxaflTlf99zdb92yGTe2mznHo2hFluMgPUfwzXe2pLkla6rHunfeS4wPHXhRF2405YjyC+kY/56i4WbYlkIbK3GwbvcN+wGFO9A1vjv6LPlmjw/dHVjp4=
+	t=1761807581; cv=none; b=Nn+/gpVH3Q9KR8P2vlntqJPmlyyKuxj7OhBsTGZ5RrCF820j9+1hV10+GoCA57pTJgtdFhIKQAKR4E9YanclL3S7zlmJe0qkFsvIQi/aYgjV75ciYSYtlbHXjCN6juosaBJrM6KBALr6s5Xk/iuL6InTm1y2RcvNlnTjNTHpZOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761806904; c=relaxed/simple;
-	bh=Hh7skkg065ylczpCr0Iv292nYGj50H++UlcoJlqnTFg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y/GKlT6ddPKELQvFv33SMVK1v8si1Q0LJ+7Xx+n8YOHxG2RI3t9jTWkmnlBUl0zRXZ9aYi6J/x5BaVe0hrgoP1PCHl+0Aeh7WGGgYbX1DboqVFTGGlWTzUNom4o9zNduORjvYNwUDf+lp5TWjvSOKN/bpcNPsuAHS3kTYczadvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jvaq5XNT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26554C4CEF1;
-	Thu, 30 Oct 2025 06:48:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761806903;
-	bh=Hh7skkg065ylczpCr0Iv292nYGj50H++UlcoJlqnTFg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Jvaq5XNTepDILhgg1JjU/RUVDN3aAiAJIkCA81z5TSuHPckkaF3X0SyKZTH4NiHLo
-	 x+finAT9AqYTJiYKAczU3VWRnf+rm3VE20OrKWYI/Xxc5hFGsCXFzXGxlRgl84S3cn
-	 1erdjEeAotdXzH15cDoYeVH+bTlS6vCEewWmlIP12FHqqmKW1wIhJVbVTWmVOPGJrX
-	 RJ5aoNnkrAbFiXF+dpmpZF6tfJYJwn+YpHGgTwxQxqrtPlhVJhYtSdcxvt/ny5ubyp
-	 08qX3boYwst6Z/pSklUkGal7BAeNf8rJyf2PuG4I88FPZtBaphc13e3GPPIzUbz0sz
-	 yNDwwG6BUC0cA==
-Date: Thu, 30 Oct 2025 08:48:18 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251030064818.GA60090@unreal>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
- <CAAywjhRb6Nwmzy+QWFPH9Zkn-xvtvOktNjAZ8HMpM2wmVw2rjw@mail.gmail.com>
+	s=arc-20240116; t=1761807581; c=relaxed/simple;
+	bh=su0oQI4QOzWItSKWQ8g0F+1/ZeshZxA11SqOEwqjvEI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=noelya/elIXzttI1nUmtlC/zJjLLUVLHNaXcnBzbDErnP3LhWt/KCslubTPDuYaNdzsf/ymE/GyeEW+pfeBpEYKmqastk5Xj3ZfoYWpYE5bxufyxLAL2UXYpvFbfFwuVaJcxKRzBXgholCC29rPvTHf5ouFZoQUpJ5+2M7jP2+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lp+dX3yh; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-63e18829aa7so889556a12.3
+        for <kvm@vger.kernel.org>; Wed, 29 Oct 2025 23:59:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1761807578; x=1762412378; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jJ/HO6pHQVocYwCqGJnhbN0FHbwRi34rNhDy730oj+I=;
+        b=lp+dX3yhUw6LvmYzmufN9r7Zv8qKSL1D6/IsRJRVP4Sg52h0YECDEJP/F/Aeg0yV2a
+         YjrqEazGQS24ab9ARRtpcnL1Fv4YJhik6vn63Pfb8j2ytE+rWo7MXhjsZghhZLi2BBRC
+         eCD8AbzkXl6rO3qDmrKNHfGPM+qbzCoNyJ5t5yhfqbASEuPQKOAKAy5+4Tvn87425E95
+         dbX04c4Ee8M6x1/tVsqFMGKXOkG8ULTg7TstnLaAYw59+tMGw/Z/Eyj/BVv/VMIwX+UK
+         EyeqBGyJgsJ+7cHkuRN2vbXyWlN22BEtUakb4j6eIDvOt7tiFWW43wiqJ6Bgc9hxm1X/
+         6IWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761807578; x=1762412378;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jJ/HO6pHQVocYwCqGJnhbN0FHbwRi34rNhDy730oj+I=;
+        b=e7COUsvP/hi85EfHJ3fdfgGDQn3HCl3Ie71I07Xd6xUGU8hPKKCRKOe9mnYd9xZu2e
+         sPqXVXi9ZoVAA2KRQF/34mfVMs/FxDqgB+/gJBT8N/exa+QHuSIKhQuXW4Ia0MF3sEWG
+         z9GuzT5cckdY9jO612BqkdlRuAxsp1wTS06IKFBYPtvmhyR/fE2YN8qA3/jbhhP8tahj
+         Axlgpwv6EUJmufK10nJTAzyFavLc1bnRPxWrvKhibS68lJDaF7lfsfEZki6CV//73CS3
+         GhbZJhXrZWIm8mwqElMprLXOIJz4S07XQyP6k0fvaD7oVE4UuM1azwkws3KiOicb/uw6
+         RT3w==
+X-Forwarded-Encrypted: i=1; AJvYcCVs4gku8KVIR0kcfZM41NB3KZdbIhXwOB1j7cz+1EWWwOHfyHQbEqlgiL7ZV//chbRbN7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtK1NC40tu5oA/2K1NqIkZcXPumUrmlkC9xuT7wFziwVI0ByQj
+	SrIGJaFTerW9XFyH4hAmYeALz3IJ37P1ocHj+6SxLgj4G40Rk4OT6zVUPscoOqjSiLQgbxcjjAf
+	IWc1qyQjsJ5PKEGCYhoQZOMF6SCrjb7qGl9u+bW8vIw==
+X-Gm-Gg: ASbGncshbAiD1jH8fpeN3dGXsGGs6pJGybRXLujH1/Wz5vXwS/qKT/mcd1Vhc9puvLA
+	+bmXBiR0uMjUghPGwUSj3y3bpXsVXAvFy/35jU2Iw7SwtzNFLpsZ4/rVgZZ7gsQisnhgPBbYf8C
+	i1YuOQIXHi/uH4MwD3a5LEjg/6/aG3tB1Km4gf/+neWEUlgl+bHwaVa+gTScysPNWFRPXW28Pna
+	fx37vbDe8USRpc0z+oS6pM1yMl0j3aW+UMup9x4vRpXTu1LtsaIoB8yQCFp4TQPIXrQNiA=
+X-Google-Smtp-Source: AGHT+IH0xKtTOvXSj0w0p9pGjs44bfmfXmJe9ZjkC3NgIW10Mc0UYv7dQoY/VDKyF22Hv8KKVyDpPTiWdRNVg40T52w=
+X-Received: by 2002:a05:6402:3506:b0:640:464a:56ce with SMTP id
+ 4fb4d7f45d1cf-64061a206bdmr1615343a12.2.1761807577663; Wed, 29 Oct 2025
+ 23:59:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAywjhRb6Nwmzy+QWFPH9Zkn-xvtvOktNjAZ8HMpM2wmVw2rjw@mail.gmail.com>
+References: <20250120061310.81368-1-philmd@linaro.org> <395c7c86-08b1-4af4-a5ca-012a9aa89339@linaro.org>
+In-Reply-To: <395c7c86-08b1-4af4-a5ca-012a9aa89339@linaro.org>
+From: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+Date: Thu, 30 Oct 2025 08:59:11 +0200
+X-Gm-Features: AWmQ_bl6hqBdTUMqfB1A4rR44hN5EJ76yR6SMau1gPDpmEtyNMVrsra4cLNQE5A
+Message-ID: <CAAjaMXZSkxCgzdC6w-onUxVxU_ZW5fiBtW5-ioeKaXwD_7tJeQ@mail.gmail.com>
+Subject: Re: [PATCH 0/7] cpus: Constify some CPUState arguments
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, 
+	Kyle Evans <kevans@freebsd.org>, Warner Losh <imp@bsdimp.com>, kvm@vger.kernel.org, 
+	Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 29, 2025 at 05:25:03PM -0700, Samiullah Khawaja wrote:
-> On Mon, Oct 13, 2025 at 8:27 AM Leon Romanovsky <leon@kernel.org> wrote:
+On Wed, Oct 29, 2025 at 7:59=E2=80=AFPM Philippe Mathieu-Daud=C3=A9
+<philmd@linaro.org> wrote:
+>
+> On 20/1/25 07:13, Philippe Mathieu-Daud=C3=A9 wrote:
+> > This is in preparation of making various CPUClass handlers
+> > take a const CPUState argument.
 > >
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> >
-> > Add support for exporting PCI device MMIO regions through dma-buf,
-> > enabling safe sharing of non-struct page memory with controlled
-> > lifetime management. This allows RDMA and other subsystems to import
-> > dma-buf FDs and build them into memory regions for PCI P2P operations.
-> >
-> > The implementation provides a revocable attachment mechanism using
-> > dma-buf move operations. MMIO regions are normally pinned as BARs
-> > don't change physical addresses, but access is revoked when the VFIO
-> > device is closed or a PCI reset is issued. This ensures kernel
-> > self-defense against potentially hostile userspace.
-> >
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > Signed-off-by: Vivek Kasireddy <vivek.kasireddy@intel.com>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >  drivers/vfio/pci/Kconfig           |   3 +
-> >  drivers/vfio/pci/Makefile          |   2 +
-> >  drivers/vfio/pci/vfio_pci_config.c |  22 +-
-> >  drivers/vfio/pci/vfio_pci_core.c   |  28 ++
-> >  drivers/vfio/pci/vfio_pci_dmabuf.c | 446 +++++++++++++++++++++++++++++
-> >  drivers/vfio/pci/vfio_pci_priv.h   |  23 ++
-> >  include/linux/vfio_pci_core.h      |   1 +
-> >  include/uapi/linux/vfio.h          |  25 ++
-> >  8 files changed, 546 insertions(+), 4 deletions(-)
-> >  create mode 100644 drivers/vfio/pci/vfio_pci_dmabuf.c
+> > Philippe Mathieu-Daud=C3=A9 (7):
+> >    qemu/thread: Constify qemu_thread_get_affinity() 'thread' argument
+> >    qemu/thread: Constify qemu_thread_is_self() argument
+> >    cpus: Constify qemu_cpu_is_self() argument
+> >    cpus: Constify cpu_get_address_space() 'cpu' argument
+> >    cpus: Constify cpu_is_stopped() argument
+> >    cpus: Constify cpu_work_list_empty() argument
+> >    accels: Constify AccelOpsClass::cpu_thread_is_idle() argument
+>
+> ping?
+>
 
-<...>
-
-> > +void vfio_pci_dma_buf_move(struct vfio_pci_core_device *vdev, bool revoked)
-> > +{
-> > +       struct vfio_pci_dma_buf *priv;
-> > +       struct vfio_pci_dma_buf *tmp;
-> > +
-> > +       lockdep_assert_held_write(&vdev->memory_lock);
-> > +
-> > +       list_for_each_entry_safe(priv, tmp, &vdev->dmabufs, dmabufs_elm) {
-> > +               if (!get_file_active(&priv->dmabuf->file))
-> > +                       continue;
-> > +
-> > +               if (priv->revoked != revoked) {
-> > +                       dma_resv_lock(priv->dmabuf->resv, NULL);
-> > +                       priv->revoked = revoked;
-> > +                       dma_buf_move_notify(priv->dmabuf);
-> 
-> I think this should only be called when revoked is true, otherwise
-> this will be calling move_notify on the already revoked dmabuf
-> attachments.
-
-This case is protected by "if (priv->revoked)" check both in vfio_pci_dma_buf_map
-and vfio_pci_dma_buf_attach. They will prevent DMABUF recreation if revoked is false.
-
-VTW, please trim your replies, it is time consuming to find your reply
-among 600 lines of unrelated text.
-
-Thanks
-
-> > +                       dma_resv_unlock(priv->dmabuf->resv);
-> > +               }
-> > +               dma_buf_put(priv->dmabuf);
-> > +       }
-> > +}
-
+Hi Philippe, I can't find this series in my mailbox and it's not on
+lore.kernel.org/patchew/lists.gnu.org either. Resend?
 
