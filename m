@@ -1,191 +1,460 @@
-Return-Path: <kvm+bounces-61458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61459-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE0E9C1E7DA
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 07:01:25 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5AC2C1E82E
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 07:08:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8B5B634C075
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 06:01:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9534D4E58B4
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 06:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB782D249B;
-	Thu, 30 Oct 2025 06:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 108A132BF48;
+	Thu, 30 Oct 2025 06:08:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dyk0noWO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NL57NLZU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA44213E6A;
-	Thu, 30 Oct 2025 06:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761804076; cv=none; b=pzU/i4RZQdjog4rztjeYXTL8Z5SVUQsZhBU0WrLGGOavbuPpD3HUtEFhbsA5O/P+OQea4FyyxZ5MDgU2DNIw/19VLu7K/jX1BRNaBjJpoyW2IvH0Ooug7O217oDqDfJddR1pGcVW11SgguRbdV52EXgM4l8n6D/ZLsC4wlwJwdA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761804076; c=relaxed/simple;
-	bh=9e/+tBi0j6rUqTntzoCnyjZDiCpqqm5t7HfJJgf9V6A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OI6rd3/iF/AVmOvObuQeD/wsJh7atEynfPr8dFop95Q+dck/JIk592Sj2nBTApoRmCiHhA1YKYrihdUBcZTA1yVYz9YFQf6Aum63evEJ7colyVV7qGSjU2YJJIlYJeP4RoDTaqtGb/X7r8DQtDDp9u/aX9yTUKA1FbZoHQES0SQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dyk0noWO; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599D02DCBEC;
+	Thu, 30 Oct 2025 06:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761804487; cv=fail; b=Rzx/pjrqHyrue/13mxxDTWSpVPQkhxcsIc70ztH8V+hs6ukZHHF59pJDcJLZfF0Ig4ONCCdv+EAv8we6HItRkhLDKDOZxFU7WQ5L3qaA32E0bVrT8kqaPaD11wnxnK5lk+bOqp4w4J1pp3v4kwL3EsGZVLe5h3hKCMY3yoeU+Fs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761804487; c=relaxed/simple;
+	bh=F1M8O+MpqHXh2dQe8en1K0jsV+kOJqpbqP5n026dMg0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=HvWxNlWIp/K2m53VJeB5Ybi5YbuQSLCbE62pe4Uc+qNRwnfKfZiohDiC1qSjhJplftF7sh6XD34/ehu5erNEY3N4kHh9vvl8rWjeYLxRXsOjkcPkx49HWYBYSgT8Ezrzrfi6Md74OT3lHjDnh+Ycb5ldXIaUQAwKAvyt5JRe6mI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NL57NLZU; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761804074; x=1793340074;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=9e/+tBi0j6rUqTntzoCnyjZDiCpqqm5t7HfJJgf9V6A=;
-  b=Dyk0noWOZjQQcaToOkljkkK/xoDEwjIT05RRW2BsZccaoQIClHjcCMNO
-   cBZD+h9I6Iut/jzhNNrA5XY+yCo3dmqmHKASHQrcYYngQO9ugRs8cA8EQ
-   wF5K5doCEuwFys3jHDGBGxCXR5ofcJu1v/3JuNH+TBCkNyiD7uFkHbKr0
-   ZRTpFFkAbOB9z9XvtlEuhpNBNRTA+jIXRESoaADOfiSfxbQQuU+3KeBbe
-   t/MrDBXO5E1Rxcgp4t/MSOx6UIWFHPGGVOYo2Zl+G+AN+coQN81QwlG1z
-   EYwzuB9ioJTwIE1j0foaZM1qszjBJs8TdxPmIDNcnEDJYqKFUsxov7j+I
-   A==;
-X-CSE-ConnectionGUID: SArjKbZJRzia4ege4MWi2g==
-X-CSE-MsgGUID: BSqc1R45Q4GCCNWiy2K4wg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="74536875"
+  t=1761804485; x=1793340485;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=F1M8O+MpqHXh2dQe8en1K0jsV+kOJqpbqP5n026dMg0=;
+  b=NL57NLZULZDvf+sArBzJ2N9WNkfITTY2PpJHNSjjvSYQuX6bwAglCGEK
+   ojn7hWXBLIljsZmBrqkQaV9SGKi9sEcVdmOO1h+5SFNtMple32ryHRf9c
+   boDOaYqlfA/gq0XTMa0S055XeEfA7iw3UvwNY6yWda7llW3ZWLADJDMpM
+   /WiU1HHMveU/r9T0Ht0ZgEllSNqsoflcM2CKoIYYMyoGYufEBGO8hRMF7
+   X7RpbQcdPIpFUQHyVD1FsJcorIzGFfctS7uYT7p8Eq45u8S5I4okzx/XC
+   5A08VfZp3DPoerlnSvA9+UztF10oukKn5CHvOFX2YTQAAH/30vfrXeCke
+   Q==;
+X-CSE-ConnectionGUID: l+MVweiXQ52yXP6HX6zN8g==
+X-CSE-MsgGUID: UMK2NQLlSJCwgo73uRR3/A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="63142699"
 X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="74536875"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 23:01:13 -0700
-X-CSE-ConnectionGUID: b50VYDypSeiSH6znKCDt9A==
-X-CSE-MsgGUID: rx1C7SNQQ2SEzNnQLujYaA==
+   d="scan'208";a="63142699"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 23:08:03 -0700
+X-CSE-ConnectionGUID: XZTP5+0uRLqiByY4qZc4Zg==
+X-CSE-MsgGUID: /Zs7SC6mTZ6RG/vgTT4e5w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="185121584"
-Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 23:01:08 -0700
-Message-ID: <ccb1dcbc-7fc3-46a4-b7d2-571afea9e39d@linux.intel.com>
-Date: Thu, 30 Oct 2025 14:01:05 +0800
+   d="scan'208";a="186607626"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 23:08:03 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 29 Oct 2025 23:08:03 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Wed, 29 Oct 2025 23:08:03 -0700
+Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.21) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 29 Oct 2025 23:08:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PtcdgEtMcmiY52rVsEauY+eWMluO8IASP0Qze+MY5TB6QG2uq5GVBuwsJ63aGbm2fDJqOkV+k6G1XI+OWZf9GFRBHxUmVY9AvqT1YV4AyQZGLPw5sdC5CabjxhMxKFtCgzAHVVLT7Ud6sgE30dp13GZZXxa0m264PVLSR4wOyAqKIsb0f0tj5qAMM+1rkDDZPPEeQdR83+N+Zq/dCucq3dCg4buVG9Boia2WnywXrEORxnhSdFoFWAQGccmpZg8jYqrQnwm6C7j4ntpMOxEenwu8qQqI1CyccoJ0YLlt5zuR8yprcKBL0OPQcsVjzti0xjqMFqTl+lz9twQptRFHfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4gJsfiUPIX2pWqdIb2rSqzbDSsgPJcCa2a32QOwftbo=;
+ b=C0IuWypvMtntRpLoQdCc426foW/aBTpH4Tkc8UgzrbWUxvHkgPBAS+oKBUaWvDfwnm4sYP3ZqU/fKW97pUF75QXUX+v951VjvfyTf3xNNIv6AmoGenAORwGHzY7SaUHNiLo6A6hM/X+j71xiBNbwRUTDBPyaqBHSL6VK7oUmRqTyhD56WOVlYGYNGcf8HrTGuE0riZaeuvcZpP0ujfHH/FEOwADNs3OFPgTo0EnXIUp/NP5w9y4RKFHuB5IEW26W5P+JuhF7p3rIGjhjp1e3dPliqFJlDCrysTVn5j2/prMwNWr6LfYRDUpz8cKNaUcRFiA/WmO8s4Ou/A5vXs7clA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BN9PR11MB5482.namprd11.prod.outlook.com (2603:10b6:408:103::16)
+ by DM4PR11MB7208.namprd11.prod.outlook.com (2603:10b6:8:110::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.12; Thu, 30 Oct
+ 2025 06:08:01 +0000
+Received: from BN9PR11MB5482.namprd11.prod.outlook.com
+ ([fe80::158b:b258:5e7:c229]) by BN9PR11MB5482.namprd11.prod.outlook.com
+ ([fe80::158b:b258:5e7:c229%5]) with mapi id 15.20.9253.018; Thu, 30 Oct 2025
+ 06:08:01 +0000
+Message-ID: <ede86234-da1f-4975-8ceb-a27dad72e35f@intel.com>
+Date: Thu, 30 Oct 2025 07:07:55 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 21/26] drm/xe/migrate: Add function to copy of VRAM
+ data in chunks
+To: Michal Wajdeczko <michal.wajdeczko@intel.com>,
+	=?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>, "Alex
+ Williamson" <alex.williamson@redhat.com>, Lucas De Marchi
+	<lucas.demarchi@intel.com>, =?UTF-8?Q?Thomas_Hellstr=C3=B6m?=
+	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
+	<kevin.tian@intel.com>, <intel-xe@lists.freedesktop.org>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
+	<matthew.brost@intel.com>
+CC: <dri-devel@lists.freedesktop.org>, Jani Nikula
+	<jani.nikula@linux.intel.com>, Joonas Lahtinen
+	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>
+References: <20251021224133.577765-1-michal.winiarski@intel.com>
+ <20251021224133.577765-22-michal.winiarski@intel.com>
+ <72f0caa9-50b3-4fb0-bc4b-41e67886be35@intel.com>
+From: "Laguna, Lukasz" <lukasz.laguna@intel.com>
+Content-Language: en-US
+In-Reply-To: <72f0caa9-50b3-4fb0-bc4b-41e67886be35@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: VI1PR0102CA0051.eurprd01.prod.exchangelabs.com
+ (2603:10a6:803::28) To BN9PR11MB5482.namprd11.prod.outlook.com
+ (2603:10b6:408:103::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 16/23] KVM: selftests: Setup memory regions for TDX on
- vm creation
-To: Ira Weiny <ira.weiny@intel.com>, Sagi Shahar <sagis@google.com>
-Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
- Andrew Jones <ajones@ventanamicro.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Erdem Aktas <erdemaktas@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
- "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Chao Gao <chao.gao@intel.com>,
- Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-References: <20251028212052.200523-1-sagis@google.com>
- <20251028212052.200523-17-sagis@google.com>
- <6902141659442_20bb411003c@iweiny-mobl.notmuch>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <6902141659442_20bb411003c@iweiny-mobl.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN9PR11MB5482:EE_|DM4PR11MB7208:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52dccf7d-daee-4e40-6220-08de177aae4b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?RTA4SksxRCtMZkZhZTQyWmFnRnEwK2xyVHBhMEpyYnBUR0ZIcmgrbVdUVCtN?=
+ =?utf-8?B?NEhJQlZRb2czbG9UamZVa0dtUTdlcTM3MS9Na2tQVVl0SnNsVU1mcGpEUG41?=
+ =?utf-8?B?QVVITElHQVNtemNvK2dMbTdzUXkydURCdGVRRWZ1eDR2WUJsdTVyZ2dhSEh6?=
+ =?utf-8?B?TnI5ZGpNTGxualN2M1dibm81aFlZSzg1RnIrT1ZhbTV1TDA5dU1COFlKU3ht?=
+ =?utf-8?B?dzloZFBXSDZTQUo3YmZGeGZtMndBdURXUE5QVEJDTnJnbXU5dmZtWUx4b3NK?=
+ =?utf-8?B?azdTaWIxeHB6ZFFQWnk3dkNINURyeXNVUlNaRkRCVHFPOGFZcVcyQ1VXUmpk?=
+ =?utf-8?B?K1V2a1dBYmkyOGZLd3FwdGhjeVhrUnJUdmRmTTNGdENnVjUyRVdJMWFzREVK?=
+ =?utf-8?B?SHE2eW1xaVVyUldYY0V4T2tSbzBNRUR0RDZocjdodVVNSFpNbm56ZGR1eTlv?=
+ =?utf-8?B?anJWWTEvUDVoSHk1UmNqaHRIbDA3UEdKZzJzQUMxQlF0L3d1N3JyMGcxSnIz?=
+ =?utf-8?B?b1VNOG1nUmVYUlJrZS94UHFtb0gxSjJrYmwxQytzbThsZkIraUZUSWdwb1cv?=
+ =?utf-8?B?SFFUU0dDRG5uTVc1VVJndUswbFFhUUd4WWMyMWxQTk8vYlo5clBldldTMnpM?=
+ =?utf-8?B?MUdYWlFwWFYyK1lHckFHZGFON29RdnZyK1hzaEZUVmIzNXpmQXdLMytrb1BR?=
+ =?utf-8?B?VXhSMnVtSUc3THZhemcxM3FjU2tGTFhLdUd4LyttSERkN0VocCsxUVZReVAz?=
+ =?utf-8?B?bm9QK3dvMVliaTJsSkMvOGZGaXJtT0R0NGV1aGxGenVlK0lwRE1jeWN1dW9v?=
+ =?utf-8?B?Y3FmakpaRlAreUE0RHdCRmRsc1ZMZWlxam5BTHBKVEIwQ09ldG1MK0xlSWxl?=
+ =?utf-8?B?TVNJUXFPUVFuajkzaDdCdUhOZ3E0MUp6OEhuWm9wSGVwckUvdGpMN2JaT3Vn?=
+ =?utf-8?B?VXR2ZEhvZE5mbDFmT1Z5Z2V1dWdTWll6ZW1Ha1B4UVh1WGpwMGQ3T213OGJG?=
+ =?utf-8?B?MklMYWgwd0drMDJJWDNOa2orQ0tVNUViaWd4c0pEUGlrYjBRcmx3dWJWbjlG?=
+ =?utf-8?B?cjd5VjFEUEU4V2FmL2NGWVIzSVU1azBlSjNsQnRRWmtXM1J4Z1I3WGxPNFc3?=
+ =?utf-8?B?dWcxb3RzdHYzWEtITGdOckg4azQ5UW9NZWVFZUtOSkFTSHJFNC9sTUh6c0M3?=
+ =?utf-8?B?V3RVWEVscVdEd2UvZTFiVzc5ekxqODhPRk9Yc2hxYWNycFpQZTVnWmdMaFhT?=
+ =?utf-8?B?VUl1SUc5NzVDOFJtWmJqVm04ZWxHNmhIWWFONy83N1pQMFMzWXRVOFZ2OEFV?=
+ =?utf-8?B?ZGtOV0pRQWQxS0Qva2pvWEw5YTZ5Z0VZQWRpVlVFaWhVa1VZS2l1ZDlCUmJZ?=
+ =?utf-8?B?MVpmWFdTMmhMSWNtNmlNZGtkbXF2UlFDTkU4d2N6ZHRxVFc3cVhBbjRkd25z?=
+ =?utf-8?B?NmNwVnQwMEtJZkpweUVLdkVDUURPL3lZMUZKd2IyUFlsZWhidlI5aU9DRitz?=
+ =?utf-8?B?VFQ2Uk1oOGo5bHpUYyswL1d3cUc4d1ZMM3dxRkl5NWg5TWs1QTRONDZuSkY5?=
+ =?utf-8?B?c3BOTFJITEgzMU9IMmFKVk44ZlVITDRNL3BWcjcweElxcGFtRXRJVHZXUVRO?=
+ =?utf-8?B?QW9YcEZMb3FwUW1oWFY5T0JHNEJoajJCNUZ3VnRDRlY4R1RGNWVaV0JYUDVk?=
+ =?utf-8?B?bHpDSjdmOUVKQ3dLQ1U0RUo1QVo5a3R5MEN2R2tCUkI4ODBqVHpDbHlDbyta?=
+ =?utf-8?B?elYvT2lFanNSMmlKVEZVR2hCTnFFOEFxQlN4OGpJQ2hnaVhFWC9kQUYvZnZC?=
+ =?utf-8?B?UEplV3RBdndvbnRJbEt5akc0SGY0NS9NQVpieXZybTdhMTB0b2RQZTRBNGpw?=
+ =?utf-8?B?dTE2MldZeEJhL2ZBYXNUQXdwNmYvZjBKSlBCZEdhRWtRMTU5clVFYm9UbmlI?=
+ =?utf-8?B?N3NtRld2RU0yUUcvcHhUYUVBM2psbWk4SWszTTl0RFd5Vk9rZXVZclBKLytJ?=
+ =?utf-8?Q?m8lup0REEUBPZOZdYOzGoe3RIjB3vw=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5482.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aXBwUzNPR09tNTVEcnEwbzhOb0QrUGVidFVGRllKN1VlVXBwOVA3Q2NLL1E3?=
+ =?utf-8?B?c2tlZG5YZnM0TDFFMGdtWlhKblBMOXdGNHJxQVBqeW1saHgvT2EvSk9Nb0ls?=
+ =?utf-8?B?TTEzNm5kdDhKWnZFOVQrRnFhRmxIaHpndnp4bjBZWm5qSmM0NTN5NkVYb2pN?=
+ =?utf-8?B?Vkp2a3kxejhRcTBwdkZuTXdxcVVFYWEvZ3dLeVZyTkpVRDhndktObW51M3Vk?=
+ =?utf-8?B?NDRaeEtaV01Gd0VFYVc3SWRTZklGbEdXOTU5bXRqdXlRR00wT3g0c2Nad2JJ?=
+ =?utf-8?B?WjEwS1huenBsdzJYbFA1czAwaDlITHpROUIveXZUc2JaaEVZeXlTdU5ZUnlR?=
+ =?utf-8?B?RHEwMlJvK2JOWHJSWDdGaHo5SHZyYm1JSEtyZWZKUlplOXNPS3hLOTNJYlhy?=
+ =?utf-8?B?Wjh1ZHVFS25Camx6NmJGdTFPeXdYVzFRM2xMcDFoSzJBZTRjU0F1RkdBZldF?=
+ =?utf-8?B?cDcxaU1MeklKWmd3ZUtPRE1GallMS094bGdydGMrZ1BsQVl2b1FIVURVeXg1?=
+ =?utf-8?B?UnFhV3VIc1BBcSttenlDc01IZHBzUmpkOWd4Q25NWDErenh3NU51d1NjR1Bj?=
+ =?utf-8?B?L3IxMkcxLzZPbUhtaWk1UUhwN2QwRTkvaGF5ek5FMmhlb2RrOUN2Ui8xSHJ4?=
+ =?utf-8?B?K05NY3RlZFFIRHVYK3JpdGlHTHBpNE40TXJZTW5CZ21ubW56eWpBclVYK0o3?=
+ =?utf-8?B?RklZbzVscEZSdGFJZ2o2a2x0RjNwV2xySHVnUUI3L1ZmQUc4eGF1UTFOZUVv?=
+ =?utf-8?B?YnVsckJjTXBJNHdnYld0YjVoUlNHQllCVVNscXpxeTFCMlBMczhNTFBCUTha?=
+ =?utf-8?B?RFJsTGxreUVNU3hFL1duN0UyS0FCQnhhd2RyVHdMOFhQc2hMN0RlMzZETThJ?=
+ =?utf-8?B?ZTBZVGtscU44Uyt2bmFLRW9BQXJkZXpLRFMrcFBCY0J1V1NNa1dEeDlNMnMr?=
+ =?utf-8?B?YzRKK05qRmVjZlNYNWJDS2V6UDdHTHFyaHVMT0VMSk1jQ3JqQit6dncwUHJS?=
+ =?utf-8?B?a1llTDhXTC9xK1J3NDgxREU4UGh3OHdFVG5CenZETTJIS3hFd25GZEwzdDYx?=
+ =?utf-8?B?N0hKamNscGlEYjBNcmF5bVZubFB1NEtWS0JFcUJXcHNQQ05PMllvZThNVExo?=
+ =?utf-8?B?aExKVEhDRGF6c2ozMlp4L2JDYU5FREdPbUwxT0xlMGxjVldjTTRQLzJsKzNx?=
+ =?utf-8?B?WEZZaEhaZGV3dWVGYjJiUkJLeEk2WlN4bzNzeGFKQmdOK2QwOVpDYlBielpL?=
+ =?utf-8?B?N3lCV1JGZVZ1ejZ1d3RsV212MFA5ZXlhQTB3eGd3YkdrUEJtM3ZmcEpILy96?=
+ =?utf-8?B?dW1PbUNHQllZMnhOdHZwSDZFYjFwNmFYYnd4SzV5SkxxTmxaaFYyTnp1Si82?=
+ =?utf-8?B?blZ0MGtEOCtRcDVvcTlUN2J4MUN2Q2l2T1d5YSsrNEkxaVkxUzRTUnlVajdi?=
+ =?utf-8?B?UUgvVVFicFQxbXI0czFrUXVjcEtlcG00amNTdDVUcTlTM2Y0eVpkcmNGS1BP?=
+ =?utf-8?B?YWlUQXpqbVAxUEVqcVpBU3EzZVNUNFQyc0QrcVV0WkJjQkNaVG4ySE9tQ0Vq?=
+ =?utf-8?B?Nmx4aEpkb1pXQVRQYlZlOEZCOHMyamtVdzNjUTF5VVZMRHlYc2tsckxnczhW?=
+ =?utf-8?B?NkpiTU9PNG1yVnZNMlFlejdxMHpmWmo0WWFkdjZ5MmFRMFJ0ZkVML204RzVH?=
+ =?utf-8?B?VGI1SzV3czNGWnNCbk1ua3pUcGJvYWhic0I3NU9kSytWYVNaVnZJMDg2aDNL?=
+ =?utf-8?B?MHZlOVdZMjNVb1JyVTRsZFc2czNqekU4TWxPZDEvNjhwczIzMUVVd1ZLUWs0?=
+ =?utf-8?B?ODFENDVDcmh3OVJ3ckUzNnMzTUpYMERuRG9kVWJVQko1WExzNG96dWttaldy?=
+ =?utf-8?B?NHBLeXRyTGlQbkpOelN4WDJlb3JHekJlWWxUMFJBS1pJZ3Z1dFNoSnZYcmhZ?=
+ =?utf-8?B?akNBU3d6ODhRNG1OcUJ4bFJSMHdkajRQYS92eEpQQzNzZUM1SlFLMERFM1d1?=
+ =?utf-8?B?dmRaejlnYm15azNUVG1xcW9nVVFmWXdQcGJMdFk0cDA2bjhNNHlyZGxocExw?=
+ =?utf-8?B?c2NCa3lKNWQwMGNpc09vamM1bjFtVnR2UjEwMFlXTkNYbFBKOW5uZU9SNlI3?=
+ =?utf-8?B?c3M5OHIxK1RieHFhVFNlRVBpdktiMWFhMEZ2bnBQbGZJNitjbHBOYm11VVFj?=
+ =?utf-8?B?elE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52dccf7d-daee-4e40-6220-08de177aae4b
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5482.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2025 06:08:01.3185
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XitNmmHVp4kLIyV14ZSnmODvGIX+YlGCYU+xRKTz7Ho1/R5s6kHB5Fh1+to2J7I7EfS3nQLp13hqvQ1rOOTAeg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7208
+X-OriginatorOrg: intel.com
 
-
-
-On 10/29/2025 9:18 PM, Ira Weiny wrote:
-> Sagi Shahar wrote:
->> Guest registers are inaccessible to kvm for TDX VMs. In order to set
->> register values for TDX we use a special boot code which loads the
-> NIT: who is 'we'?
+On 10/23/2025 21:29, Michal Wajdeczko wrote:
 >
->> register values from memory and write them into the appropriate
->> registers.
+> On 10/22/2025 12:41 AM, Michał Winiarski wrote:
+>> From: Lukasz Laguna <lukasz.laguna@intel.com>
 >>
->> This patch sets up the memory regions used for the boot code and the
->> boot parameters for TDX.
-> NIT: This is not needed.  Use imperative mood.
->
->> Signed-off-by: Sagi Shahar <sagis@google.com>
+>> Introduce a new function to copy data between VRAM and sysmem objects.
+>> The existing xe_migrate_copy() is tailored for eviction and restore
+>> operations, which involves additional logic and operates on entire
+>> objects.
+>> The xe_migrate_vram_copy_chunk() allows copying chunks of data to or
+>> from a dedicated buffer object, which is essential in case of VF
+>> migration.
+>>
+>> Signed-off-by: Lukasz Laguna <lukasz.laguna@intel.com>
+>> Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
 >> ---
->>   tools/testing/selftests/kvm/lib/kvm_util.c | 9 ++++++++-
->>   1 file changed, 8 insertions(+), 1 deletion(-)
+>>   drivers/gpu/drm/xe/xe_migrate.c | 134 ++++++++++++++++++++++++++++++--
+>>   drivers/gpu/drm/xe/xe_migrate.h |   8 ++
+>>   2 files changed, 136 insertions(+), 6 deletions(-)
 >>
->> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
->> index 0e6a487ca7a4..086e8a2a4d99 100644
->> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
->> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
->> @@ -4,6 +4,7 @@
->>    *
->>    * Copyright (C) 2018, Google LLC.
->>    */
->> +#include "tdx/tdx_util.h"
->>   #include "test_util.h"
->>   #include "kvm_util.h"
->>   #include "processor.h"
->> @@ -435,7 +436,7 @@ void kvm_set_files_rlimit(uint32_t nr_vcpus)
->>   static bool is_guest_memfd_required(struct vm_shape shape)
->>   {
->>   #ifdef __x86_64__
->> -	return shape.type == KVM_X86_SNP_VM;
->> +	return (shape.type == KVM_X86_SNP_VM || shape.type == KVM_X86_TDX_VM);
-> This caused me to dig a bit to understand why this hunk was needed given
-> the commit message only discusses guest registers.  I did not recall any
-> use of is_guest_memfd_required() in the vm_tdx_setup_*() calls so I was a
-> bit confused.
->
-> With this hunk considered the changelog should read something like:
->
-> <commit message>
->
-> Guest memfd is required for the primary memory region of TDX VMs.
->
-> Furthermore, guest registers are inaccessible to kvm for TDX VMs.  TDX
-> must use use special boot code which loads the register values from memory
-> and writes them into the appropriate registers.
->
-> Use guest_memfd for the primary memory regions and call the TDX boot code
-> functions for TDX VMs.
->
-> </commit message>
->
-> This clearly explains why the change to is_guest_memfd_required() is
-> needed.
-
-+1
-
->
-> In addition, the structure of this series is a bit odd to me.  I assume
-> this patch exists after the setup calls were added to ensure
-> bisect-ability?
-
-I think it's better to switch the order of this patch and patch 15.
-Patch 15 relies on the memory regions added by this patch for boot code and
-parameters.
-
-
->
-> Ira
->
->>   #else
->>   	return false;
->>   #endif
->> @@ -469,6 +470,12 @@ struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
->>   	for (i = 0; i < NR_MEM_REGIONS; i++)
->>   		vm->memslots[i] = 0;
+>> diff --git a/drivers/gpu/drm/xe/xe_migrate.c b/drivers/gpu/drm/xe/xe_migrate.c
+>> index 3112c966c67d7..d30675707162b 100644
+>> --- a/drivers/gpu/drm/xe/xe_migrate.c
+>> +++ b/drivers/gpu/drm/xe/xe_migrate.c
+>> @@ -514,7 +514,7 @@ int xe_migrate_init(struct xe_migrate *m)
 >>   
->> +	if (is_tdx_vm(vm)) {
->> +		/* Setup additional mem regions for TDX. */
->> +		vm_tdx_setup_boot_code_region(vm);
->> +		vm_tdx_setup_boot_parameters_region(vm, nr_runnable_vcpus);
+>>   static u64 max_mem_transfer_per_pass(struct xe_device *xe)
+>>   {
+>> -	if (!IS_DGFX(xe) && xe_device_has_flat_ccs(xe))
+>> +	if ((!IS_DGFX(xe) || IS_SRIOV_PF(xe)) && xe_device_has_flat_ccs(xe))
+> being a PF is permanent case, while your expected usage is only during of the handling of the VF migration.
+>
+> maybe it would be better to introduce flag FORCE_CCS_LIMITED_TRANSFER and pass it to the migration calls when really needed ?
+
+I don't think this change is necessary anymore since we removed support 
+for raw CCS copy. I'll revert these updates. I tested the copy with 8M 
+blocks on BMG, and it worked fine.
+
+>
+>>   		return MAX_CCS_LIMITED_TRANSFER;
+>>   
+>>   	return MAX_PREEMPTDISABLE_TRANSFER;
+>> @@ -1155,6 +1155,133 @@ struct xe_exec_queue *xe_migrate_exec_queue(struct xe_migrate *migrate)
+>>   	return migrate->q;
+>>   }
+>>   
+>> +/**
+>> + * xe_migrate_vram_copy_chunk() - Copy a chunk of a VRAM buffer object.
+>> + * @vram_bo: The VRAM buffer object.
+>> + * @vram_offset: The VRAM offset.
+>> + * @sysmem_bo: The sysmem buffer object.
+>> + * @sysmem_offset: The sysmem offset.
+>> + * @size: The size of VRAM chunk to copy.
+>> + * @dir: The direction of the copy operation.
+>> + *
+>> + * Copies a portion of a buffer object between VRAM and system memory.
+>> + * On Xe2 platforms that support flat CCS, VRAM data is decompressed when
+>> + * copying to system memory.
+>> + *
+>> + * Return: Pointer to a dma_fence representing the last copy batch, or
+>> + * an error pointer on failure. If there is a failure, any copy operation
+>> + * started by the function call has been synced.
+>> + */
+>> +struct dma_fence *xe_migrate_vram_copy_chunk(struct xe_bo *vram_bo, u64 vram_offset,
+>> +					     struct xe_bo *sysmem_bo, u64 sysmem_offset,
+>> +					     u64 size, enum xe_migrate_copy_dir dir)
+>> +{
+>> +	struct xe_device *xe = xe_bo_device(vram_bo);
+>> +	struct xe_tile *tile = vram_bo->tile;
+>> +	struct xe_gt *gt = tile->primary_gt;
+>> +	struct xe_migrate *m = tile->migrate;
+>> +	struct dma_fence *fence = NULL;
+>> +	struct ttm_resource *vram = vram_bo->ttm.resource;
+>> +	struct ttm_resource *sysmem = sysmem_bo->ttm.resource;
+>> +	struct xe_res_cursor vram_it, sysmem_it;
+>> +	u64 vram_L0_ofs, sysmem_L0_ofs;
+>> +	u32 vram_L0_pt, sysmem_L0_pt;
+>> +	u64 vram_L0, sysmem_L0;
+>> +	bool to_sysmem = (dir == XE_MIGRATE_COPY_TO_SRAM);
+>> +	bool use_comp_pat = to_sysmem &&
+>> +		GRAPHICS_VER(xe) >= 20 && xe_device_has_flat_ccs(xe);
+>> +	int pass = 0;
+>> +	int err;
+>> +
+>> +	xe_assert(xe, IS_ALIGNED(vram_offset | sysmem_offset | size, PAGE_SIZE));
+>> +	xe_assert(xe, xe_bo_is_vram(vram_bo));
+>> +	xe_assert(xe, !xe_bo_is_vram(sysmem_bo));
+>> +	xe_assert(xe, !range_overflows(vram_offset, size, (u64)vram_bo->ttm.base.size));
+>> +	xe_assert(xe, !range_overflows(sysmem_offset, size, (u64)sysmem_bo->ttm.base.size));
+>> +
+>> +	xe_res_first(vram, vram_offset, size, &vram_it);
+>> +	xe_res_first_sg(xe_bo_sg(sysmem_bo), sysmem_offset, size, &sysmem_it);
+>> +
+>> +	while (size) {
+>> +		u32 pte_flags = PTE_UPDATE_FLAG_IS_VRAM;
+>> +		u32 batch_size = 2; /* arb_clear() + MI_BATCH_BUFFER_END */
+>> +		struct xe_sched_job *job;
+>> +		struct xe_bb *bb;
+>> +		u32 update_idx;
+>> +		bool usm = xe->info.has_usm;
+>> +		u32 avail_pts = max_mem_transfer_per_pass(xe) / LEVEL0_PAGE_TABLE_ENCODE_SIZE;
+>> +
+>> +		sysmem_L0 = xe_migrate_res_sizes(m, &sysmem_it);
+>> +		vram_L0 = min(xe_migrate_res_sizes(m, &vram_it), sysmem_L0);
+>> +
+>> +		drm_dbg(&xe->drm, "Pass %u, size: %llu\n", pass++, vram_L0);
+> nit: there is xe_dbg()
+
+Ok
+
+>
+>> +
+>> +		pte_flags |= use_comp_pat ? PTE_UPDATE_FLAG_IS_COMP_PTE : 0;
+>> +		batch_size += pte_update_size(m, pte_flags, vram, &vram_it, &vram_L0,
+>> +					      &vram_L0_ofs, &vram_L0_pt, 0, 0, avail_pts);
+>> +
+>> +		batch_size += pte_update_size(m, 0, sysmem, &sysmem_it, &vram_L0, &sysmem_L0_ofs,
+>> +					      &sysmem_L0_pt, 0, avail_pts, avail_pts);
+>> +		batch_size += EMIT_COPY_DW;
+>> +
+>> +		bb = xe_bb_new(gt, batch_size, usm);
+>> +		if (IS_ERR(bb)) {
+>> +			err = PTR_ERR(bb);
+>> +			return ERR_PTR(err);
+>> +		}
+>> +
+>> +		if (xe_migrate_allow_identity(vram_L0, &vram_it))
+>> +			xe_res_next(&vram_it, vram_L0);
+>> +		else
+>> +			emit_pte(m, bb, vram_L0_pt, true, use_comp_pat, &vram_it, vram_L0, vram);
+>> +
+>> +		emit_pte(m, bb, sysmem_L0_pt, false, false, &sysmem_it, vram_L0, sysmem);
+>> +
+>> +		bb->cs[bb->len++] = MI_BATCH_BUFFER_END;
+>> +		update_idx = bb->len;
+>> +
+>> +		if (to_sysmem)
+>> +			emit_copy(gt, bb, vram_L0_ofs, sysmem_L0_ofs, vram_L0, XE_PAGE_SIZE);
+>> +		else
+>> +			emit_copy(gt, bb, sysmem_L0_ofs, vram_L0_ofs, vram_L0, XE_PAGE_SIZE);
+>> +
+>> +		job = xe_bb_create_migration_job(m->q, bb, xe_migrate_batch_base(m, usm),
+>> +						 update_idx);
+>> +		if (IS_ERR(job)) {
+>> +			err = PTR_ERR(job);
+>> +			goto err;
+> this goto inside 'while' loop is weird
+
+Good point
+
+>
+>> +		}
+>> +
+>> +		xe_sched_job_add_migrate_flush(job, MI_INVALIDATE_TLB);
+>> +
+>> +		WARN_ON_ONCE(!dma_resv_test_signaled(vram_bo->ttm.base.resv,
+>> +						     DMA_RESV_USAGE_BOOKKEEP));
+>> +		WARN_ON_ONCE(!dma_resv_test_signaled(sysmem_bo->ttm.base.resv,
+>> +						     DMA_RESV_USAGE_BOOKKEEP));
+> xe_WARN_ON_ONCE() ?
+>
+> but why do not use asserts() if we are sure that this shouldn't happen ?
+
+Ok, I'll use asserts
+
+>
+>> +
+>> +		mutex_lock(&m->job_mutex);
+> scoped_quard(mutex) ?
+
+Ok
+
+>
+>> +		xe_sched_job_arm(job);
+>> +		dma_fence_put(fence);
+>> +		fence = dma_fence_get(&job->drm.s_fence->finished);
+>> +		xe_sched_job_push(job);
+>> +
+>> +		dma_fence_put(m->fence);
+>> +		m->fence = dma_fence_get(fence);
+>> +		mutex_unlock(&m->job_mutex);
+>> +
+>> +		xe_bb_free(bb, fence);
+>> +		size -= vram_L0;
+>> +		continue;
+>> +
+>> +err:
+>> +		xe_bb_free(bb, NULL);
+>> +
+>> +		return ERR_PTR(err);
 >> +	}
 >> +
->>   	kvm_vm_elf_load(vm, program_invocation_name);
+>> +	return fence;
+>> +}
+>> +
+>>   static void emit_clear_link_copy(struct xe_gt *gt, struct xe_bb *bb, u64 src_ofs,
+>>   				 u32 size, u32 pitch)
+>>   {
+>> @@ -1852,11 +1979,6 @@ static bool xe_migrate_vram_use_pde(struct drm_pagemap_addr *sram_addr,
+>>   	return true;
+>>   }
 >>   
->>   	/*
->> -- 
->> 2.51.1.851.g4ebd6896fd-goog
->>
+>> -enum xe_migrate_copy_dir {
+>> -	XE_MIGRATE_COPY_TO_VRAM,
+>> -	XE_MIGRATE_COPY_TO_SRAM,
+>> -};
+>> -
+>>   #define XE_CACHELINE_BYTES	64ull
+>>   #define XE_CACHELINE_MASK	(XE_CACHELINE_BYTES - 1)
+>>   
+>> diff --git a/drivers/gpu/drm/xe/xe_migrate.h b/drivers/gpu/drm/xe/xe_migrate.h
+>> index 4fad324b62535..d7bcc6ad8464e 100644
+>> --- a/drivers/gpu/drm/xe/xe_migrate.h
+>> +++ b/drivers/gpu/drm/xe/xe_migrate.h
+>> @@ -28,6 +28,11 @@ struct xe_vma;
+>>   
+>>   enum xe_sriov_vf_ccs_rw_ctxs;
+>>   
+>> +enum xe_migrate_copy_dir {
+>> +	XE_MIGRATE_COPY_TO_VRAM,
+>> +	XE_MIGRATE_COPY_TO_SRAM,
+>> +};
+> nit: it's time for xe_migrate_types.h ;)
 >
-
+> but not as part of this series
+>
+>> +
+>>   /**
+>>    * struct xe_migrate_pt_update_ops - Callbacks for the
+>>    * xe_migrate_update_pgtables() function.
+>> @@ -131,6 +136,9 @@ int xe_migrate_ccs_rw_copy(struct xe_tile *tile, struct xe_exec_queue *q,
+>>   
+>>   struct xe_lrc *xe_migrate_lrc(struct xe_migrate *migrate);
+>>   struct xe_exec_queue *xe_migrate_exec_queue(struct xe_migrate *migrate);
+>> +struct dma_fence *xe_migrate_vram_copy_chunk(struct xe_bo *vram_bo, u64 vram_offset,
+>> +					     struct xe_bo *sysmem_bo, u64 sysmem_offset,
+>> +					     u64 size, enum xe_migrate_copy_dir dir);
+>>   int xe_migrate_access_memory(struct xe_migrate *m, struct xe_bo *bo,
+>>   			     unsigned long offset, void *buf, int len,
+>>   			     int write);
 
