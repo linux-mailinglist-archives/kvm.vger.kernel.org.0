@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-61553-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61554-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0EECC2234E
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 21:20:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA41C22321
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 21:19:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 64EE54F362B
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:17:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EB091886ECA
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:17:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B039F33E36B;
-	Thu, 30 Oct 2025 20:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15EA37DBC7;
+	Thu, 30 Oct 2025 20:11:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G7K9ZvO9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ioCOFbnP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9E333BBDE
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 20:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C0233E34B
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 20:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761855062; cv=none; b=TbysoOwu/Tkn5UpXBkH886ULy7DlrGVs/Yljn6u49wB8E2gYlDSkw79nZ4XCg5juHL5jwIVVP0wEi4Ds0hpBDpLoQbGqATcdYc9c9ScOpg4MXmD1cSZGdRnQ5qkAaGtnd7w1BU5FwJZhYAJe6oHVR+CIhkR9oBsVjwVrM0OcAvM=
+	t=1761855063; cv=none; b=HC8Hb6e2UMUumNbvoAXjMbasYWrS7yXS7L3d7Ms01/DC8hKYRdIRRcrfIN9gxWKLiGz7KnYA9e0YUSIWvYP0kUp6jWQsKR8TXoGiiIXwI1rmqBUA28dVLyWaIQqb+KjnRzxqOHh/OYXywODHVVTohJWczoTtwR92HoBTzPf/Tk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761855062; c=relaxed/simple;
-	bh=P1goZ+98qKVEWbuRxPkvfQzAqWl2KpW9bCv/jdGFRzQ=;
+	s=arc-20240116; t=1761855063; c=relaxed/simple;
+	bh=dmFGy64Opu9Mkjf3vfnnmQEC763oF8Lj2ACAU4D9x+8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XIjlNUn6gEYAY/ZHeeWK/3CvMIv6a74WNKOr/FmuI/nqD0/o3UPYjQjscWwcETWjCFT0toRyZZV/HQrTKciFS+n5H0NxKjNbYHQE0pRrPalVc4g2kqHraIrTR/ziWhPO9ZF1VzgLQD4L+GCpYwyEzu9Sge68pCl04r1MeWq3CZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G7K9ZvO9; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=Jog9SXyokw6tJj4yIwsTQRX+oKAxK3UyceGFF/XRQQGhDxwNcorz/aUUIT9mKikMaOKsYkkcvVSOiYrullan45DDI0xfYb/Al7hxSitJJ9NqyfvnCawDL95SUvIPkWwcwbdpddXq+rU5oQy8FTA+WqGCDJrUFy/gwS0tqQ+myUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ioCOFbnP; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-78117b8e49fso3032874b3a.3
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 13:11:00 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-29520b8e248so1196135ad.0
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 13:11:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761855059; x=1762459859; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761855061; x=1762459861; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZPfEDjublRysEg+wBq1Bud0evQ6Qw3SUr7bZgrR40cM=;
-        b=G7K9ZvO9zSv+TXHHSNOZRrOzTdgbjhJ6ptgUUZ+lPfcKTfp+V4UKer0oJgPQLYLG1T
-         LBIBF5GUOgZvmM76IIiabt4TFdYxtfOaZVhl4UWkkRY57MB79GvcAo51ivcuzfMUmh1S
-         NlVgsOJuhKUlF20SmsqKEwyfxIeJH6GA+hAvheredf75iowyteros74dUQS9VyFpKWPa
-         PGN2YrZmirqhXlaYy0/iKDkVD6TmWeXoG8gXIiS6HeB6yU+aCcFpj7mdNmTWCoA6TxzQ
-         KqlxjNapCrJGghp5EZgb7tQvcdE638b6p0ayOQyUiCYChed4nvss7EjFVQ+qpQIm+LIe
-         y+sA==
+        bh=pcGBUMDBt4QrK3gZ63mWxwFVf8xhoPzw9YjzqkGrLic=;
+        b=ioCOFbnPjht5hMODgh5BDdCHoAWbcB6ldCqCu3+zwSLxeKmbSX5AWce7jNEaxbj3Wh
+         OKxg2920qDhgK42yD4Lb7se8WyCxKEBOWId/u+jZTBSLpXvEsgPD+0AjNgu/0YZ8LBPK
+         k8RTpkis2SAM6ILviLwkYaE9058lhf+wT+2DiAdL6rulK1LpGCC99INKDC+2G+NjBl63
+         9n5hzdIBZCiBWY07L3E6UgBjlTmv+lF1/G/pXcRQ/4jK1FnBZaP+Ano6nJEx6h6z83OD
+         umdPHHMhY5uuDBQzgjJCQjFUb0AuFlrDAjkJH5lRoLpaDyrc+iSswE6QIrlchk2pclxt
+         GJ4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761855059; x=1762459859;
+        d=1e100.net; s=20230601; t=1761855061; x=1762459861;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ZPfEDjublRysEg+wBq1Bud0evQ6Qw3SUr7bZgrR40cM=;
-        b=VuR70nTlfCsPceL4qhlDvfW6GydAMesQT7p/S3/eKci3aylAOUN4rAAmD6koqNm1aQ
-         mJNtJtbtBSMSksTvi0e0FXFAKusRz5RcSiFy/LJLcjcdZ1I0395W6mYvZMb5F/xv/Db1
-         duFn13lPa/jCNtNqgGQynwr86jNASNKG40RDsu/meIRQzSo438fDYEi0Iyni9VX9UnIV
-         Kl8xfZ0BFRa11N1Q/eZc7L87vOAKcOcQ01bKQLqczKrd5r/8rIRuaLXA75rxggQQhVcs
-         /6lZ6Igx91jujNx7Ky0CzSYZJcpKnzw2B1ZAIduwq4+MkAbXtPTqWMxbTYe8U2ammIUK
-         412Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU+D4lTrRB74GkBB314p3X94eKwT0+5iLMuS+H94chP2rztaXv+G+jSUzm/j26hmUiDaOk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQeF1Zr91IUULGXJ2UM5GaiO7GePXSqanDePWTHsHyfMGfKWnu
-	veociOHZG0pXuC0Yy1GI+C5u8uY2wVJStbhxsxCOS0KObxHKOvW9xvFeFKG92bdzuWJNA1dUu2a
-	CIA9hZg==
-X-Google-Smtp-Source: AGHT+IE4oqFNhFQQZr1IyqSPUxhZWizKY8+4h3k61YypjXkX/4HyRwAM2GyKD7DH49xWshMyjNqw52ssRLY=
-X-Received: from pfbgi4.prod.google.com ([2002:a05:6a00:63c4:b0:793:b157:af42])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2283:b0:7a2:721b:adb6
- with SMTP id d2e1a72fcca58-7a77a9cb11amr747302b3a.28.1761855059275; Thu, 30
- Oct 2025 13:10:59 -0700 (PDT)
+        bh=pcGBUMDBt4QrK3gZ63mWxwFVf8xhoPzw9YjzqkGrLic=;
+        b=d/fvT0F8Wvbj5uR3aPvSKp+xSUcPhkce6lrVS6bx6Y8LYBFNjCuIuHLvcs26umHjyx
+         2svk6SgMq5p1s1JiXJ3k8WCEB7Kjjmie9+FMQfeg/awQHv0mwOM75RjfbwXbL7LT9CA6
+         kLhKGJmO0X5nMH/P4w/efzij4I7WFGI92wkiU+ebJ2uYD0jtl2QS7eFWfUO2WsVoN0Ge
+         KvSe0ha/eZUmc6TnkDRx4Xo1JXDuzKQpxbb3Tme3Zk7lXioTSFGTQitmNVN+2//M8fZS
+         Ju5tHZzPYe+Ou8GWqUQAruC1P1hIxYU4q7zgvyUe6Pb1CqhfsUE3jORXJkPii+CzaPJu
+         uZBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXM8iGFnFR9MsEIV/jqRTyI2wcjBO7V7VjoDl/Tfk2zbuIfmGPK6f3Mvd3glW28FW+eOH4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmkE2c9Xr9sfW4S2i7kn7Yz4sUKJMLuwWnB844WokvqXkeYcP1
+	5o6PipPpDrM2i8s8wTN4yKrsdlRqSOGA3EP0A+Hy0tE6eysro4rWz+p3FC9/22MVemosxeYGRqy
+	E5Qqdsg==
+X-Google-Smtp-Source: AGHT+IE/OfQCQRYqXElzN+OeKvwnTKdqn8Aa5qkU15JwMNXReTeV5Yh/81ZcfUEIC9p/s1OTRodzv1oDE/0=
+X-Received: from pjbms9.prod.google.com ([2002:a17:90b:2349:b0:33d:69cf:1f82])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c401:b0:295:21ac:3540
+ with SMTP id d9443c01a7336-29521ac3a29mr3509295ad.33.1761855061339; Thu, 30
+ Oct 2025 13:11:01 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 13:09:47 -0700
+Date: Thu, 30 Oct 2025 13:09:48 -0700
 In-Reply-To: <20251030200951.3402865-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251030200951.3402865-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251030200951.3402865-25-seanjc@google.com>
-Subject: [PATCH v4 24/28] KVM: TDX: Use guard() to acquire kvm->lock in tdx_vm_ioctl()
+Message-ID: <20251030200951.3402865-26-seanjc@google.com>
+Subject: [PATCH v4 25/28] KVM: TDX: Don't copy "cmd" back to userspace for KVM_TDX_CAPABILITIES
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -98,50 +98,40 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use guard() in tdx_vm_ioctl() to tidy up the code a small amount, but more
-importantly to minimize the diff of a future change, which will use
-guard-like semantics to acquire and release multiple locks.
+Don't copy the kvm_tdx_cmd structure back to userspace when handling
+KVM_TDX_CAPABILITIES, as tdx_get_capabilities() doesn't modify hw_error or
+any other fields.
 
-No functional change intended.
+Opportunistically hoist the call to tdx_get_capabilities() outside of the
+kvm->lock critical section, as getting the capabilities doesn't touch the
+VM in any way, e.g. doesn't even take @kvm.
 
-Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Reviewed-by: Kai Huang <kai.huang@intel.com>
+Suggested-by: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index d6f40a481487..037429964fd7 100644
+index 037429964fd7..57dfddd2a6cf 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -2806,7 +2806,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
+@@ -2806,12 +2806,12 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
  	if (r)
  		return r;
  
--	mutex_lock(&kvm->lock);
-+	guard(mutex)(&kvm->lock);
++	if (tdx_cmd.id == KVM_TDX_CAPABILITIES)
++		return tdx_get_capabilities(&tdx_cmd);
++
+ 	guard(mutex)(&kvm->lock);
  
  	switch (tdx_cmd.id) {
- 	case KVM_TDX_CAPABILITIES:
-@@ -2819,15 +2819,12 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
- 		r = tdx_td_finalize(kvm, &tdx_cmd);
+-	case KVM_TDX_CAPABILITIES:
+-		r = tdx_get_capabilities(&tdx_cmd);
+-		break;
+ 	case KVM_TDX_INIT_VM:
+ 		r = tdx_td_init(kvm, &tdx_cmd);
  		break;
- 	default:
--		r = -EINVAL;
--		goto out;
-+		return -EINVAL;
- 	}
- 
- 	if (copy_to_user(argp, &tdx_cmd, sizeof(struct kvm_tdx_cmd)))
--		r = -EFAULT;
-+		return -EFAULT;
- 
--out:
--	mutex_unlock(&kvm->lock);
- 	return r;
- }
- 
 -- 
 2.51.1.930.gacf6e81ea2-goog
 
