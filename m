@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-61531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1837EC2222D
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 21:10:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EB65C22239
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 21:11:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 02BD64EC4AE
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:10:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A048D1887F31
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFAEB375753;
-	Thu, 30 Oct 2025 20:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067D237DBD6;
+	Thu, 30 Oct 2025 20:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0siVUR5a"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T5UwO06f"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7622374AC8
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 20:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45815374ACF
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 20:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761855008; cv=none; b=i4L8Zx/I7Fpgix/tR/X2w4gucxeQGrZ60fE0oxx4cBWj3dUf2hRt2LXEu77Lf1eQRBQwTaHvc95WpZRRhdkIpylccWYlrP5dfffKN0BZ/caL6tcvWaO2nxCzZ0TdrmJmZJM6EDC0BZ80QcNcV85UxC7aCbKfzH0CLDmJ/IPhBss=
+	t=1761855009; cv=none; b=oPJqlfrq9pv1ohI9VsWr5Aqp2jjo4YOeV/Al4cEihibFdX+zW2s+Ku0eI48VLfl5FJjKLo+jny7nAyVMZus4XODnoDk8DK1SMLFff5eR7G/+QGpSEaAYJy5rS/K/7cFDae5HDVyL0Xxf/zaJ6esZ41Kd/D/hGfhwHxOTrDm8fyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761855008; c=relaxed/simple;
-	bh=JuTYFKeg2fApfbwtmQ2BcVytoG51MuKQIB+TddLOfF4=;
+	s=arc-20240116; t=1761855009; c=relaxed/simple;
+	bh=MUDH20eIOuOTsz0KS9uuqL90AQHBBTqkmMlPBeDR0dg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AqH3DBAfIa5cbuZzNMfEWmrdIfnrmcm+280ZNjY5ZGtMrdvgazsE7CPj7qaPoaQuYU3s9u7dlVQclCXZyol+0WHS07clect0thbUKAwDaPCt/r9+W7SLj5Mx84wqWomghbLEF4gYBKwIUXTofXExAKGegKlSrsHFpO5AS3t4ODA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0siVUR5a; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=T//l0+40z6HovReWtdOH5YU2w1NekZU6V7l25VdocAAvpMMZV3S/Eb/Av8lP+ICdMHCndY8hPzuRPzHMGcq4TXC/3q4yrZ9SvzUWpI+GxYTRfc0QaAFKYHCg9LcxcIIG3vFlLBNHUAHBAX3n39zxP2bGmsXNMONPlm4mID/SL/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T5UwO06f; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-290c9724deeso14513895ad.2
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 13:10:04 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-294baa12981so19216725ad.1
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 13:10:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761855004; x=1762459804; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761855007; x=1762459807; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=2OA09S1/1skw+FuU1BhzWw9OqqsMWSUfhu0LCFCqROs=;
-        b=0siVUR5aqkBOBtdfb0NNlPyiZw5VEtHXxmIBZ5O4w4uhnKvzg1fcSD/xEij6HI4qcJ
-         hWjDvzwTEehWOCy6qlvkcuqX+iMKN08zwVX6dQkfd4+wF8tfJ1KyoPpCKL1VsR0msTk4
-         2dvv1U6mnvymKh+XbNuoMGCOf7F1rZtSv7pNi6HHhrtmayOP7oZ+XPyTcR01BHCylcat
-         Am64tCg08HSLb3G98RWWxcdZzvJtl1lvpKNHX/9Qtq6pMoawSiFO0pmF2Iw68lQMU8mq
-         SIkhgg3/dZzAjGkAphoAnxqGrFLoh/mhJoXUUXHp2OKMvdZcV3AI8S9mrW6VSoEs+2zW
-         Ceuw==
+        bh=TnV5Uo4WEDSyHqNRydChmPWwv04NNnacTlgMSv81cvQ=;
+        b=T5UwO06f5YYUjTOoIBnQeZqZF3MXwA1xsiU1nObbLP4/tgmhojQYA0acKw+ROJdLk9
+         /nhe7veeJ9PR6/EvlxZ/mL4TOA/L5gZn2S0eczabNl9X2qMRy0wrgO17HvSvr3Cnmvoe
+         Ebc3mpQ1/R4HhJ6Zhp2PBi/Bd3WEzUf1WjQ3zT3PF0qlQ6BlaQNN4B85rknkW0/4a65U
+         TTQwXCjGC76CGEUdnqoTejpjoQ9+G3P1mTGkf9++df2k+gUwVdj4UiZX9JuhsIO7wCRo
+         czlCTLXHHsmRVXv6UnoyWtnqqCcU8z0eJERJy4epx5L577EKtT42wHUbSYvVKx0YiY6Z
+         NSpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761855004; x=1762459804;
+        d=1e100.net; s=20230601; t=1761855007; x=1762459807;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2OA09S1/1skw+FuU1BhzWw9OqqsMWSUfhu0LCFCqROs=;
-        b=bW8Qr0WNrpFSVHAu15nTxvxHkZ3+iHfYyKOhsemQaJpZ11cc7shHuKLG3pFv8MURGs
-         yg1o5ULoj/zk+eYF9Ih4/GfLqbbwiTe68ZiVlWMa48yOvNj7cR7uFj0bXBYboSemrfwg
-         uGCZFZ2r3EK9nrPsNxGjv8RtQ0s9MyndqPBz2UxnZXB+iQ+pmeaOi2tVHGRyWCnFEi1e
-         a/iZO2s9vBE2lfeGh3+cWO93yKcnqlb9e7VfIea6wLwhNsNFWZUm/7AAiYiYqNvtPDwT
-         6UOEN9U5k3xRt/B9h6rRMyjJebdjdO8TzB6lCifx6Ymafa7H/kWUoU20J4wQdriWl+h7
-         PfWw==
-X-Forwarded-Encrypted: i=1; AJvYcCWm9PhWaLUyNpdI8kvqtBaxA4SHFiSL2lXNbmZUVYcSbvz0bYYNqXAbNjTrl7sIvwCl/pk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywas/A6FP8fI3hiMnQOr1q0dZyxTagZLtqHfKgYLOmZY1z5TIuq
-	X76UBhwdj5EJru/Abgtc+h5M66mknk2E6W5we5lBUvspdEoQdtyOeAqanfXPKYLwOd4ALz8dNPa
-	a+8vmmw==
-X-Google-Smtp-Source: AGHT+IFyokACO79MDowezF6ant8GOHayKAjiYuTdimtA+5sS6fpyhP+P+t8J4m0XKxQ1DNOfqANuKqsRbyM=
-X-Received: from pljc8.prod.google.com ([2002:a17:903:3b88:b0:269:a7b6:c668])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2bce:b0:270:e595:a440
- with SMTP id d9443c01a7336-2951a3b61efmr15533075ad.25.1761855004041; Thu, 30
- Oct 2025 13:10:04 -0700 (PDT)
+        bh=TnV5Uo4WEDSyHqNRydChmPWwv04NNnacTlgMSv81cvQ=;
+        b=f5h56dtmEq+7sqHFd8Rf2aSx6I4u1pzoSIWi9F7d4l9OmL7p0y9x+PpvrD5LYC0Eog
+         xvXuHfxuVAguaKoyCHoAx2zklCNd9hDBXbwpjyaoEonsCocgzRagHXBD6TD5TUyfTjx8
+         RclT51eOT+2W1evYxAsA9gBRbkQcPl2IWOSdJm4YwrC/Dv2DVLHpRClc/ZoKP4kdCSkU
+         Hy/qyZpvqzCcgADu5K9SnB9lx2DIV8Xtkll82HTTSe6dMxDHKzbcv5dqSPu1KURnq4e3
+         LRyT9KWimuHJ3Nomk+7UBhrvFWWiKNodjOxznnXeukfESEyVgb7enM+QOYJwfs+pRH0h
+         KxlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXJMEInJIFMrZe8IswdHtbdKquCizpcaC23JgY6JyMztQeint9ftDEnQy/hnbL+1WV3x3E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzavIYWbqk8paihHkOvJeRCd541Gzjy2mr6ceDmwfwdyNOdYf+b
+	IDynkqfS5X8NodJtv4gPQIDrS29r/XFe7cXr9ZC944LXUdwwmLn616MeAKqd/rKQqfy1Sp+HXca
+	ARIxujQ==
+X-Google-Smtp-Source: AGHT+IFGhHo2Di0bU/Eld4A49PARSXoqPeeyu/ySpV1D9gJIOdjNn1G+WqeVqdSQrN5R+YSZ+ehbNpIGVJQ=
+X-Received: from plow8.prod.google.com ([2002:a17:903:1b08:b0:267:cd3d:3446])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f54c:b0:295:134:9ae5
+ with SMTP id d9443c01a7336-29519b9f27cmr11657375ad.24.1761855006488; Thu, 30
+ Oct 2025 13:10:06 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 13:09:25 -0700
+Date: Thu, 30 Oct 2025 13:09:26 -0700
 In-Reply-To: <20251030200951.3402865-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251030200951.3402865-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251030200951.3402865-3-seanjc@google.com>
-Subject: [PATCH v4 02/28] KVM: Rename kvm_arch_vcpu_async_ioctl() to kvm_arch_vcpu_unlocked_ioctl()
+Message-ID: <20251030200951.3402865-4-seanjc@google.com>
+Subject: [PATCH v4 03/28] KVM: TDX: Drop PROVE_MMU=y sanity check on
+ to-be-populated mappings
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -98,174 +99,74 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Rename the "async" ioctl API to "unlocked" so that upcoming usage in x86's
-TDX code doesn't result in a massive misnomer.  To avoid having to retry
-SEAMCALLs, TDX needs to acquire kvm->lock *and* all vcpu->mutex locks, and
-acquiring all of those locks after/inside the current vCPU's mutex is a
-non-starter.  However, TDX also needs to acquire the vCPU's mutex and load
-the vCPU, i.e. the handling is very much not async to the vCPU.
+Drop TDX's sanity check that a mirror EPT mapping isn't zapped between
+creating said mapping and doing TDH.MEM.PAGE.ADD, as the check is
+simultaneously superfluous and incomplete.  Per commit 2608f1057601
+("KVM: x86/tdp_mmu: Add a helper function to walk down the TDP MMU"), the
+justification for introducing kvm_tdp_mmu_gpa_is_mapped() was to check
+that the target gfn was pre-populated, with a link that points to this
+snippet:
 
-No functional change intended.
+ : > One small question:
+ : >
+ : > What if the memory region passed to KVM_TDX_INIT_MEM_REGION hasn't been pre-
+ : > populated?  If we want to make KVM_TDX_INIT_MEM_REGION work with these regions,
+ : > then we still need to do the real map.  Or we can make KVM_TDX_INIT_MEM_REGION
+ : > return error when it finds the region hasn't been pre-populated?
+ :
+ : Return an error.  I don't love the idea of bleeding so many TDX details into
+ : userspace, but I'm pretty sure that ship sailed a long, long time ago.
 
-Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+But that justification makes little sense for the final code, as the check
+on nr_premapped after TDH.MEM.PAGE.ADD will detect and return an error if
+KVM attempted to zap a S-EPT entry (tdx_sept_zap_private_spte() will fail
+on TDH.MEM.RANGE.BLOCK due lack of a valid S-EPT entry).  And as evidenced
+by the "is mapped?" code being guarded with CONFIG_KVM_PROVE_MMU=y, KVM is
+NOT relying on the check for general correctness.
+
+The sanity check is also incomplete in the sense that mmu_lock is dropped
+between the check and TDH.MEM.PAGE.ADD, i.e. will only detect KVM bugs that
+zap SPTEs in a very specific window (note, this also applies to the check
+on nr_premapped).
+
+Removing the sanity check will allow removing kvm_tdp_mmu_gpa_is_mapped(),
+which has no business being exposed to vendor code, and more importantly
+will pave the way for eliminating the "pre-map" approach entirely in favor
+of doing TDH.MEM.PAGE.ADD under mmu_lock.
+
+Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+Reviewed-by: Kai Huang <kai.huang@intel.com>
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kvm/arm.c       | 4 ++--
- arch/loongarch/kvm/vcpu.c  | 4 ++--
- arch/mips/kvm/mips.c       | 4 ++--
- arch/powerpc/kvm/powerpc.c | 4 ++--
- arch/riscv/kvm/vcpu.c      | 4 ++--
- arch/s390/kvm/kvm-s390.c   | 4 ++--
- arch/x86/kvm/x86.c         | 4 ++--
- include/linux/kvm_host.h   | 4 ++--
- virt/kvm/kvm_main.c        | 6 +++---
- 9 files changed, 19 insertions(+), 19 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 14 --------------
+ 1 file changed, 14 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index ef5bf57f79b7..cf23f6b07ec7 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1835,8 +1835,8 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 	return r;
- }
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 326db9b9c567..4c3014befe9f 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -3181,20 +3181,6 @@ static int tdx_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+ 	if (ret < 0)
+ 		goto out;
  
--long kvm_arch_vcpu_async_ioctl(struct file *filp, unsigned int ioctl,
--			       unsigned long arg)
-+long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
-+				  unsigned long arg)
- {
- 	return -ENOIOCTLCMD;
- }
-diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index 30e3b089a596..9a5844e85fd3 100644
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -1471,8 +1471,8 @@ int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu, struct kvm_interrupt *irq)
- 	return 0;
- }
- 
--long kvm_arch_vcpu_async_ioctl(struct file *filp,
--			       unsigned int ioctl, unsigned long arg)
-+long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
-+				  unsigned long arg)
- {
- 	void __user *argp = (void __user *)arg;
- 	struct kvm_vcpu *vcpu = filp->private_data;
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index a75587018f44..b0fb92fda4d4 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -895,8 +895,8 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
- 	return r;
- }
- 
--long kvm_arch_vcpu_async_ioctl(struct file *filp, unsigned int ioctl,
--			       unsigned long arg)
-+long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
-+				  unsigned long arg)
- {
- 	struct kvm_vcpu *vcpu = filp->private_data;
- 	void __user *argp = (void __user *)arg;
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 2ba057171ebe..9a89a6d98f97 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -2028,8 +2028,8 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- 	return -EINVAL;
- }
- 
--long kvm_arch_vcpu_async_ioctl(struct file *filp,
--			       unsigned int ioctl, unsigned long arg)
-+long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
-+				  unsigned long arg)
- {
- 	struct kvm_vcpu *vcpu = filp->private_data;
- 	void __user *argp = (void __user *)arg;
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index bccb919ca615..a4bd6077eecc 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -238,8 +238,8 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
- 	return VM_FAULT_SIGBUS;
- }
- 
--long kvm_arch_vcpu_async_ioctl(struct file *filp,
--			       unsigned int ioctl, unsigned long arg)
-+long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
-+				  unsigned long arg)
- {
- 	struct kvm_vcpu *vcpu = filp->private_data;
- 	void __user *argp = (void __user *)arg;
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 16ba04062854..8c4caa5f2fcd 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -5730,8 +5730,8 @@ static long kvm_s390_vcpu_memsida_op(struct kvm_vcpu *vcpu,
- 	return r;
- }
- 
--long kvm_arch_vcpu_async_ioctl(struct file *filp,
--			       unsigned int ioctl, unsigned long arg)
-+long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
-+				  unsigned long arg)
- {
- 	struct kvm_vcpu *vcpu = filp->private_data;
- 	void __user *argp = (void __user *)arg;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ca5ba2caf314..b85cb213a336 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7240,8 +7240,8 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
- 	return 0;
- }
- 
--long kvm_arch_vcpu_async_ioctl(struct file *filp, unsigned int ioctl,
--			       unsigned long arg)
-+long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
-+				  unsigned long arg)
- {
- 	return -ENOIOCTLCMD;
- }
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 7186b2ae4b57..d93f75b05ae2 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1557,6 +1557,8 @@ long kvm_arch_dev_ioctl(struct file *filp,
- 			unsigned int ioctl, unsigned long arg);
- long kvm_arch_vcpu_ioctl(struct file *filp,
- 			 unsigned int ioctl, unsigned long arg);
-+long kvm_arch_vcpu_unlocked_ioctl(struct file *filp,
-+				  unsigned int ioctl, unsigned long arg);
- vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf);
- 
- int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext);
-@@ -2437,8 +2439,6 @@ static inline bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
- }
- #endif /* CONFIG_HAVE_KVM_NO_POLL */
- 
--long kvm_arch_vcpu_async_ioctl(struct file *filp,
--			       unsigned int ioctl, unsigned long arg);
- void kvm_arch_guest_memory_reclaimed(struct kvm *kvm);
- 
- #ifdef CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 4845e5739436..9eca084bdcbe 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4434,10 +4434,10 @@ static long kvm_vcpu_ioctl(struct file *filp,
- 		return r;
- 
- 	/*
--	 * Some architectures have vcpu ioctls that are asynchronous to vcpu
--	 * execution; mutex_lock() would break them.
-+	 * Let arch code handle select vCPU ioctls without holding vcpu->mutex,
-+	 * e.g. to support ioctls that can run asynchronous to vCPU execution.
- 	 */
--	r = kvm_arch_vcpu_async_ioctl(filp, ioctl, arg);
-+	r = kvm_arch_vcpu_unlocked_ioctl(filp, ioctl, arg);
- 	if (r != -ENOIOCTLCMD)
- 		return r;
- 
+-	/*
+-	 * The private mem cannot be zapped after kvm_tdp_map_page()
+-	 * because all paths are covered by slots_lock and the
+-	 * filemap invalidate lock.  Check that they are indeed enough.
+-	 */
+-	if (IS_ENABLED(CONFIG_KVM_PROVE_MMU)) {
+-		scoped_guard(read_lock, &kvm->mmu_lock) {
+-			if (KVM_BUG_ON(!kvm_tdp_mmu_gpa_is_mapped(vcpu, gpa), kvm)) {
+-				ret = -EIO;
+-				goto out;
+-			}
+-		}
+-	}
+-
+ 	ret = 0;
+ 	err = tdh_mem_page_add(&kvm_tdx->td, gpa, pfn_to_page(pfn),
+ 			       src_page, &entry, &level_state);
 -- 
 2.51.1.930.gacf6e81ea2-goog
 
