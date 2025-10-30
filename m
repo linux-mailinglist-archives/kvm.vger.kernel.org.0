@@ -1,199 +1,208 @@
-Return-Path: <kvm+bounces-61509-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61510-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FA7BC2177B
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 18:24:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A3EEC217DB
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 18:28:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91E9756422C
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 17:19:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B70AF1A24E54
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 17:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7255368F33;
-	Thu, 30 Oct 2025 17:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47E1368F51;
+	Thu, 30 Oct 2025 17:28:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NjTRYPMi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g0ZjB2ik"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E652DF71D
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185693678BC;
+	Thu, 30 Oct 2025 17:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761844717; cv=none; b=JwvplKbGaXdrqNkUqrGZcIE9FVEZnXfSlPI6jiYKHL7kRXoN0RHg+Ot9j/qObmqna9NSDhrtcsPuymJTq/H5DKKmdIcAP1pIi+bPKEvSz6FQdJ1k94sfs/tnp9BIQakBA13bVKxUWpRjkjn2aZjcM9gxcdQ9HSjbm+EjLzK78i0=
+	t=1761845324; cv=none; b=KSod2ZZLQyw1PAovnbjbOwPgCm+wu7qv8vikiO08vZPp7MXNZQMdhm+FPvVfNQ3GkEOMZ0k2tgv3EhbO7Icdnu+dt/S+sj6b1SUDG3II55zMNqom4IZ2oSE+Ca36Q1CiWD5dVcJMQyKOV+TBTnrf+GnxMLuUcv+0QDclKFNyWTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761844717; c=relaxed/simple;
-	bh=VJLcmOospl0NvxJ/WTOkbujLbTnBJibWwvHUpjZ0/1w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VY451rGsPM9RMgsCls3Wck88sJHUwPQ1ZWC2HvG54n5CTg9FMomv8DMLHpCIJ4yjnqsZppWdtJwdIgoJqD4dkhvz7qsGxcyPuKzmYHm/k1p2mFHqVhp3m2KeHqDF7EJjMKbwxd/JKlZ4gUQULCrngPgk16YSgw8VjtUb1EEZAOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NjTRYPMi; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-475db4369b1so7154995e9.3
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 10:18:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761844713; x=1762449513; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0zIsYr/NZ5vBEDYePNHV7frUHCwl+Wvsd8lZxHFgSTA=;
-        b=NjTRYPMi7t4Sc0qduHqJAUaR2OaP2M3rj8a1pzTXzXCAraf5vvUtw5KWFZZXm8/Io0
-         xcdd8KNn3+7Rl2e0nnO4dVJD8onBJEddd11mJqnI8Cs7Al4FpN4AYzY+8QqmKWeVraiE
-         Na9enRm+27lhGolwsAX5xckYPHFPxPd9cHNIBqb7YleBuKB9ywSS9pGL18/SDkECxveI
-         uqgvhkt3hPeQC0ih1oHXBHr2aXqjWbN+9uUrwq74mAm8fct34G4D2UeVMILN73kLcXPM
-         mRdqCWI90wrOO2RKjLyUGgFd40mEdDK8A/HgHy3/G+vY0RsXKNtbzW3ecO0s+vSJl0Q6
-         F+eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761844713; x=1762449513;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0zIsYr/NZ5vBEDYePNHV7frUHCwl+Wvsd8lZxHFgSTA=;
-        b=IvFUMANELaCyZEgihxwbqz4nGpVf1ouRLp3HN2GC98KHlK9oacZQgkVgpz76wrQvtZ
-         8ctDcoLTB2TBprcd/NBkKl9p7nRUPip/sZ79sW9Rb55M3QyKGWUeLuwJ/caL+wvaqDgz
-         3XdRHLJhce24hDM0XBC8Uzw0f6h5SIyFx5fw3h5Isrp+qnSB6YTNg09Ypv15Hb9MfEJR
-         9ROb/H80JiyDY/ZkGWfHK52YS10A10CwpR5thiRZAkG5Vztg2LICx5Xt6B73kvGkt16T
-         Lxx3pRptH8wKDQxW3Edhg3B3OQojA6tKW7SQekcTprzSpGW4PHFpfH5c6cveJNa1NBcF
-         LEHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWmfT1BxK8rSRF8SWoyFwZczpwMU3SJhtxDm29WFD5aSICXts+ZHVSKiTVE93JB7hHH38M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWlgTjiquUVzmADC0X8UFzDRs0S2WeoxQ3QfoeZIQxLViwwd8e
-	eiuWo8sJ5UrPWnS/VWNQurPyxcvcXfYHheNxo2j1zj1WkgcWY5cgXtblgM9y0ADbf1SdRU48KMZ
-	yxQ9jdYGarsxmNQ==
-X-Google-Smtp-Source: AGHT+IFXk6DKJ2LvWY2ZBOreY5EWyiD1FLIIWcEezkT9L8CiZAonL3OXc94rN18lwM8G/At6waViWG4yx0JY7g==
-X-Received: from wmbka6.prod.google.com ([2002:a05:600c:5846:b0:470:ffaa:ae5e])
- (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3b8b:b0:471:989:9d7b with SMTP id 5b1f17b1804b1-4773086d53amr4625785e9.21.1761844712453;
- Thu, 30 Oct 2025 10:18:32 -0700 (PDT)
-Date: Thu, 30 Oct 2025 17:18:31 +0000
-In-Reply-To: <20250924152214.7292-9-roypat@amazon.co.uk>
+	s=arc-20240116; t=1761845324; c=relaxed/simple;
+	bh=EeHiZj86ptVWaw1dHp14/Ek3xCgDzVxz3IbbU3pJgHo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ApFMFIylRU2KEKSlP6dIglXPp9IkdLseIpENFdN8LIiUNgEZ7wphdV4FlCHTB275ZJ7c8ZZz4H/ktHuzniM1eB1rfAko2LtR5qPtLCF65+oxO15fLTouvZOvaDn1pp2OB2zSyEllaunKZltGzqjC2Xh8Vfh6DBCz5VE8dgoqALc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g0ZjB2ik; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761845323; x=1793381323;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EeHiZj86ptVWaw1dHp14/Ek3xCgDzVxz3IbbU3pJgHo=;
+  b=g0ZjB2ikNtEmtG7Pq7phF9auNsHdGpOj/ByTV319P4IXky7874BNTNKU
+   q4H0gZ5K/FxmDtn13ghYxypVmubDAOINV9CTcftvyhvC0cCCQu5Euo0zQ
+   NYd5QRFTb0cFejvxY2duOvLw/iLnsN/OKARImFAR47s4l66cV3oBdSPW2
+   31CLmPcfZevv/6bpxOsqlv1C748cHPFj6oOodcs57wK2KjzgFCxQCfT2O
+   5zPzdp1KXEg+G/+21zdtLoT7x7Wa6F7c8dSDoZbWCU30Kk5+960nsxvvA
+   E3uyH3cJjFH7GlEvb8b2dtXDMcAG+IGxHuqSxSCmWeE0sSLAk8e6sLEmW
+   g==;
+X-CSE-ConnectionGUID: foE5fsguQMO5YS1+kT0ynw==
+X-CSE-MsgGUID: KRHShXtpTHCpriz9zIF2CQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="63900918"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="63900918"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2025 10:28:43 -0700
+X-CSE-ConnectionGUID: x2CPNvEORpGk9VGkTwg3LA==
+X-CSE-MsgGUID: PAn8cadVQMCLIhHd5b73Xw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,267,1754982000"; 
+   d="scan'208";a="186109479"
+Received: from iherna2-mobl4.amr.corp.intel.com (HELO desk) ([10.124.223.240])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2025 10:28:41 -0700
+Date: Thu, 30 Oct 2025 10:28:36 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Brendan Jackman <jackmanb@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Tao Zhang <tao1.zhang@intel.com>,
+	Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH 3/3] x86/mmio: Unify VERW mitigation for guests
+Message-ID: <20251030172836.5ys2wag3dax5fmwk@desk>
+References: <20251029-verw-vm-v1-0-babf9b961519@linux.intel.com>
+ <20251029-verw-vm-v1-3-babf9b961519@linux.intel.com>
+ <DDVO5U7JZF4F.1WXXE8IYML140@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
- <20250924152214.7292-1-roypat@amazon.co.uk> <20250924152214.7292-9-roypat@amazon.co.uk>
-X-Mailer: aerc 0.21.0
-Message-ID: <DDVTTQZBJXAK.1OC7BTWCVCP9U@google.com>
-Subject: Re: [PATCH v7 12/12] KVM: selftests: Test guest execution from direct
- map removed gmem
-From: Brendan Jackman <jackmanb@google.com>
-To: "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
-	"maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
-	"joey.gouly@arm.com" <joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
-	"will@kernel.org" <will@kernel.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
-	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>, 
-	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@redhat.com" <david@redhat.com>, 
-	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, 
-	"song@kernel.org" <song@kernel.org>, "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
-	"martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
-	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
-	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>, 
-	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
-	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>, "tabba@google.com" <tabba@google.com>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DDVO5U7JZF4F.1WXXE8IYML140@google.com>
 
-On Wed Sep 24, 2025 at 3:22 PM UTC, Patrick Roy wrote:
-> Add a selftest that loads itself into guest_memfd (via
-> GUEST_MEMFD_FLAG_MMAP) and triggers an MMIO exit when executed. This
-> exercises x86 MMIO emulation code inside KVM for guest_memfd-backed
-> memslots where the guest_memfd folios are direct map removed.
-> Particularly, it validates that x86 MMIO emulation code (guest page
-> table walks + instruction fetch) correctly accesses gmem through the VMA
-> that's been reflected into the memslot's userspace_addr field (instead
-> of trying to do direct map accesses).
->
-> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
-> ---
->  .../selftests/kvm/set_memory_region_test.c    | 50 +++++++++++++++++--
->  1 file changed, 46 insertions(+), 4 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-> index ce3ac0fd6dfb..cb3bc642d376 100644
-> --- a/tools/testing/selftests/kvm/set_memory_region_test.c
-> +++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-> @@ -603,6 +603,41 @@ static void test_mmio_during_vectoring(void)
->  
->  	kvm_vm_free(vm);
->  }
-> +
-> +static void guest_code_trigger_mmio(void)
-> +{
-> +	/*
-> +	 * Read some GPA that is not backed by a memslot. KVM consider this
-> +	 * as MMIO and tell userspace to emulate the read.
-> +	 */
-> +	READ_ONCE(*((uint64_t *)MEM_REGION_GPA));
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +static void test_guest_memfd_mmio(void)
-> +{
-> +	struct kvm_vm *vm;
-> +	struct kvm_vcpu *vcpu;
-> +	struct vm_shape shape = {
-> +		.mode = VM_MODE_DEFAULT,
-> +		.src_type = VM_MEM_SRC_GUEST_MEMFD_NO_DIRECT_MAP,
-> +	};
-> +	pthread_t vcpu_thread;
-> +
-> +	pr_info("Testing MMIO emulation for instructions in gmem\n");
-> +
-> +	vm = __vm_create_shape_with_one_vcpu(shape, &vcpu, 0, guest_code_trigger_mmio);
+On Thu, Oct 30, 2025 at 12:52:12PM +0000, Brendan Jackman wrote:
+> On Wed Oct 29, 2025 at 9:26 PM UTC, Pawan Gupta wrote:
+> > When a system is only affected by MMIO Stale Data, VERW mitigation is
+> > currently handled differently than other data sampling attacks like
+> > MDS/TAA/RFDS, that do the VERW in asm. This is because for MMIO Stale Data,
+> > VERW is needed only when the guest can access host MMIO, this was tricky to
+> > check in asm.
+> >
+> > Refactoring done by:
+> >
+> >   83ebe7157483 ("KVM: VMX: Apply MMIO Stale Data mitigation if KVM maps
+> >   MMIO into the guest")
+> >
+> > now makes it easier to execute VERW conditionally in asm based on
+> > VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO.
+> >
+> > Unify MMIO Stale Data mitigation with other VERW-based mitigations and only
+> > have single VERW callsite in __vmx_vcpu_run(). Remove the now unnecessary
+> > call to x86_clear_cpu_buffer() in vmx_vcpu_enter_exit().
+> >
+> > This also untangles L1D Flush and MMIO Stale Data mitigation. Earlier, an
+> > L1D Flush would skip the VERW for MMIO Stale Data. Now, both the
+> > mitigations are independent of each other. Although, this has little
+> > practical implication since there are no CPUs that are affected by L1TF and
+> > are *only* affected by MMIO Stale Data (i.e. not affected by MDS/TAA/RFDS).
+> > But, this makes the code cleaner and easier to maintain.
+> >
+> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/run_flags.h | 12 ++++++------
+> >  arch/x86/kvm/vmx/vmenter.S   |  5 +++++
+> >  arch/x86/kvm/vmx/vmx.c       | 26 ++++++++++----------------
+> >  3 files changed, 21 insertions(+), 22 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/vmx/run_flags.h b/arch/x86/kvm/vmx/run_flags.h
+> > index 2f20fb170def8b10c8c0c46f7ba751f845c19e2c..004fe1ca89f05524bf3986540056de2caf0abbad 100644
+> > --- a/arch/x86/kvm/vmx/run_flags.h
+> > +++ b/arch/x86/kvm/vmx/run_flags.h
+> > @@ -2,12 +2,12 @@
+> >  #ifndef __KVM_X86_VMX_RUN_FLAGS_H
+> >  #define __KVM_X86_VMX_RUN_FLAGS_H
+> >  
+> > -#define VMX_RUN_VMRESUME_SHIFT				0
+> > -#define VMX_RUN_SAVE_SPEC_CTRL_SHIFT			1
+> > -#define VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO_SHIFT	2
+> > +#define VMX_RUN_VMRESUME_SHIFT			0
+> > +#define VMX_RUN_SAVE_SPEC_CTRL_SHIFT		1
+> > +#define VMX_RUN_CLEAR_CPU_BUFFERS_SHIFT		2
+> >  
+> > -#define VMX_RUN_VMRESUME			BIT(VMX_RUN_VMRESUME_SHIFT)
+> > -#define VMX_RUN_SAVE_SPEC_CTRL			BIT(VMX_RUN_SAVE_SPEC_CTRL_SHIFT)
+> > -#define VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO	BIT(VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO_SHIFT)
+> > +#define VMX_RUN_VMRESUME		BIT(VMX_RUN_VMRESUME_SHIFT)
+> > +#define VMX_RUN_SAVE_SPEC_CTRL		BIT(VMX_RUN_SAVE_SPEC_CTRL_SHIFT)
+> > +#define VMX_RUN_CLEAR_CPU_BUFFERS	BIT(VMX_RUN_CLEAR_CPU_BUFFERS_SHIFT)
+> >  
+> >  #endif /* __KVM_X86_VMX_RUN_FLAGS_H */
+> > diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+> > index 0dd23beae207795484150698d1674dc4044cc520..ec91f4267eca319ffa8e6079887e8dfecc7f96d8 100644
+> > --- a/arch/x86/kvm/vmx/vmenter.S
+> > +++ b/arch/x86/kvm/vmx/vmenter.S
+> > @@ -137,6 +137,9 @@ SYM_FUNC_START(__vmx_vcpu_run)
+> >  	/* Load @regs to RAX. */
+> >  	mov (%_ASM_SP), %_ASM_AX
+> >  
+> > +	/* jz .Lskip_clear_cpu_buffers below relies on this */
+> > +	test $VMX_RUN_CLEAR_CPU_BUFFERS, %ebx
+> > +
+> >  	/* Check if vmlaunch or vmresume is needed */
+> >  	bt   $VMX_RUN_VMRESUME_SHIFT, %ebx
+> >  
+> > @@ -160,6 +163,8 @@ SYM_FUNC_START(__vmx_vcpu_run)
+> >  	/* Load guest RAX.  This kills the @regs pointer! */
+> >  	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
+> >  
+> > +	/* Check EFLAGS.ZF from the VMX_RUN_CLEAR_CPU_BUFFERS bit test above */
+> > +	jz .Lskip_clear_cpu_buffers
+> 
+> Hm, it's a bit weird that we have the "alternative" inside
+> VM_CLEAR_CPU_BUFFERS, but then we still keep the test+jz
+> unconditionally. 
 
-When I run this test on my minimal config in a nested VM I get:
+Exactly, but it is tricky to handle the below 2 cases in asm:
 
-[root@testvm:~]# /nix/store/xlxd60n7v1qfr6s5zxda410zrzdd0xc2-kselftests/bin/run_kselftest.sh -t kvm:set_memory_region_test
-TAP version 13
-1..1
-# timeout set to 120
-# selftests: kvm: set_memory_region_test
-# Random seed: 0x6b8b4567
-# Testing KVM_RUN with zero added memory regions
-# Testing MMIO during vectoring error handling
-# Allowed number of memory slots: 32764
-# Adding slots 0..32763, each memory region with 2048K size
-# Testing MMIO emulation for instructions in gmem
-# ==== Test Assertion Failure ====
-#   lib/kvm_util.c:1118: region->mmap_start != MAP_FAILED
-#   pid=614 tid=614 errno=19 - No such device
-#      1	0x0000000000407b02: vm_mem_add at ??:?
-#      2	0x000000000040a924: __vm_create at ??:?
-#      3	0x000000000040ab16: __vm_create_shape_with_one_vcpu at ??:?
-#      4	0x00000000004042cf: main at ??:?
-#      5	0x00007faa6b08a47d: ?? ??:0
-#      6	0x00007faa6b08a538: ?? ??:0
-#      7	0x0000000000404384: _start at ??:?
-#   mmap() failed, rc: -1 errno: 19 (No such device)
+1. MDS -> Always do VM_CLEAR_CPU_BUFFERS
 
-Here's the kconfig I'm using (basically defconfig+KVM): 
+2. MMIO -> Do VM_CLEAR_CPU_BUFFERS only if guest can access host MMIO
 
-https://gist.githubusercontent.com/bjackman/4ea941ef5072606769211f3b000c8ed7/raw/73808882ddae6ff2ae8a0be85ac977b2980f7292/kconfig.txt
+In th MMIO case, one guest may have access to host MMIO while another may
+not. Alternatives alone can't handle this case as they patch code at boot
+which is then set in stone. One way is to move the conditional inside
+VM_CLEAR_CPU_BUFFERS that gets a flag as an arguement.
 
-Sorry I'm too ignorant about KVM to know what I'm missing here but I
-guess it's a missing TEST_REQUIRE()?
+> If we really want to super-optimise the no-mitigations-needed case,
+> shouldn't we want to avoid the conditional in the asm if it never
+> actually leads to a flush?
 
+Ya, so effectively, have VM_CLEAR_CPU_BUFFERS alternative spit out
+conditional VERW when affected by MMIO_only, otherwise an unconditional
+VERW.
+
+> On the other hand, if we don't mind a couple of extra instructions,
+> shouldn't we be fine with just having the whole asm code based solely
+> on VMX_RUN_CLEAR_CPU_BUFFERS and leaving the
+> X86_FEATURE_CLEAR_CPU_BUF_VM to the C code?
+
+That's also an option.
+
+> I guess the issue is that in the latter case we'd be back to having
+> unnecessary inconsistency with AMD code while in the former case... well
+> that would just be really annoying asm code - am I on the right
+> wavelength there? So I'm not necessarily asking for changes here, just
+> probing in case it prompts any interesting insights on your side.
+> 
+> (Also, maybe this test+jz has a similar cost to the nops that the
+> "alternative" would inject anyway...?)
+
+Likely yes. test+jz is a necessary evil that is needed for MMIO Stale Data
+for different per-guest handling.
 
