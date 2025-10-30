@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-61555-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61556-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57A02C223B1
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 21:24:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B76FC223AE
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 21:24:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 542A25608FD
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:17:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C17C0560EFD
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5927346FDA;
-	Thu, 30 Oct 2025 20:11:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5743534D391;
+	Thu, 30 Oct 2025 20:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A0JJnbXO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZTi4/1Mu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F64E33E37D
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 20:11:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46662346FCF
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 20:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761855066; cv=none; b=gBd0rqwxFGnFcLmsmWzVjd7Nw9Ip3YGnTb0Gd3v9mTbKqQz7tV5wUZ9ZFRMrcXlrI2+cfe0rOrNjY8M5YH+Io7BmzBa55HYYYdiDOmWc6hj2ySjDi1uZHUTkBEBN7cEykAfLXqbG5wRAKawZJiw80c25HyxzdxYKRk2z0XTmFsI=
+	t=1761855069; cv=none; b=sUVeIeeqVbEbjybncBrw4o0Sr9ZwEnS7WC2a+6aw/IKfw7wvSC3aKkNVg83HzPvqZgfp+bThlu3bBNAMTzsuk4SY90CwgNKVOCU1ezucYySuKz/3xR1Xnc9k8kV6g8p9FZYQ1vkUN+u5t7odR+k5EWTufEkQk/+Sjy9HZWAO1Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761855066; c=relaxed/simple;
-	bh=3OodWTNKfo3eGtZ7Fc7X1fUwmvd4oILOljrjn90Df3M=;
+	s=arc-20240116; t=1761855069; c=relaxed/simple;
+	bh=BNSOEKa28oWXqKHW7RuSRcfta2Y9XobgHdriosWTdaA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GhLffiMi1Qwup6Tmfdm/4DDa/FR9ssvGcWRiVV5m90mHb4xxw3tFZH5M1vET9fSim9PsBrSEEpJ8UIIOKoVHRrcFhM59kUGVIEWq/Rr04Rl44C7Y7JBjMVwXAD5/HJaC0s+QmKG8f0sBFOHFaXYpNj2/eIlU9AwxL4LsCW3zUdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A0JJnbXO; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=leouwXE7rOw9H8scueq2UUUcfcVMveY7YXbdPt37qXlewIbbCYoywJzi/86ddAL2EdIubJwygiBB4bJDr4NRK6hUnJ8B1upkCqPTWNT9XzyCcfoF14o8rrVfMNsvvFjKWltGxgYUBsAdmjLi5UsmC2i2mdGVTlwd+zYBmQ55OrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZTi4/1Mu; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3408d2c733cso57983a91.2
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 13:11:04 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b5535902495so987822a12.0
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 13:11:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761855064; x=1762459864; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761855065; x=1762459865; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ixX9GQx535IvklNL5bVhTvm5cxC1bAxRsqCoHbh8pSg=;
-        b=A0JJnbXODuaAU/SObnIaNr6/AheaUQVuUObJlIpNGGnWyaVQjn8CJW8qtkXp6ZCliz
-         /oBsZT4tyrLN7p314vgo+znP9/gCwO/B+e1Q0e3ont+p9mZOhtEg4+3dbDKA1CdSLtHs
-         /fmKD/BBBYKruu48sb84Ero8oRE9FMw7GmzcWqJTZycYc/rn1HUkiPDMYKHb/9PSAG9m
-         pgPphpjOqTVU+J3Al2YA1SJzS/jdppp42eqrpJUR+K6InWM/0ankTUk4UZFftsPOBsuI
-         yhUyvbxSFewjrm6HdvMlzHWOaPpG7Qv73/Lc+9IzbJLrgP+stzdG12oplyKgP1Mh/SbQ
-         Q+yQ==
+        bh=gJtCncfCK9X54oXx991KGpYhmmpTyjjcLT5mmtOhZeY=;
+        b=ZTi4/1Muxx6qDWUNt3cEFU7xcCSnSIePEwQ12PKIX2DNkRxj11o/CA9NZGc+1A9oFc
+         fbBdQ9CCAJPNFfeiL5zGcJJWuH4W6RV47jTfs2v5Jr9vqUON+AABZGbBBSB7p9BQJNML
+         HCPvgc3wP+fbm6Jcx6u6gFSY5y9ii/+6J+mTXq1m2yLt6Zuoi0cDJjxXWUXTzhsiPZ5U
+         4wLaLYO3gTtqdK0JmhgbF6PvqLC0BKLqvvFjfE1aqG0cj/Sm1fCeNXkCAnh3eHCT9HnM
+         rpclILEZG+aQyQcBwfW41LWYyz8ZSt2AhOvSe2Q1b/UVoX0kF73HE7bwtZclofIi6lW0
+         SZSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761855064; x=1762459864;
+        d=1e100.net; s=20230601; t=1761855065; x=1762459865;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ixX9GQx535IvklNL5bVhTvm5cxC1bAxRsqCoHbh8pSg=;
-        b=LWti5v5Ok9Xb+rVCMPuzAARGZdER5ePiY1Pgkyicx2KQKD/da7HMp9u6W84GCSY9ZO
-         qFoEM3SN0dnGUT5E3t1dzCJmeg2AzJw4ce9UoyZBqiqsNeN2r7LGQ9Yq7C9wk/ZN+zFB
-         FWp8vahR6b8R/zSwCGlXYhw9hwkeXo24Rh6scElNuzaxUUI3BdCXP1+WZsJPRDlPkMMr
-         nZIOw53dlByymUU1FvWIjZr0jFdOgxoo/JLnWyGaEIpIuN6LIUJ/s09K+SR9pu4IYmVC
-         1mrVL1OBe9DvYuT1MblEIY1VQUEHmzay5sY8tsKxkiNkkXAPv5xFflqaEVHn7cv48LgX
-         ONyw==
-X-Forwarded-Encrypted: i=1; AJvYcCUylq7V+Y9YNHmT9l22t/D2ihx6vauXenovfZGNApO3geNzykL+5bMdvqbxrJyrZbTyaag=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybZYhKZ55sHzR6siuj9E/I4kB8PX9V21mzhcw9MwlCS0hmgKnd
-	QTbbH0YubjWYrkjLrLog+1BGCLFVqwS39zIPAzNqY1RoNGFpLIMKidoHHVN93ZwSV3do1Qbu9WF
-	XhuXG3g==
-X-Google-Smtp-Source: AGHT+IFyAaLKG8h2LJ84hJgHQ75wx3G0tk8Vj+W9kFkkyUvmGPkijC+6POH5qOYkAqbj7Ex/aKtYOd6js0k=
-X-Received: from pjbcq19.prod.google.com ([2002:a17:90a:f993:b0:339:ee5f:ec32])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b10:b0:340:2a16:94be
- with SMTP id 98e67ed59e1d1-34082fab1e6mr1328002a91.4.1761855063621; Thu, 30
- Oct 2025 13:11:03 -0700 (PDT)
+        bh=gJtCncfCK9X54oXx991KGpYhmmpTyjjcLT5mmtOhZeY=;
+        b=pTOcpJ9Yk9MVTnjLWKiKwTAKsk5tzcuLzXEkZMZF6sZ7xB+mnHX6PLQtHkzC4OwV26
+         3nMaYOvOa3apwUAJJ91Iid879MNBgpEZc6KQHHN1kgztTkM01G/MfqxugGl1Ju0erkzk
+         H9/JI6gkuugUQLVPl6dLiq7x9ByEhG0Tn8m2DcNnYUk9dEVFG+0lDRThj9lcm5mX5DOn
+         h9oYrhoVPkv3gup9SX/A3xxkmFcNOx38N5oUZjl07d7l/zdON4nQPokx7JfJYo8M1jPg
+         RGPE6nfagseSQyweQoNoTsSBjBDIgQSSQj87hXFVG53qP4txZcKpSEArbK3ioAfb/Gbe
+         FAKw==
+X-Forwarded-Encrypted: i=1; AJvYcCXgvTY12KcmLC6EiXrGdZA+GEiDvrSEwV+4Dw4anBEcHx+KOeJHkPw5f4LGVOPINrp56Z0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDBZtFHFGeg0vjbaTWK727/bbSH4dHE0eG/I2dfOj77pZvyUbx
+	6gx//hxhdf9Wh9NCR97rJZCEta3HOCS72ghNmcrZxeFRmv0O5I3lQPVxzSvo/R64pkKcBiyfg+2
+	1gpKQsQ==
+X-Google-Smtp-Source: AGHT+IGHOQLpfyFznvDWNUH7H5RRwumwXl+ad4M1fU9LKzyWdjNf4lBkOJxqkb3vWAdXWhUIZ0D4LKjuEDo=
+X-Received: from pjd14.prod.google.com ([2002:a17:90b:54ce:b0:339:ee20:f620])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3e4d:b0:32e:528c:60ee
+ with SMTP id 98e67ed59e1d1-34083055b02mr1449393a91.24.1761855065570; Thu, 30
+ Oct 2025 13:11:05 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 13:09:49 -0700
+Date: Thu, 30 Oct 2025 13:09:50 -0700
 In-Reply-To: <20251030200951.3402865-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251030200951.3402865-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251030200951.3402865-27-seanjc@google.com>
-Subject: [PATCH v4 26/28] KVM: TDX: Guard VM state transitions with "all" the locks
+Message-ID: <20251030200951.3402865-28-seanjc@google.com>
+Subject: [PATCH v4 27/28] KVM: TDX: Bug the VM if extending the initial
+ measurement fails
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -98,164 +99,77 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Acquire kvm->lock, kvm->slots_lock, and all vcpu->mutex locks when
-servicing ioctls that (a) transition the TD to a new state, i.e. when
-doing INIT or FINALIZE or (b) are only valid if the TD is in a specific
-state, i.e. when initializing a vCPU or memory region.  Acquiring "all"
-the locks fixes several KVM_BUG_ON() situations where a SEAMCALL can fail
-due to racing actions, e.g. if tdh_vp_create() contends with either
-tdh_mr_extend() or tdh_mr_finalize().
+WARN and terminate the VM if TDH_MR_EXTEND fails, as extending the
+measurement should fail if and only if there is a KVM bug, or if the S-EPT
+mapping is invalid.  Now that KVM makes all state transitions mutually
+exclusive via tdx_vm_state_guard, it should be impossible for S-EPT
+mappings to be removed between kvm_tdp_mmu_map_private_pfn() and
+tdh_mr_extend().
 
-For all intents and purposes, the paths in question are fully serialized,
-i.e. there's no reason to try and allow anything remotely interesting to
-happen.  Smack 'em with a big hammer instead of trying to be "nice".
+Holding slots_lock prevents zaps due to memslot updates,
+filemap_invalidate_lock() prevents zaps due to guest_memfd PUNCH_HOLE,
+vcpu->mutex locks prevents updates from other vCPUs, kvm->lock prevents
+VM-scoped ioctls from creating havoc (e.g. by creating new vCPUs), and all
+usage of kvm_zap_gfn_range() is mutually exclusive with S-EPT entries that
+can be used for the initial image.
 
-Acquire kvm->lock to prevent VM-wide things from happening, slots_lock to
-prevent kvm_mmu_zap_all_fast(), and _all_ vCPU mutexes to prevent vCPUs
-from interefering.  Use the recently-renamed kvm_arch_vcpu_unlocked_ioctl()
-to service the vCPU-scoped ioctls to avoid a lock inversion problem, e.g.
-due to taking vcpu->mutex outside kvm->lock.
+For kvm_zap_gfn_range(), the call from sev.c is obviously mutually
+exclusive, TDX disallows KVM_X86_QUIRK_IGNORE_GUEST_PAT so the same goes
+for kvm_noncoherent_dma_assignment_start_or_stop(), and
+__kvm_set_or_clear_apicv_inhibit() is blocked by virtue of holding all
+VM and vCPU mutexes (and the APIC page has its own non-guest_memfd memslot
+and so can't be used for the initial image, which means that too is
+mutually exclusive irrespective of locking).
 
-See also commit ecf371f8b02d ("KVM: SVM: Reject SEV{-ES} intra host
-migration if vCPU creation is in-flight"), which fixed a similar bug with
-SEV intra-host migration where an in-flight vCPU creation could race with
-a VM-wide state transition.
+Opportunistically return early if the region doesn't need to be measured
+in order to reduce line lengths and avoid wraps.  Similarly, immediately
+and explicitly return if TDH_MR_EXTEND fails to make it clear that KVM
+needs to bail entirely if extending the measurement fails.
 
-Define a fancy new CLASS to handle the lock+check => unlock logic with
-guard()-like syntax:
-
-        CLASS(tdx_vm_state_guard, guard)(kvm);
-        if (IS_ERR(guard))
-                return PTR_ERR(guard);
-
-to simplify juggling the many locks.
-
-Note!  Take kvm->slots_lock *after* all vcpu->mutex locks, as per KVM's
-soon-to-be-documented lock ordering rules[1].
-
-Link: https://lore.kernel.org/all/20251016235538.171962-1-seanjc@google.com [1]
-Reported-by: Yan Zhao <yan.y.zhao@intel.com>
-Closes: https://lore.kernel.org/all/aLFiPq1smdzN3Ary@yzhao56-desk.sh.intel.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 59 +++++++++++++++++++++++++++++++++++-------
- 1 file changed, 49 insertions(+), 10 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 57dfddd2a6cf..8bcdec049ac6 100644
+index 8bcdec049ac6..762f2896547f 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -2653,6 +2653,46 @@ static int tdx_read_cpuid(struct kvm_vcpu *vcpu, u32 leaf, u32 sub_leaf,
- 	return -EIO;
- }
+@@ -3123,21 +3123,23 @@ static int tdx_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
  
-+typedef void *tdx_vm_state_guard_t;
-+
-+static tdx_vm_state_guard_t tdx_acquire_vm_state_locks(struct kvm *kvm)
-+{
-+	int r;
-+
-+	mutex_lock(&kvm->lock);
-+
-+	if (kvm->created_vcpus != atomic_read(&kvm->online_vcpus)) {
-+		r = -EBUSY;
-+		goto out_err;
-+	}
-+
-+	r = kvm_lock_all_vcpus(kvm);
-+	if (r)
-+		goto out_err;
-+
+ 	put_page(src_page);
+ 
+-	if (ret)
++	if (ret || !(arg->flags & KVM_TDX_MEASURE_MEMORY_REGION))
+ 		return ret;
+ 
+-	if (arg->flags & KVM_TDX_MEASURE_MEMORY_REGION) {
+-		for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
+-			err = tdh_mr_extend(&kvm_tdx->td, gpa + i, &entry,
+-					    &level_state);
+-			if (err) {
+-				ret = -EIO;
+-				break;
+-			}
+-		}
 +	/*
-+	 * Note the unintuitive ordering!  vcpu->mutex must be taken outside
-+	 * kvm->slots_lock!
++	 * Note, MR.EXTEND can fail if the S-EPT mapping is somehow removed
++	 * between mapping the pfn and now, but slots_lock prevents memslot
++	 * updates, filemap_invalidate_lock() prevents guest_memfd updates,
++	 * mmu_notifier events can't reach S-EPT entries, and KVM's internal
++	 * zapping flows are mutually exclusive with S-EPT mappings.
 +	 */
-+	mutex_lock(&kvm->slots_lock);
-+	return kvm;
-+
-+out_err:
-+	mutex_unlock(&kvm->lock);
-+	return ERR_PTR(r);
-+}
-+
-+static void tdx_release_vm_state_locks(struct kvm *kvm)
-+{
-+	mutex_unlock(&kvm->slots_lock);
-+	kvm_unlock_all_vcpus(kvm);
-+	mutex_unlock(&kvm->lock);
-+}
-+
-+DEFINE_CLASS(tdx_vm_state_guard, tdx_vm_state_guard_t,
-+	     if (!IS_ERR(_T)) tdx_release_vm_state_locks(_T),
-+	     tdx_acquire_vm_state_locks(kvm), struct kvm *kvm);
-+
- static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- {
- 	struct kvm_tdx_init_vm __user *user_data = u64_to_user_ptr(cmd->data);
-@@ -2764,8 +2804,6 @@ static int tdx_td_finalize(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- {
- 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
++	for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
++		err = tdh_mr_extend(&kvm_tdx->td, gpa + i, &entry, &level_state);
++		if (TDX_BUG_ON_2(err, TDH_MR_EXTEND, entry, level_state, kvm))
++			return -EIO;
+ 	}
  
--	guard(mutex)(&kvm->slots_lock);
--
- 	if (!is_hkid_assigned(kvm_tdx) || kvm_tdx->state == TD_STATE_RUNNABLE)
- 		return -EINVAL;
- 
-@@ -2809,7 +2847,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
- 	if (tdx_cmd.id == KVM_TDX_CAPABILITIES)
- 		return tdx_get_capabilities(&tdx_cmd);
- 
--	guard(mutex)(&kvm->lock);
-+	CLASS(tdx_vm_state_guard, guard)(kvm);
-+	if (IS_ERR(guard))
-+		return PTR_ERR(guard);
- 
- 	switch (tdx_cmd.id) {
- 	case KVM_TDX_INIT_VM:
-@@ -3113,8 +3153,6 @@ static int tdx_vcpu_init_mem_region(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *c
- 	if (tdx->state != VCPU_TD_STATE_INITIALIZED)
- 		return -EINVAL;
- 
--	guard(mutex)(&kvm->slots_lock);
--
- 	/* Once TD is finalized, the initial guest memory is fixed. */
- 	if (kvm_tdx->state == TD_STATE_RUNNABLE)
- 		return -EINVAL;
-@@ -3170,7 +3208,8 @@ static int tdx_vcpu_init_mem_region(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *c
- 
- int tdx_vcpu_unlocked_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- {
--	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-+	struct kvm *kvm = vcpu->kvm;
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
- 	struct kvm_tdx_cmd cmd;
- 	int r;
- 
-@@ -3178,12 +3217,13 @@ int tdx_vcpu_unlocked_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- 	if (r)
- 		return r;
- 
-+	CLASS(tdx_vm_state_guard, guard)(kvm);
-+	if (IS_ERR(guard))
-+		return PTR_ERR(guard);
-+
- 	if (!is_hkid_assigned(kvm_tdx) || kvm_tdx->state == TD_STATE_RUNNABLE)
- 		return -EINVAL;
- 
--	if (mutex_lock_killable(&vcpu->mutex))
--		return -EINTR;
--
- 	vcpu_load(vcpu);
- 
- 	switch (cmd.id) {
-@@ -3200,7 +3240,6 @@ int tdx_vcpu_unlocked_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- 
- 	vcpu_put(vcpu);
- 
--	mutex_unlock(&vcpu->mutex);
- 	return r;
+-	return ret;
++	return 0;
  }
  
+ static int tdx_vcpu_init_mem_region(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
 -- 
 2.51.1.930.gacf6e81ea2-goog
 
