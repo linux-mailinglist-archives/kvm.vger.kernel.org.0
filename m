@@ -1,228 +1,236 @@
-Return-Path: <kvm+bounces-61527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61528-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4008BC2208F
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:42:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21082C2219A
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:58:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C1944630C7
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 19:41:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 937B23AA58C
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 19:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFFD22FF676;
-	Thu, 30 Oct 2025 19:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4FE333730;
+	Thu, 30 Oct 2025 19:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S02x53gD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CLyJh0U0"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DBF2DCF5B
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 19:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0358433345B
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 19:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761853303; cv=none; b=JUbSjsSSTbCEUI+jJaoRtCmKtBWxDDAycbAOdONx8cDMkHhy3kQVvgrjpgaBTrbkUhgL5NmNcmjgVyYkeVcjr0KLgkCOBS9HV5XnC+JhWbvc7FCJ97alcroTkzNf8KLYEUuabNz9x664REHaeS3yh9K3pPM8FK0pWyY+sHWjJyA=
+	t=1761854263; cv=none; b=Tq9y2Oaux35+/L+EP7aKTx3NziD2jczKBK7wGwfMXAjFm2QAIsuvL7TohfArRpc0SMuaIaf/imIpHBZ+swVS0iHPjbCnBy03lfWKUKU/YTluk8Twh3DK65cWnj4wotcm0uQ/byVS1d7lZMQUs28nmIM7IQprAnqzn8dAS/S01Sg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761853303; c=relaxed/simple;
-	bh=WA1CJRX0ukLYCnktAdOZ7r/eXM+Yf8EYQrc3PTLtZTc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vni8OdPsm+aYX8JiVVMGvWb9rWKmjnpgSBvWmFzkTpbln7VFlpbJaEKepfzCOmUewiqrOg0jK1jQWnra+KHVDb7OYHHhVDdRBVGG8xgPzT5ADpv/N0TDLRKFB8Sepb3EVmkq8TVIwKGlHsrmpP5zQYYFtbswSeXdu9cmNHF+iMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S02x53gD; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1761854263; c=relaxed/simple;
+	bh=2tPW5kS5oYSFrmUrNHC7X2sX8Zt+2D8tcaV7A/DfPsY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Jz0YNPQnd2D2oreHdjoZy7ofRy8R8NzlQ3Tckavl6nBZ+rjgMT7GG//zEYupixflK6pOpOYJuxKwGRpguD84desDfHjtzJYUnrX78pw2MYQ5fx9BVAgCt2DNGeQmxL0cbOCdSpGvditZ26ZRQEUBZfGOrmbQTuNx0Fp2LQ5Gj7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CLyJh0U0; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761853300;
+	s=mimecast20190719; t=1761854260;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PwVb87332yDl40U4hCHa0la46+wdb8wFowPu6Dhk4SI=;
-	b=S02x53gDJZbgvclNSFtCipobWxkui+b63yHSIlSW21omidW5qDSwAX+h53VubNpJUO2Z/7
-	XVqsZp45Lo3ywaJHcGKeCA+5cb3c+e6nA5mTZaT19zC1vCpirOpcdmgsJgdHw4EaysLoIs
-	DSyVel5LL0fBzeRYfipspzmyALcGOlo=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-450-KhGgY1qSNzqorCeu6Nz6Rw-1; Thu,
- 30 Oct 2025 15:41:35 -0400
-X-MC-Unique: KhGgY1qSNzqorCeu6Nz6Rw-1
-X-Mimecast-MFC-AGG-ID: KhGgY1qSNzqorCeu6Nz6Rw_1761853294
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9F5651955EAE;
-	Thu, 30 Oct 2025 19:41:33 +0000 (UTC)
-Received: from intellaptop.redhat.com (unknown [10.22.65.1])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 270F330001A5;
-	Thu, 30 Oct 2025 19:41:30 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: kvm@vger.kernel.org
-Cc: Dave Hansen <dave.hansen@linux.intel.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	linux-kernel@vger.kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	x86@kernel.org,
-	Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH] KVM: SVM: switch to raw spinlock for svm->ir_list_lock
-Date: Thu, 30 Oct 2025 15:41:30 -0400
-Message-ID: <20251030194130.307900-1-mlevitsk@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wHUvxh29plVfP0UDVNFA7MwNdgWEnsNAEpe26M+T+AM=;
+	b=CLyJh0U01qY744Z5dClW0SefMeH8VC06zdRMRLIVjEqDhR3qBttnpGUf8USA2wi9ZlvfvW
+	HeoryVwAyxbQdZTXzb0bU1i+iv1YRqs55xfT84qvG/P0XRhfmf1/sxQu/1G6wlNvQaQGUN
+	+snE4X6u6h/v1BngL6RMHd1nRJLzAZo=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-522-sE5-Ef47MmyobhCQuka5lw-1; Thu, 30 Oct 2025 15:57:39 -0400
+X-MC-Unique: sE5-Ef47MmyobhCQuka5lw-1
+X-Mimecast-MFC-AGG-ID: sE5-Ef47MmyobhCQuka5lw_1761854259
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8a24116e89eso163306285a.0
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 12:57:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761854259; x=1762459059;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wHUvxh29plVfP0UDVNFA7MwNdgWEnsNAEpe26M+T+AM=;
+        b=irdTBtTh8uRrxMPl3hYRzzajOZ0fUS5rxz4kHrH8Zx4RjoJ2yD0rKmRgOULZDOsbrY
+         Ieg7ynW/6tan7SdJ9r0NDRsev6RZKZYd4cNz4Y/p2fIoR/EakuXa5LmoOlktqiCFu+/3
+         IdG3nebaAxMSsYq4RnRD7yDUYYzmPdxqROxEYiFpgIbAb+1BfsesZOB0ruxBBQEI0hSF
+         oFbPALlzz0x49OwecfCtsgvWFdyaJj78tCc95WsMBMHExKTByHm1IQksTdXgt+pk1dIi
+         RNp5SHUhicgdOeK7hbjcHYCLyd9lndgGBv653k1rA9W1+HFUEBRLS3faRXA2VYUaYSNb
+         Vnjg==
+X-Gm-Message-State: AOJu0Yyq+YshPqCohvVi8hLPFcLbUfZb6gedddqkbkAqGhwM3PDyQiIl
+	NdiIMpZ78fzQneWXjtMPhhJ20uUsun73jAuCe193sG1FbBn4F+BZDKB0DYIuXqjg2Vg2ufd9iPG
+	1/WGVWxhJH0GNQ7lgIDg6iY41wf4d6YntokUGQoKcaY8ziEt/Hcsi9w==
+X-Gm-Gg: ASbGncu5ZUppKiqqmZiScjFlyA9t8NaLWXcUdICu+TrhJKUArChoPvyLcwgA3TjQM7a
+	jczV6fXIwSLqN1nLFQVGuUIifW6JKYHzRCuKm6Luodfgit8NLxTffUt9uRHrlvmm7sOL213/8xX
+	XOeerTk/rBbjvrK3Nu43QC3aMIUXf7EkGBDXVU7q0+wufos/HpS8nFtloGuqMO2TTdFohic82e1
+	HCZc1oPts4B2l4FP3hp7Jb4A0PFpvrKI1hFmosGJp5AdD52oXmFI70X9a7FkcvNzansOoqiFZVx
+	glr/H1RpfCi5Y6bFTe7/0LEuxK04FQ9M2UzziK4UaM+nSWYOmhLjZnWoln8SDQvMPROiFwL/dX7
+	3AjlEuOEfKaw4vxqtwXRhbk3tH6FBpEt+35SsW7ShxmGZ5Q==
+X-Received: by 2002:a05:620a:4493:b0:892:ce2b:f869 with SMTP id af79cd13be357-8ab992a3e89mr91367185a.13.1761854259001;
+        Thu, 30 Oct 2025 12:57:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGJRwI3hew+S/hBhXzDIhRfd47T9VKrIoMXn5a19Jfc4jmsisyXOlLOhkkpn0luwcThLRLceg==
+X-Received: by 2002:a05:620a:4493:b0:892:ce2b:f869 with SMTP id af79cd13be357-8ab992a3e89mr91364485a.13.1761854258578;
+        Thu, 30 Oct 2025 12:57:38 -0700 (PDT)
+Received: from ?IPv6:2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38? ([2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4eba37d72ecsm121506711cf.9.2025.10.30.12.57.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Oct 2025 12:57:38 -0700 (PDT)
+Message-ID: <c9b893a643cea2ffd4324c25b9d169f920db1ad4.camel@redhat.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Fix a semi theoretical bug in
+ kvm_arch_async_page_present_queued
+From: mlevitsk@redhat.com
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, Dave Hansen <dave.hansen@linux.intel.com>, "H.
+ Peter Anvin"
+	 <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner
+	 <tglx@linutronix.de>, x86@kernel.org, Borislav Petkov <bp@alien8.de>, 
+	linux-kernel@vger.kernel.org
+Date: Thu, 30 Oct 2025 15:57:37 -0400
+In-Reply-To: <aP-JKkZ400TERMSy@google.com>
+References: <20250813192313.132431-1-mlevitsk@redhat.com>
+	 <20250813192313.132431-3-mlevitsk@redhat.com>
+	 <7c7a5a75-a786-4a05-a836-4368582ca4c2@redhat.com>
+	 <aNLtMC-k95pIYfeq@google.com>
+	 <23f11dc1-4fd1-4286-a69a-3892a869ed33@redhat.com>
+	 <aNMpz96c9JOtPh-w@google.com> <aP-JKkZ400TERMSy@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-svm->ir_list_lock can be taken during __avic_vcpu_put which can be called
-from schedule() via kvm_sched_out.
+On Mon, 2025-10-27 at 08:00 -0700, Sean Christopherson wrote:
+> On Tue, Sep 23, 2025, Sean Christopherson wrote:
+> > On Tue, Sep 23, 2025, Paolo Bonzini wrote:
+> > > On 9/23/25 20:55, Sean Christopherson wrote:
+> > > > On Tue, Sep 23, 2025, Paolo Bonzini wrote:
+> > > > > On 8/13/25 21:23, Maxim Levitsky wrote:
+> > > > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > > > > index 9018d56b4b0a..3d45a4cd08a4 100644
+> > > > > > --- a/arch/x86/kvm/x86.c
+> > > > > > +++ b/arch/x86/kvm/x86.c
+> > > > > > @@ -13459,9 +13459,14 @@ void kvm_arch_async_page_present(struc=
+t kvm_vcpu *vcpu,
+> > > > > > =C2=A0=C2=A0 void kvm_arch_async_page_present_queued(struct kvm=
+_vcpu *vcpu)
+> > > > > > =C2=A0=C2=A0 {
+> > > > > > -	kvm_make_request(KVM_REQ_APF_READY, vcpu);
+> > > > > > -	if (!vcpu->arch.apf.pageready_pending)
+> > > > > > +	/* Pairs with smp_store_release in vcpu_enter_guest. */
+> > > > > > +	bool in_guest_mode =3D (smp_load_acquire(&vcpu->mode) =3D=3D =
+IN_GUEST_MODE);
+> > > > > > +	bool page_ready_pending =3D READ_ONCE(vcpu->arch.apf.pageread=
+y_pending);
+> > > > > > +
+> > > > > > +	if (!in_guest_mode || !page_ready_pending) {
+> > > > > > +		kvm_make_request(KVM_REQ_APF_READY, vcpu);
+> > > > > > =C2=A0=C2=A0=C2=A0		kvm_vcpu_kick(vcpu);
+> > > > > > +	}
+> > > > >=20
+> > > > > Unlike Sean, I think the race exists in abstract and is not benig=
+n
+> > > >=20
+> > > > How is it not benign?=C2=A0 I never said the race doesn't exist, I =
+said that consuming
+> > > > a stale vcpu->arch.apf.pageready_pending in kvm_arch_async_page_pre=
+sent_queued()
+> > > > is benign.
+> > >=20
+> > > In principle there is a possibility that a KVM_REQ_APF_READY is misse=
+d.
+> >=20
+> > I think you mean a kick (wakeup or IPI), is missed, not that the APF_RE=
+ADY itself
+> > is missed.=C2=A0 I.e. KVM_REQ_APF_READY will never be lost, KVM just mi=
+ght enter the
+> > guest or schedule out the vCPU with the flag set.
+> >=20
+> > All in all, I think we're in violent agreement.=C2=A0 I agree that kvm_=
+vcpu_kick()
+> > could be missed (theoretically), but I'm saying that missing the kick w=
+ould be
+> > benign due to a myriad of other barriers and checks, i.e. that the vCPU=
+ is
+> > guaranteed to see KVM_REQ_APF_READY anyways.
+> >=20
+> > E.g. my suggestion earlier regarding OUTSIDE_GUEST_MODE was to rely on =
+the
+> > smp_mb__after_srcu_read_{,un}lock() barriers in vcpu_enter_guest() to e=
+nsure
+> > KVM_REQ_APF_READY would be observed before trying VM-Enter, and that if=
+ KVM might
+> > be in the process of emulating HLT (blocking), that either KVM_REQ_APF_=
+READY is
+> > visible to the vCPU or that kvm_arch_async_page_present() wakes the vCP=
+U.=C2=A0 Oh,
+> > hilarious, async_pf_execute() also does an unconditional __kvm_vcpu_wak=
+e_up().
+> >=20
+> > Huh.=C2=A0 But isn't that a real bug?=C2=A0 KVM doesn't consider KVM_RE=
+Q_APF_READY to be a
+> > wake event, so isn't this an actual race?
+> >=20
+> > =C2=A0 vCPU=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 async #PF
+> > =C2=A0 kvm_check_async_pf_completion()
+> > =C2=A0 pageready_pending =3D false
+> > =C2=A0 VM-Enter
+> > =C2=A0 HLT
+> > =C2=A0 VM-Exit
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 kvm_make_request(KVM_REQ_APF_READY, vcpu)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 kvm_vcpu_kick(vcpu)=C2=A0 // nop as the vCPU isn't blocking=
+, yet
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 __kvm_vcpu_wake_up() // nop for the same reason
+> > =C2=A0 vcpu_block()
+> > =C2=A0 <hang>
+> >=20
+> > On x86, the "page ready" IRQ is only injected from vCPU context, so AFA=
+ICT nothing
+> > is guarnateed wake the vCPU in the above sequence.
+>=20
+> Gah, KVM checks async_pf.done instead of the request.=C2=A0 So I don't th=
+ink there's
+> a bug, just weird code.
 
-Therefore use a raw spinlock instead.
+Hi!
 
-This fixes the following lockdep warning:
+Note that I posted a v2 of this patch series. Do I need to drop this patch =
+or its better to keep it
+(the patch should still be correct, but maybe an overkill I think).
 
-[  728.022965] =============================
-[  728.027438] [ BUG: Invalid wait context ]
-[  728.031911] 6.12.0-146.1640_2124176644.el10.x86_64+debug #1 Not tainted
-[  728.039294] -----------------------------
-[  728.043765] qemu-kvm/38299 is trying to lock:
-[  728.048624] ff11000239725600 (&svm->ir_list_lock){....}-{3:3}, at: __avic_vcpu_put+0xfd/0x300 [kvm_amd]
-[  728.059135] other info that might help us debug this:
-[  728.064768] context-{5:5}
-[  728.067688] 2 locks held by qemu-kvm/38299:
-[  728.072352]  #0: ff11000239723ba8 (&vcpu->mutex){+.+.}-{4:4}, at: kvm_vcpu_ioctl+0x240/0xe00 [kvm]
-[  728.082425]  #1: ff11000b906056d8 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x2e/0x130
-[  728.092540] stack backtrace:
-[  728.095758] CPU: 1 UID: 0 PID: 38299 Comm: qemu-kvm Kdump: loaded Not tainted 6.12.0-146.1640_2124176644.el10.x86_64+debug #1 PREEMPT(voluntary)
-[  728.095763] Hardware name: AMD Corporation QUARTZ/QUARTZ, BIOS RQZ100AB 09/14/2023
-[  728.095766] Call Trace:
-[  728.095769]  <TASK>
-[  728.095775]  dump_stack_lvl+0x6f/0xb0
-[  728.095782]  __lock_acquire+0x921/0xb80
-[  728.095787]  ? mark_held_locks+0x40/0x70
-[  728.095793]  lock_acquire.part.0+0xbe/0x270
-[  728.095797]  ? __avic_vcpu_put+0xfd/0x300 [kvm_amd]
-[  728.095811]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  728.095815]  ? rcu_is_watching+0x15/0xb0
-[  728.095818]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  728.095821]  ? lock_acquire+0x120/0x170
-[  728.095824]  ? __avic_vcpu_put+0xfd/0x300 [kvm_amd]
-[  728.095836]  _raw_spin_lock_irqsave+0x46/0x90
-[  728.095840]  ? __avic_vcpu_put+0xfd/0x300 [kvm_amd]
-[  728.095850]  __avic_vcpu_put+0xfd/0x300 [kvm_amd]
-[  728.095866]  svm_vcpu_put+0xfa/0x130 [kvm_amd]
-[  728.095877]  kvm_arch_vcpu_put+0x48c/0x790 [kvm]
-[  728.095944]  kvm_sched_out+0x161/0x1c0 [kvm]
-[  728.095994]  prepare_task_switch+0x36b/0xf60
-[  728.095998]  ? rcu_is_watching+0x15/0xb0
-[  728.096004]  __schedule+0x4f7/0x1890
-[  728.096010]  ? __pfx___schedule+0x10/0x10
-[  728.096012]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  728.096019]  ? __pfx_vcpu_enter_guest.constprop.0+0x10/0x10 [kvm]
-[  728.096067]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  728.096069]  ? find_held_lock+0x32/0x90
-[  728.096072]  ? local_clock_noinstr+0xd/0xe0
-[  728.096080]  schedule+0xd4/0x260
-[  728.096083]  xfer_to_guest_mode_handle_work+0x54/0xc0
-[  728.096089]  vcpu_run+0x69a/0xa70 [kvm]
-[  728.096136]  kvm_arch_vcpu_ioctl_run+0xdc0/0x17e0 [kvm]
-[  728.096185]  kvm_vcpu_ioctl+0x39f/0xe00 [kvm]
+What do you think?=C2=A0
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/svm/avic.c | 16 ++++++++--------
- arch/x86/kvm/svm/svm.h  |  2 +-
- 2 files changed, 9 insertions(+), 9 deletions(-)
+Can we have the patch 3 of the v2 merged as it fixes an real issue, which a=
+ctually
+causes random and hard to debug failures?
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index f286b5706d7c..2814e7e24e89 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -788,7 +788,7 @@ int avic_init_vcpu(struct vcpu_svm *svm)
- 	struct kvm_vcpu *vcpu = &svm->vcpu;
- 
- 	INIT_LIST_HEAD(&svm->ir_list);
--	spin_lock_init(&svm->ir_list_lock);
-+	raw_spin_lock_init(&svm->ir_list_lock);
- 
- 	if (!enable_apicv || !irqchip_in_kernel(vcpu->kvm))
- 		return 0;
-@@ -816,9 +816,9 @@ static void svm_ir_list_del(struct kvm_kernel_irqfd *irqfd)
- 	if (!vcpu)
- 		return;
- 
--	spin_lock_irqsave(&to_svm(vcpu)->ir_list_lock, flags);
-+	raw_spin_lock_irqsave(&to_svm(vcpu)->ir_list_lock, flags);
- 	list_del(&irqfd->vcpu_list);
--	spin_unlock_irqrestore(&to_svm(vcpu)->ir_list_lock, flags);
-+	raw_spin_unlock_irqrestore(&to_svm(vcpu)->ir_list_lock, flags);
- }
- 
- int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
-@@ -855,7 +855,7 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
- 		 * list of IRQs being posted to the vCPU, to ensure the IRTE
- 		 * isn't programmed with stale pCPU/IsRunning information.
- 		 */
--		guard(spinlock_irqsave)(&svm->ir_list_lock);
-+		guard(raw_spinlock_irqsave)(&svm->ir_list_lock);
- 
- 		/*
- 		 * Update the target pCPU for IOMMU doorbells if the vCPU is
-@@ -972,7 +972,7 @@ static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu,
- 	 * up-to-date entry information, or that this task will wait until
- 	 * svm_ir_list_add() completes to set the new target pCPU.
- 	 */
--	spin_lock_irqsave(&svm->ir_list_lock, flags);
-+	raw_spin_lock_irqsave(&svm->ir_list_lock, flags);
- 
- 	entry = svm->avic_physical_id_entry;
- 	WARN_ON_ONCE(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
-@@ -997,7 +997,7 @@ static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu,
- 
- 	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id, action);
- 
--	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
-+	raw_spin_unlock_irqrestore(&svm->ir_list_lock, flags);
- }
- 
- void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-@@ -1035,7 +1035,7 @@ static void __avic_vcpu_put(struct kvm_vcpu *vcpu, enum avic_vcpu_action action)
- 	 * or that this task will wait until svm_ir_list_add() completes to
- 	 * mark the vCPU as not running.
- 	 */
--	spin_lock_irqsave(&svm->ir_list_lock, flags);
-+	raw_spin_lock_irqsave(&svm->ir_list_lock, flags);
- 
- 	avic_update_iommu_vcpu_affinity(vcpu, -1, action);
- 
-@@ -1059,7 +1059,7 @@ static void __avic_vcpu_put(struct kvm_vcpu *vcpu, enum avic_vcpu_action action)
- 
- 	svm->avic_physical_id_entry = entry;
- 
--	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
-+	raw_spin_unlock_irqrestore(&svm->ir_list_lock, flags);
- }
- 
- void avic_vcpu_put(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index e4b04f435b3d..dbd87a87046a 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -329,7 +329,7 @@ struct vcpu_svm {
- 	 * back into remapped mode).
- 	 */
- 	struct list_head ir_list;
--	spinlock_t ir_list_lock;
-+	raw_spinlock_t ir_list_lock;
- 
- 	struct vcpu_sev_es_state sev_es;
- 
--- 
-2.49.0
+Best regards,
+	Maxim Levitsky
+
+>=20
+> =C2=A0 bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+> =C2=A0 {
+> 	if (!list_empty_careful(&vcpu->async_pf.done))=C2=A0 <=3D=3D=3D
+> 		return true;
+>=20
 
 
