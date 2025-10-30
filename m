@@ -1,236 +1,227 @@
-Return-Path: <kvm+bounces-61528-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61529-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21082C2219A
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:58:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A86AC2220F
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 21:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 937B23AA58C
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 19:58:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 646BD188750D
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4FE333730;
-	Thu, 30 Oct 2025 19:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2A436E379;
+	Thu, 30 Oct 2025 20:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CLyJh0U0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qd+iX+HR"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0358433345B
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 19:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A138736B98D
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 20:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761854263; cv=none; b=Tq9y2Oaux35+/L+EP7aKTx3NziD2jczKBK7wGwfMXAjFm2QAIsuvL7TohfArRpc0SMuaIaf/imIpHBZ+swVS0iHPjbCnBy03lfWKUKU/YTluk8Twh3DK65cWnj4wotcm0uQ/byVS1d7lZMQUs28nmIM7IQprAnqzn8dAS/S01Sg=
+	t=1761855001; cv=none; b=lnFzPvW79jWGifoLbYHmIT1Y87STDbNG7jYTeiAB4/PFBfvlLKeSq2XfX7SsCG3jBDy6Ck/JWMfKmkJf9lRQWj3F/ZHhtR7PJ69qNYUdPNMRj3K/owil5F0kqbMDpMkuOAzS1UpuR8ojq39pGH82a0MvUcc81vkxamXXjWEVaWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761854263; c=relaxed/simple;
-	bh=2tPW5kS5oYSFrmUrNHC7X2sX8Zt+2D8tcaV7A/DfPsY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Jz0YNPQnd2D2oreHdjoZy7ofRy8R8NzlQ3Tckavl6nBZ+rjgMT7GG//zEYupixflK6pOpOYJuxKwGRpguD84desDfHjtzJYUnrX78pw2MYQ5fx9BVAgCt2DNGeQmxL0cbOCdSpGvditZ26ZRQEUBZfGOrmbQTuNx0Fp2LQ5Gj7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CLyJh0U0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761854260;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wHUvxh29plVfP0UDVNFA7MwNdgWEnsNAEpe26M+T+AM=;
-	b=CLyJh0U01qY744Z5dClW0SefMeH8VC06zdRMRLIVjEqDhR3qBttnpGUf8USA2wi9ZlvfvW
-	HeoryVwAyxbQdZTXzb0bU1i+iv1YRqs55xfT84qvG/P0XRhfmf1/sxQu/1G6wlNvQaQGUN
-	+snE4X6u6h/v1BngL6RMHd1nRJLzAZo=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-522-sE5-Ef47MmyobhCQuka5lw-1; Thu, 30 Oct 2025 15:57:39 -0400
-X-MC-Unique: sE5-Ef47MmyobhCQuka5lw-1
-X-Mimecast-MFC-AGG-ID: sE5-Ef47MmyobhCQuka5lw_1761854259
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8a24116e89eso163306285a.0
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 12:57:39 -0700 (PDT)
+	s=arc-20240116; t=1761855001; c=relaxed/simple;
+	bh=iWqK9o5Q9lSs0dNS4loIwGhdjpS9qDnFS67Z8kLa5ZY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=u3GVurx5bJGzj/MLC0qL5u2BXLkg9SQCEhgzHKpl/VKTwy9FJez2Wc6g1/buAtyUuT0Pj8F2T80ncGcepO+v+WnHbtqKx3NANZqXKeAxb9TF4dl0nOwq3TmyGag5vAZtJmVF6PHdSnaIasQ0GouUgnzNazyldixzv1Rv9O/LNbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qd+iX+HR; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33bcb779733so1397512a91.3
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 13:09:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761854999; x=1762459799; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zrcNX0WZe6UQQAW+Y1acRpaDavildHCqqfp5zf8UBT8=;
+        b=qd+iX+HRguzV8RHinP+d64sx44ccYmm2BMsrzhS4vENzeN1SWeqaQgPgtyV/DWAvKj
+         jTwUwkJdsnBsZbSb/qeJSqq6GedxUJxf1SRgeUh//DgC5OL5iSMRGngr4uPB3KngiC9E
+         5C7xYqTKnnCeqWDxTEW0d4YPSujcz7B17Z40W4rPGyS7uNVgp+MHXyFP9WOJrMbujgRk
+         dNLYzzVOVd/6/WrCNM9aiUVmouZm3NQAZhl9ODa8LaWBivC4+1JMOXpfFO1R5VHRoK18
+         4/K0HRXfJ+8Mb2nVbRUq0sxgOndVg5T3n+0/BerK58U7Wl1jzTICoL9pLv4J3G59RXjX
+         KCAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761854259; x=1762459059;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wHUvxh29plVfP0UDVNFA7MwNdgWEnsNAEpe26M+T+AM=;
-        b=irdTBtTh8uRrxMPl3hYRzzajOZ0fUS5rxz4kHrH8Zx4RjoJ2yD0rKmRgOULZDOsbrY
-         Ieg7ynW/6tan7SdJ9r0NDRsev6RZKZYd4cNz4Y/p2fIoR/EakuXa5LmoOlktqiCFu+/3
-         IdG3nebaAxMSsYq4RnRD7yDUYYzmPdxqROxEYiFpgIbAb+1BfsesZOB0ruxBBQEI0hSF
-         oFbPALlzz0x49OwecfCtsgvWFdyaJj78tCc95WsMBMHExKTByHm1IQksTdXgt+pk1dIi
-         RNp5SHUhicgdOeK7hbjcHYCLyd9lndgGBv653k1rA9W1+HFUEBRLS3faRXA2VYUaYSNb
-         Vnjg==
-X-Gm-Message-State: AOJu0Yyq+YshPqCohvVi8hLPFcLbUfZb6gedddqkbkAqGhwM3PDyQiIl
-	NdiIMpZ78fzQneWXjtMPhhJ20uUsun73jAuCe193sG1FbBn4F+BZDKB0DYIuXqjg2Vg2ufd9iPG
-	1/WGVWxhJH0GNQ7lgIDg6iY41wf4d6YntokUGQoKcaY8ziEt/Hcsi9w==
-X-Gm-Gg: ASbGncu5ZUppKiqqmZiScjFlyA9t8NaLWXcUdICu+TrhJKUArChoPvyLcwgA3TjQM7a
-	jczV6fXIwSLqN1nLFQVGuUIifW6JKYHzRCuKm6Luodfgit8NLxTffUt9uRHrlvmm7sOL213/8xX
-	XOeerTk/rBbjvrK3Nu43QC3aMIUXf7EkGBDXVU7q0+wufos/HpS8nFtloGuqMO2TTdFohic82e1
-	HCZc1oPts4B2l4FP3hp7Jb4A0PFpvrKI1hFmosGJp5AdD52oXmFI70X9a7FkcvNzansOoqiFZVx
-	glr/H1RpfCi5Y6bFTe7/0LEuxK04FQ9M2UzziK4UaM+nSWYOmhLjZnWoln8SDQvMPROiFwL/dX7
-	3AjlEuOEfKaw4vxqtwXRhbk3tH6FBpEt+35SsW7ShxmGZ5Q==
-X-Received: by 2002:a05:620a:4493:b0:892:ce2b:f869 with SMTP id af79cd13be357-8ab992a3e89mr91367185a.13.1761854259001;
-        Thu, 30 Oct 2025 12:57:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGJRwI3hew+S/hBhXzDIhRfd47T9VKrIoMXn5a19Jfc4jmsisyXOlLOhkkpn0luwcThLRLceg==
-X-Received: by 2002:a05:620a:4493:b0:892:ce2b:f869 with SMTP id af79cd13be357-8ab992a3e89mr91364485a.13.1761854258578;
-        Thu, 30 Oct 2025 12:57:38 -0700 (PDT)
-Received: from ?IPv6:2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38? ([2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4eba37d72ecsm121506711cf.9.2025.10.30.12.57.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 12:57:38 -0700 (PDT)
-Message-ID: <c9b893a643cea2ffd4324c25b9d169f920db1ad4.camel@redhat.com>
-Subject: Re: [PATCH 2/3] KVM: x86: Fix a semi theoretical bug in
- kvm_arch_async_page_present_queued
-From: mlevitsk@redhat.com
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Dave Hansen <dave.hansen@linux.intel.com>, "H.
- Peter Anvin"
-	 <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner
-	 <tglx@linutronix.de>, x86@kernel.org, Borislav Petkov <bp@alien8.de>, 
-	linux-kernel@vger.kernel.org
-Date: Thu, 30 Oct 2025 15:57:37 -0400
-In-Reply-To: <aP-JKkZ400TERMSy@google.com>
-References: <20250813192313.132431-1-mlevitsk@redhat.com>
-	 <20250813192313.132431-3-mlevitsk@redhat.com>
-	 <7c7a5a75-a786-4a05-a836-4368582ca4c2@redhat.com>
-	 <aNLtMC-k95pIYfeq@google.com>
-	 <23f11dc1-4fd1-4286-a69a-3892a869ed33@redhat.com>
-	 <aNMpz96c9JOtPh-w@google.com> <aP-JKkZ400TERMSy@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+        d=1e100.net; s=20230601; t=1761854999; x=1762459799;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zrcNX0WZe6UQQAW+Y1acRpaDavildHCqqfp5zf8UBT8=;
+        b=JQtLZsYzYAF1DQJbnYNjuOJBfeN5e4rXtTYBzJUIEUN1JWo1AWXpl4dRdLIolPQXw+
+         E+q/qGIaR4fHQOw6vPkcixILADYTJRnlm8sx4YqjbuKUXfG0LSh+ILwPvkgE1N7uCqwS
+         a25GsujzV5vpSOZARbHPIu1r1HcBByhQaV0YtBxtHxtznxlMAN+Ceh2co46XwsSmcd3o
+         Ns/cKTY/LI01I4eBV67MMOSqM3nIgQsYJWV3P9Y5+la2S878jdcYwAsjGHN/caIUp0Nh
+         wptGfwJxiqHdUXOPJfrIInc+S9bZsI/p/UzpgixEnAaCdPLFVTT5BOATteWhu4qiwzUM
+         l++Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXVbJdaPSbadDZmNJQUKHZ7jH7cJWhBL0TydVme/sGIRa6MaoN0lOJuzydUBkkmg/wFQw0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz99mDsdiBOH2GmuRRBlMmMLJ5+GLYGX7YPC6JIb7vrn0Drzasx
+	aaRSpoeGcaXWAEF+/Q2av2U+2js077PxAdbNTcFpsDQv3d9UXbd7CQPOCndUYoeX5hGNA8jMO35
+	vhSWfQw==
+X-Google-Smtp-Source: AGHT+IHHZpNGbgjLGw+ZYpoCrFPTV304XH1EL6WE9wIH48O/1tSukWUG1dLDd7KIv/LOoUL3Sr92aGNZzYE=
+X-Received: from pjvp23.prod.google.com ([2002:a17:90a:df97:b0:339:e59f:e26])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d40c:b0:33b:b020:5968
+ with SMTP id 98e67ed59e1d1-34083071b1emr1223925a91.21.1761854998946; Thu, 30
+ Oct 2025 13:09:58 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 30 Oct 2025 13:09:23 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
+Message-ID: <20251030200951.3402865-1-seanjc@google.com>
+Subject: [PATCH v4 00/28] KVM: x86/mmu: TDX post-populate cleanups
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, "Kirill A. Shutemov" <kas@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, x86@kernel.org, linux-coco@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>, 
+	Kai Huang <kai.huang@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Yan Zhao <yan.y.zhao@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 2025-10-27 at 08:00 -0700, Sean Christopherson wrote:
-> On Tue, Sep 23, 2025, Sean Christopherson wrote:
-> > On Tue, Sep 23, 2025, Paolo Bonzini wrote:
-> > > On 9/23/25 20:55, Sean Christopherson wrote:
-> > > > On Tue, Sep 23, 2025, Paolo Bonzini wrote:
-> > > > > On 8/13/25 21:23, Maxim Levitsky wrote:
-> > > > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > > > index 9018d56b4b0a..3d45a4cd08a4 100644
-> > > > > > --- a/arch/x86/kvm/x86.c
-> > > > > > +++ b/arch/x86/kvm/x86.c
-> > > > > > @@ -13459,9 +13459,14 @@ void kvm_arch_async_page_present(struc=
-t kvm_vcpu *vcpu,
-> > > > > > =C2=A0=C2=A0 void kvm_arch_async_page_present_queued(struct kvm=
-_vcpu *vcpu)
-> > > > > > =C2=A0=C2=A0 {
-> > > > > > -	kvm_make_request(KVM_REQ_APF_READY, vcpu);
-> > > > > > -	if (!vcpu->arch.apf.pageready_pending)
-> > > > > > +	/* Pairs with smp_store_release in vcpu_enter_guest. */
-> > > > > > +	bool in_guest_mode =3D (smp_load_acquire(&vcpu->mode) =3D=3D =
-IN_GUEST_MODE);
-> > > > > > +	bool page_ready_pending =3D READ_ONCE(vcpu->arch.apf.pageread=
-y_pending);
-> > > > > > +
-> > > > > > +	if (!in_guest_mode || !page_ready_pending) {
-> > > > > > +		kvm_make_request(KVM_REQ_APF_READY, vcpu);
-> > > > > > =C2=A0=C2=A0=C2=A0		kvm_vcpu_kick(vcpu);
-> > > > > > +	}
-> > > > >=20
-> > > > > Unlike Sean, I think the race exists in abstract and is not benig=
-n
-> > > >=20
-> > > > How is it not benign?=C2=A0 I never said the race doesn't exist, I =
-said that consuming
-> > > > a stale vcpu->arch.apf.pageready_pending in kvm_arch_async_page_pre=
-sent_queued()
-> > > > is benign.
-> > >=20
-> > > In principle there is a possibility that a KVM_REQ_APF_READY is misse=
-d.
-> >=20
-> > I think you mean a kick (wakeup or IPI), is missed, not that the APF_RE=
-ADY itself
-> > is missed.=C2=A0 I.e. KVM_REQ_APF_READY will never be lost, KVM just mi=
-ght enter the
-> > guest or schedule out the vCPU with the flag set.
-> >=20
-> > All in all, I think we're in violent agreement.=C2=A0 I agree that kvm_=
-vcpu_kick()
-> > could be missed (theoretically), but I'm saying that missing the kick w=
-ould be
-> > benign due to a myriad of other barriers and checks, i.e. that the vCPU=
- is
-> > guaranteed to see KVM_REQ_APF_READY anyways.
-> >=20
-> > E.g. my suggestion earlier regarding OUTSIDE_GUEST_MODE was to rely on =
-the
-> > smp_mb__after_srcu_read_{,un}lock() barriers in vcpu_enter_guest() to e=
-nsure
-> > KVM_REQ_APF_READY would be observed before trying VM-Enter, and that if=
- KVM might
-> > be in the process of emulating HLT (blocking), that either KVM_REQ_APF_=
-READY is
-> > visible to the vCPU or that kvm_arch_async_page_present() wakes the vCP=
-U.=C2=A0 Oh,
-> > hilarious, async_pf_execute() also does an unconditional __kvm_vcpu_wak=
-e_up().
-> >=20
-> > Huh.=C2=A0 But isn't that a real bug?=C2=A0 KVM doesn't consider KVM_RE=
-Q_APF_READY to be a
-> > wake event, so isn't this an actual race?
-> >=20
-> > =C2=A0 vCPU=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 async #PF
-> > =C2=A0 kvm_check_async_pf_completion()
-> > =C2=A0 pageready_pending =3D false
-> > =C2=A0 VM-Enter
-> > =C2=A0 HLT
-> > =C2=A0 VM-Exit
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 kvm_make_request(KVM_REQ_APF_READY, vcpu)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 kvm_vcpu_kick(vcpu)=C2=A0 // nop as the vCPU isn't blocking=
-, yet
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 __kvm_vcpu_wake_up() // nop for the same reason
-> > =C2=A0 vcpu_block()
-> > =C2=A0 <hang>
-> >=20
-> > On x86, the "page ready" IRQ is only injected from vCPU context, so AFA=
-ICT nothing
-> > is guarnateed wake the vCPU in the above sequence.
->=20
-> Gah, KVM checks async_pf.done instead of the request.=C2=A0 So I don't th=
-ink there's
-> a bug, just weird code.
+Non-x86 folks, as with v3, patches 1 and 2 are likely the only thing of
+interest here.  They make kvm_arch_vcpu_async_ioctl() mandatory and then
+rename it to kvm_arch_vcpu_unlocked_ioctl().
 
-Hi!
+As for the x86 side...
 
-Note that I posted a v2 of this patch series. Do I need to drop this patch =
-or its better to keep it
-(the patch should still be correct, but maybe an overkill I think).
+Clean up the TDX post-populate paths (and many tangentially related paths) to
+address locking issues between gmem and TDX's post-populate hook[*], and
+within KVM itself (KVM doesn't ensure full mutual exclusivity between paths
+that for all intents and purposes the TDX-Module requires to be serialized).
 
-What do you think?=C2=A0
+I apologize if I missed any trailers or feedback, I think I got everything...
 
-Can we have the patch 3 of the v2 merged as it fixes an real issue, which a=
-ctually
-causes random and hard to debug failures?
+[*] http://lore.kernel.org/all/aG_pLUlHdYIZ2luh@google.com
 
-Best regards,
-	Maxim Levitsky
+v4:
+ - Collect reviews/acks.
+ - Add a lockdep assertion in kvm_tdp_mmu_map_private_pfn(). [Yan]
+ - Wrap kvm_tdp_mmu_map_private_pfn() with CONFIG_KVM_GUEST_MEMFD=y. [test bot]
+ - Improve (or add) comments. [Kai, and probably others]
+ - s/spte/mirror_spte to make it clear what's being passed in
+ - Update set_external_spte() to take @mirror_spte as well. [Yan]
+ - Move the KVM_BUG_ON() on tdh_mr_extend() failure to the end. [Rick]
+ - Take "all" the locks in tdx_vm_ioctl(). [Kai]
+ - WARN if KVM attempts to map SPTEs into an invalid root. [Yan]
+ - Use tdx_flush_vp_on_cpu() instead of tdx_disassociate_vp() when freeing
+   a vCPU in VCPU_TD_STATE_UNINITIALIZED state. [Yan]
 
->=20
-> =C2=A0 bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
-> =C2=A0 {
-> 	if (!list_empty_careful(&vcpu->async_pf.done))=C2=A0 <=3D=3D=3D
-> 		return true;
->=20
+v3:
+ - https://lore.kernel.org/all/20251017003244.186495-1-seanjc@google.com
+ - Collect more reviews.
+ - Add the async_ioctl() => unlocked_ioctl() patches, and use the "unlocked"
+   variant in the TDX vCPU sub-ioctls so they can take kvm->lock outside of
+   vcpu->mutex.
+ - Add a patch to document that vcpu->mutex is taken *outside* kvm->slots_lock.
+ - Add the tdx_vm_state_guard CLASS() to take kvm->lock, all vcpu->mutex locks,
+   and kvm->slots_lock, in order to make tdx_td_init(), tdx_td_finalize(),
+   tdx_vcpu_init_mem_region(), and tdx_vcpu_init() mutually exclusive with
+   each other, and mutually exclusvie with basically anything that can result
+   in contending one of the TDX-Module locks (can't remember which one).
+ - Refine the changelog for the "Drop PROVE_MMU=y" patch. [Binbin]
+
+v2:
+ - Collect a few reviews (and ignore some because the patches went away).
+   [Rick, Kai, Ira]
+ - Move TDH_MEM_PAGE_ADD under mmu_lock and drop nr_premapped. [Yan, Rick]
+ - Force max_level = PG_LEVEL_4K straightaway. [Yan]
+ - s/kvm_tdp_prefault_page/kvm_tdp_page_prefault. [Rick]
+ - Use Yan's version of "Say no to pinning!".  [Yan, Rick]
+ - Tidy up helpers and macros to reduce boilerplate and copy+pate code, and
+   to eliminate redundant/dead code (e.g. KVM_BUG_ON() the same error
+   multiple times).
+ - KVM_BUG_ON() if TDH_MR_EXTEND fails (I convinced myself it can't).
+
+v1: https://lore.kernel.org/all/20250827000522.4022426-1-seanjc@google.com
+
+
+Sean Christopherson (26):
+  KVM: Make support for kvm_arch_vcpu_async_ioctl() mandatory
+  KVM: Rename kvm_arch_vcpu_async_ioctl() to
+    kvm_arch_vcpu_unlocked_ioctl()
+  KVM: TDX: Drop PROVE_MMU=y sanity check on to-be-populated mappings
+  KVM: x86/mmu: Add dedicated API to map guest_memfd pfn into TDP MMU
+  KVM: x86/mmu: WARN if KVM attempts to map into an invalid TDP MMU root
+  Revert "KVM: x86/tdp_mmu: Add a helper function to walk down the TDP
+    MMU"
+  KVM: x86/mmu: Rename kvm_tdp_map_page() to kvm_tdp_page_prefault()
+  KVM: TDX: Return -EIO, not -EINVAL, on a KVM_BUG_ON() condition
+  KVM: TDX: Fold tdx_sept_drop_private_spte() into
+    tdx_sept_remove_private_spte()
+  KVM: x86/mmu: Drop the return code from
+    kvm_x86_ops.remove_external_spte()
+  KVM: TDX: WARN if mirror SPTE doesn't have full RWX when creating
+    S-EPT mapping
+  KVM: TDX: Avoid a double-KVM_BUG_ON() in tdx_sept_zap_private_spte()
+  KVM: TDX: Use atomic64_dec_return() instead of a poor equivalent
+  KVM: TDX: Fold tdx_mem_page_record_premap_cnt() into its sole caller
+  KVM: TDX: ADD pages to the TD image while populating mirror EPT
+    entries
+  KVM: TDX: Fold tdx_sept_zap_private_spte() into
+    tdx_sept_remove_private_spte()
+  KVM: TDX: Combine KVM_BUG_ON + pr_tdx_error() into TDX_BUG_ON()
+  KVM: TDX: Derive error argument names from the local variable names
+  KVM: TDX: Assert that mmu_lock is held for write when removing S-EPT
+    entries
+  KVM: TDX: Add macro to retry SEAMCALLs when forcing vCPUs out of guest
+  KVM: TDX: Add tdx_get_cmd() helper to get and validate sub-ioctl
+    command
+  KVM: TDX: Convert INIT_MEM_REGION and INIT_VCPU to "unlocked" vCPU
+    ioctl
+  KVM: TDX: Use guard() to acquire kvm->lock in tdx_vm_ioctl()
+  KVM: TDX: Don't copy "cmd" back to userspace for KVM_TDX_CAPABILITIES
+  KVM: TDX: Guard VM state transitions with "all" the locks
+  KVM: TDX: Bug the VM if extending the initial measurement fails
+
+Yan Zhao (2):
+  KVM: TDX: Drop superfluous page pinning in S-EPT management
+  KVM: TDX: Fix list_add corruption during vcpu_load()
+
+ arch/arm64/kvm/arm.c               |   6 +
+ arch/loongarch/kvm/Kconfig         |   1 -
+ arch/loongarch/kvm/vcpu.c          |   4 +-
+ arch/mips/kvm/Kconfig              |   1 -
+ arch/mips/kvm/mips.c               |   4 +-
+ arch/powerpc/kvm/Kconfig           |   1 -
+ arch/powerpc/kvm/powerpc.c         |   4 +-
+ arch/riscv/kvm/Kconfig             |   1 -
+ arch/riscv/kvm/vcpu.c              |   4 +-
+ arch/s390/kvm/Kconfig              |   1 -
+ arch/s390/kvm/kvm-s390.c           |   4 +-
+ arch/x86/include/asm/kvm-x86-ops.h |   1 +
+ arch/x86/include/asm/kvm_host.h    |   7 +-
+ arch/x86/kvm/mmu.h                 |   3 +-
+ arch/x86/kvm/mmu/mmu.c             |  87 +++-
+ arch/x86/kvm/mmu/tdp_mmu.c         |  50 +--
+ arch/x86/kvm/vmx/main.c            |   9 +
+ arch/x86/kvm/vmx/tdx.c             | 659 ++++++++++++++---------------
+ arch/x86/kvm/vmx/tdx.h             |   8 +-
+ arch/x86/kvm/vmx/x86_ops.h         |   1 +
+ arch/x86/kvm/x86.c                 |  13 +
+ include/linux/kvm_host.h           |  14 +-
+ virt/kvm/Kconfig                   |   3 -
+ virt/kvm/kvm_main.c                |   6 +-
+ 24 files changed, 468 insertions(+), 424 deletions(-)
+
+
+base-commit: 4cc167c50eb19d44ac7e204938724e685e3d8057
+-- 
+2.51.1.930.gacf6e81ea2-goog
 
 
