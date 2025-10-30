@@ -1,130 +1,99 @@
-Return-Path: <kvm+bounces-61491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61499-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BFD5C2109F
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 16:51:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26432C212E0
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 17:28:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8407B1A264D9
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 15:47:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78AB4189CB54
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 16:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B48221F03;
-	Thu, 30 Oct 2025 15:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0763678B5;
+	Thu, 30 Oct 2025 16:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j0EPSJge"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C+JX+u1A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D9880604
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 15:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28166366FC8;
+	Thu, 30 Oct 2025 16:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761839220; cv=none; b=S2N/KU/W1Mwkr/GZ3wnt1qJGzPepvcxnGmsjN3Uv+MDcHqYGd3N53Jg06av29qYpnMoyNMhJE9/cvzw5G1SUYNnGcovJ/QtGhvhyDkoIVu8xYb5kM0LXpp3SqhLdBIh/Dq9BpRyptz9IsUK4JRqethpOwUU6nZFMlPDkZ72iU/s=
+	t=1761841396; cv=none; b=q0xQxi7ESVBfKngK4nPQR1V9tXY9OlJGrMyy+T+Q4Ur/e7MbTQMmBmu+dXwk0Sk/yrKyl3Ab5WPh6AzcpTCtBC5G4MLaD3UuTuv28dxIvMO/FJzZcWsUwshe4rJ772U1dA7UzamXc0UAcPT8udkBx6ZHrks5kTmF6EbjD5HEBYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761839220; c=relaxed/simple;
-	bh=Eqo4DVoLwi8Ct/RRlM48iY64Hvj8SIZbn5etBQmpufw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G9OCfLAJtayhfaf+VM4+MpczZNX0sWJ0arpL0GU7iU6UIvc88zNdNcrvupVdsytWVeJjIbZGOrCyFiIw9snqdT7iJ1h3re9KhnYMxRhh7dNXIsJsAKGs6il75TV2SlN4Gn5jJg9TdrI9kvYxktY8wE4985WPJP7BVxIFt7GPzaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j0EPSJge; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761839219; x=1793375219;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Eqo4DVoLwi8Ct/RRlM48iY64Hvj8SIZbn5etBQmpufw=;
-  b=j0EPSJgeLtqrbkARwzhSoU/bz/F8bMgAnQgYXmwwQtsFux1BBMThw3ke
-   AVIqZZyI2N357Qmi891cDJ5t17BltXlhBIgcrzI3W8wMIRf72Bq/N7GjW
-   j42T/a+plgAigSD6TFUc5U1zrNZ9KpoYIw+VS5Jxo5pJhZ+Nj+Uxg6s/L
-   R4NYd4VUl2/Hqk9dn85A9WdsQtmfAMczwxsIAiEnSq0E5j6H8rFxq0dJd
-   2/bEZPYvuslj7FzkhngTUx7NPwcq86nc3yIX6NCDeF/56aQhyMdD7P+Yo
-   P7oqiE7sGB6isP93ofRuTXLaCGc0hRIFE7TfXDSipUvDs60RlCj3S8UeV
-   w==;
-X-CSE-ConnectionGUID: ijxf802VSrWbpJvXfJfEcg==
-X-CSE-MsgGUID: eutFhp3PTieyPtcysjjlbA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11598"; a="74278762"
-X-IronPort-AV: E=Sophos;i="6.19,267,1754982000"; 
-   d="scan'208";a="74278762"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2025 08:46:58 -0700
-X-CSE-ConnectionGUID: FA4RR9eUQNuPiDBK/BMq/w==
-X-CSE-MsgGUID: xB9czmitQRuLugEU7B6+XA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,267,1754982000"; 
-   d="scan'208";a="186428469"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa009.fm.intel.com with ESMTP; 30 Oct 2025 08:46:54 -0700
-Date: Fri, 31 Oct 2025 00:09:06 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, John Allen <john.allen@amd.com>,
-	Babu Moger <babu.moger@amd.com>,
-	Mathias Krause <minipli@grsecurity.net>,
-	Dapeng Mi <dapeng1.mi@intel.com>, Zide Chen <zide.chen@intel.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Farrah Chen <farrah.chen@intel.com>
-Subject: Re: [PATCH v3 16/20] i386/cpu: Mark cet-u & cet-s xstates as
- migratable
-Message-ID: <aQONorppI83cWYJK@intel.com>
-References: <20251024065632.1448606-1-zhao1.liu@intel.com>
- <20251024065632.1448606-17-zhao1.liu@intel.com>
- <aQGvwMTWYPx5FNdQ@intel.com>
+	s=arc-20240116; t=1761841396; c=relaxed/simple;
+	bh=4GBRLaudHRcBoz01Z4IeWd9bqYB0qBWnK2IVkXPjuoE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rtZwK1Nob3qgjMIhdh52qFQDC+MWQWSAKd/S4cPqLlTCw8RezlxCRBFMDeCJvNBv5i0s+8406lsosX0vkRHfmOFdOCZe/ueshzCep+y4xqp5sqVl1H+ZqaabE9Xz2T29cuHTOH1wxH8HM0hZYCYvHSyh0upJoT86OgBDdyOzfOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C+JX+u1A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00425C4CEF1;
+	Thu, 30 Oct 2025 16:23:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761841396;
+	bh=4GBRLaudHRcBoz01Z4IeWd9bqYB0qBWnK2IVkXPjuoE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=C+JX+u1AHdIdZKw4SyNVX0vtYYqnUKc0r1DZLb6pJ0joB9sWk/f5VrR5I/HS2HOM6
+	 ANZuNZEUkf+kqIi0ByD9yjuRgnWYZRjArzFYtRkHWM4L9ax/rBg3qRxJkOgR11X0yN
+	 Wpc5V88Gj76jEGU+0RZC1asYaoJOq0rbzpOe8/gx4ikTAuLlnjsT8QAm7z3hQf4p3j
+	 eoiw0TuwkHa8FbMbwFDzNMKXvFn2wZQ8ijgZbMnaeIJecVTeAwfYeGZHeuUeQD+tIf
+	 QnpUIrYZwDe9Z4a0k25LGe8onC99z5iNxqdv9iG95R+20Jdy7VByJq5twDzySRiI0x
+	 lYAJ1Bmjs+4qA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vEVQf-0000000139S-3rhC;
+	Thu, 30 Oct 2025 16:23:14 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: nd <nd@arm.com>,
+	broonie@kernel.org,
+	oliver.upton@linux.dev,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH] KVM: arm64: vgic-v3: Trap all if no in-kernel irqchip
+Date: Thu, 30 Oct 2025 16:23:07 +0000
+Message-ID: <176184138741.2037570.6590517133486615638.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251021094358.1963807-1-sascha.bischoff@arm.com>
+References: <20251021094358.1963807-1-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aQGvwMTWYPx5FNdQ@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Sascha.Bischoff@arm.com, nd@arm.com, broonie@kernel.org, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Oct 29, 2025 at 02:10:08PM +0800, Chao Gao wrote:
-> Date: Wed, 29 Oct 2025 14:10:08 +0800
-> From: Chao Gao <chao.gao@intel.com>
-> Subject: Re: [PATCH v3 16/20] i386/cpu: Mark cet-u & cet-s xstates as
->  migratable
+On Tue, 21 Oct 2025 09:44:09 +0000, Sascha Bischoff wrote:
+> If there is no in-kernel irqchip for a GICv3 host set all of the trap
+> bits to block all accesses. This fixes the no-vgic-v3 selftest again.
 > 
-> On Fri, Oct 24, 2025 at 02:56:28PM +0800, Zhao Liu wrote:
-> >Cet-u and cet-s are supervisor xstates. Their states are saved/loaded by
-> >saving/loading related CET MSRs. And there's a vmsd "vmstate_cet" to
-> >migrate these MSRs.
-> >
-> >Thus, it's safe to mark them as migratable.
-> >
-> >Tested-by: Farrah Chen <farrah.chen@intel.com>
-> >Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> >---
-> > target/i386/cpu.c | 3 ++-
-> > 1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> >diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> >index 0bb65e8c5321..c08066a338a3 100644
-> >--- a/target/i386/cpu.c
-> >+++ b/target/i386/cpu.c
-> >@@ -1522,7 +1522,8 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-> >         .migratable_flags = XSTATE_FP_MASK | XSTATE_SSE_MASK |
-> >             XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK | XSTATE_BNDCSR_MASK |
-> >             XSTATE_OPMASK_MASK | XSTATE_ZMM_Hi256_MASK | XSTATE_Hi16_ZMM_MASK |
-> >-            XSTATE_PKRU_MASK | XSTATE_ARCH_LBR_MASK | XSTATE_XTILE_CFG_MASK |
-> >+            XSTATE_PKRU_MASK | XSTATE_CET_U_MASK | XSTATE_CET_S_MASK |
-> >+            XSTATE_ARCH_LBR_MASK | XSTATE_XTILE_CFG_MASK |
-> >             XSTATE_XTILE_DATA_MASK,
 > 
-> Supervisor states are enumerated via CPUID[EAX=0xd,ECX=1].ECX/EDX while user
-> states are enumerated via CPUID[EAX=0xd,ECX=0].EAX/EDX. So, maybe we need to 
-> two new feature words?
 
-Yes, I added the mask into wrong place...
+Applied to fixes, thanks!
 
-Regards,
-Zhao
+[1/1] KVM: arm64: vgic-v3: Trap all if no in-kernel irqchip
+      commit: da888524c393b4a14727e1a821bdd51313d0a2d3
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
 
