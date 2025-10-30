@@ -1,163 +1,191 @@
-Return-Path: <kvm+bounces-61515-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61516-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12C1DC21D0C
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 19:45:15 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 411D6C21D47
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 19:50:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C15BF1A6538C
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 18:44:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 639B94E9D13
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 18:50:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CEA436CE05;
-	Thu, 30 Oct 2025 18:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBEC36E342;
+	Thu, 30 Oct 2025 18:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VPjUJc5N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y5zcmqUs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2001F37DA;
-	Thu, 30 Oct 2025 18:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9773123BD17
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 18:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761849847; cv=none; b=ipQMa35/U3urnpPYS989xT4wPWHvQpQlUuPPGq+JtGlUL4URfbYrxZUmDXhx4D6hUo8DHX75/H1C3xkKVfzmq/Q6GXOXXIjnKLPdbxr7UXzpV3AtSOrdYgKFK/xIGAg4a+dcNNC77aSQJlcb7DeHz/tEVr1eoybes1ycr7swgzw=
+	t=1761850209; cv=none; b=ucaWVRz4vjpThM08nDhb079MprXx4r0+C0lNzuSP3LMnrbNnfOU6SjWHi7OBgzLSUxQ9BJ2k1CeptqFSweE6MJ+baYw0C97sqAhJz4Hn5UUnUuLvVwPn1PkoI/JcaoOBbtsOUWcFfH8FDzrIQr6gs/YhCOGk5zftakaCNOzswy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761849847; c=relaxed/simple;
-	bh=b2/YyhhpEcCX7pH+JIsasIXaCh+uVNODB0DRCV3TVIs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rWZDOe/wK2K8kJzfinQ5zOTxT5kPIp7guIwfTNAN34dprXtSz0OyYKnYc9TZx02eGqed59I+CJ1HldK4cIWiTCSorc+NYRwNrLNdgpYHp/2rBfLykvIopK9P21pBgaHbeCcXNnjRtSy+azOf6m0S4W5LbMC8Gs9YxcCOruwjyvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VPjUJc5N; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761849845; x=1793385845;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=b2/YyhhpEcCX7pH+JIsasIXaCh+uVNODB0DRCV3TVIs=;
-  b=VPjUJc5N9WFWP4mUoSFtsb6cRdoi7G8BF2EBTVGLfA4ifg31m1Hy/X09
-   kkFlD64tT9RPu0aAqrj/HbCqjw8hzqHLEp9T8flx4vsNSDcPLEHA+uehM
-   ubg/lTrENWVFYH7Is6rwLJF6t5rDX2OP3eepLkdo296dn/v1FrqndTbl0
-   ny70b4yR5TT4ts5FIxfwb0c8j0rYST+/5A/Fb3seMK7wAP9CeAYE7Sw/d
-   RO94QEfgB01hCE3ETEMI9nXquqdAUSWs7/exHDj65Ew2rEPe9pFtOYemc
-   ZIq0ihbWnvIY2mWHNJtN9PR0k5zgP6m/o5MtPCKmDG1dcaVogmJppvh5F
-   Q==;
-X-CSE-ConnectionGUID: MKT6BtPBTIuanOJt4oj7pw==
-X-CSE-MsgGUID: YMQcMCmnRy+Wp7vl4TenlQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11598"; a="67656048"
-X-IronPort-AV: E=Sophos;i="6.19,267,1754982000"; 
-   d="scan'208";a="67656048"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2025 11:44:04 -0700
-X-CSE-ConnectionGUID: A2sQBI39TjS2bRJYnKTUxA==
-X-CSE-MsgGUID: jojEQxFYSdKERSCkmvorkA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,267,1754982000"; 
-   d="scan'208";a="185239667"
-Received: from iherna2-mobl4.amr.corp.intel.com (HELO desk) ([10.124.223.240])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2025 11:44:03 -0700
-Date: Thu, 30 Oct 2025 11:43:54 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Brendan Jackman <jackmanb@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Tao Zhang <tao1.zhang@intel.com>,
-	Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH 1/3] x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
-Message-ID: <20251030184354.qwulxmbxkt6thu6b@desk>
-References: <20251029-verw-vm-v1-0-babf9b961519@linux.intel.com>
- <20251029-verw-vm-v1-1-babf9b961519@linux.intel.com>
- <DDVNNDVOE49L.1F77ZUNBVTR1I@google.com>
+	s=arc-20240116; t=1761850209; c=relaxed/simple;
+	bh=A+WDfzdXC40Sq/9wrvjPlPLDo/3gwYMZ9f+8uEEuYZk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qRLXJiDOFgEJn13KMcPmjHZpSswJa+G7f9PQ9keTfdEFOdSJauwA/5NAXmvMNyO7VUnwarahhAOyd3F64DCLPgeAeyF3UfNRDD6JRsxwWcecwbQM50D8A0MClm2DNBB7RU1mdzbdjoS+WrNkFmLk8KthTrNmA7vS/9O0an9VLQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y5zcmqUs; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-340299cc2ecso1527900a91.1
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 11:50:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761850207; x=1762455007; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GhASEPgcAJIgjSND95sOQSORkzyJK56v/9+vwSD9zco=;
+        b=Y5zcmqUsUB0RvR+q7ldKAyQD9FGd/BWxiOghynSGU1BF1G1nbajPbH1t/+LwWhkd8u
+         IPNKfewA8oO249REiq29UqCJfAz0oCViuMVcngkFprd+xNGZowVg5fhVx+kkcfCoI5Al
+         NueOUvWfLvqq9b2XwWjvcVzfNAWYI5fGgjFeQtZF3W7j8qkKnCWxyhoPa1bfYC/NZxLJ
+         PPDRWVzrHWIaEuL6bbX63+cwA7dCDG56cuVL+36ChcfLJN6S0GDW6gAd6oa4LIkGLF90
+         HybXwJ7Qe/54wafBc2uBEss+ProgSUwZKE/cPk+ojfg4dL9MCTtpPFlKHwSK6XMtFVH0
+         lbdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761850207; x=1762455007;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GhASEPgcAJIgjSND95sOQSORkzyJK56v/9+vwSD9zco=;
+        b=efXhytOgUQe00MSUMaUZ/07Jj5ocTBhFhGNjnfWc8bpPGjdJM6x73b7ZAqG+fcQez8
+         43zqj+ji+JXYPiFDcckktSonC6GIXpQMbx88yZYo58j8UpfgcueZ5a2Ungy63R+dhX/D
+         5S3MY830CQzhy10n5BQRyjIefuv229b5GZuC805uNh4rYPf7WZfcYIrOn7ru+/yGSrAF
+         ddCXkVilVf7051Zec0Zo3OGYrCHTtWi7VQQCU1F+pHeUxsnzvwu2OKmsTly04tRokWke
+         C1+3RIdKk8nR7XMY591IUKxyK3FM5ust90q7VnqcQpNqDOPrKL03NLAgEokrWclw/FkV
+         458w==
+X-Gm-Message-State: AOJu0YzsFHIvwtEam2hOlpkslmcnysX4wDNkW129uwuLYv29ugD9oC8J
+	nQa2hWXqojrLPdI+UVDFX+aSq5tJEjtlOVGZyxMi5IB6XxE1p7cwJSMrd6HPDt3D5GHf5KA9cRN
+	TtF9gPg==
+X-Google-Smtp-Source: AGHT+IEyImF3y4s/FXpVuZsZYGpbmF0ZTyfGO9w0HTZqVW16uZesyicU7fWy0+6LcBB/GlDQMIo6mUdtepY=
+X-Received: from pjbbf20.prod.google.com ([2002:a17:90b:b14:b0:33d:9628:960e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2b4c:b0:340:767a:221f
+ with SMTP id 98e67ed59e1d1-340767a2300mr2068608a91.4.1761850206851; Thu, 30
+ Oct 2025 11:50:06 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 30 Oct 2025 11:50:03 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DDVNNDVOE49L.1F77ZUNBVTR1I@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
+Message-ID: <20251030185004.3372256-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Add a helper to dedup reporting of unhandled VM-Exits
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 30, 2025 at 12:28:06PM +0000, Brendan Jackman wrote:
-> On Wed Oct 29, 2025 at 9:26 PM UTC, Pawan Gupta wrote:
-> > TSA mitigation:
-> >
-> >   d8010d4ba43e ("x86/bugs: Add a Transient Scheduler Attacks mitigation")
-> >
-> > introduced VM_CLEAR_CPU_BUFFERS for guests on AMD CPUs. Currently on Intel
-> > CLEAR_CPU_BUFFERS is being used for guests which has a much broader scope
-> > (kernel->user also).
-> >
-> > Make mitigations on Intel consistent with TSA. This would help handling the
-> > guest-only mitigations better in future.
-> >
-> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> > ---
-> >  arch/x86/kernel/cpu/bugs.c | 9 +++++++--
-> >  arch/x86/kvm/vmx/vmenter.S | 3 ++-
-> >  2 files changed, 9 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-> > index d7fa03bf51b4517c12cc68e7c441f7589a4983d1..6d00a9ea7b4f28da291114a7a096b26cc129b57e 100644
-> > --- a/arch/x86/kernel/cpu/bugs.c
-> > +++ b/arch/x86/kernel/cpu/bugs.c
-> > @@ -194,7 +194,7 @@ DEFINE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
-> >  
-> >  /*
-> >   * Controls CPU Fill buffer clear before VMenter. This is a subset of
-> > - * X86_FEATURE_CLEAR_CPU_BUF, and should only be enabled when KVM-only
-> > + * X86_FEATURE_CLEAR_CPU_BUF_VM, and should only be enabled when KVM-only
-> >   * mitigation is required.
-> >   */
-> 
-> So if I understand correctly with this patch the aim is:
-> 
-> X86_FEATURE_CLEAR_CPU_BUF means verw before exit to usermode
-> 
-> X86_FEATURE_CLEAR_CPU_BUF_VM means unconditional verw before VM Enter
-> 
-> cpu_buf_vm_clear[_mmio_only] means verw before VM Enter for
-> MMIO-capable guests.
+Add and use a helper, kvm_prepare_unexpected_reason_exit(), to dedup the
+code that fills the exit reason and CPU when KVM encounters a VM-Exit that
+KVM doesn't know how to handle.
 
-Yup, thats the goal.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/svm/svm.c          |  7 +------
+ arch/x86/kvm/vmx/tdx.c          |  6 +-----
+ arch/x86/kvm/vmx/vmx.c          |  9 +--------
+ arch/x86/kvm/x86.c              | 12 ++++++++++++
+ 5 files changed, 16 insertions(+), 19 deletions(-)
 
-> Since this is being cleaned up can we also:
-> 
-> - Update the definition of X86_FEATURE_CLEAR_CPU_BUF in cpufeatures.h to
->   say what context it applies to (now it's specifically exit to user)
-> 
-> - Clear up how verw_clear_cpu_buf_mitigation_selected relates to these
->   two flags. Thinking aloud here... it looks like this is set:
-> 
->   - If MDS mitigations are on, meaning both flags are set
-> 
->   - If TAA mitigations are on, meaning both flags are set
-> 
->   - If MMIO mitigations are on, and the CPU has MDS or TAA. In this case
->     both flags are set, but this causality is messier.
-> 
->   - If RFDS mitigations are on and supported, meaning both flags are set
-> 
->   So if I'm reading this correctly whenever
->   verw_clear_cpu_buf_mitigation_selected we should expect both flags
->   enabled. So I think all that's needed is to add a reference to
->   X86_FEATURE_CLEAR_CPU_BUF_VM to the comment?
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 48598d017d6f..4fbe4b7ce1da 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2167,6 +2167,7 @@ void __kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu,
+ void kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu);
+ 
+ void kvm_prepare_event_vectoring_exit(struct kvm_vcpu *vcpu, gpa_t gpa);
++void kvm_prepare_unexpected_reason_exit(struct kvm_vcpu *vcpu, u64 exit_reason);
+ 
+ void kvm_enable_efer_bits(u64);
+ bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index f14709a511aa..83e0d4d5f4c5 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3451,13 +3451,8 @@ static bool svm_check_exit_valid(u64 exit_code)
+ 
+ static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code)
+ {
+-	vcpu_unimpl(vcpu, "svm: unexpected exit reason 0x%llx\n", exit_code);
+ 	dump_vmcb(vcpu);
+-	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+-	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
+-	vcpu->run->internal.ndata = 2;
+-	vcpu->run->internal.data[0] = exit_code;
+-	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
++	kvm_prepare_unexpected_reason_exit(vcpu, exit_code);
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 326db9b9c567..079d9f13eddb 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -2145,11 +2145,7 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+ 	}
+ 
+ unhandled_exit:
+-	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+-	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
+-	vcpu->run->internal.ndata = 2;
+-	vcpu->run->internal.data[0] = vp_enter_ret;
+-	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
++	kvm_prepare_unexpected_reason_exit(vcpu, vp_enter_ret);
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 1021d3b65ea0..08f7957ed4c3 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6642,15 +6642,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ 	return kvm_vmx_exit_handlers[exit_handler_index](vcpu);
+ 
+ unexpected_vmexit:
+-	vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
+-		    exit_reason.full);
+ 	dump_vmcs(vcpu);
+-	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+-	vcpu->run->internal.suberror =
+-			KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
+-	vcpu->run->internal.ndata = 2;
+-	vcpu->run->internal.data[0] = exit_reason.full;
+-	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
++	kvm_prepare_unexpected_reason_exit(vcpu, exit_reason.full);
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b4b5d2d09634..c826cd05228a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9110,6 +9110,18 @@ void kvm_prepare_event_vectoring_exit(struct kvm_vcpu *vcpu, gpa_t gpa)
+ }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_prepare_event_vectoring_exit);
+ 
++void kvm_prepare_unexpected_reason_exit(struct kvm_vcpu *vcpu, u64 exit_reason)
++{
++	vcpu_unimpl(vcpu, "unexpected exit reason 0x%llx\n", exit_reason);
++
++	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
++	vcpu->run->internal.ndata = 2;
++	vcpu->run->internal.data[0] = exit_reason;
++	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
++}
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_prepare_unexpected_reason_exit);
++
+ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
 
-Yes. I will update the comment accordingly.
+base-commit: 4cc167c50eb19d44ac7e204938724e685e3d8057
+-- 
+2.51.1.930.gacf6e81ea2-goog
 
-> I think we also need to update the assertion of vmx->disable_fb_clear?
-
-I am not quite sure about the update needed. Could you please clarify?
-
-> Anyway thanks this seems like a very clear improvement to me.
-
-Thanks for the review and suggestions!
 
