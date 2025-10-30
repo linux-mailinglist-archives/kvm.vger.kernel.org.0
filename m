@@ -1,126 +1,129 @@
-Return-Path: <kvm+bounces-61519-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61520-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CB25C21D8B
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 19:58:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A59E1C21DF1
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 20:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FFAE1A654CA
-	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 18:59:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADD0A1AA06F7
+	for <lists+kvm@lfdr.de>; Thu, 30 Oct 2025 19:08:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA85374ACB;
-	Thu, 30 Oct 2025 18:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C77374AB8;
+	Thu, 30 Oct 2025 19:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LQPBLkT8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZckXw5vU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6759136E372
-	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 18:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25EE636E354
+	for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 19:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761850690; cv=none; b=J4iGRZ0qMhdsTV813gZfyM2dAiBHXlEHJKXyGZMP1G6fQ93q4Tjf3rTf5/oyISlLdyrhvCP3S6Om4KmXqaPMalW09uPbAZcnzsaFnfU8Gr3EkS361TwhV+D29HW+nx5dp5I8rdoKkbQF5NX00beV16RXYqQ5gwcl4py9knhjR48=
+	t=1761851244; cv=none; b=IlCguEi475oNb98Y/DC6a6owebaAxud5Fkm1JSAXCUhib8BuDp08gYBUEiftOQwupdJUFO6Bof8gnqvqsVYCIVMD4mHSn65y2XbKPe0WWb4w7vsis3On1Ew60PEDtV/0AI0jFN4kPaBG+KZvHhlTo0gXHyd4ghCk2DaY+duWhmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761850690; c=relaxed/simple;
-	bh=gBhNaafHCGkv+teWASnFAg94iaqRXR4iTaEf314TGQw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SlrA0mcnyAycBxLnkD8c2dr7F0bFg5AeswSExs1QRSHI/bH477wgKgEhdtQ2c4Rt8NDRp1lFKYXtufPsnDNmykuy8bRqrTM8aZHStKMQZvscqsKwRBi7FGuSnnZl1m+wN6qcFTCO9eRLKva0+kvsPmSyJf9F9nXSEEg/zd1i47c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LQPBLkT8; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1761851244; c=relaxed/simple;
+	bh=DvFyvNSh8qxl399ZX4Dvk2UH8sJtqfrtdkTSXiS2O28=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PGrCktHsqhKOetu3tcINVAFgqLo2xkk0lLxuS5TB2V6yRXGow6Q6wgqwH9gJz/VDW6n16ETCYZBoXdL7ojtOnKXHIYgVCTqDMUKIveAInZwg/J0xtH7CS0UdiGFn+kDLDifRkIJUTUXVhqVzfagmYXg7RmGWZtLyMRgNyUASCbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZckXw5vU; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3307af9b55eso1145283a91.2
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 11:58:09 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ecfafb92bcso65241cf.1
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 12:07:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761850689; x=1762455489; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=qjjFGFuC/i6bzqqoHJlMMUDjmHoXRQt84ZbrHXQbM7E=;
-        b=LQPBLkT8c6jyvVF8kl6ZrFKLa10FxnfExScmvv5+4wHCaF6AhmDdoKtF/VIDvRtOA6
-         oU7dYehrggI/nRpzM7ZGCSs5rcTUcPQW9ZqQpOY1q4Julu7zQSJSxFehFM0M9UwWTapS
-         u/vojPEYROc5PWdT/C7KTTZK+Fs5TkKoWMMAgWUwmSI2IYgIrz3Dr9CFGrykJxWj0BQN
-         5moCdCMtzCR3rK7AJiBwzdHDxtJS8hbXOcZheCVEbdiqg8MLH1DfIi6QkqcCpoqU02qT
-         uUR9F//oYIBJZm9LaqGKFHrXaq0DjYZ7BIocag+Ln+2xu7jha6ggeTlQXNkyfRTMP4p/
-         0tEg==
+        d=google.com; s=20230601; t=1761851242; x=1762456042; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PCoLCqthfjlxcZmXPuVo/a5TDaJzLCC0xdNynQX7McU=;
+        b=ZckXw5vU0LXRw4K7WamRpYd/12eb909nfOJSCoI08y8xTLLYR3UlS/DHzw/12P+TVT
+         WG9hLNIW8f5kI9IjFfPGFdWFJMouX0MULieJ838fZCCc1+PCDzM84UwKh4K1ij6ejU6Y
+         xGE6IcMP/05CscvVqu/k/KQctwKgLT0Lk4Te+zPbS1RIYaNxHSKApG2/pfkSibhFMSsA
+         eitOA0vQ2U4ni8qXfR7iJiFLC6lDYcuaT/zs2yQpKQ2yV4DgWKO0wAQ8dJYqW+3gCOQg
+         rN2flXr4dd6UlmO7HwBbzO3VGPUlNaiUz+flcw9qqCPxtcGQF56uzothabnGPvYrXGFD
+         dcJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761850689; x=1762455489;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qjjFGFuC/i6bzqqoHJlMMUDjmHoXRQt84ZbrHXQbM7E=;
-        b=o5HuP2/jyQVV0tBgtKM5DKdm0+ckCoej381OyGc8qxXPjUNRzlgWmVMVrzCAbV4/EP
-         m22Ha0Ynj72pAhFz9dSpKmq5BSh0VBJn/ysza3dUzJkCsZYJy2EKHZhZHp2c8VCuD/zJ
-         wm8uLc6bRWFCs7DSyKnYryq5QgMxi0PAwrnAD8yieIoCnV6zkVTLd4/HNyHOMaETC9sz
-         ve+2YuaMfB1YKUr5gcZ8uNSXijMzWgJJqNQVkOAgzc+Q2AmMwLUnObMKUBnma6YBa8/l
-         u4is+gYwCRAnLf3P/o+RAHxvkfOhcjBQAGHklpJVSgdCj2t13ogQajP9pAdgCsxQUe3+
-         jD+Q==
-X-Gm-Message-State: AOJu0YzwXmxyNX8nmzZzRvz3QRX12YBv4tNuyMY4SL+uga4129mc0roP
-	iqrM3B0iiVWwtXVq3FrOte0efAzyGj7Hi4NXx/rLpzyOYP55MVj+YZjFRRCflw+GkBs9OIrreEk
-	5pN/ZXQ==
-X-Google-Smtp-Source: AGHT+IEKgvy0wUgCv5T8CNLcmWcQSEO5ENvBe1HV5y63XOGG6rep4wBvG0goTUcSpE7EICJuck+LW8gP5+Y=
-X-Received: from pjbqd11.prod.google.com ([2002:a17:90b:3ccb:b0:339:ae3b:2bc7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:134e:b0:33b:dec9:d9aa
- with SMTP id 98e67ed59e1d1-3408308c667mr906032a91.25.1761850688619; Thu, 30
- Oct 2025 11:58:08 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 11:58:02 -0700
-In-Reply-To: <20251030185802.3375059-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1761851242; x=1762456042;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PCoLCqthfjlxcZmXPuVo/a5TDaJzLCC0xdNynQX7McU=;
+        b=JpyVkKANK8/0h5WrVkKfGM6ibad0+W1pQ6wKvzmfG0wJ+0ei4r9MewPBYvNCGne3JG
+         I0zjJKrwiRXxjvky7ncXDL+QkGmcWaQ9FhyS4Tc/mrra9eyn8gI+ftithbKr7ijViDkz
+         vyuq7Zp7yFY3F19Jh0Z8xrdMEOmaZfBdQLojTQIj6OCuxsDoGNTXA6XNE5PnEaqRc4F0
+         /jkSLB46/HVytAUkI7TXdv62qbd1qoxD5qWP1+QySMG3SL73js8q8SdfUiscxITYbNRj
+         y/qlWh4JWFHW7pj3oIgqyTQmq+GKWladeQjeQx17zxb6IDj3/pvtyzVqdPsw1bp/cSIA
+         OEGw==
+X-Forwarded-Encrypted: i=1; AJvYcCX9wbGlcE/VGpJuvajO1js9cdwUUjuFq1+af+2fsYelyIJOTs7fAYY8RGcrSjq+/+Nk+gA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3OlIz428gXG8oQ7cWrM0tDppW8SQ38cykmu/EZT4wC4aFDv51
+	n4d6Ni6EMAA2VKB2NpQlgZ3n7tO0A8EG/0fXKNhSo0+rRqfy9fneC/KXPRCKfT9fpFaRZgpEe4v
+	9uxefm1ZjbzSp+RUXPdonZycrbvDH1EL6NOrdd5Cn
+X-Gm-Gg: ASbGncuoLAAfdQ5neTnBdai81KamrVUM1Af1YtL29oGT3kbH4sHlNhK6Fah3zsOyIam
+	ELIzhOpV7PXB+yTo+A+TnmBSI8F8CvPY1hSh0rZFEqnnkojH5LAaEFHh4FMB8QUIYR58C4izIG1
+	YYUP7XoAMYQT1BUs9WxjYqoGRqp8XrEtBzdRi3B6fVviPSsTFqLlWBrt++2zJbV8GTKI7x/HQGS
+	fJARYLLXwOcnNyxa956h5aGblXvCn4GA920rbexjGuJDdcY/rQL4Um5mh35ju4ihfqh+sWsfXN8
+	OsOYLV1aiaq9gXLFxetBYWDvsw==
+X-Google-Smtp-Source: AGHT+IHkIhJCo7NFdaHLBFyJbonDCNFLcwrhYELkE6OW4OeZdx3rf5ADytg1g/CT0hOvRfBwqeiJwH0z6jqJ9LzJDkw=
+X-Received: by 2002:a05:622a:2:b0:4e8:85ac:f7a7 with SMTP id
+ d75a77b69052e-4ed31f3529amr938991cf.9.1761851241873; Thu, 30 Oct 2025
+ 12:07:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251030185802.3375059-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251030185802.3375059-3-seanjc@google.com>
-Subject: [PATCH 2/2] KVM: x86: Harden KVM against imbalanced load/put of guest
- FPU state
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Alexander Potapenko <glider@google.com>
+MIME-Version: 1.0
+References: <20251030171238.1674493-1-rananta@google.com> <20251030183120.GD1204670@ziepe.ca>
+In-Reply-To: <20251030183120.GD1204670@ziepe.ca>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Thu, 30 Oct 2025 12:07:10 -0700
+X-Gm-Features: AWmQ_bmODnSgIiguqq9wgyDj-h2iOZbOtTbAP3dhn7MpDJGiXfBAH1fV5zpiZRs
+Message-ID: <CAJHc60yMgzQL9VT-K4GuDa7ZAYfNBi3Az3nnZTgd+RLYW+3iTg@mail.gmail.com>
+Subject: Re: [PATCH] vfio: Fix ksize arg while copying user struct in vfio_df_ioctl_bind_iommufd()
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Alex Williamson <alex.williamson@redhat.com>, David Matlack <dmatlack@google.com>, 
+	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Assert, via KVM_BUG_ON(), that guest FPU state isn't/is in use when
-loading/putting the FPU to help detect KVM bugs without needing an assist
-from KASAN.  If an imbalanced load/put is detected, skip the redundant
-load/put to avoid clobbering guest state and/or crashing the host.
+On Thu, Oct 30, 2025 at 11:31=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.ca> wro=
+te:
+>
+> On Thu, Oct 30, 2025 at 05:12:38PM +0000, Raghavendra Rao Ananta wrote:
+> > For the cases where user includes a non-zero value in 'token_uuid_ptr'
+> > field of 'struct vfio_device_bind_iommufd', the copy_struct_from_user()
+> > in vfio_df_ioctl_bind_iommufd() fails with -E2BIG. For the 'minsz' pass=
+ed,
+> > copy_struct_from_user() expects the newly introduced field to be zero-e=
+d,
+> > which would be incorrect in this case.
+> >
+> > Fix this by passing the actual size of the kernel struct. If working
+> > with a newer userspace, copy_struct_from_user() would copy the
+> > 'token_uuid_ptr' field, and if working with an old userspace, it would
+> > zero out this field, thus still retaining backward compatibility.
+> >
+> > Fixes: 86624ba3b522 ("vfio/pci: Do vf_token checks for VFIO_DEVICE_BIND=
+_IOMMUFD")
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  drivers/vfio/device_cdev.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+>
+> Though I feel this was copied from some other spot in vfio so I wonder
+> if we have a larger set of things that are a little off..
+>
+I could only find vfio_df_ioctl_bind_iommufd() in vfio referencing
+copy_struct_from_user(). The other closest would be in
+drivers/iommu/iommufd/main.c::iommufd_fops_ioctl(), which seems to be
+doing the right thing.
 
-Note, kvm_access_xstate_msr() already provides a similar assertion.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d1e048d14e88..67e5f735adf2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11807,6 +11807,9 @@ static int complete_emulated_mmio(struct kvm_vcpu *vcpu)
- /* Swap (qemu) user FPU context for the guest FPU context. */
- static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
- {
-+	if (KVM_BUG_ON(vcpu->arch.guest_fpu.fpstate->in_use, vcpu->kvm))
-+		return;
-+
- 	/* Exclude PKRU, it's restored separately immediately after VM-Exit. */
- 	fpu_swap_kvm_fpstate(&vcpu->arch.guest_fpu, true);
- 	trace_kvm_fpu(1);
-@@ -11815,6 +11818,9 @@ static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
- /* When vcpu_run ends, restore user space FPU context. */
- static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
- {
-+	if (KVM_BUG_ON(!vcpu->arch.guest_fpu.fpstate->in_use, vcpu->kvm))
-+		return;
-+
- 	fpu_swap_kvm_fpstate(&vcpu->arch.guest_fpu, false);
- 	++vcpu->stat.fpu_reload;
- 	trace_kvm_fpu(0);
--- 
-2.51.1.930.gacf6e81ea2-goog
-
+Thank you.
+Raghavendra
 
