@@ -1,139 +1,121 @@
-Return-Path: <kvm+bounces-61717-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61718-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB1F0C266D4
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 18:43:01 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0A18C26662
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 18:38:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C4DBC4F924D
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 17:37:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2AFED35227D
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 17:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC1B34BA59;
-	Fri, 31 Oct 2025 17:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B94A31618F;
+	Fri, 31 Oct 2025 17:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3TLlFyOs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qsMSgnyf"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEE53093C3
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 17:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9DC3043DA
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 17:36:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761932095; cv=none; b=JknY6xVn/kGh5vGAss0efmpavTk7KX14Sd9FdOIdelZ4lbQxKoQHqz0f8nkvDwXaSR4ucej7uGf6AL1ewdJSCE8baa9fTh7o3Kv+PNN5J6B3gjV7LDWfQwcMRgb1HQoMBWY0/XEF7kmM+KK+vUuih1US2kVAEe4ka6kBpXvsvBI=
+	t=1761932185; cv=none; b=aPSJRb5qlGtAfuLwzxLYmV340FhNDwUlcKpb4FV7QviZ0wMnsQ3zcqzi70ruuH1IWc2WZn8yOGZmGC4FJ5/O0JgwWbuTTXbvJOH6vcPBLuHWcX7Hp3/gaEEfibDucR1/8AinwmfyG6o9fZekgV6Qj7r1xazhL8/0FUJcSXrCqv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761932095; c=relaxed/simple;
-	bh=tRSFG9dRXG0FAWpU/Id6Zgckz1056dIV6+Bvj3jPwAc=;
+	s=arc-20240116; t=1761932185; c=relaxed/simple;
+	bh=wUmtHEk1Kb8QxeKkuMpwMU+pOoW2GV8Wfxxk4HiDohA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PMPIn+E9A0OV9QUoId+49E8ceyD0EwFWeRa0zssl7ok0k0VlxP+kq1qcm0pfu3GsLzqbuRK8W1drb4OAYqgDPTn7pqMl5eqEnW5L+DmUytnJopxsFzV7cl+9L2KOtSU7/i5uHoUxv+2kpHDx7VeL6jH91iFNgC9+d+MEr+0cKy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3TLlFyOs; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=NCBWtvXTDoodAG+snxuvgZ9rxeCo0xj5BCvF1oo+C87fG4aGTLVSmennKheSAj8U9sKOyBEZJ45cQTUKf94UobmR6FxRgp8WOZncvrsRYJiECWnwG7so7zoLD/rBBKnRB6Xmsp+IgUuDOtfp6UnWijS2gYKUbs4YZt4t2Hkdm1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qsMSgnyf; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34082c48b2bso1561172a91.1
-        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 10:34:53 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3409a1854cdso1728961a91.0
+        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 10:36:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761932093; x=1762536893; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761932183; x=1762536983; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LtnXaqdbVR8gOvpEPR+6l9cfgKr6bsCXJtfhHUXOVv8=;
-        b=3TLlFyOsKZ39E3sP6F/sSgzfKLTE/aLQmWLs6nTpdumA2BQLMnXZaz4g4Ijjh9X020
-         yzhlz3MQSfUwiLkHevuUuP6mFg/J8NIjBrZXeOk4gA0HUd30/Eu6Kr3vmVpPiZFc/JBd
-         ME1qC+7XylwakWIEppEi3OFJULxxgsraCG0n0iqAjy60azEXEE1I6f8XCnPKSDWh7Xty
-         Z1k0luwe1bzeGknhtm8KyNoTF0jgcRG9lHJuonwW5w0cGxy8W0vwnoyj3UchghrcOEeL
-         Wg3sTxPDD3j45S2+9eIzWgnSyYA/md23HEQivpyw6xIrBagfmg8B2dCkBbREYSzCrwL5
-         qpdA==
+        bh=oS0ZpZF16YCRh48Rs9UtzBxLRJbtN+FTBVVUS4s8+a8=;
+        b=qsMSgnyfRor2UE/nFoK1IhQ/pruLpfOVdRerunVFws8PttxqDYTcp4SDPCcKA6Grqi
+         KTYABmb1172VlIj1cQis4lyyKHcuDUrm2P5suk4xYcVQJDkHE1sDFIduSOlqEtVcTrhY
+         Dedw9M309cema+aK9fPmn0RSrM/at0j/W7eKXs+NzqywNBznl9Ou+vSJOq/39BuUMT2B
+         vcUNY/GCkdKQFNAGzT/FFzyOTOPGdLdWARbPLr/9INFcsrj88AOzbHnr596jw7E+qvpZ
+         a7iM5GuvhEptgidX8fgIIL0+OxjHktTTjYszAGwoSdwRR4I2YmfE62Xbde7SFU6oE7+q
+         C0mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761932093; x=1762536893;
+        d=1e100.net; s=20230601; t=1761932183; x=1762536983;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LtnXaqdbVR8gOvpEPR+6l9cfgKr6bsCXJtfhHUXOVv8=;
-        b=cuRqhyqUGhP59QVp5TTCMbUbI8CRWrFwONf1ghEtea1irBuIKSQ+S7Gkns/bh9KhqK
-         +A0I7sZqYwik3pTzwTjmSvE+V2XbrFce8GUUcLBLKFnBSfUWDbqaVbYjPVwL8thXbwho
-         VGfnrP822Qn4d+Pa/20zJ7dmSCVggjHfPmRn5gCSXGSVnj4UMDJHBL03TOclrmfg2y3w
-         /94qnP5lUamWCmvTpBn+lxEuX55CrCpQXwf/G7S4uqECKl2ynyD5JyIghyEPZgpb9f1x
-         2ejoc5GFgCwc1wScijpP7oLu1yQkHE33fpBHnMHeq+nPVov7K4KmzBdFqXjEX8vhX7f8
-         Gu3A==
-X-Forwarded-Encrypted: i=1; AJvYcCV0TmiBJZU39amwOx+WJg+QdmA3tcCJLkI/rgbyUnC9DI5IqdkR9H1FZjZYtkuaIYRry/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysakUyIXnd73I3uKWQ0Fsvh6Khojvf7dSh1LLiI7hWFrw+5tqH
-	+k0v5AMyfBlpLht7bluwS1XIzQt8//lQaFv9ZLSLq0PBfHuta621FyHJRjzWUZAwVGtr2SC0/fe
-	DNfOc3w==
-X-Google-Smtp-Source: AGHT+IEhd62pQuR9tjnc3Il5ckB3BFxieNfGOf0XAASHT7mISEiuLVbYaHxfkZsCDA/umOxHYLwWX5NLxe4=
-X-Received: from pjbmg14.prod.google.com ([2002:a17:90b:370e:b0:33e:34c2:1e17])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:fc4b:b0:32e:5646:d43f
- with SMTP id 98e67ed59e1d1-3408306e65fmr6078929a91.19.1761932092859; Fri, 31
- Oct 2025 10:34:52 -0700 (PDT)
-Date: Fri, 31 Oct 2025 10:34:51 -0700
-In-Reply-To: <aQRyyieyDrZZMpIt@yzhao56-desk.sh.intel.com>
+        bh=oS0ZpZF16YCRh48Rs9UtzBxLRJbtN+FTBVVUS4s8+a8=;
+        b=maYJvnGsUZbYgxuVXoDrYGG+VWeJjkGgn44N8jED/DvMuciAdL+JewQrwn2fQNU61B
+         1CkrdpUHrF/QDYj5qNty24Fsop/zfi+inU1oEqdvz6KlHaHAvUnlm/jOhRnLQlaIuI20
+         sbusZVPKEVjeQevZx0trI2pTzH3j0crLqMHI0WtLyWJNnHBM8wjO6ITVjISBJqCxX3fW
+         GRuGJyMTT1n3FkQIGbXX6Nj46jZOBRPaOjcupPYUOW9Sr1MGV5c1XwSDBz2YDHJ5MCPn
+         HJkic0ZBp6jA39myqWs06NPmd6PClehDWHK7FvA89DPZDz87fh04ATktjATG4MLSckl7
+         ogCw==
+X-Forwarded-Encrypted: i=1; AJvYcCVs+HmFh/PnTjOLoem9r0FqP9SVTkPLCXNKftkZG9Yoy77KUpDm/5ekZLvpVkHlDefKhdI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/n9liIAfw34XVOR1nMOpbaKtU+bcsa8ZApoQsZ5X0rt0b+vL0
+	sGgYFsuQTy6lxuNSJSBHT+XA9PiuMfLyBnx1OXyoZgSFQe80dBsql3Ppta30vD567Qu0oOv3miN
+	ev9ZMKA==
+X-Google-Smtp-Source: AGHT+IGwWg806+ynAXsdzVM9jfhS677Oh5vXzRS9qR3coFaO6PIQH8mB/qMPv1Z4pIKbcAcNDhRMXaUHW+Q=
+X-Received: from pjhu60.prod.google.com ([2002:a17:90a:51c2:b0:340:7740:281c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3fd0:b0:340:6b5e:7578
+ with SMTP id 98e67ed59e1d1-34082fc645amr5860376a91.4.1761932183557; Fri, 31
+ Oct 2025 10:36:23 -0700 (PDT)
+Date: Fri, 31 Oct 2025 10:36:22 -0700
+In-Reply-To: <DDWGVW5SJQ4S.3KBFOQPJQWLLK@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251030200951.3402865-1-seanjc@google.com> <20251030200951.3402865-27-seanjc@google.com>
- <aQRyyieyDrZZMpIt@yzhao56-desk.sh.intel.com>
-Message-ID: <aQTzO7D1O02zQbcD@google.com>
-Subject: Re: [PATCH v4 26/28] KVM: TDX: Guard VM state transitions with "all"
- the locks
+References: <20251031003040.3491385-1-seanjc@google.com> <DDWGVW5SJQ4S.3KBFOQPJQWLLK@google.com>
+Message-ID: <aQTzlivZDrT_tZRL@google.com>
+Subject: Re: [PATCH v4 0/8] x86/bugs: KVM: L1TF and MMIO Stale Data cleanups
 From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"Kirill A. Shutemov" <kas@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Ackerley Tng <ackerleytng@google.com>
+To: Brendan Jackman <jackmanb@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Oct 31, 2025, Yan Zhao wrote:
-> On Thu, Oct 30, 2025 at 01:09:49PM -0700, Sean Christopherson wrote:
-> > Acquire kvm->lock, kvm->slots_lock, and all vcpu->mutex locks when
-> > servicing ioctls that (a) transition the TD to a new state, i.e. when
-> > doing INIT or FINALIZE or (b) are only valid if the TD is in a specific
-> > state, i.e. when initializing a vCPU or memory region.  Acquiring "all"
-> > the locks fixes several KVM_BUG_ON() situations where a SEAMCALL can fail
-> > due to racing actions, e.g. if tdh_vp_create() contends with either
-> > tdh_mr_extend() or tdh_mr_finalize().
-> > 
-> > For all intents and purposes, the paths in question are fully serialized,
-> > i.e. there's no reason to try and allow anything remotely interesting to
-> > happen.  Smack 'em with a big hammer instead of trying to be "nice".
-> > 
-> > Acquire kvm->lock to prevent VM-wide things from happening, slots_lock to
-> > prevent kvm_mmu_zap_all_fast(), and _all_ vCPU mutexes to prevent vCPUs
-> s/kvm_mmu_zap_all_fast/kvm_mmu_zap_memslot
+On Fri, Oct 31, 2025, Brendan Jackman wrote:
+> On Fri Oct 31, 2025 at 12:30 AM UTC, Sean Christopherson wrote:
+> > This is a combination of Brendan's work to unify the L1TF L1D flushing
+> > mitigation, and Pawan's work to bring some sanity to the mitigations that
+> > clear CPU buffers, with a bunch of glue code and some polishing from me.
+> >
+> > The "v4" is relative to the L1TF series.  I smushed the two series together
+> > as Pawan's idea to clear CPU buffers for MMIO in vmenter.S obviated the need
+> > for a separate cleanup/fix to have vmx_l1d_flush() return true/false, and
+> > handling the series separately would have been a lot of work+churn for no
+> > real benefit.
+> >
+> > TL;DR:
+> >
+> >  - Unify L1TF flushing under per-CPU variable
+> >  - Bury L1TF L1D flushing under CONFIG_CPU_MITIGATIONS=y
+> >  - Move MMIO Stale Data into asm, and do VERW at most once per VM-Enter
+> >
+> > To allow VMX to use ALTERNATIVE_2 to select slightly different flows for doing
+> > VERW, tweak the low lever macros in nospec-branch.h to define the instruction
+> > sequence, and then wrap it with __stringify() as needed.
+> >
+> > The non-VMX code is lightly tested (but there's far less chance for breakage
+> > there).  For the VMX code, I verified it does what I want (which may or may
+> > not be correct :-D) by hacking the code to force/clear various mitigations, and
+> > using ud2 to confirm the right path got selected.
+> 
+> FWIW [0] offers a way to check end-to-end that an L1TF exploit is broken
+> by the mitigation. It's a bit of a long-winded way to achieve that and I
+> guess L1TF is anyway the easy case here, but I couldn't resist promoting
+> it.
 
-Argh!  Third time's a charm?  Hopefully...
-
-> > @@ -3170,7 +3208,8 @@ static int tdx_vcpu_init_mem_region(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *c
-> >  
-> >  int tdx_vcpu_unlocked_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
-> >  {
-> > -	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-> > +	struct kvm *kvm = vcpu->kvm;
-> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> reverse xmas tree ?
-
-No, because the shorter line generates an input to the longer line.  E.g. we could
-do this if we really, really want an xmas tree:
-
-	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-	struct kvm *kvm = vcpu->kvm;
-
-but this won't compile
-
-	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-	struct kvm *kvm = vcpu->kvm;
+Yeah, it's on my radar, but it'll be a while before I have the bandwidth to dig
+through something that involved (though I _am_ excited to have a way to actually
+test mitigations).
 
