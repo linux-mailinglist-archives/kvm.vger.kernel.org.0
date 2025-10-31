@@ -1,125 +1,120 @@
-Return-Path: <kvm+bounces-61736-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61737-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F8AAC2720B
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 23:29:12 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57695C2722C
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 23:38:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7A14834C73B
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 22:29:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7EA6D4F41C4
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 22:37:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E581732C305;
-	Fri, 31 Oct 2025 22:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B71E302144;
+	Fri, 31 Oct 2025 22:37:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kmqv0t4r"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3K6A1ECk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604C7328614
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 22:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D262DBF76
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 22:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761949738; cv=none; b=FkQvgDFdA6g+pFTSWWFwo8x5fnrL4YAzwbj8P0C7pD+p8QNeDMxP346rvYrh+dAGgz7BspPGl30N6MkokpI1YfQU+4kgv25sdaGqAxFvdMwH8x+krljEsb05uilXmJy6mYKFGYaf4e5JbG3F4C9zyG6Fa6+htAKLMkHG8xDI8A4=
+	t=1761950258; cv=none; b=nj4MDR1SyGlMfJYzSHQhykexChsqA+v7gSm4Xojha0A8r0GWgr44X/ZreLQCHHpU8O8Ef2Jt5gq+H9t46aRQcIg4yo3pDxtJnQPV/5Ce3L3dQSwuD6acx+Hs2g5TbCfNdHvofoZsRDloKEeVeIaCpATDg/ciiLOfTZ1/3dDPFBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761949738; c=relaxed/simple;
-	bh=VZXcKlS2NfJQUqJUaLkoMO31MbXfEPxVU5q67dhNYbY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aCdBPY3UrcAOWGWZ/Cdni0aAjQRdZdX7KfNMQ9tjeLZs3+vLPf/efeMiFTlH1D/ZDPZJWFHjHN9QGN5yaBmiRDrC35tf5YMlohlVMa4qkNMSKAMaCCohvAQZx9gSW03erx3X/NUJwJreB+Kii4rtP3IRZwJ/hGTNZDWpQjJA9aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kmqv0t4r; arc=none smtp.client-ip=209.85.167.42
+	s=arc-20240116; t=1761950258; c=relaxed/simple;
+	bh=vux0Wwx/9W3FtLrC7lRRcKcZZ6Lsj4RQdTq5HQzzrgs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=JvgiBq8EsbmRu1QMx5Gip9m6A9H3+hQwNefymaBDjeYyH2MGR+zEVTdW60q2oyezaeiwSQXe2hcvM75ddngwGm8A/vHOGYNhVsG/3eaMioFLyEgTe0BHGoXp4ITiDyujHOKhPmhR5Sf274Nb4DpQWUt44CmkVt7OggSCsgGp/Kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3K6A1ECk; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5930f751531so2857018e87.3
-        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 15:28:56 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-340299e05easo2662109a91.0
+        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 15:37:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761949734; x=1762554534; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A4VDPOkfEPN3V+mmkEOqmJfTYjVG4ZaMp9wTEce6ggY=;
-        b=kmqv0t4rwZ+OooujAZB89C6U1PE4NY/hxG/N3arnBNvt6gcdI5fjWrSGf9YrcyXxKN
-         yGg9J1HH/8TDQyiQiH1cwV2QnT74vWm7ZDyzcEYxuprajEkVaX4f/gJzwKnq1HfQ20ZI
-         X/H4W9dQ2Sgb7YJMKmtl9Y68AnxuYX3owuhcNhD5/lBrRXvnr8VB6MuiuH4tYrGBphz1
-         FtPytlwa3a6X1saOPHQg4ZaGJlMimZNSNYSsVunvrU6M11Y6f++bi+QoWO4mJJIvDi44
-         uv6MJFrni1aUExCr/m8s6EQTGCu1qWpjXecUUFYn+kyCivXg8JeMiTaqkLgHZZqwIxn1
-         jxhg==
+        d=google.com; s=20230601; t=1761950256; x=1762555056; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2T//pv73tE9Ei8o1XpXkzLHPQNKRotM7rF6yYw0F0ng=;
+        b=3K6A1ECkAh+26/VlWFKuVCrJ/YLOpSz5sm9cbHT4Vt5AvKQEMyehBLDF1rLv0/XU9o
+         PQZcD2q4VUMuarS+ia2u0SiLKQaCsYsG++i0BSWhV7P6oUuW4fZHiTXDtEF6ItckxYV1
+         p9UThRufukTUcFOCoIgGzNzsy5/Zc3ukaP2P19L1Meg/7hfsA+O4bQSIFaIl1u4W7tWO
+         2EkyTFkfNY42GpfuLeMYCfffk50bl1tg8SfghBA2m5IS8GK1dekvz9tZMoks8GRKKoBW
+         3FjHVaN5sd8oQ58GvqfuefVtqyFHEDlPhbA7lGxAP/VHlc4wJbKaLCNcbObsDnmsxxKG
+         QF4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761949734; x=1762554534;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A4VDPOkfEPN3V+mmkEOqmJfTYjVG4ZaMp9wTEce6ggY=;
-        b=oNK4WhUY7Qdz7C2xujRhb/9tXX6NcUz7FrdovHtH3hxOOMAZaQNB/EJTxiqCBkPol2
-         R5oBK7itw23mhFyVV3FDzPujwZJFhae7t10aUFe/P905GdjuPBhl6a88kvb9p425+GYe
-         mN/A516RDrUb9ipRrY5NPtlxxyB6Ybe7Cc+q0rpN5U8ZMp424KrEWHRp2+iJbhddslNo
-         P3aeL+cl4Zf+MDlMl9/HS7q/s9+BCPSZ2CTwmPquCSrJq9h0zClt5ys1JGL5PMGO9N3v
-         wbGQRv0yb/lS67Iz6F8nBn/BPPEm1OR+8P3Rd2PF5KYocgRALqI+qNpd5DG+5+HhG93g
-         bGIA==
-X-Forwarded-Encrypted: i=1; AJvYcCXhYY9+BSHhZxNrRtIezaJKJl7Pt9b0k/qe86RZ+FwabywuEmD/PEM5Wf8V+X5siek4G2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylNeiVRjHImKVd/eSL4/03g26QDILWQSByI4Vnlk3Uqb/KmlaU
-	P47TCn+2PiQPclTxWTT8qfjFwuqYoyVwuesqQge2R7iFNgy5Ra5/o4F4Nl8HfLZiMBf1pKWaisw
-	Ie8bSEln7wQ38ckIfj+SYbI8eIpZhV1hc0pcTtkKB
-X-Gm-Gg: ASbGncuOaj9WGSv4Ny7Wtrpi9WZtC5N07V7VRx6cfE8wfuupVXg6Ghg2H8vf5qWbQdF
-	Ql0inajcB7avHzBi6QeV3q+Qt7Sl2WBnnsncN3Rkpu98o0B/S/hGoiJBzXSjb7Ox+RKyf4m2g+b
-	bR52GaSdAMmF+5H9wpe/8YseYKx/xgi4w2KLV4sXw7zoc+HzNTL2PHNi6OQVq9RU8XyQsTg5pj8
-	l5AfrYPmKi/w32LCnm1PybymAaHNqb1Dd4r1CBrvKl/hvc/EQDO5Pfa57rRfxfavkry+Eo=
-X-Google-Smtp-Source: AGHT+IFSwcMwTIDGFtEaqjdkz/AcJl72mmVl0IpQ+J78Aae+a4oANLR7hdtuxWyAxkV1yPdEbNFPfRUD01apBcVpx5M=
-X-Received: by 2002:a05:6512:15a1:b0:593:11bd:9af7 with SMTP id
- 2adb3069b0e04-5941d5586cemr1780294e87.36.1761949734165; Fri, 31 Oct 2025
- 15:28:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761950256; x=1762555056;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2T//pv73tE9Ei8o1XpXkzLHPQNKRotM7rF6yYw0F0ng=;
+        b=QVM4hkL8NwnpwjVgMNLm2L1opVZNMmWDAH4l0//sJvjsoh13MfjRRcNLW5qXqsL0sw
+         WzGIm1H7WXGj7qjRyQCvDMcd1mZ2SuZElTMFNw5kLAAanmVmCeqhb9Pq0B+nC1HasR6G
+         aq+M67nt+/nmV3nLUEdTOIO24zu67Flc3+tLU8/4zKFVN864wK4D3GUKJBl0Fmd6LgJk
+         PME05gv28bYkxWeACZyFYje+DzEQj67BTHi7GRSUt77rz9jpmDfua+4KIm6JIJF0u0cn
+         lnYTVQjd+uhZ3hujPPIUCGjbzUExbbQxORVMw2b7wv8g2EqqqQh3nDJ1PjWNoS9jLmJ1
+         9Fyw==
+X-Forwarded-Encrypted: i=1; AJvYcCVo4UKq8tb2/ayIFsTMJq+yNKa9cmmaJ7jCt6gjWZ5/xX2JlLzGrvntTvedY0B1hnptm3o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvFGeVWi3pD/BKNbVPaaWnKQ5MZ8slHFeFzfI9PyEip2qZUUKE
+	eIWFvk5iU5UqEN9/Td245WC5a5XqrW/4bBPwbxDJ/3dG7RnlJZsKKBEUTSXc9LxUBnJeyAqqMRK
+	fT8CT9w==
+X-Google-Smtp-Source: AGHT+IFBSsgOmDJAP0ZowasZdt6RS6QGflURINqQVeeKx6xgginy5tuxDnXnTajxz/ozqhWCKYOExEAszeA=
+X-Received: from pjzh17.prod.google.com ([2002:a17:90a:ea91:b0:340:bd8e:458f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:dfcc:b0:339:f09b:d36f
+ with SMTP id 98e67ed59e1d1-3408308a1b0mr5879498a91.28.1761950256248; Fri, 31
+ Oct 2025 15:37:36 -0700 (PDT)
+Date: Fri, 31 Oct 2025 15:37:34 -0700
+In-Reply-To: <20251031222804.s26squjrtbaq7aly@desk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251018000713.677779-1-vipinsh@google.com> <20251018000713.677779-6-vipinsh@google.com>
-In-Reply-To: <20251018000713.677779-6-vipinsh@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Fri, 31 Oct 2025 15:28:27 -0700
-X-Gm-Features: AWmQ_bkJhwWK8iLPcHy-hUK2RP4WggOSXosGGLXjIhn9TKPWrHQgEkrODFylvq4
-Message-ID: <CALzav=f9tjgyF7TBsfjCpmvRezkkgfQY-OXwj+TaebjeffK-0A@mail.gmail.com>
-Subject: Re: [RFC PATCH 05/21] vfio/pci: Register VFIO live update file
- handler to Live Update Orchestrator
-To: Vipin Sharma <vipinsh@google.com>
-Cc: bhelgaas@google.com, pasha.tatashin@soleen.com, jgg@ziepe.ca, 
-	graf@amazon.com, pratyush@kernel.org, gregkh@linuxfoundation.org, 
-	chrisl@kernel.org, rppt@kernel.org, skhawaja@google.com, parav@nvidia.com, 
-	saeedm@nvidia.com, kevin.tian@intel.com, jrhilke@google.com, david@redhat.com, 
-	jgowans@amazon.com, dwmw2@infradead.org, epetron@amazon.de, 
-	junaids@google.com, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Alex Williamson <alex@shazbot.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20251031003040.3491385-1-seanjc@google.com> <20251031003040.3491385-4-seanjc@google.com>
+ <20251031222804.s26squjrtbaq7aly@desk>
+Message-ID: <aQU6LqP-PxBQ-R0m@google.com>
+Subject: Re: [PATCH v4 3/8] x86/bugs: Use an X86_FEATURE_xxx flag for the MMIO
+ Stale Data mitigation
+From: Sean Christopherson <seanjc@google.com>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Brendan Jackman <jackmanb@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Oct 17, 2025 at 5:07=E2=80=AFPM Vipin Sharma <vipinsh@google.com> w=
-rote:
-> +static const struct liveupdate_file_ops vfio_pci_luo_fops =3D {
-> +       .retrieve =3D vfio_pci_liveupdate_retrieve,
-> +       .can_preserve =3D vfio_pci_liveupdate_can_preserve,
-> +       .owner =3D THIS_MODULE,
-> +};
-> +
-> +static struct liveupdate_file_handler vfio_pci_luo_handler =3D {
-> +       .ops =3D &vfio_pci_luo_fops,
-> +       .compatible =3D "vfio-v1",
-> +};
-> +
-> +void __init vfio_pci_liveupdate_init(void)
-> +{
-> +       int err =3D liveupdate_register_file_handler(&vfio_pci_luo_handle=
-r);
-> +
-> +       if (err)
-> +               pr_err("VFIO PCI liveupdate file handler register failed,=
- error %d.\n", err);
-> +}
+On Fri, Oct 31, 2025, Pawan Gupta wrote:
+> On Thu, Oct 30, 2025 at 05:30:35PM -0700, Sean Christopherson wrote:
+> > Convert the MMIO Stale Data mitigation flag from a static branch into an
+> > X86_FEATURE_xxx so that it can be used via ALTERNATIVE_2 in KVM.
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/include/asm/cpufeatures.h   |  1 +
+> >  arch/x86/include/asm/nospec-branch.h |  2 --
+> >  arch/x86/kernel/cpu/bugs.c           | 11 +----------
+> >  arch/x86/kvm/mmu/spte.c              |  2 +-
+> >  arch/x86/kvm/vmx/vmx.c               |  4 ++--
+> >  5 files changed, 5 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> > index 7129eb44adad..d1d7b5ec6425 100644
+> > --- a/arch/x86/include/asm/cpufeatures.h
+> > +++ b/arch/x86/include/asm/cpufeatures.h
+> > @@ -501,6 +501,7 @@
+> >  #define X86_FEATURE_ABMC		(21*32+15) /* Assignable Bandwidth Monitoring Counters */
+> >  #define X86_FEATURE_MSR_IMM		(21*32+16) /* MSR immediate form instructions */
+> >  #define X86_FEATURE_X2AVIC_EXT		(21*32+17) /* AMD SVM x2AVIC support for 4k vCPUs */
+> > +#define X86_FEATURE_CLEAR_CPU_BUF_MMIO	(21*32+18) /* Clear CPU buffers using VERW before VMRUN, iff the vCPU can access host MMIO*/
+> 
+> Some bikeshedding from my side too:
+> s/iff/if/
 
-Alex and Jason, should this go in the top-level VFIO directory? And
-then have all the preservation logic go through vfio_device_ops? That
-would make Live Update support for VFIO cdev files extensible to other
-drivers in the future.
+Heh, that's actually intentional.  "iff" is shorthand for "if and only if".  But
+this isn't the first time my use of "iff" has confused people, so I've no objection
+to switching to "if".
 
