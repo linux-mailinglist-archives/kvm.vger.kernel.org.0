@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-61678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61679-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E59D1C24C8E
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 12:31:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3787DC24CF7
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 12:38:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C40504EC2AA
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 11:31:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F192D460E7B
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 11:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5366D3469EC;
-	Fri, 31 Oct 2025 11:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 245DB346A1A;
+	Fri, 31 Oct 2025 11:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O56zN/Rr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t9EEJv51"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB8133F8CD
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 11:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF6D335BB4
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 11:37:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761910258; cv=none; b=pxL8jByjh94IhiYIcRVfC9Ut4R7EtIDx9WpLtJRZ7f1I32J6eBF/vRy7NNo5vydhevMRn08VS81QHXnUD46xoPFIQOQrh7iY0eIKWTtyghXY5uLKuN5+nVU69B5V3R+RxRT9yoLCFZJnCMX1+ezlrSx956gvAXPbY+jkbhN5MRA=
+	t=1761910633; cv=none; b=qmKNYWCu+uTAcFboN0vlMm98cSEJFyce8eJVZ4u/3aDhvPtTf7a2czawFXaFlDCkfg1itFMYbuY6UbWFnwNEgP8i1pRQ9tgcghhwbjak8WIVQsZ1bjKoIPwd6Dcy4Q8Xz1+5bSfga+C8ij0D/RY/KIfpPNSyeYpdo35yvN8s2QI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761910258; c=relaxed/simple;
-	bh=xb3z6RRv9FWBgbpoNB+f0HdOZ7ja5DXI4nWbdCPpE58=;
+	s=arc-20240116; t=1761910633; c=relaxed/simple;
+	bh=b9hOx9bbMTHGqCo+KZl35DUQeFrmASN/Vli882wjP+Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ERAuwIVkNiL5jzEbVFX/lt/oxE0gj+azQiGCxTE8Nb2leazE2eJvs7jMUosqXtb5nPynU76qN/dU4GV/XPiTU1+HbH/voGmuG0Z4LWxX97YF5OChDFzOsmypL18BoLMHQNHVGQONUSJFTWkhr0tX+dFLrm6wL2lDc2mpe6tyFto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O56zN/Rr; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=op3kP+rg88cK7SutoonNqS6uZnA1qlY/xnH+6CkaiLvDMU+7ay8UJ33VdKLHCRlMq4O6iBBLux7ZpWhOV/El9MSOrP+MJwSejzcnLqH7vTGlHLGAtlxxgAauz6ud49LxjozWDhwx0ZPL0+QLF9pAcHOdsaBXh38IjOauTX84f9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t9EEJv51; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-429bc93d3edso871706f8f.0
-        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 04:30:56 -0700 (PDT)
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4711899ab0aso21264755e9.2
+        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 04:37:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761910255; x=1762515055; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761910629; x=1762515429; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f5LhUGa1olQ3GKY/+89Hs0L3mppFiQpo0PHzSoy/D1E=;
-        b=O56zN/RrFQWbNCswqdl5WyNgUtp5F1+s379ohxy8R/H3q809kGRuH4Odd72qIfIaPb
-         IaIifsjToig37mI6syZAoPgag81dihlMNod644lxpB7OST92lkExroM9XxXMXzj1hbBI
-         /KbE4LHR2/KTFYP8YTjt5ayNj1s3fJ+EBM/vEJtI5aJpnMKwR+gdQThiu/wT/L+SU7uj
-         N7Nm7EuT/td25i87+4e/1ihWjak2eprN/Xq1WohoXr+w1Zq96xZaMgg2+n4PBQfgbR9O
-         GTvp+lEVa4V4bBWw1z4QkOumeRM0EelNWOILER+ApTq+owi7z3rqcGFXKpMUyCnZOYY1
-         bcaQ==
+        bh=eSeAaB+reCzUqLEz535KqqYFPha39z1XYyNrGH461U8=;
+        b=t9EEJv51xv7+iOFxSCE0XfYHQlSdVPnQgJr2rVj7Pd/f8wFNPExiR5GswBIOAOfZ9F
+         SAKQ9DgqCKqb1/6Z81qZZcuhm+QIrjmComZFR9grBnNeyz53dvX03we1uij2+aNOSX/U
+         JNFacc+vT6KFpbAV0YKuBBemvBW2Uf5xaS4QPpITNEuIaFWBWXWR4fqTDWG5k7oeSTVH
+         RLfxMFU38WZbx6Kgo/tRA2N7OxzSUl+/GbwEZkjJeSaeEJKK/qAb6sHWL5LSjyGJKotN
+         RbVN7VEFC2aPkJTVuE3Buk0g2knM41MzXrqv3+S9ZNRVpxDh1GC/LD8GGzTPDqeiiANu
+         shdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761910255; x=1762515055;
+        d=1e100.net; s=20230601; t=1761910629; x=1762515429;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f5LhUGa1olQ3GKY/+89Hs0L3mppFiQpo0PHzSoy/D1E=;
-        b=qWKW+UqT6AH/ntC1wXTcPJF6yx02//3CQiTMuGZaGRnDKyU2gvb7+jL+sXafSkzPS1
-         6+wAOGCHhkvJiVpSYVmD6DRYEq4J4fej3IJHxQGor1IkE4LnnAsgPZs2txyDxsxQlIqQ
-         pi+Q5Etj4rgiCXePTxAY1z3wK/vme5WnMB98Vd6hPTP4K4OkNScBTJkoJgEGDoowv3E4
-         4eUNniX3Sm/VzEeJLGwD7Tdz4zkCqFfbeO4NdZRHUQMEsuihta8LWcnx8oqySp7Td5sx
-         LjZ2PPRX6lNEFdSyParXmHDOROG9Cb6zO1uaRnlOW5D9I5CVvsP4QJvQphYug4ZUahj2
-         gsmA==
-X-Gm-Message-State: AOJu0YwVNutJKklY982X/S8SBPCIkIwbYlBB/6AghmP2R++bOZdhSmTC
-	xt2Me+R95PFIJfUWHoOpOVQq3PE9Rl1W4SzrE+pgrTyoB/ITMnhSsJYq6Go7GrlVirFYTX7dxoB
-	Ie8wQGAZ8DrnSnQ==
-X-Google-Smtp-Source: AGHT+IGsaBJIkQ/y8I03wvIhCvj64lg46pEHivGFWKZTeovvbi13vTifrl6UEKclPzTqf3k83Nt11P3xJ27+8A==
-X-Received: from wmvz2.prod.google.com ([2002:a05:600d:6282:b0:477:d21:4a92])
+        bh=eSeAaB+reCzUqLEz535KqqYFPha39z1XYyNrGH461U8=;
+        b=l60HSpwkq8Pb99QFVK9NVE/22hr62C2V62mzDWuxMETKIVbiDNaIFqA6v/FaC5Ywsp
+         4A2W54yC8g6LShl7+R9XuikaU7X4HcBVGAeVEZ1ZEIBy5B5rcbiJu+I/3lxP/mL38bE1
+         6ZJMm+G6Yi1Jq6qdMzYPmtDceI8LUN49ZpHnTBzgVgqngD6WKW/GvZdqyV0QrMMSWgsP
+         H4bjO50s6FA84KetRrvyVCL8rnTtk9w9n2RCEtc4gnq0XOQyEjng6gw/2+hNLSahJumw
+         KI6prt4REiDAlKQVSunfL+OC7XvgjWdqtcxzVekxtBa2wXFCgURqtidRGW0qjsv1rDyt
+         jPGA==
+X-Gm-Message-State: AOJu0YzhbcZDdNiRLtPWo0WQ32pK39TPZsjSX49zZTplEhvHwRWHbHXf
+	80NCLDZz7JFgVReQGdGP5SukTVV/haBzR/kpqayzd1qeNKYQl65mzkVysHTyJvaRCOtqLSHRFTN
+	Fnd2lxZk2OpX9xw==
+X-Google-Smtp-Source: AGHT+IH3q2msESLIXku56gOgSX7w7vxpimVKvAA5rKp0lFFIMd4G+rmyMp8FMWkYqa0L9DddFTF2IxRw3vicJw==
+X-Received: from wmaw2.prod.google.com ([2002:a05:600c:6d42:b0:475:e0a3:4679])
  (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:41d2:b0:429:b21e:49b2 with SMTP id ffacd0b85a97d-429bd6ac0a0mr2563121f8f.51.1761910255127;
- Fri, 31 Oct 2025 04:30:55 -0700 (PDT)
-Date: Fri, 31 Oct 2025 11:30:54 +0000
-In-Reply-To: <20251031003040.3491385-2-seanjc@google.com>
+ 2002:a05:600c:468e:b0:458:a7fa:211d with SMTP id 5b1f17b1804b1-477308b2222mr29693175e9.29.1761910629010;
+ Fri, 31 Oct 2025 04:37:09 -0700 (PDT)
+Date: Fri, 31 Oct 2025 11:37:08 +0000
+In-Reply-To: <20251031003040.3491385-3-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251031003040.3491385-1-seanjc@google.com> <20251031003040.3491385-2-seanjc@google.com>
+References: <20251031003040.3491385-1-seanjc@google.com> <20251031003040.3491385-3-seanjc@google.com>
 X-Mailer: aerc 0.21.0
-Message-ID: <DDWH24WOQG3F.1VS7MT0SKPWIL@google.com>
-Subject: Re: [PATCH v4 1/8] x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
+Message-ID: <DDWH6WN6G64S.22FTEH7M615YJ@google.com>
+Subject: Re: [PATCH v4 2/8] x86/bugs: Decouple ALTERNATIVE usage from VERW
+ macro definition
 From: Brendan Jackman <jackmanb@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
@@ -83,34 +84,63 @@ Cc: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Brendan Jackman <jackmanb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Rewording my comments from:
-https://lore.kernel.org/all/20251029-verw-vm-v1-1-babf9b961519@linux.intel.com/
-
 On Fri Oct 31, 2025 at 12:30 AM UTC, Sean Christopherson wrote:
-> From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> Decouple the use of ALTERNATIVE from the encoding of VERW to clear CPU
+> buffers so that KVM can use ALTERNATIVE_2 to handle "always clear buffers"
+> and "clear if guest can access host MMIO" in a single statement.
 >
-> TSA mitigation:
+> No functional change intended.
 >
->   d8010d4ba43e ("x86/bugs: Add a Transient Scheduler Attacks mitigation")
->
-> introduced VM_CLEAR_CPU_BUFFERS for guests on AMD CPUs. Currently on Intel
-> CLEAR_CPU_BUFFERS is being used for guests which has a much broader scope
-> (kernel->user also).
->
-> Make mitigations on Intel consistent with TSA. This would help handling the
-> guest-only mitigations better in future.
->
-> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> [sean: make CLEAR_CPU_BUF_VM mutually exclusive with the MMIO mitigation]
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/nospec-branch.h | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+> index 08ed5a2e46a5..923ae21cbef1 100644
+> --- a/arch/x86/include/asm/nospec-branch.h
+> +++ b/arch/x86/include/asm/nospec-branch.h
+> @@ -308,24 +308,23 @@
+>   * CFLAGS.ZF.
+>   * Note: Only the memory operand variant of VERW clears the CPU buffers.
+>   */
+> -.macro __CLEAR_CPU_BUFFERS feature
+>  #ifdef CONFIG_X86_64
+> -	ALTERNATIVE "", "verw x86_verw_sel(%rip)", \feature
+> +#define CLEAR_CPU_BUFFERS_SEQ	verw x86_verw_sel(%rip)
+>  #else
+> -	/*
+> -	 * In 32bit mode, the memory operand must be a %cs reference. The data
+> -	 * segments may not be usable (vm86 mode), and the stack segment may not
+> -	 * be flat (ESPFIX32).
+> -	 */
+> -	ALTERNATIVE "", "verw %cs:x86_verw_sel", \feature
+> +/*
+> + * In 32bit mode, the memory operand must be a %cs reference. The data segments
+> + * may not be usable (vm86 mode), and the stack segment may not be flat (ESPFIX32).
+> + */
+> +#define CLEAR_CPU_BUFFERS_SEQ	verw %cs:x86_verw_sel
+>  #endif
+> -.endm
+> +
+> +#define __CLEAR_CPU_BUFFERS	__stringify(CLEAR_CPU_BUFFERS_SEQ)
 
-I think this is a clear improvement. Now that X86_FEATURE_CLEAR_CPU_BUF
-has a clear scope, can we also update the comment on its definition in
-cpufeatures.h? I.e. say that it's specifically about exit to user.
+Maybe CLEAR_CPU_BUFFERS_SEQ should just be defined as a string in the
+first place? But meh, that's a very bikeshed comment. I can see the
+aeshetic appeal of the separate __stringify().
 
-This also seems like a good moment to update the comment on
-verw_clear_cpu_buf_mitigation_selected to mention the _VM flag too.
+Reviewed-by: Brendan Jackman <jackmanb@google.com>
 
-Also, where we set vmx->disable_fb_clear in vmx_update_fb_clear_dis(),
-it still refers to X86_FEATURE_CLEAR_CPU_BUF, is that wrong?
+>  
+>  #define CLEAR_CPU_BUFFERS \
+> -	__CLEAR_CPU_BUFFERS X86_FEATURE_CLEAR_CPU_BUF
+> +	ALTERNATIVE "", __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF
+>  
+>  #define VM_CLEAR_CPU_BUFFERS \
+> -	__CLEAR_CPU_BUFFERS X86_FEATURE_CLEAR_CPU_BUF_VM
+> +	ALTERNATIVE "", __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF_VM
+>  
+>  #ifdef CONFIG_X86_64
+>  .macro CLEAR_BRANCH_HISTORY
+
 
