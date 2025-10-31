@@ -1,222 +1,232 @@
-Return-Path: <kvm+bounces-61672-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61673-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA280C245ED
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 11:11:53 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BD56C24796
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 11:34:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 60EE934FE0D
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 10:11:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4D06D4F07A3
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 10:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3FD233A010;
-	Fri, 31 Oct 2025 10:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB697338939;
+	Fri, 31 Oct 2025 10:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W/WqGz6D"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eNtyhP8T"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5580334C34;
-	Fri, 31 Oct 2025 10:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761905462; cv=fail; b=EQcRoAEpr2XBgM2+xKJhAQ9+qNXwPFcDe8FygcXkKJTxGy/IQYSmw3GfOnLVZhLd936Xz5fqJJQBr6CeikMg5M+Yh4smMal7x3yz6Ex+o68tyl9x4FY4MPcRSfUBPkD9CdOrEo0DiLgQM6EPEbD2XMG4CJMpV1IkM3FYBOzdqZQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761905462; c=relaxed/simple;
-	bh=U+GcdRleVC6OlI1xJRSw+riyzcyblhZqDvSmu+dOcxk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Pa/Ee99yWhTvtfN0OFqAXEb+cHsv59arjRlcdHzswPj8qIKXrz7Htce8Ieqwl2qOq366dl3gPOP0nolfh4I72z9bXluG22YHBY/dnG3Y2zNJuf0k4WgFvTkvrsElss0mjzr3yFjdsndDAW3EHkePx1Uvjqa5N/unVtkygqVRoKw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W/WqGz6D; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761905459; x=1793441459;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=U+GcdRleVC6OlI1xJRSw+riyzcyblhZqDvSmu+dOcxk=;
-  b=W/WqGz6DwX2x+80Wyq7s/li3qKSJNO/qr8UNnrr+VnEnTGmWHWGNOXLb
-   rPMydWT4UqKGLSOmvCDHTD8R4gDQqbATotG27RA2AmJKEJbuLWHgCvvPl
-   hk9kFjqhOKxgk3KvLA2PE7S4MF3h4WVdhbZtzhkuD6y83JxSnXLW3q5NM
-   sPNBHV2/lhUHYhN/awRaDShFCmk8XydkN7JfQ3svodeSdU8w2+fK2TyRK
-   G8/LLxaSc1QCqUXibjKXuoelzTIoFhQvTe2CYGCkx2JBW4W90R94yP2dI
-   tyXTtsNuWwdVCGUnOJsruVGqjfTsEsskImlFIP642v976BHaLBaBuspmA
-   Q==;
-X-CSE-ConnectionGUID: V2iGnt3ASS2TrIiVRn8cAw==
-X-CSE-MsgGUID: Y12UmTp3TxmdzDBM97UEJw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11598"; a="66677906"
-X-IronPort-AV: E=Sophos;i="6.19,269,1754982000"; 
-   d="scan'208";a="66677906"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 03:10:56 -0700
-X-CSE-ConnectionGUID: bcQDCE9WTzyj1enqgzudCQ==
-X-CSE-MsgGUID: riUPWyieRo6MsQSMuZ7KUw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,269,1754982000"; 
-   d="scan'208";a="191348641"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 03:10:55 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 31 Oct 2025 03:10:55 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Fri, 31 Oct 2025 03:10:55 -0700
-Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.69) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 31 Oct 2025 03:10:55 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fpO3L1cVbRg1H8UyzZIDkB8LXPuc+3KC818ryS5TvQnEpKa3hSNzVtnWkpxOgAhcHoNBEHv8sANvuynn2v1wVbjasPcaHu1liQ1Vy+CeHB5DKe+HRHOHEVcC82KRHqcQlpZGLnomqvvzvhUDKWhByDUVMGxOE3xmwGBTsBZ6Z+X2HY3Qaws9W0YuGrAKqTCaR3JvTfAJeKDM43UkFnTXANzvsnWZ/abRHiPkzwtW3LxqnFYio5JAdGQXFZT+PAVtiS/+N+HHe7DdT6OJgeMsokEZXKZB90Jin6SOmMxLghTRXmxg+reknZchdiy+fQugVkzmusrEgL1BAUYhbP3btA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U+GcdRleVC6OlI1xJRSw+riyzcyblhZqDvSmu+dOcxk=;
- b=d2OdUhGYlN+1G0quyMyg7OOgr+2NdgB/G2YH/QnJ33vWHbYvzGTYuasEXL9D6SrU03Da+HowcLj53AqKp6E1b+pIyXt8hajadBKUxGC3i7xuMl/irL05wUcKMbFibj2TZCFI5zBoTq5bneadbuScj7D4zK3pzwk6sXRNsInuswxxMybICmegHkJHd5zawY0YO0ghLNwBYylk+aC6PrI3howytsgNfSoJjSL9ctIAeBr3lGH7LtxKXBEgrXnGKyMsh+chOW+VTynlGhpgB7Ot/2ARYDmRCaGUPcF7RtxT2lauallh7n5PgWJc6WNXFcwQPpB5bHhf0D/WCqoe9VXlOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com (2603:10b6:208:31f::10)
- by IA3PR11MB9158.namprd11.prod.outlook.com (2603:10b6:208:57d::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Fri, 31 Oct
- 2025 10:10:53 +0000
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66]) by BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66%6]) with mapi id 15.20.9275.013; Fri, 31 Oct 2025
- 10:10:53 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com"
-	<seanjc@google.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: x86: Add a helper to dedup reporting of unhandled
- VM-Exits
-Thread-Topic: [PATCH] KVM: x86: Add a helper to dedup reporting of unhandled
- VM-Exits
-Thread-Index: AQHcSc4QHrBk6H+LAEizHpjRKKRKp7TcCacA
-Date: Fri, 31 Oct 2025 10:10:53 +0000
-Message-ID: <79757e164fce19095bef0ce84071ebc25f3e855d.camel@intel.com>
-References: <20251030185004.3372256-1-seanjc@google.com>
-In-Reply-To: <20251030185004.3372256-1-seanjc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.56.2 (3.56.2-2.fc42) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5525:EE_|IA3PR11MB9158:EE_
-x-ms-office365-filtering-correlation-id: 99ecaf49-68fb-4d8a-a426-08de1865c671
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700021;
-x-microsoft-antispam-message-info: =?utf-8?B?TzR5c3hkYTVnR2pYK2lvdnhEeFp6WHVDaVRiM0NlYk4xUzBidmp6OGV6bkcx?=
- =?utf-8?B?em5lbWNpdlFWdkVhWkRPa3VnOU1NbjkzRnFMd1loRFJGVXdCNmNuVzJIVG5n?=
- =?utf-8?B?ekMyYjJsd1NaZTJ4eEpMU2hPM01nMzNhRGdCSk52T3UzblloMS8zQllPNlQ4?=
- =?utf-8?B?OGh2dmJTcFJ6MWNoamJkWjVZR3BWcGcvTXJhWVJERDZ2ZGZOaTFsZmQ3bC80?=
- =?utf-8?B?SlhWUGdwMm8vRmR3dG1lOXYyNFBQbGx6cHV6dGNReWpIV2lSS3ZURDRPaEFR?=
- =?utf-8?B?M2dDL0lncVQzU0ZkRjNQSkJFanVLRk5tdUlqUXQyR0hjdFEzWS8zOFloaFdt?=
- =?utf-8?B?SDhNcVphc3d2VGdXaS9ubjZSeVEwY2NhcnFtV25ZM2h0b0R0NGlXUEdCR2E4?=
- =?utf-8?B?NnQ5dldVaHl5Wlp3Z3ZLT0M2enp4RUF0emJwcFpkMUhQbTFxeXFGQWRxZkJX?=
- =?utf-8?B?cy9lOHdLL0J5L3E4cnNpbFZ6dUd6bzVJdjdUTXV4T3p2MENVSGdLT0JlS1hE?=
- =?utf-8?B?bUNhdHkyN29sRGdJTVRRMC9IMHQ4bmFKZVpzMCsyclR0V3RBMGFCN3NESjdZ?=
- =?utf-8?B?Y1cvMHpVMDVKejF0eWtZVS81RWZqeEp1MG9ZYTNYSVYrYURxdkFvbS8rdmNW?=
- =?utf-8?B?RVJ1Q1JOS0luUnV0dFAzU1I0SzdMcitGZWdGeDEwd1VDdnJ5Zm9BS0VuemIz?=
- =?utf-8?B?NVBENjlLenZDTHRnNTVleEdyTTAvTVZLMjZyUkZPVGk5VGJucWJEVDRqaGNi?=
- =?utf-8?B?NHdydDV0c2NYUE1jKzJ4MjZPak1wM2MwZXlRdXM3Q0FnWTFhQTg2OFpJZzd1?=
- =?utf-8?B?RFVJOVV5QVFYcHRNd1FKbXpHUzBOa0dzZ0FjdUgrUkdKMGM1Y1p6SWFmRU5I?=
- =?utf-8?B?ZUtBaVE1ZmptSzMvTEpZNkcveDNlc0dZTjhuSC8rZy9aMTJ6YU1qZWpWeGQ1?=
- =?utf-8?B?VjhmMnM3aUpqdjc0aXNWQ1p1TGdUM0Qvb2tPd253T2hXdG9RT1oraWpldk5Z?=
- =?utf-8?B?alprLzk3OTFaNGswNWNaL0lLb1JaS2JqV0pBbks5K1BhU1ltaHJlNnFQWTRm?=
- =?utf-8?B?SjJXdTNlTWtVYUFoN1FWa0NCRkpUUUJpM0VTOERsNEY4VTJTZ3JVYkUvTnc5?=
- =?utf-8?B?YTNPSnJrRGlGSVZra2pyeFVMWERHNWxUYmF4dnE0dUcyaWhmeTBXY21YRkFP?=
- =?utf-8?B?RjBhN0wyMmV3R1M2aFBjT2oxUVFVcUlKeXk3eU81NVI4VWpEWlJrWjZNN2Nh?=
- =?utf-8?B?WXMwVXpVWUhlQU5aKzBORWtoZEFVVHkrMllMYmlGeVA5eVZGQVJBUXE1bmVD?=
- =?utf-8?B?QzNSS3RIS2dqK1pBUkxUNytuYUVsdTZBR1pJWllsT2tkU2JjaCtlSzhqWmdh?=
- =?utf-8?B?alpoYTlGNytGd0dLZzg0bTlNVFhTUUFIdktJRlZNZTN6VTlnQXpOdjlIRXJO?=
- =?utf-8?B?Qms3SEw2SGdXckt4SHNXQXR1UzZlU285S3hYUVh5TkpkMkpjNVE4M3hVbWFJ?=
- =?utf-8?B?d2FHMmREdnJxOTdBNTk5SlRjMEQvdzlTNjd4eTJ4UEpFSk8yWitsMUFXdVZq?=
- =?utf-8?B?T1lTR2lhLzl4eTRoS21HWTB4OTVYdGZCYWpsRHp6QlIzUit5MWVZOTdhYlg2?=
- =?utf-8?B?MU5sWmNEK2MvL2sreVVFTmM4ZHY4YWpmT1pnTVFZVFhLcWU5MDR6VVdKbmVu?=
- =?utf-8?B?cERoYXY5VFU4NjZEc3JCSEVCUDhrT2RrZG1rSFNVa05Vd3ptc2hyU3hsSXdJ?=
- =?utf-8?B?QzRqY3V5MXVKRSt3dksxMWpvR2xNVkdvRkFQaVNCYVZxQWpJTEs0OHQrZFpH?=
- =?utf-8?B?MnZGRFVoaS9pYzQ3MjJTUkxEV1NLQ2c3UC9hdlJPbCtmMUVCZkFGaFBzNzlL?=
- =?utf-8?B?TVl0blU2YVVvMUh1bUNaU2dRNlp1dm1Xc3ZTVXNqbm41elFONlo0UGhWOXZw?=
- =?utf-8?B?YkJJY2Q4bjNvUU1vUHAwQlRkcW1NQVdnQjZ6YVE0VDhHc3JONm5kZ1Z5bDhY?=
- =?utf-8?B?Y3krcHF5NDUrY0tVeGhueXErUEZWOTBXcFFUVnZ6SFY4Yi9mL1o4WjFkSjNz?=
- =?utf-8?Q?Zk1axN?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5525.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Snl4Mm0zWnJZTXZiNzJaaVVSeFE5bTBMWnlleURnWGlnTnZhNW02amlYZHdE?=
- =?utf-8?B?bUxoSmxJU0VsMElUWWlYbFlCc0w2QVl6VUpKdW9qUWtIc2FHODUvSERzQWdv?=
- =?utf-8?B?TU1laWVZYUM5WFllR0pkZWtrSWJyN1VURkljNE5ocUduSHZJZ1NMM1NxRnhS?=
- =?utf-8?B?akRBTWdGeVZsUFhhMndkVmc0cTQ4N1ZXeDAzRm83MWk2T0U2NUhtN0h2YnRV?=
- =?utf-8?B?QmpOaXNndkl4QXBJUG9vR0JIaWpNdlZSTExBV3kzRm85MVo2cmdNRlhiNFFY?=
- =?utf-8?B?eVdkcXdyUExUN2dwTGdENlJmM2c0djBVUlNGa0RuamNJK1FUNEVWU2JkK3FY?=
- =?utf-8?B?Yzc2a1lhR0MzM0xCeUpxb1VGVUZmYnZHT29aMi9tN1I4WFp3VmZ3TU00TllV?=
- =?utf-8?B?MTBKWGhyQmNKb044YlVzLzR2YXVRYnpLLzIrRFFwSENPSWNWRUtEdjBrQnM2?=
- =?utf-8?B?Y05GWXRHQXJDLytMalVybjErZTViRVdScFBSWm1BR1R6L0JBVU5zTUM3QUZC?=
- =?utf-8?B?NEVjNlBPWlp4RGxpalNCdWd4b3NhbXFWbEdRVzE2cTd2ZENlVEpJK0thZW51?=
- =?utf-8?B?Y3UwNlBnZ1B0aEVSUnUwaDBDRitVVFBxdTB0OWV4MDNIdFA2U1JlNUV3Q2Q3?=
- =?utf-8?B?WERqSTdNeFZISkVLMjlDNTdXRTBrNEt6RkRtMHRnbS9KeFdZb1dGQU1SdDNw?=
- =?utf-8?B?enQyWlV4TXYwT0RnenpZbFZMSi9XMTF4akN3cE5vTUh6ZXJVSzNwU3NMRklK?=
- =?utf-8?B?ay9zRmJBMzl6c3BhZHpzNUVRUnpFc2ZJclExV2lGVCtXeFMrY0djT1l5MEFv?=
- =?utf-8?B?UWVVU3ZFckM5ZjZLUmQweG1RS3l0a0ZGRHJtSyt0R0t0bjZvRVR5d2pjTUY4?=
- =?utf-8?B?RDMveW91SzdqQTlGTWZHLzA4T1YrWElJWUErTW1TZUlKTVNDbEhhYkxWWHB0?=
- =?utf-8?B?c29qcGdKSHVSS2tFbS91OGhPNG9EbGRYanJHNnZZK1U0QnY2cTRRdUg0VDJn?=
- =?utf-8?B?UldhaTdSSmg3UzBPdW82STVkWUQ4QXo4YUFNa1lNaVVnVFlXdDh3N09oelhx?=
- =?utf-8?B?SnpNalkvMU9LNTE2TGlmMFdqT05RS05kbnVyZVMvNEcyU0NOM0RpOXd2T1lq?=
- =?utf-8?B?cWkrQ3ZBaDZxaHA4VlJjQ2toMmdrRzBOR3JtU2crTVJBc3UwT3RyRkM5WXEr?=
- =?utf-8?B?eE5GNGR2MHRhNTQ5Q2pqeFVQRHE2QjRaUGwzdEVZWHkyLyt4UDFXbHdRN1dB?=
- =?utf-8?B?dGtyS0pET0RRTEkxTS9reFdybVlRYUYrbUZuR0poNm9EUVN4WmVCWURGVzE1?=
- =?utf-8?B?Zk9GUHVNRlRDeElYQ3Z6QTZsZy81WEQ3MUZXVUJuUTA4TEJoUEZhNnZrUXhD?=
- =?utf-8?B?Vi9ISzd5SW5YYUFkNWUwaUQ2RHZNSzRiOWxuTGNGMHZ5T0RIaXBycnNMZDhY?=
- =?utf-8?B?R2ticlFMaU05a1dpcDNpZStENjNxNmRCVy9TYXhodWxxeG83WitobjRxQWxv?=
- =?utf-8?B?aVlEaDQ5aVR4a29RU21LUktpdStXdUgyaDFsSHE1S2ViZmFjRVNmNVNaV0lG?=
- =?utf-8?B?YXVnSGZFV2h3YVUwbWdNM3Z3cjM1eVRFOGloM2FTOWhoc2p5SWlyZFZ2M0lG?=
- =?utf-8?B?dmpqRnJrU2RwTUJsMGhLSE13OThwbExlSCtGczRwSkpJdGZWMnBJZ2NRdWRk?=
- =?utf-8?B?SnZHeCtsc2oycXV3ZUd0R1B4NU0xQ2RLc3pZcVNEV0hRS0piKzVpTWRhT0FG?=
- =?utf-8?B?QkUyWVA4MmFsbGRBWTFqMGxBbFJoVDVReUx3MC8wZHNPY1hES1BHU0YxY1hm?=
- =?utf-8?B?RzhYekVYc0NZTitnTDRXRlh3cExtZEpuMk42NW90N0N4YnBtalIwY3NORm16?=
- =?utf-8?B?Z05YR0NONWtpN3VEM01UVUN2bnZDYXNnWUJZbkpnSEcrQkNkQXFDOGl3VFNt?=
- =?utf-8?B?NC9EbkptWit1OG05OWlNcGZQdS83aXJBWmo0TUtzRDB1K1k4MXNyU1czU2Ni?=
- =?utf-8?B?dTZKZXhDSi9WVXJ2ZXI2VGRSOUkvdTlraFRoTDdnaXlkZ0ZhOFlqNnpZbkgr?=
- =?utf-8?B?ZSsyeVFLYWY4d0g4WUozYWlTMzYwK0xUNENUVUU5bThGWDVxOS9kc2lEVGlk?=
- =?utf-8?B?ZzRLZjBqY3U0T3dhOFd3WnBIVjh5VDFaQURyNnR5VXJpWkIwbXA3eERGMGdm?=
- =?utf-8?B?TGc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <68FC77D5A14BA749BB6D330F1922FDD4@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED359339716
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 10:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761906834; cv=none; b=QJPtHWHnMtyodjaxykkKmAhOICGED5rZnA947vxdjinPcbvBda4lDDs8+ddY0uwO2X7Z9hYZ6KkK/XQwcypwxVvxJjs1Em9iaiExzWMxfuvdmwX7QAmN90xnXcAl6mC54JTjVV3KqIQec54APXqXOln50v70NyrZSBIqdhDUB5g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761906834; c=relaxed/simple;
+	bh=BhF30OUheZtacHIJ0cUqitMTog8Nlut6DmKOcQxVGgU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=al4mxNEfBJ4Du6lZllmMfDoNoWhNXE2ojE//SNhkFnFYa9kLnLQaf8f12DYSszdEj+cdM5TajFuA2zM8Q72no0XvjcUDGHhg7OBAmksjksbYezWqOvW4jevTyg4DHY7E4AqKn5iP2+OtT6C4Sg2PRbirgo7+hsArF3FyxibI4qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eNtyhP8T; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761906831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n/jGLV9GwwmWLPtAFMtsGUdWiI6XWtoKi7BhNW1nFXU=;
+	b=eNtyhP8T049fW5usrsNF1tPnnJbC+den9Vgve+1y9cNAyPbJ5ZvFJhLSUsPI7aWqrStEFJ
+	AluUFrvw7wttIxIOaFeyCMXerE446GzV1uL+hf7VGQazN4Rpmoqk6UMioG52/Upyw/3t4c
+	lu+txWBUY1U3WEGtGLgI43DIMUjX84k=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-66-CBRrpUljNF2YKfX3uwCS9A-1; Fri, 31 Oct 2025 06:33:50 -0400
+X-MC-Unique: CBRrpUljNF2YKfX3uwCS9A-1
+X-Mimecast-MFC-AGG-ID: CBRrpUljNF2YKfX3uwCS9A_1761906829
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-471168953bdso15754355e9.1
+        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 03:33:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761906829; x=1762511629;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=n/jGLV9GwwmWLPtAFMtsGUdWiI6XWtoKi7BhNW1nFXU=;
+        b=JQrSQ0fNCF7+gP+o7enRliwgZsdY2ALcWulMzpnsj72YxJ6zzxsrfOz0VyvErbfZpj
+         HuKxe6ydP5YYDWmgp/977ehdJgiQYPqAgMyoKmSDcakKDFEridVHtXLL9YhvmGarZf8r
+         /Ksdxe4sXW7tOZGgqkUyPNMUToazS1x18chhssSvc2tAVsjwkHrie8b8VI1Iw4Cb4tEf
+         ZwYw3YC240WvW7U1uwBOXtU23GXg3jXt8sHVu+pU08HBEBGBG7dJYGP/OlAmjxgONHSY
+         f+KvNxtL8SkgQ8V6YWj6sQm3euibFkiVpcDd5WB1lQOgZ7rhWeyp6LLRHY/GJZZdc/Wc
+         euag==
+X-Forwarded-Encrypted: i=1; AJvYcCWlQoOUXwwuq1zzS0LZkvHdZNFQM+X+YYUTNh96aL6j6h6lMzuB7NyP5zmzrIULRlVr9CY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmHFzrkTdHNUff8tWEC3uFY52hNjL5uek2HC0/pbZVDpCJtRKu
+	VSMpTY3gM96IzJyejnvnnZLLnU/bGwfbzrJfto9+LHqSjXbTBVp+rq48mFsFtBQF4/DrjWjCorg
+	/JAob3PWp0uNaxzdnqQJGCQQOw1VQUXmSUIezUT6JyWf27Bahybrs2w==
+X-Gm-Gg: ASbGncvR2Hp+UowpLiPUFvtrRMwnzRqO8XIbaAw+vvFaP2QJVGT9LSB1/Ox26OLu2NI
+	DfnHVKA8FJ0gAta5tLkOtpcI2RErkdkIQ6LU2KOkLzOhgT4AXBFIDuwIjEcCe0txhAFltEapbIX
+	JmrmgLCKLWCCpvOl6debOiKbUBI8W0cpLTtfGTuJuGhWdLr5UnwG28y2rCIXcE9ZEJd5Jla88tm
+	xHLV9RIGIizxi8l5XSpSfh20WfPi4znvlQdNX0cA9Vwy2MLnw9Ro8Mn/TNXM7uKxQelSLcjOe/e
+	mv1+szuJd9liZInk/8C06SsnXDaF0hKffALPjnSxd26dE4giqzmN/iPGK/zfDWxQWdGjbQjsAkU
+	RDQbpdr7ptRY=
+X-Received: by 2002:a05:600c:6207:b0:477:bf1:8c82 with SMTP id 5b1f17b1804b1-4773012927cmr30121145e9.15.1761906829108;
+        Fri, 31 Oct 2025 03:33:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHWCHcilNykTSLc62QxcCapaqI02WJ4rPlCIQNLJ1JMRw/+H68d09txCoHrM7hGWJDTD94b9Q==
+X-Received: by 2002:a05:600c:6207:b0:477:bf1:8c82 with SMTP id 5b1f17b1804b1-4773012927cmr30120385e9.15.1761906828559;
+        Fri, 31 Oct 2025 03:33:48 -0700 (PDT)
+Received: from imammedo-mac ([185.140.112.229])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429c114b93esm2889676f8f.19.2025.10.31.03.33.46
+        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
+        Fri, 31 Oct 2025 03:33:48 -0700 (PDT)
+Date: Fri, 31 Oct 2025 11:33:44 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ kvm@vger.kernel.org, Sergio Lopez <slp@redhat.com>, Gerd Hoffmann
+ <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laurent
+ Vivier <lvivier@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>, Yi Liu
+ <yi.l.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo
+ Habkost <eduardo@habkost.net>, Marcel Apfelbaum
+ <marcel.apfelbaum@gmail.com>, Alistair Francis <alistair.francis@wdc.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, qemu-riscv@nongnu.org, Weiwei Li
+ <liwei1518@gmail.com>, Amit Shah <amit@kernel.org>, Zhao Liu
+ <zhao1.liu@intel.com>, Yanan Wang <wangyanan55@huawei.com>, Helge Deller
+ <deller@gmx.de>, Palmer Dabbelt <palmer@dabbelt.com>, Ani Sinha
+ <anisinha@redhat.com>, Fabiano Rosas <farosas@suse.de>, Paolo Bonzini
+ <pbonzini@redhat.com>, Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ =?UTF-8?Q?Cl=C3=A9ment?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
+ qemu-arm@nongnu.org, =?UTF-8?Q?Marc-Andr=C3=A9?= Lureau
+ <marcandre.lureau@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, Jason
+ Wang <jasowang@redhat.com>
+Subject: Re: [PATCH v4 00/27] hw/i386/pc: Remove deprecated 2.6 and 2.7 PC
+ machines
+Message-ID: <20251031113344.7cb11540@imammedo-mac>
+In-Reply-To: <20250508133550.81391-1-philmd@linaro.org>
+References: <20250508133550.81391-1-philmd@linaro.org>
+Organization: imammedo@redhat.com
+X-Mailer: Claws Mail 3.11.1-67-g0d58c6-dirty (GTK+ 2.24.21; x86_64-apple-darwin14.0.0)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5525.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99ecaf49-68fb-4d8a-a426-08de1865c671
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Oct 2025 10:10:53.2967
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: whjnqKY7+Ml3Daet5gACLWonde2KrPSO3HdcdAh6au5Otc/loHr+QWBa4oZxfn0l0wSRF5I5UJhHgyBv2TokDg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB9158
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-T24gVGh1LCAyMDI1LTEwLTMwIGF0IDExOjUwIC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBBZGQgYW5kIHVzZSBhIGhlbHBlciwga3ZtX3ByZXBhcmVfdW5leHBlY3RlZF9yZWFz
-b25fZXhpdCgpLCB0byBkZWR1cCB0aGUNCj4gY29kZSB0aGF0IGZpbGxzIHRoZSBleGl0IHJlYXNv
-biBhbmQgQ1BVIHdoZW4gS1ZNIGVuY291bnRlcnMgYSBWTS1FeGl0IHRoYXQNCj4gS1ZNIGRvZXNu
-J3Qga25vdyBob3cgdG8gaGFuZGxlLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogU2VhbiBDaHJpc3Rv
-cGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQo+IA0KDQpBY2tlZC1ieTogS2FpIEh1YW5nIDxr
-YWkuaHVhbmdAaW50ZWwuY29tPg0K
+On Thu,  8 May 2025 15:35:23 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> wrote:
+
+Are you planning to resping it?
+(if yes, I can provide you with a fixed 2/27 patch that removes all legacy =
+cpu hp leftovers)
+
+> Since v3:
+> - Addressed Thomas and Zhao review comments
+> - Rename fw_cfg_init_mem_[no]dma() helpers
+> - Remove unused CPU properties
+> - Remove {multi,linux}boot.bin
+> - Added R-b tags
+>=20
+> Since v2:
+> - Addressed Mark review comments and added his R-b tags
+>=20
+> The versioned 'pc' and 'q35' machines up to 2.12 been marked
+> as deprecated two releases ago, and are older than 6 years,
+> so according to our support policy we can remove them.
+>=20
+> This series only includes the 2.6 and 2.7 machines removal,
+> as it is a big enough number of LoC removed. Rest will
+> follow.
+>=20
+> Based-on: <20250506143905.4961-1-philmd@linaro.org>
+>=20
+> Philippe Mathieu-Daud=C3=A9 (27):
+>   hw/i386/pc: Remove deprecated pc-q35-2.6 and pc-i440fx-2.6 machines
+>   hw/i386/pc: Remove PCMachineClass::legacy_cpu_hotplug field
+>   hw/nvram/fw_cfg: Rename fw_cfg_init_mem() with '_nodma' suffix
+>   hw/mips/loongson3_virt: Prefer using fw_cfg_init_mem_nodma()
+>   hw/nvram/fw_cfg: Factor fw_cfg_init_mem_internal() out
+>   hw/nvram/fw_cfg: Rename fw_cfg_init_mem_wide() ->
+>     fw_cfg_init_mem_dma()
+>   hw/i386/x86: Remove X86MachineClass::fwcfg_dma_enabled field
+>   hw/i386/pc: Remove multiboot.bin
+>   hw/nvram/fw_cfg: Remove fw_cfg_io_properties::dma_enabled
+>   hw/i386/pc: Remove linuxboot.bin
+>   hw/i386/pc: Remove pc_compat_2_6[] array
+>   target/i386/cpu: Remove CPUX86State::enable_cpuid_0xb field
+>   target/i386/cpu: Remove CPUX86State::fill_mtrr_mask field
+>   hw/intc/apic: Remove APICCommonState::legacy_instance_id field
+>   hw/core/machine: Remove hw_compat_2_6[] array
+>   hw/virtio/virtio-mmio: Remove
+>     VirtIOMMIOProxy::format_transport_address field
+>   hw/i386/pc: Remove deprecated pc-q35-2.7 and pc-i440fx-2.7 machines
+>   hw/i386/pc: Remove pc_compat_2_7[] array
+>   target/i386/cpu: Remove CPUX86State::full_cpuid_auto_level field
+>   target/i386/cpu: Remove CPUX86State::enable_l3_cache field
+>   hw/audio/pcspk: Remove PCSpkState::migrate field
+>   hw/core/machine: Remove hw_compat_2_7[] array
+>   hw/i386/intel_iommu: Remove IntelIOMMUState::buggy_eim field
+>   hw/intc/ioapic: Remove IOAPICCommonState::version field
+>   hw/virtio/virtio-pci: Remove VirtIOPCIProxy::ignore_backend_features
+>     field
+>   hw/char/virtio-serial: Do not expose the 'emergency-write' property
+>   hw/virtio/virtio-pci: Remove VIRTIO_PCI_FLAG_PAGE_PER_VQ definition
+>=20
+>  hw/intc/ioapic_internal.h           |   3 +-
+>  include/hw/acpi/cpu_hotplug.h       |   3 -
+>  include/hw/boards.h                 |   6 -
+>  include/hw/i386/apic_internal.h     |   1 -
+>  include/hw/i386/intel_iommu.h       |   1 -
+>  include/hw/i386/pc.h                |   9 --
+>  include/hw/i386/x86.h               |   2 -
+>  include/hw/nvram/fw_cfg.h           |   9 +-
+>  include/hw/virtio/virtio-mmio.h     |   1 -
+>  include/hw/virtio/virtio-pci.h      |   2 -
+>  include/hw/virtio/virtio-serial.h   |   2 -
+>  pc-bios/optionrom/optionrom.h       |   4 -
+>  target/i386/cpu.h                   |  15 --
+>  hw/acpi/cpu_hotplug.c               | 230 ---------------------------
+>  hw/arm/virt.c                       |   2 +-
+>  hw/audio/pcspk.c                    |  10 --
+>  hw/char/virtio-serial-bus.c         |   9 +-
+>  hw/core/machine.c                   |  17 --
+>  hw/display/virtio-vga.c             |  10 --
+>  hw/hppa/machine.c                   |   2 +-
+>  hw/i386/acpi-build.c                |   4 +-
+>  hw/i386/fw_cfg.c                    |   5 +-
+>  hw/i386/intel_iommu.c               |   5 +-
+>  hw/i386/microvm.c                   |   3 -
+>  hw/i386/multiboot.c                 |   7 +-
+>  hw/i386/pc.c                        |  22 +--
+>  hw/i386/pc_piix.c                   |  23 ---
+>  hw/i386/pc_q35.c                    |  24 ---
+>  hw/i386/x86-common.c                |   6 +-
+>  hw/i386/x86.c                       |   2 -
+>  hw/intc/apic_common.c               |   5 -
+>  hw/intc/ioapic.c                    |  18 +--
+>  hw/intc/ioapic_common.c             |   2 +-
+>  hw/mips/loongson3_virt.c            |   2 +-
+>  hw/nvram/fw_cfg.c                   |  48 +++---
+>  hw/riscv/virt.c                     |   4 +-
+>  hw/virtio/virtio-mmio.c             |  15 --
+>  hw/virtio/virtio-pci.c              |  12 +-
+>  target/i386/cpu.c                   | 152 ++++++++----------
+>  target/i386/kvm/kvm.c               |  10 +-
+>  tests/qtest/test-x86-cpuid-compat.c |  11 --
+>  pc-bios/meson.build                 |   2 -
+>  pc-bios/multiboot.bin               | Bin 1024 -> 0 bytes
+>  pc-bios/optionrom/Makefile          |   2 +-
+>  pc-bios/optionrom/linuxboot.S       | 195 -----------------------
+>  pc-bios/optionrom/multiboot.S       | 232 ---------------------------
+>  pc-bios/optionrom/multiboot_dma.S   | 234 +++++++++++++++++++++++++++-
+>  47 files changed, 349 insertions(+), 1034 deletions(-)
+>  delete mode 100644 pc-bios/multiboot.bin
+>  delete mode 100644 pc-bios/optionrom/linuxboot.S
+>  delete mode 100644 pc-bios/optionrom/multiboot.S
+>=20
+
 
