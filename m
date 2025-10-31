@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-61623-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61624-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 273B9C22C82
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:31:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D580CC22C85
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:31:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18E501896B8B
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:31:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89562400BF1
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5C51E8342;
-	Fri, 31 Oct 2025 00:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727A51F419B;
+	Fri, 31 Oct 2025 00:30:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HSNV1ug8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nIknIISg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53762137C52
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 00:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A1B1DF723
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 00:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761870650; cv=none; b=CgbtgQR/j/V/OGQgg7PMIgbviXn0Fd7ME7M3MFEZUojsbS0ZJJl38iVtV8LgBn5zr1qlt0+5Vq4t/qPzCAXUpkezTTOhdXLP1GoWHfKb89x7h53AK9YCdhjpVjwaQ2EdwGcO+ba/RuW92VTcojE2fQboio1+WizA+qsGlSDeg6A=
+	t=1761870651; cv=none; b=GKseV7g0GOHbH1drZVUS/MviGKb6AlgN7AyicbTVmWeEq5hvQWiAktFECrQGQZna+x4PBUcVXKGhvps/5d11jCjElnobcVxfjeSUfprzfNt9sMyNAR4/62Gq+gl9EwRCHxQR7s/lucHo6VRs3KhvEWgTYfsMrGQRI2OFMPSvQQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761870650; c=relaxed/simple;
-	bh=eJ+nhqmNAya1k6+OmAJ/q7k3s5/bkxXsA9XB0DsAgRE=;
+	s=arc-20240116; t=1761870651; c=relaxed/simple;
+	bh=tzp/3ROGUKURX5Xj0fHJRpM3UGAca2Jw3N2xjixt3lk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VfTiZo3SZ/k/2o3ZmsKj5DQA/2t2btFRxErpXwerpYfexRaPxH/HGaYhC3QbiNerTiSsK7m2S9J/KaW4uBn9UHpLUauPw7eec7rMlRAXikKcRmqtI2s7Y7gQjxmXKU3kLqZ4TSH+M9P1918Xx5yn+h+ouMkGmxwI3epEp7h/TGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HSNV1ug8; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=ljYu1DPrld/TeW1QyOdQhhDSPQuLe0EPIVVaLdla4RLg/7P3/ReN41unnR0jhmY+LDrXmtiIm+bIXZO9DOjlNZemOPFOBjLX6lYx2TGGVXOQEAMwla41cb1iGKdxU3BDueV7ACqTjwIeMw0Viw4kLn2B1ErQ+CJJkukbQCCJGqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nIknIISg; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-290b13c5877so31445415ad.0
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:30:48 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-294fb13f80cso9991795ad.2
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:30:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761870648; x=1762475448; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761870649; x=1762475449; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=S9xAWTHA8Zs5WgjY+eo7qPd3VInKr+zSYIAk+wJ4peM=;
-        b=HSNV1ug8kG1UFnTQnPipaSCHMelNGBGGc5FcoaLYGduuzlLFja/qJ13vg11AKMIpqd
-         fDaqcSHMSRvzEAsNQmDmiWnymE+AJ2B4AI0DKfL9ligV857OpdveGe3COiPS17JkbAen
-         P+AP3tRTTj4dUtvDVd9xz4KpIccf52dsnjrMUVEumVJGHF4fh1FiOCfPL+CmVNWsQmG5
-         Pzpi/LpypDjufQtFLmiUporlQyX+FtXpri8kuXn1SX696eYXWWdBlUcmecznwo+Xl4mo
-         FrWnYb0koaGi+E1kwqGRKqgv8MzcPFCEq9pDK1A/Efm/4MnfToxCgti9mwl+z/yxmWVC
-         8QCA==
+        bh=oMHlsC7c5oD7CcKApKn4I2mv/vdAEywap/hlKVGWtz8=;
+        b=nIknIISglhnnq0uMna6VfX6hRFucnzuozAOyZryeM3DIABIV3dsGc5pgd5ZxiYF8Nu
+         KASXx3/aYVb/o/rhpXab+5nBkyYfoe/oOhMXupQHK/VWrC3qn0ZAcH2D7+R1TrRBazr0
+         jXCpkQ3Q7+00S8TMe7K2NG26sAPTh4z2K9U9c+g2Xt5g21SbD5sXmFqk0Pq8DFHzi9aA
+         X2hiivKQxa/9Nx5wdYAHMq9fEu77Z6QWzASX5ZxKTqZoTdMX8xMu/h7gnHXdEezPneAU
+         el99+7OQsZlDcvbVuox1kT04/k6nuCjU3/FefkTUjxddaxHbgwt7PwnLvQSTQIk8XQPy
+         /6OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761870648; x=1762475448;
+        d=1e100.net; s=20230601; t=1761870649; x=1762475449;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=S9xAWTHA8Zs5WgjY+eo7qPd3VInKr+zSYIAk+wJ4peM=;
-        b=scazeClt9VTZk5JJ31mJuneafv3QHifps3HCdSX9jSvWl1ueOhZg5RHPTglhd+eN9u
-         k6FJO5m7G98A8OSS+S9NmKW112GBkTbO98wJC7erhowoQMRmC9CIP7eITkjU8eLpLN/p
-         zL+zBWjhl7O5qypN6R7Uc0x75Sx9pSccubHlKhZ6Z+iWC4XI/bDMGVsrJXEWdqWxvetO
-         XtlJkOGFBG2b/Ve1XthYeHriCT+8+CzPL8fZ9SBQEDirmSapM1vvux4D2FjABtyRFEiW
-         WQbIVyF6WbD4gtXOEhf2OSt6jY57houZhBVrqh9bEyOSeOKqSQV+4tE6m6gbu0dRU45J
-         NDGw==
-X-Gm-Message-State: AOJu0YyLP2IniMtVO2hBftgyACe7CeVPsUYxWUaHfO6WiiYHEFXaez92
-	XZxGXBBYeQ5zydHpW7TA1EqrCRa4c+oA/f1N+8c/QQ8bL9SIa31j/c0Gqb2asnvadh3+eA1TH4x
-	cwE1RNw==
-X-Google-Smtp-Source: AGHT+IGW9hpj7vBjBBA6u3ERPDC8qtzD54yvG/s87+dvnFJyDmRImsTrlkZ8d1iH/SCn+j3anWxBSXjW36Y=
-X-Received: from pjd14.prod.google.com ([2002:a17:90b:54ce:b0:339:ee20:f620])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d487:b0:295:656:4edf
- with SMTP id d9443c01a7336-2951a38d763mr23412465ad.6.1761870647512; Thu, 30
- Oct 2025 17:30:47 -0700 (PDT)
+        bh=oMHlsC7c5oD7CcKApKn4I2mv/vdAEywap/hlKVGWtz8=;
+        b=RNlz3VcZ8bnIlQJhIbI5ZTMW7OYF0vmNeWudI+nDESpJQEpsEQm0krFl0L6GHnaRVN
+         m07vc6Glhgcod6yL/Bh0uIBpF841h7/tmUdPGO0A0H3ge5vjqz+gsmTb/mhOnif3s+hh
+         Uq9NOJPa3hKaE5stvJxdRnnClsUz3Zc5cYoEaWH7GIiPQEGVy9W+NAlfKYYGv6VmFq7q
+         HX7ozVhLhCTj63ET3CrL4buIvK4orez4/iqAGUOd6ygQQGAyTWiNPzEx1oWJ83I539s1
+         K8vNXMEFukAwyTZuo1PdenfNTy4gAcFiEvWrZPIOPl4h9Mhz6/9+Wbek41HWkG4zweid
+         svyQ==
+X-Gm-Message-State: AOJu0YxDt0QIAJVipXPibUg0SKzOpPg35EoInIojDvUi9dwkd8K5GWRd
+	AsFdzIHDdyhC9CCfXIM0tHslJTuCWuMqhGm3Xl7EVV3NBa/gmX6DJHcT+wJiy2SZW/22DBqf7pc
+	Y28wEJw==
+X-Google-Smtp-Source: AGHT+IGdP5TX31n5prdQmUnY/ypxyo2o3kyqL3wOPAaMrWLK7PKvetILEtk7QXVibBOmaJMZNn/wzFqvOCM=
+X-Received: from pjo12.prod.google.com ([2002:a17:90b:566c:b0:33b:ba24:b204])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:da8e:b0:290:52aa:7291
+ with SMTP id d9443c01a7336-2951a51e6a1mr23311235ad.53.1761870649510; Thu, 30
+ Oct 2025 17:30:49 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 17:30:33 -0700
+Date: Thu, 30 Oct 2025 17:30:34 -0700
 In-Reply-To: <20251031003040.3491385-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251031003040.3491385-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251031003040.3491385-2-seanjc@google.com>
-Subject: [PATCH v4 1/8] x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
+Message-ID: <20251031003040.3491385-3-seanjc@google.com>
+Subject: [PATCH v4 2/8] x86/bugs: Decouple ALTERNATIVE usage from VERW macro definition
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
@@ -85,89 +85,56 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Brendan Jackman <jackmanb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Decouple the use of ALTERNATIVE from the encoding of VERW to clear CPU
+buffers so that KVM can use ALTERNATIVE_2 to handle "always clear buffers"
+and "clear if guest can access host MMIO" in a single statement.
 
-TSA mitigation:
+No functional change intended.
 
-  d8010d4ba43e ("x86/bugs: Add a Transient Scheduler Attacks mitigation")
-
-introduced VM_CLEAR_CPU_BUFFERS for guests on AMD CPUs. Currently on Intel
-CLEAR_CPU_BUFFERS is being used for guests which has a much broader scope
-(kernel->user also).
-
-Make mitigations on Intel consistent with TSA. This would help handling the
-guest-only mitigations better in future.
-
-Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-[sean: make CLEAR_CPU_BUF_VM mutually exclusive with the MMIO mitigation]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kernel/cpu/bugs.c | 9 +++++++--
- arch/x86/kvm/vmx/vmenter.S | 2 +-
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/nospec-branch.h | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 6a526ae1fe99..723666a1357e 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -194,7 +194,7 @@ DEFINE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
- 
- /*
-  * Controls CPU Fill buffer clear before VMenter. This is a subset of
-- * X86_FEATURE_CLEAR_CPU_BUF, and should only be enabled when KVM-only
-+ * X86_FEATURE_CLEAR_CPU_BUF_VM, and should only be enabled when KVM-only
-  * mitigation is required.
+diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+index 08ed5a2e46a5..923ae21cbef1 100644
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -308,24 +308,23 @@
+  * CFLAGS.ZF.
+  * Note: Only the memory operand variant of VERW clears the CPU buffers.
   */
- DEFINE_STATIC_KEY_FALSE(cpu_buf_vm_clear);
-@@ -536,6 +536,7 @@ static void __init mds_apply_mitigation(void)
- 	if (mds_mitigation == MDS_MITIGATION_FULL ||
- 	    mds_mitigation == MDS_MITIGATION_VMWERV) {
- 		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF);
-+		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF_VM);
- 		if (!boot_cpu_has(X86_BUG_MSBDS_ONLY) &&
- 		    (mds_nosmt || smt_mitigations == SMT_MITIGATIONS_ON))
- 			cpu_smt_disable(false);
-@@ -647,6 +648,7 @@ static void __init taa_apply_mitigation(void)
- 		 * present on host, enable the mitigation for UCODE_NEEDED as well.
- 		 */
- 		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF);
-+		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF_VM);
+-.macro __CLEAR_CPU_BUFFERS feature
+ #ifdef CONFIG_X86_64
+-	ALTERNATIVE "", "verw x86_verw_sel(%rip)", \feature
++#define CLEAR_CPU_BUFFERS_SEQ	verw x86_verw_sel(%rip)
+ #else
+-	/*
+-	 * In 32bit mode, the memory operand must be a %cs reference. The data
+-	 * segments may not be usable (vm86 mode), and the stack segment may not
+-	 * be flat (ESPFIX32).
+-	 */
+-	ALTERNATIVE "", "verw %cs:x86_verw_sel", \feature
++/*
++ * In 32bit mode, the memory operand must be a %cs reference. The data segments
++ * may not be usable (vm86 mode), and the stack segment may not be flat (ESPFIX32).
++ */
++#define CLEAR_CPU_BUFFERS_SEQ	verw %cs:x86_verw_sel
+ #endif
+-.endm
++
++#define __CLEAR_CPU_BUFFERS	__stringify(CLEAR_CPU_BUFFERS_SEQ)
  
- 		if (taa_nosmt || smt_mitigations == SMT_MITIGATIONS_ON)
- 			cpu_smt_disable(false);
-@@ -748,6 +750,7 @@ static void __init mmio_apply_mitigation(void)
- 	 */
- 	if (verw_clear_cpu_buf_mitigation_selected) {
- 		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF);
-+		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF_VM);
- 		static_branch_disable(&cpu_buf_vm_clear);
- 	} else {
- 		static_branch_enable(&cpu_buf_vm_clear);
-@@ -839,8 +842,10 @@ static void __init rfds_update_mitigation(void)
+ #define CLEAR_CPU_BUFFERS \
+-	__CLEAR_CPU_BUFFERS X86_FEATURE_CLEAR_CPU_BUF
++	ALTERNATIVE "", __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF
  
- static void __init rfds_apply_mitigation(void)
- {
--	if (rfds_mitigation == RFDS_MITIGATION_VERW)
-+	if (rfds_mitigation == RFDS_MITIGATION_VERW) {
- 		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF);
-+		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF_VM);
-+	}
- }
+ #define VM_CLEAR_CPU_BUFFERS \
+-	__CLEAR_CPU_BUFFERS X86_FEATURE_CLEAR_CPU_BUF_VM
++	ALTERNATIVE "", __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF_VM
  
- static __init int rfds_parse_cmdline(char *str)
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index bc255d709d8a..1f99a98a16a2 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -161,7 +161,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
- 	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
- 
- 	/* Clobbers EFLAGS.ZF */
--	CLEAR_CPU_BUFFERS
-+	VM_CLEAR_CPU_BUFFERS
- 
- 	/* Check EFLAGS.CF from the VMX_RUN_VMRESUME bit test above. */
- 	jnc .Lvmlaunch
+ #ifdef CONFIG_X86_64
+ .macro CLEAR_BRANCH_HISTORY
 -- 
 2.51.1.930.gacf6e81ea2-goog
 
