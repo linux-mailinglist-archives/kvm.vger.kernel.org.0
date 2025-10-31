@@ -1,285 +1,119 @@
-Return-Path: <kvm+bounces-61675-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61676-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 881E2C24C19
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 12:19:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBF7FC24C3A
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 12:23:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2C36F4F485C
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 11:18:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E62F3BC0EB
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 11:22:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1674025A35F;
-	Fri, 31 Oct 2025 11:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493902356A4;
+	Fri, 31 Oct 2025 11:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="4Ftxyp5+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q90EUdEE"
 X-Original-To: kvm@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012030.outbound.protection.outlook.com [40.93.195.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA74E306B1A;
-	Fri, 31 Oct 2025 11:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.30
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761909524; cv=fail; b=SUwcr7Ap9+hEMLmdgotRD6Qo9vGHXe866MqUQZYWhOcn5w4PYVtS5fQhSXfMTryXRaMbfOTvLivdwjk9Nc3zu0yFvKJWFfAB8+jhBYYW9ohGJXqisMlgPDszHglu1ebQNTSsjFN/oAPsk4JiaYSBOagixrEmh6/970ROMHUB9Us=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761909524; c=relaxed/simple;
-	bh=+1O9yxa3Qts/2jiTxwl9ZiIz4AGnSX5wwnS5h+g2hsk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Kt1wgmnab5e49PZMbLZ0zPFv76Vwk0fujsSnUmLLDM7uR8eJzT98AiHG5fpaUH+xTr8AWD1o5cX59xAKQaHm9RnL3/cKpgUUXbByKPMzLXV9sR+AzFHxi1iFU1ApBeXbRAmUyW9BR4kVFjs8XFKHZ1x+RxacT0fEyn87allGtHc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=4Ftxyp5+; arc=fail smtp.client-ip=40.93.195.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=q5CYpeXESF872cnaAYYNH1cIgu5qt9W7fBAXRMyDcHxN8LcgFaPSEaHwc8InXq7KBHW0YdXw3WGcNfKnpJ226381Ur+qb7ZjevkqxD40S6c3ACp81TZaSD3nogVJrw3YnJd0fe+19Zj9s/N7q2VOsdQvajTlcHesG1NnACujmCTt5lETXjyU/nhPoWaSvT39aOkGdX9bEe25e/Q07QLgRjS1Iy1NpNPGMmspysHQboBgSPdYZUWunEAhtYDxO7gJWy339uCbXOOW6NjbbtHAuXMNpMC3n9zgm7q6L1hFXv2AJdLGyBRvaE5MuILWWHjC7PVsdwxH3mb55P1FSxLWtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YtLdV01X/GaTA0Lo5CnmWWNbd551N8pgRo8L7bRUpWs=;
- b=YkfrjN/71Ri3hv6KRxmx+pwOBJTgZhB7zeSfy9RCYivOXoKffI22XmOvLcMJk5mledEynxausadahCPNH0yM+OOeSQLGE2anRLVQp2ce6srrS90iHxYPacxqUZHU4ffiKmIdJUSnJutWWwuVgP/BXnZ/cTavQO9GjfM7jpfrQa2pLdQkBKPnwLUveqkn2CliJGoqjqvgn5KSyCRVJXsy2xmKDuvKXKtLJWsXJgaexeC0K+AR//QLPSb+BxbTz6zoe9rRRUqCyma6zJPbSE9IAr3wt2nFgfkrfO6QxahUvk9WdDFbMUKMWZFsAn+Co9oK7t9zxcI+0LGOzvZU27yNkw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YtLdV01X/GaTA0Lo5CnmWWNbd551N8pgRo8L7bRUpWs=;
- b=4Ftxyp5+U2T60eXxuNBqL4rqvNJBHi+KJ5lcYhFj82e0LUIpEUB5+ESe3aoABNfleW64I4usMLTIbdPeRPL/vTCCimGbCo3kZPpYWmcBBOjTfnNn+UvhvpLtWCY8gQq3QXVQYsMTLeH699dxDR4ZL2SWe9p+ihO+W4JD9eG2z+U=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA1PR12MB8189.namprd12.prod.outlook.com (2603:10b6:208:3f0::13)
- by DS0PR12MB8575.namprd12.prod.outlook.com (2603:10b6:8:164::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.14; Fri, 31 Oct
- 2025 11:18:40 +0000
-Received: from IA1PR12MB8189.namprd12.prod.outlook.com
- ([fe80::193b:bbfd:9894:dc48]) by IA1PR12MB8189.namprd12.prod.outlook.com
- ([fe80::193b:bbfd:9894:dc48%6]) with mapi id 15.20.9275.013; Fri, 31 Oct 2025
- 11:18:40 +0000
-Message-ID: <c353115c-81a9-44c6-b863-e5637670d0d6@amd.com>
-Date: Fri, 31 Oct 2025 12:18:37 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86: Add a helper to dedup reporting of unhandled
- VM-Exits
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251030185004.3372256-1-seanjc@google.com>
-Content-Language: en-US
-From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <20251030185004.3372256-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0320.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:eb::9) To IA1PR12MB8189.namprd12.prod.outlook.com
- (2603:10b6:208:3f0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50DA1E9919
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 11:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761909770; cv=none; b=K/+P01pfMCMYye3AeGiMCRPLLSMUSJGP1g0xHMqzCzS94o6ergLqsrCo0IpIzM7sBXY7fCPRKMGSUywKGPDN8XlUi61k/nEOAeUMqlxrW3roIpFW4mqEEXpOZnLvkSYQR8i8zjwSIJx57UUFJr/tyL5B2np+s/f07JhlGAqcBkI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761909770; c=relaxed/simple;
+	bh=fbWhQfJZj8HCmG3H1/jP5tgPn2hV/GyhIqcog7Ktfkg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Km1efWpuDAPd1/hFD2G74c7Lg1EVzMBHVobDY9GaxlewqCyKisj4VY+w2fRrH/aUJrSpknoUP3L770L+EhZU/KH3vdf22A6OCHQD+3fz65oS2wDkJeVMIQ0qKU/K0Hp7MQAFCgZVYWlod/Jp9lUuADt5A4O2VmLN/m81qLiHqGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q90EUdEE; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-470fd92ad57so23639035e9.3
+        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 04:22:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761909766; x=1762514566; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fWfm1RxpCriXJZKJWKkjI+FEcuEWh6aqEd8ZawD9gRo=;
+        b=q90EUdEEvIDK3haYfEF1A1Gc9syg8Wwwt4cj3VNFkGkN7zsECzUV5ef2pF5asonmPH
+         mIjlBZMOva0nbPGgpjf6zZEnkU2HBimL+3byrNzAfHAkSD2gEWNhAYX9u5FOORPMjhtE
+         esXhrulZvx+GFT78OcKttIxig62OlP03V0iIChkiAgBtSa+omX38r5A4gnY8buraWmOR
+         jnAI0VoFamDBPy0rXAxj3VMiz6GX3S5Akc2/weSsEPv6bqXr0U1QWq5O5elw17Z3J3sD
+         QOFvvQnCLHUu8aMhKpFBLShyQb5O8ge4huLoscuxwh3EF182tuvSGwcRrBySLiSkJJ3p
+         jYew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761909766; x=1762514566;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fWfm1RxpCriXJZKJWKkjI+FEcuEWh6aqEd8ZawD9gRo=;
+        b=is0kxZ6YuTsojyKa/fHKbmyU1MIQLuZFmfpdECwkL+9249tW8+uW9P1NFDiu9znUE8
+         d5+tXh8fzKIUiMTGamas524xeTDQX/XV1bgclZgLj9o+h0dQ9+KL55IHA6LlVyYF4T/K
+         kOaG1OWBe2FUupEoRsp4Z1ReeXyRV0LcQKz768P/R64Qic9zrTZPbC5k4+Wgn4xmRFrD
+         +tm4mg/Yy0qXARk0aEb0ZvX+fY1U1SmcABU+34YUWrzEPl2Xw7u0vMiUJ1Fb+RDSLu7r
+         wl1Lu4UmMtMaPfienvBcEaBrG29G+w9qRbkNzG11o45FQmx1e2xU6+QAZqEqV6Xts9OF
+         Pz7g==
+X-Gm-Message-State: AOJu0Yx1GRCS0n4J5TB/CRLi5YaV1ZuAQ+pMywuxx5WRXC+svqP5xCqT
+	HCanL5oZ20NcN3OP+K8tqusT7PJ1RsJBmGDz+l3tXMrw5zHqR4hKPG/XeUV+K6et4v7yYpwssX8
+	VK1PWYJ8Mx7k6Cw==
+X-Google-Smtp-Source: AGHT+IHH+CXCZrRgwm3g861gn6Y0RlY6O0gwkChBWJhVrVubqV8OJjXSbqaG9Nmja1vNYsXI9PQqe4gQXc36Cw==
+X-Received: from wmbd14.prod.google.com ([2002:a05:600c:58ce:b0:46f:aa50:d70d])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:a0b:b0:475:d952:342e with SMTP id 5b1f17b1804b1-477308c2961mr32962115e9.35.1761909766216;
+ Fri, 31 Oct 2025 04:22:46 -0700 (PDT)
+Date: Fri, 31 Oct 2025 11:22:45 +0000
+In-Reply-To: <20251031003040.3491385-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB8189:EE_|DS0PR12MB8575:EE_
-X-MS-Office365-Filtering-Correlation-Id: 41c33f56-be0f-4f4b-c43d-08de186f3e4d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bVg0V2R2V3BOcEdCR1lVT1RQUHAzb0JRYXBzZVcwVCt2TzFZRUplcXVJMlpD?=
- =?utf-8?B?aUZxZWgyUVVGTk5QcmI2dGpxUVFicVQxVmxBVEo2ZlVJdWk2YUFVTU9mTW5y?=
- =?utf-8?B?WkpQUmdBNDBhNUtDNGlKNGtOV0ZFMm5USFIwZ2k4aWpOcW5QZjcyc0h6TjdS?=
- =?utf-8?B?YnVZODUwNjVZY0ZCcnNoU1k5bmptbFVuV1BBcFQ1R3VvckJCMURRQmNCMWtx?=
- =?utf-8?B?dWN0Z0VDVHBzeGJ5QWR0dSs1SnlaK0sySHFhSkJGQ0o0V1FqUHh1bkRhOGtm?=
- =?utf-8?B?K0pTSjFua1lyMm5XN1FjTDFkV1lTblorbStOQmJVeTg5YzcxNk9HSHEyWDFY?=
- =?utf-8?B?RlNtK29tM2N3UnpvL3A4dDhPc3FobWc5WmRhTGV3QWdNdXBVWWJUNVVVZ1hu?=
- =?utf-8?B?SFlJdVBacWJTQURUSlZicndZT1piVWZhSXNESU9ndWZVZTV2NkdBcmRmK3hy?=
- =?utf-8?B?b1ZDY3pJcE1NTU5uemFIMldFdTZWeHJpTkV0VWh5aTcxdjNvcXFTSEdwb21H?=
- =?utf-8?B?QSswdXpJa25RVTBBcnFENmhld3k4RGNUVVdtN1hMNE94dmwwNTlhMkNQTXps?=
- =?utf-8?B?UStpbnpLT0NESWp6YmtGYlQxcXJPSkdDZUJDU284K3lhb3BBbjV5TFh0cFpZ?=
- =?utf-8?B?NWY0OUM5cUZyNDM0V3ZobklpM2c2MndRZWpQNGtsRVlJcCtueXk1aWNOT214?=
- =?utf-8?B?SExJSjdBUHRyUG5VNHFaNjVQNk5TcG5ONENwZStOdHlhRWlIZjE0bTVCZG9I?=
- =?utf-8?B?ZmVRWnRGNUJ5WU5jOTdZb3FoTmhqZzFOWkwrVi9URWJmRk1tbEhEVGhGenJt?=
- =?utf-8?B?NHpmYllCVmFKL21uMC93UmNnSVBSMUNMQTdvYTAyaVhZYjNtcFVSNVdheitV?=
- =?utf-8?B?MXlYNndXUEtWamVvVk1ZMEhzN1hva0NTQTdDbGJRM3kzdHBrYmxkUFVNUXQy?=
- =?utf-8?B?VkRrMUVYYTFFTXZNYjliYUEyeGRwY3hpc3NMUXY5L25uWVRMeG1WQ2RFVjJm?=
- =?utf-8?B?Vk1uWjk0THYzMWl0SVRKeDlOWExic1ZaZzZnaEVWTE1lcFU4clovOFlSbVFP?=
- =?utf-8?B?UmlVcHpDczZkN1FOcTdNSm9NWlljaDZOMlJ3VlNwclNIRnRZWWxVSEVOWlF4?=
- =?utf-8?B?MGJoTGRKeUEyejRld3hQK2VJMHhnWE9xQnVRaVROZUFFQUVSQjdQRHc4amhQ?=
- =?utf-8?B?ZWgrTElqTXp5VENrajAxdW94dHd6U0dkdi9TMzNOVGtVc3Z5b1lkV3RXa3ll?=
- =?utf-8?B?ZmljKzdvZitHcFVRWnZYM0tSYzQ1a0JsNHhzUXppbkxQZmdBQXhCSTYvbk9G?=
- =?utf-8?B?OUp6aHBTTC9hQzJ5VHJZNnBHMTRoZHA4OUJzL1BWVm5DN0hDWEp6S2tUTXA5?=
- =?utf-8?B?Y01zc0tVaG1QOWdnYTJGdTBuRGl3c2RGeHEvVzliSUdJeDhwS1lYU21sak1r?=
- =?utf-8?B?QndNUUltWDFvYzJTOTB3ZkJHYkt3VkxRUzA3dE9SNjZXRnNnSUREeCszNkFq?=
- =?utf-8?B?Z1FteE4zRVBsRVA4T1VlRkh6U1NUalluVXZaYVhQSWRXQS9DdEVpWHVyUTlF?=
- =?utf-8?B?VWlHaW5jQmpsc1k2bkwrME5RSVM5RkhKVGxKMmpiVFFTTG9UMU81aFFlTFd3?=
- =?utf-8?B?cm1mOTA2OVlmWkN6US9jVGV3SENBMkFEWnFQVjRlYURCQk9QdmlJMGFTdEh4?=
- =?utf-8?B?c2loVGlCRk0vTGVzdTlXOUluWStzbjNEL3VWdmt4MVNTZjhMaWd5WWlEZVZx?=
- =?utf-8?B?UTd3WTZpM0g5MEdkYTZsb1lieE5Hbk5vcEJWbHBHZk0zT1JDOXF0dHFkeEl3?=
- =?utf-8?B?Vy9kRHB1cmtoVUR6OEJaQytHNFVXOWloVlRDUVdrUGI2ZEFQVlNra3p6ckE1?=
- =?utf-8?B?T29zd0hydGpOMk1tKzdSTkp6V0xscEZ0RHRTdkROek82RFlFTHdGanRIcGI5?=
- =?utf-8?Q?x1ILsXByqgkrZjMGSpsg6X2To1MtaaMq?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Z2R6UVJtaG0zR2VGbkZuV2ZkaVV3VDdMU3cvQmNQQk5Ic3NCdGZqM1VLdklN?=
- =?utf-8?B?OTdmanJsK2Q0TzdNVjJKNlpEUjJYUDNLMjlLSVd5OTZ5N2l0TkxtazNKcEoy?=
- =?utf-8?B?eEJEQk5LemwrWXVnMVI4ZVJxdGowRkhQYkVuODVLMzAzcDdYaHlkQzY5eEpQ?=
- =?utf-8?B?SFVIb3VOOEpVK3RDUjFXKzMzUjRJWnhqbEhRenoxUmx0R25YcGVpdjhKOGY3?=
- =?utf-8?B?RmxIRG9OcnlpZFFxVmQ2bDN4T3A2T2cxbUJ4dkRsWHpSMUx2clFpZ1VOajV4?=
- =?utf-8?B?RGtjRjExaTIyV1Y5SUZkNzQyTUhDQURwMjFWaWxXMTdvdHhQM3cxajV0ZjJh?=
- =?utf-8?B?b3ZMSW9EUzRGTXB0NDg3UXhXK2EwWkJXOExEUHhzc1BQSGsweHpXTWJjTG5U?=
- =?utf-8?B?cU1CZWxnMk1FaTVBRVZWWkRUR2MySHVORTh0cUU0NTRlemdhWE5PdjAyQXdl?=
- =?utf-8?B?RXZ4bDk3c0xhcW0rdmQxckFvREdSQSthbnZtYU5BRll1RHpTdnBVYzQ0eWNE?=
- =?utf-8?B?QXlJRTBkamVBZGlJZE1NalUwT1BPdTdndGFRMmEyVndWSmgvR2VseUNUNU9B?=
- =?utf-8?B?VHV2anRzVUR0ZXY0Q2VmL2tlS2ExRlFzRm9HT3VsN2tCMjhESUNyQVBqZmR4?=
- =?utf-8?B?MnNFdmlLckg3ek03YTdnRmZmV2t4allKdVRSWndBVE1DQ2N6ZUNBUmVDNlEr?=
- =?utf-8?B?QWwrZmdrQlJUZThKaDl6N3Yrakx4d2xJL0VNSTNTL3dmdllDSnNtZmxPT1hh?=
- =?utf-8?B?SkhnZTNnOFdsWFBVM3F3Y2tidlpPQTNuY1p5bm9QUUpWTXlMazdnYUIySFlv?=
- =?utf-8?B?aXFDNjlDdXozRmRaMEhHa2FzWFd5bE4zVEt1czB1Ni9UdmRCVHJGSU5aRk8w?=
- =?utf-8?B?VHYrTGlHQ3lJMXhLOHFDUThWODlzeUJoTjZGcGVqQ2NPdE91emM1Q1JsdlJ4?=
- =?utf-8?B?Q0FPSGY3azY5UFZYQklwRitOZHVndFNtN2d6VFA1MGMrcTlIRWNjTEVwOWtw?=
- =?utf-8?B?cjdxbXRUZkE2Q0tRNW9ub2dnaW9MQlRSKzg2Q2VGQ3lsQnhEWmdOajlCbVUw?=
- =?utf-8?B?R2xEK21EZ2crWlc0RGc4UDcwV2Z5SXZ4QW9hUEw5TlJMTjc4NzliNUNRZk42?=
- =?utf-8?B?VURybzVoWXJWRENMeDhzazFhVEFrOWM2ZXF5N1hYeVJqMDlZR1BaQ2NmbHJQ?=
- =?utf-8?B?Lzg2YUZIdGhybUhOcTZ6V2lOTll2WlNPOVdzUmNaTDJBN05wQ0VDYkhKUGlX?=
- =?utf-8?B?RVgxMmdOK2daQ3VYNzhSVmJlTW8yRDlSL2lpRjdObmQ1L1JQdjNobmpqVzRv?=
- =?utf-8?B?OUZUT0dwS1hOYXJWU3FvUExQQU0zRmNKTUlVUStXekxOL214RDhTY3A3Wjln?=
- =?utf-8?B?T1EyWHFmcWJ0M09tUE55UUpqSUtXZlNXNmdqcVRRbHJrUUIyL01URXpEdEZG?=
- =?utf-8?B?ZlVrY1hXY3h4clkxV0ZpOS9OakJaeEhxbDR1S244QVVHMmE1NDBPclRGd1pp?=
- =?utf-8?B?MjZCN0hUOFZLa0xMUHEvalNLZFdXR1hZN25hckJsbzhVSXRMd3BSc3ROTmNZ?=
- =?utf-8?B?ZGI1RHdMRFhHbHJsY0J2eHRpV3ZZVU9CU2JmbU8rOUtsbi9jNE5MSVN0MHdw?=
- =?utf-8?B?ZDE3T2tOSDNCYmxuWmIyaTFFUHE2b25Sa283T0dQL1UwV1N6TlBxajA2elRy?=
- =?utf-8?B?OHFacmhUdHhCdnVyLzlkenFPVU4yMnZsK3F5YUQ0d2swZUJQcDdUdmFJWkYw?=
- =?utf-8?B?NDQyakpJNWZUVkdhR013bDhKajl6a2JiQy9VM0ZTRXYwN3NTZEFyWExaeXdL?=
- =?utf-8?B?MFlETHFsRVdGejRHSlQweGMyU2ZHQk1XTUhFV1U0Q3RHbDN6NmNWSGNPUzRi?=
- =?utf-8?B?RVNMVmU1WUw0MVZkSXRYMVBXOVY4d0czVks2bWFLV0xmZ0pJbklVdnJYRzZW?=
- =?utf-8?B?YmxIUFQ1T0haOFdBbUV3bENOUW9HOTMrcE10THA1b0o5L0tPQWhoZHI3Unda?=
- =?utf-8?B?YVNZMHNXTE1MV25MSzBrbWpoamZaNWZWYm9rMFNNczFjcmRldXluNHN1MlFI?=
- =?utf-8?B?REZPb2FMZVNhMis0UXA5T0czdUVqTGp1T3kvbHJJVWNvMGt3eXdhSldneFNy?=
- =?utf-8?Q?Ww8LzhiuTgChR7JWjiBmqtW/3?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41c33f56-be0f-4f4b-c43d-08de186f3e4d
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8189.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2025 11:18:40.1848
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PVCEebWV/nK4mqy6jmHgBKtba68zO54suF6SsA3vNFHsBGaAAk0m0wzT9JcyMNJp6GrXXgH3fv7gcgqdqtjR5Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8575
+Mime-Version: 1.0
+References: <20251031003040.3491385-1-seanjc@google.com>
+X-Mailer: aerc 0.21.0
+Message-ID: <DDWGVW5SJQ4S.3KBFOQPJQWLLK@google.com>
+Subject: Re: [PATCH v4 0/8] x86/bugs: KVM: L1TF and MMIO Stale Data cleanups
+From: Brendan Jackman <jackmanb@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
+	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Brendan Jackman <jackmanb@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-
-> Add and use a helper, kvm_prepare_unexpected_reason_exit(), to dedup the
-> code that fills the exit reason and CPU when KVM encounters a VM-Exit that
-> KVM doesn't know how to handle.
+On Fri Oct 31, 2025 at 12:30 AM UTC, Sean Christopherson wrote:
+> This is a combination of Brendan's work to unify the L1TF L1D flushing
+> mitigation, and Pawan's work to bring some sanity to the mitigations that
+> clear CPU buffers, with a bunch of glue code and some polishing from me.
 >
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
-
-> ---
->   arch/x86/include/asm/kvm_host.h |  1 +
->   arch/x86/kvm/svm/svm.c          |  7 +------
->   arch/x86/kvm/vmx/tdx.c          |  6 +-----
->   arch/x86/kvm/vmx/vmx.c          |  9 +--------
->   arch/x86/kvm/x86.c              | 12 ++++++++++++
->   5 files changed, 16 insertions(+), 19 deletions(-)
+> The "v4" is relative to the L1TF series.  I smushed the two series together
+> as Pawan's idea to clear CPU buffers for MMIO in vmenter.S obviated the need
+> for a separate cleanup/fix to have vmx_l1d_flush() return true/false, and
+> handling the series separately would have been a lot of work+churn for no
+> real benefit.
 >
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 48598d017d6f..4fbe4b7ce1da 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2167,6 +2167,7 @@ void __kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu,
->   void kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu);
->   
->   void kvm_prepare_event_vectoring_exit(struct kvm_vcpu *vcpu, gpa_t gpa);
-> +void kvm_prepare_unexpected_reason_exit(struct kvm_vcpu *vcpu, u64 exit_reason);
->   
->   void kvm_enable_efer_bits(u64);
->   bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer);
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index f14709a511aa..83e0d4d5f4c5 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3451,13 +3451,8 @@ static bool svm_check_exit_valid(u64 exit_code)
->   
->   static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code)
->   {
-> -	vcpu_unimpl(vcpu, "svm: unexpected exit reason 0x%llx\n", exit_code);
->   	dump_vmcb(vcpu);
-> -	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> -	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
-> -	vcpu->run->internal.ndata = 2;
-> -	vcpu->run->internal.data[0] = exit_code;
-> -	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-> +	kvm_prepare_unexpected_reason_exit(vcpu, exit_code);
->   	return 0;
->   }
->   
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 326db9b9c567..079d9f13eddb 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -2145,11 +2145,7 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
->   	}
->   
->   unhandled_exit:
-> -	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> -	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
-> -	vcpu->run->internal.ndata = 2;
-> -	vcpu->run->internal.data[0] = vp_enter_ret;
-> -	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-> +	kvm_prepare_unexpected_reason_exit(vcpu, vp_enter_ret);
->   	return 0;
->   }
->   
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 1021d3b65ea0..08f7957ed4c3 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6642,15 +6642,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
->   	return kvm_vmx_exit_handlers[exit_handler_index](vcpu);
->   
->   unexpected_vmexit:
-> -	vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
-> -		    exit_reason.full);
->   	dump_vmcs(vcpu);
-> -	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> -	vcpu->run->internal.suberror =
-> -			KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
-> -	vcpu->run->internal.ndata = 2;
-> -	vcpu->run->internal.data[0] = exit_reason.full;
-> -	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-> +	kvm_prepare_unexpected_reason_exit(vcpu, exit_reason.full);
->   	return 0;
->   }
->   
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index b4b5d2d09634..c826cd05228a 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9110,6 +9110,18 @@ void kvm_prepare_event_vectoring_exit(struct kvm_vcpu *vcpu, gpa_t gpa)
->   }
->   EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_prepare_event_vectoring_exit);
->   
-> +void kvm_prepare_unexpected_reason_exit(struct kvm_vcpu *vcpu, u64 exit_reason)
-> +{
-> +	vcpu_unimpl(vcpu, "unexpected exit reason 0x%llx\n", exit_reason);
-> +
-> +	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> +	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
-> +	vcpu->run->internal.ndata = 2;
-> +	vcpu->run->internal.data[0] = exit_reason;
-> +	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-> +}
-> +EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_prepare_unexpected_reason_exit);
-> +
->   static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
->   {
->   	struct kvm *kvm = vcpu->kvm;
+> TL;DR:
 >
-> base-commit: 4cc167c50eb19d44ac7e204938724e685e3d8057
+>  - Unify L1TF flushing under per-CPU variable
+>  - Bury L1TF L1D flushing under CONFIG_CPU_MITIGATIONS=y
+>  - Move MMIO Stale Data into asm, and do VERW at most once per VM-Enter
+>
+> To allow VMX to use ALTERNATIVE_2 to select slightly different flows for doing
+> VERW, tweak the low lever macros in nospec-branch.h to define the instruction
+> sequence, and then wrap it with __stringify() as needed.
+>
+> The non-VMX code is lightly tested (but there's far less chance for breakage
+> there).  For the VMX code, I verified it does what I want (which may or may
+> not be correct :-D) by hacking the code to force/clear various mitigations, and
+> using ud2 to confirm the right path got selected.
+
+FWIW [0] offers a way to check end-to-end that an L1TF exploit is broken
+by the mitigation. It's a bit of a long-winded way to achieve that and I
+guess L1TF is anyway the easy case here, but I couldn't resist promoting
+it.
+
+(I just received a Skylake machine from ebay, once that's set up I'll be
+able to double check on there that things still work).
 
