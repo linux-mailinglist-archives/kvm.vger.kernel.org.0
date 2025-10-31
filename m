@@ -1,391 +1,253 @@
-Return-Path: <kvm+bounces-61714-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61715-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0282FC26578
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 18:28:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 719F8C266EF
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 18:43:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7BB85348E2E
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 17:28:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE34F467146
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 17:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C7130648A;
-	Fri, 31 Oct 2025 17:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8066358D08;
+	Fri, 31 Oct 2025 17:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4hjv6wSb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hcAX2TL9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8D0272E63
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 17:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761931685; cv=none; b=pMWCuvB1f8WOwD3Eu5GZbQ0UitcVqsbl2ihRhacMDHG8SsszD0y56nigTr/XEsg5VYuTX2USYZHBJh8gc0p2T/1aUqJaDeB05JfgvRBZm8Z8hFz/OO9eSgQZUg0jreKCr1IuFgw7y7IwnV/QZyVK0pYFMXml/bsS6Nbu/pd4cOw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761931685; c=relaxed/simple;
-	bh=aVXM5VmJ7KRJ9XBYs6HkDlmG7/9RjEQQZI9u3MndFkc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GKFGT5fXOIe/IjWecAgTBxHSj422VU00eTPbCqsmN8Hu2ix5wrM88SHmzGpu/JgAV89eDdx0+RjPGe2Vp8NPLAp38LKD3JShDI3lvxcKsfQez1SYSMx2/5Hs2DcForTSq168UE5slpv4ZJF9CSyV/XN+6JNLa8nsYr4Bwa3pHtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4hjv6wSb; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-294f59039d6so22243725ad.3
-        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 10:28:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761931683; x=1762536483; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f2qAn1JAbAvTAO3XPUTs6m584JRhgVGKTKcn9QMrIKU=;
-        b=4hjv6wSbgLp0mGNWQ8roeIMw/MmW45PSptQ+5mXlwq0y9kifWk3Ut7GMEF+nOgJlj3
-         8pUSlppdbfvFftVGdlNRXGZjX/k/UKNau3TvMPETF91mstuXSl+Zkw7rlEiLxZVKYhhC
-         aL7UCSBgTzVTuiKovysyaixEalFBWi9lFrmEIkPmpwxSI9Q1BBjkQjca6SsN/uOEI2XJ
-         Xloz7M9a9zJzRJhhveAN8f8XZ/kudav65d4ZKyh3UnETeBX3TWvfRb2z7BHCTCaNh79P
-         LPfXM57NVCHt9xe0sSoesu6Aj/qBk5t6KbtJLDWfzSLuoh+lNibObG8wjzf2Pe2xTBJ7
-         SdOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761931683; x=1762536483;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=f2qAn1JAbAvTAO3XPUTs6m584JRhgVGKTKcn9QMrIKU=;
-        b=ArhEX7QalSCVVfVijVheGUenAyCp9RZ5M8idr323rRqY7v0j4lcNSy/uXPVLxo93jE
-         Gc3SpMDYEj9smw4cLGhKZg7ZLwLm/5LyQKRhdFdzOFKjgQHFciQYi0WaodQFeHFiW8vS
-         F28aRu+N78rnHAEcyId06f61ho1Q1dPwNfpViNDhGJ1xi4qh8TW5VNjuV9Qi9jcqShsp
-         6O/bAdfiCTkBqVxtuSn9q9KjZpPkc1O5A+4qeI0jN92i4/bmOXsQ6f/R/nkkPD0dbIVZ
-         2CqoRZQiFoE5eloxZ408bPH0wzzUjRA6N/C9O9M6uJr01hinA/uSX7Aq6wzUvM0sw/cY
-         l0PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWVvwzWFo7lmq3k3fXBBJxIJ6ppVWUK/cNXElT2aZY/BVKeTgM8h4qJ+MY27iT7GfIWA/4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwReVbqql93paVlKAG2PX87pAo9kwK5euCkxwwMnUGSuDGOu8UK
-	58wb/X+xiO1OHsL0yi/Kvlc4mWFn0vi6FeIC9KvLIM355FsRNxVd4q/LD1jGGFAFb82fAwR0yOd
-	L+/MwmQ==
-X-Google-Smtp-Source: AGHT+IG4WheSuTjAfSc3EnUDPS2pz/ETCad4B0Sop/vJQl15RM/WsGCuUE1aZUEbgQvuzoEUmlmmvCdPedw=
-X-Received: from pjbci9.prod.google.com ([2002:a17:90a:fc89:b0:32f:46d:993b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:da87:b0:294:ccc6:cd30
- with SMTP id d9443c01a7336-2951a3851a6mr53377555ad.17.1761931683240; Fri, 31
- Oct 2025 10:28:03 -0700 (PDT)
-Date: Fri, 31 Oct 2025 10:28:01 -0700
-In-Reply-To: <EFA9296F-14F7-4D78-9B7C-1D258FF0A97A@nutanix.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A3430FF25;
+	Fri, 31 Oct 2025 17:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761931739; cv=fail; b=Jw+dkMNMP00xq22g3setcWrGVYqJ9qS7sMYN+gt1Zex14YYs3lvwDpVU3wn1SJijvQkCs9bf3xP2P/Gre6pvApU6Ev1tBdaCGL87aUnOcHmGwCx9nTQTzZBND8Dvg/Fz6ptk19Ds4tE+C9X++pwCaZj/0b5XP9ejm4rdBQ8TqJw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761931739; c=relaxed/simple;
+	bh=DIKTLrPc5oDAtRbGDqtkEfINxLpjUEomKqaIif1WE8g=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=sqTTWI4S6OvW13A8h4jxmFHr6wVcfmYrOJGpmFUqA8HqZfEae5/kQ542w3ZD0l4gDvwM0d781IWlQm4k21wDOCTOP+z1aPoYddCK1Ag7zEABlXZyOH1Vx4CUDZZ6cu+myUmM60+ljoh5OFq73g+w2IFbfLjiuWqrLCusOTqsDBU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hcAX2TL9; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761931738; x=1793467738;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=DIKTLrPc5oDAtRbGDqtkEfINxLpjUEomKqaIif1WE8g=;
+  b=hcAX2TL9ljBBq5E6CD/r8PXb643CP9tfS4FOjgyU8JebnXzmkqYMzEXw
+   YX7UHUsA0y7Jj07qLdp+oyk/1uoR+r4/w7mEpwTo5eGMftQ93y8LqE6y7
+   3bnUlD7gZW9XqAX43wN7pdJCrqtl7B0wqHR6+MJa4+kusmBlv7j0gfr6g
+   3SxsJua/cH6Q0OmGLuTouKN01HJ8gxSsqikFmqNDv2mZUmW35Hqv42DPA
+   EDqZvWTdB/W9DcOPVcZ5u4KrHUna8LneBvN6oTLFVfH4gL5XGoBGOfHfY
+   DfG1fsg0xiWzDwmmb6rl7XEyRxEaz8UvQgC4dMZS4a8aWa34P9USet6Jc
+   Q==;
+X-CSE-ConnectionGUID: SLHwEiPkQai7H9mrUequTQ==
+X-CSE-MsgGUID: uhnOByQmQkGutqGi5pA54Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11599"; a="64015505"
+X-IronPort-AV: E=Sophos;i="6.19,269,1754982000"; 
+   d="scan'208";a="64015505"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 10:28:57 -0700
+X-CSE-ConnectionGUID: hW1+MEkTQcicZE/SM89jVw==
+X-CSE-MsgGUID: XGoRjQwCTvq+UyI/vAAASQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,269,1754982000"; 
+   d="scan'208";a="186742805"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 10:28:56 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 31 Oct 2025 10:28:56 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Fri, 31 Oct 2025 10:28:56 -0700
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.43)
+ by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 31 Oct 2025 10:28:56 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=b/CvXoxYTiVCXNxTPoOpfBAL/TlRAHj291Obh/u7hG/YNk0exQ/fFw6k/KjJtgyKgwbzUy1UyGS4RN/KMMbUJT0dulCrlpQAqB/gm2FW2NXfTemlPxR1w0hA2g0aJTRV7e7nt6bjQ7cHQk2rU/2swNbKmHY4yHaAeNjERNIHzkpHDaJzZBtm5FLzXvBe+2GZaW9s73gAt/juEBzztX5aU8wm/RZV0uVWgUziZiLW71ytXFcM2ZkFUKWZJSIImcp04yTvKxChA4D0+docACBzZ55Zu5ik1EfbHQ3bXf3MUaDxCQHOTcyOWBmuAyI564MogE6Gw7bDiqiXn9w3eOw7oQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DIKTLrPc5oDAtRbGDqtkEfINxLpjUEomKqaIif1WE8g=;
+ b=jvCUCbWEYESw4PTuHkMPcRiJyxr+dntZ+n47UZPqf+GPt6kjJIP9Hl8OjZTb89b2TP1rQWfi669axPDwAq/LKREVqLEmBQmc8QcJvMtnegoWUxaemXQPZ41o0uxg+IBqqDDJ6Vl4H+hljNADXKU4rEzaQ4WY5jQGTf0rspoW4zQtZoru1N4uuS+zLsp57n671cx0/Vrub83tRiwbiRxKc+ZkJqGt4Z5GbpWx4h9wUTx9ZdNUJeaVNjZ8+qxZo7fztmISrZMH2ayyMJ8LUI4eFl+AV3cMIiQBe/G43YgYlIX4rDrvYpMDc1+E+MaHu2HyLIky+Q0zFRsrdeD9hqzwMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
+ by CO1PR11MB4788.namprd11.prod.outlook.com (2603:10b6:303:97::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.15; Fri, 31 Oct
+ 2025 17:28:52 +0000
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.9275.013; Fri, 31 Oct 2025
+ 17:28:52 +0000
+From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+To: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "frankja@linux.ibm.com"
+	<frankja@linux.ibm.com>, "maz@kernel.org" <maz@kernel.org>,
+	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "pjw@kernel.org"
+	<pjw@kernel.org>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"kas@kernel.org" <kas@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
+	"maobibo@loongson.cn" <maobibo@loongson.cn>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "maddy@linux.ibm.com" <maddy@linux.ibm.com>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>, "imbrenda@linux.ibm.com"
+	<imbrenda@linux.ibm.com>, "zhaotianrui@loongson.cn"
+	<zhaotianrui@loongson.cn>, "anup@brainfault.org" <anup@brainfault.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
+	<linux-coco@lists.linux.dev>, "Huang, Kai" <kai.huang@intel.com>, "Zhao, Yan
+ Y" <yan.y.zhao@intel.com>, "michael.roth@amd.com" <michael.roth@amd.com>,
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "Weiny, Ira"
+	<ira.weiny@intel.com>, "loongarch@lists.linux.dev"
+	<loongarch@lists.linux.dev>, "ackerleytng@google.com"
+	<ackerleytng@google.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, "Annapurve,
+ Vishal" <vannapurve@google.com>, "linuxppc-dev@lists.ozlabs.org"
+	<linuxppc-dev@lists.ozlabs.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-mips@vger.kernel.org"
+	<linux-mips@vger.kernel.org>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>, "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v4 00/28] KVM: x86/mmu: TDX post-populate cleanups
+Thread-Topic: [PATCH v4 00/28] KVM: x86/mmu: TDX post-populate cleanups
+Thread-Index: AQHcSdkzrKWzyg8VC0q4XOBdgAv7FrTcg/KA
+Date: Fri, 31 Oct 2025 17:28:52 +0000
+Message-ID: <725c68f2607ad2d4f742fd749ea517a98d669384.camel@intel.com>
+References: <20251030200951.3402865-1-seanjc@google.com>
+In-Reply-To: <20251030200951.3402865-1-seanjc@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.44.4-0ubuntu2 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|CO1PR11MB4788:EE_
+x-ms-office365-filtering-correlation-id: 4d87b731-45c4-4397-6a20-08de18a2f61d
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020|38070700021;
+x-microsoft-antispam-message-info: =?utf-8?B?ek0zSnN4a29NdmhqNXZpNEVXcytHY3BmdDJnRWV5eWMwK2RSUFBuUkhxWGVs?=
+ =?utf-8?B?S1Q2Vk11ZzZTSEdQcVcrbUt5RldaQUZ5Nk5TTE1qZVdnWXZwM1JSWW5RRXJx?=
+ =?utf-8?B?UDVUejNvRFlEMTRPWDk3S0NkR1dWNllFNWJMNmtQVXNCS0pCUzJuY1VGL1FQ?=
+ =?utf-8?B?RHMwSkp6YUNYUGZEVit3amZndnNoc2ljRGd3M0hxWCtTVUNSdTkySWJmckN1?=
+ =?utf-8?B?aWVsSzQ0d291VjdYRmhJN3ViWjhQRWF5cStKNThjYjMzaFRjYXdQS09KOTdU?=
+ =?utf-8?B?blpjazQwdXhXR05SNFJTRzlWNEtDTXJyQnVwZkNWaXovbkhIYVlYVkQ2Tyt3?=
+ =?utf-8?B?UGFnMy8wVWhEUURDTGpPa044NFZuWTdTUkZHbThIM0plVlFFQTA5dXpHYTRm?=
+ =?utf-8?B?dE96eEFlMXdPUmdSNUNxY2xqVUY0Sy9yRnp6WWtFWnA2VjNJWVNCbkJNaWVI?=
+ =?utf-8?B?Y1o1TUNXZEtMeUdxaTZ3U09qS2RPMUxZS0lmT2dTRTFlRU1ycWFjYUo5a3Ir?=
+ =?utf-8?B?bFMxQkQ0OGJ1cG1WRWxjYlF0dUNiRFRrbDJxOXJHUUtYM2h1RGk0RFJsN2wy?=
+ =?utf-8?B?elNGNlVoWEdLTjY5NldnTVJxYlB6NnRtT0k0bElCbTk2Um42bzZUZzZUZU5s?=
+ =?utf-8?B?ZVlFeWhrOWl2bmt4TW1HZVpnTkVmYlZld0xzOWZHSmFsenBNdlI1NnNnaVlQ?=
+ =?utf-8?B?ejFsZ2I5N2RYRCtSdWN2ZHhacHRIdDJ4TFVXYjlNUFhqK1h4SkV3Tm1Eekp6?=
+ =?utf-8?B?K1Z0NXdMM2hxZEhocEVVOE1sbTcrWlhqMDcwSFJwbTZUQnk2VGpGcC9Paysw?=
+ =?utf-8?B?UFFqMVQyNmhTSktrS1BDNUY1aTVWRVgxR1ZJSDBvL3BvVjdlRTlkK0tsQXBY?=
+ =?utf-8?B?MUJRNHRtdEZUOCs0RFJoeUNRanhUYk16VExKL2poNWp3eDViNVZxdFJHQXBT?=
+ =?utf-8?B?YlhsSGhySXllN3dSUExMaWNxWkhPSGhUNXV5MG03VFZmb0NycHlWQ29RMkFr?=
+ =?utf-8?B?ZGJiN2dSOWgrckpRRGEvNk1sbHJlazhKVjM4OG4xSjFXVjJ4ZENTTFRidVhF?=
+ =?utf-8?B?YnkzdGgyeTRyTGhWR01jY2k5S2hsMHNVOU9BQS9hdkkwa0tpamJQZmp2bCtP?=
+ =?utf-8?B?bzFRa2g1bzBKaUhLR3RuOWVJUHFxblhiN2dKZmxKNmNyalQ2U3NRY0pwZEZB?=
+ =?utf-8?B?TUtxbDc2K0Vsb0QxYzRPbnk1ZzhQTWRpR080Q0w1RDFndE41dFQwWlYvVXox?=
+ =?utf-8?B?WGZCTjBMWjduditPa0FIRUlwb0pHYkl5NnMvYk1uOTRjcHNCNTMvS0ZWeXYv?=
+ =?utf-8?B?U3g2SkRTdEVzY01ETHBkd09OYUxzYk82SEpjcTlxOHh6V2kyYnIxMGdXSTBY?=
+ =?utf-8?B?Wmp6ZW94U2JmZmxCelJKSUhlNU16d0VWbkIwLzg3Si9sak1HYlo5VVZRYUUr?=
+ =?utf-8?B?anRMSGRYSUthd0ZkUzZHTGpScU5TRHVyb2lheXJqSmU2MXk0dmxHSjRHZW9n?=
+ =?utf-8?B?ZFFmK1dHaTF3bTdwNEdSYjRoUHJCYVp5M2UxcWU3RUJvMHRuMmdoeDBiZms3?=
+ =?utf-8?B?c2cwaVdvcjF1ZlI3ZkkycGxscDAvN3FTY2NtT09sV0h4QU5BUEtNWHpVSmN0?=
+ =?utf-8?B?NDBUTTErY2Q2NHhxODlCbGtUQVBkY0x4NzkySkxrd0hQMFJkQTZQM245YUZF?=
+ =?utf-8?B?NFpMcVF6c3l2SU9WOFEzUFBWUE1sNjdZNHJtOEwwd0FoQTE4L1oyRnZCcHph?=
+ =?utf-8?B?K0Z5dWdISHNza0w1ZklyVjB6VzFTdnJ6SzVxZXdDbWxINXV0dVhLYzk0UEhC?=
+ =?utf-8?B?K1JxRXJnZlA4Z3ZlTzFvdUVBVXh5WUJYZGRGbTdybmtIejRQaTB6b2pBQ1A0?=
+ =?utf-8?B?UTNqNVpiZm9zY1FhenljK3RZaUd3QTlFQS9QMHBmK0VDWEFueG9CWitvNDg3?=
+ =?utf-8?B?aWtHTFFpY2NEWkhBaWNRYVhGZ3daRHhVSnM0Y2xqSHVmVTZEQjJnZVUrc3ZH?=
+ =?utf-8?B?eTc2KzhqRURBaWpoNnhnSXZxdjdUWmx3OXh3WWJPNUgzVTI3NXYxU0NlTlB2?=
+ =?utf-8?B?Zk1yeE9wdnMyU09JZUJrOUZnOCtTN0FteXE2Zz09?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MG5zSXlubHlXZC9wOTE4SFJqc3Y2a2V2V2ZVbDQ4MTcyU01Vd2pFV2h3dTNT?=
+ =?utf-8?B?ajVMeWRNMnNJTGpOa3V0V3ZBR2FKTEErWHVTV0I5QU9uL3FpMjZrU253ZkhY?=
+ =?utf-8?B?NkZGYUN3UFRoWURPVkI2OVBJaWVuZldiWUZ5a2VxV2FtaDlCa0RuSFJsdkor?=
+ =?utf-8?B?YTk3dXhMVUNHRS9GVDRhUnM5TTUwVm5kV1hLTmsrc1M4Mm1oNE5UNmRISGZI?=
+ =?utf-8?B?MXYyL2VDNGtCWjgzUzRrWnNwSE5PaGN4eGpXVTNnTUsvR2t4UEU2bDI3QzRw?=
+ =?utf-8?B?b1VZVDQ0bnNhQkg3SmRNQkZ4WXUrNTR5WkJrLzNOaHFFNjBqdTdFaVdXbTMx?=
+ =?utf-8?B?d1hGcW1DLzdwRG9kYklGSnhsbHQyUHp2SFcwVSt3TGRkcWR6MGczbFMxNlZt?=
+ =?utf-8?B?SnBzMm9OekhNbTh4SVpOalN1ZUdKSmh3bTRFSExjOGhFYytlaTJwMVUzdVVN?=
+ =?utf-8?B?VmlnbU50eUhiZmQ5OGtSaFBsSVBLdnB3UnJ2MGRzdEx1bHp5UDVkeEV3MHJ4?=
+ =?utf-8?B?M1A2c2Z3YThhT2oxZU5HeVJUNGlsdjFJNytwbnpnZ082Q0NSdGtZdlhZcG43?=
+ =?utf-8?B?T3NBUC9ZMys1ZGNlaStla2hBT2ZNTWxCdDI2VXNIV2dyTGpyTXJ1QUpDWC8v?=
+ =?utf-8?B?ODU3RkY3YVpFb2dXb1NHemtXZVBpREE3M0N3dnIvZTloallBSzhqNEErU0xv?=
+ =?utf-8?B?eGZaaTBVaTZiTXlNRytWS0Vhc3pSeFBWL1BsbCt0dHN1cDhFL1FGMVI1QU9z?=
+ =?utf-8?B?YkNkOTBXNHh6RWZkSlh1NFFPNUkwWmtrdW1qQ2d0ZENCZXBvelE3QUtFSHVE?=
+ =?utf-8?B?Q2ZXSXFvRHZSby95RXZiUFlYd25ybzY1QXkyYk16ak5TK1luQVFrOTR6NEd0?=
+ =?utf-8?B?NE16TlpnTklIYUwzSkxTdmxsdi9nb0V6UjZ0N0dCQlZISkZmQmRFZy83cmY4?=
+ =?utf-8?B?VWRHSXIvZGFTOG5xZlBNWm0wRlFIM2daUnJQMnF6bWZubm8ydEZsa0VwcEt4?=
+ =?utf-8?B?T083cUtzVXk4Vm5wUWw2UGRka0RWNyt6eVFEUUFENTE2blQxWFF5SDdHRlU1?=
+ =?utf-8?B?dm55eGhUMWRZTy9kK3Uwa000ZG5JS0FrVlZodk8rMVl0UFU2WW1TS0s1ZStH?=
+ =?utf-8?B?TlpRUEtrVVpBQ1BvUmZoRzdQUEFxM2xHSXNKNTBScmV3c2NWd2hhUUhaR05E?=
+ =?utf-8?B?cDA3dE9MQlJZZUtkZ1R2M0VIMnIxV1llWkltaVhiZmt4aGZzNEJTa3REMUNr?=
+ =?utf-8?B?Ym52SkFlWGluMXFQN0s5OEFLNjUyVFVYWEVVcUNHSFlwNUV1dDV6OXF4dlZB?=
+ =?utf-8?B?SUl6WUNoeXFtK0FsYjg3ckhqc0J2K3BBdXZGUHcwbXFvcUgzTlNZQUdRYldT?=
+ =?utf-8?B?aFlsKzZsUUhKZnRQTG4vZFZjWjZRUGVSVklBcVBxV3JkaUFoa3FTWDZSd1F3?=
+ =?utf-8?B?R0pzbXFtMmo5NnFuQnpnQy9OSGx0MVYwalUzMzltaklRVkRkNVZ5TXV2eTNa?=
+ =?utf-8?B?b2pGM0FuakJnZWFnc29xY1BTNDhQb0QvU0hqV0RmdEN5dVdzK1JqUUN6OUwv?=
+ =?utf-8?B?OUJkK2E4ZWpZWjAvZ3RrOEU1T1M0aFlUODdsZ1pVRlhIWXpldTkxR0hrbnZu?=
+ =?utf-8?B?QmFTd2JScklhY0k4K2VadDlIbnQ5MzZYZ09CYmE2L3BsQ1hTanBnMThwRTY3?=
+ =?utf-8?B?MmY2bUdNMnNkbVNDeDRuYW9nZG01d2xYZ3JmWVluajRjVVhINFVxdUEwbmxF?=
+ =?utf-8?B?N3IvaGZDOU91SG5aRW5qQmh3b1FKYThWVDQwZ25FWjdNeDdaVTJrREdWMEJM?=
+ =?utf-8?B?bGZ1ekFNZ094dW8rTmJHRGh4SmxsSVc5UGlTR3kzUllWcU4rVGNWZUxrZmJU?=
+ =?utf-8?B?Tmp4VnlxZWY0Y3RvQ1MwRUhORlREeDB1cDRYSmtuYUdhd2kwNllpUWZtRHgv?=
+ =?utf-8?B?cHg3S2FYVlV1Tkx4WGc2WUYzQ0ROYjFiSDh0SmRGc091RjVFQUJhTEw2TmZ5?=
+ =?utf-8?B?bk52NHFDR1AybmNsTFpVVXdMNFpqWmdoaTlnZGtMWjg5MHNDRUlXajZyYXlM?=
+ =?utf-8?B?OGFDZzJWWkVvNWF0ZUlOTkhFcXZ6WW1DQUUvRHF5YnNQbS9vZVBqNG1kUktu?=
+ =?utf-8?B?K1RIT1pFRGJPYjFHd3NKSFBmSXlTeGJCRVFhclp2aU5GUTlSMEVEUEVKNkNP?=
+ =?utf-8?B?Q3c9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7BA9F5F94ECE2F479F7FAC958D999B09@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250918162529.640943-1-jon@nutanix.com> <aNHE0U3qxEOniXqO@google.com>
- <7F944F65-4473-440A-9A2C-235C88672E36@nutanix.com> <B116CE75-43FD-41C4-BB3A-9B0A52FFD06B@nutanix.com>
- <aPvf5Y7qjewSVCom@google.com> <EFA9296F-14F7-4D78-9B7C-1D258FF0A97A@nutanix.com>
-Message-ID: <aQTxoX4lB_XtZM-w@google.com>
-Subject: Re: [PATCH] KVM: x86: skip userspace IOAPIC EOI exit when Directed
- EOI is enabled
-From: Sean Christopherson <seanjc@google.com>
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: Jon Kohler <jon@nutanix.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d87b731-45c4-4397-6a20-08de18a2f61d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Oct 2025 17:28:52.5862
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lDIWTFvc17xjPdDgdiv9ZMX1WufGDdla+vrrxw9PitOQJa0VlavLqLzghzNLmGz9Nd1twxTBWJ/3JOU2GWcSQ46O0aygDHqjkxfZ0dNIQxs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4788
+X-OriginatorOrg: intel.com
 
-On Fri, Oct 31, 2025, Khushit Shah wrote:
-> Hi Sean,
->=20
-> Thanks for the reply.
->=20
-> > On 25 Oct 2025, at 1:51=E2=80=AFAM, Sean Christopherson <seanjc@google.=
-com> wrote:
-> >=20
-> > Make it a quirk instead of a capability.  This is definitely a KVM bug,=
- it's just
-> > unfortunately one that we can't fix without breaking userspace :-/
->=20
-> I don=E2=80=99t think this approach fully addresses the issue.
->=20
-> For example, consider the same Windows guest running with a userspace
-> I/O APIC that has no EOI registers. The guest will set the Suppress EOI
-> Broadcast bit because KVM advertises support for it (see=20
-> kvm_apic_set_version).
->=20
-> If the quirk is enabled, an interrupt storm will occur.
-> If the quirk is disabled, userspace will never receive the EOI
-> notification.
-
-Uh, why not?
-
-> For context, Windows with CG the interrupt in the following order:
->   1. Interrupt for L2 arrives.
->   2. L1 APIC EOIs the interrupt.
->   3. L1 resumes L2 and injects the interrupt.
->   4. L2 EOIs after servicing.
->   5. L1 performs the I/O APIC EOI.
-
-And at #5, the MMIO access to the I/O APIC gets routed to userspace for emu=
-lation.
-
-> Guest is not doing anything theoretically wrong here.=20
->=20
-> The root issue is that KVM advertises support for EOI broadcast
-> suppression without knowing whether userspace supports it.
-
-That's the whole point of the quirk; userspace should disable the quirk if =
-and
-only if it supports the I/O APIC EOI extension.
-
-> Even my previous proposal doesn=E2=80=99t completely solve this. A potent=
-ial
-> way to fix it without breaking userspace would be to let userspace
-> explicitly indicate whether it supports EOI broadcast suppression
-> (i.e. whether it implements EOI registers). By default, KVM should
-> assume userspace does *not* support EOI broadcast suppression,
-> contrary to the current behavior.
-
-But as I mentioned in my previous reply, that requires a guest reboot to ta=
-ke
-affect.
-
-> This way, unmodified userspace remains unaffected,
-
-Not entirely, no.  If you strictly scope "userspace" to mean the VMM code, =
-then
-yes, that statement is true.  But changing the virtual CPU model that is pr=
-esented
-to the guest is absolutely going to affect userspace, in the sense that a g=
-uest
-will see what appears to be different CPUs=20
-
-> and updated userspace can opt in when it truly supports EOI broadcast
-> suppression.
->=20
-> Am I missing something?
-
-I think so?  It's also possible I'm missing something :-)
-
-And all of the above said, I'm not at all opposed to giving userspace contr=
-ol
-over whether or not Suppress EOI Broadcast is advertised to the guest.  Qui=
-te
-the opposite actually.  It's just that I also want to provide a fix that al=
-lows
-for fixing the worst of the issue without needing a guest reboot, and witho=
-ut
-having to change the virtual CPU model that's exposed to the guest.
-
-So, what if we do both?  And to avoid spreading the damage all over the pla=
-ce,
-use KVM_CAP_X2APIC_API?  Compile tested only...
-
-From: Khushit Shah <khushit.shah@nutanix.com>
-Date: Fri, 31 Oct 2025 09:25:59 -0700
-Subject: [PATCH] KVM: x86: Add x2APIC "features" to control EOI broadcast
- suppression
-
-Add two flags for KVM_CAP_X2APIC_API to allow userspace to control support
-for Suppress EOI Broadcasts, which KVM completely mishandles.  When x2APIC
-support was first added, KVM incorrectly advertised and "enabled" Suppress
-EOI Broadcast, without fully supporting the I/O APIC side of the equation,
-i.e. without adding directed EOI to KVM's in-kernel I/O APIC.
-
-That flaw was carried over to split IRQCHIP support, i.e. KVM advertised
-support for Suppress EOI Broadcasts irrespective of whether or not the
-userspace I/O APIC implementation supported directed EOIs.  Even worse,
-KVM didn't actually suppress EOI broadcasts, i.e. userspace VMMs without
-support for directed EOI came to rely on the "spurious" broadcasts.
-
-KVM "fixed" the in-kernel I/O APIC implementation by completely disabling
-support for Supress EOI Broadcasts in commit 0bcc3fb95b97 ("KVM: lapic:
-stop advertising DIRECTED_EOI when in-kernel IOAPIC is in use"), but
-didn't do anything to remedy userspace I/O APIC implementations.
-
-KVM's bogus handling of Supress EOI Broad is problematic when the guest
-relies on interrupts being masked in the I/O APIC until well after the
-initial local APIC EOI.  E.g. Windows with Credential Guard enabled
-handles interrupts in the following order:
-
- the interrupt in the following order:
-  1. Interrupt for L2 arrives.
-  2. L1 APIC EOIs the interrupt.
-  3. L1 resumes L2 and injects the interrupt.
-  4. L2 EOIs after servicing.
-  5. L1 performs the I/O APIC EOI.
-
-Because KVM EOIs the I/O APIC at step #2, the guest can get an interrupt
-storm, e.g. if the IRQ line is still asserted and userspace reacts to the
-EOI by re-injecting the IRQ, because the guest doesn't de-assert the line
-until step #4, and doesn't expect the interrupt to be re-enabled until
-step #5.
-
-Unfortunately, simply "fixing" the bug isn't an option, as KVM has no way
-of knowing if the userspace I/O APIC supports directed EOIs, i.e.
-suppressing EOI broadcasts would result in interrupts being stuck masked
-in the userspace I/O APIC due to step #5 being ignored by userspace.  And
-fully disabling support for Suppress EOI Broadcast is also undesirable, as
-picking up the fix would require a guest reboot, *and* more importantly
-would change the virtual CPU model exposed to the guest without any buy-in
-from userspace.
-
-Add two flags to allow userspace to choose exactly how to solve the
-immediate issue, and in the long term to allow userspace to control the
-virtual CPU model that is exposed to the guest (KVM should never have
-enabled supported for Supress EOI Broadcast without a userspace opt-in).
-
-Note, Suppress EOI Broadcasts is defined only in Intel's SDM, not in AMD's
-APM.  But the bit is writable on some AMD CPUs, e.g. Turin, and KVM's ABI
-is to support Directed EOI (KVM's name) irrespective of guest CPU vendor.
-
-Fixes: 7543a635aa09 ("KVM: x86: Add KVM exit for IOAPIC EOIs")
-Closes: https://lore.kernel.org/kvm/7D497EF1-607D-4D37-98E7-DAF95F099342@nu=
-tanix.com
-Cc: stable@vger.kernel.org
-Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- Documentation/virt/kvm/api.rst  | 14 ++++++++++++--
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/include/uapi/asm/kvm.h |  6 ++++--
- arch/x86/kvm/lapic.c            | 13 +++++++++++++
- arch/x86/kvm/x86.c              | 11 ++++++++---
- 5 files changed, 39 insertions(+), 7 deletions(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rs=
-t
-index 57061fa29e6a..4bfd4ed6afa4 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7800,8 +7800,10 @@ Will return -EBUSY if a VCPU has already been create=
-d.
-=20
- Valid feature flags in args[0] are::
-=20
--  #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
--  #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
-+  #define KVM_X2APIC_API_USE_32BIT_IDS                    (1ULL << 0)
-+  #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK          (1ULL << 1)
-+  #define KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST_QUIRK (1ULL << 2)
-+  #define KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST       (1ULL << 3)
-=20
- Enabling KVM_X2APIC_API_USE_32BIT_IDS changes the behavior of
- KVM_SET_GSI_ROUTING, KVM_SIGNAL_MSI, KVM_SET_LAPIC, and KVM_GET_LAPIC,
-@@ -7814,6 +7816,14 @@ as a broadcast even in x2APIC mode in order to suppo=
-rt physical x2APIC
- without interrupt remapping.  This is undesirable in logical mode,
- where 0xff represents CPUs 0-7 in cluster 0.
-=20
-+Setting KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST_QUIRK overrides KVM's qu=
-irky
-+behavior of not actually suppressing EOI broadcasts for split IRQ chips wh=
-en
-+support for Suppress EOI Broadcasts is advertised to the guest.
-+
-+Setting KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST disables support for Sup=
-press
-+EOI Broadcasts entirely, i.e. instructs KVM to NOT advertise support to th=
-e
-+guest and thus disallow enabling EOI broadcast suppression in SPIV.
-+
- 7.8 KVM_CAP_S390_USER_INSTR0
- ----------------------------
-=20
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_hos=
-t.h
-index 48598d017d6f..fdf4f99de630 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1480,6 +1480,8 @@ struct kvm_arch {
-=20
- 	bool x2apic_format;
- 	bool x2apic_broadcast_quirk_disabled;
-+	bool disable_suppress_eoi_broadcast_quirk;
-+	bool x2apic_disable_suppress_eoi_broadcast;
-=20
- 	bool has_mapped_host_mmio;
- 	bool guest_can_read_msr_platform_info;
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kv=
-m.h
-index d420c9c066d4..955b854b4b82 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -913,8 +913,10 @@ struct kvm_sev_snp_launch_finish {
- 	__u64 pad1[4];
- };
-=20
--#define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
--#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
-+#define KVM_X2APIC_API_USE_32BIT_IDS            	(1ULL << 0)
-+#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  	(1ULL << 1)
-+#define KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST_QUIRK	(1ULL << 2)
-+#define KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST	(1ULL << 3)
-=20
- struct kvm_hyperv_eventfd {
- 	__u32 conn_id;
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 0ae7f913d782..f83abbcf136f 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -562,6 +562,7 @@ void kvm_apic_set_version(struct kvm_vcpu *vcpu)
- 	 * IOAPIC.
- 	 */
- 	if (guest_cpu_cap_has(vcpu, X86_FEATURE_X2APIC) &&
-+	    !vcpu->kvm->arch.x2apic_disable_suppress_eoi_broadcast &&
- 	    !ioapic_in_kernel(vcpu->kvm))
- 		v |=3D APIC_LVR_DIRECTED_EOI;
- 	kvm_lapic_set_reg(apic, APIC_LVR, v);
-@@ -1517,6 +1518,18 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *ap=
-ic, int vector)
-=20
- 	/* Request a KVM exit to inform the userspace IOAPIC. */
- 	if (irqchip_split(apic->vcpu->kvm)) {
-+		/*
-+		 * Don't exit to userspace if the guest has enabled Directed
-+		 * EOI, a.k.a. Suppress EOI Broadcasts, in which case the local
-+		 * APIC doesn't broadcast EOIs (the guest must EOI the target
-+		 * I/O APIC(s) directly).  Ignore the suppression if userspace
-+		 * has NOT disabled KVM's quirk (KVM advertised support for
-+		 * Suppress EOI Broadcasts without actually suppressing EOIs).
-+		 */
-+		if ((kvm_lapic_get_reg(apic, APIC_SPIV) & APIC_SPIV_DIRECTED_EOI) &&
-+		    apic->vcpu->kvm->arch.disable_suppress_eoi_broadcast_quirk)
-+			return;
-+
- 		apic->vcpu->arch.pending_ioapic_eoi =3D vector;
- 		kvm_make_request(KVM_REQ_IOAPIC_EOI_EXIT, apic->vcpu);
- 		return;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b4b5d2d09634..b82840104c53 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -121,8 +121,10 @@ static u64 __read_mostly efer_reserved_bits =3D ~((u64=
-)EFER_SCE);
-=20
- #define KVM_CAP_PMU_VALID_MASK KVM_PMU_CAP_DISABLE
-=20
--#define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS | \
--                                    KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK=
-)
-+#define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS | 			\
-+                                    KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK=
- |		\
-+				    KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST_QUIRK |	\
-+				    KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST)
-=20
- static void update_cr8_intercept(struct kvm_vcpu *vcpu);
- static void process_nmi(struct kvm_vcpu *vcpu);
-@@ -6783,7 +6785,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			kvm->arch.x2apic_format =3D true;
- 		if (cap->args[0] & KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK)
- 			kvm->arch.x2apic_broadcast_quirk_disabled =3D true;
--
-+		if (cap->args[0] & KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST_QUIRK)
-+			kvm->arch.disable_suppress_eoi_broadcast_quirk =3D true;
-+		if (cap->args[0] & KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST)
-+			kvm->arch.x2apic_disable_suppress_eoi_broadcast =3D true;
- 		r =3D 0;
- 		break;
- 	case KVM_CAP_X86_DISABLE_EXITS:
-
-base-commit: 4361f5aa8bfcecbab3fc8db987482b9e08115a6a
---
+T24gVGh1LCAyMDI1LTEwLTMwIGF0IDEzOjA5IC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiB2NDoNCj4gwqAtIENvbGxlY3QgcmV2aWV3cy9hY2tzLg0KPiDCoC0gQWRkIGEgbG9j
+a2RlcCBhc3NlcnRpb24gaW4ga3ZtX3RkcF9tbXVfbWFwX3ByaXZhdGVfcGZuKCkuIFtZYW5dDQo+
+IMKgLSBXcmFwIGt2bV90ZHBfbW11X21hcF9wcml2YXRlX3BmbigpIHdpdGggQ09ORklHX0tWTV9H
+VUVTVF9NRU1GRD15LiBbdGVzdCBib3RdDQo+IMKgLSBJbXByb3ZlIChvciBhZGQpIGNvbW1lbnRz
+LiBbS2FpLCBhbmQgcHJvYmFibHkgb3RoZXJzXQ0KPiDCoC0gcy9zcHRlL21pcnJvcl9zcHRlIHRv
+IG1ha2UgaXQgY2xlYXIgd2hhdCdzIGJlaW5nIHBhc3NlZCBpbg0KPiDCoC0gVXBkYXRlIHNldF9l
+eHRlcm5hbF9zcHRlKCkgdG8gdGFrZSBAbWlycm9yX3NwdGUgYXMgd2VsbC4gW1lhbl0NCj4gwqAt
+IE1vdmUgdGhlIEtWTV9CVUdfT04oKSBvbiB0ZGhfbXJfZXh0ZW5kKCkgZmFpbHVyZSB0byB0aGUg
+ZW5kLiBbUmlja10NCj4gwqAtIFRha2UgImFsbCIgdGhlIGxvY2tzIGluIHRkeF92bV9pb2N0bCgp
+LiBbS2FpXQ0KPiDCoC0gV0FSTiBpZiBLVk0gYXR0ZW1wdHMgdG8gbWFwIFNQVEVzIGludG8gYW4g
+aW52YWxpZCByb290LiBbWWFuXQ0KPiDCoC0gVXNlIHRkeF9mbHVzaF92cF9vbl9jcHUoKSBpbnN0
+ZWFkIG9mIHRkeF9kaXNhc3NvY2lhdGVfdnAoKSB3aGVuIGZyZWVpbmcNCj4gwqDCoCBhIHZDUFUg
+aW4gVkNQVV9URF9TVEFURV9VTklOSVRJQUxJWkVEIHN0YXRlLiBbWWFuXQ0KDQpEbyB5b3Ugd2Fu
+dCBzb21lb25lIHRvIGZvbGxvdyB1cCB3aXRoIGEgdjIgb2YgdGhpcyBhZnRlciB0aGUgc2VyaWVz
+IGxhbmRzPyAod2l0aA0KQmluYmluJ3MgdmVyYmlhZ2UgY29tbWVudHMgaW5jb3Jwb3JhdGVkKQ0K
+DQpodHRwczovL2xvcmUua2VybmVsLm9yZy9rdm0vMjAyNTEwMjgwMDI4MjQuMTQ3MDkzOS0xLXJp
+Y2sucC5lZGdlY29tYmVAaW50ZWwuY29tLyN0DQoNCg==
 
