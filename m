@@ -1,155 +1,170 @@
-Return-Path: <kvm+bounces-61621-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61622-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92114C22C6A
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:19:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79EDDC22C7F
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:30:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D909C34B5C4
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:19:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7912D4E4C6A
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 042971A9F88;
-	Fri, 31 Oct 2025 00:19:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7E81D6193;
+	Fri, 31 Oct 2025 00:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="WR8lxUAx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AjBqu+q+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B7113E02A
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 00:19:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A3D282EB
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 00:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761869975; cv=none; b=WgcLq3C1Jh9TBMsYC6WQ08JeR0Oimyp1/wjGQUT/fTdEgc8SZmBlWjDObuvxd0O+25DCraqDaoaKosDGclgIVhnnJH0ZB2umeFI4h4TPL94QyBxXTodkRp3hn2z+iDcNG11rZB4+Gv1SZ6e871+Mhfkq/fPXMCm0cCKqgPQ5kuY=
+	t=1761870648; cv=none; b=Zi705of3PdR6k8v8CklcAQQLQJk0PS6x95MGLnXhHFL5qR1QYMGJ7BsO2QkKLrcaf7ETdag4v9GkqEb+tuyUqB+/w/PU5diryqiBKsbBXdvzM8AZQo04wxWXLxM8mmspGT1HpXiUsjJ8RjZZpjpk7+RdRm5l825luK0tclZS1jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761869975; c=relaxed/simple;
-	bh=8rHUYkXKPL5IW43a+4rQNutLuyHqHIoW5Z0VxJSm0u4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jWhUqKagdy26shUWFT4BKrkUowsAec/m+HPnD+LxPOJbmkVY/hBymIPee1T69xWPNbzHb+U/aFz65XApz0KnWqmxGn82vSn6li1q/HPwjzcA1HoV2I0tXGdXP+BuTLWLSTAo8SUOUQTEf8DQigqpn7lWsY50gwt//dj1grIMFw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com; spf=pass smtp.mailfrom=soleen.com; dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b=WR8lxUAx; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-64071184811so1892503a12.0
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:19:32 -0700 (PDT)
+	s=arc-20240116; t=1761870648; c=relaxed/simple;
+	bh=gPlIzeYfDGA258jPLcMw5THFnBDkxmCSUZp7s7X0tso=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jmwdoD9QIGjNXSMhYNMacJ/RvTR1VBwgefyg3WI+XgqEcrnchoqVRSOG9S2mjuOlLe6hrE4wX7YzYairvfaCigB9Or12MGUYZlEy/OeoiKGoamj6HSDWBTO4bh6/v8kMT4kh74Ire6jk21LOxsAnsf4TdZwVec2GCWd51RJoJw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AjBqu+q+; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33bbbb41a84so3547317a91.1
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:30:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1761869971; x=1762474771; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cv3Ljvf1heM/ChX+5Kbnk959i79o/ym9ON91SVXdVic=;
-        b=WR8lxUAxQmD+DWLD1tgzmINQnPnyk6Vm976ZZpfc/IITPpAPs+kxbXZbaybX0nFwbv
-         NP62A1PqWLovWAkXh9DGcUrXuzEEQQpxKJ3JorgCVpURG+3TKFcJ9nQy3vy+SWPmR3NS
-         X8PTqprIfWt1r8qoyEIY8+qr8MTuKr8btlRjGZ2k1dZ7zM41eNj7VKyWMl1RNHRk6Zav
-         0IxobgQB8mmDp07zCyQVT5Jn4zr7J1GWVIvCUjPxfK9x782d6AEE0y2XdGOLZJ5OPbNx
-         xq4vRUKVwBDN8go1aAmpL3GcFErz41o/O7lOstO8c67Lob+4CzOstfEduiGJ6TAwzc5Q
-         O/DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761869971; x=1762474771;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=google.com; s=20230601; t=1761870646; x=1762475446; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Cv3Ljvf1heM/ChX+5Kbnk959i79o/ym9ON91SVXdVic=;
-        b=sE3FtowT+tRSukasR8VjsFlsSuIbYVsi8XPnMMJ3CEBj1fKBYJ2ei+uU+WhtYLc5i7
-         ayoM7rIXzSMdZme96ivbeG8hVoamui6673pa9OrycppiBocAGK6VhRxL829QlHNUw+IP
-         jOed7GCnXD2xX6QgpEdRC0aME+I/pktcjX8qNjdlhkHuLbvjDhpwGreug63mGvuH3ki2
-         mGSb78xo3T1R+YCoDiC0+J9XtZeiVUfxJJlYmNqoV4C2pfJcJeG9tTJzi918l5S81AXR
-         2ypedsIFu953YhseVk4lZVrgG2j9SEo0AERgOo0FyTBKD3WkuJIjHA3shrd8CcE77ezf
-         wCcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVwvmUvRvOf/R3CwWgA6rDoNnPBlF3Tz4/MFO/4wzH83FA/TFRxYpFqzcjmVKLkPM65/+w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk5sTsRp9359wxFewZNruxBeWW4QSGDCwoUiN4AyAMlK/+bfoS
-	FobugWu9z0vbg4dgkPKantgFgLz19h24eeCLooKWsmxvN4s0JDFzY/6EMDFE9m5x26NUVqsU/tx
-	nDzYLUs4CsrDELQfRdriAvSgCGrtrTClSRhbqPrLVhw==
-X-Gm-Gg: ASbGncsE8uzboCBDKnRNMgGgpQnAP+Rm0Cv7xqsuAuGzNlhxmavQuHXQuLUDsYJyNDG
-	iiZqkb3A7zSON/GKoAyH106NjhyA0eb6nlPrJZ2ievuwNMI6DFaSkeBxqzGtYRGIqQ3FUvCoVTt
-	hBRuq7+Ch3SoAFkhG6yagkbuTvmXkhzVyRG01dDu3JQO5PHEw5RyD7gUf3UBfiX2ZCSikNrEsQ8
-	ZeYrpyZFa5orj7cTf/MuN9p/nvrfn2vMPh3WgmnzptN9PGOLE7ybT4utPnt/uilSSF9
-X-Google-Smtp-Source: AGHT+IHAmJ5aHdM6JoD2TOJsB7BThxEoT5eo1YrDOCS0gC6NmplAKbJLD+yZsTcgPKK2dj5Dhi5gMIE8RdzNHN72sus=
-X-Received: by 2002:a05:6402:13cb:b0:640:6a18:2931 with SMTP id
- 4fb4d7f45d1cf-6407702dcd1mr1160377a12.29.1761869971150; Thu, 30 Oct 2025
- 17:19:31 -0700 (PDT)
+        bh=N9tLwYhb23pEKSJRiBqjQRx2hF9R/IX4UqNL3Rew01U=;
+        b=AjBqu+q+tVHL/283CThnrg2QOnLWgeIg8rddbTbStwFfNedQYtGxwfHIzFiYO2ZPRS
+         wskXVqtb7PjU2vAjqif9wHZGzowap/QcR3iJ9i6dneagAMaroz28YFA/Y15RxQa11Hg+
+         t9XwtQN0gH3L7z7AYQV/jMxtMeVg1GH5T7iAGFqG92vbb7rLmwy+Qw5ZYmimdHkUtulx
+         HSUEsSPQu9Hg58sR2GW6K9lAbgqcz01soPxSG6nib1WJbDrvQ5yy7VJ3TQ6CHeF6SQCk
+         /gYaYANkL+eIiGoZKmvw7B30nUg1G8igMyQCPXnBfv/pdrhkurLF+gCm/8wn/2J6qqfR
+         SZSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761870646; x=1762475446;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N9tLwYhb23pEKSJRiBqjQRx2hF9R/IX4UqNL3Rew01U=;
+        b=HjhZv5ggdd9y6GOyrc8tAGHRKzmOiEkmTNUJ0daH5bTmMeFRfIiU+AiDPp1UUfxPqw
+         yPF13/nC+rbER3XikNgr9Iu8mw6Cuj2kwy+R3dsInJQQLxzLmfq3bKl5bHLTVFkHNs6j
+         2jVb6KSh4l80lh8UAEKH/Lx97+yNpMrLrXZfOT606mXaBoFXOZ2A4cutzUDJoeW6ou1M
+         Y7eTsnWp7DApEPS//926xjgVj//NueAh2btITjeUvfNi38OIr/iI3surmepfSSY9Lu66
+         3PrMHazYso+R8odEZ9THJHPO7QIkERcqMZQiYn2925/mghKqdXvoOIPDK5MauKTNLupR
+         9GPw==
+X-Gm-Message-State: AOJu0YxKsf8lOSznoneYt2h+D68T46YbkiREuMAGJq00KndGG0FeiMeT
+	9J8xtDhDuBAh7grxhFdhG0V6cLGr4wUYqwpBTftRUg3/QgMq2B6VPkQDVKXYARHoFmOrW+0FxmI
+	2/+5DLQ==
+X-Google-Smtp-Source: AGHT+IFIqP2Br1l+AyG7RNfviFrGrRQqmryzEkiWym/i/FBoJUjmhjd2KxgCWe8EgzaFaRKz53fKGFoZgGQ=
+X-Received: from pjod4.prod.google.com ([2002:a17:90a:8d84:b0:33b:51fe:1a7a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3a90:b0:340:2942:dbfe
+ with SMTP id 98e67ed59e1d1-34083055450mr2147907a91.17.1761870645952; Thu, 30
+ Oct 2025 17:30:45 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 30 Oct 2025 17:30:32 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251018000713.677779-1-vipinsh@google.com> <20251018000713.677779-7-vipinsh@google.com>
- <20251027134430.00007e46@linux.microsoft.com> <aQPwSltoH7rRsnV9@google.com>
-In-Reply-To: <aQPwSltoH7rRsnV9@google.com>
-From: Pasha Tatashin <pasha.tatashin@soleen.com>
-Date: Thu, 30 Oct 2025 20:18:54 -0400
-X-Gm-Features: AWmQ_bmaQn5U2r87lGmHMokOwG7--caG9FTwwPKr2aHRFfrExiLwJYx42aUNdvg
-Message-ID: <CA+CK2bD-E0HKsuE0SPpZqEoJyEK4=KJCBw-h1WFP7O1KEoKuNQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 06/21] vfio/pci: Accept live update preservation
- request for VFIO cdev
-To: David Matlack <dmatlack@google.com>
-Cc: Jacob Pan <jacob.pan@linux.microsoft.com>, Vipin Sharma <vipinsh@google.com>, 
-	bhelgaas@google.com, alex.williamson@redhat.com, jgg@ziepe.ca, 
-	graf@amazon.com, pratyush@kernel.org, gregkh@linuxfoundation.org, 
-	chrisl@kernel.org, rppt@kernel.org, skhawaja@google.com, parav@nvidia.com, 
-	saeedm@nvidia.com, kevin.tian@intel.com, jrhilke@google.com, david@redhat.com, 
-	jgowans@amazon.com, dwmw2@infradead.org, epetron@amazon.de, 
-	junaids@google.com, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
+Message-ID: <20251031003040.3491385-1-seanjc@google.com>
+Subject: [PATCH v4 0/8] x86/bugs: KVM: L1TF and MMIO Stale Data cleanups
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Brendan Jackman <jackmanb@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 30, 2025 at 7:10=E2=80=AFPM David Matlack <dmatlack@google.com>=
- wrote:
->
-> On 2025-10-27 01:44 PM, Jacob Pan wrote:
-> > On Fri, 17 Oct 2025 17:06:58 -0700 Vipin Sharma <vipinsh@google.com> wr=
-ote:
-> > >  static int vfio_pci_liveupdate_retrieve(struct
-> > > liveupdate_file_handler *handler, u64 data, struct file **file)
-> > >  {
-> > > @@ -21,10 +28,17 @@ static int vfio_pci_liveupdate_retrieve(struct
-> > > liveupdate_file_handler *handler, static bool
-> > > vfio_pci_liveupdate_can_preserve(struct liveupdate_file_handler
-> > > *handler, struct file *file) {
-> > > -   return -EOPNOTSUPP;
-> > > +   struct vfio_device *device =3D vfio_device_from_file(file);
-> > > +
-> > > +   if (!device)
-> > > +           return false;
-> > > +
-> > > +   guard(mutex)(&device->dev_set->lock);
-> > > +   return vfio_device_cdev_opened(device);
-> >
-> > IIUC, vfio_device_cdev_opened(device) will only return true after
-> > vfio_df_ioctl_bind_iommufd(). Where it does:
-> >       device->cdev_opened =3D true;
-> >
-> > Does this imply that devices not bound to an iommufd cannot be
-> > preserved?
->
-> Event if being bound to an iommufd is required, it seems wrong to check
-> it in can_preserve(), as the device can just be unbound from the iommufd
-> before preserve().
->
-> I think can_preserve() just needs to check if this is a VFIO cdev file,
-> i.e. vfio_device_from_file() returns non-NULL.
+This is a combination of Brendan's work to unify the L1TF L1D flushing
+mitigation, and Pawan's work to bring some sanity to the mitigations that
+clear CPU buffers, with a bunch of glue code and some polishing from me.
 
-+1, can_preserve() must be fast, as it might be called on every single
-FD that is being preserved, to check if type is correct.
-So, simply check if "struct file" is cdev via ops check perhaps via
-and thats it. It should be a very simple operation
+The "v4" is relative to the L1TF series.  I smushed the two series together
+as Pawan's idea to clear CPU buffers for MMIO in vmenter.S obviated the need
+for a separate cleanup/fix to have vmx_l1d_flush() return true/false, and
+handling the series separately would have been a lot of work+churn for no
+real benefit.
 
->
-> >
-> > If so, I am confused about your cover letter step #15
-> > > 15. It makes usual bind iommufd and attach page table calls.
-> >
-> > Does it mean after restoration, we have to bind iommufd again?
->
-> This is still being discussed. These are the two options currently:
->
->  - When userspace retrieves the iommufd from LUO after kexec, the kernel
->    will internally restore all VFIO cdevs and bind them to the iommufd
->    in a single step.
->
->  - Userspace will retrieve the iommufd and cdevs from LUO separately,
->    and then bind each cdev to the iommufd like they were before kexec.
+TL;DR:
+
+ - Unify L1TF flushing under per-CPU variable
+ - Bury L1TF L1D flushing under CONFIG_CPU_MITIGATIONS=y
+ - Move MMIO Stale Data into asm, and do VERW at most once per VM-Enter
+
+To allow VMX to use ALTERNATIVE_2 to select slightly different flows for doing
+VERW, tweak the low lever macros in nospec-branch.h to define the instruction
+sequence, and then wrap it with __stringify() as needed.
+
+The non-VMX code is lightly tested (but there's far less chance for breakage
+there).  For the VMX code, I verified it does what I want (which may or may
+not be correct :-D) by hacking the code to force/clear various mitigations, and
+using ud2 to confirm the right path got selected.
+
+v4:
+ - Drop the patch to fallback to handling the MMIO mitigation if
+   vmx_l1d_flush() doesn't flush, and instead use Pawan's approach of
+   decoupling the two entirely.
+ - Replace the static branch with X86_FEATURE_CLEAR_CPU_BUF_MMIO so that
+   it can be referenced in ALTERNATIVE macros.
+ - Decouple X86_FEATURE_CLEAR_CPU_BUF_VM from X86_FEATURE_CLEAR_CPU_BUF_MMIO
+   (though they still interact and can both be set)
+
+v3:
+ - https://lore.kernel.org/all/20251016200417.97003-1-seanjc@google.com
+ - [Pawan's series] https://lore.kernel.org/all/20251029-verw-vm-v1-0-babf9b961519@linux.intel.com
+ - Put the "raw" variant in KVM, dress it up with KVM's "request" terminology,
+   and add a comment explaining why _KVM_ knows its usage doesn't need to
+   disable virtualization.
+ - Add the prep patches.
+
+v2:
+ - https://lore.kernel.org/all/20251015-b4-l1tf-percpu-v2-1-6d7a8d3d40e9@google.com
+ - Moved the bit back to irq_stat
+ - Fixed DEBUG_PREEMPT issues by adding a _raw variant
+
+v1: https://lore.kernel.org/r/20251013-b4-l1tf-percpu-v1-1-d65c5366ea1a@google.com
+
+Brendan Jackman (1):
+  KVM: x86: Unify L1TF flushing under per-CPU variable
+
+Pawan Gupta (1):
+  x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
+
+Sean Christopherson (6):
+  x86/bugs: Decouple ALTERNATIVE usage from VERW macro definition
+  x86/bugs: Use an X86_FEATURE_xxx flag for the MMIO Stale Data
+    mitigation
+  KVM: VMX: Handle MMIO Stale Data in VM-Enter assembly via
+    ALTERNATIVES_2
+  x86/bugs: KVM: Move VM_CLEAR_CPU_BUFFERS into SVM as
+    SVM_CLEAR_CPU_BUFFERS
+  KVM: VMX: Bundle all L1 data cache flush mitigation code together
+  KVM: VMX: Disable L1TF L1 data cache flush if CONFIG_CPU_MITIGATIONS=n
+
+ arch/x86/include/asm/cpufeatures.h   |   1 +
+ arch/x86/include/asm/hardirq.h       |   4 +-
+ arch/x86/include/asm/kvm_host.h      |   3 -
+ arch/x86/include/asm/nospec-branch.h |  24 +--
+ arch/x86/kernel/cpu/bugs.c           |  18 +-
+ arch/x86/kvm/mmu/mmu.c               |   2 +-
+ arch/x86/kvm/mmu/spte.c              |   2 +-
+ arch/x86/kvm/svm/vmenter.S           |   6 +-
+ arch/x86/kvm/vmx/nested.c            |   2 +-
+ arch/x86/kvm/vmx/vmenter.S           |  14 +-
+ arch/x86/kvm/vmx/vmx.c               | 235 ++++++++++++++-------------
+ arch/x86/kvm/x86.c                   |   6 +-
+ arch/x86/kvm/x86.h                   |  14 ++
+ 13 files changed, 178 insertions(+), 153 deletions(-)
+
+
+base-commit: 4cc167c50eb19d44ac7e204938724e685e3d8057
+-- 
+2.51.1.930.gacf6e81ea2-goog
+
 
