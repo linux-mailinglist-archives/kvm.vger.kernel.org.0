@@ -1,138 +1,139 @@
-Return-Path: <kvm+bounces-61716-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61717-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12F2EC266A5
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 18:41:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB1F0C266D4
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 18:43:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 145234FC8D4
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 17:37:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C4DBC4F924D
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 17:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF78B32143F;
-	Fri, 31 Oct 2025 17:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC1B34BA59;
+	Fri, 31 Oct 2025 17:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xlTcVDMM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3TLlFyOs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDCE1F4161
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 17:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEE53093C3
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 17:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761931818; cv=none; b=fODQpufFmhCqOoly3G3W6nV4L7XTt+H2FLB4jMgNnu9EVgt3jq5VZ3WK6r3m0PyAy21dczWKanLktC0Mh2uNI9YJtrBxbwnHCKMTL3uYRVoy69qSbVFRb487HpOR2zTRCrX4zqnh1o8M6urkQVJLo12zi/r+ZQ99pwP8Sdu8Hbo=
+	t=1761932095; cv=none; b=JknY6xVn/kGh5vGAss0efmpavTk7KX14Sd9FdOIdelZ4lbQxKoQHqz0f8nkvDwXaSR4ucej7uGf6AL1ewdJSCE8baa9fTh7o3Kv+PNN5J6B3gjV7LDWfQwcMRgb1HQoMBWY0/XEF7kmM+KK+vUuih1US2kVAEe4ka6kBpXvsvBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761931818; c=relaxed/simple;
-	bh=ELK/TPtUoa0DdzfjuQJxQqd/fmBurZBKRSXbJIZQLus=;
+	s=arc-20240116; t=1761932095; c=relaxed/simple;
+	bh=tRSFG9dRXG0FAWpU/Id6Zgckz1056dIV6+Bvj3jPwAc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Fi9PXAnQJff4BCUj9uDCymhHr7jQjyc74Mign/qkm8peJg/B/kxfEZwFT07q8rkq16texE0G1hyQJW+H8WHZqdKtrGyaQUDSlbxHFt5TTeqheO+3BaLIGqOj19bui7nO9Y3VvoqsiCbXXPMmu5HS1ms1DiQkhiQjLbyAJ/A8E/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xlTcVDMM; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=PMPIn+E9A0OV9QUoId+49E8ceyD0EwFWeRa0zssl7ok0k0VlxP+kq1qcm0pfu3GsLzqbuRK8W1drb4OAYqgDPTn7pqMl5eqEnW5L+DmUytnJopxsFzV7cl+9L2KOtSU7/i5uHoUxv+2kpHDx7VeL6jH91iFNgC9+d+MEr+0cKy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3TLlFyOs; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-475dd9906e1so15016815e9.0
-        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 10:30:14 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34082c48b2bso1561172a91.1
+        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 10:34:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761931813; x=1762536613; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761932093; x=1762536893; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8smNPhdFrk3F9UsFWfFOTzaD0PFIjf/jPl9FFvNvth4=;
-        b=xlTcVDMM2YXWR1LtabsCI+fB7WxqP/BNGHnliygKqFjwb59VituBUODZN1s/r/j7LZ
-         du8UJEaeZWkJblBUuqdirmTdbacpiHAx4twPldzTYbNbBoYDCQ9FfMNVRWkDAyjcEp9G
-         VnuOdx2g5GNGlXD4wmOalAtM+oMDs0akUUdQz3DW6CTXd9MfvTLab+OkNJZSj51jdWq5
-         E2JTNX9xt1uVWpzcWaELLrnfwEbKx0glh+eyIDMLENshEB64nz6eacBkPzv78Cn42AmY
-         Cwkt7NbGfh2GaG11aiPezj6Y7a9Bg2AFHaCfoUl1eglXUaM/oKEURdSt47gJ/32LFIN5
-         gGpg==
+        bh=LtnXaqdbVR8gOvpEPR+6l9cfgKr6bsCXJtfhHUXOVv8=;
+        b=3TLlFyOsKZ39E3sP6F/sSgzfKLTE/aLQmWLs6nTpdumA2BQLMnXZaz4g4Ijjh9X020
+         yzhlz3MQSfUwiLkHevuUuP6mFg/J8NIjBrZXeOk4gA0HUd30/Eu6Kr3vmVpPiZFc/JBd
+         ME1qC+7XylwakWIEppEi3OFJULxxgsraCG0n0iqAjy60azEXEE1I6f8XCnPKSDWh7Xty
+         Z1k0luwe1bzeGknhtm8KyNoTF0jgcRG9lHJuonwW5w0cGxy8W0vwnoyj3UchghrcOEeL
+         Wg3sTxPDD3j45S2+9eIzWgnSyYA/md23HEQivpyw6xIrBagfmg8B2dCkBbREYSzCrwL5
+         qpdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761931813; x=1762536613;
+        d=1e100.net; s=20230601; t=1761932093; x=1762536893;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8smNPhdFrk3F9UsFWfFOTzaD0PFIjf/jPl9FFvNvth4=;
-        b=MsAWJYnqTdXgbYTIqrPyUsVlKpayz7snlVRDa/fXUyx9glQF39kQfsR5r3oyJHwhhW
-         83sFYLx4Ds3QEDIkqR7U2uT0jjpxtuwcaCkiNPnJynk2gjiZ3yvFVUKlxCdH0G22Zmcx
-         lswTlkMxfr+t3ohwbtkaAQpoyaCXXo6BtzdrixKxhLEiEpLfD0X6bER7o8e6LRTKSKY+
-         6ZS3OQwg8jOz/bLWTj4Y90MBvt9QQTieLGof8DEae68Hb7G4c51fhnwjfzggcMrjkCGK
-         r5S4EXzushQGgc1RnKqvUSnGGm2wuAXktCv7NlD4le2nZTGmVmUthlvBSCtZeShOUJCR
-         J2sg==
-X-Forwarded-Encrypted: i=1; AJvYcCW2SZug3oByOxs3gCozCcf7NV3FY2mu2N0Nh58sY4So8ZMmBfD7uR8B3mqWYAS8xzh4EYY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2mG2/5Mey0bJTouSboSBkavu6qeqjPuAH0PHNEZzhv0QASq3M
-	fOaRwChu1JySgyAGhjPMuw0L0zQAziHe9drGd53ME4ws6NsyoPXpZ+l+0mNWgrEQj9mmyU9zQw3
-	AM0aSmJSbshsAyQ==
-X-Google-Smtp-Source: AGHT+IGAlLQK0HkJ6COX6kdvZKn0Ro2fXbdMSgyDJ0pItor316xsKGfib1jQEkdwcGXkq1m1difB1/UltgkgBQ==
-X-Received: from wmwp25.prod.google.com ([2002:a05:600d:8319:b0:477:c8e:1959])
- (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600d:8310:b0:477:326c:b33f with SMTP id 5b1f17b1804b1-477326cb6d3mr20439815e9.16.1761931812961;
- Fri, 31 Oct 2025 10:30:12 -0700 (PDT)
-Date: Fri, 31 Oct 2025 17:30:12 +0000
-In-Reply-To: <20250924152214.7292-2-roypat@amazon.co.uk>
+        bh=LtnXaqdbVR8gOvpEPR+6l9cfgKr6bsCXJtfhHUXOVv8=;
+        b=cuRqhyqUGhP59QVp5TTCMbUbI8CRWrFwONf1ghEtea1irBuIKSQ+S7Gkns/bh9KhqK
+         +A0I7sZqYwik3pTzwTjmSvE+V2XbrFce8GUUcLBLKFnBSfUWDbqaVbYjPVwL8thXbwho
+         VGfnrP822Qn4d+Pa/20zJ7dmSCVggjHfPmRn5gCSXGSVnj4UMDJHBL03TOclrmfg2y3w
+         /94qnP5lUamWCmvTpBn+lxEuX55CrCpQXwf/G7S4uqECKl2ynyD5JyIghyEPZgpb9f1x
+         2ejoc5GFgCwc1wScijpP7oLu1yQkHE33fpBHnMHeq+nPVov7K4KmzBdFqXjEX8vhX7f8
+         Gu3A==
+X-Forwarded-Encrypted: i=1; AJvYcCV0TmiBJZU39amwOx+WJg+QdmA3tcCJLkI/rgbyUnC9DI5IqdkR9H1FZjZYtkuaIYRry/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysakUyIXnd73I3uKWQ0Fsvh6Khojvf7dSh1LLiI7hWFrw+5tqH
+	+k0v5AMyfBlpLht7bluwS1XIzQt8//lQaFv9ZLSLq0PBfHuta621FyHJRjzWUZAwVGtr2SC0/fe
+	DNfOc3w==
+X-Google-Smtp-Source: AGHT+IEhd62pQuR9tjnc3Il5ckB3BFxieNfGOf0XAASHT7mISEiuLVbYaHxfkZsCDA/umOxHYLwWX5NLxe4=
+X-Received: from pjbmg14.prod.google.com ([2002:a17:90b:370e:b0:33e:34c2:1e17])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:fc4b:b0:32e:5646:d43f
+ with SMTP id 98e67ed59e1d1-3408306e65fmr6078929a91.19.1761932092859; Fri, 31
+ Oct 2025 10:34:52 -0700 (PDT)
+Date: Fri, 31 Oct 2025 10:34:51 -0700
+In-Reply-To: <aQRyyieyDrZZMpIt@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
- <20250924152214.7292-1-roypat@amazon.co.uk> <20250924152214.7292-2-roypat@amazon.co.uk>
-X-Mailer: aerc 0.21.0
-Message-ID: <DDWOP8GKHESP.2EOY2HGM9RXHU@google.com>
-Subject: Re: [PATCH v7 05/12] KVM: guest_memfd: Add flag to remove from direct map
-From: Brendan Jackman <jackmanb@google.com>
-To: "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
-	"maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
-	"joey.gouly@arm.com" <joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
-	"will@kernel.org" <will@kernel.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
-	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>, 
-	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@redhat.com" <david@redhat.com>, 
-	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, 
-	"song@kernel.org" <song@kernel.org>, "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
-	"martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
-	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
-	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>, 
-	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
-	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>, "tabba@google.com" <tabba@google.com>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20251030200951.3402865-1-seanjc@google.com> <20251030200951.3402865-27-seanjc@google.com>
+ <aQRyyieyDrZZMpIt@yzhao56-desk.sh.intel.com>
+Message-ID: <aQTzO7D1O02zQbcD@google.com>
+Subject: Re: [PATCH v4 26/28] KVM: TDX: Guard VM state transitions with "all"
+ the locks
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"Kirill A. Shutemov" <kas@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed Sep 24, 2025 at 3:22 PM UTC, Patrick Roy wrote:
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 1d0585616aa3..73a15cade54a 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -731,6 +731,12 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
->  bool kvm_arch_supports_gmem_mmap(struct kvm *kvm);
->  #endif
->  
-> +#ifdef CONFIG_KVM_GUEST_MEMFD
-> +#ifndef kvm_arch_gmem_supports_no_direct_map
-> +#define kvm_arch_gmem_supports_no_direct_map can_set_direct_map
-> +#endif
-> +#endif /* CONFIG_KVM_GUEST_MEMFD */
+On Fri, Oct 31, 2025, Yan Zhao wrote:
+> On Thu, Oct 30, 2025 at 01:09:49PM -0700, Sean Christopherson wrote:
+> > Acquire kvm->lock, kvm->slots_lock, and all vcpu->mutex locks when
+> > servicing ioctls that (a) transition the TD to a new state, i.e. when
+> > doing INIT or FINALIZE or (b) are only valid if the TD is in a specific
+> > state, i.e. when initializing a vCPU or memory region.  Acquiring "all"
+> > the locks fixes several KVM_BUG_ON() situations where a SEAMCALL can fail
+> > due to racing actions, e.g. if tdh_vp_create() contends with either
+> > tdh_mr_extend() or tdh_mr_finalize().
+> > 
+> > For all intents and purposes, the paths in question are fully serialized,
+> > i.e. there's no reason to try and allow anything remotely interesting to
+> > happen.  Smack 'em with a big hammer instead of trying to be "nice".
+> > 
+> > Acquire kvm->lock to prevent VM-wide things from happening, slots_lock to
+> > prevent kvm_mmu_zap_all_fast(), and _all_ vCPU mutexes to prevent vCPUs
+> s/kvm_mmu_zap_all_fast/kvm_mmu_zap_memslot
 
-The test robot seems happy so I think I'm probably mistaken here, but
-AFAICS can_set_direct_map only exists when ARCH_HAS_SET_DIRECT_MAP,
-which powerpc doesn't set.
+Argh!  Third time's a charm?  Hopefully...
 
-If this is indeed an issue I think it can be fixed by just defining
-can_set_direct_map() to false when !ARCH_HAS_SET_DIRECT_MAP.
+> > @@ -3170,7 +3208,8 @@ static int tdx_vcpu_init_mem_region(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *c
+> >  
+> >  int tdx_vcpu_unlocked_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+> >  {
+> > -	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+> > +	struct kvm *kvm = vcpu->kvm;
+> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> reverse xmas tree ?
+
+No, because the shorter line generates an input to the longer line.  E.g. we could
+do this if we really, really want an xmas tree:
+
+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+	struct kvm *kvm = vcpu->kvm;
+
+but this won't compile
+
+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+	struct kvm *kvm = vcpu->kvm;
 
