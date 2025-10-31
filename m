@@ -1,193 +1,195 @@
-Return-Path: <kvm+bounces-61681-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61682-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD815C24F92
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 13:22:57 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC076C25077
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 13:35:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D2B23BC7B6
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 12:22:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0DB204F70CA
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 12:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F10634844A;
-	Fri, 31 Oct 2025 12:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92A7348875;
+	Fri, 31 Oct 2025 12:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="YYmgil9l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="axXGAO3A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7618A2DC766;
-	Fri, 31 Oct 2025 12:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7896933E369
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 12:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761913315; cv=none; b=BBmwwA88vIC4Daq6yewpteRfqDcx+znmMmRLm4ksJTqOFv89P2hcRlIVGo93gW746RrgxZIk0Pefypdk9qDXr1onP9OJTn6FDiQ2VYNyN9LX75XY7/MzImnr5lScHEeJC4jei71Bj31RSVacmr2gom8y+qe0ORpwjJJJX6H5I5g=
+	t=1761913961; cv=none; b=j7ydkOW4qJJKKknZgdgR7VV7yetgKkmbASVni3LzwTw9IXg3hwIbHIvu+cEazsO5GHZ8g2ARypuZx55Q38Ua7qDeT2fq5xtaBzhsRL/ATWlOodNiG84Km1VSJgxZoei3PJYI6SxQTwUxv9gEeVKDar+DTW97lw9/QPdYSvPhHS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761913315; c=relaxed/simple;
-	bh=uUz+WJz0AhBq+GccWtcHFgbwZw1qkTsi4mIMZTyjwJo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g4aIY3o/uXJEhrDWA30YV/Gw84jf5/hZiKclGff5rRp8XFGRjbQOoKUUx2vZw3P+x3qwNmNqG0wULm6597Z09Oxw5EPS6srO40nKQtAg9dvOGqyp6sv2eyBZ3XUcudDr9XGOod1JwC+c27CksM0KvzTXmprTaHOmlKl8rEamNTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=YYmgil9l; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0343840E0225;
-	Fri, 31 Oct 2025 12:21:50 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id pcvSBFS7-lU9; Fri, 31 Oct 2025 12:21:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1761913305; bh=Jr5fpbDSL95/OvscEnqB0dNPgRynpl0g4+v+F7hO+bo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YYmgil9lDEqD6QqCo5Syrj8EB9kn3LFUt8BxQiQduw01/qwN1Vf7pcsQa6fl5s+1W
-	 PEafeJY7v2GC6M/I/MWF5/VwvIQmLcj3jbi7LALUwvLI9MmYLHbLxwOrKxSF8VPQNH
-	 ZE39HkwiUIMREwNZD0cv81tnGGW1jbAlNO2K6ZUoY0aQRwpD7A0uJHpU8ZcD/rt7JA
-	 lIdy8kwbK513cdWsGXP+Bgi6pOliPnNZ4dAIWxmsWnm3sdGEODLryeYtDbi+2RkRAX
-	 mYJi0ssTPoqCZEQrNnciCre99VZsf7Bu2WpT3Sbx7WsQx77V2iwJdkWmrCDEFwjnhO
-	 CY9/rqOM9XUyo9AZInxmerOzX1oaN21/N7KyINhGN107rjLEeCOlyGkx5iKI5G7yfI
-	 R5u4+GqSAnpe35r6Liz7xm35Rdsq5JwPCAqBbYupNJsgmazREV/p1Xhugnql1Ff5sl
-	 SoaOV2T/Hrbi9OKWPbpD0hjwiIVbS98b+akFLtRIPQMk9UNapAoZvi5xdaKB7ejTqq
-	 /VCmHNTsMpMRA5syjEu9Fqu+dKEfmS2f/grQMFygmxHpJvHIrE8LCguORGydmUCt7b
-	 dqftMxjUKWbzBnmtIBMOgGsZTOy8rqdy4S+77Uv/mUDwMtbi/0grS3CE93VnG4aqax
-	 YU1oFIe1WyOJ3hQ0tjohOiI0=
-Received: from zn.tnic (pd9530da1.dip0.t-ipconnect.de [217.83.13.161])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 4523D40E016D;
-	Fri, 31 Oct 2025 12:21:29 +0000 (UTC)
-Date: Fri, 31 Oct 2025 13:21:22 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: John Allen <john.allen@amd.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-	seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
-	rick.p.edgecombe@intel.com, mlevitsk@redhat.com,
-	weijiang.yang@intel.com, chao.gao@intel.com,
-	dave.hansen@linux.intel.com, hpa@zytor.com, mingo@redhat.com,
-	tglx@linutronix.de, thomas.lendacky@amd.com
-Subject: [PATCH] x86/coco/sev: Convert has_cpuflag() to use
- cpu_feature_enabled()
-Message-ID: <20251031122122.GKaQSpwhLvkinKKbjG@fat_crate.local>
-References: <20250924200852.4452-1-john.allen@amd.com>
+	s=arc-20240116; t=1761913961; c=relaxed/simple;
+	bh=vQeFGtlqhgywDgznB4JAZCMBFOIaYYLeyFyIC1DM7BQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Jugz3im9eLEBek/aAez0vEtifci8CyD6FSQwUVmXzzgiCxknUFksa8oahA7bcKu9p1RL3VyXo0ZpKL+VYdYTC6O3NXo2sBeP7fyUGAhPuQK2++79rlgTRlvEJw47f1jAgOg7h+879uaoD7HeOJY4Nguyi1xT7g0Y2bErIndlc30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=axXGAO3A; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-46e47d14dceso12412295e9.2
+        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 05:32:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761913955; x=1762518755; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=db7P2jbk3Fkbtr7b2QsaX30FZiDLD2HY6aLapQ5nQME=;
+        b=axXGAO3A8C3qfhBxwVnxEF+WA8nrXEJdTMG02bhXT6LRkfGpo/qatULYrTvE9H4Tk+
+         f1IO/zGRIZJoQrERXvxxADlSOxkrvERkUXjJq+ymbNT4wQMS8htDWpGHVCg3dZfwnEYt
+         5mwQuEodDIvTzKMPN5u2MntWJTk8jTqnay1uE5cAmhvqroU/NIP7npc6NxFuX8o7bEib
+         Dl/uc3CmpaROVHOfO3Rnx3oytEKH4/bTr3PuvyviTQLdr9AFKnhM1LIiO5c7oZC0jy6y
+         Yml2UBokxTsdFVb2UFySLRhtquDd+MRG0wg9RqPro2sOti1Tv2+NiEnLVoHCMBwCWi71
+         8ERw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761913955; x=1762518755;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=db7P2jbk3Fkbtr7b2QsaX30FZiDLD2HY6aLapQ5nQME=;
+        b=Z8LozORIp3NwT+fuePDhgbW2YujU1IUWW+UVR+5WRnTUjrkLP9R/XXjc59gbIwvFFS
+         PnOPdxkodZy8mpDwJgCKSSJLBfqraN3f/+smzOTGg+jYzBA46vhRFiyDAr3iWiBopLtP
+         2zJr73LveF01XMbRz6OKro4s0zigj3vCna0ydv3jfrxcmkwgEk8gjzuceH7mmK/jywVV
+         SxbgtzAAgIsw4g4BBEwyNFhO0Bn3JH3JLWGS6VM9rS/9llin9o5SPsH5M6qR8cfw7w5o
+         eI5n8JF5DflkVe9XH8Yw9WDSpi/MlasY8yHKb0FneRXT4ehTr46uhnsKLZJHFK+DbWmk
+         CpKw==
+X-Gm-Message-State: AOJu0YxefQlObZoPG5IpUNKZrqjKdMyoy1dFSMDYBY84Tce+8aaXNJNE
+	kIsHGq1plRcoZa8vJltyr5AcAWCl7Tzi5HHz62WtdeGM3UPcwmt/ARy3/uXfDtHlca+RS9xWxY+
+	ZwAy6dK8QK7s/4A==
+X-Google-Smtp-Source: AGHT+IGbPo3kHovVtooeq2/6Etwo2zwlUdziBFwBs5h8QYkknPArFiPwXzGXMXRW4yEOziWKwAnTJda1x3rWAQ==
+X-Received: from wmcn22.prod.google.com ([2002:a05:600c:c0d6:b0:46e:1f26:9212])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600d:4393:b0:475:f16b:bcbf with SMTP id 5b1f17b1804b1-477331dbef2mr14011285e9.14.1761913955394;
+ Fri, 31 Oct 2025 05:32:35 -0700 (PDT)
+Date: Fri, 31 Oct 2025 12:32:34 +0000
+In-Reply-To: <20251031003040.3491385-5-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250924200852.4452-1-john.allen@amd.com>
+Mime-Version: 1.0
+References: <20251031003040.3491385-1-seanjc@google.com> <20251031003040.3491385-5-seanjc@google.com>
+X-Mailer: aerc 0.21.0
+Message-ID: <DDWIDCO0UKMD.2C46H6XQO1NXK@google.com>
+Subject: Re: [PATCH v4 4/8] KVM: VMX: Handle MMIO Stale Data in VM-Enter
+ assembly via ALTERNATIVES_2
+From: Brendan Jackman <jackmanb@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
+	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Brendan Jackman <jackmanb@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Sep 24, 2025 at 08:08:50PM +0000, John Allen wrote:
-> For shadow stack support in SVM when using SEV-ES, the guest kernel
-> needs to save XSS to the GHCB in order for the hypervisor to determine
-> the XSAVES save area size.
-> 
-> This series can be applied independently of the hypervisor series in
-> order to support non-KVM hypervisors.
+On Fri Oct 31, 2025 at 12:30 AM UTC, Sean Christopherson wrote:
+> Rework the handling of the MMIO Stale Data mitigation to clear CPU buffers
+> immediately prior to VM-Enter, i.e. in the same location that KVM emits a
+> VERW for unconditional (at runtime) clearing.  Co-locating the code and
+> using a single ALTERNATIVES_2 makes it more obvious how VMX mitigates the
+> various vulnerabilities.
+>
+> Deliberately order the alternatives as:
+>
+>  0. Do nothing
+>  1. Clear if vCPU can access MMIO
+>  2. Clear always
+>
+> since the last alternative wins in ALTERNATIVES_2(), i.e. so that KVM will
+> honor the strictest mitigation (always clear CPU buffers) if multiple
+> mitigations are selected.  E.g. even if the kernel chooses to mitigate
+> MMIO Stale Data via X86_FEATURE_CLEAR_CPU_BUF_MMIO, some other mitigation
+> may enable X86_FEATURE_CLEAR_CPU_BUF_VM, and that other thing needs to win.
+>
+> Note, decoupling the MMIO mitigation from the L1TF mitigation also fixes
+> a mostly-benign flaw where KVM wouldn't do any clearing/flushing if the
+> L1TF mitigation is configured to conditionally flush the L1D, and the MMIO
+> mitigation but not any other "clear CPU buffers" mitigation is enabled.
+> For that specific scenario, KVM would skip clearing CPU buffers for the
+> MMIO mitigation even though the kernel requested a clear on every VM-Enter.
+>
+> Note #2, the flaw goes back to the introduction of the MDS mitigation.  The
+> MDS mitigation was inadvertently fixed by commit 43fb862de8f6 ("KVM/VMX:
+> Move VERW closer to VMentry for MDS mitigation"), but previous kernels
+> that flush CPU buffers in vmx_vcpu_enter_exit() are affected (though it's
+> unlikely the flaw is meaningfully exploitable even older kernels).
+>
+> Fixes: 650b68a0622f ("x86/kvm/vmx: Add MDS protection when L1D Flush is not active")
+> Suggested-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
-> v3:
->   - Only CPUID.0xD.1 consumes XSS. Limit including XSS in GHCB for this
->     case.
-> v2:
->   - Update changelog for patch 2/2
-> 
-> John Allen (2):
->   x86/boot: Move boot_*msr helpers to asm/shared/msr.h
->   x86/sev-es: Include XSS value in GHCB CPUID request
-> 
->  arch/x86/boot/compressed/sev.c    |  7 ++++---
->  arch/x86/boot/compressed/sev.h    |  6 +++---
->  arch/x86/boot/cpucheck.c          | 16 ++++++++--------
->  arch/x86/boot/msr.h               | 26 --------------------------
->  arch/x86/coco/sev/vc-shared.c     | 11 +++++++++++
->  arch/x86/include/asm/shared/msr.h | 15 +++++++++++++++
->  arch/x86/include/asm/svm.h        |  1 +
->  7 files changed, 42 insertions(+), 40 deletions(-)
->  delete mode 100644 arch/x86/boot/msr.h
+>  arch/x86/kvm/vmx/vmenter.S | 14 +++++++++++++-
+>  arch/x86/kvm/vmx/vmx.c     | 13 -------------
+>  2 files changed, 13 insertions(+), 14 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+> index 1f99a98a16a2..61a809790a58 100644
+> --- a/arch/x86/kvm/vmx/vmenter.S
+> +++ b/arch/x86/kvm/vmx/vmenter.S
+> @@ -71,6 +71,7 @@
+>   * @regs:	unsigned long * (to guest registers)
+>   * @flags:	VMX_RUN_VMRESUME:	use VMRESUME instead of VMLAUNCH
+>   *		VMX_RUN_SAVE_SPEC_CTRL: save guest SPEC_CTRL into vmx->spec_ctrl
+> + *		VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO: vCPU can access host MMIO
+>   *
+>   * Returns:
+>   *	0 on VM-Exit, 1 on VM-Fail
+> @@ -137,6 +138,12 @@ SYM_FUNC_START(__vmx_vcpu_run)
+>  	/* Load @regs to RAX. */
+>  	mov (%_ASM_SP), %_ASM_AX
+>  
+> +	/* Stash "clear for MMIO" in EFLAGS.ZF (used below). */
+> +	ALTERNATIVE_2 "",								\
+> +		      __stringify(test $VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO, %ebx), 	\
+> +		      X86_FEATURE_CLEAR_CPU_BUF_MMIO,					\
+> +		      "", X86_FEATURE_CLEAR_CPU_BUF_VM
 
----
+Ah, so this ALTERNATIVE_2 (instead of just an ALTERNATIVE that checks
+CLEAR_CPU_BUF_MMIO) is really about avoiding the flags needing to be
+mutually exclusive? I.e. this is 
 
-Ontop:
+if (cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF_MMIO) && 
+    !cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF_VM))
+	test $VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO, %ebx
 
-From: "Borislav Petkov (AMD)" <bp@alien8.de>
-Date: Thu, 30 Oct 2025 17:59:11 +0100
-Subject: [PATCH] x86/coco/sev: Convert has_cpuflag() to use cpu_feature_enabled()
+... right? This is a good idea but I think it warrants a comment to
+capture the intent, without having the commit message in short-term
+memory I'd have struggled with this code, I think.
 
-Drop one redundant definition, while at it.
+>  	/* Check if vmlaunch or vmresume is needed */
+>  	bt   $VMX_RUN_VMRESUME_SHIFT, %ebx
+>  
+> @@ -161,7 +168,12 @@ SYM_FUNC_START(__vmx_vcpu_run)
+>  	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
+>  
+>  	/* Clobbers EFLAGS.ZF */
+> -	VM_CLEAR_CPU_BUFFERS
+> +	ALTERNATIVE_2 "",							\
+> +		      __stringify(jz .Lskip_clear_cpu_buffers;			\
 
-There should be no functional changes.
+Maybe I'm just an asm noob (I was very impressed by this trick of
+using CF and ZF together like this!) but I think it's helpful to
+have the comment like the jnc has below, and Pawan had in his version,
+to really make the test->jz dependency obvious, since the two
+instructions are quite far apart.
 
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
----
- arch/x86/boot/startup/sev-shared.c | 2 +-
- arch/x86/coco/sev/vc-handle.c      | 1 -
- arch/x86/coco/sev/vc-shared.c      | 2 +-
- arch/x86/lib/kaslr.c               | 2 +-
- 4 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/boot/startup/sev-shared.c b/arch/x86/boot/startup/sev-shared.c
-index 4e22ffd73516..a0fa8bb2b945 100644
---- a/arch/x86/boot/startup/sev-shared.c
-+++ b/arch/x86/boot/startup/sev-shared.c
-@@ -12,7 +12,7 @@
- #include <asm/setup_data.h>
- 
- #ifndef __BOOT_COMPRESSED
--#define has_cpuflag(f)			boot_cpu_has(f)
-+#define has_cpuflag(f)			cpu_feature_enabled(f)
- #else
- #undef WARN
- #define WARN(condition, format...) (!!(condition))
-diff --git a/arch/x86/coco/sev/vc-handle.c b/arch/x86/coco/sev/vc-handle.c
-index 7fc136a35334..f08c7505ed82 100644
---- a/arch/x86/coco/sev/vc-handle.c
-+++ b/arch/x86/coco/sev/vc-handle.c
-@@ -352,7 +352,6 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
- 
- #define sev_printk(fmt, ...)		printk(fmt, ##__VA_ARGS__)
- #define error(v)
--#define has_cpuflag(f)			boot_cpu_has(f)
- 
- #include "vc-shared.c"
- 
-diff --git a/arch/x86/coco/sev/vc-shared.c b/arch/x86/coco/sev/vc-shared.c
-index e2ac95de4611..58b2f985d546 100644
---- a/arch/x86/coco/sev/vc-shared.c
-+++ b/arch/x86/coco/sev/vc-shared.c
-@@ -1,7 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- 
- #ifndef __BOOT_COMPRESSED
--#define has_cpuflag(f)                  boot_cpu_has(f)
-+#define has_cpuflag(f)                  cpu_feature_enabled(f)
- #endif
- 
- static enum es_result vc_check_opcode_bytes(struct es_em_ctxt *ctxt,
-diff --git a/arch/x86/lib/kaslr.c b/arch/x86/lib/kaslr.c
-index b5893928d55c..8c7cd115b484 100644
---- a/arch/x86/lib/kaslr.c
-+++ b/arch/x86/lib/kaslr.c
-@@ -22,7 +22,7 @@
- #include <asm/setup.h>
- 
- #define debug_putstr(v) early_printk("%s", v)
--#define has_cpuflag(f) boot_cpu_has(f)
-+#define has_cpuflag(f) cpu_feature_enabled(f)
- #define get_boot_seed() kaslr_offset()
- #endif
- 
--- 
-2.51.0
+> +				  CLEAR_CPU_BUFFERS_SEQ;			\
+> +				  .Lskip_clear_cpu_buffers:),			\
+> +		      X86_FEATURE_CLEAR_CPU_BUF_MMIO,				\
+> +		      __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF_VM
 
--- 
-Regards/Gruss,
-    Boris.
+Sorry I'm really nitpicking but I think it's justified for asm
+readability...
 
-https://people.kernel.org/tglx/notes-about-netiquette
+It's a bit unfortunate that one branch says
+CLEAR_CPU_BUFFERS_SEQ and the other says __CLEAR_CPU_BUFFERS. With the
+current code I think it would be more readable to jut have
+__stringify(CLEAR_CPU_BUFFERS_SEQ) in the CLEAR_CPU_BUF_VM case, then
+you don't have to mentally expand the macro to see how the two branches
+actually differ.
+
+Anyway the actual idea here LGTM, thanks.
 
