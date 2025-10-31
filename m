@@ -1,124 +1,146 @@
-Return-Path: <kvm+bounces-61739-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61740-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 032CDC27244
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 23:50:49 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A202C272B0
+	for <lists+kvm@lfdr.de>; Sat, 01 Nov 2025 00:13:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B0CA3BA537
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 22:50:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 346F94E37DC
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 23:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625433126D2;
-	Fri, 31 Oct 2025 22:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34CD132B997;
+	Fri, 31 Oct 2025 23:13:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OHxjxcMn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kEU749Yw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28C72DEA74;
-	Fri, 31 Oct 2025 22:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689B8329E62
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 23:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761951037; cv=none; b=sHscSsSVDVB9oQmXj4ThIojAWwJE4ZDSvBbRkl2YXkMbNflWvmIx44FgztTkA+ub/JD9luH8hMFKcaxCqu2WK6osrDeGPrNtUO1bdEgrZcjOPTdNQ1Mv4OUmJQqH9PF23TunhNj1ztHzDQA0Q64tZSCkEHrMydPYdI1vAugyDMY=
+	t=1761952402; cv=none; b=oj6/uqSqQ3qgJK7nCvAs0losYQPyqXKXItWZIC9hPGpGIFdHSP2FtxkCnmGgvihu5IpB69PEsuhIuDIf+j8KltXyT0dEqMO3VqKWrEGPaA9y0Pgzr0mNEw+9sYdIri6Ija56q/1G3N+0UxolXb6tz2wItjDSIk3KJNaCXwUqz+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761951037; c=relaxed/simple;
-	bh=N+BjP6skRoZCMXqZexziR26mcgroiZe+JaxD8LzzPKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fOhQGyPjr+ysjhH9fn9m18bBacggqj1abfDw2p8OlXV3IUH9wIBsMNvFQEUkWvpkTdmF4QkzUk587+3kik05GNkiW7SqvFww/RVUgxZS+j89lLvVOiIiw9pWMGtan1wkbo4a7UL2EnJPY5eZoHDiQwpB80tnSfJA15IC0XKxBss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OHxjxcMn; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761951035; x=1793487035;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=N+BjP6skRoZCMXqZexziR26mcgroiZe+JaxD8LzzPKE=;
-  b=OHxjxcMnLzfFW7qBc7p8VQDol+s9nbojcg99zMZNw7Ody2T9d+VHSTgE
-   okQqJUBrz8rikGWAtqcm6eRixLEVNvAxVFzW2AXeh52fnYuNoEhDynQJu
-   ZhOI//9kyFedE2LNEE+14h5CCy8vEGGc4rhZUyXpgkuVego1eqmo1Vif/
-   +7iW3p07HUatdwNLzxQRICldoon6RLv2+vsPQ/dins/KOZtnCrodvIV7k
-   pgZdTFPjVCYRJS2DOYjEniqEmvHT91FxtZQ7yn75uZ1nucRM/BcGAWfgS
-   gb2EBV30su8clI36QfJ6QUJq3D02awDbF9EqnMQKAeeFo2p8wbOsLxwSG
-   w==;
-X-CSE-ConnectionGUID: qRz9QUgPQCmy52SoVzHqvQ==
-X-CSE-MsgGUID: sv4chqy3SESLHNOlYr37Rg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11599"; a="86744645"
-X-IronPort-AV: E=Sophos;i="6.19,270,1754982000"; 
-   d="scan'208";a="86744645"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 15:50:35 -0700
-X-CSE-ConnectionGUID: lkyuywq9TSaZ/I5sEjb6ew==
-X-CSE-MsgGUID: ++e7E4N7S5u8p3vT24J+VQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,270,1754982000"; 
-   d="scan'208";a="209907241"
-Received: from iherna2-mobl4.amr.corp.intel.com (HELO desk) ([10.124.220.87])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 15:50:34 -0700
-Date: Fri, 31 Oct 2025 15:50:28 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Borislav Petkov <bp@alien8.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Brendan Jackman <jackmanb@google.com>
-Subject: Re: [PATCH v4 3/8] x86/bugs: Use an X86_FEATURE_xxx flag for the
- MMIO Stale Data mitigation
-Message-ID: <20251031225028.fe2jztp4v5peqttb@desk>
-References: <20251031003040.3491385-1-seanjc@google.com>
- <20251031003040.3491385-4-seanjc@google.com>
- <20251031222804.s26squjrtbaq7aly@desk>
- <aQU6LqP-PxBQ-R0m@google.com>
+	s=arc-20240116; t=1761952402; c=relaxed/simple;
+	bh=XWZsqJRZo0jc8TEwczUrIZCZrP8vjp3+VpCSsodHNDc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fIjutscQeCpnFBq42vgGPaG0V9mdwINoLAO7B4bsO/YJ+9m1p17SMomMvPTn17Ehn+GOjMvG6S99/b+hXxU4FZF49XzbbppWy7LS48XBRjSM8d9Zd/KjAWdxQaxb143MYiJA/YdXTe5sN4Q6X5XdEVfw8UW21+f01vGY0nc78EQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kEU749Yw; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-592f9400b04so2560170e87.3
+        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 16:13:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761952398; x=1762557198; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CduKhDs2d95anLLqO+pCgedfe9nkoQuIaYxFtLlvMAI=;
+        b=kEU749Yw2luBSyqqeosBP2aguvxblfCIFQy0dCF+uFwUIPWuLzDHY8m+vc9S+svxtF
+         ON96JnjkHmcJj+jr4y+TcnyxRPUnBSVGk9Kb8YQfquWuYdZZMzwhR+4ep+EmnGYbW1OZ
+         wjGzSmDhQTlDpNMjqpgCXwC9lVCnmteiIS5C3r5CY+O/o7zgevmNkhAdcjW3lJ4m6RU1
+         Y4U9LMudrBMj2kwmQItNr19AVN/P3f2Ux4Tk/4qbbs9bY1o4pjH0Xb87GC/PwQbGmYqD
+         iE4DIdLAcsusXamwxNMXhe7bigmA+ElXLYDjkqf3dchNEL5sskAz32eeFZS7icmliiWr
+         gVgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761952398; x=1762557198;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CduKhDs2d95anLLqO+pCgedfe9nkoQuIaYxFtLlvMAI=;
+        b=J9hBHP8G1wXLLaKcaPLX2w+1aHzfw/YM/Xjgn3v39142FP0hbC8UvzVHeYSYS5bn3h
+         56tQCGp8ejgxbNKNOyyHgsFrFCa9FBx0u5cPNPcvD6ykzGq67Ezffqeqf9ESc5urYPm4
+         LmgnEPLZe3Csn23/qbzMaMaBxscysTEeB0Kn/qKeBrdw8LuDUsBVf5lSgkN39laIggwB
+         dKUCQsn9uMTERowvlLhQPvla+uQPhFIaC1RBdeMDojr9OaUGSO9VzAhx1pYw5WxRuRNW
+         UDNKT9jRhRW53iyMyc3rjezGOvGhANkf5VebovO5QK3+uIH6yux0yOopqSl9ueeXTNWJ
+         Lzjg==
+X-Forwarded-Encrypted: i=1; AJvYcCUKYRZk9B9JXm3bd4vL1auZBtMMRgauvaX4piUVu0mp8O9yXE1IqpDDbaMas5/sG8dZ4DU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZu31YJmiLAB+Nj4PBSJNe9phTeY7EbloZuaivrLvUk2nQGX+4
+	DPfOywjqfcZiij4BzhjrRHkBkrd9J9H+IEBqq+QsqC4jQdkHvQ37GheTwnrJuwrPhTX1cq7yClg
+	jzwhHq9aq2DC0xjq/C25y35WowXhqT4kvlhhSLPep
+X-Gm-Gg: ASbGncuMFTTWVKxowDxNilOtd4JbEfEDEvNaSQQ+erWUKQ/aRMldR6VszQGyhEIJwTr
+	EH6PTcCQv6HGyPm1AHSXx3Lw7FQ2UyX/fHFiJGcetc5cXDVOhetOi3Rr1a/XanViJqlLVrg6+Fb
+	Rsh5U79j4h4RLcCM+rEPEtUfzxI/jyR+uwSVhgqVHdDhUJqqoSNJVg2XSvNyqZIbSniGf36Svib
+	rm7hA5NKolWyMFyghUm7YJjiXSDGG8oo/PsmjOB2FB+U+QAhan5syUtNaq5
+X-Google-Smtp-Source: AGHT+IExErcOO2EIgmDaicMDUbGTWKxNreSKo2RDOW0/ULZPVApKfmIWoVK+h3uJ79oZ73j1I9/Rf0OSA92b1W105fQ=
+X-Received: by 2002:a05:6512:3c92:b0:591:c8de:467b with SMTP id
+ 2adb3069b0e04-5941d542679mr1891506e87.40.1761952398324; Fri, 31 Oct 2025
+ 16:13:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aQU6LqP-PxBQ-R0m@google.com>
+References: <20251018000713.677779-1-vipinsh@google.com> <20251018000713.677779-9-vipinsh@google.com>
+In-Reply-To: <20251018000713.677779-9-vipinsh@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Fri, 31 Oct 2025 16:12:50 -0700
+X-Gm-Features: AWmQ_bkA4phyOyQRm4wqvCBQ3eNh3dDXKfq4mZi3gYwoRKx7jeTWqc2Xmhrpb1M
+Message-ID: <CALzav=c9yw2B=1Y6kK2ZuxdBCnwuTHyOyA4VGT8_rLv2Wg5r4A@mail.gmail.com>
+Subject: Re: [RFC PATCH 08/21] vfio/pci: Retrieve preserved VFIO device for
+ Live Update Orechestrator
+To: Vipin Sharma <vipinsh@google.com>
+Cc: bhelgaas@google.com, alex.williamson@redhat.com, pasha.tatashin@soleen.com, 
+	jgg@ziepe.ca, graf@amazon.com, pratyush@kernel.org, 
+	gregkh@linuxfoundation.org, chrisl@kernel.org, rppt@kernel.org, 
+	skhawaja@google.com, parav@nvidia.com, saeedm@nvidia.com, 
+	kevin.tian@intel.com, jrhilke@google.com, david@redhat.com, 
+	jgowans@amazon.com, dwmw2@infradead.org, epetron@amazon.de, 
+	junaids@google.com, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 31, 2025 at 03:37:34PM -0700, Sean Christopherson wrote:
-> On Fri, Oct 31, 2025, Pawan Gupta wrote:
-> > On Thu, Oct 30, 2025 at 05:30:35PM -0700, Sean Christopherson wrote:
-> > > Convert the MMIO Stale Data mitigation flag from a static branch into an
-> > > X86_FEATURE_xxx so that it can be used via ALTERNATIVE_2 in KVM.
-> > > 
-> > > No functional change intended.
-> > > 
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >  arch/x86/include/asm/cpufeatures.h   |  1 +
-> > >  arch/x86/include/asm/nospec-branch.h |  2 --
-> > >  arch/x86/kernel/cpu/bugs.c           | 11 +----------
-> > >  arch/x86/kvm/mmu/spte.c              |  2 +-
-> > >  arch/x86/kvm/vmx/vmx.c               |  4 ++--
-> > >  5 files changed, 5 insertions(+), 15 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> > > index 7129eb44adad..d1d7b5ec6425 100644
-> > > --- a/arch/x86/include/asm/cpufeatures.h
-> > > +++ b/arch/x86/include/asm/cpufeatures.h
-> > > @@ -501,6 +501,7 @@
-> > >  #define X86_FEATURE_ABMC		(21*32+15) /* Assignable Bandwidth Monitoring Counters */
-> > >  #define X86_FEATURE_MSR_IMM		(21*32+16) /* MSR immediate form instructions */
-> > >  #define X86_FEATURE_X2AVIC_EXT		(21*32+17) /* AMD SVM x2AVIC support for 4k vCPUs */
-> > > +#define X86_FEATURE_CLEAR_CPU_BUF_MMIO	(21*32+18) /* Clear CPU buffers using VERW before VMRUN, iff the vCPU can access host MMIO*/
-> > 
-> > Some bikeshedding from my side too:
-> > s/iff/if/
-> 
-> Heh, that's actually intentional.  "iff" is shorthand for "if and only if".  But
-> this isn't the first time my use of "iff" has confused people, so I've no objection
-> to switching to "if".
+On Fri, Oct 17, 2025 at 5:07=E2=80=AFPM Vipin Sharma <vipinsh@google.com> w=
+rote:
+>  static int vfio_pci_liveupdate_retrieve(struct liveupdate_file_handler *=
+handler,
+>                                         u64 data, struct file **file)
+>  {
+...
+> +       filep =3D anon_inode_getfile_fmode("[vfio-cdev]", &vfio_device_fo=
+ps, df,
+> +                                        O_RDWR, FMODE_PREAD | FMODE_PWRI=
+TE);
 
-I did a quick search, there are about ~500 instances of "iff" in the
-kernel. So, it's a common abbreviation that I learnt today. It is fine to
-keep it as is.
+It's a little weird that we have to use an anonymous inode when
+restoring cdev file descriptors. Do we care not about the association
+between VFIO cdev files and their inodes?
+
+If we wanted to have the cdev inode we could have the user pass a file
+path to ioctl(LIVEUPDATE_SESSION_RESTORE_FD)? File handlers can use
+that to find the inode to use when creating a struct file. This would
+avoid the anonymous inode and also ensure that restoring the fd obeys
+the same filesystem permissions as opening a new fd (I think?).
+
+Pasha this would be a uAPI change to LUO. What do you think?
+
+Sami, Jason, what are you planning to do for iommufd?
+
+> +       if (IS_ERR(filep)) {
+> +               err =3D PTR_ERR(filep);
+> +               goto err_anon_inode;
+> +       }
+> +
+> +       /* Paired with the put in vfio_device_fops_release() */
+> +       if (!vfio_device_try_get_registration(device)) {
+> +               err =3D -ENODEV;
+> +               goto err_get_registration;
+> +       }
+> +
+> +       put_device(&device->device);
+> +
+> +       /*
+> +        * Use the pseudo fs inode on the device to link all mmaps
+> +        * to the same address space, allowing us to unmap all vmas
+> +        * associated to this device using unmap_mapping_range().
+> +        */
+> +       filep->f_mapping =3D device->inode->i_mapping;
+
+Most of this code already exists in vfio_device_fops_cdev_open(). I'll
+work on sharing the code in the next version.
 
