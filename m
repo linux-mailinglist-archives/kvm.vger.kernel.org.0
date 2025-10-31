@@ -1,169 +1,141 @@
-Return-Path: <kvm+bounces-61619-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61620-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FEB8C22C42
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:07:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70EBFC22C4B
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:09:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEFB73B93C7
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:07:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AED9420D57
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A88642AA3;
-	Fri, 31 Oct 2025 00:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1590242AA3;
+	Fri, 31 Oct 2025 00:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cR1N+OpS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="klJP2Vhk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E120F34D39C
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 00:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FA2134CF
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 00:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761869241; cv=none; b=bbKyJ5nW6/PKjDYRFk1NxUDIPZBybA5pwkOEHOITeFh55HWWuegqtUUNlat3yqDNd/6eUfwSkVrGj5K4c3TiQikd6lg8r/lIFAG8aKfC200+GpNJdhUd8qvDeb70g2Zz8czJZpEsKXV8XhZTM22rtVgZqm+9apg4MX7PPYmoyZc=
+	t=1761869384; cv=none; b=OM3k4bJKB+0oWqixEImQoP9cqKDKuN42gXxxt5j1CYE6qkrdqR/FEReV4KVWVPrEP073szmBYtkwvj9U7M1bOyXxMpHaH3uXObOrW0lNrxzC0dS9WM3XjMxy/XENz+0NXb7/WLLqAAwVxjQf+c6+YLhvqp02zL7t87VL5LIO3lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761869241; c=relaxed/simple;
-	bh=rGYe5yjMqWmwR+Rx3bwQkg6QzWBsMmU301TBlTItHbY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m/ML+jvtGyIGgmg4LneBlFeJzQxy2v15eGm3Emi1MH/e/eCrx6F0MOn7R9htnAlBJPKIXlPKKTd9Xdt828iV3KF8afrvIddU8ObE7GsCL4FCyvLZRpJ9cUmRhYNV0uFQdgivC+A0eh2ByYXDWhu6h4s+6YwVKjWMRiaRtMXJCcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cR1N+OpS; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-586883eb9fbso2165569e87.1
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:07:19 -0700 (PDT)
+	s=arc-20240116; t=1761869384; c=relaxed/simple;
+	bh=tOqji4svVFYnjsJuuwJe072kmFQ3eEB6odRukox2PW8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kmgRmjXtKfj4VL/4Ykkh0/xOsnl/t0bx5dj6oKPO+Tq6AXGuv5MvHgyQ4DNq8nyA+0hOLl5Pnj1QJ8TwIyHrR53j2+00IckD6/xcFWT8s6bDkolRieDGyOVFc04BHrhNBiLqHlsEUzamZGP+fqW6HG+4lwvQbYHQJERi9ES/bYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=klJP2Vhk; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-295018cbc50so15711455ad.3
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:09:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761869238; x=1762474038; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nmcJ0gQt/4pCFYZHqsOZ/9fiYMntoegxT4AsogqqgxI=;
-        b=cR1N+OpSKhnaUqB0cxyIpRKFqhUcBNeYE1uNDyywppCyPdAiIDfVK+DN/WnZdsDjl6
-         tXIfmOqoT636yHm297Tarjqr7NePfDrTkeNDXNFwrg3SuPWKGQL4TTZPRXbVAoAghA/z
-         NAqz9GkHVK1c0fHfZzOaqD5E3CC/0Hm5eh3Gqtjql/r1fxZKYltUh9fVhcavgZua8Lpc
-         faTNtMW64S9s/Ep9SSWHyWloDyYJP2EWHYxNMrwAq3SuJFXE61H+7f3pNnW0tF3t5s33
-         VWlkaMP2LN+VdunYydJPivyGTq19Vv08CHOFejtu+wuJZ8jowGVLqlJMAEW8wWrgt6+P
-         L/bw==
+        d=gmail.com; s=20230601; t=1761869382; x=1762474182; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tOqji4svVFYnjsJuuwJe072kmFQ3eEB6odRukox2PW8=;
+        b=klJP2Vhkcdbr8tQPOQhgfvgEmrP7vsg+2k81HHP9P/tTtuBIPewkleOebXI+v2cxRI
+         iB3nLjiW6+7ZVLdFK2W9yHGd7qeg1FAnAteUpBzo2/KoqUOWZfVKnIeJUuzSZJi0UoxV
+         SjI2OjKVg/97+XoQTI8+0/mrKW1zsrZj1x6xkNtRKbgL7krn5Q55m1Yzcvz/VlhuDCuy
+         oqPSVeoHZMmdAoDQOrctInu23kK8Yp5wyIZUPj5PgjBc3DQWG/wQu0tAvODnDP1lOx8r
+         Li/9tj4L5oWoYA+AkUcLRJ0682zcpVrs0zah+Mh5p905Du5n1m3TGWMDW6chWKaopJc7
+         to8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761869238; x=1762474038;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nmcJ0gQt/4pCFYZHqsOZ/9fiYMntoegxT4AsogqqgxI=;
-        b=rXes56E81U3osJ/9HcqNwwVrSdyMuRH80ScOcsA9QiJ+XZPQj5G1LGQdzWF2HEtlOh
-         hZEhNvm5rthTeIlVRx3WwBTJiD8XZwrcNNcmxZq8KLOWA/SpadKDU7BddSQfFkfwN9zF
-         3zTpvJVvyh/n1E3RWDxJ9xh8ZLtgCY0Od+v900JYqfg7Ev7sDldcVkFWfjMvprrirFKo
-         ltgM3WWv02kWbToDU/wVaAzt5XMCL6o1fhshJTk4CmL70NIMhCQrKwciIoTBMVvffjBt
-         KLbAnuJgRE5I37zdJ108rwvMD9nfdlN5qAGSWFcH0IRbvFbdwPPmJngEp/AHJj+WU+Zx
-         2prg==
-X-Forwarded-Encrypted: i=1; AJvYcCWVjBNePWEkyN7ym5S/WosFCp+Yuuka/wO/UGZxQ9HleMCr8RBthS2+YC+l5OsYYfQLIpY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb5xgsCjtlOBQl27qXKO3p019o3wi0Hc/Y0G1hgYt0ZrqHQ4VE
-	SKQ23EVH43Wabd7FRx4KmTzPaERxKfqq6ut1+K+XW9tcPQ15uAD+/0dv1ElZF5rE7+X4su5JYKh
-	PQo/hIuxVVke0QwBgPbcfYLCzxFtunUYjS+dMORhg
-X-Gm-Gg: ASbGncvFRgBKf9fwUhBscx7YNfSXV34xlDTGNrgWzHD513fHnH6uCK7JLLefyZ7XG5Y
-	l/ILibDW7bWTEe8OvU9GeF+CkaZqj22bJFEZSEgchTeD+p80p5Hbl0GmaJ0CZePQUy3ld076a9J
-	GRPgWJYxPeZccbZEn+XARF0KqxyndslfXX9xSA4GVYZ7hgl5Qb1sHL82zEawI+BDXwHoBxG+H6l
-	QJtWgwSac7IHwE9uqHJ12r8nmNjh19cHAMsbXG8A9hgZ7aFuEggITkNPn8cD3LZmlopNnVKiQ38
-	CgnF3A==
-X-Google-Smtp-Source: AGHT+IGpSBRowIBw9czJoVeMZr9H9pjBQVUhqQijMhY/2cscmjLpJGHSTZmm55OV1QXgaD7LcghLgUjQ0e4dM+E9He0=
-X-Received: by 2002:a05:6512:401e:b0:593:f29d:786e with SMTP id
- 2adb3069b0e04-5941d5335c0mr554266e87.33.1761869237738; Thu, 30 Oct 2025
- 17:07:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761869382; x=1762474182;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tOqji4svVFYnjsJuuwJe072kmFQ3eEB6odRukox2PW8=;
+        b=k0TgjXgcdvaerXcm1guVjw8kss2VLp2TYUmjU24xQ9+7sd3jjNrrn4cg+F1Vwrn+XC
+         KSFn12iKlGOU5TD5y9J/tn48flFL8sHDfq5HoqFi6ZLwybKUGBj7d2gHYY2w0uKP7amf
+         Sg+o3nJ9n3+9ptdBxiumPhZEOYpcfXSnuoL+XFlBrkWdxaz831yXY8rUnpqJJ8Z3scV7
+         Q4+0nQ6RBErY3P9/JPf5HoHvxkdCIv9WbH0IRS9ydyc/YZ2LtHpgxp3GpE10C7S7fHx2
+         9vaWF51MSk5iTQvktNxmHNJ6ZiQDFl6GgAI/DFizNbYYfuMeqhbM78J/CenF9EY8NpMs
+         v9UA==
+X-Forwarded-Encrypted: i=1; AJvYcCWAVo+Q0kICCtUhmAPXIgYoiMA8H1DVRE0NJ4Qse+6cDWE5A9V1MtETNSp3mueD1lnaljY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAr1sVb2lbTiHoCqOShRuvxqutVirrJyByNtPyMPIT/ZbLmk/Q
+	ezNHoeByr/9mKedFecYMNTiocqTxBOEY5iSDKJS5Ve7p2HBLrXqT4bxC
+X-Gm-Gg: ASbGncuu77x0TBK1ro5EymHcPTkJ3yp1Ahc+Dpy37mqVie1ozoJF1VCNilc1YRmp4C7
+	NPthkXFjZRfSxoIEqkm9aQOny13fbHHvkMD5KlcaEY9SuezCcpwM50+ZCri0j54jfb35oXK/iiZ
+	dfue/dp16h+tDAc7xo+ENaVflFpARwiC4yEQeFf5rmlu4bcP98n3n6G0ex2DpduAnHEz2iOGOhK
+	zyyOicGiywUnYchH2x+dVQ0ldjQ4isrpaSWOJvKxHpO1drpnllmYFzObfxqO4lYQpvbNy31J5Vd
+	CSJGS9UOyBIWB5lHWVwcpb+KjoCAj3pThSzml1LPpmymxVuuEszmxDQFwNNpoGE7aeWvtT/yF10
+	6kpksUwudcv/3kFnDCXleeOsyYnGzqHeyiAHpGDmXIdfKDcTiiOPf9HZwWT6CNKG7rFRUKXOohQ
+	Co
+X-Google-Smtp-Source: AGHT+IEXVNb2H7WFZFLBuvMGoO23i051th+3XKdx2cHyPS895ioXoRXcS0lzDT9ZxeAWygJirg3ebw==
+X-Received: by 2002:a17:902:e78d:b0:24b:24dc:91a7 with SMTP id d9443c01a7336-2951a52a946mr19593005ad.45.1761869381941;
+        Thu, 30 Oct 2025 17:09:41 -0700 (PDT)
+Received: from archie.me ([210.87.74.117])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2952696f6d6sm1785865ad.68.2025.10.30.17.09.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Oct 2025 17:09:40 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id D67E64209E4A; Fri, 31 Oct 2025 07:09:38 +0700 (WIB)
+Date: Fri, 31 Oct 2025 07:09:38 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>,
+	Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Document a virtualization gap for GIF on AMD
+ CPUs
+Message-ID: <aQP-Qv1SOi0cy-nO@archie.me>
+References: <20251030223757.2950309-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251018000713.677779-1-vipinsh@google.com> <20251018000713.677779-16-vipinsh@google.com>
- <aPM_DUyyH1KaOerU@wunner.de> <20251018223620.GD1034710.vipinsh@google.com>
- <aPSeF_QiUWnhKIma@wunner.de> <aQP6-49_FeB2nNEm@google.com>
-In-Reply-To: <aQP6-49_FeB2nNEm@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Thu, 30 Oct 2025 17:06:49 -0700
-X-Gm-Features: AWmQ_bmRHrPwuytRU-oUtcv_mAPxEXlUmanD5v3yODN3rFDHRS7aA8xmVxSdYMk
-Message-ID: <CALzav=ci-CrUgH6Kjcm6eTRB0LCYgjds3Wnun7dsG6dWBe7i+w@mail.gmail.com>
-Subject: Re: [RFC PATCH 15/21] PCI: Make PCI saved state and capability
- structs public
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Vipin Sharma <vipinsh@google.com>, bhelgaas@google.com, alex.williamson@redhat.com, 
-	pasha.tatashin@soleen.com, jgg@ziepe.ca, graf@amazon.com, pratyush@kernel.org, 
-	gregkh@linuxfoundation.org, chrisl@kernel.org, rppt@kernel.org, 
-	skhawaja@google.com, parav@nvidia.com, saeedm@nvidia.com, 
-	kevin.tian@intel.com, jrhilke@google.com, david@redhat.com, 
-	jgowans@amazon.com, dwmw2@infradead.org, epetron@amazon.de, 
-	junaids@google.com, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="esF5ABbH8ZFy2Hrc"
+Content-Disposition: inline
+In-Reply-To: <20251030223757.2950309-1-yosry.ahmed@linux.dev>
+
+
+--esF5ABbH8ZFy2Hrc
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 30, 2025 at 4:55=E2=80=AFPM David Matlack <dmatlack@google.com>=
- wrote:
->
-> On 2025-10-19 10:15 AM, Lukas Wunner wrote:
-> > On Sat, Oct 18, 2025 at 03:36:20PM -0700, Vipin Sharma wrote:
-> > > On 2025-10-18 09:17:33, Lukas Wunner wrote:
-> > > > On Fri, Oct 17, 2025 at 05:07:07PM -0700, Vipin Sharma wrote:
-> > > > > Move struct pci_saved_state{} and struct pci_cap_saved_data{} to
-> > > > > linux/pci.h so that they are available to code outside of the PCI=
- core.
-> > > > >
-> > > > > These structs will be used in subsequent commits to serialize and
-> > > > > deserialize PCI state across Live Update.
-> > > >
-> > > > That's not sufficient as a justification to make these public in my=
- view.
-> > > >
-> > > > There are already pci_store_saved_state() and pci_load_saved_state(=
-)
-> > > > helpers to serialize PCI state.  Why do you need anything more?
-> > > > (Honest question.)
-> > >
-> > > In LUO ecosystem, currently,  we do not have a solid solution to do
-> > > proper serialization/deserialization of structs along with versioning
-> > > between different kernel versions. This work is still being discussed=
-.
-> > >
-> > > Here, I created separate structs (exactly same as the original one) t=
-o
-> > > have little bit control on what gets saved in serialized state and
-> > > correctly gets deserialized after kexec.
-> > >
-> > > For example, if I am using existing structs and not creating my own
-> > > structs then I cannot just do a blind memcpy() between whole of the P=
-CI state
-> > > prior to kexec to PCI state after the kexec. In the new kernel
-> > > layout might have changed like addition or removal of a field.
-> >
-> > The last time we changed those structs was in 2013 by fd0f7f73ca96.
-> > So changes are extremely rare.
-> >
-> > What could change in theory is the layout of the individual
-> > capabilities (the data[] in struct pci_cap_saved_data).
-> > E.g. maybe we decide that we need to save an additional register.
-> > But that's also rare.  Normally we add all the mutable registers
-> > when a new capability is supported and have no need to amend that
-> > afterwards.
->
-> Yeah that has me worried. A totally innocuous commit that adds, removes,
-> or reorders a register stashed in data[] could lead a broken device when
-> VFIO does pci_restore_state() after a Live Update.
->
-> Turing pci_save_state into an actual ABI would require adding the
-> registers into the save state probably, rather than assuming their
-> order.
->
-> But... I wonder if we truly need to preserve the PCI save state
-> across Live Update.
->
-> Based on this comment in drivers/vfio/pci/vfio_pci_core.c, the PCI
-> save/restore stuff in VFIO is for cleaning up devices that do not
-> support resets:
+On Thu, Oct 30, 2025 at 10:37:57PM +0000, Yosry Ahmed wrote:
+> -TBD
+> +On AMD CPUs, when GIF is cleared, #DB exceptions or traps due to a break=
+point
+> +register match are ignored and discarded by the CPU. The CPU relies on t=
+he VMM
+> +to fully virtualize this behavior, even when vGIF is enabled for the gue=
+st
+> +(i.e. vGIF=3D0 does not cause the CPU to drop #DBs when the guest is run=
+ning).
+> +KVM does not virtualize this behavior as the complexity is unjustified g=
+iven
+> +the rarity of the use case. One way to handle this would be for KVM to
+> +intercept the #DB, temporarily disable the breakpoint, single-step over =
+the
+> +instruction, then re-enable the breakpoint.
 
-Err, no, I misread that comment. But I guess my question still stands
-whether we truly need to preserve the pci_save_state across Live
-Update. Maybe there is a simpler way for VFIO to clean up the device
-in vfio_pci_core_disable() if we make certain restrictions on which
-devices we support.
+The wording LGTM, thanks!
+
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--esF5ABbH8ZFy2Hrc
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaQP+OgAKCRD2uYlJVVFO
+o1/xAQDRkpadriLgvvT/+503xXuvsaiKT53xVLXmZHvTe/ghwwEAvNOeC1nXPtHQ
+lC6ze9NwfECTfuCk+ZlAYKbSvm0Svgo=
+=2fXT
+-----END PGP SIGNATURE-----
+
+--esF5ABbH8ZFy2Hrc--
 
