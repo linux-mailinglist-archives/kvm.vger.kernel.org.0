@@ -1,78 +1,82 @@
-Return-Path: <kvm+bounces-61622-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61623-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79EDDC22C7F
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:30:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 273B9C22C82
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:31:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7912D4E4C6A
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:30:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18E501896B8B
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7E81D6193;
-	Fri, 31 Oct 2025 00:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5C51E8342;
+	Fri, 31 Oct 2025 00:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AjBqu+q+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HSNV1ug8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A3D282EB
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 00:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53762137C52
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 00:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761870648; cv=none; b=Zi705of3PdR6k8v8CklcAQQLQJk0PS6x95MGLnXhHFL5qR1QYMGJ7BsO2QkKLrcaf7ETdag4v9GkqEb+tuyUqB+/w/PU5diryqiBKsbBXdvzM8AZQo04wxWXLxM8mmspGT1HpXiUsjJ8RjZZpjpk7+RdRm5l825luK0tclZS1jc=
+	t=1761870650; cv=none; b=CgbtgQR/j/V/OGQgg7PMIgbviXn0Fd7ME7M3MFEZUojsbS0ZJJl38iVtV8LgBn5zr1qlt0+5Vq4t/qPzCAXUpkezTTOhdXLP1GoWHfKb89x7h53AK9YCdhjpVjwaQ2EdwGcO+ba/RuW92VTcojE2fQboio1+WizA+qsGlSDeg6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761870648; c=relaxed/simple;
-	bh=gPlIzeYfDGA258jPLcMw5THFnBDkxmCSUZp7s7X0tso=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jmwdoD9QIGjNXSMhYNMacJ/RvTR1VBwgefyg3WI+XgqEcrnchoqVRSOG9S2mjuOlLe6hrE4wX7YzYairvfaCigB9Or12MGUYZlEy/OeoiKGoamj6HSDWBTO4bh6/v8kMT4kh74Ire6jk21LOxsAnsf4TdZwVec2GCWd51RJoJw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AjBqu+q+; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1761870650; c=relaxed/simple;
+	bh=eJ+nhqmNAya1k6+OmAJ/q7k3s5/bkxXsA9XB0DsAgRE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VfTiZo3SZ/k/2o3ZmsKj5DQA/2t2btFRxErpXwerpYfexRaPxH/HGaYhC3QbiNerTiSsK7m2S9J/KaW4uBn9UHpLUauPw7eec7rMlRAXikKcRmqtI2s7Y7gQjxmXKU3kLqZ4TSH+M9P1918Xx5yn+h+ouMkGmxwI3epEp7h/TGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HSNV1ug8; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33bbbb41a84so3547317a91.1
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:30:46 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-290b13c5877so31445415ad.0
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:30:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761870646; x=1762475446; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N9tLwYhb23pEKSJRiBqjQRx2hF9R/IX4UqNL3Rew01U=;
-        b=AjBqu+q+tVHL/283CThnrg2QOnLWgeIg8rddbTbStwFfNedQYtGxwfHIzFiYO2ZPRS
-         wskXVqtb7PjU2vAjqif9wHZGzowap/QcR3iJ9i6dneagAMaroz28YFA/Y15RxQa11Hg+
-         t9XwtQN0gH3L7z7AYQV/jMxtMeVg1GH5T7iAGFqG92vbb7rLmwy+Qw5ZYmimdHkUtulx
-         HSUEsSPQu9Hg58sR2GW6K9lAbgqcz01soPxSG6nib1WJbDrvQ5yy7VJ3TQ6CHeF6SQCk
-         /gYaYANkL+eIiGoZKmvw7B30nUg1G8igMyQCPXnBfv/pdrhkurLF+gCm/8wn/2J6qqfR
-         SZSQ==
+        d=google.com; s=20230601; t=1761870648; x=1762475448; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=S9xAWTHA8Zs5WgjY+eo7qPd3VInKr+zSYIAk+wJ4peM=;
+        b=HSNV1ug8kG1UFnTQnPipaSCHMelNGBGGc5FcoaLYGduuzlLFja/qJ13vg11AKMIpqd
+         fDaqcSHMSRvzEAsNQmDmiWnymE+AJ2B4AI0DKfL9ligV857OpdveGe3COiPS17JkbAen
+         P+AP3tRTTj4dUtvDVd9xz4KpIccf52dsnjrMUVEumVJGHF4fh1FiOCfPL+CmVNWsQmG5
+         Pzpi/LpypDjufQtFLmiUporlQyX+FtXpri8kuXn1SX696eYXWWdBlUcmecznwo+Xl4mo
+         FrWnYb0koaGi+E1kwqGRKqgv8MzcPFCEq9pDK1A/Efm/4MnfToxCgti9mwl+z/yxmWVC
+         8QCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761870646; x=1762475446;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N9tLwYhb23pEKSJRiBqjQRx2hF9R/IX4UqNL3Rew01U=;
-        b=HjhZv5ggdd9y6GOyrc8tAGHRKzmOiEkmTNUJ0daH5bTmMeFRfIiU+AiDPp1UUfxPqw
-         yPF13/nC+rbER3XikNgr9Iu8mw6Cuj2kwy+R3dsInJQQLxzLmfq3bKl5bHLTVFkHNs6j
-         2jVb6KSh4l80lh8UAEKH/Lx97+yNpMrLrXZfOT606mXaBoFXOZ2A4cutzUDJoeW6ou1M
-         Y7eTsnWp7DApEPS//926xjgVj//NueAh2btITjeUvfNi38OIr/iI3surmepfSSY9Lu66
-         3PrMHazYso+R8odEZ9THJHPO7QIkERcqMZQiYn2925/mghKqdXvoOIPDK5MauKTNLupR
-         9GPw==
-X-Gm-Message-State: AOJu0YxKsf8lOSznoneYt2h+D68T46YbkiREuMAGJq00KndGG0FeiMeT
-	9J8xtDhDuBAh7grxhFdhG0V6cLGr4wUYqwpBTftRUg3/QgMq2B6VPkQDVKXYARHoFmOrW+0FxmI
-	2/+5DLQ==
-X-Google-Smtp-Source: AGHT+IFIqP2Br1l+AyG7RNfviFrGrRQqmryzEkiWym/i/FBoJUjmhjd2KxgCWe8EgzaFaRKz53fKGFoZgGQ=
-X-Received: from pjod4.prod.google.com ([2002:a17:90a:8d84:b0:33b:51fe:1a7a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3a90:b0:340:2942:dbfe
- with SMTP id 98e67ed59e1d1-34083055450mr2147907a91.17.1761870645952; Thu, 30
- Oct 2025 17:30:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761870648; x=1762475448;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=S9xAWTHA8Zs5WgjY+eo7qPd3VInKr+zSYIAk+wJ4peM=;
+        b=scazeClt9VTZk5JJ31mJuneafv3QHifps3HCdSX9jSvWl1ueOhZg5RHPTglhd+eN9u
+         k6FJO5m7G98A8OSS+S9NmKW112GBkTbO98wJC7erhowoQMRmC9CIP7eITkjU8eLpLN/p
+         zL+zBWjhl7O5qypN6R7Uc0x75Sx9pSccubHlKhZ6Z+iWC4XI/bDMGVsrJXEWdqWxvetO
+         XtlJkOGFBG2b/Ve1XthYeHriCT+8+CzPL8fZ9SBQEDirmSapM1vvux4D2FjABtyRFEiW
+         WQbIVyF6WbD4gtXOEhf2OSt6jY57houZhBVrqh9bEyOSeOKqSQV+4tE6m6gbu0dRU45J
+         NDGw==
+X-Gm-Message-State: AOJu0YyLP2IniMtVO2hBftgyACe7CeVPsUYxWUaHfO6WiiYHEFXaez92
+	XZxGXBBYeQ5zydHpW7TA1EqrCRa4c+oA/f1N+8c/QQ8bL9SIa31j/c0Gqb2asnvadh3+eA1TH4x
+	cwE1RNw==
+X-Google-Smtp-Source: AGHT+IGW9hpj7vBjBBA6u3ERPDC8qtzD54yvG/s87+dvnFJyDmRImsTrlkZ8d1iH/SCn+j3anWxBSXjW36Y=
+X-Received: from pjd14.prod.google.com ([2002:a17:90b:54ce:b0:339:ee20:f620])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d487:b0:295:656:4edf
+ with SMTP id d9443c01a7336-2951a38d763mr23412465ad.6.1761870647512; Thu, 30
+ Oct 2025 17:30:47 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 17:30:32 -0700
+Date: Thu, 30 Oct 2025 17:30:33 -0700
+In-Reply-To: <20251031003040.3491385-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20251031003040.3491385-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251031003040.3491385-1-seanjc@google.com>
-Subject: [PATCH v4 0/8] x86/bugs: KVM: L1TF and MMIO Stale Data cleanups
+Message-ID: <20251031003040.3491385-2-seanjc@google.com>
+Subject: [PATCH v4 1/8] x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
@@ -81,89 +85,89 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Brendan Jackman <jackmanb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This is a combination of Brendan's work to unify the L1TF L1D flushing
-mitigation, and Pawan's work to bring some sanity to the mitigations that
-clear CPU buffers, with a bunch of glue code and some polishing from me.
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 
-The "v4" is relative to the L1TF series.  I smushed the two series together
-as Pawan's idea to clear CPU buffers for MMIO in vmenter.S obviated the need
-for a separate cleanup/fix to have vmx_l1d_flush() return true/false, and
-handling the series separately would have been a lot of work+churn for no
-real benefit.
+TSA mitigation:
 
-TL;DR:
+  d8010d4ba43e ("x86/bugs: Add a Transient Scheduler Attacks mitigation")
 
- - Unify L1TF flushing under per-CPU variable
- - Bury L1TF L1D flushing under CONFIG_CPU_MITIGATIONS=y
- - Move MMIO Stale Data into asm, and do VERW at most once per VM-Enter
+introduced VM_CLEAR_CPU_BUFFERS for guests on AMD CPUs. Currently on Intel
+CLEAR_CPU_BUFFERS is being used for guests which has a much broader scope
+(kernel->user also).
 
-To allow VMX to use ALTERNATIVE_2 to select slightly different flows for doing
-VERW, tweak the low lever macros in nospec-branch.h to define the instruction
-sequence, and then wrap it with __stringify() as needed.
+Make mitigations on Intel consistent with TSA. This would help handling the
+guest-only mitigations better in future.
 
-The non-VMX code is lightly tested (but there's far less chance for breakage
-there).  For the VMX code, I verified it does what I want (which may or may
-not be correct :-D) by hacking the code to force/clear various mitigations, and
-using ud2 to confirm the right path got selected.
+Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+[sean: make CLEAR_CPU_BUF_VM mutually exclusive with the MMIO mitigation]
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kernel/cpu/bugs.c | 9 +++++++--
+ arch/x86/kvm/vmx/vmenter.S | 2 +-
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
-v4:
- - Drop the patch to fallback to handling the MMIO mitigation if
-   vmx_l1d_flush() doesn't flush, and instead use Pawan's approach of
-   decoupling the two entirely.
- - Replace the static branch with X86_FEATURE_CLEAR_CPU_BUF_MMIO so that
-   it can be referenced in ALTERNATIVE macros.
- - Decouple X86_FEATURE_CLEAR_CPU_BUF_VM from X86_FEATURE_CLEAR_CPU_BUF_MMIO
-   (though they still interact and can both be set)
-
-v3:
- - https://lore.kernel.org/all/20251016200417.97003-1-seanjc@google.com
- - [Pawan's series] https://lore.kernel.org/all/20251029-verw-vm-v1-0-babf9b961519@linux.intel.com
- - Put the "raw" variant in KVM, dress it up with KVM's "request" terminology,
-   and add a comment explaining why _KVM_ knows its usage doesn't need to
-   disable virtualization.
- - Add the prep patches.
-
-v2:
- - https://lore.kernel.org/all/20251015-b4-l1tf-percpu-v2-1-6d7a8d3d40e9@google.com
- - Moved the bit back to irq_stat
- - Fixed DEBUG_PREEMPT issues by adding a _raw variant
-
-v1: https://lore.kernel.org/r/20251013-b4-l1tf-percpu-v1-1-d65c5366ea1a@google.com
-
-Brendan Jackman (1):
-  KVM: x86: Unify L1TF flushing under per-CPU variable
-
-Pawan Gupta (1):
-  x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
-
-Sean Christopherson (6):
-  x86/bugs: Decouple ALTERNATIVE usage from VERW macro definition
-  x86/bugs: Use an X86_FEATURE_xxx flag for the MMIO Stale Data
-    mitigation
-  KVM: VMX: Handle MMIO Stale Data in VM-Enter assembly via
-    ALTERNATIVES_2
-  x86/bugs: KVM: Move VM_CLEAR_CPU_BUFFERS into SVM as
-    SVM_CLEAR_CPU_BUFFERS
-  KVM: VMX: Bundle all L1 data cache flush mitigation code together
-  KVM: VMX: Disable L1TF L1 data cache flush if CONFIG_CPU_MITIGATIONS=n
-
- arch/x86/include/asm/cpufeatures.h   |   1 +
- arch/x86/include/asm/hardirq.h       |   4 +-
- arch/x86/include/asm/kvm_host.h      |   3 -
- arch/x86/include/asm/nospec-branch.h |  24 +--
- arch/x86/kernel/cpu/bugs.c           |  18 +-
- arch/x86/kvm/mmu/mmu.c               |   2 +-
- arch/x86/kvm/mmu/spte.c              |   2 +-
- arch/x86/kvm/svm/vmenter.S           |   6 +-
- arch/x86/kvm/vmx/nested.c            |   2 +-
- arch/x86/kvm/vmx/vmenter.S           |  14 +-
- arch/x86/kvm/vmx/vmx.c               | 235 ++++++++++++++-------------
- arch/x86/kvm/x86.c                   |   6 +-
- arch/x86/kvm/x86.h                   |  14 ++
- 13 files changed, 178 insertions(+), 153 deletions(-)
-
-
-base-commit: 4cc167c50eb19d44ac7e204938724e685e3d8057
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 6a526ae1fe99..723666a1357e 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -194,7 +194,7 @@ DEFINE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
+ 
+ /*
+  * Controls CPU Fill buffer clear before VMenter. This is a subset of
+- * X86_FEATURE_CLEAR_CPU_BUF, and should only be enabled when KVM-only
++ * X86_FEATURE_CLEAR_CPU_BUF_VM, and should only be enabled when KVM-only
+  * mitigation is required.
+  */
+ DEFINE_STATIC_KEY_FALSE(cpu_buf_vm_clear);
+@@ -536,6 +536,7 @@ static void __init mds_apply_mitigation(void)
+ 	if (mds_mitigation == MDS_MITIGATION_FULL ||
+ 	    mds_mitigation == MDS_MITIGATION_VMWERV) {
+ 		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF);
++		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF_VM);
+ 		if (!boot_cpu_has(X86_BUG_MSBDS_ONLY) &&
+ 		    (mds_nosmt || smt_mitigations == SMT_MITIGATIONS_ON))
+ 			cpu_smt_disable(false);
+@@ -647,6 +648,7 @@ static void __init taa_apply_mitigation(void)
+ 		 * present on host, enable the mitigation for UCODE_NEEDED as well.
+ 		 */
+ 		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF);
++		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF_VM);
+ 
+ 		if (taa_nosmt || smt_mitigations == SMT_MITIGATIONS_ON)
+ 			cpu_smt_disable(false);
+@@ -748,6 +750,7 @@ static void __init mmio_apply_mitigation(void)
+ 	 */
+ 	if (verw_clear_cpu_buf_mitigation_selected) {
+ 		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF);
++		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF_VM);
+ 		static_branch_disable(&cpu_buf_vm_clear);
+ 	} else {
+ 		static_branch_enable(&cpu_buf_vm_clear);
+@@ -839,8 +842,10 @@ static void __init rfds_update_mitigation(void)
+ 
+ static void __init rfds_apply_mitigation(void)
+ {
+-	if (rfds_mitigation == RFDS_MITIGATION_VERW)
++	if (rfds_mitigation == RFDS_MITIGATION_VERW) {
+ 		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF);
++		setup_force_cpu_cap(X86_FEATURE_CLEAR_CPU_BUF_VM);
++	}
+ }
+ 
+ static __init int rfds_parse_cmdline(char *str)
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index bc255d709d8a..1f99a98a16a2 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -161,7 +161,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
+ 	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
+ 
+ 	/* Clobbers EFLAGS.ZF */
+-	CLEAR_CPU_BUFFERS
++	VM_CLEAR_CPU_BUFFERS
+ 
+ 	/* Check EFLAGS.CF from the VMX_RUN_VMRESUME bit test above. */
+ 	jnc .Lvmlaunch
 -- 
 2.51.1.930.gacf6e81ea2-goog
 
