@@ -1,141 +1,155 @@
-Return-Path: <kvm+bounces-61620-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61621-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70EBFC22C4B
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:09:54 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92114C22C6A
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:19:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AED9420D57
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:09:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D909C34B5C4
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:19:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1590242AA3;
-	Fri, 31 Oct 2025 00:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 042971A9F88;
+	Fri, 31 Oct 2025 00:19:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="klJP2Vhk"
+	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="WR8lxUAx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FA2134CF
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 00:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B7113E02A
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 00:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761869384; cv=none; b=OM3k4bJKB+0oWqixEImQoP9cqKDKuN42gXxxt5j1CYE6qkrdqR/FEReV4KVWVPrEP073szmBYtkwvj9U7M1bOyXxMpHaH3uXObOrW0lNrxzC0dS9WM3XjMxy/XENz+0NXb7/WLLqAAwVxjQf+c6+YLhvqp02zL7t87VL5LIO3lA=
+	t=1761869975; cv=none; b=WgcLq3C1Jh9TBMsYC6WQ08JeR0Oimyp1/wjGQUT/fTdEgc8SZmBlWjDObuvxd0O+25DCraqDaoaKosDGclgIVhnnJH0ZB2umeFI4h4TPL94QyBxXTodkRp3hn2z+iDcNG11rZB4+Gv1SZ6e871+Mhfkq/fPXMCm0cCKqgPQ5kuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761869384; c=relaxed/simple;
-	bh=tOqji4svVFYnjsJuuwJe072kmFQ3eEB6odRukox2PW8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kmgRmjXtKfj4VL/4Ykkh0/xOsnl/t0bx5dj6oKPO+Tq6AXGuv5MvHgyQ4DNq8nyA+0hOLl5Pnj1QJ8TwIyHrR53j2+00IckD6/xcFWT8s6bDkolRieDGyOVFc04BHrhNBiLqHlsEUzamZGP+fqW6HG+4lwvQbYHQJERi9ES/bYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=klJP2Vhk; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-295018cbc50so15711455ad.3
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:09:42 -0700 (PDT)
+	s=arc-20240116; t=1761869975; c=relaxed/simple;
+	bh=8rHUYkXKPL5IW43a+4rQNutLuyHqHIoW5Z0VxJSm0u4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jWhUqKagdy26shUWFT4BKrkUowsAec/m+HPnD+LxPOJbmkVY/hBymIPee1T69xWPNbzHb+U/aFz65XApz0KnWqmxGn82vSn6li1q/HPwjzcA1HoV2I0tXGdXP+BuTLWLSTAo8SUOUQTEf8DQigqpn7lWsY50gwt//dj1grIMFw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com; spf=pass smtp.mailfrom=soleen.com; dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b=WR8lxUAx; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-64071184811so1892503a12.0
+        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:19:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761869382; x=1762474182; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tOqji4svVFYnjsJuuwJe072kmFQ3eEB6odRukox2PW8=;
-        b=klJP2Vhkcdbr8tQPOQhgfvgEmrP7vsg+2k81HHP9P/tTtuBIPewkleOebXI+v2cxRI
-         iB3nLjiW6+7ZVLdFK2W9yHGd7qeg1FAnAteUpBzo2/KoqUOWZfVKnIeJUuzSZJi0UoxV
-         SjI2OjKVg/97+XoQTI8+0/mrKW1zsrZj1x6xkNtRKbgL7krn5Q55m1Yzcvz/VlhuDCuy
-         oqPSVeoHZMmdAoDQOrctInu23kK8Yp5wyIZUPj5PgjBc3DQWG/wQu0tAvODnDP1lOx8r
-         Li/9tj4L5oWoYA+AkUcLRJ0682zcpVrs0zah+Mh5p905Du5n1m3TGWMDW6chWKaopJc7
-         to8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761869382; x=1762474182;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=soleen.com; s=google; t=1761869971; x=1762474771; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tOqji4svVFYnjsJuuwJe072kmFQ3eEB6odRukox2PW8=;
-        b=k0TgjXgcdvaerXcm1guVjw8kss2VLp2TYUmjU24xQ9+7sd3jjNrrn4cg+F1Vwrn+XC
-         KSFn12iKlGOU5TD5y9J/tn48flFL8sHDfq5HoqFi6ZLwybKUGBj7d2gHYY2w0uKP7amf
-         Sg+o3nJ9n3+9ptdBxiumPhZEOYpcfXSnuoL+XFlBrkWdxaz831yXY8rUnpqJJ8Z3scV7
-         Q4+0nQ6RBErY3P9/JPf5HoHvxkdCIv9WbH0IRS9ydyc/YZ2LtHpgxp3GpE10C7S7fHx2
-         9vaWF51MSk5iTQvktNxmHNJ6ZiQDFl6GgAI/DFizNbYYfuMeqhbM78J/CenF9EY8NpMs
-         v9UA==
-X-Forwarded-Encrypted: i=1; AJvYcCWAVo+Q0kICCtUhmAPXIgYoiMA8H1DVRE0NJ4Qse+6cDWE5A9V1MtETNSp3mueD1lnaljY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAr1sVb2lbTiHoCqOShRuvxqutVirrJyByNtPyMPIT/ZbLmk/Q
-	ezNHoeByr/9mKedFecYMNTiocqTxBOEY5iSDKJS5Ve7p2HBLrXqT4bxC
-X-Gm-Gg: ASbGncuu77x0TBK1ro5EymHcPTkJ3yp1Ahc+Dpy37mqVie1ozoJF1VCNilc1YRmp4C7
-	NPthkXFjZRfSxoIEqkm9aQOny13fbHHvkMD5KlcaEY9SuezCcpwM50+ZCri0j54jfb35oXK/iiZ
-	dfue/dp16h+tDAc7xo+ENaVflFpARwiC4yEQeFf5rmlu4bcP98n3n6G0ex2DpduAnHEz2iOGOhK
-	zyyOicGiywUnYchH2x+dVQ0ldjQ4isrpaSWOJvKxHpO1drpnllmYFzObfxqO4lYQpvbNy31J5Vd
-	CSJGS9UOyBIWB5lHWVwcpb+KjoCAj3pThSzml1LPpmymxVuuEszmxDQFwNNpoGE7aeWvtT/yF10
-	6kpksUwudcv/3kFnDCXleeOsyYnGzqHeyiAHpGDmXIdfKDcTiiOPf9HZwWT6CNKG7rFRUKXOohQ
-	Co
-X-Google-Smtp-Source: AGHT+IEXVNb2H7WFZFLBuvMGoO23i051th+3XKdx2cHyPS895ioXoRXcS0lzDT9ZxeAWygJirg3ebw==
-X-Received: by 2002:a17:902:e78d:b0:24b:24dc:91a7 with SMTP id d9443c01a7336-2951a52a946mr19593005ad.45.1761869381941;
-        Thu, 30 Oct 2025 17:09:41 -0700 (PDT)
-Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2952696f6d6sm1785865ad.68.2025.10.30.17.09.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 17:09:40 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id D67E64209E4A; Fri, 31 Oct 2025 07:09:38 +0700 (WIB)
-Date: Fri, 31 Oct 2025 07:09:38 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Document a virtualization gap for GIF on AMD
- CPUs
-Message-ID: <aQP-Qv1SOi0cy-nO@archie.me>
-References: <20251030223757.2950309-1-yosry.ahmed@linux.dev>
+        bh=Cv3Ljvf1heM/ChX+5Kbnk959i79o/ym9ON91SVXdVic=;
+        b=WR8lxUAxQmD+DWLD1tgzmINQnPnyk6Vm976ZZpfc/IITPpAPs+kxbXZbaybX0nFwbv
+         NP62A1PqWLovWAkXh9DGcUrXuzEEQQpxKJ3JorgCVpURG+3TKFcJ9nQy3vy+SWPmR3NS
+         X8PTqprIfWt1r8qoyEIY8+qr8MTuKr8btlRjGZ2k1dZ7zM41eNj7VKyWMl1RNHRk6Zav
+         0IxobgQB8mmDp07zCyQVT5Jn4zr7J1GWVIvCUjPxfK9x782d6AEE0y2XdGOLZJ5OPbNx
+         xq4vRUKVwBDN8go1aAmpL3GcFErz41o/O7lOstO8c67Lob+4CzOstfEduiGJ6TAwzc5Q
+         O/DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761869971; x=1762474771;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Cv3Ljvf1heM/ChX+5Kbnk959i79o/ym9ON91SVXdVic=;
+        b=sE3FtowT+tRSukasR8VjsFlsSuIbYVsi8XPnMMJ3CEBj1fKBYJ2ei+uU+WhtYLc5i7
+         ayoM7rIXzSMdZme96ivbeG8hVoamui6673pa9OrycppiBocAGK6VhRxL829QlHNUw+IP
+         jOed7GCnXD2xX6QgpEdRC0aME+I/pktcjX8qNjdlhkHuLbvjDhpwGreug63mGvuH3ki2
+         mGSb78xo3T1R+YCoDiC0+J9XtZeiVUfxJJlYmNqoV4C2pfJcJeG9tTJzi918l5S81AXR
+         2ypedsIFu953YhseVk4lZVrgG2j9SEo0AERgOo0FyTBKD3WkuJIjHA3shrd8CcE77ezf
+         wCcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVwvmUvRvOf/R3CwWgA6rDoNnPBlF3Tz4/MFO/4wzH83FA/TFRxYpFqzcjmVKLkPM65/+w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk5sTsRp9359wxFewZNruxBeWW4QSGDCwoUiN4AyAMlK/+bfoS
+	FobugWu9z0vbg4dgkPKantgFgLz19h24eeCLooKWsmxvN4s0JDFzY/6EMDFE9m5x26NUVqsU/tx
+	nDzYLUs4CsrDELQfRdriAvSgCGrtrTClSRhbqPrLVhw==
+X-Gm-Gg: ASbGncsE8uzboCBDKnRNMgGgpQnAP+Rm0Cv7xqsuAuGzNlhxmavQuHXQuLUDsYJyNDG
+	iiZqkb3A7zSON/GKoAyH106NjhyA0eb6nlPrJZ2ievuwNMI6DFaSkeBxqzGtYRGIqQ3FUvCoVTt
+	hBRuq7+Ch3SoAFkhG6yagkbuTvmXkhzVyRG01dDu3JQO5PHEw5RyD7gUf3UBfiX2ZCSikNrEsQ8
+	ZeYrpyZFa5orj7cTf/MuN9p/nvrfn2vMPh3WgmnzptN9PGOLE7ybT4utPnt/uilSSF9
+X-Google-Smtp-Source: AGHT+IHAmJ5aHdM6JoD2TOJsB7BThxEoT5eo1YrDOCS0gC6NmplAKbJLD+yZsTcgPKK2dj5Dhi5gMIE8RdzNHN72sus=
+X-Received: by 2002:a05:6402:13cb:b0:640:6a18:2931 with SMTP id
+ 4fb4d7f45d1cf-6407702dcd1mr1160377a12.29.1761869971150; Thu, 30 Oct 2025
+ 17:19:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="esF5ABbH8ZFy2Hrc"
-Content-Disposition: inline
-In-Reply-To: <20251030223757.2950309-1-yosry.ahmed@linux.dev>
-
-
---esF5ABbH8ZFy2Hrc
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20251018000713.677779-1-vipinsh@google.com> <20251018000713.677779-7-vipinsh@google.com>
+ <20251027134430.00007e46@linux.microsoft.com> <aQPwSltoH7rRsnV9@google.com>
+In-Reply-To: <aQPwSltoH7rRsnV9@google.com>
+From: Pasha Tatashin <pasha.tatashin@soleen.com>
+Date: Thu, 30 Oct 2025 20:18:54 -0400
+X-Gm-Features: AWmQ_bmaQn5U2r87lGmHMokOwG7--caG9FTwwPKr2aHRFfrExiLwJYx42aUNdvg
+Message-ID: <CA+CK2bD-E0HKsuE0SPpZqEoJyEK4=KJCBw-h1WFP7O1KEoKuNQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 06/21] vfio/pci: Accept live update preservation
+ request for VFIO cdev
+To: David Matlack <dmatlack@google.com>
+Cc: Jacob Pan <jacob.pan@linux.microsoft.com>, Vipin Sharma <vipinsh@google.com>, 
+	bhelgaas@google.com, alex.williamson@redhat.com, jgg@ziepe.ca, 
+	graf@amazon.com, pratyush@kernel.org, gregkh@linuxfoundation.org, 
+	chrisl@kernel.org, rppt@kernel.org, skhawaja@google.com, parav@nvidia.com, 
+	saeedm@nvidia.com, kevin.tian@intel.com, jrhilke@google.com, david@redhat.com, 
+	jgowans@amazon.com, dwmw2@infradead.org, epetron@amazon.de, 
+	junaids@google.com, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 30, 2025 at 10:37:57PM +0000, Yosry Ahmed wrote:
-> -TBD
-> +On AMD CPUs, when GIF is cleared, #DB exceptions or traps due to a break=
-point
-> +register match are ignored and discarded by the CPU. The CPU relies on t=
-he VMM
-> +to fully virtualize this behavior, even when vGIF is enabled for the gue=
-st
-> +(i.e. vGIF=3D0 does not cause the CPU to drop #DBs when the guest is run=
-ning).
-> +KVM does not virtualize this behavior as the complexity is unjustified g=
-iven
-> +the rarity of the use case. One way to handle this would be for KVM to
-> +intercept the #DB, temporarily disable the breakpoint, single-step over =
-the
-> +instruction, then re-enable the breakpoint.
+On Thu, Oct 30, 2025 at 7:10=E2=80=AFPM David Matlack <dmatlack@google.com>=
+ wrote:
+>
+> On 2025-10-27 01:44 PM, Jacob Pan wrote:
+> > On Fri, 17 Oct 2025 17:06:58 -0700 Vipin Sharma <vipinsh@google.com> wr=
+ote:
+> > >  static int vfio_pci_liveupdate_retrieve(struct
+> > > liveupdate_file_handler *handler, u64 data, struct file **file)
+> > >  {
+> > > @@ -21,10 +28,17 @@ static int vfio_pci_liveupdate_retrieve(struct
+> > > liveupdate_file_handler *handler, static bool
+> > > vfio_pci_liveupdate_can_preserve(struct liveupdate_file_handler
+> > > *handler, struct file *file) {
+> > > -   return -EOPNOTSUPP;
+> > > +   struct vfio_device *device =3D vfio_device_from_file(file);
+> > > +
+> > > +   if (!device)
+> > > +           return false;
+> > > +
+> > > +   guard(mutex)(&device->dev_set->lock);
+> > > +   return vfio_device_cdev_opened(device);
+> >
+> > IIUC, vfio_device_cdev_opened(device) will only return true after
+> > vfio_df_ioctl_bind_iommufd(). Where it does:
+> >       device->cdev_opened =3D true;
+> >
+> > Does this imply that devices not bound to an iommufd cannot be
+> > preserved?
+>
+> Event if being bound to an iommufd is required, it seems wrong to check
+> it in can_preserve(), as the device can just be unbound from the iommufd
+> before preserve().
+>
+> I think can_preserve() just needs to check if this is a VFIO cdev file,
+> i.e. vfio_device_from_file() returns non-NULL.
 
-The wording LGTM, thanks!
++1, can_preserve() must be fast, as it might be called on every single
+FD that is being preserved, to check if type is correct.
+So, simply check if "struct file" is cdev via ops check perhaps via
+and thats it. It should be a very simple operation
 
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---esF5ABbH8ZFy2Hrc
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaQP+OgAKCRD2uYlJVVFO
-o1/xAQDRkpadriLgvvT/+503xXuvsaiKT53xVLXmZHvTe/ghwwEAvNOeC1nXPtHQ
-lC6ze9NwfECTfuCk+ZlAYKbSvm0Svgo=
-=2fXT
------END PGP SIGNATURE-----
-
---esF5ABbH8ZFy2Hrc--
+>
+> >
+> > If so, I am confused about your cover letter step #15
+> > > 15. It makes usual bind iommufd and attach page table calls.
+> >
+> > Does it mean after restoration, we have to bind iommufd again?
+>
+> This is still being discussed. These are the two options currently:
+>
+>  - When userspace retrieves the iommufd from LUO after kexec, the kernel
+>    will internally restore all VFIO cdevs and bind them to the iommufd
+>    in a single step.
+>
+>  - Userspace will retrieve the iommufd and cdevs from LUO separately,
+>    and then bind each cdev to the iommufd like they were before kexec.
 
