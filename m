@@ -1,141 +1,110 @@
-Return-Path: <kvm+bounces-61712-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61713-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8952CC264C0
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 18:12:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B0AEC26506
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 18:17:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D43911895479
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 17:10:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 254F2407B5C
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 17:12:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F016302141;
-	Fri, 31 Oct 2025 17:09:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44DC4302770;
+	Fri, 31 Oct 2025 17:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fud+pnBF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wEp/Ypyw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37F02FFF84
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 17:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04BE12FD68D
+	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 17:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761930577; cv=none; b=X+BY/FCAVeOurBeBoJxtWCYMGQx9B5EzMPhaHbnBGtJ9CjpXHI8GypvOGbuusOj/+JfXf89H9sH02tYHurx2XKc+XHY0OVVg15WI5FQMPfPY/4FeXarsr0ZXyLNaXQ7Uxv0hU6UHyH3xvw4pehBlrK8K+JQhgbn1I1zCEJ+arPE=
+	t=1761930725; cv=none; b=bvMPa5+kGvo3z/4CO1D7hUp3gTfFTUJF3TefEDcIAVVrctERBtwum1AtceGg6KS+UpZ3jdT4oPJvr1HjXrqjOlluHQFf9wBXqToFkTU8UxlHwCERtxWh0Hi9RGv/5/LeLsF1B41V87ibBh7X3CS6W2BZ4C2Z/7bJoMMNJDSNZEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761930577; c=relaxed/simple;
-	bh=Zal0qUvQYA99X2Dr2KFud1Dc/yidJYhG7mu7wr/gO1g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GvpCfKia8ywF63IfIAqsBHpkto9odVzDivcjp7W23gs5Z1GA20PG2bKb3jpQlphjL/B65GkpEztdpgkV4hlq0V+qcMpKBQlnqLOHcccNy3OhP2/GJTLMuc29669myntUmlqc2M+KzxvjdUXwTk0FmuB8Lb6UGmKc7HNKdqkmYR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fud+pnBF; arc=none smtp.client-ip=209.85.160.169
+	s=arc-20240116; t=1761930725; c=relaxed/simple;
+	bh=2Py81n9yIbaq9LVne2Z6xEysNPQOVrfItEqxp5YA7aE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QB21nf9sCsfPBnz3boc+yupoG2ZrqaeRCG5jVZ1XA6Gm3DLz1WhhG3kl/vqlYcH7Qcy78g3YDAvdFcJIVZYDeOI5pA2ua58cC8gu5niYmWtYlBk/VNdUlA6wgWeY1aTanFjvuTc/8KsKllIGzpSQWR53iC0RVbdmHeDe2rVoSL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wEp/Ypyw; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ea12242d2eso13271cf.1
-        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 10:09:35 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3407734d98bso1837573a91.3
+        for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 10:12:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761930574; x=1762535374; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nL/56SuWwh5/Qtuu8QLg7wfoYDppiLXxfP3gfkDqRJ4=;
-        b=Fud+pnBFejx6yO/IxC3TkqmhS8eDD2JHMypc/F5uQnEkPo766+5ZXPTdWVXrkTbJRB
-         0r+nQyH3WHBHWhOAPUEGp+zGf0+LnPGLkp5bWszq64CCp4IS+lW1P7hyHutJ6CoVOeA+
-         BqvAO1NVAinlMDpbdx4SU1y8/+7REObvRA8nw2UA7lSik7E79UymgPBXv/RvQB1go+8I
-         doZ04JZMH1yY/I13et/lojuXDlAbxc7eUXAArZAR13n+TpIxwzbTcoQA0gQByhjeVglR
-         fHgeP2WjxpIhP7hvjHAswQgPlgdIBxOgsaXBR931AYt9uLN4qEE4Ll5BZKxa3lXlLjIM
-         nNAg==
+        d=google.com; s=20230601; t=1761930723; x=1762535523; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HjXjY8ls4xQvqV6pquPYuHe7QqNVj5FW0YEflavTuCM=;
+        b=wEp/Ypyw9pl+GnTzz1vKb0RGbY/EfAz5fUPPu7aerHeC0w96sHPea1BAOM0s6PlJr0
+         9WLki/KnBUA6ja9JQAjmB9V7M3CvhMrYYtbCcEoTVHzd/EQos/9pR9q93XJTyD+fEpfp
+         FOYzkB//Kb64qm1hoWVjfj/A8+x0G4/n/VMfjcu6YHItgD3GEq1YnYNy7JZVSn/042YI
+         kug1aYoEvl9wmCVb9Ubc2IdTQbe9Nysyo4dqm0g1UWpW0IyVOy/g4B3O4OP0miPxJTZz
+         w/ZYlcmPl1PJZ8t9uFYGHHtF3ic1ZtvANTFSkFUWZlmS4lR5+vfQPj2llwDG1GYJcjTT
+         U0Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761930574; x=1762535374;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nL/56SuWwh5/Qtuu8QLg7wfoYDppiLXxfP3gfkDqRJ4=;
-        b=w1epACA2TSy/5uyxC3thqvN4BuZi2mEsQVStjOyWxRev3JwoHgm5HPbWlZOzxNLGr9
-         Nwt6T4uTUVvh7rAjT69ft3Jg3zI1KXMqcmFK736/1LUro4xs0gFonO0FXXYRpiTtMbD+
-         IKpVFgdiQfdQjw6vtnzFhRwMqTvgtJYWDZlPXq9uMlanFqoHK/IZ0cKDklJK0UbjQ0Uc
-         Mac67p15kgiWeN7N43OpheUg+//DsO58ygwQQatkCKTn218ff2P0773A7OZYUQyk1Q+M
-         TOBRSJEdBOt55666V0ZV5Obz9cRnfZA2Pd8V4+abKggh7KHiq0RYok05mmqXNqkHq6Zd
-         kYtA==
-X-Forwarded-Encrypted: i=1; AJvYcCXY4VB7giqGU3Hv3XYOIFf8hXyhLUzXXMuuX27+xdMM5/hFQ5SQHt5rmt1FAMrbsKy6XiQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yytcr6omr+p2/KYoIhcs4/Xf91skcigEVpArKN01hjyERw5xd2P
-	9+GueWinF+ERldpR8smRPBo7PK4Zwjwx9voYDOjfJv2N0Hn92cy6iprzjxrb6tFkgiezzUb3y19
-	0uxl1WlQVWFuXuiTJ6IoIXzVrMnyw32Xj+zF89WVe
-X-Gm-Gg: ASbGnctvmDyhqtJlFBU9Pc8WPP+ujyFxSACuVqPjGGld/jOxhE+Os8aVyzBl2b07e0s
-	5e1dqqVo8rV5xnjl3xWPvWqFESUhg7t7374fBKRLvV6CpotITkljLS7HglOmmNmad0+jnhms9kd
-	v4uWGLVJdK3PzaBitLX5FUqgbyBCsEIw7lSZ2/BMboailt0wNPPcPbZgJ864A+0SzJOP9R5tCfi
-	hVxWokKn5ZCkZZ7eFp/vUsqWK9dol2RPGJPx78JNKkwag6LPkhC+WtamkPWkWOslHZ+hYeF5dcC
-	13I6k15I3SXmipSm7A==
-X-Google-Smtp-Source: AGHT+IGkg40mPW3bovCZHX0roaA3kWbGoki1BIr82JU93FEnyQBIurMN/CgDlciqSLrXLxGUzokfypjDG670BnEk3sY=
-X-Received: by 2002:a05:622a:1911:b0:4b7:9c77:6ba5 with SMTP id
- d75a77b69052e-4ed338fe804mr6958681cf.15.1761930573914; Fri, 31 Oct 2025
- 10:09:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761930723; x=1762535523;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HjXjY8ls4xQvqV6pquPYuHe7QqNVj5FW0YEflavTuCM=;
+        b=gPUbo+l43u0OtCO0t5ZEyk9bJp5Gp57xNjOvAsgJ2ylil68ynuJsvIM37fFR9U6JR/
+         6XokDVivdVfFZjobsIEaowyfD+QvX4IpM+C5fnilr0qNIOdloO2nFig2MkbFFo2mG7Iu
+         TIGrCFScx3DYbw2a0/MJmczSi9ZyHEHi7HChur01S8M2dB5tRHdm8c9TIoJ7b0iAmDqx
+         I9imWf7rbYTNLjAwntq5jluWksTFH4G29wQQGq8KDQyFV75ymNP4PXK9vCx2MS6LWxo+
+         ntywRpDxnxupDeDWW1vaIS2wOHdtVhW5lAca8uJBzUP/GNcO885D3LLrf7JWBOlOHUNs
+         ooPw==
+X-Forwarded-Encrypted: i=1; AJvYcCU7R6b+GCOWOu5y2D0kPz6P9VzF3E5bcX0E8qku38hB7JN6ncg8lEhMcVEffD4WOtL5dKc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3HohG6wTGEw7hpYOvDMUtyReH7cZBOX6UT9F5cPM4iGCnl45E
+	R5I43ifveryR0x/7T5F4znBKIkd0jfKV1c/dxY59gFvCHgvblHm5RPjhFiuf1omR5W01eT0VTHG
+	PZfDChQ==
+X-Google-Smtp-Source: AGHT+IGfSgMUQo+5u2P6PetuRGaKK3ywl60OSkXvDDKeMxjcSsBTGVvS+p3TiopL8XWw5d9McqxPGzj/wX4=
+X-Received: from pjbsr13.prod.google.com ([2002:a17:90b:4e8d:b0:340:b55d:7a07])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:388d:b0:32e:d599:1f66
+ with SMTP id 98e67ed59e1d1-34083089300mr5226937a91.30.1761930723259; Fri, 31
+ Oct 2025 10:12:03 -0700 (PDT)
+Date: Fri, 31 Oct 2025 10:12:01 -0700
+In-Reply-To: <aQRzWb3Fu6ywdE9t@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251030171238.1674493-1-rananta@google.com> <5e24cb1e-4ee8-166b-48c7-88fa6857c8dc@huawei.com>
-In-Reply-To: <5e24cb1e-4ee8-166b-48c7-88fa6857c8dc@huawei.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Fri, 31 Oct 2025 10:09:22 -0700
-X-Gm-Features: AWmQ_bl8RKNXMnZYsYniUFcgOw-utCMK_OFyrH-gMOtH0dhIyQfPT7TfvZpSNAw
-Message-ID: <CAJHc60yak=kOQmap7Tmp=84cx7Z=h_15K_ZP9kdvxBc1h15rgg@mail.gmail.com>
-Subject: Re: [PATCH] vfio: Fix ksize arg while copying user struct in vfio_df_ioctl_bind_iommufd()
-To: liulongfang <liulongfang@huawei.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, David Matlack <dmatlack@google.com>, Josh Hilke <jrhilke@google.com>, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, alex@shazbot.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20251030200951.3402865-1-seanjc@google.com> <20251030200951.3402865-9-seanjc@google.com>
+ <aQRzWb3Fu6ywdE9t@yzhao56-desk.sh.intel.com>
+Message-ID: <aQTt4R4CflSuVnCX@google.com>
+Subject: Re: [PATCH v4 08/28] KVM: TDX: Drop superfluous page pinning in S-EPT management
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"Kirill A. Shutemov" <kas@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Oct 30, 2025 at 6:34=E2=80=AFPM liulongfang <liulongfang@huawei.com=
-> wrote:
->
-> On 2025/10/31 1:12, Raghavendra Rao Ananta wrote:
-> > For the cases where user includes a non-zero value in 'token_uuid_ptr'
-> > field of 'struct vfio_device_bind_iommufd', the copy_struct_from_user()
-> > in vfio_df_ioctl_bind_iommufd() fails with -E2BIG. For the 'minsz' pass=
-ed,
-> > copy_struct_from_user() expects the newly introduced field to be zero-e=
-d,
-> > which would be incorrect in this case.
-> >
-> > Fix this by passing the actual size of the kernel struct. If working
-> > with a newer userspace, copy_struct_from_user() would copy the
-> > 'token_uuid_ptr' field, and if working with an old userspace, it would
-> > zero out this field, thus still retaining backward compatibility.
-> >
-> > Fixes: 86624ba3b522 ("vfio/pci: Do vf_token checks for VFIO_DEVICE_BIND=
-_IOMMUFD")
->
-> Hi Ananta,
->
-> This patch also has another bug: in the hisi_acc_vfio_pci.c driver, It ha=
-ve two "struct vfio_device_ops"
-> Only one of them, "hisi_acc_vfio_pci_ops" has match_token_uuid added,
-> while the other one, "hisi_acc_vfio_pci_migrn_ops", is missing it.
-> This will cause a QEMU crash (call trace) when QEMU tries to start the de=
-vice.
->
-> Could you please help include this fix in your patchset as well?
->
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -1637,6 +1637,7 @@ static const struct vfio_device_ops hisi_acc_vfio_p=
-ci_migrn_ops =3D {
->         .mmap =3D hisi_acc_vfio_pci_mmap,
->         .request =3D vfio_pci_core_request,
->         .match =3D vfio_pci_core_match,
-> +       .match_token_uuid =3D vfio_pci_core_match_token_uuid,
->         .bind_iommufd =3D vfio_iommufd_physical_bind,
->         .unbind_iommufd =3D vfio_iommufd_physical_unbind,
->         .attach_ioas =3D vfio_iommufd_physical_attach_ioas,
->
-Sent as a separate patch in v2:
-https://lore.kernel.org/all/20251031170603.2260022-3-rananta@google.com/
-(untested).
+On Fri, Oct 31, 2025, Yan Zhao wrote:
+> >   - Increasing the folio reference count only upon S-EPT zapping failure[5].
+> Nit: There's a warning:
+> 
+> WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
 
-Thank you.
-Raghavendra
+Checkpatch is a (very helpful) tool, but it is not authoritative in any way.
+Similar to the how "wrap at 80 chars" is a soft rule that can and should be
+broken depending on context, checkpatch should also be ignored for things like
+this.  If someone says that the period making the line "too long" actually makes
+this unreadable for them, then they're just trolling at that point :-)
 
