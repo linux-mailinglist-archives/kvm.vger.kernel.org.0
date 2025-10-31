@@ -1,254 +1,134 @@
-Return-Path: <kvm+bounces-61630-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61631-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED66C22CA3
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:33:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44C6DC22E1D
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 02:34:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 878D23ACC62
-	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 00:32:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 880D5188B084
+	for <lists+kvm@lfdr.de>; Fri, 31 Oct 2025 01:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 560231DF258;
-	Fri, 31 Oct 2025 00:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C192A24DD09;
+	Fri, 31 Oct 2025 01:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TZpi9qhF"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="6goHhqro"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1BF323184A
-	for <kvm@vger.kernel.org>; Fri, 31 Oct 2025 00:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50EB742AA9;
+	Fri, 31 Oct 2025 01:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761870662; cv=none; b=QBYx57N5+GiOu32MMT0u3LhRzdk9/BU06C7QSQemWGzuoJ9hD/mK1Vaf57r70JyqAZnIRcP7aDst7Pe8Crf7kbCL4s5NVBVKu/TPNIg0dJF1ypZzoWnJP28ijHZBv7dJB2bxm5E57Iumb1gAVxo4N35Yp9M8C+0hAsMCFSopE/k=
+	t=1761874465; cv=none; b=LqtejjEHBe/hykKTkakzHHW8ljmGAHJ7hA2uJasmWEndVUdcILA3dQWo42Zgs7wLkLlK16NPbmeNeEQ6z6vDkjTHEfABc1HzHBvnKtuvXNnsUf2YAFUlv79uFe4sypH9b4HBUVoCk6p+gJ93NTtgk0tyU6OP3KW8ktJiludjrB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761870662; c=relaxed/simple;
-	bh=RT/sHTj0KzhQejEjxZna5Y25pQzofKvau2oAC0XFLaw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YApKlL5QsjWMLsZhMSxWHwA2xG/vhhPzRE8Fy1LjcWzDAn/jC6VRRw0KydeJW/FaLG15PVyf16R7lwi4MGSz4iZw55SqghE2aH8Bb7dhRN3PMeSmV6B1mEnuRbEwkzgWKG7F/rbM31pI2Hv8wREHS5O5FwKxqOjSKqy7bID3xLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TZpi9qhF; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33bc5d7c289so3040577a91.0
-        for <kvm@vger.kernel.org>; Thu, 30 Oct 2025 17:31:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761870660; x=1762475460; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=LbTsWO94j2FTsRt3NBHviHWz1y0m9u2EeuxD0YgFUA4=;
-        b=TZpi9qhFK+2O1C3GQijopQgJMlMLtGga7+AqwSHkJvMxQPN724rnyE+PlzRQ+NsVBf
-         adB0KdVoHD8ANTKbvCMcKcBmFNApJPZFt7VDoWS49c3CBGzS3rqRf12tAV53FDafb+85
-         E6XL1/gKN31qy4p9gcPqR49nWCiwoXFXpziH0Zq+uIK8dUmtbz9RSi3z5LE7xpG01CWl
-         LbgpG2v420R/EWNpw+VCT73hfxKYG+XI+tkskoPH5/tzSXwesSECLsR/HfTsN0AEzmMk
-         +AviEr025TIbazYPS4ZJmVpV3QwbwVK8DiOHGp0awOZy093QHWlSBCQILceFKbjo95hq
-         jtKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761870660; x=1762475460;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LbTsWO94j2FTsRt3NBHviHWz1y0m9u2EeuxD0YgFUA4=;
-        b=cCpKhvoFBX/j164stXw7OagP/3UpXrhhi5ZKGR17Eas1c5JwhizMTnopJYT3A/GWAm
-         o4EvgNuhHn8D1wia2ZBr+UAlJkzhBBwL+5QBuTwYYFY4iv9yi6q2Ai+67rRBz/aee/hI
-         SNYn1c8slOlg5FGX3OGFqv9fV0EMPtAFE0mPZyUEA1yG7I2PZIP+1KAzOqGBtBDVUPQc
-         D1rkMbzdPq65uGJsOBvvfR/UpP1pbhoL2CxrqmPq3Oxch3Px6nE0L9ihhOhxTU3vzYtT
-         WOk7TCB9SAup2xzBNXlxDmFSn2PucA5BdLmn4wF9Fm2v85DB9+8OVxFhAvnFgSwrkWvE
-         1RUg==
-X-Gm-Message-State: AOJu0YwX82gI4hPo8DVXLCc4JG0ZzttiMIgX+ywzoJGtucJOzKW3weDc
-	3liqq3mrFPPTg0fe5CqvanmNqWBVZfiEo7frGhnF3urUapEcG8F4E2PQv64z42apipHoel5YFUK
-	wgEAn7A==
-X-Google-Smtp-Source: AGHT+IG9niXeqcQKc5xfb5DpFxjBvH7jNOuHlLCtg8NMqPQ9wNkIMDEwIxItwd+jCVHQRiKCwCLg7bs2U5Y=
-X-Received: from plblq15.prod.google.com ([2002:a17:903:144f:b0:268:11e:8271])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ea0e:b0:292:39b4:e785
- with SMTP id d9443c01a7336-2951a3e696fmr21856645ad.26.1761870660376; Thu, 30
- Oct 2025 17:31:00 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 17:30:40 -0700
-In-Reply-To: <20251031003040.3491385-1-seanjc@google.com>
+	s=arc-20240116; t=1761874465; c=relaxed/simple;
+	bh=Q9oNvyTATMCp8xwFMIhlDHEhPLJKTKTXbxJQj/E/zVg=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=N/QlGie61TEXVAe+Aj85hE2GkqHCpGYvp/Wgi9W2BJ6UM7XhnfDQnlvvF30FEOn42y99oOxnH6VxFixfSaCWN4PZCh3PNHJ4Rvol1c/V0a1Rgvs0YW4tbaQcpK4E80/tQbZJLr/l4cPmWk0sIXNx+Q4u+/0b3SV11a1UksyY5OI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=6goHhqro; arc=none smtp.client-ip=113.46.200.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=1D6RlblNdEyz/Gp1GCwZckK1/Czr6pQNPcHDM0r3WUs=;
+	b=6goHhqroXNxpR91/jD67fOmGgEG0fex1H9x48zkCmUaSr2bE7n0vaBFibcGtX4o7GAokQWXg0
+	tIddyuaRqAqaZURDWVMacw9TZ+HVXo8sjShPu3LU+Dy7DcPhh8B3VPlD3U7+W669kFqxXkYyKY2
+	klRzh3l5obTWUi9AIOyqtas=
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4cyNlS3y7lzcZyk;
+	Fri, 31 Oct 2025 09:32:52 +0800 (CST)
+Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
+	by mail.maildlp.com (Postfix) with ESMTPS id 77923140137;
+	Fri, 31 Oct 2025 09:34:19 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 31 Oct 2025 09:34:18 +0800
+Subject: Re: [PATCH] vfio: Fix ksize arg while copying user struct in
+ vfio_df_ioctl_bind_iommufd()
+To: Raghavendra Rao Ananta <rananta@google.com>, Jason Gunthorpe
+	<jgg@ziepe.ca>, Alex Williamson <alex.williamson@redhat.com>, David Matlack
+	<dmatlack@google.com>
+CC: Josh Hilke <jrhilke@google.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20251030171238.1674493-1-rananta@google.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <5e24cb1e-4ee8-166b-48c7-88fa6857c8dc@huawei.com>
+Date: Fri, 31 Oct 2025 09:34:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251031003040.3491385-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251031003040.3491385-9-seanjc@google.com>
-Subject: [PATCH v4 8/8] KVM: x86: Unify L1TF flushing under per-CPU variable
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Brendan Jackman <jackmanb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+In-Reply-To: <20251030171238.1674493-1-rananta@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemf500015.china.huawei.com (7.185.36.143)
 
-From: Brendan Jackman <jackmanb@google.com>
+On 2025/10/31 1:12, Raghavendra Rao Ananta wrote:
+> For the cases where user includes a non-zero value in 'token_uuid_ptr'
+> field of 'struct vfio_device_bind_iommufd', the copy_struct_from_user()
+> in vfio_df_ioctl_bind_iommufd() fails with -E2BIG. For the 'minsz' passed,
+> copy_struct_from_user() expects the newly introduced field to be zero-ed,
+> which would be incorrect in this case.
+> 
+> Fix this by passing the actual size of the kernel struct. If working
+> with a newer userspace, copy_struct_from_user() would copy the
+> 'token_uuid_ptr' field, and if working with an old userspace, it would
+> zero out this field, thus still retaining backward compatibility.
+> 
+> Fixes: 86624ba3b522 ("vfio/pci: Do vf_token checks for VFIO_DEVICE_BIND_IOMMUFD")
 
-Currently the tracking of the need to flush L1D for L1TF is tracked by
-two bits: one per-CPU and one per-vCPU.
+Hi Ananta,
 
-The per-vCPU bit is always set when the vCPU shows up on a core, so
-there is no interesting state that's truly per-vCPU. Indeed, this is a
-requirement, since L1D is a part of the physical CPU.
+This patch also has another bug: in the hisi_acc_vfio_pci.c driver, It have two "struct vfio_device_ops"
+Only one of them, "hisi_acc_vfio_pci_ops" has match_token_uuid added,
+while the other one, "hisi_acc_vfio_pci_migrn_ops", is missing it.
+This will cause a QEMU crash (call trace) when QEMU tries to start the device.
 
-So simplify this by combining the two bits.
+Could you please help include this fix in your patchset as well?
 
-The vCPU bit was being written from preemption-enabled regions.  To play
-nice with those cases, wrap all calls from KVM and use a raw write so that
-request a flush with preemption enabled doesn't trigger what would
-effectively be DEBUG_PREEMPT false positives.  Preemption doesn't need to
-be disabled, as kvm_arch_vcpu_load() will mark the new CPU as needing a
-flush if the vCPU task is migrated, or if userspace runs the vCPU on a
-different task.
+--- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
++++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+@@ -1637,6 +1637,7 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
+ 	.mmap = hisi_acc_vfio_pci_mmap,
+ 	.request = vfio_pci_core_request,
+ 	.match = vfio_pci_core_match,
++	.match_token_uuid = vfio_pci_core_match_token_uuid,
+ 	.bind_iommufd = vfio_iommufd_physical_bind,
+ 	.unbind_iommufd = vfio_iommufd_physical_unbind,
+ 	.attach_ioas = vfio_iommufd_physical_attach_ioas,
 
-Signed-off-by: Brendan Jackman <jackmanb@google.com>
-[sean: put raw write in KVM instead of in a hardirq.h variant]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h |  3 ---
- arch/x86/kvm/mmu/mmu.c          |  2 +-
- arch/x86/kvm/vmx/nested.c       |  2 +-
- arch/x86/kvm/vmx/vmx.c          | 20 +++++---------------
- arch/x86/kvm/x86.c              |  6 +++---
- arch/x86/kvm/x86.h              | 14 ++++++++++++++
- 6 files changed, 24 insertions(+), 23 deletions(-)
+Thanks.
+Longfang.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 48598d017d6f..fcdc65ab13d8 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1055,9 +1055,6 @@ struct kvm_vcpu_arch {
- 	/* be preempted when it's in kernel-mode(cpl=0) */
- 	bool preempted_in_kernel;
- 
--	/* Flush the L1 Data cache for L1TF mitigation on VMENTER */
--	bool l1tf_flush_l1d;
--
- 	/* Host CPU on which VM-entry was most recently attempted */
- 	int last_vmentry_cpu;
- 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 18d69d48bc55..4e016582adc7 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4859,7 +4859,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
- 	 */
- 	BUILD_BUG_ON(lower_32_bits(PFERR_SYNTHETIC_MASK));
- 
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_request_l1tf_flush_l1d();
- 	if (!flags) {
- 		trace_kvm_page_fault(vcpu, fault_address, error_code);
- 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index b0cd745518b4..6f2f969d19f9 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3828,7 +3828,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 		goto vmentry_failed;
- 
- 	/* Hide L1D cache contents from the nested guest.  */
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_request_l1tf_flush_l1d();
- 
- 	/*
- 	 * Must happen outside of nested_vmx_enter_non_root_mode() as it will
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 1b5540105e4b..f87af1836ea1 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -395,26 +395,16 @@ static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
- 	 * 'always'
- 	 */
- 	if (static_branch_likely(&vmx_l1d_flush_cond)) {
--		bool flush_l1d;
--
- 		/*
--		 * Clear the per-vcpu flush bit, it gets set again if the vCPU
-+		 * Clear the per-cpu flush bit, it gets set again if the vCPU
- 		 * is reloaded, i.e. if the vCPU is scheduled out or if KVM
- 		 * exits to userspace, or if KVM reaches one of the unsafe
--		 * VMEXIT handlers, e.g. if KVM calls into the emulator.
-+		 * VMEXIT handlers, e.g. if KVM calls into the emulator,
-+		 * or from the interrupt handlers.
- 		 */
--		flush_l1d = vcpu->arch.l1tf_flush_l1d;
--		vcpu->arch.l1tf_flush_l1d = false;
--
--		/*
--		 * Clear the per-cpu flush bit, it gets set again from
--		 * the interrupt handlers.
--		 */
--		flush_l1d |= kvm_get_cpu_l1tf_flush_l1d();
-+		if (!kvm_get_cpu_l1tf_flush_l1d())
-+			return;
- 		kvm_clear_cpu_l1tf_flush_l1d();
--
--		if (!flush_l1d)
--			return;
- 	}
- 
- 	vcpu->stat.l1d_flush++;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b4b5d2d09634..851f078cd5ca 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5189,7 +5189,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_request_l1tf_flush_l1d();
- 
- 	if (vcpu->scheduled_out && pmu->version && pmu->event_count) {
- 		pmu->need_cleanup = true;
-@@ -7999,7 +7999,7 @@ int kvm_write_guest_virt_system(struct kvm_vcpu *vcpu, gva_t addr, void *val,
- 				unsigned int bytes, struct x86_exception *exception)
- {
- 	/* kvm_write_guest_virt_system can pull in tons of pages. */
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_request_l1tf_flush_l1d();
- 
- 	return kvm_write_guest_virt_helper(addr, val, bytes, vcpu,
- 					   PFERR_WRITE_MASK, exception);
-@@ -9395,7 +9395,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		return handle_emulation_failure(vcpu, emulation_type);
- 	}
- 
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_request_l1tf_flush_l1d();
- 
- 	if (!(emulation_type & EMULTYPE_NO_DECODE)) {
- 		kvm_clear_exception_queue(vcpu);
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index f3dc77f006f9..cd67ccbb747f 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -420,6 +420,20 @@ static inline bool kvm_check_has_quirk(struct kvm *kvm, u64 quirk)
- 	return !(kvm->arch.disabled_quirks & quirk);
- }
- 
-+static __always_inline void kvm_request_l1tf_flush_l1d(void)
-+{
-+#if IS_ENABLED(CONFIG_CPU_MITIGATIONS) && IS_ENABLED(CONFIG_KVM_INTEL)
-+	/*
-+	 * Use a raw write to set the per-CPU flag, as KVM will ensure a flush
-+	 * even if preemption is currently enabled..  If the current vCPU task
-+	 * is migrated to a different CPU (or userspace runs the vCPU on a
-+	 * different task) before the next VM-Entry, then kvm_arch_vcpu_load()
-+	 * will request a flush on the new CPU.
-+	 */
-+	raw_cpu_write(irq_stat.kvm_cpu_l1tf_flush_l1d, 1);
-+#endif
-+}
-+
- void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip);
- 
- u64 get_kvmclock_ns(struct kvm *kvm);
--- 
-2.51.1.930.gacf6e81ea2-goog
-
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  drivers/vfio/device_cdev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
+> index 480cac3a0c274..8ceca24ac136c 100644
+> --- a/drivers/vfio/device_cdev.c
+> +++ b/drivers/vfio/device_cdev.c
+> @@ -99,7 +99,7 @@ long vfio_df_ioctl_bind_iommufd(struct vfio_device_file *df,
+>  		return ret;
+>  	if (user_size < minsz)
+>  		return -EINVAL;
+> -	ret = copy_struct_from_user(&bind, minsz, arg, user_size);
+> +	ret = copy_struct_from_user(&bind, sizeof(bind), arg, user_size);
+>  	if (ret)
+>  		return ret;
+>  
+> 
+> base-commit: 3a8660878839faadb4f1a6dd72c3179c1df56787
+> 
 
