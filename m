@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-61773-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61774-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B601C29560
-	for <lists+kvm@lfdr.de>; Sun, 02 Nov 2025 19:45:36 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA09CC2956C
+	for <lists+kvm@lfdr.de>; Sun, 02 Nov 2025 19:45:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5EB674E89FA
-	for <lists+kvm@lfdr.de>; Sun,  2 Nov 2025 18:45:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 518684E9005
+	for <lists+kvm@lfdr.de>; Sun,  2 Nov 2025 18:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5737625394B;
-	Sun,  2 Nov 2025 18:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77CF52580EC;
+	Sun,  2 Nov 2025 18:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="b0k2iIiH"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Gw7rISxJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010032.outbound.protection.outlook.com [52.101.85.32])
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012017.outbound.protection.outlook.com [52.101.53.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8BB24339D;
-	Sun,  2 Nov 2025 18:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42D12472BB;
+	Sun,  2 Nov 2025 18:44:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762109100; cv=fail; b=eq1EtpREOcKXbr5inNA/xc22HLMC1LO6UWkTLcAccVQpeqQXjcTUVQtf0LLGVWhfS9yjeJ8y9w0qbO9uAB9b+gmyxSIckwZwaiqiZ6zUV4XxlnDSAD29PibpsHSJxWKDsythUyhylat7NfAWSYkuaW42+llEUfW6Xd7JSsWYGEU=
+	t=1762109101; cv=fail; b=j6s6x6QDmNEwGuWFS/bIQjDRiL8H9F8vQZ/YVEpy3AlF2BpMLu8lBYZc3Qq99oKnsSfYAmu1+mW28Vd10AG71dvIGqBjHjMBBEV2HIO1BiC2c+0xK/c4dpAx50PGzOSKXBXDeAFMVTGy7oT0yfz4c3rAdGk5Jct6y/twKb3FNzc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762109100; c=relaxed/simple;
-	bh=M8Ohiwrt676sBetcqcPNkWv2P//oCvcFa4OqjXKUFZg=;
+	s=arc-20240116; t=1762109101; c=relaxed/simple;
+	bh=wuCKEicDcIsv1O+0qRo5ntlItvTTh/31+SqaSS6tYyI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=InZVPSRv0t/oqufDvwtAQ9jv+miaEP/HitXBJWwnjrWa4rfFBgUYVQDMM4938+4SVx7SA8Jxu0S+KmFYmIgJ4xDPpod/TP3iLhjxJgHshdoRa4gkg3Qi/+G2VFL8xpaOcsDnAyvW1OZ2fBtnxSksbXU2oSRa0ZUyabKiaDU3IwY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=b0k2iIiH; arc=fail smtp.client-ip=52.101.85.32
+	 MIME-Version:Content-Type; b=CPjnrQAKMgsePEy+nBerL7BRGPHv2EWSE+D/4CDPiZuklBrpCeMSgsvh84GaBaVvwUJXv1pHfGNV7oM3hMbmxlbFpGDhFzYCBXxZecyd96qsJK7kyCvsHdU/ZKhJrujAkGNMLhujntJgxp9P/2RiWCyTGibjDIJ48pADpilLRKE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Gw7rISxJ; arc=fail smtp.client-ip=52.101.53.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QPfxPuaZ9DGDgJUaY6AXt6Sjp7IqPH1Kuuvc17ARtxZXQYDvHvgHSwqCFoyj12q+u/+J9yuTvQ/GPrkeVIdsBtsM8TMLq51SxmzkQ+jF1JSmhpUj7fPK/mHGXoxTc3aM77q9zNLaTFzKkb2FfiLtoUMO9BHhUBGoEHz1J5Pv8j97Gry2yP/SZbhj2/e7LxTUROlHpMGQmCvJ2lD0F3EwLcr+4kBeiW5mnNcX6r3zgWdEbURquhGms+d/dgiZS/5F+hZ/4fkNGqZ226g1prXiqX68JXr9O8WjqqrgBFnb188lc+vlsUmVP6Kjsn2497SxfYQyJTHMiyZPjb7GoC6NdA==
+ b=IInk9iO+mKsZC2etefRQSca9KUITU8TAPyoXJoMrI+KexRVV2dv34W3yWT/TaxQAB8TsLSST1MUJvYyhI79xsWYNoof8qZ0WSDroYJXBHOr6Rn3ITv3aHiK40ZR9oeOiH8ayb0Xl5z0fRlyUvSRofw/Fl2wX8EkGTq5A1a1eqxbr3Et9DjhIqN4lnRKKB+EnkQ0BwA85R6H8VfhuTp4o3U2Y+h2SXe7yzpTKh6jKtvyrty9I5hGKFNzxf/I/LyJczvA5NGG+2RXcusW7Z3kXjMtTExzPEYP3sBcQXJCMjVsJ5o4IweqQBnJ4p9OPwTS+h3l42ZZFzM/HYmh1VoIWjw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PAwxvj/DLDRkughw4hJj4pBQuOdPY7FXIhHFqx8/HEs=;
- b=PmMmyJJ0D7P0ZwcmKOxkeaUjQK15qVskRNQ0EIT3roEmpaseXHEtcejBvDVBcLxol5yfYiG1Prj9eKEA9sIv4rejEnQjInJ4fyDNTkZgzGHWUJA0GeV8k52NaEhChseGbGyaaPbNh+sM+PysG7c3hWW6AwHwyTPsgBZqm0JCS9RSdxyB2QNqwv7Uz+BAUtQJczsWRxEvmmlR0IOEtuNsjk6DD8bZBpZ9VNLHoHJpOMKIdpH+gaDVbpq930jb6CitcGNnYJ10xRwrmc39YJ7zS3LgE95V6XSn8cCglanZHAqnp8oPsoaSI+XsEODeLJsT8jJIDt/5BiGOVqPQeMNZbw==
+ bh=l+PoeFQBtdd6tvq+PxWLLVPThcvfQiPhoI1YysoCFeo=;
+ b=Jq6ohgMcVi5w8bvw32N0kqlwzyaQxQRHGWTwi7Zc8RsaUJD535ptmFqpSn8+BnyEeVyn9Fvm5G97gQvYpOcHR/v0Rop9Ou8zxG/CcxMIH5yJvslUmLrS29GKPuyB16o1wVn2xPbSgKPGc01n0XJbNoESnyXpymQC2eSsEkWEcTNwbD7h7bAxkv7FrexT8oKvdXvtXANkbHd4hQSvg1kIsj2I0PLLRvBtCcaCQVh3YYkTgv3FnuXVtK9ut1CMZU5PZyR4fAJThXWyhuFPxNNHiwzT/ec6OIAEnq0x8nvL/CQ9sd4bpB8hZt+HPDSnV1bJz1TGvTbGqVcVuoySGnqqGg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PAwxvj/DLDRkughw4hJj4pBQuOdPY7FXIhHFqx8/HEs=;
- b=b0k2iIiH4POsKzZvRlmRY0iszKstQQOmybM2hCESrRUBVYriY2ph/LssY4SZ938nMPRXJGkvXva4CK2wsAbQHz1RidfoIHZ04LHNXrGR4rfguteLbjIkIksley81vTXByQtO857s4W0bC2ocTi1SKYPpBiQqB8VAm94TWPstYPeN8x9oMV4jVLPEDYG6utUTfeol8RUayE/orKcaXXwl2oLR2tNV3aKS3hz9kFsBdmzC5wnHBGIHpRPefRTudsv9h3phRRgBpkjmfCX9OOXGNSkhkt3vcHY/34PeyUnK1wkxND2pr5ja5hxbzWZQG9IDMT2+YClbjbIYK5c0JG87Sg==
-Received: from CH2PR18CA0039.namprd18.prod.outlook.com (2603:10b6:610:55::19)
- by IA0PR12MB8982.namprd12.prod.outlook.com (2603:10b6:208:481::17) with
+ bh=l+PoeFQBtdd6tvq+PxWLLVPThcvfQiPhoI1YysoCFeo=;
+ b=Gw7rISxJVtSYinqKAVxLlBEdnhKp5njHn4GWfojrflYf1GKdFfzASBkf8t7j/stEeJT7c8mVsaFDG/yIYg3hDZXaNPjuJJ2sA3vCxzmbVpnqPG/3xZPzjZREsWCYFM30rA6tiKshrKzOrKw3ChaCvpSKo1XYhO48UiEQqw3i4idSVCkTBmsCpICSab0zvgTxpbKyI9MeE5PWIKpdWImcDEmbMVWpNjWq4m2lM0YovvxYiNBsPc7my245Pmw8kDP06j6I4OKAKyma8JUUL8C6F4C1G60VUG42qq6c0zMeE3V8fxTqOcMFvcSY2sJShTA/r5JNl0Db4iGZ4VbSgbw2lQ==
+Received: from MW4P221CA0030.NAMP221.PROD.OUTLOOK.COM (2603:10b6:303:8b::35)
+ by CYYPR12MB8963.namprd12.prod.outlook.com (2603:10b6:930:c3::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.15; Sun, 2 Nov
- 2025 18:44:54 +0000
-Received: from CH1PEPF0000AD80.namprd04.prod.outlook.com
- (2603:10b6:610:55:cafe::b3) by CH2PR18CA0039.outlook.office365.com
- (2603:10b6:610:55::19) with Microsoft SMTP Server (version=TLS1_3,
+ 2025 18:44:55 +0000
+Received: from MWH0EPF000A6734.namprd04.prod.outlook.com
+ (2603:10b6:303:8b:cafe::89) by MW4P221CA0030.outlook.office365.com
+ (2603:10b6:303:8b::35) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9275.16 via Frontend Transport; Sun,
- 2 Nov 2025 18:44:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ 2 Nov 2025 18:44:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH1PEPF0000AD80.mail.protection.outlook.com (10.167.244.90) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MWH0EPF000A6734.mail.protection.outlook.com (10.167.249.26) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9298.6 via Frontend Transport; Sun, 2 Nov 2025 18:44:53 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9298.6 via Frontend Transport; Sun, 2 Nov 2025 18:44:54 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 2 Nov
+ 2025 10:44:43 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 2 Nov
- 2025 10:44:41 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 2 Nov
- 2025 10:44:40 -0800
+ 2025 10:44:42 -0800
 Received: from localhost.nvidia.com (10.127.8.12) by mail.nvidia.com
  (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Sun, 2 Nov 2025 10:44:40 -0800
+ Transport; Sun, 2 Nov 2025 10:44:41 -0800
 From: <ankita@nvidia.com>
 To: <ankita@nvidia.com>, <aniketa@nvidia.com>, <vsethi@nvidia.com>,
 	<jgg@nvidia.com>, <mochs@nvidia.com>, <skolothumtho@nvidia.com>,
@@ -96,9 +96,9 @@ CC: <cjia@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
 	<ira.weiny@intel.com>, <Smita.KoralahalliChannabasappa@amd.com>,
 	<u.kleine-koenig@baylibre.com>, <peterz@infradead.org>,
 	<linux-acpi@vger.kernel.org>, <kvm@vger.kernel.org>
-Subject: [PATCH v5 2/3] mm: handle poisoning of pfn without struct pages
-Date: Sun, 2 Nov 2025 18:44:33 +0000
-Message-ID: <20251102184434.2406-3-ankita@nvidia.com>
+Subject: [PATCH v5 3/3] vfio/nvgrace-gpu: register device memory for poison handling
+Date: Sun, 2 Nov 2025 18:44:34 +0000
+Message-ID: <20251102184434.2406-4-ankita@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251102184434.2406-1-ankita@nvidia.com>
 References: <20251102184434.2406-1-ankita@nvidia.com>
@@ -113,362 +113,157 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD80:EE_|IA0PR12MB8982:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8f3070c5-250f-4361-cd48-08de1a3fe9b2
+X-MS-TrafficTypeDiagnostic: MWH0EPF000A6734:EE_|CYYPR12MB8963:EE_
+X-MS-Office365-Filtering-Correlation-Id: 839be808-df8a-4910-f006-08de1a3fea27
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|7416014|376014|1800799024|82310400026|921020|13003099007;
+	BCL:0;ARA:13230040|376014|7416014|82310400026|1800799024|36860700013|921020|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?zXyi5WKNyNpmuSDVaWAeAFBxSwZ97/seJHcKoZXF1qkP9iND2tSaq39hK7c7?=
- =?us-ascii?Q?6FjNccawwQSeDlBVatuBHwSzdFBUMVMOHezNUK05ZpkhxWTTmG/sgK0jgCNh?=
- =?us-ascii?Q?0IZqALJGUQwDBGLWzrpxfVEQyRM1BO7ARNhYxZC3Ih5eH5YQV8kMfWOTHHju?=
- =?us-ascii?Q?nC4uVWvLB5rmtCxlfLOLIE6LFENBgxl+8P2vQTGgnPi6tC8Ir4KR6EuqhZ3V?=
- =?us-ascii?Q?QrAMUiHgUHuSwIUfA3J/RetGFffr2HamdNhjl2ct21l55Xs9knXRW8beQG0m?=
- =?us-ascii?Q?+SHhHhAnVSc+gaNoEfQ4b65yJ8whPfelx2cord4qTsMvYzrJGnAMH/it3nNz?=
- =?us-ascii?Q?rYyqJz0PxMbOije1L6ZLHDR13T0TB0I12q5efOdC9XBdsDtsMtvuMhfcGavk?=
- =?us-ascii?Q?jiWZ3OPUIlhRpRRws31dSPBdUd6KiL5A4zq5RVaBDkdyvEWc1ieukxsBVfj/?=
- =?us-ascii?Q?533Yfbc/mZUpfIwYw/Eq1WNd/EOoTQiLO53/R9tSQmxluoDBDyWFYPtMbw7q?=
- =?us-ascii?Q?QVIwn4jh5V6IcMc8Fs9AXj7GJIrfsX/RrH48qCqqquYFKiiDZgPNqQeDJKt3?=
- =?us-ascii?Q?pG2dPRGWMNmUl0wJ/XVzhA/Hb7NHfeSMOkSs3sptMNJzPCRS4Afg9EAAhOEj?=
- =?us-ascii?Q?Uvcgq8ggJz9VSkCyYIyHYCo0938jQaJE19pv+8qUwKUASLhJP10NnPAw1J1C?=
- =?us-ascii?Q?VdEPyTDi2tLUtOHSknI4YKZwf/h+UkCNZ/KhDUUzRhQZ7zhtQX2xjmguW1e9?=
- =?us-ascii?Q?GSU7wuXuAyHUQHOCea/b9Du/gPawVbMkG1l2is1r2F9KZ0t2Q44Yr5bVWmEL?=
- =?us-ascii?Q?CGrsiiV71GQg5FSdwRojYEpVnyouH6bbEjmj1wq2GSww8RFOBobXFnDwK24r?=
- =?us-ascii?Q?T0OxnklG2PcfeWSO+RkWNC6isZsYHBIIIgZ6AbwiWry82XI+Lh2XaeNCr1jP?=
- =?us-ascii?Q?+ZAAEAQF9MlLI7PayJvXs8yjgksOZa9TLgr0XWL9RE2wUUL6YoNnj3GyhI0I?=
- =?us-ascii?Q?g+2FClANkXbFxRoQgWffXhxLtwKJ5JDu/YNZ+t0ZwaaVMA5HNrXmml4GVHh+?=
- =?us-ascii?Q?wfrRq9jbbyzFUcLp+CEzrmmEp4XhQ8EnOFFKz94rASkdKZJYp+PmIkwOQwDD?=
- =?us-ascii?Q?fy4eSTvi9MLdRPEqyfqnD0dbVHGLq+meVwBE49e9xMasBkaUfywrO62iwkoG?=
- =?us-ascii?Q?8r9fOzE1Zem1xyVS6/L5wlhsbSY7DvwU5eI0Ticor502zKpAIhId3+ZEFtmZ?=
- =?us-ascii?Q?Cx198cKz4ucviyBes2eQ08DQKeFkKWiSGHtkIerWH4KdI70mzw7U9/r7fJJm?=
- =?us-ascii?Q?M/wH3TYX98xlDDLXfHYDJjrrb7C/LSAIWjwQ51gSvurP6rNLYLPO7ZB2K5Vw?=
- =?us-ascii?Q?VEn8E1/ER4yRoMvA94uqXQK+Xi92vdkMGoWX/rj/sr2ViBk8Wl4WT8CNr9JS?=
- =?us-ascii?Q?Nb+SqSaGR/oOcLNAMP46rUJJcf9aJdLyWQFz0pS6wEzETnOcP0IqEu3iepEi?=
- =?us-ascii?Q?oJAWGa/mz9trmUFMhD6ds38wxwkkLxvakyA3Dn6jeq1CLhOaF0jT/2iT2A8x?=
- =?us-ascii?Q?xQM0DR+PpWZgIoQo3f28BO4cg4VSREVqN0q0SWkH?=
+	=?us-ascii?Q?0MTTMYc95tKexXH+nsaEtf5T1LmfXWjaOsX+9WecLhLLaa0EjucticDUA2Pj?=
+ =?us-ascii?Q?CFqZXzKjmwGJuIauQkXLU1I2aql/KxfCxq9E9mAjZL1KcwbruEaCmOgmFXni?=
+ =?us-ascii?Q?M3qs6tDHlVmQfzOmlY1T2mmQPzWeimZ6wL73Cgf2A3WRK8aLg1PEZzg04mME?=
+ =?us-ascii?Q?dDkoM6GxcrF9WZ9fxjlGrJQxD7tmwB672KlpgmhFgnXhj92NceYL/8fYhvYB?=
+ =?us-ascii?Q?xNHHIIYKrw4woTxLp73SU9lW5NE+DQuYbs+l41MTanCcNxzocdPQirINSTOB?=
+ =?us-ascii?Q?1SyGajjvwOU5kPyC9IDAvowJ4pWYPo70wjMSdDJSRcLP7yQf2pez/R3lNvWS?=
+ =?us-ascii?Q?+KuLjp/VFXTzchusG8YiooTvSXsx/IpguuPvAvugZ4Fr2km8+Kw5uLYwQ+Ux?=
+ =?us-ascii?Q?o0L5MHfDW8y7wW84kdRf70CQVD/DaAwJauZIadyfqtoJJwlhc7KNZlCR+bVk?=
+ =?us-ascii?Q?pbSIH8aFy5tXARWG/B6CWqRwfHUler6iPRwdAkIXFSrSl9a0SPnjkFeQIR1G?=
+ =?us-ascii?Q?UltQG9Gx3qJtjAj+pqc0xynMQW1s7w7I5yjR1ar82UP4qYBWR7XuZbDecwip?=
+ =?us-ascii?Q?VEvzBzmmoGLyzcp3QaBR9PBkzPa3DYHnF5EgEr1D6aN/9ZB/7yS2l8CEUMfj?=
+ =?us-ascii?Q?IswzjSoIMqwRpNpObvTnrmsfzLeyvFNeHTqHdRR9vyfCuwU6Hq/MNtwzoxFB?=
+ =?us-ascii?Q?3LzyRWlWb3EXShI739S8UCW6+92cwrfIim55QhKc6gSJ6ha48HOhfumT7sWu?=
+ =?us-ascii?Q?gG90rwciCpyy02/Km+pY204uCxpnBsO+BJvTdZb4Lbzu5YgexEJDHXYCERlW?=
+ =?us-ascii?Q?ckxkO7D9vqrQAw0sIjFzSFBQ6YtK4wkCKFVG2vx9obgJIa2cJ+YeqIewXMtA?=
+ =?us-ascii?Q?LdugQ4isK8t3bC5NXq9om9TGAWFKizi2w9e9RpKITQopBdAg1hVzMORbS5N/?=
+ =?us-ascii?Q?rn+6Uz0y38jJ4Cjgwqg3sw0s3O/xVu/5UU6fdZN88ALPeZIG4KOe/Zo77+i1?=
+ =?us-ascii?Q?byhuSHA8qGvCXWWXIuHrGrrfmvpNiWf2XURFnSb6sojD9yosatWsb2iTWnD3?=
+ =?us-ascii?Q?UbGpl3nehJPBNce5Rl/98Nc2bLEHmBBxj7siD+R2g1Z6rhIs9o0URCAkjORz?=
+ =?us-ascii?Q?hOJ/+UWkqBa9Mmkcu1Kt44/KDxChEjyWeJP8+Jrrq8qE/Lw0+V11Lmrs6VSu?=
+ =?us-ascii?Q?jWrja/Jj30GQQoR4LWKfbw0/Aqy5X/Uk7dGpAEognHS/6783CQstKbmaNPWi?=
+ =?us-ascii?Q?IxZo88BGxedjNNybEO/SzJM34VDXMdpjSFYa6PiLI+d2fQf5LYkkQ1kkSOIS?=
+ =?us-ascii?Q?f92OjP13Ml9oPUSkTFlJG+uAz+ezRGAnrSFLWVeJu56AQROVMT/R9GwLcX7v?=
+ =?us-ascii?Q?c3VIESBRE9ojbPO9Eb8H4H8Ojv6+pJiAnz30A8qya+krzqeUoW6EVv0NtRps?=
+ =?us-ascii?Q?UeHBy3H4ozWtTYh5SrrIhQCWcBH+WEDTHYhRHLyWnG5Hfnq0P2ECRIJe3AYZ?=
+ =?us-ascii?Q?gxPZ1FUmHR2/4K2PbjFOkKZyLMqTKVvFZm2D96b8DwbWT3wTtkyy3KLUipUA?=
+ =?us-ascii?Q?6RFHLn1G9G2PYeAyJ2GjO5c0e3b/sBDXK72+8tiG?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(1800799024)(82310400026)(921020)(13003099007);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(1800799024)(36860700013)(921020)(13003099007);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Nov 2025 18:44:53.8564
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Nov 2025 18:44:54.6331
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f3070c5-250f-4361-cd48-08de1a3fe9b2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 839be808-df8a-4910-f006-08de1a3fea27
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD80.namprd04.prod.outlook.com
+	MWH0EPF000A6734.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8982
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8963
 
 From: Ankit Agrawal <ankita@nvidia.com>
 
-Poison (or ECC) errors can be very common on a large size cluster.
-The kernel MM currently does not handle ECC errors / poison on a memory
-region that is not backed by struct pages. If a memory region mapped
-using remap_pfn_range() for example, but not added to the kernel, MM
-will not have associated struct pages. Add a new mechanism to handle
-memory failure on such memory.
+The nvgrace-gpu-vfio-pci module [1] maps the device memory to the user VA
+(Qemu) using remap_pfn_range() without adding the memory to the kernel.
+The device memory pages are not backed by struct page. The previous
+patch implements the mechanism to handle ECC/poison on memory page without
+struct page. This new mechanism is being used here.
 
-Make kernel MM expose a function to allow modules managing the device
-memory to register the device memory SPA and the address space associated
-it. MM maintains this information as an interval tree. On poison, MM can
-search for the range that the poisoned PFN belong and use the address_space
-to determine the mapping VMA.
+The module registers its memory region and the address_space with the
+kernel MM for ECC handling using the register_pfn_address_space()
+registration API exposed by the kernel.
 
-In this implementation, kernel MM follows the following sequence that is
-largely similar to the memory_failure() handler for struct page backed
-memory:
-1. memory_failure() is triggered on reception of a poison error. An
-absence of struct page is detected and consequently memory_failure_pfn()
-is executed.
-2. memory_failure_pfn() collects the processes mapped to the PFN.
-3. memory_failure_pfn() sends SIGBUS to all the processes mapping the
-faulty PFN using kill_procs().
-
-Note that there is one primary difference versus the handling of the
-poison on struct pages, which is to skip unmapping to the faulty PFN.
-This is done to handle the huge PFNMAP support added recently [1] that
-enables VM_PFNMAP vmas to map at PMD or PUD level. A poison to a PFN
-mapped in such as way would need breaking the PMD/PUD mapping into PTEs
-that will get mirrored into the S2. This can greatly increase the cost
-of table walks and have a major performance impact.
-
-Link: https://lore.kernel.org/all/20240826204353.2228736-1-peterx@redhat.com/ [1]
+Link: https://lore.kernel.org/all/20240220115055.23546-1-ankita@nvidia.com/ [1]
 
 Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 ---
- MAINTAINERS                    |   1 +
- include/linux/memory-failure.h |  17 ++++
- include/linux/mm.h             |   1 +
- include/ras/ras_event.h        |   1 +
- mm/Kconfig                     |   1 +
- mm/memory-failure.c            | 145 ++++++++++++++++++++++++++++++++-
- 6 files changed, 165 insertions(+), 1 deletion(-)
- create mode 100644 include/linux/memory-failure.h
+ drivers/vfio/pci/nvgrace-gpu/main.c | 45 ++++++++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 520fb4e379a3..463d062d0386 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11359,6 +11359,7 @@ M:	Miaohe Lin <linmiaohe@huawei.com>
- R:	Naoya Horiguchi <nao.horiguchi@gmail.com>
- L:	linux-mm@kvack.org
- S:	Maintained
-+F:	include/linux/memory-failure.h
- F:	mm/hwpoison-inject.c
- F:	mm/memory-failure.c
+diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+index d95761dcdd58..80b3ed63c682 100644
+--- a/drivers/vfio/pci/nvgrace-gpu/main.c
++++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+@@ -8,6 +8,10 @@
+ #include <linux/delay.h>
+ #include <linux/jiffies.h>
  
-diff --git a/include/linux/memory-failure.h b/include/linux/memory-failure.h
-new file mode 100644
-index 000000000000..bc326503d2d2
---- /dev/null
-+++ b/include/linux/memory-failure.h
-@@ -0,0 +1,17 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _LINUX_MEMORY_FAILURE_H
-+#define _LINUX_MEMORY_FAILURE_H
-+
-+#include <linux/interval_tree.h>
-+
-+struct pfn_address_space;
-+
-+struct pfn_address_space {
-+	struct interval_tree_node node;
-+	struct address_space *mapping;
-+};
-+
-+int register_pfn_address_space(struct pfn_address_space *pfn_space);
-+void unregister_pfn_address_space(struct pfn_address_space *pfn_space);
-+
-+#endif /* _LINUX_MEMORY_FAILURE_H */
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 1ae97a0b8ec7..0ab4ea82ce9e 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -4006,6 +4006,7 @@ enum mf_action_page_type {
- 	MF_MSG_DAX,
- 	MF_MSG_UNSPLIT_THP,
- 	MF_MSG_ALREADY_POISONED,
-+	MF_MSG_PFN_MAP,
- 	MF_MSG_UNKNOWN,
- };
- 
-diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
-index c8cd0f00c845..fecfeb7c8be7 100644
---- a/include/ras/ras_event.h
-+++ b/include/ras/ras_event.h
-@@ -375,6 +375,7 @@ TRACE_EVENT(aer_event,
- 	EM ( MF_MSG_DAX, "dax page" )					\
- 	EM ( MF_MSG_UNSPLIT_THP, "unsplit thp" )			\
- 	EM ( MF_MSG_ALREADY_POISONED, "already poisoned" )		\
-+	EM ( MF_MSG_PFN_MAP, "non struct page pfn" )                    \
- 	EMe ( MF_MSG_UNKNOWN, "unknown page" )
- 
- /*
-diff --git a/mm/Kconfig b/mm/Kconfig
-index e443fe8cd6cf..0b07219390b9 100644
---- a/mm/Kconfig
-+++ b/mm/Kconfig
-@@ -777,6 +777,7 @@ config MEMORY_FAILURE
- 	depends on ARCH_SUPPORTS_MEMORY_FAILURE
- 	bool "Enable recovery from hardware memory errors"
- 	select MEMORY_ISOLATION
-+	select INTERVAL_TREE
- 	select RAS
- 	help
- 	  Enables code to recover from some memory failures on systems
-diff --git a/mm/memory-failure.c b/mm/memory-failure.c
-index df6ee59527dd..03e4249a9f8f 100644
---- a/mm/memory-failure.c
-+++ b/mm/memory-failure.c
-@@ -38,6 +38,7 @@
- 
- #include <linux/kernel.h>
- #include <linux/mm.h>
++#ifdef CONFIG_MEMORY_FAILURE
 +#include <linux/memory-failure.h>
- #include <linux/page-flags.h>
- #include <linux/sched/signal.h>
- #include <linux/sched/task.h>
-@@ -154,6 +155,10 @@ static const struct ctl_table memory_failure_table[] = {
- 	}
- };
- 
-+static struct rb_root_cached pfn_space_itree = RB_ROOT_CACHED;
-+
-+static DEFINE_MUTEX(pfn_space_lock);
++#endif
 +
  /*
-  * Return values:
-  *   1:   the page is dissolved (if needed) and taken off from buddy,
-@@ -957,6 +962,7 @@ static const char * const action_page_types[] = {
- 	[MF_MSG_DAX]			= "dax page",
- 	[MF_MSG_UNSPLIT_THP]		= "unsplit thp",
- 	[MF_MSG_ALREADY_POISONED]	= "already poisoned page",
-+	[MF_MSG_PFN_MAP]                = "non struct page pfn",
- 	[MF_MSG_UNKNOWN]		= "unknown page",
+  * The device memory usable to the workloads running in the VM is cached
+  * and showcased as a 64b device BAR (comprising of BAR4 and BAR5 region)
+@@ -47,6 +51,9 @@ struct mem_region {
+ 		void *memaddr;
+ 		void __iomem *ioaddr;
+ 	};                      /* Base virtual address of the region */
++#ifdef CONFIG_MEMORY_FAILURE
++	struct pfn_address_space pfn_address_space;
++#endif
  };
  
-@@ -1349,7 +1355,7 @@ static int action_result(unsigned long pfn, enum mf_action_page_type type,
- {
- 	trace_memory_failure_event(pfn, type, result);
+ struct nvgrace_gpu_pci_core_device {
+@@ -60,6 +67,28 @@ struct nvgrace_gpu_pci_core_device {
+ 	bool has_mig_hw_bug;
+ };
  
--	if (type != MF_MSG_ALREADY_POISONED) {
-+	if (type != MF_MSG_ALREADY_POISONED && type != MF_MSG_PFN_MAP) {
- 		num_poisoned_pages_inc(pfn);
- 		update_per_node_mf_stats(pfn, result);
- 	}
-@@ -2216,6 +2222,135 @@ static void kill_procs_now(struct page *p, unsigned long pfn, int flags,
- 	kill_procs(&tokill, true, pfn, flags);
++#ifdef CONFIG_MEMORY_FAILURE
++
++static int
++nvgrace_gpu_vfio_pci_register_pfn_range(struct mem_region *region,
++					struct vm_area_struct *vma)
++{
++	unsigned long nr_pages;
++	int ret = 0;
++
++	nr_pages = region->memlength >> PAGE_SHIFT;
++
++	region->pfn_address_space.node.start = vma->vm_pgoff;
++	region->pfn_address_space.node.last = vma->vm_pgoff + nr_pages - 1;
++	region->pfn_address_space.mapping = vma->vm_file->f_mapping;
++
++	ret = register_pfn_address_space(&region->pfn_address_space);
++
++	return ret;
++}
++
++#endif
++
+ static void nvgrace_gpu_init_fake_bar_emu_regs(struct vfio_device *core_vdev)
+ {
+ 	struct nvgrace_gpu_pci_core_device *nvdev =
+@@ -127,6 +156,13 @@ static void nvgrace_gpu_close_device(struct vfio_device *core_vdev)
+ 
+ 	mutex_destroy(&nvdev->remap_lock);
+ 
++#ifdef CONFIG_MEMORY_FAILURE
++	if (nvdev->resmem.memlength)
++		unregister_pfn_address_space(&nvdev->resmem.pfn_address_space);
++
++	unregister_pfn_address_space(&nvdev->usemem.pfn_address_space);
++#endif
++
+ 	vfio_pci_core_close_device(core_vdev);
  }
  
-+int register_pfn_address_space(struct pfn_address_space *pfn_space)
-+{
-+	guard(mutex)(&pfn_space_lock);
-+
-+	if (interval_tree_iter_first(&pfn_space_itree,
-+				     pfn_space->node.start,
-+				     pfn_space->node.last))
-+		return -EBUSY;
-+
-+	interval_tree_insert(&pfn_space->node, &pfn_space_itree);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(register_pfn_address_space);
-+
-+void unregister_pfn_address_space(struct pfn_address_space *pfn_space)
-+{
-+	guard(mutex)(&pfn_space_lock);
-+
-+	if (interval_tree_iter_first(&pfn_space_itree,
-+				     pfn_space->node.start,
-+				     pfn_space->node.last))
-+		interval_tree_remove(&pfn_space->node, &pfn_space_itree);
-+}
-+EXPORT_SYMBOL_GPL(unregister_pfn_address_space);
-+
-+static void add_to_kill_pfn(struct task_struct *tsk,
-+			    struct vm_area_struct *vma,
-+			    struct list_head *to_kill,
-+			    unsigned long pfn)
-+{
-+	struct to_kill *tk;
-+
-+	tk = kmalloc(sizeof(*tk), GFP_ATOMIC);
-+	if (!tk) {
-+		pr_info("Unable to kill proc %d\n", tsk->pid);
-+		return;
-+	}
-+
-+	/* Check for pgoff not backed by struct page */
-+	tk->addr = vma_address(vma, pfn, 1);
-+	tk->size_shift = PAGE_SHIFT;
-+
-+	if (tk->addr == -EFAULT)
-+		pr_info("Unable to find address %lx in %s\n",
-+			pfn, tsk->comm);
-+
-+	get_task_struct(tsk);
-+	tk->tsk = tsk;
-+	list_add_tail(&tk->nd, to_kill);
-+}
-+
-+/*
-+ * Collect processes when the error hit a PFN not backed by struct page.
-+ */
-+static void collect_procs_pfn(struct address_space *mapping,
-+			      unsigned long pfn, struct list_head *to_kill)
-+{
-+	struct vm_area_struct *vma;
-+	struct task_struct *tsk;
-+
-+	i_mmap_lock_read(mapping);
-+	rcu_read_lock();
-+	for_each_process(tsk) {
-+		struct task_struct *t = tsk;
-+
-+		t = task_early_kill(tsk, true);
-+		if (!t)
-+			continue;
-+		vma_interval_tree_foreach(vma, &mapping->i_mmap, pfn, pfn) {
-+			if (vma->vm_mm == t->mm)
-+				add_to_kill_pfn(t, vma, to_kill, pfn);
-+		}
-+	}
-+	rcu_read_unlock();
-+	i_mmap_unlock_read(mapping);
-+}
-+
-+/**
-+ * memory_failure_pfn - Handle memory failure on a page not backed by
-+ *                      struct page.
-+ * @pfn: Page Number of the corrupted page
-+ * @flags: fine tune action taken
-+ *
-+ * Return:
-+ *   0             - success,
-+ *   -EBUSY        - Page PFN does not belong to any address space mapping.
-+ */
-+static int memory_failure_pfn(unsigned long pfn, int flags)
-+{
-+	struct interval_tree_node *node;
-+	LIST_HEAD(tokill);
-+
-+	scoped_guard(mutex, &pfn_space_lock) {
-+		bool mf_handled = false;
-+
-+		/*
-+		 * Modules registers with MM the address space mapping to
-+		 * the device memory they manage. Iterate to identify
-+		 * exactly which address space has mapped to this failing
-+		 * PFN.
-+		 */
-+		for (node = interval_tree_iter_first(&pfn_space_itree, pfn, pfn); node;
-+		     node = interval_tree_iter_next(node, pfn, pfn)) {
-+			struct pfn_address_space *pfn_space =
-+				container_of(node, struct pfn_address_space, node);
-+
-+			collect_procs_pfn(pfn_space->mapping, pfn, &tokill);
-+
-+			mf_handled = true;
-+		}
-+
-+		if (!mf_handled)
-+			return action_result(pfn, MF_MSG_PFN_MAP, MF_IGNORED);
-+	}
-+
-+	/*
-+	 * Unlike System-RAM there is no possibility to swap in a different
-+	 * physical page at a given virtual address, so all userspace
-+	 * consumption of direct PFN memory necessitates SIGBUS (i.e.
-+	 * MF_MUST_KILL)
-+	 */
-+	flags |= MF_ACTION_REQUIRED | MF_MUST_KILL;
-+
-+	kill_procs(&tokill, true, pfn, flags);
-+
-+	return action_result(pfn, MF_MSG_PFN_MAP, MF_RECOVERED);
-+}
-+
- /**
-  * memory_failure - Handle memory failure of a page.
-  * @pfn: Page Number of the corrupted page
-@@ -2265,6 +2400,14 @@ int memory_failure(unsigned long pfn, int flags)
- 		if (res == 0)
- 			goto unlock_mutex;
+@@ -202,7 +238,14 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
  
-+		if (!pfn_valid(pfn) && !arch_is_platform_page(PFN_PHYS(pfn))) {
-+			/*
-+			 * The PFN is not backed by struct page.
-+			 */
-+			res = memory_failure_pfn(pfn, flags);
-+			goto unlock_mutex;
-+		}
+ 	vma->vm_pgoff = start_pfn;
+ 
+-	return 0;
++#ifdef CONFIG_MEMORY_FAILURE
++	if (nvdev->resmem.memlength && index == VFIO_PCI_BAR2_REGION_INDEX)
++		ret = nvgrace_gpu_vfio_pci_register_pfn_range(&nvdev->resmem, vma);
++	else if (index == VFIO_PCI_BAR4_REGION_INDEX)
++		ret = nvgrace_gpu_vfio_pci_register_pfn_range(&nvdev->usemem, vma);
++#endif
 +
- 		if (pfn_valid(pfn)) {
- 			pgmap = get_dev_pagemap(pfn, NULL);
- 			put_ref_page(pfn, flags);
++	return ret;
+ }
+ 
+ static long
 -- 
 2.34.1
 
