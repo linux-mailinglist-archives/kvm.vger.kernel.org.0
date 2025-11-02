@@ -1,230 +1,255 @@
-Return-Path: <kvm+bounces-61770-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61772-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 796DFC294C4
-	for <lists+kvm@lfdr.de>; Sun, 02 Nov 2025 19:17:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E589C29554
+	for <lists+kvm@lfdr.de>; Sun, 02 Nov 2025 19:45:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68CEE188D483
-	for <lists+kvm@lfdr.de>; Sun,  2 Nov 2025 18:18:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 069174E79F7
+	for <lists+kvm@lfdr.de>; Sun,  2 Nov 2025 18:45:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B9A23814D;
-	Sun,  2 Nov 2025 18:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD85247281;
+	Sun,  2 Nov 2025 18:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="4FI+yGp9"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="YGKM+xao"
 X-Original-To: kvm@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010067.outbound.protection.outlook.com [52.101.193.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0055695;
-	Sun,  2 Nov 2025 18:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762107441; cv=none; b=Y0bUvYVI1rKt600FOGlDYUDU5vsQG+zKQmgTfM9j0OriyZa7jEakom6V9GfuGSJm5tfwDIDWodQsdZLlTEuOTB9WptR/GFHnFoT0tNUJceHHGzDpXcSC2zkEuGtF7d5w4GndTpVSx3FI2DMJGgX0HwfbtJCRZ5JJFtvLsFTpsko=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762107441; c=relaxed/simple;
-	bh=QuoWBbW9eEPsqfCDUH4ItiHeuhmu80127JiWwEXZWTI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JHz6jHZ6bg6XFW5HdnNi3Fl+Q6kHE12+/pYGXEW9h0Yb2PN1cz2lmHn48jhefyOk2q9zwjjA5LMsNp8Xoieesdoc4RZgaJ6tpL861jveSAH2RYcNbPW6FeiRDBui21jclrek0ebU2pkDLlZA5xJeqKUiIyB7QrcozjZX63oSeLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=4FI+yGp9; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=L6RCmAWijCnvF4Bo5wOHGcYuLeUjw8rFoqEsFyghVK4=; b=4FI+yGp97huIAfdBGGco3fbw7P
-	ax4P2Kwz3qaUaWjAc4X5stCOM77TA8aotCPc0/LJL1M6jg37tryJvE4GmlP0aMSIdlw80SMhjyWy9
-	qYg6UM66XyF7z99G58anT9hMLHPdBHoo8cAE9aY+0f3mUrzHQil/uk78McmuRIFi6SBLkKYAjtSIh
-	Gs8ZlKmtjdrktIa4nv91/stIbGVM1MKlP/mQCnhC58HSSPqVE335UExcQIfPTBg7Fvizl64v5Wrz0
-	dOra08BphEOrFjTCza+MY/qowMuTfEdEY+OrdbGxEtOhbYbO+klb3ZnJQbQZycRlhojckBsTIrbKq
-	H5HDZiMA==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vFcdQ-00000008ixQ-0jc1;
-	Sun, 02 Nov 2025 18:17:00 +0000
-Message-ID: <86383031-807e-43d9-976e-dd955d79dc52@infradead.org>
-Date: Sun, 2 Nov 2025 10:16:59 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9BE241690;
+	Sun,  2 Nov 2025 18:44:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762109098; cv=fail; b=uvAw6SWkIYp9fiFwSY3AooYAFDdAd3/TyqDJ392J/8aBgnGKI1oBl6foBktNlfGqMtYCGcwXa34SVsYBiRycnZaeGz/PVU5Tr7qpCoUxh4+JuaG2HAxhjFjn+AvpiIaoCwIEF1o+sVGMpomXADhq9yhpv3/vh4T/01R54Kg/JhA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762109098; c=relaxed/simple;
+	bh=3py+kyZG3bbRA0KxQdpz3JZN+RTZ57g8klLnw94Aqww=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D++gZIX86dg5HnZCJm4Ib+QtHCgah4+B8xntL2sYh44zFGkR0izfOHpyBqH8VjSZBn9pFIRJlUJDpOmKS9q4Vm+zSJHceCHEj/UPPmjvs3u8zuaWjTKCLm7BC7A0oSt5y/EjBgfTNOTfdC+ctYXTZK6fMDg3PGi0xwcwcYl9BBk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=YGKM+xao; arc=fail smtp.client-ip=52.101.193.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SUnkN+dHyQPGqJ4lnDLcEQoX+BNi6QIpUWrOJIUl6XcfmJRkPU4rUHYksx9SlzyZ05C2A3uAKsmH1FnCwH45cgBlWLoVj+FTOVJxx4ZHzyJ5a9XA4Fp1qOjCG8iYVweGRmyt/aeCFBISOn0mxyrU2s3oSN0sVZ7JnWYuH+iBLpSk3cwr5w0Nja+24FSSJZuyGF7To7e51HUoBsaU+KK44GE1PQlTK24d0/oPy359Rrc0wUOA48aQitAusrmpYmmPE5Wq5vKhzCaZ+AEE/nLaWRfrQpTVugGAjSjIBcvK7ROFKIF+W06/4Sx+S7m/sjoNvzvPIiZzGocWM1EZziW76A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+5mod4mxn76zK1A2rVV4hGb8xdoHo6pCM0dFY826oqw=;
+ b=usAq0K80W1/jyyDDPy+kwDWszBt2+nGhp8vPfqoRQjblHmJ3Wm/zB4qBpCtmgntAuRZWcbSF9/mjsBxvtBTC5EtaophGguxvzLh+Ob4FBj3qWFbbLtkExCQNPT+TbABmY/nDbGzS352mpwrrcZwXYUPooWzQG0n7GMhLGI+TqhS8hSDozZVqm90Pahj1BWN1XWEeitXRSZvyCQLcHZUHct1ao6iJDRGz1UJrLe1wnkpceM8SCMAJxT1Zh/oT2Hwmwh1+qNENZfxqxtrS48c3L9bfY0F3eNSRakIKU0bDR+69Mj7jCDX3AGiYpSZ0MvFJWsLbjEj4Cdkmd34+eUWssg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+5mod4mxn76zK1A2rVV4hGb8xdoHo6pCM0dFY826oqw=;
+ b=YGKM+xaoZYP4ENlifwBia0E0VFo1qBO9J+unuj5OPAkhzEVKjSQ28XH5cnzP4veCxTQlNDWxL9fWUDYjyytQltmK+14vkSUe6+E49fvhS1oVXHrb5EOsPPv+FC5iQb3blRg5CLCgd05ePIb4FGEM8t8CkuIth2Hqylpbix9Y36luTeHVlKL/34MJCFFyDwRgh3PPWjgBoLOvhJEbDVH2aubi0HGONaZVZp7iUlmcFZsbLNNMoemjNCXcwWWK7b3X/o0mIppCEiVPQLh9DJ8sG/mlab4gHSniUAiz+3fXk6qZ1Z5tDwGw/gKjxYxIlXzDjooQnDb3fT6G7j92PedRFA==
+Received: from CH2PR18CA0035.namprd18.prod.outlook.com (2603:10b6:610:55::15)
+ by CY3PR12MB9654.namprd12.prod.outlook.com (2603:10b6:930:ff::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.14; Sun, 2 Nov
+ 2025 18:44:51 +0000
+Received: from CH1PEPF0000AD80.namprd04.prod.outlook.com
+ (2603:10b6:610:55:cafe::7c) by CH2PR18CA0035.outlook.office365.com
+ (2603:10b6:610:55::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9275.16 via Frontend Transport; Sun,
+ 2 Nov 2025 18:44:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CH1PEPF0000AD80.mail.protection.outlook.com (10.167.244.90) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9298.6 via Frontend Transport; Sun, 2 Nov 2025 18:44:51 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 2 Nov
+ 2025 10:44:41 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 2 Nov
+ 2025 10:44:36 -0800
+Received: from localhost.nvidia.com (10.127.8.12) by mail.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Sun, 2 Nov 2025 10:44:36 -0800
+From: <ankita@nvidia.com>
+To: <ankita@nvidia.com>, <aniketa@nvidia.com>, <vsethi@nvidia.com>,
+	<jgg@nvidia.com>, <mochs@nvidia.com>, <skolothumtho@nvidia.com>,
+	<linmiaohe@huawei.com>, <nao.horiguchi@gmail.com>,
+	<akpm@linux-foundation.org>, <david@redhat.com>,
+	<lorenzo.stoakes@oracle.com>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
+	<rppt@kernel.org>, <surenb@google.com>, <mhocko@suse.com>,
+	<tony.luck@intel.com>, <bp@alien8.de>, <rafael@kernel.org>,
+	<guohanjun@huawei.com>, <mchehab@kernel.org>, <lenb@kernel.org>,
+	<kevin.tian@intel.com>, <alex@shazbot.org>
+CC: <cjia@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
+	<zhiw@nvidia.com>, <dnigam@nvidia.com>, <kjaju@nvidia.com>,
+	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+	<linux-edac@vger.kernel.org>, <Jonathan.Cameron@huawei.com>,
+	<ira.weiny@intel.com>, <Smita.KoralahalliChannabasappa@amd.com>,
+	<u.kleine-koenig@baylibre.com>, <peterz@infradead.org>,
+	<linux-acpi@vger.kernel.org>, <kvm@vger.kernel.org>
+Subject: [PATCH v5 0/3] mm: Implement ECC handling for pfn with no struct page
+Date: Sun, 2 Nov 2025 18:44:31 +0000
+Message-ID: <20251102184434.2406-1-ankita@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 05/11] PCI/P2PDMA: Document DMABUF model
-To: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
- Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
- Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Andrew Morton <akpm@linux-foundation.org>,
- Jonathan Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Alex Williamson <alex.williamson@redhat.com>, Kees Cook <kees@kernel.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Ankit Agrawal <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <skolothumtho@nvidia.com>, Kevin Tian <kevin.tian@intel.com>
-Cc: Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
- linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, iommu@lists.linux.dev, linux-mm@kvack.org,
- linux-doc@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
- kvm@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20251102-dmabuf-vfio-v6-0-d773cff0db9f@nvidia.com>
- <20251102-dmabuf-vfio-v6-5-d773cff0db9f@nvidia.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20251102-dmabuf-vfio-v6-5-d773cff0db9f@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD80:EE_|CY3PR12MB9654:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3ab94818-134d-4f46-5e3d-08de1a3fe855
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|7416014|1800799024|36860700013|13003099007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?T/ukPz/B7b0N5PJ+dogl+ApB+YFM3idxqeV70b9e8lG7Xfbvt/urQw6uFi1N?=
+ =?us-ascii?Q?BSnqOgUMwyOYwHOf4xyzScN8vfZR6UpHZz2bwFCwngBt9Y2/k2RJnnO0cpNH?=
+ =?us-ascii?Q?k6pWrb4TKHotMM6GgKRWi6CzwDcHg0thr87Xd4Ier3d32dmC+wdTWkkuR4tb?=
+ =?us-ascii?Q?ngwkofiw49Dr+gFsXe1QMxcJoKv3EL9PJaoLA5AckQvUThVZpLEoR1QLBRbW?=
+ =?us-ascii?Q?3W7gqNeagKcprOkRZFhQucuiwOww7+HCBkvq1+LLO1TL7s9mVZfsA9OOg7Sn?=
+ =?us-ascii?Q?7fGDFcCKBPvC0797E7l5UXgQitBc19LBOZINa0W5DnRhvTY0Ju0VRnfDNKLC?=
+ =?us-ascii?Q?skr3LcvwxMKB7fed11gb+GDzujWVmDGJ+41PCfGFTy7SV4cCAW9pEXUqVPEo?=
+ =?us-ascii?Q?tF4LKmK2Xlm1u6lJ1mm2RugJGhjN77G5tCcMP1mRs0nei1Wy1Gi7uWx92ONg?=
+ =?us-ascii?Q?itfRRhqMZfHfXC/4ly7Fy+9ohLumpO24KLCJxt3oiUGMdD9UrLe1/MEDxXI4?=
+ =?us-ascii?Q?aEtNNOYDVurhoTC3IoZlh4xBQz/HiOhI8iFHgB7ARSlR9S7u3F5exFOG3zHQ?=
+ =?us-ascii?Q?LGoDli40BYl4NOg1Q0Sr8cHS3INmcJ5qYydhvRYZ1AL259LsaX89rpejJkGU?=
+ =?us-ascii?Q?88Ytt3Ssjt5ukwWYoyDFxO1R4Jj2O92MTt2omwL7DChk0uswlg7BhAa4xvot?=
+ =?us-ascii?Q?VPTBnRqg7Zhs3bQ9Cl2uGmGKCW0cECCghRTfQjM71MF+4TOlVZBy9JfNTuGR?=
+ =?us-ascii?Q?RmMv+8n2Nqezf3Nb7xd2zmalfbdPzvMQWo53m0cbbpYanUq6P+s06csm49ft?=
+ =?us-ascii?Q?gvp8jchtaQcMZnNtpnTH219obvSyYYDFDINA3NJk15wZKUnMtkF9VJ+RoOAt?=
+ =?us-ascii?Q?eGk9DO5O/AH+bxgKefQ4z1uiSMYS/pQjDl62CyBEa8kkvMyvbULZEbkwS9Vx?=
+ =?us-ascii?Q?ELYaPkNZo4/fZwck/rQ0b6KNXGci9TtsVXkTz9fuR8A0c+xOeEgQLXNXAuZs?=
+ =?us-ascii?Q?JlS7gJcv+GF54wRYk8Oc3h5aYs1YcMtygOKJ5Gi7rd+VDOGJxXk3yiO2WV5v?=
+ =?us-ascii?Q?0BxuCcHezIt0N87zaBM5gpjXIAf5eHoV6tEwHB9di/6wM+7g1JenvjZhQJ2k?=
+ =?us-ascii?Q?WMCmoK2ANwd2VvgodqGKKixGD4GLnI0jns3FTLEbRrCdJuitnbFDLtmOsaUl?=
+ =?us-ascii?Q?/tTngfw7AuRcJe6FNjqk7YGWaybj7myNIyS8SRTL2YNXGgSGRA6M74AMir3W?=
+ =?us-ascii?Q?IGGbDkzZ0BUNFqa/CRx5x/atZ5cZfvJmsQTUIWLzuyxF8sJC/KLe9fy9QS6V?=
+ =?us-ascii?Q?2AHv9JZbkQtOZxQWK+oEw4sGFPKeWxRvPbTzrVODn4AOFigI/e57KNM2+s2H?=
+ =?us-ascii?Q?4yePNh3AeN7ZA3o3PEy2N5gGbmBpANP0FJCyUHtUZR/6fNilzYW8Y1dxuGHr?=
+ =?us-ascii?Q?fFTvBaBjzqgyZl5//Mqr9fNogBBcr3G/gY8HvtnBcv6OWRNJXteS+iWAxtvI?=
+ =?us-ascii?Q?xNvSR0Z5D8ln/hkEFK/BlczN+RJcFV3CvP3UOyv8gare9GwSM/dzkeLXpwCW?=
+ =?us-ascii?Q?uUOTGCJNSvGKtyBvXHfMHt2n0/8yIav9y1VptJIWJ1A2UW45MWScZRjYOFYt?=
+ =?us-ascii?Q?xA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(7416014)(1800799024)(36860700013)(13003099007)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Nov 2025 18:44:51.5676
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ab94818-134d-4f46-5e3d-08de1a3fe855
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD80.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY3PR12MB9654
 
+From: Ankit Agrawal <ankita@nvidia.com>
 
+Poison (or ECC) errors can be very common on a large size cluster.
+The kernel MM currently handles ECC errors / poison only on memory page
+backed by struct page. The handling is currently missing for the PFNMAP
+memory that does not have struct pages. The series adds such support.
 
-On 11/2/25 1:00 AM, Leon Romanovsky wrote:
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> 
-> Reflect latest changes in p2p implementation to support DMABUF lifecycle.
-> 
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  Documentation/driver-api/pci/p2pdma.rst | 95 +++++++++++++++++++++++++--------
->  1 file changed, 72 insertions(+), 23 deletions(-)
-> 
-> diff --git a/Documentation/driver-api/pci/p2pdma.rst b/Documentation/driver-api/pci/p2pdma.rst
-> index d0b241628cf1..c43ec1356471 100644
-> --- a/Documentation/driver-api/pci/p2pdma.rst
-> +++ b/Documentation/driver-api/pci/p2pdma.rst
-> @@ -9,22 +9,47 @@ between two devices on the bus. This type of transaction is henceforth
->  called Peer-to-Peer (or P2P). However, there are a number of issues that
->  make P2P transactions tricky to do in a perfectly safe way.
->  
-> -One of the biggest issues is that PCI doesn't require forwarding
-> -transactions between hierarchy domains, and in PCIe, each Root Port
-> -defines a separate hierarchy domain. To make things worse, there is no
-> -simple way to determine if a given Root Complex supports this or not.
-> -(See PCIe r4.0, sec 1.3.1). Therefore, as of this writing, the kernel
-> -only supports doing P2P when the endpoints involved are all behind the
-> -same PCI bridge, as such devices are all in the same PCI hierarchy
-> -domain, and the spec guarantees that all transactions within the
-> -hierarchy will be routable, but it does not require routing
-> -between hierarchies.
-> -
-> -The second issue is that to make use of existing interfaces in Linux,
-> -memory that is used for P2P transactions needs to be backed by struct
-> -pages. However, PCI BARs are not typically cache coherent so there are
-> -a few corner case gotchas with these pages so developers need to
-> -be careful about what they do with them.
-> +For PCIe the routing of TLPs is well defined up until they reach a host bridge
-> +or root port. If the path includes PCIe switches then based on the ACS settings
-> +the transaction can route entirely within the PCIe hierarchy and never reach the
-> +root port. The kernel will evaluate the PCIe topology and always permit P2P
-> +in these well defined cases.
-> +
-> +However, if the P2P transaction reaches the host bridge then it might have to
-> +hairpin back out the same root port, be routed inside the CPU SOC to another
-> +PCIe root port, or routed internally to the SOC.
-> +
-> +As this is not well defined or well supported in real HW the kernel defaults to
-> +blocking such routing. There is an allow list to allow detecting known-good HW,
-> +in which case P2P between any two PCIe devices will be permitted.
-> +
-> +Since P2P inherently is doing transactions between two devices it requires two
-> +drivers to be co-operating inside the kernel. The providing driver has to convay
+Implement a new ECC handling for memory without struct pages. Kernel MM
+expose registration APIs to allow modules that are managing the device
+to register its device memory region. MM then tracks such regions using
+interval tree.
 
-                                                                             convey
+The mechanism is largely similar to that of ECC on pfn with struct pages.
+If there is an ECC error on a pfn, all the mapping to it are identified
+and a SIGBUS is sent to the user space processes owning those mappings.
+Note that there is one primary difference versus the handling of the
+poison on struct pages, which is to skip unmapping to the faulty PFN.
+This is done to handle the huge PFNMAP support added recently [1] that
+enables VM_PFNMAP vmas to map at PMD or PUD level. A poison to a PFN
+mapped in such as way would need breaking the PMD/PUD mapping into PTEs
+that will get mirrored into the S2. This can greatly increase the cost
+of table walks and have a major performance impact.
 
-> +its MMIO to the consuming driver. To meet the driver model lifecycle rules the
-> +MMIO must have all DMA mapping removed, all CPU accesses prevented, all page
-> +table mappings undone before the providing driver completes remove().
-> +
-> +This requires the providing and consuming driver to actively work together to
-> +guarentee that the consuming driver has stopped using the MMIO during a removal
+nvgrace-gpu-vfio-pci module maps the device memory to user VA (Qemu) using
+remap_pfn_range without being added to the kernel [2]. These device memory
+PFNs are not backed by struct page. So make nvgrace-gpu-vfio-pci module
+make use of the mechanism to get poison handling support on the device
+memory.
 
-   guarantee
+Patch rebased to v6.17-rc7.
 
-> +cycle. This is done by either a synchronous invalidation shutdown or waiting
-> +for all usage refcounts to reach zero.
-> +
-> +At the lowest level the P2P subsystem offers a naked struct p2p_provider that
-> +delegates lifecycle management to the providing driver. It is expected that
-> +drivers using this option will wrap their MMIO memory in DMABUF and use DMABUF
-> +to provide an invalidation shutdown. These MMIO pages have no struct page, and
-> +if are used with mmap() must create special PTEs. As such there are very few
+Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+---
 
-   if used
+Link: https://lore.kernel.org/all/20251026141919.2261-1-ankita@nvidia.com/ [v4]
 
-> +kernel uAPIs that can accept pointers to them, in particular they cannot be used
-> +with read()/write(), including O_DIRECT.
-> +
-> +Building on this, the subsystem offers a layer to wrap the MMIO in a ZONE_DEVICE
-> +pggmap of MEMORY_DEVICE_PCI_P2PDMA to create struct pages. The lifecylce of
+v4 -> v5
+- Removed pfn_space NULL checks. Instead a wrong parameter would cause
+a panic. (Thanks Andrew Morton for suggestion)
+- Log message to mention kmalloc allocation error and the failure to
+kill a process. (Thanks Andrew Morton)
+- Comments with 80 chars.
 
-   pgmap ?                                                        lifecycle
+v3 -> v4
+- Added guards in memory_failure_pfn, register, unregister function to
+simplify code. (Thanks Ira Weiny for suggestion).
+- Collected reviewed-by from Shuai Xue (Thanks!) on the mm GHES patch. Also
+moved it to the front of the series.
+- Added check for interval_tree_iter_first before removing the device
+memory region. (Thanks Jiaqi Yan for suggestion)
+- If pfn doesn't belong to any address space mapping, returning
+MF_IGNORED (Thanks Miaohe Lin for suggestion).
+- Updated patch commit to add more details on the perf impact on
+HUGE PFNMAP (Thanks Jason Gunthorpe, Tony Luck for suggestion).
 
-> +pgmap ensures that when the pgmap is destroyed all other drivers have stopped
-> +using the MMIO. This option works with O_DIRECT flows, in some cases, if the
-> +underlying subsystem supports handling MEMORY_DEVICE_PCI_P2PDMA through
-> +FOLL_PCI_P2PDMA. The use of FOLL_LONGTERM is prevented. As this relies on pgmap
-> +it also relies on architecture support along with alignment and minimum size
-> +limitations.
->  
->  
->  Driver Writer's Guide
-> @@ -114,14 +139,38 @@ allocating scatter-gather lists with P2P memory.
->  Struct Page Caveats
->  -------------------
->  
-> -Driver writers should be very careful about not passing these special
-> -struct pages to code that isn't prepared for it. At this time, the kernel
-> -interfaces do not have any checks for ensuring this. This obviously
-> -precludes passing these pages to userspace.
-> +While the MEMORY_DEVICE_PCI_P2PDMA pages can be installed in VMAs,
-> +pin_user_pages() and related will not return them unless FOLL_PCI_P2PDMA is set.
->  
-> -P2P memory is also technically IO memory but should never have any side
-> -effects behind it. Thus, the order of loads and stores should not be important
-> -and ioreadX(), iowriteX() and friends should not be necessary.
-> +The MEMORY_DEVICE_PCI_P2PDMA pages require care to support in the kernel. The
-> +KVA is still MMIO and must still be accessed through the normal
-> +readX()/writeX()/etc helpers. Direct CPU access (e.g. memcpy) is forbidden, just
-> +like any other MMIO mapping. While this will actually work on some
-> +architectures, others will experiance corruption or just crash in the kernel.
+v2 -> v3
+- Rebased to v6.17-rc7.
+- Skipped the unmapping of PFNMAP during reception of poison. Suggested by
+Jason Gunthorpe, Jiaqi Yan, Vikram Sethi (Thanks!)
+- Updated the check to prevent multiple registration to the same PFN
+range using interval_tree_iter_first. Thanks Shameer Kolothum for the
+suggestion.
+- Removed the callback function in the nvgrace-gpu requiring tracking of
+poisoned PFN as it isn't required anymore.
+- Introduced seperate collect_procs_pfn function to collect the list of
+processes mapping to the poisoned PFN.
 
-                              experience
+v1 -> v2
+- Change poisoned page tracking from bitmap to hashtable.
+- Addressed miscellaneous comments in v1.
 
-> +Supporting FOLL_PCI_P2PDMA in a subsystem requires scrubbing it to ensure no CPU
-> +access happens.
-> +
-> +
-> +Usage With DMABUF
-> +=================
-> +
-> +DMABUF provides an alternative to the above struct page based
-> +client/provider/orchestrator system. In this mode the exporting driver will wrap
-> +some of its MMIO in a DMABUF and give the DMABUF FD to userspace.
-> +
-> +Userspace can then pass the FD to an importing driver which will ask the
-> +exporting driver to map it.
-> +
-> +In this case the initator and target pci_devices are known and the P2P subsystem
+Link: https://lore.kernel.org/all/20240826204353.2228736-1-peterx@redhat.com/ [1]
+Link: https://lore.kernel.org/all/20240220115055.23546-1-ankita@nvidia.com/ [2]
 
-                    initiator
+Ankit Agrawal (3):
+  mm: Change ghes code to allow poison of non-struct pfn
+  mm: handle poisoning of pfn without struct pages
+  vfio/nvgrace-gpu: register device memory for poison handling
 
-> +is used to determine the mapping type. The phys_addr_t based DMA API is used to
-> +establish the dma_addr_t.
-> +
-> +Lifecycle is controlled by DMABUF move_notify(), when the exporting driver wants
-> +to remove() it must deliver an invalidation shutdown to all DMABUF importing
-> +drivers through move_notify() and synchronously DMA unmap all the MMIO.
-> +
-> +No importing driver can continue to have a DMA map to the MMIO after the
-> +exporting driver has destroyed it's p2p_provider.
-                                  its
+ MAINTAINERS                         |   1 +
+ drivers/acpi/apei/ghes.c            |   6 --
+ drivers/vfio/pci/nvgrace-gpu/main.c |  45 ++++++++-
+ include/linux/memory-failure.h      |  17 ++++
+ include/linux/mm.h                  |   1 +
+ include/ras/ras_event.h             |   1 +
+ mm/Kconfig                          |   1 +
+ mm/memory-failure.c                 | 145 +++++++++++++++++++++++++++-
+ 8 files changed, 209 insertions(+), 8 deletions(-)
+ create mode 100644 include/linux/memory-failure.h
 
 -- 
-~Randy
+2.34.1
 
 
