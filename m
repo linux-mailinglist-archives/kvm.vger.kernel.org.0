@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-61793-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61794-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71DE9C2A590
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 08:34:10 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 349E3C2A5EA
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 08:40:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9A65F4E9721
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 07:32:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2336A4E3468
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 07:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DB32BE658;
-	Mon,  3 Nov 2025 07:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A222BF00B;
+	Mon,  3 Nov 2025 07:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zSookYoF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4xbSGM1m"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB98C239E9E
-	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 07:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B972C15B7
+	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 07:39:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762155125; cv=none; b=uDGgsPfvsDkOHZqZHRnlUYBAYlzwhyFn3QGvb9eoM+eJQQbGSj+ionDcKnRmT6dmNC1jaIZAZQ8jJWzo0QT6RCKA4cI6jPG9yhen9EB4SS2oHoOLbkn/qGISV+usCzR+wm2PmMDyLkEPgGvgAIe6s/iI8Iz67AAfaPDs62veaH4=
+	t=1762155590; cv=none; b=ql06+Zg5FKbDrgj0HNVayRc1vFiWhlaFodsdasbrPJvwmLQiSpIQnLVUkjhOvUh1pniboe/vAmq7sQ/G42Sd7JwfuZPgainKg3uB3ljwWNgdsyRM3KOkpxWeBl4cGX0MS2A7AWnBt4Jfb0BaeiPTlHzdBmXGQeEOFAR4S4dq5yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762155125; c=relaxed/simple;
-	bh=I7HDUIQg/KdqyDmPQ+qrxG240GLYIT2LqIXpnIqKcNE=;
+	s=arc-20240116; t=1762155590; c=relaxed/simple;
+	bh=30R4PwwoDn0ue1N2GS0GOY1SWIFA7GBPa8q4kx5mc+o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jnl5muDQhNqJjkQZjNg/ErNh1wdtQjVp77I5LUIZKw+QiXOTvCVse+tluUGg/Qq5hWwyyNKovRRiVuQE07DveSzPz0XdX2h4KN/K81PZfoKFIf3qaq1wkA3ONsi/kwSR70GbCuCkdwSVf74Cmr3CFnbPHUgQ2ZerJwLZ5BTqylw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zSookYoF; arc=none smtp.client-ip=209.85.214.176
+	 Content-Type:Content-Disposition:In-Reply-To; b=HSIVNg8trAbnLZBkC9qVkO6+qQjjq50rDX2IpJi98KONlJoMF4Ir6rNL4lISMIItSH8jEs1xITXh9ScszPoytpr0CENlV7coI4vGk7UZEvk5pm1z9scOe60LsRQgFAr04dTdPtTQfOagZRIVlpEwkvJ2pfE3ngMuGnsSXIcQzPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4xbSGM1m; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-295c64cb951so87975ad.0
-        for <kvm@vger.kernel.org>; Sun, 02 Nov 2025 23:32:02 -0800 (PST)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-294f3105435so343775ad.1
+        for <kvm@vger.kernel.org>; Sun, 02 Nov 2025 23:39:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762155122; x=1762759922; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762155588; x=1762760388; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dADjXQcJVAcOBFwaI/JeQVroSWZH3kzmeM+gasunsjY=;
-        b=zSookYoFfRjRsve0TquPbNlYHAKP8u8FjlXo1epzJ6/MiQOm3xl17tPdtSpUkKMd8d
-         wwt2uP+wqJVBOc4WxSuC4VPnKPS+96pFg219qfLnd5GeGFo6HmHghY55eRmYR8Csw6AD
-         G429iGUTkh0fMW1GPkmq9CDj00OZl2DSRdi0avBZqa75Y6Z7pe7bk6IIkFHNg2IlzxGg
-         +YErQEbQZj4EIcQ2pji1k9FVSyZ10O0tDol1UhmvHbtx1KkbJRaPo7PILN3lL6lwqTUb
-         JFqxwMAB7kcpqlAQLM0HEiTJ1FdYKnsxHXJseW+lSy5tLB2Z6Hu21xaHBP+YT+hSB2UC
-         mhew==
+        bh=zzwh3KfEQpKPksD5Xn4ZAd8EEqdDZL8lWisUmSvX4T0=;
+        b=4xbSGM1mPiF/5mRata4Qedj/4eMBsRxrlBvOyJ/WRxJmYaaudM9u/jHawCavHJy5zS
+         zNajQolEqAOlkri6Y9CYfPH+Xz1QidD1HKDek4zBj0H4+/tTWlB26MuDTKkUaJx8h7sV
+         P2V8EOfUxIX82cSMk/UpbFQNAidfIwJPcXMJZwOhAhEz3UWc5LhY1FplbXJlk5DlZtdI
+         R9pLstQWJi9iwyAmV/TG60n8N/419R61sruPSBuh8zMksPHKd5cQ1vJ2YNVqm3I6uM49
+         Vb5SIwDOGLz5Wlzb/ka/p3RpES6a+ruAN/bIuoeVjeTXr403latneInTCizTGfrihLqB
+         IeJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762155122; x=1762759922;
+        d=1e100.net; s=20230601; t=1762155588; x=1762760388;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dADjXQcJVAcOBFwaI/JeQVroSWZH3kzmeM+gasunsjY=;
-        b=jI+fQoqzFIwQEhCRWDBAP9kvsyzFHt2ThYnu+H39iSe1effdmMD7aSirMxPK8ai3m6
-         2DoHY9LfnscxA5blZuiyhdGqtcefOsdwTnq59KY7uw/ETo4YBIj5m/HEzEZBfGZaOBje
-         IsdC9zhUCpTdaaX4FHWVhTjIdifo1T5DuKsEtxouGdAbO0eLe9koa3RxwaJSId6+Y5lF
-         G+DfDGuvQj8ybNNWTCWmVrBOR4TV/+HH+YZXCoiz5DQB0IRVCHBFJfcEroT4mzfhy9IW
-         ZiDBigEVZCekP9woikn7+htqgGsUSTA/El+QTT7ZWqq1h/pcaSa/0HWAR8w2ItFoNqEb
-         boJg==
-X-Forwarded-Encrypted: i=1; AJvYcCVST3LxTDvJGzU4airv0X15zezMfuVBm3DbLVD+qfd0VFiW99EO3LX8mBQ3AyJuJIORlec=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVuCVcxQeqI4j11jw2FrAGHYJJmM74I9wa/2REg3sX1stSdqZa
-	qOab7pgIDhVU2Wcl2qfhzouIHA1kFxG0i7XgHyKJ6MjFr+IAvpx5R9SoQqe1Rs/jeg==
-X-Gm-Gg: ASbGncsAPnrK3wkYtKUOtpEu2gm2dK0h/X0K3/P3kcKSgfWME2zANXspSbMl5+AT/MV
-	23MTsoIZxwbuj5q2treY5IW0HN6pu/sQZ05xBxycIKAVJhhBX4S4jnYR7zEtQ6VWmqSpYC7EhBc
-	PAAZ+ZUdmeiKmK7DtxRuPGfsaWF9bqZbC/g6AGeIqaCNiPzG1o8iyA8TXpG57FIAEgjx2BJAHit
-	O6dUNncUr7B4mU73V++ZW04WOAhUfn/cat/6AmwXgRheR86EtE1UtAtqd3pFZo3Sz3gHwRSLrit
-	zlvvGvFGvdc8be4Wcz+zXdcwIhFGoXG6ACQy9gSzQEd0t4n/rsQTk/0d+b7Q7UWTYo+0IwJFGlp
-	lJXh3x0Eo3JsWEcoDRq1NAAT5qrLhjFKD99G5xhGzgbVB+xsCzG6IVvjGUSdV/SLga6wBnyg+gC
-	i2XMMKq1JjIONsdGmlYPnyhPPSMEjG60ALm+htBg==
-X-Google-Smtp-Source: AGHT+IHfrP3JzShs73f4Ou9j74BKdOau8otZ+u7WUYTtBZ6PInXsEFYOD9H0FiQHWOz2YtGspU3bog==
-X-Received: by 2002:a17:902:ec8e:b0:274:1a09:9553 with SMTP id d9443c01a7336-29554bb5d5cmr6804875ad.6.1762155121865;
-        Sun, 02 Nov 2025 23:32:01 -0800 (PST)
+        bh=zzwh3KfEQpKPksD5Xn4ZAd8EEqdDZL8lWisUmSvX4T0=;
+        b=bi/sdCzM/yT5+NAu+jcxKXabiMilbKfhuISH4yQ++CFgIRwUKQFJ+/FPypHftI0KMP
+         0bHTALVApjcj3kO9AkRmN+IASaKrJBBIWv2418y/8dsax27S61+PHVJ6cVYL5mqaCBMF
+         lzzX7Z0y2LnMKC3qwwxLuZxYKjm9/HLyvaiH4U9r1wHB7v1tZ2+LD1xw0TpdTs7hlQWy
+         3kTiyqVfoJexDfNK9bo30zm33dfWBI06l/QAgRbLJS5XMwAGdBRkQd37epEXZgBz1cJT
+         NnNAP+lzlpgG9J4IrpSq5oHz7XvO418uBSuYCZSOQWphP8BsgnZ6LlQ6FXB5rzFeHEVn
+         sttA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8EDK0sqse7BovpXJgXPUZvp660NS9SusCtZcR6Mt29qF3VuxveZBFxfCgfDLYpS2NKXk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnCVw+ynYoJLvVW5C3NVKKSGOjtBg3FQrWSPzHdcab3RcUPMG7
+	k3fae021LGZiiuQJtRJ9Is4Vv287jq/1hRI+LmAU+3H2/rmgqUuOVskaedpg6BpvKQ==
+X-Gm-Gg: ASbGncv/rFihwQqDsvIp0XdzAnQSA1q9KwzzS30djDjYnUXQFy7iA1LGYYXsO0ALy/n
+	aixcIo23MVU4sSinON10bXLULZ1NSjMA+utvR1EeCZgluNh1pM2CXlnsr5tHz5QliN1i/LdlliU
+	yyOY0Blg3wSTuBtjJG969ya3ziTOA2C2SjuVL0e9eFuSJkgZljHydbuMD88p3MRXQ+efE7TBzWG
+	KH/2jJchikgAIf1LzYRK6Q7ag15Tmae+4xiIgWFcaKBvBhh/fVLAScMOKVgg+quZoVD/mi1JDm1
+	NeTBx0SsFI3kP1imeslbOVDdGZQnrsZK5Ly4WUJgfCECudJid3d157LuY5QpPahZ41J78ktn5Vu
+	Y8YTYSjyORwxBX0bpHZYAXRFLmTF/Tk3Fs6a2lAXWFCczbbL8kbuqDA2YcguFchJsZPVdSovc7B
+	QRhp8LO/dl7FA+f1sly1UJ02VI33IxMwsuzLKrn3LwetCHI4QS
+X-Google-Smtp-Source: AGHT+IGoX/eRPHIgiRFzzACV20d0ftHJvRprPrWC1Oq8kyrn4muK0Mu+0fpj1flmH53tBH91iPLzGw==
+X-Received: by 2002:a17:902:ea0d:b0:24b:1741:1a4c with SMTP id d9443c01a7336-295549f6bcbmr6601575ad.0.1762155587782;
+        Sun, 02 Nov 2025 23:39:47 -0800 (PST)
 Received: from google.com (164.210.142.34.bc.googleusercontent.com. [34.142.210.164])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-295512dedabsm82398675ad.5.2025.11.02.23.31.54
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2952e9a399csm102714425ad.33.2025.11.02.23.39.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Nov 2025 23:32:01 -0800 (PST)
-Date: Mon, 3 Nov 2025 07:31:51 +0000
+        Sun, 02 Nov 2025 23:39:47 -0800 (PST)
+Date: Mon, 3 Nov 2025 07:39:37 +0000
 From: Pranjal Shrivastava <praan@google.com>
 To: Jason Gunthorpe <jgg@nvidia.com>
 Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
@@ -108,10 +108,10 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
 	Yishai Hadas <yishaih@nvidia.com>,
 	Zhenyu Wang <zhenyuw.linux@gmail.com>,
 	Zhi Wang <zhi.wang.linux@gmail.com>, patches@lists.linux.dev
-Subject: Re: [PATCH 11/22] vfio/cdx: Provide a get_region_info op
-Message-ID: <aQhaZ2HvTTtanNdu@google.com>
+Subject: Re: [PATCH 14/22] vfio: Require drivers to implement get_region_info
+Message-ID: <aQhcOYVbY-LqOjW5@google.com>
 References: <0-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
- <11-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
+ <14-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -120,17 +120,42 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <11-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
+In-Reply-To: <14-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
 
-On Thu, Oct 23, 2025 at 08:09:25PM -0300, Jason Gunthorpe wrote:
-> Change the signature of vfio_cdx_ioctl_get_region_info() and hook it to
-> the op.
+On Thu, Oct 23, 2025 at 08:09:28PM -0300, Jason Gunthorpe wrote:
+> Remove the fallback through the ioctl callback, no drivers use this now.
 > 
 > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->  drivers/vfio/cdx/main.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  drivers/vfio/vfio_main.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index a390163ce706c4..f056e82ba35075 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -1297,13 +1297,13 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
+>  		break;
+>  
+>  	case VFIO_DEVICE_GET_REGION_INFO:
+> -		if (!device->ops->get_region_info)
+> -			goto ioctl_fallback;
+> -		ret = device->ops->get_region_info(device, uptr);
+> +		if (unlikely(!device->ops->get_region_info))
+> +			ret = -EINVAL;
+
+Nit: Let's also add a warn/err log here highliting that the device
+doesn't populate the get_region_info op?
+
+> +		else
+> +			ret = device->ops->get_region_info(device, uptr);
+>  		break;
+>  
+>  	default:
+> -ioctl_fallback:
+>  		if (unlikely(!device->ops->ioctl))
+>  			ret = -EINVAL;
+>  		else
 
 Reviewed-by: Pranjal Shrivastava <praan@google.com>
 
