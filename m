@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-61877-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61882-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCBC7C2D5B4
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 18:08:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25D00C2D5BA
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 18:08:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 057B23AE0C4
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 16:58:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61A603A7922
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 16:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9917E324B20;
-	Mon,  3 Nov 2025 16:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CCDA325717;
+	Mon,  3 Nov 2025 16:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aVWAkiZy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aT1xrAMR"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4277B320CBB;
-	Mon,  3 Nov 2025 16:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14645322A2E;
+	Mon,  3 Nov 2025 16:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762188931; cv=none; b=FO3/Q3B17zRByAqWh9ZYnCjxoXnvIW0wKNDV4iHJCDiImelLzZy9V8MlrYoBJu44RtlwkEBnqfzj2kB/NMo/KtUg5IdcCoyh1/LpOJCijaih8SKMuRPBityrawsGvxWemYovELfxxUcA71KMq/9AVPcY5lu5CJJoInXSuUBDbek=
+	t=1762188932; cv=none; b=YNjYGdn3rnpklcrcp8c+SRYMZoAj6/nLCaNiynTMjYu30TPIO1loI2JYwMO9bI0qe4OsB8Vphg76+sVX61g083aXxnwNCXdd2FVIKmcJ8GrxmK9oZelpAZ0314fklmTpRYA0OxHFhudLQZODiJTEDQXhZudwbxmXl2wOrvrO+Hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762188931; c=relaxed/simple;
-	bh=aQ7u70SG7WFJvTtI0RPPihLeSLpWJXoLDaE7OdfAJsw=;
+	s=arc-20240116; t=1762188932; c=relaxed/simple;
+	bh=PnttpW5k/sZbVwWIADxCl8IZlSHBNDSq8thM0EUpP/0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KB7drgrhf10Dn95Ofa9Z958J/WP6Q0rQC8alCG1+0lfRwT4nBrVW40sQ//KwXEIXt/p/ak7nX5dLZJeVhO/evc6Xc2kHXPEOcPahLA2aQnFVIMMIILx8OZAEkkhvFQ/dmHHsvPJWbsY+qoUZq9q7OyT+ejnzbHK4kOkDcimWUTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aVWAkiZy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06300C4CEE7;
+	 MIME-Version; b=jSw2kJWcJtOj9Qx11/pNVfSysEeSY/Y4zmMRumkPxDo5e5JJFfr6A71R4ePUzBb7wsjqHQnZvmfiyrBRhhcl2YZC8i6HQ/Vi8IsUy6yqNMU0xHRapc0aSbeWTQymn9fGuxkepvxPNPa+MXWC1zwMthk499UVZENNcwuv0nQXbRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aT1xrAMR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8BD1C113D0;
 	Mon,  3 Nov 2025 16:55:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1762188931;
-	bh=aQ7u70SG7WFJvTtI0RPPihLeSLpWJXoLDaE7OdfAJsw=;
+	bh=PnttpW5k/sZbVwWIADxCl8IZlSHBNDSq8thM0EUpP/0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aVWAkiZy6GPAHGfO1Nxuc8vnC7R4C9UJdbb5HcPVA/ZogDt64H4UVFAOEgrx3RxlX
-	 mqMacbrAewsDnUEeliAGqVcFxhEwYeMRjrcgRqZYkld7Q8+L5iU7iZWy3xiW/iPSwO
-	 IRsUDfawyZGbz09+4fYQ0poNDId2IDXInl6fhg/B7I4dWcKDK1XX4ke6//+vAB3FVo
-	 V06Narhx/v1qhO+YsdgrcOCX7EFlxXuddL2Kx73hgtfI1m9fMPj81RNDiC9+H/TC41
-	 jlc4mkBmw7ya/MwNUwM25N/Dd8KQYMP+/aVAsYlwWG1j3T71dq7beAssahP8df2PNr
-	 g4C9Kly+sfkpQ==
+	b=aT1xrAMRMQNRyHDOnEcLIz88OfZ3iGHZ5jvhf6RnlO/jq5c6WvTJ6KgyICS/94+kh
+	 BVi3HrAW6SXP95M9Xs/ln2r/ab0m6ed7dNwxydPje1rj9AcL4MW7GCvk1cjtNRPHW3
+	 iexzxxtZxgFgaSn83JBb6T5fY/+ecmBHl/szNM8HzZzAF2zsIc4pmjMxMFZZln7r6b
+	 /RgOmRVBB3XojUdi+lxgYyEjxzUNBE7PgLm0zpldomOuE+hJBmBfK0RB1HQ8pGU3lR
+	 gtfbXORyaF35smIf/cn3YCWuuNHCpKBJ332bLAwl0+jI7/eERDELA+C0Lu/W2EqnJR
+	 coAmtvSrPVjxQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vFxq5-000000021VN-0miM;
-	Mon, 03 Nov 2025 16:55:29 +0000
+	id 1vFxq6-000000021VN-0cO6;
+	Mon, 03 Nov 2025 16:55:30 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Subject: [PATCH 19/33] KVM: arm64: Eagerly save VMCR on exit
-Date: Mon,  3 Nov 2025 16:55:03 +0000
-Message-ID: <20251103165517.2960148-20-maz@kernel.org>
+Subject: [PATCH 23/33] KVM: arm64: Move undeliverable interrupts to the end of ap_list
+Date: Mon,  3 Nov 2025 16:55:07 +0000
+Message-ID: <20251103165517.2960148-24-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251103165517.2960148-1-maz@kernel.org>
 References: <20251103165517.2960148-1-maz@kernel.org>
@@ -75,195 +75,80 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We currently save/restore the VMCR register in a pretty lazy way
-(on load/put, consistently with what we do with the APRs).
-
-However, we are going to need the group-enable bits that are backed
-by VMCR on each entry (so that we can avoid injecting interrupts for
-disabled groups).
-
-Move the synchronisation from put to sync, which results in some minor
-churn in the nVHE hypercalls to simplify things.
+Interrupts in the ap_list that cannot be acted upon because they
+are not enabled, or that their group is not enabled, shouldn't
+make it into the LRs if we are space-constrained.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_asm.h     |  2 +-
- arch/arm64/include/asm/kvm_hyp.h     |  2 +-
- arch/arm64/kvm/arm.c                 |  3 +--
- arch/arm64/kvm/hyp/nvhe/hyp-main.c   |  7 ++++---
- arch/arm64/kvm/hyp/vgic-v3-sr.c      | 15 +++------------
- arch/arm64/kvm/vgic/vgic-v2.c        |  2 +-
- arch/arm64/kvm/vgic/vgic-v3-nested.c |  2 +-
- arch/arm64/kvm/vgic/vgic-v3.c        |  2 +-
- 8 files changed, 13 insertions(+), 22 deletions(-)
+ arch/arm64/kvm/vgic/vgic.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 9da54d4ee49ee..f8adbd535b4ae 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -79,7 +79,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_range,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
--	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_vmcr_aprs,
-+	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_reserve_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_unreserve_vm,
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index e6be1f5d0967f..dbf16a9f67728 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -82,7 +82,7 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if);
--void __vgic_v3_save_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
-+void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
- int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 870953b4a8a74..733195ef183e1 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -659,8 +659,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
- 	if (is_protected_kvm_enabled()) {
--		kvm_call_hyp(__vgic_v3_save_vmcr_aprs,
--			     &vcpu->arch.vgic_cpu.vgic_v3);
-+		kvm_call_hyp(__vgic_v3_save_aprs, &vcpu->arch.vgic_cpu.vgic_v3);
- 		kvm_call_hyp_nvhe(__pkvm_vcpu_put);
- 	}
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 29430c031095a..a7c689152f686 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -157,6 +157,7 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	host_vcpu->arch.iflags		= hyp_vcpu->vcpu.arch.iflags;
- 
- 	host_cpu_if->vgic_hcr		= hyp_cpu_if->vgic_hcr;
-+	host_cpu_if->vgic_vmcr		= hyp_cpu_if->vgic_vmcr;
- 	for (i = 0; i < hyp_cpu_if->used_lrs; ++i)
- 		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
- }
-@@ -464,11 +465,11 @@ static void handle___vgic_v3_init_lrs(struct kvm_cpu_context *host_ctxt)
- 	__vgic_v3_init_lrs();
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 56c61e17e1e88..5c9204d18b27d 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -265,6 +265,11 @@ struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+ 	return NULL;
  }
  
--static void handle___vgic_v3_save_vmcr_aprs(struct kvm_cpu_context *host_ctxt)
-+static void handle___vgic_v3_save_aprs(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
- 
--	__vgic_v3_save_vmcr_aprs(kern_hyp_va(cpu_if));
-+	__vgic_v3_save_aprs(kern_hyp_va(cpu_if));
- }
- 
- static void handle___vgic_v3_restore_vmcr_aprs(struct kvm_cpu_context *host_ctxt)
-@@ -616,7 +617,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid_range),
- 	HANDLE_FUNC(__kvm_flush_cpu_context),
- 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
--	HANDLE_FUNC(__vgic_v3_save_vmcr_aprs),
-+	HANDLE_FUNC(__vgic_v3_save_aprs),
- 	HANDLE_FUNC(__vgic_v3_restore_vmcr_aprs),
- 	HANDLE_FUNC(__pkvm_reserve_vm),
- 	HANDLE_FUNC(__pkvm_unreserve_vm),
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index d001b26a21f16..1e5c1cf4b9144 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -235,6 +235,8 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
- 		}
- 	}
- 
-+	cpu_if->vgic_vmcr = read_gicreg(ICH_VMCR_EL2);
++struct vgic_sort_info {
++	struct kvm_vcpu *vcpu;
++	struct vgic_vmcr vmcr;
++};
 +
- 	if (cpu_if->vgic_hcr & ICH_HCR_EL2_LRENPIE) {
- 		u64 val = read_gicreg(ICH_HCR_EL2);
- 		cpu_if->vgic_hcr &= ~ICH_HCR_EL2_EOIcount;
-@@ -332,10 +334,6 @@ void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
+ /*
+  * The order of items in the ap_lists defines how we'll pack things in LRs as
+  * well, the first items in the list being the first things populated in the
+@@ -273,6 +278,7 @@ struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+  * Pending, non-active interrupts must be placed at the head of the list.
+  * Otherwise things should be sorted by the priority field and the GIC
+  * hardware support will take care of preemption of priority groups etc.
++ * Interrupts that are not deliverable should be at the end of the list.
+  *
+  * Return negative if "a" sorts before "b", 0 to preserve order, and positive
+  * to sort "b" before "a".
+@@ -282,6 +288,8 @@ static int vgic_irq_cmp(void *priv, const struct list_head *a,
  {
- 	u64 val;
+ 	struct vgic_irq *irqa = container_of(a, struct vgic_irq, ap_list);
+ 	struct vgic_irq *irqb = container_of(b, struct vgic_irq, ap_list);
++	struct vgic_sort_info *info = priv;
++	struct kvm_vcpu *vcpu = info->vcpu;
+ 	bool penda, pendb;
+ 	int ret;
  
--	if (!cpu_if->vgic_sre) {
--		cpu_if->vgic_vmcr = read_gicreg(ICH_VMCR_EL2);
--	}
--
- 	/* Only restore SRE if the host implements the GICv2 interface */
- 	if (static_branch_unlikely(&vgic_v3_has_v2_compat)) {
- 		val = read_gicreg(ICC_SRE_EL2);
-@@ -357,7 +355,7 @@ void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
- 		write_gicreg(0, ICH_HCR_EL2);
+@@ -295,6 +303,17 @@ static int vgic_irq_cmp(void *priv, const struct list_head *a,
+ 	raw_spin_lock(&irqa->irq_lock);
+ 	raw_spin_lock_nested(&irqb->irq_lock, SINGLE_DEPTH_NESTING);
+ 
++	/* Undeliverable interrupts should be last */
++	ret = (int)(vgic_target_oracle(irqb) == vcpu) - (int)(vgic_target_oracle(irqa) == vcpu);
++	if (ret)
++		goto out;
++
++	/* Same thing for interrupts targeting a disabled group */
++	ret =  (int)(irqb->group ? info->vmcr.grpen1 : info->vmcr.grpen0);
++	ret -= (int)(irqa->group ? info->vmcr.grpen1 : info->vmcr.grpen0);
++	if (ret)
++		goto out;
++
+ 	penda = irqa->enabled && irq_is_pending(irqa) && !irqa->active;
+ 	pendb = irqb->enabled && irq_is_pending(irqb) && !irqb->active;
+ 
+@@ -320,10 +339,12 @@ static int vgic_irq_cmp(void *priv, const struct list_head *a,
+ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_sort_info info = { .vcpu = vcpu, };
+ 
+ 	lockdep_assert_held(&vgic_cpu->ap_list_lock);
+ 
+-	list_sort(NULL, &vgic_cpu->ap_list_head, vgic_irq_cmp);
++	vgic_get_vmcr(vcpu, &info.vmcr);
++	list_sort(&info, &vgic_cpu->ap_list_head, vgic_irq_cmp);
  }
  
--static void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if)
-+void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if)
- {
- 	u64 val;
- 	u32 nr_pre_bits;
-@@ -518,13 +516,6 @@ static void __vgic_v3_write_vmcr(u32 vmcr)
- 	write_gicreg(vmcr, ICH_VMCR_EL2);
- }
- 
--void __vgic_v3_save_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if)
--{
--	__vgic_v3_save_aprs(cpu_if);
--	if (cpu_if->vgic_sre)
--		cpu_if->vgic_vmcr = __vgic_v3_read_vmcr();
--}
--
- void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if)
- {
- 	__vgic_v3_compat_mode_enable();
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 5a2165a8d22c0..07e93acafd04d 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -451,6 +451,7 @@ void vgic_v2_save_state(struct kvm_vcpu *vcpu)
- 	if (!base)
- 		return;
- 
-+	cpu_if->vgic_vmcr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VMCR);
- 
- 	if (used_lrs)
- 		save_lrs(vcpu, base);
-@@ -495,6 +496,5 @@ void vgic_v2_put(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
- 
--	cpu_if->vgic_vmcr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VMCR);
- 	cpu_if->vgic_apr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_APR);
- }
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index 387557e20a272..17bceef83269e 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -341,7 +341,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
- 	u64 val;
- 	int i;
- 
--	__vgic_v3_save_vmcr_aprs(s_cpu_if);
-+	__vgic_v3_save_aprs(s_cpu_if);
- 	__vgic_v3_deactivate_traps(s_cpu_if);
- 	__vgic_v3_save_state(s_cpu_if);
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index ad5c0dbae2dfe..15225cf353f91 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -815,7 +815,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
- 	}
- 
- 	if (likely(!is_protected_kvm_enabled()))
--		kvm_call_hyp(__vgic_v3_save_vmcr_aprs, cpu_if);
-+		kvm_call_hyp(__vgic_v3_save_aprs, cpu_if);
- 	WARN_ON(vgic_v4_put(vcpu));
- 
- 	if (has_vhe())
+ /*
 -- 
 2.47.3
 
