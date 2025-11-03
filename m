@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-61912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61913-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1901FC2E08C
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 21:31:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5F7EC2E0E3
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 21:45:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CC551898A18
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 20:32:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E933D3BB287
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 20:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0492C159F;
-	Mon,  3 Nov 2025 20:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EA52C0F67;
+	Mon,  3 Nov 2025 20:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bb/TTmzo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S0HZzdMJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D661DFE26;
-	Mon,  3 Nov 2025 20:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D124A23;
+	Mon,  3 Nov 2025 20:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762201873; cv=none; b=cSlLzl4mq//yJaeIfkXevgh2quFlVDYUl9q7hSTljLuIZkn+ly4Ri4hmeM1pipglBzqzoehvzobORiD4TY/syja8Hj09jjYQT6GXw2PrJjqlbsqQZLxx+V9NawmXV75va1NjGPAM7JlwIK6cXasCA7U/uJJSkErNLcQ7FWToG+0=
+	t=1762202738; cv=none; b=ZFXNoKHw8GG1ECiuwv4YSSHrzefn0JhBZTvlHxuof5A2JI1RlpZ+03+VCRVr6Vi7Wwlh7KECPWO92XnOVXoIhe72cr2MQ81M7ynUyvCVOTAwXjLLV4JkuYNOPfURFu8fJcSPnniGL59/+V2LOdkSW4g6Z0AZwff079J+/T87zRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762201873; c=relaxed/simple;
-	bh=v778Iea2GSy92KicvT65BGxZD8ysspDSIEJ0F6r/wbE=;
+	s=arc-20240116; t=1762202738; c=relaxed/simple;
+	bh=MZ+rbyW9m9iL7mSNNyupgzySn0M4oxTsbe4Ittc8wGM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lTjq3TdnH5kooXbCmrCLeAInLfngHzaaddQ9SQ3z70VFnTjy3nrIkMqybYf/Dh7WpS/LKT+Pn58RP+KVKCj5nDFausS7L7djZUuC4phHzGcZ5UQak/qhm5jZrtLyccmDvv7jQZVwVapoIsNmREcqLSuJ/OmKp1mRuD9D4sHJ2Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bb/TTmzo; arc=none smtp.client-ip=192.198.163.13
+	 In-Reply-To:Content-Type; b=aVKstFyXiGQwFGusogDqyUbngFhmt42Fya76Er0sBaH7Jm+7fpPmdonDcw3V1Zm4cdh5ynXE7gjjofosmzD4REEXWD6+gYEUpS4zyxO4Dpft0zWRfCFgl4Tg5pYE+O33Y1RfwkxdS7RkNCLUoHuQj590OvFv1bqqTHcIdAe04cA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S0HZzdMJ; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762201871; x=1793737871;
+  t=1762202737; x=1793738737;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=v778Iea2GSy92KicvT65BGxZD8ysspDSIEJ0F6r/wbE=;
-  b=Bb/TTmzoDfXjtD38mvJKZmLzbaGvw1ugLtyX8oW59BEj01Kx1BTftWcP
-   K3TO1HBj/qDgsj/lYZrHnFAUcaUu84XQS/IqLmKxRn+WshAQOAeRNTfrn
-   NKQiqimdQSxBq4RDfDd3i0uu+WXLZZnt4d0xoOxCORNbxpXVyV9oEzQ5i
-   CMQNvuxBFcPH2k9NPbifG2Cywb5QLWVcbnxsM3zjGADZmUNKJ2AP/O/dO
-   Co5iWvse/r1LkL/tEWpDCFzBGZMilr1M3QDphUOBrEcpXNIfxnOhpN9Bh
-   Xsh1tkxLw+k5O609UT5DLExM+qc8+bXhlPZy76ZRP1CwZIZa0yB1UPGFb
-   g==;
-X-CSE-ConnectionGUID: Wz/kq1kfSeS6dwJDzwQ/QQ==
-X-CSE-MsgGUID: UeI7TeS7RT67KLaiziinGg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="66900503"
+  bh=MZ+rbyW9m9iL7mSNNyupgzySn0M4oxTsbe4Ittc8wGM=;
+  b=S0HZzdMJP2942+01sbd0DdofieqBAF98U4TwLri9AJI6IvJL2dUjP1z6
+   fAoXkJJ/mpOQ+JS6gLhbzzxgz2JKzkhdotLTQ2LmGE34s4iGY59FBrtHa
+   ie8gEgA9JG2cMfReK+RuKYS9e1Li8KNBXcQo5roZDMk0uPuOOGl+5L/Zh
+   A0nBI6lkW84EKoEPIoNpla4iMRIio59GT6v1a44rXzPfQmGiQWcr8Rs3D
+   jx6hlEcxntHOJUBhRZHQjhEdkZGH+pRavhvqUZrfVp1TM2L7rnObLkfWh
+   VDaIlRWW4LMZjr0SWeifkCFGhPBWE58/nkzUZ4L5JvY2Eh34x300K2WOl
+   A==;
+X-CSE-ConnectionGUID: F8RoXaQATIyqjlGyo4pPvQ==
+X-CSE-MsgGUID: y+zNUVPESFCGGctT5CsDPg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="68149332"
 X-IronPort-AV: E=Sophos;i="6.19,277,1754982000"; 
-   d="scan'208";a="66900503"
+   d="scan'208";a="68149332"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 12:31:10 -0800
-X-CSE-ConnectionGUID: gIAn2H+fR0Wp+9aQN2ul0Q==
-X-CSE-MsgGUID: qLqgZrNJSpCz9OoHkpnIyg==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 12:45:37 -0800
+X-CSE-ConnectionGUID: XhA7OxGcTvmvjqfvmN6V8Q==
+X-CSE-MsgGUID: ci93+YdwQAeQvpzPG5KiRQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,277,1754982000"; 
-   d="scan'208";a="186253820"
+   d="scan'208";a="186256234"
 Received: from jmaxwel1-mobl.amr.corp.intel.com (HELO [10.125.110.129]) ([10.125.110.129])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 12:31:11 -0800
-Message-ID: <b808c532-44aa-47a0-8fb8-2bdf5b27c3e4@intel.com>
-Date: Mon, 3 Nov 2025 12:31:09 -0800
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 12:45:36 -0800
+Message-ID: <c98e68f0-e5e2-482d-9a64-ad8164e4bae8@intel.com>
+Date: Mon, 3 Nov 2025 12:45:35 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/3] x86/vmscape: Replace IBPB with branch history
- clear on exit to userspace
+Subject: Re: [PATCH v3 3/3] x86/vmscape: Remove LFENCE from BHB clearing long
+ loop
 To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
  "H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
  David Kaplan <david.kaplan@amd.com>, Sean Christopherson
@@ -77,7 +77,7 @@ To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>
 References: <20251027-vmscape-bhb-v3-0-5793c2534e93@linux.intel.com>
- <20251027-vmscape-bhb-v3-2-5793c2534e93@linux.intel.com>
+ <20251027-vmscape-bhb-v3-3-5793c2534e93@linux.intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -123,177 +123,58 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20251027-vmscape-bhb-v3-2-5793c2534e93@linux.intel.com>
+In-Reply-To: <20251027-vmscape-bhb-v3-3-5793c2534e93@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 10/27/25 16:43, Pawan Gupta wrote:
-> IBPB mitigation for VMSCAPE is an overkill for CPUs that are only affected
-> by the BHI variant of VMSCAPE. On such CPUs, eIBRS already provides
-> indirect branch isolation between guest and host userspace. But, a guest
-> could still poison the branch history.
+> Long loop is used to clear the branch history when switching from a guest
+> to host userspace. The LFENCE barrier is not required in this case as ring
+> transition itself acts as a barrier.
+> 
+> Move the prologue, LFENCE and epilogue out of __CLEAR_BHB_LOOP macro to
+> allow skipping the LFENCE in the long loop variant. Rename the long loop
+> function to clear_bhb_long_loop_no_barrier() to reflect the change.
 
-This is missing a wee bit of background about how branch history and
-indirect branch prediction are involved in VMSCAPE.
+Too. Much. Assembly.
 
-> To mitigate that, use the recently added clear_bhb_long_loop() to isolate
-> the branch history between guest and userspace. Add cmdline option
-> 'vmscape=on' that automatically selects the appropriate mitigation based
-> on the CPU.
+Is there a reason we can't do more of this in C? Can we have _one_
+assembly function, please? One that takes the loop counts? No macros, no
+duplication functions. Just one:
 
-Is "=on" the right thing here as opposed to "=auto"? What you have here
-doesn't actually turn VMSCAPE mitigation on for 'vmscape=on'.
+	void __clear_bhb_loop(int inner, int outer);
 
->  Documentation/admin-guide/hw-vuln/vmscape.rst   |  8 ++++
->  Documentation/admin-guide/kernel-parameters.txt |  4 +-
->  arch/x86/include/asm/cpufeatures.h              |  1 +
->  arch/x86/include/asm/entry-common.h             | 12 +++---
->  arch/x86/include/asm/nospec-branch.h            |  2 +-
->  arch/x86/kernel/cpu/bugs.c                      | 53 ++++++++++++++++++-------
->  arch/x86/kvm/x86.c                              |  5 ++-
->  7 files changed, 61 insertions(+), 24 deletions(-)
+Then we have sensible code that looks like this:
 
-I think I'd rather this be three or four or five more patches.
+	void clear_bhb_loop()
+	{
+		__clear_bhb_loop(inner, outer);
+		lfence();
+	}
 
-The rename:
+	void clear_bhb_loop_nofence()
+	{
+		__clear_bhb_loop(inner, outer);
+	}
 
-> -DECLARE_PER_CPU(bool, x86_ibpb_exit_to_user);
-> +DECLARE_PER_CPU(bool, x86_predictor_flush_exit_to_user);
+We don't need a short and a long *version*. We just have one function
+(or pair of functions) that gets called that works everywhere.
 
-could be alone by itself.
+Actually, if you just used global variables and called the assembly one:
 
-So could the additional command-line override and its documentation.
-(whatever it gets named).
+	extern void clear_bhb_loop_nofence();
 
-...
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 4091a776e37aaed67ca93b0a0cd23cc25dbc33d4..3d547c3eab4e3290de3eee8e89f21587fee34931 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -499,6 +499,7 @@
->  #define X86_FEATURE_IBPB_EXIT_TO_USER	(21*32+14) /* Use IBPB on exit-to-userspace, see VMSCAPE bug */
->  #define X86_FEATURE_ABMC		(21*32+15) /* Assignable Bandwidth Monitoring Counters */
->  #define X86_FEATURE_MSR_IMM		(21*32+16) /* MSR immediate form instructions */
-> +#define X86_FEATURE_CLEAR_BHB_EXIT_TO_USER (21*32+17) /* Clear branch history on exit-to-userspace, see VMSCAPE bug */
+then the other implementation would just be:
 
-X86_FEATURE flags are cheap, but they're not infinite. Is this worth two
-of these? It actually makes the code actively worse. (See below).
+	void clear_bhb_loop()
+	{
+		__clear_bhb_loop(inner, outer);
+		lfence();
+	}
 
-> diff --git a/arch/x86/include/asm/entry-common.h b/arch/x86/include/asm/entry-common.h
-> index ce3eb6d5fdf9f2dba59b7bad24afbfafc8c36918..b629e85c33aa7387042cce60040b8a493e3e6d46 100644
-> --- a/arch/x86/include/asm/entry-common.h
-> +++ b/arch/x86/include/asm/entry-common.h
-> @@ -94,11 +94,13 @@ static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
->  	 */
->  	choose_random_kstack_offset(rdtsc());
->  
-> -	/* Avoid unnecessary reads of 'x86_ibpb_exit_to_user' */
-> -	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER) &&
-> -	    this_cpu_read(x86_ibpb_exit_to_user)) {
-> -		indirect_branch_prediction_barrier();
-> -		this_cpu_write(x86_ibpb_exit_to_user, false);
-> +	if (unlikely(this_cpu_read(x86_predictor_flush_exit_to_user))) {
-> +		if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
-> +			indirect_branch_prediction_barrier();
-> +		if (cpu_feature_enabled(X86_FEATURE_CLEAR_BHB_EXIT_TO_USER))
-> +			clear_bhb_long_loop();
-> +
-> +		this_cpu_write(x86_predictor_flush_exit_to_user, false);
->  	}
->  }
+Then we have *ONE* assembly function instead of four.
 
-One (mildly) nice thing about the old code was that it could avoid
-reading 'x86_predictor_flush_exit_to_user' in the unaffected case.
+Right? What am I missing?
 
-Also, how does the code generation end up looking here? Each
-cpu_feature_enabled() has an alternative, and
-indirect_branch_prediction_barrier() has another one. Are we generating
-alternatives that can't even possibly happen? For instance, could we
-ever have system with X86_FEATURE_IBPB_EXIT_TO_USER but *not*
-X86_FEATURE_IBPB?
-
-Let's say this was:
-
-        if (cpu_feature_enabled(X86_FEATURE_FOO_EXIT_TO_USER) &&
-            this_cpu_read(x86_ibpb_exit_to_user)) {
-		static_call(clear_branch_history);
-                this_cpu_write(x86_ibpb_exit_to_user, false);
-        }
-
-And the static_call() was assigned to either clear_bhb_long_loop() or
-write_ibpb(). I suspect the code generation would be nicer and it would
-eliminate one reason for having two X86_FEATUREs.
-
-
->  static enum vmscape_mitigations vmscape_mitigation __ro_after_init =
-> @@ -3221,6 +3222,8 @@ static int __init vmscape_parse_cmdline(char *str)
->  	} else if (!strcmp(str, "force")) {
->  		setup_force_cpu_bug(X86_BUG_VMSCAPE);
->  		vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
-> +	} else if (!strcmp(str, "on")) {
-> +		vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
->  	} else {
->  		pr_err("Ignoring unknown vmscape=%s option.\n", str);
->  	}
-
-Yeah, it's goofy that =on sets ..._AUTO.
-
-> @@ -3231,18 +3234,35 @@ early_param("vmscape", vmscape_parse_cmdline);
->  
->  static void __init vmscape_select_mitigation(void)
->  {
-> -	if (!boot_cpu_has_bug(X86_BUG_VMSCAPE) ||
-> -	    !boot_cpu_has(X86_FEATURE_IBPB)) {
-> +	if (!boot_cpu_has_bug(X86_BUG_VMSCAPE)) {
->  		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
->  		return;
->  	}
->  
-> -	if (vmscape_mitigation == VMSCAPE_MITIGATION_AUTO) {
-> -		if (should_mitigate_vuln(X86_BUG_VMSCAPE))
-> -			vmscape_mitigation = VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER;
-> -		else
-> -			vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
-> +	if (vmscape_mitigation == VMSCAPE_MITIGATION_AUTO &&
-> +	    !should_mitigate_vuln(X86_BUG_VMSCAPE))
-> +		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
-> +
-> +	if (vmscape_mitigation == VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER &&
-> +	    !boot_cpu_has(X86_FEATURE_IBPB)) {
-> +		pr_err("IBPB not supported, switching to AUTO select\n");
-> +		vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
->  	}
-> +
-> +	if (vmscape_mitigation != VMSCAPE_MITIGATION_AUTO)
-> +		return;
-> +
-> +	/*
-> +	 * CPUs with BHI_CTRL(ADL and newer) can avoid the IBPB and use BHB
-> +	 * clear sequence. These CPUs are only vulnerable to the BHI variant
-> +	 * of the VMSCAPE attack and does not require an IBPB flush.
-> +	 */
-> +	if (boot_cpu_has(X86_FEATURE_BHI_CTRL))
-> +		vmscape_mitigation = VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER;
-> +	else if (boot_cpu_has(X86_FEATURE_IBPB))
-> +		vmscape_mitigation = VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER;
-> +	else
-> +		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
->  }
-
-Yeah, there are a *lot* of logic changes there. Any simplifications by
-breaking this up would be appreciated.
-
->  static void __init vmscape_update_mitigation(void)
-> @@ -3261,6 +3281,8 @@ static void __init vmscape_apply_mitigation(void)
->  {
->  	if (vmscape_mitigation == VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER)
->  		setup_force_cpu_cap(X86_FEATURE_IBPB_EXIT_TO_USER);
-> +	else if (vmscape_mitigation == VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER)
-> +		setup_force_cpu_cap(X86_FEATURE_CLEAR_BHB_EXIT_TO_USER);
->  }
-
-Yeah, so in that scheme I was talking about a minute ago, this could be
-where you do a static_call_update() instead of setting individual
-feature bits.
-
+Does the LFENCE *need* to be before that last pop and RET?
 
