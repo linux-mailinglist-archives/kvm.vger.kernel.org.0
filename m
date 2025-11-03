@@ -1,59 +1,77 @@
-Return-Path: <kvm+bounces-61900-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61901-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF05C2D824
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 18:42:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C89FAC2D869
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 18:46:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 24E0C4E927A
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 17:42:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3032B3B0651
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 17:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D33B31B809;
-	Mon,  3 Nov 2025 17:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2708921CFFA;
+	Mon,  3 Nov 2025 17:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nbH8mJEK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AflPVl88"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1881831A815
-	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 17:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66B472618;
+	Mon,  3 Nov 2025 17:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762191737; cv=none; b=MtJ8127C1DMulCVN+9Mgg7N9h5U9F9g5AOEmvejMDGINkh7V94RXXqq5uw0mT8/YbB2YRTd4CU/EdNBNM/5jnOfby/p1y58y1sikh102Py5c0qH8ir9S3O9KlNLPBKmj+sFDFT0Y52Ozg7Cm55a+9//znMPF7akTXtpZGEDJY5Y=
+	t=1762191976; cv=none; b=LsS+Af2MvI29scFc7pI2buX6UQ9HSs56wbYFERmH44i1rk+0zm6jqKNTASYiFpKk4HWpZK0+uvvknt4i12IFVmuDeVr2tjpC4WeSS6bhJ4vRztoe7AQ63rf/3LNtrhxshQ88Xc0pIv8+Qua0GHmx/Jo5jLElT4/qI/qVQ8toDcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762191737; c=relaxed/simple;
-	bh=QzWllWVn5yrHh7nNt4n4mceQ4Uf0pLV9CpCEEkgUK34=;
+	s=arc-20240116; t=1762191976; c=relaxed/simple;
+	bh=+iaaWRw8B4NvnWOTSfgkouB60zccA7A8ZPnoe7ymArs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D3XE2quWPWtfMQoQy6ylVUCKZXiYMT2vqD72Iq9Iz4qRk8KrbBLcdauX1/sqesW41mFnn/CyuivfoOjwfKgIDRy8evv6zeQF4OQ1CxbBdQsv3WEcfsBxK0VuXEXCB5NCg5f19fPpbjZKR9kOOAHk20aAYvXkoYLtd60ck6mYvmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nbH8mJEK; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 3 Nov 2025 17:42:03 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762191731;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SKLIB64ZIhTtcFHmOvDpo0hsn2FVov07VUH7lbNowPk=;
-	b=nbH8mJEKymnkb7LL3mIw3UK8MkClv2JR9WMpvOsglHlfIdEimqc30tqT62BLhaOKfvxFVS
-	20/wcReHO/Yr+kB52IdrPJ5cX7pZojJL24zBPGaEfvzlEP1Cg5pQJ8xo0G7OuNIqDaF9LK
-	MrDhELPGDttPwNigu6xlmIGuwDdXRzQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Jim Mattson <jmattson@google.com>
-Cc: Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Matteo Rizzo <matteorizzo@google.com>, evn@google.com
-Subject: Re: [PATCH] KVM: x86: SVM: Mark VMCB_LBR dirty when L1 sets
- DebugCtl[LBR]
-Message-ID: <tavsqj24pscngpu5pxfuvpsylcn72anoc7q5i5goip5lb5fqpt@xh2srbojpvfs>
-References: <20251101000241.3764458-1-jmattson@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=l1Ji96YAz2lvf8ip0crslTL7q1mUGd6eP2Z6WQsfNYUe5xfG6ZAy7WYYjHO17yFBkOPj7sN2jSxePKrH+JecVfrFLo98ny0DVPsCKg1iKC63PpCiRpdiaF4ni5RcvTeo2haU90xgx1He8Y5o0ddIK0WM6vlK/zFXfkxnE0mGoio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AflPVl88; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762191974; x=1793727974;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+iaaWRw8B4NvnWOTSfgkouB60zccA7A8ZPnoe7ymArs=;
+  b=AflPVl88c6JjHYYfLX59Qd7YGL+jvJ3jKfQD38QgrCMAFHQMEpFJ5WeE
+   FKzBUhfUPR2QZZoKuh4MOsYKJ3oJefX/gMfS7n1JJ//CAxmQNMaDgQP7i
+   s4gBtOxTTWcJH2zXhkhi2RD5xZrQ2VaPcFiEyshCPuhjITIP10JE+te0O
+   Pu7QmBYRuTlHx1gvmYC4c1oIaWFswhh1U56B6L4rGNwZei/GpO2UFD0CK
+   2GFKnovjZ9ZRALCcW3lS50eL+HyiyYLiqNGYFWQ29yuh6kWtDR7OMIYDS
+   0GgTqt6jWANvrlNxXwaTbR79CLaXhbkMG3IkkuR7SFABUJmOC9//uoP/C
+   g==;
+X-CSE-ConnectionGUID: vqa74VqLRki2TsF1NmZtUQ==
+X-CSE-MsgGUID: l6YLO66hQEug39syBvE+yA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="86900573"
+X-IronPort-AV: E=Sophos;i="6.19,276,1754982000"; 
+   d="scan'208";a="86900573"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 09:46:14 -0800
+X-CSE-ConnectionGUID: 9+1oGi0QRhu7GEJpo3hShg==
+X-CSE-MsgGUID: IcB7kOkoTJClOOC1GbIaxw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,276,1754982000"; 
+   d="scan'208";a="191273506"
+Received: from mgerlach-mobl1.amr.corp.intel.com (HELO desk) ([10.124.220.244])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 09:46:14 -0800
+Date: Mon, 3 Nov 2025 09:46:08 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@alien8.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Brendan Jackman <jackmanb@google.com>
+Subject: Re: [PATCH v4 4/8] KVM: VMX: Handle MMIO Stale Data in VM-Enter
+ assembly via ALTERNATIVES_2
+Message-ID: <20251103174608.lfghes3daaxvejxj@desk>
+References: <20251031003040.3491385-1-seanjc@google.com>
+ <20251031003040.3491385-5-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,50 +80,44 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251101000241.3764458-1-jmattson@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20251031003040.3491385-5-seanjc@google.com>
 
-On Fri, Oct 31, 2025 at 05:02:29PM -0700, Jim Mattson wrote:
-> With the VMCB's LBR_VIRTUALIZATION_ENABLE bit set, the CPU will load
-> the DebugCtl MSR from the VMCB's DBGCTL field at VMRUN. To ensure that
-> it does not load a stale cached value, clear the VMCB's LBR clean bit
-> when L1 is running and bit 0 (LBR) of the DBGCTL field is changed from
-> 0 to 1. (Note that this is already handled correctly when L2 is
-> running.)
+On Thu, Oct 30, 2025 at 05:30:36PM -0700, Sean Christopherson wrote:
+> Rework the handling of the MMIO Stale Data mitigation to clear CPU buffers
+> immediately prior to VM-Enter, i.e. in the same location that KVM emits a
+> VERW for unconditional (at runtime) clearing.  Co-locating the code and
+> using a single ALTERNATIVES_2 makes it more obvious how VMX mitigates the
+> various vulnerabilities.
 > 
-> There is no need to clear the clean bit in the other direction,
-> because when the VMCB's DBGCTL.LBR is 0, the VMCB's
-> LBR_VIRTUALIZATION_ENABLE bit will be clear, and the CPU will not
-> consult the VMCB's DBGCTL field at VMRUN.
-
-Is it worth the mental load of figuring out why we do it in
-svm_enable_lbrv() but not svm_disable_lbrv()?
-
-Maybe we can at least document it in svm_disable_lbrv() with a comment?
-
+> Deliberately order the alternatives as:
 > 
-> Fixes: 1d5a1b5860ed ("KVM: x86: nSVM: correctly virtualize LBR msrs when L2 is running")
-> Reported-by: Matteo Rizzo <matteorizzo@google.com>
-> Reported-by: evn@google.com
-> Signed-off-by: Jim Mattson <jmattson@google.com>
+>  0. Do nothing
+>  1. Clear if vCPU can access MMIO
+>  2. Clear always
+> 
+> since the last alternative wins in ALTERNATIVES_2(), i.e. so that KVM will
+> honor the strictest mitigation (always clear CPU buffers) if multiple
+> mitigations are selected.  E.g. even if the kernel chooses to mitigate
+> MMIO Stale Data via X86_FEATURE_CLEAR_CPU_BUF_MMIO, some other mitigation
+> may enable X86_FEATURE_CLEAR_CPU_BUF_VM, and that other thing needs to win.
+> 
+> Note, decoupling the MMIO mitigation from the L1TF mitigation also fixes
+> a mostly-benign flaw where KVM wouldn't do any clearing/flushing if the
+> L1TF mitigation is configured to conditionally flush the L1D, and the MMIO
+> mitigation but not any other "clear CPU buffers" mitigation is enabled.
+> For that specific scenario, KVM would skip clearing CPU buffers for the
+> MMIO mitigation even though the kernel requested a clear on every VM-Enter.
+> 
+> Note #2, the flaw goes back to the introduction of the MDS mitigation.  The
+> MDS mitigation was inadvertently fixed by commit 43fb862de8f6 ("KVM/VMX:
+> Move VERW closer to VMentry for MDS mitigation"), but previous kernels
+> that flush CPU buffers in vmx_vcpu_enter_exit() are affected (though it's
+> unlikely the flaw is meaningfully exploitable even older kernels).
+> 
+> Fixes: 650b68a0622f ("x86/kvm/vmx: Add MDS protection when L1D Flush is not active")
+> Suggested-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/svm/svm.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 153c12dbf3eb..b4e5a0684f57 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -816,6 +816,8 @@ void svm_enable_lbrv(struct kvm_vcpu *vcpu)
->  	/* Move the LBR msrs to the vmcb02 so that the guest can see them. */
->  	if (is_guest_mode(vcpu))
->  		svm_copy_lbrs(svm->vmcb, svm->vmcb01.ptr);
-> +	else
-> +		vmcb_mark_dirty(svm->vmcb, VMCB_LBR);
->  }
->  
->  static void svm_disable_lbrv(struct kvm_vcpu *vcpu)
-> -- 
-> 2.51.2.1006.ga50a493c49-goog
-> 
+
+Reviewed-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 
