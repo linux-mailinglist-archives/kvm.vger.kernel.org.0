@@ -1,146 +1,121 @@
-Return-Path: <kvm+bounces-61812-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61813-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B1FFC2B16D
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 11:35:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F237C2B22A
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 11:49:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 07634349013
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 10:35:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 927EC4EF58F
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 10:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B655A2FF160;
-	Mon,  3 Nov 2025 10:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E2F2FFF8B;
+	Mon,  3 Nov 2025 10:49:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bAh+hzmA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CQctnQvS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A785C2E228D
-	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 10:35:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65192F28FC
+	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 10:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762166142; cv=none; b=IUvLIk32eX9BxZHg0bw2rkJnFLmFycCle3CcBFid0k4xqGM+OUM02vbYeMIxWyaDBu9xwMY5Y8evMxNiL35f+T9Ebyz/0mWULJwkk/tXqqU/CctrrIjoCMIXc81V91RjvzXM9+VPqQcoP7kAdItaHYxW+GUfgVScTnkgSNIkWuU=
+	t=1762166964; cv=none; b=i762G5n/XxZKyCW2HNxX1d8AXOjE8TCo+BqZDQOLsZf34POamIsneRtcZgCqAEOpGLAga/x+bjphHwnPKAfbk77hh6WzF6m/vk9ldNZ1CaYTDmOcTuY7qM4413xojPN9wS53GjwyWiln5bO6jPNiUyaQM9pAFa51/JkZ2ed7VkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762166142; c=relaxed/simple;
-	bh=8+P2mAiDVHSJp2el3mv9Dg4i98lSGdENhVxS8H1dViM=;
+	s=arc-20240116; t=1762166964; c=relaxed/simple;
+	bh=3W6Xuuc2I1xsIYPE53X0l6DDrvgNWRJfyqWNvoG+sYk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F+0MPMIImx/qFNdAKzFhLQwXrWBj9VTSU+4WbCG78+HRvdZmwSk+KyyTjiZw65sWAsMpUfABhAC70GLPxH1WOlbotBzwmSf82CTbmQbMjYEOeV6E2PkhYKTbvp5Qi80npxdz+S6Te9onZbB3SQ9HTwh8ryEOVpjrFIaAiLL5P2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bAh+hzmA; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=ILnUbGU6+IrfO5UEMgre5fhO0xRkubeAdy/oTPrNscnEcJbfMTp8uR2URPugc8PjTK9Ie9RBmVONS+AeeAHYT6F70U2hC+uHVLXJoWiNWeuCI/gH4TiALvUK0DGXBrdNwa+NsOWCooVuCzWT7zrVqQ2lXhuh+RN2b9np8DgrhUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CQctnQvS; arc=none smtp.client-ip=209.85.218.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-475de1afec6so14048315e9.1
-        for <kvm@vger.kernel.org>; Mon, 03 Nov 2025 02:35:40 -0800 (PST)
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b70caafad59so64015166b.0
+        for <kvm@vger.kernel.org>; Mon, 03 Nov 2025 02:49:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762166139; x=1762770939; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762166961; x=1762771761; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HIh+p2hn8CWwp1yzNpGitqYXRaRZUOuOWC3H0V0dQOo=;
-        b=bAh+hzmAkGwoEFOBG+v9yKOCVi3zavh23jHO+A0Bi5r/D7LMYkktgkY2Y2RyBLUgA0
-         xSGwERHygk1BrxIVKdOeDyF09DXGFkGXdgy+W2/hhV8vpJ+OpOzD6FgY6AQx/3lWYn12
-         utCNcPpSFHFdbgfBPUbIBF/QetYRgHSSnq9sO/i8cyMIbFCaAtzB+oxx/Oy2PhNQrV1N
-         DqRcNqisvLNoaNY2R10KbFb1tIauYOly1ThbyrmS9h13jYbcufakyKK2xoa+D84X1dHb
-         cpPHiCP+l7K6+t1vuz/gY20iCjSB0T/BJGC1M+3nROAW8WbSKCwuXs4Qg323yAKF/kYv
-         jsUQ==
+        bh=D5xgBKghQgoZ8jHr9LooPHr1KU7mYZjYus8oMFAhjcE=;
+        b=CQctnQvSqz5l4szjHnf9m0Eg3Oa5eW/UvOKl1FrQYT6Gh6P+GVwQ1KSdLjsF753ZPq
+         RSJtwsCmUJ9yuYBJjtFoAHF60CH1Hx+ETZkDFHEglgBUyDNIKH+lNxKbDw6RICXE25Sx
+         k15EamVKtVDXSDNPFvkJXX7sjdpRBPg35SjdYAGNDJ1Nio4TRpjVl6YYRjn2Ee1GJcpD
+         19jNNTy+MrXPfSURyIUg8k93vwtYAbayUpE+l713oXaEjVkDX0pJipDpxAvwk1HrCl4h
+         LIIgGR3/6rHr7nls2Cd+dmJnX2Jo+rZIfxTBPLcJSY2z1hdHZZzwSm+469+/eUwmqloI
+         JgxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762166139; x=1762770939;
+        d=1e100.net; s=20230601; t=1762166961; x=1762771761;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HIh+p2hn8CWwp1yzNpGitqYXRaRZUOuOWC3H0V0dQOo=;
-        b=SwIhFW8dzmYTbMjWWcRudOxtQE4aeQ3zMGUAxtePtrJcTQBXNqNu19kN/F9L1P6whr
-         Jf1zJPokxGs2mAidNZrx7/+CXdblWOsqNMKEyuotMXJLCDsmVexYmeKAaI9LL4rx92XE
-         t/wDZyAM6d+WuYS0zntVduUhlFVUhvBi9RsIWs0T1zc1qfcAX5mzLPmuJ808tpoLGwg3
-         6MYo4uzBgvMxuTMoE6L1GFeZVa8lq6Tw4rKV8X3hhyrutRoJKWbWIww6hWzuoLakEuL2
-         FDXvVs9S7DURGM+ZlbtBlEKcKV1bdbD0ApOOdX0KRWrG7AhM/e0lYd4Q3I3WIySHTBcn
-         t35Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVrni50PhSoHqHQZ5q7PEueF4NWSk4Nb64xiW6NxLsO67WeM7Q5UrDafeScJ8ULNSnR77k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlOvwhVnmRLwZht3kZnN9NWRs2KbUavkn7gTS6w3X04mS/b0BL
-	6qeCi4wqvRnDezZJVZfwk4paTwLDMp6pFo94ZceYf0MeW1en5SDZm60D07P13b0eb5ap2RF4BKi
-	rjU3Qqinb+eyy4A==
-X-Google-Smtp-Source: AGHT+IGsdQiHDuxdy1N3E7iEx3V3SXYmD4K71IvzTwmgh+q16FRulMDnGB/75cnoaLGyb09UfRoHjiberggitA==
-X-Received: from wmco10.prod.google.com ([2002:a05:600c:a30a:b0:477:cf9:f4a3])
+        bh=D5xgBKghQgoZ8jHr9LooPHr1KU7mYZjYus8oMFAhjcE=;
+        b=oV5ktoyouUEfeRUPa3c4HpbPBTSHE/hI/SWfgxH47yV6vUmwQJA8Jax05hg5OEQD6d
+         buq55XO9ZmalI+i7ydG95tXHDxhaYPA8tlitoNVXkyifmAes3zu9/erJvGbnEPuSBhUw
+         7CvB7Fzq4HGkEtLrPX1rpaeGLhQ1FWRmnQ72GeNG4P1B3DJdPdRKUiqAbuxVuv0Da24S
+         eEFb03HVhQZH4AkoEV0cUDIyXwCcaXrNUY5WsJZElYcA2ScybBliMMyCNfSW8QkXP1D0
+         y9RHiXDoeZIklRoXl4uMEUs9U3ZImCaWteO1c1htJhY02ZhNmzvN2tmJqDznxWzR4+FP
+         8zIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUcdyerD/pWqLrrZ1ugh8KZreRj0ynUf35WPMsjeHeA67OFjfEOxufuJcSgkc+P3pl+9Yo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx40iS1B9mj/RneGs58dRc4mAgJhnQE0HZ9Iv9T5SOyYC+4l3s0
+	ouct7hoiwOR+qbSd3V5TVdU/x6Z5j0Rk18fOpvtTJzM7k8uIjhZvkvmYBOGEFBwE1D7xKjhMiaj
+	6TxhacDX2gWSluQ==
+X-Google-Smtp-Source: AGHT+IH7VLvpWRkyGeIFJn46JBW7w21D13s7SFtrkQAw9lj7o8FPwTrJxc6kXqC3MUiKZWsGcCG1jYhBht0kPw==
+X-Received: from ejcux13.prod.google.com ([2002:a17:907:cf8d:b0:b6d:74f9:3451])
  (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:699a:b0:477:19af:31c2 with SMTP id 5b1f17b1804b1-477300d96c2mr124516735e9.9.1762166139059;
- Mon, 03 Nov 2025 02:35:39 -0800 (PST)
-Date: Mon, 03 Nov 2025 10:35:38 +0000
-In-Reply-To: <aQXVNuBwEIRBtOc0@kernel.org>
+ 2002:a17:907:2685:b0:b6d:7f28:4319 with SMTP id a640c23a62f3a-b70700b98c7mr1505627066b.3.1762166961470;
+ Mon, 03 Nov 2025 02:49:21 -0800 (PST)
+Date: Mon, 03 Nov 2025 10:49:20 +0000
+In-Reply-To: <aQUuYqowQtbRCYyC@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
- <20250924152214.7292-1-roypat@amazon.co.uk> <20250924152214.7292-2-roypat@amazon.co.uk>
- <DDWOP8GKHESP.2EOY2HGM9RXHU@google.com> <aQXVNuBwEIRBtOc0@kernel.org>
+References: <20251031003040.3491385-1-seanjc@google.com> <20251031003040.3491385-4-seanjc@google.com>
+ <DDWHCMBU8GVB.1CXGUGVWSF8RD@google.com> <aQUuYqowQtbRCYyC@google.com>
 X-Mailer: aerc 0.21.0
-Message-ID: <DDYZRG8A99D1.2MYZVGBKJNHJW@google.com>
-Subject: Re: [PATCH v7 05/12] KVM: guest_memfd: Add flag to remove from direct map
+Message-ID: <DDZ01Y0TC9J2.26YWWKHOKKGSG@google.com>
+Subject: Re: [PATCH v4 3/8] x86/bugs: Use an X86_FEATURE_xxx flag for the MMIO
+ Stale Data mitigation
 From: Brendan Jackman <jackmanb@google.com>
-To: Mike Rapoport <rppt@kernel.org>, Brendan Jackman <jackmanb@google.com>
-Cc: "Roy, Patrick" <roypat@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "joey.gouly@arm.com" <joey.gouly@arm.com>, 
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>, 
-	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@redhat.com" <david@redhat.com>, 
-	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>, 
-	"jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
-	"martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
-	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
-	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>, 
-	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
-	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>, "tabba@google.com" <tabba@google.com>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>, Brendan Jackman <jackmanb@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-On Sat Nov 1, 2025 at 9:39 AM UTC, Mike Rapoport wrote:
-> On Fri, Oct 31, 2025 at 05:30:12PM +0000, Brendan Jackman wrote:
->> On Wed Sep 24, 2025 at 3:22 PM UTC, Patrick Roy wrote:
->> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
->> > index 1d0585616aa3..73a15cade54a 100644
->> > --- a/include/linux/kvm_host.h
->> > +++ b/include/linux/kvm_host.h
->> > @@ -731,6 +731,12 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
->> >  bool kvm_arch_supports_gmem_mmap(struct kvm *kvm);
->> >  #endif
+On Fri Oct 31, 2025 at 9:47 PM UTC, Sean Christopherson wrote:
+> On Fri, Oct 31, 2025, Brendan Jackman wrote:
+>> On Fri Oct 31, 2025 at 12:30 AM UTC, Sean Christopherson wrote:
+>> > diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+>> > index 723666a1357e..9acf6343b0ac 100644
+>> > --- a/arch/x86/kernel/cpu/bugs.c
+>> > +++ b/arch/x86/kernel/cpu/bugs.c
+>> > @@ -192,14 +192,6 @@ EXPORT_SYMBOL_GPL(cpu_buf_idle_clear);
+>> >   */
+>> >  DEFINE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
 >> >  
->> > +#ifdef CONFIG_KVM_GUEST_MEMFD
->> > +#ifndef kvm_arch_gmem_supports_no_direct_map
->> > +#define kvm_arch_gmem_supports_no_direct_map can_set_direct_map
->> > +#endif
->> > +#endif /* CONFIG_KVM_GUEST_MEMFD */
+>> > -/*
+>> > - * Controls CPU Fill buffer clear before VMenter. This is a subset of
+>> > - * X86_FEATURE_CLEAR_CPU_BUF_VM, and should only be enabled when KVM-only
+>> > - * mitigation is required.
+>> > - */
 >> 
->> The test robot seems happy so I think I'm probably mistaken here, but
->> AFAICS can_set_direct_map only exists when ARCH_HAS_SET_DIRECT_MAP,
->> which powerpc doesn't set.
+>> This comment wasn't super clear IMO but now that we're losing it, maybe
+>> we can replace it with a WARN_ON() at the end of
+>> cpu_apply_mitigations() or something (maybe it belongs in VMX code)? To
+>> make it more obvious that X86_FEATURE_CLEAR_CPU_BUF_VM and
+>> X86_FEATURE_CLEAR_CPU_BUF_MMIO are mutually exclusive.
 >
-> We have stubs returning 0 for architectures that don't have
-> ARCH_HAS_SET_DIRECT_MAP.
+> No objection from me if we want strong guarantees that CLEAR_CPU_BUF_VM and
+> CLEAR_CPU_BUF_MMIO are mutually exclusive.  Though I do think the KVM side of
+> things (and the kernel in general) should be paranoid and not lean _too_ hard
+> on such assumptions.
 
-I can't see any such stub for can_set_direct_map() specifically?
-
-(But again, the bot seems happy, so I still suspect I'm wrong somehow or
-other).
+Ah, after finishing the review I realised these are _not_ actually
+mutually exclusive in terms of the implementation. So asserting here
+that they are mutually exclusive would just be confusing, rather than
+helfpul, IMO.
 
