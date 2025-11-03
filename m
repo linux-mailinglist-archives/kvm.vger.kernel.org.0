@@ -1,228 +1,245 @@
-Return-Path: <kvm+bounces-61841-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61842-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 907DCC2C629
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 15:21:49 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA540C2C686
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 15:28:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A6AA74E6343
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 14:21:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 334C54E3E1D
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 14:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D80B30E827;
-	Mon,  3 Nov 2025 14:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2818F3128D6;
+	Mon,  3 Nov 2025 14:28:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LPOQwzcC"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IRK/glo2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011002.outbound.protection.outlook.com [40.93.194.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00CD226D02
-	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 14:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762179662; cv=none; b=UPb1MGZnSgZRXyof25ritZE83Sd9ziufP50run17RS7/g3PWKIw+HQVgdOuddF2EBL3PEtATdiltOfkITAC7Wffx6PWVgcAVzyHy88EQAZhNJoa1cBv7RzNoO35yqv/WTRkJdV3rz2scwjkO6rJf8Kl869v9S2vGHB/cp9nOe5I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762179662; c=relaxed/simple;
-	bh=1YE4N+9ygu7tvW7gCAtObLJcxrBRRt5nxWG3Dk/wnq8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iceTp6x4K1yURCwVDVD1Fq/Pe6eEZS+5be/matwSloWbRKO5OCD4CsP6NPLmi60uXeZPUgacNNFuwjY692G6ghfwpN1bsjhGXaeLgnEM/bfwHiUou1sz95w9qo3CKrk5lwz7FwGx8+xpKvsP/hlnwnuQTOqtsU/AIUJqHR2XSQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LPOQwzcC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762179659;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F7uJpM+IX3iswe8DPfd0iPbF2mfDVsJfMczQqxcPMxc=;
-	b=LPOQwzcCSGA2lni0vFB94whGyVcPvGjEs/bqRRqukl60onV+lhGaLCFcuCBufFl0eqlUFX
-	w2rrm3BTjhGM/YBGohtoKP0dxwnmHjheljGhcRsp2HyTFyst+1y2oS8VJhtwGwfQQDyuqO
-	QWrEHd3/mC36zpjwcI1lhjwCok2fghE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-yWGI-S4rPqSLR3ozXiBY0A-1; Mon, 03 Nov 2025 09:20:57 -0500
-X-MC-Unique: yWGI-S4rPqSLR3ozXiBY0A-1
-X-Mimecast-MFC-AGG-ID: yWGI-S4rPqSLR3ozXiBY0A_1762179656
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-429c76c8a1bso1205434f8f.0
-        for <kvm@vger.kernel.org>; Mon, 03 Nov 2025 06:20:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762179655; x=1762784455;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=F7uJpM+IX3iswe8DPfd0iPbF2mfDVsJfMczQqxcPMxc=;
-        b=GdluT2lvj0Vrh3Q+sO/N8ofAXLDLzJ6+vEbA+OenZT4qv4quyFE8MlDDPFwQtGiDJN
-         expS9or4y5DeqvfJH13PBp1ydqrKdRSwdhI+FElEScL5JEwix5GIt8gW8jjxHKb2JvlO
-         FGYLMXYhqy0XopxL+vdqNkJsDuCUQC0Lt2JFoFZgOEDkuf0BfCMhMZjpNKD1kp1wcjcr
-         pjsX4DoixHY+lt/GO2/lt61lTgZ2XcyT+CxyfxSdR4gveyKGeS2D9YO3Lk1dcBUEG34Z
-         K3TQuuUf/ouA6M+YnrissWpkIuuFNfz4eLxzuVU1FX798Vxtg5x6GgvKbCwhngtEfq+B
-         Lsaw==
-X-Forwarded-Encrypted: i=1; AJvYcCX+ghdspAAr0FtzEtg+xxps8xVlDhauQTCs8T6JPh95FvrZ6v23JXMf5x/pQJ1jBNCnDbA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdfnfYVhAcE3Y5XxABOUfVek6lLA5dQ6l1snVjn6awuQEEbnkW
-	PVDCl/S+uidpNHoShiqJTjj/XO44OKQnmm5JOuSbvCJfrQ1jfu6A1ZtKgbzvamkqTJlt9X55lqo
-	wTbmfazxHqHzsaxdxPnwwK/2JMtySy/MxZLId9XoaqW4Efb9NmYxFKg==
-X-Gm-Gg: ASbGnctVkwp4G6+ag8AgtwB/S6Ab5wnxlSVzUfKRTl2m2UlnXGowD4WJhmb5mFZgYkI
-	cfJKf55MIxpaXtH5NMHB3F5HBcNyxhJQgO5Wh5oTrR1NgDJuGswJOu8VdmBQr/d11O/rrqGvy2z
-	TQ6oXnoEj8yYepPatQQKt1d7TwX2IbhrkJzOJKUn4pLstG5vPqtuuA1MjhrI3/AcQLgdH28knjS
-	93vS2gN6ny5xzbTyVsxWK1jJ099ZmpIenzYVU/EHQE4FiztH+wop+NxSIROjaiOF+WQenRwio+8
-	YsejkWEAqyhNbxZ8EGPHU5mCYCwVDm9aSOIu3Rxk3J86RIlDCHWvajh49ZzhiojdnmtUMmNQWSc
-	z757ktur5aknFPgUznkx6qRyc6GhrMazLWRuEKL/Xwe01RQ==
-X-Received: by 2002:a05:6000:2c07:b0:429:d436:f142 with SMTP id ffacd0b85a97d-429d436f26fmr2390296f8f.57.1762179655445;
-        Mon, 03 Nov 2025 06:20:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEzkoLi+d77cMUSgKnEhwbdSo0rEoMdb6I48dSnxMn95tj2GQKmjbzhfBOjcWOs+RDqyIi7wg==
-X-Received: by 2002:a05:6000:2c07:b0:429:d436:f142 with SMTP id ffacd0b85a97d-429d436f26fmr2390227f8f.57.1762179654772;
-        Mon, 03 Nov 2025 06:20:54 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429c13e1d47sm20888368f8f.23.2025.11.03.06.20.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Nov 2025 06:20:54 -0800 (PST)
-Message-ID: <e3eb5b90-5f56-4669-8c89-1f405d23c5d6@redhat.com>
-Date: Mon, 3 Nov 2025 15:20:52 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C931FDE14;
+	Mon,  3 Nov 2025 14:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.2
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762180083; cv=fail; b=qZEUKd1BFmnXhCGGGzuDzUeLP3dfd5/K2KPfzo7putkr7H5zEorewBWVC7C7Kd5b6cXMM3wV2oVOEpzy0bS7tExWekfPLBxY7aIVMs+ZKxbaHWJQzXwoHE8OsZNcSqnwYRA/hYwo9FPEwKaQfCqToQUOr4ryG8q7JHNuc0winPM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762180083; c=relaxed/simple;
+	bh=rt7bdrL+v3SRV0rJMOYLzmswZCX2XUhcKQXBAOh58PE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=jpIryNyUJDwJTRJW0e8wFfK5eKdysf5uiTX5B7yDi3sqlZsTuCrLtoSGGOQp4Mbkk14hjuuWOL7kjIeZJ0Cj+wjSd8X6/dlX4dJY/zkmlmL44/DoPTzavfhy1bIQGiTkJlozXmxpDSmH0G5WStbaVlQBX9espQwmOFiDlNWe5N0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IRK/glo2; arc=fail smtp.client-ip=40.93.194.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pJZ8peV8tj+7euJeVLKV+ZMiwTIGQSHK5cMiUVWi8+q3eyz+21mv+ATtmBL505mum1XD1hxdDMkRiGSfBPV3E27JnMy/aIbmxTyOwxfH6t1ngCddVOdkXrN7T+OnZ9UZbDSwTNPAk4g8Ml+CZCzlyDvi9HYVWQe342vOXLarPnq6BBYpk8sfOXk05+YpvysFF0pXMmGtI8/F44c2n/mwD+z9fxULlsW8caig4F8XxQGSe1VJMIhi06DUIoFncTc1/S2qfGGR47hOqS3luBSyHaZwhzH2RZbnZBj1rGwbB47GFwbrcuP8YM721erQdQwmjOiAOa8O8y4zHXeA8+LPgg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GZD3mXLytW2gxhRwi7fDnTwKHnriSmWiHNjVgeRf4So=;
+ b=qdXrtKRi7M2+FGQxxGM75aNwYi8bBBAIwVWXzlDBMHV/v4YVkfuTYOUBWOpB5ltcNMJJBnCHc/lWg1ld1O2YY85ae8Yu6jdQEGoWq4OyK6Tn1dpfUr/d2DHyPGZfAS7z2QDvNi+c6fSqrBC0uwWN4+KnmdwcAfAM40UsJVjSNGv1knvPTyc+oEvCBtuhedKvwmsgHA8cE2e1wQLHCXtmWe8hAWqsUxPMQeF+di8C9B/il39atECT+YRYCzPRpN9SOJmgkk3ZSUVlzaopOhqkZEF6P7melewreAj5jAf41+sSSXZBh+0amhH5DY/Le542SzTtN9Mvs39iKKCWYUWBxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GZD3mXLytW2gxhRwi7fDnTwKHnriSmWiHNjVgeRf4So=;
+ b=IRK/glo29FyX1BByaY//5YUzoHU8L4lCYO57mwAY68+r4orA/YrT0FhKRAeqDbruiwchg0rBh855Avf/JDx+kN8Uu80qHNVW4Wsxeigj10qihH3q4dEfLvjze77el8CsopLaVJzw+hryM3kMCAReRA2Knk6gGJk8RxQ3XXmJfz+vo8ocjon1OpTx5S/LkipkuVdfc9M+byBfFENvBIoIUSQ5xzFcZCQvLcd2ZFsP7Q7nspmVP9Eg0ybOCkyX8035f0LsVSmE/MkczgJxYrZgCQvdzQg54DmwM1077Budx5JAQX/M2flslMK3Y4MQNStJt7jbnni3ID3/nHSHLeIjrw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
+ by SJ2PR12MB8160.namprd12.prod.outlook.com (2603:10b6:a03:4af::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.16; Mon, 3 Nov
+ 2025 14:27:58 +0000
+Received: from MN2PR12MB3613.namprd12.prod.outlook.com
+ ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
+ ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9275.015; Mon, 3 Nov 2025
+ 14:27:57 +0000
+Date: Mon, 3 Nov 2025 10:27:56 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+	David Airlie <airlied@gmail.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	dri-devel@lists.freedesktop.org, Eric Farman <farman@linux.ibm.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>, intel-gfx@lists.freedesktop.org,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+	Kirti Wankhede <kwankhede@nvidia.com>, linux-s390@vger.kernel.org,
+	Longfang Liu <liulongfang@huawei.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Nikhil Agarwal <nikhil.agarwal@amd.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Pranjal Shrivastava <praan@google.com>, qat-linux@intel.com,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	virtualization@lists.linux.dev,
+	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Zhenyu Wang <zhenyuw.linux@gmail.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>, patches@lists.linux.dev
+Subject: Re: [PATCH 09/22] vfio/platform: Provide a get_region_info op
+Message-ID: <20251103142756.GR1235738@nvidia.com>
+References: <9-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
+ <0815321f-00d5-402c-b84d-99bc862b4575@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0815321f-00d5-402c-b84d-99bc862b4575@redhat.com>
+X-ClientProxiedBy: BLAPR03CA0061.namprd03.prod.outlook.com
+ (2603:10b6:208:329::6) To MN2PR12MB3613.namprd12.prod.outlook.com
+ (2603:10b6:208:c1::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 20/22] vfio/platform: Convert to get_region_info_caps
-Content-Language: en-US
-To: Jason Gunthorpe <jgg@nvidia.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>, David Airlie
- <airlied@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
- Ankit Agrawal <ankita@nvidia.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Brett Creeley <brett.creeley@amd.com>, dri-devel@lists.freedesktop.org,
- Eric Farman <farman@linux.ibm.com>,
- Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- intel-gfx@lists.freedesktop.org, Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
- Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
- Kirti Wankhede <kwankhede@nvidia.com>, linux-s390@vger.kernel.org,
- Longfang Liu <liulongfang@huawei.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>,
- Nikhil Agarwal <nikhil.agarwal@amd.com>, Nipun Gupta <nipun.gupta@amd.com>,
- Peter Oberparleiter <oberpar@linux.ibm.com>,
- Halil Pasic <pasic@linux.ibm.com>, Pranjal Shrivastava <praan@google.com>,
- qat-linux@intel.com, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Simona Vetter <simona@ffwll.ch>, Shameer Kolothum <skolothumtho@nvidia.com>,
- Mostafa Saleh <smostafa@google.com>, Sven Schnelle <svens@linux.ibm.com>,
- Tvrtko Ursulin <tursulin@ursulin.net>, virtualization@lists.linux.dev,
- Vineeth Vijayan <vneethv@linux.ibm.com>, Yishai Hadas <yishaih@nvidia.com>,
- Zhenyu Wang <zhenyuw.linux@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>
-Cc: patches@lists.linux.dev
-References: <20-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|SJ2PR12MB8160:EE_
+X-MS-Office365-Filtering-Correlation-Id: 338a6ced-678a-4c1d-df7f-08de1ae52f05
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?WCdp6GiuUtxBruj0qOv89UAE5nK2KrvtfkpGPvuQu36+sq4FmIe2pZyAqQbe?=
+ =?us-ascii?Q?+tOoW8NZ3GVAsFiQqnEFUi+7Rc5Ni/QQIUZm7lDh0HWhhPnG56Yu+qn867PC?=
+ =?us-ascii?Q?qOVzc5Izze0YPBS/iZZv+2ZUaeOhC46Oij0xeE8RjLrEq3nYRKTwyMcjGUxc?=
+ =?us-ascii?Q?UtdetfVH1Iymlg/i06ldqoUNQ2rs8PCYvuOsOG4NtLVB/BuE3Es/CQrt0vUj?=
+ =?us-ascii?Q?Qba9quVS1PMM3nx+hshxD2OiScsqs+COhdx/7JUEIDKFApzRd8yfWMwQd93n?=
+ =?us-ascii?Q?Cj14H8s9MpMDJ7zMHInmqtx/yadtJuEhcslRD3NpaXNyMYn3SK4LSVoGxC82?=
+ =?us-ascii?Q?Fp2w47dS7KdBt/oqpNWIifo8RFPq4sHnwsCH0yD/Ev59Tiu0WDY+OlTAOSHm?=
+ =?us-ascii?Q?RUdnUsbb5Uq5pyjiAVX95ZZzFzjw/NxKNQ6dMscsp7UfC3dMLvdhZ1MrVCKO?=
+ =?us-ascii?Q?87pSX6BjMBbspODBxNvdIWy9PD0RVlex04aZPZKhjfgRoZv6oEDTLcEr149e?=
+ =?us-ascii?Q?LQWpB4hRFRkoWoEgoBihGEkYrGYOBuS8egE+pe7zMNnEOkQqAHhU3QW26i1L?=
+ =?us-ascii?Q?8VgJi+loGBxag5P8UHka7TUqztCaJwH9c9ryq8c0oCK/ayGe3cpdFsHMc+J0?=
+ =?us-ascii?Q?r7N7bslldH52I0tt7xV4so/xUrqpvsVALiqomqVNho1hyRQsYA2y+cH4RtEu?=
+ =?us-ascii?Q?aIB3WFxpG+GNjkZwZXtiaspNX73sKRhbFxbDCzMibz/3Q2esd/O1Zp3orQYb?=
+ =?us-ascii?Q?baPmJt6t1AtvzGUdCAuG0GtU0Rjl3K5W/CvxvpWBhg5helK1Bp6xEl3g1GIS?=
+ =?us-ascii?Q?3WEU8mBfqfXQHjurtDgOdBTXJF6P6n/EF2sH0+JpOiF3UBZ+ap1fvQCKIFX9?=
+ =?us-ascii?Q?iinYQdMZcQwERbU/0OTuIQ133sOoXGHOuUBJLEu77YDbrcz9Yd7PSFuKZeIW?=
+ =?us-ascii?Q?erEqNWCehGxZQWiG93WAxebexQ92frxMLIbXZxezX8LH/4rVyVDXEmQTaRVX?=
+ =?us-ascii?Q?ZX/dxvnaSX4afJmICIdHxZUkBwk1+cnXFxnNSyV3N8La2dlvVw7XSITsGOJC?=
+ =?us-ascii?Q?WtV6HI4K+gzwSE15AE7YaQkABCVYfZsukJP83+TTzIB+n0lIYpAIIRlrxaqr?=
+ =?us-ascii?Q?qF0vd6WWYgsDLE+7oBG9atPjwcX2JbOLQf0Zr1xTnb4Z4vmZXM7PDOxI5VEz?=
+ =?us-ascii?Q?7HpFGO30YeCLHzLUUzcrKxRaBDfZ2HaGhKrRA80DtuGHhw8ncwkFO7OxPWPS?=
+ =?us-ascii?Q?iIVkuGgwzsEYZpvqtLYLOet+iSMcU+4ugCEg4NyvFTeC0C+Qvxn5LyyJceRm?=
+ =?us-ascii?Q?aEMCHISGIilcfx+YkV9eiZnn7ItcWPWqa5LitS4jfuivSw5tmr5Gn1T10Hm0?=
+ =?us-ascii?Q?NbvdEM7xtAejWEZaBqtUC2An98HQaWONFWBSHfZ8VseWIDUSbJdOvbfyHH7h?=
+ =?us-ascii?Q?ThLCBxJ/060znEf3T8I98wrBZPjfCKi3?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?xulFN4rbuz+DtOFoh5M3joBWO8SzRaEM8eIC5bF5tEdVrkh4K1Cs0mHV2lGm?=
+ =?us-ascii?Q?5CJl8sECJVaT3oOm7A7lKUqiwqR+RTgqTzPU4SNeuE7IvsI1ItRzuORPExS2?=
+ =?us-ascii?Q?mbbqLN9ithl6/WDBSagjGHXHlF18tVQOUzcL1rlhbF1HikLporV2Ik5vy+Tt?=
+ =?us-ascii?Q?kzBPCWwwLonqdg7yyiSj4f/ViJRV1A2l7VH104gasPj+toeXvUyC/4nU4BI7?=
+ =?us-ascii?Q?vyfw6wV8VrVmBn12eip97fVau0lTiPwLRcMYPsDXj/KwuDa3aSXckdmx0XlN?=
+ =?us-ascii?Q?B2W1fBdDvE2/2s8vAN5Iwx1rDKmRfFQwpAqw0w8Wlaq5+ZiQmJ4so0TXPlCY?=
+ =?us-ascii?Q?dfKpqOa8d1yPNJjjqhuNFSKkFSmAIQNXx9K/GQqT7taYKnpuzqVpXnvva9E+?=
+ =?us-ascii?Q?vN7bS9+KPIHbDn7rlMgxA4P7fhuK9sDzNSyA7clY3XkmMJ+rxSIxEDESKc0L?=
+ =?us-ascii?Q?Kx0LQMCupZrYad6JX4oqrlr61c71TlZxQcnd/mpDOKo9ovwvWZHP56ugSUly?=
+ =?us-ascii?Q?GhSaaSrFFjtr07dlL/QUAWtYFJAD0K78bpbc5DsppujQeNKVujoiE1Ss6Dqm?=
+ =?us-ascii?Q?pmZ0DJZ3IovAiVWU1DyWxag7eUtWwerDkfr6byrgOq5RNz+xFG3I0fiWWGoV?=
+ =?us-ascii?Q?rCXXUJnO6f/6f2mgMJNeP08FWcfWrs5+RQEpGtm9IR5MsSOja90AaZ67cVd3?=
+ =?us-ascii?Q?M8xEqiVCV4+Rmnaoa/4ZREo5vLsO1LSRUh64uNAUF56Wn27OUQR4Rr0RzPxd?=
+ =?us-ascii?Q?ETK/jYMWgLAFStc2UPoKdeGuLpA4EHAF4pGgsEjlhdCxpjDWccpusYRRN0+l?=
+ =?us-ascii?Q?uj5vCu9d4uH0k88ZSKxtI3IvFqxtEoyyxj121uBPurW2B0P2/Znd8ydLH/ky?=
+ =?us-ascii?Q?UxR2mVS/NSP1qc7bBkyEDP5yXjjoc0umpjnjj+9zjV/6hGOUSJiWdeWdZRND?=
+ =?us-ascii?Q?E0j4b5CBy0vGTCXanyZlpDLt7hVrFqa+CQzEb9+1ZQutC1inQELYZeyP2tRO?=
+ =?us-ascii?Q?qpgfg/230taHZI0KaAnNdP/R+AdDLe5nTKnVgaopmFHO6OLEcGisro2vv8ha?=
+ =?us-ascii?Q?hYDVcrQvlFZpWCSCUWaIwQNFyR9H+oJ2dadoDC+HEbr7ZOPagbpvbxuNMtC7?=
+ =?us-ascii?Q?lPPGFlw773d7KEwnVFdCUnEz8JkiVBJ/r8XWNCbyTRM8HTNlmKDI9/MKVjrE?=
+ =?us-ascii?Q?gJO5UUERT97VO6Xuq7nbvsspARLdhdxwJlNw90jztujcYjXV1d6Tiv2QTbye?=
+ =?us-ascii?Q?tGCYe4Mv/The6GVqqjjOZ8fzIM9zmUuTrz7luOEgio6n0Ybn1bnNP6iL8ubh?=
+ =?us-ascii?Q?HeNlo4+Eh8BVlWTZYM4MCNS6KUDaEFti0e8IXHw2e/9qo7pLVj64MBCN4QtI?=
+ =?us-ascii?Q?jsnY+gLcQxSVOnFh9hH/3Nf4VK0AyrT2Lzzqeu5xgZcR64WG85N7BlrTLjG/?=
+ =?us-ascii?Q?XCp9H9y5vZ3UGU8n5fIuiO5ePk0WVT55+gVo1T21WwPt3e0QvvYZP4j7YmsJ?=
+ =?us-ascii?Q?kfiN2WPj6kB0B4MESa1hkF0hEVkM2nPgmoFiUM5hgf98gOa3+5V4fsydwbDP?=
+ =?us-ascii?Q?f43nzPswKoaKMznXwwU=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 338a6ced-678a-4c1d-df7f-08de1ae52f05
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2025 14:27:57.4255
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GzMW1OZEPI3Y4JPpL5j/HamJRzuebpcPkGodvnMsRiDG+Gp99clY9CFtDBZN1YiC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8160
 
-Hi Jason,
+On Mon, Nov 03, 2025 at 02:59:29PM +0100, Eric Auger wrote:
+> Hi Jason,
+> 
+> On 10/24/25 1:09 AM, Jason Gunthorpe wrote:
+> > Move it out of vfio_platform_ioctl() and re-indent it. Add it to all
+> > platform drivers.
+> >
+> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > ---
+> >  drivers/vfio/platform/vfio_amba.c             |  1 +
+> >  drivers/vfio/platform/vfio_platform.c         |  1 +
+> >  drivers/vfio/platform/vfio_platform_common.c  | 50 +++++++++++--------
+> >  drivers/vfio/platform/vfio_platform_private.h |  2 +
+> >  4 files changed, 32 insertions(+), 22 deletions(-)
+> >
+> > diff --git a/drivers/vfio/platform/vfio_amba.c b/drivers/vfio/platform/vfio_amba.c
+> > index 9f5c527baa8a36..d600deaf23b6d7 100644
+> > --- a/drivers/vfio/platform/vfio_amba.c
+> > +++ b/drivers/vfio/platform/vfio_amba.c
+> > @@ -115,6 +115,7 @@ static const struct vfio_device_ops vfio_amba_ops = {
+> >  	.open_device	= vfio_platform_open_device,
+> >  	.close_device	= vfio_platform_close_device,
+> >  	.ioctl		= vfio_platform_ioctl,
+> > +	.get_region_info = vfio_platform_ioctl_get_region_info,
 
-On 10/24/25 1:09 AM, Jason Gunthorpe wrote:
-> Remove the duplicate code and change info to a pointer. caps are not used.
->
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/vfio/platform/vfio_amba.c             |  2 +-
->  drivers/vfio/platform/vfio_platform.c         |  2 +-
->  drivers/vfio/platform/vfio_platform_common.c  | 24 ++++++-------------
->  drivers/vfio/platform/vfio_platform_private.h |  3 ++-
->  4 files changed, 11 insertions(+), 20 deletions(-)
->
-> diff --git a/drivers/vfio/platform/vfio_amba.c b/drivers/vfio/platform/vfio_amba.c
-> index d600deaf23b6d7..fa754f203b2dfc 100644
-> --- a/drivers/vfio/platform/vfio_amba.c
-> +++ b/drivers/vfio/platform/vfio_amba.c
-> @@ -115,7 +115,7 @@ static const struct vfio_device_ops vfio_amba_ops = {
->  	.open_device	= vfio_platform_open_device,
->  	.close_device	= vfio_platform_close_device,
->  	.ioctl		= vfio_platform_ioctl,
-> -	.get_region_info = vfio_platform_ioctl_get_region_info,
-> +	.get_region_info_caps = vfio_platform_ioctl_get_region_info,
-This would be nicer if called vfio_platform_get_region_info_caps I think
->  	.read		= vfio_platform_read,
->  	.write		= vfio_platform_write,
->  	.mmap		= vfio_platform_mmap,
-> diff --git a/drivers/vfio/platform/vfio_platform.c b/drivers/vfio/platform/vfio_platform.c
-> index 0e85c914b65105..a4d3ace3e02dda 100644
-> --- a/drivers/vfio/platform/vfio_platform.c
-> +++ b/drivers/vfio/platform/vfio_platform.c
-> @@ -101,7 +101,7 @@ static const struct vfio_device_ops vfio_platform_ops = {
->  	.open_device	= vfio_platform_open_device,
->  	.close_device	= vfio_platform_close_device,
->  	.ioctl		= vfio_platform_ioctl,
-> -	.get_region_info = vfio_platform_ioctl_get_region_info,
-> +	.get_region_info_caps = vfio_platform_ioctl_get_region_info,
->  	.read		= vfio_platform_read,
->  	.write		= vfio_platform_write,
->  	.mmap		= vfio_platform_mmap,
-> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-> index 3ebd50fb78fbb7..c2990b7e900fa5 100644
-> --- a/drivers/vfio/platform/vfio_platform_common.c
-> +++ b/drivers/vfio/platform/vfio_platform_common.c
-> @@ -273,30 +273,20 @@ int vfio_platform_open_device(struct vfio_device *core_vdev)
->  EXPORT_SYMBOL_GPL(vfio_platform_open_device);
->  
->  int vfio_platform_ioctl_get_region_info(struct vfio_device *core_vdev,
-> -					struct vfio_region_info __user *arg)
-> +					struct vfio_region_info *info,
-> +					struct vfio_info_cap *caps)
->  {
->  	struct vfio_platform_device *vdev =
->  		container_of(core_vdev, struct vfio_platform_device, vdev);
-> -	struct vfio_region_info info;
-> -	unsigned long minsz;
->  
-> -	minsz = offsetofend(struct vfio_region_info, offset);
-> -
-> -	if (copy_from_user(&info, arg, minsz))
-> -		return -EFAULT;
-> -
-> -	if (info.argsz < minsz)
-> -		return -EINVAL;
-> -
-> -	if (info.index >= vdev->num_regions)
-> +	if (info->index >= vdev->num_regions)
->  		return -EINVAL;
->  
->  	/* map offset to the physical address  */
-> -	info.offset = VFIO_PLATFORM_INDEX_TO_OFFSET(info.index);
-> -	info.size = vdev->regions[info.index].size;
-> -	info.flags = vdev->regions[info.index].flags;
-> -
-> -	return copy_to_user(arg, &info, minsz) ? -EFAULT : 0;
-> +	info->offset = VFIO_PLATFORM_INDEX_TO_OFFSET(info->index);
-> +	info->size = vdev->regions[info->index].size;
-> +	info->flags = vdev->regions[info->index].flags;
-> +	return 0;
->  }
->  EXPORT_SYMBOL_GPL(vfio_platform_ioctl_get_region_info);
->  
-> diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
-> index a6008320e77bae..05084212a76eb6 100644
-> --- a/drivers/vfio/platform/vfio_platform_private.h
-> +++ b/drivers/vfio/platform/vfio_platform_private.h
-> @@ -86,7 +86,8 @@ void vfio_platform_close_device(struct vfio_device *core_vdev);
->  long vfio_platform_ioctl(struct vfio_device *core_vdev,
->  			 unsigned int cmd, unsigned long arg);
->  int vfio_platform_ioctl_get_region_info(struct vfio_device *core_vdev,
-> -					struct vfio_region_info __user *arg);
-> +					struct vfio_region_info *info,
-> +					struct vfio_info_cap *caps);
->  ssize_t vfio_platform_read(struct vfio_device *core_vdev,
->  			   char __user *buf, size_t count,
->  			   loff_t *ppos);
-Thanks
+> Any rationale behind why using _ioctl naming in some drivers and not in
+> some others?
 
-Eric
+No, I was making changes sort of in line to the code that was already
+there.. The _ioctl_ came from PCI where I had labeled all the sub
+functions that broke out of the ioctl function with _ioctl_ to make it
+clear they were part of those system calls.
 
+I guess these can have _ioctl_ added in:
+
+drivers/gpu/drm/i915/gvt/kvmgt.c:       .get_region_info_caps = intel_vgpu_get_region_info,
+drivers/s390/cio/vfio_ccw_ops.c:        .get_region_info_caps = vfio_ccw_mdev_get_region_info,
+drivers/vfio/fsl-mc/vfio_fsl_mc.c:      .get_region_info_caps = vfio_fsl_mc_get_region_info,
+drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c: .get_region_info_caps = hisi_acc_vfio_get_region,
+samples/vfio-mdev/mbochs.c:     .get_region_info_caps = mbochs_get_region_info,
+
+drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c: .get_region_info_caps = vfio_pci_ioctl_get_region_info,
+drivers/vfio/pci/mlx5/main.c:   .get_region_info_caps = vfio_pci_ioctl_get_region_info,
+drivers/vfio/pci/nvgrace-gpu/main.c:    .get_region_info_caps = nvgrace_gpu_ioctl_get_region_info,
+drivers/vfio/pci/nvgrace-gpu/main.c:    .get_region_info_caps = vfio_pci_ioctl_get_region_info,
+drivers/vfio/pci/pds/vfio_dev.c:        .get_region_info_caps = vfio_pci_ioctl_get_region_info,
+drivers/vfio/cdx/main.c:        .get_region_info_caps = vfio_cdx_ioctl_get_region_info,
+drivers/vfio/pci/qat/main.c:    .get_region_info_caps = vfio_pci_ioctl_get_region_info,
+drivers/vfio/pci/vfio_pci.c:    .get_region_info_caps = vfio_pci_ioctl_get_region_info,
+drivers/vfio/pci/virtio/main.c: .get_region_info_caps = vfio_pci_ioctl_get_region_info,
+drivers/vfio/pci/virtio/main.c: .get_region_info_caps = virtiovf_pci_ioctl_get_region_info,
+drivers/vfio/pci/virtio/main.c: .get_region_info_caps = vfio_pci_ioctl_get_region_info,
+drivers/vfio/platform/vfio_amba.c:      .get_region_info_caps = vfio_platform_ioctl_get_region_info,
+drivers/vfio/platform/vfio_platform.c:  .get_region_info_caps = vfio_platform_ioctl_get_region_info,
+samples/vfio-mdev/mdpy.c:       .get_region_info_caps = mdpy_ioctl_get_region_info,
+samples/vfio-mdev/mtty.c:       .get_region_info_caps = mtty_ioctl_get_region_info,
+
+Thanks,
+Jason
 
