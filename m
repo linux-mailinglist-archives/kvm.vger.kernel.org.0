@@ -1,193 +1,146 @@
-Return-Path: <kvm+bounces-61893-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61894-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 592DFC2D50F
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 18:00:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B84DC2D56F
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 18:04:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 372D64EB041
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 17:00:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 24B8C4F159E
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 17:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00F631CA59;
-	Mon,  3 Nov 2025 16:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 504D8322C81;
+	Mon,  3 Nov 2025 17:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oeUPv9lO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Uh0coHKJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F91631C56A
-	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 16:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1633F31DDA0
+	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 17:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762189075; cv=none; b=BhpC3szrfgn6hAaMF5Psd0sbQB56hqZnyR8oVYESQP6e+e3NyOR5nTKmwVDFp4qiMe3KJzV4Fv7hU9ZsrTbIcv5aecucoQ2xIpCWoE46svB5bQBzuJGwc3lIwZdP1xK1Z9Xo5OI355BGixC914VDi+fY+gKmfDJ4LlgVkI0gmeo=
+	t=1762189252; cv=none; b=Gv+tggFkF1+RJYY7OVJz/vALa+IbaWpwHCfThlBe1KSLs0XjhTK6H7J99OehJAUflifZ7EDvvQlcBDSfWEMztFnPR87o+OsOx/SwTIHXiMIUR5xn1aY6ejtcLEXvfxnpQuueTCh/fuEE7iOUos0C7n82Z6QTlxSWC3fxOpvIV+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762189075; c=relaxed/simple;
-	bh=8QZMELXENbunUYpr28WqprFjzAksKDqeP0VLh+0+HBE=;
+	s=arc-20240116; t=1762189252; c=relaxed/simple;
+	bh=epEz5JO14EzdvaM0l5sjchiiiWhS1f9DBzocBK/FLHk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=B7KmLAKerYGPrR13gKjD4vwzHf9jOwqJ//zfij4TlPTvdSugZXCKzRa7XbBPGXAPGnzIxgE++i5+WvzblfXWUoolhcZFk9W2D48xtGeKmICACLuT53hKQ4tesl27C+j2BwAmv2WSHtkcvU3YmeQvTl0e/i2orjpJhLmbOaLYxPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oeUPv9lO; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=ULdOFJ8mLgDmvQ1ajkCiEsZv/pDbVImB4LeMwOnEE4J/4CwXgTpXxk1bJth1Qr8CrNobW2cl9jyvA9gko8UgLkR1HLNHm0Dpb7zAliAOSqv/XYKZ4YhxXb1/Ro/Orf60N2FaYEDOG7rYndWYIhRm3Hm/uhynZdrBACmuk6IRhK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Uh0coHKJ; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-341616a6fb7so448523a91.0
-        for <kvm@vger.kernel.org>; Mon, 03 Nov 2025 08:57:53 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b9a72a43e42so1279405a12.2
+        for <kvm@vger.kernel.org>; Mon, 03 Nov 2025 09:00:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762189073; x=1762793873; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KgHCRB+iOhQXBR2DJ3UKt+ri7IzX08+hr1DQhDLbsGo=;
-        b=oeUPv9lOtOFFcTCXXx73+qQHLeGQdoIKmtLtfdAco9WN6qOFn56grch2nwnNSVD9M9
-         tavasGV0VNjLhrJpBaC5yTq7YVD6tv46LLzSIlFbZl2YoyvRcZTG23WioFeGFE/yibOv
-         O2J0qhdeorK89aTivvkWtEzkCwGgoMYk9dPYnTfMeg7VxQTmOUx66DlfnYkWxTY1f3o3
-         I+iSgAhsEim66RmAE7uSXkrFD4pfQS897HnVNBWT9gxE78QnAatBE6EaJfvEWjBje9+d
-         z7WGLhbSKonl+JqWVODRjETfaZoyyNM5G8Nmz+ZKHW/ciLutNNNGOvEUVp7LKX7jbajW
-         /1fg==
+        d=google.com; s=20230601; t=1762189250; x=1762794050; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6IRIo7fpurV9GwKBfgD4OHFoa2+Cu2Rk9LbA8Fikj3I=;
+        b=Uh0coHKJorT4bPh9+27hakbFp4SE4YVDoB8nPNi2YjGoJmOHB0n4LNmFyUqRYotYCK
+         0ySBYU9xkfiiKaRYBq5mRXVDZ6rZJdOMXiWPIZYmizl+V0gZrc2kG6U2lkE7VLgEzzjx
+         pewFtKE15qEDrDPb9I4J22uAuJ903S8psqXznAHXhVvD+oa2u9RoJc2Pe3xzXiO7psbs
+         X9EhG/+4M1XLznvAfo5N84Oh6aadJg88FfWVIgkzC0FsUzJR0rP6rs0ya5+n7AVf8qzm
+         AK1VGBzWfdWao97K08AhDabmDL/cqCw5P/Onj3ePhPz95x21/lhsA2TRozMiJu1B5ThO
+         T2Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762189073; x=1762793873;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KgHCRB+iOhQXBR2DJ3UKt+ri7IzX08+hr1DQhDLbsGo=;
-        b=L1EqdU84jl9kKC06xugSq9UXxdx5e7a77ik1OjdGJDZPZd+926DFG0Ig3jNOiHcxRB
-         v0NpIZ9BFJKmCm1c3LztQ+uP7jPFNZTjhNX2CtGtTseFzfbM1cipOk8czg22nWz6AuGr
-         8Gu2zmVWeXKm+mL0xzKSw+USzJivG5BrpQ4o+JkTLzFMl+pMDghg1sf77k7DuqetovJe
-         ggeGzWYaZQ5DzEfIt6V/8PsHahzudgWEIo1QVnXor8hmWP+AqeyoJa4Qp0nzKZNBF8t0
-         0fHxmBrEILqYdZ186bBKDdUuB6d/Zwnzh1ZzA+wwMCTW/baIBsbIw1gJes2Dhm1WKRrP
-         KtNg==
-X-Forwarded-Encrypted: i=1; AJvYcCVadSMrLQSSl32T0KaM59c8nusYSubFClF9cEiYi69qiZWwlGlViEHkveu17u9xnf3SYEA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAb92sL+lc6yPnGXbpa73m0r9iEBRxwkRVjsuxCU0f0xt8i8kV
-	bhxbHBXkkE/kQVU0zSi9IX4R99/Y7bfERHW4EbeGUAYIVnD8uBnmWmTsm9aapCDruiEpF9xfdMh
-	ZWMSeAA==
-X-Google-Smtp-Source: AGHT+IFOpWte/V7QEZNwmFK3W3HK1rZFTmmKzEm/d2Hx1LQQlueXjMmVSeG9D67BxqXsCpRIlefh72yq0PE=
-X-Received: from pjpe14.prod.google.com ([2002:a17:90a:9a8e:b0:340:92f6:5531])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3e8e:b0:332:3515:3049
- with SMTP id 98e67ed59e1d1-34082fc930bmr15533204a91.4.1762189072869; Mon, 03
- Nov 2025 08:57:52 -0800 (PST)
-Date: Mon, 3 Nov 2025 08:57:51 -0800
-In-Reply-To: <80691865-7295-44C9-9967-5E5B744EB5D4@nutanix.com>
+        d=1e100.net; s=20230601; t=1762189250; x=1762794050;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6IRIo7fpurV9GwKBfgD4OHFoa2+Cu2Rk9LbA8Fikj3I=;
+        b=fxRMhDl84S4u+gD1kIXlTHJtwjzDC0WoPKBc8G5XiKh5aoX+B2XPy9HM9GPS63bZxu
+         sw/ogwm0DJMBsexbMpaCyc4DyF+pGEc3BfN8S3bc6GrBA+FIJFscSOAUR8ZsNyRh75ey
+         ksh/0NC4jEP5jdtIUMc+MbCH6Hunf5OAItbS7odGe6sGNNtz8BKIirWGKns8I3Has5XZ
+         yl4YSxXC0QQDnn1qXAJpZtA9h6JAjkMxZpAij5qAdBFiT/RG5Xn/RXkjxUe5hWmzhJ07
+         9Fqjsj8pj6h48RdRSlIRThgt01lB56ZueAZD6+bZtnW418Gc/ULneZBngI5WUbdHcPdG
+         76ig==
+X-Forwarded-Encrypted: i=1; AJvYcCV6tX5/lTjL28cTQgXYZVtf1h74skW+wE6UnWqWkyAuX7InYuYoGBhhETmS7eAFA0OTnsc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFWjz2OxSlUq0M6tQyf1JNyZHMFwTZEkt07uQC8SwUEMTDzDJr
+	mvE0g0udNwlqu2eAa83EzNr9leU3rC74pN7aUUbnX7M4J2uzy0F/Xooga4Hu5/JyLYn89Cc4UE/
+	IgdXYoQ==
+X-Google-Smtp-Source: AGHT+IF4lU1MjPjgJlhY3ic7+3CyBeck4ktMoovFtnCRGs7Fp/0cEW7DY9B8zdM7xq780PsQFsocJ4vjmC4=
+X-Received: from pjqt18.prod.google.com ([2002:a17:90a:ae12:b0:340:c0e9:24b6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:185:b0:290:9a31:26da
+ with SMTP id d9443c01a7336-2951a37a3d6mr188846515ad.16.1762189250233; Mon, 03
+ Nov 2025 09:00:50 -0800 (PST)
+Date: Mon, 3 Nov 2025 09:00:48 -0800
+In-Reply-To: <20251101041324.k2crtjvwqaxhkasr@desk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250918162529.640943-1-jon@nutanix.com> <aNHE0U3qxEOniXqO@google.com>
- <7F944F65-4473-440A-9A2C-235C88672E36@nutanix.com> <B116CE75-43FD-41C4-BB3A-9B0A52FFD06B@nutanix.com>
- <aPvf5Y7qjewSVCom@google.com> <EFA9296F-14F7-4D78-9B7C-1D258FF0A97A@nutanix.com>
- <aQTxoX4lB_XtZM-w@google.com> <80691865-7295-44C9-9967-5E5B744EB5D4@nutanix.com>
-Message-ID: <aQjd1q5jF5uSTfmu@google.com>
-Subject: Re: [PATCH] KVM: x86: skip userspace IOAPIC EOI exit when Directed
- EOI is enabled
+References: <20251031003040.3491385-1-seanjc@google.com> <20251031003040.3491385-3-seanjc@google.com>
+ <20251101041324.k2crtjvwqaxhkasr@desk>
+Message-ID: <aQjfwARMXlb1GGLJ@google.com>
+Subject: Re: [PATCH v4 2/8] x86/bugs: Decouple ALTERNATIVE usage from VERW
+ macro definition
 From: Sean Christopherson <seanjc@google.com>
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: Jon Kohler <jon@nutanix.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Brendan Jackman <jackmanb@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Nov 03, 2025, Khushit Shah wrote:
-> Hi Sean,=20
->=20
-> > On 31 Oct 2025, at 10:58=E2=80=AFPM, Sean Christopherson <seanjc@google=
-.com> wrote:
-> >=20
-> >> Hi Sean,
-> >>=20
-> >> Thanks for the reply.
-> >>=20
-> >>> On 25 Oct 2025, at 1:51=E2=80=AFAM, Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >>>=20
-> >>> Make it a quirk instead of a capability.  This is definitely a KVM bu=
-g, it's just
-> >>> unfortunately one that we can't fix without breaking userspace :-/
-> >>=20
-> >> I don=E2=80=99t think this approach fully addresses the issue.
-> >>=20
-> >> For example, consider the same Windows guest running with a userspace
-> >> I/O APIC that has no EOI registers. The guest will set the Suppress EO=
-I
-> >> Broadcast bit because KVM advertises support for it (see=20
-> >> kvm_apic_set_version).
-> >>=20
-> >> If the quirk is enabled, an interrupt storm will occur.
-> >> If the quirk is disabled, userspace will never receive the EOI
-> >> notification.
-> >=20
-> > Uh, why not?
-> >=20
-> >> For context, Windows with CG the interrupt in the following order:
-> >>  1. Interrupt for L2 arrives.
-> >>  2. L1 APIC EOIs the interrupt.
-> >>  3. L1 resumes L2 and injects the interrupt.
-> >>  4. L2 EOIs after servicing.
-> >>  5. L1 performs the I/O APIC EOI.
-> >=20
-> > And at #5, the MMIO access to the I/O APIC gets routed to userspace for=
- emulation.
->=20
-> Yes, but the userspace does not have I/O APIC EOI register and so it will=
- just be a
-> meaningless MMIO write, resulting in the the IRQ line being kept masked.
+On Fri, Oct 31, 2025, Pawan Gupta wrote:
+> On Thu, Oct 30, 2025 at 05:30:34PM -0700, Sean Christopherson wrote:
+> > Decouple the use of ALTERNATIVE from the encoding of VERW to clear CPU
+> > buffers so that KVM can use ALTERNATIVE_2 to handle "always clear buffers"
+> > and "clear if guest can access host MMIO" in a single statement.
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/include/asm/nospec-branch.h | 21 ++++++++++-----------
+> >  1 file changed, 10 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+> > index 08ed5a2e46a5..923ae21cbef1 100644
+> > --- a/arch/x86/include/asm/nospec-branch.h
+> > +++ b/arch/x86/include/asm/nospec-branch.h
+> > @@ -308,24 +308,23 @@
+> >   * CFLAGS.ZF.
+> >   * Note: Only the memory operand variant of VERW clears the CPU buffers.
+> >   */
+> > -.macro __CLEAR_CPU_BUFFERS feature
+> >  #ifdef CONFIG_X86_64
+> > -	ALTERNATIVE "", "verw x86_verw_sel(%rip)", \feature
+> > +#define CLEAR_CPU_BUFFERS_SEQ	verw x86_verw_sel(%rip)
+> >  #else
+> > -	/*
+> > -	 * In 32bit mode, the memory operand must be a %cs reference. The data
+> > -	 * segments may not be usable (vm86 mode), and the stack segment may not
+> > -	 * be flat (ESPFIX32).
+> > -	 */
+> > -	ALTERNATIVE "", "verw %cs:x86_verw_sel", \feature
+> > +/*
+> > + * In 32bit mode, the memory operand must be a %cs reference. The data segments
+> > + * may not be usable (vm86 mode), and the stack segment may not be flat (ESPFIX32).
+> > + */
+> > +#define CLEAR_CPU_BUFFERS_SEQ	verw %cs:x86_verw_sel
+> >  #endif
+> > -.endm
+> > +
+> > +#define __CLEAR_CPU_BUFFERS	__stringify(CLEAR_CPU_BUFFERS_SEQ)
+> >  
+> >  #define CLEAR_CPU_BUFFERS \
+> > -	__CLEAR_CPU_BUFFERS X86_FEATURE_CLEAR_CPU_BUF
+> > +	ALTERNATIVE "", __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF
+> >  
+> >  #define VM_CLEAR_CPU_BUFFERS \
+> > -	__CLEAR_CPU_BUFFERS X86_FEATURE_CLEAR_CPU_BUF_VM
+> > +	ALTERNATIVE "", __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF_VM
+> 
+> Sorry nitpicking, we have too many "CLEAR_CPU_BUF" in these macros, can we
+> avoid adding CLEAR_CPU_BUFFERS_SEQ?
 
-Why on earth would userspace disable the quirk without proper support?
+AFAICT, there's no sane way to avoid defining a macro for the raw instruction. :-/
 
-> > On 31 Oct 2025, at 10:58=E2=80=AFPM, Sean Christopherson <seanjc@google=
-.com> wrote:
-> >=20
-> > That's the whole point of the quirk; userspace should disable the quirk=
- if and
-> > only if it supports the I/O APIC EOI extension.
->=20
->=20
-> Sadly, so if the quirk is kept enabled (no I/O APIC EOI extension) and if=
- we do
-> not want a guest reboot, the original windows interrupt storm bug will pe=
-rsist?
+> Or better yet, can we name the actual instruction define to VERW_SEQ, 
 
-Well, yeah, if you don't fix the bug it'll keep causing problems.
-
-> Unless we also update the userspace to handle the EOI register write none=
-theless,
-> as damage has been done on the time of power on.
->=20
-> > On 31 Oct 2025, at 10:58=E2=80=AFPM, Sean Christopherson <seanjc@google=
-.com> wrote:
-> >=20
-> >> and updated userspace can opt in when it truly supports EOI broadcast
-> >> suppression.
-> >>=20
-> >> Am I missing something?
-> >=20
-> > I think so?  It's also possible I'm missing something :-)
->=20
-> I am just thinking that the original Windows bug is not solved for all th=
-e cases,
-> i.e A powered on Windows guest with userspace I/O APIC that does not have
-> EOI register.=20
-
-Userspace _must_ change one way or the other.  Either that or you livepatch=
- your
-kernel to carry an out-of-tree hack-a-fix to avoid updating userspace.=20
-
-> Also, in the patch instead of a knob to disable suppress EOI broadcast, I=
- think
-> we should have a knob to enable, this way at least for unmodified userspa=
-ce=20
-> the buggy situation is never reached.
-
-No.  Having a bug that prevents booting certain guests is bad.  Introducing=
- a
-change that potentially breaks existing setups is worse.  Yes, it's unfortu=
-nate
-that userspace needs to be updated to fully remedy the issue.  But unless y=
-ou're
-livepatching the kernel, userspace should be updated anyways on a full rebo=
-ot.
+Works for me.
 
