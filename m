@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-61869-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61871-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DB42C2D4CC
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 17:58:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A8E9C2D4DB
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 17:58:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FFDD1899B0D
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 16:57:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C55961889D39
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 16:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66463320390;
-	Mon,  3 Nov 2025 16:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E0132144A;
+	Mon,  3 Nov 2025 16:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9GVfA/X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X3dpGie9"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3615E31C59F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019BB31DD90;
 	Mon,  3 Nov 2025 16:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762188929; cv=none; b=INC9YaF8Pg5JQ5O29grkdn9jjnRF59nMBf+usGHq8IfarvBx8gSJ7msYzI0JIn8uDlH1CliTMX0/zb+E5RqpTqAbziESYMzTCW3lPkbWo38EazLgAz9b913Ml2vJ+w991k5X+zUlo79+Y36YWZ/AlSA5W8Y4ZL+HTR9kfXuaVQs=
+	t=1762188930; cv=none; b=fFb5V+fOfnMMvLjOk0Y0oYlYgNs89lcVO1V+SqA7o8tvcLhZJgMULueLBZ+Tk382HJqeGoO0HiFFjKRrZoDT/R8Rmn+yhbUonC+9FGln/31kkzqri04MCNJZ2gZyettAtfx/dx0Honsk4sTmChLBn++EsLiyOI7rx8h3qtxaU9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762188929; c=relaxed/simple;
-	bh=QMaC0gqBcRF3hw0Xjj6IXI4r1QPU/njBPXxtSLfQ9YE=;
+	s=arc-20240116; t=1762188930; c=relaxed/simple;
+	bh=8vW7hVXkdmFLbBP8mgsVQ0V5dZeUtkUr2bYWHI7FQb8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eOYuJswrmdbXoUehGqJFTlOOBxYq96kUTqqN80E4q8usA5q7HvCr2uKS1jfysOQYcAeOzBW9pQ7UUPSaTHU+NbXEeTAzvMtQKnraDRfmFymLQLZNTCB7jIFEBghGGQqkQFqgM6Po6mvtQAIc8dsPxs3jesfUVTE8WRm5Sxu0c7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9GVfA/X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1722BC4CEE7;
+	 MIME-Version; b=BGfrA62yq8tEbUgO7awsWYIN6md/GLnJiHnMyin/0lgiaoecgOBmPDrPrIYwTp/OyNcG4i4gxe1/y0ZdnZwaUi7GsksmRsGB/2Qyl5O0h6cc+lJh4zPgGLzkH+wKIZJHQ/XGrJB26pi+NkPm1Fc38+JPQlRsUCtJAc0YBRqUvHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X3dpGie9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D609C19422;
 	Mon,  3 Nov 2025 16:55:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1762188929;
-	bh=QMaC0gqBcRF3hw0Xjj6IXI4r1QPU/njBPXxtSLfQ9YE=;
+	bh=8vW7hVXkdmFLbBP8mgsVQ0V5dZeUtkUr2bYWHI7FQb8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q9GVfA/XE980ACjtwpBE1/betOQqaRRgRdFcXEk06XZzC/mX2t72dvq0m+fiVoFUr
-	 XJbWit+auL6euD7O4eHH//Bp4oVWavirUm/ymL8TUcDySmZ9YSrXiFRnFlXE4lu4dP
-	 leNPfDPMTmp8046HgzkHWGscWCdxousrFppWEEGgfCr+QyZB+F+Ivtg8yI0faRRx+p
-	 7ugEi/qm66FYV8xR80if/T+zGlDC7YsNW6I2vSnuR27vXI36aRrpAUfgd/dCFZ8TDV
-	 2KYohOeBzgUi9A2Vwy61HZs5Ejkia1KAXXhpnjM2E3hDQhy67ANTOZCvbC+Q0rgNa7
-	 dhCEdqqAwd1Ww==
+	b=X3dpGie9B+GO+Zf6XZ8EeRbhRirHrJePrEYww5mIe+WTPxL6x+JmvOpXbVOfRNurQ
+	 faXiAslnUxbTvh8R6jynORGSttFbU1L3Z/T9wRvt6/QUM2VCVLhNDaW4I3fNq8ZX1S
+	 lFVJAMppPCHnjolMnLTjDKpRZxWJLBcJaISjfhrIqKYEYw3zg1vSwpeMl5jimS4nVC
+	 GB7dXvTzMU64zBJfanN2MeZIM6T7jdJvZaW2bPo/EeC9R8K7y2leh8e2WX5ilntjRq
+	 5gMiny8OoCjZgJKnrLTqcYY/6GmH3egUbpQNAMqsCRJUjgHIrWzGytMDVESqks9Kkm
+	 92WVeFhDfx3Nw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vFxq3-000000021VN-0yl1;
+	id 1vFxq3-000000021VN-2JzG;
 	Mon, 03 Nov 2025 16:55:27 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Subject: [PATCH 11/33] KVM: arm64: GICv3: Decouple ICH_HCR_EL2 programming from LRs
-Date: Mon,  3 Nov 2025 16:54:55 +0000
-Message-ID: <20251103165517.2960148-12-maz@kernel.org>
+Subject: [PATCH 12/33] KVM: arm64: GICv3: Extract LR folding primitive
+Date: Mon,  3 Nov 2025 16:54:56 +0000
+Message-ID: <20251103165517.2960148-13-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251103165517.2960148-1-maz@kernel.org>
 References: <20251103165517.2960148-1-maz@kernel.org>
@@ -75,75 +75,142 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Not programming ICH_HCR_EL2 while no LRs are populated is a bit
-of an issue, as we otherwise don't see any maintenance interrupt
-when the guest interacts with the LRs.
-
-Decouple the two and always program the control register, even when
-we don't have to touch the LRs.
+As we are going to need to handle deactivation for interrupts that
+are not in the LRs, split vgic_v3_fold_lr_state() into a helper
+that deals with a single interrupt, and the function that loops
+over the used LRs.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vgic-v3-sr.c | 26 ++++++++++++--------------
- 1 file changed, 12 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/vgic/vgic-v3.c | 88 +++++++++++++++++------------------
+ 1 file changed, 43 insertions(+), 45 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index aa04cc9cdc1ab..d001b26a21f16 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -219,20 +219,12 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
- 		}
- 	}
- 
--	if (used_lrs || cpu_if->its_vpe.its_vm) {
-+	if (used_lrs) {
- 		int i;
- 		u32 elrsr;
- 
- 		elrsr = read_gicreg(ICH_ELRSR_EL2);
- 
--		if (cpu_if->vgic_hcr & ICH_HCR_EL2_LRENPIE) {
--			u64 val = read_gicreg(ICH_HCR_EL2);
--			cpu_if->vgic_hcr &= ~ICH_HCR_EL2_EOIcount;
--			cpu_if->vgic_hcr |= val & ICH_HCR_EL2_EOIcount;
--		}
--
--		write_gicreg(compute_ich_hcr(cpu_if) & ~ICH_HCR_EL2_En, ICH_HCR_EL2);
--
- 		for (i = 0; i < used_lrs; i++) {
- 			if (elrsr & (1 << i))
- 				cpu_if->vgic_lr[i] &= ~ICH_LR_STATE;
-@@ -242,6 +234,14 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
- 			__gic_v3_set_lr(0, i);
- 		}
- 	}
-+
-+	if (cpu_if->vgic_hcr & ICH_HCR_EL2_LRENPIE) {
-+		u64 val = read_gicreg(ICH_HCR_EL2);
-+		cpu_if->vgic_hcr &= ~ICH_HCR_EL2_EOIcount;
-+		cpu_if->vgic_hcr |= val & ICH_HCR_EL2_EOIcount;
-+	}
-+
-+	write_gicreg(compute_ich_hcr(cpu_if) & ~ICH_HCR_EL2_En, ICH_HCR_EL2);
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index ba2b9d4d0c778..8f28227ae7193 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -33,78 +33,76 @@ static bool lr_signals_eoi_mi(u64 lr_val)
+ 	       !(lr_val & ICH_LR_HW);
  }
  
- void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
-@@ -249,12 +249,10 @@ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
- 	u64 used_lrs = cpu_if->used_lrs;
- 	int i;
+-void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
++static void vgic_v3_fold_lr(struct kvm_vcpu *vcpu, u64 val)
+ {
+-	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+-	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
+-	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+-	int lr;
+-
+-	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+-
+-	cpuif->vgic_hcr &= ~ICH_HCR_EL2_UIE;
+-
+-	for (lr = 0; lr < cpuif->used_lrs; lr++) {
+-		u64 val = cpuif->vgic_lr[lr];
+-		u32 intid, cpuid;
+-		struct vgic_irq *irq;
+-		bool is_v2_sgi = false;
+-		bool deactivated;
+-
+-		cpuid = val & GICH_LR_PHYSID_CPUID;
+-		cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
+-
+-		if (model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+-			intid = val & ICH_LR_VIRTUAL_ID_MASK;
+-		} else {
+-			intid = val & GICH_LR_VIRTUALID;
+-			is_v2_sgi = vgic_irq_is_sgi(intid);
+-		}
++	struct vgic_irq *irq;
++	bool is_v2_sgi = false;
++	bool deactivated;
++	u32 intid;
  
--	if (used_lrs || cpu_if->its_vpe.its_vm) {
--		write_gicreg(compute_ich_hcr(cpu_if), ICH_HCR_EL2);
-+	write_gicreg(compute_ich_hcr(cpu_if), ICH_HCR_EL2);
+-		/* Notify fds when the guest EOI'ed a level-triggered IRQ */
+-		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+-			kvm_notify_acked_irq(vcpu->kvm, 0,
+-					     intid - VGIC_NR_PRIVATE_IRQS);
++	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++		intid = val & ICH_LR_VIRTUAL_ID_MASK;
++	} else {
++		intid = val & GICH_LR_VIRTUALID;
++		is_v2_sgi = vgic_irq_is_sgi(intid);
++	}
  
--		for (i = 0; i < used_lrs; i++)
--			__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
--	}
-+	for (i = 0; i < used_lrs; i++)
-+		__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
+-		irq = vgic_get_vcpu_irq(vcpu, intid);
+-		if (!irq)	/* An LPI could have been unmapped. */
+-			continue;
++	irq = vgic_get_vcpu_irq(vcpu, intid);
++	if (!irq)	/* An LPI could have been unmapped. */
++		return;
  
- 	/*
- 	 * Ensure that writes to the LRs, and on non-VHE systems ensure that
+-		raw_spin_lock(&irq->irq_lock);
++	/* Notify fds when the guest EOI'ed a level-triggered IRQ */
++	if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
++		kvm_notify_acked_irq(vcpu->kvm, 0,
++				     intid - VGIC_NR_PRIVATE_IRQS);
+ 
++	scoped_guard(raw_spinlock, &irq->irq_lock) {
+ 		/* Always preserve the active bit for !LPIs, note deactivation */
+ 		if (irq->intid >= VGIC_MIN_LPI)
+ 			val &= ~ICH_LR_ACTIVE_BIT;
+ 		deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
+ 		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
+ 
+-		if (irq->active && is_v2_sgi)
+-			irq->active_source = cpuid;
+-
+ 		/* Edge is the only case where we preserve the pending bit */
+ 		if (irq->config == VGIC_CONFIG_EDGE &&
+-		    (val & ICH_LR_PENDING_BIT)) {
++		    (val & ICH_LR_PENDING_BIT))
+ 			irq->pending_latch = true;
+ 
+-			if (is_v2_sgi)
+-				irq->source |= (1 << cpuid);
+-		}
+-
+ 		/*
+ 		 * Clear soft pending state when level irqs have been acked.
+ 		 */
+ 		if (irq->config == VGIC_CONFIG_LEVEL && !(val & ICH_LR_STATE))
+ 			irq->pending_latch = false;
+ 
++		if (is_v2_sgi) {
++			u8 cpuid = FIELD_GET(GICH_LR_PHYSID_CPUID, val);
++
++			if (irq->active)
++				irq->active_source = cpuid;
++
++			if (val & ICH_LR_PENDING_BIT)
++				irq->source |= BIT(cpuid);
++		}
++
+ 		/* Handle resampling for mapped interrupts if required */
+ 		vgic_irq_handle_resampling(irq, deactivated, val & ICH_LR_PENDING_BIT);
+ 
+ 		irq->on_lr = false;
+-
+-		raw_spin_unlock(&irq->irq_lock);
+-		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+ 
++	vgic_put_irq(vcpu->kvm, irq);
++}
++
++void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
++{
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
++
++	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
++
++	for (int lr = 0; lr < cpuif->used_lrs; lr++)
++		vgic_v3_fold_lr(vcpu, cpuif->vgic_lr[lr]);
++
+ 	cpuif->used_lrs = 0;
+ }
+ 
 -- 
 2.47.3
 
