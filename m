@@ -1,233 +1,226 @@
-Return-Path: <kvm+bounces-61815-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61816-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE252C2B281
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 11:53:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D80C2B2C9
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 11:56:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 543EA4EF9CB
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 10:51:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0161A3ABF83
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 10:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11722FFF9B;
-	Mon,  3 Nov 2025 10:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C4C3009E1;
+	Mon,  3 Nov 2025 10:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xzUAAwde"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tgVQ5rGf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24239189F43
-	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 10:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A3F2FDC5B
+	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 10:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762167109; cv=none; b=riTEV0h3tCbutmdm0oa5KhKCUf3TOZeaR45TONJAXZuj+15a7QEYZY4ZAB6tTjCucL31qpibwV7g5qTak5arBi5jOndnCEjfmj5HKRy0gM1lvz6BffdZf7mlXVktbGfMLFnF3HLF4kYxC8I2FeMNTRsVbSo12u/QGO2pnyfDwYw=
+	t=1762167141; cv=none; b=PIUQ+EwhO9oVp4H3vxhW2OGgWSHJQjwW/YnAhXsyeCo+w4MSjGIesvOwAFT8JhuxaBFsKj+cYOXuduz7c8o7gs+wOy37KsnlBu3vveDGh+oIrCmW/6jzi2ihwiB/fT8JRgDYi8ujxPaLf02K1ldT/pLx4g8xMTstK7SWqZwPAhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762167109; c=relaxed/simple;
-	bh=YKUPKJACp9MBEQLTEhMxkc0Zxpn6YWjSxFnJb81yljw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eE6OHJ3gD6nFE/6JqjZ7e85u72pzSvCYw7dYldIFQYZhmXKiBbHO8Wsgbgmg4ZFKWA+VcdYsz5aDJmhOVJgVUpWrA32Yn7c9XQjjnk/meUiYKb7P9nMVlxwocEBxy1B5chhs5doRXKObLLT4wmIv/Orka7E5LIXiRhfxrI39SV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xzUAAwde; arc=none smtp.client-ip=209.85.128.73
+	s=arc-20240116; t=1762167141; c=relaxed/simple;
+	bh=mvE+DUWqyOq8EZSNgDW4VO8ZUoDnjwG4bmh01CUVPv8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MZkNWtXB6gtxnUDoQi6utVc0MjAhDO16Cn6W0xa4wCkQlRWObma/ic8QiCeASMYMeQocvfpDsWXLWyk0dhH7I+S8JF92uKDCBCKGQEyf06wfrgYw5nbK2PwbVnAKRMM4mlE9IxOavLhv1bQIwQKOjMZ8ADeh2FJUFmwrH0XsnIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tgVQ5rGf; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4770c37331fso30891285e9.3
-        for <kvm@vger.kernel.org>; Mon, 03 Nov 2025 02:51:46 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2959197b68eso235695ad.1
+        for <kvm@vger.kernel.org>; Mon, 03 Nov 2025 02:52:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762167105; x=1762771905; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v7g/6qEaP3lVvaAUqgLfdxkWNvLvmTkjz5emWRXoiAI=;
-        b=xzUAAwdeWgCalm9sgHjaY8aMZj5f1CVB75tOyYHaeB4Gbtpq3BpYIBtd+XP8zfNS0s
-         iEFZPJV4H48/Lhgc6jgu5heQ4WYW+PVLYutUIQng9lSqjDVYD5jpJdBeypUzloUIxkwV
-         ZKPLFoJt7e5m/jX99AFnktsii8EHxiG5kvnZkFRBpN5qe62L7vjuc2X2xxTVLPL8cud/
-         Sqp+J85Wt8rJqrEvDVgW5nlrhaCPyXm+iZ22enWEqEJ0WkZXAcaaHo0D8w0Trnk5SGHz
-         jIEof1P7v5b1sIxZVpyoG8/hgTj1X0gh7NkOPxfRtc1XVwh9KvI95wJcoRLUW2zY+MDQ
-         PYbw==
+        d=google.com; s=20230601; t=1762167139; x=1762771939; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WwKprwTirCt4i5Js91Sl+ZyTThwVs5kTlEuvLY+kPJk=;
+        b=tgVQ5rGfvOoa+FTTecpjeXTkKtLOL8EhaSfkAKNOGwV5/NNWvTRE7NwH8/oKqooaRf
+         mCmNilbebWGQTKyn7vr5Lul2cYXVO48C+dBcCKRgQWrq73ASs46e2F2KWzSXpkWhOTyz
+         AX686p0MVQd9nKXhpkhlViJDlxeltdEvwBmWTKjoGH9e3XQgJnKwJXfCOsWC36WBWb3q
+         ytDLszOKPL3v8itFgcLWh1kjovMiR/d0a1Teh/qvhORpxJF2Tx/s/qgYFt/5q++dNtVV
+         Kz735OKnpWWQGV/MRINR97LJRNxC8sPhdEOOMd27ifvq1Z7RdBmoQpcgI/zQATLq1pan
+         67XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762167105; x=1762771905;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v7g/6qEaP3lVvaAUqgLfdxkWNvLvmTkjz5emWRXoiAI=;
-        b=ZWeWzPJbDpcB8in+NNGuEhssLtZMbXCKtMm7K+VptWKYSBt/v8Vbty5F2CDAPMG0Vw
-         pOyHxm423rBV7d73va07kg732aPZMtSrj1PPWNwsUkKQevRbG9hm3tvKFB9DGFI2pFzH
-         3J048EVjiVs+N4mUHc/5VHkQ2UnJPsaezwhTmTshDS0NgZNZNX9TWonHrLrj5025iK8O
-         AemGME0qO9G4bvMPj6GM0AW5Dy9oMpsXMk3m6LPHETw4veA/FWlgnZpY6OS/pjBw4uJl
-         vJgQVTxsNHc3+MNsFfo3qDAQwj3LdLAyCvRp1pj6o5Vr6MqDomk1GH7sdwa6fVgS5gVe
-         7pRg==
-X-Forwarded-Encrypted: i=1; AJvYcCUANXU7hiGeoFopp+NRt1Ek5owpl6OlSWzPjnBt4TeS6YSc5fqkUs228UNnWoFZXriHqvk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziCbkggFkzm1Uopow6fWeYoWEjCw5IDA4s1QVZluvjg0suQn2W
-	3qTX1hmkGDIRsL2gjJpitg6KkhyTM5kw54nn0FjDmB3agIcK0EKZqgk9T204B7euGxoXC5ba4Pb
-	R55On54ZDQxEXaA==
-X-Google-Smtp-Source: AGHT+IEw5fnIKwkSUZmAUqO9mhNp8ygq/NsEP3OfpwX7swAOb/CiCgrOmNFr4ws8XArtH5CoBtZ78Zworjy3jA==
-X-Received: from wrbeb17.prod.google.com ([2002:a05:6000:2011:b0:429:c7ee:6aac])
- (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:2601:b0:429:d41b:9fe5 with SMTP id ffacd0b85a97d-429d41ba1f5mr1861037f8f.24.1762167105379;
- Mon, 03 Nov 2025 02:51:45 -0800 (PST)
-Date: Mon, 03 Nov 2025 10:51:44 +0000
-In-Reply-To: <aQUtwsfxEsUi4us0@google.com>
+        d=1e100.net; s=20230601; t=1762167139; x=1762771939;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WwKprwTirCt4i5Js91Sl+ZyTThwVs5kTlEuvLY+kPJk=;
+        b=VLEkT0wRcM6RjlBKjtR9//Ephi4B1fPWC8Dxkn8pYKVU7YZdkI6wC5J7unrw5TSJpM
+         CT3aETOdvatP4aZTHO1tr2GtfuU2rmak/Yi98baS5q5YM7E/+Z/yikMc44cTsM+nqfh9
+         tCCCuzt3M//T2jtaypryrCMH0aftQ0+ITmY28gNGAnMfm3bbYBXI2VVrjrx4dDEQTXjn
+         3XxRZeXDfP2Egcu6WVlz+KI9nLRjd052f6bwPf+w5m4hA3GJIygY7pECRasklg3EB0Mu
+         mz8zSyrwnS8BUxsunuFzunkok/lJMjXpc/60z2yuhsSprI5gEN8A/DNZ+YwQWhs7BNTD
+         mX2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUJOE2etzao7L2lIKYWDybypSTB86xNn8GCgoaNmaW0OdAMcnt9F8Ua2iGZ7vV9GP5NbAQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGSSoABCwQWuxub/10OhbRLzL8qLpmYaYzLc6+2xBvNowv8jpG
+	tUS9UachABgMhKQ0qAE2YzC4oWiwOhVCkxD9i11LMkTYJzRcWUbn2FXf+XW3keG1vg==
+X-Gm-Gg: ASbGncvIELg980AvgAemRrbh5jWeHMFfnIfclPWijT7PIL3gBJtkoo2VjGILnbksRxr
+	RD1xtLwnNMYMqp6Xq5Zs6tlFH5SajxPfN43T9jM8qlH+rV2HA6wEV5M0oVpWUypHTbuVOk9Wg/s
+	XIIZ4aui3ivoRo3GOGXoUSTS7Tq9T4vQE6yO6/+32DzvN5vkPPHX2YThkAzLus+5x0GPqV0f1wC
+	+H91JBfUWlUelrZUAgR0mXduFPpTt1cafMy1eGGmTlN6hQBS6+Wu13ddTXw6CXMTtG88TT/EvZ6
+	1aHJ5X4FgSx2wdkNnwnmt6RGVp1sUth8VPjc/uLS6gmzNA1MKu1Q0cmnzDEDRPKo1NSvHMQ2/gw
+	B+i+y7xym0S5EJ5crxZe+HT4NKgqO5wg4IWLgcLsqkzWIf12QYi3xGmZniWX1aauKJN4I3Mx98c
+	FZFR1Csw6wHIxYJQPgkm23aPLrVxh4lgSdJgOLQA==
+X-Google-Smtp-Source: AGHT+IHPuCzOHK+gl1PDmhIoWt8nQcQHNMFtOu890fqfdIsVUQlawn89pKWjl6bN9nnq4lv2uM5QPg==
+X-Received: by 2002:a17:902:c411:b0:295:3f35:a315 with SMTP id d9443c01a7336-2955658e37fmr6124875ad.5.1762167138172;
+        Mon, 03 Nov 2025 02:52:18 -0800 (PST)
+Received: from google.com (164.210.142.34.bc.googleusercontent.com. [34.142.210.164])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3415994181esm651172a91.5.2025.11.03.02.52.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Nov 2025 02:52:17 -0800 (PST)
+Date: Mon, 3 Nov 2025 10:52:07 +0000
+From: Pranjal Shrivastava <praan@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+	David Airlie <airlied@gmail.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	dri-devel@lists.freedesktop.org, Eric Auger <eric.auger@redhat.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>, intel-gfx@lists.freedesktop.org,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+	Kirti Wankhede <kwankhede@nvidia.com>, linux-s390@vger.kernel.org,
+	Longfang Liu <liulongfang@huawei.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Nikhil Agarwal <nikhil.agarwal@amd.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>, qat-linux@intel.com,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	virtualization@lists.linux.dev,
+	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Zhenyu Wang <zhenyuw.linux@gmail.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>, patches@lists.linux.dev
+Subject: Re: [PATCH 22/22] vfio: Remove the get_region_info op
+Message-ID: <aQiJV4p3AKZSDH08@google.com>
+References: <0-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
+ <22-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251031003040.3491385-1-seanjc@google.com> <20251031003040.3491385-5-seanjc@google.com>
- <DDWIDCO0UKMD.2C46H6XQO1NXK@google.com> <aQUtwsfxEsUi4us0@google.com>
-X-Mailer: aerc 0.21.0
-Message-ID: <DDZ03S9DS8TP.174VN17SHX6NH@google.com>
-Subject: Re: [PATCH v4 4/8] KVM: VMX: Handle MMIO Stale Data in VM-Enter
- assembly via ALTERNATIVES_2
-From: Brendan Jackman <jackmanb@google.com>
-To: Sean Christopherson <seanjc@google.com>, Brendan Jackman <jackmanb@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <22-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
 
-On Fri Oct 31, 2025 at 9:44 PM UTC, Sean Christopherson wrote:
-> On Fri, Oct 31, 2025, Brendan Jackman wrote:
->> On Fri Oct 31, 2025 at 12:30 AM UTC, Sean Christopherson wrote:
->> > Rework the handling of the MMIO Stale Data mitigation to clear CPU buffers
->> > immediately prior to VM-Enter, i.e. in the same location that KVM emits a
->> > VERW for unconditional (at runtime) clearing.  Co-locating the code and
->> > using a single ALTERNATIVES_2 makes it more obvious how VMX mitigates the
->> > various vulnerabilities.
->> >
->> > Deliberately order the alternatives as:
->> >
->> >  0. Do nothing
->> >  1. Clear if vCPU can access MMIO
->> >  2. Clear always
->> >
->> > since the last alternative wins in ALTERNATIVES_2(), i.e. so that KVM will
->> > honor the strictest mitigation (always clear CPU buffers) if multiple
->> > mitigations are selected.  E.g. even if the kernel chooses to mitigate
->> > MMIO Stale Data via X86_FEATURE_CLEAR_CPU_BUF_MMIO, some other mitigation
->> > may enable X86_FEATURE_CLEAR_CPU_BUF_VM, and that other thing needs to win.
->> >
->> > Note, decoupling the MMIO mitigation from the L1TF mitigation also fixes
->> > a mostly-benign flaw where KVM wouldn't do any clearing/flushing if the
->> > L1TF mitigation is configured to conditionally flush the L1D, and the MMIO
->> > mitigation but not any other "clear CPU buffers" mitigation is enabled.
->> > For that specific scenario, KVM would skip clearing CPU buffers for the
->> > MMIO mitigation even though the kernel requested a clear on every VM-Enter.
->> >
->> > Note #2, the flaw goes back to the introduction of the MDS mitigation.  The
->> > MDS mitigation was inadvertently fixed by commit 43fb862de8f6 ("KVM/VMX:
->> > Move VERW closer to VMentry for MDS mitigation"), but previous kernels
->> > that flush CPU buffers in vmx_vcpu_enter_exit() are affected (though it's
->> > unlikely the flaw is meaningfully exploitable even older kernels).
->> >
->> > Fixes: 650b68a0622f ("x86/kvm/vmx: Add MDS protection when L1D Flush is not active")
->> > Suggested-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
->> > Signed-off-by: Sean Christopherson <seanjc@google.com>
->> > ---
->> >  arch/x86/kvm/vmx/vmenter.S | 14 +++++++++++++-
->> >  arch/x86/kvm/vmx/vmx.c     | 13 -------------
->> >  2 files changed, 13 insertions(+), 14 deletions(-)
->> >
->> > diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
->> > index 1f99a98a16a2..61a809790a58 100644
->> > --- a/arch/x86/kvm/vmx/vmenter.S
->> > +++ b/arch/x86/kvm/vmx/vmenter.S
->> > @@ -71,6 +71,7 @@
->> >   * @regs:	unsigned long * (to guest registers)
->> >   * @flags:	VMX_RUN_VMRESUME:	use VMRESUME instead of VMLAUNCH
->> >   *		VMX_RUN_SAVE_SPEC_CTRL: save guest SPEC_CTRL into vmx->spec_ctrl
->> > + *		VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO: vCPU can access host MMIO
->> >   *
->> >   * Returns:
->> >   *	0 on VM-Exit, 1 on VM-Fail
->> > @@ -137,6 +138,12 @@ SYM_FUNC_START(__vmx_vcpu_run)
->> >  	/* Load @regs to RAX. */
->> >  	mov (%_ASM_SP), %_ASM_AX
->> >  
->> > +	/* Stash "clear for MMIO" in EFLAGS.ZF (used below). */
->> > +	ALTERNATIVE_2 "",								\
->> > +		      __stringify(test $VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO, %ebx), 	\
->> > +		      X86_FEATURE_CLEAR_CPU_BUF_MMIO,					\
->> > +		      "", X86_FEATURE_CLEAR_CPU_BUF_VM
->> 
->> Ah, so this ALTERNATIVE_2 (instead of just an ALTERNATIVE that checks
->> CLEAR_CPU_BUF_MMIO) is really about avoiding the flags needing to be
->> mutually exclusive?
->
-> Yeah, more or less.  More specifically, I want to keep the X vs. Y logic in one
-> place (well, two if you count both ALTERNATIVE_2 flows), so that in generaly,
-> from KVM's perspective, the mitigations are handled as independent things.  E.g.
-> even if CLEAR_CPU_BUF_VM and CLEAR_CPU_BUF_MMIO are mutually exclusive within
-> the kernel (and it's not clear to me that that's 100% guaranteed), I want to
-> limit how much of KVM assumes they are exclusive.  Partly to avoid "oops, we
-> forgot to mitigate that thing you care about", partly so that reading code like
-> the setting of VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO doesn't require understanding
-> the relationship between CLEAR_CPU_BUF_VM and CLEAR_CPU_BUF_MMIO.
+On Thu, Oct 23, 2025 at 08:09:36PM -0300, Jason Gunthorpe wrote:
+> No driver uses it now, all are using get_region_info_caps().
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/vfio/vfio_main.c | 50 +++++++++++++++++-----------------------
+>  include/linux/vfio.h     |  2 --
+>  2 files changed, 21 insertions(+), 31 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 82e7d79b1f9fe2..f911c1980c9420 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -1263,48 +1263,40 @@ static long vfio_get_region_info(struct vfio_device *device,
+>  				 struct vfio_region_info __user *arg)
+>  {
+>  	unsigned long minsz = offsetofend(struct vfio_region_info, offset);
+> +	struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
+>  	struct vfio_region_info info = {};
+>  	int ret;
+>  
+> +	if (unlikely(!device->ops->get_region_info_caps))
+> +		return -EINVAL;
+> +
+>  	if (copy_from_user(&info, arg, minsz))
+>  		return -EFAULT;
+>  	if (info.argsz < minsz)
+>  		return -EINVAL;
+>  
+> -	if (device->ops->get_region_info_caps) {
+> -		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
+> +	ret = device->ops->get_region_info_caps(device, &info, &caps);
+> +	if (ret)
+> +		return ret;
 
-Yeah, this makes sense, if we can avoid creating any unnecessary
-and awkward-to-enforce invariants that seems like a win.
+Shall we kfree(caps.buf); before returning?
 
->> if (cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF_MMIO) && 
->>     !cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF_VM))
->> 	test $VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO, %ebx
->> 
->> ... right? This is a good idea but I think it warrants a comment to
->> capture the intent, without having the commit message in short-term
->> memory I'd have struggled with this code, I think.
->> 
->> >  	/* Check if vmlaunch or vmresume is needed */
->> >  	bt   $VMX_RUN_VMRESUME_SHIFT, %ebx
->> >  
->> > @@ -161,7 +168,12 @@ SYM_FUNC_START(__vmx_vcpu_run)
->> >  	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
->> >  
->> >  	/* Clobbers EFLAGS.ZF */
->> > -	VM_CLEAR_CPU_BUFFERS
->> > +	ALTERNATIVE_2 "",							\
->> > +		      __stringify(jz .Lskip_clear_cpu_buffers;			\
->> 
->> Maybe I'm just an asm noob 
->
-> Nah, all of this is definitely playing on hard mode.  I'm just thankful we don't
-> have to deal with the horrors of KVM doing all of this in inline asm.  :-D
->
->> I was very impressed by this trick of using CF and ZF together like this!)
->> but I think it's helpful to have the comment like the jnc has below, and
->> Pawan had in his version, to really make the test->jz dependency obvious,
->> since the two instructions are quite far apart.
->> 
->> 
->> > +				  CLEAR_CPU_BUFFERS_SEQ;			\
->> > +				  .Lskip_clear_cpu_buffers:),			\
->> > +		      X86_FEATURE_CLEAR_CPU_BUF_MMIO,				\
->> > +		      __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF_VM
->> 
->> Sorry I'm really nitpicking but I think it's justified for asm
->> readability...
->> 
->> It's a bit unfortunate that one branch says
->> CLEAR_CPU_BUFFERS_SEQ and the other says __CLEAR_CPU_BUFFERS. With the
->> current code I think it would be more readable to jut have
->> __stringify(CLEAR_CPU_BUFFERS_SEQ) in the CLEAR_CPU_BUF_VM case, then
->> you don't have to mentally expand the macro to see how the two branches
->> actually differ.
->
-> No preference here (assuming I understand what you're asking).
->
-> Is this better?
->
-> 	/*
-> 	 * Note, this sequence consumes *and* clobbers EFLAGS.ZF.  The MMIO
-> 	 * mitigations uses ZF to track whether or not the vCPU has access to
-> 	 * host MMIO (see above), and VERW (the instruction microcode hijacks
-> 	 * to clear CPU buffers) writes ZF.
-> 	 */
-> 	ALTERNATIVE_2 "",							\
-> 		      __stringify(jz .Lskip_clear_cpu_buffers;			\
-> 				  CLEAR_CPU_BUFFERS_SEQ;			\
-> 				  .Lskip_clear_cpu_buffers:),			\
-> 		      X86_FEATURE_CLEAR_CPU_BUF_MMIO,				\
-> 		      __stringify(CLEAR_CPU_BUFFERS_SEQ), X86_FEATURE_CLEAR_CPU_BUF_VM
+> -		ret = device->ops->get_region_info_caps(device, &info, &caps);
+> -		if (ret)
+> -			return ret;
+> -
+> -		if (caps.size) {
+> -			info.flags |= VFIO_REGION_INFO_FLAG_CAPS;
+> -			if (info.argsz < sizeof(info) + caps.size) {
+> -				info.argsz = sizeof(info) + caps.size;
+> -				info.cap_offset = 0;
+> -			} else {
+> -				vfio_info_cap_shift(&caps, sizeof(info));
+> -				if (copy_to_user(arg + 1, caps.buf,
+> -						 caps.size)) {
+> -					kfree(caps.buf);
+> -					return -EFAULT;
+> -				}
+> -				info.cap_offset = sizeof(info);
+> +	if (caps.size) {
+> +		info.flags |= VFIO_REGION_INFO_FLAG_CAPS;
+> +		if (info.argsz < sizeof(info) + caps.size) {
+> +			info.argsz = sizeof(info) + caps.size;
+> +			info.cap_offset = 0;
+> +		} else {
+> +			vfio_info_cap_shift(&caps, sizeof(info));
+> +			if (copy_to_user(arg + 1, caps.buf, caps.size)) {
+> +				kfree(caps.buf);
+> +				return -EFAULT;
+>  			}
+> -			kfree(caps.buf);
+> +			info.cap_offset = sizeof(info);
+>  		}
+> -
+> -		if (copy_to_user(arg, &info, minsz))
+> -			return -EFAULT;
+> -	} else if (device->ops->get_region_info) {
+> -		ret = device->ops->get_region_info(device, arg);
+> -		if (ret)
+> -			return ret;
+> -	} else {
+> -		return -EINVAL;
+> +		kfree(caps.buf);
+>  	}
+>  
+> +	if (copy_to_user(arg, &info, minsz))
+> +		return -EFAULT;
+>  	return 0;
+>  }
+>  
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 6311ddc837701d..8e1ddb48b9b54e 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -133,8 +133,6 @@ struct vfio_device_ops {
+>  			 size_t count, loff_t *size);
+>  	long	(*ioctl)(struct vfio_device *vdev, unsigned int cmd,
+>  			 unsigned long arg);
+> -	int	(*get_region_info)(struct vfio_device *vdev,
+> -				   struct vfio_region_info __user *arg);
+>  	int	(*get_region_info_caps)(struct vfio_device *vdev,
+>  					struct vfio_region_info *info,
+>  					struct vfio_info_cap *caps);
 
-Yep that looks good to me.
+Thanks,
+Praan
 
