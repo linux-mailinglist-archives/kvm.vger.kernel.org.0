@@ -1,282 +1,336 @@
-Return-Path: <kvm+bounces-61858-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61879-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65EBBC2D563
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 18:04:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 736A8C2D4F0
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 17:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBE743ADEF5
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 16:55:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86802189CB5F
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 16:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6580A31A562;
-	Mon,  3 Nov 2025 16:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F272325487;
+	Mon,  3 Nov 2025 16:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="chCqRGOi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tseblQ2p"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.178.143.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED37305068;
-	Mon,  3 Nov 2025 16:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.178.143.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A00C32145E;
+	Mon,  3 Nov 2025 16:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762188926; cv=none; b=Zh9fZPX0Snw9kqzVmITopriznlHe2jQ2SpynFThFbsROBeHzyvRQl2Ku2mJ0NFreuDrQSYDc+nVICa4ruPINYWIaHd/2os9Td6AjFSbfk/4HbedT8NaBBaydn97wpUXWRGwVvf92QonBOtgwZtwvpe1+nXJeCZISWYMN8EE1MZc=
+	t=1762188931; cv=none; b=T9RfInnR6mkIf5INnAOVw4YzO01dTUp1H1YGpcBBouAvWEiySAfBHRvnD60KfyF1Dexw51CQFoswhyoOXlA37NgvS+pCRFKPj91nb+b+vWWJiG4iFvvlZXYHJS+za2m4db7pnAJxfQXLloWsSv+ulvLUjcTNOR/4W8Z3kiPE8Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762188926; c=relaxed/simple;
-	bh=bERujlan6xYBCXPOFlM4FGae/3KW3OBLj5Y11k2yHJQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Q8e/8xVBODnU7xHgh6kuPPKqltzYldVJG69smml4a+NZ/7A8fYdn9viiVn8LGQFavGOq0AX5RdQgS3UYgou+c2Hmy2/ijy4g1njhVEcNIYe9ZXC7ZZgtq3IAcPvYfqH26kbTXfXDGB/IeksFBrnpr8q4AzDxe3mz6AKQhp1so4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=chCqRGOi; arc=none smtp.client-ip=63.178.143.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1762188924; x=1793724924;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=UEH2vz5x8bkUyz4ezTN39e/gCvIEAbggvIgsadkudPo=;
-  b=chCqRGOiza9e64wPfZ0xn/xoLDFY7WOUDUi1aP+e+3HOGVMr+tu4OtQ2
-   uiOdWTeWCdyfOoDZ1S070zbr9T5yRT4mHMMomEtsXczFD6pW2iGF2sicx
-   3/ujdrpTPFR/voLEzBlm5TP1Q6gM4sQ56akOZw9fcnOYR8mKupVmbgQtv
-   uSz8vVXT+HxpG4ByhE3Eaxtm6atBgHS4PoXyav0PlhOuUEvHuVB9XCv6o
-   o3DuKRiFRciUGsLMd4VBu+lSzi7xP2j6hAjuswNhk+APSavJmKR75guYH
-   MYN5GO5xZYZ9UmgoPliL0a4FxSK9etL4YwSkMrsg2QLK0ZwJsqVHbhLMW
-   Q==;
-X-CSE-ConnectionGUID: meLlLgWBTP27Rl/TBc+JIw==
-X-CSE-MsgGUID: K7u5/hGKSz6id+1S8o9fbg==
-X-IronPort-AV: E=Sophos;i="6.19,276,1754956800"; 
-   d="scan'208";a="4501536"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 16:55:05 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.234:12012]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.15.8:2525] with esmtp (Farcaster)
- id bb542154-10c3-4be7-aa9d-727e3397c42e; Mon, 3 Nov 2025 16:55:05 +0000 (UTC)
-X-Farcaster-Flow-ID: bb542154-10c3-4be7-aa9d-727e3397c42e
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Mon, 3 Nov 2025 16:55:05 +0000
-Received: from [192.168.10.21] (10.106.83.21) by EX19D022EUC002.ant.amazon.com
- (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Mon, 3 Nov 2025
- 16:55:04 +0000
-Message-ID: <2c61545f-befb-4681-95fd-ff281e1a947b@amazon.com>
-Date: Mon, 3 Nov 2025 16:55:02 +0000
+	s=arc-20240116; t=1762188931; c=relaxed/simple;
+	bh=3/UPj3JyOdGjjMKJy1YD56dVdglZfCN/A8x3/NIHl78=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GKQ495KeuNetuG7h48MKVhyfhAYO0EOkanysKD5ctQ5IWrOQfbFAeyKmhKR8SqcnW8ZDOvNi5iy7wu3XXj638KT1mPdM5KOf4KEawsAWAWE7G0TYI04T1zUZYx66mGFtpt3buC/MivCtjCRuKJGBpyKYGd7nErKQAWdLFljDWXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tseblQ2p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B197C4CEFD;
+	Mon,  3 Nov 2025 16:55:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762188931;
+	bh=3/UPj3JyOdGjjMKJy1YD56dVdglZfCN/A8x3/NIHl78=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tseblQ2prC4cEb/PdN+c0HlVpBCZSkIJRqFCo5pwDu9akkr9HwweR0ELtiqh5a/qn
+	 6AZZiegYRfWavxMCvkX2zCe3U7vat1r4QiNid5t/xkZW0wdWCWB0BqkUpbIztwlI61
+	 azb2QU9L5uW+ltvarmcDeg/B8LxkZJWYsyOhFjixw4vP3GiEN7V2DzCE6/5uujEyUP
+	 Q+xB8+Uf3KefYnxwAW/0mpuj6oIpwSC22VusT0HMiWOTWyVyoneI5HoflZr0zs1TJu
+	 K9MNUpwpjS2+cEo+5uDWGguq7RrQSpIFAUVcH34n8quNU03SQfIxaJujfXU1y2GrvF
+	 lY5dcApr9Js1Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vFxq5-000000021VN-1oDq;
+	Mon, 03 Nov 2025 16:55:29 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
+Subject: [PATCH 20/33] KVM: arm64: Revamp vgic maintenance interrupt configuration
+Date: Mon,  3 Nov 2025 16:55:04 +0000
+Message-ID: <20251103165517.2960148-21-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251103165517.2960148-1-maz@kernel.org>
+References: <20251103165517.2960148-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v6 1/2] KVM: guest_memfd: add generic population via write
-To: Sean Christopherson <seanjc@google.com>
-CC: Nikita Kalyazin <kalyazin@amazon.co.uk>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "shuah@kernel.org" <shuah@kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"david@redhat.com" <david@redhat.com>, "jthoughton@google.com"
-	<jthoughton@google.com>, "patrick.roy@linux.dev" <patrick.roy@linux.dev>,
-	Jack Thomson <jackabt@amazon.co.uk>, Derek Manwaring <derekmn@amazon.com>,
-	Marco Cali <xmarcalx@amazon.co.uk>, <ackerleytng@google.com>, "Vishal
- Annapurve" <vannapurve@google.com>
-References: <20251020161352.69257-1-kalyazin@amazon.com>
- <20251020161352.69257-2-kalyazin@amazon.com> <aPpS2aqdobVTk_ed@google.com>
- <8a28ddea-35c0-490e-a7d2-7fb612fdd008@amazon.com>
- <aQPakDuteQkg0hTu@google.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <aQPakDuteQkg0hTu@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D010EUA002.ant.amazon.com (10.252.50.108) To
- EX19D022EUC002.ant.amazon.com (10.252.51.137)
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+We currently don't use the maintenance interrupt very much, apart
+from EOI on level interrupts, and for LR underflow in limited cases.
 
+However, as we are moving toward a setup where active interrupts
+can live outside of the LRs, we need to use the MIs in a more
+diverse set of cases.
 
-On 30/10/2025 21:37, Sean Christopherson wrote:
-> On Fri, Oct 24, 2025, Nikita Kalyazin wrote:
->>
->>
->> On 23/10/2025 17:07, Sean Christopherson wrote:
->>> On Mon, Oct 20, 2025, Nikita Kalyazin wrote:
->>>> From: Nikita Kalyazin <kalyazin@amazon.com>
->>
->> + Vishal and Ackerley
->>
->>>>
->>>> write syscall populates guest_memfd with user-supplied data in a generic
->>>> way, ie no vendor-specific preparation is performed.  If the request is
->>>> not page-aligned, the remaining bytes are initialised to 0.
->>>>
->>>> write is only supported for non-CoCo setups where guest memory is not
->>>> hardware-encrypted.
->>>
->>> Please include all of the "why".  The code mostly communicates the "what", but
->>> it doesn't capture why write() support is at all interesting, nor does it explain
->>> why read() isn't supported.
->>
->> Hi Sean,
->>
->> Thanks for the review.
->>
->> Do you think including the explanation from the cover letter would be
->> sufficient?
-> 
-> It's pretty close.  A few more details would be helpful, e.g. to explain that VMMs
-> may use write() to populate the initial image
+Add a new helper that produces a digest of the ap_list, and use
+that summary to set the various control bits as required.
 
-Ack.
+This slightly changes the way v2 SGIs are handled, as they used to
+count for more than one interrupt, but not anymore.
 
-> 
->> Shall I additionally say that read() isn't supported because there is no use
->> case for it as of now or would it be obvious?
-> 
-> Hmm, I think if you want to exclude read() support, the changelog should explicitly
-> state why.  E.g. "there's no use case" is quite different from "deliberately
-> don't support read() for security reasons".
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/vgic/vgic-v2.c | 12 ++++-
+ arch/arm64/kvm/vgic/vgic-v3.c | 15 +++++-
+ arch/arm64/kvm/vgic/vgic.c    | 91 ++++++++++++-----------------------
+ arch/arm64/kvm/vgic/vgic.h    | 19 +++++++-
+ 4 files changed, 71 insertions(+), 66 deletions(-)
 
-Ack.
-
-> 
->>>> Signed-off-by: Nikitia Kalyazin <kalyazin@amazon.com>
->>>> ---
->>>>    virt/kvm/guest_memfd.c | 48 ++++++++++++++++++++++++++++++++++++++++++
->>>
->>> There's a notable lack of uAPI and Documentation chanegs.  I.e. this needs a
->>> GUEST_MEMFD_FLAG_xxx along with proper documentation.
->>
->> Would the following be ok in the doc?
->>
->> When the capability KVM_CAP_GUEST_MEMFD_WRITE is supported, the 'flags'
-> 
-> No capability is necessary, see d2042d8f96dd ("KVM: Rework KVM_CAP_GUEST_MEMFD_MMAP
-> into KVM_CAP_GUEST_MEMFD_FLAGS").
-
-Thanks, I didn't realise that kvm/next was behind kvm/master.
-
-> 
->> field
->> supports GUEST_MEMFD_FLAG_WRITE. Setting this flag on guest_memfd creation
->> enables write() syscall operations to populate guest_memfd memory from host
->> userspace.
->>
->> When a write() operation is performed on a guest_memfd file descriptor with
->> the
->> GUEST_MEMFD_FLAG_WRITE set, the syscall will populate the guest memory with
->> user-supplied data in a generic way, without any vendor-specific
->> preparation.
->> The write operation is only supported for non-CoCo (Confidential Computing)
->> setups where guest memory is not hardware-encrypted.
-> 
-> The restriction should be that guest memory must be SHARED, i.e. not PRIVATE.
-> Strictly speaking, guest memory can be encrypted, e.g. with SME and TME (I think
-> TME is still a thing?), but with a shared key and thus accessible from the host.
-> 
-> Even if that weren't the case, we want to support this for CoCo VMs.
-
-To clarify, should it depend on GUEST_MEMFD_FLAG_INIT_SHARED for now?
-
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 5bd76cf394fa..5fbf65f49586 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -736,7 +736,7 @@ static inline u64 
-kvm_gmem_get_supported_flags(struct kvm *kvm)
-         u64 flags = GUEST_MEMFD_FLAG_MMAP;
-
-         if (!kvm || kvm_arch_supports_gmem_init_shared(kvm))
--               flags |= GUEST_MEMFD_FLAG_INIT_SHARED;
-+               flags |= GUEST_MEMFD_FLAG_INIT_SHARED | 
-GUEST_MEMFD_FLAG_WRITE;
-
-         return flags;
-  }
-
-> 
->> If the write request is not page-aligned, any remaining bytes within the page
->> are initialized to zero.
-> 
-> Why?  (Honest question, e.g. is that standard file semantics?)
-
-The clause was originally suggested by James in v5 [1].  The behaviour 
-shouldn't be deviating from the standard semantics though, so I will 
-omit it.  Moreover, when looking at the shmem implementation, I realised 
-that I hadn't handled the case of clearing bytes _before_ written bytes 
-properly.  I will fix it in the next version.
-
-[1] 
-https://lore.kernel.org/kvm/CADrL8HUObfEd80sr783dB3dPWGSX7H5=0HCp9OjiL6D_Sp+2Ww@mail.gmail.com/
-
-> 
->>> And while it's definitely it's a-ok to land .write() in advance of the direct map
->>> changes, we do need to at least map out how we want the two to interact, e.g. so
->>> that we don't end up with constraints that are impossible to satisfy.
->>>
->>
->> write() shall not attempt to access a page that is not in the direct map,
->> which I believe can be achieved via kvm_kmem_gmem_write_begin() consulting
->> the KVM_GMEM_FOLIO_NO_DIRECT_MAP in folio->private (introduced in [1]).
->>
->> Do you think we should mention it in the commit message in some way? What
->> particular constraint are you cautious about?
-> 
-> I want to be cautious with respect to the ABI/uAPI.  Patrick's series also adds
-> a flag, and guest_memfd doesn't currently provide a way to toggle flags after the
-> file is created.  That begs the question of how GUEST_MEMFD_FLAG_NO_DIRECT_MAP
-> will co-exist with GUEST_MEMFD_FLAG_WRITE.  Presumably the goal is to use write()
-> to initialize memory, and _then_ nuke the direct map.
-> 
-> I want line of sight to understanding the exact semantics/flows.  E.g. will KVM
-> require userspace to clear GUEST_MEMFD_FLAG_WRITE before allowing
-> NO_DIRECT_MAP?  Or will the write() simply fail?  How will the sequencing be
-> achieved?
-
-No, I don't think we can clear the GUEST_MEMFD_FLAG_WRITE as we expect 
-faults and writes to different pages to be arriving interspersed: some 
-pages will be populated by write() proactively, some will be allocated 
-by faults in the user mapping on demand.  Both write() and the fault 
-handler, if they need to allocate a page, will be writing content to it 
-and "sealing" by removing it from the direct map.  If write() faces an 
-already "sealed" page, it will fail (with EEXIST [1]).
-
-> 
->>>> +     struct inode *inode = file_inode(file);
->>>> +     pgoff_t index = pos >> PAGE_SHIFT;
->>>> +     struct folio *folio;
->>>> +
->>>> +     if (!kvm_gmem_supports_mmap(inode))
->>>
->>> Checking for MMAP is neither sufficient nor strictly necessary.  MMAP doesn't
->>> imply SHARED, and it's not clear to me that mmap() support should be in any way
->>> tied to WRITE support.
->>
->> As in my reply to the comment about doc, I plan to introduce
->> KVM_CAP_GUEST_MEMFD_WRITE and GUEST_MEMFD_FLAG_WRITE.  The
->> kvm_arch_supports_gmem_write() will be a weak symbol and relying on
->> !kvm_arch_has_private_mem() on x86, similar to
->> kvm_arch_supports_gmem_mmap().  Does it look right?
-> 
-> No.  As above, write() should be allowed iff memory is SHARED.  Relevant commits
-> that are now in Linus' tree:
-> 
->    44c6cb9fe9888b371e31165b2854bd0f4e2787d4 KVM: guest_memfd: Allow mmap() on guest_memfd for x86 VMs with private memory
->    9aef71c892a55e004419923ba7129abe3e58d9f1 KVM: Explicitly mark KVM_GUEST_MEMFD as depending on KVM_GENERIC_MMU_NOTIFIER
->    5d3341d684be80892d8f6f9812f90f9274b81177 KVM: guest_memfd: Invalidate SHARED GPAs if gmem supports INIT_SHARED
-
-Ack.
+diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+index 07e93acafd04d..f53bc55288978 100644
+--- a/arch/arm64/kvm/vgic/vgic-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-v2.c
+@@ -26,11 +26,19 @@ void vgic_v2_init_lrs(void)
+ 		vgic_v2_write_lr(i, 0);
+ }
+ 
+-void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
++void vgic_v2_configure_hcr(struct kvm_vcpu *vcpu,
++			   struct ap_list_summary *als)
+ {
+ 	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+ 
+-	cpuif->vgic_hcr |= GICH_HCR_UIE;
++	cpuif->vgic_hcr = GICH_HCR_EN;
++
++	if (irqs_pending_outside_lrs(als))
++		cpuif->vgic_hcr |= GICH_HCR_NPIE;
++	if (irqs_active_outside_lrs(als))
++		cpuif->vgic_hcr |= GICH_HCR_LRENPIE;
++	if (irqs_outside_lrs(als))
++		cpuif->vgic_hcr |= GICH_HCR_UIE;
+ }
+ 
+ static bool lr_signals_eoi_mi(u32 lr_val)
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 15225cf353f91..79fa16c5344fb 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -20,11 +20,22 @@ static bool common_trap;
+ static bool dir_trap;
+ static bool gicv4_enable;
+ 
+-void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
++void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
++			   struct ap_list_summary *als)
+ {
+ 	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+ 
+-	cpuif->vgic_hcr |= ICH_HCR_EL2_UIE;
++	cpuif->vgic_hcr = ICH_HCR_EL2_En;
++
++	if (irqs_pending_outside_lrs(als))
++		cpuif->vgic_hcr |= ICH_HCR_EL2_NPIE;
++	if (irqs_active_outside_lrs(als))
++		cpuif->vgic_hcr |= ICH_HCR_EL2_LRENPIE;
++	if (irqs_outside_lrs(als))
++		cpuif->vgic_hcr |= ICH_HCR_EL2_UIE;
++
++	if (!als->nr_sgi)
++		cpuif->vgic_hcr |= ICH_HCR_EL2_vSGIEOICount;
+ }
+ 
+ static bool lr_signals_eoi_mi(u64 lr_val)
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 46b31cd365466..c420f8262e4c1 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -791,38 +791,30 @@ static inline void vgic_clear_lr(struct kvm_vcpu *vcpu, int lr)
+ 		vgic_v3_clear_lr(vcpu, lr);
+ }
+ 
+-static inline void vgic_set_underflow(struct kvm_vcpu *vcpu)
+-{
+-	if (kvm_vgic_global_state.type == VGIC_V2)
+-		vgic_v2_set_underflow(vcpu);
+-	else
+-		vgic_v3_set_underflow(vcpu);
+-}
+-
+-/* Requires the ap_list_lock to be held. */
+-static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
+-				 bool *multi_sgi)
++static void summarize_ap_list(struct kvm_vcpu *vcpu,
++			      struct ap_list_summary *als)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_irq *irq;
+-	int count = 0;
+-
+-	*multi_sgi = false;
+ 
+ 	lockdep_assert_held(&vgic_cpu->ap_list_lock);
+ 
+-	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+-		int w;
++	*als = (typeof(*als)){};
+ 
+-		raw_spin_lock(&irq->irq_lock);
+-		/* GICv2 SGIs can count for more than one... */
+-		w = vgic_irq_get_lr_count(irq);
+-		raw_spin_unlock(&irq->irq_lock);
++	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
++		scoped_guard(raw_spinlock, &irq->irq_lock) {
++			if (vgic_target_oracle(irq) != vcpu)
++				continue;
++
++			if (!irq->active)
++				als->nr_pend++;
++			else
++				als->nr_act++;
++		}
+ 
+-		count += w;
+-		*multi_sgi |= (w > 1);
++		if (irq->intid < VGIC_NR_SGIS)
++			als->nr_sgi++;
+ 	}
+-	return count;
+ }
+ 
+ /*
+@@ -908,60 +900,39 @@ static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
+ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct ap_list_summary als;
+ 	struct vgic_irq *irq;
+-	int count;
+-	bool multi_sgi;
+-	u8 prio = 0xff;
+-	int i = 0;
++	int count = 0;
+ 
+ 	lockdep_assert_held(&vgic_cpu->ap_list_lock);
+ 
+-	count = compute_ap_list_depth(vcpu, &multi_sgi);
+-	if (count > kvm_vgic_global_state.nr_lr || multi_sgi)
+-		vgic_sort_ap_list(vcpu);
++	summarize_ap_list(vcpu, &als);
+ 
+-	count = 0;
++	if (irqs_outside_lrs(&als))
++		vgic_sort_ap_list(vcpu);
+ 
+ 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+-		raw_spin_lock(&irq->irq_lock);
+-
+-		/*
+-		 * If we have multi-SGIs in the pipeline, we need to
+-		 * guarantee that they are all seen before any IRQ of
+-		 * lower priority. In that case, we need to filter out
+-		 * these interrupts by exiting early. This is easy as
+-		 * the AP list has been sorted already.
+-		 */
+-		if (multi_sgi && irq->priority > prio) {
+-			raw_spin_unlock(&irq->irq_lock);
+-			break;
++		scoped_guard(raw_spinlock,  &irq->irq_lock) {
++			if (likely(vgic_target_oracle(irq) == vcpu)) {
++				vgic_populate_lr(vcpu, irq, count++);
++			}
+ 		}
+ 
+-		if (likely(vgic_target_oracle(irq) == vcpu)) {
+-			vgic_populate_lr(vcpu, irq, count++);
+-
+-			if (irq->source)
+-				prio = irq->priority;
+-		}
+-
+-		raw_spin_unlock(&irq->irq_lock);
+-
+-		if (count == kvm_vgic_global_state.nr_lr) {
+-			if (!list_is_last(&irq->ap_list,
+-					  &vgic_cpu->ap_list_head))
+-				vgic_set_underflow(vcpu);
++		if (count == kvm_vgic_global_state.nr_lr)
+ 			break;
+-		}
+ 	}
+ 
+ 	/* Nuke remaining LRs */
+-	for (i = count ; i < kvm_vgic_global_state.nr_lr; i++)
++	for (int i = count ; i < kvm_vgic_global_state.nr_lr; i++)
+ 		vgic_clear_lr(vcpu, i);
+ 
+-	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
++	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
+ 		vcpu->arch.vgic_cpu.vgic_v2.used_lrs = count;
+-	else
++		vgic_v2_configure_hcr(vcpu, &als);
++	} else {
+ 		vcpu->arch.vgic_cpu.vgic_v3.used_lrs = count;
++		vgic_v3_configure_hcr(vcpu, &als);
++	}
+ }
+ 
+ static inline bool can_access_vgic_from_kernel(void)
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 5b7318ceefbd1..f35410de1457b 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -220,6 +220,21 @@ struct its_ite {
+ 	u32 event_id;
+ };
+ 
++struct ap_list_summary {
++	unsigned int	nr_pend;	/* purely pending, not active */
++	unsigned int	nr_act;		/* active, or active+pending */
++	unsigned int	nr_sgi;		/* any SGI */
++};
++
++#define irqs_outside_lrs(s)						\
++	 (((s)->nr_pend + (s)->nr_act) > kvm_vgic_global_state.nr_lr)
++
++#define irqs_pending_outside_lrs(s)			\
++	((s)->nr_pend > kvm_vgic_global_state.nr_lr)
++
++#define irqs_active_outside_lrs(s)		\
++	((s)->nr_act &&	irqs_outside_lrs(s))
++
+ int vgic_v3_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
+ 		       struct vgic_reg_attr *reg_attr);
+ int vgic_v2_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
+@@ -246,7 +261,7 @@ int vgic_check_iorange(struct kvm *kvm, phys_addr_t ioaddr,
+ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
+ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
+-void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
++void vgic_v2_configure_hcr(struct kvm_vcpu *vcpu, struct ap_list_summary *als);
+ int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
+ int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 			 int offset, u32 *val);
+@@ -286,7 +301,7 @@ static inline void vgic_get_irq_ref(struct vgic_irq *irq)
+ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
+ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
+-void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
++void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu, struct ap_list_summary *als);
+ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_v3_enable(struct kvm_vcpu *vcpu);
+-- 
+2.47.3
 
 
