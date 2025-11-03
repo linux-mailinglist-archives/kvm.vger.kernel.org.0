@@ -1,257 +1,207 @@
-Return-Path: <kvm+bounces-61915-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61916-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 526CCC2E280
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 22:31:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CD2CC2E34F
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 22:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99853189921A
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 21:31:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F5073BC4AD
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 21:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91542D061F;
-	Mon,  3 Nov 2025 21:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178B52D6612;
+	Mon,  3 Nov 2025 21:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GphVs64e"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="PeOwxnqV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6DA2AF00;
-	Mon,  3 Nov 2025 21:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762205460; cv=fail; b=Ikwl07wP8EcQseXgUKshZc76NCIS8c3laCxNzfkvhVfSjmxBEazhTRxRw+x5K+PXlW4jxOTtSiI/p0iIZgj5oc6wcweN4jIU9kv2FuIPTFgfSA1p5zjacLr3gAMf+SYzE8WzJn4F9ekLppmJzLcL9FMLc4Kena4mMrWk/4XdG4E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762205460; c=relaxed/simple;
-	bh=a1fT+xQ9K2Y+7sQv48xCjtrNvCElXl6E5VSPNvNDpzM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=d+Uk/REjXCJWIJ0yOOycaOjUPQnZN/zI+kdxNTLr88uaSH9qFRQeRMFP5Tbdqux+ycvWGowXRLdxP4z82/F3Xn/h/2Okvrc3kn8aFPv8TxavR4q6jijhJ7xv8/0iZIR0WDu+NPQ4uS+umZgRb4lzN778lp+ha5T2wDddWvngrSg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GphVs64e; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762205458; x=1793741458;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=a1fT+xQ9K2Y+7sQv48xCjtrNvCElXl6E5VSPNvNDpzM=;
-  b=GphVs64e2Hn/RmaYOjIffshoDZD8dWx0t7e2CABogqlnBoK39smWuwKl
-   iSmcd7B6BjvT1cOn/Q0KA8bnW8h7fRgCmpcOStU+PwOuni0gCedLlCasp
-   vIeIEtpvrHoC68vmY2kGD5F3pbJwMyye95aKy8g7f9LMuWWSFNtajNSZb
-   115hFthvHJSSir67PF+u+kfR2TfawVV9cSrctHX09afSLHoCWeensPPtI
-   l64+q6l1ssSN20Yhm8hI1k632GyklrlrLSQTrfesPF8boDc1Mvewe5JUB
-   JVKzVGw7usbmQJTo5jQiFnEM82CG/7Itrmch5KcLNrH/DSQH/siQQfJau
-   A==;
-X-CSE-ConnectionGUID: ln5Hjk0wSJug+1oMB0N57Q==
-X-CSE-MsgGUID: VgEv51X7QvuuWFJf5qphiA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="74584199"
-X-IronPort-AV: E=Sophos;i="6.19,277,1754982000"; 
-   d="scan'208";a="74584199"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 13:30:57 -0800
-X-CSE-ConnectionGUID: xJv6/23ZRja9zC0UAb4jDw==
-X-CSE-MsgGUID: 3x72M+d1Q9WB3d4sALkc8g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,277,1754982000"; 
-   d="scan'208";a="191297945"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 13:30:56 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 3 Nov 2025 13:30:55 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Mon, 3 Nov 2025 13:30:55 -0800
-Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.33) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 3 Nov 2025 13:30:55 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oMPeiB0NvztJVpHgP41KcAxxJssqb6bIWPSfnqKxsMaCZvWGmGoIqqL3q/ZDwzRpHpmOKPcn6cjRLTViUWHpMwR6uLiQ5gCWp8ebERTdf9N4IqYWtsAOexVgFjes4c8D8nNGbzJfVdjoJt3hQndPUsf5kumYdnvGmHI5soGmRIS5DEi0XLXG0fbrduUb2kpTIRFrYtQxJXr/6Jz7mR1kkKLLDA260oWV3wh7YOW2MUfSqNrtehePBw5Id81qG4CFRA4Lbcz9YigN5Hb4aMJ1/OR9ynlGs9UAnN9kDjajkFIOmv58AY3g0b577xbS4Bbyee0I4/cnyb7HruiXetzYhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e71pnvIX2/4JAn5sN0tQoJdoUZr5YuuSsSDHyxYSDkU=;
- b=aCf1Oe24yiLqYpNKQIXM/LO5p+d17TcexEKtXxIotXSuRqEGXJ+xlSnz2toPN31NzpYTi+BpYi5VTuioEkH2F83vZW9JWo9RssZkkxeQQZ2ZUPQXRAad4U3M4kLxY/h2TaTh0/LGuoyB+u6HPoKwR3FMF3tvvgjS4cPRSNb2OkoLTPUAeviBe/LepN+XGBGvDnfw8W1sG5+mRxW+X+4RTlUkAXBan8Sk2A8i8EQ+hgdJ/Hmew75GFpuAPgvnTCSpfP16GyXusFiI0BoRsNwJleTXWzldENDR4IpEJHNV4NVsEFOSqGKMxOPur0WXy2XYvKkfA+/6wwBn9rQHSVQaPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6139.namprd11.prod.outlook.com (2603:10b6:930:29::17)
- by SA1PR11MB8280.namprd11.prod.outlook.com (2603:10b6:806:25d::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.16; Mon, 3 Nov
- 2025 21:30:53 +0000
-Received: from CY5PR11MB6139.namprd11.prod.outlook.com
- ([fe80::7141:316f:77a0:9c44]) by CY5PR11MB6139.namprd11.prod.outlook.com
- ([fe80::7141:316f:77a0:9c44%6]) with mapi id 15.20.9275.013; Mon, 3 Nov 2025
- 21:30:53 +0000
-Date: Mon, 3 Nov 2025 15:30:49 -0600
-From: Lucas De Marchi <lucas.demarchi@intel.com>
-To: =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>
-CC: Alex Williamson <alex@shazbot.org>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
-	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
-	<kevin.tian@intel.com>, Shameer Kolothum <skolothumtho@nvidia.com>,
-	<intel-xe@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, Matthew Brost <matthew.brost@intel.com>, "Michal
- Wajdeczko" <michal.wajdeczko@intel.com>, <dri-devel@lists.freedesktop.org>,
-	Jani Nikula <jani.nikula@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
- Laguna" <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v3 27/28] drm/intel/pciids: Add match with VFIO override
-Message-ID: <cj3ohepcobrqmam5upr5nc6jbvb6wuhkv4akw2lm5g3rms7foo@4snkr5sui32w>
-References: <20251030203135.337696-1-michal.winiarski@intel.com>
- <20251030203135.337696-28-michal.winiarski@intel.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251030203135.337696-28-michal.winiarski@intel.com>
-X-ClientProxiedBy: BY5PR03CA0010.namprd03.prod.outlook.com
- (2603:10b6:a03:1e0::20) To CY5PR11MB6139.namprd11.prod.outlook.com
- (2603:10b6:930:29::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9695E1917ED;
+	Mon,  3 Nov 2025 21:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762207123; cv=none; b=S9epNxI9M/h0bwVfHRTSKI2Pn6kZVFHozJ+DPa/zBjoD9AwST/94zNGwDPdJ14NdaD/sCR18YtHRGbyGZcrFLvdIRwtQlcZ5Ng88WvOP1KpiLLDRAlhh0m6PJDAxMLg9wEuOWJRBZ1t6MXrZR0fli0jFHfmYioJKGx8hBeJZVJE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762207123; c=relaxed/simple;
+	bh=PfXU/jh66uDBoYjeoG+dYeM131MAN3sH+/yAuxBWU+w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tHLG7WAo5w0ZXbfDNdlVqZdWQYB0d41sw4xXVI/LfqXQrQr0WlqBqXvW5pfvOXbcWgYdBTAVS4ZZrRGuXkVVmvrX6lCbSKA9Kfe1rk2j9hNeNDmuBssBQguO/IDTyEBl4kkg+2JgwdhyaGpDnFnYY1pDak4UqK7esf22r+wk/ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=PeOwxnqV; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A3LsFHf027741;
+	Mon, 3 Nov 2025 21:58:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=XRx1Ysmz7tjQyomBspsIRzLkLsakV
+	p13MOixsdHybeo=; b=PeOwxnqV3FOq3lR+jZkioExPJ3qGkUA9CtjvOJk0/9p9o
+	A3oXajTPQ0c07zgkDrYZzR0V13+tMHO01AWKpj/mcUxaMqxCJSDq+WDqGqBJM2ZF
+	WzEh7ZaSbGhw7XW0DgdGDghGUcZf45ujQvBZoSdbhMH1f7I+N3X5pCE9OjkoYB2/
+	YVa+oSPYq7u7gvVJ2b2X4CuLkwn85rOrh98iuoYJd7zSIMj2MjPG7LeNweIKr12M
+	wXyswtLUVnVqUTtwhgtasH/W9CeIsUtKpixjIczUXQUxVBq5NvNdCidKJYemnUQ8
+	JU0Ejd8do7C1RhMA5ZYJQqUOaOetJdEaa26DWnkkA==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4a74qg80ac-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 03 Nov 2025 21:58:12 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5A3Kiara014974;
+	Mon, 3 Nov 2025 21:44:31 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4a58n8g5pp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 03 Nov 2025 21:44:31 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5A3LiUU4038655;
+	Mon, 3 Nov 2025 21:44:30 GMT
+Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4a58n8g5pd-1;
+	Mon, 03 Nov 2025 21:44:30 +0000
+From: Dongli Zhang <dongli.zhang@oracle.com>
+To: kvm@vger.kernel.org
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org, seanjc@google.com,
+        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        joe.jin@oracle.com
+Subject: [PATCH 1/1] KVM: VMX: configure SVI during runtime APICv activation
+Date: Mon,  3 Nov 2025 13:41:15 -0800
+Message-ID: <20251103214115.29430-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6139:EE_|SA1PR11MB8280:EE_
-X-MS-Office365-Filtering-Correlation-Id: 80a0651b-cb1f-4434-3140-08de1b20442c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?U0NURDV5NFdTcDJaSWJFZFJVSFBGenVtOGJJb1l6dlF5WWdLTkZ3Q1BZVDlr?=
- =?utf-8?B?VnJaTnJIeW95a0x1aG96Q1Rxb3lveGR0bktjNG0vT1orT3V1RU4wV2pLSFBa?=
- =?utf-8?B?c3huemJrbG5zWVZMMlVRQ1dVbFVvRjdhQnMxLzJPcU1lNEJTTTJuTm9ZcXdQ?=
- =?utf-8?B?QXlUb29HM0lLWGlZTUZYejhUazF4VW1zdGFjNWg3YU40NTAyZWhrc1gxYjdm?=
- =?utf-8?B?UXM1eWpYd1VyOHhlT2w5QVY1MDVYQ2VNVlJ3QitlbVFxQ3VBQkY5TW9ibDFC?=
- =?utf-8?B?WEk2ZFVKRzlNUkppcGNFN2hhVXBZc1NwZkRMOEhYZCtrZ2I3cHFhUmEzR1pa?=
- =?utf-8?B?Y2dGRExVTTF3Q0laSi9QMVpFWXBDSnplclpiUUttZkxGbjlZVTc2L2FranpR?=
- =?utf-8?B?V0RYZFpWUkl2d3hYVUFxcXBFTWZiNFZ6QUV2YUxlYjROYmxyY0tNMFBJQ09M?=
- =?utf-8?B?Z2wzaXhtdXJUVS96akVxcWdYR3VRNzFUeGVjNUNXSDFJcnJwa2VlYjlwV04w?=
- =?utf-8?B?bVd0VnZFWTBhaTVMc3psWW1pdkdMTXRjeTNhQVg5cTh4RmI4RStTZFlXZ1ps?=
- =?utf-8?B?MnAwcUdOQmJwOGRianE2S2NhaWVHQ1piTzd6Si9HNUF6SVJXOG1nQURTa0lQ?=
- =?utf-8?B?bHVEYXBueWRIOW5VdGJFbCtBMkFqN1FvOHhFMnRrVVpETzN2K1pYa2JLWFpm?=
- =?utf-8?B?WnVYaFlIZTJZcjhsQUhZT1FMcWxybExGQ0ZLRGNFbUhGZzVwMWloWUpwUWM1?=
- =?utf-8?B?M2R2eHRCaEFpalZaMVFuS1JwaFBsT3lTTnZ2SlFkeU9iSG14aW1lUVJzRUJ3?=
- =?utf-8?B?N2dERnQ2ZGZZSVJFTzI4djJHMWY1ZlJjc2lCVTRWRnkvYlFRSVNsc3hmQzVB?=
- =?utf-8?B?TXRzUDRSNFl3YXhhdExWZXptc3BrVXJtVkVJNzVWaUt1QkFIZUlwMUc1bkJR?=
- =?utf-8?B?V0IxZ3UxWE1GcDB4WHdnOGRQWVF1WnY5YStLa3lkNVQ2blo0YWRrNktKZ09w?=
- =?utf-8?B?Yzc2Zjkveks4cWN6QlBESEJHRDZoWGlNdXNJU2pOaGFLZnhydW10TUpON0Rq?=
- =?utf-8?B?a1pGeHFGOHI1MzYzOEhzSUpwQjhMU1g4ejNkZmtkNlR4MEJNclVGcEU0aGJK?=
- =?utf-8?B?R29HeE84eEZITE5hcFRtT0tVUjVSRFRIUWJLUGVnaDNpS1liNHJmWEZBaU5K?=
- =?utf-8?B?VXcxVlV0S2ExR0hNL0ZaeFJmWUlsZmtmVkoydkxYQW1uaFIydklHbGRCaGxv?=
- =?utf-8?B?RksvNEZSeHNIVFZWaGNUc05iZW9lKzFpa3duaTZrRXFUWk03N0lhc0tXT1ZC?=
- =?utf-8?B?ZzhCQktBdlI3TXRvM2VsSTgyUHM2U25EUUtCOWJFcnNNRlFsbjBzOFlEYXF6?=
- =?utf-8?B?ODdvOEpHaGhwZjJYNHh1RFJUR2RDKzYyUlRuMHFTWVVROTdIdStrOC9OWHo3?=
- =?utf-8?B?OHRuV09aV3pmUG5rZ2dDdS9jb3RYMUkwWVhZOFBaOERxd094aDYvR2xQc2Y2?=
- =?utf-8?B?Yk1send3S3JFSlRyb2gyWi9oalJPQWo4WkpRVDA5MzRMTGFDRTRFSEROMXdn?=
- =?utf-8?B?RWFkcDU0ajlHNUZ0V1hPN3FpWm5wRHExS0xVOE9oYjNKdmxXQ2JaaUVkM0cz?=
- =?utf-8?B?VU52OGlldkdRNndYL0MzdVJqQ25hZUpOQzdpMERncXVyWjA3NTI0eUZYaXZV?=
- =?utf-8?B?MWtaTDllMXUwdyttRDJuTFNNUmhxbVNWbVdRWGFjbk5aRWhtcnFiV0NIaThQ?=
- =?utf-8?B?dkFsNisycHcvZVVQTEd5bmU5aVJ6cjV0aUluMElQNHdoc2xOOEFZSTdPRjBW?=
- =?utf-8?B?TjlEWTJPVkYrajM5b0RzSmJZc3drU1c0ZEN1SjZaVEZYbXM3ZjliVnBWdHRk?=
- =?utf-8?B?aDB0NDBheGNLN3BlMWZ2ZXJaYTJLZzgvN2FwaHlNZFd3bkxjdXpWbit0QzRF?=
- =?utf-8?Q?x3u/Z0/JF9tWJ42KWt7u5VT2qTGHDs/A?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6139.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TVY5TjZ1RHZFblFOUGN5VkxJQVVURXpmT042TjhkRDhLcUNRSjl2eUttcjB1?=
- =?utf-8?B?RHRXZXdyYkd4ZXExYm9CUnlCRlRIeExEa0luWmhmL0N1YjNsZDl0d3RTTzFP?=
- =?utf-8?B?SUxublRNbmd1NnozaWg2ZlBJK2h3Z3ZvaGdZc3M4eFIzMVdPczlzZ3BMMkNj?=
- =?utf-8?B?KzJ6dWpjSGNyaG8renc5QVJXazJyT2xRVTg1RmRNTHVpNnlMb04wZlZCdHdp?=
- =?utf-8?B?cUFVS2QweThoVDZRQjJCYm5lNkR4WGs2bHBETVU3Qm1BeFdqbVEwYlZBTFJw?=
- =?utf-8?B?R2dycUlTUWMwMW81ZDNtOUhWQkNRUjBHYTRtdlhvMVp1TzhsZ01qcGl5b1hr?=
- =?utf-8?B?ZVJuWnVhRWZmSzVvc29GTWF6dEJzc1J5VzVZUHIvRnVFOFN3dm1xSUFMOGRR?=
- =?utf-8?B?aE1lWXB1R3FqcUMyQXR0SXFoSTI0b056MUlDL3V5bmRyKzV6Z2lkNlU5Mmoy?=
- =?utf-8?B?aU9GU1dTYlhOdllkclRJZVBiNFlhMGZqWnUyRTMwVGJISUhHczNnMVl2UXNE?=
- =?utf-8?B?eXBPVlBlbzZGbFR6NkNDeEp1MG1TVnpQbDVhYWZZdnhLRnJwbGtLbjQ2dUNW?=
- =?utf-8?B?SFJPQ1lPZjI2ODQ3R1p3Sk85YjVwRUNSSWpzMzFQa2NCeE95anBsSHcweHYy?=
- =?utf-8?B?bCt5S1ozUDBZbENRMGtVSnVhOFAvRVZNYVRrY251T1l3VnN3ZlB2LzNBTllF?=
- =?utf-8?B?eFYzR2hiWWd4V3RjeTBMZWVxcEtlaWhMdTVUY3JvV3VaenVJc3pMY3RHWlBl?=
- =?utf-8?B?bHFIYWp5eUNETWcvRlQ3aWRCUEx6U3N6cFhNYmhrc29weE1LR1RHemhpcysv?=
- =?utf-8?B?MmVKcVQ3Q2lPZjZDaDArWUZKVU9PbThqVU8waFVaR2ZyL0lNRWFKdDBjOHlL?=
- =?utf-8?B?cjJ4NWNFSldXdnNZZUVkdUloTm1GNTZvM0drRi9FL3kveW9nTVRJVmY3RWNK?=
- =?utf-8?B?b2U2dGEwaXhRdHhlamF6NStLbHZHdjlzdWIwbjdtb2tYTTFvcEVNZWdiZlgy?=
- =?utf-8?B?Qi80alg3dnhOTmdRdzdJTXBVQ3FvMDZtOWc1QVpPYkN6Y2NIRERBalQ1dEY5?=
- =?utf-8?B?d1pONitoeW5lVmxxb1NDaHlpb21XUGt5VHNxWjlCRW9LWDZnK0pLWnloWUN3?=
- =?utf-8?B?akVjd3A2QkFicVgwODNOUzErckVMU0dSMTlnMVZpaElXbWNtQ1F6N3puaUtH?=
- =?utf-8?B?V3RJNTNHaVJQMWhpeTF2YkhKNkVEMWNxcVUzQnZtTlJCOUhNb0hvOXNPbTFQ?=
- =?utf-8?B?cndPWVZpVStZckg0N0xnbGdZREx1WURJViswYUVKT2NkK0M1VWZYcFF0QVRK?=
- =?utf-8?B?aVB0MW81eUIzdm02V1hQNGFrRTZ6bjJJdmVOdXdpMlI3ckdlanBiNHdpbEZK?=
- =?utf-8?B?ekx4elJqd0c4MzNiWUd5RTBXTm9tZUQvZlRmMm5ORVRCUXFUSGRCbWs4Vk9p?=
- =?utf-8?B?K1FueWYyY2o0Z2NyeFl2dyt2bHh6SXdOMGJUQ1BoZVVlUjN3c3A0WDQrRmxE?=
- =?utf-8?B?ZXU4NXFaRStMK3FySXgvY0duSFNzYmY3dEl5elpOQnV0RkNra1V5cG9hOWpU?=
- =?utf-8?B?Z2ZBeWtKU0tBdnNYbFE2Z1JXUHZRclp5bGM5QVFQMmJoN2xDTjE1Z0tXTUVQ?=
- =?utf-8?B?QkpXZERxQy9BU2pkTTBOQXo2SHRleGgzMzZ3RmJzbFJSamlMazU0a2VEMUQ4?=
- =?utf-8?B?b3E2ZHQzZkdtb0FoNWFhQnNidkRwL2RtSnJzWGN5d1JHQjk0K0pYcnNJZDRQ?=
- =?utf-8?B?eGhsZGhTb1UycDNXeVJGZWJobjQwZTRQUllHb1FIajZZVjB2bjlpb3VGdERB?=
- =?utf-8?B?THlGTXpmV0pvQWVubmNMbzNYc3dRc0V1bWcrdVNraktjS3VlZjN4bHpPK0JI?=
- =?utf-8?B?aWVxUGExY3ZRT2xwaFhLNnVUY2xuR3AwM0VEUUZPOU9SbHVqQSs4RXdwaXFa?=
- =?utf-8?B?VDVsT003ZGplbWZGb1V2eHhBWnVRK2hoRmF4cjU3M1NzRDYwRXlSQXVsTEZw?=
- =?utf-8?B?VTJpbFdFSmxwdER4MU9JZkxMUUszNkFVY1oveVRBMTVlZlI2L05BVHg4Y0ln?=
- =?utf-8?B?bEtkUnBESlB3QTJrYlRNZHNuVS9wMjA2bGdiVXpZRFl3eUlXaE8zQ0JoeFN3?=
- =?utf-8?B?Q3oxcW1hcDdBbXVsK1ZWalFuc2YrTVRrTlJuSTVneEFGK2d4U2UrYXk0OWNC?=
- =?utf-8?B?bkE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80a0651b-cb1f-4434-3140-08de1b20442c
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6139.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2025 21:30:53.1708
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KfgCanVmsGSS26rbRfWU7Z4nEJNXDRwI72qdlj/52Lm/qs0fR/6894BThBnA7C7SD7iQYoyb6cvi8xkhjiig+BeOv8kqGDesRjmoqYL2rCY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8280
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-03_05,2025-11-03_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999 spamscore=0
+ adultscore=0 phishscore=0 malwarescore=0 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
+ definitions=main-2511030193
+X-Authority-Analysis: v=2.4 cv=V7dwEOni c=1 sm=1 tr=0 ts=69092574 b=1 cx=c_pps
+ a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
+ a=mHEEIGHzy4QsYcnjCaUA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAzMDE5NSBTYWx0ZWRfX1SXgacrUFcgQ
+ EXDRgePCpKiZpM2KzZOmAjwzaZaIjB9Qbw2nc8o68rqGl5YLKcvELxx9u7J6aFR6e3dQSQEr/DB
+ A0SJ4lFQN9/fj4y1Rab0j39nhO9xoXbGh6JcTM4pIm7t+pNxiViVIXxnvc22dbS6HYF/JSc1Fe4
+ awQADh3afU3nwPCgxuLMAFX/2u7TfyzpLtUXgucGhPXRJ4LA0i1R/RfrSwRPKW0ZQaxS4GenpID
+ csUwgDq/QSc1oB0luuy5/be0BLMN2dcBSfWyDbWc/oHH2AVzk4yCpMk6907OlO8WR9/R7X6V5uL
+ 2KwyhtDSbuwHqb77RLXNdJC/iUaPfeXD1kcMnOXaqTINc5qgsFnTbYR5HAi/KobLsHOdl5VJsIt
+ EFrdgGoSnk6989B+K8GbUAriaCrdLQ==
+X-Proofpoint-GUID: eCW0CGtaAoyD_slSOp9s6ssaML17vbYU
+X-Proofpoint-ORIG-GUID: eCW0CGtaAoyD_slSOp9s6ssaML17vbYU
 
-On Thu, Oct 30, 2025 at 09:31:34PM +0100, Michał Winiarski wrote:
->In order to allow VFIO users to choose the right driver override, VFIO
->driver variant used for VF migration needs to use Intel Graphics PCI
->IDs.
->Add INTEL_VGA_VFIO_DEVICE match that sets VFIO override_only.
->
->Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
->---
-> include/drm/intel/pciids.h | 7 +++++++
-> 1 file changed, 7 insertions(+)
->
->diff --git a/include/drm/intel/pciids.h b/include/drm/intel/pciids.h
->index b258e79b437ac..d14ce43139a28 100644
->--- a/include/drm/intel/pciids.h
->+++ b/include/drm/intel/pciids.h
->@@ -43,6 +43,13 @@
-> 	.class = PCI_BASE_CLASS_DISPLAY << 16, .class_mask = 0xff << 16, \
-> 	.driver_data = (kernel_ulong_t)(_info), \
-> }
->+
->+#define INTEL_VGA_VFIO_DEVICE(_id, _info) { \
->+	PCI_DEVICE(PCI_VENDOR_ID_INTEL, (_id)), \
->+	.class = PCI_BASE_CLASS_DISPLAY << 16, .class_mask = 0xff << 16, \
->+	.driver_data = (kernel_ulong_t)(_info), \
->+	.override_only = PCI_ID_F_VFIO_DRIVER_OVERRIDE, \
+The APICv (apic->apicv_active) can be activated or deactivated at runtime,
+for instance, because of APICv inhibit reasons. Intel VMX employs different
+mechanisms to virtualize LAPIC based on whether APICv is active.
 
-why do we need this and can't use PCI_DRIVER_OVERRIDE_DEVICE_VFIO()
-directly? Note that there are GPUs that wouldn't match the display class
-above.
+When APICv is activated at runtime, GUEST_INTR_STATUS is used to configure
+and report the current pending IRR and ISR states. Unless a specific vector
+is explicitly included in EOI_EXIT_BITMAP, its EOI will not be trapped to
+KVM. Intel VMX automatically clears the corresponding ISR bit based on the
+GUEST_INTR_STATUS.SVI field.
 
-	edb660ad79ff ("drm/intel/pciids: Add match on vendor/id only")
-	5e0de2dfbc1b ("drm/xe/cri: Add CRI platform definition")
+When APICv is deactivated at runtime, the VM_ENTRY_INTR_INFO_FIELD is used
+to specify the next interrupt vector to invoke upon VM-entry. The
+VMX IDT_VECTORING_INFO_FIELD is used to report un-invoked vectors on
+VM-exit. EOIs are always trapped to KVM, so the software can manually clear
+pending ISR bits.
 
-Lucas De Marchi
+There are scenarios where, with APICv activated at runtime, a guest-issued
+EOI may not be able to clear the pending ISR bit.
 
->+}
-> #endif
->
-> #define INTEL_I810_IDS(MACRO__, ...) \
->-- 
->2.50.1
->
+Taking vector 236 as an example, here is one scenario.
+
+1. Suppose APICv is inactive. Vector 236 is pending in the IRR.
+2. To handle KVM_REQ_EVENT, KVM moves vector 236 from the IRR to the ISR,
+and configures the VM_ENTRY_INTR_INFO_FIELD via vmx_inject_irq().
+3. After VM-entry, vector 236 is invoked through the guest IDT. At this
+point, the data in VM_ENTRY_INTR_INFO_FIELD is no longer valid. The guest
+interrupt handler for vector 236 is invoked.
+4. Suppose a VM exit occurs very early in the guest interrupt handler,
+before the EOI is issued.
+5. Nothing is reported through the IDT_VECTORING_INFO_FIELD because
+vector 236 has already been invoked in the guest.
+6. Now, suppose APICv is activated. Before the next VM-entry, KVM calls
+kvm_vcpu_update_apicv() to activate APICv.
+7. Unfortunately, GUEST_INTR_STATUS.SVI is not configured, although
+vector 236 is still pending in the ISR.
+8. After VM-entry, the guest finally issues the EOI for vector 236.
+However, because SVI is not configured, vector 236 is not cleared.
+9. ISR is stalled forever on vector 236.
+
+Here is another scenario.
+
+1. Suppose APICv is inactive. Vector 236 is pending in the IRR.
+2. To handle KVM_REQ_EVENT, KVM moves vector 236 from the IRR to the ISR,
+and configures the VM_ENTRY_INTR_INFO_FIELD via vmx_inject_irq().
+3. VM-exit occurs immediately after the next VM-entry. The vector 236 is
+not invoked through the guest IDT. Instead, it is saved to the
+IDT_VECTORING_INFO_FIELD during the VM-exit.
+4. KVM calls kvm_queue_interrupt() to re-queue the un-invoked vector 236
+into vcpu->arch.interrupt. A KVM_REQ_EVENT is requested.
+5. Now, suppose APICv is activated. Before the next VM-entry, KVM calls
+kvm_vcpu_update_apicv() to activate APICv.
+6. Although APICv is now active, KVM still uses the legacy
+VM_ENTRY_INTR_INFO_FIELD to re-inject vector 236. GUEST_INTR_STATUS.SVI is
+not configured.
+7. After the next VM-entry, vector 236 is invoked through the guest IDT.
+Finally, an EOI occurs. However, due to the lack of GUEST_INTR_STATUS.SVI
+configuration, vector 236 is not cleared from the ISR.
+8. ISR is stalled forever on vector 236.
+
+Using QEMU as an example, vector 236 is stuck in ISR forever.
+
+(qemu) info lapic 1
+dumping local APIC state for CPU 1
+
+LVT0	 0x00010700 active-hi edge  masked                      ExtINT (vec 0)
+LVT1	 0x00010400 active-hi edge  masked                      NMI
+LVTPC	 0x00000400 active-hi edge                              NMI
+LVTERR	 0x000000fe active-hi edge                              Fixed  (vec 254)
+LVTTHMR	 0x00010000 active-hi edge  masked                      Fixed  (vec 0)
+LVTT	 0x000400ec active-hi edge                 tsc-deadline Fixed  (vec 236)
+Timer	 DCR=0x0 (divide by 2) initial_count = 0 current_count = 0
+SPIV	 0x000001ff APIC enabled, focus=off, spurious vec 255
+ICR	 0x000000fd physical edge de-assert no-shorthand
+ICR2	 0x00000000 cpu 0 (X2APIC ID)
+ESR	 0x00000000
+ISR	 236
+IRR	 37(level) 236
+
+The issue is not applicable to AMD SVM which employs a different LAPIC
+virtualization mechanism. In addition, APICV_INHIBIT_REASON_IRQWIN ensures
+AMD SVM APICv is not activated until the last interrupt is EOI.
+
+Fix the bug by configuring Intel VMX GUEST_INTR_STATUS.SVI if APICv is
+activated at runtime.
+
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+---
+ arch/x86/kvm/x86.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b4b5d2d09634..a20cca69f2ed 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10873,6 +10873,9 @@ void __kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
+ 	kvm_apic_update_apicv(vcpu);
+ 	kvm_x86_call(refresh_apicv_exec_ctrl)(vcpu);
+ 
++	if (apic->apicv_active && !is_guest_mode(vcpu))
++		kvm_apic_update_hwapic_isr(vcpu);
++
+ 	/*
+ 	 * When APICv gets disabled, we may still have injected interrupts
+ 	 * pending. At the same time, KVM_REQ_EVENT may not be set as APICv was
+-- 
+2.39.3
+
 
