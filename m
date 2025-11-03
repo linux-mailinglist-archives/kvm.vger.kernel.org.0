@@ -1,223 +1,131 @@
-Return-Path: <kvm+bounces-61798-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61800-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36492C2AB0F
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 10:13:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4495C2AB42
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 10:19:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 93E8D4E69EA
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 09:12:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 14DB94EFB45
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 09:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE5B2E5B1B;
-	Mon,  3 Nov 2025 09:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C94F2E88B6;
+	Mon,  3 Nov 2025 09:18:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sd3HN1tK"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BSPwC5kG"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322421B87C9
-	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 09:12:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E810E2E7BCE;
+	Mon,  3 Nov 2025 09:18:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762161172; cv=none; b=dAztxBLIzHzj3lQzctgD3rRbX3rYODQXQ8oT+soHNLQuufypgRkxV7vGvdJdpaevDtSSJAW5Y6hNelg8x1Rjnysv6H+Di68mhHs//SQQJpkqvtS7kc4nsigk+XJyowgTyK3n1B/sqpRjYxjtNGngDl5aDoVJ9HmtFeskQXhaJUg=
+	t=1762161483; cv=none; b=rbRI0JztsOYMU5nFPtepAU4XDKyvZh2Xi+THzVRzJESoKzhgtQ562pN3r80VtjM/kfccJKy4TQEEJuT7Zw90UhZVbivplT2stsaCdwO4NhMO5XfDbwxwTrovIhw2PaqV62OyvYmXtkXDrQ9PrZdAv//2UOEWTKoeLn4hUBNBy4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762161172; c=relaxed/simple;
-	bh=PBYpNLYnnMbku+7d1x4dCv4wHnzS9z2Su+rR8nJHbOM=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=J9M4fT4mFASNyOd3sH3RbivG8nCvS0Nrj8eqhnjVcJJPi0QY7fiLjGzWXuwITee92Rlz0zDNrIkD0dIakx6PVEOTiQSuZLnys7xQzNflhrvK1p3P0DKvjqSpoWJkGInyX5fUjaYuvVHO6Winour7qRzp5E4vldWz/J2irM/fIFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sd3HN1tK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AF2D5C116D0
-	for <kvm@vger.kernel.org>; Mon,  3 Nov 2025 09:12:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762161171;
-	bh=PBYpNLYnnMbku+7d1x4dCv4wHnzS9z2Su+rR8nJHbOM=;
-	h=From:To:Subject:Date:From;
-	b=sd3HN1tKLLoeuu0jOEaE4cr/00A69FEZolKlqqL2jvHiBLmH57upbYDZWo9vNXNWI
-	 UhzDcUi2QLUfDgKNwIoluaYytWBW/WDZ/ITCBvQvfdIPbsNstQ4NuWDEqoqUAPRwqc
-	 0DBqVIAh7YJzc9IdVcFNscdyNrj4TW8Uqemo8PKYhV7mhLHrbcpPWeiO12bp7jNpmi
-	 Jq4z1FDtc81YYYeRL9DmkQnfftsXJLYvH0Gh7tx/uM1UZgtQ4SfADdWyLQ7/OcQB2E
-	 Kj1dx7QGGXrQj21XrW0noSaNUMR13MWnJvSrFn2x2VQLLjlmccXkocBc093LTHzqaF
-	 id5LxYkWhYzjA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id A3BE0C41613; Mon,  3 Nov 2025 09:12:51 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 220740] New: Host crash when do PF passthrough to KVM guest
- with some devices
-Date: Mon, 03 Nov 2025 09:12:51 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: farrah.chen@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-220740-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1762161483; c=relaxed/simple;
+	bh=uDw7dUcSPLDcLjn4FHKbeawyT4pKbSlyz6Q50G7OEfo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P/CyM91IXKy0DVtKyuS12REHXVo17jRwUgYxiCDb2du8yGy83lehZ46OyYrX+3jpPYM8+gZghGtNxNh7Ohz9ZAkiym9O0K3u8y+4rhu8gIHh9XWdT+M6L+Z423RDdoJN6188puAVBbyimBySBoSVskBfeJtJbTAyXuLgsBlcAOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BSPwC5kG; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ZGAHTQeKhhaTDSVnfwPbs9ecAwvUD0Gp75ur/DeNVyY=; b=BSPwC5kGlJJHZs1RBLRxslg68M
+	XezaODI0jdADd65PbZls4qvrFJBC1OLGhS/PJsOR5y5q6hBkN6jriV+lwwETRij9YX+yPl2/Mj55j
+	xYu+pcOlVg73WVP2cWxwlrGw7kqXaGCNlyfQlv33ZbP2c2iGB+cdg0uZqWPufREe2ZQl99uwdQgYU
+	cP77FsvyGBg8ufHXHLok+/lZ8SlLawP5sYXBJXCoTkFxBcKGwxZq5MwoC9D/BJGdcHk9VzTApCBa6
+	pXlM+foM17+OLHh+s5UDiuaYdqVkHDIvzpHaXcIzIbPJMCBVfztLPGiW8YPlT7tPNJcKLO2F0yUib
+	iTisLoQA==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vFqhC-00000001mNs-2ET0;
+	Mon, 03 Nov 2025 09:17:51 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id E6DB030023C; Mon, 03 Nov 2025 10:17:49 +0100 (CET)
+Date: Mon, 3 Nov 2025 10:17:49 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@alien8.de>,
+	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Brendan Jackman <jackmanb@google.com>
+Subject: Re: [PATCH v4 4/8] KVM: VMX: Handle MMIO Stale Data in VM-Enter
+ assembly via ALTERNATIVES_2
+Message-ID: <20251103091749.GW3245006@noisy.programming.kicks-ass.net>
+References: <20251031003040.3491385-1-seanjc@google.com>
+ <20251031003040.3491385-5-seanjc@google.com>
+ <20251031235524.cuwrx4qys46xnpjr@desk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251031235524.cuwrx4qys46xnpjr@desk>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220740
+On Fri, Oct 31, 2025 at 04:55:24PM -0700, Pawan Gupta wrote:
+> On Thu, Oct 30, 2025 at 05:30:36PM -0700, Sean Christopherson wrote:
+> ...
+> > diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+> > index 1f99a98a16a2..61a809790a58 100644
+> > --- a/arch/x86/kvm/vmx/vmenter.S
+> > +++ b/arch/x86/kvm/vmx/vmenter.S
+> > @@ -71,6 +71,7 @@
+> >   * @regs:	unsigned long * (to guest registers)
+> >   * @flags:	VMX_RUN_VMRESUME:	use VMRESUME instead of VMLAUNCH
+> >   *		VMX_RUN_SAVE_SPEC_CTRL: save guest SPEC_CTRL into vmx->spec_ctrl
+> > + *		VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO: vCPU can access host MMIO
+> >   *
+> >   * Returns:
+> >   *	0 on VM-Exit, 1 on VM-Fail
+> > @@ -137,6 +138,12 @@ SYM_FUNC_START(__vmx_vcpu_run)
+> >  	/* Load @regs to RAX. */
+> >  	mov (%_ASM_SP), %_ASM_AX
+> >  
+> > +	/* Stash "clear for MMIO" in EFLAGS.ZF (used below). */
+> > +	ALTERNATIVE_2 "",								\
+> > +		      __stringify(test $VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO, %ebx), 	\
+> > +		      X86_FEATURE_CLEAR_CPU_BUF_MMIO,					\
+> > +		      "", X86_FEATURE_CLEAR_CPU_BUF_VM
+> > +
+> >  	/* Check if vmlaunch or vmresume is needed */
+> >  	bt   $VMX_RUN_VMRESUME_SHIFT, %ebx
+> >  
+> > @@ -161,7 +168,12 @@ SYM_FUNC_START(__vmx_vcpu_run)
+> >  	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
+> >  
+> >  	/* Clobbers EFLAGS.ZF */
+> > -	VM_CLEAR_CPU_BUFFERS
+> > +	ALTERNATIVE_2 "",							\
+> > +		      __stringify(jz .Lskip_clear_cpu_buffers;			\
+> > +				  CLEAR_CPU_BUFFERS_SEQ;			\
+> > +				  .Lskip_clear_cpu_buffers:),			\
+> > +		      X86_FEATURE_CLEAR_CPU_BUF_MMIO,				\
+> > +		      __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF_VM
+> 
+> Another way to write this could be:
+> 
+> 	ALTERNATIVE_2 "jmp .Lskip_clear_cpu_buffers",					\
+> 		      "jz  .Lskip_clear_cpu_buffers", X86_FEATURE_CLEAR_CPU_BUF_MMIO,	\
+> 		      "",			      X86_FEATURE_CLEAR_CPU_BUF_VM
+> 
+> 	CLEAR_CPU_BUFFERS_SEQ
+> .Lskip_clear_cpu_buffers:
+> 
+> With this jmp;verw; would show up in the disassembly on unaffected CPUs, I
+> don't know how big a problem is that. OTOH, I find this easier to understand.
 
-            Bug ID: 220740
-           Summary: Host crash when do PF passthrough to KVM guest with
-                    some devices
-           Product: Virtualization
-           Version: unspecified
-          Hardware: Intel
-                OS: Linux
-            Status: NEW
-          Severity: high
-          Priority: P3
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: farrah.chen@intel.com
-        Regression: No
+Generating larger code just to keep disassembly 'simple' seems wrong.
+Also, see this:
 
-Environment:
-
-Host Kernel: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux=
-.git
-v6.18.0-rc4
-
-Guest kernel: 6.17-rc7
-
-QEMU: https://gitlab.com/qemu-project/qemu.git master 37ad0e48e9fd58b17
-
-Bug detail description:=20
-
-when do PF passthrough to KVM guest with some devices, guest failed to boot=
- and
-host crash.
-
-Not all devices can trigger this issue, currently, I found Intel NIC
-X710(almost every time) and Nvidia GPU A10(randomly) can reproduce this iss=
-ue.
-VF passthrough can't reproduce this issue.
-
-Reproduce steps:=20
-
-Add "intel_iommu=3Don" host kernel cmdline to enable VTD
-Check VTD in dmesg
-[root@gnr ~]# dmesg|grep "Virtualization Technology"
-[   27.313975] DMAR: Intel(R) Virtualization Technology for Directed I/O
-Check BDF of X710
-[root@gnr ~]# lspci|grep "X710"
-b8:00.0 Ethernet controller: Intel Corporation Ethernet Controller X710 for
-10GbE SFP+ (rev 01)
-...
-Bind X710 to vfio-pci driver
-[root@gnr ~]# modprobe vfio-pci
-[root@gnr ~]# echo 0000:b8:00.0 >
-/sys/bus/pci/devices/0000\:b8\:00.0/driver/unbind
-
-[root@gnr ~]# lspci -n -s b8:00.0
-b8:00.0 0200: 8086:1572 (rev 01)
-[root@gnr ~]# echo 8086 1572 > /sys/bus/pci/drivers/vfio-pci/new_id
-[root@gnr ~]# lspci -k -s b8:00.0
-b8:00.0 Ethernet controller: Intel Corporation Ethernet Controller X710 for
-10GbE SFP+ (rev 01)
-        Subsystem: Intel Corporation Ethernet Converged Network Adapter X71=
-0-2
-        Kernel driver in use: vfio-pci
-        Kernel modules: i40e
-
-Boot guest with b8:00.0 assigned
-/home/qemu/build/qemu-system-x86_64 \
-    -name legacy,debug-threads=3Don \
-    -accel kvm \
-    -cpu host \
-    -smp 16 \
-    -m 16G \
-    -drive file=3D/home/centos9.qcow2,if=3Dnone,id=3Dvirtio-disk0 \
-    -device virtio-blk-pci,drive=3Dvirtio-disk0 \
-    -vnc :1 \
-    -monitor telnet:127.0.0.1:45455,nowait,server \
-    -device vfio-pci,host=3Db8:00.0 \
-    -serial stdio
-Error log:=20
-
-VM failed to boot, no output.
-Host crash with below error in serial output.
-
-gnr login: [  120.259677] i40e 0000:b8:00.0: i40e_ptp_stop: removed PHC on
-ens26f0np0
-
-[  136.778544] vfio-pci 0000:b8:00.0: resetting
-
-[  136.891303] vfio-pci 0000:b8:00.0: reset done
-
-[  136.896389] vfio-pci 0000:b8:00.0: Masking broken INTx support
-
-[  136.940637] vfio-pci 0000:b8:00.0: resetting
-
-[  137.051298] vfio-pci 0000:b8:00.0: reset done
-
-[IEH] error found at IEH(S:0x1 B:0xFE D:0x2 F:0x0) Sev: IEH CORRECT ERROR
-
-[IEH] ErrorStatus 0x10, MaxBitIdx 0x1D
-
-IEH CORRECT ERROR
-
-[IEH] BitIdx 0x4, ShareIdx 0x0
-
-[IEH] error device is (S:0x1 B:0xB7 D:0x0 F:0x4) BitIdx 0x4, ShareIdx 0x0 [=
-IEH]
-error found at IEH(S:0x1 B:0xB7 D:0x0 F:0x4) Sev: IEH CORRECT ERROR
-
-[IEH] ErrorStatus 0x4, MaxBitIdx 0x11
-
-IEH CORRECT ERROR
-
-[IEH] BitIdx 0x2, ShareIdx 0x0
-
-[IEH] error device is (S:0x1 B:0xB7 D:0x2 F:0x0) BitIdx 0x2, ShareIdx 0x0=
-=20=20
-[Device Error] error on skt:0x1 Bus:0xB7 Device:0x2 func:0x0
-
-PcieRootPortErrorHandler MailBox->PcieInitPar.SerrEmuTestEn =3D 0x0
-
-PcieRootPortMultiErrorsHandler RP Error handler.
-
-ERROR: C00000002:V03071008 I0 515DFD4E-2D7E-40D1-8C22-8AD3CD224325 7C7C9818
-
-WHEA: Detected PCIe Error
-
- --Logging Corrected Error to WHEA
-
-WHEA: Sending OS notification via SCI. Success
-
-ERROR: C00000002:V03071008 I0 515DFD4E-2D7E-40D1-8C22-8AD3CD224325 7C7C9818
-
-WHEA: Detected PCIe Error
-
- --Logging Corrected Error to WHEA
-
-WHEA: Sending OS notification via SCI. Success
-...
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+  https://lkml.kernel.org/r/194ad779-f41f-46a5-9973-e886f483b60a@oracle.com
 
