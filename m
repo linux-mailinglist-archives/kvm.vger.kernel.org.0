@@ -1,276 +1,175 @@
-Return-Path: <kvm+bounces-61908-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61909-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28513C2DC33
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 19:55:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09FA4C2DFC6
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 21:06:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDA753B60A4
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 18:55:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3A49189702A
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 20:05:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AACF31D740;
-	Mon,  3 Nov 2025 18:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DEB4241CB2;
+	Mon,  3 Nov 2025 20:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WnLCR1Tg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F1IvAqiz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B95286890;
-	Mon,  3 Nov 2025 18:55:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762196120; cv=fail; b=msOeavfROPxbso0asoiIgw5gedCb9D5Og3Z+YnYT7dpLIDXuYUBpDoEfZXF7UCeIvNpWHqtZR3D7U/i9aU2s87v1YTcUyukjLPgUMFIIJZ0UiFuImAo25u56hpHu5cAj6K3G1Tu1eh3JnDmX43HyTA8g9erOUpKSgHYnNgQ/KQA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762196120; c=relaxed/simple;
-	bh=sDdenJVQiBju/b4OhhyATNGa7eG0+qiZpAL6R+ldboI=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=lqgtJtAX7V+of8XgTfYV9jAzcrsQSE6fBMnZMgxaKLnsQaEvqY7VU9jhUyIubZD/a1cvXJ48mutnBWC/8eJ8GbXtC8Spkrmkh5k3wgSwXyjPcfZdy5OQFtvUI0wNOdynQjO9FJ7fg14xRlEOj2yctTxz42e51f/lF+3SAWcVK/U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WnLCR1Tg; arc=fail smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6673829994B;
+	Mon,  3 Nov 2025 20:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762200294; cv=none; b=BwkgpyXpBQ7JTX4Xaz1YMkYSoNdXOvwlxq3SpjhuwtgDyfRMema9EkEiPjkh7sb055eWmZjecAcSZ1+sI8eIxpZqspX+peSqDPjQO9dsKsahNrwh4FtSRgNskFTU1oWKeSxZ848Q/QphNhuuUzByAUZ1dU7LOCcZ4/u5mfNQIsw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762200294; c=relaxed/simple;
+	bh=zSZ7IBXioErhSo4Nbik2yG9o/pB1tR/0x/oZ8K6xjb4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l/Vh4aaRp9u98HWKiyV2s5gg0UTXYUfFJrhoSkJLw7pFYD4i96k2eeLszOdE39raY9/L+4nORrEAzzP1W1UZs6RUbyTUMHs8u/iPzflLn8ynqm7qgYgoo5hqhuKRWUT0J3LsqkUyONoIfir/1DDq/c5aMaP3WYeC6vXOeAV5UWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F1IvAqiz; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762196119; x=1793732119;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=sDdenJVQiBju/b4OhhyATNGa7eG0+qiZpAL6R+ldboI=;
-  b=WnLCR1TgTactPfXqf9hAYAUSGs+L8e8NMU0fdtSjqFVMCyKNbjUzCP0/
-   9ar33WOUkMpJEVLdstoDCRc8MLPNvbcErTCtlG9kyCOZaW1xrVwgBJQqj
-   TAyTApiLsCV9LgdGe+e394hWKmeScJRvxL5ymUEo345mNwcbYwK89/UBG
-   Zaw7v3p3HyiJV2IheQxrZCF93Bks3foX+TQ6nbRHy/eukDenPJDTnKSSg
-   bbPN3GG15uWdfr1yoIUJmSCAjpZt1n8hTI/Ik5rUhdrtxhYu4WI9Ss6v8
-   ReHJjTIZxCiZ6XgLltvl8RLDmdDuxeYILcM0HE4xXmGQSWnloRD5DnqaK
-   g==;
-X-CSE-ConnectionGUID: lpv+BGQ9R+WuQDTshLMplg==
-X-CSE-MsgGUID: wcfV9GqZSTGf5DdKvVeihA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="64318500"
+  t=1762200292; x=1793736292;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zSZ7IBXioErhSo4Nbik2yG9o/pB1tR/0x/oZ8K6xjb4=;
+  b=F1IvAqizQIWaEQ7sEr3jwiOgypCZCJjxJnlgR4XPUIFj2dygYzdkyiq/
+   7czMxFyZEP0SDasSOG7WfCvHE9vIUcFre+WdBqJvIn5zZqbAA5ZMJFriG
+   xCmHV6f7iyZpkwiFxcryEWUXzhJ6S2mh7dKXdi9S7qxuGy0uiUqxTapB8
+   3fZ7jy9lq/sENT1T/qJP/WEb8euWzI+yFODmr5fFlIkvOI+E3IzBtRI53
+   Vnkm4DyXZDaWH6lfnbh6qtO9oOnfwBQPu/2O9g8opOlvMF8n96RKB23xs
+   f2yxUY7ZjdkDoObZspoYkEZCRKK63bagnpFeh/gUZqFWd/wSnFzeUHSMT
+   Q==;
+X-CSE-ConnectionGUID: 76Ucoo1aSdew8KUbRVRExQ==
+X-CSE-MsgGUID: pvJNbLaeRuiffoyiW/JYxg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="74964537"
 X-IronPort-AV: E=Sophos;i="6.19,277,1754982000"; 
-   d="scan'208";a="64318500"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 10:55:18 -0800
-X-CSE-ConnectionGUID: UgvAbGMWRae5FHISCSrnUA==
-X-CSE-MsgGUID: 8saqJka1SIig6P8IN7AcPQ==
+   d="scan'208";a="74964537"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 12:04:51 -0800
+X-CSE-ConnectionGUID: AqV9ayP4Qm+aU/pCsOM7vQ==
+X-CSE-MsgGUID: T5HbE5iZTNiDps0DWzT1DQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,277,1754982000"; 
-   d="scan'208";a="187665622"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 10:55:18 -0800
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 3 Nov 2025 10:55:17 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Mon, 3 Nov 2025 10:55:17 -0800
-Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.28) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 3 Nov 2025 10:55:17 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aWrBrGwP3LmHsEmjqSte9Ue/mKnw30+/4MDUaH2CZRYrtcdsT2qXlpZ5AJtchJH9cJoV4etT4u98Xo9w6Qb+7O17hsfIZdapVcx0oW4Kb25xXxmUpHAzFCIMWTKF9q8avDiArk3BCiaxHEIG2ne9dAX/smq/luFwkbDI7YT7s/GHDC+QVh2QoDsdRAGxL7DaJOc0kJrcMu7SS/oeklVvdAr1KJetRa+LX5fdDaqgwERZubCULrvMbJdYFxpUEZuGAVbiGP5xyrLqfUO6ArQajBmt2xQmPCrjC0PBhqoUmlGSx46/nsAwKZy1LJX4PSViBrEOGh9x9FOk3dP9KDeHLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9dJR3qUnKcbn/tK6lH4f/3vAls8fCoPbqX3F0+qaQiM=;
- b=gzfFFRTN3VKiA6vUT2/ShOdWj+t6lFPEry1fiTW1WHZVDMU82+umfaVXtPkPACZC5LUBE2wrAuSGXmLDOTDPpPy6dpuA/Ia9h0PKpBQ8rB+Y96Tw9ZPTlmyqWje4zKR8Bbmh8UHAJktskRRSJCBtcg640+VscCkszYWBKyyRsEUQGHkuTwwjQAwORj+QNnKrJR9sNQJpgnqjhI5eRMWPLaIMWZ0IY3scDCXLIxNXvdlMoXBxFesbNe+0zCkYCqUsG0TCN+HFl26Q/+b45hatWhIWU9AofZHGN5ScmFbAF/Wuyvzfr3QMNKXXHNBoYyGlYBbCRuFqU5d5C4FAjYQ6RQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN0PR11MB6011.namprd11.prod.outlook.com (2603:10b6:208:372::6)
- by DS0PR11MB8183.namprd11.prod.outlook.com (2603:10b6:8:161::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.16; Mon, 3 Nov
- 2025 18:55:15 +0000
-Received: from MN0PR11MB6011.namprd11.prod.outlook.com
- ([fe80::bbbc:5368:4433:4267]) by MN0PR11MB6011.namprd11.prod.outlook.com
- ([fe80::bbbc:5368:4433:4267%6]) with mapi id 15.20.9275.015; Mon, 3 Nov 2025
- 18:55:15 +0000
-Message-ID: <0f279cfe-c3b0-44d2-9bcd-82662058d9c3@intel.com>
-Date: Mon, 3 Nov 2025 19:55:08 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/28] drm/xe: Move migration support to device-level
- struct
-To: =?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>, "Alex
- Williamson" <alex@shazbot.org>, Lucas De Marchi <lucas.demarchi@intel.com>,
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	"Rodrigo Vivi" <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Yishai Hadas <yishaih@nvidia.com>, Kevin Tian <kevin.tian@intel.com>, Shameer
- Kolothum <skolothumtho@nvidia.com>, <intel-xe@lists.freedesktop.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
-	<matthew.brost@intel.com>
-CC: <dri-devel@lists.freedesktop.org>, Jani Nikula
-	<jani.nikula@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
- Laguna" <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>
-References: <20251030203135.337696-1-michal.winiarski@intel.com>
- <20251030203135.337696-3-michal.winiarski@intel.com>
-Content-Language: en-US
-From: Michal Wajdeczko <michal.wajdeczko@intel.com>
-In-Reply-To: <20251030203135.337696-3-michal.winiarski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BE1P281CA0066.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:26::17) To MN0PR11MB6011.namprd11.prod.outlook.com
- (2603:10b6:208:372::6)
+   d="scan'208";a="186249300"
+Received: from jmaxwel1-mobl.amr.corp.intel.com (HELO [10.125.110.129]) ([10.125.110.129])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 12:04:52 -0800
+Message-ID: <40dd7445-a94d-4b90-8a8a-56c15386866a@intel.com>
+Date: Mon, 3 Nov 2025 12:04:50 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR11MB6011:EE_|DS0PR11MB8183:EE_
-X-MS-Office365-Filtering-Correlation-Id: 60f8c498-60e4-48a4-c08e-08de1b0a8642
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?MUNWaWVmNVJ6OTBiSGJYUmxscVhqMHkrQ3JTU3duRmFpdGpLYVY2VSs3YThi?=
- =?utf-8?B?K3Nyb1VaUVAzZjBrY2dZUjdMZFJqRW9UWFVrMWhoU2k2MFVhaDk0QUthWUt5?=
- =?utf-8?B?TmdGcTdjSE9IMjJUMG5RQTR5YXdRendmdXdFTmVRYU8vNGVXb2RPT29vdlhI?=
- =?utf-8?B?SFlUblcrMkhINmNRZFJZOGlrNWdGMHlUb0xPSnBYRDRRWUVzeWdhay9wTEh5?=
- =?utf-8?B?MjYyemllMllhUEUrRkVFMzZlZXZUcFBIMENWd3EveWJOYy9HUENTZkE0ak1V?=
- =?utf-8?B?YUM4TUZDUTQ3eWJLTlNmRm91WFdSdzgxNTBSb3NXd3pMNEtQTi83TXpMenR2?=
- =?utf-8?B?c2hyTlZrR0p6QzJjRysxVVNiejlxdHhlTnlabG1JSGtRMTN6enpsbGlsYlJI?=
- =?utf-8?B?WWZIOFVYMys4SkZlV3V6MjBHb3M4bmh0ekkxT2RKUzkzV3B1cVpoeXFEWTBn?=
- =?utf-8?B?RDRHeXFyMXE1QWVLY2JROXpVeDMzT0V0Qjh5SmVOZ0Y0L2t5RG5vVFY5MHVE?=
- =?utf-8?B?cHlSdjU5cjRtR1FxYWp1QndVMzFUL2VBelVhbm85QlJaTUVaend0MkdyNWRM?=
- =?utf-8?B?dVNEMjJUZHBDN0k4dzJZbldiTWZpOGZMT1BwZUo0N0oxUStXa2xkSmFQY2pE?=
- =?utf-8?B?dDFlNlR6WWd4ODlXNWwxSWlTbFphMERLMDMwRy9kVzRBSXJGRmQ4OWdHSEhx?=
- =?utf-8?B?czZtYVMwdjMvZHh3ZXJGZ1RKSjl6Y1BZdHFMY2Q4MTBVSUttdDhLZFlSS2FF?=
- =?utf-8?B?Z0hOZXRGRWJuQWZNRy9IczJiRzVlaE1tT2tlM1VvTVlFT2xKVmpJUkRqV2pl?=
- =?utf-8?B?UDdpd0pGbWtLckp4OWRmNEc5VEIrbXAxTWdaYWVZNUllY2RoTGljWmpZbm54?=
- =?utf-8?B?dVpvU29nUWl0YUlKZHVQVzY1MXVWNUFDNWhjSE9zV3BRREJkSTRWRXQyM3Fq?=
- =?utf-8?B?dmxnaW56TmxqajlyUFJzU0tXQ0RNbHFDTFRsWFZoNTFrSWJhbFRtQ0Y3RTZY?=
- =?utf-8?B?aG5VQjlnUm9BNnMybEV2eGdHbHhpV0dReWRmK3pPNmhuaGI0QmF4Y0tGaVVK?=
- =?utf-8?B?SEhGM2xSVEVBT3RYMUFOby9zZW9tVEhtWEY1Q2U3azh6Wm5DenJqZU9JM1J2?=
- =?utf-8?B?dTRmSVV5QUp4OGVPMThQbnMxc2tGd1Q5UjlsTmljM1h2amZqSEJua0pKWmZJ?=
- =?utf-8?B?emd2TWpCazNpU2FXRlpPMW82ZVBhQjhucUZoN1hnS2tnYWc3a0thQVlYU0kr?=
- =?utf-8?B?WTdjb2NNK3FZUXBLSENacE9RWWxhWXQyWDQxSnY4Q2l5a1UvSGUyVmNpbCs4?=
- =?utf-8?B?cm1zOGRpTCs1MERNZ3FTRmtyd3BteWgwM0RzVFVyM0ZLS2FVcU81MzNtZGcz?=
- =?utf-8?B?bE90WElxbGR0Y3BFOUUwVmZPR1JaTHEzNXNGWFJxQmhTNGtCY1ZlZG1zZ042?=
- =?utf-8?B?ZmoxK21mSm9vRUZuQU50Sk1Gd0Qrd0lwbm5JNGYvcUEyZy9ES0RYSHl5eHBB?=
- =?utf-8?B?Wkh0RVJ4a0dkMjRMSmhXZ1NUY3RudXRGK1ErSmhISEpGdUlYZFdEV2ViYVds?=
- =?utf-8?B?SjFIOTJDNnkrVXFWQTJtMjRKQTM5c0M1aTJ0NlF5dXdIU2VJSG9SazZkZ3hj?=
- =?utf-8?B?S2ZXWHR0cFhJeTdETitaSU4reTRTdERFb1VXSG1uaVFMRm1iUnE3aGc3Q1Jp?=
- =?utf-8?B?bUp5YXFEdmcyc1FUdURvVFlZNHV4WkdMbUdTSSswcVdMcjQ5WDBFZStXSk1p?=
- =?utf-8?B?ZVJwK296OWlpbU50elNzQlBlalNQbkI0MXpDRFRnTE1OdzFXYlBHTCtrQmtz?=
- =?utf-8?B?RHFQb3I0WDN0ZVVsa05YQ3Y0QW5vTzNLdklvSjZtQXRnZ3lmZlp3ekZPMTBK?=
- =?utf-8?B?OGJlamFSLzNITkorVFNqOHZSSnVWMEJYUnMxVzVEUE5HOTk4dVBCT2RDOEk1?=
- =?utf-8?B?OVBpenhzV2dHRUVGMEF3aEY2ODNYRWJkcEE4eTJFQk4xYnF0YWhRK2UzRnQ3?=
- =?utf-8?B?YWZpc2o5dUliSHJlZ3A2SHNaNllNU2ZlZmxkQ2Nxd0FlUjNRNFZmVjRiYkNw?=
- =?utf-8?Q?fGusBk?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB6011.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K256SUFMTFBTMWZoL2Y0TStncGF6MHVIaUo1ZlluSzZKVVI1ZmViQ1lHeXpy?=
- =?utf-8?B?dTB1S3VzSTZjc3Z1NmQwd0E2cGVmU0VQazAwdFBjUi90ak1rMXN3QXZwRUZw?=
- =?utf-8?B?RGVCRkpQa1J4bndVQkMrVVc2SnpKTCtIKzZWa3EvR0ZacktNNVI3cmpLdm0v?=
- =?utf-8?B?eGhndzRTallwOUZVUEpqcTVnVXhZaWlmaG52OSs1R1pOdGI0WVpCckFmSDNU?=
- =?utf-8?B?d2JjaElTNGQyZ2IvQkV5OGpSOTRxR0RubFVrUDZvNFNjaU5jUDZ6Y2hWK3Ry?=
- =?utf-8?B?bXB2OHNJS0cySUJBQ0xyaC9lZC9USXRsRXc2cThHQm92UnBRZlFyTjM0QW5L?=
- =?utf-8?B?aWt3R0RraUEzUkh6TGY5SEowS00vYmE5MHZRdE1mVFlIblpuR0t4VmZsbWln?=
- =?utf-8?B?d1VDRkZoTzRvUDAvb3hqN2JwNUVSenBXdTdPYmhjRll0S0E3eVFmclFBZ2FS?=
- =?utf-8?B?RDRYWngrRW9JOGI0UStBMGFQUkcvVVRPWW9uWmVsOFIyamhVZ3pyRTZ6WGph?=
- =?utf-8?B?bG1kZzFqTlhLZlVXbUJ5UkZOYnloVncycXRuMmhDWVFVeUZpZ2gxZjlwM3JX?=
- =?utf-8?B?S0JMNEt6cXlqeFozTWNIc2pNVGttYWhxSzZkN21zb1FFU2JMZWxvTWVmTkxG?=
- =?utf-8?B?c3Joc0F6SnYvVlkyK3VMZXdBaDFudjE2emJ2MUhnZXA3bWlaY3c1dndNNGNQ?=
- =?utf-8?B?M0RqR1hCNnRBQjFwN1RwK2hGMWZBd3d4b0Q3d28vTmM0MDZzbGsxRXlXb0Fm?=
- =?utf-8?B?bWV4K1hlM01DamttMmxKUmRIR1g3UEZiUkVmM1hzTmNqT2JYMlpKM1VTMDQv?=
- =?utf-8?B?YmdZdjErZ2h4cGVzL0VwS0FFa09iNFFFa0NweXJCU0hGZEFyYkppWENWWEZ6?=
- =?utf-8?B?elplTG1LZktLaCtKejgwVGx1dkZZTW0rdDNwN2lBVFNwOG45Q3Y4NEExMHhX?=
- =?utf-8?B?M3NBbDZVUmRnek5lQkw3QlV3QS9PMmloSW9xdi9rK0xXMzVoWlRnNk9BUkRH?=
- =?utf-8?B?YUxuR1luK1ZkMUh5MzFLcjFQcDBwM3dhL2Ewd0N5RERYSEI5OHc0dk4yMVMr?=
- =?utf-8?B?Qk11MHpkY1FKYU1yam1CTHVuSGVCVEdwc0xaMlpSZ0VCY202dGduTnU2MDFn?=
- =?utf-8?B?R28yZ2EzR01PVzFkM1ZKdEpHeC9rUEdkaUlBMDRXYTFLMGVvcVlCY2s2Y0sr?=
- =?utf-8?B?cFMvZVlLZjA2RU5jTEF3M1lKdWgxZTJBTzlLVlFBUXV3YzJmb0Vic0FUVmlV?=
- =?utf-8?B?b21SK2xFNjRDcjFlRlFMbndvZ1d4Y3p4WXV6dTJPNnRMYy8wWC91VFkxTW1l?=
- =?utf-8?B?WmYyd2h2QStvNUNrVkVJWEliN3Q3ZXZTeVJjUUI5TE01QXNvVTFqZDV2aER6?=
- =?utf-8?B?VDZzOUo1OGxWRmJhOVd6SkJRSnc3QWdhSHlnWXJyYjhsQjYzR3gvRUpDdVBV?=
- =?utf-8?B?R1BJcldIM1RqdzZTaTRjbmVQS2RTVEhKRkRTQm5OelBVbVBDK0hnWTIwa0Fz?=
- =?utf-8?B?blJKN1A5ZTU4QXJqUTlicTJtQUd0aExPOWlNN3FqQ0NJTm9wTTZTMlh0MGlR?=
- =?utf-8?B?Vk9xamExWGJFVmdPQ0RnbUxHVGRIY0hNYXRGL3Mxd0Y2ekZmeTBmbndrNzBO?=
- =?utf-8?B?MHhhViswSCtoaEFEOG5zbkVDWTE3WlI3ZFFUNTVLcHVudGM1eFUwaWhSeGFz?=
- =?utf-8?B?RzR4bEJzK3huUG1IRGEvR0N0VVcvOWxLTTVIcEpndS9wNzIzb2xQTS90VGMw?=
- =?utf-8?B?ZE9ZYm9ERXQzdGgwSUhlaTFJQ2RMU0N0Z08vZXZBS2ozWk5xYnJ0VzBhRDA1?=
- =?utf-8?B?MzBqbWhLRm9oL0NYVjM3bzdBVW1pcnhZeFpsOC9XWW15VEgrNWJvdmo5eU1H?=
- =?utf-8?B?M2dJWTh1aUNIbFpmUDVaWFFoUS9xa2NHajVvS1k0WnZWMVBCOGdTU1YrZWts?=
- =?utf-8?B?YUE3c0MyT0VXQWgzQUNBZncwNW1XSmtSTk5LMnNSWElhUFUxU0pId3FOVmdI?=
- =?utf-8?B?V1hwR0RQWHBlZ2lEbmExM3Q3aFU2aDA3YUNYaStRQ1NzalN0ODhZWjFBRGt3?=
- =?utf-8?B?RVJ3aGxKa0dVaS9wT0RBWFpnWDRleUo1L2t5VERra21kT3RYVk93TUZTeHNM?=
- =?utf-8?B?TEJoQURDYnBsTzk0WnNqT2tqNkVoT1N6OXIxTE9YaEJDYlNkNERIaFgvVk95?=
- =?utf-8?B?cmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 60f8c498-60e4-48a4-c08e-08de1b0a8642
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB6011.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2025 18:55:15.1295
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MDe28sjEiBp8xal/5hJSj8EqcP8L1sXJtlvUoHaYsVs+WUr/cE7SHu+CvOYWbwEegNmReYKvOB8zeEHv2QuWkq550zpzo9WnsPW+xLAl7rM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8183
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/3] x86/bhi: Add BHB clearing for CPUs with larger
+ branch history
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ David Kaplan <david.kaplan@amd.com>, Sean Christopherson
+ <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>
+References: <20251027-vmscape-bhb-v3-0-5793c2534e93@linux.intel.com>
+ <20251027-vmscape-bhb-v3-1-5793c2534e93@linux.intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20251027-vmscape-bhb-v3-1-5793c2534e93@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 10/27/25 16:43, Pawan Gupta wrote:
+> Add a version of clear_bhb_loop() that works on CPUs with larger branch
+> history table such as Alder Lake and newer. This could serve as a cheaper
+> alternative to IBPB mitigation for VMSCAPE.
 
+This is missing a bit of background about clear_bhb_loop(). What does it
+mitigate? This is also a better place to talk about why this loop exists
+if it doesn't work on newer CPUs.
 
-On 10/30/2025 9:31 PM, Michał Winiarski wrote:
-> Upcoming changes will allow users to control VF state and obtain its
-> migration data with a device-level granularity (not tile/gt).
-> Change the data structures to reflect that and move the GT-level
-> migration init to happen after device-level init.
-> 
-> Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
-> Reviewed-by: Michal Wajdeczko <michal.wajdeczko@intel.com>
-> ---
+In other words, please mention BHI_DIS_S here.
 
-...
+> clear_bhb_loop() and the new clear_bhb_long_loop() only differ in the loop
+> counter. Convert the asm implementation of clear_bhb_loop() into a macro
+> that is used by both the variants, passing counter as an argument.
 
-> diff --git a/drivers/gpu/drm/xe/xe_sriov_pf_migration_types.h b/drivers/gpu/drm/xe/xe_sriov_pf_migration_types.h
-> new file mode 100644
-> index 0000000000000..e69de29bb2d1d
-> diff --git a/drivers/gpu/drm/xe/xe_sriov_pf_types.h b/drivers/gpu/drm/xe/xe_sriov_pf_types.h
-> index c753cd59aed2b..24d22afeececa 100644
-> --- a/drivers/gpu/drm/xe/xe_sriov_pf_types.h
-> +++ b/drivers/gpu/drm/xe/xe_sriov_pf_types.h
-> @@ -39,6 +39,12 @@ struct xe_device_pf {
->  	/** @provision: device level provisioning data. */
->  	struct xe_sriov_pf_provision provision;
->  
-> +	/** @migration: device level VF migration data */
-> +	struct {
-> +		/** @migration.supported: indicates whether VF migration feature is supported */
-> +		bool supported;
-> +	} migration;
-> +
+I find these a lot easier to review if you separate out the refactoring
+from the new work. I know it's not a lot of code, but refactor first,
+then add he new function in a separate patch.
 
-late notice: all our other sub-components (except sysfs *) to hold its private fields define its own struct that matches component name
+> +/*
+> + * A longer version of clear_bhb_loop to ensure that the BHB is cleared on CPUs
 
-but here, you use anonymous struct instead and what worse,
-later on you start using xe_sriov_pf_migration name to hold per-VF data,
-which breaks the above naming pattern even more
+"clear_bhb_loop()", please.
 
-can you add to xe_sriov_pf_migration_types.h:
+> + * with larger branch history tables (i.e. Alder Lake and newer). BHI_DIS_S
+> + * protects the kernel, but to mitigate the guest influence on the host
+> + * userspace either IBPB or this sequence should be used. See VMSCAPE bug.
+> + */
+> +SYM_FUNC_START(clear_bhb_long_loop)
+> +	__CLEAR_BHB_LOOP 12, 7
+> +SYM_FUNC_END(clear_bhb_long_loop)
+> +EXPORT_SYMBOL_GPL(clear_bhb_long_loop)
+> +STACK_FRAME_NON_STANDARD(clear_bhb_long_loop)
 
-+struct xe_sriov_pf_migration {
-+	/** @supported: indicates whether VF migration feature is supported */
-+	bool supported;
-+};
+All the pieces are out there, but I feel like we need this in one place,
+somewhere:
 
-and rename per-VF struct to something else? like:
+BHI_DIS_S:  Mitigates user=>kernel attacks on new CPUs. Faster than the
+            long loop.
+Long Loop:  Mitigates guest=>host userspace attacks on new CPUs. Would
+	    also work for user=>kernel, but BHI_DIS_S is faster.
+Short Loop: The only choice on older CPUs. Used for both user=>kernel
+	    and guest=>host userspace mitigation.
 
-	struct xe_sriov_migration_state - Per VF device-level migration related data
-
-
-*) sysfs doesn't define/use any custom data types, just kobject
-
->  	/** @service: device level service data. */
->  	struct xe_sriov_pf_service service;
->  
 
 
