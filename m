@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-61862-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61867-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00964C2D57B
-	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 18:05:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B3CEC2D596
+	for <lists+kvm@lfdr.de>; Mon, 03 Nov 2025 18:06:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4341E3A5FBD
-	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 16:56:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76D6C3BC9F3
+	for <lists+kvm@lfdr.de>; Mon,  3 Nov 2025 16:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8286331B133;
-	Mon,  3 Nov 2025 16:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA42031D75A;
+	Mon,  3 Nov 2025 16:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VYA9XzlO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hRvihzsi"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E6B31A7E3;
-	Mon,  3 Nov 2025 16:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C10F31AF24;
+	Mon,  3 Nov 2025 16:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762188927; cv=none; b=uoslr6ZokRAzMIcMVHGEGBN7jk7ntCPaxHQfhRbsYieDBeIDNyfHNCscpiMbqVOAhw/K7uNaPBO+IFQUPphNCCaKMEl6nxnGFSujVJQroSh/oWWRTwyZCFQF/AwSh/7k5hFsFeY9N0O//iPV75PPXLE71dU7k5mrwTX+AK5JWtY=
+	t=1762188928; cv=none; b=sn4b61DJJU+uPHGOftogg5xYovN5HiP/CQwTV1cVK228wG8tBK+oMrUPAZRwvSqy0KnUxrY3kvyrZWfUdW9Cef86SFWsTdHaHfXlKQZ11II0P3UpPagsCwNatLclAvF2dYhk0ecCubQo82TZ0RT2+JV/hu24wV+vkghnj/1dxns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762188927; c=relaxed/simple;
-	bh=OMxD2PYcmSUFGf3eaSzIGAaXKeRPy9/qh6982gD/Xp0=;
+	s=arc-20240116; t=1762188928; c=relaxed/simple;
+	bh=uG/sGiah4ee3+/bxdFax57bVH6y6zvhTVa/pehRU4hI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K6ia4NpS1dgXN/SkGpbWhVONgxx2BdLKgF+VwUKKZj62oyoflNEtYrYvswAN+kFr+/eYxWd6fMVrJwsU0VV2PZXFqJjCtA7hisLV1yWrStXiBr5ncu3nMmwFdkWUXdjx/IP0Er/Bq71F++RMIelYIJiJDbe29SjQuFew5Otib9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VYA9XzlO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6692EC4CEE7;
-	Mon,  3 Nov 2025 16:55:27 +0000 (UTC)
+	 MIME-Version; b=kqw67YLL6ULa2C40Ui07AOEvIveW5FiJfC1y2zxYK8ABOsjLbAveac2BvMkdkcrkh4zMky+D+OGaY2BtKOsDZx+UawwNPLEZ5U5AaExuFrQjnY9EAwqeSNsW70uZCv+z/p/4swG0x6O0wmALP7aUI9Bzm0MIGLfujA/Fm7P7qyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hRvihzsi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DE2CC4CEE7;
+	Mon,  3 Nov 2025 16:55:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762188927;
-	bh=OMxD2PYcmSUFGf3eaSzIGAaXKeRPy9/qh6982gD/Xp0=;
+	s=k20201202; t=1762188928;
+	bh=uG/sGiah4ee3+/bxdFax57bVH6y6zvhTVa/pehRU4hI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VYA9XzlO/t8NiQpLYfMq7BC7TxV6sKrJOkNnRH18fve5zMjUDh4T5Vpk5cil4fLSo
-	 TRo5kVG1oMr+kNqt28OaRZFvl12aTExFw3uA6U7VqxYS0N3sm3WGnNfZDodHVrJn2d
-	 DYFaWxf3kCbQqu0uHR9GRQRED+DRBvTsDr6k4FhOjsxj7bvejwy82PD2qUtmTgZIrY
-	 /wNW/I8gXTCvJbco9Hc/3TYuglHY2K3Hb8RJlk9G6ocxvp1ue9GiknXw1yQ8ylsIRz
-	 h61VTUisVuUXAZQnLYY3IzXrGK9FyOxEqUiom6VAqxTArl0WKjrP8LD1YD14wcbRCM
-	 achBZm5+F7mgw==
+	b=hRvihzsiD5gV/QP8RGA3qdspcojSiKsLZh2kF/N70KhSMAxv2BfV1WC9XfIk/MJti
+	 N8P+Jb2I//P/DjfbTWWDd7ACPAjtXKc9F7FtKVFs7ES3bBWcdC10ZI5DAQlBjPbNZh
+	 jGIjdZcXh6UCJFvA3iH0kXRKNF+9/A8mtpHa2vpy6hQOOwKaDnbFUqgqmfcPEc4hxj
+	 nuS2LFtNx4Tyxsmba+tKeF7zobf7tnCbzieKLZzKo2YO2h77LdUD3SWVfoXF011O+I
+	 pA9wS1KAv8xbM/+NwCjvGJ8oy05qD3EfEadmRdp/dZDnowLuXXjwWVFtrL6PYJf+mP
+	 WtvjqXyIc5m7g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vFxq1-000000021VN-1bHg;
-	Mon, 03 Nov 2025 16:55:25 +0000
+	id 1vFxq2-000000021VN-0LB6;
+	Mon, 03 Nov 2025 16:55:26 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Subject: [PATCH 03/33] irqchip/apple-aic: Spit out ICH_MIDR_EL2 value on spurious vGIC MI
-Date: Mon,  3 Nov 2025 16:54:47 +0000
-Message-ID: <20251103165517.2960148-4-maz@kernel.org>
+Subject: [PATCH 06/33] KVM: arm64: Repack struct vgic_irq fields
+Date: Mon,  3 Nov 2025 16:54:50 +0000
+Message-ID: <20251103165517.2960148-7-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251103165517.2960148-1-maz@kernel.org>
 References: <20251103165517.2960148-1-maz@kernel.org>
@@ -75,39 +75,88 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-It is all good and well to scream about spurious vGIC maintenance
-interrupts. It would be even better to output the reason why, which
-is already checked, but not printed out.
-
-The unsuspecting kernel tinkerer thanks you.
+struct vgic_irq has grown over the years, in a rather bad way.
+Repack it using bitfields so that the individual flags, and move
+things around a bit so that it a bit smaller.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-apple-aic.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/vgic/vgic-v4.c |  5 ++++-
+ include/kvm/arm_vgic.h        | 20 ++++++++++----------
+ 2 files changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/irqchip/irq-apple-aic.c b/drivers/irqchip/irq-apple-aic.c
-index 032d66dceb8ec..4607f4943b19a 100644
---- a/drivers/irqchip/irq-apple-aic.c
-+++ b/drivers/irqchip/irq-apple-aic.c
-@@ -411,12 +411,15 @@ static void __exception_irq_entry aic_handle_irq(struct pt_regs *regs)
- 	if (is_kernel_in_hyp_mode() &&
- 	    (read_sysreg_s(SYS_ICH_HCR_EL2) & ICH_HCR_EL2_En) &&
- 	    read_sysreg_s(SYS_ICH_MISR_EL2) != 0) {
-+		u64 val;
-+
- 		generic_handle_domain_irq(aic_irqc->hw_domain,
- 					  AIC_FIQ_HWIRQ(AIC_VGIC_MI));
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index 548aec9d5a728..09c3e9eb23f89 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -163,6 +163,7 @@ static void vgic_v4_disable_vsgis(struct kvm_vcpu *vcpu)
+ 		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, i);
+ 		struct irq_desc *desc;
+ 		unsigned long flags;
++		bool pending;
+ 		int ret;
  
- 		if (unlikely((read_sysreg_s(SYS_ICH_HCR_EL2) & ICH_HCR_EL2_En) &&
--			     read_sysreg_s(SYS_ICH_MISR_EL2))) {
--			pr_err_ratelimited("vGIC IRQ fired and not handled by KVM, disabling.\n");
-+			     (val = read_sysreg_s(SYS_ICH_MISR_EL2)))) {
-+			pr_err_ratelimited("vGIC IRQ fired and not handled by KVM (MISR=%llx), disabling.\n",
-+					   val);
- 			sysreg_clear_set_s(SYS_ICH_HCR_EL2, ICH_HCR_EL2_En, 0);
- 		}
- 	}
+ 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+@@ -173,9 +174,11 @@ static void vgic_v4_disable_vsgis(struct kvm_vcpu *vcpu)
+ 		irq->hw = false;
+ 		ret = irq_get_irqchip_state(irq->host_irq,
+ 					    IRQCHIP_STATE_PENDING,
+-					    &irq->pending_latch);
++					    &pending);
+ 		WARN_ON(ret);
+ 
++		irq->pending_latch = pending;
++
+ 		desc = irq_to_desc(irq->host_irq);
+ 		irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
+ 	unlock:
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 577723f5599bd..e84a1bc5cf172 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -123,6 +123,7 @@ struct irq_ops {
+ 
+ struct vgic_irq {
+ 	raw_spinlock_t irq_lock;	/* Protects the content of the struct */
++	u32 intid;			/* Guest visible INTID */
+ 	struct rcu_head rcu;
+ 	struct list_head ap_list;
+ 
+@@ -137,17 +138,17 @@ struct vgic_irq {
+ 					 * affinity reg (v3).
+ 					 */
+ 
+-	u32 intid;			/* Guest visible INTID */
+-	bool line_level;		/* Level only */
+-	bool pending_latch;		/* The pending latch state used to calculate
+-					 * the pending state for both level
+-					 * and edge triggered IRQs. */
+-	bool active;
+-	bool pending_release;		/* Used for LPIs only, unreferenced IRQ
++	bool pending_release:1;		/* Used for LPIs only, unreferenced IRQ
+ 					 * pending a release */
+ 
+-	bool enabled;
+-	bool hw;			/* Tied to HW IRQ */
++	bool pending_latch:1;		/* The pending latch state used to calculate
++					 * the pending state for both level
++					 * and edge triggered IRQs. */
++	enum vgic_irq_config config:1;	/* Level or edge */
++	bool line_level:1;		/* Level only */
++	bool enabled:1;
++	bool active:1;
++	bool hw:1;			/* Tied to HW IRQ */
+ 	refcount_t refcount;		/* Used for LPIs */
+ 	u32 hwintid;			/* HW INTID number */
+ 	unsigned int host_irq;		/* linux irq corresponding to hwintid */
+@@ -159,7 +160,6 @@ struct vgic_irq {
+ 	u8 active_source;		/* GICv2 SGIs only */
+ 	u8 priority;
+ 	u8 group;			/* 0 == group 0, 1 == group 1 */
+-	enum vgic_irq_config config;	/* Level or edge */
+ 
+ 	struct irq_ops *ops;
+ 
 -- 
 2.47.3
 
