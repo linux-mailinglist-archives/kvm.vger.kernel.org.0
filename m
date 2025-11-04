@@ -1,183 +1,142 @@
-Return-Path: <kvm+bounces-61952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDDE1C302C9
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 10:09:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5DA7C30432
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 10:28:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EFF93AB14E
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 09:04:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A1AD189618D
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 09:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302CA2BE7B1;
-	Tue,  4 Nov 2025 09:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2271153BED;
+	Tue,  4 Nov 2025 09:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CmOWGoyB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KocpVr9N"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0C7271A9A;
-	Tue,  4 Nov 2025 09:04:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFEE1EA84
+	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 09:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762247058; cv=none; b=rpYF5r3x9rquFIeB28peLGbIcjGPoxwYT8FSvQUbfdWYlM+WAKmT4jm3vzrD8nrJGw4T/zXJFfKVQFgGQpErOM4kxx5Bra0AMCWaI41KZvWuwz3JBa4533e222aqiG4BVgXQq5EbcdhszDLXsPaO4LXYhncVzcWVn9qXKLULbyM=
+	t=1762248236; cv=none; b=r/MDCZUWsbtEdaXbHt96XERUFYyXrEQ+KJTtYLqjVlPWy/eR6dd5Nx4PNEysNdBrxAcrKGVHHXLJ2MpTId/ZVjqiPH92agC8DUwv05Ed2Fg+iQLw8Btmumun6rKtEzeEH6IUD+gD0tcdpxiGxpoUZekH5AYIoPYvSfFy7/6FqBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762247058; c=relaxed/simple;
-	bh=z10J5XPxAwVH3Vw4dBwDiXFrC7TpRWkdOo9+Yz5+U3s=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=moZ7ksgkESmM48HpAzkif13XuCbsegSmTJFlU7gmIR6VkgoAOq5nUSPZuEHj58ApbGtIeqmsmmy/YlyrzYkKWdlXM4wclmtwFTcd0b3eKyWJVCOKMsm+7EvKNiqcGzuZyeIzHEN2O93IHduNs/5I6U+75O+WiE6Fx5x3AO/KR1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CmOWGoyB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3CD0C4CEF7;
-	Tue,  4 Nov 2025 09:04:17 +0000 (UTC)
+	s=arc-20240116; t=1762248236; c=relaxed/simple;
+	bh=nn+pSgqE05qlXhp5xrrNooKd/IT5Tw+jAVmsSuLPC5Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hd9NY6nyYJATWmcpksGUBjrCICBlldDe+0rDhX+KeyqkH7vitSA1GazELybou8mhw3ZOzPauojzDQnxLsownc0CDGpcS5dj6I8pZCS95lQU0FSPNEc/5Qh5YG4Z6x7+ISlnr+ryCFxAVGc0QVVhH21xVyNg0ZHToklnJFCzM7VE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KocpVr9N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DC82C4CEF7;
+	Tue,  4 Nov 2025 09:23:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762247057;
-	bh=z10J5XPxAwVH3Vw4dBwDiXFrC7TpRWkdOo9+Yz5+U3s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CmOWGoyBs6fv7yEP1oOt+ocymgiht9JSc073prHK7Y1Vd2sHCpXOKfLRTGtm0pzUL
-	 VAsQIugWwVZkiD46IS4Le+SzHft6GDpinZc8Z64WFMsRhkc4hCGMC82WcwW1yEPfpN
-	 nagGB2wvclRW1ZZiKKp6/YPrmqWXmoRy2XyvmVbpNgjgXpTMbyTeJn8nW6fi3cPHFH
-	 Jeb0FTmohhbn2bnvkWtSL1kKuGDQjjFsbRPaYYig9/ao/wTuLtiN2ofk6+et3CphnP
-	 xrHYXnb8y5SukMy+mjYWoF3065PLs1Xi6YlnZ4PEHk0w0jzGai+3XAhGLYndAZR1v3
-	 r4GLYo8dhq1QA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vGCxb-00000002E8l-25h3;
-	Tue, 04 Nov 2025 09:04:15 +0000
-Date: Tue, 04 Nov 2025 09:04:15 +0000
-Message-ID: <86ikfquq28.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Yao Yuan <yaoyuan@linux.alibaba.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Subject: Re: [PATCH 05/33] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
-In-Reply-To: <eossoxorxj5knjyx2xglsrzhrbi6rry3rcr2xryfmft3q7up4b@tr5yrg6lljzq>
-References: <20251103165517.2960148-1-maz@kernel.org>
-	<20251103165517.2960148-6-maz@kernel.org>
-	<eossoxorxj5knjyx2xglsrzhrbi6rry3rcr2xryfmft3q7up4b@tr5yrg6lljzq>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1762248236;
+	bh=nn+pSgqE05qlXhp5xrrNooKd/IT5Tw+jAVmsSuLPC5Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KocpVr9NQ5hk/2FemqFb32mdMyU0PYMCpAKLp26F0/3NS9Q36dC8Eb1gj42HXUI7F
+	 LMbjigl/buzgauQuAPnpHqbk2zUaXfbUUXp70DL2/49hrKd930MWNC2V1Rwf8AvF6I
+	 5aWlmqRqkIGw/dl1cElkoeoeRAsqjKjoDm0wA421A334KKfA3HDdSJeUclSDlc3HxL
+	 Smi5n3xFnhTNjo9jB2b4pgPuEU/3sLnFjllFPiq8+IAhHi7JPRKfQ0tTtTRCDk2Rrt
+	 ZvBWN4jCQIRMxZkejmcK8ETQ24SFUwXQjVNxMOWuq+MeuS4QmvxmbOkpg0STXrV0Qd
+	 5PeBoSCtgS5+w==
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 352BEF40078;
+	Tue,  4 Nov 2025 04:23:55 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Tue, 04 Nov 2025 04:23:55 -0500
+X-ME-Sender: <xms:K8YJad607quwV_M_BtCdBN09Q04X-jBEkFayn2IYhaM9XmcJdC6_sg>
+    <xme:K8YJaWWIE-v5wvDVa0w_IcVaE3QtLK1WgKW3RDY2YtTTQTFCF2ruM3JkNuHBtrDyt
+    P7_pwDOr6SGC_kWHdWEvoPlB6sMyFBloPYvqspJDqOkGuTYUc2-ZZ8>
+X-ME-Received: <xmr:K8YJaTL36EZtuyy9R4C_ycDsaJwuKFshvCLbIa4GcgCCIL4Xvs4NmjZb8LTabw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukedtieegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhepmfhirhihlhcu
+    ufhhuhhtshgvmhgruhcuoehkrghssehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvg
+    hrnhepheeikeeuveduheevtddvffekhfeufefhvedtudehheektdfhtdehjeevleeuffeg
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepkhhirh
+    hilhhlodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieduudeivdeiheeh
+    qddvkeeggeegjedvkedqkhgrsheppehkvghrnhgvlhdrohhrghesshhhuhhtvghmohhvrd
+    hnrghmvgdpnhgspghrtghpthhtohepvdegpdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopegurghvvgdrhhgrnhhsvghnsehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpth
+    htoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtohepsghpsegrlhhivghnkedruggvpdhrtghpthhtohephhhprgesiiihthhorhdrtg
+    homhdprhgtphhtthhopehmihhnghhosehrvgguhhgrthdrtghomhdprhgtphhtthhopehk
+    vhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgsohhniihinhhise
+    hrvgguhhgrthdrtghomhdprhgtphhtthhopehrihgtkhdrphdrvggughgvtghomhgsvges
+    ihhnthgvlhdrtghomhdprhgtphhtthhopehsvggrnhhjtgesghhoohhglhgvrdgtohhm
+X-ME-Proxy: <xmx:K8YJaTRbAhYYgfUoftVSMZ_r7ItmpDXokerXUGiUHb_FfKCcdfNE4A>
+    <xmx:K8YJaXjZK9GC34-w_O6DSpba2C0Vz4Vy3PnqvdrlEJRB8qETHkzA_w>
+    <xmx:K8YJaVsDCpOd5GSAniM-ADac6umfQk8mMNcOZusSx6NGNHbV313F6Q>
+    <xmx:K8YJaajgKZk7Q87e1SNIbjR0B-iPmxZ-MKNysZPvjm0IQrGqFn3xlQ>
+    <xmx:K8YJaUGN-voS8fs3xCiZuspccyKTZcGviiYY3GcT0SypoI6PKwxBeZRw>
+Feedback-ID: i10464835:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 4 Nov 2025 04:23:54 -0500 (EST)
+Date: Tue, 4 Nov 2025 09:23:52 +0000
+From: Kiryl Shutsemau <kas@kernel.org>
+To: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org, 
+	Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [v2][PATCH 1/2] x86/virt/tdx: Remove __user annotation from
+ kernel pointer
+Message-ID: <7lrtlgncz3qaycmyg2sk5hkhzexlfwo5snr43ixg3kmxrzh3ub@biackh7rexlo>
+References: <20251103234435.0850400B@davehans-spike.ostc.intel.com>
+ <20251103234437.A0532420@davehans-spike.ostc.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yaoyuan@linux.alibaba.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251103234437.A0532420@davehans-spike.ostc.intel.com>
 
-On Tue, 04 Nov 2025 08:50:26 +0000,
-Yao Yuan <yaoyuan@linux.alibaba.com> wrote:
+On Mon, Nov 03, 2025 at 03:44:37PM -0800, Dave Hansen wrote:
 > 
-> On Mon, Nov 03, 2025 at 04:54:49PM +0800, Marc Zyngier wrote:
-> > A long time ago, an unsuspecting architect forgot to add a trap
-> > bit for ICV_DIR_EL1 in ICH_HCR_EL2. Which was unfortunate, but
-> > what's a bit of spec between friends? Thankfully, this was fixed
-> > in a later revision, and ARM "deprecates" the lack of trapping
-> > ability.
-> >
-> > Unfortuantely, a few (billion) CPUs went out with that defect,
-> > anything ARMv8.0 from ARM, give or take. And on these CPUs,
-> > you can't trap DIR on its own, full stop.
-> >
-> > As the next best thing, we can trap everything in the common group,
-> > which is a tad expensive, but hey ho, that's what you get. You can
-> > otherwise recycle the HW in the neaby bin.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/virt.h  |  7 ++++++-
-> >  arch/arm64/kernel/cpufeature.c | 34 ++++++++++++++++++++++++++++++++++
-> >  arch/arm64/kernel/hyp-stub.S   |  5 +++++
-> >  arch/arm64/kvm/vgic/vgic-v3.c  |  3 +++
-> >  arch/arm64/tools/cpucaps       |  1 +
-> >  5 files changed, 49 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> > index aa280f356b96a..8eb63d3294974 100644
-> > --- a/arch/arm64/include/asm/virt.h
-> > +++ b/arch/arm64/include/asm/virt.h
-> > @@ -40,8 +40,13 @@
-> >   */
-> >  #define HVC_FINALISE_EL2	3
-> >
-> > +/*
-> > + * HVC_GET_ICH_VTR_EL2 - Retrieve the ICH_VTR_EL2 value
-> > + */
-> > +#define HVC_GET_ICH_VTR_EL2	4
-> > +
-> >  /* Max number of HYP stub hypercalls */
-> > -#define HVC_STUB_HCALL_NR 4
-> > +#define HVC_STUB_HCALL_NR 5
-> >
-> >  /* Error returned when an invalid stub number is passed into x0 */
-> >  #define HVC_STUB_ERR	0xbadca11
-> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> > index 5ed401ff79e3e..44103ad98805d 100644
-> > --- a/arch/arm64/kernel/cpufeature.c
-> > +++ b/arch/arm64/kernel/cpufeature.c
-> > @@ -2303,6 +2303,31 @@ static bool has_gic_prio_relaxed_sync(const struct arm64_cpu_capabilities *entry
-> >  }
-> >  #endif
-> >
-> > +static bool can_trap_icv_dir_el1(const struct arm64_cpu_capabilities *entry,
-> > +				 int scope)
-> > +{
-> > +	struct arm_smccc_res res = {};
-> > +
-> > +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDS <= ARM64_HAS_GICV3_CPUIF);
-> > +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDS <= ARM64_HAS_GICV5_LEGACY);
-> > +	if (!cpus_have_cap(ARM64_HAS_GICV3_CPUIF) ||
-> > +	    !cpus_have_cap(ARM64_HAS_GICV3_CPUIF))
+> From: Dave Hansen <dave.hansen@linux.intel.com>
 > 
-> Duplicated checking ?
+> Separate __user pointer variable declaration from kernel one.
+> 
+> There are two 'kvm_cpuid2' pointers involved here. There's an "input"
+> side: 'td_cpuid' which is a normal kernel pointer and an 'output'
+> side. The output here is userspace and there is an attempt at properly
+> annotating the variable with __user:
+> 
+> 	struct kvm_cpuid2 __user *output, *td_cpuid;
+> 
+> But, alas, this is wrong. The __user in the definition applies to both
+> 'output' and 'td_cpuid'. Sparse notices the address space mismatch and
+> will complain about it.
+> 
+> Fix it up by completely separating the two definitions so that it is
+> obviously correct without even having to know what the C syntax rules
+> even are.
+> 
+> Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+> Fixes: 488808e682e7 ("KVM: x86: Introduce KVM_TDX_GET_CPUID")
+> Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: x86@kernel.org
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: "Kirill A. Shutemov" <kas@kernel.org>
+> Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
 
-Yup, cut'n'paste, and lack of GICv5 testing... This should really look
-like the hack below, since GICv5 legacy feature is guaranteed to have
-TDIR:
-
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 44103ad98805d..3f2d4b033966d 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2310,13 +2310,15 @@ static bool can_trap_icv_dir_el1(const struct arm64_cpu_capabilities *entry,
- 
- 	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDS <= ARM64_HAS_GICV3_CPUIF);
- 	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDS <= ARM64_HAS_GICV5_LEGACY);
--	if (!cpus_have_cap(ARM64_HAS_GICV3_CPUIF) ||
--	    !cpus_have_cap(ARM64_HAS_GICV3_CPUIF))
-+	if (!cpus_have_cap(ARM64_HAS_GICV3_CPUIF))
- 		return false;
- 
- 	if (!is_hyp_mode_available())
- 		return false;
- 
-+	if (cpus_have_cap(ARM64_HAS_GICV5_LEGACY))
-+		return true;
-+
- 	if (is_kernel_in_hyp_mode())
- 		res.a1 = read_sysreg_s(SYS_ICH_VTR_EL2);
- 	else
-
-
-Thanks for the heads-up!
-
-	M.
+Acked-by: Kiryl Shutsemau <kas@kernel.org>
 
 -- 
-Without deviation from the norm, progress is not possible.
+ Kiryl Shutsemau / Kirill A. Shutemov
 
