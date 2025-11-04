@@ -1,105 +1,93 @@
-Return-Path: <kvm+bounces-61937-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61938-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C81C4C2F084
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 03:54:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4425DC2F0CA
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 04:03:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64AB43BF45A
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 02:52:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7F8F188ECA1
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 03:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D6E260592;
-	Tue,  4 Nov 2025 02:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D31D26B2D2;
+	Tue,  4 Nov 2025 03:03:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="q7xTFejP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ne+bSW8m"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F65525A631;
-	Tue,  4 Nov 2025 02:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD387262D;
+	Tue,  4 Nov 2025 03:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762224748; cv=none; b=Kf70K87BbCgArm+k5AYj9T+kB6cnaqOcxUX8Mz1VvDfxgh3bpsi8LCyW7ybfxuJZelaO85JL6S7HNHN5LBdYTRp1EAD0PVgNdwhzjXEWSEDZ/OT/HvdbWVneh9wELsxreK4wqYDisfVFYCxcXMZE9rz8q9iydyp1ySkRr6lu0ps=
+	t=1762225413; cv=none; b=l+v/alM/n/frwnFIFwBNVgwq7hcgtM5AqvwcHtMDM69PrHQsQscz41vl1IRrIYnEK8VjIsNPhvURa7BY1FAEUoOvFxuOLAq1j/mH8wn3X+vY/CFgyyhM1Ug3bs5dS5pvrFGzzOVAHTPqFFr1i9Lq1DBFc27/8bo33blelNO4r+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762224748; c=relaxed/simple;
-	bh=Xovpelytaf1rVw6/MGWZziRvb+wid13hMajWjKa65Y8=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=VhwOtx5rm+ql1bYHfJ+8Ri1n5QOBJmgwUOi8zO6w4bgJXqVqw13Ed4Ywjeu4XbuQSX0u6YNgc34h3at3pUJIeajusMYHwedZt6d+eaO1WpIV1BUJxrpWgqPMX1C0OJDsM3cRHcIClwwEc99wPCCuN08Eb8oW4DvodtW94VhCs68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=q7xTFejP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCA1DC4CEFD;
-	Tue,  4 Nov 2025 02:52:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1762224748;
-	bh=Xovpelytaf1rVw6/MGWZziRvb+wid13hMajWjKa65Y8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q7xTFejPKd6NhT06RWpXtSixWQbEpsjjKBezm1wVg44aGl0ALe0Oy1XhGDJVqSHHy
-	 MAJJ0qgiFXuHTQuaQRCrTT7oBrEjP3r5aNq6iZqPuLddO7lzY8BxtsRizHiiSc4pKe
-	 hIbRUTmPyMmu1L6vvb9GyRzw3s52raw3T8RmJaig=
-Date: Mon, 3 Nov 2025 18:52:26 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Michal Hocko <mhocko@suse.com>
-Cc: Ankit Agrawal <ankita@nvidia.com>, Aniket Agashe <aniketa@nvidia.com>,
- Vikram Sethi <vsethi@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Matt
- Ochs <mochs@nvidia.com>, Shameer Kolothum <skolothumtho@nvidia.com>,
- "linmiaohe@huawei.com" <linmiaohe@huawei.com>, "nao.horiguchi@gmail.com"
- <nao.horiguchi@gmail.com>, "david@redhat.com" <david@redhat.com>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz"
- <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com"
- <surenb@google.com>, "tony.luck@intel.com" <tony.luck@intel.com>,
- "bp@alien8.de" <bp@alien8.de>, "rafael@kernel.org" <rafael@kernel.org>,
- "guohanjun@huawei.com" <guohanjun@huawei.com>, "mchehab@kernel.org"
- <mchehab@kernel.org>, "lenb@kernel.org" <lenb@kernel.org>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>, "alex@shazbot.org"
- <alex@shazbot.org>, Neo Jia <cjia@nvidia.com>, Kirti Wankhede
- <kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>, Zhi
- Wang <zhiw@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>, Krishnakant Jaju
- <kjaju@nvidia.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
- "Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>,
- "ira.weiny@intel.com" <ira.weiny@intel.com>,
- "Smita.KoralahalliChannabasappa@amd.com"
- <Smita.KoralahalliChannabasappa@amd.com>, "u.kleine-koenig@baylibre.com"
- <u.kleine-koenig@baylibre.com>, "peterz@infradead.org"
- <peterz@infradead.org>, "linux-acpi@vger.kernel.org"
- <linux-acpi@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v4 2/3] mm: handle poisoning of pfn without struct pages
-Message-Id: <20251103185226.fea151c58ce7077b11b106aa@linux-foundation.org>
-In-Reply-To: <aQjy0ZsVq7vhxtr7@tiehlicka>
-References: <20251026141919.2261-1-ankita@nvidia.com>
-	<20251026141919.2261-3-ankita@nvidia.com>
-	<20251027172620.d764b8e0eab34abd427d7945@linux-foundation.org>
-	<MW4PR12MB7213976611F767842380FB56B0FAA@MW4PR12MB7213.namprd12.prod.outlook.com>
-	<aQRy4rafpvo-W-j6@tiehlicka>
-	<SA1PR12MB71998D21DD1852EB074A11ABB0C6A@SA1PR12MB7199.namprd12.prod.outlook.com>
-	<aQjy0ZsVq7vhxtr7@tiehlicka>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1762225413; c=relaxed/simple;
+	bh=WGw4lGJj9huttZ/mJwmJZYcOekuBZSxll0pcVFaWMwA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mvcZlG/MaaC4L43hhZ1RMJcJjJYvrkLJsahCIRGcpa7sMAZ3ui0Mv1M601OvKuQjO50mFjrP84GjbFB8g/PQRkCI8LbAqj3HqL3sWovONQ+jis8C9C2NbNASsKyF8yy9KFjmT2n06p+2HdCKipvIR0lJWILLa6i2+mEln548YWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ne+bSW8m; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762225411; x=1793761411;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=WGw4lGJj9huttZ/mJwmJZYcOekuBZSxll0pcVFaWMwA=;
+  b=ne+bSW8mVcby4xPGPlVA0au3PDsEGVVHvhTJ2bd0X1isnUMt//TAiTph
+   X6tubDTXtq8EXKOKKMftSaopFJu56UmCC4OITaxqNEHLSW9YXaGaneJnl
+   u34oCOL+t5w//7wpD3BIINa21ibcCe+gyWB4H6GjKtduVr0AJD44N6R8c
+   Nhl39BTihvvFU4As+Nz9QyiRw4W3iik+w36/tvQm6JYGCU/RzOgSSNV+X
+   ODaUA0ZIoj1wFo9ArnJGKjXxz7U1IS8/mZs3G/BshbbP0JC0d3gUJrXBk
+   vABvH5pMHyzsLwLlX/oc3sGigZ8IUcwZJVLZ9sihgynAo9tSSmRoO1isr
+   Q==;
+X-CSE-ConnectionGUID: i8iFHqNCSiGb0ennV0FlmA==
+X-CSE-MsgGUID: 3A24ChJfTQa49ZKoXFevDg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="81718503"
+X-IronPort-AV: E=Sophos;i="6.19,278,1754982000"; 
+   d="scan'208";a="81718503"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 19:03:31 -0800
+X-CSE-ConnectionGUID: FLfftsxNTY6nI+xyiXi2xg==
+X-CSE-MsgGUID: h/xj5pRDQ2y1fFMtDEdqZQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,278,1754982000"; 
+   d="scan'208";a="210545521"
+Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 19:03:28 -0800
+Message-ID: <063b0ccb-42bb-4120-89f4-48b8c2191eb7@linux.intel.com>
+Date: Tue, 4 Nov 2025 11:03:26 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86: Add a helper to dedup reporting of unhandled
+ VM-Exits
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251030185004.3372256-1-seanjc@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20251030185004.3372256-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Mon, 3 Nov 2025 19:22:09 +0100 Michal Hocko <mhocko@suse.com> wrote:
 
-> > Hi Michal, I am trying to replicate what is being done today for non-PFNMAP
-> > memory failure in __add_to_kill
-> > (https://github.com/torvalds/linux/blob/master/mm/memory-failure.c#L376).
-> > For this series, I am inclined to keep it uniform.
-> 
-> Unless there is a very good reason for this code then I would rather not
-> rely on an atomic allocation. This just makes the behavior hard to
-> predict
 
-I don't think this was addressed in the v5 series.
+On 10/31/2025 2:50 AM, Sean Christopherson wrote:
+> Add and use a helper, kvm_prepare_unexpected_reason_exit(), to dedup the
+> code that fills the exit reason and CPU when KVM encounters a VM-Exit that
+> KVM doesn't know how to handle.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Yes please, anything we can do to avoid GFP_ATOMIC makes the kernel
-more reliable.
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
 
