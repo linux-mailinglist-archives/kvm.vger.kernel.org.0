@@ -1,132 +1,129 @@
-Return-Path: <kvm+bounces-62008-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62009-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECD64C327C6
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 18:59:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61280C327FC
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 19:02:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AC8EB4E1CE8
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 17:59:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE30418902F2
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 18:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5339A33A027;
-	Tue,  4 Nov 2025 17:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03DC633DEFA;
+	Tue,  4 Nov 2025 18:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g2kNi4TS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UR4+Tqi1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF0328031C
-	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 17:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C608C28751A
+	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 18:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762279134; cv=none; b=FYEZoYdqo5XAioIsA0JnBh0t9aurvm6i1J9unaZZW4mKwfCwS5HY2BfKyG1e5oDEppwO3iVzs+/zIRa7BjnPK5ywCLuKkc2DPBfWYpjSa7xWVo76BhpTQuf5izB+NefuMgKxzLShodCWUNoWS/zRe5NvmyP2LYzmJjl2BDDtMRg=
+	t=1762279353; cv=none; b=Vh/AHzgpUhPmbZHEf21BE20DVu3j6s5WjZKcWX8ory2E63DsQog3mJv66o8f++q0HQbd5oS+Cy6tWngZcSk6S2N5h6Fuyt+0Ct4tl3cYNiJIUNa2KmLGvSsmjgAvego+2LcfgcafRvTsZdAfJVOVwM28s8j2YX9OmIxYs5XYiYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762279134; c=relaxed/simple;
-	bh=M8hteS49kDBBnmC972KvrKrHthGw8+MuUqHN8fekdI0=;
+	s=arc-20240116; t=1762279353; c=relaxed/simple;
+	bh=OF+yEyqL038M/7cjkLTDiCOgvMsbpIL4Y8u0B391S+g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rGkLZrI1xE7YAafoPoYNMXljjri13hb8Ck/DCIT78XvwODJGEb2F0Y2boY5NojVgQJuMvwK00JMZ/PH5lkw8+5QheHkP0rdn2Z8lNogOOmdQMH1ai9rX0fPyKVEckfbueO1rPxZCuvpgRRDWHm66a73soMMXV5LGYI5MaFv7hmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g2kNi4TS; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=VPY5BvrHpqYdzw62xcVneZ0yhxtKzkuy5yDAxfvORwY3iJXDYNglMlTXSVaP38VsP5jQqQt/xUvWLlD9OsiKyJGtephWba9MUbW2frUiVECsedy5mqy4JvpIGvgDsSF1P4Vzdqzc6rIqOCSaVVh4IJ2uRFSUF/IlEsaIWdPaXcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UR4+Tqi1; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-294ecd3fdd4so69810785ad.3
-        for <kvm@vger.kernel.org>; Tue, 04 Nov 2025 09:58:53 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b969f3f5c13so2856368a12.0
+        for <kvm@vger.kernel.org>; Tue, 04 Nov 2025 10:02:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762279133; x=1762883933; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sTsoW0ur76ePtMo7HcuL4NYZdCCENhkyANXlSBYjqrA=;
-        b=g2kNi4TS0fhFySox+vfyeebQMICDYfFWWT16X4bYfp/CkS5n94JN6/0S7IOoRkQk06
-         qgRwW+mxLsg0bmaMSvvpxawCzdNLpQZY7nwFXNdCTapkuBKVn1k+nzQu6XgcknhTeVIe
-         mAky9pOZHG76ics0INdEgmUiKSspTqqo+vVnVE0QJ7amB4CRut6Wr3YD5SVesImRX/OZ
-         oh8S9lQkG8QvWhtKBLOVDt56/xX9buqOypkdNm7/wb4UX8ygiM3maiAKI2nx6oLYsl2Q
-         KCW6qoL0fyocQ3UO+vq8Q8eyJE+IM2mPIr/iDdDs8lQ2kOxwr75sPeEZQKpQGAe86ZZu
-         3yfg==
+        d=google.com; s=20230601; t=1762279351; x=1762884151; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=z7TAMX5tgRxcaQgmnIz2dr5/J34h/wClq0GmkAjx/eU=;
+        b=UR4+Tqi1L73FMojp9iVDZ+IQvopPBnewz3yrj2mrt7+uFNjZMEjoss+Y89vqlTc6g6
+         1QkCZc49hnn3O7tD4S7+u05OBdO+fT/7uw3I/UwXMma9HKDA/6rCnl2wgj3kVJQZS417
+         yoZ/RY+RRIFriCAwiiTn8qM5VemCllpOot/NyH5hPEz7pBGdGOsebyz/vUx8p2Gej/Jw
+         sDFulLp3PJfS+bm/nMZfEN1zAMUKII06enHPIkGOLq1o/At6DNDteG6Tgax73nvNOvqr
+         h+ESmxXJjVeyOzvG/eqKQHjmUmq9C59EmIZ0U+uD072Y8LJ6RmdSEurrbVCQ9PE1+2XT
+         7crw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762279133; x=1762883933;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=sTsoW0ur76ePtMo7HcuL4NYZdCCENhkyANXlSBYjqrA=;
-        b=BTuP2TxLHiYDApcSK5tPefs0kZ4UhYnOcual10qN8PDoUHT7BbmpT2WX27srxFRybK
-         GshJKStpko5zjgqr79FLFV/BkAC6wEUwK6g9NUQG463Gu5ZM4VMhV+6IrosvN2Zz0fdT
-         u0LAEXQuzkc0OF1G45dEleBDqOb5IIsnBidDh8ZxNoEv975KjTkZ6rd3UaJf90LEBRLr
-         ePkQk9rHtrGt+kYcDE68HYc38I+Vw+fbq9Xp001vdRGfJp2ITMClqlUslgQaw8VOd/RG
-         3wPFE1mBtH/gW+Nu7fFvdsZZaeumLsgkGnfx8mr1FAhgAtRB41MiXGj2avYnBIg6cDvB
-         SlVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXwLuhxb4YHFwdraRWMQxY9piE1La5mVtxmtM6UXeX6RNToJWI1B+0X48dBtG1xQU5x7+g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWZM0tX5Sw4VV1vkD2scR5IQ4sWChqLt7A2zvpB/BHOQkoh0t+
-	YF/HjK3Fh3/gp9xbe/JD8sGLFsBFltjhH2EnNX5KPKc2PQdktX4fa3D1UhZLyvKhcoYr1ul3kgq
-	Lm7vtGw==
-X-Google-Smtp-Source: AGHT+IHo6/KH4EkXGXP40ZLufzSsgW7yh9/qU70MiYfxQR70XqX2CyQgg6697l1DVe5Ug6vhYlNvwdh/uJA=
-X-Received: from plok6.prod.google.com ([2002:a17:903:3bc6:b0:269:8ca7:6998])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f609:b0:295:4d97:84dd
- with SMTP id d9443c01a7336-2962adb8f9cmr4243385ad.51.1762279132506; Tue, 04
- Nov 2025 09:58:52 -0800 (PST)
-Date: Tue, 4 Nov 2025 09:58:48 -0800
-In-Reply-To: <725c68f2607ad2d4f742fd749ea517a98d669384.camel@intel.com>
+        d=1e100.net; s=20230601; t=1762279351; x=1762884151;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z7TAMX5tgRxcaQgmnIz2dr5/J34h/wClq0GmkAjx/eU=;
+        b=buHquAVFgcEfoClP7W8qOYQnBwoku9LYlJoqZZNjRQexJcrO70aXTPa44XPMehRSof
+         Sf9wQ+vho5ZQlyEUckeDNSTy3LG/Q1iMGmC28AB6oQV2lPdLuotYAi3Gz2Pd/m7B8Uhd
+         8Wjnsn1b5QnMvoAutVqPE8GDZi4wF2DbK9S+OYgZBlcEvxHbqjUCFikpB6WjfKggWVBt
+         JPLnHlykfFDd1h7qPCxSIe0wIJ8qwvJvrInf7u9K3u6aac1OdAw79NcG6uoVrKSRfTIi
+         XQbaECofjwqlXDyfLUKWEcIp69n9kbysJabchjP8A3+6jDjpB8Zvm8lDrXVxF7VrMRNm
+         rcIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUqVi6VwwKtgjYUwwBG9ZaYn1n0BlibUIaoyKpmUWTV2/WRTSkfPng6f62IlznMxbuMQfk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywv/m8ik5eKp2t1Y0oZAh4R59HdiSb80vj48lQJVBkrUQ3f1mLy
+	HVC+/NVxGCHB854mHWp7VT2TT2pNoV8NIei1RCIgxMS8Dp7WTUm3vNXK8Zck85lSpIOekH3gJX+
+	ZrpLr4A==
+X-Google-Smtp-Source: AGHT+IEToeihVC8rNRp4WXHuCXbja7cJV9DF8/gVM9lRFkFysIMA8abH+TqAL0waWRxDGRap6/agKlo3e+8=
+X-Received: from pjbmv10.prod.google.com ([2002:a17:90b:198a:b0:340:d512:22dc])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6d92:b0:32b:7222:7459
+ with SMTP id adf61e73a8af0-34f8591c355mr151990637.34.1762279351036; Tue, 04
+ Nov 2025 10:02:31 -0800 (PST)
+Date: Tue, 4 Nov 2025 10:02:26 -0800
+In-Reply-To: <31da959f-d004-4ae0-a6a7-d5d31b646b70@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251030200951.3402865-1-seanjc@google.com> <725c68f2607ad2d4f742fd749ea517a98d669384.camel@intel.com>
-Message-ID: <aQo-2OQd8ktU0ygn@google.com>
-Subject: Re: [PATCH v4 00/28] KVM: x86/mmu: TDX post-populate cleanups
+References: <20251030200951.3402865-1-seanjc@google.com> <20251030200951.3402865-28-seanjc@google.com>
+ <31da959f-d004-4ae0-a6a7-d5d31b646b70@linux.intel.com>
+Message-ID: <aQo_spywQuek7fUi@google.com>
+Subject: Re: [PATCH v4 27/28] KVM: TDX: Bug the VM if extending the initial
+ measurement fails
 From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, 
-	"pjw@kernel.org" <pjw@kernel.org>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
-	"kas@kernel.org" <kas@kernel.org>, "maobibo@loongson.cn" <maobibo@loongson.cn>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "maddy@linux.ibm.com" <maddy@linux.ibm.com>, 
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>, 
-	"zhaotianrui@loongson.cn" <zhaotianrui@loongson.cn>, "anup@brainfault.org" <anup@brainfault.org>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Kai Huang <kai.huang@intel.com>, 
-	Yan Y Zhao <yan.y.zhao@intel.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, Vishal Annapurve <vannapurve@google.com>, 
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, "x86@kernel.org" <x86@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"Kirill A. Shutemov" <kas@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Yan Zhao <yan.y.zhao@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Oct 31, 2025, Rick P Edgecombe wrote:
-> On Thu, 2025-10-30 at 13:09 -0700, Sean Christopherson wrote:
-> > v4:
-> > =C2=A0- Collect reviews/acks.
-> > =C2=A0- Add a lockdep assertion in kvm_tdp_mmu_map_private_pfn(). [Yan]
-> > =C2=A0- Wrap kvm_tdp_mmu_map_private_pfn() with CONFIG_KVM_GUEST_MEMFD=
-=3Dy. [test bot]
-> > =C2=A0- Improve (or add) comments. [Kai, and probably others]
-> > =C2=A0- s/spte/mirror_spte to make it clear what's being passed in
-> > =C2=A0- Update set_external_spte() to take @mirror_spte as well. [Yan]
-> > =C2=A0- Move the KVM_BUG_ON() on tdh_mr_extend() failure to the end. [R=
-ick]
-> > =C2=A0- Take "all" the locks in tdx_vm_ioctl(). [Kai]
-> > =C2=A0- WARN if KVM attempts to map SPTEs into an invalid root. [Yan]
-> > =C2=A0- Use tdx_flush_vp_on_cpu() instead of tdx_disassociate_vp() when=
- freeing
-> > =C2=A0=C2=A0 a vCPU in VCPU_TD_STATE_UNINITIALIZED state. [Yan]
->=20
-> Do you want someone to follow up with a v2 of this after the series lands=
-? (with
-> Binbin's verbiage comments incorporated)
+On Tue, Nov 04, 2025, Binbin Wu wrote:
+> 
+> 
+> On 10/31/2025 4:09 AM, Sean Christopherson wrote:
+> > WARN and terminate the VM if TDH_MR_EXTEND fails, as extending the
+> > measurement should fail if and only if there is a KVM bug, or if the S-EPT
+> > mapping is invalid.  Now that KVM makes all state transitions mutually
+> > exclusive via tdx_vm_state_guard, it should be impossible for S-EPT
+> > mappings to be removed between kvm_tdp_mmu_map_private_pfn() and
+> > tdh_mr_extend().
+> > 
+> > Holding slots_lock prevents zaps due to memslot updates,
+> > filemap_invalidate_lock() prevents zaps due to guest_memfd PUNCH_HOLE,
+> > vcpu->mutex locks prevents updates from other vCPUs, kvm->lock prevents
+> > VM-scoped ioctls from creating havoc (e.g. by creating new vCPUs), and all
+> > usage of kvm_zap_gfn_range() is mutually exclusive with S-EPT entries that
+> > can be used for the initial image.
+> > 
+> > For kvm_zap_gfn_range(), the call from sev.c is obviously mutually
+> > exclusive, TDX disallows KVM_X86_QUIRK_IGNORE_GUEST_PAT so the same goes
+> > for kvm_noncoherent_dma_assignment_start_or_stop(), and
+> > __kvm_set_or_clear_apicv_inhibit() is blocked by virtue of holding all
+> > VM and vCPU mutexes (and the APIC page has its own non-guest_memfd memslot
+> 
+> Nit:
+> It sounds like TDX is using the memslot for the APIC page, but for a TD, the
+> memslot for the APIC page is never initialized or used?
 
-Feel free to send a v2 now.  Or just reply to Binbin's mail with the update=
-d
-comment.
-
-> https://lore.kernel.org/kvm/20251028002824.1470939-1-rick.p.edgecombe@int=
-el.com/#t
+Oh!  Good point.  I'll tweak that snippet when applying.
 
