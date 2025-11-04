@@ -1,381 +1,261 @@
-Return-Path: <kvm+bounces-61993-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61994-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E828CC3266E
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 18:41:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55AB7C3268C
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 18:42:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6AF7B34B76D
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 17:41:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 258EA3BF012
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 17:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570E833BBD0;
-	Tue,  4 Nov 2025 17:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD8333B960;
+	Tue,  4 Nov 2025 17:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZuZ43735";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="r5317QgB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="COfBEkfe"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3BE33BBC9
-	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 17:40:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762278052; cv=none; b=dcqJYrhGFsfLmkUr7aHBUELzej4pl+AQeRoqDlRxjKr8R1ljShYzUxelp5sPnbrpWGSoTwdhHKaKmeSHuHwCEDmziLnqgijdRtAnzR2xBIysJSx/C2gu5PDpwaUZEOzGPU5Jc1zogdCKvLXNIac5huLz5mUxSmgGKhdZ/YilZqY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762278052; c=relaxed/simple;
-	bh=9/V+JtN1C3x8MaOLuLtLksJtuBICm2Ac1ulgOuUH7iY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SzgsqUYYrtacu+Qmi6i8c+W+m40yHhKYkCE758bv8hwzQIsPL/nnZHAH6HXgUFRFmcMWPnegFxSO79/Ph772mKOH7L5o6kqLZ74s5/teDNLarqeL3STpsaiTMEsxVIcA+bySFr3HmHu+zBbQCS5VBkyfDSNYol320ZCkUlBhDAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZuZ43735; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=r5317QgB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762278049;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=NbV6Oebj1HpBMQtd1evkIv+/GOafpt/zOBeftSw66JI=;
-	b=ZuZ43735TyIaG0WEeYJntJIEGmwpPTH2L5/lp5puDu6h+qb0nkDNTWukGcwFkUUblZmNA/
-	vLySkFioDplrsO1+87dlhZtHWXg3Y/BlS0juNaWGE8nL32xzJkc8sKZIhh+CTyai81H+PG
-	X010J8Qb5/YJ4s1ZZmInHRqMrqPDci4=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-538-EhlC5AI4NPmfYGGy68Y1Ng-1; Tue, 04 Nov 2025 12:40:47 -0500
-X-MC-Unique: EhlC5AI4NPmfYGGy68Y1Ng-1
-X-Mimecast-MFC-AGG-ID: EhlC5AI4NPmfYGGy68Y1Ng_1762278045
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b70b974b818so233944266b.1
-        for <kvm@vger.kernel.org>; Tue, 04 Nov 2025 09:40:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762278045; x=1762882845; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NbV6Oebj1HpBMQtd1evkIv+/GOafpt/zOBeftSw66JI=;
-        b=r5317QgB7GOLHuQPvdRxUbw5iQ9ZE5bO/WhMQ0QC4mwDJuCPOrS0rm3BxBfBsVlPDL
-         ADfIYnliT/YaBQZzB8DIK9ywfyb103nue1j/ERL/tNwi1gtSvOvIfoJBVHh+Hcj+XLyi
-         /81UR9vCpRwuDFubF1g9nV479+oUKMqZ8Tny7r93evLKU3fEF+eDBoDZit1UU277w+K1
-         go4vqVXO1zIQ4VsCHpZUWqSsBlnxb5fO4ARc3JLRkRm746cbKx393vQyCGVBlOnDMN+N
-         nh9vfDdcQlzuGA5l5XDYdJ8HXdhzSUoioz/EbQ3b9kyj58NP24RlS/kybvYmftjbojqo
-         xkVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762278045; x=1762882845;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NbV6Oebj1HpBMQtd1evkIv+/GOafpt/zOBeftSw66JI=;
-        b=CTTupenhc6eByBQwgngomchJeI+IAZMxB1ESO1M8+YQriMmauKwBqLxnb47wVhVQi0
-         Rw7MyfsXLC5GcX0sRSVudeJw/EXgL7zWKxjv+gMo6oY3jx10RCTtIxoTpzX4Ftgf978v
-         RXbHm07sXIx8kXJXx1g8B7Lt88nHk27EeMrsSuP7WEsZorUAN2trzPAOEpi1JmsGAV61
-         4qbhU5GWa3aImMH+SkBfZXoB6h8hFv/zc/tKkwSnpcEpKo5N+s//MXDn8BdHc6wChXKS
-         WaqRPz3cz2Or/3Ie4iWhYaoTJ9O3G77v/KSNVwJ9pkga880coMrP/ERkbYuhUFGlEhQ/
-         2Vow==
-X-Forwarded-Encrypted: i=1; AJvYcCWt8lw2HW1uv+QNCSB79cJVXcu8SfYTIqcNAT8gdVs6rlEV1Fpa2og+bQ+q6tpdPAbCNOQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8Fxk2oOTA1rPPGCyMKv0vYo/xWyn4F0NaNx3ZOYYD8YhYjzKc
-	oh7jIFWI0zXFV9Im95rZSIdUpmY/fyLuDzs3TMUmboEaAFf8BVjyOav+cQRMBD/8w1Ljvf278CU
-	9t26g9wgyVfRiH8Rbn2AOuptPy9v9dVIarnQ9Xw3TAYr6bU00feJvFw==
-X-Gm-Gg: ASbGncvoXgfF6v/xbQn+2+ok7yHQE2an/J1lljTt+tZv84HqmD0xotly352KLX5G53N
-	jOzc1E/ZQmtxxw0T+7zAtrS+m7hPBR3PA1KXYAc+zRVQjeJN0y6IFHcrzCyQ4F97tN9rB5x7hmZ
-	z2YAqefXohbwzfNdsDDeT8AKbJNoZ285bWoLD237Y7EHMlduqX75d1SQgcqeowfStDOuO1OBl7u
-	QltoOEY9x3RqhGLTwOu4dSl4YBTuPzLv4oUenlNGPhnMKp942R/3LBPr5FzhJ3liAqTmvh7+Y1X
-	lleSyGzHwohho7JkJrhKSr7xCj4BbQqSy4tjfuWNi5CTL7wgQJNOtOMjeB4BDcQFkArdqPoq5Yv
-	/NALDSLTA7Q8I3v/iy7fCUXak9nCiQdxSmnW/QtWKi8Bc8R4DOI1IeII7VSM5PgPZUqlTZL0hf8
-	hrZzRo
-X-Received: by 2002:a17:906:478e:b0:b3f:33f6:fb57 with SMTP id a640c23a62f3a-b70700ad60dmr1852446966b.9.1762278045287;
-        Tue, 04 Nov 2025 09:40:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEMuwDLpCcGol7XijHs46PRw1XUB6pY2PrEin7/u5W3BZusaOceEpzO/bp6xBOR6v6i9pyfdw==
-X-Received: by 2002:a17:906:478e:b0:b3f:33f6:fb57 with SMTP id a640c23a62f3a-b70700ad60dmr1852443066b.9.1762278044793;
-        Tue, 04 Nov 2025 09:40:44 -0800 (PST)
-Received: from [192.168.10.48] ([151.95.110.222])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b723fa038e0sm272432766b.54.2025.11.04.09.40.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Nov 2025 09:40:44 -0800 (PST)
-Message-ID: <d9fb8b26-95f7-4929-9168-5413a7904edf@redhat.com>
-Date: Tue, 4 Nov 2025 18:40:43 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C1932D0D6;
+	Tue,  4 Nov 2025 17:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762278123; cv=fail; b=ftrCxI1fZxWX7SDaxqv+tc7pd7wg4ZGFkw2vzS4XOvxSL0sAZfvf52c5xaJVNSX/Vy0Y886DCrPBEAhnZTXrNYaFD2lg3jxsBl6nyw4iR4+e48cnAavTO4CHeiRye+P8ZyJhaX3rgOermoa5UcNKDjDzqdM20JUv0VmLXqHEYNo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762278123; c=relaxed/simple;
+	bh=MSvF1EFvz27BQXln675LMSXQlWLzWyeZybrHjR+kikI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=qXQBHeUzfp5KwvVG11bzHBr2DuNBTV0rAkwnW4TLtCJJxBqL3yNfgrNV7PNc06YaVY5NKHCFEA+0+mbOxQru9TAsjXXUxwKEZAp4T4K0oYGII+Ip5DXWWwJGtmwJuFb4z5YPaW84xeW7mvsL4gN0VqJ4IleQZFr1S0b4R80rTe0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=COfBEkfe; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762278122; x=1793814122;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=MSvF1EFvz27BQXln675LMSXQlWLzWyeZybrHjR+kikI=;
+  b=COfBEkfeKpfLE/TVzDinWSrgP5GlPVTEbmG2ztoZXgz4IKJQg3KqhFiV
+   mRqpeXF9zTJW3OqlVAlYwaG9EXERzMZfTbfT4r2ROZ6MAhsYvFSuWu6YE
+   55m8NQhdJUNFDxwvcQzC6KM281cRTW9TxCVd8oERAW9AzyfwX5dLPv9pu
+   rTDCASTt0FQDXc7ZwPYVGI9wOFp5EwdfnjcLn2VtKBY9v1l0gCixwA6SW
+   zyQO3TR46VFES8/2vT0I3T+/2VCmtUkFi3ShhiFCP6Uxhhgl+BgVHGszJ
+   iWPDsTTzR5QD3sq3kYcvbD9jaWDhxX+lalYcIbfC0v3WUnMToDbK9eSWo
+   w==;
+X-CSE-ConnectionGUID: f7HlOJnoQjyOkfM632N+Lw==
+X-CSE-MsgGUID: 2d/YyRacTsOtSQp0p22CLQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="64288650"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="64288650"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 09:42:01 -0800
+X-CSE-ConnectionGUID: vp+3yagiSz+v5RAZ/PHKtw==
+X-CSE-MsgGUID: updpShTWS9eBxnJVuuhEpA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,279,1754982000"; 
+   d="scan'208";a="210716253"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 09:42:01 -0800
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 4 Nov 2025 09:42:00 -0800
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Tue, 4 Nov 2025 09:42:00 -0800
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.61) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 4 Nov 2025 09:42:00 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ll+uOnIgj3nsxkFZAeofVIsBsEGXfBKi2Ixg7H3Ht372aMR00gcgkYvK5ZIi4a2TZ9aR+4SZ6Km24b3yLu3xo9ZrbfEyy3sUFHhiHWVFAJd95lEUsZ2ICMRiFETGYOAd0cfgvcNxAVLK980I73kn0Yzyv0+YlVIOVerbSCg5bJEHVke3pdhMWiCUnL8roJ0GitcgJVEFpFQHD2rblWiK9/kXjvTBrpBWPE95ebMXDQ0JdOUMeKanSGTG+2CvKOQlsWOsQaIPwhDDksexp9ROyutWjdYcQy0Y2PF/WHYN8nm1M3T38TNIsvId3ax3EZQ61jQVUQ5o3r1ihxprvDokZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1i93F0lApODizGlfDpHgb6f+cKSKuKPTPizII4nwrxs=;
+ b=aKREvfYRBrj11uxzgJxlX+Wf3GiTAHv0lFbDBucHJoy4Vmunf5PwFYEh+NPirB+tUlf3da3WcWJTBI/VphP/wzvFnc/DZfZNOcpd4tgqZl5j5gDOuUZhD4G1PT4eQ0okG5casST8Mai4ymHLgGW9j7HxuhiBNnypy/N5bEodMIuBAswcg9zawxiCcpavsVrco/IXjanSezH7UvpSG0MXIFAFpmB4nmiQzUYD5vDnXmcF6uW7GAslD86yEKZR2izfpNGxLMEpShl4YFjsBMv3RfELBY4fAQy6bNG9yBz97zMPKpfxHsQRFTKb+0WejkH9r/XmfVikReZqyYKKUrDbHw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6139.namprd11.prod.outlook.com (2603:10b6:930:29::17)
+ by IA1PR11MB8246.namprd11.prod.outlook.com (2603:10b6:208:445::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.7; Tue, 4 Nov
+ 2025 17:41:58 +0000
+Received: from CY5PR11MB6139.namprd11.prod.outlook.com
+ ([fe80::7141:316f:77a0:9c44]) by CY5PR11MB6139.namprd11.prod.outlook.com
+ ([fe80::7141:316f:77a0:9c44%6]) with mapi id 15.20.9275.013; Tue, 4 Nov 2025
+ 17:41:57 +0000
+Date: Tue, 4 Nov 2025 11:41:53 -0600
+From: Lucas De Marchi <lucas.demarchi@intel.com>
+To: =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>
+CC: Alex Williamson <alex@shazbot.org>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
+	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
+	<kevin.tian@intel.com>, Shameer Kolothum <skolothumtho@nvidia.com>,
+	<intel-xe@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, Matthew Brost <matthew.brost@intel.com>, "Michal
+ Wajdeczko" <michal.wajdeczko@intel.com>, <dri-devel@lists.freedesktop.org>,
+	Jani Nikula <jani.nikula@linux.intel.com>, Joonas Lahtinen
+	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
+ Laguna" <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v3 27/28] drm/intel/pciids: Add match with VFIO override
+Message-ID: <3y2rsj2r27htdisspmulaoufy74w3rs7eramz4fezwcs6j5xuh@jzjrjasasryz>
+References: <20251030203135.337696-1-michal.winiarski@intel.com>
+ <20251030203135.337696-28-michal.winiarski@intel.com>
+ <cj3ohepcobrqmam5upr5nc6jbvb6wuhkv4akw2lm5g3rms7foo@4snkr5sui32w>
+ <xewec63623hktutmcnmrvuuq4wsmd5nvih5ptm7ovdlcjcgii2@lruzhh5raltm>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <xewec63623hktutmcnmrvuuq4wsmd5nvih5ptm7ovdlcjcgii2@lruzhh5raltm>
+X-ClientProxiedBy: SJ0PR03CA0294.namprd03.prod.outlook.com
+ (2603:10b6:a03:39e::29) To CY5PR11MB6139.namprd11.prod.outlook.com
+ (2603:10b6:930:29::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC] kvm: emulate avx vmovdq
-To: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org
-Cc: x86@kernel.org, Keith Busch <kbusch@kernel.org>,
- Alex Williamson <alex.williamson@redhat.com>, Xu Liu <liuxu@meta.com>
-References: <20240820230431.3850991-1-kbusch@meta.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20240820230431.3850991-1-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6139:EE_|IA1PR11MB8246:EE_
+X-MS-Office365-Filtering-Correlation-Id: 937116e0-2484-477b-a3ab-08de1bc9738f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Yk5HQisvMVYwQUNQWXFCZzVvSmVzTEdlMEpwbTFBUXovSGhad3JQVURydXhL?=
+ =?utf-8?B?NGtnbkpUelQxTmR3SEFYZjQ1cVZKM3BWbUZObmphNDVBRjByU2dkRkxWbVlB?=
+ =?utf-8?B?azhTcHlIZHN3SkJDdHA0OHU3d2hxTFZwbmRzLzFuZ2lFZTFCbVJMR1daUlN2?=
+ =?utf-8?B?T3RJdlU2dEZPdjZDZnJvazhhTVI1TDZsWnkwSXp2VXNUT29YYnFHV3AxaDVF?=
+ =?utf-8?B?REQ4OHBoblNiUklqWGNtbExkTFpmN2xabXV5dlBJSzFmaFhtYzcranhGblFz?=
+ =?utf-8?B?OVFjS0x3Tmw2QVlkRkR6K2VmQ2hEV1lUaEJHbkVwVVZXQmpSalBCd0Y4bXh5?=
+ =?utf-8?B?TGtHSWpUdkZlZVUwL1ZvaHdKSUJoSVRhUjB4djluVjRvWjl6MmxNVzVnQVM0?=
+ =?utf-8?B?ZDBYcDcrVjFQS2JGRGxLQ1ZQTlFjQTJxcG9tTVpoMFl2UnlCRmRNWS9nNkpR?=
+ =?utf-8?B?NzcvOEV4T1k1d1FSU3UxdHgyWDJoY2p0Mk9scXNZZjhYUmVmdkwyOEZ3d1R1?=
+ =?utf-8?B?Sk91cWRSVWJvbzZScGIybnFudktMTE1rOUtYcStkWk1lZEQvZGR6RkVIc3dB?=
+ =?utf-8?B?N3ZMOS9tYUd0ajE0Q3FFSXJVcmk1YzM1RStmTU45QmdzNjJoZlBpWXpIK2tt?=
+ =?utf-8?B?anRUKzI5NHoyZXVrWUxheUcwUUY3eUFOeGxUMUdIWS9xbGNJMm1Kbm1FcUZl?=
+ =?utf-8?B?V2JmcnJwcGxPeW9IWldQNlBBcCtQNTFnV1hHTFI0Z0E1NUFKOEdKaEo0cFNT?=
+ =?utf-8?B?ZGZGM0Nsbmo0U1Y0Q1Iwd0dKb05HaDBxdmpsS2JVM25BMXRQeVZhU0N6K0tq?=
+ =?utf-8?B?YUhVZ0NyQUFhSGJPZ0hVNlRSSHFKOTl6MmM0ekt0TXByQ1hpbmVIbWR5RmVJ?=
+ =?utf-8?B?S1QzWFRsRSs2L0RCSUpNd1pON2duN2tGckgwWTF3UmYwRExzU1YyeVpHRG8z?=
+ =?utf-8?B?WUQrTUphQ0hFYjNXdVlZNUUrek5PdllLUzBWQVJLM2NsaC9CcVdoeDBtQVZF?=
+ =?utf-8?B?Mzdja3Zla2doTU9EYm53T1BKOFJnSTZpeXFWTHVHbVhudm1MbG93KzY0V1V0?=
+ =?utf-8?B?d0dHYnFOTFBOTjFpaDkzSURkUHpFZnZFUUd0YkkvRUdzRDNuRWovS1ErT2FM?=
+ =?utf-8?B?UThVckJCKzRlS2wvSG1hTmlZUWVmd09GdVVZS3ExdzZ0dHJtaFd0amVFMndF?=
+ =?utf-8?B?aDlWcGpzazJ2L2F3NFdUcjNxaWZ4OXhpekFqL0ZQakJrRzhrMGIxN1YxY1Zs?=
+ =?utf-8?B?U1ltdmpxV3lwSW5IMDVLemJmN3Rad01SWmV0YW1RdVQ3MWpsK2E1cUxFc2Nh?=
+ =?utf-8?B?MTlFZndXQytHV0NzMXgvV0kwTEhKNDhteUtHc2xnQTJadnR2ZlJDbmhuM1BC?=
+ =?utf-8?B?azZKcGJ3cEZuZnA4Q29QOFpCV3ovMXlkK0RPSnBhTW4yc25FOEJvdmVRcmZP?=
+ =?utf-8?B?cUIvbzFQdzJaQzdpUXk0bWRBYS9PbDBkb2ZiTjZPRjNNajZ4ZElyK1JnRk8y?=
+ =?utf-8?B?WEU0cTBpMzRZVjdXNWNEbnJVMURSRE5XQlh6aWJBZUZSeFF2VXJZKzJmczQw?=
+ =?utf-8?B?TVR0cnlOWk5xb2NabWJGYW1nblg3U251Z2lxN3gwU05MNG8wYjJXc1pFSjdw?=
+ =?utf-8?B?ZXBCWS8yeVFxUWV1cFFxam9tN2pQZGJSSkt6bTF5QXZqNnJoUkxGa0VnSG45?=
+ =?utf-8?B?UjZ1Q09paGpBamxwQnNKcVUyNTJxays4OEVQdk16UlFTSjNMNGxwLzZjNzd2?=
+ =?utf-8?B?MVBzRTlPdFhWYktuRGlGeHoyRFQ3b0dTT0kwWFpoKzl5Vk9GZis3c29uRjRs?=
+ =?utf-8?B?VDc4UEFzeFJXbytpUXNwcnR5aTVDYzBROU90TnlITU9CR0dLbEZxWjNhdWpG?=
+ =?utf-8?B?SGVhQmx5bVZQMGJWZHpyUTZnaXdKdVV3MlMwQXVpenltSEhpK3VKdUZydURH?=
+ =?utf-8?Q?touH0bVsR8aqh/4ZYMnlMJT+nA9ZP6zI?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6139.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WWJiMnBGa25EQi9WVDlGTnNjUTF3bUszWktEQ0ZoeVZtdlRaWGVGMjRzTG1h?=
+ =?utf-8?B?SXoyM0p1WGpwZUYwc1JrMDBnUUF4TUNmbVRjd1JZbFRSNUtDbEtxbnJ2QlJx?=
+ =?utf-8?B?TWdOK1l1bVVDR0JTUXpvdzNldmpPYUVVNFBjUldwa3dQVFRiSG0vTFNkdVY5?=
+ =?utf-8?B?MmpSK1JIZ2FXbU5xZGpPNVlRSDJjNnEyUHM0aWpEN2o5RVkwL1RHaGxwbklH?=
+ =?utf-8?B?Sy8yaERhdWZ2YVJDeWxBU2k0TkpydHBLc0Z5TFNSYVdSWlZzTk94MjBLMkMr?=
+ =?utf-8?B?NlFNME44TmdNaUdCRzFVSU5hVWdCdDU1Y21IQUtHOUlkS2J2cXFSWlpXQU9o?=
+ =?utf-8?B?ajBJSzU4VlRMQlpQMWx4N1RCRitjV25NMDhEbkRZb2J3TkNneFloQnpqQU5W?=
+ =?utf-8?B?OFk5NGZPS21GUnRQRGthTVRwMXBMUlQwMFhJZUFUZEJBWlFWVFhhZExKbWs1?=
+ =?utf-8?B?S3BsTEtiNS9xb1FiQlNNQ1B2L3BUdDhZNGFob0VUbC90RzBSdDdrUlZtcXM4?=
+ =?utf-8?B?d05xcUZOUVRrRUFWcm5YdU5UK2daRVZSTkd2UTg5b1doTTJoS0xIMlMvdVRu?=
+ =?utf-8?B?blBzRElSVFBEV3QvWlRmdnNrNGNHdmU4a0dadDNES0tzZDFxUWFydlN0c25q?=
+ =?utf-8?B?bmdaWFh5SFk1Z2NpTGxUZTVjYmx2QTc0UVpqb0FSTDNjOGtvdkNySlhnd2Fh?=
+ =?utf-8?B?R0x3RXpwMGFSaFNuY1FpV2ZwWlJuQnp0WCtJTDhCZHJ4ZEN2b1JXOVhJWHV5?=
+ =?utf-8?B?endVaXNCbzM0TUVvR3RMaFlhUENaNVFUUG9iV3FtSDkyV0JsOHl4REFDcmtV?=
+ =?utf-8?B?TElTTHNOemxncE9Bb1k4K3o3S3JPWVpPNnFFMHFKWW9sOHR3enRxSm5kR2dj?=
+ =?utf-8?B?RGZNMHpQSnFMMzFLSmZJNzRRY3JJN0xTZUhkT0lSb1daeWxEREJCYkNBV0My?=
+ =?utf-8?B?VjBjZEFiWXFEL0tXeUovSTZJeWpiL2dMcXduTUdiWEZRRDRQaFdYc2FrZWdv?=
+ =?utf-8?B?L0pONEt1NFhsZ21iVTZQSmZyU3JocmZST1hVL3dCRlJrT0Q5ZFh6dlA0WXRX?=
+ =?utf-8?B?akdOUTQxbnZYdHBkTmVHeVcrN1ZYUERUak44UmYyM2pUVUZrb05ZWm14U1Ro?=
+ =?utf-8?B?TE4wUExHejIzTnFoYXVsaFpTcTk3aWJWeWpZdzNtT0tIbXNhd0R2QzRkWVQw?=
+ =?utf-8?B?VXdhcmZOQkhSUnZ0Q25XRUcvR1VrNTJoTXJEMUZ4UkQ4RExPYUMxd1RiS3pW?=
+ =?utf-8?B?UGxVOFVXSUF5SEdZSTJaRFAyd25JcDFid3ZKSitCWmNja1hzUnl1NHhQM0R0?=
+ =?utf-8?B?S1NkY3daaGMrdEluN3FFRDVrd0RhVndCUkRmM1dzMy9SUHV3Mkk0ZzR6QXJy?=
+ =?utf-8?B?MDgxUURDaUoxSDlRMy9JMUJWNXF4ckRNdWZ3RnVNYitaMWJhQXIyZVFZaVpP?=
+ =?utf-8?B?emhNYlJWWnVxYjlLWXFyckhKcmpkeVhyTDh0Q2lKZWZ3RU9hRGxZVGVtLzhu?=
+ =?utf-8?B?VHFVQ0Jqd1QzVkR5OC9XNGczazhkdXV4ejJGMWkvS1UwOG1ZTk5xV09Bd04r?=
+ =?utf-8?B?MHZBSFJENjNNaTU1NzJyeVVjMFBwZURUeHBYcDZJQStOTTRoWTk1SnU2VHI3?=
+ =?utf-8?B?MytJMllET1AwZ25SaE5YRTU0RzdJWkF1OXRpbEZzMXFsN0NnaXZMam9tdC95?=
+ =?utf-8?B?SXZUbGxDbG5XZHIxYmtIY0NJVzVkYTl2Wkp4dXVveHFBQ0lqZEdKa2pSSTVM?=
+ =?utf-8?B?MlIwa2FwWU55Z2xrWk1iVlRuQStPYXByaG83NGlaSS9ENVU2Z2JMUEVLMDZQ?=
+ =?utf-8?B?UWFjbEl0aXdkQjQvN3NnMHhmOUtPdDlDWUtPanpHUzBKSWhXdm5obHFmYlJ4?=
+ =?utf-8?B?NWpTL1hCMjk5NG1xS3NvOHg5a2hhWFlPTE1uSHpYL1k2a1BTNHI3QmZtTWVk?=
+ =?utf-8?B?czFTWUVENkVmRWd4VmpCRXg1RFBnRy9obzFEVzZXV29TOWJ2b3V1SFJ3cGNS?=
+ =?utf-8?B?OE05OE5laDhZcWMySDZ1OGo5cVpYeE5zekpoaWhFZGQvTHBBd0Y4TmhlUUk1?=
+ =?utf-8?B?NTgzbEUvUVJPSGxrdVpQR3lqN2prVnd6RmdiZUM1QlpSZld2VDBJb1hkbXMr?=
+ =?utf-8?B?bGovZm5EOFRWRlRwMXFrMGpsN0JaOHhML2VwTVR2MmpzNUozUUEzZHRVMjV0?=
+ =?utf-8?B?b0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 937116e0-2484-477b-a3ab-08de1bc9738f
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6139.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2025 17:41:57.6342
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZJO3zw6C4ir+lsZ5Z8nvdgIjRa22ZY9oqOEpeipk5yCHY/hR/qP+u98EpBXdF34JSTKQTM6ePopp9jAGjarzFiz+ePnUjSzwzS7MhVFymvE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB8246
+X-OriginatorOrg: intel.com
 
-On 8/21/24 01:04, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Because people would like to use this (see "Link"), interpret the VEX
-> prefix and emulate mov instrutions accordingly. The only avx
-> instructions emulated here are the aligned and unaligned mov.
-> Everything else will fail as before.
-> 
-> This is new territory for me, so any feedback is appreciated.
-> 
-> To test, I executed the following program against a qemu emulated pci
-> device resource. Prior to this kernel patch, it would fail with
-> 
->    traps: vmovdq[378] trap invalid opcode ip:4006b2 sp:7ffe2f5bb680 error:0 in vmovdq[6b2,400000+1000]
-> 
-> And is successful with this kernel patch.
+On Tue, Nov 04, 2025 at 01:59:45PM +0100, Michał Winiarski wrote:
+>On Mon, Nov 03, 2025 at 03:30:49PM -0600, Lucas De Marchi wrote:
+>> On Thu, Oct 30, 2025 at 09:31:34PM +0100, Michał Winiarski wrote:
+>> > In order to allow VFIO users to choose the right driver override, VFIO
+>> > driver variant used for VF migration needs to use Intel Graphics PCI
+>> > IDs.
+>> > Add INTEL_VGA_VFIO_DEVICE match that sets VFIO override_only.
+>> >
+>> > Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
+>> > ---
+>> > include/drm/intel/pciids.h | 7 +++++++
+>> > 1 file changed, 7 insertions(+)
+>> >
+>> > diff --git a/include/drm/intel/pciids.h b/include/drm/intel/pciids.h
+>> > index b258e79b437ac..d14ce43139a28 100644
+>> > --- a/include/drm/intel/pciids.h
+>> > +++ b/include/drm/intel/pciids.h
+>> > @@ -43,6 +43,13 @@
+>> > 	.class = PCI_BASE_CLASS_DISPLAY << 16, .class_mask = 0xff << 16, \
+>> > 	.driver_data = (kernel_ulong_t)(_info), \
+>> > }
+>> > +
+>> > +#define INTEL_VGA_VFIO_DEVICE(_id, _info) { \
+>> > +	PCI_DEVICE(PCI_VENDOR_ID_INTEL, (_id)), \
+>> > +	.class = PCI_BASE_CLASS_DISPLAY << 16, .class_mask = 0xff << 16, \
+>> > +	.driver_data = (kernel_ulong_t)(_info), \
+>> > +	.override_only = PCI_ID_F_VFIO_DRIVER_OVERRIDE, \
+>>
+>> why do we need this and can't use PCI_DRIVER_OVERRIDE_DEVICE_VFIO()
+>> directly? Note that there are GPUs that wouldn't match the display class
+>> above.
+>>
+>> 	edb660ad79ff ("drm/intel/pciids: Add match on vendor/id only")
+>> 	5e0de2dfbc1b ("drm/xe/cri: Add CRI platform definition")
+>>
+>> Lucas De Marchi
+>>
+>
+>I'll define it on xe-vfio-pci side and use
 
-It's been a while but I am going to revive this patch (fix it and resend 
-it)...  Here are a couple notes on what can be done.
-> -	ctxt->modrm_reg = ((ctxt->rex_prefix << 1) & 8); /* REX.R */
-> -	index_reg = (ctxt->rex_prefix << 2) & 8; /* REX.X */
-> -	base_reg = (ctxt->rex_prefix << 3) & 8; /* REX.B */
-> +	if (ctxt->vex_prefix[0]) {
-> +		if ((ctxt->vex_prefix[1] & 0x80) == 0)  /* VEX._R */
-> +			ctxt->modrm_reg = 8;
-> +		if (ctxt->vex_prefix[0] == 0xc4) {
-> +			if ((ctxt->vex_prefix[1] & 0x40) == 0) /* VEX._X */
-> +				index_reg = 8;
-> +			if ((ctxt->vex_prefix[1] & 0x20) == 0) /* VEX._B */
-> +				base_reg = 8;
-> +		}
-> +	} else {
-> +		ctxt->modrm_reg = ((ctxt->rex_prefix << 1) & 8); /* REX.R */
-> +		index_reg = (ctxt->rex_prefix << 2) & 8; /* REX.X */
-> +		base_reg = (ctxt->rex_prefix << 3) & 8; /* REX.B */
-> +	}
-It's easier to do all the VEX decoding straight into rex_prefix in 
-x86_decode_avx.
+but no matter where it's defined, why do you need it to match on the
+class? The vid/devid should be sufficient.
 
->   	ctxt->modrm_mod = (ctxt->modrm & 0xc0) >> 6;
->   	ctxt->modrm_reg |= (ctxt->modrm & 0x38) >> 3;
-> @@ -1195,6 +1219,19 @@ static int decode_modrm(struct x86_emulate_ctxt *ctxt,
->   		op->bytes = (ctxt->d & ByteOp) ? 1 : ctxt->op_bytes;
->   		op->addr.reg = decode_register(ctxt, ctxt->modrm_rm,
->   				ctxt->d & ByteOp);
-> +		if (ctxt->d & Avx) {
-> +			op->bytes = ctxt->op_bytes;
-> +			if (op->bytes == 16) {
-> +				op->type = OP_XMM;
-> +				op->addr.xmm = ctxt->modrm_rm;
-> +				kvm_read_sse_reg(ctxt->modrm_rm, &op->vec_val);
-> +			} else {
-> +				op->type = OP_YMM;
-> +				op->addr.ymm = ctxt->modrm_rm;
-> +				kvm_read_avx_reg(ctxt->modrm_rm, &op->vec_val2);
-> +			}
-> +			return rc;
-> +		}
-
-The duplication with decode_register_operand sucks, I'll check what can 
-be done about it.
-
->   		if (ctxt->d & Sse) {
->   			op->type = OP_XMM;
->   			op->bytes = 16;
-> @@ -1808,6 +1845,9 @@ static int writeback(struct x86_emulate_ctxt *ctxt, struct operand *op)
->   	case OP_XMM:
->   		kvm_write_sse_reg(op->addr.xmm, &op->vec_val);
->   		break;
-> +	case OP_YMM:
-> +		kvm_write_avx_reg(op->addr.ymm, &op->vec_val2);
-> +		break;
->   	case OP_MM:
->   		kvm_write_mmx_reg(op->addr.mm, &op->mm_val);
->   		break;
-> @@ -3232,7 +3272,7 @@ static int em_rdpmc(struct x86_emulate_ctxt *ctxt)
->   
->   static int em_mov(struct x86_emulate_ctxt *ctxt)
->   {
-> -	memcpy(ctxt->dst.valptr, ctxt->src.valptr, sizeof(ctxt->src.valptr));
-> +	memcpy(ctxt->dst.valptr, ctxt->src.valptr, ctxt->op_bytes);
-
-The idea here was that copying everything is faster because the size is 
-constant.  256 bits starts to be relatively hefty, but still only 4 
-words.  Maybe worth adding an "if (ctxt->op_bytes <= 8)".
-
-
-> +static const struct gprefix pfx_avx_0f_6f_0f_7f = {
-> +	N, I(Avx | Aligned, em_mov), N, I(Avx | Unaligned, em_mov),
-> +};
-> +
-> +static const struct opcode avx_0f_table[256] = {
-> +	/* 0x00 - 0x5f */
-> +	X16(N), X16(N), X16(N), X16(N), X16(N), X16(N),
-> +	/* 0x60 - 0x6F */
-> +	X8(N), X4(N), X2(N), N,
-> +	GP(SrcMem | DstReg | ModRM | Mov, &pfx_avx_0f_6f_0f_7f),
-> +	/* 0x70 - 0x7F */
-> +	X8(N), X4(N), X2(N), N,
-> +	GP(SrcReg | DstMem | ModRM | Mov, &pfx_avx_0f_6f_0f_7f),
-> +	/* 0x80 - 0xFF */
-> +	X16(N), X16(N), X16(N), X16(N), X16(N), X16(N), X16(N), X16(N),
-> +};
-
-Can't blame you for duplicating the table, as that's the easiest way to 
-do it.  I'll check if I can reuse some ideas from QEMU on how to avoid that.
-
-> +static struct opcode x86_decode_avx(struct x86_emulate_ctxt *ctxt)
-> +{
-> +	u8 map, pp, l, v;
-
-Should check that there are no 0x66/0xf2/0xf3 prefixes.
-
-> +	if (ctxt->vex_prefix[0] == 0xc5) {
-> +		pp = ctxt->vex_prefix[1] & 0x3;	/* VEX.p1p0 */
-> +		l = ctxt->vex_prefix[1] & 0x4;	/* VEX.L */
-> +		v = ~((ctxt->vex_prefix[1] >> 3) & 0xf) & 0xf; /* VEX.v3v2v1v0 */
-> +		map = 1; /* for 0f map */
-> +		ctxt->opcode_len = 2;
-> +	} else {
-> +		map = ctxt->vex_prefix[1] & 0x1f;
-> +		pp = ctxt->vex_prefix[2] & 0x3;
-> +		l = ctxt->vex_prefix[2] & 0x4;
-> +		v = ~((ctxt->vex_prefix[2] >> 3) & 0xf) & 0xf;
-> +		ctxt->opcode_len = 3;
-> +	}
-> +
-> +	if (l)
-> +		ctxt->op_bytes = 32;
-> +	else
-> +		ctxt->op_bytes = 16;
-> +
-> +	switch (pp) {
-> +	case 0: ctxt->rep_prefix = 0x00; break;
-> +	case 1: ctxt->rep_prefix = 0x66; break;
-> +	case 2: ctxt->rep_prefix = 0xf3; break;
-> +	case 3: ctxt->rep_prefix = 0xf2; break;
-> +	}
-> +
-> +	if (map == 1 && !v)
-> +		return avx_0f_table[ctxt->b];
-> +	return (struct opcode){.flags = NotImpl};
-> +}
-> +
->   int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int emulation_type)
->   {
->   	int rc = X86EMUL_CONTINUE;
-> @@ -4777,7 +4869,7 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
->   	ctxt->op_bytes = def_op_bytes;
->   	ctxt->ad_bytes = def_ad_bytes;
->   
-> -	/* Legacy prefixes. */
-> +	/* prefixes. */
->   	for (;;) {
->   		switch (ctxt->b = insn_fetch(u8, ctxt)) {
->   		case 0x66:	/* operand-size override */
-> @@ -4822,6 +4914,19 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
->   				goto done_prefixes;
->   			ctxt->rex_prefix = ctxt->b;
->   			continue;
-> +		case 0xc4: /* VEX */
-> +			if (mode != X86EMUL_MODE_PROT64)
-> +				goto done_prefixes;
-
-VEX prefixes can actually be used in 32-bit modes as long as bits 7:6 
-are 11 in binary.  Might actually do that, since we don't support 
-lds/les instructions at all in the emulator.
-
-Also I'll move all the fetches to x86_decode_avx as well.  Just do a 
-"break" here...
-
-> +			ctxt->vex_prefix[0] = ctxt->b;
-> +			ctxt->vex_prefix[1] = insn_fetch(u8, ctxt);
-> +			ctxt->vex_prefix[2] = insn_fetch(u8, ctxt);
-> +			break;
-> +		case 0xc5: /* VEX */
-> +			if (mode != X86EMUL_MODE_PROT64)
-> +				goto done_prefixes;
-> +			ctxt->vex_prefix[0] = ctxt->b;
-> +			ctxt->vex_prefix[1] = insn_fetch(u8, ctxt);
-> +			break;
->   		case 0xf0:	/* LOCK */
->   			ctxt->lock_prefix = 1;
->   			break;
-> @@ -4844,10 +4949,10 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
->   	if (ctxt->rex_prefix & 8)
->   		ctxt->op_bytes = 8;	/* REX.W */
->   
-> -	/* Opcode byte(s). */
-> -	opcode = opcode_table[ctxt->b];
-> -	/* Two-byte opcode? */
-> -	if (ctxt->b == 0x0f) {
-> +	if (ctxt->vex_prefix[0]) {
-> +		opcode = x86_decode_avx(ctxt);
-> +	} else if (ctxt->b == 0x0f) {
-> +		/* Two-byte opcode? */
->   		ctxt->opcode_len = 2;
->   		ctxt->b = insn_fetch(u8, ctxt);
->   		opcode = twobyte_table[ctxt->b];
-> @@ -4858,18 +4963,16 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
->   			ctxt->b = insn_fetch(u8, ctxt);
->   			opcode = opcode_map_0f_38[ctxt->b];
->   		}
-> +	} else {
-> +		/* Opcode byte(s). */
-> +		opcode = opcode_table[ctxt->b];
->   	}
-> +
->   	ctxt->d = opcode.flags;
-
-... and call out to x86_decode_avx here for the actual processing of the 
-prefix:
-
-	if (ctxt->opcode_len == 1 && ctxt->b == 0xc4 || ctxt->b == 0xc5) {
-   		int modrm = insn_fetch(u8, ctxt);
-		if (mode == X86EMUL_MODE_PROT64 || (modrm & 0xc0) == 0xc0) {
-			opcode = x86_decode_avx(ctxt, ctxt->b, modrm);
-	  		modrm = insn_fetch(u8, ctxt);
-		}
-		ctxt->modrm = modrm;
-	} else if (ctxt->d & ModRM)
-   		modrm = insn_fetch(u8, ctxt);
-
-Nevertheless, thanks so much for writing this and sorry for dropping it 
-on the floor for so long.  It's way overdue.
-
-Paolo
-
+Lucas De Marchi
 
