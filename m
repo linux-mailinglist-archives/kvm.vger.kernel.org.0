@@ -1,47 +1,45 @@
-Return-Path: <kvm+bounces-62017-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C770C32C9E
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 20:32:23 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E1ECC32DC4
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 21:02:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C95C7342D22
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 19:32:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D53934EC652
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 20:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37ACF2E8DED;
-	Tue,  4 Nov 2025 19:31:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31E22FF14D;
+	Tue,  4 Nov 2025 20:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JMwYmvBO"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kDt1VJTf"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A2A52E62A2
-	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 19:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29422FCC02
+	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 20:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762284684; cv=none; b=Dq6Kb7w/R7MpZqpSpgkdqKxcgOYCUOwO+MmtAb9sZKML9B9bZCbEtWVh5jBnsa2sO+e8LXaM1nWh+1o6gPMR/Xz0YiKdNFSnQAW+jmnBwfuZg3M8M/E/SVEtL/sBQbSWFMKTi8sYu5PfwUzVL11VC7AKXlppTk4Kt3HklYEwFZ0=
+	t=1762286419; cv=none; b=dS+xVK4+9PKjxgea8FjsKU7NE6NoXqjkN6dn80O0p26F3Sn1pllUFXOnw5PH+7ra40iQb9zm7sinjqbEqvsyVYq7ANW0whfCz/BoSDHJ5C6UX1sEyVMlNYGeOGEQbXzrW2g9V3fWzJPjZPJu03i/eXeR2bgxEV7N4YS3Ubs9br4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762284684; c=relaxed/simple;
-	bh=+ZJA6Q75MIRb7BPwJQxYYkjbOwsjL+1qbka9doCeMbA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q7JGntK26mFGpmiLFW4M2hUC4GJt2PZzumHoWr/iAc3DK4YsIgmDNNyi2i8yO2lHH1LLiLj0IVDoE+/Eye9ZMQVr4uZ8fPLvSypuJv5ZSEcMLsUmD7jRrM5Ie5CpvLVUbw+JQvZ06AVQCg2Ajp/UMp3wuf7zaonGG0J8NdhJvXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JMwYmvBO; arc=none smtp.client-ip=95.215.58.187
+	s=arc-20240116; t=1762286419; c=relaxed/simple;
+	bh=2OhcAUdB0tHmscZz9a/V7gpElutoP/FD8ca9U+0iMrI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=thw9lin4zGexSlY6poaxtIuKPYX21VhdayR6LJHAUJxxZVih3F3kmjIYVkrhRGOsfbGt+x/dqwyC+kMIj1B6TlQjp8z9YAslk8uAJ7Lo+bfCvAt1UgTdDjSrznnJIUg31gazgmEgOGf6sp3qyxB1gRxPyvY2UkvakgZ3+2d/Gj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kDt1VJTf; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762284680;
+	t=1762286405;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=givJI//PiAABh+/f+gBvpZ0lroLLWSUedcKqAHccxGg=;
-	b=JMwYmvBOMhpEjCwRCpCXCEUnynnZCC36OZL1GruFCVBVHW6+CLEIPl1+ZWyjQUhagROsBD
-	JaScDP0pzUaLU1yohIV7iNXFG0lQZwEl0EkFsHdxUv7YQhGMf54KjZ2onkBGmXI5GBEAi7
-	QJb7krxIBAYJF+vcb7qwaPwh1lAPAR0=
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Lm03zTugh5/LobL3mDR9QgjFS+gdjZMCrMtSX6UIEmA=;
+	b=kDt1VJTfvo8GlrWFY8BAGnUc0yJ9QD3F5qz6lBNdBgVdzIuojeBDOu5Wpo1wc2v0fq5hFD
+	PgnsMJBD7Zj2EzGLt9wWebi+svqZWtS1ogb7i4JI4FP/dazkSZGMqtIlC08Hx9H4N9WgFC
+	FU8MsMJr2cqGaajC6whMl/MgTzlZHj0=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,46 +47,53 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [kvm-unit-tests 4/4] x86/svm: Deflake svm_tsc_scale_test
-Date: Tue,  4 Nov 2025 19:30:16 +0000
-Message-ID: <20251104193016.3408754-5-yosry.ahmed@linux.dev>
-In-Reply-To: <20251104193016.3408754-1-yosry.ahmed@linux.dev>
-References: <20251104193016.3408754-1-yosry.ahmed@linux.dev>
+Subject: [PATCH 00/11] Nested SVM fixes, cleanups, and hardening
+Date: Tue,  4 Nov 2025 19:59:38 +0000
+Message-ID: <20251104195949.3528411-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On an AMT Turin (EPYC Zen 5), svm_tsc_scale_test flakes on the last test
-case with 0.0001 TSC scaling ratio, even with the 24-bit shift for
-stability. On failure, the actual value is 49 instead of the expected
-50.
+A group of semi-related fixes, cleanups, and hardening patches for nSVM.
 
-Use a higher scaling ratio, 0.001, which makes the test pass
-consistently.
+Patches 1-3 fix or add missing consistency checks.
 
-Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
----
- x86/svm_tests.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Patches 4-5 are renames to clarify some VMCB fields.
 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 8d309860e76e5..29c899762b7a4 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -1002,7 +1002,7 @@ static void svm_tsc_scale_test(void)
- 	}
- 
- 	svm_tsc_scale_run_testcase(50, 255, rdrand());
--	svm_tsc_scale_run_testcase(50, 0.0001, rdrand());
-+	svm_tsc_scale_run_testcase(50, 0.001, rdrand());
- }
- 
- static void latency_prepare(struct svm_test *test)
+Patches 6-10 add hardening to reading the VMCB12, caching all used
+fields in the save area to prevent theoritical TOC-TOU bugs, sanitizing
+used fields in the control area, and restricting accesses to the VMCB12
+through guest memory.
+
+Patch 11 further restricts fields copied from VMCB01 to VMCB12.
+
+Yosry Ahmed (11):
+  KVM: nSVM: Fix consistency checks for NP_ENABLE
+  KVM: nSVM: Add missing consistency check for EFER, CR0, CR4, and CS
+  KVM: nSVM: Add missing consistency check for event_inj
+  KVM: SVM: Rename vmcb->nested_ctl to vmcb->misc_ctl
+  KVM: SVM: Rename vmcb->virt_ext to vmcb->misc_ctl2
+  KVM: SVM: switch svm_copy_lbrs() to a macro
+  KVM: nSVM: Cache all used fields from VMCB12
+  KVM: nSVM: Restrict mapping VMCB12 on nested VMRUN
+  KVM: nSVM: Simplify nested_svm_vmrun()
+  KVM: nSVM: Sanitize control fields copied from VMCB12
+  KVM: nSVM: Only copy NP_ENABLE from VMCB01's nested_ctl
+
+ arch/x86/include/asm/svm.h                    |  31 +-
+ arch/x86/kvm/svm/nested.c                     | 335 +++++++++++-------
+ arch/x86/kvm/svm/sev.c                        |   4 +-
+ arch/x86/kvm/svm/svm.c                        |  51 ++-
+ arch/x86/kvm/svm/svm.h                        |  46 ++-
+ tools/testing/selftests/kvm/include/x86/svm.h |  14 +-
+ 6 files changed, 302 insertions(+), 179 deletions(-)
+
 -- 
 2.51.2.1026.g39e6a42477-goog
 
