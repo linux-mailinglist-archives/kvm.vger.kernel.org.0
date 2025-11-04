@@ -1,106 +1,106 @@
-Return-Path: <kvm+bounces-61997-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61998-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E87DC326A9
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 18:46:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 890F5C326AC
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 18:46:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3B2B234B8FD
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 17:46:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47B69420DFB
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 17:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D6E33BBDB;
-	Tue,  4 Nov 2025 17:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6517733B6F8;
+	Tue,  4 Nov 2025 17:46:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O8YCkQaV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G6ql2ZHb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C972236FD
-	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 17:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBE432B9A9
+	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 17:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762278375; cv=none; b=FkHhTjqfIkuMT2XkeMuR2nuNFnCE6lj2ElspUH1N4BbEdOiX0atF726EXnHES0Ctl3XulODTp+Nnx+Fd5kU7yf+nKGWFrP/OSrUsIvIcemr4NNlOPha0Xx8ZCINDyzfWbyY/ThxKkpvZM5DVZ2tYELmGwES96yVN7Zm6/2AYAGQ=
+	t=1762278405; cv=none; b=QDPw89H6a7Qc7sPQrq5WIOuyhwn3ZcYPMlzI341pplDfkzqJpuCdFODRAr3XV+ksj/zZ1cNoZWQaRpS0/eB4Fsx+N/spo8amEDmfGMO27kCM0tM8v8Ud3nLZzAWXfJpGBD66B1kpOxZGaF1edz3T41hEKXjgAlMp4GPhaOTypQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762278375; c=relaxed/simple;
-	bh=zvK3AGR/wfWblYlZlGaB0GtsE5DjaYWmJ5QCpM+ehoo=;
+	s=arc-20240116; t=1762278405; c=relaxed/simple;
+	bh=yB3/nOCSolZYFw3NqOCpNhBq8JwPtYbPpdL4/GvIScU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=E3g4pX4nieKAbyMWImNuaLBkdIAS6Y6HbV8NHW3sk7b7uYjvZ4L1retSC3HlH5ew7zlk8eT26EuUbCHnN2E/dxzMiZVQzD4wcsg/C4hKlvt6s5Vzwr9qodyUMBr/THXjbiFKQcPJB8/t3v5mG1Z4Uxr5ANPw1Z8fr/gcFp18LbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O8YCkQaV; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=nLh3nvAIuY4ofsz4gl9bLs9p1HHUP9CP4qYPhKbUJPfe4GNDHTpsF4pvmbF3UcvdzEQ5HzwHP6tbBL/6kxHWvW1DHnfC+VlzfV45T9wS90Ny6HPhohndWIs9dENriQbqsxTogCnyTcKdA5TFldtTCB15ubzahZMKqLu0OtSNjzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G6ql2ZHb; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2954d676f9dso28427095ad.0
-        for <kvm@vger.kernel.org>; Tue, 04 Nov 2025 09:46:12 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3407734d98bso6030107a91.3
+        for <kvm@vger.kernel.org>; Tue, 04 Nov 2025 09:46:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762278372; x=1762883172; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762278403; x=1762883203; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H0VNiWAjsdYdl3WJhMa7XY5d4qYfHVmup3jEU4PY9Ko=;
-        b=O8YCkQaVyBTVgmZ69hk/Ntw8BmTzQPm8lnNTOQmaI/i/9BYhGTiS6/kO/eyq5tEP0W
-         JGUd3uLVSJk4MWUU/8T0pni+fi2x52RzC8uY2YF3Dsy8tTKaInUFQtkc8LXARLP4Yrrn
-         ZCVwYHw5RvcdTsYex0Le3SdbTnhCk0F6MYQ3RYaGZpCMrrskhALnaMeUiLR9l1//gEdq
-         EVEeC0Kx1da8xAWgpgWOmobSsvEkdOtlGHYBfmCzayHi8m5n1o4km9wgBelHZdtzspgq
-         YvBGSbJ250uta8u5eQeqbr7mtXZrCpyIVxY3AVaY+uYm/k62giCiZUp7/fB/GigYRv38
-         ax5g==
+        bh=9zBNdPZyMQiDMIvVQuzjWZpTv+5WuzG3WL0fRvU8okA=;
+        b=G6ql2ZHb3scuDi+/AcJeNTwDMAzSG1pCmV2PEgO/ruCKPwWArN8dpLLoBV8ZGt5h9d
+         K2ld9UAb7GOgunAH6I0jcdcpq7dAOTUuDp96ij+HVwjO6ScOPKCmg1g4jwjJU7q1cAx1
+         dsO8n7F3IRNjSHsxpGzQBKSBYvybTbkjhhH4Se/RKaAoezoVWaDWNjQ0bBaUnyylEkb2
+         jycjuYHSzTPUTsvIbYpZZaXICNenoKq7N0/+SV4xIL+d+JhPlNO5rJ6nQWBP/TJcHykl
+         D2PlCo4jThY3P+ql1QI/stOf6vJg3Wufe+7lA9JYwoYkypdD9hsnrmeKaMHeRNpLkKNO
+         h6Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762278372; x=1762883172;
+        d=1e100.net; s=20230601; t=1762278403; x=1762883203;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H0VNiWAjsdYdl3WJhMa7XY5d4qYfHVmup3jEU4PY9Ko=;
-        b=dLPs+aYcEyEz2Lt+vl5ZV8cLK3lsQMSc8+MbLzYtEQw88EraBSiRx1YfrO20Qxz601
-         G2fRGB/ML4G99f7nq5pltqABLvNC7v9gXT1A0qvbXCDtHwSii9soFiVdwRK3Af2PxlaP
-         p67m9vHxP4ttXVV8aw7AUVWvDjEifrbc2EQ8Bus8DbnU3QNhroCopfCSmZ7FFsCl3PXn
-         mmSzO3u2K7hDJYDYdlIgYp0loWRVq+Zes1PtCtb6hDchyC7zweGLgyaRCxqmoLS+Dyeb
-         EtFQ898JfOZWed7hwpKnABgYF+Fn421v/HS9hGn1v9sTXkLwN2M3Numzauc1r4jAjJ0F
-         Jn7Q==
-X-Gm-Message-State: AOJu0YyGVKM87M43/us3Bs7oN4t8EB5kQLSXwj/nb92ZOSrXmuU7XN67
-	gCYaBHDJqR+XQGc6b1N8+7C0Q+jBrdBzhsOxKijrsPYJznUvaKGmPOrVoL+Nk5ZjpZL1dmT/64R
-	dHRANFA==
-X-Google-Smtp-Source: AGHT+IH/4RfaWZuPZrBPg1BQIo1EQLknH0ihFneDscbhHvDFB4mHizM2ii7GyfQACuJRrOjP8M7SvfZf+R0=
-X-Received: from pldr17.prod.google.com ([2002:a17:903:4111:b0:27e:ed03:b5a5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:94b:b0:295:8dbb:b3cd
- with SMTP id d9443c01a7336-2962adf009fmr5333595ad.27.1762278371863; Tue, 04
- Nov 2025 09:46:11 -0800 (PST)
-Date: Tue,  4 Nov 2025 09:45:00 -0800
-In-Reply-To: <20251030185802.3375059-1-seanjc@google.com>
+        bh=9zBNdPZyMQiDMIvVQuzjWZpTv+5WuzG3WL0fRvU8okA=;
+        b=M7P/o753hpQe8J/X3KgKCPRkPTj/4L5oyz5/to3zmtPXAQKAz+czvW3HBGb/wHh4R+
+         biIz0oid07MgZxtJ03VQ1iPYfGcbAcRUKjL7M3DcYGIbV8tnvfKno49KcXCix4Ruzf0Q
+         +RAnfCTaaGZ+EvJgAoZ+iFkoS6p184E5Z3vNZz0bpW3A9997vm4qN/5HsvHfeO5o+HGo
+         bn5qqtwfoBmAzI3IBfE+IF4phYpHxB9cryTHRT9fXfAwjSttXEmpkig0abDrhiIUAwuf
+         98OFK972LigXV+EmrSgUkzftYgqLuFazadkvphFfTLd1EZRgVw3gigJctGDoqI9wm1Fk
+         fvsw==
+X-Gm-Message-State: AOJu0YxKgcdcwD/x7Ronh63ykl8mS448WRoVqHnR7qiOFDhEyj8UBQbD
+	Y7jJztJYel0vW0d5ab2YiGUFOdW+UqfM6NWncHLWWIYjGDWS9+J5e3QPcMEYe+qFdA1SJv+AXzV
+	QkvB0Ow==
+X-Google-Smtp-Source: AGHT+IGjNvNGh/Lh7x+2tqDDFgx64vRukJdu/nBZBUQeHayzMYjsqpnHxZxrhnzLZk7wroIFbYfjk7cXRdY=
+X-Received: from pjbms6.prod.google.com ([2002:a17:90b:2346:b0:33e:384c:7327])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5281:b0:340:5b6a:5bb0
+ with SMTP id 98e67ed59e1d1-341a6def359mr27137a91.26.1762278403491; Tue, 04
+ Nov 2025 09:46:43 -0800 (PST)
+Date: Tue,  4 Nov 2025 09:45:02 -0800
+In-Reply-To: <20251016190643.80529-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251030185802.3375059-1-seanjc@google.com>
+References: <20251016190643.80529-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.2.1006.ga50a493c49-goog
-Message-ID: <176227794415.3934259.3450243632077976793.b4-ty@google.com>
-Subject: Re: [PATCH 0/2] KVM: x86: Fix an FPU+CET splat
+Message-ID: <176227791321.3934009.13375648150137883983.b4-ty@google.com>
+Subject: Re: [PATCH 0/3] KVM: SVM: Unregister GALog notifier on module exit
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Alexander Potapenko <glider@google.com>
+	Hou Wenlong <houwenlong.hwl@antgroup.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 30 Oct 2025 11:58:00 -0700, Sean Christopherson wrote:
-> Fix a explosion found via syzkaller+KASAN where KVM attempts to "put" an
-> FPU without first having loading the FPU.  The underlying problem is the
-> ugly hack for dealing with INIT being processed during MP_STATE.
+On Thu, 16 Oct 2025 12:06:40 -0700, Sean Christopherson wrote:
+> Unregister KVM's GALog notifier when kvm-amd.ko is being unloaded so that
+> a spurious GALog event, e.g. due to some other bug, doesn't escalate to a
+> use-after-free.
 > 
-> KVM needs to ensure the FPU state is resident in memory in order to clear
-> MPX and CET state.  In most cases, INIT is emulated during KVM_RUN, and so
-> KVM needs to put the FPU.  But for MP_STATE, the FPU doesn't need to be
-> loaded, and so isn't.  Except when KVM predicts that the FPU will be
-> unloaded.  CET enabling updated the "put" path but missed the prediction
-> logic in MP_STATE.
+> I deliberately didn't tag this for stable@, as shuffling the setup code
+> around could easily introduce more problems than it solves, e.g. the patch
+> might apply cleanly to an older kernel, but blow up at runtime due to the
+> ordering being wrong.
 > 
 > [...]
 
 Applied to kvm-x86 fixes, thanks!
 
-[1/2] KVM: x86: Unload "FPU" state on INIT if and only if its currently in-use
-      https://github.com/kvm-x86/linux/commit/8819a49f9ff8
-[2/2] KVM: x86: Harden KVM against imbalanced load/put of guest FPU state
-      https://github.com/kvm-x86/linux/commit/9bc610b6a2a7
+[1/3] KVM: SVM: Initialize per-CPU svm_data at the end of hardware setup
+      https://github.com/kvm-x86/linux/commit/59a217ced3e7
+[2/3] KVM: SVM: Unregister KVM's GALog notifier on kvm-amd.ko exit
+      https://github.com/kvm-x86/linux/commit/adc6ae972971
+[3/3] KVM: SVM: Make avic_ga_log_notifier() local to avic.c
+      https://github.com/kvm-x86/linux/commit/aaac099459f9
 
 --
 https://github.com/kvm-x86/linux/tree/next
