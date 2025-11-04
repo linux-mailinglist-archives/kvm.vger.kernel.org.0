@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-62018-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62020-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE084C32DA0
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 21:00:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FCB9C32DB5
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 21:01:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFAA44213E3
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 20:00:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C142718C4D1B
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 20:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00FE82E7F0A;
-	Tue,  4 Nov 2025 20:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4CE2FC00C;
+	Tue,  4 Nov 2025 20:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="INFvzPZp"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Gu/cED9p"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C10972874E9;
-	Tue,  4 Nov 2025 20:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA982E764D
+	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 20:00:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762286412; cv=none; b=uso5SVMUUigAC9wqtRQKYbaNiL3L6cjVL3S7Rcs70qoV93zwR20ZKK003ZC+W2Rn7Yk62sdIp34Afi52oHs0Qyz54BeWuNULsmTYxhoBG3BXPp8U0gQI/KcEj+V93kU4VYcmRYSlqumTjob5vREkGbtshviKIDmVM7ZSvF0Bf34=
+	t=1762286415; cv=none; b=F6qhzvZl155a97D7B1QDOVMa3eWiqhCGbZd+UwnrIqdf5S2N9HUApK/XP1MEg9A9WZiSQjB4PahcjbSkmnk35xlJPg3qmjo/iG7gfs/pXiGHWJOTB3Ev9RbElaId2It4ZcPLzjO+zeKHtS3BGFwoQrZUvF3kReVb4UC1oj/gVTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762286412; c=relaxed/simple;
-	bh=sXYJzjseqJuvj8NINKu5aCwyL2sAus6gfzVskW5l7H4=;
+	s=arc-20240116; t=1762286415; c=relaxed/simple;
+	bh=3SZLZNF3cYTuUQGnWwham9Q9DCKPuYhxMLuTx+7LaW4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FwsVoLQ5PIlWgBj5378sxxiL+1nd3VchFuLX6QMHRjG6CrbxO9Yrs7217U95vKUCM7qUKCT7N2zTHWlFovcxswEfG7a9y4Udh7krOiKrZgd8MGKGDV1VIApFVRJIsjjL+4OeRLXJ9HEaQsQeQBXu9rtB73wkwXR8Mho3xf7Xn1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=INFvzPZp; arc=none smtp.client-ip=91.218.175.184
+	 MIME-Version:Content-Type; b=Tnm2xTEJM6nO0ricGxw4G+1iLio2OFRQorOHggZebWEsyPjY1Hb3SxuBC9llaQjv203ftdmjWZx8/u347+6hVkpXXKWZpTw8k0to62/b5Unj44mP27SJjP4sVG0xYniYPsokxzclKETf0ChAiygCI2rX10vYDWSMHucM8nQ9rX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Gu/cED9p; arc=none smtp.client-ip=91.218.175.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762286409;
+	t=1762286410;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+63j098rpFjBiDSEQuayeuzFS+idIYHSpwfAxQDf2J0=;
-	b=INFvzPZphCoN1LjY3YMVWX8xHa5AxP7EJkK4CwKs/QAqwbS2KQ2laoNGdmMo5Z7LayyyRS
-	xtlsxOZ9DnMn8HXTQjPGJ8gqcCt4hhxV0CLYd5g5QeBxK6RaB2B4TagCDLapRNpa1gsDzn
-	/lzH6aDT3HUsbYbIUkwcuQ/z6fhlS2Q=
+	bh=HV4S+peGRoTsgN2fUfkCI3V0B36Ozd3fgJngLdVoJ/Q=;
+	b=Gu/cED9pZMkmVdQ/WjoyBoCro0lpvlJHkfCqxg675YzvDEsVw+3y2P5W19XooOpySYD0sE
+	egQXN9KOYewZyM7URD2SKX/jf1WfiXAxHRNFfNOMNmDvQmpxUwlcfZdB9YM5FK1Vi0Zx16
+	g9p7c142dZYnFipUSesmLVtEdE3s1/8=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,9 +49,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH 02/11] KVM: nSVM: Add missing consistency check for EFER, CR0, CR4, and CS
-Date: Tue,  4 Nov 2025 19:59:40 +0000
-Message-ID: <20251104195949.3528411-3-yosry.ahmed@linux.dev>
+Subject: [PATCH 03/11] KVM: nSVM: Add missing consistency check for event_inj
+Date: Tue,  4 Nov 2025 19:59:41 +0000
+Message-ID: <20251104195949.3528411-4-yosry.ahmed@linux.dev>
 In-Reply-To: <20251104195949.3528411-1-yosry.ahmed@linux.dev>
 References: <20251104195949.3528411-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -64,60 +64,94 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-According to the APM Volume #2, 15.5, Canonicalization and Consistency
-Checks (24593—Rev. 3.42—March 2024), the following condition (among
-others) results in a #VMEXIT with VMEXIT_INVALID (aka SVM_EXIT_ERR):
+According to the APM Volume #2, 15.20 (24593—Rev. 3.42—March 2024):
 
-  EFER.LME, CR0.PG, CR4.PAE, CS.L, and CS.D are all non-zero.
+  VMRUN exits with VMEXIT_INVALID error code if either:
+  • Reserved values of TYPE have been specified, or
+  • TYPE = 3 (exception) has been specified with a vector that does not
+    correspond to an exception (this includes vector 2, which is an NMI,
+    not an exception).
 
-Add the missing consistency check. This is functionally a nop because
-the nested VMRUN results in SVM_EXIT_ERR in HW, which is forwarded to
-L1, but KVM makes all consistency checks before a VMRUN is actually
-attempted.
+Add the missing consistency checks to KVM. For the second point, inject
+VMEXIT_INVALID if the vector is anything but the vectors defined by the
+APM for exceptions. Reserved vectors are also considered invalid, which
+matches the HW behavior. Vector 9 (i.e. #CSO) is considered invalid
+because it is reserved on modern CPUs, and according to LLMs no CPUs
+exist supporting SVM and producing #CSOs.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- arch/x86/kvm/svm/nested.c | 7 +++++++
- arch/x86/kvm/svm/svm.h    | 1 +
- 2 files changed, 8 insertions(+)
+ arch/x86/include/asm/svm.h |  5 +++++
+ arch/x86/kvm/svm/nested.c  | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
 
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index e69b6d0dedcf0..3a9441a8954f3 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -633,6 +633,11 @@ static inline void __unused_size_checks(void)
+ #define SVM_EVTINJ_VALID (1 << 31)
+ #define SVM_EVTINJ_VALID_ERR (1 << 11)
+ 
++/* Only valid exceptions (and not NMIs) are allowed for SVM_EVTINJ_TYPE_EXEPT */
++#define SVM_EVNTINJ_INVALID_EXEPTS (NMI_VECTOR | BIT_ULL(9) | BIT_ULL(15) | \
++				    BIT_ULL(20) | GENMASK_ULL(27, 22) | \
++				    BIT_ULL(31))
++
+ #define SVM_EXITINTINFO_VEC_MASK SVM_EVTINJ_VEC_MASK
+ #define SVM_EXITINTINFO_TYPE_MASK SVM_EVTINJ_TYPE_MASK
+ 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 9a534f04bdc83..9866b2fd8f32a 100644
+index 9866b2fd8f32a..8641ac9331c5d 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -380,6 +380,11 @@ static bool __nested_vmcb_check_save(struct kvm_vcpu *vcpu,
- 		    CC(!(save->cr0 & X86_CR0_PE)) ||
- 		    CC(!kvm_vcpu_is_legal_cr3(vcpu, save->cr3)))
- 			return false;
+@@ -324,6 +324,36 @@ static bool nested_svm_check_bitmap_pa(struct kvm_vcpu *vcpu, u64 pa, u32 size)
+ 	    kvm_vcpu_is_legal_gpa(vcpu, addr + size - 1);
+ }
+ 
++/*
++ * According to the APM, VMRUN exits with SVM_EXIT_ERR if:
++ * - The type of event_inj is not one of the defined values.
++ * - The type is SVM_EVTINJ_TYPE_EXEPT, but the vector does not
++ *   correspond to an exception (no NMIs and no reserved values).
++ *
++ * These checks are only performed if SVM_EVTINJ_VALID is set.
++ */
++static bool nested_svm_check_event_inj(u32 event_inj)
++{
++	u32 type = event_inj & SVM_EVTINJ_TYPE_MASK;
++	u8 vector = event_inj & SVM_EVTINJ_VEC_MASK;
 +
-+		if (CC((save->cr4 & X86_CR4_PAE) &&
-+		       (save->cs.attrib & SVM_SELECTOR_L_MASK) &&
-+		       (save->cs.attrib & SVM_SELECTOR_DB_MASK)))
++	if (!(event_inj & SVM_EVTINJ_VALID))
++		return true;
++
++	if (type != SVM_EVTINJ_TYPE_INTR && type != SVM_EVTINJ_TYPE_NMI &&
++	    type != SVM_EVTINJ_TYPE_EXEPT && type != SVM_EVTINJ_TYPE_SOFT)
++		return false;
++
++	if (type == SVM_EVTINJ_TYPE_EXEPT) {
++		if (vector >= FIRST_EXTERNAL_VECTOR)
 +			return false;
++
++		if ((1 << vector) & SVM_EVNTINJ_INVALID_EXEPTS)
++			return false;
++	}
++	return true;
++}
++
+ static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+ 					 struct vmcb_ctrl_area_cached *control,
+ 					 unsigned long l1_cr0)
+@@ -353,6 +383,9 @@ static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+ 		return false;
  	}
  
- 	/* Note, SVM doesn't have any additional restrictions on CR4. */
-@@ -473,6 +478,8 @@ static void __nested_copy_vmcb_save_to_cache(struct vmcb_save_area_cached *to,
- 	 * Copy only fields that are validated, as we need them
- 	 * to avoid TOC/TOU races.
- 	 */
-+	to->cs = from->cs;
++	if (CC(!nested_svm_check_event_inj(control->event_inj)))
++		return false;
 +
- 	to->efer = from->efer;
- 	to->cr0 = from->cr0;
- 	to->cr3 = from->cr3;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 0a2908e22d746..efcf923264c55 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -142,6 +142,7 @@ struct kvm_vmcb_info {
- };
+ 	return true;
+ }
  
- struct vmcb_save_area_cached {
-+	struct vmcb_seg cs;
- 	u64 efer;
- 	u64 cr4;
- 	u64 cr3;
 -- 
 2.51.2.1026.g39e6a42477-goog
 
