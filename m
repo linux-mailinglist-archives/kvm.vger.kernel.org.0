@@ -1,122 +1,120 @@
-Return-Path: <kvm+bounces-61980-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61981-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88FE2C30FB7
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 13:29:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B696C3105F
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 13:39:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCC84189FACA
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 12:30:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9F371885F3A
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 12:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE38B2EC57D;
-	Tue,  4 Nov 2025 12:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 255582E2DC1;
+	Tue,  4 Nov 2025 12:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hjCZV7vF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="COlCicpk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A3C2EB5CD;
-	Tue,  4 Nov 2025 12:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C49F610B;
+	Tue,  4 Nov 2025 12:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762259378; cv=fail; b=sl5dvY1MVvQl7oWc2ZeP6fJgJtq3qjEA3xMlM0/Mxbt4HNI5ksHYiPiPLMyY8JUSHfYcbbUS+X+vx+k6hgZU9w4/7h61nsQ4xsyK8S5VzdlOCuHgU54m07rmfJtyQPHv2P6NGpPZmXw/0JL2ugsLrz+H8BQjOTybCj/FsjKcRN0=
+	t=1762259956; cv=fail; b=ceybgX1kTmoDBS6sGsQtghwu83eLjcrLDNQzBWsqzCfULgXXDnEaXlwIs5IyvvWbpuRWRxTtYx0LMfumtjruazHyNwppygB2B44AQunmZ/tj1ny8lDvAlLzo8lkbvB7RgTnctlhgY6lEI+mMoxesNk7N7x5xWHYeLmJjJCg5yV8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762259378; c=relaxed/simple;
-	bh=HwRHYWvoOYmYflprkcC3wBTHEOUgNg5K7b7ORllQ6zY=;
+	s=arc-20240116; t=1762259956; c=relaxed/simple;
+	bh=Xi1VjvopUT4ObxbJaz3uxvejkqQnV1Vn/V1q1JnrXJQ=;
 	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Sh8zdYzWQuDRg6jodh+SQsOfELKqD/SzXK6oL3xla9ur1XTBzeF78eCcqWdR5g4VsKbUZX1lK9LUfGtoDpMXe5tIRPJaafoc9Gfog96kdp2yMdvd9TWnxckQaZl289bC1gtZcxu0pKKC37H/HVXvGnk8ts+KUP/pssLF3c2ixIQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hjCZV7vF; arc=fail smtp.client-ip=198.175.65.9
+	 Content-Disposition:In-Reply-To:MIME-Version; b=VQfYqiCG5gYYMi708uJXGCp5KHTZv8QYkBDx7fk0lZtwLEDTe6vZi6h0/BwPY1+sLWWwFcNa70AH6kalXi8kmEcIFmvwyFxoab5BV4B6CbLk4KpoVvoB2t3fyjGdi3XRw1CXNVhy5a6RQzFlnu6xErk6xOacVz8T0IQWJe9U0ZA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=COlCicpk; arc=fail smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762259376; x=1793795376;
+  t=1762259954; x=1793795954;
   h=date:from:to:cc:subject:message-id:references:
    content-transfer-encoding:in-reply-to:mime-version;
-  bh=HwRHYWvoOYmYflprkcC3wBTHEOUgNg5K7b7ORllQ6zY=;
-  b=hjCZV7vFFvlnqDzwTTQ94DIVPYZAgn331YrqK9UZ+ilXoL6GEse+kAaz
-   MIEMiZl3oqDsh046vdqGuZ37LrPFOo9P5r2Gfr5LUdlcL7b8QvnZD6I/B
-   6bcjM5cPDZGXqvZz6zedvxzmaO9hXWxMXlQ5W/4HuhLK2jsjmN3mMMWN3
-   VDml3IvL44WLH3XN5xrCN+BhAMWpuMbYQHg/aRFVu/Ic9OWHITMo0CuKg
-   7uVmwCBIyHF+2KwTVev9jRQa0ftkgJCXsEFmJl+sYpAAxQRH4EbildlP4
-   y7EjzgYa6VgiUTBZknBrkHWk4QWxSIBiUJ67rQj7TSA8sJOSNX+qTfAvh
-   w==;
-X-CSE-ConnectionGUID: 9bJtKhOATpGS0uS3QVxiUg==
-X-CSE-MsgGUID: JiG5hotPRQOXdILQP5pNpA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="86980735"
+  bh=Xi1VjvopUT4ObxbJaz3uxvejkqQnV1Vn/V1q1JnrXJQ=;
+  b=COlCicpk5q5vwjQ3ODuZbWofz5Ohf1c3cLe1JHJX0olEyDPQq4LQu71n
+   J6V23k6y5ROGCPgL+/qJgKxDvKcgFfJYYJUYT4Qlj/7ay1vmqNqsXlTwz
+   teeQWfKn8TgqzF1IuuSiFwzQEhPNzX5JoUP/byuOn/28qlgnuasjmvDLN
+   m35mT/rry9Ydag8FFNWVM1sY51Gv06oUVliLjnXSd0rl1zB5puhTDMmWF
+   1/DIgbaZpyEN9lyfGSAi3Wa/TF+ldWTeJtCKiTDbfk2gIbvhqxsR88ICC
+   w/181hWH5erIOdTFX8RiTno4y9hThcaGbhe8zN4S0KisDkZlhHE1LVrUu
+   A==;
+X-CSE-ConnectionGUID: 8PZt7jy2SWKwGgZeQLpfnQ==
+X-CSE-MsgGUID: 2IcFkLtVSjyXfcwc9mn8YQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="64502499"
 X-IronPort-AV: E=Sophos;i="6.19,279,1754982000"; 
-   d="scan'208";a="86980735"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 04:29:36 -0800
-X-CSE-ConnectionGUID: bfsHjCGcTEiofpIHvwg7Pw==
-X-CSE-MsgGUID: ICOHF6GCTdGdud7KKVt+Yg==
+   d="scan'208";a="64502499"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 04:39:12 -0800
+X-CSE-ConnectionGUID: DzfpqFntRmG2yO2jEtrmvQ==
+X-CSE-MsgGUID: 5s01rrM9SoCUYccaShdTSg==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,279,1754982000"; 
-   d="scan'208";a="192315693"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 04:29:35 -0800
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 04:39:11 -0800
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 4 Nov 2025 04:29:34 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ 15.2.2562.27; Tue, 4 Nov 2025 04:39:10 -0800
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Tue, 4 Nov 2025 04:29:34 -0800
-Received: from PH8PR06CU001.outbound.protection.outlook.com (40.107.209.38) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ 15.2.2562.27 via Frontend Transport; Tue, 4 Nov 2025 04:39:10 -0800
+Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.9) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 4 Nov 2025 04:29:34 -0800
+ 15.2.2562.27; Tue, 4 Nov 2025 04:39:10 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QJx/KHC2jP9495ftR8X044cDIHG5fnKlTd/xyJp2BPEL/9F5juPMahGOrOJHAOV/JnxltEmWfOdCuDhnzwaREqegm+YuR7SsgxtcMTk051wGXH0gtoK+BhdGv41PeqDNkdqQLQ+5pYAnAuN9G0yBS/VA42PlVbDBi7HyaOoyHTnDRPDf9iwIi8i5t9R8HesNwEEk70f9M5UyAgHwoQXHBQa7AOwugPPVRSp3/aE4FcuzX02TfeuxQfOxP4BWh6czEL3rlqPja3C75LCNVBSnkiMYBrKoVyNrE8KGtXo4L1tDWwL93CiQiK8oXkEpnfVD+38l49LbDKSJkZJ53AMSKQ==
+ b=LKnaoFPkhpsK/99+Ev7aiPNtyTNq2KQE3nFE9I4TMlOkfdv02njlsVDqixHf8zsccvJti2wkRJoMM1OofX2rfJ/5FHhveqL2pPoVmBe351gBWq3uoL7mWoKCNOw8xHq+YxTIfqPj4e2AxdxnQG9t7yRTrElG+Rs9meT2YPIAbFyjGThTqUhK9sE8bZsivCP9roLQY+Pn9Qm5REwiOyRjqmfMd13r2FUYQahXP1Pr1RGsvCfb2wquQ6lKgewv5QjydVhHRLEEK2u7ZEj7IzaY2OEeX/fBhpp0RBPoEuWgfb40w3KP1BC0iztZg9OEMhY+iTfO45Y4+kc/7dOdq/CRnw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0bhxoBnQz3ZXTArGCJBto0KwUd2sBUOeZNB5FGQ+Qco=;
- b=b6gbGIQ8JL5C66NQ5diSwFWo6bEkGOqo3+JRQw193l23rcHFx9zj5f8XD2o0vePGIKAEFKkynw3jkQyk1ax3Xbf2QObdfmkfCyAAc4NIST553neXCBfCiKUwjd0+XvyzDXZpD10f4poB4iMvRwYF6CndwQ7CnC7wcI1dn22yFHcNt1KelO7ZoTasiJIIg2mtKbb0d/kwtddaiFMiXUCt3tMqf2+vrKS5a5WYx213UQVVGfH3uaRlv7d/RW2UP67LpvZX3NcOmCOZGHSBAY4MgLpnzJbBgaOjocPT81msRM7N2OIgXxtiuwoqgrqaAwAt0UNlxdG3K4gF/7xIN4IGZg==
+ bh=zVBOQmVvVfj0hAp7RU6e0wxzRRD6ifImNdrL+cR1T6w=;
+ b=dZkyMkU7BMGKCnkTnSTGuwaLluwTXFpaa9gTVNu+j40umpg8IWqzlCYmvo5asPR9eg1rctUdjKWG9TeIb4unUrJaZR089XXpnhKx/ohZsUZh2Vxc1ktwPQ1O5NfRNGSy4+u6WYoV0a/4cHYZUB9XOGKaPreCkUfL/IvUZEHDoMdtpb5GWpe7OU7zuVoYzrp8iXpHxr+iWnJqi0CQgOks3Xniuu4tSIEkojHXm0TlUU1zXWWSz9dpBM9StcKHBXbTAJbBjzgSQUAl72QeHxl0d1xnCgxnJx1WoePH6d1Wjiq91F8qK5OaO2nxxFqlc/qTX2NYnlLIW+YwZgmDGnbBMQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from DM4PR11MB5373.namprd11.prod.outlook.com (2603:10b6:5:394::7) by
- PH0PR11MB4934.namprd11.prod.outlook.com (2603:10b6:510:30::17) with Microsoft
+ PH0PR11MB4773.namprd11.prod.outlook.com (2603:10b6:510:33::7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9298.7; Tue, 4 Nov 2025 12:29:32 +0000
+ 15.20.9298.7; Tue, 4 Nov 2025 12:39:08 +0000
 Received: from DM4PR11MB5373.namprd11.prod.outlook.com
  ([fe80::927a:9c08:26f7:5b39]) by DM4PR11MB5373.namprd11.prod.outlook.com
  ([fe80::927a:9c08:26f7:5b39%5]) with mapi id 15.20.9275.011; Tue, 4 Nov 2025
- 12:29:32 +0000
-Date: Tue, 4 Nov 2025 13:29:28 +0100
+ 12:39:08 +0000
+Date: Tue, 4 Nov 2025 13:39:04 +0100
 From: =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>
-To: Michal Wajdeczko <michal.wajdeczko@intel.com>
+To: Matthew Brost <matthew.brost@intel.com>
 CC: Alex Williamson <alex@shazbot.org>, Lucas De Marchi
 	<lucas.demarchi@intel.com>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
 	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
 	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
 	<kevin.tian@intel.com>, Shameer Kolothum <skolothumtho@nvidia.com>,
 	<intel-xe@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, Matthew Brost <matthew.brost@intel.com>,
+	<kvm@vger.kernel.org>, Michal Wajdeczko <michal.wajdeczko@intel.com>,
 	<dri-devel@lists.freedesktop.org>, Jani Nikula <jani.nikula@linux.intel.com>,
 	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin
 	<tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, Simona Vetter
 	<simona@ffwll.ch>, Lukasz Laguna <lukasz.laguna@intel.com>, Christoph Hellwig
 	<hch@infradead.org>
-Subject: Re: [PATCH v3 19/28] drm/xe/pf: Handle MMIO migration data as part
+Subject: Re: [PATCH v3 22/28] drm/xe/pf: Handle VRAM migration data as part
  of PF control
-Message-ID: <75wxtpocoxc5qaxcdxmqzazwny3eoqtdmiudt5j4ep5e7t3x5q@wxefgbt3m7lm>
+Message-ID: <dwcgtmtzzx3bjp5ibl2gzrp52gshna6iydi556p5lxd5ofk7sp@f67aavazuzu4>
 References: <20251030203135.337696-1-michal.winiarski@intel.com>
- <20251030203135.337696-20-michal.winiarski@intel.com>
- <63446059-7af2-45b8-906b-4ba0688ed0d4@intel.com>
+ <20251030203135.337696-23-michal.winiarski@intel.com>
+ <aQkuqa8u6nFVo26k@lstrano-desk.jf.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <63446059-7af2-45b8-906b-4ba0688ed0d4@intel.com>
-X-ClientProxiedBy: VI1P195CA0074.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:802:59::27) To DM4PR11MB5373.namprd11.prod.outlook.com
+In-Reply-To: <aQkuqa8u6nFVo26k@lstrano-desk.jf.intel.com>
+X-ClientProxiedBy: BE1P281CA0057.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:23::13) To DM4PR11MB5373.namprd11.prod.outlook.com
  (2603:10b6:5:394::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -125,143 +123,127 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB5373:EE_|PH0PR11MB4934:EE_
-X-MS-Office365-Filtering-Correlation-Id: c4daa625-6936-4ed6-0115-08de1b9dceaf
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5373:EE_|PH0PR11MB4773:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9b96265c-2eb5-4145-35bf-08de1b9f25cd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?aEtWbkdnN000TVQ2b090dVNBamRtekRYUXR0LytaeFJRLytaVGh2bFR5a0Nv?=
- =?utf-8?B?TDRod3N6dGticEp6c0YyUGUwTkZlcStmZHhXM21TbzIxRHFMd1RVZnoxZm1W?=
- =?utf-8?B?UmhtVE4wL2gweGVJMExLdFBza3E1SGNaWWVwbzMzME16eTUwdW9GaXFjNThw?=
- =?utf-8?B?bUh4bFFsZGprMVl3aTkxdXZqRkZsdnFkUFNqVldiUFdpYjhmaHp5VjBscmVE?=
- =?utf-8?B?WE00dUJMMCtBTzN5U1NCMEwwbG1IZm1KT3pMemRDLzdSTG9IL1RGRFlvN1p5?=
- =?utf-8?B?REJOK083ZkhJN3VhWGhvT3dQZjNFM3BkR05uWUs1aFZYOXYxem9WZHpJcnRX?=
- =?utf-8?B?cGpobFhYTUszNUFYdndLU0cxTllPSFRJd2RKeWpVZkZNSlZZdFFFdlE5SEk1?=
- =?utf-8?B?SU1xTVQ3UVVqbVA5V01EQlRSTlRlc2NIb2JPeFdlVnJiZFRBeGErOFg2RkVF?=
- =?utf-8?B?R3ZLK2dMQ3VVQ1Fid0ZwRzlJNDAwSkdjUWxXR2RwRkdXRkMzcjhDTVlYSUdj?=
- =?utf-8?B?Y1FZTjRPKzB6OENYOWlLOE9rSjR6MmQ2bFNDcFhHZUZXQjFFd0J0MzBqZlk3?=
- =?utf-8?B?N2ZGODBrQ1N5L1FVbjZhUFhQSlhQZ3RoZStXcENmZE14anRRN3ZvNXVjeDFy?=
- =?utf-8?B?eUNQUGM1SHpMN1JmSmdnazBUZ1Axa21LZkVpRWRudWZqeEwwUzFmNE9qc2xq?=
- =?utf-8?B?SThMbjlhZUg5Mmo1VTJkNDRYYWM1bFJDdTJrRS9HT2w4ckFZUHZRNmpkOEdt?=
- =?utf-8?B?b0xXV0s3d2hZRnVMQjY2TUtGdUFqdVI5WkxXWmR5cVAvNXVvVm1HSW1DQk5h?=
- =?utf-8?B?eC9Nc0FXSlpxSXZaYUxsQk5UQzd0SC9PUUhZN0ZYekN0SGViTlRSNThLU25W?=
- =?utf-8?B?dzUyME1SS1ZyNGZwb2FRZXk1SW9rQzU5TkIvUDgxOTNPeGdYZnJGR2Roazg0?=
- =?utf-8?B?QUZCMkxyZlcvZ2FjbWxMTURHMGxjcHk1UkpKSEZoRnlhK1dFbjhXYVlnUDRy?=
- =?utf-8?B?cW5zUjJacXd3T1l5MzFNbEwvQ0V2QTR6LzVSKzBUMW9jbU9VcjRVci9CRGNC?=
- =?utf-8?B?NCtlUE9CWkF6M1U4SFUwOGl3VzdDNzhwVmY1NUFLQjdhM013cjE5OGkyN05k?=
- =?utf-8?B?c3dmdWc2d3RqaFdLNTJ4RnNrdmswaW9pR3ZXM1pyTFZVVktyb3ZKam00UDBh?=
- =?utf-8?B?Vm5zcTBlWXhyV3dld2QxYWpvWDlCa0p0T2pRNUVKVXJCM0krSTdaS3hCN2N0?=
- =?utf-8?B?SzM3Yy8vamJjN1NndTFpQTE0Tm1rc0FoK1VuRFZ4UEpqNVpmNk1UVjduQnlO?=
- =?utf-8?B?a0liRmtseVVCdUQ1TkVrcVU1UTA0ejh0bWxPcHlYbE5FM1g5T3RFWEl4aUR1?=
- =?utf-8?B?cVg2NklCNlNLMDFURnFJK0lzODBDSDNyd3VGaEtCWTBLUWVDYXg0aTlwOTNs?=
- =?utf-8?B?OEVQYUxjMERtUnVCVVNDbTV2Y0d0djZKYWhzdzRlUnZIalNqWFVVVGc2SzBl?=
- =?utf-8?B?QUlYRzJOS0JySmpKQmZDVE4vQUFFSm5IcHlFUHJnbVV3VmtBMkNDcU5KRXYv?=
- =?utf-8?B?TEk2K1NyL3lGcnhhL2JGSTh4RHlDVmFrNW5Nd3V5MFJXVEVMUEVaVnFvZmZE?=
- =?utf-8?B?Z2ozVXgzYTY0U0l0TGxBWDhQLzlWS2dhZUVQM1ZOdklpZ2FmTlVlUWh6eVJB?=
- =?utf-8?B?SEJvdWIvbjNmY29aTzNNMUEzaWlZV213TTZvTm5GSTJvZm96SmFlMGRpandO?=
- =?utf-8?B?djl2K1NGWFdtdkNwZ1hTOGFSSGxEUVpJM3VIeXd3Wm5LYTRvL3IrTHFONEts?=
- =?utf-8?B?dnFXdVNiSnZ5YzF4cE1BdGlMTVZZTkplejl2TDNNWXJaRkozR0ZVSUxCZFIv?=
- =?utf-8?B?b1kzQlZwTUprSGE4Unk3YzVEandaNmxQWWxvaXJPSkprUjVHemJ1b1lEc2RF?=
- =?utf-8?Q?OFtsKKlwPN5xZKxMy/gRvmJ+FZI7gsie?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?L010cWRIZGl6ajVzOC9HcVFMNHNJd0lqTjNQTUtZZk9zVFQzMnhQa2g1YU9E?=
+ =?utf-8?B?bVVMeS95Tnk1S0dhcnlSSHRpQjExNjdqWmRaZ2M1R1E0MHF3MlhwcDg4VGkz?=
+ =?utf-8?B?SllmY1hjZ2ttOXdwT0ZMb2cxVkJEMy9oUHFDLzZOaDV3R21KVVMrM1Y5ekI5?=
+ =?utf-8?B?eUppNGxHZzNGK1hBemsyNFdZTnFzOGJNTXJCWlFHZHhVdUhCN0N3MEVVRzlN?=
+ =?utf-8?B?THNCcU5xbnZ0cHlPYVJVUkkxMUErdFo2WVR3ZVpKek40Yjk1Wnd2dCtnQU5Z?=
+ =?utf-8?B?VEoxTDN3KzFTMTREem8vYzB3RlFkaDZJeHdtUW9hWTd0VHFBUDk2c3lCZ01G?=
+ =?utf-8?B?ZXpBNTU0cEVhejl3Nm5Jd2NQMTBIRkJGZXduUGQvMHRFMG85eXhZOU9HRmlY?=
+ =?utf-8?B?Y2RqZldvWTRzNlArVm1HdXBVYSt3T1d6cFVtZTlzRTE4LzhMbkJROEhOMC9v?=
+ =?utf-8?B?V0xxeVNTVHQyLzJvd244blVpbXJOM2hhMUVtZi9yWkRlSlB6azVtd1pNbzVk?=
+ =?utf-8?B?b2FQUThCa0Q2ZEN4OUdHR2xKUEhhU1NMSkc2ZG9YU3N0UGdHbXU5TmRSSHZX?=
+ =?utf-8?B?a3lwdXVaYmZsTDFXVEFHVVNhTVREUk56eVNoL05DVjBGSUhlYzBHQzRmWXlX?=
+ =?utf-8?B?NW5Ba3JpY1E2VkFkRW5Ic2ZXZW5vd01JWUtDWnVlRThCV0VhckFDL1RlaVdr?=
+ =?utf-8?B?NHZkc2hwTFFjeldxK0V0M21FRkF5K2ppdHU2SVErdTU3M242eVRVdXFnNXAz?=
+ =?utf-8?B?d21KaWkvVyt2OFFHbXVtSWNZNVdaZ2N0TjZRQUc4K2I1V3dxZGxxU3hDSHhO?=
+ =?utf-8?B?ZnpJQ2c5Rkw4aUUxc3YvZjRaZVdCSTRSSDlEZjZobEd1N3I2NjFvdmZnY1JG?=
+ =?utf-8?B?Sy9HVElUTmNYbzV6cXJDNzV1OHF0TEZpU2lmMnFHZTFzWm9nQ21RcENaa1ZH?=
+ =?utf-8?B?V1k2Q0c1OUpEWGd6NzZhd2VVRjlVeExQZWdtb2U1VEc5MXdUcjZXMHgwS0RJ?=
+ =?utf-8?B?dUN6VWlFb3pYVE8wYzIwb0srK3FjaXRKSnp0dnlUUGNXeCtNU2ZyVm5yQWMw?=
+ =?utf-8?B?MnlERDRRd01TK0xDTUlMa213ZlZrdW5rNWh0Y0NxMGl1U2dxZmdYZUE5RTEr?=
+ =?utf-8?B?Q2pjRFQvdUhlM1NoYjNlMFVCejZ1VVEyVWJOa2RjUml1cE1MM2lRWGNETml5?=
+ =?utf-8?B?TmRFR3YwZGt5WHg1ekh1NU1CVThHNzEzeTV4VDdQY01uQTl0THNFK1FXbXNW?=
+ =?utf-8?B?Q3VqcUtEeFJrTEN6ekZPUWxjMksxeDR4NVB2VUFzNy9wT0RWM0FITXh1cnFq?=
+ =?utf-8?B?cEFvUmdmdk54VXlzeFFWaEdwak1HeDJ0Q0pGb1RKN3dMTGgrNERtMGZrZGI3?=
+ =?utf-8?B?TUhUSUVLU3FmZHlEVHAzbkdzbzgzU1MxOEZESHJQbDdtYlpaa09QNk1HcTRz?=
+ =?utf-8?B?bnhnMWxwdlU1QzltakhIM2xhVnU3akdvRy9uY1VrbE5kWFg4dGkzV2lnQi9Q?=
+ =?utf-8?B?aGJZYW1WcFdPNkx2ckUvUVhYei83ZnQzbE5rTjZpRU1KQk9yZ0l0a2ZMdmdp?=
+ =?utf-8?B?MUxoSUxxYVJzNGF6bmVVSlFGcHZQcXJSbzlLc3B6Z3NjenBWQ1ZlcHJNS1FW?=
+ =?utf-8?B?bnZ4ZmRNRzU5L2M1VDc5LytyVEwxRWVKbTFjbEFmdkpXdWROdGc0MmoyTXZT?=
+ =?utf-8?B?ZVlnRlI2V1RsZjlJTWdQS1I4OW1KSy9yaEJXVFR6NGFQNUxlYWE0bkppZlZB?=
+ =?utf-8?B?bzlqd1hLdW53dHJMbWV6UEQ4RVBXenlVUmJhdkY3TExMNEVYbCtFbENiSG5O?=
+ =?utf-8?B?eC9zWStvWU12NnArY21mRHdMZkh3RW9NMnNUcFF3ZW0walBqRWs1TkpZUmND?=
+ =?utf-8?B?L0ErREdIUmNjeHFCZmc5Q1BrRjJWWkFqcFFsdWp6QmplL3UvVWE5Uzc2SDNt?=
+ =?utf-8?Q?5TApC2twBCCvKKPQk/Tr9Zkcw7LRFzqW?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TVZLTGMwT3MyVmh1UWVZUW5vOUpEVlYrdlN4OXJWM1k0eXc4NGkrUk55SGxq?=
- =?utf-8?B?OFM5bHhjc0J4WVZlY21PNW9QZU5Oa1lZNGZ0Y0x1Tmg3R1h2N05mV3RRUmM3?=
- =?utf-8?B?QzRsNVNRZk54ZVcrKzZqQkZQRjNmL1duK0pmNnFEdE5ibi9oRHg2SUh1NXRq?=
- =?utf-8?B?cXZRVEFVSW9WcTh5S2J3SVdxazNSOEdBVStnMnRxU0JvQWNPUGFJa1UxSmE5?=
- =?utf-8?B?R05HelY2UE85TnhNZ2dvMndmRlBUcnpZQS9NNmIzRUpvZ2Fyd0QwRGhya0Fp?=
- =?utf-8?B?ekpkRk50TnJoS2VQNXUxRCtaMll3dEs2T1VER2VhRGwvOUlkMWozdUdmSkNG?=
- =?utf-8?B?VWhPblAwT2pXNi9hcTQ0eVRFSjIvdHZkMnlaSHA3Qk1HN2FiWnQ2bkd0V1JB?=
- =?utf-8?B?SkdFckVsUjFTVTVXdHF1eTVqWmdXTFErSFVTdVo5WFphL3BuSWFmYUpDbWNy?=
- =?utf-8?B?VDNtcnVxYjhoUFRQcnJsK3BtWWdoZHRLb3hMeU4zRnhzQVRnZHY3OXl1VmR3?=
- =?utf-8?B?S0x0cmk3eklPb1BGYnVFdE1mb1I3bkR5Sjh0WlJtbGQzQ3lQWEdiS09QTnVu?=
- =?utf-8?B?NTZieGUrQTFsZ2g1bXdqeHFjRlV4L3lWekdiNklqN1BqNmdSVElub1Z2bjVF?=
- =?utf-8?B?UmVmQmNjZktzVDZ5U1ZmdnFnejJqWWQxY3RnUXhaSzE5OFc4RDdyYnVXNEIy?=
- =?utf-8?B?VGdoSHluOHpzaE1vUnRLeGJzQ0JGQS9IWFZRYUFZS1ROWkJ6TEtqL1M3Q2dX?=
- =?utf-8?B?SFNXd0prc2NXYzlYUWpPS1dXWkZpamtOU3BOOEZINU9YUXBMWndSU0cwVTdT?=
- =?utf-8?B?aTg3bjJvbVJuVThtVittdEE4NkdYVjNON1ZpRCt0MzVvaHp6V3Rvbmg0RjJM?=
- =?utf-8?B?RUFVZUlMdTN4TmhVVXJJNEJQenB4cFgzRStVZkFKRnIvRlhrMlJuT1FLWmV4?=
- =?utf-8?B?eXVnNzVJQUlxOGN3MXNsSWhiS2lDcEwzWW1vRFhzMzROL2o3bUxKS2xPMUdE?=
- =?utf-8?B?Rk1vVSs1ZHB5c2o5cSsxeC85a0VJRzNyOFhPc1JGMlNmWlc4ZFVHVHFmcnNx?=
- =?utf-8?B?S2s3VS9RdnZzK3duZHdTbEVPWkU2ekQ0YlFEVDAvdTgxNkV6dHdDbEFyTXBq?=
- =?utf-8?B?eUZicEZsdWFRSk1jT2piNzY2dVFPdlJnRTFXQVhXVUtucFhuMUd4ZzhBZEhE?=
- =?utf-8?B?T3JPTjNLVnNyTXczRGNZYlZCblBlMCsvekVNT3NrOTRYUWNhdzR3djg3M0JB?=
- =?utf-8?B?Rm9aTFRsSlRsc3JSd251Y1dYbzRTVXduUEk5MityZ0sxOGVnOTVWdGE3N2Vr?=
- =?utf-8?B?Yjd1c2QrUW15aUxheFBHLzQ1c29mZTZ3L1RoZm1PQnFvOVFTeVp6RTk3dzZz?=
- =?utf-8?B?M2dkYlFFbGFyeVZ3NUlBM09tYVB5eWZza3VTc0RCMWpLcTNEWnRBNjVXcVBQ?=
- =?utf-8?B?ZGpGWEJQYjdZWDlPc3FxQVdQYUN1clNlMUN0OVkweEFuMFJid01wdVR4VUpr?=
- =?utf-8?B?UGNpRkJNYmlPeUFRd0lwdFFLdU5HaWJZajdraFNaNVVMQm1Ta0NvQWlKb2tU?=
- =?utf-8?B?Z1NHVldmeFozMWZNM0RNSyt6d2JtSE0ycG5EdmpEeFo4ZGl2N0dEVE5ETGtt?=
- =?utf-8?B?M2Y1YTRXSEh3cFpGR2EvNWJvRldnVmV5UmFVNVp5amxOSGJOOU9iY28wNWY2?=
- =?utf-8?B?UWIvdElMVGlCS21SS2FvZXk5S0R6SEQrUGxnWnFJd3dieTZLRHB6M2E4aUxx?=
- =?utf-8?B?RW1BbFhVRllHSFJqeThsa1RIc3FKbi8rY0pUekpMMWRySWFSZVQ5ekJlbFdx?=
- =?utf-8?B?cUVUYU5na1hhV3dlOHBRWDdjQ0NPVmJtRy9IMGx2L3RlaWRRZXhpVnFGTjhn?=
- =?utf-8?B?MzVPSFZrMU96dG9QYWs0dzFjSlUya0RjeXF0T0poSjN1M05tcUpHT2N2dEVu?=
- =?utf-8?B?WVlvSTlTc3kwa1IrZC9pZjJyVUw2SXFiQVlQamlLLzEzRXpwSko0Mmg3RElC?=
- =?utf-8?B?dlZYcHMwNTY3c0lLSXZFMGNvN3M5VFk0R2dyOXFPVlN3Umx1MWdrNWtKUXpn?=
- =?utf-8?B?Wk9rblRVdWhkYXcwQWFxSWhqRVJLZHEySHZqSVNOUFdmQTkxdDRCWGFoeUNL?=
- =?utf-8?B?Z3g3Q3VETG1mVUs4cENlS3QwR1FSdjVod2llYjlCaFBMNHRWbTdiMDU0OTFh?=
- =?utf-8?B?Y1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: c4daa625-6936-4ed6-0115-08de1b9dceaf
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?blppTkZ1aU80U21QcTkyTXBFNlMvQXRGdnphWkx1SlZvQXNhZXdGeGpPMTZh?=
+ =?utf-8?B?WkY0a1R4NWhZdDdJQVdZd3o3NDh6MCtXbUViVEkzNFpBV1lnVDNHbHZTY0hS?=
+ =?utf-8?B?MDZKT2dkSmVzVlFHZzBGYUNWVXpYWmZIYVRHQzdac3k4dERaSUpybVg0bzlI?=
+ =?utf-8?B?NGFhVzVQZUs4aW9FYjNSbUwzaFNOVEdZL3FCTnU4R0JmQ3NKS09kNk5UeGk0?=
+ =?utf-8?B?c0tYSzE0TGJnWVFZM081VnBUcTlZRDgySUZrYWprSVJZa1BEc3NlNWV3RW9U?=
+ =?utf-8?B?K2R1bDIwVzVLLzYxN3U1WTlTSXdOYXIvU2tvcGlJV2xEZVJnYjZYMjluYkJa?=
+ =?utf-8?B?Z3pCN0ZWSlZyd21oSWl3NGV2emJQaVNWT0R1YUhFVFk0MHd4aFUyb1orTXdn?=
+ =?utf-8?B?RGxJbUVPcE5HY3MvajlCaWROUkdGc1YxRG8wOHdjdjdya2htRDRVT0FuSmM3?=
+ =?utf-8?B?ZnpDOWdTWmpxM2k0Z3VmQVV5QUpTeDNqMVlMMW1zRkt1YXptRTcvTVdaQXFV?=
+ =?utf-8?B?NHl4K3VFNU5oVmdHYmk5MjVwTFNGckNIb2xnbXA5N2F5TFFrYi9uTmhzNEZi?=
+ =?utf-8?B?cUVhZ2VvTzYraUc4RDh6eit3VzJubGpUdGtxbnZ2TmNOTDUrbnBpdGdDNXV2?=
+ =?utf-8?B?N2Z0QkZhYjVOOENtVUxVK0FTYU9sc3ZjRDBaVzhnQ2pXNE9uWFdlYkRjOWR1?=
+ =?utf-8?B?MjZNc25PbVltaDI5dFBxOVVzMHpOUWh6RFFxeGxRcHZOaDExUEY2NzV4NVpu?=
+ =?utf-8?B?QzJ6MjBzVmZ2T1hmUVRPZnVDck9WUTkzdEc2UktnVWtKU3ZpTmczUjZGaTZJ?=
+ =?utf-8?B?aEdnUmlUM2gvMlFyS3pqL0t6YUNLWXVpZnJKL2V0dW9uTHJGZ1dwSzBPUVpm?=
+ =?utf-8?B?UUdWTXJOSWVZZ3ZLUWZkb0Z2a0g5NDVScmd3WWFwVERJbEFEbFlaeXlrZWI3?=
+ =?utf-8?B?L3J1UFpQWTNReEphaVdjaXBTYUNNWHFVU3BGdTJEaUF6akJ0NHJUWG1SaHdU?=
+ =?utf-8?B?Z21BZ1Q5VWxQTlpuaGRjeTU3UkZ1bGtLOHhLWHdaanZTQkVNcmgxVCtMdWo0?=
+ =?utf-8?B?bFJzQk04Wk9zV1d2NnlxVmVWVi9UaXNETXpMSXhQd1JZWW9peVlqd240OWlw?=
+ =?utf-8?B?eEVySVMyQWx5aytIL09PZ3dFeFpuNS9INExLSUlSeTNTM2FlZFhvNWsyOHZU?=
+ =?utf-8?B?K1l3RTgvSmx2cm5MRjI0dnp5Ri9yUWlwelZnSkM1TGp6SkNDVy8yMmxiYmlM?=
+ =?utf-8?B?ZjJadlE1MkhkU1NSM29kRU1naVh1clAvOWN5TVVJemxzOWZJaldwWis5dEVY?=
+ =?utf-8?B?eVdWaTF5cnZldjBlTEw0cGw4M0U5eE45NmpNVjRyRGRHQnR3c3FReE1sUEQ4?=
+ =?utf-8?B?dDZvOVZlTTg3cHUybFcyaEF0aTRjb1cvUjlMQnhGNVkya3F5NXh1MXhUaFlh?=
+ =?utf-8?B?TWtsWUhvcTJORjZ6L0RxcFRJVVptQ2MvbzFVSkxpL1QzY2dvUFM0bjZxZkFZ?=
+ =?utf-8?B?ODBFNlJJSS9qSDF4YTd0QkxJS29aQkRLOGZrbStzd2k3Z2F6OE5wZ3REdzZl?=
+ =?utf-8?B?Ti9QTUJMaFpmdHIvTklhejZLbC80YlZIV1JSa1B2M3Rka1dHY0xDa2JhRjV5?=
+ =?utf-8?B?aGFlRDhhUkhGcmZRREg4bDc3dmdEb1JySE1RK2pidjlSQzdBY2pGMllZT0Ix?=
+ =?utf-8?B?aVFtQVdENEw5eDFmbnpSenNFVS9lRkJkVTJCU0pSUU15QWM1dWYyWCtkdy9X?=
+ =?utf-8?B?TitPYm5NUTQvYXZrMU9JNU1QaEhXdlBZREtCbWtKRmRWYm5Ba3J4ZFpiSEky?=
+ =?utf-8?B?RHF3R0JkM2ZxY2dWanZOdUQ3R2xtdlFjTllyeHBod0g4UG14K1oveXA5T0dX?=
+ =?utf-8?B?MUFZeWdIUFNDeFE4N0t5UThpUnFCQUNVZGJJY2k2OVhhT25oNHpYa3ZmeTlz?=
+ =?utf-8?B?Y2tHMlRoQkZUdFpPOUFScmhjL211eUJNN3JQYkhpVVRvREpOMVE0SlpTaVV4?=
+ =?utf-8?B?UWxlUmtVVlpiV2doL0hCMWdXZ05HREJmbmtVcmx1RERCTmppNlJTMU5HU0Ni?=
+ =?utf-8?B?YmcvcUpobzlxc0tJb1ZncFJjNGRyYUVXeDBoTWZoOGM4eW1JaHExeWswMEdS?=
+ =?utf-8?B?bTdCNVI1MjBGV09VdkQ4QzJSeDRqbitDNFV1Kys2K0MzOHBJNVpmL2sza0xw?=
+ =?utf-8?B?UkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9b96265c-2eb5-4145-35bf-08de1b9f25cd
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5373.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2025 12:29:32.7366
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2025 12:39:08.4022
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZTffo731DpOR0e5ws4xfmGetqG0rF4Z1g/ON9oECl18vVTgQDkWDd4DYcCgs/DUGi16pju+JrYn/gjU5V2tAZXG3H7S2wRhO69vQbuUz9Cc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4934
+X-MS-Exchange-CrossTenant-UserPrincipalName: oYzYv3oTPhSklDJB8djcIjeLPjwtb6NpQwBrfDEwPIX2FN6HyAuK90GWTLjwRP+fBmNfQy51wp5y3qk0pzAKPWrxP+gdx1Op6C7Ksvr7Tjc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4773
 X-OriginatorOrg: intel.com
 
-On Fri, Oct 31, 2025 at 07:39:58PM +0100, Michal Wajdeczko wrote:
-> 
-> 
-> On 10/30/2025 9:31 PM, Michał Winiarski wrote:
-> > Implement the helpers and use them for save and restore of MMIO
-> > migration data in stop_copy / resume device state.
+On Mon, Nov 03, 2025 at 02:37:29PM -0800, Matthew Brost wrote:
+> On Thu, Oct 30, 2025 at 09:31:29PM +0100, Michał Winiarski wrote:
+> > Connect the helpers to allow save and restore of VRAM migration data in
+> > stop_copy / resume device state.
 > > 
+> > Co-developed-by: Lukasz Laguna <lukasz.laguna@intel.com>
+> > Signed-off-by: Lukasz Laguna <lukasz.laguna@intel.com>
 > > Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
 > > ---
-> >  drivers/gpu/drm/xe/xe_gt_sriov_pf.h           |   2 +
-> >  drivers/gpu/drm/xe/xe_gt_sriov_pf_control.c   |  13 ++
-> >  drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c | 158 ++++++++++++++++++
-> >  drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.h |   3 +
-> >  4 files changed, 176 insertions(+)
+> >  drivers/gpu/drm/xe/xe_gt_sriov_pf_control.c   |  15 ++
+> >  drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c | 213 ++++++++++++++++++
+> >  drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.h |   5 +
+> >  .../drm/xe/xe_gt_sriov_pf_migration_types.h   |   2 +
+> >  drivers/gpu/drm/xe/xe_sriov_pf_control.c      |   3 +
+> >  5 files changed, 238 insertions(+)
 > > 
-> > diff --git a/drivers/gpu/drm/xe/xe_gt_sriov_pf.h b/drivers/gpu/drm/xe/xe_gt_sriov_pf.h
-> > index e7fde3f9937af..c0dcbb1054e4d 100644
-> > --- a/drivers/gpu/drm/xe/xe_gt_sriov_pf.h
-> > +++ b/drivers/gpu/drm/xe/xe_gt_sriov_pf.h
-> > @@ -6,6 +6,8 @@
-> >  #ifndef _XE_GT_SRIOV_PF_H_
-> >  #define _XE_GT_SRIOV_PF_H_
-> >  
-> > +#include <linux/types.h>
-> 
-> ?
-
-Oops, leftover from previous iterations.
-
-> 
-> > +
-> >  struct xe_gt;
-> >  
-> >  #ifdef CONFIG_PCI_IOV
 > > diff --git a/drivers/gpu/drm/xe/xe_gt_sriov_pf_control.c b/drivers/gpu/drm/xe/xe_gt_sriov_pf_control.c
-> > index e7ea9b88fd246..7cd7cae950bc7 100644
+> > index 7cd7cae950bc7..de0f63610e780 100644
 > > --- a/drivers/gpu/drm/xe/xe_gt_sriov_pf_control.c
 > > +++ b/drivers/gpu/drm/xe/xe_gt_sriov_pf_control.c
-> > @@ -870,6 +870,16 @@ static int pf_handle_vf_save_data(struct xe_gt *gt, unsigned int vfid)
+> > @@ -880,6 +880,18 @@ static int pf_handle_vf_save_data(struct xe_gt *gt, unsigned int vfid)
 > >  		return -EAGAIN;
 > >  	}
 > >  
-> > +	if (xe_gt_sriov_pf_migration_save_test(gt, vfid, XE_SRIOV_MIGRATION_DATA_TYPE_MMIO)) {
-> > +		ret = xe_gt_sriov_pf_migration_mmio_save(gt, vfid);
-> > +		if (ret)
+> > +	if (xe_gt_sriov_pf_migration_save_test(gt, vfid, XE_SRIOV_MIGRATION_DATA_TYPE_VRAM)) {
+> > +		ret = xe_gt_sriov_pf_migration_vram_save(gt, vfid);
+> > +		if (ret == -EAGAIN)
+> > +			return -EAGAIN;
+> > +		else if (ret)
 > > +			return ret;
 > > +
-> > +		xe_gt_sriov_pf_migration_save_clear(gt, vfid, XE_SRIOV_MIGRATION_DATA_TYPE_MMIO);
+> > +		xe_gt_sriov_pf_migration_save_clear(gt, vfid, XE_SRIOV_MIGRATION_DATA_TYPE_VRAM);
 > > +
 > > +		return -EAGAIN;
 > > +	}
@@ -269,140 +251,112 @@ Oops, leftover from previous iterations.
 > >  	return 0;
 > >  }
 > >  
-> > @@ -1079,6 +1089,9 @@ static int pf_handle_vf_restore_data(struct xe_gt *gt, unsigned int vfid)
-> >  	case XE_SRIOV_MIGRATION_DATA_TYPE_GGTT:
-> >  		ret = xe_gt_sriov_pf_migration_ggtt_restore(gt, vfid, data);
-> >  		break;
-> > +	case XE_SRIOV_MIGRATION_DATA_TYPE_MMIO:
-> > +		ret = xe_gt_sriov_pf_migration_mmio_restore(gt, vfid, data);
-> > +		break;
+> > @@ -1095,6 +1107,9 @@ static int pf_handle_vf_restore_data(struct xe_gt *gt, unsigned int vfid)
 > >  	case XE_SRIOV_MIGRATION_DATA_TYPE_GUC:
 > >  		ret = xe_gt_sriov_pf_migration_guc_restore(gt, vfid, data);
 > >  		break;
+> > +	case XE_SRIOV_MIGRATION_DATA_TYPE_VRAM:
+> > +		ret = xe_gt_sriov_pf_migration_vram_restore(gt, vfid, data);
+> > +		break;
+> >  	default:
+> >  		xe_gt_sriov_notice(gt, "Skipping VF%u unknown data type: %d\n", vfid, data->type);
+> >  		break;
 > > diff --git a/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c b/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c
-> > index 6f2ee5820bdd4..5e90aeafeeb41 100644
+> > index 5e90aeafeeb41..7ccd43545fdac 100644
 > > --- a/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c
 > > +++ b/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c
-> > @@ -5,10 +5,13 @@
-> >  
-> >  #include <drm/drm_managed.h>
-> >  
-> > +#include "regs/xe_guc_regs.h"
-> > +
-> >  #include "abi/guc_actions_sriov_abi.h"
-> >  #include "xe_bo.h"
-> >  #include "xe_ggtt.h"
-> >  #include "xe_gt.h"
-> > +#include "xe_gt_sriov_pf.h"
-> >  #include "xe_gt_sriov_pf_config.h"
-> >  #include "xe_gt_sriov_pf_control.h"
-> >  #include "xe_gt_sriov_pf_helpers.h"
-> > @@ -16,6 +19,7 @@
+> > @@ -19,6 +19,7 @@
 > >  #include "xe_gt_sriov_printk.h"
 > >  #include "xe_guc_buf.h"
 > >  #include "xe_guc_ct.h"
-> > +#include "xe_mmio.h"
+> > +#include "xe_migrate.h"
+> >  #include "xe_mmio.h"
 > >  #include "xe_sriov.h"
 > >  #include "xe_sriov_migration_data.h"
-> >  #include "xe_sriov_pf_migration.h"
-> > @@ -357,6 +361,150 @@ int xe_gt_sriov_pf_migration_guc_restore(struct xe_gt *gt, unsigned int vfid,
-> >  	return pf_restore_vf_guc_state(gt, vfid, data);
+> > @@ -505,6 +506,207 @@ int xe_gt_sriov_pf_migration_mmio_restore(struct xe_gt *gt, unsigned int vfid,
+> >  	return pf_restore_vf_mmio_mig_data(gt, vfid, data);
 > >  }
 > >  
-> > +static ssize_t pf_migration_mmio_size(struct xe_gt *gt, unsigned int vfid)
+> > +static ssize_t pf_migration_vram_size(struct xe_gt *gt, unsigned int vfid)
 > > +{
-> > +	if (xe_gt_is_media_type(gt))
-> > +		return MED_VF_SW_FLAG_COUNT * sizeof(u32);
-> > +	else
-> > +		return VF_SW_FLAG_COUNT * sizeof(u32);
+> > +	if (!xe_gt_is_main_type(gt))
+> > +		return 0;
+> > +
+> > +	return xe_gt_sriov_pf_config_get_lmem(gt, vfid);
 > > +}
 > > +
-> > +static int pf_migration_mmio_save(struct xe_gt *gt, unsigned int vfid, void *buf, size_t size)
+> > +static struct dma_fence *__pf_save_restore_vram(struct xe_gt *gt, unsigned int vfid,
+> > +						struct xe_bo *vram, u64 vram_offset,
+> > +						struct xe_bo *sysmem, u64 sysmem_offset,
+> > +						size_t size, bool save)
 > > +{
-> > +	struct xe_mmio mmio;
-> > +	u32 *regs = buf;
-> > +	int n;
+> > +	struct dma_fence *ret = NULL;
+> > +	struct drm_exec exec;
+> > +	int err;
 > > +
-> > +	xe_mmio_init_vf_view(&mmio, &gt->mmio, vfid);
-> > +
-> > +	if (size != pf_migration_mmio_size(gt, vfid))
-> > +		return -EINVAL;
+> > +	drm_exec_init(&exec, DRM_EXEC_INTERRUPTIBLE_WAIT, 0);
 > 
-> you may want to check that first (before init vf view)
-
-Ok.
-
+> It is a bit incongruent that the dma-resv lock is interruptible here.
 > 
+> > +	drm_exec_until_all_locked(&exec) {
+> > +		err = drm_exec_lock_obj(&exec, &vram->ttm.base);
+> > +		drm_exec_retry_on_contention(&exec);
+> > +		if (err) {
+> > +			ret = ERR_PTR(err);
+> > +			goto err;
+> > +		}
 > > +
-> > +	if (xe_gt_is_media_type(gt))
-> > +		for (n = 0; n < MED_VF_SW_FLAG_COUNT; n++)
-> > +			regs[n] = xe_mmio_read32(&gt->mmio, MED_VF_SW_FLAG(n));
-> > +	else
-> > +		for (n = 0; n < VF_SW_FLAG_COUNT; n++)
-> > +			regs[n] = xe_mmio_read32(&gt->mmio, VF_SW_FLAG(n));
+> > +		err = drm_exec_lock_obj(&exec, &sysmem->ttm.base);
+> > +		drm_exec_retry_on_contention(&exec);
+> > +		if (err) {
+> > +			ret = ERR_PTR(err);
+> > +			goto err;
+> > +		}
+> > +	}
 > > +
-> > +	return 0;
+> > +	ret = xe_migrate_vram_copy_chunk(vram, vram_offset, sysmem, sysmem_offset, size,
+> > +					 save ? XE_MIGRATE_COPY_TO_SRAM : XE_MIGRATE_COPY_TO_VRAM);
+> > +
+> > +err:
+> > +	drm_exec_fini(&exec);
+> > +
+> > +	return ret;
 > > +}
 > > +
-> > +static int pf_migration_mmio_restore(struct xe_gt *gt, unsigned int vfid,
-> > +				     const void *buf, size_t size)
-> > +{
-> > +	const u32 *regs = buf;
-> > +	struct xe_mmio mmio;
-> > +	int n;
-> > +
-> > +	xe_mmio_init_vf_view(&mmio, &gt->mmio, vfid);
-> > +
-> > +	if (size != pf_migration_mmio_size(gt, vfid))
-> > +		return -EINVAL;
-> 
-> ditto
-
-Ok.
-
-> 
-> > +
-> > +	if (xe_gt_is_media_type(gt))
-> > +		for (n = 0; n < MED_VF_SW_FLAG_COUNT; n++)
-> > +			xe_mmio_write32(&gt->mmio, MED_VF_SW_FLAG(n), regs[n]);
-> > +	else
-> > +		for (n = 0; n < VF_SW_FLAG_COUNT; n++)
-> > +			xe_mmio_write32(&gt->mmio, VF_SW_FLAG(n), regs[n]);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int pf_save_vf_mmio_mig_data(struct xe_gt *gt, unsigned int vfid)
+> > +#define PF_VRAM_SAVE_RESTORE_TIMEOUT (5 * HZ)
+> > +static int pf_save_vram_chunk(struct xe_gt *gt, unsigned int vfid,
+> > +			      struct xe_bo *src_vram, u64 src_vram_offset,
+> > +			      size_t size)
 > > +{
 > > +	struct xe_sriov_migration_data *data;
-> > +	size_t size;
+> > +	struct dma_fence *fence;
 > > +	int ret;
-> > +
-> > +	size = pf_migration_mmio_size(gt, vfid);
-> > +	xe_gt_assert(gt, size);
 > > +
 > > +	data = xe_sriov_migration_data_alloc(gt_to_xe(gt));
 > > +	if (!data)
 > > +		return -ENOMEM;
 > > +
 > > +	ret = xe_sriov_migration_data_init(data, gt->tile->id, gt->info.id,
-> > +					   XE_SRIOV_MIGRATION_DATA_TYPE_MMIO, 0, size);
+> > +					   XE_SRIOV_MIGRATION_DATA_TYPE_VRAM,
+> > +					   src_vram_offset, size);
 > > +	if (ret)
 > > +		goto fail;
 > > +
-> > +	ret = pf_migration_mmio_save(gt, vfid, data->vaddr, size);
-> > +	if (ret)
-> > +		goto fail;
+> > +	fence = __pf_save_restore_vram(gt, vfid,
+> > +				       src_vram, src_vram_offset,
+> > +				       data->bo, 0, size, true);
 > > +
-> > +	xe_gt_sriov_dbg_verbose(gt, "VF%u MMIO data save (%zu bytes)\n", vfid, size);
+> > +	ret = dma_fence_wait_timeout(fence, false, PF_VRAM_SAVE_RESTORE_TIMEOUT);
 > 
-> maybe make it part of the pf_dump_mig_data() ?
+> Then here the dma-fence wait is non-interruptible.
 > 
-> 	pf_dump_mig_data(gt, vfid, data, "MMIO saved");
-
-Different patch - but I'll merge the two.
-
-> 
+> > +	dma_fence_put(fence);
+> > +	if (!ret) {
+> > +		ret = -ETIME;
+> > +		goto fail;
+> > +	}
+> > +
+> > +	xe_gt_sriov_dbg_verbose(gt, "VF%u VRAM data save (%zu bytes)\n", vfid, size);
 > > +	pf_dump_mig_data(gt, vfid, data);
 > > +
 > > +	ret = xe_gt_sriov_pf_migration_save_produce(gt, vfid, data);
@@ -413,38 +367,103 @@ Different patch - but I'll merge the two.
 > > +
 > > +fail:
 > > +	xe_sriov_migration_data_free(data);
-> > +	xe_gt_sriov_err(gt, "Failed to save VF%u MMIO data (%pe)\n", vfid, ERR_PTR(ret));
 > > +	return ret;
 > > +}
 > > +
-> > +static int pf_restore_vf_mmio_mig_data(struct xe_gt *gt, unsigned int vfid,
-> > +				       struct xe_sriov_migration_data *data)
+> > +#define VF_VRAM_STATE_CHUNK_MAX_SIZE SZ_512M
+> > +static int pf_save_vf_vram_mig_data(struct xe_gt *gt, unsigned int vfid)
 > > +{
+> > +	struct xe_gt_sriov_migration_data *migration = pf_pick_gt_migration(gt, vfid);
+> > +	loff_t *offset = &migration->save.vram_offset;
+> > +	struct xe_bo *vram;
+> > +	size_t vram_size, chunk_size;
 > > +	int ret;
 > > +
-> > +	xe_gt_sriov_dbg_verbose(gt, "VF%u MMIO data restore (%llu bytes)\n", vfid, data->size);
-> 
-> and here:
-
-Ok.
-
-> 
-> 	pf_dump_mig_data(gt, vfid, data, "restoring MMIO");
+> > +	vram = xe_gt_sriov_pf_config_get_lmem_obj(gt, vfid);
+> > +	if (!vram)
+> > +		return -ENXIO;
+> > +
+> > +	vram_size = xe_bo_size(vram);
+> > +
+> > +	xe_gt_assert(gt, *offset < vram_size);
+> > +
+> > +	chunk_size = min(vram_size - *offset, VF_VRAM_STATE_CHUNK_MAX_SIZE);
+> > +
+> > +	ret = pf_save_vram_chunk(gt, vfid, vram, *offset, chunk_size);
+> > +	if (ret)
+> > +		goto fail;
+> > +
+> > +	*offset += chunk_size;
+> > +
+> > +	xe_bo_put(vram);
+> > +
+> > +	if (*offset < vram_size)
+> > +		return -EAGAIN;
+> > +
+> > +	return 0;
+> > +
+> > +fail:
+> > +	xe_bo_put(vram);
+> > +	xe_gt_sriov_err(gt, "Failed to save VF%u VRAM data (%pe)\n", vfid, ERR_PTR(ret));
+> > +	return ret;
+> > +}
+> > +
+> > +static int pf_restore_vf_vram_mig_data(struct xe_gt *gt, unsigned int vfid,
+> > +				       struct xe_sriov_migration_data *data)
+> > +{
+> > +	u64 end = data->hdr.offset + data->hdr.size;
+> > +	struct dma_fence *fence;
+> > +	struct xe_bo *vram;
+> > +	size_t size;
+> > +	int ret = 0;
+> > +
+> > +	vram = xe_gt_sriov_pf_config_get_lmem_obj(gt, vfid);
+> > +	if (!vram)
+> > +		return -ENXIO;
+> > +
+> > +	size = xe_bo_size(vram);
+> > +
+> > +	if (end > size || end < data->hdr.size) {
+> > +		ret = -EINVAL;
+> > +		goto err;
+> > +	}
+> > +
+> > +	xe_gt_sriov_dbg_verbose(gt, "VF%u VRAM data restore (%llu bytes)\n", vfid, data->size);
 > > +	pf_dump_mig_data(gt, vfid, data);
 > > +
-> > +	ret = pf_migration_mmio_restore(gt, vfid, data->vaddr, data->size);
-> > +	if (ret) {
-> > +		xe_gt_sriov_err(gt, "Failed to restore VF%u MMIO data (%pe)\n",
-> > +				vfid, ERR_PTR(ret));
-> > +
-> > +		return ret;
+> > +	fence = __pf_save_restore_vram(gt, vfid, vram, data->hdr.offset,
+> > +				       data->bo, 0, data->hdr.size, false);
+> > +	ret = dma_fence_wait_timeout(fence, false, PF_VRAM_SAVE_RESTORE_TIMEOUT);
+> 
+> And also here the dma-fence wait is non-interruptible.
+> 
+> Aside from the incongruence, the usage of drm-exec, dma-fences looks correct.
+
+All of this code is executed from the PF control state worker, so using
+non-interruptible sleep is fine.
+I'll drop the DRM_EXEC_INTERRUPTIBLE_WAIT flag from drm_exec_init().
+
+Thanks,
+-Michał
+
+> 
+> Matt
+> 
+> > +	dma_fence_put(fence);
+> > +	if (!ret) {
+> > +		ret = -ETIME;
+> > +		goto err;
 > > +	}
 > > +
 > > +	return 0;
+> > +err:
+> > +	xe_bo_put(vram);
+> > +	xe_gt_sriov_err(gt, "Failed to restore VF%u VRAM data (%pe)\n", vfid, ERR_PTR(ret));
+> > +	return ret;
 > > +}
 > > +
 > > +/**
-> > + * xe_gt_sriov_pf_migration_mmio_save() - Save VF MMIO migration data.
+> > + * xe_gt_sriov_pf_migration_vram_save() - Save VF VRAM migration data.
 > > + * @gt: the &xe_gt
 > > + * @vfid: the VF identifier (can't be 0)
 > > + *
@@ -452,17 +471,17 @@ Ok.
 > > + *
 > > + * Return: 0 on success or a negative error code on failure.
 > > + */
-> > +int xe_gt_sriov_pf_migration_mmio_save(struct xe_gt *gt, unsigned int vfid)
+> > +int xe_gt_sriov_pf_migration_vram_save(struct xe_gt *gt, unsigned int vfid)
 > > +{
 > > +	xe_gt_assert(gt, IS_SRIOV_PF(gt_to_xe(gt)));
 > > +	xe_gt_assert(gt, vfid != PFID);
 > > +	xe_gt_assert(gt, vfid <= xe_sriov_pf_get_totalvfs(gt_to_xe(gt)));
 > > +
-> > +	return pf_save_vf_mmio_mig_data(gt, vfid);
+> > +	return pf_save_vf_vram_mig_data(gt, vfid);
 > > +}
 > > +
 > > +/**
-> > + * xe_gt_sriov_pf_migration_mmio_restore() - Restore VF MMIO migration data.
+> > + * xe_gt_sriov_pf_migration_vram_restore() - Restore VF VRAM migration data.
 > > + * @gt: the &xe_gt
 > > + * @vfid: the VF identifier (can't be 0)
 > > + *
@@ -470,24 +489,24 @@ Ok.
 > > + *
 > > + * Return: 0 on success or a negative error code on failure.
 > > + */
-> > +int xe_gt_sriov_pf_migration_mmio_restore(struct xe_gt *gt, unsigned int vfid,
+> > +int xe_gt_sriov_pf_migration_vram_restore(struct xe_gt *gt, unsigned int vfid,
 > > +					  struct xe_sriov_migration_data *data)
 > > +{
 > > +	xe_gt_assert(gt, IS_SRIOV_PF(gt_to_xe(gt)));
 > > +	xe_gt_assert(gt, vfid != PFID);
 > > +	xe_gt_assert(gt, vfid <= xe_sriov_pf_get_totalvfs(gt_to_xe(gt)));
 > > +
-> > +	return pf_restore_vf_mmio_mig_data(gt, vfid, data);
+> > +	return pf_restore_vf_vram_mig_data(gt, vfid, data);
 > > +}
 > > +
 > >  /**
 > >   * xe_gt_sriov_pf_migration_size() - Total size of migration data from all components within a GT.
 > >   * @gt: the &xe_gt
-> > @@ -389,6 +537,13 @@ ssize_t xe_gt_sriov_pf_migration_size(struct xe_gt *gt, unsigned int vfid)
+> > @@ -544,6 +746,13 @@ ssize_t xe_gt_sriov_pf_migration_size(struct xe_gt *gt, unsigned int vfid)
 > >  		size += sizeof(struct xe_sriov_pf_migration_hdr);
 > >  	total += size;
 > >  
-> > +	size = pf_migration_mmio_size(gt, vfid);
+> > +	size = pf_migration_vram_size(gt, vfid);
 > > +	if (size < 0)
 > > +		return size;
 > > +	if (size > 0)
@@ -497,36 +516,75 @@ Ok.
 > >  	return total;
 > >  }
 > >  
-> > @@ -453,6 +608,9 @@ void xe_gt_sriov_pf_migration_save_init(struct xe_gt *gt, unsigned int vfid)
+> > @@ -602,6 +811,7 @@ void xe_gt_sriov_pf_migration_save_init(struct xe_gt *gt, unsigned int vfid)
+> >  	struct xe_gt_sriov_migration_data *migration = pf_pick_gt_migration(gt, vfid);
 > >  
-> >  	if (pf_migration_ggtt_size(gt, vfid) > 0)
-> >  		set_bit(XE_SRIOV_MIGRATION_DATA_TYPE_GGTT, &migration->save.data_remaining);
+> >  	migration->save.data_remaining = 0;
+> > +	migration->save.vram_offset = 0;
+> >  
+> >  	xe_gt_assert(gt, pf_migration_guc_size(gt, vfid) > 0);
+> >  	set_bit(XE_SRIOV_MIGRATION_DATA_TYPE_GUC, &migration->save.data_remaining);
+> > @@ -611,6 +821,9 @@ void xe_gt_sriov_pf_migration_save_init(struct xe_gt *gt, unsigned int vfid)
+> >  
+> >  	xe_gt_assert(gt, pf_migration_mmio_size(gt, vfid) > 0);
+> >  	set_bit(XE_SRIOV_MIGRATION_DATA_TYPE_MMIO, &migration->save.data_remaining);
 > > +
-> > +	xe_gt_assert(gt, pf_migration_mmio_size(gt, vfid) > 0);
-> > +	set_bit(XE_SRIOV_MIGRATION_DATA_TYPE_MMIO, &migration->save.data_remaining);
+> > +	if (pf_migration_vram_size(gt, vfid) > 0)
+> > +		set_bit(XE_SRIOV_MIGRATION_DATA_TYPE_VRAM, &migration->save.data_remaining);
 > >  }
 > >  
 > >  /**
 > > diff --git a/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.h b/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.h
-> > index bc201d8f3147a..b0eec94fea3a6 100644
+> > index b0eec94fea3a6..85b43b2cceb73 100644
 > > --- a/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.h
 > > +++ b/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.h
-> > @@ -22,6 +22,9 @@ int xe_gt_sriov_pf_migration_guc_restore(struct xe_gt *gt, unsigned int vfid,
-> >  int xe_gt_sriov_pf_migration_ggtt_save(struct xe_gt *gt, unsigned int vfid);
-> >  int xe_gt_sriov_pf_migration_ggtt_restore(struct xe_gt *gt, unsigned int vfid,
+> > @@ -25,6 +25,11 @@ int xe_gt_sriov_pf_migration_ggtt_restore(struct xe_gt *gt, unsigned int vfid,
+> >  int xe_gt_sriov_pf_migration_mmio_save(struct xe_gt *gt, unsigned int vfid);
+> >  int xe_gt_sriov_pf_migration_mmio_restore(struct xe_gt *gt, unsigned int vfid,
 > >  					  struct xe_sriov_migration_data *data);
-> > +int xe_gt_sriov_pf_migration_mmio_save(struct xe_gt *gt, unsigned int vfid);
-> > +int xe_gt_sriov_pf_migration_mmio_restore(struct xe_gt *gt, unsigned int vfid,
+> > +int xe_gt_sriov_pf_migration_vram_save(struct xe_gt *gt, unsigned int vfid);
+> > +int xe_gt_sriov_pf_migration_vram_restore(struct xe_gt *gt, unsigned int vfid,
 > > +					  struct xe_sriov_migration_data *data);
+> > +
+> > +void xe_gt_sriov_pf_migration_save_init(struct xe_gt *gt, unsigned int vfid);
 > >  
 > >  ssize_t xe_gt_sriov_pf_migration_size(struct xe_gt *gt, unsigned int vfid);
 > >  
-> 
-> but patch looks ok, so with #include fixed (and maybe with better dump helper),
-> 
-> Reviewed-by: Michal Wajdeczko <michal.wajdeczko@intel.com>
-> 
-
-Thanks,
--Michał
+> > diff --git a/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration_types.h b/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration_types.h
+> > index 9f24878690d9c..f50c64241e9c0 100644
+> > --- a/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration_types.h
+> > +++ b/drivers/gpu/drm/xe/xe_gt_sriov_pf_migration_types.h
+> > @@ -20,6 +20,8 @@ struct xe_gt_sriov_migration_data {
+> >  	struct {
+> >  		/** @save.data_remaining: bitmap of migration types that need to be saved */
+> >  		unsigned long data_remaining;
+> > +		/** @save.vram_offset: last saved offset within VRAM, used for chunked VRAM save */
+> > +		loff_t vram_offset;
+> >  	} save;
+> >  };
+> >  
+> > diff --git a/drivers/gpu/drm/xe/xe_sriov_pf_control.c b/drivers/gpu/drm/xe/xe_sriov_pf_control.c
+> > index c2768848daba1..aac8ecb861545 100644
+> > --- a/drivers/gpu/drm/xe/xe_sriov_pf_control.c
+> > +++ b/drivers/gpu/drm/xe/xe_sriov_pf_control.c
+> > @@ -5,6 +5,7 @@
+> >  
+> >  #include "xe_device.h"
+> >  #include "xe_gt_sriov_pf_control.h"
+> > +#include "xe_gt_sriov_pf_migration.h"
+> >  #include "xe_sriov_migration_data.h"
+> >  #include "xe_sriov_pf_control.h"
+> >  #include "xe_sriov_printk.h"
+> > @@ -171,6 +172,8 @@ int xe_sriov_pf_control_trigger_save_vf(struct xe_device *xe, unsigned int vfid)
+> >  		return ret;
+> >  
+> >  	for_each_gt(gt, xe, id) {
+> > +		xe_gt_sriov_pf_migration_save_init(gt, vfid);
+> > +
+> >  		ret = xe_gt_sriov_pf_control_trigger_save_vf(gt, vfid);
+> >  		if (ret)
+> >  			return ret;
+> > -- 
+> > 2.50.1
+> > 
 
