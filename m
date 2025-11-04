@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-61958-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61960-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 473D5C305EF
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 10:56:08 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E45CEC3061E
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 10:58:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D4B234E7A43
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 09:56:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4C8C84F7700
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 09:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85B4B31329E;
-	Tue,  4 Nov 2025 09:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FEA2314D1E;
+	Tue,  4 Nov 2025 09:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NJ84IDxd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DQI/Xra/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B45305E01;
-	Tue,  4 Nov 2025 09:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1840A313544;
+	Tue,  4 Nov 2025 09:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762250149; cv=none; b=YrOCKmSGY//QkcHPKLxBjrrQ/TkpezIFJpnhDcSsks45PF9VAlDIvtkzSqsfzDWUz6qFbf9A2KlBm8d1Jx6Ile0w5Znt0F/Zgazi4+59O2epm0PK95DR/Wnu7tWt8HPBAK7s32CTw2UWP7lQO8xCxdVxX8DjT3M/nNo+R9Opsns=
+	t=1762250191; cv=none; b=faXHGB9JSi4CSJ7Hurpuwpv/WjV5ijmfvxtu33+Rp8LqYYl31rvUtyQnB3Q2VegyNfas2wSWEGKZ6D47zwrJU3fAKAUf5PlT2K15E7yNv60YBdSNYa7gxVwpPLHUsxfhEejzC4ys5CAp0oBMTrhGO+Rr+ZXmK6O3j3RXBItVpZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762250149; c=relaxed/simple;
-	bh=7DYEB3sfqraZqe5u9N0cq1EdSkfB6r2RUJ53TZ2nd74=;
+	s=arc-20240116; t=1762250191; c=relaxed/simple;
+	bh=tW9gsdIOQn8xhR60DE+ues5vAhWhmuyUp0xEp6ncD3Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LtgoFsMskmrztJnwNJbI8iaaG7GU27lOjc8eOUhvzddvLcqCDMmk1pWyZm+17mNgAkXSCKgc9/lVaGvvfKdyr/eRzdue4dOBTF3kL43xj/cFTjJVz3jfDYO3j+JsRGS7ZoSyyxa8+1rKCQcvZHnU4GhbCiRAIfePq8fuAqq4ttE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NJ84IDxd; arc=none smtp.client-ip=198.175.65.20
+	 In-Reply-To:Content-Type; b=CXuFFfvu9vjwKLH4EHGIbG/iGeHZ/6e7320SAW6LfU+0LNp7Gh0wgpoOnrE6aTRmM/Ktiwz6SwB3zl58tj63oo5Vb5+dfkNEdR1j5mvdmFbiTnZTHSzOuVuNlFYGLbHhypYAzLE4An9vjqUBoHuvWsL6IWthALrF0llzJxXOXCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DQI/Xra/; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762250149; x=1793786149;
+  t=1762250190; x=1793786190;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=7DYEB3sfqraZqe5u9N0cq1EdSkfB6r2RUJ53TZ2nd74=;
-  b=NJ84IDxdN+CnXtQNOmq6hq2BGtmBMHjmxxtWYCAZO9nCPMcDofk9/oht
-   HMwTh//htrNcxvWQA9ADIOnh1jUAHfqXSdEieaAQtZE0KwDJxEbiXuiFJ
-   HVxO5g6DlpfnxdNFj3o1t2xoXE38pHlBzHXhwrYZY0MX273lMehqqL2LT
-   k9HTzY1tQK3R4SXgpkL5+EKlkVfT1WQCgHBiNtrjxcVQnjMdiCUMD0jW/
-   0e19v6xOXSD4jViT/aDFqdrB4TI1CYSgm5OXz+E3S0LHZSMbT2TxvqoVS
-   Isyou1G5ja8X8MagRjAcTTjKNrtSobsuHm8drylYtPj/LFX0JjepPn6ZL
-   Q==;
-X-CSE-ConnectionGUID: O1edlaerSCeaY3Fkw+z8Bw==
-X-CSE-MsgGUID: oinmEtRhR+GW00zjpIa18w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="64037203"
-X-IronPort-AV: E=Sophos;i="6.19,278,1754982000"; 
-   d="scan'208";a="64037203"
+  bh=tW9gsdIOQn8xhR60DE+ues5vAhWhmuyUp0xEp6ncD3Y=;
+  b=DQI/Xra/9eDA0bJv1Nc2S7ahx2yv6EzbGb4qA+3z98nRl4El5+1HKsVC
+   BzURFdOMR7AqktO9ZIRnpvEqLhJUYhedvFvPvld8in9GTRvRCkMuc+gqJ
+   eNRK0xwTKMFivAqmIOtNal4VAfm47dCpqEMlez0IOk4AisvrVwrbgNx86
+   7zgz/7wfDgSepunmBjRYU/MHuSMQ0ji+uMBo69HrDQyxQQiwzIi1X/FLl
+   MavyOkzcTZ8Q23FdmDO88qFrlF+zYticquaeAdCCfLE9XSBfGoAutFsoJ
+   YMMP9H0k5EzYP7Zngkg26fQYf61xRqKdhRs3Vws4tyhBZBYM/QEaA9DiZ
+   g==;
+X-CSE-ConnectionGUID: wxO9fC2lS9qAOiVdKMZq0w==
+X-CSE-MsgGUID: J2T3C5ulQaec9irnDaKSVA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="64244757"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="64244757"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 01:55:47 -0800
-X-CSE-ConnectionGUID: sZqCLyO4QsyOw5q1qfwoHw==
-X-CSE-MsgGUID: D+yviwQqRYi2FTLsfX9ufA==
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 01:56:30 -0800
+X-CSE-ConnectionGUID: dTvwCAMoQ/y4+ke5hnczVA==
+X-CSE-MsgGUID: +xGWQw7tRxmGAByjZgnUfA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,278,1754982000"; 
-   d="scan'208";a="187267273"
+   d="scan'208";a="187267438"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.240.49]) ([10.124.240.49])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 01:55:43 -0800
-Message-ID: <72503421-803c-4fa8-8e28-b0c793798c7c@intel.com>
-Date: Tue, 4 Nov 2025 17:55:40 +0800
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 01:56:27 -0800
+Message-ID: <cea597f3-3a59-4775-b416-f95360d52b0f@intel.com>
+Date: Tue, 4 Nov 2025 17:56:23 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [v2][PATCH 1/2] x86/virt/tdx: Remove __user annotation from
- kernel pointer
+Subject: Re: [v2][PATCH 2/2] x86/virt/tdx: Fix sparse warnings from using 0
+ for NULL
 To: Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org
 Cc: Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>,
  Ingo Molnar <mingo@redhat.com>, "Kirill A. Shutemov" <kas@kernel.org>,
@@ -77,10 +77,10 @@ Cc: Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>,
  Sean Christopherson <seanjc@google.com>, Thomas Gleixner
  <tglx@linutronix.de>, x86@kernel.org
 References: <20251103234435.0850400B@davehans-spike.ostc.intel.com>
- <20251103234437.A0532420@davehans-spike.ostc.intel.com>
+ <20251103234439.DC8227E4@davehans-spike.ostc.intel.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20251103234437.A0532420@davehans-spike.ostc.intel.com>
+In-Reply-To: <20251103234439.DC8227E4@davehans-spike.ostc.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
@@ -88,31 +88,19 @@ On 11/4/2025 7:44 AM, Dave Hansen wrote:
 > 
 > From: Dave Hansen <dave.hansen@linux.intel.com>
 > 
-> Separate __user pointer variable declaration from kernel one.
+> Stop using 0 for NULL.
 > 
-> There are two 'kvm_cpuid2' pointers involved here. There's an "input"
-> side: 'td_cpuid' which is a normal kernel pointer and an 'output'
-> side. The output here is userspace and there is an attempt at properly
-> annotating the variable with __user:
+> sparse moans:
 > 
-> 	struct kvm_cpuid2 __user *output, *td_cpuid;
+> 	... arch/x86/kvm/vmx/tdx.c:859:38: warning: Using plain integer as NULL pointer
 > 
-> But, alas, this is wrong. The __user in the definition applies to both
-> 'output' and 'td_cpuid'. Sparse notices the address space mismatch and
-> will complain about it.
-> 
-> Fix it up by completely separating the two definitions so that it is
-> obviously correct without even having to know what the C syntax rules
-> even are.
+> for several TDX pointer initializations. While I love a good ptr=0
+> now and then, it's good to have quiet sparse builds.
 > 
 > Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
-> Fixes: 488808e682e7 ("KVM: x86: Introduce KVM_TDX_GET_CPUID")
+> Fixes: a50f673f25e0 ("KVM: TDX: Do TDX specific vcpu initialization")
+> Fixes: 8d032b683c29 ("KVM: TDX: create/destroy VM structure")
 > Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-
-the prefix of the shortlog is still "x86/virt/tdx". I think Sean will 
-change it to "KVM: TDX:", if it gets routed through KVM tree.
-
-Anyway,
 
 Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
@@ -130,22 +118,39 @@ Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Cc: linux-kernel@vger.kernel.org
 > ---
 > 
->   b/arch/x86/kvm/vmx/tdx.c |    3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+>   b/arch/x86/kvm/vmx/tdx.c |    6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff -puN arch/x86/kvm/vmx/tdx.c~tdx-sparse-fix-3 arch/x86/kvm/vmx/tdx.c
-> --- a/arch/x86/kvm/vmx/tdx.c~tdx-sparse-fix-3	2025-11-03 15:11:26.773525519 -0800
-> +++ b/arch/x86/kvm/vmx/tdx.c	2025-11-03 15:11:26.782526277 -0800
-> @@ -3054,7 +3054,8 @@ static int tdx_vcpu_get_cpuid_leaf(struc
+> diff -puN arch/x86/kvm/vmx/tdx.c~tdx-sparse-fix-1 arch/x86/kvm/vmx/tdx.c
+> --- a/arch/x86/kvm/vmx/tdx.c~tdx-sparse-fix-1	2025-11-03 15:11:28.177643833 -0800
+> +++ b/arch/x86/kvm/vmx/tdx.c	2025-11-03 15:11:28.185644508 -0800
+> @@ -856,7 +856,7 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu
+>   	}
+>   	if (tdx->vp.tdvpr_page) {
+>   		tdx_reclaim_control_page(tdx->vp.tdvpr_page);
+> -		tdx->vp.tdvpr_page = 0;
+> +		tdx->vp.tdvpr_page = NULL;
+>   		tdx->vp.tdvpr_pa = 0;
+>   	}
 >   
->   static int tdx_vcpu_get_cpuid(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
->   {
-> -	struct kvm_cpuid2 __user *output, *td_cpuid;
-> +	struct kvm_cpuid2 __user *output;
-> +	struct kvm_cpuid2 *td_cpuid;
->   	int r = 0, i = 0, leaf;
->   	u32 level;
+> @@ -2642,7 +2642,7 @@ free_tdcs:
+>   free_tdr:
+>   	if (tdr_page)
+>   		__free_page(tdr_page);
+> -	kvm_tdx->td.tdr_page = 0;
+> +	kvm_tdx->td.tdr_page = NULL;
 >   
+>   free_hkid:
+>   	tdx_hkid_free(kvm_tdx);
+> @@ -3016,7 +3016,7 @@ free_tdcx:
+>   free_tdvpr:
+>   	if (tdx->vp.tdvpr_page)
+>   		__free_page(tdx->vp.tdvpr_page);
+> -	tdx->vp.tdvpr_page = 0;
+> +	tdx->vp.tdvpr_page = NULL;
+>   	tdx->vp.tdvpr_pa = 0;
+>   
+>   	return ret;
 > _
 
 
