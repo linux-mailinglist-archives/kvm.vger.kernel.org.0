@@ -1,193 +1,83 @@
-Return-Path: <kvm+bounces-61967-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61968-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FBDCC30AC0
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 12:09:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C732C30AF5
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 12:14:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B1B318C04DA
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 11:09:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E0A764E4901
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 11:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9882E3AE6;
-	Tue,  4 Nov 2025 11:08:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B1C2E54B9;
+	Tue,  4 Nov 2025 11:13:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fOi6cERc"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="zbnfA3Re"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6682E285B
-	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 11:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741042E426A
+	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 11:13:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762254509; cv=none; b=RBAF8lEMJUqjgqT2gN/24ytvvfsTTBlQGZwDBdoH+4MnO1dR+tjXo6FaYhn5fRgbg8JI7czYKcMcPfKpkUC8pbwmeuZyMWIYMpWTr8T2QbQwKx/eQmShJ+t78X7Yqb66bHAiYxh8YBmlNV4Y+R21d8ZF5ZsVsGJMmB9PI8glMJg=
+	t=1762254832; cv=none; b=CCk1tcmAZFu9GaT2OKoS4vVzvLLCyahYDbHgQqJwJY4rBg8S7pb24kIhQtkpkqaoKaMgDPpcTvzYZ3tyJ7uxFOqKjf1uabQgVGM3KZRNihuskV20sgKoezM31dCAls3nDs5r3n0Fy/bHq5OMGtc2Q4ecLXF9v+r1xM1gdH9sbsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762254509; c=relaxed/simple;
-	bh=hGCmoKsbTJZjLqzPr2g+Pp/EUZnTi1S5B2EwX1vZ0U0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PIlxjiliTLsRLSm4oAUv1PVRFhjDbMp36RYVWHtxLcfhndQhF4mZfLegUqaLpfDaCSUG9iwJtQP678pDVAQi0CTzkI//5pKeQ+gX9GZtaG3qiDqxK79+88E2BIuCwNMxnVYSlz/rokgI30xI6yPgeiikjDvS98ioaHMig6/hz3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fOi6cERc; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-477563e531cso5001245e9.1
-        for <kvm@vger.kernel.org>; Tue, 04 Nov 2025 03:08:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762254505; x=1762859305; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=a4cH/AxQtviVkhj7n7m5X/IItvMNFrrOxnPoGxdV9l8=;
-        b=fOi6cERc3oxNKySp93N+xGtpdQTmBLUmZkeP7IiX4XXgPG6lFdOGAFIHaEADyURTxl
-         7Kxddg0lFNrsFDZkwJiMeD0PQvHm2DXbCQqsh77jpMWgqySROtYGzyz7ma3XJeoHIcsp
-         nGJbFzQqKI9fDJe70U/xBwYf9AosmwzziDmgi7uc0T1PqPjUeDZOFRNqffXEpf26Ovwp
-         G6i5Ke4VD14cYJglw3x53i+hkX352Rl3na838EnIMVB6XsYr8G21taJ6cj4XVkH7g+9b
-         tp5JOoIzjh9jXzrN9n2ox9sFzFssx6MO5EqKwCCra5puyFSmVMcKQ4XKC3hqZIaSYjk9
-         0M9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762254505; x=1762859305;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a4cH/AxQtviVkhj7n7m5X/IItvMNFrrOxnPoGxdV9l8=;
-        b=T2R+rwvH1+/tGRCoQsO22i72DW0I+qH4SWQSG+n50XKsvm6QAFNTtyprb7LSChRrKM
-         IKGqA64KSTaiiqyJwacfBArnU54R7fePTBOzVY7inJPMsAfqvvL842izpoYZc42TN3bx
-         9fdht/XEK2v3tQO94tRfziMLekLOuG/kC1EFO6HVE1OaOOA0j2F4ZgFPssBe1mk9IkCA
-         jh8Ev7cpu5l4wjJ5z0jov0lCQNQRbfG+9HOwGLsM9FonBzBL5YPED7ChoYFSDBd9yukQ
-         H0Qs6JLB0hFwmFBqkG7cZSnU4crK96TPGO09pvQoYgsP7lAfMQM/8ISesWF22ce9O+wg
-         tsIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX6TUj3ep84weGwUQKAjQ/jkF9114Jvt0SolN86cYv7EviMn5TE0NESDOI9dpGEWjIEvdY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhYb08qsoKwIn3YvO5tXhu/5nb/EOsFpwKiwKz6xI5bqEoYqQp
-	XG4WvHBK1He7py25FmSwXCZsWWvkpiCYor1zW3XLuiqMMe8EVKGJFMdPCGYKZOknB3niJ5Vq9dh
-	4AkCAWe0DssDqig==
-X-Google-Smtp-Source: AGHT+IHvMIGMZ3oRYsIKBDomkCS6KVzlMOaVYE+CMhTF6/Om+i57uqifzVXn/OYDK9jNj1kCcP7uTWSdj5qqlA==
-X-Received: from wmbg22.prod.google.com ([2002:a05:600c:a416:b0:477:14b8:19f6])
- (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1549:b0:477:e66:4077 with SMTP id 5b1f17b1804b1-4773089bd5bmr143775885e9.29.1762254504672;
- Tue, 04 Nov 2025 03:08:24 -0800 (PST)
-Date: Tue, 04 Nov 2025 11:08:23 +0000
-In-Reply-To: <aQiJAfO8wiVPko_N@kernel.org>
+	s=arc-20240116; t=1762254832; c=relaxed/simple;
+	bh=4nVBl5r6hmuhvvbq9MpULBbT9ItrCt4YCDr9efMVybE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=ZPbELS4psN+CBYIE0G2l+lfJ389s4Miv8ZIWk5TNbZbT6iISTUwiLGj5vGihIJZG7NVfnBc+xT5O3O1ESzHGAtGjcCTupCRF+mYnjdaLlxifxEeV/p2Cwv6C9f1o818nrB2UNxyqfNOCXSWR1hF33wthmDmR9wp/iqGEvyZ7DRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=zbnfA3Re; arc=none smtp.client-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=4nVBl5r6hmuhvvbq9MpULBbT9ItrCt4YCDr9efMVybE=;
+	b=zbnfA3RezbrDNkzJJdE7pwbmng3YMVGS6Q5geiHWXqZ1ZZAgTPrgHz4KoS+Dys7sTiIwETiE4
+	xIrEQ0x0B8NQ7+PNoNfBrnvPUrZXWlbVO/DkP0cZTQW2CKnXduyoyVVCdXp3EIWWfK+cpUfA5UX
+	KJyEIVb/fmy0+I0Se2WiMKU=
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4d15Q4535HzLlTr;
+	Tue,  4 Nov 2025 19:12:12 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 06F0C1A016C;
+	Tue,  4 Nov 2025 19:13:47 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 4 Nov 2025 19:13:46 +0800
+Subject: Re: [PATCH 03/33] irqchip/apple-aic: Spit out ICH_MIDR_EL2 value on
+ spurious vGIC MI
+To: Marc Zyngier <maz@kernel.org>
+CC: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<kvm@vger.kernel.org>, Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+	<suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Christoffer
+ Dall <christoffer.dall@arm.com>, Volodymyr Babchuk
+	<Volodymyr_Babchuk@epam.com>
+References: <20251103165517.2960148-1-maz@kernel.org>
+ <20251103165517.2960148-4-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <4dfdc1da-5b5f-26be-f318-4a30ab0db1cc@huawei.com>
+Date: Tue, 4 Nov 2025 19:13:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
- <20250924152214.7292-1-roypat@amazon.co.uk> <20250924152214.7292-2-roypat@amazon.co.uk>
- <DDWOP8GKHESP.2EOY2HGM9RXHU@google.com> <aQXVNuBwEIRBtOc0@kernel.org>
- <DDYZRG8A99D1.2MYZVGBKJNHJW@google.com> <aQiJAfO8wiVPko_N@kernel.org>
-X-Mailer: aerc 0.21.0
-Message-ID: <DDZV32U60137.1HE9JGMU6P1KD@google.com>
-Subject: Re: [PATCH v7 05/12] KVM: guest_memfd: Add flag to remove from direct map
-From: Brendan Jackman <jackmanb@google.com>
-To: Mike Rapoport <rppt@kernel.org>, Brendan Jackman <jackmanb@google.com>
-Cc: "Roy, Patrick" <roypat@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "joey.gouly@arm.com" <joey.gouly@arm.com>, 
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>, 
-	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@redhat.com" <david@redhat.com>, 
-	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>, 
-	"jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
-	"martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
-	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
-	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>, 
-	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
-	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>, "tabba@google.com" <tabba@google.com>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+In-Reply-To: <20251103165517.2960148-4-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-On Mon Nov 3, 2025 at 10:50 AM UTC, Mike Rapoport wrote:
-> On Mon, Nov 03, 2025 at 10:35:38AM +0000, Brendan Jackman wrote:
->> On Sat Nov 1, 2025 at 9:39 AM UTC, Mike Rapoport wrote:
->> > On Fri, Oct 31, 2025 at 05:30:12PM +0000, Brendan Jackman wrote:
->> >> On Wed Sep 24, 2025 at 3:22 PM UTC, Patrick Roy wrote:
->> >> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
->> >> > index 1d0585616aa3..73a15cade54a 100644
->> >> > --- a/include/linux/kvm_host.h
->> >> > +++ b/include/linux/kvm_host.h
->> >> > @@ -731,6 +731,12 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
->> >> >  bool kvm_arch_supports_gmem_mmap(struct kvm *kvm);
->> >> >  #endif
->> >> >  
->> >> > +#ifdef CONFIG_KVM_GUEST_MEMFD
->> >> > +#ifndef kvm_arch_gmem_supports_no_direct_map
->> >> > +#define kvm_arch_gmem_supports_no_direct_map can_set_direct_map
->> >> > +#endif
->> >> > +#endif /* CONFIG_KVM_GUEST_MEMFD */
->> >> 
->> >> The test robot seems happy so I think I'm probably mistaken here, but
->> >> AFAICS can_set_direct_map only exists when ARCH_HAS_SET_DIRECT_MAP,
->> >> which powerpc doesn't set.
->> >
->> > We have stubs returning 0 for architectures that don't have
->> > ARCH_HAS_SET_DIRECT_MAP.
->> 
->> I can't see any such stub for can_set_direct_map() specifically?
->
-> include/linux/set_memory.h:
->
-> #ifndef CONFIG_ARCH_HAS_SET_DIRECT_MAP
-> static inline int set_direct_map_invalid_noflush(struct page *page)
-> {
-> 	return 0;
-> }
-> static inline int set_direct_map_default_noflush(struct page *page)
-> {
-> 	return 0;
-> }
->
-> static inline int set_direct_map_valid_noflush(struct page *page,
-> 					       unsigned nr, bool valid)
-> {
-> 	return 0;
-> }
->
-> static inline bool kernel_page_present(struct page *page)
-> {
-> 	return true;
-> }
-> #else /* CONFIG_ARCH_HAS_SET_DIRECT_MAP */
-> /*
->  * Some architectures, e.g. ARM64 can disable direct map modifications at
->  * boot time. Let them overrive this query.
->  */
-> #ifndef can_set_direct_map
-> static inline bool can_set_direct_map(void)
-> {
-> 	return true;
-> }
-> #define can_set_direct_map can_set_direct_map
+Subject: s/ICH_MIDR_EL2/ICH_MISR_EL2/
 
-But this is for CONFIG_ARCH_HAS_DIRECT_MAP? I am reading this as a stub
-to fill in for archs that have set_direct_map_*, but don't have runtime
-disablement like arm64.
-
-Whereas my concern is archs that don't have set_direct_map_* at all,
-i.e. where we need to unconditionally fail
-GUEST_MEMFG_FLAG_NO_DIRECT_MAP.
-
-(Or would we prefer to just not define it at all on those archs? Not
-sure what the norms are there, I guess that's a question for KVM/arch
-maintainers).
-
+Thanks,
+Zenghui
 
