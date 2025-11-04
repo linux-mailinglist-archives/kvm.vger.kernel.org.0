@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-62015-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62016-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05F04C32CF5
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 20:34:28 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B234C32D0D
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 20:34:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B039D4F64B2
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 19:31:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0ECCD4F9538
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 19:32:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D933E2DF151;
-	Tue,  4 Nov 2025 19:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E24E2E8B9E;
+	Tue,  4 Nov 2025 19:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TSO5Zpvl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e4bKQDvR"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CBFE2C15AC
-	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 19:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA6D2DF138
+	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 19:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762284680; cv=none; b=qJ0KjZLbcshCe7fUo7JSznU1AV+7UO2VYB/Wsg478nClmzIZ1ap7KVeZCg0fxibaAiJu2K45KOkSXKyQ+uQbrwxHWnjmBIHFR77BgBYl6UwRb+F6bb36Dckd7zAkFk4Yv8lbrM8PGz6TCbpweNkUEHT8jc4Jcm5yZb83HoodVl8=
+	t=1762284682; cv=none; b=jdYwRoLdBMf5xJ0j99CcRYz8TweDijQI7BEZcfZxcHUIaZyi/9gx7nLZCn0nHxzLuq0aOKlL0pBQ+cRMD+Extzz22FtcvipE8NLiO1xi5FGclP5GFugGlKtAIMoTJSKV5UsFGB8INImIZls2OeMRhq+0vGhMgRraxCnZxOYF4wI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762284680; c=relaxed/simple;
-	bh=wqUNVKL8v768YOHBTWNTvZgtQ4Ct5tATq9NbNTdlpU8=;
+	s=arc-20240116; t=1762284682; c=relaxed/simple;
+	bh=kt678DbU1qxWHIB0EdWESp0hwR1eDkZu5lvd3m8VPAM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QJ2B/xhRR0tcIe2/OpNT4TrMtJTBxQHHRU9GzuHvulkupLd1nVr7P8ddMs/cAH4r/zSQzpkpapVrCTmfuEh+abVj8P3shfiiVPcWe9Jvkc/St1ahNZBb7BPUY/6fV5UtuxyQYEG+BZ+w3OLtYw9uD4DttgCOBT8S05cN7x0qny0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TSO5Zpvl; arc=none smtp.client-ip=95.215.58.186
+	 MIME-Version; b=OMEJVrLZzwPNLl9J/nf7vIcFmIlE1UIBVRLe+G+VFtxot4e2Zqu0sK6vXccjDIoN2u6pgh8DMjd+HzeEhTWSU1QF/lmgtWFG9AKiXhK4sGyFiPwvwwWa3bLsyUe9AmIJPvkYDILcQ1ZGJ0f2YdMyq8+VYNI5rPTBhjT04BHmnKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e4bKQDvR; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762284676;
+	t=1762284679;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5yeVlMAcS+nPhQGjM8V6lNyq9Vi8yJTliVlIvK4CNPY=;
-	b=TSO5ZpvlEa0Jnz4DHG5kBK8jHyWxYqLVTD5khYb6YNnAtyei0ID/rtIzELnGJhrKdTPEWh
-	JQ8C5pQZH9wDAAr4sqIHNvCUfAv9YPV4hDlOdVB2oOdc9I1UHo1LG0/LFHwa5spFeVT3WQ
-	9oPVBHAdJuxWyr3A9e8NVYq0clPFoaI=
+	bh=3L/cBhwg47T+kUAQUIyvUlpW3xHKx07/9p0yryhRDOY=;
+	b=e4bKQDvR+p/mKAV3Nfe+qHm6Dk52w4rpjOyqSGhxu8Egi1T9vp/SgSuR4P2lnm2J0IIrHw
+	KazOn7Ih8TJup/tcuYQFarywnLvOoJvwF0tkwMGcMeqiHTMFaE76JZTpY+DNy/JnJTLc0d
+	KQRIX4DXcFv7sbSqBXelorVwouY24t8=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,9 +49,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [kvm-unit-tests 2/4] x86/svm: Print SVM test names before running tests
-Date: Tue,  4 Nov 2025 19:30:14 +0000
-Message-ID: <20251104193016.3408754-3-yosry.ahmed@linux.dev>
+Subject: [kvm-unit-tests 3/4] x86/svm: Replace #UD on failure in LBRV tests with proper report()s
+Date: Tue,  4 Nov 2025 19:30:15 +0000
+Message-ID: <20251104193016.3408754-4-yosry.ahmed@linux.dev>
 In-Reply-To: <20251104193016.3408754-1-yosry.ahmed@linux.dev>
 References: <20251104193016.3408754-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -63,29 +63,48 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-When SVM tests are run, the log is a see of PASS/FAIL/SKIPs that are not
-clearly separated by test. Sometimes it's hard to attribute a failure to
-a specific test (e.g. if the same helper is reused by multiple tests).
+In LBRV tests, failures in the guest trigger a #UD and does not convey
+useful debugging info (i.e. expected and actual values of MSRs). Replace
+them with proper report() calls.
 
-Print the test name before running each test.
+Admittedly, it is unclear why the choice of #UD was made given that
+report() works fine in the guest.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- x86/svm.c | 1 +
- 1 file changed, 1 insertion(+)
+ x86/svm_tests.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/x86/svm.c b/x86/svm.c
-index 5015339ddb657..de9eb19443caa 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -407,6 +407,7 @@ int run_svm_tests(int ac, char **av, struct svm_test *svm_tests)
- 			report_skip("%s (not supported)", svm_tests[i].name);
- 			continue;
- 		}
-+		printf("SVM test: %s\n", svm_tests[i].name);
- 		if (svm_tests[i].v2 == NULL) {
- 			if (svm_tests[i].on_vcpu) {
- 				if (cpu_count() <= svm_tests[i].on_vcpu)
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 2981f459032cb..8d309860e76e5 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -3017,16 +3017,17 @@ do {											\
+ 	TEST_EXPECT_EQ((u64)to_expected, amd_get_lbr_rip(MSR_IA32_LASTBRANCHTOIP));	\
+ } while (0)
+ 
+-/*
+- * FIXME: Do something other than generate an exception to communicate failure.
+- * Debugging without expected vs. actual is an absolute nightmare.
+- */
+ #define GUEST_CHECK_LBR(from_expected, to_expected)				\
+ do {										\
+-	if ((u64)(from_expected) != amd_get_lbr_rip(MSR_IA32_LASTBRANCHFROMIP))	\
+-		asm volatile("ud2");						\
+-	if ((u64)(to_expected) != amd_get_lbr_rip(MSR_IA32_LASTBRANCHTOIP))	\
+-		asm volatile("ud2");						\
++	u64 from_ip = amd_get_lbr_rip(MSR_IA32_LASTBRANCHFROMIP);		\
++	u64 to_ip = amd_get_lbr_rip(MSR_IA32_LASTBRANCHTOIP);			\
++										\
++	report((u64)(from_expected) == from_ip,					\
++	       "Expected MSR_IA32_LASTBRANCHFROMIP: 0x%lx, found: 0x%lx",	\
++	       (u64)from_expected, from_ip);					\
++	report((u64)(to_expected) == to_ip,					\
++	       "Expected MSR_IA32_LASTBRANCHTOIP: 0x%lx, found: 0x%lx",		\
++	       (u64)to_expected, to_ip);					\
+ } while (0)
+ 
+ #define REPORT_GUEST_LBR_ERROR(vmcb)						\
 -- 
 2.51.2.1026.g39e6a42477-goog
 
