@@ -1,120 +1,107 @@
-Return-Path: <kvm+bounces-61999-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62000-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63679C326C4
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 18:48:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54263C326B3
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 18:47:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A93F34F3949
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 17:47:10 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EC6B734C7D3
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 17:47:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1363033C50B;
-	Tue,  4 Nov 2025 17:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A77133C53B;
+	Tue,  4 Nov 2025 17:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d1SN72X0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tjqh/CBy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3B23396EE
-	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 17:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42FE5267B90
+	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 17:46:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762278413; cv=none; b=UwZklk8LI02z3Su3UUngobWDQNIc4lCxzPkQKzAM85BWrd7AcrhdiKQ2Mrze3IvPynC1v164tI9iGAu/L0mbqLKfZglmwJpAbsNodHcVxqtKDv8XypeJTDcxeaxUbQHAjMMYzAQFGs1vF0p53gwnmw8tKf+b6h9Pduq/fqgL1b8=
+	t=1762278420; cv=none; b=aaSVOlrQdtBxjsDGvxh6qsLN9eJa0nUKREDC+sQSTE1o4RuSQ9IvqTWxCRR+K4mC/x5q+yOT1UzxDvbuG+uLhrYe8w2XYK9wUB3yy8aJnGj46uxqlhbNriq7gG2S0u7jfQ+gzy8J0FGGzSdk91ATs/WwNw8PACBwWVZ5DN9YNig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762278413; c=relaxed/simple;
-	bh=0yGAFsZK/ZOs1LyRJ0YrGf+aIvZ2uzN1ts2a//mG9Xo=;
+	s=arc-20240116; t=1762278420; c=relaxed/simple;
+	bh=Y4TUpuiUQw+GzqYKQyfXSEMFi9nilwF7AL4KVO8m+bI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DXJkJqVk5tRvs598yeUvu0REzAH9qAuw1iozmSRp6EtF99SBhGikP9puGaP84EoRFOWiIesZZ3Ml/3uUFDVIuwMLOCWwgbnufDE5r6cM9ydX3mfbXEPmunr9vMk/wTrWE1Sxcnez8N9RVWoXENyTwBXVhVnWwCJKmVyz0bQbq7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d1SN72X0; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=kwqPBYgrioG68TGGCkZ6k0TFr1mfXakXKCSUaw0gKfD+IuxYDKoKVx7g2cHBFGlib11J5ZvHKSn8A9aWGruEq8JeocZI/FsIEbcr3k8LuYnU+x56uWdNpWx7DMANvnX6uW1qRpi2XoPDj+/82XzzyWw1FStN/DVXNvuo1hP+qXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tjqh/CBy; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34188ba5990so1436593a91.0
-        for <kvm@vger.kernel.org>; Tue, 04 Nov 2025 09:46:51 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-29598910dd2so60343375ad.1
+        for <kvm@vger.kernel.org>; Tue, 04 Nov 2025 09:46:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762278411; x=1762883211; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762278418; x=1762883218; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wxZmu92VBNo3ZNs8uk3xtJDnVPLBURDJBhabtGLpMSc=;
-        b=d1SN72X098qIrAxlS7iEAMKakkrkl0+A3mdqtzOcOrKMcBwpJnE3VpupyLEAxHdIf3
-         r8gPjJ5eZDWhB5e6Y2XdrIazyZpyeiJhaq0s5lhIsK0Ke/ZZDm0DkJmoL3Htm2E8zQYs
-         wJxdGEMRMtFZ2/aQkCc7of84YdiFMws47fJhL12JXIkHGFV2AArpnsxHsE3jimw2Iyof
-         BVdrqMD8W5/3iU/CGR6oWph1kastrVDzSAGYfoS0GxftH1KvTaJnOAa2XBtMbSVKBW/m
-         alBiuPYKo5PjqNusMICsoFlwHc7g35iZ8XGJdSvMJqEGFq+jfy8BESjkqts+j1Osu0Gb
-         3aLQ==
+        bh=VJYfbRa1skFRmqZg0D90ANzgNEg7u5J9Wjfg+lSYibM=;
+        b=Tjqh/CBys5zal9kyhIE7+3ED50/4Vlle3o2FXX5pWYdw7XF6ZUxQ7bfYikCED3fVCM
+         avfzH5x3by6Gr+MWTcXVRx+5hL6ITpNi1GD+XydtNO6bU7aY+AGXT7syIkscJF2LOBBe
+         zN1ov5BR9nW2ET9ZVqcec4yjwO4MalMTgz5v8NR7V67YKqxCETeSQqdg7UTrMm7Y9tgu
+         PD8kAcSicdPKi2cXf5r4DpfsEEVLu5wc1wTRSOJ9BQ+lkSe+N2osTCZ4KsBzFApcZU0x
+         CkSc5QF5CHVAr68imi3FfJfrXWYmW0hK/hqw/l2fmu7o9w4y9Ju6QKIsMfjf6gQn/rTc
+         GHoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762278411; x=1762883211;
+        d=1e100.net; s=20230601; t=1762278418; x=1762883218;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wxZmu92VBNo3ZNs8uk3xtJDnVPLBURDJBhabtGLpMSc=;
-        b=VUURYaLGF0ypM4gO201UEmTIbce45xzF/AM62xketZnnfqgSQDQs2NnaP2/Dykc2b3
-         nIYs/WBjvHLqDVTpih1TOXMQPMqukjIXoMV47mBeO+S8GVlA0d9rmdpZdFbvTZR8Z6qJ
-         8MeZvjTq6W1qrYDljtdwj0wVK8a+Nm+FAjIrNi0aUVgMeAjecVDPxPY/6B1HXKkBS/di
-         cywy3wY2eWgk+nW0TqbbTasPWiCIZM4Zsxse/Zsq4Q0K9YCW5Y/x2oGLuBHbGHEtA+7X
-         +M9ieSxc76VqnSBLcBotP4og1tnszMgEs7PRiR+es1g62Oc0/AMloEv1z+ypJHWoQStc
-         PZnQ==
-X-Gm-Message-State: AOJu0Yz3RSnW5lPcI7GyqTUhVcxHeirQaQsKNZlsZcM1+UbuRA5+Vaih
-	LN5Ab5c4ZrhnpaFeZXwx0Cjk6FpZfGZDpyuawfdRjnKdRZeyGoc5gRYfNOru9+vLEY8Ldhkg+kP
-	EApyBGA==
-X-Google-Smtp-Source: AGHT+IF2w+QUzQmGm88xylznNwALcIwnLH35z1gzfSNPKSINRGs9eZiPe3VCtQNgWgpABVBw+tns4zm27Og=
-X-Received: from pjbge14.prod.google.com ([2002:a17:90b:e0e:b0:32d:dbd4:5cf3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f54d:b0:295:3ad7:9485
- with SMTP id d9443c01a7336-2962ada3a9amr6135875ad.14.1762278410993; Tue, 04
- Nov 2025 09:46:50 -0800 (PST)
-Date: Tue,  4 Nov 2025 09:45:04 -0800
-In-Reply-To: <20251104011205.3853541-1-seanjc@google.com>
+        bh=VJYfbRa1skFRmqZg0D90ANzgNEg7u5J9Wjfg+lSYibM=;
+        b=RaI7XghscWdQftqvu4WzdWcst/BzCrgmJULemyv8L9htp5sgGjgiNTjF5XJvsd3ZCo
+         z6dIGSSlokBCADaCFTizxhytJcI6b+PHkdhsDx12Ir3OQnHLaA79yIWA4rR3s2kmr5zR
+         aAtevl6ioFreY9I/KDT/PPYnonalKQoVdrfZKvjy/RFzlm30Y/bQuf+uhwaw3qIJdSX7
+         PZLwc5B1JfpXRCaA/HANhxmi988oz1nBadX20CyRP0sWE5ziZPDTbO1Wpgj8aPiyj/1g
+         vEIlPkVuCHH5n8wKlsWWHS7IOXC21VzfP80W8xAe5qswHNbfHnY7TNkywAS/iPdFTQnW
+         uREg==
+X-Gm-Message-State: AOJu0Yxux2jm1jNO2Rlm3+997wQR1dNYSEEP/9wbfBgFuaX5TNMrOlML
+	CcXzFLL2yC+Gow3hvJfFb/iSQ/N5NDlHoY5nWIz9pV7wp/Bbx5cY4p6uXLSprRmu6x8hdP6fsSW
+	KM6F0kQ==
+X-Google-Smtp-Source: AGHT+IGYxsQvFaY2hHAY1uE3tT9SUmH3z9MYA7vtfwuBlucl6eZbkeKjQCrIA5crD2sXmTLO2ZPmC1CMias=
+X-Received: from pjbpa2.prod.google.com ([2002:a17:90b:2642:b0:33b:bb95:de6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e78f:b0:295:592f:9498
+ with SMTP id d9443c01a7336-2962adb6281mr5015815ad.44.1762278418392; Tue, 04
+ Nov 2025 09:46:58 -0800 (PST)
+Date: Tue,  4 Nov 2025 09:45:06 -0800
+In-Reply-To: <20251016182148.69085-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251104011205.3853541-1-seanjc@google.com>
+References: <20251016182148.69085-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.2.1006.ga50a493c49-goog
-Message-ID: <176227766483.3932613.3439641824887004985.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: guest_memfd: Remove bindings on memslot deletion
- when gmem is dying
+Message-ID: <176227799547.3934766.1180879279941291815.b4-ty@google.com>
+Subject: Re: [PATCH v2 0/2] KVM: VMX: Handle SEAMCALL or TDCALL VM-Exits
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+2479e53d0db9b32ae2aa@syzkaller.appspotmail.com, 
-	Hillf Danton <hdanton@sina.com>
+	Kai Huang <kai.huang@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, 03 Nov 2025 17:12:05 -0800, Sean Christopherson wrote:
-> When unbinding a memslot from a guest_memfd instance, remove the bindings
-> even if the guest_memfd file is dying, i.e. even if its file refcount has
-> gone to zero.  If the memslot is freed before the file is fully released,
-> nullifying the memslot side of the binding in kvm_gmem_release() will
-> write to freed memory, as detected by syzbot+KASAN:
+On Thu, 16 Oct 2025 11:21:46 -0700, Sean Christopherson wrote:
+> Add VM-Exit handlers for SEAMCALL and TDCALL as the instructions are gated
+> only by VMXON, and so a buggy/misbehaving guest will likely be terminated
+> (because KVM bails with KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON) if the
+> guest executes SEAMCALL or TDCALL.
 > 
->   ==================================================================
->   BUG: KASAN: slab-use-after-free in kvm_gmem_release+0x176/0x440 virt/kvm/guest_memfd.c:353
->   Write of size 8 at addr ffff88807befa508 by task syz.0.17/6022
+> v2:
+>  - Apply the behavior only to VMX.  KVM can't inject #UDs for TDX, and the
+>    TDX-Module is supposed to handle SEAMCALL. [Chao]
+>  - Fix nested exit handling (inverted return). [Xiaoyao]
+>  - WARN if the TDX-Module punts a SEAMCALL exit to KVM. [Xiaoyao]
+>  - Fix typos. [Binbin]
 > 
 > [...]
 
-Applied to kvm-x86 fixes, with a tweaked comment to clarify that the bindings
-and file haven't yet been destroyed/freed (and can't be destroyed/freed
-concurrently either).
+Applied patch 1 to kvm-x86 fixes.
 
-	/*
-	 * However, if the file is _being_ closed, then the bindings need to be
-	 * removed as kvm_gmem_release() might not run until after the memslot
-	 * is freed.  Note, modifying the bindings is safe even though the file
-	 * is dying as kvm_gmem_release() nullifies slot->gmem.file under
-	 * slots_lock, and only puts its reference to KVM after destroying all
-	 * bindings.  I.e. reaching this point means kvm_gmem_release() hasn't
-	 * yet destroyed the bindings or freed the gmem_file, and can't do so
-	 * until the caller drops slots_lock.
-	 */
-
-Thanks!
-
-[1/1] KVM: guest_memfd: Remove bindings on memslot deletion when gmem is dying
-      https://github.com/kvm-x86/linux/commit/ae431059e75d
+[1/2] KVM: VMX: Inject #UD if guest tries to execute SEAMCALL or TDCALL
+      https://github.com/kvm-x86/linux/commit/9d7dfb95da2c
 
 --
 https://github.com/kvm-x86/linux/tree/next
