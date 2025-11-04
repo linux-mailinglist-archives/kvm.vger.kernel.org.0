@@ -1,150 +1,118 @@
-Return-Path: <kvm+bounces-61984-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61985-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76D9BC31D93
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 16:32:42 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A48FC32110
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 17:31:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A9EFD4ECDAB
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 15:29:42 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3C88034A39E
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 16:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6922673A5;
-	Tue,  4 Nov 2025 15:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED659333744;
+	Tue,  4 Nov 2025 16:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="komXz4R+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qMcTzQ8d"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B122472B5
-	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 15:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B6B333344B
+	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 16:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762270172; cv=none; b=jIFi84nWv8qoajr3Zm8bsMhtTEqW3JDehzD7Ej7ZID0RAP3IzaAMjvxTLD2y8ot9mmwLYR4J4W0aUVkgASa2G7FBwZ8XTRMX33bWa+89tzOUnYKuc1Sarr6d239/ffV+pLlfzZ9AYD1Gb5mqWTOYuMfqzboPmb3bSbAYI1skZnw=
+	t=1762273866; cv=none; b=qGAY5k4qiSihFjtg0WYscKwnkJZQ7qN9RVfHW0U8N6xr6Yc2GoNgN4MqHP6+EoTolUSfFzqezGrzh7ycWlXVmxaBVqI1LpaDdJca6ap4ppF1C7UaFJqcsSShhVxNSuLEK1xvCKvH96TTR5ABIiYQ401Mv2TJAgsF2rCrNmqZ85M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762270172; c=relaxed/simple;
-	bh=8GNMbexAGe1nKqMzzLVClEkNd7j6DVDRkgcdOMp8ajQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iqo3CllkY/b9Q8yWn1hIGrvfd8by2SAxn5EdMUNIqlOmjlhdd7vFefHVW8Ls32abXPZvroQw8ZFQvyvPjza4XX93r05s/4mBMJQRd8qbjFKWgn8cp50qhqmTfhM0vEgwHgWAvVAkawe1HExtdl8Hyg/lBJxpCEyBTpo/xbV29S4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=komXz4R+; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1762273866; c=relaxed/simple;
+	bh=A/yfd8jdGr+pFUR3XHiPL7+bb9IBKOGPpvRZdjY/3oU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ZPFOxSnaAE/wT/V3jEVXveuCqn5JtOtde2KhdqSuNURbO3QnRZDqqkMu7WX+49dHmGGMfutB4sIUuh5aDYKtMYDfnBhTjiRQOg81fCTdQkm9n8wADgzzEuNmcOV4yyK2SMm9B3SMwCgo4vHnHDLdgGNr+vzNWCa0zAENm7iqzdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qMcTzQ8d; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2959197b68eso195675ad.1
-        for <kvm@vger.kernel.org>; Tue, 04 Nov 2025 07:29:30 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33d75897745so13994598a91.0
+        for <kvm@vger.kernel.org>; Tue, 04 Nov 2025 08:31:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762270170; x=1762874970; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8GNMbexAGe1nKqMzzLVClEkNd7j6DVDRkgcdOMp8ajQ=;
-        b=komXz4R+41dzT/XSiGVn89xk28v1lVjn5ZUX4+R3Vry1fRFm0on3hzx47TViArkgsV
-         64igP4q74IHlHGz/e6WNOhIzO4NoXFVpzWZY5PT6xsU5aMt5urG5Tmgum3HpayNNAR7W
-         qMgE5xpOgsKWwcZiD/HiON3MyShaU7sEGd9iKE/mhwXRZZth+xK/SZMi8eNiy6M2u/JN
-         mu5mOt3DcNFAVsM5g7HUMIvWJa2e7uJ6jJGTK7/tdfqn1iuKZ03YmvQ6604ISnoZsI6F
-         EwQrKMGUNWm7ChO2CPB+o/p4InWbwf4bs/Ew38x9e09dHaSp+1R2iw0gthCKjcs7qe3Y
-         ZcNQ==
+        d=google.com; s=20230601; t=1762273864; x=1762878664; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=U/Sb6f6VhAgw9tNbhfts2Rrb10ZloGtd+JKJI3B0aR8=;
+        b=qMcTzQ8dbQOOoGx89ivQdY/FRhF8jCiXIk82bAKmg1SOwv9RFV3iX3MJJ6jhlYGJyL
+         k+Y6Mfur1Z8gaAB6Vcr95T+iXKrfZDxLFeRtL+XOU+LFnMawfFrJ7i0hAT7M9W6RXIXL
+         bxPDtKNsskkBfltuEze49wEJGjiUbVsVv3Trq4dck92aLrOAIiblEGPWUoArn99K/9Mp
+         TpNf4PC+skflc85HxG/EU1yM/6O95z5yy51cY6NUlzSe+bsZXJpaZn97wwdYICjI2qoY
+         O1nelEq93b0npTKpFWp2FTBxp1pXTEM3pdXmRrLo/qNSi9ke8F2aEy7Xn9J691woklit
+         741A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762270170; x=1762874970;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8GNMbexAGe1nKqMzzLVClEkNd7j6DVDRkgcdOMp8ajQ=;
-        b=fV3R3sH4IZw7l2qMZqnJ1eZROF5y8Hh8NtM9KkV03SuVpwG1OWAOdQUSCz2VuAp5Q5
-         Yeh5EYoa5CtSDDjqiXts5XJyhmUWmFPiv/C+D8yGY6PZIWLK0s1K7+S+zxwIpHnk38Fo
-         uqap/3PkIwYzinO4BtVSk19+/SLx/fIW0KI+T+/1kY6f44L3Tf1GtvJTpjI4g0v8N55x
-         mHIJM0lXNDAEkbGPmhGB2fJorsnt7EzRWB6YYI2cJoe/7thSyDRhcD3cds73Jw3OfLOg
-         IfnTuyxbThT9Tw8JpZMmvDgVNo58GM+ckOMKzm2oPeSZqoJb74U0lXLvHGXneJe2VqJc
-         mxjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0WUTk3zMqJGLZZtBEuUf8cFMjvur4qBec0V/T1J1+x2IGYA3iEEhqHBTHHjDnL/lEjXA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJbi8EMA1/75qXNSb0lgY06+1felVLU4kbbrNlszfMEef1qeXf
-	QMwgWAdV06nWHfjYFVA/Y2nqEK/zWAMfc+j7uKMLy7WwlX5ezFMXO3zIX2gzL9mextw7ersiPFr
-	18kuCAPGRpFwBwqFNwKh8xkHW36gOj2pvN4xY0jiD
-X-Gm-Gg: ASbGncuCdMvEt5a5BsPr7jmg1DSmv/bTOHv6YCFON5LdNQsE3TMu4xxALh7kfiTyIhf
-	cDwR1VSzrF09MuPDpjq4/FiPGZyA1XxEd/NbGnUHKBX/LD+LZrPvGFXyPNvznjvJpm76Bbwho2L
-	1iCYvbMPFOfVHVR1HhuA0MkAdarjjUwfnO7KhKsfuTecJZk7d4yJxE61hHFZjp91ATIVPTuaKoX
-	0uuTNNiHilLfwyCn1lRTn2NJjAHiWuB8LM6NnpGYO+tJSOYUjgFXgxr7/bVn6u4Cr7S4EM2h8+T
-	uPDrUq8z+0es0xkkYQ==
-X-Google-Smtp-Source: AGHT+IH4UAJnle8ScuJWqynVoBOWdaJhxSn6rAs6bqvidoqyAcb3/mjW+zeWXvxPSrbgnMnIJK48J8HHgBswCtIjjHM=
-X-Received: by 2002:a17:902:c412:b0:294:d42c:ca0f with SMTP id
- d9443c01a7336-295fd276d54mr4970305ad.2.1762270169379; Tue, 04 Nov 2025
- 07:29:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762273864; x=1762878664;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U/Sb6f6VhAgw9tNbhfts2Rrb10ZloGtd+JKJI3B0aR8=;
+        b=sAb2FNue58LAKwRUpAjayb2f39v5K/w3QmjZf7NWXCX0sAgKaKYWNId/IrInvVMWrA
+         nAu1QzrzzvxriZbHjNgrdPESLOmvlE82YR/bOtHxJzaLLem8OtqfHlEElG83nB3bU/lH
+         FOunNiCaiS4oYj9zG0HUvS403atOqtNCWAz8/ZYICp3w0RqxVwZzxNe4woj4o22G7iFk
+         WAOTq31KusOqd5M7IaT3f2mChZ3LOO2AXrf7PWEKzqXmsLuZkTf1CNYxTBxRNPtmIPXd
+         c18yk3D4+SVWJNQcp6QyGIxTI7IKRPO2FxgROUCXENHQrBV5emXorYJDJg0mb+Tsq+wX
+         pxFA==
+X-Forwarded-Encrypted: i=1; AJvYcCXc6yrHWNX5P88GX7pA6QeJTw0c9xdd3lROt7car4rTKqYvTnA6CGziYO00DGcRZAWXM+Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMGCJTtWwOU92crjO3uEEtQqnjlp0Rn3aT6nUi4shI14rcGt1O
+	voLdxxPAjOcjtT3DXw9ERzA0QzCureEWfFv+sLZ/NnFKLLfbFkME2Qn2p6IacN2tWfUHZLCLZqe
+	Rrm5Hrg==
+X-Google-Smtp-Source: AGHT+IEdQIr4M4XGWf0zRZoQtdQw+taTREO4d8GsRuDyXslQHePyubkG85oVwJP7U4BBQL/hLY8JoYEzu04=
+X-Received: from pjbbt5.prod.google.com ([2002:a17:90a:f005:b0:340:bd8e:458f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:17ca:b0:340:d569:d295
+ with SMTP id 98e67ed59e1d1-340d569d470mr15274032a91.24.1762273863798; Tue, 04
+ Nov 2025 08:31:03 -0800 (PST)
+Date: Tue, 4 Nov 2025 08:31:02 -0800
+In-Reply-To: <72503421-803c-4fa8-8e28-b0c793798c7c@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1760731772.git.ackerleytng@google.com> <5a4dfc265a46959953e6c24730d22584972b1179.1760731772.git.ackerleytng@google.com>
- <aQnGJ5agTohMijj8@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aQnGJ5agTohMijj8@yzhao56-desk.sh.intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Tue, 4 Nov 2025 07:29:14 -0800
-X-Gm-Features: AWmQ_bl_ayCFfhnMsugNyyrAbP6HSGsNUxGOugUtPG7U3zm3zMrinB0nHoIiMMY
-Message-ID: <CAGtprH9cajbGWrU9PAZWNKMeKJ9DyhoV=nEYk_DnYnR8Fyapww@mail.gmail.com>
-Subject: Re: [RFC PATCH v1 11/37] KVM: guest_memfd: Add support for KVM_SET_MEMORY_ATTRIBUTES
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, cgroups@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, x86@kernel.org, 
-	akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de, 
-	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com, 
-	david@redhat.com, dmatlack@google.com, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, 
-	hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com, 
-	mail@maciej.szmigiero.name, maobibo@loongson.cn, 
-	mathieu.desnoyers@efficios.com, maz@kernel.org, mhiramat@kernel.org, 
-	mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, mingo@redhat.com, 
-	mlevitsk@redhat.com, mpe@ellerman.id.au, muchun.song@linux.dev, 
-	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
-	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
-	peterx@redhat.com, pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, 
-	qperret@google.com, richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, 
-	rientjes@google.com, rostedt@goodmis.org, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shakeel.butt@linux.dev, shuah@kernel.org, 
-	steven.price@arm.com, steven.sistare@oracle.com, suzuki.poulose@arm.com, 
-	tabba@google.com, tglx@linutronix.de, thomas.lendacky@amd.com, vbabka@suse.cz, 
-	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
-	will@kernel.org, willy@infradead.org, wyihan@google.com, xiaoyao.li@intel.com, 
-	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20251103234435.0850400B@davehans-spike.ostc.intel.com>
+ <20251103234437.A0532420@davehans-spike.ostc.intel.com> <72503421-803c-4fa8-8e28-b0c793798c7c@intel.com>
+Message-ID: <aQoqRqb-vN5GxT-x@google.com>
+Subject: Re: [v2][PATCH 1/2] x86/virt/tdx: Remove __user annotation from
+ kernel pointer
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org, 
+	Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	"Kirill A. Shutemov" <kas@kernel.org>, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Nov 4, 2025 at 1:27=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> wrot=
-e:
->
-> On Fri, Oct 17, 2025 at 01:11:52PM -0700, Ackerley Tng wrote:
-> > For shared to private conversions, if refcounts on any of the folios
-> > within the range are elevated, fail the conversion with -EAGAIN.
-> >
-> > At the point of shared to private conversion, all folios in range are
-> > also unmapped. The filemap_invalidate_lock() is held, so no faulting
-> > can occur. Hence, from that point on, only transient refcounts can be
-> > taken on the folios associated with that guest_memfd.
-> >
-> > Hence, it is safe to do the conversion from shared to private.
-> >
-> > After conversion is complete, refcounts may become elevated, but that
-> > is fine since users of transient refcounts don't actually access
-> > memory.
-> >
-> > For private to shared conversions, there are no refcount checks. any
-> > transient refcounts are expected to drop their refcounts soon. The
-> > conversion process will spin waiting for these transient refcounts to
-> > go away.
-> Where's the code to spin?
+On Tue, Nov 04, 2025, Xiaoyao Li wrote:
+> On 11/4/2025 7:44 AM, Dave Hansen wrote:
+> > 
+> > From: Dave Hansen <dave.hansen@linux.intel.com>
+> > 
+> > Separate __user pointer variable declaration from kernel one.
+> > 
+> > There are two 'kvm_cpuid2' pointers involved here. There's an "input"
+> > side: 'td_cpuid' which is a normal kernel pointer and an 'output'
+> > side. The output here is userspace and there is an attempt at properly
+> > annotating the variable with __user:
+> > 
+> > 	struct kvm_cpuid2 __user *output, *td_cpuid;
+> > 
+> > But, alas, this is wrong. The __user in the definition applies to both
+> > 'output' and 'td_cpuid'. Sparse notices the address space mismatch and
+> > will complain about it.
+> > 
+> > Fix it up by completely separating the two definitions so that it is
+> > obviously correct without even having to know what the C syntax rules
+> > even are.
+> > 
+> > Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+> > Fixes: 488808e682e7 ("KVM: x86: Introduce KVM_TDX_GET_CPUID")
+> > Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> 
+> the prefix of the shortlog is still "x86/virt/tdx". I think Sean will change
+> it to "KVM: TDX:", if it gets routed through KVM tree.
 
-When dealing with 4k pages, I think we don't need to spin waiting for
-transient refcounts to drop, that logic will be needed when dealing
-with huge folios in order to restructure them while handling
-conversion. So the specific part can be safely dropped from the commit
-message.
+Ya, I'll fixup when applying.
 
