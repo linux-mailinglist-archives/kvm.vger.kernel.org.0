@@ -1,123 +1,150 @@
-Return-Path: <kvm+bounces-61983-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-61984-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8F62C31A00
-	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 15:51:52 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76D9BC31D93
+	for <lists+kvm@lfdr.de>; Tue, 04 Nov 2025 16:32:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21E651896854
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 14:47:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A9EFD4ECDAB
+	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 15:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF80330B37;
-	Tue,  4 Nov 2025 14:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6922673A5;
+	Tue,  4 Nov 2025 15:29:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BR6iMq/o"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="komXz4R+"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A12E33030C;
-	Tue,  4 Nov 2025 14:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B122472B5
+	for <kvm@vger.kernel.org>; Tue,  4 Nov 2025 15:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762267614; cv=none; b=dLuhmDqYwYEt0ni9OBrfFmwUCqXuHr0B7xIbaISvmYAckvxfvs2wg2//AHjT+hdlNjO/cGI8x/Sha7aTk7ZbYEarmkfqc59sWScyCjEgwG823ivCDOM/bQeqWcFFp4yj9LMWTJ6MYwaFY7zCoCeIzUWlfn+b2C3dUSR2kDP1Ktc=
+	t=1762270172; cv=none; b=jIFi84nWv8qoajr3Zm8bsMhtTEqW3JDehzD7Ej7ZID0RAP3IzaAMjvxTLD2y8ot9mmwLYR4J4W0aUVkgASa2G7FBwZ8XTRMX33bWa+89tzOUnYKuc1Sarr6d239/ffV+pLlfzZ9AYD1Gb5mqWTOYuMfqzboPmb3bSbAYI1skZnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762267614; c=relaxed/simple;
-	bh=p5hPIDaRZCzt92kFfvg6R3vu6oORTHx9zKqVYsgt6JI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JCfXGKVBPE5WvG6+pBCmxM3/PllHuUDJkPd3EpeXa1Z7GL59SpoeQb56CQJD+BPghjEsFHMLbzaN7Raaf2hQTtu77ukg0gggWpxLW6ssC4wvLNYf1jdakH18gTHRijhiQDj1C+PaNnP5kJsOEzl3WYWjPJtonA+ULppBLrHTLQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BR6iMq/o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB10EC4CEF7;
-	Tue,  4 Nov 2025 14:46:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762267614;
-	bh=p5hPIDaRZCzt92kFfvg6R3vu6oORTHx9zKqVYsgt6JI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BR6iMq/oPyikLtPw6az2lrms+Ge4xlCbIe4fTtTyY4tHC2n45aUuCaBWJvcHF/A2p
-	 KG+L13PEc2RsLTe2Mk23kete59d+Q1weoVYh9oZ41Lcj9tYM2y+3AgeUK0+VINu39M
-	 +JpI0LM2k4BtTsZKgmnBxnJEAXybPeg27TbBNKLF9yugOPhB0NVxSo6HVchUeXfVAF
-	 qRNmKshZFjj0DiPJkSKfZkszZJmfsbrYupU4l4zs45YfAOANDcda1F7Ts/8j3ypxQY
-	 +7Cw7rjtPK5Q40NkqYq8PGtP20CMcQreJOx9l0FiifHdkN4FehAdO4R06gT/JgzvpB
-	 p/l0PIqbrDxMw==
-Date: Tue, 4 Nov 2025 09:46:51 -0500
-From: Sasha Levin <sashal@kernel.org>
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: "patches@lists.linux.dev" <patches@lists.linux.dev>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"alexandre.f.demers@gmail.com" <alexandre.f.demers@gmail.com>,
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"mingo@kernel.org" <mingo@kernel.org>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-	"kas@kernel.org" <kas@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
-	"coxu@redhat.com" <coxu@redhat.com>,
-	"Chen, Farrah" <farrah.chen@intel.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>,
-	"x86@kernel.org" <x86@kernel.org>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	"peterz@infradead.org" <peterz@infradead.org>
-Subject: Re: [PATCH AUTOSEL 6.17] x86/kexec: Disable kexec/kdump on platforms
- with TDX partial write erratum
-Message-ID: <aQoR27GYadapWwhy@laps>
-References: <20251025160905.3857885-1-sashal@kernel.org>
- <20251025160905.3857885-288-sashal@kernel.org>
- <834a33d34c5c3bf659c94cefc374b0b7a52ee1a6.camel@intel.com>
- <e15710b10ff4a5ddb62b4c2124700b1ab1c6763d.camel@intel.com>
+	s=arc-20240116; t=1762270172; c=relaxed/simple;
+	bh=8GNMbexAGe1nKqMzzLVClEkNd7j6DVDRkgcdOMp8ajQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iqo3CllkY/b9Q8yWn1hIGrvfd8by2SAxn5EdMUNIqlOmjlhdd7vFefHVW8Ls32abXPZvroQw8ZFQvyvPjza4XX93r05s/4mBMJQRd8qbjFKWgn8cp50qhqmTfhM0vEgwHgWAvVAkawe1HExtdl8Hyg/lBJxpCEyBTpo/xbV29S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=komXz4R+; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2959197b68eso195675ad.1
+        for <kvm@vger.kernel.org>; Tue, 04 Nov 2025 07:29:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762270170; x=1762874970; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8GNMbexAGe1nKqMzzLVClEkNd7j6DVDRkgcdOMp8ajQ=;
+        b=komXz4R+41dzT/XSiGVn89xk28v1lVjn5ZUX4+R3Vry1fRFm0on3hzx47TViArkgsV
+         64igP4q74IHlHGz/e6WNOhIzO4NoXFVpzWZY5PT6xsU5aMt5urG5Tmgum3HpayNNAR7W
+         qMgE5xpOgsKWwcZiD/HiON3MyShaU7sEGd9iKE/mhwXRZZth+xK/SZMi8eNiy6M2u/JN
+         mu5mOt3DcNFAVsM5g7HUMIvWJa2e7uJ6jJGTK7/tdfqn1iuKZ03YmvQ6604ISnoZsI6F
+         EwQrKMGUNWm7ChO2CPB+o/p4InWbwf4bs/Ew38x9e09dHaSp+1R2iw0gthCKjcs7qe3Y
+         ZcNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762270170; x=1762874970;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8GNMbexAGe1nKqMzzLVClEkNd7j6DVDRkgcdOMp8ajQ=;
+        b=fV3R3sH4IZw7l2qMZqnJ1eZROF5y8Hh8NtM9KkV03SuVpwG1OWAOdQUSCz2VuAp5Q5
+         Yeh5EYoa5CtSDDjqiXts5XJyhmUWmFPiv/C+D8yGY6PZIWLK0s1K7+S+zxwIpHnk38Fo
+         uqap/3PkIwYzinO4BtVSk19+/SLx/fIW0KI+T+/1kY6f44L3Tf1GtvJTpjI4g0v8N55x
+         mHIJM0lXNDAEkbGPmhGB2fJorsnt7EzRWB6YYI2cJoe/7thSyDRhcD3cds73Jw3OfLOg
+         IfnTuyxbThT9Tw8JpZMmvDgVNo58GM+ckOMKzm2oPeSZqoJb74U0lXLvHGXneJe2VqJc
+         mxjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0WUTk3zMqJGLZZtBEuUf8cFMjvur4qBec0V/T1J1+x2IGYA3iEEhqHBTHHjDnL/lEjXA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJbi8EMA1/75qXNSb0lgY06+1felVLU4kbbrNlszfMEef1qeXf
+	QMwgWAdV06nWHfjYFVA/Y2nqEK/zWAMfc+j7uKMLy7WwlX5ezFMXO3zIX2gzL9mextw7ersiPFr
+	18kuCAPGRpFwBwqFNwKh8xkHW36gOj2pvN4xY0jiD
+X-Gm-Gg: ASbGncuCdMvEt5a5BsPr7jmg1DSmv/bTOHv6YCFON5LdNQsE3TMu4xxALh7kfiTyIhf
+	cDwR1VSzrF09MuPDpjq4/FiPGZyA1XxEd/NbGnUHKBX/LD+LZrPvGFXyPNvznjvJpm76Bbwho2L
+	1iCYvbMPFOfVHVR1HhuA0MkAdarjjUwfnO7KhKsfuTecJZk7d4yJxE61hHFZjp91ATIVPTuaKoX
+	0uuTNNiHilLfwyCn1lRTn2NJjAHiWuB8LM6NnpGYO+tJSOYUjgFXgxr7/bVn6u4Cr7S4EM2h8+T
+	uPDrUq8z+0es0xkkYQ==
+X-Google-Smtp-Source: AGHT+IH4UAJnle8ScuJWqynVoBOWdaJhxSn6rAs6bqvidoqyAcb3/mjW+zeWXvxPSrbgnMnIJK48J8HHgBswCtIjjHM=
+X-Received: by 2002:a17:902:c412:b0:294:d42c:ca0f with SMTP id
+ d9443c01a7336-295fd276d54mr4970305ad.2.1762270169379; Tue, 04 Nov 2025
+ 07:29:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e15710b10ff4a5ddb62b4c2124700b1ab1c6763d.camel@intel.com>
+References: <cover.1760731772.git.ackerleytng@google.com> <5a4dfc265a46959953e6c24730d22584972b1179.1760731772.git.ackerleytng@google.com>
+ <aQnGJ5agTohMijj8@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aQnGJ5agTohMijj8@yzhao56-desk.sh.intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Tue, 4 Nov 2025 07:29:14 -0800
+X-Gm-Features: AWmQ_bl_ayCFfhnMsugNyyrAbP6HSGsNUxGOugUtPG7U3zm3zMrinB0nHoIiMMY
+Message-ID: <CAGtprH9cajbGWrU9PAZWNKMeKJ9DyhoV=nEYk_DnYnR8Fyapww@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 11/37] KVM: guest_memfd: Add support for KVM_SET_MEMORY_ATTRIBUTES
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, cgroups@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, x86@kernel.org, 
+	akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de, 
+	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com, 
+	david@redhat.com, dmatlack@google.com, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, 
+	hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com, 
+	mail@maciej.szmigiero.name, maobibo@loongson.cn, 
+	mathieu.desnoyers@efficios.com, maz@kernel.org, mhiramat@kernel.org, 
+	mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, mingo@redhat.com, 
+	mlevitsk@redhat.com, mpe@ellerman.id.au, muchun.song@linux.dev, 
+	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
+	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	peterx@redhat.com, pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, 
+	qperret@google.com, richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, 
+	rientjes@google.com, rostedt@goodmis.org, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shakeel.butt@linux.dev, shuah@kernel.org, 
+	steven.price@arm.com, steven.sistare@oracle.com, suzuki.poulose@arm.com, 
+	tabba@google.com, tglx@linutronix.de, thomas.lendacky@amd.com, vbabka@suse.cz, 
+	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
+	will@kernel.org, willy@infradead.org, wyihan@google.com, xiaoyao.li@intel.com, 
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 03, 2025 at 09:26:38AM +0000, Huang, Kai wrote:
->On Sun, 2025-10-26 at 22:24 +0000, Huang, Kai wrote:
->> On Sat, 2025-10-25 at 11:58 -0400, Sasha Levin wrote:
->> > From: Kai Huang <kai.huang@intel.com>
->> >
->> > [ Upstream commit b18651f70ce0e45d52b9e66d9065b831b3f30784 ]
->> >
->> >
->>
->> [...]
->>
->> > ---
->> >
->> > LLM Generated explanations, may be completely bogus:
->> >
->> > YES
->> >
->> > **Why This Fix Matters**
->> > - Prevents machine checks during kexec/kdump on early TDX-capable
->> >   platforms with the “partial write to TDX private memory” erratum.
->> >   Without this, the new kernel may hit an MCE after the old kernel
->> >   jumps, which is a hard failure affecting users.
->>
->> Hi,
->>
->> I don't think we should backport this for 6.17 stable.  Kexec/kdump and
->> TDX are mutually exclusive in Kconfig in 6.17, therefore it's not possible
->> for TDX to impact kexec/kdump.
->>
->> This patch is part of the series which enables kexec/kdump together with
->> TDX in Kconfig (which landed in 6.18) and should not be backported alone.
+On Tue, Nov 4, 2025 at 1:27=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> wrot=
+e:
 >
->Hi Sasha,
->
->Just a reminder that this patch should be dropped from stable kernel too
->(just in case you missed, since I didn't get any further notice).
+> On Fri, Oct 17, 2025 at 01:11:52PM -0700, Ackerley Tng wrote:
+> > For shared to private conversions, if refcounts on any of the folios
+> > within the range are elevated, fail the conversion with -EAGAIN.
+> >
+> > At the point of shared to private conversion, all folios in range are
+> > also unmapped. The filemap_invalidate_lock() is held, so no faulting
+> > can occur. Hence, from that point on, only transient refcounts can be
+> > taken on the folios associated with that guest_memfd.
+> >
+> > Hence, it is safe to do the conversion from shared to private.
+> >
+> > After conversion is complete, refcounts may become elevated, but that
+> > is fine since users of transient refcounts don't actually access
+> > memory.
+> >
+> > For private to shared conversions, there are no refcount checks. any
+> > transient refcounts are expected to drop their refcounts soon. The
+> > conversion process will spin waiting for these transient refcounts to
+> > go away.
+> Where's the code to spin?
 
-Now dropped, thanks!
-
--- 
-Thanks,
-Sasha
+When dealing with 4k pages, I think we don't need to spin waiting for
+transient refcounts to drop, that logic will be needed when dealing
+with huge folios in order to restructure them while handling
+conversion. So the specific part can be safely dropped from the commit
+message.
 
