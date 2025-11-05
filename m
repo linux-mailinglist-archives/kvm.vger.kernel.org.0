@@ -1,141 +1,185 @@
-Return-Path: <kvm+bounces-62118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62119-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D179DC37C1F
-	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 21:38:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0040C37C88
+	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 21:48:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E574A18C6FDD
-	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 20:38:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4806D18C6BA5
+	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 20:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766012DFA5A;
-	Wed,  5 Nov 2025 20:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825082D6E53;
+	Wed,  5 Nov 2025 20:48:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h9V17CSe"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="ggyPflQg";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="F9WfphXM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCC7346776
-	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 20:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9298A264630;
+	Wed,  5 Nov 2025 20:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762375060; cv=none; b=XJxG4lLImSvUGJfvHJ0f3gQD6+yKq+S+T55qAF1hJMmvjJ3aLkoOJin27sckF5P2tkxzJQBKs2nd+BldO0OBxsNVhmmQDTWguOZiVAdmJItPp7wnMSfGJk4EUliWP4mPKcdlStwqbT+3Yiz/B5DQYOwxwThftK/A8FYdOyupZvk=
+	t=1762375718; cv=none; b=UI49ocoda1SNY60zmpVGO0HEr2QJb4cjiI4lTyWou/CCgJgpDJJuVCfpqXhSeOUH8Lm3gQ+H7Y78RZpt53vf2FMu2wLYinXtbJRmaI9kGOYzddF7th7emQh4UeDwh+qMBSpF3NMdnD6JwC/utXR3UT/Xhmuf2H24DjBzfuuawHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762375060; c=relaxed/simple;
-	bh=/dIXgKrc7kWPivNtkWF/fsWtXetBOX0Nm3ORbrdX5U0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oLhy9xzYQAJP/gA5oGQJZ1dpfrrJ9pt41+sBCF/y9PrvqA/BWF+go5CuDHaunVvMv2qlGnV9PCkjq7i190uqJip3XsF3kDu3MouErNjlKDJ26cRwYlsuRAFYKJbDik1Ipk/EbxlSphIG/jy2TTSXYXZrDMCEgN4RUpmXTaQrj90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h9V17CSe; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-ba795c4d4a2so128269a12.3
-        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 12:37:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762375058; x=1762979858; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8kswFulOYsNT/YP4oovgUt/1YW5XfFHpW4akALi6SPw=;
-        b=h9V17CSeOAQn/0cWL56dA0DnNJEZR/lOKBrdsi1QF8/ADtAbqD0fJlVn/0LKpEkkhL
-         9+Q+oOF6xXWyvEiA354tAzO/bEQPs1pAwt98qtcuIw8XgzTmdmowPceSZwS+3Q64RCZA
-         /FbD9ZiNn//daZK4vOFy3kk+pPkJ/hnfQQRCT9wGiYGV+GRN5wp7X+JClEcLRMeWWuMd
-         N29n8ifTK8zJQpu97FKrh3MQ1sd3tS9N87Ze/aV4GqZZUGws6dYy4z+CH7DivtegrL3w
-         JXH52ZPL9GvF0uJ6g0L8pv6Sn/vf/J2Fsm52Vv1QQBZ8cbrHXt3TvkoFuJZJhlBXL9Ib
-         2gZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762375058; x=1762979858;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8kswFulOYsNT/YP4oovgUt/1YW5XfFHpW4akALi6SPw=;
-        b=DHWVTrKIqQHGj4Vueu6wELfmz1Es0ugBD0J1syPhYgditT2yeKYQ585KBfUP/H/+42
-         hfwPfHjN0K6G4qD8UlDCu7H0Oh/vIB1rSs9VtARxUMbzxyO1s28T1qCebF5Vv0SbrQux
-         mR9rvWShfLtiH2uenbLHA6AIohIZOkd2XngYeU/Oo7uJ7CfEjcOnpQdN7ekZ3OpTT+Sz
-         9ssx0XD9nXc7fys++5HrDTvFKYZ1RHhwEi+NWiAcfC37Qce0eg4jyVWe9ZGGwB7D3uBo
-         5Le7Dm7aplL8Yls668nqr5oB2tJV8IXUEMW0JmgED2CFnkbj2jclfRRm3lp+7ugNHNvO
-         7LRw==
-X-Forwarded-Encrypted: i=1; AJvYcCW5UvCtA0dQeMbKLCaNgNHuBgVIGyvwvDyL4jGb2osN4tFXUbDk4st/as1oKpVMc74xYfU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydkdsryPThNw0RFxsQmuJUh+zBO2Mj546fIrAcTt8RNWhG8GE2
-	C//NhbBvfB3qxSXLe0p1reN3HK4yEQgN4SweDHduesqC6jGUdRLFjPrgLnY9PYXnnN/g5cgpdM9
-	y/BFQzA==
-X-Google-Smtp-Source: AGHT+IHSoiymoUpGD1MQPckL3XwILZ8Xl2FA43nDVPbvC4+E+3NwwFFb1EKUYBPhlb2y0RUeDJZEG6dMRL8=
-X-Received: from pfbml5.prod.google.com ([2002:a05:6a00:3d85:b0:7a6:ef83:8937])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:32a2:b0:34e:d62d:9dce
- with SMTP id adf61e73a8af0-34f854eb560mr5245526637.39.1762375058468; Wed, 05
- Nov 2025 12:37:38 -0800 (PST)
-Date: Wed, 5 Nov 2025 12:37:37 -0800
-In-Reply-To: <ek624i3z4e4nwlk36h7frogzgiml47xdzzilu5zuhiyb5gk5eb@tr2a6ptojzyo>
+	s=arc-20240116; t=1762375718; c=relaxed/simple;
+	bh=XjX2Gu+czV/t+mrHM5omQPaJbXT57OwcqoDhbRZ9AEo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jH/VPG7ZKNmvsedMchGWib9T6lx/21euE9/xYM2pOGADjYHsUZNsJ9Pqvkr/k30EVBC4lZ+PrCWoGLy58Szjt694OoDeW4KXgnaTuDOMfN+4SWePuvmrAJz/wJaouKe3X+txJWHXCM+aRh7j/HABS+2sAe7U9Dc+htZlNit8aIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=ggyPflQg; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=F9WfphXM; arc=none smtp.client-ip=103.168.172.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 7DDCA140012B;
+	Wed,  5 Nov 2025 15:48:34 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Wed, 05 Nov 2025 15:48:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1762375714;
+	 x=1762462114; bh=ohNL1+6zNNmYIdt9oX7AGViWYMx2eZbUzhURanHRVqc=; b=
+	ggyPflQgHh6TLSYrPr5qAFAFzbvv/EUJGhXQZWZjIngcQ43LuqyXJoVstaFGVwyO
+	8v/2eh8QVzB66hrc9OF4ls1c0jlRa/OaC6c4hFXmdTK65pXhjKYNXNrwvDxhCzLb
+	cIhCYO+t1C3CPtuc1rIK/4NdHtSxycUflS+P/I6qOi2HtevQThAbAj23aH+VG8dV
+	btV2Od3y1OwYcnbfTx9hIi0982VRVrYeQ5bHkAg/oMeUTOZwHW1U1Gx+NkLZUFBl
+	MGaH/NWpVbGreZvA3OJ/qzkofm/LfVW066+8Im87qf8OjWvKeHPlTcBgCNuNHQ6Z
+	7Rw4zk2jH0/ZNoAK1C7bLQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762375714; x=
+	1762462114; bh=ohNL1+6zNNmYIdt9oX7AGViWYMx2eZbUzhURanHRVqc=; b=F
+	9WfphXMWcIW8a8omrOiJRS4vq2bjM0yAjPJ9s0+pgvj+pgr5niiwhnu6oSFnp6ts
+	dztx1dQOJYjnrNZST1cEDOqwE/FieKKvMJ+0x42WQztd9rkvYEiChxYrVQbQca4i
+	WjpOogdTI2VTz+mg5eFPiss4p1F+WykfHxUILSPHtMIVLfrVt8mRUD3Fk1HyAwH1
+	YMg8acFFDVdv6UE23skQpxrCas3yT0p4hXodsq8ObTOHf1OC/EyoK/ua0yRdwMy6
+	hde1ERzOPT09iH7tb/PJpbex49Xt/dmkLaZ+lXhfGpTuF++Q4xFVT950A8qRn6RE
+	/oXXTTvYOByWlWk7YRAbA==
+X-ME-Sender: <xms:IbgLaZP21oYZAefMJOmF5Mm3c7Lv5X9PhAZF1wVTxXzMhOVaG4gDwQ>
+    <xme:IbgLaVLkT4Zs-ARkdCFuq-0_ZRGqfRQScGVtd9GnT1mWtasvp7PrwPsmCp8AOteH9
+    OeCu0nEjvzTGdVZYmV7iZrUBuzsBMedOWfoU1MxHbAE42ZG39pr>
+X-ME-Received: <xmr:IbgLacgVqytAa8Jgc3CefYGptOjO4IlFqkd6YKB13ltqMVAS6QHVTnXs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeegledtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
+    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
+    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
+    hffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopeegtddpmhhouggvpehs
+    mhhtphhouhhtpdhrtghpthhtohepphhrrggrnhesghhoohhglhgvrdgtohhmpdhrtghpth
+    htohepjhhgghesnhhvihguihgrrdgtohhmpdhrtghpthhtoheprghgohhruggvvghvsehl
+    ihhnuhigrdhisghmrdgtohhmpdhrtghpthhtoheprghirhhlihgvugesghhmrghilhdrtg
+    homhdprhgtphhtthhopegrlhgvgidrfihilhhlihgrmhhsohhnsehrvgguhhgrthdrtgho
+    mhdprhgtphhtthhopegrnhhkihhtrgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepsg
+    horhhnthhrrggvghgvrheslhhinhhugidrihgsmhdrtghomhdprhgtphhtthhopegsrhgv
+    thhtrdgtrhgvvghlvgihsegrmhgurdgtohhmpdhrtghpthhtohepughrihdquggvvhgvlh
+    eslhhishhtshdrfhhrvggvuggvshhkthhophdrohhrgh
+X-ME-Proxy: <xmx:IbgLabf4MeGhfi3gNmowE7mD37sHgNH2WDwF5uz_DRckxmZNEl2TVw>
+    <xmx:IbgLac6GnpBjn1Obw1EEsjUzeywMCKsH8b3lTrDAOXZowAalTuV3Ow>
+    <xmx:IbgLachtNFumMNL4vC2n74-G33nTJUMKGlJq_2E4NSbPxZ3-5jNX4g>
+    <xmx:IbgLabH9DtlfEpWnYK7pUkApvb-syRCS2ZP9nP-8RLj2oglsb2bBzQ>
+    <xmx:IrgLaceGyGmekenMqPNiLCD9fPFtA4ot0EGM5UOvgQtmC9TptrzEqdzp>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Nov 2025 15:48:30 -0500 (EST)
+Date: Wed, 5 Nov 2025 13:48:29 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: Pranjal Shrivastava <praan@google.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ David Airlie <airlied@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Ankit Agrawal <ankita@nvidia.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Brett Creeley <brett.creeley@amd.com>, dri-devel@lists.freedesktop.org,
+ Eric Auger <eric.auger@redhat.com>, Eric Farman <farman@linux.ibm.com>,
+ Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ intel-gfx@lists.freedesktop.org,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+ Kirti Wankhede <kwankhede@nvidia.com>, linux-s390@vger.kernel.org,
+ Longfang Liu <liulongfang@huawei.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>,
+ Nikhil Agarwal <nikhil.agarwal@amd.com>,
+ Nipun Gupta <nipun.gupta@amd.com>,
+ Peter Oberparleiter <oberpar@linux.ibm.com>,
+ Halil Pasic <pasic@linux.ibm.com>, qat-linux@intel.com,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Simona Vetter <simona@ffwll.ch>,
+ Shameer Kolothum <skolothumtho@nvidia.com>,
+ Mostafa Saleh <smostafa@google.com>, Sven Schnelle <svens@linux.ibm.com>,
+ Tvrtko Ursulin <tursulin@ursulin.net>, virtualization@lists.linux.dev,
+ Vineeth Vijayan <vneethv@linux.ibm.com>,
+ Yishai Hadas <yishaih@nvidia.com>, Zhenyu Wang <zhenyuw.linux@gmail.com>,
+ Zhi Wang <zhi.wang.linux@gmail.com>, patches@lists.linux.dev
+Subject: Re: [PATCH 14/22] vfio: Require drivers to implement
+ get_region_info
+Message-ID: <20251105134829.333243dd.alex@shazbot.org>
+In-Reply-To: <aQhcOYVbY-LqOjW5@google.com>
+References: <0-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
+	<14-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
+	<aQhcOYVbY-LqOjW5@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251024192918.3191141-1-yosry.ahmed@linux.dev>
- <20251024192918.3191141-4-yosry.ahmed@linux.dev> <aQuqC6Nh4--OV0Je@google.com>
- <ek624i3z4e4nwlk36h7frogzgiml47xdzzilu5zuhiyb5gk5eb@tr2a6ptojzyo>
-Message-ID: <aQu1keKld2CT0OY5@google.com>
-Subject: Re: [PATCH 3/3] KVM: nSVM: Avoid incorrect injection of SVM_EXIT_CR0_SEL_WRITE
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 05, 2025, Yosry Ahmed wrote:
-> On Wed, Nov 05, 2025 at 11:48:27AM -0800, Sean Christopherson wrote:
-> > On Fri, Oct 24, 2025, Yosry Ahmed wrote:
-> Looks good with a minor nit:
-> 
+On Mon, 3 Nov 2025 07:39:37 +0000
+Pranjal Shrivastava <praan@google.com> wrote:
+
+> On Thu, Oct 23, 2025 at 08:09:28PM -0300, Jason Gunthorpe wrote:
+> > Remove the fallback through the ioctl callback, no drivers use this now.
 > > 
-> > 		/*
-> > 		 * Adjust the exit code accordingly if a CR other than CR0 is
-> > 		 * being written, and skip straight to the common handling as
-> > 		 * only CR0 has an additional selective intercept.
-> > 		 */
-> > 		if (info->intercept == x86_intercept_cr_write && info->modrm_reg) {
-> > 			icpt_info.exit_code += info->modrm_reg;
-> > 			break;
-> > 		}
+> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > ---
+> >  drivers/vfio/vfio_main.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
 > > 
-> > 		/*
-> > 		 * Convert the exit_code to SVM_EXIT_CR0_SEL_WRITE if L1 set
-> > 		 * INTERCEPT_SELECTIVE_CR0 but not INTERCEPT_CR0_WRITE, as the
-> > 		 * unconditional intercept has higher priority.
-> > 		 */
-> 
-> We only convert the exict_code to SVM_EXIT_CR0_SEL_WRITE if other
-> conditions are true below. So maybe "Check if the exit_code needs to be
-> converted to.."?
+> > diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> > index a390163ce706c4..f056e82ba35075 100644
+> > --- a/drivers/vfio/vfio_main.c
+> > +++ b/drivers/vfio/vfio_main.c
+> > @@ -1297,13 +1297,13 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
+> >  		break;
+> >  
+> >  	case VFIO_DEVICE_GET_REGION_INFO:
+> > -		if (!device->ops->get_region_info)
+> > -			goto ioctl_fallback;
+> > -		ret = device->ops->get_region_info(device, uptr);
+> > +		if (unlikely(!device->ops->get_region_info))
+> > +			ret = -EINVAL;  
 
-Ouch, good point.  I keep forgetting that the common code below this needs to
-check the exit_code against the intercept enables.  How about this?
+Nit, typically I would have expected a success oriented flow, ie.
 
-		/*
-		 * Convert the exit_code to SVM_EXIT_CR0_SEL_WRITE if a
-		 * selective CR0 intercept is triggered (the common logic will
-		 * treat the selective intercept as being enabled).  Note, the
-		 * unconditional intercept has higher priority, i.e. this is
-		 * only relevant if *only* the selective intercept is enabled.
-		 */
+		if (likely(device->ops->get_region_info))
+			ret = device->ops->get_region_info(device, uptr);
+		else
+			ret = -EINVAL;
+
+But it goes away in the next patch, so *shrug*.
 
 > 
-> > 		if (vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_CR0_WRITE) ||
-> > 		    !(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_SELECTIVE_CR0)))
-> > 			break;
-> > 
-> > 
-> > > -		    info->intercept == x86_intercept_clts)
-> > > +		    vmcb12_is_intercept(&svm->nested.ctl,
-> > > +					INTERCEPT_CR0_WRITE) ||
-> > > +		    !(vmcb12_is_intercept(&svm->nested.ctl,
-> > > +					  INTERCEPT_SELECTIVE_CR0)))
-> > 
-> > Let these poke out.
-> 
-> Sure. Do you prefer a new version with this + your fixup above, or will
-> you fix them up while applying?
+> Nit: Let's also add a warn/err log here highliting that the device
+> doesn't populate the get_region_info op?
 
-If you're happy with it, I'll just fixup when applying.
+Are devices required to implement regions?  If so, it'd be more
+appropriate to fail the device registration in __vfio_register_dev()
+for the missing op than wait for an ioctl.  However, here in the device
+agnostic layer of vfio, I think the answer leans more towards no, we
+could theoretically have a device with no regions.  We also want to be
+careful not to introduce a WARN_ON that's user trigger'able.  Thanks,
+
+Alex
 
