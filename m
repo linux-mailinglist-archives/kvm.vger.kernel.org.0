@@ -1,135 +1,111 @@
-Return-Path: <kvm+bounces-62104-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62105-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD72DC377AD
-	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 20:29:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61377C37873
+	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 20:44:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5B7CD34EF5C
-	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 19:29:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4402818C7AD6
+	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 19:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F3F33F360;
-	Wed,  5 Nov 2025 19:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B0A342170;
+	Wed,  5 Nov 2025 19:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VQnFthLo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HAKZpPRO"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E00E242D9D;
-	Wed,  5 Nov 2025 19:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7EE33EAF8
+	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 19:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762370990; cv=none; b=cqly1qT9/SeOjOMzKOXqjmx7DjxGW+iB+43v3yQiF1BMWMnzKQxo1BR1bj8VDtU9o2DwNQswmJCWjRM1aubKTO8vNZ2aISqLSj1SHqW1wZ8yBe1ffN9NCmzvsA0sg4oE0XrWhW7OgE7IOZDGSlV3eiIbqmC2HtPAMxN4kYgTdj8=
+	t=1762371871; cv=none; b=cUjv0T8Jpi6l5utgAGVRsRuoqBFXD4vXEuUYW6b7e3jjPVpXON/gtPx03+VSrcjnt/JmMoDmqwSrbVzTbXVaMoIEyPLDRm4nHFpDCLl5OjxW4leH11G4TlKY1ldVt9eu6GvND0lYXBBBmT1Sh3ZlCHrMvoMZE61l1n9QghQdxhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762370990; c=relaxed/simple;
-	bh=LkTG1zHXP6J3ZFzi+KMBwvboVw8ILLtSPGXHXcUZcWM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZDp1YMVPjyuELXrnKtmqRLpNHRq1emqn55g9xwwZv9Gbv79jYxIwbq8STg1IxD5vObBqeUoBq/Kp57sDIP66+ycy4FCX91ZGOn6/DKG/oAcElALCDr5/lXuMxHtq3L735x2WGqd1H29mWUgVMK1p5Yo6BRPO2Jc2zc+uJ83y0fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VQnFthLo; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 5 Nov 2025 19:29:41 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762370986;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2s6Xz6N3ffaHvjBBNrhTy35NZz3ibcESxZXNI2iVCDU=;
-	b=VQnFthLoiT+e1qXntQwDrVbiMWS/KXuxW1RoRoc+xce3OIrTF8ohXSO5O+QNjfDQcMvj8/
-	EMC9lKefT/eqZLl775vJ/otAZ8SkrvO0cQZpfZLPW5D+7+N+KNY0JLA9ckqgGVbTNhqxZ9
-	ApMfIBTw22HV19ubjlcrMameXpMAWtU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/11] KVM: nSVM: Add missing consistency check for
- event_inj
-Message-ID: <heahqrdiujkusb42hir3qbejwnc6svspt3owwtat345myquny4@5ebkzc6mt2y3>
-References: <20251104195949.3528411-1-yosry.ahmed@linux.dev>
- <20251104195949.3528411-4-yosry.ahmed@linux.dev>
- <aQub_AbP6l6BJlB2@google.com>
+	s=arc-20240116; t=1762371871; c=relaxed/simple;
+	bh=F1PLsq9xm+III7HBdcj18czd5KsIWEZ81RMxhvzVsNg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=c0zTmy7QX/5RltjNd4uHwkaMHxx7kSeeB8fY9roqlTlF94VR9Aa3E9NYGmj45VCiHHeIJ9H5dg+k4TscWXtlBknPkRhSqy3Ua3ajj+ZCKaAoZd7vOsgs+slm+7k41v376aLX4ETGAkGPw1vbSc8NudqzntSq0ZpjrVdA1R0h2Z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HAKZpPRO; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-336b646768eso248744a91.1
+        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 11:44:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762371869; x=1762976669; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K8ZK0MiZ1hzn7iH0lOR2KZ5CJE/Z492UpE0NsitI4ac=;
+        b=HAKZpPROeyWEmoNXYbZCWAf/QHh47RVnABxelKbu8ysPRNzzl7e7qGLAzW7PvS6n5K
+         7eB3jqr9d+P1H4BV37W/lh2s3kPha1D7Jw8REzCfe+h/9Ugg9CL6sxOE2joLKlwiX5uy
+         XQQr8oCzvnWf0P58S3yGP9dCyd+SiQTvz/g67TyAuvgNub0meEUM6CJocvYxTHPmYySF
+         7eyya8TlVN6nWjFNP7bdLx9FodfmquHascYSE0DkgLHfas+1VRh3TK6UzbFRbGDH394R
+         +lpMUllEBKR1/uSUGJ/cqCkP2gdLv9KRUVYMtd6i4Y88bB77h0fwMcHnf5aptZxUM/8G
+         iNcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762371869; x=1762976669;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=K8ZK0MiZ1hzn7iH0lOR2KZ5CJE/Z492UpE0NsitI4ac=;
+        b=TSO+tXsr8zB7ne2hGGMRHAAuQJkYjlhLleEuTINqeLPouxu/WclHPQjf/MtdlbuUjF
+         5TEzYLdwTKRcHCtZXTRkRQp9V9jnFgN6gy+EefaM9oZSuP+fjIafMQFdUnxgaAWIppDg
+         TK1/CUVit7vNjaTW7WI2lIxxYE0Y9/zK+BFhtsNZRK2QF7FWKK6JQrn/6VBZ5ilYatPp
+         63YK9HWFiSlm+VtvNdHRtqxO8VQPIrK1w8fe18ZY8lUKmEfnM/xn6s267SD9hSsgjDIW
+         tz+aDQalSo7LsHddHM6JS2M2nKy0rTCOszFOyjzbxoCbGgm+LYTvRSIBO61dfzFHBwa0
+         +VEg==
+X-Forwarded-Encrypted: i=1; AJvYcCUw13+LcUN3aPSULronz+1nsVbVf+d7YJab+8uT6yxTUIGFSNPZMDu+3iRtOqOortB0qqo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/a6GMhhgQtCT6ubdAODFwnEF2ovpScFU4ilQX+oIagbZ+Lx3Y
+	D0J+qNbj4JbF9/pVikFN6SjSZnLBPa/kdADqSQQTUu/txtfN3GtkNKQ++kht0cjs7Q3cr6HNjfZ
+	jmMqRHA==
+X-Google-Smtp-Source: AGHT+IGUe19WzjgS7NVl1on3cCWT7NzacMbeJ7zc1z1lSJo6Mtsb4w1JefM4Y086HcyZXcE3ju6dHq1EPBY=
+X-Received: from pjbca19.prod.google.com ([2002:a17:90a:f313:b0:340:66e4:4269])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2dc3:b0:340:f05a:3ebd
+ with SMTP id 98e67ed59e1d1-341a6dd9a30mr4900591a91.28.1762371868572; Wed, 05
+ Nov 2025 11:44:28 -0800 (PST)
+Date: Wed, 5 Nov 2025 11:44:27 -0800
+In-Reply-To: <20251024192918.3191141-3-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aQub_AbP6l6BJlB2@google.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20251024192918.3191141-1-yosry.ahmed@linux.dev> <20251024192918.3191141-3-yosry.ahmed@linux.dev>
+Message-ID: <aQupG93pUl-IYx8G@google.com>
+Subject: Re: [PATCH 2/3] KVM: nSVM: Propagate SVM_EXIT_CR0_SEL_WRITE correctly
+ for LMSW emulation
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel, 
+	Matteo Rizzo <matteorizzo@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 05, 2025 at 10:48:28AM -0800, Sean Christopherson wrote:
-> On Tue, Nov 04, 2025, Yosry Ahmed wrote:
-> > According to the APM Volume #2, 15.20 (24593—Rev. 3.42—March 2024):
-> > 
-> >   VMRUN exits with VMEXIT_INVALID error code if either:
-> >   • Reserved values of TYPE have been specified, or
-> >   • TYPE = 3 (exception) has been specified with a vector that does not
-> >     correspond to an exception (this includes vector 2, which is an NMI,
-> >     not an exception).
-> > 
-> > Add the missing consistency checks to KVM. For the second point, inject
-> > VMEXIT_INVALID if the vector is anything but the vectors defined by the
-> > APM for exceptions. Reserved vectors are also considered invalid, which
-> > matches the HW behavior.
-> 
-> Ugh.  Strictly speaking, that means KVM needs to match the capabilities of the
-> virtual CPU.  E.g. if the virtual CPU predates SEV-ES, then #VC should be reserved
-> from the guest's perspective.
-> 
-> > Vector 9 (i.e. #CSO) is considered invalid because it is reserved on modern
-> > CPUs, and according to LLMs no CPUs exist supporting SVM and producing #CSOs.
-> > 
-> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > ---
-> >  arch/x86/include/asm/svm.h |  5 +++++
-> >  arch/x86/kvm/svm/nested.c  | 33 +++++++++++++++++++++++++++++++++
-> >  2 files changed, 38 insertions(+)
-> > 
-> > diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> > index e69b6d0dedcf0..3a9441a8954f3 100644
-> > --- a/arch/x86/include/asm/svm.h
-> > +++ b/arch/x86/include/asm/svm.h
-> > @@ -633,6 +633,11 @@ static inline void __unused_size_checks(void)
-> >  #define SVM_EVTINJ_VALID (1 << 31)
-> >  #define SVM_EVTINJ_VALID_ERR (1 << 11)
-> >  
-> > +/* Only valid exceptions (and not NMIs) are allowed for SVM_EVTINJ_TYPE_EXEPT */
-> > +#define SVM_EVNTINJ_INVALID_EXEPTS (NMI_VECTOR | BIT_ULL(9) | BIT_ULL(15) | \
-> > +				    BIT_ULL(20) | GENMASK_ULL(27, 22) | \
-> > +				    BIT_ULL(31))
-> 
-> As above, hardcoding this won't work.  E.g. if a VM is migrated from a CPU where
-> vector X is reserved to a CPU where vector X is valid, then the VM will observe
-> a change in behavior. 
-> 
-> Even if we're ok being overly permissive today (e.g. by taking an erratum), this
-> will create problems in the future when one of the reserved vectors is defined,
-> at which point we'll end up changing guest-visible behavior (and will have to
-> take another erratum, or maybe define the erratum to be that KVM straight up
-> doesn't enforce this correctly?)
-> 
-> And if we do throw in the towel and don't try to enforce this, we'll still want
-> a safeguard against this becoming stale, e.g. when KVM adds support for new
-> feature XYZ that comes with a new vector.
-> 
-> Off the cuff, the best idea I have is to define the positive set of vectors
-> somewhere common with a static assert, and then invert that.  E.g. maybe something
-> shared with kvm_trace_sym_exc()?
+On Fri, Oct 24, 2025, Yosry Ahmed wrote:
+> When emulating L2 instructions, svm_check_intercept() checks whether a
+> write to CR0 should trigger a synthesized #VMEXIT with
+> SVM_EXIT_CR0_SEL_WRITE. For MOV-to-CR0, SVM_EXIT_CR0_SEL_WRITE is only
+> triggered if any bit other than CR0.MP and CR0.TS is updated. However,
+> according to the APM (24593=E2=80=94Rev.  3.42=E2=80=94March 2024, Table =
+15-7):
+>=20
+>   The LMSW instruction treats the selective CR0-write
+>   intercept as a non-selective intercept (i.e., it intercepts
+>   regardless of the value being written).
+>=20
+> Skip checking the changed bits for x86_intercept_lmsw and always inject
+> SVM_EXIT_CR0_SEL_WRITE.
+>=20
+> Fixes: cfec82cb7d31 ("KVM: SVM: Add intercept check for emulated cr acces=
+ses")
+> Cc: stable@vger.kernel
 
-Do you mean define the positive set of vectors dynamically based on the
-vCPU caps? Like a helper returning a dynamic bitmask instead of
-SVM_EVNTINJ_INVALID_EXEPTS?
-
-If we'll reuse that for kvm_trace_sym_exc() it will need more work, but
-I don't see why we need a dynamic list for kvm_trace_sym_exc().
-
-So my best guess is that I didn't really understand your suggestion :)
+Bad email (mostly in case you're using a macro for this; the next patch has=
+ the
+same typo).
 
