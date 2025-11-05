@@ -1,146 +1,141 @@
-Return-Path: <kvm+bounces-62117-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62118-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97017C37BB9
-	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 21:32:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D179DC37C1F
+	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 21:38:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A00F64E665C
-	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 20:29:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E574A18C6FDD
+	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 20:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E77347BC6;
-	Wed,  5 Nov 2025 20:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766012DFA5A;
+	Wed,  5 Nov 2025 20:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ehDPKZLj";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MDN8oeil"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h9V17CSe"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA231ACEAF
-	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 20:29:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCC7346776
+	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 20:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762374594; cv=none; b=VArXl9u65bcHceBa5KZEV861VZneeY7QX/02v1CI8FxErZqvUJhv2jB2f4Yd88Fy1RUWf9XwQNfsh9UXsKUjbMbXSUHaMLPl5ruyvz3T0d/NZjjfumV2YjnZTmKLvDmHqCsoj2pNjiPbwPHP2AAbwf2vRRpL3lhzEpZhn0Odceg=
+	t=1762375060; cv=none; b=XJxG4lLImSvUGJfvHJ0f3gQD6+yKq+S+T55qAF1hJMmvjJ3aLkoOJin27sckF5P2tkxzJQBKs2nd+BldO0OBxsNVhmmQDTWguOZiVAdmJItPp7wnMSfGJk4EUliWP4mPKcdlStwqbT+3Yiz/B5DQYOwxwThftK/A8FYdOyupZvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762374594; c=relaxed/simple;
-	bh=llzVL8WP7FtAoyI6Bw87QxdSaoX5wZyqaF/gUnGjDKs=;
-	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=sptCTBbEP1ZnB/SgihBjJgYtGKB/gRgEH3lukYCKRPGRBGW9srLuDVYZ2HDz9dXedQMmUbohucKbiMSSuvkIXKj6vk84IqzN3Kt9se3r9LCwQRSQRgmAkp3Uljjjr4GZbup7yJoamDmKuOxxX553HtyOa1krwuKsw6ohZ7wZxHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ehDPKZLj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MDN8oeil; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762374590;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=iIz6E0qujLA95o4Ov58/AudEd/Cd0xTuStKCJ4cr5ak=;
-	b=ehDPKZLjhwkZAQFn8mfKo21vxJ6h0uYQr/ATy97aT/wpyxgw2vRMQ3CQCDEyAAC48OhbUM
-	d/5LVrCSwG6D5PBC9BJhFMpCMuEe97u1iZnwnMCBNdHx16mwRMSBhKFXlF0nPx1t3EC4Nu
-	mDMy0i78BXIPLsT3bMwkOSmnLJ4pD0A=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-435-SohFl4b6PSaWhHYYRGLraQ-1; Wed, 05 Nov 2025 15:29:49 -0500
-X-MC-Unique: SohFl4b6PSaWhHYYRGLraQ-1
-X-Mimecast-MFC-AGG-ID: SohFl4b6PSaWhHYYRGLraQ_1762374589
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-88046a6850bso7869706d6.0
-        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 12:29:49 -0800 (PST)
+	s=arc-20240116; t=1762375060; c=relaxed/simple;
+	bh=/dIXgKrc7kWPivNtkWF/fsWtXetBOX0Nm3ORbrdX5U0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=oLhy9xzYQAJP/gA5oGQJZ1dpfrrJ9pt41+sBCF/y9PrvqA/BWF+go5CuDHaunVvMv2qlGnV9PCkjq7i190uqJip3XsF3kDu3MouErNjlKDJ26cRwYlsuRAFYKJbDik1Ipk/EbxlSphIG/jy2TTSXYXZrDMCEgN4RUpmXTaQrj90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h9V17CSe; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-ba795c4d4a2so128269a12.3
+        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 12:37:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762374589; x=1762979389; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:date:cc:to:from
-         :subject:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iIz6E0qujLA95o4Ov58/AudEd/Cd0xTuStKCJ4cr5ak=;
-        b=MDN8oeilLpKYp7T4AYTLrVY1ADB6OzsYvklX5ZnQRjE5pSOB8vmD9EfupxC8dhW3Tn
-         t8g6VxEkj7hN9B/bruVmBRcuw984tyf94aZkvNRYAeOhyXHwaGZbK+FeeCkHFvfUOfZc
-         pG68T5Ef+T7XjWjlPM6+d85DWRZ4T4jD8zwWkY8mYFYeAGiMJDyVID6EgrfXOICzqC2H
-         cz1E76x4P0KhQ+dSDtkPwEhCGS+hGYbISm7FvUjwoO+gdFhLagdpvKDD6NoVf6p//NoT
-         mGact3aUS6DqIiAhYeguOUX9riPiItdZyDs83hoIJ/TUaOiR9fUE7tgBDcvvm31d7Wxa
-         0PLA==
+        d=google.com; s=20230601; t=1762375058; x=1762979858; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8kswFulOYsNT/YP4oovgUt/1YW5XfFHpW4akALi6SPw=;
+        b=h9V17CSeOAQn/0cWL56dA0DnNJEZR/lOKBrdsi1QF8/ADtAbqD0fJlVn/0LKpEkkhL
+         9+Q+oOF6xXWyvEiA354tAzO/bEQPs1pAwt98qtcuIw8XgzTmdmowPceSZwS+3Q64RCZA
+         /FbD9ZiNn//daZK4vOFy3kk+pPkJ/hnfQQRCT9wGiYGV+GRN5wp7X+JClEcLRMeWWuMd
+         N29n8ifTK8zJQpu97FKrh3MQ1sd3tS9N87Ze/aV4GqZZUGws6dYy4z+CH7DivtegrL3w
+         JXH52ZPL9GvF0uJ6g0L8pv6Sn/vf/J2Fsm52Vv1QQBZ8cbrHXt3TvkoFuJZJhlBXL9Ib
+         2gZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762374589; x=1762979389;
-        h=mime-version:user-agent:content-transfer-encoding:date:cc:to:from
-         :subject:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iIz6E0qujLA95o4Ov58/AudEd/Cd0xTuStKCJ4cr5ak=;
-        b=GA/mjllH6jW294N5sLw0zwICVUw5mBpdLC0cZHUOH5RNoTQS/B/0L2KpCL88OiMbjX
-         LtXwh7sXYBMeNsf+cJzhWUTp45NIshJiQtfxSLYfTctCNoKLXNnO/xJpIy4M6SNvvkBd
-         zjquElzPKv1IXYAwh2u7XJ5mrcBMmqVAqeeSJmSs5HXCHoqpOApc662DFdplW1QxR6q0
-         WkIhSH2B9l8wHMloQBVKsSMxKmIZK1yvbNNFsbUNRnNYENKDONaCOY9S0JLQFv/bMd17
-         nWLXXMOi5bQj7RQvpAYcsG9mlv1lkxMYGQVqtn0Wr+QMl9zhY6S6F1KECHalguBgDJBy
-         9A1Q==
-X-Gm-Message-State: AOJu0YwlQ4+ztSwu5+VYjKurB4uXxSm2NhXRtCqCorPEt3j0OIczb9Rv
-	0+sEthvdiagq1/XvF0XiZVK+bTMK8OgkJXW/l60fn/gQAgUVJH5ib4kLyAcOB0kRPI7B1k6PmuR
-	wxBE0L0nKR6rK9HjTEJaSQXvi+MXNf+/sB9SmNjxBGCgdljk2oSvtAM/5kG9dRGxm+ITBjLhuPN
-	1+5HycOFEs9bHyMFmqqwfDn9L5g4EgyQ0R0wA7Mw==
-X-Gm-Gg: ASbGncv7qP5zkAFW30JHRXQSSaAwYB6EOuKllsS8DUT4R4p4djAYudrujBGdC/khOuT
-	D84SLUYiQV3GWgOTpHySkkdt/u6wHhy9SzEcYCIRBcrTaYKg0rjXrex6JvRjy1lC3INImHZoRs5
-	UjbK56Z2b6VHAeL+gMfF0R9lo0zbRdihpd4fNit+wiTb1hGiFPxMOHnT1446MqUI/T+GZZZh8D8
-	Q4Mmmos9FUexA/ZrGyR5niEkGXVZXzMl3/APzvBjPPQN9p2IdclBV7Jt8wlSCP6AMvB8PLIfndO
-	RnWlygebhil8hObYsGFi8Ihdln4FeB+RSQhf0bNP4lq4gQgbQvXPTZ66aZU1YyVNYPCdJovlKgt
-	YqDn2qMvGhFng9DQPm4KyxwRlYMvGhbTu+KwhF5mYnUlLQQ==
-X-Received: by 2002:a05:6214:c43:b0:880:58ac:be6f with SMTP id 6a1803df08f44-8807117423amr74732056d6.35.1762374588737;
-        Wed, 05 Nov 2025 12:29:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGJHALWnxulypv5MObSyEwe+zzVwHGJzCcGgDZYZ2XHhgu3+VKH/42YtWVZvSP7w7E4zN8OtQ==
-X-Received: by 2002:a05:6214:c43:b0:880:58ac:be6f with SMTP id 6a1803df08f44-8807117423amr74731516d6.35.1762374588266;
-        Wed, 05 Nov 2025 12:29:48 -0800 (PST)
-Received: from ?IPv6:2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38? ([2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-880829f4dd5sm3987896d6.45.2025.11.05.12.29.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 12:29:48 -0800 (PST)
-Message-ID: <10d3f95717b7072e30576b7e3931ea277399fdf8.camel@redhat.com>
-Subject: Question: 'pmu' kvm unit test fails when run nested with NMI
- watchdog on the host
-From: mlevitsk@redhat.com
-To: kvm@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>
-Date: Wed, 05 Nov 2025 15:29:47 -0500
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+        d=1e100.net; s=20230601; t=1762375058; x=1762979858;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8kswFulOYsNT/YP4oovgUt/1YW5XfFHpW4akALi6SPw=;
+        b=DHWVTrKIqQHGj4Vueu6wELfmz1Es0ugBD0J1syPhYgditT2yeKYQ585KBfUP/H/+42
+         hfwPfHjN0K6G4qD8UlDCu7H0Oh/vIB1rSs9VtARxUMbzxyO1s28T1qCebF5Vv0SbrQux
+         mR9rvWShfLtiH2uenbLHA6AIohIZOkd2XngYeU/Oo7uJ7CfEjcOnpQdN7ekZ3OpTT+Sz
+         9ssx0XD9nXc7fys++5HrDTvFKYZ1RHhwEi+NWiAcfC37Qce0eg4jyVWe9ZGGwB7D3uBo
+         5Le7Dm7aplL8Yls668nqr5oB2tJV8IXUEMW0JmgED2CFnkbj2jclfRRm3lp+7ugNHNvO
+         7LRw==
+X-Forwarded-Encrypted: i=1; AJvYcCW5UvCtA0dQeMbKLCaNgNHuBgVIGyvwvDyL4jGb2osN4tFXUbDk4st/as1oKpVMc74xYfU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydkdsryPThNw0RFxsQmuJUh+zBO2Mj546fIrAcTt8RNWhG8GE2
+	C//NhbBvfB3qxSXLe0p1reN3HK4yEQgN4SweDHduesqC6jGUdRLFjPrgLnY9PYXnnN/g5cgpdM9
+	y/BFQzA==
+X-Google-Smtp-Source: AGHT+IHSoiymoUpGD1MQPckL3XwILZ8Xl2FA43nDVPbvC4+E+3NwwFFb1EKUYBPhlb2y0RUeDJZEG6dMRL8=
+X-Received: from pfbml5.prod.google.com ([2002:a05:6a00:3d85:b0:7a6:ef83:8937])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:32a2:b0:34e:d62d:9dce
+ with SMTP id adf61e73a8af0-34f854eb560mr5245526637.39.1762375058468; Wed, 05
+ Nov 2025 12:37:38 -0800 (PST)
+Date: Wed, 5 Nov 2025 12:37:37 -0800
+In-Reply-To: <ek624i3z4e4nwlk36h7frogzgiml47xdzzilu5zuhiyb5gk5eb@tr2a6ptojzyo>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20251024192918.3191141-1-yosry.ahmed@linux.dev>
+ <20251024192918.3191141-4-yosry.ahmed@linux.dev> <aQuqC6Nh4--OV0Je@google.com>
+ <ek624i3z4e4nwlk36h7frogzgiml47xdzzilu5zuhiyb5gk5eb@tr2a6ptojzyo>
+Message-ID: <aQu1keKld2CT0OY5@google.com>
+Subject: Re: [PATCH 3/3] KVM: nSVM: Avoid incorrect injection of SVM_EXIT_CR0_SEL_WRITE
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel
+Content-Type: text/plain; charset="us-ascii"
 
-Hi,
+On Wed, Nov 05, 2025, Yosry Ahmed wrote:
+> On Wed, Nov 05, 2025 at 11:48:27AM -0800, Sean Christopherson wrote:
+> > On Fri, Oct 24, 2025, Yosry Ahmed wrote:
+> Looks good with a minor nit:
+> 
+> > 
+> > 		/*
+> > 		 * Adjust the exit code accordingly if a CR other than CR0 is
+> > 		 * being written, and skip straight to the common handling as
+> > 		 * only CR0 has an additional selective intercept.
+> > 		 */
+> > 		if (info->intercept == x86_intercept_cr_write && info->modrm_reg) {
+> > 			icpt_info.exit_code += info->modrm_reg;
+> > 			break;
+> > 		}
+> > 
+> > 		/*
+> > 		 * Convert the exit_code to SVM_EXIT_CR0_SEL_WRITE if L1 set
+> > 		 * INTERCEPT_SELECTIVE_CR0 but not INTERCEPT_CR0_WRITE, as the
+> > 		 * unconditional intercept has higher priority.
+> > 		 */
+> 
+> We only convert the exict_code to SVM_EXIT_CR0_SEL_WRITE if other
+> conditions are true below. So maybe "Check if the exit_code needs to be
+> converted to.."?
 
-I have a small, a bit philosophical question about the pmu kvm unit test:
+Ouch, good point.  I keep forgetting that the common code below this needs to
+check the exit_code against the intercept enables.  How about this?
 
-One of the subtests of this test, tests all GP counters at once, and it dep=
-ends on the NMI watchdog being disabled,
-because it occupies one GP counter.
+		/*
+		 * Convert the exit_code to SVM_EXIT_CR0_SEL_WRITE if a
+		 * selective CR0 intercept is triggered (the common logic will
+		 * treat the selective intercept as being enabled).  Note, the
+		 * unconditional intercept has higher priority, i.e. this is
+		 * only relevant if *only* the selective intercept is enabled.
+		 */
 
-This works fine, except when this test is run nested. In this case, assumin=
-g that the host has the NMI watchdog enabled,
-the L1 still can=E2=80=99t use all counters and has no way of working this =
-around.
+> 
+> > 		if (vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_CR0_WRITE) ||
+> > 		    !(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_SELECTIVE_CR0)))
+> > 			break;
+> > 
+> > 
+> > > -		    info->intercept == x86_intercept_clts)
+> > > +		    vmcb12_is_intercept(&svm->nested.ctl,
+> > > +					INTERCEPT_CR0_WRITE) ||
+> > > +		    !(vmcb12_is_intercept(&svm->nested.ctl,
+> > > +					  INTERCEPT_SELECTIVE_CR0)))
+> > 
+> > Let these poke out.
+> 
+> Sure. Do you prefer a new version with this + your fixup above, or will
+> you fix them up while applying?
 
-Since AFAIK the current long term direction is vPMU, which is especially de=
-signed to address those kinds of issues,
-I am not sure it is worthy to attempt to fix this at L0 level (by reducing =
-the number of counters that the guest can see for example,
-which also won=E2=80=99t always fix the issue, since there could be more pe=
-rf users on the host, and NMI watchdog can also
-get dynamically enabled and disabled).
-
-My question is: Since the test fails and since it interferes with CI, does =
-it make sense to add a workaround to the test,
-by making it use 1 counter less if run nested?=20
-
-As a bonus the test can also check the NMI watchdog state and also reduce t=
-he number of tested counters instead of being skipped,
-improving coverage.
-
-Does all this make sense? If not, what about making the =E2=80=98all_counte=
-rs=E2=80=99 testcase optional (only print a warning) in case the test is ru=
-n nested?
-
-Best regards,
-	Maxim Levitsky
-
+If you're happy with it, I'll just fixup when applying.
 
