@@ -1,197 +1,169 @@
-Return-Path: <kvm+bounces-62089-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62090-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C5FBC36F03
-	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 18:08:01 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB954C37150
+	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 18:29:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 520F76459D8
-	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 16:33:50 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 93DBE4F74FC
+	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 17:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E78334C2B;
-	Wed,  5 Nov 2025 16:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85A8225D6;
+	Wed,  5 Nov 2025 17:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2JXTurZo"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fBUZmXyf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A0214F112
-	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 16:33:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ADCF2C15B0
+	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 17:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762360422; cv=none; b=r1BLArigkUyOkT8CJNtjqKiGraXDtlty0vwejmpNIZXNMe2YANlpfi26FeW+y75KYEIHqOruhA6HkNpUTr/gLaC8VGSGxkGx6vPfaE0qku5kCLQOm6QkADLIw6CbBg7J/dVytVnyOX+7DS2YxCVhDz1CB1vH5Tze5TYIIQecWhs=
+	t=1762362952; cv=none; b=nMVImAwhMgoFhheC2GY3n8+GgKOm0UFW3fv6zZ2nWM4pA62JtyPC6hCNjh188ffgtUUb91iVW0u//jyr50wKh0xbee7bjRdUaylhpcvT2H+x/uZ16xmpkTG7EINOHUXtYLZiL4faxhv0KRy5Cx3MW309v4W7towdUw5A0ih929g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762360422; c=relaxed/simple;
-	bh=y8ahAV0PZEghI2naLgmQaNfd+dOSiqQChsbkdjIjE44=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pD0gMMZ4LvZlfsHwtOXhREgZfP0T2//efoASwz1QUR1xnNukCnqyNtbEb0xQKEISEyGTKSFKvbeEc3vqEU5JAizdUvbMk7T/g8wKCTu8zQRzMkbvK/HSuziMgWfd4qF9lSewM/VyGCZ+cVQ29FacXfKR7Cra+Sq7ficLDXF3hk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2JXTurZo; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33d75897745so406623a91.0
-        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 08:33:41 -0800 (PST)
+	s=arc-20240116; t=1762362952; c=relaxed/simple;
+	bh=eVKD3bsjyZ0uo5KJ9oROutwHux5K45xSldhubqIwOuE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pNhRatR/lmachdHH/krXw1Rj5Lv0T7sv1lCShvpwManknLGR6iR7e6QhQe065ZlL0KqkyOYMrEjptAPQSiNhiaRdJorvX+1aPfQSoM3VpUsKB0Z2UQN1PFIiEAo5wIMOXZ04SCz0R4tV8EbNY+wL8Yre8JAd+zCSphCF1kQGGjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=fBUZmXyf; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-8802b66c811so1435526d6.1
+        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 09:15:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762360420; x=1762965220; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E+7k5zidXXcD+HatMzm349R3MQaUo0m1tgnERSfVu50=;
-        b=2JXTurZoQ/1tr70rv09/BzfxoyaGkxBLmEf20pvVmOhs6OtUZI3kXqsxwQCIBcfWVU
-         VCuhmWdVuYZM8qPCP2NzywF8J2pIWqyTMEdvVpqVBhdvxyRJKiDSDAPtSYaqjg8gDERU
-         DFoa8By+4hJ3sDN5Hpne/4Ry1ymTIlYir7PHpwAAd9fjBNaG8AKJDlb08FQXBSeAkcRI
-         Y7dx0ejnSLLBZ092mvmfZPDRsQTL7k7lc5ZGWBOsk4Zb5YjDQVHLq7R9QykqWv795B1i
-         FAvJz3Wc0uQkQ3peLnnwSZX0FJV0kH2vYNOVP4vS0ZsILETmx4kYQONnHf2anhI58Nhg
-         H67A==
+        d=ziepe.ca; s=google; t=1762362950; x=1762967750; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=waenEKCMjn97yqJgR3j8p8YSw3a8sLLocbZT7haat5A=;
+        b=fBUZmXyfecAmBE4EaSf7lOvc4JxFDSMxcSK6xyOcwofdwMQFA6DJ0rUmGqP+jAcFXZ
+         ePGPzzSvttGBkBNk701xIQSiLotElDnYnuTSwb7SpKcOnbhTuPpfbJ+l3k3sPNIkvJqI
+         DImS9qbxwcysAZJVbSU9nLREyiNZiIi/eVkQkKrEJHAKsT1Mb7XHX6L0eEgCKtGcoRca
+         PFHMr7ZGixym5pQJSF776hGVIV9PBKiOh2sHLiLkHZu63VZoMIzYrCG05KiILPTmBeAb
+         QuwUqDTIvI59hHkP4v3/ao1Vt09QRsnp9xKsivRtAhu0Rm6Qe+Y0rR90RZpvrt+FdDkm
+         3gUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762360420; x=1762965220;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E+7k5zidXXcD+HatMzm349R3MQaUo0m1tgnERSfVu50=;
-        b=YTVbTtRtt43xd1SXdIGqScnkgwLm03bartyqbG1AzQnsc7b+AarJvTAxPV93dNPOh5
-         A56Qb79zb6vZZ2hsseyLKKzyfabR/ICcPxphLqLy3nTn9Oh64e51Wlv2KlSM8S2bvKrk
-         hZl2IyGlPlzOXsNTS+sHWcq4gVakP8FvsQXhjC9vqfdlff6dwDgsNTLp06E5/9iDEiY1
-         JtfmM1TIgfQG9mgiaXwBxZZLmeyY/DRbXkng4fg5++cZQwiMURUG2dtC2YvHt7532WP/
-         /sYLfBCtE0UXWan1s0u/sKTY4sz9GQ0dvQNtBpmTCQNU/oBpHXYJthOLU3+075jJb6Ms
-         7v6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXzqBNEYAvKhROb22c/EmJultMErC8vQKeu96JBPK8FIUObzw2w3BmOPRX4PrRLyqKQdbI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/LWmwJqu/7S8jeFGTHYP+1rr32DkT2+HxOxgPOoVR/znSUH+6
-	7TOZkXjqHRukifYTXk9+oJQrXquoa+bKeLbAFtRiioozKECU2CZsWU11S0riwSlrstsAAdg7B8M
-	4h3JrCw==
-X-Google-Smtp-Source: AGHT+IHCE/7TNWD+0Bce75w45cojnDuYxEm5sQEcKUCO9oij2Cy9EVkqNqDCBx82s4XyrV0dcB8Ivh4jQnQ=
-X-Received: from pjzs14.prod.google.com ([2002:a17:90b:70e:b0:33b:8aa1:75ed])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:350d:b0:33b:8ac4:1ac4
- with SMTP id 98e67ed59e1d1-341a7012c73mr4773216a91.35.1762360420430; Wed, 05
- Nov 2025 08:33:40 -0800 (PST)
-Date: Wed, 5 Nov 2025 08:33:38 -0800
-In-Reply-To: <cc6de4bfd9fbe0c7ac48b138681670d113d2475e.camel@intel.com>
+        d=1e100.net; s=20230601; t=1762362950; x=1762967750;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=waenEKCMjn97yqJgR3j8p8YSw3a8sLLocbZT7haat5A=;
+        b=ekQP3rTlXauPOlfoldhT/zaP4IvQ8iD9sy8kGHjYW20z99oVf57fqiGMrWns5+2BOo
+         SOrkOTM5gx45w7B6rsqd7OcZ+nmG2TPyC0gwqEqN0lpL4Fm1U11Co2dnpgkcM7OShp9i
+         5hrBhp5bvpMLOprKbovBJzBki4KJXkUYcSDT3d3DeacwtxhtIZm1+gDIsmV5ZzwALOtD
+         nw+nw7L7JOzNTGclId/U3sWRD8tOPxKm3ebRSc2rj8JOvqR54O9d6TYCQnlg9cIyiPmM
+         09EAz0KrqdwMzFSQVje9FCo24wH8mtk5VU1NIwVLvHI2aw8p4RqaooULAgSxIVkIBKG3
+         4yIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUzosHTEyDt2kK0caU7S1HnDu3KqP1+LZItlqCkakQmxAuyo8/SMEDa80SNhuovQD11GJk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWcipgaYJJaEHjFF1hFtTHiMo1CE5MTVHT8XpH6XbPUI53qpW4
+	gmG9l/bmHpCETOcc1jO3BmL0K6KRI3Yjhd6FRLkzKPbCxX50FWNsXEff28aqp2EvHW4=
+X-Gm-Gg: ASbGncssnQNqh9pwks6LCRjbLbN3Bjywxp+ECxbCBtHWtLfbFNeAiepQrUs3AZEKXsd
+	iis4KY24ZDyXJcnO8sxNmuFlseZ29XD9pLrILtR8fd8kpjibhQCmzq1cwixwpeg5C1AXWYtnLQc
+	DSO+a6wQ00v4Mjukbmq7HSsP7WBFRcVXC1ecgy1Mz+FkKJKsVVnDexTCoBQvfk1JsTGKtWhIl34
+	Cp7fQylnigroy1n80mGvFiN6gnXbNkTcKKS7vhoYlrP7KOf4EATbsngpLM9UM/ZumnAsuIwZf10
+	539RsQidf92qVum1JJLdGcA7oclkcc9Pgi0GP031n8h1kR9HflJLmTuFZ+r9e3ckaOoZFUfZ/KY
+	LRUS9tl88DScMETGJa3WHECFBUowIp2GIe1jKR1+/6GnIk3m4qoGK/eD2sfYoB4CHArS8RlBvOI
+	j5eKumwH2OZo21BqmteXPxXij3jQQLcpeDh11mcChgDfEMLg==
+X-Google-Smtp-Source: AGHT+IHujecuHKAp19SOjD1ziznvYD8tAwFGOLS3T8YEf0KUSZ8DObLM9JfUqnSghUiTTZ/sscfDOQ==
+X-Received: by 2002:a05:6214:2262:b0:880:4690:3bb8 with SMTP id 6a1803df08f44-880710ba284mr52063816d6.18.1762362949784;
+        Wed, 05 Nov 2025 09:15:49 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88082a3ac4fsm551996d6.57.2025.11.05.09.15.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Nov 2025 09:15:49 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vGh6p-00000007BtB-1oaJ;
+	Wed, 05 Nov 2025 13:15:47 -0400
+Date: Wed, 5 Nov 2025 13:15:47 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>
+Cc: Lucas De Marchi <lucas.demarchi@intel.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	intel-xe@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Matthew Brost <matthew.brost@intel.com>,
+	Michal Wajdeczko <michal.wajdeczko@intel.com>,
+	dri-devel@lists.freedesktop.org,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Lukasz Laguna <lukasz.laguna@intel.com>,
+	Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v3 27/28] drm/intel/pciids: Add match with VFIO override
+Message-ID: <20251105171547.GP1204670@ziepe.ca>
+References: <20251030203135.337696-1-michal.winiarski@intel.com>
+ <20251030203135.337696-28-michal.winiarski@intel.com>
+ <cj3ohepcobrqmam5upr5nc6jbvb6wuhkv4akw2lm5g3rms7foo@4snkr5sui32w>
+ <xewec63623hktutmcnmrvuuq4wsmd5nvih5ptm7ovdlcjcgii2@lruzhh5raltm>
+ <3y2rsj2r27htdisspmulaoufy74w3rs7eramz4fezwcs6j5xuh@jzjrjasasryz>
+ <20251104192714.GK1204670@ziepe.ca>
+ <r5c2d7zcz2xemyo4mlwpzwhiix7vysznp335dqzhx3zumafrs4@62tmcvj4ccao>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250918162529.640943-1-jon@nutanix.com> <aNHE0U3qxEOniXqO@google.com>
- <7F944F65-4473-440A-9A2C-235C88672E36@nutanix.com> <B116CE75-43FD-41C4-BB3A-9B0A52FFD06B@nutanix.com>
- <aPvf5Y7qjewSVCom@google.com> <EFA9296F-14F7-4D78-9B7C-1D258FF0A97A@nutanix.com>
- <aQTxoX4lB_XtZM-w@google.com> <cc6de4bfd9fbe0c7ac48b138681670d113d2475e.camel@intel.com>
-Message-ID: <aQt8Yoxea-goWrnR@google.com>
-Subject: Re: [PATCH] KVM: x86: skip userspace IOAPIC EOI exit when Directed
- EOI is enabled
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "khushit.shah@nutanix.com" <khushit.shah@nutanix.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, 
-	"bp@alien8.de" <bp@alien8.de>, Jon Kohler <jon@nutanix.com>, "hpa@zytor.com" <hpa@zytor.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mingo@redhat.com" <mingo@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <r5c2d7zcz2xemyo4mlwpzwhiix7vysznp335dqzhx3zumafrs4@62tmcvj4ccao>
 
-On Tue, Nov 04, 2025, Kai Huang wrote:
-> 
-> [...]
-> 
-> 
-> > KVM's bogus handling of Supress EOI Broad is problematic when the guest
-> > relies on interrupts being masked in the I/O APIC until well after the
-> > initial local APIC EOI.  E.g. Windows with Credential Guard enabled
-> > handles interrupts in the following order:
+On Wed, Nov 05, 2025 at 04:20:33PM +0100, Michał Winiarski wrote:
+> On Tue, Nov 04, 2025 at 03:27:14PM -0400, Jason Gunthorpe wrote:
+> > On Tue, Nov 04, 2025 at 11:41:53AM -0600, Lucas De Marchi wrote:
 > > 
-> >  the interrupt in the following order:
-> 
-> This sentence is broken and is not needed.
-> 
-> >   1. Interrupt for L2 arrives.
-> >   2. L1 APIC EOIs the interrupt.
-> >   3. L1 resumes L2 and injects the interrupt.
-> >   4. L2 EOIs after servicing.
-> >   5. L1 performs the I/O APIC EOI.
+> > > > > > +#define INTEL_VGA_VFIO_DEVICE(_id, _info) { \
+> > > > > > +	PCI_DEVICE(PCI_VENDOR_ID_INTEL, (_id)), \
+> > > > > > +	.class = PCI_BASE_CLASS_DISPLAY << 16, .class_mask = 0xff << 16, \
+> > > > > > +	.driver_data = (kernel_ulong_t)(_info), \
+> > > > > > +	.override_only = PCI_ID_F_VFIO_DRIVER_OVERRIDE, \
+> > > > > 
+> > > > > why do we need this and can't use PCI_DRIVER_OVERRIDE_DEVICE_VFIO()
+> > > > > directly? Note that there are GPUs that wouldn't match the display class
+> > > > > above.
+> > > > > 
+> > > > > 	edb660ad79ff ("drm/intel/pciids: Add match on vendor/id only")
+> > > > > 	5e0de2dfbc1b ("drm/xe/cri: Add CRI platform definition")
+> > > > > 
+> > > > > Lucas De Marchi
+> > > > > 
+> > > > 
+> > > > I'll define it on xe-vfio-pci side and use
+> > > 
+> > > but no matter where it's defined, why do you need it to match on the
+> > > class? The vid/devid should be sufficient.
 > > 
+> > +1
+> > 
+> > Jason
 > 
-> [...]
+> I don't need to match on class.
 > 
-> > @@ -1517,6 +1518,18 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
-> >  
-> >  	/* Request a KVM exit to inform the userspace IOAPIC. */
-> >  	if (irqchip_split(apic->vcpu->kvm)) {
-> > +		/*
-> > +		 * Don't exit to userspace if the guest has enabled Directed
-> > +		 * EOI, a.k.a. Suppress EOI Broadcasts, in which case the local
-> > +		 * APIC doesn't broadcast EOIs (the guest must EOI the target
-> > +		 * I/O APIC(s) directly).  Ignore the suppression if userspace
-> > +		 * has NOT disabled KVM's quirk (KVM advertised support for
-> > +		 * Suppress EOI Broadcasts without actually suppressing EOIs).
-> > +		 */
-> > +		if ((kvm_lapic_get_reg(apic, APIC_SPIV) & APIC_SPIV_DIRECTED_EOI) &&
-> > +		    apic->vcpu->kvm->arch.disable_suppress_eoi_broadcast_quirk)
-> > +			return;
-> > +
+> With PCI_DRIVER_OVERRIDE_DEVICE_VFIO it just becomes:
+> #define INTEL_PCI_VFIO_DEVICE(_id) { \
+> 	PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, (_id)) \
+> }
 > 
-> I found the name 'disable_suppress_eoi_broadcast_quick' is kinda confusing,
-> since it can be interpreted in two ways:
+> static const struct pci_device_id xe_vfio_pci_table[] = {
+> 	INTEL_PTL_IDS(INTEL_PCI_VFIO_DEVICE),
+> 	INTEL_WCL_IDS(INTEL_PCI_VFIO_DEVICE),
+> 	INTEL_BMG_IDS(INTEL_PCI_VFIO_DEVICE),
+> 	{}
+> };
 > 
->  - the quirk is 'suppress_eoi_broadcast', and this boolean is to disable
->    this quirk.
->  - the quirk is 'disable_suppress_eoi_broadcast'.
+> So, no matching on class, but I still do need a helper macro.
 
-I hear you, but all of KVM's quirks are phrased exactly like this:
+Yes, that looks right to me.
 
-  KVM_CAP_DISABLE_QUIRKS
-  KVM_CAP_DISABLE_QUIRKS2
-  KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK
-  disable_slot_zap_quirk
-
-> And in either case, the final meaning is KVM needs to "disable suppress EOI
-> broadcast" when that boolean is true, 
-
-No.  The flag says "Disable KVM's 'Suppress EOI-broadcast' Quirk", where the
-quirk is that KVM always broadcasts even when broadcasts are supposed to be
-suppressed.
-
-> which in turn means KVM actually needs to "broadcast EOI" IIUC.  But the
-> above check seems does the opposite.
-> 
-> Perhaps "ignore suppress EOI broadcast" in your previous version is better?
-
-Hmm, I wanted to specifically call out that the behavior is a quirk.  At the
-risk of being too verbose, maybe DISABLE_IGNORE_SUPPRESS_EOI_BROADCAST_QUIRK?
-
-And then to keep line lengths sane, grab "kvm" locally so that we can end up with:
-
-	/* Request a KVM exit to inform the userspace IOAPIC. */
-	if (irqchip_split(kvm)) {
-		/*
-		 * Don't exit to userspace if the guest has enabled Directed
-		 * EOI, a.k.a. Suppress EOI Broadcasts, in which case the local
-		 * APIC doesn't broadcast EOIs (the guest must EOI the target
-		 * I/O APIC(s) directly).  Ignore the suppression if userspace
-		 * has NOT disabled KVM's quirk (KVM advertised support for
-		 * Suppress EOI Broadcasts without actually suppressing EOIs).
-		 */
-		if ((kvm_lapic_get_reg(apic, APIC_SPIV) & APIC_SPIV_DIRECTED_EOI) &&
-		    kvm->arch.disable_ignore_suppress_eoi_broadcast_quirk)
-			return;
-
-> Also, IIUC the quirk only applies to userspace IOAPIC, so is it better to
-> include "split IRQCHIP" to the name?  Otherwise people may think it also
-> applies to in-kernel IOAPIC.
-
-Eh, I'd prefer to solve that through documentation and comments.  The name is
-already brutally long.
- 
-> Btw, personally I also found "directed EOI" is more understandable than
-> "suppress EOI broadcast".  How about using "directed EOI" in the code
-> instead?  E.g.,
-> 
->  s/disable_suppress_eoi_broadcast/disable_directed_eoi
->  s/KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST/KVM_X2APIC_DISABLE_DIRECTED_EOI
-> 	
-> It is shorter, and KVM is already using APIC_LVR_DIRECTED_EOI anyway.
-
-It's also wrong.  Directed EOI is the I/O APIC feature, the local APIC (CPU)
-feature is "Suppress EOI-broadcasts" or "EOI-broadcast suppression".  Conflating
-those two features is largely what led to this mess in the first place, so I'd
-strongly prefer not to bleed that confusion into KVM's uAPI.
+Jason
 
