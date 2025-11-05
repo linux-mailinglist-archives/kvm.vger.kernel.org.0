@@ -1,186 +1,193 @@
-Return-Path: <kvm+bounces-62125-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62126-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14DC9C3805A
-	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 22:29:24 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03DCBC37FEE
+	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 22:26:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E0983BAA96
-	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 21:18:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8E48B4EBB48
+	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 21:23:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3992DA774;
-	Wed,  5 Nov 2025 21:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31292DE6F9;
+	Wed,  5 Nov 2025 21:19:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VkhK4jvA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MSyNrDLD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749202BE7C2
-	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 21:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E37B2DBF4B
+	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 21:19:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762377359; cv=none; b=F0yXKt586o/Uy6hFQgYIE/sQiFyKS/yBpEotlrOWil/S5IORwlPkdL8/l84BDIUHfvwN1ggdcVrx0gDGicR5WP4/rsdQI249t3Cto/GLWPJvpLP/R0FNPD/bIz2b7ysWWnpl62wTZJ9OWDo6KxZ7UTbvwsfmfSEy3AFgLT8xqQc=
+	t=1762377567; cv=none; b=HGEUERBPWL0S0Xt886g9q62U720jNUvcrnkk0641p3g6RSH2Q64EawI2Qp32hR7slzMWnkUF5WqyZM9JAsHDiQVQkW/G5jDkhQfyHKO8WPSW6XRnCCJdjpO08PpZP+umfbU5eJTCkygOR/pWewVCGsKd/YkUm+Y7slDBr7ZCasY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762377359; c=relaxed/simple;
-	bh=f9gnacKKf2I1AkHrp5BqN18zRTjnCOrkCGu1EP+5wLU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jVR0gUS+FU7x3c6twJ1Nm83n3YfYm9/p8ULJn827MfBXcpAAO5uumPIW/iPhvYzKW/SR5yBnPKCBrkWsiQak6tkCR7E04h83TEf87UQR3CbFqIuVzoSG5UHfQhqSe+jDatzDcvsT5z0Y6drLKu/86L+ia2z1ibENb/B4SFifwXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VkhK4jvA; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3ecdf2b1751so207742f8f.0
-        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 13:15:57 -0800 (PST)
+	s=arc-20240116; t=1762377567; c=relaxed/simple;
+	bh=qCj0HkjcLlvzURF6w77QHtU0WP9/ZsapXnXVQY35VDE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uZg9VhkZpIf7pYgfwlVbOzYSTmXQ+no43AEnhwwYWi/BH/7Uhy1KIDLMXYYndjoJuVK6ZYcMgDXBdorjAKvjL+1SBf8+m0/f2Dk9S/K91+oJ/oatqq0dXs06rz9TtQfUwoHZoUa44fh8bTAoXARxiw1TZKftmhPJ8OluhL25MTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MSyNrDLD; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2959197b68eso11055ad.1
+        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 13:19:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762377356; x=1762982156; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8ppaE2LQfT94SEh9VKLVy8mNImdVN7dwxyvCopktHPk=;
-        b=VkhK4jvA99PG3acbgpmUypWPEdtb0MKnA5L0WDSKIpwQwS3xHnOn9s8Y0xdq3FiNAS
-         68cVm7oqgzT70gg+TPdHlJ1EijPf+hAt2zhvLNS7uPQOyBUoy9p2O9gGFTWL3zWsKRgH
-         57w/sLfa7P2x/2tlr5TUvpld/VD65YmWFqwwJAUngCXEQq0dO6P7fcgjn6a0Ece3tj3d
-         PbEX7jrRRObD7pZRGtsO6csWRKwEg9tdla8SWVrPXJvzOJKqmcCz80g0gxa9q2dGLkf4
-         X7NnPJtcJhOHU9k5JPEK2uyGjkHcbbSzvqz+wQFPCBkGDsyiQI6wZc/mV76QK2S3eBAB
-         7DNw==
+        d=google.com; s=20230601; t=1762377565; x=1762982365; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wsPKARLgoDbiEbqdjmx1yQIPjPrrWc4YFZC2utX6iXU=;
+        b=MSyNrDLDOzz5fvFQWFa8k4op61UU9jUNtn2NmFE0/5qxxkI1PDwmqcVfwXQ9RyAlEw
+         x/ZTGRNd9oBLWyuApaCS46A8feSLwLPNPjt6SGrCzwJbOB29y0oQA9nwXxFXGetmXDzk
+         cYRFwtkPKaYl+OOJqOM0LanNN2Cu6kwVk4x85eoWViTekWKbhd2SAYcYnqPjV4wLu3hV
+         SsdJ046YlAeEAdiVPkxs9nmzn19gH7sBhM11SnK4ejybsNOjdSKciNID3wdEaNYLvKJE
+         HObxa0DgbuhMu7iWs+H1/Nv63HgYmLn5BjqdxcV8HkQdLxekw+Ax4iSS2sySgx45dirt
+         BEqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762377356; x=1762982156;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ppaE2LQfT94SEh9VKLVy8mNImdVN7dwxyvCopktHPk=;
-        b=siWkb+ICqZYectm7FRsBT1r/x8pvZgJpGknrFM2WHHcaRkOi6asIOCg8On5nn0ZT6n
-         xSQ7QNss7WaUguVqgP5uS9qIPzD+fC9Td+gA4/U7/RGWBKwxADR7FM19ecXVmv2Nytvb
-         SmV1I11+mPL0tI+DzqniY76SbBj+kfCVJPXu4sm0MRsiLH47oY+yEAI6oaaG2bRwkuTO
-         TcRuQ3BIUYa9SCLDVxHeCSK1homSmwTgbcOUGjD/hjtdinKWpub6auuceKJA+jMHsuCA
-         tFO1enVbA5h/XX4/V+Ito+QMfpEY6WGIyymTrjC/HMAf+vfFpiQEgP17dt6ctvDtMdX8
-         DDRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9lqq08jL0OtFM87/FKEvcFtSoSMhSXruOmaS2FaUafK12s7QdcPlYBvqhehdoXAupc9U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyq3xGHwz7bv5ckJ/jm7auDHdWnyi57J/OmW+ODOOvz3WuxhjHC
-	QWyxvWTCaVRcYkuizzBjxnWOyMSdMgFMNFSZfDBr+YY+R5YeB/bd4g8b
-X-Gm-Gg: ASbGncto8VCfXfwV47mhWwGMmMnROfrArAX6Te+BqE4fNovoAifSWS6aIqv37/MbFIl
-	W1fu3ALQOoZ+LLMYECL90caNX6lrCmsRF3SkB5zzhZ07wq88P7LHn34MFmAZRethLwHaAhcsLYa
-	zX95TmrGVSVK24sv9OdjydaVYZgbZn0qFhCRLqpOUAhGEE9M2cYttRrHmA6eY7UppRZ8tf+Txvd
-	NKvdw/VQ1HEunhA14OlV9E4qqKwXvBRjmKuNovhVxBlHNGinaf8ELY8kHJV9d3ayPJK4IOSE2d/
-	VH0CYGT6V3jFGr0WwxzpdGXlVdLk7ltz7ejEI0liebLc8zC8w64eihTOLTqnVgNVQ5wC43gbTg+
-	qeoF4j8H2ZxGrRTAFiBFS6rq190lgSzjfmti0aG+EarvTODfVqEoeTqBGEXHecc2MmWVijsIQdk
-	jMK3MsxlygqJgfILMc8MhXePnwROmbyq8VN02ca/SVN06c24rQxPsly+MLlp3fLJmWqeqeer2tw
-	lZXVXjiJ3dkwBSEnLAXovV3Ysb0pk0=
-X-Google-Smtp-Source: AGHT+IHhnDU7C8JIw0mU7ueaGAVALbH7ZSUb6hbiggFXfD6/S5ypV4gK3TS5wjxW/SnnCtFGhSbz5Q==
-X-Received: by 2002:a5d:5f53:0:b0:427:4b0:b3e5 with SMTP id ffacd0b85a97d-429e330aed4mr4567372f8f.47.1762377355551;
-        Wed, 05 Nov 2025 13:15:55 -0800 (PST)
-Received: from ?IPV6:2003:d8:2f30:b00:cea9:dee:d607:41d? (p200300d82f300b00cea90deed607041d.dip0.t-ipconnect.de. [2003:d8:2f30:b00:cea9:dee:d607:41d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429eb40617asm851462f8f.10.2025.11.05.13.15.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Nov 2025 13:15:54 -0800 (PST)
-Message-ID: <563246df-cca4-4d21-bad0-7269ab5a419c@gmail.com>
-Date: Wed, 5 Nov 2025 22:15:51 +0100
+        d=1e100.net; s=20230601; t=1762377565; x=1762982365;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wsPKARLgoDbiEbqdjmx1yQIPjPrrWc4YFZC2utX6iXU=;
+        b=UMTLhPWDsLq++Z97+dSbtlzjByjVcQESUlezFscPWYajdEwxu2o7DpRpmY5bxjeKoz
+         /98/au9IBKCwyzLJfBQlM9+P7epnd+cXjM77SZ8EKT1DErIH8fJBq0/oefIyrGSuymFK
+         1WmZR+XjjVi536nfkN3JGGUUZZP+nfAbhisOzShoe797zwhvcwyY7CktKRqLSxFR6IVK
+         Sa4UsshI25wA7klYVLnileXSGFF2t/9R6O6ytX70SVYxIiG5UzoM43gh/bHaLDHy7qc+
+         1kxjgfKwgquMu3MF2ht1irB7qO5M4iUfEmcTK8kSkwwvjPOBCdEwddS8K8EMCj7WXQfK
+         1NnA==
+X-Forwarded-Encrypted: i=1; AJvYcCXJ3UdTCCJi7c1CMARLibtyXXGtH4iPTJNDF7dfkuUN6RDCwsOsFz3mdzIMM06Z4b/P7L8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx91NbjroaorWYzNdvvjP62nqtyDlxMUjUht1FTKf/iSB/mIZgz
+	HpEs1ipHL7fleya08ZTV/QV5Y5L/lGBHvFEAdtlCYNXfCZ6Qilqq9JA5j7KBEjFKKA==
+X-Gm-Gg: ASbGncvEEM72HORnUKDhrz7oZ0nzbJR0kFm+DWwPUfiSgPwPiOePFOny+cTSecXCgbn
+	4yD9sWEZ/MsFdeZcl6gcFJ8IBx0+4gc7g2uFmGh0c76LWsSeTMfdFxq4mXL+NCzr3bwMzGX8rFn
+	/PrZ7lMcZiITEUhHg4IkjmzIGaW4Wfxpo8ov4TpulIMB8JnQ7MJRelvzjKe5hdgo3xXUdtqb78V
+	QE0677CIyOPZ5IrpHrpKP9bv3Ljb9fisPDX8Ix4KthslS3E73tFQgV0eSUVFd61Vn/DOPihX+cf
+	wVP6WqQu2+4VFp6k7WUF3BZsKq7SbBi+QMk/d6x5GtSaRivaWBPJ6Rmq4qZsrwig0zmrkfXmPBJ
+	MhAB2VwT+Sh1OiXYzLor8gBNzGUniCYsjYnwYzu+MerZPps+cWt38XHwONHH3s+j/ZYbrM0GHbu
+	9uTz6bgYEGgROS0PUTnOpS21hdJuaHWVyGTc66fQ==
+X-Google-Smtp-Source: AGHT+IEIIO35cH2PrBkhqYMd/E+xZSf3lgI2yKX1DyfVtbO2pYBYeKyrnA3lBD1BQHg2AJrJT8JqeQ==
+X-Received: by 2002:a17:902:d505:b0:266:b8a2:f5d8 with SMTP id d9443c01a7336-29655c7a119mr1205695ad.14.1762377564053;
+        Wed, 05 Nov 2025 13:19:24 -0800 (PST)
+Received: from google.com (164.210.142.34.bc.googleusercontent.com. [34.142.210.164])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7af82bf14d6sm365224b3a.66.2025.11.05.13.19.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Nov 2025 13:19:23 -0800 (PST)
+Date: Wed, 5 Nov 2025 21:19:13 +0000
+From: Pranjal Shrivastava <praan@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alex Williamson <alex@shazbot.org>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	David Airlie <airlied@gmail.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	dri-devel@lists.freedesktop.org, Eric Auger <eric.auger@redhat.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>, intel-gfx@lists.freedesktop.org,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+	Kirti Wankhede <kwankhede@nvidia.com>, linux-s390@vger.kernel.org,
+	Longfang Liu <liulongfang@huawei.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Nikhil Agarwal <nikhil.agarwal@amd.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>, qat-linux@intel.com,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	virtualization@lists.linux.dev,
+	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Zhenyu Wang <zhenyuw.linux@gmail.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>, patches@lists.linux.dev
+Subject: Re: [PATCH 14/22] vfio: Require drivers to implement get_region_info
+Message-ID: <aQu_Uc_ZmBJUgw0_@google.com>
+References: <0-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
+ <14-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
+ <aQhcOYVbY-LqOjW5@google.com>
+ <20251105134829.333243dd.alex@shazbot.org>
+ <20251105205600.GX1537560@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/16] mm: introduce leaf entry type and use to simplify
- leaf entry logic
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Gregory Price <gourry@gourry.net>, Matthew Wilcox <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
- Baolin Wang <baolin.wang@linux.alibaba.com>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache
- <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
- Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
- Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>,
- Oscar Salvador <osalvador@suse.de>, Vlastimil Babka <vbabka@suse.cz>,
- Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>,
- Michal Hocko <mhocko@suse.com>, Matthew Brost <matthew.brost@intel.com>,
- Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
- Byungchul Park <byungchul@sk.com>, Ying Huang
- <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>,
- Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
- Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
- Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
- Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
- SeongJae Park <sj@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Leon Romanovsky <leon@kernel.org>, Xu Xin <xu.xin16@zte.com.cn>,
- Chengming Zhou <chengming.zhou@linux.dev>, Jann Horn <jannh@google.com>,
- Miaohe Lin <linmiaohe@huawei.com>, Naoya Horiguchi
- <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
- Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
- Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
-References: <cover.1762171281.git.lorenzo.stoakes@oracle.com>
- <2c75a316f1b91a502fad718de9b1bb151aafe717.1762171281.git.lorenzo.stoakes@oracle.com>
- <aQugI-F_Jig41FR9@casper.infradead.org>
- <aQukruJP6CyG7UNx@gourry-fedora-PF4VCD3F>
- <373a0e43-c9bf-4b5b-8d39-4f71684ef883@lucifer.local>
- <aQus_MNi2gFyY_pL@gourry-fedora-PF4VCD3F>
- <fb718e69-8827-4226-8ab4-38d80ee07043@lucifer.local>
- <7f507cb7-f6aa-4f52-b0b5-8f0f27905122@gmail.com>
- <2d1f420e-c391-487d-a3cc-536eb62f3518@lucifer.local>
-From: "David Hildenbrand (Red Hat)" <davidhildenbrandkernel@gmail.com>
-Content-Language: en-US
-In-Reply-To: <2d1f420e-c391-487d-a3cc-536eb62f3518@lucifer.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251105205600.GX1537560@nvidia.com>
 
-On 05.11.25 22:08, Lorenzo Stoakes wrote:
-> On Wed, Nov 05, 2025 at 09:11:45PM +0100, David Hildenbrand (Red Hat) wrote:
->> On 05.11.25 21:05, Lorenzo Stoakes wrote:
->>> On Wed, Nov 05, 2025 at 03:01:00PM -0500, Gregory Price wrote:
->>>> On Wed, Nov 05, 2025 at 07:52:36PM +0000, Lorenzo Stoakes wrote:
->>>>> On Wed, Nov 05, 2025 at 02:25:34PM -0500, Gregory Price wrote:
->>>>>> On Wed, Nov 05, 2025 at 07:06:11PM +0000, Matthew Wilcox wrote:
->>>>> I thought about doing this but it doesn't really work as the type is
->>>>> _abstracted_ from the architecture-specific value, _and_ we use what is
->>>>> currently the swp_type field to identify what this is.
->>>>>
->>>>> So we would lose the architecture-specific information that any 'hardware leaf'
->>>>> entry would require and not be able to reliably identify it without losing bits.
->>>>>
->>>>> Trying to preserve the value _and_ correctly identify it as a present entry
->>>>> would be difficult.
->>>>>
->>>>> And I _really_ didn't want to go on a deep dive through all the architectures to
->>>>> see if we could encode it differently to allow for this.
->>>>>
->>>>> Rather I think it's better to differentiate between s/w + h/w leaf entries.
->>>>>
->>>>
->>>> Reasonable - names are hard, but just about anything will be better than swp_entry.
->>>>
->>>> SWE / sw_entry seems perfectly reasonable.
->>>
->>> I'm not a lover of 'sw' in there it's just... eye-stabby. Is that a word?
->>>
->>> I am quite fond of my suggested soft_leaf_t, softleaf_xxx()
->>
->> We do have soft_dirty.
->>
->> It will get interesting with pte_swp_soft_dirty() :)
+On Wed, Nov 05, 2025 at 04:56:00PM -0400, Jason Gunthorpe wrote:
+> On Wed, Nov 05, 2025 at 01:48:29PM -0700, Alex Williamson wrote:
+> > On Mon, 3 Nov 2025 07:39:37 +0000
+> > Pranjal Shrivastava <praan@google.com> wrote:
+> > 
+> > > On Thu, Oct 23, 2025 at 08:09:28PM -0300, Jason Gunthorpe wrote:
+> > > > Remove the fallback through the ioctl callback, no drivers use this now.
+> > > > 
+> > > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > > > ---
+> > > >  drivers/vfio/vfio_main.c | 8 ++++----
+> > > >  1 file changed, 4 insertions(+), 4 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> > > > index a390163ce706c4..f056e82ba35075 100644
+> > > > --- a/drivers/vfio/vfio_main.c
+> > > > +++ b/drivers/vfio/vfio_main.c
+> > > > @@ -1297,13 +1297,13 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
+> > > >  		break;
+> > > >  
+> > > >  	case VFIO_DEVICE_GET_REGION_INFO:
+> > > > -		if (!device->ops->get_region_info)
+> > > > -			goto ioctl_fallback;
+> > > > -		ret = device->ops->get_region_info(device, uptr);
+> > > > +		if (unlikely(!device->ops->get_region_info))
+> > > > +			ret = -EINVAL;  
+> > 
+> > Nit, typically I would have expected a success oriented flow, ie.
+> > 
+> > 		if (likely(device->ops->get_region_info))
+> > 			ret = device->ops->get_region_info(device, uptr);
+> > 		else
+> > 			ret = -EINVAL;
+> > 
+> > But it goes away in the next patch, so *shrug*.
 > 
-> Hmm but that's literally a swap entry, and is used against an actual PTE entry
-> not an abstracted s/w leaf entry so I doubt that'd require renaming on any
-> level.
+> Yeah, still I can edit it..
+> 
+> > > Nit: Let's also add a warn/err log here highliting that the device
+> > > doesn't populate the get_region_info op?
+> > 
+> > Are devices required to implement regions?  If so, it'd be more
+> > appropriate to fail the device registration in __vfio_register_dev()
+> > for the missing op than wait for an ioctl.  However, here in the device
+> > agnostic layer of vfio, I think the answer leans more towards no, we
+> > could theoretically have a device with no regions.  We also want to be
+> > careful not to introduce a WARN_ON that's user trigger'able.  Thanks,
+> 
+> Yeah, I had the same thought, so lets leave this. If we do want a warn
+> it should be in registration.
+> 
+> A device without regions does not seem useful, but also it doesn't
+> malfunction if someone does want to do that.
+> 
 
-It's used on migration entries as well. Just like pte_swp_uffd_wp().
+I agree with the both of you.. I just thought if we should remind the
+user with a log that the dev doesn't expose a region. But I guess we
+don't need to worry about that.
 
-So, it's ... tricky :)
+> Thanks,
+> Jason
 
-But maybe I am missing your point (my brain is exhausted from uffd code)
+Thanks,
+Praan
 
