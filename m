@@ -1,160 +1,176 @@
-Return-Path: <kvm+bounces-62133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62134-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07939C381DB
-	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 22:54:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EBAEC3833E
+	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 23:32:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 049FB4E9EE0
-	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 21:54:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6BD51A23568
+	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 22:33:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1444B2E0406;
-	Wed,  5 Nov 2025 21:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31F22F12C3;
+	Wed,  5 Nov 2025 22:32:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="XKidI/CF";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QnflL+mD"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="eb4y8GUg";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="wgnrdSsO"
 X-Original-To: kvm@vger.kernel.org
 Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD0E2749C9
-	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 21:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1BE256C70;
+	Wed,  5 Nov 2025 22:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762379667; cv=none; b=NgmAUF6jO8NumdJfA9BX+7e8B440+E14PfVGyX5RLV6AygkHWc2aK6EUTh1NuE8nZXPMbri2E1pp170BJ1bbAg9JDijHGivunUAsyC4J/Kj3ccKNZQJO+f6JYQ4gYctNSkeutOyi7YgUTdMNmzcjDU5ruxOJHfnO7czrPhO6LD4=
+	t=1762381960; cv=none; b=lhW+e2o5n34tyA3dCmW59icyebD2/6IMzudK6WHD8B/aT1dWIABi+QGhpxQhHtu+DLvYaZDU9RrH6Lya123l0toUstiRwOpV/M1fGdyQpNH9K+reeMFaeo7BI6TR0e6j9YTyjSlXXCpsxs7JCJeDUyhYVidmuoiVo1SHXQ/rc7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762379667; c=relaxed/simple;
-	bh=nZAfXaxS4TbxTxhV2EwyP8b6xf2akeBu8OX20MmVURA=;
+	s=arc-20240116; t=1762381960; c=relaxed/simple;
+	bh=Y89HE2wRiWrwHFIIH5yf9M+Pax0OddbuTh7zu565CuA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a26nER2uI7tyyzaWF4g/CUP/EN+6/+cddjw9En1eW9tunsAKXTFkQGpOw74WH3GP+n5/bRnkH7jYAHNFQ6PfN/wl+9qiLAw1qThVLaN1YFKOH1trvYlND/R7WfutY2jqw4ackL5eSNd4dOYjtvk0slXhjxsKJh2DC+IwDufB9sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=XKidI/CF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QnflL+mD; arc=none smtp.client-ip=103.168.172.151
+	 MIME-Version:Content-Type; b=NHLV01vNrYgCHfjjrR33Ndn5LBv9zrlef+3g0r8CAKlPVBI3ImE8uQ+QSI0c/nM0z29fcuAqiEGPiHYkfmUvnvfcYKChq/8yTR92J9Rc4Bv6mS2wi28cyzmSQc7lBEr6Npkm/8e2JAHxMY1FW3RUBDY++WD9zOZ3wTkFsKqtWiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=eb4y8GUg; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=wgnrdSsO; arc=none smtp.client-ip=103.168.172.151
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id ACE71EC0177;
-	Wed,  5 Nov 2025 16:54:23 -0500 (EST)
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 89CD8EC01DD;
+	Wed,  5 Nov 2025 17:32:36 -0500 (EST)
 Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Wed, 05 Nov 2025 16:54:23 -0500
+  by phl-compute-06.internal (MEProxy); Wed, 05 Nov 2025 17:32:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1762379663;
-	 x=1762466063; bh=LdWr9dQGcsKLWFPrabrYdojVTQ/5NNNUNnJM/kPysAQ=; b=
-	XKidI/CF8vGR0aszq/yEcCtL2TtpIde6ChPngNoRYEQaYYjyQQy2dPBw2tJrhtkr
-	75ZoY45WuAYgiil/w4lEwxFDpg3vfMUKMRJRwGalg3eYAWhtNSdsExNOdouqbbGV
-	KFYBF/FCmcJX3ILn1ab88P7QHcGATsln4rTX6+Y96mRvf5/g1yuWpio2txv37RLf
-	ztYQqSeH7tN0T6uiwXc4Z/oUrh49HCA9WC+fggO2ilxIeANA14TNiwwz/ZdXhf7p
-	uTZUPUpy6jlY/hHHz13On6q2NAyVA4HU1ecdFukh9o/sGz9DAngorHio+YCoxdnh
-	c+u2Danphn8wg4QErIyidw==
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1762381956;
+	 x=1762468356; bh=C/N7mmjzp5gariu8cXvOhV8km+uTuUuFPtmIFDADyQA=; b=
+	eb4y8GUg6136NbMIwDQUYOQd6ySWnrutZzG0S5POEcX+UWRKBQKdl7toZsV1p3wr
+	62vfJE+8VhxaraQipFHiuYKqfa6gpK1Itm9emtj0JlH34sQcK0JgjOYN6T82HI6K
+	amWWxtEk3EBvA0VP/zB4hQIeb73F40BOTIN0dA/USFCmL6rIZK3dGkX1Ua0g9Oo/
+	2Gd0bSz1jzidLGoxML06ovIO6ZfJeEA3k3dL/7fSKfKO1hirXuCr/R6VDzYg6pRU
+	ZSpYqO7CLICatQMQgNhl+9chCgY8eiGbVxCbwGv3c80hAREUx6zGYG4ZUK61u+Bw
+	unfPbSNEUCMmlQSAFN/CSA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762379663; x=
-	1762466063; bh=LdWr9dQGcsKLWFPrabrYdojVTQ/5NNNUNnJM/kPysAQ=; b=Q
-	nflL+mDZG5q5MvxAXc4EFvskDiSpyuS3+s6cHyH04yOt9g8hi6d7jSi2/YpD9wBI
-	bsWKkV9kzJFAmvn1UH0CAsj1Dc4PwVL5h7EtYH/Gtx6xQqCM6fG+90FiK49uJlJE
-	63229rLMO5NZO0n2Z3+9ow1lZ9Oe2Pc+V+GYGGyv2KE5RyJth1IlHHrBmbAEhdsR
-	owRb+b4dTW4pry+peLuDfAoZ7CBXFmmr6dbbYlAvmtElxoPy1/BI5Bh4HbCtt68l
-	20B4hJqvKeIdyxkH/ydti3l21ozbuVGlqoqdNZI9GB0f5XmhuRAbfNxd56Kc5j9i
-	1MFJTjS/GY4ejWonAP/OQ==
-X-ME-Sender: <xms:j8cLaWVY88SCaUTievezswgl7sts0G0yhjSILdgLYDRtZ-qj3X2Q6g>
-    <xme:j8cLaWSilIdH_ETW__a2Or0NcBPe3jB236uibUmPTONNngMpDKCi_WuX_R2t-iMRI
-    X_UQ2c2GW5z4tg-zj_V25K77316yR8dKuJ3VLrN0_lGLRv9Sgc36A>
-X-ME-Received: <xmr:j8cLaUNXIvnL2-0EjD3xJSPSzt7nvuADN83cTde4qxbNc3dviWwGReeL>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeehtdefucetufdoteggodetrf
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762381956; x=
+	1762468356; bh=C/N7mmjzp5gariu8cXvOhV8km+uTuUuFPtmIFDADyQA=; b=w
+	gnrdSsOpXEnZFjW/Y1z4SLWGIUCfJ5Xm9wrkzwbKS/syWRifZ6kxzZheD+u7pKAm
+	LnoK29GKC5NLk3bHfJ9GF+8UoaAAZU4Rz5ekM1Oq+tTY98XB2bAPLJ4LvaJ0wEzl
+	XUFPqtcf0uDnu6dL1kd4OqFT06LItrTTKKhPGvITRVa/P166DEpwWMjUhhwtUESN
+	dqUzeRChBu4AnAmJrQtpKFq7Te7mkZws0h75V559NC4+uzBN0iVgxaeu1FJV8BF7
+	DFC7lBCVtB3FZ0196WZ/tpNQjinYlCBAQEmfLEyFt0Is7EaJJhziI67eQuWhkyFd
+	OP0lhzm5r5wFjjRBchhmQ==
+X-ME-Sender: <xms:g9ALad3NwZyt3WdM0zy18D6h-DF3H0YrWlSv8hAXzG4zHIcLIYcCaw>
+    <xme:g9ALaXI2qnuk-EBtpZQbcrm3bRRiDIDm88lwXQpC_uRHHG9iS0eo-d_uYVd2Meb-S
+    DeWZjsxHahQOwsAUYOi3DIy0r1OdRbli7vD1_G6sZAahKYJDDV4wQ>
+X-ME-Received: <xmr:g9ALaYhymf0TKPqYwYSZLH1KLkEdjsHnKICRZ675h2MHrzd9plJhbgZb>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeehudduucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfgggtgfesthhqredttddtjeenucfhrhhomheptehlvgigucgh
+    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
     ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
-    htvghrnhepgffggfegffffhffhhefftdeikedtueefkefghfehledtkedvvddtieehveej
-    fffgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdp
-    nhgspghrtghpthhtohepiedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepughmrg
-    htlhgrtghksehgohhoghhlvgdrtghomhdprhgtphhtthhopegrlhgvgidrfihilhhlihgr
-    mhhsohhnsehrvgguhhgrthdrtghomhdprhgtphhtthhopehjghhgsehnvhhiughirgdrtg
-    homhdprhgtphhtthhopehjrhhhihhlkhgvsehgohhoghhlvgdrtghomhdprhgtphhtthho
-    pehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvhhiphhinhhshh
-    esghhoohhglhgvrdgtohhm
-X-ME-Proxy: <xmx:j8cLaUTJtl2FUwknhpxTZgoUBehZ8MyExuMPPftV79hvaSxsEUEWIg>
-    <xmx:j8cLaSiZzAi13wnnxMfnyLNYTfE0naC5umzKbeNlJLNOYK6u66QUTw>
-    <xmx:j8cLad9ExwA-9PR3vguY8YcvoMDD7xp_Oouj7RbpyA-u4gcPu0xQQQ>
-    <xmx:j8cLaZEjVUrBVoRqis9DKgC5lKOsPG4mwSTFcCpUpoGbOujmtx-yNw>
-    <xmx:j8cLab50MCbqGJ-QI10JhlrYkwHc0WF3-ZrKb3PIQ1UYqsmCSzcqNbHQ>
+    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
+    hffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopeelpdhmohguvgepshhm
+    thhpohhuthdprhgtphhtthhopehlihhulhhonhhgfhgrnhhgsehhuhgrfigvihdrtghomh
+    dprhgtphhtthhopegrlhgvgidrfihilhhlihgrmhhsohhnsehrvgguhhgrthdrtghomhdp
+    rhgtphhtthhopehjghhgsehnvhhiughirgdrtghomhdprhgtphhtthhopehhvghrsggvrh
+    htsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepshhhrghmvggv
+    rhhkohhlohhthhhumhesghhmrghilhdrtghomhdprhgtphhtthhopehjohhnrghthhgrnh
+    drtggrmhgvrhhonheshhhurgifvghirdgtohhmpdhrtghpthhtoheplhhinhhugidqtghr
+    hihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhvmhesvhhgvg
+    hrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhg
+    vghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:g9ALaXBrnjXp1uxZhdUrQeFjoEf_HcUzZY6xFgV3WFVJ-9ZRBV49gQ>
+    <xmx:g9ALaa7H-uchEmi3frv73-YrPWRUW06xHpGufEbTwM9_1XukFbcBZw>
+    <xmx:g9ALacFpB9CQaICNumc93uCeg-vDK-KZmBztDFKxUFPdjg4vREhxHQ>
+    <xmx:g9ALaVAvkqHt7j8cUU2JuA-eZ3oezH-zn1atN3yMtEGCwdcKBDAo8w>
+    <xmx:hNALaZPnduhhM-bLgujjoSIUAFZmeo-Wh3qWzBDP-r8l4121mdw32fNw>
 Feedback-ID: i03f14258:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 5 Nov 2025 16:54:22 -0500 (EST)
-Date: Wed, 5 Nov 2025 14:54:21 -0700
+ 5 Nov 2025 17:32:34 -0500 (EST)
+Date: Wed, 5 Nov 2025 15:32:33 -0700
 From: Alex Williamson <alex@shazbot.org>
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Jason Gunthorpe
- <jgg@nvidia.com>, Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org,
- Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH 00/12] vfio: selftests: Support for multi-device tests
-Message-ID: <20251105145421.216ae95c.alex@shazbot.org>
-In-Reply-To: <CALzav=cMyD=SOUnpy3XnFn5cmn7xb8_YnTJHFyfCgqNpECCQsA@mail.gmail.com>
-References: <20251008232531.1152035-1-dmatlack@google.com>
-	<20251105120634.3aca5a6b.alex@shazbot.org>
-	<CALzav=cMyD=SOUnpy3XnFn5cmn7xb8_YnTJHFyfCgqNpECCQsA@mail.gmail.com>
+To: Longfang Liu <liulongfang@huawei.com>
+Cc: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+ <herbert@gondor.apana.org.au>, <shameerkolothum@gmail.com>,
+ <jonathan.cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
+ <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v12 2/2] hisi_acc_vfio_pci: adapt to new migration
+ configuration
+Message-ID: <20251105153233.59a504ae.alex@shazbot.org>
+In-Reply-To: <20251030015744.131771-3-liulongfang@huawei.com>
+References: <20251030015744.131771-1-liulongfang@huawei.com>
+	<20251030015744.131771-3-liulongfang@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 5 Nov 2025 13:03:51 -0800
-David Matlack <dmatlack@google.com> wrote:
+On Thu, 30 Oct 2025 09:57:44 +0800
+Longfang Liu <liulongfang@huawei.com> wrote:
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> index 91002ceeebc1..419a378c3d1d 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> @@ -50,8 +50,10 @@
+>  #define QM_QUE_ISO_CFG_V	0x0030
+>  #define QM_PAGE_SIZE		0x0034
+>  
+> -#define QM_EQC_DW0		0X8000
+> -#define QM_AEQC_DW0		0X8020
+> +#define QM_EQC_VF_DW0		0X8000
+> +#define QM_AEQC_VF_DW0		0X8020
+> +#define QM_EQC_PF_DW0		0x1c00
+> +#define QM_AEQC_PF_DW0		0x1c20
+>  
+>  #define ACC_DRV_MAJOR_VER 1
+>  #define ACC_DRV_MINOR_VER 0
+> @@ -59,6 +61,22 @@
+>  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
+>  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
+>  
+> +#define QM_MIG_REGION_OFFSET		0x180000
+> +#define QM_MIG_REGION_SIZE		0x2000
+> +
+> +/**
+> + * On HW_ACC_MIG_VF_CTRL mode, the configuration domain supporting live
+> + * migration functionality is located in the latter 32KB of the VF's BAR2.
+> + * The Guest is only provided with the first 32KB of the VF's BAR2.
+> + * On HW_ACC_MIG_PF_CTRL mode, the configuration domain supporting live
+> + * migration functionality is located in the PF's BAR2, and the entire 64KB
+> + * of the VF's BAR2 is allocated to the Guest.
+> + */
+> +enum hw_drv_mode {
+> +	HW_ACC_MIG_VF_CTRL = 0,
+> +	HW_ACC_MIG_PF_CTRL,
+> +};
+> +
+>  struct acc_vf_data {
+>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+>  	/* QM match information */
+> @@ -125,6 +143,7 @@ struct hisi_acc_vf_core_device {
+>  	struct pci_dev *vf_dev;
+>  	struct hisi_qm *pf_qm;
+>  	struct hisi_qm vf_qm;
+> +	int drv_mode;
 
-> On Wed, Nov 5, 2025 at 11:06=E2=80=AFAM Alex Williamson <alex@shazbot.org=
-> wrote:
-> >
-> > On Wed,  8 Oct 2025 23:25:19 +0000
-> > David Matlack <dmatlack@google.com> wrote:
-> > =20
-> > > This series adds support for tests that use multiple devices, and adds
-> > > one new test, vfio_pci_device_init_perf_test, which measures parallel
-> > > device initialization time to demonstrate the improvement from commit
-> > > e908f58b6beb ("vfio/pci: Separate SR-IOV VF dev_set").
-> > >
-> > > This series also breaks apart the monolithic vfio_util.h and
-> > > vfio_pci_device.c into separate files, to account for all the new cod=
-e.
-> > > This required some code motion so the diffstat looks large. The final
-> > > layout is more granular and provides a better separation of the IOMMU
-> > > code from the device code. =20
-> >
-> > Hi David,
-> >
-> > This series doesn't apply to mainline currently and I see you have some
-> > self-comments that suggests this is still a WIP, so I'll drop it and
-> > look for a v2. =20
->=20
-> Yes, I am going to send a v2 to address my self-comments. I'm also
-> looking at getting reviews of this series from some fellow Googlers on
-> the mailing list. Feel free to hold off for now.
->=20
-> >  I believe
-> > https://lore.kernel.org/kvm/20250912222525.2515416-2-dmatlack@google.co=
-m/
-> > is still in play though and does apply.  Thanks, =20
->=20
-> This series will need another revision as well to address Sean's
-> feedback, and I think can be merged via KVM maintainers.
->=20
-> That being said,
-> https://lore.kernel.org/kvm/20250922224857.2528737-1-dmatlack@google.com/
-> should apply and be ready to merge. It is a small prep patch for the
-> KVM selftests integration.
+I can fix this on commit rather than send a new version, but is there
+any reason we wouldn't make use of the enum here:
 
-Oops, yes, that's the one I meant to reference.  It links to the prior
-one and I grabbed the wrong link from my local branch.  Thanks for the
-confirmation.
+	enum hw_drv_mode drv_mode;
+
+?  Thanks,
 
 Alex
+
+>  	/*
+>  	 * vf_qm_state represents the QM_VF_STATE register value.
+>  	 * It is set by Guest driver for the ACC VF dev indicating
+
 
