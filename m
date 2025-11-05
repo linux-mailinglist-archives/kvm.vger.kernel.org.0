@@ -1,236 +1,197 @@
-Return-Path: <kvm+bounces-62098-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62099-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27861C3763D
-	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 19:53:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C864FC3766D
+	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 19:55:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C3903B801C
-	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 18:51:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED1B31A23E26
+	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 18:54:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14363093CE;
-	Wed,  5 Nov 2025 18:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7EC31329B;
+	Wed,  5 Nov 2025 18:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PnMXWLOT"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pJ8FeuGk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E0B268688;
-	Wed,  5 Nov 2025 18:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762368698; cv=fail; b=UPApB5uYwZPcirkvZbIRTYEy0tCxlA9MdVuzI03pXam19QO3aI3dZCIFPyyio6tTwBbHe0zO/k2A25jz/6ZwQQyScPYkgT3Y3pCJCh81JGufTPGy4/VW7UV1gYh4aBZdixYVvWZSYMXNJXVgsYsTxLesDptTOOFeKvRQacCNJXg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762368698; c=relaxed/simple;
-	bh=PXvCDKk0K/zJugpagohpbbzwnNAWMBEwcAKgF0jLOPI=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BQU8hKpPfW30Yi0wDNtvXhZ6r2Wsz4aneEQvcaNHAU0HppLFslU9VvNfW3F5D0htozH9vfkwADMKVG3HMAgvXFEKx97VeWUIHu0kZozxP/N+FEp7dG4aM3I/RcbOzNkdOB6f1sa3HQYP0/0fu1lG82YTT/8Upd/UNlTZHo1onqY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PnMXWLOT; arc=fail smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762368696; x=1793904696;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=PXvCDKk0K/zJugpagohpbbzwnNAWMBEwcAKgF0jLOPI=;
-  b=PnMXWLOTyd1PXSRk+JujELBLLvfw+rWRxnT5LTcq4dsbgD8zKl+ppUWP
-   4MDnYYVI8dYiUJiKHjMfBuk+cu2Z30XQskUmzKEfaIvAAPuo8MMUV8PvN
-   lrXYCRc9OXoWJRNZ82hdlpDeiiZuAeM6trj8RR26ymWA+iuWS8EJjd8u7
-   AMKJSXzOAhsMiBzQhGgx8S3YdxIKbTZIRkNF5IUYlxJdVnY90exjbN72Q
-   H7UruWcqPFXH6sfa1deYELFgzRllUuvrDfibm5VSUyMxyjSGtyHc33YQQ
-   /OdI3Mv7qhamcskbuFsF+fV22y7v15Mv54Fm7ybZ/Ds8MWFDUo/xTh2rp
-   w==;
-X-CSE-ConnectionGUID: ALccBFvOS1C7kwPMVZbGWA==
-X-CSE-MsgGUID: qXOEqhI4SmKT0z1dsQHc2A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11604"; a="87122355"
-X-IronPort-AV: E=Sophos;i="6.19,282,1754982000"; 
-   d="scan'208";a="87122355"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 10:51:35 -0800
-X-CSE-ConnectionGUID: tZ+3PkyYSNWIwrVex7auZA==
-X-CSE-MsgGUID: m5BfFST3TJyueyq1kYHf7Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,282,1754982000"; 
-   d="scan'208";a="188257514"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 10:51:35 -0800
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 5 Nov 2025 10:51:35 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Wed, 5 Nov 2025 10:51:35 -0800
-Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.65) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 5 Nov 2025 10:51:35 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sD1DiHeaQVTJPWtDNhRN+3tALOHIMSLPGJDFZH+TUiqn7c5Z/+4Jei66QBEvk0ndgwC10IDlB/UPK80abMnPcFlugCV//7RvjU7LjcxXh3C2Oxnf7mjh+GAw21mdtbs0Dq69I5V04dQb0pbYCeAHQaqeUqNhCBjWRF/C73gj0TV3BwqDxbvHzjrj8Txgm285b8cko2WwNcw9fI+v9Od5eNpD0erRS8LUUsBC7gyTUqz9NkPX+0xTDwjJqpgv+baI81WT3YvA8CHp/bNRWx2OGqb4/2VAkBhYhYm4Z1/Kt4Ug/LBxgqE4FDBRNUM65AVcSXnDiNvrITbwue92uWTa8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HjPQtXkcakAtSmqfbZ+duMqs5zj5esP+M9x899Jgg9A=;
- b=Ej/7VIfZ4IT2wKNjcJe+k5ZkqimxYkaVlQN/eXKLeZZsBsSR7bzAtmZfmhIxq4AwqyrvfQsHfnZgWuuSHLZ7m/1vZJcJdxKPBnBqU5Y8hflu96YTVNij5dL+J0lHaEOqFZUS2I/K46Wng+JMdqm3f+IQCuJtOt+GvOkKRzS2t8bUPRvvk1rxotDggWNyZbXYbeG2mwjKGV7MGlHiWCv5XiG/wQD41oLTIkmb28uuJrbeNHAm9LpVcmUSRlYlE+StmaiEc+oyTNQhKTNk+ToGa+rGEGqI3jd1o3zAE4SHqqDgzeqq4HQjRHc+jDbzC770MO/JVTvZBWy6Ai2HKMkrgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN0PR11MB6011.namprd11.prod.outlook.com (2603:10b6:208:372::6)
- by DM4PR11MB7303.namprd11.prod.outlook.com (2603:10b6:8:108::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.7; Wed, 5 Nov
- 2025 18:51:32 +0000
-Received: from MN0PR11MB6011.namprd11.prod.outlook.com
- ([fe80::bbbc:5368:4433:4267]) by MN0PR11MB6011.namprd11.prod.outlook.com
- ([fe80::bbbc:5368:4433:4267%6]) with mapi id 15.20.9275.015; Wed, 5 Nov 2025
- 18:51:32 +0000
-Message-ID: <481aa68f-ffb4-4eaf-a2aa-d112e9529aa0@intel.com>
-Date: Wed, 5 Nov 2025 19:51:23 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 03/28] drm/xe/pf: Convert control state to bitmap
-To: =?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>, "Alex
- Williamson" <alex@shazbot.org>, Lucas De Marchi <lucas.demarchi@intel.com>,
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	"Rodrigo Vivi" <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Yishai Hadas <yishaih@nvidia.com>, Kevin Tian <kevin.tian@intel.com>, Shameer
- Kolothum <skolothumtho@nvidia.com>, <intel-xe@lists.freedesktop.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
-	<matthew.brost@intel.com>
-CC: <dri-devel@lists.freedesktop.org>, Jani Nikula
-	<jani.nikula@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
- Laguna" <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>,
-	kernel test robot <lkp@intel.com>
-References: <20251105151027.540712-1-michal.winiarski@intel.com>
- <20251105151027.540712-4-michal.winiarski@intel.com>
-Content-Language: en-US
-From: Michal Wajdeczko <michal.wajdeczko@intel.com>
-In-Reply-To: <20251105151027.540712-4-michal.winiarski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: WA2P291CA0010.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1e::16) To MN0PR11MB6011.namprd11.prod.outlook.com
- (2603:10b6:208:372::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BED2749CB
+	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 18:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762368788; cv=none; b=ApMnScDwbjB42Osi65b57VAqzSsdwP0eqzt1nU4aZ7Cp4a0Vp5ttbdSxbsYRHYVa7u5L84Ga9IrAXcTyP8ZJpaNeUkWHZojPTImyo3TKJOPP3ZkdpE8hw19ofkdz1Qm6XrOUIQzToh5RhsLu7OK5KfAe/DPdxF57sDVIvOguu9U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762368788; c=relaxed/simple;
+	bh=hGYtg3SMJ/8fPejXLuX/M5MTrCR8udYqfjCkYvVLQxQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eaBhWv0cLl/i0iuW104091N3LVAZ7T70GnwwdCltlo52MrH8HeGHAp8VIgBSUKzWoRpWtBjhm34sO3cDo/050ugYDYmKz//l1EgYTajlAPBo6rNDDfqM8FjYVXS/BWeMOA/kKbIWOpfbICnxLwYgcODY4l28zJObO7ExMzESDng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pJ8FeuGk; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 5 Nov 2025 18:52:58 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762368782;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sZSJZBsgkAuNbH16IgDCXUM6/0/g06p7gdu8EXXgJUA=;
+	b=pJ8FeuGk2lWOuDhDP129D38Shi4EDhhz3mVD+JAeWJ0TsGSiIZ0AKwJDCj1iLe5lP4USvm
+	d9NtzdZvbhpskxpU2PoH7fJbSlLX1NT5lqpM/jY3Bml4qmfJzjl68jSfhd3LjuACNw09oa
+	B15/xtLRuXn5ISTjEeaad3HcPPXUHRA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 01/11] KVM: nSVM: Fix consistency checks for NP_ENABLE
+Message-ID: <bghpqd23vy6pszckz4psxox3ww256uazmoa6zadagnn4zclja2@x5cb23tigyfw>
+References: <20251104195949.3528411-1-yosry.ahmed@linux.dev>
+ <20251104195949.3528411-2-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR11MB6011:EE_|DM4PR11MB7303:EE_
-X-MS-Office365-Filtering-Correlation-Id: d779fcbf-3699-41b1-0efe-08de1c9c5612
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?K2dZWGJWUHN5WWMzSzNJQVc3Vk5ZWkxSSXo3ZlE4Ty9RbW9NREY5ZVNBVkdK?=
- =?utf-8?B?SVEwWStITnI4REI2NnBEK2pKUzVmaytKUWlvVXJKTm94ck92ZVRnNXNWbzg5?=
- =?utf-8?B?Z0NtMEJYWC9wMEVBQkVQdi9OekVnQkNaU0E4czhFQnpPU0FmbStISGxsNGlx?=
- =?utf-8?B?WDFUTzBSSVc4Mm9XMzlDVlJiOEkyQ0ZON1AvbHprSFBuYlQ1QldUNnNvcUNw?=
- =?utf-8?B?ZEdOZnBRbm9XM2swTHNEWFJTWEtua1Y0MitJVVdtdnJlNDF2bEN4QnJuMjdL?=
- =?utf-8?B?enBMQVA3V2NuVVFpYjZSMkRxSWtJQzVpcWYvSEJabEVidk1yYis5T3BXWkpO?=
- =?utf-8?B?Y1BFbitYYllzK2hmOW9MeGlQdEtqUTRvdVAza0h1N3A3WkZQZElmMU56U0V1?=
- =?utf-8?B?UGpzOUJzUE9HQlFLQ0p4Q2pLWXFuTDZYQTIwb0JrQmVMVXJHUkVKTlRKNnk4?=
- =?utf-8?B?Zzc0WVcyWEdCY0xEWUhlUGxNV0t1dzdRZmRoaGY5RXkzZm84ekhWalZQL09E?=
- =?utf-8?B?bDhVUGZCT2cwdlFnbEpYZVRCYmpmWVlacVBhTTRhRmlVMWdpRm56V3NwM2ZX?=
- =?utf-8?B?QjVPZGliOHU4anlTTlJwL2IyK0pIU1FoS0lZR0JMeHJ4OFlrTGJPY1M5RnFN?=
- =?utf-8?B?dVdsaVR0QXk3YUdNeFBNa29LMWpSSFlVR3VJSE1XcktZZ29GZlFPUk1UOEZz?=
- =?utf-8?B?aGw2WWplLzEvVmM4R0I0VzhLK2Jxei8ybWNsYkFEa2NrcWZpamc5Rml2NFJy?=
- =?utf-8?B?Zjg1d09mdlliWGdzVDMxYWVVaUJHejlocmJMRXNJWjlZTVFaSEMzWS9wem9M?=
- =?utf-8?B?aDdyY0pJVG1makhqTTBlMVB4eFVEcUJkRlRlRnlDMUF2WXdLSEUzZEl1L3hr?=
- =?utf-8?B?SExnSlF0RWg0SnBLOU5vSDYxdmExQ1VKdlUzTUJjZ1llS0FoNHZZTlpabGR2?=
- =?utf-8?B?dW1QQTY4V3RESzJXTkFwUFU2Y2svQnFESk5KWnd3bG1nbWplc3NpOWZLbE11?=
- =?utf-8?B?OVFJcWNabGU1QzhOd0FzeXQ5TFVaOW9yMmJyb2NzdjhOWlYrdEc4M0FmdnZ2?=
- =?utf-8?B?eENWMENxY0R5TXdRRG9OODVYNEFxZ2VIclZXQjZlNG5SK0NGRzE1L3E4TEhM?=
- =?utf-8?B?WUlWTUZqbzlxcjdaWTVhaDlPa3VtekxtUmNickN5ZW52RTdtL0VkdkdOVzZa?=
- =?utf-8?B?UmRIQU1xcTljRjlQU0JNZC9qc3doTFlKdlJMdFplc0hZdHF6anFvMEE0Y0FZ?=
- =?utf-8?B?T3lRVFRrSXFHakFvWHlwcTY3eElzeG9tbHhDeDg5MU1RVXhYQ3o0VjZwTVU2?=
- =?utf-8?B?dmU1T2g0Q1V1VURsSjZXeDBwK0N2R3A1VXh0ekJrYjROWWl5TTRMdWZPY2hu?=
- =?utf-8?B?bFhyblBtSDBXZ045OTFwRUxYVU05bTlhTHY5K0JRSVdRSkVoVDcwdnFvbkgy?=
- =?utf-8?B?cjVOYXlwKzJ1dzlxTXE4a3ZreHdydStjTXF3dUVUTGVBR3VGeHFac3c2bkgz?=
- =?utf-8?B?ei9MSUo5YlAvN2RnTkllUmovTlBDNm5VZkc3ekJhN1RnLzAvaWpmS2tzS1po?=
- =?utf-8?B?SEYwRXhLSkVxZmw5ZzREZjQwbitmSHdvV1pKRUNoeDRmN1ZCZm41UW9TSGxy?=
- =?utf-8?B?MUNsUGRZQmxUWWd0cmZ6VUlWc3R1aVQ5dFBYOUdsL2JRR0hyTGNvZzFnUjM5?=
- =?utf-8?B?WDBOczFrRmtRR1RXNEROTE85ZHEwQXZ3OHZFRXJjMXY5SE9JRFVkMGZtaFNn?=
- =?utf-8?B?OHBudldWaUNHcHlzRndkVFFUZmgweldQbHowVlhycUgvMHlicWpqMlBKUW55?=
- =?utf-8?B?VEFoNlBSNnNRRnN1QzA0b21MMUtJci9qbUcyZ2FVMDJxdUtZL2VZVlA4NXBO?=
- =?utf-8?B?TEFZd3BLb3EzNVYrVkxmSTRlMXlRVDdvR0VFVnJrb0ZmdS9KOHQ2cGN6NGpC?=
- =?utf-8?B?SjBzTjRHVFdUaGZGb092Mkcyb1oycDhyVjdCSXhwRG1QQnRmWkVQTkV2OVZV?=
- =?utf-8?Q?4ujmQrhXeqRSaPklDWDK0iTT2Xjq6A=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB6011.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bVNPd0N5NDIzUmI3Zm5uMC9kL0QrUDg5eE9aamc4L2VCUCtDY3NqckQ2c252?=
- =?utf-8?B?cy9YMGU0OGtnOU01cEJ2TzRSbjJGTUhJaEE5OFk0eER4bk00UDVLNmNUU3F1?=
- =?utf-8?B?ZU1pK0xPM3RiUFFOa1JUcGd0andSR2hlK015MVcxNnhRM0tvSm44TC9nWlpP?=
- =?utf-8?B?eGZzaXZka0x3UVl4TndiRFQ4NFUzMW12anNaaWIyWlQ3eHJEc2J2SmlYc1JD?=
- =?utf-8?B?VjUwRGtsUVV2MkxIWTFZTklJbXVaU08wekwwSjgyWXpVMDdXakxuVVRvZ3FI?=
- =?utf-8?B?ZXNWS2g0bXBNYzYzUFB0SGlUOTZmZ3J5NzREQlM0WGx4TWlkWWtlRFBWWTM3?=
- =?utf-8?B?alBRZHlCL1JwR3dKOEpML0FaN2dQRUh5eHc2eHM4VmVkM2tZSnRUY3pWTDBI?=
- =?utf-8?B?M2d1K3gyTWpnS2Jrdy91V3RIanhOUEZMdVN6Q0dEQ1ZhZ1lGcC83U214ZkxP?=
- =?utf-8?B?cDZHSHlSZ3ZOK0FyZ0V1Y01HVXlmUm1LU09tUVhVR2J0ZUFUTVJHUEF2SWg1?=
- =?utf-8?B?ZnRyMERKWkRUakZ3UGY2UHIxWjhXUXlJZmxIWDVBVEJPS21wVEhPTVVnRnZG?=
- =?utf-8?B?MWhYR0ZNanZ0MjJKN2wwc0p4NXZSb1RQdFM5bE05MlUwTzhXMHYzSUJZdjVo?=
- =?utf-8?B?T1p1cUJQUm43TDliK2RMSzFibzArL2NqNlFLVTJ5dW1SWVp6TFRjTUNNaFBK?=
- =?utf-8?B?UzJNRWZIaFdBcGc0OE9oV0g4Z01pY09ySFp6RzFzdUl6QS9sdVlISDNORFRq?=
- =?utf-8?B?RzJHdktjc1lub1hUV0V2ZGpoM3RsZ3B5TXUrSVpYYkhwaGZTaXozc25GMVFo?=
- =?utf-8?B?Znp6MGVCa3ZLenJjbVZ0cFBZdzZQUXVOL2FvSEg2WEt2dWVtWlRGOExjbVZR?=
- =?utf-8?B?cERYYXBRSEl0dC9wSGRrdk50SzhHVWJnK0JwMUxXdGVtTlZBKytTV05yYStX?=
- =?utf-8?B?bStSUU8rVzFWY2hRRGtrNVhKR3paWitjM05MMTBaWUk5WjJjaTlacU1pNG90?=
- =?utf-8?B?U0U3NlhBREx1ZGtZVEd5ZmwxaDhMQ1ZocjRuNmg4d2lVa2cxd25qV09TSC9a?=
- =?utf-8?B?OGdLazZLN2pkbW1mZEF0U3l5bFRReEl4VllDMldQZElrMnRPVGdQQURzcXFS?=
- =?utf-8?B?MVJ0WmgvSGZiT2lrZ1pCbDQ4NTBzUWlWWE0yTEtFaEY4RmRYd1VoWFpHcERn?=
- =?utf-8?B?Zk1kRnIwaTZzVEpxalpKenhQQnpBSnBicWF5QWdnVlh6ZGRsb0dKbDFLQlhE?=
- =?utf-8?B?S2RTV3VxeGJmVldwbFk3a0JicFVNaU5rL1ZpWXlIWmlrVUZTdDkyVkhCRXo5?=
- =?utf-8?B?QVhvK0YzSXh6dksxSW8xek5pMHBmanFKMklZd1dQSVlzaWlkMWpvWXd6M1FS?=
- =?utf-8?B?Y3NKVnovcmttUmNWT1RvOCt1NXd1N3l0dFJ5WjV4WVdiNFliSDZNTnRRZEN0?=
- =?utf-8?B?bGFyMERRNCtxOXRLNFRRaWhqRVFFSVJrVU9OQm5hR0UyWnNkekdBOVNnQVpx?=
- =?utf-8?B?NFB0d1hoc0kxb3RmUzA5UXQ3bEdURWFoRHpDMHdzVXZQa052MmRGc3NBSzNI?=
- =?utf-8?B?RGdkU2Exam1aUmtBN2VhY2hhSUN2NnQ4N1I0NEZyM0M2WGtLbG1qd1lvWHJt?=
- =?utf-8?B?MHM4bW9kNVdCL0xZUUdrL0o1WjJRcDFCTG4xSk55N2Qya1hwbHc3ckpsNnpx?=
- =?utf-8?B?UHoyWGVDbEx3QlhhOTFNZDNqM2NtdUNxYlZYc1lhcHdEL0o5RXNZeUl6RE15?=
- =?utf-8?B?RSs5TFJ1TldkSi9KcEw1cjBDMHIxQ0piYVcyMkU4TC9ZeEZEbGZ1aVRCcWNa?=
- =?utf-8?B?bkc2U1FJUHZIR2lkY1FpeU9sTmk5YVQyVjA1M254enBTRkpYRG85UEJPUHZM?=
- =?utf-8?B?R3NtSGdLYWsvM2RRaU15S1VmWndGbStaOXdKOVJEb254YTVBNFdmTndMdTBU?=
- =?utf-8?B?UDEyd2YzU1dVTWdQT1VkaFFSL1BhblRxTUZ5WUttTGJxOTI5WEUzRCt2T0hh?=
- =?utf-8?B?OFhsWkpReVQ1UTBwSDVUcWtORGR6TmhISlRQZjdJa256L3BrUnZ6ODJWdTZK?=
- =?utf-8?B?ang2NGZ3OGkvV0VQZStGUGZMQ2pWRlFVUUtTY2g3cGFnd004cWpnRzdGdjdB?=
- =?utf-8?B?a0docXZzK214Z3VuZDk0UXNGYk5LUVF6Q2g3M2FaT09hWVZmWUF1R0RkaUFD?=
- =?utf-8?B?S2c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d779fcbf-3699-41b1-0efe-08de1c9c5612
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB6011.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2025 18:51:32.2174
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 17X07qEwY6dwwg6SKjR6pO3XGu2vxJ1CguiLL+S2tyPyUWSTlZalD9xbQ4VTRhqZxhTu0N27gOJGJ9rFQban56+s+sruJtnHDEPvj2se4FM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7303
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251104195949.3528411-2-yosry.ahmed@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-
-
-On 11/5/2025 4:10 PM, Michał Winiarski wrote:
-> In upcoming changes, the number of states will increase as a result of
-> introducing SAVE and RESTORE states.
-> This means that using unsigned long as underlying storage won't work on
-> 32-bit architectures, as we'll run out of bits.
-> Use bitmap instead.
+On Tue, Nov 04, 2025 at 07:59:39PM +0000, Yosry Ahmed wrote:
+> KVM currenty fails a nested VMRUN and injects VMEXIT_INVALID (aka
+> SVM_EXIT_ERR) if L1 sets NP_ENABLE and the host does not support NPTs.
+> On first glance, it seems like the check should actually be for
+> guest_cpu_cap_has(X86_FEATURE_NPT) instead, as it is possible for the
+> host to support NPTs but the guest CPUID to not advertise it.
 > 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202510231918.XlOqymLC-lkp@intel.com/
-> Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
+> However, the consistency check is not architectural to begin with. The
+> APM does not mention VMEXIT_INVALID if NP_ENABLE is set on a processor
+> that does not have X86_FEATURE_NPT. Hence, NP_ENABLE should be ignored
+> if X86_FEATURE_NPT is not available for L1. Apart from the consistency
+> check, this is currently the case because NP_ENABLE is actually copied
+> from VMCB01 to VMCB02, not from VMCB12.
+> 
+> On the other hand, the APM does mention two other consistency checks for
+> NP_ENABLE, both of which are missing (paraphrased):
+> 
+> In Volume #2, 15.25.3 (24593—Rev. 3.42—March 2024):
+> 
+>   If VMRUN is executed with hCR0.PG cleared to zero and NP_ENABLE set to
+>   1, VMRUN terminates with #VMEXIT(VMEXIT_INVALID)
+> 
+> In Volume #2, 15.25.4 (24593—Rev. 3.42—March 2024):
+> 
+>   When VMRUN is executed with nested paging enabled (NP_ENABLE = 1), the
+>   following conditions are considered illegal state combinations, in
+>   addition to those mentioned in “Canonicalization and Consistency
+>   Checks”:
+>     • Any MBZ bit of nCR3 is set.
+>     • Any G_PAT.PA field has an unsupported type encoding or any
+>     reserved field in G_PAT has a nonzero value.
+> 
+> Replace the existing consistency check with consistency checks on
+> hCR0.PG and nCR3. The G_PAT consistency check will be addressed
+> separately.
+> 
+> Pass L1's CR0 to __nested_vmcb_check_controls(). In
+> nested_vmcb_check_controls(), L1's CR0 is available through
+> kvm_read_cr0(), as vcpu->arch.cr0 is not updated to L2's CR0 until later
+> through nested_vmcb02_prepare_save() -> svm_set_cr0().
+> 
+> In svm_set_nested_state(), L1's CR0 is available in the captured save
+> area, as svm_get_nested_state() captures L1's save area when running L2,
+> and L1's CR0 is stashed in VMCB01 on nested VMRUN (in
+> nested_svm_vmrun()).
+> 
+> Fixes: 4b16184c1cca ("KVM: SVM: Initialize Nested Nested MMU context on VMRUN")
+> Cc: stable@vger.kernel.org
+> 
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 > ---
+>  arch/x86/kvm/svm/nested.c | 21 ++++++++++++++++-----
+>  arch/x86/kvm/svm/svm.h    |  3 ++-
+>  2 files changed, 18 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 83de3456df708..9a534f04bdc83 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -325,7 +325,8 @@ static bool nested_svm_check_bitmap_pa(struct kvm_vcpu *vcpu, u64 pa, u32 size)
+>  }
+>  
+>  static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+> -					 struct vmcb_ctrl_area_cached *control)
+> +					 struct vmcb_ctrl_area_cached *control,
+> +					 unsigned long l1_cr0)
+>  {
+>  	if (CC(!vmcb12_is_intercept(control, INTERCEPT_VMRUN)))
+>  		return false;
+> @@ -333,8 +334,12 @@ static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+>  	if (CC(control->asid == 0))
+>  		return false;
+>  
+> -	if (CC((control->nested_ctl & SVM_NESTED_CTL_NP_ENABLE) && !npt_enabled))
+> -		return false;
+> +	if (control->nested_ctl & SVM_NESTED_CTL_NP_ENABLE) {
 
-Reviewed-by: Michal Wajdeczko <michal.wajdeczko@intel.com>
+I think this should actually be nested_npt_enabled(), because we
+shouldn't do these consistency checks if NPT is not supported on the
+vCPU at all (which was kinda the point).
 
+> +		if (CC(!kvm_vcpu_is_legal_gpa(vcpu, control->nested_cr3)))
+> +			return false;
+> +		if (CC(!(l1_cr0 & X86_CR0_PG)))
+> +			return false;
+> +	}
+>  
+>  	if (CC(!nested_svm_check_bitmap_pa(vcpu, control->msrpm_base_pa,
+>  					   MSRPM_SIZE)))
 
+> @@ -400,7 +405,12 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu)
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  	struct vmcb_ctrl_area_cached *ctl = &svm->nested.ctl;
+>  
+> -	return __nested_vmcb_check_controls(vcpu, ctl);
+> +	/*
+> +	 * Make sure we did not enter guest mode yet, in which case
+> +	 * kvm_read_cr0() could return L2's CR0.
+> +	 */
+> +	WARN_ON_ONCE(is_guest_mode(vcpu));
+> +	return __nested_vmcb_check_controls(vcpu, ctl, kvm_read_cr0(vcpu));
+>  }
+>  
+>  static
+> @@ -1832,7 +1842,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>  
+>  	ret = -EINVAL;
+>  	__nested_copy_vmcb_control_to_cache(vcpu, &ctl_cached, ctl);
+> -	if (!__nested_vmcb_check_controls(vcpu, &ctl_cached))
+> +	/* 'save' contains L1 state saved from before VMRUN */
+> +	if (!__nested_vmcb_check_controls(vcpu, &ctl_cached, save->cr0))
+>  		goto out_free;
+>  
+>  	/*
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 6765a5e433cea..0a2908e22d746 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -552,7 +552,8 @@ static inline bool gif_set(struct vcpu_svm *svm)
+>  
+>  static inline bool nested_npt_enabled(struct vcpu_svm *svm)
+>  {
+> -	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
+> +	return guest_cpu_cap_has(&svm->vcpu, X86_FEATURE_NPT) &&
+> +		svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
+>  }
+>  
+>  static inline bool nested_vnmi_enabled(struct vcpu_svm *svm)
+> -- 
+> 2.51.2.1026.g39e6a42477-goog
+> 
 
