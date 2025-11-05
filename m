@@ -1,126 +1,132 @@
-Return-Path: <kvm+bounces-62101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62100-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DD45C376F5
-	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 20:09:51 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B55E4C37702
+	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 20:13:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8389E3BE905
-	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 19:07:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3A6B34E6F7F
+	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 19:06:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDDA33DED5;
-	Wed,  5 Nov 2025 19:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E4B320A3F;
+	Wed,  5 Nov 2025 19:06:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IBWlsteG"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="FKhwSZN9";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XLMNZT7P"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF4D3203B6;
-	Wed,  5 Nov 2025 19:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9337299AB5
+	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 19:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762369616; cv=none; b=HuQEjqY8Pnea9gFTkz9LT0ce/KRYgThJdaWBkzNkgShy0Tnb98i5W28yxsO/IPCC3ZrWYQwXJiK6LwYsyIL2HhvGjaaSJLDbyfwmXdmgy5jLeDYrAwJAttmWVEWtEQyQYV5moCYYl8Z1PSznF+HF0SdkKRB9easPZLjXp+lxRkQ=
+	t=1762369601; cv=none; b=lCljNWc4DKLahl3EMVl2h4VPsDXv9Mt9NbbmIBird/xDP1eBySV5Qh+zeh69PDPs19bIpFD/YLlVZYb5TtoZMf8SpHpJZfLa4rT7mnB2zA20u7fqDwpMTvaKZKIabdjv0DLd7rF3Htqyf5DAtD1ayZM69/zv/pFnScCQzukjjvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762369616; c=relaxed/simple;
-	bh=r1RUQ5w8cqf5Ixyk9+1OWb64pQySNdzgjfAjsvNRiJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FlwWRp5UV7OxbHF3hRKd1ndf5QqsvcP52HKi4Psn52krWv9XFTwyK+n+LLurvAJLrdbCJyDphb2bU//mvlJL5C76ab4xeN2Y76HiqyjUEwgODJP3kUc5QIofSJiZKZ6pjrRtLxBgnBwdQ8y+P+mH46ja9HQ7xCmXWca0eoFBgek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=IBWlsteG; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=uNlLN91IPUmzKBqToljugUBHU3xTh3YeZQvGikTGxf8=; b=IBWlsteGV5BqKNpBp269P8rt+Z
-	0VKCpMHLJcEcVC5ca9y4mzUMBegTviTXPimmvvPBDSDtP77WZVHbwThO2KmT1T+XeAvGKLAHF0PRS
-	80OeZej4TWRoq+EBL9TfPVoHaT5QOWeDqbMqMYIPbHtgQcNFN/L4z1JJbVyFD/pSjiTrFgovznnIc
-	XkeQQXR5rl4/W2+7Z7UKzeQs8t3TjbaEvjtqAn49fXOGK2vvpbhXLkByLlSORalsuHmw82rYhXDs8
-	Uheq42GmULctQ5UcWDeMNW3yFM55Ral+on9Ve62bU57pkBQ0EU+4PaIXi/iqPUMHvyrIi9YQne70n
-	F2cEH7Kw==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vGipf-0000000EnwZ-1iQX;
-	Wed, 05 Nov 2025 19:06:11 +0000
-Date: Wed, 5 Nov 2025 19:06:11 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
-	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
-	Lance Yang <lance.yang@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
-	Byungchul Park <byungchul@sk.com>,
-	Gregory Price <gourry@gourry.net>,
-	Ying Huang <ying.huang@linux.alibaba.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
-	Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
-	SeongJae Park <sj@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>, Xu Xin <xu.xin16@zte.com.cn>,
-	Chengming Zhou <chengming.zhou@linux.dev>,
-	Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
-	Naoya Horiguchi <nao.horiguchi@gmail.com>,
-	Pedro Falcato <pfalcato@suse.de>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
-	Hugh Dickins <hughd@google.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-arch@vger.kernel.org, damon@lists.linux.dev
-Subject: Re: [PATCH 02/16] mm: introduce leaf entry type and use to simplify
- leaf entry logic
-Message-ID: <aQugI-F_Jig41FR9@casper.infradead.org>
-References: <cover.1762171281.git.lorenzo.stoakes@oracle.com>
- <2c75a316f1b91a502fad718de9b1bb151aafe717.1762171281.git.lorenzo.stoakes@oracle.com>
+	s=arc-20240116; t=1762369601; c=relaxed/simple;
+	bh=MBekS82VXAuTjli1bsQTvJsTBmKL9qlic3Kwg7XID4k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hpXkeZxKcLeyFEw5GZgWe+AGOJYwM2vLiJhO1R/C3AeSj0HbUY62QZjdsgitZPZPFmSq6Es54Mb6LJgnFsYWb/yFNjtYr955LbkTZQRQ1prtP2iLUZbt/2aXXJLBW9mxYjHO9UkdtdnhrBcgKQIrZaoDb3gN6K90pIU5azkF8b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=FKhwSZN9; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XLMNZT7P; arc=none smtp.client-ip=103.168.172.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfout.phl.internal (Postfix) with ESMTP id 01351EC0290;
+	Wed,  5 Nov 2025 14:06:37 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-10.internal (MEProxy); Wed, 05 Nov 2025 14:06:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1762369596;
+	 x=1762455996; bh=effwJ3GhBH8MdmmMsCH2KSzUZkLzM1/gHLmaOmoZ3g0=; b=
+	FKhwSZN996aLc3XkFmDlvsVKiaNFn83m8Mds2UR9M1djn6LBRot1SrfBtkfZ/+C7
+	mdY6EFOR7d4TznWWF4r2YWf8jvWuk8Pr7bddgJPrMtFDEkiqFZ8E11DnfRXD+Z63
+	rXwG6Wm769xzWlWww5hTWOw05JyLAkLUnEI34Ntnk9O0QRwda89VLzTe59KAIn/s
+	DvsTrgasVIF9Ac0Q6/WOkRoWHRZx44VjOKcUydkh4KT6zUjy7KdO1EiaUaNroGYY
+	bh3HXbMGMERkLn3PKn40Rgn7xl6ZSF8UVOZW5lxYMBbQi7csXA20KAZc2TX5BPwv
+	yE91y6CLQ2nS6R7IKk+DpA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762369596; x=
+	1762455996; bh=effwJ3GhBH8MdmmMsCH2KSzUZkLzM1/gHLmaOmoZ3g0=; b=X
+	LMNZT7Pe0GjcY2VTtrqliRt2Q44NdEio15CycMbnSOLTBYcaMTiivgydk/14VfbS
+	G2yqGnTIJtP/1JY/dqGIQn72HxKEQ2JrvjEeGBBoJw9amRU2Xzef2W5dUDIU8NFX
+	exntoMvlH4hMGKD3RKw4o8J/qVp6pyx1MlX9ThJ5qxKjH7U3WuO6kf1n/WaDEWyN
+	aV+hH7TwJCdunmyOncoDcke01169rnzn46X86MkqMJhx1LaYADj2wP11RD6KivVo
+	0UbkDMw8flAyhVqtyiA59CmvkuJolbtmjs/8xH6/9VvQKef4DO8+cH6H9HcY9+yS
+	pffHHLnDwVY0rtT7vRxJw==
+X-ME-Sender: <xms:PKALadRGFeJwVVT3_uS_wq5h3MGeaR7NASbGpWQkJ8J0KkArD5B9Qg>
+    <xme:PKALaafhknsTznjkqI4fpUspM_MH10-p4Luwd-ZHldZmGXkafiXDng2ER3tNFkzsJ
+    T1ehyFk4iXJjo4kdecMF4cfG30agTrNWD3-7t1SLX8FRuu3aqEiqzs>
+X-ME-Received: <xmr:PKALacp4_bSNvnn08FSL8pKV85nbH9do5CzaRZGWsPUDckqPD4UP8CN4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeegjedtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
+    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
+    htvghrnhephedvtdeuveejudffjeefudfhueefjedvtefgffdtieeiudfhjeejhffhfeeu
+    vedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdp
+    nhgspghrtghpthhtohepiedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepughmrg
+    htlhgrtghksehgohhoghhlvgdrtghomhdprhgtphhtthhopegrlhgvgidrfihilhhlihgr
+    mhhsohhnsehrvgguhhgrthdrtghomhdprhgtphhtthhopehjghhgsehnvhhiughirgdrtg
+    homhdprhgtphhtthhopehjrhhhihhlkhgvsehgohhoghhlvgdrtghomhdprhgtphhtthho
+    pehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvhhiphhinhhshh
+    esghhoohhglhgvrdgtohhm
+X-ME-Proxy: <xmx:PKALab9ZlzQG2jLORkZvfMhAjMYXWwkwHCqWedkl6HIHU-T-PJDSjA>
+    <xmx:PKALaYefnCNjBfOfyQt3XdMxKuGZBy8g_A6yxg7S3rTAYwGPVLIAiQ>
+    <xmx:PKALaVJVp5LsdpH39XySSK6qRWZrewhzT_VhoBsLr9r0KHFrxdR3VA>
+    <xmx:PKALaYh2h5mekk8sNlpjYGFsFjz-BGobfeLtl9gXrQTb0lCwZEW6pQ>
+    <xmx:PKALaV1MLhuL5vJrbZNkL0nbnhslQ_b87_0nVa3adFcA9yHn6JNVyf9U>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Nov 2025 14:06:35 -0500 (EST)
+Date: Wed, 5 Nov 2025 12:06:34 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Jason Gunthorpe
+ <jgg@nvidia.com>, Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org,
+ Vipin Sharma <vipinsh@google.com>
+Subject: Re: [PATCH 00/12] vfio: selftests: Support for multi-device tests
+Message-ID: <20251105120634.3aca5a6b.alex@shazbot.org>
+In-Reply-To: <20251008232531.1152035-1-dmatlack@google.com>
+References: <20251008232531.1152035-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2c75a316f1b91a502fad718de9b1bb151aafe717.1762171281.git.lorenzo.stoakes@oracle.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 03, 2025 at 12:31:43PM +0000, Lorenzo Stoakes wrote:
-> The kernel maintains leaf page table entries which contain either:
+On Wed,  8 Oct 2025 23:25:19 +0000
+David Matlack <dmatlack@google.com> wrote:
+
+> This series adds support for tests that use multiple devices, and adds
+> one new test, vfio_pci_device_init_perf_test, which measures parallel
+> device initialization time to demonstrate the improvement from commit
+> e908f58b6beb ("vfio/pci: Separate SR-IOV VF dev_set").
 > 
-> - Nothing ('none' entries)
-> - Present entries (that is stuff the hardware can navigate without fault)
-> - Everything else that will cause a fault which the kernel handles
+> This series also breaks apart the monolithic vfio_util.h and
+> vfio_pci_device.c into separate files, to account for all the new code.
+> This required some code motion so the diffstat looks large. The final
+> layout is more granular and provides a better separation of the IOMMU
+> code from the device code.
 
-The problem is that we're already using 'pmd leaf entries' to mean "this
-is a pointer to a PMD entry rather than a table of PTEs".  So I think
-we need a new name.  A boring name would be 'swent' (software entry).
-An acronym would be SWE.  In the XArray I distinguish between pointer
-entries and value entries -- would calling them value entries work here?
-Or we could call them something entirely different.  Say 'twig'.  Or
-'cask'.
+Hi David,
 
+This series doesn't apply to mainline currently and I see you have some
+self-comments that suggests this is still a WIP, so I'll drop it and
+look for a v2.  I believe
+https://lore.kernel.org/kvm/20250912222525.2515416-2-dmatlack@google.com/
+is still in play though and does apply.  Thanks,
+
+Alex
 
