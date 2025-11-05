@@ -1,366 +1,266 @@
-Return-Path: <kvm+bounces-62085-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62086-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE70AC365B5
-	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 16:36:10 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44DA2C3650A
+	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 16:26:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72E721A270B7
-	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 15:25:18 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BF3CD34F073
+	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 15:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ECF9338594;
-	Wed,  5 Nov 2025 15:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28DD633C535;
+	Wed,  5 Nov 2025 15:20:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="O5HQpvDv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dnjobKRu"
 X-Original-To: kvm@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09ECD337B9C
-	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 15:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762355863; cv=none; b=HAPS7SjISXkeJOJh3JYrVIdI/xex+qn9US5KvZw30mz0pT94FvyEZNdknh1/PQnghq9lEjBUZUH1kc665JFJ+XnPKzRQPt+GarVgkMYjPK1wgTZczURwEorGYAJtBrmPBRugSiLeaZvpKdkKoWNOJQlzwSO3Xdkkl35KXgKnhxU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762355863; c=relaxed/simple;
-	bh=c9SLWHQtfImXQXCj5SjPTg9JAAAgpj3FHP5QB9S9pYE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lrJcFK7+2ocVxDz0O5HzER2HKeAvPCnIylz+IKjqKTB0/hC2i3M25PgWY7BtBjrHByp/OO5Xq8zW+T2EuaTey123USfGxlVnrYha723hdJKAT/tR5bZ8GGOLXuODDAm+QMkPsNbju+rmt0sng1BbcjSLL44yvz/BgwjqUxqyDc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sanechips.com.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=O5HQpvDv; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sanechips.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=xa
-	Nnz3xllFFklv0+6RHlce9uSFLQrslVQn0HbzGh3CM=; b=O5HQpvDvHlo0jkxy1w
-	b/h0vb6/XPd+WqP7L9Fv7Q54ZGKEs86l2mSmZhUdjsV3i2256wSLzClKXgWGTPNe
-	cKmP88Zdfg0z6d61AdF9lMHNujhfVODiXTx+JUuWMa5tbJAn6nnMTLEH50pQ9pBp
-	OFXsGF0EJGYikDl2NMO/sxgC4=
-Received: from wufei (unknown [])
-	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wDnz70cagtpVB05Bw--.55534S2;
-	Wed, 05 Nov 2025 23:16:02 +0800 (CST)
-From: Wu Fei <wu.fei9@sanechips.com.cn>
-To: kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Wu Fei <wu.fei9@sanechips.com.cn>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Nutty Liu <nutty.liu@hotmail.com>,
-	Anup Patel <anup@brainfault.org>
-Subject: [PATCH v2 RESEND] KVM: riscv: selftests: Add riscv vm satp modes
-Date: Wed,  5 Nov 2025 23:14:26 +0800
-Message-ID: <20251105151442.28767-1-wu.fei9@sanechips.com.cn>
-X-Mailer: git-send-email 2.51.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A6133BBD5;
+	Wed,  5 Nov 2025 15:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762356045; cv=fail; b=dgmMnxHzCEZGkc9GCMd4fwSnDOH+2y/F7ev8O9+eYF/uE72Blhg2Yj2WUY8Qge1+cAtEo0XoQvHJUPPb1EXIPJ+pfE6vzIQkAhkoD69KWhF1cb5ECtOp2DxELPqVJSfhlkrkiLhS+71XcBKhsiXEyr7OdgA3/+PNTFrhaQ5cieg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762356045; c=relaxed/simple;
+	bh=/9mE9jWkROC9ZMVzZ72gdbZqIizhHHbxJRL1tgl7+6c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=HNrdRplet0p4/IVBe7d06mg1wBKETSkGf4Rg3zuWk6sNbaP2OELG4cu0v2XpJ0c3TLzrpsWtMEQLWpGvvzC8TSkGHgruurfkSAYSK/cBJUm6sm8UpsexCHY1JvfHGFCoEVbMH7gYATPMzlc7dGgVexUkxvhF/2/wH0ST2ifhSjQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dnjobKRu; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762356044; x=1793892044;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=/9mE9jWkROC9ZMVzZ72gdbZqIizhHHbxJRL1tgl7+6c=;
+  b=dnjobKRuDIkcQ7Hub9zZJTPuhf6hWU9FYNhjyNX94nt4eDMVWvYtTkec
+   zROBMKjM4i7HCCuZee1HKPq3wFbqtW7LWS7cC5LF9sa0R9+oXobuyyMCs
+   V3nEeVyFfekGdeKgfPltfc+AuCA82JExgtzdgXJt5SQ/Koeo8mY8sDroZ
+   PnhnLz5rmxr8+Kx6PjyshZ43RQujk/dezEoF6zIzf3hdAFSRRKWrww/KD
+   YEBH4vg53Y/z0PqsZd0fc8osVR9v4Vm6N42OFGBA5IN5h2A4KYjNwciSe
+   q4nev4+A5UiWGSZjt6Hha2ec1QTv0gi+gqOjgM4D0M+YKzVIUmQjSNBb5
+   Q==;
+X-CSE-ConnectionGUID: MoGGUaRRQQKhydKZ0AfsIg==
+X-CSE-MsgGUID: BHH5utJoQfW47LJxjo8b0g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11603"; a="87101323"
+X-IronPort-AV: E=Sophos;i="6.19,282,1754982000"; 
+   d="scan'208";a="87101323"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 07:20:40 -0800
+X-CSE-ConnectionGUID: l6VKLMXPT7WK+wPhiPOYqw==
+X-CSE-MsgGUID: siTbIQGpSEa+YkKNXFVnUg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,282,1754982000"; 
+   d="scan'208";a="210959639"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 07:20:39 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 5 Nov 2025 07:20:38 -0800
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Wed, 5 Nov 2025 07:20:38 -0800
+Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.41) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 5 Nov 2025 07:20:38 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=V7ViTjvF/nHQpGca51Cn5rGz3yb0rxpabpW3iB+0MurDa3tQuirm+iI8zx7g0JtCfFsDXZMHhrKbsYC80xaZi5tkcGtFLoWSOGNulEeWelZnjx3Gr2t9+CggpOxeBUJF2S4X6aaXe4crvInDmF/jZAC2NUaZ+EG1A89DzyUoKXxKSYdBBzmrhocp4jLC6w96RrEkTKQxnw6UpBZvWCeB6oOLh0n8/AT4Q2P95fRMZb02KAtSfTL4N70/EBIbraMDZLvpzBsUmPAZEwb6kzFrBCRmdVurei6MaVeZl30TRlkUm3nZDSyh77GBySX/rI8Vhks7NXPsITsG95aTQ/gKpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xaHjIC+0arQdpAxtukGPqiy8pVWapDqFCpnPBBPNoNg=;
+ b=SMT7Ry2rpKrtFavkGGu+09abxWmhkKGaR698O+2choCLIaMmttPN7avHanoy4NDEIec7KirO28lSYU3X33313dch12AHhKnBlB2kuDt9ZbeWtBX1t9tRHGMlx8n8mS2Q24oSoeckBaFM6IUPuehIwZtelzgO0+qoedVd0nKvSCnhBgvYibIiebxPvKU+BAoqBiKwl1E4RFIqrun6FC+Jf9JgpiJ+Bi0TvOjDRpqN84IlFUQWimlMTfYYIovD/x4JKowotvaGt4vgphOjZinmfESwZlk1+GwSO3o9GImkQ24cb56cSNXZUxTiblCUb4UvWpQecAJsmtktyeB8JeTaOA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB5373.namprd11.prod.outlook.com (2603:10b6:5:394::7) by
+ DM3PPF7C7D8332C.namprd11.prod.outlook.com (2603:10b6:f:fc00::f31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.7; Wed, 5 Nov
+ 2025 15:20:37 +0000
+Received: from DM4PR11MB5373.namprd11.prod.outlook.com
+ ([fe80::927a:9c08:26f7:5b39]) by DM4PR11MB5373.namprd11.prod.outlook.com
+ ([fe80::927a:9c08:26f7:5b39%5]) with mapi id 15.20.9298.007; Wed, 5 Nov 2025
+ 15:20:36 +0000
+Date: Wed, 5 Nov 2025 16:20:33 +0100
+From: =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: Lucas De Marchi <lucas.demarchi@intel.com>, Alex Williamson
+	<alex@shazbot.org>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
+	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Yishai Hadas <yishaih@nvidia.com>, Kevin Tian <kevin.tian@intel.com>,
+	"Shameer Kolothum" <skolothumtho@nvidia.com>,
+	<intel-xe@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, Matthew Brost <matthew.brost@intel.com>, Michal
+ Wajdeczko <michal.wajdeczko@intel.com>, <dri-devel@lists.freedesktop.org>,
+	Jani Nikula <jani.nikula@linux.intel.com>, Joonas Lahtinen
+	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Lukasz
+ Laguna <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v3 27/28] drm/intel/pciids: Add match with VFIO override
+Message-ID: <r5c2d7zcz2xemyo4mlwpzwhiix7vysznp335dqzhx3zumafrs4@62tmcvj4ccao>
+References: <20251030203135.337696-1-michal.winiarski@intel.com>
+ <20251030203135.337696-28-michal.winiarski@intel.com>
+ <cj3ohepcobrqmam5upr5nc6jbvb6wuhkv4akw2lm5g3rms7foo@4snkr5sui32w>
+ <xewec63623hktutmcnmrvuuq4wsmd5nvih5ptm7ovdlcjcgii2@lruzhh5raltm>
+ <3y2rsj2r27htdisspmulaoufy74w3rs7eramz4fezwcs6j5xuh@jzjrjasasryz>
+ <20251104192714.GK1204670@ziepe.ca>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251104192714.GK1204670@ziepe.ca>
+X-ClientProxiedBy: BE1P281CA0332.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:7d::27) To DM4PR11MB5373.namprd11.prod.outlook.com
+ (2603:10b6:5:394::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnz70cagtpVB05Bw--.55534S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3ZryrCF4UAr47Ar1fur1UAwb_yoWDCryUpF
-	4DGw10k347tFy3ZFy8Gr9YvrWxJw1rJrW8ury2ganruw4ktr1xJr1xKFZxAa43urW8W3Wr
-	Cr1SgFy7WrWkWF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07je9a9UUUUU=
-Sender: atwufei@163.com
-X-CM-SenderInfo: pdwz3wlhl6il2tof0z/1tbiYB38oWkLYPnhsgAAsI
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5373:EE_|DM3PPF7C7D8332C:EE_
+X-MS-Office365-Filtering-Correlation-Id: 697ec49b-cb50-4bec-f146-08de1c7edf02
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?ajdmUVVrYm9kSEtScGxUWEhSUEl6cHN1SFZMS3pMenkzOElOOE9YZm8zTDND?=
+ =?utf-8?B?dTB4RkRCRWhBbk9pSklIcGNabHUwQUZibStzeXJKbTVOeERBL2pFMEhINE1H?=
+ =?utf-8?B?MThKdE9SdXBoTXI2ZVh0UjZnM3lpdmMwWjZPWWx3S0IwN2xhU0RGdEFyRGNt?=
+ =?utf-8?B?VWtKTzdvNTZYYzNRSEJ0TnIreGRjS0tGWktnYXozdk83V3dUMTdNdVNoVVdr?=
+ =?utf-8?B?S0lBQnZrT1hIQ09UckYzUzNWVkdQOWNJaG93U2NjeFhhcUUxdmpvSVRBV2wv?=
+ =?utf-8?B?RXhLNEV3eEl3Z25VQmtPWmJ4TzRBR0RUQzg3ckFDaFNGVzRCbVVFQmx3TmpJ?=
+ =?utf-8?B?QU83RHhFWlQ5MWdtNUoxK2MvSC9yS2QrbndpNHpieWE0c1JpT0pnVEg5OGQz?=
+ =?utf-8?B?QnprQXhWZ2llVHJIZEx3NGdFTXJTa2pRZ0lRM3NqWlZ4c3E4SndQZ1lKM1Ji?=
+ =?utf-8?B?UzdZVVd6MXorMkxVSzhENVFHcDBXL1BiNkh3QmhJdmhENXJtV3RCR3VjUTZE?=
+ =?utf-8?B?NnZnMEtQZ3YwbWxaK2h2TWdWMk1kZ0hqb1I5SE0vaXcyakJ6d3FTY2JYMWdt?=
+ =?utf-8?B?V0grYXpmOEd4Mk40djJXRWVJQldUM2FnUHZJczhZQVEvUVZiSGZmT08vQWph?=
+ =?utf-8?B?WUlMNHFzZFVzUmFTZUNCdklOREVIc01scFAwSGNYVFphOXd6b3FBQ0JYalRr?=
+ =?utf-8?B?ZjJTa3dtS04zV2llWXRqM1FKKzYxTVpFKzZwWEl3SVpNZldnQ2tkNGlHZ2lw?=
+ =?utf-8?B?TVVWaWE3aGlZb250U0wzRWk5bG5yN3JUSXQ1YmVGRTFJWmNLRTBiWFY5VCtB?=
+ =?utf-8?B?MFUyTUl6OEtuUllOdkR5UHFNbzZIanZRS0l0RitkVVBqVUJjSU1TaHE5U0tX?=
+ =?utf-8?B?RXYzckZodmNrWCtpb3dGeEVWRDFBZDl1SWpNU3RiTXc5b3lOWVBtUDdqRXlC?=
+ =?utf-8?B?MktNUVNGUS9RNFU0UzQrSTFRU2o1VXUxdTl4am9JOFBucE8relVqWWhWNk82?=
+ =?utf-8?B?RHcvOEx3ZnZ3SU1wbG1Dc0syRmw3UXovZ29ZWXE2YU0renJxWFhwUThEODcy?=
+ =?utf-8?B?NEJXbzN2Z3RzTlFYVjY5cFdoN05VYlhNcDVienB6UVRFaHVnY2I0Tm9HS2p6?=
+ =?utf-8?B?MEk3clM1bDIyZDdmNWxhOWhJWFVsTzdtelJPRE5IOGNQa0FjdGF6QkdIbUov?=
+ =?utf-8?B?UkZhTEFMdHZwbHRBTDEvT21lUG92bUgyM3hrM3Jjci9HM2hxN2NCZndoZkJ6?=
+ =?utf-8?B?N2c4TVVrKzMxSTI2THdxWGgrUzdMQ21oY3JxQ243eTdRN1IwT29zWjJNaWMy?=
+ =?utf-8?B?NTFJMGJkVFhPU3ppa1A1M3RIRUwwVXdwanE2NFlHNTZtSmRZVFF5MEFZbmJv?=
+ =?utf-8?B?SVo2eXZERmRwS1dEYXpNcVRTaS9WOHcxZTdnRFEzZzk5aVBoSlNxM3ROVDNR?=
+ =?utf-8?B?NklRdGtFaVVCNHRzMzlnUm1wd00zUU8yTXZIUXJoTnMyc2dlQVR2RGhhbnU3?=
+ =?utf-8?B?bEpwVGVxZTZJckZJajIvOTYybU9yZkEveEo3eThSUkNYM0VOWGN1T24rM0E4?=
+ =?utf-8?B?K3g3L05WMEhjdXF2eFNZeXFPdmpkcXZLT1k2Q254UTBQd1Q4Q0ZwblhtTXlX?=
+ =?utf-8?B?enVleXllZHZzOC9XcUR3aE00aEo5K0NBQUxNRjhjMlJCcWpuQW9FY2tNR1Q3?=
+ =?utf-8?B?T01PQzQvRWEraU81WGhMUGlhdWpHMk9KaTdJei95T3hEc1ZUeFRjcUtxUU5U?=
+ =?utf-8?B?Mld1Ulk5Ymo2MDNsMmRQa3d4Q1VxMzB0SzlyM3ZTbjNKbWFZVlFhS2FvbEFY?=
+ =?utf-8?B?c2RRQWxEY09ocFl2ZVFmakduZG9vTFg3aEZnZk5HMDNKMHhSWUNrV3ZWczN3?=
+ =?utf-8?B?Ulp1M2R3NHFzait3djh4Tmp4ZkE3UWNsR3FuOGZyaHpjRzEyRXZLOW1WR0FF?=
+ =?utf-8?Q?u6UAcK4IwShXb//fESsE32zLVFTcu5Bm?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?T2lSR1FBeU9BZGZ5cTJqcTF3WU9jMjRaMXZ5RyszcHZ1WGQrck1qWDRPTjBU?=
+ =?utf-8?B?R0orRm5rSXdYd0xxUVdVNVoxbnA3ZE15dXJUNzB0ZjlFMEFtREdOMnlac0k4?=
+ =?utf-8?B?Z2w3cUhuTUJEeU94dE94UHM0TmJIZUoxYkoxTXJxTjBWTGNob0lOSEEyTnlk?=
+ =?utf-8?B?V0pBdFZ2cVIyTVVUMXk2SFlURisybWJ1cHJsT1h1dmtwRTg5ZjQyRUdWVHNX?=
+ =?utf-8?B?V2FuWjhYdmFYQWY1MlMwSnhRRmdlWklNNDVQNU10Q3orWFZzcFBVeDFMa1ZL?=
+ =?utf-8?B?R1VVM0o5b3lvTnhJRGliajRybnYzWFo4anhxV3Q5Y1dDTFEzcWhRSGVQRnRt?=
+ =?utf-8?B?MGVRVHYyb0ZsdmxLZDhZOHNrN2ZVMUQrQVg0MExhd05WWGE0aTZ0NkJsNjFv?=
+ =?utf-8?B?Y0RWeWZJZXE2WlFFTjZ0OGFUUEtHMGxnT2JRNGpacGVyQ3BmMi9CMklyakpv?=
+ =?utf-8?B?dnliK0JCSEp0a0cwMkxadEdNdVdTMTJrUHVuUUlVVXQxOCtSaVJvZTkrejNj?=
+ =?utf-8?B?ZEcycC93ZVdha3RHRGo0c09qclM0NUZzanEwSnQyT1hHSmhBM01qNGJESTM2?=
+ =?utf-8?B?OXN4WFBEdzFjOFhUSVlnZ3JRSkRRbUdyMVhzZzYwTHFRVGhDTnVPcTdNZVBD?=
+ =?utf-8?B?a2RBNCtyK1dyTFN3R0Y2OVFMZEd5NHlxVklWOFhPTUtZUUFQTVhUTGh1SWlI?=
+ =?utf-8?B?WjVuTzl5OE1OajBnOXVVMFdVY1hoNkRWbEJraHFrK1lvWC9qOSswa0w1TmJs?=
+ =?utf-8?B?R0pXM1NBZzhNRWdoTk1kYnVwd3V5U1FoZlIzS1lxSTQ1ZGhFWXlvdmp1TlZm?=
+ =?utf-8?B?MFNEU3pCMjZqNWJvVG0zYTlBTVFRaHdXRDBSUnF2Z3lCNFAvRzVrY3B3dG1t?=
+ =?utf-8?B?SzFXSzkvQmt5Rkt5eGNaMWhQWkprQzB5MFQ3SitjZUU3U3A5NXVMdTFFaVNV?=
+ =?utf-8?B?ZVdnbTZyTXJZUkQrZzlxSXVycitEU0pPVFZRVjA3ZTl6ZUs3T29ESUUzTm1u?=
+ =?utf-8?B?YjJLUE9mVVozSHpid2dsejEwUTJDZkhDbGxwR2lRSUQ2MGxFamtNSTdkcm9X?=
+ =?utf-8?B?Q1VqMHZuSjZsSUNtZTRzdjhWWTIyd1NwUFgvTWtTano3VGxZVEN5dEFKTDZ1?=
+ =?utf-8?B?T3dKdkF0eFdGUU5YaHBFQmYrQTZMb0ZVS1F5MUxnaFVFMm9RUGZoN2QyZHVZ?=
+ =?utf-8?B?elRGQjZkSGxVTWJaTjRicXFyRjZ4U3NDQmVqbElxVWdNSFYreWN0NjNlQXZP?=
+ =?utf-8?B?MTRTVVBLRUJ1Q1BNM0pIRlFySlFQTXd5MU8zTW40SE5Td1Y3a21jSzM2cmhu?=
+ =?utf-8?B?dWNDeDJoZ2hEUlpzYi9TZDI0Y2VqT01YTEtvblFGRzVDS3ltVEZaYTN6NG9Y?=
+ =?utf-8?B?b0hkSFpwT0g3cFVKQ0JObnE1QzN3aUQ3T0VZbTZJS1EwbmozNXVXbmYyaWV2?=
+ =?utf-8?B?Q2UvekZlZTJhaWwwTzFYVUVEdnY0ajNCeTdDeFdSOVlyd1RhcEpLdDRMMklr?=
+ =?utf-8?B?SitjTmozd3FiTTd1T1Z2eXQ2M0o4OWV4dloxWXhHUnZ1cjlSc3Nzdk5sQlB1?=
+ =?utf-8?B?V0l5STZRZElBNThRbjZUc29USVhMd2R2NjFLNEdVa1hRYVJTQmdtck5UMDds?=
+ =?utf-8?B?b1RTOEZGcjMwZ3Z3d3JMQ2VDSml3ZC9nT1JQa21BMjhQRFhWLzRsZWtIWnBl?=
+ =?utf-8?B?cWRoZC9MeEQzSFFEcEVCcTltS2d0RnpyemRNSHlCNVJiQW44b1BYTDB1SE0v?=
+ =?utf-8?B?NEJoK1ZmSFRHVkQrK1AvSnlqa0pOenM3QkcyZUdZRHVqTFlOeDZsNThrRkJM?=
+ =?utf-8?B?TEFQc3R6aVp4dmxndUZFMVQwOWdqQ2tFUnpYcW83cUp3RHVKRXRwSFZpN3Zo?=
+ =?utf-8?B?M0p2WFRRVitmaXFUbmpteU1LdGlsTjRoTVVFQkFpOFpTeGZsVkJvZEt1SXc3?=
+ =?utf-8?B?RlVJbnAzb21mTDdrRXdoSnNtRkhOVFVvcEhPRjA5OW5BOHJsZy9VemhUcjdB?=
+ =?utf-8?B?QjRmV0wzaUh5aHUreG5MUXp0YTJXL1pEMHo5bzZVVVFZbVpPTXNNMVFVS1Yx?=
+ =?utf-8?B?RW9oWENVT1Bwbkp0b0RIZEc4WEVjSTBQMHNKY0RLNGh1K1dqYy84VUY3Nms0?=
+ =?utf-8?B?L1N1aUNmTkxFc1ZpUUwrOU5nbGZDU1lNQmxSQ2JGVjdKQ0Z2RVRDd0wzSngz?=
+ =?utf-8?B?VFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 697ec49b-cb50-4bec-f146-08de1c7edf02
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5373.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2025 15:20:36.7993
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2MW7+VHwvYtGKbjCMON/33AOg9EegPQZ6xA5cPmuKWgG9WnAo04O9Ka9Yi9VYcMLUYyM3mNSiTzGQYBkFFzU/EoMRf3U6aSqBnEZ348dQfw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPF7C7D8332C
+X-OriginatorOrg: intel.com
 
-Current vm modes cannot represent riscv guest modes precisely, here add
-all 9 combinations of P(56,40,41) x V(57,48,39). Also the default vm
-mode is detected on runtime instead of hardcoded one, which might not be
-supported on specific machine.
+On Tue, Nov 04, 2025 at 03:27:14PM -0400, Jason Gunthorpe wrote:
+> On Tue, Nov 04, 2025 at 11:41:53AM -0600, Lucas De Marchi wrote:
+> 
+> > > > > +#define INTEL_VGA_VFIO_DEVICE(_id, _info) { \
+> > > > > +	PCI_DEVICE(PCI_VENDOR_ID_INTEL, (_id)), \
+> > > > > +	.class = PCI_BASE_CLASS_DISPLAY << 16, .class_mask = 0xff << 16, \
+> > > > > +	.driver_data = (kernel_ulong_t)(_info), \
+> > > > > +	.override_only = PCI_ID_F_VFIO_DRIVER_OVERRIDE, \
+> > > > 
+> > > > why do we need this and can't use PCI_DRIVER_OVERRIDE_DEVICE_VFIO()
+> > > > directly? Note that there are GPUs that wouldn't match the display class
+> > > > above.
+> > > > 
+> > > > 	edb660ad79ff ("drm/intel/pciids: Add match on vendor/id only")
+> > > > 	5e0de2dfbc1b ("drm/xe/cri: Add CRI platform definition")
+> > > > 
+> > > > Lucas De Marchi
+> > > > 
+> > > 
+> > > I'll define it on xe-vfio-pci side and use
+> > 
+> > but no matter where it's defined, why do you need it to match on the
+> > class? The vid/devid should be sufficient.
+> 
+> +1
+> 
+> Jason
 
-Signed-off-by: Wu Fei <wu.fei9@sanechips.com.cn>
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-Reviewed-by: Nutty Liu <nutty.liu@hotmail.com>
-Reviewed-by: Anup Patel <anup@brainfault.org>
----
- .../testing/selftests/kvm/include/kvm_util.h  | 17 ++++-
- .../selftests/kvm/include/riscv/processor.h   |  2 +
- tools/testing/selftests/kvm/lib/guest_modes.c | 41 +++++++++---
- tools/testing/selftests/kvm/lib/kvm_util.c    | 33 ++++++++++
- .../selftests/kvm/lib/riscv/processor.c       | 63 +++++++++++++++++--
- 5 files changed, 142 insertions(+), 14 deletions(-)
+I don't need to match on class.
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index d3f3e455c031..c6d0b4a5b263 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -185,6 +185,17 @@ enum vm_guest_mode {
- 	VM_MODE_P36V48_64K,
- 	VM_MODE_P47V47_16K,
- 	VM_MODE_P36V47_16K,
-+
-+	VM_MODE_P56V57_4K,	/* For riscv64 */
-+	VM_MODE_P56V48_4K,
-+	VM_MODE_P56V39_4K,
-+	VM_MODE_P50V57_4K,
-+	VM_MODE_P50V48_4K,
-+	VM_MODE_P50V39_4K,
-+	VM_MODE_P41V57_4K,
-+	VM_MODE_P41V48_4K,
-+	VM_MODE_P41V39_4K,
-+
- 	NUM_VM_MODES,
- };
- 
-@@ -209,10 +220,10 @@ kvm_static_assert(sizeof(struct vm_shape) == sizeof(uint64_t));
- 	shape;					\
- })
- 
--#if defined(__aarch64__)
--
- extern enum vm_guest_mode vm_mode_default;
- 
-+#if defined(__aarch64__)
-+
- #define VM_MODE_DEFAULT			vm_mode_default
- #define MIN_PAGE_SHIFT			12U
- #define ptes_per_page(page_size)	((page_size) / 8)
-@@ -235,7 +246,7 @@ extern enum vm_guest_mode vm_mode_default;
- #error "RISC-V 32-bit kvm selftests not supported"
- #endif
- 
--#define VM_MODE_DEFAULT			VM_MODE_P40V48_4K
-+#define VM_MODE_DEFAULT			vm_mode_default
- #define MIN_PAGE_SHIFT			12U
- #define ptes_per_page(page_size)	((page_size) / 8)
- 
-diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
-index e58282488beb..4dade8c4d18e 100644
---- a/tools/testing/selftests/kvm/include/riscv/processor.h
-+++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-@@ -192,4 +192,6 @@ static inline void local_irq_disable(void)
- 	csr_clear(CSR_SSTATUS, SR_SIE);
- }
- 
-+unsigned long riscv64_get_satp_mode(void);
-+
- #endif /* SELFTEST_KVM_PROCESSOR_H */
-diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
-index b04901e55138..ce3099630397 100644
---- a/tools/testing/selftests/kvm/lib/guest_modes.c
-+++ b/tools/testing/selftests/kvm/lib/guest_modes.c
-@@ -4,7 +4,7 @@
-  */
- #include "guest_modes.h"
- 
--#ifdef __aarch64__
-+#if defined(__aarch64__) || defined(__riscv)
- #include "processor.h"
- enum vm_guest_mode vm_mode_default;
- #endif
-@@ -13,9 +13,11 @@ struct guest_mode guest_modes[NUM_VM_MODES];
- 
- void guest_modes_append_default(void)
- {
--#ifndef __aarch64__
-+#if !defined(__aarch64__) && !defined(__riscv)
- 	guest_mode_append(VM_MODE_DEFAULT, true);
--#else
-+#endif
-+
-+#ifdef __aarch64__
- 	{
- 		unsigned int limit = kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
- 		uint32_t ipa4k, ipa16k, ipa64k;
-@@ -74,11 +76,36 @@ void guest_modes_append_default(void)
- #ifdef __riscv
- 	{
- 		unsigned int sz = kvm_check_cap(KVM_CAP_VM_GPA_BITS);
-+		unsigned long satp_mode = riscv64_get_satp_mode() << SATP_MODE_SHIFT;
-+		int i;
- 
--		if (sz >= 52)
--			guest_mode_append(VM_MODE_P52V48_4K, true);
--		if (sz >= 48)
--			guest_mode_append(VM_MODE_P48V48_4K, true);
-+		switch (sz) {
-+		case 59:
-+			guest_mode_append(VM_MODE_P56V57_4K, satp_mode >= SATP_MODE_57);
-+			guest_mode_append(VM_MODE_P56V48_4K, satp_mode >= SATP_MODE_48);
-+			guest_mode_append(VM_MODE_P56V39_4K, satp_mode >= SATP_MODE_39);
-+			break;
-+		case 50:
-+			guest_mode_append(VM_MODE_P50V57_4K, satp_mode >= SATP_MODE_57);
-+			guest_mode_append(VM_MODE_P50V48_4K, satp_mode >= SATP_MODE_48);
-+			guest_mode_append(VM_MODE_P50V39_4K, satp_mode >= SATP_MODE_39);
-+			break;
-+		case 41:
-+			guest_mode_append(VM_MODE_P41V57_4K, satp_mode >= SATP_MODE_57);
-+			guest_mode_append(VM_MODE_P41V48_4K, satp_mode >= SATP_MODE_48);
-+			guest_mode_append(VM_MODE_P41V39_4K, satp_mode >= SATP_MODE_39);
-+			break;
-+		default:
-+			break;
-+		}
-+
-+		/* set the first supported mode as default */
-+		vm_mode_default = NUM_VM_MODES;
-+		for (i = 0; vm_mode_default == NUM_VM_MODES && i < NUM_VM_MODES; i++) {
-+			if (guest_modes[i].supported && guest_modes[i].enabled)
-+				vm_mode_default = i;
-+		}
-+		TEST_ASSERT(vm_mode_default != NUM_VM_MODES, "No supported mode!");
- 	}
- #endif
- }
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 1a93d6361671..a6a4bbc07211 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -209,6 +209,15 @@ const char *vm_guest_mode_string(uint32_t i)
- 		[VM_MODE_P36V48_64K]	= "PA-bits:36,  VA-bits:48, 64K pages",
- 		[VM_MODE_P47V47_16K]	= "PA-bits:47,  VA-bits:47, 16K pages",
- 		[VM_MODE_P36V47_16K]	= "PA-bits:36,  VA-bits:47, 16K pages",
-+		[VM_MODE_P56V57_4K]	= "PA-bits:56,  VA-bits:57,  4K pages",
-+		[VM_MODE_P56V48_4K]	= "PA-bits:56,  VA-bits:48,  4K pages",
-+		[VM_MODE_P56V39_4K]	= "PA-bits:56,  VA-bits:39,  4K pages",
-+		[VM_MODE_P50V57_4K]	= "PA-bits:50,  VA-bits:57,  4K pages",
-+		[VM_MODE_P50V48_4K]	= "PA-bits:50,  VA-bits:48,  4K pages",
-+		[VM_MODE_P50V39_4K]	= "PA-bits:50,  VA-bits:39,  4K pages",
-+		[VM_MODE_P41V57_4K]	= "PA-bits:41,  VA-bits:57,  4K pages",
-+		[VM_MODE_P41V48_4K]	= "PA-bits:41,  VA-bits:48,  4K pages",
-+		[VM_MODE_P41V39_4K]	= "PA-bits:41,  VA-bits:39,  4K pages",
- 	};
- 	_Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
- 		       "Missing new mode strings?");
-@@ -236,6 +245,15 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
- 	[VM_MODE_P36V48_64K]	= { 36, 48, 0x10000, 16 },
- 	[VM_MODE_P47V47_16K]	= { 47, 47,  0x4000, 14 },
- 	[VM_MODE_P36V47_16K]	= { 36, 47,  0x4000, 14 },
-+	[VM_MODE_P56V57_4K]	= { 56, 57,  0x1000, 12 },
-+	[VM_MODE_P56V48_4K]	= { 56, 48,  0x1000, 12 },
-+	[VM_MODE_P56V39_4K]	= { 56, 39,  0x1000, 12 },
-+	[VM_MODE_P50V57_4K]	= { 50, 57,  0x1000, 12 },
-+	[VM_MODE_P50V48_4K]	= { 50, 48,  0x1000, 12 },
-+	[VM_MODE_P50V39_4K]	= { 50, 39,  0x1000, 12 },
-+	[VM_MODE_P41V57_4K]	= { 41, 57,  0x1000, 12 },
-+	[VM_MODE_P41V48_4K]	= { 41, 48,  0x1000, 12 },
-+	[VM_MODE_P41V39_4K]	= { 41, 39,  0x1000, 12 },
- };
- _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
- 	       "Missing new mode params?");
-@@ -336,6 +354,21 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
- 	case VM_MODE_P44V64_4K:
- 		vm->pgtable_levels = 5;
- 		break;
-+	case VM_MODE_P56V57_4K:
-+	case VM_MODE_P50V57_4K:
-+	case VM_MODE_P41V57_4K:
-+		vm->pgtable_levels = 5;
-+		break;
-+	case VM_MODE_P56V48_4K:
-+	case VM_MODE_P50V48_4K:
-+	case VM_MODE_P41V48_4K:
-+		vm->pgtable_levels = 4;
-+		break;
-+	case VM_MODE_P56V39_4K:
-+	case VM_MODE_P50V39_4K:
-+	case VM_MODE_P41V39_4K:
-+		vm->pgtable_levels = 3;
-+		break;
- 	default:
- 		TEST_FAIL("Unknown guest mode: 0x%x", vm->mode);
- 	}
-diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-index 2eac7d4b59e9..003693576225 100644
---- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-@@ -8,6 +8,7 @@
- #include <linux/compiler.h>
- #include <assert.h>
- 
-+#include "guest_modes.h"
- #include "kvm_util.h"
- #include "processor.h"
- #include "ucall_common.h"
-@@ -197,22 +198,41 @@ void riscv_vcpu_mmu_setup(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_vm *vm = vcpu->vm;
- 	unsigned long satp;
-+	unsigned long satp_mode;
-+	unsigned long max_satp_mode;
- 
- 	/*
- 	 * The RISC-V Sv48 MMU mode supports 56-bit physical address
- 	 * for 48-bit virtual address with 4KB last level page size.
- 	 */
- 	switch (vm->mode) {
--	case VM_MODE_P52V48_4K:
--	case VM_MODE_P48V48_4K:
--	case VM_MODE_P40V48_4K:
-+	case VM_MODE_P56V57_4K:
-+	case VM_MODE_P50V57_4K:
-+	case VM_MODE_P41V57_4K:
-+		satp_mode = SATP_MODE_57;
-+		break;
-+	case VM_MODE_P56V48_4K:
-+	case VM_MODE_P50V48_4K:
-+	case VM_MODE_P41V48_4K:
-+		satp_mode = SATP_MODE_48;
-+		break;
-+	case VM_MODE_P56V39_4K:
-+	case VM_MODE_P50V39_4K:
-+	case VM_MODE_P41V39_4K:
-+		satp_mode = SATP_MODE_39;
- 		break;
- 	default:
- 		TEST_FAIL("Unknown guest mode, mode: 0x%x", vm->mode);
- 	}
- 
-+	max_satp_mode = vcpu_get_reg(vcpu, RISCV_CONFIG_REG(satp_mode));
-+
-+	if ((satp_mode >> SATP_MODE_SHIFT) > max_satp_mode)
-+		TEST_FAIL("Unable to set satp mode 0x%lx, max mode 0x%lx\n",
-+			  satp_mode >> SATP_MODE_SHIFT, max_satp_mode);
-+
- 	satp = (vm->pgd >> PGTBL_PAGE_SIZE_SHIFT) & SATP_PPN;
--	satp |= SATP_MODE_48;
-+	satp |= satp_mode;
- 
- 	vcpu_set_reg(vcpu, RISCV_GENERAL_CSR_REG(satp), satp);
- }
-@@ -515,3 +535,38 @@ unsigned long get_host_sbi_spec_version(void)
- 
- 	return ret.value;
- }
-+
-+void kvm_selftest_arch_init(void)
-+{
-+	/*
-+	 * riscv64 doesn't have a true default mode, so start by detecting the
-+	 * supported vm mode.
-+	 */
-+	guest_modes_append_default();
-+}
-+
-+unsigned long riscv64_get_satp_mode(void)
-+{
-+	int kvm_fd, vm_fd, vcpu_fd, err;
-+	uint64_t val;
-+	struct kvm_one_reg reg = {
-+		.id     = RISCV_CONFIG_REG(satp_mode),
-+		.addr   = (uint64_t)&val,
-+	};
-+
-+	kvm_fd = open_kvm_dev_path_or_exit();
-+	vm_fd = __kvm_ioctl(kvm_fd, KVM_CREATE_VM, NULL);
-+	TEST_ASSERT(vm_fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_VM, vm_fd));
-+
-+	vcpu_fd = ioctl(vm_fd, KVM_CREATE_VCPU, 0);
-+	TEST_ASSERT(vcpu_fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_VCPU, vcpu_fd));
-+
-+	err = ioctl(vcpu_fd, KVM_GET_ONE_REG, &reg);
-+	TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_GET_ONE_REG, vcpu_fd));
-+
-+	close(vcpu_fd);
-+	close(vm_fd);
-+	close(kvm_fd);
-+
-+	return val;
-+}
--- 
-2.51.0
+With PCI_DRIVER_OVERRIDE_DEVICE_VFIO it just becomes:
+#define INTEL_PCI_VFIO_DEVICE(_id) { \
+	PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, (_id)) \
+}
 
+static const struct pci_device_id xe_vfio_pci_table[] = {
+	INTEL_PTL_IDS(INTEL_PCI_VFIO_DEVICE),
+	INTEL_WCL_IDS(INTEL_PCI_VFIO_DEVICE),
+	INTEL_BMG_IDS(INTEL_PCI_VFIO_DEVICE),
+	{}
+};
+
+So, no matching on class, but I still do need a helper macro.
+
+Thanks,
+-Michał
 
