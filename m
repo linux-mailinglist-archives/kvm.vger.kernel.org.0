@@ -1,153 +1,126 @@
-Return-Path: <kvm+bounces-62033-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62034-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9A49C3365A
-	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 00:37:00 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF9BBC336F0
+	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 01:03:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6857B3A2CB0
-	for <lists+kvm@lfdr.de>; Tue,  4 Nov 2025 23:36:56 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 77BFC34DEB9
+	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 00:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F216347BA0;
-	Tue,  4 Nov 2025 23:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181B11B87F2;
+	Wed,  5 Nov 2025 00:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fIHXjlup"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f6nDeiTH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCB9346FC5;
-	Tue,  4 Nov 2025 23:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38AC119E7E2
+	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 00:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762299409; cv=none; b=YuJHJ6yjgUXMe8FhNcLyd0ryiEeo34dgunrZRvlp1ktL95efAdE6MPl0/x8SCJF9ImUf+jVfvd7BYOQGuJl2wxifF6E85veGUVU/5Otn2ydJo5uk/Nppkg7A5ONjIiHSqz63nvrRLzxdPifnCEf6VfV5zoSwSADQwgMZRzzpnkc=
+	t=1762300983; cv=none; b=u6idEhVQIfPSonssdaA3qVxbA2b2KI3G7RUzw7Qn2/1qLPs0Dahd2QNtgVlRmBOcEnWaUEcdkAJp9Yh3pQpQtsUVOJbt2vmFR6zBAyfJe8QkhD30AZXb5vRqn5zTKJRj9+HxmO7OJ8gTZp6av/fKqGClCar4srbRtYoVIiNPaSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762299409; c=relaxed/simple;
-	bh=PKWKmIdlfyKfFqEKnAFOIWxWsIWRYB5asKBV1Y6ZW1g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tcwt9ht45br9g4vPcdTPx748sWrfzYhn9CwQqcOQ37hGmNNCdoioA3RawGIWBHONlALKEM/FRWBMIqyx88r9i49AZhjOzE7HqF8L9mVKmfhJVV5xvUsVo0LceKCYK5o9ICKpb27/dO5pZutrOr1YAaO7grz0rXPFiB4XzELAOVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fIHXjlup; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762299408; x=1793835408;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PKWKmIdlfyKfFqEKnAFOIWxWsIWRYB5asKBV1Y6ZW1g=;
-  b=fIHXjlupSitaAKkoVJ1rg0hWirb8XoN3IFRYzRJ3y2rmWZqAPKtJPsRg
-   uIilztaTgNO32Sk3nF38oAH7v7iYhGNBzDzkoAMcQ9cmaHRYxpH/sI9Zd
-   MMof6L7BipS2lZWht8EpWRcXyLB76/bWlgGyICp8wwPnYKhaDS5o+w7d0
-   mZskxYLxVK6UGiTdpZ/ZzVBmQ955HIRBl+vDJNtcRrg0EnazfB+u2jMbi
-   CrTiM4UH8G4joghJW+kcMpBngRk7nKKj731FRx/Ukwha9WYgb7pXVSMaz
-   STHOmM4xj6nODAxYXqI+nyfCscCUx+bp8dCLW0k8K6jjARyslpAt80ZZ/
-   A==;
-X-CSE-ConnectionGUID: rBs3imWnR1G93hQxKgsgaQ==
-X-CSE-MsgGUID: JOZgcLQVRqqcl3w/PAyP8w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11603"; a="68265513"
-X-IronPort-AV: E=Sophos;i="6.19,280,1754982000"; 
-   d="scan'208";a="68265513"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 15:36:46 -0800
-X-CSE-ConnectionGUID: rswLq5OwQS6ylN+55p2Log==
-X-CSE-MsgGUID: 31jX9TLASFqYdLt9tXRV8w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,280,1754982000"; 
-   d="scan'208";a="186540925"
-Received: from mgerlach-mobl1.amr.corp.intel.com (HELO desk) ([10.124.221.88])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 15:36:45 -0800
-Date: Tue, 4 Nov 2025 15:36:39 -0800
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>
-Subject: Re: [PATCH v3 3/3] x86/vmscape: Remove LFENCE from BHB clearing long
- loop
-Message-ID: <20251104233639.luharyaq5twafmlk@desk>
-References: <20251027-vmscape-bhb-v3-0-5793c2534e93@linux.intel.com>
- <20251027-vmscape-bhb-v3-3-5793c2534e93@linux.intel.com>
- <c98e68f0-e5e2-482d-9a64-ad8164e4bae8@intel.com>
- <20251104220100.wrorcuok5slqy74u@desk>
- <c6b9a696-975f-4dfa-bf65-9a1e983fab54@intel.com>
+	s=arc-20240116; t=1762300983; c=relaxed/simple;
+	bh=mw/JkC7Rw+9eec8IbwLymvX1pCZY7TXzkGMdhZgmVPM=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mF2BYi1At2DrdwVvg+QQ3CBy75TfK8eRvUzksYvTYl9tdJcbtibzTadYgbNeSoGemJ7W6GKTYPplcPFz531f01NewvnJWBuGkYE58C6A7Efq3cZguSgT8nSqYqIFoUr+DDTfo23YGpn4hfh/2Nzrz1dXI5HBPPw1uqaK0x1aCog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f6nDeiTH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1B0EBC4CEF8
+	for <kvm@vger.kernel.org>; Wed,  5 Nov 2025 00:03:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762300983;
+	bh=mw/JkC7Rw+9eec8IbwLymvX1pCZY7TXzkGMdhZgmVPM=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=f6nDeiTH8vOEzwiJljzzLoZHv2DplpOOwefQeCHu+cgNqb2NEetbn66Ug6pGjRtxT
+	 kaYAdu8m4jIObPYTusEWLlVMiP3r0817O9qHROxD9UnCOEQ9xl4VjOpgqWCpkXfxTD
+	 GuaYrOzTd8YXCzBKJbzfmRvpQTn6mm5poRs3NhzArhQzgsg9COiVwJgR3Toq2Vxav0
+	 ECUB83Yng//ZQ6pmXAmK2clXOyU4Bvs6vM9YHf59D3rLpkT6uZRccaSSgfNu2aD+Oa
+	 FNqH/Np/mL3Zl/gjyyA4DkbfyTHIYVIf6ez5JaXTDVpDuCezged7Vcmg+dPIk9XjSS
+	 iFaI9u8BDyyMA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 13CB1C41612; Wed,  5 Nov 2025 00:03:03 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 220740] Host crash when do PF passthrough to KVM guest with
+ some devices
+Date: Wed, 05 Nov 2025 00:03:02 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: alex.l.williamson@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-220740-28872-OFut6o5vJZ@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220740-28872@https.bugzilla.kernel.org/>
+References: <bug-220740-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c6b9a696-975f-4dfa-bf65-9a1e983fab54@intel.com>
 
-On Tue, Nov 04, 2025 at 02:35:11PM -0800, Dave Hansen wrote:
-> On 11/4/25 14:01, Pawan Gupta wrote:
-> > On Mon, Nov 03, 2025 at 12:45:35PM -0800, Dave Hansen wrote:
-> ...
-> >> Too. Much. Assembly.
-> >>
-> >> Is there a reason we can't do more of this in C?
-> > 
-> > Apart from VMSCAPE, BHB clearing is also required when entering kernel from
-> > system calls. And one of the safety requirement is to absolutely not
-> > execute any indirect call/jmp unless we have cleared the BHB. In a C
-> > implementation we cannot guarantee that the compiler won't generate
-> > indirect branches before the BHB clearing can be done.
-> 
-> That's a good reason, and I did forget about the CLEAR_BRANCH_HISTORY
-> route to get in to this code.
-> 
-> But my main aversion was to having so many different functions with
-> different names to do different things that are also exported to the world.
-> 
-> For instance, if we need an LFENCE in the entry code, we could do this:
-> 
-> .macro CLEAR_BRANCH_HISTORY
->         ALTERNATIVE "", "call clear_bhb_loop; lfence",\
-> 			X86_FEATURE_CLEAR_BHB_LOOP
-> .endm
-> 
-> Instead of having a LFENCE variant of clear_bhb_loop().
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220740
 
-This makes perfect sense. I will do that.
+--- Comment #5 from Alex Williamson (alex.l.williamson@gmail.com) ---
+I have an X710, but not a system that can reproduce the issue.
 
-> >> Can we have _one_ assembly function, please? One that takes the loop
-> >> counts? No macros, no duplication functions. Just one:
-> > 
-> > This seems possible for all the C callers. ASM callers should stick to asm
-> > versions of BHB clearing to guarantee the compiler did not do anything
-> > funky that would break the mitigation.
-> 
-> ASM callers can pass arguments to functions too. ;)
+Also I need to correct my previous statement after untangling the headers.=
+=20
+This commit did introduce 8-byte access support for archs including x86_64
+where they don't otherwise defined a ioread/write64 support.  This access u=
+ses
+readq/writeq, where previously we'd use pairs or readl/writel.  The expecta=
+tion
+is that we're more closely matching the access by the guest.
 
-Oh my comment was more from the safety perspective of compiler induced
-code.
+I'm curious how we're getting into this code for an X710 though, mine shows
+BARs as:
 
-> Sure, the syscall entry path might not be the *best* place in the world
-> to do that because it'll add even more noops.
+03:00.0 Ethernet controller: Intel Corporation Ethernet Controller X710 for
+10GbE SFP+ (rev 01)
+        Region 0: Memory at 380000000000 (64-bit, prefetchable) [size=3D8M]
+        Region 3: Memory at 380001800000 (64-bit, prefetchable) [size=3D32K]
 
-Right.
+Those would typically be mapped directly into the KVM address space and not
+fault through QEMU to trigger access through this code.  The MSI-X capabili=
+ty
+lands in BAR3:
 
-> It does make me wonder if we want to deal with this more holistically
-> somehow:
-> 
->         /* clobbers %rax, make sure it is after saving the syscall nr */
->         IBRS_ENTER
->         UNTRAIN_RET
->         CLEAR_BRANCH_HISTORY
-> 
-> especially if we're creating lots and lots of variants of functions to
-> keep the ALTERNATIVE noop padding short.
+        Capabilities: [70] MSI-X: Enable- Count=3D129 Masked-
+                Vector table: BAR=3D3 offset=3D00000000
+                PBA: BAR=3D3 offset=3D00001000
 
-Hmm, mitigations that are mutually exclusive can certainly be grouped
-together in an ALTERNATIVE_N block. It also has a potential to quickly
-become messy. But certainly worth exploring.
+Ideally the device follows the PCIe recommendation not to place registers in
+the same page as the vector and pba tables, not doing so could cause this
+access though.  If it were such an access, QEMU could virtualize the MSI-X
+tables on a different BAR with the option x-msix-relocation=3Dbar5 (or bar2=
+).
+
+If QEMU were using x-no-mmap=3Don then we could expect this code would be u=
+sed,
+but that's not specified in the example.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
