@@ -1,140 +1,141 @@
-Return-Path: <kvm+bounces-62050-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62051-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08938C3525F
-	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 11:42:52 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D04C8C355EE
+	for <lists+kvm@lfdr.de>; Wed, 05 Nov 2025 12:33:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60079562E12
-	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 10:42:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 79C394F2605
+	for <lists+kvm@lfdr.de>; Wed,  5 Nov 2025 11:31:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 528D43054F7;
-	Wed,  5 Nov 2025 10:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75DF22FFDFB;
+	Wed,  5 Nov 2025 11:31:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LiPDoa+d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ragxC15H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E77304BD4;
-	Wed,  5 Nov 2025 10:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F2D2D7DE8;
+	Wed,  5 Nov 2025 11:31:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762339330; cv=none; b=Tm4oBw+Lq0QkYf2XnCDL0wik1oHRD+/NusU4t6SsVgqyGtZD0WI4BGMGZhPoyK9Fmrv2ApphKZlARwGf35gjanwcEoENitQEnqO8s0c+wSVZCFBwaaBtiQ2ZCzxqDQA3o0ptiRxFwdow7qLZkofZr968pLvDFtaE4bgwl61wVXo=
+	t=1762342313; cv=none; b=eBli6VTfbtyHW7KrGkA3vpQIRKyHWkgzRPpPSDwCONI9SgJdAK8/Uq8sC8FfRE2bvoILIAHR+olXPy9XwxVHaqOZkdoP+4HLqzaarg96hOsowcLWwQL+wVMY9/VOcVQjUZ1rvESrFcUP1fNk23UOdhzY/Vx0L0Tfei4pAVqX8uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762339330; c=relaxed/simple;
-	bh=1ViRHw8lx988HaKq8748rY8eBv1qH6oDXHX338eSFtQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oRDyma0fa6/8uon6gqjdxOmwmoe+sIjSIaVSo1cr+8DzlcBHnI7BbT+2BPRCDOUriT67vrfU01eZ6OY6epuYPhLw4bafeDN513re2v6YqsXn4R4ReDmROu6XKUBmonT13WmW3+bSjL4L3uYpzDtmbf+k2miarfAChA48LUsWoVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LiPDoa+d; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762339329; x=1793875329;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1ViRHw8lx988HaKq8748rY8eBv1qH6oDXHX338eSFtQ=;
-  b=LiPDoa+dXu1mWf9v6XBpNmmN1O0pTAnJyJLZ8cVs0cawL+vVjKYaiI+I
-   3DBc/BUIglQIX6z9cgz/A40vHLUjjZOqYl+39vqr5OeFvIJnkT0M11GmX
-   QQGg2wGbQiH4lepJjIlB6f1JdHQIGUHPMsRRS0gT8P+9fPpxeqe2kVCzQ
-   qgk0h4pIxXEitpE5GzjMfPQA4fmyxs1H2yjk7o5IFeVHeBgzC3K9llOD/
-   Sonr7B5Zx5UXxTSQcQHOzdnXfRirghbfccaadedhp4C+dQ5TaVekaRLB9
-   Hz4HDixVY1dnKc3UglPLXAtTauhwX2bbWpCQc2IIxKCTBworppCGjyWcw
-   w==;
-X-CSE-ConnectionGUID: dsEmGMWMQFOWFWUdV8/j7Q==
-X-CSE-MsgGUID: Q7T/VMsoSEK+NfjKPOvxnQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11603"; a="64145557"
-X-IronPort-AV: E=Sophos;i="6.19,281,1754982000"; 
-   d="scan'208";a="64145557"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 02:42:09 -0800
-X-CSE-ConnectionGUID: IgVkqlvMQd6bQciLaUzw0g==
-X-CSE-MsgGUID: WXzQ1lwKRUOpBcGYcCeFWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,281,1754982000"; 
-   d="scan'208";a="188147446"
-Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 02:42:07 -0800
-Message-ID: <88404ae2-fa4b-4357-918b-fd949dd2521a@linux.intel.com>
-Date: Wed, 5 Nov 2025 18:42:04 +0800
+	s=arc-20240116; t=1762342313; c=relaxed/simple;
+	bh=U57loPexlLZP5HdBIPeios3Zx2jNddLmBLVcIU228JY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mWJuq4e+waVXoHamaePchSNSKzlAKUWyo8fbE5R7Y0+Gb5vKgbO3bt09dWtZF2kF5tYrfzsKqOZdWWieiDGQP9/0HQVoXOBk6E9WsMsUeLF1t3qF9T6FJTZBr1PkqitKHXgk6X0H2J6hL1e1pVQTsERvNJkjiq7jQeunVZUsB6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ragxC15H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24291C4CEF8;
+	Wed,  5 Nov 2025 11:31:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762342312;
+	bh=U57loPexlLZP5HdBIPeios3Zx2jNddLmBLVcIU228JY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ragxC15Ht/seLaHZR7ulK+vdLU+DtRY2viILGtE8Zf4JihbWC9/iRZ5LH5zTASPg8
+	 ksS2TnwHb5P+G0uTXLPLzQ/EElYIQisOKOqV5DbfbNBwpuCyEaKZWdTJPXaWMBN+m2
+	 XnDaeG/OhBSmwFVq0gNfv2LtSNRJA7Sc1cQ92TOq+H1N0NdfnLN2s8Y+8O8VLEJgiD
+	 LSCpk9+GJXVVCsKhFpqsx4+UjqKsD4Ucl8FvuiPVw9pALgq8Xu6RF0gJMiQF1srgkI
+	 P3NMhuFOf1XAAyjPJxxhDxOD0px2P4w8Lvjv2vrRVy7LnbVczEHMyV1NXpCwaftSwG
+	 dS/l8XCzLMRoQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vGbjx-00000002Zmi-31vj;
+	Wed, 05 Nov 2025 11:31:49 +0000
+Date: Wed, 05 Nov 2025 11:31:49 +0000
+Message-ID: <86bjlgvhp6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: kernel test robot <lkp@intel.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	oe-kbuild-all@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
+Subject: Re: [PATCH 05/33] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
+In-Reply-To: <202511050925.kQxVnIUB-lkp@intel.com>
+References: <20251103165517.2960148-6-maz@kernel.org>
+	<202511050925.kQxVnIUB-lkp@intel.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] KVM: x86: Load guest/host XCR0 and XSS outside of the
- fastpath run loop
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jon Kohler <jon@nutanix.com>
-References: <20251030224246.3456492-1-seanjc@google.com>
- <20251030224246.3456492-4-seanjc@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20251030224246.3456492-4-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: lkp@intel.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, oe-kbuild-all@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 05 Nov 2025 02:01:36 +0000,
+kernel test robot <lkp@intel.com> wrote:
+> 
+> Hi Marc,
+> 
+> kernel test robot noticed the following build errors:
+> 
+> [auto build test ERROR on kvmarm/next]
+> [also build test ERROR on linus/master v6.18-rc4 next-20251104]
+> [cannot apply to arm64/for-next/core tip/irq/core]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Marc-Zyngier/irqchip-gic-Add-missing-GICH_HCR-control-bits/20251104-011133
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+> patch link:    https://lore.kernel.org/r/20251103165517.2960148-6-maz%40kernel.org
+> patch subject: [PATCH 05/33] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
+> config: arm64-randconfig-003-20251105 (https://download.01.org/0day-ci/archive/20251105/202511050925.kQxVnIUB-lkp@intel.com/config)
+> compiler: aarch64-linux-gcc (GCC) 8.5.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251105/202511050925.kQxVnIUB-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202511050925.kQxVnIUB-lkp@intel.com/
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    arch/arm64/kernel/hyp-stub.S: Assembler messages:
+> >> arch/arm64/kernel/hyp-stub.S:59: Error: unknown or missing system register name at operand 2 -- `mrs x1,ich_vtr_el2'
+> 
+> 
+> vim +59 arch/arm64/kernel/hyp-stub.S
+> 
+>     45	
+>     46		.align 11
+>     47	
+>     48	SYM_CODE_START_LOCAL(elx_sync)
+>     49		cmp	x0, #HVC_SET_VECTORS
+>     50		b.ne	1f
+>     51		msr	vbar_el2, x1
+>     52		b	9f
+>     53	
+>     54	1:	cmp	x0, #HVC_FINALISE_EL2
+>     55		b.eq	__finalise_el2
+>     56	
+>     57		cmp	x0, #HVC_GET_ICH_VTR_EL2
+>     58		b.ne	2f
+>   > 59		mrs	x1, ich_vtr_el2
 
+Ah, ancient assembler that doesn't understand the GICv3 registers...
+Oh well, I'll give it the generated encoding instead.
 
-On 10/31/2025 6:42 AM, Sean Christopherson wrote:
-[...]
->   
-> -void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
-> +static void kvm_load_guest_xfeatures(struct kvm_vcpu *vcpu)
->   {
->   	if (vcpu->arch.guest_state_protected)
->   		return;
->   
->   	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
-> -
->   		if (vcpu->arch.xcr0 != kvm_host.xcr0)
->   			xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
->   
-> @@ -1217,6 +1216,27 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
->   		    vcpu->arch.ia32_xss != kvm_host.xss)
->   			wrmsrq(MSR_IA32_XSS, vcpu->arch.ia32_xss);
->   	}
-> +}
-> +
-> +static void kvm_load_host_xfeatures(struct kvm_vcpu *vcpu)
-> +{
-> +	if (vcpu->arch.guest_state_protected)
-> +		return;
-> +
-> +	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
-> +		if (vcpu->arch.xcr0 != kvm_host.xcr0)
-> +			xsetbv(XCR_XFEATURE_ENABLED_MASK, kvm_host.xcr0);
-> +
-> +		if (guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVES) &&
-> +		    vcpu->arch.ia32_xss != kvm_host.xss)
-> +			wrmsrq(MSR_IA32_XSS, kvm_host.xss);
-> +	}
-> +}
+	M.
 
-kvm_load_guest_xfeatures() and kvm_load_host_xfeatures() are almost the same
-except for the guest values VS. host values to set.
-I am wondering if it is worth adding a helper to dedup the code, like:
-
-static void kvm_load_xfeatures(struct kvm_vcpu *vcpu, u64 xcr0, u64 xss)
-{
-         if (vcpu->arch.guest_state_protected)
-                 return;
-
-         if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
-                 if (vcpu->arch.xcr0 != kvm_host.xcr0)
-                         xsetbv(XCR_XFEATURE_ENABLED_MASK, xcr0);
-
-                 if (guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVES) &&
-                     vcpu->arch.ia32_xss != kvm_host.xss)
-                         wrmsrq(MSR_IA32_XSS, xss);
-         }
-}
-
-
+-- 
+Without deviation from the norm, progress is not possible.
 
