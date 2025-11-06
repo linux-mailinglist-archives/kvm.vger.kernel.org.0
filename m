@@ -1,264 +1,313 @@
-Return-Path: <kvm+bounces-62244-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62245-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4458BC3DCF2
-	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 00:23:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48840C3DE00
+	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 00:41:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 635AC189173F
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 23:23:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A6F73A5F0F
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 23:41:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1A935471E;
-	Thu,  6 Nov 2025 23:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59D17350A3A;
+	Thu,  6 Nov 2025 23:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="StwribzF"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291EB350D64;
-	Thu,  6 Nov 2025 23:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F962EBDD6;
+	Thu,  6 Nov 2025 23:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762471173; cv=none; b=OFNLwitB1/UYtiIzAQuOi8osLS+mTEBE5w5mOw/iLDXJLx0Z6Hl0cnDKMHxuFzKKH8C++yX5Dvn6cklbX04epKUGg0YYZfYjL2Z60uM18J0dc2Y1Qg/i0eY6Dvktx1xf/IOoWKfN6hHhcfOCI1EbjddWL4JEnoQwhriRto9W+TE=
+	t=1762472465; cv=none; b=paOZEfgiKNHdRlvYb8BfjWwzFyC9hXHTwzEgM6D8s5b+cCWyfNqykeDA8wL2rUnx4VinFbZCMhRszCeZRFfzJ0+JQsbwhzH/hPeMTjeSinWAfEozNMpNaIEjL8qK//DxoPhUWoWLAPWbyI+g+3YNq44K5Yhosq1/O/+kq7v+cHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762471173; c=relaxed/simple;
-	bh=QbnhjtM2DHCyRlTmO5eo3u7W6bXvB1xuo27Rpl1G/KI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wvi4PHEFj9kIdHQuXzlGMa90YNt0iAZhScOxetmzkuigj2gtXni/7kGcfNNyqeVBKHJozL1eMpHY/kHmZbn4k0XlnwpwdrU5a6nshY0gN2Zr0gPVCuuTRpJQRhL6V/oBoS2Xrdti83qg1Yv27vWzs/bORSnb4q48gp8viD/9i3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 855301595;
-	Thu,  6 Nov 2025 15:19:22 -0800 (PST)
-Received: from [10.118.100.70] (u104515.arm.com [10.118.100.70])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 228253F694;
-	Thu,  6 Nov 2025 15:19:30 -0800 (PST)
-Message-ID: <e50f810f-a770-47b2-b266-5701172c8041@arm.com>
-Date: Thu, 6 Nov 2025 17:19:29 -0600
+	s=arc-20240116; t=1762472465; c=relaxed/simple;
+	bh=m7IwhM/JVsofJPnzNF9rHIXw+lW6+tvKLrZu9897zjY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=blXxZikyTgxTnwnCRrVRlk8dxQmKN0Eq8bFJKv47XcLOWi+2BlsHFVC38K0sCfgXiIDu9SO+p6oGmSOtCuFGfsKYvgRKWOYv+5NZTsd3L4Tw0ImL4DtNVq1GXmxyH8MHUcZlcyMe9CJdx00cVtBk5SWJAETx1TJfu/Jp0Dg6utU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=StwribzF; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762472463; x=1794008463;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=m7IwhM/JVsofJPnzNF9rHIXw+lW6+tvKLrZu9897zjY=;
+  b=StwribzFegwCo1iSC5iaIcZJLs6x4CiA7c2CRjOqMQK1srJrqwGIMW99
+   tgt4mDpnHrhguDQZP1ylav4eE+0eWwl65tYHgy17Agi6bbfKnjs7uGF/S
+   Cpp2orYWedUM/m6bQDn8L08JMbTkpnz2T9bVEeCxtzfSM9DNbhME5jLFF
+   gGP3ye/hvrI63z/7I1ebXuuhHU+OGLr1aURbq7B7yDXoXk6/U5pTIEbQw
+   b5DqCnia4uGJiVC7UCOB7oK/x/+trBjI1gEpGb0b1MA4IUj751FIpMjZX
+   bOR+I+Q4g/LH9AnFfMyPNFiLEcEt8wS/95Hxa6UClBR4HE5kBp9puwzmH
+   A==;
+X-CSE-ConnectionGUID: W/9omFCjRhGF3WiEPE8cGA==
+X-CSE-MsgGUID: fg2JQZAuSsalE1NrOS4AaA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11605"; a="63634265"
+X-IronPort-AV: E=Sophos;i="6.19,285,1754982000"; 
+   d="scan'208";a="63634265"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2025 15:41:01 -0800
+X-CSE-ConnectionGUID: gb5HyUiuQtKGBDXfL9dTNQ==
+X-CSE-MsgGUID: B7tZYuwMSoiySzlwvqeTKw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,285,1754982000"; 
+   d="scan'208";a="188330869"
+Received: from rfrazer-mobl3.amr.corp.intel.com (HELO desk) ([10.124.221.253])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2025 15:41:01 -0800
+Date: Thu, 6 Nov 2025 15:40:55 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	David Kaplan <david.kaplan@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>
+Subject: Re: [PATCH v3 2/3] x86/vmscape: Replace IBPB with branch history
+ clear on exit to userspace
+Message-ID: <20251106234055.ftahbvqxrfzjwr6t@desk>
+References: <20251027-vmscape-bhb-v3-0-5793c2534e93@linux.intel.com>
+ <20251027-vmscape-bhb-v3-2-5793c2534e93@linux.intel.com>
+ <b808c532-44aa-47a0-8fb8-2bdf5b27c3e4@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] vfio/pci: add PCIe TPH device ioctl
-To: Alex Williamson <alex@shazbot.org>
-Cc: Jeremy Linton <jeremy.linton@arm.com>, alex.williamson@redhat.com,
- jgg@ziepe.ca, pstanner@redhat.com, kvm@vger.kernel.org,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20251013163515.16565-1-wathsala.vithanage@arm.com>
- <9df72789-ab35-46a0-86cf-7b1eb3339ac7@arm.com>
- <4bf8ba8f-57c3-4af2-9f2a-f4313121be87@arm.com>
- <20251105121541.4d383694.alex@shazbot.org>
-Content-Language: en-US
-From: Wathsala Vithanage <wathsala.vithanage@arm.com>
-In-Reply-To: <20251105121541.4d383694.alex@shazbot.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b808c532-44aa-47a0-8fb8-2bdf5b27c3e4@intel.com>
 
+[ I drafted the reply this this email earlier, but forgot to send it, sorry. ]
 
-On 11/5/25 13:15, Alex Williamson wrote:
-> On Mon, 27 Oct 2025 09:33:33 -0500
-> Wathsala Vithanage <wathsala.vithanage@arm.com> wrote:
+On Mon, Nov 03, 2025 at 12:31:09PM -0800, Dave Hansen wrote:
+> On 10/27/25 16:43, Pawan Gupta wrote:
+> > IBPB mitigation for VMSCAPE is an overkill for CPUs that are only affected
+> > by the BHI variant of VMSCAPE. On such CPUs, eIBRS already provides
+> > indirect branch isolation between guest and host userspace. But, a guest
+> > could still poison the branch history.
+> 
+> This is missing a wee bit of background about how branch history and
+> indirect branch prediction are involved in VMSCAPE.
+
+Adding more background to this.
+
+> > To mitigate that, use the recently added clear_bhb_long_loop() to isolate
+> > the branch history between guest and userspace. Add cmdline option
+> > 'vmscape=on' that automatically selects the appropriate mitigation based
+> > on the CPU.
+> 
+> Is "=on" the right thing here as opposed to "=auto"?
+
+v1 had it as =auto, David Kaplan made a point that for attack vector controls
+"auto" means "defer to attack vector controls":
+
+  https://lore.kernel.org/all/LV3PR12MB9265B1C6D9D36408539B68B9941EA@LV3PR12MB9265.namprd12.prod.outlook.com/
+
+  "Maybe a better solution instead is to add a new option 'vmscape=on'.
+
+  If we look at the other most recently added bugs like TSA and ITS, neither
+  have an explicit 'auto' cmdline option.  But they do have 'on' cmdline
+  options.
+
+  The difference between 'auto' and 'on' is that 'auto' defers to the attack
+  vector controls while 'on' means 'enable this mitigation if the CPU is
+  vulnerable' (as opposed to 'force' which will enable it even if not
+  vulnerable).
+
+  An explicit 'vmscape=on' could give users an option to ensure the
+  mitigation is used (regardless of attack vectors) and could choose the best
+  mitigation (BHB clear if available, otherwise IBPB).
+
+  I'd still advise users to not specify any option here unless they know what
+  they're doing.  But an 'on' option would arguably be more consistent with
+  the other recent bugs and maybe meets the needs you're after?"
+
+> What you have here doesn't actually turn VMSCAPE mitigation on for
+> 'vmscape=on'.
+
+It picks between BHB-clear and IBPB, but it still turns 'on' the
+mitigation. Maybe I am misunderstanding you?
+
+> >  Documentation/admin-guide/hw-vuln/vmscape.rst   |  8 ++++
+> >  Documentation/admin-guide/kernel-parameters.txt |  4 +-
+> >  arch/x86/include/asm/cpufeatures.h              |  1 +
+> >  arch/x86/include/asm/entry-common.h             | 12 +++---
+> >  arch/x86/include/asm/nospec-branch.h            |  2 +-
+> >  arch/x86/kernel/cpu/bugs.c                      | 53 ++++++++++++++++++-------
+> >  arch/x86/kvm/x86.c                              |  5 ++-
+> >  7 files changed, 61 insertions(+), 24 deletions(-)
+> 
+> I think I'd rather this be three or four or five more patches.
 >
->> On 10/16/25 16:41, Jeremy Linton wrote:
->>> Hi,
->>>
->>> On 10/13/25 11:35 AM, Wathsala Vithanage wrote:
->>>> TLP Processing Hints (TPH) let a requester provide steering hints that
->>>> can enable direct cache injection on supported platforms and PCIe
->>>> devices. The PCIe core already exposes TPH handling to kernel drivers.
->>>>
->>>> This change adds the VFIO_DEVICE_PCI_TPH ioctl and exposes TPH control
->>>> to user space to reduce memory latency and improve throughput for
->>>> polling drivers (e.g., DPDK poll-mode drivers). Through this interface,
->>>> user-space drivers can:
->>>>     - enable or disable TPH for the device function
->>>>     - program steering tags in device-specific mode
->>>>
->>>> The ioctl is available only when the device advertises the TPH
->>>> Capability. Invalid modes or tags are rejected. No functional change
->>>> occurs unless the ioctl is used.
->>>>
->>>> Signed-off-by: Wathsala Vithanage <wathsala.vithanage@arm.com>
->>>> ---
->>>>    drivers/vfio/pci/vfio_pci_core.c | 74 ++++++++++++++++++++++++++++++++
->>>>    include/uapi/linux/vfio.h        | 36 ++++++++++++++++
->>>>    2 files changed, 110 insertions(+)
->>>>
->>>> diff --git a/drivers/vfio/pci/vfio_pci_core.c
->>>> b/drivers/vfio/pci/vfio_pci_core.c
->>>> index 7dcf5439dedc..0646d9a483fb 100644
->>>> --- a/drivers/vfio/pci/vfio_pci_core.c
->>>> +++ b/drivers/vfio/pci/vfio_pci_core.c
->>>> @@ -28,6 +28,7 @@
->>>>    #include <linux/nospec.h>
->>>>    #include <linux/sched/mm.h>
->>>>    #include <linux/iommufd.h>
->>>> +#include <linux/pci-tph.h>
->>>>    #if IS_ENABLED(CONFIG_EEH)
->>>>    #include <asm/eeh.h>
->>>>    #endif
->>>> @@ -1443,6 +1444,77 @@ static int vfio_pci_ioctl_ioeventfd(struct
->>>> vfio_pci_core_device *vdev,
->>>>                      ioeventfd.fd);
->>>>    }
->>>>    +static int vfio_pci_tph_set_st(struct vfio_pci_core_device *vdev,
->>>> +                   const struct vfio_pci_tph_entry *ent)
->>>> +{
->>>> +    int ret, mem_type;
->>>> +    u16 st;
->>>> +    u32 cpu_id = ent->cpu_id;
->>>> +
->>>> +    if (cpu_id >= nr_cpu_ids || !cpu_present(cpu_id))
->>>> +        return -EINVAL;
->>>> +
->>>> +    if (!cpumask_test_cpu(cpu_id, current->cpus_ptr))
->>>> +        return -EINVAL;
->>>> +
->>>> +    switch (ent->mem_type) {
->>>> +    case VFIO_TPH_MEM_TYPE_VMEM:
->>>> +        mem_type = TPH_MEM_TYPE_VM;
->>>> +        break;
->>>> +    case VFIO_TPH_MEM_TYPE_PMEM:
->>>> +        mem_type = TPH_MEM_TYPE_PM;
->>>> +        break;
->>>> +    default:
->>>> +        return -EINVAL;
->>>> +    }
->>>> +    ret = pcie_tph_get_cpu_st(vdev->pdev, mem_type,
->>>> topology_core_id(cpu_id),
->>>> +                  &st);
->>>> +    if (ret)
->>>> +        return ret;
->>>> +    /*
->>>> +     * PCI core enforces table bounds and disables TPH on error.
->>>> +     */
->>>> +    return pcie_tph_set_st_entry(vdev->pdev, ent->index, st);
->>>> +}
->>>> +
->>>> +static int vfio_pci_tph_enable(struct vfio_pci_core_device *vdev,
->>>> int mode)
->>>> +{
->>>> +    /* IV mode is not supported. */
->>>> +    if (mode == PCI_TPH_ST_IV_MODE)
->>>> +        return -EINVAL;
->>>> +    /* PCI core validates 'mode' and returns -EINVAL on bad values. */
->>>> +    return pcie_enable_tph(vdev->pdev, mode);
->>>> +}
->>>> +
->>>> +static int vfio_pci_tph_disable(struct vfio_pci_core_device *vdev)
->>>> +{
->>>> +    pcie_disable_tph(vdev->pdev);
->>>> +    return 0;
->>>> +}
->>>> +
->>>> +static int vfio_pci_ioctl_tph(struct vfio_pci_core_device *vdev,
->>>> +                  void __user *uarg)
->>>> +{
->>>> +    struct vfio_pci_tph tph;
->>>> +
->>>> +    if (copy_from_user(&tph, uarg, sizeof(struct vfio_pci_tph)))
->>>> +        return -EFAULT;
->>>> +
->>>> +    if (tph.argsz != sizeof(struct vfio_pci_tph))
->>>> +        return -EINVAL;
->>>> +
->>>> +    switch (tph.op) {
->>>> +    case VFIO_DEVICE_TPH_ENABLE:
->>>> +        return vfio_pci_tph_enable(vdev, tph.mode);
->>>> +    case VFIO_DEVICE_TPH_DISABLE:
->>>> +        return vfio_pci_tph_disable(vdev);
->>>> +    case VFIO_DEVICE_TPH_SET_ST:
->>>> +        return vfio_pci_tph_set_st(vdev, &tph.ent);
->>>> +    default:
->>>> +        return -EINVAL;
->>>> +    }
->>>> +}
->>>> +
->>>>    long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned
->>>> int cmd,
->>>>                 unsigned long arg)
->>>>    {
->>>> @@ -1467,6 +1539,8 @@ long vfio_pci_core_ioctl(struct vfio_device
->>>> *core_vdev, unsigned int cmd,
->>>>            return vfio_pci_ioctl_reset(vdev, uarg);
->>>>        case VFIO_DEVICE_SET_IRQS:
->>>>            return vfio_pci_ioctl_set_irqs(vdev, uarg);
->>>> +    case VFIO_DEVICE_PCI_TPH:
->>>> +        return vfio_pci_ioctl_tph(vdev, uarg);
->>>>        default:
->>>>            return -ENOTTY;
->>>>        }
->>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->>>> index 75100bf009ba..cfdee851031e 100644
->>>> --- a/include/uapi/linux/vfio.h
->>>> +++ b/include/uapi/linux/vfio.h
->>>> @@ -873,6 +873,42 @@ struct vfio_device_ioeventfd {
->>>>      #define VFIO_DEVICE_IOEVENTFD        _IO(VFIO_TYPE, VFIO_BASE + 16)
->>>>    +/**
->>>> + * VFIO_DEVICE_PCI_TPH - _IO(VFIO_TYPE, VFIO_BASE + 22)
->>>> + *
->>>> + * Control PCIe TLP Processing Hints (TPH) on a PCIe device.
->>>> + *
->>>> + * Supported operations:
->>>> + * - VFIO_DEVICE_TPH_ENABLE: enable TPH in no-steering-tag (NS) or
->>>> + *   device-specific (DS) mode. IV mode is not supported via this ioctl
->>>> + *   and returns -EINVAL.
->>>> + * - VFIO_DEVICE_TPH_DISABLE: disable TPH on the device.
->>>> + * - VFIO_DEVICE_TPH_SET_ST: program an entry in the device TPH
->>>> Steering-Tag
->>>> + *   (ST) table. The kernel derives the ST from cpu_id and mem_type;
->>>> the
->>>> + *   value is not returned to userspace.
->>>> + */
->>>> +struct vfio_pci_tph_entry {
->>>> +    __u32 cpu_id;            /* CPU logical ID */
->>>> +    __u8  mem_type;
->>>> +#define VFIO_TPH_MEM_TYPE_VMEM        0   /* Request volatile memory
->>>> ST */
->>>> +#define VFIO_TPH_MEM_TYPE_PMEM        1   /* Request persistent
->>>> memory ST */
->>>> +    __u8  rsvd[1];
->>>> +    __u16 index;            /* ST-table index */
->>>> +};
->>>> +
->>>> +struct vfio_pci_tph {
->>>> +    __u32 argsz;            /* Size of vfio_pci_tph */
->>>> +    __u32 mode;            /* NS and DS modes; IV not supported */
->>>> +    __u32 op;
->>>> +#define VFIO_DEVICE_TPH_ENABLE        0
->>>> +#define VFIO_DEVICE_TPH_DISABLE        1
->>>> +#define VFIO_DEVICE_TPH_SET_ST        2
->>>> +    struct vfio_pci_tph_entry ent;
->>>> +};
->>>> +
->>>> +#define VFIO_DEVICE_PCI_TPH    _IO(VFIO_TYPE, VFIO_BASE + 22)
->>> A quick look at this, it seems its following the way the existing vfio
->>> IOCTls are defined, yet two of them (ENABLE and DISABLE) won't likely
->>> really change their structure, or don't need a structure in the case
->>> of disable. Why not use IOW() and let the kernel error handling deal
->>> with those two as independent ioctls?
->>>
->>>
->>> Thanks,
->>
->> It will require two IOCTLs. I’m ok with having two IOCTLs for this
->> feature if the maintainers are fine with it.
-> TBH, I'm not sure why we didn't use a DEVICE_FEATURE for this.  Seems
-> like we could implement a SET operation that does enable/disable and
+> The rename:
+> 
+> > -DECLARE_PER_CPU(bool, x86_ibpb_exit_to_user);
+> > +DECLARE_PER_CPU(bool, x86_predictor_flush_exit_to_user);
+> 
+> could be alone by itself.
+> 
+> So could the additional command-line override and its documentation.
+> (whatever it gets named).
 
-Thanks Alex, it was implemented as a DEVICE_FEATURE in RFC v1,
-except it had a GET operation to get the tag to the user; which we
-decided to drop.
+On it.
 
-> another for steering tags.  I still need to fully grasp the
-> implications of this support though.  Thanks,
-This is now same as the already merged RDMA TPH feature.
-https://lore.kernel.org/linux-rdma/cover.1751907231.git.leon@kernel.org/
+> > diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> > index 4091a776e37aaed67ca93b0a0cd23cc25dbc33d4..3d547c3eab4e3290de3eee8e89f21587fee34931 100644
+> > --- a/arch/x86/include/asm/cpufeatures.h
+> > +++ b/arch/x86/include/asm/cpufeatures.h
+> > @@ -499,6 +499,7 @@
+> >  #define X86_FEATURE_IBPB_EXIT_TO_USER	(21*32+14) /* Use IBPB on exit-to-userspace, see VMSCAPE bug */
+> >  #define X86_FEATURE_ABMC		(21*32+15) /* Assignable Bandwidth Monitoring Counters */
+> >  #define X86_FEATURE_MSR_IMM		(21*32+16) /* MSR immediate form instructions */
+> > +#define X86_FEATURE_CLEAR_BHB_EXIT_TO_USER (21*32+17) /* Clear branch history on exit-to-userspace, see VMSCAPE bug */
+> 
+> X86_FEATURE flags are cheap, but they're not infinite. Is this worth two
+> of these? It actually makes the code actively worse. (See below).
+>
+> > diff --git a/arch/x86/include/asm/entry-common.h b/arch/x86/include/asm/entry-common.h
+> > index ce3eb6d5fdf9f2dba59b7bad24afbfafc8c36918..b629e85c33aa7387042cce60040b8a493e3e6d46 100644
+> > --- a/arch/x86/include/asm/entry-common.h
+> > +++ b/arch/x86/include/asm/entry-common.h
+> > @@ -94,11 +94,13 @@ static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
+> >  	 */
+> >  	choose_random_kstack_offset(rdtsc());
+> >  
+> > -	/* Avoid unnecessary reads of 'x86_ibpb_exit_to_user' */
+> > -	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER) &&
+> > -	    this_cpu_read(x86_ibpb_exit_to_user)) {
+> > -		indirect_branch_prediction_barrier();
+> > -		this_cpu_write(x86_ibpb_exit_to_user, false);
+> > +	if (unlikely(this_cpu_read(x86_predictor_flush_exit_to_user))) {
+> > +		if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
+> > +			indirect_branch_prediction_barrier();
+> > +		if (cpu_feature_enabled(X86_FEATURE_CLEAR_BHB_EXIT_TO_USER))
+> > +			clear_bhb_long_loop();
+> > +
+> > +		this_cpu_write(x86_predictor_flush_exit_to_user, false);
+> >  	}
+> >  }
+> 
+> One (mildly) nice thing about the old code was that it could avoid
+> reading 'x86_predictor_flush_exit_to_user' in the unaffected case.
 
---wathsala
+Yes.
 
+> Also, how does the code generation end up looking here? Each
+> cpu_feature_enabled() has an alternative, and
+> indirect_branch_prediction_barrier() has another one. Are we generating
+> alternatives that can't even possibly happen? For instance, could we
+> ever have system with X86_FEATURE_IBPB_EXIT_TO_USER but *not*
+> X86_FEATURE_IBPB?
 
+No, without IBPB X86_FEATURE_IBPB_EXIT_TO_USER won't be set. As you
+suggested below, static_call() can call write_ibpb() directly in this case.
+
+> Let's say this was:
+> 
+>         if (cpu_feature_enabled(X86_FEATURE_FOO_EXIT_TO_USER) &&
+
+With static_call() we could also live without X86_FEATURE_FOO_EXIT_TO_USER,
+but ...
+
+>             this_cpu_read(x86_ibpb_exit_to_user)) {
+
+... it has a slight drawback that we read this always.
+
+> 		static_call(clear_branch_history);
+>                 this_cpu_write(x86_ibpb_exit_to_user, false);
+>         }
+> 
+> And the static_call() was assigned to either clear_bhb_long_loop() or
+> write_ibpb(). I suspect the code generation would be nicer and it would
+> eliminate one reason for having two X86_FEATUREs.
+
+Agree.
+
+> >  static enum vmscape_mitigations vmscape_mitigation __ro_after_init =
+> > @@ -3221,6 +3222,8 @@ static int __init vmscape_parse_cmdline(char *str)
+> >  	} else if (!strcmp(str, "force")) {
+> >  		setup_force_cpu_bug(X86_BUG_VMSCAPE);
+> >  		vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
+> > +	} else if (!strcmp(str, "on")) {
+> > +		vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
+> >  	} else {
+> >  		pr_err("Ignoring unknown vmscape=%s option.\n", str);
+> >  	}
+> 
+> Yeah, it's goofy that =on sets ..._AUTO.
+
+Yes, we can go back to =auto. David, I hope it is not too big of a problem
+with attack vector controls?
+
+> > @@ -3231,18 +3234,35 @@ early_param("vmscape", vmscape_parse_cmdline);
+> >  
+> >  static void __init vmscape_select_mitigation(void)
+> >  {
+> > -	if (!boot_cpu_has_bug(X86_BUG_VMSCAPE) ||
+> > -	    !boot_cpu_has(X86_FEATURE_IBPB)) {
+> > +	if (!boot_cpu_has_bug(X86_BUG_VMSCAPE)) {
+> >  		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+> >  		return;
+> >  	}
+> >  
+> > -	if (vmscape_mitigation == VMSCAPE_MITIGATION_AUTO) {
+> > -		if (should_mitigate_vuln(X86_BUG_VMSCAPE))
+> > -			vmscape_mitigation = VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER;
+> > -		else
+> > -			vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+> > +	if (vmscape_mitigation == VMSCAPE_MITIGATION_AUTO &&
+> > +	    !should_mitigate_vuln(X86_BUG_VMSCAPE))
+> > +		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+> > +
+> > +	if (vmscape_mitigation == VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER &&
+> > +	    !boot_cpu_has(X86_FEATURE_IBPB)) {
+> > +		pr_err("IBPB not supported, switching to AUTO select\n");
+> > +		vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
+> >  	}
+> > +
+> > +	if (vmscape_mitigation != VMSCAPE_MITIGATION_AUTO)
+> > +		return;
+> > +
+> > +	/*
+> > +	 * CPUs with BHI_CTRL(ADL and newer) can avoid the IBPB and use BHB
+> > +	 * clear sequence. These CPUs are only vulnerable to the BHI variant
+> > +	 * of the VMSCAPE attack and does not require an IBPB flush.
+> > +	 */
+> > +	if (boot_cpu_has(X86_FEATURE_BHI_CTRL))
+> > +		vmscape_mitigation = VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER;
+> > +	else if (boot_cpu_has(X86_FEATURE_IBPB))
+> > +		vmscape_mitigation = VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER;
+> > +	else
+> > +		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+> >  }
+> 
+> Yeah, there are a *lot* of logic changes there. Any simplifications by
+> breaking this up would be appreciated.
+
+Into multiple patches, I guess? Will do.
+
+> >  static void __init vmscape_update_mitigation(void)
+> > @@ -3261,6 +3281,8 @@ static void __init vmscape_apply_mitigation(void)
+> >  {
+> >  	if (vmscape_mitigation == VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER)
+> >  		setup_force_cpu_cap(X86_FEATURE_IBPB_EXIT_TO_USER);
+> > +	else if (vmscape_mitigation == VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER)
+> > +		setup_force_cpu_cap(X86_FEATURE_CLEAR_BHB_EXIT_TO_USER);
+> >  }
+> 
+> Yeah, so in that scheme I was talking about a minute ago, this could be
+> where you do a static_call_update() instead of setting individual
+> feature bits.
+
+Yes, and we can avoid both IBPB_EXIT_TO_USER and CLEAR_BHB_EXIT_TO_USER
+feature flags.
 
