@@ -1,115 +1,175 @@
-Return-Path: <kvm+bounces-62172-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62173-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F22A4C3AE4E
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 13:30:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3412FC3B48A
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 14:39:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 33BDA4E43D4
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 12:30:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 425B64275B5
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 13:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0068932B991;
-	Thu,  6 Nov 2025 12:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77C332B99E;
+	Thu,  6 Nov 2025 13:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RnewM3NA"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Z7jQs5Mc"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247D032B98B
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 12:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048522550CA;
+	Thu,  6 Nov 2025 13:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762432212; cv=none; b=BbUyhFPTAcJojjtR7x5NVCrJLqwq6vNTkHDYQQz5W7jql/Cgt2yTQu+E42GaT9BOO4kI/d+x1dAiN1lDGM4hNmiSWaJNFXqbdjg1psLC2hSY+e5hzl7dwrT3gY11y3oDiCHiVyY5RawMxoo3/B4/05mYcYYNxoRAQsQPclG+oH8=
+	t=1762435800; cv=none; b=VyknptV5vn1x9/VO6Xr0/ckOTpLbxLxG5nU6aNC2bz4LQBuzbQA8pdbEXxyvFoA/RTKSM60YDN2H/9rR2Lk26E5J0vDH807JW/Z3kzxt8rpyqnGVDsCXcaGkr6b3J1OB2/ey7+9gbOxD9zRWJt/HuFTHGJlRRkzj+DXUejrxJAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762432212; c=relaxed/simple;
-	bh=Zxv238Sh/My5WupzWXJ5MQHjYqFRMOz2qFcj9KoIvAM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d48vDYWHelnB6I2RnCGwScTr8GliPkrg3XATQOtEPeX38aRy0S9vd1EYym6gQQc0BcNlDp7tP8Cxs2dJbxR0mot5qOM0XpJF150zyaBNZIAsEjS/0CXi41Y3Gk7yj7K7yVZ/K5G3nXZbpcBta+Sg68UY8+fK4w5plGd0P5/2lAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RnewM3NA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B12DDC16AAE
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 12:30:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762432211;
-	bh=Zxv238Sh/My5WupzWXJ5MQHjYqFRMOz2qFcj9KoIvAM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=RnewM3NAGeeXi664eFAadOd4km/YPRZtGTojr0Pg9xCttOSHiw4fSKBASbO1fzUQD
-	 lifL3pV5ToV+FPoG4dUqB3AjHBvuNq8fJsWqPljVSetD/BfC1g3k7gYrHjbBC6SDOl
-	 SOiyvCIXNy/pt5DuugplRBlsFKoS6ax02f3euQhMjxPa3DBQASdDblU5u6vszoOlGc
-	 CWJggJXToH2wxdqrXjcmy1LJL0iNQRe8ydQRdav2Ks4jlTxoOaPaybvCWMW7jdA2XN
-	 9AWR0jWZAw5Bdc5nZQ74W8DyzeHSv0j1HR2caIeNJ774TcrEISu5SoTzVYA3J/UGtW
-	 Ooc8qWpUf14pA==
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b3e9d633b78so155287866b.1
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 04:30:11 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVZ3OGrcYGg5+nReWSoOdtrEGL1PtHF7hLGcorKX76s3mQcR8nNdoCIn1RnOT1RfVWSKPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzibzEVYaroecvscwbbySSAeOBr/8LnqWBvwtXWc1km1zqZDYDz
-	ei5B3nwiiPeMAMwNZXhzsITMZDDD8uEvFbEUcuvXV9Iedvhid3rQ59NHVXnHOMohcgZPminrGbo
-	Td+cWordZ2OrbD7wHrbF2zKzEgDp9y/M=
-X-Google-Smtp-Source: AGHT+IGQEaG1Jr8KNRKTKhKSGldPg2aCZWHEsSxhESBypSgE7Lwo8wgnhpm146x+RnaEjQknFnpLfsOoNAnq23QHBTU=
-X-Received: by 2002:a17:907:d20:b0:b07:87f1:fc42 with SMTP id
- a640c23a62f3a-b7289537134mr356096166b.16.1762432210334; Thu, 06 Nov 2025
- 04:30:10 -0800 (PST)
+	s=arc-20240116; t=1762435800; c=relaxed/simple;
+	bh=yscLidwPb/TfU6vuuKFD9lrGYUswI5iL1Fu4J6VabZo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=e4GuPE6Lug0En1LF++UfXzYnxthErQ0m6pfpR00+kzLlMwQMuaD8gQWsRd+oZn2MJymeB7K6qTkKkNAX8kIx9MgXgwor51dGjbFiqrUNQwKLBr8m+HLBZtFWTPcHjNfOIt8fEDV02BEKEogdwahx8yJHevvi2eM4kAdqSYkLjjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Z7jQs5Mc; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1762435793; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=1kXLXXv2N3VYJNPmf0poJF0RIiMv5kZuy7eqQXCw1X4=;
+	b=Z7jQs5McRR/RUUvFRE7otomvLWt0boJZ1+Pkv1Zam6Qu0BPlEdHaDUEz5VT2wQbz+Pa9GSPt6hWBdiOkvzHtxM1ANuxCAiIOWweja/nFkaqnkjELynDtdUdmpZGWLi+W0dEqDcud7D295t/QKWleRKSZmK6D/mlkA0DJg183jYk=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WrptGql_1762435791 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 06 Nov 2025 21:29:52 +0800
+From: fangyu.yu@linux.alibaba.com
+To: anup@brainfault.org
+Cc: alex@ghiti.fr,
+	aou@eecs.berkeley.edu,
+	atish.patra@linux.dev,
+	fangyu.yu@linux.alibaba.com,
+	graf@amazon.com,
+	guoren@kernel.org,
+	jiangyifei@huawei.com,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	palmer@dabbelt.com,
+	paul.walmsley@sifive.com,
+	pbonzini@redhat.com
+Subject: Re: Re: [PATCH] RISC-V: KVM: Fix guest page fault within HLV* instructions 
+Date: Thu,  6 Nov 2025 21:29:50 +0800
+Message-Id: <20251106132950.80534-1-fangyu.yu@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+In-Reply-To: <CAAhSdy0azfC-L3buko7-mN1PDWxi08HN=3NQ+0VeyMR8gVJNoQ@mail.gmail.com>
+References: <CAAhSdy0azfC-L3buko7-mN1PDWxi08HN=3NQ+0VeyMR8gVJNoQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250930091702.2610357-1-maobibo@loongson.cn>
-In-Reply-To: <20250930091702.2610357-1-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Thu, 6 Nov 2025 20:30:08 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H7bo0d4qO695nJ+t5p3Bf2Ogzmeas1wKE2beKmdRvLpng@mail.gmail.com>
-X-Gm-Features: AWmQ_bmB66uKwtpDAnzIJNSSEa0MWJtWtXfudDySosiSwEl973K_bVHQ36bASy0
-Message-ID: <CAAhV-H7bo0d4qO695nJ+t5p3Bf2Ogzmeas1wKE2beKmdRvLpng@mail.gmail.com>
-Subject: Re: [PATCH] LoongArch: KVM: Set page with write privilege if dirty
- track disabled
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Applied, thanks.
+>> From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>>
+>> When executing HLV* instructions at the HS mode, a guest page fault
+>> may occur when a g-stage page table migration between triggering the
+>> virtual instruction exception and executing the HLV* instruction.
+>>
+>> This may be a corner case, and one simpler way to handle this is to
+>> re-execute the instruction where the virtual  instruction exception
+>> occurred, and the guest page fault will be automatically handled.
+>>
+>> Fixes: 9f7013265112 ("RISC-V: KVM: Handle MMIO exits for VCPU")
+>> Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>> ---
+>>  arch/riscv/kvm/vcpu_insn.c | 21 ++++++++++++++++++---
+>>  1 file changed, 18 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
+>> index 97dec18e6989..a8b93aa4d8ec 100644
+>> --- a/arch/riscv/kvm/vcpu_insn.c
+>> +++ b/arch/riscv/kvm/vcpu_insn.c
+>> @@ -448,7 +448,12 @@ int kvm_riscv_vcpu_virtual_insn(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>>                         insn = kvm_riscv_vcpu_unpriv_read(vcpu, true,
+>>                                                           ct->sepc,
+>>                                                           &utrap);
+>> -                       if (utrap.scause) {
+>> +                       switch (utrap.scause) {
+>> +                       case 0:
+>> +                               break;
+>
+>This looks like an unrelated change so drop it or send a separate patch
+>with proper explanation.
+>
+>> +                       case EXC_LOAD_GUEST_PAGE_FAULT:
+>> +                               return KVM_INSN_CONTINUE_SAME_SEPC;
+>
+>The KVM_INSN_xyz enum values are only for functions called via
+>system_opcode_insn() so return 1 over here just like the below
+>default case.
+>
+>Also, add some comments over here about why we are simply
+>continuing the guest.
+>
+>> +                       default:
+>>                                 utrap.sepc = ct->sepc;
+>>                                 kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+>>                                 return 1;
+>> @@ -503,7 +508,12 @@ int kvm_riscv_vcpu_mmio_load(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>>                  */
+>>                 insn = kvm_riscv_vcpu_unpriv_read(vcpu, true, ct->sepc,
+>>                                                   &utrap);
+>> -               if (utrap.scause) {
+>> +               switch (utrap.scause) {
+>> +               case 0:
+>> +                       break;
+>
+>This looks like an unrelated change so drop it or send a separate patch
+>with proper explanation.
+>
+>> +               case EXC_LOAD_GUEST_PAGE_FAULT:
+>> +                       return KVM_INSN_CONTINUE_SAME_SEPC;
+>
+>Same comment as kvm_riscv_vcpu_virtual_insn().
+>
+>> +               default:
+>>                         /* Redirect trap if we failed to read instruction */
+>>                         utrap.sepc = ct->sepc;
+>>                         kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+>> @@ -629,7 +639,12 @@ int kvm_riscv_vcpu_mmio_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>>                  */
+>>                 insn = kvm_riscv_vcpu_unpriv_read(vcpu, true, ct->sepc,
+>>                                                   &utrap);
+>> -               if (utrap.scause) {
+>> +               switch (utrap.scause) {
+>> +               case 0:
+>> +                       break;
+>
+>This looks like an unrelated change so drop it or send a separate patch
+>with proper explanation.
+>
+>> +               case EXC_LOAD_GUEST_PAGE_FAULT:
+>> +                       return KVM_INSN_CONTINUE_SAME_SEPC;
+>
+>Same comment as kvm_riscv_vcpu_virtual_insn().
+>
+>> +               default:
+>>                         /* Redirect trap if we failed to read instruction */
+>>                         utrap.sepc = ct->sepc;
+>>                         kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+>> --
+>> 2.49.0
+>>
+>>
+>
+>Regards,
+>Anup
 
-Huacai
+Hi Anup:
 
-On Tue, Sep 30, 2025 at 5:17=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
-> With secondary MMU page table, if there is read page fault, page write
-> privilege will not set even if it is writable from master MMU page
-> table. This logic only works if dirty tracking is enabled, page table
-> can be set as page_write if dirty tracking is disabled.
->
-> It reduces extra page fault on secondary MMU page table if VM finishes
-> migration, where master MMU page table is ready and secondary MMU page
-> is fresh.
->
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> ---
->  arch/loongarch/kvm/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
-> index 7c8143e79c12..a7fa458e3360 100644
-> --- a/arch/loongarch/kvm/mmu.c
-> +++ b/arch/loongarch/kvm/mmu.c
-> @@ -857,7 +857,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsign=
-ed long gpa, bool write)
->
->         if (writeable) {
->                 prot_bits =3D kvm_pte_mkwriteable(prot_bits);
-> -               if (write)
-> +               if (write || !kvm_slot_dirty_track_enabled(memslot))
->                         prot_bits =3D kvm_pte_mkdirty(prot_bits);
->         }
->
->
-> base-commit: e5f0a698b34ed76002dc5cff3804a61c80233a7a
-> --
-> 2.39.3
->
+Thanks for the review.
+I will follow your suggestions in the next version.
+
+Thanks,
+Fangyu
 
