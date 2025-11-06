@@ -1,89 +1,89 @@
-Return-Path: <kvm+bounces-62139-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62140-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 665A5C38820
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 01:42:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2FB2C38A2B
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 02:03:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 936C34EC2D5
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 00:42:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 944191A2468E
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 01:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43741DC985;
-	Thu,  6 Nov 2025 00:42:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62BA01E7C12;
+	Thu,  6 Nov 2025 01:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jxYZZLVR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JgqXSInt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF791AF0BB
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 00:42:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193391A9FAF
+	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 01:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762389727; cv=none; b=BCMYCoYVOfICkIl1O8SKLSdHL6K5JwFknax1vZly9J6doK8zPB5KqpK8j+vvjatGUf0OYlE94AeI+BQMeyYiHrbkgBwJgttwxDvaB8prMGXJ0lDbeFI+kjGI38yMnA7KfiK3SGGc4ldMkKxJcUokrudpDLkNVqsWOLW2VFrkToI=
+	t=1762390845; cv=none; b=jXqOjquDQA5+zwav53ErKLC2HronaWmiT39GUwcv78Zg/rabgKV6yqUELJdYRjMb4VkvKIOwUmU+RkriqmVKV2wVh+r+XSFLCjHj6dwxwC6zG+0CUIzzWKtRALztCJ31itmrkTKnYDYES8JucBMCOqJ5KTUqxiP6yR3BzkWKLGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762389727; c=relaxed/simple;
-	bh=IlSwVwT1VuvzUynUU4Xj+hFZKWXPHeFJ1t0CgyLYuU8=;
+	s=arc-20240116; t=1762390845; c=relaxed/simple;
+	bh=xg+DPaVUx7Y/In8FIB9xUi1KWDGD4s91tBb3OY+DLZs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RkfMEZqyQjizJVzdEEFbO02lVkY6ysWMUafWfESntuLOFdXRgphNzU3bQBX7H6Gzv1NMbJrWWf/UU4T6JWV6Py9VaLjtA8GnDbdTOKYW61ZqLc/jISzTHS93TCjcvssvlKs0N0dhuUN7D7XWm+/cCsSDziayWfxk70aZCUtPR5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jxYZZLVR; arc=none smtp.client-ip=209.85.215.194
+	 Content-Type:Content-Disposition:In-Reply-To; b=cRJOOK7Z6zUScX7Rp/+Sryeh297vJl2d0hjNOBRZuw0W3kM2f+kknMT34UiOpcmNTIpyPBJ+2JGPLgYi0w8gSI/fa7sIt6JbbxpT++o6hty4/Iar6WKlQ3bvufn1QSV1sWOPoAmnpvch3cOen/CYq5WujpVMQa5+69Fyv7UUamU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JgqXSInt; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f194.google.com with SMTP id 41be03b00d2f7-b4755f37c3eso284021a12.3
-        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 16:42:03 -0800 (PST)
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-330b4739538so453650a91.3
+        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 17:00:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762389723; x=1762994523; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762390843; x=1762995643; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IlSwVwT1VuvzUynUU4Xj+hFZKWXPHeFJ1t0CgyLYuU8=;
-        b=jxYZZLVRmKD+A/1jnQUWCe+E+/WBS48P+l5h9b7jghDKwZkyINezQhB/k2bxPDpl2A
-         ueM92wOHyvjh/Hf0zfaU99gs/2RwMuGhoEvXSQ2uUXqEv/cE0GuVzlI41baY7+kh1nRR
-         Oq4xQfi8Y+4tmuvyxE2CFmilTWQdV2ERTMjT13C6fitbHMYjcRxJaxb8S3YkbOGN97/R
-         uEnV1gZjzqeRECL8sbVabcpLstDsGeOW3i1abup15/srQikrAyoChfJ7GCV4qntBtMTq
-         /4Uc7sIXMkTMW1m8BYzIv/HvzUN9/0CY19+KqNr+eDWoK3MyinE1x3Xh8kI+pI/QGhDd
-         gEbQ==
+        bh=jyCdrwmtzeYh65kctndrCh80WL08MrlmZ7q7ncz+eYA=;
+        b=JgqXSIntiMnuhw0twoBtcDOfSAqtLr34WjzNgzAxrJTK8iFO1qbWXjW4l9K7FYhLMI
+         Rikwt4aTqMubKZyvGhxu3M6uSsKQM9FLkwP7ClLMw2HziTrnjcdRak/FgOcUYqi3Aawl
+         UTRi7y20MuK4CqdXpAqkS7VsnUslSnPbYLOtaXV+GekIXGcr88bo8uk/fVbbMhKe51tv
+         uD1heVUWWOnnXf+KblvRfXepoht+sNzTTJ/oBjLUaS0TBX5sTg0O6N+4GCidCi3fKtWX
+         93je7AvwC0480kXUj2jGgwMSHzbNozrByAFgP6nqdzQqayhk1wPfSddbZuM2Ww51wG8r
+         HZgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762389723; x=1762994523;
+        d=1e100.net; s=20230601; t=1762390843; x=1762995643;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IlSwVwT1VuvzUynUU4Xj+hFZKWXPHeFJ1t0CgyLYuU8=;
-        b=o4cUdZgAm/p34iOWFPBDp1QRLKewbIWaG6HFKeG0+ujjaTVboM2goG6zqqYnMRqtGH
-         8bjy3nw7R3CYjt7utAFj04dLjctnmR/oMGrj3vQArLNjKF3HIU9YUVIlEISfzVegOmjx
-         drD6CagxlJ36kK31awx5mAxuIu2fCTSVB+YcEy9vmfLmoerEzr9X548LFCY8jw9esrh0
-         /mV67XvKDXZVPb3Qb201ve3x+pVJGtMW27UmmPK4KkxwQ7uBH8FN3nyOS0QN5JlWzaBs
-         OHIza/o7Uou4LssgY74YzWBXVT6t0/IzLJhJgWumBge00LFMU94JwCoHiIRMWAeH72h7
-         oekA==
-X-Forwarded-Encrypted: i=1; AJvYcCX78CAi1iI0eqPkchRZKyv7Y0XnZbLlHNkWc0pqDjIsG9jlVG6qNU3rMVOLG3Kp3+V5LrQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0i0yi9dwdhtjTKpb5cvTee8eilfJYupj5QkQwv4XXxxDMmiCt
-	hyitQgFxKAL0+yJKRTUkMwj1qlLAMj2KeH7RlbBzEQVWkLFSY/TpwjtQ/yi9ZHWjfA==
-X-Gm-Gg: ASbGncu5xeOElb1l5kItwNBzRwES2EGwGV8usZmKAD9iV9ZEBrxeZj1jmG0nQN1pXTb
-	G8aFl5ErCuM0Thz151m3My0xhsD+HOt5htJQddd+N9L0SgQMzkNPbdPJwg+QjSvuC2Y7qL2rep0
-	eXi5Z3zXuBK0l4bU6gLZohv15zoc5kXBkkjk5PR11yGoGEkpxSB0xGYTAZD3eYD8jVnRDk46PyL
-	6ov57nUTC7cqc0HFxK2+wCMbkVU/3ZmU+wmrCWid7hWabIAcDmiaw5W2WPMjiow4e/AZoxE+XYO
-	F6Cvth6H1Xbq3/C78/Y2QoS8yjqd3GPKYc9ii7AF2pku3R0FfHDHbZDBBmzlm69JSMTLjg3js4n
-	iYo1CWiXAkd3auhrLjdOK9acIhSb79hTzf+7Fskev5D5AmMyObZWN7s/kAlgEJga8cDp2l5NKWj
-	pkNvfIMZB0ETC6TmJ5zYBu+Pm27JT+EbByT3ePG6vUSP/TlK2itWin
-X-Google-Smtp-Source: AGHT+IH41on4jpXBOi5c2bKsIC6xn61T+UyJ69pWDeAn3RI973fXQ7iyPYS01mgsWNu4I+diNqvKWQ==
-X-Received: by 2002:a05:6a20:3d11:b0:33e:eb7a:4476 with SMTP id adf61e73a8af0-34f84dfc120mr6673105637.23.1762389722735;
-        Wed, 05 Nov 2025 16:42:02 -0800 (PST)
+        bh=jyCdrwmtzeYh65kctndrCh80WL08MrlmZ7q7ncz+eYA=;
+        b=r8mPxwpnmDnJOSPtrUAhmK9SbtqhEgfrCREOQabIdImB1g6rJ3J2O1T4bUpYbdbt+H
+         RrlaFU+XZxpwlut59ZCdMd6q3v8dpR3ri0tmZ3M/kY1X4SM2ZsXl5bLAPogSCySh6AXo
+         FNxZ/IqD7Zd06U1+T44d8wlNu5CsjtuvHpu/I/m3E7AD1G0SldbfXD6oU0i7iXhfQu7g
+         q8rwR6NnD7s7Usgz/NUGAHcAatUfLw13HEJAiv9Qdr1fNZQyoOyfFY4X+0SDMKGvjx2A
+         W4RYOJkXcwpDk77IoJ5a5YyK6vV1unQeXRKkkwq3JpeSeJQHVmIt1ARO4ir9CoVVtc+g
+         AZZg==
+X-Forwarded-Encrypted: i=1; AJvYcCVFORgRoXpGBbefYslmw876JIH4AFeLXdXhzDwuAG06vcdDo8bkdDSgUicb8BI9ef+mvuE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywf6Vq4n9QnjA+mKw9gSoqZq6pHc93uhsS+KeoITOSALJRUCM6r
+	EBWJQvwQJRBxBzdIyT/uomfREsiVrKRRyGZpPBEWOQBAys/vcKvVtek2b/J/kLdcuw==
+X-Gm-Gg: ASbGncuw+F2QiI8559gOECWCefxZ61UWQVo38YqTFfkhuKUQPxcLbbEhJwQotiFQjqD
+	aicw7WyqZ0HdHynYbROZ9ud+bi54gfpvlM5C4yIlOsuMMNNVW51pzC5LS70Ia7gA9yAEjrIx1o9
+	2juYzzKBzjqhMqrsrmJPJd7TKFhIIzG9WbB1My+gj2hyKyAexWJNOiJT1vDmwaoEyKVTbuRKvAp
+	9HoTs9z5uX2I4dumkOUHfNpK2JoKAheYGjrZDNRebpGMJIh0xfIJzAjzeaVJPns2zkruxpdCWqN
+	y6WONgAI1TAC4UsoHlkb3euiMWR7XwFWs8nVyR+61CI1xCCsG90x4E4nFoqx59zpLVPO00eK9v5
+	KxgJpJCgmDAKuRdBg34gfkCVkufo54CDVEUJwyuDGi/XSw5aTK81Gnm4g1L0ACz7JJfWUkMeUAK
+	4b5Zjb2elidLowCq3BPQKFxrI+aUrd4h8mpvSsJ0cBex3v3BEnm9kH
+X-Google-Smtp-Source: AGHT+IHM/szIvc6H/RjXKB2OAGRkV4S9iMOAZRtwQ2X3KKChCXJOhTQKeV++dDoFxAgAZQ81pWgySQ==
+X-Received: by 2002:a17:903:244b:b0:295:20b8:e0ef with SMTP id d9443c01a7336-2962add94fdmr64516045ad.57.1762390841917;
+        Wed, 05 Nov 2025 17:00:41 -0800 (PST)
 Received: from google.com (132.200.185.35.bc.googleusercontent.com. [35.185.200.132])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba8f8e750c1sm539201a12.1.2025.11.05.16.42.01
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29650c5c6b3sm7911595ad.24.2025.11.05.17.00.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 16:42:01 -0800 (PST)
-Date: Thu, 6 Nov 2025 00:41:57 +0000
+        Wed, 05 Nov 2025 17:00:41 -0800 (PST)
+Date: Thu, 6 Nov 2025 01:00:37 +0000
 From: David Matlack <dmatlack@google.com>
 To: Raghavendra Rao Ananta <rananta@google.com>
 Cc: Alex Williamson <alex@shazbot.org>,
 	Alex Williamson <alex.williamson@redhat.com>,
 	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] vfio: selftests: Export vfio_pci_device functions
-Message-ID: <aQvu1c8Hb8i-JxXd@google.com>
+Subject: Re: [PATCH 4/4] vfio: selftests: Add tests to validate SR-IOV UAPI
+Message-ID: <aQvzNZU9x9gmFzH3@google.com>
 References: <20251104003536.3601931-1-rananta@google.com>
- <20251104003536.3601931-3-rananta@google.com>
+ <20251104003536.3601931-5-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,23 +92,164 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251104003536.3601931-3-rananta@google.com>
+In-Reply-To: <20251104003536.3601931-5-rananta@google.com>
 
 On 2025-11-04 12:35 AM, Raghavendra Rao Ananta wrote:
-> Refactor and make the functions called under device initialization
-> public. A later patch adds a test that calls these functions to validate
-> the UAPI of SR-IOV devices. Opportunistically, to test the success
-> and failure cases of the UAPI, split the functions dealing with
-> VFIO_GROUP_GET_DEVICE_FD and VFIO_DEVICE_BIND_IOMMUFD into a core
-> function and another one that asserts the ioctl. The former will be
-> used for testing the SR-IOV UAPI, hence only export these.
 
-I have a series that separates the IOMMU initialization and fields from
-struct vfio_pci_device. I suspect that will make what you are trying to
-do a lot easier.
+> +static const char *pf_dev_bdf;
+> +static char vf_dev_bdf[16];
 
-https://lore.kernel.org/kvm/20251008232531.1152035-1-dmatlack@google.com/
+vf_dev_bdf can be part of the test fixture instead of a global variable.
+pf_dev_bdf should be the only global variable since we have to get it
+from main() into the text fixture.
 
-Can you take a look at it and see if it would simplifying things for
-you? Reviews would be very appreciated if so :)
+> +
+> +struct vfio_pci_device *pf_device;
+> +struct vfio_pci_device *vf_device;
+
+These can be local variables in the places they are used.
+
+> +
+> +static void test_vfio_pci_container_setup(struct vfio_pci_device *device,
+> +					   const char *bdf,
+> +					   const char *vf_token)
+> +{
+> +	vfio_container_open(device);
+> +	vfio_pci_group_setup(device, bdf);
+> +	vfio_container_set_iommu(device);
+> +	__vfio_container_get_device_fd(device, bdf, vf_token);
+> +}
+> +
+> +static int test_vfio_pci_iommufd_setup(struct vfio_pci_device *device,
+> +					const char *bdf, const char *vf_token)
+> +{
+> +	vfio_pci_iommufd_cdev_open(device, bdf);
+> +	vfio_pci_iommufd_iommudev_open(device);
+> +	return __vfio_device_bind_iommufd(device->fd, device->iommufd, vf_token);
+> +}
+> +
+> +static struct vfio_pci_device *test_vfio_pci_device_init(const char *bdf,
+> +							  const char *iommu_mode,
+> +							  const char *vf_token,
+> +							  int *out_ret)
+> +{
+> +	struct vfio_pci_device *device;
+> +
+> +	device = calloc(1, sizeof(*device));
+> +	VFIO_ASSERT_NOT_NULL(device);
+> +
+> +	device->iommu_mode = lookup_iommu_mode(iommu_mode);
+> +
+> +	if (iommu_mode_container_path(iommu_mode)) {
+> +		test_vfio_pci_container_setup(device, bdf, vf_token);
+> +		/* The device fd will be -1 in case of mismatched tokens */
+> +		*out_ret = (device->fd < 0);
+
+Maybe just return device->fd from test_vfio_pci_container_setup() so
+this can be:
+
+  *out_ret = test_vfio_pci_container_setup(device, bdf, vf_token);
+
+and then you can drop the curly braces.
+
+> +	} else {
+> +		*out_ret = test_vfio_pci_iommufd_setup(device, bdf, vf_token);
+> +	}
+> +
+> +	return device;
+> +}
+> +
+> +static void test_vfio_pci_device_cleanup(struct vfio_pci_device *device)
+> +{
+> +	if (device->fd > 0)
+> +		VFIO_ASSERT_EQ(close(device->fd), 0);
+> +
+> +	if (device->iommufd) {
+> +		VFIO_ASSERT_EQ(close(device->iommufd), 0);
+> +	} else {
+> +		VFIO_ASSERT_EQ(close(device->group_fd), 0);
+> +		VFIO_ASSERT_EQ(close(device->container_fd), 0);
+> +	}
+> +
+> +	free(device);
+> +}
+> +
+> +FIXTURE(vfio_pci_sriov_uapi_test) {};
+> +
+> +FIXTURE_SETUP(vfio_pci_sriov_uapi_test)
+> +{
+> +	char vf_path[PATH_MAX] = {0};
+> +	char path[PATH_MAX] = {0};
+> +	unsigned int nr_vfs;
+> +	char buf[32] = {0};
+> +	int ret;
+> +	int fd;
+> +
+> +	/* Check if SR-IOV is supported by the device */
+> +	snprintf(path, PATH_MAX, "%s/%s/sriov_totalvfs", PCI_SYSFS_PATH, pf_dev_bdf);
+
+nit: Personally I would just hard-code the sysfs path instead of using
+PCI_SYSFS_PATH. I think the code is more readable and more succinct that
+way. And sysfs should be a stable ABI.
+
+> +	fd = open(path, O_RDONLY);
+> +	if (fd < 0) {
+> +		fprintf(stderr, "SR-IOV may not be supported by the device\n");
+> +		exit(KSFT_SKIP);
+
+Use SKIP() for this:
+
+if (fd < 0)
+        SKIP(return, "SR-IOV is not supported by the device\n");
+
+Ditto below.
+
+> +	}
+> +
+> +	ASSERT_GT(read(fd, buf, ARRAY_SIZE(buf)), 0);
+> +	ASSERT_EQ(close(fd), 0);
+> +	nr_vfs = strtoul(buf, NULL, 0);
+> +	if (nr_vfs < 0) {
+> +		fprintf(stderr, "SR-IOV may not be supported by the device\n");
+> +		exit(KSFT_SKIP);
+> +	}
+> +
+> +	/* Setup VFs, if already not done */
+
+Before creating VFs, should we disable auto-probing so the VFs don't get
+bound to some other random driver (write 0 to sriov_drivers_autoprobe)?
+
+> +	snprintf(path, PATH_MAX, "%s/%s/sriov_numvfs", PCI_SYSFS_PATH, pf_dev_bdf);
+> +	ASSERT_GT(fd = open(path, O_RDWR), 0);
+> +	ASSERT_GT(read(fd, buf, ARRAY_SIZE(buf)), 0);
+> +	nr_vfs = strtoul(buf, NULL, 0);
+> +	if (nr_vfs == 0)
+
+If VFs are already enabled, shouldn't the test fail or skip?
+
+> +		ASSERT_EQ(write(fd, "1", 1), 1);
+> +	ASSERT_EQ(close(fd), 0);
+> +
+> +	/* Get the BDF of the first VF */
+> +	snprintf(path, PATH_MAX, "%s/%s/virtfn0", PCI_SYSFS_PATH, pf_dev_bdf);
+> +	ret = readlink(path, vf_path, PATH_MAX);
+> +	ASSERT_NE(ret, -1);
+> +	ret = sscanf(basename(vf_path), "%s", vf_dev_bdf);
+> +	ASSERT_EQ(ret, 1);
+
+What ensures the created VF is bound to vfio-pci?
+
+> +}
+> +
+> +FIXTURE_TEARDOWN(vfio_pci_sriov_uapi_test)
+> +{
+> +}
+
+FIXTURE_TEARDOWN() should undo what FIXTURE_SETUP() did, i.e. write 0 to
+sriov_numvfs. Otherwise running this test will leave behind SR-IOV
+enabled on the PF.
+
+You could also make this the users problem (the user has to provide a PF
+with 1 VF where both PF and VF are bound to vfio-pci). But I think it
+would be nice to make the test work automatically given a PF if we can.
 
