@@ -1,151 +1,142 @@
-Return-Path: <kvm+bounces-62233-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62234-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F792C3CE28
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 18:39:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC438C3CFD8
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 19:02:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F264A4F3399
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 17:36:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B85BD4E5554
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 18:01:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7483234F253;
-	Thu,  6 Nov 2025 17:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E462232F753;
+	Thu,  6 Nov 2025 18:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="qderbo3h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IbxB/F35"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C76019D07E;
-	Thu,  6 Nov 2025 17:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F1A26FA6E
+	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 18:00:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762450581; cv=none; b=KDNcUeW5KXGfuHkySsKG2s44feCT2aomf92DeVEuvXQsFwiBVxoHeRxOfRWOPlUilGa7yzJvRb5vsuLoCZUanmbsp+QLd2LlG6Bwwsyg1OHcllyHl0vlm1K7fDut65D9ix9e0Qerd4ow4fVq6Q8b5wVrGiVhqwhxz9UfIF3+yZs=
+	t=1762452057; cv=none; b=tWYIbkt9oWYEqL44kh557H7VPAFIUX4Q04C0Fuu+3QS1IiIMYavmzGrYGL5HeqVHcZm19+IyByMHZ/JU3NhIrnztScRNjOuSDo/71RexDRUjPuIdE25+9r8ZtPQpdPfw+S0m9Xgu6u2Pk4oq4DEQPU+MsxTreNtGyccDlGsFd2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762450581; c=relaxed/simple;
-	bh=a5hetV/RGzRrXvVR45KZvABuomwQxaqs3PCaxKj4vKQ=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=I3cRepBWkwW6wd6/wyukrSCnVuyI1uL0cmpLBYLZoGr1xeJPF2e/tYc0dpCQJIG9kmKoMLu4pr3uHt7xonKGeTyEqDob89IhX6piGbrknGNDls1n36I5rMOp6kfou/gspZi2D4sFQm2wJ2nTIDYj0rBk84KmJEggDxi7GPJ2GCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=qderbo3h; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from smtpclient.apple ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5A6HZN2c1176414
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 6 Nov 2025 09:35:24 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5A6HZN2c1176414
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025102301; t=1762450525;
-	bh=ZNXA8TEdsM5oF8ouKkrvVpMu+D9FhagmmSfId25Z3RE=;
-	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
-	b=qderbo3hrDf0QFnlNbvQhYxzN8cbALlvWhJYZAB34Iu+W0Or+C2FB1qnYYyINtLOx
-	 N7GElzwB51Bl4WPD+LDlPgr9wgw5hNyzaC7avJZt9y/Z9SqctMPCjBx/tgreZGYn5R
-	 WCk3xxqB1GPzAuq4GGyTvG1FWwam1AWT0cdKhu/oCVZ7NXhc7fQBTuhkdq5wz2BsqA
-	 WjkvNI3TYOpX5r6Khahk3v6ChLK20o6OBRI+x8PqnPAB4yQHiu60Fe4qzdIQId0Qlk
-	 JXIqfTlg2rfmHDtD4bY+LtlMFq8CcAa75wwRryz/aetJPhxL645SiL8bpv/Bzv0ID/
-	 VLuZ/NLOb90jg==
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1762452057; c=relaxed/simple;
+	bh=RDbOBh66JjfFuihq973fOzGY3o9zf2l1zRXPEVekqzE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N9LeUAfYSNefvcP1ctkDxbQ6Khr2mm/qIREDorZnwb/dNo7SC7cp6pkqP5+i5t2hVyXhBRpijJkzSMUPXBR65XCiuQJ5opZKHZQJV3ojmAZiDa6z5c2mB9fpynEUEfRoCVqdxtNjBA+lEdKMDxZjOhQ4d5AXFIK6+9R0xFDwhBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IbxB/F35; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-640b1d0496aso492a12.0
+        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 10:00:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762452054; x=1763056854; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ECxc40/29Z32hQLab5xgI0WYbyB6Uam5SiKdMQt43ew=;
+        b=IbxB/F35JSeMuUWgL7ZzMS4I35FMAoE3bkr6uWDqgUkDaL0Y7tBeih0zJZaGbzc7Xn
+         W6gitdVahiT1WoTZjqYw6hBdoo4u/EUtPavbBWADM/Q19eeyM9mvK9wPgtPWh6ZXPne+
+         8fSa3zCE2CdKuTChCvgrfyq8mSZZ9DiBtyikjJm/hPFfOUYGmRxE/BwKXEhR/MhHptoc
+         w2r+nQ/e8jiVXUWmAXfwU6UlbZ0igVWvcQn00f/eSGQL/IDYkld6z8Zi99H2uio2StsI
+         wsrJnVxreJQ9iSAbh5sruzlhBSS0CgawIvT96lUnyf1LYch2op1i5XuS8x5JtGUJ5mm7
+         MW1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762452054; x=1763056854;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ECxc40/29Z32hQLab5xgI0WYbyB6Uam5SiKdMQt43ew=;
+        b=FoBbdv6pF2buSGxMQ1Ch5ccRw2K55Rly17a9xBBEVKSOnXfdil34c0dVxPUzFKhxDF
+         ZXdMyhfbjbV9sjPIzUWt/MdnbIwm0PLYIdRZbmLPoeXaFg7Y7WrvhvwASPQIQcLDnc6C
+         P6r1QFoNHKyRIzgdlShtU9nSCgUvOAkQY/uU1CTB3+Ci2ECLELJbFw7GU5J/ikepbqlq
+         9y1jV1CWQUF6kxZPf6DfSHhN1/hKTGr+gs9RGrP3DFqmT4yYJQD/O1QlnuW4SS2x47MW
+         8CQr+lTRi2Milbhi/nWwPAoGBD5GVJSstXdW/uDk1wEEg64qnG+xHVZr7COt1+SUknHn
+         Pq7w==
+X-Forwarded-Encrypted: i=1; AJvYcCVk3aYb4jjqbDen0c7CpJAcSsEAD8jn9UBnG72+k3ZmDyGXfz3gOWpHtDivuHx1rKCIqkk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKdqA4D0bvXzrL97ByTCWfciwWR1kPwfl11lwhWELHaOEwAHb9
+	Q+/nyw6ZAgSo20XvvygJgrev0luFUbhNbKMBZamOoEsuyh01D8FphNCkgs3p8PLe3YKgkNsk9iI
+	useZfvuFd+Zw+hvwxOB6MBEncDnJWxAoRbWUtU0OV
+X-Gm-Gg: ASbGncuDzIYcM+lvBFaDXO4iY8liEQ3RVy4HGs56U4rq/ZBXvzY9/gZUtpMJj77u214
+	Tyj6D29g7QI06zY+k0jfLhc1A2Z6e94ExUckXpfook/NvanbtHYlZPRbSJ/Q8mRm1vQ5PgPueIp
+	2KHz5/IQRnjwD2ZOEOctd/5DN7k7sb/bRQlrUJwgZyHpZMA3uMzUS8dT7n48/oCUPzGFny/Fr4q
+	BZQikiLF2HxkquvyHFyBKrC52qCzwnbaObBIkWpUQf/H3ieCrgVpcU54xlT
+X-Google-Smtp-Source: AGHT+IE7GjLCqbggaJQz0UO9QtVJXndW650mkFQiyDlLAyMAbdE71393iphWqqs4UlmzxKitL9AYC90ViRjQuJU6m/Q=
+X-Received: by 2002:aa7:cf93:0:b0:640:fa3c:da93 with SMTP id
+ 4fb4d7f45d1cf-6413f4f7c98mr6926a12.4.1762452053454; Thu, 06 Nov 2025 10:00:53
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.200.81.1.6\))
-Subject: Re: [PATCH v9 00/22] Enable FRED with KVM VMX
-From: Xin Li <xin@zytor.com>
-In-Reply-To: <20251026201911.505204-1-xin@zytor.com>
-Date: Thu, 6 Nov 2025 09:35:13 -0800
-Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, luto@kernel.org, peterz@infradead.org,
-        andrew.cooper3@citrix.com, chao.gao@intel.com, hch@infradead.org,
-        sohil.mehta@intel.com
+MIME-Version: 1.0
+References: <20251101000241.3764458-1-jmattson@google.com> <6f749888-28ef-419b-bc0a-5a82b6b58787@amd.com>
+In-Reply-To: <6f749888-28ef-419b-bc0a-5a82b6b58787@amd.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Thu, 6 Nov 2025 10:00:40 -0800
+X-Gm-Features: AWmQ_bmLFtgDgGCdP9lS_QlaeE1Am88tZ8dhTXJnTRlEz705U-E3EMSXmDVBmHI
+Message-ID: <CALMp9eQJ69euqBs2NF6fQtb-Vf_0XqSiXs07h29Gr57-cvdGJg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: SVM: Mark VMCB_LBR dirty when L1 sets DebugCtl[LBR]
+To: Shivansh Dhiman <shivansh.dhiman@amd.com>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, nikunj.dadhania@amd.com, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Matteo Rizzo <matteorizzo@google.com>, evn@google.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <9EF391B5-71E8-4A9C-BD55-B78B5DEE5638@zytor.com>
-References: <20251026201911.505204-1-xin@zytor.com>
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org
-X-Mailer: Apple Mail (2.3864.200.81.1.6)
 
+On Thu, Nov 6, 2025 at 8:09=E2=80=AFAM Shivansh Dhiman <shivansh.dhiman@amd=
+.com> wrote:
+>
+> On 01-11-2025 05:32, Jim Mattson wrote:
+> > With the VMCB's LBR_VIRTUALIZATION_ENABLE bit set, the CPU will load
+> > the DebugCtl MSR from the VMCB's DBGCTL field at VMRUN. To ensure that
+> > it does not load a stale cached value, clear the VMCB's LBR clean bit
+> > when L1 is running and bit 0 (LBR) of the DBGCTL field is changed from
+> > 0 to 1. (Note that this is already handled correctly when L2 is
+> > running.)
+> >
+> > There is no need to clear the clean bit in the other direction,
+> > because when the VMCB's DBGCTL.LBR is 0, the VMCB's
+> > LBR_VIRTUALIZATION_ENABLE bit will be clear, and the CPU will not
+> > consult the VMCB's DBGCTL field at VMRUN.
+> >
+> > Fixes: 1d5a1b5860ed ("KVM: x86: nSVM: correctly virtualize LBR msrs whe=
+n L2 is running")
+> > Reported-by: Matteo Rizzo <matteorizzo@google.com>
+> > Reported-by: evn@google.com
+> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > ---
+> >  arch/x86/kvm/svm/svm.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index 153c12dbf3eb..b4e5a0684f57 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -816,6 +816,8 @@ void svm_enable_lbrv(struct kvm_vcpu *vcpu)
+> >       /* Move the LBR msrs to the vmcb02 so that the guest can see them=
+. */
+> >       if (is_guest_mode(vcpu))
+> >               svm_copy_lbrs(svm->vmcb, svm->vmcb01.ptr);
+> > +     else
+> > +             vmcb_mark_dirty(svm->vmcb, VMCB_LBR);
+> >  }
+> >
+> >  static void svm_disable_lbrv(struct kvm_vcpu *vcpu)
+>
+> Hi Jim,
+> I am thinking, is it possible to add a test in KVM Unit Tests that
+> covers this? Something where the stale cached value is loaded instead of
+> the correct one, without your patch.
 
-> On Oct 26, 2025, at 1:18=E2=80=AFPM, Xin Li (Intel) <xin@zytor.com> =
-wrote:
->=20
-> This patch set enables the Intel flexible return and event delivery
-> (FRED) architecture with KVM VMX to allow guests to utilize FRED.
->=20
-> The FRED architecture defines simple new transitions that change
-> privilege level (ring transitions). The FRED architecture was
-> designed with the following goals:
->=20
-> 1) Improve overall performance and response time by replacing event
->   delivery through the interrupt descriptor table (IDT event
->   delivery) and event return by the IRET instruction with lower
->   latency transitions.
->=20
-> 2) Improve software robustness by ensuring that event delivery
->   establishes the full supervisor context and that event return
->   establishes the full user context.
->=20
-> The new transitions defined by the FRED architecture are FRED event
-> delivery and, for returning from events, two FRED return instructions.
-> FRED event delivery can effect a transition from ring 3 to ring 0, but
-> it is used also to deliver events incident to ring 0. One FRED
-> instruction (ERETU) effects a return from ring 0 to ring 3, while the
-> other (ERETS) returns while remaining in ring 0. Collectively, FRED
-> event delivery and the FRED return instructions are FRED transitions.
->=20
->=20
-> Intel VMX architecture is extended to run FRED guests, and the major
-> changes are:
->=20
-> 1) New VMCS fields for FRED context management, which includes two new
-> event data VMCS fields, eight new guest FRED context VMCS fields and
-> eight new host FRED context VMCS fields.
->=20
-> 2) VMX nested-exception support for proper virtualization of stack
-> levels introduced with FRED architecture.
->=20
-> Search for the latest FRED spec in most search engines with this =
-search
-> pattern:
->=20
->  site:intel.com FRED (flexible return and event delivery) =
-specification
->=20
->=20
-> Although FRED and CET supervisor shadow stacks are independent CPU
-> features, FRED unconditionally includes FRED shadow stack pointer
-> MSRs IA32_FRED_SSP[0123], and IA32_FRED_SSP0 is just an alias of the
-> CET MSR IA32_PL0_SSP.  IOW, the state management of MSR IA32_PL0_SSP
-> becomes an overlap area, and Sean requested that FRED virtualization
-> to land after CET virtualization [1].
->=20
-> With CET virtualization now merged in v6.18, the path is clear to =
-submit
-> the FRED virtualization patch series :).
-
-Sean, what is the plan for the FRED patch series?
-
-A good news is that we have got acks on all 3 common x86 patches.
-
-Thanks!
-Xin
-
->=20
-> Changes in v9:
-> * Rebased to the latest kvm-x86/next branch, tag =
-kvm-x86-next-2025.10.20-2.
-> * Guard FRED state save/restore with guest_cpu_cap_has(vcpu, =
-X86_FEATURE_FRED)
->  in patch 19 (syzbot & Chao).
-> * Use array indexing for exception stack access, eliminating the need =
-for
->  the ESTACKS_MEMBERS() macro in struct cea_exception_stacks, and then
->  exported __this_cpu_ist_top_va() in a subsequent patch (Dave Hansen).
-> * Rewrote some of the change logs.
+Though permitted by the architectural specification, I don't know if
+there is any hardware that caches the DBGCTL field when LBR
+virtualization is disabled.
 
