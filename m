@@ -1,197 +1,237 @@
-Return-Path: <kvm+bounces-62239-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62240-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90F47C3D5A4
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 21:28:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55CE6C3D60D
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 21:37:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B7FF3B2738
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 20:28:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EAD394E1638
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 20:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080462FBE0E;
-	Thu,  6 Nov 2025 20:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2851D33BBD5;
+	Thu,  6 Nov 2025 20:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QhSRhCqA"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tdJDXDcZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011038.outbound.protection.outlook.com [52.101.52.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0CE42FB62C
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 20:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762460902; cv=none; b=KQH45pREB0eFvyTpSbAZf7ZzQAqlQmFpCoXEhoCUdXn58vw9UDQuILGS6oqOe9mkKF2SWcZNob9/ioHGSvYdb4OA1hQZ0e2VfumcP8kLnhKap16abWqIbsWFgxAj/bu8108hDEov6mxqf+CtrtFXd9K5Vou2lhmlvU1USz/k4eQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762460902; c=relaxed/simple;
-	bh=s7JjaxVRGzDmcHhI8AEluXZzJ9B2Oblzutc30b370MQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jUfcsuHNUgdQwCoENs8pZTMpzHVfTpfVFlb1Aq0lv+J9mQzdIvk0u+96bSMojErYl5NrHTbJR33zWU8nekGsSivoQ5/nmf6ICcK2N+e9VFD+03/slfDOHuID/xIbsTuAi+BfaDg2rPKLH9DbG6KVvdWU7dH/WsCJ1Hc7drTDAQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QhSRhCqA; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-295592eb5dbso520505ad.0
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 12:28:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762460900; x=1763065700; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZxRs1KoaK6oa9YoLLml5ndaynCe6AptiJDUeJAShw+Q=;
-        b=QhSRhCqAQybhfb84d+D/iYde7Xd4pBTWC8/pqhaxQ5MeIIeAnsvbFkr8vKS/Ivoh8u
-         17s495a3t+0osgQUOn6CCaDQ4Y7T8kzJJo8QbE9Jz/YrdH+DHB9CqVrk5HsKHrsRMDEF
-         +j98xGq4LgpJdAEGYUD3/YSS8o3vQtSeHGB6WbzJeG1cO1GTLnAUmIKGYauaze5G5Emu
-         xvDy3f95dQzpdDMiGVYTLm11juYrm+VFytnYH4ZQTbp0JvsicQc3+R4Merkp9hVoS4cH
-         b6VFYiJpG53qCIEMxlqrNDHxYMI5mYjiIEKP3TQi+Pl6+he2nVIB5hmAQl+Wx9kbzoGp
-         NCUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762460900; x=1763065700;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZxRs1KoaK6oa9YoLLml5ndaynCe6AptiJDUeJAShw+Q=;
-        b=dKFM/YgQcw1ovMN6baAGoXTS2ixMdMxap/uKiEIQ+8Ul70LfTgapoPBorgV8x4qwuq
-         ueLYgxQI1QDez6PcMj02P6yQnvwMinawi6/PIyBaqOKHbFQytK8Lm9ybEnIoA3lThqNj
-         C+DDgCS2/ar/xwcqgvZ+DCwP7V4SOROLf8jE7/rzxnrOcwhaGGc1BuHHEwXzToOaWgYy
-         aGu3aXZYhuj9qMDY29URt+O7diEpNzvOmwhy4EWCBc8yUPmkI6Lqk39ZdnMguWaO2M/U
-         dEWZ7GcaxNLFKwvfmxoYcSm43FBzkcoF5+A/OaZmAQjoszXOmWQQFoDkFUW01xJrBlsL
-         p42g==
-X-Gm-Message-State: AOJu0YwntHp3j96RG3wkDjQ6S+zNPCIfOA8lY73A01z9oVFB0ltNuRk/
-	fOlEHNu9PNJhdyAQhv0zpv+x8WUUYOiR4iXjsWKE18NzOV/HKvHg6ZGzgXF4V0J71Gn5w92ARbh
-	iyiEbMA==
-X-Google-Smtp-Source: AGHT+IHqjGQP8UTZTtMj2QcFhyHlRrBeBJkjlHeG4vrwg6qhQSWRJzq8rRdwN0zz5xgPPNrid06QN7Ln1Go=
-X-Received: from plcr13.prod.google.com ([2002:a17:903:14d:b0:295:16a7:a285])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e5cd:b0:248:ff5a:b768
- with SMTP id d9443c01a7336-297c03ab6c0mr9484105ad.10.1762460899942; Thu, 06
- Nov 2025 12:28:19 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  6 Nov 2025 12:28:11 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD438303A0E;
+	Thu,  6 Nov 2025 20:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.38
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762461453; cv=fail; b=uzEfzziKpo7MtqLGAVlEuVC46Dip3R7gAqke37xtZUJlZR+iPyc2uphOb/p/dtniweXOjpDkPsAbO6PAmLnWNet8VNfuanJdW9oVnPfIqTJaZy4DYBpHLqLnKcfqsBy3Ub0r/C080AszA9ToQZNp5eAF1YGtm6ua4nuS/GYuF+I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762461453; c=relaxed/simple;
+	bh=s0VqRDlCzYqcKt/sJPpcFmmNwPwswpMqVJB1fw0Z3Cw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ozerpwITcGyG1Lm6D/iQiNG3kxPSCE9x0Lu60uM8MoWwsOC253iWM5QbwKlNXVTYlVYqFSt01+tcQAjp7yGbcXq1WliUa+JMV3wmtssgo56WXg67v+viESoK4Jg8rjKNvTQ7knV5U1hEKy0PkUULxoDs+LfWs2xFGIAw3mrO6AY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tdJDXDcZ; arc=fail smtp.client-ip=52.101.52.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=l+KQAr9DC9mJabtNxPkzcvMFWWmlGwUebLkRaBGKeAVxJW3yrk9EJ5T4cl0fNYoM21aO09eZyxGCKXY8A39vKIkbnYpvcn+GCy8X3mazEEIdbBIXx6XRFizNsfvlq3gyeP0tAybfHxbjIb/p4s2TSb7R+VCecPaEGRI0J6QFMRcbcPjynTxFGPjpuxiruHSJ7fGjPt3pErbEU9nuEKxEut7cHdIjIfbmruMEjCw2dKV5Zj2MslXxcsR5r+oxNHIURDX8XQlYGPo95kwKTgE9hm/7VWtUzCortR3bueAXMgJHyxH7lsH8rHWCTtxbwr/cwhMStOHFnaj+IPyc9aL1rQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MkUtyqX3nJpBQC11Y8c3g5Y606BWIS3BkyBHkbnQVEs=;
+ b=Ce/lB1CS7AbzwVtQXsDaLHTKegIqWO57nTw0cuvZmjpIkwe7ObYhueFa5J79IPZ21C+uuI88eOk82q0KNTBExkzX1Xn1k79rr1vE33Tr/ZvpW0wq8XhCqLkkQYReXvOfz7Vx0omXb5HQ72e/lNEJ9FFzGiwvWSIyUrQ3ROYfIt19tk13xrwWwC44fRiQWl3GHjrit9DWhKrK0h7KNDf9BolksHQHd9HIJhS1QA0gA2AxeyaWGk6TEzGhOCKijjithOVckSu+S4dt5cqPvyNgP6uUPE5XlLo8SDIM+jedqP2p/4qyhNgD8MRFfqAW9I6t9RXbo0TVPAhKdmnwPcxNaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MkUtyqX3nJpBQC11Y8c3g5Y606BWIS3BkyBHkbnQVEs=;
+ b=tdJDXDcZrVOECC+D1EavieBP3HO7HnpVwmxIXJtB60rydsGJpu054YBGSVf3CDsnY2XQ9WcLXQUX6L06y//pmaaI/ZTzIadJQxsc78uYe+SrOmucIPB2C/H++PueCWNzekmN060DDAKLFIinW2/ARSanCx5dO+oNSHpnr/yg8rceRmXN/bLSu3UjI8r/DgDkjbDJdonYv/dvyimpscEiYBK/WLDCPOk/0MmupadjGlo00IPeNQRwKHSSP0twOAU81co+UAYpmc16XPyrMiCkRNHFLeLTFSUsSqGvEFFaUc6zZU0cl6TPFTKWPoKldX2j3KgJdKuj2gpCIiQqkBc7Ew==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
+ by SN7PR12MB7108.namprd12.prod.outlook.com (2603:10b6:806:2a3::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Thu, 6 Nov
+ 2025 20:37:28 +0000
+Received: from MN2PR12MB3613.namprd12.prod.outlook.com
+ ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
+ ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9298.006; Thu, 6 Nov 2025
+ 20:37:27 +0000
+Date: Thu, 6 Nov 2025 16:37:21 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Alex Williamson <alex@shazbot.org>
+Cc: Mostafa Saleh <smostafa@google.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	David Airlie <airlied@gmail.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	dri-devel@lists.freedesktop.org, Eric Auger <eric.auger@redhat.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>, intel-gfx@lists.freedesktop.org,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+	Kirti Wankhede <kwankhede@nvidia.com>, linux-s390@vger.kernel.org,
+	Longfang Liu <liulongfang@huawei.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Nikhil Agarwal <nikhil.agarwal@amd.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Pranjal Shrivastava <praan@google.com>, qat-linux@intel.com,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	virtualization@lists.linux.dev,
+	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Zhenyu Wang <zhenyuw.linux@gmail.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>, patches@lists.linux.dev
+Subject: Re: [PATCH 00/22] vfio: Give VFIO_DEVICE_GET_REGION_INFO its own op
+Message-ID: <20251106203721.GH1732817@nvidia.com>
+References: <0-v1-679a6fa27d31+209-vfio_get_region_info_op_jgg@nvidia.com>
+ <aQh7gG3IAEgEaKY_@google.com>
+ <20251105135804.0cb3b340.alex@shazbot.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251105135804.0cb3b340.alex@shazbot.org>
+X-ClientProxiedBy: BLAP220CA0007.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:208:32c::12) To MN2PR12MB3613.namprd12.prod.outlook.com
+ (2603:10b6:208:c1::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251106202811.211002-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Enforce use of EXPORT_SYMBOL_FOR_KVM_INTERNAL
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Chao Gao <chao.gao@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|SN7PR12MB7108:EE_
+X-MS-Office365-Filtering-Correlation-Id: c3a41b10-b9d2-47a0-bffb-08de1d744a96
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?G3rVEdXWNWrdUYWP2uC2vijH4VnN0Yc5fIkyMyG89CNlB9WlBDOqM2fa0jJn?=
+ =?us-ascii?Q?wLz8eUTV8Pm6BdEyB6a+bQKPZs6s2+phca/qZvvU0MtXFhZwJxkgSB5mI0LI?=
+ =?us-ascii?Q?hjh6A1k+OpcyA7j2C9jJvW7es2YWAbClvnyWmsTbnYzI9bEjzzXiAqff9Mg3?=
+ =?us-ascii?Q?crkgWWImbbiPZc8ZFCoRZnjGMHdRX1wIfIIAjSMMOgtU7IR7DkT1BdRbRwMN?=
+ =?us-ascii?Q?qG8XDuJE6iWAuS4q9tfED1k0yF7wjnfw6bF4vGUQnYrigXBzzsTffkiVAHPI?=
+ =?us-ascii?Q?RKbyN7GyiQwKY/ckRbKVfdbz/Hd7jdmt+80TkkX2MV6seAaR5+mcP5/LYrc9?=
+ =?us-ascii?Q?tz/pFB37AuYug59ArdVXzPcw955MambibJebqZJfVubrkpHjz3uUxqJ+MN8/?=
+ =?us-ascii?Q?2k9QWl5DqIQCabdYe0wzxiHAlfKEGzK9QejL7pE7AE6DNSuFLdI7p6N3DhZZ?=
+ =?us-ascii?Q?8VbyBKq5qOZ39rDeCeR9+S3K296L6fcX7oNogljA4gTWWcTDSoycJy3idTH5?=
+ =?us-ascii?Q?yKA8gdWLVTVCrvjzC59vmPaiKiEid9tA1V+5pS/95ej23SMhpVRDqgCf7OnC?=
+ =?us-ascii?Q?co4jU1hcf8KybjqvZR14DoNaMOz7NANQRaZQnRsTOmdNvzfAozwI60N6nIW4?=
+ =?us-ascii?Q?sOvS3htyfhluTUOAFSAjDXgPjz6sfhehzxH6tks6qdq9JNj8dxaG/Z7Xptix?=
+ =?us-ascii?Q?9NnG6oTfxDWqqghobqWqZKDMBTjtrvbZKPDfoDVqei068KdsCnG2rVslCOf/?=
+ =?us-ascii?Q?nFYifa2eacDY8n1d9wMcLLzWHjPKpas66oj28RYfFOEJ5w7XPFH9zKFWnTFD?=
+ =?us-ascii?Q?OS7AvRMj0w0aN7jxZb7lFxJJQIOAcJ222Gnt376H6mzB2opY/3lxhf3I4Bc7?=
+ =?us-ascii?Q?suxkncZYv5n9xLhrQlxZEOM738v/E4e9DBhSyP9ON1McpkRaSE3SJTm5U/4Y?=
+ =?us-ascii?Q?7i+eUgnhz9h6E6fXWDGmnnDSxctzNL+jJ6wVJKXY6mSBYXBv8OPSSaiCPIOE?=
+ =?us-ascii?Q?b3zww4XudlgTECC+ungfJBcauQL+EdW/9t658SWkMtXe/xkAhM9reW0mIMw9?=
+ =?us-ascii?Q?XtcHKfb7wGT6KUWbV2QMQ0bpP1fvjA0zkLEnOKvSAxxh9tW+nW6vIEFP8m1F?=
+ =?us-ascii?Q?0d+jokt/dom4DB9EjD5G55xiild708pXCuA8BFKp2frcMGY3Is2sDANVmf1S?=
+ =?us-ascii?Q?u+q2n2UevE4QmzH1p47GzjVqIZj3GqaF7niYqaQNznIOtaYox6qnJZ3pPTkx?=
+ =?us-ascii?Q?8ZAKIk/w8da3yVRB0btdlJ39MDLRYYrwl6jZFiEo1pNN7ajxv1y1fGDolAQP?=
+ =?us-ascii?Q?hNfaIHFc1G5vma1L3XLY6npgSgdqdtbFPWjePWIw3E5pvNAVfMUxwO2xLk3X?=
+ =?us-ascii?Q?xy+fxmcT8jMp941hY7eP6g/jrmYe8gw/gOoSLGPMovucfgKDPGwmp8k7WtOm?=
+ =?us-ascii?Q?NE2ui52SrmiuZcQ/BKb+QePXSk8qEFOj?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?vbpq4bZ4ejcembgna0TBuNMaQy8j7PLMEq/HDg82STai6NsB1MmFSL9iZ4YO?=
+ =?us-ascii?Q?TA+K4ft0XB0JjyQXUuWrMo/mieR98GDFhykPEeqq/bymZXmSqWxUkGpPwp4B?=
+ =?us-ascii?Q?+apVSbY3SQMK6k04OdeoEt0VNG22A4r55/NuQ3uzXO6FPNkGlbJfuaCP0ipK?=
+ =?us-ascii?Q?LGAsg3+FK4mWui8RYe4aTnes3VuHDTN0HFUfwDp5oKJPYhpj3AfQFDC+/XEZ?=
+ =?us-ascii?Q?fQFrhDnXTpocVBz3eCUMHE8BRADOl6e9yujDFlz9SkswcIgAa7zVKxi5N3cJ?=
+ =?us-ascii?Q?Sfvayvpgg2rWGCuz81qH2jaZKZltFlj+QqqegMb0LnwAmKXE+o6554xAx0tu?=
+ =?us-ascii?Q?TBftGja7Cth5/CgFuBou6dBHW+M3mCanaIBZsABJkMCUqvHyx9sIEsRwfsPe?=
+ =?us-ascii?Q?O1p19ljkAenmzdHQW0tVF+g5HlKa4nqMJOx5Y4573XmHdrGXPiBAFWeZCLDc?=
+ =?us-ascii?Q?vUrewXz/aFwTl6AYK4v37MGexmn9p2alEg01j60mQcnsn1PEpWA8w1DM8Gsh?=
+ =?us-ascii?Q?UQ9gPE13/Ti6YEeI2dNiQhVf28BEA1gVTcXn+8E4PCKXPmKb3cKREDWV7U/T?=
+ =?us-ascii?Q?gwz1N+wuykOGS2yNLsylPjTgF3tTwiMkpf/BGFcmSZV671UEcNBhvrXI864H?=
+ =?us-ascii?Q?Eh47bgN7lUI+NTwjohPobbBqOODhJpTKSgpYyZwKLGbfwfzkJwHSqja8HlUs?=
+ =?us-ascii?Q?NO2RD8blNyQ2C9QRSUxFTx2F/AVvK6LChegDKv6qeGAQqC0t+dr/EfZ+7mOD?=
+ =?us-ascii?Q?CJ/rtltqPrrpIBRpuH8rqOw6MR89QkKK/dXFrSkkbb2fPQ97b0dYNODoqPHN?=
+ =?us-ascii?Q?1MtFcwlubS6fgfWnDd9oQ+tSEyHeYWjMSkRB8dYthrU+w1iWTkjFcGp4i3OC?=
+ =?us-ascii?Q?QpD1W0tqjztccHRM3jB9q5wNBJvzK4+Q1qz5VML0ZDsk2U6rtSC9FBxfzbYo?=
+ =?us-ascii?Q?dBQ2sVSZpuoiC+7vESVB7Tbm46RGXjRAptireIpnaDeMJZx3RHcq9tx/+FPy?=
+ =?us-ascii?Q?0bnkmNoKWBM7eH+IJPaXX76jibXAJLEI6kJqJfxC3TdWGJkmWf5Z14liZAjQ?=
+ =?us-ascii?Q?QfIfTtBxUzGQMNcD+Yl2+mPvcBnvj2Y8P9yHkI5wCWfJtnlfmw8tEjJYVD4M?=
+ =?us-ascii?Q?u+vL67m5xdSdM0/d4THE1eSSYqLHP6kUeAZgyekcOZoyUSByyO4c+S4ZTuJC?=
+ =?us-ascii?Q?sMZhDSJQbyTROXGceVkJncHQtI+UpiUfJmMhmN7A61ki+EJUdTi6gOdYlKd7?=
+ =?us-ascii?Q?sDSbVuURshTNtyaX5iJ3FXzEjp0MGXPoOyu0DWGCNjCA6B21QjwrcXet4s3L?=
+ =?us-ascii?Q?wRho0KcC69cQxC8AIlhLd/szRFSHvekG7P7pvVYpFCSopCojreKgrLpyHCpJ?=
+ =?us-ascii?Q?RZ20ooIMQmYv+bnkxTl207G6NL9O4BN0We5aBYMCoxkqx6F3o69GhNS6J0IN?=
+ =?us-ascii?Q?6SCniI2a6EI4N/Twtm4KVoqZVjzE3PuzQDGFlJOMx4nf0IvLT2gtuAxl1n5y?=
+ =?us-ascii?Q?TCmSo7wh74I0UcH2RvabJLpMB1zoHhi+PkdcTY/+bjPRgFueBMpec9TpNYCm?=
+ =?us-ascii?Q?ZdmnUOzw+IvwYd0wR+k=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c3a41b10-b9d2-47a0-bffb-08de1d744a96
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2025 20:37:26.1468
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Z3pLKo3KQueBf7+vRQ3qOcnO3Ni7/4Ro2tlYtYjy+Gp/LUf0AILJxL9iGkliQIVi
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7108
 
-Add a (gnarly) inline "script" in the Makefile to fail the build if there
-is EXPORT_SYMBOL_GPL or EXPORT_SYMBOL usage in virt/kvm or arch/x86/kvm
-beyond the known-good/expected exports for other modules.  Remembering to
-use EXPORT_SYMBOL_FOR_KVM_INTERNAL is surprisingly difficult, and hoping
-to detect "bad" exports via code review is not a robust long-term strategy.
+On Wed, Nov 05, 2025 at 01:58:04PM -0700, Alex Williamson wrote:
+> On Mon, 3 Nov 2025 09:53:04 +0000
+> Mostafa Saleh <smostafa@google.com> wrote:
+> 
+> > On Thu, Oct 23, 2025 at 08:09:14PM -0300, Jason Gunthorpe wrote:
+> > > There is alot of duplicated code in the drivers for processing
+> > > VFIO_DEVICE_GET_REGION_INFO. Introduce a new op get_region_info_caps()
+> > > which provides a struct vfio_info_cap and handles the cap chain logic
+> > > to write the caps back to userspace and remove all of this duplication
+> > > from drivers.
+> > > 
+> > > This is done in two steps, the first is a largely mechanical introduction
+> > > of the get_region_info(). These patches are best viewed with the diff
+> > > option to ignore whitespace (-b) as most of the lines are re-indending
+> > > things.
+> > > 
+> > > Then drivers are updated to remove the duplicate cap related code. Some
+> > > drivers are converted to use vfio_info_add_capability() instead of open
+> > > coding a version of it.  
+> > 
+> > The series as a whole looks good.
+> > However, I got confused walking through it as almost all non-PCI drivers
+> > had to transition to get_region_info then get_region_info_caps then
+> > removing get_region_info completely from core code after introducing
+> > it in this series.
 
-Jump through a pile of hoops to coerce make into printing a human-friendly
-error message, with the offending files+lines cleanly separated.
+This makes it alot easier to read as most of the lines are just
+re-indenting code. If you try to do it in one shot the patches would
+be much more dense. The stopping point at get_region_info() lets it be
+more incremental..
 
-E.g. where <srctree> is the resolution of $(srctree), i.e. '.' for in-tree
-builds, and the absolute path for out-of-tree-builds:
+> > IMO, the series should start with just consolidating PCI based implementation
+> > and then add get_region_info_caps for all drivers at the end.
+> > Anyway, no really strong opinion as the final outcome makes sense.
+> 
+> I agree it was a bit indirect to get there, but the result still makes
+> sense and I don't think it's worth reworking the series.
+>
+> I think Eric has some outstanding naming concerns and Praan noted that
+> either a comment or gratuitous kfree(caps.buf) might be worthwhile to
+> keep call-outs in check regarding cap buffer leaks.  I don't think we
+> have any such cases, but it can't hurt to note the policy at least.
+> 
+> Otherwise, LGTM.  Should these be addressed as follow-ups rather than a
+> re-spin?  Thanks,
 
-  <srctree>/arch/x86/kvm/Makefile:97: *** ERROR ***
-  found 2 unwanted occurrences of EXPORT_SYMBOL_GPL:
-    <srctree>/arch/x86/kvm/x86.c:686:EXPORT_SYMBOL_GPL(__kvm_set_user_return_msr);
-    <srctree>/arch/x86/kvm/x86.c:703:EXPORT_SYMBOL_GPL(kvm_set_user_return_msr);
-  in directories:
-    <srctree>/arch/x86/kvm
-    <srctree>/virt/kvm
-  Use EXPORT_SYMBOL_FOR_KVM_INTERNAL, not EXPORT_SYMBOL_GPL.  Stop.
+I was planning to respin it but time keeps ticking away..
 
-and
-
-  <srctree>/arch/x86/kvm/Makefile:98: *** ERROR ***
-  found 1 unwanted occurrences of EXPORT_SYMBOL:
-    <srctree>/arch/x86/kvm/x86.c:709:EXPORT_SYMBOL(kvm_get_user_return_msr);
-  in directories:
-    <srctree>/arch/x86/kvm
-    <srctree>/virt/kvm
-  Use EXPORT_SYMBOL_FOR_KVM_INTERNAL, not EXPORT_SYMBOL.  Stop.
-
-Put the enforcement in x86's Makefile even though the rule itself applies
-to virt/kvm, as putting the enforcement in virt/kvm/Makefile.kvm would
-effectively require exempting every architecture except x86.  PPC is the
-only other architecture with sub-modules, and PPC hasn't been switched to
-use EXPORT_SYMBOL_FOR_KVM_INTERNAL (and given its nearly-orphaned state,
-likely never will).  And for KVM architectures without sub-modules, that
-means that, barring truly spurious exports, the exports are intended for
-non-KVM usage and thus shouldn't be using EXPORT_SYMBOL_FOR_KVM_INTERNAL.
-
-Cc: Chao Gao <chao.gao@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/Makefile | 56 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
-
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index c4b8950c7abe..357138ac5cc6 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -47,3 +47,59 @@ $(obj)/kvm-asm-offsets.h: $(obj)/kvm-asm-offsets.s FORCE
- 
- targets += kvm-asm-offsets.s
- clean-files += kvm-asm-offsets.h
-+
-+
-+# Fail the build if there is unexpected EXPORT_SYMBOL_GPL (or EXPORT_SYMBOL)
-+# usage.  All KVM-internal exports should use EXPORT_SYMBOL_FOR_KVM_INTERNAL.
-+# Only a handful of exports intended for other modules (VFIO, KVMGT) should
-+# use EXPORT_SYMBOL_GPL, and EXPORT_SYMBOL should never be used.
-+ifdef CONFIG_KVM_X86
-+define newline
-+
-+
-+endef
-+
-+# Search recursively for whole words and print line numbers.  Filter out the
-+# allowed set of exports, i.e. those that are intended for external usage.
-+exports_grep_trailer := --include='*.[ch]' -nrw $(srctree)/virt/kvm $(srctree)/arch/x86/kvm | \
-+			grep -v -e kvm_page_track_register_notifier \
-+				-e kvm_page_track_unregister_notifier \
-+				-e kvm_write_track_add_gfn \
-+				-e kvm_write_track_remove_gfn \
-+				-e kvm_get_kvm \
-+				-e kvm_get_kvm_safe \
-+				-e kvm_put_kvm
-+
-+# Force grep to emit a goofy group separator that can in turn be replaced with
-+# the above newline macro (newlines in Make are a nightmare).  Note, grep only
-+# prints the group separator when N lines of context are requested via -C,
-+# a.k.a. --NUM.  Simply request zero lines.  Print the separator only after
-+# filtering out expected exports to avoid extra newlines in the error message.
-+define get_kvm_exports
-+$(shell grep "$(1)" -C0 $(exports_grep_trailer) | grep "$(1)" -C0 --group-separator="AAAA")
-+endef
-+
-+define check_kvm_exports
-+nr_kvm_exports := $(shell grep "$(1)" $(exports_grep_trailer) | wc -l)
-+
-+ifneq (0,$$(nr_kvm_exports))
-+$$(error ERROR ***\
-+$$(newline)found $$(nr_kvm_exports) unwanted occurrences of $(1):\
-+$$(newline)  $(subst AAAA,$$(newline) ,$(call get_kvm_exports,$(1)))\
-+$$(newline)in directories:\
-+$$(newline)  $(srctree)/arch/x86/kvm\
-+$$(newline)  $(srctree)/virt/kvm\
-+$$(newline)Use EXPORT_SYMBOL_FOR_KVM_INTERNAL, not $(1))
-+endif # nr_kvm_exports != expected
-+undefine exports_advice
-+undefine nr_kvm_exports
-+endef # check_kvm_exports
-+
-+$(eval $(call check_kvm_exports,EXPORT_SYMBOL_GPL))
-+$(eval $(call check_kvm_exports,EXPORT_SYMBOL))
-+
-+undefine check_kvm_exports
-+undefine get_kvm_exports
-+undefine exports_grep_trailer
-+undefine newline
-+endif # CONFIG_KVM_X86
-
-base-commit: a996dd2a5e1ec54dcf7d7b93915ea3f97e14e68a
--- 
-2.51.2.1041.gc1ab5b90ca-goog
-
+Jason
 
