@@ -1,213 +1,152 @@
-Return-Path: <kvm+bounces-62185-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62186-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A626CC3BBAC
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 15:27:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FD47C3C0D9
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 16:31:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47BDC422B4F
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 14:23:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF5253ACE58
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 15:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B6F834B430;
-	Thu,  6 Nov 2025 14:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD7B2737F3;
+	Thu,  6 Nov 2025 15:25:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qSfbrYle"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pgAu75m5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E81233DEE6;
-	Thu,  6 Nov 2025 14:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D291EEA5D;
+	Thu,  6 Nov 2025 15:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762438666; cv=none; b=OkcavlAJLM5608ETxPh/EL2PgwwQ+U6PuRCMhYWXxySOMJpKa0eveGKDSkH8nMS5+kyjG4TlUKE2JZpN14YRiLG74ezLKzM+lGCn8HRP8ztKTKTzo03RvrmJbwwpuH/YIBfI2ENa70lrGufWE6CxSRr62d1YBok/sZZjWG1MJP0=
+	t=1762442755; cv=none; b=F1+MLUw4EOM4dTGFeqRb9MWrtNG6pMQN6PfLNKim5dDOnZpt3AZLtmk5BzLoXYx5osi9IgOP+EOPDlUa4g/P4snvIoB+sIm9oTHWrLf/ugsMREUIBiUXjvAg57QtZMJmb8H9h3IkatLDAbPXCslqAAAcSRu/VTS9z3uoA9KjkiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762438666; c=relaxed/simple;
-	bh=Ysr30Sn5K0VIh/QChgAA+mxNzBcIIHvszbujsNqJTIY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LdwL31D0TuoAeF1kDp8RKkfEQ90G49yZQuvc9NL7SHSDHLzaxSFfkrQOo2tZw9Xpvy64ne3jRd0PS4qEIrWjX2h7YGEoG1AEFAT5r/d3Ci9AFZMns0FnPFgb69uGqlAGysn6TeKbAuqi3d8auZ2yTZhuWR6OrGIY/Vi4tXtBfIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qSfbrYle; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40CACC19423;
-	Thu,  6 Nov 2025 14:17:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762438665;
-	bh=Ysr30Sn5K0VIh/QChgAA+mxNzBcIIHvszbujsNqJTIY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qSfbrYleS0pgRnWFVOVVECfkmFN3RhXDUr/qoNyfh3zGJM1uA2s4UV18MtwOik7ka
-	 O4/CuPI1n6UVPro/r9Jyh/hs/0aO7rlsmwPkiXVCMLbBw0Bh9xwKkhVFBUffXCLwUj
-	 5b8B6F2h7nhjNngQA8Rq0R9L5064vJnmjKlDemXUyy2OEQdvyHHjaucrxksP26KgZ1
-	 rnT5Ep8vEinwOQ7uBWN57R2mEmsTM9V47wfGBgzEwiHvgH4i9Rv0SMKteBvBGq3dty
-	 +GPOfSKQdiHbe2RpZM3uiqyZNrzu0UXvfyY38PqqqLZdXOqMkkKwxarubXjozUjpZ3
-	 7AN5yEPxfo5Kg==
-From: Leon Romanovsky <leon@kernel.org>
-To: Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	=?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <skolothumtho@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex@shazbot.org>
-Cc: Krishnakant Jaju <kjaju@nvidia.com>,
-	Matt Ochs <mochs@nvidia.com>,
-	linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	iommu@lists.linux.dev,
-	linux-mm@kvack.org,
-	linux-doc@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org,
-	kvm@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Alex Mastro <amastro@fb.com>,
-	Nicolin Chen <nicolinc@nvidia.com>
-Subject: [PATCH v7 11/11] vfio/nvgrace: Support get_dmabuf_phys
-Date: Thu,  6 Nov 2025 16:16:56 +0200
-Message-ID: <20251106-dmabuf-vfio-v7-11-2503bf390699@nvidia.com>
+	s=arc-20240116; t=1762442755; c=relaxed/simple;
+	bh=6iOjcSAxs3NxY9p5Z8vOb47o67EQ2so0Ix8yDCMTguI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qh2KfO0U3exbJJSI5K0H9CC7hoHC6Rt/dC9BKHKhgOGDg7D62nwoDtzjXUxiyRqAhvh10j3oBWLL6QkCBnneLXXBcU2eb2Qz4dL1mXHa7Dz5GEKGBpdjXypDkVy9wUO7tsOYH0JKT1bc0KneJbl8anYNm8AW/jqb5S/4L2VVUqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pgAu75m5; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A6FF8iF009215;
+	Thu, 6 Nov 2025 15:25:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=mtsa329fUtQbDlBUnISqk9oEEDR1m5/u3hkXhk6pG
+	Zs=; b=pgAu75m5IL45mlIeS1eY+G9JVK/VDS9W4kK01MCGGiR1lxnnqQf0fnbSm
+	kZW8tAKFpxzZkgu9XSnCUoyzK1Sj69wkwfDQuMqmnX5PQ9lk3FDF7DizDzqOWD6O
+	v9D3m/3CoAjd+6Xlxn3E3gS/iCHCncsQg9MwuvN71v1hpg1+wtFmnqq+bRNcfuia
+	daQBjZA0GAayQmZhQ5RhyvOZKbbaNVARwfmT5zb1p/ccUs2KRrXDk/z72U5K19by
+	xOM0CAo+GrxR6r1H7gh0rN2a+frmCExz9qz0UCoRU5rLcEy3cNRLtImjp6aSipm4
+	yPT2jgJIJcV/8RhWHlBp9yFVswSog==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a59q97y9b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Nov 2025 15:25:51 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A6CdwoS012875;
+	Thu, 6 Nov 2025 15:25:50 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a5y825udp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Nov 2025 15:25:50 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5A6FPkh454657462
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 6 Nov 2025 15:25:46 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 82B5020043;
+	Thu,  6 Nov 2025 15:25:46 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1BBB820040;
+	Thu,  6 Nov 2025 15:25:46 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.155.209.42])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  6 Nov 2025 15:25:46 +0000 (GMT)
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        mhartmay@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        seiden@linux.ibm.com, gra@linux.ibm.com, schlameuss@linux.ibm.com,
+        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, ggala@linux.ibm.com, david@redhat.com
+Subject: [PATCH v1 1/1] KVM: s390: Fix gmap_helper_zap_one_page() again
+Date: Thu,  6 Nov 2025 16:25:45 +0100
+Message-ID: <20251106152545.338188-1-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
-References: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.15-dev-3ae27
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=StmdKfO0 c=1 sm=1 tr=0 ts=690cbdff cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
+ a=hc2NwQUhtlEWUF91VgoA:9
+X-Proofpoint-ORIG-GUID: PPbXzuvdWZmfUfVvDHg_xbUhVffvJ9Qq
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAxMDAxOCBTYWx0ZWRfX/ouv/e8mabm4
+ +nrjP7XCRoqBndZr4vqYW21w/zxq9maqd+c8/AXH1LbDl54gZ8jhgXUH2VPEg2hqbQmzob9V1Ji
+ /kLqiIPRuzBh0b01VOEZ+mtgXPANFMdxLcuvZDYXT2DH9NfweC1xlHBqW433cNsIKlhrTbe4rnG
+ ohneebLB2xTKSVRu3NOqE52NV0X3/+tmAahiPkcYBvj2ltQZDLzTLoXLOE8a8w5xl+MnJuQFOiD
+ G9RLxg6UHtMEpehMYLbvdg9WenE33k637fQ1FlFpmKYLxi+at1amleYts1CxJeTj957wpymFrt3
+ Zl+oJx3tz4EbfqlkGgnGi1aa1tXgbUMUTFQjTxXz01bfVRa7WzKoFhEdfSxTceYn7a1DOcST0C+
+ TsMhe3UHHHmJJyxqXm+RZxEklzV1GQ==
+X-Proofpoint-GUID: PPbXzuvdWZmfUfVvDHg_xbUhVffvJ9Qq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-06_03,2025-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 suspectscore=0 phishscore=0 impostorscore=0 priorityscore=1501
+ malwarescore=0 clxscore=1015 adultscore=0 bulkscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511010018
 
-From: Jason Gunthorpe <jgg@nvidia.com>
+A few checks were missing in gmap_helper_zap_one_page(), which can lead
+to memory corruption in the guest under specific circumstances.
 
-Call vfio_pci_core_fill_phys_vec() with the proper physical ranges for the
-synthetic BAR 2 and BAR 4 regions. Otherwise use the normal flow based on
-the PCI bar.
+Add the missing checks.
 
-This demonstrates a DMABUF that follows the region info report to only
-allow mapping parts of the region that are mmapable. Since the BAR is
-power of two sized and the "CXL" region is just page aligned the there can
-be a padding region at the end that is not mmaped or passed into the
-DMABUF.
-
-The "CXL" ranges that are remapped into BAR 2 and BAR 4 areas are not PCI
-MMIO, they actually run over the CXL-like coherent interconnect and for
-the purposes of DMA behave identically to DRAM. We don't try to model this
-distinction between true PCI BAR memory that takes a real PCI path and the
-"CXL" memory that takes a different path in the p2p framework for now.
-
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Tested-by: Alex Mastro <amastro@fb.com>
-Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Fixes: 5deafa27d9ae ("KVM: s390: Fix to clear PTE when discarding a swapped page")
+Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- drivers/vfio/pci/nvgrace-gpu/main.c | 56 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ arch/s390/mm/gmap_helpers.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-index e346392b72f6..7d7ab2c84018 100644
---- a/drivers/vfio/pci/nvgrace-gpu/main.c
-+++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-@@ -7,6 +7,7 @@
- #include <linux/vfio_pci_core.h>
- #include <linux/delay.h>
- #include <linux/jiffies.h>
-+#include <linux/pci-p2pdma.h>
+diff --git a/arch/s390/mm/gmap_helpers.c b/arch/s390/mm/gmap_helpers.c
+index d4c3c36855e2..38a2d82cd88a 100644
+--- a/arch/s390/mm/gmap_helpers.c
++++ b/arch/s390/mm/gmap_helpers.c
+@@ -47,6 +47,7 @@ static void ptep_zap_swap_entry(struct mm_struct *mm, swp_entry_t entry)
+ void gmap_helper_zap_one_page(struct mm_struct *mm, unsigned long vmaddr)
+ {
+ 	struct vm_area_struct *vma;
++	unsigned long pgstev;
+ 	spinlock_t *ptl;
+ 	pgste_t pgste;
+ 	pte_t *ptep;
+@@ -65,9 +66,13 @@ void gmap_helper_zap_one_page(struct mm_struct *mm, unsigned long vmaddr)
+ 	if (pte_swap(*ptep)) {
+ 		preempt_disable();
+ 		pgste = pgste_get_lock(ptep);
++		pgstev = pgste_val(pgste);
  
- /*
-  * The device memory usable to the workloads running in the VM is cached
-@@ -683,6 +684,54 @@ nvgrace_gpu_write(struct vfio_device *core_vdev,
- 	return vfio_pci_core_write(core_vdev, buf, count, ppos);
- }
+-		ptep_zap_swap_entry(mm, pte_to_swp_entry(*ptep));
+-		pte_clear(mm, vmaddr, ptep);
++		if ((pgstev & _PGSTE_GPS_USAGE_MASK) == _PGSTE_GPS_USAGE_UNUSED ||
++		    (pgstev & _PGSTE_GPS_ZERO)) {
++			ptep_zap_swap_entry(mm, pte_to_swp_entry(*ptep));
++			pte_clear(mm, vmaddr, ptep);
++		}
  
-+static int nvgrace_get_dmabuf_phys(struct vfio_pci_core_device *core_vdev,
-+				   struct p2pdma_provider **provider,
-+				   unsigned int region_index,
-+				   struct dma_buf_phys_vec *phys_vec,
-+				   struct vfio_region_dma_range *dma_ranges,
-+				   size_t nr_ranges)
-+{
-+	struct nvgrace_gpu_pci_core_device *nvdev = container_of(
-+		core_vdev, struct nvgrace_gpu_pci_core_device, core_device);
-+	struct pci_dev *pdev = core_vdev->pdev;
-+
-+	if (nvdev->resmem.memlength && region_index == RESMEM_REGION_INDEX) {
-+		/*
-+		 * The P2P properties of the non-BAR memory is the same as the
-+		 * BAR memory, so just use the provider for index 0. Someday
-+		 * when CXL gets P2P support we could create CXLish providers
-+		 * for the non-BAR memory.
-+		 */
-+		*provider = pcim_p2pdma_provider(pdev, 0);
-+		if (!*provider)
-+			return -EINVAL;
-+		return vfio_pci_core_fill_phys_vec(phys_vec, dma_ranges,
-+						   nr_ranges,
-+						   nvdev->resmem.memphys,
-+						   nvdev->resmem.memlength);
-+	} else if (region_index == USEMEM_REGION_INDEX) {
-+		/*
-+		 * This is actually cachable memory and isn't treated as P2P in
-+		 * the chip. For now we have no way to push cachable memory
-+		 * through everything and the Grace HW doesn't care what caching
-+		 * attribute is programmed into the SMMU. So use BAR 0.
-+		 */
-+		*provider = pcim_p2pdma_provider(pdev, 0);
-+		if (!*provider)
-+			return -EINVAL;
-+		return vfio_pci_core_fill_phys_vec(phys_vec, dma_ranges,
-+						   nr_ranges,
-+						   nvdev->usemem.memphys,
-+						   nvdev->usemem.memlength);
-+	}
-+	return vfio_pci_core_get_dmabuf_phys(core_vdev, provider, region_index,
-+					     phys_vec, dma_ranges, nr_ranges);
-+}
-+
-+static const struct vfio_pci_device_ops nvgrace_gpu_pci_dev_ops = {
-+	.get_dmabuf_phys = nvgrace_get_dmabuf_phys,
-+};
-+
- static const struct vfio_device_ops nvgrace_gpu_pci_ops = {
- 	.name		= "nvgrace-gpu-vfio-pci",
- 	.init		= vfio_pci_core_init_dev,
-@@ -703,6 +752,10 @@ static const struct vfio_device_ops nvgrace_gpu_pci_ops = {
- 	.detach_ioas	= vfio_iommufd_physical_detach_ioas,
- };
- 
-+static const struct vfio_pci_device_ops nvgrace_gpu_pci_dev_core_ops = {
-+	.get_dmabuf_phys = vfio_pci_core_get_dmabuf_phys,
-+};
-+
- static const struct vfio_device_ops nvgrace_gpu_pci_core_ops = {
- 	.name		= "nvgrace-gpu-vfio-pci-core",
- 	.init		= vfio_pci_core_init_dev,
-@@ -965,6 +1018,9 @@ static int nvgrace_gpu_probe(struct pci_dev *pdev,
- 						    memphys, memlength);
- 		if (ret)
- 			goto out_put_vdev;
-+		nvdev->core_device.pci_ops = &nvgrace_gpu_pci_dev_ops;
-+	} else {
-+		nvdev->core_device.pci_ops = &nvgrace_gpu_pci_dev_core_ops;
- 	}
- 
- 	ret = vfio_pci_core_register_device(&nvdev->core_device);
-
+ 		pgste_set_unlock(ptep, pgste);
+ 		preempt_enable();
 -- 
 2.51.1
 
