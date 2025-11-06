@@ -1,202 +1,251 @@
-Return-Path: <kvm+bounces-62187-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62188-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F41FC3C448
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 17:09:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A64C2C3C58A
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 17:20:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE1601B21A0C
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 16:10:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1B3862014D
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 16:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C2134B661;
-	Thu,  6 Nov 2025 16:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A4ED34E747;
+	Thu,  6 Nov 2025 16:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ErxnYFq/"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lJxWjUIS"
 X-Original-To: kvm@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013022.outbound.protection.outlook.com [40.93.196.22])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A2329B766;
-	Thu,  6 Nov 2025 16:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.22
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762445355; cv=fail; b=ZZYCgXhKLN8CHYa31nGFDogwvRTAtgs7jzyYmqB0OSGgxRl/Syk60ZkSdKoR7jLAODTmbDweW2JpI4kGTkP0+ZDE18tEfTM5At3JC2ZDSYYF4r0GdSJjHlBb19SRPrQzrTtQAKj3/CLqGdiSqQNl2q//yE5IbGxyznWWx/Wj3jo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762445355; c=relaxed/simple;
-	bh=ZfFStExC3BVw0Bn0jzqrrpDEya2elUUZKo5fSTsZhxE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ZzcvtQ70h7t6JmV9srjzvnorwII/6A7KSIAJsOz/ezqmiSvIohm2P0B+efU9E0y9UQxXMtFdBsa6Jl1/GiWw0W/3zE/j35ZKQ/eGC+Xs9poYFa/Iojah9hBZJPoFUrMF9lJ3KzPzTubx5G3sGuNgSdas6+PjO93qQIjHmh8VdJU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ErxnYFq/; arc=fail smtp.client-ip=40.93.196.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u2e8czzKN3odEwSAxPS2nRj8h/GTpUBIjhLOP5QY9w21iLaxSGkqx8cOt8nKNASkAg19N1OQqEV6nJ3Q1kfIjes7o6GNvknEnfFHT9J8T33vcrfy+olg8kyUDHlBKnzrOhlmFW0m9PY1vmXwKgaNvq3mJMtoMJpCFblKY/Vvc/SH9v2K/DIays3SUHmVU4dKi956ziSv6Fyiepq4VouWythBqxIvgxpVZmeHX74Y221radrxB5ot+4pYEP8T6K0U8SVhU28INQ/vTYLRuWXX+srf5G1Jr/MlmB30UHhAxslJsscmvIVgnFj8M1FgtoOHBhTsJ2q8e7cjc8IfjkQADA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LN0ij2p4wFTCjOedRMnPL2tPIR2cLXsUzXtHJQnRsKI=;
- b=ncAX2aoxZA7MABrapR42HG8Z1FyQxd4ZXB8+1tESrMVOGKcOeG21O/dsZy301tHfnGjLNz8uFyq5XOa9a8TUpw74yZRw6m+84/OyaUHDt9+rjy5XckdELvbG5CfGBWzfzbuo5YU9oLX8jNApoTbn700Usoqd8lF7FIFiYJTjUQJUEpt+n1AvpM7giXONNDmPxRm2WWEJQkBvM3stV6E6EI6aINCOVO2samq0Ol/48+sOntCDTSFGpENS2mt2cSZb9GWQYdfKC5MLA/WZB5sUcS2yA9/OrzkBiixirx32mnsHdcOuTR9n3tnpsCJaGR3VTqOhAV+04SZs/jObxpSy0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LN0ij2p4wFTCjOedRMnPL2tPIR2cLXsUzXtHJQnRsKI=;
- b=ErxnYFq/1ziHoFlwY13rQsOSvleeyBafrAzZY0p8wg6qr5UZKE0zCvqHPat58U32xVMe+IfgGZWHCIZ34NVHnpagDiMuX9W8j1Frft8pfSXpghGPG5N81oL9BdMGTjV08yRQv7h87Mv6dGbcBzejqg7L+AaKZZL1Sk5HuiAQyQY=
-Received: from CH0PR13CA0012.namprd13.prod.outlook.com (2603:10b6:610:b1::17)
- by CY8PR12MB7660.namprd12.prod.outlook.com (2603:10b6:930:84::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.8; Thu, 6 Nov
- 2025 16:09:10 +0000
-Received: from CH2PEPF0000009E.namprd02.prod.outlook.com
- (2603:10b6:610:b1:cafe::e8) by CH0PR13CA0012.outlook.office365.com
- (2603:10b6:610:b1::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.8 via Frontend Transport; Thu, 6
- Nov 2025 16:09:10 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- CH2PEPF0000009E.mail.protection.outlook.com (10.167.244.27) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9298.6 via Frontend Transport; Thu, 6 Nov 2025 16:09:10 +0000
-Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 6 Nov
- 2025 08:09:09 -0800
-Received: from [172.31.180.39] (10.180.168.240) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Thu, 6 Nov 2025 08:09:01 -0800
-Message-ID: <6f749888-28ef-419b-bc0a-5a82b6b58787@amd.com>
-Date: Thu, 6 Nov 2025 21:38:54 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAF734CFA0;
+	Thu,  6 Nov 2025 16:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762445487; cv=none; b=fe62FqEuxEZ7Hp3/MCO94CBueV54XYOvWZkzZcSoTUtElC8ysog6DvCWl83Bk/Mc6/prJIlIc51X8DfpXDROsxaVcy4Klz4FFPdoQl0itmwFPFeUHC/xyLIclSmRlkNjWWnG5ncW+0D+CBnu4/nQBYC6EQDH5GG6Ry0R42joVUY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762445487; c=relaxed/simple;
+	bh=XH4+lwyFACHHtvind3oO7V+qFasFasS+jBGUmEuxkjI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ex+ffBHrxTUOu/b1cBmpFL9VHlo77nxsKLRCcSuC9s1AIdfNGkWhz1sIxuiayKPD5DK1mIXBJOVnNhWDwXjNWaDSX0y1LL5XeMdupTKxkbKhEXDq3dYL5ZsjFQnQMD7mUjxGNmEb7yYiwdAm9rmvlfS+I6c29swZCZJwV5iP8xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lJxWjUIS; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A6EdmAQ026450;
+	Thu, 6 Nov 2025 16:11:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=Q2UksBgU4B1EFbaighN3qMLZUxtLWsrE6SLEVvNVy
+	c0=; b=lJxWjUISW8aVA5jS/ymmv3DvPCAYofdm2w0OLeSLPfteS3BJFXAVTtEC1
+	tcI6Cqx2PQA5knP5Ee0O6HbRnfRS4JzgJHS8SGqeWifjPF3KZOBdhiXlR03Jvyvu
+	2I0g6FAra8p8Eiz3F4PZFb2kbp3KD+wyYIP2JsPrhdVGjPbfYMP1klWmiDBWrmUB
+	cNPfITRItvHvBKFijuKwDn7pJuuWx3JKVu2neeaj33DFLUN300Dbeqqhgt3AYt9C
+	CVVi1TXWExB8CBoMumAuLjyz8G7MBIbVx04G5dQ0kz4EQgI2BDO/2j/SU8G7Xmf+
+	Vjcu9bA0PiuRhXB8/+7c8k3kvfXmw==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a59q9876c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Nov 2025 16:11:23 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A6FSEuY009863;
+	Thu, 6 Nov 2025 16:11:22 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4a5x1kp933-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Nov 2025 16:11:21 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5A6GBIdu16384402
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 6 Nov 2025 16:11:18 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F38BA20043;
+	Thu,  6 Nov 2025 16:11:17 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8BE9320040;
+	Thu,  6 Nov 2025 16:11:17 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.155.209.42])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  6 Nov 2025 16:11:17 +0000 (GMT)
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, nsg@linux.ibm.com,
+        nrb@linux.ibm.com, seiden@linux.ibm.com, schlameuss@linux.ibm.com,
+        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, david@redhat.com, gerald.schaefer@linux.ibm.com
+Subject: [PATCH v3 00/23] KVM: s390: gmap rewrite, the real deal
+Date: Thu,  6 Nov 2025 17:10:54 +0100
+Message-ID: <20251106161117.350395-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86: SVM: Mark VMCB_LBR dirty when L1 sets
- DebugCtl[LBR]
-To: Jim Mattson <jmattson@google.com>
-CC: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, <nikunj.dadhania@amd.com>, Thomas Gleixner
-	<tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
-	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-	"H. Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Matteo Rizzo
-	<matteorizzo@google.com>, <evn@google.com>
-References: <20251101000241.3764458-1-jmattson@google.com>
-Content-Language: en-US
-From: Shivansh Dhiman <shivansh.dhiman@amd.com>
-In-Reply-To: <20251101000241.3764458-1-jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000009E:EE_|CY8PR12MB7660:EE_
-X-MS-Office365-Filtering-Correlation-Id: 86550045-381e-4bd1-3013-08de1d4ed213
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|7416014|82310400026|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SVlSNUZCRVdoa2FTMHc0REdoQ2Z6VDRjNXdyMVFXT2kxY0ZFTm5yWWVpWTNB?=
- =?utf-8?B?ZkhqR2RZaGlHK2ZrNUd2dUtqd3FmeUlmTVExZWRFakM2UVpsSk91bmsxcENC?=
- =?utf-8?B?aUk1WmJXMTkzbWp6QVVma2ZaWkFGQkRxZ3VDREx1WGdGaTlBaXZBOVRqNGxU?=
- =?utf-8?B?RGFudEFMeTN5UEQrMExXTjYzd0piZkcrMHVFaTZSVHppcUhNUUtlOVEreUUz?=
- =?utf-8?B?MUpHL2hBdWlzMTllV1YvcUlGbWcvTGR6N1ZLV2dWNkZhdnN4NjM1aEhMNFpa?=
- =?utf-8?B?aWNHcnI1OTA1MHB1cnhmTmZNVktJQlRTVkdFd1BKY1V6cDdOZnQ4dkJleVdZ?=
- =?utf-8?B?NnAwTWJJdGE3ZDNXb2JjaVF5Ukx2STJKbFQ3SmdqZmdpOHhpQnVlYUxkL2tQ?=
- =?utf-8?B?TnlPS3RWSjRGZjdwUTRlVGE1MEdGZW9GeHFxVmsxRmJYclVLQXdEMDR0Smxw?=
- =?utf-8?B?UnYybzExMzVYM3UvU0lXUTJ6VFZuYUJXZWNWK0k0YkVKY2MrQTV1dnRpZHZp?=
- =?utf-8?B?SVJ1QTQ4VDRZa0d5b0xXSnpUVEc1Y2Z2Y3ZSdWlpQjgyLytUWndodVZya25x?=
- =?utf-8?B?OFVDcWlodCsvUENaZGt4MTRQN2wwandrWVJReW0xWDM1ampBamVEbnkyTmZJ?=
- =?utf-8?B?YUwwbnMxVHo4NHMzZmtOV05XckI0QWVSdFhxYkl1VDVPbjBTUTIxM2xSUUtH?=
- =?utf-8?B?bktTWVpad2gyV20wTHFXeUV5V2FtMUIwZDI2WEF0RTgyMVY3ZitKV1RQVnVT?=
- =?utf-8?B?RmMwdFVidW16ZnBYOHdmU3FBbEVscTBIYlZ2NjR2WjF5VHhYY0NwMnQ5WHZX?=
- =?utf-8?B?ZVRLRzBhRk1zQzYrMkdZMzM1bytmbUdoakxmckN5U1FzdkxIUmxFY1k3Z2Vx?=
- =?utf-8?B?cnJGMy8wKytxTDJESFVMM2dkM2FNRlVlQVE3SUhSZk9vVjRxRkxCUGw3Um1E?=
- =?utf-8?B?ZVltRG9RamoveU9mZzNQaEwzNkVzWmk4N1l5T0VQUVRWc0RqeU55aUR1TFZt?=
- =?utf-8?B?Z1dtVXVUeU1iUGViem91MjRCMmtaak4zclRBT1E4Y04vQUF3Y3FZOGc1NEUy?=
- =?utf-8?B?ek1HSkpBUHcyM1hBdUpnYXFQSTAvZ0VPa2ptV2dDTndVK2JVeW5wOWpGWXlE?=
- =?utf-8?B?TjM3dExUNzV3akk1ejZvdEVtMzFNc3c5WElEazlFNWl5TTZTWTdZd1lUaEh3?=
- =?utf-8?B?cXRIQ3c5eG9pU1JLUGpySmxaczFQR1F3SngrNEVPdDUvVDlnQlBocTZrOGNj?=
- =?utf-8?B?L3ptaS9YTTFZRVFSeUk1RlZUeGFKeTl5UUx4STRTbUxTV2VScDdneTZpQ09y?=
- =?utf-8?B?dXpyVDFPNEh0WTZEdDVBOFhQVC9WV04yYlJZbjMzelpNaURoNjQ2aEI4TTdT?=
- =?utf-8?B?dThPYXlOMk9YSnVrbEx6V3dVZk9pWTVwSmdNOWFwRWNiMUQ3Z3UrU0NjdXFQ?=
- =?utf-8?B?VEJPYmphM2M1cVk1WVhoZFZkRk14SjBTbTd1d1N3VGhVQ2J3OEJyZllZcGlZ?=
- =?utf-8?B?VjdKVVlFYk5qRmFrK0RhSURZTGYraXFFUnFNT2FIVTNUcDZQMFVGWHIxZUF1?=
- =?utf-8?B?cXk4bFMwS2FXWi9TdEZNMEhPN3o5V3VZczVHaTluK2lwbHJtbEtyaElwN29n?=
- =?utf-8?B?S1lRMUJIS0RMei9OS0VCSmswbXMyRytzNUtDS0VOay9CSHZCSVpzLzliTENy?=
- =?utf-8?B?b2VqL1grNlpOSUN0bEJLeE9aVjNXSk1yQ2VYOElMWU9pV2E0S2w1MiszbkNi?=
- =?utf-8?B?N1JnK1JIamNNdm1XRi8zOFhkbmFLSVY3YTFpa1lnODdXVE0raHpLS3RjN0NS?=
- =?utf-8?B?MWJjY0xmUTdOK2w4Vy9ZSW0rSmZNZ0hDVFRmV1kxRFBPSkIydm5rSWxUWmpY?=
- =?utf-8?B?eXVtSjNCa014VHJuVE9TSGZJZUdZd0R6cUhra0t1YzkrYzFrRkc2NzMzRmll?=
- =?utf-8?B?WHcvd0hpWGY0OUZyanhNekkrbU9KNFRRWFRCNFFYVGZPd2Z6bCs5RXBnTzhi?=
- =?utf-8?B?NDhkakNxM1U2bDdoT2Y2aVlvSGZoVGg0Zmp4NUxyMDhGOE9VS2NWTXQ4R2RO?=
- =?utf-8?B?RTZKdDVTejEraTUvTVg2cUh2NFJjNk1hZTRTMlpwVk1xalZnQVBnbUFGWDJ0?=
- =?utf-8?Q?4uFk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(7416014)(82310400026)(7053199007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2025 16:09:10.1787
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86550045-381e-4bd1-3013-08de1d4ed213
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000009E.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7660
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=StmdKfO0 c=1 sm=1 tr=0 ts=690cc8ab cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=KiohzL8Nbn7Py9lwjSIA:9
+X-Proofpoint-ORIG-GUID: bOJ5VDC4VVzbOXZPI-c9m6nlY5xlhPUq
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAxMDAxOCBTYWx0ZWRfX32h5ryJwgnDN
+ 5fzQvVwI9BxVe0tOK5hPWHbPtGo077DzrXE2E2XXrDm5jyisRyTu97LX6+MSem9p0RHBWHYtDEV
+ vnSCCweopSKua7rk079uiPORSGK7CvSa7kxqSoo4fOWoOd0AZ8uMIxb/XdDw/pK4y9wCIlblZwM
+ aj+7cmyNtImResk145Nmy/4Az+Ssjk4XJZOCSC6J4BDaEfVn514a+/K3tz10eVePa9rJ29vKOcM
+ BWnSfqZvDte+cJN4SzcJ+3nO5mu0pGcqaNE87tvMEtIumdDosQMCIVBMrqSO04ducbw37gv7vJ4
+ Tb4z/HS3HYBF9qFcqFXb0xbVgJQTKx9RMythu0F02GK+iuPHkG7/rMA/tlYdBQ0wlrs0UklmIss
+ CzK+6dMkOEAamFQuZzIQ3i4RwKSncA==
+X-Proofpoint-GUID: bOJ5VDC4VVzbOXZPI-c9m6nlY5xlhPUq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-06_03,2025-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 suspectscore=0 phishscore=0 impostorscore=0 priorityscore=1501
+ malwarescore=0 clxscore=1015 adultscore=0 bulkscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511010018
 
-On 01-11-2025 05:32, Jim Mattson wrote:
-> With the VMCB's LBR_VIRTUALIZATION_ENABLE bit set, the CPU will load
-> the DebugCtl MSR from the VMCB's DBGCTL field at VMRUN. To ensure that
-> it does not load a stale cached value, clear the VMCB's LBR clean bit
-> when L1 is running and bit 0 (LBR) of the DBGCTL field is changed from
-> 0 to 1. (Note that this is already handled correctly when L2 is
-> running.)
-> 
-> There is no need to clear the clean bit in the other direction,
-> because when the VMCB's DBGCTL.LBR is 0, the VMCB's
-> LBR_VIRTUALIZATION_ENABLE bit will be clear, and the CPU will not
-> consult the VMCB's DBGCTL field at VMRUN.
-> 
-> Fixes: 1d5a1b5860ed ("KVM: x86: nSVM: correctly virtualize LBR msrs when L2 is running")
-> Reported-by: Matteo Rizzo <matteorizzo@google.com>
-> Reported-by: evn@google.com
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 153c12dbf3eb..b4e5a0684f57 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -816,6 +816,8 @@ void svm_enable_lbrv(struct kvm_vcpu *vcpu)
->  	/* Move the LBR msrs to the vmcb02 so that the guest can see them. */
->  	if (is_guest_mode(vcpu))
->  		svm_copy_lbrs(svm->vmcb, svm->vmcb01.ptr);
-> +	else
-> +		vmcb_mark_dirty(svm->vmcb, VMCB_LBR);
->  }
->  
->  static void svm_disable_lbrv(struct kvm_vcpu *vcpu)
+This series is the last big series of the gmap rewrite. It introduces
+the new code and actually uses it. The old code is then removed.
 
-Hi Jim,
-I am thinking, is it possible to add a test in KVM Unit Tests that
-covers this? Something where the stale cached value is loaded instead of
-the correct one, without your patch.
+The insertions/deletions balance is negative both for this series, and
+for the whole rewrite, also considering all the preparatory patches.
 
-Best regards,
-Shivansh
+KVM on s390 will now use the mmu_notifier, like most other
+architectures. The gmap address space is now completely separate from
+userspace; no level of the page tables is shared between guest mapping
+and userspace.
+
+One of the biggest advantages is that the page size of userspace is
+completely independent of the page size used by the guest. Userspace
+can mix normal pages, THPs, hugetlbfs, and more.
+
+Patches 1 to 6 are mostly preparations; introducing some new bits and
+functions, and moving code around.
+
+Patch 7 to 16 is the meat of the new gmap code; page table management
+functions and gmap management. This is the code that will be used to
+manage guest memory.
+
+Patch 18 is unfortunately big; the existing code is converted to use
+the new gmap and all references to the old gmap are removed. This needs
+to be done all at once, unfortunately, hence the size of the patch.
+
+Patch 19 and 20 remove all the now unused code.
+
+Patch 21 and 22 allow for 1M pages to be used to back guests, and add
+some more functions that are useful for testing.
+
+Patch 23 fixes storage key manipulation functions, which would
+otherwise be broken by the new code.
+
+
+v2->v3:
+* Add lots of small comments and cosmetic fixes
+* Rename some functions to improve clarity
+* Remove unused helper functions and macros
+* Rename inline asm constraints labels to make them more understandable
+* Refactor the code to pre-allocate the page tables (using custom
+  caches) when sleeping is allowed, use the cached pages when holding
+  spinlocks and handle gracefully allocation failures (i.e. retry
+  instead of killing the guest)
+* Refactor the code for fault handling; it's now in a separate file,
+  and it takes a callback that can be optionally called when all the
+  relevant locks are still held
+* Use assembler mnemonics instead of manually specifying the opcode
+  where appropriate
+* Remove the LEVEL_* enum, and use TABLE_TYPE_* macros instead;
+  introduce new TABLE_TYPE_PAGE_TABLE
+* Remove usage of cpu_has_idte() since it is being removed from the
+  kernel
+* Improve storage key handling and PGSTE locking
+* Introduce struct guest_fault to represent the state of a guest fault
+  that is being resolved
+* Minor CMMA fixes
+
+
+Claudio Imbrenda (23):
+  KVM: s390: Refactor pgste lock and unlock functions
+  KVM: s390: add P bit in table entry bitfields, move union vaddress
+  s390: Move sske_frame() to a header
+  KVM: s390: Add gmap_helper_set_unused()
+  KVM: s390: Enable KVM_GENERIC_MMU_NOTIFIER
+  KVM: s390: Rename some functions in gaccess.c
+  KVM: s390: KVM-specific bitfields and helper functions
+  KVM: s390: KVM page table management functions: allocation
+  KVM: s390: KVM page table management functions: clear and replace
+  KVM: s390: KVM page table management functions: walks
+  KVM: s390: KVM page table management functions: storage keys
+  KVM: s390: KVM page table management functions: lifecycle management
+  KVM: s390: KVM page table management functions: CMMA
+  KVM: s390: New gmap code
+  KVM: s390: Add helper functions for fault handling
+  KVM: s390: Add some helper functions needed for vSIE
+  KVM: s390: Stop using CONFIG_PGSTE
+  KVM: s390: Switch to new gmap
+  KVM: s390: Remove gmap from s390/mm
+  KVM: S390: Remove PGSTE code from linux/s390 mm
+  KVM: s390: Enable 1M pages for gmap
+  KVM: s390: Storage key manipulation IOCTL
+  KVM: s390: Fix storage key memop IOCTLs
+
+ MAINTAINERS                          |    2 -
+ arch/s390/Kconfig                    |    3 -
+ arch/s390/include/asm/dat-bits.h     |   32 +-
+ arch/s390/include/asm/gmap.h         |  174 --
+ arch/s390/include/asm/gmap_helpers.h |    1 +
+ arch/s390/include/asm/kvm_host.h     |    5 +
+ arch/s390/include/asm/mmu.h          |   13 -
+ arch/s390/include/asm/mmu_context.h  |    6 +-
+ arch/s390/include/asm/page.h         |    4 -
+ arch/s390/include/asm/pgalloc.h      |    4 -
+ arch/s390/include/asm/pgtable.h      |  163 +-
+ arch/s390/include/asm/tlb.h          |    3 -
+ arch/s390/include/asm/uaccess.h      |   70 +-
+ arch/s390/kvm/Kconfig                |    3 +-
+ arch/s390/kvm/Makefile               |    3 +-
+ arch/s390/kvm/dat.c                  | 1362 ++++++++++++++
+ arch/s390/kvm/dat.h                  |  971 ++++++++++
+ arch/s390/kvm/diag.c                 |    2 +-
+ arch/s390/kvm/faultin.c              |  148 ++
+ arch/s390/kvm/faultin.h              |   92 +
+ arch/s390/kvm/gaccess.c              |  929 +++++-----
+ arch/s390/kvm/gaccess.h              |   20 +-
+ arch/s390/kvm/gmap-vsie.c            |  141 --
+ arch/s390/kvm/gmap.c                 | 1125 ++++++++++++
+ arch/s390/kvm/gmap.h                 |  159 ++
+ arch/s390/kvm/intercept.c            |   15 +-
+ arch/s390/kvm/interrupt.c            |    2 +-
+ arch/s390/kvm/kvm-s390.c             |  926 ++++------
+ arch/s390/kvm/kvm-s390.h             |   28 +-
+ arch/s390/kvm/priv.c                 |  207 +--
+ arch/s390/kvm/pv.c                   |   67 +-
+ arch/s390/kvm/vsie.c                 |  117 +-
+ arch/s390/lib/uaccess.c              |  184 +-
+ arch/s390/mm/Makefile                |    1 -
+ arch/s390/mm/fault.c                 |    4 +-
+ arch/s390/mm/gmap.c                  | 2453 --------------------------
+ arch/s390/mm/gmap_helpers.c          |   87 +-
+ arch/s390/mm/hugetlbpage.c           |   24 -
+ arch/s390/mm/page-states.c           |    1 +
+ arch/s390/mm/pageattr.c              |    7 -
+ arch/s390/mm/pgalloc.c               |   24 -
+ arch/s390/mm/pgtable.c               |  818 +--------
+ include/uapi/linux/kvm.h             |   10 +
+ mm/khugepaged.c                      |    9 -
+ 44 files changed, 5116 insertions(+), 5303 deletions(-)
+ delete mode 100644 arch/s390/include/asm/gmap.h
+ create mode 100644 arch/s390/kvm/dat.c
+ create mode 100644 arch/s390/kvm/dat.h
+ create mode 100644 arch/s390/kvm/faultin.c
+ create mode 100644 arch/s390/kvm/faultin.h
+ delete mode 100644 arch/s390/kvm/gmap-vsie.c
+ create mode 100644 arch/s390/kvm/gmap.c
+ create mode 100644 arch/s390/kvm/gmap.h
+ delete mode 100644 arch/s390/mm/gmap.c
+
+-- 
+2.51.1
+
 
