@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-62222-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62223-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4522DC3C877
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 17:42:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B68AEC3C91C
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 17:50:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6504C4F3D6E
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 16:37:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 363873A85D1
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 16:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B0C35028B;
-	Thu,  6 Nov 2025 16:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC9434D4FA;
+	Thu,  6 Nov 2025 16:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FgfXQ2Ep"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XY/FDOaQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974433314CB
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 16:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8AEC34C820
+	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 16:36:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762446814; cv=none; b=fVYPVcfU+LgnFlT6qXTrdH2KPBZ2xTsE2JaY1dPmU7vRMHXz0EHbTbVWliil8CEh4FYx40U+SY7G6//aGBeNwhT9sEGxJaOFNxrGm2aSHqeCBhWyTistibxp4SKVVFIR1RBqq8KSE6HvHYycE5vXdkHcdYQ7JXzY2NImKgPdXE0=
+	t=1762447020; cv=none; b=rtJ5nYEg1q/e/vi/jc/t1iocpKzeGJxe8v8v8ZVOcQgcPD9lUDMMR1AaXzAX82fhTbYE8etF7szeIGWoIwEUXYo4LqbJ7t/VEgGa+o5Ippa1fkwHVPp9IArEZ5pxGVhhZ92YAixI7gaCUXVZ+V6me8iO+m63GiOQREJ1TEuof8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762446814; c=relaxed/simple;
-	bh=5ihuDeqsYQ0psikMxLSzF19AqAAShlKz6wsIdUFp4WU=;
+	s=arc-20240116; t=1762447020; c=relaxed/simple;
+	bh=/H4aKQiGoB+WRNMdPbS39s+XSOfaGMVBTg+VNXS/AO8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SJ/osCy5mMRSNMlXSk1x8U84YT9ZpZHqnCGjgq9Wpz3vqG+0UcQeZRn5UnZyZtHTNzu/llPuXalRaxqqjaUQgWB8MAPLkywoazkhtFnXCc73UhL6JhVBB+MsxiRWTQjqXWDcFRWLJbm03l1MuLcBDrdJHFq0ROShJy5l+34NHzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FgfXQ2Ep; arc=none smtp.client-ip=209.85.160.171
+	 To:Cc:Content-Type; b=tRAD2YoPPCUcZBPirCFBbTqaES9NlWT5A6rjn0QD21dJdFI63z8osCc/mPjoblTb7M+4MQPR/mAnYIwzz8YAeq6OTJpZM00X823jS5atfqR1Ew1rN8AkJEkUjv5GjOUl7i6vNVC6snhQlRr6fVlK+WtZnJ+m0SpkWV1Uwn0aVRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XY/FDOaQ; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ed6ca52a0bso328291cf.1
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 08:33:32 -0800 (PST)
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ea12242d2eso336751cf.1
+        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 08:36:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762446811; x=1763051611; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762447018; x=1763051818; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lnZy7OiPe/kS2Rv9Wy12Swhc5j0bx/uxDP7H3ZzWM20=;
-        b=FgfXQ2EpMNBcci4CetxscIG0V4Mueb5shGFITySLZIDUOMsdvqtJYJeuI5X9cF7MAq
-         wHTcxIfnENX63Wa192zliRtYQmYTJ4mj+wltbT3IzEUCq0BiXIFESuXWRId9y5nZojar
-         ICrRMNI259tYOi7krTRtN9u/ijN9ICe4G7y4uCe759kw7qDuXnt7HKcsmBJX6BiqmPzw
-         Xzqckd6WDV4tm3GdfBKY0w2xowNPYkbhxxdHfZr1UTCIq1AgMkvLJBvZTjYNbFRScF0J
-         CIqGyl3+tzpUi8hhP6SASjyqklTrt9Kv8HxIziE2NUVaKxGXZ/XaXQAfPn6m0QUCqWxL
-         1tKQ==
+        bh=unfH04DSjfahtY/Ro5y5JWosPD9lmvBdHPZWteASQ2g=;
+        b=XY/FDOaQoj+ZAR8PxvT+5Y2lv7KZxY5LGlkhb8xvsn1s7ZpZY4LqYia5rRHbEUpuXs
+         aqae7ZK4Ji4maep+IVLR4olUuACbVMgUVPbMeHYIk6n7JePULk6YpHdC6v59dheNdfhw
+         PzrOhLsyJvdR49Gl4TDuCVPlxObpz/aB0LWGnKCw2zj6RyJRrfWtwkxwVO+Fy4fFvHZj
+         gw5V/QpL30/X6gqXhaK7eVLXfkNLY5JEf1bTUk92FUSL1a7RuK3+moTT9k9GPfRG9WhM
+         fpxbcvw0QRwCUAro5A2zCH5Plut8s5Li8xiyh/6PhLjRlxRI1yfvPqZgXOWlE2j7X+cj
+         /pSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762446811; x=1763051611;
+        d=1e100.net; s=20230601; t=1762447018; x=1763051818;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=lnZy7OiPe/kS2Rv9Wy12Swhc5j0bx/uxDP7H3ZzWM20=;
-        b=RovsRSsEL3FYqJdjTeQrqL/K1KC9WNDnjO5Ret3s38jYWIEfn6Jin3NxskBeas+wuc
-         2WFmZov0FbqurtEemW4jTebDteR7qqO1C81+ZuwQzBoB0hBGHaecP6+dr5JvhRwjwgPl
-         u/Zgmxfk9kqTOvqDApI6X18PMyaAFmsj0E7HnHqnVniL653mVXKEqsd5IsTGtffpU1Y0
-         kuKZ0cKUcsk87vv20QyR1lZwt3kE2IDthtr714es0ItH5+vFbGF49hDBTAOZy6/LMXzY
-         XUjvcWCv9RpMe32YgvR1Gj9ldyDJnlsr8afxTGXNQtVE40ASjq1Cf1vOdBKSSzSIsgQD
-         wx+A==
-X-Forwarded-Encrypted: i=1; AJvYcCUuw3/OaaWiWd/3WgME8hb/CeCnWXqUt4SQ87a2p+yfLF63LHXVH+NRjHtgrfDt/pZBEJU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPe7ZuVIDL3nlIS3U3+jRHwXJIGIBSf8coY0ilaDnFcd55fLZQ
-	GzJygVGno6MDEGSEnt7kTeGQbLXjzg+qGUJy5q+hswEP3pty+wjqwtWZOCsW6iTAt941WZSZRY5
-	USR4txhKYl16ZjNCn8auqMFt9U9cMp/rVWbfg1XlL
-X-Gm-Gg: ASbGnctcADZpGra3Az20uV8JcALpjVqmxUUEcaTsP/yaxTdxgjKxtp2rKxKtbJ+BbSO
-	72RF4ceWZ37f8rIWkzit7DMnwtTPoLsn2FV+z6xdQR54eu7qo8HzfWk7MUb3K0xeR+2RvVsgQkE
-	e/66/45Yoq78V3wLj7O6qJSy1xBAgdVxd4Wf+OJXEBidpGHDcOtL4nqW/SMDdpY4e5MN5PavcBT
-	l/cyl/ovJH+H7/yDfg1jgymdZNgJl0kSkTbGMhNr4aHE49HllakCMPUjetQ
-X-Google-Smtp-Source: AGHT+IHkFFTqQuW3CEPcoZzja9ixONknh7QDVB4aPSigXJPx2frRev2iHo0yg8eQxo4ySjq4nFKmcGplZ7r9pitYqzM=
-X-Received: by 2002:a05:622a:60a:b0:4ed:341a:5499 with SMTP id
- d75a77b69052e-4ed82bc69e1mr6700211cf.11.1762446811408; Thu, 06 Nov 2025
- 08:33:31 -0800 (PST)
+        bh=unfH04DSjfahtY/Ro5y5JWosPD9lmvBdHPZWteASQ2g=;
+        b=GVAqSA9X/Bjl4HOh5ZcIKvZ9jvtHW8iEj2YxbkezODal3GmVsizld5Z4B4ZnMJJduG
+         dWsDfaCConHcU7AwclixPKdOe2LOXzCv5SBVOq1OIlY4HjLR81907MdsboAdjEkKbqX8
+         HxvU/odnvpprmj8R90yd3dvbX2wr6+aO4oQePaUSf5luzWDMA3JDJtdjIZH1Cw52oHUR
+         z2EgDVQT10LRUmg7uAQAi0gJoXbX7DGVTIe3eBl8MlOQvYwaliRKkcha7PexEwawVVQe
+         jyN+dJJ9+g/Iu0/EteF34JoJiFonNY9Kb+qIA5T1amuxU0FC29oCpR1bGDr1sm1e2ok2
+         uvfw==
+X-Forwarded-Encrypted: i=1; AJvYcCUpyq0bwfLIonkK1YqZwpcDYsKJzytdk5htYgjx4d+Dmuc387ETB8uf1LL2tLH+RNnZ9VE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOK6sPRY6aufX7764UQCTN3zp7JO4y1vkzfJ+N97BwvN+eVsu8
+	40WzwBtL4ZJhbF+UGCfeKm9bOi8SbHXvGVT6q37gyClRtyuNYeAQ7fbMAFUX+JI0h9QTk3k7/Vx
+	Mf7tE7vNgHkO9rdmn5kNI1U79Ohg2creZ2r5wfRZQ
+X-Gm-Gg: ASbGncv4crQsAAmL6/GY98VJ8XyMmxvVx8YjYwXaK/izD7xj5W9AgkGjZSNqbtMgJye
+	0/qzAfj7r7NQuvTgtGbBRPg6rUW0DhoMZQGknIW4cWIyLtObHYObN2CLDq2EKWfbhMARrszrPOD
+	bAir+c6CgIdcvsnbo87DI+zD4XR5wjuLQ/23PeYI830DgF6M6M1oIv5n/39N9PM3Ab8eH8kKGw8
+	GkoYJDdgFtqkX4LDcdZAQUTV66ak1e27HwSspulwM3jGjgK+YaiMpwdImv1
+X-Google-Smtp-Source: AGHT+IH4D/IkZOkIcH6+QihJJUYRXkSroIwjVIneHKA2+S/ighH3/zauPQTD1YhucwuTFxNEEfdh6lM9UHFcearQHbo=
+X-Received: by 2002:ac8:5792:0:b0:4b7:aa51:116a with SMTP id
+ d75a77b69052e-4ed813f1d79mr8130581cf.4.1762447017683; Thu, 06 Nov 2025
+ 08:36:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,12 +76,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20251104003536.3601931-1-rananta@google.com> <20251104003536.3601931-2-rananta@google.com>
- <aQvjQDwU3f0crccT@google.com> <aQvn1b9sspmbYQVo@google.com>
-In-Reply-To: <aQvn1b9sspmbYQVo@google.com>
+ <aQvoYE7LPQp1uNEA@google.com>
+In-Reply-To: <aQvoYE7LPQp1uNEA@google.com>
 From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Thu, 6 Nov 2025 22:03:19 +0530
-X-Gm-Features: AWmQ_bkGLaUZfEme6FxbIW7ZkiI0Va_bGW9y5wLoRjtgBHqe9dY7AfVYeS3floE
-Message-ID: <CAJHc60z5wX7My+2TYGjV4DYYWow=v9XQH8EQNP+WVQdq2LoxXg@mail.gmail.com>
+Date: Thu, 6 Nov 2025 22:06:44 +0530
+X-Gm-Features: AWmQ_bnOnZ7KqbhSC0MJ1bizQMExDCc20cQdxq8DyRf13e7QBXYi53UHkKLSdUk
+Message-ID: <CAJHc60xjPktqw=RgxgpOSqJP0Ldq6skmxLQm4QhpiojPAMOA=A@mail.gmail.com>
 Subject: Re: [PATCH 1/4] vfio: selftests: Add support for passing vf_token in
  device init
 To: David Matlack <dmatlack@google.com>
@@ -90,30 +90,35 @@ Cc: Alex Williamson <alex@shazbot.org>, Alex Williamson <alex.williamson@redhat.
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 6, 2025 at 5:42=E2=80=AFAM David Matlack <dmatlack@google.com> =
+On Thu, Nov 6, 2025 at 5:44=E2=80=AFAM David Matlack <dmatlack@google.com> =
 wrote:
 >
-> On 2025-11-05 11:52 PM, David Matlack wrote:
-> > On 2025-11-04 12:35 AM, Raghavendra Rao Ananta wrote:
-> >
-> > > -struct vfio_pci_device *vfio_pci_device_init(const char *bdf, const =
-char *iommu_mode);
-> > > +struct vfio_pci_device *vfio_pci_device_init(const char *bdf,
-> > > +                                         const char *iommu_mode,
-> > > +                                         const char *vf_token);
-> >
-> > Vipin is also looking at adding an optional parameter to
-> > vfio_pci_device_init():
-> > https://lore.kernel.org/kvm/20251018000713.677779-20-vipinsh@google.com=
-/
-> >
-> > I am wondering if we should support an options struct for such
-> > parameters. e.g. something like this
+> On 2025-11-04 12:35 AM, Raghavendra Rao Ananta wrote:
 >
-> Wait, patch 4 doesn't even use vfio_pci_device_init(). Do we need this
-> commit? It seems like we just need some of the inner functions to have
-> support for vf_token.
+> > diff --git a/tools/testing/selftests/vfio/lib/libvfio.mk b/tools/testin=
+g/selftests/vfio/lib/libvfio.mk
+> > index 5d11c3a89a28e..2dc85c41ffb4b 100644
+> > --- a/tools/testing/selftests/vfio/lib/libvfio.mk
+> > +++ b/tools/testing/selftests/vfio/lib/libvfio.mk
+> > @@ -18,7 +18,9 @@ $(shell mkdir -p $(LIBVFIO_O_DIRS))
+> >
+> >  CFLAGS +=3D -I$(VFIO_DIR)/lib/include
+> >
+> > +LDLIBS +=3D -luuid
+>
+> I wonder if we really need this dependency. VFIO and IOMMUFD just expect
+> a 16 byte character array. That is easy enough to represent. The other
+> part we use is uuid_parse(), but I don't know if selftests need to do
+> that validation. We can let VFIO and IOMMUFD validate the UUID as they
+> see fit and return an error if they aren't happy with it. i.e. We do not
+> need to duplicate validation in the test.
 
-Gah, that's my bad. I changed the approach later but forgot to revert
-the API. I'll fix it in v2.
+Unfortunately, VFIO interface accepts UUID in multiple formats. For
+VFIO_DEVICE_FEATURE and VFIO_DEVICE_BIND_IOMMUFD it accepts a
+'u8[16]', but for VFIO_GROUP_GET_DEVICE_FD, we must present it as a
+string. Is there an issue with the inclusion of an external library (I
+think I've seen others in tools/ use it).
+
+Thank you.
+Raghavendra
 
