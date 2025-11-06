@@ -1,148 +1,239 @@
-Return-Path: <kvm+bounces-62242-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62243-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD2A1C3D71C
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 22:02:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 375EFC3D886
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 22:56:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3CD574E7C87
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 21:02:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B83934E392A
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 21:56:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3AF3043AC;
-	Thu,  6 Nov 2025 21:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 969F33081DD;
+	Thu,  6 Nov 2025 21:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z+I6Uk42"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="REjd7ea4";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="TEBqBx0v"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0594303C8D
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 21:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E56F2ED175;
+	Thu,  6 Nov 2025 21:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762462931; cv=none; b=qUBex0j80WD/u0RvYZFbvqikfUBB2xZ0UM0MUp0Uibn+9gzQsSgl5dT8RK2BEo63P7yobVqTy40wfx9pj8/4uiARSkJnFkAevRFJKi7G43blVLguiWIDBQgvB3AWjBKQOCvYcx8kV46/sUUDVXVFsP6JysY3R58087aIrIN1o6Q=
+	t=1762466194; cv=none; b=pq3FlPvHubjhz4bL1PPhBVukNfRjMytt+nNdF1N8Jbw8TKpZ6W9ujX+bAynRDa0yywcAVb6XJvqQ0RlNa3odq5vT8prFu12a1G+YZ3nWN1156cg6HV+jwbzskPVzHM+E3T16so4mwpCxfSk9D3/A7lXuWUhi7BdAqaHEEaojSw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762462931; c=relaxed/simple;
-	bh=K4r0PNR/pXspBk+Ybp47LxKdosojHAfMcGsiWbchkRM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=COXk+CPavOSxw5w6VsHW3A1/dRqt8LaaxvMQdx90FxS59GOdPJtCxXzW92WrwQZKIPiKa/RZiliD8yZTYxFoEqASvT772pT0bABjxEjDNKDHs+Y0RkIfMxD6UexQcjrYDjNIntOqEnPFToUahH08Y/9hyiaLA2jdNYK42tESgdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z+I6Uk42; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b92bdc65593so96354a12.3
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 13:02:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762462929; x=1763067729; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=etgqy533ROEysuZvffdaI1/BVd4Q9s3epCFCu4cehdk=;
-        b=Z+I6Uk42XJ6/OFmZdWOBnzPppMF8JHtQ6cQg2cDarSi0fYcAIqGH5OI06NdPJ1LcLL
-         J1wd0PxQHyTyY5N5EwX4a760DLxcnFUHUUduqF6jVNKG+X8s8xZeSw1N80KOavyudD/x
-         3Q0sguD7JvA1gmIQqQaXQ5n58b/NvuufBKitbTrlvKxsagXFExKU73oNQtHKpGn+PUT9
-         DJ9vdtT3+hsTO40Wwm+ysDjWOLAgAnMDRTMtKDuLEsH1UCzwMMPD8/R/ZcdeGRRP7OEa
-         8J4xGo6Htc9KUaGppZzzOI2+2XjYvVdQzFUW9G2MKstcQtPOqeYoes2QdgHK/tv39JLN
-         iOMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762462929; x=1763067729;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=etgqy533ROEysuZvffdaI1/BVd4Q9s3epCFCu4cehdk=;
-        b=hPCo0O0cR3loaFo4rMKP8K26FaNQvUSTpy2AnEdnK+7Btd+CYtTW2Jr4IV/mBSTHCd
-         RK5t5WjQRSS9j6pri8OZANMMPRwwDU2hHZ9Qg9UKk45TwYW3D2glY7RbpZmkDL8mBd/f
-         gJNasMOvq3gpbX6FDQh8m460zQnFXTTSGCcEFhVwCMTIReDRd/cebiKDlxfMbF3K6YUO
-         TovXXJ8wSYyCThbARa2rq+ZV67yh04My+bYYviOUHHskbSENGbil++5gtVslz44bz8Rr
-         S0hEM2GMnLExvAfXDt0ksQM75LujGvQkkQKIhcVsnHKVvJPmQiEhA34KS7pZ1x2HfFFw
-         vQhw==
-X-Gm-Message-State: AOJu0YyxWc5sKHy0pwDwntqxBwhjN2LL93sRNVOuAGdQJcjsAy4sD8eK
-	PAWIS02xxO5XKIbxoza/gshXHhISxqc6PLhPBCmUYgEYkNTB95QdOWqkA1ZpxApofKm/DFzVz7D
-	6mPZB8g==
-X-Google-Smtp-Source: AGHT+IF68+vi3zbqywUQatkJVyKP2WAhgDao7YLP3uY26pGcAOhsev+0/UeCKxtZdrx+5pOPGxmZ0MpMUNk=
-X-Received: from plblk16.prod.google.com ([2002:a17:903:8d0:b0:294:f721:8bc2])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e5cb:b0:295:24ab:fb08
- with SMTP id d9443c01a7336-297c0474ce9mr11049625ad.47.1762462928932; Thu, 06
- Nov 2025 13:02:08 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  6 Nov 2025 13:02:06 -0800
+	s=arc-20240116; t=1762466194; c=relaxed/simple;
+	bh=Wnn2TE7l8/HF6KTmsLA1p6vAtjQPjrc9cNKpin17/Pw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cm/r6Q+RpivgLXsG5NjiyXR4GczgmlSfUlSZww2sI4r4VwxVUUgncSDlNmSewMv5ItcdS0EzSMg4pbKeg/gg/5sC/dhfkkjRuIbMDV9s3MLxG8aC6SKDnqmJYC3DppT6+CP31CqhGZFNBxqjCyrQat+U4iRRpmcIy0Aa1n54Lm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=REjd7ea4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=TEBqBx0v; arc=none smtp.client-ip=202.12.124.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 33E637A009A;
+	Thu,  6 Nov 2025 16:56:29 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Thu, 06 Nov 2025 16:56:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1762466189;
+	 x=1762552589; bh=qPfsiLN1n3oCXH0bYb9sc+hEU45g8Wrq4al92DnOXSw=; b=
+	REjd7ea48BU9x1rmydQeYrwoKcgxNX8+mUmzTKMSvlEpUs8m9K9hlcK0GbU1LEeA
+	NVYPwD98/nmhIhUIkLFGqEMkZ0zcb0UQhKmGw+p9ULpJ6tfK3soxbmxm7mpK1sID
+	0KVYWCJWDNk6s3a4BLoCx0SUO8J1WUcG40XOMjtQAlKGZEmb3YXWXyZUcr1PFtHv
+	9lrTfMGzUTYcWiQFC9b1lvoBBt+S0AC9DYVLwU3vGQBdD5rpksjiEq8ERDMLzQh2
+	TCKP8oE1oMim/s7wzlN+v5BhFYNDZ88Y+Q85D3JXd4I889RtES83LnojVTX7vIhz
+	gcPNtHt1r9nbutpmtX3g/A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762466189; x=
+	1762552589; bh=qPfsiLN1n3oCXH0bYb9sc+hEU45g8Wrq4al92DnOXSw=; b=T
+	EBqBx0vGyrD+M7zHDdEiypWw2aHj44F4s+KKGiS6E7bbBqutRUYGGdUXJDCJOPAP
+	cH8T4NgtQFCrRZMfvh5JdrYimP+Atx9vaYclPTYIVED5Zl30HjeD0vqfv//7lsem
+	/80j4lM4I85ZsZf0Cexk0ZY5LuzcuBze1x76Fgl5QNEJd3cNydWw5o4PC+u4vOPl
+	DSgosf/FvJe/Rjs8EJdluO5i2unn6u8QIJUwn8NCw1dqdWDjpaXDTLxAdmRlbRc4
+	s33o+DwUb34GVfaw0ww0pKuJ0GAxUvtYopgP56lHjoNF1Y29qJLrQ39QmyWuzt9e
+	Cm0zXNNMk0OliQDNcZyzg==
+X-ME-Sender: <xms:ihkNaZyuoNPb30d6i4X9m4a5JDlaVzyKERQvPEE3jNzHt2CQQ3PhSA>
+    <xme:ihkNaRjbfos2rb-YOcRfsfkOJQcqWFRmF26uvJe4fv47K1yA6hxkEVdV0jWjhsjfB
+    RHMgljin4t4oRzgzZD1sERWcnEn2PiyrV8uRKsfUZE0tqtIN9JI>
+X-ME-Received: <xmr:ihkNaRI8Za-W-t78sM2q5XqiH2yb-clOLLraA92U79VBmkvuUWTNPmp8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeejledvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhggtgfgsehtjeertd
+    dttddvnecuhfhrohhmpeetlhgvgicuhghilhhlihgrmhhsohhnuceorghlvgigsehshhgr
+    iigsohhtrdhorhhgqeenucggtffrrghtthgvrhhnpeehvddtueevjeduffejfeduhfeufe
+    ejvdetgffftdeiieduhfejjefhhfefueevudenucffohhmrghinhepkhgvrhhnvghlrdho
+    rhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopeefledpmhhouggvpehs
+    mhhtphhouhhtpdhrtghpthhtoheprghnkhhithgrsehnvhhiughirgdrtghomhdprhgtph
+    htthhopegrnhhikhgvthgrsehnvhhiughirgdrtghomhdprhgtphhtthhopehvshgvthhh
+    ihesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhgghesnhhvihguihgrrdgtohhmpd
+    hrtghpthhtohepmhhotghhshesnhhvihguihgrrdgtohhmpdhrtghpthhtohepshhkohhl
+    ohhthhhumhhthhhosehnvhhiughirgdrtghomhdprhgtphhtthhopehlihhnmhhirghohh
+    gvsehhuhgrfigvihdrtghomhdprhgtphhtthhopehnrghordhhohhrihhguhgthhhisehg
+    mhgrihhlrdgtohhmpdhrtghpthhtoheprghkphhmsehlihhnuhigqdhfohhunhgurghtih
+    honhdrohhrgh
+X-ME-Proxy: <xmx:ihkNaQcEhPMq-qSqBVkoefCb_0FrAK5mvbl7mJTt0zHmSaNo0LROJw>
+    <xmx:ixkNaVjv2QmUxlYiv9iqoyIZtqTYLtXDPfE3w3ztagX3NOq5dIUI3g>
+    <xmx:ixkNaVmiKwJPbNlzenf75TxYAt9k9HqaWn0xSxG0NfO9US_s1_J6uw>
+    <xmx:ixkNacVfSy0qbaJ67wFSS92CC5LBEmjQeDgZ49X0naGjhg6gxdpY9w>
+    <xmx:jRkNaWE7ZC2BhJZqjFONk0ddcg7naexkNkaf5fTZrI7LB8RMAz3li4ND>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 6 Nov 2025 16:56:24 -0500 (EST)
+Date: Thu, 6 Nov 2025 14:56:22 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: <ankita@nvidia.com>
+Cc: <aniketa@nvidia.com>, <vsethi@nvidia.com>, <jgg@nvidia.com>,
+ <mochs@nvidia.com>, <skolothumtho@nvidia.com>, <linmiaohe@huawei.com>,
+ <nao.horiguchi@gmail.com>, <akpm@linux-foundation.org>, <david@redhat.com>,
+ <lorenzo.stoakes@oracle.com>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
+ <rppt@kernel.org>, <surenb@google.com>, <mhocko@suse.com>,
+ <tony.luck@intel.com>, <bp@alien8.de>, <rafael@kernel.org>,
+ <guohanjun@huawei.com>, <mchehab@kernel.org>, <lenb@kernel.org>,
+ <kevin.tian@intel.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
+ <targupta@nvidia.com>, <zhiw@nvidia.com>, <dnigam@nvidia.com>,
+ <kjaju@nvidia.com>, <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+ <linux-edac@vger.kernel.org>, <Jonathan.Cameron@huawei.com>,
+ <ira.weiny@intel.com>, <Smita.KoralahalliChannabasappa@amd.com>,
+ <u.kleine-koenig@baylibre.com>, <peterz@infradead.org>,
+ <linux-acpi@vger.kernel.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v5 3/3] vfio/nvgrace-gpu: register device memory for
+ poison handling
+Message-ID: <20251106145622.1610d306.alex@shazbot.org>
+In-Reply-To: <20251102184434.2406-4-ankita@nvidia.com>
+References: <20251102184434.2406-1-ankita@nvidia.com>
+	<20251102184434.2406-4-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251106210206.221558-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Use "checked" versions of get_user() and put_user()
-From: Sean Christopherson <seanjc@google.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Borislav Petkov <bp@alien8.de>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Use the normal, checked versions for get_user() and put_user() instead of
-the double-underscore versions that omit range checks, as the checked
-versions are actually measurably faster on modern CPUs (12%+ on Intel,
-25%+ on AMD).
+On Sun, 2 Nov 2025 18:44:34 +0000
+<ankita@nvidia.com> wrote:
 
-The performance hit on the unchecked versions is almost entirely due to
-the added LFENCE on CPUs where LFENCE is serializing (which is effectively
-all modern CPUs), which was added by commit 304ec1b05031 ("x86/uaccess:
-Use __uaccess_begin_nospec() and uaccess_try_nospec").  The small
-optimizations done by commit b19b74bc99b1 ("x86/mm: Rework address range
-check in get_user() and put_user()") likely shave a few cycles off, but
-the bulk of the extra latency comes from the LFENCE.
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> The nvgrace-gpu-vfio-pci module [1] maps the device memory to the user VA
+> (Qemu) using remap_pfn_range() without adding the memory to the kernel.
+> The device memory pages are not backed by struct page. The previous
+> patch implements the mechanism to handle ECC/poison on memory page without
+> struct page. This new mechanism is being used here.
+> 
+> The module registers its memory region and the address_space with the
+> kernel MM for ECC handling using the register_pfn_address_space()
+> registration API exposed by the kernel.
+> 
+> Link: https://lore.kernel.org/all/20240220115055.23546-1-ankita@nvidia.com/ [1]
+> 
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  drivers/vfio/pci/nvgrace-gpu/main.c | 45 ++++++++++++++++++++++++++++-
+>  1 file changed, 44 insertions(+), 1 deletion(-)
 
-Don't bother trying to open-code an equivalent for performance reasons, as
-the loss of inlining (e.g. see commit ea6f043fc984 ("x86: Make __get_user()
-generate an out-of-line call") is largely a non-factor (ignoring setups
-where RET is something entirely different),
+LGTM.  I see Andrew has already picked this up in mm-new, if he
+refreshes, here's another ack.
 
-As measured across tens of millions of calls of guest PTE reads in
-FNAME(walk_addr_generic):
+Acked-by: Alex Williamson <alex@shazbot.org>
 
-              __get_user()  get_user()  open-coded  open-coded, no LFENCE
-Intel (EMR)           75.1        67.6        75.3                   65.5
-AMD (Turin)           68.1        51.1        67.5                   49.3
+Thanks,
+Alex
 
-Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-Closes: https://lore.kernel.org/all/CAHk-=wimh_3jM9Xe8Zx0rpuf8CPDu6DkRCGb44azk0Sz5yqSnw@mail.gmail.com
-Cc: Borislav Petkov <bp@alien8.de>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/hyperv.c          | 2 +-
- arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 38595ecb990d..de92292eb1f5 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1568,7 +1568,7 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
- 		 * only, there can be valuable data in the rest which needs
- 		 * to be preserved e.g. on migration.
- 		 */
--		if (__put_user(0, (u32 __user *)addr))
-+		if (put_user(0, (u32 __user *)addr))
- 			return 1;
- 		hv_vcpu->hv_vapic = data;
- 		kvm_vcpu_mark_page_dirty(vcpu, gfn);
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index ed762bb4b007..901cd2bd40b8 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -402,7 +402,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 			goto error;
- 
- 		ptep_user = (pt_element_t __user *)((void *)host_addr + offset);
--		if (unlikely(__get_user(pte, ptep_user)))
-+		if (unlikely(get_user(pte, ptep_user)))
- 			goto error;
- 		walker->ptep_user[walker->level - 1] = ptep_user;
- 
-
-base-commit: a996dd2a5e1ec54dcf7d7b93915ea3f97e14e68a
--- 
-2.51.2.1041.gc1ab5b90ca-goog
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+> index d95761dcdd58..80b3ed63c682 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
+> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+> @@ -8,6 +8,10 @@
+>  #include <linux/delay.h>
+>  #include <linux/jiffies.h>
+>  
+> +#ifdef CONFIG_MEMORY_FAILURE
+> +#include <linux/memory-failure.h>
+> +#endif
+> +
+>  /*
+>   * The device memory usable to the workloads running in the VM is cached
+>   * and showcased as a 64b device BAR (comprising of BAR4 and BAR5 region)
+> @@ -47,6 +51,9 @@ struct mem_region {
+>  		void *memaddr;
+>  		void __iomem *ioaddr;
+>  	};                      /* Base virtual address of the region */
+> +#ifdef CONFIG_MEMORY_FAILURE
+> +	struct pfn_address_space pfn_address_space;
+> +#endif
+>  };
+>  
+>  struct nvgrace_gpu_pci_core_device {
+> @@ -60,6 +67,28 @@ struct nvgrace_gpu_pci_core_device {
+>  	bool has_mig_hw_bug;
+>  };
+>  
+> +#ifdef CONFIG_MEMORY_FAILURE
+> +
+> +static int
+> +nvgrace_gpu_vfio_pci_register_pfn_range(struct mem_region *region,
+> +					struct vm_area_struct *vma)
+> +{
+> +	unsigned long nr_pages;
+> +	int ret = 0;
+> +
+> +	nr_pages = region->memlength >> PAGE_SHIFT;
+> +
+> +	region->pfn_address_space.node.start = vma->vm_pgoff;
+> +	region->pfn_address_space.node.last = vma->vm_pgoff + nr_pages - 1;
+> +	region->pfn_address_space.mapping = vma->vm_file->f_mapping;
+> +
+> +	ret = register_pfn_address_space(&region->pfn_address_space);
+> +
+> +	return ret;
+> +}
+> +
+> +#endif
+> +
+>  static void nvgrace_gpu_init_fake_bar_emu_regs(struct vfio_device *core_vdev)
+>  {
+>  	struct nvgrace_gpu_pci_core_device *nvdev =
+> @@ -127,6 +156,13 @@ static void nvgrace_gpu_close_device(struct vfio_device *core_vdev)
+>  
+>  	mutex_destroy(&nvdev->remap_lock);
+>  
+> +#ifdef CONFIG_MEMORY_FAILURE
+> +	if (nvdev->resmem.memlength)
+> +		unregister_pfn_address_space(&nvdev->resmem.pfn_address_space);
+> +
+> +	unregister_pfn_address_space(&nvdev->usemem.pfn_address_space);
+> +#endif
+> +
+>  	vfio_pci_core_close_device(core_vdev);
+>  }
+>  
+> @@ -202,7 +238,14 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
+>  
+>  	vma->vm_pgoff = start_pfn;
+>  
+> -	return 0;
+> +#ifdef CONFIG_MEMORY_FAILURE
+> +	if (nvdev->resmem.memlength && index == VFIO_PCI_BAR2_REGION_INDEX)
+> +		ret = nvgrace_gpu_vfio_pci_register_pfn_range(&nvdev->resmem, vma);
+> +	else if (index == VFIO_PCI_BAR4_REGION_INDEX)
+> +		ret = nvgrace_gpu_vfio_pci_register_pfn_range(&nvdev->usemem, vma);
+> +#endif
+> +
+> +	return ret;
+>  }
+>  
+>  static long
 
 
