@@ -1,74 +1,73 @@
-Return-Path: <kvm+bounces-62170-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62171-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 673B7C3AE3F
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 13:29:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F284EC3AE30
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 13:28:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D255F4EB871
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 12:27:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 011DC1A46C7D
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 12:28:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE29932AAC8;
-	Thu,  6 Nov 2025 12:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E4732AAC5;
+	Thu,  6 Nov 2025 12:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k2dYhB1K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ILT1IGrL"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A75030BF7D
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 12:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF81A30BF7D
+	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 12:27:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762432054; cv=none; b=cPlFQXqwT4oiyi8oK4PBu+hJruP60KaBYyLybiWkE7J+0ZPnATf62Q+3ayaivuNLTo/xGufCAztQyWUj2VaaVWmTZ6gxcLGQj0CaOnExu+Pbdu3zfRauWCusJISP8v0AE1yZjtB0Jw/cFALt6mZLw4uH/9pwdrPNB7sItG1BwF4=
+	t=1762432072; cv=none; b=jajgLAb/pdD4XTwJUPIuQOuOChSixqScYFUa7hVPhSuk4hFVYdo5IInruKl5fFDpqfPWuWe8Qiz53dmg1bRxtMmA/sNuqGnI6q1oUNF4KCp2AGBmvW42UIZWH50WrLrPcRUPxccz6gCGOo0kLQ7YMmiGMiSi5cZmeYJLrTDRnvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762432054; c=relaxed/simple;
-	bh=h15G83qRa4EAlnHQG3eauAt/XjCuhxcVME6Tt6DsaLg=;
+	s=arc-20240116; t=1762432072; c=relaxed/simple;
+	bh=sm/KEkDKVz7vizhaeMVvJjcOC3jXdbItHDrSAh+s32Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sm+jPaRp4XuM4SpzS42T+tzLa99nVLYqmdVfYO6nbTkTcgrXi/Dl3N371bP4ql3OSrzuWzgMQEOD6hKJx96e7kXwfP94e6qF0oGmowu5nFzuMtuD0bKDKN/KqMWnw7EIt0+I8hlwHLqyFESKEHPKPoG38tzPb7iAD2CNFGMv/fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k2dYhB1K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1026C4AF0B
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 12:27:33 +0000 (UTC)
+	 To:Cc:Content-Type; b=hEROp/Y0FyAq4ndBQ7DtsLfl3ZjCtZ5JjKLDcT5z1zvn2dUVzGX6x0nvIrW9jv3rx/QkvkZSfdpvEuQp9f1N0Cr/jQWYtzgBlr81RpoewPuTNgAInFcBc+qeBYDIRvUA1XIcIcHv8xuXOVliqH1QOdb3VUPM91jzlGLHR13hVe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ILT1IGrL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 905B9C4AF0B
+	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 12:27:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762432053;
-	bh=h15G83qRa4EAlnHQG3eauAt/XjCuhxcVME6Tt6DsaLg=;
+	s=k20201202; t=1762432072;
+	bh=sm/KEkDKVz7vizhaeMVvJjcOC3jXdbItHDrSAh+s32Y=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=k2dYhB1K2S2KLa8iUV50fg2MFBq7wA2ZfpanHvhfpwHRVQ9n/LMk6tGjDeHtJB/CS
-	 UFBjCMLKPYm3aXwaSxh0ozuMBUJc4Qj5WLwOrzYph+L0JSr8HScp80XXg9SBR42e36
-	 ZLOqoUiCwGW/839WRGxtMV0U9kitug9zFvQJNiBcIBq+O074P6cligl5zWNrMd78AM
-	 AnfP9vCvgX2K06At9ZXSWe+WpJLSRYK2P1bGc/2BmBjE7HTWtuWKlKdh48AOr4+Eyp
-	 AzCOg34iSPeXp3GAs409Thvp5Sq7w0vR1Spfair0TObsC+NZW48jZ446Ms59/AwyaP
-	 pal9poSOuIN8A==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6409e985505so1442438a12.2
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 04:27:33 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXHiP16jBAuz/iHJ1aRpA3UFvfHx1j6n3Yu+bK0g23VeIFP/Ut6m89zqHC+CX5JRarYexo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxN9OLwtHFrPoTcq/+e2G/KxTK+bNMbhCVvzwPbpPznx4EyC/4X
-	s+PUCANq1IbGdF7NNvjB8ltwWY1nCUUJH+YcDg0DR7U/AY++Qvb0kne9JYjKnoCdOg+6aNZmSRU
-	qq2kZl0VascVG/7YEUyIwGkIi4nlJoE4=
-X-Google-Smtp-Source: AGHT+IEZZdegMLed88oyF+xMFLhFB3ojId3saCkwcGgWhzckz3M9Qn6iyj5VHe4SZj8gMTln6hEHl5t7IkJBu0oPkbA=
-X-Received: by 2002:a17:907:7f9f:b0:b6c:38d9:6935 with SMTP id
- a640c23a62f3a-b72652b9d65mr674490566b.24.1762432052335; Thu, 06 Nov 2025
- 04:27:32 -0800 (PST)
+	b=ILT1IGrLAYWOfXBvB4nwal/UeIfixWNtXGoFSvifgSWFrxPrHrr+jjvrVDbnxGlTX
+	 WNm++JnHuK89c4BGwoIPkzN0CTTYS5eeqZbxtBVBEhRErHK0KwbCfHlS8mHI24fBnW
+	 S+wxfCm2DeOC8W7Svxjan4jXILutqd+0I7APAoCLBK1/vQNfMjhq34ahg2QxZU0f2f
+	 4BR40Wn2VSQbg0bUoNBF0YrdFemd6Js2Ci4deRbczKwGFBmuUwa0ehwAWj40h8TwIg
+	 gth8M5oMAWKvjNPSjV7Z/2Lwtdi4HX3vvrL5228q4UNnwtt4SQ7D+qMf4ERVc7qLGO
+	 WK55Mq1NtHIQQ==
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-64034284521so1373040a12.1
+        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 04:27:52 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU9C99zD9Ajuxtmmz9oWw8PAWeEDmtW4dEijfiou6WQLf8hRgdPO85niJu/Z+s8NXAqcRg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzrg+Z4+LBAwyB9JbMZlkBbqF2BIhqnn2gA5UTo7fY2XqzSki/r
+	CrGMQE/qHAERqzqyVGL5PHSngihxgct654uCeEC7FJa5ZBPod0MKUkoXCoKh9EI6oV8LSTaDd8+
+	vrGFjWOQM4GT4ITOpnvJbHahIQk5pk+g=
+X-Google-Smtp-Source: AGHT+IFESibQa1gcJX7J+Cs+qz1FciOmFCrI+QgcI9cbug6Igg0lCqc39uumUPK1urXvMah7dkzf3k9m9UonBj3Rkuk=
+X-Received: by 2002:a17:906:f59d:b0:b70:50f1:3daa with SMTP id
+ a640c23a62f3a-b726564af26mr735644166b.57.1762432071206; Thu, 06 Nov 2025
+ 04:27:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251014095055.1159534-1-maobibo@loongson.cn>
-In-Reply-To: <20251014095055.1159534-1-maobibo@loongson.cn>
+References: <20251104114659.1562404-1-maobibo@loongson.cn>
+In-Reply-To: <20251104114659.1562404-1-maobibo@loongson.cn>
 From: Huacai Chen <chenhuacai@kernel.org>
-Date: Thu, 6 Nov 2025 20:27:30 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H6iTmb6d86RL9XXY9oOzLcZeAcbdMp2xhEcsRPhtWNQPw@mail.gmail.com>
-X-Gm-Features: AWmQ_bnkLxapQogJm3u5CicP5EyTvoaZ13lG_jWf5avDm4sWjmvplRrsuwi9ojo
-Message-ID: <CAAhV-H6iTmb6d86RL9XXY9oOzLcZeAcbdMp2xhEcsRPhtWNQPw@mail.gmail.com>
-Subject: Re: [PATCH] LoongArch: KVM: Fix max supported vCPUs set with eiointc
+Date: Thu, 6 Nov 2025 20:27:49 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5mzkpbZMmxtmGh3S8MAeWnn_Pfe6g-ZqWOER=oeOZNAQ@mail.gmail.com>
+X-Gm-Features: AWmQ_blSEGRj-hJ4TXNc9b5AG3hqN2wmBcLXpbd4AuxFaGRrZc68C_g3pt6cP54
+Message-ID: <CAAhV-H5mzkpbZMmxtmGh3S8MAeWnn_Pfe6g-ZqWOER=oeOZNAQ@mail.gmail.com>
+Subject: Re: [PATCH] LoongArch: KVM: Add delay until timer interrupt injected
 To: Bibo Mao <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Xianglai Li <lixianglai@loongson.cn>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -76,43 +75,52 @@ Applied, thanks.
 
 Huacai
 
-On Tue, Oct 14, 2025 at 5:51=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
+On Tue, Nov 4, 2025 at 7:47=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrote=
+:
 >
-> VM fails to boot with 256 vCPUs, the detailed command is
-> qemu-system-loongarch64 -smp 256 and there is error reported as follows:
->   KVM_LOONGARCH_EXTIOI_INIT_NUM_CPU failed: Invalid argument
+> When timer is fired in oneshot mode, CSR TVAL will stop with value -1
+> rather than 0. However when register CSR TVAL is restored, it will
+> continue to count down rather than stop there.
 >
-> There is typo issue in function kvm_eiointc_ctrl_access() when set
-> max supported vCPUs.
+> Now the method is to write 0 to CSR TVAL, wait to count down for 1
+> cycle at least, which is 10ns with timer freq 100MHZ, and retore timer
+> interrupt status. Here add 2 cycles delay to assure that timer interrupt
+> is injected.
 >
-> Cc: stable@vger.kernel.org
-> Fixes: 47256c4c8b1b ("LoongArch: KVM: Avoid copy_*_user() with lock hold =
-in kvm_eiointc_ctrl_access()")
+> With this patch, timer selftest case passes to run always.
 >
 > Signed-off-by: Bibo Mao <maobibo@loongson.cn>
 > ---
->  arch/loongarch/kvm/intc/eiointc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/loongarch/kvm/timer.c | 3 +++
+>  1 file changed, 3 insertions(+)
 >
-> diff --git a/arch/loongarch/kvm/intc/eiointc.c b/arch/loongarch/kvm/intc/=
-eiointc.c
-> index c32333695381..a1cc116b4dac 100644
-> --- a/arch/loongarch/kvm/intc/eiointc.c
-> +++ b/arch/loongarch/kvm/intc/eiointc.c
-> @@ -439,7 +439,7 @@ static int kvm_eiointc_ctrl_access(struct kvm_device =
-*dev,
->         spin_lock_irqsave(&s->lock, flags);
->         switch (type) {
->         case KVM_DEV_LOONGARCH_EXTIOI_CTRL_INIT_NUM_CPU:
-> -               if (val >=3D EIOINTC_ROUTE_MAX_VCPUS)
-> +               if (val > EIOINTC_ROUTE_MAX_VCPUS)
->                         ret =3D -EINVAL;
->                 else
->                         s->num_cpu =3D val;
+> diff --git a/arch/loongarch/kvm/timer.c b/arch/loongarch/kvm/timer.c
+> index 32dc213374be..daf1b60a8d47 100644
+> --- a/arch/loongarch/kvm/timer.c
+> +++ b/arch/loongarch/kvm/timer.c
+> @@ -3,6 +3,7 @@
+>   * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+>   */
 >
-> base-commit: 3a8660878839faadb4f1a6dd72c3179c1df56787
+> +#include <asm/delay.h>
+>  #include <linux/kvm_host.h>
+>  #include <asm/kvm_csr.h>
+>  #include <asm/kvm_vcpu.h>
+> @@ -95,6 +96,8 @@ void kvm_restore_timer(struct kvm_vcpu *vcpu)
+>                  * and set CSR TVAL with -1
+>                  */
+>                 write_gcsr_timertick(0);
+> +               /* wait more than 1 cycle until timer interrupt injected =
+*/
+> +               __delay(2);
+>
+>                 /*
+>                  * Writing CSR_TINTCLR_TI to LOONGARCH_CSR_TINTCLR will c=
+lear
+>
+> base-commit: ec0b62ccc986c06552c57f54116171cfd186ef92
 > --
 > 2.39.3
+>
 >
 
