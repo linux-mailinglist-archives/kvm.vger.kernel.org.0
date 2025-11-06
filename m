@@ -1,73 +1,74 @@
-Return-Path: <kvm+bounces-62171-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62172-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F284EC3AE30
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 13:28:11 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F22A4C3AE4E
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 13:30:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 011DC1A46C7D
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 12:28:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 33BDA4E43D4
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 12:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E4732AAC5;
-	Thu,  6 Nov 2025 12:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0068932B991;
+	Thu,  6 Nov 2025 12:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ILT1IGrL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RnewM3NA"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF81A30BF7D
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 12:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247D032B98B
+	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 12:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762432072; cv=none; b=jajgLAb/pdD4XTwJUPIuQOuOChSixqScYFUa7hVPhSuk4hFVYdo5IInruKl5fFDpqfPWuWe8Qiz53dmg1bRxtMmA/sNuqGnI6q1oUNF4KCp2AGBmvW42UIZWH50WrLrPcRUPxccz6gCGOo0kLQ7YMmiGMiSi5cZmeYJLrTDRnvg=
+	t=1762432212; cv=none; b=BbUyhFPTAcJojjtR7x5NVCrJLqwq6vNTkHDYQQz5W7jql/Cgt2yTQu+E42GaT9BOO4kI/d+x1dAiN1lDGM4hNmiSWaJNFXqbdjg1psLC2hSY+e5hzl7dwrT3gY11y3oDiCHiVyY5RawMxoo3/B4/05mYcYYNxoRAQsQPclG+oH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762432072; c=relaxed/simple;
-	bh=sm/KEkDKVz7vizhaeMVvJjcOC3jXdbItHDrSAh+s32Y=;
+	s=arc-20240116; t=1762432212; c=relaxed/simple;
+	bh=Zxv238Sh/My5WupzWXJ5MQHjYqFRMOz2qFcj9KoIvAM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hEROp/Y0FyAq4ndBQ7DtsLfl3ZjCtZ5JjKLDcT5z1zvn2dUVzGX6x0nvIrW9jv3rx/QkvkZSfdpvEuQp9f1N0Cr/jQWYtzgBlr81RpoewPuTNgAInFcBc+qeBYDIRvUA1XIcIcHv8xuXOVliqH1QOdb3VUPM91jzlGLHR13hVe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ILT1IGrL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 905B9C4AF0B
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 12:27:52 +0000 (UTC)
+	 To:Cc:Content-Type; b=d48vDYWHelnB6I2RnCGwScTr8GliPkrg3XATQOtEPeX38aRy0S9vd1EYym6gQQc0BcNlDp7tP8Cxs2dJbxR0mot5qOM0XpJF150zyaBNZIAsEjS/0CXi41Y3Gk7yj7K7yVZ/K5G3nXZbpcBta+Sg68UY8+fK4w5plGd0P5/2lAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RnewM3NA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B12DDC16AAE
+	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 12:30:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762432072;
-	bh=sm/KEkDKVz7vizhaeMVvJjcOC3jXdbItHDrSAh+s32Y=;
+	s=k20201202; t=1762432211;
+	bh=Zxv238Sh/My5WupzWXJ5MQHjYqFRMOz2qFcj9KoIvAM=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ILT1IGrLAYWOfXBvB4nwal/UeIfixWNtXGoFSvifgSWFrxPrHrr+jjvrVDbnxGlTX
-	 WNm++JnHuK89c4BGwoIPkzN0CTTYS5eeqZbxtBVBEhRErHK0KwbCfHlS8mHI24fBnW
-	 S+wxfCm2DeOC8W7Svxjan4jXILutqd+0I7APAoCLBK1/vQNfMjhq34ahg2QxZU0f2f
-	 4BR40Wn2VSQbg0bUoNBF0YrdFemd6Js2Ci4deRbczKwGFBmuUwa0ehwAWj40h8TwIg
-	 gth8M5oMAWKvjNPSjV7Z/2Lwtdi4HX3vvrL5228q4UNnwtt4SQ7D+qMf4ERVc7qLGO
-	 WK55Mq1NtHIQQ==
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-64034284521so1373040a12.1
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 04:27:52 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU9C99zD9Ajuxtmmz9oWw8PAWeEDmtW4dEijfiou6WQLf8hRgdPO85niJu/Z+s8NXAqcRg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzrg+Z4+LBAwyB9JbMZlkBbqF2BIhqnn2gA5UTo7fY2XqzSki/r
-	CrGMQE/qHAERqzqyVGL5PHSngihxgct654uCeEC7FJa5ZBPod0MKUkoXCoKh9EI6oV8LSTaDd8+
-	vrGFjWOQM4GT4ITOpnvJbHahIQk5pk+g=
-X-Google-Smtp-Source: AGHT+IFESibQa1gcJX7J+Cs+qz1FciOmFCrI+QgcI9cbug6Igg0lCqc39uumUPK1urXvMah7dkzf3k9m9UonBj3Rkuk=
-X-Received: by 2002:a17:906:f59d:b0:b70:50f1:3daa with SMTP id
- a640c23a62f3a-b726564af26mr735644166b.57.1762432071206; Thu, 06 Nov 2025
- 04:27:51 -0800 (PST)
+	b=RnewM3NAGeeXi664eFAadOd4km/YPRZtGTojr0Pg9xCttOSHiw4fSKBASbO1fzUQD
+	 lifL3pV5ToV+FPoG4dUqB3AjHBvuNq8fJsWqPljVSetD/BfC1g3k7gYrHjbBC6SDOl
+	 SOiyvCIXNy/pt5DuugplRBlsFKoS6ax02f3euQhMjxPa3DBQASdDblU5u6vszoOlGc
+	 CWJggJXToH2wxdqrXjcmy1LJL0iNQRe8ydQRdav2Ks4jlTxoOaPaybvCWMW7jdA2XN
+	 9AWR0jWZAw5Bdc5nZQ74W8DyzeHSv0j1HR2caIeNJ774TcrEISu5SoTzVYA3J/UGtW
+	 Ooc8qWpUf14pA==
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b3e9d633b78so155287866b.1
+        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 04:30:11 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVZ3OGrcYGg5+nReWSoOdtrEGL1PtHF7hLGcorKX76s3mQcR8nNdoCIn1RnOT1RfVWSKPw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzibzEVYaroecvscwbbySSAeOBr/8LnqWBvwtXWc1km1zqZDYDz
+	ei5B3nwiiPeMAMwNZXhzsITMZDDD8uEvFbEUcuvXV9Iedvhid3rQ59NHVXnHOMohcgZPminrGbo
+	Td+cWordZ2OrbD7wHrbF2zKzEgDp9y/M=
+X-Google-Smtp-Source: AGHT+IGQEaG1Jr8KNRKTKhKSGldPg2aCZWHEsSxhESBypSgE7Lwo8wgnhpm146x+RnaEjQknFnpLfsOoNAnq23QHBTU=
+X-Received: by 2002:a17:907:d20:b0:b07:87f1:fc42 with SMTP id
+ a640c23a62f3a-b7289537134mr356096166b.16.1762432210334; Thu, 06 Nov 2025
+ 04:30:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251104114659.1562404-1-maobibo@loongson.cn>
-In-Reply-To: <20251104114659.1562404-1-maobibo@loongson.cn>
+References: <20250930091702.2610357-1-maobibo@loongson.cn>
+In-Reply-To: <20250930091702.2610357-1-maobibo@loongson.cn>
 From: Huacai Chen <chenhuacai@kernel.org>
-Date: Thu, 6 Nov 2025 20:27:49 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5mzkpbZMmxtmGh3S8MAeWnn_Pfe6g-ZqWOER=oeOZNAQ@mail.gmail.com>
-X-Gm-Features: AWmQ_blSEGRj-hJ4TXNc9b5AG3hqN2wmBcLXpbd4AuxFaGRrZc68C_g3pt6cP54
-Message-ID: <CAAhV-H5mzkpbZMmxtmGh3S8MAeWnn_Pfe6g-ZqWOER=oeOZNAQ@mail.gmail.com>
-Subject: Re: [PATCH] LoongArch: KVM: Add delay until timer interrupt injected
+Date: Thu, 6 Nov 2025 20:30:08 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7bo0d4qO695nJ+t5p3Bf2Ogzmeas1wKE2beKmdRvLpng@mail.gmail.com>
+X-Gm-Features: AWmQ_bmB66uKwtpDAnzIJNSSEa0MWJtWtXfudDySosiSwEl973K_bVHQ36bASy0
+Message-ID: <CAAhV-H7bo0d4qO695nJ+t5p3Bf2Ogzmeas1wKE2beKmdRvLpng@mail.gmail.com>
+Subject: Re: [PATCH] LoongArch: KVM: Set page with write privilege if dirty
+ track disabled
 To: Bibo Mao <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+Cc: WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -75,52 +76,40 @@ Applied, thanks.
 
 Huacai
 
-On Tue, Nov 4, 2025 at 7:47=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrote=
-:
+On Tue, Sep 30, 2025 at 5:17=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
+e:
 >
-> When timer is fired in oneshot mode, CSR TVAL will stop with value -1
-> rather than 0. However when register CSR TVAL is restored, it will
-> continue to count down rather than stop there.
+> With secondary MMU page table, if there is read page fault, page write
+> privilege will not set even if it is writable from master MMU page
+> table. This logic only works if dirty tracking is enabled, page table
+> can be set as page_write if dirty tracking is disabled.
 >
-> Now the method is to write 0 to CSR TVAL, wait to count down for 1
-> cycle at least, which is 10ns with timer freq 100MHZ, and retore timer
-> interrupt status. Here add 2 cycles delay to assure that timer interrupt
-> is injected.
->
-> With this patch, timer selftest case passes to run always.
+> It reduces extra page fault on secondary MMU page table if VM finishes
+> migration, where master MMU page table is ready and secondary MMU page
+> is fresh.
 >
 > Signed-off-by: Bibo Mao <maobibo@loongson.cn>
 > ---
->  arch/loongarch/kvm/timer.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  arch/loongarch/kvm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/arch/loongarch/kvm/timer.c b/arch/loongarch/kvm/timer.c
-> index 32dc213374be..daf1b60a8d47 100644
-> --- a/arch/loongarch/kvm/timer.c
-> +++ b/arch/loongarch/kvm/timer.c
-> @@ -3,6 +3,7 @@
->   * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
->   */
+> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+> index 7c8143e79c12..a7fa458e3360 100644
+> --- a/arch/loongarch/kvm/mmu.c
+> +++ b/arch/loongarch/kvm/mmu.c
+> @@ -857,7 +857,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsign=
+ed long gpa, bool write)
 >
-> +#include <asm/delay.h>
->  #include <linux/kvm_host.h>
->  #include <asm/kvm_csr.h>
->  #include <asm/kvm_vcpu.h>
-> @@ -95,6 +96,8 @@ void kvm_restore_timer(struct kvm_vcpu *vcpu)
->                  * and set CSR TVAL with -1
->                  */
->                 write_gcsr_timertick(0);
-> +               /* wait more than 1 cycle until timer interrupt injected =
-*/
-> +               __delay(2);
+>         if (writeable) {
+>                 prot_bits =3D kvm_pte_mkwriteable(prot_bits);
+> -               if (write)
+> +               if (write || !kvm_slot_dirty_track_enabled(memslot))
+>                         prot_bits =3D kvm_pte_mkdirty(prot_bits);
+>         }
 >
->                 /*
->                  * Writing CSR_TINTCLR_TI to LOONGARCH_CSR_TINTCLR will c=
-lear
 >
-> base-commit: ec0b62ccc986c06552c57f54116171cfd186ef92
+> base-commit: e5f0a698b34ed76002dc5cff3804a61c80233a7a
 > --
 > 2.39.3
->
 >
 
