@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-62230-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62231-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A1F1C3CC3E
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 18:16:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 062FAC3CC7E
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 18:19:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 021794FBED1
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 17:11:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78402188B47A
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 17:19:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354B434DB5E;
-	Thu,  6 Nov 2025 17:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213F5351FBB;
+	Thu,  6 Nov 2025 17:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4SOuIlMH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w4AKHo3S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
+Received: from mail-pj1-f66.google.com (mail-pj1-f66.google.com [209.85.216.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CADBA2264D3
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 17:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFFD34F25E
+	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 17:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762449060; cv=none; b=dlwOeJm7fLQKpHmGyhCgAxCLz8NssAPFFA5ZksJlshX9y4dsWyA5x6xcTp+45eLAtfEtRji32D/SwlPQr7bVgFHPN3BXHVmxLGGRAv8K5kMSFUdB2EaNZmhTigFHl0rZZV6EDeEufXm4COW7b92QWgdDd5Z+SHa7YnZUteDVWa8=
+	t=1762449474; cv=none; b=RvSw9d/7JEF+F498yyqjk2jP+bFT5COUhAJxE219wZwolXj+hHF1ldmwfJg92h/AQEsw1ut2Cvj3xJAN2vkS0CJY250D+lhL+tW4pNs/wYNUy8q5lU4u2r0FkqwAUQuiq95zKo1I5MTF1d4vA2+V5pQFm5vWbZSkpDL7iYuteFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762449060; c=relaxed/simple;
-	bh=NAbw2pgQJJbL/qkU6OyN28/zel6H0dRSE1JH7v5neMw=;
+	s=arc-20240116; t=1762449474; c=relaxed/simple;
+	bh=UJl3TI/ILL+L2NZ+C5cZaJQp+uHS3WBY0UUH6UoHN8A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qQx7vCP614IeH2mcl7fY03WeaCcXVlnv3SQzkCmhJhSOSPDiihfNHh3BX/U2BnkhX81OSA7jQCQWfX5hfIRNAo/YfK3o64KgRBxMT7bVz/AClgZxD3aCP9uGfc6KX1/DCSozFGorgTehhZBb9tX+mnXaF3e6ahnxDOnlPU+JKjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4SOuIlMH; arc=none smtp.client-ip=209.85.210.196
+	 Content-Type:Content-Disposition:In-Reply-To; b=mlyvyRFmLEgtCCOJxJuo2E8rElnBZWuljgOs0/11V7W2Pbk6lr2r42/UpKgjo+GPf3x3vV6MvSzBUlAlUG+lVvH4e5olQGHd94L98+oYJ/YZKXcAp4SsUWnGH+COCUBeZ4XZEWuyIiJfIFV19/ctBTa5Pd3YdfWRArtCThCcb6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w4AKHo3S; arc=none smtp.client-ip=209.85.216.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-7af6a6f20easo1225849b3a.0
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 09:10:58 -0800 (PST)
+Received: by mail-pj1-f66.google.com with SMTP id 98e67ed59e1d1-33db8fde85cso1139510a91.0
+        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 09:17:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762449058; x=1763053858; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762449472; x=1763054272; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=WdZEL1EHDSq3ZNiGpe0rhkC6wH1kK9qkAITFBJu/irM=;
-        b=4SOuIlMHt3MiyfTYnXf4+fvNrTt7Te/aRhjeux08G2Daq+NPJPuwME3sPF2EoHSRU3
-         Nl11RQnaMLtixhUj+x7Fc3ViUIMYRCimeRcEKmdgy0nFL5CH7h6lgINKK1zXU5HenwgJ
-         rc/BD5KXdrM2eN0GhV5b53r7014HVpnOupQi0s464TAAhKAHxKW8NpLoUjhaQKeLg8H2
-         lFWYK+ZuarVGHHO1AoWvljxY1z/N0Hde8FHjxj2EUTMOTw1PyN1xLddG8r0fNceBTexo
-         fBGIkvaOGbCFEDkGywUf9JSvUpHG4c5tS7FmfDEjcDe/3Sv3Xz+vdWfORH4LFN4EsoTW
-         9Cdg==
+        bh=e8rOmUB/Qab4XNuUxUB9H9N1Hcl6ltErOzE5ty1KzV8=;
+        b=w4AKHo3S9eS/LeesnMUfXSDs1G0dLnrETNoCEg2s9Q9m0k86V2W/T4wfmli9HQ7cXH
+         s+34AYGUN1hzBM0/wWgMu7RmRHyz1xpFL2dAyxu2MhMtlkbi6BEtdA818n3iFBU/SvJR
+         nP7PAldxBu4nZ1FnHvUZRK5DrgyynjOZkCQMbjAQesWuHPZ9cNHUQY6zComg44CdCzAE
+         nXQ5Og7BJNyv5HgqXGQGzyKh0+EgoSN/16X0GZCKsgugp1PAJYEwKBJL4fiWHprI88Sj
+         YtUczu8xnDKGq546Nfl1sAyILPr4fdIW6Myk8MqKdKwQTdkIdE0/jJZqMKH0JSaAVg1g
+         JC0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762449058; x=1763053858;
+        d=1e100.net; s=20230601; t=1762449472; x=1763054272;
         h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WdZEL1EHDSq3ZNiGpe0rhkC6wH1kK9qkAITFBJu/irM=;
-        b=NMsQw9WIoEv/LTlD0SvlT+Rr4xsnZ3raJ+caTmSurkj/j9n5ZOyjxJpt2yyB5Gemnt
-         uakDuqw/gvN3K3700QuN6vAfwgMrPwOf8H8maPjO/OXifhof/4V0SyoG1c2zCpkgSBy1
-         mEf6rf4slBhA1NAhE7cm1IU2YwyA3HZzYVBarVi0x0njLpkbetmHWPG/uDXGxbbryMuz
-         EqQHM3jLa2VKwb0KKulmWgTXYbNWsRajEI/gKPJJKPXAyyDExzzMVkT7Vs+0DS9qcK0Q
-         gh3uwfccu+NWA0JvwK3jCRYJsMINJAg/+E+BsFwA8HKHDJI9XaVk00104O3oiQVPcrYR
-         hbhw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVraLf64VGwj+StFBCeveY/Q/tJ3i6nsSWRmKpC9wD9g82dgf9kpxo2LvWt8A0D5CNpEo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGF9OaoaZxKARC1F55P9DTUG2nN7IbHL41/hjeQvgg7AyjT6J9
-	1U4HWD9hA4Y8Enms1AkCj1+MKq7C9QXQR+xIVlNdcf58+29JM1EiXFsdbtGHVVBDRg==
-X-Gm-Gg: ASbGncvXKzlyktoLZSOzP8/9urEo1UmCTTV3d33njaG5xylutUDx62AW1vDmSAazsmQ
-	+v8Ml9oklBQpcXNSFBC16+fqYa1lhTj7/i6RVzZwL8NbEXBX+aff6wVAeI4y8zvCrFBswoqFxMT
-	izgIx1u5PSRXjkbOx1Ffj+hc6G4f53ZmYjkOzEJ681M6wL8eKjkDlueqAdwK0U6BLaPMAwESQRj
-	fMHYRoXA78NCAo0lpZZMq8zZX6+enlzTyphZ2IeBFKgda3egodJye5Wc67lPfPZPbsyng+BGaJp
-	+uLSegygQLAECmM1rP2Rjd5ae9KfX2RvDt8yhILlrY1RihpSfy+7YNNHXYuAvHkayRuTvMLsyPB
-	h8TXRhCYob9a0HEA74FuyzVOJ/ZwEc5n9V0ylTt0XkN24EHt1cKaOspJz/FHoy2/yVfACSrTlNT
-	BU8np4gWxQlrTEIu5Viwa05C0q/jPBhfTI7QhpUuHi8g==
-X-Google-Smtp-Source: AGHT+IHPm82vc2DBF70vhD6PERm/XBQoRpWwg+wEs2NCF7+zKnTBYd2FPBt04x2iza2MprpBAgD/zQ==
-X-Received: by 2002:a05:6a20:7492:b0:334:87c2:445 with SMTP id adf61e73a8af0-3522a16ee21mr377797637.36.1762449057848;
-        Thu, 06 Nov 2025 09:10:57 -0800 (PST)
+        bh=e8rOmUB/Qab4XNuUxUB9H9N1Hcl6ltErOzE5ty1KzV8=;
+        b=V+etsVXOSKnDw70ZkHQKMzOcZUeRz16hKuBMWrxyUHPN/cBF+pG/FhkKydW0rKRtx0
+         2AahKpvMta0lC8HcRZb5ct9XGLWWae9FKjar4cWiR8Q2+FoWEmypRFKCW+aOe61hRY3+
+         oaPRPKFUg4YXRR72bczOJww6+L5ubQ6PjSKHkAvdgVnYm/1zgsgJYItyqdgI7jRKfhbX
+         cvkn6Pvs3S0p4FqpJ1nmWwasMkhweQ1TVu10237zOELdhptmv/yOxv27IlUt7zCVuTj3
+         RaxPng48bfLlJqcUewR/Q50CpfROXfI2WG/yAbP2yH6GDxSLQA/9VE8T+gCKxcpWsPDs
+         yB7g==
+X-Forwarded-Encrypted: i=1; AJvYcCXz43ZAlViFq1ztpDkFj0T8TS8yLuHwkOY9YqNZ5lEv4DlJamGH0fkLYYFuG1a2RfLnBp4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdE679iyj1/93RWPIbxLAWQhpkGQDWsvE6kY+/1XM9bAcuSEQW
+	jdr5UPvlyFcTe3RH3Jno0ByoUMwzgdwM/m4Fg1R7Xnrtrx5A/MPqaTRa9UUDP92Avw==
+X-Gm-Gg: ASbGncv0v5kjbt3TqCxzzmr1fR5e14NAjoWgMfyR82yiSu5vAhvFmY2JMwrrW10mPJy
+	2eMjt2YwHnENDeIVAvEa2VcIJ/wJ1oDA4dUuMaPi2oAUksdnzHYqHfUj64apBPxShbTOAoVFt/R
+	De/kW1eW8bRlYA11MAIXWWe1+b2pLVLIwHXdDWULxc7EMYh3ejSkaHjMQ2hj8RwKXNAcSIPmmJK
+	XEGCvgeMTWUY/UUzvVo9p/cUmy2dApK9LKVrsHGjWIa48+86iWeDpRng5hpF4nH3nvAawz2G8M6
+	L/D3seXHm5ntFSBNmh8hEYT/cr3msNkxzEbGuLxwiPiwyF7+DVQ7pPPvbg4xzUltM4J+bVfU4EV
+	8xrhM6U2GRuQfSRCrm5LeX/ffYaSTKA6WMpvujFyi2I+tHDOntIQDiXvlDKSQY326/et/KCU8Zc
+	NiBfslw7hTJzjXYyyptF1Yz0IzBrfxrhXqOOZNLAwmIplwVU+nlkr0
+X-Google-Smtp-Source: AGHT+IF5dm3b+TfCvr+idRK4WAQL6ailGdHxqBosbW+mh5LC8pP1b83d5wfZFY8YbKRvEpQzBtUNuQ==
+X-Received: by 2002:a17:90b:48ca:b0:340:bfcd:6af8 with SMTP id 98e67ed59e1d1-341a6bfb6bdmr10106676a91.4.1762449471620;
+        Thu, 06 Nov 2025 09:17:51 -0800 (PST)
 Received: from google.com (132.200.185.35.bc.googleusercontent.com. [35.185.200.132])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0cc179f14sm56176b3a.45.2025.11.06.09.10.56
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-341a699c98dsm6825962a91.17.2025.11.06.09.17.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 09:10:57 -0800 (PST)
-Date: Thu, 6 Nov 2025 17:10:53 +0000
+        Thu, 06 Nov 2025 09:17:50 -0800 (PST)
+Date: Thu, 6 Nov 2025 17:17:46 +0000
 From: David Matlack <dmatlack@google.com>
 To: Raghavendra Rao Ananta <rananta@google.com>
 Cc: Alex Williamson <alex@shazbot.org>,
@@ -83,11 +83,11 @@ Cc: Alex Williamson <alex@shazbot.org>,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 1/4] vfio: selftests: Add support for passing vf_token in
  device init
-Message-ID: <aQzWnS63x81EhTWy@google.com>
+Message-ID: <aQzYOjWPs0qsW4YR@google.com>
 References: <20251104003536.3601931-1-rananta@google.com>
  <20251104003536.3601931-2-rananta@google.com>
- <aQvoYE7LPQp1uNEA@google.com>
- <CAJHc60xjPktqw=RgxgpOSqJP0Ldq6skmxLQm4QhpiojPAMOA=A@mail.gmail.com>
+ <aQvjQDwU3f0crccT@google.com>
+ <CAJHc60xb_=v9k46MEo=6S5QmMXKnd_1FiuWQr9dkCnE_XtTkfQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -97,39 +97,100 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJHc60xjPktqw=RgxgpOSqJP0Ldq6skmxLQm4QhpiojPAMOA=A@mail.gmail.com>
+In-Reply-To: <CAJHc60xb_=v9k46MEo=6S5QmMXKnd_1FiuWQr9dkCnE_XtTkfQ@mail.gmail.com>
 
-On 2025-11-06 10:06 PM, Raghavendra Rao Ananta wrote:
-> On Thu, Nov 6, 2025 at 5:44 AM David Matlack <dmatlack@google.com> wrote:
-> >
+On 2025-11-06 09:56 PM, Raghavendra Rao Ananta wrote:
+> On Thu, Nov 6, 2025 at 5:22 AM David Matlack <dmatlack@google.com> wrote:
 > > On 2025-11-04 12:35 AM, Raghavendra Rao Ananta wrote:
 > >
-> > > diff --git a/tools/testing/selftests/vfio/lib/libvfio.mk b/tools/testing/selftests/vfio/lib/libvfio.mk
-> > > index 5d11c3a89a28e..2dc85c41ffb4b 100644
-> > > --- a/tools/testing/selftests/vfio/lib/libvfio.mk
-> > > +++ b/tools/testing/selftests/vfio/lib/libvfio.mk
-> > > @@ -18,7 +18,9 @@ $(shell mkdir -p $(LIBVFIO_O_DIRS))
-> > >
-> > >  CFLAGS += -I$(VFIO_DIR)/lib/include
-> > >
-> > > +LDLIBS += -luuid
+> > > -struct vfio_pci_device *vfio_pci_device_init(const char *bdf, const char *iommu_mode);
+> > > +struct vfio_pci_device *vfio_pci_device_init(const char *bdf,
+> > > +                                           const char *iommu_mode,
+> > > +                                           const char *vf_token);
 > >
-> > I wonder if we really need this dependency. VFIO and IOMMUFD just expect
-> > a 16 byte character array. That is easy enough to represent. The other
-> > part we use is uuid_parse(), but I don't know if selftests need to do
-> > that validation. We can let VFIO and IOMMUFD validate the UUID as they
-> > see fit and return an error if they aren't happy with it. i.e. We do not
-> > need to duplicate validation in the test.
+> > Vipin is also looking at adding an optional parameter to
+> > vfio_pci_device_init():
+> > https://lore.kernel.org/kvm/20251018000713.677779-20-vipinsh@google.com/
+> >
+> > I am wondering if we should support an options struct for such
+> > parameters. e.g. something like this
+> >
+> > diff --git a/tools/testing/selftests/vfio/lib/include/vfio_util.h b/tools/testing/selftests/vfio/lib/include/vfio_util.h
+> > index b01068d98fda..cee837fe561c 100644
+> > --- a/tools/testing/selftests/vfio/lib/include/vfio_util.h
+> > +++ b/tools/testing/selftests/vfio/lib/include/vfio_util.h
+> > @@ -160,6 +160,10 @@ struct vfio_pci_driver {
+> >         int msi;
+> >  };
+> >
+> > +struct vfio_pci_device_options {
+> > +       const char *vf_token;
+> > +};
+> > +
+> >  struct vfio_pci_device {
+> >         int fd;
+> >
+> > @@ -202,9 +206,18 @@ const char *vfio_pci_get_cdev_path(const char *bdf);
+> >
+> >  extern const char *default_iommu_mode;
+> >
+> > -struct vfio_pci_device *vfio_pci_device_init(const char *bdf,
+> > -                                             const char *iommu_mode,
+> > -                                             const char *vf_token);
+> > +struct vfio_pci_device *__vfio_pci_device_init(const char *bdf,
+> > +                                              const char *iommu_mode,
+> > +                                              const struct vfio_pci_device_options *options);
+> > +
+> > +static inline struct vfio_pci_device *vfio_pci_device_init(const char *bdf,
+> > +                                                          const char *iommu_mode)
+> > +{
+> > +       static const struct vfio_pci_device_options default_options = {};
+> > +
+> > +       return __vfio_pci_device_init(bdf, iommu_mode, &default_options);
+> > +}
+> > +
+> >
+> > This will avoid you having to update every test.
+> >
+> > You can create a helper function in vfio_pci_sriov_uapi_test.c to call
+> > __vfio_pci_device_init() and abstract away the options stuff from your
+> > test.
+> >
+> I like the idea of an optional expandable struct. I'll implement this in v2.
+
+Just to make sure we're on the same page: I don't think you need to add
+this in v2 since you don't need to call vfio_pci_device_init(). For the
+inner functions that you want to call from your test, passing vf_token
+directly makes more sense IMO. vfio_pci_device_init() will just pass in
+NULL to those functions for vf_token by default.
+
+If/when we want to pass vf_token to vfio_pci_device_init() we can add
+the options struct.
+
+> > No space necessary after a cast. This is another one checkpatch.pl will
+> > catch for you.
+> >
+> >   CHECK:SPACING: No space is necessary after a cast
+> >   #81: FILE: tools/testing/selftests/vfio/lib/vfio_pci_device.c:338:
+> >   +       char *arg = (char *) bdf;
+> >
+> Actually, I did run checkpatch.pl on the entire series as:
+> .$ ./scripts/checkpatch.pl *.patch
 > 
-> Unfortunately, VFIO interface accepts UUID in multiple formats. For
-> VFIO_DEVICE_FEATURE and VFIO_DEVICE_BIND_IOMMUFD it accepts a
-> 'u8[16]', but for VFIO_GROUP_GET_DEVICE_FD, we must present it as a
-> string. Is there an issue with the inclusion of an external library (I
-> think I've seen others in tools/ use it).
+> I didn't see any of these warnings. Are there any other options to consider?
 
-Ack. In that case, depending on libuuid SGTM.
+Ah, I run with a few additional options. That's probably why we are
+seeing different output. Here's what I have in my .bashrc:
 
-I mistakenly thought VFIO always took the UUID as a string and
-uuid_parse() was just being used to sanity check the format. Thanks for
-clarifying.
+function checkpatch() {
+        scripts/checkpatch.pl \
+                -q \
+                --strict \
+                --codespell \
+                --no-signoff \
+                --show-types \
+                --ignore gerrit_change_id,FILE_PATH_CHANGES,NOT_UNIFIED_DIFF \
+                --no-summary \
+                "$@"
+}
 
