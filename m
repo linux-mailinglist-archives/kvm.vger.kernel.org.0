@@ -1,196 +1,217 @@
-Return-Path: <kvm+bounces-62150-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62151-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 900B7C39416
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 07:18:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2227C39461
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 07:31:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 764C4188A0CC
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 06:19:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68CDE3B3B03
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 06:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7CE2DC772;
-	Thu,  6 Nov 2025 06:18:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B88F27C842;
+	Thu,  6 Nov 2025 06:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="h/VX9yxP"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="ivnu9Bnp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C91BA3F
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 06:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB63E1E1E1C
+	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 06:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762409912; cv=none; b=YgL7PGs19UaS/eJGGQPMWvrDeX1/63QO69wn4lPsodDz+zUihbX8DuzhzHXfLuJa6Swxu8pR4/7/as6BY+PDiu8IqFwYrdJyz0gKM739W7KIvfrJElB94D+KvBpZeIe2Kyus2XFIWBxqCqmefl9gJvmALq6Gr0yvFTAHp+Kz7DU=
+	t=1762410675; cv=none; b=cgxNtmp9LPRD/CmapTBqbH6LDEQQxF1dUDY8WOk8hQsuQsWtQ8hUyY9fh/Z2XByHIYyLYI6gi8AovYfwSlkIQvc34UIWTbJCZjRpsAuUpq/lncshAZQ8gAAu59FRm/yCj50FutsPYVW87T1LZebbb6cj9NSNF+z2klDIl5c3ZGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762409912; c=relaxed/simple;
-	bh=aKe4/0MN7whjYPYTVCTx7LB+LHZM61tX/dP9I9RAcNw=;
+	s=arc-20240116; t=1762410675; c=relaxed/simple;
+	bh=mH++FUUWiNs6njLTnVHXr3I4PNEnL/QgVM/9ZKawPqM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j8VsMlRUiA8SrqpQMTNbHe65A8Lx+DA7zXdMScPfizWQj6YnJfJ7vv8iuHWTIzA590sYdJuoHC+xxBeP2ILRcdnyJHn1F1G2y3T99hrzR4Vq+dlX6m8qfabk0jSrWApLiLmvI7D/pjSK8tyXUFWTwgTt1DQkiiKZitU5KDJpsQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=h/VX9yxP; arc=none smtp.client-ip=209.85.166.181
+	 To:Cc:Content-Type; b=Unex9d6wuGYKCsFdoreciezjN1Rb2esc3JZGA0Gat5iS8ofHOw0Qs5B3783JuLkpjtVbLUtlVjjaQDZv9SbAynJg2LZpQJCm60FsFGVaRSXawd3Ptnfy81CE3dVeWXvr00F6jbCUWklokNBXA1QhNp4KG1XGWKXhu2kT9fxhxzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=ivnu9Bnp; arc=none smtp.client-ip=209.85.166.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-432107e48deso1907305ab.0
-        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 22:18:30 -0800 (PST)
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-4330d2ea04eso1881515ab.3
+        for <kvm@vger.kernel.org>; Wed, 05 Nov 2025 22:31:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1762409910; x=1763014710; darn=vger.kernel.org;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1762410673; x=1763015473; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZDlEAMtwezpxLrpFe3CnV9gmK4kKgusAvfJ9H5INCMk=;
-        b=h/VX9yxP2gXF2TTIzYAVODpcFjsDu5mBEs0o+2jJqu/7gLzu3U+jLZdswBTbjOe1uW
-         sw02ACBUBDrq39yL8DwFXqOcbJZgUzY6Taf+tnnHiODU+cbFJ01ZCyCdEyPluwNGd8vq
-         6A9jRK6yy4rNcCw2uvnNcWqvsO7jqSO8o+jcGLOhemEB4VyJ/O6ynBGO2J3XGgAplhQs
-         zYcZNEGiCb8HZ7ofj+MI6yTGGo3ZqGxfAo5xNZ3Turms7TZ82+7tJE0P9UYUSppx7+xf
-         hmpQZygW0CLkdwcIjjU/YzUN9zoSou4u6wXv+SaVrYgqqDJnsK4e5BCVnXzeIt/SZicg
-         hd8w==
+        bh=8wsAqJo0NXbvMDfBjbCfB9v96+a4KboR1hex7uLJfTY=;
+        b=ivnu9Bnpdyr6HD37ODXkMpI/1eJb/GLduZXZAtmwH4maRvFtZGukq+L/aqNDwcCZcR
+         CDRlMNRNLcW1ilohUHxp2gUvQUczlGxW28OMddnXMMbyG/cdO0iVJzzMkgOGfzjPcSc8
+         W3f/mZ4/SJimtpJube0n2sTeRCXGPMgdg6GIYVxp6lIZo2Aet6ecwtRDNI9wDXYmYAMI
+         D81PaB9dKodIicfpCfJ3f7lUU/L7dSXmEEgUHUnfJeMsJSHdyOaIcLwbwcC26UPBVyM9
+         rGP4GPk+fVwzA2pYixP6dGZa3ZhYJRZiXc1qwlOfWPgutGiRwfT5CQ3ewTZPi7Qw4a66
+         JQJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762409910; x=1763014710;
+        d=1e100.net; s=20230601; t=1762410673; x=1763015473;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZDlEAMtwezpxLrpFe3CnV9gmK4kKgusAvfJ9H5INCMk=;
-        b=UJc8+C0K+ixQmLs00FR6IEotZdyOSWXPehhRj6K+yBdwpzYfIVhKHRuxhDe9mEBEk/
-         q/aGwTT59SalBnN/3jnmeYTwOVIqWryq9i/Myp0XI+5MGCyhR7weKRpYlfkh4lnHbcfU
-         ZLkZZTmWWyYELTsCj40MH2itiLXovNWWlqrrP/JNqRSd4s2gwHcM3gPYMSui4l//bAnL
-         6h2FlvPhVkn5j8ax1b0wElpPAH8FZI7B4YzPe7pFStt8eYAg0dbQmAzIE9+fAvgrZS3u
-         oVTB5+vqlB/hDsF+9Q3dT5MBSUJayUIEkHJ16uDMLmgvlNkrQdxjgAYGOFPueB/OL/OT
-         U+jg==
-X-Forwarded-Encrypted: i=1; AJvYcCX1zYq+ovSeCTb4H29smoH3Psui+S8IjgD4GhllRAWlreRBPk8gAFw7mBu7T+ldnYHb+4g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgIyRHah67o8S/apMiusYjMknK04/IOUYSuQfQJI0m8vl90otu
-	mH9fbnjybxZ/01Dm1yuEPSutlDi+h+Gg8JrpAMxt8gS4C+m4E3E8REcF2B9+Z9voozqd1Txs+Ol
-	01q048pdraOlaVuu6fIBYAa3nLSnVp9dKzpEBvSUvkg==
-X-Gm-Gg: ASbGncsqDQBhb/piA6aBa5NjRHvDY7r6rtGkyBtnzm2r6E4W2MJPwY108uJL3mbcc5a
-	t5pBKh8P7O+hCobC7avbS9h1Wp9P+FfEBvZbSubzVJMD1EYDTckbqHpcp4GTCOQ2vFJESUzcl8e
-	XIZkLVneRIz5stCMORSGrUvb0a5a/y3SrMCp4gZ0UbbrJ3WXK5NsC/yAlEsFesaZU3LKg6KFubY
-	jBXq0tW9hydp5Ks2AL4W9wm0c5fMyo2IzL7RFfqB0msFRJPCM/bbBSHhCUbvuwFNpFHX2PA
-X-Google-Smtp-Source: AGHT+IE+rRbZRK5f4ZtDH8DjGPSvoL5SP2kkRip7iD92MCZ4BarBIUpiiJumXPAmNS0ZCoGwkMuOapcuWSF2WD95Ouk=
-X-Received: by 2002:a92:ca0f:0:b0:433:27b5:1faa with SMTP id
- e9e14a558f8ab-43340759a02mr82201175ab.1.1762409909706; Wed, 05 Nov 2025
- 22:18:29 -0800 (PST)
+        bh=8wsAqJo0NXbvMDfBjbCfB9v96+a4KboR1hex7uLJfTY=;
+        b=MF1qYJ+T5b536N9RgDJwGi5g3TVAKODiklAa60Nj6krhDGg0kYlU0aivH7gcImFWYu
+         xUGi+e4OeZaR0KamCb6W8EtMQn4cYAWynLRkL2n9PgmcWt12x7wNE12OBh0Ca6DxGIcu
+         SFoJ58hQocZYqI4XpJPWjHEhUakyCS8s4SIsyq5ilRmMRo6wiKfmEWtrpY1exeED+7qK
+         jlpD0YjSnHEeGYBRyENgr0frnYgxWTat8fT+Hy9E2/xMeRQq6ONf1wbSMIUtHsRK5WgD
+         c21qWKuLJqdbnhQy3Dy2OOjJDdgWkUFfQ55Hr2uHRZAzFco7F5gnDVG7wbe9WxAbcLHE
+         As6w==
+X-Forwarded-Encrypted: i=1; AJvYcCXHybuWKzLf9qS/+OSZFXy9tSzqUMqmSfkC/OwrMfs3Rxc9x/MPke+1bH2Cidf8zEiBShw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKNtyN7C2X8w2PXJI5ePf3UyizvAbiJpklQMw6J4Lr7ESUc1pF
+	+pBYM4PLpihmOGOhqL2S3jUpGuQl8wlEPvVxJylMrbH3d5VFjA2Hdcs4Fs3EMIgGObspO8FS7SJ
+	vfYik11EoTMspSkkXURgHBlGyo3Jl7T05Kz7rHLgCgw==
+X-Gm-Gg: ASbGncs2BRUghM6EhPO3yIpLbhAjTRhIjFIasrW6mRpQ8q2dlMlKaEHN4ywhlaGe3Yu
+	5azhfZyD3HXXzpsW8/Q7f5mgdsn7BNc9XSZEO0D64IFeixmex8XmzFjUNo7M2Qjy8Pu/mrw1M/x
+	b3V+c1vzr7CIr28JBMQjoVbT5ruo5R4lpG01S5ATzTA921jB74X5BhPh4JpAsqK2Q/vmEvKas+z
+	DX8ofG7k+fu2ey2jdRN1w1tc3aXyPEKocivUVIdWDXhDZRnNzU3wyoQ3pQwhdxr0JAJijWjTSyN
+	phIRx3o=
+X-Google-Smtp-Source: AGHT+IE62i5hdnOw1tkRcQojVd9lPnQXpVgG5xN5CqCFTDG7bifDDZ9QHqo5x/eJro/G00X8hkfIC+3pZrHlhszwkJs=
+X-Received: by 2002:a05:6e02:3087:b0:433:2fa2:a558 with SMTP id
+ e9e14a558f8ab-43340789f0cmr86438485ab.9.1762410672706; Wed, 05 Nov 2025
+ 22:31:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250912134332.22053-1-fangyu.yu@linux.alibaba.com>
-In-Reply-To: <20250912134332.22053-1-fangyu.yu@linux.alibaba.com>
+References: <20250918073927.403410-1-qiaozhe@iscas.ac.cn>
+In-Reply-To: <20250918073927.403410-1-qiaozhe@iscas.ac.cn>
 From: Anup Patel <anup@brainfault.org>
-Date: Thu, 6 Nov 2025 11:48:17 +0530
-X-Gm-Features: AWmQ_blNuHZQBO2zDIsL_jsP12Ozv0UDhbowq70IYcJdfGZ1HSMpnvQsCEW7hdU
-Message-ID: <CAAhSdy0azfC-L3buko7-mN1PDWxi08HN=3NQ+0VeyMR8gVJNoQ@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: Fix guest page fault within HLV* instructions
-To: fangyu.yu@linux.alibaba.com
+Date: Thu, 6 Nov 2025 12:01:01 +0530
+X-Gm-Features: AWmQ_bnVS73erzCQONrC7p_TFgCPBgKI27B4YWN1vAUbG-ECAIYJMH0uCmATp_w
+Message-ID: <CAAhSdy2asCgoU+2q2wTQVCMD+LvdQjhJSbKUc-yRaGqmHnQoLQ@mail.gmail.com>
+Subject: Re: [PATCH] RISCV: KVM: Add support for userspace to suspend a vCPU
+To: Zhe Qiao <qiaozhe@iscas.ac.cn>
 Cc: atish.patra@linux.dev, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, alex@ghiti.fr, pbonzini@redhat.com, graf@amazon.com, 
-	jiangyifei@huawei.com, guoren@kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
+	aou@eecs.berkeley.edu, alex@ghiti.fr, linux-riscv@lists.infradead.org, 
+	kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 12, 2025 at 7:13=E2=80=AFPM <fangyu.yu@linux.alibaba.com> wrote=
-:
+On Thu, Sep 18, 2025 at 1:09=E2=80=AFPM Zhe Qiao <qiaozhe@iscas.ac.cn> wrot=
+e:
 >
-> From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+> Add RISC-V architecture support for the KVM_MP_STATE_SUSPENDED vCPU
+> state, indicating that a vCPU is in suspended mode. While suspended,
+> the vCPU will block execution until a wakeup event is detected.
+
+There is no clear use-case why KVM user-space would put a VCPU in
+suspended state while it is running.
+
 >
-> When executing HLV* instructions at the HS mode, a guest page fault
-> may occur when a g-stage page table migration between triggering the
-> virtual instruction exception and executing the HLV* instruction.
+> Introduce a new system event type, KVM_SYSTEM_EVENT_WAKEUP, to notify
+
+As the name suggests, the KVM_SYSTEM_EVENT_WAKEUP is for
+system-level (or vm-level) wake-up and not VCPU-level wake-up.
+
+> userspace when KVM has recognized such a wakeup event. It is then
+> userspace=E2=80=99s responsibility to either make the vCPU runnable again=
+ or
+> keep it suspended until the next wakeup event occurs.
 >
-> This may be a corner case, and one simpler way to handle this is to
-> re-execute the instruction where the virtual  instruction exception
-> occurred, and the guest page fault will be automatically handled.
->
-> Fixes: 9f7013265112 ("RISC-V: KVM: Handle MMIO exits for VCPU")
-> Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+> Signed-off-by: Zhe Qiao <qiaozhe@iscas.ac.cn>
 > ---
->  arch/riscv/kvm/vcpu_insn.c | 21 ++++++++++++++++++---
->  1 file changed, 18 insertions(+), 3 deletions(-)
+>  arch/riscv/include/asm/kvm_host.h |  2 ++
+>  arch/riscv/kvm/vcpu.c             | 37 +++++++++++++++++++++++++++++++
+>  2 files changed, 39 insertions(+)
 >
-> diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
-> index 97dec18e6989..a8b93aa4d8ec 100644
-> --- a/arch/riscv/kvm/vcpu_insn.c
-> +++ b/arch/riscv/kvm/vcpu_insn.c
-> @@ -448,7 +448,12 @@ int kvm_riscv_vcpu_virtual_insn(struct kvm_vcpu *vcp=
-u, struct kvm_run *run,
->                         insn =3D kvm_riscv_vcpu_unpriv_read(vcpu, true,
->                                                           ct->sepc,
->                                                           &utrap);
-> -                       if (utrap.scause) {
-> +                       switch (utrap.scause) {
-> +                       case 0:
-> +                               break;
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
+vm_host.h
+> index d71d3299a335..dbc6391407ae 100644
+> --- a/arch/riscv/include/asm/kvm_host.h
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -43,6 +43,8 @@
+>  #define KVM_REQ_HFENCE                 \
+>         KVM_ARCH_REQ_FLAGS(5, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_STEAL_UPDATE           KVM_ARCH_REQ(6)
+> +#define KVM_REQ_SUSPEND                \
+> +       KVM_ARCH_REQ_FLAGS(7, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>
+>  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+>
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 3ebcfffaa978..0881c78476b1 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -496,6 +496,18 @@ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu =
+*vcpu,
+>         return 0;
+>  }
+>
+> +static void kvm_riscv_vcpu_suspend(struct kvm_vcpu *vcpu)
+> +{
+> +       WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_SUSPENDED);
+> +       kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> +       kvm_vcpu_kick(vcpu);
+> +}
+> +
+> +static bool kvm_riscv_vcpu_suspended(struct kvm_vcpu *vcpu)
+> +{
+> +       return READ_ONCE(vcpu->arch.mp_state.mp_state) =3D=3D KVM_MP_STAT=
+E_SUSPENDED;
+> +}
+> +
+>  int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>                                     struct kvm_mp_state *mp_state)
+>  {
+> @@ -516,6 +528,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *=
+vcpu,
+>                 else
+>                         ret =3D -EINVAL;
+>                 break;
+> +       case KVM_MP_STATE_SUSPENDED:
+> +               kvm_riscv_vcpu_suspend(vcpu);
+> +               break;
+>         default:
+>                 ret =3D -EINVAL;
+>         }
+> @@ -682,6 +697,25 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>         }
+>  }
+>
+> +static int kvm_riscv_handle_suspend(struct kvm_vcpu *vcpu)
+> +{
+> +       if (!kvm_riscv_vcpu_suspended(vcpu))
+> +               return 1;
+> +
+> +       kvm_riscv_vcpu_wfi(vcpu);
+> +
+> +       kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> +
+> +       if (kvm_arch_vcpu_runnable(vcpu)) {
+> +               memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->sys=
+tem_event));
+> +               vcpu->run->system_event.type =3D KVM_SYSTEM_EVENT_WAKEUP;
+> +               vcpu->run->exit_reason =3D KVM_EXIT_SYSTEM_EVENT;
+> +               return 0;
+> +       }
+> +
+> +       return 1;
+> +}
+> +
+>  /**
+>   * kvm_riscv_check_vcpu_requests - check and handle pending vCPU request=
+s
+>   * @vcpu:      the VCPU pointer
+> @@ -731,6 +765,9 @@ static int kvm_riscv_check_vcpu_requests(struct kvm_v=
+cpu *vcpu)
+>                 if (kvm_check_request(KVM_REQ_STEAL_UPDATE, vcpu))
+>                         kvm_riscv_vcpu_record_steal_time(vcpu);
+>
+> +               if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+> +                       kvm_riscv_handle_suspend(vcpu);
 
-This looks like an unrelated change so drop it or send a separate patch
-with proper explanation.
+Why ignore the return value of kvm_riscv_handle_suspend() ?
 
-> +                       case EXC_LOAD_GUEST_PAGE_FAULT:
-> +                               return KVM_INSN_CONTINUE_SAME_SEPC;
-
-The KVM_INSN_xyz enum values are only for functions called via
-system_opcode_insn() so return 1 over here just like the below
-default case.
-
-Also, add some comments over here about why we are simply
-continuing the guest.
-
-> +                       default:
->                                 utrap.sepc =3D ct->sepc;
->                                 kvm_riscv_vcpu_trap_redirect(vcpu, &utrap=
-);
->                                 return 1;
-> @@ -503,7 +508,12 @@ int kvm_riscv_vcpu_mmio_load(struct kvm_vcpu *vcpu, =
-struct kvm_run *run,
->                  */
->                 insn =3D kvm_riscv_vcpu_unpriv_read(vcpu, true, ct->sepc,
->                                                   &utrap);
-> -               if (utrap.scause) {
-> +               switch (utrap.scause) {
-> +               case 0:
-> +                       break;
-
-This looks like an unrelated change so drop it or send a separate patch
-with proper explanation.
-
-> +               case EXC_LOAD_GUEST_PAGE_FAULT:
-> +                       return KVM_INSN_CONTINUE_SAME_SEPC;
-
-Same comment as kvm_riscv_vcpu_virtual_insn().
-
-> +               default:
->                         /* Redirect trap if we failed to read instruction=
- */
->                         utrap.sepc =3D ct->sepc;
->                         kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
-> @@ -629,7 +639,12 @@ int kvm_riscv_vcpu_mmio_store(struct kvm_vcpu *vcpu,=
- struct kvm_run *run,
->                  */
->                 insn =3D kvm_riscv_vcpu_unpriv_read(vcpu, true, ct->sepc,
->                                                   &utrap);
-> -               if (utrap.scause) {
-> +               switch (utrap.scause) {
-> +               case 0:
-> +                       break;
-
-This looks like an unrelated change so drop it or send a separate patch
-with proper explanation.
-
-> +               case EXC_LOAD_GUEST_PAGE_FAULT:
-> +                       return KVM_INSN_CONTINUE_SAME_SEPC;
-
-Same comment as kvm_riscv_vcpu_virtual_insn().
-
-> +               default:
->                         /* Redirect trap if we failed to read instruction=
- */
->                         utrap.sepc =3D ct->sepc;
->                         kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+> +
+>                 if (kvm_dirty_ring_check_request(vcpu))
+>                         return 0;
+>         }
 > --
-> 2.49.0
->
+> 2.43.0
 >
 
 Regards,
