@@ -1,146 +1,133 @@
-Return-Path: <kvm+bounces-62236-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62237-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D472C3D127
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 19:29:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D503C3D13E
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 19:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DEDAC4E324F
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 18:29:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 515924E37EB
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 18:33:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9AF634574D;
-	Thu,  6 Nov 2025 18:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7910B350A16;
+	Thu,  6 Nov 2025 18:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tt/9nv3l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vyFqBeDD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3F030F931
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 18:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5073F34DB65
+	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 18:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762453786; cv=none; b=fZ2ZSxQtq75G/9VtArZXB+1roy/zdW2oLhwVtDQiUMu4ThE/9JwsLBIY7OXuQXegvu5Y3xhUuKva7tZp9RsMBwJcb7fOCc7PMJs0KcToTEKdFmunM0HkuT8MMkRvUWLqy/2HSXmgCpnLDpTaW3PRmlBsyLRs8rQRlSG4TMA/7AY=
+	t=1762453975; cv=none; b=Y2Fvv73YP5FBP1mep2VN07BSU2SmjTD8e37XmlnosgwiOYpiHQDdAzFlmG0x6DW/XOwRir1U5JiK0yKPlkDdIBwvs3tKY8Rq94NTLNOtGFqtnMhmnaYo3nGayk/RHkjZ9tGYsOnz1uU9iE1aqR82sPSkc7ARNqnwAZ8wB6YfIGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762453786; c=relaxed/simple;
-	bh=Hk2kkkXAIhT7SLFpYPU2qd4ra9YnnoIlTUZDjuxhE60=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sxKYDvlzhuwHIgPX305GJ3WEA9I3gMilWLhxk6UQZHtMd6gnbsgTPGTdfpMdbOrQDXclYSOHEMAGLa3nN8WfdD/I3FGEWa4/HYc3XySBQu33BI+POLlmszfiJIFAj79mCYTLoL7FVPrcHUkrZyDHZ2+eBraxFbKKUOGya66uNBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tt/9nv3l; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-3761e5287c9so12097181fa.2
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 10:29:45 -0800 (PST)
+	s=arc-20240116; t=1762453975; c=relaxed/simple;
+	bh=sVQLIpPNNK87Swax1RQ2kNXix0G9QJSkyvr+/9F+uA0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Z5TfGiyHJosoRwurYpG9hAJ0nEYNw76SkUFeTmTvDWZTL+tE8QDsAgcgJAEdq+l119LnpwonGANzjZpKA9qmqpJ82JRz2GafIwyHiMKW591F9B92lemktgwF7n5jqWM9Rn8lrV90tb2D1CQBPpgIpyrfFU6ga6k+oiR0a1cu230=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vyFqBeDD; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29557f43d56so16455335ad.3
+        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 10:32:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762453783; x=1763058583; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A66ECIPhhDrcdtn9psWFuT8F3KeGTGpZjxoa205S5r8=;
-        b=Tt/9nv3lUq5QJzNNzSri/kDy0kaEUZC0TPtpx+vGRjEvyWq1rkJg3dgbON04HCFGfD
-         Nl6PdypFngkKZKsSukE0TgFCUnTRE1qwfKByD4wWHv7bpKXBSh8tjKyU/zlvN0tcRdnX
-         TMaaFwcQG2gAEBUgITjVyAe0oN6IoUMIc2bDbcIjSVOKIkS+RQVcq0oHelC2trKCarys
-         P1CbUUJc5NnGNiGZZdBop4VMDFLRDo0ZnCsaetVKsTK95cgL4MKoMSWjiSRbGrwkkwD0
-         ajOgHxrQZjqchViSQijo3ON6VH2VY4FNKkEJP2i2wGTnM8bmcDwdbWTdkqMPmGqHQpxY
-         2wOA==
+        d=google.com; s=20230601; t=1762453974; x=1763058774; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ILtqOILvGty/pMJ9/qXl6knV0E74S+U/rmoIpSy5GYU=;
+        b=vyFqBeDDe69xCrA8XH6jbdMtDtWCDf6vNkTEWY19Sro76iSwUxBDs2bRsRyAT/R/kY
+         gZUyzIdDt5+5xw0BFq3GnEeUNLJd1WnhF8ReURyyk2PQNwZBxbycAgSKONBFig6JnFp9
+         MnhqKl/DsvFW7nXPatVqho34xK5gZ3tv+HvlNkNkCoymgUHAUrQYtnhfVeL2dtoEiNgn
+         oDJZ1MHgcioTotR1DaKg2xzNLqsF40b0g+9oTt8jfLkQcapgdX0usblqwgoIhxXgJtjO
+         WXuPVe2nxEjQKYhzqVrOOj/rWXdWavAXEPX8gvAF+D1KrdLxq6o16GA+gMqOXKSPYe0g
+         978g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762453783; x=1763058583;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=A66ECIPhhDrcdtn9psWFuT8F3KeGTGpZjxoa205S5r8=;
-        b=A0NJGQSSwys7DRlFMjsOP17tjnhgf2ioFU4FxHWAGjRN2ZKl3zfXPJ4+Pt6fMlcmG2
-         d+vMn/bsUkd3zCGQVfx9CV//kpX91qZt7PKPM19Nc0U53LcVn8C9HNeNyGeyZo4oPW7H
-         nAMSYaty65j0LQfCJXlSDRhfy5syn4T5pCNYiPWfgiW3mOyMuaz+H46w72/S/XXCEcFn
-         cODyAZjFMkm6yQonoVGZMHf/P6t5qgXX2RTNRwd3V7XCbh4SwBs/XROECJrcyKAuVUUz
-         ZjtZnk/s5aANg1d1irlhNSB9EvJXEXPBf5DHk/v89EkOVbOdMFVX9HBvJO19g76aJP7W
-         KEYw==
-X-Gm-Message-State: AOJu0YwC8IL+0a8zhM4fHkV/OjaVh8Wyf+wbBKrYBFqK+pkTH2EREXTh
-	Qi/K0ZHrEwvoOOwUksFhWlx5PqC7z4/L6hwg6J/vmC/PTAL5ckq+mo3iPRDF7aTpSLFfrxqFMTj
-	9IN1NhFzJv9uRBp0nRr/eoy1hCN//jQoDxA/l
-X-Gm-Gg: ASbGncuf4D3jrGpdmEmv0kxXSCtXeVDpV3TntcjHpbD6M3TRqTudmFTUbW0knQ795ip
-	c+3J8dqbRlk2SCjO/PIr17FtO4NFPSvwX3Ntn799eDFc1xrTm33mLl/yroPEBZCMEGdnM7CzhRi
-	wU+qVH1vdY75Sq5ONLEBiTLhhsnl3faeBTb6aYPSN77DreYuBZPJLTRL7CPXZy1Ie4WaGkHO2zQ
-	ycqUCO08dms3IOJQZxiE54296o16AwPV0XVoxAa5m2a7ug62fmYSKhOl6VrQuhBjt5zCQA=
-X-Google-Smtp-Source: AGHT+IFxE5CJeoOVNA1k5WhO44qMMlAItFYH7FTjGkRzoWepzYjW/MXRUWMCq/Gb8/8s2KlF+dkeFMMq6bXkYiuXaMY=
-X-Received: by 2002:a05:651c:f08:b0:37a:2e63:d4c0 with SMTP id
- 38308e7fff4ca-37a73155778mr907001fa.16.1762453783180; Thu, 06 Nov 2025
- 10:29:43 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762453974; x=1763058774;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ILtqOILvGty/pMJ9/qXl6knV0E74S+U/rmoIpSy5GYU=;
+        b=QqhBCYEQUnCYV1/LLHUbfJElh/kpvWTzOcqMHIkhkfca3sM/6wdBCShuGztJSO1vQu
+         HyDue7C7YMG3YTdQ07gNKyJrfM9i4kxhCnFNBYCcBu9O7a9oCkj0+zFPv54oJvasOEHh
+         jr18ipGaHvTlZ6p21FKrlsM0haYTAKZAfSbxuxKnigbS0NRy6ffGdg8zUpSl0LKb3vgB
+         jVPVjwIiRxwzahgAPJZ0+vqPiX+QlosHVPZ2/0hbeQ20mIEr37Zqp149bHjYevYxB8Sr
+         JmFWaTX4+igOpH3tLgIxu47BHrhCEBCmUCe52pPR6A086wQKBZUdp2I4mrG1qDAG1JAE
+         uFVA==
+X-Forwarded-Encrypted: i=1; AJvYcCX1Sbbpnle6SAcOD4oRHecNUNm5Ganv1W0u39yXxFm+3KiLQRbZ4KP05x3q6nMK/hjF3Yg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO0ml5/2vm0qRYnSQpaav6M83qwy2mexkS0COhLmfcNa+RMufd
+	kfVev5OmiOerwzBSWLgsvd6wu/zMUyLeckCYXNnjDHLPtmeepwHf9e84eNyVTn0sNihfAgzflaG
+	gT38+kg==
+X-Google-Smtp-Source: AGHT+IHxhdirp/8jMYvdEMpulJuVcQ8tfoz/G82tmND5n6uBXi9xqwvXWzZIhBm3NMCpdYEMxyVrG89AQwM=
+X-Received: from plbm10.prod.google.com ([2002:a17:902:d18a:b0:267:dbc3:f98d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:b10:b0:295:a1a5:bb0f
+ with SMTP id d9443c01a7336-297c03a8e41mr6156695ad.18.1762453973700; Thu, 06
+ Nov 2025 10:32:53 -0800 (PST)
+Date: Thu, 6 Nov 2025 10:32:52 -0800
+In-Reply-To: <CAFULd4Z=PKeyzaER51CE7Zm4a-yeiru=HcBFx8E4J5hx3io=Tw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250807063733.6943-1-ubizjak@gmail.com> <aKSRbjgtp7Nk8-sb@google.com>
- <CAFULd4ZOtj7WZkSSKqLjxCJ-yBr20AYrqzCpxj2K_=XmrX1QZg@mail.gmail.com>
- <aKTI1WOJAKDnkRyu@google.com> <CAFULd4ZR6TPVqq5TXToR-0HbX5oM=NEdw126kcDe5LNDdxZ++w@mail.gmail.com>
- <CAFULd4Y6W0hJbA8Ki2yB60537mC8+ohXyUgxD+HuKDQhq7zGmA@mail.gmail.com> <aQv14mmAkUPL-Fap@google.com>
-In-Reply-To: <aQv14mmAkUPL-Fap@google.com>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Thu, 6 Nov 2025 19:29:31 +0100
-X-Gm-Features: AWmQ_bmgjjm2sj4rYZqaFqFzmhntIXH-7Wb0by4SazycfXC0teZFBBV6Nt2z3SQ
-Message-ID: <CAFULd4Zc4-nPLSEeUbOh_A1O9VyC8arHVy=Y4Gg-d_Rjhon1Ow@mail.gmail.com>
-Subject: Re: [PATCH] KVM: VMX: Micro-optimize SPEC_CTRL handling in __vmx_vcpu_run()
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20251106011330.75571-1-seanjc@google.com> <CAFULd4Z=PKeyzaER51CE7Zm4a-yeiru=HcBFx8E4J5hx3io=Tw@mail.gmail.com>
+Message-ID: <aQzp1I1D8CfUSEug@google.com>
+Subject: Re: [PATCH] KVM: SVM: Ensure SPEC_CTRL[63:32] is context switched
+ between guest and host
+From: Sean Christopherson <seanjc@google.com>
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 6, 2025 at 2:12=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
-
-> > VMX patch is at [1]. SVM patch is a bit more involved, because new
-> > 32-bit code needs to clobber one additional register. The SVM patch is
-> > attached to this message, but while I compile tested it, I have no
-> > means of testing it with runtime tests. Can you please put it through
-> > your torture tests?
-
-[...]
-
+On Thu, Nov 06, 2025, Uros Bizjak wrote:
+> On Thu, Nov 6, 2025 at 2:13=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >  998:
 > > -
-> >       /* Now restore the host value of the MSR if different from the gu=
-est's.  */
-> > -     movl PER_CPU_VAR(x86_spec_ctrl_current), %eax
-> > -     cmp SVM_spec_ctrl(%_ASM_DI), %eax
-> > +     mov SVM_spec_ctrl(%rdi), %rdx
-> > +     cmp PER_CPU_VAR(x86_spec_ctrl_current), %rdx
-> >       je 901b
-> > -     xor %edx, %edx
-> > +     movl %edx, %eax
-> > +     shr $32, %rdx
+> >         /* Now restore the host value of the MSR if different from the =
+guest's.  */
+> > -       movl PER_CPU_VAR(x86_spec_ctrl_current), %eax
+> > -       cmp SVM_spec_ctrl(%_ASM_DI), %eax
+> > +#ifdef CONFIG_X86_64
+> > +       mov SVM_spec_ctrl(%rdi), %rdx
+> > +       cmp PER_CPU_VAR(x86_spec_ctrl_current), %rdx
+> >         je 901b
+> > -       xor %edx, %edx
+> > +       mov PER_CPU_VAR(x86_spec_ctrl_current), %rdx
+> > +       movl %edx, %eax
+> > +       shr $32, %rdx
+>=20
+> The above code can be written as:
+>=20
+> mov PER_CPU_VAR(x86_spec_ctrl_current), %rdx
+> cmp SVM_spec_ctrl(%rdi), %rdx
+
+Gah, that's obvious in hindsight.
+
+> je 901b
+> movl %edx, %eax
+> shr $32, %rdx
+>=20
+> The improved code will save a memory read from x86_spec_ctrl_current.
+>=20
 > > +#else
-> > +     mov %eax, SVM_spec_ctrl(%edi)
-> > +     mov %edx, SVM_spec_ctrl + 4(%edi)
-> > +998:
-> > +     /* Now restore the host value of the MSR if different from the gu=
-est's.  */
-> > +     mov SVM_spec_ctrl(%edi), %eax
-> > +     mov PER_CPU_VAR(x86_spec_ctrl_current), %esi
-> > +     xor %eax, %esi
-> > +     mov SVM_spec_ctrl + 4(%edi), %edx
-> > +     mov PER_CPU_VAR(x86_spec_ctrl_current + 4), %edi
-> > +     xor %edx, %edi
-> > +     or %edi, %esi
-> > +     je 901b
->
-> This particular flow is backwards, in that it loads the guest value into =
-EDX:EAX
-> instead of the host values.
+> > +       mov SVM_spec_ctrl(%edi), %esi
+> > +       mov PER_CPU_VAR(x86_spec_ctrl_current), %eax
+>=20
+> Can the above two instructions be swapped, just to be consistent with
+> x86_64 code?
+>=20
+> > +       xor %eax, %esi
+>=20
+> > +       mov SVM_spec_ctrl + 4(%edi), %edi
+> > +       mov PER_CPU_VAR(x86_spec_ctrl_current + 4), %edx
+>=20
+> ... and the above two insns.
 
-Yeah, sorry about that, I was really not sure which value is where.
-Please just swap
-
-SVM_spec_ctrl(%edi) with PER_CPU_VAR(x86_spec_ctrl_current)
-
-references (and their offseted variants) in the above code, and it
-will result in the correct and optimal code.
-
-Thanks,
-Uros.
+Ya, will do.  Thanks!
 
