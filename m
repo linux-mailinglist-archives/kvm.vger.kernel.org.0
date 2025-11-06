@@ -1,153 +1,286 @@
-Return-Path: <kvm+bounces-62220-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62221-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DD42C3C74F
-	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 17:33:58 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19F2FC3C6D4
+	for <lists+kvm@lfdr.de>; Thu, 06 Nov 2025 17:31:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55ED6189A85B
-	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 16:29:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 91CA63523B5
+	for <lists+kvm@lfdr.de>; Thu,  6 Nov 2025 16:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B86634F246;
-	Thu,  6 Nov 2025 16:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA161350D64;
+	Thu,  6 Nov 2025 16:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KBi6CCRn";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="t8icFj3q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eucMkQVr"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4CF34EEFA
-	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 16:24:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7793350D4E
+	for <kvm@vger.kernel.org>; Thu,  6 Nov 2025 16:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762446250; cv=none; b=aoIYDnlKXdJVkaX9u4kUjiIO0HsAk4wTDn6s72qBR+pxK2XwzytAfzMniEPc19M7CoPKlKfSXRmTUNhAtTpLuZTRUOvPKJDU0wOpbNIdxNtjTcv5xiJWlq+Sv9ZSkLxtEO8D5e9dmBlyqj+xmMAb2I2wsk4Iwe6KMjRTlmYwZ9s=
+	t=1762446402; cv=none; b=s/DE9G6C0iAXbJDsy4gSVJI1SSUB9NtjakiRlDcEMIkVnHeb+19zHcNVtVOUu6lmaA8/nnVoG7riQ0QHj0HE+hNODa/I3smpHDuZ98PCMQyO7kjgQO39vjLwuPwKyadOgUeD/5dEA0bsvtkEpKrKRrGkQ0wMy9HnkK9tyeen7qE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762446250; c=relaxed/simple;
-	bh=0vKjDbLZ5uIsJA1uwTP3kzZUDanfSCuXi6/Z1HKwKG4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NFRvyk0JjnG+37VGlpzcIGmf+Tjzk3ka3BTTBMaWh4ygjA/+8B+TDOrCaYDDDVYOQrkU6gmQGNRbEOvhjcx4F2KcbdUXZmCVbjc+I35J0mYMhBah2jsEzJrrfEsnvnGJXBv1MeL9zUhIJpmHLWJUvjpfnZXFQ7ZSxtwarDiVYFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KBi6CCRn; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=t8icFj3q; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762446247;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N1DG4kG92g8zznE2M/rfvvdgAVk3otj7VoXSOREQcnM=;
-	b=KBi6CCRnkBQYux57mT9fYKyyVuxOOWgHrd6L4GGlCo9ZQIBCqrsCZCmpYESrFzU41gihza
-	DTUes5j7dSO7QPesoKqxtCLi1q4CiYTtNJ59gi929cxei9WiVPhMT3TFbSJrkVKGucN+fi
-	XN2DOjTXbt8VqqgbYSSrAlz2yF31cJU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-fnPidB7KOiytoCB6i6XfrA-1; Thu, 06 Nov 2025 11:24:06 -0500
-X-MC-Unique: fnPidB7KOiytoCB6i6XfrA-1
-X-Mimecast-MFC-AGG-ID: fnPidB7KOiytoCB6i6XfrA_1762446245
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4710d174c31so9920905e9.0
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 08:24:06 -0800 (PST)
+	s=arc-20240116; t=1762446402; c=relaxed/simple;
+	bh=bII4r8AGGbtwvg7qCc/ztiXsM56g22qYrv0PaOQwk3M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ipF/DsHGl2gAO2bCukmferL64+iggyHP9gy1DgAQb0HZ+cEYSG/tO6WSRngIgMSp99byoRK+cQzrggUoPNzx9hxmZrbjK62HEIJhXtPWwxHmkQANUqv0ezZ3YSC6zf8/sskSoZb5vtyRYinsvrqiUpCCD0CewgwFnyjRI2oR7gI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eucMkQVr; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ed0c8e4dbcso348741cf.0
+        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 08:26:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762446245; x=1763051045; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N1DG4kG92g8zznE2M/rfvvdgAVk3otj7VoXSOREQcnM=;
-        b=t8icFj3qcK2oUVcdV1K/+09UzGEZx9vO11ghuK8XhkNBhOGU9+2JMp2DYrP0X1IXGa
-         f5qOqFxXxly4Dmuet1jPE0cgz/ebUT4Y5EHqFKAxwRjlwdhmUSwVzcX/LTXEkJKCoL2G
-         1bYomD1hwC7aEpdmW0VqNAVz7CUiZARrCqhrx1PcbRhquB6nPBNtBEjMI8Vh20NU8/AY
-         Q5GMDUufIAgL6IMxoVgsjq/8t3MWai7PBRW6VsThpAi5LFcYns0JYUloxoedv3vFz5wY
-         4kvQsYELA846+ONvrH6Gvh7iLba63EZ+rD5rwJswv3cLgN25QSwTUotV7XPkBugu94a/
-         uqjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762446245; x=1763051045;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1762446399; x=1763051199; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N1DG4kG92g8zznE2M/rfvvdgAVk3otj7VoXSOREQcnM=;
-        b=OCQwIPNwv/Yb2GIKMky9trWSDYaj2sGyOoKqOE8yk5wMii8YiK0lz9TkgvJaJeuQXI
-         0zFsS+5JbRyREmnfNe4Q53SJ30oMu8Pf6/vJUQjy3GMdNN7NjllhbqXO7L5sbfTUq9Nz
-         VEr0BMuty+KfpIRUfH1ZsmSLNaC4g8e+Gm9/NJQTBZswQeNsN5SMYCltpvzT589nIq8b
-         iw+hJhBxRQgzsFgN6q97ZGWp8gwDtEP6nQSPfd56ftNkLLs3DsKBdjsIydMRCgG+qmU/
-         i88Mo9YJxGMNsHM2rEnuGOxS2agZkWqcQLLK/0TmB/U3DqczWZNzxTtvuFLZitEnFLDi
-         CLnw==
-X-Forwarded-Encrypted: i=1; AJvYcCWOqPsP+IaGqwZlumF7TAFsZ93G/Ab44mYN+p9mXYmXF6Qe53ia5RIjnavKXfKhT0g0snA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJ+NtNazvDiZKwrZOqo3N99kHNvLKbgjJ40pgKfo68YSSVX6h9
-	YfJqPbtwL8EZPpJ5pwhtocxEIpDacV5wEIYWJmQkngf8/g9K+E94nzT6WogZrgkkAqDpUxhIcar
-	vi16tgsLThBu8fbcdktkDdK8OncRqqG1sPXvu9OAOOK+O7vxtcpkBpQ==
-X-Gm-Gg: ASbGncsbH+KkHKTcjWfFU5W1YdUv6+AvZ5oFOemFOWctz5AVefscXN7d31Q1cVfUHBv
-	mOUErvcg4MM6VG/Fs8U49fCQYOzADZO/ePfOMUHJgntsTLn8jDwshCwVteh64akODIhef4ju1Nt
-	2fmkzbxco2QB7ZawWBkiFl9ZCGfzYoRDiaI38aQsyJ6akJv+sa4SL/AwnXEFsAp6/eCh477ULl6
-	lnk53CxX4pCJ7czqlXwSw7aIQ+6sLICARvsc30Oep471Tf5ygH9AMr61Cz/D4CY0QY/YQgfhQHH
-	IbEXZNRLtM0gWWrw6AdMzSlSEF4a8xnBv1PrC0BUw/koFf4SJmeLSESd/wV0YWDuQcI1UWG91Q0
-	arQ==
-X-Received: by 2002:a05:600c:5486:b0:477:5a30:1c37 with SMTP id 5b1f17b1804b1-4775ce9de52mr66234015e9.41.1762446245372;
-        Thu, 06 Nov 2025 08:24:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF0G1GMRMF16+MzLwvDgk0DmYYlo1r00tXQsnMrr1muBaVhluzHBbanGO0G1csDS3yewZ8H4g==
-X-Received: by 2002:a05:600c:5486:b0:477:5a30:1c37 with SMTP id 5b1f17b1804b1-4775ce9de52mr66233365e9.41.1762446243795;
-        Thu, 06 Nov 2025 08:24:03 -0800 (PST)
-Received: from sgarzare-redhat ([78.209.9.120])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477625c2f77sm56342755e9.9.2025.11.06.08.24.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 08:24:03 -0800 (PST)
-Date: Thu, 6 Nov 2025 17:23:53 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v8 00/14] vsock: add namespace support to
- vhost-vsock
-Message-ID: <4vleifija3dfkvhvqixov5d6cefsr5wnwae74xwc5wz55wi6ic@su3h4ffnp3et>
-References: <20251023-vsock-vmtest-v8-0-dea984d02bb0@meta.com>
- <k4tqyp7wlnbmcntmvzp7oawacfofnnzdi5cjwlj6djxtlo6xai@44ivtv4kgjz2>
- <aP+rCQih4YMm1OAp@devvm11784.nha0.facebook.com>
+        bh=0q6PCg+W2iuobOkSwULGRQ7ElBYC+BvlMlpyq3y6HfY=;
+        b=eucMkQVr/LoRjavSTXaGJnV9X1nlt64P1YHOXDP3xnmV9NlcVznX+TNV3rldGBnwd6
+         q92mcUls6s0mFnDcNT43p/SQ5z/vnrvxpcJbaIb7bYm6axPNptpiNAsF294/Oi71Efy9
+         tQ4U0bFgjodHlwSL6BTA+72lIH3TZwGLEMxuxFNuzMgzYvpG+4NkTG8Uq8V1ADA+dxoi
+         jfLDQV8o0CuJu1aBJ2h1LVWN8npPHsQF3BeIKXLBVQUJ4dWDiPjQ6IsEijP09p75DDqR
+         ksfq4akkSk1243KycbmZK+FGIapUj+BCu90NbhlXSsnOY+As60ZXO20d1FzlwlUNVb/1
+         66eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762446399; x=1763051199;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0q6PCg+W2iuobOkSwULGRQ7ElBYC+BvlMlpyq3y6HfY=;
+        b=a4VQva7BSvTOGyj3K9+iKlnlouGLjt2sLV79S0ikVV1PTle175FTx24gSLgdguEYXG
+         4mA2OKtBBk08h8TdKZ/U1UACewMvqAWWgDfRgVP5shasCZU+vTzFwbX/T39fEdfhVB9P
+         HgrTVfCxO9Cjyql3FZmECUMsBd3oR03fZvd79n/Oa3D7pHaFX+22sDVyPl+MqVWNGbhf
+         hKihyu/UbXoV0CuH7/Hrt5FXzbF1gf2TaSx2QosGQPJpm4kPMXoj507IZ126noaqqj/W
+         fiArGBHuRe9hbgtfJerloHefJV2N587zt/Fk/acY7OHLXnxr7cNwCfjVzWUtZ0hvs7It
+         FzDw==
+X-Forwarded-Encrypted: i=1; AJvYcCVL0dMn2ztq0Xz9besWB9fUghEUdiPhaVS6hAPCVjAxxksbKOx69LsROIV8CNZucnKt6Mk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxB7ZVYltYFxMaQYGXKxqaUbjBrk8EWwnPv/XnLgAKrmyxvUulr
+	G7CF6Xy0FP09tModsy2zpuIkhklwYHMAUVecPsScIHLZTf/HRdLJ0pfMjh9FK3PbLqX3BwoC+fU
+	oMXf5hiIfL2ZaOBt2TdEJAx9FQxRkrI3QKMvFHQMk
+X-Gm-Gg: ASbGnctF2UOMdMz2f0L/LQX02FwjC1JjQK9/45IBicjvJwOciXmbXK/PLN/j/zOiH0O
+	AIO3fkdwNgQP54jefuCxk506vd+65wfNBtv6hRUM59Lg9s8Y0QmI7YLGFvuGvqwXNzcEkKLbFlm
+	gW2eka4CUuR3efaeCbZvHR55rkLCPwnwcEHI0qoq2oAFIRResxr/rU34a7BFfDudTwvEV2u3gUg
+	JUzy2a81lvGAlZTRmKYaOlhqqLKxk/RQqGnWGVGsxXIzpP5zRcncna8kgxVc9mmFAC9QTg=
+X-Google-Smtp-Source: AGHT+IEKYGFOAEb95xBi/hAEe+N1Hr05URWSKgSTmNRkE1Cu0Q0CJW4cKhxufqO7fCfEUMLYoCaSMX1Vw6m5LGNYwi0=
+X-Received: by 2002:a05:622a:1492:b0:4b3:8ee:521b with SMTP id
+ d75a77b69052e-4ed81344ea3mr7773141cf.0.1762446399475; Thu, 06 Nov 2025
+ 08:26:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <aP+rCQih4YMm1OAp@devvm11784.nha0.facebook.com>
+References: <20251104003536.3601931-1-rananta@google.com> <20251104003536.3601931-2-rananta@google.com>
+ <aQvjQDwU3f0crccT@google.com>
+In-Reply-To: <aQvjQDwU3f0crccT@google.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Thu, 6 Nov 2025 21:56:27 +0530
+X-Gm-Features: AWmQ_bki584d0M1XeO0TkydTENfBebX0YdN8fphcl6VQqXlJAWt2avEb5ReAohQ
+Message-ID: <CAJHc60xb_=v9k46MEo=6S5QmMXKnd_1FiuWQr9dkCnE_XtTkfQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] vfio: selftests: Add support for passing vf_token in
+ device init
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>, Alex Williamson <alex.williamson@redhat.com>, 
+	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 27, 2025 at 10:25:29AM -0700, Bobby Eshleman wrote:
->On Mon, Oct 27, 2025 at 02:28:31PM +0100, Stefano Garzarella wrote:
->> Hi Bobby,
->>
->> >
->> > Changes in v8:
->> > - Break generic cleanup/refactoring patches into standalone series,
->> >  remove those from this series
->>
->> Yep, thanks for splitting the series. I'll review it ASAP since it's a
->> dependency.
->>
->> I was at GSoC mentor summit last week, so I'm bit busy with the backlog, but
->> I'll do my best to review both series this week.
->>
->> Thanks,
->> Stefano
->>
+Hi David,
+
+On Thu, Nov 6, 2025 at 5:22=E2=80=AFAM David Matlack <dmatlack@google.com> =
+wrote:
 >
->Thanks for the heads up!
+> On 2025-11-04 12:35 AM, Raghavendra Rao Ananta wrote:
+>
+> > -struct vfio_pci_device *vfio_pci_device_init(const char *bdf, const ch=
+ar *iommu_mode);
+> > +struct vfio_pci_device *vfio_pci_device_init(const char *bdf,
+> > +                                           const char *iommu_mode,
+> > +                                           const char *vf_token);
+>
+> Vipin is also looking at adding an optional parameter to
+> vfio_pci_device_init():
+> https://lore.kernel.org/kvm/20251018000713.677779-20-vipinsh@google.com/
+>
+> I am wondering if we should support an options struct for such
+> parameters. e.g. something like this
+>
+> diff --git a/tools/testing/selftests/vfio/lib/include/vfio_util.h b/tools=
+/testing/selftests/vfio/lib/include/vfio_util.h
+> index b01068d98fda..cee837fe561c 100644
+> --- a/tools/testing/selftests/vfio/lib/include/vfio_util.h
+> +++ b/tools/testing/selftests/vfio/lib/include/vfio_util.h
+> @@ -160,6 +160,10 @@ struct vfio_pci_driver {
+>         int msi;
+>  };
+>
+> +struct vfio_pci_device_options {
+> +       const char *vf_token;
+> +};
+> +
+>  struct vfio_pci_device {
+>         int fd;
+>
+> @@ -202,9 +206,18 @@ const char *vfio_pci_get_cdev_path(const char *bdf);
+>
+>  extern const char *default_iommu_mode;
+>
+> -struct vfio_pci_device *vfio_pci_device_init(const char *bdf,
+> -                                             const char *iommu_mode,
+> -                                             const char *vf_token);
+> +struct vfio_pci_device *__vfio_pci_device_init(const char *bdf,
+> +                                              const char *iommu_mode,
+> +                                              const struct vfio_pci_devi=
+ce_options *options);
+> +
+> +static inline struct vfio_pci_device *vfio_pci_device_init(const char *b=
+df,
+> +                                                          const char *io=
+mmu_mode)
+> +{
+> +       static const struct vfio_pci_device_options default_options =3D {=
+};
+> +
+> +       return __vfio_pci_device_init(bdf, iommu_mode, &default_options);
+> +}
+> +
+>
+> This will avoid you having to update every test.
+>
+> You can create a helper function in vfio_pci_sriov_uapi_test.c to call
+> __vfio_pci_device_init() and abstract away the options stuff from your
+> test.
+>
+I like the idea of an optional expandable struct. I'll implement this in v2=
+.
 
-I just reviewed the code changes. I skipped the selftest, since we are 
-still discussing the other series (indeed I can't apply this anymore on 
-top of that), so I'll check the rest later.
+> > -static void vfio_pci_container_setup(struct vfio_pci_device *device, c=
+onst char *bdf)
+> > +static void vfio_pci_container_get_device_fd(struct vfio_pci_device *d=
+evice,
+>
+> Let's name this vfio_pci_group_get_device_fd() since it's getting the
+> device FD from the group using ioctl(VFIO_GROUP_GET_DEVICE_FD).
+>
+> > +                                           const char *bdf,
+> > +                                           const char *vf_token)
+>
+> There's an extra space before these arguments. Align them all vertically
+> with the first argument.
+>
+> I noticed this throughout this patch, so please fix throughout the whole
+> series in v2.
+>
+I may have to fix my editor to display this right. Thanks for catching this=
+.
 
-Thanks for the great work!
+> Also please run checkpatch.pl. It will catch things like this for you.
+>
+>   CHECK:PARENTHESIS_ALIGNMENT: Alignment should match open parenthesis
+>   #78: FILE: tools/testing/selftests/vfio/lib/vfio_pci_device.c:335:
+>   +static void vfio_pci_container_get_device_fd(struct vfio_pci_device *d=
+evice,
+>   +                                             const char *bdf,
+>
+> > +{
+> > +     char *arg =3D (char *) bdf;
+>
+> No space necessary after a cast. This is another one checkpatch.pl will
+> catch for you.
+>
+>   CHECK:SPACING: No space is necessary after a cast
+>   #81: FILE: tools/testing/selftests/vfio/lib/vfio_pci_device.c:338:
+>   +       char *arg =3D (char *) bdf;
+>
+Actually, I did run checkpatch.pl on the entire series as:
+.$ ./scripts/checkpatch.pl *.patch
 
-Stefano
+I didn't see any of these warnings. Are there any other options to consider=
+?
 
+> > +
+> > +     /*
+> > +      * If a vf_token exists, argument to VFIO_GROUP_GET_DEVICE_FD
+> > +      * will be in the form of the following example:
+> > +      * "0000:04:10.0 vf_token=3Dbd8d9d2b-5a5f-4f5a-a211-f591514ba1f3"
+> > +      */
+> > +     if (vf_token) {
+> > +             size_t sz =3D strlen(bdf) + strlen(" "VF_TOKEN_ARG) +
+> > +                         strlen(vf_token) + 1;
+> > +
+> > +             arg =3D calloc(1, sz);
+> > +             VFIO_ASSERT_NOT_NULL(arg);
+> > +
+> > +             snprintf(arg, sz, "%s %s%s", bdf, VF_TOKEN_ARG, vf_token)=
+;
+> > +     }
+>
+> UUIDs are 16 bytes so I think we could create a pretty reasonably fixed
+> size array to hold the argument and simplify this code, make it more
+> self-documenting, and eliminate VF_TOKEN_ARG. This is test code, so we
+> can make the array bigger in the future if we need to.  Keeping the code
+> simple is more important IMO.
+>
+> static void vfio_pci_container_get_device_fd(struct vfio_pci_device *devi=
+ce,
+>                                              const char *bdf,
+>                                              const char *vf_token)
+> {
+>         char arg[64];
+>
+>         if (vf_token)
+>                 snprintf(arg, ARRAY_SIZE(arg), "%s vf_token=3D%s", bdf, v=
+f_token);
+>         else
+>                 snprintf(arg, ARRAY_SIZE(arg), "%s", bdf);
+>
+>         device->fd =3D ioctl(device->group_fd, VFIO_GROUP_GET_DEVICE_FD, =
+arg);
+>         VFIO_ASSERT_GE(device->fd, 0);
+> }
+>
+Yeah, this is a good idea! I'll implement it in v2.
+
+> And to protect against writing off the end of arg, we can introduce a
+> snprintf_assert() in a separate commit. There are actually a few
+> snprintf() calls in vfio_pci_device.c that would be nice to convert to
+> snprintf_assert().
+>
+> #define snprintf_assert(_s, _size, _fmt, ...) do {                      \
+>         int __ret =3D snprintf(_s, _size, _fmt, ##__VA_ARGS__);          =
+ \
+>         VFIO_ASSERT_LT(__ret, _size);                                   \
+> } while (0)
+>
+> snprintf_assert() could be added in a precursor commit to this one.
+>
+Sounds good. I'll add a commit for this and convert all the
+snprintf()s to snprintf_assert()s.
+
+> > +static void vfio_device_bind_iommufd(int device_fd, int iommufd, const=
+ char *vf_token)
+> >  {
+> >       struct vfio_device_bind_iommufd args =3D {
+> >               .argsz =3D sizeof(args),
+> >               .iommufd =3D iommufd,
+> >       };
+> > +     uuid_t token_uuid =3D {0};
+> > +
+> > +     if (vf_token) {
+> > +             VFIO_ASSERT_EQ(uuid_parse(vf_token, token_uuid), 0);
+> > +             args.flags =3D VFIO_DEVICE_BIND_FLAG_TOKEN;
+>
+> Maybe make this |=3D instead of =3D ? I had to double-check that this was=
+n't
+> overwriting any flags set above this. Obviously it's not since this is a
+> small function, but |=3D would make that super obvious.
+Oh yes, absolutely!
+
+Thank you.
+Raghavendra
 
