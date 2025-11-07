@@ -1,183 +1,211 @@
-Return-Path: <kvm+bounces-62256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62257-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D031EC3E3A3
-	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 03:18:01 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DC5CC3E472
+	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 03:46:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 660F01889144
-	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 02:18:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 199D34EA974
+	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 02:46:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C122D876F;
-	Fri,  7 Nov 2025 02:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4C22F1FE6;
+	Fri,  7 Nov 2025 02:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d9v2D5Ss"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RSh1VrRk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCFB28D8F4
-	for <kvm@vger.kernel.org>; Fri,  7 Nov 2025 02:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B0AF9EC
+	for <kvm@vger.kernel.org>; Fri,  7 Nov 2025 02:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762481869; cv=none; b=AtqsIprQmFGadXxtUDrVYVndOWACe3q9WsSL0i4BaZe5YWpmHAEePIK04/8NeyGm/XN9EFx8IRYsUqjX/Pur/UeUiyr1nVkNmneyBjZFRDN4ljXyJ0u/GW73Xv0UojTTSnbp1Jq3RSsUfiUZBz2hMABgaMyv6SResTNr2VznZB8=
+	t=1762483576; cv=none; b=He60czt711QOdAQehlHmVfIu9S5LCZsxOX5mt4NewdykkMngBP0RpPFAsAO8gQo/g9ehIQUB/PrKEjGmyzeYP+60cKlK8bqjNGA/6qgVEbuMafJSb0atoQ6m2X2TQMJWGaK8kcUwnQlZaMER6Rbdok8TYCa5L/mOXYOxjXnUq/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762481869; c=relaxed/simple;
-	bh=n3gYr3RvsG4vHe7a+dCbLSQSRL9C74quEHXFc8TjktI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SJcDM7Y315Ixl9jXZeVUUZgNHRySDnUBrAa9nmXS3l2sAJURQkRg3VaaK4SlN78Pf/yFFCSKjVPTmyAKQYgRt4+unogE+9zhpCAPf21bANULMzoRb8YMAmkRa5zSU4ScNB4cjw2l/jK8WAr360EQIG2m5b5VhBwkHk9DL9PZIGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d9v2D5Ss; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-787c9f90eccso722097b3.3
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 18:17:47 -0800 (PST)
+	s=arc-20240116; t=1762483576; c=relaxed/simple;
+	bh=CN5K3yzDftChpk9iPHZj0k8ikaXMoctpj7lZgTmoTc0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F55y0ETwuPCHOaPXLlQIVfztTH5+rfDcgHuT7PyP85jX2339L94bQPMWhaF0P4BHtfpklPszXrK5pgFliOlIhkycJzoGA+denTrJlG5IaQ/+erP5bJUnxbaW4F/ZAMYv5x5IlDul+M/MoLbdJOW40bDY0Aj21BUUSD8JcAmjdic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RSh1VrRk; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ea12242d2eso97861cf.1
+        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 18:46:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762481867; x=1763086667; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f/qDZWpyxKihNvVQgiqCWAS1sqvTSoRcnWFm1GLCK/o=;
-        b=d9v2D5SsfeCeXVKsLIF6ukY/S5jDZtenVQczg0yRrNoCXSF0W+9lD4qyJy16KwTV7n
-         6anuKzewTjR5vHbYjW1YM9nwlFzsp85OFJg2FR/41t2WMcHb1M6eWJP2+JGDRRWd7Q9M
-         fXI6roy2jhsvLTljdK+csj6wmJax8h60YPR7nr9c28hfyImyTjMiYnk3quQbc43N3NZs
-         3V3ZIMd0aEJaNANavhjh1eIP6q+OYOa47Tr2KnIztIlMBsuC5G8RFWH+los1OOdPSnI/
-         OtdiW2LP55wy6MpyXKagWKxDIPc5slvOgr2xdXWpjqa+2OHB/iC7tHXw/+k7T5eNWGx3
-         OLGg==
+        d=google.com; s=20230601; t=1762483573; x=1763088373; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uNskrK7tJFFsUI2zJYFppzc5EdnT8JZKI21ow7cwyB8=;
+        b=RSh1VrRkRu9G+l6cdXQqUza24Sggi4Ps9NH8CoYdIz8IxNh/2whQfti/xH4CRbETlk
+         8j+m7IdliEZMbULVcbLBvomCQ8I7FYMS8f9iLhYdpofw43046Vo6uOCeRKw5qkvJ17eF
+         xz1d0lWhnXR8iV7U2cvUxZyyhk0we6l0foMUA3JqZRpvbF9+c7qD1KJ9BkKv438DGXMu
+         W1UTurIZlYiM0IKJj0NOjUV+YMfJ6m1PdPJ3FHJclSykeoJuV8+dzFtAqG6fpBY1cyYq
+         JnxJ3t/s5KTnL0tvlyJ1DuqB8sXaqGoIxl6HzhthNeEWkDGZNUin78aefgWRT3LsYak5
+         JWyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762481867; x=1763086667;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f/qDZWpyxKihNvVQgiqCWAS1sqvTSoRcnWFm1GLCK/o=;
-        b=s4YJ/GGreO8TKyBg1KyLXKLyHtj6gRn7Q/pQ3J1WHxmf++ltIuROiskN/U1tUr5b+N
-         GkkPY1CuWO7QYXBuPaJG/gAUW5/qewknY+HWHLtQycHHEEHXBOjloZqONZJI6dwaOwIq
-         4iNU4QtVrE5i1D5CCGSZ102g4jT0cLeKaAuPCXFqTMFtFAM1OZx2HCRCkmzdEY5ezuFr
-         mUOGBB2n09DfhEoEsFcZCjDrZcWjJlvOVxRAtMDqv3zvx8ByOaYuZGnQTJiwFUVv+/NG
-         J/3ovZRW3vF9KBFu7LDkHRFxmA1GiiA6x899LhvfmnUyMF4otDIlU5tS+Sz44vmzn2sQ
-         tNgA==
-X-Forwarded-Encrypted: i=1; AJvYcCX9kF06olhFqW4ksl9Rp7Iyz0XOJvrObu+tVU43yC44bGN63T6EUw5NN/tdNGQlfn+uu88=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxs3uwQAtuLeafP0wHEhrg7D9wIoiTY/NsymbdpdCSh2ncTkymp
-	ZpB03nmP9mSWqAyw6C2pBgZ8JNeJTcFhPASDqw+HPmpdOA2I4s22wpxy
-X-Gm-Gg: ASbGncvwMs1LsXxb3MBJAHkAB3Hqnf4lQQNxfzDP+vrdLa6hClHTKbOs3vLY8eqOa1n
-	D7SuvSWgfL46eh7bl1GKBBOlYe5dtaamnfs+sRX4cJMeT48uv8R2TTIz6+4Au6ThB7dtK8YHPa8
-	+P9t5v/6wVDC8c0PPpvayFuvMNYvveCg0xG53SwzdIJZZ2TrCedE2RwyuXV+/1pW+t0BS3vm2qF
-	Xme+4vWsab+2KHVihufec9azLOFOPabMS8+r7aMfGSEHTnGHlqKGVZly4ZH0Pz0T+8Uo4eWBUHU
-	6sSV5QSR1/a+fx2X/ko1EEkW4trdXue6HnY3MiPWnEBB4vy/cVVeav2puevrqWytTFGz61P6CpC
-	n3qs4aCBaqAwv0fZz76R8ckga+R88U6hHmdaojY3oQdQlK0PbqGTdcPyW6LybsCutAjo5D5zuhf
-	Ue57CTcxiF+U2Pt9jI1ZVLkjJzF+oBxCG+m5yl
-X-Google-Smtp-Source: AGHT+IFZ8bZR9p7ByW2qTZ7t1G8+dcC59pbrnej+Xjx5wnA7nuCjNt5Anuhhygsgcb+Dgcf4MRxUlQ==
-X-Received: by 2002:a05:690c:62c1:b0:786:6383:658b with SMTP id 00721157ae682-787c53e7b73mr13168407b3.46.1762481867107;
-        Thu, 06 Nov 2025 18:17:47 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:58::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-787b159b3cdsm13516547b3.33.2025.11.06.18.17.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 18:17:46 -0800 (PST)
-Date: Thu, 6 Nov 2025 18:17:45 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v8 05/14] vsock/loopback: add netns support
-Message-ID: <aQ1WyeN9VRy505si@devvm11784.nha0.facebook.com>
-References: <20251023-vsock-vmtest-v8-0-dea984d02bb0@meta.com>
- <20251023-vsock-vmtest-v8-5-dea984d02bb0@meta.com>
- <tuclqrdg5p2uzfvczhcdig7jlifvhqtlafe4xcqy4x4p3vrya6@jq5mujdluze5>
+        d=1e100.net; s=20230601; t=1762483573; x=1763088373;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uNskrK7tJFFsUI2zJYFppzc5EdnT8JZKI21ow7cwyB8=;
+        b=bRnIufZHd3JFqZnXJgesWQyUcLxY84Wl8/d3SziB9EW4/njiS6YbOm9emo7dvYJP6V
+         VluQ9WbaYVuWuNx5R9nnEQX7KkWIWV4Qly/FQXWtIObmeb5J+QnDpgFbQ0pZrFznOrJF
+         X23qalg85p1BcreeabH1t1uhBxHUSK1h9drn06+E4VDfjIBwldAeNXSmfKzX6Q5WUNy6
+         08yp8X8kIgRJp3PZV8jzz6WNtM7AChQFDw/lLKqD5bgaGwcvYSHjgSJ+xjqoVwe0Pa7s
+         O2+YW8UV39yvl5/Kc7x/HkywovDzwxl7yGBARtc2xHNiADTnG/ByFzGXUFya79sD/36/
+         0WKA==
+X-Forwarded-Encrypted: i=1; AJvYcCVeLeMdXaD3kCBXZp4bqa0nq+p7/lEK6NbYAkTbu3lG3MUFOAF1s+VCdnCoQY1thKgDMI4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yymw/fF7Bo7smHpYK/1IISNEf0Qqi2kvs3DSRVLwlM1Z9peu2eG
+	wfuYzssoN1oOjtFWrxBmxzOwZcZGVzKvgvg0+z+AQdjFSz8S8zLp0mIk2mkfQNzQtBlC9cjl6Sz
+	smogI6MZr2bSeNzhrM1Qb5ra45zyoNPPkcWUR2Jz0
+X-Gm-Gg: ASbGncuNPLjkuLCX+NNPhxWn9ReYLPHPnKuCX/kgxGXnko2HtShrp6mpEIcatb7cTgP
+	ttcK6nctq6QGq06jN4/Q1gtd4yzfxYci02rrV3Nr8mv+SSMNtNbGB8NaWrIwiPTR66HVkJVBRbG
+	SPcJC+Uwn1zKoX09xslCPoXm6a5NI65cvWonaEbnDk8cj6VDAvmNA7hOk3ODV5M+r9XdKY57aJh
+	HhV3nH9bqAmkZPBjZBS6imRV6BdM6MOfdgP0d1GSVjO3jA3vwuApv0Pgogs7rUyx/AbbGg=
+X-Google-Smtp-Source: AGHT+IEorFy/XQylN//cdx26SVjPxbveC2oreM7dnrKJ9wDt0WGW6CjtWa1f25tjWXKFtnzqz/Udq0wK7cTgvWyhDm0=
+X-Received: by 2002:a05:622a:14cb:b0:4b3:8ee:521b with SMTP id
+ d75a77b69052e-4ed955ca3ecmr2689741cf.0.1762483572542; Thu, 06 Nov 2025
+ 18:46:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tuclqrdg5p2uzfvczhcdig7jlifvhqtlafe4xcqy4x4p3vrya6@jq5mujdluze5>
+References: <20251104003536.3601931-1-rananta@google.com> <20251104003536.3601931-2-rananta@google.com>
+ <aQvjQDwU3f0crccT@google.com> <CAJHc60xb_=v9k46MEo=6S5QmMXKnd_1FiuWQr9dkCnE_XtTkfQ@mail.gmail.com>
+ <aQzYOjWPs0qsW4YR@google.com>
+In-Reply-To: <aQzYOjWPs0qsW4YR@google.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Fri, 7 Nov 2025 08:16:01 +0530
+X-Gm-Features: AWmQ_blJnQHSRhtNMwi529tokKmsZ3S89cLrOC2vc6Yi1GAzpBOsvHyg-TXYXtU
+Message-ID: <CAJHc60y0KA00KmcW09ft-O_oUwp=5Wr9nBpF8RtYytrQ2tFYaw@mail.gmail.com>
+Subject: Re: [PATCH 1/4] vfio: selftests: Add support for passing vf_token in
+ device init
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>, Alex Williamson <alex.williamson@redhat.com>, 
+	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 06, 2025 at 05:18:36PM +0100, Stefano Garzarella wrote:
-> On Thu, Oct 23, 2025 at 11:27:44AM -0700, Bobby Eshleman wrote:
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > Add NS support to vsock loopback. Sockets in a global mode netns
-> > communicate with each other, regardless of namespace. Sockets in a local
-> > mode netns may only communicate with other sockets within the same
-> > namespace.
-> > 
-> > Use pernet_ops to install a vsock_loopback for every namespace that is
-> > created (to be used if local mode is enabled).
-> > 
-> > Retroactively call init/exit on every namespace when the vsock_loopback
-> > module is loaded in order to initialize the per-ns device.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> > ---
-> 
-> I'm a bit confused, should we move this after the next patch that add
-> support of netns in the virtio common module?
-> 
-> Or this is a pre-requisite?
-> 
+On Thu, Nov 6, 2025 at 10:47=E2=80=AFPM David Matlack <dmatlack@google.com>=
+ wrote:
+>
+> On 2025-11-06 09:56 PM, Raghavendra Rao Ananta wrote:
+> > On Thu, Nov 6, 2025 at 5:22=E2=80=AFAM David Matlack <dmatlack@google.c=
+om> wrote:
+> > > On 2025-11-04 12:35 AM, Raghavendra Rao Ananta wrote:
+> > >
+> > > > -struct vfio_pci_device *vfio_pci_device_init(const char *bdf, cons=
+t char *iommu_mode);
+> > > > +struct vfio_pci_device *vfio_pci_device_init(const char *bdf,
+> > > > +                                           const char *iommu_mode,
+> > > > +                                           const char *vf_token);
+> > >
+> > > Vipin is also looking at adding an optional parameter to
+> > > vfio_pci_device_init():
+> > > https://lore.kernel.org/kvm/20251018000713.677779-20-vipinsh@google.c=
+om/
+> > >
+> > > I am wondering if we should support an options struct for such
+> > > parameters. e.g. something like this
+> > >
+> > > diff --git a/tools/testing/selftests/vfio/lib/include/vfio_util.h b/t=
+ools/testing/selftests/vfio/lib/include/vfio_util.h
+> > > index b01068d98fda..cee837fe561c 100644
+> > > --- a/tools/testing/selftests/vfio/lib/include/vfio_util.h
+> > > +++ b/tools/testing/selftests/vfio/lib/include/vfio_util.h
+> > > @@ -160,6 +160,10 @@ struct vfio_pci_driver {
+> > >         int msi;
+> > >  };
+> > >
+> > > +struct vfio_pci_device_options {
+> > > +       const char *vf_token;
+> > > +};
+> > > +
+> > >  struct vfio_pci_device {
+> > >         int fd;
+> > >
+> > > @@ -202,9 +206,18 @@ const char *vfio_pci_get_cdev_path(const char *b=
+df);
+> > >
+> > >  extern const char *default_iommu_mode;
+> > >
+> > > -struct vfio_pci_device *vfio_pci_device_init(const char *bdf,
+> > > -                                             const char *iommu_mode,
+> > > -                                             const char *vf_token);
+> > > +struct vfio_pci_device *__vfio_pci_device_init(const char *bdf,
+> > > +                                              const char *iommu_mode=
+,
+> > > +                                              const struct vfio_pci_=
+device_options *options);
+> > > +
+> > > +static inline struct vfio_pci_device *vfio_pci_device_init(const cha=
+r *bdf,
+> > > +                                                          const char=
+ *iommu_mode)
+> > > +{
+> > > +       static const struct vfio_pci_device_options default_options =
+=3D {};
+> > > +
+> > > +       return __vfio_pci_device_init(bdf, iommu_mode, &default_optio=
+ns);
+> > > +}
+> > > +
+> > >
+> > > This will avoid you having to update every test.
+> > >
+> > > You can create a helper function in vfio_pci_sriov_uapi_test.c to cal=
+l
+> > > __vfio_pci_device_init() and abstract away the options stuff from you=
+r
+> > > test.
+> > >
+> > I like the idea of an optional expandable struct. I'll implement this i=
+n v2.
+>
+> Just to make sure we're on the same page: I don't think you need to add
+> this in v2 since you don't need to call vfio_pci_device_init(). For the
+> inner functions that you want to call from your test, passing vf_token
+> directly makes more sense IMO. vfio_pci_device_init() will just pass in
+> NULL to those functions for vf_token by default.
+>
+> If/when we want to pass vf_token to vfio_pci_device_init() we can add
+> the options struct.
+>
+Yes, of course. I'll avoid it until we have a need.
 
-Yes let's do that, it does need common.
-
-[...]
-
-> > #endif /* __NET_NET_NAMESPACE_VSOCK_H */
-> > diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
-> > index a8f218f0c5a3..474083d4cfcb 100644
-> > --- a/net/vmw_vsock/vsock_loopback.c
-> > +++ b/net/vmw_vsock/vsock_loopback.c
-> > @@ -28,8 +28,16 @@ static u32 vsock_loopback_get_local_cid(void)
-> > 
-> > static int vsock_loopback_send_pkt(struct sk_buff *skb)
-> > {
-> > -	struct vsock_loopback *vsock = &the_vsock_loopback;
-> > +	struct vsock_loopback *vsock;
-> > 	int len = skb->len;
-> > +	struct net *net;
-> > +
-> > +	net = virtio_vsock_skb_net(skb);
-> > +
-> > +	if (virtio_vsock_skb_net_mode(skb) == VSOCK_NET_MODE_LOCAL)
-> > +		vsock = (struct vsock_loopback *)net->vsock.priv;
-> 
-> Is there some kind of refcount on the net?
-> What I mean is, are we sure this pointer is still valid? Could the net
-> disappear in the meantime?
-
-I only considered the case of net being removed, which I think is okay
-because user sockets take a net reference in sk_alloc(), and we can't
-reach this point after the sock is destroyed and the reference is
-released because the transport will be unassigned prior.
-
-But... I'm now realizing there is the case of
-virtio_transport_reset_no_sock() where skb net is null. I can't see why
-that wouldn't be possible for loopback?
-
-Let's handle that case to be sure...
-
-> 
-> The rest LGTM!
-> 
-> Thanks, Stefano
-> 
-
-Best,
-Bobby
+> > > No space necessary after a cast. This is another one checkpatch.pl wi=
+ll
+> > > catch for you.
+> > >
+> > >   CHECK:SPACING: No space is necessary after a cast
+> > >   #81: FILE: tools/testing/selftests/vfio/lib/vfio_pci_device.c:338:
+> > >   +       char *arg =3D (char *) bdf;
+> > >
+> > Actually, I did run checkpatch.pl on the entire series as:
+> > .$ ./scripts/checkpatch.pl *.patch
+> >
+> > I didn't see any of these warnings. Are there any other options to cons=
+ider?
+>
+> Ah, I run with a few additional options. That's probably why we are
+> seeing different output. Here's what I have in my .bashrc:
+>
+> function checkpatch() {
+>         scripts/checkpatch.pl \
+>                 -q \
+>                 --strict \
+>                 --codespell \
+>                 --no-signoff \
+>                 --show-types \
+>                 --ignore gerrit_change_id,FILE_PATH_CHANGES,NOT_UNIFIED_D=
+IFF \
+>                 --no-summary \
+>                 "$@"
+> }
+Thanks! I'll give this a shot!
 
