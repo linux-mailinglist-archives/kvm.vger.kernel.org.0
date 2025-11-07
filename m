@@ -1,190 +1,154 @@
-Return-Path: <kvm+bounces-62285-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62286-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7877BC3F9FF
-	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 12:04:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD81DC3FD22
+	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 12:53:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E63C71890DEF
-	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 11:04:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B6BA189315A
+	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 11:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C880C31DD98;
-	Fri,  7 Nov 2025 11:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D063B3043CD;
+	Fri,  7 Nov 2025 11:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="FT/csjbq"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="nZYPXGpB";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="3EZfkgsH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D2031A571
-	for <kvm@vger.kernel.org>; Fri,  7 Nov 2025 11:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF2521CFF6;
+	Fri,  7 Nov 2025 11:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762513443; cv=none; b=qmulm90PMaALTriD12YEUo/I/VfjaoxHRQW2ib2tkoiRPax1dRui5sVhnqAXrM+xNYJD3KZJQG0KubDf4QT1i2p+ga2Vt0NO6guJOLbavcyaR5fA3G91Vy2pG/nDEfLbJCt4Zuo/Y2qeWoDKW1vU2b73tkasjuzkugqhFIw6XeY=
+	t=1762516403; cv=none; b=byEIV1LV7G7tiQV4uoO0xDL81i3wt6SHBY2hzj726zNQ2zmkWoJibF1EeBMqZqGNq2X05UJt6/gioHuhPcuDESzqhj+SiopHSucKzG5SYgzL2hdv7kw62EfPlyucPlTDwtamBvRfsdBvqHBpwhemegRiOh8ThaRi+JA3Wuv+Ymg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762513443; c=relaxed/simple;
-	bh=N00Ucd856bSWhiBAjcJFbc+enaLUyVUPZnhock7gOjA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qeJmUAKUP6nkNEV8lWLguGfPi2RXPXXovanYaHKHMRl4EMm0IZtSBwXSofrIwSPt8hRiYZ5Mx3u3Im0038PhYDWofXyI1JZ8Ypep2oIqLEaW8+d5djiyac18CLty9ebB47kZMuUlY2vzu6OokCCwJQ+KruX4YBn1M/h9hNIW7aU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=FT/csjbq; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-9487e2b95f1so20963039f.2
-        for <kvm@vger.kernel.org>; Fri, 07 Nov 2025 03:04:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1762513440; x=1763118240; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L5VodCG3bTal5vrS9k2SlGtZ950F4z5chIAl+OKVPjk=;
-        b=FT/csjbqPjXHu4j+S/opnVm2SNJGIq2x0f+HOOKEisK2soNU19trNmGfnEOyyymdON
-         syXZ0NS+Z1BaEvgrTa3TDFzLOQJ/IeT7IMUwV4dTsHScPA9pKZwD5GwQRIdsBxtTMW5F
-         1lOzZwN5m4AEAtn7Ez9eHZ7vjQVZ/xbL3OUDyxEGFYof/Csy30wj5XE4Jh49iw5kyU51
-         yYiWpoAYUMO6016bfPRLrMJcr/DJuMObsaxtVKe12BoiwiYjWdEn3gC5VO5rxYaZoP5w
-         vKpfFvLowsNDgnD1dodlW+31apQ3uhk0zJrFxO5bDp5Xmr0o4vSTRruVIj1/OA9Kw0ru
-         xUkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762513440; x=1763118240;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=L5VodCG3bTal5vrS9k2SlGtZ950F4z5chIAl+OKVPjk=;
-        b=XEpgPhN+btd3KULa124x/zzAQ5q4G8IVtSzImxylAigPI27H0qfEp2Oz120evS5QSv
-         btCpVXz2KbZ6+KH1kaL7A3F/P4cuM0bOIyqoJM1vig6wI96lZuZzZCzYJzeO6QHYUI+m
-         b/pSGB3KE2pPCiwFLa0XvqDa+5DBi+lzh3eSsF8Uv3V3l2Dggb3O0TSaW9CV/0HBIlb6
-         S154pd+1Hbwq2khXJLY4/L7fXL2SgfCGz9BYg5V0IDLiW24cCSw5WG7fuhAoklpfNCIM
-         7Qh94f9G7TBlDmMn/sCbxKTg8PJmQD3erPtOpjjSp7KOr6m6ZEB6U+Cy/hCuwJOUPxs2
-         ZQ8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUjUHtStBcUyPA7xYxiXhIq0gwlztYmsw43djj956UDIFz0IfPjLOIaOykRYl0SBCoIG/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYgu5daecndFYgFJ/NERQPPcKrlQhuxy4XDOPLp+9uPYyL2Uyc
-	yvg+MLJF8qugEB1Mslfu+L9yobq955kxeCJMtMSQV6YE6TPPyjKZzEZBTwE4d9JOXIc6/rmJd8o
-	fUroejrbFhB0S22ujvZmXt7+3Tc5+DAZgfK+jxmADXszHfpqYSWGr
-X-Gm-Gg: ASbGnctXllvz0+U1aGR7BqwlD/P/zYs6zfGb5uUVWxUGfEw3lu/TEJsvV7hqfdWEdVd
-	G+U17nM+NYbZfjIn7FzgXIP7Ikz4d4KsGN1p2K3FD0fC4ogKnTGxc2Z+QBfjK+tHVKIQnDqUH5T
-	JXEvrtn9DC/MXLRs+rIJ4RbTshm4h1dkJ7AdjqGDFxKsRiQrKy/udYJXKSp+TCQIdZ/+Yc852gE
-	tLXU0yvy92eM5dHpI7CEdzo9+mMx3bxB88tKy7czYNXxB+zC4VPp+1dEDj+taV+1i3utjlv
-X-Google-Smtp-Source: AGHT+IEq9I1p8OP3yDbh00Mj9+qoqszlTYDSFXyp8DuqLQvxre/JkxTDPf1QjwQFRLpKChHb1al8+Tk6n1fWExeFbow=
-X-Received: by 2002:a05:6e02:3044:b0:433:258e:5a92 with SMTP id
- e9e14a558f8ab-4335f479c79mr44021005ab.32.1762513440480; Fri, 07 Nov 2025
- 03:04:00 -0800 (PST)
+	s=arc-20240116; t=1762516403; c=relaxed/simple;
+	bh=yQd1wP4dtJY3qwd3ZbTPi9Q/RA+YpkYHvKkoR396j6Q=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=WfhZaJUQx2WQyXvJSfnNHoq1RxbaLZ6+ZjVnZX5YBwnwnYjmEOKE8FMMGvBoxAZkKwF5XZow5ubjg4nIcQoRMSSgQ33SyqoMNcpYxqYX+f+bqaun+8pIZ7rzLQkfDRWK79urj/ixtk5rhY3qosads+XgxSzGCGfhuladNHjyiac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=nZYPXGpB; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=3EZfkgsH; arc=none smtp.client-ip=202.12.124.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id C72A91D0014F;
+	Fri,  7 Nov 2025 06:53:20 -0500 (EST)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-04.internal (MEProxy); Fri, 07 Nov 2025 06:53:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1762516400;
+	 x=1762602800; bh=gsS27V0zYbo8yJ9T1sSydfxjZObboVuI8REAIsMuIYA=; b=
+	nZYPXGpBqzTG8KfhVvOQDNoZLtc3+Vkdh228V8+pj56i/Qm2peUDrvCMygNC5KbD
+	JQ/uZ81AmSWUFzCcblz0vmfZSw/7BBT2RPJzzmUfLyYJll5SWnFxnjCphPEHh96w
+	8kMu0BSc+o0f2bkkxuvO03zeXRZcanoFzt4q1+pljkveIh+Wk0fC1x28Z6ZRG+pa
+	sb1zfC7EMu2wnDrC0J09vliAAwMC2bsc5E+9zE+OhA+whjz+BPe53f7zXfm/KRTJ
+	caQ3I+k6uh9GCnHcOWYy+sVxUdu326xn8UzCgmueWeeQwq89GcQB/USiNYN58tFm
+	T3iRh2Eskdm1UlbZY1nWgA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762516400; x=
+	1762602800; bh=gsS27V0zYbo8yJ9T1sSydfxjZObboVuI8REAIsMuIYA=; b=3
+	EZfkgsHEaT84CaUc+anzrmrs9QeECQIR5p2OM9fGvHT0fDs7/KV0zn3cAj3UZrXA
+	WbPpAoH7zv4+M46Ay0zcSAonKvQggGaqOfQm2REyqgKHpox4MRaJduvZoj6hQpoO
+	BSPz4Ou3eVBPo/glrhOU13Ac17xegnClsxl18KWBntOZSsDL8Eus2FVuvLfR3nGV
+	U6YdzRvqcfKN+c81TkF5lxy27ya6zva+5tawKd+Gc+jBuyZ8OcJegYxKE6AwqiPk
+	wBBVJMPn1toPs9XcG7OlAvBViVy7wac9P5a/oAtaHgT6ZSCVBCYX8r3QOHYQe9xe
+	1ZmHuZLgfSmvme1oYx19g==
+X-ME-Sender: <xms:r90NaabeM2LyeI1AQ57PK2DWvphAmwIpxUQJ9Q-iesNws4vF3sr9ug>
+    <xme:r90NaYPEtXoRPMsXCPgGKOcmSq54PKVMVfwmG3MdxA1wpNp3LhY_CjjmcXLxzmJrs
+    nxvK7buXeLbyz40hjEwrpUogYbe7Y-JGyrkdfUURAUJ1u1NohlUK9M>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeelheelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
+    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
+    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
+    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepvdefpdhmohguvgepshhmthhpohhu
+    thdprhgtphhtthhopegtrghtrghlihhnrdhmrghrihhnrghssegrrhhmrdgtohhmpdhrtg
+    hpthhtohepjhhovgihrdhgohhulhihsegrrhhmrdgtohhmpdhrtghpthhtohepkhgvvhhi
+    nhdrsghrohgushhkhiesrghrmhdrtghomhdprhgtphhtthhopehmrghrkhdrrhhuthhlrg
+    hnugesrghrmhdrtghomhdprhgtphhtthhopehmihhkohdrlhgvnhgtiigvfihskhhisegr
+    rhhmrdgtohhmpdhrtghpthhtohepshhuiihukhhirdhpohhulhhoshgvsegrrhhmrdgtoh
+    hmpdhrtghpthhtohephigvohhrvghumhdrhihunhesrghrmhdrtghomhdprhgtphhtthho
+    peihrghnghihihgtohhngheshhhishhilhhitghonhdrtghomhdprhgtphhtthhopeihuh
+    iivghnghhhuhhisehhuhgrfigvihdrtghomh
+X-ME-Proxy: <xmx:r90Naa08TY73QAwQ15r2x0tWjcVK6iZ1U2jLiQ7uTwmZg-I_ucnftQ>
+    <xmx:r90NaYFUvmKHKTbn2nih1V_hWSqX6ycF5ywAeCuxVGwNx4PaMDJP4w>
+    <xmx:r90NaZgzqp4uVDE1DBQqjb7wUkxkHU0lvUlcFwlUStCzeGKZG0IMTA>
+    <xmx:r90NaZeZO9h15HpmRuk8i_fm0tmCxIyyKoQJmtTN_XzDMsUkCPmSww>
+    <xmx:sN0NaXNoJ3py5k8GLIR5-D3o_QeFRMYc_o86Zo7ZZ5QpcIsnJ76i-TNA>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id A92BF700063; Fri,  7 Nov 2025 06:53:19 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251103062825.9084-1-dayss1224@gmail.com>
-In-Reply-To: <20251103062825.9084-1-dayss1224@gmail.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 7 Nov 2025 16:33:48 +0530
-X-Gm-Features: AWmQ_bktMTn5j_WJdcxCdJE6SpTHSxLvgVWZIkGAWguCXPvlqqDsCY8TuZP0sdM
-Message-ID: <CAAhSdy01XGT6psT+3EgHbgyyOhuXP63Zv1K2acvDZKD0LxxQ=w@mail.gmail.com>
-Subject: Re: [PATCH] KVM: riscv: Support enabling dirty log gradually in small chunks
-To: dayss1224@gmail.com
-Cc: ajones@ventanamicro.com, atishp@atishpatra.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, Quan Zhou <zhouquan@iscas.ac.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-ThreadId: AGYZwPnl2csF
+Date: Fri, 07 Nov 2025 12:52:38 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Yeoreum Yun" <yeoreum.yun@arm.com>,
+ "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
+ "Marc Zyngier" <maz@kernel.org>, "Mark Brown" <broonie@kernel.org>,
+ "Oliver Upton" <oliver.upton@linux.dev>, miko.lenczewski@arm.com,
+ "Kevin Brodsky" <kevin.brodsky@arm.com>, "Ard Biesheuvel" <ardb@kernel.org>,
+ "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+ "Lorenzo Pieralisi" <lpieralisi@kernel.org>, yangyicong@hisilicon.com,
+ scott@os.amperecomputing.com, "Joey Gouly" <joey.gouly@arm.com>,
+ "Zenghui Yu" <yuzenghui@huawei.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
+ shuah <shuah@kernel.org>, "Mark Rutland" <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Message-Id: <9fffb30d-fc9c-4e2e-94d2-c724e81ae3ac@app.fastmail.com>
+In-Reply-To: <20251106094023.1371246-10-yeoreum.yun@arm.com>
+References: <20251106094023.1371246-1-yeoreum.yun@arm.com>
+ <20251106094023.1371246-10-yeoreum.yun@arm.com>
+Subject: Re: [PATCH v11 9/9] arm64: armv8_deprecated: apply FEAT_LSUI for swpX
+ emulation.
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 3, 2025 at 11:58=E2=80=AFAM <dayss1224@gmail.com> wrote:
->
-> From: Dong Yang <dayss1224@gmail.com>
->
-> There is already support of enabling dirty log gradually in small chunks
-> for x86 in commit 3c9bd4006bfc ("KVM: x86: enable dirty log gradually in
-> small chunks") and c862626 ("KVM: arm64: Support enabling dirty log
-> gradually in small chunks"). This adds support for riscv.
->
-> x86 and arm64 writes protect both huge pages and normal pages now, so
-> riscv protect also protects both huge pages and normal pages.
->
-> On a nested virtualization setup (RISC-V KVM running inside a QEMU VM
-> on an [Intel=C2=AE Core=E2=84=A2 i5-12500H] host), I did some tests with =
-a 2G Linux
-> VM using different backing page sizes. The time taken for
-> memory_global_dirty_log_start in the L2 QEMU is listed below:
->
-> Page Size      Before    After Optimization
->   4K            4490.23ms         31.94ms
->   2M             48.97ms          45.46ms
->   1G             28.40ms          30.93ms
->
-> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
-> Signed-off-by: Dong Yang <dayss1224@gmail.com>
+On Thu, Nov 6, 2025, at 10:40, Yeoreum Yun wrote:
+> apply FEAT_LSUI instruction to emulate deprecated swpX instruction.
 
-LGTM.
+Can you explain in the changrelog why you do this?
 
-Reviewed-by: Anup Patel <anup@brainfault.org>
+In particular, is this a performance optimization or is this required
+for correctness in some scenario?
 
-Queued this patch for Linux-6.19
+I would have expected that there is very little benefit in
+changing the swp/swpb emulation here if the existing code
+has to remain compiled into the kernel and the overhead of
+the trap is so much larger than the uaccess_enable_privileged()
+overhead.
 
-Thanks,
-Anup
-
-
-> ---
->  Documentation/virt/kvm/api.rst    | 2 +-
->  arch/riscv/include/asm/kvm_host.h | 3 +++
->  arch/riscv/kvm/mmu.c              | 5 ++++-
->  3 files changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> index 57061fa29e6a..3b621c3ae67c 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8028,7 +8028,7 @@ will be initialized to 1 when created.  This also i=
-mproves performance because
->  dirty logging can be enabled gradually in small chunks on the first call
->  to KVM_CLEAR_DIRTY_LOG.  KVM_DIRTY_LOG_INITIALLY_SET depends on
->  KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE (it is also only available on
-> -x86 and arm64 for now).
-> +x86, arm64 and riscv for now).
->
->  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 was previously available under the nam=
-e
->  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT, but the implementation had bugs that m=
-ake
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
-vm_host.h
-> index 4d794573e3db..848b63f87001 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -59,6 +59,9 @@
->                                          BIT(IRQ_VS_TIMER) | \
->                                          BIT(IRQ_VS_EXT))
->
-> +#define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE=
- | \
-> +       KVM_DIRTY_LOG_INITIALLY_SET)
+> +		curval.var = newval.var = oldval;
+> +		newval.raw[idx] = *data;
 > +
->  struct kvm_vm_stat {
->         struct kvm_vm_stat_generic generic;
->  };
-> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> index 525fb5a330c0..a194eee256d8 100644
-> --- a/arch/riscv/kvm/mmu.c
-> +++ b/arch/riscv/kvm/mmu.c
-> @@ -161,8 +161,11 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->          * allocated dirty_bitmap[], dirty pages will be tracked while
->          * the memory slot is write protected.
->          */
-> -       if (change !=3D KVM_MR_DELETE && new->flags & KVM_MEM_LOG_DIRTY_P=
-AGES)
-> +       if (change !=3D KVM_MR_DELETE && new->flags & KVM_MEM_LOG_DIRTY_P=
-AGES) {
-> +               if (kvm_dirty_log_manual_protect_and_init_set(kvm))
-> +                       return;
->                 mmu_wp_memory_region(kvm, new->id);
-> +       }
->  }
->
->  int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> --
-> 2.34.1
->
+> +		asm volatile("// __lsui_user_swpb_asm\n"
+> +		__LSUI_PREAMBLE
+> +		"1: cast	%x2, %x3, %1\n"
+> +		"2:\n"
+> +		_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
+> +		: "+r" (err), "+Q" (*addr_al), "+r" (curval.var)
+> +		: "r" (newval.var)
+> +		: "memory");
+
+I see that you fixed the race now. I had written an email about
+it earlier when I saw the same mistake you found as well, but
+it got stuck in my drafts folder. The new version looks correct
+to me, I'm just not sure we need the added complexity.
+
+     Arnd
 
