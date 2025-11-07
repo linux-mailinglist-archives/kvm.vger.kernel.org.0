@@ -1,176 +1,173 @@
-Return-Path: <kvm+bounces-62355-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62356-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5792FC41809
-	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 21:04:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDD3BC418AB
+	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 21:12:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A8E942210E
-	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 20:04:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 422981882D0C
+	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 20:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71372E0B47;
-	Fri,  7 Nov 2025 20:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4CA9309EF5;
+	Fri,  7 Nov 2025 20:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="H39ZqBg6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R4N0PRgx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D882957B6;
-	Fri,  7 Nov 2025 20:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BF4309DA0
+	for <kvm@vger.kernel.org>; Fri,  7 Nov 2025 20:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762545860; cv=none; b=OatwBxvFlUwgbdmYs+U+1WBrwXoTRd4TUuyWZ3UNsnjKRolymqA0OQKpdfK7C4wDGhNOAjFibcGslZ2s8SjIB9khUM/FW49jmpzOnWclxAeu3I5KuABPZd3SEqLP0wovzGdchNt730qjBFSkuIT/v9WVJrYLMiaphntxuPji9QE=
+	t=1762546319; cv=none; b=IKo2jgoFH6U/swd/OqMgtA7RnhBFTHsZsZEH+st2nXraG7Y832tZ5n939aIgfRGkKYoDbJdQohVZtmLMwLjqwE61zSBxTLB4OIj5iDpbqxE8X+ZgQKmLXSlLjs2nEB8CvcaAxhRw92lVMm0MdJWkkFSeSG2ue5pAHu20K13WssA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762545860; c=relaxed/simple;
-	bh=OnBpoAqeH6gMRGM+S3RxuTIZcip+Pqgz3dyqnSZG+VM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Tpf9vtegdaQ7bXyT2v2n7/wU/JYXn6a4zcFiUP5sWEWGNZpxMosDgpNxDyUXt4iQaIq2R1yRMPYgv3EH7AcayYinrZbbJCLyxATsy538ApeQyEd0/zBl5AC/Yga3ejVgDIr0lShVHIOeUNa0Xe1GeBvSQ54UHfA9qEshqe/WlYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=H39ZqBg6; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A7HNkEL024261;
-	Fri, 7 Nov 2025 20:03:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=2eGLYm
-	e5VwHp+AJZ/CpMtGPReJuK3FwyynF7wHhYkvA=; b=H39ZqBg6ELRsBI8IqrWREp
-	rhjL78rKsc96eOnL+X5Cy2rr1ljlpPFGcKy8nLRx/mcTHG0vrAXUO52e/Lha6zSk
-	5FIvQoiTzXmy4DhsWEKCjb+EjadjqYG/3mbmWJU35Rc/X+P8HaeEt+G7kHqh76RS
-	f63pbxQTgZUPyeIVYtUltuWwbhKaqbyl0Nm1mcn+wlQsrj4nzpgfG4ic86WIZpvf
-	WNJdtDrlWEQpVD58ESxjxMl6tVOzYnIYYzYfpVn0kmLwcOMPmTa7nZ3az3W2hV99
-	B7dcHjR0UD4TVMutSYrtVjIFbQ3y9cRqPxr4G8rfDosq2TyWgJcys2AyOvUBbxLw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a9n4egp43-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Nov 2025 20:03:57 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5A7K3vMY021721;
-	Fri, 7 Nov 2025 20:03:57 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a9n4egp3v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Nov 2025 20:03:57 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A7JIojI012861;
-	Fri, 7 Nov 2025 20:03:56 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a5y82cbg0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Nov 2025 20:03:56 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5A7K3sHQ27853452
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 7 Nov 2025 20:03:54 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5A43D58059;
-	Fri,  7 Nov 2025 20:03:54 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 841DB5805E;
-	Fri,  7 Nov 2025 20:03:50 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.62.231])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  7 Nov 2025 20:03:50 +0000 (GMT)
-Message-ID: <8cfa84e31a275db3d85431e18836a5ed921f1cfd.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 18/22] vfio/ccw: Convert to get_region_info_caps
-From: Eric Farman <farman@linux.ibm.com>
-To: Jason Gunthorpe <jgg@nvidia.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        David Airlie <airlied@gmail.com>,
-        Alex
- Williamson <alex.williamson@redhat.com>,
-        Ankit Agrawal	
- <ankita@nvidia.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Brett Creeley <brett.creeley@amd.com>, dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Giovanni Cabiddu
- <giovanni.cabiddu@intel.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Heiko
- Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        Jani Nikula
- <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen
- <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede
- <kwankhede@nvidia.com>,
-        linux-s390@vger.kernel.org, Longfang Liu
- <liulongfang@huawei.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Nikhil
- Agarwal <nikhil.agarwal@amd.com>,
-        Nipun Gupta	 <nipun.gupta@amd.com>,
-        Peter
- Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic	 <pasic@linux.ibm.com>, qat-linux@intel.com,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Simona Vetter
- <simona@ffwll.ch>,
-        Shameer Kolothum <skolothumtho@nvidia.com>,
-        Sven
- Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tursulin@ursulin.net>, virtualization@lists.linux.dev,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw.linux@gmail.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>
-Cc: Kevin Tian <kevin.tian@intel.com>, patches@lists.linux.dev,
-        Pranjal
- Shrivastava <praan@google.com>,
-        Mostafa Saleh <smostafa@google.com>
-Date: Fri, 07 Nov 2025 15:03:49 -0500
-In-Reply-To: <18-v2-2a9e24d62f1b+e10a-vfio_get_region_info_op_jgg@nvidia.com>
-References: <18-v2-2a9e24d62f1b+e10a-vfio_get_region_info_op_jgg@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	s=arc-20240116; t=1762546319; c=relaxed/simple;
+	bh=vu3UIZNsXZvEn3912xlHp6GrYHgg+le6ZZDu3A8AtYY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Bel/FftQ5rzedc4JKg3YEIhJA9OVXiZFbR1ifcU/n8tFcIei8cqqlakCRfiO1mWQDIlFRWijy5YAIKaH9HAK5JpRgjNi6PFBiD3RxdRxcqLMzVyKfsRJffM/YV1EyDbr2tkQ1pVHzOEnJjDVQ5WyQYaV2K03N3r2W6K9OnUSMf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R4N0PRgx; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b5533921eb2so996363a12.0
+        for <kvm@vger.kernel.org>; Fri, 07 Nov 2025 12:11:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762546317; x=1763151117; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=F64yYD+PzY/BVLq3NntjbsV9dJABC475STBHx/m6gwA=;
+        b=R4N0PRgxuNAETJ2N72yFsoapiPo2d3hHlJ9txTO5N/vqidzbU0YBLFZJRzsFV3c+VR
+         tODkdvr7pTqk4oWuotOUm2h+p83svsr9fesEA8FIbbTxygQtZNhmezpAsBH0jCRxEKKj
+         +u4yRh7nnMNmAC8rRc7/VuPlwp22GMYFEpUXIIeQ8PBmjRR+s+6n9I2fS40nUmLUaTow
+         JI+DHdWhYkjc0QoubgNAijL0AYARkO2zEGFhn6jWitkdL6QKSj92mjRIxujaMUrfP0yV
+         4WoW0IlNt8JPaMawuc6tNNd5YymNK7p7TE3HHI5FjYGGpGH4zKFc3NksVxsAkgfvaj4Q
+         FtUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762546317; x=1763151117;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=F64yYD+PzY/BVLq3NntjbsV9dJABC475STBHx/m6gwA=;
+        b=C7X+h/OYH3jQ5tPhljzzPG+d7MpaOsdu213cSiQxHZ1tV1OvVfaWJlSMrzXI9smEMB
+         s/mp2dk+eXCMwE7ipc0vnp1r4kYZMHMiLn8ekSTwH+BEygTZaJUwOHwzjomAWjpRc8Rb
+         vMMNbwEa231Qq49BX8gn1TW+9YiV8i0thXjBpyoqENVSYx9j15+KDC9nmUp7Z/ooXD25
+         AFwZBnuHQySPw71DVUqzQmYiHE2kJnN6oLopAV6/4U+01GQT6kcCvgA4RpwoS+oRUwQy
+         SWxYNoJVT/Z7WrudOjiHY4vLxgN4bWKqlNkavxr2RBcXKJ9g4u5WkEOm/ByJCNAZOSxb
+         gozA==
+X-Forwarded-Encrypted: i=1; AJvYcCWbL6CdWmNRyR56FSydQTWsNAyGb3ZtAJ3d5IFFjJf/sQYzOnCqaYVW9TepimDLc6FPkPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgM6BQqd1uwkPSKVV2i+PQWjRWX7XjJ4mp3QLue+u8LY43no3c
+	Oar7XdxNe0ew3FDJ2yjpBivPIpcJI3way8FPpKHiVoymOCadB7V6exe1xCF7dXbvF+87zME6+ug
+	BvQZoV7iTId3EOw==
+X-Google-Smtp-Source: AGHT+IG+rJfutR0wYR1zy21ifkRKt01C06Fx3nGIjNOzYgpEnaw3ubx5f+RPFOnj2GZZ9rNeePM/4rP4Y1bnHQ==
+X-Received: from pjbfy18.prod.google.com ([2002:a17:90b:212:b0:343:6935:a83e])
+ (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:28cd:b0:340:ec6f:5ac5 with SMTP id 98e67ed59e1d1-3436cb73b5dmr376689a91.2.1762546317587;
+ Fri, 07 Nov 2025 12:11:57 -0800 (PST)
+Date: Fri,  7 Nov 2025 12:11:23 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=fdWgCkQF c=1 sm=1 tr=0 ts=690e50ae cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=QyXUC8HyAAAA:8 a=Ikd4Dj_1AAAA:8 a=VnNF1IyMAAAA:8 a=U2-HQc-8H8NLPWOta0UA:9
- a=NqO74GWdXPXpGKcKHaDJD/ajO6k=:19 a=QEXdDO2ut3YA:10 a=nl4s5V0KI7Kw-pW0DWrs:22
- a=pHzHmUro8NiASowvMSCR:22 a=xoEH_sTeL_Rfw54TyV31:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDE0MyBTYWx0ZWRfX0Ed6DsP/EZpl
- R6JNco0yAlxO/SwHuhy/AjpJC4v10LGM9p9nyzzdUQU5j4P+m2gpIt8WRq5EkfPQi4qaUD6t2mb
- yOYGARGXYv1qbCcNBzEV8tQKHLI2XVtjuxmjCfvXZUDMEx2MEIXrEkLafWB0w+xu7fJS2haJjoQ
- 1kqlZ9BiceN43foEgbtTh7CuM9XJr1EkxP7tiyMkMGQgRpEh8EtnFIL2QmzDNxkfO/26/8TLqRr
- tYeA6tMDk12aEbnr435o8Jy7trcOgbPIwUr1zZBmuZ8OlhIALt44KXpkjEpA2HsUu2AIZccXwxu
- 4LNZur2JEcuUyxPbc5uIKJPoGccBQ61NZogNRn12XCXpfmOwJbNhxRTQTjxM55BxIJrVNx6DzTz
- 781V0hJCcLUEzrQpiS0GQ1q9v5odWw==
-X-Proofpoint-GUID: E27P93uknM2eSl9_5brOvfeQ8jl7TC6I
-X-Proofpoint-ORIG-GUID: _2DmvAYtew7Y7XdQl82VWE9yY_26JjyR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-07_06,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0
- spamscore=0 clxscore=1011 phishscore=0 suspectscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511070143
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
+Message-ID: <20251107201151.3303170-1-jmattson@google.com>
+Subject: [RFC PATCH 0/6] KVM: x86: nSVM: Improve virtualization of VMCB12 G_PAT
+From: Jim Mattson <jmattson@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Alexander Graf <agraf@suse.de>, Joerg Roedel <joro@8bytes.org>, 
+	Avi Kivity <avi@redhat.com>, 
+	"=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=" <rkrcmar@redhat.com>, David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Cc: Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 2025-11-07 at 13:41 -0400, Jason Gunthorpe wrote:
-> Remove the duplicate code and flatten the call chain.
->=20
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/s390/cio/vfio_ccw_ops.c | 55 +++++----------------------------
->  1 file changed, 7 insertions(+), 48 deletions(-)
+There are several problems with KVM's virtualization of the G_PAT
+field when nested paging is enabled in VMCB12.
 
-Nice.
+* The VMCB12 G_PAT field is not checked for validity when emulating
+  VMRUN.  (APM volume 2, section 15.25.4: Nested Paging and
+  VMRUN/#VMEXIT)
 
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
+* RDMSR(PAT) and WRMSR(PAT) from L2 access L1's PAT MSR rather than
+  L2's Guest PAT register. (APM volume 2, section 15.25.2: Replicated
+  State)
+
+* The L2 Guest PAT register is not written back to VMCB12 on #VMEXIT
+  from L2 to L1. (APM volume 3, Section 4: "VMRUN")
+
+* The value of L2's Guest PAT register is not serialized for
+  save/restore when a checkpoint is taken while L2 is active.
+
+Commit 4995a3685f1b ("KVM: SVM: Use a separate vmcb for the nested L2
+guest") left this comment in nested_vmcb02_compute_g_pat():
+
+      /* FIXME: merge g_pat from vmcb01 and vmcb12.  */
+
+This comment makes no sense. It is true that there are now three
+different PATs to consider: L2's PAT for guest page tables, L1's PAT
+for the nested page tables mapping L2 guest physical addresses to L1
+guest physical addresses, and L0's PAT for the nested page tables
+mapping L1 guest physical addresses to host physical
+addresses. However, if there is any "merging" to be done, it would
+involve the latter two, and would happen during shadow nested page
+table construction. (For the record, I don't think "merging" the two
+nested page table PATs is feasible.) In any case, the VMCB12 G_PAT
+should be copied unmodified into VMCB02.
+
+Maybe the rest of the current implementation is a consistent quirk
+based on the existing nested_vmcb02_compute_g_pat() code that bypasses
+L1's request in VMCB12 and copies L1's PAT MSR into vmcb02
+instead. However, an L1 hypervisor that does not intercept accesses to
+the PAT MSR would legitimately be surprised to find that its L2 guest
+can modify the hypervisor's own PAT!
+
+The commits in this series are in an awkward order, because I didn't
+want to change nested_vmcb02_compute_g_pat() until I had removed the
+call site from svm_set_msr().
+
+The first two commits should arguably be one, but I tried to deal with
+the serialization issue separately from the RDMSR/WRMSR issue, despite
+the two being intertwined.
+
+I don't like the ugliness of KVM_GET_MSRS saving the L2 Guest PAT
+register during a checkpoint, but KVM_SET_MSRS restoring the
+architectural PAT MSR on restore (because when KVM_SET_MSRS is called,
+L2 is not active). The APM section on replicated state offers a
+possible out:
+
+  While nested paging is enabled, all (guest) references to the state
+  of the paging registers by x86 code (MOV to/from CRn, etc.) read and
+  write the guest copy of the registers
+
+If we consider KVM_{GET,SET}_MSRS not to be "guest" references, we
+could always access the architected PAT MSR from userspace, and we
+could grab 64 bits from the SVM nested state header to serialize L2's
+G_PAT. In some ways, that seems cleaner, but it does mean that
+KVM_{GET,SET}_MSR will access L1's PAT, which is irrelevant while L2
+is active.
+
+Hence, I am posting this series as an RFC.
+
+Jim Mattson (6):
+  KVM: x86: nSVM: Shuffle guest PAT and PAT MSR in
+    svm_set_nested_state()
+  KVM: x86: nSVM: Redirect PAT MSR accesses to gPAT when NPT is enabled
+    in vmcb12
+  KVM: x86: nSVM: Copy current vmcb02 g_pat to vmcb12 g_pat on #VMEXIT
+  KVM: x86: nSVM: Cache g_pat in vmcb_ctrl_area_cached
+  KVM: x86: nSVM: Add validity check for the VMCB12 g_pat
+  KVM: x86: nSVM: Use cached VMCB12 g_pat in VMCB02 when using NPT
+
+ arch/x86/include/uapi/asm/kvm.h |  2 ++
+ arch/x86/kvm/svm/nested.c       | 35 +++++++++++++++++++++++++++++++--
+ arch/x86/kvm/svm/svm.c          | 25 +++++++++++++++--------
+ arch/x86/kvm/svm/svm.h          |  1 +
+ 4 files changed, 53 insertions(+), 10 deletions(-)
+
+-- 
+2.51.2.1041.gc1ab5b90ca-goog
+
 
