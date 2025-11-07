@@ -1,156 +1,300 @@
-Return-Path: <kvm+bounces-62296-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62297-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C49D0C408CB
-	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 16:10:43 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3842C40972
+	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 16:29:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D1CD04EC7AC
-	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 15:10:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 79F9D34D9DD
+	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 15:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 281F832B9AE;
-	Fri,  7 Nov 2025 15:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F91732D0DC;
+	Fri,  7 Nov 2025 15:29:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vb3qAgMG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3882D0C6C
-	for <kvm@vger.kernel.org>; Fri,  7 Nov 2025 15:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DCF32ABE1
+	for <kvm@vger.kernel.org>; Fri,  7 Nov 2025 15:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762528231; cv=none; b=ISkBuS72f1tP8aXCduwt4QWIDWUZNxHM6nGKMnJ9s8NikLqek7BETUXKFuo/YhPsYz+yAkUQvoHWIAx0Xnge/oHM9DqMfFDwKSaxA3l3RMB6L76PbTUbffAD3WIoEyS0U0hTHqHmtpLybc2yYh7X01nwQZYq2E/e6Qu42o8sT6Y=
+	t=1762529380; cv=none; b=oezP7jLjD0AWufp7mhtYQdP0VgjAPOGZvxPfP3A+0tzMe+mhK6K8UJfM7f7KLLN4KwgH8kYB3xeQlctjBqag3BBbbj21tfYzwQKPqbNS2wLO6TIyDgLSCJc8cYkkdOWEemqd7a08omU9T6ONLHDusr6wBo7veeTEMYVOEZ4PHCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762528231; c=relaxed/simple;
-	bh=imYJgJK3yE89xgNM6WG9I3e7kgFWg66OAp278Y3nsw8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=H617OAXr3rl+/AK9N+eehcHm3E5aDQVv4w2z6zWXhDUPJNWjVKLsOShzJ2jAiFNp4DwCJeudgh5OqVPnH6DezXJ/np7NUvTs6lZYvgO7qFnUjrVEVZPOgwvgBLaCG3oJ/y3+asJAepLxRUaoz9Yj10M+HvkPAS7+Dy9SV8WnK9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-433316b78f4so9637295ab.3
-        for <kvm@vger.kernel.org>; Fri, 07 Nov 2025 07:10:29 -0800 (PST)
+	s=arc-20240116; t=1762529380; c=relaxed/simple;
+	bh=+ilurqvnGnbEEZ7W3D5HzrDcpmhkK5oAxtaDG3U4ixI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=vChQRnDvjsesnhAxejRHDoAiCIJiBxvndr3DUL8zKV7opVvM4jL0+N17BmZsmFA15S7KRc6TQiQh5x6vgR6D6cRAdQqSk2vh6NXju8x2bU31a1tZAMPNUsQ5AJz1rKpWFCuDEG8NdYKaU2nO4HJkVEN6Md0GozhYvmVU7QzxoCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vb3qAgMG; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7aac981b333so911451b3a.2
+        for <kvm@vger.kernel.org>; Fri, 07 Nov 2025 07:29:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762529378; x=1763134178; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1NCtP8IGmv+Pw2m+0QbiCX0FT/X+Jg+0AV+Nk5shH04=;
+        b=vb3qAgMGKI26wL0NSNHi2fuOYhVNChgeoErGKgFw1cL1G7EdFfeLhEMU65Wyfop5f4
+         TG0TTvwDcWEvd5p9drEHVW60VTT0RZLpi6aaZk2RmLWVP+BHNmeQyqtxl7WkWflHX60W
+         XYuSK5ox1igH1GgGsEslAo4c10FuKD9v/LE1F0iKDQ56C3MQizHAENRlPa5/5gJBK8XF
+         LWlZm2EEFQp4do8pF7atdyxIhX4uelBYw2SvgDVMGd9i5O0LidjDADK9vVttJXgtN/nu
+         Slav8ia3PzkFdeGG6cz2Us8yCRITw4YCMIr/i0WMQwnC+48S5u58U4N9FSDA9O1f/BlX
+         jIbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762528228; x=1763133028;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=T1tqpolWM4ITEU43y70omU9y9wXcif44mofTVyALHkg=;
-        b=fK1VlDfT5fMXjuG0mIR1xbDQsUCxeedYZEyl6wzkS+A84s4Gru0TesVdoqpXUjSfwT
-         hcCDCsbAsi2r3Gc0UfHWxYFRGZ9Ey8zEjyejLmgg+PEMm5UAaq7mh5/Z3/vgMERKprdO
-         jq/yAJA28YEbcURaDb/0rqiraCjT1MVehygrOvhLWPpBWUJRl+JAjVwE5ZX3LlKS9WYg
-         JOx+rhbMhAQpE7yh+dtVKtKQjRk+OaILlvkWEExTZ7sGaTCvSq6r640z+Y+hk9L5mpm7
-         9cJlAS7AFLZ1ZLylJyvRUSSffgtKao27DhQ4MU9rDXW8182pMpR+7FtVl1JwoHX2HU5I
-         YAkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUs2CQuqLe2LRSi2Kz0HkU3OxGVSEVx+sB2lmLYuW5snWu8nX+AgSKvygCUFv5D9WqpJt8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXkzHikVN8GUTCf4i0DrV1V2n7MZF1pjHDNsovcltB908h/U0u
-	dyt2DF1k/70WGc4SqU4ztRvCTKRNxf5N8p1spQo/IsgBHQxJcsUbDC385rzfT0iF0dBOT+zo7oG
-	y0mcV7SrYwzlaCyv/oUA8wyp3MQ8e+y6MvX0S2hLoeEaEqMsquP85hJCCiI4=
-X-Google-Smtp-Source: AGHT+IGh26snMwvSnJmWwk3UfazZc7x9P3W22C3UgXg6p9/OcfnQ7Bp05FUYnQ2HQw7DGG+0g1vmjX82zZRCjJZqR+k1l87kYehD
+        d=1e100.net; s=20230601; t=1762529378; x=1763134178;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1NCtP8IGmv+Pw2m+0QbiCX0FT/X+Jg+0AV+Nk5shH04=;
+        b=s5if3q3RLYc0w1sH2OLRP9Q7yVHRWuMjk0/lLoKtqlBnf53DvZR+nPXTIVDwkxxhLQ
+         v61fc912dOq/WkzgXS3FdeqX5e9qygSwt1q1Sikd9vF/H6lrIxheo9AJNqeRAoOh/W0F
+         3/U6jHengkl9+i+MIFEkqIeYs5F6qDSjQBigRSyjZUiWcdAcwtuKri3jy+3bqLbwdGRC
+         59K+3wj69ND07n9pkzXcbfFfRs0FB7MxDH96sZW9SoRJQVvuNmaV59D8nRgt3tS0oeK7
+         4etiNlqn2Fy/4MPQJsjFhJcy+R5kQTTDvjdPOT0splF/oPwJdTjK0OmuFLCO+KWey22V
+         FA9g==
+X-Forwarded-Encrypted: i=1; AJvYcCWv2YJ/XdzFzwQIxoMdTbXP8kS5AE3UgumzrKfpk2MK9XbwBNQtjIuWTolPP0VoaQEKPiM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdonVjv2aF7i3E6Yih3i49hpwtYSx7HiP/Ft+3gv34Qf1TSyF1
+	0aqjHXdF5gBihZKPdqi+/dfmAMLEBLbeJpzpKzJWRVdhAzFbJEG8x9m+A7GVZOK6h3ihVbeAUWR
+	SvdtiVGktxxl4pAv6D4BvkoToOQ==
+X-Google-Smtp-Source: AGHT+IFdBm9PWDkj6mr4favewOwyFDia/jMLQ8Mc88gwVWiHhbOXmm65FevtICCyCLCB04h8IaDFB/VQj/QABmFYNg==
+X-Received: from pfoo25.prod.google.com ([2002:a05:6a00:1a19:b0:7b0:c46:4c56])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:3cd1:b0:7ab:6fdb:1d1f with SMTP id d2e1a72fcca58-7b0bdf66564mr4826942b3a.29.1762529377589;
+ Fri, 07 Nov 2025 07:29:37 -0800 (PST)
+Date: Fri, 07 Nov 2025 07:29:35 -0800
+In-Reply-To: <d25340e3-2017-4614-a472-c5c7244c7ce4@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2304:b0:433:2aad:9869 with SMTP id
- e9e14a558f8ab-4335f4d7fcdmr52527915ab.30.1762528228583; Fri, 07 Nov 2025
- 07:10:28 -0800 (PST)
-Date: Fri, 07 Nov 2025 07:10:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <690e0be4.a70a0220.22f260.0050.GAE@google.com>
-Subject: [syzbot] [kvm-x86?] WARNING in kvm_arch_can_dequeue_async_page_present
-From: syzbot <syzbot+6bea72f0c8acbde47c55@syzkaller.appspotmail.com>
-To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
-	pbonzini@redhat.com, seanjc@google.com, syzkaller-bugs@googlegroups.com, 
-	tglx@linutronix.de, x86@kernel.org
+Mime-Version: 1.0
+References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
+ <20250924152214.7292-1-roypat@amazon.co.uk> <20250924152214.7292-3-roypat@amazon.co.uk>
+ <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com> <c1875a54-0c87-450f-9370-29e7ec4fea3d@redhat.com>
+ <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com> <c79173d8-6f18-40fa-9621-e691990501e4@redhat.com>
+ <c88514c3-e15f-4853-8acf-15e7b4b979f4@linux.dev> <aNZwmPFAxm_HRYpC@willie-the-truck>
+ <5d11b5f7-3208-4ea8-bbff-f535cf62d576@redhat.com> <be89abc6-97ca-47d8-b8e7-95f58ab9cc67@linux.dev>
+ <f13e06f3-3c7b-4993-b33a-a6921c14231b@redhat.com> <d25340e3-2017-4614-a472-c5c7244c7ce4@linux.dev>
+Message-ID: <diqzqzu9dfog.fsf@google.com>
+Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
+ TLB flushing
+From: Ackerley Tng <ackerleytng@google.com>
+To: Patrick Roy <patrick.roy@linux.dev>, David Hildenbrand <david@redhat.com>, 
+	Will Deacon <will@kernel.org>
+Cc: Dave Hansen <dave.hansen@intel.com>, "Roy, Patrick" <roypat@amazon.co.uk>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "joey.gouly@arm.com" <joey.gouly@arm.com>, 
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>, 
+	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, 
+	"song@kernel.org" <song@kernel.org>, "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
+	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>, 
+	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
+	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>, "tabba@google.com" <tabba@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Patrick Roy <patrick.roy@linux.dev> writes:
 
-syzbot found the following issue on:
+> Hey all,
+>
+> sorry it took me a while to get back to this, turns out moving
+> internationally is move time consuming than I expected.
+>
+> On Mon, 2025-09-29 at 12:20 +0200, David Hildenbrand wrote:
+>> On 27.09.25 09:38, Patrick Roy wrote:
+>>> On Fri, 2025-09-26 at 21:09 +0100, David Hildenbrand wrote:
+>>>> On 26.09.25 12:53, Will Deacon wrote:
+>>>>> On Fri, Sep 26, 2025 at 10:46:15AM +0100, Patrick Roy wrote:
+>>>>>> On Thu, 2025-09-25 at 21:13 +0100, David Hildenbrand wrote:
+>>>>>>> On 25.09.25 21:59, Dave Hansen wrote:
+>>>>>>>> On 9/25/25 12:20, David Hildenbrand wrote:
+>>>>>>>>> On 25.09.25 20:27, Dave Hansen wrote:
+>>>>>>>>>> On 9/24/25 08:22, Roy, Patrick wrote:
+>>>>>>>>>>> Add an option to not perform TLB flushes after direct map manip=
+ulations.
+>>>>>>>>>>
+>>>>>>>>>> I'd really prefer this be left out for now. It's a massive can o=
+f worms.
+>>>>>>>>>> Let's agree on something that works and has well-defined behavio=
+r before
+>>>>>>>>>> we go breaking it on purpose.
+>>>>>>>>>
+>>>>>>>>> May I ask what the big concern here is?
+>>>>>>>>
+>>>>>>>> It's not a _big_ concern.
+>>>>>>>
+>>>>>>> Oh, I read "can of worms" and thought there is something seriously =
+problematic :)
+>>>>>>>
+>>>>>>>> I just think we want to start on something
+>>>>>>>> like this as simple, secure, and deterministic as possible.
+>>>>>>>
+>>>>>>> Yes, I agree. And it should be the default. Less secure would have =
+to be opt-in and documented thoroughly.
+>>>>>>
+>>>>>> Yes, I am definitely happy to have the 100% secure behavior be the
+>>>>>> default, and the skipping of TLB flushes be an opt-in, with thorough
+>>>>>> documentation!
+>>>>>>
+>>>>>> But I would like to include the "skip tlb flushes" option as part of
+>>>>>> this patch series straight away, because as I was alluding to in the
+>>>>>> commit message, with TLB flushes this is not usable for Firecracker =
+for
+>>>>>> performance reasons :(
+>>>>>
+>>>>> I really don't want that option for arm64. If we're going to bother
+>>>>> unmapping from the linear map, we should invalidate the TLB.
+>>>>
+>>>> Reading "TLB flushes result in a up to 40x elongation of page faults i=
+n
+>>>> guest_memfd (scaling with the number of CPU cores), or a 5x elongation
+>>>> of memory population,", I can understand why one would want that optim=
+ization :)
+>>>>
+>>>> @Patrick, couldn't we use fallocate() to preallocate memory and batch =
+the TLB flush within such an operation?
+>>>>
+>>>> That is, we wouldn't flush after each individual direct-map modificati=
+on but after multiple ones part of a single operation like fallocate of a l=
+arger range.
+>>>>
+>>>> Likely wouldn't make all use cases happy.
+>>>>
+>>>
+>>> For Firecracker, we rely a lot on not preallocating _all_ VM memory, an=
+d
+>>> trying to ensure only the actual "working set" of a VM is faulted in (w=
+e
+>>> pack a lot more VMs onto a physical host than there is actual physical
+>>> memory available). For VMs that are restored from a snapshot, we know
+>>> pretty well what memory needs to be faulted in (that's where @Nikita's
+>>> write syscall comes in), so there we could try such an optimization. Bu=
+t
+>>> for everything else we very much rely on the on-demand nature of guest
+>>> memory allocation (and hence direct map removal). And even right now,
+>>> the long pole performance-wise are these on-demand faults, so really, w=
+e
+>>> don't want them to become even slower :(
+>>=20
+>> Makes sense. I guess even without support for large folios one could imp=
+lement a kind of "fault" around: for example, on access to one addr, alloca=
+te+prepare all pages in the same 2 M chunk, flushing the tlb only once afte=
+r adjusting all the direct map entries.
+>>=20
+>>>
+>>> Also, can we really batch multiple TLB flushes as you suggest? Even if
+>>> pages are at consecutive indices in guest_memfd, they're not guaranteed
+>>> to be continguous physically, e.g. we couldn't just coalesce multiple
+>>> TLB flushes into a single TLB flush of a larger range.
+>>=20
+>> Well, you there is the option on just flushing the complete tlb of cours=
+e :) When trying to flush a range you would indeed run into the problem of =
+flushing an ever growing range.
+>
+> In the last guest_memfd upstream call (over a week ago now), we've
+> discussed the option of batching and deferring TLB flushes, while
+> providing a sort of "deadline" at which a TLB flush will
+> deterministically be done.  E.g. guest_memfd would keep a counter of how
+> many pages got direct map zapped, and do a flush of a range that
+> contains all zapped pages every 512 allocated pages (and to ensure the
+> flushes even happen in a timely manner if no allocations happen for a
+> long time, also every, say, 5 seconds or something like that). Would
+> that work for everyone? I briefly tested the performance of
+> batch-flushes with secretmem in QEMU, and its within of 30% of the "no
+> TLB flushes at all" solution in a simple benchmark that just memsets
+> 2GiB of memory.
+>
+> I think something like this, together with the batch-flushing at the end
+> of fallocate() / write() as David suggested above should work for
+> Firecracker.
+>
+>>> There's probably other things we can try. Backing guest_memfd with
+>>> hugepages would reduce the number TLB flushes by 512x (although not all
+>>> users of Firecracker at Amazon [can] use hugepages).
+>>=20
+>> Right.
+>>=20
+>>>
+>>> And I do still wonder if it's possible to have "async TLB flushes" wher=
+e
+>>> we simply don't wait for the IPI (x86 terminology, not sure what the
+>>> mechanism on arm64 is). Looking at
+>>> smp_call_function_many_cond()/invlpgb_kernel_range_flush() on x86, it
+>>> seems so? Although seems like on ARM it's actually just handled by a
+>>> single instruction (TLBI) and not some interprocess communication
+>>> thingy. Maybe there's a variant that's faster / better for this usecase=
+?
+>>=20
+>> Right, some architectures (and IIRC also x86 with some extension) are ab=
+le to flush remote TLBs without IPIs.
+>>=20
+>> Doing a quick search, there seems to be some research on async TLB flush=
+ing, e.g., [1].
+>>=20
+>> In the context here, I wonder whether an async TLB flush would be
+>> significantly better than not doing an explicit TLB flush: in both
+>> cases, it's not really deterministic when the relevant TLB entries
+>> will vanish: with the async variant it might happen faster on average
+>> I guess.
+>
+> I actually did end up playing around with this a while ago, and it made
+> things slightly better performance wise, but it was still too bad to be
+> useful :(
+>
 
-HEAD commit:    9c0826a5d9aa Add linux-next specific files for 20251107
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=13a67012580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4f8fcc6438a785e7
-dashboard link: https://syzkaller.appspot.com/bug?extid=6bea72f0c8acbde47c55
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14e110b4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14ab1114580000
+Does it help if we add a guest_memfd ioctl that allows userspace to zap
+from the direct map to batch TLB flushes?
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6b76dc0ec17f/disk-9c0826a5.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/522b6d2a1d1d/vmlinux-9c0826a5.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4a58225d70f3/bzImage-9c0826a5.xz
+Could usage be something like:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6bea72f0c8acbde47c55@syzkaller.appspotmail.com
+0. Create guest_memfd with GUEST_MEMFD_FLAG_NO_DIRECT_MAP.
+1. write() entire VM memory to guest_memfd.
+2. ioctl(guest_memfd, KVM_GUEST_MEMFD_ZAP_DIRECT_MAP, { offset, len })
+3. vcpu_run()
 
-kvm_intel: L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
-------------[ cut here ]------------
-WARNING: arch/x86/kvm/x86.c:13965 at kvm_arch_can_dequeue_async_page_present+0x1a9/0x2f0 arch/x86/kvm/x86.c:13965, CPU#0: syz.0.17/5998
-Modules linked in:
-CPU: 0 UID: 0 PID: 5998 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-RIP: 0010:kvm_arch_can_dequeue_async_page_present+0x1a9/0x2f0 arch/x86/kvm/x86.c:13965
-Code: 00 65 48 8b 0d 58 81 72 11 48 3b 4c 24 40 75 21 48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d e9 3e af 20 0a cc e8 48 e1 79 00 90 <0f> 0b 90 b0 01 eb c0 e8 4b c1 1d 0a f3 0f 1e fa 4c 8d b3 f8 02 00
-RSP: 0018:ffffc90003167460 EFLAGS: 00010293
-RAX: ffffffff8147eee8 RBX: ffff888030280000 RCX: ffff88807fda1e80
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000009
-RBP: ffffc900031674e8 R08: ffff88803028003f R09: 1ffff11006050007
-R10: dffffc0000000000 R11: ffffed1006050008 R12: 1ffff9200062ce8c
-R13: dffffc0000000000 R14: 0000000000000000 R15: dffffc0000000000
-FS:  000055556a8c3500(0000) GS:ffff888125a79000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000072cc2000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- kvm_check_async_pf_completion+0x102/0x3c0 virt/kvm/async_pf.c:158
- vcpu_enter_guest arch/x86/kvm/x86.c:11209 [inline]
- vcpu_run+0x26be/0x7760 arch/x86/kvm/x86.c:11650
- kvm_arch_vcpu_ioctl_run+0x116c/0x1cb0 arch/x86/kvm/x86.c:11995
- kvm_vcpu_ioctl+0x99a/0xed0 virt/kvm/kvm_main.c:4477
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1588b8f6c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffdfcd816a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f1588de5fa0 RCX: 00007f1588b8f6c9
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000006
-RBP: 00007f1588c11f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f1588de5fa0 R14: 00007f1588de5fa0 R15: 0000000000000003
- </TASK>
+This way, we could flush the tlb once for the entire range of { offset,
+len } instead of zapping once per fault.
 
+For not-yet-allocated folios, those will get zapped once per fault
+though.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Maybe this won't help much if the intention is to allow on-demand
+loading of memory, since the demands will come to guest_memfd on a
+per-folio basis.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>>=20
+>> [1] https://cs.yale.edu/homes/abhishek/kumar-taco20.pdf
+>>
+>
+> Best,=20
+> Patrick
 
