@@ -1,135 +1,160 @@
-Return-Path: <kvm+bounces-62248-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62249-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68C4CC3E020
-	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 01:45:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3402C3E03B
+	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 01:49:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FDAB188B12C
-	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 00:45:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F3AD188BB82
+	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 00:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58E762E62CF;
-	Fri,  7 Nov 2025 00:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B762EA743;
+	Fri,  7 Nov 2025 00:48:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d+E/aN7x"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="aRpekQGt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C272857CA
-	for <kvm@vger.kernel.org>; Fri,  7 Nov 2025 00:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E352D9EE7
+	for <kvm@vger.kernel.org>; Fri,  7 Nov 2025 00:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762476293; cv=none; b=G2cjqoOeB78ARdGZcK2Cs/DylD7Qt6tM2zSx3Q3yvzcnXrFO/jQ72AoI3EyXEx26FzaYUjTtVR7RP/CpiVrGkXpumJVuKTj3rGSqN+2txNwSI8SCfLiIHHZ+YWDwiwJv6+3PXV7zt7ZjzCafPRwo43Cn5PgP00zYI97hi2BGXcQ=
+	t=1762476535; cv=none; b=ZLhp1I8hnLysHqjBC1RhvGa11r9S2bM1SmVbWOIjGrpMu53fzmroQHz3OO93KbdW30nkqnbN1/mPR+2olSp1+tvIgu/j7uOZoozDrYH1lQkCY/1xCgk7DtrXONIqqzOR2HN8xSMNy6yaWWaEb2YtCUtNGshGeQeKO2Jb1Sxi8Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762476293; c=relaxed/simple;
-	bh=5K/96wvWgT/tr739PKgS2vReih0PG6EAGbybEdDCOR8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TBTpNL4qd+utm5VDWVWPsk7jK6oTW8pYRlnohJo2z9a7OgPiTh3pPmhl7u026TtfU18iea4DM3JQVZPIX9yU9BNuCHCkp5cjezSIR1o63hQVCE8p+j3peD48y5CfcBvnvACJoHzwjOjxZ2KktseeSW/r3sliCiw3mVktXMypqRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d+E/aN7x; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-33067909400so187746a91.2
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 16:44:51 -0800 (PST)
+	s=arc-20240116; t=1762476535; c=relaxed/simple;
+	bh=sn6j/WP+bd+jqgBuRpz17xz8i5sjTIQyCJWXHeB0/S4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ol4qfuP5na/TEkUoXJ9GeGtu+vkuBstX1WN2WVtCmJgQJmKKp/i+ryo20U4bhU8dBLmTzTQSsf0mY6lBkevwQkNQMrCly5gXYgsRTP23xpFjippDU3GBWbcxWBvizChC+vBHlmAZLGmO79mNDAC99ikmZsHJhV6bUrp0R87mMMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=aRpekQGt; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b3c2c748bc8so24434966b.2
+        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 16:48:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762476291; x=1763081091; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ZxEQwudOCfHw07Q15hA7q5sXo7hmUKvy1motLcLA9I=;
-        b=d+E/aN7xR1CBxaDfpAuvvkx3wbLDObdGuJZpDPCeclf5jaNu9azZLt6duTlKqB38ds
-         X7YiimNEL1SjxOFq7sCmWBgSWavyPFR9eViRLn4xTGmnscDndRjbBb1vON+Nri6ntg4o
-         +Uku+1IoeAv61Q58SzH0mMCVlssX0EgeMxM7zV8Ete+DXWUayVZro0SXsH4SmhvEB6mj
-         6mfBbqB9FUdncIMv/+kVAJhfc1fBtJ1NId9+EQyWLsubB7i0UevutVRsHlrzQ2M1NAZk
-         JFA3AE8RpP4M1M1WYiAhQJUgrALR/btrukl6Z9STEeDM3utIodvfF+pQS5KmB7tWBurn
-         tvfw==
+        d=linux-foundation.org; s=google; t=1762476532; x=1763081332; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UJyXy2HPeNxeSWk8AJrSzQ9IAraFkis5RK31sTtcUcA=;
+        b=aRpekQGttGudCzq5LccHPB4kOu4Q4PbMRRs3rlaVumgjMQodQEq8a456DSRQFeHt2B
+         TC4FRMQAS6QCWNy6wC5mibVRDN6FKdn79PCJOcrkemNPrmOsZ7K2utmSIqZmEFAh1Xit
+         wXDBh17RU2//P86WZM1Usd6rkknSM+00Ds2fI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762476291; x=1763081091;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3ZxEQwudOCfHw07Q15hA7q5sXo7hmUKvy1motLcLA9I=;
-        b=XsMfoVXJITnmxLex5DllYqZl9GKP6lqKuJk5NvjAeSzDIoyAQbuO4p+8gT91JRu1pC
-         BB1hdYNWnTWLS0a067xrxlDjRYZiQ9GOGe1Zwj/+A/GgaOIzIfMyrJXOxKgMnXdEVchf
-         FMvX3DnfvnFGrYb0DOevn+wyzkVbW6WlZlaXVC/dF+YgADQkm9AHkt7ARnspMbOXFYqG
-         nHfwLziLB3DqXy3gbkhRJOiWYnT/RcEOiBkMdHG9PDL0qy6wfRsQ6h6dxzC6sh2alL6x
-         eE1foZ4TbcYoamjqB+G/+RPjsErMJdR/p97fxWla7qLVGOFo/6+Gdh/mMSiAUuHgAfn/
-         6r+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUc8g7uYF2yTW9GidoccXNPmje6/aTCqC07twL7S8lEFO2Edx+SaZZxVGBqJZXRwglcO38=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdIDUApoMmyDzQh8jj4rk+vzTKxKQelRL/icE8FMrCv/78J49H
-	ByfhfbAloSi76jOW8Wt+k1dqamYbKW3CZh1mogw/x9jepm+IdDQ5xu/wE5ApLUKfLA==
-X-Gm-Gg: ASbGncsIVYZNtTJSHaf8fq/BqoSjQMLP8DF0fHNgi7orlZcD+qU3rSNjmn7p/qQ+Mfy
-	6Z0x+lv2zIK+wzllDqZz2j4f1nQes4vkMECITVOOyDc89xLttL6PII+vsIC/95HiJ0P+USdGina
-	0SkZee7lmF1rEdIcLOPsaR5HCVWPsj75cyk5yUO5sMihQainbcUx4dpVzeFiHtMtwwG5FXloO6G
-	gYE40ilIEKKsA7V0hg+MDxGyiHUXivzD9pwGjfwayFGaV4mYq9CuFqUesyLVGvpptno7G2t9F+Z
-	tT4BooKnHF6VEVyzJrZ+QUfKNokxWhFq8MEDvmqp9SjWO0To5kCV1lFliUS3yKur2BbJfJpH+oa
-	qDiRh1YdeUl0kesKGLlPxlaDZm9AGbF52WEA0fdJKKN6PdYoK5JxFmCCsmSnSVwjI7FiessK7Wt
-	jnaVRRVTSczHBO70saVvgRU0U3MuIlBbWqVYdrIpW1798UGNNmecYd
-X-Google-Smtp-Source: AGHT+IHSAzcRTzsn4152VkBYv6RCsQ83TfDSRyvlGR+AZG6R3bypq+4AhiefhHJKc2IDulPKmb5IZw==
-X-Received: by 2002:a17:90b:3512:b0:341:8c15:959e with SMTP id 98e67ed59e1d1-3434c54db8bmr1473740a91.17.1762476291066;
-        Thu, 06 Nov 2025 16:44:51 -0800 (PST)
-Received: from google.com (132.200.185.35.bc.googleusercontent.com. [35.185.200.132])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-341d1375e70sm1870285a91.5.2025.11.06.16.44.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 16:44:49 -0800 (PST)
-Date: Fri, 7 Nov 2025 00:44:45 +0000
-From: David Matlack <dmatlack@google.com>
-To: Alex Mastro <amastro@fb.com>
-Cc: Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 0/5] vfio: handle DMA map/unmap up to the addressable
- limit
-Message-ID: <aQ1A_XQAyFqD5s77@google.com>
-References: <20251028-fix-unmap-v6-0-2542b96bcc8e@fb.com>
+        d=1e100.net; s=20230601; t=1762476532; x=1763081332;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UJyXy2HPeNxeSWk8AJrSzQ9IAraFkis5RK31sTtcUcA=;
+        b=XCaTmIk4tVKBy33ew8SBmi6UeX3l0DstFE+m+aEvpCjihOiIR1XOJefsg1QR73nV+L
+         R3ng/qO0Lzq2kOyfy/HnZ8BLXxMEA0FkSCnldBysJRk4zCWC8WIwn0yUdZ6+CTTocMtR
+         c9Y+YCsQ2w9TWtMFdOX/e8iTiB7zEOPgTX3B1GJ/ckMlMKHvZ/Q2Jqhb2CaaoCzyPl5q
+         s8atw5BzQK2krZFGaUfvz5nv5RgF7WAVPwMki0n4+rRkZrYdF7+hEeoieLgZq2yGffkR
+         6/2UBbLiJjoHxMknXSx7oUkwPJv1eoe1d8iIj2Zi7/7KbcFw+VxC7+uio2JGigz3abeZ
+         HtLg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFGashnikuABZUTYMEO/OlLdok2ZK1s7sQo5uTLV+P6gjPmbZZd2HJiPpk/JbFuGSR+zY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+qJeAo5lUJXj7mTdONhNSjZh8CLLoALf/pcFAUGCPLV8LGJEh
+	lg0ON46wmUGB/8mIc1382g/SqM4NATKMi2g25f1/+JIMdtvBU+XFenvyY+B7YHTj8Z7Sr23XLG9
+	yzNYz+CA=
+X-Gm-Gg: ASbGncu20fItGvV1PbB7sQ/tkm4lxymDcNyuX+bi3MxZA7eioQY4B4Zm3OrPEsJGfmK
+	uRofq+HDoLMn8ak8y8L2KUrn3PACzms8zCAWpoflLHYPsKfMCS5GiPEaXAJRLwq+fZBGKOrq1mQ
+	CvqM4Es86V5yD6DiGfNpbtf4Wjw5FdZ7OD6brOooX+WaxLuIf1QF8aPcmRR1iQLJavwv1tHy6p2
+	Zei7LgQmWObru4dpu+hHQvzkBTXHakvxJEiV+/OpuhS9CYx9sEfUtgz/5K7J77DTqbQ3JttErHH
+	JInLCOGUYvUhXdqaa2azxAtHEVBxgF3JXkbrf7p6/xDZJoKuFqdincc2AxRwKEaBBnjkdKU2oFj
+	Cawk1XlVrw+H1TGPWPQdNVc/Zq+iJLNSpLgpmTZwKKBEEuygFGQanFOVDR0Ini91G4UjON4csBB
+	xyFk0hRXUpiSQn2zDMgY1aIQX7lSyct6GkXqET1W2y68GUAmSm9g==
+X-Google-Smtp-Source: AGHT+IEgEt/5GAH+TwV82L6Mk09M/tcyOW3e0gLeAhbuGRsfUrRzyECkqb1/JsOkj0jbhg2BreN0lg==
+X-Received: by 2002:a17:907:cd07:b0:b70:b7c2:abe9 with SMTP id a640c23a62f3a-b72c0cec571mr116399966b.38.1762476531799;
+        Thu, 06 Nov 2025 16:48:51 -0800 (PST)
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com. [209.85.218.53])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bfa11333sm88835366b.69.2025.11.06.16.48.50
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Nov 2025 16:48:50 -0800 (PST)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b3c2c748bc8so24432566b.2
+        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 16:48:50 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVQB4mQL3dihuvPM3wdRp/DjWHxgj4KzwvuujHWVnL2fduu5EjOqDGKYV/O7yMYACmMMAQ=@vger.kernel.org
+X-Received: by 2002:a17:907:d8e:b0:b71:fa4a:e16a with SMTP id
+ a640c23a62f3a-b72c099753amr152181766b.28.1762476530309; Thu, 06 Nov 2025
+ 16:48:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251028-fix-unmap-v6-0-2542b96bcc8e@fb.com>
+References: <20251106210206.221558-1-seanjc@google.com>
+In-Reply-To: <20251106210206.221558-1-seanjc@google.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 6 Nov 2025 16:48:33 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wiJiDSPZJTV7z3Q-u4DfLgQTNWqUqqrwSBHp0+Dh016FA@mail.gmail.com>
+X-Gm-Features: AWmQ_blj82Vcahx3SOa6MtKIrMn8wu7jk2421gv57pbk7yInk5N0KSx4Ebh8Ack
+Message-ID: <CAHk-=wiJiDSPZJTV7z3Q-u4DfLgQTNWqUqqrwSBHp0+Dh016FA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Use "checked" versions of get_user() and put_user()
+To: Sean Christopherson <seanjc@google.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2025-10-28 09:14 AM, Alex Mastro wrote:
+On Thu, 6 Nov 2025 at 13:02, Sean Christopherson <seanjc@google.com> wrote:
+>
+> Use the normal, checked versions for get_user() and put_user() instead of
+> the double-underscore versions that omit range checks, as the checked
+> versions are actually measurably faster on modern CPUs (12%+ on Intel,
+> 25%+ on AMD).
 
-> This series spends the first couple commits making mechanical
-> preparations before the fix lands in the third commit. Selftests are
-> added in the last two commits.
+Thanks. I'm assuming I'll see this from the regular kvm pull at some point.
 
-Hi Alex,
+We have a number of other cases of this in x86 signal handling, and
+those probably should also be just replaced with plain get_user()
+calls.
 
-The new unmap_range and unmap_all selftests are failing for me. They all fail
-when attempting to map in region at the top of the IOVA address space.
+The x86 FPU context handling in particular is disgusting, and doesn't
+have access_ok() close to the actual accesses.  The access_ok() is in
+copy_fpstate_to_sigframe(), while the __get_user() calls are in a
+different file entirely.
 
-Here's one example:
+That's almost certainly also a pessimization, in *addition* to being
+an unreadable mess with security implications if anybody ever gets
+that code wrong. So I really think that should be fixed.
 
-$ ./run.sh -d 0000:6a:01.0 -- ./vfio_dma_mapping_test -r vfio_dma_map_limit_test.iommufd.unmap_range
-+ echo "vfio-pci" > /sys/bus/pci/devices/0000:6a:01.0/driver_override
-+ echo "0000:6a:01.0" > /sys/bus/pci/drivers/vfio-pci/bind
+The perf events core similarly has some odd checking. For a moment I
+thought it used __get_user() as a way to do both user and kernel
+frames, but no, it actually has an alias for access_ok(), except it
+calls it "valid_user_frame()" and for some reason uses "__access_ok()"
+which lacks the compiler "likely()" marking.
 
-TAP version 13
-1..1
-# Starting 1 tests from 1 test cases.
-#  RUN           vfio_dma_map_limit_test.iommufd.unmap_range ...
-Driver found: dsa
-tools/testing/selftests/vfio/lib/include/vfio_util.h:219: Assertion Failure
+Anyway, every single __get_user() call I looked at looked like
+historical garbage.
 
-  Expression: __vfio_pci_dma_map(device, region) == 0
-  Observed: 0xffffffffffffffea == 0
-  [errno: 22 - Invalid argument]
+Another example of complete horror: the PCI code uses
+__get_user/__put_user in the /proc handling code.
 
-# unmap_range: Test failed
-#          FAIL  vfio_dma_map_limit_test.iommufd.unmap_range
-not ok 1 vfio_dma_map_limit_test.iommufd.unmap_range
-# FAILED: 0 / 1 tests passed.
-# Totals: pass:0 fail:1 xfail:0 xpass:0 skip:0 error:0
-+ echo "0000:6a:01.0" > /sys/bus/pci/drivers/vfio-pci/unbind
-+ echo "" > /sys/bus/pci/devices/0000:6a:01.0/driver_override
+Which didn't even make sense historically, when the actual data read
+or written is then used with the pci_user_read/write_config_xyz()
+functions.
 
-I am testing at the tip of Linus' tree at commit a1388fcb52fc ("Merge tag
-'libcrypto-for-linus' of
-git://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux").
+I suspect it may go back to some *really* old code when the PCI writes
+were also done as just raw inline asm, and while that has not been the
+case for decades, the user accesses remained because they still
+worked. That code predates not just git, but the BK tree too.
+
+End result: I get the feeling that we should just do a global
+search-and-replace of the __get_user/__put_user users, replace them
+with plain get_user/put_user instead, and then fix up any fallout (eg
+the coco code).
+
+Because unlike the "start checking __{get,put}_user() addresses", such
+a global search-and-replace could then be reverted one case at a time
+as people notice "that was one of those horror-cases that actually
+*wanted* to work with kernel addresses too".
+
+Clearly it's much too late to do that for 6.18, but if somebody
+reminds me during the 6.19 merge window, I think I'll do exactly that.
+
+Or even better - some brave heroic soul that wants to deal with the
+fallout do this in a branch for linux-next?
+
+              Linus
 
