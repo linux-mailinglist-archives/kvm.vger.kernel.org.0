@@ -1,75 +1,80 @@
-Return-Path: <kvm+bounces-62274-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62275-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92953C3EA5C
-	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 07:47:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EECBC3EADE
+	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 08:02:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8B08E4E8640
-	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 06:47:32 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9E7B934B0AE
+	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 07:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4802A303C97;
-	Fri,  7 Nov 2025 06:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C92306D57;
+	Fri,  7 Nov 2025 07:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GU9Gr9xd"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MDq97Shx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012023.outbound.protection.outlook.com [52.101.43.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF8A303A29;
-	Fri,  7 Nov 2025 06:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762498046; cv=none; b=BDTM5oz9A4og+8cmmf7s7cO+iL+iRtmMqC0ZTubikvOTTxhhxk+GaR/4AgXJ39BbsywthknxERtaddEz7MYDQhJRsSiPiu8rl5ECl0kGKvVYIE0k6DwGPnuesv/afNsW4LshRvMRJZesnXKN4vKI7hFZqH4Z3nC4VbWj2z9wdzU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762498046; c=relaxed/simple;
-	bh=penEAhMr/GSlDiIoiSg0G2G27IVjdQw0U9mEKfgNQJo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ttNkaBUL0YhjqqgePSpXuASHGt9DG3lkIvmw0Z1zITUmVfAQulSA3udMlD4Lyhcw0ac0/HU+dfU53AqFZUyacyBtmywDLdpBr7S+GyaXZnrrvM5cP5/eQMv3OOWsAVJ0hA4OXnC0uasnX2R3lkyMGHl4E+ipN+4PMa+n6Y1D8Fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GU9Gr9xd; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A73HaUm007895;
-	Fri, 7 Nov 2025 06:47:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=PLUZG9
-	h6Zl8Ih1CPrIic/9f5ZXGQlni37186BXQHqzs=; b=GU9Gr9xdywoIaU432NJF72
-	caoPYgvW8ADQrtHP5U0GLV9XoUb/9s/QGdS8lJb0KHjLGgIJGkRb4rKySSaE/jk8
-	bNjh4NXUCnItarYVH/oxiZHK+zhYryDSOfThNYSum8wCiTThQc9KIG9WksXEDh6x
-	uGVi/V8Svcp1Yusx0q51zzZVhbnBnMKHOkB70U241r8uIsiQddSttNwuW6/bpPOl
-	TYx1Yyu60ksJvqNkbfqsdDNnqK0+oXVtj8JvNdJuGVzoaiMQ8NdtHiB01LQHDHYv
-	n0TKspAzQvIZJZMEeeT+K9OGyD5S+Q+9sDyH1WtyWtK+C3R04eIbRKOhFM0Jzv5Q
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a57mrj5ej-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Nov 2025 06:47:21 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A76NZJJ025605;
-	Fri, 7 Nov 2025 06:47:21 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a5vht1kqa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Nov 2025 06:47:20 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5A76lHHl48890344
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 7 Nov 2025 06:47:17 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 156A92004B;
-	Fri,  7 Nov 2025 06:47:17 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9E8D820040;
-	Fri,  7 Nov 2025 06:47:16 +0000 (GMT)
-Received: from [9.111.44.147] (unknown [9.111.44.147])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  7 Nov 2025 06:47:16 +0000 (GMT)
-Message-ID: <a45e260a-ce8e-4145-97ce-1e1cd684f2b8@linux.ibm.com>
-Date: Fri, 7 Nov 2025 07:47:16 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4383054EE;
+	Fri,  7 Nov 2025 07:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.23
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762498937; cv=fail; b=eWH80FypxAmqHjO+tWaivZX+SgShfPb97WkQpq4yvl860d22CPs89DUFYcLpjrcb90kDUVDaRI7BN+JA/r38LxD6lo/WBZrIaQvEyHS7k6zezKmMWY4xKENqqhmxnfd84h3qygdXeGcVbS8HDjvexw0sz7sSAbj4MRlePDaw4Nc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762498937; c=relaxed/simple;
+	bh=0MDi54Q/pHuUs26ElZS+RPUYAaX+ZVTdHp6tZvyM6i0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=pYwPAW+lWMtHSIgT0cp8mQSRYXsk/o4a0nZdL5OvlJ6xgF+wHPq7NZdAtQe3yFZq8TEBiC1J9/z9ccFDstGSlpmcbACT2ZP3qZxFGMoKOwu/yb/3gBQWt4wP6WZdEawmtf3Mfq9bWx2CCYutQmdD6bQE9rfjXpTwwupwthfW4/8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MDq97Shx; arc=fail smtp.client-ip=52.101.43.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WOvb64uFEbf9H27+bYbdmSfNulu7HbCbWCbrdG61lAJnnmWpkcowk+5bkYpNhz9Y41SlfqM1ZRWzyM6BcZbZ/B+87GH+jU1w4LVVxE65HQ0YBHk9LFE08cKu8hmXO0R42H5UIDMxmBjoEIiQvcKaNmw/WEdubryHWFssGIv7dwZbLhoRj6mqOhqNzl3qdgpac8mcr/Zqb5kV6eK+TsGhEM884A0ythTuHHaQoOF4wj0NEYJ/WqQuoVjIzXAbdeOGmTHTQQhSEgWC+cDjDJPdDrmdjCvAurr3BzQmMG/eqjyHnSblx9o9ae4LHNS7mZJ8/Cseiex5IqUi00mXmHxtFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mTcezy7lq6c6TDknXM9/i28cENTvapnWDwdoAMtUeMw=;
+ b=UbAsHZEolL3h0Q0EDJ4Ib86XOSAHXUfEl5r9wZLcoYiXQtqh9qAJSlagkQSCbeCLxG1O8fvkBU2CC6X3LdBsZTjA19R4aCeMYE05hiMvPs7Uuf/+9BOE2adPNwYuQRdb+QxMfs6Iv8PjHrDFVRVLax0M41x7/IshAUQpjsWPy3WgW7PJuHFlCc179uxwrSGbInDqo2n7CBxxm754FoB4z1uEZ3yQ4PiQe862DnjjqgR2//e79idWCxkdfL64WQh38jg+qGmzTceaBP/DLPbmcxkNs9n+n9QKssC+znyjNI4ADV+bEwbx+l9DELBArfQtSrj0eETbCqiehUtHw4bywg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mTcezy7lq6c6TDknXM9/i28cENTvapnWDwdoAMtUeMw=;
+ b=MDq97ShxgFEpSc7XxnAX99VjDwYuvlF52HwuY1fumkP1qAS1BFwGUdUpsKoF4g7UU/+T6qYGlk7GiP3SBsIzMUrmX9M3VtghIVsmsMxtsT53cu1oQCnouZpv5v5srjyxiS7tGs4YiFqoi4YjYerUWm3OimwLH8FjqBekJG50AEo=
+Received: from DM6PR02CA0069.namprd02.prod.outlook.com (2603:10b6:5:177::46)
+ by IA1PR12MB6067.namprd12.prod.outlook.com (2603:10b6:208:3ed::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.12; Fri, 7 Nov
+ 2025 07:02:11 +0000
+Received: from DS3PEPF000099E2.namprd04.prod.outlook.com
+ (2603:10b6:5:177:cafe::d) by DM6PR02CA0069.outlook.office365.com
+ (2603:10b6:5:177::46) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.12 via Frontend Transport; Fri,
+ 7 Nov 2025 07:02:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ DS3PEPF000099E2.mail.protection.outlook.com (10.167.17.201) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9298.6 via Frontend Transport; Fri, 7 Nov 2025 07:02:11 +0000
+Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 6 Nov
+ 2025 23:02:11 -0800
+Received: from [172.31.180.39] (10.180.168.240) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Thu, 6 Nov 2025 23:02:07 -0800
+Message-ID: <93211ebf-1b8b-4543-bd1c-f3805a54833e@amd.com>
+Date: Fri, 7 Nov 2025 12:32:01 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,82 +82,106 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: s390: vsie: Check alignment of BSCA header
-To: Eric Farman <farman@linux.ibm.com>, Janosch Frank
- <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Christoph Schlameuss <schlameuss@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20251107024927.1414253-1-farman@linux.ibm.com>
+Subject: Re: [PATCH] KVM: x86: SVM: Mark VMCB_LBR dirty when L1 sets
+ DebugCtl[LBR]
+To: Jim Mattson <jmattson@google.com>
+CC: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, <nikunj.dadhania@amd.com>, Thomas Gleixner
+	<tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+	"H. Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Matteo Rizzo
+	<matteorizzo@google.com>, <evn@google.com>
+References: <20251101000241.3764458-1-jmattson@google.com>
+ <6f749888-28ef-419b-bc0a-5a82b6b58787@amd.com>
+ <CALMp9eQJ69euqBs2NF6fQtb-Vf_0XqSiXs07h29Gr57-cvdGJg@mail.gmail.com>
 Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20251107024927.1414253-1-farman@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 01UTNO2J2sEewDrfu3HEhVuYiupfJAX3
-X-Authority-Analysis: v=2.4 cv=MKhtWcZl c=1 sm=1 tr=0 ts=690d95f9 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=-uTLTygCCHB6PFIRPhQA:9 a=NqO74GWdXPXpGKcKHaDJD/ajO6k=:19
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 01UTNO2J2sEewDrfu3HEhVuYiupfJAX3
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAxMDAwMSBTYWx0ZWRfX+8D92CdhIyE+
- ZpsvNk0mXt5G5X4DhYC2IWJ9MKLYfONM0ZM93iCd2t/RWqv4tIwev09+QnKq5aFhMLvZGyTZQoP
- 3wcONxeDvVmCAUDeB38HwwTUuCU4hsqxmVhX1AN1i9HvSWGgCypJXZTm1BhWKcdYJuvnk2YDfPV
- tfqKxT3Ji/zW8KgObp4wFfrbmG02v8KlgvuH87TnfHd6Czn4whmHA5nlvaf7g+U3N//yvwKA4k6
- ode+LHUoTN5UK/jD99WxxAsx6eX1s1vl0W8MAoBsDlz6+mP2RU0OQVYUcuyE4Ocf3ri25TsgJNx
- 8jwepz9iDngZO5u7l6Vq3WLnufquy/pXluSEvoTXhxOoESdyAah9L4hbfMvvin8jFWUW/QlicSI
- XHtQwewLEZLtQR04ekNMq6dSNqHWzg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-07_01,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 bulkscore=0 impostorscore=0 clxscore=1015
- lowpriorityscore=0 malwarescore=0 adultscore=0 phishscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511010001
+From: Shivansh Dhiman <shivansh.dhiman@amd.com>
+In-Reply-To: <CALMp9eQJ69euqBs2NF6fQtb-Vf_0XqSiXs07h29Gr57-cvdGJg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099E2:EE_|IA1PR12MB6067:EE_
+X-MS-Office365-Filtering-Correlation-Id: f0ce7f5a-5e4f-473f-734f-08de1dcb92ec
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|7416014|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bHVpaXh4V1FrUVIrdlVXaW9tQk1KMGxCTnJoblY1VExuTU01bjgzdHF2b0hl?=
+ =?utf-8?B?Z1haaGxCd283Z0UwbzlVM1NIOTNuZkNzZ0xqRjRMVjlmVDNoMVFGTDZCRHRk?=
+ =?utf-8?B?UHVHM2ovc2xQZ1AwSmxXbHZlSFlrTTFlQkFIWFVGSFhZY0NBa2tIKytSN2lj?=
+ =?utf-8?B?MGloN3h6TGlTOS9hL0pZZjh4NWJEN1Y0Mmk1a1RvaWFCM1Uxc0JHTXJaTEZK?=
+ =?utf-8?B?cVF3QUYyZit2QjJKMVpxTXV6Y2FUMEpGVW4rZmtia0JRTk5RbTlMTmpVZ2d5?=
+ =?utf-8?B?a3N1bkVIeCtWSFIvSHp3TXJLNGEvU0pZR3dMRDZuMGFxNkdFOU5LTm1vREpI?=
+ =?utf-8?B?cXp4SkpZZWdNUnZ4L1hFWEtuL0s1dFE5NHZPMENUMlNYeGNtTWJoR3R3WUZP?=
+ =?utf-8?B?cDVHamF1SzM2amU2eDQzY0lDT3JEZHdxZHlTYmlMTjB4ZlRDTkZ1M3Urc2lN?=
+ =?utf-8?B?UGxwVVo2dzlIWkZmN0JlNGlxanowSFVmYkFpcmVYTmJvMk9zVnl6a2V2QTRm?=
+ =?utf-8?B?VjBIaE1NcHg3MTBuVDNXRUk3MlIrWUd1TzcyWWVlSnRleEtubDdjOGY3dU9D?=
+ =?utf-8?B?dENMWjVueEo2UzBiWGJUUExabjFjY0dFYU5iRXU5ZHVjVmg4SnBaejFuNkRW?=
+ =?utf-8?B?dnFnVy9ieVk4UU9kQk9wMmFxOU10dEtJQUdrUDdLc2xuTVpjQlBhSUtCZ1Fk?=
+ =?utf-8?B?TXVWR25jaXZGeWJwSVgwYmtVTURRc3A4RkNBeVdxWFM1SFR6a3BIM1Q5Mkhs?=
+ =?utf-8?B?TkN6ODBaQWF0cnpyY2FkZFVGdmI2TFU1bDdoejlPY014dUNlZHNQQlZHcUdv?=
+ =?utf-8?B?Vkh0bjlzY2lJa1hsRnNpR2VCKzR6N1hhMzZQWDhDdzg4S3ZObE9pc3lWaTRR?=
+ =?utf-8?B?OWMybEJUemg2YS9hQkp2VFg1dWdzM3Y5N3Z5anJPM1F4bGlNZVM3UFQyQVh5?=
+ =?utf-8?B?Y25nT3VMOVhRYzI2RjJNTDZuNTBKQnFjQkdTTTVCVkZLbTM4R293RUFTNk5a?=
+ =?utf-8?B?bVJEckVyNFp0cmNIZkJsSXFLZGlVSm0zbk5SWDdwYVZvMzhoOGhMY0RsRGtp?=
+ =?utf-8?B?ZHRCTWVWTlVRN3V2REVjMjVieU42UVZVVlVCcHRlbzY1WjBvRVdjU2NjQkFR?=
+ =?utf-8?B?b3I0RVlITVNEdUs3dWlXNi9TVVVuNVRpSll3QlkyTGpNY1A3TjNSbU5KTnBu?=
+ =?utf-8?B?MmoxL0hJQ0YyWGM3UkFnK2twZnF2ZTlHY09iclI4VDl1SWVIUDA2V0xjbnlL?=
+ =?utf-8?B?emMrUkJ5Zy9SdW1aVWExSGljYjhieWlkbzRhR2J2VEhMaGRkVmxhaGVVZnhL?=
+ =?utf-8?B?NytudGJac0JBT0E4djFIRUZzZkFZZmJyajFCSzF3UXB1SVNoQkZLaDI1Skxj?=
+ =?utf-8?B?eTJoRFd3dlJDcHFqWWlqcUhVZjN6YS9GVnFxdnR0UENWbDFvV3A4a1NqYmdU?=
+ =?utf-8?B?T3ZoOWI2ZWl1Um5mdExoRG9ub2JjNXUzaHMvYWIvNGZ6ak1NekVhUnkxSzU5?=
+ =?utf-8?B?YTFIcCtVOTZLaVA3dWFFMGNtSVUvcnc2RlVNY25LWnVlVlJZc2VQK3dralhF?=
+ =?utf-8?B?TVpoKzdhTzl3SzdvK0h5eVVaRUw5WGJTOWVFSkpQZERDRkZvVVdCeVJMNHYx?=
+ =?utf-8?B?dHpKNitoUlI5ZlplYmZUQWdyTUwrOVc5RlA1VDNDa1gvbHg3SEh6ekZKMGdD?=
+ =?utf-8?B?MDMxR3pCeHFCbkNOb1FERVVGTGdPTXFuV0cxK08vek5ZUGsyN3pQZ1BadFlC?=
+ =?utf-8?B?NnBaMVlRZ2YvQi9NVWVZcWl2SkpMTmdwUkJsQVlhcXhOMXdwRlpUeFVtSDV6?=
+ =?utf-8?B?WUkrSDZHcXZ3dkdlSTIvbFlnajF5eElzeWhETXhRU3BlZEczVjJqQXZabDBX?=
+ =?utf-8?B?WUs3RmRVd2RCanhteERmS0tPRzl4QXQ3MHBxcFd0ODVwTU9QeXBqRk50VEgz?=
+ =?utf-8?B?S3RlVm5WaEJwWkU5cTQvdG1XVWoveEZnaS81TG1GUDJIaitzY0h5Y1hkbHp6?=
+ =?utf-8?B?RkxTSEMyRlBwZE1RNWFFaDBtYzZWL2l2THMvYStXdGI5UTQyMWQvTXUwcGFn?=
+ =?utf-8?B?cEZlMGVLM3V3VEZ2elEwdUowWWdCQXdUZkZTM0VVenVSWTVvbDlYalpBb2FF?=
+ =?utf-8?Q?Aq8U=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2025 07:02:11.2936
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f0ce7f5a-5e4f-473f-734f-08de1dcb92ec
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099E2.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6067
 
-Am 07.11.25 um 03:49 schrieb Eric Farman:
-> The VSIE code currently checks that the BSCA struct fits within
-> a page, and returns a validity exception 0x003b if it doesn't.
-> The BSCA is pinned in memory rather than shadowed (see block
-> comment at end of kvm_s390_cpu_feat_init()), so enforcing the
-> CPU entries to be on the same pinned page makes sense.
+On 06-11-2025 23:30, Jim Mattson wrote:
+> On Thu, Nov 6, 2025 at 8:09 AM Shivansh Dhiman <shivansh.dhiman@amd.com> wrote:
+>>
+>> On 01-11-2025 05:32, Jim Mattson wrote:
+>>> With the VMCB's LBR_VIRTUALIZATION_ENABLE bit set, the CPU will load
+>>> the DebugCtl MSR from the VMCB's DBGCTL field at VMRUN. To ensure that
+>>> it does not load a stale cached value, clear the VMCB's LBR clean bit
+>>> when L1 is running and bit 0 (LBR) of the DBGCTL field is changed from
+>>> 0 to 1. (Note that this is already handled correctly when L2 is
+>>> running.)
+>>>
+>> Hi Jim,
+>> I am thinking, is it possible to add a test in KVM Unit Tests that
+>> covers this? Something where the stale cached value is loaded instead of
+>> the correct one, without your patch.
 > 
-> Except those entries aren't going to be used below the guest,
-> and according to the definition of that validity exception only
-> the header of the BSCA (everything but the CPU entries) needs to
-> be within a page. Adjust the alignment check to account for that.
+> Though permitted by the architectural specification, I don't know if
+> there is any hardware that caches the DBGCTL field when LBR
+> virtualization is disabled.
 
-Right, we do not yet support sigp interpretion for vsie and the
-validity is indeed defined only for bsca header alignment:
----
-The SCA header crosses a 4 K-byte boundary
-(VIR code 003B hex).
+Alrighty.
 
-Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+Tested-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
 
-
---- 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
->   arch/s390/kvm/vsie.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-> index 347268f89f2f..d23ab5120888 100644
-> --- a/arch/s390/kvm/vsie.c
-> +++ b/arch/s390/kvm/vsie.c
-> @@ -782,7 +782,7 @@ static int pin_blocks(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
->   		else if ((gpa & ~0x1fffUL) == kvm_s390_get_prefix(vcpu))
->   			rc = set_validity_icpt(scb_s, 0x0011U);
->   		else if ((gpa & PAGE_MASK) !=
-> -			 ((gpa + sizeof(struct bsca_block) - 1) & PAGE_MASK))
-> +			 ((gpa + offsetof(struct bsca_block, cpu[0]) - 1) & PAGE_MASK))
->   			rc = set_validity_icpt(scb_s, 0x003bU);
->   		if (!rc) {
->   			rc = pin_guest_page(vcpu->kvm, gpa, &hpa);
-
+-Shivansh
 
