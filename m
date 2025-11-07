@@ -1,120 +1,95 @@
-Return-Path: <kvm+bounces-62350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14474C41619
-	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 20:06:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0427C4163D
+	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 20:08:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 54ABD4EB689
-	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 19:06:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CB89188ED2C
+	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 19:09:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD025287257;
-	Fri,  7 Nov 2025 19:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DF5C2D6638;
+	Fri,  7 Nov 2025 19:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="XmWfL3hV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="azlffg9Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87716239E88;
-	Fri,  7 Nov 2025 19:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D499526CE3F
+	for <kvm@vger.kernel.org>; Fri,  7 Nov 2025 19:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762542352; cv=none; b=f5DKK9x0GrYHFdD/tcYjD4y8SPsFIlIjR9ItdASwkUbcs/MGy1V9FSyclw9YEduzycD+UClpQBu6wS1/s36PvnPjYtI8ozCK0ZMtoSGcBtyMZbofF+w1mU5K4g8dYn8n0wneM0RFLjs1xeD2us3w3pEnHmkT/UW7xQdYPuLoI90=
+	t=1762542519; cv=none; b=YDMuVQnwKF+yDyTn8J+fwBOdQb8M3YZGakWSTJ4y2G546e1exsqUVvMcCbl/5dv9sfssOhfm4aLhS4uBvEUWTjKyzSEUufS4q0XBe9fMhu36Alhn7Reeh1eU3SJ70PhBpzHc+sljhDix7EhE5vp6t9mzTX7r2sPPXrxDkxzmzLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762542352; c=relaxed/simple;
-	bh=mXFR1PhmKgmSVMFeCXXi28Wz72C3jBWODvB+di636gc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K5D/a7FErE3tMP/p5e37T3hs6lkpl5N48qz7R81lGHSwXI98V3WY0Vkg3D/xZFcYjLysQ+4CIsCDRRguadVT+WOLnh4aT0VRhfIW+m6ur/ycvMzeduZH2fgHmrtVzTama03hFwfMldr7iniZhgPGrjQPF03OUaT7QMxkYO0dqPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=XmWfL3hV; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 47D2140E019D;
-	Fri,  7 Nov 2025 19:05:48 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 6kqq-evhot0V; Fri,  7 Nov 2025 19:05:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1762542344; bh=lujgfbqZ4qlRCiqTlaXxcoUU22N7BBwu48Sd8U8jwCc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XmWfL3hVNM+7GgDM7O4LUM10o5oZxOwNMcMYFdL70WGMKfQrcKGEaZLgGZjZP7Jwk
-	 v0cdEL+w1ykgG7nAn0zAh3g+P6ip0qJZkT/cqu8OGsLyaOH5ruBD8ymHemYR6P7QmQ
-	 i1zaGx5Ps5mlRtYja4PZQc69fGAGVCuiMnwwBTlMX2mfLsqXdX9RJmUprU0VIZmInq
-	 3KNcX+Imb8dGzwlYxflOd9Elt12TAgJyRBZgj5OhZuev519s/KkX7wvYog/1GkonUh
-	 hZk9DP+F3Amxyc7q6h7NBUwIFVLnTaaLg1JfDKqdegNDa0Kgprs5c1bs1oFLsgKqzn
-	 6QUa1hH5wT1Zs2oI6IWb4shqWcvnbCJ9uwrLuF3LG4oIildrK/OdWTO8mOEDaQwp7m
-	 GamvI5na+K+2MRJSxhZfmtTAHxrP2F3+PGEHpRET+g6Wg6JxtSpWA309a08i7wBBjD
-	 2lrigkC5WwwYJS8CCfIjNSu2e5rnc7fcwDfar1PckSeNhr3FH+hWUQJ6VpmOslyjMc
-	 I5+cGfYsJArRmpnIWaouL+f3nr0tAPIBRN52Jlez4EPmwpCV/678TT/41tjQ8FEzOW
-	 fX+V5y/SqamrXJm0pH67AE/jK4qH7/TOJbPvJtneREzk+egzTvfwX5SrwXQPJ08MM6
-	 kylKx3g3vKhgouhhMyfnea4w=
-Received: from zn.tnic (pd9530da1.dip0.t-ipconnect.de [217.83.13.161])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 90F9B40E0191;
-	Fri,  7 Nov 2025 19:05:35 +0000 (UTC)
-Date: Fri, 7 Nov 2025 20:05:34 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Brendan Jackman <jackmanb@google.com>
-Subject: Re: [PATCH v4 1/8] x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
-Message-ID: <20251107190534.GTaQ5C_l_UsZmQR1ph@fat_crate.local>
-References: <20251031003040.3491385-1-seanjc@google.com>
- <20251031003040.3491385-2-seanjc@google.com>
- <20251103181840.kx3egw5fwgzpksu4@desk>
+	s=arc-20240116; t=1762542519; c=relaxed/simple;
+	bh=YEApJjb+BKSUJEihP5IIJwfQnVF2BrNHxqVRXXY4P7U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LFsMpGFKXfu67s3oRoRKYhwxbjy7CfApqBTJhgKdErGziCJF9lY3zS2PMfKLbtMxLaxNlpOpkVOrYZ+3PWlHc9TrQG7qo6hKCuSXems/ixaWBOhqXFqZ+GTGQKNbradvlGXo/uUWkEdxpX+zaG7zoTJ2R7RKJC4oOYRl1gAaNoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=azlffg9Y; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-640fb02a662so909a12.1
+        for <kvm@vger.kernel.org>; Fri, 07 Nov 2025 11:08:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762542516; x=1763147316; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=YEApJjb+BKSUJEihP5IIJwfQnVF2BrNHxqVRXXY4P7U=;
+        b=azlffg9Yk8/EA28FE7gn+RB2mYHYJK3rOSM6wH0cyeuTij2n2pznAeqjxOTprjmWrz
+         DVcUcLvkiVBRXT8UR1T23vm2W2cTZVzx6LEGLYDW1shuCostxGbgB+i0IV0wvX/8hEjC
+         yv4Onqae1z8ve9b3xCL2e8r/hb/J072rbp1XBbL2v9BMnUCT1g3auSVwQ5iSHRaSneYo
+         XCIWQ7+xJPPzAUmAhEDtUuxScZeiWEIlpzPOPCtZxudkgWFNLGNyvKLts3zK3Wcn3scx
+         p9e7t3nrBriQJXsv7f1aV4yUIeP7I8nTBx6ea6MD1oWfI/R1AQB6nAGxY1G4xnVklALq
+         jYHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762542516; x=1763147316;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YEApJjb+BKSUJEihP5IIJwfQnVF2BrNHxqVRXXY4P7U=;
+        b=mCirk//p8TgISiXHFMBGLKKmxm7HNaGx+P/KKmLB95hOdy0nB9Fr9dmgiPSnIXrUM8
+         3+oNqHbT6m1t4KC7L5p2cHXDWT1Gfdpi+oU/OudfZWqbjDYdU6jQtHrGRiJ/k2IOtNkn
+         rbZGZbNv0pxShSzv58VHQTwcMoedKL27DwyyGjJ208CbB5Y4zmYwOGhYwQpvQbc2ZoyY
+         r27gyQ8fsynwkCh+9i6SdexodgPHYwliouDiZAr3aRyEUQuldzObrUBXpLmIUMcmEZCU
+         aj5c2NxgZoyEfdc4rVizQ3K+W+ukvIzcZv8LMDef0Vrrs7Pv/dgX0+BaQEHeTnht1LUi
+         J/Mw==
+X-Forwarded-Encrypted: i=1; AJvYcCVPzr3MaLBu3MUCEgWr3CpLA0pBuSa1pzkgZ2UJ22qJbN+Yhp6uZ4odgV7B3oUhJhyUYLc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4I8CUEFZPxghG03bcv0R5NVpAuUmh9dkMugyiQXLQ6u91MY86
+	l8cMY2XH/OXi6oy0rEHU3tbqRfOoJ4FzRkKzoF+czNcmBx+K5rCE8Xnmpi8twNhPYRCj8E2mOfP
+	/HqIZ2ZnyPSDkxwCContrFhrjTZqxV5+ZZRQvvOmC
+X-Gm-Gg: ASbGncujBM4b+eOxml2FgKnUnW1ADzrq4fHh8x0fp0dY8HayKVVEm8FdjRIZdd0/cYE
+	wiYJCwYCGN6EBWfTPbCcsUXQraRTxKQ99Li8AGafC3zpaB37lddUzSJqm4MDeLujZHVbt8oolNb
+	aihM4mo743jhCT6ldTfpFQWvrq99Udqr/n7k6q+7fk3P4kj6yVPqkRUxHlTDXUliI6TwI8oc3Bh
+	EyYvPFWzbMbw13r2TW0GUo32WRlpD6bsmZhrUekSPp3+mQjHxBdXTwUFfo7
+X-Google-Smtp-Source: AGHT+IGG6ljG8dQXrbPMHMngTWoRxuoBwiYTf1g+loJabph/3sJvjF+CAfgur8C+kI6DxVyO7cJEyTRIhbK+lyOGqDM=
+X-Received: by 2002:aa7:de05:0:b0:62f:9f43:2117 with SMTP id
+ 4fb4d7f45d1cf-6415d3ae66cmr9769a12.0.1762542516150; Fri, 07 Nov 2025 11:08:36
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251103181840.kx3egw5fwgzpksu4@desk>
+References: <20251101000241.3764458-1-jmattson@google.com> <6f749888-28ef-419b-bc0a-5a82b6b58787@amd.com>
+ <CALMp9eQJ69euqBs2NF6fQtb-Vf_0XqSiXs07h29Gr57-cvdGJg@mail.gmail.com> <93211ebf-1b8b-4543-bd1c-f3805a54833e@amd.com>
+In-Reply-To: <93211ebf-1b8b-4543-bd1c-f3805a54833e@amd.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 7 Nov 2025 11:08:24 -0800
+X-Gm-Features: AWmQ_bkz3gjPINUjSPU2FE5U7CJsGeQ2ZdXMf9L_NIA6-76979_FlFZxjte5sfY
+Message-ID: <CALMp9eSVXX4mdPP-t_m9R553qaRY_i5q=+1d-9cC3ZuBkynxOA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: SVM: Mark VMCB_LBR dirty when L1 sets DebugCtl[LBR]
+To: Shivansh Dhiman <shivansh.dhiman@amd.com>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, nikunj.dadhania@amd.com, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Matteo Rizzo <matteorizzo@google.com>, evn@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Nov 03, 2025 at 10:18:40AM -0800, Pawan Gupta wrote:
-> diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-> index 08ed5a2e46a5..2be9be782013 100644
-> --- a/arch/x86/include/asm/nospec-branch.h
-> +++ b/arch/x86/include/asm/nospec-branch.h
-> @@ -321,9 +321,11 @@
->  #endif
->  .endm
->  
-> +/* Primarily used in exit-to-userspace path */
-
-What does "primarily" mean here?
-
-$ git grep -w CLEAR_CPU_BUFFERS
-
-says *only* the kernel->user vector.
-
->  #define CLEAR_CPU_BUFFERS \
->  	__CLEAR_CPU_BUFFERS X86_FEATURE_CLEAR_CPU_BUF
->  
-> +/* For use in KVM */
-
-That's why the "VM_" prefix is there.
-
-The comments in arch/x86/include/asm/cpufeatures.h actually already explain
-that, you could make them more explicit but let's not sprinkle comments
-willy-nilly.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+I'm going to rescind this patch. Yosry is going to handle the
+situation differently in his LBRV patch series.
 
