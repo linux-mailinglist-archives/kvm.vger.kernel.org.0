@@ -1,224 +1,215 @@
-Return-Path: <kvm+bounces-62259-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62260-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F41DC3E493
-	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 03:52:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D0AFC3E4A5
+	for <lists+kvm@lfdr.de>; Fri, 07 Nov 2025 03:56:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F347F34B48E
-	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 02:52:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F3C3ACA0B
+	for <lists+kvm@lfdr.de>; Fri,  7 Nov 2025 02:56:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44BA22E7199;
-	Fri,  7 Nov 2025 02:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9202EDD63;
+	Fri,  7 Nov 2025 02:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kJF2I0X1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="US2fHcAA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB552DAFAB
-	for <kvm@vger.kernel.org>; Fri,  7 Nov 2025 02:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CC0F9EC
+	for <kvm@vger.kernel.org>; Fri,  7 Nov 2025 02:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762483940; cv=none; b=DzNAnVm60x3om29DabkeYA3CCym4dsUYE2L6Vf7NvNVcOhWA9DSIJrCxW4EftPddNdknTU6bkvQmnjMHz5LROklRxiomL29Ah21ZSqyE0xKmJyiaX3NGS+SCVpuYzws47jQzrKjOoiiffD/e8QCRCBHkD5kN9PVcV5zoMgR6H9U=
+	t=1762484189; cv=none; b=D4G3BlgMoMDFpWouRrWTeDCHHzzg8vVOWNMcvHnTuzmg+Hkp12LRpPclKzFeynzwBh+cYJ39rKT/RDuIwvyMy8/y7lZV5eRHMALQKhLn+fwzbSllOmpRIxyiJBIE7O6QkErD2YFwMh9e+VgKT85RV6qOO8QTdC3oplXI9ogrFdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762483940; c=relaxed/simple;
-	bh=LGZkf7YP6OLV6kK3Rv7CYUIiRvg3i+u7/aOFPhkBPKg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jZ9KUutBxFw46Ip1BaPbtyBK1jnf9VpZ7MWUzooR7Q8D/03KI++3jOHR6S7pFg0T4NXN+J/+uycItBgUe00sGzeatX8xGjEdybmyQOPu2nhgzgQpOudVeTwzD2gpKaxF0TY4Dj43x74JoXy9msMAlQR2X15vq3UU0/c8b6hcyn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kJF2I0X1; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7864cef1976so3977687b3.0
-        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 18:52:18 -0800 (PST)
+	s=arc-20240116; t=1762484189; c=relaxed/simple;
+	bh=KGyX5E3l/2rEAVe4fMzxCdPllwN1yg3tAT2+mr3+nM8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cxiqBzRjaIOkcmlJQdJP5/ub6s/TJl1IV9YNHUH18UwxcjvdAyu2lW9Jw5KlPTRNzjmsmOcIYi8fbP3TiZ2J7FtOwggAobe9SM3zz8vy40d9E0A32QfR9Ma9wg09zQ6Xn4Pvw4EXoaBP9nl3XbQjN1f589xSR2N2r1Dop7jjP+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=US2fHcAA; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4ed6ca52a0bso104901cf.1
+        for <kvm@vger.kernel.org>; Thu, 06 Nov 2025 18:56:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762483938; x=1763088738; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=to+M3YH5XNWJ8sgc76iueqXwuR+T+gGj83wJZ0qaDfw=;
-        b=kJF2I0X1AKqT9qXyqG+VcidrqeN5gvl0jJRs2IONlijFLouYtf02uxAT5wGnSrLEpN
-         Tp8/Zk2GFMhBzcmxkrkU9iHoerpdmNlyI+SIRMdHSdG34P9nOmE4VR6alI7kqLDI7TGQ
-         zyyV7eZDwNMWoPK557DH6O7DpBHedIX0MoSdobE1CllqN7uIIgbXl7rOKBTTeGBMVyDy
-         c3qte+sOn7hqBWkEohW+68dxlsTdQ8bcAW81aVvEfEVdG74BUsUvEj3tcmUgBCnsvfK6
-         8SzLU8EwY+KiJfYM6GKiTvic+s0pTs7NfwYOT6NEnZpxAX0FIUso1KGlABN5oDqJpyin
-         f2Xg==
+        d=google.com; s=20230601; t=1762484186; x=1763088986; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CQmgj5QKChdvWBZl6l2K3P0Jmw4eVyyr9pwq1Eec+/A=;
+        b=US2fHcAAxOFqj401dhmK2itmJnVSnZY4fpM42aS+n3JX1caMB4TO0AGocHk25PfPkG
+         b/s5/Fbkc0czeiK+QgEMH9UvLjLxXbQFJ4Sufq8hhzwgxREa2HokH9vziTkk6VbJtUGq
+         s8mon1sb2Gt+IcqYCbXHI1jbTlI7Lks5ZLyBdO96teE+YG44O0bLBSc1TTYv4yHwhLYz
+         zkLUnqH/vQBTbVFxX+0wnX+Jg9OkALrT6zIxUX6A+AfYjwxs6YM8j9nTqP068LeCopSC
+         EzkBWwva470U0IAOF5UaNHAbtHh427ykdqQREgMONl5nTCEITWpsWYiTcdCFYMdXg48D
+         ZUEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762483938; x=1763088738;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=to+M3YH5XNWJ8sgc76iueqXwuR+T+gGj83wJZ0qaDfw=;
-        b=kUqbVNbnZ39SFBdcpxvh3NTAPuDbINx1lyssnlFI0Kyv3Tm9/Q0wNWH9PQoPJ86o2a
-         +bMV0nOhBNOOyXFeUw+dI23NSu/SpLtG2RCQGpHTp8xwzMIi673aPVva3qLawZJtw2ce
-         7bJfZn+GFurqf8tzHSb1TuuATBjz7LaSHccgJhOYBIIVI/rWhyGn4S1r3/danOGhBSz6
-         3tDU4dLFaMM6umzD4e+rll4E3sVM8ygxBQq08RauCBQQLhBegUq0VI1/WSvnf/G1pdF1
-         V9qwgHRtzOS9LtanJIcthgNp//El3JPxrn+xdh7QOidVhi/AtgZXTCyuPIX0VXcJLZ00
-         uycg==
-X-Forwarded-Encrypted: i=1; AJvYcCVNgdXlgbvOCMf49E3Olks3GHquqFfGUjQRmTbgxG3Lzpfh4DyRFdw43rpBU6IwYxuz2V4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRUTBo395w0W8Liez527FQDIBPWP9H5RNtsrFvHb1JjFJ4LgVw
-	YpjIha7S7kXKdauyYqzLBwAHhc6IQiJa51mUczFYzJthpIcM41HL2q5+
-X-Gm-Gg: ASbGncvp31quJGIL71U4A2enu33mFLdyIQ7nV/+2Kk6DNRUknbFlC5reYRPZtQ86BPp
-	r0z+AymbegWK0Ng1gq6GtIbYWcm5lh8e0uwPeEbiiakIsX5a/0dAE3bUrgEJoTyCgXWw8m+UffH
-	u1x8tSFAotyXlHZkx2DlpGoLZVNKVtR8bXVJ2YtxtFi+FhO/ddpq0lhuTxKr5DGn6iG8HZrMoTj
-	4fASqh7Qv3oqlnG2P2Znxcm3wHxHwKXXMtX2YQ2aefW8xZfKEcLWAoN3X0EEhZAHpJ+b7j1xbfb
-	mM6Bqxu2ItNlvqJALEqrf6U26Z2IEVl6cT0+owi+rFS3fuK9YKHPszhp2b48bajp/zIt2TzQvQq
-	ivDpsBmgpZp9Ggva77iwzoTiJc+Esk9rylBXHKt2LsDI0K16bcHLSvZo7MOAwUMloy/E+84A+bt
-	+Nu6uX5SzjyVQE2R9yCn6mfY7J9eM3aNEiKD7G
-X-Google-Smtp-Source: AGHT+IEjmJ3F7jVxmWzAKOE8ZCFLH8yvuCjB7m8mU8An6yxSyAVDGX/tJUnPe0dCIHSXZMA38QvYjg==
-X-Received: by 2002:a05:690e:4185:b0:63e:1563:4801 with SMTP id 956f58d0204a3-640c9d699f7mr96467d50.22.1762483937682;
-        Thu, 06 Nov 2025 18:52:17 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:41::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-640b5ca70f7sm1358837d50.12.2025.11.06.18.52.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 18:52:17 -0800 (PST)
-Date: Thu, 6 Nov 2025 18:52:15 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v8 06/14] vsock/virtio: add netns to virtio
- transport common
-Message-ID: <aQ1e3/DZbgnYw4Ja@devvm11784.nha0.facebook.com>
-References: <20251023-vsock-vmtest-v8-0-dea984d02bb0@meta.com>
- <20251023-vsock-vmtest-v8-6-dea984d02bb0@meta.com>
- <hkwlp6wpiik35zesxqfe6uw7m6uayd4tcbvrg55qhhej3ox33q@lah2dwed477g>
+        d=1e100.net; s=20230601; t=1762484186; x=1763088986;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=CQmgj5QKChdvWBZl6l2K3P0Jmw4eVyyr9pwq1Eec+/A=;
+        b=QDDKKkuuJ0oAvyjQNju63D0/a3E/pLGsNkHNZ1W++bpWnhn3vbbQ6BXjGWfSO+4t+Q
+         TvRTJ3o1Jx+b9pbrSJe53bjG9VX7HphKY0zMyyuxFVcvzTCBvYFpHl1ruLJ40ffkYjlq
+         FncRqHg48dnOn2+h1BKoE14zRG6XxK525AHp09OEkntZDGwE66WElrdHfN6IINskdGnV
+         PvwUW9Mm5kdQIevftAFI+zNNaI2OKUg13X384KLpYif45rNK4Gt0eka0oxaEGUsTsmrI
+         acKkydc29hEcc9a/VMoenIbaXSlgRIhsv0E0/JdlIMVub3SHVd1MGPcAlOeS0DVGVQFc
+         A5sw==
+X-Forwarded-Encrypted: i=1; AJvYcCU2OuLyGNqm71ENG/ZiScPsdev1Vf/Mvn/oJuSIFsBHhnhmNDLc+EtiL46tmPyRP8Hw0/8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyB2TUOmcVtPsPatOnIgd9UnUee2uLQx1fPWcx88XatkGhC53ac
+	3LO0NwxxKUf1r5gf/172xcwUQf8V9b/eA6/cDGAXlMfwuva5o2iioIAmzZscKlQDGS15qWm/lsc
+	JDw7QMB5oVsox8zAWjNh/wvRlpRu5y4h0j045IwMg
+X-Gm-Gg: ASbGncsqYzAk8/pFzKCJ7CBp4ADSefOrQ7Zrx4xrJHfX8358pUy6ZM/xPZLuphqqmV7
+	6ugDQH8ACn8OrpG9cEQN1UANpTX6+Tiz4c2QV4JagGa0XuIvoI2CaE1UzrlisNp+lYoroI2Eti6
+	faNGDWv6ieIFX1/JR5qTKzaL8O5NQjUbT0y3QeIO+23G1KsHx/XiTc5e7vwgYDF32xPaEuOfHRH
+	EneQfAr43YzAaSRAKduYKGwa5ryJuCaMcBdRInRl/yV32697rBGqDZGcjW+
+X-Google-Smtp-Source: AGHT+IEGltPMlvWKHIQAUQbc07wVxz4D4r3t1360g0HtPzLaVR/78O7+74fTpgXmKuSxlgcBZCrr9IfOzixdBMHk7v0=
+X-Received: by 2002:a05:622a:14d1:b0:4b7:9617:4b51 with SMTP id
+ d75a77b69052e-4ed960aa0f2mr1753261cf.15.1762484186227; Thu, 06 Nov 2025
+ 18:56:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <hkwlp6wpiik35zesxqfe6uw7m6uayd4tcbvrg55qhhej3ox33q@lah2dwed477g>
+References: <20251104003536.3601931-1-rananta@google.com> <20251104003536.3601931-5-rananta@google.com>
+ <aQvzNZU9x9gmFzH3@google.com> <CAJHc60ycPfeba0hjiHLTgFO2JAjPsuWzHhJqVbqOTEaOPfNy_A@mail.gmail.com>
+ <aQzcQ0fJd-aCRThS@google.com>
+In-Reply-To: <aQzcQ0fJd-aCRThS@google.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Fri, 7 Nov 2025 08:26:15 +0530
+X-Gm-Features: AWmQ_bn_M54rF3JLR8P7eKkDr2OreZ7Iqye392uow-ms0jUYNX8AdkTca3yQK5I
+Message-ID: <CAJHc60y-0ea=7_WExNzcVNYWkAP43507puJfOEir1r4ezv3CUQ@mail.gmail.com>
+Subject: Re: [PATCH 4/4] vfio: selftests: Add tests to validate SR-IOV UAPI
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>, Alex Williamson <alex.williamson@redhat.com>, 
+	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 06, 2025 at 05:20:05PM +0100, Stefano Garzarella wrote:
-> On Thu, Oct 23, 2025 at 11:27:45AM -0700, Bobby Eshleman wrote:
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > Enable network namespace support in the virtio-vsock common transport
-> > layer by declaring namespace pointers in the transmit and receive
-> > paths.
-> > 
-> > The changes include:
-> > 1. Add a 'net' field to virtio_vsock_pkt_info to carry the namespace
-> >   pointer for outgoing packets.
-> > 2. Store the namespace and namespace mode in the skb control buffer when
-> >   allocating packets (except for VIRTIO_VSOCK_OP_RST packets which do
-> >   not have an associated socket).
-> > 3. Retrieve namespace information from skbs on the receive path for
-> >   lookups using vsock_find_connected_socket_net() and
-> >   vsock_find_bound_socket_net().
-> > 
-> > This allows users of virtio transport common code
-> > (vhost-vsock/virtio-vsock) to later enable namespace support.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> > ---
-> > Changes in v7:
-> > - add comment explaining the !vsk case in virtio_transport_alloc_skb()
-> > ---
-> > include/linux/virtio_vsock.h            |  1 +
-> > net/vmw_vsock/virtio_transport_common.c | 21 +++++++++++++++++++--
-> > 2 files changed, 20 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-> > index 29290395054c..f90646f82993 100644
-> > --- a/include/linux/virtio_vsock.h
-> > +++ b/include/linux/virtio_vsock.h
-> > @@ -217,6 +217,7 @@ struct virtio_vsock_pkt_info {
-> > 	u32 remote_cid, remote_port;
-> > 	struct vsock_sock *vsk;
-> > 	struct msghdr *msg;
-> > +	struct net *net;
-> > 	u32 pkt_len;
-> > 	u16 type;
-> > 	u16 op;
-> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > index dcc8a1d5851e..b8e52c71920a 100644
-> > --- a/net/vmw_vsock/virtio_transport_common.c
-> > +++ b/net/vmw_vsock/virtio_transport_common.c
-> > @@ -316,6 +316,15 @@ static struct sk_buff *virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *
-> > 					 info->flags,
-> > 					 zcopy);
-> > 
-> > +	/*
-> > +	 * If there is no corresponding socket, then we don't have a
-> > +	 * corresponding namespace. This only happens For VIRTIO_VSOCK_OP_RST.
-> > +	 */
-> 
-> So, in virtio_transport_recv_pkt() should we check that `net` is not set?
-> 
-> Should we set it to NULL here?
-> 
+On Thu, Nov 6, 2025 at 11:05=E2=80=AFPM David Matlack <dmatlack@google.com>=
+ wrote:
+>
+> On 2025-11-06 10:35 PM, Raghavendra Rao Ananta wrote:
+> > On Thu, Nov 6, 2025 at 6:30=E2=80=AFAM David Matlack <dmatlack@google.c=
+om> wrote:
+> > >
+> > > On 2025-11-04 12:35 AM, Raghavendra Rao Ananta wrote:
+> > >
+> > > > +static const char *pf_dev_bdf;
+> > > > +static char vf_dev_bdf[16];
+> > >
+> > > vf_dev_bdf can be part of the test fixture instead of a global variab=
+le.
+> > > pf_dev_bdf should be the only global variable since we have to get it
+> > > from main() into the text fixture.
+> > >
+> > My understading is placing vars in FIXTURE() is helpful to get an
+> > access across various other FIXTURE_*() and TEST*() functions. Out of
+> > curiosity, is there an advantage here vs having them global?
+>
+> Global variables are just generally a bad design pattern. IMO, only
+> variables that truly need to be global should be global.
+>
+> The only variable that needs to be global is pf_dev_bdf.
+>
+> Since vf_dev_bdf needs to be accessed within FIXTURE_SETUP(),
+> FIXTURE_TEARDOWN(), and TEST_F(), then FIXTURE() is the right home for
+> it. The whole point of FIXTURE() is to hold state for each TEST_F().
+>
+Sounds good. I'll move them into FIXTURE().
 
-Sounds good to me.
+> >
+> > > > +
+> > > > +struct vfio_pci_device *pf_device;
+> > > > +struct vfio_pci_device *vf_device;
+> > >
+> > > These can be local variables in the places they are used.
+> > >
+> > I was a bit greedy to save a few lines, as they are reassigned in
+> > every TEST_F() anyway. Is there any advantage by making them local?
+>
+> It's easy to mess up global variables. And also when reading the code it
+> is confusing to see a global variable that does not need to be global.
+> It makes me think I must be missing something.
+>
+> As a general practice I think it's good to limit the scope of variables
+> to the minimum scope they are needed.
+>
+Agreed. I prefer min scope too, but I guess my habit of using global
+variables in other tests and avoiding passing pointers around led me
+to use it here. I'll move it to a local scope.
 
-> > +	if (vsk) {
-> > +		virtio_vsock_skb_set_net(skb, info->net);
-> 
-> Ditto here about the net refcnt, can the net disappear?
-> Should we use get_net() in some way, or the socket will prevent that?
-> 
+> > > > +     snprintf(path, PATH_MAX, "%s/%s/sriov_numvfs", PCI_SYSFS_PATH=
+, pf_dev_bdf);
+> > > > +     ASSERT_GT(fd =3D open(path, O_RDWR), 0);
+> > > > +     ASSERT_GT(read(fd, buf, ARRAY_SIZE(buf)), 0);
+> > > > +     nr_vfs =3D strtoul(buf, NULL, 0);
+> > > > +     if (nr_vfs =3D=3D 0)
+> > >
+> > > If VFs are already enabled, shouldn't the test fail or skip?
+> > >
+> > My idea was to simply "steal" the device that was already created and
+> > use it. Do we want to skip it, as you suggested?
+>
+> If a VF already exists it might be bound to a different driver, and may
+> be in use by something else. I think the only safe thing to do is to
+> bail if a VF already exists. If the test creates the VF, then it knows
+> that it owns it.
+>
+Makes sense. Let's skip in that case.
 
-As long as the socket has an outstanding skb it can't be destroyed and
-so will have a reference to the net, that is after skb_set_owner_w() and
-freeing... so I think this is okay.
+> > > > +FIXTURE_TEARDOWN(vfio_pci_sriov_uapi_test)
+> > > > +{
+> > > > +}
+> > >
+> > > FIXTURE_TEARDOWN() should undo what FIXTURE_SETUP() did, i.e. write 0=
+ to
+> > > sriov_numvfs. Otherwise running this test will leave behind SR-IOV
+> > > enabled on the PF.
+> > >
+> > I had this originally, but then realized that run.sh aready resets the
+> > sriov_numvfs to its original value. We can do it here too, if you'd
+> > like to keep the symmetry and make the test self-sufficient. With some
+> > of your other suggestions, I may have to do some more cleanup here
+> > now.
+>
+> I think the test should return the PF back to the state it was in at the
+> start of the test. That way the test doesn't "leak" changes it made. The
+> best way to do that is to clean up in FIXTURE_TEARDOWN(). There might be
+> some other test that wants to run using the PF before run.sh does its
+> cleanup work.
+>
+Sure, I'll clean up everything that the test does in FIXTURE_SETUP().
 
-But, maybe we could simplify the implied relationship between skb, sk,
-and net by removing the VIRTIO_VSOCK_SKB_CB(skb)->net entirely, and only
-ever referring to sock_net(skb->sk)? I remember originally having a
-reason for adding it to the cb, but my hunch is it that it was probably
-some confusion over the !vsk case.
+> > > You could also make this the users problem (the user has to provide a=
+ PF
+> > > with 1 VF where both PF and VF are bound to vfio-pci). But I think it
+> > > would be nice to make the test work automatically given a PF if we ca=
+n.
+> > Let's go with the latter, assuming it doesn't get too complicated
+> > (currently, the setup part seems bigger than the actual test :) )
+>
+> Let's create helpers for all the sysfs operations under lib.
+>
+> e.g. tools/testing/selftests/vfio/lib/sysfs.c:
+>
+>   int sysfs_get_sriov_totalvfs(const char *bdf);
+>   void sysfs_set_sriov_numvfs(const char *bdfs, int numvfs);
+>   ...
+>
+> That will greatly simplify the amount of code in this test, and I think
+> it's highly likely we re-use those functions in other tests. And even if
+> we don't, it's nice to encapsulate all the sysfs code in one place for
+> readability and maintainability.
+>
+> If you do this I think there's also some sysfs stuff in
+> vfio_pci_device.c that you can also pull out into this helper file.
+Good idea. I'll create this lib.
 
-WDYT?
-
-[...]
-
-> > 
-> > 	return virtio_transport_send_pkt_info(vsk, &info);
-> > @@ -1578,7 +1593,9 @@ static bool virtio_transport_valid_type(u16 type)
-> > void virtio_transport_recv_pkt(struct virtio_transport *t,
-> > 			       struct sk_buff *skb)
-> > {
-> > +	enum vsock_net_mode net_mode = virtio_vsock_skb_net_mode(skb);
-> > 	struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
-> > +	struct net *net = virtio_vsock_skb_net(skb);
-> 
-> Okay, so this is where the skb net is read, so why we touch the virtio-vsock
-> driver (virtio_transport.c) in the other patch where we changed just
-> af_vsock.c?
-> 
-> IMO we should move that change here, or in a separate commit.
-> Or maybe I missed some dependency :-)
-> 
-
-100% agree.
-
-> Thanks,
-> Stefano
-> 
-
-Thanks!
-
--Bobby
+Thank you.
+Raghavendra
 
