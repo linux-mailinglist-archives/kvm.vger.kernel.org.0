@@ -1,116 +1,92 @@
-Return-Path: <kvm+bounces-62369-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62370-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D118C42220
-	for <lists+kvm@lfdr.de>; Sat, 08 Nov 2025 01:37:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 209B7C4225F
+	for <lists+kvm@lfdr.de>; Sat, 08 Nov 2025 01:46:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E816E4EB5DD
-	for <lists+kvm@lfdr.de>; Sat,  8 Nov 2025 00:37:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFE884267C8
+	for <lists+kvm@lfdr.de>; Sat,  8 Nov 2025 00:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46696246332;
-	Sat,  8 Nov 2025 00:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72F6286422;
+	Sat,  8 Nov 2025 00:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="5pvNYkpL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j+PEvx3q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7B623A99F;
-	Sat,  8 Nov 2025 00:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA7618DB26;
+	Sat,  8 Nov 2025 00:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762562212; cv=none; b=fiJFHsUDpR7ZxjOpAMzunz+RAJxn1mgWmN5n7k+xVCQ3yMGBQ3LpsmrV7XbV7qRIJlq6GJcGYD4j8M0ngF3VnHsSbkgT+ZUMX625CKc/dxM+D0gDw6ND/fA2MxI+kDc7A7/awI5p4A0FsaRtj6jJdIubWZi85Z0Uhq8V9VEM+HQ=
+	t=1762562755; cv=none; b=iNZ05PyhwaahPXw9rbr1X7FPAsmWmaBNgv5c98VHO3mciSy2WGk4QGA77nQXNt/6SdS/xExElyXpayXcdd5nooHDUitd7vBKhpMp4pZOlRme6+pFwXc6WMF1x529M4w3eZSyrZmt4yebR38feQ0fa2p3RyTUNCDqvY6SWDqRSho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762562212; c=relaxed/simple;
-	bh=eU4TAIZbs7C6gGLQnekCSFGis0qEoilzG6PALi+wMrY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K3Bf0zcdqQiiCMZbTEDvzEqFGG9cZNBoN9br2uwfszr91dEn6OLNyJsC//V8fX38NqlX/KMxVvfg07zx+pgRDbTdgi10//pKGvljkxM9BJSaVu6uax0j9Nuzt2Ya0sgml3omR3qubuHqxLSbP26zNmVJikfpjxbSiqChH0qb/eA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=5pvNYkpL; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A7Lu8JX2926361;
-	Fri, 7 Nov 2025 16:36:45 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=Et2be86M8p24fu0+u8Pm
-	0xt4QWqeKRsLhMWif8WRR/8=; b=5pvNYkpLD7pZSr8hskWlDZBZ7qHaMWTRu8LQ
-	BTvSvvanAw2Ed2aTIF4jE+3vbqy9YHx3yhSro0R98S2jcx1RNzLgGyDxkKKNbNUk
-	z7IcoL1tOKPCxZQnPNysD73oXuzQ7R/8p3WkqOSWn7GJIVfMesSJxxyMKlMxreuc
-	dhIlfQlNWcm8dVGTwygbABVZswNMV8Ljq4ypwSj+E/rABc4Uumyqzkfop9jrP5Rc
-	SGkDpvhuecaacZXcnNkZ7ZNIqzgyp1/eyk7/gPMp72xk3pZ+S1sW25+sQ2PP24lP
-	pKrF6xufd4qj4TVaYIyAtBZ0B7mZAVwsXiYgt4xutNHYwQGqIw==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4a9kpvcc9x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Fri, 07 Nov 2025 16:36:44 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Sat, 8 Nov 2025 00:36:43 +0000
-Date: Fri, 7 Nov 2025 16:36:42 -0800
-From: Alex Mastro <amastro@fb.com>
-To: David Matlack <dmatlack@google.com>
-CC: Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v6 0/5] vfio: handle DMA map/unmap up to the addressable
- limit
-Message-ID: <aQ6Qmrzf7X0EP9aJ@devgpu015.cco6.facebook.com>
-References: <20251028-fix-unmap-v6-0-2542b96bcc8e@fb.com>
- <aQ1A_XQAyFqD5s77@google.com>
- <aQ5xmwPOAzG4b_vm@google.com>
+	s=arc-20240116; t=1762562755; c=relaxed/simple;
+	bh=Hsqc59LHEZr6vRsViG4HA9mssxxXrUhOeveBVu79iD8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZOF7dAZtM3qrMe5nQSdu04tUu4FraimyYGplJ59e0GV2KgaCdhSjMse5yW+EnN0EbaAZwL5OZcrFE+4O0JDs0iRqNkwCY3twNVcNdSCtoJMEEA0yuNcyTmdu3YC1vLHlMs4/ZfBkvCnU7MRToExwHMT3fmNWDhe3am3m5/Iepag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j+PEvx3q; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762562749;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=y8OjT80dzDQbAAfR+kGSDqcO/L4H9alEphnOquJBA7c=;
+	b=j+PEvx3qhym64yqATfF6VPTA3eEK37PtUUhLoE6akGSIJ9DhUXMXkinkNqb3Qsn83uTnzo
+	4fI60aDvBZJJFugWq6BkbqGWnOVBNPSff+sz0ECHF/lP3Uu0r6TPTtkzpXj9xec6V3fLhp
+	1iE7pxfRAsyXJz26c2NNbKgiD0S0pog=
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Jim Mattson <jmattson@google.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Subject: [PATCH 0/6] KVM: SVM: LBR virtualization fixes
+Date: Sat,  8 Nov 2025 00:45:18 +0000
+Message-ID: <20251108004524.1600006-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aQ5xmwPOAzG4b_vm@google.com>
-X-Authority-Analysis: v=2.4 cv=GopPO01C c=1 sm=1 tr=0 ts=690e909d cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=1XWaLZrsAAAA:8 a=Xgbwr4nqScdIo8cszjEA:9 a=CjuIK1q_8ugA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: 1wYNdKE4l1eFVFDrwhJSmHOJkPN8yh2X
-X-Proofpoint-GUID: 1wYNdKE4l1eFVFDrwhJSmHOJkPN8yh2X
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDAwMyBTYWx0ZWRfXwYqFehUMMp5i
- ZIov0xSL8XAHzN0EQgDI+fVUD7VHmBVKmtYeA2NdICsitVas+xf3TZpvUbq6dkAp9PH0ZvNDTPG
- 3QseW/UHwU6Hr/FiYLRID+9mXA2CQGGBnyAF9LB0Z73v6+s5oKvP9B525CPCaMp1rjhUXjOw4dX
- 87nniVHG609Ajl1QvdwKJN8tuA14MpCLKfC1RyLBFJ8PG6v6wTbTL+t6jE4dn3F+ky9Vm2UaSjY
- 5nrU8SYcrfRc7wM8MSVo04jbV60AU9O6nMYa3I+pEyfvidj8DGDSfWFProlmTWsD3+nBKE6YqOa
- v9OR3JimthGRvPXYTZlYHZuiOsbsFKu6TxHLOX87qOL+cty0m3x7xFMhC8/uVNg1nZSujwyRDj1
- rb1aqeYKBSFrfFvCLTXv3nLVb14oKQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-07_07,2025-11-06_01,2025-10-01_01
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Nov 07, 2025 at 10:24:27PM +0000, David Matlack wrote:
-> On 2025-11-07 12:44 AM, David Matlack wrote:
-> > On 2025-10-28 09:14 AM, Alex Mastro wrote:
-> For type1, I tracked down -EINVAL as coming from
-> vfio_iommu_iova_dma_valid() returning false.
-> 
-> The system I tested on only supports IOVAs up through
-> 0x00ffffffffffffff.
-> 
-> Do you know what systems supports up to 0xffffffffffffffff? I would like
-> to try to make sure I am getting test coverage there when running these
-> tests.
+This series fixes multiple problems with LBR virtualization, including a
+fun problem that leads to L1 reading the host's LBR MSRs. It also
+considerably simplifies the code.
 
-I observed this on an AMD EPYC 9654 server.
+The series has a selftest in the end that verifies that save/restore
+work correctly. I will send a couple of new kvm-unit-tests separately
+that exercise the bugs fixed by patches 2 & 3.
 
-> In the meantime, I sent out a fix to skip this test instead of failing:
-> 
->   https://lore.kernel.org/kvm/20251107222058.2009244-1-dmatlack@google.com/
+Yosry Ahmed (6):
+  KVM: SVM: Mark VMCB_LBR dirty when MSR_IA32_DEBUGCTLMSR is updated
+  KVM: nSVM: Always recalculate LBR MSR intercepts in svm_update_lbrv()
+  KVM: nSVM: Fix and simplify LBR virtualization handling with nested
+  KVM: SVM: Switch svm_copy_lbrs() to a macro
+  KVM: SVM: Add missing save/restore handling of LBR MSRs
+  KVM: selftests: Add a test for LBR save/restore (ft. nested)
 
-Thanks for the fix -- acked. My tests were making too strong an assumption
-about availability of those ranges.
+ arch/x86/kvm/svm/nested.c                     |  31 ++--
+ arch/x86/kvm/svm/svm.c                        |  98 ++++++-----
+ arch/x86/kvm/svm/svm.h                        |  10 +-
+ arch/x86/kvm/x86.c                            |   3 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/include/x86/processor.h     |   5 +
+ .../selftests/kvm/x86/svm_lbr_nested_state.c  | 155 ++++++++++++++++++
+ 7 files changed, 236 insertions(+), 67 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/svm_lbr_nested_state.c
 
-Alex
+-- 
+2.51.2.1041.gc1ab5b90ca-goog
+
 
