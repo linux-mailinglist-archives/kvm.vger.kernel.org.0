@@ -1,390 +1,191 @@
-Return-Path: <kvm+bounces-62410-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62411-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD680C434F8
-	for <lists+kvm@lfdr.de>; Sat, 08 Nov 2025 22:37:25 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A912BC435C4
+	for <lists+kvm@lfdr.de>; Sat, 08 Nov 2025 23:58:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB5313AE9A6
-	for <lists+kvm@lfdr.de>; Sat,  8 Nov 2025 21:37:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E310E4E2135
+	for <lists+kvm@lfdr.de>; Sat,  8 Nov 2025 22:58:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4C7286413;
-	Sat,  8 Nov 2025 21:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581C324E4B4;
+	Sat,  8 Nov 2025 22:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="lAP2oxQe";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mWxUOEOt"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gDuV+wuL"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011033.outbound.protection.outlook.com [40.93.194.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD842556E;
-	Sat,  8 Nov 2025 21:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762637836; cv=none; b=k5j+vic78Y7JrbyBBK7wB89A5VzIHM0nhPZwFtMx9I9JcZg/ZAma9laOeNHb5ktDsf9qi6WN/bouZDw/ZXNt2JWZ/LFLefOsVKCHjk5X2d9/JZsPI5/CP8egTDSnfnSlIe49+qZPhAzGWJXOm73hzxaNSc6Wf97Ka7eQLtuyeHI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762637836; c=relaxed/simple;
-	bh=tqRXJEE6t0G/CkZOZKgSO/5cqL3qn1wQsFqLb2HciZk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qr4rTqPFqy5m7OJR9theFwkCv9cM++qOhsWd8fs1B5PaRMJ6kkFt+KtS2z/uo2zdJsnSm843vfvVM3adSpFTPfwEw8nJlFlhShRDHPVY76XWg1LJWjhcEwwdTO6zITd7f5NdYFWtYaHDxGKk5kX01zIpl8xCnS19k3NwK68VIH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=lAP2oxQe; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mWxUOEOt; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id 222D11D0013D;
-	Sat,  8 Nov 2025 16:37:13 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Sat, 08 Nov 2025 16:37:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1762637832;
-	 x=1762724232; bh=R2o8dRgLBu6k5ntCRvLmVSXDys99jeWl6z7XGHj9RW4=; b=
-	lAP2oxQeNiHKRliIm1PcHfwLBDgv991Wm5AooHXTjLKN38MIDzmaIdTEs3+7hJHB
-	deMPH/xfMKVDAfJ40FdUPx2EHpga2VQBkKwThj5Tem4yF5PXz9TvVgJVS89lF6e4
-	RiN+qS+HBkipJ+2G4q64Ly6He58vw+nZHXCMKTFI+jDNaSIYkt2BhzSLbmfSbx/3
-	65wd1NOzWmfiWgfOkRnINGdhB4G4hMpHiRiOSD6LUeoA1duNPJFtZv9BYay9NU0Z
-	3xLqLok730nf5opeg9LtKRIAJ6ytbuxowcb8SkSvOT400/ufHaSuloEBGHiOP9hQ
-	z3DceOUbRfUd2E6Iw/m5Bw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762637832; x=
-	1762724232; bh=R2o8dRgLBu6k5ntCRvLmVSXDys99jeWl6z7XGHj9RW4=; b=m
-	WxUOEOtZ/x5a/JeOaOTU8goZcuCEgXqEgPZO/8dSXu7VeolmPh/f1762YI+BFPJD
-	0UbZQvuCDjOQa9HrVV3ExZz2YVLA6szC7Nv84hTg4H+HdN7BQgF6vxatKCcJOIpe
-	2YzOn65faeUkjV3xVSMgUpsnIxYQcdtabsSD3DhBbgaJIvjm5m67gCMGlBjlSYmD
-	i4F6ePdJ8EO6vSAX8OKYVkX+u1cGXB52cNJ3S7XkqKJ52NIEp5732D1I7AMdTQ6p
-	lcYfqd9WlrJB9NqYMq1em3+DG9ae2wc8u3YtBUsF4msy99s5qbXgGi/H7+uKJR10
-	okosFptTL8M42B5jhiHpg==
-X-ME-Sender: <xms:CLgPaYvH-tS2HvtA52PPJbVpmJPwG1OcKiu42GRg0eLUT-A7Q1CNGA>
-    <xme:CLgPaexHH2ADw_xmN4yICl2TYm7i0VdWM2e5SgisaD8aGOCiWogXSgpq7nDTHtC4n
-    iTTUFsnPgmZO19oM_I5VwTnNJvjwLqdRIE9s8C-w2PsjUZsXbK36A>
-X-ME-Received: <xmr:CLgPabB29WNLeB7klUeaLXPjl9KSDLf76f8kuFPITUZG7PnreHwRYgaB>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduleefieegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
-    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
-    htvghrnhephedvtdeuveejudffjeefudfhueefjedvtefgffdtieeiudfhjeejhffhfeeu
-    vedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdp
-    nhgspghrtghpthhtohepiedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghmrg
-    hsthhrohesfhgsrdgtohhmpdhrtghpthhtohepughmrghtlhgrtghksehgohhoghhlvgdr
-    tghomhdprhgtphhtthhopegrlhgvgidrfihilhhlihgrmhhsohhnsehrvgguhhgrthdrtg
-    homhdprhgtphhtthhopehjghhgseiiihgvphgvrdgtrgdprhgtphhtthhopehkvhhmsehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:CLgPacfHlbEkngtk9NsOIKFhcTSrPkwSFV_lo1gZ0YssB3kuIWU8kA>
-    <xmx:CLgPaVlQv_l4_Gok10C4sMrpsARXSfq6OEzxkdwnAoaAB89TFOiFnQ>
-    <xmx:CLgPaTEwf3cynC29zfuAd8_8ZqtlSRsfD2cET29rcuPkig6MVFrKJw>
-    <xmx:CLgPad5m4_wLtku7Hw4VIUGn-5jsI9NS_OPWLtt1fF9Zu0bzleqY5w>
-    <xmx:CLgPad_SCKnCcGQcFP9cUDEoovz4NiOMqyE2prgDCqMhZNwe4_fs2eng>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 8 Nov 2025 16:37:11 -0500 (EST)
-Date: Sat, 8 Nov 2025 14:37:10 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Alex Mastro <amastro@fb.com>
-Cc: David Matlack <dmatlack@google.com>, Alex Williamson
- <alex.williamson@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] vfio: selftests: Skip vfio_dma_map_limit_test if
- mapping returns -EINVAL
-Message-ID: <20251108143710.318702ec.alex@shazbot.org>
-In-Reply-To: <aQ+l5IRtFaE24v0g@devgpu015.cco6.facebook.com>
-References: <20251107222058.2009244-1-dmatlack@google.com>
-	<aQ6MFM1NX8WsDIdX@devgpu015.cco6.facebook.com>
-	<aQ+l5IRtFaE24v0g@devgpu015.cco6.facebook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA77F18E1F
+	for <kvm@vger.kernel.org>; Sat,  8 Nov 2025 22:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.33
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762642731; cv=fail; b=Jq6t57Nahk1w0EqFByVzWKyOdjB2BW4enzy/Qaor3aFw76DBYZFxodI21YZPp/3Y5SIVc0X/b36gZo/BiNZoe/vquWOJmLrJvWJgxFiISuWEMv3ei25Ut2+qoDLNNLab3R1xfVCICXBGhp6/tBRUHb96VZ3i43il6whZ11G/3AE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762642731; c=relaxed/simple;
+	bh=mqWLwZlCDF/h5Anq7XbzC7y+8C+3bPkYERfRUaltU4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ifSNiPhZLhzCU/+9gTb1pTdAsbw5QwXBGNQ02938qLfhqGJRaWFA5pl5EfieKS3Y01t8f4JSdmFawFEvgiu+36mYlc2Dk5OwoIek8020tAK3RoW8sgT4N+YAoaqORpJrbo/+UySB1APWJ7wKKdJqlq4eHt8QsLylDyeksB+6N6g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gDuV+wuL; arc=fail smtp.client-ip=40.93.194.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vYyq8Zle6xKPJsU+YTD3NXfOhCgcHx3ZSUVfoC179nzFsiJoImxOT5gZxdy+a2clExGwmnoEmqSJRNURbNWO1uzJLEbwuI/kjFgTvuCzjIqtQ5qLrKfx3+JQmO1W4OogHIlvtgd0UXci+LNEw+h/Dlqvq0dkCjRcIDduK6rl1EaQnyM1H2hBPoROATjgFqLFTvQJI0PKCOMvvittz8FBBJi4qEepQcuM617CeafpcZKLP8mQaK2GzzI8lBeqoOrSNLzFA6dpG7nUlcqUy6ojRSyApA/pJSz9FPPQEnsbS/6/S+7aXJClOJ2wTo3TyTmwD9uD2KjoLT7NBLqcT+TAtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/DvpOcMUz05SNJOvi3EOdRQdV8opsKsTMZZQS/i2wvI=;
+ b=F679N5nonbkZ5xBRGhmeShQvS4OwpNWwlyc4FPSax9aQ4bsdGtCbhBFVh/hd9zzM6w+YGKZNYt8DK1ec5F16x/kQShL3rgQlAxbwfrIZQwrV5OQ+dKiWoTjPVadPta3IBtMASQtVmOQ6YWU6hQuysN967o6Z6zZLWk6M6dypvB0iB12owRXqGQ2bue99WUc9Q0bTuQqtBMWZuya1PcQ5y+1xSWq416BEYehr5YNo3npoKzO9HJQ6Xe5+hbZmgkq5hqrREHSBzIhZDxzB1CgnPr3QtualtOJZZspA5huxR+9KeARGQ6H16wDloL+Qkq8gAnexieqXJwNhwqd/z6Fxmg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/DvpOcMUz05SNJOvi3EOdRQdV8opsKsTMZZQS/i2wvI=;
+ b=gDuV+wuLa8+pK2/Y0yLSh862qimJM6fsUwpqzIyo8THVZmwdIJr1srWUsh+NDurd4zl9RAqaukRBFoPAjAHIVmHaChrFk4kDt5/VNNAb19/ZGmgPw1pChP4R8O7LM247a8uhxiBapSkrjKl0MGDnwLbuzt52XeWNI5mXS0SJrWUda5WIaN5yUMGJHu/0Yx5xid8mfdaJM0lQ1o3ULUbq9P+ADv9PhoNndcdXNpzs7oXpS+HhClkoIAyZ9Scm8IryHT4QGSDRDrGLS3aVlRkMVAmD3HozYgjI3Nut8fYE9KU0Im6hBIsUnGRZDkh4xwQMAaSanVwpw+GPbZfXrVY7HQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
+ by DS0PR12MB7899.namprd12.prod.outlook.com (2603:10b6:8:149::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.13; Sat, 8 Nov
+ 2025 22:58:44 +0000
+Received: from MN2PR12MB3613.namprd12.prod.outlook.com
+ ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
+ ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9298.015; Sat, 8 Nov 2025
+ 22:58:44 +0000
+Date: Sat, 8 Nov 2025 18:58:42 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Alex Williamson <alex@shazbot.org>
+Cc: dmatlack@google.com, Alex Williamson <alex.williamson@nvidia.com>,
+	amastro@fb.com, kvm@vger.kernel.org
+Subject: Re: [PATCH] vfio: selftests: Incorporate IOVA range info
+Message-ID: <20251108225842.GI1932966@nvidia.com>
+References: <20251108212954.26477-1-alex@shazbot.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251108212954.26477-1-alex@shazbot.org>
+X-ClientProxiedBy: BL1PR13CA0448.namprd13.prod.outlook.com
+ (2603:10b6:208:2c3::33) To MN2PR12MB3613.namprd12.prod.outlook.com
+ (2603:10b6:208:c1::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|DS0PR12MB7899:EE_
+X-MS-Office365-Filtering-Correlation-Id: dfc6ff8d-7920-44b3-771a-08de1f1a5de9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?to+zJWNwb0dImMH83sdirEud981VLltwZNwSLs2fpN1FWsAlK/wGQns00DvM?=
+ =?us-ascii?Q?B86XBo/71opSbcko2RhUzOWe/1MWqrzGiAkisxOeO8tobV15Wzvh9Oe0GWQ8?=
+ =?us-ascii?Q?I4OI/F1O7YYov9uj9fO75z8yTsuGQJNwWeE376gi4cr4HIJ61xtJFw+NBU5p?=
+ =?us-ascii?Q?9O136oS1c8vQNGzTha6CLD65P4628Jq5qkXlSYISrGgVr3JuxWLll9l592EE?=
+ =?us-ascii?Q?P4OgKbx3DZr044w1xmx/Ilh4/znjDIFIElZIB8XCltBaMTvLBNu4Y48y6hEb?=
+ =?us-ascii?Q?OnpOBDroAeg7X4EXHUvzOR8YFDBsjW79qQ1LN/vTAGXgcFd8MnvQL4fsWcch?=
+ =?us-ascii?Q?SbLysbf/bVSOqrhhcnbMYrzwqh0X+UdSYeVjzGXjPd3Tes1OJiivFlxxl44n?=
+ =?us-ascii?Q?kY1HdViuoMABrODwfepk43FPljiVRZIP55LbgaGc5Beur0dLOKN+UbN4RrgG?=
+ =?us-ascii?Q?u0SHU+9m328kkK/BriGRlilnQn/CDbZc9Ewh1wJViQaem1exiS1QmNI4N0nV?=
+ =?us-ascii?Q?Njuwsu0i5kbbW+NAYfHPh6wRexauaZEwkTwaJEFrIKuBLnmra67Y7tzQHcXR?=
+ =?us-ascii?Q?lokW/i4wqhtuLzWC5F3Pfr3CoXFKoS0Mxrujx/SDoZjtcMZRpMRFWQANQDJO?=
+ =?us-ascii?Q?tmpUzMBVGqi/XGPOjVGbT3ymXhrlZV9QaqsE7kyEtEkhCvq2pMLquR1F3HzG?=
+ =?us-ascii?Q?TPs1w/u879W2Q8dbfN2dyKZkthaGAVVVeB5OFQfnpdy+8bOPPqykl+Tht2m3?=
+ =?us-ascii?Q?TdHQIiGaYBS0kFxCFV0GKIrk8HRNvz2ASzHfHw1cJTkYpJsahxgAzsChF8Dm?=
+ =?us-ascii?Q?o17LPwRfadhFjhHXDWWkUs9ReUVi20kEWE3waWJ4ansqpgBEviebhHa3ruFp?=
+ =?us-ascii?Q?ZyOl/1CdB1shfj+AeGpbud7eE5TxPGfxEpnyG8RZ5dtZROZwFXI8cyLj0bl0?=
+ =?us-ascii?Q?8SoJW6jtEKPsuMN7ZYbdWLnprY6VePgEnrHvQDX6v8o1sqR5uZutvnzz2CdA?=
+ =?us-ascii?Q?68mZrxo60hjpkltlEFzsU4P26dk8gTND3tacPFP5TpOBBH1K0hUSHTUv3gUI?=
+ =?us-ascii?Q?p2eDXOfBbDFxGDQQzsJMO5cuAtbzULKwZVmm0fQidnC69wbV2g1rvbgAkorh?=
+ =?us-ascii?Q?AuQ3DwM3Rd0Hl+gJmxOHd2jHxDBoaXwHGxDPkIeR84usnET92YKg5IcodcJJ?=
+ =?us-ascii?Q?9rzrC8DSL/CoKQWIZJCZB4NVM5t8cwnGLoKbXW+qYz5s2Wq5UQtrHHIgFW2I?=
+ =?us-ascii?Q?z26IZykazqNpIDUPncEi0Fjrm/auPKtlqWNyzMV/u3Oe6qY5Kyo97BLtZiIn?=
+ =?us-ascii?Q?zsig/H5FWYtsOnEbY4gNAIOrk379WUfSZ+o/GcpIzWX5/W3XdM4JCsiwjlb+?=
+ =?us-ascii?Q?xWG+4sBwuZn3rsPCCjPf195z6ObOfoAAk1qUnv3FraVRMp4/YPVSpIbZI1Ui?=
+ =?us-ascii?Q?iAskof3ealMdJ8xp1zav0yz7O+fSXsjZ?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?fATo/E7ECp92cnGiIzhc5LgyXgSbBOn1hSW+Bd4TDx/FtmBNkQwbKmpiO8l7?=
+ =?us-ascii?Q?mRLXGPMo4bjJDLRFR+Wb7fRphUXHZ8883jV9LiiFEALuFgGQLevLu7KXQcXr?=
+ =?us-ascii?Q?Fh/Y4yIAx/4IQC9b5yOs+HxhPMwvQotrTHVk/+00/1c2o9JRzrCXfRMP929/?=
+ =?us-ascii?Q?X46dRJlt5/rtVjNaGDNWU0CQHWvFlP9KlMqszFDyJvrJAjSpRt1cX4F04oyX?=
+ =?us-ascii?Q?L0AisWzkV3iDOHMuZ0iOmD9YVKUMLoDaDPFsaxKaqfVdoYoUu9KYApkGSUmC?=
+ =?us-ascii?Q?2qsZ4XTA5IQed+1Yx+4ewZdr9HMa3TdHl+w++lO7M85BuXj/KbmiKm5eiEKu?=
+ =?us-ascii?Q?Ww4Sw8hPbuWF7CjjTmxV0mMuGPIEO3RG0JfBMp4jLRTvLk5kMEk74wz35Inn?=
+ =?us-ascii?Q?m9oQmGf99Jor521kCNR++eOa0fvqujPJuY9iJ3z6MGZCHNuVGuKAecUEkap5?=
+ =?us-ascii?Q?a2kymsGbF9acvY9YdJd432d/K73WGEwHNr6CHo/SQFx5CjuHunbUgTrDPj2H?=
+ =?us-ascii?Q?nA1EjYbpPpMYp80C3+FUBevwmoPSKhqU0SwAYnJzpd8Y2KPD/AWK4Vyb4kHs?=
+ =?us-ascii?Q?IWnOHyqmR5k7xisX+UY09HC8O0B4XNSSMmNNMnLGCNOvF6G0HRlvQ+FZtRCK?=
+ =?us-ascii?Q?1C8VeFyyhroRxTfGJ2hhJpt6xdggTRCB958QcH4ksCbpa2lnNhbdJ+qZ9nFH?=
+ =?us-ascii?Q?HLDRuQZ7mPJpM2xA9LU0DlkT2feA8x2YCaOm61qx3y/tGQ8au0m9t93sLnj/?=
+ =?us-ascii?Q?VlNR8M+TAD+mUqVEwisilcXOvmFoCSpW5w8s6wjod8fhlYsQQEXgERGxB2Gk?=
+ =?us-ascii?Q?Pa4Jn7CEDQKyBA9hbKYWRcMIYOQmMPNwcbQB04hUqmFe6p/JLBZNTORNk5Bj?=
+ =?us-ascii?Q?7zww2VGtpS/SVuvJsN7hXHJkqmiltZShJsTPRQaw/QFY1wxsvwt9IG2mpKAs?=
+ =?us-ascii?Q?nvy99nI12NCYAxH86JYtSLmNHaU9TA/pgHRHWJo/EGeeoFE5GC7AxRWeStzy?=
+ =?us-ascii?Q?YVqEsvyfEQ5o6wc5FIVdJD75fKcprk6BNExxyUEQcg/N+yDUN9Ikh5xDFNn5?=
+ =?us-ascii?Q?zPC8B9DjqAUUNbuJQujsDAhgNdSOWGmHvzhviCfMkkmoPmWn7LH+Hlqb912H?=
+ =?us-ascii?Q?0SMRUAZWeTDDh3pZJAQuAfSfpxIEbInDjRSvweecrZlfLzJ8PWAmnF13MVAK?=
+ =?us-ascii?Q?ZZx7VFnCuZZSlzevGg473TJ/sH6YEKyBxhQcyh3IKCEItfplVVG/XzpGQOcl?=
+ =?us-ascii?Q?w7qC8F88tVBwaGvOMALE0mZ3GuAMU2d0Hnhg54KxBc1em6uhE6t5E+3rZyRq?=
+ =?us-ascii?Q?hx1Ga4PoduMrBXAl/XDs+Re8vlWfBhK+Ecwh4wMI0eXacHRps/m3h5/SWnlP?=
+ =?us-ascii?Q?4RxAdj4EeARSJ4Sp6QiY7b1NWulxxrwpyFe7itRhHK9nuxu5mH+QCTGUYAWH?=
+ =?us-ascii?Q?/hYCvcrW08b12pfeDOUOEXSFQmLCgW34oy4MhWAmeersmUu1Twrqaev0owlm?=
+ =?us-ascii?Q?txVKKetOKqSH8npBiMMrWz7aGNfCnUDOB4D400vK8uL3Xp9XN3qrEe9uyikN?=
+ =?us-ascii?Q?WzjRW6ha9O76U6YiR+8=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dfc6ff8d-7920-44b3-771a-08de1f1a5de9
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2025 22:58:44.0085
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: amDjbFuXYPq9AlMNtBFqN3FO/yeFo1IOSrr8wphVB0f+yMUksrVaYcOHRD0xQyJ2
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7899
 
-On Sat, 8 Nov 2025 12:19:48 -0800
-Alex Mastro <amastro@fb.com> wrote:
-
-> On Fri, Nov 07, 2025 at 04:17:24PM -0800, Alex Mastro wrote:
-> > On Fri, Nov 07, 2025 at 10:20:58PM +0000, David Matlack wrote:  
-> > > Skip vfio_dma_map_limit_test.{unmap_range,unmap_all} (instead of
-> > > failing) on systems that do not support mapping in the page-sized region
-> > > at the top of the u64 address space. Use -EINVAL as the signal for
-> > > detecting systems with this limitation, as that is what both VFIO Type1
-> > > and iommufd return.
-> > > 
-> > > A more robust solution that could be considered in the future would be
-> > > to explicitly check the range of supported IOVA regions and key off
-> > > that, instead of inferring from -EINVAL.
-> > > 
-> > > Fixes: de8d1f2fd5a5 ("vfio: selftests: add end of address space DMA map/unmap tests")
-> > > Signed-off-by: David Matlack <dmatlack@google.com>  
-> > 
-> > Makes sense -- thanks David. Agree about keying this off
-> > VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE longer term.
-> > 
-> > Reviewed-by: Alex Mastro <amastro@fb.com>  
+On Sat, Nov 08, 2025 at 02:29:49PM -0700, Alex Williamson wrote:
+> From: Alex Williamson <alex.williamson@nvidia.com>
 > 
-> Here's my attempt at adding some machinery to query iova ranges, with
-> normalization to iommufd's struct. I kept the vfio capability chain stuff
-> relatively generic so we can use it for other things in the future if needed.
-
-Seems we were both hacking on this, I hadn't seen you posted this
-before sending:
-
-https://lore.kernel.org/kvm/20251108212954.26477-1-alex@shazbot.org/T/#u
-
-Maybe we can combine the best merits of each.  Thanks,
-
-Alex
-
-> I can sequence this after your fix?
+> Not all IOMMUs support the same virtual address width as the processor,
+> for instance older Intel consumer platforms only support 39-bits of
+> IOMMU address space.  On such platforms, using the virtual address as
+> the IOVA and mappings at the top of the address space both fail.
 > 
-> diff --git a/tools/testing/selftests/vfio/lib/include/vfio_util.h b/tools/testing/selftests/vfio/lib/include/vfio_util.h
-> index 240409bf5f8a..fb5efec52316 100644
-> --- a/tools/testing/selftests/vfio/lib/include/vfio_util.h
-> +++ b/tools/testing/selftests/vfio/lib/include/vfio_util.h
-> @@ -4,9 +4,12 @@
->  
->  #include <fcntl.h>
->  #include <string.h>
-> -#include <linux/vfio.h>
-> +
-> +#include <uapi/linux/types.h>
-> +#include <linux/iommufd.h>
->  #include <linux/list.h>
->  #include <linux/pci_regs.h>
-> +#include <linux/vfio.h>
->  
->  #include "../../../kselftest.h"
->  
-> @@ -206,6 +209,9 @@ struct vfio_pci_device *vfio_pci_device_init(const char *bdf, const char *iommu_
->  void vfio_pci_device_cleanup(struct vfio_pci_device *device);
->  void vfio_pci_device_reset(struct vfio_pci_device *device);
->  
-> +struct iommu_iova_range *vfio_pci_iova_ranges(struct vfio_pci_device *device,
-> +					      size_t *nranges);
-> +
->  int __vfio_pci_dma_map(struct vfio_pci_device *device,
->  		       struct vfio_dma_region *region);
->  int __vfio_pci_dma_unmap(struct vfio_pci_device *device,
-> diff --git a/tools/testing/selftests/vfio/lib/vfio_pci_device.c b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> index a381fd253aa7..3297a41fdc31 100644
-> --- a/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> +++ b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> @@ -29,6 +29,145 @@
->  	VFIO_ASSERT_EQ(__ret, 0, "ioctl(%s, %s, %s) returned %d\n", #_fd, #_op, #_arg, __ret); \
->  } while (0)
->  
-> +static struct vfio_info_cap_header *next_cap_hdr(void *buf, size_t bufsz,
-> +						 size_t *cap_offset)
-> +{
-> +	struct vfio_info_cap_header *hdr;
-> +
-> +	if (!*cap_offset)
-> +		return NULL;
-> +
-> +	/* Cap offset must be in bounds */
-> +	VFIO_ASSERT_LT(*cap_offset, bufsz);
-> +	/* There must be enough remaining space to contain the header */
-> +	VFIO_ASSERT_GE(bufsz - *cap_offset, sizeof(*hdr));
-> +	hdr = (struct vfio_info_cap_header *)((u8 *)buf + *cap_offset);
-> +	/* If there is a next, offset must monotonically increase */
-> +	if (hdr->next)
-> +		VFIO_ASSERT_GT(hdr->next, *cap_offset);
-> +	*cap_offset = hdr->next;
-> +
-> +	return hdr;
-> +}
-> +
-> +static struct vfio_info_cap_header *vfio_iommu_info_cap_hdr(struct vfio_iommu_type1_info *buf,
-> +							    u16 cap_id)
-> +{
-> +	struct vfio_info_cap_header *hdr;
-> +	size_t cap_offset = buf->cap_offset;
-> +
-> +	if (!(buf->flags & VFIO_IOMMU_INFO_CAPS))
-> +		return NULL;
-> +
-> +	if (cap_offset)
-> +		VFIO_ASSERT_GE(cap_offset, sizeof(struct vfio_iommu_type1_info));
-> +
-> +	while ((hdr = next_cap_hdr(buf, buf->argsz, &cap_offset))) {
-> +		if (hdr->id == cap_id)
-> +			return hdr;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +/* Return buffer including capability chain, if present. Free with free() */
-> +static struct vfio_iommu_type1_info *vfio_iommu_info_buf(struct vfio_pci_device *device)
-> +{
-> +	struct vfio_iommu_type1_info *buf;
-> +
-> +	buf = malloc(sizeof(*buf));
-> +	VFIO_ASSERT_NOT_NULL(buf);
-> +
-> +	*buf = (struct vfio_iommu_type1_info) {
-> +		.argsz = sizeof(*buf),
-> +	};
-> +
-> +	ioctl_assert(device->container_fd, VFIO_IOMMU_GET_INFO, buf);
-> +
-> +	buf = realloc(buf, buf->argsz);
-> +	VFIO_ASSERT_NOT_NULL(buf);
-> +
-> +	ioctl_assert(device->container_fd, VFIO_IOMMU_GET_INFO, buf);
-> +
-> +	return buf;
-> +}
-> +
-> +/*
-> + * Normalize vfio_iommu_type1 to report iommufd's iommu_iova_range. Free with
-> + * free().
-> + */
-> +static struct iommu_iova_range *vfio_iommu_iova_ranges(struct vfio_pci_device *device,
-> +						       size_t *nranges)
-> +{
-> +	struct vfio_iommu_type1_info_cap_iova_range *cap_range;
-> +	struct vfio_iommu_type1_info *buf;
-> +	struct vfio_info_cap_header *hdr;
-> +	struct iommu_iova_range *ranges = NULL;
-> +
-> +	buf = vfio_iommu_info_buf(device);
-> +	VFIO_ASSERT_NOT_NULL(buf);
-> +
-> +	hdr = vfio_iommu_info_cap_hdr(buf, VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE);
-> +	if (!hdr)
-> +		goto free_buf;
-> +
-> +	cap_range = container_of(hdr, struct vfio_iommu_type1_info_cap_iova_range, header);
-> +	if (!cap_range->nr_iovas)
-> +		goto free_buf;
-> +
-> +	ranges = malloc(cap_range->nr_iovas * sizeof(*ranges));
-> +	VFIO_ASSERT_NOT_NULL(ranges);
-> +
-> +	for (u32 i = 0; i < cap_range->nr_iovas; i++) {
-> +		ranges[i] = (struct iommu_iova_range){
-> +			.start = cap_range->iova_ranges[i].start,
-> +			.last = cap_range->iova_ranges[i].end,
-> +		};
-> +	}
-> +
-> +	*nranges = cap_range->nr_iovas;
-> +
-> +free_buf:
-> +	free(buf);
-> +	return ranges;
-> +}
-> +
-> +struct iommu_iova_range *iommufd_iova_ranges(struct vfio_pci_device *device,
-> +					     size_t *nranges)
-> +{
-> +	struct iommu_iova_range *ranges;
-> +	int ret;
-> +
-> +	struct iommu_ioas_iova_ranges query = {
-> +		.size = sizeof(query),
-> +		.ioas_id = device->ioas_id,
-> +	};
-> +
-> +	ret = ioctl(device->iommufd, IOMMU_IOAS_IOVA_RANGES, &query);
-> +	VFIO_ASSERT_EQ(ret, -1);
-> +	VFIO_ASSERT_EQ(errno, EMSGSIZE);
-> +	VFIO_ASSERT_GT(query.num_iovas, 0);
-> +
-> +	ranges = malloc(query.num_iovas * sizeof(*ranges));
-> +	VFIO_ASSERT_NOT_NULL(ranges);
-> +
-> +	query.allowed_iovas = (uintptr_t)ranges;
-> +
-> +	ioctl_assert(device->iommufd, IOMMU_IOAS_IOVA_RANGES, &query);
-> +	*nranges = query.num_iovas;
-> +
-> +	return ranges;
-> +}
-> +
-> +struct iommu_iova_range *vfio_pci_iova_ranges(struct vfio_pci_device *device,
-> +					      size_t *nranges)
-> +{
-> +	if (device->iommufd)
-> +		return iommufd_iova_ranges(device, nranges);
-> +
-> +	return vfio_iommu_iova_ranges(device, nranges);
-> +}
-> +
->  iova_t __to_iova(struct vfio_pci_device *device, void *vaddr)
->  {
->  	struct vfio_dma_region *region;
-> diff --git a/tools/testing/selftests/vfio/vfio_dma_mapping_test.c b/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
-> index 4f1ea79a200c..78983c4c293b 100644
-> --- a/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
-> +++ b/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
-> @@ -3,6 +3,8 @@
->  #include <sys/mman.h>
->  #include <unistd.h>
->  
-> +#include <uapi/linux/types.h>
-> +#include <linux/iommufd.h>
->  #include <linux/limits.h>
->  #include <linux/mman.h>
->  #include <linux/sizes.h>
-> @@ -243,12 +245,31 @@ FIXTURE_TEARDOWN(vfio_dma_map_limit_test)
->  	ASSERT_EQ(munmap(self->region.vaddr, self->mmap_size), 0);
->  }
->  
-> +static iova_t last_legal_iova(struct vfio_pci_device *device)
-> +{
-> +	struct iommu_iova_range *ranges;
-> +	size_t nranges;
-> +	iova_t ret;
-> +
-> +	ranges = vfio_pci_iova_ranges(device, &nranges);
-> +	VFIO_ASSERT_NOT_NULL(ranges);
-> +
-> +	ret = ranges[nranges - 1].last;
-> +	free(ranges);
-> +
-> +	return ret;
-> +}
-> +
->  TEST_F(vfio_dma_map_limit_test, unmap_range)
->  {
-> +	iova_t last_iova = last_legal_iova(self->device);
->  	struct vfio_dma_region *region = &self->region;
->  	u64 unmapped;
->  	int rc;
->  
-> +	if (last_iova != ~(iova_t)0)
-> +		SKIP(return, "last legal iova=0x%lx\n", last_iova);
-> +
->  	vfio_pci_dma_map(self->device, region);
->  	ASSERT_EQ(region->iova, to_iova(self->device, region->vaddr));
->  
-> @@ -259,10 +280,14 @@ TEST_F(vfio_dma_map_limit_test, unmap_range)
->  
->  TEST_F(vfio_dma_map_limit_test, unmap_all)
->  {
-> +	iova_t last_iova = last_legal_iova(self->device);
->  	struct vfio_dma_region *region = &self->region;
->  	u64 unmapped;
->  	int rc;
->  
-> +	if (last_iova != ~(iova_t)0)
-> +		SKIP(return, "last legal iova=0x%lx\n", last_iova);
-> +
->  	vfio_pci_dma_map(self->device, region);
->  	ASSERT_EQ(region->iova, to_iova(self->device, region->vaddr));
->  
+> VFIO and IOMMUFD have facilities for retrieving valid IOVA ranges,
+> VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE and IOMMU_IOAS_IOVA_RANGES,
+> respectively.  These provide compatible arrays of ranges from which
+> we can construct a simple allocator and record the maximum supported
+> IOVA address.
 > 
+> Use this new allocator in place of reusing the virtual address, and
+> incorporate the maximum supported IOVA into the limit testing.  This
+> latter change doesn't test quite the same absolute end-of-address space
+> behavior but still seems to have some value.  Testing for overflow is
+> skipped when a reduced address space is supported as the desired errno
+> is not generated.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@nvidia.com>
+> ---
+> 
+> This happened upon another interesting vfio-compat difference for
+> IOMMUFD, native type1 returns the correct set of IOVA ranges after
+> VFIO_SET_IOMMU, vfio-compat requires the next step of calling
+> VFIO_GROUP_GET_DEVICE_FD to attach the device to the IOAS.  If
+> checked prior to this, the IOVA range is reported as the full
+> 64-bit address space.  ISTR this is known, but it's sufficiently
+> subtle to make note of again.
 
+Maybe we should fail in this in between state rather than give wrong
+information?
+
+Jason
 
