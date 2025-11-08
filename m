@@ -1,93 +1,113 @@
-Return-Path: <kvm+bounces-62385-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62386-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C6BFC42A09
-	for <lists+kvm@lfdr.de>; Sat, 08 Nov 2025 10:09:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE9FFC42BC9
+	for <lists+kvm@lfdr.de>; Sat, 08 Nov 2025 12:24:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33523188D4BA
-	for <lists+kvm@lfdr.de>; Sat,  8 Nov 2025 09:09:51 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C91144E3FAC
+	for <lists+kvm@lfdr.de>; Sat,  8 Nov 2025 11:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D6E2E7BDE;
-	Sat,  8 Nov 2025 09:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4C129ACFD;
+	Sat,  8 Nov 2025 11:24:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Zfvqq7OI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FzvaOpzs"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1596B286412
-	for <kvm@vger.kernel.org>; Sat,  8 Nov 2025 09:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5B723AD;
+	Sat,  8 Nov 2025 11:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762592955; cv=none; b=tJXRTr54tc20QHQYYAnslahMYkYwmYdigmcJFDEwN8WDcC5hVm6G/p4wEto/QyytynkFoz8B+zEX6Zlt9+7uGIBRS4A9DcjjUTAjJC2wKsyAnB8J4DgbzYFllLFtYk/WL/i/c/94Kow+pR4kle+hrO0N8++kaXDLR1ynwDSLHRE=
+	t=1762601087; cv=none; b=EkVmSClyZxayeyr+upgG3yepWvfB1FRPTVF3cLYYT08/4kGi9bNgsIDCuZ1h3uWoAUNsKaXKjHSGUynZL9qi7i+tG3HjXvzDPVUM68E3igTyBK+q2x09jgr+HaLHYHvoCdspcCA9uC/e31LbPlEu8KI8kcp9jEp+ePQnSXKw3Kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762592955; c=relaxed/simple;
-	bh=ac9IS7LxhGvsJ5M7ao47Xp0eXk3OFOlfbqAMvrPtePE=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=kQkOd39/QrgpXBQQjCd9iAJaIRYHCIj7ROIoiFA5Mq8L96GHp6HImtDI4qSMdh295LZclK0z27CCn3XHNXL3aU1rbC6ahHPSbczlVxr7ve/uO8Q9mgqrLcMqdUdNa334ayErKlX6SCS9VMtVVz03X4+I8sE+kuWSYvBTSZDKYrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Zfvqq7OI; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1762601087; c=relaxed/simple;
+	bh=WVKATNSn+dHdM78+/c06JPrFjsN/T65IToKcvJGfL6w=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QNUFGPdHPncuKuxSOvfUDiFXPN4Gi4TSzSKCWr5eeMCv8oPtUkreJEjdR21MRy8UtvQU9OqUnPW3yKJefLVkhN9tYNvlKFKYN2jLzmKKt8e6mNHYAl1b54XT8flvEZ3XvDTWMWz76v5oEkOEeHvcd+senjwth4dhRimN8Ryl8GI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FzvaOpzs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58FA3C19422;
+	Sat,  8 Nov 2025 11:24:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762601087;
+	bh=WVKATNSn+dHdM78+/c06JPrFjsN/T65IToKcvJGfL6w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FzvaOpzs2h/YJ3CAsIcQXIX3cZWJZK0JuticaJOhS2Tn9hwUlQ5QWPuweu9BV7K4w
+	 etTd2syxrUJPu3TJCXHV80nkO2nffS9ZC4/Zqf8QsOu2xbC0UUgspPyAmX2ecrdoRH
+	 0G0aqq2nx6iHn84ipieOUaY69aaGuLVKgWN2cI+UWwnG0n7wKcK6YQK/YobEkzLU/Q
+	 DIswDymoKo3qqjTYeN7requVHZO7YzBQ34i06vvEa71/i1h4r1TkAhJL8laWSWaR2v
+	 s8Dkquhiwqh884Q8pqwiRNhfWRT29N4tHXBE8nEPqf/Kk0Sau8vbV9UzEkjhsEv9mK
+	 7LkFNr9P3LYqw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vHh3l-00000003TNw-03Dk;
+	Sat, 08 Nov 2025 11:24:45 +0000
+Date: Sat, 08 Nov 2025 11:24:44 +0000
+Message-ID: <86a50wvkar.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 0/3] KVM: arm64: Fix handling of ID_PFR1_EL1.GIC
+In-Reply-To: <264b9f2d-5fca-4fda-a0ce-1b0223906560@arm.com>
+References: <20251030122707.2033690-1-maz@kernel.org>
+	<264b9f2d-5fca-4fda-a0ce-1b0223906560@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762592941;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ac9IS7LxhGvsJ5M7ao47Xp0eXk3OFOlfbqAMvrPtePE=;
-	b=Zfvqq7OI9pkjpiJOrYomc+ls+98QLTL/pSq9xUOjZjJVPdkNowl9gQav1VxF6GlDQcSVU/
-	mFg6UEjC/0myT6bcnk/pTfd5m3iJduwhS7Jqb4hoZAG4auxE75Xx/IQRpbW7ESbJMvJHL9
-	F5Wc0q8Ooe7P3d4n1rDliQmB1Q3N80g=
-Date: Sat, 08 Nov 2025 09:08:58 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Yosry Ahmed" <yosry.ahmed@linux.dev>
-Message-ID: <3759161383b53759888f64d9a03983c05026ab1c@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH 5/6] KVM: SVM: Add missing save/restore handling of LBR
- MSRs
-To: "Sean Christopherson" <seanjc@google.com>
-Cc: "Paolo Bonzini" <pbonzini@redhat.com>, "Jim Mattson"
- <jmattson@google.com>, "Maxim Levitsky" <mlevitsk@redhat.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-In-Reply-To: <20251108004524.1600006-6-yosry.ahmed@linux.dev>
-References: <20251108004524.1600006-1-yosry.ahmed@linux.dev>
- <20251108004524.1600006-6-yosry.ahmed@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-November 7, 2025 at 4:45 PM, "Yosry Ahmed" <yosry.ahmed@linux.dev mailto:=
-yosry.ahmed@linux.dev?to=3D%22Yosry%20Ahmed%22%20%3Cyosry.ahmed%40linux.d=
-ev%3E > wrote:
->=20
->=20MSR_IA32_DEBUGCTLMSR and LBR MSRs are currently not enumerated by
-> KVM_GET_MSR_INDEX_LIST, and LBR MSRs cannot be set with KVM_SET_MSRS. S=
-o
-> save/restore is completely broken.
->=20
->=20Fix it by adding the MSRs to msrs_to_save_base, and allowing writes t=
-o
-> LBR MSRs from userspace only (as they are read-only MSRs). Additionally=
-,
-> to correctly restore L1's LBRs while L2 is running, make sure the LBRs
-> are copied from the captured VMCB01 save area in svm_copy_vmrun_state()=
-.
->=20
->=20Fixes: 24e09cbf480a ("KVM: SVM: enable LBR virtualization")
-> Cc: stable@vger.kernel.org
->
+On Fri, 07 Nov 2025 10:06:23 +0000,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> 
+> Hi Marc
+> 
+> On 30/10/2025 12:27, Marc Zyngier wrote:
+> > Peter reported[0] that restoring a GICv2 VM fails badly, and correctly
+> > points out that ID_PFR1_EL1.GIC isn't writable, while its 64bit
+> > equivalent is. I broke that in 6.12.
+> > 
+> > The other thing is that fixing the ID regs at runtime isn't great.
+> > specially when we could adjust them at the point where the GIC gets
+> > created.
+> > 
+> > This small series aims at fixing these issues. I've only tagged the
+> > first one as a stable candidate. 
+> 
+> But, all 3 patches have the same Fixes tag, was that intentional ?
 
-Reported-by:=C2=A0Jim Mattson <jmattson@google.com>
+Yes. Fixes don't necessarily need backporting, and the latter ones,
+while making things less awful, are not absolutely necessary to fix
+6.12.
 
-> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-[..]
+However, I have no doubt that the Artificial Idiots that automatically
+backport stuff to stable will pick whatever seems to apply without any
+discrimination.
+
+I've stopped fighting that battle.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
