@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-62455-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62456-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50303C44428
-	for <lists+kvm@lfdr.de>; Sun, 09 Nov 2025 18:20:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AE77C44434
+	for <lists+kvm@lfdr.de>; Sun, 09 Nov 2025 18:20:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CBB83A8BB6
-	for <lists+kvm@lfdr.de>; Sun,  9 Nov 2025 17:18:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 424013B3A97
+	for <lists+kvm@lfdr.de>; Sun,  9 Nov 2025 17:18:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB4130F95A;
-	Sun,  9 Nov 2025 17:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC763101A6;
+	Sun,  9 Nov 2025 17:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tfG5h49k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tiavHW5a"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED02030EF85;
-	Sun,  9 Nov 2025 17:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8113730F819;
+	Sun,  9 Nov 2025 17:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762708598; cv=none; b=p4lQexqeiHvAOtgsh7ecixt3TM3resphJBhaWPsP9Cs3JxNL3R7tUENDMorvKWh/2GJUwCX8BIaIwFXyFWtPMC2th/lw0hGNRRVHdTP2fsY5EFruolYaVF6+I5DJevzkapngycuu5a4+98C+VVTVtO/y8OWVpnmHu4bzfLc3xhs=
+	t=1762708598; cv=none; b=FDNSVajQDb8i8Pu6SP3y2oKA43Fp4vLXDzTWMG6MrTUIAFoD+Ayr6x1x+722ju5Dy5dfrVNp/g2hXRqWUfEePplixJMIui4fOaPHJ8WlSZM8fhGLYHJn8xk000o/aG9iGew0Kk7kI5NzL/op8z29RYH7R18/bh1xOB0lolqd9BY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762708598; c=relaxed/simple;
-	bh=SLRiFgk9c+wOGfa2B+I0f696jbLpPaxhNQ3kVExvE1c=;
+	bh=0HS/4qE6qTgeyCBJPAK5i628M7zUg3PGilYhBnFOIe0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ScTMi58iVq5Wz4Sv+1JYK8cuUHxrsSguj3tMrRRAuDuZglq014lNouKx3AiW+Di6e/r46lX4gz7qSayjrbiwOp7sYZnkawvOaYsVpFDAsxA50dB53A9xXcmtBJr1oUy0JF8cRq36QI+nFtZTRU39ytTZJ404kpTle1IspOiXlFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tfG5h49k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6FB8C2BCAF;
+	 MIME-Version; b=ODLfPb3ehO6tNdhVZJnKg7jjNrOORVF9HzLcBNYkjUOwFUefIl1Vpp4pSDEXGdmSCDFTAbl+SxISS0w4W5gSNIbW3X/n5u3NL5qzMldp56eAsUIL0Cu3XDgcnnjMQtOySSQFtO1gxp7WAIHpbLe+tTNphy9VbbDtBE9NUBzhJFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tiavHW5a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E213AC19422;
 	Sun,  9 Nov 2025 17:16:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762708597;
-	bh=SLRiFgk9c+wOGfa2B+I0f696jbLpPaxhNQ3kVExvE1c=;
+	s=k20201202; t=1762708598;
+	bh=0HS/4qE6qTgeyCBJPAK5i628M7zUg3PGilYhBnFOIe0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tfG5h49kBf1krDdwQH1lptaqNElPI5xEFPDaAzQyPGE8CESvD8UFQHJtMsO+3dLGs
-	 Qjs/H6P3jxtSW/FuZhDr419AQeyYeU1Z/IvjPKzaO0g5Eih3OHo82XEX8uA917yTN4
-	 Y7Z1TLfhBd3hoMnmiaK8VhAU8bzFBAcBEhvcUBapc7IOln/HphKBpmMYkqehjuxSm1
-	 y3S+/HG58oEIxVfuXmhy3QqF52y+AMrg63Bp4jsydk+lCfqSm87nC8T1DvOm/xmU2D
-	 dVN6NZyOiKBdQqCJsQenqzB1fWfqBOifXrzunXk1/UcqG/4VO7Sf0af79t7g/01C4H
-	 bRzS5wZDJcLnA==
+	b=tiavHW5aQHfrZ534hcNX0458qMjZfxey3WbdPr1F5XaGjzJe1WGVAykBrYYKzIIKh
+	 xOZT5rOYm8hQyY2bvIdN2PE0Xgh7wTofS3rQH3bOG+Y2qAjnVReNszoTEw/gffe+4o
+	 0L4XvHr0HTNi9DrJyST04KCj2mmGJMB7M3N8+eJ60dY9PASuiN12G8h7J3MlhnLXJT
+	 XpofIKweelAOq2igwGtfUPdyisljEY+n2UOM48kQqGqloyVCO3xpYv7o86cIuGQJtb
+	 Kxcv7UuJA3zvVcrf8Lbz2errO7xG9J+9uLXV1KJHf+aHuSaXa92bE02TlMa2OvnagU
+	 a1s5Aty9rM2Gg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vI91n-00000003exw-3swL;
+	id 1vI91o-00000003exw-0oGQ;
 	Sun, 09 Nov 2025 17:16:36 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -58,9 +58,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: [PATCH v2 32/45] KVM: arm64: GICv3: Avoid broadcast kick on CPUs lacking TDIR
-Date: Sun,  9 Nov 2025 17:16:06 +0000
-Message-ID: <20251109171619.1507205-33-maz@kernel.org>
+Subject: [PATCH v2 33/45] KVM: arm64: GICv2: Handle LR overflow when EOImode==0
+Date: Sun,  9 Nov 2025 17:16:07 +0000
+Message-ID: <20251109171619.1507205-34-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251109171619.1507205-1-maz@kernel.org>
 References: <20251109171619.1507205-1-maz@kernel.org>
@@ -76,67 +76,65 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-CPUs lacking TDIR always trap ICV_DIR_EL1, no matter what, since
-we have ICH_HCR_EL2.TC set permanently. For these CPUs, it is
-useless to use a broadcast kick on SPI injection, as the sole
-purpose of this is to set TDIR.
-
-We can therefore skip this on these CPUs, which are challenged
-enough not to be burdened by extra IPIs. As a consequence,
-permanently set the TDIR bit in the shadow state to notify the
-fast-path emulation code of the exit reason.
+Similarly to the GICv3 version, handle the EOIcount-driven deactivation
+by walking the overflow list.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v3.c |  6 +++++-
- arch/arm64/kvm/vgic/vgic.c    | 13 ++++++++-----
- 2 files changed, 13 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/vgic/vgic-v2.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index bf4dde158d516..32654ea51418b 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -50,10 +50,14 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
- 	 * need to deal with SPIs that can be deactivated on another
- 	 * CPU.
- 	 *
-+	 * On systems that do not implement TDIR, force the bit in the
-+	 * shadow state anyway to avoid IPI-ing on these poor sods.
-+	 *
- 	 * Note that we set the trap irrespective of EOIMode, as that
- 	 * can change behind our back without any warning...
- 	 */
--	if (irqs_active_outside_lrs(als)		     ||
-+	if (!cpus_have_final_cap(ARM64_HAS_ICH_HCR_EL2_TDIR) ||
-+	    irqs_active_outside_lrs(als)		     ||
- 	    atomic_read(&vcpu->kvm->arch.vgic.active_spis))
- 		cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
- }
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 60bdddf3472e7..a4c42884f1e16 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -370,12 +370,15 @@ static bool vgic_validate_injection(struct vgic_irq *irq, bool level, void *owne
- static bool vgic_model_needs_bcst_kick(struct kvm *kvm)
- {
- 	/*
--	 * A GICv3 (or GICv3-like) system exposing a GICv3 to the
--	 * guest needs a broadcast kick to set TDIR globally, even if
--	 * the bit doesn't really exist (we still need to check for
--	 * the shadow bit in the DIR emulation fast-path).
-+	 * A GICv3 (or GICv3-like) system exposing a GICv3 to the guest
-+	 * needs a broadcast kick to set TDIR globally.
-+	 *
-+	 * For systems that do not have TDIR (ARM's own v8.0 CPUs), the
-+	 * shadow TDIR bit is always set, and so is the register's TC bit,
-+	 * so no need to kick the CPUs.
- 	 */
--	return (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3);
-+	return (cpus_have_final_cap(ARM64_HAS_ICH_HCR_EL2_TDIR) &&
-+		kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3);
+diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+index 9a2de03f74c30..bbd4d003fde86 100644
+--- a/arch/arm64/kvm/vgic/vgic-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-v2.c
+@@ -100,6 +100,8 @@ static void vgic_v2_fold_lr(struct kvm_vcpu *vcpu, u32 val)
+ 	vgic_put_irq(vcpu->kvm, irq);
  }
  
++static u32 vgic_v2_compute_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq);
++
  /*
+  * transfer the content of the LRs back into the corresponding ap_list:
+  * - active bit is transferred as is
+@@ -111,12 +113,37 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_v2_cpu_if *cpuif = &vgic_cpu->vgic_v2;
++	u32 eoicount = FIELD_GET(GICH_HCR_EOICOUNT, cpuif->vgic_hcr);
++	struct vgic_irq *irq;
+ 
+ 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+ 
+ 	for (int lr = 0; lr < vgic_cpu->vgic_v2.used_lrs; lr++)
+ 		vgic_v2_fold_lr(vcpu, cpuif->vgic_lr[lr]);
+ 
++	/* See the GICv3 equivalent for the EOIcount handling rationale */
++	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
++		u32 lr;
++
++		if (!eoicount) {
++			break;
++		} else {
++			guard(raw_spinlock)(&irq->irq_lock);
++
++			if (!(likely(vgic_target_oracle(irq) == vcpu) &&
++			      irq->active))
++				continue;
++
++			lr = vgic_v2_compute_lr(vcpu, irq) & ~GICH_LR_ACTIVE_BIT;
++		}
++
++		if (lr & GICH_LR_HW)
++			writel_relaxed(FIELD_GET(GICH_LR_PHYSID_CPUID, lr),
++				       kvm_vgic_global_state.gicc_base + GIC_CPU_DEACTIVATE);
++		vgic_v2_fold_lr(vcpu, lr);
++		eoicount--;
++	}
++
+ 	cpuif->used_lrs = 0;
+ }
+ 
 -- 
 2.47.3
 
