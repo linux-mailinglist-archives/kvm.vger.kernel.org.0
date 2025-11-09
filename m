@@ -1,124 +1,168 @@
-Return-Path: <kvm+bounces-62412-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62413-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59487C43709
-	for <lists+kvm@lfdr.de>; Sun, 09 Nov 2025 02:20:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8B70C439AD
+	for <lists+kvm@lfdr.de>; Sun, 09 Nov 2025 08:07:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0CA2188B36F
-	for <lists+kvm@lfdr.de>; Sun,  9 Nov 2025 01:21:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 76D184E221A
+	for <lists+kvm@lfdr.de>; Sun,  9 Nov 2025 07:07:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB10E1A3029;
-	Sun,  9 Nov 2025 01:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE40245014;
+	Sun,  9 Nov 2025 07:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="Q8UFLoT5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XGUl+MxX";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bn+evX0Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACCFDF59;
-	Sun,  9 Nov 2025 01:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40EB71482E8
+	for <kvm@vger.kernel.org>; Sun,  9 Nov 2025 07:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762651237; cv=none; b=jyfEbFFxYna6f1TFc8/Fg54Nh3qPtS+qq8jyjqZyYRxd7e9E87EIeW4MApwCwfqxc6YqJTcctnNNZcT4CBv5fbRs+bKmxFEWr0CfWvJ6mfEOPHkbz2DiFVg+CL23DymcD9r7xJyJKov3EOUD/8Ie0v0Pv++KZeSPNfFDhJMEbGc=
+	t=1762672051; cv=none; b=dEcW+xgPqKhcHgtOUo0+9vqgBKeVC1FifZe45VFQgIgY8t7MvsgM9u4y52uR/ukyj9Snjz0c4KEBGADv9PR1MVKjkP6PLvZH6CtQ/OqePQpjP3uJ8ldeQUEI0+JdLrbVy1diY28UoLCHfhO3lAGbzIWyFIYzFzjrOPFvmRZwZGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762651237; c=relaxed/simple;
-	bh=yl709K2/EBaiSPbcl7V+o9B/u6yVKPr1BkggrDZSyhY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iecCPPpaOXaAi9CDbodbT7n2CAAieTEzWfGulf1NKNu+Zk9wa/mDSK5AUePVi9zaNP9MDSn7fqfvJM1NG3xovl6/tBFskKyBgOBaMiVsoW1d6OKE9a0GHqkW/laLcON7HAt3DpgQsIj/fk1jlG0/sLQbqGSnxPgg04l4ZKyaPCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=Q8UFLoT5; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A8MPlr54180894;
-	Sat, 8 Nov 2025 17:20:29 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=4WQMv/utZqIebRrgDmAQ
-	C4G7cEEZTYQHPc1QJPVNWUc=; b=Q8UFLoT5eAk+tvwdXkdGapgJkuH9cSxHpyvl
-	85Nz1p4gHbeJyM1BPDsXvdXs5fyIYmfnDszNWYTdPfkphzeLtrTJn/xT6Yjfm/gL
-	wQIxLBpwPY4CWx/IVhCMHjs2annlFva4iDKJS38OWS+UW7xpYf1amjhPPtkSjKGd
-	POaIEFCoc3J2ro6gkb26LEDaxr3rkJJTWpF0xwj0qK8NNy4S2GejmJylexWr5uJu
-	+/jzhbsXni25CWDTOqmmxcausgscmxDoTA5DXxE/XMilJg+HMyq8SW8AZi/r+pQu
-	XAMSdV1JZh3R4PeKi4PG1ZmzYvU074xvI+bqTzTQQyGRWOJ6iA==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4aa2s34mq7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Sat, 08 Nov 2025 17:20:28 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Sun, 9 Nov 2025 01:20:14 +0000
-Date: Sat, 8 Nov 2025 17:20:10 -0800
-From: Alex Mastro <amastro@fb.com>
-To: Alex Williamson <alex@shazbot.org>
-CC: David Matlack <dmatlack@google.com>,
-        Alex Williamson
-	<alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] vfio: selftests: Skip vfio_dma_map_limit_test if mapping
- returns -EINVAL
-Message-ID: <aQ/sShi4MWr6+f5l@devgpu015.cco6.facebook.com>
-References: <20251107222058.2009244-1-dmatlack@google.com>
- <aQ6MFM1NX8WsDIdX@devgpu015.cco6.facebook.com>
- <aQ+l5IRtFaE24v0g@devgpu015.cco6.facebook.com>
- <20251108143710.318702ec.alex@shazbot.org>
+	s=arc-20240116; t=1762672051; c=relaxed/simple;
+	bh=Jmp9ZrL7yj20ouM54WfJB0CbhEdJY3rhnhwFbU4U5QE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mzEeKLMTSRwuALZn2w9aWMAnHGpzcvkfDYSjs6+tpmWpbYMgVP7WWnzcwtb5MzVA0G9XWLQuVo1BuvkxIdCg424sTs0Lr6gDOGBYxL5FP8fSnkVldhb/1HiiyVCVF4X6PF85Du7wPWehLKsvOUcmUw2en+xi0BAWTgohKzrxHjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XGUl+MxX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bn+evX0Y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762672048;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QHvKsjMe/AixpxnbJYjrVGK6zy8xknqlwpjxpwPDfNM=;
+	b=XGUl+MxXhAYGJHK8CJuSIJ899TOuTBoSIKbNXRG/Nsi+x4l1B9qABVrQqHUX/ICKI7QLld
+	3AS5L8GHWifcALfRIAhGK8Vd6/6reF9IvOhJCC/VvCUAbgBH5NP+bxbxQ1lPTxzs5Xsff+
+	DTlJFS8w6HSvfMRV2QPOKoKMFw44MRg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-553-v31PoZvwPFu7Juty-srhnw-1; Sun, 09 Nov 2025 02:07:26 -0500
+X-MC-Unique: v31PoZvwPFu7Juty-srhnw-1
+X-Mimecast-MFC-AGG-ID: v31PoZvwPFu7Juty-srhnw_1762672045
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-40cfb98eddbso904825f8f.0
+        for <kvm@vger.kernel.org>; Sat, 08 Nov 2025 23:07:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762672044; x=1763276844; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QHvKsjMe/AixpxnbJYjrVGK6zy8xknqlwpjxpwPDfNM=;
+        b=Bn+evX0YE5MQ6FDaAGNk1GZl4qvdooh6suyCd90nSt8qHYBpdypJHRuaPvJieHwBAf
+         fYaJQZRXBdeoy2THDI5q21cYiZEkjLDP7vbh3ksnjAlEpR4gVx2PWkO+LBAOByUPWzWv
+         wk0JpCZUz77dGwfYdG++kiopUqHzvO3HN4CYRLM4NmcJW6qtQ5LyUMG2oUy9y5aN8wKW
+         g4SRBlgu/MVxyBHbdq3/KPRxDNasKp3sJy1KtmNZu9lpX4AzOohtmYaUMQkjB152NOUC
+         FkMaUlaNz5ovN/Ry4HaOLFwglh3lyK3g/7ns1qySTfnoQEC0YbRPd8U8QaRZM3bmJ0WL
+         cWqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762672044; x=1763276844;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QHvKsjMe/AixpxnbJYjrVGK6zy8xknqlwpjxpwPDfNM=;
+        b=lSKx1ok4ICHtHxoIOwd4ARBWSp9qBnbdW8Q86rtLhvEuSVHOdkPcoEAoCtfCCFnf3l
+         QvWpgUKs2k17kn/PKSkHtYZm5HQtRQEVqinuMBKjt36Cl5iJomGxxt9gaUUt08YxkM+8
+         Y3bKJTaIhG8o05e5v1WxpOUPj7Eq9U9aTYV9DA4OEb6QVtCeuY8oUhdVZrC59aIw6CoQ
+         b0h7SIQkmZ4nO4mFaj9JLkQD2SBh4JIx+35YNMTac37veSksnrX4nCGDwO6rHWPB4BeB
+         dpJK43GKrXCMqlLTdZGzgm3lGdVULPKb2JVsrP11EjD5suvGRwt98c+ucb7hlwlNP0y/
+         1SXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWYs8LTg02Vao3Uy04WJXWDmMpvEeCILwznpM3MIglSfl3tTbUUPZygqYlhhxy5ee/5mLw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNxD7MHCHYHnzWbefnzdfLtV/YM7P8D/rww/ckMpROODTVwvSa
+	WyDDoiHzJ3JrKBTJPWCgZOVIcijua0LZrpTExcz0MJMsJ7BVFqi0PTHdmX8YecCCw4xnlsDJufz
+	7WulMZV9A8celtkN4zXpr8yxxcjf5kxAjlZZBILDe5dJE9RdGx5WhHNK/YvSBD93SIO6/XNjtV3
+	kg8r3Q19AZ1GkEziA5bkgXKEfTHaDVliwWKTVr
+X-Gm-Gg: ASbGncv2E0k5bwmHyid6J10cjNYKSuUdomq4BOAqAvCemqFRcWRTKvdnh1eEp4tGGvJ
+	4WyY6StUXeMpNqNcT46TGBKci3v3T9hTuomrELPXdvMZhLRjPb92YUHjkSSFlutkQfd5pwQKC5H
+	GuFLN8w2f05QvpGBZ1HEVpJTjPWrwETbz9+Mgw+UpVORRryRqM3W67rOkhXRE5IoRMEEQy5ReJG
+	sBnlTRZvgYGWdNyA02EHA+lTwIeKju8R1bev2cuvC1vGVYgjuoZQOkdQRmI
+X-Received: by 2002:a5d:5f51:0:b0:42b:2dc9:437d with SMTP id ffacd0b85a97d-42b2dc945bemr3340224f8f.8.1762672044537;
+        Sat, 08 Nov 2025 23:07:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHlgHVVqddTf0z9GBTwc7IKuQZJE4lbbt4jIACSUKr9tRwMh48mz2VQwkxk817nUPP85PYqX+H4iU6UOxhzr7A=
+X-Received: by 2002:a5d:5f51:0:b0:42b:2dc9:437d with SMTP id
+ ffacd0b85a97d-42b2dc945bemr3340209f8f.8.1762672044139; Sat, 08 Nov 2025
+ 23:07:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251108143710.318702ec.alex@shazbot.org>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA5MDAwOSBTYWx0ZWRfX52BcyYTlebrR
- dxM21h/hDXhD6D16mZo+NZ9GitbxB+GKabhAejP7JNHTs3p/sFye+k/+qC7VSzjKakLOD97idUw
- jirJopCuamR1ja7k3Gk8KMc+4vRjDWR53zKj0oME5lgWjbaOAm1gRrncGOfJroqvr7gD+04w5Hg
- h8te6Uej+RaOhpZOJeIIt5xv44rluPshqG3UCZLHlIy+gyxKmXkswZeRBYbAT6hfAgoObxbKLEY
- RBx/GUMG/hV++Rlr2ROShzifsgjW4O/XioF6NbAWv+J+y1qPzp+755TXf9brXDI026RH5YR4E/O
- jBuTJK7mhdpXkkZ2pDhYv3Fat6RfRHJQdjnlbOk0/PnNzO2lMhLmjdhxdZo+o0VyIQtGDQFZDUo
- lKui4E2yrguDQRj6Ha2nygy0KYyryw==
-X-Authority-Analysis: v=2.4 cv=LoCfC3dc c=1 sm=1 tr=0 ts=690fec5c cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=r1p2_3pzAAAA:8 a=FOH2dFAWAAAA:8 a=KLQ7IMvFttoUVMJHvGgA:9
- a=CjuIK1q_8ugA:10 a=r_pkcD-q9-ctt7trBg_g:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: i3kzQWJ9M9xbcUPXOqI5FU_vG3PvuBZz
-X-Proofpoint-GUID: i3kzQWJ9M9xbcUPXOqI5FU_vG3PvuBZz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-09_01,2025-11-06_01,2025-10-01_01
+References: <CAAhSdy1jcXypH3yCUBaci2EbOy2cbr2qNtdYriKa-vcyFFeCzg@mail.gmail.com>
+In-Reply-To: <CAAhSdy1jcXypH3yCUBaci2EbOy2cbr2qNtdYriKa-vcyFFeCzg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sun, 9 Nov 2025 08:07:12 +0100
+X-Gm-Features: AWmQ_bnx7mWPxNcnsLGyK7FcbtNdFOMyOYxt5lXfFl9U8cdhZMTbepfHl2tYedU
+Message-ID: <CABgObfYYc1MTR6MFjVWfXKu6tOe0iVY-dh9OnGU_6RvF1fCMeg@mail.gmail.com>
+Subject: Re: [GIT PULL v2] KVM/riscv fixes for 6.18 take #2
+To: Anup Patel <anup@brainfault.org>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, 
+	Atish Patra <atish.patra@linux.dev>, Andrew Jones <ajones@ventanamicro.com>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 08, 2025 at 02:37:10PM -0700, Alex Williamson wrote:
-> On Sat, 8 Nov 2025 12:19:48 -0800
-> Alex Mastro <amastro@fb.com> wrote:
-> > Here's my attempt at adding some machinery to query iova ranges, with
-> > normalization to iommufd's struct. I kept the vfio capability chain stuff
-> > relatively generic so we can use it for other things in the future if needed.
-> 
-> Seems we were both hacking on this, I hadn't seen you posted this
-> before sending:
-> 
-> https://lore.kernel.org/kvm/20251108212954.26477-1-alex@shazbot.org/T/#u
-> 
-> Maybe we can combine the best merits of each.  Thanks,
+On Sat, Oct 25, 2025 at 12:14=E2=80=AFPM Anup Patel <anup@brainfault.org> w=
+rote:
+>
+> Hi Paolo,
+>
+> We have three fixes for the 6.18 kernel. Two of these
+> are related to checking pending interrupts whereas
+> the third one removes automatic I/O mapping from
+> kvm_arch_prepare_memory_region().
+>
+> Please pull.
 
-Yes! I have been thinking along the following lines
-- Your idea to change the end of address space test to allocate at the end of
-  the supported range is better and more general than my idea of skipping the
-  test if ~(iova_t)0 is out of bounds. We should do that.
-- Introducing the concept iova allocator makes sense.
-- I think it's worthwhile to keep common test concepts like vfio_pci_device
-  less opinionated/stateful so as not to close the door on certain categories of
-  testing in the future. For example, if we ever wanted to test IOVA range
-  contraction after binding additional devices to an IOAS or vfio container.
-- What do you think about making the concept of an IOVA allocator something
-  standalone for which tests that need it can create one? I think it would
-  compose pretty cleanly on top of my vfio_pci_iova_ranges().
+Pulled, thanks.
 
-Alex
+Paolo
+
+>
+> Regards,
+> Anup
+>
+> The following changes since commit 3a8660878839faadb4f1a6dd72c3179c1df567=
+87:
+>
+>   Linux 6.18-rc1 (2025-10-12 13:42:36 -0700)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.18-2
+>
+> for you to fetch changes up to 8c5fa3764facaad6d38336e90f406c2c11d69733:
+>
+>   RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP (2025-10-24
+> 21:24:36 +0530)
+>
+> ----------------------------------------------------------------
+> KVM/riscv fixes for 6.18, take #2
+>
+> - Fix check for local interrupts on riscv32
+> - Read HGEIP CSR on the correct cpu when checking for IMSIC interrupts
+> - Remove automatic I/O mapping from kvm_arch_prepare_memory_region()
+>
+> ----------------------------------------------------------------
+> Fangyu Yu (2):
+>       RISC-V: KVM: Read HGEIP CSR on the correct cpu
+>       RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP
+>
+> Samuel Holland (1):
+>       RISC-V: KVM: Fix check for local interrupts on riscv32
+>
+>  arch/riscv/kvm/aia_imsic.c | 16 ++++++++++++++--
+>  arch/riscv/kvm/mmu.c       | 25 ++-----------------------
+>  arch/riscv/kvm/vcpu.c      |  2 +-
+>  3 files changed, 17 insertions(+), 26 deletions(-)
+>
+
 
