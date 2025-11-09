@@ -1,230 +1,208 @@
-Return-Path: <kvm+bounces-62415-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62416-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2D1FC439B9
-	for <lists+kvm@lfdr.de>; Sun, 09 Nov 2025 08:12:44 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 224E0C439DB
+	for <lists+kvm@lfdr.de>; Sun, 09 Nov 2025 08:43:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E3B3AFB39
-	for <lists+kvm@lfdr.de>; Sun,  9 Nov 2025 07:12:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 579AD346EDC
+	for <lists+kvm@lfdr.de>; Sun,  9 Nov 2025 07:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26AF245014;
-	Sun,  9 Nov 2025 07:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49DB273D81;
+	Sun,  9 Nov 2025 07:43:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dQQWJMin";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OtwONP0E"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="heyXYyDW";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="R7sLJHUH"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9A3242D7D
-	for <kvm@vger.kernel.org>; Sun,  9 Nov 2025 07:12:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9FB1193077
+	for <kvm@vger.kernel.org>; Sun,  9 Nov 2025 07:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762672356; cv=none; b=QL6ZvLm9Lp24xT446/6DZUz/VaDlSXfhuQx8KwT3FItySV4Ag/6OMIzaJ5wCggZ9gtqjA8hMmZ7oZf/0vGXoIWNgeFSc5r6J2tFe/W89pGTBOBJYWTzVdEX5kX8BBtYvm4RPHANKoe0IuNMJhrEtzXXfZTSiQtEK+l4V6FnOXDU=
+	t=1762674183; cv=none; b=Qvg5BkWR2ZP+GgUDMY+C0jSuzQyjTq9K2qPQPl2OmAkXvNUrLlbofhkBewClAiv41C0BjfSPPffpike7aR7WEuGkwoxnE4ql8QfC8ogLl/5APZk0mH/usJ9DGkoj4wAq8OCHUzmQZUrmOjLon9MXTdfx6PVfqj/ai/ujBXnLVtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762672356; c=relaxed/simple;
-	bh=AdHoQjrbJVFhbXbn4e53hG++/4NMIHDDh8uAXYDruqQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QctlIJP+qUtmRt/t69bHlICh87O7S7yyRhvN9Cy0J7REk6TesSwZ69eTjV7+82G+TJVx++rBLjoNiXFCnSfQCsS+OvR+KeQek4D/0bwWwhO+sCFSlAbPPzT/LwYQ0SnfyQA5X0kEIA6lYNBgMKtgQFwd7O2dj+LVQK6y+KP/4qU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dQQWJMin; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OtwONP0E; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1762674183; c=relaxed/simple;
+	bh=0l6kSDxuZolXxPvtX81Imos77pzD4xL9UNkd4sLU+f0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O0SaAR+eUspTGvyhyX8ZsV8mKAsmKUiz/vA6+AJFwZZJ8SzQnqQ9kSu6vrOXblsyxh32lPiL+0n4tHhjhBs10fajH0VInbh2cnKAtGc1L+eN46h2UY2DBZhbXoXvUYzoD/61itk0r49vucfIpzi0KLZcEt9pOXJT9Hif0Z69u3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=heyXYyDW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=R7sLJHUH; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762672354;
+	s=mimecast20190719; t=1762674179;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m82cK3xRCUvbcWhZbxs+7WqSqZtr7xd6qiGXFqz/RDg=;
-	b=dQQWJMin8BoFu9Iz8/O4zl1ZszWz+I8apNdzENFNDj7qX5t0VHWqOPQ8pP0HxUa+joPUug
-	vx0Lg8RDN77MNIGfeJZY+iL1duaYfkXlLrJWNftgEOs7Iu4jT1P79gWspBRDMNuLWqulsW
-	4dTC9pSVlen1tERg2zYRJt2907IPrZc=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=7l+lGeZ8zBElsB2/hWui9sncARHZER0YlsEox3jgWYg=;
+	b=heyXYyDWxnUgYhXlqoAy/oC1oU8R1Zpgf0s7KF/9MQek3EYZF5rAdmycwayAXRiB8UmA/o
+	aLgS95ol2hdScxL/x60G9lvPzE7uFYeql8/EkUtiRlde7w1MdZQPv0ig6TO9pwDTtjTafa
+	Xh6odeV23ceWezq33+OaQ7N3XWcAUr4=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-634-pFNbucxKOayFfDaWfLmb-w-1; Sun, 09 Nov 2025 02:12:32 -0500
-X-MC-Unique: pFNbucxKOayFfDaWfLmb-w-1
-X-Mimecast-MFC-AGG-ID: pFNbucxKOayFfDaWfLmb-w_1762672352
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-297d50cd8c4so38028615ad.0
-        for <kvm@vger.kernel.org>; Sat, 08 Nov 2025 23:12:32 -0800 (PST)
+ us-mta-103-AqeMQFwsPk28qttllV0mdA-1; Sun, 09 Nov 2025 02:42:57 -0500
+X-MC-Unique: AqeMQFwsPk28qttllV0mdA-1
+X-Mimecast-MFC-AGG-ID: AqeMQFwsPk28qttllV0mdA_1762674176
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b7270cab7eeso193961466b.1
+        for <kvm@vger.kernel.org>; Sat, 08 Nov 2025 23:42:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762672351; x=1763277151; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m82cK3xRCUvbcWhZbxs+7WqSqZtr7xd6qiGXFqz/RDg=;
-        b=OtwONP0Es+55TGk0aJEIkjpgaQ/DMVMlWXLwLBMHJfTv3apandFkzEAcqym3Ui8Jos
-         NhrbT3w6CQ1ZBJs6gOzqNg9cyq7uQEaNc9isTC0tqemkCAYQQGMP+wolasoYWQ+ZQsfM
-         qOrDV3+0dL83+BLPCYjt12n6ZuV4I/4pha0BivSod32mgJ7FCbyMZMsctnyUd64e+hUb
-         sAI/DtmU6AC8WlKMcJkmG/mXbjDYYObyNAe41/g3rP0ih61iJI5mNHYqnPh0yiYZ12lV
-         /52VqGq1+lrIdr9nuirgNrSPo5R+ND3/kMqqxPITYEtaMITjrX0TYqc3UF/kBH4Sc2BK
-         ZJZw==
+        d=redhat.com; s=google; t=1762674176; x=1763278976; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7l+lGeZ8zBElsB2/hWui9sncARHZER0YlsEox3jgWYg=;
+        b=R7sLJHUH6CsxJXxK3EMgG8rDA5qWp3H6m3fSMvf0hX62iwoTDD92Nog7A6J6/Ex+Bi
+         HLZdvlqMeAbWdYEz2tAlBSF1hNcIn/Ws6yj6oa3uode2q4z14Z+t1NoekqneohkoXjys
+         4fKmPjJ3F8Ro/g/hHsQolL4qo+KUAegIBK5NAM3kCcRj4jpBu/8LpDe11P5U2zWKSMJp
+         TjaiWcRhDnKpf85QjZ/xXSuxHyc88V6UtHsJor9e0r1rSFZmzitucYW/lC80vAMYHack
+         HsZnceElFy4Y/B0G0+/d6DH8m6DCc8C5PbYj1OnvaE//+/+oYNn0h1v1q8MldeGidYdG
+         H4Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762672351; x=1763277151;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=m82cK3xRCUvbcWhZbxs+7WqSqZtr7xd6qiGXFqz/RDg=;
-        b=c513Bpn0QlycQbODwc4twk/2xYXMcpUXqyIHJTZHD5tPEfno3v9UvzPss6XdpUhFuO
-         uE44z707RlRfPxtup/JAwDdPYroBLE8MHEdyRCmooO/EWijCdNdpwWd/5/e8SwJVKdwf
-         gnPdyR+hLzQtSeCFF0kbglOSX2fs/gtLKuKISXmLqp/NTj1BmULR0wwGqBW3qYwRbOrG
-         CuVPhoSIjcHDaM7WLz2/E7dX/NUkg/Gy2rywlUSNAIDjGZ5wQoeJf0710oLUVSijzM8m
-         d/XLphbTJMWT4szfn4PQoH6Ihr/EpKKugt4xpYzjzVG9Bf/Q9i+8bc6axjtJvxGqEZOQ
-         2baQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUMNovJ6/3XrbFt6wo/jtCLXNMq0KUPQnwGhWN9w8rdevLAEIK1PadeVEhOIO9zRPRUYNk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywe4zM45QATDlbTO5Rd8oph/bUys7rMdSNFRvDgQdGgRGUuDMx+
-	xqDinbO6iOEH1Smcl4e6NPnThDD+3f6yfx+bNNnBw/BE20QynHH/azLaheigd+9pxJdZOgAhCx5
-	Aan1IZGd6OS4DetVW0pophwYqFfMML58Du/E6nk3cT7eScyIqCq3hvcJIH0jpqgyVAkJNpJ4+XK
-	9Eu/gc/7rowAyrMpTTpoaxkbdCOhs5
-X-Gm-Gg: ASbGncsKLUWzp5jd9oG9eHeIhySY7zTWhvjdu9Jn7ZZyic7e6JHj2MX5IA31hVuV+BJ
-	d6uvMoEbZ0kqHCL0x/eiOYPM39ao+pM12ZXPdoy/aFIIqn6pYXxSIgatp1R4cJQ/qvc3v5cQ2S7
-	kX5xzXZ9nAlyhttRgpx2a913WG2nA4qWw2GBWEEBXar/XFKZyfsIMyTRAa6WNVe7jqEUMkpqYhP
-	4Xv69ENvMJDfcxqqkXsdz/nx23O+4MRcNQj5KekmuJJ/96/xiW3J4xfXgQx
-X-Received: by 2002:a17:902:e78f:b0:295:68df:da34 with SMTP id d9443c01a7336-297e5718086mr51623535ad.53.1762672351600;
-        Sat, 08 Nov 2025 23:12:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGmxSGLvw4pgRZ8aTw3qCykYC8xSzISK8rwIn1R2Gkp0ELn8flQDD1U9o+r1UzqIM5FPkf2ioy3/4F0I7hTmD4=
-X-Received: by 2002:a17:902:e78f:b0:295:68df:da34 with SMTP id
- d9443c01a7336-297e5718086mr51623375ad.53.1762672351274; Sat, 08 Nov 2025
- 23:12:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762674176; x=1763278976;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7l+lGeZ8zBElsB2/hWui9sncARHZER0YlsEox3jgWYg=;
+        b=aspXPaRyRIehB6SCsbxqLd8w8VGVpRuxCzzYI2cpYuoYc9L4p0OH9Z+Wa2VC/kGlM5
+         LYW6wJMRF7TbU6J4vCYxS6T6+Rc4v3++fiWAfvfKRIMybJSneXaDV+D14lWccHEczNkQ
+         CBS9ksbtJ6puX+XOqnf6KTbOt519aBjW5vsP7ULjl8wAfWqUJW9r/QYen050f1BkWcUg
+         CcqcGrLJgf7JG7aMEuroKd1eFALa93fV1COQgVkyXrgzHZdOVTC4fzYYEl0ACjwUVJ9N
+         3Cgn/xBEJVYmATmJmNn4LunM1etC14rKCSqkNhM+zOYZZfQQ5n7XROvTB8OxJA1yl2ir
+         sQlw==
+X-Forwarded-Encrypted: i=1; AJvYcCUFVUoG5vwT+3x4XhFX6IKB9H4zetTCgtPzv/rhHCT6vbHB3xx4uVcwhMdayT2KAz4BnY8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRRgsUG8g/ZfMIoi+McvHPNOdzq6QAGLAvgzMh31+/j82u6Ecr
+	h5RO+jfYEncDsBnME51bOpuzjfGX7jYhmxXxVHo7i/Xf/EJj8ghNMrbQi0EH9JIASc1aDjU8ogb
+	vsQm5jJtUk78071j0XZC47ucXusihpla7wJ8Ad5FZKQsqIs5+CCSiAA==
+X-Gm-Gg: ASbGncvZQe5DqXGtshgCmvmyJCdeGpHM082xe5yMlSgb+yzAMJIHFoPXPm1g/jfss92
+	O0C99VWHz1KyzcG2rtY6gp2jq9BTzIwZKrKF4fpif5mI5H+57IQqqeawkoWKYnCN2LIiNIfMO4Y
+	OkJ2rQM+j6UBOGKF3VlpnY5FRn9nlnqc3exWjzAt7SEZHgQKoQsClqZgkBdDTFLpMuJV5QVfYYi
+	6BsdyuJStIh58pnswRhcSOw8+06H2g5fwhSdDIV2EX5O/AtYPHiipySsBVKXP4P0OoXP+0pyPRJ
+	cWYxnOWfoEVC3TboPjatAv+7v6WdSBvjJ+cbIs9+LyByiuZvp4JpiSN9nDaYn5lXWqtFKOWMHs1
+	dyo4qIPN560ddks2loH/HNMevhYTxvbIkE6ayFZkjTeiNA812erq2tz5S3jx7kA1h34VRczk4MK
+	lqvvUB
+X-Received: by 2002:a17:907:2d22:b0:b6d:7b77:ff33 with SMTP id a640c23a62f3a-b72e02db6bfmr380120766b.19.1762674176075;
+        Sat, 08 Nov 2025 23:42:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGZQB94vRvTudvuLEaO7R+cm3s9oXIrJERucltzdm1MPb3XJt9DN7Y2H/ORMphe6ximrdmO9A==
+X-Received: by 2002:a17:907:2d22:b0:b6d:7b77:ff33 with SMTP id a640c23a62f3a-b72e02db6bfmr380119166b.19.1762674175662;
+        Sat, 08 Nov 2025 23:42:55 -0800 (PST)
+Received: from [192.168.10.48] ([151.95.110.222])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b72bf9bd36csm766237366b.61.2025.11.08.23.42.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 08 Nov 2025 23:42:55 -0800 (PST)
+Message-ID: <b46bfeef-c728-4598-a047-fcdad2d42d6e@redhat.com>
+Date: Sun, 9 Nov 2025 08:42:50 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251108120559.1201561-1-maz@kernel.org>
-In-Reply-To: <20251108120559.1201561-1-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/6] KVM: SVM: Mark VMCB_LBR dirty when
+ MSR_IA32_DEBUGCTLMSR is updated
+To: Yosry Ahmed <yosry.ahmed@linux.dev>,
+ Sean Christopherson <seanjc@google.com>
+Cc: Jim Mattson <jmattson@google.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Matteo Rizzo <matteorizzo@google.com>, evn@google.com
+References: <20251108004524.1600006-1-yosry.ahmed@linux.dev>
+ <20251108004524.1600006-2-yosry.ahmed@linux.dev>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 9 Nov 2025 08:12:17 +0100
-X-Gm-Features: AWmQ_bkaJ1JaU0aGn42MK0o7nRRGD7HuTETuGXjvrbkmq0cZ5a-Jnj8bQX-Px3w
-Message-ID: <CABgObfa2ShbRn-MctT7-y4joG85AgtjgKXM=OJA9_2FbDZ6XPQ@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.18, take #2
-To: Marc Zyngier <maz@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>, Maximilian Dittgen <mdittgen@amazon.de>, 
-	Oliver Upton <oupton@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, 
-	Sascha Bischoff <sascha.bischoff@arm.com>, Sebastian Ene <sebastianene@google.com>, 
-	Sebastian Ott <sebott@redhat.com>, stable@vger.kernel.org, 
-	Vincent Donnefort <vdonnefort@google.com>, Will Deacon <will@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20251108004524.1600006-2-yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Nov 8, 2025 at 1:06=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
->
-> Paolo,
->
-> Much later than expected, but here's the second set of fixes KVM/arm64
-> for 6.18. The core changes are mostly fixes for a bunch of recent
-> regressions, plus a couple that address the way pKVM deals with
-> untrusted data. The rest address a couple of selftests, and Oliver's
-> new email address.
+On 11/8/25 01:45, Yosry Ahmed wrote:
+> Clear the VMCB_LBR clean bit when MSR_IA32_DEBUGCTLMSR is updated, as
+> the only valid bit is DEBUGCTLMSR_LBR.
+> 
+> The history is complicated, it was correctly cleared for L1 before
+> commit 1d5a1b5860ed ("KVM: x86: nSVM: correctly virtualize LBR msrs when
+> L2 is running"), then the latter relied on svm_update_lbrv() to clear
+> it, but it only did so for L2. Go back to clearing it directly in
+> svm_set_msr().
 
-Pulled, thanks.
+Slightly more accurate:
+
+The APM lists the DbgCtlMsr field as being tracked by the VMCB_LBR clean
+bit.  Always clear the bit when MSR_IA32_DEBUGCTLMSR is updated.
+
+The history is complicated, it was correctly cleared for L1 before
+commit 1d5a1b5860ed ("KVM: x86: nSVM: correctly virtualize LBR msrs when
+L2 is running").  At that point svm_set_msr() started to rely on
+svm_update_lbrv() to clear the bit, but when nested virtualization
+is enabled the latter does not always clear it even if MSR_IA32_DEBUGCTLMSR
+changed. Go back to clearing it directly in svm_set_msr().
 
 Paolo
 
->
-> Please pull,
->
->         M.
->
-> The following changes since commit ca88ecdce5f51874a7c151809bd2c936ee0d38=
-05:
->
->   arm64: Revamp HCR_EL2.E2H RES1 detection (2025-10-14 08:18:40 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-6.18-2
->
-> for you to fetch changes up to 4af235bf645516481a82227d82d1352b9788903a:
->
->   MAINTAINERS: Switch myself to using kernel.org address (2025-11-08 11:2=
-1:20 +0000)
->
-> ----------------------------------------------------------------
-> KVM/arm654 fixes for 6.18, take #2
->
-> * Core fixes
->
->   - Fix trapping regression when no in-kernel irqchip is present
->     (20251021094358.1963807-1-sascha.bischoff@arm.com)
->
->   - Check host-provided, untrusted ranges and offsets in pKVM
->     (20251016164541.3771235-1-vdonnefort@google.com)
->     (20251017075710.2605118-1-sebastianene@google.com)
->
->   - Fix regression restoring the ID_PFR1_EL1 register
->     (20251030122707.2033690-1-maz@kernel.org
->
->   - Fix vgic ITS locking issues when LPIs are not directly injected
->     (20251107184847.1784820-1-oupton@kernel.org)
->
-> * Test fixes
->
->   - Correct target CPU programming in vgic_lpi_stress selftest
->     (20251020145946.48288-1-mdittgen@amazon.de)
->
->   - Fix exposure of SCTLR2_EL2 and ZCR_EL2 in get-reg-list selftest
->     (20251023-b4-kvm-arm64-get-reg-list-sctlr-el2-v1-1-088f88ff992a@kerne=
-l.org)
->     (20251024-kvm-arm64-get-reg-list-zcr-el2-v1-1-0cd0ff75e22f@kernel.org=
-)
->
-> * Misc
->
->   - Update Oliver's email address
->     (20251107012830.1708225-1-oupton@kernel.org)
->
-> ----------------------------------------------------------------
-> Marc Zyngier (3):
->       KVM: arm64: Make all 32bit ID registers fully writable
->       KVM: arm64: Set ID_{AA64PFR0,PFR1}_EL1.GIC when GICv3 is configured
->       KVM: arm64: Limit clearing of ID_{AA64PFR0,PFR1}_EL1.GIC to userspa=
-ce irqchip
->
-> Mark Brown (2):
->       KVM: arm64: selftests: Add SCTLR2_EL2 to get-reg-list
->       KVM: arm64: selftests: Filter ZCR_EL2 in get-reg-list
->
-> Maximilian Dittgen (1):
->       KVM: selftests: fix MAPC RDbase target formatting in vgic_lpi_stres=
-s
->
-> Oliver Upton (3):
->       KVM: arm64: vgic-v3: Reinstate IRQ lock ordering for LPI xarray
->       KVM: arm64: vgic-v3: Release reserved slot outside of lpi_xa's lock
->       MAINTAINERS: Switch myself to using kernel.org address
->
-> Sascha Bischoff (1):
->       KVM: arm64: vgic-v3: Trap all if no in-kernel irqchip
->
-> Sebastian Ene (1):
->       KVM: arm64: Check the untrusted offset in FF-A memory share
->
-> Vincent Donnefort (1):
->       KVM: arm64: Check range args for pKVM mem transitions
->
->  .mailmap                                           |  3 +-
->  MAINTAINERS                                        |  2 +-
->  arch/arm64/kvm/hyp/nvhe/ffa.c                      |  9 ++-
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c              | 28 +++++++++
->  arch/arm64/kvm/sys_regs.c                          | 71 ++++++++++++----=
-------
->  arch/arm64/kvm/vgic/vgic-debug.c                   | 16 +++--
->  arch/arm64/kvm/vgic/vgic-init.c                    | 16 ++++-
->  arch/arm64/kvm/vgic/vgic-its.c                     | 18 +++---
->  arch/arm64/kvm/vgic/vgic-v3.c                      |  3 +-
->  arch/arm64/kvm/vgic/vgic.c                         | 23 ++++---
->  tools/testing/selftests/kvm/arm64/get-reg-list.c   |  3 +
->  tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c |  9 ++-
->  12 files changed, 137 insertions(+), 64 deletions(-)
->
+> Fixes: 1d5a1b5860ed ("KVM: x86: nSVM: correctly virtualize LBR msrs when L2 is running")
+> Reported-by: Matteo Rizzo <matteorizzo@google.com>
+> Reported-by: evn@google.com
+> Co-developed-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> ---
+>   arch/x86/kvm/svm/svm.c | 4 ++++
+>   1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 55bd7aa5cd743..d25c56b30b4e2 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3009,7 +3009,11 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>   		if (data & DEBUGCTL_RESERVED_BITS)
+>   			return 1;
+>   
+> +		if (svm_get_lbr_vmcb(svm)->save.dbgctl == data)
+> +			break;
+> +
+>   		svm_get_lbr_vmcb(svm)->save.dbgctl = data;
+> +		vmcb_mark_dirty(svm->vmcb, VMCB_LBR);
+>   		svm_update_lbrv(vcpu);
+>   		break;
+>   	case MSR_VM_HSAVE_PA:
 
 
