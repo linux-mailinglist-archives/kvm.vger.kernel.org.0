@@ -1,601 +1,226 @@
-Return-Path: <kvm+bounces-62422-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62425-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E83F2C4424C
-	for <lists+kvm@lfdr.de>; Sun, 09 Nov 2025 17:27:10 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3E6DC443B6
+	for <lists+kvm@lfdr.de>; Sun, 09 Nov 2025 18:16:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B94744E4B1F
-	for <lists+kvm@lfdr.de>; Sun,  9 Nov 2025 16:27:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4FE904E8014
+	for <lists+kvm@lfdr.de>; Sun,  9 Nov 2025 17:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F83030214E;
-	Sun,  9 Nov 2025 16:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82DAB306492;
+	Sun,  9 Nov 2025 17:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pwyW2EW6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sFhLtFYG"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347D4301718
-	for <kvm@vger.kernel.org>; Sun,  9 Nov 2025 16:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACD03043A2;
+	Sun,  9 Nov 2025 17:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762705621; cv=none; b=aV8tSx/wCSlJbksRCNeum2x8C6sULk+veP6pOLPOr2DFOiJly+lU6NT51/zm/z9i1Vum9WM+1c0BcJysH2VL7BzhhqpUWfgV0kXuWsK8yak3ZYZ6JwgLgqSMyZOHrzUieFVRHbLg/nitVlh46Ji51sKPsv1WM+R55951nSpUmvE=
+	t=1762708590; cv=none; b=J/6m/lsK9SaXaLuhcz59HkTizYyUS5+kYCZ2fEv626i+1RStMSobQhvP6g8xvVr5vLZug6IJEyvBeGBu9Xa5rMHH2vwh8limXS90+dX15IHm/ygqsCHToSb1Sl2ExSDd+13657xJ+gDODk3iLfEwjoMt8RafgLjkjufXUcM9E4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762705621; c=relaxed/simple;
-	bh=M6/vBucdxVbLAF6O/PzO5KEcefqj1NXVjYQTgRfyGgM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lti7Bxgdn9jwFeG8LHhpQczaCUlBNOx9oPzPsvstN/eiJWbRi24CyJQBo5wUxqzGbgZQshXx1tAU6DfzvmrN8xPGZUfIHYkGxrVAY+KgN5s3/vRrDbUHDQrmQ+vXfCE8qdupnRMl3xGjeJPJZM8l7fRGwBWmz+nDzoSB+CJ4uEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pwyW2EW6; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5ed51639-604c-4e15-84ae-4bf3777f83c1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762705611;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Oc0nS0Oa6VgyqrdvhkSTK7B+nOWIW7alkYgFANGDZPQ=;
-	b=pwyW2EW686jL52qUi8I2VuTz1EmNkWpfSru0DsgZMM+9Q0p0FNTrkdRidIItTWCToFu7KE
-	n9z0y9FEp1NXnIrrKUnS0acP2LaEfRrFzFZYM6R/qjdwf2GSGPEVniFjn2kGZ4QpoXZKdK
-	dRzKFf0NJRNE89MT5AE5NrJjf4gimIk=
-Date: Mon, 10 Nov 2025 00:26:26 +0800
+	s=arc-20240116; t=1762708590; c=relaxed/simple;
+	bh=LU5ZFdx4EUgvb0p/xCvsj9L4R5ggGs+NLiMz5m9HfUc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qQiWzg9qOikP1U4n/Gf1qfa+jdS7pev2uOKg0AowiVY5pk0Dfc+UoOcSGrDULFVOVVbTFyF4rBJZWDTpVgYN4N1/qC8Tlel1vNjQXO8i12lTzCnJkKfEgNAKuHAg7ORRvos4Zgzci6IOMSoGVIDl3SxWJ5V6TAk1rQ8ZHXr9p3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sFhLtFYG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28D55C4CEF7;
+	Sun,  9 Nov 2025 17:16:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762708590;
+	bh=LU5ZFdx4EUgvb0p/xCvsj9L4R5ggGs+NLiMz5m9HfUc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=sFhLtFYG3Z+0+DBLaN0LKpKwk6ur3WVl9zuRVWr+46ey1p8gnSk5u84BNs3sDaDIE
+	 xdxfHpDB6jXpaFnestxrxmSbo2SH6uT0tb39tuZ/bqdinwzFXQezUHtMcnkuIBrsJG
+	 sBRNdRp8+1bfyr/uS5NkAICDk/7HrUhatH/4LUS791pDgy4X5N6+vSELUJOt3xqHLL
+	 ppFpYzfLxGH7bM7u9xwpxv/FENRGsy5LoTRk5f8tVl54DyXNYGZvdWaYdaZapLZnqH
+	 7KY/1aX8n3+lfVefc4tTGgb73zfXyfq+x76oXQoA6LQ1Lt0y6neYjIRroarqRGNKbZ
+	 E7RqSzBrRLYSA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vI91f-00000003exw-3VIj;
+	Sun, 09 Nov 2025 17:16:27 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>
+Subject: [PATCH v2 00/45] KVM: arm64: Add LR overflow infrastructure
+Date: Sun,  9 Nov 2025 17:15:34 +0000
+Message-ID: <20251109171619.1507205-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 01/16] mm: correctly handle UFFD PTE markers
-Content-Language: en-US
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>,
- Zi Yan <ziy@nvidia.com>, Baolin Wang <baolin.wang@linux.alibaba.com>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache
- <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
- Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
- Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
- Matthew Brost <matthew.brost@intel.com>,
- Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
- Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
- Ying Huang <ying.huang@linux.alibaba.com>,
- Alistair Popple <apopple@nvidia.com>,
- Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
- Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
- Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
- Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
- SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
- Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
- Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
- Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
- Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
-References: <cover.1762621567.git.lorenzo.stoakes@oracle.com>
- <0b50fd4b1d3241d0965e6b969fb49bcc14704d9b.1762621568.git.lorenzo.stoakes@oracle.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Lance Yang <lance.yang@linux.dev>
-In-Reply-To: <0b50fd4b1d3241d0965e6b969fb49bcc14704d9b.1762621568.git.lorenzo.stoakes@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+This is the 2nd version of the series originally posted at [1]. The
+series has significantly evolved with a bunch of bug fixes, some
+additional optimisations, and a number of test cases.
 
+This has now been extensively tested on much of what I have access to,
+specially on some of the most broken stuff (Apple, Qualcomm, Cavium,
+ARMv8.0 CPUs without TDIR), but also on some less shitty systems
+(which are the minority, unsurprisingly).
 
-On 2025/11/9 01:08, Lorenzo Stoakes wrote:
-> PTE markers were previously only concerned with UFFD-specific logic - that
-> is, PTE entries with the UFFD WP marker set or those marked via
-> UFFDIO_POISON.
-> 
-> However since the introduction of guard markers in commit
->   7c53dfbdb024 ("mm: add PTE_MARKER_GUARD PTE marker"), this has no longer
->   been the case.
-> 
-> Issues have been avoided as guard regions are not permitted in conjunction
-> with UFFD, but it still leaves very confusing logic in place, most notably
-> the misleading and poorly named pte_none_mostly() and
-> huge_pte_none_mostly().
-> 
-> This predicate returns true for PTE entries that ought to be treated as
-> none, but only in certain circumstances, and on the assumption we are
-> dealing with H/W poison markers or UFFD WP markers.
-> 
-> This patch removes these functions and makes each invocation of these
-> functions instead explicitly check what it needs to check.
-> 
-> As part of this effort it introduces is_uffd_pte_marker() to explicitly
-> determine if a marker in fact is used as part of UFFD or not.
-> 
-> In the HMM logic we note that the only time we would need to check for a
-> fault is in the case of a UFFD WP marker, otherwise we simply encounter a
-> fault error (VM_FAULT_HWPOISON for H/W poisoned marker, VM_FAULT_SIGSEGV
-> for a guard marker), so only check for the UFFD WP case.
-> 
-> While we're here we also refactor code to make it easier to understand.
-> 
-> Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
-> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-> ---
->   fs/userfaultfd.c              | 83 +++++++++++++++++++----------------
->   include/asm-generic/hugetlb.h |  8 ----
->   include/linux/swapops.h       | 18 --------
->   include/linux/userfaultfd_k.h | 21 +++++++++
->   mm/hmm.c                      |  2 +-
->   mm/hugetlb.c                  | 47 ++++++++++----------
->   mm/mincore.c                  | 17 +++++--
->   mm/userfaultfd.c              | 27 +++++++-----
->   8 files changed, 123 insertions(+), 100 deletions(-)
-> 
-> diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-> index 54c6cc7fe9c6..04c66b5001d5 100644
-> --- a/fs/userfaultfd.c
-> +++ b/fs/userfaultfd.c
-> @@ -233,40 +233,46 @@ static inline bool userfaultfd_huge_must_wait(struct userfaultfd_ctx *ctx,
->   {
->   	struct vm_area_struct *vma = vmf->vma;
->   	pte_t *ptep, pte;
-> -	bool ret = true;
->   
->   	assert_fault_locked(vmf);
->   
->   	ptep = hugetlb_walk(vma, vmf->address, vma_mmu_pagesize(vma));
->   	if (!ptep)
-> -		goto out;
-> +		return true;
->   
-> -	ret = false;
->   	pte = huge_ptep_get(vma->vm_mm, vmf->address, ptep);
->   
->   	/*
->   	 * Lockless access: we're in a wait_event so it's ok if it
-> -	 * changes under us.  PTE markers should be handled the same as none
-> -	 * ptes here.
-> +	 * changes under us.
->   	 */
-> -	if (huge_pte_none_mostly(pte))
-> -		ret = true;
-> +
-> +	/* If missing entry, wait for handler. */
-> +	if (huge_pte_none(pte))
-> +		return true;
-> +	/* UFFD PTE markers require handling. */
-> +	if (is_uffd_pte_marker(pte))
-> +		return true;
-> +	/* If VMA has UFFD WP faults enabled and WP fault, wait for handler. */
->   	if (!huge_pte_write(pte) && (reason & VM_UFFD_WP))
-> -		ret = true;
-> -out:
-> -	return ret;
-> +		return true;
-> +
-> +	/* Otherwise, if entry isn't present, let fault handler deal with it. */
-> +	return false;
->   }
->   #else
->   static inline bool userfaultfd_huge_must_wait(struct userfaultfd_ctx *ctx,
->   					      struct vm_fault *vmf,
->   					      unsigned long reason)
->   {
-> -	return false;	/* should never get here */
-> +	/* Should never get here. */
-> +	VM_WARN_ON_ONCE(1);
-> +	return false;
->   }
->   #endif /* CONFIG_HUGETLB_PAGE */
->   
->   /*
-> - * Verify the pagetables are still not ok after having reigstered into
-> + * Verify the pagetables are still not ok after having registered into
->    * the fault_pending_wqh to avoid userland having to UFFDIO_WAKE any
->    * userfault that has already been resolved, if userfaultfd_read_iter and
->    * UFFDIO_COPY|ZEROPAGE are being run simultaneously on two different
-> @@ -284,53 +290,55 @@ static inline bool userfaultfd_must_wait(struct userfaultfd_ctx *ctx,
->   	pmd_t *pmd, _pmd;
->   	pte_t *pte;
->   	pte_t ptent;
-> -	bool ret = true;
-> +	bool ret;
->   
->   	assert_fault_locked(vmf);
->   
->   	pgd = pgd_offset(mm, address);
->   	if (!pgd_present(*pgd))
-> -		goto out;
-> +		return true;
->   	p4d = p4d_offset(pgd, address);
->   	if (!p4d_present(*p4d))
-> -		goto out;
-> +		return true;
->   	pud = pud_offset(p4d, address);
->   	if (!pud_present(*pud))
-> -		goto out;
-> +		return true;
->   	pmd = pmd_offset(pud, address);
->   again:
->   	_pmd = pmdp_get_lockless(pmd);
->   	if (pmd_none(_pmd))
-> -		goto out;
-> +		return true;
->   
-> -	ret = false;
->   	if (!pmd_present(_pmd))
-> -		goto out;
-> +		return false;
->   
-> -	if (pmd_trans_huge(_pmd)) {
-> -		if (!pmd_write(_pmd) && (reason & VM_UFFD_WP))
-> -			ret = true;
-> -		goto out;
-> -	}
-> +	if (pmd_trans_huge(_pmd))
-> +		return !pmd_write(_pmd) && (reason & VM_UFFD_WP);
->   
->   	pte = pte_offset_map(pmd, address);
-> -	if (!pte) {
-> -		ret = true;
-> +	if (!pte)
->   		goto again;
-> -	}
-> +
->   	/*
->   	 * Lockless access: we're in a wait_event so it's ok if it
-> -	 * changes under us.  PTE markers should be handled the same as none
-> -	 * ptes here.
-> +	 * changes under us.
->   	 */
->   	ptent = ptep_get(pte);
-> -	if (pte_none_mostly(ptent))
-> -		ret = true;
-> +
-> +	ret = true;
-> +	/* If missing entry, wait for handler. */
-> +	if (pte_none(ptent))
-> +		goto out;
-> +	/* UFFD PTE markers require handling. */
-> +	if (is_uffd_pte_marker(ptent))
-> +		goto out;
-> +	/* If VMA has UFFD WP faults enabled and WP fault, wait for handler. */
->   	if (!pte_write(ptent) && (reason & VM_UFFD_WP))
-> -		ret = true;
-> -	pte_unmap(pte);
-> +		goto out;
->   
-> +	ret = false;
->   out:
-> +	pte_unmap(pte);
->   	return ret;
->   }
->   
-> @@ -490,12 +498,13 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
->   	set_current_state(blocking_state);
->   	spin_unlock_irq(&ctx->fault_pending_wqh.lock);
->   
-> -	if (!is_vm_hugetlb_page(vma))
-> -		must_wait = userfaultfd_must_wait(ctx, vmf, reason);
-> -	else
-> +	if (is_vm_hugetlb_page(vma)) {
->   		must_wait = userfaultfd_huge_must_wait(ctx, vmf, reason);
-> -	if (is_vm_hugetlb_page(vma))
->   		hugetlb_vma_unlock_read(vma);
-> +	} else {
-> +		must_wait = userfaultfd_must_wait(ctx, vmf, reason);
-> +	}
-> +
->   	release_fault_lock(vmf);
->   
->   	if (likely(must_wait && !READ_ONCE(ctx->released))) {
-> diff --git a/include/asm-generic/hugetlb.h b/include/asm-generic/hugetlb.h
-> index dcb8727f2b82..e1a2e1b7c8e7 100644
-> --- a/include/asm-generic/hugetlb.h
-> +++ b/include/asm-generic/hugetlb.h
-> @@ -97,14 +97,6 @@ static inline int huge_pte_none(pte_t pte)
->   }
->   #endif
->   
-> -/* Please refer to comments above pte_none_mostly() for the usage */
-> -#ifndef __HAVE_ARCH_HUGE_PTE_NONE_MOSTLY
-> -static inline int huge_pte_none_mostly(pte_t pte)
-> -{
-> -	return huge_pte_none(pte) || is_pte_marker(pte);
-> -}
-> -#endif
-> -
->   #ifndef __HAVE_ARCH_HUGE_PTEP_SET_WRPROTECT
->   static inline void huge_ptep_set_wrprotect(struct mm_struct *mm,
->   		unsigned long addr, pte_t *ptep)
-> diff --git a/include/linux/swapops.h b/include/linux/swapops.h
-> index 2687928a8146..d1f665935cfc 100644
-> --- a/include/linux/swapops.h
-> +++ b/include/linux/swapops.h
-> @@ -469,24 +469,6 @@ static inline int is_guard_swp_entry(swp_entry_t entry)
->   		(pte_marker_get(entry) & PTE_MARKER_GUARD);
->   }
->   
-> -/*
-> - * This is a special version to check pte_none() just to cover the case when
-> - * the pte is a pte marker.  It existed because in many cases the pte marker
-> - * should be seen as a none pte; it's just that we have stored some information
-> - * onto the none pte so it becomes not-none any more.
-> - *
-> - * It should be used when the pte is file-backed, ram-based and backing
-> - * userspace pages, like shmem.  It is not needed upon pgtables that do not
-> - * support pte markers at all.  For example, it's not needed on anonymous
-> - * memory, kernel-only memory (including when the system is during-boot),
-> - * non-ram based generic file-system.  It's fine to be used even there, but the
-> - * extra pte marker check will be pure overhead.
-> - */
-> -static inline int pte_none_mostly(pte_t pte)
-> -{
-> -	return pte_none(pte) || is_pte_marker(pte);
-> -}
-> -
->   static inline struct page *pfn_swap_entry_to_page(swp_entry_t entry)
->   {
->   	struct page *p = pfn_to_page(swp_offset_pfn(entry));
-> diff --git a/include/linux/userfaultfd_k.h b/include/linux/userfaultfd_k.h
-> index c0e716aec26a..da0b4fcc566f 100644
-> --- a/include/linux/userfaultfd_k.h
-> +++ b/include/linux/userfaultfd_k.h
-> @@ -479,4 +479,25 @@ static inline bool pte_swp_uffd_wp_any(pte_t pte)
->   	return false;
->   }
->   
-> +
-> +static inline bool is_uffd_pte_marker(pte_t pte)
-> +{
-> +	swp_entry_t entry;
-> +
-> +	if (pte_present(pte))
-> +		return false;
-> +
-> +	entry = pte_to_swp_entry(pte);
-> +	if (!is_pte_marker_entry(entry))
-> +		return false;
-> +
-> +	/* UFFD WP, poisoned swap entries are UFFD handled. */
-> +	if (pte_marker_entry_uffd_wp(entry))
-> +		return true;
-> +	if (is_poisoned_swp_entry(entry))
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
->   #endif /* _LINUX_USERFAULTFD_K_H */
-> diff --git a/mm/hmm.c b/mm/hmm.c
-> index a56081d67ad6..43d4a91035ff 100644
-> --- a/mm/hmm.c
-> +++ b/mm/hmm.c
-> @@ -244,7 +244,7 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
->   	uint64_t pfn_req_flags = *hmm_pfn;
->   	uint64_t new_pfn_flags = 0;
->   
-> -	if (pte_none_mostly(pte)) {
-> +	if (pte_none(pte) || pte_marker_uffd_wp(pte)) {
->   		required_fault =
->   			hmm_pte_need_fault(hmm_vma_walk, pfn_req_flags, 0);
->   		if (required_fault)
-> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-> index 1ea459723cce..01c784547d1e 100644
-> --- a/mm/hugetlb.c
-> +++ b/mm/hugetlb.c
-> @@ -6743,29 +6743,28 @@ vm_fault_t hugetlb_fault(struct mm_struct *mm, struct vm_area_struct *vma,
->   	}
->   
->   	vmf.orig_pte = huge_ptep_get(mm, vmf.address, vmf.pte);
-> -	if (huge_pte_none_mostly(vmf.orig_pte)) {
-> -		if (is_pte_marker(vmf.orig_pte)) {
-> -			pte_marker marker =
-> -				pte_marker_get(pte_to_swp_entry(vmf.orig_pte));
-> -
-> -			if (marker & PTE_MARKER_POISONED) {
-> -				ret = VM_FAULT_HWPOISON_LARGE |
-> -				      VM_FAULT_SET_HINDEX(hstate_index(h));
-> -				goto out_mutex;
-> -			} else if (WARN_ON_ONCE(marker & PTE_MARKER_GUARD)) {
-> -				/* This isn't supported in hugetlb. */
-> -				ret = VM_FAULT_SIGSEGV;
-> -				goto out_mutex;
-> -			}
-> -		}
-> -
-> +	if (huge_pte_none(vmf.orig_pte))
->   		/*
-> -		 * Other PTE markers should be handled the same way as none PTE.
-> -		 *
->   		 * hugetlb_no_page will drop vma lock and hugetlb fault
->   		 * mutex internally, which make us return immediately.
->   		 */
->   		return hugetlb_no_page(mapping, &vmf);
-> +
-> +	if (is_pte_marker(vmf.orig_pte)) {
-> +		const pte_marker marker =
-> +			pte_marker_get(pte_to_swp_entry(vmf.orig_pte));
-> +
-> +		if (marker & PTE_MARKER_POISONED) {
-> +			ret = VM_FAULT_HWPOISON_LARGE |
-> +				VM_FAULT_SET_HINDEX(hstate_index(h));
-> +			goto out_mutex;
-> +		} else if (WARN_ON_ONCE(marker & PTE_MARKER_GUARD)) {
-> +			/* This isn't supported in hugetlb. */
-> +			ret = VM_FAULT_SIGSEGV;
-> +			goto out_mutex;
-> +		}
-> +
-> +		return hugetlb_no_page(mapping, &vmf);
->   	}
->   
->   	ret = 0;
-> @@ -6934,6 +6933,7 @@ int hugetlb_mfill_atomic_pte(pte_t *dst_pte,
->   	int ret = -ENOMEM;
->   	struct folio *folio;
->   	bool folio_in_pagecache = false;
-> +	pte_t dst_ptep;
->   
->   	if (uffd_flags_mode_is(flags, MFILL_ATOMIC_POISON)) {
->   		ptl = huge_pte_lock(h, dst_mm, dst_pte);
-> @@ -7073,13 +7073,14 @@ int hugetlb_mfill_atomic_pte(pte_t *dst_pte,
->   	if (folio_test_hwpoison(folio))
->   		goto out_release_unlock;
->   
-> +	ret = -EEXIST;
-> +
-> +	dst_ptep = huge_ptep_get(dst_mm, dst_addr, dst_pte);
->   	/*
-> -	 * We allow to overwrite a pte marker: consider when both MISSING|WP
-> -	 * registered, we firstly wr-protect a none pte which has no page cache
-> -	 * page backing it, then access the page.
-> +	 * See comment about UFFD marker overwriting in
-> +	 * mfill_atomic_install_pte().
->   	 */
-> -	ret = -EEXIST;
-> -	if (!huge_pte_none_mostly(huge_ptep_get(dst_mm, dst_addr, dst_pte)))
-> +	if (!huge_pte_none(dst_ptep) && !is_uffd_pte_marker(dst_ptep))
->   		goto out_release_unlock;
->   
->   	if (folio_in_pagecache)
-> diff --git a/mm/mincore.c b/mm/mincore.c
-> index 8ec4719370e1..151b2dbb783b 100644
-> --- a/mm/mincore.c
-> +++ b/mm/mincore.c
-> @@ -32,11 +32,22 @@ static int mincore_hugetlb(pte_t *pte, unsigned long hmask, unsigned long addr,
->   	spinlock_t *ptl;
->   
->   	ptl = huge_pte_lock(hstate_vma(walk->vma), walk->mm, pte);
-> +
->   	/*
->   	 * Hugepages under user process are always in RAM and never
->   	 * swapped out, but theoretically it needs to be checked.
->   	 */
-> -	present = pte && !huge_pte_none_mostly(huge_ptep_get(walk->mm, addr, pte));
-> +	if (!pte) {
-> +		present = 0;
-> +	} else {
-> +		const pte_t ptep = huge_ptep_get(walk->mm, addr, pte);
-> +
-> +		if (huge_pte_none(ptep) || is_pte_marker(ptep))
-> +			present = 0;
-> +		else
-> +			present = 1;
-> +	}
-> +
->   	for (; addr != end; vec++, addr += PAGE_SIZE)
->   		*vec = present;
->   	walk->private = vec;
-> @@ -175,8 +186,8 @@ static int mincore_pte_range(pmd_t *pmd, unsigned long addr, unsigned long end,
->   		pte_t pte = ptep_get(ptep);
->   
->   		step = 1;
-> -		/* We need to do cache lookup too for pte markers */
-> -		if (pte_none_mostly(pte))
-> +		/* We need to do cache lookup too for UFFD pte markers */
-> +		if (pte_none(pte) || is_uffd_pte_marker(pte))
+Given that this is fixing some really ugly vgic bugs, I'm aiming this
+at 6.19, though these bugs being 10 year old, any form of urgency is
+very questionable.
 
-Seems like something is changed, new is_uffd_pte_marker check will
-miss non-UFFD markers (like guard markers) , and then would fall
-through to the swap entry logic to be misreported as resident by
-mincore_swap().
+Patches still against -rc4.
 
-```
-		/* We need to do cache lookup too for UFFD pte markers */
-		if (pte_none(pte) || is_uffd_pte_marker(pte))
-			__mincore_unmapped_range(addr, addr + PAGE_SIZE,
-						 vma, vec);
-		else if (pte_present(pte)) {
-			unsigned int batch = pte_batch_hint(ptep, pte);
+* From v1 [1]:
 
-			if (batch > 1) {
-				unsigned int max_nr = (end - addr) >> PAGE_SHIFT;
+  - Fixed the ICH_HCR_EL2.TDIR detection code to include the Apple
+    stuff, and to deal with GICv5's legacy mode
 
-				step = min_t(unsigned int, batch, max_nr);
-			}
+  - Fixed compilation issue for old toolchains that don't understand
+    the GICv3 sysreg names
 
-			for (i = 0; i < step; i++)
-				vec[i] = 1;
-		} else { /* pte is a swap entry */
-			*vec = mincore_swap(pte_to_swp_entry(pte), false);
-		}
-```
+  - Allow GICv3 in-LR deactivation even when DIR trapping is enabled
 
-Wouldn't the generic is_pte_marker() be safer here?
+  - Dropped the split overflow list, once I convinced myself it wasn't
+    bringing much to the table
 
-Thanks,
-Lance
+  - Turned kvm_vgic_vcpu_enable() into a vgic reset helper
 
->   			__mincore_unmapped_range(addr, addr + PAGE_SIZE,
->   						 vma, vec);
->   		else if (pte_present(pte)) {
-> diff --git a/mm/userfaultfd.c b/mm/userfaultfd.c
-> index 00122f42718c..cc4ce205bbec 100644
-> --- a/mm/userfaultfd.c
-> +++ b/mm/userfaultfd.c
-> @@ -178,6 +178,7 @@ int mfill_atomic_install_pte(pmd_t *dst_pmd,
->   	spinlock_t *ptl;
->   	struct folio *folio = page_folio(page);
->   	bool page_in_cache = folio_mapping(folio);
-> +	pte_t dst_ptep;
->   
->   	_dst_pte = mk_pte(page, dst_vma->vm_page_prot);
->   	_dst_pte = pte_mkdirty(_dst_pte);
-> @@ -199,12 +200,15 @@ int mfill_atomic_install_pte(pmd_t *dst_pmd,
->   	}
->   
->   	ret = -EEXIST;
-> +
-> +	dst_ptep = ptep_get(dst_pte);
-> +
->   	/*
-> -	 * We allow to overwrite a pte marker: consider when both MISSING|WP
-> -	 * registered, we firstly wr-protect a none pte which has no page cache
-> -	 * page backing it, then access the page.
-> +	 * We are allowed to overwrite a UFFD pte marker: consider when both
-> +	 * MISSING|WP registered, we firstly wr-protect a none pte which has no
-> +	 * page cache page backing it, then access the page.
->   	 */
-> -	if (!pte_none_mostly(ptep_get(dst_pte)))
-> +	if (!pte_none(dst_ptep) && !is_uffd_pte_marker(dst_ptep))
->   		goto out_unlock;
->   
->   	if (page_in_cache) {
-> @@ -583,12 +587,15 @@ static __always_inline ssize_t mfill_atomic_hugetlb(
->   			goto out_unlock;
->   		}
->   
-> -		if (!uffd_flags_mode_is(flags, MFILL_ATOMIC_CONTINUE) &&
-> -		    !huge_pte_none_mostly(huge_ptep_get(dst_mm, dst_addr, dst_pte))) {
-> -			err = -EEXIST;
-> -			hugetlb_vma_unlock_read(dst_vma);
-> -			mutex_unlock(&hugetlb_fault_mutex_table[hash]);
-> -			goto out_unlock;
-> +		if (!uffd_flags_mode_is(flags, MFILL_ATOMIC_CONTINUE)) {
-> +			const pte_t ptep = huge_ptep_get(dst_mm, dst_addr, dst_pte);
-> +
-> +			if (!huge_pte_none(ptep) && !is_uffd_pte_marker(ptep)) {
-> +				err = -EEXIST;
-> +				hugetlb_vma_unlock_read(dst_vma);
-> +				mutex_unlock(&hugetlb_fault_mutex_table[hash]);
-> +				goto out_unlock;
-> +			}
->   		}
->   
->   		err = hugetlb_mfill_atomic_pte(dst_pte, dst_vma, dst_addr,
+  - Remove IPI-ing on GICv3 systems without TDIR
+
+  - Fixed the out-of-LR deactivation when dealing with asymmetric SPI
+    deactivation
+
+  - Fixed broken MMIO offset computation
+
+  - Added group enable to the GIC selftest library
+
+  - Added fixes and improvements to the vgic_irq selftest:
+
+    - Fixed definition of spurious interrupt
+
+    - Fixed config/enable ordering
+
+    - Prevent timer interrupts from being injected from userspace
+
+    - Removed limit of 4 interrupts being injected at any given time
+
+    - Added an asymmetric SPI deactivation test case
+
+    - Added a Group-0 enable test case
+
+    - Added a timer interrupt + SPI interrupt test case
+
+  - Fixed a couple of spelling mistakes (and added many more, I'm sure)
+
+  - Reordered the series slightly
+
+[1] https://lore.kernel.org/r/20251103165517.2960148-1-maz@kernel.org
+
+Marc Zyngier (45):
+  irqchip/gic: Add missing GICH_HCR control bits
+  irqchip/gic: Expose CPU interface VA to KVM
+  irqchip/apple-aic: Spit out ICH_MISR_EL2 value on spurious vGIC MI
+  KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
+  KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1
+    trapping
+  KVM: arm64: Repack struct vgic_irq fields
+  KVM: arm64: Add tracking of vgic_irq being present in a LR
+  KVM: arm64: Add LR overflow handling documentation
+  KVM: arm64: GICv3: Drop LPI active state when folding LRs
+  KVM: arm64: GICv3: Preserve EOIcount on exit
+  KVM: arm64: GICv3: Decouple ICH_HCR_EL2 programming from LRs
+  KVM: arm64: GICv3: Extract LR folding primitive
+  KVM: arm64: GICv3: Extract LR computing primitive
+  KVM: arm64: GICv2: Preserve EOIcount on exit
+  KVM: arm64: GICv2: Decouple GICH_HCR programming from LRs being loaded
+  KVM: arm64: GICv2: Extract LR folding primitive
+  KVM: arm64: GICv2: Extract LR computing primitive
+  KVM: arm64: Compute vgic state irrespective of the number of
+    interrupts
+  KVM: arm64: Eagerly save VMCR on exit
+  KVM: arm64: Revamp vgic maintenance interrupt configuration
+  KVM: arm64: Turn kvm_vgic_vcpu_enable() into kvm_vgic_vcpu_reset()
+  KVM: arm64: Make vgic_target_oracle() globally available
+  KVM: arm64: Invert ap_list sorting to push active interrupts out
+  KVM: arm64: Move undeliverable interrupts to the end of ap_list
+  KVM: arm64: Use MI to detect groups being enabled/disabled
+  KVM: arm64: GICv3: Handle LR overflow when EOImode==0
+  KVM: arm64: GICv3: Handle deactivation via ICV_DIR_EL1 traps
+  KVM: arm64: GICv3: Add GICv2 SGI handling to deactivation primitive
+  KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR
+    capacity
+  KVM: arm64: GICv3: Add SPI tracking to handle asymmetric deactivation
+  KVM: arm64: GICv3: Handle in-LR deactivation when possible
+  KVM: arm64: GICv3: Avoid broadcast kick on CPUs lacking TDIR
+  KVM: arm64: GICv2: Handle LR overflow when EOImode==0
+  KVM: arm64: GICv2: Handle deactivation via GICV_DIR traps
+  KVM: arm64: GICv2: Always trap GICV_DIR register
+  KVM: arm64: selftests: gic_v3: Add irq group setting helper
+  KVM: arm64: selftests: gic_v3: Disable Group-0 interrupts by default
+  KVM: arm64: selftests: vgic_irq: Fix GUEST_ASSERT_IAR_EMPTY() helper
+  KVM: arm64: selftests: vgic_irq: Change configuration before enabling
+    interrupt
+  KVM: arm64: selftests: vgic_irq: Exclude timer-controlled interrupts
+  KVM: arm64: selftests: vgic_irq: Remove LR-bound limitation
+  KVM: arm64: selftests: vgic_irq: Perform EOImode==1 deactivation in
+    ack order
+  KVM: arm64: selftests: vgic_irq: Add asymmetric SPI deaectivation test
+  KVM: arm64: selftests: vgic_irq: Add Group-0 enable test
+  KVM: arm64: selftests: vgic_irq: Add timer deactivation test
+
+ arch/arm64/include/asm/kvm_asm.h              |   2 +-
+ arch/arm64/include/asm/kvm_host.h             |   1 +
+ arch/arm64/include/asm/kvm_hyp.h              |   2 +-
+ arch/arm64/include/asm/virt.h                 |   7 +-
+ arch/arm64/kernel/cpufeature.c                |  52 +++
+ arch/arm64/kernel/hyp-stub.S                  |   5 +
+ arch/arm64/kernel/image-vars.h                |   1 +
+ arch/arm64/kvm/arm.c                          |   7 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   7 +-
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c      |   4 +
+ arch/arm64/kvm/hyp/vgic-v3-sr.c               |  87 ++--
+ arch/arm64/kvm/sys_regs.c                     |  19 +-
+ arch/arm64/kvm/vgic/vgic-init.c               |   9 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v2.c            |  24 +
+ arch/arm64/kvm/vgic/vgic-mmio.h               |   1 +
+ arch/arm64/kvm/vgic/vgic-v2.c                 | 291 +++++++++---
+ arch/arm64/kvm/vgic/vgic-v3-nested.c          |  11 +-
+ arch/arm64/kvm/vgic/vgic-v3.c                 | 421 ++++++++++++++----
+ arch/arm64/kvm/vgic/vgic-v4.c                 |   5 +-
+ arch/arm64/kvm/vgic/vgic.c                    | 294 +++++++-----
+ arch/arm64/kvm/vgic/vgic.h                    |  42 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ drivers/irqchip/irq-apple-aic.c               |   7 +-
+ drivers/irqchip/irq-gic.c                     |   3 +
+ include/kvm/arm_vgic.h                        |  29 +-
+ include/linux/irqchip/arm-gic.h               |   6 +
+ include/linux/irqchip/arm-vgic-info.h         |   2 +
+ tools/testing/selftests/kvm/arm64/vgic_irq.c  | 285 +++++++++++-
+ .../testing/selftests/kvm/include/arm64/gic.h |   1 +
+ tools/testing/selftests/kvm/lib/arm64/gic.c   |   6 +
+ .../selftests/kvm/lib/arm64/gic_private.h     |   1 +
+ .../testing/selftests/kvm/lib/arm64/gic_v3.c  |  17 +
+ 32 files changed, 1276 insertions(+), 374 deletions(-)
+
+-- 
+2.47.3
 
 
