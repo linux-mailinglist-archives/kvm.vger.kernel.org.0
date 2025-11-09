@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-62454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 472FDC44407
-	for <lists+kvm@lfdr.de>; Sun, 09 Nov 2025 18:19:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50303C44428
+	for <lists+kvm@lfdr.de>; Sun, 09 Nov 2025 18:20:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 02E724EA574
-	for <lists+kvm@lfdr.de>; Sun,  9 Nov 2025 17:18:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CBB83A8BB6
+	for <lists+kvm@lfdr.de>; Sun,  9 Nov 2025 17:18:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFA330FC08;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB4130F95A;
 	Sun,  9 Nov 2025 17:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CVc1eMT1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tfG5h49k"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE6530EF7F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED02030EF85;
 	Sun,  9 Nov 2025 17:16:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762708598; cv=none; b=lEroFcXUclDblZImWJcBIOB5O4Usg+EpnQtsYBGaJUds/UZSvpuyqEzBd+imAGS71L9R+wP2eytIgEmm4vDTcX2g9EbPra043YUMxI/LoalaD5dxQh8R1TrgebydryKJ8baxH/RcGNjJ0+mNhFA+f2oS3MXsACXMdI8L6NP1vCs=
+	t=1762708598; cv=none; b=p4lQexqeiHvAOtgsh7ecixt3TM3resphJBhaWPsP9Cs3JxNL3R7tUENDMorvKWh/2GJUwCX8BIaIwFXyFWtPMC2th/lw0hGNRRVHdTP2fsY5EFruolYaVF6+I5DJevzkapngycuu5a4+98C+VVTVtO/y8OWVpnmHu4bzfLc3xhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762708598; c=relaxed/simple;
-	bh=0Cx21DFv+o0C6Y+UxV0ERfuwdJ4fIlnLl2DzexkfE94=;
+	bh=SLRiFgk9c+wOGfa2B+I0f696jbLpPaxhNQ3kVExvE1c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BJFyQ7Jv59PBjexge2WVuXgEgtX0RP9x9Yhjfl09Ew1UknqcXVp76xBKNfwrqoWX6h7Wy44AUfEZTZC0dxZIsPhuiTSTCx9E3KOGeL+FZfskHAhOBgTOZV7Bg06dXI8UoXXRxbmJauLMIPGxNEL5SRV3m3EBkfanI+fXVxHFaWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CVc1eMT1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8097FC19425;
+	 MIME-Version; b=ScTMi58iVq5Wz4Sv+1JYK8cuUHxrsSguj3tMrRRAuDuZglq014lNouKx3AiW+Di6e/r46lX4gz7qSayjrbiwOp7sYZnkawvOaYsVpFDAsxA50dB53A9xXcmtBJr1oUy0JF8cRq36QI+nFtZTRU39ytTZJ404kpTle1IspOiXlFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tfG5h49k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6FB8C2BCAF;
 	Sun,  9 Nov 2025 17:16:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1762708597;
-	bh=0Cx21DFv+o0C6Y+UxV0ERfuwdJ4fIlnLl2DzexkfE94=;
+	bh=SLRiFgk9c+wOGfa2B+I0f696jbLpPaxhNQ3kVExvE1c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CVc1eMT1KGPi/Z7ZsokwNoR8uaruXjv/TL+jtaJub5ZYjCloE9+cJPMhUPi2YZMzI
-	 sGJjVAZd6Qh6AHVCB5e7Tdv9cJsa125NubfgnYfdNPCW4t4Oat+rSkVf6Mm1emP/2T
-	 cLEMgY0SG7+u/SIo/2rQeaxId3y2G0iOyuesLtIuuSVbz+Q/n+g6PBtt33T0maawS/
-	 d0uQYWBAACdqAXybTe4N3TnIA/XybW9gLT2/KXVAoGJa2B7ORDc4wZoLqwlw8kh+pd
-	 YZElFgAasJkFe91XmOhLxgyPGXvmQw+47TrWaExcjvuUaA055TBhOj7R8/Wtm4jnPH
-	 ilJMtyJa9Kuaw==
+	b=tfG5h49kBf1krDdwQH1lptaqNElPI5xEFPDaAzQyPGE8CESvD8UFQHJtMsO+3dLGs
+	 Qjs/H6P3jxtSW/FuZhDr419AQeyYeU1Z/IvjPKzaO0g5Eih3OHo82XEX8uA917yTN4
+	 Y7Z1TLfhBd3hoMnmiaK8VhAU8bzFBAcBEhvcUBapc7IOln/HphKBpmMYkqehjuxSm1
+	 y3S+/HG58oEIxVfuXmhy3QqF52y+AMrg63Bp4jsydk+lCfqSm87nC8T1DvOm/xmU2D
+	 dVN6NZyOiKBdQqCJsQenqzB1fWfqBOifXrzunXk1/UcqG/4VO7Sf0af79t7g/01C4H
+	 bRzS5wZDJcLnA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vI91n-00000003exw-2xHU;
-	Sun, 09 Nov 2025 17:16:35 +0000
+	id 1vI91n-00000003exw-3swL;
+	Sun, 09 Nov 2025 17:16:36 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -58,9 +58,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: [PATCH v2 31/45] KVM: arm64: GICv3: Handle in-LR deactivation when possible
-Date: Sun,  9 Nov 2025 17:16:05 +0000
-Message-ID: <20251109171619.1507205-32-maz@kernel.org>
+Subject: [PATCH v2 32/45] KVM: arm64: GICv3: Avoid broadcast kick on CPUs lacking TDIR
+Date: Sun,  9 Nov 2025 17:16:06 +0000
+Message-ID: <20251109171619.1507205-33-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251109171619.1507205-1-maz@kernel.org>
 References: <20251109171619.1507205-1-maz@kernel.org>
@@ -76,89 +76,67 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Even when we have either an LR overflow or SPIs in flight, it is
-extremely likely that the interrupt being deactivated is still in
-the LRs, and that going all the way back to the the generic trap
-handling code is a waste of time.
+CPUs lacking TDIR always trap ICV_DIR_EL1, no matter what, since
+we have ICH_HCR_EL2.TC set permanently. For these CPUs, it is
+useless to use a broadcast kick on SPI injection, as the sole
+purpose of this is to set TDIR.
 
-Instead, try and deactivate in place when possible, and only if
-this fails, perform a full exit.
+We can therefore skip this on these CPUs, which are challenged
+enough not to be burdened by extra IPIs. As a consequence,
+permanently set the TDIR bit in the shadow state to notify the
+fast-path emulation code of the exit reason.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vgic-v3-sr.c | 38 ++++++++++++++++++++++++---------
- 1 file changed, 28 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/vgic/vgic-v3.c |  6 +++++-
+ arch/arm64/kvm/vgic/vgic.c    | 13 ++++++++-----
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 8d3f4c069ea63..e950efa225478 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -792,7 +792,7 @@ static void __vgic_v3_bump_eoicount(void)
- 	write_gicreg(hcr, ICH_HCR_EL2);
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index bf4dde158d516..32654ea51418b 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -50,10 +50,14 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
+ 	 * need to deal with SPIs that can be deactivated on another
+ 	 * CPU.
+ 	 *
++	 * On systems that do not implement TDIR, force the bit in the
++	 * shadow state anyway to avoid IPI-ing on these poor sods.
++	 *
+ 	 * Note that we set the trap irrespective of EOIMode, as that
+ 	 * can change behind our back without any warning...
+ 	 */
+-	if (irqs_active_outside_lrs(als)		     ||
++	if (!cpus_have_final_cap(ARM64_HAS_ICH_HCR_EL2_TDIR) ||
++	    irqs_active_outside_lrs(als)		     ||
+ 	    atomic_read(&vcpu->kvm->arch.vgic.active_spis))
+ 		cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
  }
- 
--static void __vgic_v3_write_dir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+static int ___vgic_v3_write_dir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 60bdddf3472e7..a4c42884f1e16 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -370,12 +370,15 @@ static bool vgic_validate_injection(struct vgic_irq *irq, bool level, void *owne
+ static bool vgic_model_needs_bcst_kick(struct kvm *kvm)
  {
- 	u32 vid = vcpu_get_reg(vcpu, rt);
- 	u64 lr_val;
-@@ -800,19 +800,25 @@ static void __vgic_v3_write_dir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- 
- 	/* EOImode == 0, nothing to be done here */
- 	if (!(vmcr & ICH_VMCR_EOIM_MASK))
--		return;
-+		return 1;
- 
- 	/* No deactivate to be performed on an LPI */
- 	if (vid >= VGIC_MIN_LPI)
--		return;
-+		return 1;
- 
- 	lr = __vgic_v3_find_active_lr(vcpu, vid, &lr_val);
--	if (lr == -1) {
--		__vgic_v3_bump_eoicount();
--		return;
-+	if (lr != -1) {
-+		__vgic_v3_clear_active_lr(lr, lr_val);
-+		return 1;
- 	}
- 
--	__vgic_v3_clear_active_lr(lr, lr_val);
-+	return 0;
-+}
-+
-+static void __vgic_v3_write_dir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+{
-+	if (!___vgic_v3_write_dir(vcpu, vmcr, rt))
-+		__vgic_v3_bump_eoicount();
+ 	/*
+-	 * A GICv3 (or GICv3-like) system exposing a GICv3 to the
+-	 * guest needs a broadcast kick to set TDIR globally, even if
+-	 * the bit doesn't really exist (we still need to check for
+-	 * the shadow bit in the DIR emulation fast-path).
++	 * A GICv3 (or GICv3-like) system exposing a GICv3 to the guest
++	 * needs a broadcast kick to set TDIR globally.
++	 *
++	 * For systems that do not have TDIR (ARM's own v8.0 CPUs), the
++	 * shadow TDIR bit is always set, and so is the register's TC bit,
++	 * so no need to kick the CPUs.
+ 	 */
+-	return (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3);
++	return (cpus_have_final_cap(ARM64_HAS_ICH_HCR_EL2_TDIR) &&
++		kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3);
  }
  
- static void __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-@@ -1247,9 +1253,21 @@ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 	case SYS_ICC_DIR_EL1:
- 		if (unlikely(is_read))
- 			return 0;
--		/* Full exit if required to handle overflow deactivation... */
--		if (vcpu->arch.vgic_cpu.vgic_v3.vgic_hcr & ICH_HCR_EL2_TDIR)
--			return 0;
-+		/*
-+		 * Full exit if required to handle overflow deactivation,
-+		 * unless we can emulate it in the LRs (likely the majority
-+		 * of the cases).
-+		 */
-+		if (vcpu->arch.vgic_cpu.vgic_v3.vgic_hcr & ICH_HCR_EL2_TDIR) {
-+			int ret;
-+
-+			ret = ___vgic_v3_write_dir(vcpu, __vgic_v3_read_vmcr(),
-+						   kvm_vcpu_sys_get_rt(vcpu));
-+			if (ret)
-+				__kvm_skip_instr(vcpu);
-+
-+			return ret;
-+		}
- 		fn = __vgic_v3_write_dir;
- 		break;
- 	case SYS_ICC_RPR_EL1:
+ /*
 -- 
 2.47.3
 
