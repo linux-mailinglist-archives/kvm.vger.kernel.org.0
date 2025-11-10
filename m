@@ -1,172 +1,154 @@
-Return-Path: <kvm+bounces-62549-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62550-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B81BC4884D
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 19:20:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84E48C4885C
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 19:23:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1447D3B9D3C
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 18:19:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAAF91886FDB
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 18:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBFDC32939E;
-	Mon, 10 Nov 2025 18:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576F832AAAF;
+	Mon, 10 Nov 2025 18:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zm18xISC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EixBAtBQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C3131B10D
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 18:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F84328622
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 18:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762798789; cv=none; b=is6Deh1nVcLflkKAz8yFfJzARxTFGqt6qN4QoUL0Xfm2pi8JRqwp4Rat2dtRWcTs2npzktIeLmHPho3OoWhW4QcYAD2VlbtCTCflADZrgAb91uCwJ6aLFRrWTTctQWqEjEek5ZQu7bQb4mFGLOBfp3OTzBhHHP1qaII5PzHy6YE=
+	t=1762799028; cv=none; b=j5nyBNwbXzTIt7QXGwcayIYnoHDX8gjaRGu6oaDyKh7bHmRusTYn6WkNmnWxqHT71hmVj52wrIam62FlqGKJmrZDnZAuJxllgDnzcnTF5OuA4E5KuzrRenkL2Q8A201CHHVZIg8I7bUMVSoVzkNmmzosXtf59V96ixMMsiJ0zcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762798789; c=relaxed/simple;
-	bh=oyHg3zXu/b6Cjpi2ub1O6Gg6iEOnJq+3EJOcKuli2yA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bkVDt2XmiezcGD9f67SGSn9Gx57osQPJI1IRTNtTTHTl+wlJu83mTLN1X57PofJ/RFnB/citr5CzlTjE/zYtjN7vhIj9/zBeheed4bTqQ69XbJ+NfyEb/7ZecUhX96y2NEYm8b/b/2vIMQ6ZuM91rkyh/I2fY//MMQKuuRpjVk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zm18xISC; arc=none smtp.client-ip=209.85.216.49
+	s=arc-20240116; t=1762799028; c=relaxed/simple;
+	bh=0B5t6DWhDiwMV6cYZ+zAwswI7QSnPE13XKjJKivILI8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=SGACNMq0EPTjYBCZPBu92vWYA5nh7vKAmwESPjR42mhZRUM0aFRfLEhH2l1tf49koJVb+nb7inLvUjSgowY27GGIB/T2rFp9o9OXCY9FuQtfjGGMOcKXgEPW1mydEYdQj7XQinaaV7geXW0VOJENUNHadVidkRUoDf4dim9Xc+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EixBAtBQ; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-3436cbb723fso1934705a91.2
-        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 10:19:47 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2958c80fcabso91476185ad.0
+        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 10:23:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762798787; x=1763403587; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=C2BTPYOB6RYO59SSrAH4Sj40+ULfOFTRdMdLYImnqNg=;
-        b=zm18xISCBOnwtXjWi7UlBtcHz2uy2Pz+3eAgJC3hIHCKfTzWHMXVks190ul/Pf9FoX
-         NGrIxQw1CnUVo9J6XxOX7uMBggSK0K3s+6+SH2SewrR0xuZ9PL5zGfvtAVbNQx+61t7M
-         vzHvvs316Ab6AjWi7MtPeYX3f5OKGLyaYPsMv+5DN5R09uxtAoI+rGO9c52CjD5TLBQV
-         GiK8qFW5ambNkDe26hQm0Qv+MecPXmfiypgAVVoqN8yTvydLiiTCwM5l6DTvmZwkRpd4
-         RsBC2ult2pV7TN5d2uyG612B3M8x7mKXUystumlNq6c7BOZLiea5FJ1YkiK94vJzFukF
-         mWGQ==
+        d=google.com; s=20230601; t=1762799026; x=1763403826; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4/RtuixS6ivHaJzMt+cypZgpKYgDJDNLyz12fZKnsp0=;
+        b=EixBAtBQcHIbxnbECgTVfCMhh0Q8b1aqZW6pSgKUZ+tIoKLnyg1izjOhbDQ7gmFLwN
+         8ujkOCVEiUu70iju58EeQj4kMpDPskMwYgEitGyTZMat5qn3nF+Mv+J3scEroxB5Hgtj
+         2QbY+gUKRGtDGuesOZbRAxcLxN+vSiM6nXQrFrP6Jji5Siz1FrP/xP5nIqJnbOvZwhmI
+         qDyjhPVpWo+P3UP7CF31c2p3hSHTCxgq1uyEJ4cDy6u0L9KQwNuE4Jcyx8S/2Kk/oqYd
+         u8x/0IJQqZH/lkxSjte3dYVIZk1hfKmnW093mJyJjtzC3eYD4HoX7EIYtG9AuV58FdwS
+         UNdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762798787; x=1763403587;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C2BTPYOB6RYO59SSrAH4Sj40+ULfOFTRdMdLYImnqNg=;
-        b=O9l58XJKawygvBPW/ynFWP78hbHkDakFUzARBSoVNaxkExLcIgDBlVgRC1swQiwIZB
-         dzaNZa4E12G+IkFMzd2oCVa4UmDOaa4hRcFVRDnZG8DhWHe6sLg/aGS4QJOarSOhuExF
-         mjVZKHNQU7PcKkR0WxDUgCS3V9qy3T2aykQAbgvYyYo6CXMBjxaLgdt1fOjDESAyA38P
-         /1C8kxnbUAVFsOkA3XBNSnoTYYOhYrjMs+VimlpTtmSOEwsUt31rxp1LbQ+/z4hcvT3l
-         cMCg7QaCAc/v1chwXTpr5YCrmjGtumC2hri5nBlESTDsRbdhootm6+HErqgCwReaRPHc
-         GStA==
-X-Forwarded-Encrypted: i=1; AJvYcCUtTTnYDlSBMBuW6Tr4N/c2FVSRXlqMGqqr8fzUcr7WGL1eE5p0D5lFlITiWFp0Sv3kALI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7MIWTrUfS2PkI5fXboMUyonRs5qy5esLK7+GV0IV+JPSTP9Ry
-	LImhDidoxNaBjMDqYnkQNn9xNaG1AXi6+u+60sgSOu9Y8QgNFhXpQ5ymG5A5SevIzw==
-X-Gm-Gg: ASbGnctTX5EnL9RRCFqNQXx7AXwtDCaaTWMMhsi7J0bVJa8pvc3KfaCCtB31uQMa7EC
-	LTupzGPtiy/b7Ltmkd44HOIpEykgY2UI+o28Yd7sZy66+ZPljni3TAUVqh26NX9btne+JUfvCYw
-	JGE6Sb6bqfgEf9euFHMka0me3E8WLizLUK+fFuqHE9Kz+/IejELCWAP5fXNXB5ukEu5z4PE5oRy
-	fUDvK/b4PtSZO76D1i1emaelx9DjZvOtjCU7G6xCmAMRfvTiWwszrq+qPAntaquLHXMMiur8CNE
-	sTmhzmzGVaAa1g4P8hiTzclyNhL24Yzo5JhTSpgdXH4F+dnDxbuU9HiMeyWYUP9TqS0WgGp2aZp
-	Yk5d2MQu8ZxfovmS/Zj2q7KsoFU9W7my4MD2BqYDX1eBHQG4NJciuPPdkuAnXXch6f7rdWoz0fi
-	DDuhKwvCV5iSKmPttua4wv4SzlBwDiqatY2jjjHwVAJ+XSLz7PF4hq
-X-Google-Smtp-Source: AGHT+IEe4Ce9FXlVu2kPVcwhzaBZbkaFMwwo+xcYRkopHjSo/+4yLjWlYJ21Dlx9C3qs+SHhovo0nw==
-X-Received: by 2002:a17:90b:2d0d:b0:32e:e18a:3691 with SMTP id 98e67ed59e1d1-3436cd0c3b4mr11416880a91.35.1762798786537;
-        Mon, 10 Nov 2025 10:19:46 -0800 (PST)
-Received: from google.com (132.200.185.35.bc.googleusercontent.com. [35.185.200.132])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3434c30bffesm11373484a91.6.2025.11.10.10.19.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 10:19:45 -0800 (PST)
-Date: Mon, 10 Nov 2025 18:19:41 +0000
-From: David Matlack <dmatlack@google.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Josh Hilke <jrhilke@google.com>,
-	kvm@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH 01/12] vfio: selftests: Split run.sh into separate scripts
-Message-ID: <aRIsvZhxD9kPfX-J@google.com>
-References: <20251008232531.1152035-1-dmatlack@google.com>
- <20251008232531.1152035-2-dmatlack@google.com>
- <CAJHc60y=rcbXixxT+dmKebQP3txcQbCDKr_tGrqVxjn9AFHuVg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1762799026; x=1763403826;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4/RtuixS6ivHaJzMt+cypZgpKYgDJDNLyz12fZKnsp0=;
+        b=DvmAVsGnvtleFh09E1SeTKaN7wul/L+sU40BO6E2n4xXF8HhX3hFARt/iO9y0h6T5C
+         ha5uqormKk2Bf5tb9GmCuCH6DFfKDMcO15/ipCUjcttKNFv5jkFr0LUVaDh/4+jBHwmu
+         /dTjXBIQGApcf7W1ANJOyDQurm76mPfzIARIB+d7IfVH8AvrVusVEM2bEjonTz8uMONi
+         eQuJhm5AKx25/0n2aVpXkAS2nFCp8PKPdNhFnY2u+Qf1TVQDwoBNNrI9ZiMiEOMvk8gh
+         gCQApRpSL7u4RVQg0ebABaSIl51R1wpbM/SRN2GFw6yBddQZnembclhlEw7iyGKsWcfc
+         hhhA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDCG8Xcsp8a5rMnGOHQ6UBCXQRHUzQ++t2tfAj9GKlcwjt8PXLmdTw4s1/6HEZY/K6oeQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5z8AYbFyfZWU6ElpI2j+dXxmgjZ0dWKTwBi4xsvGHwbjS/8YU
+	LNs5zuCHMjuPx9xW+78DSxz7AcHOlhBEAqlVTJVXBtCruaJpm6sznXNm/RIE+CuVnMbGgwNxg06
+	Ec3z++Q==
+X-Google-Smtp-Source: AGHT+IHLjhF/B9JRNWlfF4xQjImNcP66JBbSmi5nz2WQmt8Y80nCa0FnJnmx6rkg3zEfysgHKy0W5hbcKSg=
+X-Received: from plpn7.prod.google.com ([2002:a17:902:9687:b0:296:18d:ea16])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1a0c:b0:297:f8dd:4d8e
+ with SMTP id d9443c01a7336-297f8dd5382mr86324925ad.30.1762799026327; Mon, 10
+ Nov 2025 10:23:46 -0800 (PST)
+Date: Mon, 10 Nov 2025 10:23:44 -0800
+In-Reply-To: <690e0be4.a70a0220.22f260.0050.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJHc60y=rcbXixxT+dmKebQP3txcQbCDKr_tGrqVxjn9AFHuVg@mail.gmail.com>
+Mime-Version: 1.0
+References: <690e0be4.a70a0220.22f260.0050.GAE@google.com>
+Message-ID: <aRItsJNnsja0Wj2W@google.com>
+Subject: Re: [syzbot] [kvm-x86?] WARNING in kvm_arch_can_dequeue_async_page_present
+From: Sean Christopherson <seanjc@google.com>
+To: syzbot <syzbot+6bea72f0c8acbde47c55@syzkaller.appspotmail.com>
+Cc: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
+	pbonzini@redhat.com, syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
+	x86@kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On 2025-11-10 08:51 AM, Raghavendra Rao Ananta wrote:
-> On Thu, Oct 9, 2025 at 4:56 AM David Matlack <dmatlack@google.com> wrote:
-> >
-> > If the future, VFIO selftests can automatically detect set up devices by
-> nit: s/If/In
+On Fri, Nov 07, 2025, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    9c0826a5d9aa Add linux-next specific files for 20251107
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=13a67012580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=4f8fcc6438a785e7
+> dashboard link: https://syzkaller.appspot.com/bug?extid=6bea72f0c8acbde47c55
+> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14e110b4580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14ab1114580000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/6b76dc0ec17f/disk-9c0826a5.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/522b6d2a1d1d/vmlinux-9c0826a5.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/4a58225d70f3/bzImage-9c0826a5.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+6bea72f0c8acbde47c55@syzkaller.appspotmail.com
+> 
+> kvm_intel: L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
+> ------------[ cut here ]------------
+> WARNING: arch/x86/kvm/x86.c:13965 at kvm_arch_can_dequeue_async_page_present+0x1a9/0x2f0 arch/x86/kvm/x86.c:13965, CPU#0: syz.0.17/5998
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 5998 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
+> RIP: 0010:kvm_arch_can_dequeue_async_page_present+0x1a9/0x2f0 arch/x86/kvm/x86.c:13965
+> Code: 00 65 48 8b 0d 58 81 72 11 48 3b 4c 24 40 75 21 48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d e9 3e af 20 0a cc e8 48 e1 79 00 90 <0f> 0b 90 b0 01 eb c0 e8 4b c1 1d 0a f3 0f 1e fa 4c 8d b3 f8 02 00
+> RSP: 0018:ffffc90003167460 EFLAGS: 00010293
+> RAX: ffffffff8147eee8 RBX: ffff888030280000 RCX: ffff88807fda1e80
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000009
+> RBP: ffffc900031674e8 R08: ffff88803028003f R09: 1ffff11006050007
+> R10: dffffc0000000000 R11: ffffed1006050008 R12: 1ffff9200062ce8c
+> R13: dffffc0000000000 R14: 0000000000000000 R15: dffffc0000000000
+> FS:  000055556a8c3500(0000) GS:ffff888125a79000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000000 CR3: 0000000072cc2000 CR4: 00000000003526f0
+> Call Trace:
+>  <TASK>
+>  kvm_check_async_pf_completion+0x102/0x3c0 virt/kvm/async_pf.c:158
+>  vcpu_enter_guest arch/x86/kvm/x86.c:11209 [inline]
+>  vcpu_run+0x26be/0x7760 arch/x86/kvm/x86.c:11650
+>  kvm_arch_vcpu_ioctl_run+0x116c/0x1cb0 arch/x86/kvm/x86.c:11995
+>  kvm_vcpu_ioctl+0x99a/0xed0 virt/kvm/kvm_main.c:4477
+>  vfs_ioctl fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl fs/ioctl.c:597 [inline]
+>  __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f1588b8f6c9
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffdfcd816a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> RAX: ffffffffffffffda RBX: 00007f1588de5fa0 RCX: 00007f1588b8f6c9
+> RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000006
+> RBP: 00007f1588c11f91 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 00007f1588de5fa0 R14: 00007f1588de5fa0 R15: 0000000000000003
+>  </TASK>
+> 
+> 
+> ---
 
-Ack
+Now that the buggy patch is gone from linux-next...
 
-> > +       rm -rf ${DEVICES_DIR}
-> Since the cleanup.sh can potentially be run against a single device,
-> we should probably check if no devices exist under ${DEVICES_DIR}
-> before removing the entire dir.
-
-Oof, good catch. Will fix in v2.
-
-> > +function bind() {
-> > +       write_to /sys/bus/pci/drivers/${2}/bind ${1}
-> > +}
-> Since these scripts reside within the selftests/vfio/ dir, and most of
-> these functions target PCI aspects, should we hardcode `vfio-pci` as
-> the driver instead of passing the arg around? This is a general
-> question/suggestion for the patch. We can even rename it to
-> <op>_vfio_pci() (bind_vfio_pci() for example) for better clarity.
-
-This function is also used to bind the device back to whatever driver it
-was originally bound to in cleanup.sh. So "${2}" is not always
-"vfio-pci".
-
-> > +function set_sriov_numvfs() {
-> > +       write_to /sys/bus/pci/devices/${1}/sriov_numvfs ${2}
-> > +}
-> > +
-> Similar to get_sriov_numvfs(), shall we check the existence of the
-> 'sriov_numvfs' first? In the current workflow, we indirectly check for
-> the file using get_sriov_numvfs() or look for 'sriov_numvfs' in the
-> ${device_bdf}. However, an independent check would be cleaner and
-> safer (for any future references). WDYT?
-
-I don't think set_sriov_numvfs() should silently do nothing if
-sriov_numvfs file does not exist. Calling set_sriov_numvfs() on a device
-that does not support SR-IOV indicates a bug in the caller, so it should
-fail IMO.
-
-> > +               driver=$(get_driver ${device_bdf})
-> > +               if [ "${driver}" ]; then
-> > +                       unbind ${device_bdf} ${driver}
-> > +                       echo ${driver} > ${device_dir}/driver
-> Sorry, what is the purpose of writing the driver's name to the
-> "driver" file? Isn't "unbind" sufficient?
-
-So that cleanup.sh can bind the device back to this driver. The goal is
-that cleanup.sh returns the device back to the state it was in before
-setup.sh. i.e. cleanup.sh needs to undo everything done by setup.sh.
-
-> > +               fi
-> > +
-> Since vfio-pci can be built as a module that may not be loaded yet (or
-> even disabled), do you think it's worth checking before binding the
-> device to the driver? Of course, these operations would fail, but
-> would it be better if we informed users why?
-
-If that were to happen, I think it will be debuggable by the user.
-
-write_to() in lib.sh always prints out what setup.sh and cleanup.sh are
-trying to do. So the user will see something like:
-
-  echo BDF > /sys/bus/pci/drivers/vfio-pci/bind
-  Error: No such file or directory
-
-And then the user can go investigate why /sys/bus/pci/drivers/ does not
-exist. I think if we try to make the script diagnose why something
-failed, that will be an endless game of whack-a-mole and the scripts
-will start getting long and complex.
+#syz invalid
 
