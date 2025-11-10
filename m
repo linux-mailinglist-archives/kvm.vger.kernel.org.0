@@ -1,234 +1,174 @@
-Return-Path: <kvm+bounces-62483-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62484-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 450C0C44EE9
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 05:54:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BCFDC44F1A
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 06:03:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 95F1A4E6671
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 04:54:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC1D63B090C
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 05:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D415D23B62B;
-	Mon, 10 Nov 2025 04:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 046BC2E7651;
+	Mon, 10 Nov 2025 05:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="geke9eFc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fFA1wVqd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48ABC18C31
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 04:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFEF34D395;
+	Mon, 10 Nov 2025 05:03:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762750490; cv=none; b=b83gtRhyJlYNf1GKgjIyvGO5hd0zSkammI0aYAp0GRJzfCxFGqpHmClJnZyemUwlwBadiZ46EIebn3Zoe5Py8FbeLARygJyw72ITwJwiwnQqcVNIXmEm/QMIAezT6qdu/ccANSjxOJFyYCet4BBaasp3pX3ryuAJXdO8lH8Anag=
+	t=1762751018; cv=none; b=g0H4Vue6XPWMRsZE0x8YiaQjk+vc4l2CkLOD4NxnLumSc364QThVQDi0d4ICAlX6hFInejtoUj+wKOU5RunGtJx6lTG9uZnhRh8DQpn2E/uTu8vLeE71ap2btqeh6DCV+2Uz2hqVE8Nb2+dNHDV4znLUYKjAU0s+8QXv5O/cgjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762750490; c=relaxed/simple;
-	bh=+ADw/NKu8bLv/bHZ//dWF7yM0OuiWyEwOUxVQQPdd/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L2K1J/neKTezRkeVfqa2GGbVOS5WXRxKncHzRW8hu33dPQFinogIyt372uNhCqSGNg4LoRasKM84ubbPH6cAvuEdLcVWkGlxfR2hJdvcCLjvWZazb+2EVAnegPL47Y4O/Tc2hvrLshwsppjC20SlTd8Cy8eCwxr+TqEs020IqO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=geke9eFc; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ed6ca52a0bso381141cf.1
-        for <kvm@vger.kernel.org>; Sun, 09 Nov 2025 20:54:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762750487; x=1763355287; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6iMcslIvoGeK2ivHIbP/bwE4kKToPkBygPUdlLLCs7s=;
-        b=geke9eFcitXOHMdKWYRuiNTYnRRsix4XJuEcs7GfqmUKKsWiMdUQ7wENiwkGEk68Lb
-         DE5EUN9YJDBGQB6e5V2BJgJlN2ctFYKMOllAfbz7EAVwLIdbQ14ugCvMG2/FqisLvjcO
-         BEfwjkWJ3107QOaSUN7xGTRFbLRQx90hR6e8VxD12Q/Uzxb1Zf/ZkFwNyVyVq/06YE8E
-         4EHspR5Oe8m9tg4WdC7Yc/K7Q3CVW97YRas05MYUsjGIDsv12bbCIo2/z3A/hSOXsSBL
-         Lr9V7EaV4Y/7OEPH/Fy+c3uLffbOCEJ6S25k+7T8DSI25Ht2Vladp4cxG3y4r0otgQJo
-         DTCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762750487; x=1763355287;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6iMcslIvoGeK2ivHIbP/bwE4kKToPkBygPUdlLLCs7s=;
-        b=TIP+aFWsGZinX0jh1LhzSwZlBwiFqdUWbm5NtsqfrGwn7Fh9VFjhQL5Lc/DhVK8uzM
-         ZrWv+uZQr4ObkF9gatL6Vy+eC11DOm1KcMXYGqYuyieFL/5dSNAvjB9A6XeCMUc1K2w9
-         pxjRmYY/tIrQ++QaPm09Rd3oFgEp6VfqC1zbc2BbFBk5HqkmYzFvDUfAYLdqO0xCG1Jx
-         +KGVkJhV9udU1VpclDBv0/7nlq4qpxBAH+675mmT5aSM/gGZ+k8lDmdYJ4jNT0Q/y9wN
-         +QXiczLovkVeryoAsfdSXnqfhOWUUmMuBOyxaHpT3F+G57zkIbXNh8ihxwnAd3viYeT4
-         /BQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV1Xdif2MTTMGvOYz6igJHsJA/jH7LnH04qcuWGR6gu3t5y+1dVLcOtiBCBYKLPiG83Hg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWujHIEj2dw0O4udTyN8M+YuwUXtvT8EGsqPf7pLQkbLIhE0IZ
-	bpJV9z4J9DGmT9vDFLpkro5glYv4n8q7q+QVo3RUTjHbCNg3msZO+fNMo/zAMsPUkrGA8sYrq7r
-	i6vwMQqnGoJbCTUaP3OSXJVrXYWPfA+AroNXtUOjM
-X-Gm-Gg: ASbGncs3mzz/olsJIXxP6G5lytCtdWFk8sBOAIIzyQX+FpxIcwcPzKfDFD1aDcGk62m
-	giOOj930Bl59BKYzpcXAlSpiZcrt/gW2nWaJkxXKRKKOQjWiDuvIMho423F356V3MasFSIOOE7l
-	UjfeY1G9lsCmDUIR8T42q6HVSZevbtaMQo6Ee0EBDXG14BrU9Hvyg7w3SHlg9sixtcxYuJzcJ8+
-	mamuLhnCULXOzhdYFEkmhOz7DgFQ8SimGbPlsOCbElEugSBe2uZsiwW/1qA2R1w2q3iQ9TxRq5L
-	x9cWT1IzLJfZK/QffIYgwcJtF9cLbw==
-X-Google-Smtp-Source: AGHT+IEQDHf9C9gWBdUCo8EHStOQDaQ+1db1WUHKj7RPNy6G6/xrYVcJmvgs3fmjZ1Mzj+yg83rSLse2ZG+aMQ4QlZ4=
-X-Received: by 2002:a05:622a:203:b0:4b5:d6bb:f29b with SMTP id
- d75a77b69052e-4edc20eb651mr1000141cf.8.1762750486923; Sun, 09 Nov 2025
- 20:54:46 -0800 (PST)
+	s=arc-20240116; t=1762751018; c=relaxed/simple;
+	bh=3GT022IDl51OJ3HfZWkBX/7wSTp7WCuq70lx/F2NMGU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QJR4SZh4v5wdCDd5VXqk917ZrHO0CBsKZNZAiOhITsHu/U6Y+9jybeLZ8BikG07+OdDBT7DEXQiTfQMEpeYU1+dOlOuRFQFaNXSlh6357mjohdOVRZZsDs4UmA4crO80LVhSN8smcksbaKUAFCefF1NIrY2LJBpwV8wdOPlO9fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fFA1wVqd; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762751016; x=1794287016;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3GT022IDl51OJ3HfZWkBX/7wSTp7WCuq70lx/F2NMGU=;
+  b=fFA1wVqd6LXcQMEQy4Ch7YB1Tne4+N+2Fx03IDMY0b3y579T9De4EgPl
+   fWO/REZp4k+81tnbWx8ULksL5b0HeNDfuvpo9ojBNL6SQiDNlBeUMw4AD
+   XV0WGixQrLtb5K6vv2U4fHe3NThr45xOmi8kPicBRtjMoQ60E1xUAUY4l
+   7uUhN66agohog4XhiW2aa+okbAy6KiC+mnkTjTIW+mvn+2SM0ckVvXPBe
+   dKyHoFf2x6fgE6ByfkWMT/wBHzpzIlClZCav+B/iRc18ryyxWsTaZTPvh
+   n8EhiAzwAt8oTssVTA5Sn6hsQMG9AWbHy/wuTWFJ7TQc1FTPDYa68/+2/
+   w==;
+X-CSE-ConnectionGUID: 1gRIsznvT9yiJ8iTvjJHyA==
+X-CSE-MsgGUID: 83WrxgQ8RBWqNqcCbBJCrg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11608"; a="68440706"
+X-IronPort-AV: E=Sophos;i="6.19,292,1754982000"; 
+   d="scan'208";a="68440706"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2025 21:03:35 -0800
+X-CSE-ConnectionGUID: Hvdkg7nxRCmSTSVjE7LqvA==
+X-CSE-MsgGUID: 3s+bEmmlQp264ZTqeIHwDw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,292,1754982000"; 
+   d="scan'208";a="188321481"
+Received: from litbin-desktop.sh.intel.com ([10.239.159.60])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2025 21:03:34 -0800
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	chao.gao@intel.com,
+	xiaoyao.li@intel.com,
+	binbin.wu@linux.intel.com
+Subject: [PATCH v2] KVM: x86: Add a helper to dedup loading guest/host XCR0 and XSS
+Date: Mon, 10 Nov 2025 13:05:39 +0800
+Message-ID: <20251110050539.3398759-1-binbin.wu@linux.intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251008232531.1152035-1-dmatlack@google.com> <20251008232531.1152035-8-dmatlack@google.com>
-In-Reply-To: <20251008232531.1152035-8-dmatlack@google.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 10 Nov 2025 10:24:34 +0530
-X-Gm-Features: AWmQ_bnt6Hixtk2L1hfdnREwOXlYp6Ik_jiZKg3hy8TNdfo1TM_p5kkiSYlWqTU
-Message-ID: <CAJHc60zH4x98uCDEveGf3Lr+b0RaiBUC+r9ZdwpNxu9wTAPptQ@mail.gmail.com>
-Subject: Re: [PATCH 07/12] vfio: selftests: Prefix logs with device BDF where relevant
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 9, 2025 at 4:56=E2=80=AFAM David Matlack <dmatlack@google.com> =
-wrote:
->
-> Prefix log messages with the device's BDF where relevant. This will help
-> understanding VFIO selftests logs when tests are run with multiple
-> devices.
->
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  .../selftests/vfio/lib/drivers/dsa/dsa.c      | 34 +++++++++----------
->  .../selftests/vfio/lib/drivers/ioat/ioat.c    | 16 ++++-----
->  .../selftests/vfio/lib/include/vfio_util.h    |  4 +++
->  .../selftests/vfio/lib/vfio_pci_device.c      |  1 +
->  4 files changed, 30 insertions(+), 25 deletions(-)
->
-> diff --git a/tools/testing/selftests/vfio/lib/drivers/dsa/dsa.c b/tools/t=
-esting/selftests/vfio/lib/drivers/dsa/dsa.c
-> index 0ca2cbc2a316..8d667be80229 100644
-> --- a/tools/testing/selftests/vfio/lib/drivers/dsa/dsa.c
-> +++ b/tools/testing/selftests/vfio/lib/drivers/dsa/dsa.c
-> @@ -70,7 +70,7 @@ static int dsa_probe(struct vfio_pci_device *device)
->                 return -EINVAL;
->
->         if (dsa_int_handle_request_required(device)) {
-> -               printf("Device requires requesting interrupt handles\n");
-> +               dev_info(device, "Device requires requesting interrupt ha=
-ndles\n");
->                 return -EINVAL;
->         }
->
-> @@ -91,23 +91,23 @@ static void dsa_check_sw_err(struct vfio_pci_device *=
-device)
->                         return;
->         }
->
-> -       fprintf(stderr, "SWERR: 0x%016lx 0x%016lx 0x%016lx 0x%016lx\n",
-> +       dev_err(device, "SWERR: 0x%016lx 0x%016lx 0x%016lx 0x%016lx\n",
->                 err.bits[0], err.bits[1], err.bits[2], err.bits[3]);
->
-> -       fprintf(stderr, "  valid: 0x%x\n", err.valid);
-> -       fprintf(stderr, "  overflow: 0x%x\n", err.overflow);
-> -       fprintf(stderr, "  desc_valid: 0x%x\n", err.desc_valid);
-> -       fprintf(stderr, "  wq_idx_valid: 0x%x\n", err.wq_idx_valid);
-> -       fprintf(stderr, "  batch: 0x%x\n", err.batch);
-> -       fprintf(stderr, "  fault_rw: 0x%x\n", err.fault_rw);
-> -       fprintf(stderr, "  priv: 0x%x\n", err.priv);
-> -       fprintf(stderr, "  error: 0x%x\n", err.error);
-> -       fprintf(stderr, "  wq_idx: 0x%x\n", err.wq_idx);
-> -       fprintf(stderr, "  operation: 0x%x\n", err.operation);
-> -       fprintf(stderr, "  pasid: 0x%x\n", err.pasid);
-> -       fprintf(stderr, "  batch_idx: 0x%x\n", err.batch_idx);
-> -       fprintf(stderr, "  invalid_flags: 0x%x\n", err.invalid_flags);
-> -       fprintf(stderr, "  fault_addr: 0x%lx\n", err.fault_addr);
-> +       dev_err(device, "  valid: 0x%x\n", err.valid);
-> +       dev_err(device, "  overflow: 0x%x\n", err.overflow);
-> +       dev_err(device, "  desc_valid: 0x%x\n", err.desc_valid);
-> +       dev_err(device, "  wq_idx_valid: 0x%x\n", err.wq_idx_valid);
-> +       dev_err(device, "  batch: 0x%x\n", err.batch);
-> +       dev_err(device, "  fault_rw: 0x%x\n", err.fault_rw);
-> +       dev_err(device, "  priv: 0x%x\n", err.priv);
-> +       dev_err(device, "  error: 0x%x\n", err.error);
-> +       dev_err(device, "  wq_idx: 0x%x\n", err.wq_idx);
-> +       dev_err(device, "  operation: 0x%x\n", err.operation);
-> +       dev_err(device, "  pasid: 0x%x\n", err.pasid);
-> +       dev_err(device, "  batch_idx: 0x%x\n", err.batch_idx);
-> +       dev_err(device, "  invalid_flags: 0x%x\n", err.invalid_flags);
-> +       dev_err(device, "  fault_addr: 0x%lx\n", err.fault_addr);
->
->         VFIO_FAIL("Software Error Detected!\n");
->  }
-> @@ -256,7 +256,7 @@ static int dsa_completion_wait(struct vfio_pci_device=
- *device,
->         if (status =3D=3D DSA_COMP_SUCCESS)
->                 return 0;
->
-> -       printf("Error detected during memcpy operation: 0x%x\n", status);
-> +       dev_info(device, "Error detected during memcpy operation: 0x%x\n"=
-, status);
->         return -1;
->  }
->
-> diff --git a/tools/testing/selftests/vfio/lib/drivers/ioat/ioat.c b/tools=
-/testing/selftests/vfio/lib/drivers/ioat/ioat.c
-> index c3b91d9b1f59..e04dce1d544c 100644
-> --- a/tools/testing/selftests/vfio/lib/drivers/ioat/ioat.c
-> +++ b/tools/testing/selftests/vfio/lib/drivers/ioat/ioat.c
-> @@ -51,7 +51,7 @@ static int ioat_probe(struct vfio_pci_device *device)
->                 r =3D 0;
->                 break;
->         default:
-> -               printf("ioat: Unsupported version: 0x%x\n", version);
-> +               dev_info(device, "ioat: Unsupported version: 0x%x\n", ver=
-sion);
->                 r =3D -EINVAL;
->         }
->         return r;
-> @@ -135,13 +135,13 @@ static void ioat_handle_error(struct vfio_pci_devic=
-e *device)
->  {
->         void *registers =3D ioat_channel_registers(device);
->
-> -       printf("Error detected during memcpy operation!\n"
-> -              "  CHANERR: 0x%x\n"
-> -              "  CHANERR_INT: 0x%x\n"
-> -              "  DMAUNCERRSTS: 0x%x\n",
-> -              readl(registers + IOAT_CHANERR_OFFSET),
-> -              vfio_pci_config_readl(device, IOAT_PCI_CHANERR_INT_OFFSET)=
-,
-> -              vfio_pci_config_readl(device, IOAT_PCI_DMAUNCERRSTS_OFFSET=
-));
-> +       dev_info(device, "Error detected during memcpy operation!\n"
-> +                "  CHANERR: 0x%x\n"
-> +                "  CHANERR_INT: 0x%x\n"
-> +                "  DMAUNCERRSTS: 0x%x\n",
-> +                readl(registers + IOAT_CHANERR_OFFSET),
-> +                vfio_pci_config_readl(device, IOAT_PCI_CHANERR_INT_OFFSE=
-T),
-> +                vfio_pci_config_readl(device, IOAT_PCI_DMAUNCERRSTS_OFFS=
-ET));
->
->         ioat_reset(device);
->  }
-> diff --git a/tools/testing/selftests/vfio/lib/include/vfio_util.h b/tools=
-/testing/selftests/vfio/lib/include/vfio_util.h
-> index 8a01bcaa3ee8..b7175d4c2132 100644
-> --- a/tools/testing/selftests/vfio/lib/include/vfio_util.h
-> +++ b/tools/testing/selftests/vfio/lib/include/vfio_util.h
-> @@ -47,6 +47,9 @@
->         VFIO_LOG_AND_EXIT(_fmt, ##__VA_ARGS__);                 \
->  } while (0)
->
-> +#define dev_info(_dev, _fmt, ...) printf("%s: " _fmt, (_dev)->bdf, ##__V=
-A_ARGS__)
-> +#define dev_err(_dev, _fmt, ...) fprintf(stderr, "%s: " _fmt, (_dev)->bd=
-f, ##__VA_ARGS__)
-> +
-nit: For all the dev_info() replacements in this patch, the messages
-sound like something went bad/wrong. Shouldn't they be dev_err()
-instead, or were you just aiming for a 1:1 conversion?
+Add and use a helper, kvm_load_xfeatures(), to dedup the code that loads
+guest/host xfeatures.
 
-Thank you.
-Raghavendra
+Opportunistically return early if X86_CR4_OSXSAVE is not set to reduce
+indentations.
+
+No functional change intended.
+
+Suggested-by: Chao Gao <chao.gao@intel.com>
+Reviewed-by: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+---
+v2:
+- Pass a bool to distinguish guest/host. [Chao, Xiaoyao]
+- Fix a typo in the short log. [Chao]
+- Opportunistically return early if X86_CR4_OSXSAVE is not set to reduce
+  indentations.
+
+v1:
+- https://lore.kernel.org/kvm/20251106101138.2756175-1-binbin.wu@linux.intel.com
+---
+ arch/x86/kvm/x86.c | 33 ++++++++++-----------------------
+ 1 file changed, 10 insertions(+), 23 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9c2e28028c2b..2c521902e2c6 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1219,34 +1219,21 @@ void kvm_lmsw(struct kvm_vcpu *vcpu, unsigned long msw)
+ }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_lmsw);
+ 
+-static void kvm_load_guest_xfeatures(struct kvm_vcpu *vcpu)
++static void kvm_load_xfeatures(struct kvm_vcpu *vcpu, bool load_guest)
+ {
+ 	if (vcpu->arch.guest_state_protected)
+ 		return;
+ 
+-	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
+-		if (vcpu->arch.xcr0 != kvm_host.xcr0)
+-			xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
+-
+-		if (guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVES) &&
+-		    vcpu->arch.ia32_xss != kvm_host.xss)
+-			wrmsrq(MSR_IA32_XSS, vcpu->arch.ia32_xss);
+-	}
+-}
+-
+-static void kvm_load_host_xfeatures(struct kvm_vcpu *vcpu)
+-{
+-	if (vcpu->arch.guest_state_protected)
++	if (!kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE))
+ 		return;
+ 
+-	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
+-		if (vcpu->arch.xcr0 != kvm_host.xcr0)
+-			xsetbv(XCR_XFEATURE_ENABLED_MASK, kvm_host.xcr0);
++	if (vcpu->arch.xcr0 != kvm_host.xcr0)
++		xsetbv(XCR_XFEATURE_ENABLED_MASK,
++		       load_guest ? vcpu->arch.xcr0 : kvm_host.xcr0);
+ 
+-		if (guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVES) &&
+-		    vcpu->arch.ia32_xss != kvm_host.xss)
+-			wrmsrq(MSR_IA32_XSS, kvm_host.xss);
+-	}
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVES) &&
++	    vcpu->arch.ia32_xss != kvm_host.xss)
++		wrmsrq(MSR_IA32_XSS, load_guest ? vcpu->arch.ia32_xss : kvm_host.xss);
+ }
+ 
+ static void kvm_load_guest_pkru(struct kvm_vcpu *vcpu)
+@@ -11333,7 +11320,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.guest_fpu.xfd_err)
+ 		wrmsrq(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
+ 
+-	kvm_load_guest_xfeatures(vcpu);
++	kvm_load_xfeatures(vcpu, true);
+ 
+ 	if (unlikely(vcpu->arch.switch_db_regs &&
+ 		     !(vcpu->arch.switch_db_regs & KVM_DEBUGREG_AUTO_SWITCH))) {
+@@ -11429,7 +11416,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	vcpu->mode = OUTSIDE_GUEST_MODE;
+ 	smp_wmb();
+ 
+-	kvm_load_host_xfeatures(vcpu);
++	kvm_load_xfeatures(vcpu, false);
+ 
+ 	/*
+ 	 * Sync xfd before calling handle_exit_irqoff() which may
+
+base-commit: 9052f4f6c539ea1fb7b282a34e6bb33154ce0b63
+-- 
+2.46.0
+
 
