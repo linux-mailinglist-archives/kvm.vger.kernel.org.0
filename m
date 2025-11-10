@@ -1,166 +1,172 @@
-Return-Path: <kvm+bounces-62548-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62549-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6D04C4883E
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 19:19:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B81BC4884D
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 19:20:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B0343B3B69
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 18:19:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1447D3B9D3C
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 18:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A8432AAA6;
-	Mon, 10 Nov 2025 18:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBFDC32939E;
+	Mon, 10 Nov 2025 18:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZKa3gmn";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KNQRksje"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zm18xISC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1384F313265
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 18:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C3131B10D
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 18:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762798763; cv=none; b=AS5SW3ilkQDXE5iazgqaEAGq4ogaC3zhBFfVGI1LOZIw7dKb2XtK7eSavysLwE+DtI0ifiZCWN8MitSjktTK7WRKJjXNLg3w0BYZMR91M+BhTHPaF7yhL9VXKT/04JHKHg9oIRvvvKBKUU5dNj7xzOnBOCYK8tj8dbbt3i0bCrQ=
+	t=1762798789; cv=none; b=is6Deh1nVcLflkKAz8yFfJzARxTFGqt6qN4QoUL0Xfm2pi8JRqwp4Rat2dtRWcTs2npzktIeLmHPho3OoWhW4QcYAD2VlbtCTCflADZrgAb91uCwJ6aLFRrWTTctQWqEjEek5ZQu7bQb4mFGLOBfp3OTzBhHHP1qaII5PzHy6YE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762798763; c=relaxed/simple;
-	bh=1QZl5r7sIr5sRRuRRJHMFTSX73wHJTLDlyXpkcHSecY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oCH9Ltm7sB07cC4JROEN998s2tNSOV0NE6bxjecHEjEQ3BrhW3HdUiogyLEywDG4pSSKFA8/g2Z849l52ly4B/ZRJiRskCKdifYw8lpkdg8wgwAp1Cg+gw0xUbkQZby8mwKwfVu61IX1VntdfFQX/D9h+FEP+CcBW6fHoA+wSuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZZKa3gmn; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KNQRksje; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762798760;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LhvLst+P0pIwwi9pGBO2xXY1tmD2l0kTSuuyImpVM8c=;
-	b=ZZKa3gmn5HmzhDrp9NL2BQWe3/Yk+hHDAZKvpLGQ5KkvQifFyGrHKIstghbTO/2VTPKt8G
-	ygn5tHLklouTP3Oe8+PqT7/arEBrNXhUUenTrdANhYgI+HhuPjXAseVrhTz++rUUvfNDns
-	Gc9KX9nS8+IKvtJRU+J0smHe3j3aoGQ=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-149-PgkynIJsPIqy1ttQhJ-7tQ-1; Mon, 10 Nov 2025 13:19:18 -0500
-X-MC-Unique: PgkynIJsPIqy1ttQhJ-7tQ-1
-X-Mimecast-MFC-AGG-ID: PgkynIJsPIqy1ttQhJ-7tQ_1762798758
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8b2619f07aeso635125185a.0
-        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 10:19:18 -0800 (PST)
+	s=arc-20240116; t=1762798789; c=relaxed/simple;
+	bh=oyHg3zXu/b6Cjpi2ub1O6Gg6iEOnJq+3EJOcKuli2yA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bkVDt2XmiezcGD9f67SGSn9Gx57osQPJI1IRTNtTTHTl+wlJu83mTLN1X57PofJ/RFnB/citr5CzlTjE/zYtjN7vhIj9/zBeheed4bTqQ69XbJ+NfyEb/7ZecUhX96y2NEYm8b/b/2vIMQ6ZuM91rkyh/I2fY//MMQKuuRpjVk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zm18xISC; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-3436cbb723fso1934705a91.2
+        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 10:19:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762798758; x=1763403558; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LhvLst+P0pIwwi9pGBO2xXY1tmD2l0kTSuuyImpVM8c=;
-        b=KNQRksjevAIiH6YwujA+jWfvLIShPEja2YEmM+hHr+G/va/eTyl1SRVghRamTfvMlq
-         KWB0xJ82Fm6k3Tb09rbml1I7VCi4zUmfPz7/Tc1ZXuxiTsnEsyHloMuzfHE3NjiwzOdh
-         p6i6F5Vp85moIShLDaaaRJEyV6h/5yTLxbNTKrdyoBwKli55U9rHBRvSLIQ4x1mCHNZ8
-         Tq5fIe7Xrd6Ql6n0xtzCXIzJ52B3MEwE/ZLP0WbwA83QRRltJYvnh+qxPbT+zakOA5B2
-         vE+AEhwWUY6fc2Sf7QHkPISAsN5eA8g+BWP3PCquSAemFAW+PZmzcTuAF/DlBnBCrWNh
-         QUGQ==
+        d=google.com; s=20230601; t=1762798787; x=1763403587; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=C2BTPYOB6RYO59SSrAH4Sj40+ULfOFTRdMdLYImnqNg=;
+        b=zm18xISCBOnwtXjWi7UlBtcHz2uy2Pz+3eAgJC3hIHCKfTzWHMXVks190ul/Pf9FoX
+         NGrIxQw1CnUVo9J6XxOX7uMBggSK0K3s+6+SH2SewrR0xuZ9PL5zGfvtAVbNQx+61t7M
+         vzHvvs316Ab6AjWi7MtPeYX3f5OKGLyaYPsMv+5DN5R09uxtAoI+rGO9c52CjD5TLBQV
+         GiK8qFW5ambNkDe26hQm0Qv+MecPXmfiypgAVVoqN8yTvydLiiTCwM5l6DTvmZwkRpd4
+         RsBC2ult2pV7TN5d2uyG612B3M8x7mKXUystumlNq6c7BOZLiea5FJ1YkiK94vJzFukF
+         mWGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762798758; x=1763403558;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+        d=1e100.net; s=20230601; t=1762798787; x=1763403587;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LhvLst+P0pIwwi9pGBO2xXY1tmD2l0kTSuuyImpVM8c=;
-        b=XcT3rwPQn3yuDPUV1jUHXHmYSGw+PBAHCR6OIL5XD/LBHSnmymIpfoyVXPlqqX56g/
-         HcOjqF+DAqt2KxU4qE+mn3QojMtX+NbWyr6+M88T2xmtPg6boy56CEGN6F+TYoB2qg+s
-         d6NGvI+imoVq2a8PcheFdwEekgql233rSMmhdHQXWpBFLe3CYt3U5o+QRG5FXo7c71W4
-         4zO8KXrBBDAs/sJM/GP9M4WUpUnmZUlOZxpnd6CxRIRJX/lucT1y6lIYrbIMwMPMnzbY
-         aGF6+92E86M7J+ZyYramO1n6uO5e07v4R6rDNOi4l2vfWWFdNT32ZLk5RN/4VHDOkcZ4
-         XtQw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyYgER2VMTLTzn9+B8WEdPrK9tNI8PzshkbPadF/h5hgQkbmgZhQ99XF0RNS/n/mv9TCU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1fKFb8fieWufNH99o1j5vzn/SkiDnIuZgMASzaxjjuqsVeOou
-	8ByE80BZj41IvpPkifwDV5HbS8VpQYc11V1rf162voZf3+gu0sIFMp5/PBWEKPwaBjkmHFhHKM/
-	m2KzwUbhS6kebzqG7+pLN3iFfboklAKY/EpWFK8z7L1v7k9hwehoSsQ==
-X-Gm-Gg: ASbGnctx/0IVq0BiCJg7hEoUDDy6qPyN+9F2s2SGSz0Ob/xekJRYpV8sFR0NoiCNnDa
-	jmslb2AK9v37wu8k8U3h42s2wMKUJZT/2Fuc/GsVELPt42GGDxXuuRgC8wrJWYk6RK6DSSCmw79
-	o3XwuUc6j2lHziyfShiPr+wMDpiV2tVbzW7naqvj3vkXXJ7gCsmU+t83pvZFQETTgvw1FDUVK/W
-	xeA6R5CI2VpNZBOmApKTJvoBgSzAol9O5Dx/Wa03QANrYscWNWsNZhRu+/wKcxXhDRiHIlc7dYb
-	B7wlkOiIX1ixZZyPLkO+qXBXmPEpf8tQdsXMi7WbKD4lg0qdSxg5xi5ZlgBW1vKoLtMmySOAhzZ
-	LIOKMa21AH+hXsBroEcJfAeLt93E+1aa1VtkxpEQ5bixVqw==
-X-Received: by 2002:a05:620a:1790:b0:8a3:87ef:9245 with SMTP id af79cd13be357-8b257f76956mr1198804385a.85.1762798757999;
-        Mon, 10 Nov 2025 10:19:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF+PJnuQIOmozkDYCSrliPkbbXo0Xy49cuqoebK2tXkzI9uYUruFfyTQDfTiP6bVgjiW7/jHQ==
-X-Received: by 2002:a05:620a:1790:b0:8a3:87ef:9245 with SMTP id af79cd13be357-8b257f76956mr1198799985a.85.1762798757576;
-        Mon, 10 Nov 2025 10:19:17 -0800 (PST)
-Received: from ?IPv6:2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38? ([2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b2355e776esm1037884585a.21.2025.11.10.10.19.16
+        bh=C2BTPYOB6RYO59SSrAH4Sj40+ULfOFTRdMdLYImnqNg=;
+        b=O9l58XJKawygvBPW/ynFWP78hbHkDakFUzARBSoVNaxkExLcIgDBlVgRC1swQiwIZB
+         dzaNZa4E12G+IkFMzd2oCVa4UmDOaa4hRcFVRDnZG8DhWHe6sLg/aGS4QJOarSOhuExF
+         mjVZKHNQU7PcKkR0WxDUgCS3V9qy3T2aykQAbgvYyYo6CXMBjxaLgdt1fOjDESAyA38P
+         /1C8kxnbUAVFsOkA3XBNSnoTYYOhYrjMs+VimlpTtmSOEwsUt31rxp1LbQ+/z4hcvT3l
+         cMCg7QaCAc/v1chwXTpr5YCrmjGtumC2hri5nBlESTDsRbdhootm6+HErqgCwReaRPHc
+         GStA==
+X-Forwarded-Encrypted: i=1; AJvYcCUtTTnYDlSBMBuW6Tr4N/c2FVSRXlqMGqqr8fzUcr7WGL1eE5p0D5lFlITiWFp0Sv3kALI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7MIWTrUfS2PkI5fXboMUyonRs5qy5esLK7+GV0IV+JPSTP9Ry
+	LImhDidoxNaBjMDqYnkQNn9xNaG1AXi6+u+60sgSOu9Y8QgNFhXpQ5ymG5A5SevIzw==
+X-Gm-Gg: ASbGnctTX5EnL9RRCFqNQXx7AXwtDCaaTWMMhsi7J0bVJa8pvc3KfaCCtB31uQMa7EC
+	LTupzGPtiy/b7Ltmkd44HOIpEykgY2UI+o28Yd7sZy66+ZPljni3TAUVqh26NX9btne+JUfvCYw
+	JGE6Sb6bqfgEf9euFHMka0me3E8WLizLUK+fFuqHE9Kz+/IejELCWAP5fXNXB5ukEu5z4PE5oRy
+	fUDvK/b4PtSZO76D1i1emaelx9DjZvOtjCU7G6xCmAMRfvTiWwszrq+qPAntaquLHXMMiur8CNE
+	sTmhzmzGVaAa1g4P8hiTzclyNhL24Yzo5JhTSpgdXH4F+dnDxbuU9HiMeyWYUP9TqS0WgGp2aZp
+	Yk5d2MQu8ZxfovmS/Zj2q7KsoFU9W7my4MD2BqYDX1eBHQG4NJciuPPdkuAnXXch6f7rdWoz0fi
+	DDuhKwvCV5iSKmPttua4wv4SzlBwDiqatY2jjjHwVAJ+XSLz7PF4hq
+X-Google-Smtp-Source: AGHT+IEe4Ce9FXlVu2kPVcwhzaBZbkaFMwwo+xcYRkopHjSo/+4yLjWlYJ21Dlx9C3qs+SHhovo0nw==
+X-Received: by 2002:a17:90b:2d0d:b0:32e:e18a:3691 with SMTP id 98e67ed59e1d1-3436cd0c3b4mr11416880a91.35.1762798786537;
+        Mon, 10 Nov 2025 10:19:46 -0800 (PST)
+Received: from google.com (132.200.185.35.bc.googleusercontent.com. [35.185.200.132])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3434c30bffesm11373484a91.6.2025.11.10.10.19.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 10:19:17 -0800 (PST)
-Message-ID: <36f35af3070673c6b0b899ab34724f05ece36fba.camel@redhat.com>
-Subject: Re: [PATCH v2 0/3] Fix a lost async pagefault notification when the
- guest is using SMM
-From: mlevitsk@redhat.com
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Cc: x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini
- <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
- linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>, "H. Peter
- Anvin" <hpa@zytor.com>, Dave Hansen <dave.hansen@linux.intel.com>
-Date: Mon, 10 Nov 2025 13:19:11 -0500
-In-Reply-To: <176278796977.917257.9553898354103958134.b4-ty@google.com>
-References: <20251015033258.50974-1-mlevitsk@redhat.com>
-	 <176278796977.917257.9553898354103958134.b4-ty@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+        Mon, 10 Nov 2025 10:19:45 -0800 (PST)
+Date: Mon, 10 Nov 2025 18:19:41 +0000
+From: David Matlack <dmatlack@google.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, Josh Hilke <jrhilke@google.com>,
+	kvm@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
+Subject: Re: [PATCH 01/12] vfio: selftests: Split run.sh into separate scripts
+Message-ID: <aRIsvZhxD9kPfX-J@google.com>
+References: <20251008232531.1152035-1-dmatlack@google.com>
+ <20251008232531.1152035-2-dmatlack@google.com>
+ <CAJHc60y=rcbXixxT+dmKebQP3txcQbCDKr_tGrqVxjn9AFHuVg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJHc60y=rcbXixxT+dmKebQP3txcQbCDKr_tGrqVxjn9AFHuVg@mail.gmail.com>
 
-On Mon, 2025-11-10 at 07:37 -0800, Sean Christopherson wrote:
-> On Tue, 14 Oct 2025 23:32:55 -0400, Maxim Levitsky wrote:
-> > Recently we debugged a customer case in which the guest VM was showing
-> > tasks permanently stuck in the kvm_async_pf_task_wait_schedule.
-> >=20
-> > This was traced to the incorrect flushing of the async pagefault queue,
-> > which was done during the real mode entry by the kvm_post_set_cr0.
-> >=20
-> > This code, the kvm_clear_async_pf_completion_queue does wait for all #A=
-PF
-> > tasks to complete but then it proceeds to wipe the 'done' queue without
-> > notifying the guest.
-> >=20
-> > [...]
->=20
-> Applied 2 and 3 to kvm-x86 misc.=C2=A0 The async #PF delivery path is als=
-o used by
-> the host-only version of async #PF (where KVM puts the vCPU into HLT inst=
-ead of
-> letting the kernel schedule() in I/O), and so it's entirely expected that=
- KVM
-> will dequeue completed async #PFs when the PV version is disabled.
+On 2025-11-10 08:51 AM, Raghavendra Rao Ananta wrote:
+> On Thu, Oct 9, 2025 at 4:56 AM David Matlack <dmatlack@google.com> wrote:
+> >
+> > If the future, VFIO selftests can automatically detect set up devices by
+> nit: s/If/In
 
-True, sorry for confusion.
-Thanks,
-	Best regards,
-		Maxim Levitsky
+Ack
 
->=20
-> https://lore.kernel.org/all/aQ5BiLBWGKcMe-mM@google.com
->=20
-> [1/3] KVM: x86: Warn if KVM tries to deliver an #APF completion when APF =
-is not enabled
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [DROP]
-> [2/3] KVM: x86: Fix a semi theoretical bug in kvm_arch_async_page_present=
-_queued
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 https://github.com/kvm-x86/linux/commit/68=
-c35f89d016
-> [3/3] KVM: x86: Fix the interaction between SMM and the asynchronous page=
-fault
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 https://github.com/kvm-x86/linux/commit/ab=
-4e41eb9fab
->=20
-> --
-> https://github.com/kvm-x86/linux/tree/next
->=20
+> > +       rm -rf ${DEVICES_DIR}
+> Since the cleanup.sh can potentially be run against a single device,
+> we should probably check if no devices exist under ${DEVICES_DIR}
+> before removing the entire dir.
 
+Oof, good catch. Will fix in v2.
+
+> > +function bind() {
+> > +       write_to /sys/bus/pci/drivers/${2}/bind ${1}
+> > +}
+> Since these scripts reside within the selftests/vfio/ dir, and most of
+> these functions target PCI aspects, should we hardcode `vfio-pci` as
+> the driver instead of passing the arg around? This is a general
+> question/suggestion for the patch. We can even rename it to
+> <op>_vfio_pci() (bind_vfio_pci() for example) for better clarity.
+
+This function is also used to bind the device back to whatever driver it
+was originally bound to in cleanup.sh. So "${2}" is not always
+"vfio-pci".
+
+> > +function set_sriov_numvfs() {
+> > +       write_to /sys/bus/pci/devices/${1}/sriov_numvfs ${2}
+> > +}
+> > +
+> Similar to get_sriov_numvfs(), shall we check the existence of the
+> 'sriov_numvfs' first? In the current workflow, we indirectly check for
+> the file using get_sriov_numvfs() or look for 'sriov_numvfs' in the
+> ${device_bdf}. However, an independent check would be cleaner and
+> safer (for any future references). WDYT?
+
+I don't think set_sriov_numvfs() should silently do nothing if
+sriov_numvfs file does not exist. Calling set_sriov_numvfs() on a device
+that does not support SR-IOV indicates a bug in the caller, so it should
+fail IMO.
+
+> > +               driver=$(get_driver ${device_bdf})
+> > +               if [ "${driver}" ]; then
+> > +                       unbind ${device_bdf} ${driver}
+> > +                       echo ${driver} > ${device_dir}/driver
+> Sorry, what is the purpose of writing the driver's name to the
+> "driver" file? Isn't "unbind" sufficient?
+
+So that cleanup.sh can bind the device back to this driver. The goal is
+that cleanup.sh returns the device back to the state it was in before
+setup.sh. i.e. cleanup.sh needs to undo everything done by setup.sh.
+
+> > +               fi
+> > +
+> Since vfio-pci can be built as a module that may not be loaded yet (or
+> even disabled), do you think it's worth checking before binding the
+> device to the driver? Of course, these operations would fail, but
+> would it be better if we informed users why?
+
+If that were to happen, I think it will be debuggable by the user.
+
+write_to() in lib.sh always prints out what setup.sh and cleanup.sh are
+trying to do. So the user will see something like:
+
+  echo BDF > /sys/bus/pci/drivers/vfio-pci/bind
+  Error: No such file or directory
+
+And then the user can go investigate why /sys/bus/pci/drivers/ does not
+exist. I think if we try to make the script diagnose why something
+failed, that will be an endless game of whack-a-mole and the scripts
+will start getting long and complex.
 
