@@ -1,174 +1,123 @@
-Return-Path: <kvm+bounces-62484-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62485-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BCFDC44F1A
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 06:03:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F41C44F8A
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 06:17:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC1D63B090C
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 05:03:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 331363A8987
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 05:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 046BC2E7651;
-	Mon, 10 Nov 2025 05:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B53B2E7F1D;
+	Mon, 10 Nov 2025 05:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fFA1wVqd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ljIXziJw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFEF34D395;
-	Mon, 10 Nov 2025 05:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CFA1A2C25;
+	Mon, 10 Nov 2025 05:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762751018; cv=none; b=g0H4Vue6XPWMRsZE0x8YiaQjk+vc4l2CkLOD4NxnLumSc364QThVQDi0d4ICAlX6hFInejtoUj+wKOU5RunGtJx6lTG9uZnhRh8DQpn2E/uTu8vLeE71ap2btqeh6DCV+2Uz2hqVE8Nb2+dNHDV4znLUYKjAU0s+8QXv5O/cgjM=
+	t=1762751843; cv=none; b=if4Sx1Ga0h2oc1T/10tLPc/l8R2H7MHUOv+ipB0PB4qTZmxlWTUbj3JIhRYIAOOSE9Uk/iEPETTR21tHmRr2TGOCaaW17f0ARuvjlc313LvjAi+XMPi8v9JqBMGJjpcny4PDR8rRTA16vToTj46nAGnEDqrpt1Fp88gFYlNGEE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762751018; c=relaxed/simple;
-	bh=3GT022IDl51OJ3HfZWkBX/7wSTp7WCuq70lx/F2NMGU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QJR4SZh4v5wdCDd5VXqk917ZrHO0CBsKZNZAiOhITsHu/U6Y+9jybeLZ8BikG07+OdDBT7DEXQiTfQMEpeYU1+dOlOuRFQFaNXSlh6357mjohdOVRZZsDs4UmA4crO80LVhSN8smcksbaKUAFCefF1NIrY2LJBpwV8wdOPlO9fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fFA1wVqd; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1762751843; c=relaxed/simple;
+	bh=arMEVgo3EncNgwNhXraToER5I5/99hzkDqa6X/+wgao=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AWClIbwEgnX7sBeKieEJVXCSAYU1gL/MslJvvTdrAo0aLUr6QiQ9BVndaKgXHVdP2mZDsj/0YSJ4wD1pOhCGlblhe96co7t/RYVXp8KNekzCBYO5AHm4qQtxAxnpLaqumAIivCbM54L3/iEaV90HKnuszfqEGxFU9eZThtp7sfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ljIXziJw; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762751016; x=1794287016;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=3GT022IDl51OJ3HfZWkBX/7wSTp7WCuq70lx/F2NMGU=;
-  b=fFA1wVqd6LXcQMEQy4Ch7YB1Tne4+N+2Fx03IDMY0b3y579T9De4EgPl
-   fWO/REZp4k+81tnbWx8ULksL5b0HeNDfuvpo9ojBNL6SQiDNlBeUMw4AD
-   XV0WGixQrLtb5K6vv2U4fHe3NThr45xOmi8kPicBRtjMoQ60E1xUAUY4l
-   7uUhN66agohog4XhiW2aa+okbAy6KiC+mnkTjTIW+mvn+2SM0ckVvXPBe
-   dKyHoFf2x6fgE6ByfkWMT/wBHzpzIlClZCav+B/iRc18ryyxWsTaZTPvh
-   n8EhiAzwAt8oTssVTA5Sn6hsQMG9AWbHy/wuTWFJ7TQc1FTPDYa68/+2/
-   w==;
-X-CSE-ConnectionGUID: 1gRIsznvT9yiJ8iTvjJHyA==
-X-CSE-MsgGUID: 83WrxgQ8RBWqNqcCbBJCrg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11608"; a="68440706"
-X-IronPort-AV: E=Sophos;i="6.19,292,1754982000"; 
-   d="scan'208";a="68440706"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2025 21:03:35 -0800
-X-CSE-ConnectionGUID: Hvdkg7nxRCmSTSVjE7LqvA==
-X-CSE-MsgGUID: 3s+bEmmlQp264ZTqeIHwDw==
+  t=1762751842; x=1794287842;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=arMEVgo3EncNgwNhXraToER5I5/99hzkDqa6X/+wgao=;
+  b=ljIXziJwU8o4XYbn7hYrisuNafSD4OCxHebScw791JR3wHo1DH1sC34p
+   ZOpZDcwwsef0Q+nlc+OhQxxUP6eV3cJiyKqF/bColnquuK/ulehuDE47L
+   3TtsH6j53ng6CJBDtOaRkYWUP/XrxPNIoi2FqmcCCgEDAlPv9I6MBBDqr
+   8PLUCMUav+DqtR6Ru0OVrhkbZo80YPz/XQ9jwZFVwOH1J01wwM+viFtEi
+   RdnND56Y2/eBeAV0LOjwo3z510deyYV3TXQZI/5icP/Bcz9o/mWTcILCy
+   /bL2KoUYsp5x+TywY8LU/5/0Eij0Wx4QL5sWkmoPqRECQCbV6ArjCC7/B
+   A==;
+X-CSE-ConnectionGUID: 9ceLQA61QIWvK1zBKcU6ww==
+X-CSE-MsgGUID: EAB68TD4Q6WaM6zaVLouTw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11608"; a="64498884"
+X-IronPort-AV: E=Sophos;i="6.19,293,1754982000"; 
+   d="scan'208";a="64498884"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2025 21:17:21 -0800
+X-CSE-ConnectionGUID: qMO86JjpQ5ytB6igoohgxg==
+X-CSE-MsgGUID: j4kEaJboTVOCVcb0E/J8dw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,292,1754982000"; 
-   d="scan'208";a="188321481"
-Received: from litbin-desktop.sh.intel.com ([10.239.159.60])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2025 21:03:34 -0800
-From: Binbin Wu <binbin.wu@linux.intel.com>
-To: seanjc@google.com,
-	pbonzini@redhat.com
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	chao.gao@intel.com,
-	xiaoyao.li@intel.com,
-	binbin.wu@linux.intel.com
-Subject: [PATCH v2] KVM: x86: Add a helper to dedup loading guest/host XCR0 and XSS
-Date: Mon, 10 Nov 2025 13:05:39 +0800
-Message-ID: <20251110050539.3398759-1-binbin.wu@linux.intel.com>
-X-Mailer: git-send-email 2.46.0
+X-IronPort-AV: E=Sophos;i="6.19,293,1754982000"; 
+   d="scan'208";a="211983862"
+Received: from lkp-server01.sh.intel.com (HELO 6ef82f2de774) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 09 Nov 2025 21:17:18 -0800
+Received: from kbuild by 6ef82f2de774 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vIKHE-0002gJ-0j;
+	Mon, 10 Nov 2025 05:17:16 +0000
+Date: Mon, 10 Nov 2025 13:16:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wanpeng Li <kernellwp@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, Steven Rostedt <rostedt@goodmis.org>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Juri Lelli <juri.lelli@redhat.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH 05/10] sched/fair: Wire up yield deboost in
+ yield_to_task_fair()
+Message-ID: <202511101310.HuFb12n3-lkp@intel.com>
+References: <20251110033232.12538-6-kernellwp@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251110033232.12538-6-kernellwp@gmail.com>
 
-Add and use a helper, kvm_load_xfeatures(), to dedup the code that loads
-guest/host xfeatures.
+Hi Wanpeng,
 
-Opportunistically return early if X86_CR4_OSXSAVE is not set to reduce
-indentations.
+kernel test robot noticed the following build errors:
 
-No functional change intended.
+[auto build test ERROR on kvm/queue]
+[also build test ERROR on kvm/next tip/sched/core tip/master linus/master v6.18-rc5 next-20251107]
+[cannot apply to kvm/linux-next tip/auto-latest]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Suggested-by: Chao Gao <chao.gao@intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
----
-v2:
-- Pass a bool to distinguish guest/host. [Chao, Xiaoyao]
-- Fix a typo in the short log. [Chao]
-- Opportunistically return early if X86_CR4_OSXSAVE is not set to reduce
-  indentations.
+url:    https://github.com/intel-lab-lkp/linux/commits/Wanpeng-Li/sched-Add-vCPU-debooster-infrastructure/20251110-114219
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20251110033232.12538-6-kernellwp%40gmail.com
+patch subject: [PATCH 05/10] sched/fair: Wire up yield deboost in yield_to_task_fair()
+config: xtensa-allnoconfig (https://download.01.org/0day-ci/archive/20251110/202511101310.HuFb12n3-lkp@intel.com/config)
+compiler: xtensa-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251110/202511101310.HuFb12n3-lkp@intel.com/reproduce)
 
-v1:
-- https://lore.kernel.org/kvm/20251106101138.2756175-1-binbin.wu@linux.intel.com
----
- arch/x86/kvm/x86.c | 33 ++++++++++-----------------------
- 1 file changed, 10 insertions(+), 23 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511101310.HuFb12n3-lkp@intel.com/
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9c2e28028c2b..2c521902e2c6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1219,34 +1219,21 @@ void kvm_lmsw(struct kvm_vcpu *vcpu, unsigned long msw)
- }
- EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_lmsw);
- 
--static void kvm_load_guest_xfeatures(struct kvm_vcpu *vcpu)
-+static void kvm_load_xfeatures(struct kvm_vcpu *vcpu, bool load_guest)
- {
- 	if (vcpu->arch.guest_state_protected)
- 		return;
- 
--	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
--		if (vcpu->arch.xcr0 != kvm_host.xcr0)
--			xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
--
--		if (guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVES) &&
--		    vcpu->arch.ia32_xss != kvm_host.xss)
--			wrmsrq(MSR_IA32_XSS, vcpu->arch.ia32_xss);
--	}
--}
--
--static void kvm_load_host_xfeatures(struct kvm_vcpu *vcpu)
--{
--	if (vcpu->arch.guest_state_protected)
-+	if (!kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE))
- 		return;
- 
--	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
--		if (vcpu->arch.xcr0 != kvm_host.xcr0)
--			xsetbv(XCR_XFEATURE_ENABLED_MASK, kvm_host.xcr0);
-+	if (vcpu->arch.xcr0 != kvm_host.xcr0)
-+		xsetbv(XCR_XFEATURE_ENABLED_MASK,
-+		       load_guest ? vcpu->arch.xcr0 : kvm_host.xcr0);
- 
--		if (guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVES) &&
--		    vcpu->arch.ia32_xss != kvm_host.xss)
--			wrmsrq(MSR_IA32_XSS, kvm_host.xss);
--	}
-+	if (guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVES) &&
-+	    vcpu->arch.ia32_xss != kvm_host.xss)
-+		wrmsrq(MSR_IA32_XSS, load_guest ? vcpu->arch.ia32_xss : kvm_host.xss);
- }
- 
- static void kvm_load_guest_pkru(struct kvm_vcpu *vcpu)
-@@ -11333,7 +11320,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.guest_fpu.xfd_err)
- 		wrmsrq(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
- 
--	kvm_load_guest_xfeatures(vcpu);
-+	kvm_load_xfeatures(vcpu, true);
- 
- 	if (unlikely(vcpu->arch.switch_db_regs &&
- 		     !(vcpu->arch.switch_db_regs & KVM_DEBUGREG_AUTO_SWITCH))) {
-@@ -11429,7 +11416,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	vcpu->mode = OUTSIDE_GUEST_MODE;
- 	smp_wmb();
- 
--	kvm_load_host_xfeatures(vcpu);
-+	kvm_load_xfeatures(vcpu, false);
- 
- 	/*
- 	 * Sync xfd before calling handle_exit_irqoff() which may
+All errors (new ones prefixed by >>):
 
-base-commit: 9052f4f6c539ea1fb7b282a34e6bb33154ce0b63
+   xtensa-linux-ld: kernel/sched/fair.o: in function `detach_entity_load_avg.constprop.0':
+   fair.c:(.text+0xc84): undefined reference to `__udivdi3'
+>> xtensa-linux-ld: fair.c:(.text+0xd06): undefined reference to `__udivdi3'
+
 -- 
-2.46.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
