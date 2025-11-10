@@ -1,99 +1,116 @@
-Return-Path: <kvm+bounces-62518-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62519-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 515CBC47BAB
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 16:58:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C60AC47A37
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 16:49:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06035422B67
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:40:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2ABC4EED15
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D963101B8;
-	Mon, 10 Nov 2025 15:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E06F3148D0;
+	Mon, 10 Nov 2025 15:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PDzqMueP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zL6ZXU+1"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D2E26CE05
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 15:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EE52236E5
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 15:38:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762789109; cv=none; b=ds000XNksk97PDwUgKgZEZWy5hfViLAdjMPcau8wvZDNz05e3sm2Cdb6unO9cER9RktuaArXT+b3eX3bPVQF1ffs8qarca35sAwoCcHvuzj9zwwJlap9ZpOUjUkgxD2lM75GNc2EjLzBuLLdWdHoY57m4I+OLHZqzwiMV0XMYaw=
+	t=1762789119; cv=none; b=GI1X0jNsW+BwaQ+pPY99+A7oCXYxik021Kske08Zwg4C8Fg9zlItJrm5DYrtMhghjBlsR/HD5QoI74hEb8kkVJoL+yEYZyeJkOqnZR9ilMEeoM+pW781Iikeh/zICjOvhARl3msMd2myQyhTFl+oSWK6GD+MueuC+RrUjIg70mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762789109; c=relaxed/simple;
-	bh=MH9e2jUGvIq5Ft7KriMkDd6ks0WjI/g+33oaK7F7aYc=;
+	s=arc-20240116; t=1762789119; c=relaxed/simple;
+	bh=wWF6uOjqUv6W+Plh3B4k3LA4DNAjjEGlwhf3dBu6NtY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nCiWLesSj6F0NItasVJkkD7MqG4Ial81Q1k0JkzXh/56OzVl6K3wCRAnD5HFHzFUnQGsX+mtpiHWhbo9TZqr553Mj1vBCHAkV5Ix3VvtpmeH0ftacRC89oJ+DL/DYruMt6HRFqyRhysZ0KAk92bnY9Hu4jt+zY3Yc4r/t06cirU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PDzqMueP; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=f93q5E3W1hC8R/3qYAT+9ZpDFTBhX9ix8oHkKW7HGHvD8SLIGAVcbkbobdUn3y5B5b+ILhgdy/8Lm0FtxTR/JtYl/pckUmfLqvMDXRhORl942xRULEiedsnwTvHPUXRh+w4JVHCAK6sFS53s55FGa8of069fqRkxw1tqoDVh9f0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zL6ZXU+1; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340bb1bf12aso7762475a91.1
-        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:38:27 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340c07119bfso7742054a91.2
+        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:38:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762789107; x=1763393907; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762789117; x=1763393917; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BoKPfyuNiGqxtvxZUAx5vRDQ3EuycZdCnNRhVlKwewU=;
-        b=PDzqMuePd+MbGhUpzQo5sRzP8cF8KRsNKzJU/6wkdavoASLr0tWbP4C+RBUazVw1zR
-         mkQNA8vhOgmd7izpCE321BgvhdSw1Ce1qc+lqBLz0kAc+m33TEhYuQTdlV6WN9AHTbCI
-         TpZpbYTQn6ceBRwQA22ReLELGQN2XeqHCf4qjAaMf2f5+Cu8EVi8Rbmsb6WebljMEGK0
-         wsO2LW+rnieJTfmG1l2VIVEiPfv8wJYHqPGpGvizCUcBh+EyeDK48tyHytLVAUtzcVWe
-         S1qJ6xxnyRyiidVEI/lwllpe327WKVe3AQLQBTWf4S/grcZiLe5+nmf2KdTdx+caBsct
-         iJuQ==
+        bh=yfPsA9R0m1PbgxrFpo4vz1rRRYntzKHoCzeS0KAV2Qg=;
+        b=zL6ZXU+1kZvN2/nDjtTNLLS/91EPST7S/A/BgiUDrMIHamYQI5Pi3/yxTF9ze5j3XV
+         Lk29HOsx3HFkpQSIAaKhV+85TL2Qy/ybstwq/o6BEylxuYKkj4yjTfZVbuX4qAJ+LFjl
+         19fuZ54Fij6hnmDvSl2BxViA2p3s2BjTq3I5MdT4YH0FEg3mGBZ5h0TUHV0v6Lo3Iezr
+         Z7shCvBLrR+CC2KUdK7IHW777D6AqmWtMTr2LEHhYVGyF6Lggn0wIj1yX09SqSS1AdX6
+         /0eRZVtCxm0rCYXTe0VI7B6H9Rn4jcusJhZcJur01i9yPOT/2XNVFu2aUs+OsuNKMbWj
+         H+Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762789107; x=1763393907;
+        d=1e100.net; s=20230601; t=1762789117; x=1763393917;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BoKPfyuNiGqxtvxZUAx5vRDQ3EuycZdCnNRhVlKwewU=;
-        b=CM5voYAIZEpBYCFLxA1XiIilRichMKjuNPUH6YApVKZVw+QI96f3IXJkb4HHX+XRKq
-         AyoVyAzkNVFSxjQH9CFS/e+IooJGoAxHkSKIw3beu7mOKYBg+njuudWJmGFz6QKTwZQq
-         GTD5plpni1DcCYTi8FsOtjXYsLdw0U4BxxhOga5TLeWfs4bbF1Xf3oU5VAfOl4tWTggn
-         GlZKMKEig3kvGuCYIw6sQ5paLU/uGbl70DnOZ0KbZKSVH/HGnHUkbkrGb7UptwRJq0Mc
-         tqDqz6+nclmkJ8IRsZerysX5X28UtJUXcC0QEXfMZNCSUUxj0DFigZm0udV9fKo6J+vf
-         ifRA==
-X-Gm-Message-State: AOJu0YxjZPWD6pid0IHVvlHB9Pipgt5QDpCdXmM82xUujew1IIeCgvDG
-	rpE4WgKeKpBFRGbWXuyZ0HCara8p6SxoVxODt5W8h7sjidrevO/BTkqqPLr/QkFOOkC7+FmoLfT
-	9i3jA/A==
-X-Google-Smtp-Source: AGHT+IFuNMyIOyWiCmXwIQtmnVOqvD0FU82ow8XbLbiFGi5sUkdbby7hl7o1fcYbsf1vVDa9Ipl3YToxTwI=
-X-Received: from pjov2.prod.google.com ([2002:a17:90a:9602:b0:340:a575:55db])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2d48:b0:32d:d5f1:fe7f
- with SMTP id 98e67ed59e1d1-3436cb29c92mr9068601a91.15.1762789106936; Mon, 10
- Nov 2025 07:38:26 -0800 (PST)
-Date: Mon, 10 Nov 2025 07:37:15 -0800
-In-Reply-To: <20251106052853.3071088-1-Sukrit.Bhatnagar@sony.com>
+        bh=yfPsA9R0m1PbgxrFpo4vz1rRRYntzKHoCzeS0KAV2Qg=;
+        b=YwV9lPKgAw8j7TzlxvSf/7RQYhovC3LDQybRthKtitTwRfWNknJqTD+leyDmhvV5HU
+         G1pBIhxXSGj7UPD4TfZkn/QTjdUIzlsJckwva0EralUvkRo6FQkwHr7CWh7SPbxEEeB2
+         mH4RHXLqJf6zMHQtvakJ/Zn9Wp047UZ9AJXS2XAtLoInck8LLkRDWK7jYkugeJpHp8XA
+         8/Hh/YNIuNiI2obNSmuEfu6J5M5yvghCg9gnl6nJLXbUOPSK27oFgvutkE+t3GOhf51R
+         z/xlVT97RXI6o6euvBepzhlvviYlPj9cKAbUst77YYeSPkZD3OVsfmXuWP6FDTJY0A4l
+         yEew==
+X-Forwarded-Encrypted: i=1; AJvYcCVFaXRuTSxEtYrKT2FZVioFMVqPoShWqO7kxLC4dg5sBBaA/OkaYPDyhJlWmHIa7R43B3s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOrJKr8tB5Vaa+T1mtR64z6DlVWpzDMNU5VzwtOWMVt7rmCvSr
+	j1w/51B/EtufnzrWuQvr6RmpW/A5/95gylWf9lzu6gsIAm6JBvddJ1xhHLy3bA1DIeloRq5htXj
+	MD9gIkQ==
+X-Google-Smtp-Source: AGHT+IGK1wZ3/zucTg6yFltfJmAFT0YJdOBTxemOkKdCIS/Efg08CIE0m38N8M4xq0bxiDvgMiQUD2dCHdc=
+X-Received: from pjbgv9.prod.google.com ([2002:a17:90b:11c9:b0:340:c625:b238])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3811:b0:340:29ce:f7fa
+ with SMTP id 98e67ed59e1d1-3436cb7ae1emr12134871a91.7.1762789117528; Mon, 10
+ Nov 2025 07:38:37 -0800 (PST)
+Date: Mon, 10 Nov 2025 07:37:17 -0800
+In-Reply-To: <20251015033258.50974-1-mlevitsk@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251106052853.3071088-1-Sukrit.Bhatnagar@sony.com>
+References: <20251015033258.50974-1-mlevitsk@redhat.com>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <176278793531.916768.7425548531906697015.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: VMX: Fix check for valid GVA on an EPT violation
+Message-ID: <176278796977.917257.9553898354103958134.b4-ty@google.com>
+Subject: Re: [PATCH v2 0/3] Fix a lost async pagefault notification when the
+ guest is using SMM
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Yuan Yao <yuan.yao@intel.com>, 
-	Sukrit Bhatnagar <Sukrit.Bhatnagar@sony.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	Maxim Levitsky <mlevitsk@redhat.com>
+Cc: x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Ingo Molnar <mingo@redhat.com>, linux-kernel@vger.kernel.org, 
+	Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, Dave Hansen <dave.hansen@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 06 Nov 2025 14:28:51 +0900, Sukrit Bhatnagar wrote:
-> On an EPT violation, bit 7 of the exit qualification is set if the
-> guest linear-address is valid. The derived page fault error code
-> should not be checked for this bit.
+On Tue, 14 Oct 2025 23:32:55 -0400, Maxim Levitsky wrote:
+> Recently we debugged a customer case in which the guest VM was showing
+> tasks permanently stuck in the kvm_async_pf_task_wait_schedule.
+> 
+> This was traced to the incorrect flushing of the async pagefault queue,
+> which was done during the real mode entry by the kvm_post_set_cr0.
+> 
+> This code, the kvm_clear_async_pf_completion_queue does wait for all #APF
+> tasks to complete but then it proceeds to wipe the 'done' queue without
+> notifying the guest.
+> 
+> [...]
 
-Applied to kvm-x86 fixes (and it's in now in kvm/master as this "thank you" is
-coming a bit late).  Thanks!
+Applied 2 and 3 to kvm-x86 misc.  The async #PF delivery path is also used by
+the host-only version of async #PF (where KVM puts the vCPU into HLT instead of
+letting the kernel schedule() in I/O), and so it's entirely expected that KVM
+will dequeue completed async #PFs when the PV version is disabled.
 
-[1/1] KVM: VMX: Fix check for valid GVA on an EPT violation
-      https://github.com/kvm-x86/linux/commit/d0164c161923
+https://lore.kernel.org/all/aQ5BiLBWGKcMe-mM@google.com
+
+[1/3] KVM: x86: Warn if KVM tries to deliver an #APF completion when APF is not enabled
+      [DROP]
+[2/3] KVM: x86: Fix a semi theoretical bug in kvm_arch_async_page_present_queued
+      https://github.com/kvm-x86/linux/commit/68c35f89d016
+[3/3] KVM: x86: Fix the interaction between SMM and the asynchronous pagefault
+      https://github.com/kvm-x86/linux/commit/ab4e41eb9fab
 
 --
 https://github.com/kvm-x86/linux/tree/next
