@@ -1,97 +1,107 @@
-Return-Path: <kvm+bounces-62524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60148C479F5
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 16:46:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95C0CC47A19
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 16:47:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 136FB188A64C
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:43:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0346C188CEBC
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:44:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E1231A053;
-	Mon, 10 Nov 2025 15:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98532279355;
+	Mon, 10 Nov 2025 15:41:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J80sQnt5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bl/IsGhf"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EAA1319608
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 15:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6288B224AE8
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 15:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762789178; cv=none; b=Lov3OqJFDgibVEZohgyCMNGuTkgaPnnArmY1XX6ng/GgVpdUu/2A5Q2FLhMdgE2LtiFHxd82rpWyUXUZYXeJp/h9fFC2FbjwckI3p0olnPC7lPxkwnEjaol4aGOmEDDX+9+2p76+KE1maNZ7YNK2SFtBudRgRtqDwrE5JYv/tfA=
+	t=1762789291; cv=none; b=eMtePTUQb/J18a5dH2uV89XZup870vzS2d8+hQ4D7Hja0IG3HTnW94gZo5raAsGBSWz7JEJse8LLMSGpPXltFU9qlTg7TpQVSGHjZT5vxQM0AgE8G1ZlfP4ZBGWDrlYZdsA+bYSUse22CRxl5uJ8CK1NBnQglmu48BqWxVg8ncY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762789178; c=relaxed/simple;
-	bh=HLqpw9OccrvyzVMI8pr94sqlLBqJLI8wM/NU8/1R4X4=;
+	s=arc-20240116; t=1762789291; c=relaxed/simple;
+	bh=h6fvhlb5qL2yiZWyNImFBexKvyI93L8SUFeljjK9Ops=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KYIPTXmZODYVf5XAmHyt0AI2BjhEpT2WL515/IA8Mtvxneu00ZlDki/p5jCrRg4tc1M5FSAq46icXatzHEtnzVb4e9mIIYI8TbnLrNYhr4WZ0UMOlNdCXbaLM0bcxgL3SxIUQJC9wEcFxHOEJxnLiEkmEB4WGvJ3fAcgTzC350Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J80sQnt5; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=GuHyn5krkHwNnkhN/mI/B7gJV+U3Dnv0cqAps6yNuUVu/sQKgOkFkUm96o0HfZZzkEZ+irO8fEKQejvm4SlsicBbjdJOAWyPPWsig/oXWNhJZvV26d0RqgwLnAtGOmQ4qRwCYZHy7uAsg+FGrROV0wC1F+HG+y5DN2Fpm2S/bNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bl/IsGhf; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33da1f30fdfso7653878a91.3
-        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:39:34 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3438b1220bcso1663367a91.2
+        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:41:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762789174; x=1763393974; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762789290; x=1763394090; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IxV2BK8QKnCiH1AuK2g4amllIFkIURPoopgCW0Ha0PY=;
-        b=J80sQnt5gziIRbw9fSifeRn8BYIsf1jg4gw6ZdmS9RIw5840ZKkrW7sfEfxeCiIoPO
-         8OGDzuc3vvVtLbGrcMvxkIcqwwa1TBPyn4S9bGzjrLRnP5r62KK29Vb/pFLGRbtT8gj9
-         C7C5X4cANXIPEeIOd0HmXl9JULUpX67Ncnfq3jXAJPOgS0wVi1wrDbTXHSbhuFZPzvuX
-         fSB1TZDH9+v232CESYGHDs9KntKyzQV/pwkuUJ0H34CXCaPMFFneDtl6cA1rE0INC7xe
-         N31upxXcVF00QY7vKF1xMz2Loijcxowhnt52P+Rr9Na9lU2wTBXPfoFo0XmD8vAjNEks
-         rzGw==
+        bh=IgkoVDJKLe1jOBuatcMyGEsvjHvtN3ZYXFqt51mzfaM=;
+        b=bl/IsGhfibbZZfT6Oli9cONWBMOL8XPB2/sl9FIRneQoC9l54fY9kOdAEUl4rq4rL5
+         RZPOIid2T5cScwGOJjhdKMK+mIykEXpehUKrZf0imN4ml8AwFn33PzjZclFYyBJjS7ok
+         OjOSJpzz5CvZ/fkBleL1Vr36kd/nDY/Ycs2XptNasF9DTVmydlPBDzQvd2aS7MOa5kBs
+         GLk8ONMMTXPN5JghA+iBgE6iTZ+mBL8DGEcAyRef4/j6/JrBC5uy8NktlTtoQ5JY+Cr9
+         ZvqktGz7PKlj3+laflONsMKJJzvoDrjMHCNFj7UP3bDDG2wF8Ima+wwJbgqte93uOjXN
+         OPUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762789174; x=1763393974;
+        d=1e100.net; s=20230601; t=1762789290; x=1763394090;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IxV2BK8QKnCiH1AuK2g4amllIFkIURPoopgCW0Ha0PY=;
-        b=WmzlBnBO6FjwPasZo6+pUHGqNIFi4m9baLWz2U1yCDYs4KWGnIKRfmfvCDp3JqHjmF
-         sgHBqgcNNxyp/jPw9Ur6s6IvF5Cyy1cRbU093t6FxB+DvhUj+2hOIRM0ATxKzPDkbSv8
-         CR75pGL87b4HPH8E0000Vwk2XXKtNIcGrW33z9I6Nj0IyGp6NgoN6fdeV/6pjKD5tuyZ
-         L4cmBtpL9Oo0MvU4PmKYWdEvsz5yXjpD7OB+0chwm+xfKstGnvpW55O+m4uxaLKKpUsf
-         GfVEaMDPmYBHZoMOn7g2eO1zUYNLUaKCwNcxxGYcELdLyQiK9qAtxrpuP9v8+OjOT0le
-         P8uA==
-X-Gm-Message-State: AOJu0YxIYcwPAheDH8DnUy3J5MDD7pZ26ptk7/PChBhyoT2+WbxlfPOu
-	g/DBz+NOIzj945Ycs4C+ZdQt0B7Hf6TWmhpxk1ualmq6nUyHqhfq4/Xv3TpAr8PQx7dMMP2CTa/
-	GgeHPCQ==
-X-Google-Smtp-Source: AGHT+IG1WjnuFZxaKrB2Uz9FQb9ICjT0M8KZd2b+Eh4t1Ia5GLPxzkUDRvJD7JP0d2vdeKv3tjb+ORIQYT0=
-X-Received: from pjbsv16.prod.google.com ([2002:a17:90b:5390:b0:33d:98cb:883b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3cc3:b0:33f:eca0:47ae
- with SMTP id 98e67ed59e1d1-3436cbc9a33mr8936483a91.28.1762789173839; Mon, 10
- Nov 2025 07:39:33 -0800 (PST)
-Date: Mon, 10 Nov 2025 07:37:25 -0800
-In-Reply-To: <20251106191230.182393-1-seanjc@google.com>
+        bh=IgkoVDJKLe1jOBuatcMyGEsvjHvtN3ZYXFqt51mzfaM=;
+        b=apZ281ACeGlXzaf0X+BVt+aD4ptOST6H4hJjRzWUhkuf19SDQ0RNV4AefsBOczCs2h
+         Wvo8/K5dmcaSgYcduf8VwRCvOhYf56YdKmxeMHte8TaF24GxVLzWP4qR4Jb6RDw5Nn6G
+         QW5uejH1yJSprgtO5OC0gQvqh+4gIbGq6Cs4592QoLkEC/MLU8v2yCG2COnRz/O10Pcu
+         UaljVhMKH3ZptmufneBJB/ar/jJAEHgkE1OoiqCvGlrinxwrwNEieEweLGWKLdfWhAkM
+         EdHQAw8yIZceiDYKvEK6VKPomUpNKurbCjU34uyS/fjbpLfaJf0kUaAJvSDkWLe/Tpw+
+         ATog==
+X-Forwarded-Encrypted: i=1; AJvYcCWmC/AvySbk/NvqNndA/S/AqMDKQEkMlA4PnPUK7Oo/zIjTV9xahFtrAPtln+eAntiRsM8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdiscCFj+XnaA6JdW+bvMoVja7zLfP2wCjqq1V1w6HcfQFmpLV
+	wRsl0T+tnHCfKba/vNYr3vbT39+igRKe3XOpEkDWDXWc/mcb5lCTXVmDM9zK9KYl4sRSwwVJsUC
+	66RZ6Ug==
+X-Google-Smtp-Source: AGHT+IGdNkJMtTEnYMfSsIqBsSSQ/jBHwYkaAkoEe8549P2buRjTsfhQe8p1ftk/vjq/9yTIZHYVO8kgbHE=
+X-Received: from pjbkk1.prod.google.com ([2002:a17:90b:4a01:b0:343:65be:4db2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a8d:b0:340:f05a:3ed1
+ with SMTP id 98e67ed59e1d1-3436cced91fmr10306410a91.21.1762789289588; Mon, 10
+ Nov 2025 07:41:29 -0800 (PST)
+Date: Mon, 10 Nov 2025 07:37:27 -0800
+In-Reply-To: <20251024192918.3191141-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251106191230.182393-1-seanjc@google.com>
+References: <20251024192918.3191141-1-yosry.ahmed@linux.dev>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <176254226343.805329.8193068148325939353.b4-ty@google.com>
-Subject: Re: [PATCH v2] KVM: SVM: Ensure SPEC_CTRL[63:32] is context switched
- between guest and host
+Message-ID: <176278819404.918294.6609629362258186097.b4-ty@google.com>
+Subject: Re: [PATCH 0/3] KVM: nSVM: Fixes for SVM_EXIT_CR0_SEL_WRITE injection
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Uros Bizjak <ubizjak@gmail.com>
+To: Sean Christopherson <seanjc@google.com>, Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 06 Nov 2025 11:12:30 -0800, Sean Christopherson wrote:
-> SPEC_CTRL is an MSR, i.e. a 64-bit value, but the VMRUN assembly code
-> assumes bits 63:32 are always zero.  The bug is _currently_ benign because
-> neither KVM nor the kernel support setting any of bits 63:32, but it's
-> still a bug that needs to be fixed.
+On Fri, 24 Oct 2025 19:29:15 +0000, Yosry Ahmed wrote:
+> A couple of fixes for injecting SVM_EXIT_CR0_SEL_WRITE to L1 when
+> emulating MOV-to-CR0 or LMSW. LMSW is handled by the emulator even in
+> some cases where decode assists are enabled, so it's a more important
+> fix. An example would be if L0 intercepts SVM_EXIT_WRITE_CR0 while L1
+> intercepts SVM_EXIT_CR0_SEL_WRITE.
+> 
+> Patch is an unrelated cleanup that can be dropped/merged separately.
+> 
+> [...]
 
-Applied to kvm-x86 svm, with the comment fixups.
+Applied to kvm-x86 svm, with the proper stable@ email and the tweaks to
+svm_check_intercept().  Thanks!
 
-[1/1] KVM: SVM: Ensure SPEC_CTRL[63:32] is context switched between guest and host
-      https://github.com/kvm-x86/linux/commit/c331b400e291
+[1/3] KVM: nSVM: Remove redundant cases in nested_svm_intercept()
+      https://github.com/kvm-x86/linux/commit/3d31bdf9cc79
+[2/3] KVM: nSVM: Propagate SVM_EXIT_CR0_SEL_WRITE correctly for LMSW emulation
+      https://github.com/kvm-x86/linux/commit/5674a76db021
+[3/3] KVM: nSVM: Avoid incorrect injection of SVM_EXIT_CR0_SEL_WRITE
+      https://github.com/kvm-x86/linux/commit/3d80f4c93d3d
 
 --
 https://github.com/kvm-x86/linux/tree/next
