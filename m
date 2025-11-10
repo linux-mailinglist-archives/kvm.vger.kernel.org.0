@@ -1,195 +1,140 @@
-Return-Path: <kvm+bounces-62480-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62481-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFE0FC44D96
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 04:40:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50904C44DB3
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 04:45:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7465D3B0D6E
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 03:40:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1606C188D6AA
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 03:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516F92857EA;
-	Mon, 10 Nov 2025 03:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27D3288505;
+	Mon, 10 Nov 2025 03:45:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgnCPLtC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zFDFB6tZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068792848B4
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 03:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C72D21CFFD
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 03:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762746002; cv=none; b=HJh87VpFh9NGhQLdhAiA//A0ypoXCjw9XjIYZrb4V9yT1dMrm5yrkzMbg5pNHd2M4mbx0Wr9CxUjQweKuXWJpfeLGnkOoyzt1Ki4bhRS0NCfxGCiHRrKCultt8Tkv6vJl9edYIks9yLWGrxB+hZO5NDBxg/hfW48W4jnFh2xSVY=
+	t=1762746332; cv=none; b=ti/GGjKmbBdoKe7V2fQi7TU34NUz/eS3sDp0wHMHmUgOvCBjVa+nDNaHEC+FnHzBm4Dq4kKPZoI/8c+cPGu1N0FbzOngmDcmFA9dU1vG3oo1G23JZm8LwriG7IBukKsnaDTf3nCWWqnu/V3azIm+u08a7bIz66mpk2Bey0xiMEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762746002; c=relaxed/simple;
-	bh=9fSVaG1uC1BiaaraAMlQRxKUAMgCSO5mz0dNmTqscUY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ehYlHMS/8eZxvdZErL2qGFQPlPEcKrErTstnkQpDZsWCWcdq7cwyOS0dINs2Nn3z+N2vyTclA4qw1ORAICyzSufiW7tGzCDBndXcqUpYAbkjOnlFqt3rZ7eMaVjwsfrYr9DPMAqRXH/XIaAQ/GM/v7t+YNO0Qqj4ibODvKpqG0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XgnCPLtC; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-298145fe27eso7447125ad.1
-        for <kvm@vger.kernel.org>; Sun, 09 Nov 2025 19:40:00 -0800 (PST)
+	s=arc-20240116; t=1762746332; c=relaxed/simple;
+	bh=bEaPGuay/6gbRMrtAIFDUCiDY7Ufhk5Da+3wjvGIHDY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R2NMR3isQI1qGNp1Q5E3Ok4MyJnUZvtOWX3HfVmMXgqAP/kul9LCvSQiNPpvWKP41Z0dl2Zhx2fjRhNKsgQ7ZmcDMPW6jX0TPMGoMqL44J+fUF46Ze9kEuJq2o5Txu0Q5mlo60PfRXnPM7Dlj5q8NiCfZEqWnF6FGl6QrN2S/Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zFDFB6tZ; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4edb8d6e98aso126631cf.0
+        for <kvm@vger.kernel.org>; Sun, 09 Nov 2025 19:45:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762746000; x=1763350800; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1762746330; x=1763351130; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kyHdinwOK0g1o44QvaD951QSRNsd3g9ZIX/MxVLDNPY=;
-        b=XgnCPLtCVigIljv8y+CSnw6JNOAamiWNdKO4Ol8P2mtKBOaVp8MBzm+EZ7i918jvKq
-         YTnHmQiph8wgKqHDTTUAwzEfwm1SBgbLSrrbvUWOA4xP2MDZVVY9wr2kIkom+bmEiOtQ
-         2UyJw+740wRIYAqnFYU3qKRhx4Bp+AG2G5lMt+/5Eec63hL9augL67Z90FZe5W63zgDb
-         mEagfuRbUmJM6OuGR74nMSV/pYVZ5skO/c01xSNl6x+wCHmrd3+L2dRt3z3kVQ7zLgBG
-         ZRAVpnbYrTC4pi3zPw1ClKtYj+43c/EvSaoINaKpV5wuDX5XS6L/BsDeQYjnk2S5pPiG
-         6+pw==
+        bh=pO1+WA3Lo3SzoRELtMhVMVFvpwqIDn7YXcebJoNLSSY=;
+        b=zFDFB6tZaZ8KYrihoBtwGml6HUUIMCBVWgUdlNFfJf4I/DyNn3S0bheMyLituYhUQf
+         pYTNV0GlxiGYyQvqfLADL26ussAsRb0X4Q9rBKD+nZo8AOU/9YjKT0Y1ZKlPwzx9MVtw
+         qdSwUB2giX/EDhLUxo7VIJn+eZ71VCFvMDAa2j8gTu+M7cB5YxLbw/kou/Plre9B+FgC
+         LTSBj68HsIos+Sd6asp0XfMgJRrVbbTmiYWmzwqgqyFHEVF98s87mA0EZ0cGIN67AeLz
+         1iBkq9gjho3p2vgXVIMk8F/f4SzQv7G28JOAZhEyJA5l4GUmKoleWw2xYBuhbuA/9iD6
+         cXMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762746000; x=1763350800;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1762746330; x=1763351130;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=kyHdinwOK0g1o44QvaD951QSRNsd3g9ZIX/MxVLDNPY=;
-        b=CGmSpl9U4K38MRQyXYdISYs6/TpBtbOM2HO07jZLdUGFdc6hYAGqTPsuWqJ9Rgu+js
-         ne/ULo80kQIsQkqunZRmtJK+Z7OMdLmf2wZ7mD1gObcPxhL9lyj1q/0xogWwzwMlfmWd
-         jmPcuWSKu9PpvOqnGtMya/8HCeOykzhGIMzefn6M0DMkQAY8w1w7GwEgJDVgEcIAn75o
-         ujTq5dyXbT327YdOUHQj7MuiI8jg2Q3fyzqDz8CSQGDcif4pqCrry9xt+mirJM0jIIG4
-         WunK1KPn6UQmGn7KyZqTjFFuiFXVVk86+YZRtthLkgX702v2fWuRLCf3VdZvaaiKpxmX
-         04LQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUrOM3Fjl43ESQkSC+/Fldqge1oyBgBLBkv5kleQOupLOAZ2rVkuiykp4IYYhT8iB4O+M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfkY8BmVqs55mxR5+95eyZ3IaAjf46u9AwM6nB8h/9DC18bUdA
-	VX0UCGzhual1fvWJWgsUAsWBA0McVfH26v37ZgQ/PVtq2GMb4M0J86HJ
-X-Gm-Gg: ASbGnctfR0QWaz745BGrVoJ/yNZXD123k23+X7wgNz8JPZPWHfHzzdXxSmRln1EjQRz
-	Uw1Y5W6Xiar7mo0MLOfidfp0wMgahPJCMeMBF/fSNmXNWEgk3KmTV3AHATIn2ouvy8DIu9h+7ae
-	5Bur7qrLDVPqhFcamGk4UQciUjEXbgeudAHO/vRzEqwtOHsI0cpnh2ycotN1QvIBfKmI7IevL6J
-	wQVJob6aa3F8cOUB7jsCIr1vvvn5xSnNX4Z4fd7VDc0L92B/CgKUBjO2e/2N6VyMpYWdBr7cfA1
-	oqDG/9fNWAsfsbZpDiTR+YfcK5ujoy5LOVxSPwf0wf9q6d+swOehJdCNNrOhjeoAYym6T26PnSD
-	mP3N1s91srSjgsw+1WNTVOALqVK0DWpfi20s4q8vN3a5HwKWATZHkbv+N6AKbDZYAxo2GEMaHzJ
-	v4bkrCjAkU
-X-Google-Smtp-Source: AGHT+IFpEw2uaxPZOv2frrYrOOFzZim7qBgUpLz1BMg7jwJmYB9wgwu99U615UVe3F+N/pX5E14Y6Q==
-X-Received: by 2002:a17:903:1a0c:b0:297:fc22:3a9f with SMTP id d9443c01a7336-297fc223c26mr50766735ad.38.1762746000290;
-        Sun, 09 Nov 2025 19:40:00 -0800 (PST)
-Received: from wanpengli.. ([124.93.80.37])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2964f2a9716sm131118915ad.0.2025.11.09.19.39.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Nov 2025 19:39:59 -0800 (PST)
-From: Wanpeng Li <kernellwp@gmail.com>
-To: Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Wanpeng Li <wanpengli@tencent.com>
-Subject: [PATCH 10/10] KVM: Relaxed boost as safety net
-Date: Mon, 10 Nov 2025 11:39:54 +0800
-Message-ID: <20251110033954.13524-1-kernellwp@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251110033232.12538-1-kernellwp@gmail.com>
-References: <20251110033232.12538-1-kernellwp@gmail.com>
+        bh=pO1+WA3Lo3SzoRELtMhVMVFvpwqIDn7YXcebJoNLSSY=;
+        b=sO3khPJqMcYaGyeRLYCIbxd0XQ1q03neQyR3rkbhkpaytkS521dmEEoTESP+Y/sllj
+         /MXe4Y5KvjCTOPMtzQfgKJ2Nyq7wved6sR9d2Ra5cCCAM2KNDTiBaA2AHZV/cRNhhYAA
+         vayC5gRGkzcAePhheA3tmB1Qp9Ncfc1OfcZ94+KuMpIdgtUZYSF7sXHda18OBxK4y2mS
+         R23MPnKV0SlGw2Kx7V1BrdVxg1Dy9sVlZcyrF2uy3KHQC7l2zyHjXpinHf0TVMHF8KHb
+         +5iUOXdxVOb/dbwM/EOacPnm3VvOdItuiaeI3CW0EsS7o9+h74Z67djFVnw4CqVCYyR1
+         Fz7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWqzh61NJ8NxmO98GbbfPepwQVn3BCUnHXtyKtcy0JEyNjKaS9hpY86zpMGTot5cDkcQVY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yza9SX2Cwnbe+16ZBK4T3xJmkIFGU8wEhKKOj+RFoyut809XgD8
+	VjWbmLZFzAfZfPngQlyDcE0jBd3txNyJo3tXGm9/kfOEstkHMkS7zxBKUFkkzoYV5wgCKGW4n01
+	+Jk/Sl8Z6VDle35fDH0bWwp7IscM8asgph9a06gc3
+X-Gm-Gg: ASbGncuas5Yjfhv80lH+QlVwdZJY+LOJT7Q78Th1zdo9jrlo8YiqJdrYq/8zHhh4H07
+	cuf1lE91pGQLjlTxGFrv60ZNl5eG06nUyxahmu25fG44Lba3nA1EF+0N5UFvITtABC5V/yXgdbq
+	QPVQdRWKecLJEZFNFtGoMlbdldBrvx5gqEVwuU4ew/1L27+pTL1ATMtJD38pbGuGKG5Fz25ysDL
+	aTlTXEMYfKpIm0MowbMZebdhZv1j+gjKeGJ/GO1PkUR9n++q+29E6KwQd+WQeokXceU6XJ3jH6v
+	TFQ5d8G2DV1ZqMcigq2CkjRQEuGR/g==
+X-Google-Smtp-Source: AGHT+IHkI5YsbFxyyS82tj2X9LN/0dzwhUDZCyTzbn8FGecyGYjxBiFXH5j3XoKfpwvhov2NCgV4EVJFZmr2eVlcJks=
+X-Received: by 2002:ac8:57d3:0:b0:4e8:b245:fba0 with SMTP id
+ d75a77b69052e-4eda4e8cc1emr11941391cf.14.1762746330092; Sun, 09 Nov 2025
+ 19:45:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251008232531.1152035-1-dmatlack@google.com> <20251008232531.1152035-3-dmatlack@google.com>
+In-Reply-To: <20251008232531.1152035-3-dmatlack@google.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Mon, 10 Nov 2025 09:15:18 +0530
+X-Gm-Features: AWmQ_bkpnxbMBI97zxsCaCAoaAd2gGCuZUFH_hhBv2_QmN9jUVMGOfF04SoZg5c
+Message-ID: <CAJHc60yVqHHVjX2_oGVUBfBatFom-7-d3q9_uwgHy=-dSS4xNg@mail.gmail.com>
+Subject: Re: [PATCH 02/12] vfio: selftests: Allow passing multiple BDFs on the
+ command line
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, 
+	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Thu, Oct 9, 2025 at 4:56=E2=80=AFAM David Matlack <dmatlack@google.com> =
+wrote:
+> -const char *vfio_selftests_get_bdf(int *argc, char *argv[])
+> +static char **vfio_selftests_get_bdfs_cmdline(int *argc, char *argv[], i=
+nt *nr_bdfs)
+>  {
+> -       char *bdf;
+> +       int i;
+> +
+> +       for (i =3D *argc - 1; i > 0 && is_bdf(argv[i]); i--)
+> +               continue;
+> +
+> +       i++;
+> +       *nr_bdfs =3D *argc - i;
+> +       *argc -=3D *nr_bdfs;
+Just curious, why update 'argc' (I know we had this before as well)?
 
-Add a minimal two-round fallback mechanism in kvm_vcpu_on_spin() to
-avoid pathological stalls when the first round finds no eligible
-target.
+> +
+> +       return *nr_bdfs ? &argv[i] : NULL;
+> +}
+>
+> -       if (*argc > 1 && is_bdf(argv[*argc - 1]))
+> -               return argv[--(*argc)];
+> +static char **vfio_selftests_get_bdfs_env(int *argc, char *argv[], int *=
+nr_bdfs)
+> +{
+> +       static char *bdf;
+>
+>         bdf =3D getenv("VFIO_SELFTESTS_BDF");
+> -       if (bdf) {
+> -               VFIO_ASSERT_TRUE(is_bdf(bdf), "Invalid BDF: %s\n", bdf);
+> -               return bdf;
+> -       }
+> +       if (!bdf)
+> +               return NULL;
+> +
+> +       *nr_bdfs =3D 1;
+> +       VFIO_ASSERT_TRUE(is_bdf(bdf), "Invalid BDF: %s\n", bdf);
+> +
+> +       return &bdf;
+> +}
+nit: Since vfio_selftests_get_bdfs_env() still returns a single BDF,
+perhaps add a comment, as it contradicts the plurality in the
+function's name?
 
-Round 1 applies strict IPI-aware candidate selection (existing
-behavior). Round 2 provides a relaxed scan gated only by preempted
-state as a safety net, addressing cases where IPI context is missed or
-the runnable set is transient.
-
-The second round is controlled by module parameter enable_relaxed_boost
-(bool, 0644, default on) to allow easy disablement by distributions if
-needed.
-
-Introduce the enable_relaxed_boost parameter, add a first_round flag,
-retry label, and reset of yielded counter. Gate the IPI-aware check in
-round 1 and use preempted-only gating in round 2. Keep churn minimal
-by reusing the same scan logic while preserving all existing
-heuristics, tracing, and bookkeeping.
-
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- virt/kvm/kvm_main.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9cf44b6b396d..b03be8d9ae4c 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -101,6 +101,9 @@ EXPORT_SYMBOL_FOR_KVM_INTERNAL(halt_poll_ns_shrink);
- static bool allow_unsafe_mappings;
- module_param(allow_unsafe_mappings, bool, 0444);
- 
-+static bool enable_relaxed_boost = true;
-+module_param(enable_relaxed_boost, bool, 0644);
-+
- /*
-  * Ordering of locks:
-  *
-@@ -4015,6 +4018,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
- 	struct kvm *kvm = me->kvm;
- 	struct kvm_vcpu *vcpu;
- 	int try = 3;
-+	bool first_round = true;
- 
- 	nr_vcpus = atomic_read(&kvm->online_vcpus);
- 	if (nr_vcpus < 2)
-@@ -4025,6 +4029,9 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
- 
- 	kvm_vcpu_set_in_spin_loop(me, true);
- 
-+retry:
-+	yielded = 0;
-+
- 	/*
- 	 * The current vCPU ("me") is spinning in kernel mode, i.e. is likely
- 	 * waiting for a resource to become available.  Attempt to yield to a
-@@ -4057,7 +4064,12 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
- 			continue;
- 
- 		/* IPI-aware candidate selection */
--		if (!kvm_vcpu_is_good_yield_candidate(me, vcpu, yield_to_kernel_mode))
-+		if (first_round &&
-+			!kvm_vcpu_is_good_yield_candidate(me, vcpu, yield_to_kernel_mode))
-+			continue;
-+
-+		/* Minimal preempted gate for second round */
-+		if (!first_round && !READ_ONCE(vcpu->preempted))
- 			continue;
- 
- 		if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
-@@ -4071,6 +4083,16 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
- 			break;
- 		}
- 	}
-+
-+	/*
-+	 * Second round: relaxed boost as safety net, with preempted gate.
-+	 * Only execute when enabled and when the first round yielded nothing.
-+	 */
-+	if (enable_relaxed_boost && first_round && yielded <= 0) {
-+		first_round = false;
-+		goto retry;
-+	}
-+
- 	kvm_vcpu_set_in_spin_loop(me, false);
- 
- 	/* Ensure vcpu is not eligible during next spinloop */
--- 
-2.43.0
-
+Thank you.
+Raghavendra
 
