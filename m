@@ -1,308 +1,210 @@
-Return-Path: <kvm+bounces-62492-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62493-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 977BAC45387
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 08:32:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 325E8C457D8
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 10:02:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22C11188EA36
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 07:33:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16B15188FFBF
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 09:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0F32EBDEB;
-	Mon, 10 Nov 2025 07:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B789A2FE58C;
+	Mon, 10 Nov 2025 09:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TttXGVvk"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="FlwOGefe"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955C22EBBA1
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5333F2FE566
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 09:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762759943; cv=none; b=NppzfC/C9rdJZiIQjRshT0XaVhMTkWi4lyAdrly611Cnyq4GvHnAAVp5e7+8LTewgIr3F9bLWXn3knfXbnJ+n+/Mt3grw4iQGaAuk6TIGeL0XJfcfiYeTeMFPs6lIbinUMScDxoP/ot/EGEkJe2Hyqseui/bNgAsuTTLmstcEgM=
+	t=1762765293; cv=none; b=dg+H0GK1BW8uZ7S7Qrp8rgs9nLXpr8VTpo5OkZ5OzNRdKup0uNhv9eAKMA3nH0GBeedzzINvGkPJP7+J0bXcSzckrI2SLiwvENktG19rHxrpVuUEUQnWYvzDWlhFegIOhZLC2o3KtcxxOx2+HRiyERAECeoKdg3Vc27AI8fUvpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762759943; c=relaxed/simple;
-	bh=cQN4kGT4Z9RnV16R7zCdXa49GPir2ZqJr/78v+Lovzc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BRuSdR0tyXY2BNYivaDOh2EGFLUHCGzIGxepR8+zdLNrPQeBcJrfW2AegZ2rOKpaU+MuwMY8Ea26Q4HrTgwusVp7l8+cilaV1nvTKa2Ms0vvmoVnuteh3UMGt1MN+b/F4/slg0j79JQL/+kb38nd5dpeAYpLCS4Mes/9pXjO0yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TttXGVvk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2447FC2BCB6
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:32:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762759943;
-	bh=cQN4kGT4Z9RnV16R7zCdXa49GPir2ZqJr/78v+Lovzc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=TttXGVvkIUJaWyrEQTsAzD644dY6txmMdgi2+MXugsuxrrMgrxL6k4WJpBn8dGyjw
-	 gdg5w1Wc99/87cFpxrTixUJqu4IPoJXxTyNLOpOstsESvCVQu+6vcPKEL7QwdR4uZh
-	 oivdkq4j3l6mTXWxOi50WWVo1ZmUflmauyayiwiEzLt6llnKO6RxWlDX+zBaxqo5mD
-	 IDNYnZ4nNsJJYM7BZpuN0iPdm1CtafZiLyPWf+Q1nNa3WbvahTWo7bZLfDRht1ooQU
-	 ijYvdG/NVMT/rz85mliJiPLwTcZsWdZEpf05HbJuNO/p4d5dbihb4zbKJHfq0y9TVx
-	 9NfW5vbscOshQ==
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-71d6014810fso20829397b3.0
-        for <kvm@vger.kernel.org>; Sun, 09 Nov 2025 23:32:23 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV2ZU0F5PYPpVnN78oDe9UFEsMesaYokIdbmsMmYXaojHJyqCBhe3gVrWv+5p3QxRDRC68=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHCt4/yUJ1yvuxHJXLbbeiPH+rHi1GXpE/LQHGRLLiYv/t+Zyi
-	Edmqayl+F7+QK5Zq+AAJpQ0lSv+dGUh60lN7aUTUWhCO47HC3FwN0tIleCettaFUY8a64Zl2i9e
-	2h2K45Rqrm5xkKmudaobrbu1XMWH7xX2+rFUd+S3czA==
-X-Google-Smtp-Source: AGHT+IFQ9N0QJyzxbx3agttaPppdKNBBAeeuQ6oXFqx9fA4bbGoFwr4rbbdYkUn5xJYMpCIw+moKhVHJZhszc+EwPJo=
-X-Received: by 2002:a05:690c:670f:b0:786:61c6:7e57 with SMTP id
- 00721157ae682-787d5438549mr67487947b3.42.1762759941154; Sun, 09 Nov 2025
- 23:32:21 -0800 (PST)
+	s=arc-20240116; t=1762765293; c=relaxed/simple;
+	bh=gPcDGKwEsVJRvSCUHSJdrdgSd4eu3X4NeLWy+T2fUg4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iC4xNjTN2lHqpE6zCohpgfvAwdOS/Vb0I26J+dmOzhmVXyrxNI7V1C8Gg7/X6FDEiMz7Bw5r00Lc7iRtf7PxpdwAuUgB7X8RtHTyN59toYUtyUnLYFM3rnvURiG0BUrU080nT4MTkDs9jTcSypPMQguzPVMrhnMWIsCZO83pFD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FlwOGefe; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1762765282; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=vxV0Bv9e0M/3aXxevVPMy47RYEU13Dm8RyI5inKduGU=;
+	b=FlwOGefehqKjuHLk1uf5ix47zgs9Kx27lBfuqtg8dowAUVr4AjS72pW2GE2CP5qTkiykLTs4mBOb4sGFWWSl4Ay7W1Z1didHMLCqsurZ+yv0D5QekeRUAsztVhmZBTe8+KJx0Wq0hYULL4wLe0/w8TsAferRCZWNBOqzRAxQKVw=
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0Ws1SfV-_1762765281 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 10 Nov 2025 17:01:21 +0800
+Date: Mon, 10 Nov 2025 17:01:21 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
+Subject: Re: [PATCH v2 12/45] KVM: arm64: GICv3: Extract LR folding primitive
+Message-ID: <3tb7ekdzl5f4rs24bla63vw22awejhbn7ngvttid7v7bzaer2m@62bxshf7uj34>
+References: <20251109171619.1507205-1-maz@kernel.org>
+ <20251109171619.1507205-13-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1762621567.git.lorenzo.stoakes@oracle.com>
-In-Reply-To: <cover.1762621567.git.lorenzo.stoakes@oracle.com>
-From: Chris Li <chrisl@kernel.org>
-Date: Sun, 9 Nov 2025 23:32:09 -0800
-X-Gmail-Original-Message-ID: <CACePvbVq3kFtrue2smXRSZ86+EuNVf6q+awQnU-n7=Q4x7U9Lw@mail.gmail.com>
-X-Gm-Features: AWmQ_blwAcP-jPkdX_BL8n-dN0nskCj9MNzjkUZFE3hb8I8DIawlcAt-KR_uwfY
-Message-ID: <CACePvbVq3kFtrue2smXRSZ86+EuNVf6q+awQnU-n7=Q4x7U9Lw@mail.gmail.com>
-Subject: Re: [PATCH v2 00/16] mm: remove is_swap_[pte, pmd]() + non-swap
- entries, introduce leaf entries
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, 
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache <npache@redhat.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
-	Oscar Salvador <osalvador@suse.de>, Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	Matthew Brost <matthew.brost@intel.com>, Joshua Hahn <joshua.hahnjy@gmail.com>, 
-	Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, 
-	Ying Huang <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, 
-	Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>, 
-	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <bhe@redhat.com>, 
-	SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Xu Xin <xu.xin16@zte.com.cn>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Jann Horn <jannh@google.com>, 
-	Miaohe Lin <linmiaohe@huawei.com>, Naoya Horiguchi <nao.horiguchi@gmail.com>, 
-	Pedro Falcato <pfalcato@suse.de>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-s390@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-arch@vger.kernel.org, 
-	damon@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251109171619.1507205-13-maz@kernel.org>
 
-On Sat, Nov 8, 2025 at 9:09=E2=80=AFAM Lorenzo Stoakes
-<lorenzo.stoakes@oracle.com> wrote:
+On Sun, Nov 09, 2025 at 05:15:46PM +0800, Marc Zyngier wrote:
+> As we are going to need to handle deactivation for interrupts that
+> are not in the LRs, split vgic_v3_fold_lr_state() into a helper
+> that deals with a single interrupt, and the function that loops
+> over the used LRs.
 >
-> There's an established convention in the kernel that we treat leaf page
-> tables (so far at the PTE, PMD level) as containing 'swap entries' should
-> they be neither empty (i.e. p**_none() evaluating true) nor present
-> (i.e. p**_present() evaluating true).
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v3.c | 88 +++++++++++++++++------------------
+>  1 file changed, 43 insertions(+), 45 deletions(-)
 >
-> However, at the same time we also have helper predicates - is_swap_pte(),
-> is_swap_pmd() - which are inconsistently used.
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index 3ede79e381513..0fccfe9e3e8dd 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -33,78 +33,76 @@ static bool lr_signals_eoi_mi(u64 lr_val)
+>  	       !(lr_val & ICH_LR_HW);
+>  }
 >
-> This is problematic, as it is logical to assume that should somebody wish
-> to operate upon a page table swap entry they should first check to see if
-> it is in fact one.
+> -void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+> +static void vgic_v3_fold_lr(struct kvm_vcpu *vcpu, u64 val)
+>  {
+> -	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> -	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
+> -	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+> -	int lr;
+> -
+> -	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+> -
+> -	cpuif->vgic_hcr &= ~ICH_HCR_EL2_UIE;
+> -
+> -	for (lr = 0; lr < cpuif->used_lrs; lr++) {
+> -		u64 val = cpuif->vgic_lr[lr];
+> -		u32 intid, cpuid;
+> -		struct vgic_irq *irq;
+> -		bool is_v2_sgi = false;
+> -		bool deactivated;
+> -
+> -		cpuid = val & GICH_LR_PHYSID_CPUID;
+> -		cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
+> -
+> -		if (model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> -			intid = val & ICH_LR_VIRTUAL_ID_MASK;
+> -		} else {
+> -			intid = val & GICH_LR_VIRTUALID;
+> -			is_v2_sgi = vgic_irq_is_sgi(intid);
+> -		}
+> +	struct vgic_irq *irq;
+> +	bool is_v2_sgi = false;
+> +	bool deactivated;
+> +	u32 intid;
 >
-> It also implies that perhaps, in future, we might introduce a non-present=
-,
-> none page table entry that is not a swap entry.
+> -		/* Notify fds when the guest EOI'ed a level-triggered IRQ */
+> -		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+> -			kvm_notify_acked_irq(vcpu->kvm, 0,
+> -					     intid - VGIC_NR_PRIVATE_IRQS);
+> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> +		intid = val & ICH_LR_VIRTUAL_ID_MASK;
+> +	} else {
+> +		intid = val & GICH_LR_VIRTUALID;
+> +		is_v2_sgi = vgic_irq_is_sgi(intid);
+> +	}
 >
-> This series resolves this issue by systematically eliminating all use of
-> the is_swap_pte() and is swap_pmd() predicates so we retain only the
-> convention that should a leaf page table entry be neither none nor presen=
-t
-> it is a swap entry.
+> -		irq = vgic_get_vcpu_irq(vcpu, intid);
+> -		if (!irq)	/* An LPI could have been unmapped. */
+> -			continue;
+> +	irq = vgic_get_vcpu_irq(vcpu, intid);
+> +	if (!irq)	/* An LPI could have been unmapped. */
+> +		return;
 >
-> We also have the further issue that 'swap entry' is unfortunately a reall=
-y
-> rather overloaded term and in fact refers to both entries for swap and fo=
-r
-> other information such as migration entries, page table markers, and devi=
-ce
-> private entries.
->
-> We therefore have the rather 'unique' concept of a 'non-swap' swap entry.
->
-> This series therefore introduces the concept of 'software leaf entries', =
-of
-> type softleaf_t, to eliminate this confusion.
->
-> A software leaf entry in this sense is any page table entry which is
-> non-present, and represented by the softleaf_t type. That is - page table
-> leaf entries which are software-controlled by the kernel.
->
-> This includes 'none' or empty entries, which are simply represented by an
-> zero leaf entry value.
->
-> In order to maintain compatibility as we transition the kernel to this ne=
-w
-> type, we simply typedef swp_entry_t to softleaf_t.
+> -		raw_spin_lock(&irq->irq_lock);
+> +	/* Notify fds when the guest EOI'ed a level-triggered IRQ */
+> +	if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+> +		kvm_notify_acked_irq(vcpu->kvm, 0,
+> +				     intid - VGIC_NR_PRIVATE_IRQS);
 
-Hi Lorenzo,
-
-Sorry I was late to the party. Can you clarify that you intend to
-remove swp_entry_t completely to softleaf_t?
-I think for the traditional usage of the swp_entry_t, which is made up
-of swap device type and swap device offset. Can we please keep the
-swp_entry_t for the traditional swap system usage? The mix type can
-stay in softleaf_t in the pte level.
-
-I kind of wish the swap system could still use swp_entry_t. At least I
-don't see any complete reason to massively rename all the swap system
-code if we already know the entry is the limited meaning of swap entry
-(device + offset).
-
-Timing is not great either. We have the swap table phase II on review
-now. There is also phase III and phase IV on the backlog pipeline. All
-this renaming can create unnecessary conflicts. I am pleading please
-reduce the renaming in the swap system code for now until we can
-figure out what is the impact to the rest of the swap table series,
-which is the heavy lifting for swap right now. I want to draw a line
-in the sand that, on the PTE entry side, having multiple meanings, we
-can call it softleaft_t whatever. If we know it is the traditional
-swap entry meaning. Keep it swp_entry_t for now until we figure out
-the real impact.
-
-Does this renaming have any behavior change in the produced machine code?
-
-Chris
+The fds notifiy happens before checking irq's mapping before
+this patch, and now in reversal order w/ above change. It's
+fine for vLPI, and for vSPI no necessary call
+kvm_notify_acked_irq() if the it has been remapped, no
+gsi<->pin mapping there. Is above understanding correct ?
 
 >
-> We introduce a number of predicates and helpers to interact with software
-> leaf entries in include/linux/leafops.h which, as it imports swapops.h, c=
-an
-> be treated as a drop-in replacement for swapops.h wherever leaf entry
-> helpers are used.
+> +	scoped_guard(raw_spinlock, &irq->irq_lock) {
+>  		/* Always preserve the active bit for !LPIs, note deactivation */
+>  		if (irq->intid >= VGIC_MIN_LPI)
+>  			val &= ~ICH_LR_ACTIVE_BIT;
+>  		deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
+>  		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
 >
-> Since softleaf_from_[pte, pmd]() treats present entries as they were
-> empty/none leaf entries, this allows for a great deal of simplification o=
-f
-> code throughout the code base, which this series utilises a great deal.
+> -		if (irq->active && is_v2_sgi)
+> -			irq->active_source = cpuid;
+> -
+>  		/* Edge is the only case where we preserve the pending bit */
+>  		if (irq->config == VGIC_CONFIG_EDGE &&
+> -		    (val & ICH_LR_PENDING_BIT)) {
+> +		    (val & ICH_LR_PENDING_BIT))
+>  			irq->pending_latch = true;
 >
-> We additionally change from swap entry to software leaf entry handling
-> where it makes sense to and eliminate functions from swapops.h where
-> software leaf entries obviate the need for the functions.
+> -			if (is_v2_sgi)
+> -				irq->source |= (1 << cpuid);
+> -		}
+> -
+>  		/*
+>  		 * Clear soft pending state when level irqs have been acked.
+>  		 */
+>  		if (irq->config == VGIC_CONFIG_LEVEL && !(val & ICH_LR_STATE))
+>  			irq->pending_latch = false;
 >
+> +		if (is_v2_sgi) {
+> +			u8 cpuid = FIELD_GET(GICH_LR_PHYSID_CPUID, val);
+> +
+> +			if (irq->active)
+> +				irq->active_source = cpuid;
+> +
+> +			if (val & ICH_LR_PENDING_BIT)
+> +				irq->source |= BIT(cpuid);
+> +		}
+> +
+>  		/* Handle resampling for mapped interrupts if required */
+>  		vgic_irq_handle_resampling(irq, deactivated, val & ICH_LR_PENDING_BIT);
 >
-> v2:
-> * Folded all fixpatches into patches they fix.
-> * Added Vlasta's tag to patch 1 (thanks!)
-> * Renamed leaf_entry_t to softleaf_t and leafent_xxx() to softleaf_xxx() =
-as
->   a result of discussion between Matthew, Jason, David, Gregory & myself =
-to
->   make clearer that we abstract the concept of a software page table leaf
->   entry.
-> * Updated all commit messages to reference softleaves.
-> * Updated the kdoc comment describing softleaf_t to provide more detail.
-> * Added a description of softleaves to the top of leafops.h.
+>  		irq->on_lr = false;
+> -
+> -		raw_spin_unlock(&irq->irq_lock);
+> -		vgic_put_irq(vcpu->kvm, irq);
+>  	}
 >
-> non-RFC v1:
-> * As part of efforts to eliminate swp_entry_t usage, remove
->   pte_none_mostly() and correct UFFD PTE marker handling.
-> * Introduce leaf_entry_t - credit to Gregory for naming, and to Jason for
->   the concept of simply using a leafent_*() set of functions to interact
->   with these entities.
-> * Replace pte_to_swp_entry_or_zero() with leafent_from_pte() and simply
->   categorise pte_none() cases as an empty leaf entry, as per Jason.
-> * Eliminate get_pte_swap_entry() - as we can simply do this with
->   leafent_from_pte() also, as discussed with Jason.
-> * Put pmd_trans_huge_lock() acquisition/release in pagemap_pmd_range()
->   rather than pmd_trans_huge_lock_thp() as per Gregory.
-> * Eliminate pmd_to_swp_entry() and related and introduce leafent_from_pmd=
-()
->   to replace it and further propagate leaf entry usage.
-> * Remove the confusing and unnecessary is_hugetlb_entry_[migration,
->   hwpoison]() functions.
-> * Replace is_pfn_swap_entry(), pfn_swap_entry_to_page(),
->   is_writable_device_private_entry(), is_device_exclusive_entry(),
->   is_migration_entry(), is_writable_migration_entry(),
->   is_readable_migration_entry(), is_readable_exclusive_migration_entry()
->   and pfn_swap_entry_folio() with leafent equivalents.
-> * Wrapped up the 'safe' behaviour discussed with Jason in
->   leafent_from_[pte, pmd]() so these can be used unconditionally which
->   simplifies things a lot.
-> * Further changes that are a consequence of the introduction of leaf
->   entries.
-> https://lore.kernel.org/all/cover.1762171281.git.lorenzo.stoakes@oracle.c=
-om/
->
-> RFC:
-> https://lore.kernel.org/all/cover.1761288179.git.lorenzo.stoakes@oracle.c=
-om/
->
-> Lorenzo Stoakes (16):
->   mm: correctly handle UFFD PTE markers
->   mm: introduce leaf entry type and use to simplify leaf entry logic
->   mm: avoid unnecessary uses of is_swap_pte()
->   mm: eliminate is_swap_pte() when softleaf_from_pte() suffices
->   mm: use leaf entries in debug pgtable + remove is_swap_pte()
->   fs/proc/task_mmu: refactor pagemap_pmd_range()
->   mm: avoid unnecessary use of is_swap_pmd()
->   mm/huge_memory: refactor copy_huge_pmd() non-present logic
->   mm/huge_memory: refactor change_huge_pmd() non-present logic
->   mm: replace pmd_to_swp_entry() with softleaf_from_pmd()
->   mm: introduce pmd_is_huge() and use where appropriate
->   mm: remove remaining is_swap_pmd() users and is_swap_pmd()
->   mm: remove non_swap_entry() and use softleaf helpers instead
->   mm: remove is_hugetlb_entry_[migration, hwpoisoned]()
->   mm: eliminate further swapops predicates
->   mm: replace remaining pte_to_swp_entry() with softleaf_from_pte()
->
->  MAINTAINERS                   |   1 +
->  arch/s390/mm/gmap_helpers.c   |  20 +-
->  arch/s390/mm/pgtable.c        |  12 +-
->  fs/proc/task_mmu.c            | 294 +++++++++-------
->  fs/userfaultfd.c              |  85 ++---
->  include/asm-generic/hugetlb.h |   8 -
->  include/linux/huge_mm.h       |  48 ++-
->  include/linux/hugetlb.h       |   2 -
->  include/linux/leafops.h       | 620 ++++++++++++++++++++++++++++++++++
->  include/linux/migrate.h       |   2 +-
->  include/linux/mm_inline.h     |   6 +-
->  include/linux/mm_types.h      |  25 ++
->  include/linux/swapops.h       | 273 +--------------
->  include/linux/userfaultfd_k.h |  33 +-
->  mm/damon/ops-common.c         |   6 +-
->  mm/debug_vm_pgtable.c         |  86 +++--
->  mm/filemap.c                  |   8 +-
->  mm/hmm.c                      |  36 +-
->  mm/huge_memory.c              | 263 +++++++-------
->  mm/hugetlb.c                  | 165 ++++-----
->  mm/internal.h                 |  20 +-
->  mm/khugepaged.c               |  33 +-
->  mm/ksm.c                      |   6 +-
->  mm/madvise.c                  |  28 +-
->  mm/memory-failure.c           |   8 +-
->  mm/memory.c                   | 150 ++++----
->  mm/mempolicy.c                |  25 +-
->  mm/migrate.c                  |  45 +--
->  mm/migrate_device.c           |  24 +-
->  mm/mincore.c                  |  25 +-
->  mm/mprotect.c                 |  59 ++--
->  mm/mremap.c                   |  13 +-
->  mm/page_table_check.c         |  33 +-
->  mm/page_vma_mapped.c          |  65 ++--
->  mm/pagewalk.c                 |  15 +-
->  mm/rmap.c                     |  17 +-
->  mm/shmem.c                    |   7 +-
->  mm/swap_state.c               |  12 +-
->  mm/swapfile.c                 |  14 +-
->  mm/userfaultfd.c              |  53 +--
->  40 files changed, 1560 insertions(+), 1085 deletions(-)
->  create mode 100644 include/linux/leafops.h
+> +	vgic_put_irq(vcpu->kvm, irq);
+> +}
+> +
+> +void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
+> +
+> +	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+> +
+> +	for (int lr = 0; lr < cpuif->used_lrs; lr++)
+> +		vgic_v3_fold_lr(vcpu, cpuif->vgic_lr[lr]);
+> +
+>  	cpuif->used_lrs = 0;
+>  }
 >
 > --
-> 2.51.0
+> 2.47.3
 
