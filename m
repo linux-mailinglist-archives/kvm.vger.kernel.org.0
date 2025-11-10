@@ -1,215 +1,210 @@
-Return-Path: <kvm+bounces-62576-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62578-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D02F4C48EDB
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 20:14:01 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 922F1C48FB4
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 20:24:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C3EB3BBC6B
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 19:01:47 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1E57834AE92
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 19:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87BE6330B3E;
-	Mon, 10 Nov 2025 18:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E94D32C336;
+	Mon, 10 Nov 2025 19:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jr+PtW1E"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Zt85dsqR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9DD330B00;
-	Mon, 10 Nov 2025 18:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762800646; cv=fail; b=uJ4WkYz1pA+Miuvwbs+WtluC1lSLseNHQqdXozNC9R48FoNc9/z+kg6+0wtjHgGsXnvyP2dbiVCi8a7q9mL9VGw5fdR50uIQ/bfCGH8sATy7pDFQxKPthAm59bjCvklSMN5AH3qUA/tW0mGCFy62SgpV635fy3qpmIuPzPNPj6g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762800646; c=relaxed/simple;
-	bh=xTV7QYZzZy1UG+4DKnlxrotJdO+aq03oW5uR3bLH5GI=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=FT8YbHQj60uTt/nicxqn7iasjM9fxqM9i4taxSlcD9H4OyHELcOgMyAWFx4yhHXv+/gzFqIg1gGKw1wlsoxBosfwohAsSF/3takDzf875pt5RK+Sv0gyGzifsDg6xA6XPpRbnbo39JIECgfQTDnV033YzCg03ZeONY0R8UK3VSg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jr+PtW1E; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762800645; x=1794336645;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=xTV7QYZzZy1UG+4DKnlxrotJdO+aq03oW5uR3bLH5GI=;
-  b=jr+PtW1EFeZzDtxwxdP50fhb3cIfPAqWYPOQ38SW6Bk9Q1IdSOodJI6u
-   dEm0TQ/ve97jX1Fx33EkX+Wz9kAbpUybf6H5bmbIDAfiHZCXyvOK7V6qp
-   ow8176i5vxDEiaaWTlVIw6c0b88LIymyt+sFIjuilopMRlawqg9x6w30i
-   8RMKJwvnDaOds61aXYspWtJEtKp9TPEVRaX5mtxArohebXfCluZFTcull
-   brRgQ8sp4AiE8RETJRH3J+lMTOF/y70rDzCf5TvmQ2G9WMi5IdkPcfnFR
-   Tg/xAMc/ymF6KWh66aGdVQN2pwubtUP/zUzqdfMgBILv6/QPflIBDIaHh
-   w==;
-X-CSE-ConnectionGUID: vcEt9UsnSs6CujTv9r6bug==
-X-CSE-MsgGUID: ZSm8wxMrSvWGRk/Gcg1hYg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11609"; a="64898015"
-X-IronPort-AV: E=Sophos;i="6.19,294,1754982000"; 
-   d="scan'208";a="64898015"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2025 10:50:45 -0800
-X-CSE-ConnectionGUID: udsDuok3RqmjMCrMNs79Zw==
-X-CSE-MsgGUID: s8yupxxISlKzD2R9wvCegA==
-X-ExtLoop1: 1
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2025 10:50:44 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 10 Nov 2025 10:50:43 -0800
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Mon, 10 Nov 2025 10:50:43 -0800
-Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.16) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 10 Nov 2025 10:50:43 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PdYE3L4ubj9fozNAN64OF8OZw/QpW0j07MRuaCdxILN7vYkIZnFBXi4n5LZUb43CpXa19m6QRNi8DURhkfCdnAcWEjrCtrDEnUiCqMeZapEBGS2w0wGzaC2uBXa4M/r2YeWL2oiHujV98Ac/j8N4SM5OJxaEBHo1BfMMttous6KJ6sci3O08Ewj/yrxLPNMDYBMHfz7ik7kGZCOPQy8/w0A+JkBTytaZFSGr+pAMb+Qiiz/eOCx279WEA7VilzFsemka8tm3vndPqTydyHy4cH9XtnrQW4F6HMzw7DAiyEodPFhE7fgRpiGGHeZz9c5FlUO+y5qxtdPpkXXNKwdZ8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oskcQLjnTfSlWk6/hgRugdfijfWdOri3KL552CA4nl0=;
- b=dPlgOZqVIHK1ilhtIwBjz7mow+0+0YgqvGiGflxEqJ575ZpeN7KZVFALT8Iap3zEEex6r1aKiin8ZKrr1rZ1ZuuC0RXDO2rqpSjm4oVuPYpsQQSpgS2MGdT3fAEo2OulDPIqxDy1u4WXHWvklwjvSYesZkJNb4Pkkg0ieXr/xHiCzgLjS8ToKuAKaxgscuyuqhI/SgpeFI7xts1N50DCdhFQACPAoumOtL5+VLJTSg2PhJz+GLE4R/IUfQw8HTMnH9E5Z6UKoq/+mBPL8hFPoz/gj0mgwz7Pu03Xk9F49L2JdqSz+NCVvgINU5lleMSE51T40pxqnlHt3X352EOk9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7925.namprd11.prod.outlook.com (2603:10b6:8:f8::18) by
- DS4PPF0442004E1.namprd11.prod.outlook.com (2603:10b6:f:fc02::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Mon, 10 Nov
- 2025 18:50:41 +0000
-Received: from DS0PR11MB7925.namprd11.prod.outlook.com
- ([fe80::b1ef:c95b:554d:19c9]) by DS0PR11MB7925.namprd11.prod.outlook.com
- ([fe80::b1ef:c95b:554d:19c9%6]) with mapi id 15.20.9298.015; Mon, 10 Nov 2025
- 18:50:41 +0000
-Message-ID: <2bb461a0-1332-49c8-94f7-fd8ba562b752@intel.com>
-Date: Mon, 10 Nov 2025 10:50:39 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 00/20] KVM: x86: Support APX feature for guests
-To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>, <chao.gao@intel.com>,
-	<zhao1.liu@intel.com>
-References: <20251110180131.28264-1-chang.seok.bae@intel.com>
-Content-Language: en-US
-From: "Chang S. Bae" <chang.seok.bae@intel.com>
-In-Reply-To: <20251110180131.28264-1-chang.seok.bae@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0065.namprd13.prod.outlook.com
- (2603:10b6:a03:2c4::10) To DS0PR11MB7925.namprd11.prod.outlook.com
- (2603:10b6:8:f8::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C651723B607
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 19:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762802641; cv=none; b=PfxN+IfZY/KUqcpDH08z2mWjobYEoyJiMZabXPbB3uDon3YG05TTadyPa/zhPOC36SS0xBVgKl0YJ0274Df5fk4EAXbFCE0XhvERkf5DpWcsA6paw4pLnJWH2OdLgdC5pCwsSLo3Nl0HHYn87mc36s/ZYViXsyiTxbTqm6Us+j4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762802641; c=relaxed/simple;
+	bh=cPHuYy1Wv4KChFqeJH+AEWpOUMF+PpB+ceAvxNwbR4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=raoDrZSRlo221rf3lACLJ1GTGn8+wzg+l3dOEFn6W4LGLJ5Od9ln1623T1WQ6nq/cyx7Am0iaMFc2Aypwxe3M0oQl/HxLvOQcoFizlLETfvAUDJ5puOuh5d5bP/oFq75yolIxh5zJAhdXnF9DlHsltfcIV8j6X35WMwmpb3Xv2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Zt85dsqR; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 10 Nov 2025 19:23:39 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762802636;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oOQqHpzs5q+h5Yjbnc6DPZt8+0zjzGikaeAdSf3y5Kg=;
+	b=Zt85dsqRh+CYFl2JZ84Z0d5GpmolfFxnYuzQ1yrgjLnTW0O5r3Xqe+FTSyHtRDu7VHMkuz
+	kGacCCsp9XHoKNYVMmciAUQgetU+IS1E0ISGouRZwUuBOlYeHma6+eOPWxPkSIAv5MAU/L
+	7T000vk8DdXcsxtFq98IvgcE2KaykyM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, 
+	Jim Mattson <jmattson@google.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 4/6] KVM: SVM: Switch svm_copy_lbrs() to a macro
+Message-ID: <dyfu7nopxqtdw6k6s37dmq3wedqua2risfgolsltepykffqjkp@ij3ogvhxpvrg>
+References: <20251108004524.1600006-1-yosry.ahmed@linux.dev>
+ <20251108004524.1600006-5-yosry.ahmed@linux.dev>
+ <be2a7126-2abc-4333-b067-75dd16634f13@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7925:EE_|DS4PPF0442004E1:EE_
-X-MS-Office365-Filtering-Correlation-Id: 732154de-4020-4e99-8b21-08de208a0c14
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?dXVFbUVQL01qWXdDTWFtcU1MMkJBNldkLzZRcnB3bjJRZ0dQOVA0L2gvam1T?=
- =?utf-8?B?aG9xZkE5cGFIUEgvMjZtaVhNQ3JreHpuNXVpM0FnaEx4MUFGdnM3THVkYWpM?=
- =?utf-8?B?K0ljWEFVNWNPdGpaRUtseDM1ejhkRHFwdEdQRElTQW1aYWY3M3J5U0Q0dlEx?=
- =?utf-8?B?ZmVOczBIRTN4YWR3OXE2d3BLQmxNdXB6YnM3bTBpVDRlZHo2NlFqTlFjS2Ir?=
- =?utf-8?B?TjNlT0lWdEJxbWt1QWZsd2NsdWZZNFRDQVZ0WFd2YmVuOG5OWE5hbmw1SkF6?=
- =?utf-8?B?Mk1EMTlBSzBjWXRmZUUzYVlLR0VrZWIvRWM0eUFJNlJ0b3h1Z202WWcvVXpx?=
- =?utf-8?B?R08rQ1ovdDhTRDFqT3B4d1lteTFMZ25HVnozRXVHb2NwT1ZuZlF2dVJSQ0Mz?=
- =?utf-8?B?dTVHeTZVZlgxWUpXQVNORVpOUzhtTGR6Um5nVWlUNzB6cXk1N2xMc2kxNGJV?=
- =?utf-8?B?WmhLcjNJVkJEZUpDR01ZcENvZ3VrVmY2aW8ycjFXa09lVXZjbXNHY1lYYnUw?=
- =?utf-8?B?VlB2TDZBanFVbWhHZUxJTWFDVFlRVTFaa0cwQUpYQU5VMElpSHExeTBqbm9P?=
- =?utf-8?B?bDVNbmJHVG8xcGxyVVd3WThERUV1OHZoZ052RmFEVWhJQ2ZoelAwblN1YkJ2?=
- =?utf-8?B?aitPOXZWV1Z6Z3BPRjY1a2tYSFJQTWhmaHZkTUNzV1BvZDBiaFpyQ2ZJcGhP?=
- =?utf-8?B?Zktha2dNb2cvUEJxNnFaQ05uaVRxY1FFQ3lkU0dFT0hvTUFKL3RnMjlmUlJM?=
- =?utf-8?B?TFE3eFlidWFaY1o2K1ZDemwzTlVCdDd6eis5TkczaUlkRVBWSS9xWEpocUVq?=
- =?utf-8?B?emJacGlTd081TEIvTzMxcXFUWGpWVHNnTkNrOWRXK2pQSHZ4aGo4MTFvd0g5?=
- =?utf-8?B?QTVVZ3FUUWdQbFp5MGF3RjRQcUZSRHBHcC8yWUdQcUk3a0tUL3hRUHFmTHJB?=
- =?utf-8?B?ZGtuVzJaeUxJWVVJcklsUXJPczlNK25WOXoxTFRMTTlBblYxSEZPUHBZdlor?=
- =?utf-8?B?NS9iNkplQmNHL0dnNVYvMVNoRDIyWHpPMHpKRkFjNk5lajFVUGI3aGVUa3p3?=
- =?utf-8?B?V0s4bEZnZS8vaHdWb2FxcjVXSngzQ2swVHRVdkE1YXZDLytzSlVzN2duS1Zl?=
- =?utf-8?B?dzUvNkNvVGtPTkkwWUlaQnk3U3JVWWZmRjhORWtaWGhWUEowZGxFVEUwN1dO?=
- =?utf-8?B?NVhnd01yV3A5SlJ5ajBHZ0tadGRZc1FBNi9tdkFFYTVsd1IwS29QVXlmOG1N?=
- =?utf-8?B?VmhkWkdjVWtVUWVIRFFSZlVtM21uUXo5T0pUY0hyTHlGUlllUnN3VkQrS3ZW?=
- =?utf-8?B?STZ6bzFHNmF3OHI2azltWG5RTmQzaUlXS00yYzhjYWJVcEpTYXIwQUQ4c2FR?=
- =?utf-8?B?bWg2VlhleEpncWQzd1FGRTFCVngxVFczaVRyKzRKblVuMEVSS3NCakZTRmxX?=
- =?utf-8?B?RVAvWGdTRytGd0tqVFZHTzA0elB0WkhBZ2ZWODFrRTIwY3lVNUxSMWNYb1Bs?=
- =?utf-8?B?ekRyNlVteStvdjJkMlZnZXpLM1JCd0pLWHdLRjQrdWw2cWdKd0pvdTc3alJv?=
- =?utf-8?B?QSt6SmZtNXE1VU4vQ2U2Rm5yanFoVzJWbmFuY0lKWnR3S04yQitZTHJubGhV?=
- =?utf-8?B?MWJtdFdXUkxyazJvZGVnTkp0ckRPdnhFSmxscVdwTEdGV1Y0NUhGYUd1SU1o?=
- =?utf-8?B?cml1OXpMZE1ETkM2TmVFNTRWUmpXeU1wa1BTMnhEdVNDRGpsdXRiZGN0SUdS?=
- =?utf-8?B?SDF5OTRobnVoQmVGZ1BDcHZxQi90YldORHFKOThIL2s3UzNxa2hoUlI1VHA5?=
- =?utf-8?B?U09mZWZ5a0grbGRTQXRZTFJDcVR4SGdCSzBLV2g5QmZlZXNMSkdyZDlzbEJX?=
- =?utf-8?B?dUZxTndxelo1M3N3UFRpa25GRXkvRmYzTTRuVVJMM052eWNyMUVBbkJ5cW5z?=
- =?utf-8?Q?jt+hIuxkiGrwsfhuhy9P6jbB1Ax0+nL2?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7925.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aHI0RUxIb1dSOU5hUTNQUy81Z0k5eDR2djZ4MjRsZXI1MTlCM0lJOUhBb3o4?=
- =?utf-8?B?YzFCZmNvK1BWcE9NSjNEanZyanRxTlQ5akIwMGdBRDFVbVU2emFramJFK3Nh?=
- =?utf-8?B?U1pnU0NibGwvTGhDN3J1TUZlbnhmWVZEUTlEeFZJeURqenE1MG0rQlNVR2Zm?=
- =?utf-8?B?Q0ZHYkpTTzg3N2Zob0swUlZjcXpCemZzbC9EM3hDR001S1ZyQ0FvTjluSzhV?=
- =?utf-8?B?QXFPT2gxdnhJcEFHNjZFcmhJVmhQMWJtbVkyT0N2bXVDK1BCNlZGbFpHWEtT?=
- =?utf-8?B?UUtVdVRxeG5tSmhSZzNlMFZEbWgwbFVBcjQ4OUtzdDBSR01NTnQvS2xadXBk?=
- =?utf-8?B?cnF0MG85Y3pURk0zK0dadzBwaHZBbTRzbDA3TlJJVmVobWQ4c3ZUYWNuU2tE?=
- =?utf-8?B?TTcvL1J4RFNMaWtEclBpVW1aUVZ4VmpKY3UzOENkb1ZMQkZ3dDVMaEtnVW1o?=
- =?utf-8?B?QmdYaGVXcER5a1M3c1pKNzdab1k5MStwcndKMUJFcXhVZThKeFNyeWRGL3RQ?=
- =?utf-8?B?SEpFR0dyS3RRMDVkS3o4NXpQTTg4YnhZTU1PTkJaVC9qdkZNeStDMUVCL1pC?=
- =?utf-8?B?dTRWSWNRTGNJU2tVSWp4U1hxVE0ySHhKRUtIYXZMSzA4YUlnd05YU3FxdGU2?=
- =?utf-8?B?QS91Z2ZHNWtDN3lOSlA5aERMaDFLUFU3QXlSMEpXbG9tR1J6cDd2d2VEZ0JJ?=
- =?utf-8?B?eE1JTUozaEZRS2pLSS9DdkxUNFpMQmduVERmQit2eERPTW5CVlJ5K2NCcWRa?=
- =?utf-8?B?aksyQkxscnEwWGRhQ1ArQmR0UDZ5dE5pTDJOdFh2YW5xSUh2bG8zQy9OTlZJ?=
- =?utf-8?B?L0tIa21mRHdySzd0ZVhMTDNyQ0hrbTRzWFBVd1Vsdzh3MWZvWXYwQk9EbTBo?=
- =?utf-8?B?b1RwcTcxQUxOV2pCdkZqQWJXQ1J5OWhtV2Q2RUdjZE1kQjR3SFBtWkIvUkY2?=
- =?utf-8?B?RDFLQW9pYnMzWjR5WGxKejMwQVJhdVBlMjJSYmlGQ1RuYmRoTVZwNTZLMkV6?=
- =?utf-8?B?N3pnazR2QnA1NXdyWU8xUnBBdjJEMXRHd3BwMG9XODRJa3NzWmR2SlZLZk5j?=
- =?utf-8?B?RXo4aXRFMTU0bElIRm0yUXRSaCtQSjhTTWljV3R6NWtEZGZQTlZkdzFabUtW?=
- =?utf-8?B?aXUzZ1BNN2xBSmpWWjIzc1dPQ3pMcncyOC9ybGhFdHlVcjY1ZDlnYjQzNUJv?=
- =?utf-8?B?RGZiRzVpZVFTclJ0OGpYSUppeVJjMUg1RDJjd1AyYWpxUTRQQlZJRHNla3RM?=
- =?utf-8?B?THJlTGhSVkp4Tmtia25YbnIxQkVZVnl5aFJ3SUdRSVJBQU1TVmRiQzJDa3FV?=
- =?utf-8?B?ZTdlSVREN1pMMWs3ZVk4bTVMYmw1TFk0aWVQVE5IN2N6WXdGTDJqa2pJVWRR?=
- =?utf-8?B?U0tTOHhWcUFhRi9IVklIK3Rqa1BWamsxc09zc055SWNIWEtvMWg1M3pTL1RW?=
- =?utf-8?B?b1RxK3kzODlyMGdKSGxtdUFTUkxMcFJvWFZUK0RCQ29lUVFCNE56WURiZ094?=
- =?utf-8?B?ajY4b0ZWQXQzbUUyRCtVSXE1MGJ2dk00bDVNcWhmVE05dGMwUXlYV0kvSjZy?=
- =?utf-8?B?R3VjRmF3eER2UUR0TXBqVDdPazBFSldBTkFGc1pDWXZzbWgxMHkvRW1lUnVD?=
- =?utf-8?B?b1lxY3FmY2w3eXN5bnNQd0lVZ0dudVBTeHdVOGR2OGhiSktzenREOVpmL0h5?=
- =?utf-8?B?N3UrZWh3Ym1IaEVxaVJQYlVwTVZieHJEUTJFUERlTjlkR2dKb01ISURJTDhw?=
- =?utf-8?B?ditjdjZOeGlNODZRZldiQk5LUXRlWVNhRXRiSHpTS29YM1ZIRk5icStlRjNl?=
- =?utf-8?B?VlBDZFZIcVVhTGkyZmh6Nnd5ZzE4RThSaVdGZDR0cStua0k3d2tqVGhWRGt3?=
- =?utf-8?B?VDE4RldyQXNtbWZnSElPKzAvNUVybVpzMXdNR1hTc1krVXlZdGpPazhORmtl?=
- =?utf-8?B?SzcxL2twWU96OWthVDhISzJzSnpua3c5WkhuM2NucjhFc0t1RjJ1WnVZcEtm?=
- =?utf-8?B?SXFmaEJVYmVsQndGclMvNEZ2bk40dkFUM1A4SVZJWjI3UVRYMHdsZy84MzhC?=
- =?utf-8?B?ZnJsaHNEWlZFa3hLSWQ2eWNGT0hFa3dsWjhwOFIyUm40dVpDQ3dlYkpOcHY4?=
- =?utf-8?B?N28rdnVSK1BHTzNxK1hoemY0Z3RNZjNFdHFiK1g2QTlQV0trSXo0YTBLcnZW?=
- =?utf-8?B?ZGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 732154de-4020-4e99-8b21-08de208a0c14
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7925.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2025 18:50:41.5865
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hyMn37Gw1LGi/kO58Pwh4TlpTJ9n7pPVCR51mANi/Ju/qf5WRJ95R9sE82oBHXB0ZAlp+THpSQOV0Slwn1PTdR/3no56CMsraI23ktelkCg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPF0442004E1
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <be2a7126-2abc-4333-b067-75dd16634f13@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 11/10/2025 10:01 AM, Chang S. Bae wrote:
+On Sun, Nov 09, 2025 at 08:59:18AM +0100, Paolo Bonzini wrote:
+> On 11/8/25 01:45, Yosry Ahmed wrote:
+> > In preparation for using svm_copy_lbrs() with 'struct vmcb_save_area'
+> > without a containing 'struct vmcb', and later even 'struct
+> > vmcb_save_area_cached', make it a macro. Pull the call to
+> > vmcb_mark_dirty() out to the callers.
 > 
-> This series is based on the next branch of the KVM x86 tree [3] and is
-> available at:
+> The changes to use `struct vmcb_save_area_cached' are not included in this
+> series, so they are irrelevant.
 > 
->    git://github.com/intel/apx.git apx-kvm_rfc-v1
-...
-> base-commit: e9a6fb0bcdd7609be6969112f3fbfcce3b1d4a7c
+> Since I've applied patches 1-3, which fix the worst bugs, there are two ways
+> to handle the rest:
+> 
+> * keep the function instead of the macro, while making it take a struct
+> vmcb_save_area (and therefore pulling vmcb_mark_dirty() to the callers and
+> fixing the bug you mention below).
+> 
+> * you resubmit with the changes to use struct vmcb_save_area_cached, so that
+> the commit message makes more sense.
 
-I don't think it really matters at this point. But I just rebased on 
-6.18-rc5 during last minutes.
+I can include patches 4-6 with the respin of the series [1] that has the
+changes to use `struct vmcb_save_area_cached`. That series origianlly
+had the patch to switch svm_copy_lbrs() to a macro, but I moved it here
+to use for the save/restore patch. I was planning to rebase [1] on top
+of this series anyway.
+
+There is a hiccup though, I assumed everything would go through Sean's
+tree so I planned to respin [1] on top of this series. Otherwise, they
+will conflict. With the first 3 patches in your tree, I am not sure how
+that would work.
+
+I can respin [1] on top of Sean's kvm-x86/next or kvm-x86/svm, but it
+will conflict with the patches you picked up eventually, and I already
+have them locally on top of the LBR fixes so it seems like wasted
+effort.
+
+Sean, Paolo, how do you want to handle this?
+
+[1]https://lore.kernel.org/kvm/20251104195949.3528411-1-yosry.ahmed@linux.dev/
+
+> 
+> Thanks,
+> 
+> Paolo
+> 
+> > Macros are generally not preferred compared to functions, mainly due to
+> > type-safety. However, in this case it seems like having a simple macro
+> > copying a few fields is better than copy-pasting the same 5 lines of
+> > code in different places.
+> > 
+> > On the bright side, pulling vmcb_mark_dirty() calls to the callers makes
+> > it clear that in one case, vmcb_mark_dirty() was being called on VMCB12.
+> > It is not architecturally defined for the CPU to clear arbitrary clean
+> > bits, and it is not needed, so drop that one call.
+> 
+> > Technically fixes the non-architectural behavior of setting the dirty
+> > bit on VMCB12.
+> > 
+> > Fixes: d20c796ca370 ("KVM: x86: nSVM: implement nested LBR virtualization")
+> > Cc: stable@vger.kernel.org
+> > 
+> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > ---
+> >   arch/x86/kvm/svm/nested.c | 16 ++++++++++------
+> >   arch/x86/kvm/svm/svm.c    | 11 -----------
+> >   arch/x86/kvm/svm/svm.h    | 10 +++++++++-
+> >   3 files changed, 19 insertions(+), 18 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index c81005b245222..e7861392f2fcd 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -676,10 +676,12 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
+> >   		 * Reserved bits of DEBUGCTL are ignored.  Be consistent with
+> >   		 * svm_set_msr's definition of reserved bits.
+> >   		 */
+> > -		svm_copy_lbrs(vmcb02, vmcb12);
+> > +		svm_copy_lbrs(&vmcb02->save, &vmcb12->save);
+> > +		vmcb_mark_dirty(vmcb02, VMCB_LBR);
+> >   		vmcb02->save.dbgctl &= ~DEBUGCTL_RESERVED_BITS;
+> >   	} else {
+> > -		svm_copy_lbrs(vmcb02, vmcb01);
+> > +		svm_copy_lbrs(&vmcb02->save, &vmcb01->save);
+> > +		vmcb_mark_dirty(vmcb02, VMCB_LBR);
+> >   	}
+> >   	svm_update_lbrv(&svm->vcpu);
+> >   }
+> > @@ -1186,10 +1188,12 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+> >   		kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+> >   	if (unlikely(guest_cpu_cap_has(vcpu, X86_FEATURE_LBRV) &&
+> > -		     (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK)))
+> > -		svm_copy_lbrs(vmcb12, vmcb02);
+> > -	else
+> > -		svm_copy_lbrs(vmcb01, vmcb02);
+> > +		     (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK))) {
+> > +		svm_copy_lbrs(&vmcb12->save, &vmcb02->save);
+> > +	} else {
+> > +		svm_copy_lbrs(&vmcb01->save, &vmcb02->save);
+> > +		vmcb_mark_dirty(vmcb01, VMCB_LBR);
+> > +	}
+> >   	svm_update_lbrv(vcpu);
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index fc42bcdbb5200..9eb112f0e61f0 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -795,17 +795,6 @@ static void svm_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
+> >   	 */
+> >   }
+> > -void svm_copy_lbrs(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
+> > -{
+> > -	to_vmcb->save.dbgctl		= from_vmcb->save.dbgctl;
+> > -	to_vmcb->save.br_from		= from_vmcb->save.br_from;
+> > -	to_vmcb->save.br_to		= from_vmcb->save.br_to;
+> > -	to_vmcb->save.last_excp_from	= from_vmcb->save.last_excp_from;
+> > -	to_vmcb->save.last_excp_to	= from_vmcb->save.last_excp_to;
+> > -
+> > -	vmcb_mark_dirty(to_vmcb, VMCB_LBR);
+> > -}
+> > -
+> >   static void __svm_enable_lbrv(struct kvm_vcpu *vcpu)
+> >   {
+> >   	to_svm(vcpu)->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
+> > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> > index c2acaa49ee1c5..e510c8183bd87 100644
+> > --- a/arch/x86/kvm/svm/svm.h
+> > +++ b/arch/x86/kvm/svm/svm.h
+> > @@ -687,8 +687,16 @@ static inline void *svm_vcpu_alloc_msrpm(void)
+> >   	return svm_alloc_permissions_map(MSRPM_SIZE, GFP_KERNEL_ACCOUNT);
+> >   }
+> > +#define svm_copy_lbrs(to, from)					\
+> > +({								\
+> > +	(to)->dbgctl		= (from)->dbgctl;		\
+> > +	(to)->br_from		= (from)->br_from;		\
+> > +	(to)->br_to		= (from)->br_to;		\
+> > +	(to)->last_excp_from	= (from)->last_excp_from;	\
+> > +	(to)->last_excp_to	= (from)->last_excp_to;		\
+> > +})
+> > +
+> >   void svm_vcpu_free_msrpm(void *msrpm);
+> > -void svm_copy_lbrs(struct vmcb *to_vmcb, struct vmcb *from_vmcb);
+> >   void svm_enable_lbrv(struct kvm_vcpu *vcpu);
+> >   void svm_update_lbrv(struct kvm_vcpu *vcpu);
+> Since
+> 
 
