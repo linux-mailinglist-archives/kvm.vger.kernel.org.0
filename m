@@ -1,146 +1,157 @@
-Return-Path: <kvm+bounces-62586-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62587-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF304C494A9
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 21:45:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B760AC494CD
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 21:48:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FC193B437B
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 20:43:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E4403B2B7D
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 20:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA5C2F5467;
-	Mon, 10 Nov 2025 20:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27CCB2EF662;
+	Mon, 10 Nov 2025 20:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="htuAqLZ4";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="W1pcFNtX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hs6EgrmQ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ENPZoCy0"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680472F291B;
-	Mon, 10 Nov 2025 20:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E412F25F8
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 20:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762807347; cv=none; b=lysskvUAiExUfC+tFAC+Floa4Q7j5i/KPtcr0Dfzpwq0dwWBrxnbAnZCHu4dLgno5GgadBb+S5w7iocrL2JNCx1Q5SkCwtIO/awU7mlxvycMj3C7jah+vyiBSfi0hYrHxjRSH1rb3IJeQyLXjTAdtaEOqJ+K0peFSKe9R6VHMv4=
+	t=1762807500; cv=none; b=s9KkKhPSRRCIB4zEIpEYDdZoDDx/C/UUr7/QVMamkTkfD7GpkQB42hIdWR/P5L5TY61Uoq/E8hFmCqI2E7z00TmVIKEsNN8Ph9O/RvSRNSR9X1B6OLCja10UvzsSdAe1bjXTHdpN4oUx1G9GZamQhymJsGW4ygpjV6Yx2QVdRHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762807347; c=relaxed/simple;
-	bh=EVZlZ6pxpX8LL3e1/kedrfN4wUWfo9Ezw2G03AI99jE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fi0vyutT7WBs6aU0w+xNF3bahL2GS9TQ3qVwvzd2PSq71W7oayLszx1k1HgKPXpPLPvRo9WU1hiQEDDcg+33vQcz42o5kWdybDi3e7ZY7lNu7UDRTdZiNqzBPvg0ZhGtItMPxtiabLM+E5JALVF9vta0nbVA+L2pFbVBgmDtt/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=htuAqLZ4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=W1pcFNtX; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.stl.internal (Postfix) with ESMTP id C4D701D000F8;
-	Mon, 10 Nov 2025 15:42:23 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Mon, 10 Nov 2025 15:42:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1762807343;
-	 x=1762893743; bh=gqeX2If3HYh30yCslpotpD1eSH8ukdg4bxJbH47uciI=; b=
-	htuAqLZ4SouJYoITuzsRhJjEXMvYg51jdhYpfuNbonoAiCijob/69evbidTgy+sh
-	iRd/focxifhKHG29GSovKjpd+ZahK1KX4u/ZS5xwu1cwXqVC/UCcfTwYH5JPDv12
-	hGHLp/nV+WavmCJRl9wTrZikJq0k+REA/xuHpzuBgd81DF7sIwQG9Nn6LXDccuBp
-	Kcbv2MQHhh0bNcI9y7090F/H/ONHQBQn0M3YoNGcqHaUJhgJYpUOx9LyevwJdnFy
-	Ict245DxpPf6jiaMEQZaHVfubTy/2FN5JOeKQcWBk3z0YAlBC9LITZ62vdXk1Y/c
-	Rd49/UzrTC9Hg0y+GBi9Hg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762807343; x=
-	1762893743; bh=gqeX2If3HYh30yCslpotpD1eSH8ukdg4bxJbH47uciI=; b=W
-	1pcFNtXWP9fMq2c7Go8PGx8HwIWpuPF2lBF5s8fzNuWqlubpSf71I4RGXc/+pwcE
-	wq+IM4acQDpUfJS8lOK336Hg+6Yhp/JfxC5SEFBEOLYskuuF1zMvdgewgnWx52X/
-	fNOBJyzaAv96LswEo/scIGTSRxWJi2ZUU5XAvFuOshhDJGBo38Xa+K5zj1omajl4
-	9Nzw2IiBoN/XHZmZW4L1O2XuQ5m2ygcV/Ej73MJG4tl8Yp+XoKJ+BgkgvopLu2GH
-	obrv7xcViS0KT+tbc+wUE4u16+09BsabKp6VUrTPLyomAqmaiXC7s3Fr/VvCaEMh
-	I3yt1TVyxJAxtgG24ZoJw==
-X-ME-Sender: <xms:Lk4SadPf7Z_61ugy1UZG-S0z50mLGWjkeWFW-KUtptz0WE1qSwYswA>
-    <xme:Lk4SaWQnTbNosFeU6S8-IkOOxvD-vMp6PSlA7UVcS1gFInm63zNeLDUnY47L26hp1
-    UJx5XZp5pVS_p1iGPb8C2-PW03MLsP60V0ld5GGp6ghlpo8mHKR>
-X-ME-Received: <xmr:Lk4SaSQT-qKgrv4djpFBdctnnMfQHHqqcvgPYrMcvkpGGEF5Ve9ebvTg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduleelfedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
-    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
-    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
-    hffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopeefhedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtoheplhgvohhnsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopegshhgvlhhgrggrshesghhoohhglhgvrdgtohhmpdhrtghpthhtoheplhhoghgrnhhg
-    seguvghlthgrthgvvgdrtghomhdprhgtphhtthhopegrgigsohgvsehkvghrnhgvlhdrug
-    hkpdhrtghpthhtoheprhhosghinhdrmhhurhhphhihsegrrhhmrdgtohhmpdhrtghpthht
-    ohepjhhorhhoseeksgihthgvshdrohhrghdprhgtphhtthhopeifihhllheskhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtohepmhdrshiihihprhhofihskhhisehsrghmshhunhhgrdgt
-    ohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggr
-X-ME-Proxy: <xmx:Lk4SaXAf2U3xTIUQxs8i0IsnHoTy1Jl7o0BH0TlVy7zhF4WWB901JA>
-    <xmx:Lk4SacCXUZGgOPwzyeCst1KYlCMu_DTngssMm-yanfi8GAiSreZfOA>
-    <xmx:Lk4SaYxVBS9qwrWpCA566IQDcrCbii10ahjD77GRLJBh3SrN6LWZAw>
-    <xmx:Lk4SaejgdRKg7EjLQE1Gk-cfpzoWXZw-pFjsodEgU8MMWqFzLPeaiQ>
-    <xmx:L04SaZr36QwMGCQIKH-kIOIQH3332nOSuBo78ltSYdTNpyhWUvhiqLCC>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 10 Nov 2025 15:42:19 -0500 (EST)
-Date: Mon, 10 Nov 2025 13:42:18 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Bjorn Helgaas <bhelgaas@google.com>,
- Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
- Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Jason Gunthorpe <jgg@ziepe.ca>,
- Andrew Morton <akpm@linux-foundation.org>,
- Jonathan Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
- Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
- Kees Cook <kees@kernel.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Ankit Agrawal <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <skolothumtho@nvidia.com>,
- Kevin Tian <kevin.tian@intel.com>, Krishnakant Jaju <kjaju@nvidia.com>,
- Matt Ochs <mochs@nvidia.com>, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- iommu@lists.linux.dev, linux-mm@kvack.org, linux-doc@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
- linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
- Nicolin Chen <nicolinc@nvidia.com>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>
-Subject: Re: [PATCH v7 00/11] vfio/pci: Allow MMIO regions to be exported
- through dma-buf
-Message-ID: <20251110134218.5e399b0f.alex@shazbot.org>
-In-Reply-To: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
-References: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
+	s=arc-20240116; t=1762807500; c=relaxed/simple;
+	bh=0QmLAhB4Dr1WEPpk3887110fcGYJhxEIE8hNtWv5p9w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UyJqtR0+J4bZtaQP/PMAy14rZX3/8JYBuMElnLdZw0inVv9nMqyPkaPRaLUeD1ziX1tf9Iwxb78ag/Bcbm+SsGAz4CFKaeP0kwGVjBTd7u2DSmYQaScNpytYSuxXNUM0YzaPVtTkqSo8YT8T0R82uq6E5YJardxxhDBTBhX8Y2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hs6EgrmQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ENPZoCy0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762807492;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0QmLAhB4Dr1WEPpk3887110fcGYJhxEIE8hNtWv5p9w=;
+	b=hs6EgrmQIDgnDTOH7X/W5iJLUuSMn956wLRjDslN9bsxZqROrb8sJdr4M4L9FeHVhMjMFC
+	eUUnjGer0cyJtroCaon+WbUM4sPT/qj3awCpvtB2JR/IzB0wgsaDt5+g4cPfSwAmtNPkVz
+	lKCDsEk/LNUL4TdgWoktVk53THTvGdQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-395-dvrcDgHhNsiaWmu2p5CElA-1; Mon, 10 Nov 2025 15:44:51 -0500
+X-MC-Unique: dvrcDgHhNsiaWmu2p5CElA-1
+X-Mimecast-MFC-AGG-ID: dvrcDgHhNsiaWmu2p5CElA_1762807490
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47111dc7c5dso588845e9.0
+        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 12:44:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762807490; x=1763412290; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=0QmLAhB4Dr1WEPpk3887110fcGYJhxEIE8hNtWv5p9w=;
+        b=ENPZoCy0Y5Ucx0OvtHBoir7oqkL46BKyCGz7Zxun3iFZX/mSB3M6LpZjJA57ajn9cC
+         e2TfJS3KMPUTYeSyloLORAd4hz4RtbJdRynZQhOXuc0HMMcNZ1FgXayFx4dHe5lFpttT
+         SFA8yl0HT1/at5uM7af+H5XO111q0G3WRV+TCi4bfRao2kv8Dhc67RowED1y8XGs3jae
+         9oaUDq/AtmDcBmNlholvzzPGe/I+sq0Rhxacn0eccv0wCFxOl88i0QxB1CXEW2jVQ4Ol
+         tw1GAs+Okn7W1fN4Yf05GfxoavGAqmAYSf3vrbkgcX/ZpBE7rIBUShcH9LG2w1hPNq5V
+         V65Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762807490; x=1763412290;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0QmLAhB4Dr1WEPpk3887110fcGYJhxEIE8hNtWv5p9w=;
+        b=aKIiQLRORna292QPS/QuPaeYLUlNGWx1llKIrejr3E6T8NPMqB1YKEUpf1ZR+Cwy6O
+         X31P21yAQ2YgQBtDudN6Z0qNjjs1kWhsj/F94ad0wyZALTZ0A3L71LgakXRqH8hnO+49
+         yWyPozKwXk1RLJn5QO1om/OiDCRuMa8KTJV+eqirdr4KdnxIn18V1F6nW27+loMH/3bO
+         zwI8bqb08qDG5v/gCfPFN5CMBjFuxcojHMiQToIms8z+Jc9s+RnP5S+36VZqWvOTi6r6
+         vm2pcEbDly24tL1oDHgz5nyU0smw/NIp9G7ubKsk+TT0uQrsuk/ZjHdEKEXQ/rvy4xPO
+         pn6g==
+X-Forwarded-Encrypted: i=1; AJvYcCVngBkicmVFOM6pTOxH4mt7Hdo8ZWDSZoMj4sVL3QLZhiz3SIAZwEgILgpv62z2FXzfhfY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQ+1+bhm1WqMumBeuAUAESduGIjTp5Pw2mfJR3KQDeyPSjXNJH
+	8ASkdLgri/o7LS5oCEe6q/sSLQ0JzDGrdU2I21WW2LDZYHYjnpiYoCKWo67dr3E24pXGHkl1TQu
+	3OcNlSqHCaxmU38Gu8XqaiLaJKWuyMOHP79VeAxpUWH6TUOccjHuT2EJNWiW+9KHCNgF50Y4a/W
+	LgCgIEyDhnrfRctY6wiGKob0z1IbFr
+X-Gm-Gg: ASbGnctQpzLr/W6ubk0idFXslif7sfxF9IA9CDI0iSH4vxJ3pXdBCfpIr0wOmi9STuU
+	rmz6Gct1uZjGkc95qbm3FxqJt2NcP3UY7M+bANnAGFga54V1QFqDHwvE3ZZq4GakltuGshyuZ80
+	kcVeiUL7dwUi4Bi1E67zvtTlkvdm+olzTMd96+7d/DS+un42kGvMMIZXLYsZNeUzaLrtUKuADcB
+	vKhzf7sVfbhEKfB5S+URyrl96RnPGA33sm9peouUX6ox0pU+kFp5/XdQ6dQsQ==
+X-Received: by 2002:a05:600c:705:b0:477:81d8:df8 with SMTP id 5b1f17b1804b1-47781d8110dmr569385e9.19.1762807490025;
+        Mon, 10 Nov 2025 12:44:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHxgmlnkD4pZaOUZoaHUEyi4FhNrg7OIYNzNltbzPAiHrzD/ABZ6T0/DHHvTLeLO5rSzr5b0t7kC6amnCZvfAo=
+X-Received: by 2002:a05:600c:705:b0:477:81d8:df8 with SMTP id
+ 5b1f17b1804b1-47781d8110dmr569225e9.19.1762807489677; Mon, 10 Nov 2025
+ 12:44:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20220424101557.134102-1-lei4.wang@intel.com> <20251110162900.354698-1-lrh2000@pku.edu.cn>
+In-Reply-To: <20251110162900.354698-1-lrh2000@pku.edu.cn>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 10 Nov 2025 21:44:36 +0100
+X-Gm-Features: AWmQ_bmE9lW1YJSBbubQWZMySQSyLd1I6Mr0gyYvS3wFNwWQ6M81mIDCY6FrJwU
+Message-ID: <CABgObfZc4FQa9sj=FK5Q-tQxr2yQ-9Ez69R5z=5_R0x5MS1d0A@mail.gmail.com>
+Subject: Re: The current status of PKS virtualization
+To: Ruihan Li <lrh2000@pku.edu.cn>
+Cc: lei4.wang@intel.com, Sean Christopherson <seanjc@google.com>, 
+	Chenyi Qiang <chenyi.qiang@intel.com>, Jim Mattson <jmattson@google.com>, 
+	Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>, 
+	"Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Wanpeng Li <wanpengli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu,  6 Nov 2025 16:16:45 +0200
-Leon Romanovsky <leon@kernel.org> wrote:
+Il lun 10 nov 2025, 17:32 Ruihan Li <lrh2000@pku.edu.cn> ha scritto:
+>
+> Hi,
+>
+> I'm sorry to bother you by replying to the email from years ago. I would like
+> to learn about the current status of PKS virtualization.
+>
+> In short, I tried to rebase this patch series on the latest kernel. The result
+> was a working kernel that supports PKS virtualization, which would be useful
+> for my purposes. Would PKS virtualization be accepted even if the kernel itself
+> does not use PKS?
 
-> Changelog:
-> v7:
->  * Dropped restore_revoke flag and added vfio_pci_dma_buf_move
->    to reverse loop.
->  * Fixed spelling errors in documentation patch.
->  * Rebased on top of v6.18-rc3.
->  * Added include to stddef.h to vfio.h, to keep uapi header file independent.
 
-I think we're winding down on review comments.  It'd be great to get
-p2pdma and dma-buf acks on this series.  Otherwise it's been posted
-enough that we'll assume no objections.  Thanks,
+Yes, I think it should.
 
-Alex
+Virtualized PKS does not depend on host PKS, because it uses an MSR
+rather than XSAVE areas (which are harder to add to KVM without host
+support).
+
+> Fundamentally, I don't think this patch series
+> has to be built on top of basic PKS support. But I am unsure whether there is a
+> policy or convention that states virtualization support can only be added after
+> basic support.
+
+No, there is none. In fact, the only dependency of the original series
+on host PKS was for functions to read/write the host PKRS MSR. Without
+host PKS support it could be loaded with all-ones, or technically it
+could even be left with the guest value. Since the host clears
+CR4.PKS, the actual value won't matter.
+
+> One problem is that if the Linux kernel does not use PKS, we will be unable to
+> test PKS virtualization with a guest Linux kernel. However, given that we have
+> KVM unit test infrastructure, I believe we can find a way to properly test PKS
+> virtualization for its correctness?
+
+I agree. Thanks!
+
+Paolo
+
+> I'd like to hear from you to know whether I understand things correctly. Thank
+> you in advance for any feedback.
+>
+> Thanks,
+> Ruihan Li
+>
+
 
