@@ -1,135 +1,127 @@
-Return-Path: <kvm+bounces-62512-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62513-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD8B4C4734C
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:30:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82EF1C4761E
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:59:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7A25B349B1F
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 14:30:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74CDD1892B46
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 14:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46B9313542;
-	Mon, 10 Nov 2025 14:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56A03313267;
+	Mon, 10 Nov 2025 14:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JDxgyhIW"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="R+MfrppO";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="snw1OOJ7"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52D8312813;
-	Mon, 10 Nov 2025 14:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817A8199935
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 14:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762784950; cv=none; b=E8XvkZGDIQ04X10mBH0LstsAnvDNoxJJ5lI6+CPpp2h+8KFy0UQztkcZBmrbiFfSvu/fmaH128oeV1Rsj+An7puOnnoQJ0DCjZHUByjwLB6NLEMLPjfJUqqPCH7hovbKWyj71/J2kENbUEFX70GcWV84xNH+mANmW94JC3DQYWQ=
+	t=1762786752; cv=none; b=tSdfK8XR9XUSZLwwBJSmomCG7e7+AQpvLBVofytkhwZqaLgB9soW566bn5zwaRg06twU/M3LrIeKCSCEj1ooFHEwqAGkRjMX9L6GRnjPody0gMc5dNPkJg6tj/kI2IR28ztyQwfFM7ul98pHqi8Q9y1ijYBpRRypAJyZGBWM/F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762784950; c=relaxed/simple;
-	bh=T+QKJlyYpK0J8p8YQ+LHF05Ncc6rQkcMI/cu/2kofT8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kfz4Lk6zK38XnkKE96HAYCG33tRh/lekBc48zzq1FkYIFy0F404F6mvXJ35Bp6FiXJdj0jVuPmiiIffPsZwzOunSxEcj+MUoFGp/sYqE5nElBbP/y2OGbM7S+cz/RjEpoRXIZw+N4wpG33gKl/OYEQTRbbqnHNWqhEovMaB6oTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JDxgyhIW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50D37C116B1;
-	Mon, 10 Nov 2025 14:29:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762784948;
-	bh=T+QKJlyYpK0J8p8YQ+LHF05Ncc6rQkcMI/cu/2kofT8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JDxgyhIWYi/CK6nSh01oC00hRc42uvHtxEdFb1w55s8HmwJVAJi0MrACPJN7B6WXE
-	 m/nngJVqxuLo3/ye4pMb2F/sFScT1aYf2AAiwjPG19irbVJiiNa+CpBLbBb1Ga/Hs0
-	 rmJ+pLqMHftYvpB1nGVu6NHuWDR7CEYqUcOWbA5JuXog+1cWwdG7AtGIamXgTTvBUE
-	 C56v1OjZe7R1G1J1KrEbnPP+UQdW+9BgenUT4LMsZPO7ILeNlVN1otISInhl8kZDCp
-	 AOanKAnBZcMyLZftb5UG04xpH06PhoQMCbdOVbE3KDoibxLnc4PAOHkJLWdHAlVzjh
-	 bX/8EwQDCIzOA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vIStG-00000003tLC-13Vz;
-	Mon, 10 Nov 2025 14:29:06 +0000
-Date: Mon, 10 Nov 2025 14:29:05 +0000
-Message-ID: <864ir2ufke.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Aishwarya.TCV@arm.com
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Limit clearing of ID_{AA64PFR0,PFR1}_EL1.GIC to userspace irqchip
-In-Reply-To: <aRHzf5wgJg5vSoKo@finisterre.sirena.org.uk>
-References: <20251030122707.2033690-1-maz@kernel.org>
-	<20251030122707.2033690-4-maz@kernel.org>
-	<aRHf6x5umkTYhYJ3@finisterre.sirena.org.uk>
-	<865xbiuj6e.wl-maz@kernel.org>
-	<aRHzf5wgJg5vSoKo@finisterre.sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1762786752; c=relaxed/simple;
+	bh=MoZKJbNEEL7dJCMPkSpj54RkPBaUCZ8glAsAHs5dzjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Dv/xS1rZOyNOuz747Ui2lXRRSelR257fxu2DjF+8yF77NFZm4uIi3aErcyBtrKqVhXFvx16V3dk1ahCsh3SJF7OQK7uOBoGlSTp5s1V2xRxc2myFdJZaRLh6tQcWul6PCsP8+AZ77+DAjU8yQYXlT1nfv3tVgxorvMy/pQcufl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=R+MfrppO; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=snw1OOJ7; arc=none smtp.client-ip=103.168.172.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 75CD514001D1;
+	Mon, 10 Nov 2025 09:59:08 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Mon, 10 Nov 2025 09:59:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1762786748;
+	 x=1762873148; bh=k8oL0rZhRULD9QhoKb/Mut8jIeqm5DEP6R/+qN+DPqc=; b=
+	R+MfrppO7yqVPxnQwBnpT3mufKHCGEHErmzaCCrBplUpuIfoW4cANMHMVTt8Fg3x
+	XrPsg4j4uQzEjjPBg3XsEvjJU3o9nrg4NSrTmJRXAoNdZnc2O69MU9Q+v/FEOsbw
+	bSvBx4FhfoClJNrSRX7OU9Rqxo5e5tVLHpk479CGthz0+PQxYHJJ4FPOhAbUX9Pq
+	BygPAs5N7vinD8WcMWvgA3zp92UkSffvyVFE5TUHxRbdR9DOXbt9jJkoxK0re+66
+	5h1b7bXJKKUEX2iQ+9AZrso+hJtkttwteC+JrcXbbsh+/mA3Bh3WOC3q2YiNKq9l
+	yYnoDl3heB3NdUqd29xKVg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762786748; x=
+	1762873148; bh=k8oL0rZhRULD9QhoKb/Mut8jIeqm5DEP6R/+qN+DPqc=; b=s
+	nw1OOJ7GLfc7a9beEzt8vtEWLPKoP1Bg6A2XsFsVfQiW6pZSbCJ+yZHxIxEuUkgv
+	kG7GC1PfaH6UdxxrEmgKWUOi2GWc9x0cAf94jD180xO4q/Y4LzBTZOSoHVEUAysM
+	2+bB2Wocut4szKdEzEikJxYH1tf6gLxbQpow/JPQO/gAV/qkw2xFQuyal+qlLy/A
+	+GSzp4Z+Ffvs3f49sETd7pIa0erfYCpWGRes+XzuKu/gz3YQZeXy+rq7YyzpkeZJ
+	qBr1H7uhRm/ThIE1cEuhRKQOudCwqM1fpM7KWsoVVSuV9nes+g8uGCZD6fx6OYQV
+	OvRu6kB7QVSGTaL3rwJdQ==
+X-ME-Sender: <xms:vP0RaZClufYJ2M_wvKdg4V9sIdYUUh_bM31sUE15WOxP2DVCM-LzlA>
+    <xme:vP0RaebEt3O6nbTsTrwWuLEYpMDFmE5XrNoloA1-TnPQgDnrXe0UD2hxy2otDdJZn
+    Bm9xSxFuMbESnmQxC--5W-AXq8owQukepLTbe7O8mK5Cc-OZk1L>
+X-ME-Received: <xmr:vP0Rac4MQPtZ3sQ-ek6ZjT8XGfbjiMJxepf4Zf5_B8Dpc3YLIyKc67Xv>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduleekieduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhggtgfgsehtjeertd
+    dttddvnecuhfhrohhmpeetlhgvgicuhghilhhlihgrmhhsohhnuceorghlvgigsehshhgr
+    iigsohhtrdhorhhgqeenucggtffrrghtthgvrhhnpeetteduleegkeeigedugeeluedvff
+    egheeliedvtdefkedtkeekheffhedutefhhfenucevlhhushhtvghrufhiiigvpedtnecu
+    rfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgspg
+    hrtghpthhtohephedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepjhhgghesnhhv
+    ihguihgrrdgtohhmpdhrtghpthhtohepughmrghtlhgrtghksehgohhoghhlvgdrtghomh
+    dprhgtphhtthhopegrlhgvgidrfihilhhlihgrmhhsohhnsehnvhhiughirgdrtghomhdp
+    rhgtphhtthhopegrmhgrshhtrhhosehfsgdrtghomhdprhgtphhtthhopehkvhhmsehvgh
+    gvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:vP0RafaxT32o1vqwHbQ4ik7pnLn5svk_dHTPtzsZUs6w0UpF11kaUg>
+    <xmx:vP0RabiGr4xgR9l5rgchFks6B6ZUzDEoZaOiEMLQNWnmDkzs7VUWSA>
+    <xmx:vP0RaQ8GYl_E78ZT4vY5kPlXcTwGLcnmLmYfQLYvEt25NCfIElAA3Q>
+    <xmx:vP0RaWpWO5zL9d2HSwe-AodKzfrE-Xu0ptn73wVZAR5d50_B5hbfvA>
+    <xmx:vP0RacjovL35w0BrdXoUa4DjfWBiwUCIaJJOm9qhVDsj-Zu0yzhD-3zK>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 10 Nov 2025 09:59:07 -0500 (EST)
+Date: Mon, 10 Nov 2025 07:59:04 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: dmatlack@google.com, Alex Williamson <alex.williamson@nvidia.com>,
+ amastro@fb.com, kvm@vger.kernel.org
+Subject: Re: [PATCH] vfio: selftests: Incorporate IOVA range info
+Message-ID: <20251110075904.6c9f0fc6.alex@shazbot.org>
+In-Reply-To: <20251108225842.GI1932966@nvidia.com>
+References: <20251108212954.26477-1-alex@shazbot.org>
+	<20251108225842.GI1932966@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, Aishwarya.TCV@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
 
-On Mon, 10 Nov 2025 14:15:27 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On Sat, 8 Nov 2025 18:58:42 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+> On Sat, Nov 08, 2025 at 02:29:49PM -0700, Alex Williamson wrote:
+> > ---
+> > 
+> > This happened upon another interesting vfio-compat difference for
+> > IOMMUFD, native type1 returns the correct set of IOVA ranges after
+> > VFIO_SET_IOMMU, vfio-compat requires the next step of calling
+> > VFIO_GROUP_GET_DEVICE_FD to attach the device to the IOAS.  If
+> > checked prior to this, the IOVA range is reported as the full
+> > 64-bit address space.  ISTR this is known, but it's sufficiently
+> > subtle to make note of again.  
 > 
-> On Mon, Nov 10, 2025 at 01:11:05PM +0000, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > Today's next/pending-fixes is showing regressions on a range of physical
-> > > arm64 platforms (including at least a bunch of A53 systems, an A55 one
-> > > and an A72 one) in the steal_time selftest which bisect to this patch.
-> > > We get asserts in the kernel on ID register sets:
-> 
-> > Please name the platforms this fails on. Here, on a sample of one A72
-> > box, I don't see the issue:
-> 
-> It looks like it's GICv2 that's affected - I'm seeing this on at least
-> Raspberry Pi 3B+ and 4, Pine 64 Plus and Libretech Potato, Solitude and
-> Tritum.  The platforms with GICv3 that I have results for (eg, the
-> Toradex Verdin i.MX8MP and Mallow AM625) all seem fine.
+> Maybe we should fail in this in between state rather than give wrong
+> information?
 
-Yeah, I just found out by exhuming the dusty dregs. As it turns out,
-this catches a pre-existing bug that wasn't noticed until we moved
-over to the standard accessors rather than bypassing them.
+That's probably an improvement, maybe with a WARN_ONCE indicating the
+ordering requirement for vfio-compat.  Thanks,
 
-The hack below fixes it for me on XGene.
-
-	M.
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 3bf7005258f07..19afcd833d6fa 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5624,7 +5624,11 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
- 
- 	guard(mutex)(&kvm->arch.config_lock);
- 
--	if (!irqchip_in_kernel(kvm)) {
-+	/*
-+	 * This hacks into the ID registers, so only perform it when the
-+	 * first vcpu runs, or the kvm_set_vm_id_reg() helper will scream.
-+	 */
-+	if (!irqchip_in_kernel(kvm) && !kvm_vm_has_ran_once(kvm)) {
- 		u64 val;
- 
- 		val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
-
-
-
--- 
-Without deviation from the norm, progress is not possible.
+Alex
 
