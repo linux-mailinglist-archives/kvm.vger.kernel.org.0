@@ -1,167 +1,165 @@
-Return-Path: <kvm+bounces-62504-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62505-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60DD0C4674B
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 13:07:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC340C469FF
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 13:35:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CD12189ADE8
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 12:03:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 816704EAF5A
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 12:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBC830EF62;
-	Mon, 10 Nov 2025 12:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34CA230EF7D;
+	Mon, 10 Nov 2025 12:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="koM03mHG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bjyLkioR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE8530DD2C;
-	Mon, 10 Nov 2025 12:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252FF2F690D;
+	Mon, 10 Nov 2025 12:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762776168; cv=none; b=jTJnxrzMB8/zWRyN6QmDIUr5K93fzbHRlvgeTzj0WPqMFJxKjYUGub0lRfSbn9ggPNarsG3BopE829DEzK8MB5oSTZo+Hregw2ObRk4xqqp9wnpIwOg8FfDaa9kS0gn3VVWuSj0TlrV3F53YfUbJ3BOtap3bOJmr02k01j3eVRM=
+	t=1762778110; cv=none; b=KY/PD4iESgPlzDDJ5xHXQhkJ+Reby9TIPyWWp8fD1+1g8Ps6hx8VVUHdxNcxltR4z7Rq2gnxLcLXADcyjikHehykSUmkC3gf6tVjEVtXNDKtNMZy4iFR7G/RpL2fuVQWB2lSin/CnRy55jv0omrREZ6pf25n2POFrBvqWDMp3uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762776168; c=relaxed/simple;
-	bh=REp9wQTaEi6nHXZh4VunZPcTgElybS6FbKuJdk8yULU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=itrcDX3LHnaf4tvu+hE6Z+CK5ZrtndI0M+ZUocA0r1DNL25nCsyOzJFwPIMoGnKOC3MA2nD27F7vnSFM43xKiXL17wPqc/DojT/B7Pb7wvlcJkSxXUmstaZcaD14lP5GxIfFNdSEldmyIqSSfOuZP2OFLQLv0pkGAVOz4tUZi0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=koM03mHG; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A9Jt3Ho015833;
-	Mon, 10 Nov 2025 12:02:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=EMHJjy
-	3qfDUPwPK/YVKa96nT5T98Vmmf6aAAX/6JP5s=; b=koM03mHGSM4qb0L2zIX6zp
-	EC9LjiQqH93Q34AhlwzkNCeL8yH7V3SFLjD1INJyjH5HoeRf8WE1yaoyECBNYyOl
-	OythlMTeFT8ldj+0BSSAEYcYOXDc3qvMAM4zEPldbUGISICV4YVhJWRyT2Cy7FWH
-	laKaXL0rQjvUetLI69M1NB4alR2JFk2Ouqt6bmG9turTvG2F5L1bm0FIlOtOIGPL
-	wNK8SpISu50STVLd8onFLQ+DGhf4IyytFtdd0ibdFZyuh/ZNnElqHWpkgTbuc/Wf
-	uH9mmmwPxzh2ruUcuJs3lpkQbJOQ2SjVxUatXAZW4VH8ff13VhBApjGgyo0a98qA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa3m7x8gb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Nov 2025 12:02:17 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5AABxwbv004164;
-	Mon, 10 Nov 2025 12:02:17 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa3m7x8g9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Nov 2025 12:02:17 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AA98fRp008218;
-	Mon, 10 Nov 2025 12:02:16 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4aah6mnf5m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Nov 2025 12:02:16 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AAC2CHm22217422
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 10 Nov 2025 12:02:12 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 784FB20043;
-	Mon, 10 Nov 2025 12:02:12 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 08CD62004B;
-	Mon, 10 Nov 2025 12:02:12 +0000 (GMT)
-Received: from [9.155.199.94] (unknown [9.155.199.94])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 10 Nov 2025 12:02:11 +0000 (GMT)
-Message-ID: <a1e5a8db-8382-4f52-8ef2-3b62b0c031ab@linux.ibm.com>
-Date: Mon, 10 Nov 2025 13:02:11 +0100
+	s=arc-20240116; t=1762778110; c=relaxed/simple;
+	bh=Aqloc7BOWQNjYEGGJL4VNHIwvX0puHEXVUArW0wY5yM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XMom9hifIeP2N1qEPtjd4xPU5RqUvszFMiCYEeTZMmK0nCWsRnMvh+GjykJlQ2Mkv/vJZk97/f+qK0HBaMlxLCM2We37EVTSVSwg3D8bzAonyNksWpdsEtttxQrYTephNUf9QPm10YiwP4c2ZRoAR1f2hOg3o7F9mYBCe71AoL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bjyLkioR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4C89C19425;
+	Mon, 10 Nov 2025 12:34:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762778107;
+	bh=Aqloc7BOWQNjYEGGJL4VNHIwvX0puHEXVUArW0wY5yM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bjyLkioRQTNOQX7WV1Bvgk28/2Npo87/4O/DYvYxhvdIkzERkIF4YWgs3zpThh4Nb
+	 nk4DxXanbkMIWVH7rVuKqkYHYeYKOOPFEthmKGnYEIAObYRKAndU3l8nRk9CvViRux
+	 65l/SP8udZTmUVNRLT5uXlJoPFSAOuwJ8MFyqobPnPc/FGkeiRAg+O5ICkw1tnUxZ9
+	 nw59ACFdY/BU2F4GziHlZTo7UgjLJ3h/vdd4gyK6wH9qrNK6e1DhackPpUZT9njHNg
+	 FBi/N8QIzRNuYSKNnCDyU3rxchuLO1kRHhf4q/nx8ccSCm7L7vHbfETFkVt/ILm193
+	 OzCXZMlkxupeQ==
+Date: Mon, 10 Nov 2025 14:34:44 +0200
+From: Mike Rapoport <rppt@kernel.org>
+To: Brendan Jackman <jackmanb@google.com>
+Cc: "Roy, Patrick" <roypat@amazon.co.uk>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"bp@alien8.de" <bp@alien8.de>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+	"luto@kernel.org" <luto@kernel.org>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"willy@infradead.org" <willy@infradead.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"david@redhat.com" <david@redhat.com>,
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+	"vbabka@suse.cz" <vbabka@suse.cz>,
+	"surenb@google.com" <surenb@google.com>,
+	"mhocko@suse.com" <mhocko@suse.com>,
+	"song@kernel.org" <song@kernel.org>,
+	"jolsa@kernel.org" <jolsa@kernel.org>,
+	"ast@kernel.org" <ast@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"andrii@kernel.org" <andrii@kernel.org>,
+	"martin.lau@linux.dev" <martin.lau@linux.dev>,
+	"eddyz87@gmail.com" <eddyz87@gmail.com>,
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"kpsingh@kernel.org" <kpsingh@kernel.org>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"haoluo@google.com" <haoluo@google.com>,
+	"jgg@ziepe.ca" <jgg@ziepe.ca>,
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>,
+	"peterx@redhat.com" <peterx@redhat.com>,
+	"jannh@google.com" <jannh@google.com>,
+	"pfalcato@suse.de" <pfalcato@suse.de>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"Cali, Marco" <xmarcalx@amazon.co.uk>,
+	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"Thomson, Jack" <jackabt@amazon.co.uk>,
+	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
+	"tabba@google.com" <tabba@google.com>,
+	"ackerleytng@google.com" <ackerleytng@google.com>
+Subject: Re: [PATCH v7 05/12] KVM: guest_memfd: Add flag to remove from
+ direct map
+Message-ID: <aRHb5FJ2TUMtktVz@kernel.org>
+References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
+ <20250924152214.7292-1-roypat@amazon.co.uk>
+ <20250924152214.7292-2-roypat@amazon.co.uk>
+ <DDWOP8GKHESP.2EOY2HGM9RXHU@google.com>
+ <aQXVNuBwEIRBtOc0@kernel.org>
+ <DDYZRG8A99D1.2MYZVGBKJNHJW@google.com>
+ <aQiJAfO8wiVPko_N@kernel.org>
+ <DDZV32U60137.1HE9JGMU6P1KD@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/10] sched/kvm: Semantics-aware vCPU scheduling for
- oversubscribed KVM
-To: Wanpeng Li <kernellwp@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Juri Lelli <juri.lelli@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>, Mete Durlu <meted@linux.ibm.com>
-References: <20251110033232.12538-1-kernellwp@gmail.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20251110033232.12538-1-kernellwp@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=MtZfKmae c=1 sm=1 tr=0 ts=6911d44a cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=GvQkQWPkAAAA:8 a=RGqg41XGIlgyeIaX6XkA:9 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: qXsWQnQL86nX1XvMI3FtIg5oLzxHqs6d
-X-Proofpoint-ORIG-GUID: bpb605FGcMWJ3fRxGCD26Rs-flBGB4Fu
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA3OSBTYWx0ZWRfX5cdfHi7QNWyw
- 4AGDjPnDx5KhpOOm/6/eKaBa6uALkPoIAkNqIPEW4jcsNmqoiuWuhLBcabEYgWrouNQQ+OdnTng
- uZxHVN5DdVPoYvQkLm/0QqydjDxFD7DD5pyOF0NK1U/FVkhB5QxAbMbGtawBh0Xi9ZU6anORBTg
- QMSIZyED7k1CLi2CTfxFQ17VDrB2v2HTGVf1/BeT9DlxDTa0OY5U7J+SIMSqdsIEGtP3rbDsAVA
- snzWn3FlEUMubepQpYnzNjpbQ2z5Qd3cRRy7o/G0TQ1ebB3rSdlrfbH/r+ZRdycYVf+fvfAK8hF
- u5ShSDtVmdwB+iV97498cGXe7c5qUfZF5MgZtw+jHODjtqoN5Vvyca8es1lEIfGPG+853WvfNzw
- it9OEdI3s1kjWxwC8qj0n3dYQsfdTw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-10_04,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0 impostorscore=0
- suspectscore=0 lowpriorityscore=0 clxscore=1011 phishscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080079
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DDZV32U60137.1HE9JGMU6P1KD@google.com>
 
-Am 10.11.25 um 04:32 schrieb Wanpeng Li:
-> From: Wanpeng Li <wanpengli@tencent.com>
+On Tue, Nov 04, 2025 at 11:08:23AM +0000, Brendan Jackman wrote:
+> On Mon Nov 3, 2025 at 10:50 AM UTC, Mike Rapoport wrote:
+> >
+> >> >> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> >> >> > index 1d0585616aa3..73a15cade54a 100644
+> >> >> > --- a/include/linux/kvm_host.h
+> >> >> > +++ b/include/linux/kvm_host.h
+> >> >> > @@ -731,6 +731,12 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+> >> >> >  bool kvm_arch_supports_gmem_mmap(struct kvm *kvm);
+> >> >> >  #endif
+> >> >> >  
+> >> >> > +#ifdef CONFIG_KVM_GUEST_MEMFD
+> >> >> > +#ifndef kvm_arch_gmem_supports_no_direct_map
+> >> >> > +#define kvm_arch_gmem_supports_no_direct_map can_set_direct_map
+> >> >> > +#endif
+> >> >> > +#endif /* CONFIG_KVM_GUEST_MEMFD */
+> >> >> 
 > 
-> This series addresses long-standing yield_to() inefficiencies in
-> virtualized environments through two complementary mechanisms: a vCPU
-> debooster in the scheduler and IPI-aware directed yield in KVM.
-> 
-> Problem Statement
-> -----------------
-> 
-> In overcommitted virtualization scenarios, vCPUs frequently spin on locks
-> held by other vCPUs that are not currently running. The kernel's
-> paravirtual spinlock support detects these situations and calls yield_to()
-> to boost the lock holder, allowing it to run and release the lock.
-> 
-> However, the current implementation has two critical limitations:
-> 
-> 1. Scheduler-side limitation:
-> 
->     yield_to_task_fair() relies solely on set_next_buddy() to provide
->     preference to the target vCPU. This buddy mechanism only offers
->     immediate, transient preference. Once the buddy hint expires (typically
->     after one scheduling decision), the yielding vCPU may preempt the target
->     again, especially in nested cgroup hierarchies where vruntime domains
->     differ.
-> 
->     This creates a ping-pong effect: the lock holder runs briefly, gets
->     preempted before completing critical sections, and the yielding vCPU
->     spins again, triggering another futile yield_to() cycle. The overhead
->     accumulates rapidly in workloads with high lock contention.
+> But this is for CONFIG_ARCH_HAS_DIRECT_MAP? I am reading this as a stub
+> to fill in for archs that have set_direct_map_*, but don't have runtime
+> disablement like arm64.
 
-I can certainly confirm that on s390 we do see that yield_to does not always
-work as expected. Our spinlock code is lock holder aware so our KVM always yield
-correctly but often enought the hint is ignored our bounced back as you describe.
-So I am certainly interested in that part.
+You are right.
+ 
+> Whereas my concern is archs that don't have set_direct_map_* at all,
+> i.e. where we need to unconditionally fail
+> GUEST_MEMFG_FLAG_NO_DIRECT_MAP.
+> 
+> (Or would we prefer to just not define it at all on those archs? Not
+> sure what the norms are there, I guess that's a question for KVM/arch
+> maintainers).
 
-I need to look more closely into the other part.
+It makes sense to define can_set_direct_map to false for arches that don't
+support set_direct_map. 
 
-
+-- 
+Sincerely yours,
+Mike.
 
