@@ -1,140 +1,149 @@
-Return-Path: <kvm+bounces-62481-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62482-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50904C44DB3
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 04:45:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E84DEC44ED4
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 05:44:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1606C188D6AA
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 03:46:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E253D3AF649
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 04:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27D3288505;
-	Mon, 10 Nov 2025 03:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56AB428F948;
+	Mon, 10 Nov 2025 04:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zFDFB6tZ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="s7WkGRgT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C72D21CFFD
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 03:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAA28F7D;
+	Mon, 10 Nov 2025 04:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762746332; cv=none; b=ti/GGjKmbBdoKe7V2fQi7TU34NUz/eS3sDp0wHMHmUgOvCBjVa+nDNaHEC+FnHzBm4Dq4kKPZoI/8c+cPGu1N0FbzOngmDcmFA9dU1vG3oo1G23JZm8LwriG7IBukKsnaDTf3nCWWqnu/V3azIm+u08a7bIz66mpk2Bey0xiMEk=
+	t=1762749868; cv=none; b=hI96WEmzu46JyWPBCACN28SfugmX8HRowi0XXhCtRDkMWvQ2BQJmHJfnAGNAbbhPvdD1s1CoCznY3KtLChWrjmAM3dAdK+IgVCvEmWF4hgCa0WNa87Gv8QMAvTNpjtlafnrn5UWJvu5mid/qlGfCT8Hv2EfXQrCil2IGozDxg/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762746332; c=relaxed/simple;
-	bh=bEaPGuay/6gbRMrtAIFDUCiDY7Ufhk5Da+3wjvGIHDY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R2NMR3isQI1qGNp1Q5E3Ok4MyJnUZvtOWX3HfVmMXgqAP/kul9LCvSQiNPpvWKP41Z0dl2Zhx2fjRhNKsgQ7ZmcDMPW6jX0TPMGoMqL44J+fUF46Ze9kEuJq2o5Txu0Q5mlo60PfRXnPM7Dlj5q8NiCfZEqWnF6FGl6QrN2S/Rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zFDFB6tZ; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4edb8d6e98aso126631cf.0
-        for <kvm@vger.kernel.org>; Sun, 09 Nov 2025 19:45:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762746330; x=1763351130; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pO1+WA3Lo3SzoRELtMhVMVFvpwqIDn7YXcebJoNLSSY=;
-        b=zFDFB6tZaZ8KYrihoBtwGml6HUUIMCBVWgUdlNFfJf4I/DyNn3S0bheMyLituYhUQf
-         pYTNV0GlxiGYyQvqfLADL26ussAsRb0X4Q9rBKD+nZo8AOU/9YjKT0Y1ZKlPwzx9MVtw
-         qdSwUB2giX/EDhLUxo7VIJn+eZ71VCFvMDAa2j8gTu+M7cB5YxLbw/kou/Plre9B+FgC
-         LTSBj68HsIos+Sd6asp0XfMgJRrVbbTmiYWmzwqgqyFHEVF98s87mA0EZ0cGIN67AeLz
-         1iBkq9gjho3p2vgXVIMk8F/f4SzQv7G28JOAZhEyJA5l4GUmKoleWw2xYBuhbuA/9iD6
-         cXMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762746330; x=1763351130;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pO1+WA3Lo3SzoRELtMhVMVFvpwqIDn7YXcebJoNLSSY=;
-        b=sO3khPJqMcYaGyeRLYCIbxd0XQ1q03neQyR3rkbhkpaytkS521dmEEoTESP+Y/sllj
-         /MXe4Y5KvjCTOPMtzQfgKJ2Nyq7wved6sR9d2Ra5cCCAM2KNDTiBaA2AHZV/cRNhhYAA
-         vayC5gRGkzcAePhheA3tmB1Qp9Ncfc1OfcZ94+KuMpIdgtUZYSF7sXHda18OBxK4y2mS
-         R23MPnKV0SlGw2Kx7V1BrdVxg1Dy9sVlZcyrF2uy3KHQC7l2zyHjXpinHf0TVMHF8KHb
-         +5iUOXdxVOb/dbwM/EOacPnm3VvOdItuiaeI3CW0EsS7o9+h74Z67djFVnw4CqVCYyR1
-         Fz7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWqzh61NJ8NxmO98GbbfPepwQVn3BCUnHXtyKtcy0JEyNjKaS9hpY86zpMGTot5cDkcQVY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yza9SX2Cwnbe+16ZBK4T3xJmkIFGU8wEhKKOj+RFoyut809XgD8
-	VjWbmLZFzAfZfPngQlyDcE0jBd3txNyJo3tXGm9/kfOEstkHMkS7zxBKUFkkzoYV5wgCKGW4n01
-	+Jk/Sl8Z6VDle35fDH0bWwp7IscM8asgph9a06gc3
-X-Gm-Gg: ASbGncuas5Yjfhv80lH+QlVwdZJY+LOJT7Q78Th1zdo9jrlo8YiqJdrYq/8zHhh4H07
-	cuf1lE91pGQLjlTxGFrv60ZNl5eG06nUyxahmu25fG44Lba3nA1EF+0N5UFvITtABC5V/yXgdbq
-	QPVQdRWKecLJEZFNFtGoMlbdldBrvx5gqEVwuU4ew/1L27+pTL1ATMtJD38pbGuGKG5Fz25ysDL
-	aTlTXEMYfKpIm0MowbMZebdhZv1j+gjKeGJ/GO1PkUR9n++q+29E6KwQd+WQeokXceU6XJ3jH6v
-	TFQ5d8G2DV1ZqMcigq2CkjRQEuGR/g==
-X-Google-Smtp-Source: AGHT+IHkI5YsbFxyyS82tj2X9LN/0dzwhUDZCyTzbn8FGecyGYjxBiFXH5j3XoKfpwvhov2NCgV4EVJFZmr2eVlcJks=
-X-Received: by 2002:ac8:57d3:0:b0:4e8:b245:fba0 with SMTP id
- d75a77b69052e-4eda4e8cc1emr11941391cf.14.1762746330092; Sun, 09 Nov 2025
- 19:45:30 -0800 (PST)
+	s=arc-20240116; t=1762749868; c=relaxed/simple;
+	bh=Wg1BQVZmTgBecIjkx8wabSuTRo5FSqplDgtolJxTVPk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QaBbzRNN4hIESzFY6Tof3T/p/ec958RoAbtoL2G+BnokGDaSK/g07HhPGbjMrReLC8RWt1yOHvYkopUWgFXmUS/Qcy/Frf+6cjuM30elocdpG+oACsZ+CGvJ3sI/i7ZuWkHWpJZTqCQBV74fnbfer1k4JtDUoYRBFwM6kWY36xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=s7WkGRgT; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A9JNDLh019381;
+	Mon, 10 Nov 2025 04:44:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=iLOa2c00F111K6/ewY+KuYeVS5jPBT
+	xjJdw+OjbJPXs=; b=s7WkGRgTYVUdso/+OntinDJ4LtLMswECC+RqhZfECdeQDC
+	u3yfAWcTgDP3GWo+n9UMncQ+6dwvPymntm+Dde00nfKnKI5InEYt8F7rMjdfZv8Y
+	ApzuDSQ7i54q/LfnCGrtR9BmwFBWuRgQoy5sHFmN4o7PhBrUeZ+jTefrVd8TvQpC
+	qK1Sy4O/+3W4SXSYRPk0c9tUx5Agj6mK89+aFXXymGAT/d3F7mvvegnBkgg6hqTu
+	KrTnJ0/2mLFiIMmKusHJTJfQAYZWZlTKNkszF9ncMQ7FojzAWCRFRd4NtrUR3u8o
+	G0dnvfgeBijU3NzVECssDbFPZIq+JkGut4fQPf4g==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5tjmer7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Nov 2025 04:44:21 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5AA4fxK1023851;
+	Mon, 10 Nov 2025 04:44:21 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5tjmer6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Nov 2025 04:44:21 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A9NJJ15011605;
+	Mon, 10 Nov 2025 04:44:20 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aajw13m84-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Nov 2025 04:44:18 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AA4iExJ61341968
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 10 Nov 2025 04:44:15 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D810D20043;
+	Mon, 10 Nov 2025 04:44:14 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A124F20040;
+	Mon, 10 Nov 2025 04:44:13 +0000 (GMT)
+Received: from mac.in.ibm.com (unknown [9.43.55.27])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 10 Nov 2025 04:44:13 +0000 (GMT)
+Date: Mon, 10 Nov 2025 10:14:08 +0530
+From: Amit Machhiwal <amachhiw@linux.ibm.com>
+To: Gautam Menghani <gautam@linux.ibm.com>
+Cc: maddy@linux.ibm.com, npiggin@gmail.com, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] MAINTAINERS : Add myself as reviewer for PPC KVM
+Message-ID: <20251110101329.ec2380a2-c0-amachhiw@linux.ibm.com>
+Mail-Followup-To: Gautam Menghani <gautam@linux.ibm.com>, 
+	maddy@linux.ibm.com, npiggin@gmail.com, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251103094243.57593-1-gautam@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251008232531.1152035-1-dmatlack@google.com> <20251008232531.1152035-3-dmatlack@google.com>
-In-Reply-To: <20251008232531.1152035-3-dmatlack@google.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 10 Nov 2025 09:15:18 +0530
-X-Gm-Features: AWmQ_bkpnxbMBI97zxsCaCAoaAd2gGCuZUFH_hhBv2_QmN9jUVMGOfF04SoZg5c
-Message-ID: <CAJHc60yVqHHVjX2_oGVUBfBatFom-7-d3q9_uwgHy=-dSS4xNg@mail.gmail.com>
-Subject: Re: [PATCH 02/12] vfio: selftests: Allow passing multiple BDFs on the
- command line
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251103094243.57593-1-gautam@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: xlrIlckMt4y5ynY84qLoBuCmi1S9PTM4
+X-Proofpoint-ORIG-GUID: TbGYaeb4lm2bDUaIRysIET2x0FmuPnzT
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA5OSBTYWx0ZWRfX285U4tSFwe4P
+ txlWA1vHP42EKGgLrAkoPVhPMLUHm+EhCViZrkzEYleX+dhc3XfO5/DHlWfhDiKGMuXs32EHyXK
+ vdfpex+5FoXF/0Hlor//5Lctr+HyxOfMarHccxI8QWUFDfegyDmp/otdeSjNxZEUvu1oxs/1rsN
+ Db84NOtK5XqPMQ21FXd+Nk81owJK7lPa8X3ugN/HX4EcqwXw4kYtgQRiFFYHvv5IfHTvC/RF4lN
+ cRRuKLboDCD6vCwo0a7pkINdTPAtMXF+wmOIibIm0vt8Wr8mTnZVMdb6Gvqd0nJUKbtoYuB3c7z
+ pX4IIr8RAXZwAtmPd2fTlJpDw7ilCOKN2Gaan6H3vQcR/XcTfIEgR7bJSyvpsGMO1GOTQwA6PT0
+ +zsGaJJTc4t7T4UREiO1LF6CTdSX7g==
+X-Authority-Analysis: v=2.4 cv=V6xwEOni c=1 sm=1 tr=0 ts=69116da5 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VnNF1IyMAAAA:8 a=pGLkceISAAAA:8 a=voM4FWlXAAAA:8 a=VwQbUJbxAAAA:8
+ a=tdM2vFJyyvqnMuV-wiAA:9 a=CjuIK1q_8ugA:10 a=IC2XNlieTeVoXbcui8wp:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-10_01,2025-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 lowpriorityscore=0 adultscore=0 malwarescore=0 impostorscore=0
+ suspectscore=0 priorityscore=1501 phishscore=0 bulkscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080099
 
-On Thu, Oct 9, 2025 at 4:56=E2=80=AFAM David Matlack <dmatlack@google.com> =
-wrote:
-> -const char *vfio_selftests_get_bdf(int *argc, char *argv[])
-> +static char **vfio_selftests_get_bdfs_cmdline(int *argc, char *argv[], i=
-nt *nr_bdfs)
->  {
-> -       char *bdf;
-> +       int i;
-> +
-> +       for (i =3D *argc - 1; i > 0 && is_bdf(argv[i]); i--)
-> +               continue;
-> +
-> +       i++;
-> +       *nr_bdfs =3D *argc - i;
-> +       *argc -=3D *nr_bdfs;
-Just curious, why update 'argc' (I know we had this before as well)?
+On 2025/11/03 03:12 PM, Gautam Menghani wrote:
+> I have been contributing to PPC KVM for sometime now and would like to get
+> notified of incoming changes to help with code reviews as well.
+> 
+> Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
 
-> +
-> +       return *nr_bdfs ? &argv[i] : NULL;
-> +}
->
-> -       if (*argc > 1 && is_bdf(argv[*argc - 1]))
-> -               return argv[--(*argc)];
-> +static char **vfio_selftests_get_bdfs_env(int *argc, char *argv[], int *=
-nr_bdfs)
-> +{
-> +       static char *bdf;
->
->         bdf =3D getenv("VFIO_SELFTESTS_BDF");
-> -       if (bdf) {
-> -               VFIO_ASSERT_TRUE(is_bdf(bdf), "Invalid BDF: %s\n", bdf);
-> -               return bdf;
-> -       }
-> +       if (!bdf)
-> +               return NULL;
-> +
-> +       *nr_bdfs =3D 1;
-> +       VFIO_ASSERT_TRUE(is_bdf(bdf), "Invalid BDF: %s\n", bdf);
-> +
-> +       return &bdf;
-> +}
-nit: Since vfio_selftests_get_bdfs_env() still returns a single BDF,
-perhaps add a comment, as it contradicts the plurality in the
-function's name?
+Reviewed-by: Amit Machhiwal <amachhiw@linux.ibm.com>
 
-Thank you.
-Raghavendra
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 46bd8e033042..3f2f60486222 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -13701,6 +13701,7 @@ F:	arch/mips/kvm/
+>  KERNEL VIRTUAL MACHINE FOR POWERPC (KVM/powerpc)
+>  M:	Madhavan Srinivasan <maddy@linux.ibm.com>
+>  R:	Nicholas Piggin <npiggin@gmail.com>
+> +R:	Gautam Menghani <gautam@linux.ibm.com>
+>  L:	linuxppc-dev@lists.ozlabs.org
+>  L:	kvm@vger.kernel.org
+>  S:	Maintained (Book3S 64-bit HV)
+> -- 
+> 2.51.0
+> 
+> 
 
