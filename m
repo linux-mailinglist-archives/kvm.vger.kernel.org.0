@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-62472-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62473-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FF05C44D59
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 04:33:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6AFCC44D5C
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 04:33:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 097BD4E5DC3
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 03:33:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A4EB44E61F1
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 03:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57BA3285045;
-	Mon, 10 Nov 2025 03:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D5692882A1;
+	Mon, 10 Nov 2025 03:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FPQTIbZA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8dnngHt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1161A2868A6
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 03:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E1D287508
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 03:32:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762745568; cv=none; b=lEjzSQGwHgVuQi+Ywq62MuvfK57ir2CpYad8IOMtqB9MTci6UQIs34650ZZVpQ4RgiYfIcgJvG26YE/9l+dI9OzunlwJzS7kylonqHRRoehPt182AgjaL43NaNhiv4B+YL78WzfCxV+46ptn83Vt51O1fozZOx5NPwsOgxYmWCw=
+	t=1762745572; cv=none; b=N1UNJGyH6R6oJS47ivPQFZoSuDTI+nONE2+7+AQDRih2lGcj0+UFE/KcWpi1Zbh5SkCqeEKUZmjbUorUJFzSLQL4k79U4sBRLaF00/lAiDhq2V2yydlUjS3QPDWdJcuR+XvbRVGUiE8XDtaoRpY9uPlv14dV4yM5no8sWnU+zBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762745568; c=relaxed/simple;
-	bh=wbPUX9n8s+drIAX87sNapw/D2lFZMgm0X/R+CGmmVxQ=;
+	s=arc-20240116; t=1762745572; c=relaxed/simple;
+	bh=/Sbi2RsDbKFxh18qy4P7m0nH9/yJnCUGEiCikFyDTJk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UxLzAYIMa5+KdwDuC/r9VWG8HPV23x6C+yAocfVfZtcoWpJU6vOeN+WYtu5auWgMEbm/mO67SKRlz8X00B/czgKbKxX/5hYgNv+VuDFI5sObYvGyE6/gDgyLeGdLiGm7fG+eu3P8ZEeYNp9bka6YzBcHOVzE3i2v4vEKvma0eAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FPQTIbZA; arc=none smtp.client-ip=209.85.210.179
+	 MIME-Version; b=pKoQKqE9sJIII8QeDPSL7gdc8KvRkuOkHdme3soeiOJqgqKsh70Zi8tDiOk0Bel814MZ+YL9zisx6yGFez11PBQrXKC0XvW5xRTkZ7iCKcqqK3Ao8V0ODDZIKgGpsf6vYlE3zIyGlLJswC5lbwIRPK7agitOyJOoGaYY8xOQMEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z8dnngHt; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7ade456b6abso2089613b3a.3
-        for <kvm@vger.kernel.org>; Sun, 09 Nov 2025 19:32:46 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-29599f08202so32695795ad.3
+        for <kvm@vger.kernel.org>; Sun, 09 Nov 2025 19:32:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762745566; x=1763350366; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762745570; x=1763350370; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=njeTN44gIUPeOIH83iq5dF5dVqD8fgi+Xi9oci3U0Kg=;
-        b=FPQTIbZAU1KO4n4qkSJRdtbpnVcVh4X9XvM+TfIrdyedQg+cXHzXzio/JZSoehhzLl
-         pA/P2XXEYUVburC1LW70vu/7t6XLBQlr75RL45YAmu6oGQGAu5lAgqpTp5b/0uWg7a30
-         MDMxF6wozDPnmFXmMwACXnq2WrSK+bGbRO5OWeXo1Mj7eq0Wlz8T5gj2VuHWDBObsIfC
-         RN3Ap3YvIT3UokXZe9eU0+9DvLKLpoqgHZDbs0KT6H0Q6o+wEpzdrf3EpDrGXWw2MdXv
-         3REACQG68ndVt9HuJRE0jeYSbB5HzfVnpp4FTN4HvFgccOgi8tLVBoi/MpWZAU5BmTlp
-         GraQ==
+        bh=mJ2T78O7RQhMqXnI5opkr+3j7nLw8GADo232iLhnq+M=;
+        b=Z8dnngHt/b5aMUY9WnaF+GYgDuxVtosMTTkzSJ+9CRgjsgwtAjHtJ56ZJDVfM7Pb01
+         X2FPrOqHu+midWrOugGwvT3a2VcHqXSNi+YWkYmiAGgrAUKnDO9UqCrNb3sYViOlYGju
+         KPuj/1p6cSUp+Z8AOxC1DyJXV4UJsj0+Ur+lxtmbV/mjEtMk8iOd+ZBCR1px9als/aao
+         F0RjxJh7oerqXtNS8wGyQXTeRqLPBJsYZmbHahE/n4u8AGK7+uY/GpHz4eilqihvOAdC
+         KNGtYwkonic8LMn45PTiBVhyrVYMbXKxqY7xn4p3FhJNDs8eJ56f1nFq7VipI5sDn10E
+         gK3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762745566; x=1763350366;
+        d=1e100.net; s=20230601; t=1762745570; x=1763350370;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=njeTN44gIUPeOIH83iq5dF5dVqD8fgi+Xi9oci3U0Kg=;
-        b=WjY5h5E5xwuzfGlkm+aYY5WICGR+j/d+5/msqJAXygbkA2bOQPjlHjKjvT/75/1751
-         u0QApUy4B8OOl/pGJHjIUg0SzJwCIZ0YH4cjIFr8/+4yY6lvJszWZb4K7AWt8fjqNuK+
-         oMR/IHVPVr/qa7Mr3XB56s0nMFlKlU/Iv5ruu0yStCDakbwI6WO7dgLChqLxcamAhFXb
-         VScWa+pkmtCmfWFU0SVjYHVzbZ+ohR8l2/idrj6NVB/0yX3BeUQQem1kwPu+4M66Tb84
-         QsiLVrqZ5GokfF+k+Z+m+vU+9ZvROzcaMeGahebf2YcmMMhTjEuh017O5BjDBSM2g7Sv
-         hf0w==
-X-Forwarded-Encrypted: i=1; AJvYcCV1MRM+0qZT79/TsEtzg9pVF41wr7aqz9TWVSXdT4xPG9UovDhprjkMPjtU+Y9LXJ0vQu8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxENFoc0jTEWLtOBDED6gb6If2G4wv369jlD47hLWxkb5yqabZd
-	4frb05H+ibmN7SVoPvuEbgT377k/vcetYsIQxu/WOhKTZQ7cAtd9AG/x
-X-Gm-Gg: ASbGncsy8Xypkc6ZMCGjrtczK1LGgmnb2Hwve22ffc33xIhbgRyDomVPzsFk5fAVeOO
-	6dPRhokl17MvPQcTSq9+FgUSMVRRKBkaGFRe63qvGHZQUc0WHeIeP3Ym8/h9gSGGUHdDXdsfy31
-	70vi/e7sJERUtFao2FVFT/iRoLfbvOS2kIZtHFsgK5hW0Ab2kfAFrHTt0cL3NzgkqVqakk5rkdM
-	XGKyyZtageMtSHLVzqdBeFc45sMj2ZtxAV+GHner49dlk3ZDYUUARE2QWu6KdRSr5ly3vppr7ft
-	RgR5JmmX/iQ/n/qXWT/x9vnLAhtKP90xGm1FP6+G4ph6UWv6t3LaJKvvZzh7W9l7sRaHIEaijWn
-	kGvbiT20Pf0vmEVRopqxby22Enck3R7YX8z5TD6PmgRmmVSlJljuyTDMJ8IDiFRISIqRSaTdEog
-	==
-X-Google-Smtp-Source: AGHT+IGgWj+riHl/0AxPM6/yf+3pf97HB4xt0VxRxXs/RO4msxXfu/kysFJz978Pl0ItdGF8SGUj7A==
-X-Received: by 2002:a05:6a20:3d82:b0:342:a7cd:9214 with SMTP id adf61e73a8af0-353a20d6c44mr9577178637.23.1762745566383;
-        Sun, 09 Nov 2025 19:32:46 -0800 (PST)
+        bh=mJ2T78O7RQhMqXnI5opkr+3j7nLw8GADo232iLhnq+M=;
+        b=rIvQjaoL4Ti6INNCYoPjMopx1/Lp6a5w1vjPsO1G1fCjiyQ/g8x4XvDzA/LE+7e0jZ
+         Ug+JQFtX3QcsXz1874BU13pxeLXofy4FXa7FUV2cAV+b0MfGz1wPyaL8wMVdXsk3VMlZ
+         dSbCU1pe8PJHzWzrhTtb4Oe87Qc+X6QlU4Jfw/GGJh/R2BRz0ANwnFdA4sv7cXmQDx3/
+         6MkJ/2uRmUoI3PhubE60I6H15TVwls35MOF68drlQ7QOwMZKBKw5roPeuY368OqznyQc
+         vmypjqGekz1YXwj0LJAgbetx84DWRv4ASUeUc74kovx+qG43CfZSAtGYmlLclvPLl64V
+         WwxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUXB/tEndk2BoSQT6nEC3V6NN8jw0irvpUA9hUj+QVGn4SBDz1RFQn9N1Bv1dMOoYdLbl4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/CFa/fMBUEC0Im3c5li+Cu9DT2AfhU7nMCihU7O4mm3tyXyO9
+	zyB6zfQGmnfeXlD4JXLmQUQNi831gd403G3WwBG0aJr5BU6xplBcNXcv
+X-Gm-Gg: ASbGncsamKB50w9w/kSdFgnEBvT1bn7JK2FkK6lHBDpfaAyf2V4/tXZECu/tifsz4+2
+	/zc8uGMi5c4ZWiDVD0iKRXFXy/YK+utFkq3LZWvM54d+ejkxhDgGw/mmgosURiPBgyF0FIfqi1c
+	xVV/G7VRSCcBN/wJgdw/d63NDAr6j0hMOFGyRLBRcrMWtu8ZT/8Qk0OzyZcnqdM/NTJxwLu7E/9
+	hjy2r7dwF7Nh16EMIOzaAlq7LUKAvWSuGA0BHnrW1FNDy7iHuyTbGvusPRtzNpjkxMDvwc4kppS
+	gmSL6gKLZ+Mx23O52crOwHYMkTa9k07ZQ9EUxUy+eLj1aMjvuFCyFxZP8/r/jpFZkjg3XcXtOYb
+	STAMJbKo11Q8b1aDkvCiwje76ARQwoQlN8ENCfBmh3zAalnizBsj25VAgsvS02ksFIdo+SwmgJe
+	ePilALgUcZ
+X-Google-Smtp-Source: AGHT+IH8IURFUXv0dHkJ6ZHGGTBAvnY0vbnOOUIKPpXB78BdN5c4T+GwBYMwLuqJLnGxvgOdporgtA==
+X-Received: by 2002:a17:903:f8c:b0:26c:2e56:ec27 with SMTP id d9443c01a7336-297e5627d67mr89334695ad.19.1762745570152;
+        Sun, 09 Nov 2025 19:32:50 -0800 (PST)
 Received: from wanpengli.. ([124.93.80.37])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-ba900fa571esm10913877a12.26.2025.11.09.19.32.42
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-ba900fa571esm10913877a12.26.2025.11.09.19.32.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Nov 2025 19:32:46 -0800 (PST)
+        Sun, 09 Nov 2025 19:32:49 -0800 (PST)
 From: Wanpeng Li <kernellwp@gmail.com>
 To: Peter Zijlstra <peterz@infradead.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -86,9 +86,9 @@ Cc: Steven Rostedt <rostedt@goodmis.org>,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	Wanpeng Li <wanpengli@tencent.com>
-Subject: [PATCH 02/10] sched/fair: Add rate-limiting and validation helpers
-Date: Mon, 10 Nov 2025 11:32:23 +0800
-Message-ID: <20251110033232.12538-3-kernellwp@gmail.com>
+Subject: [PATCH 03/10] sched/fair: Add cgroup LCA finder for hierarchical yield
+Date: Mon, 10 Nov 2025 11:32:24 +0800
+Message-ID: <20251110033232.12538-4-kernellwp@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251110033232.12538-1-kernellwp@gmail.com>
 References: <20251110033232.12538-1-kernellwp@gmail.com>
@@ -104,100 +104,93 @@ From: Wanpeng Li <wanpengli@tencent.com>
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-Implement core safety mechanisms for yield deboost operations.
+Implement yield_deboost_find_lca() to locate the lowest common ancestor
+(LCA) in the cgroup hierarchy for EEVDF-aware yield operations.
 
-Add yield_deboost_rate_limit() for high-frequency gating to prevent
-excessive overhead on compute-intensive workloads. Use 6ms threshold
-with lockless READ_ONCE/WRITE_ONCE to minimize cache line contention
-while providing effective rate limiting.
+The LCA represents the appropriate hierarchy level where vruntime
+adjustments should be applied to ensure fairness is maintained across
+cgroup boundaries. This is critical for virtualization workloads where
+vCPUs may be organized in nested cgroups.
 
-Add yield_deboost_validate_tasks() for comprehensive validation
-ensuring feature is enabled via sysctl, both tasks are valid and
-distinct, both belong to fair_sched_class, entities are on the same
-runqueue, and tasks are runnable.
+For CONFIG_FAIR_GROUP_SCHED, walk up both entity hierarchies by
+aligning depths, then ascend together until a common cfs_rq is found.
+For flat hierarchy, verify both entities share the same cfs_rq.
+Validate that meaningful contention exists (nr_queued > 1) and ensure
+the yielding entity has non-zero slice for safe penalty calculation.
 
-The rate limiter prevents pathological high-frequency cases while
-validation ensures only appropriate task pairs proceed. Both functions
-are static and will be integrated in subsequent patches.
+The function operates under rq->lock protection. This static helper
+will be integrated in subsequent patches.
 
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- kernel/sched/fair.c | 68 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+ kernel/sched/fair.c | 60 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 5b7fcc86ccff..a7dc21c2dbdb 100644
+index a7dc21c2dbdb..740c002b8f1c 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
-@@ -8990,6 +8990,74 @@ static void put_prev_task_fair(struct rq *rq, struct task_struct *prev, struct t
- 	}
+@@ -9058,6 +9058,66 @@ static bool __maybe_unused yield_deboost_validate_tasks(struct rq *rq, struct ta
+ 	return true;
  }
  
 +/*
-+ * High-frequency yield gating to reduce overhead on compute-intensive workloads.
-+ * Returns true if the yield should be skipped due to frequency limits.
-+ *
-+ * Optimized: single threshold with READ_ONCE/WRITE_ONCE, refresh timestamp on every call.
++ * Find the lowest common ancestor (LCA) in the cgroup hierarchy for EEVDF.
++ * We walk up both entity hierarchies under rq->lock protection.
++ * Task migration requires task_rq_lock, ensuring parent chains remain stable.
++ * We locate the first common cfs_rq where both entities coexist, representing
++ * the appropriate level for vruntime adjustments and EEVDF field updates
++ * (deadline, vlag) to maintain scheduler consistency.
 + */
-+static bool yield_deboost_rate_limit(struct rq *rq, u64 now_ns)
++static bool __maybe_unused yield_deboost_find_lca(struct sched_entity *se_y, struct sched_entity *se_t,
++				    struct sched_entity **se_y_lca_out,
++				    struct sched_entity **se_t_lca_out,
++				    struct cfs_rq **cfs_rq_common_out)
 +{
-+	u64 last = READ_ONCE(rq->yield_deboost_last_time_ns);
-+	bool limited = false;
++	struct sched_entity *se_y_lca, *se_t_lca;
++	struct cfs_rq *cfs_rq_common;
 +
-+	if (last) {
-+		u64 delta = now_ns - last;
-+		limited = (delta <= 6000ULL * NSEC_PER_USEC);
++#ifdef CONFIG_FAIR_GROUP_SCHED
++	se_t_lca = se_t;
++	se_y_lca = se_y;
++
++	while (se_t_lca && se_y_lca && se_t_lca->depth != se_y_lca->depth) {
++		if (se_t_lca->depth > se_y_lca->depth)
++			se_t_lca = se_t_lca->parent;
++		else
++			se_y_lca = se_y_lca->parent;
 +	}
 +
-+	WRITE_ONCE(rq->yield_deboost_last_time_ns, now_ns);
-+	return limited;
-+}
++	while (se_t_lca && se_y_lca) {
++		if (cfs_rq_of(se_t_lca) == cfs_rq_of(se_y_lca)) {
++			cfs_rq_common = cfs_rq_of(se_t_lca);
++			goto found_lca;
++		}
++		se_t_lca = se_t_lca->parent;
++		se_y_lca = se_y_lca->parent;
++	}
++	return false;
++#else
++	if (cfs_rq_of(se_y) != cfs_rq_of(se_t))
++		return false;
++	cfs_rq_common = cfs_rq_of(se_y);
++	se_y_lca = se_y;
++	se_t_lca = se_t;
++#endif
 +
-+/*
-+ * Validate tasks and basic parameters for yield deboost operation.
-+ * Performs comprehensive safety checks including feature enablement,
-+ * NULL pointer validation, task state verification, and same-rq requirement.
-+ * Returns false with appropriate debug logging if any validation fails,
-+ * ensuring only safe and meaningful yield operations proceed.
-+ */
-+static bool __maybe_unused yield_deboost_validate_tasks(struct rq *rq, struct task_struct *p_target,
-+					  struct task_struct **p_yielding_out,
-+					  struct sched_entity **se_y_out,
-+					  struct sched_entity **se_t_out)
-+{
-+	struct task_struct *p_yielding;
-+	struct sched_entity *se_y, *se_t;
-+	u64 now_ns;
-+
-+	if (!sysctl_sched_vcpu_debooster_enabled)
++found_lca:
++	if (!se_y_lca || !se_t_lca)
 +		return false;
 +
-+	if (!rq || !p_target)
++	if (cfs_rq_common->nr_queued <= 1)
 +		return false;
 +
-+	now_ns = rq->clock;
-+
-+	if (yield_deboost_rate_limit(rq, now_ns))
++	if (!se_y_lca->slice)
 +		return false;
 +
-+	p_yielding = rq->curr;
-+	if (!p_yielding || p_yielding == p_target ||
-+	    p_target->sched_class != &fair_sched_class ||
-+	    p_yielding->sched_class != &fair_sched_class)
-+		return false;
-+
-+	se_y = &p_yielding->se;
-+	se_t = &p_target->se;
-+
-+	if (!se_t || !se_y || !se_t->on_rq || !se_y->on_rq)
-+		return false;
-+
-+	if (task_rq(p_yielding) != rq || task_rq(p_target) != rq)
-+		return false;
-+
-+	*p_yielding_out = p_yielding;
-+	*se_y_out = se_y;
-+	*se_t_out = se_t;
++	*se_y_lca_out = se_y_lca;
++	*se_t_lca_out = se_t_lca;
++	*cfs_rq_common_out = cfs_rq_common;
 +	return true;
 +}
 +
