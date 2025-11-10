@@ -1,110 +1,135 @@
-Return-Path: <kvm+bounces-62511-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62512-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4495CC471F3
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:15:36 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD8B4C4734C
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:30:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9723189379D
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 14:16:00 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7A25B349B1F
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 14:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE35830EF7D;
-	Mon, 10 Nov 2025 14:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46B9313542;
+	Mon, 10 Nov 2025 14:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GA42ph7s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JDxgyhIW"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB6722FDEC;
-	Mon, 10 Nov 2025 14:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52D8312813;
+	Mon, 10 Nov 2025 14:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762784131; cv=none; b=a7Q/GEuiXUVaFU1Kr2ckRV6t35rHIitYxijE/FfT0XQODFryVi3ZrMh8NfPE3NYKyetdsXTN+ZOXFBXwsG/5GW/rexpDpXNIX4ThYXxASNPXd5mygfxlu3oEUIWZ5NnXSZZCC1JSnHErLuB5dzAOk8BoEwJBRrKP9YQ8uXHHs1o=
+	t=1762784950; cv=none; b=E8XvkZGDIQ04X10mBH0LstsAnvDNoxJJ5lI6+CPpp2h+8KFy0UQztkcZBmrbiFfSvu/fmaH128oeV1Rsj+An7puOnnoQJ0DCjZHUByjwLB6NLEMLPjfJUqqPCH7hovbKWyj71/J2kENbUEFX70GcWV84xNH+mANmW94JC3DQYWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762784131; c=relaxed/simple;
-	bh=Zjtpe0PcMapcWqqZkDdW+4o/kiPNnUphphvNHXelxIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=elQnFZfrTGbF9OAhZHzkeqL8nYfHRhC61UhXQL/LTI9eGB/dfr5ZcKNbwCobBT5+uVWiyBGhnwRdH1RTL2UXTBTtsNFje8ZBso33M88YVdUq7Hb8B+8BYhTwIvpjTwFeiotNG7JFxlls6MkXIVYQEimf50GAaSmo9EnhtB7p/AU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GA42ph7s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6A5AC16AAE;
-	Mon, 10 Nov 2025 14:15:29 +0000 (UTC)
+	s=arc-20240116; t=1762784950; c=relaxed/simple;
+	bh=T+QKJlyYpK0J8p8YQ+LHF05Ncc6rQkcMI/cu/2kofT8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kfz4Lk6zK38XnkKE96HAYCG33tRh/lekBc48zzq1FkYIFy0F404F6mvXJ35Bp6FiXJdj0jVuPmiiIffPsZwzOunSxEcj+MUoFGp/sYqE5nElBbP/y2OGbM7S+cz/RjEpoRXIZw+N4wpG33gKl/OYEQTRbbqnHNWqhEovMaB6oTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JDxgyhIW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50D37C116B1;
+	Mon, 10 Nov 2025 14:29:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762784130;
-	bh=Zjtpe0PcMapcWqqZkDdW+4o/kiPNnUphphvNHXelxIQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GA42ph7s2s7+Yl7kwe6WfC59VTGLEboLESGwJyU1V1aigA81vgr0GaSEHqSq7Vzou
-	 aOjGL/skU+9gr0wuCZMkj+dYY/k99CGv8IbvjRMfgDJMAQcpafQ4rwxR0DskeKbd3c
-	 k/bly5tjvA0+25B5Klj3vQzAF4hK2DyU+2f8gFGIOiQSJa4fbeNo8UKuG4+32R8DA5
-	 iSkb4zzDc1K0xysjIYCXJNR1NgLDu7br3jUdOPz2AKgTblQFRc9GFLk5pVh9C81U4K
-	 6AgVr8+MQWs+dUxApCQXJAdol1IPGOCqnjX1DZb1UwVGbi1l6ib1pncC4w5c1ntAiz
-	 4kwn8cI0TPScQ==
-Date: Mon, 10 Nov 2025 14:15:27 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	s=k20201202; t=1762784948;
+	bh=T+QKJlyYpK0J8p8YQ+LHF05Ncc6rQkcMI/cu/2kofT8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JDxgyhIWYi/CK6nSh01oC00hRc42uvHtxEdFb1w55s8HmwJVAJi0MrACPJN7B6WXE
+	 m/nngJVqxuLo3/ye4pMb2F/sFScT1aYf2AAiwjPG19irbVJiiNa+CpBLbBb1Ga/Hs0
+	 rmJ+pLqMHftYvpB1nGVu6NHuWDR7CEYqUcOWbA5JuXog+1cWwdG7AtGIamXgTTvBUE
+	 C56v1OjZe7R1G1J1KrEbnPP+UQdW+9BgenUT4LMsZPO7ILeNlVN1otISInhl8kZDCp
+	 AOanKAnBZcMyLZftb5UG04xpH06PhoQMCbdOVbE3KDoibxLnc4PAOHkJLWdHAlVzjh
+	 bX/8EwQDCIzOA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vIStG-00000003tLC-13Vz;
+	Mon, 10 Nov 2025 14:29:06 +0000
+Date: Mon, 10 Nov 2025 14:29:05 +0000
+Message-ID: <864ir2ufke.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Aishwarya.TCV@arm.com
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Limit clearing of
- ID_{AA64PFR0,PFR1}_EL1.GIC to userspace irqchip
-Message-ID: <aRHzf5wgJg5vSoKo@finisterre.sirena.org.uk>
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Aishwarya.TCV@arm.com
+Subject: Re: [PATCH v2 3/3] KVM: arm64: Limit clearing of ID_{AA64PFR0,PFR1}_EL1.GIC to userspace irqchip
+In-Reply-To: <aRHzf5wgJg5vSoKo@finisterre.sirena.org.uk>
 References: <20251030122707.2033690-1-maz@kernel.org>
- <20251030122707.2033690-4-maz@kernel.org>
- <aRHf6x5umkTYhYJ3@finisterre.sirena.org.uk>
- <865xbiuj6e.wl-maz@kernel.org>
+	<20251030122707.2033690-4-maz@kernel.org>
+	<aRHf6x5umkTYhYJ3@finisterre.sirena.org.uk>
+	<865xbiuj6e.wl-maz@kernel.org>
+	<aRHzf5wgJg5vSoKo@finisterre.sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nmuVcHVoFc1KSfwu"
-Content-Disposition: inline
-In-Reply-To: <865xbiuj6e.wl-maz@kernel.org>
-X-Cookie: You dialed 5483.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, Aishwarya.TCV@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+
+On Mon, 10 Nov 2025 14:15:27 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> On Mon, Nov 10, 2025 at 01:11:05PM +0000, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
+> 
+> > > Today's next/pending-fixes is showing regressions on a range of physical
+> > > arm64 platforms (including at least a bunch of A53 systems, an A55 one
+> > > and an A72 one) in the steal_time selftest which bisect to this patch.
+> > > We get asserts in the kernel on ID register sets:
+> 
+> > Please name the platforms this fails on. Here, on a sample of one A72
+> > box, I don't see the issue:
+> 
+> It looks like it's GICv2 that's affected - I'm seeing this on at least
+> Raspberry Pi 3B+ and 4, Pine 64 Plus and Libretech Potato, Solitude and
+> Tritum.  The platforms with GICv3 that I have results for (eg, the
+> Toradex Verdin i.MX8MP and Mallow AM625) all seem fine.
+
+Yeah, I just found out by exhuming the dusty dregs. As it turns out,
+this catches a pre-existing bug that wasn't noticed until we moved
+over to the standard accessors rather than bypassing them.
+
+The hack below fixes it for me on XGene.
+
+	M.
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 3bf7005258f07..19afcd833d6fa 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -5624,7 +5624,11 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
+ 
+ 	guard(mutex)(&kvm->arch.config_lock);
+ 
+-	if (!irqchip_in_kernel(kvm)) {
++	/*
++	 * This hacks into the ID registers, so only perform it when the
++	 * first vcpu runs, or the kvm_set_vm_id_reg() helper will scream.
++	 */
++	if (!irqchip_in_kernel(kvm) && !kvm_vm_has_ran_once(kvm)) {
+ 		u64 val;
+ 
+ 		val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
 
 
---nmuVcHVoFc1KSfwu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-On Mon, Nov 10, 2025 at 01:11:05PM +0000, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-
-> > Today's next/pending-fixes is showing regressions on a range of physical
-> > arm64 platforms (including at least a bunch of A53 systems, an A55 one
-> > and an A72 one) in the steal_time selftest which bisect to this patch.
-> > We get asserts in the kernel on ID register sets:
-
-> Please name the platforms this fails on. Here, on a sample of one A72
-> box, I don't see the issue:
-
-It looks like it's GICv2 that's affected - I'm seeing this on at least
-Raspberry Pi 3B+ and 4, Pine 64 Plus and Libretech Potato, Solitude and
-Tritum.  The platforms with GICv3 that I have results for (eg, the
-Toradex Verdin i.MX8MP and Mallow AM625) all seem fine.
-
---nmuVcHVoFc1KSfwu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmkR834ACgkQJNaLcl1U
-h9BOeQf9F0JppM6Dk5c7+DhSmGwO4/k/K/NN2DSDzXyrzdW9KWlMWhKIfk0uvhLD
-7Ne8pxY4YiamvsR/BgueeBbMum8BTfEZdT8nIkMdksIEDXrTTNz59bsDyqSw836z
-vvrIGpN1rtR8w61ptev/8jF9EDH3QQF+GkoRF6RFOW0rMMNMIN7EHciTVHcE2xBW
-T0Cf2fVgdYQAGNIs4j1dO3mmttXmQwNPeUAbasMw2qo8mw4kSqCGBhKO4mqvLBy4
-UQcK5zFxuf4S4gQCHTkBUHbiBReMvtgJJOV9wOA9+mK3KOwKC2+cuhVUfNl1s3zd
-Fs1H3D7kNPzDwNJl47kxXxHRqeQjHA==
-=/URp
------END PGP SIGNATURE-----
-
---nmuVcHVoFc1KSfwu--
+-- 
+Without deviation from the norm, progress is not possible.
 
