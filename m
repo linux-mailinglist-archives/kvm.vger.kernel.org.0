@@ -1,278 +1,308 @@
-Return-Path: <kvm+bounces-62491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62492-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DC34C452C5
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 08:09:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 977BAC45387
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 08:32:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 210D4346C39
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 07:09:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22C11188EA36
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 07:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004212EB5B4;
-	Mon, 10 Nov 2025 07:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0F32EBDEB;
+	Mon, 10 Nov 2025 07:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nRDeDB0v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TttXGVvk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422D52765F5;
-	Mon, 10 Nov 2025 07:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762758534; cv=fail; b=JTgt+EqyT85oUfQFIkyNWyuU2ombps0Qbnnc1+egQbSL4Ua/KyuMSDY7jxbWScUmv5Cdx72/uHw0nUyVrJggN1k7+kZSP2GPVcXUNdb0RCdulOk4pwyQnZsVZ1UstoklKmjdi6dKFrQJX2FdCs1snF9L/keAL1axw8tM5/DpE4o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762758534; c=relaxed/simple;
-	bh=weLQyT3EaGzgOXCoAuQksWFLwsIddYHOI7jKbIJHOJY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ATAtskyKQireEBHixlXTbf8c8OgzmsN7+2V9C3TWDDj14UvxcgSwBlN4QECe4cD6EA9RpBJrhXENBc/+XHGGUsV4adr+oEhlwvFUii1XcsCDhGjG0DXBtWmBiDHnHvZ+mZgJJwkzGoSHXVyUJPKIMgTp6JBfrx8XFmal8+bKqCc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nRDeDB0v; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762758532; x=1794294532;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=weLQyT3EaGzgOXCoAuQksWFLwsIddYHOI7jKbIJHOJY=;
-  b=nRDeDB0vaRHwpN0QY4X1KiG5lABaFjK3i2IrY5kfFIxx7oirF5LcYief
-   SigOTW4kl+Ve/jd0b8q3xdc0KQQ45UP9XEhd2uH5SL+39DIlSPUgdqjz6
-   AKjQgzctAhSIEwPpkLMgbcNZCA/aa7I7nObFBiJPm4H5KQk1Jr9Lj8F+8
-   bMpR5crpKhQfFu0jc7rJE48AFtK1eeTCKJx56TdWrLPVQSRF1ZDLtUk4w
-   nCtugrKGoly1B8R65NgwbeNwrS8WHiN45i5re8Ys8BntTfDHd7qBbXxKC
-   nEncmwPbpplpH77/r9jUas3hY7X9XgyNLvDhCA/IV43OEtV9YKa3Eo1HM
-   A==;
-X-CSE-ConnectionGUID: sRgNwNbyTweTSXI2OvsZUw==
-X-CSE-MsgGUID: lHo9n1vhSNeLXEeC+UUDIg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11608"; a="76256700"
-X-IronPort-AV: E=Sophos;i="6.19,293,1754982000"; 
-   d="scan'208";a="76256700"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2025 23:08:52 -0800
-X-CSE-ConnectionGUID: 6QiISvePQvqz6uK/cuaxDg==
-X-CSE-MsgGUID: paeM18FgQxqsa1tUXj2gHw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,293,1754982000"; 
-   d="scan'208";a="189322924"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2025 23:08:51 -0800
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Sun, 9 Nov 2025 23:08:50 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Sun, 9 Nov 2025 23:08:50 -0800
-Received: from CH1PR05CU001.outbound.protection.outlook.com (52.101.193.59) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Sun, 9 Nov 2025 23:08:50 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xTml2ivQWVUduxfeG39H/mpKsx0wIuxc45mddJ7clsJP1RzaXq942n5QG9ecPgTTWriJJZVocW+9arsJoFHICitO+iVQ8K7rgBECTzYapf5o2+/tMQRxhe8Y0Os5KrCg5y5MTsu2oLXWogf2knG66qJxpi0/rL1446T+f8QbBP6s72I3aszGjMd9jbnHpT7oo2sO5hA7tVd2tkH9YQh5+xKWr6DunbvH7Q7NNTVE63s3QQiZ3XVWvNOhWLm8b4fCx2Zd+vNznK5EyGih7JRy7bicLuqKvSV23H7oXVVGRq2zkOfW3FoNqoTugmF8arWA2qpbjiGg5cdK2HJFnDhy8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bV6Fj730+772hiGS2ax4QwfbJj//EuIfcwPxJqnBxF4=;
- b=VwUawC46c4Cyg3a6aJHKSFC0HL304EkW823DigtfpYvJfsueDz2zSGKy/IohRFV5vcVJGuzj45FE3+1C4H+xTv/jsYHIp5OqXuj0HPNAJ2LYkiBBMfRFPGMkqJsOHgJVR8NJQZGA/+6cZN1EnGTKLgRI4osvkaMPUbFxeXaPyni6CGeKceVdFK9aR7O9jx/2vaD1/UcmQfmiaHoHFTV7FJrYkfMVeOkBOd3xJ1GTEa1dyO1GhesMtpM2R4q8mNZ81iqpQlZ/an//Gp0iSUEWpObrQLjc+uzyTW0EtTLu1Gwh6ljWIoC8DXU0mhamPufIfxaOe1A8ohW2R4ss6y3/NQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by SJ5PPF77D28E3C2.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::837) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Mon, 10 Nov
- 2025 07:08:44 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%4]) with mapi id 15.20.9298.015; Mon, 10 Nov 2025
- 07:08:44 +0000
-Date: Mon, 10 Nov 2025 15:08:33 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-CC: <kvm@vger.kernel.org>, <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<hpa@zytor.com>, <joe.jin@oracle.com>, <alejandro.j.jimenez@oracle.com>
-Subject: Re: [PATCH v2 1/1] KVM: VMX: configure SVI during runtime APICv
- activation
-Message-ID: <aRGPcYE4liEI+DfT@intel.com>
-References: <20251110063212.34902-1-dongli.zhang@oracle.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251110063212.34902-1-dongli.zhang@oracle.com>
-X-ClientProxiedBy: SI2PR02CA0042.apcprd02.prod.outlook.com
- (2603:1096:4:196::19) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955C22EBBA1
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762759943; cv=none; b=NppzfC/C9rdJZiIQjRshT0XaVhMTkWi4lyAdrly611Cnyq4GvHnAAVp5e7+8LTewgIr3F9bLWXn3knfXbnJ+n+/Mt3grw4iQGaAuk6TIGeL0XJfcfiYeTeMFPs6lIbinUMScDxoP/ot/EGEkJe2Hyqseui/bNgAsuTTLmstcEgM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762759943; c=relaxed/simple;
+	bh=cQN4kGT4Z9RnV16R7zCdXa49GPir2ZqJr/78v+Lovzc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BRuSdR0tyXY2BNYivaDOh2EGFLUHCGzIGxepR8+zdLNrPQeBcJrfW2AegZ2rOKpaU+MuwMY8Ea26Q4HrTgwusVp7l8+cilaV1nvTKa2Ms0vvmoVnuteh3UMGt1MN+b/F4/slg0j79JQL/+kb38nd5dpeAYpLCS4Mes/9pXjO0yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TttXGVvk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2447FC2BCB6
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:32:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762759943;
+	bh=cQN4kGT4Z9RnV16R7zCdXa49GPir2ZqJr/78v+Lovzc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=TttXGVvkIUJaWyrEQTsAzD644dY6txmMdgi2+MXugsuxrrMgrxL6k4WJpBn8dGyjw
+	 gdg5w1Wc99/87cFpxrTixUJqu4IPoJXxTyNLOpOstsESvCVQu+6vcPKEL7QwdR4uZh
+	 oivdkq4j3l6mTXWxOi50WWVo1ZmUflmauyayiwiEzLt6llnKO6RxWlDX+zBaxqo5mD
+	 IDNYnZ4nNsJJYM7BZpuN0iPdm1CtafZiLyPWf+Q1nNa3WbvahTWo7bZLfDRht1ooQU
+	 ijYvdG/NVMT/rz85mliJiPLwTcZsWdZEpf05HbJuNO/p4d5dbihb4zbKJHfq0y9TVx
+	 9NfW5vbscOshQ==
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-71d6014810fso20829397b3.0
+        for <kvm@vger.kernel.org>; Sun, 09 Nov 2025 23:32:23 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV2ZU0F5PYPpVnN78oDe9UFEsMesaYokIdbmsMmYXaojHJyqCBhe3gVrWv+5p3QxRDRC68=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHCt4/yUJ1yvuxHJXLbbeiPH+rHi1GXpE/LQHGRLLiYv/t+Zyi
+	Edmqayl+F7+QK5Zq+AAJpQ0lSv+dGUh60lN7aUTUWhCO47HC3FwN0tIleCettaFUY8a64Zl2i9e
+	2h2K45Rqrm5xkKmudaobrbu1XMWH7xX2+rFUd+S3czA==
+X-Google-Smtp-Source: AGHT+IFQ9N0QJyzxbx3agttaPppdKNBBAeeuQ6oXFqx9fA4bbGoFwr4rbbdYkUn5xJYMpCIw+moKhVHJZhszc+EwPJo=
+X-Received: by 2002:a05:690c:670f:b0:786:61c6:7e57 with SMTP id
+ 00721157ae682-787d5438549mr67487947b3.42.1762759941154; Sun, 09 Nov 2025
+ 23:32:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SJ5PPF77D28E3C2:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2d0cb721-a7c6-42f5-41b6-08de2027fbee
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?idYZG5T6uZ2GQnrVUEyTa4ypEl237n9Ro2+JD5rdmeFMzdVDkLuS3ncQqe0R?=
- =?us-ascii?Q?/zRTF8ULpIzWWwa4E7egeLShnIF1nJWDIBqglDwWEpAo8zVpdeb/L3WReYO1?=
- =?us-ascii?Q?snSHcuhz9rTYHHPvp3NDGQiijZLX/cwffqHFGJkzx0igKojT5tuGpiN0OGlU?=
- =?us-ascii?Q?mN/RUCA8TUv3zOjVbLjAXWkWvH0OQIqBjoZvEvZrwHbAoutqPsolnGJr2u99?=
- =?us-ascii?Q?ZhY0wLXbHQKUc3r4EbKob833n+3LWbiHjP5mCX6vu2b5eXxCQWh4v5B7+Nij?=
- =?us-ascii?Q?XksMi08xh+TsKhygzjSvryf7N5CxiMxE8t4uSACNvSndYnWdvVWKWMOqHj2v?=
- =?us-ascii?Q?mbXHV526nGzz8ludg9kHJ/gc8nv2/Y1oyr8Znp9pAKATuZyu5HC9TwnTS489?=
- =?us-ascii?Q?puyB5TRE93iFbJZHQ++Q27yx496H0sc+UlatAFWfskXosoYzZZvpk2C6blRe?=
- =?us-ascii?Q?4H2fY/9b6CZ33sdSBnlAwxgNMrAMifz/KI60WStcDG0YO15zZoeVHxvAyT1h?=
- =?us-ascii?Q?jrbe2ONXsJESqaEGMN6Hpf++9QGsXz4Nwe6MRgl0dv1Y59NVT0iRDaEbKv5m?=
- =?us-ascii?Q?SbmlQ6BeY8FKMGhx0KNyR+Owprcb9IdHt6cdCuheSv4TJYrv7+g8mudfHerC?=
- =?us-ascii?Q?GRuc0fMOdS3JNrPcxoTNTV2HA76eERqJ4tVVVcgrrPVpyBIsfI99x9waumKQ?=
- =?us-ascii?Q?iGALt0rTSF9517VFnyxyPMzekRezpLY8MuuhPZ/xGQtfeQmP3KGDWS4lwEwv?=
- =?us-ascii?Q?DAQAn/Kw0qyYyauXrh/FuD8t6tTSENETp2doGpCAoW3rUMPzwvJeXbjdTehV?=
- =?us-ascii?Q?sa8TPrjz4Q3VQj9duQUZ4xXLG3Wq8L5Ni3BVxxhWq0YiLV8eHcDSuL2PnfWW?=
- =?us-ascii?Q?m3sXvJ05NbkOI57qBqqd5l0hxPKygcpU6Q5MRrZJcS3IYQjHOePYmCA0EbDi?=
- =?us-ascii?Q?ei0QhnEnSFH+PXRdRdJTZMqwmdxOt7Zf+2rz5rUweWpdDdSeUuE99zvDjC8K?=
- =?us-ascii?Q?wlz7UEKZkV5bzuEQCs/LLCVo7Lc+7nI+dnxr3dk7fy+3i5zav/OqRs0il0Fg?=
- =?us-ascii?Q?HjuQAv2aOjR1AfqmZEqwzhX4fEYxmfeYuDBeFLUrVB/zRNV8ht9Ko38ElEh1?=
- =?us-ascii?Q?vKoY9Sx40ut/tvHaaReA9ELrngdtWqqAz7K9vtwEep6ApiHbCLfrnvmxghQP?=
- =?us-ascii?Q?7gjhY2lFbmzGuNBOLLpggcIzkZr//yMa6Y5Xf/lNzBZfbQ6l3Tkii+Wv6KNV?=
- =?us-ascii?Q?bYIHsu/mau9djKP5o2Xa3PxCf9HTDZeRgJrbPWN1cSo1/L5sp1tbykO7ETBJ?=
- =?us-ascii?Q?eUyfb81EIsUIgHba1xirzkAlz80Qc5N2dJKjUzqoAey7sJ/SD5bs8xsmsC9H?=
- =?us-ascii?Q?xxWV7fqU3Oc44bd7E+RDCb4zm+64HB6i1+miglR2q8mJ0bureD0Aty36z/JH?=
- =?us-ascii?Q?cNUqDMGS5+i03Leok7czAYjSoQHFQfzH?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?QXk2TOtoRavoKDTyIir7NxSWqOwGAluFJyblGNPZubaOWywFVHsKcDIs8lbB?=
- =?us-ascii?Q?blT2bwTJhN3NPWEedgn/Ubl9XXMYz+NEq9C9RqjoaVhcNQGqoJUKSHiie5PA?=
- =?us-ascii?Q?q5WnYrP5kfSBQwovQLURVp4onVtduAW/ZB7WG105X++53eAmlnvJ659rmUYm?=
- =?us-ascii?Q?m2iVSPuhk27ld1KsQ4emAZYFGSWgJ/rIJLzpQgMuH3Q7/HTZZlnrVnqXsiEV?=
- =?us-ascii?Q?pxpaGEb8d2JklyZ0WGJTP5v0MlNJr+gdNHIrsniEr+Gpo0TF5njSAl0sdOih?=
- =?us-ascii?Q?YsmmxUuAg1pL5qV24DsJpPZH6RZTAHYj/j/KRUXx/aw4BTTahfmBKy9gAtJZ?=
- =?us-ascii?Q?rhjdHywuIMhJ9FzxEqHJH+FEbfAvocHkp7WqWOnkFDBoCFdbZWRghcHK078V?=
- =?us-ascii?Q?9+QsmOva8oRLaL4M3vDhmznp6ftr7TRFpW+HGNQ3d8WU/lZyl4AIDxGS2oOZ?=
- =?us-ascii?Q?0FiyOb2Fc4LXB4aHm7/0TfwwrrWsiEep6K7/OE6zZ2ajNmV8wRF+zg1BV5sG?=
- =?us-ascii?Q?4ouPtn3d4Yt5CfY5gYjzJ/WcCwQOKSBvfWJQ3wkbkQRdyFNEDMDEFns/mWdF?=
- =?us-ascii?Q?4yx2UkBvwGbfRkeQQ4hNl2VnhvWq0DOL9QD9wsAl10nfMh/2JuhK4J2/pfkI?=
- =?us-ascii?Q?HUebC0DiL1+3k/7RvfFNBz8IAxgfjHQcwLqgfbOhb9SbdNZOC0zDZ22fWwfr?=
- =?us-ascii?Q?oZgXbPvT6rzFmvQNbblqKoN41RWQt38Btr4Qx8ypjB47+xsbIE4+r2CFBi4L?=
- =?us-ascii?Q?VF+W6QIWKoAwrk2FwKMd9KLuSNvdI5USimPLqeAbyHjx9ZYMcwLuyP8nrcYh?=
- =?us-ascii?Q?7NnlwUHcnFCoI3F1Bum81m+Q/ITYF9rTkejPEJpldtYprYWM2OaZ0k7T9xFJ?=
- =?us-ascii?Q?xoBzj8pLydQ6CgkM2G2g/n/Rr7+i+2sY4sb6UZueJp7DZ4t4siMWd8qDYa8K?=
- =?us-ascii?Q?6PLIvf+E3Z5kOTmvbGTCgIZae4qEZiJaPBC8rvVCqp1uYkC3Q2TUC4KvrWlF?=
- =?us-ascii?Q?KIeWtCTCBb87jC0Dis8AmuM0HRk0XHwG1dWFqgjMp/qEnMCS7re2bOECbJyF?=
- =?us-ascii?Q?pnnmTamMaMwf1DZlpv1RUD809LmwQsxEV8W3noUJ53zAQV2VsNdw3kQJQah9?=
- =?us-ascii?Q?d6q+2Y7CjZ4Y5wg3P0a5zbBDYEoMz+P5Lz1CRDtYCrkgknxCt5hvbLskN3lt?=
- =?us-ascii?Q?XSHyBUeqWl1CbduXuE+VYi9kZLC2PO9/IddNY3hXkmSWLuVoWZ1UXe3hkczP?=
- =?us-ascii?Q?ziZ8kJBx+FLBa5cDhhmD2aEqZQ5zB5X2LT1F0m3R9IT0BjHPKLjyxr6Uep5z?=
- =?us-ascii?Q?rRLf0PNSNMT/tv4ga6z2yyhWNw+S3moARL4mcnkWPCnsVzdXUIg0HwwQSKpb?=
- =?us-ascii?Q?66GqT2mBH+JTIVhQfXQpRGPju2LvjUwC0gfhFgwllmZ5YmE8DBgHANxyLS9o?=
- =?us-ascii?Q?dF4j4phgmQM77R3zUC8LwubEpZjQHWGXI+2Vou26UiHP7026UwpS+P6zxMbf?=
- =?us-ascii?Q?nSRelYZLbF4yQnEr6HMS/XnTVmUF7DdSpfBScviXzkIRRyHieXfxoqhFWXRJ?=
- =?us-ascii?Q?TWsBFl11A6f/Jp+W5aSuXgVhFBokTPTfqUgSwI2N?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d0cb721-a7c6-42f5-41b6-08de2027fbee
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2025 07:08:43.9151
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9ij+AnH7YJ42B3HExWAJDsXuVGpklTjmg7vq5HSifUdKpG/B4zPo48tisyUWyWr9ei373vnMz8UNqKjkjKELEQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF77D28E3C2
-X-OriginatorOrg: intel.com
+References: <cover.1762621567.git.lorenzo.stoakes@oracle.com>
+In-Reply-To: <cover.1762621567.git.lorenzo.stoakes@oracle.com>
+From: Chris Li <chrisl@kernel.org>
+Date: Sun, 9 Nov 2025 23:32:09 -0800
+X-Gmail-Original-Message-ID: <CACePvbVq3kFtrue2smXRSZ86+EuNVf6q+awQnU-n7=Q4x7U9Lw@mail.gmail.com>
+X-Gm-Features: AWmQ_blwAcP-jPkdX_BL8n-dN0nskCj9MNzjkUZFE3hb8I8DIawlcAt-KR_uwfY
+Message-ID: <CACePvbVq3kFtrue2smXRSZ86+EuNVf6q+awQnU-n7=Q4x7U9Lw@mail.gmail.com>
+Subject: Re: [PATCH v2 00/16] mm: remove is_swap_[pte, pmd]() + non-swap
+ entries, introduce leaf entries
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, 
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache <npache@redhat.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+	Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
+	Oscar Salvador <osalvador@suse.de>, Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Matthew Brost <matthew.brost@intel.com>, Joshua Hahn <joshua.hahnjy@gmail.com>, 
+	Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, 
+	Ying Huang <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, 
+	Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>, 
+	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <bhe@redhat.com>, 
+	SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>, Xu Xin <xu.xin16@zte.com.cn>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Jann Horn <jannh@google.com>, 
+	Miaohe Lin <linmiaohe@huawei.com>, Naoya Horiguchi <nao.horiguchi@gmail.com>, 
+	Pedro Falcato <pfalcato@suse.de>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-s390@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-arch@vger.kernel.org, 
+	damon@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 09, 2025 at 10:32:12PM -0800, Dongli Zhang wrote:
->The APICv (apic->apicv_active) can be activated or deactivated at runtime,
->for instance, because of APICv inhibit reasons. Intel VMX employs different
->mechanisms to virtualize LAPIC based on whether APICv is active.
+On Sat, Nov 8, 2025 at 9:09=E2=80=AFAM Lorenzo Stoakes
+<lorenzo.stoakes@oracle.com> wrote:
 >
->When APICv is activated at runtime, GUEST_INTR_STATUS is used to configure
->and report the current pending IRR and ISR states. Unless a specific vector
->is explicitly included in EOI_EXIT_BITMAP, its EOI will not be trapped to
->KVM. Intel VMX automatically clears the corresponding ISR bit based on the
->GUEST_INTR_STATUS.SVI field.
+> There's an established convention in the kernel that we treat leaf page
+> tables (so far at the PTE, PMD level) as containing 'swap entries' should
+> they be neither empty (i.e. p**_none() evaluating true) nor present
+> (i.e. p**_present() evaluating true).
 >
->When APICv is deactivated at runtime, the VM_ENTRY_INTR_INFO_FIELD is used
->to specify the next interrupt vector to invoke upon VM-entry. The
->VMX IDT_VECTORING_INFO_FIELD is used to report un-invoked vectors on
->VM-exit. EOIs are always trapped to KVM, so the software can manually clear
->pending ISR bits.
+> However, at the same time we also have helper predicates - is_swap_pte(),
+> is_swap_pmd() - which are inconsistently used.
 >
->There are scenarios where, with APICv activated at runtime, a guest-issued
->EOI may not be able to clear the pending ISR bit.
+> This is problematic, as it is logical to assume that should somebody wish
+> to operate upon a page table swap entry they should first check to see if
+> it is in fact one.
 >
->Taking vector 236 as an example, here is one scenario.
+> It also implies that perhaps, in future, we might introduce a non-present=
+,
+> none page table entry that is not a swap entry.
 >
->1. Suppose APICv is inactive. Vector 236 is pending in the IRR.
->2. To handle KVM_REQ_EVENT, KVM moves vector 236 from the IRR to the ISR,
->and configures the VM_ENTRY_INTR_INFO_FIELD via vmx_inject_irq().
->3. After VM-entry, vector 236 is invoked through the guest IDT. At this
->point, the data in VM_ENTRY_INTR_INFO_FIELD is no longer valid. The guest
->interrupt handler for vector 236 is invoked.
->4. Suppose a VM exit occurs very early in the guest interrupt handler,
->before the EOI is issued.
->5. Nothing is reported through the IDT_VECTORING_INFO_FIELD because
->vector 236 has already been invoked in the guest.
->6. Now, suppose APICv is activated. Before the next VM-entry, KVM calls
->kvm_vcpu_update_apicv() to activate APICv.
->7. Unfortunately, GUEST_INTR_STATUS.SVI is not configured, although
->vector 236 is still pending in the ISR.
->8. After VM-entry, the guest finally issues the EOI for vector 236.
->However, because SVI is not configured, vector 236 is not cleared.
->9. ISR is stalled forever on vector 236.
+> This series resolves this issue by systematically eliminating all use of
+> the is_swap_pte() and is swap_pmd() predicates so we retain only the
+> convention that should a leaf page table entry be neither none nor presen=
+t
+> it is a swap entry.
 >
->Here is another scenario.
+> We also have the further issue that 'swap entry' is unfortunately a reall=
+y
+> rather overloaded term and in fact refers to both entries for swap and fo=
+r
+> other information such as migration entries, page table markers, and devi=
+ce
+> private entries.
 >
->1. Suppose APICv is inactive. Vector 236 is pending in the IRR.
->2. To handle KVM_REQ_EVENT, KVM moves vector 236 from the IRR to the ISR,
->and configures the VM_ENTRY_INTR_INFO_FIELD via vmx_inject_irq().
->3. VM-exit occurs immediately after the next VM-entry. The vector 236 is
->not invoked through the guest IDT. Instead, it is saved to the
->IDT_VECTORING_INFO_FIELD during the VM-exit.
->4. KVM calls kvm_queue_interrupt() to re-queue the un-invoked vector 236
->into vcpu->arch.interrupt. A KVM_REQ_EVENT is requested.
->5. Now, suppose APICv is activated. Before the next VM-entry, KVM calls
->kvm_vcpu_update_apicv() to activate APICv.
->6. Although APICv is now active, KVM still uses the legacy
->VM_ENTRY_INTR_INFO_FIELD to re-inject vector 236. GUEST_INTR_STATUS.SVI is
->not configured.
->7. After the next VM-entry, vector 236 is invoked through the guest IDT.
->Finally, an EOI occurs. However, due to the lack of GUEST_INTR_STATUS.SVI
->configuration, vector 236 is not cleared from the ISR.
->8. ISR is stalled forever on vector 236.
+> We therefore have the rather 'unique' concept of a 'non-swap' swap entry.
 >
->Using QEMU as an example, vector 236 is stuck in ISR forever.
+> This series therefore introduces the concept of 'software leaf entries', =
+of
+> type softleaf_t, to eliminate this confusion.
 >
->(qemu) info lapic 1
->dumping local APIC state for CPU 1
+> A software leaf entry in this sense is any page table entry which is
+> non-present, and represented by the softleaf_t type. That is - page table
+> leaf entries which are software-controlled by the kernel.
 >
->LVT0	 0x00010700 active-hi edge  masked                      ExtINT (vec 0)
->LVT1	 0x00010400 active-hi edge  masked                      NMI
->LVTPC	 0x00000400 active-hi edge                              NMI
->LVTERR	 0x000000fe active-hi edge                              Fixed  (vec 254)
->LVTTHMR	 0x00010000 active-hi edge  masked                      Fixed  (vec 0)
->LVTT	 0x000400ec active-hi edge                 tsc-deadline Fixed  (vec 236)
->Timer	 DCR=0x0 (divide by 2) initial_count = 0 current_count = 0
->SPIV	 0x000001ff APIC enabled, focus=off, spurious vec 255
->ICR	 0x000000fd physical edge de-assert no-shorthand
->ICR2	 0x00000000 cpu 0 (X2APIC ID)
->ESR	 0x00000000
->ISR	 236
->IRR	 37(level) 236
+> This includes 'none' or empty entries, which are simply represented by an
+> zero leaf entry value.
 >
->The issue is not applicable to AMD SVM which employs a different LAPIC
->virtualization mechanism. In addition, APICV_INHIBIT_REASON_IRQWIN ensures
->AMD SVM AVIC is not activated until the last interrupt is EOI.
->
->Fix the bug by configuring Intel VMX GUEST_INTR_STATUS.SVI if APICv is
->activated at runtime.
->
->Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> In order to maintain compatibility as we transition the kernel to this ne=
+w
+> type, we simply typedef swp_entry_t to softleaf_t.
 
-Reviewed-by: Chao Gao <chao.gao@intel.com>
+Hi Lorenzo,
+
+Sorry I was late to the party. Can you clarify that you intend to
+remove swp_entry_t completely to softleaf_t?
+I think for the traditional usage of the swp_entry_t, which is made up
+of swap device type and swap device offset. Can we please keep the
+swp_entry_t for the traditional swap system usage? The mix type can
+stay in softleaf_t in the pte level.
+
+I kind of wish the swap system could still use swp_entry_t. At least I
+don't see any complete reason to massively rename all the swap system
+code if we already know the entry is the limited meaning of swap entry
+(device + offset).
+
+Timing is not great either. We have the swap table phase II on review
+now. There is also phase III and phase IV on the backlog pipeline. All
+this renaming can create unnecessary conflicts. I am pleading please
+reduce the renaming in the swap system code for now until we can
+figure out what is the impact to the rest of the swap table series,
+which is the heavy lifting for swap right now. I want to draw a line
+in the sand that, on the PTE entry side, having multiple meanings, we
+can call it softleaft_t whatever. If we know it is the traditional
+swap entry meaning. Keep it swp_entry_t for now until we figure out
+the real impact.
+
+Does this renaming have any behavior change in the produced machine code?
+
+Chris
+
+>
+> We introduce a number of predicates and helpers to interact with software
+> leaf entries in include/linux/leafops.h which, as it imports swapops.h, c=
+an
+> be treated as a drop-in replacement for swapops.h wherever leaf entry
+> helpers are used.
+>
+> Since softleaf_from_[pte, pmd]() treats present entries as they were
+> empty/none leaf entries, this allows for a great deal of simplification o=
+f
+> code throughout the code base, which this series utilises a great deal.
+>
+> We additionally change from swap entry to software leaf entry handling
+> where it makes sense to and eliminate functions from swapops.h where
+> software leaf entries obviate the need for the functions.
+>
+>
+> v2:
+> * Folded all fixpatches into patches they fix.
+> * Added Vlasta's tag to patch 1 (thanks!)
+> * Renamed leaf_entry_t to softleaf_t and leafent_xxx() to softleaf_xxx() =
+as
+>   a result of discussion between Matthew, Jason, David, Gregory & myself =
+to
+>   make clearer that we abstract the concept of a software page table leaf
+>   entry.
+> * Updated all commit messages to reference softleaves.
+> * Updated the kdoc comment describing softleaf_t to provide more detail.
+> * Added a description of softleaves to the top of leafops.h.
+>
+> non-RFC v1:
+> * As part of efforts to eliminate swp_entry_t usage, remove
+>   pte_none_mostly() and correct UFFD PTE marker handling.
+> * Introduce leaf_entry_t - credit to Gregory for naming, and to Jason for
+>   the concept of simply using a leafent_*() set of functions to interact
+>   with these entities.
+> * Replace pte_to_swp_entry_or_zero() with leafent_from_pte() and simply
+>   categorise pte_none() cases as an empty leaf entry, as per Jason.
+> * Eliminate get_pte_swap_entry() - as we can simply do this with
+>   leafent_from_pte() also, as discussed with Jason.
+> * Put pmd_trans_huge_lock() acquisition/release in pagemap_pmd_range()
+>   rather than pmd_trans_huge_lock_thp() as per Gregory.
+> * Eliminate pmd_to_swp_entry() and related and introduce leafent_from_pmd=
+()
+>   to replace it and further propagate leaf entry usage.
+> * Remove the confusing and unnecessary is_hugetlb_entry_[migration,
+>   hwpoison]() functions.
+> * Replace is_pfn_swap_entry(), pfn_swap_entry_to_page(),
+>   is_writable_device_private_entry(), is_device_exclusive_entry(),
+>   is_migration_entry(), is_writable_migration_entry(),
+>   is_readable_migration_entry(), is_readable_exclusive_migration_entry()
+>   and pfn_swap_entry_folio() with leafent equivalents.
+> * Wrapped up the 'safe' behaviour discussed with Jason in
+>   leafent_from_[pte, pmd]() so these can be used unconditionally which
+>   simplifies things a lot.
+> * Further changes that are a consequence of the introduction of leaf
+>   entries.
+> https://lore.kernel.org/all/cover.1762171281.git.lorenzo.stoakes@oracle.c=
+om/
+>
+> RFC:
+> https://lore.kernel.org/all/cover.1761288179.git.lorenzo.stoakes@oracle.c=
+om/
+>
+> Lorenzo Stoakes (16):
+>   mm: correctly handle UFFD PTE markers
+>   mm: introduce leaf entry type and use to simplify leaf entry logic
+>   mm: avoid unnecessary uses of is_swap_pte()
+>   mm: eliminate is_swap_pte() when softleaf_from_pte() suffices
+>   mm: use leaf entries in debug pgtable + remove is_swap_pte()
+>   fs/proc/task_mmu: refactor pagemap_pmd_range()
+>   mm: avoid unnecessary use of is_swap_pmd()
+>   mm/huge_memory: refactor copy_huge_pmd() non-present logic
+>   mm/huge_memory: refactor change_huge_pmd() non-present logic
+>   mm: replace pmd_to_swp_entry() with softleaf_from_pmd()
+>   mm: introduce pmd_is_huge() and use where appropriate
+>   mm: remove remaining is_swap_pmd() users and is_swap_pmd()
+>   mm: remove non_swap_entry() and use softleaf helpers instead
+>   mm: remove is_hugetlb_entry_[migration, hwpoisoned]()
+>   mm: eliminate further swapops predicates
+>   mm: replace remaining pte_to_swp_entry() with softleaf_from_pte()
+>
+>  MAINTAINERS                   |   1 +
+>  arch/s390/mm/gmap_helpers.c   |  20 +-
+>  arch/s390/mm/pgtable.c        |  12 +-
+>  fs/proc/task_mmu.c            | 294 +++++++++-------
+>  fs/userfaultfd.c              |  85 ++---
+>  include/asm-generic/hugetlb.h |   8 -
+>  include/linux/huge_mm.h       |  48 ++-
+>  include/linux/hugetlb.h       |   2 -
+>  include/linux/leafops.h       | 620 ++++++++++++++++++++++++++++++++++
+>  include/linux/migrate.h       |   2 +-
+>  include/linux/mm_inline.h     |   6 +-
+>  include/linux/mm_types.h      |  25 ++
+>  include/linux/swapops.h       | 273 +--------------
+>  include/linux/userfaultfd_k.h |  33 +-
+>  mm/damon/ops-common.c         |   6 +-
+>  mm/debug_vm_pgtable.c         |  86 +++--
+>  mm/filemap.c                  |   8 +-
+>  mm/hmm.c                      |  36 +-
+>  mm/huge_memory.c              | 263 +++++++-------
+>  mm/hugetlb.c                  | 165 ++++-----
+>  mm/internal.h                 |  20 +-
+>  mm/khugepaged.c               |  33 +-
+>  mm/ksm.c                      |   6 +-
+>  mm/madvise.c                  |  28 +-
+>  mm/memory-failure.c           |   8 +-
+>  mm/memory.c                   | 150 ++++----
+>  mm/mempolicy.c                |  25 +-
+>  mm/migrate.c                  |  45 +--
+>  mm/migrate_device.c           |  24 +-
+>  mm/mincore.c                  |  25 +-
+>  mm/mprotect.c                 |  59 ++--
+>  mm/mremap.c                   |  13 +-
+>  mm/page_table_check.c         |  33 +-
+>  mm/page_vma_mapped.c          |  65 ++--
+>  mm/pagewalk.c                 |  15 +-
+>  mm/rmap.c                     |  17 +-
+>  mm/shmem.c                    |   7 +-
+>  mm/swap_state.c               |  12 +-
+>  mm/swapfile.c                 |  14 +-
+>  mm/userfaultfd.c              |  53 +--
+>  40 files changed, 1560 insertions(+), 1085 deletions(-)
+>  create mode 100644 include/linux/leafops.h
+>
+> --
+> 2.51.0
 
