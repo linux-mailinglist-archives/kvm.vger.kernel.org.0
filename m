@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-62473-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62474-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6AFCC44D5C
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 04:33:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FDFEC44D62
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 04:33:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A4EB44E61F1
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 03:33:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7BCA34E535B
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 03:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D5692882A1;
-	Mon, 10 Nov 2025 03:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462E628851C;
+	Mon, 10 Nov 2025 03:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8dnngHt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MELO5OJP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E1D287508
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 03:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB80D2857EA
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 03:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762745572; cv=none; b=N1UNJGyH6R6oJS47ivPQFZoSuDTI+nONE2+7+AQDRih2lGcj0+UFE/KcWpi1Zbh5SkCqeEKUZmjbUorUJFzSLQL4k79U4sBRLaF00/lAiDhq2V2yydlUjS3QPDWdJcuR+XvbRVGUiE8XDtaoRpY9uPlv14dV4yM5no8sWnU+zBk=
+	t=1762745576; cv=none; b=jdEjMujWQF/8phMfdKfu7aCQk43ROqI3gGOwu8BNerQCNEVlpVIHnc/6GL5kzuReCAjz8Rx9B3fU1XDtYvfIcWIE9uhLVaXM1UzMVF1vATj6q/MGJ4v2oHLylP1yJxY3E++qhg9vSKb6avbrZzF1uvLM9GdW2/ldmMuGXwxTbv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762745572; c=relaxed/simple;
-	bh=/Sbi2RsDbKFxh18qy4P7m0nH9/yJnCUGEiCikFyDTJk=;
+	s=arc-20240116; t=1762745576; c=relaxed/simple;
+	bh=0DhqCZEAUwk5GW0YZMqACGIGSxBV+gPljFPnDh14bNQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pKoQKqE9sJIII8QeDPSL7gdc8KvRkuOkHdme3soeiOJqgqKsh70Zi8tDiOk0Bel814MZ+YL9zisx6yGFez11PBQrXKC0XvW5xRTkZ7iCKcqqK3Ao8V0ODDZIKgGpsf6vYlE3zIyGlLJswC5lbwIRPK7agitOyJOoGaYY8xOQMEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z8dnngHt; arc=none smtp.client-ip=209.85.214.169
+	 MIME-Version:Content-Type; b=c/suqKsozCLQSfDO0mzCQPvjP/ASjf+BATPTLT7yfSFWuQOyBgHPCbExaWLKdzGzQ+zN0/ns84t0EZP1O9s/fsS9ZYUqKrrrmxWH0OSONVElXhsloFekbWO8RTfYc89znCx27mXsG/HEz9K4pbACAi1Q3AVF4cGswClSGFA8OXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MELO5OJP; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-29599f08202so32695795ad.3
-        for <kvm@vger.kernel.org>; Sun, 09 Nov 2025 19:32:50 -0800 (PST)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b99dc8f439cso1035742a12.0
+        for <kvm@vger.kernel.org>; Sun, 09 Nov 2025 19:32:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762745570; x=1763350370; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762745574; x=1763350374; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mJ2T78O7RQhMqXnI5opkr+3j7nLw8GADo232iLhnq+M=;
-        b=Z8dnngHt/b5aMUY9WnaF+GYgDuxVtosMTTkzSJ+9CRgjsgwtAjHtJ56ZJDVfM7Pb01
-         X2FPrOqHu+midWrOugGwvT3a2VcHqXSNi+YWkYmiAGgrAUKnDO9UqCrNb3sYViOlYGju
-         KPuj/1p6cSUp+Z8AOxC1DyJXV4UJsj0+Ur+lxtmbV/mjEtMk8iOd+ZBCR1px9als/aao
-         F0RjxJh7oerqXtNS8wGyQXTeRqLPBJsYZmbHahE/n4u8AGK7+uY/GpHz4eilqihvOAdC
-         KNGtYwkonic8LMn45PTiBVhyrVYMbXKxqY7xn4p3FhJNDs8eJ56f1nFq7VipI5sDn10E
-         gK3g==
+        bh=mPX8tZ0O6TTAOa2ZKkEwpS16B7GgfDVYswzaVPR09nc=;
+        b=MELO5OJPOkHUDrAW/N82XYbs//lVRGq3kiGOw6E77r7YgtQgA+fcL2d3P1ODrTmMYA
+         JXVRANrTvcwpR1kWRPuWSZ1FCn7YU/fE2QlyMe7fa6CTlBn2qd0uipatl6qN98HHS6mR
+         dv5Al01BBolAFn96NZUC1NE4Jcs7Jh5VKMXCkhsszRFruwrLW40YBtabsMW3ftuIxS50
+         MNCOQengD5e1FMAguuScpBFWW+phDjufPcyb4jz/0f1WSpAB+CaoMafOKbLgH6gej5tM
+         onq+pfmZho5iQ6TFDQq/wgs+fEaUnyeS/sj3+2bEjDzNM1+SenNkDSlf+lceEQS8hgcZ
+         o87A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762745570; x=1763350370;
+        d=1e100.net; s=20230601; t=1762745574; x=1763350374;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=mJ2T78O7RQhMqXnI5opkr+3j7nLw8GADo232iLhnq+M=;
-        b=rIvQjaoL4Ti6INNCYoPjMopx1/Lp6a5w1vjPsO1G1fCjiyQ/g8x4XvDzA/LE+7e0jZ
-         Ug+JQFtX3QcsXz1874BU13pxeLXofy4FXa7FUV2cAV+b0MfGz1wPyaL8wMVdXsk3VMlZ
-         dSbCU1pe8PJHzWzrhTtb4Oe87Qc+X6QlU4Jfw/GGJh/R2BRz0ANwnFdA4sv7cXmQDx3/
-         6MkJ/2uRmUoI3PhubE60I6H15TVwls35MOF68drlQ7QOwMZKBKw5roPeuY368OqznyQc
-         vmypjqGekz1YXwj0LJAgbetx84DWRv4ASUeUc74kovx+qG43CfZSAtGYmlLclvPLl64V
-         WwxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUXB/tEndk2BoSQT6nEC3V6NN8jw0irvpUA9hUj+QVGn4SBDz1RFQn9N1Bv1dMOoYdLbl4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/CFa/fMBUEC0Im3c5li+Cu9DT2AfhU7nMCihU7O4mm3tyXyO9
-	zyB6zfQGmnfeXlD4JXLmQUQNi831gd403G3WwBG0aJr5BU6xplBcNXcv
-X-Gm-Gg: ASbGncsamKB50w9w/kSdFgnEBvT1bn7JK2FkK6lHBDpfaAyf2V4/tXZECu/tifsz4+2
-	/zc8uGMi5c4ZWiDVD0iKRXFXy/YK+utFkq3LZWvM54d+ejkxhDgGw/mmgosURiPBgyF0FIfqi1c
-	xVV/G7VRSCcBN/wJgdw/d63NDAr6j0hMOFGyRLBRcrMWtu8ZT/8Qk0OzyZcnqdM/NTJxwLu7E/9
-	hjy2r7dwF7Nh16EMIOzaAlq7LUKAvWSuGA0BHnrW1FNDy7iHuyTbGvusPRtzNpjkxMDvwc4kppS
-	gmSL6gKLZ+Mx23O52crOwHYMkTa9k07ZQ9EUxUy+eLj1aMjvuFCyFxZP8/r/jpFZkjg3XcXtOYb
-	STAMJbKo11Q8b1aDkvCiwje76ARQwoQlN8ENCfBmh3zAalnizBsj25VAgsvS02ksFIdo+SwmgJe
-	ePilALgUcZ
-X-Google-Smtp-Source: AGHT+IH8IURFUXv0dHkJ6ZHGGTBAvnY0vbnOOUIKPpXB78BdN5c4T+GwBYMwLuqJLnGxvgOdporgtA==
-X-Received: by 2002:a17:903:f8c:b0:26c:2e56:ec27 with SMTP id d9443c01a7336-297e5627d67mr89334695ad.19.1762745570152;
-        Sun, 09 Nov 2025 19:32:50 -0800 (PST)
+        bh=mPX8tZ0O6TTAOa2ZKkEwpS16B7GgfDVYswzaVPR09nc=;
+        b=nLbgffXMvA62l2/q3y7f1jxsDCbAWSTcQby9plXWzCc5X/vKxeV1rKfyQ2JbMDw6+x
+         1as0EhAktpWO0+xbPCdy2PfYwPB/dDoyuCtdcqNx4EbNSIlisLiQnu639oMiDawixDMF
+         MwbGdYp4LEOtDkADrr0iBjQti3rSkjB6Y8XWK88iOyxEH2iAvxcZ6I01JFRx4Aw+Ncli
+         nZVEKs1M0n4rJDDIsJ+8JIymL/zcgkpCTQ1qBaSzyN2BjH99m5brDzMO/eacYDh+0aDm
+         xJtT7+ik8RfOm8b3j9vi7X44I7JSWS9195/oCMu7WRaf80yaxFCSUm/4XIf3q8QhK3Jn
+         dbPw==
+X-Forwarded-Encrypted: i=1; AJvYcCWdGspyAlKca+kkGN8uBgkhTE9IgwPWbgzia4tpN32f0Wzq+hyLn0zy2+Sj8P441ua5h0A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0GuuNTE9n5KoPA50Njyfj5vH99GKYS2c/AN+WV7STydwaiP/L
+	hPRLjs3CbS5MmjQSAwAB8q+zwSe9OVER4baew9N6N1UkrVx4/DwbDaoS
+X-Gm-Gg: ASbGncsaDGAgkZJBtk6tNp7uamcsizfe3X3j2NItUPWzYstKxRpMUJrE3FVAcdGKkih
+	NHyJIxhU9Fby8orCY4NK2ik+8OBg3XDZtW82OPtNw67vKHJUkGchqIWcjij2eDaDcNxN5zCOyqk
+	+CUTccWvTtQjXjA/LwOC7E71FamzeIki45P8R4VTdtAi5ygquN8hNIAcjVjBJVq3GD180R3xnkn
+	TSXqrtejZsgPBBc8fQL/0uRGoMqpVgtirwY2quc9/+MhnqaWmRjRoEF7S4tcXHvyndYJ2fm1+qX
+	4cfkpsilOIlyHCBlk+CHEKonk3IGpDNiAOM5w9EBZmkg/mctn1ubxLNVyqikmxiNoxKgbzurmAx
+	ykkWY+XWxUVscc4lfbUFin/r8fFAagQrxna19lV3tf3UMCZBVw32YZssLRVykA8MYdZMImA9g3h
+	s1h3V6Rebe
+X-Google-Smtp-Source: AGHT+IGjidzUsSplxn0P3HZuGz53BOScmTeAp5wKz3ixJpJAL/2ddgSpIa9esU2unCmxQgSvrv47wg==
+X-Received: by 2002:a17:903:2c03:b0:295:5a15:63db with SMTP id d9443c01a7336-297e570bf2emr92689815ad.61.1762745573950;
+        Sun, 09 Nov 2025 19:32:53 -0800 (PST)
 Received: from wanpengli.. ([124.93.80.37])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-ba900fa571esm10913877a12.26.2025.11.09.19.32.46
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-ba900fa571esm10913877a12.26.2025.11.09.19.32.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Nov 2025 19:32:49 -0800 (PST)
+        Sun, 09 Nov 2025 19:32:53 -0800 (PST)
 From: Wanpeng Li <kernellwp@gmail.com>
 To: Peter Zijlstra <peterz@infradead.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -86,9 +86,9 @@ Cc: Steven Rostedt <rostedt@goodmis.org>,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	Wanpeng Li <wanpengli@tencent.com>
-Subject: [PATCH 03/10] sched/fair: Add cgroup LCA finder for hierarchical yield
-Date: Mon, 10 Nov 2025 11:32:24 +0800
-Message-ID: <20251110033232.12538-4-kernellwp@gmail.com>
+Subject: [PATCH 04/10] sched/fair: Add penalty calculation and application logic
+Date: Mon, 10 Nov 2025 11:32:25 +0800
+Message-ID: <20251110033232.12538-5-kernellwp@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251110033232.12538-1-kernellwp@gmail.com>
 References: <20251110033232.12538-1-kernellwp@gmail.com>
@@ -98,100 +98,199 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-Implement yield_deboost_find_lca() to locate the lowest common ancestor
-(LCA) in the cgroup hierarchy for EEVDF-aware yield operations.
+Implement core penalty calculation and application mechanisms for
+yield deboost operations.
 
-The LCA represents the appropriate hierarchy level where vruntime
-adjustments should be applied to ensure fairness is maintained across
-cgroup boundaries. This is critical for virtualization workloads where
-vCPUs may be organized in nested cgroups.
+Add yield_deboost_apply_debounce() for reverse-pair debouncing to
+prevent ping-pong behavior. When A→B then B→A occurs within ~600us,
+downscale the penalty.
 
-For CONFIG_FAIR_GROUP_SCHED, walk up both entity hierarchies by
-aligning depths, then ascend together until a common cfs_rq is found.
-For flat hierarchy, verify both entities share the same cfs_rq.
-Validate that meaningful contention exists (nr_queued > 1) and ensure
-the yielding entity has non-zero slice for safe penalty calculation.
+Add yield_deboost_calculate_penalty() to calculate vruntime penalty
+based on the fairness gap (vruntime delta between yielding and target
+tasks), scheduling granularity with safety floor for abnormal values,
+and queue-size-based caps (2 tasks: 6.0×gran, 3: 4.0×, 4-6: 2.5×,
+7-8: 2.0×, 9-12: 1.5×, >12: 1.0×). Apply special handling for zero
+gap with refined multipliers and 10% boost weighting on positive gaps.
 
-The function operates under rq->lock protection. This static helper
-will be integrated in subsequent patches.
+Add yield_deboost_apply_penalty() to apply the penalty with overflow
+protection and update EEVDF fields (deadline, vlag) and min_vruntime.
+
+The penalty is tuned to provide meaningful preference while avoiding
+starvation, scales with queue depth, and prevents oscillation through
+debouncing. These static functions will be integrated in the next
+patch.
 
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- kernel/sched/fair.c | 60 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ kernel/sched/fair.c | 153 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 153 insertions(+)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index a7dc21c2dbdb..740c002b8f1c 100644
+index 740c002b8f1c..4bad324f3662 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
-@@ -9058,6 +9058,66 @@ static bool __maybe_unused yield_deboost_validate_tasks(struct rq *rq, struct ta
+@@ -9118,6 +9118,159 @@ static bool __maybe_unused yield_deboost_find_lca(struct sched_entity *se_y, str
  	return true;
  }
  
 +/*
-+ * Find the lowest common ancestor (LCA) in the cgroup hierarchy for EEVDF.
-+ * We walk up both entity hierarchies under rq->lock protection.
-+ * Task migration requires task_rq_lock, ensuring parent chains remain stable.
-+ * We locate the first common cfs_rq where both entities coexist, representing
-+ * the appropriate level for vruntime adjustments and EEVDF field updates
-+ * (deadline, vlag) to maintain scheduler consistency.
++ * Apply debounce for reverse pair within ~600us to reduce ping-pong.
++ * Downscales penalty to max(need, gran) when the previous pair was target->source,
++ * and updates per-rq debounce tracking fields to avoid cross-CPU races.
 + */
-+static bool __maybe_unused yield_deboost_find_lca(struct sched_entity *se_y, struct sched_entity *se_t,
-+				    struct sched_entity **se_y_lca_out,
-+				    struct sched_entity **se_t_lca_out,
-+				    struct cfs_rq **cfs_rq_common_out)
++static u64 yield_deboost_apply_debounce(struct rq *rq, struct sched_entity *se_t,
++					u64 penalty, u64 need, u64 gran)
 +{
-+	struct sched_entity *se_y_lca, *se_t_lca;
-+	struct cfs_rq *cfs_rq_common;
++	u64 now_ns = rq->clock;
++	struct task_struct *p_yielding = rq->curr;
++	struct task_struct *p_target = task_of(se_t);
 +
-+#ifdef CONFIG_FAIR_GROUP_SCHED
-+	se_t_lca = se_t;
-+	se_y_lca = se_y;
++	if (p_yielding && p_target) {
++		pid_t src_pid = p_yielding->pid;
++		pid_t dst_pid = p_target->pid;
++		pid_t last_src = rq->yield_deboost_last_src_pid;
++		pid_t last_dst = rq->yield_deboost_last_dst_pid;
++		u64  last_ns  = rq->yield_deboost_last_pair_time_ns;
 +
-+	while (se_t_lca && se_y_lca && se_t_lca->depth != se_y_lca->depth) {
-+		if (se_t_lca->depth > se_y_lca->depth)
-+			se_t_lca = se_t_lca->parent;
-+		else
-+			se_y_lca = se_y_lca->parent;
-+	}
-+
-+	while (se_t_lca && se_y_lca) {
-+		if (cfs_rq_of(se_t_lca) == cfs_rq_of(se_y_lca)) {
-+			cfs_rq_common = cfs_rq_of(se_t_lca);
-+			goto found_lca;
++		if (last_src == dst_pid && last_dst == src_pid &&
++		    (now_ns - last_ns) <= (600ULL * NSEC_PER_USEC)) {
++			u64 alt = need;
++			if (alt < gran)
++				alt = gran;
++			if (penalty > alt)
++				penalty = alt;
 +		}
-+		se_t_lca = se_t_lca->parent;
-+		se_y_lca = se_y_lca->parent;
++
++		/* Update per-rq tracking */
++		rq->yield_deboost_last_src_pid = src_pid;
++		rq->yield_deboost_last_dst_pid = dst_pid;
++		rq->yield_deboost_last_pair_time_ns = now_ns;
 +	}
-+	return false;
-+#else
-+	if (cfs_rq_of(se_y) != cfs_rq_of(se_t))
-+		return false;
-+	cfs_rq_common = cfs_rq_of(se_y);
-+	se_y_lca = se_y;
-+	se_t_lca = se_t;
-+#endif
 +
-+found_lca:
-+	if (!se_y_lca || !se_t_lca)
-+		return false;
++	return penalty;
++}
 +
-+	if (cfs_rq_common->nr_queued <= 1)
-+		return false;
++/*
++ * Calculate penalty with debounce logic for EEVDF yield deboost.
++ * Computes vruntime penalty based on fairness gap (need) plus granularity,
++ * applies queue-size-based caps to prevent excessive penalties in small queues,
++ * and implements reverse-pair debounce (~300us) to reduce ping-pong effects.
++ * Returns 0 if no penalty needed, otherwise returns clamped penalty value.
++ */
++static u64 __maybe_unused yield_deboost_calculate_penalty(struct rq *rq, struct sched_entity *se_y_lca,
++				    struct sched_entity *se_t_lca, struct sched_entity *se_t,
++				    int nr_queued)
++{
++	u64 gran, need, penalty, maxp;
++	u64 gran_floor;
++	u64 weighted_need, base;
 +
-+	if (!se_y_lca->slice)
-+		return false;
++	gran = calc_delta_fair(sysctl_sched_base_slice, se_y_lca);
++	/* Low-bound safeguard for gran when slice is abnormally small */
++	gran_floor = calc_delta_fair(sysctl_sched_base_slice >> 1, se_y_lca);
++	if (gran < gran_floor)
++		gran = gran_floor;
 +
-+	*se_y_lca_out = se_y_lca;
-+	*se_t_lca_out = se_t_lca;
-+	*cfs_rq_common_out = cfs_rq_common;
-+	return true;
++	need = 0;
++	if (se_t_lca->vruntime > se_y_lca->vruntime)
++		need = se_t_lca->vruntime - se_y_lca->vruntime;
++
++	/* Apply 10% boost to need when positive (weighted_need = need * 1.10) */
++	penalty = gran;
++	if (need) {
++		/* weighted_need = need + 10% */
++		weighted_need = need + need / 10;
++		/* clamp to avoid overflow when adding to gran (still capped later) */
++		if (weighted_need > U64_MAX - penalty)
++			weighted_need = U64_MAX - penalty;
++		penalty += weighted_need;
++	}
++
++	/* Apply debounce via helper to avoid ping-pong */
++	penalty = yield_deboost_apply_debounce(rq, se_t, penalty, need, gran);
++
++	/* Upper bound (cap): slightly more aggressive for mid-size queues */
++	if (nr_queued == 2)
++		maxp = gran * 6;		/* Strongest push for 2-task ping-pong */
++	else if (nr_queued == 3)
++		maxp = gran * 4;		/* 4.0 * gran */
++	else if (nr_queued <= 6)
++		maxp = (gran * 5) / 2;		/* 2.5 * gran */
++	else if (nr_queued <= 8)
++		maxp = gran * 2;		/* 2.0 * gran */
++	else if (nr_queued <= 12)
++		maxp = (gran * 3) / 2;		/* 1.5 * gran */
++	else
++		maxp = gran;			/* 1.0 * gran */
++
++	if (penalty < gran)
++		penalty = gran;
++	if (penalty > maxp)
++		penalty = maxp;
++
++	/* If no need, apply refined baseline push (low risk + mid risk combined). */
++	if (need == 0) {
++		/*
++		 * Baseline multiplier for need==0:
++		 *   2        -> 1.00 * gran
++		 *   3        -> 0.9375 * gran
++		 *   4–6      -> 0.625 * gran
++		 *   7–8      -> 0.50  * gran
++		 *   9–12     -> 0.375 * gran
++		 *   >12      -> 0.25  * gran
++		 */
++		base = gran;
++		if (nr_queued == 3)
++			base = (gran * 15) / 16;	/* 0.9375 */
++		else if (nr_queued >= 4 && nr_queued <= 6)
++			base = (gran * 5) / 8;		/* 0.625 */
++		else if (nr_queued >= 7 && nr_queued <= 8)
++			base = gran / 2;		/* 0.5 */
++		else if (nr_queued >= 9 && nr_queued <= 12)
++			base = (gran * 3) / 8;		/* 0.375 */
++		else if (nr_queued > 12)
++			base = gran / 4;		/* 0.25 */
++
++		if (penalty < base)
++			penalty = base;
++	}
++
++	return penalty;
++}
++
++/*
++ * Apply penalty and update EEVDF fields for scheduler consistency.
++ * Safely applies vruntime penalty with overflow protection, then updates
++ * EEVDF-specific fields (deadline, vlag) and cfs_rq min_vruntime to maintain
++ * scheduler state consistency. Returns true on successful application,
++ * false if penalty cannot be safely applied.
++ */
++static void __maybe_unused yield_deboost_apply_penalty(struct rq *rq, struct sched_entity *se_y_lca,
++				 struct cfs_rq *cfs_rq_common, u64 penalty)
++{
++	u64 new_vruntime;
++
++	/* Overflow protection */
++	if (se_y_lca->vruntime > (U64_MAX - penalty))
++		return;
++
++	new_vruntime = se_y_lca->vruntime + penalty;
++
++	/* Validity check */
++	if (new_vruntime <= se_y_lca->vruntime)
++		return;
++
++	se_y_lca->vruntime = new_vruntime;
++	se_y_lca->deadline = se_y_lca->vruntime + calc_delta_fair(se_y_lca->slice, se_y_lca);
++	se_y_lca->vlag = avg_vruntime(cfs_rq_common) - se_y_lca->vruntime;
++	update_min_vruntime(cfs_rq_common);
 +}
 +
  /*
