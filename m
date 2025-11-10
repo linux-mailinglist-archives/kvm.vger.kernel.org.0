@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-62551-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62552-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78EAEC488B9
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 19:26:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00B4CC488BF
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 19:26:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF150189267A
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 18:26:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 353293B57F2
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 18:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21EE532B98C;
-	Mon, 10 Nov 2025 18:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1153432ED45;
+	Mon, 10 Nov 2025 18:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UKtDhT7o"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DAxqdRoa"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D2C32AAB8;
-	Mon, 10 Nov 2025 18:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733A0328B67;
+	Mon, 10 Nov 2025 18:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762799074; cv=none; b=FgRjpJwumw/YbJOTMNdSCbyJeYrLWiekgOqbWDIn55W3setjtLJnzon4K7FIxphC5n8tqocjHYpVLa9J/H1lM0QVX1xd7M/emFMA/yNhfsJh4u21IRappai/SoUNctfS4pY+XLRbvx4bbyngFxMv07SIRC8uI0E4XJeHdfKfpPI=
+	t=1762799076; cv=none; b=i5ME0cDFGADv5jEmKduXVGW/+5IFii6RryAxp3OQUV2W4Y5S8gl1JS4S1OS6EmQuA3qZQZN+C7uRxZbFiuo0fd9kXh1+CwhisA6RNrE7vaEFIwgzn0m854t8A22M7FDJbGXBAehyUgZGBFMrpQwgixCEsF6B3SJ21+8jQYn8lsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762799074; c=relaxed/simple;
-	bh=Fi/ogMOE8ci/isPMMZbSl/BCrquYT2jUtaPI4KPRkzo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rYLb5feU18efAZGyl4e52h2AMT31mE0sJ/rR9Wt589UicqoUa37kDj8FLU+zEtwC6tzUz2PH2CHFUJHDQJ1QHn+6SpQoeZK6kDFS9B2Q29J0Fidti+zXpz37yi7Noyj56eFuCzqwQssuuEWke1/aNPQTtiWmKu4qhCHUj9NL0gE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UKtDhT7o; arc=none smtp.client-ip=198.175.65.12
+	s=arc-20240116; t=1762799076; c=relaxed/simple;
+	bh=qKfymT4CzUPc+oFKR+qBDa5+aKxK1tf6clEXGCz4zPs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=h/81kPQALNt5tVezlqcP2tOtQUW9Oadap3xhDo/rYa0sB4zX3UVGtxLAxQR3dZZU4dqXlOacRETu8qbb/rN6UAGn6CpnvGM2B/0/rn2wUbaxaYLiq0iM+55s/5hwewysTVD2wpX8AjZcIHQGnLK5BCHE4fEB5rPFuNjej2/IBbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DAxqdRoa; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762799072; x=1794335072;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Fi/ogMOE8ci/isPMMZbSl/BCrquYT2jUtaPI4KPRkzo=;
-  b=UKtDhT7oN1reogmIsf1ofnmHbr+rG9577APYMLKV13RWIOLiSRGmU50v
-   4rSoXZle/vqH/t6LADwfbCwmSpUnXcQR4ywvDNWr9ynL+DOMuZEXe43YF
-   a5zGFziSsgMo47tuZWtViPao0q/4m7MuPt0YINKPbwY1XjmtBnVODLJBe
-   TgRmUx4Oo+sbkwAMuJK0Bi4w1qmnrDVQKZe6QJwLDHvDyYvluMeEIBra8
-   sWpuMSdpNIRR5n5JZ1sAJRIfbUwthh5XYjMQZad5YR8iJX+NTpGquvIKn
-   BZICe/mol/sIYeUP/bHcEAH4ug0V6+K9gSBLAZXYk4eIc4Nll60ewkW8y
-   A==;
-X-CSE-ConnectionGUID: 65D3++JbSr6+3s0NlsXWAw==
-X-CSE-MsgGUID: dMix0K7YSWKc8IOarKl/3g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11609"; a="76305475"
+  t=1762799075; x=1794335075;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=qKfymT4CzUPc+oFKR+qBDa5+aKxK1tf6clEXGCz4zPs=;
+  b=DAxqdRoaKyQ/B8ui6Earw7J3wBMvtsuNljtQiO+GfQVOe7fsm0XPxx9Q
+   LHweal+6WqMCTtn/np1SIpi9iagfGCxmHu5IWEoMmCJCTVHtHOtYSUExc
+   AENkA9EOqrMruRjp7KySzGr9RJOgcAjiaFZBAIrXIw1paUHRRPCl5u75C
+   Z1SUpXOjMkdyjKFDCIg8/0TYYu/uGdoq3eGlfQ/S9H84OECMRHlKMdUSO
+   u5U0BkRbcJD0t/2OBusLfGt3lCM4SA1KS1yPA3raisnWfHN1rd+BYFi0/
+   v6GfreeBDuuDR8gQ03LMyWY4D9GoLBvrD+R9ZLMEZ5+KJLHYisjJT1QCR
+   Q==;
+X-CSE-ConnectionGUID: Z/TNvu1XTfqELgWGimmxEQ==
+X-CSE-MsgGUID: VtUAwOomQh+98V9KLvvThQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11609"; a="76305479"
 X-IronPort-AV: E=Sophos;i="6.19,294,1754982000"; 
-   d="scan'208";a="76305475"
+   d="scan'208";a="76305479"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2025 10:24:32 -0800
-X-CSE-ConnectionGUID: UywlTR1cQQu8EePz0KEhcQ==
-X-CSE-MsgGUID: /3VUevgjTJ+vC5SnN6Vp2Q==
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2025 10:24:34 -0800
+X-CSE-ConnectionGUID: GIKrYYquRKKm5am0rThq7A==
+X-CSE-MsgGUID: TugSciuUSACFpTB1LJKSNQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,294,1754982000"; 
-   d="scan'208";a="219396019"
+   d="scan'208";a="219396031"
 Received: from chang-linux-3.sc.intel.com (HELO chang-linux-3) ([172.25.66.172])
-  by orviesa002.jf.intel.com with ESMTP; 10 Nov 2025 10:24:32 -0800
+  by orviesa002.jf.intel.com with ESMTP; 10 Nov 2025 10:24:35 -0800
 From: "Chang S. Bae" <chang.seok.bae@intel.com>
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -65,244 +66,288 @@ Cc: pbonzini@redhat.com,
 	chao.gao@intel.com,
 	zhao1.liu@intel.com,
 	chang.seok.bae@intel.com
-Subject: [PATCH RFC v1 00/20] KVM: x86: Support APX feature for guests
-Date: Mon, 10 Nov 2025 18:01:11 +0000
-Message-ID: <20251110180131.28264-1-chang.seok.bae@intel.com>
+Subject: [PATCH RFC v1 01/20] KVM: x86: Rename register accessors to be GPR-specific
+Date: Mon, 10 Nov 2025 18:01:12 +0000
+Message-ID: <20251110180131.28264-2-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251110180131.28264-1-chang.seok.bae@intel.com>
+References: <20251110180131.28264-1-chang.seok.bae@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi all,
+Refactor the VCPU register state accessors to make them explicitly
+GPR-only.
 
-This series is intended to initiate the enablement of APX support in KVM.
-The goal is to start discussions and, ideally, reach consensus on key
-decisions for the enabling path.
+The existing register accessors operate on the cached VCPU register
+state. That cache holds GPRs and RIP. RIP has its own interface already.
+This renaming clarifies GPR access only.
 
-== Introduction ==
+No functional changes intended.
 
-Intel introduces Advanced Performance Extensions (APX), which add 16
-additional 64-bit general-purpose registers (EGPRs: R16–R31).
+Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+---
+ arch/x86/kvm/svm/svm.c    |  8 ++++----
+ arch/x86/kvm/vmx/nested.c | 20 ++++++++++----------
+ arch/x86/kvm/vmx/vmx.c    | 12 ++++++------
+ arch/x86/kvm/x86.c        | 10 +++++-----
+ arch/x86/kvm/x86.h        |  5 ++---
+ arch/x86/kvm/xen.c        |  2 +-
+ 6 files changed, 28 insertions(+), 29 deletions(-)
 
-APX also introduces new instruction prefixes that extend register indices
-to 5 bits, providing additional encoding space. The feature specification
-[1] describes these extensions in detail.
-
-The specification deliberately scopes out some areas. For example,
-Sections 3.1.4.4.2–7 note that initialization and reset behaviors follow
-existing XSTATE conventions.
-
-That said, there are still some essential elements to consider at first.
-
-== Ingredients to Consider ==
-
-With guest exposure, the new registers will affect how KVM handles VM
-exits and manages guest state. So the extended register indices need to
-be properly interpreted.
-
-There are three relevant contexts where KVM must handle the new 5-bit
-register index:
-
- * Instruction Information in VMCS
-
-   VMX provides instruction information through a dedicated field in the
-   VMCS. However, the legacy format supports only 4-bit register indices,
-   so a new 64-bit field was introduced to support 5-bit indices for
-   EGPRs (see Table 3.11 in the spec).
-
- * Exit Qualification in VMCS
-
-   This field also carries register index information. Fortunately, the
-   current layout is not fully packed, so it appears feasible to extend
-   index fields to 5 bits without structural conflict.
-
- * Instruction Emulator
-
-   When exits are handled through instruction emulation, the emulator
-   must decode REX2-prefixed instructions, which carry the additional
-   bits encoding the extended indices and other new modifiers.
-
-Once handlers can identify EGPR-related indices, the next question is how
-to access and maintain their state.
-
- * Extended GPR State Management
-
-   Current KVM behavior for legacy GPRs can be summarized as follows:
-   (a) All legacy GPRs are saved on every VM exit and written back on
-       re-entry. Most access operations go through KVM register cache.
-   (b) The instruction emulator also maintains a temporary GPR cache
-       during emulation, backed by the same KVM-managed accessor
-       interface.
-
-   For the new EGPRs, there are a few important differences:
-   (a) They are general-purpose registers, but their state is
-       XSAVE-managed, which makes them distinct from legacy GPRs.
-   (b) The kernel itself currently does not use them, so there is no
-       requirement to save EGPRs on every VM exit -- they can remain in
-       hardware registers.
-
-The mechanism to read and write EGPR state will therefore be commonly
-needed by both VMX handlers and the instruction emulator.
-
-== Approaches to Support ==
-
-Given the above aspects, the first step is to build out a generalized GPR
-accessor framework. This constitutes the first part (PART1: PATCH1–3) of
-the series, laying the foundational infrastructure.
-
- * New EGPR Accessors (PATCH3)
-
-   Since EGPRs are not yet clobbered by the host, they can be accessed
-   directly through hardware, using the existing helpers kvm_fpu_get()
-   and kvm_fpu_put().
-
-   This model follows the same approach used for legacy FP state
-   handling.
-
-   The design choice is based on the following considerations:
-   (a) Caching EGPR state on every VM exit would be unnecessary cost.
-   (b) If EGPRs are updated during VM exit handling or instruction
-       emulation, synchronizing them with the guest fpstate would require
-       new interfaces to interact with x86 core logic, adding complexity.
-
- * Common GPR Access Interface --Unifying Legacy and Extended Accessors
-   (PATCH2)
-
-   Although legacy GPRs and EGPRs differ in how their state is accessed,
-   that distinction does not justify maintaining separate interfaces. A
-   unified accessor abstraction allows both legacy and extended registers
-   to be accessed uniformly, simplifying usage for both exit handlers and
-   the emulator.
-
-Returning to the remaining key ingredients -- VMX handlers and the
-instruction emulator -- the necessary updates break down into the
-following.
-
- * Extended Instruction Information Extraction (PART2: PATCH4–8)
-
-   Currently, instruction-related VMCS fields are stored as 32-bit raw
-   data and interpreted on site. Adding separate variable in this manner
-   would increase code complexity.
-
-   Thus, refactoring this logic into a proper data structure with clear
-   semantics appears to be a sensible direction.
-
- * Instruction Emulator (PART3: PATCH9–16)
-
-   As noted in Paolo’s earlier feedback [2], support for REX2-prefixed
-   instruction emulation is required.
-
-   While REX2 largely mirrors legacy opcode behavior, a few exceptions
-   and new instructions introduce additional decoding and handling
-   requirements.
-
-Conceptually, the changes are straightforward, though details are better
-handled directly in the patches.
-
-Finally, actual feature exposure and XCR0 management form the last stage
-of enabling (PART4: PATCH17-20), relatively small but with a few key
-constraints:
-
- * XCR0 updates and CPUID feature exposure must occur together (PATCH18).
- * The current enabling scope applies only to VMX (PATCH17-18).
-
-== Patchset ==
-
-As mentioned earlier, while the number of patches is relatively large,
-the series is organized into four logical parts for clarity and
-reviewability:
-
- * PART1, PATCH 01–03: GPR accessor refactoring (foundational)
- * PART2, PATCH 04–08: VMX support for EGPR index handling
- * PART3, PATCH 09–16: Instruction emulator support for REX2
- * PART4, PATCH 17–20: APX exposure and minor selftest updates
-
-Each patch includes an RFC note to provide context for reviewers.
-
-This series is based on the next branch of the KVM x86 tree [3] and is
-available at:
-
-  git://github.com/intel/apx.git apx-kvm_rfc-v1
-
-== Testing ==
-
-Testing so far has focused on unit and synthetic coverage of relevant
-code paths using KVM selftests, both on legacy and APX systems.
-
-For decoder-related changes, additional testing was performed by invoking
-x86_decode_insn() from a pseudo driver with some test inputs to exercise
-REX2 and legacy decoding logic.
-
-== References ==
-
-[1] https://cdrdv2.intel.com/v1/dl/getContent/784266
-[2] https://lore.kernel.org/kvm/CABgObfaHp9bH783Kdwm_tMBHZk5zWCxD7R+RroB_Q_o5NWBVZg@mail.gmail.com/
-[3] https://github.com/kvm-x86/linux
-
-
-I would also give thanks to Chao and Zhao for helping me out in this
-KVM series.
-
-Thanks for a look on this.
-Chang
-
-Chang S. Bae (19):
-  KVM: x86: Rename register accessors to be GPR-specific
-  KVM: x86: Refactor GPR accessors to differentiate register access
-    types
-  KVM: x86: Implement accessors for extended GPRs
-  KVM: VMX: Introduce unified instruction info structure
-  KVM: VMX: Refactor instruction information retrieval
-  KVM: VMX: Refactor GPR index retrieval from exit qualification
-  KVM: nVMX: Support the extended instruction info field
-  KVM: VMX: Support extended register index in exit handling
-  KVM: x86: Support EGPR accessing and tracking for instruction
-    emulation
-  KVM: x86: Refactor REX prefix handling in instruction emulation
-  KVM: x86: Refactor opcode table lookup in instruction emulation
-  KVM: x86: Support REX2-extended register index in the decoder
-  KVM: x86: Add REX2 opcode tables to the instruction decoder
-  KVM: x86: Emulate REX2-prefixed 64-bit absolute jump
-  KVM: x86: Reject EVEX-prefix instructions in the emulator
-  KVM: x86: Decode REX2 prefix in the emulator
-  KVM: x86: Prepare APX state setting in XCR0
-  KVM: x86: Expose APX sub-features to guests
-  KVM: selftests: Add APX state handling and XCR0 sanity checks
-
-Peter Fang (1):
-  KVM: x86: Expose APX foundational feature bit to guests
-
- arch/x86/include/asm/kvm_host.h               |  19 ++
- arch/x86/include/asm/kvm_vcpu_regs.h          |  16 ++
- arch/x86/include/asm/vmx.h                    |   2 +
- arch/x86/kvm/cpuid.c                          |  14 +-
- arch/x86/kvm/emulate.c                        | 177 +++++++++++++++---
- arch/x86/kvm/fpu.h                            |  82 ++++++++
- arch/x86/kvm/kvm_cache_regs.h                 |   1 +
- arch/x86/kvm/kvm_emulate.h                    |  44 ++++-
- arch/x86/kvm/reverse_cpuid.h                  |   6 +
- arch/x86/kvm/svm/svm.c                        |  23 ++-
- arch/x86/kvm/vmx/nested.c                     |  83 ++++----
- arch/x86/kvm/vmx/nested.h                     |   2 +-
- arch/x86/kvm/vmx/vmcs12.c                     |   1 +
- arch/x86/kvm/vmx/vmcs12.h                     |   3 +-
- arch/x86/kvm/vmx/vmx.c                        |  26 +--
- arch/x86/kvm/vmx/vmx.h                        | 106 ++++++++++-
- arch/x86/kvm/x86.c                            |  29 ++-
- arch/x86/kvm/x86.h                            |  49 ++++-
- arch/x86/kvm/xen.c                            |   2 +-
- .../selftests/kvm/include/x86/processor.h     |   1 +
- tools/testing/selftests/kvm/x86/state_test.c  |   6 +
- .../selftests/kvm/x86/xcr0_cpuid_test.c       |  20 ++
- 22 files changed, 592 insertions(+), 120 deletions(-)
-
-
-base-commit: e9a6fb0bcdd7609be6969112f3fbfcce3b1d4a7c
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 153c12dbf3eb..3aa2c37754ef 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2473,7 +2473,7 @@ static int cr_interception(struct kvm_vcpu *vcpu)
+ 	err = 0;
+ 	if (cr >= 16) { /* mov to cr */
+ 		cr -= 16;
+-		val = kvm_register_read(vcpu, reg);
++		val = kvm_gpr_read(vcpu, reg);
+ 		trace_kvm_cr_write(cr, val);
+ 		switch (cr) {
+ 		case 0:
+@@ -2519,7 +2519,7 @@ static int cr_interception(struct kvm_vcpu *vcpu)
+ 			kvm_queue_exception(vcpu, UD_VECTOR);
+ 			return 1;
+ 		}
+-		kvm_register_write(vcpu, reg, val);
++		kvm_gpr_write(vcpu, reg, val);
+ 		trace_kvm_cr_read(cr, val);
+ 	}
+ 	return kvm_complete_insn_gp(vcpu, err);
+@@ -2591,9 +2591,9 @@ static int dr_interception(struct kvm_vcpu *vcpu)
+ 	dr = svm->vmcb->control.exit_code - SVM_EXIT_READ_DR0;
+ 	if (dr >= 16) { /* mov to DRn  */
+ 		dr -= 16;
+-		err = kvm_set_dr(vcpu, dr, kvm_register_read(vcpu, reg));
++		err = kvm_set_dr(vcpu, dr, kvm_gpr_read(vcpu, reg));
+ 	} else {
+-		kvm_register_write(vcpu, reg, kvm_get_dr(vcpu, dr));
++		kvm_gpr_write(vcpu, reg, kvm_get_dr(vcpu, dr));
+ 	}
+ 
+ 	return kvm_complete_insn_gp(vcpu, err);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 76271962cb70..47a941989787 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -5325,9 +5325,9 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
+ 	else if (addr_size == 0)
+ 		off = (gva_t)sign_extend64(off, 15);
+ 	if (base_is_valid)
+-		off += kvm_register_read(vcpu, base_reg);
++		off += kvm_gpr_read(vcpu, base_reg);
+ 	if (index_is_valid)
+-		off += kvm_register_read(vcpu, index_reg) << scaling;
++		off += kvm_gpr_read(vcpu, index_reg) << scaling;
+ 	vmx_get_segment(vcpu, &s, seg_reg);
+ 
+ 	/*
+@@ -5719,7 +5719,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+ 		return 1;
+ 
+ 	/* Decode instruction info and find the field to read */
+-	field = kvm_register_read(vcpu, (((instr_info) >> 28) & 0xf));
++	field = kvm_gpr_read(vcpu, (((instr_info) >> 28) & 0xf));
+ 
+ 	if (!nested_vmx_is_evmptr12_valid(vmx)) {
+ 		/*
+@@ -5768,7 +5768,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+ 	 * on the guest's mode (32 or 64 bit), not on the given field's length.
+ 	 */
+ 	if (instr_info & BIT(10)) {
+-		kvm_register_write(vcpu, (((instr_info) >> 3) & 0xf), value);
++		kvm_gpr_write(vcpu, (((instr_info) >> 3) & 0xf), value);
+ 	} else {
+ 		len = is_64_bit_mode(vcpu) ? 8 : 4;
+ 		if (get_vmx_mem_address(vcpu, exit_qualification,
+@@ -5842,7 +5842,7 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+ 		return nested_vmx_failInvalid(vcpu);
+ 
+ 	if (instr_info & BIT(10))
+-		value = kvm_register_read(vcpu, (((instr_info) >> 3) & 0xf));
++		value = kvm_gpr_read(vcpu, (((instr_info) >> 3) & 0xf));
+ 	else {
+ 		len = is_64_bit_mode(vcpu) ? 8 : 4;
+ 		if (get_vmx_mem_address(vcpu, exit_qualification,
+@@ -5853,7 +5853,7 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+ 			return kvm_handle_memory_failure(vcpu, r, &e);
+ 	}
+ 
+-	field = kvm_register_read(vcpu, (((instr_info) >> 28) & 0xf));
++	field = kvm_gpr_read(vcpu, (((instr_info) >> 28) & 0xf));
+ 
+ 	offset = get_vmcs12_field_offset(field);
+ 	if (offset < 0)
+@@ -6051,7 +6051,7 @@ static int handle_invept(struct kvm_vcpu *vcpu)
+ 
+ 	vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
+ 	gpr_index = vmx_get_instr_info_reg2(vmx_instruction_info);
+-	type = kvm_register_read(vcpu, gpr_index);
++	type = kvm_gpr_read(vcpu, gpr_index);
+ 
+ 	types = (vmx->nested.msrs.ept_caps >> VMX_EPT_EXTENT_SHIFT) & 6;
+ 
+@@ -6132,7 +6132,7 @@ static int handle_invvpid(struct kvm_vcpu *vcpu)
+ 
+ 	vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
+ 	gpr_index = vmx_get_instr_info_reg2(vmx_instruction_info);
+-	type = kvm_register_read(vcpu, gpr_index);
++	type = kvm_gpr_read(vcpu, gpr_index);
+ 
+ 	types = (vmx->nested.msrs.vpid_caps &
+ 			VMX_VPID_EXTENT_SUPPORTED_MASK) >> 8;
+@@ -6406,7 +6406,7 @@ static bool nested_vmx_exit_handled_cr(struct kvm_vcpu *vcpu,
+ 	switch ((exit_qualification >> 4) & 3) {
+ 	case 0: /* mov to cr */
+ 		reg = (exit_qualification >> 8) & 15;
+-		val = kvm_register_read(vcpu, reg);
++		val = kvm_gpr_read(vcpu, reg);
+ 		switch (cr) {
+ 		case 0:
+ 			if (vmcs12->cr0_guest_host_mask &
+@@ -6492,7 +6492,7 @@ static bool nested_vmx_exit_handled_vmcs_access(struct kvm_vcpu *vcpu,
+ 
+ 	/* Decode instruction info and find the field to access */
+ 	vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
+-	field = kvm_register_read(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
++	field = kvm_gpr_read(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
+ 
+ 	/* Out-of-range fields always cause a VM exit from L2 to L1 */
+ 	if (field >> 15)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f87c216d976d..c7d38f7692cf 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5462,7 +5462,7 @@ static int handle_cr(struct kvm_vcpu *vcpu)
+ 	reg = (exit_qualification >> 8) & 15;
+ 	switch ((exit_qualification >> 4) & 3) {
+ 	case 0: /* mov to cr */
+-		val = kvm_register_read(vcpu, reg);
++		val = kvm_gpr_read(vcpu, reg);
+ 		trace_kvm_cr_write(cr, val);
+ 		switch (cr) {
+ 		case 0:
+@@ -5504,12 +5504,12 @@ static int handle_cr(struct kvm_vcpu *vcpu)
+ 			WARN_ON_ONCE(enable_unrestricted_guest);
+ 
+ 			val = kvm_read_cr3(vcpu);
+-			kvm_register_write(vcpu, reg, val);
++			kvm_gpr_write(vcpu, reg, val);
+ 			trace_kvm_cr_read(cr, val);
+ 			return kvm_skip_emulated_instruction(vcpu);
+ 		case 8:
+ 			val = kvm_get_cr8(vcpu);
+-			kvm_register_write(vcpu, reg, val);
++			kvm_gpr_write(vcpu, reg, val);
+ 			trace_kvm_cr_read(cr, val);
+ 			return kvm_skip_emulated_instruction(vcpu);
+ 		}
+@@ -5579,10 +5579,10 @@ static int handle_dr(struct kvm_vcpu *vcpu)
+ 
+ 	reg = DEBUG_REG_ACCESS_REG(exit_qualification);
+ 	if (exit_qualification & TYPE_MOV_FROM_DR) {
+-		kvm_register_write(vcpu, reg, kvm_get_dr(vcpu, dr));
++		kvm_gpr_write(vcpu, reg, kvm_get_dr(vcpu, dr));
+ 		err = 0;
+ 	} else {
+-		err = kvm_set_dr(vcpu, dr, kvm_register_read(vcpu, reg));
++		err = kvm_set_dr(vcpu, dr, kvm_gpr_read(vcpu, reg));
+ 	}
+ 
+ out:
+@@ -5941,7 +5941,7 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
+ 
+ 	vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
+ 	gpr_index = vmx_get_instr_info_reg2(vmx_instruction_info);
+-	type = kvm_register_read(vcpu, gpr_index);
++	type = kvm_gpr_read(vcpu, gpr_index);
+ 
+ 	/* According to the Intel instruction reference, the memory operand
+ 	 * is read even if it isn't needed (e.g., for type==all)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b4b5d2d09634..603057ea7421 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2084,8 +2084,8 @@ static int complete_fast_rdmsr(struct kvm_vcpu *vcpu)
+ static int complete_fast_rdmsr_imm(struct kvm_vcpu *vcpu)
+ {
+ 	if (!vcpu->run->msr.error)
+-		kvm_register_write(vcpu, vcpu->arch.cui_rdmsr_imm_reg,
+-				   vcpu->run->msr.data);
++		kvm_gpr_write(vcpu, vcpu->arch.cui_rdmsr_imm_reg,
++			      vcpu->run->msr.data);
+ 
+ 	return complete_fast_msr_access(vcpu);
+ }
+@@ -2139,7 +2139,7 @@ static int __kvm_emulate_rdmsr(struct kvm_vcpu *vcpu, u32 msr, int reg,
+ 			kvm_rax_write(vcpu, data & -1u);
+ 			kvm_rdx_write(vcpu, (data >> 32) & -1u);
+ 		} else {
+-			kvm_register_write(vcpu, reg, data);
++			kvm_gpr_write(vcpu, reg, data);
+ 		}
+ 	} else {
+ 		/* MSR read failed? See if we should ask user space */
+@@ -2197,7 +2197,7 @@ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_emulate_wrmsr);
+ 
+ int kvm_emulate_wrmsr_imm(struct kvm_vcpu *vcpu, u32 msr, int reg)
+ {
+-	return __kvm_emulate_wrmsr(vcpu, msr, kvm_register_read(vcpu, reg));
++	return __kvm_emulate_wrmsr(vcpu, msr, kvm_gpr_read(vcpu, reg));
+ }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_emulate_wrmsr_imm);
+ 
+@@ -2301,7 +2301,7 @@ EXPORT_SYMBOL_FOR_KVM_INTERNAL(handle_fastpath_wrmsr);
+ 
+ fastpath_t handle_fastpath_wrmsr_imm(struct kvm_vcpu *vcpu, u32 msr, int reg)
+ {
+-	return __handle_fastpath_wrmsr(vcpu, msr, kvm_register_read(vcpu, reg));
++	return __handle_fastpath_wrmsr(vcpu, msr, kvm_gpr_read(vcpu, reg));
+ }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(handle_fastpath_wrmsr_imm);
+ 
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index f3dc77f006f9..4edadd64d3d5 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -400,15 +400,14 @@ static inline bool vcpu_match_mmio_gpa(struct kvm_vcpu *vcpu, gpa_t gpa)
+ 	return false;
+ }
+ 
+-static inline unsigned long kvm_register_read(struct kvm_vcpu *vcpu, int reg)
++static inline unsigned long kvm_gpr_read(struct kvm_vcpu *vcpu, int reg)
+ {
+ 	unsigned long val = kvm_register_read_raw(vcpu, reg);
+ 
+ 	return is_64_bit_mode(vcpu) ? val : (u32)val;
+ }
+ 
+-static inline void kvm_register_write(struct kvm_vcpu *vcpu,
+-				       int reg, unsigned long val)
++static inline void kvm_gpr_write(struct kvm_vcpu *vcpu, int reg, unsigned long val)
+ {
+ 	if (!is_64_bit_mode(vcpu))
+ 		val = (u32)val;
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index d6b2a665b499..c9700dc88bb1 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -1679,7 +1679,7 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
+ 	bool handled = false;
+ 	u8 cpl;
+ 
+-	input = (u64)kvm_register_read(vcpu, VCPU_REGS_RAX);
++	input = (u64)kvm_gpr_read(vcpu, VCPU_REGS_RAX);
+ 
+ 	/* Hyper-V hypercalls get bit 31 set in EAX */
+ 	if ((input & 0x80000000) &&
 -- 
 2.51.0
 
