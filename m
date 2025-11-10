@@ -1,161 +1,194 @@
-Return-Path: <kvm+bounces-62529-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62530-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0879C48380
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 18:09:37 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27CEFC484AD
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 18:23:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83AFD424727
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 16:54:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 999FA4F01FD
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 17:17:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9FF31690D;
-	Mon, 10 Nov 2025 16:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F6D293C4E;
+	Mon, 10 Nov 2025 17:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="TxKlYjN/"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Nev/A3NH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2910F2737F3;
-	Mon, 10 Nov 2025 16:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E701826C39F;
+	Mon, 10 Nov 2025 17:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762793371; cv=none; b=NQoBM8lupNrM6HXnI8R/Tcx3DQCfOWkdncdUoDZA3jcwyVx8p9mpJSG7hNi7QJOrp0zljT1KBbBx2wcQM/4Qv7Ukb0mu/Pyyu6CJwhTKB3Kk4O3GG+m8/CxneR1gBNP0XvFuxRUj7FRkQhxXSGiBXV7m2WZddFgsltIvVApRQic=
+	t=1762795064; cv=none; b=tOEoUfvtqXRlXakuG9H76nlG/C6jj5pfq4Vc24DYcBKNnX0J2JHyNy8ZuUtOvZZWo978EaeckoKiEnnFpouMzwbUe66lkv5wxX7yZg0MOikmW9/MVqx8bVeKjoyHaxLxws2+gf1ZzT+zcZ3Zv0osnEKI63fGTBEHgDwBAsdI8uA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762793371; c=relaxed/simple;
-	bh=dAg7lV6p38a92584BWoHIvoT+pZ93ZRcc+WXnalEY/I=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kGB3Bq7q/1hzMJZGKxqzGTdz6C5PrizWqThRph0+N3O6to2kpLzx1RW+QLlPQKhB22yUtnwjilgofOPPndfoKtGBKqQ7INvuTwKvceNn++THNVTnFQt4Xr1pXgo9uyFJOxjRa99e7urxXT4WsM9zaY05OgnMYk0QidriHQYaCok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=TxKlYjN/; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AAFOIKB3199890;
-	Mon, 10 Nov 2025 08:49:23 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=D+PntMDPhPtz0A95s+u1
-	swkQIUSc56a8yJ/Neey5cFU=; b=TxKlYjN/GnQHdKrnyJVbKALyyPQezDVH9Xjd
-	MIh69kFfgcn9ScSdgwiM+Xc5YXtwqbL3/qVmmny+SkCKIfZ3IbVWAQmWa1sXwQA9
-	M21VTOefSTCuhWmee51GLf2WZGwLsa50fVNi/Y2XK5s103vbdiKzhzoRDrR1Z62J
-	HznYku6RDTrGScTvEhfjmNNWjEmc9ADR2SH/G1ucHPTHu5/AN0FXZSAmtPqh+fyV
-	WLQb6b6MogCerYjbHWltCumcVUqG7weElGpGxzNhusWP6NloSwxVUl5r/xCxBDt0
-	VFYAVhVcbHGaLKGfHIhlL6Qr/BormukRVTpPjAgXPMuXL04XTg==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4abjnqrune-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 10 Nov 2025 08:49:23 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c085:108::150d) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Mon, 10 Nov 2025 16:48:51 +0000
-Date: Mon, 10 Nov 2025 08:48:46 -0800
-From: Alex Mastro <amastro@fb.com>
-To: Alex Williamson <alex@shazbot.org>
-CC: David Matlack <dmatlack@google.com>,
-        Alex Williamson
-	<alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] vfio: selftests: Skip vfio_dma_map_limit_test if mapping
- returns -EINVAL
-Message-ID: <aRIXboz5X4KKq/8R@devgpu015.cco6.facebook.com>
-References: <20251107222058.2009244-1-dmatlack@google.com>
- <aQ6MFM1NX8WsDIdX@devgpu015.cco6.facebook.com>
- <aQ+l5IRtFaE24v0g@devgpu015.cco6.facebook.com>
- <20251108143710.318702ec.alex@shazbot.org>
- <aQ/sShi4MWr6+f5l@devgpu015.cco6.facebook.com>
- <20251110081709.53b70993.alex@shazbot.org>
+	s=arc-20240116; t=1762795064; c=relaxed/simple;
+	bh=lI/nEJMJODueKUd5QjWmkX1Ilbm4jrdu6TAToCeWiIM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lGNqzvuzxG+hn/FChTSmWj14mpLuoUblECKvDuhMrJTaWLM7gztzIFx8jQmZZNyLZ/bDy9u3GteR2TFvkfu3oXxMnQCn5WKI9fR86FUt+sacEzc4OMcl4MeOqmb0RbfTVOerEJM8YuiZlxHpDwivdi0R3iFDm1rfeKifCQhChPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Nev/A3NH; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AADa9Zm031615;
+	Mon, 10 Nov 2025 17:17:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=1fq6WfH10IaQNhmm2T2SUVeF3/pC
+	3vtE1lqeoOp+9ic=; b=Nev/A3NHzDCO+QTE6NBTTxapfu6ZOCE2mgYCOG/Gy9NQ
+	C78zJRFY8gHlmhE94HrQyh7O1liZN3N/yO/Izl69gbimpsixOupgckq3CJgSYMYt
+	+FPKDjTbH0Ut3/RhaXhU5US15ttLsrmMZz+z+pi+rqn3KZwb8MZsRri+gO1yc9gr
+	WwbHrTVDS3UAz8X5+X6ic6Frxbu4ysaS6TkparmxYCeAtX3YgTUhpaOf3XbKishC
+	HiS78K69LSGWRzrcrp3uH9OcqP76OheI2srLVfs1TMtFHsNzKFPMhOF2fuP6c/1W
+	YAJOeppu2O82FTaAvr1RWWexiQg4bRCXvp9VAnFTiw==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a9wk81c3t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Nov 2025 17:17:37 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AAGbcMc011437;
+	Mon, 10 Nov 2025 17:17:36 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aajw16emn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Nov 2025 17:17:36 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AAHHWl816450000
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 10 Nov 2025 17:17:32 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 99D9620043;
+	Mon, 10 Nov 2025 17:17:32 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0E40120040;
+	Mon, 10 Nov 2025 17:17:32 +0000 (GMT)
+Received: from [192.168.88.52] (unknown [9.111.69.239])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 10 Nov 2025 17:17:31 +0000 (GMT)
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+Subject: [PATCH RFC v2 00/11] KVM: s390: Add VSIE SIGP Interpretation
+ (vsie_sigpif)
+Date: Mon, 10 Nov 2025 18:16:40 +0100
+Message-Id: <20251110-vsieie-v2-0-9e53a3618c8c@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251110081709.53b70993.alex@shazbot.org>
-X-Proofpoint-ORIG-GUID: Oiga7WGzTg6NXT49QFGeJsRppwyHIy0v
-X-Authority-Analysis: v=2.4 cv=RMq+3oi+ c=1 sm=1 tr=0 ts=69121793 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=r1p2_3pzAAAA:8 a=FOH2dFAWAAAA:8 a=-7Oq7wjPLrkyoNOUAdIA:9
- a=CjuIK1q_8ugA:10 a=r_pkcD-q9-ctt7trBg_g:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEwMDE0MSBTYWx0ZWRfX7BMpE22kGDB1
- k3hKpd/L27vShvc1uIQrsQpOHcw0ikR6L1JDeV9NquWxiJMfTELVRQ9/i5qT5/hcGSDD27mvyzg
- e1PaVIBRx33pshs7k0Gv6JvT//q0EbCIh0tc1CN66kVE+/FGk/b0MS0A4tb6pxoxNEea6ygFY4t
- 140E7gvaavaaqHgZEo+GVQAulgmn9LaTBSjWaVu48HIx4uOBirAABTxzcT3GBSWKeI8H/Ixy1Ve
- JHtWQ0YtnLalczxU200RI3m7UTNtKLvOLJ2fpTCVzJ0Q3E3l4goNkRn66YbaPXTjb41+31/RvPe
- +apQ17hqbqpFv8tN4A/vjC07i9HlELucwqHz+KE07OHBOO9uIHEaxpwhB2YZYunGG3uGyO0B3aF
- 7Na9Y94JHEDbSLi0bChRYbnN9hMaIQ==
-X-Proofpoint-GUID: Oiga7WGzTg6NXT49QFGeJsRppwyHIy0v
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPgdEmkC/02Pz07DMAyHX6XymVT517TrCQmJB+CKdkg8l1msL
+ SRdNDTt3UnLNHG0/fPnz1dIFJkS9NUVImVOPE+l0E8V4NFPHyT4UGrQUjdS607kxMQkZBvI2AH
+ NrrNQwl+RBr5soHd4e32BfWkeOS1z/NngWW2jjWPUg5OVkMJZpwakwViln088nS81h7HGeYT97
+ Q8e6ftc5Jb7hYdbUV2JjTIijiIk9MIHRZ2zO4++7XML/1+5x53Ua3xNn2b8FIcWFaHXjQ6qz3p
+ dCT6RKAYjL32VXV2UIzbF5/YLIWuwoTQBAAA=
+X-Change-ID: 20250228-vsieie-07be34fc3984
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Christoph Schlameuss <schlameuss@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2689;
+ i=schlameuss@linux.ibm.com; h=from:subject:message-id;
+ bh=lI/nEJMJODueKUd5QjWmkX1Ilbm4jrdu6TAToCeWiIM=;
+ b=owGbwMvMwCUmoqVx+bqN+mXG02pJDJlCclrM+jsj9jc31Lfq+G786lG2oLac9f+W0mTm6oCzH
+ d6rf1d1lLIwiHExyIopslSLW+dV9bUunXPQ8hrMHFYmkCEMXJwCMJF76owMczZqRK22NLvAv4Kr
+ WSuG661e+GungshL+WeF1q7cVHKngOF/ZWmrbME15QmPf7DFLtJJ7jSumX3sxb4ZGdN1fjotFQh
+ mBAA=
+X-Developer-Key: i=schlameuss@linux.ibm.com; a=openpgp;
+ fpr=0E34A68642574B2253AF4D31EEED6AB388551EC3
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDAyMiBTYWx0ZWRfX4QAirXkGE2xr
+ 6U9pd64uovsGgmuDoee19tIVwZBVAloNzkWIJmye8x6BvtzUd3OkBcY4D7FIrLnrJm+rLuKxIfn
+ kC/p7zS6Z5O+bDoVJlBore1fJ5SAVm8mHwiyBn0E/BMsxF5XvuAAr/tkOxhVKOblsO8OX0NpUgh
+ Illf8CLUO81tERelTPXnEObhiiAWEronYoKChLEERQlMA2ivsir2Sj8/ebeiNg8KB5G6tWvjLNM
+ qy/dqIQPgviQAsdHrkbn+ZNj8+CHwLAr4DFFUzHIQkdNxExqfgrdA8BmyKc5HF8QCDSce0JT3Qe
+ 7r3ZS8NL8Sa2ymcgt7b7yyboG8+rd/P819eYXxumgqZCw+aOwd1uRYZvilYjjFwASvULKi0mMt8
+ RNHA48qmeHqI+++MyBvY+CZciVWMBA==
+X-Authority-Analysis: v=2.4 cv=ZK3aWH7b c=1 sm=1 tr=0 ts=69121e31 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VnNF1IyMAAAA:8 a=p1OOIYIeqOTM9QzR76EA:9 a=QEXdDO2ut3YA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-ORIG-GUID: GXgFPiZLJTkiecBGAyBN4DT_FdF-0-tB
+X-Proofpoint-GUID: GXgFPiZLJTkiecBGAyBN4DT_FdF-0-tB
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-10_06,2025-11-10_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0
+ phishscore=0 impostorscore=0 spamscore=0 bulkscore=0 adultscore=0
+ clxscore=1011 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2511080022
 
-On Mon, Nov 10, 2025 at 08:17:09AM -0700, Alex Williamson wrote:
-> On Sat, 8 Nov 2025 17:20:10 -0800
-> Alex Mastro <amastro@fb.com> wrote:
-> 
-> > On Sat, Nov 08, 2025 at 02:37:10PM -0700, Alex Williamson wrote:
-> > > On Sat, 8 Nov 2025 12:19:48 -0800
-> > > Alex Mastro <amastro@fb.com> wrote:  
-> > > > Here's my attempt at adding some machinery to query iova ranges, with
-> > > > normalization to iommufd's struct. I kept the vfio capability chain stuff
-> > > > relatively generic so we can use it for other things in the future if needed.  
-> > > 
-> > > Seems we were both hacking on this, I hadn't seen you posted this
-> > > before sending:
-> > > 
-> > > https://lore.kernel.org/kvm/20251108212954.26477-1-alex@shazbot.org/T/#u
-> > > 
-> > > Maybe we can combine the best merits of each.  Thanks,  
-> > 
-> > Yes! I have been thinking along the following lines
-> > - Your idea to change the end of address space test to allocate at the end of
-> >   the supported range is better and more general than my idea of skipping the
-> >   test if ~(iova_t)0 is out of bounds. We should do that.
-> > - Introducing the concept iova allocator makes sense.
-> > - I think it's worthwhile to keep common test concepts like vfio_pci_device
-> >   less opinionated/stateful so as not to close the door on certain categories of
-> >   testing in the future. For example, if we ever wanted to test IOVA range
-> >   contraction after binding additional devices to an IOAS or vfio container.
-> 
-> Yes, fetching the IOVA ranges should really occur after all the devices
-> are attached to the container/ioas rather than in device init.  We need
-> another layer of abstraction for the shared IOMMU state.  We can
-> probably work on that incrementally.
-> 
-> I certainly like the idea of testing range contraction, but I don't
-> know where we can reliably see that behavior.
+In the upcoming IBM Z machine generation (gen17) the s390x architecture
+adds a new VSIE Interpretation Extension Facility (vsie_sigpif) to
+improve guest-3 guest performance.
 
-I'm not sure about the exact testing strategy for that yet either actually.
+To exploit the new machine support the guest-1 KVM needs to create and
+maintain shadow structures pointing to the original state descriptions
+and system control areas of currently running guest-3 configurations.
+These pointers are followed by the machines firmware and modifications
+of the original SCA for guest-3 (located in guest-2) are monitored and
+handled by firmware. This results in fewer VSIE exits.
 
-> > - What do you think about making the concept of an IOVA allocator something
-> >   standalone for which tests that need it can create one? I think it would
-> >   compose pretty cleanly on top of my vfio_pci_iova_ranges().
-> 
-> Yep, that sounds good.  Obviously what's there is just the simplest
-> possible linear, aligned allocator with no attempt to fill gaps or
-> track allocations for freeing.  We're not likely to exhaust the address
-> space in an individual unit test, I just wanted to relieve the test
-> from the burden of coming up with a valid IOVA, while leaving some
-> degree of geometry info for exploring the boundaries.
+---
+There are still some problems with the current state but I think it is
+in a good state to gather some feedback.
 
-Keeping the simple linear allocator makes sense to me.
+Known Functional Problems:
+- reuse of sca allocation with sigpif enabled does hang
 
-> Are you interested in generating a combined v2?
+Known Non-Functional Problems:
+- Performance of the initial configuration shadowing can be streamlined
+- Performance for reentry can likely be improved
+- Locking can be improved to allow for more concurrency
 
-Sure -- I can put up a v2 series which stages like so
-- adds stateless low level iova ranges queries
-- adds iova allocator utility object
-- fixes end of ranges tests, uses iova allocator instead of iova=vaddr 
+---
+Christoph Schlameuss (11):
+      KVM: s390: Add SCAO read and write helpers
+      KVM: s390: Remove double 64bscao feature check
+      KVM: s390: Move scao validation into a function
+      KVM: s390: Add vsie_sigpif detection
+      KVM: s390: Add ssca_block and ssca_entry structs for vsie_ie
+      KVM: s390: Add helper to pin multiple guest pages
+      KVM: s390: Shadow VSIE SCA in guest-1
+      KVM: s390: Allow guest-3 cpu add and remove with vsie sigpif
+      KVM: s390: Allow guest-3 switch to extended sca with vsie sigpif
+      KVM: s390: Add VSIE shadow configuration
+      KVM: s390: Add VSIE shadow stat counters
 
-> TBH I'm not sure that just marking a test as skipped based on the DMA
-> mapping return is worthwhile with a couple proposals to add IOVA range
-> support already on the table.  Thanks,
+ arch/s390/include/asm/kvm_host.h               |  16 +-
+ arch/s390/include/asm/kvm_host_types.h         |  24 +-
+ arch/s390/include/asm/sclp.h                   |   1 +
+ arch/s390/kvm/kvm-s390.c                       |  14 +-
+ arch/s390/kvm/kvm-s390.h                       |   2 +-
+ arch/s390/kvm/vsie.c                           | 852 +++++++++++++++++++++----
+ drivers/s390/char/sclp_early.c                 |   1 +
+ tools/testing/selftests/kvm/include/s390/sie.h |   2 +-
+ 8 files changed, 773 insertions(+), 139 deletions(-)
+---
+base-commit: 62ad2b01b0c7dba966c6843b77e99b06a3b12d27
+change-id: 20250228-vsieie-07be34fc3984
+prerequisite-change-id: 20250513-rm-bsca-ab1e8649aca7:v7
+prerequisite-patch-id: 52dadcc65bc9fddfee7499ed55a3fa909051ab1c
+prerequisite-change-id: 20250602-rm-sca-lock-d7c1eca252b1:v2
+prerequisite-patch-id: 52dadcc65bc9fddfee7499ed55a3fa909051ab1c
+prerequisite-patch-id: 7117176d5763754fc7c1474288bcbe4de567c60e
 
-I'll put up the new series rooted on linux-vfio/next soon.
+Best regards,
+-- 
+Christoph Schlameuss <schlameuss@linux.ibm.com>
+
 
