@@ -1,220 +1,275 @@
-Return-Path: <kvm+bounces-62515-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62516-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42337C47846
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 16:26:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1B2DC47885
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 16:28:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 78AB84F3127
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:19:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1456C1885B85
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 226C523D2B2;
-	Mon, 10 Nov 2025 15:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20C3825A2DE;
+	Mon, 10 Nov 2025 15:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FSf2bZdP";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="J6SfizIQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ePYpfMI7";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OyS0Eybc"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7798A18DB37
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 15:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEE521579F
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 15:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762787934; cv=none; b=iKlwlMYaC+9Y3qVqkCxIYXPxE6WhEUWHymypKDgLuWNff9aPnjroPPhcEIMPVltVKWuMRwB081GbykJJjLGkmn5zDkT4e3IUYiRyW31AZjshiOLMU9BkxnQISp78h4n+PKVOibiaLBXrEMW/osMT331Z5cl1Rc3zckMzpHWT8Xw=
+	t=1762788334; cv=none; b=rmlngiu28Fk2HkRvI2lDHrTDPptTyqIl5PyJuOGO3yAdSA9Lh4KD0E+JEuZF77ZTtkPYz/c9D9i56PNtOVZFulOlbRbxul8FW/r12mz5PHOGNj7Hp6W3NC3ZYPn8LAiahXWpwEJbIgtdXta5r8OK2lddfY1ZoAHw8HgUYsVvhbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762787934; c=relaxed/simple;
-	bh=ipX76GJ+E+MU92+t7o//0oqh+sfpvzqejU1G4XYNo1o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MwhMH/e3W72I1Bj8zqAKfqn6a9MdiIizBWT13LFgCkjy9CqPP0O9LxoIgI1LE1/D1G3yGntZYR+WEln/pJiVqUyKmfVWU9+sTOrgO6wYYfenDcX+mq+MRQT0n306vce81DY9kYUrtPUWEzPWNs9L0C3LCOjrfO1+s/vyot2e9eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FSf2bZdP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=J6SfizIQ; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1762788334; c=relaxed/simple;
+	bh=3PdoaQ69lO98fxJxlxz78/56MDJZTv4E2mJnO7/mo0A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ROg26zamEadNSxSfR7G43eBEDthuBgLiWC/Do7ous9hm1OQvrciQO/NrNjwlHFbYcx0lQr7yjq6rf1uRPVlJM3wQl54Q8ChyV4EKsN8eVbac8eJdBaE1MQL0PCXo0iRsbtj3tSuFlpyaK07M5Rn45VVQCXC15zqgu7Nq2HibpCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ePYpfMI7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OyS0Eybc; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762787931;
+	s=mimecast20190719; t=1762788331;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=AlA+x0tRAsBDGTDa9nRiETe1XJez8KQz5PhSrdYv6ys=;
-	b=FSf2bZdPyXz4BPBHFx70cWxbGN5oqjZFP/4/s+5rV9tvJf5Ys+vLlwtVrQcUReeQ/YO6dx
-	B0PRLQr+xiBig08K+msob//izGRcuZaMmtL/g6YcbWo7AhZVYTwCAkb/Xyg2q973KvcZ5A
-	d+or1Tg+OvpDW5OHx7uigg1VpC/gTck=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YJCJNPxt+7zeWQvgKHWvJDmRLvWvUbVuicewdqhIuZQ=;
+	b=ePYpfMI7jvPSyrBCuwsBh20SquolDyJHnqLCzgwvS7fleh3OXzqPPL7U4wgdTYTQye3vWh
+	fCvtvGTW1K3lNq9S6pAgamKEgNJptl1F1W0ukApU26y4dim99MG2T4hsriUlPnlMp3g39+
+	sGtBwe5A4N/5AUqpDN48LqooWBVBVrg=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-543-PIcJkFp3M_WFqEh2mEA90w-1; Mon, 10 Nov 2025 10:18:50 -0500
-X-MC-Unique: PIcJkFp3M_WFqEh2mEA90w-1
-X-Mimecast-MFC-AGG-ID: PIcJkFp3M_WFqEh2mEA90w_1762787929
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-7a9fb6fcc78so2458492b3a.3
-        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:18:50 -0800 (PST)
+ us-mta-93-Ar0ggATGOFGiJXcBgpFbzg-1; Mon, 10 Nov 2025 10:25:28 -0500
+X-MC-Unique: Ar0ggATGOFGiJXcBgpFbzg-1
+X-Mimecast-MFC-AGG-ID: Ar0ggATGOFGiJXcBgpFbzg_1762788328
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-297f8a2ba9eso50828635ad.3
+        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:25:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762787928; x=1763392728; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=AlA+x0tRAsBDGTDa9nRiETe1XJez8KQz5PhSrdYv6ys=;
-        b=J6SfizIQTfgOSs7RVTnbI68sLJ8L3ozByVForhOJDam7Jlh0cETc2kakFalNEWYXxx
-         sQr4OqlUXPVISE3r3MWNxQbtxQv16SDfIKv+l2FnOiWBQyBY/+V89atJ4mK8bhD1MCnW
-         UlPiToOZLxv0zjA2gHEIAFw/jxRbxplXB4k+PswjR9sG8CyCgUsscc6AYvM0dg43dAbQ
-         N/RtsOal5RZZTbdclUDWfej+3KBZHCVNbuuf9u8Z98VDJYhKj4FedoQ9VYhxmCYvNKzl
-         L0K0Suw4uhQI8aRAUwRdzQhsXAoWCmblbIsXwBVTj+PLbKBUkM2t0jH6X1/OAeyknBL2
-         g7GA==
+        d=redhat.com; s=google; t=1762788327; x=1763393127; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YJCJNPxt+7zeWQvgKHWvJDmRLvWvUbVuicewdqhIuZQ=;
+        b=OyS0EybceKhO2JMX/AcPD9wKbeXdRFDTPrQKz1K9tJSHcH2afuf8NSLptNXFEcu9H/
+         TsWe6qzgg8bI+6W1qrARFbq5XCDD+G3Mx69dtFugYFFUo05DXO7kLQTzeVQxtbxyU64F
+         kVTy6F500ntb3BBSCsAn6zphffsmzw73/Tg0BXKh2KZuIhn7X22tpySL9A1eedOUJQN7
+         e5xySv5XsDEYZqGk6aklyepwxaet3jaZilZC+2xzoZg4kQqKKgPST5hMNCU8iSOXRLJW
+         7PUsdOYEznMc3JLxKUBUCGr3ICMiJjxwGaJQ8e3uL9JzD7SX1hASitwTaL34XkqRQZSi
+         8zOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762787928; x=1763392728;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1762788327; x=1763393127;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AlA+x0tRAsBDGTDa9nRiETe1XJez8KQz5PhSrdYv6ys=;
-        b=q7a572hAkGLvqAjDAO6pA74YmMOi39rMz/3kLXz4T1Qw6pAB6HzHw+S0C+Ah0j6A2k
-         3hpmt+2HVHdjgKnP9tES/cg+B1GKDxJBcWGmfU2BThz2pwY4SxVJwWwfNq0bUO8NOiJp
-         gJ/CqsbajtPDpcQaWfU74SHA0XW6atzDlfsto2DWnf5np5c3Z2jIwKvDpf0KkXRR7T30
-         vggufDByabzm4kHV7ZWE5rhz+ie4cbfHNQfsmXbk6vbHvVF28iWWcY1ICMCy79/kNhRK
-         VIN5eZmR1sUaeprUd6oj7l4GmI26Sau8sAHHlg/xCu9O7ec5hpa5jn/QvAnBefA+nmQP
-         nmBw==
-X-Gm-Message-State: AOJu0Yy4y4YibhvROXiKb8QliOM9XJJsdxwRvP1GJK1bgspf19BH3uUf
-	uQthXIJg60Wtn/Lps3oaiyLxgvC7LlYLPONTTzpHhSrWIbl84tqsCJ44dRFhiPtLObVQcivwsKR
-	Uv3I0xTMAfAVu0DcP2ftbruNkutYnonXr8ZniXxbZpfEZd70MwEVDj65hqpHScA==
-X-Gm-Gg: ASbGncvunX2bnuANPB5BEl8zpIUpPSbvyQtFLEPtkugYsXVoN5RLHa01G/laVTLHEI7
-	VR7M0EgjIfDWN85WD1GIlyCwqTFKqm+wVZg68sNZTQSTHSL+byu+wOPo92RM1Ims9LSsDBWfDt3
-	S1/4sQIyXgVwxVqXa/CsPjftrmnFE6DqAAIyv3x1JiYGIA7CSHymi7Xl3FM1p6QQsN86MlvFEoj
-	WAEZ61GK6g7dCUMbvX6ppTKIFrhT5OOkQlpd+Skfa1NVJ0nj2PntqhhR6XgrFmdsdwZIXgQ7Z/A
-	JauQLkNk6etGkOQg77n6XqRNVerfCG5is+DBrzGoyjt7mRmmtsD7X4vr893yP8xPOniEUDzstff
-	zmL3Q9PnXg/vT5nSBdyPfnPREVw5abEnNkn1zv0gmQkILyleuUZAQLfTeXrAmzt3S8gWRNJMRP4
-	hhdv8qgZsgj1IyGV/+FroF6WCPnrvc
-X-Received: by 2002:a05:6a20:5483:b0:342:873d:7e62 with SMTP id adf61e73a8af0-353a2d42046mr10053485637.29.1762787928212;
-        Mon, 10 Nov 2025 07:18:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH2rcG42hzb4L/Vmwsv1WFpuCX/wTouXy7m9UtumHSxM2ed5rjvQJY8JW0zkSSyPLbwhXkjug==
-X-Received: by 2002:a05:6a20:5483:b0:342:873d:7e62 with SMTP id adf61e73a8af0-353a2d42046mr10053435637.29.1762787927572;
-        Mon, 10 Nov 2025 07:18:47 -0800 (PST)
+        bh=YJCJNPxt+7zeWQvgKHWvJDmRLvWvUbVuicewdqhIuZQ=;
+        b=Og/WZphxA05gjDUq5fWawoQyLe86OG1zI63xYw9voImaSm0BOv+wVDTnv4y438gg5I
+         DS7SRwem1VLoLzbgYEsQQ/bxAhS4paDjX/lqrprBfQE4/c2NHoja3BOQdyKebqAccGUp
+         MzqQDzxgolsmTyAB19AC9+qJZ05+VNBTSBYKxHuZNHls19rNtogkkB+GziQCGxOMler0
+         jj26MWEK2g0+PuIV6l+b1/YatiosT4wi64hBf7qOLFS5kED+lrnBgAUk3xKN29Zs5w4H
+         EiTS67wUlRuCusF6l+8Q0v5xe+lR2hR4TgRtgCmrU8LD0PNfz/Ow1cC+QRvVzXe4Opif
+         oV7A==
+X-Forwarded-Encrypted: i=1; AJvYcCU8HsPnlqOnbg7fJPcA7OTIA3YCvRlJoFgktTZjlvY3ByEsxnz5xDkldfMd4GBVR/kewlc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEVx5PGfJF3LKnkQV1Sv+Ey47j4YILKT+tgKxcC/7n0LrsBLUl
+	VKlYTVsc2ok3EvcoGf3fjfsHMNQwoMH8gG9skcRgcJD0jwHRpP9c6kd6HRujCI+KsRubkMJiB5j
+	xKqmvrZrqVQ7AmgbBS6VnsCcZF3frwbR2ZtJykZzDyzDY1O/sVKeTyTUzGqLILA==
+X-Gm-Gg: ASbGncus6u7sbmzc9QQaeH1rpgTi00p1PnV7y1IIN2dG52SoeLlfb4N46JdcuOzClhJ
+	59HJU0oaLkI4rdZYUh7JVxkIWQNnOWzvSNUJsF4KOqiKZ6j4IEsgHfS+BPt9ObWBQO6DT1F/qbE
+	rN1BisvUQT/nuGpnsnYDDCwgmCNWlZQ5o7MuA8aZozIdf1XXt98Z2hxC+dp3sX29bDxKMXe517O
+	VlW9OOyfkLOi3IMDtEKkpMfbjCYPYHF5RYNmSYluAN4xhv+PhY73KcVbZVAJvgk9RkPe+XCF4bX
+	ZyC9ctjx+t3WItY9/ed+YSRURCT/dKoIabX+d0RKT3ZhsqMn66l8HPtiAiqCvo1eYIpPHL+W/g5
+	lHPoqhRokhL94xbQhSDk7RAa/TvLOACQVOqzbmalew7zSbBht19os5Lci6DRuwueLJ8bafhs1XX
+	pD5t25HrHhEQ06A1IYm3nBwZg5S6h7
+X-Received: by 2002:a17:902:e88f:b0:295:592e:7633 with SMTP id d9443c01a7336-297e56be211mr121170575ad.29.1762788326973;
+        Mon, 10 Nov 2025 07:25:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHp6btLyGMbhBFVf9NawnEUuYIX/bUHYsz7izUv20oBDHeYwe1eKrgYurw9h6/x7rKkrG1fEQ==
+X-Received: by 2002:a17:902:e88f:b0:295:592e:7633 with SMTP id d9443c01a7336-297e56be211mr121170135ad.29.1762788326458;
+        Mon, 10 Nov 2025 07:25:26 -0800 (PST)
 Received: from [10.201.49.111] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7b0c953d0a6sm12124750b3a.12.2025.11.10.07.18.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Nov 2025 07:18:46 -0800 (PST)
-Message-ID: <e47c4e56-d279-4aa8-8e78-ca1fe77b9f3e@redhat.com>
-Date: Mon, 10 Nov 2025 16:18:38 +0100
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-296509682bfsm153193685ad.4.2025.11.10.07.25.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Nov 2025 07:25:25 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 6.18-rc5^H6
+Date: Mon, 10 Nov 2025 16:25:17 +0100
+Message-ID: <20251110152517.421706-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86: Enforce use of EXPORT_SYMBOL_FOR_KVM_INTERNAL
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Chao Gao <chao.gao@intel.com>
-References: <20251106202811.211002-1-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20251106202811.211002-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/6/25 21:28, Sean Christopherson wrote:
-> +# Fail the build if there is unexpected EXPORT_SYMBOL_GPL (or EXPORT_SYMBOL)
-> +# usage.  All KVM-internal exports should use EXPORT_SYMBOL_FOR_KVM_INTERNAL.
-> +# Only a handful of exports intended for other modules (VFIO, KVMGT) should
-> +# use EXPORT_SYMBOL_GPL, and EXPORT_SYMBOL should never be used.
-> +ifdef CONFIG_KVM_X86
-> +define newline
-> +
-> +
-> +endef
+Linus,
 
-$(newline) is already defined in scripts/Kbuild.include, is it necessary 
-here?
+The following changes since commit 6146a0f1dfae5d37442a9ddcba012add260bceb0:
 
-> +# Search recursively for whole words and print line numbers.  Filter out the
-> +# allowed set of exports, i.e. those that are intended for external usage.
-> +exports_grep_trailer := --include='*.[ch]' -nrw $(srctree)/virt/kvm $(srctree)/arch/x86/kvm | \
-> +			grep -v -e kvm_page_track_register_notifier \
-> +				-e kvm_page_track_unregister_notifier \
-> +				-e kvm_write_track_add_gfn \
-> +				-e kvm_write_track_remove_gfn \
-> +				-e kvm_get_kvm \
-> +				-e kvm_get_kvm_safe \
-> +				-e kvm_put_kvm
-> +
-> +# Force grep to emit a goofy group separator that can in turn be replaced with
-> +# the above newline macro (newlines in Make are a nightmare).  Note, grep only
-> +# prints the group separator when N lines of context are requested via -C,
-> +# a.k.a. --NUM.  Simply request zero lines.  Print the separator only after
-> +# filtering out expected exports to avoid extra newlines in the error message.
-> +define get_kvm_exports
-> +$(shell grep "$(1)" -C0 $(exports_grep_trailer) | grep "$(1)" -C0 --group-separator="AAAA")
+  Linux 6.18-rc4 (2025-11-02 11:28:02 -0800)
 
-Maybe replace AAAA with something less goofy like !SEP! or similar?
+are available in the Git repository at:
 
-> +endef
-> +
-> +define check_kvm_exports
-> +nr_kvm_exports := $(shell grep "$(1)" $(exports_grep_trailer) | wc -l)
-> +
-> +ifneq (0,$$(nr_kvm_exports))
-> +$$(error ERROR ***\
-> +$$(newline)found $$(nr_kvm_exports) unwanted occurrences of $(1):\
-> +$$(newline)  $(subst AAAA,$$(newline) ,$(call get_kvm_exports,$(1)))\
-> +$$(newline)in directories:\
-> +$$(newline)  $(srctree)/arch/x86/kvm\
-> +$$(newline)  $(srctree)/virt/kvm\
-> +$$(newline)Use EXPORT_SYMBOL_FOR_KVM_INTERNAL, not $(1))
-> +endif # nr_kvm_exports != expected
-> +undefine exports_advice
-> +undefine nr_kvm_exports
-> +endef # check_kvm_exports
-> +
-> +$(eval $(call check_kvm_exports,EXPORT_SYMBOL_GPL))
-> +$(eval $(call check_kvm_exports,EXPORT_SYMBOL))
-> +
-> +undefine check_kvm_exports
-> +undefine get_kvm_exports
-> +undefine exports_grep_trailer
-> +undefine newline
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-(if the definition is not needed above, remember to remove the 
-"undefine" here too).
+for you to fetch changes up to 8a4821412cf2c1429fffa07c012dd150f2edf78c:
 
-Thanks,
+  KVM: nSVM: Fix and simplify LBR virtualization handling with nested (2025-11-09 08:50:13 +0100)
+
+I generally try to send out on Sunday to ensure I collect pull requests
+from all submaintainers, but yesterday I only prepared this one and
+didn't have time to send it; the timing will therefore make 6.18-rc6 a
+bit bigger.
 
 Paolo
+----------------------------------------------------------------
+Arm:
+
+- Fix trapping regression when no in-kernel irqchip is present
+
+- Check host-provided, untrusted ranges and offsets in pKVM
+
+- Fix regression restoring the ID_PFR1_EL1 register
+
+- Fix vgic ITS locking issues when LPIs are not directly injected
+
+Arm selftests:
+
+- Correct target CPU programming in vgic_lpi_stress selftest
+
+- Fix exposure of SCTLR2_EL2 and ZCR_EL2 in get-reg-list selftest
+
+RISC-V:
+
+- Fix check for local interrupts on riscv32
+
+- Read HGEIP CSR on the correct cpu when checking for IMSIC interrupts
+
+- Remove automatic I/O mapping from kvm_arch_prepare_memory_region()
+
+x86:
+
+- Inject #UD if the guest attempts to execute SEAMCALL or TDCALL as KVM
+  doesn't support virtualization the instructions, but the instructions
+  are gated only by VMXON.  That is, they will VM-Exit instead of taking
+  a #UD and until now this resulted in KVM exiting to userspace with an
+  emulation error.
+
+- Unload the "FPU" when emulating INIT of XSTATE features if and only if
+  the FPU is actually loaded, instead of trying to predict when KVM will
+  emulate an INIT (CET support missed the MP_STATE path).  Add sanity
+  checks to detect and harden against similar bugs in the future.
+
+- Unregister KVM's GALog notifier (for AVIC) when kvm-amd.ko is unloaded.
+
+- Use a raw spinlock for svm->ir_list_lock as the lock is taken during
+  schedule(), and "normal" spinlocks are sleepable locks when PREEMPT_RT=y.
+
+- Remove guest_memfd bindings on memslot deletion when a gmem file is dying
+  to fix a use-after-free race found by syzkaller.
+
+- Fix a goof in the EPT Violation handler where KVM checks the wrong
+  variable when determining if the reported GVA is valid.
+
+- Fix and simplify the handling of LBR virtualization on AMD, which was made
+  buggy and unnecessarily complicated by nested VM support
+
+Misc:
+
+- Update Oliver's email address
+
+----------------------------------------------------------------
+Chao Gao (1):
+      KVM: x86: Call out MSR_IA32_S_CET is not handled by XSAVES
+
+Fangyu Yu (2):
+      RISC-V: KVM: Read HGEIP CSR on the correct cpu
+      RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP
+
+Marc Zyngier (3):
+      KVM: arm64: Make all 32bit ID registers fully writable
+      KVM: arm64: Set ID_{AA64PFR0,PFR1}_EL1.GIC when GICv3 is configured
+      KVM: arm64: Limit clearing of ID_{AA64PFR0,PFR1}_EL1.GIC to userspace irqchip
+
+Mark Brown (2):
+      KVM: arm64: selftests: Add SCTLR2_EL2 to get-reg-list
+      KVM: arm64: selftests: Filter ZCR_EL2 in get-reg-list
+
+Maxim Levitsky (1):
+      KVM: SVM: switch to raw spinlock for svm->ir_list_lock
+
+Maximilian Dittgen (1):
+      KVM: selftests: fix MAPC RDbase target formatting in vgic_lpi_stress
+
+Oliver Upton (3):
+      KVM: arm64: vgic-v3: Reinstate IRQ lock ordering for LPI xarray
+      KVM: arm64: vgic-v3: Release reserved slot outside of lpi_xa's lock
+      MAINTAINERS: Switch myself to using kernel.org address
+
+Paolo Bonzini (3):
+      Merge tag 'kvm-riscv-fixes-6.18-2' of https://github.com/kvm-riscv/linux into HEAD
+      Merge tag 'kvm-x86-fixes-6.18-rc5' of https://github.com/kvm-x86/linux into HEAD
+      Merge tag 'kvmarm-fixes-6.18-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+
+Samuel Holland (1):
+      RISC-V: KVM: Fix check for local interrupts on riscv32
+
+Sascha Bischoff (1):
+      KVM: arm64: vgic-v3: Trap all if no in-kernel irqchip
+
+Sean Christopherson (7):
+      KVM: VMX: Inject #UD if guest tries to execute SEAMCALL or TDCALL
+      KVM: x86: Unload "FPU" state on INIT if and only if its currently in-use
+      KVM: x86: Harden KVM against imbalanced load/put of guest FPU state
+      KVM: SVM: Initialize per-CPU svm_data at the end of hardware setup
+      KVM: SVM: Unregister KVM's GALog notifier on kvm-amd.ko exit
+      KVM: SVM: Make avic_ga_log_notifier() local to avic.c
+      KVM: guest_memfd: Remove bindings on memslot deletion when gmem is dying
+
+Sebastian Ene (1):
+      KVM: arm64: Check the untrusted offset in FF-A memory share
+
+Sukrit Bhatnagar (1):
+      KVM: VMX: Fix check for valid GVA on an EPT violation
+
+Vincent Donnefort (1):
+      KVM: arm64: Check range args for pKVM mem transitions
+
+Yosry Ahmed (3):
+      KVM: SVM: Mark VMCB_LBR dirty when MSR_IA32_DEBUGCTLMSR is updated
+      KVM: nSVM: Always recalculate LBR MSR intercepts in svm_update_lbrv()
+      KVM: nSVM: Fix and simplify LBR virtualization handling with nested
+
+ .mailmap                                           |  3 +-
+ MAINTAINERS                                        |  2 +-
+ arch/arm64/kvm/hyp/nvhe/ffa.c                      |  9 ++-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c              | 28 +++++++
+ arch/arm64/kvm/sys_regs.c                          | 71 +++++++++--------
+ arch/arm64/kvm/vgic/vgic-debug.c                   | 16 +++-
+ arch/arm64/kvm/vgic/vgic-init.c                    | 16 +++-
+ arch/arm64/kvm/vgic/vgic-its.c                     | 18 ++---
+ arch/arm64/kvm/vgic/vgic-v3.c                      |  3 +-
+ arch/arm64/kvm/vgic/vgic.c                         | 23 ++++--
+ arch/riscv/kvm/aia_imsic.c                         | 16 +++-
+ arch/riscv/kvm/mmu.c                               | 25 +-----
+ arch/riscv/kvm/vcpu.c                              |  2 +-
+ arch/x86/include/uapi/asm/vmx.h                    |  1 +
+ arch/x86/kvm/svm/avic.c                            | 24 +++---
+ arch/x86/kvm/svm/nested.c                          | 20 ++---
+ arch/x86/kvm/svm/svm.c                             | 88 ++++++++++------------
+ arch/x86/kvm/svm/svm.h                             |  4 +-
+ arch/x86/kvm/vmx/common.h                          |  2 +-
+ arch/x86/kvm/vmx/nested.c                          |  8 ++
+ arch/x86/kvm/vmx/vmx.c                             |  8 ++
+ arch/x86/kvm/x86.c                                 | 48 +++++++-----
+ tools/testing/selftests/kvm/arm64/get-reg-list.c   |  3 +
+ tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c |  9 ++-
+ virt/kvm/guest_memfd.c                             | 47 ++++++++----
+ 25 files changed, 297 insertions(+), 197 deletions(-)
 
 
