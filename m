@@ -1,155 +1,167 @@
-Return-Path: <kvm+bounces-62503-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62504-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E26EAC465D3
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 12:49:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60DD0C4674B
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 13:07:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F10AE3BA354
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 11:47:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CD12189ADE8
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 12:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB25330AAC8;
-	Mon, 10 Nov 2025 11:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBC830EF62;
+	Mon, 10 Nov 2025 12:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rcCMBG+V"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="koM03mHG"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3319221282;
-	Mon, 10 Nov 2025 11:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE8530DD2C;
+	Mon, 10 Nov 2025 12:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762775264; cv=none; b=VjDzOhGhsjUYEyhs+VDNNBSXAcyOwdAve94qQZq36/3p4ovrrj3iFc/ghNTgXj3/kOrc2cpk1QbN8eoXds2xOr0BH3yuKibmf8uYUcl9uhE7TYZKIJdkS/ZPrqYcMO8S3mzGzMuA/e04MAXIaDaWvpHYCF/SpFcCXkgbuGixwAw=
+	t=1762776168; cv=none; b=jTJnxrzMB8/zWRyN6QmDIUr5K93fzbHRlvgeTzj0WPqMFJxKjYUGub0lRfSbn9ggPNarsG3BopE829DEzK8MB5oSTZo+Hregw2ObRk4xqqp9wnpIwOg8FfDaa9kS0gn3VVWuSj0TlrV3F53YfUbJ3BOtap3bOJmr02k01j3eVRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762775264; c=relaxed/simple;
-	bh=99WN30ryzWzH5hzRtlGC+kQjBRsdpDks1HmAmYRDMKA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CvYE6vtLwIZ2RD304VmKvyNeS3zW8D/iVaCRtE011PD0UrwxqA4QZVzWRT38ovRb20AZdPSStiVKKGoLO0PsFdnciKvnh2Yj5FKrh80zNh0R3Z8IHlfhMjEJ6jf1fS9/KvfAKYKLBvgLgSy4uThusWWANHW4oJZms1QBcOg5xZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rcCMBG+V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1FEDC19422;
-	Mon, 10 Nov 2025 11:47:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762775263;
-	bh=99WN30ryzWzH5hzRtlGC+kQjBRsdpDks1HmAmYRDMKA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rcCMBG+VU5HREdfNJgNish0MFJIZMNJB0GFmidQV69QhAQqOZ4lqKFwAPDLb9mAiY
-	 Ew6Wn4RUdcGoM6WtLDUdtGNBZVwQJ4fy9PQaj7U3bL6z5JKWqComWBXRmt9533il7O
-	 NlfPBLPdzDkucsF6uUXYm50ZpOp80hJdn2Z6RE5CfVob9Ghq5Cb2G6jTDxgI90eV+9
-	 cJdhJa2nmvpOC6BDo1EX75IUo5j+fq1FVuFW71MCaEsNEg508A98DhglHfhOVBq95h
-	 sQg5vNRU1fHyAWybkezEUX5uZtVUlYsRjH1m+wrU7eYrk6r4duvg1ZhKvbgERHVzga
-	 H4qvzB+ZK9BEw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vIQN3-00000003qIk-1Cd1;
-	Mon, 10 Nov 2025 11:47:41 +0000
-Date: Mon, 10 Nov 2025 11:47:40 +0000
-Message-ID: <867bvyun1f.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 04/45] KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
-In-Reply-To: <a914297b-753b-4fa0-8ffc-3a64b006316c@arm.com>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-5-maz@kernel.org>
-	<a914297b-753b-4fa0-8ffc-3a64b006316c@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1762776168; c=relaxed/simple;
+	bh=REp9wQTaEi6nHXZh4VunZPcTgElybS6FbKuJdk8yULU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=itrcDX3LHnaf4tvu+hE6Z+CK5ZrtndI0M+ZUocA0r1DNL25nCsyOzJFwPIMoGnKOC3MA2nD27F7vnSFM43xKiXL17wPqc/DojT/B7Pb7wvlcJkSxXUmstaZcaD14lP5GxIfFNdSEldmyIqSSfOuZP2OFLQLv0pkGAVOz4tUZi0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=koM03mHG; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A9Jt3Ho015833;
+	Mon, 10 Nov 2025 12:02:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=EMHJjy
+	3qfDUPwPK/YVKa96nT5T98Vmmf6aAAX/6JP5s=; b=koM03mHGSM4qb0L2zIX6zp
+	EC9LjiQqH93Q34AhlwzkNCeL8yH7V3SFLjD1INJyjH5HoeRf8WE1yaoyECBNYyOl
+	OythlMTeFT8ldj+0BSSAEYcYOXDc3qvMAM4zEPldbUGISICV4YVhJWRyT2Cy7FWH
+	laKaXL0rQjvUetLI69M1NB4alR2JFk2Ouqt6bmG9turTvG2F5L1bm0FIlOtOIGPL
+	wNK8SpISu50STVLd8onFLQ+DGhf4IyytFtdd0ibdFZyuh/ZNnElqHWpkgTbuc/Wf
+	uH9mmmwPxzh2ruUcuJs3lpkQbJOQ2SjVxUatXAZW4VH8ff13VhBApjGgyo0a98qA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa3m7x8gb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Nov 2025 12:02:17 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5AABxwbv004164;
+	Mon, 10 Nov 2025 12:02:17 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa3m7x8g9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Nov 2025 12:02:17 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AA98fRp008218;
+	Mon, 10 Nov 2025 12:02:16 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4aah6mnf5m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Nov 2025 12:02:16 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AAC2CHm22217422
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 10 Nov 2025 12:02:12 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 784FB20043;
+	Mon, 10 Nov 2025 12:02:12 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 08CD62004B;
+	Mon, 10 Nov 2025 12:02:12 +0000 (GMT)
+Received: from [9.155.199.94] (unknown [9.155.199.94])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 10 Nov 2025 12:02:11 +0000 (GMT)
+Message-ID: <a1e5a8db-8382-4f52-8ef2-3b62b0c031ab@linux.ibm.com>
+Date: Mon, 10 Nov 2025 13:02:11 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/10] sched/kvm: Semantics-aware vCPU scheduling for
+ oversubscribed KVM
+To: Wanpeng Li <kernellwp@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Juri Lelli <juri.lelli@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>, Mete Durlu <meted@linux.ibm.com>
+References: <20251110033232.12538-1-kernellwp@gmail.com>
+Content-Language: en-US
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20251110033232.12538-1-kernellwp@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=MtZfKmae c=1 sm=1 tr=0 ts=6911d44a cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=GvQkQWPkAAAA:8 a=RGqg41XGIlgyeIaX6XkA:9 a=QEXdDO2ut3YA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: qXsWQnQL86nX1XvMI3FtIg5oLzxHqs6d
+X-Proofpoint-ORIG-GUID: bpb605FGcMWJ3fRxGCD26Rs-flBGB4Fu
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA3OSBTYWx0ZWRfX5cdfHi7QNWyw
+ 4AGDjPnDx5KhpOOm/6/eKaBa6uALkPoIAkNqIPEW4jcsNmqoiuWuhLBcabEYgWrouNQQ+OdnTng
+ uZxHVN5DdVPoYvQkLm/0QqydjDxFD7DD5pyOF0NK1U/FVkhB5QxAbMbGtawBh0Xi9ZU6anORBTg
+ QMSIZyED7k1CLi2CTfxFQ17VDrB2v2HTGVf1/BeT9DlxDTa0OY5U7J+SIMSqdsIEGtP3rbDsAVA
+ snzWn3FlEUMubepQpYnzNjpbQ2z5Qd3cRRy7o/G0TQ1ebB3rSdlrfbH/r+ZRdycYVf+fvfAK8hF
+ u5ShSDtVmdwB+iV97498cGXe7c5qUfZF5MgZtw+jHODjtqoN5Vvyca8es1lEIfGPG+853WvfNzw
+ it9OEdI3s1kjWxwC8qj0n3dYQsfdTw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-10_04,2025-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0 impostorscore=0
+ suspectscore=0 lowpriorityscore=0 clxscore=1011 phishscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080079
 
-On Mon, 10 Nov 2025 10:40:21 +0000,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+Am 10.11.25 um 04:32 schrieb Wanpeng Li:
+> From: Wanpeng Li <wanpengli@tencent.com>
 > 
-> Hi Marc,
+> This series addresses long-standing yield_to() inefficiencies in
+> virtualized environments through two complementary mechanisms: a vCPU
+> debooster in the scheduler and IPI-aware directed yield in KVM.
 > 
-> On 09/11/2025 17:15, Marc Zyngier wrote:
-> > The trap bits are currently only set to manage CPU errata. However,
-> > we are about to make use of them for purposes beyond beating broken
-> > CPUs into submission.
-> > 
-> > For this purpose, turn these errata-driven bits into a patched-in
-> > constant that is merged with the KVM-driven value at the point of
-> > programming the ICH_HCR_EL2 register, rather than being directly
-> > stored with with the shadow value..
-> > 
-> > This allows the KVM code to distinguish between a trap being handled
-> > for the purpose of an erratum workaround, or for KVM's own need.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
+> Problem Statement
+> -----------------
 > 
-> ...
+> In overcommitted virtualization scenarios, vCPUs frequently spin on locks
+> held by other vCPUs that are not currently running. The kernel's
+> paravirtual spinlock support detects these situations and calls yield_to()
+> to boost the lock holder, allowing it to run and release the lock.
 > 
-> > diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> > index ac5f9c5d2b980..0ecadfa00397d 100644
-> > --- a/arch/arm64/kvm/vgic/vgic.h
-> > +++ b/arch/arm64/kvm/vgic/vgic.h
-> > @@ -164,6 +164,22 @@ static inline int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
-> >   	return ret;
-> >   }
-> >   +void kvm_compute_ich_hcr_trap_bits(struct alt_instr *alt,
-> > +				   __le32 *origptr, __le32 *updptr, int nr_inst);
-> > +
-> > +static inline u64 vgic_ich_hcr_trap_bits(void)
-> > +{
-> > +	u64 hcr;
+> However, the current implementation has two critical limitations:
 > 
-> minor nit: Do we need a guard to make sure this isn't called before
-> the capabilities are finalized (given we may use it outside VM
-> context, e.g. VGIC probe). perhaps :
+> 1. Scheduler-side limitation:
 > 
-> WARN_ON(!system_capabilities_finalized());
+>     yield_to_task_fair() relies solely on set_next_buddy() to provide
+>     preference to the target vCPU. This buddy mechanism only offers
+>     immediate, transient preference. Once the buddy hint expires (typically
+>     after one scheduling decision), the yielding vCPU may preempt the target
+>     again, especially in nested cgroup hierarchies where vruntime domains
+>     differ.
+> 
+>     This creates a ping-pong effect: the lock holder runs briefly, gets
+>     preempted before completing critical sections, and the yielding vCPU
+>     spins again, triggering another futile yield_to() cycle. The overhead
+>     accumulates rapidly in workloads with high lock contention.
 
-We already have a BUG_ON() for that at the point of setting up the
-vectors for pKVM. It wouldn't hurt to move this up as a general check
-for KVM, but I don't think placing these checks in random leaf
-functions is very appealing.
+I can certainly confirm that on s390 we do see that yield_to does not always
+work as expected. Our spinlock code is lock holder aware so our KVM always yield
+correctly but often enought the hint is ignored our bounced back as you describe.
+So I am certainly interested in that part.
 
-And if we do, it should be gated to not emit code in the hot path,
-with something like this (which I find awful):
+I need to look more closely into the other part.
 
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index ec3a61e8e6b30..43f202cb83b48 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -171,6 +171,9 @@ static inline u64 vgic_ich_hcr_trap_bits(void)
- {
- 	u64 hcr;
- 
-+#if !defined(__KVM_VHE_HYPERVISOR__) && !defined(__KVM_NVHE_HYPERVISOR__)
-+	WARN_ON(!system_capabilities_finalized());
-+#endif
- 	/* All the traps are in the bottom 16bits */
- 	asm volatile(ALTERNATIVE_CB("movz %0, #0\n",
- 				    ARM64_ALWAYS_SYSTEM,
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
