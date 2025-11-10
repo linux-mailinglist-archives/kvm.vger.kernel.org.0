@@ -1,275 +1,267 @@
-Return-Path: <kvm+bounces-62516-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62517-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1B2DC47885
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 16:28:35 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68104C47998
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 16:41:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1456C1885B85
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:26:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 65D4B4EF171
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 15:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20C3825A2DE;
-	Mon, 10 Nov 2025 15:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0080A1AAE13;
+	Mon, 10 Nov 2025 15:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ePYpfMI7";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OyS0Eybc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0deuG2kE"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEE521579F
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 15:25:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D6516EB42
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 15:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762788334; cv=none; b=rmlngiu28Fk2HkRvI2lDHrTDPptTyqIl5PyJuOGO3yAdSA9Lh4KD0E+JEuZF77ZTtkPYz/c9D9i56PNtOVZFulOlbRbxul8FW/r12mz5PHOGNj7Hp6W3NC3ZYPn8LAiahXWpwEJbIgtdXta5r8OK2lddfY1ZoAHw8HgUYsVvhbk=
+	t=1762788982; cv=none; b=B/qWYirK40GL+XXzyki1Zm7OWjH/y9HnuLzkOHLKJRQY52wc4qYy/LNxWYEJ3LG0LOMy4sFxNnU/VQQ7BM05YRrQ7MiOI2aRdvh1YRrVXcQN0Kmu0elDGkJf5yP0zoMHr5qN8kRqQ8TE44ZxQrB0k1vHqiP7sSt15WbAzfslUvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762788334; c=relaxed/simple;
-	bh=3PdoaQ69lO98fxJxlxz78/56MDJZTv4E2mJnO7/mo0A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ROg26zamEadNSxSfR7G43eBEDthuBgLiWC/Do7ous9hm1OQvrciQO/NrNjwlHFbYcx0lQr7yjq6rf1uRPVlJM3wQl54Q8ChyV4EKsN8eVbac8eJdBaE1MQL0PCXo0iRsbtj3tSuFlpyaK07M5Rn45VVQCXC15zqgu7Nq2HibpCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ePYpfMI7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OyS0Eybc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762788331;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=YJCJNPxt+7zeWQvgKHWvJDmRLvWvUbVuicewdqhIuZQ=;
-	b=ePYpfMI7jvPSyrBCuwsBh20SquolDyJHnqLCzgwvS7fleh3OXzqPPL7U4wgdTYTQye3vWh
-	fCvtvGTW1K3lNq9S6pAgamKEgNJptl1F1W0ukApU26y4dim99MG2T4hsriUlPnlMp3g39+
-	sGtBwe5A4N/5AUqpDN48LqooWBVBVrg=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-93-Ar0ggATGOFGiJXcBgpFbzg-1; Mon, 10 Nov 2025 10:25:28 -0500
-X-MC-Unique: Ar0ggATGOFGiJXcBgpFbzg-1
-X-Mimecast-MFC-AGG-ID: Ar0ggATGOFGiJXcBgpFbzg_1762788328
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-297f8a2ba9eso50828635ad.3
-        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:25:28 -0800 (PST)
+	s=arc-20240116; t=1762788982; c=relaxed/simple;
+	bh=6dsX1nap/ClvsXK7KrTRSd4Tz0PaTzKIHfmrOcuYTvQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uw3JC7f05qlqo13DafirDMuIRjmGZI6Slr17mWH6SHOwM8HEO/3urcaeymPg4ReVBZu9ksiY1fj3nJHPWa5DufcxztsCrnSvSEgniV12VLo6CubztgWF7k9ClHxH7f0waySFlMynyf8YCAV8Y082RM4JroRVoleASbvK3NP8Q1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0deuG2kE; arc=none smtp.client-ip=209.85.218.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b70a978cd51so425040266b.3
+        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 07:36:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762788327; x=1763393127; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YJCJNPxt+7zeWQvgKHWvJDmRLvWvUbVuicewdqhIuZQ=;
-        b=OyS0EybceKhO2JMX/AcPD9wKbeXdRFDTPrQKz1K9tJSHcH2afuf8NSLptNXFEcu9H/
-         TsWe6qzgg8bI+6W1qrARFbq5XCDD+G3Mx69dtFugYFFUo05DXO7kLQTzeVQxtbxyU64F
-         kVTy6F500ntb3BBSCsAn6zphffsmzw73/Tg0BXKh2KZuIhn7X22tpySL9A1eedOUJQN7
-         e5xySv5XsDEYZqGk6aklyepwxaet3jaZilZC+2xzoZg4kQqKKgPST5hMNCU8iSOXRLJW
-         7PUsdOYEznMc3JLxKUBUCGr3ICMiJjxwGaJQ8e3uL9JzD7SX1hASitwTaL34XkqRQZSi
-         8zOg==
+        d=google.com; s=20230601; t=1762788978; x=1763393778; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GaWutXseEM49NYYHvmu1piLSnNhRd63IQT+QthHzxAo=;
+        b=0deuG2kEWMF/6g9rM6XhekMoGiPnBy4VakFsAiejf9rhz3V8KsN5hO3bnoMNszQDxF
+         hGugU0Xht6eooCGB4hqJxqwzQG0eU2bJRqxpEYT81pF3lTq74nFgYxZYDO9jG/V4wEhX
+         xAGFZxaBJuVCCs7uibJ0/zJWnbH+DKM8RNOJcGkOQLcPla47UrQRtHFuKqmUnoMvms5T
+         bf4+8vazv0d/JpAWQ9rBFcdBHnEoRsxCc7MwjJfdrARo6xrH75ImPXXy0dY3ZBFzFxP+
+         YmnB02/VWJGgwzl3zBW0dADB2kP3k1zlmHZa1cMS93j8BfTZGxjsbjJVNlIws/E6zjab
+         Ootw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762788327; x=1763393127;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YJCJNPxt+7zeWQvgKHWvJDmRLvWvUbVuicewdqhIuZQ=;
-        b=Og/WZphxA05gjDUq5fWawoQyLe86OG1zI63xYw9voImaSm0BOv+wVDTnv4y438gg5I
-         DS7SRwem1VLoLzbgYEsQQ/bxAhS4paDjX/lqrprBfQE4/c2NHoja3BOQdyKebqAccGUp
-         MzqQDzxgolsmTyAB19AC9+qJZ05+VNBTSBYKxHuZNHls19rNtogkkB+GziQCGxOMler0
-         jj26MWEK2g0+PuIV6l+b1/YatiosT4wi64hBf7qOLFS5kED+lrnBgAUk3xKN29Zs5w4H
-         EiTS67wUlRuCusF6l+8Q0v5xe+lR2hR4TgRtgCmrU8LD0PNfz/Ow1cC+QRvVzXe4Opif
-         oV7A==
-X-Forwarded-Encrypted: i=1; AJvYcCU8HsPnlqOnbg7fJPcA7OTIA3YCvRlJoFgktTZjlvY3ByEsxnz5xDkldfMd4GBVR/kewlc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEVx5PGfJF3LKnkQV1Sv+Ey47j4YILKT+tgKxcC/7n0LrsBLUl
-	VKlYTVsc2ok3EvcoGf3fjfsHMNQwoMH8gG9skcRgcJD0jwHRpP9c6kd6HRujCI+KsRubkMJiB5j
-	xKqmvrZrqVQ7AmgbBS6VnsCcZF3frwbR2ZtJykZzDyzDY1O/sVKeTyTUzGqLILA==
-X-Gm-Gg: ASbGncus6u7sbmzc9QQaeH1rpgTi00p1PnV7y1IIN2dG52SoeLlfb4N46JdcuOzClhJ
-	59HJU0oaLkI4rdZYUh7JVxkIWQNnOWzvSNUJsF4KOqiKZ6j4IEsgHfS+BPt9ObWBQO6DT1F/qbE
-	rN1BisvUQT/nuGpnsnYDDCwgmCNWlZQ5o7MuA8aZozIdf1XXt98Z2hxC+dp3sX29bDxKMXe517O
-	VlW9OOyfkLOi3IMDtEKkpMfbjCYPYHF5RYNmSYluAN4xhv+PhY73KcVbZVAJvgk9RkPe+XCF4bX
-	ZyC9ctjx+t3WItY9/ed+YSRURCT/dKoIabX+d0RKT3ZhsqMn66l8HPtiAiqCvo1eYIpPHL+W/g5
-	lHPoqhRokhL94xbQhSDk7RAa/TvLOACQVOqzbmalew7zSbBht19os5Lci6DRuwueLJ8bafhs1XX
-	pD5t25HrHhEQ06A1IYm3nBwZg5S6h7
-X-Received: by 2002:a17:902:e88f:b0:295:592e:7633 with SMTP id d9443c01a7336-297e56be211mr121170575ad.29.1762788326973;
-        Mon, 10 Nov 2025 07:25:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHp6btLyGMbhBFVf9NawnEUuYIX/bUHYsz7izUv20oBDHeYwe1eKrgYurw9h6/x7rKkrG1fEQ==
-X-Received: by 2002:a17:902:e88f:b0:295:592e:7633 with SMTP id d9443c01a7336-297e56be211mr121170135ad.29.1762788326458;
-        Mon, 10 Nov 2025 07:25:26 -0800 (PST)
-Received: from [10.201.49.111] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-296509682bfsm153193685ad.4.2025.11.10.07.25.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 07:25:25 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 6.18-rc5^H6
-Date: Mon, 10 Nov 2025 16:25:17 +0100
-Message-ID: <20251110152517.421706-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.51.1
+        d=1e100.net; s=20230601; t=1762788978; x=1763393778;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GaWutXseEM49NYYHvmu1piLSnNhRd63IQT+QthHzxAo=;
+        b=Bpdf0Q4QJdqImGqceodUMwIoJga9KrqUMFNg0U0K1mzQDOREuZJoyf+yJ0ZenF844p
+         WaopodVihlD8u3TXQyKW5molH8S0p2Q7pzLV8HD2ssh0CS0n+qnRhxZ3Ew4ljdb+4i4K
+         YYnB1yHMtjrehoTEzeFspt18/eJNvZquMK6a1vaHcZqrF9PxWhfy83+OpnNqqDMWwBxG
+         vusFRjcCGOy1dWRBSX44Uz0we7AC+6NZNlzMVYqwvBydsJALcmGDy1LVmaGwuz8Me4sQ
+         t8UiAnQzdyQX2XgJH06dhmd+ir7A6jn96gtTEYu+wMXNbr7VAFoNgRDYyvOVjLwc0jWT
+         XdiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWACfI3KY6T03+hC6EfXOwYfDLrpPjOvlIi5jeemjjT7QXpTquPH6bJAKLyjqgLr+EdPVg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2MC+5Uthck+vLvlS3M3RPUoqKPkB6yBkWyWwQibZlCzNSQRiF
+	/o2mEuKEi6FGPY5n8qju8wnJ4dquHkMCcS3ilvMZVs09ZwgnrMNcvsU8smm2BV6Tyd02XVTbrl6
+	WYRnqfZ4w/nHMpQ==
+X-Google-Smtp-Source: AGHT+IHTU5FXzUFeb1nI9cPK796M7PgT3DwXYMV5kcA8PjpI6OADg2Z/FZfwu9WOGlr1GmkIIQ0Qzc++hauFnA==
+X-Received: from ejcsq16.prod.google.com ([2002:a17:907:3890:b0:b72:b433:246f])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:907:72c5:b0:b70:be84:5183 with SMTP id a640c23a62f3a-b72e0591830mr875999666b.60.1762788978060;
+ Mon, 10 Nov 2025 07:36:18 -0800 (PST)
+Date: Mon, 10 Nov 2025 15:36:17 +0000
+In-Reply-To: <a940044f-3ae4-451f-b9ba-946ec6df5082@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250924151101.2225820-1-patrick.roy@campus.lmu.de>
+ <DE2L1SAOC55E.E4JY62WJQ2A8@google.com> <add94932-290c-4037-b4e6-c3c760240819@amazon.com>
+ <DE2NTMZXQ1MT.2TH9VAKM6WP6I@google.com> <a940044f-3ae4-451f-b9ba-946ec6df5082@amazon.com>
+X-Mailer: aerc 0.21.0
+Message-ID: <DE54JGHVJ4QH.KW6CD73R58AU@google.com>
+Subject: Re: [PATCH v7 00/12] Direct Map Removal Support for guest_memfd
+From: Brendan Jackman <jackmanb@google.com>
+To: <kalyazin@amazon.com>, Brendan Jackman <jackmanb@google.com>
+Cc: <pbonzini@redhat.com>, <corbet@lwn.net>, <maz@kernel.org>, 
+	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, 
+	<yuzenghui@huawei.com>, <catalin.marinas@arm.com>, <will@kernel.org>, 
+	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>, 
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>, 
+	<luto@kernel.org>, <peterz@infradead.org>, <willy@infradead.org>, 
+	<akpm@linux-foundation.org>, <david@redhat.com>, <lorenzo.stoakes@oracle.com>, 
+	<Liam.Howlett@oracle.com>, <vbabka@suse.cz>, <rppt@kernel.org>, 
+	<surenb@google.com>, <mhocko@suse.com>, <song@kernel.org>, <jolsa@kernel.org>, 
+	<ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>, 
+	<martin.lau@linux.dev>, <eddyz87@gmail.com>, <yonghong.song@linux.dev>, 
+	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@fomichev.me>, 
+	<haoluo@google.com>, <jgg@ziepe.ca>, <jhubbard@nvidia.com>, 
+	<peterx@redhat.com>, <jannh@google.com>, <pfalcato@suse.de>, 
+	<shuah@kernel.org>, <seanjc@google.com>, <kvm@vger.kernel.org>, 
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>, 
+	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>, <bpf@vger.kernel.org>, 
+	<linux-kselftest@vger.kernel.org>, <xmarcalx@amazon.co.uk>, 
+	<kalyazin@amazon.co.uk>, <jackabt@amazon.co.uk>, <derekmn@amazon.co.uk>, 
+	<tabba@google.com>, <ackerleytng@google.com>, 
+	Patrick Roy <patrick.roy@campus.lmu.de>
+Content-Type: text/plain; charset="UTF-8"
 
-Linus,
+On Fri Nov 7, 2025 at 6:11 PM UTC, Nikita Kalyazin wrote:
+>
+>
+> On 07/11/2025 18:04, Brendan Jackman wrote:
+>> On Fri Nov 7, 2025 at 5:23 PM UTC, Nikita Kalyazin wrote:
+>>>
+>>>
+>>> On 07/11/2025 15:54, Brendan Jackman wrote:
+>>>> On Wed Sep 24, 2025 at 3:10 PM UTC, Patrick Roy wrote:
+>>>>> From: Patrick Roy <roypat@amazon.co.uk>
+>>>>>
+>>>>> [ based on kvm/next ]
+>>>>>
+>>>>> Unmapping virtual machine guest memory from the host kernel's direct map is a
+>>>>> successful mitigation against Spectre-style transient execution issues: If the
+>>>>> kernel page tables do not contain entries pointing to guest memory, then any
+>>>>> attempted speculative read through the direct map will necessarily be blocked
+>>>>> by the MMU before any observable microarchitectural side-effects happen. This
+>>>>> means that Spectre-gadgets and similar cannot be used to target virtual machine
+>>>>> memory. Roughly 60% of speculative execution issues fall into this category [1,
+>>>>> Table 1].
+>>>>>
+>>>>> This patch series extends guest_memfd with the ability to remove its memory
+>>>>> from the host kernel's direct map, to be able to attain the above protection
+>>>>> for KVM guests running inside guest_memfd.
+>>>>>
+>>>>> Additionally, a Firecracker branch with support for these VMs can be found on
+>>>>> GitHub [2].
+>>>>>
+>>>>> For more details, please refer to the v5 cover letter [v5]. No
+>>>>> substantial changes in design have taken place since.
+>>>>>
+>>>>> === Changes Since v6 ===
+>>>>>
+>>>>> - Drop patch for passing struct address_space to ->free_folio(), due to
+>>>>>     possible races with freeing of the address_space. (Hugh)
+>>>>> - Stop using PG_uptodate / gmem preparedness tracking to keep track of
+>>>>>     direct map state.  Instead, use the lowest bit of folio->private. (Mike, David)
+>>>>> - Do direct map removal when establishing mapping of gmem folio instead
+>>>>>     of at allocation time, due to impossibility of handling direct map
+>>>>>     removal errors in kvm_gmem_populate(). (Patrick)
+>>>>> - Do TLB flushes after direct map removal, and provide a module
+>>>>>     parameter to opt out from them, and a new patch to export
+>>>>>     flush_tlb_kernel_range() to KVM. (Will)
+>>>>>
+>>>>> [1]: https://download.vusec.net/papers/quarantine_raid23.pdf
+>>>>> [2]: https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding
+>>>>
+>>>> I just got around to trying this out, I checked out this patchset using
+>>>> its base-commit and grabbed the Firecracker branch. Things seem OK until
+>>>> I set the secrets_free flag in the Firecracker config which IIUC makes
+>>>> it set GUEST_MEMFD_FLAG_NO_DIRECT_MAP.
+>>>>
+>>>> If I set it, I find the guest doesn't show anything on the console.
+>>>> Running it in a VM and attaching GDB suggests that it's entering the
+>>>> guest repeatedly, it doesn't seem like the vCPU thread is stuck or
+>>>> anything. I'm a bit clueless about how to debug that (so far, whenever
+>>>> I've broken KVM, things always exploded very dramatically).
+>>>>
+>>>> Anyway, if I then kill the firecracker process, the host sometimes
+>>>> crashes, I think this is the most suggestive splat I've seen:
+>>>>
+>>>> [   99.673420][    T2] BUG: unable to handle page fault for address: ffff888012804000
+>>>> [   99.676216][    T2] #PF: supervisor write access in kernel mode
+>>>> [   99.678381][    T2] #PF: error_code(0x0002) - not-present page
+>>>> [   99.680499][    T2] PGD 2e01067 P4D 2e01067 PUD 2e02067 PMD 12801063 PTE 800fffffed7fb020
+>>>> [   99.683374][    T2] Oops: Oops: 0002 [#1] SMP
+>>>> [   99.685004][    T2] CPU: 0 UID: 0 PID: 2 Comm: kthreadd Not tainted 6.17.0-rc7-00366-g473c46a3cb2a #106 NONE
+>>>> [   99.688514][    T2] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 0.1 11/11/2019
+>>>> [   99.691547][    T2] RIP: 0010:clear_page_erms+0x7/0x10
+>>>> [   99.693440][    T2] Code: 48 89 47 18 48 89 47 20 48 89 47 28 48 89 47 30 48 89 47 38 48 8d 7f 40 75 d9 90 c3 0f 1f 80 00 00 00 00 b9 00 10 00 00 31 c0 <f3> aa c3 66 0f 1f 44 00 00 48 83 f9 40 73 2a 83 f9 08 73 0f 85 c9
+>>>> [   99.700188][    T2] RSP: 0018:ffff88800318fc10 EFLAGS: 00010246
+>>>> [   99.702321][    T2] RAX: 0000000000000000 RBX: 0000000000400dc0 RCX: 0000000000001000
+>>>> [   99.705100][    T2] RDX: ffffea00004a0100 RSI: ffffea00004a0200 RDI: ffff888012804000
+>>>> [   99.707861][    T2] RBP: 0000000000000801 R08: 0000000000000000 R09: 0000000000000000
+>>>> [   99.710648][    T2] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000002
+>>>> [   99.713412][    T2] R13: 0000000000000801 R14: ffffea00004a0100 R15: ffffffff81f4df80
+>>>> [   99.716191][    T2] FS:  0000000000000000(0000) GS:ffff8880bbf28000(0000) knlGS:0000000000000000
+>>>> [   99.719316][    T2] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>> [   99.721648][    T2] CR2: ffff888012804000 CR3: 0000000007583001 CR4: 0000000000372eb0
+>>>> [   99.724421][    T2] Call Trace:
+>>>> [   99.725608][    T2]  <TASK>
+>>>> [   99.726646][    T2]  get_page_from_freelist+0x6fe/0x14b0
+>>>> [   99.728583][    T2]  ? fs_reclaim_acquire+0x43/0xe0
+>>>> [   99.730325][    T2]  ? find_held_lock+0x2b/0x80
+>>>> [   99.731965][    T2]  __alloc_frozen_pages_noprof+0x147/0x2d0
+>>>> [   99.734003][    T2]  __alloc_pages_noprof+0x5/0x50
+>>>> [   99.735766][    T2]  copy_process+0x1b1/0x1b30
+>>>> [   99.737398][    T2]  ? lock_is_held_type+0x89/0x100
+>>>> [   99.739157][    T2]  ? kthreadd+0x25/0x190
+>>>> [   99.740664][    T2]  kernel_clone+0x59/0x390
+>>>> [   99.742213][    T2]  ? kthreadd+0x25/0x190
+>>>> [   99.743728][    T2]  kernel_thread+0x55/0x70
+>>>> [   99.745310][    T2]  ? kthread_complete_and_exit+0x20/0x20
+>>>> [   99.747265][    T2]  kthreadd+0x117/0x190
+>>>> [   99.748748][    T2]  ? kthread_is_per_cpu+0x30/0x30
+>>>> [   99.750509][    T2]  ret_from_fork+0x16b/0x1e0
+>>>> [   99.752193][    T2]  ? kthread_is_per_cpu+0x30/0x30
+>>>> [   99.753992][    T2]  ret_from_fork_asm+0x11/0x20
+>>>> [   99.755717][    T2]  </TASK>
+>>>> [   99.756861][    T2] CR2: ffff888012804000
+>>>> [   99.758353][    T2] ---[ end trace 0000000000000000 ]---
+>>>> [   99.760319][    T2] RIP: 0010:clear_page_erms+0x7/0x10
+>>>> [   99.762209][    T2] Code: 48 89 47 18 48 89 47 20 48 89 47 28 48 89 47 30 48 89 47 38 48 8d 7f 40 75 d9 90 c3 0f 1f 80 00 00 00 00 b9 00 10 00 00 31 c0 <f3> aa c3 66 0f 1f 44 00 00 48 83 f9 40 73 2a 83 f9 08 73 0f 85 c9
+>>>> [   99.769129][    T2] RSP: 0018:ffff88800318fc10 EFLAGS: 00010246
+>>>> [   99.771297][    T2] RAX: 0000000000000000 RBX: 0000000000400dc0 RCX: 0000000000001000
+>>>> [   99.774126][    T2] RDX: ffffea00004a0100 RSI: ffffea00004a0200 RDI: ffff888012804000
+>>>> [   99.777013][    T2] RBP: 0000000000000801 R08: 0000000000000000 R09: 0000000000000000
+>>>> [   99.779827][    T2] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000002
+>>>> [   99.782641][    T2] R13: 0000000000000801 R14: ffffea00004a0100 R15: ffffffff81f4df80
+>>>> [   99.785487][    T2] FS:  0000000000000000(0000) GS:ffff8880bbf28000(0000) knlGS:0000000000000000
+>>>> [   99.788671][    T2] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>> [   99.791012][    T2] CR2: ffff888012804000 CR3: 0000000007583001 CR4: 0000000000372eb0
+>>>> [   99.793863][    T2] Kernel panic - not syncing: Fatal exception
+>>>> [   99.796760][    T2] Kernel Offset: disabled
+>>>> [   99.798296][    T2] ---[ end Kernel panic - not syncing: Fatal exception ]---
+>>>>
+>>>> This makes me suspect the kvm_gmem_folio_restore_direct_map() path isn't
+>>>> working or isn't getting called.
+>>>>
+>>>> If anyone wants help trying to reproduce this let me know.
+>>>
+>>> Hi Brendan,
+>>>
+>>> Thanks for trying to run it!
+>>>
+>>> Just as a sanity check, the way it is known for us to work is we apply
+>>> all patches from [1].  For booted VMs (as opposed to restored from
+>>> snapshot), apart from the v6 of the direct map removal series, the only
+>>> additional patch is a fix for kvmclock on x86 [2].  Please let me know
+>>> if you see the same issue with that patch applied too.
+>>>
+>>> Nikita
+>>>
+>>> [1]
+>>> https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding/resources/hiding_ci/linux_patches
+>>> [2]
+>>> https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding/resources/hiding_ci/linux_patches/11-kvm-clock
+>> 
+>> Ah, thanks! Seems I should have checked my inbox before sending my other
+>> mail. With the kvmclock fix applied to my host kernel, I start setting
+>> the other crash immediately when the VM boots. If I comment out the
+>> actual unmapping of memory, it boots (before, it wouldn't boot even with
+>> that commented out).
+>> 
+>> For the other linux_patches, I couldn't apply them on top of this
+>> series, do you have a branch I can use as a reference?
+>
+> Instead of having an explicit branch, we apply all the patches on top of 
+> [1].  There is a script that performs fetch/build/install end-to-end: [2].
+>
+> [1] 
+> https://github.com/firecracker-microvm/firecracker/blob/feature/secret-hiding/resources/hiding_ci/kernel_commit_hash
+> [2] 
+> https://github.com/firecracker-microvm/firecracker/blob/feature/secret-hiding/resources/hiding_ci/build_and_install_kernel.sh
 
-The following changes since commit 6146a0f1dfae5d37442a9ddcba012add260bceb0:
-
-  Linux 6.18-rc4 (2025-11-02 11:28:02 -0800)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 8a4821412cf2c1429fffa07c012dd150f2edf78c:
-
-  KVM: nSVM: Fix and simplify LBR virtualization handling with nested (2025-11-09 08:50:13 +0100)
-
-I generally try to send out on Sunday to ensure I collect pull requests
-from all submaintainers, but yesterday I only prepared this one and
-didn't have time to send it; the timing will therefore make 6.18-rc6 a
-bit bigger.
-
-Paolo
-----------------------------------------------------------------
-Arm:
-
-- Fix trapping regression when no in-kernel irqchip is present
-
-- Check host-provided, untrusted ranges and offsets in pKVM
-
-- Fix regression restoring the ID_PFR1_EL1 register
-
-- Fix vgic ITS locking issues when LPIs are not directly injected
-
-Arm selftests:
-
-- Correct target CPU programming in vgic_lpi_stress selftest
-
-- Fix exposure of SCTLR2_EL2 and ZCR_EL2 in get-reg-list selftest
-
-RISC-V:
-
-- Fix check for local interrupts on riscv32
-
-- Read HGEIP CSR on the correct cpu when checking for IMSIC interrupts
-
-- Remove automatic I/O mapping from kvm_arch_prepare_memory_region()
-
-x86:
-
-- Inject #UD if the guest attempts to execute SEAMCALL or TDCALL as KVM
-  doesn't support virtualization the instructions, but the instructions
-  are gated only by VMXON.  That is, they will VM-Exit instead of taking
-  a #UD and until now this resulted in KVM exiting to userspace with an
-  emulation error.
-
-- Unload the "FPU" when emulating INIT of XSTATE features if and only if
-  the FPU is actually loaded, instead of trying to predict when KVM will
-  emulate an INIT (CET support missed the MP_STATE path).  Add sanity
-  checks to detect and harden against similar bugs in the future.
-
-- Unregister KVM's GALog notifier (for AVIC) when kvm-amd.ko is unloaded.
-
-- Use a raw spinlock for svm->ir_list_lock as the lock is taken during
-  schedule(), and "normal" spinlocks are sleepable locks when PREEMPT_RT=y.
-
-- Remove guest_memfd bindings on memslot deletion when a gmem file is dying
-  to fix a use-after-free race found by syzkaller.
-
-- Fix a goof in the EPT Violation handler where KVM checks the wrong
-  variable when determining if the reported GVA is valid.
-
-- Fix and simplify the handling of LBR virtualization on AMD, which was made
-  buggy and unnecessarily complicated by nested VM support
-
-Misc:
-
-- Update Oliver's email address
-
-----------------------------------------------------------------
-Chao Gao (1):
-      KVM: x86: Call out MSR_IA32_S_CET is not handled by XSAVES
-
-Fangyu Yu (2):
-      RISC-V: KVM: Read HGEIP CSR on the correct cpu
-      RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP
-
-Marc Zyngier (3):
-      KVM: arm64: Make all 32bit ID registers fully writable
-      KVM: arm64: Set ID_{AA64PFR0,PFR1}_EL1.GIC when GICv3 is configured
-      KVM: arm64: Limit clearing of ID_{AA64PFR0,PFR1}_EL1.GIC to userspace irqchip
-
-Mark Brown (2):
-      KVM: arm64: selftests: Add SCTLR2_EL2 to get-reg-list
-      KVM: arm64: selftests: Filter ZCR_EL2 in get-reg-list
-
-Maxim Levitsky (1):
-      KVM: SVM: switch to raw spinlock for svm->ir_list_lock
-
-Maximilian Dittgen (1):
-      KVM: selftests: fix MAPC RDbase target formatting in vgic_lpi_stress
-
-Oliver Upton (3):
-      KVM: arm64: vgic-v3: Reinstate IRQ lock ordering for LPI xarray
-      KVM: arm64: vgic-v3: Release reserved slot outside of lpi_xa's lock
-      MAINTAINERS: Switch myself to using kernel.org address
-
-Paolo Bonzini (3):
-      Merge tag 'kvm-riscv-fixes-6.18-2' of https://github.com/kvm-riscv/linux into HEAD
-      Merge tag 'kvm-x86-fixes-6.18-rc5' of https://github.com/kvm-x86/linux into HEAD
-      Merge tag 'kvmarm-fixes-6.18-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-
-Samuel Holland (1):
-      RISC-V: KVM: Fix check for local interrupts on riscv32
-
-Sascha Bischoff (1):
-      KVM: arm64: vgic-v3: Trap all if no in-kernel irqchip
-
-Sean Christopherson (7):
-      KVM: VMX: Inject #UD if guest tries to execute SEAMCALL or TDCALL
-      KVM: x86: Unload "FPU" state on INIT if and only if its currently in-use
-      KVM: x86: Harden KVM against imbalanced load/put of guest FPU state
-      KVM: SVM: Initialize per-CPU svm_data at the end of hardware setup
-      KVM: SVM: Unregister KVM's GALog notifier on kvm-amd.ko exit
-      KVM: SVM: Make avic_ga_log_notifier() local to avic.c
-      KVM: guest_memfd: Remove bindings on memslot deletion when gmem is dying
-
-Sebastian Ene (1):
-      KVM: arm64: Check the untrusted offset in FF-A memory share
-
-Sukrit Bhatnagar (1):
-      KVM: VMX: Fix check for valid GVA on an EPT violation
-
-Vincent Donnefort (1):
-      KVM: arm64: Check range args for pKVM mem transitions
-
-Yosry Ahmed (3):
-      KVM: SVM: Mark VMCB_LBR dirty when MSR_IA32_DEBUGCTLMSR is updated
-      KVM: nSVM: Always recalculate LBR MSR intercepts in svm_update_lbrv()
-      KVM: nSVM: Fix and simplify LBR virtualization handling with nested
-
- .mailmap                                           |  3 +-
- MAINTAINERS                                        |  2 +-
- arch/arm64/kvm/hyp/nvhe/ffa.c                      |  9 ++-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c              | 28 +++++++
- arch/arm64/kvm/sys_regs.c                          | 71 +++++++++--------
- arch/arm64/kvm/vgic/vgic-debug.c                   | 16 +++-
- arch/arm64/kvm/vgic/vgic-init.c                    | 16 +++-
- arch/arm64/kvm/vgic/vgic-its.c                     | 18 ++---
- arch/arm64/kvm/vgic/vgic-v3.c                      |  3 +-
- arch/arm64/kvm/vgic/vgic.c                         | 23 ++++--
- arch/riscv/kvm/aia_imsic.c                         | 16 +++-
- arch/riscv/kvm/mmu.c                               | 25 +-----
- arch/riscv/kvm/vcpu.c                              |  2 +-
- arch/x86/include/uapi/asm/vmx.h                    |  1 +
- arch/x86/kvm/svm/avic.c                            | 24 +++---
- arch/x86/kvm/svm/nested.c                          | 20 ++---
- arch/x86/kvm/svm/svm.c                             | 88 ++++++++++------------
- arch/x86/kvm/svm/svm.h                             |  4 +-
- arch/x86/kvm/vmx/common.h                          |  2 +-
- arch/x86/kvm/vmx/nested.c                          |  8 ++
- arch/x86/kvm/vmx/vmx.c                             |  8 ++
- arch/x86/kvm/x86.c                                 | 48 +++++++-----
- tools/testing/selftests/kvm/arm64/get-reg-list.c   |  3 +
- tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c |  9 ++-
- virt/kvm/guest_memfd.c                             | 47 ++++++++----
- 25 files changed, 297 insertions(+), 197 deletions(-)
-
+Thanks, I was able to construct a branch and confirm the crashes go
+away. I guess this should block merging the feature though, right? Do
+you know which particular of the patches are the likely relevant ones
+here?
 
