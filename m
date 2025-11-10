@@ -1,178 +1,169 @@
-Return-Path: <kvm+bounces-62658-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62659-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4420C49C39
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 00:32:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6658AC49CBC
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 00:41:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74D40188EA17
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 23:31:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A37963B027F
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 23:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059873054D7;
-	Mon, 10 Nov 2025 23:27:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23855242D78;
+	Mon, 10 Nov 2025 23:39:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BwWIMQVa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mEGty8YH"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9140343D72
-	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 23:27:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60C12FBDFF
+	for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 23:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762817248; cv=none; b=EJPOpMXhC63Yu/ehJJqLyAES4Fd1VrlTEv3D/G8yTEHYqC3vT/cOWQ0nSrCffgsmG1jUkSJCgmpJufKDeMwndj6PYAeIl+vGYPREMsIGwJEq0c+MqHoI/zn2qiyE3vbf9f+NZewNV2EcVn6ElZwvPs13NPvZu0xSpOzegE3v6rs=
+	t=1762817954; cv=none; b=ZDziJUkULaiTAN882/eYqtABhF06Ugc9nNN2V17kZx0969lfU+OON0zBb1d2bQT6p5RelMSdNEYpUWTGVMjJUzMkIbtiGk7jJEb16NhI1oY4+Ongt/ZxSCSHhB0NBLuzy0Runqc3w+6J5DcDDVlhFwL3oornR2oAiFAkHTMErwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762817248; c=relaxed/simple;
-	bh=1nnldSyEvUMxdV3DKPZB9q5uBddTFGvYWQ+A5Gk4ElM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PvF52Au+APVAkBR6QVEcnpdkIi2M433oSHLComojLPpH0taNHMkVqm7ygJd/1wPD9Aq2sQLjFxYE9WMNzhhxw4xmPchUTe5glOlgjg6brTotbj+kj8qOwkDv7Xk1OkV9VEloI5GEa1yV+yKnfmyVJfy9I4LFvWUYVvVVmtL6DCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BwWIMQVa; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762817245;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3vRe2/SJRKLIb78m7r5C5J3c6BhgOIpUIxQ+bEHV9RQ=;
-	b=BwWIMQVaAl13BoMv9/NJv+GhfuwUnn53OtluxqiPKy/xZVYaz+kcjuibSOhBmIewv4ha/6
-	ePzp2J1uFwPxYgauZZB0McSZofHSDHBpOFy3mSs/5Gq+U/qPXEr2yq6oUyOw3s/cufKUxG
-	NNC4GbQlmwkD9yqNTZjTg5HAWC9RTGw=
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Kevin Cheng <chengkev@google.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH v3 14/14] x86/svm: Rename VMCB fields to match KVM
-Date: Mon, 10 Nov 2025 23:26:42 +0000
-Message-ID: <20251110232642.633672-15-yosry.ahmed@linux.dev>
-In-Reply-To: <20251110232642.633672-1-yosry.ahmed@linux.dev>
-References: <20251110232642.633672-1-yosry.ahmed@linux.dev>
+	s=arc-20240116; t=1762817954; c=relaxed/simple;
+	bh=Dn/NYX3Wj4798jgUyiyxe8j2iflj/zcXoK6zpJuJGpw=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=NBOnwYEjSK2ekwtZW27opqSKwC8/aFqJH2CoeZ0uiESMndhj07XNQvm8xstWHoj15WuTDSyeAJed27/K0etVSoA4e9wvTxvx40CuaC1Qs+Sh82ne8T3uChAJyF5NxXnigCSuKU5VAb2fIILT3yjcsfH4wwmMT9jRDCT9YI3scAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mEGty8YH; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-787eb2d8663so5202827b3.0
+        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 15:39:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762817951; x=1763422751; darn=vger.kernel.org;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=auOCGMGZsgkQSYvZ+oudFtHe19C6Wc96WcK7gMZx0zg=;
+        b=mEGty8YHoT9lQfsMZxDzImwxoSukZsGElucuwailTczNWbXvFVZVaib8NlFztpaXjv
+         DINb0HvO59EpPjVQfH0dH4S9w7v5cVqho+oGE80jK/g5WRlAsbjgkFwn5QPHyC8nmK07
+         yb9DAiwpQJrZc/sRM2CnfxddXUN01w56nFY8HfWO2EUoGU9B2AAnDCx3C+julOLyBBDr
+         h9cm2VEX4KSRyrToAhtT6SMUYjDHt+wAtEhNMLGz+qUy2MiCJ8q18pspYRWMbS2LzXe4
+         h17Xk9fpaU8yFq9XP6jrXvmBGM87DwA5BW+gedZmfW58GymS/Yo9xOliYgTr4VWJQHJe
+         9OEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762817951; x=1763422751;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=auOCGMGZsgkQSYvZ+oudFtHe19C6Wc96WcK7gMZx0zg=;
+        b=WaOW1i1Wq8m5KE+auAQIrVF785JXJuRPFcg4J1x17bURWhJGYIk8tAc1XWrZUH8ifj
+         GlQjhO7kQh7RrePYT4slBdpchX9d+GsPPNN237WJb/54MQC0pOVovPYkdIwMKIk4aN/v
+         BBavSNkhsrlunSaLxgHvPrw39M6zqpFtPmBIRU1bTC0/MGU3Q00hCTRCzWzVwuF9JgyM
+         GtXK+Gw0/l1mXbzYgdZvSH0+wZciKpRaM0qwhYgjJ5u/emoNFu/odHafr/JR2k8vc6jJ
+         85wnJ96Go1crqraSoyMbc7NVDNcqN/gDLhRo6/KDm/Kpx19djAV/wis6eeI+eXTJmHeF
+         RBng==
+X-Forwarded-Encrypted: i=1; AJvYcCUiy7/oy3UVIC2JUBqfnL+hsJG63cewIPbp+THAYjjoVxcyOt5RZZW0vZ/LIZVwrv9DCpo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9aWsIx/wHG68ec4hwutpJO0FyvkpoPlH1J1T1liurImUuAUHI
+	oWuPHEj7dB2tIJlEDMuOQmq+tzaIS/+ZvwBPRXqxJZyJKN1l6SGaP70tdkberJ1aLg==
+X-Gm-Gg: ASbGncsrMD501NezifYkFoAPyO2dORvGperL1s+CQzGamFulj5+v5U8RIlfICvxAasj
+	LjR/YLP0Gm1DsVLMsTyIWf7bWaxk9SI8rjSWm3IHZabtYKwss1NVsZ7KW9G1fUu1aSXPpy2GaZr
+	pNS7G3KvmO/pyfFkBUOwwtzqLEy3lvpc/6vmWuXuWt5SrVY4Z2zSDvcU27rCQ6Xh66nxY/NFAVb
+	iIkLtpZehLvAN9pr4wEnzfBOT0qFbIJdhj2ndsCCnw9TOtVr6e2Qr+qtY6R+7r8nd9tFpIl8Vks
+	R75eKwTP/hbIXL8ywcqbbapA+HzYy2Bi0AX7cZIC8P1lw07jGOBGLTIIv5UA1KoDQ3jKDvzeoQ2
+	+bgksh3N9V58ZfahL+tbj/NFYbPo6K8Q6P6p5xz0afiqTzg2MXHMVJ9vyc5I7Vax6q+S/CuEjcv
+	Jqe8OQWuiYz68vftMuzbsa+f0afK3AQAZPb1kJ1BKxM0R4mMbrwGjtBwsQxS6qfZ1esgeb4Q1BS
+	YcqjGN56w==
+X-Google-Smtp-Source: AGHT+IGhKzpHrBaCl8nie6rdibzD1wCPS/Sl7zTN9XwZ4g855DlbGN22SspoKQKrIKKHgp9q/nU6ag==
+X-Received: by 2002:a81:8a07:0:b0:787:d107:ca88 with SMTP id 00721157ae682-7880355f82bmr9116177b3.10.1762817950151;
+        Mon, 10 Nov 2025 15:39:10 -0800 (PST)
+Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-787d6a2947asm27792067b3.55.2025.11.10.15.39.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Nov 2025 15:39:09 -0800 (PST)
+Date: Mon, 10 Nov 2025 15:38:55 -0800 (PST)
+From: Hugh Dickins <hughd@google.com>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+cc: Chris Li <chrisl@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+    Christian Borntraeger <borntraeger@linux.ibm.com>, 
+    Janosch Frank <frankja@linux.ibm.com>, 
+    Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+    David Hildenbrand <david@redhat.com>, 
+    Alexander Gordeev <agordeev@linux.ibm.com>, 
+    Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
+    Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+    Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>, 
+    Alexander Viro <viro@zeniv.linux.org.uk>, 
+    Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+    Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>, 
+    Baolin Wang <baolin.wang@linux.alibaba.com>, 
+    "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
+    Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+    Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+    Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
+    Oscar Salvador <osalvador@suse.de>, Vlastimil Babka <vbabka@suse.cz>, 
+    Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
+    Michal Hocko <mhocko@suse.com>, Matthew Brost <matthew.brost@intel.com>, 
+    Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, 
+    Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, 
+    Ying Huang <ying.huang@linux.alibaba.com>, 
+    Alistair Popple <apopple@nvidia.com>, 
+    Axel Rasmussen <axelrasmussen@google.com>, 
+    Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
+    Kemeng Shi <shikemeng@huaweicloud.com>, Kairui Song <kasong@tencent.com>, 
+    Nhat Pham <nphamcs@gmail.com>, Baoquan He <bhe@redhat.com>, 
+    SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>, 
+    Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+    Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>, 
+    Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>, 
+    Naoya Horiguchi <nao.horiguchi@gmail.com>, 
+    Pedro Falcato <pfalcato@suse.de>, 
+    Pasha Tatashin <pasha.tatashin@soleen.com>, 
+    Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>, 
+    Hugh Dickins <hughd@google.com>, linux-kernel@vger.kernel.org, 
+    kvm@vger.kernel.org, linux-s390@vger.kernel.org, 
+    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+    linux-arch@vger.kernel.org, damon@lists.linux.dev
+Subject: Re: [PATCH v2 00/16] mm: remove is_swap_[pte, pmd]() + non-swap
+ entries, introduce leaf entries
+In-Reply-To: <3c0e9dd0-70ac-4588-813b-ffb24d40f067@lucifer.local>
+Message-ID: <c9e3ad0e-02ef-077c-c12c-f72057eb7817@google.com>
+References: <cover.1762621567.git.lorenzo.stoakes@oracle.com> <CACePvbVq3kFtrue2smXRSZ86+EuNVf6q+awQnU-n7=Q4x7U9Lw@mail.gmail.com> <5b60f6e8-7eab-4518-808a-b34331662da5@lucifer.local> <CACePvbUvQu+So7OoUbJTMLODz8YDAOgWaM8A-RXFj2U_Qc-dng@mail.gmail.com>
+ <3c0e9dd0-70ac-4588-813b-ffb24d40f067@lucifer.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
 
-Rename nested_ctl and virt_ext to misc_ctl and misc_ctl2, respectively,
-to match new names in KVM code.
+On Mon, 10 Nov 2025, Lorenzo Stoakes wrote:
+> On Mon, Nov 10, 2025 at 03:04:48AM -0800, Chris Li wrote:
+> >
+> > That is actually the reason to give the swap table change more
+> > priority. Just saying.
+> 
+> I'm sorry but this is not a reasonable request. I am being as empathetic and
+> kind as I can be here, but this series is proceeding without arbitrary delay.
+> 
+> I will do everything I can to accommodate any concerns or issues you may have
+> here _within reason_ :)
 
-Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
----
- x86/svm.c       |  2 +-
- x86/svm.h       |  6 +++---
- x86/svm_tests.c | 12 ++++++------
- 3 files changed, 10 insertions(+), 10 deletions(-)
+But Lorenzo, have you even tested your series properly yet, with
+swapping and folio migration and huge pages and tmpfs under load?
+Please do.
 
-diff --git a/x86/svm.c b/x86/svm.c
-index de9eb19443caa..c40ef154bcacd 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -200,7 +200,7 @@ void vmcb_ident(struct vmcb *vmcb)
- 	ctrl->msrpm_base_pa = virt_to_phys(msr_bitmap);
- 
- 	if (npt_supported()) {
--		ctrl->nested_ctl = 1;
-+		ctrl->misc_ctl = 1;
- 		ctrl->nested_cr3 = (u64)pml4e;
- 		ctrl->tlb_ctl = TLB_CONTROL_FLUSH_ALL_ASID;
- 	}
-diff --git a/x86/svm.h b/x86/svm.h
-index 264583a6547ef..00d28199f65f5 100644
---- a/x86/svm.h
-+++ b/x86/svm.h
-@@ -94,12 +94,12 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u64 exit_info_2;
- 	u32 exit_int_info;
- 	u32 exit_int_info_err;
--	u64 nested_ctl;
-+	u64 misc_ctl;
- 	u8 reserved_4[16];
- 	u32 event_inj;
- 	u32 event_inj_err;
- 	u64 nested_cr3;
--	u64 virt_ext;
-+	u64 misc_ctl2;
- 	u32 clean;
- 	u32 reserved_5;
- 	u64 next_rip;
-@@ -370,7 +370,7 @@ struct __attribute__ ((__packed__)) vmcb {
- 
- #define MSR_BITMAP_SIZE 8192
- 
--#define LBR_CTL_ENABLE_MASK BIT_ULL(0)
-+#define SVM_MISC_CTL2_LBR_CTL_ENABLE BIT_ULL(0)
- 
- struct svm_test {
- 	const char *name;
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 47a2edfbb6c9b..49b5906965b7e 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -3139,7 +3139,7 @@ static void svm_lbrv_test1(void)
- 	u64 from_ip, to_ip;
- 
- 	svm_setup_vmrun((u64)svm_lbrv_test_guest1);
--	vmcb->control.virt_ext = 0;
-+	vmcb->control.misc_ctl2 = 0;
- 
- 	wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
- 	DO_BRANCH(host_branch1);
-@@ -3160,7 +3160,7 @@ static void svm_lbrv_test2(void)
- 	u64 from_ip, to_ip;
- 
- 	svm_setup_vmrun((u64)svm_lbrv_test_guest2);
--	vmcb->control.virt_ext = 0;
-+	vmcb->control.misc_ctl2 = 0;
- 
- 	wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
- 	DO_BRANCH(host_branch2);
-@@ -3185,7 +3185,7 @@ static void svm_lbrv_test3(void)
- 	u64 from_ip, to_ip;
- 
- 	svm_setup_vmrun((u64)svm_lbrv_test_guest3);
--	vmcb->control.virt_ext = 0;
-+	vmcb->control.misc_ctl2 = 0;
- 
- 	wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
- 	DO_BRANCH(host_branch5);
-@@ -3214,7 +3214,7 @@ static void svm_lbrv_nested_test1(void)
- 	}
- 
- 	svm_setup_vmrun((u64)svm_lbrv_test_guest1);
--	vmcb->control.virt_ext = LBR_CTL_ENABLE_MASK;
-+	vmcb->control.misc_ctl2 = SVM_MISC_CTL2_LBR_CTL_ENABLE;
- 	vmcb->save.dbgctl = DEBUGCTLMSR_LBR;
- 
- 	wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
-@@ -3244,7 +3244,7 @@ static void svm_lbrv_nested_test2(void)
- 	}
- 
- 	svm_setup_vmrun((u64)svm_lbrv_test_guest2);
--	vmcb->control.virt_ext = LBR_CTL_ENABLE_MASK;
-+	vmcb->control.misc_ctl2 = SVM_MISC_CTL2_LBR_CTL_ENABLE;
- 
- 	vmcb->save.dbgctl = 0;
- 	vmcb->save.br_from = (u64)&host_branch2_from;
-@@ -3278,7 +3278,7 @@ static void svm_lbrv_nested_test3(void)
- 	}
- 
- 	svm_setup_vmrun((u64)svm_lbrv_test_guest3);
--	vmcb->control.virt_ext = LBR_CTL_ENABLE_MASK;
-+	vmcb->control.misc_ctl2 = SVM_MISC_CTL2_LBR_CTL_ENABLE;
- 	vmcb->save.dbgctl = 0;
- 
- 	wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
--- 
-2.51.2.1041.gc1ab5b90ca-goog
+I haven't had time to bisect yet, maybe there's nothing more needed
+than a one-liner fix somewhere; but from my experience it is not yet
+ready for inclusion in mm and next - it stops testing other folks' work.
 
+I haven't tried today's v3, but from the cover letter of differences,
+it didn't look like much of importance is fixed since v2: which
+(after a profusion of "Bad swap offet entry 3ffffffffffff" messages,
+not seen with v1, and probably not really serious) soon hits an Oops
+or a BUG or something (as v1 did) - I don't have any logs or notes
+to give yet, just forewarning before pursuing later in the day.
+
+If you think v3 has fixed real crashes under load, please say so:
+otherwise, I doubt it's worth Andrew hurrying to replace v2 by v3.
+
+(Or have I got something bad in my build, and will have to apologize?
+Or am I blaming your series - seems most likely - when it's actually
+something else which came into mm in the last week?)
+
+Hugh
 
