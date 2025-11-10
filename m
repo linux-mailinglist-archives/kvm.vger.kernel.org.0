@@ -1,242 +1,312 @@
-Return-Path: <kvm+bounces-62488-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62489-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 250B3C45186
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 07:36:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54636C451B3
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 07:38:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F04F04E6964
-	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 06:36:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCEA4188EB96
+	for <lists+kvm@lfdr.de>; Mon, 10 Nov 2025 06:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7AE2E92C3;
-	Mon, 10 Nov 2025 06:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C69182EA498;
+	Mon, 10 Nov 2025 06:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="k+knjV4Z"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AdYp01j7";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="js3Gqx/D"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAC11E9B3A;
-	Mon, 10 Nov 2025 06:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762756599; cv=none; b=F5HMc5qP7TloAn+TriMIppHvENO5Aj0w44fXKaflEN2ZZ/833F2ju7hqGfYSAzzTW5wL4t71Cl5zBs7wsFPfNRMgCgZHNkXW8GyUh0ZkuuGBIE6k/Yak7V7kn1zaIVjb6nZSDFrX3NACGYwhCIQ8hm4l+IFKpf+APbGj1UT0dpY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762756599; c=relaxed/simple;
-	bh=BF8AGVxjXagG8CDMrjpmpEX5NBU+aG0VlGTv+qVDQSg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YWwHwSIIQkF+EF01B3M8javse13rh+8xB9nezLpQVT72kcZD6vJjpJWWvt9sYTweMxFoHcllv1zq3xtcYJsnY1NRPyx8g/gksWCTpmjNvjDEcx2Gm5BzA4LWuxktUpK1i/6ZtltlKvJDLpSg3lLOBDa0g7ZlIBdC2wPJB7Uazko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=k+knjV4Z; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DCE226D17;
+	Mon, 10 Nov 2025 06:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762756709; cv=fail; b=nO0GD3K1c1PHq1/94BKEz+yrCS0NVeptBtzLVBOzm1jALy1eb5PTX3Vps3izxhK2D33nWYDgjPIGil11qiPT/Je9GGhgTWWRj3aXmIMkCb82cQvW0zINOUmR3EaNsrehlZv3VbKo8s9xvt5J+FPlqNfYHGtDGZD13hCNB5UpmiI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762756709; c=relaxed/simple;
+	bh=a9H/JQ1F0eRuF0eRm1UT2vK71gbTLRowVFY3QR15TxE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=VWvni3b5fsE4VNcpQ7r5SBr4WpRA/bpoXWCtRbLZzUb5jrNWCrcqeGcd/fWYCd+kWDmdQHVe4DKJ/PlmmfL6WMrExBPrHPnix4wJKWHXtSTna1tVsm5bytgEw2fu7V6dwGQ70wGzax0+LrltqKlQBBNoi8yKDQEZSg7DcoVXppw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=AdYp01j7; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=js3Gqx/D; arc=fail smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AA6ICtp016040;
-	Mon, 10 Nov 2025 06:36:21 GMT
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AA6Ahw7019259;
+	Mon, 10 Nov 2025 06:36:55 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=qB2gRdRWWZQuS6hhGI2svmpQs+w3S
-	U/Fedj5Ew0g5GE=; b=k+knjV4ZimGjYJErcgfz/eTgRSXLKzwMd5BpM2PtHOj/j
-	nlJZ7qMHp81p/ypiJuP433s4MvC5EnsKXIrGrrjKsLmZElGVzdANLygkLWzS0Ld6
-	V4epB2Bb8emM+nx2+p92BTG4QM7ZxP+0s9etw/V3yEPQDyJBLkNSvySWlwk27bWG
-	7QvAL1r5XQih0S/eejE4d6Pt1Fp22Yb7YY71Hz7lIpI2avn1jRqKzRZOGpp50ju9
-	20HcdX6qm0478f495gmzHPkuP6vl/CXQjCgx7noyGCUfSjaXrd+PSF3zhDnNsHWi
-	I7ZBQM7JeK3h3RnyNZXUqgmp8k1h+ZWDxVu5FwnmQ==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4ab899080x-1
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=ZQcoqszeuQMeY/1yiU
+	zR/DpV75atjhp8xh2smHDnnrI=; b=AdYp01j7AyhGDErw1P7LpUYbemMDbLuSy9
+	1Ppvavlsy8Ci3E5bKILgM9yeT6226urXBzILJgXLNRhWkprALi2XPNd4XA2Ih4SV
+	wsn1vnMXqCa5Prq+IsZQL94d/I9wkSBtPwZ+VNePClfkolCkUdV623Q1OcLQBbgx
+	kMn91IR7SelgxIQtSORGyw/x7NZiXk6VIX/5Pjno31jMiToiAppuFMf4fW8zY+Jd
+	csy5CvIic6JVCPmDE+8gQaVlrywzGCclmQRZTIgJ2evxG16Lll9SsBh2gIyF9mLB
+	IPWF2a0mbnRHvANWXlHra4gJcH15CAWlOQHzVoljjuIZjI0uC5cw==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4ab8qa06pn-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 10 Nov 2025 06:36:20 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AA51PAV020907;
-	Mon, 10 Nov 2025 06:36:20 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4a9va7qxpu-1
+	Mon, 10 Nov 2025 06:36:54 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AA4lQXl000889;
+	Mon, 10 Nov 2025 06:36:53 GMT
+Received: from mw6pr02cu001.outbound.protection.outlook.com (mail-westus2azon11012010.outbound.protection.outlook.com [52.101.48.10])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4a9vabrv6y-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 10 Nov 2025 06:36:19 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AA6a7nE027536;
-	Mon, 10 Nov 2025 06:36:19 GMT
-Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4a9va7qxpe-1;
-	Mon, 10 Nov 2025 06:36:19 +0000
-From: Dongli Zhang <dongli.zhang@oracle.com>
-To: kvm@vger.kernel.org
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org, chao.gao@intel.com,
-        seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, joe.jin@oracle.com, alejandro.j.jimenez@oracle.com
-Subject: [PATCH v2 1/1] KVM: VMX: configure SVI during runtime APICv activation
-Date: Sun,  9 Nov 2025 22:32:12 -0800
-Message-ID: <20251110063212.34902-1-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.43.5
+	Mon, 10 Nov 2025 06:36:53 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SbjwvFE71Q+RRYJykyABhPYFjmtRqzicnTI2QiizoLN2cBzU5t/AhjRuTOzNoNxQKfNCtY6M7X1YVMieQRPD7StLK7IO/26tyZWDbAUyjQWRYIxz55Q384xByRA+i/hwDFer6zO486HQwy532983kYEIiPan3T5bpJD3ihOoetyzq5UINqPGE1jHXV0K9mtUtT04yU3aO9UBGta+405OxVqt9fTgXbWJfAUcxwem9AMFkr0tKjzLVvrIScVTCcfSvcUo10SBrhvNsmZzWT9nGQKwg5BpxML7kMN+/W9/te8Xg2WgTwtaACHAd9MpStlLYjnpqogSNTQIYX+LV0hHxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZQcoqszeuQMeY/1yiUzR/DpV75atjhp8xh2smHDnnrI=;
+ b=VAO8Gl1kFeiBo/bCkJE6SC/AE+3dWuQXLVesdRJR7rzOaFJYIx+AgfiWsOi9C+tFPVzQY/b5a0warsNyj3FZc5WK77As5UQGOGucTZYsYwvj/vdWh4qeyZ0Az2IBnvrCwDtOG1rcRmO+2tYgHMe8n1gdihExlyqrKmg4R3O7csaef3tf37OxCaslpeTsUoEu4ZJ7i5VF2GSC3/v/ZtPBrm+H0JT0elPuchb+JO08hHj0optRTrwA09nlNDT2LLGOGSPS2UP6HLhDfroXtcoXSxP2ernIySp7NoD4FCkm/KlknVm/AVSnDo6eNWSB9HgVWavkCPeAq0cK9s6uEav3Bw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZQcoqszeuQMeY/1yiUzR/DpV75atjhp8xh2smHDnnrI=;
+ b=js3Gqx/Dx2tOBRTiM1Ijq7etlKSeBEtJhezCxydDLo0ATndcchi6h706OAGGpfHc7G/ca/H6ucPChZb1L1uX1wxpI6jB76uq+CeMo3ee0DklI7vWWEFBsHvfuIkpMRBKjtXnB2H2ReATsUJFK7ewTmWQ0ajIW+vDAlowjpX0eF8=
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com (2603:10b6:8:1cc::16)
+ by DS7PR10MB5135.namprd10.prod.outlook.com (2603:10b6:5:38e::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.18; Mon, 10 Nov
+ 2025 06:36:49 +0000
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::2650:55cf:2816:5f2]) by DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::2650:55cf:2816:5f2%7]) with mapi id 15.20.9298.010; Mon, 10 Nov 2025
+ 06:36:49 +0000
+Date: Mon, 10 Nov 2025 06:36:46 +0000
+From: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+To: Lance Yang <lance.yang@linux.dev>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
+        Baolin Wang <baolin.wang@linux.alibaba.com>,
+        "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+        Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+        Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+        Muchun Song <muchun.song@linux.dev>,
+        Oscar Salvador <osalvador@suse.de>, Vlastimil Babka <vbabka@suse.cz>,
+        Mike Rapoport <rppt@kernel.org>,
+        Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+        Matthew Brost <matthew.brost@intel.com>,
+        Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+        Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
+        Ying Huang <ying.huang@linux.alibaba.com>,
+        Alistair Popple <apopple@nvidia.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>,
+        Kemeng Shi <shikemeng@huaweicloud.com>,
+        Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+        Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+        SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+        Xu Xin <xu.xin16@zte.com.cn>,
+        Chengming Zhou <chengming.zhou@linux.dev>,
+        Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+        Naoya Horiguchi <nao.horiguchi@gmail.com>,
+        Pedro Falcato <pfalcato@suse.de>,
+        Pasha Tatashin <pasha.tatashin@soleen.com>,
+        Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
+        Hugh Dickins <hughd@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, damon@lists.linux.dev
+Subject: Re: [PATCH v2 01/16] mm: correctly handle UFFD PTE markers
+Message-ID: <1e8da66f-0af9-48f5-9c70-d71d3108fb52@lucifer.local>
+References: <cover.1762621567.git.lorenzo.stoakes@oracle.com>
+ <0b50fd4b1d3241d0965e6b969fb49bcc14704d9b.1762621568.git.lorenzo.stoakes@oracle.com>
+ <5ed51639-604c-4e15-84ae-4bf3777f83c1@linux.dev>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5ed51639-604c-4e15-84ae-4bf3777f83c1@linux.dev>
+X-ClientProxiedBy: LO2P265CA0057.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:60::21) To DM4PR10MB8218.namprd10.prod.outlook.com
+ (2603:10b6:8:1cc::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR10MB8218:EE_|DS7PR10MB5135:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8f67dafe-ac3f-40d5-9880-08de202386d7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?WkXS35OfDU4hoOl5L//AuWfl4TnKfqqePSdpPGH6Gu92Xo/nmd7/z3UmESy/?=
+ =?us-ascii?Q?LkZd+0WbVcr5WkHEGSJgJOpAus9FB+0Z/tyU3jAu2DX2dAhmULyRsW2M2oHV?=
+ =?us-ascii?Q?yV8dOtGYTj06cQbk8c9TrRqlpPIGT7JOxHPPMswUGMqKcKrzo15M6mkZ/syl?=
+ =?us-ascii?Q?yDTtLySOjvSEsUsIZtLic4Pt3AU/CoLxXvo6WmKub8VUplZLqgN95oHGXzSx?=
+ =?us-ascii?Q?Pp8V6BIEsPBQYcr617Va/ZuJdgVCF7WH9F+KeuKtYMpi7EQsUvNjX0FPJCN0?=
+ =?us-ascii?Q?LZd1ZcSshOGqgGOUgJ0niuCRQAVlqQ8vyK0cyFklBrBbGtd9fRQqtptKD7wV?=
+ =?us-ascii?Q?T99/EeNFi3kaukc94FxiExfSb4MM2ye6M9KeF3ihdfkuW7zHD32SEPKFMiJo?=
+ =?us-ascii?Q?6kEclqvk2mKOsLJbDKFKlwcbbDhe4utluB3N5JY38/mZ6RUmzAR1JDi3O2VX?=
+ =?us-ascii?Q?EMqk49u9Z1R/HcTQLPW8ttnJyi2Cm5NrBYfHvcNLc+agESbVSHfV+uW5wl6e?=
+ =?us-ascii?Q?XYWVH0GCrjwb0/4aOpt+GfKDTmPv+zEOusuUFZ7sevX2NkfRT/rzDA+xSmu9?=
+ =?us-ascii?Q?aFC8RaetfM8YyEHoY4sXJQkWefsAYLrjxWCcxxgw4cqjbm2vWp0YBJidg0us?=
+ =?us-ascii?Q?MlM8M54UOqIyyt6H+0yLX8vITpwTIM/4F621UmIe9sslkX1KdWHvUImZ4MSn?=
+ =?us-ascii?Q?5CnR9P5JqS9IbSgdRtXynYm7fjXzHNC2Zwu3FV3pG2uYRjMk+SVKZoy4MECp?=
+ =?us-ascii?Q?cHmUbzUl2nd+olHyeSfh6qAnVHErNRdZTZmrXmYD52283FKwATxPvFlRJLpl?=
+ =?us-ascii?Q?t55Dw8qnYlnFkjpPsSKZcNZzxkSGSLOK24Amy8YLCO80+FoUe9b45PZIakd9?=
+ =?us-ascii?Q?RoX9OU6NDp0K/kbCCq48eHUl8vVfVuWlo6K+m9BrQXQRL/3rIK485hnK5QlJ?=
+ =?us-ascii?Q?QfMiE3xQyTeVBkhEgNlcqKg+u12ZgBl2Ckeq8uw2bxB9T8cSwG1nwrccLszO?=
+ =?us-ascii?Q?5eTQkYQsIHESZe8W2g5Kt6jxAZGlPqdwhwjtQA3ddd0Z2EfRZpVCEuV7kSsU?=
+ =?us-ascii?Q?FgdkaqgnJR/OzTwMCsN8Z0c5804xIhbTiBEr90Mox1vTffMFadpaKiEYDGNw?=
+ =?us-ascii?Q?WyK+aEHMDP9BbGXNN3d7BNTc1rqI2jIzwNTgLCykJcXHFiSLB76dgoV0B/ap?=
+ =?us-ascii?Q?dLEAMDrpmwZDFRz8II1lAb0YzL608urVqyeIEIrG/5vbxFpVRo819rfUEwLV?=
+ =?us-ascii?Q?In+r1oHA7zw8TGNCTq4lsJjiR5r6Yz+rHTtEWdoA1Uqsd+rv5LhhI2sEHuCz?=
+ =?us-ascii?Q?u98liXxU94F2RTVU1EKPwA59akJrXMrD8haDqBW+kGKF6Xhiq9fxjXWjAnCD?=
+ =?us-ascii?Q?9cy412HBwVvWGs95BysLDiPKQ/hXKbVrd9soLiddioKYKl94VlJmSAtfMUZk?=
+ =?us-ascii?Q?2kaswV4sSq9z9/zQN+df5o4DGgJMr/cE?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB8218.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?b4heUkBmTH3PfbGP3X2MRfoa6QgsPJhW3WTrRiLVpVBMovE2QhI5UPQdaA3g?=
+ =?us-ascii?Q?G3gjQMoRFo26aU3/fcaK4K/iweykZzWDHk5QAze981qQ9rAsNdtNFJ80ut4E?=
+ =?us-ascii?Q?nmNdau2ufEA8i8LjnVy26I3FyrbzwTL/Qy54GMp5wGC36SJ7pCgaeO//PDB/?=
+ =?us-ascii?Q?5/+3fa/mYjKJDV14crDTPB9hmNX/T+CZbVJezDx5o5mPvs/5AGl5l0GpWocX?=
+ =?us-ascii?Q?srPyuY7cvfgsW6SDWoDADs+XWXhNqyNbMor0zwHVVFZBCN/QnKkI5Q6H8PDD?=
+ =?us-ascii?Q?7UkwHbjxwAHzUYseZBszMctYJh9lrDVmBi50nBgYfo6F3xzvhMEm7myNTlPQ?=
+ =?us-ascii?Q?NWHy3U7FFq/MZH+K6IXIrP+65qPHVA61BpMBJPqP2wVYQ/AIOsZkRVSglmi2?=
+ =?us-ascii?Q?fTsqkvq9hQjvQxrUFHsJVt6WqPMcNbGyuA4Ir5OBjn1RRDocHP8ORBdj33DA?=
+ =?us-ascii?Q?iBqi4ia1ZUGAr6fdBcC7SXacEsidYTxAHyKqJlnu9dN2WRDYsvpbNbqKxbYl?=
+ =?us-ascii?Q?d0CxiXHopZwjbg2WkB0U/aye2FLBxq3VebpLJhEbgMLqePquJyK5wEU2tvYr?=
+ =?us-ascii?Q?GZ1wONyeE3tyIFkEzgjM7Sy1USbZJIHSjk6D8eyeMtwjBKMLtC0IalNzmjcl?=
+ =?us-ascii?Q?7MUacPVOP4MTE0W6mJrqnElo3CQIzyJdrOx7YoL8uWoqdydAOiQBZJwS3cZn?=
+ =?us-ascii?Q?KEJ3RQXtSrbaB7sY2Y31Q67z72Hh69L91ZzKXl/PSvPQ8wMauwaeqBGtf/1I?=
+ =?us-ascii?Q?UMAUv4SeRfGxZSisiQM9GwBkuq/a5XAI5HClo295bV6l/4knYkZFlt+3Ov2x?=
+ =?us-ascii?Q?GABLJc/PKY74daNqwjnPVt3rQC489fhxjGKG3nwW0eNdReHc0zWLGLRIYDvg?=
+ =?us-ascii?Q?3boyqkXz5QgTzKmQUDPfsD435p78IW9zRDdNYuW1amDTCrQTpQvxZ1FNGgtF?=
+ =?us-ascii?Q?u6YcqOC6dIVgCTEf3LqxycykaLIJ9BpzwvQDmCyjJN/epaZY7VdTEWBDAWWI?=
+ =?us-ascii?Q?xSAwcX6iY6m/5kFwIsVuqJTRgfpiTGHpPQfEnW67IJz9zsKkx630DEEkO7Y0?=
+ =?us-ascii?Q?mfy+R862rbYl1MnNFSdR5Cwe6Y768j9kGq3IPMntW5pyqlCWHl+q2QEYRlYd?=
+ =?us-ascii?Q?zUnxfXt6e05AhomGY6ishPoNkVYl/b/J7RUD0YdSAURlMRwuV4H1UW4drUez?=
+ =?us-ascii?Q?7LdLG9C6CxAIOYt/2VjpXrz3dCbGBB/vxDuVPTAnlE8OrarttiH6vl66XvKb?=
+ =?us-ascii?Q?VBEqY3qnWPIhSJv31f6PH6k33QN/baAs7S2sdObqMlX0PbdduqpTxlnss5dC?=
+ =?us-ascii?Q?+GQtKHoHm1D1XzSTiUnRNPMcr+fHt/e/hJOY101WydHfHtwX89WDhRS+Bp4t?=
+ =?us-ascii?Q?PO1fSgFlsu5Z1nfTn3mikobX7BpR2NqpYG8/nZIowMTvmaWmeNu4rP4NYruP?=
+ =?us-ascii?Q?VUSx0WcXl5osR/1GQAEq5GS6setLLZn1B+DMVdXC55v5EVGfJ3EXlB444lpL?=
+ =?us-ascii?Q?oki85DXtR4kWXqgUf56hR7jcOuLfcDtzzPzyxYbtgZnzOwr9B8zuGI5RsLDW?=
+ =?us-ascii?Q?mu3QHUMRL6MJQhOW2PAo3Fyi6AYXM6DjGLnoap5/ylnteM2FFyVV3gxfEv/i?=
+ =?us-ascii?Q?xw=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	VdLW+fdCFTsgo4cwq35ERz4JxBabVVvcWDeyb7zx7DKSLMDI6RrfJ3RvWodi7OnYsL9rDq9e9Q95FA4QIRdhtlVgsTOrXYCQcxGapaDJX4zTPVZUvDXgz7k12rAVOqjDAo6UUzWfahMumNbCJSuIdsqXePImyGj66NPaDZPPWYWXISyx3rUUzc8eDrp+DeQnVemIvMPFWDMx30ESrNr0e8Vsk/YNLvduiTm+qTp1qgdTxq+1/kIxr2evyO68aziOKLCnMguNvwi2xmBvr9cGwicO2HL1bn87NyQqFOhBhhJ9nmULvsGvn9u33mvg/T/vqYFjqH5gyzlGs3ROTbdM6BKLhpdTGJBBiOuO9zm5XlSLTXHf0GE4jxidaexO1G66RTvYTYzfjVNjDzRiHWhHwr/JHjrkWK3LSy5Gd+8PJ2kmj8Zbcd1UXTwPMEzcuFCXVTMxKiOUaMOIsnfbuajON0fBeViq+lY1zGkbT3RVb8xy+h+S3hWdrND7rvj0bTOl13T8lPCrDNbMZ9IdrvVC33XETUIyq8qWB+tFndpctRwdjxX/9knDhLioiryb+lRcvd4vRs0YKKzXlCoq8QBj8dO8aS7GhEh3sZpWJxA/K3c=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8f67dafe-ac3f-40d5-9880-08de202386d7
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB8218.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2025 06:36:49.3692
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: urR9K0hiOdp7nO0k1hXHYdMp9Pm7ACzTxlEk4OmFatDEEw7a1OwNAVwJNqiJJm+5n6XEdoKHbz+rq7CYnWAGrvck9g6raxbnYsr2kX8mRQs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5135
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-10_02,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
- adultscore=0 bulkscore=0 suspectscore=0 spamscore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0
+ malwarescore=0 spamscore=0 suspectscore=0 bulkscore=0 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2510240000 definitions=main-2511100056
-X-Proofpoint-GUID: 2bIu93AptfZOH12qEOXsUbwwElvhjhAM
-X-Authority-Analysis: v=2.4 cv=C4/kCAP+ c=1 sm=1 tr=0 ts=691187e5 cx=c_pps
- a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
- a=dhBlWXeqEOJ0AjUelTEA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEwMDAyOCBTYWx0ZWRfXyK7bKXRI9/RB
- l+g9blH87m3IvYB1QtGGiJRRMS/OJnxfhD3Mlk/P/HhbDEiXhQibW73EfGwLFOjGjrQhm96jHkh
- +UhENFSF3YNTgt6ZEKcKdKrdR4KFnINa1i1rwDOeU2cA5FdktLpqmTCs+xzrVelSbvbam6tINBT
- ExTBbjqAfQHE1dbQYRHoRIf+iElX+B7S4DHBexymTmpGvClkYOEyjT31s5hx7gtPUem20a4wcsd
- +U0Lq7QRIYg5kz3pGH9Ej2pCxFGG5St+BPsZbOlMjthauhxIMsbMa8vvgMpXuqXGqJvXlawzfcO
- gq3mzAIEUSHpFn8ycHKSWxgbIn+U2OCfHt8QngGgfEvMhsO7F0X66iqUthFjh07O+zigpLVW8Hz
- HTtuHUoVt1lT7yvm/uIBP75LrgZhYQ==
-X-Proofpoint-ORIG-GUID: 2bIu93AptfZOH12qEOXsUbwwElvhjhAM
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEwMDAzMiBTYWx0ZWRfX9+mPP3nW4h60
+ OtCInRUB+qQG97puS3DBLYbpZ0TAiZhe8Sn1JuvXniTZT2XvrOgjDEMeZrnTHsNrXowQTPATk7N
+ FI4/rjIR1GEz5mREkB36zxxni7y6PESxtrMsILOt8iFEjd8PzQcStQKKAurfKRN3FGnnUnqHzZY
+ UNnHyKKhKAxOusoaXI91t+DV0/glIVKLqFlUPa98E8mYPkK6kaEa2LOZEQHNibwR2c5lsxAEk5R
+ gBrDAZnnT74QSJxZd81D2fEmRDZcxBUFQ7tUuDnZn7G9GkObt3DFGs5vbN4dn0sKxq6OCZC6fyC
+ KV/vd9+dA1CZurL7lH2UVq9osT87OeqBRMtakCRrYZp5O3NJhjCp+W9DVJ3Bmg8Xb0TK8k5d/hA
+ +C98rIlsJPpyNxeN0UkNzbnBOjEJLVig+zAXghJnQwRN93Qecws=
+X-Proofpoint-GUID: KvCOwA_cZBFmo7Jklzp0iOrjcjN2cBn0
+X-Authority-Analysis: v=2.4 cv=XZuEDY55 c=1 sm=1 tr=0 ts=69118806 b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=6UeiqGixMTsA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=-D80Zjvrs50afXV6huEA:9 a=CjuIK1q_8ugA:10 cc=ntf awl=host:13629
+X-Proofpoint-ORIG-GUID: KvCOwA_cZBFmo7Jklzp0iOrjcjN2cBn0
 
-The APICv (apic->apicv_active) can be activated or deactivated at runtime,
-for instance, because of APICv inhibit reasons. Intel VMX employs different
-mechanisms to virtualize LAPIC based on whether APICv is active.
+On Mon, Nov 10, 2025 at 12:26:26AM +0800, Lance Yang wrote:
+> > @@ -175,8 +186,8 @@ static int mincore_pte_range(pmd_t *pmd, unsigned long addr, unsigned long end,
+> >   		pte_t pte = ptep_get(ptep);
+> >   		step = 1;
+> > -		/* We need to do cache lookup too for pte markers */
+> > -		if (pte_none_mostly(pte))
+> > +		/* We need to do cache lookup too for UFFD pte markers */
+> > +		if (pte_none(pte) || is_uffd_pte_marker(pte))
+>
+> Seems like something is changed, new is_uffd_pte_marker check will
+> miss non-UFFD markers (like guard markers) , and then would fall
+> through to the swap entry logic to be misreported as resident by
+> mincore_swap().
 
-When APICv is activated at runtime, GUEST_INTR_STATUS is used to configure
-and report the current pending IRR and ISR states. Unless a specific vector
-is explicitly included in EOI_EXIT_BITMAP, its EOI will not be trapped to
-KVM. Intel VMX automatically clears the corresponding ISR bit based on the
-GUEST_INTR_STATUS.SVI field.
+I intentionally changed cases that seemed to be explicitly wanting to only check
+for is_uffd_pte_marker().
 
-When APICv is deactivated at runtime, the VM_ENTRY_INTR_INFO_FIELD is used
-to specify the next interrupt vector to invoke upon VM-entry. The
-VMX IDT_VECTORING_INFO_FIELD is used to report un-invoked vectors on
-VM-exit. EOIs are always trapped to KVM, so the software can manually clear
-pending ISR bits.
+The issue with markers is it was first implemented on the assumption that it was
+only one kind (UFFD WP) then other markers were added without correction.
 
-There are scenarios where, with APICv activated at runtime, a guest-issued
-EOI may not be able to clear the pending ISR bit.
+Since we explicitly test for the softleaf is swap case I assumed we were good
+(we check for softleaf entries explicitly):
 
-Taking vector 236 as an example, here is one scenario.
+	/*
+	 * Shmem mapping may contain swapin error entries, which are
+	 * absent. Page table may contain migration or hwpoison
+	 * entries which are always uptodate.
+	 */
+	if (!leafent_is_swap(entry))
+		return !shmem;
 
-1. Suppose APICv is inactive. Vector 236 is pending in the IRR.
-2. To handle KVM_REQ_EVENT, KVM moves vector 236 from the IRR to the ISR,
-and configures the VM_ENTRY_INTR_INFO_FIELD via vmx_inject_irq().
-3. After VM-entry, vector 236 is invoked through the guest IDT. At this
-point, the data in VM_ENTRY_INTR_INFO_FIELD is no longer valid. The guest
-interrupt handler for vector 236 is invoked.
-4. Suppose a VM exit occurs very early in the guest interrupt handler,
-before the EOI is issued.
-5. Nothing is reported through the IDT_VECTORING_INFO_FIELD because
-vector 236 has already been invoked in the guest.
-6. Now, suppose APICv is activated. Before the next VM-entry, KVM calls
-kvm_vcpu_update_apicv() to activate APICv.
-7. Unfortunately, GUEST_INTR_STATUS.SVI is not configured, although
-vector 236 is still pending in the ISR.
-8. After VM-entry, the guest finally issues the EOI for vector 236.
-However, because SVI is not configured, vector 236 is not cleared.
-9. ISR is stalled forever on vector 236.
+But obviously didn't read that carefully enough - mincore assumes literally all
+soft leaf entries can be considered present for not-shmem and shmem would only
+have no-longer-exists swapin error entries...
 
-Here is another scenario.
+Really that function needs refactoring and the is swap check put higher.
 
-1. Suppose APICv is inactive. Vector 236 is pending in the IRR.
-2. To handle KVM_REQ_EVENT, KVM moves vector 236 from the IRR to the ISR,
-and configures the VM_ENTRY_INTR_INFO_FIELD via vmx_inject_irq().
-3. VM-exit occurs immediately after the next VM-entry. The vector 236 is
-not invoked through the guest IDT. Instead, it is saved to the
-IDT_VECTORING_INFO_FIELD during the VM-exit.
-4. KVM calls kvm_queue_interrupt() to re-queue the un-invoked vector 236
-into vcpu->arch.interrupt. A KVM_REQ_EVENT is requested.
-5. Now, suppose APICv is activated. Before the next VM-entry, KVM calls
-kvm_vcpu_update_apicv() to activate APICv.
-6. Although APICv is now active, KVM still uses the legacy
-VM_ENTRY_INTR_INFO_FIELD to re-inject vector 236. GUEST_INTR_STATUS.SVI is
-not configured.
-7. After the next VM-entry, vector 236 is invoked through the guest IDT.
-Finally, an EOI occurs. However, due to the lack of GUEST_INTR_STATUS.SVI
-configuration, vector 236 is not cleared from the ISR.
-8. ISR is stalled forever on vector 236.
+But TL;DR you're right I"ll send a fixpatch...
 
-Using QEMU as an example, vector 236 is stuck in ISR forever.
+>
+> ```
+> 		/* We need to do cache lookup too for UFFD pte markers */
+> 		if (pte_none(pte) || is_uffd_pte_marker(pte))
+> 			__mincore_unmapped_range(addr, addr + PAGE_SIZE,
+> 						 vma, vec);
+> 		else if (pte_present(pte)) {
+> 			unsigned int batch = pte_batch_hint(ptep, pte);
+>
+> 			if (batch > 1) {
+> 				unsigned int max_nr = (end - addr) >> PAGE_SHIFT;
+>
+> 				step = min_t(unsigned int, batch, max_nr);
+> 			}
+>
+> 			for (i = 0; i < step; i++)
+> 				vec[i] = 1;
+> 		} else { /* pte is a swap entry */
+> 			*vec = mincore_swap(pte_to_swp_entry(pte), false);
+> 		}
+> ```
+>
+> Wouldn't the generic is_pte_marker() be safer here?
 
-(qemu) info lapic 1
-dumping local APIC state for CPU 1
+pte_is_marker() now :) I fixed the silly naming inconsistency...
 
-LVT0	 0x00010700 active-hi edge  masked                      ExtINT (vec 0)
-LVT1	 0x00010400 active-hi edge  masked                      NMI
-LVTPC	 0x00000400 active-hi edge                              NMI
-LVTERR	 0x000000fe active-hi edge                              Fixed  (vec 254)
-LVTTHMR	 0x00010000 active-hi edge  masked                      Fixed  (vec 0)
-LVTT	 0x000400ec active-hi edge                 tsc-deadline Fixed  (vec 236)
-Timer	 DCR=0x0 (divide by 2) initial_count = 0 current_count = 0
-SPIV	 0x000001ff APIC enabled, focus=off, spurious vec 255
-ICR	 0x000000fd physical edge de-assert no-shorthand
-ICR2	 0x00000000 cpu 0 (X2APIC ID)
-ESR	 0x00000000
-ISR	 236
-IRR	 37(level) 236
-
-The issue is not applicable to AMD SVM which employs a different LAPIC
-virtualization mechanism. In addition, APICV_INHIBIT_REASON_IRQWIN ensures
-AMD SVM AVIC is not activated until the last interrupt is EOI.
-
-Fix the bug by configuring Intel VMX GUEST_INTR_STATUS.SVI if APICv is
-activated at runtime.
-
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
-Changed since v2:
-  - Add support for guest mode (suggested by Chao Gao).
-  - Add comments in the code (suggested by Chao Gao).
-  - Remove WARN_ON_ONCE from vmx_hwapic_isr_update().
-  - Edit commit message "AMD SVM APICv" to "AMD SVM AVIC"
-    (suggested by Alejandro Jimenez).
-
- arch/x86/kvm/vmx/vmx.c | 9 ---------
- arch/x86/kvm/x86.c     | 7 +++++++
- 2 files changed, 7 insertions(+), 9 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f87c216d976d..d263dbf0b917 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6878,15 +6878,6 @@ void vmx_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
- 	 * VM-Exit, otherwise L1 with run with a stale SVI.
- 	 */
- 	if (is_guest_mode(vcpu)) {
--		/*
--		 * KVM is supposed to forward intercepted L2 EOIs to L1 if VID
--		 * is enabled in vmcs12; as above, the EOIs affect L2's vAPIC.
--		 * Note, userspace can stuff state while L2 is active; assert
--		 * that VID is disabled if and only if the vCPU is in KVM_RUN
--		 * to avoid false positives if userspace is setting APIC state.
--		 */
--		WARN_ON_ONCE(vcpu->wants_to_run &&
--			     nested_cpu_has_vid(get_vmcs12(vcpu)));
- 		to_vmx(vcpu)->nested.update_vmcs01_hwapic_isr = true;
- 		return;
- 	}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b4b5d2d09634..08b34431c187 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10878,9 +10878,16 @@ void __kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
- 	 * pending. At the same time, KVM_REQ_EVENT may not be set as APICv was
- 	 * still active when the interrupt got accepted. Make sure
- 	 * kvm_check_and_inject_events() is called to check for that.
-+	 *
-+	 * When APICv gets enabled, updating SVI is necessary; otherwise,
-+	 * SVI won't reflect the highest bit in vISR and the next EOI from
-+	 * the guest won't be virtualized correctly, as the CPU will clear
-+	 * the SVI bit from vISR.
- 	 */
- 	if (!apic->apicv_active)
- 		kvm_make_request(KVM_REQ_EVENT, vcpu);
-+	else
-+		kvm_apic_update_hwapic_isr(vcpu);
- 
- out:
- 	preempt_enable();
--- 
-2.39.3
-
+Cheers, Lorenzo
 
