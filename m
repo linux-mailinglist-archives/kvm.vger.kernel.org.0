@@ -1,102 +1,102 @@
-Return-Path: <kvm+bounces-62791-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62792-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5F55C4F245
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:56:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75CF8C4F257
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A32BB4F4780
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:55:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1700A4EAB1F
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B8A393DD6;
-	Tue, 11 Nov 2025 16:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374613730F4;
+	Tue, 11 Nov 2025 16:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJB2KNJD";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="I7CzNzI/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b1js4xGl";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BUXpbIAi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C49A377EBD
-	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 16:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4DC1D6195
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 16:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762880010; cv=none; b=tX7ftqNYBabZ02QT7CI6OuFhwky6m9hwfxY54BeNXUbN174sgDfkBk6HTde/qkuU41UDtLR5YYwCKm2iodjsGZt/7qiXTKMBtUsZuDo4h/hLmL3EOLo7pfNEpvZEPMCORjZFRhi9lIGUr5xg2svd6r2SLc6+1honk9jkFK5eD98=
+	t=1762880141; cv=none; b=WvY5iu8z9dOzisbymugU+CKtc/wUnbfd+AmNZ5HcSl4K/I5Vid80FLL+EgAa7Ezkq6U6EehOfOCgOXDNVIijlFi1Agz783hez/SW323wGF/6ECJDksFelcAlwIeX8itwnKi2SehXiKyToasY+E62Kbmn2zSqBK1yrVoYTPt51y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762880010; c=relaxed/simple;
-	bh=SS0LZ3kWuX/E6hwB65fRvUu+pViB6WaWPy05xJu0hgM=;
+	s=arc-20240116; t=1762880141; c=relaxed/simple;
+	bh=nlEfTmws0Q46o78NUfhpjE3w9PAskdTxv3a88lJzlpU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qg0r8mtSCZibmfdJNqL7nG9LrpSuIZ09ufFIVkqq14FpEjfPcBc7B2FpGoJuZpP4T7Ce6zB9DJMXOVbyuZVI6PQM/WWVyJzaFx9DeTKQvk2Ub2E2nmdCgC/kPQu4yoDo+WIvAtoctjp8pK4V5r87I5iKP7YfgAnjmE/i4wVec7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iJB2KNJD; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=I7CzNzI/; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=aexdao6X61C0EzGiU3zbtq+o/0C7sv2Tv+DngggXam72aG/rDZLJH0Bxc95B4wKbH3UkSVHk3SqJRAlE1+Pgmv/Isbpk/APhJ/JJeIVRQ88GKF5cP2/x/5apftof2B47OAwq0zBBv2C8zpTbYtSFxcrKN/RUIWt98IuFYnWIcoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b1js4xGl; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BUXpbIAi; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762880008;
+	s=mimecast20190719; t=1762880138;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Jv9tA8d7GDzG4uMgQEzEG6S975RuueXPPh6IjnESOqs=;
-	b=iJB2KNJDjZKas9tWGhHoTtvF1pEfBQ4Y+1yAblzr0B9mw+ihWA+ms6m0I7M26n2Gaox0ZL
-	LxNtvR0lS9hsNYaT+EscVentlIddbLH3PxcEAhush4KA+DcCXE+oZbCbhswHRDxvNec+MJ
-	xAIB6mDc/a0G4pNUT2Kzd9Frh8vt5JI=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=gnMIv0Ik+hITHUqF7t+6yoyTUpUVXjJtFWV6UcASCo0=;
+	b=b1js4xGlbKUSGz3rtJp2zOMe8x77+rZvE9HrYlFpounWmIxWIVhPEEvg2/u/pRLK10kMeR
+	4eHkveRNxwVdZH0rMP4knXLirU8D1qyZdqH1VMTZ9wYaIPP17qbToIiSwnX7v+ikzAizZc
+	/fdNd4cw6zo7jRyuK0fk6xt7t5VYKRo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-77-8OcrsWUOM_CVz30T4eyG0A-1; Tue, 11 Nov 2025 11:53:27 -0500
-X-MC-Unique: 8OcrsWUOM_CVz30T4eyG0A-1
-X-Mimecast-MFC-AGG-ID: 8OcrsWUOM_CVz30T4eyG0A_1762880006
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b726a3c3214so388259466b.2
-        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 08:53:26 -0800 (PST)
+ us-mta-136-Hojp4HwoO1uHggqkuJ5dDw-1; Tue, 11 Nov 2025 11:55:37 -0500
+X-MC-Unique: Hojp4HwoO1uHggqkuJ5dDw-1
+X-Mimecast-MFC-AGG-ID: Hojp4HwoO1uHggqkuJ5dDw_1762880136
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-429be5aee5bso2015583f8f.3
+        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 08:55:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762880006; x=1763484806; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1762880136; x=1763484936; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jv9tA8d7GDzG4uMgQEzEG6S975RuueXPPh6IjnESOqs=;
-        b=I7CzNzI/LVx8TR6964pA0QufkAXXCFWHq7dYm8HSPOWbWX1Cbx2uHhsrrbXYkkZ9i2
-         schN4KYeeBNKsuI/7esSv9JGaMC7of1FN0eF4fpH33myPDE2CjgVDTVZqRG3zWsQVNr7
-         FR8Tn33MVuJod+XQ835LHDLZa8FLNWpRepxg62GlwsutgAVTdAC0+claddXci4PgUJo3
-         70xMKS622p2t1PlYahcJZXMCrGsChYMcqknbdTiWOS/mw5AjdSeYpJNgXnoY66HVkmzi
-         76ojuo/FH0gA+jebFS3RvWeWms0XfmN1xA8z9qNjasQa+MZxoh/3P23eRHpvGPg0OEZU
-         ra0Q==
+        bh=gnMIv0Ik+hITHUqF7t+6yoyTUpUVXjJtFWV6UcASCo0=;
+        b=BUXpbIAi4TzFpdEinFY81Q/MYpNv6s5W/kRxFAC2GPgT7AgQrAa/1YnyGqPT3NFvkw
+         RsWZE5KdNsBPHD2MI8FEc5jQIn0U33eqJQIyG/fZqzxUjeYQb2LRVG6SHqXHFhFQdS1t
+         RMXcVziQkC6+eJSDzaNpLA64Z1Rkc6Yqyw5whMW9VqCIhTTEcXe5i56TYp+nvY+WOJi7
+         QOR0RCsZXYCKozEb7Nnn/r/VqMaviS02n5VsrjjEu4iXPFMBI6kwHppk3cOu2waqq5C4
+         1KvkFRtQ36rXZyD75aYAXD3A3WNJKyFImc6D+5NMLWo59Cau91HXleSnPYVO4nGK8jYk
+         eJ5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762880006; x=1763484806;
+        d=1e100.net; s=20230601; t=1762880136; x=1763484936;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Jv9tA8d7GDzG4uMgQEzEG6S975RuueXPPh6IjnESOqs=;
-        b=FCjEiKO6BrPxnjZguBswJW69nR5LmizwlYUcBaFuvJ+HvB3PeD+T7NzPAcB8dAlJ0Q
-         bFIeju0E1rkF0v9r4GIQmAKU/eLftnLvxJKeJ0OmeHdlTzNdMJULC+Hq8SsZPNfldQPD
-         +B6IdMnp/DBCacdChh747UGdEZSAKZpHlY0sO4Cdg0x6Bdk7OAq1vdQ/rpHRE9Smp24I
-         YFBS7YvvmUKekDXQk8/255XPp/UAjpvTh41w3YqJciTuvKZrbON45asBT/bDWkjkC6o1
-         pKdP45vtjYQ2xUXNyrOfPgynXQPssEs0b+gVQclGuyXD8WzhHeNF6IVaM7mYErk3Oq7B
-         2fVg==
-X-Forwarded-Encrypted: i=1; AJvYcCV+hDVk9J66TGk5tyIQ2U/NKATlwfsBNqS3BUwWR4Py6Py59738NJTzcCTVsVPTfvXWO+Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1S7w9WXypRoK10xn58XjvHuzqVY6B/7Yzflv8954GlNbubXSc
-	9JkzkgDcgyygxtIPrHqPEgHzt6HVP4S/B+3CRJS7PURhQBxdqFHKnJwXvgmR8GBhS+Aq71UrFmz
-	EezcSGI7Hr+8JfvOQPC94XPauQ/XyC+yXBTBuj97ydbDZT9edgmCdIw==
-X-Gm-Gg: ASbGnct3hdMnKFpgqVfWl+GF0pt+0SbaPi9VZ0br7AGTqpPYLianVgQtxsS0WHYdGjP
-	qGs/gQXPF5s8wsdw9vojArH5guSrhKj3XT3Q4Kjor7Tmrkodr6SuI7suNQD/7e+nccuhAYsCKmF
-	bZgkAduYl18EW5ciGimCGVSWG8oyYQixKKSSyy7qC3O4T2dDvKG9XQlV4od/8lXAYep/1i5xdwx
-	cjJNv2Ucdn8xHoLKGBEzCDe7Q1UExGQo7V/3bVupatm+40C374va7MT3T+47UYnUDdSYkD2pka3
-	/q3yj0quxBpaYUvqkOfWHWUr3wFGb8iW2okptwfi2s7cGGn6MLTjbVsXeeyyFO/mG0pS8rRuLgT
-	LAJQxE/IHrs7Nb/UqWhTSSEoCSLHkpovtGRo7qMgr3OdXrt7XXD/PTOUiQvBH7v2+giTdZ8rtm3
-	nZyKdoHA==
-X-Received: by 2002:a17:907:2d8f:b0:b70:b13c:3622 with SMTP id a640c23a62f3a-b72e02d20acmr1307170366b.4.1762880005749;
-        Tue, 11 Nov 2025 08:53:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHi5yK53r4gzdwr4cN+XIhmGedNSM+6slG564RO1Q+SEbGpJKZilfw72VaC5vPjhYR0V+gqJA==
-X-Received: by 2002:a17:907:2d8f:b0:b70:b13c:3622 with SMTP id a640c23a62f3a-b72e02d20acmr1307167266b.4.1762880005311;
-        Tue, 11 Nov 2025 08:53:25 -0800 (PST)
+        bh=gnMIv0Ik+hITHUqF7t+6yoyTUpUVXjJtFWV6UcASCo0=;
+        b=BHXW03VKND3L8m+HByjJFNdHHjyDmeM4KVDbgKd87Dt5I/nfh9cAr45swqSapym7g+
+         2XSs/K9on+zFpQxpQBTUIw8qi7X0EysnvOCxkrDOAr0DoW/Mnt9+SE3x16ZhUZAwquwV
+         YaB/8Skepavi7OsN3T9rIP8OWF/+BS8z1P7gHm7vhUjHQS04JAvqXBPQ9xp34VvkbDKn
+         bl2oxzqkDB3doO5nQTxeYyp19H4H+8EMoiEOzBchprbyZ3fcTqEV2lpIZw10kQqxax6V
+         aX3ybkOcaX4qU83LdbizjKSULvKmpjitLmaOtPccXOuY8PzSXIuwc98QBlQoV1TyvWae
+         eyyg==
+X-Forwarded-Encrypted: i=1; AJvYcCUlOPQlM+BIcHa8rhRMNvVtivWwfrpj6zXVAfFz0Du3c3u4pQQItNRbSTX0aVn+wxBnmnw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyv/WrjrPaTV8uYsOkQO1Ku+HQLQO3MlITm1aNcOKLjSHN/SFjw
+	urM1WiUcIJX8AH6RYceEdx3Zc/bujoI2yjwryS4/mH/lRwChNmxRKT3obAO/DecOi7vI06WOI7s
+	ulxde8yInnTmXPN5r+1Iy21F84olq76znQVIREqEaly2Aao4GUzb3dQ==
+X-Gm-Gg: ASbGncsDTNhFkKRoYhrF/I4WCwq+Hu2l6Ecl3BDoU/cHcV/4UxIe0wQiA9Udgh5sKGs
+	ViI5OEJ9UkzKNPNzcmoTzJFV3cU5mF1R082Rvp8CgeX6IJty7/jif9rcIOtLHois67ILL6KS8Y8
+	REawYHOyiSlhwpWurPwJOwSX5Se0MKBs8Vgtdpr4myCzSMP/4SNKPTq2vzV+rijxLlXHGRTYPow
+	bW7PB2u5OKeJjjatqDSMeDbk54BFBJ59wLQodOoaw3KLr19EkpTSXIe7KxFzFSlRg1ffN8g2iol
+	eNsOAIWntq2SkrTOb/stM+DvIh4GqMxTayTDlnO4NR81Sk5Tj5LqzYipHSoi+lHxiBktD/oJGMt
+	6QlZ2Cd+rhWSj5EQ7ciQrQ2bxBB+B/EEvE0I7e0/AxT2PinSkmVYp2g7NbyFsgKGhNLDsC1OFjp
+	teiw90KQ==
+X-Received: by 2002:a05:6000:144e:b0:42b:3bfc:d5cb with SMTP id ffacd0b85a97d-42b3bfcde1bmr6451767f8f.51.1762880136103;
+        Tue, 11 Nov 2025 08:55:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEwXz8O+8CJxSCaosY+x8WzSmDIqFBYmIyaTJkW/+khTeoschvxJNMBqDWOCSADXh+6y0zXnQ==
+X-Received: by 2002:a05:6000:144e:b0:42b:3bfc:d5cb with SMTP id ffacd0b85a97d-42b3bfcde1bmr6451748f8f.51.1762880135650;
+        Tue, 11 Nov 2025 08:55:35 -0800 (PST)
 Received: from [192.168.10.81] ([176.206.111.214])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b72bf97d430sm1451420666b.37.2025.11.11.08.53.22
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-42abe63dfecsm29514102f8f.12.2025.11.11.08.55.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 08:53:23 -0800 (PST)
-Message-ID: <1ebf3a23-5671-41c1-8daa-c83f2f105936@redhat.com>
-Date: Tue, 11 Nov 2025 17:53:16 +0100
+        Tue, 11 Nov 2025 08:55:31 -0800 (PST)
+Message-ID: <0de0215b-6013-4565-9cda-92a7b6f8c34b@redhat.com>
+Date: Tue, 11 Nov 2025 17:55:28 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -104,13 +104,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 12/20] KVM: x86: Support REX2-extended register
- index in the decoder
+Subject: Re: [PATCH RFC v1 11/20] KVM: x86: Refactor opcode table lookup in
+ instruction emulation
 To: "Chang S. Bae" <chang.seok.bae@intel.com>, kvm@vger.kernel.org,
  linux-kernel@vger.kernel.org
 Cc: seanjc@google.com, chao.gao@intel.com, zhao1.liu@intel.com
 References: <20251110180131.28264-1-chang.seok.bae@intel.com>
- <20251110180131.28264-13-chang.seok.bae@intel.com>
+ <20251110180131.28264-12-chang.seok.bae@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -148,72 +148,77 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20251110180131.28264-13-chang.seok.bae@intel.com>
+In-Reply-To: <20251110180131.28264-12-chang.seok.bae@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 11/10/25 19:01, Chang S. Bae wrote:
-> Update register index decoding to account for the additional bit fields
-> introduced by the REX2 prefix.
+> Refactor opcode lookup to clearly separate handling of different byte
+> sequences and prefix types, in preparation for REX2 support.
 > 
-> Both ModR/M and opcode register decoding paths now consider the extended
-> index bits (R4, X4, B4) in addition to the legacy REX bits (R3, X3, B3).
+> The decoder begins with a one-byte opcode table by default and falls
+> through to other tables on escape bytes, but the logic is intertwined and
+> hard to extend.
+> 
+> REX2 introduces a dedicated bit in its payload byte to indicate which
+> opcode table to use. To accommodate this mapping bit, the existing lookup
+> path needs to be restructured.
+> 
+> No functional changes intended.
 > 
 > Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-
-Replying here for both patches 10 and 12, because I think you can merge 
-them in one, I'd prefer to avoid bitfields.
-
-You only need a single enum:
-
-enum {
-	REX_B = 1,
-	REX_X = 2,
-	REX_R = 4,
-	REX_W = 8,
-	REX_M = 0x80,
-};
-
-for REX_W/REX_M you access them directly, while for RXB you go through a 
-function:
-
-static inline rex_get_rxb(u8 rex, u8 fld)
-{
-	BUILD_BUG_ON(!__builtin_constant_p(fld));
-	BUILD_BUG_ON(fld != REX_B && fld != REX_X && fld != REX_R);
-
-	rex >>= ffs(fld) - 1;	// bits 0+4
-	return (rex & 1) + (rex & 0x10 ? 8 : 0);
-}
-
->   	} else {
->   		reg = (ctxt->b & 7) |
-> -		      (ctxt->rex.bits.b3 * BIT(3));
-> +		      (ctxt->rex.bits.b3 * BIT(3)) |
-> +		      (ctxt->rex.bits.b4 * BIT(4));
-
-+		      rex_get_rxb(ctxt->rex, REX_B);
-
-and likewise everywhere else.
-
+> ---
+>   arch/x86/kvm/emulate.c | 19 +++++++++++--------
+>   1 file changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 763fbd139242..9c98843094a1 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -4773,7 +4773,6 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
+>   	ctxt->_eip = ctxt->eip;
+>   	ctxt->fetch.ptr = ctxt->fetch.data;
+>   	ctxt->fetch.end = ctxt->fetch.data + insn_len;
+> -	ctxt->opcode_len = 1;
+>   	ctxt->intercept = x86_intercept_none;
+>   	if (insn_len > 0)
+>   		memcpy(ctxt->fetch.data, insn, insn_len);
+> @@ -4877,20 +4876,24 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
+>   	if (ctxt->rex.bits.w)
+>   		ctxt->op_bytes = 8;
+>   
+> -	/* Opcode byte(s). */
+> -	opcode = opcode_table[ctxt->b];
+> -	/* Two-byte opcode? */
+> +	/* Determine opcode byte(s): */
+>   	if (ctxt->b == 0x0f) {
+> -		ctxt->opcode_len = 2;
+> +		/* Escape byte: start two-byte opcode sequence */
+>   		ctxt->b = insn_fetch(u8, ctxt);
+> -		opcode = twobyte_table[ctxt->b];
+> -
+> -		/* 0F_38 opcode map */
+>   		if (ctxt->b == 0x38) {
+> +			/* Three-byte opcode */
+>   			ctxt->opcode_len = 3;
+>   			ctxt->b = insn_fetch(u8, ctxt);
+>   			opcode = opcode_map_0f_38[ctxt->b];
+> +		} else {
+> +			/* Two-byte opcode */
+> +			ctxt->opcode_len = 2;
+> +			opcode = twobyte_table[ctxt->b];
+>   		}
+> +	} else {
+> +		/* Single-byte opcode */
+> +		ctxt->opcode_len = 1;
+> +		opcode = opcode_table[ctxt->b];
 >   	}
+>   	ctxt->d = opcode.flags;
 >   
->   	if (ctxt->d & Sse) {
-> @@ -1124,9 +1125,12 @@ static int decode_modrm(struct x86_emulate_ctxt *ctxt,
->   	int rc = X86EMUL_CONTINUE;
->   	ulong modrm_ea = 0;
->   
-> -	ctxt->modrm_reg = ctxt->rex.bits.r3 * BIT(3);
-> -	index_reg       = ctxt->rex.bits.x3 * BIT(3);
-> -	base_reg        = ctxt->rex.bits.b3 * BIT(3);
-> +	ctxt->modrm_reg	= (ctxt->rex.bits.r3 * BIT(3)) |
-> +			  (ctxt->rex.bits.r4 * BIT(4));
-> +	index_reg	= (ctxt->rex.bits.x3 * BIT(3)) |
-> +			  (ctxt->rex.bits.x4 * BIT(4));
-> +	base_reg	= (ctxt->rex.bits.b3 * BIT(3)) |
-> +			  (ctxt->rex.bits.b4 * BIT(4));
->   
->   	ctxt->modrm_mod = (ctxt->modrm & 0xc0) >> 6;
->   	ctxt->modrm_reg |= (ctxt->modrm & 0x38) >> 3;
+
+This will also conflict with the VEX patches, overall I think all 10-12 
+patches can be merged in one.
+
+Paolo
 
 
