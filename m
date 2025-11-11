@@ -1,555 +1,443 @@
-Return-Path: <kvm+bounces-62756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62757-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E28FC4CEE9
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 11:13:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61810C4CF6E
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 11:17:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 721E64FF08C
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 10:07:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 76B264FD94E
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 10:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 095F4329C45;
-	Tue, 11 Nov 2025 10:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC644343D85;
+	Tue, 11 Nov 2025 10:05:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="46Tgatwx"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QgUjDPjV";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="OmBl0oCE"
 X-Original-To: kvm@vger.kernel.org
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011022.outbound.protection.outlook.com [52.101.62.22])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229DE2E6CBB;
-	Tue, 11 Nov 2025 10:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A12155389;
+	Tue, 11 Nov 2025 10:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762855440; cv=fail; b=oT6lcBaK4BK4k1pAHEqaf8SuAZDaG8OCvjVkFO+7i4LJevwUusWThO6SI2UJv7XOSA5pNJyQSSQLuETAsJTylHvTkdctqN6OUk8WVufzR7+QQD67IHjl/1zlqllOwsKelpe5lFLOFoz7ZahEx6doCqowkMqP2XOSbJHYr45/XuU=
+	t=1762855531; cv=fail; b=eFqGw36G8xpVCTv5IZ7GlvBhaEevNxu88LIhZfk67zwMzWT1+PXrn8XNthApaQ7wGpvUXmWPgFh2O8fg0OdruA+jKnvbZI2IbMVZN2ezppypLYp/ClY8DXSSvG6RQWkoIYwQ/++8HxUIDvMP9fyaLC0yiGGOEiA5vG8WCzdX3JY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762855440; c=relaxed/simple;
-	bh=8uaiNj6nbKr8+UOzta04c0GqvEX2/kW6zHt7wJjdG5A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WBmY3FiZ0BMXhwIvLXNcsTrp36uImAXQ2uk8JutDEhhSoGcilVJSrayASx+McZC+/VinkVb8y/eGLNGxDIsTCUc9QaPsz+YLU+42mxa4Dzn/g5VL8qYDq6JBJWImxS6PWE+ARS+8gYUZIdJrqutGUH2dossT9KbEgUBjAn0qO18=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=46Tgatwx; arc=fail smtp.client-ip=52.101.62.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1762855531; c=relaxed/simple;
+	bh=Rdt7cjfYalkQki9JmAxyYivEnzs2w1pi099Nh+kzTA8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Fg8wI25lK62SKgkTQctB3pPSsNzICVBpgB1YX+ehNwPQQTDZ1MVNEZu9UjUa1Km7EC9tKSZLeALC99gVvkRbJCi5MrAHNsjOyuCFQ8Uv5QcE9UjyafFJmF2kWPOmdSfgocDVpQdaSy3B/HVc9+E2oQ4iqGu1Em/2XZzTryWRxyM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=QgUjDPjV; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=OmBl0oCE; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AB9ulAD000941;
+	Tue, 11 Nov 2025 10:03:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=2ApjexKXL3fdw330miU1beeOnsbPmr/5vqY93SSf7RI=; b=
+	QgUjDPjVDpGhhym1xEffWo2tBM385wf1B1wKltsmypQO+iIXC9wz5X0Qfq0UgAWf
+	SARZNs9NQXYyHMsPmLG1n/rJ94tVh7l2OCE6q0F8rmctiN8ZtJL22TZa1R35uw7d
+	XVXzJHWP/GnfnAzR1/g9YmeLTIJ1GVEFzpfKZ8o8720DN1TPfuO2fZ1io44oasgu
+	Ddde61756hTNA9KbAW/1pt+bRE+ImXlle2itce1oW8yFSjrU8zt2pUOVLxH0T0P0
+	S9OGDmlaxRR7/qYRxAG5z4dm3oOltYSkxv+b3alMKRGzP768YxNjZLXCI4Y6xeH4
+	wnuwRqofTSwYqGavZ3yGkQ==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4ac2xbr0t9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Nov 2025 10:03:42 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AB9SI3B009978;
+	Tue, 11 Nov 2025 10:03:42 GMT
+Received: from sa9pr02cu001.outbound.protection.outlook.com (mail-southcentralusazon11013036.outbound.protection.outlook.com [40.93.196.36])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4a9vak2xcs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Nov 2025 10:03:41 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BcMuU6pJZwwCn01ZMzzYXBbdZFT5ZOiM3WlibXphEnH8hcnF9AXJPk3PO6n1W8mQ9GEGCaaJdAGLAWWAtxDjZBVGQcaatLCJp4rzbA5bK0zCjdfTgPscN2mCb2NEWLJ4oy/2xAri0heQzgwTeQfHXKrOWXfwaUo1SST1l07A0zkextAjbum1XP6LXHVQGaDj4vuaK8bOUC/IIOwKasmKksqy7FI2+6Om42fnHIfry1P5i0UncNDFX7OMRFJThCPs1dgEhhR/LL4z3u+QQwu3eXbSuERai5iB77Izb0dkg3fO9WuxUgu7zLRfkO892MzOVI+G27y2QDcGMiKpIUmS4g==
+ b=abNlm9pZ3hY75U4RkQi9utnkpe+J6wCt8TotlB1bB4xjfCF6dkNv5f/a+m38ym6VajH4gPo8ibS7G4pHGU0432VbNQ7s1uGNECpyONOGLlP3ji2ZsMshsoiDtxICnrG/BItibFWGQ/Opw44VEsmjXmR3Ks/3GlsL3NarvUFR3yhy1mr7MeCCwRpA0bn+3S3ukg82QMY6zrWFxXNWqK/didaLKD4lOnRNoJvYaLxzKxHvUMHiAc7IDdD4X/aPXprHCPg+mi4fUSTkUB/08W+GhtI+sF6QIGxSPgbU065VaO2EHE3c37PKNOJRbu9lm43Bw04MCYcy4KglTLKytI3Uig==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nUph+PVVsC73QDO5uoEp9upJ7KPi9cXcTBaxIioXpVE=;
- b=mJLekEZeSgcU4u/mbk6zFIhMEplA+Z749nA9v5XB7o/pMnFbM0w1WyvEs0hUsMmQYCGEwoLdgQgoLIlIU/L7Op9uZht34mkdJm41w5ZEgzmdmGTzV2lX+MoYBsgSm5eFNj6NyqNa6/Dl9mHFnCigd+s/a9F0+hvHTVQkq1l02PZ6vbDjwt9O7DXPGH6AwXF3Yh19iJnL5dcbqgHdLWIRzgNoNZCTqA/VDp13cLcTYGmm85MKusCKiuTBHxLaClj4ZVHCQOK0RZ3c+rjmGNcIYlbgpTLRBTtsekMU8gFBNVEKPdWkGPr2o7l25hIM7UCny0e13qIq8blJKVKqH2/OMQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=2ApjexKXL3fdw330miU1beeOnsbPmr/5vqY93SSf7RI=;
+ b=aAOtMW2CZlJrAvioEp3kV0iNakNviW7dKPA0OQuMpPdft3FMDMdSKotMDC00N8EXvctcmOc3VCd4xusO4T409g5KK70+OID/feC3bbwe1NjaqlgTRBXZjnI1fdzdEmpyqxmffvjEzV6z7uf9aPyfy7ICmwsh64CmuFhjtOlBgOKUfi8NN3EeS4GqZ+ZY2+97kaS9ogCy3qLA0Pcm/gt5/t40uRuURPMpVPYup54wdLXSBvLOrcrKd2eGjLRSjtAFd/K+qhpEzXjuKiTjq4Y4Ch96G0Di4S9+iDKFGpXK2qE6Jt9+jauYK+1iu59+CgGsUMq5Wd9NpoRReDImRooO4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nUph+PVVsC73QDO5uoEp9upJ7KPi9cXcTBaxIioXpVE=;
- b=46TgatwxjjChBxyHjv21cFWuEZAfN+CLPeLn3FiV110FzTpMPtzWvS0wkJQcQi6r47T96yq/yBBPhVdnQRzBjKROic+3Hkml7/+A/oE+1/MBdR/z7LlsQ/NB2SPdBeWIEQvXMKmJYqF9FhlRK1376Xohk9rDeSuqbOLIs6WJxuk=
-Received: from PH7P221CA0040.NAMP221.PROD.OUTLOOK.COM (2603:10b6:510:33c::24)
- by IA1PR12MB6578.namprd12.prod.outlook.com (2603:10b6:208:3a2::8) with
+ bh=2ApjexKXL3fdw330miU1beeOnsbPmr/5vqY93SSf7RI=;
+ b=OmBl0oCEsEcTV+uxvasninUT4q71+OttvsAtnz0EkgdU3f+Y5cP0cOAf47Y772sI7tYFU/FdiAM/dS9HOZN++G/e700/kmXqu+J0IDZlZo+s0eV+8OllEuLITAA0cKyU/lCoZiIYmNn5gmoYzMx4RvJEd00MQ8aY1GOd0pVq98w=
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com (2603:10b6:8:1cc::16)
+ by MN6PR10MB8048.namprd10.prod.outlook.com (2603:10b6:208:4f4::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Tue, 11 Nov
- 2025 10:03:51 +0000
-Received: from CY4PEPF0000EDD7.namprd03.prod.outlook.com
- (2603:10b6:510:33c:cafe::49) by PH7P221CA0040.outlook.office365.com
- (2603:10b6:510:33c::24) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.16 via Frontend Transport; Tue,
- 11 Nov 2025 10:03:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- CY4PEPF0000EDD7.mail.protection.outlook.com (10.167.241.203) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9320.13 via Frontend Transport; Tue, 11 Nov 2025 10:03:50 +0000
-Received: from SATLEXMB03.amd.com (10.181.40.144) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Tue, 11 Nov
- 2025 02:03:09 -0800
-Received: from satlexmb07.amd.com (10.181.42.216) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 11 Nov
- 2025 04:03:09 -0600
-Received: from [10.136.45.190] (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Tue, 11 Nov 2025 02:03:02 -0800
-Message-ID: <a704b1f7-a550-4c38-b58d-9bc0783019f1@amd.com>
-Date: Tue, 11 Nov 2025 15:33:01 +0530
+ 2025 10:03:38 +0000
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::2650:55cf:2816:5f2]) by DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::2650:55cf:2816:5f2%7]) with mapi id 15.20.9320.013; Tue, 11 Nov 2025
+ 10:03:38 +0000
+Date: Tue, 11 Nov 2025 10:03:35 +0000
+From: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+To: Chris Li <chrisl@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+        Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
+        Baolin Wang <baolin.wang@linux.alibaba.com>,
+        "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+        Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+        Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+        Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>,
+        Oscar Salvador <osalvador@suse.de>, Vlastimil Babka <vbabka@suse.cz>,
+        Mike Rapoport <rppt@kernel.org>,
+        Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+        Matthew Brost <matthew.brost@intel.com>,
+        Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+        Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
+        Ying Huang <ying.huang@linux.alibaba.com>,
+        Alistair Popple <apopple@nvidia.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>,
+        Kemeng Shi <shikemeng@huaweicloud.com>,
+        Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+        Baoquan He <bhe@redhat.com>, SeongJae Park <sj@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>, Xu Xin <xu.xin16@zte.com.cn>,
+        Chengming Zhou <chengming.zhou@linux.dev>,
+        Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+        Naoya Horiguchi <nao.horiguchi@gmail.com>,
+        Pedro Falcato <pfalcato@suse.de>,
+        Pasha Tatashin <pasha.tatashin@soleen.com>,
+        Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
+        Hugh Dickins <hughd@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, damon@lists.linux.dev
+Subject: Re: [PATCH v2 00/16] mm: remove is_swap_[pte, pmd]() + non-swap
+ entries, introduce leaf entries
+Message-ID: <0468f101-1350-4879-8a85-22e181bf8aea@lucifer.local>
+References: <cover.1762621567.git.lorenzo.stoakes@oracle.com>
+ <CACePvbVq3kFtrue2smXRSZ86+EuNVf6q+awQnU-n7=Q4x7U9Lw@mail.gmail.com>
+ <5b60f6e8-7eab-4518-808a-b34331662da5@lucifer.local>
+ <CACePvbUvQu+So7OoUbJTMLODz8YDAOgWaM8A-RXFj2U_Qc-dng@mail.gmail.com>
+ <3c0e9dd0-70ac-4588-813b-ffb24d40f067@lucifer.local>
+ <CACePvbUHCrNNy38G4fZP92sdMY7k5pRQkcfo=iPp0=10T5oCEw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACePvbUHCrNNy38G4fZP92sdMY7k5pRQkcfo=iPp0=10T5oCEw@mail.gmail.com>
+X-ClientProxiedBy: LO4P123CA0300.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:196::17) To BL4PR10MB8229.namprd10.prod.outlook.com
+ (2603:10b6:208:4e6::14)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/4] KVM: SVM: Add Bus Lock Detect support
-To: Sean Christopherson <seanjc@google.com>, Ravi Bangoria
-	<ravi.bangoria@amd.com>
-CC: <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <pbonzini@redhat.com>,
-	<thomas.lendacky@amd.com>, <jmattson@google.com>, <hpa@zytor.com>,
-	<rmk+kernel@armlinux.org.uk>, <peterz@infradead.org>, <james.morse@arm.com>,
-	<lukas.bulwahn@gmail.com>, <arjan@linux.intel.com>, <j.granados@samsung.com>,
-	<sibs@chinatelecom.cn>, <nik.borisov@suse.com>, <michael.roth@amd.com>,
-	<nikunj.dadhania@amd.com>, <babu.moger@amd.com>, <x86@kernel.org>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<santosh.shukla@amd.com>, <ananth.narayan@amd.com>, <sandipan.das@amd.com>,
-	<manali.shukla@amd.com>, <yosry.ahmed@linux.dev>, Shivansh Dhiman
-	<shivansh.dhiman@amd.com>
-References: <20240808062937.1149-1-ravi.bangoria@amd.com>
- <20240808062937.1149-5-ravi.bangoria@amd.com> <Zr_rIrJpWmuipInQ@google.com>
-Content-Language: en-US
-From: Shivansh Dhiman <shivansh.dhiman@amd.com>
-In-Reply-To: <Zr_rIrJpWmuipInQ@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: None (SATLEXMB03.amd.com: shivansh.dhiman@amd.com does not
- designate permitted sender hosts)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD7:EE_|IA1PR12MB6578:EE_
-X-MS-Office365-Filtering-Correlation-Id: f93f4743-0729-413f-a93e-08de21099d22
+X-MS-TrafficTypeDiagnostic: DM4PR10MB8218:EE_|MN6PR10MB8048:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1741cc9d-0a41-4e16-34e2-08de21099527
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|7416014|376014|36860700013;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Z3dpTG5iWUhwckZVWlhFaDUwRzlGek4vMTFSMDNtY1Q5dXhkQUM4NXJkU3Zq?=
- =?utf-8?B?STdlN3EwK0x2ZHU1N2Fuckh3ek1sT0RVSVFWSEN6UWdCWTk2RDlKTitMT0Zi?=
- =?utf-8?B?YnY0WGpxb0daeXd1QmFaM2xieWhHZ1lWYVlkQlNBa0dUVlN2QmpwTjZ6UWlU?=
- =?utf-8?B?OXZNcGt1MXR6MUlCTFRZMXhEUnhZQ0hCbEJ0NHZMR2F5K0tHekZoQ24vbmk2?=
- =?utf-8?B?a1JLZ1BqekpCaVJMekFWd0pVS0pRTFBkN2R3OWt1TXpvd2x2cXArNWhtTWw0?=
- =?utf-8?B?VExndzZ5Rkd4bUFiS0ZCUzN4UjlXN1YrMjVDMEdLaDdabXZjN0JMM2pBY3dG?=
- =?utf-8?B?WVZzRXFIMUViZGZKSFNxMDBoMUZzb05KRDd6WnJRZEJGcGFqcG85dDdXVDZp?=
- =?utf-8?B?MTRidURDNCszLzhsM3BxRnFYS2ovaU5tSUFheTB6RjJMQVVKdzRqbUV3QTZD?=
- =?utf-8?B?T1BJU0VmNHExYlJCdlUrYVFReUgzRWZycjlpc0Y5N1Y3WVNIZkdaemFxTU5O?=
- =?utf-8?B?Qlpub0p6bldJcTZreHgwemEwYTd6a2dkSWNvRjd3NkxQVXp1d2RXNDJZRnhE?=
- =?utf-8?B?K1JNOTJSK1ZiRTJFSjhjK2pkSVBRQUhrcTkyR3dDVm9MT2xHQ1NhemYzbVhZ?=
- =?utf-8?B?aWV1SzM0Vk91elUzL3picUlkUUExcmtMTStld0QwMVBvdk9xOVJpOVdPRWov?=
- =?utf-8?B?anI5U0hwdmswUWNucGwzdGtNTDRHYU5yL2dhcy9BV2tHOGp3RjBMb0MvdnZQ?=
- =?utf-8?B?YitIUzlRYlRGZ0dTd29hUmpieHY3VS9BeDZFckJLZW8rUUppMjN1eWRpVEVs?=
- =?utf-8?B?bkJBVU9yZXU2dlhjaHNOZnVQZlhnSlZEd0ZJNDZkUXdkNkJoS25SN0IxTTdk?=
- =?utf-8?B?dUV2bTNwK3Izc2lBOUN2NkN3eEpIRXRiYTVVbHZPVVBHcUZ0UWxzMHNVek5j?=
- =?utf-8?B?cHQ4RStDVEZ2U09wRUxWNDVJSmlGL290MVgzVUdrR2ovdmlCalh5Y3pITmg0?=
- =?utf-8?B?aU9RQjNwVDFYYU5Xdi83T0JUVzVsREZZUzlpV041bFo0bUJucWhpZHp0clN3?=
- =?utf-8?B?QjdJYVdsQVBaZW9qT2RYUUUwUU1EVDA5Zk9LNmlQeW0rcit3UDhKOVM4YXlp?=
- =?utf-8?B?OER6TjZkZVlCU3Z0RVZ2eXAwWW9PY3g0QjRDdlVVT01nSkFQQnNmWEtXWDll?=
- =?utf-8?B?bmtTT08vMktmcmNZT1dGMVdZcTR1eUNmV21KdlA5bklzZElaOG00bEJXOGF1?=
- =?utf-8?B?TmlqcUJJY2pYNGM5WG9FL1B6R2pxcDlBMkp4T25vWTkwODBGL3pRV1duYTls?=
- =?utf-8?B?enQrWi9pS2JQRlp1QzE0ZEhWUGJjN2JxMHAwNHF4SzJwa3dCUlB4VTU4R3dS?=
- =?utf-8?B?dnMxZUtoSFZQdUxoS3J1VlVrMmlINjRna1ZrWEExK0tNMG5Qb1BSalhaTFh3?=
- =?utf-8?B?NHJpSnJHRndxWEc4VzlSczQ5MFZYUURXR3p4QUNqWVkvQUhQVzF5WGJxZm1u?=
- =?utf-8?B?c2RLV1N0YTBwTzE0azZyR2grMm9WRWR1LzlKcSszdGtmdVZRem5VMERoejBG?=
- =?utf-8?B?TGhNMXhmMnBPQUdqdXVZanlqeGdCS3BXTVZ4MjI5MGNFUEFIMHNSb0tPR0hz?=
- =?utf-8?B?b24yNlNzaEh1UVNDdEdqNHcwelJ0MklBRG4xRHVocTdFYUM4VWdiU29wa2lT?=
- =?utf-8?B?anRjRWRJR1NGdVpmUG53R3kyZ3gzNmRaNU1zMG9MeDIvV1VjSi9OSS9kTGpk?=
- =?utf-8?B?TWJJRnVCWS83dWZmNUVEeUhLMExmL2VZSVZZbUw3NFV0V1VGTDBXeUw1WjlU?=
- =?utf-8?B?dW1uR3UyOUV2Vi9tS0pDenVPa0VwZXN6dHpmNFNsYjNBbko0aGRwZDlqRWdr?=
- =?utf-8?B?WGwwdDlFQXNYOWduN25ldjlrSjN6Y0ZNU1NMcWlUWlowRStYVlJxblN3aTMr?=
- =?utf-8?B?R3JCQ0ZjZnBsaWp2NVJva1Q0OU84K2UyTFZtcXYyVTJBbHQ3dVBob0pacENZ?=
- =?utf-8?B?aWkxTmZrQ2twNXdiZ3VGOXo3NXVETUFPY3krdkN3RFMxVWIxbEUxNWxvN2Ew?=
- =?utf-8?B?V2pEV1FrTE14RUUwdzhRMGhLTkw2M3hEazlYWXlDL0Q2T21qMm1BRlNRWEFZ?=
- =?utf-8?Q?esq4=3D?=
+	=?utf-8?B?aUtOTjU4TXJYbGRNb0FEdFRKRnROeWk3bTE5aHZLbTRCTmxpWFVYNnQ1T3lw?=
+ =?utf-8?B?T094ZDlmaXJ1bFM3VXZnNzFwSjFWS3VVT3o2M21rSmhBNEEydmFGVnd0MHNB?=
+ =?utf-8?B?MVlYcEprTnhIRXJOSXk4aTBqQWFhZXI0VnRVWTdoVGIrVlArMGpJZVc0c2pp?=
+ =?utf-8?B?TnpMNzgvei9ScjIxWjdZMG43Vyt4N2FuN3ZVd2FkalN4VmhLZlVpbUFPWm9E?=
+ =?utf-8?B?N2VYTTRaR3o4ZmxQNWRnOElFT2RDRGF2dkpJc2JqZHVlU1hLV0N6RkdpenBl?=
+ =?utf-8?B?QkwweWJvRmNGRHRSVG9LZGVXRDRydUpSWUpNc1Ztb01WTkZIS1VRcFUraGNW?=
+ =?utf-8?B?SGFva1FnbFE4UmdDMDg5RWxiRWd6dDhZbmFiVUdxanVlZVlCRHY2anFWcnJB?=
+ =?utf-8?B?dGQ5WFhpdnZDdTVzVFNHV0duUlJKRXZhdHZsRUI2VXpKbVZaS2lOZTdhZE1Y?=
+ =?utf-8?B?a3R3N1RzdFB3Tm8wOVRJc05MTzBGY1pta2x4YitLWGc2bEpMdGdQY1dSbFZW?=
+ =?utf-8?B?MGhqdVVGTVdpOEdEamhLNWliTERZOVhZNDQvdDRZcDhkcUxKL0Mzem9XVnRS?=
+ =?utf-8?B?TlZVTmZMQm14MnRpcittR2YwaWcrajR1cU5HWHpyT2JaWTVMNmpIV0VvMXMw?=
+ =?utf-8?B?SWpnREd1NG5XUHQ2MVBUQmplY09wbGlRaHRoUjU0UndZcUh1TlA3R2k4TDk4?=
+ =?utf-8?B?QUtLYnlMeE5Kc01uTmZpbVY5V285a1RzRHJrYmd6enZyY1IxSWZEbVFLV0Ft?=
+ =?utf-8?B?b3BsLzFKeVdoK0h6QXZzR3lEQ0N2ZkI1c01oU1Y0dXppMXc1U0pDYW5OOHFm?=
+ =?utf-8?B?TjdlN2p6YnVxc3FNKzhhWnplMVF5T3dJYnNiYUxia3RWcnNvVGxVVWRDS0d0?=
+ =?utf-8?B?cFpSY0xxUGsrNVRhNDNKTHIwOVFrU082clk0YjJvTVFvZHJyZ21pV2dVMDRj?=
+ =?utf-8?B?bXVqOXF5N1B3cFVzOHZmcVRyMDhvWG9yWEcvNlBnRWpBR05iV1hJK1RoV0VB?=
+ =?utf-8?B?K0xzWkswSFIySlZHM2xqZVZac004OEtwWlZzK0ZoVVRWR3Z0bGRjMEdhTDRT?=
+ =?utf-8?B?VmE5eXgxNTl0dEd6SmNKbStPWGxHZHpSOGJoaDBOWUxYVWtDZFVqM2NZN0M1?=
+ =?utf-8?B?dzBYT1NsejJLMTBrUG9RUWo5ajdYQVdEUmxJVWlnME85UDlFeUx1WjlRT3dM?=
+ =?utf-8?B?c0EzUGtVbldpdlNuWEFzN0t1WWNaNWxjd1NQaUVRK1lDR3A0QWxTMDZIc2lF?=
+ =?utf-8?B?Z3BGejJORFM2eWF2Smk5SXlBdEs4R252a1BlZ1EzajVKdEdNaGpJT1Q0a2Jm?=
+ =?utf-8?B?WXcwTXJnbFl1ZUhCbzIydmxJbzV0alFqeXJZKzRzV1Y3YzRSYkVJeFdYMVdY?=
+ =?utf-8?B?ZWV2YXRGdFErZHpWMGZsNGRoUC84TUcybzhMdmJZNXI2K1dSUFozMnJkaWJP?=
+ =?utf-8?B?UUpTa0s2Mmtsa1V3Z3ZnbVlkZ01pbExIK1g0K2hKc1RnVmhpU1dyQWFRRnlK?=
+ =?utf-8?B?MGJ5OHB2KzNxcjZ5RStEYUFVdXV4Rk5vamJ2QWllK01LdmJmTlVYTmpGaStO?=
+ =?utf-8?B?VENNV3BOQkduck9LMUJKYzR4MlF0b0ZFaHhNZmdTQ1lxVWRjclVVUDhDQTl5?=
+ =?utf-8?B?MGxwSGhxL3dJTmRpTnZOMzRFeUFnYjI0VkUxbWZXdDlydDBVMzJMUHNqRlJt?=
+ =?utf-8?B?TXVCMjQ1RWZaNWVSaGNXdFZwejZhTnk3RmQ1RDYrTE10RDdYLzhpalVuSFhB?=
+ =?utf-8?B?cGkxMjB4QmJtTUV3V0IwL1o2Sk9weW1qaFVVVitialRiY3NXMXNMOGtmaENM?=
+ =?utf-8?B?YzRmNStPb0JOU2txcm5NTlh2d0Zvd0xndkZZRU1QcmUxdzUraU9sZFpzUGFT?=
+ =?utf-8?B?VXA3eTYzdnhpKzJkZWVFYS9SSng2MGREeThLOXhiWXhDYmlrK0xyQ0w3L0tr?=
+ =?utf-8?Q?fPjCaRe72SiSOyZpy+0+OBX03M2UUACP?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(7416014)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2025 10:03:50.7024
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB8218.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZDFabi8rY1hxTDA4ZXRISVJBYUUzUXNsRkVFTUk0c25NSDdwMktDSUhMVFVl?=
+ =?utf-8?B?TlRaSnBUeXVRMDN2U1Rtcnk3OXcwNjB5RklxdlFqU1JTY3NGVnlTTnpZWTVF?=
+ =?utf-8?B?Tm5zak5Fem5wd3JrVVNVWGEvdTJaSGprUVJseDJUenJDM2NzR3VLMmNUVnNy?=
+ =?utf-8?B?aG1HZnBKRlRtOWhLSjhoS0xCYVVYWTgwcjZYaFc5SDFYNTl4ODdkUC8zdXlm?=
+ =?utf-8?B?UkdRVXI5VUhmOTdrcUV0aXgxVVpLbWhxa3JiSUZ5QnNBMXJxL3R6b1BSdUpm?=
+ =?utf-8?B?bVlmcVNjWitYbUJxVVd5b1ZVaEV1YU5Tdjc1WmRPMXhsbE4xNkxwblMvSUF0?=
+ =?utf-8?B?UFpEekkyMTMybFo3dkxpVmxBbUtyVE8yTTFsOHBZK1pSUDY4dmxvRzYzd1Fa?=
+ =?utf-8?B?d215YjVDdEI3S0pPY1dCQ0RWYTNWMW5UMmNKbmNIb29KckZjQlRmV2ludnFW?=
+ =?utf-8?B?bDdqZXg3WGh3M3ZmRThjZjZGTkdZQVhYbk82aGk5QzB6MnZDdEtnajIweHRo?=
+ =?utf-8?B?V2hvSzlMaVBMbjdPVEgzT3FEYjIzYWdJdHhEVWRqbU1leDVMMGFMSXNhbHI3?=
+ =?utf-8?B?b0IvRHdnaXFGTm5JN2MyWEJRd2xncGZKc05CSmdiUnhUakQ1aWxqMENvVkpt?=
+ =?utf-8?B?R253WEM2dUhTSU9YR2xTdC9vT3hWM2Y4cWREWWprdk5Ha3VqeHFiTXlLUUtD?=
+ =?utf-8?B?N0MvYzhqUmp6WDNrREtsTnR1d2VpUXpSR1J3cmIwUzA0bDF2QmdNTUVKdE1Q?=
+ =?utf-8?B?TzVHT2pXekxaSmhPd3A2RlpCaUxIdWJvbmxiRHJic3dEVUp4dUdrblBoQThE?=
+ =?utf-8?B?azRUS0dpdzJ1ZXpyZVVRYm9FRkczR3dSNEVpU01yVDdBaGQ1UTkrTXV6QjVZ?=
+ =?utf-8?B?VGZ3aTVOOTYwUWg0KzEzekhscnZNV2FyNmo3aExWOHBPQXVFWWJEbzZVdUpj?=
+ =?utf-8?B?RnlzWUdxNmpQd0gvY2M4Y28wV1hBeGJGekU4M2JyZVU4cm84Z0pVeU1oeVNy?=
+ =?utf-8?B?SGFvYlZiVndMUUxEcEZvK2dNK3hKTkRvYTVlSkdBZ01jOFRjdmJBU2d2UVNH?=
+ =?utf-8?B?enY3OTI2a1VkZ3N0cXo2YjJBR2h3bS9pUDNWR3dtWldLbStqZW0xRUZTMXp2?=
+ =?utf-8?B?UVR4bUh0K2hZN2I0cndnalUycjRsWTFJL2F0NDhCT0VNM212Q2pXblJZd0Vq?=
+ =?utf-8?B?NncwQ0t5cC9VTHhJR3VEM3RxWWRabXVjUTk2RGdpdXF2Z2x3QUR3MmNRcEFD?=
+ =?utf-8?B?ci90Vk5razdXZzJYUUlKbkRzMnZlTWF1L0s5eDh5c3Z2UTZuQjNjSmRVMWlh?=
+ =?utf-8?B?MHNaeDF6alk2RXg0a0JqZFZLNWRDaE1xdWZtTk9NVEs4V1pTNzJKczhlWUZQ?=
+ =?utf-8?B?eTZCY2FzelZ4eHMxSVhjY2FsOGFhbVdMcVVybWFncXY3dlZVdWtCenhtNzBh?=
+ =?utf-8?B?UTRIckZxNW5qZngwZXludm5BNU5TNS9GaU0vcmg3eEFQVnNoMTNZUU01RjJz?=
+ =?utf-8?B?OWQ1RVN4a2J4UWQ2d0dyc2pIVG5ZL0VlR1I1ZjRlbGQ2ZVp3VzdUYlNZMlVm?=
+ =?utf-8?B?bHQxbFo0RzBORytjSVR5NFo4MmVPbjJyd05lSUR4bTh6LzRPbXI4UDhsaUJ1?=
+ =?utf-8?B?dHgzdTlUMWNYejBwMGl3ajFmMzA1d0hwNTJXR1J5TGpFd0VCTW1UVFFrTENi?=
+ =?utf-8?B?eU4yVDEyQkd6YmNUR3JvUFNHcDVyNS9NMHlOWHgyNzJvaTBKNFV0MWxIQmEr?=
+ =?utf-8?B?dGdseU84bFJ0Y3BmVTBXTG5WeFFIaVFXTnowYjdxSXpOak1oQUErT2ZpTnBO?=
+ =?utf-8?B?YlMwZE12MnpQQkN0YzZtcUpERTRoa0NZaS9qYWpPUmU1Y3RQbXI4ajFOMXdV?=
+ =?utf-8?B?VVZXMlhjZ2hBaW9HMFA1dXpnVmpJUG5uL2s2dmkyc1VGTzhaeE5Kblh2SjdF?=
+ =?utf-8?B?VENQTmllTGgzc3J6Mkx5SVZUN0NwbkxHeVRPajc5clV3ZmM4WUx6YTVCa0xk?=
+ =?utf-8?B?VzZyZnFoRHQyQmFPbFdwV0VCL1d1UERsY1I1RDJkUnRBeGNna1hndTlGTEMz?=
+ =?utf-8?B?K2xRMVZteXVrQkhZS2JhUm5aQW9xTEVBT2dGMHJhYWtoSXYzY1dWUEpxU3Zu?=
+ =?utf-8?B?bktCMDAzZS9aUTE0bDBhVHpiRG4ySjZqMm13TXgweFZwdWdDbWlPMDI0NGVs?=
+ =?utf-8?B?ZkE9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	UpQ3uWeAYPtgy09/pyEwmc+Yf48nDiFyF3htA3s2QNIyxJJ5jAP4n4w3A6N5c2gYUbnVtL/3sfxem+4CEtKJ5Co8/zFXUc++7qVdxivb5Tk5LSpU2qYe/DSwErgeWWc+dxpkUi8S2h/vF/GVGCDhU0TWuwT5XtwGd1eL7yeeBNoAazW3wFnvGcSvq3GlyiWqZUpT5BtLIQC4M6BRjRK0GSgjcQwt5ygWSPASLE8YfGmTCrho+2clDoljkzn074NmS/NdZtbmQ7XCmPS50atJC3A7/FB1vVG5wYogZJ5/6mQQLudQ7H2F4RmFgyF32GLbTIBwlnljILF2o7LN+2rgTyJJdJQhCP6/TFkDQu0792op1RACyf4u43TJJVEiuf0YeEtrytFDoB0hgn1gidVm6Qzu2F2jVXmrY9ekbovs6KZBo3LQy3Deq6xSPqkWSbJj4zmR0j48Muue694tN8W1Akw4dO51bL4Incg3niVpN/1k/hotLYkhA31CNLdGSCT6ML9XC2AZ0oJNvgaTuhJcVz/baGWxacDuzKAHMKeECjfLpNZogRMXVpZ9bzF/h70DhGikkNy+LL1cemOqyW4OYA+/aa2OWlnkju5CkfnubiM=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1741cc9d-0a41-4e16-34e2-08de21099527
+X-MS-Exchange-CrossTenant-AuthSource: BL4PR10MB8229.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2025 10:03:38.1197
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f93f4743-0729-413f-a93e-08de21099d22
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EDD7.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6578
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kA+iXecam0mThvMPI82/SqfwZAbWkR6L4lnDMSddHoFOWz5o187+2V9GM7HYXP6VQIcL8Cl6Ytw48CCqBq/wAfrXVTVBfttL6hFPt/Ngb7Y=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR10MB8048
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-11_01,2025-11-11_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0 mlxscore=0
+ phishscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
+ definitions=main-2511110079
+X-Authority-Analysis: v=2.4 cv=ApvjHe9P c=1 sm=1 tr=0 ts=691309fe b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=6UeiqGixMTsA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=yPCof4ZbAAAA:8 a=KcGyZ3GnvE1oL6Ba1eIA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ cc=ntf awl=host:12100
+X-Proofpoint-ORIG-GUID: DK2DXP8C8yZ7cms9xFp3-4Ea_tlmh0yl
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTExMDA3OCBTYWx0ZWRfX3CEIWdY+2tCI
+ H/JROERai5cjXWYjsFz9KINKUGqoLv2rrm4QNoj2SQ3grwyJxRDngPpmpbHPClq6LmMUDMtpop+
+ zgWAfS+3O+uQEIUcBB4NGX3hW7EFnpJSFlA0rrRHkuL168RRdFME29squNjMMBMur3xEYVRq+XQ
+ xESI2t8vjp85Uzj8+dK3ivDR9vgE9OGuscInnTXnc4VDJpIf4I6xEl6L/89wW4xSLDKp3XCmqfY
+ I2VR4hJoMjXFpMwG70weCItgueP3ytiOmOA+I971tEJ9B9mFxllNPyncSBxsrK2E8rIMGXt6xQ7
+ BLnL7/Pea83LyFWIxkiESr0zJvEaCin6tNsnIj9ujGaA56wHEfWP6wGb8x7h2RhlE8uO24lMEA9
+ /BNJZGgfz1HvWKY3MXvYZsZxD6aTzAK4v1XGlgNQQElzH7HxvCY=
+X-Proofpoint-GUID: DK2DXP8C8yZ7cms9xFp3-4Ea_tlmh0yl
 
-Hi,
+On Tue, Nov 11, 2025 at 01:19:37AM -0800, Chris Li wrote:
+> On Mon, Nov 10, 2025 at 3:28 AM Lorenzo Stoakes
+> <lorenzo.stoakes@oracle.com> wrote:
+> > > > > I kind of wish the swap system could still use swp_entry_t. At least I
+> > > > > don't see any complete reason to massively rename all the swap system
+> > > > > code if we already know the entry is the limited meaning of swap entry
+> > > > > (device + offset).
+> > > >
+> > > > Well the reason would be because we are trying to keep things consistent
+> > > > and viewing a swap entry as merely being one of the modes of a softleaf.
+> > >
+> > > Your reason applies to the multi-personality non-present pte entries.
+> > > I am fine with those as softleaf. However the reasoning does not apply
+> > > to the swap entry where we already know it is for actual swap. The
+> > > multi-personality does not apply there. I see no conflict with the
+> > > swp_entry type there. I argue that it is even cleaner that the swap
+> > > codes only refer to those as swp_entry rather than softleaf because
+> > > there is no possibility that the swap entry has multi-personality.
+> >
+> > Swap is one of the 'personalities', very explicitly. Having it this way hugely
+> > cleans up the code.
+> >
+> > I'm not sure I really understand your objection given the type will be
+> > bit-by-bit compatible.
+>
+> Just to clarify. I only object to the blanket replacing all the
+> swp_entry_t to softleaf_t.
+> It seems you are not going to change the swp_entry_t for actual swap
+> usage, we are in alignment then.
 
-On 17-08-2024 05:43, Sean Christopherson wrote:
-> On Thu, Aug 08, 2024, Ravi Bangoria wrote:
->> Add Bus Lock Detect support in AMD SVM. Bus Lock Detect is enabled through
->> MSR_IA32_DEBUGCTLMSR and MSR_IA32_DEBUGCTLMSR is virtualized only if LBR
->> Virtualization is enabled. Add this dependency in the SVM.
-> 
-> This doesn't depend on the x86 patches that have gone into tip-tree, correct?
-> 
-> In the future, unless there's an actual depenency in code or functionality,
-> please send separate series for patches that obviously need to be routed through
-> different trees.
-> 
->> Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
->> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
->> ---
->>  arch/x86/kvm/svm/nested.c |  3 ++-
->>  arch/x86/kvm/svm/svm.c    | 17 ++++++++++++++---
->>  2 files changed, 16 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->> index 6f704c1037e5..1df9158c72c1 100644
->> --- a/arch/x86/kvm/svm/nested.c
->> +++ b/arch/x86/kvm/svm/nested.c
->> @@ -586,7 +586,8 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
->>  	/* These bits will be set properly on the first execution when new_vmc12 is true */
->>  	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_DR))) {
->>  		vmcb02->save.dr7 = svm->nested.save.dr7 | DR7_FIXED_1;
->> -		svm->vcpu.arch.dr6  = svm->nested.save.dr6 | DR6_ACTIVE_LOW;
->> +		/* DR6_RTM is a reserved bit on AMD and as such must be set to 1 */
->> +		svm->vcpu.arch.dr6  = svm->nested.save.dr6 | DR6_FIXED_1 | DR6_RTM;
->>  		vmcb_mark_dirty(vmcb02, VMCB_DR);
->>  	}
->>  
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index e1b6a16e97c0..9f3d31a5d231 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -1047,7 +1047,8 @@ void svm_update_lbrv(struct kvm_vcpu *vcpu)
->>  {
->>  	struct vcpu_svm *svm = to_svm(vcpu);
->>  	bool current_enable_lbrv = svm->vmcb->control.virt_ext & LBR_CTL_ENABLE_MASK;
->> -	bool enable_lbrv = (svm_get_lbr_vmcb(svm)->save.dbgctl & DEBUGCTLMSR_LBR) ||
->> +	u64 dbgctl_buslock_lbr = DEBUGCTLMSR_BUS_LOCK_DETECT | DEBUGCTLMSR_LBR;
->> +	bool enable_lbrv = (svm_get_lbr_vmcb(svm)->save.dbgctl & dbgctl_buslock_lbr) ||
->>  			    (is_guest_mode(vcpu) && guest_can_use(vcpu, X86_FEATURE_LBRV) &&
->>  			    (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK));
-> 
-> Out of sight, but this leads to calling svm_enable_lbrv() even when the guest
-> just wants to enable BUS_LOCK_DETECT.  Ignoring SEV-ES guests, KVM will intercept
-> writes to DEBUGCTL, so can't KVM defer mucking with the intercepts and
-> svm_copy_lbrs() until the guest actually wants to use LBRs?
-> 
-> Hmm, and I think the existing code is broken.  If L1 passes DEBUGCTL through to
-> L2, then KVM will handles writes to L1's effective value.  And if L1 also passes
-> through the LBRs, then KVM will fail to update the MSR bitmaps for vmcb02.
-> 
-> Ah, it's just a performance issue though, because KVM will still emulate RDMSR.
-> 
-> Ugh, this code is silly.  The LBR MSRs are read-only, yet KVM passes them through
-> for write.
-> 
-> Anyways, I'm thinking something like this?  Note, using msr_write_intercepted()
-> is wrong, because that'll check L2's bitmap if is_guest_mode(), and the idea is
-> to use L1's bitmap as the canary.
-> 
-> static void svm_update_passthrough_lbrs(struct kvm_vcpu *vcpu, bool passthrough)
-> {
-> 	struct vcpu_svm *svm = to_svm(vcpu);
-> 
-> 	KVM_BUG_ON(!passthrough && sev_es_guest(vcpu->kvm), vcpu->kvm);
-> 
-> 	if (!msr_write_intercepted(vcpu, MSR_IA32_LASTBRANCHFROMIP) == passthrough)
-> 		return;
-> 
-> 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTBRANCHFROMIP, passthrough, 0);
-> 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTBRANCHTOIP, passthrough, 0);
-> 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTINTFROMIP, passthrough, 0);
-> 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTINTTOIP, passthrough, 0);
-> 
-> 	/*
-> 	 * When enabling, move the LBR msrs to vmcb02 so that L2 can see them,
-> 	 * and then move them back to vmcb01 when disabling to avoid copying
-> 	 * them on nested guest entries.
-> 	 */
-> 	if (is_guest_mode(vcpu)) {
-> 		if (passthrough)
-> 			svm_copy_lbrs(svm->vmcb, svm->vmcb01.ptr);
-> 		else
-> 			svm_copy_lbrs(svm->vmcb01.ptr, svm->vmcb);
-> 	}
-> }
-> 
-> void svm_enable_lbrv(struct kvm_vcpu *vcpu)
-> {
-> 	struct vcpu_svm *svm = to_svm(vcpu);
-> 
-> 	if (WARN_ON_ONCE(!sev_es_guest(vcpu->kvm)))
-> 		return;
-> 
-> 	svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
-> 	svm_update_passthrough_lbrs(vcpu, true);
-> 
-> 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_DEBUGCTLMSR, 1, 1);
-> }
-> 
-> static struct vmcb *svm_get_lbr_vmcb(struct vcpu_svm *svm)
-> {
-> 	/*
-> 	 * If LBR virtualization is disabled, the LBR MSRs are always kept in
-> 	 * vmcb01.  If LBR virtualization is enabled and L1 is running VMs of
-> 	 * its own, the MSRs are moved between vmcb01 and vmcb02 as needed.
-> 	 */
-> 	return svm->vmcb->control.virt_ext & LBR_CTL_ENABLE_MASK ? svm->vmcb :
-> 								   svm->vmcb01.ptr;
-> }
-> 
-> void svm_update_lbrv(struct kvm_vcpu *vcpu)
-> {
-> 	struct vcpu_svm *svm = to_svm(vcpu);
-> 	u64 guest_debugctl = svm_get_lbr_vmcb(svm)->save.dbgctl;
-> 	bool enable_lbrv = (guest_debugctl & DEBUGCTLMSR_LBR) ||
-> 			    (is_guest_mode(vcpu) && guest_can_use(vcpu, X86_FEATURE_LBRV) &&
-> 			    (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK));
-> 
-> 	if (enable_lbrv || (guest_debugctl & DEBUGCTLMSR_BUS_LOCK_DETECT))
-> 		svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
-> 	else
-> 		svm->vmcb->control.virt_ext &= ~LBR_CTL_ENABLE_MASK;
-> 
-> 	svm_update_passthrough_lbrs(vcpu, enable_lbrv);
-> }
-> 
-> 
->> @@ -3158,6 +3159,10 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
->>  		if (data & DEBUGCTL_RESERVED_BITS)
-> 
-> Not your code, but why does DEBUGCTL_RESERVED_BITS = ~0x3f!?!?  That means the
-> introduction of the below check, which is architecturally correct, has the
-> potential to break guests.  *sigh*
-> 
-> I doubt it will cause a problem, but it's something to look out for.
-> 
->>  			return 1;
->>  
->> +		if ((data & DEBUGCTLMSR_BUS_LOCK_DETECT) &&
->> +		    !guest_cpuid_has(vcpu, X86_FEATURE_BUS_LOCK_DETECT))
->> +			return 1;
->> +
->>  		svm_get_lbr_vmcb(svm)->save.dbgctl = data;
->>  		svm_update_lbrv(vcpu);
->>  		break;
->> @@ -5225,8 +5230,14 @@ static __init void svm_set_cpu_caps(void)
->>  	/* CPUID 0x8000001F (SME/SEV features) */
->>  	sev_set_cpu_caps();
->>  
->> -	/* Don't advertise Bus Lock Detect to guest if SVM support is absent */
->> -	kvm_cpu_cap_clear(X86_FEATURE_BUS_LOCK_DETECT);
->> +	/*
->> +	 * LBR Virtualization must be enabled to support BusLockTrap inside the
->> +	 * guest, since BusLockTrap is enabled through MSR_IA32_DEBUGCTLMSR and
->> +	 * MSR_IA32_DEBUGCTLMSR is virtualized only if LBR Virtualization is
->> +	 * enabled.
->> +	 */
->> +	if (!lbrv)
->> +		kvm_cpu_cap_clear(X86_FEATURE_BUS_LOCK_DETECT);
->>  }
->>  
->>  static __init int svm_hardware_setup(void)
->> -- 
->> 2.34.1
->>
+Ack yes :)
 
-Thanks Sean for the refactored code. I ported your implementation to the 6.16
-kernel and did some testing with KVM unit tests. After instrumentation I found
-couple of issues and potential fixes.
+>
+> BTW, about the name "softleaf_t", it does not reflect the nature of
+> this type is a not presented pte. If you have someone new to guess
+> what does  "softleaf_t" mean, I bet none of them would have guessed it
+> is a PTE  related value. I have considered  "idlepte_t", something
+> given to the reader by the idea that it is not a valid PTE entry. Just
+> some food for thought.
 
-===========================================================
-Issue 1: Interception still enabled after enabling LBRV
-===========================================================
-Using the 6.16 upstream kernel (unpatched) I ran the KUT tests and they passed
-when run from both the bare metal and from inside a L1 guest. However for L2
-guest, when looking at the logs I found that RDMSR interception of LBR MSRs is
-still enabled despite the LBRV is enabled for the L2 guest. Effectively, the
-reads are emulated instead of being virtualized, which is not the intended
-behaviour. KUT cannot distinguish between emulated and virtualized RDMSR, and
-hence the test passes regardless.
+It's not a PTE value, it's an abstracted representation of a leaf entry,
+hence leaf, and as relevant to the software interpretation of leaf entries,
+hence soft :)
 
+We also encode PMD entries so that'd be totally wrong.
 
-===========================================================
-Issue 2: Basic LBR KUT fails with Sean's implementation
-===========================================================
-After using your implementation, all KUTs passed on the bare metal. With LBRV
-enabled for L2, RDMSR interception of LBR MSRs is disabled as intended.
-However, when running KUT tests inside an L1 guest, the tests fail.
+We do make sure any PTE/PMD related stuff is prefixed appropriately
+e.g. pte_xxx(), pmd_xxx().
 
-After digging deeper, I figured that when L2 attempts to update the LBR using
-DBGCTL, the L1's LBRs are copied to L2's LBR MSRs from
-svm_update_passthrough_lbrs().
+>
+> > I'll deal with this when I come to this follow-up series.
+> >
+> > As I said before I'm empathetic to conflicts, but also - this is something we
+> > all have to live with. I have had to deal with numerous conflict fixups. They're
+> > really not all that bad to fix up.
+> >
+> > And again I'm happy to do it for you if it's too egregious.
+> >
+> > BUT I'm pretty sure we can just keep using swp_entry_t. In fact unless there's
+> > an absolutely compelling reason not to - this is exactly what I"ll do :)
+>
+> Good.
+>
+> > > > So this series will proceed as it is.
+> > >
+> > > Please clarify the "proceed as it is" regarding the actual swap code.
+> > > I hope you mean you are continuing your series, maybe with
+> > > modifications also consider my feedback. After all, you just say " But
+> > > I did think perhaps we could maintain this type explicitly for the
+> > > _actual_ swap code."
+> >
+> > I mean keeping this series as-is, of course modulo changes in response to review
+> > feedback.
+> >
+> > To be clear - I have no plans whatsoever to change the actual swap code _in this
+> > series_ beyond what is already here.
+> >
+> > And in the follow-up that will do more on this - I will most likely keep the
+> > swp_entry_t as-is in core swap code or at least absolutely minimal changes
+> > there.
+>
+> Ack
+>
+> > And that series you will be cc'd on and welcome of course to push back on
+> > anything you have an issue with :)
+> >
+> > >
+> > > > However I'm more than happy to help resolve conflicts - if you want to send
+> > > > me any of these series off list etc. I can rebase to mm-new myself if
+> > > > that'd be helpful?
+> > >
+> > > As I said above, leaving the actual swap code alone is more helpful
+> > > and I consider it cleaner as well. We can also look into incremental
+> > > change on your V2 to crave out the swap code.
+> >
+> > Well I welcome review feedback.
+> >
+> > I don't think I really touched anything particularly swap-specific that is
+> > problematic, but obviously feel free to review and will absolutely try to
+> > accommodate any reasonable requests!
+> >
+> > >
+> > > >
+> > > > >
+> > > > > Does this renaming have any behavior change in the produced machine code?
+> > > >
+> > > > It shouldn't result in any meaningful change no.
+> > >
+> > > That is actually the reason to give the swap table change more
+> > > priority. Just saying.
+> >
+> > I'm sorry but this is not a reasonable request. I am being as empathetic and
+> > kind as I can be here, but this series is proceeding without arbitrary delay.
+> >
+> > I will do everything I can to accommodate any concerns or issues you may have
+> > here _within reason_ :)
+>
+> I did not expect you to delay this. It is just expressing the
+> viewpoint that this is internal clean up for benefit the developers
+> rather than the end users.
 
-/*
- * When enabling, move the LBR msrs to vmcb02 so that L2 can see them,
- * and then move them back to vmcb01 when disabling to avoid copying
- * them on nested guest entries.
- */
-if (is_guest_mode(vcpu)) {
-	if (passthrough)
-		svm_copy_lbrs(svm->vmcb, svm->vmcb01.ptr);  <---- copy happens here
-	else
-		svm_copy_lbrs(svm->vmcb01.ptr, svm->vmcb);
-}
+I don't agree with this interpretation - this directly benefits everybody,
+I've seen LOTS of bugs and issues that have arisen from misunderstanding of
+internal kernel components or because somebody understandably missed
+open-coded stuff or 'implicit' assumptions.
 
-This results in DBGCTL and other LBRs of L2 being overwritten by L1's value.
-So if L1 has DBGCTL.LBR disabled, L2 won't be able to turn on LBR. This results
-in failing KUT test.
+In fact it's an ongoing theme of (understandable) kernel developer
+confusion resulting in bugs, instability, performance regressions and the
+inability to extend or improve functionality.
 
-L2>  wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
-L2>  DO_BRANCH(host_branch0);
-L2>  dbgctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
-L2>  wrmsr(MSR_IA32_DEBUGCTLMSR, 0);
-L2>  TEST_EXPECT_EQ(dbgctl, DEBUGCTLMSR_LBR);  <---- This check fails since
-                                                      dbgctl is still 0
+I've repeatedly seen very significant negative impact in every measurable
+metric from poorly structured and implemented code throughout my career,
+and the exact opposite for the opposite.
 
-Line-by-line code analysis
---------------------------
+So running counter to this, this series directly improves things for the
+end user AS WELL as improving internal kernel developer happiness :)
 
-KVM>  # start L1 guest
-<L1>  # start KUT test svm_lbrv_test0
+For instance - the mmap 'cleanup' literally resolved a zero-day securiy
+flaw.
 
-<L2>  wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
-KVM>  # inject wrmsr into L1
-<L1>  vmcb01->control.virt_ext = 1;  <---- L1's vmcb01 is vmcb12 wrt KVM
-<L1>  # turn off intercepts
-<L1>  vmrun
-KVM>  vmcb02->control.virt_ext = 1;
-KVM>  svm_copy_lbrs(vmcb02, vmcb12);  <---- Correct value loaded here
-KVM>  nested.ctl.virt_ext = 1;
-KVM>  # turn off intercepts
-KVM>  svm_copy_lbrs(vmcb02, vmcb01);  <---- This overwrites the value
-KVM>  # start L2 guest
+I think it's very unfortunate that we overload the term 'cleanup' to both
+describe 'fundamentally changing how parts of a subsystem operation' and
+'typo fixes'. But anyway. I shall stop going on ;)
 
-<L2>  DO_BRANCH(host_branch0);
-<L2>  dbgctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
-...
-<L2>  wrmsr(MSR_IA32_DEBUGCTLMSR, 0);
-...
-<L2>  TEST_EXPECT_EQ(dbgctl, DEBUGCTLMSR_LBR);  <---- This check fails
+>
+> Keep the existing swp_entry_t for the actual core swap usage is within
+> reasonable request. We already align on that.
 
+Yup, but within reason. I'm not going to duplicate pte_to_swp_entry() just
+to satisfy this, and the swap code touches some softleaf stuff (e.g. not
+processing non-swap stuff), but the idea is to keep it to a sensible
+minimum.
 
-===========================================================
-Potential Solution
-===========================================================
-A potential fix is to copy the LBRs only when L1 has DBGCTL.LBR is enabled.
-This will prevent the overwrite. I successfully tested it by running KUT on
-all levels, viz, bare metal, L1 and L2. Please share your thoughts on
-this.
+Everything will be bit-for-bit compatible and have zero impact on the swap
+implemenetation.
 
-if (is_guest_mode(vcpu) && svm->vmcb01.ptr->save.dbgctl & DEBUGCTLMSR_LBR) {
-	if (passthrough)
-		svm_copy_lbrs(svm->vmcb, svm->vmcb01.ptr);
-	else
-		svm_copy_lbrs(svm->vmcb01.ptr, svm->vmcb);
-}
+But yes intent is the _vast majority_ of the swap code stays exactly as it
+is.
 
-If the patch below looks good, I'll split it and send it as a series.
-Additionaly, I added a MSR read interception API similar to the one
-implemented by Ravi.
+Future changes are really going to be focused on actually softleaf stuff
+generally.
 
----
- arch/x86/kvm/svm/svm.c | 66 ++++++++++++++++++++++++++++--------------
- 1 file changed, 44 insertions(+), 22 deletions(-)
+I hope to stop having leafops.h include swapops.h and then have swap stuff
+include both and have the types be different _from C type safety
+perspective_ but still bit-for-bit compatible so we just have a
+satisfy-the-compiler conversion funtion that'll be a nop in generated
+binary.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index d9931c6c4bc6..f0f77199ec12 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -663,6 +663,11 @@ static void clr_dr_intercepts(struct vcpu_svm *svm)
- 	recalc_intercepts(svm);
- }
+But all that's for future series :)
 
-+static bool msr_read_intercepted_msrpm(void *msrpm, u32 msr)
-+{
-+	return svm_test_msr_bitmap_read(msrpm, msr);
-+}
-+
- static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
- {
- 	/*
-@@ -864,32 +869,49 @@ void svm_copy_lbrs(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
- 	vmcb_mark_dirty(to_vmcb, VMCB_LBR);
- }
+>
+> Chris
 
--void svm_enable_lbrv(struct kvm_vcpu *vcpu)
-+static void svm_update_passthrough_lbrs(struct kvm_vcpu *vcpu, bool passthrough)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-+	bool to_intercept = !passthrough;
-
--	svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
--	svm_recalc_lbr_msr_intercepts(vcpu);
-+	KVM_BUG_ON(to_intercept && sev_es_guest(vcpu->kvm), vcpu->kvm);
-
--	/* Move the LBR msrs to the vmcb02 so that the guest can see them. */
--	if (is_guest_mode(vcpu))
--		svm_copy_lbrs(svm->vmcb, svm->vmcb01.ptr);
-+	if (msr_read_intercepted_msrpm(svm->msrpm, MSR_IA32_LASTBRANCHFROMIP) == to_intercept)
-+		return;
-+
-+	svm_set_intercept_for_msr(vcpu, MSR_IA32_LASTBRANCHFROMIP, MSR_TYPE_R, to_intercept);
-+	svm_set_intercept_for_msr(vcpu, MSR_IA32_LASTBRANCHTOIP, MSR_TYPE_R, to_intercept);
-+	svm_set_intercept_for_msr(vcpu, MSR_IA32_LASTINTFROMIP, MSR_TYPE_R, to_intercept);
-+	svm_set_intercept_for_msr(vcpu, MSR_IA32_LASTINTTOIP, MSR_TYPE_R, to_intercept);
-+
-+	/*
-+	 * When enabling, move the LBR msrs to vmcb02 so that L2 can see them,
-+	 * and then move them back to vmcb01 when disabling to avoid copying
-+	 * them on nested guest entries.
-+	 *
-+	 * Perform this only when L1 has enabled LBR to prevent the overwrite.
-+	 */
-+	if (is_guest_mode(vcpu) && svm->vmcb01.ptr->save.dbgctl & DEBUGCTLMSR_LBR) {
-+		if (passthrough)
-+			svm_copy_lbrs(svm->vmcb, svm->vmcb01.ptr);
-+		else
-+			svm_copy_lbrs(svm->vmcb01.ptr, svm->vmcb);
-+	}
- }
-
--static void svm_disable_lbrv(struct kvm_vcpu *vcpu)
-+void svm_enable_lbrv(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-
--	KVM_BUG_ON(sev_es_guest(vcpu->kvm), vcpu->kvm);
--	svm->vmcb->control.virt_ext &= ~LBR_CTL_ENABLE_MASK;
--	svm_recalc_lbr_msr_intercepts(vcpu);
-+	/* Allow the function call from SEV-ES guests only */
-+	if (WARN_ON_ONCE(!sev_es_guest(vcpu->kvm)))
-+		return;
-
--	/*
--	 * Move the LBR msrs back to the vmcb01 to avoid copying them
--	 * on nested guest entries.
--	 */
--	if (is_guest_mode(vcpu))
--		svm_copy_lbrs(svm->vmcb01.ptr, svm->vmcb);
-+	svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
-+
-+	svm_update_passthrough_lbrs(vcpu, true);
-+
-+	svm_set_intercept_for_msr(vcpu, MSR_IA32_DEBUGCTLMSR, MSR_TYPE_RW, 0);
- }
-
- static struct vmcb *svm_get_lbr_vmcb(struct vcpu_svm *svm)
-@@ -906,18 +928,18 @@ static struct vmcb *svm_get_lbr_vmcb(struct vcpu_svm *svm)
- void svm_update_lbrv(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
--	bool current_enable_lbrv = svm->vmcb->control.virt_ext & LBR_CTL_ENABLE_MASK;
--	bool enable_lbrv = (svm_get_lbr_vmcb(svm)->save.dbgctl & DEBUGCTLMSR_LBR) ||
-+	u64 guest_debugctl = svm_get_lbr_vmcb(svm)->save.dbgctl;
-+	bool enable_lbrv = (guest_debugctl & DEBUGCTLMSR_LBR) ||
- 			    (is_guest_mode(vcpu) && guest_cpu_cap_has(vcpu, X86_FEATURE_LBRV) &&
- 			    (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK));
-
--	if (enable_lbrv == current_enable_lbrv)
--		return;
-
- 	if (enable_lbrv)
--		svm_enable_lbrv(vcpu);
-+		svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
- 	else
--		svm_disable_lbrv(vcpu);
-+		svm->vmcb->control.virt_ext &= ~LBR_CTL_ENABLE_MASK;
-+
-+	svm_update_passthrough_lbrs(vcpu, enable_lbrv);
- }
-
- void disable_nmi_singlestep(struct vcpu_svm *svm)
--- 
-2.43.0
-
-
+Thanks, Lorenzo
 
