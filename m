@@ -1,241 +1,228 @@
-Return-Path: <kvm+bounces-62698-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62699-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81F5DC4AFE2
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 02:52:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C19AC4B499
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 04:11:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B79E3B935F
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 01:43:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AF5F24EE627
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 03:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3381341678;
-	Tue, 11 Nov 2025 01:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FED3491F2;
+	Tue, 11 Nov 2025 03:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L6g1Zc06"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Skm0YYT0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223F426E16C;
-	Tue, 11 Nov 2025 01:38:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762825104; cv=fail; b=JTmsKXmiAiLXLlEwSu3H0c6Ld6bh3FO38Oae2c06nBJ+uQ82AU1W9vlMb924IG+cNpOh2jcPHp8HENT8uIECrll+/TR0pGihdXUX6FbU8l3734clhIAu+mLGEWBLrZWPid3Kzcu/Wba8czir3nH2ETbCsoKcZRaUcu3w45srYS8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762825104; c=relaxed/simple;
-	bh=9GuXh/hJUe207FbZNvR2lQ17NWvJehZO7NjlhN2H/AU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZFDokDXHoys9gpg9XJO63jXIWHe8yBIA+1JYBsWrFJCdzVu5NT+RA/NczBMvHqD90DyqENcRbHf6rKHhMiF8l4uIPt9fAkKYljX56M/6zEfppCfcDZxrhxIzEO7S9M3lUXl7HD1lr3B+Itnb52Mnnf9xuZjDrknN5mGFVjPmQ/Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L6g1Zc06; arc=fail smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762825104; x=1794361104;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=9GuXh/hJUe207FbZNvR2lQ17NWvJehZO7NjlhN2H/AU=;
-  b=L6g1Zc06xDtL92UWzvPACmEhAzkLu3ej0vG2B+L4Yji/8wGp4yRU6kVC
-   3yX4Y4EnWE5C9wKxymFEknDo2lNgg/x6pwJ9JkJxVnT+/6ulmvBFeC8M1
-   o+EK0PYex/bmFcD3NHPPBIISTRGNq2Sb3/QMpzxLzl9B/Zrer0vNt+wv2
-   7/UOMkZRsSnMt9SQ6U3rzReFElXBGCuBbA4iAF/NkcLzLq8tjJ0PEP5iR
-   S01J5kovJ8samuHLMKss5ManV9fr88HW5kCJos46GUzWxPJsizAF3hAgv
-   9xNVtudqs6VQRjzTWZ2mZhM8eKkSTts5JCTa63uLbivsNipFeDnHNm4CJ
-   g==;
-X-CSE-ConnectionGUID: p2VQjpz0R8mSEYvIqy0WNA==
-X-CSE-MsgGUID: grAah3oyRL6nROlvXBLDwQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11609"; a="87513255"
-X-IronPort-AV: E=Sophos;i="6.19,295,1754982000"; 
-   d="scan'208";a="87513255"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2025 17:38:23 -0800
-X-CSE-ConnectionGUID: jtaE9xTtTl6+OI7jlJ3u+w==
-X-CSE-MsgGUID: NNmswenBRDCQDposCVNxVw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,295,1754982000"; 
-   d="scan'208";a="212209983"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2025 17:38:22 -0800
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 10 Nov 2025 17:38:21 -0800
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Mon, 10 Nov 2025 17:38:21 -0800
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.12)
- by edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 10 Nov 2025 17:38:21 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LZWBRpqJrObY7QdZatVHM9vtdIIlNwKku8dNNztLnRy3mRmBK0yR6a2Bs5W52n8AlvHHA2mdVd9FDKz0xFIgLP5sVQgbopQ0iZ21wm2F+kPbgfh5oc48oWPD/ZJHQCEZk3DlYxv356GQ1VI8gFGVllTUuMy24Y4iLrON87EduGVwmYWgL++IvY0vhSgJJ0DyQWM+qaPtLmoYZbxwv+zggmamJh+2yeHqGYjsuYWzVWWinqsXslMUbapsSG8ib38wHivo9GieZJTMK45dbc3FZasZevmVFLwZmPGw+pMnP9Dw8StSsYbiS6WH7HERzPAAiMb79+wzsV0B5W8n9Tzp4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9GuXh/hJUe207FbZNvR2lQ17NWvJehZO7NjlhN2H/AU=;
- b=GLqH9EUGtzZNO3ImWewJq18/RiG9l03UhYS5EEr5HmoRg5cwJjmympfXn+s7DZ+wQ+qyt+XtoZJa2GM9RK3aTAOgH5bzFrDOtKtQ577MM2Dodr2Af2k/UzG6BS4BsQ57qejYf8mAwehjrOpWFjWfAj+mqjs1l6NhmNCpQn3/P6EpH8YP2265y6za5UyEtEhsItayR4bbu2uvKZ8N1UUQADRf1mpJDDWCOmfcWVhjwOrlKVAsVxEd31YUCs2yXUW4l7PzRDim2UerzSpORDX3M7ghX3xpYwW9MgimxnBAl263b6XvaZanY6rt6A/F5gvuu2tfLGCbMMES6PTGkajzSQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SJ0PR11MB5152.namprd11.prod.outlook.com (2603:10b6:a03:2ae::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Tue, 11 Nov
- 2025 01:38:19 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1%5]) with mapi id 15.20.9298.015; Tue, 11 Nov 2025
- 01:38:19 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: "Winiarski, Michal" <michal.winiarski@intel.com>, Alex Williamson
-	<alex@shazbot.org>, "De Marchi, Lucas" <lucas.demarchi@intel.com>,
-	=?utf-8?B?VGhvbWFzIEhlbGxzdHLDtm0=?= <thomas.hellstrom@linux.intel.com>,
-	"Vivi, Rodrigo" <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Yishai Hadas <yishaih@nvidia.com>, Shameer Kolothum
-	<skolothumtho@nvidia.com>, "intel-xe@lists.freedesktop.org"
-	<intel-xe@lists.freedesktop.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"Brost, Matthew" <matthew.brost@intel.com>, "Wajdeczko, Michal"
-	<Michal.Wajdeczko@intel.com>
-CC: "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, "Jani
- Nikula" <jani.nikula@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Laguna,
- Lukasz" <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>
-Subject: RE: [PATCH v5 28/28] vfio/xe: Add device specific vfio_pci driver
- variant for Intel graphics
-Thread-Topic: [PATCH v5 28/28] vfio/xe: Add device specific vfio_pci driver
- variant for Intel graphics
-Thread-Index: AQHcUqd+vf1n1dVj5UmyiLVe2Lh3r7TssNbQ
-Date: Tue, 11 Nov 2025 01:38:19 +0000
-Message-ID: <BN9PR11MB527638018267BA3AF8CD49678CCFA@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20251111010439.347045-1-michal.winiarski@intel.com>
- <20251111010439.347045-29-michal.winiarski@intel.com>
-In-Reply-To: <20251111010439.347045-29-michal.winiarski@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SJ0PR11MB5152:EE_
-x-ms-office365-filtering-correlation-id: 2e836767-b030-463b-df1c-08de20c2fe31
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700021|921020;
-x-microsoft-antispam-message-info: =?utf-8?B?WTlIRUNIRWloK1h6VUpzREttUEtkSDFWckg2SGF0WFN5VkY5b3N0TElycWdM?=
- =?utf-8?B?TEpUZFRIQ0NFMGxNbWRZTVFFc3FCTzhDSlgzNEh2SmwvZ08wVFNVNGJPS2tv?=
- =?utf-8?B?QnN1TEhnOVBhWlZyZ0d5RWtaUi96ZDB2SjN4dEdqb2I5T2JCbEYxb21DU2F0?=
- =?utf-8?B?a1MveXp0cVB2bHUyQThEYnp3bFcwOTIrN3kyTGZhck0zYk1ZcVhXNmV6UUlt?=
- =?utf-8?B?dVpxY3NOVHdVYllrTWtGS3gyL1ZzaVRmRE5qUGFKM0xKcjFXSk9uK1E2ZkNT?=
- =?utf-8?B?YUxnRkcxdFZYdWtVR01tdDZ3OGx3Sm0wakJKcVhNRlUxald3Y1ZYVkwrUUFp?=
- =?utf-8?B?aFB3UUxiVzJ1R0VLM05mTmdQaXBMR2V6S09KWVdoT1ZDYUNjSVlKcklEODVu?=
- =?utf-8?B?OVF1YVFxb0tib0hSVVUxRnNZUXJ4NDhqOHN2VHJoNzhUUFNYcm9TVzZTZE9n?=
- =?utf-8?B?ZzNmckFyeGlFZVpPK3pwekRpeE1IaENxNmdEV3ZHR1JrK2FoTzhSQUhrS3Rk?=
- =?utf-8?B?NlBGckhEL1VPV1JsQzNPUVhKWU1PTDJBaU92VithVGF3Tlo1Wm5hSmVnWnla?=
- =?utf-8?B?cDMxWWY2TGV4dWxKcHZQeEcvS3RMaXRMd3YwQlIvWFdwc1ZwUWFKZGdycDlK?=
- =?utf-8?B?bzZLREh4SmxuaDlYazlYMjN4aTFueUFWYTlsaEcxWjJSbHdJNTZERlBuVzB5?=
- =?utf-8?B?NElxMVM2NTlXa1FMbkQvaFZVSDJOcUJCbnZ1Nk4yUk45ZWw1Q0NYdktuNmlF?=
- =?utf-8?B?SWJCNmNxcGdJNTVRS3R5M2h3SjRQbkVxQWpSZEFCOXNoelRVMml3Ymw1SFdI?=
- =?utf-8?B?eGVxaFJIVG1PR0tzOWdHVGRTQ3hwU3dXOC9URW0wTzBDbjVOREdOWGhucWd1?=
- =?utf-8?B?NVFsUDdFbnIyd3lQN0loT0tLSzNxYWlxOXpOYzdZdjZ1eHIzMUZPOXl2V0d0?=
- =?utf-8?B?Y0I0NEc0bjBPWFgrK3lpWmJGZE9jWW1paDlSNlpMQUduckhwZjZOczdveVk0?=
- =?utf-8?B?YmRkZnZ5bWt6OVpUS3NEZlBpMUI3c200bDBMc1EyT2dMODRpZVhyNzdyRFhE?=
- =?utf-8?B?Y0Flb2ovNVZjbTVlMDd0SXhsS2RkeE1pM2t3OS9td0Z1ZHlrcWJuaHhUcVpl?=
- =?utf-8?B?dEdrVWQ0QlVRTSt4THNoUmNSREozbFd3dFE3M1FUVzE4S3h4ck1FWEdSTVdC?=
- =?utf-8?B?Z2JVMWJzcVdJaVgycEhZd2Y1Sko0Z0FYTnFSUWNkOVRITzJKUjZrcDNWMytQ?=
- =?utf-8?B?ZVNKc3NUb3F3Mm93SDk2L3dRTkhBL1VsUTg4dllnYUpYaWpVcEc5NS9QSTZW?=
- =?utf-8?B?QTk4M2tJUWtKQlptNVNnSHdaOUVaSGVKMWkvNGxMc1B4ckIxUyt5c0xBV0FX?=
- =?utf-8?B?bnNadDBaSHhGTjV1S3NPeXk2Y3BUakxkT3k5aUNxRWRMZVdjd2xBV1FVZTZE?=
- =?utf-8?B?dUFQbU4xSUZaOGZtdzVJUlhoS1YvN1FHR2k3QWZINXl0WnMzNEFrTWt0TTJN?=
- =?utf-8?B?TWtQUnNVNVN3RmY3WDB5ejdobGs2WENOZDl3K2hiSjVkaERVSWdKOHBFTVhm?=
- =?utf-8?B?bmcwTXIyMDhscThqdXc3SkxLWDdmTFlmQ0hNcXJZNUd2aEdBcFYwNjdFWjBp?=
- =?utf-8?B?WTVIK04xdTF4cXVScWxiM3piMnlneGFlaUFQTU1CVzJ4U0tWQnZIVGJYZnpo?=
- =?utf-8?B?UUlnR1NtcTUvVTJWSDNYSjh5ZjB5UEpZSkloUU5TY29mcUZ3dHdSU3AyRHhz?=
- =?utf-8?B?dkk0WjRESWxsbVBZZkpLME4xZlN3Sk5OL0VYRC9ibjRkN21RQjdrY3lvS0hi?=
- =?utf-8?B?Z1NoVjdBL0VFaEQ3WFVmWWlPVGF4U01HS2VhRHd0M09XTTVoM1NqK3FhVUUr?=
- =?utf-8?B?VHdQZTY3RnV2U1FxbEVGV1FqT1A4bWtGMG5SMzdmVUZMWVhyUkF3cE9qRUpu?=
- =?utf-8?B?ekxveTVnUG1GaEg3Y3NOY0g5SU5FZ1ZubnpTUmhXNDhHU1hsVUJXaDFnYm5r?=
- =?utf-8?B?VjFYS3VqeDAxbGE5Ni9CVnBzZWdBSjdnZHVHSGtmbkRJdWx1UUQycmJDTzRQ?=
- =?utf-8?B?QjlOYUVlUi9ieGVHcGR6Y1R6VTVpSnlPenRQdz09?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700021)(921020);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NHZ0SnlkaXF0RFpCcHVOMVJXR1JsVnluMnQrclo0ZTNpNy9Lemp2QldmTE1p?=
- =?utf-8?B?cURydFEyVGVwMERZTmhzZWcyZDlSdURocTRGenc5NytadTVEQTRCT0o3TkUy?=
- =?utf-8?B?dXp4V2E0WXI0cVhrcXZENkUxL1VBYjdsVlY4TlJodnhTWVhyQTNsTzJsdm5O?=
- =?utf-8?B?dTRCbU1ic1BUQkpOaS9UV0NBQ1B5YVdWUHJ6dm1oUkV4Tm9UdHRqeER3RlVD?=
- =?utf-8?B?dWtMa3NtWGRQUVVUa3NkMmttQm1LMU56eUtGNE53bDBlSlo1cFUvYnovUm1V?=
- =?utf-8?B?N2NRemFtdWZCNzJnOU1JMklNWUJDN3R6RzhHcHEycUZZbGpkV1VmVGdSbEdi?=
- =?utf-8?B?cVp4U0JOaUwrckZhQ1VPTnRic0NLbzFseW0rU0xlUDhKUHZ1OG0rclZ4aVhN?=
- =?utf-8?B?VmdJaTl2c2plT0FPbkJPSEtWMHBxcko1d1N4TWNQTGpaenI0U0gyOGJwU0py?=
- =?utf-8?B?c0ZKS05PUTJyandBRXJGSWhlWDJNc3JjRkNhZlhha29OSHNLN3BzUVNmV3FP?=
- =?utf-8?B?OFNuQVJCODJlSU1nVzI5TS9nVWswa3lJdHRBVkpwaGVEM1d4blJSV3Z5Ynd2?=
- =?utf-8?B?NDBDdFEvSW4zK2xCUTVpaXR3VS9ERHlIVkF6T0RQaFZQTExMUXpQVnU5alpp?=
- =?utf-8?B?d09oSU9PaTZ0M1IvejN2WmhlLzJyQW43VXArLyt3N0lRNnJYT29wbFNhZGdW?=
- =?utf-8?B?SGN3Y0YvMmhyc2RGbjNlZzFVRmlIbXhiWWg1ZnFxbERwWGhqRDFsZzhhWHJD?=
- =?utf-8?B?OFA5UU9qZ1VmUjVQWVp5dCt0K01BVHBCNEsxSnZoSXowYnltYStGZnNHM1RD?=
- =?utf-8?B?RFBmai9yZXlTYzdjUXBLSWd2bGVpSDlPYnVJUWljOGFLaTFrTnRvUHpwZDYw?=
- =?utf-8?B?czE0cUNiU1NvSnhoOFRPUURUWDltTHlIbDdpZE92KzhqNjVyd2pJMXNYOXdZ?=
- =?utf-8?B?OWpUV0NQV2lrY0UweGlvNW1UbWVDSmZtRHJBMVBDSEkrNEdGajlqNFVESUs3?=
- =?utf-8?B?bFYzaW5qWE5hMm8xUytUMWEyZVFGZFArYkVZaUczVGF1K3JabEk1b1RIbkVV?=
- =?utf-8?B?RDJpcU5NNm5LZW9wQ1pmNStGNDhaU0tjajZ4VmZxOWtkVlFOS0U3cFVXWXo3?=
- =?utf-8?B?TENIMzBtMitVZkhWNTgvMTBMZVprZXRpOHRmQ1NEdTFXa2Fza1BFWnR3MDQw?=
- =?utf-8?B?OVpVQTJOQTFzL252QTl3S3daN1NPRnI5bFpoWTNIT2wzZUhJY0EwQlA2eDV0?=
- =?utf-8?B?ZFpnT2pwTVM4V3VTTjA0RnY5MTRNN2YvS0xVSFFmbXJWMFlRMndrbjdlWG5N?=
- =?utf-8?B?a0JIWDVodUR3Z0tTOWtRb01TeVZ2Kzh0V1JqZHlIdi9KK3k5YkpQQ2tMcE5X?=
- =?utf-8?B?VHJNdm52TThLcFE4ekx0L3I5YklyTUdjNlJFUzlEMEszcDdwcnJzelNESE5D?=
- =?utf-8?B?eVJsbkxCU2FpRXhBeHpuUy9ReXZGQ1RDSWd6LzFzVHNuWVFsN3VwTHYrM3pZ?=
- =?utf-8?B?UXdDcExPbUJ2eE1UM0NXOXpoVStTLzY4emxVUG5oYisxTVhkLzJiVkZQak9Y?=
- =?utf-8?B?TVJrbDFoUkJRMGpOUjgyRmcwTjMrNVFuaFA5TUh2bnFUTHVmQUtOeHhMdlpC?=
- =?utf-8?B?WDZZbzVwMHROUTRjaTFYUTEvUFNycHZrMVppR0EwZXF5TEVxT016aXVwV2p3?=
- =?utf-8?B?Q08zZ2RTZFpOc1NCZXdRTjR3Z2J4bGZYeEZKYWZmSE11VVVaTEV0MVI1Q1o1?=
- =?utf-8?B?bk5ydVBCamZTYWZlbHFEL3hwSldGaWVSZmdOelA0RUgrdHAwTWJFS3BESkpR?=
- =?utf-8?B?TE9NdzFLL3poR3p0S3kyaVo4STVFUE1jQWRxUlRkc3V1akhqc01WVEovUmtM?=
- =?utf-8?B?cUNEc1U5ZGgwdG94SGRaSTlteW1iamtOU1QwSGYzT0xJbmduczVvaVN1Q2dS?=
- =?utf-8?B?QjBUd3dyZmRtKzhTNzFlYUxyekttdzV1RkE5QU0wRnVtOGEyWGJUTHRadGFT?=
- =?utf-8?B?TEh5cVpld2M2ZUFibnpnbjhrWGhlQi9JSW13Q0h5RHJ4Qk85S3Rkd1Axb3l5?=
- =?utf-8?B?aG9WcmV0bjZkb2JmcUNjMVZmMnVQREV6VFBjZCtvYkVBS1F5T0R0Y0VVNTRa?=
- =?utf-8?Q?NJrkvY5VESK3Ai9aTUN8Gz2kd?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193FE31D36C
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 03:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762830701; cv=none; b=K9QLWBJM6Dyisb7cHgaZuNIvGfmdYpF6zjeDibjF8EjyIMLjDgzQqAu0Y0EX/4SBrm5Dfhu2GOO95GVUlgpxzYiI7qL1zNJuUwfHlWq6vvoSICBVSrT1EphJ3mwFI7CZ1Cw0Q5drIdljSySLyJEiwv2eQLxb/oJcdM2xMMb+bGE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762830701; c=relaxed/simple;
+	bh=USQ/wPIxJAH7GpbX1QvZ9fIFzSecnN5IjUXB8iXX3c8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oBQGiEN2MMYtdAyomC9BYc5NbA4P2kJ3uRZdfyHtRAPjZGeYl5F8wZK/IdJGhQ6vA8jcs0iWR52jvF45Pi+B+ILiEvE/g0MyCmaTW2B5/InYqMAw0PqTZmdJsM/4OsP2rtE6EnGOol/NPEuaSmAVMoLEKCoKr7LA7iWJmkAVYp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Skm0YYT0; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 11 Nov 2025 03:11:13 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762830697;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nsHIXl5EhCMyskzxVvo+4ZfHKMb5wMbNpmFMAwBDo4w=;
+	b=Skm0YYT0GvoNOhWH+pV+5oS3eT6o/vfhrBCrwz4PAbh5hutD72prIuTz1K1g30Y2d+DXpn
+	aTB/1KO9T+o6lelML5jc9RLKsyHEEi183Fdf14U1ZEPqfmISiyAhvTnq1ZoKMlARBk5djB
+	fJl0ZZwrTwkZw+czg+0UgyWfDX4leUc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Subject: Re: [PATCH 2/6] KVM: nSVM: Always recalculate LBR MSR intercepts in
+ svm_update_lbrv()
+Message-ID: <aktjuidgjmdqdlc42mmy4hby5zc2e5at7lgrmkfxavlzusveus@ai7h3sk6j37b>
+References: <20251108004524.1600006-1-yosry.ahmed@linux.dev>
+ <20251108004524.1600006-3-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e836767-b030-463b-df1c-08de20c2fe31
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2025 01:38:19.3294
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PVPLey8hNn2WmybrT2mEsFJ6Lible4q/q1kGksxS7JSoyBWjzB3AygS3UPRZdzpNT9hQO+DHMCrC5smgVonXDw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5152
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251108004524.1600006-3-yosry.ahmed@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-PiBGcm9tOiBXaW5pYXJza2ksIE1pY2hhbCA8bWljaGFsLndpbmlhcnNraUBpbnRlbC5jb20+DQo+
-IFNlbnQ6IFR1ZXNkYXksIE5vdmVtYmVyIDExLCAyMDI1IDk6MDUgQU0NCj4gKw0KPiArCS8qDQo+
-ICsJICogQXMgdGhlIGhpZ2hlciBWRklPIGxheWVycyBhcmUgaG9sZGluZyBsb2NrcyBhY3Jvc3Mg
-cmVzZXQgYW5kIHVzaW5nDQo+ICsJICogdGhvc2Ugc2FtZSBsb2NrcyB3aXRoIHRoZSBtbV9sb2Nr
-IHdlIG5lZWQgdG8gcHJldmVudCBBQkJBDQo+IGRlYWRsb2NrDQo+ICsJICogd2l0aCB0aGUgc3Rh
-dGVfbXV0ZXggYW5kIG1tX2xvY2suDQo+ICsJICogSW4gY2FzZSB0aGUgc3RhdGVfbXV0ZXggd2Fz
-IHRha2VuIGFscmVhZHkgd2UgZGVmZXIgdGhlIGNsZWFudXANCj4gd29yaw0KPiArCSAqIHRvIHRo
-ZSB1bmxvY2sgZmxvdyBvZiB0aGUgb3RoZXIgcnVubmluZyBjb250ZXh0Lg0KPiArCSAqLw0KPiAr
-CXNwaW5fbG9jaygmeGVfdmRldi0+cmVzZXRfbG9jayk7DQo+ICsJeGVfdmRldi0+ZGVmZXJyZWRf
-cmVzZXQgPSB0cnVlOw0KPiArCWlmICghbXV0ZXhfdHJ5bG9jaygmeGVfdmRldi0+c3RhdGVfbXV0
-ZXgpKSB7DQo+ICsJCXNwaW5fdW5sb2NrKCZ4ZV92ZGV2LT5yZXNldF9sb2NrKTsNCj4gKwkJcmV0
-dXJuOw0KPiArCX0NCj4gKwlzcGluX3VubG9jaygmeGVfdmRldi0+cmVzZXRfbG9jayk7DQo+ICsJ
-eGVfdmZpb19wY2lfc3RhdGVfbXV0ZXhfdW5sb2NrKHhlX3ZkZXYpOw0KPiArDQo+ICsJeGVfdmZp
-b19wY2lfcmVzZXQoeGVfdmRldik7DQo+ICt9DQoNCkphc29uIHN1Z2dlc3RlZCB0byBkbyB0aGlz
-IGluIHRoZSBjb3JlIGdpdmVuIGl0J3MgY29tbW9uIFsxXS4NCg0KSWYgeW91IGRpc2FncmVlLCB0
-aGVuIHBsZWFzZSByYWlzZSBpdCBhbmQgZ2V0IGNvbnNlbnN1cyBpbiB0aGF0IHRocmVhZA0KaW5z
-dGVhZCBvZiBydXNoaW5nIHRvIHBvc3QgYSBuZXcgdmVyc2lvbi4uLg0KDQpbMV0gaHR0cHM6Ly9s
-b3JlLmtlcm5lbC5vcmcvYWxsLzIwMjUxMTA4MDA0NzU0LkdEMTg1OTE3OEB6aWVwZS5jYS8NCg==
+On Sat, Nov 08, 2025 at 12:45:20AM +0000, Yosry Ahmed wrote:
+> svm_update_lbrv() is called when MSR_IA32_DEBUGCTLMSR is updated, and on
+> nested transitions where LBRV is used. It checks whether LBRV enablement
+> needs to be changed in the current VMCB, and if it does, it also
+> recalculate intercepts to LBR MSRs.
+> 
+> However, there are cases where intercepts need to be updated even when
+> LBRV enablement doesn't. Example scenario:
+> - L1 has MSR_IA32_DEBUGCTLMSR cleared.
+> - L1 runs L2 without LBR_CTL_ENABLE (no LBRV).
+> - L2 sets DEBUGCTLMSR_LBR in MSR_IA32_DEBUGCTLMSR, svm_update_lbrv()
+>   sets LBR_CTL_ENABLE in VMCB02 and disables intercepts to LBR MSRs.
+> - L2 exits to L1, svm_update_lbrv() is not called on this transition.
+> - L1 clears MSR_IA32_DEBUGCTLMSR, svm_update_lbrv() finds that
+>   LBR_CTL_ENABLE is already cleared in VMCB01 and does nothing.
+> - Intercepts remain disabled, L1 reads to LBR MSRs read the host MSRs.
+> 
+> Fix it by always recalculating intercepts in svm_update_lbrv().
+
+This actually breaks hyperv_svm_test, because svm_update_lbrv() is
+called on every nested transition, calling
+svm_recalc_lbr_msr_intercepts() -> svm_set_intercept_for_msr() and
+setting svm->nested.force_msr_bitmap_recalc to true.
+
+This breaks the hyperv optimization in nested_svm_vmrun_msrpm() AFAICT.
+
+I think there are two ways to fix this:
+- Add another bool to svm->nested to track LBR intercepts, and only call
+  svm_set_intercept_for_msr() if the intercepts need to be updated.
+
+- Update svm_set_intercept_for_msr() itself to do nothing if the
+  intercepts do not need to be changed, which is more clutter but
+  applies to other callers as well so could shave cycles elsewhere (see
+  below).
+
+Sean, Paolo, any preferences?
+
+Here's what updating svm_set_intercept_for_msr() looks like:
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 2fbb0b88c6a3e..b1afafc8b37c0 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -664,24 +664,36 @@ void svm_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type, bool se
+ {
+        struct vcpu_svm *svm = to_svm(vcpu);
+        void *msrpm = svm->msrpm;
++       bool recalc = false;
++       bool already_set;
+
+        /* Don't disable interception for MSRs userspace wants to handle. */
+        if (type & MSR_TYPE_R) {
+-               if (!set && kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_READ))
++               already_set = svm_test_msr_bitmap_read(msrpm, msr);
++               if (!set && already_set && kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_READ)) {
+                        svm_clear_msr_bitmap_read(msrpm, msr);
+-               else
++                       recalc = true;
++               } else if (set && !already_set) {
+                        svm_set_msr_bitmap_read(msrpm, msr);
++                       recalc = true;
++               }
+        }
+
+        if (type & MSR_TYPE_W) {
+-               if (!set && kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_WRITE))
++               already_set = svm_test_msr_bitmap_write(msrpm, msr);
++               if (!set && already_set && kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_WRITE)) {
+                        svm_clear_msr_bitmap_write(msrpm, msr);
+-               else
++                       recalc = true;
++               } else if (set && !already_set) {
+                        svm_set_msr_bitmap_write(msrpm, msr);
++                       recalc = true;
++               }
+        }
+
+-       svm_hv_vmcb_dirty_nested_enlightenments(vcpu);
+-       svm->nested.force_msr_bitmap_recalc = true;
++       if (recalc) {
++               svm_hv_vmcb_dirty_nested_enlightenments(vcpu);
++               svm->nested.force_msr_bitmap_recalc = true;
++       }
+ }
+
+ void *svm_alloc_permissions_map(unsigned long size, gfp_t gfp_mask)
+
+> 
+> Fixes: 1d5a1b5860ed ("KVM: x86: nSVM: correctly virtualize LBR msrs when L2 is running")
+> Cc: stable@vger.kernel.org
+> 
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> ---
+>  arch/x86/kvm/svm/svm.c | 29 +++++++++++++++++++----------
+>  1 file changed, 19 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index d25c56b30b4e2..26ab75ecf1c67 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -806,25 +806,29 @@ void svm_copy_lbrs(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
+>  	vmcb_mark_dirty(to_vmcb, VMCB_LBR);
+>  }
+>  
+> -void svm_enable_lbrv(struct kvm_vcpu *vcpu)
+> +static void __svm_enable_lbrv(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+>  	svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
+> -	svm_recalc_lbr_msr_intercepts(vcpu);
+>  
+>  	/* Move the LBR msrs to the vmcb02 so that the guest can see them. */
+>  	if (is_guest_mode(vcpu))
+>  		svm_copy_lbrs(svm->vmcb, svm->vmcb01.ptr);
+>  }
+>  
+> -static void svm_disable_lbrv(struct kvm_vcpu *vcpu)
+> +void svm_enable_lbrv(struct kvm_vcpu *vcpu)
+> +{
+> +	__svm_enable_lbrv(vcpu);
+> +	svm_recalc_lbr_msr_intercepts(vcpu);
+> +}
+> +
+> +static void __svm_disable_lbrv(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+>  	KVM_BUG_ON(sev_es_guest(vcpu->kvm), vcpu->kvm);
+>  	svm->vmcb->control.virt_ext &= ~LBR_CTL_ENABLE_MASK;
+> -	svm_recalc_lbr_msr_intercepts(vcpu);
+>  
+>  	/*
+>  	 * Move the LBR msrs back to the vmcb01 to avoid copying them
+> @@ -853,13 +857,18 @@ void svm_update_lbrv(struct kvm_vcpu *vcpu)
+>  			    (is_guest_mode(vcpu) && guest_cpu_cap_has(vcpu, X86_FEATURE_LBRV) &&
+>  			    (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK));
+>  
+> -	if (enable_lbrv == current_enable_lbrv)
+> -		return;
+> +	if (enable_lbrv && !current_enable_lbrv)
+> +		__svm_enable_lbrv(vcpu);
+> +	else if (!enable_lbrv && current_enable_lbrv)
+> +		__svm_disable_lbrv(vcpu);
+>  
+> -	if (enable_lbrv)
+> -		svm_enable_lbrv(vcpu);
+> -	else
+> -		svm_disable_lbrv(vcpu);
+> +	/*
+> +	 * During nested transitions, it is possible that the current VMCB has
+> +	 * LBR_CTL set, but the previous LBR_CTL had it cleared (or vice versa).
+> +	 * In this case, even though LBR_CTL does not need an update, intercepts
+> +	 * do, so always recalculate the intercepts here.
+> +	 */
+> +	svm_recalc_lbr_msr_intercepts(vcpu);
+>  }
+>  
+>  void disable_nmi_singlestep(struct vcpu_svm *svm)
+> -- 
+> 2.51.2.1041.gc1ab5b90ca-goog
+> 
 
