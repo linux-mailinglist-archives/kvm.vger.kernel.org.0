@@ -1,228 +1,298 @@
-Return-Path: <kvm+bounces-62699-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62700-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C19AC4B499
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 04:11:53 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C17B3C4B4F1
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 04:26:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AF5F24EE627
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 03:11:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 90F984E4C8B
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 03:25:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FED3491F2;
-	Tue, 11 Nov 2025 03:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDAE134A79E;
+	Tue, 11 Nov 2025 03:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Skm0YYT0"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="W/h87OjG"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010036.outbound.protection.outlook.com [52.101.46.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193FE31D36C
-	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 03:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762830701; cv=none; b=K9QLWBJM6Dyisb7cHgaZuNIvGfmdYpF6zjeDibjF8EjyIMLjDgzQqAu0Y0EX/4SBrm5Dfhu2GOO95GVUlgpxzYiI7qL1zNJuUwfHlWq6vvoSICBVSrT1EphJ3mwFI7CZ1Cw0Q5drIdljSySLyJEiwv2eQLxb/oJcdM2xMMb+bGE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762830701; c=relaxed/simple;
-	bh=USQ/wPIxJAH7GpbX1QvZ9fIFzSecnN5IjUXB8iXX3c8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oBQGiEN2MMYtdAyomC9BYc5NbA4P2kJ3uRZdfyHtRAPjZGeYl5F8wZK/IdJGhQ6vA8jcs0iWR52jvF45Pi+B+ILiEvE/g0MyCmaTW2B5/InYqMAw0PqTZmdJsM/4OsP2rtE6EnGOol/NPEuaSmAVMoLEKCoKr7LA7iWJmkAVYp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Skm0YYT0; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 11 Nov 2025 03:11:13 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762830697;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nsHIXl5EhCMyskzxVvo+4ZfHKMb5wMbNpmFMAwBDo4w=;
-	b=Skm0YYT0GvoNOhWH+pV+5oS3eT6o/vfhrBCrwz4PAbh5hutD72prIuTz1K1g30Y2d+DXpn
-	aTB/1KO9T+o6lelML5jc9RLKsyHEEi183Fdf14U1ZEPqfmISiyAhvTnq1ZoKMlARBk5djB
-	fJl0ZZwrTwkZw+czg+0UgyWfDX4leUc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH 2/6] KVM: nSVM: Always recalculate LBR MSR intercepts in
- svm_update_lbrv()
-Message-ID: <aktjuidgjmdqdlc42mmy4hby5zc2e5at7lgrmkfxavlzusveus@ai7h3sk6j37b>
-References: <20251108004524.1600006-1-yosry.ahmed@linux.dev>
- <20251108004524.1600006-3-yosry.ahmed@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1031D314A8F;
+	Tue, 11 Nov 2025 03:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.36
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762831550; cv=fail; b=FOYqAxno0sTjr/Yn7uRB7cccUzT3v9w/tYzuDpXx3E8Tc3ikLAcRC+d7qmY/fymTMIPfMdc8/+b/89ievsNHMB/0T5Ouoz95HVmXPQd9v/3Oe+EvmQyo0NjYN+RwphZzjm8uw0DIbsmi1W7FPteuIhE/k+d+Sw8qn0Kqo1+zaHg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762831550; c=relaxed/simple;
+	bh=9ueGGJVmefH++k2cerGNCc0JvDa+PywFviatQwCPl3g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ErHkZWLnsjP5W8yId/itQzutYDRrdwfaSbwwx1ll84oVqhwOOR79d9gan/rIUS1N+a6UZ620BgFx15auAg5s7fcf+EZkMwmWbX/cTvoyAOjEw5hUC7QZkNWCj/jrpllbOjauccFaAVu24UpRB2eyxWZPh+7LZ115GHa4Rp9AZv8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=W/h87OjG; arc=fail smtp.client-ip=52.101.46.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=usRfm/7IGRAtDBTinuFHpXCu1rgHvKdvLQUpWZuQV3N8qLzK7Fe9Qhu/fGNLZVtuZuNhPco1W6um/o9wvO4JOvXK8Tr4x4tpVL/bjyzcrcHsjnKaNDsg7ZkRid2lrNJQ5MM4+v3kUVtMgVPUxzQhmfM+Kx7djjmezF9fKYA7qEd1ixXZ5VHtKUgSDNTw3axlHUzT1P6PdwlgO2ptsnASIv+pWHO7iag4uLwLvaIZ06s6pGHtlcDdwPR4fb66MyLtJN01krRh3gkLChw+PxHlP4DwR+i/l7IcMgr6nJJkyw5syG2pr4HQxHkRa/yBXNTM0knbPQehzuffwRmjOvJOTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5INBg9jNnvIMmN0NR8lVODCaHdgNXGPLmCTUuvpExa8=;
+ b=mnRDQDS99dLo0PCVn/se4wVsGogdFkx4DgCIijhR93UvUU3Ulu9eZmi0DXi5iqvu/6UduCMlMi4kImTIYdI/lXCB67ftTeI01N5i76mRGR5yj+qtCA2PZHoU7e7s5dSV1/5V+MeRqBYZVU1HWuBC7nBkCCDGzfYM/uwUa4gNyxgDHYmhniUOwuhkK+QWiplsX99sbn1sLDw/HLW/PFZ3Tezo9/qJjy/XgRs4W/+Qxhb5Ys02MicCy7lp75KRCHoX9vVsfjXo0+bmI+XUrTTULoMsFWnLjKi2il+7l8NbZV2YrJzmvzHGJZLa4RVNHweZcz0+kSBgCE0ZMK26X1KWQQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5INBg9jNnvIMmN0NR8lVODCaHdgNXGPLmCTUuvpExa8=;
+ b=W/h87OjGyLYKzzql5iRnFjFH0RzuvCpmxZEk87SaxTvnZNMLJ96chyPw0urRkbpSNmQhvtR09bTMBd3UbrnkoymesS7Bi1DFsfbTs0l+QDxfIFkM8D3i0dsCL9vOurw8HMU4PZxkM89XHKyPCgxTWHPpbFOhBD/Vwr/G55wQVFozUTbf+rKCAG+yysaIl91X39X5VEFxdlI2UK6EbTO+YMm5ogtBJj1BLScEXOwIXNJbpeNxugdiX8s2nzTGS4S8Bi2OkQxo7f5MNe/Bk3ScR9Wg0jNOsCO0xasQmZxUDPwvgtVIrgO0KQc7T2lJIWu5bjM8D1PGjF6bn5uNpgp8vg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
+ MN0PR12MB5881.namprd12.prod.outlook.com (2603:10b6:208:379::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Tue, 11 Nov
+ 2025 03:25:45 +0000
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::5189:ecec:d84a:133a%5]) with mapi id 15.20.9298.015; Tue, 11 Nov 2025
+ 03:25:45 +0000
+From: Zi Yan <ziy@nvidia.com>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Arnd Bergmann <arnd@arndb.de>, Baolin Wang <baolin.wang@linux.alibaba.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache <npache@redhat.com>,
+ Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>,
+ Barry Song <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>,
+ Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Matthew Brost <matthew.brost@intel.com>,
+ Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+ Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
+ Ying Huang <ying.huang@linux.alibaba.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
+ Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
+ Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+ Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+ SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
+ Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+ Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
+ Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
+Subject: Re: [PATCH v3 02/16] mm: introduce leaf entry type and use to
+ simplify leaf entry logic
+Date: Mon, 10 Nov 2025 22:25:40 -0500
+X-Mailer: MailMate (2.0r6283)
+Message-ID: <CBBF1711-5881-4B5A-ADE6-1D86C0E94296@nvidia.com>
+In-Reply-To: <c879383aac77d96a03e4d38f7daba893cd35fc76.1762812360.git.lorenzo.stoakes@oracle.com>
+References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
+ <c879383aac77d96a03e4d38f7daba893cd35fc76.1762812360.git.lorenzo.stoakes@oracle.com>
+Content-Type: text/plain
+X-ClientProxiedBy: BL1PR13CA0439.namprd13.prod.outlook.com
+ (2603:10b6:208:2c3::24) To DS7PR12MB9473.namprd12.prod.outlook.com
+ (2603:10b6:8:252::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251108004524.1600006-3-yosry.ahmed@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|MN0PR12MB5881:EE_
+X-MS-Office365-Filtering-Correlation-Id: cfbb3817-367b-4c2a-26cf-08de20d2005d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?gAIge3gskcRqDxzv5xi4+a8G1uPZYkJm6OO4w8+hQ+BjJh14JpOhDWPkTZia?=
+ =?us-ascii?Q?g2q1hBE6JnJHZphSP7mlvcaxfQrLLTSGaMxn5OKyt9PGj/DboD6Am9mD7A/G?=
+ =?us-ascii?Q?35ttTb52bpVUEXif9zxYO2X2w59XEjH11UOFRZUOdsdP+J73bWcriVw9km8h?=
+ =?us-ascii?Q?avvdFDQFvxjgduuix0dpCbNAFKxSbhgzKHR8LkCK1dqmH21XL3utL22QjaMW?=
+ =?us-ascii?Q?E9qlJOKvXOn8Bg75aI84ZKePBwKqbRgI0GEXfl7mjP5aNQynyqii/0S3Kz18?=
+ =?us-ascii?Q?IPqHSsAeLXMqpeDT0R05yOEJ8j1wJ6pM+96AVqTtja8NmT7nJBJ45qKXYFDc?=
+ =?us-ascii?Q?U3qYP/M4z6m0S2Hp4KyjyF7bllUAIpuj+WaCjqO+nDnAQDTvKE07fIIIsFH2?=
+ =?us-ascii?Q?4DCPWyxvGJW6M0HtwHqZEshqViEVFcmyHSyPjj49d7hu4cy04F/zhs/HZDVY?=
+ =?us-ascii?Q?bgfbi35Lndvsmd3tXakj7wyw/41Vf+DZ3KLzDbVNA98daVcvK2+IQ0xwPjzt?=
+ =?us-ascii?Q?QdDFbOtSI38i6WK3pEC9Ir7LjZ/gfc8JoAIVkWGustU/AMFkk/30+jw5X1Zy?=
+ =?us-ascii?Q?HJHZT2DYvwlNInWdfQ0xPXSZHKALVV7OZJ1OKR2rTAvqpB+jI+l9vPLhZLqf?=
+ =?us-ascii?Q?pUGv2ANs4NkS5cDidx5jy1oSDBwM7JTy57AcWYtk6ifRsElVIs7DNyS0AuO6?=
+ =?us-ascii?Q?63YzEia16/CEWmBjLw5Y+Lf3LUcX/PUFqaiVt7igZL/hbyBv1OTHr9d/2hmR?=
+ =?us-ascii?Q?MErWmpjrQQ/3WoginnvfiYoxEOVfbOP1clueXE/wN7MT3RByNpJ2QRAJitbP?=
+ =?us-ascii?Q?AtkoLq0i2qsVktJ8d64dEVMi8Rdu+Ststy0hnfyc1lT5wv5l8FUEn/S9CnsR?=
+ =?us-ascii?Q?qm8O5yimHYrRSR6Kb2J+xTOS+nylhGAYsfKP3Ol+9QtU5/jbHEy+AQKfyA5G?=
+ =?us-ascii?Q?+VvzysnxzURL1GsUAHoOnVq+39w6gyXLZuvDUbBS8CW04SdN8Nwh0/RbzMMh?=
+ =?us-ascii?Q?Kl9278pq/IVHti4psf+zc4r3moZyYhnioYErF5f0oCfRSaVZjFioWazZ1dsG?=
+ =?us-ascii?Q?IuGvg7CIaTBQVrzrGTscvGL6dywI0bu9VlCLJJu1pzXI0d5VHL4nD//Eu7ub?=
+ =?us-ascii?Q?GCrH8F691azfKIPI+rEfrDTWaihW2kHADW+JV615olZz2AICr3kEMliXCPZ6?=
+ =?us-ascii?Q?HeSPmtF3bbaonsSVr0OwD4zI12l1dSbTwhX+arFVTCOnvYcjZqeTKKF51mAQ?=
+ =?us-ascii?Q?n7i++oYFAle5rqNfTIrK98rNztTmW51vfElaJqmd5lXngknk6nQUuJgIxyZh?=
+ =?us-ascii?Q?rpyIkcWN0c0enohUQ4ub8og3raVU0gPCcpCN3rwrmHGyv8R/DlqWN1/5piGc?=
+ =?us-ascii?Q?nkrrdP4JL2+vBF1W/8DTKalJj7yIEHlQOdtDRIkEnvg85qvOa0HT1J+usZdB?=
+ =?us-ascii?Q?C2+ReZ9Vmoi/w+N/Lh7ObE7JX7WQ17F4?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?wXaFwKf5XzPLP1TGuWDOyNKkfs5VoR4hygRbt7PBa7jYBhlta7TKzeunihjM?=
+ =?us-ascii?Q?VXgfNGPO13e62+QjGOOX/nvx4zu89vsUc3gisn2euZHEu8BRCX0GGB2Nyd8K?=
+ =?us-ascii?Q?Z7TsBlbilKgMWRcxnDd6dLEYiPrdKkLw5E3HXnUeQujc110oIZu9QRCGFGfo?=
+ =?us-ascii?Q?VQsh2dWfnbN92QjI71J7NOSupBnqqeIfeVDuEi3a7ArGYqcpQvySOHZOBVrk?=
+ =?us-ascii?Q?kzavHnqDfsLIPbkXJtGNQ698h2H66xQo1H0RqlhxwKkoTOZvlkBgUIhwSCUJ?=
+ =?us-ascii?Q?z0EY5sCplqt/jyJSXO/UsJVfeSAWjn1ZPMVCEYj9Vn9k5NDj5N3cjfrmtYno?=
+ =?us-ascii?Q?diC2dW8+pMjeu5oz8PeRMbWNaHeZEGKCWcs6oxAEKsdWgJTCZNW6A6Fk7ZlR?=
+ =?us-ascii?Q?8Bw4EXye59VcIPXRwzdEvb0+9J2T+SHXwGAuuaCi5YNMZK5G/egzy4FoG7a7?=
+ =?us-ascii?Q?ssJekc3mY+hu6Nf+H3l5KbMUqlrPcLDAH/URIoY4DRgnBMMgtyqfrzbvEsSC?=
+ =?us-ascii?Q?MW04GUrMOScZLBarBF1Qf0cBairruYoKVnPeUF0Sbomsxy2FbMjydb8eHsLs?=
+ =?us-ascii?Q?+Ps6wQkZoAUfFQWErjTEFvFS9dllHtqHX35L8MVxPXcuaCRedZ5WFHtO/gb3?=
+ =?us-ascii?Q?ABrNtU850PlQwRksnvxDcyfl91iDFiz7/nqcg6oyObRsE3Gj/SEZV8NbIRuC?=
+ =?us-ascii?Q?vY8AW6yh9g/4fGlFhsS2nxzXzXZeRgk1RWFCgJfpRDYF/mX8/XxuWAv+cvjz?=
+ =?us-ascii?Q?i5dGJC53FZzktFRFWPqpBuhQoj4/kXoMQUjSVRLgBq6pHTxPHzMRnPV0kSRo?=
+ =?us-ascii?Q?OAGHzU9FBctamdGw8zwLAgN4DNnxhSFJt6xsh7Fh9NvZb+5BvRfqbo8IcNIi?=
+ =?us-ascii?Q?Aj4ssxaLMn55TOy4tWbdyhXDfbYfdCrLEPEDznus3jcqCqqWFMDISZWejf47?=
+ =?us-ascii?Q?XVB+FyqsHnMityUdDKaH8U5GkzDcckRfgLjF72m8aDhb8PrGaWcLX0gI3L5v?=
+ =?us-ascii?Q?IYaG4V526yKUWIDrk+yodY1TFeG4xmof+nAwb2NZg1Y3+uKqg0Rj4/ITD5Sm?=
+ =?us-ascii?Q?saa4pXAzzFqM0jCBGWvX/FCxRGDgQ82ufgQxo1w/hE7iuXq5IoVecgL+hfk1?=
+ =?us-ascii?Q?n0zPJW2P4C5x9LBR3pq5pHr/MrHFS+QYL0N4r6A7xCSHagg0befqwtmMFLn+?=
+ =?us-ascii?Q?ZD9cqU/2ZY0FsOxe3iSVx4P9XWwGm/kff+dX+MtdwxkoQUY+1rnrAUEl4PmD?=
+ =?us-ascii?Q?EDCzb28IWbQVYKoVu0QOZ4WVOH+F715LRmHWoi1mzdAZ9TWu/1BtcxxvJxGP?=
+ =?us-ascii?Q?4cvyLIHJE7I3LyrjKWmFjS+PouQP6c4c8ggf5XmGlJPmY9XjB/ywnitZxbaf?=
+ =?us-ascii?Q?fQhwZ3laSAlleox2aqTGRTl462MiApgyNajweI4zUqEHHrUHZtunL82xIsJ8?=
+ =?us-ascii?Q?0VERmbeudrEXSoacWBEAOM91+M3upMCdKm01dezvMwbDzOVTLupDzRqyDZM6?=
+ =?us-ascii?Q?4IJmiIpOYgDqIELMxYI6wjV4YAvMhEY2kGXVtXcEi9MEVzuY8r6YIlOZ8r8H?=
+ =?us-ascii?Q?AmZ4EUUqLX57Gznj/zgPDtaqbXnjNPgjXpJp3JRC?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cfbb3817-367b-4c2a-26cf-08de20d2005d
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2025 03:25:45.5971
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eAAdXOF4E5RKnARcMAg+R9tax9eeAsQA897Vpu7k4Lw/d0KqVfeGXIPmHUjZNTh2
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5881
 
-On Sat, Nov 08, 2025 at 12:45:20AM +0000, Yosry Ahmed wrote:
-> svm_update_lbrv() is called when MSR_IA32_DEBUGCTLMSR is updated, and on
-> nested transitions where LBRV is used. It checks whether LBRV enablement
-> needs to be changed in the current VMCB, and if it does, it also
-> recalculate intercepts to LBR MSRs.
-> 
-> However, there are cases where intercepts need to be updated even when
-> LBRV enablement doesn't. Example scenario:
-> - L1 has MSR_IA32_DEBUGCTLMSR cleared.
-> - L1 runs L2 without LBR_CTL_ENABLE (no LBRV).
-> - L2 sets DEBUGCTLMSR_LBR in MSR_IA32_DEBUGCTLMSR, svm_update_lbrv()
->   sets LBR_CTL_ENABLE in VMCB02 and disables intercepts to LBR MSRs.
-> - L2 exits to L1, svm_update_lbrv() is not called on this transition.
-> - L1 clears MSR_IA32_DEBUGCTLMSR, svm_update_lbrv() finds that
->   LBR_CTL_ENABLE is already cleared in VMCB01 and does nothing.
-> - Intercepts remain disabled, L1 reads to LBR MSRs read the host MSRs.
-> 
-> Fix it by always recalculating intercepts in svm_update_lbrv().
+On 10 Nov 2025, at 17:21, Lorenzo Stoakes wrote:
 
-This actually breaks hyperv_svm_test, because svm_update_lbrv() is
-called on every nested transition, calling
-svm_recalc_lbr_msr_intercepts() -> svm_set_intercept_for_msr() and
-setting svm->nested.force_msr_bitmap_recalc to true.
+> The kernel maintains leaf page table entries which contain either:
+>
+> - Nothing ('none' entries)
+> - Present entries (that is stuff the hardware can navigate without fault)
 
-This breaks the hyperv optimization in nested_svm_vmrun_msrpm() AFAICT.
+This is not true for:
 
-I think there are two ways to fix this:
-- Add another bool to svm->nested to track LBR intercepts, and only call
-  svm_set_intercept_for_msr() if the intercepts need to be updated.
+1. pXX_protnone(), where _PAGE_PROTNONE flag also means pXX_present() is
+true, but hardware would still trigger a fault.
+2. pmd_present() where _PAGE_PSE also means a present PMD (see the comment
+in pmd_present()).
 
-- Update svm_set_intercept_for_msr() itself to do nothing if the
-  intercepts do not need to be changed, which is more clutter but
-  applies to other callers as well so could shave cycles elsewhere (see
-  below).
+This commit log needs to be updated.
 
-Sean, Paolo, any preferences?
+> - Everything else that will cause a fault which the kernel handles
 
-Here's what updating svm_set_intercept_for_msr() looks like:
+This is not true because of the reasons above.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2fbb0b88c6a3e..b1afafc8b37c0 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -664,24 +664,36 @@ void svm_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type, bool se
- {
-        struct vcpu_svm *svm = to_svm(vcpu);
-        void *msrpm = svm->msrpm;
-+       bool recalc = false;
-+       bool already_set;
+How should we categorize these non-present to HW but present to SW entries,
+like protnone and under splitting PMDs? Strictly speaking, they are
+softleaf entries, but that would require more changes to the kernel code
+and pXX_present() means HW present.
 
-        /* Don't disable interception for MSRs userspace wants to handle. */
-        if (type & MSR_TYPE_R) {
--               if (!set && kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_READ))
-+               already_set = svm_test_msr_bitmap_read(msrpm, msr);
-+               if (!set && already_set && kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_READ)) {
-                        svm_clear_msr_bitmap_read(msrpm, msr);
--               else
-+                       recalc = true;
-+               } else if (set && !already_set) {
-                        svm_set_msr_bitmap_read(msrpm, msr);
-+                       recalc = true;
-+               }
-        }
+To not make this series more complicated, I think updating commit log
+and comments to use pXX_present() instead of HW present might be
+the easiest way out. We can revisit pXX_present() vs HW present later.
 
-        if (type & MSR_TYPE_W) {
--               if (!set && kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_WRITE))
-+               already_set = svm_test_msr_bitmap_write(msrpm, msr);
-+               if (!set && already_set && kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_WRITE)) {
-                        svm_clear_msr_bitmap_write(msrpm, msr);
--               else
-+                       recalc = true;
-+               } else if (set && !already_set) {
-                        svm_set_msr_bitmap_write(msrpm, msr);
-+                       recalc = true;
-+               }
-        }
+OK, I will focus on code review now.
 
--       svm_hv_vmcb_dirty_nested_enlightenments(vcpu);
--       svm->nested.force_msr_bitmap_recalc = true;
-+       if (recalc) {
-+               svm_hv_vmcb_dirty_nested_enlightenments(vcpu);
-+               svm->nested.force_msr_bitmap_recalc = true;
-+       }
- }
-
- void *svm_alloc_permissions_map(unsigned long size, gfp_t gfp_mask)
-
-> 
-> Fixes: 1d5a1b5860ed ("KVM: x86: nSVM: correctly virtualize LBR msrs when L2 is running")
-> Cc: stable@vger.kernel.org
-> 
-> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+>
+> In the 'everything else' group we include swap entries, but we also include
+> a number of other things such as migration entries, device private entries
+> and marker entries.
+>
+> Unfortunately this 'everything else' group expresses everything through
+> a swp_entry_t type, and these entries are referred to swap entries even
+> though they may well not contain a... swap entry.
+>
+> This is compounded by the rather mind-boggling concept of a non-swap swap
+> entry (checked via non_swap_entry()) and the means by which we twist and
+> turn to satisfy this.
+>
+> This patch lays the foundation for reducing this confusion.
+>
+> We refer to 'everything else' as a 'software-define leaf entry' or
+> 'softleaf'. for short And in fact we scoop up the 'none' entries into this
+> concept also so we are left with:
+>
+> - Present entries.
+> - Softleaf entries (which may be empty).
+>
+> This allows for radical simplification across the board - one can simply
+> convert any leaf page table entry to a leaf entry via softleaf_from_pte().
+>
+> If the entry is present, we return an empty leaf entry, so it is assumed
+> the caller is aware that they must differentiate between the two categories
+> of page table entries, checking for the former via pte_present().
+>
+> As a result, we can eliminate a number of places where we would otherwise
+> need to use predicates to see if we can proceed with leaf page table entry
+> conversion and instead just go ahead and do it unconditionally.
+>
+> We do so where we can, adjusting surrounding logic as necessary to
+> integrate the new softleaf_t logic as far as seems reasonable at this
+> stage.
+>
+> We typedef swp_entry_t to softleaf_t for the time being until the
+> conversion can be complete, meaning everything remains compatible
+> regardless of which type is used. We will eventually remove swp_entry_t
+> when the conversion is complete.
+>
+> We introduce a new header file to keep things clear - leafops.h - this
+> imports swapops.h so can direct replace swapops imports without issue, and
+> we do so in all the files that require it.
+>
+> Additionally, add new leafops.h file to core mm maintainers entry.
+>
+> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 > ---
->  arch/x86/kvm/svm/svm.c | 29 +++++++++++++++++++----------
->  1 file changed, 19 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index d25c56b30b4e2..26ab75ecf1c67 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -806,25 +806,29 @@ void svm_copy_lbrs(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
->  	vmcb_mark_dirty(to_vmcb, VMCB_LBR);
->  }
->  
-> -void svm_enable_lbrv(struct kvm_vcpu *vcpu)
-> +static void __svm_enable_lbrv(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  
->  	svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
-> -	svm_recalc_lbr_msr_intercepts(vcpu);
->  
->  	/* Move the LBR msrs to the vmcb02 so that the guest can see them. */
->  	if (is_guest_mode(vcpu))
->  		svm_copy_lbrs(svm->vmcb, svm->vmcb01.ptr);
->  }
->  
-> -static void svm_disable_lbrv(struct kvm_vcpu *vcpu)
-> +void svm_enable_lbrv(struct kvm_vcpu *vcpu)
-> +{
-> +	__svm_enable_lbrv(vcpu);
-> +	svm_recalc_lbr_msr_intercepts(vcpu);
-> +}
-> +
-> +static void __svm_disable_lbrv(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  
->  	KVM_BUG_ON(sev_es_guest(vcpu->kvm), vcpu->kvm);
->  	svm->vmcb->control.virt_ext &= ~LBR_CTL_ENABLE_MASK;
-> -	svm_recalc_lbr_msr_intercepts(vcpu);
->  
->  	/*
->  	 * Move the LBR msrs back to the vmcb01 to avoid copying them
-> @@ -853,13 +857,18 @@ void svm_update_lbrv(struct kvm_vcpu *vcpu)
->  			    (is_guest_mode(vcpu) && guest_cpu_cap_has(vcpu, X86_FEATURE_LBRV) &&
->  			    (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK));
->  
-> -	if (enable_lbrv == current_enable_lbrv)
-> -		return;
-> +	if (enable_lbrv && !current_enable_lbrv)
-> +		__svm_enable_lbrv(vcpu);
-> +	else if (!enable_lbrv && current_enable_lbrv)
-> +		__svm_disable_lbrv(vcpu);
->  
-> -	if (enable_lbrv)
-> -		svm_enable_lbrv(vcpu);
-> -	else
-> -		svm_disable_lbrv(vcpu);
-> +	/*
-> +	 * During nested transitions, it is possible that the current VMCB has
-> +	 * LBR_CTL set, but the previous LBR_CTL had it cleared (or vice versa).
-> +	 * In this case, even though LBR_CTL does not need an update, intercepts
-> +	 * do, so always recalculate the intercepts here.
-> +	 */
-> +	svm_recalc_lbr_msr_intercepts(vcpu);
->  }
->  
->  void disable_nmi_singlestep(struct vcpu_svm *svm)
-> -- 
-> 2.51.2.1041.gc1ab5b90ca-goog
-> 
+>  MAINTAINERS                   |   1 +
+>  fs/proc/task_mmu.c            |  26 +--
+>  fs/userfaultfd.c              |   6 +-
+>  include/linux/leafops.h       | 387 ++++++++++++++++++++++++++++++++++
+>  include/linux/mm_inline.h     |   6 +-
+>  include/linux/mm_types.h      |  25 +++
+>  include/linux/swapops.h       |  28 ---
+>  include/linux/userfaultfd_k.h |  51 +----
+>  mm/hmm.c                      |   2 +-
+>  mm/hugetlb.c                  |  37 ++--
+>  mm/madvise.c                  |  16 +-
+>  mm/memory.c                   |  41 ++--
+>  mm/mincore.c                  |   6 +-
+>  mm/mprotect.c                 |   6 +-
+>  mm/mremap.c                   |   4 +-
+>  mm/page_vma_mapped.c          |  11 +-
+>  mm/shmem.c                    |   7 +-
+>  mm/userfaultfd.c              |   6 +-
+>  18 files changed, 502 insertions(+), 164 deletions(-)
+>  create mode 100644 include/linux/leafops.h
+>
+
+
+Best Regards,
+Yan, Zi
 
