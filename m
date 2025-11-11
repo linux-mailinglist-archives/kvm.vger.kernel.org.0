@@ -1,169 +1,291 @@
-Return-Path: <kvm+bounces-62720-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62722-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F874C4BA55
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 07:21:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BA0EC4BAD6
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 07:28:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F141234E87C
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 06:21:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3541E3A3D0D
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 06:28:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E682D839E;
-	Tue, 11 Nov 2025 06:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1B02D739A;
+	Tue, 11 Nov 2025 06:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="afqfaflZ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="dJwQKWHR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010028.outbound.protection.outlook.com [52.101.85.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630652D7805
-	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 06:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762842028; cv=none; b=tEmd/urJKOO6We7aDUiecXMuJHwSSXSrGWWZ0JIXYbnLWxqwqOLNpLjZHgV4Oatp688sj32tNG9Ogv85SXUD7EqYOC3vaE6HT0hfMPeKxOcT8KFWjZ+etlhdUMAlwn2djfsroUYpGelhKL7Uwlrih4QtDO1+jgEFZEMLdFNorBc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762842028; c=relaxed/simple;
-	bh=hklp8k3vCs8qAvGdbHaR+MQTpXuKOGRarVJqZuShxOo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fyNydPXGaInpk6vws/yVBH63UG0w7bR2b//6ixub4BdUp9VSLQYPy+Wni61o0u69DcZwHQBKSWgdiLne9PPqaH8ZtZr/up4hZM2Q5LjZTWoowQs3z4QIeAn+ulIR5y4FKgRRq0WUGyb77H3YdYHJFpjRm8Sxah25jX7i4/GBpjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=afqfaflZ; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AB68EI8001041;
-	Tue, 11 Nov 2025 06:20:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=vOa3O
-	0dowZ7B+SXuKhootqsWVoB6Ku5f0N3qcBEwP3s=; b=afqfaflZdpQdS3BpNltJR
-	ZWSOSQRcxDwAl/El3nXiuW4Gtjc/kur/D7TEQjqrIBvJ8L3lHWWfNdQlbxD4bOo6
-	gn7N0UyDYtWA5Rz2K7bFvzRoQwv9e1XR7jmiFa9vGBnATf3BmyxKaD/ooY/JXrx0
-	wJcf8hrHxQ3I77zasD34n7ZwDIvdUcO2RMNreLiRuaP6NUsLD92fsFXQWB/o+O7z
-	xm2OIaN3vj3JQdlRJr+MuJ2YlGWCi2dd62qL5UkWBkX48DJ9xiUQiph7ojmxLvS3
-	/VVokBz7XoiEKRfexSQxzGlNAACYkupjbb4Qyt+Z8UBz8fBKr5WF7PSpFMkJh57H
-	Q==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4abxrt82q7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 11 Nov 2025 06:20:03 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AB51YH3007485;
-	Tue, 11 Nov 2025 06:20:02 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4a9va9mkeu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 11 Nov 2025 06:20:02 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AB6C6r1029277;
-	Tue, 11 Nov 2025 06:20:02 GMT
-Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4a9va9mk84-10;
-	Tue, 11 Nov 2025 06:20:02 +0000
-From: Dongli Zhang <dongli.zhang@oracle.com>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
-        sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
-        like.xu.linux@gmail.com, groug@kaod.org, khorenko@virtuozzo.com,
-        alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
-        davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
-        dapeng1.mi@linux.intel.com, joe.jin@oracle.com, ewanhai-oc@zhaoxin.com,
-        ewanhai@zhaoxin.com
-Subject: [PATCH v7 9/9] target/i386/kvm: don't stop Intel PMU counters
-Date: Mon, 10 Nov 2025 22:14:58 -0800
-Message-ID: <20251111061532.36702-10-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20251111061532.36702-1-dongli.zhang@oracle.com>
-References: <20251111061532.36702-1-dongli.zhang@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD492D0C7A;
+	Tue, 11 Nov 2025 06:28:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.28
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762842511; cv=fail; b=JKfoaXFMWZhMswyACgtLnE0peFkXkmOy4f3bDUOa6M95kWtsNl7Y1JfiA9uJGePQDk0g+sfaXrzp4OiPTz+SnK/rNFGBW4mMHW3Vi3FQSWeahdSOAuS6L68rVyKZ1vaFdXWoIUAx7zNcect68qRAvp2xqcwptu5MCw3FUpjjVQ0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762842511; c=relaxed/simple;
+	bh=vvjkNG/cIS1+9yN5fPFmlIWIPeb7AMAsbNBlrUmswxM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Jiq1eX0FKpDEuQ9y+blfcVAb14YpDLihYQ1qki8HdZhR1vEYBY6UwA2YJ97y5JGZzbr2UnMI+BbO1GqQYzo91G5ueNeSDKMPAvd0kKrlhHiuRclCyWjpQ0OBY+uG37PGKf7VJig0dKbAKqv8sZJS9/KCc+7JGILW+4vGzeihla8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=dJwQKWHR; arc=fail smtp.client-ip=52.101.85.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PNSxBvrYRlN+sWJgCUWpQ5twrY0RHqV/CebtCDAjgZ3FyTujKizP9IdS6JEH/QaA+Jr0ZCjG50CyVl74jM+uxh+kCCEHuwVrbatOGgQLwXuxp5+N3LzjsG/4S5VpxJErubAUnhcVisksaO7AVKRk8gegDl1sYDNilizCzn6DkBE8He7mMwgQNEu1kmAXbfV2sTz7vAnYAavPlU7c30iFnHMpIy+gDgZN2z3Tqevk0brxn3emM3JG2TjvTeRhVRHM4uK50bWrh0tKoAf06jnsO/sjh63Z3PU5B11qnSIMxwTtuDKvkWC4dC1j1JQ4pxlrcuUuU60WMWIqucIKXG4rPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=26CZP3n03XL1oyHKQ6x1nClQkVh4Koje3/Kbb+rSW8c=;
+ b=pZcfhVWE6byE7ko2cD+DE9XSRcIBZDtGAx3ZdcQ/lNIr1UrWMWW0M7b9o87s2/uaAJex8KGTT06GA2vTXWIJYKpM0ldJDsXjKzV7QD+hlS3XYyDo4A41nV92RuKIUPL8aqBd+g1goMiXH3p4Xidg+bhJjz+d0nM/RnOpRwtPEWwFMY4YfuCigyl80Lpx7+gXhJEwBlcMcu75b6VIfe+FZx8jSYCA11yFt8URaUJ4NXXLLP6PsXYpvZNdk7dhHYyEqqME1Gx0NnZ1SY+GvfmHjbJbRzURyPP31MmV284Axzzo5oNu3+L/Neys9NjL6nKSgBOlStm1HGQBfSiM7tz2hA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gmail.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=26CZP3n03XL1oyHKQ6x1nClQkVh4Koje3/Kbb+rSW8c=;
+ b=dJwQKWHReV9m82zeuQAMXZ6f8OptN1epO2X+xHmhFH0vropINt35EoOW507DH8pNKXYjk6UoGbet9AAlgClA0h2gyryZUM1MbjdBZ23X7ENVJsA03Lglt5BwBWPxxEJfW5n2GUMKPaB0CTitZWTzAsMr+GQrZxGp06GsUMDTu/A=
+Received: from DM6PR04CA0019.namprd04.prod.outlook.com (2603:10b6:5:334::24)
+ by MW3PR12MB4425.namprd12.prod.outlook.com (2603:10b6:303:5e::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.13; Tue, 11 Nov
+ 2025 06:28:26 +0000
+Received: from DS2PEPF0000343C.namprd02.prod.outlook.com
+ (2603:10b6:5:334:cafe::3c) by DM6PR04CA0019.outlook.office365.com
+ (2603:10b6:5:334::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9320.15 via Frontend Transport; Tue,
+ 11 Nov 2025 06:28:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
+Received: from satlexmb08.amd.com (165.204.84.17) by
+ DS2PEPF0000343C.mail.protection.outlook.com (10.167.18.39) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9320.13 via Frontend Transport; Tue, 11 Nov 2025 06:28:26 +0000
+Received: from satlexmb10.amd.com (10.181.42.219) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 10 Nov
+ 2025 22:28:25 -0800
+Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb10.amd.com
+ (10.181.42.219) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 10 Nov
+ 2025 22:28:25 -0800
+Received: from [10.136.37.117] (10.180.168.240) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Mon, 10 Nov 2025 22:28:22 -0800
+Message-ID: <7bc4b0b7-42ea-42fc-ae96-3084f44bdc81@amd.com>
+Date: Tue, 11 Nov 2025 11:58:21 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-11_01,2025-11-10_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0 spamscore=0
- mlxscore=0 bulkscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
- definitions=main-2511110047
-X-Authority-Analysis: v=2.4 cv=c7+mgB9l c=1 sm=1 tr=0 ts=6912d593 cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8 a=QyXUC8HyAAAA:8
- a=A3X0-5CtyMG_TZ3YDawA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: BYFQM3QWp1zg9QQetq0jN3TAyQiGpIK2
-X-Proofpoint-ORIG-GUID: BYFQM3QWp1zg9QQetq0jN3TAyQiGpIK2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTExMDAzNyBTYWx0ZWRfXxVqqfR43JXih
- 5DJYzk7bUayrJf9ZbOgHOViXKF/tnrGfaNaJfZWaut6ANQxGGx1cqQ2gXbc3DhZYFLswgu81cLx
- Uua38HQomTlDNrb3OnP1+Ioi1F8bBzXdSnlAPL1AhmqPcy8Un1igBJh+o5DssLrjn+mer4+WH6i
- jl/Iq4gJGjr8ozY0xzDkHfoD4nhxIJFpMf/Kyey+W3J+Zhw7b1mH1ynngjz1R0cFiLVXlwDTFWH
- KTk6+7KwaqsfTOazib7na3Ri/5H5XQCA8hBgny/LINq+SD5SjhXDnh036saZWHeAwlddetACyWa
- LdMvwF3LM/AwH13JNU2pM7dwwKn79cluKKYFiOVym2A3q9qaGYZa0XsUNlEZAyAX68xbFdKZv8l
- dLhTuL+azuhrvCzvcmdcystHWy1/Bg==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/10] sched/kvm: Semantics-aware vCPU scheduling for
+ oversubscribed KVM
+To: Wanpeng Li <kernellwp@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, "Paolo
+ Bonzini" <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+CC: Steven Rostedt <rostedt@goodmis.org>, Vincent Guittot
+	<vincent.guittot@linaro.org>, Juri Lelli <juri.lelli@redhat.com>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Wanpeng Li
+	<wanpengli@tencent.com>
+References: <20251110033232.12538-1-kernellwp@gmail.com>
+Content-Language: en-US
+From: K Prateek Nayak <kprateek.nayak@amd.com>
+In-Reply-To: <20251110033232.12538-1-kernellwp@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF0000343C:EE_|MW3PR12MB4425:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32a8036e-a836-447c-83ea-08de20eb8572
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|30052699003|1800799024|376014|7416014|82310400026|36860700013|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aVZvTUpiWkM0eVBlQzJmUnRIVHd0ZE9tMGkxaEp6WDVpTHF2UkUyUVU1clND?=
+ =?utf-8?B?ek9RdG5xejI0aytoWEYrTWtaeXhFaUJrRHlqUitEZkcxWFltWEdCY2dEcGxs?=
+ =?utf-8?B?c1RGSXpha3h6RUI5UEZkQWFsU3JhS2ZPRVBoSkpTTXhUNFhPaHRkUFNhZmVp?=
+ =?utf-8?B?WEkzRURvV1RUY0wwWmhnMzFKVHJHeENQUHVGSkF0a25hWENnUWpkNnZpTDNX?=
+ =?utf-8?B?SFZmcXZKY2V1UEE2MXdTMTVJQStqLzNKMWxucXBmY1d2THN3bHdOVy9kOHV5?=
+ =?utf-8?B?eWJ1Q3BrdEMwbHZER3RNYlBJTUIvUnpSbzRNc3dUTFp3Qi9WUnlIeFptQ3pR?=
+ =?utf-8?B?UlIzdTlnSXo4WGRiaHowRlU1NGRPZTV4N0RmOHZBZkt6MEJEeGliMTZtMisz?=
+ =?utf-8?B?NXFCVmN0eGJmTkZGWm9GWlVXeTNnT0FSY1o3UE11SUdnMFpjdy82UWtzSVFj?=
+ =?utf-8?B?QWpITXg2KzR2RS80SWszVE9MWkZnSHJ5L1JlcFg4RldEbjgxN242eEhQWUF3?=
+ =?utf-8?B?R1Bic05nQ2dPQ3daY3RxSVBjRVNPZWkyMTIzblBrWk5EbkkxRnc5T0Z3VmJp?=
+ =?utf-8?B?S2ZzTWZIYXcwYmdDQmoxZmtMN3lQZ05DRFFPZzRKT2p5bEJ2VUZBd0ZmYlpL?=
+ =?utf-8?B?bk1aeWFWNzV5Znl4d3Zra1FsWm9GV256dFdOaURCVHZwdC9uQzdkZDZpNXBU?=
+ =?utf-8?B?VzlhYVpGRE5JMWJuV3duK3pEM3JETzRobFpVbGJ1QXl6bU9VQmdic1BVTnZy?=
+ =?utf-8?B?OHlsaEo4NU9lQWlRRUQ2Q1IreHFNQktVUjc2NW9vaVZLTi8reDlPMGxoRWsx?=
+ =?utf-8?B?TklnQzRDUmRSY0NlWGlBN3RQL0xSVDMxWDBySmJDdUZ0b1NOYzljS2Zva0cz?=
+ =?utf-8?B?WlRxc042ZndKUnNiUkdkUmdkREJ0cTBzNkllWThqMTh4UHVxNHFwNFJudWRR?=
+ =?utf-8?B?UXZTU1JDYm43V21UbGlITG1hVVA1dmFWc2dZWStyME56NGVIWlF5QSszTEpQ?=
+ =?utf-8?B?cTRSYVRGeUJnRktNajZPSFpsbUR6N0l0WTdwSktiUHRRS3FVaHN1STFETGI2?=
+ =?utf-8?B?WnR1VmNjSDZ6LzdLeS9FODVkTGJiTkk3Yk9RWjZySVNDV3NFZklaSGs0TlZv?=
+ =?utf-8?B?VTNhSUUySnhTVVUyRDZDTERYUHpGL1JYaUI5dnRyODEvd2RzS1BZMHFWQ1p0?=
+ =?utf-8?B?VERXYmxzUENXaXRFREhrRG03Vk5jdUJlQWFmejN1eU10WkhZVzFZZDhtOGsw?=
+ =?utf-8?B?OEZBSS9FL1JtOTQ3MkkzNmVDQVFKaEtNajN2TkdXemNReURYaVg3dG14VmRB?=
+ =?utf-8?B?a250TnorT2NWV2RpbU5FOW13WHNaUmptOW1VYnA5RmxCYkkyUjROMDBWem4v?=
+ =?utf-8?B?NjJ5aWp2ZFRNTUY4di9BMnVVNk9JSFp1MTRRZWtBcS9CUHVIRzQ0MFk1blph?=
+ =?utf-8?B?dWppdGY2Zmo0MnNGU0FPcUlwaWRHTUNjRXBPM3pJWG9ZQWdwTjhmTkN1VGNH?=
+ =?utf-8?B?MjBLKzlnN2tsTVpSUGRacGFjK0pRdFp2d0xzRTlnaksxQ05CLysyYWg4L0NW?=
+ =?utf-8?B?YzIrSTA4OWlyRHkvMjY4UzFaN3ErelVYZi9aVkZHekhKdzBoL2VtNUZReDJP?=
+ =?utf-8?B?K1F0d1RDK2xlanQrVGxMOXlMWm80a0FUcVBVYnRETzVORWdINEg5QUs1dHNC?=
+ =?utf-8?B?eis1TVUwakRudnFsQ04xYmREVkhWdjdyOGRLenlhNWE2T1Rwd3FUbGM5eGdD?=
+ =?utf-8?B?NG9xMzhlWkIwWjZVZWYyNzR5aHZscDFXYmZJdDBtU25DVVFZbnJSdHR1Qm4r?=
+ =?utf-8?B?ZGpxRkRCVHVCZHVDeGRJUTYvWlpsa3Z5NlZZRCtmRGVqMkRvTk04VTYzdExQ?=
+ =?utf-8?B?amRDT3NmN2ZWOVNKRFhOd2ZDODFvK216djE5Qm9Jazdzc0IybUowMk5pdjFO?=
+ =?utf-8?B?QmVQNDBqTWhrUGpubTVVczh5LzJlaGJlaUhPNTNXKzFTQkxCRklUdTIvZk1r?=
+ =?utf-8?B?aEhBZ09vTjk4S2pEdWVBYk9FWS82NlVhTGdCZW10NjVNOXhCWXBubjZWd1NR?=
+ =?utf-8?Q?Sq1k/N?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(30052699003)(1800799024)(376014)(7416014)(82310400026)(36860700013)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2025 06:28:26.0685
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32a8036e-a836-447c-83ea-08de20eb8572
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF0000343C.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4425
 
-PMU MSRs are set by QEMU only at levels >= KVM_PUT_RESET_STATE,
-excluding runtime. Therefore, updating these MSRs without stopping events
-should be acceptable.
+Hello Wanpeng,
 
-In addition, KVM creates kernel perf events with host mode excluded
-(exclude_host = 1). While the events remain active, they don't increment
-the counter during QEMU vCPU userspace mode.
+I haven't looked at the entire series and the penalty calculation math
+but I've a few questions looking at the cover-letter.
 
-Finally, The kvm_put_msrs() sets the MSRs using KVM_SET_MSRS. The x86 KVM
-processes these MSRs one by one in a loop, only saving the config and
-triggering the KVM_REQ_PMU request. This approach does not immediately stop
-the event before updating PMC. This approach is true since Linux kernel
-commit 68fb4757e867 ("KVM: x86/pmu: Defer reprogram_counter() to
-kvm_pmu_handle_event"), that is, v6.2.
+On 11/10/2025 9:02 AM, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> This series addresses long-standing yield_to() inefficiencies in
+> virtualized environments through two complementary mechanisms: a vCPU
+> debooster in the scheduler and IPI-aware directed yield in KVM.
+> 
+> Problem Statement
+> -----------------
+> 
+> In overcommitted virtualization scenarios, vCPUs frequently spin on locks
+> held by other vCPUs that are not currently running. The kernel's
+> paravirtual spinlock support detects these situations and calls yield_to()
+> to boost the lock holder, allowing it to run and release the lock.
+> 
+> However, the current implementation has two critical limitations:
+> 
+> 1. Scheduler-side limitation:
+> 
+>    yield_to_task_fair() relies solely on set_next_buddy() to provide
+>    preference to the target vCPU. This buddy mechanism only offers
+>    immediate, transient preference. Once the buddy hint expires (typically
+>    after one scheduling decision), the yielding vCPU may preempt the target
+>    again, especially in nested cgroup hierarchies where vruntime domains
+>    differ.
 
-No Fixed tag is going to be added for the commit 0d89436786b0 ("kvm:
-migrate vPMU state"), because this isn't a bugfix.
+So what you are saying is there are configurations out there where vCPUs
+of same guest are put in different cgroups? Why? Does the use case
+warrant enabling the cpu controller for the subtree? Are you running
+with the "NEXT_BUDDY" sched feat enabled?
 
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
----
-Changed since v3:
-  - Re-order reasons in commit messages.
-  - Mention KVM's commit 68fb4757e867 (v6.2).
-  - Keep Zhao's review as there isn't code change.
-Changed since v6:
-  - Add Reviewed-by from Dapeng Mi.
+If they are in the same cgroup, the recent optimizations/fixes to
+yield_task_fair() in queue:sched/core should help remedy some of the
+problems you might be seeing.
 
- target/i386/kvm/kvm.c | 9 ---------
- 1 file changed, 9 deletions(-)
+For multiple cgroups, perhaps you can extend yield_task_fair() to do:
 
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 5258023fe7..d0df53807f 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -4213,13 +4213,6 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
-         }
+( Only build and boot tested on top of
+    git.kernel.org/pub/scm/linux/kernel/git/peterz/queue.git sched/core
+  at commit f82a0f91493f "sched/deadline: Minor cleanup in
+  select_task_rq_dl()" )
+
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index b4617d631549..87560f5a18b3 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -8962,10 +8962,28 @@ static void yield_task_fair(struct rq *rq)
+ 	 * which yields immediately again; without the condition the vruntime
+ 	 * ends up quickly running away.
+ 	 */
+-	if (entity_eligible(cfs_rq, se)) {
++	do {
++		cfs_rq = cfs_rq_of(se);
++
++		/*
++		 * Another entity will be selected at next pick.
++		 * Single entity on cfs_rq can never be ineligible.
++		 */
++		if (!entity_eligible(cfs_rq, se))
++			break;
++
+ 		se->vruntime = se->deadline;
+ 		se->deadline += calc_delta_fair(se->slice, se);
+-	}
++
++		/*
++		 * If we have more than one runnable task queued below
++		 * this cfs_rq, the next pick will likely go for a
++		 * different entity now that we have advanced the
++		 * vruntime and the deadline of the running entity.
++		 */
++		if (cfs_rq->h_nr_runnable > 1)
++			break;
++	} while ((se = parent_entity(se)));
+ }
  
-         if ((IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env)) && pmu_version > 0) {
--            if (pmu_version > 1) {
--                /* Stop the counter.  */
--                kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
--                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
--            }
--
--            /* Set the counter values.  */
-             for (i = 0; i < num_pmu_fixed_counters; i++) {
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i,
-                                   env->msr_fixed_counters[i]);
-@@ -4235,8 +4228,6 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
-                                   env->msr_global_status);
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-                                   env->msr_global_ovf_ctrl);
--
--                /* Now start the PMU.  */
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
-                                   env->msr_fixed_ctr_ctrl);
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL,
+ static bool yield_to_task_fair(struct rq *rq, struct task_struct *p)
+---
+
+With that, I'm pretty sure there is a good chance we'll not select the
+hierarchy that did a yield_to() unless there is a large discrepancy in
+their weights and just advancing se->vruntime to se->deadline once isn't
+enough to make it ineligible and you'll have to do it multiple time (at
+which point that cgroup hierarchy needs to be studied).
+
+As for the problem that NEXT_BUDDY hint is used only once, you can
+perhaps reintroduce LAST_BUDDY which sets does a set_next_buddy() for
+the "prev" task during schedule?
+
+> 
+>    This creates a ping-pong effect: the lock holder runs briefly, gets
+>    preempted before completing critical sections, and the yielding vCPU
+>    spins again, triggering another futile yield_to() cycle. The overhead
+>    accumulates rapidly in workloads with high lock contention.
+> 
+> 2. KVM-side limitation:
+> 
+>    kvm_vcpu_on_spin() attempts to identify which vCPU to yield to through
+>    directed yield candidate selection. However, it lacks awareness of IPI
+>    communication patterns. When a vCPU sends an IPI and spins waiting for
+>    a response (common in inter-processor synchronization), the current
+>    heuristics often fail to identify the IPI receiver as the yield target.
+
+Can't that be solved on the KVM end? Also shouldn't Patch 6 be on top
+with a "Fixes:" tag.
+
+> 
+>    Instead, the code may boost an unrelated vCPU based on coarse-grained
+>    preemption state, missing opportunities to accelerate actual IPI
+>    response handling. This is particularly problematic when the IPI receiver
+>    is runnable but not scheduled, as lock-holder-detection logic doesn't
+>    capture the IPI dependency relationship.
+
+Are you saying the yield_to() is called with an incorrect target vCPU?
+
+> 
+> Combined, these issues cause excessive lock hold times, cache thrashing,
+> and degraded throughput in overcommitted environments, particularly
+> affecting workloads with fine-grained synchronization patterns.
+> 
 -- 
-2.39.3
+Thanks and Regards,
+Prateek
 
 
