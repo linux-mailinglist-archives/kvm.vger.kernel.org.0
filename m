@@ -1,102 +1,102 @@
-Return-Path: <kvm+bounces-62809-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62810-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB729C4F656
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 19:16:21 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BBC2C4F66C
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 19:17:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 204104F10D3
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 18:14:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BEF7934B476
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 18:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000343A1CFA;
-	Tue, 11 Nov 2025 18:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBC212BE05E;
+	Tue, 11 Nov 2025 18:17:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pp7R6GHM";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWT3Tfvm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AUu4JYj4";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zr9Lu9M/"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D6130AAD2
-	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 18:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19CC3254B18
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 18:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762884891; cv=none; b=Y9SEnTHd1Upf1CkilU8GWLr/Do8iJFUde0HQ6fkfBax3/FY77cdVogbLGfTI9kvp7ZqZw5jeMLjyBrIByGIhFWGWX8iA01/JU/sL74S/PzOYWpuDg9/pLCpYHs0WCt+LVWfrA72kMYf5sLGEQF6+j1dug9pgt1O3QrKyfg4exxI=
+	t=1762885036; cv=none; b=brIAm7F6N6uQKnTU7qDnt1sP7ZHYBDu8CbvR+CkrR+/AfIJGx46O7eYWlOygGxWSihO5s56QZ3o5vi5DuV2NcnRuyz4mgsm1ZYqju7XAoNu5kyTxv+8ylQmdVXO/FNiU32TYxQdL4M2QJwUwxR4MaDMKjXYCe37vHAxiT+3LPiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762884891; c=relaxed/simple;
-	bh=fjzkIKleHETgnvP4mpcyCEH4StUorlz7426aNCCVdDQ=;
+	s=arc-20240116; t=1762885036; c=relaxed/simple;
+	bh=6hts3DkE2BzY2m1GKyImcLooh3IaAGH4dYaJezwdHNc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eU4Qvv2pEUWNfh4SOqAo65tnDnMaO7Cm+XZo0NglRYGysNzLWpQK7Lbv3y6tGyxdCUU1JSHXYIWC4lJOD7UUcu6Iax2hjIl7xprHn9qwmkxAyZiuYLc8CzEXpIlZV5NoOlpl/xkm4pyLFgU31Fwfoxb/8plcvEgYJp+vfwx5G00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pp7R6GHM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EWT3Tfvm; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=oQCJeGR3rePHaTM2ARuTm4PDV2dIrQO7rr4cluBVyFQ/LIq97OwXgxgFpK/f3HQMcOp/U6RTcXUfkHjpiQY6yHfWKfh3aai3zS+kxQy5wOucYkq46KZ7Sql/PaNWIK/XTjH6v+sRnbG8DAXcjF2U2/N8cl6OhHKW5mKJC+msqXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AUu4JYj4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zr9Lu9M/; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762884887;
+	s=mimecast20190719; t=1762885034;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=XGonUkVU9GzwbNAYzZZD4KT8uaQRpiz1tcUeJPvRi8s=;
-	b=Pp7R6GHMwQfHA9h0AoLXljMinQ63NXCcyvEqwfZszll7R6Q0m7wa7NJ56swMP5VdXQPuG3
-	0JD1F7j3WpsTWD5CynCqwu3GMTjwaCCy9naI6PoNwfGBf2IgrsUvrCm3SuGkqURj6jO1lZ
-	WU17jcEYOSCiR+nU5/2fR+rBqW/hVIo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=/CQb3+BDzPWJy0/i2IahQqVF8wIN4ECXKW8e3nuZNe4=;
+	b=AUu4JYj4rZTJxhig2dTQIM0I3MZFC8LiIF90qOR87RTjIcnwE9oBKua8tvkWDSCMQCALD1
+	ReymL5XIMPyNmkD73AJY9Gur/kwn039OjOSyShNs1HuLpIyNY0JuswAq6Mb6EvegsaERbf
+	2xWfGiteXRBMpk+8+MXNoiJL62VW9sg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-155-WEAAbINoMk-ppW3Qt8l4gw-1; Tue, 11 Nov 2025 13:14:45 -0500
-X-MC-Unique: WEAAbINoMk-ppW3Qt8l4gw-1
-X-Mimecast-MFC-AGG-ID: WEAAbINoMk-ppW3Qt8l4gw_1762884884
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-429cceeeb96so2348653f8f.1
-        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 10:14:45 -0800 (PST)
+ us-mta-691-54t_W81KO1yahBlZGPZrwA-1; Tue, 11 Nov 2025 13:17:12 -0500
+X-MC-Unique: 54t_W81KO1yahBlZGPZrwA-1
+X-Mimecast-MFC-AGG-ID: 54t_W81KO1yahBlZGPZrwA_1762885031
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-475e032d81bso303455e9.3
+        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 10:17:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762884884; x=1763489684; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1762885031; x=1763489831; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XGonUkVU9GzwbNAYzZZD4KT8uaQRpiz1tcUeJPvRi8s=;
-        b=EWT3TfvmifWdrb0cXhmfstRZ3s7ciUuXq0o8UEZ2YXMvsiGI7dPHH5VljrK9+uGgPs
-         cfN8Ev9zBlVqXs2Inpb3rutxTBWEYFaY718/PfrStaGJzWkIycl3LB/rwfbIcbb8Jn4e
-         rzyfSz/C5LAyHs1kLm0vRA3M4bEZNfPpB9Hwio2A+Ywrtn6lhJ/nGVRQ+nF9q8UMLWBK
-         ZCtfPCoPu2nTWfzr/EgYDi6fq1sjRjLrPzRj+sRJXikfnJylGJ8h5JxYS8ycZWxMF29/
-         9YuJ00bmHZfgliLqDdXtz0VSna+NdNkjEV1YFlAFY8Eg5P0qs0vTGOsfnkafv7s5pdEg
-         nqkQ==
+        bh=/CQb3+BDzPWJy0/i2IahQqVF8wIN4ECXKW8e3nuZNe4=;
+        b=Zr9Lu9M/pb94In43sG4K8NN9vokcW1sS50FD67JP9nOkrTdGKcqZ+xBgUveDVAFtEF
+         EyN2OxiGp0FE21t4D0Q56JTgbF3RRY7L6Lr3z58wtaMocFdI7PExgCZ+dAJ7eYqsJr1e
+         D2H1Z5XRj+kuGCtBy31VvL3ghEstfZogeDIpUoFMvXWmtRIR4CRThsmjeGTQrnOLMphS
+         HKNaeQuUF9JOfRzupQSRMX2Bi7ZGh5zBIveu8b8gn9dOcw83aBZbrCFvZscLVQxnR3tw
+         SRHnZ4wbtt39wrWvJUoBDfdB8bRZlMhladWu7eTjl8MxUQ/dSy8vmajKp+18H2uRNfJY
+         /oew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762884884; x=1763489684;
+        d=1e100.net; s=20230601; t=1762885031; x=1763489831;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XGonUkVU9GzwbNAYzZZD4KT8uaQRpiz1tcUeJPvRi8s=;
-        b=lvSuYqRMYO/xrQWPumjfGPfR08AD1tqI/YNzxOvyjTmpTgHWBISQhOr80/l6v1C2lh
-         l/UVLxUnEwJ6jOCgmxpEVxOZrE43LRbW9YZo3kx97CMfvZATOfmGZUvMlri1zVlaEkm2
-         zvn0r88o8c8gCIrgKYIYJxvlc+kvYdB6ypr8C0ISovswWoM9mPr6Bh0ovGjgo1+0p/TF
-         f9glz0hAvyDVVfCKvdMbRa5q8spqvlU/O3Mgt3I+sQF79e91bqixeEtnLus+rDdG7/DE
-         rE5+kKrHey1v9d5Ht4f+WH+bzeGCOzgKv7raKs9HRf6IK2/9pe34ZyHuTQtuK59o+6z+
-         AWYw==
-X-Forwarded-Encrypted: i=1; AJvYcCW0xZrDLdTtdna3RgX4h3i6xwcLJHxSK3DuepV9qCZRgGmOpSMRzfcRWpyvZ/M4IOYGUI0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLncSG3NnuJl4VdfHZPmvXV0Hf5dhfVfWYphEXl1JtVcd+k0Kp
-	asapfzHSfe5E3gIG308BHo7ZFFPXrmFyjPc2z+Ias3pPMqWbNt8NDxZNKlcBeLfKjTqtTV2ACjd
-	rV1kv88jdR9XbpArwMk134HkfhYXODqSGv0Dw5GN5ApUzgyhJpCaMsg==
-X-Gm-Gg: ASbGnct7BMDckxVMb0vjUeFbnIHKoyFSJMmdo8WMjKL2UxYjfHyDRoQud0GaWZcj+qr
-	+HKFB+giNRv1lqprZlQaaglCqm+qxUiPqXNHXYU2Hn7I1BcE5YJoD/tpNrp8Z6UmqhClp/OS3k8
-	d94tDmDAyQtt2VOGzVbU0w8Jv2FWwbpeWyfs+A/54oK7PGxoopcTKgtdztdyJZyySMo0U8E+UGU
-	say+kJZsEQ5TAephyoYI9ByEb16u9U2XFoiKoFkfjjrWt8Tm/0/N5RT30mlWXnz6UiVNKwN+9D/
-	2VjCRNF4RV+k5tn+3+pSCb8Nn99m+6FwH4JNmp0Iod2JYf4M/YpzT6v/7KBlOPuzIMF2780NQUh
-	mbr6hHUE3ucldyd8xGk7OyYFrCz1XvSLkSuVSwuweNEJSueJo/2yE+YN839fw7v/iRfXljLgROj
-	IoSUpMsw==
-X-Received: by 2002:a05:6000:310d:b0:42b:4061:23f3 with SMTP id ffacd0b85a97d-42b4bdb7e14mr100006f8f.44.1762884884324;
-        Tue, 11 Nov 2025 10:14:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHX10mBGqJmcA+Ixtz//hWuBwgTdHZb2g4oj54Ltp41deVDOeK5dRTAjKH9fLw0RDHK37cF+Q==
-X-Received: by 2002:a05:6000:310d:b0:42b:4061:23f3 with SMTP id ffacd0b85a97d-42b4bdb7e14mr99986f8f.44.1762884883887;
-        Tue, 11 Nov 2025 10:14:43 -0800 (PST)
+        bh=/CQb3+BDzPWJy0/i2IahQqVF8wIN4ECXKW8e3nuZNe4=;
+        b=pUSJWfxw80C33wuCISoopVJyZDWRT7jS5LC41cM3C3XXLln5YyQxXQ+rGTg3yOH0Df
+         ID6nJ0maMYvz+ykbq8iRtRoL8v/oOCXOH0DLWFUKQnBBpuemI0mSJq9JUGcNcvmLVvnl
+         r8aZLXOlwI3zenECxeuSGGG/MjdcO2+e/G3AoSxIzLF07Qjil9eUWPbHo56dodmZZLtk
+         avmBYy9AUjIW40WVxMhVSukWoiZYB2MJdmRPS+iOAW9JCLALpBbiK2utiea6mi55U15/
+         rB4l9j730zxptWhRagXLFeKpElrmSb9vDdIVvFDLVFY1rd+GRfJdhMDk5hM85x/aWfY0
+         FkYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVIsHo4Ii3tvunIJZtiJbSriDyYlzZtin0fgaQpq+Jzs3AHmXlcEssi9TNlS6HaHR5DUow=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAAV+p/bzoacJE7bRD2tWP8Hug6p8vE0Le7MbqoBkAdAE2oZsn
+	0fcPzUcVL/4G5LdOJlxaZwkkpAKS8gNipZranXldyzf+fpCSOvtQHk1KqBO/jSOWF+H5tnFhn0H
+	34LAcxNysWZ5TnIJJL1QNLz008RQGX03kVGeHurLjl1IOIWNIMcm+tQ==
+X-Gm-Gg: ASbGncunFBRqwM2+KTkb98s1o2s0hWzuQfu4ZW5wwSaXfzNcnkBQy6EXHJ7WvYY+awQ
+	XeQGZanE/0YV3NzjDOUikMikT56H5ohXlmDT0V4TYRWyHTJ7e0QQcdjhJXr/wsOIxzWtuW4MHUr
+	fmzC213Z5dvnYmg97bfUwidC9AOuHXvivgigXd+sSdvcY9cpk0gBjQWAflUIsHuPLdoDWJ3rJNw
+	5wzc9b48qwOwbOH9gtBr+ea6ZqYZB+lYmtyNuvn5R4O06Nyi5nUnPRSUrUMeD6fwHo6rJ0d+08k
+	VqtZFlJKzvCqSgfRcohWVPQChyUwh1NM3LD3KqNjIHuGhFX8U+XFOb7zxIjV1hr0JJoH3S7J1w9
+	ci9rqPdzVPm+z519tkRX81P3RMVvkS/wE9shpBf4QQQoQOgiyTobjqCaSqC/phSAxszTTIslLKD
+	kED9IULQ==
+X-Received: by 2002:a05:600c:154d:b0:46e:2801:84aa with SMTP id 5b1f17b1804b1-47786ff92ccmr3683325e9.0.1762885031216;
+        Tue, 11 Nov 2025 10:17:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGHCTdnGJpaWczOPph/hSzeC9f0d6LpbSd7kzcP0dS1lBXXTVlyKldXpNlmuDp3D5q+KPaASw==
+X-Received: by 2002:a05:600c:154d:b0:46e:2801:84aa with SMTP id 5b1f17b1804b1-47786ff92ccmr3683095e9.0.1762885030715;
+        Tue, 11 Nov 2025 10:17:10 -0800 (PST)
 Received: from [192.168.10.81] ([176.206.111.214])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-42abe63b7d7sm30063513f8f.11.2025.11.11.10.14.42
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-47778daf2c3sm158773155e9.10.2025.11.11.10.17.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 10:14:43 -0800 (PST)
-Message-ID: <5fe5239f-f042-4960-b180-9b9144ee02b8@redhat.com>
-Date: Tue, 11 Nov 2025 19:14:41 +0100
+        Tue, 11 Nov 2025 10:17:10 -0800 (PST)
+Message-ID: <d6c3e231-fc24-434d-bb5b-7db5852043b3@redhat.com>
+Date: Tue, 11 Nov 2025 19:17:09 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -104,11 +104,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 00/20] KVM: x86: Support APX feature for guests
+Subject: Re: [PATCH RFC v1 10/20] KVM: x86: Refactor REX prefix handling in
+ instruction emulation
 To: "Chang S. Bae" <chang.seok.bae@intel.com>, kvm@vger.kernel.org,
  linux-kernel@vger.kernel.org
 Cc: seanjc@google.com, chao.gao@intel.com, zhao1.liu@intel.com
 References: <20251110180131.28264-1-chang.seok.bae@intel.com>
+ <20251110180131.28264-11-chang.seok.bae@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -146,185 +148,205 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20251110180131.28264-1-chang.seok.bae@intel.com>
+In-Reply-To: <20251110180131.28264-11-chang.seok.bae@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 On 11/10/25 19:01, Chang S. Bae wrote:
-> Hi all,
+> Restructure how to represent and interpret REX fields. Specifically,
 > 
-> This series is intended to initiate the enablement of APX support in KVM.
-> The goal is to start discussions and, ideally, reach consensus on key
-> decisions for the enabling path.
+>   * Repurpose the existing rex_prefix field to identify the prefix type
+>   * Introduce a new union to hold both REX and REX2 bitfields
+>   * Update decoder logic to interpret the unified data type
 > 
-> == Introduction ==
+> Historically, REX used the upper four bits of a signle byte as a fixed
+> identifier, with the lower bits encoded. REX2 extends this to two bytes.
+> The first byte identifies the prefix, and the second encodes additional
+> bits, preserving compatibility with legacy REX encoding.
 > 
-> Intel introduces Advanced Performance Extensions (APX), which add 16
-> additional 64-bit general-purpose registers (EGPRs: R16–R31).
+> Previously, the emulator stored the REX byte as-is, which cannot capture
+> REX2 semantics. This refactor prepares for REX2 decoding while preserving
+> current behavior.
 > 
-> APX also introduces new instruction prefixes that extend register indices
-> to 5 bits, providing additional encoding space. The feature specification
-> [1] describes these extensions in detail.
+> No functional changes intended.
 > 
-> The specification deliberately scopes out some areas. For example,
-> Sections 3.1.4.4.2–7 note that initialization and reset behaviors follow
-> existing XSTATE conventions.
-> 
-> That said, there are still some essential elements to consider at first.
-> 
-> == Ingredients to Consider ==
-> 
-> With guest exposure, the new registers will affect how KVM handles VM
-> exits and manages guest state. So the extended register indices need to
-> be properly interpreted.
-> 
-> There are three relevant contexts where KVM must handle the new 5-bit
-> register index:
-> 
->   * Instruction Information in VMCS
-> 
->     VMX provides instruction information through a dedicated field in the
->     VMCS. However, the legacy format supports only 4-bit register indices,
->     so a new 64-bit field was introduced to support 5-bit indices for
->     EGPRs (see Table 3.11 in the spec).
-> 
->   * Exit Qualification in VMCS
-> 
->     This field also carries register index information. Fortunately, the
->     current layout is not fully packed, so it appears feasible to extend
->     index fields to 5 bits without structural conflict.
-> 
->   * Instruction Emulator
-> 
->     When exits are handled through instruction emulation, the emulator
->     must decode REX2-prefixed instructions, which carry the additional
->     bits encoding the extended indices and other new modifiers.
-> 
-> Once handlers can identify EGPR-related indices, the next question is how
-> to access and maintain their state.
-> 
->   * Extended GPR State Management
-> 
->     Current KVM behavior for legacy GPRs can be summarized as follows:
->     (a) All legacy GPRs are saved on every VM exit and written back on
->         re-entry. Most access operations go through KVM register cache.
->     (b) The instruction emulator also maintains a temporary GPR cache
->         during emulation, backed by the same KVM-managed accessor
->         interface.
-> 
->     For the new EGPRs, there are a few important differences:
->     (a) They are general-purpose registers, but their state is
->         XSAVE-managed, which makes them distinct from legacy GPRs.
->     (b) The kernel itself currently does not use them, so there is no
->         requirement to save EGPRs on every VM exit -- they can remain in
->         hardware registers.
-> 
-> The mechanism to read and write EGPR state will therefore be commonly
-> needed by both VMX handlers and the instruction emulator.
-> 
-> == Approaches to Support ==
-> 
-> Given the above aspects, the first step is to build out a generalized GPR
-> accessor framework. This constitutes the first part (PART1: PATCH1–3) of
-> the series, laying the foundational infrastructure.
-> 
->   * New EGPR Accessors (PATCH3)
-> 
->     Since EGPRs are not yet clobbered by the host, they can be accessed
->     directly through hardware, using the existing helpers kvm_fpu_get()
->     and kvm_fpu_put().
-> 
->     This model follows the same approach used for legacy FP state
->     handling.
-> 
->     The design choice is based on the following considerations:
->     (a) Caching EGPR state on every VM exit would be unnecessary cost.
->     (b) If EGPRs are updated during VM exit handling or instruction
->         emulation, synchronizing them with the guest fpstate would require
->         new interfaces to interact with x86 core logic, adding complexity.
-> 
->   * Common GPR Access Interface --Unifying Legacy and Extended Accessors
->     (PATCH2)
-> 
->     Although legacy GPRs and EGPRs differ in how their state is accessed,
->     that distinction does not justify maintaining separate interfaces. A
->     unified accessor abstraction allows both legacy and extended registers
->     to be accessed uniformly, simplifying usage for both exit handlers and
->     the emulator.
-> 
-> Returning to the remaining key ingredients -- VMX handlers and the
-> instruction emulator -- the necessary updates break down into the
-> following.
-> 
->   * Extended Instruction Information Extraction (PART2: PATCH4–8)
-> 
->     Currently, instruction-related VMCS fields are stored as 32-bit raw
->     data and interpreted on site. Adding separate variable in this manner
->     would increase code complexity.
-> 
->     Thus, refactoring this logic into a proper data structure with clear
->     semantics appears to be a sensible direction.
-> 
->   * Instruction Emulator (PART3: PATCH9–16)
-> 
->     As noted in Paolo’s earlier feedback [2], support for REX2-prefixed
->     instruction emulation is required.
-> 
->     While REX2 largely mirrors legacy opcode behavior, a few exceptions
->     and new instructions introduce additional decoding and handling
->     requirements.
-> 
-> Conceptually, the changes are straightforward, though details are better
-> handled directly in the patches.
-> 
-> Finally, actual feature exposure and XCR0 management form the last stage
-> of enabling (PART4: PATCH17-20), relatively small but with a few key
-> constraints:
-> 
->   * XCR0 updates and CPUID feature exposure must occur together (PATCH18).
->   * The current enabling scope applies only to VMX (PATCH17-18).
-> 
-> == Patchset ==
-> 
-> As mentioned earlier, while the number of patches is relatively large,
-> the series is organized into four logical parts for clarity and
-> reviewability:
-> 
->   * PART1, PATCH 01–03: GPR accessor refactoring (foundational)
->   * PART2, PATCH 04–08: VMX support for EGPR index handling
->   * PART3, PATCH 09–16: Instruction emulator support for REX2
->   * PART4, PATCH 17–20: APX exposure and minor selftest updates
-> 
-> Each patch includes an RFC note to provide context for reviewers.
-> 
-> This series is based on the next branch of the KVM x86 tree [3] and is
-> available at:
-> 
->    git://github.com/intel/apx.git apx-kvm_rfc-v1
-> 
-> == Testing ==
-> 
-> Testing so far has focused on unit and synthetic coverage of relevant
-> code paths using KVM selftests, both on legacy and APX systems.
-> 
-> For decoder-related changes, additional testing was performed by invoking
-> x86_decode_insn() from a pseudo driver with some test inputs to exercise
-> REX2 and legacy decoding logic.
-> 
-> == References ==
-> 
-> [1] https://cdrdv2.intel.com/v1/dl/getContent/784266
-> [2] https://lore.kernel.org/kvm/CABgObfaHp9bH783Kdwm_tMBHZk5zWCxD7R+RroB_Q_o5NWBVZg@mail.gmail.com/
-> [3] https://github.com/kvm-x86/linux
-> 
-> 
-> I would also give thanks to Chao and Zhao for helping me out in this
-> KVM series.
+> Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
 
-There are a few bugs, but most of my remarks are really just stylistic. 
-The next version, if you base it on the emulator AVX support, should be 
-pretty close.
+Good idea; having to add 0x40 to rex_prefix when decoding VEX was too
+mysterious, I'll include something like this in my VEX patches.  Here
+is the commit message I came up with:
+
+commit fc8aa5c45d558393069a1c89b7a64e059b8f9418
+Author: Chang S. Bae <chang.seok.bae@intel.com>
+Date:   Mon Nov 10 18:01:21 2025 +0000
+
+     KVM: x86: Refactor REX prefix handling in instruction emulation
+     
+     Restructure how to represent and interpret REX fields, preparing
+     for handling of VEX and REX2.
+     
+     REX uses the upper four bits of a single byte as a fixed identifier,
+     and the lower four bits containing the data. VEX and REX2 extend this so
+     that the first byte identifies the prefix and the rest encode additional
+     bits; and while VEX only has the same four data bits as REX, eight zero
+     bits are a valid value for the data bits of REX2.  So, stop storing the
+     REX byte as-is.  Instead, store only the low bits of the REX prefix and
+     track separately whether a REX-like prefix wasused.
+     
+     No functional changes intended.
+     
+     Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+     Message-ID: <20251110180131.28264-11-chang.seok.bae@intel.com>
+     [Extracted from APX series; removed bitfields and REX2-specific
+      definitions. - Paolo]
+     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Paolo
+
+> ---
+>   arch/x86/kvm/emulate.c     | 33 ++++++++++++++++++---------------
+>   arch/x86/kvm/kvm_emulate.h | 31 ++++++++++++++++++++++++++++++-
+>   2 files changed, 48 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 4e3da5b497b8..763fbd139242 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -924,7 +924,7 @@ static void *decode_register(struct x86_emulate_ctxt *ctxt, u8 modrm_reg,
+>   			     int byteop)
+>   {
+>   	void *p;
+> -	int highbyte_regs = (ctxt->rex_prefix == 0) && byteop;
+> +	int highbyte_regs = (ctxt->rex_prefix == REX_NONE) && byteop;
+>   
+>   	if (highbyte_regs && modrm_reg >= 4 && modrm_reg < 8)
+>   		p = (unsigned char *)reg_rmw(ctxt, modrm_reg & 3) + 1;
+> @@ -1080,10 +1080,12 @@ static void decode_register_operand(struct x86_emulate_ctxt *ctxt,
+>   {
+>   	unsigned int reg;
+>   
+> -	if (ctxt->d & ModRM)
+> +	if (ctxt->d & ModRM) {
+>   		reg = ctxt->modrm_reg;
+> -	else
+> -		reg = (ctxt->b & 7) | ((ctxt->rex_prefix & 1) << 3);
+> +	} else {
+> +		reg = (ctxt->b & 7) |
+> +		      (ctxt->rex.bits.b3 * BIT(3));
+> +	}
+>   
+>   	if (ctxt->d & Sse) {
+>   		op->type = OP_XMM;
+> @@ -1122,9 +1124,9 @@ static int decode_modrm(struct x86_emulate_ctxt *ctxt,
+>   	int rc = X86EMUL_CONTINUE;
+>   	ulong modrm_ea = 0;
+>   
+> -	ctxt->modrm_reg = ((ctxt->rex_prefix << 1) & 8); /* REX.R */
+> -	index_reg = (ctxt->rex_prefix << 2) & 8; /* REX.X */
+> -	base_reg = (ctxt->rex_prefix << 3) & 8; /* REX.B */
+> +	ctxt->modrm_reg = ctxt->rex.bits.r3 * BIT(3);
+> +	index_reg       = ctxt->rex.bits.x3 * BIT(3);
+> +	base_reg        = ctxt->rex.bits.b3 * BIT(3);
+>   
+>   	ctxt->modrm_mod = (ctxt->modrm & 0xc0) >> 6;
+>   	ctxt->modrm_reg |= (ctxt->modrm & 0x38) >> 3;
+> @@ -2466,7 +2468,7 @@ static int em_sysexit(struct x86_emulate_ctxt *ctxt)
+>   
+>   	setup_syscalls_segments(&cs, &ss);
+>   
+> -	if ((ctxt->rex_prefix & 0x8) != 0x0)
+> +	if (ctxt->rex.bits.w)
+>   		usermode = X86EMUL_MODE_PROT64;
+>   	else
+>   		usermode = X86EMUL_MODE_PROT32;
+> @@ -4851,7 +4853,8 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
+>   		case 0x40 ... 0x4f: /* REX */
+>   			if (mode != X86EMUL_MODE_PROT64)
+>   				goto done_prefixes;
+> -			ctxt->rex_prefix = ctxt->b;
+> +			ctxt->rex_prefix = REX_PREFIX;
+> +			ctxt->rex.raw    = 0x0f & ctxt->b;
+>   			continue;
+>   		case 0xf0:	/* LOCK */
+>   			ctxt->lock_prefix = 1;
+> @@ -4865,15 +4868,14 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
+>   		}
+>   
+>   		/* Any legacy prefix after a REX prefix nullifies its effect. */
+> -
+> -		ctxt->rex_prefix = 0;
+> +		ctxt->rex_prefix = REX_NONE;
+> +		ctxt->rex.raw = 0;
+>   	}
+>   
+>   done_prefixes:
+>   
+> -	/* REX prefix. */
+> -	if (ctxt->rex_prefix & 8)
+> -		ctxt->op_bytes = 8;	/* REX.W */
+> +	if (ctxt->rex.bits.w)
+> +		ctxt->op_bytes = 8;
+>   
+>   	/* Opcode byte(s). */
+>   	opcode = opcode_table[ctxt->b];
+> @@ -5137,7 +5139,8 @@ void init_decode_cache(struct x86_emulate_ctxt *ctxt)
+>   {
+>   	/* Clear fields that are set conditionally but read without a guard. */
+>   	ctxt->rip_relative = false;
+> -	ctxt->rex_prefix = 0;
+> +	ctxt->rex_prefix = REX_NONE;
+> +	ctxt->rex.raw = 0;
+>   	ctxt->lock_prefix = 0;
+>   	ctxt->rep_prefix = 0;
+>   	ctxt->regs_valid = 0;
+> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+> index 153c70ea5561..b285299ebfa4 100644
+> --- a/arch/x86/kvm/kvm_emulate.h
+> +++ b/arch/x86/kvm/kvm_emulate.h
+> @@ -317,6 +317,32 @@ typedef void (*fastop_t)(struct fastop *);
+>   #define NR_EMULATOR_GPRS	8
+>   #endif
+>   
+> +/*
+> + * REX prefix type to distinguish between no prefix, legacy REX, REX2,
+> + * or an invalid REX2 sequence.
+> + */
+> +enum rex_type {
+> +	REX_NONE,
+> +	REX_PREFIX,
+> +	REX2_PREFIX,
+> +	REX2_INVALID
+> +};
+> +
+> +/* Unified representation for REX/REX2 prefix bits */
+> +union rex_field {
+> +	struct {
+> +		u8 b3 :1, /* REX2.B3 or REX.B */
+> +		   x3 :1, /* REX2.X3 or REX.X */
+> +		   r3 :1, /* REX2.R3 or REX.R */
+> +		   w  :1, /* REX2.W  or REX.W */
+> +		   b4 :1, /* REX2.B4 */
+> +		   x4 :1, /* REX2.X4 */
+> +		   r4 :1, /* REX2.R4 */
+> +		   m0 :1; /* REX2.M0 */
+> +	} bits;
+> +	u8 raw;
+> +};
+> +
+>   struct x86_emulate_ctxt {
+>   	void *vcpu;
+>   	const struct x86_emulate_ops *ops;
+> @@ -357,7 +383,10 @@ struct x86_emulate_ctxt {
+>   	int (*check_perm)(struct x86_emulate_ctxt *ctxt);
+>   
+>   	bool rip_relative;
+> -	u8 rex_prefix;
+> +	/* Type of REX prefix (none, REX, REX2) */
+> +	enum rex_type rex_prefix;
+> +	/* Rex bits */
+> +	union rex_field rex;
+>   	u8 lock_prefix;
+>   	u8 rep_prefix;
+>   	/* bitmaps of registers in _regs[] that can be read */
 
 
