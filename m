@@ -1,145 +1,166 @@
-Return-Path: <kvm+bounces-62817-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62818-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47F02C4F813
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 19:50:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0094CC4F840
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 19:55:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 12B944ED3C6
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 18:50:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B92773A6864
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 18:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2539D2C15B4;
-	Tue, 11 Nov 2025 18:49:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468172C0288;
+	Tue, 11 Nov 2025 18:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="i5VxH8M9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HAXezBSR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58D92BD5BB;
-	Tue, 11 Nov 2025 18:49:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0BC252292
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 18:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762886978; cv=none; b=QCU5KBAnLc5r7PmatHOnz12yu3eguFmBMhQ7mOpsYbXPx15lqpIPnEE6wTFYiFN8nMykGJP/KwwlLT7vxfGpi1sxPrE0Yr3G18HWiDtIg1KYMuJIDvbkYg9FcooiuGrvJYz98V4rvUKti1O75h/LCaKQ02rmndDpSJkVEfl0Hdw=
+	t=1762887350; cv=none; b=GJxLJ4ifKpnix7dvSrDkaLMFyKgXQDLX7gidocm18k4/OHapLfFzx/IJtDaQrYQ5g70yDdlccjRsshDfM/ZybELh/EwnaAXiGbxGWZOtgrw9tFlyHUerFwkHyBE7lRSLYhPNsYag7t/LlSsjxyQSDnYj4rSzauXakyqSm+FF+m8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762886978; c=relaxed/simple;
-	bh=IeKI7EN+aRDwHDG7nb75Mg43OEG8tZf6/aAnVkhwr9A=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RSfxk1D4kYNqurQEpjdfSctLuAYGT8YaY2nAEAdGb/qBIJd9Gmov0BTWGPbMRhZStFL9S81vgQrff04393MHSX4fb/KEKwLIOdExYJW+W8cRl5sFoPcJamHqO49QBcU2xOTXW1YT14BwTKMMEFpgONTu6+3UGhL831H2hZNoK/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=i5VxH8M9; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ABGVXgP3806237;
-	Tue, 11 Nov 2025 10:49:31 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=+8Jo7kyiJm65ZLieY55G
-	q5HyHbRo5mmDuZD1xndd2og=; b=i5VxH8M9YPGhEq2cUeeTk/4KZaDfQmwwnYkE
-	PO16jWSqLRQU8yahxOWbo4o+IqMmxI2eZffd7ARtKqcnjWREB9hHElQ83+lx/QHo
-	B92FmdDJzf7DXkPW1x0XqRpa0DYan/wS4V90Mn2IYHDoCCE/V2WJpNNkJFwUat0h
-	qiWWCuHxBZdmPjTVuw1+K3H22iqTWlfNo6ChIQcle4hRz4mHACICPvn6Vqyt59Nl
-	0J3QWxuPewVRgLY7jtEdoZz8A10VJSgIIko0AXkT1p1Sze8jAgx+TpeIBOd91lAA
-	YDrww8aNZMpvUiLp43DPMzUGDJ4Ybbi/3VRcCEzhxmobOfjtqA==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ac0xhvhf2-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 11 Nov 2025 10:49:31 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Tue, 11 Nov 2025 18:49:25 +0000
-Date: Tue, 11 Nov 2025 10:49:21 -0800
-From: Alex Mastro <amastro@fb.com>
-To: David Matlack <dmatlack@google.com>
-CC: Alex Williamson <alex@shazbot.org>, Shuah Khan <shuah@kernel.org>,
-        Jason
- Gunthorpe <jgg@ziepe.ca>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 0/4] vfio: selftests: update DMA mapping tests to use
- queried IOVA ranges
-Message-ID: <aROFMS+Di8geIqOy@devgpu015.cco6.facebook.com>
-References: <20251111-iova-ranges-v2-0-0fa267ff9b78@fb.com>
- <aRN1MKrfm9GQZpzI@google.com>
+	s=arc-20240116; t=1762887350; c=relaxed/simple;
+	bh=D3LH1D14RTYnGMZJXON1DwndSko5rujuhxnqiK1VLQM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NKwtYIbHQ6fSG6j8+gmxaZ8sM9EJiWXcCynR5HBk9CiiiOmvkWPisKQNRXqj7LBXDtB8HeK0JkEyvdmQlYo1kocU0wFLJXGr1x/RMdSZ5ia1S8gJnocR7zWR0DNmlwpLmp843K9wCbPpXuOAJ9indFU9kjo7c1EK72lnHGgsSLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HAXezBSR; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 11 Nov 2025 18:55:30 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762887335;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hOi6XjO42RDCAcEGgINwcv4u2ylLtSQlkzdIS1Ook3U=;
+	b=HAXezBSRKSG12htgc94ooYjp8Q3BzxPqyavlanGPJB3berpmrEiDwsyRERNw1Gv0v9kckF
+	Fth4uPhwS4bh8sXnNvEJEfo9KVyJGhCp5QEQmcYHIc7yGkoxXUrGt32JFe9qROXt1fnqjG
+	P01t4kaD4LXaRywdEjUVWSCy543bbXM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Subject: Re: [PATCH 2/6] KVM: nSVM: Always recalculate LBR MSR intercepts in
+ svm_update_lbrv()
+Message-ID: <6ving6sg3ywr23epd3fmorzhovdom5uaty4ae4itit2amxafql@iui7as55sb55>
+References: <20251108004524.1600006-1-yosry.ahmed@linux.dev>
+ <20251108004524.1600006-3-yosry.ahmed@linux.dev>
+ <aktjuidgjmdqdlc42mmy4hby5zc2e5at7lgrmkfxavlzusveus@ai7h3sk6j37b>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aRN1MKrfm9GQZpzI@google.com>
-X-Authority-Analysis: v=2.4 cv=efcwvrEH c=1 sm=1 tr=0 ts=6913853b cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=r1p2_3pzAAAA:8 a=1XWaLZrsAAAA:8 a=9jRdOu3wAAAA:8
- a=FOH2dFAWAAAA:8 a=84ljBqc_iw8H7pXuDXEA:9 a=CjuIK1q_8ugA:10
- a=r_pkcD-q9-ctt7trBg_g:22 a=ZE6KLimJVUuLrTuGpvhn:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: Vx1f7q_TweyaX8596SyKAiC4mzTtOqEM
-X-Proofpoint-GUID: Vx1f7q_TweyaX8596SyKAiC4mzTtOqEM
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTExMDE1MiBTYWx0ZWRfX6eJDv1GAZ9zN
- yOrPKzdIHA9PEFYA6/bgZp4iybF6MwFUdRMZyYH9aYcM3u3DUMkrY5bgyImhAG6Yrh23/UIGe08
- JDJAKEHCQQzmZ17fq1krKx/RC5OYqH5z8147zdls2RgQmpIGrN0BX2aj3fsTaBNDsDVpp9kfNYu
- qyDqWJMnEfX2tjDMz+bJBEAfu2rEDdQc6SkrBwd5wwIRQoTDeDLHaT6iubMawFny+utMmo4ls84
- apdzpZ2Nmllwn4KVEV26PTXvBREyO5pGSLEtkv2TyL5aYS6Cpt9e1x/asCiAgv34Fj98Mi04VRI
- AOJtY+2w3dviZo6Tsx9dAwkyvlTMjcESOzBbJwHKCmi2PsjIU1DsRCbPpw2FybI/VkuxddSsVPM
- UOLbUAL8xwyuQrJXIOUTHbEfWLW5Tw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-11_03,2025-11-11_03,2025-10-01_01
+In-Reply-To: <aktjuidgjmdqdlc42mmy4hby5zc2e5at7lgrmkfxavlzusveus@ai7h3sk6j37b>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Nov 11, 2025 at 05:41:04PM +0000, David Matlack wrote:
-> On 2025-11-11 06:52 AM, Alex Mastro wrote:
-> > Not all IOMMUs support the same virtual address width as the processor,
-> > for instance older Intel consumer platforms only support 39-bits of
-> > IOMMU address space.  On such platforms, using the virtual address as
-> > the IOVA and mappings at the top of the address space both fail.
+On Tue, Nov 11, 2025 at 03:11:37AM +0000, Yosry Ahmed wrote:
+> On Sat, Nov 08, 2025 at 12:45:20AM +0000, Yosry Ahmed wrote:
+> > svm_update_lbrv() is called when MSR_IA32_DEBUGCTLMSR is updated, and on
+> > nested transitions where LBRV is used. It checks whether LBRV enablement
+> > needs to be changed in the current VMCB, and if it does, it also
+> > recalculate intercepts to LBR MSRs.
 > > 
-> > VFIO and IOMMUFD have facilities for retrieving valid IOVA ranges,
-> > VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE and IOMMU_IOAS_IOVA_RANGES,
-> > respectively.  These provide compatible arrays of ranges from which
-> > we can construct a simple allocator and record the maximum supported
-> > IOVA address.
+> > However, there are cases where intercepts need to be updated even when
+> > LBRV enablement doesn't. Example scenario:
+> > - L1 has MSR_IA32_DEBUGCTLMSR cleared.
+> > - L1 runs L2 without LBR_CTL_ENABLE (no LBRV).
+> > - L2 sets DEBUGCTLMSR_LBR in MSR_IA32_DEBUGCTLMSR, svm_update_lbrv()
+> >   sets LBR_CTL_ENABLE in VMCB02 and disables intercepts to LBR MSRs.
+> > - L2 exits to L1, svm_update_lbrv() is not called on this transition.
+> > - L1 clears MSR_IA32_DEBUGCTLMSR, svm_update_lbrv() finds that
+> >   LBR_CTL_ENABLE is already cleared in VMCB01 and does nothing.
+> > - Intercepts remain disabled, L1 reads to LBR MSRs read the host MSRs.
 > > 
-> > Use this new allocator in place of reusing the virtual address, and
-> > incorporate the maximum supported IOVA into the limit testing.  This
-> > latter change doesn't test quite the same absolute end-of-address space
-> > behavior but still seems to have some value.  Testing for overflow is
-> > skipped when a reduced address space is supported as the desired errno
-> > is not generated.
-> > 
-> > This series is based on Alex Williamson's "Incorporate IOVA range info"
-> > [1] along with feedback from the discussion in David Matlack's "Skip
-> > vfio_dma_map_limit_test if mapping returns -EINVAL" [2].
-> > 
-> > Given David's plans to split IOMMU concerns from devices as described in
-> > [3], this series' home for `struct iova_allocator` and IOVA
-> > range helpers are likely to be short lived, since they reside in
-> > vfio_pci_device.c. I assume that the rework can move this functionality
-> > to a more appropriate location next to other IOMMU-focused code, once
-> > such a place exists.
-> > 
-> > [1] https://lore.kernel.org/all/20251108212954.26477-1-alex@shazbot.org/#t
-> > [2] https://lore.kernel.org/all/20251107222058.2009244-1-dmatlack@google.com/
-> > [3] https://lore.kernel.org/all/aRIoKJk0uwLD-yGr@google.com/
-> > 
-> > To: Alex Williamson <alex@shazbot.org>
-> > To: David Matlack <dmatlack@google.com>
-> > To: Shuah Khan <shuah@kernel.org>
-> > To: Jason Gunthorpe <jgg@ziepe.ca>
-> > Cc: kvm@vger.kernel.org
-> > Cc: linux-kselftest@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Signed-off-by: Alex Mastro <amastro@fb.com>
+> > Fix it by always recalculating intercepts in svm_update_lbrv().
 > 
-> LGTM. And I confirmed this fixes vfio_dma_mapping_test on HW that does
-> not support IOVA 0xffffffffffffffff. Thanks!
+> This actually breaks hyperv_svm_test, because svm_update_lbrv() is
+> called on every nested transition, calling
+> svm_recalc_lbr_msr_intercepts() -> svm_set_intercept_for_msr() and
+> setting svm->nested.force_msr_bitmap_recalc to true.
 > 
-> Reviewed-by: David Matlack <dmatlack@google.com>
-> Tested-by: David Matlack <dmatlack@google.com>
+> This breaks the hyperv optimization in nested_svm_vmrun_msrpm() AFAICT.
+> 
+> I think there are two ways to fix this:
+> - Add another bool to svm->nested to track LBR intercepts, and only call
+>   svm_set_intercept_for_msr() if the intercepts need to be updated.
+> 
+> - Update svm_set_intercept_for_msr() itself to do nothing if the
+>   intercepts do not need to be changed, which is more clutter but
+>   applies to other callers as well so could shave cycles elsewhere (see
+>   below).
+> 
+> Sean, Paolo, any preferences?
+> 
+> Here's what updating svm_set_intercept_for_msr() looks like:
 
-Thanks David!
+and that diff breaks userspace_msr_exit_test :)
+
+Here's an actually tested diff:
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 2fbb0b88c6a3e..88717429ba9d5 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -664,24 +664,38 @@ void svm_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type, bool se
+ {
+        struct vcpu_svm *svm = to_svm(vcpu);
+        void *msrpm = svm->msrpm;
++       bool recalc = false;
++       bool already_set;
+
+        /* Don't disable interception for MSRs userspace wants to handle. */
+        if (type & MSR_TYPE_R) {
+-               if (!set && kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_READ))
++               set = set || !kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_READ);
++               already_set = svm_test_msr_bitmap_read(msrpm, msr);
++
++               if (!set && already_set)
+                        svm_clear_msr_bitmap_read(msrpm, msr);
+-               else
++               else if (set && !already_set)
+                        svm_set_msr_bitmap_read(msrpm, msr);
++
++               recalc |= (set != already_set);
+        }
+
+        if (type & MSR_TYPE_W) {
+-               if (!set && kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_WRITE))
++               set = set || !kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_WRITE);
++               already_set = svm_test_msr_bitmap_write(msrpm, msr);
++
++               if (!set && already_set)
+                        svm_clear_msr_bitmap_write(msrpm, msr);
+-               else
++               else if (set && !already_set)
+                        svm_set_msr_bitmap_write(msrpm, msr);
++
++               recalc |= (set != already_set);
+        }
+
+-       svm_hv_vmcb_dirty_nested_enlightenments(vcpu);
+-       svm->nested.force_msr_bitmap_recalc = true;
++       if (recalc) {
++               svm_hv_vmcb_dirty_nested_enlightenments(vcpu);
++               svm->nested.force_msr_bitmap_recalc = true;
++       }
+ }
+
+ void *svm_alloc_permissions_map(unsigned long size, gfp_t gfp_mask)
+
+---
+
+For the record, I don't want to just use svm_test_msr_bitmap_*() in
+svm_update_lbrv() because there is no direct equivalent in older kernels
+as far as I can tell, so a backport would be completely inapplicable.
 
