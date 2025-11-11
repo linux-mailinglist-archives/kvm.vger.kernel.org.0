@@ -1,151 +1,329 @@
-Return-Path: <kvm+bounces-62806-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62807-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 459AFC4F584
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 18:59:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFD98C4F605
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 19:09:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0C85A4E1027
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:59:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D72A3AF68F
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 18:09:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8383A5E69;
-	Tue, 11 Nov 2025 17:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B9D3361DA3;
+	Tue, 11 Nov 2025 18:09:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="z/Nam/XU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJqx4hqG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mnnex841"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142E136B05F;
-	Tue, 11 Nov 2025 17:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942AA270ED2
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 18:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762883970; cv=none; b=rrc73BEcnWLXJ3/l/N4MtjDa8HMv8fFPvhEwSX8o07tK8idLvEKKrL071KRxO9w5Hz2oxANNtnfVU6+ddpdIusf8xXutfj0XEY5pDSjBM2ICkYQwqug/BdedXLICMRF7uvy0zXgrLh0+U6WHxrP7CEG4rowb3RbpkSVgda/QjzU=
+	t=1762884544; cv=none; b=Cgl56tJfm+rn/9g85nQjchgVq3nuDYe1EymhWTRKdoi+af1os82GOnyn7nsuttfO4093uJ6Wjf691/GzFMr5nNbtMLVny4Vf/WzF5Fr6fUkJ+0E09IoPULBWEow0Hdy2wpv5y9vphAkLPQLX9o0UC62fOLmAX7kbuj/tsfUyCVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762883970; c=relaxed/simple;
-	bh=wPj5vVJ1YtKHjf81QWXyvaJqGXJKZIFerpk4kTAdFjI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r53IvnQx0WNLvyHwWsT+JYXmW4iBN8oEX76xFdEkQN4Rdf3Zl1Db09PuhQN/iEPBWAPKH+dUnfdqvemh0GpoYJsJTBz5Wl6SuOy5uNHzJAe+63mZG2ePPdPrDhtCtbbN3INVUSBdsDjOOPgC4zUpgXGXZ0C5kX2R+ohbR3SHNOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=z/Nam/XU; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ABCFLAc1434375;
-	Tue, 11 Nov 2025 09:59:22 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=DvfPjs5kBAETFMTBWW1/
-	kBVT3srDOto+/Gf3urRsfIU=; b=z/Nam/XUvMzD5evT9DfklRxO5OwIMVxF20MQ
-	p69zSIk7AsFCrZgmlimsnaiFFwZmUXRfnyC70EzkO0EMbH4e8WEUXBfqpxH6syNJ
-	JErsOJgbZorBUEpLD45UYTbBhaD6CfTqwnLxHtsp7IC10WYCyzQyZdrmjza0ewep
-	QkMpI6h7B26oNYuhATzrEee5O5KywE43LWR7/CgH1X/mPV3Wi+jdXNjpVjFd5rwf
-	geUSV/NMhkVxjCe48KxrosI16Dc4HKshnyCpbm+dW4tKBipjvPXvyE6tyIAK+nRV
-	TFgl6F2tSBnnlLZV2mFBg1CM5fS+cBaz26FUy9iI6XkMBQTfNw==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ac502aqye-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 11 Nov 2025 09:59:22 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c085:108::150d) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Tue, 11 Nov 2025 17:59:08 +0000
-Date: Tue, 11 Nov 2025 09:59:00 -0800
-From: Alex Mastro <amastro@fb.com>
-To: Alex Williamson <alex@shazbot.org>
-CC: David Matlack <dmatlack@google.com>, Shuah Khan <shuah@kernel.org>,
-        Jason
- Gunthorpe <jgg@ziepe.ca>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 1/4] vfio: selftests: add iova range query helpers
-Message-ID: <aRN5ZBWJ16I/TtY5@devgpu015.cco6.facebook.com>
-References: <20251111-iova-ranges-v2-0-0fa267ff9b78@fb.com>
- <20251111-iova-ranges-v2-1-0fa267ff9b78@fb.com>
- <20251111100948.513f013b.alex@shazbot.org>
- <aRNz4ynek6siv0FZ@devgpu015.cco6.facebook.com>
- <20251111105202.3aa734aa.alex@shazbot.org>
+	s=arc-20240116; t=1762884544; c=relaxed/simple;
+	bh=eM057ONsBUwVHwEcTJHHOB8WMV8ykuIXS2pwGufAqps=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XwrAcGI5Gyx9oMGRBf2UJyLTJYpZQdORDsBFP8eiVRqw+lVTdkEPV/VnJ/J38oMg/Yd6pxnCO9ExYhR0/76jP1rYBR2Haiu1+Hczq86kwELTGI8sh4lu/gNRfWnJJDDXKy+0Ax1ABOWMJLJ52D0Zkfu205PHwdxr72ULr962L+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iJqx4hqG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mnnex841; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762884541;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ZTiiH+FfdmBKx/X3lpx9zM3sRSjKewzog8F+EGlzxMw=;
+	b=iJqx4hqGZhFl0eVKFATK7qvipcKEtHEC1qoUY4t2r2rXt0fncX6p2BgKWH80eleLAld6Pm
+	VZJzx9Qs9exbdFYTQ+HU+aD/hGTQndFY56rg4rCEKPw3vE59tscOOcGSjQstVw5FT7tafY
+	lDJqB3N1V5Fk+oZKpzbYhCHLVz298xk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-349-jPLYDhF-M42UDrm4b1OlFg-1; Tue, 11 Nov 2025 13:09:00 -0500
+X-MC-Unique: jPLYDhF-M42UDrm4b1OlFg-1
+X-Mimecast-MFC-AGG-ID: jPLYDhF-M42UDrm4b1OlFg_1762884539
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47496b3c1dcso92075e9.3
+        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 10:09:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762884539; x=1763489339; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZTiiH+FfdmBKx/X3lpx9zM3sRSjKewzog8F+EGlzxMw=;
+        b=Mnnex841eKPrWTBYvpbRREGJXn1tz5N2zUVWsZrT0rOAeDt+d+BmyWbxRQvRNgitIl
+         wTswzZCwSBDG9l3VnGTP+YKAx3iUB2+JNyuK4zH6p3hZFVESzQ2dpTmP5QpXkM+PA/dH
+         0UaNcym+EGuqYia7ddXJPWHHmXWmZwaqV4FupGXXcL9R0tLg3iSttLrGxHmoaelwCYmf
+         /KFtuymBixW6qfNQMNGcEkpHijMcNluA41DjcQIRIc2xMD9MNxk/T3NsbG2DznifIqQD
+         PDfPJnk8BXaRPoobMMSO+dphtBGopOIciYqus1N6ovzNa+mOw+12uIALYXR3jP5V+JFX
+         XInA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762884539; x=1763489339;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZTiiH+FfdmBKx/X3lpx9zM3sRSjKewzog8F+EGlzxMw=;
+        b=ns0txjtxSGrQKmLpJb7iJcrFkZKTvfmHBJGD0mkeA7pSe/Ewi+3DmLRVPwejIuIe2x
+         LZTojJgEAoJhlDNoGAnuCykV9RL2uUSUImCF/687S9couKXM4m8Mj/o6iIRVgrRL4riE
+         iXBt6m6DFoPEZK7sfg8zQ7pEzm+NphVsL596KeRt6BkNuy4ABTimQErf+SgRoLzRGASx
+         kNe1qJ20wgZQyMwm7FW5hIO0MK9lv9GPnLqc+ZoopF1OK+O2l8tTdg06EG+A1eCxfFPF
+         4gESP7Q0os8Kh2xbzGLpRk/8q6GmXt9KdQET8WDtdsh6weOJoGBEGGOXR+GTk32mu1Cn
+         sedw==
+X-Forwarded-Encrypted: i=1; AJvYcCWi2IA+E/iPvQFVFJV48RPDZAYtu/ieDbRQs4HKG+A1Q866DEBETXtRRWe9kmaaIfnrh+M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuB4uC7vSiAp7YXNYlJmpIqB7S9qU2rk37FtzhDf5O2IeikuKv
+	0BGZ2CZR0NmSJRoqi4PJ8p1RUHYIEA19IY0s1LL4QdtDNvKOzxaanBAvNFrYK6gYgFyHxSVfnUa
+	RaFhWS01KEF14pYoXgQkAkAovpdI8ou0FitZtomxA/gvr9qn66sg2ZA==
+X-Gm-Gg: ASbGncsZIH89nHpqfJmgbZ0k0kvPlw5Aa/EozvtEHZfwd7X7/+lxjDdv5j5H6vCfjmz
+	zPPEjP4au4tcoCe/KEZ/VrZnEdPUboioGJN5CqNEnU5tcLkoNt7ccKHTGDYzqGdxr7CJWnrnsSS
+	oFybH3O+hxuaVkUW+Q5rDSiknH0pczCS86DhhYP4N1J/lRkusR/UO3Iu8yfsqzkfroVRCg5Fjo4
+	Ofdav7ELTqZrVMKcS+rnil4lc6F2XAsm75H43RLPngKWpJSq+aj3Bf62sErn/p5S7sXtImHG3xJ
+	rHS2XAZMy+XIV8mqJ3DMM7heLApcPy2t7TpfoKdVJV49zNoChb57rCyc46QIIYWWqMJsvlevQLD
+	zOWVIaTXLBviw7zNoMCK4NEsEO2ytx1Ieu/bjE6YCocbgFp446Ff7JS1OdPlbQHKr0oBVxb8vF/
+	XFdTpp6w==
+X-Received: by 2002:a05:600c:4fc9:b0:477:557b:691d with SMTP id 5b1f17b1804b1-477870857e3mr2529945e9.25.1762884539159;
+        Tue, 11 Nov 2025 10:08:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFu6AOQN1R5m7gTW6bq/E9O2wxQesMHXXbmPkMIGlWRaF8ha07Tu7YdBjaAgwcY2Fz7PGbqNw==
+X-Received: by 2002:a05:600c:4fc9:b0:477:557b:691d with SMTP id 5b1f17b1804b1-477870857e3mr2529745e9.25.1762884538737;
+        Tue, 11 Nov 2025 10:08:58 -0800 (PST)
+Received: from [192.168.10.81] ([176.206.111.214])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4775cd45466sm379917565e9.0.2025.11.11.10.08.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Nov 2025 10:08:58 -0800 (PST)
+Message-ID: <7cff2a78-94f3-4746-9833-c2a1bf51eed6@redhat.com>
+Date: Tue, 11 Nov 2025 19:08:56 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251111105202.3aa734aa.alex@shazbot.org>
-X-Proofpoint-GUID: e1yVIs7jH70XmYrKTK7gWc5NuAWppnOt
-X-Authority-Analysis: v=2.4 cv=CPInnBrD c=1 sm=1 tr=0 ts=6913797a cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=FOH2dFAWAAAA:8 a=KS96cTW66y6CtfVdv8wA:9 a=CjuIK1q_8ugA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: e1yVIs7jH70XmYrKTK7gWc5NuAWppnOt
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTExMDE0NiBTYWx0ZWRfX/8KDQuzfSw9h
- hff7Yx6wXmpSFX5SKyT0wYWEc5WUwyAcpDkoH8utFnmmida4UVNY5rUnkqgLB4lSSqtO4FYhU56
- oqAJ73kNbJwNNJx8io8p81xWF0zNTqwrqtg3gwxxHO5kW8W7HVrwk2tArdVHff9Md47y0vmRFV/
- u9xuHtEb6bC6FPf4tRLd2cpDRRon5ph2MSvY1csNW4khp4HI5o4BN9j5uGoHHu/bATgO04PdK5b
- 5e2qW4700iMwhtZPK4yNeZHUJ4xVNIvkdSJmBh0uNlBfwPvHzhU4PhNEiEPYWLSZ8BnY8l0VrGq
- QX0N/3dC9QbbPKRr+Uxic7TquB0pPSwvV4O5L5wupbiTS/gAx4D2SaWRbqbLiAUxFkafVM4W++V
- 0ph5Y1v8E3LlpbNlNzLxeGjHyPhlBg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-11_03,2025-11-11_02,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v1 02/20] KVM: x86: Refactor GPR accessors to
+ differentiate register access types
+To: "Chang S. Bae" <chang.seok.bae@intel.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: seanjc@google.com, chao.gao@intel.com, zhao1.liu@intel.com
+References: <20251110180131.28264-1-chang.seok.bae@intel.com>
+ <20251110180131.28264-3-chang.seok.bae@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20251110180131.28264-3-chang.seok.bae@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 11, 2025 at 10:52:02AM -0700, Alex Williamson wrote:
-> On Tue, 11 Nov 2025 09:35:31 -0800
-> Alex Mastro <amastro@fb.com> wrote:
+On 11/10/25 19:01, Chang S. Bae wrote:
+> Refactor the GPR accessors to introduce internal helpers to distinguish
+> between legacy and extended registers.
 > 
-> > On Tue, Nov 11, 2025 at 10:09:48AM -0700, Alex Williamson wrote:
-> > > On Tue, 11 Nov 2025 06:52:02 -0800
-> > > Alex Mastro <amastro@fb.com> wrote:  
-> > > > diff --git a/tools/testing/selftests/vfio/lib/vfio_pci_device.c b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> > > > index a381fd253aa7..7a523e3f2dce 100644
-> > > > --- a/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> > > > +++ b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> > > > @@ -29,6 +29,173 @@
-> > > >  	VFIO_ASSERT_EQ(__ret, 0, "ioctl(%s, %s, %s) returned %d\n", #_fd, #_op, #_arg, __ret); \
-> > > >  } while (0)
-> > > >  
-> > > > +static struct vfio_info_cap_header *next_cap_hdr(void *buf, size_t bufsz,
-> > > > +						 size_t *cap_offset)
-> > > > +{
-> > > > +	struct vfio_info_cap_header *hdr;
-> > > > +
-> > > > +	if (!*cap_offset)
-> > > > +		return NULL;
-> > > > +
-> > > > +	VFIO_ASSERT_LT(*cap_offset, bufsz);
-> > > > +	VFIO_ASSERT_GE(bufsz - *cap_offset, sizeof(*hdr));
-> > > > +
-> > > > +	hdr = (struct vfio_info_cap_header *)((u8 *)buf + *cap_offset);
-> > > > +
-> > > > +	if (hdr->next)
-> > > > +		VFIO_ASSERT_GT(hdr->next, *cap_offset);  
-> > > 
-> > > This might be implementation, but I don't think it's a requirement.
-> > > The vfio capability chains are based on PCI capabilities, which have no
-> > > ordering requirement.  Thanks,  
-> > 
-> > My main interest was to enforce that the chain doesn't contain a cycle, and
-> > checking for monotonically increasing cap offset was the simplest way I could
-> > think of to guarantee such.
-> > 
-> > If there isn't such a check, and kernel vends a malformed cycle-containing
-> > chain, chain traversal would infinite loop.
-> > 
-> > Given the location of this test code coupled to the kernel tree, do you think
-> > such assumptions about implementation still reach too far? If yes, I can either
-> > remove this check, or try to make cycle detection more relaxed about offsets
-> > potentially going backwards.
+> x86 CPUs introduce additional GPRs, but those registers will initially
+> remain unused in the kernel and will not be saved in KVM register cache
+> on every VM exit. Guest states are expected to remain live in hardware
+> registers.
 > 
-> I've seen cycle detection in PCI config space implemented as just a
-> depth/ttl counter.  Max cycles is roughly (buffer-size/header-size).  I
-> think that would be sufficient if we want to include that sanity
-> testing.  Thanks,
+> This abstraction layer centralizes the selection of access methods,
+> providing a unified interface. For now, the EGPR accessors are
+> placeholders to be implemented later.
+> 
+> Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h      | 18 ++++++++++++
+>   arch/x86/include/asm/kvm_vcpu_regs.h | 16 ++++++++++
+>   arch/x86/kvm/fpu.h                   |  6 ++++
+>   arch/x86/kvm/x86.h                   | 44 ++++++++++++++++++++++++++--
+>   4 files changed, 82 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 48598d017d6f..940f83c121cf 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -212,6 +212,24 @@ enum {
+>   	VCPU_SREG_GS,
+>   	VCPU_SREG_TR,
+>   	VCPU_SREG_LDTR,
+> +#ifdef CONFIG_X86_64
+> +	VCPU_XREG_R16 = __VCPU_XREG_R16,
+> +	VCPU_XREG_R17 = __VCPU_XREG_R17,
+> +	VCPU_XREG_R18 = __VCPU_XREG_R18,
+> +	VCPU_XREG_R19 = __VCPU_XREG_R19,
+> +	VCPU_XREG_R20 = __VCPU_XREG_R20,
+> +	VCPU_XREG_R21 = __VCPU_XREG_R21,
+> +	VCPU_XREG_R22 = __VCPU_XREG_R22,
+> +	VCPU_XREG_R23 = __VCPU_XREG_R23,
+> +	VCPU_XREG_R24 = __VCPU_XREG_R24,
+> +	VCPU_XREG_R25 = __VCPU_XREG_R25,
+> +	VCPU_XREG_R26 = __VCPU_XREG_R26,
+> +	VCPU_XREG_R27 = __VCPU_XREG_R27,
+> +	VCPU_XREG_R28 = __VCPU_XREG_R28,
+> +	VCPU_XREG_R29 = __VCPU_XREG_R29,
+> +	VCPU_XREG_R30 = __VCPU_XREG_R30,
+> +	VCPU_XREG_R31 = __VCPU_XREG_R31,
+> +#endif
+>   };
+>   
+>   enum exit_fastpath_completion {
+> diff --git a/arch/x86/include/asm/kvm_vcpu_regs.h b/arch/x86/include/asm/kvm_vcpu_regs.h
+> index 1af2cb59233b..dd0cc171f405 100644
+> --- a/arch/x86/include/asm/kvm_vcpu_regs.h
+> +++ b/arch/x86/include/asm/kvm_vcpu_regs.h
+> @@ -20,6 +20,22 @@
+>   #define __VCPU_REGS_R13 13
+>   #define __VCPU_REGS_R14 14
+>   #define __VCPU_REGS_R15 15
+> +#define __VCPU_XREG_R16 16
+> +#define __VCPU_XREG_R17 17
+> +#define __VCPU_XREG_R18 18
+> +#define __VCPU_XREG_R19 19
+> +#define __VCPU_XREG_R20 20
+> +#define __VCPU_XREG_R21 21
+> +#define __VCPU_XREG_R22 22
+> +#define __VCPU_XREG_R23 23
+> +#define __VCPU_XREG_R24 24
+> +#define __VCPU_XREG_R25 25
+> +#define __VCPU_XREG_R26 26
+> +#define __VCPU_XREG_R27 27
+> +#define __VCPU_XREG_R28 28
+> +#define __VCPU_XREG_R29 29
+> +#define __VCPU_XREG_R30 30
+> +#define __VCPU_XREG_R31 31
+>   #endif
+>   
+>   #endif /* _ASM_X86_KVM_VCPU_REGS_H */
+> diff --git a/arch/x86/kvm/fpu.h b/arch/x86/kvm/fpu.h
+> index 3ba12888bf66..159239b3a651 100644
+> --- a/arch/x86/kvm/fpu.h
+> +++ b/arch/x86/kvm/fpu.h
+> @@ -4,6 +4,7 @@
+>   #define __KVM_FPU_H_
+>   
+>   #include <asm/fpu/api.h>
+> +#include <asm/kvm_vcpu_regs.h>
+>   
+>   typedef u32		__attribute__((vector_size(16))) sse128_t;
+>   #define __sse128_u	union { sse128_t vec; u64 as_u64[2]; u32 as_u32[4]; }
+> @@ -137,4 +138,9 @@ static inline void kvm_write_mmx_reg(int reg, const u64 *data)
+>   	kvm_fpu_put();
+>   }
+>   
+> +#ifdef CONFIG_X86_64
+> +static inline unsigned long kvm_read_egpr(int reg) { return 0; }
+> +static inline void kvm_write_egpr(int reg, unsigned long data) { }
 
-Thanks, that's a good suggestion -- will take this in v3.
+Do not inline these, they're quite large.  Leave them in x86.c.
 
-> 
-> Alex
+Also please add a KVM_APX Kconfig symbol and add "select KVM_APX if 
+X86_64" to KVM_INTEL.
+
+This way, AMD and 32-bit use the same logic to elide all the EGPR code.
+
+Paolo
+
+> +#endif
+> +
+>   #endif
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 4edadd64d3d5..74ae8f12b5a1 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -400,9 +400,49 @@ static inline bool vcpu_match_mmio_gpa(struct kvm_vcpu *vcpu, gpa_t gpa)
+>   	return false;
+>   }
+>   
+> +#ifdef CONFIG_X86_64
+> +static inline unsigned long _kvm_gpr_read(struct kvm_vcpu *vcpu, int reg)
+> +{
+> +	switch (reg) {
+> +	case VCPU_REGS_RAX ... VCPU_REGS_R15:
+> +		return kvm_register_read_raw(vcpu, reg);
+> +	case VCPU_XREG_R16 ... VCPU_XREG_R31:
+> +		return kvm_read_egpr(reg);
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static inline void _kvm_gpr_write(struct kvm_vcpu *vcpu, int reg, unsigned long val)
+> +{
+> +	switch (reg) {
+> +	case VCPU_REGS_RAX ... VCPU_REGS_R15:
+> +		kvm_register_write_raw(vcpu, reg, val);
+> +		break;
+> +	case VCPU_XREG_R16 ... VCPU_XREG_R31:
+> +		kvm_write_egpr(reg, val);
+> +		break;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +	}
+> +}
+> +#else
+> +static inline unsigned long _kvm_gpr_read(struct kvm_vcpu *vcpu, int reg)
+> +{
+> +	return kvm_register_read_raw(vcpu, reg);
+> +}
+> +
+> +static inline void _kvm_gpr_write(struct kvm_vcpu *vcpu, int reg, unsigned long val)
+> +{
+> +	kvm_register_write_raw(vcpu, reg, val);
+> +}
+> +#endif
+> +
+>   static inline unsigned long kvm_gpr_read(struct kvm_vcpu *vcpu, int reg)
+>   {
+> -	unsigned long val = kvm_register_read_raw(vcpu, reg);
+> +	unsigned long val = _kvm_gpr_read(vcpu, reg);
+>   
+>   	return is_64_bit_mode(vcpu) ? val : (u32)val;
+>   }
+> @@ -411,7 +451,7 @@ static inline void kvm_gpr_write(struct kvm_vcpu *vcpu, int reg, unsigned long v
+>   {
+>   	if (!is_64_bit_mode(vcpu))
+>   		val = (u32)val;
+> -	return kvm_register_write_raw(vcpu, reg, val);
+> +	_kvm_gpr_write(vcpu, reg, val);
+>   }
+>   
+>   static inline bool kvm_check_has_quirk(struct kvm *kvm, u64 quirk)
+
 
