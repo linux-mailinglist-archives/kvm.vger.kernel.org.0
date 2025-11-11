@@ -1,102 +1,102 @@
-Return-Path: <kvm+bounces-62792-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62793-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75CF8C4F257
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:57:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F6ABC4F275
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:59:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1700A4EAB1F
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:56:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AF30A4E2356
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374613730F4;
-	Tue, 11 Nov 2025 16:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC1F377EB4;
+	Tue, 11 Nov 2025 16:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b1js4xGl";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BUXpbIAi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elplknBI";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="amfBcSFI"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4DC1D6195
-	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 16:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993273730F3
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 16:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762880141; cv=none; b=WvY5iu8z9dOzisbymugU+CKtc/wUnbfd+AmNZ5HcSl4K/I5Vid80FLL+EgAa7Ezkq6U6EehOfOCgOXDNVIijlFi1Agz783hez/SW323wGF/6ECJDksFelcAlwIeX8itwnKi2SehXiKyToasY+E62Kbmn2zSqBK1yrVoYTPt51y0=
+	t=1762880372; cv=none; b=hclClaz1th5g+t6NFXzTOStvgF2mEK6DBdd/51pQJhPH1FLZKO0wHjrYHiJedIeTHITnOPP//zDyybYcufGHZdds13rHuxY3u+NsrfP2n4+AZAWUCXlqVio13BzpSFYLxNZTxXHpHcCe3Ow0/maFMB3bQLruNMJublr/YTUXvmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762880141; c=relaxed/simple;
-	bh=nlEfTmws0Q46o78NUfhpjE3w9PAskdTxv3a88lJzlpU=;
+	s=arc-20240116; t=1762880372; c=relaxed/simple;
+	bh=Qo7Exj/APE0HnRn2oxlqExyR6R1HSPpbWInRXXGeD64=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aexdao6X61C0EzGiU3zbtq+o/0C7sv2Tv+DngggXam72aG/rDZLJH0Bxc95B4wKbH3UkSVHk3SqJRAlE1+Pgmv/Isbpk/APhJ/JJeIVRQ88GKF5cP2/x/5apftof2B47OAwq0zBBv2C8zpTbYtSFxcrKN/RUIWt98IuFYnWIcoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b1js4xGl; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BUXpbIAi; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=CMDHlBX3geiqrjpVm57UZrcUq77Yxqi9KTPfeePQ0wg9u9bdHr811QQiLuSysmlZ0D7Y4NDnASrYFsFbZWaLjqUwoEBSWFGUvib7pWXeDpj6/sloAv+tWEnXslOlOuT8PkXg4ryprEgyeGDyT2lpm14LIJZrFL8GTP0RhVMCIJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=elplknBI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=amfBcSFI; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762880138;
+	s=mimecast20190719; t=1762880369;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=gnMIv0Ik+hITHUqF7t+6yoyTUpUVXjJtFWV6UcASCo0=;
-	b=b1js4xGlbKUSGz3rtJp2zOMe8x77+rZvE9HrYlFpounWmIxWIVhPEEvg2/u/pRLK10kMeR
-	4eHkveRNxwVdZH0rMP4knXLirU8D1qyZdqH1VMTZ9wYaIPP17qbToIiSwnX7v+ikzAizZc
-	/fdNd4cw6zo7jRyuK0fk6xt7t5VYKRo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=0yjyFEdJw3Z/9UU9NvRSds9W8+PuhWjUlM+UriXTdoU=;
+	b=elplknBI+iRbCpwOiOuxXTRx1UEVGuNxvlwaIy45MHEjTcztrJBhMDXH4G5ySBcxkiuzfH
+	I+SFNgotuhD9Z6Ut/RkCLEGGBJnTJb4GvK5oeYpOZXpH7r7veYIhxoXHeRW/x5vGAs64iM
+	xPEFg+YhtrmNf56FzCa3y+myMGDrOiI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-136-Hojp4HwoO1uHggqkuJ5dDw-1; Tue, 11 Nov 2025 11:55:37 -0500
-X-MC-Unique: Hojp4HwoO1uHggqkuJ5dDw-1
-X-Mimecast-MFC-AGG-ID: Hojp4HwoO1uHggqkuJ5dDw_1762880136
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-429be5aee5bso2015583f8f.3
-        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 08:55:37 -0800 (PST)
+ us-mta-50-FrisXJ0YMDeALyshIbONfw-1; Tue, 11 Nov 2025 11:59:28 -0500
+X-MC-Unique: FrisXJ0YMDeALyshIbONfw-1
+X-Mimecast-MFC-AGG-ID: FrisXJ0YMDeALyshIbONfw_1762880367
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42b2c8fb84fso1552685f8f.2
+        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 08:59:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762880136; x=1763484936; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1762880367; x=1763485167; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=gnMIv0Ik+hITHUqF7t+6yoyTUpUVXjJtFWV6UcASCo0=;
-        b=BUXpbIAi4TzFpdEinFY81Q/MYpNv6s5W/kRxFAC2GPgT7AgQrAa/1YnyGqPT3NFvkw
-         RsWZE5KdNsBPHD2MI8FEc5jQIn0U33eqJQIyG/fZqzxUjeYQb2LRVG6SHqXHFhFQdS1t
-         RMXcVziQkC6+eJSDzaNpLA64Z1Rkc6Yqyw5whMW9VqCIhTTEcXe5i56TYp+nvY+WOJi7
-         QOR0RCsZXYCKozEb7Nnn/r/VqMaviS02n5VsrjjEu4iXPFMBI6kwHppk3cOu2waqq5C4
-         1KvkFRtQ36rXZyD75aYAXD3A3WNJKyFImc6D+5NMLWo59Cau91HXleSnPYVO4nGK8jYk
-         eJ5A==
+        bh=0yjyFEdJw3Z/9UU9NvRSds9W8+PuhWjUlM+UriXTdoU=;
+        b=amfBcSFIzYIl45fpVzx9fTA87T/Xw4H2gcBhUJIvIG8LkJqLjpwE/DymM5NZkJy0zM
+         OvEfUUxaqRaFAhhicdFQhYEsOjo0jamyqWTPDf/tTJtWCFWJkyudFuskOuN/dL22TIIv
+         lUTLbL2ideaWtJG6Xe0CUmFf/GCy5IUvosqmt4BWkKBS1g18VY/egC6cCOZtuPi4ULMI
+         EpBl7coQ2QK5TMOblDz2kmZ10qfiIzQDhLyFA+SeBRPLHczwO2pjEHZllHgcbTjGnwoc
+         rfvT+156TP2JSlNqUuK11L5GaD3jfe0Ol1FyHx5XBJhbiodEcYSoVN81R6ghMUEpqxIa
+         QdrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762880136; x=1763484936;
+        d=1e100.net; s=20230601; t=1762880367; x=1763485167;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gnMIv0Ik+hITHUqF7t+6yoyTUpUVXjJtFWV6UcASCo0=;
-        b=BHXW03VKND3L8m+HByjJFNdHHjyDmeM4KVDbgKd87Dt5I/nfh9cAr45swqSapym7g+
-         2XSs/K9on+zFpQxpQBTUIw8qi7X0EysnvOCxkrDOAr0DoW/Mnt9+SE3x16ZhUZAwquwV
-         YaB/8Skepavi7OsN3T9rIP8OWF/+BS8z1P7gHm7vhUjHQS04JAvqXBPQ9xp34VvkbDKn
-         bl2oxzqkDB3doO5nQTxeYyp19H4H+8EMoiEOzBchprbyZ3fcTqEV2lpIZw10kQqxax6V
-         aX3ybkOcaX4qU83LdbizjKSULvKmpjitLmaOtPccXOuY8PzSXIuwc98QBlQoV1TyvWae
-         eyyg==
-X-Forwarded-Encrypted: i=1; AJvYcCUlOPQlM+BIcHa8rhRMNvVtivWwfrpj6zXVAfFz0Du3c3u4pQQItNRbSTX0aVn+wxBnmnw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyv/WrjrPaTV8uYsOkQO1Ku+HQLQO3MlITm1aNcOKLjSHN/SFjw
-	urM1WiUcIJX8AH6RYceEdx3Zc/bujoI2yjwryS4/mH/lRwChNmxRKT3obAO/DecOi7vI06WOI7s
-	ulxde8yInnTmXPN5r+1Iy21F84olq76znQVIREqEaly2Aao4GUzb3dQ==
-X-Gm-Gg: ASbGncsDTNhFkKRoYhrF/I4WCwq+Hu2l6Ecl3BDoU/cHcV/4UxIe0wQiA9Udgh5sKGs
-	ViI5OEJ9UkzKNPNzcmoTzJFV3cU5mF1R082Rvp8CgeX6IJty7/jif9rcIOtLHois67ILL6KS8Y8
-	REawYHOyiSlhwpWurPwJOwSX5Se0MKBs8Vgtdpr4myCzSMP/4SNKPTq2vzV+rijxLlXHGRTYPow
-	bW7PB2u5OKeJjjatqDSMeDbk54BFBJ59wLQodOoaw3KLr19EkpTSXIe7KxFzFSlRg1ffN8g2iol
-	eNsOAIWntq2SkrTOb/stM+DvIh4GqMxTayTDlnO4NR81Sk5Tj5LqzYipHSoi+lHxiBktD/oJGMt
-	6QlZ2Cd+rhWSj5EQ7ciQrQ2bxBB+B/EEvE0I7e0/AxT2PinSkmVYp2g7NbyFsgKGhNLDsC1OFjp
-	teiw90KQ==
-X-Received: by 2002:a05:6000:144e:b0:42b:3bfc:d5cb with SMTP id ffacd0b85a97d-42b3bfcde1bmr6451767f8f.51.1762880136103;
-        Tue, 11 Nov 2025 08:55:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEwXz8O+8CJxSCaosY+x8WzSmDIqFBYmIyaTJkW/+khTeoschvxJNMBqDWOCSADXh+6y0zXnQ==
-X-Received: by 2002:a05:6000:144e:b0:42b:3bfc:d5cb with SMTP id ffacd0b85a97d-42b3bfcde1bmr6451748f8f.51.1762880135650;
-        Tue, 11 Nov 2025 08:55:35 -0800 (PST)
+        bh=0yjyFEdJw3Z/9UU9NvRSds9W8+PuhWjUlM+UriXTdoU=;
+        b=dO+Zk8eVXZhuEkt9OTHks4GpmB5liSiFcEHoZmkTviGMaAjGS/M4YjzCZEbBE2YHTD
+         4VvgqVywao7QDkiyDlKKc4wzMhY9f/wiKWQVSJyvTybQENzFsigQlrEJAx5ltGgW/GQb
+         8fyYlHciAj5HG1QuKmGbaOa9ZXCxR+P1/J+VgC3KsHP4HiznbOwKXvnGcp/s+9qJvxKo
+         Jn7hgdxEXqHkr6FQmBkeDvA19uvgiHcdB9+/jdL89l35kFvWGh+BP3Zjx+QPzevRFv7Y
+         YCxuJf5eQniy8Rl2K4p78l3FoizAEDR5Sd4LYFwXZ3nRDnR/QblAn0UHx32zVKmBJz8T
+         iBRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUx4dGZTzdpNN0mKaLBZXkDEkhgNywpZT2M18kevkCnxmx/YVPShDbvJpaTB7Wla86wfB0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxt/uI3ayBopbmBuj6bzv1ZDPgbyzolbqWhqkt7Dy6LbjRJyK5L
+	L7txAT/ST+M32B78LvxK7CrkM2crz7vs6JkATlpb63ufIQ+QDEKiKKoeMw3XLaZZZYPNStmf8zB
+	ofUpYOC2J2LIS2iIpZaUaOtSV7Ri8P6Dacivrf4zH4rlM42+lN1tBtg==
+X-Gm-Gg: ASbGncvnW3aGM7DdqGJYsJPyCwQyWH3bnKy904QUYsUv948l7epTqXO8RhBW8ybHPzt
+	neLaI2VxpsYjpNTRvw9cOFGTkfD8I8Am9Cx1BrRtb9NStAM+1zMvP9XLJqQZJtYNEK3pEiv3RpB
+	J+rGdbK+CgDQEdMt+AbVGnKgqkr+4qQ1o3ZEwDIgFvc1gyd4uBOFLEC+yhbKXNMXfHiu6QFa4v3
+	+IqN5AHRSvnqmPuU0kK/bEX1diKfYRPuCLqZKEG6d5RFaRMhShw7/elUl3TExHIzaKg4LdHQFWg
+	ydyzWbVZhdA1yFI3JzOwzDIFwZMifJKgR2htPQ63X7tlQYhF7sF6VC34p9pes84RgmPxx1g3hRt
+	dQw+/PCLvePhuYAWNQl1/tQ7bcea8uDrfJFVqT/KbY2G4/OD1ED7qc8pWvzPgSNa1o7csSkrUzE
+	6RYWBqSg==
+X-Received: by 2002:a5d:64e9:0:b0:42b:3b8a:308c with SMTP id ffacd0b85a97d-42b3b8a330dmr6778697f8f.42.1762880366620;
+        Tue, 11 Nov 2025 08:59:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEBW6xdCq116y/1XekpG/swzz3TUrPhCCJUWZkLqBlcg3nEm6rS3ZuSaKjCs2735S7BCkgu+g==
+X-Received: by 2002:a5d:64e9:0:b0:42b:3b8a:308c with SMTP id ffacd0b85a97d-42b3b8a330dmr6778671f8f.42.1762880366165;
+        Tue, 11 Nov 2025 08:59:26 -0800 (PST)
 Received: from [192.168.10.81] ([176.206.111.214])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-42abe63dfecsm29514102f8f.12.2025.11.11.08.55.30
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-42ac679607esm28646672f8f.43.2025.11.11.08.59.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 08:55:31 -0800 (PST)
-Message-ID: <0de0215b-6013-4565-9cda-92a7b6f8c34b@redhat.com>
-Date: Tue, 11 Nov 2025 17:55:28 +0100
+        Tue, 11 Nov 2025 08:59:23 -0800 (PST)
+Message-ID: <ab3f4937-38f5-4354-8850-bf773c159bbe@redhat.com>
+Date: Tue, 11 Nov 2025 17:59:21 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -104,13 +104,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 11/20] KVM: x86: Refactor opcode table lookup in
- instruction emulation
+Subject: Re: [PATCH RFC v1 17/20] KVM: x86: Prepare APX state setting in XCR0
 To: "Chang S. Bae" <chang.seok.bae@intel.com>, kvm@vger.kernel.org,
  linux-kernel@vger.kernel.org
 Cc: seanjc@google.com, chao.gao@intel.com, zhao1.liu@intel.com
 References: <20251110180131.28264-1-chang.seok.bae@intel.com>
- <20251110180131.28264-12-chang.seok.bae@intel.com>
+ <20251110180131.28264-18-chang.seok.bae@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -148,77 +147,159 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20251110180131.28264-12-chang.seok.bae@intel.com>
+In-Reply-To: <20251110180131.28264-18-chang.seok.bae@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 11/10/25 19:01, Chang S. Bae wrote:
-> Refactor opcode lookup to clearly separate handling of different byte
-> sequences and prefix types, in preparation for REX2 support.
+> Prepare the APX state enabling in XCR0 by implementing the previous
+> placeholders and ensuring its readiness.
 > 
-> The decoder begins with a one-byte opcode table by default and falls
-> through to other tables on escape bytes, but the logic is intertwined and
-> hard to extend.
+> APX introduces EGPRs, tracked as XSTATE component 19. Like other
+> XSAVE-managed states, EGPR availability is controlled through XCR0, and
+> the registers are accessible only in 64-bit mode.
 > 
-> REX2 introduces a dedicated bit in its payload byte to indicate which
-> opcode table to use. To accommodate this mapping bit, the existing lookup
-> path needs to be restructured.
+> At this point, only VMX supports EGPRs. SVM will require corresponding
+> extensions to handle EGPR indices.
 > 
-> No functional changes intended.
+> The addition to the supported XCR0 mask should accompany guest CPUID
+> exposure, which will be done separately.
+
+You should also adjust set_xcr to reject setting BNDREGS and APX 
+together (QEMU should also reject MPX and APX together in CPUID, but KVM 
+doesn't care enough about invalid CPUID configuration).
+
+Paolo
+
 > 
 > Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
 > ---
->   arch/x86/kvm/emulate.c | 19 +++++++++++--------
->   1 file changed, 11 insertions(+), 8 deletions(-)
+> RFC note
+> Not all callers may need to validate the XCR0 bit -- maybe a capability
+> bit. However, every exit associated with EGPRs should already have that
+> control bit set in the first place. Checking it explicitly does not
+> charge additional cost, so I have this for consistency.
+> ---
+>   arch/x86/kvm/emulate.c        |  9 +++++++--
+>   arch/x86/kvm/kvm_cache_regs.h |  1 +
+>   arch/x86/kvm/kvm_emulate.h    |  1 +
+>   arch/x86/kvm/svm/svm.c        |  7 ++++++-
+>   arch/x86/kvm/vmx/vmx.h        |  9 ++++++++-
+>   arch/x86/kvm/x86.c            | 11 +++++++++++
+>   6 files changed, 34 insertions(+), 4 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 763fbd139242..9c98843094a1 100644
+> index f9381a4055d6..ba3020e6f469 100644
 > --- a/arch/x86/kvm/emulate.c
 > +++ b/arch/x86/kvm/emulate.c
-> @@ -4773,7 +4773,6 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
->   	ctxt->_eip = ctxt->eip;
->   	ctxt->fetch.ptr = ctxt->fetch.data;
->   	ctxt->fetch.end = ctxt->fetch.data + insn_len;
-> -	ctxt->opcode_len = 1;
->   	ctxt->intercept = x86_intercept_none;
->   	if (insn_len > 0)
->   		memcpy(ctxt->fetch.data, insn, insn_len);
-> @@ -4877,20 +4876,24 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
->   	if (ctxt->rex.bits.w)
->   		ctxt->op_bytes = 8;
+> @@ -4787,9 +4787,14 @@ static int decode_operand(struct x86_emulate_ctxt *ctxt, struct operand *op,
+>   	return rc;
+>   }
 >   
-> -	/* Opcode byte(s). */
-> -	opcode = opcode_table[ctxt->b];
-> -	/* Two-byte opcode? */
-> +	/* Determine opcode byte(s): */
->   	if (ctxt->b == 0x0f) {
-> -		ctxt->opcode_len = 2;
-> +		/* Escape byte: start two-byte opcode sequence */
->   		ctxt->b = insn_fetch(u8, ctxt);
-> -		opcode = twobyte_table[ctxt->b];
-> -
-> -		/* 0F_38 opcode map */
->   		if (ctxt->b == 0x38) {
-> +			/* Three-byte opcode */
->   			ctxt->opcode_len = 3;
->   			ctxt->b = insn_fetch(u8, ctxt);
->   			opcode = opcode_map_0f_38[ctxt->b];
-> +		} else {
-> +			/* Two-byte opcode */
-> +			ctxt->opcode_len = 2;
-> +			opcode = twobyte_table[ctxt->b];
->   		}
-> +	} else {
-> +		/* Single-byte opcode */
-> +		ctxt->opcode_len = 1;
-> +		opcode = opcode_table[ctxt->b];
+> -static inline bool emul_egpr_enabled(struct x86_emulate_ctxt *ctxt __maybe_unused)
+> +/* EGPR availability is controlled by the APX feature bit in XCR0. */
+> +static inline bool emul_egpr_enabled(struct x86_emulate_ctxt *ctxt)
+>   {
+> -	return false;
+> +	u64 xcr0;
+> +
+> +	ctxt->ops->get_xcr(ctxt, XCR_XFEATURE_ENABLED_MASK, &xcr0);
+> +
+> +	return xcr0 & XFEATURE_MASK_APX;
+>   }
+>   
+>   int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int emulation_type)
+> diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
+> index 8ddb01191d6f..acdb3751317c 100644
+> --- a/arch/x86/kvm/kvm_cache_regs.h
+> +++ b/arch/x86/kvm/kvm_cache_regs.h
+> @@ -3,6 +3,7 @@
+>   #define ASM_KVM_CACHE_REGS_H
+>   
+>   #include <linux/kvm_host.h>
+> +#include <asm/fpu/xcr.h>
+>   
+>   #define KVM_POSSIBLE_CR0_GUEST_BITS	(X86_CR0_TS | X86_CR0_WP)
+>   #define KVM_POSSIBLE_CR4_GUEST_BITS				  \
+> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+> index cc16211d61f6..673a82532c78 100644
+> --- a/arch/x86/kvm/kvm_emulate.h
+> +++ b/arch/x86/kvm/kvm_emulate.h
+> @@ -237,6 +237,7 @@ struct x86_emulate_ops {
+>   	bool (*is_smm)(struct x86_emulate_ctxt *ctxt);
+>   	int (*leave_smm)(struct x86_emulate_ctxt *ctxt);
+>   	void (*triple_fault)(struct x86_emulate_ctxt *ctxt);
+> +	int (*get_xcr)(struct x86_emulate_ctxt *ctxt, u32 index, u64 *xcr);
+>   	int (*set_xcr)(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr);
+>   
+>   	gva_t (*get_untagged_addr)(struct x86_emulate_ctxt *ctxt, gva_t addr,
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 3aa2c37754ef..e6a082686000 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -5288,8 +5288,13 @@ static __init int svm_hardware_setup(void)
 >   	}
->   	ctxt->d = opcode.flags;
+>   	kvm_enable_efer_bits(EFER_NX);
 >   
-
-This will also conflict with the VEX patches, overall I think all 10-12 
-patches can be merged in one.
-
-Paolo
+> +	/*
+> +	 * APX introduces EGPRs, which require additional VMCB support.
+> +	 * Disable APX until the necessary extensions are handled.
+> +	 */
+>   	kvm_caps.supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS |
+> -				     XFEATURE_MASK_BNDCSR);
+> +				     XFEATURE_MASK_BNDCSR  |
+> +				     XFEATURE_MASK_APX);
+>   
+>   	if (boot_cpu_has(X86_FEATURE_FXSR_OPT))
+>   		kvm_enable_efer_bits(EFER_FFXSR);
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 6cf1eb739caf..784aa0504dce 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -372,7 +372,14 @@ struct vmx_insn_info {
+>   	union insn_info info;
+>   };
+>   
+> -static inline bool vmx_egpr_enabled(struct kvm_vcpu *vcpu __maybe_unused) { return false; }
+> +/*
+> + * EGPR availability is controlled by the APX xfeature bit in XCR0 and is
+> + * only accessible in 64-bit mode.
+> + */
+> +static inline bool vmx_egpr_enabled(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.xcr0 & XFEATURE_MASK_APX && is_64_bit_mode(vcpu);
+> +}
+>   
+>   static inline struct vmx_insn_info vmx_get_insn_info(struct kvm_vcpu *vcpu)
+>   {
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4c8c2fc3bda6..e087db0f4153 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8843,6 +8843,16 @@ static void emulator_triple_fault(struct x86_emulate_ctxt *ctxt)
+>   	kvm_make_request(KVM_REQ_TRIPLE_FAULT, emul_to_vcpu(ctxt));
+>   }
+>   
+> +static int emulator_get_xcr(struct x86_emulate_ctxt *ctxt, u32 index, u64 *xcr)
+> +{
+> +	/* Only support XCR_XFEATURE_ENABLED_MASK now  */
+> +	if (index != XCR_XFEATURE_ENABLED_MASK)
+> +		return 1;
+> +
+> +	*xcr = emul_to_vcpu(ctxt)->arch.xcr0;
+> +	return 0;
+> +}
+> +
+>   static int emulator_set_xcr(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr)
+>   {
+>   	return __kvm_set_xcr(emul_to_vcpu(ctxt), index, xcr);
+> @@ -8915,6 +8925,7 @@ static const struct x86_emulate_ops emulate_ops = {
+>   	.is_smm              = emulator_is_smm,
+>   	.leave_smm           = emulator_leave_smm,
+>   	.triple_fault        = emulator_triple_fault,
+> +	.get_xcr             = emulator_get_xcr,
+>   	.set_xcr             = emulator_set_xcr,
+>   	.get_untagged_addr   = emulator_get_untagged_addr,
+>   	.is_canonical_addr   = emulator_is_canonical_addr,
 
 
