@@ -1,125 +1,156 @@
-Return-Path: <kvm+bounces-62662-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62663-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95898C49DBC
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 01:23:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D72E9C49DD1
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 01:26:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75F953A34F9
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 00:23:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96AE83A7D5F
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 00:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A001B043C;
-	Tue, 11 Nov 2025 00:23:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8241D6DB5;
+	Tue, 11 Nov 2025 00:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="pBK+uz/9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eHvm1Lzy"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3B2188CC9;
-	Tue, 11 Nov 2025 00:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51BB1C3BFC
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 00:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762820596; cv=none; b=U8kZUaY+H/tnkWfukAy9g1blNupE1FQu8Il2q/pl7VVPlYZgIEPNvxR9IzERrE4yP0AJ5TJPx/gnjaCZiWykVZ1Gb5D6H5QPldaxGywf0QcthhTGRs20XSyy1Ore2vmbwCqyX56x/dk59a4dmyU0P90HalDF5TEMNcADO09zHJE=
+	t=1762820813; cv=none; b=eeMsSudFtFtAopubfYTuOqex9ikdJSDWZbmwK/xDYRkBsdcKmlwfHfr5RGqGUhR+j3UTaz4ejQXTWtjp4jdbvpU8anoN93vNszBuqrv0CLh0dDuiJaURBA9Z/OR8lnlnJZxCj+c3qPrdbhPkvtSQA2csw8/OyfOsKPkZJS79Rz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762820596; c=relaxed/simple;
-	bh=gHyaL6pqvKbF/42T+jG0a6a0x8S6QYiyQ3WK/gyAZKs=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=Sm/o2JNgzFDYvJ2xTQn6h702uXE691TWQaz9QeeBifwUtFFISQitehhwX7w4ZNmMTkoqNcCKFDzXUVSINzJNyV8Qc80nb6bGYcA7mc2XtaHhatss3DHZ9BzrKP3RBgV/0Txb0VC+vu0dzDHkP7/OyOG7C72OD1F8RHJHBqLAezs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=pBK+uz/9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D8D1C19425;
-	Tue, 11 Nov 2025 00:23:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1762820596;
-	bh=gHyaL6pqvKbF/42T+jG0a6a0x8S6QYiyQ3WK/gyAZKs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pBK+uz/9B/7dT4Dfr1fmhdpoHhdxbIQqjTbyre/CkikfJY2PM+IIamTL2ZV0BAKI6
-	 KK/J5MjNOlWuttzCb4ScA2sCUxaN79WlqRq+Yt72sQj5jhbtkPdo/BxnO6J7GWbfms
-	 VP61krwUmcnmNbdLHyOdfy1bZLglbb1ntnV/rcd8=
-Date: Mon, 10 Nov 2025 16:23:13 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Hugh Dickins <hughd@google.com>
-Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Chris Li
- <chrisl@kernel.org>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda
- <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, Alexander
- Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer
- <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, Vasily
- Gorbik <gor@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Peter Xu
- <peterx@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
- Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Arnd Bergmann
- <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>, Baolin Wang
- <baolin.wang@linux.alibaba.com>, "Liam R . Howlett"
- <Liam.Howlett@oracle.com>, Nico Pache <npache@redhat.com>, Ryan Roberts
- <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song
- <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>, Muchun Song
- <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, Vlastimil
- Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan
- <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Matthew Brost
- <matthew.brost@intel.com>, Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim
- <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, Gregory Price
- <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, Alistair
- Popple <apopple@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
- Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, Kemeng Shi
- <shikemeng@huaweicloud.com>, Kairui Song <kasong@tencent.com>, Nhat Pham
- <nphamcs@gmail.com>, Baoquan He <bhe@redhat.com>, SeongJae Park
- <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>, Jason Gunthorpe
- <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Xu Xin
- <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>, Jann Horn
- <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>, Naoya Horiguchi
- <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>, Pasha Tatashin
- <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>, Harry Yoo
- <harry.yoo@oracle.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
-Subject: Re: [PATCH v2 00/16] mm: remove is_swap_[pte, pmd]() + non-swap
- entries, introduce leaf entries
-Message-Id: <20251110162313.baee36f4815b3aeb3f12921e@linux-foundation.org>
-In-Reply-To: <c9e3ad0e-02ef-077c-c12c-f72057eb7817@google.com>
-References: <cover.1762621567.git.lorenzo.stoakes@oracle.com>
-	<CACePvbVq3kFtrue2smXRSZ86+EuNVf6q+awQnU-n7=Q4x7U9Lw@mail.gmail.com>
-	<5b60f6e8-7eab-4518-808a-b34331662da5@lucifer.local>
-	<CACePvbUvQu+So7OoUbJTMLODz8YDAOgWaM8A-RXFj2U_Qc-dng@mail.gmail.com>
-	<3c0e9dd0-70ac-4588-813b-ffb24d40f067@lucifer.local>
-	<c9e3ad0e-02ef-077c-c12c-f72057eb7817@google.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1762820813; c=relaxed/simple;
+	bh=NgfNWY3Wt3nuaS355AaMY+stuYNDIeq0GOQ3IoiEeuw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ElUKoSBn7g5GfZVcbw1F9BUJOfjKIWkuhA+JSzk4GasltKhRVIsPbvzvvx1OEYhKUG/BZYl4HvtsFJoEbEKieWo9bSUA/spI3vUYh9RMLHu+fE+ppLZBgVbAfMIcB9Pc7NMBkOXQzTWt0x4JfpnJZa2mNKreRkbw29aMGTELzFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eHvm1Lzy; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 11 Nov 2025 00:26:31 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762820808;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tlmDsda+dxGOrCn1EldCEA+y3uPWJnnm3FqHlVKFFcA=;
+	b=eHvm1LzyuVQp0E5hsdfidIAeXCuNsVLZ6K0BtpkwGMbJBe2V4CDBidlA1bInYYKzvx731j
+	zJRFMH8OYb8nZZkpKB70fzbQnr6zfD/XJzsmXapkxtt8gKUvWLhC4vInH1Lk2gohjN0DlJ
+	HSKtN0rnh+MZ4DXOFs5u/35A55/upzc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Jim Mattson <jmattson@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] KVM: SVM: Don't set GIF when clearing EFER.SVME
+Message-ID: <472x65cnmgux7nrbclwfsaf6gaym6jb7vvh2vgxfxfevdb47x2@nz2rv3wzhduv>
+References: <20251009223153.3344555-1-jmattson@google.com>
+ <20251009223153.3344555-3-jmattson@google.com>
+ <aO1-IV-R6XX7RIlv@google.com>
+ <CALMp9eRQZuDy8-H3b8tbdZVQSznUK9=yhuBV9vBFAQz3UP+iRg@mail.gmail.com>
+ <aO6-CbTRPp1ZNIWq@google.com>
+ <CALMp9eRJaO9z=u5y0e+D44_U_FH1ye2s+cHNHmtERxEe+k2Dsw@mail.gmail.com>
+ <aO7JjaymjPMBcjrz@google.com>
+ <CALMp9eQ3Ff4pYJgwcyzq-Ttw=Se6f+Q3VK06ROg5FCJe+=kAhg@mail.gmail.com>
+ <aPK7qvIeSdzxdzMZ@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aPK7qvIeSdzxdzMZ@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 10 Nov 2025 15:38:55 -0800 (PST) Hugh Dickins <hughd@google.com> wrote:
-
-> > I'm sorry but this is not a reasonable request. I am being as empathetic and
-> > kind as I can be here, but this series is proceeding without arbitrary delay.
+On Fri, Oct 17, 2025 at 02:56:58PM -0700, Sean Christopherson wrote:
+> On Tue, Oct 14, 2025, Jim Mattson wrote:
+> > On Tue, Oct 14, 2025 at 3:07 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Tue, Oct 14, 2025, Jim Mattson wrote:
+> > > > On Tue, Oct 14, 2025 at 2:18 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > > >
+> > > > > On Tue, Oct 14, 2025, Jim Mattson wrote:
+> > > > > > On Mon, Oct 13, 2025 at 3:33 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > > > > >
+> > > > > > > On Thu, Oct 09, 2025, Jim Mattson wrote:
+> > > > > > > > Clearing EFER.SVME is not architected to set GIF.
+> > > > > > >
+> > > > > > > But it's also not architected to leave GIF set when the guest is running, which
+> > > > > > > was the basic gist of the Fixes commit.  I suspect that forcing GIF=1 was
+> > > > > > > intentional, e.g. so that the guest doesn't end up with GIF=0 after stuffing the
+> > > > > > > vCPU into SMM mode, which might actually be invalid.
+> > > > > > >
+> > > > > > > I think what we actually want is to to set GIF when force-leaving nested.  The
+> > > > > > > only path where it's not obvious that's "safe" is toggling SMM in
+> > > > > > > kvm_vcpu_ioctl_x86_set_vcpu_events().  In every other path, setting GIF is either
+> > > > > > > correct/desirable, or irrelevant because the caller immediately and unconditionally
+> > > > > > > sets/clears GIF.
+> > > > > > >
+> > > > > > > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > > > > > > index a6443feab252..3392c7e22cae 100644
+> > > > > > > --- a/arch/x86/kvm/svm/nested.c
+> > > > > > > +++ b/arch/x86/kvm/svm/nested.c
+> > > > > > > @@ -1367,6 +1367,8 @@ void svm_leave_nested(struct kvm_vcpu *vcpu)
+> > > > > > >                 nested_svm_uninit_mmu_context(vcpu);
+> > > > > > >                 vmcb_mark_all_dirty(svm->vmcb);
+> > > > > > >
+> > > > > > > +               svm_set_gif(svm, true);
+> > > > > > > +
+> > > > > > >                 if (kvm_apicv_activated(vcpu->kvm))
+> > > > > > >                         kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
+> > > > > > >         }
+> > > > > > >
+> > > > > >
+> > > > > > This seems dangerously close to KVM making up "hardware" behavior, but
+> > > > > > I'm okay with that if you are.
+> > > > >
+> > > > > Regardless of what KVM does, we're defining hardware behavior, i.e. keeping GIF
+> > > > > unchanged defines behavior just as much as setting GIF.  The only way to truly
+> > > > > avoid defining behavior would be to terminate the VM and completely prevent
+> > > > > userspace from accessing its state.
+> > > >
+> > > > This can't be the only instance of "undefined behavior" that KVM deals
+> > > > with.
+> > >
+> > > Oh, for sure.  But unsurprisingly, people only care about cases that actually
+> > > matter in practice.  E.g. the other one that comes to mind is SHUTDOWN on AMD:
+> > >
+> > >         /*
+> > >          * VMCB is undefined after a SHUTDOWN intercept.  INIT the vCPU to put
+> > >          * the VMCB in a known good state.  Unfortuately, KVM doesn't have
+> > >          * KVM_MP_STATE_SHUTDOWN and can't add it without potentially breaking
+> > >          * userspace.  At a platform view, INIT is acceptable behavior as
+> > >          * there exist bare metal platforms that automatically INIT the CPU
+> > >          * in response to shutdown.
+> > >          *
 > > 
-> > I will do everything I can to accommodate any concerns or issues you may have
-> > here _within reason_ :)
+> > The behavior of SHUTDOWN while GIF==0 is clearly architected:
+> > 
+> > "If the processor enters the shutdown state (due to a triple fault for
+> > instance) while GIF is clear, it can only be restarted by means of a
+> > RESET."
+> > 
+> > Doesn't setting GIF in svm_leave_nested() violate this specification?
 > 
-> But Lorenzo, have you even tested your series properly yet, with
-> swapping and folio migration and huge pages and tmpfs under load?
-> Please do.
+> Probably?  But SHUTDOWN also makes the VMCB undefined, so KVM is caught between
+> a rock and a hard place.  And when using vGIF, I don't see how KVM can do the
+> right thing, because the state of GIF at the time of SHUTDOWN is unknown.
 > 
-> I haven't had time to bisect yet, maybe there's nothing more needed
-> than a one-liner fix somewhere; but from my experience it is not yet
-> ready for inclusion in mm and next - it stops testing other folks' work.
-> 
-> I haven't tried today's v3, but from the cover letter of differences,
-> it didn't look like much of importance is fixed since v2: which
-> (after a profusion of "Bad swap offet entry 3ffffffffffff" messages,
-> not seen with v1, and probably not really serious) soon hits an Oops
-> or a BUG or something (as v1 did) - I don't have any logs or notes
-> to give yet, just forewarning before pursuing later in the day.
-> 
-> If you think v3 has fixed real crashes under load, please say so:
-> otherwise, I doubt it's worth Andrew hurrying to replace v2 by v3.
+> And FWIW, if userspace does RESET the guest (which KVM can't detect with 100%
+> accuracy), GIF=1 on RESET, so it's kinda sorta right :-)
 
-Oh.  Thanks.  I'll move the v3 series into mm-new for now.
+This thread kinda ended on a cliffhanger.
 
+Sean, is the plan to apply Jim's patch + your diff to svm_set_gif() in
+svm_leave_nested()? Or are you waiting for Jim to send a v2?
 
