@@ -1,256 +1,235 @@
-Return-Path: <kvm+bounces-62736-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62737-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43F0AC4C98C
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 10:18:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A229C4C9FA
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 10:23:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C570D189A92C
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 09:16:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7439A189F548
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 09:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D762EDD5F;
-	Tue, 11 Nov 2025 09:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E362F12CA;
+	Tue, 11 Nov 2025 09:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LXJYyD4H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vGClO8NE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82B6242D6A;
-	Tue, 11 Nov 2025 09:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762852527; cv=fail; b=DSQOJutB+9XJJzlmGNaJNd6VSNsMFY/ifgAPxaMzBgHuAOKHyJZOrxNdFth5u0x7COzQGJpgA3vcelQZg12pLFUOHJ4rHJXWgRvwYHPXLrrD3Jeh1wGjvDKShDd6cmy6gYvPcM/g5SuQHIR6QB1g9j+VzUX3CNPbis6KNilI/Fk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762852527; c=relaxed/simple;
-	bh=WFW1F72y0gzVulZOaEebBrp2OqLoEPbzcfjCl6voe8c=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=i2lCsVteVWj48gAngweVSFIagWXx3eY9/lxfKoLD1+YH4r9pA16BUATc5S3USRhvT4o8dAV2+RfzMh718yqHGbSkkr5s505enHz5mYGfpdZSIfCcVedRU62n7aORz91Pe2M/qhrr8Rgm5/vKxPycQ9r9aXUrkmAGfjUPlPW2Psw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LXJYyD4H; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762852525; x=1794388525;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=WFW1F72y0gzVulZOaEebBrp2OqLoEPbzcfjCl6voe8c=;
-  b=LXJYyD4HYeIQlSw7u7qbe/8VBhTgroTQRq9FQCe4vFIMWzsBR+At7AX2
-   0XstwV7oSiSCfDyR97CjzfO85B7GyLNGwD0tswAbqjMorCpAvpNb/eRDH
-   lQu05VhBO9qNJ0CsrX94TmnifhsGT4zR4tVQ8ckn5Y4i0Jk8RVb+p8QsH
-   IOUjGTRlEYJKNSkaC9MPQtOcjOOO/d3JnYuLFlViLRXF4zY/BCRoWXCZR
-   ehCuWe4fXA/VDTiU5BdfgraYXonC7K3kk8n5l1D7op1PEpDZpxZtpWuQ4
-   COSsR8AIOqFUSuyS2tFfWaoiLODsMUfac0aUSGpSMH7/NyIhYySMjF6x2
-   g==;
-X-CSE-ConnectionGUID: DmFaVs89RJC+vycLChei0Q==
-X-CSE-MsgGUID: SFkCdWqhSeSKFvp+C6ONiw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11609"; a="65001861"
-X-IronPort-AV: E=Sophos;i="6.19,296,1754982000"; 
-   d="scan'208";a="65001861"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 01:15:25 -0800
-X-CSE-ConnectionGUID: 6j74r7xsRU2VBN5zeTp3kg==
-X-CSE-MsgGUID: GZXJ3o8cS3yMGUkHNWrDYg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,296,1754982000"; 
-   d="scan'208";a="188873987"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 01:15:25 -0800
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 11 Nov 2025 01:15:24 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Tue, 11 Nov 2025 01:15:24 -0800
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.70)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 11 Nov 2025 01:15:24 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=icAx+XzjDx4q8gkTTOR3Cwf/Kl1NXQXRXnzv0hV8b40/BZ6T8miia59YkvrX76OW7WrQ7andQw+ed41k1iB4Cbk+xEBxMUahuFaG/Cd1H3Id9JygR8N5D0pMENZiI3XqH08yPIP06XvOZj+IPXrsd/Gk2ZiQ3M6OhhXsokVclnIVLykwCjvcTQg2xlDVgxhoFRO0k+WYqEA2GS5y/lX//w/4cp1aiZfuklsDMwizuzGjodhkTZyV4mZn60WH92MH4ItjdTU/1AADiM9KVJ30iKQhihn+d3Tm9BynpEZB3FisHolZBOVjG4vkNRbd+8Sp2C+wixLM6/AHsUPffQxtnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WFW1F72y0gzVulZOaEebBrp2OqLoEPbzcfjCl6voe8c=;
- b=uo1pHHpC8B1GzUPTPRCFtbSUJB1ZHExkusikMWJObJ8TcFYFVfba/s465g1amahIa7scc4WrDoDoILuOJGiL0JnFQq6Un+s6iecq6QStIDTc7dMavHCstmrujHu3GwUAgpR3KoA4nmVFErnMysgNY3yQRtqNq7UjPjpVQ4+V4NQsTOr/P3+0mj0TclzNi8vXO9y8cxuPLcRdfrTdAsQ+boZ4lBwAOzYKfXdWQOkoBfs4LROID6CaRgFpBfQpnZg/xLHKx4Bl6GXMGv99gHmrozcx2VTBQjdaCp1IbweGqpx9eUcz/dMzUROJMiUA9RIsdZ5mop8qNp0Cob3+D4TVLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com (2603:10b6:208:31f::10)
- by SA0PR11MB4720.namprd11.prod.outlook.com (2603:10b6:806:72::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Tue, 11 Nov
- 2025 09:15:22 +0000
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66]) by BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66%6]) with mapi id 15.20.9320.013; Tue, 11 Nov 2025
- 09:15:22 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "Zhao, Yan Y" <yan.y.zhao@intel.com>, "binbin.wu@linux.intel.com"
-	<binbin.wu@linux.intel.com>
-CC: "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Li, Xiaoyao"
-	<xiaoyao.li@intel.com>, "Du, Fan" <fan.du@intel.com>, "Hansen, Dave"
-	<dave.hansen@intel.com>, "david@redhat.com" <david@redhat.com>,
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "vbabka@suse.cz"
-	<vbabka@suse.cz>, "tabba@google.com" <tabba@google.com>,
-	"michael.roth@amd.com" <michael.roth@amd.com>, "seanjc@google.com"
-	<seanjc@google.com>, "Weiny, Ira" <ira.weiny@intel.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Peng, Chao P"
-	<chao.p.peng@intel.com>, "ackerleytng@google.com" <ackerleytng@google.com>,
-	"kas@kernel.org" <kas@kernel.org>, "Yamahata, Isaku"
-	<isaku.yamahata@intel.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "Annapurve, Vishal" <vannapurve@google.com>,
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "Miao, Jun"
-	<jun.miao@intel.com>, "zhiquan1.li@intel.com" <zhiquan1.li@intel.com>,
-	"x86@kernel.org" <x86@kernel.org>, "pgonda@google.com" <pgonda@google.com>
-Subject: Re: [RFC PATCH v2 02/23] x86/virt/tdx: Add SEAMCALL wrapper
- tdh_mem_page_demote()
-Thread-Topic: [RFC PATCH v2 02/23] x86/virt/tdx: Add SEAMCALL wrapper
- tdh_mem_page_demote()
-Thread-Index: AQHcB3+gmKuDSfTS10GpgpsbOhjPgbR+LVYAgAADmoCAb5d1AA==
-Date: Tue, 11 Nov 2025 09:15:22 +0000
-Message-ID: <fbf04b09f13bc2ce004ac97ee9c1f2c965f44fdf.camel@intel.com>
-References: <20250807093950.4395-1-yan.y.zhao@intel.com>
-	 <20250807094149.4467-1-yan.y.zhao@intel.com>
-	 <281ae89b-9fc3-4a9b-87f6-26d2a96cde49@linux.intel.com>
-	 <aLVih+zi8gW5zrJY@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aLVih+zi8gW5zrJY@yzhao56-desk.sh.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.56.2 (3.56.2-2.fc42) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5525:EE_|SA0PR11MB4720:EE_
-x-ms-office365-filtering-correlation-id: 764adb0a-5cf9-42a5-b4dd-08de2102d78c
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700021;
-x-microsoft-antispam-message-info: =?utf-8?B?ZHdyaXIwQ2x5SVEwTUpGN0kxWlVRa0szOFhrZFZVRFQvOEpUQWdnZnJQQ1Zx?=
- =?utf-8?B?Qzl5cVd3NXB2NnhiWnYzMFNnRDBXMnBKV1ZYR3hKYTlabDBlZHFvRkRuRFlU?=
- =?utf-8?B?VzU3cllmWFpqc1lBVVY0NG8wYWlJNHNxRmNXTFVuWTNqVm1iQzJPbmFlY1Ro?=
- =?utf-8?B?YkZyZzdmTHNEa0hBUnErYkErRFZmY0xHZnVxYTdWakhNYjJXQnA3R0g5ZmJw?=
- =?utf-8?B?NC9VUGVwMktVOHdHeFZhRGdzcWxnVmNRR3VSeTAxdWJIbXZuUmVIMktJOEcz?=
- =?utf-8?B?ZFpJWDVpRjNjTHQ5K1NzTXh5RWpBc3E0SGtVaDFENnZGL2xIbjc0b1k2UDVq?=
- =?utf-8?B?ODRwUk1LN2JSQmx4bnBxSGIrYlZ5VlFTQmZCU0R4KzNOUWVkcjF4TUtXcHpn?=
- =?utf-8?B?VVZSZDFCRm9ZdHdjTXRvNkY2eHgxWGwvVFE3UG1LQXlrZDltRlIzT0xPbXZN?=
- =?utf-8?B?U0Ywd0xFa3o5cXB0S2dJdzNOVHQyU29SRE5mc29zaTA3V0NlR2s5Kzh2amM4?=
- =?utf-8?B?N05PMFZjREcxU2lnMjF3WXNDbDZVOFYyazVHM2puKy9xbnZqaHFOWGw1MkFL?=
- =?utf-8?B?NG43M0FFSlA1REFYZ3FHdDdIQVRKd2pqNUF3Umx6a2ZXaGsvcXdqVTBUMldm?=
- =?utf-8?B?dW0zMFpMQW1PdHByazFYWFE3eGdaMzNYdUk3RnMvNXdvYml3b0g2Q3U3dlNk?=
- =?utf-8?B?c3hYeEJGRkhHZXVRQktxeVNOUk5aNUVWMjRYMXhUcit3SHF3Qi93Q0tyOGRw?=
- =?utf-8?B?V0hYN1Y1eUdPQVF3M3BBa1AvM1J1em5KdndBSmdOWjZnNUtrcUFaS1Q4MzZy?=
- =?utf-8?B?am50T1Naa3JmWFJhUmhLelJnMEl3cHdYVTRWdlJLSjJrUDhHQ3JKVjVrRjNs?=
- =?utf-8?B?b0IvaThqVDROTklzUExyYWRNdVA1YWRKaUIySmU1MVNMN2lGNW5hL1VTWVJn?=
- =?utf-8?B?K3JObDhIYkp0SmZpZGFSK0VaemN0cVN6MmFnZUdia2VwQTM1VzRxcmJKdjJY?=
- =?utf-8?B?M2drZnZFQjBQbFVxWFViY3dDQUdWUmRRdWFXdy9HMWtHYjNIMHdMVG1SbEh4?=
- =?utf-8?B?OUdmU3ZTaFF4WmdIMVV5aFpiUDhBRVIyL25uems2aG5VMFdWQ2lyRkZucjRD?=
- =?utf-8?B?ejg4Y3hMQ1JML1NEYzg3NlFEWjRDTGdVazkyNzJrSlRqT29hZXYya0lVM1ZB?=
- =?utf-8?B?MDRBclBBdWlMNVoxUlRMRjNJYUM3anZTSVB3Zy9ET0NZdDlDc1hzeEVDV2Qv?=
- =?utf-8?B?ek9LZUhPRjNqc0JDUVVJUENXdmkzWENuMkV4M2dzMWRnM29ReWxBSWphNGl5?=
- =?utf-8?B?Vm5zTWdVQ2NjNTZPbnJVdWQrOTVtVmZFOFVnc2I4NTUzSzJSTEsrZXpJTVVJ?=
- =?utf-8?B?eGN0ZzJ3aXV0RlZQTnJDNVZpN0xLOTMzWkFuWDJvUmdkRDhJNVlOWERxUjQ3?=
- =?utf-8?B?bTFpZkhJK1FlWkUvUFZ3WU42Ujl6OTR1VUpZdzNsSnZCNDdXOUdRdnlTRGxz?=
- =?utf-8?B?NnlHa01yN0tkaldod1ZEdU1GVENMLzVqa2RuMW93djJqbXNqL0FrU2Y1MEM1?=
- =?utf-8?B?eDhoeXZ0RS9PYVNRV0pQd3FiRWlXL3A4QnlVb1B3SWJKSForT1NnWlJmSzJG?=
- =?utf-8?B?OHlwZzdWNGtuWU1UR3VDSUsrWHVvMWRsa3IwMmhzbFFiUEJzQXFrZkx4Z0NN?=
- =?utf-8?B?bC9zS1BjZmQ5bEFLNFFsZ2VOT29Dd25lSkk3Q0JQTGsxWk1UcC81MlFTVmtE?=
- =?utf-8?B?ejJzb2lPUWZaVTQ5MDczUG1jeDBleXI4bXlIVjJBUEl3UEFPUEhGUVhMblZo?=
- =?utf-8?B?WFBmd3JyaXdSVXJ2QWxHNXd0dHowUWdhRDNBd2NIdm9UakNzVGU5YnpSQU1L?=
- =?utf-8?B?ejkxRDhqQUNFL015RGRwbm1ydGdaU3RaY3JKanBCOGQ5THFKWE5UUTFBdlNG?=
- =?utf-8?B?OEJEbWNmcjc1d2hhZE9pUk5SNEY4ZGpMblAyeGl1aWZybnMwM2hNTE4xTVh6?=
- =?utf-8?B?NWk4Z0V6Q2Rja3lRQ1l6NGFVdk1DSVlkNTZicFd6SVYxUGF3YVV3bVZyOG9u?=
- =?utf-8?Q?Befz/6?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5525.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZVR5bTF3N2doK0hsejJCZ0hGNW5SSGk5T2J5V1hFajViSUNvYVJpWDdKcDBr?=
- =?utf-8?B?cDNhQWRWWTUydGhoNmM3QlNNNzJQZHBwa0VKajZIUzY5cTVIRnhQYnBjMUxV?=
- =?utf-8?B?bFNGa1lkZVVuY3VyM1pTMm5XOWdVSWFSRkp6OVErbkc5bGlzREl6c0dsaTVK?=
- =?utf-8?B?UVUzRFlKSGFMZG1RYWFlY0I2V0VjdVdLSWY5d25vRDFTanMzUlNwZ0lvU1hq?=
- =?utf-8?B?akNjSkJHRFhOV3NMai9wR3pDZ0kwdzlPU01xemNWZ1Z0UkFtN2xGdDZJajd4?=
- =?utf-8?B?d09FMkhXMjI0eUZaQzZSV3ZPT1orSlZIWUJiQlB6QjJTMVVtN3R4YURYbUMr?=
- =?utf-8?B?a21LSlJWcnd2SUJlbzNMSVAvekRTVWlwZHErcDVzNVZHYzB3aWltZHpIb2ZZ?=
- =?utf-8?B?YmdDMFd0WjRtZ25ZSzJ5NU4xN1RDck96L2xoS3p3YUp5L0c5TnRNdXBkYlRV?=
- =?utf-8?B?dUE4Z1dTU05nZzErRGF2ZFVPeWVkeTRkQUUwWk04dExPRUJyMHNrdWE3Ym1K?=
- =?utf-8?B?UHBveVBuTGpNTVdKWEErTkduQitIWlZLRkZKKzZmVXV1SVFLcDBjYTRUeVV5?=
- =?utf-8?B?WHJETXA4MnRrNGJUMEQ2aDdBOEVrTFJLYzc0SUsrSXRQSUNCK2Q3NlUvTmgx?=
- =?utf-8?B?djVFeFdCZ1M3cWY5cWpUeGZKSy9TWWNwQjY5OHgzQlhLb0ZkK254Qkw4U1o3?=
- =?utf-8?B?b1FudThJRnhmQUlGdjRZcHpESWhkeFk3b0paVGdRMmNGeGlHSlpFYkY0NG01?=
- =?utf-8?B?bXZRaHUyU3FIb0dnSjZZSjVIc3BrL3pTVG5mZUE1VXFxYWpCTWY0N0wrM2tB?=
- =?utf-8?B?YWlVRmNTcEpETitBQk9ya21ud2FwOTU3V1YvWDdhK2RkczhYbjZJMjFTS3F4?=
- =?utf-8?B?TUE4RzdPT3dYZ1BaRVdOY2dmRlY3VlhtTm9OdlY3NmVsVkhLblBsZU1FS3FP?=
- =?utf-8?B?RlkwYitTUHdIYmVxNW9nN0lDeitOWjB5Y2dHcUpuR0dKWXNLcm1vUTRhNUUy?=
- =?utf-8?B?bm54cDg2QU41MjJCaDJ0Z1JsNTV3Z2VPVzU5N053cTZnenZNLzV1SGk5Wndr?=
- =?utf-8?B?Zlpra0NpMFYrL0QyaEY5SURTTDhrTlR5d29aa3o3cjl4bnBid1A3Q3ZoOE1J?=
- =?utf-8?B?OVVkdUlSYmpiUE9CWGs0bFd1N0xwUFZJK21lVU9wS0grbGNSOW5pUUk2RndC?=
- =?utf-8?B?YU9abWZ5L0N2UHNwcU5HbWFiMmhHTWZ5MXExM2FJMTRTWVlHYkhLd25WTzYy?=
- =?utf-8?B?Zkthc0JtaWEvaXBlZGp4QWlCYUFWM0w3RU0yQUxLQjNycGYzQlFJb3ExV0lO?=
- =?utf-8?B?SVlsNXowR1ZLSllKT1hXRWR2VzFFdFVGcTR4azBjYWxYTFFzU09BbnU0aHpG?=
- =?utf-8?B?QTN1QjhjaWRzZzB6OUFZOStqblAvbGFsWFZYWmlSUG40NGZ1QU4waFEzRmxG?=
- =?utf-8?B?c2RaQk05M1lqVXJEYU82OXJYY3F0dThFNlQ0WGV6UVh0ZmQvR1JpNFcxSTdW?=
- =?utf-8?B?TEw3Z1FXeEFUSmhYcnJGc3M5ZHZLbmw2SXMxTW0rakxQdUttTnRSWmNsVEdI?=
- =?utf-8?B?OFhqT3o1Y20xaUVTN05VTEIrL2dOR3NyUzlMZWI3QWYzQm9Ld2Y2cXR3eW83?=
- =?utf-8?B?bTNqWFo4QTRuaCtMeEQ3S3pvVFRnUG03NFU3d0J5cUc1UFE1QW1RVGdHWGps?=
- =?utf-8?B?VGpZNzhsRzZmR3V1b1hCRlNIZ0pPcVB6aUtwTzh2ZTExWUZPOW5FWHdIR2xh?=
- =?utf-8?B?RnZFWG9uUmRQZTFTU1VBUkM3S2dLOHk1blFEMWEwQWNIeTBzOFd0L3h2UlNz?=
- =?utf-8?B?aTBMTDBscnpUSTBQQ3dQcUc5a1N4MUZjTjBuSGhwM1AyV25WYW5wQXdYcDVS?=
- =?utf-8?B?elFNZ05aWHJJRTMxdDJWbDF4YXgrTjdSbWpWZFpzODJ5c1dSQlAweUhtK2lF?=
- =?utf-8?B?Lzh6Qmw2ZWRUMDJMcW8xbC9FbytlY1hQQkZjanVja2V0ajNnbmUrSEp4a0Fk?=
- =?utf-8?B?MlBweHV3UkkzK3NRNWNQRlJOUERIVys0dEhqaFFhUWUxNXZWeGhDV2Q4VUdF?=
- =?utf-8?B?MTRhN0dOUHFZb2JSamEwUFloOXREZGVJRVVZRk11bWZzdU4ycnpDcGxHbnpL?=
- =?utf-8?Q?6UXOsL7LjfPwS3qcBvC874VFn?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2D3D3196FC38EC4396C8324E9629FF10@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2825A2586E8
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 09:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762852792; cv=none; b=QkJ4+OvsWQalGW+zug6DHuJhDxkeFk69dXrPfHDGwJk7L9v9Rwk/oWAVbCXvdWywA+KnN29VEBo6V77yr/lrQPxG1GzG+XNMiYNFCkkZ0JmLED0nxX3J50vnoxzJUrqHnMXgtJuJhoZUPVbpNHhyt0fykZ92yctEXDj9fkdyaEE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762852792; c=relaxed/simple;
+	bh=dVuTtHvnVZEobITrk9FyDHPMZXl5yRe3omNS/JcWa64=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TpiY/XZV+q85DEaWs5Zm78Jc2UwFVRO+sf/rC8lt4WCrh/QWQtIkEMvZQJDSqnuij7Wi4aGxaMSXUISpvbD9QGF+2J+3Y+aiazGK4O6ltV2bYSAzc/u3ujNFOZ+F3JCxOOuGOI0otN0licFfLIypNO757MxHeAY4Z/gKQeZbJi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vGClO8NE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C9EC2BCB5
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 09:19:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762852791;
+	bh=dVuTtHvnVZEobITrk9FyDHPMZXl5yRe3omNS/JcWa64=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=vGClO8NE0KorCNpVq7YjjPoJy4vppAc1exbgNg08YFojL+dCZUmXYan4Wftv6Gmgv
+	 GEa5Cfno24p5jxvYB/qDkaZk9C5q5w3kRLHUbzXznZ6oolxTsaWOZHMZ30eLed0sXX
+	 Egq/iKpmX81Z2Ojm2N/HTq94Olgee+8BMC8ZQeiiffDB8QDkji4mseoLtGvE7ZrhYn
+	 dP6Lyes8MmmyzNcHmC8Tv8TlcJnJCoZxEs+Jh5/+z/VVpJKPEC43Am3km0NAnjA2Au
+	 zZAMssPqCgroICwsfk9a9tSlMA452D+MVB2qo029A00ncGyiyFIJrvq/hmj6vDJQzp
+	 +9zlwlmMK1NvQ==
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-787be077127so40290327b3.2
+        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 01:19:51 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXA7LN5p4IaWRjj190J/wRMb6jHmZfbOzLchY76SfF1iG8ZaNeKvmn8Z8MPdU2ls06PA+Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxmxm5JEer3+qMX9QrkeNjGmfUjUMik1aEJU6Umck9wa/3AKo5Z
+	TNndpFcWkTs/iwuPPrHGoRcHRLEFqWauscMd7z9q55/7l9PTVKArYfFPrb0quJ3DWxUSmECo53R
+	ERnTKAUZtaygcu6zmcBjgCciAWf8IQq+sf8LfzjvZOA==
+X-Google-Smtp-Source: AGHT+IE7U/hfMH//RfLupvft/VoqtwYRbFfH+avnkA19gWihvYeZ3A5/gr7GLzY5y0EQ9dDLUE90MgX0MeQiFlzqDkk=
+X-Received: by 2002:a05:690c:3341:b0:786:6b92:b1f5 with SMTP id
+ 00721157ae682-787d5439064mr100470067b3.47.1762852790107; Tue, 11 Nov 2025
+ 01:19:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5525.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 764adb0a-5cf9-42a5-b4dd-08de2102d78c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2025 09:15:22.2852
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CdqJN320Y82IFnl9jT3ZSa55/VSftlVAUZCtsMPDW/WDRUOR70Ktk/wfDAZ3ZHplMJN8RVAMfhyq0/svYQpa3w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4720
-X-OriginatorOrg: intel.com
+References: <cover.1762621567.git.lorenzo.stoakes@oracle.com>
+ <CACePvbVq3kFtrue2smXRSZ86+EuNVf6q+awQnU-n7=Q4x7U9Lw@mail.gmail.com>
+ <5b60f6e8-7eab-4518-808a-b34331662da5@lucifer.local> <CACePvbUvQu+So7OoUbJTMLODz8YDAOgWaM8A-RXFj2U_Qc-dng@mail.gmail.com>
+ <3c0e9dd0-70ac-4588-813b-ffb24d40f067@lucifer.local>
+In-Reply-To: <3c0e9dd0-70ac-4588-813b-ffb24d40f067@lucifer.local>
+From: Chris Li <chrisl@kernel.org>
+Date: Tue, 11 Nov 2025 01:19:37 -0800
+X-Gmail-Original-Message-ID: <CACePvbUHCrNNy38G4fZP92sdMY7k5pRQkcfo=iPp0=10T5oCEw@mail.gmail.com>
+X-Gm-Features: AWmQ_bkffqW5YvxjFtC7ucCTeEYe-oG-VIvciMpKUSHdG9LRrce-7fJweHmox0c
+Message-ID: <CACePvbUHCrNNy38G4fZP92sdMY7k5pRQkcfo=iPp0=10T5oCEw@mail.gmail.com>
+Subject: Re: [PATCH v2 00/16] mm: remove is_swap_[pte, pmd]() + non-swap
+ entries, introduce leaf entries
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, 
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache <npache@redhat.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+	Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
+	Oscar Salvador <osalvador@suse.de>, Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Matthew Brost <matthew.brost@intel.com>, Joshua Hahn <joshua.hahnjy@gmail.com>, 
+	Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, 
+	Ying Huang <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, 
+	Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>, 
+	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <bhe@redhat.com>, 
+	SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>, Xu Xin <xu.xin16@zte.com.cn>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Jann Horn <jannh@google.com>, 
+	Miaohe Lin <linmiaohe@huawei.com>, Naoya Horiguchi <nao.horiguchi@gmail.com>, 
+	Pedro Falcato <pfalcato@suse.de>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-s390@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-arch@vger.kernel.org, 
+	damon@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gTW9uLCAyMDI1LTA5LTAxIGF0IDE3OjA4ICswODAwLCBZYW4gWmhhbyB3cm90ZToNCj4gPiA+
-IERvIG5vdCBoYW5kbGUgVERYX0lOVEVSUlVQVEVEX1JFU1RBUlRBQkxFIGJlY2F1c2UgU0VBTUNB
-TEwNCj4gPiA+IFRESF9NRU1fUEFHRV9ERU1PVEUgZG9lcyBub3QgY2hlY2sgaW50ZXJydXB0cyAo
-aW5jbHVkaW5nIE5NSXMpIGZvciBiYXNpYw0KPiA+ID4gVERYICh3aXRoIG9yIHdpdGhvdXQgRHlu
-YW1pYyBQQU1UKS4NCj4gPiANCj4gPiBUaGUgY292ZXIgbGV0dGVyIG1lbnRpb25zIHRoYXQgdGhl
-cmUgaXMgYSBuZXcgVERYIG1vZHVsZSBpbiBwbGFubmluZywgd2hpY2gNCj4gPiBkaXNhYmxlcyB0
-aGUgaW50ZXJydXB0IGNoZWNraW5nLiBJIGd1ZXNzIFREWCBtb2R1bGUgd291bGQgbmVlZCB0byBo
-YXZlIGENCj4gPiBpbnRlcmZhY2UgdG8gcmVwb3J0IHRoZSBjaGFuZ2UsIEtWTSB0aGVuIGRlY2lk
-ZXMgdG8gZW5hYmxlIGh1Z2UgcGFnZSBzdXBwb3J0IG9yDQo+ID4gbm90IGZvciBURHM/DQo+IFll
-cy4gQnV0IEkgZ3Vlc3MgZGV0ZWN0aW5nIFREWCBtb2R1bGUgdmVyc2lvbiBvciBpZiBpdCBzdXBw
-b3J0cyBjZXJ0YWluIGZlYXR1cmUNCj4gaXMgYSBnZW5lcmljIHByb2JsZW0uIGUuZy4sIGNlcnRh
-aW4gdmVyc2lvbnMgb2YgVERYIG1vZHVsZSBoYXZlIGJ1Z3MgaW4NCj4gemVyby1zdGVwIG1pdGln
-YXRpb24gYW5kIG1heSBibG9jayB2Q1BVIGVudGVyaW5nLg0KPiANCj4gU28sIG1heWJlIGl0IGRl
-c2VydmVzIGEgc2VwYXJhdGUgc2VyaWVzPw0KDQpMb29raW5nIGF0IHRoZSBzcGVjIChURFggbW9k
-dWxlIEFCSSBzcGVjIDM0ODU1MS0wMDdVUyksIGlzIGl0IGVudW1lcmF0ZWQgdmlhDQpURFhfRkVB
-VFVSRVMwLkVOSEFOQ0VEX0RFTU9URV9JTlRFUlJVUFRJQklMSVRZPw0KDQogIDUuNC4yNS4zLjku
-DQoNCiAgSW50ZXJydXB0aWJpbGl0eQ0KDQogIElmIHRoZSBURCBpcyBub3QgcGFydGl0aW9uZWQg
-KGkuZS4sIGl0IGhhcyBiZWVuIGNvbmZpZ3VyZWQgd2l0aCBubyBMMsKgDQogIFZNcyksIGFuZCB0
-aGUgVERYIE1vZHVsZSBlbnVtZXJhdGVzwqANCiAgVERYX0ZFQVRVUkVTMC5FTkhBTkNFRF9ERU1P
-VEVfSU5URVJSVVBUSUJJTElUWSBhcyAxLCBUREguTUVNLlBBR0UuREVNT1RFwqANCiAgaXMgbm90
-IGludGVycnVwdGlibGUuDQoNClNvIGlmIHRoZSBkZWNpc2lvbiBpcyB0byBub3QgdXNlIDJNIHBh
-Z2Ugd2hlbiBUREhfTUVNX1BBR0VfREVNT1RFIGNhbiByZXR1cm4NClREWF9JTlRFUlJVUFRFRF9S
-RVNUQVJUQUJMRSwgbWF5YmUgd2UgY2FuIGp1c3QgY2hlY2sgdGhpcyBlbnVtZXJhdGlvbiBpbg0K
-ZmF1bHQgaGFuZGxlciBhbmQgYWx3YXlzIG1ha2UgbWFwcGluZyBsZXZlbCBhcyA0Sz8NCg==
+On Mon, Nov 10, 2025 at 3:28=E2=80=AFAM Lorenzo Stoakes
+<lorenzo.stoakes@oracle.com> wrote:
+> > > > I kind of wish the swap system could still use swp_entry_t. At leas=
+t I
+> > > > don't see any complete reason to massively rename all the swap syst=
+em
+> > > > code if we already know the entry is the limited meaning of swap en=
+try
+> > > > (device + offset).
+> > >
+> > > Well the reason would be because we are trying to keep things consist=
+ent
+> > > and viewing a swap entry as merely being one of the modes of a softle=
+af.
+> >
+> > Your reason applies to the multi-personality non-present pte entries.
+> > I am fine with those as softleaf. However the reasoning does not apply
+> > to the swap entry where we already know it is for actual swap. The
+> > multi-personality does not apply there. I see no conflict with the
+> > swp_entry type there. I argue that it is even cleaner that the swap
+> > codes only refer to those as swp_entry rather than softleaf because
+> > there is no possibility that the swap entry has multi-personality.
+>
+> Swap is one of the 'personalities', very explicitly. Having it this way h=
+ugely
+> cleans up the code.
+>
+> I'm not sure I really understand your objection given the type will be
+> bit-by-bit compatible.
+
+Just to clarify. I only object to the blanket replacing all the
+swp_entry_t to softleaf_t.
+It seems you are not going to change the swp_entry_t for actual swap
+usage, we are in alignment then.
+
+BTW, about the name "softleaf_t", it does not reflect the nature of
+this type is a not presented pte. If you have someone new to guess
+what does  "softleaf_t" mean, I bet none of them would have guessed it
+is a PTE  related value. I have considered  "idlepte_t", something
+given to the reader by the idea that it is not a valid PTE entry. Just
+some food for thought.
+
+> I'll deal with this when I come to this follow-up series.
+>
+> As I said before I'm empathetic to conflicts, but also - this is somethin=
+g we
+> all have to live with. I have had to deal with numerous conflict fixups. =
+They're
+> really not all that bad to fix up.
+>
+> And again I'm happy to do it for you if it's too egregious.
+>
+> BUT I'm pretty sure we can just keep using swp_entry_t. In fact unless th=
+ere's
+> an absolutely compelling reason not to - this is exactly what I"ll do :)
+
+Good.
+
+> > > So this series will proceed as it is.
+> >
+> > Please clarify the "proceed as it is" regarding the actual swap code.
+> > I hope you mean you are continuing your series, maybe with
+> > modifications also consider my feedback. After all, you just say " But
+> > I did think perhaps we could maintain this type explicitly for the
+> > _actual_ swap code."
+>
+> I mean keeping this series as-is, of course modulo changes in response to=
+ review
+> feedback.
+>
+> To be clear - I have no plans whatsoever to change the actual swap code _=
+in this
+> series_ beyond what is already here.
+>
+> And in the follow-up that will do more on this - I will most likely keep =
+the
+> swp_entry_t as-is in core swap code or at least absolutely minimal change=
+s
+> there.
+
+Ack
+
+> And that series you will be cc'd on and welcome of course to push back on
+> anything you have an issue with :)
+>
+> >
+> > > However I'm more than happy to help resolve conflicts - if you want t=
+o send
+> > > me any of these series off list etc. I can rebase to mm-new myself if
+> > > that'd be helpful?
+> >
+> > As I said above, leaving the actual swap code alone is more helpful
+> > and I consider it cleaner as well. We can also look into incremental
+> > change on your V2 to crave out the swap code.
+>
+> Well I welcome review feedback.
+>
+> I don't think I really touched anything particularly swap-specific that i=
+s
+> problematic, but obviously feel free to review and will absolutely try to
+> accommodate any reasonable requests!
+>
+> >
+> > >
+> > > >
+> > > > Does this renaming have any behavior change in the produced machine=
+ code?
+> > >
+> > > It shouldn't result in any meaningful change no.
+> >
+> > That is actually the reason to give the swap table change more
+> > priority. Just saying.
+>
+> I'm sorry but this is not a reasonable request. I am being as empathetic =
+and
+> kind as I can be here, but this series is proceeding without arbitrary de=
+lay.
+>
+> I will do everything I can to accommodate any concerns or issues you may =
+have
+> here _within reason_ :)
+
+I did not expect you to delay this. It is just expressing the
+viewpoint that this is internal clean up for benefit the developers
+rather than the end users.
+
+Keep the existing swp_entry_t for the actual core swap usage is within
+reasonable request. We already align on that.
+
+Chris
 
