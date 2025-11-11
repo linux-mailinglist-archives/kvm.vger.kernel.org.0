@@ -1,143 +1,144 @@
-Return-Path: <kvm+bounces-62798-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62799-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B60AC4F41E
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 18:35:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 045F3C4F4A9
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 18:41:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E1E5834D29B
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:35:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADC5A18836AE
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D2823A1CEF;
-	Tue, 11 Nov 2025 17:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FB53A1CEE;
+	Tue, 11 Nov 2025 17:41:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="jhB/8hoI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4eUnBY3T"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E483AA1BB;
-	Tue, 11 Nov 2025 17:35:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9AD393DED
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 17:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762882542; cv=none; b=SU/vpBEi/NaI/CIyCHdsjdv8O5ZaMs1IhA6WHc/IyY3Be239byhWPqkTd+NCHx1FcTVzRZY/fVsWpGL0OpKUgmAUbbfsGeA06jb3p7sGGBzNbg0W6s080xQDn01cPO/zAkp1DgiCcuucJDpMu4L11tWCNDP/CL43XEFf2VfYDnc=
+	t=1762882872; cv=none; b=Q1wLxqzU2rLrhiKPB56WS4ez5pnL+t7oRmfbqsw44xZE6uT7YxNK1txsNyKFufHIaVtoxBT05UG3G8AhlnGQ6zFr4zl155sQAF5Q/zuMV4IC40WriHxQukpdXx3Z7gmWRcpyiO2YK3PLjDI5gqB5rYBNViT7E7GI8QZObj0toBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762882542; c=relaxed/simple;
-	bh=bZYITAb//HGZ/PK53HRhVxiYBDhYkagJ10l0AcE+do4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DxEGgivqtZzDPQH0mBDNBu6PmqPbdgNeRB6lLsIHJcnIPkHcq/E1q05ThW6MTb2v/Cc6BlTPKO7pmRHChmhMKrVRL1llWFlOX4KeMU8+fcekjq2m20iTrZC1ImLRjAsIeR9tqclVEQYd1+ODaIkoGueexXXy9Tlk6lHlRd3t170=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=jhB/8hoI; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ABGKcVR2600415;
-	Tue, 11 Nov 2025 09:35:35 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=1VmrT0oK0iGhp/K108c6
-	n2yMdw8L2qW+yW/LKJlR7r8=; b=jhB/8hoIiwGkHDHZuosISLCqsZPcsW7go/1Z
-	14WbFu84GWH0PDiEAWGTL3q2M8mmZH9UeKcaCNE5JnWnaspHa8NMZbjy3SJN1/ud
-	yNzqPPfWyToCpVYzfYDes4z7f3Pt2k31rTfZxKG0LnTKYCfncNWGEtiQrbRRzxXZ
-	WKG+AUUoy47jBNd/nDi8Tu1auI+sYn+VbUNFEW6j6fTZMHX5tqmJGkrzfada850A
-	XtvAEza9sF16F3akULp3A3XCSI2gYfHu4A2k4L0bksQbuWdFqjICCm3vIMtr4t3Z
-	9aH7xhZtuxYV3akNDPiVH9trvj+GS7Dzd03+sA3odTYWqZGsOw==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ac8k50qr6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 11 Nov 2025 09:35:34 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Tue, 11 Nov 2025 17:35:33 +0000
-Date: Tue, 11 Nov 2025 09:35:31 -0800
-From: Alex Mastro <amastro@fb.com>
-To: Alex Williamson <alex@shazbot.org>
-CC: David Matlack <dmatlack@google.com>, Shuah Khan <shuah@kernel.org>,
-        Jason
- Gunthorpe <jgg@ziepe.ca>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 1/4] vfio: selftests: add iova range query helpers
-Message-ID: <aRNz4ynek6siv0FZ@devgpu015.cco6.facebook.com>
+	s=arc-20240116; t=1762882872; c=relaxed/simple;
+	bh=A3dCqptOcTzRgXrYKY6arq6dn0GyZOmvKu8eNBYqvO8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JsvfrrczFmNR1VJwPWHmznoL2X2/koJ1bpaZdUTRC0LHOvCSr5heCg6W/6B5j2PqzIALCVyZJoNDnJSi2cHSfcDP5f8v+YYQEPqCV9KhMMnBqD61DGd+zVp8EDUYXPSFfWzXYLM3upViSGdZDwm9i0/1FHdeyDOcVM7ZUPmuudc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4eUnBY3T; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-343d73d08faso13427a91.0
+        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 09:41:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762882870; x=1763487670; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VLML9QIDCd2Nh7IkEnXTPWZwGZyyJRn46il9NEEMgiQ=;
+        b=4eUnBY3Tv48SXNCChjsA/6UurtICmK912BAqLI9N/gYaRZP4b2s2OTqJVCrwAILIwJ
+         lZ7sPs0vXV1HjFjnLt3S71ay0yLteC78S/GVb9h7ingpDjRqKcrSbq1/7pPDfmwp/oC5
+         R1pjRLcFDeAEKQef/KB+RxIav7XOZWt/v6W9y9r0wiWVlDuF3t40ffRxUhWpuakian+s
+         ndos/9ESG08mVK0Y4nwZxv/Se0U44Tunm7anjV3KK+mW6GwPmvFJjG5ABHlqYnAWMAtm
+         +lczxEvHo5J2O/pcInvwEjJac/eVQyG+inVIhJfheV8LWNUhbkkN6ODZLMxnjL16b2tx
+         a1Xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762882870; x=1763487670;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VLML9QIDCd2Nh7IkEnXTPWZwGZyyJRn46il9NEEMgiQ=;
+        b=K/9D736fxEBSjEnPY7hNEkZa9EuKCJYXLttB0F9xH9tVWUDVEVWTzvwxheYW00LNOw
+         Xb4o4d919APXOtTAnjnztExJsey3zqjrdelxqfne4qFcXL4iSVAYPMrVh0uHZUvp99cM
+         YSEPbYFbDhU/ZfAObQ26/+w6AVL6aQP3gwi7ctq2hmMI79eJ2jlHlQiV3B9mv7zVEreH
+         miFfam9R1fBNtrutFnlBQ3cI3HcOq1dut16xjd2TziMMkbsiQe0cMQ+GYtl/KYjy6qKb
+         BVzNNHFJudGtTDD+2eYl1GzHecFqIZK3Ktdg6dO+xB9cP0dyLRkNF/Zx/PjYwMR+o0ZI
+         Umlg==
+X-Forwarded-Encrypted: i=1; AJvYcCUXPRHls/YLqVfWU7mdJQnusdA5DhRz3V2wA3PtnbjVT5JLNAtNpGho1ac/n39t8SpUomY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaN4lTfdmvfklScKQF2hghkbPKq1cXdPbkkjNrL7ncz6NH1dnO
+	Ietsf1R8mLRNAYRN9IgrEFfc11gnPOU4yv4K9+HhjisoIueUPoOClT9inmnNRBItHw==
+X-Gm-Gg: ASbGnct6GBVkllrAKQx/iu/WHpevk2F7iQ8H4n5ikvfqXyqW3CnbBIKTFRNj7g6AP2C
+	eq/q1pL+vBEtyTJmIohUFbUyZTE6c3D5pOLxD3SlzDZ+ULMAyUgoWH5CsGJ4vR86DCtOr3U0E0d
+	7CYTxSXaj6hl26lsVszpxVNYfjc01z6B+3Lght9HVdRPMzi+hDM8JlHD+CaACTPRHGLJW4HW0rx
+	/5eekmiu88dovIxhN3xMcln1gssdDEieFWmkrkOn4TTV1cvAzbNdIy/izMnpPcvXpUDhmux2gmj
+	6lNqsmdUvLBS/OyXkFZFPouy38BpUJJhdQVJ+DbWSkcxjGuqBOs3ab53cUyOILHef2FEMdYQG1c
+	o/bMFH363Sv6EyV45ZNHGr7ONfmx85Q7+rxVHXnl6q1DzBJ+GGwa140AuT5Ej6UhBSu7Nq/jPY1
+	FHv5g01YiIEwlvHfI4BEH9SRPRNBKPDs8QRorN6Z9h5YpGKfzfiXe/
+X-Google-Smtp-Source: AGHT+IEvwmOPuxLIG6g8YJxuSY1Ag9QNyhIsSAktbkG66XXY1WuAd5qXvp+4W0YdAckfJVsZ/Qdviw==
+X-Received: by 2002:a17:90b:4a89:b0:32e:3592:581a with SMTP id 98e67ed59e1d1-343ddeec98cmr150863a91.17.1762882869455;
+        Tue, 11 Nov 2025 09:41:09 -0800 (PST)
+Received: from google.com (132.200.185.35.bc.googleusercontent.com. [35.185.200.132])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-343705c1354sm11607638a91.18.2025.11.11.09.41.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Nov 2025 09:41:08 -0800 (PST)
+Date: Tue, 11 Nov 2025 17:41:04 +0000
+From: David Matlack <dmatlack@google.com>
+To: Alex Mastro <amastro@fb.com>
+Cc: Alex Williamson <alex@shazbot.org>, Shuah Khan <shuah@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] vfio: selftests: update DMA mapping tests to use
+ queried IOVA ranges
+Message-ID: <aRN1MKrfm9GQZpzI@google.com>
 References: <20251111-iova-ranges-v2-0-0fa267ff9b78@fb.com>
- <20251111-iova-ranges-v2-1-0fa267ff9b78@fb.com>
- <20251111100948.513f013b.alex@shazbot.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251111100948.513f013b.alex@shazbot.org>
-X-Proofpoint-ORIG-GUID: QMCfOnNg60SOxZedip_bSss0IoH7Lnn2
-X-Authority-Analysis: v=2.4 cv=X95f6WTe c=1 sm=1 tr=0 ts=691373e6 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=FOH2dFAWAAAA:8 a=gAnhvMwacpa_2wFJLncA:9 a=CjuIK1q_8ugA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTExMDE0MyBTYWx0ZWRfXyIOIECX72vEv
- 4WvyxnSGk875oGuNWM2RzDuzoksf5qXBCiwV3ZwiwvnCThAFlOA2/z1mHhoH0a5ped6iH/SBNCW
- nW7ki7nPSzDNUSBzyA0pv4rkzzZ28V0jiORU2XZCchqg8xITasOybsBT3SmouJerWviQR3AJ3y8
- mI+NdFr6EUf5iyykldGJ5sIoTKWl/KTl1TuMzU79Ad7VxzP4LFJVWnNiQNZInTKKBd+ACq9pLoj
- HJPb94XHckCWh+DmQGfwYy1+FdbyW6zGhq2lbJJMqJ2UH9V9pNlOf68I5uJJ27XNTNVF9uRao76
- lfRCrQO8cUB+Z+NaBAbFyyOxR0/aNgA7BL9aokpJ9wbZomGfoxZ8w0PK1wjT5NitXGfn8FtMEtu
- iKlhvVS6SnoCUL68/vNViqGyH0mC3g==
-X-Proofpoint-GUID: QMCfOnNg60SOxZedip_bSss0IoH7Lnn2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-11_03,2025-11-11_02,2025-10-01_01
+In-Reply-To: <20251111-iova-ranges-v2-0-0fa267ff9b78@fb.com>
 
-On Tue, Nov 11, 2025 at 10:09:48AM -0700, Alex Williamson wrote:
-> On Tue, 11 Nov 2025 06:52:02 -0800
-> Alex Mastro <amastro@fb.com> wrote:
-> > diff --git a/tools/testing/selftests/vfio/lib/vfio_pci_device.c b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> > index a381fd253aa7..7a523e3f2dce 100644
-> > --- a/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> > +++ b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> > @@ -29,6 +29,173 @@
-> >  	VFIO_ASSERT_EQ(__ret, 0, "ioctl(%s, %s, %s) returned %d\n", #_fd, #_op, #_arg, __ret); \
-> >  } while (0)
-> >  
-> > +static struct vfio_info_cap_header *next_cap_hdr(void *buf, size_t bufsz,
-> > +						 size_t *cap_offset)
-> > +{
-> > +	struct vfio_info_cap_header *hdr;
-> > +
-> > +	if (!*cap_offset)
-> > +		return NULL;
-> > +
-> > +	VFIO_ASSERT_LT(*cap_offset, bufsz);
-> > +	VFIO_ASSERT_GE(bufsz - *cap_offset, sizeof(*hdr));
-> > +
-> > +	hdr = (struct vfio_info_cap_header *)((u8 *)buf + *cap_offset);
-> > +
-> > +	if (hdr->next)
-> > +		VFIO_ASSERT_GT(hdr->next, *cap_offset);
+On 2025-11-11 06:52 AM, Alex Mastro wrote:
+> Not all IOMMUs support the same virtual address width as the processor,
+> for instance older Intel consumer platforms only support 39-bits of
+> IOMMU address space.  On such platforms, using the virtual address as
+> the IOVA and mappings at the top of the address space both fail.
 > 
-> This might be implementation, but I don't think it's a requirement.
-> The vfio capability chains are based on PCI capabilities, which have no
-> ordering requirement.  Thanks,
-
-My main interest was to enforce that the chain doesn't contain a cycle, and
-checking for monotonically increasing cap offset was the simplest way I could
-think of to guarantee such.
-
-If there isn't such a check, and kernel vends a malformed cycle-containing
-chain, chain traversal would infinite loop.
-
-Given the location of this test code coupled to the kernel tree, do you think
-such assumptions about implementation still reach too far? If yes, I can either
-remove this check, or try to make cycle detection more relaxed about offsets
-potentially going backwards.
-
-> Alex
+> VFIO and IOMMUFD have facilities for retrieving valid IOVA ranges,
+> VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE and IOMMU_IOAS_IOVA_RANGES,
+> respectively.  These provide compatible arrays of ranges from which
+> we can construct a simple allocator and record the maximum supported
+> IOVA address.
 > 
-> > +
-> > +	*cap_offset = hdr->next;
-> > +
-> > +	return hdr;
-> > +}
+> Use this new allocator in place of reusing the virtual address, and
+> incorporate the maximum supported IOVA into the limit testing.  This
+> latter change doesn't test quite the same absolute end-of-address space
+> behavior but still seems to have some value.  Testing for overflow is
+> skipped when a reduced address space is supported as the desired errno
+> is not generated.
+> 
+> This series is based on Alex Williamson's "Incorporate IOVA range info"
+> [1] along with feedback from the discussion in David Matlack's "Skip
+> vfio_dma_map_limit_test if mapping returns -EINVAL" [2].
+> 
+> Given David's plans to split IOMMU concerns from devices as described in
+> [3], this series' home for `struct iova_allocator` and IOVA
+> range helpers are likely to be short lived, since they reside in
+> vfio_pci_device.c. I assume that the rework can move this functionality
+> to a more appropriate location next to other IOMMU-focused code, once
+> such a place exists.
+> 
+> [1] https://lore.kernel.org/all/20251108212954.26477-1-alex@shazbot.org/#t
+> [2] https://lore.kernel.org/all/20251107222058.2009244-1-dmatlack@google.com/
+> [3] https://lore.kernel.org/all/aRIoKJk0uwLD-yGr@google.com/
+> 
+> To: Alex Williamson <alex@shazbot.org>
+> To: David Matlack <dmatlack@google.com>
+> To: Shuah Khan <shuah@kernel.org>
+> To: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kselftest@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Alex Mastro <amastro@fb.com>
+
+LGTM. And I confirmed this fixes vfio_dma_mapping_test on HW that does
+not support IOVA 0xffffffffffffffff. Thanks!
+
+Reviewed-by: David Matlack <dmatlack@google.com>
+Tested-by: David Matlack <dmatlack@google.com>
 
