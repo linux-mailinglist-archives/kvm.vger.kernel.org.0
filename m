@@ -1,188 +1,258 @@
-Return-Path: <kvm+bounces-62784-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62785-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3853CC4F067
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:25:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23D70C4F07C
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:26:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9C9094E43BE
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:25:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7971B3AECF8
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC9536CDEF;
-	Tue, 11 Nov 2025 16:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2563136CDFF;
+	Tue, 11 Nov 2025 16:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WGCB9uQa"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="B6R1kLMN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010062.outbound.protection.outlook.com [52.101.85.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690E0365A04;
-	Tue, 11 Nov 2025 16:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762878297; cv=none; b=kdsgeVi0ksP8SD7Jda3NSXtYEq+m5wRVSaG97wIwXnUX3vEM7kUKeeFxu/igogaytHSMuA8eRcRrV/IThjcPBAOtXD6SKf6l/33VV5lZb0tEu9ovoDJzgxX36CsGKmt4qseWC6JqlntyaDZFBIqyfzJvqhcjGHWWGnnlJhEX9TU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762878297; c=relaxed/simple;
-	bh=/hwQqZL9g1+w6hCYqSZXwuJ5kjCR82xJCwQUS56WPRs=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Subject:From:Cc:
-	 References:In-Reply-To; b=AtWH2sR2bclaQ98BwcxKWe8qadZOkEUaNzX8hTQ4+3aGHqpPCgUqy1J6VN0qjffidG3TSHRGFCofLXaw7Ro63Dm7TiRL32+JG1+s/0l/C9hy3BUKulNw2pmuqR5evBIdMvAO1ap9t6cGa01hSxrIwmSAmmm0O7cmq+C5289NOE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WGCB9uQa; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AB5HFoi031978;
-	Tue, 11 Nov 2025 16:24:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=FBHTJy
-	VZ0sIvnKqqpCXsfvx5Sm96wv/6+rRCjsw5uco=; b=WGCB9uQaqQWkX34fk9or7j
-	K0S1+c8+XG1u8+tIU5Ir/i1JiVLV58TxOkSXueMi9Ie/oDEujOvKXqDpU9XGbriD
-	M5wNFy+cChrSgTRw59t0xDZ+B+6X5KD/rcZhjmUmqNuK7cnyFTSsUTA+znBE/WRN
-	+UZbEMx0MHklNrGoYSukwViA9yS8J5IbCLQKK4MekEDp2ledLFw7zCUPraR8lj0g
-	0SW4x7flDIEHHB0Px4CjfbVsgXQ5jjlWtGv1qZt3eNBFJ0iChPom9zmqeSFcF6Rm
-	sf7lzrEZo+1s2RIaLQg9GKt2Hv0xtD4vpCUaplfVX2WDFsu1bAPZ6LcwVNcDATBA
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa3m844q6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Nov 2025 16:24:52 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5ABDbOoa004744;
-	Tue, 11 Nov 2025 16:24:52 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4aagjxus6p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Nov 2025 16:24:52 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ABGOmFH29098358
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 11 Nov 2025 16:24:48 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EE9ED2004E;
-	Tue, 11 Nov 2025 16:24:47 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 56BFF2004B;
-	Tue, 11 Nov 2025 16:24:47 +0000 (GMT)
-Received: from darkmoore (unknown [9.87.148.94])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 11 Nov 2025 16:24:47 +0000 (GMT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9A036C58E;
+	Tue, 11 Nov 2025 16:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762878375; cv=fail; b=WrEgyi6HRuYmFibV9EmHoY8gBKri9hyDF71zYlILziDDpEwajdsDBcq4pQm2LVgHvh6+6hECEKAN36WQfa3DvHeNl2T22xwyyvBlAw8p+blu0LGcVpAUoGMG5c1aoqB0xJ9NWS4d+ziTke1340RsbBBrBIzfR9x7ZhilXukku8c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762878375; c=relaxed/simple;
+	bh=W2tNseVPXmnmEo0BzCxeDJEeHQUplMk5p693FOZvqxE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jxDyC7keEdmFD1IqdaZ06PIQcifaPhXnFySbRUOprEsUeLOAy/PrDMYrP6ufmOZZa8NS8m6COFzv6D6DmH1URptnquCpvXQaCyOYHPfqhNWjdm7GeFYOadLhTi0JSGvdcVY9/LLQQB2yNO9dmcg2/0Zw6is+jlAEAQhTLYFZbqg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=B6R1kLMN; arc=fail smtp.client-ip=52.101.85.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=taa1HD3XOifJrqcnZ/1tu1+1KOTLTwhHCXqFFBEZJ06Py5V9XUSMUKDTmWCdcSwhxdHMe5cB6pWgp/0tN6RFZWQcdamLm4RHnHZVJIjBcijxNqueRgMwUZeH5KjFDbxH6Ps/+oTV3zhqlmaMWJVxRMyR6MNdzRDh1ZkLg99QcUea2un7K/e1z7fChBtVnRW2na7MDlAAx1a0s1cGzeEgTdMFNE4bJ1cRErmU9U7LOrB52N+Xz/O6pQ/0C5r4kWgiTbq3EOk6h4sX8z5alfRx8bUVdLHy21unmp3/ZItY5LpH0zPQjZDPO8RlergJ1NSc367zvVPa41ETwpIWF6iabg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W2tNseVPXmnmEo0BzCxeDJEeHQUplMk5p693FOZvqxE=;
+ b=HWQs1yPR1o3vvIOm6Ki0joJGXBO2kKbjaU4T/OmeAhape3r7MZfFRsZmUfS24cz8OE5O/f3dTrj3D4/qHJCazWtGhi47KcwLanhF3WyMIrwnvHMXTLZSRQf0Jla/A+8xGswgcQWkQbQ0qweFq4W2+q0JlSmVWjoL5EskzY58YC2H+YbyiE/44ZHb7zcMeso7behoaBKOS2rtR4A92b3W3NhLMYeCB9ifww5oYnQM9pipscWRcBI0bz8jOiiF3xF6DiEk0+42eMuRVAMixxDhtBk8AsbrNUuthw8OIljNi9oWfM+VfS0FjoAMif+Rpnq/1NEvHjZKrINApz35g6/Ozw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W2tNseVPXmnmEo0BzCxeDJEeHQUplMk5p693FOZvqxE=;
+ b=B6R1kLMN6409ZLvdfse/8Cnqz1fTLNrZydczW7LPspRXTvGRGHbFcfLYkaSzyWqerEuEUeHygW6g3ywUtTJp2UNkiNNk0e4P9g+Tg4nyRuglu7nbOAnJPKa12BA/QiiM7idpiZFkpXKAk/haBW82Buc/N1AVL6KYs1gankXPVXPSG0SMbqeKpoRKbUtHpc5vPdX/Y32ywDOh3oqjWyyPjSp6ynkv5+Ex2iRI/JHYrdxiYr9sEYQtb2hyTpD52b15D/2Uk4Q9XsfGAxKoG08YuS2fLaxwSIXhD2AF29lOtId+cjXquzGaYpnVMUEW5QpytEXWCqeoUCSjbjTCgPGFiQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
+ DM4PR12MB6010.namprd12.prod.outlook.com (2603:10b6:8:6a::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9298.16; Tue, 11 Nov 2025 16:26:10 +0000
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::5189:ecec:d84a:133a%5]) with mapi id 15.20.9320.013; Tue, 11 Nov 2025
+ 16:26:09 +0000
+From: Zi Yan <ziy@nvidia.com>
+To: "David Hildenbrand (Red Hat)" <david@kernel.org>
+Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Arnd Bergmann <arnd@arndb.de>, Baolin Wang <baolin.wang@linux.alibaba.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache <npache@redhat.com>,
+ Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>,
+ Barry Song <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>,
+ Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Matthew Brost <matthew.brost@intel.com>,
+ Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+ Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
+ Ying Huang <ying.huang@linux.alibaba.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
+ Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
+ Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+ Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+ SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
+ Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+ Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
+ Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
+Subject: Re: [PATCH v3 02/16] mm: introduce leaf entry type and use to
+ simplify leaf entry logic
+Date: Tue, 11 Nov 2025 11:26:03 -0500
+X-Mailer: MailMate (2.0r6283)
+Message-ID: <B02ECB62-606A-471A-8139-81327D2F6B5A@nvidia.com>
+In-Reply-To: <6c7c5f86-a9d5-4b7e-aa08-968077f66ace@kernel.org>
+References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
+ <c879383aac77d96a03e4d38f7daba893cd35fc76.1762812360.git.lorenzo.stoakes@oracle.com>
+ <CBBF1711-5881-4B5A-ADE6-1D86C0E94296@nvidia.com>
+ <6c7c5f86-a9d5-4b7e-aa08-968077f66ace@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: MN2PR16CA0062.namprd16.prod.outlook.com
+ (2603:10b6:208:234::31) To DS7PR12MB9473.namprd12.prod.outlook.com
+ (2603:10b6:8:252::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 11 Nov 2025 17:24:38 +0100
-Message-Id: <DE607138SEAQ.2YON9QDYCAHEM@linux.ibm.com>
-To: "Eric Farman" <farman@linux.ibm.com>,
-        "Christian Borntraeger"
- <borntraeger@linux.ibm.com>,
-        "Janosch Frank" <frankja@linux.ibm.com>,
-        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
-        "David Hildenbrand"
- <david@redhat.com>
-Subject: Re: [PATCH] KVM: s390: vsie: Check alignment of BSCA header
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>
-X-Mailer: aerc 0.20.1
-References: <20251107024927.1414253-1-farman@linux.ibm.com>
- <DE5QK1RDMQR7.3OEIS68GLQHK5@linux.ibm.com>
- <cbb6ffbc3946b6f4da6bef9c6c876cdc68b608cf.camel@linux.ibm.com>
-In-Reply-To: <cbb6ffbc3946b6f4da6bef9c6c876cdc68b608cf.camel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=MtZfKmae c=1 sm=1 tr=0 ts=69136354 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=E-M7EcLIl58dVeEKm_QA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: rnIrQmljJZX1Hkoyuiu3z8uqO7KKF4IA
-X-Proofpoint-ORIG-GUID: rnIrQmljJZX1Hkoyuiu3z8uqO7KKF4IA
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA3OSBTYWx0ZWRfX4/Smw6XMOG51
- cbaZLLXNP1ejXIz7D+XoL9q6S6o/yGZjUe4xslCBlcinSUV0yUHg+hjTQ6eXZnkjrFjFrF2/yJf
- 1j5lPX91aPaWH5GAoOPFltoCbCGQVRMpa1nhhHL4XUawKnGLKo8Nsi2fE1rBi1g4ZEjEiIWWXF9
- 392IkIl6cIWItyLzKPH5t0JXcPII7racdnLvYofVYqUPQ80NnAPqAA54dnoH8OqB9IcYYwzqkyC
- sLgdkfv5cuqYuUa7gN66ERoiYzWVkR4HZ81S91Kd2ydRiFBNxNaoatYO0J8XX7064g+SXmjO45a
- xOKKq5KM6hveagKa9b/r55Vgg7aBZQI5u/Z6CFyjYTU5qS6vdMXsn8BcG8ZsFPwjQql5DbvEIz8
- cT0Tj7uOzq/BOwL702K6aL4HyXuwQA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-11_03,2025-11-11_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0 impostorscore=0
- suspectscore=0 lowpriorityscore=0 clxscore=1015 phishscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080079
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|DM4PR12MB6010:EE_
+X-MS-Office365-Filtering-Correlation-Id: 00d8b9d7-0de8-4be0-d383-08de213f05bf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?R0Nhc3BQaURCLzFoOFdLeE5kWlJXcEJweStVYnc2RVBUaHNydW1ya1JnQUwy?=
+ =?utf-8?B?NEMvL1FYK2IrOHBYU09kQmVMNFVpMVBkaW1CeXMyTXIrRzhlOU1sb01Qbi9h?=
+ =?utf-8?B?bFJ5NklISkFXWWpoT2lUR2dzcFY3d1JtWit4cnBLS1FWaVB2L2JSb2dMd0Nz?=
+ =?utf-8?B?WS95WFJBZS82Q0drMnhlbmdqQzNGaEFDSldIRjY1MmJzMFR6amtDR2wycG5R?=
+ =?utf-8?B?Y01VdmZrcTl4OUNBQjVMazFYVThhTXFOa2JLUTltcE5UTTl4Q1lseEpxUHRs?=
+ =?utf-8?B?S0oycGhhaFlmZ3ErZVhxZjE2UThEUDhSUjZvTnVqT0QvbG5vVEZWRTdvTk1G?=
+ =?utf-8?B?TWs2cjNDZFVmalNYTFVNdTl5bTBTMzRGa04xZUx6ZkZvTGlndXQxVFRrU1kx?=
+ =?utf-8?B?dEdLZm1uMUFHamQ5QkZ0cWVmVHkyeWVxNmRCb3RhdktyZnQvZjg5YXQ4c3BW?=
+ =?utf-8?B?QkJyakswVWhLRXA0UEEvOTFFbDlCMEtNNmp4Zk9JY0RvdG5OQW9BN1IwcGl2?=
+ =?utf-8?B?NUh0Tlk2Z3hFRHY2emlIclhVRUI1cG5QdHFrWTFvTXRST09xOHhkQnhvQmY2?=
+ =?utf-8?B?aTZWWUlEeHZJc2ozNFlWNmpOckZ1UWViSytxaFlEQnRKbTFnWmwvUXhTRFNJ?=
+ =?utf-8?B?Tm13c2JMdERKMUpkTjBTNVJpdzdrd1RiQzBLbFhUQlpJaWg4WkdhRXZBWWw0?=
+ =?utf-8?B?S05XZHNVTHlBajV0ODRmR2pQOEhjcnZkdUU5Rmx2SGcvZXI3QXY1TGUvRFd4?=
+ =?utf-8?B?N1I0Q1dXd05JdURiR2QxLzRuU1dxdjAwVVFNbGs1b3R4MktTcWlFVDlGc1hs?=
+ =?utf-8?B?NHNIN1hUV1J0RGE0Wll6dld3SEJDRlhOQXNpL0RpbjhRZTgxMktSNnlrenZk?=
+ =?utf-8?B?WUl5ZWVJdmxWTDZNQWtBRzA2NDVPd0hTRDZLcE1aV1ZsRUl2WDNlYVd3Q1g0?=
+ =?utf-8?B?ODNzNmJRRmo3Wmt4RU5TUWZ3UnBOdHJQZk96VmNGcFpnNEpqaThzaDY4SVho?=
+ =?utf-8?B?eUZObGp2YnlpbldEa0xwUW1NaVBMUnl5Y3lMd3lUSitDZ3FQZDNJVmtoREZJ?=
+ =?utf-8?B?a0laSFhvdHVRa3hNSGhJaG1JMWFNaktya3h4OGhFUVhvUWkrUmtPdnplbUcv?=
+ =?utf-8?B?ZlcwMlNPZzUzZ2pSQStFWFE5L2JRVjFhbW9oTXNjTmNmZWo0and3blFwTnFa?=
+ =?utf-8?B?WU00ZkJPUUVjNHRwZmpua2lwVmVhdDRRaUlYNjErVzJDNkN6QVk4ekE2aVJV?=
+ =?utf-8?B?TzRNK3FHWlMvblB5UFkxaGVLWDB4bjZySGl6VnZyWU81TGg1YjBGQVJ4UTgv?=
+ =?utf-8?B?YkxWdm54dDBBTTluNDZMaFlyZktncDlwWHhOZGFSZ095bzh0Q0xsSmpsM3dW?=
+ =?utf-8?B?L0pBbDNWdXFGc05BTGVwT1R3M214V2tuY0xHVDVTc1NzSElMYk80UVhRdXht?=
+ =?utf-8?B?K0dkRVdmQnQyNGFIb0toeUZwb1h0OGRaVURGVkxpYzlLUjlSeVZpMFdRVVdR?=
+ =?utf-8?B?MDNJeUp2QlU4Q1RvV2YzVDRqOXBQdFhNSW5oeHZQNkM4c0tGSlRGV0FqcGhD?=
+ =?utf-8?B?enJ0c0R5MHJOSjkrUFoxS3NiUWN4V2xuK1ZNblpMSEZjRWN0RGt1S1p0QVE4?=
+ =?utf-8?B?KzJXM0txbi8xdytEWDNZTkxSVWQ0OThQM3dpRlVkMTJGM3cyUEVNK09COG5B?=
+ =?utf-8?B?Y0ljbHVabWduQjNLQm5pZGJDSjl4ZjQ5VUphWHlzaXdCRVZqQXhqc1pWS0px?=
+ =?utf-8?B?UnVCMDhSRUFZOXVxc1E4R2w0djRXR2psU1pTZW9RNTlGMDlwSUZMMTVzc2h6?=
+ =?utf-8?B?c2hYSEdTMVlWRExwRGx2b1VpLytZT01iQkNKTzlvSVlGMXkyY2NHcThua3FT?=
+ =?utf-8?B?ZVJJRi9qM2pqdkJrLyt0NmcwQVZmaUpSQkd1Tk1wQzBncDk1S3NnNXE0am1w?=
+ =?utf-8?Q?/pkq9bcLoUCwVRuSYI5cqZXYsnieMhLq?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TENYeTA5WWtQSnIyb1FESnlnVCtjTzVENlhKVzNpb1V5QkxoakVFNkJhcFYw?=
+ =?utf-8?B?SitmQlFJbU1Fb3c0dEk1bkVQdStFQ1FIUGpEbEVicTBRdVpoUlJ4SXlQUTI0?=
+ =?utf-8?B?dDkwQ2lyRUsybUpSN0psaytsZS9LZG5UVFYyTTQ0TUlRdys5UGZzRUZTSExx?=
+ =?utf-8?B?YUpwRklnbFdMQS9wQkRlMU9wR2QvL3NiNitycWNkeUZGL3EzcytxRHAxWDZD?=
+ =?utf-8?B?dWdRK0ppbW9ZbnhxVldNQmo3Sis5TEJpeVBwS3loWVU0VjZZZXJjL3V4eWw3?=
+ =?utf-8?B?MWNGRldsRXhFMWF6L3pQeXgzVmhzeWdxWTZ5UVl3LzV0Z3ExWXBiYnVMc0JI?=
+ =?utf-8?B?SktqbHk3ZC9oZ3NLc01uNTExUmVKMitSS29ZVWwrNHo3RkQ2ZC84VGRxaXhQ?=
+ =?utf-8?B?ZEFDZDlqUDkvTzl1YXU5YTJqUStvNkVYY3g4MFVZcFZhZkpJeUZ6N0NaQWlD?=
+ =?utf-8?B?VVFCWHZBaXFVWTJodDZkQzYzWEVYdFQyVDB4K3A0byt2NUJUTzhFTlByS1I1?=
+ =?utf-8?B?RnFOczV4SStRYUNhVnEwTXJzbDVzSmV6MkJzWFZ1VGN2TUZuOUViQ29lUS9P?=
+ =?utf-8?B?MlZRTnliUjc5dGF4WENpOVd0L1V5RzBJWnF1MmtwaFg4K1k3TTBkcHcxdU5a?=
+ =?utf-8?B?UGxsWDhRbnBuUEtOU1hDWDNxWkZVSGYvTjI2d0EzQ20xRm5hbWc2ZFA0YmlR?=
+ =?utf-8?B?czlYZStBd0RUbHlWYzJYWGRPcFJSUUlmcVZxNTcvSXB1MjZ1Wnl0K1B0ZXVK?=
+ =?utf-8?B?dThtbXpKeFRuVWhNU3NsR0QrcTNnU2FmVmJWeWpleUtnNlhselJoaEVnMWZT?=
+ =?utf-8?B?TnNSTU9IK1FaU3BqdjI2YnQrUVVXZmx2VFhSY0xrajhuMjBWSmFFZHZVSTlJ?=
+ =?utf-8?B?bDB2K3NlUkV5bENMZ1FEUGxDUlZBZHBCZ3ZVei9kM1JNcEtJTmtFbUVJaHJq?=
+ =?utf-8?B?dWFsZ08wOGJaNDhEaVR6d1VDd01CSXFjOGtEL1pCd2tMOU9Ddis1Y1YycGN1?=
+ =?utf-8?B?cFZBOTI4Zmo4TDlqNHNSMlBxV21KYmJwdVhXbEMxejNFa2N0RWZQRmh2YVR3?=
+ =?utf-8?B?eXRobzk4QnV6SGQ1U1U5aWlZK3p5VEJSeVRmR2dNWklLZENKOGREa0pRRk5P?=
+ =?utf-8?B?ZHBvbEJTTFF1NmtKbDZQWGpSc3BFVnBkTmx2WUlJVkpXemZCTEljTmFFODJ0?=
+ =?utf-8?B?dWVPeEZFMG1JQWgvL1JWbitQK1dKZnNHTWR6NW5DTDU1dUQ3b3lVdEx0VFN2?=
+ =?utf-8?B?S1VlNVRPaWNkT3pqTXdZREJuSGRBb1k5RkVqQjRhVlRLMGRyZjJMb0lNemVH?=
+ =?utf-8?B?anhtVGQ1ekU3bmhZQUpURzNSZXhNTzdZZ3lmUWx2RTI5S29qNDhvMHMyUVZr?=
+ =?utf-8?B?Y1NaZHFIMEs3a1BSWFNZZnBGNUJzaGw4c0N1N293VGUyUnlDek1tajc0SzMv?=
+ =?utf-8?B?S1FPK1VmWWp5VnYySUpWMUtzTkZ2emZ3RDNKMmp3L1A5T3JTSXRUTDQyWEZ4?=
+ =?utf-8?B?SmUzN0RmdWlGZHpUclVXalg0dVgxSGhTdHNmaFVadEM2aG9WK09wOHR2RGln?=
+ =?utf-8?B?dytvZVQ0NXNJTFJ3NUNSekNCUmRPZXRKbnpJOG1KWit1ZDN5MjEwY29scCsx?=
+ =?utf-8?B?aldwemxDMTFQYTRLdGpPRE9NUjFVZURySStZNHBrRDJ5Y3VCTEoxbnV0b2RI?=
+ =?utf-8?B?YXlsWjdFRHdZeUJ0OGk0WXBrYkNBbkZua1hNWUNuTjlPVXZHZyt3ODc2a1lW?=
+ =?utf-8?B?bXhDemR6dldBOFRUYWZJRlRLOVpiT0t6dS9uVjU1aWtsN1kwcWhvMU5SRVVa?=
+ =?utf-8?B?UlVjQjFRRUZBZHdsYThOM29JR3dlblZtWmI2RTE2WitId0RBS2EvOFlrZTda?=
+ =?utf-8?B?cytQUndWOUwxVENKaTNjZCtBVi9vekdrY0FpdGlHcjhWV0tFOUtlVXNlQ1Za?=
+ =?utf-8?B?bXF2Rno1eHdsYWRBRGJERHAraDZYSlBvWTZ0M0dCbThMbjFlWlplMFBJQmc5?=
+ =?utf-8?B?UWJoK2tyeUhhek4zWnByMWw0eG1iWW1SbnZ4eFAvQVE4MmhmR2NMVWdOUEtz?=
+ =?utf-8?B?UURsUDlKNk84YUNmbVlLcTc0MFZCWGVRVzVFZWpwc2R3aWh6VCs4YVZnd1FU?=
+ =?utf-8?Q?cZ6hymm6C6UfVza5mBpLVVqvw?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 00d8b9d7-0de8-4be0-d383-08de213f05bf
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2025 16:26:09.8000
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mK2cbAxMOpuOADCSjEN3HIoMfUXOJh7FPM83s0wo6ERCeRRcI3Cl/dd69usoKLrO
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6010
 
-On Tue Nov 11, 2025 at 4:36 PM CET, Eric Farman wrote:
-> On Tue, 2025-11-11 at 09:51 +0100, Christoph Schlameuss wrote:
->> On Fri Nov 7, 2025 at 3:49 AM CET, Eric Farman wrote:
->> > The VSIE code currently checks that the BSCA struct fits within
->> > a page, and returns a validity exception 0x003b if it doesn't.
->> > The BSCA is pinned in memory rather than shadowed (see block
->> > comment at end of kvm_s390_cpu_feat_init()), so enforcing the
->> > CPU entries to be on the same pinned page makes sense.
->> >=20
->> > Except those entries aren't going to be used below the guest,
->> > and according to the definition of that validity exception only
->> > the header of the BSCA (everything but the CPU entries) needs to
->> > be within a page. Adjust the alignment check to account for that.
->> >=20
->> > Signed-off-by: Eric Farman <farman@linux.ibm.com>
->> > ---
->> >  arch/s390/kvm/vsie.c | 2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> >=20
->> > diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
->> > index 347268f89f2f..d23ab5120888 100644
->> > --- a/arch/s390/kvm/vsie.c
->> > +++ b/arch/s390/kvm/vsie.c
->> > @@ -782,7 +782,7 @@ static int pin_blocks(struct kvm_vcpu *vcpu, struc=
-t vsie_page *vsie_page)
->> >  		else if ((gpa & ~0x1fffUL) =3D=3D kvm_s390_get_prefix(vcpu))
->> >  			rc =3D set_validity_icpt(scb_s, 0x0011U);
->> >  		else if ((gpa & PAGE_MASK) !=3D
->> > -			 ((gpa + sizeof(struct bsca_block) - 1) & PAGE_MASK))
->> > +			 ((gpa + offsetof(struct bsca_block, cpu[0]) - 1) & PAGE_MASK))
->>=20
->> Did you test if this works with an esca, where the header is bigger than=
- this?
->> Previously the esca header was covered by the whole bsca struct.
+On 11 Nov 2025, at 8:06, David Hildenbrand (Red Hat) wrote:
+
+> On 11.11.25 04:25, Zi Yan wrote:
+>> On 10 Nov 2025, at 17:21, Lorenzo Stoakes wrote:
+>>
+>>> The kernel maintains leaf page table entries which contain either:
+>>>
+>>> - Nothing ('none' entries)
+>>> - Present entries (that is stuff the hardware can navigate without faul=
+t)
+>>
+>> This is not true for:
+>>
+>> 1. pXX_protnone(), where _PAGE_PROTNONE flag also means pXX_present() is
+>> true, but hardware would still trigger a fault.
+>> 2. pmd_present() where _PAGE_PSE also means a present PMD (see the comme=
+nt
+>> in pmd_present()).
 >
-> I had originally coded up an offset like you did in your vsie sigpif seri=
-es [*] for just this point,
-> but since we don't surface KVM_S390_VM_CPU_FEAT_SIGPIF to the guest (that=
- comes later in your
-> series), I was having to force my way into driving that path and for mini=
-mal benefit. Now that I'm
-> remembering your RFC, having a conditional length is certainly correct bu=
-t this is a good first
-> step.
+> I'll note that pte_present/pmd_present etc is always about "soft-present"=
+.
 >
-> [*] https://lore.kernel.org/linux-s390/20251110-vsieie-v2-3-9e53a3618c8c@=
-linux.ibm.com/
+> For example, if the hardware does not have a hw-managed access bit, doing=
+ a pte_mkyoung() would also clear the hw-valid/hw-present bit because we ha=
+ve to catch any next access done by hardware.
 >
+> [fun fact: some hardware has an invalid bit instead of a valid/present bi=
+t :) IIRC s390x falls into that category]
+>
+> Similar things happen on ordinary PROT_NONE of course (independent of pte=
+_protnone).
+>
+> A better description might be "there is a page/pfn mapped here, but it mi=
+ght not be accessible by the CPU right now".
+>
+> We have device-exclusive/device-private nonswap (before this series) entr=
+ies that fall into the same category, unfortunately ("there is something ma=
+pped there that is not accessible by the CPU")
 
-I agree that this is a good step in that direction. I am only concerned if =
-we
-may still get a validity intercept from fw when entering SIE while the ESCA
-header is crossing the page boundary. The chances of that happening are sli=
-m as
-at least Linux does always place the ESCA on the beginning of the page, but
-other guests might not.
-But then again getting the validity intercept from fw is not that much wors=
-e
-than getting it from us directly.
+I agree. I am fine with the categorization using pte_none(), pte_present(),
+and softleaf. It is =E2=80=9Chardware can navigate without fault=E2=80=9D t=
+hat causes
+confusion. Removing this comment would work for me, since people can look
+at the definition of pXX_present() for further clarification.
 
-So either way:
-
-Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-
->>=20
->> >  			rc =3D set_validity_icpt(scb_s, 0x003bU);
->> >  		if (!rc) {
->> >  			rc =3D pin_guest_page(vcpu->kvm, gpa, &hpa);
-
+Best Regards,
+Yan, Zi
 
