@@ -1,157 +1,171 @@
-Return-Path: <kvm+bounces-62780-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62781-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 577BCC4EC46
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:24:53 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC404C4ED3E
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:42:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BEBF24FC59D
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 15:15:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 73B764F578A
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 15:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB16035028E;
-	Tue, 11 Nov 2025 15:15:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F35336656C;
+	Tue, 11 Nov 2025 15:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sKgYKUTq"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Wul1/mh6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4E2363C4D
-	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 15:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1A32874F1;
+	Tue, 11 Nov 2025 15:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762874118; cv=none; b=jTfHcqTwX9qRqBqNBxZ1JoYBF9vmjGlvIY9EOZzXNvnpblNXUJzFIuvv74FLW2zgc1YLu8m7ZaeZN0hReB8BM2yDhMQCcqjKOn4GXmx3/Kq7wa0LztBO28a7vD2ZVeZuWygX8OjkHu2jdBXFlSyDxyJa1+cr3QNBKJKycqNrZIw=
+	t=1762875371; cv=none; b=eBrm5dywDGNLyL6pVQjPJ8JMK6/8Ok+8XPWqq5TLjMLtT8q6gv8DhoR4b2CQlXd/bM4b8vi97u58PIohdfPmwH4qoZ1k8jLvspj2kQYOuMTSKV3P8FI8Rw+VpR7frSHsuMrUVTsverv+Cv/CLiIsiorAwKibHrL0h1mHF5QC/Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762874118; c=relaxed/simple;
-	bh=M8FnmF1LuduMskcLWNRFiRCfNY7mztPAtm71RZ+b/70=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QaGO2nhmbSg2xmBXJxCvYKOYCWRu3YFFZp82hKvR8Flp539aBQVTekZGfZ6jW1nsep48BaFpy02U9VKFVklc14jPyW5m+SVCDJzR8DH8B+zgu3eKp3SO04/1Br68JVc9dX14PmKM5lB6dbJhTlsa5FGYLzaRMu896yqpkAZNsCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sKgYKUTq; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-297d50cd8c4so89257085ad.0
-        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 07:15:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762874114; x=1763478914; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZAnQxZAKQsfrq9oNGV2MTQzc7zfbDE/qBeAJ+I4fygg=;
-        b=sKgYKUTqYs9EDDqW2cljvdYBcv3HEiYBh39/8caUuXYrJ3ER8NvZAvdVgke2H8xrxS
-         CdU1Z8nOky9CSuW8oKfjVFMcy+FoF3ToguSrNrU0MmsMtZrndQl5kSqvaiAcD6ktx8aC
-         akMachiBi3fPXGUc6mD4qvyJ1JjjuWcYCzulZHaCaJJUCFENhLPRgBDfI9ozAfIDqQ1N
-         PejpsWRYQbzczSxRIW6wqIv0GZBcOklOGhcoXKWOq9epFF/1nOz6xOMO+hUpq0D3hxsm
-         knAmuI0wRxr6XDos3/ysvZWx4ewnyHfIZ2Qz+bcrSDuR5mKDVwiwnFzdJkdLhVUNWGmf
-         KE/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762874114; x=1763478914;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZAnQxZAKQsfrq9oNGV2MTQzc7zfbDE/qBeAJ+I4fygg=;
-        b=wVy6oIWNwAv6EjkrFc/dPYg/7D/qY5JgbeHr8fdhOaAacbre4yhKZ3xz4W6PcvO6/G
-         sfeOU9HIe5i+y/f4ixP7gY4vTmS2APiZStFkS27yW3pTZQyU2lcX4CtP46tHEtrEBRFY
-         DFDZsp7IbwKRjSMtuQT74twcndZejUJcxmdUsY5zwJkGbhbXpASvJlAtq3tXxhv3J2HD
-         qXtMfscM9s0z48jY7fGTTzLxbnUftY5+sUNSSPoeNsBuNcsuLc7gxhmCQbenkcPwCbfG
-         4FicwfoIuoUYHDjBmvwnHk4ZwJ/u+6c46iXfVM4zX3dehdELChLssnnnHktYvlOQtuKg
-         q54Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWwr7rfG3lP/Eu9LeH3rtt0doAZwcH9lyA+94JzzQwKLvjBtthftn7kGd3RxGWZMOzqYLc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrLVcRmHQTCDt6bOhZuOsLeIQT+iLC7jF5/w+42W2VbqcXKOhe
-	PLK3w0SFU3fQmF2nq0DjXD2AUBT8GwZ3KWCXR09qRUeR5fm/ohleplJ6Xx7I+nyY2apABYSALNy
-	y9kdDBw==
-X-Google-Smtp-Source: AGHT+IGNSbX2YVdJ7FQ7XRLA0GH4GQy5nJgIYxD7PeArNdMdG8wjAi25AL1qFpCs/b+Z/TWOo4u9ZLErU2s=
-X-Received: from plav13.prod.google.com ([2002:a17:902:f0cd:b0:292:5d48:6269])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e888:b0:295:1a5b:f406
- with SMTP id d9443c01a7336-297e564f99emr148498115ad.25.1762874114507; Tue, 11
- Nov 2025 07:15:14 -0800 (PST)
-Date: Tue, 11 Nov 2025 07:15:12 -0800
-In-Reply-To: <a704b1f7-a550-4c38-b58d-9bc0783019f1@amd.com>
+	s=arc-20240116; t=1762875371; c=relaxed/simple;
+	bh=j44kKBuPtKN5iIbGvNg+++B/AiysUnp+UeW8k37wjtQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=t/W5HNQ7IES7ri1MV6OCi3cnst2E3rQlEg33wrc89Eunj28zs7nzkHTjDs2DP2mV/WbxxEiBbEhR8Of7JSI3dxyNrtuJJYhkf3ThsH9e8rb93BwvlcALrj1PDB64b2VSV+mNUYyHyzB6ivMv16ReFC+7jYahwi612QwEEK6LHp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Wul1/mh6; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5ABEknKq007136;
+	Tue, 11 Nov 2025 15:36:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=KtbU/Z
+	fEaF4tJRH/dCwDt9uQ0XLj/75T+pT8JtBTOtk=; b=Wul1/mh6hrJzAkgyRQKE/V
+	1PW0s/+otoYloI1DQxiQLqjWScnnl7tvejTQWUJAlFwF/56r0J9h4mYpfmym7Jdm
+	w22T2J8Ehlaobsl7wHIqaRs5+D44mcH6nRBWH9UsKCM4hlldyB5NxshqKAFTjcLP
+	k+Y5It/rmgiCGmev9aMKM9S1g98B2UPCZpcWJtc37RkDcR4zffy7BdGWelqJqzXy
+	hzwwQPvdLOiIB8Nm2Jxq32LMnd2hpE0M/pkIdXChMi7jBgW7LOKV46RrG3uv0O0B
+	g7Aodjy09ZDUlf51RCns5bxzs+ADOqUtPin9iGIKMyZUzOZOX051A0XrW/8R4xOg
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a9wgwvmfh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Nov 2025 15:36:07 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5ABDvgg3014755;
+	Tue, 11 Nov 2025 15:36:06 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4aahpk3ent-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Nov 2025 15:36:06 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ABFa5dq16188008
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Nov 2025 15:36:05 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1E3F75805A;
+	Tue, 11 Nov 2025 15:36:05 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8481258052;
+	Tue, 11 Nov 2025 15:36:04 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.62.231])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 11 Nov 2025 15:36:04 +0000 (GMT)
+Message-ID: <cbb6ffbc3946b6f4da6bef9c6c876cdc68b608cf.camel@linux.ibm.com>
+Subject: Re: [PATCH] KVM: s390: vsie: Check alignment of BSCA header
+From: Eric Farman <farman@linux.ibm.com>
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>,
+        Christian Borntraeger	
+ <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio
+ Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Date: Tue, 11 Nov 2025 10:36:04 -0500
+In-Reply-To: <DE5QK1RDMQR7.3OEIS68GLQHK5@linux.ibm.com>
+References: <20251107024927.1414253-1-farman@linux.ibm.com>
+	 <DE5QK1RDMQR7.3OEIS68GLQHK5@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240808062937.1149-1-ravi.bangoria@amd.com> <20240808062937.1149-5-ravi.bangoria@amd.com>
- <Zr_rIrJpWmuipInQ@google.com> <a704b1f7-a550-4c38-b58d-9bc0783019f1@amd.com>
-Message-ID: <aRNTADUbIGze6Vyt@google.com>
-Subject: Re: [PATCH v4 4/4] KVM: SVM: Add Bus Lock Detect support
-From: Sean Christopherson <seanjc@google.com>
-To: Shivansh Dhiman <shivansh.dhiman@amd.com>
-Cc: Ravi Bangoria <ravi.bangoria@amd.com>, tglx@linutronix.de, mingo@redhat.com, 
-	bp@alien8.de, dave.hansen@linux.intel.com, pbonzini@redhat.com, 
-	thomas.lendacky@amd.com, jmattson@google.com, hpa@zytor.com, 
-	rmk+kernel@armlinux.org.uk, peterz@infradead.org, james.morse@arm.com, 
-	lukas.bulwahn@gmail.com, arjan@linux.intel.com, j.granados@samsung.com, 
-	sibs@chinatelecom.cn, nik.borisov@suse.com, michael.roth@amd.com, 
-	nikunj.dadhania@amd.com, babu.moger@amd.com, x86@kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, santosh.shukla@amd.com, 
-	ananth.narayan@amd.com, sandipan.das@amd.com, manali.shukla@amd.com, 
-	yosry.ahmed@linux.dev
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: JVE8UQsZQwNQXOkNSewhYMQhSRfFERlV
+X-Proofpoint-ORIG-GUID: JVE8UQsZQwNQXOkNSewhYMQhSRfFERlV
+X-Authority-Analysis: v=2.4 cv=VMPQXtPX c=1 sm=1 tr=0 ts=691357e7 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=QADOUfkMlaS2RCrf3QwA:9
+ a=NqO74GWdXPXpGKcKHaDJD/ajO6k=:19 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDAyMiBTYWx0ZWRfX0uuhP2Ot4sOg
+ 2Yh6gKICaSzj92Z7xEGb9t7XBcH0YUnFLDbfe7RW11uru3CDJKFmfnTKGr59hfFILIIT9p0y0Zf
+ dxe7DJwXJoBJEKbkJqqhHi7ahfAFyOzwVPa6YIAyKwSnCQrg7LOJMYggEjmSrriFhhC9okU2DAg
+ Zs2M7CAb6D6/sO1b8Y1Li2c6Gg4fhTb4dS5I51whp9Az8r/EhnC2Zpm6W6B6Q8cwwUbg3S7MIW7
+ TtxjYzS8heELOz5kz/Pbp4CNxWXDB+hLzU3pjIpNJX3oAA4mAAjV/ucU8aZGPuEWJOM88jr81Un
+ yVBnE+A4IRcuCGuzbOk71rKbmeAowLfCo0BoWzv/bifLwggFhvQN8KTyHkwcyHFpKAtolKo0Pcd
+ GK97+xBPrpD/9lThE23Gceh9tdtyxQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-11_02,2025-11-11_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 priorityscore=1501 lowpriorityscore=0 bulkscore=0
+ clxscore=1015 phishscore=0 spamscore=0 malwarescore=0 adultscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2511080022
 
-On Tue, Nov 11, 2025, Shivansh Dhiman wrote:
-> On 17-08-2024 05:43, Sean Christopherson wrote:
-> > On Thu, Aug 08, 2024, Ravi Bangoria wrote:
-> >> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> >> index e1b6a16e97c0..9f3d31a5d231 100644
-> >> --- a/arch/x86/kvm/svm/svm.c
-> >> +++ b/arch/x86/kvm/svm/svm.c
-> >> @@ -1047,7 +1047,8 @@ void svm_update_lbrv(struct kvm_vcpu *vcpu)
-> >>  {
-> >>  	struct vcpu_svm *svm = to_svm(vcpu);
-> >>  	bool current_enable_lbrv = svm->vmcb->control.virt_ext & LBR_CTL_ENABLE_MASK;
-> >> -	bool enable_lbrv = (svm_get_lbr_vmcb(svm)->save.dbgctl & DEBUGCTLMSR_LBR) ||
-> >> +	u64 dbgctl_buslock_lbr = DEBUGCTLMSR_BUS_LOCK_DETECT | DEBUGCTLMSR_LBR;
-> >> +	bool enable_lbrv = (svm_get_lbr_vmcb(svm)->save.dbgctl & dbgctl_buslock_lbr) ||
-> >>  			    (is_guest_mode(vcpu) && guest_can_use(vcpu, X86_FEATURE_LBRV) &&
-> >>  			    (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK));
-> > 
-> > Out of sight, but this leads to calling svm_enable_lbrv() even when the guest
-> > just wants to enable BUS_LOCK_DETECT.  Ignoring SEV-ES guests, KVM will intercept
-> > writes to DEBUGCTL, so can't KVM defer mucking with the intercepts and
-> > svm_copy_lbrs() until the guest actually wants to use LBRs?
-> > 
-> > Hmm, and I think the existing code is broken.  If L1 passes DEBUGCTL through to
-> > L2, then KVM will handles writes to L1's effective value.  And if L1 also passes
-> > through the LBRs, then KVM will fail to update the MSR bitmaps for vmcb02.
-> > 
-> > Ah, it's just a performance issue though, because KVM will still emulate RDMSR.
-> > 
-> > Ugh, this code is silly.  The LBR MSRs are read-only, yet KVM passes them through
-> > for write.
-> > 
-> > Anyways, I'm thinking something like this?  Note, using msr_write_intercepted()
-> > is wrong, because that'll check L2's bitmap if is_guest_mode(), and the idea is
-> > to use L1's bitmap as the canary.
+On Tue, 2025-11-11 at 09:51 +0100, Christoph Schlameuss wrote:
+> On Fri Nov 7, 2025 at 3:49 AM CET, Eric Farman wrote:
+> > The VSIE code currently checks that the BSCA struct fits within
+> > a page, and returns a validity exception 0x003b if it doesn't.
+> > The BSCA is pinned in memory rather than shadowed (see block
+> > comment at end of kvm_s390_cpu_feat_init()), so enforcing the
+> > CPU entries to be on the same pinned page makes sense.
+> >=20
+> > Except those entries aren't going to be used below the guest,
+> > and according to the definition of that validity exception only
+> > the header of the BSCA (everything but the CPU entries) needs to
+> > be within a page. Adjust the alignment check to account for that.
+> >=20
+> > Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> > ---
+> >  arch/s390/kvm/vsie.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> > index 347268f89f2f..d23ab5120888 100644
+> > --- a/arch/s390/kvm/vsie.c
+> > +++ b/arch/s390/kvm/vsie.c
+> > @@ -782,7 +782,7 @@ static int pin_blocks(struct kvm_vcpu *vcpu, struct=
+ vsie_page *vsie_page)
+> >  		else if ((gpa & ~0x1fffUL) =3D=3D kvm_s390_get_prefix(vcpu))
+> >  			rc =3D set_validity_icpt(scb_s, 0x0011U);
+> >  		else if ((gpa & PAGE_MASK) !=3D
+> > -			 ((gpa + sizeof(struct bsca_block) - 1) & PAGE_MASK))
+> > +			 ((gpa + offsetof(struct bsca_block, cpu[0]) - 1) & PAGE_MASK))
+>=20
+> Did you test if this works with an esca, where the header is bigger than =
+this?
+> Previously the esca header was covered by the whole bsca struct.
 
-...
+I had originally coded up an offset like you did in your vsie sigpif series=
+ [*] for just this point,
+but since we don't surface KVM_S390_VM_CPU_FEAT_SIGPIF to the guest (that c=
+omes later in your
+series), I was having to force my way into driving that path and for minima=
+l benefit. Now that I'm
+remembering your RFC, having a conditional length is certainly correct but =
+this is a good first
+step.
 
-> ===========================================================
-> Issue 1: Interception still enabled after enabling LBRV
-> ===========================================================
-> Using the 6.16 upstream kernel (unpatched) I ran the KUT tests and they passed
-> when run from both the bare metal and from inside a L1 guest. However for L2
-> guest, when looking at the logs I found that RDMSR interception of LBR MSRs is
-> still enabled despite the LBRV is enabled for the L2 guest. Effectively, the
-> reads are emulated instead of being virtualized, which is not the intended
-> behaviour. KUT cannot distinguish between emulated and virtualized RDMSR, and
-> hence the test passes regardless.
+[*] https://lore.kernel.org/linux-s390/20251110-vsieie-v2-3-9e53a3618c8c@li=
+nux.ibm.com/
 
-I haven't looked closely at your patch or at Yosry's patches, but I suspect this
-was _just_ fixed:
-
-https://lore.kernel.org/all/20251108004524.1600006-1-yosry.ahmed@linux.dev
-
-> ===========================================================
-> Issue 2: Basic LBR KUT fails with Sean's implementation
-> ===========================================================
-> After using your implementation, all KUTs passed on the bare metal. With LBRV
-> enabled for L2, RDMSR interception of LBR MSRs is disabled as intended.
-> However, when running KUT tests inside an L1 guest, the tests fail.
-
-Same story here: I haven't had cycles to actually look at code, but Yosry also
-posted a pile of changes for KUT:
-
-https://lore.kernel.org/all/20251110232642.633672-1-yosry.ahmed@linux.dev
+>=20
+> >  			rc =3D set_validity_icpt(scb_s, 0x003bU);
+> >  		if (!rc) {
+> >  			rc =3D pin_guest_page(vcpu->kvm, gpa, &hpa);
 
