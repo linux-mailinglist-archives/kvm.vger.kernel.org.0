@@ -1,258 +1,219 @@
-Return-Path: <kvm+bounces-62785-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62786-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23D70C4F07C
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:26:37 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98636C4F101
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:38:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7971B3AECF8
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:26:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 024FE4F705E
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2563136CDFF;
-	Tue, 11 Nov 2025 16:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91EF83730D9;
+	Tue, 11 Nov 2025 16:34:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="B6R1kLMN"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SXsuXKUo"
 X-Original-To: kvm@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010062.outbound.protection.outlook.com [52.101.85.62])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9A036C58E;
-	Tue, 11 Nov 2025 16:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762878375; cv=fail; b=WrEgyi6HRuYmFibV9EmHoY8gBKri9hyDF71zYlILziDDpEwajdsDBcq4pQm2LVgHvh6+6hECEKAN36WQfa3DvHeNl2T22xwyyvBlAw8p+blu0LGcVpAUoGMG5c1aoqB0xJ9NWS4d+ziTke1340RsbBBrBIzfR9x7ZhilXukku8c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762878375; c=relaxed/simple;
-	bh=W2tNseVPXmnmEo0BzCxeDJEeHQUplMk5p693FOZvqxE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jxDyC7keEdmFD1IqdaZ06PIQcifaPhXnFySbRUOprEsUeLOAy/PrDMYrP6ufmOZZa8NS8m6COFzv6D6DmH1URptnquCpvXQaCyOYHPfqhNWjdm7GeFYOadLhTi0JSGvdcVY9/LLQQB2yNO9dmcg2/0Zw6is+jlAEAQhTLYFZbqg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=B6R1kLMN; arc=fail smtp.client-ip=52.101.85.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=taa1HD3XOifJrqcnZ/1tu1+1KOTLTwhHCXqFFBEZJ06Py5V9XUSMUKDTmWCdcSwhxdHMe5cB6pWgp/0tN6RFZWQcdamLm4RHnHZVJIjBcijxNqueRgMwUZeH5KjFDbxH6Ps/+oTV3zhqlmaMWJVxRMyR6MNdzRDh1ZkLg99QcUea2un7K/e1z7fChBtVnRW2na7MDlAAx1a0s1cGzeEgTdMFNE4bJ1cRErmU9U7LOrB52N+Xz/O6pQ/0C5r4kWgiTbq3EOk6h4sX8z5alfRx8bUVdLHy21unmp3/ZItY5LpH0zPQjZDPO8RlergJ1NSc367zvVPa41ETwpIWF6iabg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W2tNseVPXmnmEo0BzCxeDJEeHQUplMk5p693FOZvqxE=;
- b=HWQs1yPR1o3vvIOm6Ki0joJGXBO2kKbjaU4T/OmeAhape3r7MZfFRsZmUfS24cz8OE5O/f3dTrj3D4/qHJCazWtGhi47KcwLanhF3WyMIrwnvHMXTLZSRQf0Jla/A+8xGswgcQWkQbQ0qweFq4W2+q0JlSmVWjoL5EskzY58YC2H+YbyiE/44ZHb7zcMeso7behoaBKOS2rtR4A92b3W3NhLMYeCB9ifww5oYnQM9pipscWRcBI0bz8jOiiF3xF6DiEk0+42eMuRVAMixxDhtBk8AsbrNUuthw8OIljNi9oWfM+VfS0FjoAMif+Rpnq/1NEvHjZKrINApz35g6/Ozw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W2tNseVPXmnmEo0BzCxeDJEeHQUplMk5p693FOZvqxE=;
- b=B6R1kLMN6409ZLvdfse/8Cnqz1fTLNrZydczW7LPspRXTvGRGHbFcfLYkaSzyWqerEuEUeHygW6g3ywUtTJp2UNkiNNk0e4P9g+Tg4nyRuglu7nbOAnJPKa12BA/QiiM7idpiZFkpXKAk/haBW82Buc/N1AVL6KYs1gankXPVXPSG0SMbqeKpoRKbUtHpc5vPdX/Y32ywDOh3oqjWyyPjSp6ynkv5+Ex2iRI/JHYrdxiYr9sEYQtb2hyTpD52b15D/2Uk4Q9XsfGAxKoG08YuS2fLaxwSIXhD2AF29lOtId+cjXquzGaYpnVMUEW5QpytEXWCqeoUCSjbjTCgPGFiQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
- DM4PR12MB6010.namprd12.prod.outlook.com (2603:10b6:8:6a::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9298.16; Tue, 11 Nov 2025 16:26:10 +0000
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a%5]) with mapi id 15.20.9320.013; Tue, 11 Nov 2025
- 16:26:09 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: "David Hildenbrand (Red Hat)" <david@kernel.org>
-Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Arnd Bergmann <arnd@arndb.de>, Baolin Wang <baolin.wang@linux.alibaba.com>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache <npache@redhat.com>,
- Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>,
- Barry Song <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>,
- Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
- Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
- Matthew Brost <matthew.brost@intel.com>,
- Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
- Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
- Ying Huang <ying.huang@linux.alibaba.com>,
- Alistair Popple <apopple@nvidia.com>,
- Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
- Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
- Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
- Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
- SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
- Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
- Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
- Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
- Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
-Subject: Re: [PATCH v3 02/16] mm: introduce leaf entry type and use to
- simplify leaf entry logic
-Date: Tue, 11 Nov 2025 11:26:03 -0500
-X-Mailer: MailMate (2.0r6283)
-Message-ID: <B02ECB62-606A-471A-8139-81327D2F6B5A@nvidia.com>
-In-Reply-To: <6c7c5f86-a9d5-4b7e-aa08-968077f66ace@kernel.org>
-References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
- <c879383aac77d96a03e4d38f7daba893cd35fc76.1762812360.git.lorenzo.stoakes@oracle.com>
- <CBBF1711-5881-4B5A-ADE6-1D86C0E94296@nvidia.com>
- <6c7c5f86-a9d5-4b7e-aa08-968077f66ace@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: MN2PR16CA0062.namprd16.prod.outlook.com
- (2603:10b6:208:234::31) To DS7PR12MB9473.namprd12.prod.outlook.com
- (2603:10b6:8:252::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D9B3730CB;
+	Tue, 11 Nov 2025 16:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762878858; cv=none; b=UquQVLY6UEuu9eCcgfzDUYPF34XHcLEa+qVQZZJr5yp6LlVVacb6JG6u4MkednTSkPVUxFYWvfE4Y84WNlzeUl9mcLpYhBOyR4PDdlEpU1nufL1KvnQ/PUt7sO8WH+7d8yJJ/MhHFFfpijZ8QhbS+eN4Z392Q5Tu/xtDqoQIvNM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762878858; c=relaxed/simple;
+	bh=KrzYFF9zR89B6Oaf4D8r7JXYC4sNf/lOSJ6nBJNJvaQ=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
+	 References:In-Reply-To; b=qd/kKYC2bUt5Nk0wijaJDCsoF02seKm/0im5iwJF44c25UqaNWoAlEt0hN2jkmk2T1Fkjsu9xGGiDOpDo1ZcBoOtbRMwvyT9cC2nTm3NsJtiPsDH+FBM9UAwdj0DjUIdLynYm1aiQLLVZrf0dMQTkC4Q6sM7Y1e06az5iRd0RO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SXsuXKUo; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AB50Ll1031499;
+	Tue, 11 Nov 2025 16:34:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=F989jz
+	5247bYLcZgPAyIEz+NOWuM7E2LUzujjrc1yiI=; b=SXsuXKUoj5q11EYGszU06B
+	qbTbZsmMrHvAI0YM2yESR1XVXTtLRaQ8h9hi4reftINAx1xE9Y1IeajrMXEdigAv
+	u6Jr73lIFyDXmf/Ff9hRurr6dafFGYP5tEMbWqN9ECGXW5wM+fF8lzRn3ZXN7z2K
+	EJbkxNBrhEGH7264XQ7aLX3UrsHL7a9+gWBxQGUkO0YAkmgI2Din2FaxYJOSO4Np
+	kpFMjJjQfmnkzhV4bAoFlU4bc4MC92JkMixenZLVg7rd49VM2lX4Oy6WNn/M57Tj
+	8323lmpKscw6Y4rJD11YGRyayX4Vp5d6XLXzbaal/fOdayCIEZS2gC8s4EtBgg2A
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a9wk86624-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Nov 2025 16:34:12 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5ABE1i5g008260;
+	Tue, 11 Nov 2025 16:34:11 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4aah6muq9c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Nov 2025 16:34:11 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ABGY7RA43188480
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Nov 2025 16:34:07 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 77D542004F;
+	Tue, 11 Nov 2025 16:34:07 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B423320040;
+	Tue, 11 Nov 2025 16:34:06 +0000 (GMT)
+Received: from darkmoore (unknown [9.87.148.94])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 11 Nov 2025 16:34:06 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|DM4PR12MB6010:EE_
-X-MS-Office365-Filtering-Correlation-Id: 00d8b9d7-0de8-4be0-d383-08de213f05bf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?R0Nhc3BQaURCLzFoOFdLeE5kWlJXcEJweStVYnc2RVBUaHNydW1ya1JnQUwy?=
- =?utf-8?B?NEMvL1FYK2IrOHBYU09kQmVMNFVpMVBkaW1CeXMyTXIrRzhlOU1sb01Qbi9h?=
- =?utf-8?B?bFJ5NklISkFXWWpoT2lUR2dzcFY3d1JtWit4cnBLS1FWaVB2L2JSb2dMd0Nz?=
- =?utf-8?B?WS95WFJBZS82Q0drMnhlbmdqQzNGaEFDSldIRjY1MmJzMFR6amtDR2wycG5R?=
- =?utf-8?B?Y01VdmZrcTl4OUNBQjVMazFYVThhTXFOa2JLUTltcE5UTTl4Q1lseEpxUHRs?=
- =?utf-8?B?S0oycGhhaFlmZ3ErZVhxZjE2UThEUDhSUjZvTnVqT0QvbG5vVEZWRTdvTk1G?=
- =?utf-8?B?TWs2cjNDZFVmalNYTFVNdTl5bTBTMzRGa04xZUx6ZkZvTGlndXQxVFRrU1kx?=
- =?utf-8?B?dEdLZm1uMUFHamQ5QkZ0cWVmVHkyeWVxNmRCb3RhdktyZnQvZjg5YXQ4c3BW?=
- =?utf-8?B?QkJyakswVWhLRXA0UEEvOTFFbDlCMEtNNmp4Zk9JY0RvdG5OQW9BN1IwcGl2?=
- =?utf-8?B?NUh0Tlk2Z3hFRHY2emlIclhVRUI1cG5QdHFrWTFvTXRST09xOHhkQnhvQmY2?=
- =?utf-8?B?aTZWWUlEeHZJc2ozNFlWNmpOckZ1UWViSytxaFlEQnRKbTFnWmwvUXhTRFNJ?=
- =?utf-8?B?Tm13c2JMdERKMUpkTjBTNVJpdzdrd1RiQzBLbFhUQlpJaWg4WkdhRXZBWWw0?=
- =?utf-8?B?S05XZHNVTHlBajV0ODRmR2pQOEhjcnZkdUU5Rmx2SGcvZXI3QXY1TGUvRFd4?=
- =?utf-8?B?N1I0Q1dXd05JdURiR2QxLzRuU1dxdjAwVVFNbGs1b3R4MktTcWlFVDlGc1hs?=
- =?utf-8?B?NHNIN1hUV1J0RGE0Wll6dld3SEJDRlhOQXNpL0RpbjhRZTgxMktSNnlrenZk?=
- =?utf-8?B?WUl5ZWVJdmxWTDZNQWtBRzA2NDVPd0hTRDZLcE1aV1ZsRUl2WDNlYVd3Q1g0?=
- =?utf-8?B?ODNzNmJRRmo3Wmt4RU5TUWZ3UnBOdHJQZk96VmNGcFpnNEpqaThzaDY4SVho?=
- =?utf-8?B?eUZObGp2YnlpbldEa0xwUW1NaVBMUnl5Y3lMd3lUSitDZ3FQZDNJVmtoREZJ?=
- =?utf-8?B?a0laSFhvdHVRa3hNSGhJaG1JMWFNaktya3h4OGhFUVhvUWkrUmtPdnplbUcv?=
- =?utf-8?B?ZlcwMlNPZzUzZ2pSQStFWFE5L2JRVjFhbW9oTXNjTmNmZWo0and3blFwTnFa?=
- =?utf-8?B?WU00ZkJPUUVjNHRwZmpua2lwVmVhdDRRaUlYNjErVzJDNkN6QVk4ekE2aVJV?=
- =?utf-8?B?TzRNK3FHWlMvblB5UFkxaGVLWDB4bjZySGl6VnZyWU81TGg1YjBGQVJ4UTgv?=
- =?utf-8?B?YkxWdm54dDBBTTluNDZMaFlyZktncDlwWHhOZGFSZ095bzh0Q0xsSmpsM3dW?=
- =?utf-8?B?L0pBbDNWdXFGc05BTGVwT1R3M214V2tuY0xHVDVTc1NzSElMYk80UVhRdXht?=
- =?utf-8?B?K0dkRVdmQnQyNGFIb0toeUZwb1h0OGRaVURGVkxpYzlLUjlSeVZpMFdRVVdR?=
- =?utf-8?B?MDNJeUp2QlU4Q1RvV2YzVDRqOXBQdFhNSW5oeHZQNkM4c0tGSlRGV0FqcGhD?=
- =?utf-8?B?enJ0c0R5MHJOSjkrUFoxS3NiUWN4V2xuK1ZNblpMSEZjRWN0RGt1S1p0QVE4?=
- =?utf-8?B?KzJXM0txbi8xdytEWDNZTkxSVWQ0OThQM3dpRlVkMTJGM3cyUEVNK09COG5B?=
- =?utf-8?B?Y0ljbHVabWduQjNLQm5pZGJDSjl4ZjQ5VUphWHlzaXdCRVZqQXhqc1pWS0px?=
- =?utf-8?B?UnVCMDhSRUFZOXVxc1E4R2w0djRXR2psU1pTZW9RNTlGMDlwSUZMMTVzc2h6?=
- =?utf-8?B?c2hYSEdTMVlWRExwRGx2b1VpLytZT01iQkNKTzlvSVlGMXkyY2NHcThua3FT?=
- =?utf-8?B?ZVJJRi9qM2pqdkJrLyt0NmcwQVZmaUpSQkd1Tk1wQzBncDk1S3NnNXE0am1w?=
- =?utf-8?Q?/pkq9bcLoUCwVRuSYI5cqZXYsnieMhLq?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TENYeTA5WWtQSnIyb1FESnlnVCtjTzVENlhKVzNpb1V5QkxoakVFNkJhcFYw?=
- =?utf-8?B?SitmQlFJbU1Fb3c0dEk1bkVQdStFQ1FIUGpEbEVicTBRdVpoUlJ4SXlQUTI0?=
- =?utf-8?B?dDkwQ2lyRUsybUpSN0psaytsZS9LZG5UVFYyTTQ0TUlRdys5UGZzRUZTSExx?=
- =?utf-8?B?YUpwRklnbFdMQS9wQkRlMU9wR2QvL3NiNitycWNkeUZGL3EzcytxRHAxWDZD?=
- =?utf-8?B?dWdRK0ppbW9ZbnhxVldNQmo3Sis5TEJpeVBwS3loWVU0VjZZZXJjL3V4eWw3?=
- =?utf-8?B?MWNGRldsRXhFMWF6L3pQeXgzVmhzeWdxWTZ5UVl3LzV0Z3ExWXBiYnVMc0JI?=
- =?utf-8?B?SktqbHk3ZC9oZ3NLc01uNTExUmVKMitSS29ZVWwrNHo3RkQ2ZC84VGRxaXhQ?=
- =?utf-8?B?ZEFDZDlqUDkvTzl1YXU5YTJqUStvNkVYY3g4MFVZcFZhZkpJeUZ6N0NaQWlD?=
- =?utf-8?B?VVFCWHZBaXFVWTJodDZkQzYzWEVYdFQyVDB4K3A0byt2NUJUTzhFTlByS1I1?=
- =?utf-8?B?RnFOczV4SStRYUNhVnEwTXJzbDVzSmV6MkJzWFZ1VGN2TUZuOUViQ29lUS9P?=
- =?utf-8?B?MlZRTnliUjc5dGF4WENpOVd0L1V5RzBJWnF1MmtwaFg4K1k3TTBkcHcxdU5a?=
- =?utf-8?B?UGxsWDhRbnBuUEtOU1hDWDNxWkZVSGYvTjI2d0EzQ20xRm5hbWc2ZFA0YmlR?=
- =?utf-8?B?czlYZStBd0RUbHlWYzJYWGRPcFJSUUlmcVZxNTcvSXB1MjZ1Wnl0K1B0ZXVK?=
- =?utf-8?B?dThtbXpKeFRuVWhNU3NsR0QrcTNnU2FmVmJWeWpleUtnNlhselJoaEVnMWZT?=
- =?utf-8?B?TnNSTU9IK1FaU3BqdjI2YnQrUVVXZmx2VFhSY0xrajhuMjBWSmFFZHZVSTlJ?=
- =?utf-8?B?bDB2K3NlUkV5bENMZ1FEUGxDUlZBZHBCZ3ZVei9kM1JNcEtJTmtFbUVJaHJq?=
- =?utf-8?B?dWFsZ08wOGJaNDhEaVR6d1VDd01CSXFjOGtEL1pCd2tMOU9Ddis1Y1YycGN1?=
- =?utf-8?B?cFZBOTI4Zmo4TDlqNHNSMlBxV21KYmJwdVhXbEMxejNFa2N0RWZQRmh2YVR3?=
- =?utf-8?B?eXRobzk4QnV6SGQ1U1U5aWlZK3p5VEJSeVRmR2dNWklLZENKOGREa0pRRk5P?=
- =?utf-8?B?ZHBvbEJTTFF1NmtKbDZQWGpSc3BFVnBkTmx2WUlJVkpXemZCTEljTmFFODJ0?=
- =?utf-8?B?dWVPeEZFMG1JQWgvL1JWbitQK1dKZnNHTWR6NW5DTDU1dUQ3b3lVdEx0VFN2?=
- =?utf-8?B?S1VlNVRPaWNkT3pqTXdZREJuSGRBb1k5RkVqQjRhVlRLMGRyZjJMb0lNemVH?=
- =?utf-8?B?anhtVGQ1ekU3bmhZQUpURzNSZXhNTzdZZ3lmUWx2RTI5S29qNDhvMHMyUVZr?=
- =?utf-8?B?Y1NaZHFIMEs3a1BSWFNZZnBGNUJzaGw4c0N1N293VGUyUnlDek1tajc0SzMv?=
- =?utf-8?B?S1FPK1VmWWp5VnYySUpWMUtzTkZ2emZ3RDNKMmp3L1A5T3JTSXRUTDQyWEZ4?=
- =?utf-8?B?SmUzN0RmdWlGZHpUclVXalg0dVgxSGhTdHNmaFVadEM2aG9WK09wOHR2RGln?=
- =?utf-8?B?dytvZVQ0NXNJTFJ3NUNSekNCUmRPZXRKbnpJOG1KWit1ZDN5MjEwY29scCsx?=
- =?utf-8?B?aldwemxDMTFQYTRLdGpPRE9NUjFVZURySStZNHBrRDJ5Y3VCTEoxbnV0b2RI?=
- =?utf-8?B?YXlsWjdFRHdZeUJ0OGk0WXBrYkNBbkZua1hNWUNuTjlPVXZHZyt3ODc2a1lW?=
- =?utf-8?B?bXhDemR6dldBOFRUYWZJRlRLOVpiT0t6dS9uVjU1aWtsN1kwcWhvMU5SRVVa?=
- =?utf-8?B?UlVjQjFRRUZBZHdsYThOM29JR3dlblZtWmI2RTE2WitId0RBS2EvOFlrZTda?=
- =?utf-8?B?cytQUndWOUwxVENKaTNjZCtBVi9vekdrY0FpdGlHcjhWV0tFOUtlVXNlQ1Za?=
- =?utf-8?B?bXF2Rno1eHdsYWRBRGJERHAraDZYSlBvWTZ0M0dCbThMbjFlWlplMFBJQmc5?=
- =?utf-8?B?UWJoK2tyeUhhek4zWnByMWw0eG1iWW1SbnZ4eFAvQVE4MmhmR2NMVWdOUEtz?=
- =?utf-8?B?UURsUDlKNk84YUNmbVlLcTc0MFZCWGVRVzVFZWpwc2R3aWh6VCs4YVZnd1FU?=
- =?utf-8?Q?cZ6hymm6C6UfVza5mBpLVVqvw?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00d8b9d7-0de8-4be0-d383-08de213f05bf
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2025 16:26:09.8000
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mK2cbAxMOpuOADCSjEN3HIoMfUXOJh7FPM83s0wo6ERCeRRcI3Cl/dd69usoKLrO
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6010
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 11 Nov 2025 17:34:00 +0100
+Message-Id: <DE60E769OKA9.WHUN623MD8L1@linux.ibm.com>
+From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
+Cc: <linux-s390@vger.kernel.org>, "Heiko Carstens" <hca@linux.ibm.com>,
+        "Vasily Gorbik" <gor@linux.ibm.com>,
+        "Alexander Gordeev"
+ <agordeev@linux.ibm.com>,
+        "Christian Borntraeger"
+ <borntraeger@linux.ibm.com>,
+        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
+        "Nico Boehr" <nrb@linux.ibm.com>,
+        "David Hildenbrand" <david@redhat.com>,
+        "Sven Schnelle" <svens@linux.ibm.com>,
+        "Paolo Bonzini"
+ <pbonzini@redhat.com>,
+        "Shuah Khan" <shuah@kernel.org>
+To: "Janosch Frank" <frankja@linux.ibm.com>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH RFC v2 08/11] KVM: s390: Allow guest-3 cpu add and
+ remove with vsie sigpif
+X-Mailer: aerc 0.20.1
+References: <20251110-vsieie-v2-0-9e53a3618c8c@linux.ibm.com>
+ <20251110-vsieie-v2-8-9e53a3618c8c@linux.ibm.com>
+ <1a694540-3e7b-4453-8f7f-294eaf904afe@linux.ibm.com>
+In-Reply-To: <1a694540-3e7b-4453-8f7f-294eaf904afe@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDAyMiBTYWx0ZWRfX1k8bkjwE85eL
+ wVUiOuzABlc+R/5qO5AUOwgVYdwtdO+MUWRZ4OrxU+UMklkEt057XEY/Nu75kE1q23X7In4v8Bz
+ 8Qf9HsHl+nDcGBxCP9mBW78giqTbB1SLHcD/cnUVzZrsg1HHJMz3KCOWP7PWd9Y/gH/uS4nFuu7
+ NDbKWfVVLdr5bK4wUXpBvXdE9ZZnJY5gJxEHVGArWFhOB/h3pUdFKmbmHS57hId0fKgdv0NIKzd
+ 1/J06xDZYNvhO3/5t/pKA4105453XElUWwN7ZFb7wFXT7c1tInXerF2u5gL6bShU3aWBf+KK0V7
+ MPFYBwYEFepYOwHs30nU4dbOxCNwxObVqGqyl+tjAvkzdISPUC2veaeaguxxuDf7vzvjiZuGxHv
+ Y/YHsY3EAPOUci6+LZB9nyJn+G/Wkw==
+X-Authority-Analysis: v=2.4 cv=ZK3aWH7b c=1 sm=1 tr=0 ts=69136584 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VnNF1IyMAAAA:8 a=xPGm2OtmPOwl28xsW98A:9 a=QEXdDO2ut3YA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-ORIG-GUID: QkSBlm8BfwkJWNOINIoP2vPmdYt2GxFr
+X-Proofpoint-GUID: QkSBlm8BfwkJWNOINIoP2vPmdYt2GxFr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-11_02,2025-11-11_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0
+ phishscore=0 impostorscore=0 spamscore=0 bulkscore=0 adultscore=0
+ clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2511080022
 
-On 11 Nov 2025, at 8:06, David Hildenbrand (Red Hat) wrote:
+On Tue Nov 11, 2025 at 4:47 PM CET, Janosch Frank wrote:
+> On 11/10/25 18:16, Christoph Schlameuss wrote:
+>> As we are shadowing the SCA we need to add and remove the pointers to
+>> the shadowed control blocks and sca entries whenever the mcn changes.
+>>=20
+>> It is not expected that the mcn changes frequently for a already running
+>> guest-3 configuration. So we can simply re-init the ssca whenever the
+>> mcn changes.
+>> To detect the mcn change we store the expected mcn in the struct
+>> vsie_sca when running the ssca init.
+>>=20
+>> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+>> ---
+>>   arch/s390/kvm/vsie.c | 20 ++++++++++++++++++--
+>>   1 file changed, 18 insertions(+), 2 deletions(-)
+>>=20
+>> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+>> index 72c794945be916cc107aba74e1609d3b4780d4b9..1e15220e1f1ecfd83b10aa06=
+20ca84ff0ff3c1ac 100644
+>> --- a/arch/s390/kvm/vsie.c
+>> +++ b/arch/s390/kvm/vsie.c
+>> @@ -1926,12 +1926,27 @@ static int init_ssca(struct kvm_vcpu *vcpu, stru=
+ct vsie_page *vsie_page, struct
+>>   	return PTR_ERR(vsie_page_n);
+>>   }
+>>  =20
+>> +static bool sca_mcn_equals(struct vsie_sca *sca, u64 *mcn)
+>> +{
+>> +	bool is_esca =3D test_bit(VSIE_SCA_ESCA, &sca->flags);
+>> +	int i;
+>> +
+>> +	if (!is_esca)
+>> +		return ((struct bsca_block *)phys_to_virt(sca->ssca->osca))->mcn =3D=
+=3D *mcn;
+>> +
+>> +	for (i =3D 0; i < 4; i++)
+>> +		if (((struct esca_block *)phys_to_virt(sca->ssca->osca))->mcn[i] !=3D=
+ sca->mcn[i])
+>> +			return false;
+>
+> You're reimplementing memcmp(), no?
+> Instead of casting which makes the comparison really messy you could use=
+=20
+> offsetof.
+>
+> Something like this (+- errors):
+>
+> void *osca =3D phys_to_virt(sca->ssca->osca);
+> int offset =3D offsetof(struct bsca_block, mcn);
+> int size =3D 8;
+>
+> if (test_bit(VSIE_SCA_ESCA, &sca->flags)) {
+> 	size =3D 8 * 4;
+> 	offset =3D offsetof(struct esca_block, mcn);
+> }
+>
+> return !memcmp(osca + offset, mcn, size);
+>
+>
 
-> On 11.11.25 04:25, Zi Yan wrote:
->> On 10 Nov 2025, at 17:21, Lorenzo Stoakes wrote:
->>
->>> The kernel maintains leaf page table entries which contain either:
->>>
->>> - Nothing ('none' entries)
->>> - Present entries (that is stuff the hardware can navigate without faul=
-t)
->>
->> This is not true for:
->>
->> 1. pXX_protnone(), where _PAGE_PROTNONE flag also means pXX_present() is
->> true, but hardware would still trigger a fault.
->> 2. pmd_present() where _PAGE_PSE also means a present PMD (see the comme=
-nt
->> in pmd_present()).
->
-> I'll note that pte_present/pmd_present etc is always about "soft-present"=
-.
->
-> For example, if the hardware does not have a hw-managed access bit, doing=
- a pte_mkyoung() would also clear the hw-valid/hw-present bit because we ha=
-ve to catch any next access done by hardware.
->
-> [fun fact: some hardware has an invalid bit instead of a valid/present bi=
-t :) IIRC s390x falls into that category]
->
-> Similar things happen on ordinary PROT_NONE of course (independent of pte=
-_protnone).
->
-> A better description might be "there is a page/pfn mapped here, but it mi=
-ght not be accessible by the CPU right now".
->
-> We have device-exclusive/device-private nonswap (before this series) entr=
-ies that fall into the same category, unfortunately ("there is something ma=
-pped there that is not accessible by the CPU")
+Yes, that is exactly what it is. Will use your proposal instead.
 
-I agree. I am fine with the categorization using pte_none(), pte_present(),
-and softleaf. It is =E2=80=9Chardware can navigate without fault=E2=80=9D t=
-hat causes
-confusion. Removing this comment would work for me, since people can look
-at the definition of pXX_present() for further clarification.
+>> +	return true;
+>> +}
+>> +
+>>   /*
+>>    * Shadow the sca on vsie enter.
+>>    */
+>>   static int shadow_sca(struct kvm_vcpu *vcpu, struct vsie_page *vsie_pa=
+ge, struct vsie_sca *sca)
+>>   {
+>>   	struct kvm_s390_sie_block *scb_s =3D &vsie_page->scb_s;
+>> +	bool do_init_ssca;
+>>   	int rc;
+>>  =20
+>>   	vsie_page->sca =3D sca;
+>> @@ -1947,8 +1962,9 @@ static int shadow_sca(struct kvm_vcpu *vcpu, struc=
+t vsie_page *vsie_page, struct
+>>   	if (!use_vsie_sigpif_for(vcpu->kvm, vsie_page))
+>>   		return false;
+>>  =20
+>> -	/* skip if the guest does not have an usable sca */
+>> -	if (!sca->ssca->osca) {
+>> +	do_init_ssca =3D !sca->ssca->osca;
+>> +	do_init_ssca =3D do_init_ssca || !sca_mcn_equals(sca, sca->mcn);
+>> +	if (do_init_ssca) {
+>>   		rc =3D init_ssca(vcpu, vsie_page, sca);
+>>   		if (rc)
+>>   			return rc;
+>>=20
 
-Best Regards,
-Yan, Zi
 
