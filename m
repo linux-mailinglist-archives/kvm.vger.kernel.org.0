@@ -1,242 +1,220 @@
-Return-Path: <kvm+bounces-62711-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62719-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D7E2C4B8E3
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 06:40:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 971C7C4BA52
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 07:21:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE185189252A
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 05:40:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1D37034E88E
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 06:21:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12FE2882B6;
-	Tue, 11 Nov 2025 05:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA1B2D8378;
+	Tue, 11 Nov 2025 06:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GXFueeCd"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kxbk8Xiy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F74277CA4;
-	Tue, 11 Nov 2025 05:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762839625; cv=fail; b=FgfAm4jRaZ4cQuHCjSbwP1GoffC3Rqf6PQY8qSI4aBtYHUkr/XYS3UMQHzRas+kqHfcuPS3FVpCvHjeB+MDj1QNmjgO1tYMg+KmhyB0+lj/a54KrJd9ciEUuoQrGJyWh4v5VYuDrn3xGlrBjwbISI8bRu/FNiCyDis49XSZMbLE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762839625; c=relaxed/simple;
-	bh=rx2/jpj6A6S9oXSIwjuoA3XNWKntTbFW3mT4FOAIOzc=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=cAqWo3ngsHzKEZA9NZggubwXGZkhnslWwtKOqPVPpwboYK3HPrdnB8By/JpzvouWsp7xZR9P/CTCPQa7qV2SInYcsJp0VSGYDXA0USlMJE5Pef/QqNh0sLaIptdgTJ+SA5rrt+5/lu5ai+P8E5/HVttAol/ScBQb5S8citvwbqE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GXFueeCd; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762839623; x=1794375623;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=rx2/jpj6A6S9oXSIwjuoA3XNWKntTbFW3mT4FOAIOzc=;
-  b=GXFueeCdCtTMQN5NgIn3xxD5dNLekFD8Q67ZfiblcxjRlURmhbbu/oB2
-   +/jmH0sT2huwf4QClGLRxY7PR61XIs7eGijZirhxh+rM98MMck4twZ5KX
-   jYRxT0+o9eTAd4QwjNnDBotDJepH1YhYETN6ljAn67RStjq5i2i5BGwcb
-   2p0BXBS2IR9wFxK3eoEitnPaoA+1jtC1Av7gAppk+Yuj5wNxLnxjgsIM7
-   0BRou1jcKe6RlIq/TvTl9gK16DbjnnzZrj7bugh50IhLxcHH8/cy05uDZ
-   lgCVbJazedbSsCkcxevgYP0Y27sWR8WGxVHg05vPukgYKS7Q/18to2A6/
-   w==;
-X-CSE-ConnectionGUID: vkU5vSfUTpemHOE5+8SccQ==
-X-CSE-MsgGUID: Qlll4pboSxy5SUVEqNJJ4Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11609"; a="75510365"
-X-IronPort-AV: E=Sophos;i="6.19,295,1754982000"; 
-   d="scan'208";a="75510365"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2025 21:40:22 -0800
-X-CSE-ConnectionGUID: TIwj88i+Qxah+u5vM0qK7w==
-X-CSE-MsgGUID: XlBuFUF4SSqxBQTCRevWHg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,295,1754982000"; 
-   d="scan'208";a="189613562"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2025 21:40:22 -0800
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 10 Nov 2025 21:40:21 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Mon, 10 Nov 2025 21:40:21 -0800
-Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.27) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 10 Nov 2025 21:40:21 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xlgYZOjn4JBuu7dXPFmcplGCfO2rVY/xUgAT4G94g81TNywQ9ycDEdxy5yTzq2dtVRvpr15hqJcNr4CXLikKML+VrIOFL8tr8Eo0rRnPkicUzVzi6SsRvu5oDsb6j5M4F51dNFy/86KoEjgW5KyACdBaG581gSDthFVtt8j3t//sib4pr5vCqS3LUb+JLpt/q5KnWdbZ3vZtO+TxaSt84Y/MjpZIXLiDAWOgrGYtxWZX0fewdkUI9+3VNRDFDSyuX53YTO3lMPTFgFFESGuBJAxgljVEC+Tjj5LeMgqT0YPbkmHLicdKYi0rSgdwsnn8Ae4KeZ7BSf4uB+1K6cqq5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+OeT9Lf/8cpYThMf+TD2FBB6TNEndJSRjO1mePx/F3Y=;
- b=bOjBqxZn2GtBiVVopT6+Ziaq/Mw3fFlWNlLYUy0dk2BF6Wr1MpQvC5Yy2Y44lXIS+848tB+/a7VB2MX++r4z/RSdWK7gPlJX24rrPkbNSkw2NOnu/L9J1ieFO2+DDR8bHWifOpel/j+vs9tL/DoxisixmM6aVvvzFUllaZ1Vt79ZdLxS0a2hF0r/ECbqxHZkvXKtJUwf3pw5mKSAp1odCOClHNeEXkHF4letB8ioRiltKxS4OFy553zp/nUYyNfaeemdSRAUtUHlBaU2Ajc47jsB7+dKeoCyXGvPpe44E2ocI3D5rSk1PvVTBbbFxsm4F9WMHBMpWgIAZGkAcN1Y7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
- SJ0PR11MB4989.namprd11.prod.outlook.com (2603:10b6:a03:2d9::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.15; Tue, 11 Nov
- 2025 05:40:19 +0000
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95]) by DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95%5]) with mapi id 15.20.9298.015; Tue, 11 Nov 2025
- 05:40:18 +0000
-Message-ID: <2701ea93-48a6-492a-9d4a-17da31d953c2@intel.com>
-Date: Tue, 11 Nov 2025 13:40:08 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: The current status of PKS virtualization
-To: Ruihan Li <lrh2000@pku.edu.cn>, Paolo Bonzini <pbonzini@redhat.com>
-CC: <lei4.wang@intel.com>, Sean Christopherson <seanjc@google.com>, "Jim
- Mattson" <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>, kvm
-	<kvm@vger.kernel.org>, "Kernel Mailing List, Linux"
-	<linux-kernel@vger.kernel.org>, Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Wanpeng Li <wanpengli@tencent.com>
-References: <20220424101557.134102-1-lei4.wang@intel.com>
- <20251110162900.354698-1-lrh2000@pku.edu.cn>
- <CABgObfZc4FQa9sj=FK5Q-tQxr2yQ-9Ez69R5z=5_R0x5MS1d0A@mail.gmail.com>
- <dh77d4uo3riuf3d7dbtkbz3k5ubeucnaq4yjdqdbo6uqyplggg@pesxsx2jbkac>
-From: Chenyi Qiang <chenyi.qiang@intel.com>
-Content-Language: en-US
-In-Reply-To: <dh77d4uo3riuf3d7dbtkbz3k5ubeucnaq4yjdqdbo6uqyplggg@pesxsx2jbkac>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2P153CA0015.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:140::21) To DM3PR11MB8735.namprd11.prod.outlook.com
- (2603:10b6:0:4b::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846782D63EF
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 06:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762842026; cv=none; b=jGWz3bMvhKS7gWGFGYV/Kf/7z4PlMhj7wSpDkLqlTtyE8fc6QMcgjE5V1YsieybfMzOj97m8kqkKgLpHaNDnhU8Ffgk0Y9wq2xi3l1V+D0pPGDnNcYQpqbdofItDUEb+Q/qfqzQrh29WNsQsMn/taU1XkKQhiQ1GdbNBSWQITHA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762842026; c=relaxed/simple;
+	bh=jn4JfKazny1OZ2SKTZW3KuU0cxndxeJeSbZOy4vrLVw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R4TgYp4usv0LhBFoROyxHEzFiOByhVXWlfsmllP3LlqhbGW1b5nLGDW/gQZ+z296M3LEBqQ2GQevbJe1VxNBbdAZPek1520KlMXypfn2fOK7uihzQUws8ALPoDmI5NznRCi15EBhmxN3kcTMkEmxxfJHppUIxhPHYPRgZ0f5Qjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=kxbk8Xiy; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AB3cpps025436;
+	Tue, 11 Nov 2025 06:19:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=xd4Hthn9sMbr+itpmFOzNHpgavLzS
+	qTDEvV1i4oGWVY=; b=kxbk8XiyZFeTYNrK9hVsjGLmnpvDXftXvVjLAh42ao1ea
+	6mQUXMbB9DoTug9cIdaty/2Ib213KX0YMpOC0GnoXsmHLYXx0IWUvicmKE2RjqEQ
+	5s7C6jXs7McDl/QeMLnwDL5qDiifczgWEgjZXy+VdpNylQOkoTsUDFcLiAAEEkxS
+	VNMyVEwwoVIiMgUN8uHSQekP2sEosOYIdh7pqKOoSJzn1lSfitdGyizZnY1WqLVB
+	zIBTEmdwI62pnXhQY7QKzcahJBdMNn/1Evq4poR4kjsIW1+eVBdd4qFGYfW0oZ5B
+	qjyFTRzXGzaoy//aB+ztzo1IDMCy701YQr9t409cw==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4abrpb8mjy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Nov 2025 06:19:53 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AB68PAq007603;
+	Tue, 11 Nov 2025 06:19:52 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4a9va9mk8x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Nov 2025 06:19:52 +0000
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AB6C6qh029277;
+	Tue, 11 Nov 2025 06:19:51 GMT
+Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4a9va9mk84-1;
+	Tue, 11 Nov 2025 06:19:51 +0000
+From: Dongli Zhang <dongli.zhang@oracle.com>
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
+        sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
+        like.xu.linux@gmail.com, groug@kaod.org, khorenko@virtuozzo.com,
+        alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
+        davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
+        dapeng1.mi@linux.intel.com, joe.jin@oracle.com, ewanhai-oc@zhaoxin.com,
+        ewanhai@zhaoxin.com
+Subject: [PATCH v7 0/9] target/i386/kvm/pmu: PMU Enhancement, Bugfix and Cleanup
+Date: Mon, 10 Nov 2025 22:14:49 -0800
+Message-ID: <20251111061532.36702-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|SJ0PR11MB4989:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3c24d64f-2b16-4a2a-93af-08de20e4cc73
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WEV5MFllS01GMVVKbkZkL3hxWUp3SmNsS05nc1lsZS9yZ3dKUFY1L3BEZHNR?=
- =?utf-8?B?ZWFzZGxjVDQ4ZDFNS2NTUTg2RUNMYThFdm8rRml6TDZyZmgvVk5nc3hpbW9V?=
- =?utf-8?B?SnRaVXpTMXBhcS83cHpJdFRkYTZBVWt0N0lLWFFYbkZ0WnhReWxyYnpMMjF2?=
- =?utf-8?B?SDdqSm9BV1VEcDBPMzJnY2R4Tk9vOWVDVHY3T0dlNDQ2UjhLRFVEeWphVkgy?=
- =?utf-8?B?N1VQNC94VzJ2cGE4QkJOOC8xSThzYlBKVDJoSU1ldGJQUFFXZEdQeXc0dkNm?=
- =?utf-8?B?UEtDNlNuS2huZk9PU1YxWXZKUnA5bVVaWmY4QUY1cVZNS0hkeDZhQlphWENn?=
- =?utf-8?B?SXpjQVFFdUxkM0NsN2JONWVTRE5FS0JsR1BwaWpsY3VURjlMYVZaVVhPNXJj?=
- =?utf-8?B?MkVGaHozdTNSaStKbUtHRlhsY2huZlpaOXZMbjZDdGxhWXlhYzZ5eHFNTlRC?=
- =?utf-8?B?NTFpbXVsOHlOTzRkMGRqOTVHeWd2VlVndnZwYSs3c2N5cERRT1FHUWRlSkl2?=
- =?utf-8?B?aEFHb2hUV1E4d0lHQXgveTNPQW04b3g5eWNxdjdQRzYvbTBCWmhBY2lkY3lx?=
- =?utf-8?B?S2Y2YmozWStaQjcrdmxmLzdqRmlmY09ld0Vza2dQSXZ1K2luSFh1K3JOMDRh?=
- =?utf-8?B?RDNCRFlObVBldkkvTzRxVXhlV3U4dWo3VDdQeGk3VmxXaHVDRnVZQjVnOENm?=
- =?utf-8?B?blJkZmNLNGV2RElrQXFDaExPdDhvQXRCbjNzOUJ6VnBjTW1PV1ZGL1BWcnFJ?=
- =?utf-8?B?aFc3UnI4YXMva2VwWEI1dDU5SHhrbWhIM2Z0RGhJZUo5L1JJYTVBbXF4RUhh?=
- =?utf-8?B?c0tGeXlRZ2xWM21pQ0dXVWx3MTlpZG1qeld1K3VMWnVaNG8wd1hITGx2TTlh?=
- =?utf-8?B?VlZ3L0NBVDFFQW5xOHVvZ3V2OUcvQ2pXazZ4b2JpU2lScHlMTnRLL0JWZXk1?=
- =?utf-8?B?YjVwc1B2blVSbGtDWTYwNlVVaUYzaHRGcEo0VzJNTy9oakJPRkdUWXRncEdK?=
- =?utf-8?B?TFdTUzZzUHBmaEdZaGJVSWNwMEM2VGFObm5hd2hlY1JHTjhPY3dZUVg2V2Jr?=
- =?utf-8?B?U0I5U1k0ME5wMnVIMi8zMUtqQ1k4TEZVQ21BaWovNWpHNUkrSStuOXhWRXcr?=
- =?utf-8?B?b2hWcWhZcGF0VUR0NGhyaFRnaUN3N1J3TDVwN1haemVBL3ZTWklocHJtUEpE?=
- =?utf-8?B?QktMK2VzQVRLYW9CZm5jYWtEOTVlaFZ3enUxNDdPZldMdDNNbWZtd0VMRm5a?=
- =?utf-8?B?YkJ3Z01pVlZIZGpPZUR4WXVZR0RWVk05dTJobHpVVkMyVWdmc0V0TEVjZmc3?=
- =?utf-8?B?Q1lWMDBTMWxTZTRQcGd6d1hTc3JDUTd2TFVycmJGV2lQeFZ2dDRZOHV6VmhE?=
- =?utf-8?B?UEEzclhsZHA4cUo2MVFrSTFQcEZHZ2djYXNXaEZjdlpkZDJpVWhTRkhJT1hl?=
- =?utf-8?B?RmxlYkg4OHFrd3NYcFRWc0Y2KytSSjVVdGVtNHlKNkdySWlRaGRYc2N4QWZQ?=
- =?utf-8?B?TGRRYUtVWVhFT3hMejMvaGhIWllRQUQxKzhjNERwcnZJa1NxaVJaUWdTc0RC?=
- =?utf-8?B?aFZLV2NEdVhyb3ZmN1IrZ29tSHlqNlBTY0ZtZXRUenVFY2tFQWUrc0tpOUhn?=
- =?utf-8?B?QXpvYXRpVHdQRE5qSWZqekdOUlFtbnYwWkNmKzNuczFMOS9Ya2M2MUxKaWEv?=
- =?utf-8?B?Y3ZSWlNvNVptVzVsRTgxNE1oWUVUUkdSdWRod3dnbTJqeUNmMDQxaXpnQzNZ?=
- =?utf-8?B?RXZFR1Q3M0t1aHNpYVZyeG1hQXRNL08wVEd6VEgxb0lxaUhkbXNXc3d4Ny9X?=
- =?utf-8?B?TW5OSnVtOE4zR0wxY2ZQWTVpcXEyVlNzVGtwWlNkNWNGVm1jUUNaZEFrZFNC?=
- =?utf-8?B?VEl1QTJrY0QvTlVaa1Ezd1I0Y3V5M1g2YzRlWVhHMTExd0pWWU55RUZZclJp?=
- =?utf-8?Q?zIfjDqKWOEkKEzUTasWP/TuJMDfwVWpG?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MFJEa045V0NuRndLK1dycUZ4OFdrNjFLdFAyd09EOER5eVAxL01VR3BHcUVv?=
- =?utf-8?B?VFkwNTBOdTEvd1VpbEpyc1dNTE0vY203OG5QdEZYeW5WUzFEc01zZExDYkRi?=
- =?utf-8?B?eG1lazBXaFRXVXNoUTJ4N1ptb3JJalBndVVmT3NLL3AwdzN2QmNWT0tkUHVX?=
- =?utf-8?B?cHF5cU9NMUdPNEVCREswdzlQb21BTmRub1k4SHdJcVp3YzVGNWVuM3Btdlpo?=
- =?utf-8?B?b0YzKzNzNWZvTmVwMis4ZUFCbWtlUW5ZU0g4RlVMMEh6NGFkUDYyaFdGZy9Q?=
- =?utf-8?B?akNSRExVeGdVNVlkNG8yTDI4WFEySFpDcER1YVpIa2dLamhHNlJXVUR4VndF?=
- =?utf-8?B?Ti9QT0xOR0FsaGhGZTFJQThvQVQ2bk9ycFJ4Mjlzdm9ZQVgwUFExSEJzdmNL?=
- =?utf-8?B?SmEvTCt5b0tPa0hPSXJWaDNMM1QyTWptam5kY0NFUmlKUWRpMEVhbjZUYStT?=
- =?utf-8?B?bllSeXNjenUraVQ3dzl2WkxmMm1SdHU2OHZXdkhlUEhmMjkxKzhmV0txUTBQ?=
- =?utf-8?B?L0hid3VhdUJ4V1oyKzg1UlYwT25Ca1lPbHJjMHlOUTNQWmFJQzM5Nm1yRXB1?=
- =?utf-8?B?RHVnZmVCby9GcXk4L1dZdDFaa2pyc2F5cjdTaldzVDVMQzFoaWkzQ1JkbTRR?=
- =?utf-8?B?SDNNanE2eHFZVTJDZlNBcHZucVNmY294UDNyblJIZTk4ZUdjM2EyNU5EcGNv?=
- =?utf-8?B?WDJMWGJlWHEvNzU1OVRzRHFjS3NHS00vczdrQWQ0NUwrQ0RhbzN5RFByRFJr?=
- =?utf-8?B?UnlXRFN1anIrc0VIRk1NWHBQNXh1dlg1NjV0clBuS3Y1TTY4R1V1V01KVHlZ?=
- =?utf-8?B?RzllTm40UXcvQ2ZpZUNkQy9sV0lsMXdJUzc5alBOU012bjJUc2hlQkY4SUhz?=
- =?utf-8?B?TUYwU2wwNHpUSlFWcjhUaEYzMStyYWtxQ0JJeVo4cGJpMlFUL1IzVTN0TUN5?=
- =?utf-8?B?dnl3TVZxSmRYNmhQMlBoSmljMWluenB4MWIxOTJHVG5VZE1GbmJNejY5MUR4?=
- =?utf-8?B?OTJaZlJrWEdBNDk5MDRtTUpueE5UblJJN1pWeHIyKzJOVFA2MXRFbU9lelVD?=
- =?utf-8?B?NElxSVJNUmh0dDJTZHdydnZJTW85RVRXYTZqVXRwZG05RmZENEQ5NkZYKzZn?=
- =?utf-8?B?d05GQm83bmR5SnROblEwNzFZQ0pnQVVkcStsOHM5d3phT3IyMW04YllFWUVI?=
- =?utf-8?B?ZXFmL2s1ZE11ZXlaQUJNVUlOTzZCeXFKVndNU1VtaDlyYUVTTDIrWXo5YnhW?=
- =?utf-8?B?aC9XdlpJMUNZQVlwWUVvQ0QzNklHeTdBYlpncEJoWE54N1J2NE95V1VVVjg0?=
- =?utf-8?B?bTcySzBxTmZKZ3Fua2tQZ0ZEWFNWSlZqODZoMnRBc0FiZ3RIS0c5SDJoMkhj?=
- =?utf-8?B?czZiR0VockI3ellrVGkvbFMraEZuWW4reDEwVFQrWWJzbUJRTTlEbysrRW40?=
- =?utf-8?B?RFdWWEY1aldoN2V2ZllrTEF1MitrMzRWdVFLNGNQdk5VY2J6VDFHKzhXT2xS?=
- =?utf-8?B?eEtPK3hJTjY3ODBHRm1HaWk2VEhNN1JlZzN0MGhmemQ3UjhORzJXWXpYejk1?=
- =?utf-8?B?YjlBeUJlSFZkUlZBZzBycGxlaUpCQmE0K3JSM3RmVm5ZWmVPdFAxMFBUaGlZ?=
- =?utf-8?B?VW1SM215bHArTlJhQUtuZVR6NTlIUzNOVlFHdU85Q043RFI4YWFxaDJ6NGNa?=
- =?utf-8?B?QmZFL3dxalh4Q1JqVHVuL3kwcVNFb3hFRnJjN1pGdmtIeGd0b2VSSlNyWjVO?=
- =?utf-8?B?bjRKMUFSbXpiTXVPbzEranFZdytvczQyOEtOWVZOOVg5bThIUjNpZDlNQlFT?=
- =?utf-8?B?NzJIZGdxMzBlSldnVWIySGVpMExVaWIvbWVwTWNsVmloTUtDdStaOG1vaGJF?=
- =?utf-8?B?L2Q3ZWgxZzU3S3pEVjBqeERSMlZsVTU0RTJsOHFWaG81UW0yUjhzcyt6b0Ey?=
- =?utf-8?B?T0p0bE1NZTcydWs1cEdSUkZZUlgxOXp4ZEk2K1NucVk1UEtiNzZSSysyWFVX?=
- =?utf-8?B?NGxYeDRHSHplT0VldW9xMkhZelhOMFJxVXdMM2tieDZ1VzRKUCtiNGVURTJX?=
- =?utf-8?B?SytsRXFDUVY2V2gzc01xWTZYMk9GL1dFa09WU2w1R2doNmRoL2I2eXVpOUFv?=
- =?utf-8?B?S0pQYmZiY3RnSVlkZUZHYjdsSllQMTFibWUzM2hrd0hrS2c1am1UUWtzaWlM?=
- =?utf-8?B?dnc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c24d64f-2b16-4a2a-93af-08de20e4cc73
-X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2025 05:40:18.9346
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mUPWXNwO0VXjVIThSu/dFQ8Kl4cRz/eFneH+5tyYXd7HOeIjwLv8BnrmJlDc+BSru7Ermp73p2OzWDjVFNDa9Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4989
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-11_01,2025-11-10_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0 spamscore=0
+ mlxscore=0 bulkscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
+ definitions=main-2511110047
+X-Proofpoint-GUID: Nobb7F94eErhj2oI-YPMDL9ImnqcarAl
+X-Proofpoint-ORIG-GUID: Nobb7F94eErhj2oI-YPMDL9ImnqcarAl
+X-Authority-Analysis: v=2.4 cv=FqEIPmrq c=1 sm=1 tr=0 ts=6912d58a cx=c_pps
+ a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=NMLfzRoFxyNNWpThmMoA:9
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEwMDE4OSBTYWx0ZWRfX8KzGJXshM75+
+ vbeQCxV1YqfHYRprbwcKElCaQpzI5L7ctm0jHKHSk9wSXWui/dyzv/bP8qcc5s9if+Nu+qqBp6j
+ HGrc0hGLMT4xbX0BD5yFGKqh3GMcm6jBXIJK6RMH952GSPS/+6t8yujx9+NWH9cWkhk9xMt8WTQ
+ j9FxncZaLbob6lUI87GppuoBvdtT2XfHns+/YWtlmI3Y+G8xKI4f+MgRrAea0+ltgUul9/ibsQF
+ OP1ObO1gftgQztbWjxE1ZbdruS3xpXk+WEv7LeDp0BE/4t5pYAEVXumQ0UsopBrExwFltc2I6IN
+ 93GHhJpz1TAa1Uz8yQEHg0/dCzmKuaK/fRR9YymoxR9eqNnsN+FxcAAIDbPwCSRw/V8O2Xw2RKz
+ xz2XxWyXwYt0htZjaFThgF207WJ0mg==
+
+This patchset addresses four bugs related to AMD PMU virtualization.
+
+1. The PerfMonV2 is still available if PERCORE if disabled via
+"-cpu host,-perfctr-core".
+
+2. The VM 'cpuid' command still returns PERFCORE although "-pmu" is
+configured.
+
+3. The third issue is that using "-cpu host,-pmu" does not disable AMD PMU
+virtualization. When using "-cpu EPYC" or "-cpu host,-pmu", AMD PMU
+virtualization remains enabled. On the VM's Linux side, you might still
+see:
+
+[    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
+
+instead of:
+
+[    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
+[    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
+
+To address this, KVM_CAP_PMU_CAPABILITY is used to set KVM_PMU_CAP_DISABLE
+when "-pmu" is configured.
+
+4. The fourth issue is that unreclaimed performance events (after a QEMU
+system_reset) in KVM may cause random, unwanted, or unknown NMIs to be
+injected into the VM.
+
+The AMD PMU registers are not reset during QEMU system_reset.
+
+(1) If the VM is reset (e.g., via QEMU system_reset or VM kdump/kexec) while
+running "perf top", the PMU registers are not disabled properly.
+
+(2) Despite x86_cpu_reset() resetting many registers to zero, kvm_put_msrs()
+does not handle AMD PMU registers, causing some PMU events to remain
+enabled in KVM.
+
+(3) The KVM kvm_pmc_speculative_in_use() function consistently returns true,
+preventing the reclamation of these events. Consequently, the
+kvm_pmc->perf_event remains active.
+
+(4) After a reboot, the VM kernel may report the following error:
+
+[    0.092011] Performance Events: Fam17h+ core perfctr, Broken BIOS detected, complain to your hardware vendor.
+[    0.092023] [Firmware Bug]: the BIOS has corrupted hw-PMU resources (MSR c0010200 is 530076)
+
+(5) In the worst case, the active kvm_pmc->perf_event may inject unknown
+NMIs randomly into the VM kernel:
+
+[...] Uhhuh. NMI received for unknown reason 30 on CPU 0.
+
+To resolve these issues, we propose resetting AMD PMU registers during the
+VM reset process
 
 
+Changed since v1:
+  - Use feature_dependencies for CPUID_EXT3_PERFCORE and
+    CPUID_8000_0022_EAX_PERFMON_V2.
+  - Remove CPUID_EXT3_PERFCORE when !cpu->enable_pmu.
+  - Pick kvm_arch_pre_create_vcpu() patch from Xiaoyao Li.
+  - Use "-pmu" but not a global "pmu-cap-disabled" for KVM_PMU_CAP_DISABLE.
+  - Also use sysfs kvm.enable_pmu=N to determine if PMU is supported.
+  - Some changes to PMU register limit calculation.
+Changed since v2:
+  - Change has_pmu_cap to pmu_cap.
+  - Use cpuid_find_entry() instead of cpu_x86_cpuid().
+  - Rework the code flow of PATCH 07 related to kvm.enable_pmu=N following
+    Zhao's suggestion.
+  - Use object_property_get_int() to get CPU family.
+  - Add support to Zhaoxin.
+Changed since v3:
+  - Re-base on top of Zhao's queued patch.
+  - Use host_cpu_vendor_fms() from Zhao's patch.
+  - Pick new version of kvm_arch_pre_create_vcpu() patch from Xiaoyao.
+  - Re-split the cases into enable_pmu and !enable_pmu, following Zhao's
+    suggestion.
+  - Check AMD directly makes the "compat" rule clear.
+  - Some changes on commit message and comment.
+  - Bring back global static variable 'kvm_pmu_disabled' read from
+    /sys/module/kvm/parameters/enable_pmu.
+Changed since v4:
+  - Re-base on top of most recent mainline QEMU.
+  - Add more Reviewed-by.
+  - All patches are reviewed.
+Changed since v5:
+  - Re-base on top of most recent mainline QEMU.
+  - Remove patch "kvm: Introduce kvm_arch_pre_create_vcpu()" as it is
+    already merged.
+  - To resolve conflicts in new [PATCH v6 3/9] , move the PMU related code
+    before the call site of is_tdx_vm().
+Changed since v6:
+  - Re-base on top of most recent mainline QEMU (staging branch).
+  - Add more Reviewed-by from Dapeng and Sandipan.
 
-On 11/11/2025 9:14 AM, Ruihan Li wrote:
-> On Mon, Nov 10, 2025 at 09:44:36PM +0100, Paolo Bonzini wrote:
->> No, there is none. In fact, the only dependency of the original series
->> on host PKS was for functions to read/write the host PKRS MSR. Without
->> host PKS support it could be loaded with all-ones, or technically it
->> could even be left with the guest value. Since the host clears
->> CR4.PKS, the actual value won't matter.
-> 
-> Thanks a lot for your quick and detailed reply! That's good news for me.
-> Then I plan to spend some time tidying up my rebased version to see if I
-> can get PKS virtualization upstreamed.
-> 
-> As a side note, I can no longer contact the original author of this
-> patch series. At least, my previous email was returned by Intel's
-> server. However, since more than three years have passed, I assume it's
-> okay for me to post a new version after I have the code ready.
 
-Lei has left Intel so the mail address in unreachable.
+Dongli Zhang (9):
+  target/i386: disable PerfMonV2 when PERFCORE unavailable
+  target/i386: disable PERFCORE when "-pmu" is configured
+  target/i386/kvm: set KVM_PMU_CAP_DISABLE if "-pmu" is configured
+  target/i386/kvm: extract unrelated code out of kvm_x86_build_cpuid()
+  target/i386/kvm: rename architectural PMU variables
+  target/i386/kvm: query kvm.enable_pmu parameter
+  target/i386/kvm: reset AMD PMU registers during VM reset
+  target/i386/kvm: support perfmon-v2 for reset
+  target/i386/kvm: don't stop Intel PMU counters
 
-And as you found, we dropped the PKS KVM upstream along with the base PKS support
-due to no valid use case in Linux. You can feel free to continue the upstream work.
-But I'm not sure if your use case is compelling enough to be accepted by maintainers.
+ target/i386/cpu.c     |   8 +
+ target/i386/cpu.h     |  16 ++
+ target/i386/kvm/kvm.c | 355 +++++++++++++++++++++++++++++++++++++++------
+ 3 files changed, 332 insertions(+), 47 deletions(-)
 
-> 
-> Thanks,
-> Ruihan Li
-> 
+branch: remotes/origin/staging
+base-commit: 593aee5df98b4a862ff8841a57ea3dbf22131a5f
+
+Thank you very much!
+
+Dongli Zhang
 
 
