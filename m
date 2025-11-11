@@ -1,86 +1,74 @@
-Return-Path: <kvm+bounces-62666-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62667-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25770C4A0A6
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 01:55:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F7ECC4A168
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 01:59:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1B1644F43EA
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 00:52:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB17E188E67B
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 00:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D143257849;
-	Tue, 11 Nov 2025 00:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A51C257842;
+	Tue, 11 Nov 2025 00:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PAOuJwPQ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KLA9yCoO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B72E4086A
-	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 00:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072B94C97
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 00:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762822360; cv=none; b=HSG+gDKqlIs3qBrgREK6hS2mv8tWIveU7ByAGMhdJnEIan1Ls7NQxzyTTXJdeQZFUAVjYAjPB4t9FJslAbHG63uPwlhEevmadNOH9RO56SsoE8Qhp6d91XBV4IwZDBUp2D+PEgzSbRRV5O7vOXFUmuW7Wiji+Xbl+52zH9BkJTY=
+	t=1762822724; cv=none; b=NGfWwzxQoA2jtydot/gpF9qF+mMYq3B158+Eoepg5JLhBK0OA+XPmJqi82UCMdh8Sr99IVWqzuLB0Nq3T6in9yZX5TzCYpYeSMjyir3ag0gWoxbMm9P99xFf3KbS3VuW7qCLCjtiIf2MTPe0nr7PWhO7y1d9omYthJ3rbAmkqxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762822360; c=relaxed/simple;
-	bh=AtQ/82EtmVgp8qVHviU2+lHSIDSfcaSM+ddQXov0DvY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Xjyf1YrrrvpuOQjAYkhYkmINoYvj7MDGc0q9umA9lr+FVoZ9JmWnEWgFGsmIEAOU7zKpnVe7KE1/8qb+AqmOV4LUJQnCyGdA8CF386h8X+Nd36C4pyAM7lB1ygpQrzfciTg4axNNNZrkA9Bq5Eh2Fm25BLlQQl7ppOpcZxr7+m4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PAOuJwPQ; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29809acd049so25223405ad.3
-        for <kvm@vger.kernel.org>; Mon, 10 Nov 2025 16:52:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762822358; x=1763427158; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AtQ/82EtmVgp8qVHviU2+lHSIDSfcaSM+ddQXov0DvY=;
-        b=PAOuJwPQ2rB2o6dwZxMjWxzfjIBn75cgYhgMJNlsxtkGHRUJdaYpweN0l+ghdAax13
-         +3rBKyuR0YcxcwT2nDV2iJQ2CO+bL0rzntkcY3vwpgLnDU0rSc6WMvwFX9iT3K+8x7+1
-         NdABF2WerHeoVt0xrSDW9F6emmkvEQ000/+Y9tlUlm3chogXyTP6dau9WMFAOtl5PO57
-         t5pRauyijGHgBUPHMlWtLFEOHm1IpJAWzg3gXYy7VhMnveNEo+JB58C2OrzOMx5c260g
-         haMF/Z+icgzsWcMtXBC6cyTc18+2WHptBgJc8RefQN1z9YFIX8EjtQQuiQ5Mp5V5UiiX
-         oU1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762822358; x=1763427158;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AtQ/82EtmVgp8qVHviU2+lHSIDSfcaSM+ddQXov0DvY=;
-        b=aJuJgL3FEJv0isIG6mqemORQoeE2EMc5O3ZNQrFpXZG61OZgWOP3supKfw2oM7rYHH
-         /OusjdP3EfmNHZaqjq2ZxncxBMXqSr2aoGIDlGhyMihl6vVip108bC28+///DUlf1Mre
-         bgptgg163hdBGBZ2InvlrDRUv30nNLLjgBSBEKGt7fOMmHKrSOMC817yC08IwAwJ44Qy
-         uZ/86GPZ103WSHGjNHP2pwVUnXFGdQlLxl1YYLTeIjMYNybMZx4iClsHJ1wLOKMZUbDK
-         BFk6iNJNe0zbMGhNX9ddE2hY1LnkhvCgwSoQa0FSNrRlqPirECv8WX+wp+F5oTu/JUkQ
-         Wxkw==
-X-Forwarded-Encrypted: i=1; AJvYcCWGeoH9QwJOHAuOjYeS4DYzfA67B0FUyfveST47ulBq5WnRTNhdhI7g+ijmCTdrYfK8mnU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFcK9Hl9W34w/tBgxjDIEAZdWLGbzmatMejlsp1gQaQiqj2dyf
-	HwL/i9g2sGulA6NZRJwXwLJen++q1U0hX0TeX5uImFQD4mjAIkJaEt//kznazLcyKRZKLczNPec
-	QhszrEw==
-X-Google-Smtp-Source: AGHT+IEbjrsxaiNUslg2isBtzSL5dpA3I7qFnMuYN9dPxztymlV3kqChz46KobwAd71NGTPeJlxs97sSep0=
-X-Received: from plnx8.prod.google.com ([2002:a17:902:8208:b0:295:5d05:b2b9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1aaf:b0:298:3aa6:c03d
- with SMTP id d9443c01a7336-2983aa6c179mr35537105ad.57.1762822358616; Mon, 10
- Nov 2025 16:52:38 -0800 (PST)
-Date: Mon, 10 Nov 2025 16:52:37 -0800
-In-Reply-To: <20251110232642.633672-1-yosry.ahmed@linux.dev>
+	s=arc-20240116; t=1762822724; c=relaxed/simple;
+	bh=SdFhQ6OZB0yMMMQZRGiMyXL9GCPyz7OFon/zG6zgvuQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o5fgcftV5/9e+QW0207pxjQo5y2DoakJhh9TJ3aPZ4S/WIIVGNGH/dC9Jd9eGsPzIuAzZKCrNqburom4mT1O7c2wzsT3rEO7M9GK9RDwK8SCZ0C+oSAjqo5mKwcMru8whpdcHidutYjR9/bhYheJUhkKiFUbhuF9DTVAgzsOTMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KLA9yCoO; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 11 Nov 2025 00:58:24 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762822710;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SdFhQ6OZB0yMMMQZRGiMyXL9GCPyz7OFon/zG6zgvuQ=;
+	b=KLA9yCoOqkUwo6Oub4tIa8sCyoPxaq0Br1aquYBAY1k2fqZuDsnvE7ZYxhdt5nx1TSWYhj
+	sufgZD3O4SjhQrtgoEJm+WZ11qse9WOH0Mp49JOhUBqSiHTx4YxUroBgmbrYLcZck/2j5L
+	opVFtR0bmmiBHup/EWGa3kzfxcpNCqQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Cheng <chengkev@google.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 00/14] Improvements for (nested) SVM testing
+Message-ID: <ooihav6sc5d6bace3kxug3ze2oicumwyocdhh5kletjclmnk27@cxzqcmn6eo2v>
+References: <20251110232642.633672-1-yosry.ahmed@linux.dev>
+ <aRKI1bzrNRiWaQBK@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251110232642.633672-1-yosry.ahmed@linux.dev>
-Message-ID: <aRKI1bzrNRiWaQBK@google.com>
-Subject: Re: [PATCH v3 00/14] Improvements for (nested) SVM testing
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Cheng <chengkev@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aRKI1bzrNRiWaQBK@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Nit, in the future, please label the patches with "kvm-unit-tests" so that it's
-super obvious what they're for, e.g. [kvm-unit-tests PATCH ...].
+On Mon, Nov 10, 2025 at 04:52:37PM -0800, Sean Christopherson wrote:
+> Nit, in the future, please label the patches with "kvm-unit-tests" so that it's
+> super obvious what they're for, e.g. [kvm-unit-tests PATCH ...].
+
+Ugh not a nit, it's actually annoying, even for me, because I use these
+labels to search for my patches. Sorry about that, I had the correct
+prefix in previous versions but forgot to add it this time around.
+
+Let me know if you want me to resend to make things easier for you
+(assuming you'll be the one to apply this if/when the time comes :) ).
 
