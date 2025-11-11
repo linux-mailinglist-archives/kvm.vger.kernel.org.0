@@ -1,356 +1,267 @@
-Return-Path: <kvm+bounces-62730-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62731-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D8BCC4C64B
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 09:27:35 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECF64C4C698
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 09:34:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 240EA427048
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 08:18:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 544484F77DA
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 08:26:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013843019C5;
-	Tue, 11 Nov 2025 08:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126E223C4FD;
+	Tue, 11 Nov 2025 08:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzjuAjEe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NxSieVQ7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B32C26738C
-	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 08:18:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762849085; cv=none; b=axVvB8h8AkOZoV26IBSfi/tp/VI2SDaO2V4QdR2kl50U8BEZ6xupL0zaHS65rNluHmce0palBFvtDf0jnjnVQPuvPS/H5yUlWn1hHJJdvbjypd3+Dp8KLzoBAQNFyxlFM6VDDRtIxvVBPVGcFfQihNyQjAkIMLjCdEDOd7GrVLQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762849085; c=relaxed/simple;
-	bh=Gd05+mo2UfaTJ6Gef25M+dl3hVN1h2S/cxF6i+WJxQU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rF1vgFiEqgGm5m0CRMcV+x87IlTNph+zKPHAFN+e3qiWSAtznmvSIoyF9uJcHqdgdgHzrApVLh/TfY5UJO4O6mNEedYbvxyGCWeLMoQRV4kjsR4J1DI+j1uLSbm2h7GkYgJiiyIxEtyasbP8tzfl4cEreGjksCCqyiJNnka/F+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OzjuAjEe; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-297f35be2ffso32808865ad.2
-        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 00:18:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762849081; x=1763453881; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4379rKWiMGjTG5Kj37FfET64MZEq6+W47iq/srN4//4=;
-        b=OzjuAjEe9nDzpHpxH0v2nNYiJq0YGzGk8X4Mx3ILL9qkT9ejPP8Qa3nyO98sar08fI
-         MtUsud5fMu/c9Sd8AIjZ7fl8HSLOJb8PUBdDxcnYg5xHvMgPEJa30eZnWHa8divHMhBX
-         RUQYz0XmMKS2/9OZZOXB4EovP6iT4+BLwMfiuIAj4/Y4fPscAHit4zzed1IUtfxoXRKP
-         AV9rpv3auBvVwnu+X5UdJNk2ZhkeSwdeeRhtzMmq9bGQyg6b1srPzateMH0/4vSguVjg
-         ingvE+zw4X1xY1K628LWXPRpkxvCn/0QgINn3VWWUkqxW9Mx7aH8xyaxdoRa/JGHWNNK
-         E0Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762849081; x=1763453881;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4379rKWiMGjTG5Kj37FfET64MZEq6+W47iq/srN4//4=;
-        b=numOhuxt4i2HZl7OS2GsgZ/JuQCXgJwTc5ezJU66dhXwQeRUD8WRZYGF+aabFlJ2YD
-         EylphiPIdy1aqWsAUnr+XwpQus8VcRCCrD/g/kC2eQy6/1vNvYs3VXOKxYDTGPGu9TUY
-         e1w0l+43LKlWYkuexNfp7sjx5ARaA1pLfeFEU4ydsH9AWoCVGuW5Gz5AqsApnCbfp75D
-         Uh+vVROcOfoH7yYHKJhF/Hlt0oWVQ1Qm4UDAt+h7oswcvPNaFwEPNODGUldlZdtzrwm5
-         xueHkHCjjcHeV8lSlICugGY2xOzrQbbKgaDIelLoKPS8gVsbjz/5Xszs6U4RXXwWuy0r
-         DSAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUdp040kCSXoTVJq0020fyA5dkIZLG69nFursNqE95GPtW2Rnd2V8upBOChqdhjQjRVwHc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7hOIWan2Y68a+1LBEe6wukV3DP7GrdN7VjpYqblbQ3Eud9dwk
-	qz8uYWxDTLJh5yr52LpO/I5tW8BnKnVl856yWhemFJSkv5cjkcmDMMbj
-X-Gm-Gg: ASbGncvzZEqMkl1LM7DlLyY5FiMZsH4HdwcM7xSfZDCGe6eZAULhnEpyvSGP0rmiiid
-	z7oFjkaNToQbNFf5Pf9+z1sb3xrtFpw5gkbWwO41bbFSjEcz6i0GFIgZgxitVEoQIRsgXj0JLfG
-	DPubhyv6XxiiEj73bUo0Jxh+uiAj50Ul0x4IqVw/zr0LJJpcOJ4avaHDYF4eI2UIaIQPB9c+98l
-	QzlxONVM7/8k+8Gl1Pwn0qSOj1T4zLlmsxCn9jG1c567BLVJu5Ua9S1Y+2LrX+Y6I92ZB1EasAQ
-	GvoT3uIUnyxWqXRDlBNMis/OyaJIfiIjaAmkyUlDhQdGz/g9UxuflPSOsMNoam6MRTE0rrzUECy
-	3m3OlBCBjLQV8weSJyaminFCVp64/Qos0Pe+N+OgZdpEkV8sT0UsC6njIJCsZvWklqLpqinSVI4
-	xV7w==
-X-Google-Smtp-Source: AGHT+IHjkw7MBYtKgvvaRgvArdCndGOSPPCHj2s+7jvjc7uA4yJCCnrde9cUrhFkuV2y2zHzimBjWw==
-X-Received: by 2002:a17:902:cf04:b0:26b:da03:60db with SMTP id d9443c01a7336-297e5626565mr147335395ad.13.1762849081387;
-        Tue, 11 Nov 2025 00:18:01 -0800 (PST)
-Received: from [10.253.64.201] ([47.82.118.6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-297df996d31sm108508675ad.13.2025.11.11.00.17.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 00:18:00 -0800 (PST)
-Message-ID: <7705e9e2-4b74-4063-ab5d-96d9c8f4ad11@gmail.com>
-Date: Tue, 11 Nov 2025 16:17:55 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0C12EA498;
+	Tue, 11 Nov 2025 08:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762849561; cv=fail; b=Pm86330U2e3tcWoZCfICW8oHMJAEly9RZp3tyr7hKPNvydxLeX94/6KcWMZQGJBk3TUaeSIprnp6HE2NYB21qMPvQFEHD8fQpRQRqs8Ms5imH1w/+SspdYZi7sQ9xVK75kyBcSXLLcdbm75GcnPKWMeXB5zXaXQrUw1WlyUFRhA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762849561; c=relaxed/simple;
+	bh=r2me81pemsAVDT35XBmk1D6DGjlmX/KjjwEu/gkm4sE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=NCUEJir8hzqm0Tyym39SgXtscYUu2A0IaJNlvfsWrhgqR6RjwF1PwRmwLBX8uAWeMYePQtLVLDMCflrb80lBWksiONedyd6NVf1qiM/LN2QZFe7NqpBJb1xmV28i5OhceA13GoduuiswkF8KOgv9pY0PTavFlKloLqFwuwAELmE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NxSieVQ7; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762849559; x=1794385559;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=r2me81pemsAVDT35XBmk1D6DGjlmX/KjjwEu/gkm4sE=;
+  b=NxSieVQ7krjgmBnlLjlnN+h01VdFTeC09ahSo+uq1SdiUh0JN+Ye6JGt
+   xPrPE/SNNV+NcgNtKkAlM1fhUCZCipsMrv8gavxv3Fe8hYAHPCBWWNTtT
+   EaIPRQSe8sGUc/NYRfzH7GLvmnIvFymdyBQAC998bApjzEn2IWaavHdNg
+   jGF+zwTnX4Er7tFAKJ6zYeEk7y3PhwkuNEvLjmau95EBOo8dw0B1H9+gt
+   +3BuMugts22r9X1ZfkPDR4+UVhd3TvLnMxecAJvMYiuHQF/LZvTBOtPmJ
+   84vDR5KW6qisVWxVGygv3nwSn/S8hubWOrHpnqqVY6y8xBWFzUwyMJvU5
+   Q==;
+X-CSE-ConnectionGUID: ssVKTpr8S6i1UQvM/9WntA==
+X-CSE-MsgGUID: aAMZbhGzRGuhoPkNqoyLhg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11609"; a="64611690"
+X-IronPort-AV: E=Sophos;i="6.19,296,1754982000"; 
+   d="scan'208";a="64611690"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 00:25:58 -0800
+X-CSE-ConnectionGUID: Nkiq0seARyOu5SlgK9jsgQ==
+X-CSE-MsgGUID: KfPcNro8SBCFwOGVcm9ReQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,296,1754982000"; 
+   d="scan'208";a="188166339"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 00:25:58 -0800
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 11 Nov 2025 00:25:57 -0800
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Tue, 11 Nov 2025 00:25:57 -0800
+Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.54) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 11 Nov 2025 00:25:57 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SvxH1XWFwFWdOtauuudUu/X+9pQduv7khT/zD7aiRXYm5U1legVooFQ1ofBGphp4GXoMA//CI7wb4c+MfVKYMie7L4eCvyZcha4QqudBKl5fCn2Z8kfGnPmB/bkPm/VUfU+YrirMlqLxdT646I3ZHR8cPBoFphuBOI4XXLwB6F67O+5OnecnxaYraqo2aTCyHtSvWwaNfpxrUV8uj+hISKQcEtf9CwcRbzYxezwmqL3ttN59pb0FyBENjYvzywR+9zUuAonquGGvut3Ii3vUTh4EjG/0HwHOMJwjT/mCg8VWX+fWfOva4GoOSMReKOlxno09+AKCvsp89Yi2jQcF7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tj3F/EB6tWPTrQh//sI71Cr7hjHDrL4Dq14evpRvouQ=;
+ b=JtcEaPtT6dQ6SLOLlS+J+Tao9R48UIWGqyU5wWm0T+ySm87ROsAXWMGoqETuJi1RsFGZoRB+AJqjDchcFtQVygHO4AkthHzitheFCJQJ9QpK/6PR10jwxugotCD9UvGho45P8xl2Fj7Z098wW1nSaRas+CgBEH47ephFCnEVoZmfpW9/JroBgQwxfil/mq+Ew6p19iT6QN9UOFcXDsKFnG4oJ9DcatvMm527L7WPJIS/NnQjEsuF32Ce2gh2YeRMkbbByJlyznK0HwgI8BY/bHeTbbBnBP0kKeQyoqVhKvkJm/lN1yPTe6gjPwsOnnukvaa+WxYD1l3u+xp6PdVkGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB5373.namprd11.prod.outlook.com (2603:10b6:5:394::7) by
+ PH0PR11MB5093.namprd11.prod.outlook.com (2603:10b6:510:3e::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9320.15; Tue, 11 Nov 2025 08:25:55 +0000
+Received: from DM4PR11MB5373.namprd11.prod.outlook.com
+ ([fe80::927a:9c08:26f7:5b39]) by DM4PR11MB5373.namprd11.prod.outlook.com
+ ([fe80::927a:9c08:26f7:5b39%5]) with mapi id 15.20.9320.013; Tue, 11 Nov 2025
+ 08:25:55 +0000
+Date: Tue, 11 Nov 2025 09:25:51 +0100
+From: "Winiarski, Michal" <michal.winiarski@intel.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+CC: Alex Williamson <alex@shazbot.org>, "De Marchi, Lucas"
+	<lucas.demarchi@intel.com>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
+	<thomas.hellstrom@linux.intel.com>, "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, "Shameer
+ Kolothum" <skolothumtho@nvidia.com>, "intel-xe@lists.freedesktop.org"
+	<intel-xe@lists.freedesktop.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"Brost, Matthew" <matthew.brost@intel.com>, "Wajdeczko, Michal"
+	<Michal.Wajdeczko@intel.com>, "dri-devel@lists.freedesktop.org"
+	<dri-devel@lists.freedesktop.org>, Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin
+	<tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, Simona Vetter
+	<simona@ffwll.ch>, "Laguna, Lukasz" <lukasz.laguna@intel.com>, "Christoph
+ Hellwig" <hch@infradead.org>
+Subject: Re: [PATCH v5 28/28] vfio/xe: Add device specific vfio_pci driver
+ variant for Intel graphics
+Message-ID: <7ig24norebemzdih64rcpvdj22xee23ha7bndiltkgjlpmoau2@25usxq7teedz>
+References: <20251111010439.347045-1-michal.winiarski@intel.com>
+ <20251111010439.347045-29-michal.winiarski@intel.com>
+ <BN9PR11MB527638018267BA3AF8CD49678CCFA@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BN9PR11MB527638018267BA3AF8CD49678CCFA@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: WA0P291CA0022.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1::22) To DM4PR11MB5373.namprd11.prod.outlook.com
+ (2603:10b6:5:394::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/1] KVM: x86: Fix VM hard lockup after prolonged
- suspend with periodic HV timer
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner
- <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
- "H . Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, yu chen
- <33988979@163.com>, dongxu zhang <xu910121@sina.com>
-References: <20251107034802.39763-1-fuqiang.wng@gmail.com>
- <20251107034802.39763-2-fuqiang.wng@gmail.com> <aRKHcPLEEHTE5hpJ@google.com>
-From: fuqiang wang <fuqiang.wng@gmail.com>
-In-Reply-To: <aRKHcPLEEHTE5hpJ@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5373:EE_|PH0PR11MB5093:EE_
+X-MS-Office365-Filtering-Correlation-Id: a9a1c389-d981-46ec-0ece-08de20fbeebd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?enlEaEoydDdCZnRjM1VrbEFUWCsxeVB3U1htcG1jaTJmOTNtaEN5K21tMk4y?=
+ =?utf-8?B?ekVVN3FVWm1mNmhjMzlvbGJsUERnU0lkWU10N2FBbTF2bll3aUlZMVl5OGpY?=
+ =?utf-8?B?dlJrYmY3Y3RONVZqak1kT1NBQWhCbVk0a25aQ2J4WHhuZTcrUDNoNWQ4a1Fj?=
+ =?utf-8?B?U3dXbTJKejZqeis5V3B4U09maXR4eHQ5RHlRMFRLakQ5VEgyWUErbW5zZ2xX?=
+ =?utf-8?B?N3hYUWlvVFhrQncwbDh3bmFHdzhNSUNuZkk0R3BRcHZCVCtSd2tvc0hZTTA2?=
+ =?utf-8?B?bzNJTFFwT1QrQ3hYNFpFVTRjZUYxYU42QlUwN0tibUllMWdmOEJTQmJJeFRR?=
+ =?utf-8?B?MENoOVpzZWY2aFA1aTdPWWUwNTA2WWtKYXk0aWVINU9FVFZMeHlVdkNyRUJO?=
+ =?utf-8?B?VFRVUnUyeUkvVmNJcDB0NUxGVkNHNUNIVnFLL1Rpc0UyL05uQW15QnZ3eEpR?=
+ =?utf-8?B?eldBTktCbGRjSWZYamhyTGtxRU55L3VhQlhVZllHdTQvemo1MXBPVE94QWIv?=
+ =?utf-8?B?bXRJV2dYdWlqL1hHTENGRjdYYnJGMUV0QzNuRlZMMDZ0RDBHWlpaTmdNcmRT?=
+ =?utf-8?B?YXlocnlrcldQTmZuNHkwOVVVL25lNTY5RTQ2WFdIbVFlY0twS2hUWTB2d3di?=
+ =?utf-8?B?dFJycWovUU5uVlZDUzB0WktJYUVVZGw3Ym4wRmx5SkZBQjFnck5tbUpsbXo1?=
+ =?utf-8?B?SVR0aEpFaENjbTh0VE9kLzlMSmFza05jbER5WGlKWGY0dTZ0UkJBSUpVSnpk?=
+ =?utf-8?B?a2krVVpGQTFkdDZMeDJIY2kycHJTWmJDaW5uOG45ZWxJK2oyQitkbHdCUnM4?=
+ =?utf-8?B?QkVDYWYwR1RzTmF3WStHd0NtZzVvdWlNaCtybzBuVUI4OTg3cndtZEwvQXNx?=
+ =?utf-8?B?VjVkcjFUZkt5ZHhCL3dRM2UyVEs2TmY5MUpPOGdBSERicWlGTU55UlJQQk5v?=
+ =?utf-8?B?WUxSYlNjbUZxNDgzeFhOOXdSMmQ5NFlWT1BsajhjbG9SQUkrNUIvYkc2Rkdm?=
+ =?utf-8?B?c05vZERjbTByeXZTckU3b2pGd2dHQ2Y4TURxclAxV2tKemNNTmVnYVFsNXdt?=
+ =?utf-8?B?QWloTmZrRGhHTTNLa25oL09HcFUzRVNMRm5Xa1hWNzVWWGpUdDhmeWR1RmJh?=
+ =?utf-8?B?RWFBendvMmdwQ25PTExzRU02b2FoYURtcjlEcU43L0lQY2RobHF4SzBHVUwy?=
+ =?utf-8?B?cWY0d2UyVFNWVnRtK3RGOGEyUlNoRDQrTmZYRFVSd1dIbU5pMjlPdHNkd1N3?=
+ =?utf-8?B?bEZRSE11VE1FdlZLczVseEd6dTVNSlhIdW5KQWxWcWxIdW1UelJwSkUzVFg2?=
+ =?utf-8?B?WHpYTjJhWC9uT1B6N1JLZFFkRVpMQVVzQi83RlhLc2ZncysxK2JzaWt6L2t4?=
+ =?utf-8?B?ZEMyalYxa3dQMVhScGZCVGtSRElWSEd3M2lPQzV3d3pZZVRPNUVxUWNoOVlO?=
+ =?utf-8?B?djJTQjhFZ3luZmxWckhGRmgzSmhKN1oyYmFVMUZPV0NQVnFXMnJ1NXdvMjEw?=
+ =?utf-8?B?WDJZREVhcUl6WE9xalN4ay9Fb21kWkdET3R4N3RiZGFkWG9LQkhYSmFnNklP?=
+ =?utf-8?B?UUpISnowZEpUbDJOeXJ0QldpMFljQWhxK01BcnI4bU1sWW51UGVmZDQ1eWVv?=
+ =?utf-8?B?NGRJTnBZdkVYNHhYWXBFQlVveFRXMkdHaFFYRUNzTUZpbVZZcnZmZW9qaEk2?=
+ =?utf-8?B?aVdjRGRNY1hFWVU1cVBxMDRsSVp1Rmo5RGMxQkRacHl0TG9YNTFIRWJZeHhj?=
+ =?utf-8?B?NlFqZzg2Z09vTmwvL2x6OWV1Mll0ZmtiQ0k4TzVjRXFVVFFPTm0vR0U4emxE?=
+ =?utf-8?B?SzhERWtZdW45RThrMmFaQ3Vzb3p3VzFYQ2sxbGE2c1EwMExxdEZFcFBQaVJV?=
+ =?utf-8?B?WmpEMFFQMGtpT3QwaGZnNWpTbzVGajhSNUlaKzhzc3VRWHdZbkROTkdjdURm?=
+ =?utf-8?B?alo3eWZ5SUdQQTliMVJnMUF5ZHkyUHJZMHpWZVo1MkZWUythTHZsaGg3c2t1?=
+ =?utf-8?B?Y2lqZ3JPTjlBPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZXg5dWU0dDYyaEJudXBwdG1vckdHckNGTVg5S0o0TDBHN3lBZU56ekhqWlFE?=
+ =?utf-8?B?eHlsaHoxQitWTWlJZmN1VHdEYmF1V1RDVUJxK2xOdW5aNjE5ZGRhSXdncXBO?=
+ =?utf-8?B?T2VmOUZIaXJjRVFSSGhIU3NYM3JGVEM5eWYyQTdnWTlrdWhWMzJ6ZHJRVDVV?=
+ =?utf-8?B?bHlJUjIvRTVnWU1zaFZjVCttbGtJWG9Sc2ZvOHhVeTd4S1pOM2dXY205V3k3?=
+ =?utf-8?B?SDgwcHovVUFMZ2MzeU9nWU5Pb251TlZlcm1TcHhicXBzV1RnQjQ5bGtSY2Ny?=
+ =?utf-8?B?dzlVYlhid0FRL2tpUnladHo2Wi9keUUrNlRVb0dzK1RHUTl1Qit5Z2YrQWFq?=
+ =?utf-8?B?UjFWMWZOdWJrWmZwdWc2ZXMyZkg3ajhVWlkwL2N1UDlib3JJTC83bTQ5d2dI?=
+ =?utf-8?B?ajMraEtIQVF5MjdEYm9HSDZCVmE1Y2JRdTVFY3lsV2hVS05NVWs3aW9xU1Aw?=
+ =?utf-8?B?NXFKbnlJM0tzSVRreFM4d0R3Qm5mYnRQSnlMQW51aVBDK2pjdmNtcUJXc3Vh?=
+ =?utf-8?B?SmVNNDhDb2xlNFYwZ0FqcTZqMlFCQzlZQ1hMbkVTM3N2Y3ltUnl5ZWdzSUtD?=
+ =?utf-8?B?N3pNdk1SbXdYekVDMEVFY1B0SjBSUFRXa3VFVXRTVnpyOEZDN1BBZEsxNGdq?=
+ =?utf-8?B?UnB4VDRvNVVtK0IvUmdBQSs4d1h1OGlmV1ZhSjlocFRwWUNSdW9yQkVXTTVv?=
+ =?utf-8?B?d25Za1p4N2RqSU1QM2Y2dW9XdHZ4VmVOSEl6QXFkVWkzSksyTkxBRlJxN1k1?=
+ =?utf-8?B?TFpwQnlWaUxiZWIrd3pnVFEwZWVHRHlmWDFoRUsxSW9aTE1PdEtBTk16Y2kr?=
+ =?utf-8?B?MUtzcnJwSklCbjFRZ1hocmxaZ3ZwRWdWaUs5TGo4bGJuZGtnVEhuWXVFU3Jm?=
+ =?utf-8?B?TWo1eEF6L2xvL0E1K0R1MFdHdlczdHhLQ3Y4b0ZzR3d3enV5b0xiQzFXSUFh?=
+ =?utf-8?B?ZVphY0p5UEgzdWtrdFpnSWo4TXgrdzNPM00yUDhnZ0JJS0pDNS9YMmFPdXpO?=
+ =?utf-8?B?SDhUVTMvMUd5MUVLODF5WXMwazhMb3RZemFoeGRJUEpRTmpPWXRYdVdQazFV?=
+ =?utf-8?B?RWZ1QU9pSmFjZ2ZiMmV6NUZvcGVuZXN1TUdSZmo0SHpEUGwrS2pzYzJnNHVL?=
+ =?utf-8?B?WVp1RFdHQjVvNi9XRHlMTmVRTWdicXBoSkFHUnlZRHBtZ3hMQTR4OGxUZkxO?=
+ =?utf-8?B?RCtCSzA3K255ekdxVjVuaUk3dmpiRU5xZ1ZwV3ZLZmk5Y1ZpcVBmUXg0MWxo?=
+ =?utf-8?B?QlN6VitVS1N6R2JUR0NUNXQwTzE0ZXhiVHExUGMwK1duK0c4cDI2UDhPNTQz?=
+ =?utf-8?B?Ylp6VDQxVnA1ZnRpYXdSQzJPOStONUNodFNiSmpGZUoyVlBaQ2YwS1FpMjFP?=
+ =?utf-8?B?UlZtQ1BTTmZRRjJLM21DVnlLd3hkckdmbUdscnQwdFBUMUpLbHBoR094N0wv?=
+ =?utf-8?B?VVNZWmZleVRHdHJFVTNuTzRSNmMraGlkSG9xbVlTcUxDaDc4ZjV3MlBwM2FS?=
+ =?utf-8?B?Mmk0MFNiOTJLdXIvN1RFeTdPTW5iTzhYRTBHRW5haHB4c0tVaGk1Skg5Zjdq?=
+ =?utf-8?B?V0JXTHRHSDNFenZUZzJSMGNZTVVydm1SSlFWVms3SlNKL21oVEdCQjVxdU55?=
+ =?utf-8?B?K1ByVnZVejRyLzlUSWxrV3FZeWF1TktPOWxUMkFaOWxRMDBrV2JFQ1F3YVhZ?=
+ =?utf-8?B?enA5d0wvcXNqR3hFMkF1dm5PV0RVZG8wK0VIejJkNGdCTGRsNmRtcFE3eHlN?=
+ =?utf-8?B?QzlnTG80WlV2WWt3UlBjMjBmWXlESzNrQlJXZ0lmazF1T2IyZUxtVXNmZndV?=
+ =?utf-8?B?ODFzTUkrYjNRcmVaNm1VejJyNFE3Y3ArbEhqM1BQYTRONWtja2tLUC8zcEhm?=
+ =?utf-8?B?a1ZOcnBUMXVNMGdMcjUyanlsUkpkbFI3ejY1eS9qZ0c3S2F2Y0xzSDRHN1lS?=
+ =?utf-8?B?bmQwaWRETEdmT2dMUSt0UTlvZVczbGVqd215T20rSVIwQU9yU0xIN0owV0Q0?=
+ =?utf-8?B?cVJNMjE2Ni9OQU45UGFvZTFFeDd4WEloWEhLeTZ2T0ozTGorb2N4WFpJYzFU?=
+ =?utf-8?B?WTY5cGd1TGhXaG1oSWNhbmJDS3B3cEZoNGtNVHJDQnM5dHBZMzI4RTBKUzgx?=
+ =?utf-8?B?MGJrek5SbUo1TkxnR08zOHZCOFdaT0hKcmJobFNmRUh0TVRnd1dzWHo3ZVZl?=
+ =?utf-8?B?YVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9a1c389-d981-46ec-0ece-08de20fbeebd
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5373.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2025 08:25:55.1513
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3NM0Anne7A7kiUqL1NKdZ8BsIQWYnoRNw0tstzP/BBMPVwgpjE8Fd4G7C69KFkAX7w2a5YjSTDY+YmQ/cCeciXGkEX0mRRpnFi5ssj5qqgg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5093
+X-OriginatorOrg: intel.com
 
-
-
-On 11/11/25 8:46 AM, Sean Christopherson wrote:
-
-> On Fri, Nov 07, 2025, fuqiang wang wrote:
-> > When a VM is suspended while using the periodic HV timer, the KVM timer
-> > also ceases to advance. After the VM resumes from a prolonged suspend,
-> 
-> Maybe it's because I've been dealing with a variety of different suspend+resume
-> issue, but I find it confusing to talk about suspend+resume, partly because it's
-> not immediately clear if you're talking about _host_ suspend+resume versus guest
-> suspend+resume.
-
-Yes, using guest suspend+resume is clearer.
-
-> And suspend+resume isn't the only way this issue could be hit,
-> e.g. userspace could simply stop running a VM for whatever reason and get the
-> same result.
-
-Yes, it just requires staying in user space for a rather long time(I haven’t
-tested it specifically, it might take several days or even dozens of days). As a
-comment or commit message in the KVM, it is indeed better to make the
-description more general, rather than restricting it to specific scenarios.
-
->
-> I even think we should downplay the HV timer / VMX Preemption Timer angle to
-> some extent, because restarting the hrtimer if it expires while the vCPU is in
-> userspace is wasteful and unnecessary.  And if we ever "fix" that, e.g. maybe by
-> not restarting the hrtimer if vcpu->wants_to_run is false, then the hard lockup
-> could be hittable even without the HV timer.
-
-Yes, I also noticed this issue. But initially, I didn’t have a good idea for how
-to fix it, because KVM can’t determine how long it will take to return to
-userspace. If the guest is in user space only briefly, not restarting the KVM
-software period timer is unreasonable. Using vcpu->wants_to_run seems good.
-However, I am not very familiar with KVM_CAP_IMMEDIATE_EXIT. I will review its
-history and try to run some tests.
-
-> > This patch makes the following modification: When handling KVM periodic
-> > timer expiration, if we find that the advanced target_expiration is still
-> > less than now, we set target_expiration directly to now (just like how
-> > update_target_expiration handles the remaining).
-> 
-> Please don't use "this patch" (it's superfluous since this is obvioulsy a patch),
-> or pronouns like "we" and "us" as pronouns are often ambiguous in the world of
-> KVM.  E.g. "we" might me "we the cloud provider", "we the VMM", "we as KVM", "we
-> as the host kernel", etc.
-
-Thank you for patiently. This is a big mistake I shouldn’t have made and I will
-thoroughly review the code submission guidelines for kernel/KVM-x86 as provided
-in following links:
-
-[1] https://docs.kernel.org/process/maintainer-kvm-x86.html#comments
-[2] https://docs.kernel.org/process/submitting-patches.html#describe-your-changes
-
-> 
-> > Fixes: d8f2f498d9ed ("x86/kvm: fix LAPIC timer drift when guest uses periodic mode")
-> > Signed-off-by: fuqiang wang <fuqiang.wng@gmail.com>
-> > ---
-> >  arch/x86/kvm/lapic.c | 32 ++++++++++++++++++++++++--------
-> >  1 file changed, 24 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 0ae7f913d782..bc082271c81c 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2131,18 +2131,34 @@ static void advance_periodic_target_expiration(struct kvm_lapic *apic)
-> >  	ktime_t delta;
-> >
-> >  	/*
-> > -	 * Synchronize both deadlines to the same time source or
-> > -	 * differences in the periods (caused by differences in the
-> > -	 * underlying clocks or numerical approximation errors) will
-> > -	 * cause the two to drift apart over time as the errors
-> > -	 * accumulate.
-> > +	 * Use kernel time as the time source for both deadlines so that they
-> > +	 * stay synchronized.  Computing each deadline independently will cause
-> > +	 * the two deadlines to drift apart over time as differences in the
-> > +	 * periods accumulate, e.g. due to differences in the underlying clocks
-> > +	 * or numerical approximation errors.
-> >  	 */
-> >  	apic->lapic_timer.target_expiration =
-> >  		ktime_add_ns(apic->lapic_timer.target_expiration,
-> >  				apic->lapic_timer.period);
+On Tue, Nov 11, 2025 at 02:38:19AM +0100, Tian, Kevin wrote:
+> > From: Winiarski, Michal <michal.winiarski@intel.com>
+> > Sent: Tuesday, November 11, 2025 9:05 AM
 > > +
 > > +	/*
-> > +	 * When the vm is suspend, the hv timer also stops advancing. After it
-> > +	 * is resumed, this may result in a large delta. If the
-> 
-> This definitely shouldn't talk about suspend+resume, because that's fully a VMM
-> concept and isn't the _only_ way to end up with a huge delta.
-
-Yes, it's better!
-
-> 
-> > +	 * target_expiration only advances by one period each time, it will
-> > +	 * cause KVM to frequently handle timer expirations.
-> 
-> It's also worth calling out that KVM will only deliver a single IRQ to the guest,
-> i.e. restarting the timer over and over (and over and over) is completey usless.
-> *Except* if KVM is posting IRQs across CPUs, e.g. running hrtimers on housekeeping
-> CPUs, in which case KVM really will deliver an interrupt storm to the guest.
->
-> But I don't want to try and special case that mode, because there's no guarantee
-> KVM can post a timer, and I don't want to have arbitrarily different guest-visible
-> behavior based on a fairly obscure module param (and other settings).  So unless
-> I too am missing something, setting the target expiration to "now" seems like the
-> way to go.
-
-Yep, I also think it’s better to handle this in a simple and consistent way.
-Here are my thoughts:
-
-There are two possible reasons why the new target_expiration might lag behind:
-
-1. The KVM timer is stopped.
-2. The period is smaller than the delay in processing the timer.
-
-In the first case, the timer shouldn’t be counting down because cpu is stopped.
-Therefore, we should keep the LAPIC current count as it was before stopping.
-That means we need to record the delta between target_expiration and now before
-stopping, and set it when starting timer in future.
-
-***
-
-In the second case, it appears to the guest that the timer source is not very
-accurate and cannot deliver interrupts at precise times. In d8f2f498d9ed
-("x86/kvm: fix LAPIC timer drift when guest uses periodic mode"), David made the
-KVM periodic timer more accurate by adjusting the next target_expiration, as a
-result, over a relatively long duration, we can observe more accurate timer
-interrupt counts and intervals.
-
-However, this approach doesn’t apply when the target_expiration is already
-significantly behind. In that situation, even though the total number of timer
-interrupts over a long duration may be correct, the interrupts themselves are
-triggered too close together. In this situation, the guest would prefer to see
-regular timer period, rather than an almost frantic burst of timer interrupts.
-
-And as you mentioned, if KVM is not posting timer IRQs across CPUs, the guest
-won’t even have a chance to see the interrupt storm, or even two consecutive
-interrupts.
-
-***
-
-Given all the situations above, I don’t think it’s worth adding a lot of
-complexity for this, it’s better to handle this in a simple and consistent way.
-
+> > +	 * As the higher VFIO layers are holding locks across reset and using
+> > +	 * those same locks with the mm_lock we need to prevent ABBA
+> > deadlock
+> > +	 * with the state_mutex and mm_lock.
+> > +	 * In case the state_mutex was taken already we defer the cleanup
+> > work
+> > +	 * to the unlock flow of the other running context.
 > > +	 */
-> > +	if (apic->lapic_timer.period > 0 &&
-> 
-> apic->lapic_timer.period is guaranteed to be zero here.  kvm_lapic_expired_hv_timer()
-> and start_sw_period() check it explicitly, and apic_timer_fn() should be unreachable
-> with period==0 (KVM is supposed to cancel the hrtimer before changing the period).
-> 
-
-Yes, that was my mistake. Thank you for pointing it out.
-
-> I do think it's worth hardening apic_timer_fn() though, but in a separate prep
-> patch.
-> 
-> > +	    ktime_before(apic->lapic_timer.target_expiration, now))
-> > +		apic->lapic_timer.target_expiration = now;
+> > +	spin_lock(&xe_vdev->reset_lock);
+> > +	xe_vdev->deferred_reset = true;
+> > +	if (!mutex_trylock(&xe_vdev->state_mutex)) {
+> > +		spin_unlock(&xe_vdev->reset_lock);
+> > +		return;
+> > +	}
+> > +	spin_unlock(&xe_vdev->reset_lock);
+> > +	xe_vfio_pci_state_mutex_unlock(xe_vdev);
 > > +
-> >  	delta = ktime_sub(apic->lapic_timer.target_expiration, now);
-> > -	apic->lapic_timer.tscdeadline = kvm_read_l1_tsc(apic->vcpu, tscl) +
-> > -		nsec_to_cycles(apic->vcpu, delta);
-> > +	apic->lapic_timer.tscdeadline = kvm_read_l1_tsc(apic->vcpu, tscl);
-> > +	/*
-> > +	 * Note: delta must not be negative. Otherwise, blindly adding a
-> > +	 * negative delta could cause the deadline to become excessively large
-> > +	 * due to the tscdeadline being an unsigned value.
-> > +	 */
+> > +	xe_vfio_pci_reset(xe_vdev);
+> > +}
 > 
-> Rather than say "delta must not be negative", instead call out that the delta
-> _can't_ be negative thanks to the above calculation (which is also why moving
-> the "period > 0" check to the caller is important).  And I think it's worth
-> putting this comment above the calculation of "delta" to preserve the existing
-> code that does "tscdead = l1_tsc + delta" (and it yields a smaller diff).
-
-Yes, it's better.
-
-> > +	apic->lapic_timer.tscdeadline += nsec_to_cycles(apic->vcpu, delta);
-> >  }
-> >  
-> >  static void start_sw_period(struct kvm_lapic *apic)
-> > @@ -2972,7 +2988,7 @@ static enum hrtimer_restart apic_timer_fn(struct hrtimer *data)
-> >  
-> >  	if (lapic_is_periodic(apic)) {
-> >  		advance_periodic_target_expiration(apic);
-> > -		hrtimer_add_expires_ns(&ktimer->timer, ktimer->period);
-> > +		hrtimer_set_expires(&ktimer->timer, ktimer->target_expiration);
+> Jason suggested to do this in the core given it's common [1].
 > 
-> This can also go in a separate prep patch.  Logically it stands on its own (use
-> the computed expiration instead of doing yet another calculation), and in case
-> something goes sideways, it'll give us another bisection point.
+> If you disagree, then please raise it and get consensus in that thread
+> instead of rushing to post a new version...
 > 
-> Lastly, adding a cleanup patch on top to capture apic->lapic_timer in a local
-> variable would make this code easier to read (I don't want to say "easy" to
-> read, but at least easier :-D).
+> [1] https://lore.kernel.org/all/20251108004754.GD1859178@ziepe.ca/
 
-Yes, it's better.
+Hi,
 
-> 
-> All in all, I ended up with the below.  I'll post a v6 tomorrow (I've got the
-> tweaks made locally) after testing.  Thanks much!
->
-> static void advance_periodic_target_expiration(struct kvm_lapic *apic)
-> {
-> 	struct kvm_timer *ktimer = &apic->lapic_timer;
-> 	ktime_t now = ktime_get();
-> 	u64 tscl = rdtsc();
-> 	ktime_t delta;
-> 
-> 	/*
-> 	 * Use kernel time as the time source for both the hrtimer deadline and
-> 	 * TSC-based deadline so that they stay synchronized.  Computing each
-> 	 * deadline independently will cause the two deadlines to drift apart
-> 	 * over time as differences in the periods accumulate, e.g. due to
-> 	 * differences in the underlying clocks or numerical approximation errors.
-> 	 */
-> 	ktimer->target_expiration = ktime_add_ns(ktimer->target_expiration,
-> 						 ktimer->period);
-> 
-> 	/*
-> 	 * If the new expiration is in the past, e.g. because userspace stopped
-> 	 * running the VM for an extended duration, then force the expiration
-> 	 * to "now" and don't try to play catch-up with the missed events.  KVM
-> 	 * will only deliver a single interrupt regardless of how many events
-> 	 * are pending, i.e. restarting the timer with an expiration in the
-> 	 * past will do nothing more than waste host cycles, and can even lead
-> 	 * to a hard lockup in extreme cases.
-> 	 */
+I agree that it should be done in the core eventually.
+I didn't view it as something blocking next revision, as the discussion
+was in the context of converting every driver, which is something that
+probably shouldn't be done as part of this series.
 
-This comment is a significant improvement over v5...
+Note that the v6.19 feature pull for Xe is likely going to happen
+tomorrow, so that's part of the reason for "rushing" the next version.
+I wanted to collect all the r-bs on Xe side to be prepared for that.
+If any parts of this series need to go through Xe tree, it will need to
+be merged there soon (or wait all the way until v6.20 / v7).
 
-> 	if (ktime_before(ktimer->target_expiration, now))
-> 		ktimer->target_expiration = now;
-> 
-> 	/*
-> 	 * Note, ensuring the expiration isn't in the past also prevents delta
-> 	 * from going negative, which could cause the TSC deadline to become
-> 	 * excessively large due to it an unsigned value.
-> 	 */
-> 	delta = ktime_sub(ktimer->target_expiration, now);
-> 	ktimer->target_expiration = kvm_read_l1_tsc(apic->vcpu, tscl) +
-> 				    nsec_to_cycles(apic->vcpu, delta);
-> }
-
-I really appreciate your patient corrections and advice. They have helped me
-learn how to submit a good patch and I will also actively learn and abide by
-these rules.
-
-Regards,
-fuqiang
+Thanks,
+-Michał
 
