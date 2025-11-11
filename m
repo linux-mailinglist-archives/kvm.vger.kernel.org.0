@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-62751-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62755-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38F95C4CE98
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 11:11:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EAA8C4CEC8
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 11:12:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B1733A7D06
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 10:01:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73D774A2DC8
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 10:03:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D1033891B;
-	Tue, 11 Nov 2025 09:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C9A8342CB4;
+	Tue, 11 Nov 2025 09:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BSGkFCpi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m91Cvs5L"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDFB9335BC1;
-	Tue, 11 Nov 2025 09:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A8E33F8D7;
+	Tue, 11 Nov 2025 09:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762855109; cv=none; b=AObAYudy5yVJiA36svJxZ1WX5BYsFF6i2dj0mrcD24+Nvn3qhpxXIS/wTLWR2buxiSCLtEXIsEb4sYIz8alxGIzNBHSO5Qs36Hn5wsPg9T0/sFaTtkzq3O4JNF3HDVJCzIpSETV1//uIZPwFCjD8RIiGn0pPo7kuiI03VpSmrIA=
+	t=1762855124; cv=none; b=bCjk+uyOdN1HqgoNfMsb8T7scy/D1vjGaelXHxiF6JNO/I/NTYd6w/fe/9hpbh1OtNWWJa1y0dParVJMXhzeYbwKevmvotOaHxMkL1rURYENB0zUUPK5FY+6fU1pLfsWGWMPqcKLUEKYWnJJ9e9yHNi4U2sFAOCKwWZqsjc80Fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762855109; c=relaxed/simple;
-	bh=lS6T58DHt9wPHQS8Kvm1FHiA6t+nNSAifcX8vWpYDwc=;
+	s=arc-20240116; t=1762855124; c=relaxed/simple;
+	bh=RNhQRersDtpXI6Het2PRLPg6Pf8djhGeIyqap//L360=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EdvUz8c47GLk8/PZDBMGzGsBSwlgBgfF/gaJDhlfLDf8l7H60x3YKciRF13cJbwQmRlnjAvcoAW2kw/uiQe/od1WkkNDtNSIrkQEPrRcWyNdSM3zy0FgOBG/FyDNdmwteOQtVCKDLD4ZMDncikhnQwmjI38s2HnksRd4GGR+rIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BSGkFCpi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7531C116D0;
-	Tue, 11 Nov 2025 09:58:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=IPjSQuzUrQqMk2P8JoPEH4twifhWHNRhjbNDk2xAcEYjwkNGiCJQTO01zuSYCfvKhkNM/95dOdR1HGojOUK9BrZ71VSimYzAml3LauQhD2qVKdQzM+ISgG9r/PJEMOByREsYBnGdgvzxqI9m7xhqwZNrkuxwBZEJySLCOawz2aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m91Cvs5L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF8DEC4AF0C;
+	Tue, 11 Nov 2025 09:58:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762855108;
-	bh=lS6T58DHt9wPHQS8Kvm1FHiA6t+nNSAifcX8vWpYDwc=;
+	s=k20201202; t=1762855123;
+	bh=RNhQRersDtpXI6Het2PRLPg6Pf8djhGeIyqap//L360=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BSGkFCpicG96X7vFHZ5HW4Mj4KH+4wNi8vv62J2wwznZbavZISMCBFYMiLkxE8Qog
-	 p5+D5op+BLuvmHVeA5srt6cx6kBCmCWG5wPGnbpF+s+OAeWTWHcdKqhqXmOnXupF/Z
-	 zZkWyEtZ4m78eIBLUOCYHfT45soSCLSjLPWME7VcYi2qrCugpb+mJOGRhMFRhZSVUP
-	 nLGy6c7uz2y4sbDJjZf1D6fVh5t0FVp2YUBrnBHxyQkR4azdQUrQet3SSYzjJhhsfQ
-	 lWELuAq0eowmi5gpESSKJX7udUguoqXdF+AkhwPUFixtr5vAQP6y0hVSMLTfElscDl
-	 SLLFX+cN0GU4A==
+	b=m91Cvs5LMEj+eGKN/zSGKHFgLn5OOKb6iBpr2HEAPuKEuOKnCutXDEc5JBoZrO3dp
+	 nX6pZtBqyo1gEDea8WYR/UY3E1b1aOvK9J4eK7Sh2Ip7fE9o07N1yzx0Nw2z5GjK3Z
+	 HJgPAsEptYiJPdaHwSLGVCZ20GpxOY76HvEh8MzXAIc3DmPRhCkeAtpy525bRKlimk
+	 C2aytYrId2LtUJW8EPhTIZ4E4Jw+gvI27B9jqMhKdjFxvv1gxRBqG5MKBDZQjAcvyt
+	 e2DJ4lzH4e3tl+6nlqXTZeHgMeor6n8DtPFTPJVpcFDxJR0fmhy90/cN2Z1HsDkssQ
+	 NcMMmjN0stnWw==
 From: Leon Romanovsky <leon@kernel.org>
 To: Bjorn Helgaas <bhelgaas@google.com>,
 	Logan Gunthorpe <logang@deltatee.com>,
@@ -75,12 +75,11 @@ Cc: Krishnakant Jaju <kjaju@nvidia.com>,
 	linaro-mm-sig@lists.linaro.org,
 	kvm@vger.kernel.org,
 	linux-hardening@vger.kernel.org,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
 	Alex Mastro <amastro@fb.com>,
 	Nicolin Chen <nicolinc@nvidia.com>
-Subject: [PATCH v8 08/11] vfio/pci: Share the core device pointer while invoking feature functions
-Date: Tue, 11 Nov 2025 11:57:50 +0200
-Message-ID: <20251111-dmabuf-vfio-v8-8-fd9aa5df478f@nvidia.com>
+Subject: [PATCH v8 09/11] vfio/pci: Enable peer-to-peer DMA transactions by default
+Date: Tue, 11 Nov 2025 11:57:51 +0200
+Message-ID: <20251111-dmabuf-vfio-v8-9-fd9aa5df478f@nvidia.com>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
 References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
@@ -94,104 +93,73 @@ Content-Type: text/plain; charset="utf-8"
 X-Mailer: b4 0.15-dev-3ae27
 Content-Transfer-Encoding: 8bit
 
-From: Vivek Kasireddy <vivek.kasireddy@intel.com>
+From: Leon Romanovsky <leonro@nvidia.com>
 
-There is no need to share the main device pointer (struct vfio_device *)
-with all the feature functions as they only need the core device
-pointer. Therefore, extract the core device pointer once in the
-caller (vfio_pci_core_ioctl_feature) and share it instead.
+Make sure that all VFIO PCI devices have peer-to-peer capabilities
+enables, so we would be able to export their MMIO memory through DMABUF,
 
-Signed-off-by: Vivek Kasireddy <vivek.kasireddy@intel.com>
+VFIO has always supported P2P mappings with itself. VFIO type 1
+insecurely reads PFNs directly out of a VMA's PTEs and programs them
+into the IOMMU allowing any two VFIO devices to perform P2P to each
+other.
+
+All existing VMMs use this capability to export P2P into a VM where
+the VM could setup any kind of DMA it likes. Projects like DPDK/SPDK
+are also known to make use of this, though less frequently.
+
+As a first step to more properly integrating VFIO with the P2P
+subsystem unconditionally enable P2P support for VFIO PCI devices. The
+struct p2pdma_provider will act has a handle to the P2P subsystem to
+do things like DMA mapping.
+
+While real PCI devices have to support P2P (they can't even tell if an
+IOVA is P2P or not) there may be fake PCI devices that may trigger
+some kind of catastrophic system failure. To date VFIO has never
+tripped up on such a case, but if one is discovered the plan is to add
+a PCI quirk and have pcim_p2pdma_init() fail. This will fully block
+the broken device throughout any users of the P2P subsystem in the
+kernel.
+
+Thus P2P through DMABUF will follow the historical VFIO model and be
+unconditionally enabled by vfio-pci.
+
 Tested-by: Alex Mastro <amastro@fb.com>
 Tested-by: Nicolin Chen <nicolinc@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/vfio/pci/vfio_pci_core.c | 30 +++++++++++++-----------------
- 1 file changed, 13 insertions(+), 17 deletions(-)
+ drivers/vfio/pci/vfio_pci_core.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 7dcf5439dedc..ca9a95716a85 100644
+index ca9a95716a85..142b84b3f225 100644
 --- a/drivers/vfio/pci/vfio_pci_core.c
 +++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -299,11 +299,9 @@ static int vfio_pci_runtime_pm_entry(struct vfio_pci_core_device *vdev,
- 	return 0;
- }
- 
--static int vfio_pci_core_pm_entry(struct vfio_device *device, u32 flags,
-+static int vfio_pci_core_pm_entry(struct vfio_pci_core_device *vdev, u32 flags,
- 				  void __user *arg, size_t argsz)
+@@ -28,6 +28,7 @@
+ #include <linux/nospec.h>
+ #include <linux/sched/mm.h>
+ #include <linux/iommufd.h>
++#include <linux/pci-p2pdma.h>
+ #if IS_ENABLED(CONFIG_EEH)
+ #include <asm/eeh.h>
+ #endif
+@@ -2081,6 +2082,7 @@ int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
  {
--	struct vfio_pci_core_device *vdev =
--		container_of(device, struct vfio_pci_core_device, vdev);
- 	int ret;
+ 	struct vfio_pci_core_device *vdev =
+ 		container_of(core_vdev, struct vfio_pci_core_device, vdev);
++	int ret;
  
- 	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET, 0);
-@@ -320,12 +318,10 @@ static int vfio_pci_core_pm_entry(struct vfio_device *device, u32 flags,
- }
+ 	vdev->pdev = to_pci_dev(core_vdev->dev);
+ 	vdev->irq_type = VFIO_PCI_NUM_IRQS;
+@@ -2090,6 +2092,9 @@ int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
+ 	INIT_LIST_HEAD(&vdev->dummy_resources_list);
+ 	INIT_LIST_HEAD(&vdev->ioeventfds_list);
+ 	INIT_LIST_HEAD(&vdev->sriov_pfs_item);
++	ret = pcim_p2pdma_init(vdev->pdev);
++	if (ret && ret != -EOPNOTSUPP)
++		return ret;
+ 	init_rwsem(&vdev->memory_lock);
+ 	xa_init(&vdev->ctx);
  
- static int vfio_pci_core_pm_entry_with_wakeup(
--	struct vfio_device *device, u32 flags,
-+	struct vfio_pci_core_device *vdev, u32 flags,
- 	struct vfio_device_low_power_entry_with_wakeup __user *arg,
- 	size_t argsz)
- {
--	struct vfio_pci_core_device *vdev =
--		container_of(device, struct vfio_pci_core_device, vdev);
- 	struct vfio_device_low_power_entry_with_wakeup entry;
- 	struct eventfd_ctx *efdctx;
- 	int ret;
-@@ -376,11 +372,9 @@ static void vfio_pci_runtime_pm_exit(struct vfio_pci_core_device *vdev)
- 	up_write(&vdev->memory_lock);
- }
- 
--static int vfio_pci_core_pm_exit(struct vfio_device *device, u32 flags,
-+static int vfio_pci_core_pm_exit(struct vfio_pci_core_device *vdev, u32 flags,
- 				 void __user *arg, size_t argsz)
- {
--	struct vfio_pci_core_device *vdev =
--		container_of(device, struct vfio_pci_core_device, vdev);
- 	int ret;
- 
- 	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET, 0);
-@@ -1473,11 +1467,10 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
- }
- EXPORT_SYMBOL_GPL(vfio_pci_core_ioctl);
- 
--static int vfio_pci_core_feature_token(struct vfio_device *device, u32 flags,
--				       uuid_t __user *arg, size_t argsz)
-+static int vfio_pci_core_feature_token(struct vfio_pci_core_device *vdev,
-+				       u32 flags, uuid_t __user *arg,
-+				       size_t argsz)
- {
--	struct vfio_pci_core_device *vdev =
--		container_of(device, struct vfio_pci_core_device, vdev);
- 	uuid_t uuid;
- 	int ret;
- 
-@@ -1504,16 +1497,19 @@ static int vfio_pci_core_feature_token(struct vfio_device *device, u32 flags,
- int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
- 				void __user *arg, size_t argsz)
- {
-+	struct vfio_pci_core_device *vdev =
-+		container_of(device, struct vfio_pci_core_device, vdev);
-+
- 	switch (flags & VFIO_DEVICE_FEATURE_MASK) {
- 	case VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY:
--		return vfio_pci_core_pm_entry(device, flags, arg, argsz);
-+		return vfio_pci_core_pm_entry(vdev, flags, arg, argsz);
- 	case VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY_WITH_WAKEUP:
--		return vfio_pci_core_pm_entry_with_wakeup(device, flags,
-+		return vfio_pci_core_pm_entry_with_wakeup(vdev, flags,
- 							  arg, argsz);
- 	case VFIO_DEVICE_FEATURE_LOW_POWER_EXIT:
--		return vfio_pci_core_pm_exit(device, flags, arg, argsz);
-+		return vfio_pci_core_pm_exit(vdev, flags, arg, argsz);
- 	case VFIO_DEVICE_FEATURE_PCI_VF_TOKEN:
--		return vfio_pci_core_feature_token(device, flags, arg, argsz);
-+		return vfio_pci_core_feature_token(vdev, flags, arg, argsz);
- 	default:
- 		return -ENOTTY;
- 	}
 
 -- 
 2.51.1
