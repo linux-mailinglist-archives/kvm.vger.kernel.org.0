@@ -1,102 +1,102 @@
-Return-Path: <kvm+bounces-62787-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62788-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EF9CC4F0F1
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:37:52 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2DF7C4F14C
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 17:42:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79FCD189FAE9
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:38:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 529804F4307
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 16:39:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03513730D3;
-	Tue, 11 Nov 2025 16:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CBD3730CD;
+	Tue, 11 Nov 2025 16:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gDAWQdQQ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HHeArAuT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="emcRYPBI";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="RZGJz+N6"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2347B3730C8
-	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 16:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7493570AA
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 16:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762879054; cv=none; b=Lt+0535PgQOMhe8+TOA2BgbWX6ARiNjUGuJg+etn27tcte7tbdiCsvr5aY+/bUGkkHRKiYDOihi9cgkiJX0bpxbK15AEdOfp2NGlPBzGB5CIrq4XsfNkO30zlSKqOY+bdEcBlcF8iOkydIVET6JKxv6rkoM112O3+oQieaVU26c=
+	t=1762879176; cv=none; b=VVE+6zVVp43SwIXlJYvAHhEZGqTFTq0p33Q0YHdXkRnYS4nweXUXsG+aG5gi96ESwbShn6MbwHZlf9IO3IvjskBMubCfQLe6q1cfyL7iwLPCLXrbekGRh18/NIcX4NFLf1S+Y0d75AMkarLda2YvTK3u3Nn1OUUUwvmAxVhevPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762879054; c=relaxed/simple;
-	bh=CmB1eUcoNGTFZrhIPIJJSrN0/MRzuZ3tT3YhNKBWw/U=;
+	s=arc-20240116; t=1762879176; c=relaxed/simple;
+	bh=wi9+MVEzyXv51Z2qk5BA7F+hDTXVHbnwNxVZS1tdKHo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K01URD3xM3oUXlehc5D9mpS0XWoFUy4Y/N+JzB+tPWnzMKmCeA6djkJdL3n9g0vJ7+7ohxgh8V6Bf+oBmjQjPEUGjE18Vb6NM3ZtC9B+N6qDPIR+iJJ/ZTEK0fb0X2GDb22/jZbvHdi43NT+q45yf6NREwWBG8VeLLl1AtXbGds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gDAWQdQQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HHeArAuT; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=kz+TSMem6eZbKP6o36sNxLqljj40YlTQYU5j92lca9BuNPgfUEiWLV36FBWflK9HKZ2paIjSs3w2DRcil2OUFEqFUnpa00+MAEqpATZeQTcklDl1+Ym4OTBb/XiJN3pNc+8JhH0UZiEqmYgZeUtVYC2R6JFoWfpFjrEKZxk45UU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=emcRYPBI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=RZGJz+N6; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762879052;
+	s=mimecast20190719; t=1762879172;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HImt604PJ3Z8w/cR0ElYpUFLDlMbNEVlH4hMkZPWNJA=;
-	b=gDAWQdQQWEfS9jRiG77kutSdTKlEz9IRljG9MW5Wd/EKCv1Q299JEboYfrdadN5rf6o3Kz
-	ubdNdayXLa82yobwnsPZ5ZyYFxiqSZy2LMVkRv1P2ji3Soo7tIUMuY8Mq//NitXgBs8I7H
-	gRmGfjAXYyYdjil6mA9SnZXUayCbJ1U=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bjIoXWyNnXTU6CFqoZWwGE9DyZZqYSh+RJwX/t658jw=;
+	b=emcRYPBIM/H+SQKtnkTkCbvFo9GYClakjj9nYVhubnbooBCpScvZnPlYTYjXaT93M4tTGu
+	/BPzn9L7ysXb8Le4OChLBpIEKIUc2Cu7Ac0irIaUO0RcFVJDpJeGrKhmI1bTYHSSxUE+RU
+	/YfMoeBytWpsxNyRDZIoXTC1brbRkdU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-450-_NaWypvCP6mn5fhS4HU8ZA-1; Tue, 11 Nov 2025 11:37:30 -0500
-X-MC-Unique: _NaWypvCP6mn5fhS4HU8ZA-1
-X-Mimecast-MFC-AGG-ID: _NaWypvCP6mn5fhS4HU8ZA_1762879050
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4775fcf67d8so39428025e9.0
-        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 08:37:30 -0800 (PST)
+ us-mta-664-mgWpE_bAOWqZUWFksa1iPg-1; Tue, 11 Nov 2025 11:39:31 -0500
+X-MC-Unique: mgWpE_bAOWqZUWFksa1iPg-1
+X-Mimecast-MFC-AGG-ID: mgWpE_bAOWqZUWFksa1iPg_1762879170
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-477171bbf51so27600975e9.3
+        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 08:39:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762879049; x=1763483849; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1762879170; x=1763483970; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=HImt604PJ3Z8w/cR0ElYpUFLDlMbNEVlH4hMkZPWNJA=;
-        b=HHeArAuT7dvpVbfe+tUCgt8FhN+JYkBNGnUFqxK8/zLUOj1bYExDM3Gl70AoIBQrLy
-         DMtsczCC3XFwHkPwf79CNJ/GxM+S++rOxjMU+XJuzfg3uq6vtzfajNd1K0xLqFIli7sT
-         F96sKtPCN/2pRuTkzd73Q3vy14x5E0rUqj9Ga5LJrTWbnnFGTSHj+9XIYYLSOe46Jav7
-         N3GiQEBja4kyQCSGNRWiP+c1IJZkUu4lzVigSUdEXKqjqzaNQe3HRynCwnnAuo/HEcPO
-         6Fd2wQQIeYyDbGSxA+wyXAMtOz2z4MT8kvAdcTIc9E5n6t6CmpiN/tbgC7cBJd54gkrS
-         x8Aw==
+        bh=bjIoXWyNnXTU6CFqoZWwGE9DyZZqYSh+RJwX/t658jw=;
+        b=RZGJz+N6T1j1y+5Iq5HwU5J2nSdSFzZt8eBJdJGMa0TFKf32kdvcau1JaDmQqvLpPk
+         r6PBx0lZU8kImts+1Bo7e07o1171suhGideK11SIJuIdk+NYdPsF4Pyw0cJENfh+J0+E
+         d6imJyk1fYFXtxIKDOrTsV5IomUAZZzkQZNlyOmVBjl5zjxA0oLGuZAM79uM9yEcmkJR
+         vrDBS5Am3oFgmxHLN3ZOX7Xqw5NAh9WBi6naBpT4+GdSJPKv8Avt532tR5oHS7mcMPTU
+         +FdUOi+ns399bLn2GrJovHTnHUg4qLWsHTVztXet33yapWdo2P9+cNfr3uMM/ftaGIHk
+         GYHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762879049; x=1763483849;
+        d=1e100.net; s=20230601; t=1762879170; x=1763483970;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HImt604PJ3Z8w/cR0ElYpUFLDlMbNEVlH4hMkZPWNJA=;
-        b=wTJep8m4orUtCOAUjf05hN6aPSUWIH0txPKHYEukAhErylRAGj06lTkgx1xSz+ySo2
-         tY1XACM9WZQc8WXYBAeLoW+4rqTiwORc3UdpioEzykRY17X7gHvKssgD9AiVDqOeeZbx
-         rDT3PcX3t/BfzifnevduSoMuZpzo/OGxq+p7i0lC44+oWiQXdJQ08mwp9bB5ouondUpp
-         N86s3fjrPMwvZn/lJx8Wj30N9IpAdPSjpSYMmTLgzwdkzC7yGW+hv5jVcuV1GSxplrkP
-         7yqet2YRvGyB40YuMG+qo7RKdHSmuJAv73XzDjw9ga5aSc6dGI8f/iBRf+vniS3s44ym
-         LddQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVf+kolBtW46AKsF14RfwVmfjl5GkhGfceXCojhv+OWujFa3KJMGqdGE58BvTbhRT5uOuA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1kaKLwDc3+vTQ41ctPLMaO5aZTJsSmmE+N312Z67xE14CAGXZ
-	w+k4gxuw1DY3joVfKDq9ZbHEKOkRU1gOH8buyh163mECicU8DcxNwcoTaPFOvb8f+L9YF35w4SA
-	9gw3E4LYU+v03Xem4Gk5Zwsd6nrWW3OwT0K8yfA4UFxkridp1dvmgww==
-X-Gm-Gg: ASbGnctnn17SznITJupN6/ApO+z9oSeOv5aFPrCaQMHCXHXPDHqrYC6UiaMqHnxTA9r
-	aJVIfrEq4J4iaNE6KqanvxX+vcWMwX9WlOEh7ydhfTL8Io3a0gfs98Nh4ZcInKz+xOw4ThKJGRH
-	DRgObdm26qG5j/RKXBxNujNTrymwRIhCAen65t4nhHJ9Di58SSQXFyj2L2IX2OtRItIkCm8gNQR
-	JEvX6WWFCkVT5k1yh1Qt6gltIOnYQdBNl5q7ZrYrzPPYjv7JOrat4R5YMYfZ1KbnaGubtGwzq/k
-	291XY9+9i3XvX3s7NO165gmvZRDtjybiKWMhtYKD/ddjdV7SbCWZrPZFSc9O/FKhPTNAen+Tb58
-	DWwa2+It+Jfeyoee2ci9hETawghtCU57uBDG/Jb2bvQz5rWpkFHryV72LeQqMPz8LjxogTwHR3G
-	tcoFy9uQ==
-X-Received: by 2002:a05:600c:4593:b0:475:dd7f:f6cd with SMTP id 5b1f17b1804b1-477870b92f6mr263335e9.35.1762879049505;
-        Tue, 11 Nov 2025 08:37:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH0FFQqiFEcuP0QuOZESv6esXKON7IZgxgQeWvfeD0418RmgbA8MrtmypbihbYyHq3QGSegyg==
-X-Received: by 2002:a05:600c:4593:b0:475:dd7f:f6cd with SMTP id 5b1f17b1804b1-477870b92f6mr263125e9.35.1762879049128;
-        Tue, 11 Nov 2025 08:37:29 -0800 (PST)
+        bh=bjIoXWyNnXTU6CFqoZWwGE9DyZZqYSh+RJwX/t658jw=;
+        b=Vvpl9l1T6KxGpYUHy4+FLItQOfxHSDul0tAAGhC0Zkhrh4ae1T9MSBHt6WOSpSDr78
+         wrduIyl7Khz1NVjs0kHcB8iNwoL2FB4XzedGu0j9yVdhl/dtxQ5CE7Buzi02nea5xbvm
+         UQWmsNQQXOe1pAhGrUsjGJNBTBUTaHvC+77nqGuBIgar3hpRhrYlQE5iJl+4tYj0tia2
+         tcsKQSSAyVJ/FwNuoO6LRjznPlc0KedcjdNBA141kgen4/C6UJN3NoR4b4Hp+VDoXBG0
+         5YvgqszjH009pQo0Vv9ktqyWU/WKDZzymIiguIblltgY7rLpRO3pb3TsWjJzSDCsGZMV
+         LCFA==
+X-Forwarded-Encrypted: i=1; AJvYcCXcA7twrwmf+B8JqnIE4FAF2cLbVPigL0PfNZPAVnCIZsy1Cl5RN4P/NgnxfXhMQsLNXt4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzAcmqiXaJfv9UIW970PQGNaMukqe3WZ4A+dkBuoJxxcwA1Hzw
+	PuXf1TA113VlYLLx0K4o1pNJKiveu0liKiAtadJ4QlLNeCYZLooaZJUm4WhXhN1IrA8FoY3smB0
+	Rf5DGtCUvHnTzAiNoyyYL20dQIZW5JCNaLKJLzMxRDgDd4t/BOKRCUA==
+X-Gm-Gg: ASbGncvmR+520nN39vrf96Q2W9l1SyxU5O8AATernBhnBFWBGqa61lHBg4fSUM3zonn
+	VDXodQAY33eHOXE7+nW3HtAcgkt9RlOV7b9hrXTUxNwm6U12GUqqNhdqCibS6bFZTxUUsgIKMPk
+	MDB3iAuFHUEl0WBgfILV4fqClBjd1DpIJpgC4wgghvFyaMAEM7CyNEDFMLRA42o/N9zy85YLMA7
+	JdPV+/E0z9ODkykMervh8UtnLDBxo652r/sD2KO4og60cDq8of9ZEY64JomWQ+BC4fLal03tUUg
+	pU0uChOufZmpaba/YMyRHcs8zPF9KIARV/PiuNxwGU5KA6Sz/jJcKQFppCMVshxYMyXQxayMrU2
+	vfDTwRneyvKmG+lePKN+SpMLIuT47ncHm/J4ZpWzJSTafj5wDuBnJczR8gGnQ2Dj+Z4JicJ/ODb
+	OWBItTRg==
+X-Received: by 2002:a05:600c:1f08:b0:477:3e0b:c0e3 with SMTP id 5b1f17b1804b1-477870c32f2mr362775e9.32.1762879169963;
+        Tue, 11 Nov 2025 08:39:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFjH6KYSywDziqCu+cKpmbGvHOcpQyVfiAoFBkiY/Bj2n1ic162NAIH9yR8bes6swTTLFDr7Q==
+X-Received: by 2002:a05:600c:1f08:b0:477:3e0b:c0e3 with SMTP id 5b1f17b1804b1-477870c32f2mr362555e9.32.1762879169545;
+        Tue, 11 Nov 2025 08:39:29 -0800 (PST)
 Received: from [192.168.10.81] ([176.206.111.214])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4777d9447eesm122367945e9.16.2025.11.11.08.37.23
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4775cdc33c8sm376226375e9.2.2025.11.11.08.39.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 08:37:24 -0800 (PST)
-Message-ID: <896debcd-f0d3-4f75-b090-c59b0ac1fa57@redhat.com>
-Date: Tue, 11 Nov 2025 17:37:21 +0100
+        Tue, 11 Nov 2025 08:39:28 -0800 (PST)
+Message-ID: <eb61475f-e5be-4f39-ac62-908453895ad9@redhat.com>
+Date: Tue, 11 Nov 2025 17:39:26 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -104,13 +104,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 15/20] KVM: x86: Reject EVEX-prefix instructions in
- the emulator
+Subject: Re: [PATCH RFC v1 14/20] KVM: x86: Emulate REX2-prefixed 64-bit
+ absolute jump
 To: "Chang S. Bae" <chang.seok.bae@intel.com>, kvm@vger.kernel.org,
  linux-kernel@vger.kernel.org
 Cc: seanjc@google.com, chao.gao@intel.com, zhao1.liu@intel.com
 References: <20251110180131.28264-1-chang.seok.bae@intel.com>
- <20251110180131.28264-16-chang.seok.bae@intel.com>
+ <20251110180131.28264-15-chang.seok.bae@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -148,41 +148,122 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20251110180131.28264-16-chang.seok.bae@intel.com>
+In-Reply-To: <20251110180131.28264-15-chang.seok.bae@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 11/10/25 19:01, Chang S. Bae wrote:
-> Explicitly mark EVEX-prefixed opcodes (0x62) as unsupported, clarifying
-> current decoding behavior.
+> Add support for the new absolute jump, previously unimplemented.
 > 
-> While new prefixes like REX2 extend GPR handling, EVEX emulation should
-> be addressed separately once after VEX support is implemented.
+> This instruction has an unusual quirk: the REX2.W bit uses inverted
+> polarity. Unlike normal REX or REX2 semantics (where W=1 indicates a
+> 64-bit operand size), this instruction uses W=0 to select an 8-byte
+> operand size.
+> 
+> The new InvertedWidthPolarity flag and its helper to interpret the
+> W bit correctly, avoiding special-case hacks in the emulator logic.
+> 
+> Since the ctxt->op_bytes depends on the instruction flags, the size
+> should be determined after the instruction lookup.
 > 
 > Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+
+I think this is not needed.  Emulation of non-memory operations, in 
+practice, is only needed to support big real mode on very old processors.
+
+We can just add a NoRex bit and apply it to the six reows you touch in 
+patch 13.
+
+Paolo
+
 > ---
->   arch/x86/kvm/emulate.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>   arch/x86/kvm/emulate.c | 27 ++++++++++++++++++++-------
+>   1 file changed, 20 insertions(+), 7 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 03f8e007b14e..9bd61ea496e5 100644
+> index 58879a31abcd..03f8e007b14e 100644
 > --- a/arch/x86/kvm/emulate.c
 > +++ b/arch/x86/kvm/emulate.c
-> @@ -4952,8 +4952,8 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
+> @@ -179,6 +179,7 @@
+>   #define TwoMemOp    ((u64)1 << 55)  /* Instruction has two memory operand */
+>   #define IsBranch    ((u64)1 << 56)  /* Instruction is considered a branch. */
+>   #define ShadowStack ((u64)1 << 57)  /* Instruction affects Shadow Stacks. */
+> +#define InvertedWidthPolarity ((u64)1 << 58) /* Instruction uses inverted REX2.W polarity */
+>   
+>   #define DstXacc     (DstAccLo | SrcAccHi | SrcWrite)
+>   
+> @@ -993,6 +994,16 @@ EM_ASM_2W(btc);
+>   
+>   EM_ASM_2R(cmp, cmp_r);
+>   
+> +static inline bool is_64bit_operand_size(struct x86_emulate_ctxt *ctxt)
+> +{
+> +	/*
+> +	 * Most instructions interpret REX.W=1 as 64-bit operand size.
+> +	 * Some REX2 opcodes invert this logic.
+> +	 */
+> +	return ctxt->d & InvertedWidthPolarity ?
+> +	       ctxt->rex.bits.w == 0 : ctxt->rex.bits.w == 1;
+> +}
+> +
+>   static int em_bsf_c(struct x86_emulate_ctxt *ctxt)
+>   {
+>   	/* If src is zero, do not writeback, but update flags */
+> @@ -2472,7 +2483,7 @@ static int em_sysexit(struct x86_emulate_ctxt *ctxt)
+>   
+>   	setup_syscalls_segments(&cs, &ss);
+>   
+> -	if (ctxt->rex.bits.w)
+> +	if (is_64bit_operand_size(ctxt))
+>   		usermode = X86EMUL_MODE_PROT64;
+>   	else
+>   		usermode = X86EMUL_MODE_PROT32;
+> @@ -4486,7 +4497,8 @@ static struct opcode rex2_opcode_table[256]  __ro_after_init;
+>   static struct opcode rex2_twobyte_table[256] __ro_after_init;
+>   
+>   static const struct opcode undefined = D(Undefined);
+> -static const struct opcode notimpl   = N;
+> +static const struct opcode pfx_d5_a1 = I(SrcImm64 | NearBranch | IsBranch | InvertedWidthPolarity, \
+> +					 em_jmp_abs);
+>   
+>   #undef D
+>   #undef N
+> @@ -4543,6 +4555,7 @@ static bool is_ibt_instruction(struct x86_emulate_ctxt *ctxt)
+>   		return true;
+>   	case SrcNone:
+>   	case SrcImm:
+> +	case SrcImm64:
+>   	case SrcImmByte:
+>   	/*
+>   	 * Note, ImmU16 is used only for the stack adjustment operand on ENTER
+> @@ -4895,9 +4908,6 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
+>   
+>   done_prefixes:
+>   
+> -	if (ctxt->rex.bits.w)
+> -		ctxt->op_bytes = 8;
+> -
+>   	/* Determine opcode byte(s): */
+>   	if (ctxt->rex_prefix == REX2_INVALID) {
+>   		/*
+> @@ -4936,6 +4946,9 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
+>   	}
+>   	ctxt->d = opcode.flags;
+>   
+> +	if (is_64bit_operand_size(ctxt))
+> +		ctxt->op_bytes = 8;
+> +
 >   	if (ctxt->d & ModRM)
 >   		ctxt->modrm = insn_fetch(u8, ctxt);
 >   
-> -	/* vex-prefix instructions are not implemented */
-> -	if (ctxt->opcode_len == 1 && (ctxt->b == 0xc5 || ctxt->b == 0xc4) &&
-> +	/* VEX and EVEX-prefixed instructions are not implemented */
-> +	if (ctxt->opcode_len == 1 && (ctxt->b == 0xc5 || ctxt->b == 0xc4 || ctxt->b == 0x62) &&
->   	    (mode == X86EMUL_MODE_PROT64 || (ctxt->modrm & 0xc0) == 0xc0)) {
->   		ctxt->d = NotImpl;
->   	}
-
-VEX support is coming (will post tomorrow I think) so the patches around 
-decode are going to need changes, but nothing major.
-
-Paolo
+> @@ -5594,6 +5607,6 @@ void __init kvm_init_rex2_opcode_table(void)
+>   	undefine_row(&rex2_twobyte_table[0x30]);
+>   	undefine_row(&rex2_twobyte_table[0x80]);
+>   
+> -	/* Mark opcode not yet implemented: */
+> -	rex2_opcode_table[0xa1] = notimpl;
+> +	/* Define the REX2-specific absolute jump (0xA1) opcode */
+> +	rex2_opcode_table[0xa1] = pfx_d5_a1;
+>   }
 
 
