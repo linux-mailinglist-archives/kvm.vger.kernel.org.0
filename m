@@ -1,135 +1,255 @@
-Return-Path: <kvm+bounces-62822-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62823-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3DC8C4FF93
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 23:31:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB59DC50101
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 00:33:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2A553AE0CE
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 22:31:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 310993ABECF
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 23:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD00D299AA9;
-	Tue, 11 Nov 2025 22:31:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3272F4A0A;
+	Tue, 11 Nov 2025 23:32:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b5lGd+Nd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zyBh4dcx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828C4257831
-	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 22:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B4B2EE263
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 23:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762900262; cv=none; b=c95bTEhHapKDOHQbmEopT662uEFEvDW6rARQ9ipedLoAzv+plXR7reMd0w9BLX1W2j4onga2Y8ZKJViZISu/aMGPp+2Q1yg/5RDX54KtGFAvoPeCHE3Lp0eIB5dP07IPbeA4YVzZHuXpyHccxkmHlFz4wztmpQzJ/FytTnIfW2Y=
+	t=1762903947; cv=none; b=pMWNrd+3UN+fqE5ehcmGZXzT1Bmm4zf3qVFIXKGuyMa18VY09yUuywB+djaNhV95Q3zN3tAH/LPc+2oRmXPFId+mF1AtsF1K3FzOk0uKLjvBJwbqDA8dxTBhGwteX0vrUNUBED7Tp5T+Zjy2QTlEBnSU3ne/ahIausiBX6OF4uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762900262; c=relaxed/simple;
-	bh=nBOmB4ONg8kALGVCz8jrfhPIlcVdJM+IcFGCif8wqF0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qcTF+0dP/t2eAYEJ5hHrMFsHmfLU9vWUrBw93se9UkboIawfFLqooGSjVQxceVlWtuYEo5L5HSJDGStB/dfndOsMhB3Y0Dc4obSqxPGvYmo38wFaexfvtid/e3/a7rJn6wNAGUONKcJRPLmJl+0HGrW0MSfNYAP1ODMV0ZpQz3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b5lGd+Nd; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1762903947; c=relaxed/simple;
+	bh=JjX9POR99X3WO8seBV4smfP/yFiulAv2T8J9krlcaG0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UKJhDSpp+QX+dKTSC0Pf2lmO1l8Fz9Bgo618RQxuUP0mxt2eHmLwMOIzDHuIGMyQN+AO+EWHHCTDuWOmKM65dk4s32Qf9ALLEHPIqVLiNmwDz2WbsKV2BrUvr5DPL7u2KJJbJxjpKAHws8mm+TKZbFuoyCfaBlEZtcJrHO2TUeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zyBh4dcx; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7a432101881so387183b3a.0
-        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 14:31:00 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47777136777so17595e9.1
+        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 15:32:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762900260; x=1763505060; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+O8RYt755g+phSGczRrtxqFHw21U9A5DwYjvKLhqMbA=;
-        b=b5lGd+NdRKiKKKuMQzLLTIJ5dpTIPVw8mAULHAFjGv4YmTQbBuHAy1XUaZoUbPAAIq
-         o2iOvA4kyFciRA+WEsMnVwCoo2ZMm2aLzFXBCeF/J015lNuDt2YaVexyKMcJ+9wpcr6K
-         U8lBuCPqb68Jm5Rk5D7v+V651LjhUyDM6YLw7xPo+KcpBabWDvojuI7FylGCx584v3fJ
-         8SIbVC9vOxkS9zQNzip5dBTe+TGvwtWhT70WcXbFmpvT+o+TplsdyIL8eUPSuKeaO6nj
-         IZWOxkQO8sxBSFYQxa2hTe4oCdWfMd1SLV9JwrjPUKcMWIfbP3VwgHfuYxd7/521UMnx
-         +4JQ==
+        d=google.com; s=20230601; t=1762903943; x=1763508743; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DfSphR+3zkc3ca5t+ekeHVOKX60kamodZsUsUQPEe+8=;
+        b=zyBh4dcxJ01scHduHnb8os9MhBZywHRHbf4VA6Pg9sKToqdNyitgbleQLG4PkrVjOB
+         r1KmjPuWIVTWeBBsXT2zBhHbC9Y2WG976ZJ5nHDCwioo3g79rUkOD8StGQBmOgrwLILK
+         YZuCw3Z9p98rWWzSLzyNcupYWx6jNRhnPvSNRze+rYkL1z8ugatxxUwKVjVMqnRRUbP7
+         GprOSJ2nZzXI6UGilJwevqyXo7tPvWCxAkol9cQAZuUkpd0l5sH0raAoCblIaMIlmcgl
+         FBROGqAGgmSrY9AHGapHoIYt5ebE7Rda4J8NDsHQss8RbzFCud4sAg5hD6sH9TMg2wFf
+         iwFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762900260; x=1763505060;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+O8RYt755g+phSGczRrtxqFHw21U9A5DwYjvKLhqMbA=;
-        b=ORnSwDWoygwmzrWkWSynp3nvat0DzKhYt4OR1gi7CjpuCGG41OyxUZqFZqYrSF0o6b
-         wXz/UHBPLV7T4dDqva25fQtx1ze5U3OPDBJA5CcIWbuQtcw0c2nCOXwZ1JiHM3Vm2L+E
-         Dm7vmtkID5og4JTi1065heEEaIvEqQLRMxMIPXcnAFUh1TXzg+jfQhT6igq7nAEpHPWK
-         jlLSchxfc+m0E4pTDu+AdhVusGm1fSRy9fngw7RwtNVprxJeyUVkB82bGcYHj9R0xgSM
-         XcMDNBLs8RwKktiI7RHtq4+knUliKyrfTPP+L2BLjcSgbqoAq+g6YOS+e/HLxKB/QD9z
-         4dKw==
-X-Forwarded-Encrypted: i=1; AJvYcCXcDlrwBPsXgKdN275rkVgwMxX4NlqaCxPf0w9lg56GbtAYNrZguJvVbi6158+Ron08hnw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEq/tNY8AVcswu3WkoEw7McwO0D5zxsj5p1qlE3oOj+plAeSlF
-	kui8IzteNgrTLxLkC+JuqWoS6NgNRYuu96wRRc4tBXpS2v38zvazQwwNiQ6m6cxj45sxu4W1Hsn
-	VrZKn1A==
-X-Google-Smtp-Source: AGHT+IHtFVXr/uGxNz1xOC+oARtDBh6AgJQTtR8J1TlbgEsvQHGkSIKZOzneMX7GY0qygAOFGBUFmCHpdCc=
-X-Received: from pfbea28.prod.google.com ([2002:a05:6a00:4c1c:b0:77f:2e96:5d3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3a0f:b0:7ab:a41:2874
- with SMTP id d2e1a72fcca58-7b7a2d91dcdmr700837b3a.10.1762900259787; Tue, 11
- Nov 2025 14:30:59 -0800 (PST)
-Date: Tue, 11 Nov 2025 14:30:58 -0800
-In-Reply-To: <6ving6sg3ywr23epd3fmorzhovdom5uaty4ae4itit2amxafql@iui7as55sb55>
+        d=1e100.net; s=20230601; t=1762903943; x=1763508743;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=DfSphR+3zkc3ca5t+ekeHVOKX60kamodZsUsUQPEe+8=;
+        b=rYwd4YHkUvNQcRAwuObf/nrssa97dgFTtJjPwlGHbfO7e1AxEPL3pEqGb5tH3faygs
+         DY/KJbMIXzcgLEPhJwoXtqqhUjRA9rFjlTjMXI2EgOdIiJnzCNrHPuVY6+u0AeWT6fjE
+         JDFsmE/c2j0GIyhd4LG0GL8eZTNTjs8H5uFfNY0qgRVG9JKWc+fLJqa8QWaAYCLds9a8
+         r/CfAvJJ7orNvhi+fTzWz6OuQPgp487VTsRiSESRAnpvWKn3HufwE6uQguHzxo2sDAFZ
+         H1vbZ4bKqBQKUbZO17ZBGHUVJoJHyD1GD1joTW20o6mQJHkYU7uje7z5JT1HITK0fzf1
+         GTZA==
+X-Forwarded-Encrypted: i=1; AJvYcCUzH7aS2HoPMwVlgc+4QNZ1efbkbeqUnOIjWDMoulsfIs5pi8od0WUOZUMckIlgdcr2q3s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztPUJ2zNTxLUGz4VQugEFFHuPf2/bZxorXSVQBTq7Gq49BQa4c
+	M6QXJl7qOFSuTV35e8klBW/ZM7Q7bnYfg8BcCDCVlAsx+q/u/kgIWcde/5/HhdRE0gOlnhcite9
+	xQ9HPq3Po6JMfzPGAhPsqByuCQeBKOiH0R4c6s+Pt
+X-Gm-Gg: ASbGncskq4Md1CjoFJ/bVFZne90zLuwxjxX28o0lQw6kRF7GjgUuhcvCw2gsIwrQir0
+	1J6ooBvz3owHYwiUPoyXv0/yUhNjiv97tWc/+cc3wwjSBa2VrR9Ds5IkbVtEdFDJlCn1aKwmh3o
+	XIden2/TVQFgqBDV3H7gtjENYdGUsFHz+VlXAJ0t0vEqSBqjC+A80CSVdVt/vJ4awdCEKH3k2lT
+	uVnu575XdE6DhF4XcWTo9ma4MWPwXUaOT+rgp5mNahq5oUjC9rSJmdwWGBq0EJJ6Hc4yK9mJP3d
+	jJYhgELxMe5iVXVgmBWzmgu1Kw==
+X-Google-Smtp-Source: AGHT+IEFVyoAcKs88ZinjKACl2in26RA2Ulg4hwVbiPwjRL/ixynji4/f1TVt67UUXxDpe/cHBTPN/6zNnOi8MU74rE=
+X-Received: by 2002:a05:600c:4f50:b0:477:73f4:26b with SMTP id
+ 5b1f17b1804b1-47787e10f86mr299925e9.3.1762903942551; Tue, 11 Nov 2025
+ 15:32:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251108004524.1600006-1-yosry.ahmed@linux.dev>
- <20251108004524.1600006-3-yosry.ahmed@linux.dev> <aktjuidgjmdqdlc42mmy4hby5zc2e5at7lgrmkfxavlzusveus@ai7h3sk6j37b>
- <6ving6sg3ywr23epd3fmorzhovdom5uaty4ae4itit2amxafql@iui7as55sb55>
-Message-ID: <aRO5ItX_--ZDfnfM@google.com>
-Subject: Re: [PATCH 2/6] KVM: nSVM: Always recalculate LBR MSR intercepts in svm_update_lbrv()
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20251013185903.1372553-1-jiaqiyan@google.com> <20251013185903.1372553-2-jiaqiyan@google.com>
+ <7a61bcf9-a57d-a8e9-a9b8-4eacef80acd3@arm.com> <CACw3F51_0A8CuCgzcvoA3Db=Wxo8mm5XZw5in+nTKrst+NCcqw@mail.gmail.com>
+ <aRMHfS1-K4E4UCbc@kernel.org>
+In-Reply-To: <aRMHfS1-K4E4UCbc@kernel.org>
+From: Jiaqi Yan <jiaqiyan@google.com>
+Date: Tue, 11 Nov 2025 15:32:10 -0800
+X-Gm-Features: AWmQ_bnzli5IDq508gd9gl_I2k2ye51PrgqB8PlLzeSpUSiMz9YXG-gXISoy5Ow
+Message-ID: <CACw3F51x4sxwSm0ZGeO-Mk3Q3b7iwY-9cnxCveXkc6MF5RGnyA@mail.gmail.com>
+Subject: Re: [PATCH v4 1/3] KVM: arm64: VM exit to userspace to handle SEA
+To: Oliver Upton <oupton@kernel.org>, Jose Marinho <jose.marinho@arm.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, duenwen@google.com, 
+	rananta@google.com, jthoughton@google.com, vsethi@nvidia.com, jgg@nvidia.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
+	shuah@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 11, 2025, Yosry Ahmed wrote:
-> On Tue, Nov 11, 2025 at 03:11:37AM +0000, Yosry Ahmed wrote:
-> > On Sat, Nov 08, 2025 at 12:45:20AM +0000, Yosry Ahmed wrote:
-> > > svm_update_lbrv() is called when MSR_IA32_DEBUGCTLMSR is updated, and on
-> > > nested transitions where LBRV is used. It checks whether LBRV enablement
-> > > needs to be changed in the current VMCB, and if it does, it also
-> > > recalculate intercepts to LBR MSRs.
-> > > 
-> > > However, there are cases where intercepts need to be updated even when
-> > > LBRV enablement doesn't. Example scenario:
-> > > - L1 has MSR_IA32_DEBUGCTLMSR cleared.
-> > > - L1 runs L2 without LBR_CTL_ENABLE (no LBRV).
-> > > - L2 sets DEBUGCTLMSR_LBR in MSR_IA32_DEBUGCTLMSR, svm_update_lbrv()
-> > >   sets LBR_CTL_ENABLE in VMCB02 and disables intercepts to LBR MSRs.
-> > > - L2 exits to L1, svm_update_lbrv() is not called on this transition.
-> > > - L1 clears MSR_IA32_DEBUGCTLMSR, svm_update_lbrv() finds that
-> > >   LBR_CTL_ENABLE is already cleared in VMCB01 and does nothing.
-> > > - Intercepts remain disabled, L1 reads to LBR MSRs read the host MSRs.
-> > > 
-> > > Fix it by always recalculating intercepts in svm_update_lbrv().
-> > 
-> > This actually breaks hyperv_svm_test, because svm_update_lbrv() is
-> > called on every nested transition, calling
-> > svm_recalc_lbr_msr_intercepts() -> svm_set_intercept_for_msr() and
-> > setting svm->nested.force_msr_bitmap_recalc to true.
-> > 
-> > This breaks the hyperv optimization in nested_svm_vmrun_msrpm() AFAICT.
-> > 
-> > I think there are two ways to fix this:
-> > - Add another bool to svm->nested to track LBR intercepts, and only call
-> >   svm_set_intercept_for_msr() if the intercepts need to be updated.
-> > 
-> > - Update svm_set_intercept_for_msr() itself to do nothing if the
-> >   intercepts do not need to be changed, which is more clutter but
-> >   applies to other callers as well so could shave cycles elsewhere (see
-> >   below).
-> > 
-> > Sean, Paolo, any preferences?
-> > 
-> > Here's what updating svm_set_intercept_for_msr() looks like:
+On Tue, Nov 11, 2025 at 1:53=E2=80=AFAM Oliver Upton <oupton@kernel.org> wr=
+ote:
+>
+> Hi Jiaqi,
+>
+> On Mon, Nov 03, 2025 at 12:45:50PM -0800, Jiaqi Yan wrote:
+> > On Mon, Nov 3, 2025 at 10:17=E2=80=AFAM Jose Marinho <jose.marinho@arm.=
+com> wrote:
+> > >
+> > > Thank you for these patches.
+> >
+> > Thanks for your comments, Jose!
+> >
+> > >
+> > > On 10/13/2025 7:59 PM, Jiaqi Yan wrote:
+> > > > When APEI fails to handle a stage-2 synchronous external abort (SEA=
+),
+> > > > today KVM injects an asynchronous SError to the VCPU then resumes i=
+t,
+> > > > which usually results in unpleasant guest kernel panic.
+> > > >
+> > > > One major situation of guest SEA is when vCPU consumes recoverable
+> > > > uncorrected memory error (UER). Although SError and guest kernel pa=
+nic
+> > > > effectively stops the propagation of corrupted memory, guest may
+> > > > re-use the corrupted memory if auto-rebooted; in worse case, guest
+> > > > boot may run into poisoned memory. So there is room to recover from
+> > > > an UER in a more graceful manner.
+> > > >
+> > > > Alternatively KVM can redirect the synchronous SEA event to VMM to
+> > > > - Reduce blast radius if possible. VMM can inject a SEA to VCPU via
+> > > >    KVM's existing KVM_SET_VCPU_EVENTS API. If the memory poison
+> > > >    consumption or fault is not from guest kernel, blast radius can =
+be
+> > > >    limited to the triggering thread in guest userspace, so VM can
+> > > >    keep running.
+> > > > - Allow VMM to protect from future memory poison consumption by
+> > > >    unmapping the page from stage-2, or to interrupt guest of the
+> > > >    poisoned page so guest kernel can unmap it from stage-1 page tab=
+le.
+> > > > - Allow VMM to track SEA events that VM customers care about, to re=
+start
+> > > >    VM when certain number of distinct poison events have happened,
+> > > >    to provide observability to customers in log management UI.
+> > > >
+> > > > Introduce an userspace-visible feature to enable VMM handle SEA:
+> > > > - KVM_CAP_ARM_SEA_TO_USER. As the alternative fallback behavior
+> > > >    when host APEI fails to claim a SEA, userspace can opt in this n=
+ew
+> > > >    capability to let KVM exit to userspace during SEA if it is not
+> > > >    owned by host.
+> > > > - KVM_EXIT_ARM_SEA. A new exit reason is introduced for this.
+> > > >    KVM fills kvm_run.arm_sea with as much as possible information a=
+bout
+> > > >    the SEA, enabling VMM to emulate SEA to guest by itself.
+> > > >    - Sanitized ESR_EL2. The general rule is to keep only the bits
+> > > >      useful for userspace and relevant to guest memory.
+> > > >    - Flags indicating if faulting guest physical address is valid.
+> > > >    - Faulting guest physical and virtual addresses if valid.
+> > > >
+> > > > Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+> > > > Co-developed-by: Oliver Upton <oliver.upton@linux.dev>
+> > > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > > > ---
+> > > >   arch/arm64/include/asm/kvm_host.h |  2 +
+> > > >   arch/arm64/kvm/arm.c              |  5 +++
+> > > >   arch/arm64/kvm/mmu.c              | 68 ++++++++++++++++++++++++++=
+++++-
+> > > >   include/uapi/linux/kvm.h          | 10 +++++
+> > > >   4 files changed, 84 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include=
+/asm/kvm_host.h
+> > > > index b763293281c88..e2c65b14e60c4 100644
+> > > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > > @@ -350,6 +350,8 @@ struct kvm_arch {
+> > > >   #define KVM_ARCH_FLAG_GUEST_HAS_SVE                 9
+> > > >       /* MIDR_EL1, REVIDR_EL1, and AIDR_EL1 are writable from users=
+pace */
+> > > >   #define KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS          10
+> > > > +     /* Unhandled SEAs are taken to userspace */
+> > > > +#define KVM_ARCH_FLAG_EXIT_SEA                               11
+> > > >       unsigned long flags;
+> > > >
+> > > >       /* VM-wide vCPU feature set */
+> > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > > index f21d1b7f20f8e..888600df79c40 100644
+> > > > --- a/arch/arm64/kvm/arm.c
+> > > > +++ b/arch/arm64/kvm/arm.c
+> > > > @@ -132,6 +132,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> > > >               }
+> > > >               mutex_unlock(&kvm->lock);
+> > > >               break;
+> > > > +     case KVM_CAP_ARM_SEA_TO_USER:
+> > > > +             r =3D 0;
+> > > > +             set_bit(KVM_ARCH_FLAG_EXIT_SEA, &kvm->arch.flags);
+> > > > +             break;
+> > > >       default:
+> > > >               break;
+> > > >       }
+> > > > @@ -327,6 +331,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kv=
+m, long ext)
+> > > >       case KVM_CAP_IRQFD_RESAMPLE:
+> > > >       case KVM_CAP_COUNTER_OFFSET:
+> > > >       case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
+> > > > +     case KVM_CAP_ARM_SEA_TO_USER:
+> > > >               r =3D 1;
+> > > >               break;
+> > > >       case KVM_CAP_SET_GUEST_DEBUG2:
+> > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > > index 7cc964af8d305..09210b6ab3907 100644
+> > > > --- a/arch/arm64/kvm/mmu.c
+> > > > +++ b/arch/arm64/kvm/mmu.c
+> > > > @@ -1899,8 +1899,48 @@ static void handle_access_fault(struct kvm_v=
+cpu *vcpu, phys_addr_t fault_ipa)
+> > > >       read_unlock(&vcpu->kvm->mmu_lock);
+> > > >   }
+> > > >
+> > > > +/*
+> > > > + * Returns true if the SEA should be handled locally within KVM if=
+ the abort
+> > > > + * is caused by a kernel memory allocation (e.g. stage-2 table mem=
+ory).
+> > > > + */
+> > > > +static bool host_owns_sea(struct kvm_vcpu *vcpu, u64 esr)
+> > > > +{
+> > > > +     /*
+> > > > +      * Without FEAT_RAS HCR_EL2.TEA is RES0, meaning any external=
+ abort
+> > > > +      * taken from a guest EL to EL2 is due to a host-imposed acce=
+ss (e.g.
+> > > > +      * stage-2 PTW).
+> > > > +      */
+> > > > +     if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+> > > > +             return true;
+> > > > +
+> > > > +     /* KVM owns the VNCR when the vCPU isn't in a nested context.=
+ */
+> > > > +     if (is_hyp_ctxt(vcpu) && (esr & ESR_ELx_VNCR))
+> > > Is this check valid only for a "Data Abort"?
+> >
+> > Yes, the VNCR bit is specific to a Data Abort (provided we can only
+> > reach host_owns_sea if kvm_vcpu_abt_issea).
+> > I don't think we need to explicitly exclude the check here for
+> > Instruction Abort.
+>
+> You can take an external abort on an instruction fetch, in which case
+> bit 13 of the ISS (VNCR bit for data abort) is RES0. So this does need
+> to check for a data abort.
 
-I am *very* strongly opposed to modifying svm_set_intercept_for_msr() to deal
-with whatever mess LBRs has created.  Whatever the problem is (I haven't read
-through all of this yet), it needs to be fixed in the LBR code, not in
-svm_set_intercept_for_msr().
+Agreed and thanks for correcting me, Oliver! I will fix this in v5.
 
-Recalculating MSR intercepts is supposed to done only as needed, I don't want to
-encourage lazy code that works by optimizing paths that should be rare.
+>
+> Thanks,
+> Oliver
 
