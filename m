@@ -1,101 +1,139 @@
-Return-Path: <kvm+bounces-62766-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62767-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A9E3C4DB93
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 13:31:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B88D6C4E064
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 14:08:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 60E4E4F1205
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 12:25:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E3C684E9DA8
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 13:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486F5354AF2;
-	Tue, 11 Nov 2025 12:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D5F3246FF;
+	Tue, 11 Nov 2025 13:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmkV+Cja"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tg0OtVLz"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632282737E7;
-	Tue, 11 Nov 2025 12:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021373246F5;
+	Tue, 11 Nov 2025 13:06:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762863924; cv=none; b=WFB5zsKYpIkr/s3IH0YQFZBNCVlX/m9m+0MJML3jCw2OR1004mMpJVBgj9tiuEBulOVNCGp1uv/g56DjeQMTj/LkmqmjbXNbsfrs4OL4xvVhHbKbgLED5u3RPekpwF7HEGDij71q/3Lb1I3cwEfX3yqCAntv9Rq0drpzLLUdmWE=
+	t=1762866393; cv=none; b=rIw/Zzli9dpzekIhskdkrOION/uadSKCRGmUxyrBbocoPKQ6TLZsJgFwB9ovAKqaZVZt+CzSrblzuFFXQcuxJvp9KCOh0JAsVWDiUa7aK8A5s+B6g+XWm5ToHEcoa0QJq64n+Wo7YYNKjlotukNAOSj3OHSv/XUz1GOsHLjnAuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762863924; c=relaxed/simple;
-	bh=hdRYlFv1BM0TA2up7sgM34/8y2YohOBd/gO3L8ew3jA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u7FQ/iW18GlHTc7PyULnBYdvicmNpKxkcBgxs2bEiSn1OqK61d1zBNuBP9VZ6gImhIlGch1g4clshmen5hD/iD3mSR4o62a7ug1TKh1fxe6jZxxSk8tNAaLrVRwzAAFfmjGuyZRg/2gXgN32Q3X6A0EaTJLZi7vfcxPU4dfhwEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmkV+Cja; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0A0BC4CEF5;
-	Tue, 11 Nov 2025 12:25:23 +0000 (UTC)
+	s=arc-20240116; t=1762866393; c=relaxed/simple;
+	bh=ahDE0Hde9+gZsnP0JCOLdJBo8hGroTd4JJCH/jgFj/0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pcyFDvhd5C3pJgGaufhpTbLBW+xIlW3dgzZmEuqgiIf5efj9EIHHpzh9qAnFz12H4YF4BWm9mJ41ePu1U0SqUyQLT4DLUY1FSR6G3tKjBo3dS+JcYx86/h5BssdVHxdSuIj4gRnyq5WwDuyecfnLjFN9lblKk2idScNaSwhwvY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tg0OtVLz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6E9AC16AAE;
+	Tue, 11 Nov 2025 13:06:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762863924;
-	bh=hdRYlFv1BM0TA2up7sgM34/8y2YohOBd/gO3L8ew3jA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tmkV+Cja1QetbgbcXSwPGo+AXobFQ2hnRYB7oMUWSFieS/C9bGof5wXdAvn5C76Nq
-	 LmES90H2AqbidNC7tQzwJhTVkQZchlipjTxCUX7rL81I77FdTZvdhdmu/WQvLMIRq1
-	 L1fNSmMjDIl/uYsLxz9uTrSJfXn4i+CBYzi0bvTp/Aee5SjbTBIFs9pl1MqFPWI6fC
-	 beAy5HAcotUo7q1w+0Lcmk9ft9xgalvQehrjE+7sqcGz/qjih3fkP3ttgT+p+P0/zQ
-	 EBgqxLpSN9eOIQD5+TwNMlsYdaLnvTKVQpBlAAfnIkT5qIHG/uD3OtAEiJPvWs69TU
-	 23mgcMOjTk6pg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vInR3-00000004ED3-3brA;
-	Tue, 11 Nov 2025 12:25:21 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Finalize ID registers only once per VM
-Date: Tue, 11 Nov 2025 12:25:16 +0000
-Message-ID: <176286391603.1927379.11875919783471032489.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251110173010.1918424-1-maz@kernel.org>
-References: <20251110173010.1918424-1-maz@kernel.org>
+	s=k20201202; t=1762866392;
+	bh=ahDE0Hde9+gZsnP0JCOLdJBo8hGroTd4JJCH/jgFj/0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Tg0OtVLz3wAXRZo7tCvWTInHjKpVK4LV67NTO+lYAZ/bR93jyG2IyFgcvsue4SRjB
+	 0h8QMWesGpk3qXoW3f/y5g5hNGaIhpu5ZvQWDGwHfLvH2QohrLgDnSv/T7XK5D98wL
+	 z5paZ8OThivObxShM274wdwZcvtkA9PuAU6b+qI29fKv1akghKWsQ9OqLPjtgfb1tU
+	 4dhW8r72DwTtl22M6htocWaDV7hTEh5uNlGrHZ2wikbz5TAqNJgsCaWZxjg5IGzZHl
+	 e2ra3fX+DjamK0ohLsg2Y80OH6UCT/oI2TuutGRfJ5NWGrLux815QwhhypwuSp+iZj
+	 JUT65tT6i+w6g==
+Message-ID: <6c7c5f86-a9d5-4b7e-aa08-968077f66ace@kernel.org>
+Date: Tue, 11 Nov 2025 14:06:10 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/16] mm: introduce leaf entry type and use to
+ simplify leaf entry logic
+To: Zi Yan <ziy@nvidia.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Arnd Bergmann <arnd@arndb.de>, Baolin Wang <baolin.wang@linux.alibaba.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache
+ <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+ Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>,
+ Oscar Salvador <osalvador@suse.de>, Vlastimil Babka <vbabka@suse.cz>,
+ Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>,
+ Michal Hocko <mhocko@suse.com>, Matthew Brost <matthew.brost@intel.com>,
+ Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+ Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
+ Ying Huang <ying.huang@linux.alibaba.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
+ Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
+ Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+ Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+ SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
+ Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+ Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
+ Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
+References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
+ <c879383aac77d96a03e4d38f7daba893cd35fc76.1762812360.git.lorenzo.stoakes@oracle.com>
+ <CBBF1711-5881-4B5A-ADE6-1D86C0E94296@nvidia.com>
+From: "David Hildenbrand (Red Hat)" <david@kernel.org>
+Content-Language: en-US
+In-Reply-To: <CBBF1711-5881-4B5A-ADE6-1D86C0E94296@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 10 Nov 2025 17:30:10 +0000, Marc Zyngier wrote:
-> Owing to the ID registers being global to the VM, there is no point
-> in computing them more than once.  However, recent changes making
-> use of kvm_set_vm_id_reg() outlined that we repeatedly hammer
-> the ID registers when we shouldn't.
+On 11.11.25 04:25, Zi Yan wrote:
+> On 10 Nov 2025, at 17:21, Lorenzo Stoakes wrote:
 > 
-> Gate the ID reg update on the VM having never run.
+>> The kernel maintains leaf page table entries which contain either:
+>>
+>> - Nothing ('none' entries)
+>> - Present entries (that is stuff the hardware can navigate without fault)
 > 
-> [...]
+> This is not true for:
+> 
+> 1. pXX_protnone(), where _PAGE_PROTNONE flag also means pXX_present() is
+> true, but hardware would still trigger a fault.
+> 2. pmd_present() where _PAGE_PSE also means a present PMD (see the comment
+> in pmd_present()).
 
-Applied to fixes, thanks!
+I'll note that pte_present/pmd_present etc is always about "soft-present".
 
-[1/1] KVM: arm64: Finalize ID registers only once per VM
-      commit: 0f559cd91e37b7978e4198ca2fbf7eb95df11361
+For example, if the hardware does not have a hw-managed access bit, 
+doing a pte_mkyoung() would also clear the hw-valid/hw-present bit 
+because we have to catch any next access done by hardware.
 
-Cheers,
+[fun fact: some hardware has an invalid bit instead of a valid/present 
+bit :) IIRC s390x falls into that category]
 
-	M.
+Similar things happen on ordinary PROT_NONE of course (independent of 
+pte_protnone).
+
+A better description might be "there is a page/pfn mapped here, but it 
+might not be accessible by the CPU right now".
+
+We have device-exclusive/device-private nonswap (before this series) 
+entries that fall into the same category, unfortunately ("there is 
+something mapped there that is not accessible by the CPU")
+
 -- 
-Without deviation from the norm, progress is not possible.
+Cheers
 
-
+David
 
