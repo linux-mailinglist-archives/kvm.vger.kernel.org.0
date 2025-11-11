@@ -1,225 +1,166 @@
-Return-Path: <kvm+bounces-62773-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62777-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 277FAC4E988
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 15:52:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7216C4EA27
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 15:58:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB4023BC6A3
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 14:42:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6171A188BFC0
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 14:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3046D3396FE;
-	Tue, 11 Nov 2025 14:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4C633555E;
+	Tue, 11 Nov 2025 14:52:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cBLxYscf"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="VvzRDd9D"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79ED3385B8;
-	Tue, 11 Nov 2025 14:37:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A24E305E24;
+	Tue, 11 Nov 2025 14:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762871880; cv=none; b=H6zyza2rQEDagi8x80EjApewLcfyYO2Y218Xkh8qzZJEjub/MHpxy+0qvkRit04+koIHBmHQNHQcM+gNfLJL0DIYGRR3dLhGh4jg86UIPHcb8Ib6eNt3Hqid/WcgZFKLS9YbF29g6Vok2nKPW7kRFIrjmaoZWC+YIKsNgi7OPGI=
+	t=1762872759; cv=none; b=BGDLpfkZ01SN+LErib9ufhKtZeBkrdyZ43GfVrftKH/SiFB3cRuHLJbWvySdcTas6on3tCRGr96KAqhJkJo1C9il7glKcbqRFlB43GKpTJ8zx4EPrGqe2ILNGlh59H5NPR0WPrnU2El1P7BnXfsieD0U1C7ckD27Zd3JRVQ5SBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762871880; c=relaxed/simple;
-	bh=fpM4rZm2eTFj5lA0ILdXZXAm1QmHZWdHUdT36ODYhpU=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=FrU8eLfU9kfk2Dik1jdtcpSycDBcJozo8d9CDm4zfx+a/w1hCFOAbXzn8vFhXMBoFOKy8zLCcOny90U1MYxxtu4fVK9wepPytbsZZYAWv6Uu3zRdfFLdNn+Ud8hXolFEkym9OqvlZz1ZYMTFUkFPLC6WRoDMNfgsYTTf9BFotdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cBLxYscf; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AB377lt016772;
-	Tue, 11 Nov 2025 14:37:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=JyOEWN
-	2IWol6MDam6GH2q2lnGc1owVcKuC9mQE4g/Y4=; b=cBLxYscf6ER9HxoLJHXeyY
-	ty42DGawV+mqA2ihBvnPfh0JSUmcjYOHFFlNVYeSOqX0on1nSrK+uOpPUe6bXi9L
-	k9nCmggE8KQ7/XIAwK7omA2qYCQd8KdOTLY19agipshUN9McBbN8oIn3x+NXNPqA
-	2nmCHYi7JBvUCPM02a7dYVMcOEVZEf9HGDtBpI01F2Req6M0tYEGerjZutmcGUro
-	x1PbSfJ8eTM0IdaAgd35sEb5axddyXbyuVD2mW89YjRuZdH3rwoR6l4GGUqvyR1h
-	tITJ/QW9FXEVM+5129V4XSaLcd3nWIxULc9s1iZ2HmTHeshmMEX+AZ5LZ81akEig
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5cj4dgd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Nov 2025 14:37:54 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5ABDl8m6007313;
-	Tue, 11 Nov 2025 14:37:53 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aajdjb0ph-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Nov 2025 14:37:53 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ABEbnNj16056730
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 11 Nov 2025 14:37:49 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C83B320043;
-	Tue, 11 Nov 2025 14:37:49 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 92A9120040;
-	Tue, 11 Nov 2025 14:37:49 +0000 (GMT)
-Received: from darkmoore (unknown [9.111.33.212])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 11 Nov 2025 14:37:49 +0000 (GMT)
+	s=arc-20240116; t=1762872759; c=relaxed/simple;
+	bh=i+sH/g3Q/zxRDXJUWVAcLjIlE78QLJOOmzP1YnJWwKo=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=IBIy4OtLaMvtUlCcl0Fp+LBgQ+P3qn5CsaBtnufQ6L0kTLjyRnamgv/uT+5Ke+OBMHKY8KgfDTH4LXhDtb4dbULc0uoURbEaSl9ytdZxWed1EhZMhLfP9FS8V009lVzoUzxb9agH4Xqf6OBfAxKcfU30VjvcySiJ7cdeWt70eE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=VvzRDd9D; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AB7SXNG1282474;
+	Tue, 11 Nov 2025 06:52:29 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=+sYjHIgeGgtgEtM/ZY
+	/rnb14rK5E2/vuUb3zVUYyCSo=; b=VvzRDd9D2evyyQXrKiJnGaWNsRk3B17oQ1
+	lRx25HrBeyol7c5ekZuBB8j1I+se2wDXRs6eot+TuvuBiLYm3SGMLavkECcI05Uw
+	T9GqDBOT3Ugc6Z/FL2QhZnpdOtIRoSy5U30+18ft8Up8WRIVLr43Yx4AHKJwuPR/
+	jukMNLyW4GkLRlZlk/AL3q5lDZFPu576v4hK5HXyDTpQdMdhshB4y6r0LNEeA5ry
+	vhzVZVOf0iPjyoM2kfevRIgOKiLYEXn+aRDVrXr5oVobG+o8KdtaEmGhiSI9/gr4
+	bbLhytpDcpMBuqzk7SRwxT53kWaQCpcYpYLFbF4KpjEDp5X+H+dQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ac0shadt9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 11 Nov 2025 06:52:29 -0800 (PST)
+Received: from devgpu015.cco6.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Tue, 11 Nov 2025 14:52:28 +0000
+From: Alex Mastro <amastro@fb.com>
+Subject: [PATCH v2 0/4] vfio: selftests: update DMA mapping tests to use
+ queried IOVA ranges
+Date: Tue, 11 Nov 2025 06:52:01 -0800
+Message-ID: <20251111-iova-ranges-v2-0-0fa267ff9b78@fb.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 11 Nov 2025 15:37:44 +0100
-Message-Id: <DE5XX691NDPL.23EQ56H2AP7CK@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        "Heiko Carstens"
- <hca@linux.ibm.com>,
-        "Vasily Gorbik" <gor@linux.ibm.com>,
-        "Alexander
- Gordeev" <agordeev@linux.ibm.com>,
-        "Christian Borntraeger"
- <borntraeger@linux.ibm.com>,
-        "Janosch Frank" <frankja@linux.ibm.com>,
-        "Nico
- Boehr" <nrb@linux.ibm.com>,
-        "David Hildenbrand" <david@redhat.com>,
-        "Sven
- Schnelle" <svens@linux.ibm.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>, "Shuah Khan" <shuah@kernel.org>
-To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>
-Subject: Re: [PATCH RFC v2 01/11] KVM: s390: Add SCAO read and write helpers
-X-Mailer: aerc 0.20.1
-References: <20251110-vsieie-v2-0-9e53a3618c8c@linux.ibm.com>
- <20251110-vsieie-v2-1-9e53a3618c8c@linux.ibm.com>
- <20251111144511.64450b0e@p-imbrenda>
-In-Reply-To: <20251111144511.64450b0e@p-imbrenda>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Ss+dKfO0 c=1 sm=1 tr=0 ts=69134a42 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJFNE2kC/32MOw7CMBAFrxJtjZHXsRGh4h6IIvGHbEGMbGSBI
+ t+ddQoqRDnvaWaF7BP5DKduheQLZYoLg9p1YOdxuXlBjhmUVAYRpaBYRpHakwVaORg9hCkcemD
+ jkXyg11a7XJlnys+Y3lu8YFt/dwoKKbTTGm0wHHPnMO1tvEOLFPVHVE30bkDDcn/Er1hr/QDJ3
+ 1IH3AAAAA==
+To: Alex Williamson <alex@shazbot.org>, David Matlack <dmatlack@google.com>,
+        Shuah Khan <shuah@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>
+CC: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Alex Mastro <amastro@fb.com>
+X-Mailer: b4 0.13.0
+X-Authority-Analysis: v=2.4 cv=Pf/yRyhd c=1 sm=1 tr=0 ts=69134dad cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
  a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=F1t4R9oC0O7z7MunMTsA:9 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA5NSBTYWx0ZWRfX8Tebmb6YcY6s
- RL0Sj9qi+LUEEYxfUp0i3y1UfpHSIwTuqMadsjQ6Letb1W8lJsf6bbh3jLeVkaezkAfOx4m1zmm
- 46smpans+AkYQZq1IuHuiqWTt7J1V7lLbgo0ZOKFwb9NUt8jZW6JAWZ4tBhZsCTEABvmfFBW1hs
- tQv8o5qLDmyYCtvA4hiWETqVxmynBEmEtUvUvBaMY6FhSqcBnf1VsZ61E13bh0xjfFuZnUmPhQy
- F2SPRvzeciFmu+5kvKot5silWctuyzjzhyIgWdKcdar3fthu5c8lvGAbxZJrBlXnKJBCOcCJZER
- rCtgAwDoMWWc28+NmpcOrQIvv4iplYWIeHimHm8B74vEDyw0ao4gPYkM4farshgMBkF+tns2l5M
- cJcYXvtPR5Uuem1XCY73D+eTTZbdpg==
-X-Proofpoint-GUID: UYLt-63Dy6Yti-VvDvi0tU-RpLlkehKO
-X-Proofpoint-ORIG-GUID: UYLt-63Dy6Yti-VvDvi0tU-RpLlkehKO
+ a=VwQbUJbxAAAA:8 a=r1p2_3pzAAAA:8 a=1XWaLZrsAAAA:8 a=FOH2dFAWAAAA:8
+ a=9jRdOu3wAAAA:8 a=yzAeJPK-mxwKR1Fv_EMA:9 a=QEXdDO2ut3YA:10
+ a=r_pkcD-q9-ctt7trBg_g:22 a=ZE6KLimJVUuLrTuGpvhn:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: mpVuFlv2TWYADdiwxTnQRgit2ebAZJba
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTExMDExOSBTYWx0ZWRfX1jOLyskkoLOt
+ gnYTg7IFAL055BvfGzME6Eagiq6SDkCsJJqIquLgLzVDuShdKFYEiYsB3ILZs2VItWauseXadXg
+ wyNirE/6mqcd7F9DCJqpLSuKObABlw/PfejkqS+q6LULLP1PGgFWz+QtsEdaEhLkb45ZGK+003N
+ v8YzO09ivG7+Yk3z9azEqfxlZVSR21NvQ+MoAkdQ3qsM53LqY279BSlZto+NMXAcL4lu7S1Hwx4
+ DZbV8aRn2i9zw/8NJ08r9LnsB0EVFb3QaYGMRRkeXfLBoii9wCWyOEUCFSllaAVkMfPsUlGjFpN
+ 8mBy/SaFtQwP4roRHxReoaLAvKygsZ1d2ZvqzrWnKYAkbdu4d7LLgGkG73JlE7K+W1LyVIZjZ1r
+ Oczz1FmXBknz2Ev1JZNcOt7xYqbonw==
+X-Proofpoint-ORIG-GUID: mpVuFlv2TWYADdiwxTnQRgit2ebAZJba
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-11_02,2025-11-11_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 adultscore=0 priorityscore=1501 spamscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080095
 
-On Tue Nov 11, 2025 at 2:45 PM CET, Claudio Imbrenda wrote:
-> On Mon, 10 Nov 2025 18:16:41 +0100
-> Christoph Schlameuss <schlameuss@linux.ibm.com> wrote:
->
->> Introduce some small helper functions to get and set the system control
->> area origin address from the SIE control block.
->>=20
->> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
->> ---
->>  arch/s390/kvm/vsie.c | 29 +++++++++++++++++++++--------
->>  1 file changed, 21 insertions(+), 8 deletions(-)
->>=20
->> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
->> index 347268f89f2f186bea623a3adff7376cabc305b2..ced2ca4ce5b584403d900ed1=
-1cb064919feda8e9 100644
->> --- a/arch/s390/kvm/vsie.c
->> +++ b/arch/s390/kvm/vsie.c
->> @@ -123,6 +123,23 @@ static int prefix_is_mapped(struct vsie_page *vsie_=
-page)
->>  	return !(atomic_read(&vsie_page->scb_s.prog20) & PROG_REQUEST);
->>  }
->> =20
->> +static gpa_t read_scao(struct kvm *kvm, struct kvm_s390_sie_block *scb)
->> +{
->> +	gpa_t sca;
->
-> is it, though?
->
->> +
->> +	sca =3D READ_ONCE(scb->scaol) & ~0xfUL;
->> +	if (test_kvm_cpu_feat(kvm, KVM_S390_VM_CPU_FEAT_64BSCAO))
->> +		sca |=3D (u64)READ_ONCE(scb->scaoh) << 32;
->
-> this feels more like an hpa_t, which is what you also use in the
-> function below
->
+Not all IOMMUs support the same virtual address width as the processor,
+for instance older Intel consumer platforms only support 39-bits of
+IOMMU address space.  On such platforms, using the virtual address as
+the IOVA and mappings at the top of the address space both fail.
 
-It actually can be either. Without vsie sigp this is a gpa for reading and
-writing. With vsie sigp this is a gpa when reading and a hpa when writing
-it. It might be best to not imply anything here but just use "unsigned long=
-"
-for these functions.
+VFIO and IOMMUFD have facilities for retrieving valid IOVA ranges,
+VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE and IOMMU_IOAS_IOVA_RANGES,
+respectively.  These provide compatible arrays of ranges from which
+we can construct a simple allocator and record the maximum supported
+IOVA address.
 
->> +
->> +	return sca;
->> +}
->> +
->> +static void write_scao(struct kvm_s390_sie_block *scb, hpa_t hpa)
->> +{
->> +	scb->scaoh =3D (u32)((u64)hpa >> 32);
->> +	scb->scaol =3D (u32)(u64)hpa;
->> +}
->> +
->>  /* copy the updated intervention request bits into the shadow scb */
->>  static void update_intervention_requests(struct vsie_page *vsie_page)
->>  {
->> @@ -714,12 +731,11 @@ static void unpin_blocks(struct kvm_vcpu *vcpu, st=
-ruct vsie_page *vsie_page)
->>  	struct kvm_s390_sie_block *scb_s =3D &vsie_page->scb_s;
->>  	hpa_t hpa;
->> =20
->> -	hpa =3D (u64) scb_s->scaoh << 32 | scb_s->scaol;
->> +	hpa =3D read_scao(vcpu->kvm, scb_s);
->>  	if (hpa) {
->>  		unpin_guest_page(vcpu->kvm, vsie_page->sca_gpa, hpa);
->>  		vsie_page->sca_gpa =3D 0;
->> -		scb_s->scaol =3D 0;
->> -		scb_s->scaoh =3D 0;
->> +		write_scao(scb_s, 0);
->>  	}
->> =20
->>  	hpa =3D scb_s->itdba;
->> @@ -773,9 +789,7 @@ static int pin_blocks(struct kvm_vcpu *vcpu, struct =
-vsie_page *vsie_page)
->>  	gpa_t gpa;
->>  	int rc =3D 0;
->> =20
->> -	gpa =3D READ_ONCE(scb_o->scaol) & ~0xfUL;
->> -	if (test_kvm_cpu_feat(vcpu->kvm, KVM_S390_VM_CPU_FEAT_64BSCAO))
->> -		gpa |=3D (u64) READ_ONCE(scb_o->scaoh) << 32;
->> +	gpa =3D read_scao(vcpu->kvm, scb_o);
->>  	if (gpa) {
->>  		if (gpa < 2 * PAGE_SIZE)
->>  			rc =3D set_validity_icpt(scb_s, 0x0038U);
->> @@ -792,8 +806,7 @@ static int pin_blocks(struct kvm_vcpu *vcpu, struct =
-vsie_page *vsie_page)
->>  		if (rc)
->>  			goto unpin;
->>  		vsie_page->sca_gpa =3D gpa;
->> -		scb_s->scaoh =3D (u32)((u64)hpa >> 32);
->> -		scb_s->scaol =3D (u32)(u64)hpa;
->> +		write_scao(scb_s, hpa);
->>  	}
->> =20
->>  	gpa =3D READ_ONCE(scb_o->itdba) & ~0xffUL;
->>=20
+Use this new allocator in place of reusing the virtual address, and
+incorporate the maximum supported IOVA into the limit testing.  This
+latter change doesn't test quite the same absolute end-of-address space
+behavior but still seems to have some value.  Testing for overflow is
+skipped when a reduced address space is supported as the desired errno
+is not generated.
+
+This series is based on Alex Williamson's "Incorporate IOVA range info"
+[1] along with feedback from the discussion in David Matlack's "Skip
+vfio_dma_map_limit_test if mapping returns -EINVAL" [2].
+
+Given David's plans to split IOMMU concerns from devices as described in
+[3], this series' home for `struct iova_allocator` and IOVA
+range helpers are likely to be short lived, since they reside in
+vfio_pci_device.c. I assume that the rework can move this functionality
+to a more appropriate location next to other IOMMU-focused code, once
+such a place exists.
+
+[1] https://lore.kernel.org/all/20251108212954.26477-1-alex@shazbot.org/#t
+[2] https://lore.kernel.org/all/20251107222058.2009244-1-dmatlack@google.com/
+[3] https://lore.kernel.org/all/aRIoKJk0uwLD-yGr@google.com/
+
+To: Alex Williamson <alex@shazbot.org>
+To: David Matlack <dmatlack@google.com>
+To: Shuah Khan <shuah@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: kvm@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Alex Mastro <amastro@fb.com>
+
+Changes in v2:
+- Fix various nits
+- calloc() where appropriate
+- Update overflow test to run regardless of iova range constraints
+- Change iova_allocator_init() to return an allocated struct
+- Unfold iova_allocator_alloc()
+- Fix iova allocator initial state bug
+- Update vfio_pci_driver_test to use iova allocator
+- Link to v1: https://lore.kernel.org/r/20251110-iova-ranges-v1-0-4d441cf5bf6d@fb.com
+
+---
+Alex Mastro (4):
+      vfio: selftests: add iova range query helpers
+      vfio: selftests: fix map limit tests to use last available iova
+      vfio: selftests: add iova allocator
+      vfio: selftests: replace iova=vaddr with allocated iovas
+
+ .../testing/selftests/vfio/lib/include/vfio_util.h |  19 +-
+ tools/testing/selftests/vfio/lib/vfio_pci_device.c | 241 ++++++++++++++++++++-
+ .../testing/selftests/vfio/vfio_dma_mapping_test.c |  20 +-
+ .../testing/selftests/vfio/vfio_pci_driver_test.c  |  12 +-
+ 4 files changed, 283 insertions(+), 9 deletions(-)
+---
+base-commit: 0ed3a30fd996cb0cac872432cf25185fda7e5316
+change-id: 20251110-iova-ranges-1c09549fbf63
+
+Best regards,
+-- 
+Alex Mastro <amastro@fb.com>
 
 
