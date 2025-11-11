@@ -1,102 +1,102 @@
-Return-Path: <kvm+bounces-62807-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62808-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFD98C4F605
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 19:09:17 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35EC0C4F611
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 19:12:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D72A3AF68F
-	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 18:09:09 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5E58334BE50
+	for <lists+kvm@lfdr.de>; Tue, 11 Nov 2025 18:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B9D3361DA3;
-	Tue, 11 Nov 2025 18:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3B7393DF7;
+	Tue, 11 Nov 2025 18:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJqx4hqG";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mnnex841"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ODIcz9QC";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="iZQaTt7h"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942AA270ED2
-	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 18:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38B7272801
+	for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 18:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762884544; cv=none; b=Cgl56tJfm+rn/9g85nQjchgVq3nuDYe1EymhWTRKdoi+af1os82GOnyn7nsuttfO4093uJ6Wjf691/GzFMr5nNbtMLVny4Vf/WzF5Fr6fUkJ+0E09IoPULBWEow0Hdy2wpv5y9vphAkLPQLX9o0UC62fOLmAX7kbuj/tsfUyCVM=
+	t=1762884715; cv=none; b=i8wSVV5tomCBVSeUTtBLIbvd5TKEaigknp5jaTulRJSkSLSk7b+c6w85hidhWPRGEygwl+KAjDmSRXTMEJTUAkrWxgfbX8agpI0fTTCVHGlhw5YzUwbonlZl5TXLKqCvUPupfjsh4dGS0qY6wrKGw3au3TBsorKJMnsEtkePWBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762884544; c=relaxed/simple;
-	bh=eM057ONsBUwVHwEcTJHHOB8WMV8ykuIXS2pwGufAqps=;
+	s=arc-20240116; t=1762884715; c=relaxed/simple;
+	bh=0CN8aCPRSUd02g74zKDkW0H+gl7LB0GARCp62YCq0Qg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XwrAcGI5Gyx9oMGRBf2UJyLTJYpZQdORDsBFP8eiVRqw+lVTdkEPV/VnJ/J38oMg/Yd6pxnCO9ExYhR0/76jP1rYBR2Haiu1+Hczq86kwELTGI8sh4lu/gNRfWnJJDDXKy+0Ax1ABOWMJLJ52D0Zkfu205PHwdxr72ULr962L+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iJqx4hqG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mnnex841; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=nWd+39GW4zknnBLKv5S9KnsyIWCb5yUvX+iTNGZGWnumZoNzpG+0e3OiGWIHoaxNMFtU2AFhKJEFF0ZjGUiriN8xDKd34fiBRRgZpA2/DcpE3aYf/NvX98qeQMv3tIDg2mYeyGDoJym/W37JjU2vmasOA/r5b3vvVW4cCKm3s9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ODIcz9QC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=iZQaTt7h; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762884541;
+	s=mimecast20190719; t=1762884713;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ZTiiH+FfdmBKx/X3lpx9zM3sRSjKewzog8F+EGlzxMw=;
-	b=iJqx4hqGZhFl0eVKFATK7qvipcKEtHEC1qoUY4t2r2rXt0fncX6p2BgKWH80eleLAld6Pm
-	VZJzx9Qs9exbdFYTQ+HU+aD/hGTQndFY56rg4rCEKPw3vE59tscOOcGSjQstVw5FT7tafY
-	lDJqB3N1V5Fk+oZKpzbYhCHLVz298xk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=VyEVcxglwaCXXs+jyaytGrNn4eMjO/GxB3dXawBvms0=;
+	b=ODIcz9QCFmcLU8Jd8qihJqCfqFzEkicXojfSGe69LnUHIXyCjyr/icAZJ1b+m1aT0/JwLG
+	A4KzQEEfnGQK0pey1Ocq7EX4Bj93yw8JxwJmlej3GQQs47OQoKTNswnsTTIi2+iLRFiG92
+	I9ZwSGKqb029JZpbwe1smU43XQWOoDs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-349-jPLYDhF-M42UDrm4b1OlFg-1; Tue, 11 Nov 2025 13:09:00 -0500
-X-MC-Unique: jPLYDhF-M42UDrm4b1OlFg-1
-X-Mimecast-MFC-AGG-ID: jPLYDhF-M42UDrm4b1OlFg_1762884539
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47496b3c1dcso92075e9.3
-        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 10:09:00 -0800 (PST)
+ us-mta-97-RuK9Uno5Oi2pnKoO9v9tLg-1; Tue, 11 Nov 2025 13:11:51 -0500
+X-MC-Unique: RuK9Uno5Oi2pnKoO9v9tLg-1
+X-Mimecast-MFC-AGG-ID: RuK9Uno5Oi2pnKoO9v9tLg_1762884711
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42b3339cab7so1569267f8f.0
+        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 10:11:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762884539; x=1763489339; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1762884711; x=1763489511; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZTiiH+FfdmBKx/X3lpx9zM3sRSjKewzog8F+EGlzxMw=;
-        b=Mnnex841eKPrWTBYvpbRREGJXn1tz5N2zUVWsZrT0rOAeDt+d+BmyWbxRQvRNgitIl
-         wTswzZCwSBDG9l3VnGTP+YKAx3iUB2+JNyuK4zH6p3hZFVESzQ2dpTmP5QpXkM+PA/dH
-         0UaNcym+EGuqYia7ddXJPWHHmXWmZwaqV4FupGXXcL9R0tLg3iSttLrGxHmoaelwCYmf
-         /KFtuymBixW6qfNQMNGcEkpHijMcNluA41DjcQIRIc2xMD9MNxk/T3NsbG2DznifIqQD
-         PDfPJnk8BXaRPoobMMSO+dphtBGopOIciYqus1N6ovzNa+mOw+12uIALYXR3jP5V+JFX
-         XInA==
+        bh=VyEVcxglwaCXXs+jyaytGrNn4eMjO/GxB3dXawBvms0=;
+        b=iZQaTt7hTWZyg23IxFRIZU1ghKMB3hjND2W4c4EFWZNHQ0hFQesV6A0Ij0yPxwBTcp
+         XgpUtd+4QDANhdDF46qPOrBOHtba8HTpTn6OMXSVpkp3r0qbfPAVHOgreDB8ijwFbnlX
+         kQQ0AlS/FVhmgyZGP0RuqjS7Yx8SuOBGEVBpbUhhUUrhR3CzS/T+r61G00eJ+/W90Ge/
+         2S1tAvH92nQ4SH8nOdqQSyEW6WEvTH9q65a0yIr7W7EJhhgHQ9bO8Lr2FKJUp6b4wv0w
+         /WsKTnnmoSOAD2iAIy6IIrmSAEFSUWqRHfeQe/Fy59iXWYaDU3N/ShZGTAjk4Aim86FN
+         aBjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762884539; x=1763489339;
+        d=1e100.net; s=20230601; t=1762884711; x=1763489511;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZTiiH+FfdmBKx/X3lpx9zM3sRSjKewzog8F+EGlzxMw=;
-        b=ns0txjtxSGrQKmLpJb7iJcrFkZKTvfmHBJGD0mkeA7pSe/Ewi+3DmLRVPwejIuIe2x
-         LZTojJgEAoJhlDNoGAnuCykV9RL2uUSUImCF/687S9couKXM4m8Mj/o6iIRVgrRL4riE
-         iXBt6m6DFoPEZK7sfg8zQ7pEzm+NphVsL596KeRt6BkNuy4ABTimQErf+SgRoLzRGASx
-         kNe1qJ20wgZQyMwm7FW5hIO0MK9lv9GPnLqc+ZoopF1OK+O2l8tTdg06EG+A1eCxfFPF
-         4gESP7Q0os8Kh2xbzGLpRk/8q6GmXt9KdQET8WDtdsh6weOJoGBEGGOXR+GTk32mu1Cn
-         sedw==
-X-Forwarded-Encrypted: i=1; AJvYcCWi2IA+E/iPvQFVFJV48RPDZAYtu/ieDbRQs4HKG+A1Q866DEBETXtRRWe9kmaaIfnrh+M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuB4uC7vSiAp7YXNYlJmpIqB7S9qU2rk37FtzhDf5O2IeikuKv
-	0BGZ2CZR0NmSJRoqi4PJ8p1RUHYIEA19IY0s1LL4QdtDNvKOzxaanBAvNFrYK6gYgFyHxSVfnUa
-	RaFhWS01KEF14pYoXgQkAkAovpdI8ou0FitZtomxA/gvr9qn66sg2ZA==
-X-Gm-Gg: ASbGncsZIH89nHpqfJmgbZ0k0kvPlw5Aa/EozvtEHZfwd7X7/+lxjDdv5j5H6vCfjmz
-	zPPEjP4au4tcoCe/KEZ/VrZnEdPUboioGJN5CqNEnU5tcLkoNt7ccKHTGDYzqGdxr7CJWnrnsSS
-	oFybH3O+hxuaVkUW+Q5rDSiknH0pczCS86DhhYP4N1J/lRkusR/UO3Iu8yfsqzkfroVRCg5Fjo4
-	Ofdav7ELTqZrVMKcS+rnil4lc6F2XAsm75H43RLPngKWpJSq+aj3Bf62sErn/p5S7sXtImHG3xJ
-	rHS2XAZMy+XIV8mqJ3DMM7heLApcPy2t7TpfoKdVJV49zNoChb57rCyc46QIIYWWqMJsvlevQLD
-	zOWVIaTXLBviw7zNoMCK4NEsEO2ytx1Ieu/bjE6YCocbgFp446Ff7JS1OdPlbQHKr0oBVxb8vF/
-	XFdTpp6w==
-X-Received: by 2002:a05:600c:4fc9:b0:477:557b:691d with SMTP id 5b1f17b1804b1-477870857e3mr2529945e9.25.1762884539159;
-        Tue, 11 Nov 2025 10:08:59 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFu6AOQN1R5m7gTW6bq/E9O2wxQesMHXXbmPkMIGlWRaF8ha07Tu7YdBjaAgwcY2Fz7PGbqNw==
-X-Received: by 2002:a05:600c:4fc9:b0:477:557b:691d with SMTP id 5b1f17b1804b1-477870857e3mr2529745e9.25.1762884538737;
-        Tue, 11 Nov 2025 10:08:58 -0800 (PST)
+        bh=VyEVcxglwaCXXs+jyaytGrNn4eMjO/GxB3dXawBvms0=;
+        b=FYLryFqARcVS4B6+4gvOH8bFC2/z5dmpsAC6wl1Tz5PBP1PoTB1MeYmHTy9T17sm/j
+         5YYmMLEZvzRkpOfRShevrCLj/yUbZDQ4oJXz5EplM9LQFk+uXK3xBU5CiAz3whv9kUvk
+         92AjU4V7LZ3QxYBC2Nd3LQyo7LGsbIzPDcfdgJhZDNZ9nvuEQ3TXj6MC8v9CTrlUbCkF
+         u6QYQQEZgrRjz6zPh5/XeyLdIXxzKrWwiYlV8uhvTyhZTF6N3WOYU9yg/M4j18wTTFIY
+         OcAom5PcKjST2TOluZ33oAADrDRugKvLyQ/TSyoQETvMx1ACEUdTn7+mi4SeOqMAEwML
+         QF4w==
+X-Forwarded-Encrypted: i=1; AJvYcCU1w9RGXG8+5yFbvpudmsOBbn0vGFFGipw+KKioI+5WfQfnQ+8UzrcmMywnDakKQeH70S4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3lR3Z6WbSrVTzP95IQN62+ZFhBWYKt/7KVjxxFPiCRH9FDqVx
+	n9d385mSRb2276lYAY7Q9MTQV+5r6VO8ynre13hp3aAojTF8+dWh3Ry02nK9BFE882So5yyGRPE
+	BBDEQfp1EixJ783JM8mMlLvZeWrXRyXSWDISDP6Q+/HVil0IN59tb+g==
+X-Gm-Gg: ASbGncv8W/ezsmQUPCzWMeRZZN4U9n6PZYX7Q1OLjoqW52rZN0IG9EOLtPUZ6K8VumE
+	Xg7o/sVcV+jhduRZMJcknqKEYD+Mv6wZ1uLIEYf2oIyczRqseXSrXvB2Qt5n68rypWgdN1YsltI
+	nU+PaJCOV++IuNqzk9SQakcvhp6E4S0uFlmJvIHuo5/h9cOSB+Lk4umLyDQLSDajC/qbttKT+zS
+	tPq0XW0CWeELCL1Jw1jITrREfQG0cGs/dCRBORWyzOqW8gKozpoFEX8+/UcL494gtbBc4XAkznO
+	FlH6GdkOlapftVHBkzwUrNN/mvxQ2OR7JuFbTK9QrApNquOI9va+Mak9APLJz2hSwLY64JnqtPz
+	HdiLcNki2eG4roSp4iNkK1KoJC5dleJ7MN3/mhmf9MA3WQfgMYsI5M1dYu+Fpsu7By6QcRgeSKA
+	WV3mik+A==
+X-Received: by 2002:a05:6000:657:b0:42b:394a:9b1 with SMTP id ffacd0b85a97d-42b4bdb2a8amr77460f8f.37.1762884710590;
+        Tue, 11 Nov 2025 10:11:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGHlLWXKzjkDYJCcvUKBM9NipPqJyE3f107uFZbqslvgYkn1WQZdgE0yG7thg8iRJRVCmu8Jg==
+X-Received: by 2002:a05:6000:657:b0:42b:394a:9b1 with SMTP id ffacd0b85a97d-42b4bdb2a8amr77449f8f.37.1762884710169;
+        Tue, 11 Nov 2025 10:11:50 -0800 (PST)
 Received: from [192.168.10.81] ([176.206.111.214])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4775cd45466sm379917565e9.0.2025.11.11.10.08.57
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-42ac675caecsm29390759f8f.30.2025.11.11.10.11.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 10:08:58 -0800 (PST)
-Message-ID: <7cff2a78-94f3-4746-9833-c2a1bf51eed6@redhat.com>
-Date: Tue, 11 Nov 2025 19:08:56 +0100
+        Tue, 11 Nov 2025 10:11:49 -0800 (PST)
+Message-ID: <33eacd6f-5598-49cb-bb11-ca3a47bfb111@redhat.com>
+Date: Tue, 11 Nov 2025 19:11:48 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -248,16 +248,6 @@ On 11/10/25 19:01, Chang S. Bae wrote:
 > +#ifdef CONFIG_X86_64
 > +static inline unsigned long kvm_read_egpr(int reg) { return 0; }
 > +static inline void kvm_write_egpr(int reg, unsigned long data) { }
-
-Do not inline these, they're quite large.  Leave them in x86.c.
-
-Also please add a KVM_APX Kconfig symbol and add "select KVM_APX if 
-X86_64" to KVM_INTEL.
-
-This way, AMD and 32-bit use the same logic to elide all the EGPR code.
-
-Paolo
-
 > +#endif
 > +
 >   #endif
@@ -302,7 +292,14 @@ Paolo
 > +{
 > +	return kvm_register_read_raw(vcpu, reg);
 > +}
-> +
+
+Please leave these as kvm_gpr_{read,write}_raw.  It's easier to review 
+than the leading underscore.  (It's not hard to undo if you use "git 
+format-patch --stdout", do a mass replace on the resulting patch file, 
+and then reapply the patch with "git am").
+
+Paolo
+
 > +static inline void _kvm_gpr_write(struct kvm_vcpu *vcpu, int reg, unsigned long val)
 > +{
 > +	kvm_register_write_raw(vcpu, reg, val);
