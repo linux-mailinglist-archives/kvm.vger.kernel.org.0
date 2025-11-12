@@ -1,68 +1,71 @@
-Return-Path: <kvm+bounces-62952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6DCBC549F9
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 22:34:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 316DDC54AEC
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 23:08:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4653C4E2E04
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 21:32:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CA48B348C1A
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 22:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796EC2E0905;
-	Wed, 12 Nov 2025 21:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039552EA470;
+	Wed, 12 Nov 2025 22:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="ks5XHpSB"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="yn/7LuWP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E421935CBD6;
-	Wed, 12 Nov 2025 21:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8574C28CF56;
+	Wed, 12 Nov 2025 22:07:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762983117; cv=none; b=l3pAFtvbzClNL/OL8Omql1oXNiKQwdzrIVt/1MO6LHEuwOD/9aVlTZY3D5gyzdjRYSmHn8bmk7QoG1vwndsictMiclmPICfX84AigqHR8u1aiL2EaqHWLY4VphicPaOO3EagfZQlvzmRqvi4ulup4uYsdeQt3ZgTtzixvfhMB0g=
+	t=1762985255; cv=none; b=nDQyjN9ltmjIgRt9lQ3AmQj3qROCxBCMh0ZqAQzAgtH8hCzxImNCAxzgorGZ68fL5Mq+jYF2tfYlW11dTkOH/Ed5q8WAGmc4douT4h9u+ykqGgKmkCuIOrNFJqrk3a8z0uNoBEnLeaBGCEIIhtJcoWd3HYfGZumLdxCp1M0IP20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762983117; c=relaxed/simple;
-	bh=NXavT7ThkFAlGBuDxqi1Rnvl5BvGu9ni8f7YELCEI0M=;
+	s=arc-20240116; t=1762985255; c=relaxed/simple;
+	bh=vFb162fQrfik4BXt5CZU9D4wyBDl0W+eQVuWkuKKRQE=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NWo89OpfVxDQb4HiJ9AA56iuv8swAmfUpLxe34qlpoQcPVqDi7a4Y5Tcb6sTi1UiQk15hd/FOWmeAeNSn8tFsyR7GK2AhDevhl3zccNiNquxS3P1MvFUofK4xxlVlbKC8wxmvq4ADuHCjFoxBIkzI6RQgK60BN4r1KC2nMTlzxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=ks5XHpSB; arc=none smtp.client-ip=67.231.145.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=GUAkkIAS7Pc0++SO/i6aUDhiRZha6bWdmcKqY5XBVq7iJZpthojq82OQBv2fwU9M1c+ZL2dL8MGMYFnJEWnqIx8mqrIb9pc7ZYf9+8xknxgUDYfei0sjFDJiA7qGAe0KOTXr93xnLIlyi3EwiRXh15dw+rs/YteURWOXIrinp7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=yn/7LuWP; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ACGQPZK1245993;
-	Wed, 12 Nov 2025 13:31:50 -0800
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 5ACJUfBW1517738;
+	Wed, 12 Nov 2025 14:07:26 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
 	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=Lvvg/PHh6A0GH1jtv9xb
-	Q6bl1Ps8OM5ohm1Q3wH5ZXE=; b=ks5XHpSBFg3BBbSy37/e49F3ZP4IvFsHtKJt
-	8AtxHDTRkiGdGhRoiTaUMOLXX4I6If1QUWL9h9FwK7HRI+IMPIoMvZbTRlznQFCi
-	3yGVX3+bvO5f1PkJad9lAYbTGiMByl8K8Dk3NJP/Qta+FOXU0TuoduzrQA65CeIl
-	TbnV58T+ZtEctHkhhq65B6l8pCjxU2cwCMN3kQSp60J3ar68D22VmBD8kv1HWOQq
-	Llm+os5AowgAAraB9w92pxKOMsICHQw3RT2yCVi9c2NolIpnHn+bFYr/LmcQiOuG
-	1k/pf/z+Gch0FOZ+FG+yxDuUopKztOBNKbIpv0YddzfUV/ptKw==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4acwrv2t9h-1
+	:references:subject:to; s=s2048-2025-q2; bh=dyPzt6jYWQBlgpZrAEGm
+	Ly5XUl+8bBVMINlubHmdpe8=; b=yn/7LuWPdJq/zbD+UyTGYFExLs8tgTr1y7wU
+	2Zv29CCZ4VQiHQtyLQXIyzjrO9fzfejC12xm3+TkiB/U/q2lw9rBFvF/3W4/DNJy
+	5P+1cU6wBM+vQ3deX5bZW4L1oDpPiy0r71E8PNqZ/KOHuUofBBxi/zjFx6YBL852
+	ZXyVOoe48thRkpwNBvwqwNdeObw4saxPu0rm9U+qz+pjNeqNwi3LaKXG0jmiSZU4
+	DqG74+vDWgoXlzyU4lz812TpM8nyg93ooHGOpyPKyRwn658CPqiZqQbEX4p1YfFy
+	3RrkonWK6VX80t+//cARdziEKEbs/rvAIDOnR+0DDvoaT0kRNw==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by m0089730.ppops.net (PPS) with ESMTPS id 4acuj7cdkn-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 12 Nov 2025 13:31:50 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+	Wed, 12 Nov 2025 14:07:26 -0800 (PST)
+Received: from devgpu015.cco6.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Wed, 12 Nov 2025 21:31:48 +0000
-Date: Wed, 12 Nov 2025 13:31:43 -0800
+ 15.2.2562.20; Wed, 12 Nov 2025 22:07:25 +0000
+Date: Wed, 12 Nov 2025 14:07:20 -0800
 From: Alex Mastro <amastro@fb.com>
-To: Alex Williamson <alex@shazbot.org>
-CC: David Matlack <dmatlack@google.com>, Shuah Khan <shuah@kernel.org>,
-        Jason
- Gunthorpe <jgg@ziepe.ca>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 0/4] vfio: selftests: update DMA mapping tests to use
- queried IOVA ranges
-Message-ID: <aRT8v4Yj8Lm5KlUk@devgpu015.cco6.facebook.com>
-References: <20251111-iova-ranges-v3-0-7960244642c5@fb.com>
- <20251112083005.542e0b7f.alex@shazbot.org>
+To: David Matlack <dmatlack@google.com>
+CC: Alex Williamson <alex.williamson@redhat.com>,
+        Alex Williamson
+	<alex@shazbot.org>, Jason Gunthorpe <jgg@nvidia.com>,
+        Josh Hilke
+	<jrhilke@google.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        Raghavendra Rao Ananta
+	<rananta@google.com>,
+        Vipin Sharma <vipinsh@google.com>
+Subject: Re: [PATCH v2 00/18] vfio: selftests: Support for multi-device tests
+Message-ID: <aRUFGHPe+EXao10B@devgpu015.cco6.facebook.com>
+References: <20251112192232.442761-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,79 +74,101 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20251112083005.542e0b7f.alex@shazbot.org>
-X-Proofpoint-GUID: EOUL9R4ULoSN3G97SLQ6JlZz0E1StJmB
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEyMDE3NCBTYWx0ZWRfX3tOI34qUrmTd
- o4kAcnh+1p8bZmR+sM8Z5nK8Q9QDCDkK28v60L2eWVquRiSAn/Rz+48CQM8KgN7xgoxkCGGT1PC
- ku05GYYmfzza0yDPUbWtb2bFkF0uCq5Lzs36AspKRywT8OylotACEUKWrrDolkmNbZM4+juOhH9
- K6fqVCUJI3nQbGgOH6Y5M/Rk8cqK3w51A5ohpwXGKbbS4peR2KLRpsFewarqkYzx8Oeg/AZYGoO
- wzdDQf+h2xnyakxBOcCO/PehlGTZuprkCxuAKD+oT+idAHtu+vtLGnXo71OZ6hHpGDxEKuIGRCL
- 54GOznJ2QJjO+Es1sYyBMmd8nSdL0guCuUsH86zzpAWzUDk/2tCM/Uk/Z+wWJazdQZ8yGFHBg82
- EhBMtA1ZWjK7xnpL8X70Adkg8nOx6A==
-X-Authority-Analysis: v=2.4 cv=Scv6t/Ru c=1 sm=1 tr=0 ts=6914fcc6 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+In-Reply-To: <20251112192232.442761-1-dmatlack@google.com>
+X-Proofpoint-GUID: a6rH3zQb7kVzxe_6ShyBkjTM7yvOQYUf
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEyMDE3OSBTYWx0ZWRfX0bCPA514uoLx
+ UFqKskTLffagL1adLoObxbJOYTr/g/DXCg270IplUb0WBp3nA+xzwAyrizRtc/4UFmZgfCL9+XP
+ Q834SzfrPCTPFoYGazp/90tKnyEail34Kb1gOrzMbQw7/46laste7h7Ydm7l/lqQJA9ZIGsNJtV
+ ilaS1miMxZYN6/3pY6MJ7H+rvzt9YnW/ng2V5Y+LMPe2lJFz6ewBxSSqv3xc3WwFGPqtkAz5JeX
+ eAB3baQ8FbjkgbqniFioNSBeaFDdkw7ThgcTwE5E2K2ykGgYwFKxZ4/Q2nJl1yUXpZ90QXnLY87
+ c0NmJdqefd+VDrHMkjSei5zVzh2fbJN21NbfiDpWWMlBLp4Fu665ALYeODcaLMT1bvduvBcRH/F
+ 4WTPBo+GKjK1qDHEtT8oDz5jMPbhVQ==
+X-Authority-Analysis: v=2.4 cv=H8LWAuYi c=1 sm=1 tr=0 ts=6915051e cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
  a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=r1p2_3pzAAAA:8 a=1XWaLZrsAAAA:8 a=FOH2dFAWAAAA:8
- a=9jRdOu3wAAAA:8 a=84ljBqc_iw8H7pXuDXEA:9 a=CjuIK1q_8ugA:10
- a=r_pkcD-q9-ctt7trBg_g:22 a=ZE6KLimJVUuLrTuGpvhn:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: EOUL9R4ULoSN3G97SLQ6JlZz0E1StJmB
+ a=FOH2dFAWAAAA:8 a=BPcALthgWs1Ll9ulZ4YA:9 a=CjuIK1q_8ugA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-ORIG-GUID: a6rH3zQb7kVzxe_6ShyBkjTM7yvOQYUf
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-12_06,2025-11-12_01,2025-10-01_01
 
-On Wed, Nov 12, 2025 at 08:30:05AM -0700, Alex Williamson wrote:
-> On Tue, 11 Nov 2025 10:48:23 -0800
-> Alex Mastro <amastro@fb.com> wrote:
-> 
-> > Not all IOMMUs support the same virtual address width as the processor,
-> > for instance older Intel consumer platforms only support 39-bits of
-> > IOMMU address space. On such platforms, using the virtual address as the
-> > IOVA and mappings at the top of the address space both fail.
-> > 
-> > VFIO and IOMMUFD have facilities for retrieving valid IOVA ranges,
-> > VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE and IOMMU_IOAS_IOVA_RANGES,
-> > respectively. These provide compatible arrays of ranges from which we
-> > can construct a simple allocator.
-> > 
-> > Use this new allocator in place of reusing the virtual address, and
-> > incorporate the maximum supported IOVA into the limit testing.  This
-> > latter change doesn't test quite the same absolute end-of-address space
-> > behavior but still seems to have some value.
-> > 
-> > This series is based on Alex Williamson's "Incorporate IOVA range info"
-> > [1] along with feedback from the discussion in David Matlack's "Skip
-> > vfio_dma_map_limit_test if mapping returns -EINVAL" [2].
-> > 
-> > Given David's plans to split IOMMU concerns from devices as described
-> > in [3], this series' home for `struct iova_allocator` and IOVA
-> > range helpers are likely to be short lived, since they reside in
-> > vfio_pci_device.c. I assume that the rework can move this functionality
-> > to a more appropriate location next to other IOMMU-focused code, once
-> > such a place exists.
-> > 
-> > [1] https://lore.kernel.org/all/20251108212954.26477-1-alex@shazbot.org/#t
-> > [2] https://lore.kernel.org/all/20251107222058.2009244-1-dmatlack@google.com/
-> > [3] https://lore.kernel.org/all/aRIoKJk0uwLD-yGr@google.com/
-> > 
-> > To: Alex Williamson <alex@shazbot.org>
-> > To: David Matlack <dmatlack@google.com>
-> > To: Shuah Khan <shuah@kernel.org>
-> > To: Jason Gunthorpe <jgg@ziepe.ca>
-> > Cc: kvm@vger.kernel.org
-> > Cc: linux-kselftest@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Signed-off-by: Alex Mastro <amastro@fb.com>
-> > 
-> > Changes in v3:
-> > - Update capability chain cycle detection
-> > - Clarify the iova=vaddr commit message
-> > - Link to v2: https://lore.kernel.org/r/20251111-iova-ranges-v2-0-0fa267ff9b78@fb.com
-> 
-> Applied to vfio for-linus branch for v6.18.  Thanks for the quick
-> resolution on this!
+On Wed, Nov 12, 2025 at 07:22:14PM +0000, David Matlack wrote:
+> This series adds support for tests that use multiple devices, and adds
+> one new test, vfio_pci_device_init_perf_test, which measures parallel
+> device initialization time to demonstrate the improvement from commit
+> e908f58b6beb ("vfio/pci: Separate SR-IOV VF dev_set").
 
-No problem, thanks for the reviews!
+The new test runs and passes for me.
 
-> 
-> Alex
+Tested-by: Alex Mastro <amastro@fb.com>
+
+$ vfio_pci_device_init_perf_test $(readlink -f /sys/class/vfio-dev/*/../.. | xargs -n1 basename)
+Testing parallel initialization of 24 devices:
+    0000:05:00.0
+    0000:06:00.0
+    0000:27:00.0
+    0000:28:00.0
+    0000:e5:00.0
+    0000:e6:00.0
+    0000:e7:00.0
+    0000:e8:00.0
+    0000:e9:00.0
+    0000:ea:00.0
+    0000:c5:00.0
+    0000:c6:00.0
+    0000:07:00.0
+    0000:c7:00.0
+    0000:c8:00.0
+    0000:c9:00.0
+    0000:ca:00.0
+    0000:08:00.0
+    0000:09:00.0
+    0000:0a:00.0
+    0000:23:00.0
+    0000:24:00.0
+    0000:25:00.0
+    0000:26:00.0
+TAP version 13
+1..5
+# Starting 5 tests from 5 test cases.
+#  RUN           vfio_pci_device_init_perf_test.vfio_type1_iommu.init ...
+Wall time: 1.440004083s
+Min init time (per device): 1.236283226s
+Max init time (per device): 1.440002010s
+Avg init time (per device): 1.258762246s
+#            OK  vfio_pci_device_init_perf_test.vfio_type1_iommu.init
+ok 1 vfio_pci_device_init_perf_test.vfio_type1_iommu.init
+#  RUN           vfio_pci_device_init_perf_test.vfio_type1v2_iommu.init ...
+Wall time: 1.448952696s
+Min init time (per device): 1.242623358s
+Max init time (per device): 1.448951915s
+Avg init time (per device): 1.264836317s
+#            OK  vfio_pci_device_init_perf_test.vfio_type1v2_iommu.init
+ok 2 vfio_pci_device_init_perf_test.vfio_type1v2_iommu.init
+#  RUN           vfio_pci_device_init_perf_test.iommufd_compat_type1.init ...
+Wall time: 1.446931666s
+Min init time (per device): 1.242316634s
+Max init time (per device): 1.446927360s
+Avg init time (per device): 1.264904097s
+#            OK  vfio_pci_device_init_perf_test.iommufd_compat_type1.init
+ok 3 vfio_pci_device_init_perf_test.iommufd_compat_type1.init
+#  RUN           vfio_pci_device_init_perf_test.iommufd_compat_type1v2.init ...
+Wall time: 1.449211729s
+Min init time (per device): 1.243377853s
+Max init time (per device): 1.449211729s
+Avg init time (per device): 1.264266785s
+#            OK  vfio_pci_device_init_perf_test.iommufd_compat_type1v2.init
+ok 4 vfio_pci_device_init_perf_test.iommufd_compat_type1v2.init
+#  RUN           vfio_pci_device_init_perf_test.iommufd.init ...
+Wall time: 1.447583702s
+Min init time (per device): 1.241216318s
+Max init time (per device): 1.447582350s
+Avg init time (per device): 1.264159293s
+#            OK  vfio_pci_device_init_perf_test.iommufd.init
+ok 5 vfio_pci_device_init_perf_test.iommufd.init
+# PASSED: 5 / 5 tests passed.
+# Totals: pass:5 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+ 
 
