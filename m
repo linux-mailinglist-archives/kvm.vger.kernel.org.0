@@ -1,179 +1,264 @@
-Return-Path: <kvm+bounces-62923-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62924-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8747BC53FC2
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:49:35 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE785C5400A
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:51:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F3F33AF5F4
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 18:42:14 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E68F634644A
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 18:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9658134D901;
-	Wed, 12 Nov 2025 18:39:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C77734C130;
+	Wed, 12 Nov 2025 18:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="bpK7oEWo"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Pmm2REXr";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="4UXI8DMY";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Pmm2REXr";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="4UXI8DMY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA1F34B402;
-	Wed, 12 Nov 2025 18:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB8B34404F
+	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 18:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762972742; cv=none; b=E6NiaB3Qle9XVeXswR+WcXzLypTTTWUD8O0RRQZp3W1F7xy+NvURTKTR39dCYJtXs3ZGO8AciE2O53hiy0XWydqPFRwxNnBEMlCaS9Y5PW5EptHXBE9Lm4ilSkJ5o0Opwg2b81GNusV7HCUv/Hf9KzJgC9vfCfucvavvlzxN00k=
+	t=1762973343; cv=none; b=etuaxJa4MnWiBn9NYarBENV084mxzOn0T4OnhneDYp4OeGV1S7EUMbL41bdCWMoNo24xbxE0uWwN96WwHvjk1A+dPn/L/K03BdnGMRkFWtNajQoIZFpQh4A61+5vBZnsImUs8PJllJ5imCACLvxvUwYXN/7pQSlWyeGtKmLYjrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762972742; c=relaxed/simple;
-	bh=POv7NkoF44sU+mFkRsPUnoPJGmeAATZEDnKOAGTsCOQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aFEbjrHFaGtMGUtkrTUsmZlJC/gGr1EJVJv99CRh9lu8EJINmnAb1XT6TNQrvV7kGp+2gVgKTYHkWIdZZ0GGpyqV82b9MlitwT0Uc/VvSHeh+51YekqHvcofmZkencVA7CQvF5eufbhckp/DRM9K7qoTizAqCjg5Iau1uLjeRq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=bpK7oEWo; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3F00440E01CD;
-	Wed, 12 Nov 2025 18:38:57 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id e05PRrtV6K6R; Wed, 12 Nov 2025 18:38:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1762972731; bh=0aGt+4sMYIhh0E/2xYmyk01i4uKCzPvyHNRoOm86K+k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bpK7oEWoXCfaEHu+FD7jo28m0ekyWR9OOpd7z9cY6lLs5uKhm7JWeWb10WUL0A/sj
-	 RXBSMeCaZxHUyrgfTUfMUrDuScNwqBfe1RshpnxrmpUaIPNhcrYjt4dAK0yVnFJ3gA
-	 7eFkWE8nlYg5rX0Y2og5+hEDG9H/sdKzOxkFJXcRnlHFqfzgnqWrMKDNAdPMAmyVOa
-	 mSAtNk+V2BIEFqSAthAoUkANmulRtWNb2w1Z1iV3CwWamlalU/OwwYfEfy1VDGpf9Y
-	 nHvWLdM3PIOyUZKk1wMbaPRYzx0CN0SIG6r60f4DhW1EeHEbh0KghKDqRLSaauGw8Q
-	 RzRtwusNWPoiMF13u8l39hC7CE9tz5U8PWnJs+O9Qjd4jZIy7MlscahUsqOMuZ0AwI
-	 sjzVVHxRH3oKM+LaoPTF7LZIbVBJxeXwOsPmbBqCKK3q2qWcVWCAudWnTx7Aswt8RR
-	 FJKfmNFgM7NNlkpw6a2RYqcmW0mgRTE6SDORpA3I/LCczNSrqAKGysW9eWzMRkwTpU
-	 sjt446jcbqRMwbF3ofHFxzlDaLwqWGAc3Jx8ocUBRlBp95kriXALKiGLWP8HN79lvL
-	 ifK4phPmkuzePgi3Y5lOeGmWXtUtcR6epu9w0499t3nFkY4+XKkgAHqM5T42PqYF4B
-	 +fr1kmtKeAz9nw2Qzc7ufxuw=
-Received: from zn.tnic (pd9530da1.dip0.t-ipconnect.de [217.83.13.161])
+	s=arc-20240116; t=1762973343; c=relaxed/simple;
+	bh=k1KBaOWc9iO3SoX+n0iAl78/KjK6mRyLLMHPlt71iEw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LVjZzB68TzhczDgJQBZPBZfeIkaJcGAP+E9iTqsDHFEWwcg41o9bdXkSyBeQAVv6fHz0RQFcU1UGPUkUuon+YKwA/HCXAjR+8Fb3y/qEa1ETZfBLUsAgEtK9b32FhBxukFPWiyzb2LarAwzw4QXegRC1ZZ4B4Y2jIuAGl2cH8ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Pmm2REXr; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=4UXI8DMY; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Pmm2REXr; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=4UXI8DMY; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 917FD40E0191;
-	Wed, 12 Nov 2025 18:38:42 +0000 (UTC)
-Date: Wed, 12 Nov 2025 19:38:36 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	Brendan Jackman <jackmanb@google.com>
-Subject: Re: [PATCH v4 4/8] KVM: VMX: Handle MMIO Stale Data in VM-Enter
- assembly via ALTERNATIVES_2
-Message-ID: <20251112183836.GBaRTULLaMWA5hkfT9@fat_crate.local>
-References: <20251031003040.3491385-1-seanjc@google.com>
- <20251031003040.3491385-5-seanjc@google.com>
- <20251112164144.GAaRS4yKgF0gQrLSnR@fat_crate.local>
- <aRTAlEaq-bI5AMFA@google.com>
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 73B4721BDD;
+	Wed, 12 Nov 2025 18:48:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1762973339; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=/12U6SR7WkQgyj2k+NmhedtIT7x+SNnjxUusuTSQA7k=;
+	b=Pmm2REXrw1avWrBH+xz082qOSzPsytWtjS+uiwtgQHpTK+SEAHQwFa6VeDIk8oSgJJMf4G
+	7b/b0+HXynbZXSrqE3FRplaG9dxCTSDXEhupy9yHUiHvWzfxUciyh6svHFn8l1IZtpes12
+	VxEWNIDMso6lVfKLVbpC63dN32ixUTw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1762973339;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=/12U6SR7WkQgyj2k+NmhedtIT7x+SNnjxUusuTSQA7k=;
+	b=4UXI8DMYPhNXKXIhfaBTaPhH4Io+ehEVIOk/BV+5G9jRf1H+FIMfYKEFJj+sS/HLJSVIAi
+	PxJhju4cEI5v4eCA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=Pmm2REXr;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=4UXI8DMY
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1762973339; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=/12U6SR7WkQgyj2k+NmhedtIT7x+SNnjxUusuTSQA7k=;
+	b=Pmm2REXrw1avWrBH+xz082qOSzPsytWtjS+uiwtgQHpTK+SEAHQwFa6VeDIk8oSgJJMf4G
+	7b/b0+HXynbZXSrqE3FRplaG9dxCTSDXEhupy9yHUiHvWzfxUciyh6svHFn8l1IZtpes12
+	VxEWNIDMso6lVfKLVbpC63dN32ixUTw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1762973339;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=/12U6SR7WkQgyj2k+NmhedtIT7x+SNnjxUusuTSQA7k=;
+	b=4UXI8DMYPhNXKXIhfaBTaPhH4Io+ehEVIOk/BV+5G9jRf1H+FIMfYKEFJj+sS/HLJSVIAi
+	PxJhju4cEI5v4eCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 02ED13EA61;
+	Wed, 12 Nov 2025 18:48:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 8rFgAJvWFGkCNgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Wed, 12 Nov 2025 18:48:59 +0000
+Message-ID: <dfcf8c59-e836-4e35-8585-656b64149ad7@suse.cz>
+Date: Wed, 12 Nov 2025 19:48:58 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aRTAlEaq-bI5AMFA@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 03/16] mm: avoid unnecessary uses of is_swap_pte()
+Content-Language: en-US
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache
+ <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+ Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>,
+ Oscar Salvador <osalvador@suse.de>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Matthew Brost <matthew.brost@intel.com>,
+ Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+ Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
+ Ying Huang <ying.huang@linux.alibaba.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
+ Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
+ Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+ Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+ SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
+ Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+ Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
+ Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
+References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
+ <17fd6d7f46a846517fd455fadd640af47fcd7c55.1762812360.git.lorenzo.stoakes@oracle.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <17fd6d7f46a846517fd455fadd640af47fcd7c55.1762812360.git.lorenzo.stoakes@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 73B4721BDD
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_CC(0.00)[linux.ibm.com,redhat.com,zeniv.linux.org.uk,kernel.org,suse.cz,arndb.de,nvidia.com,linux.alibaba.com,oracle.com,arm.com,linux.dev,suse.de,google.com,suse.com,intel.com,gmail.com,sk.com,gourry.net,huaweicloud.com,tencent.com,infradead.org,ziepe.ca,zte.com.cn,huawei.com,soleen.com,surriel.com,vger.kernel.org,kvack.org,lists.linux.dev];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[65];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.cz:dkim,suse.cz:mid,suse.cz:email]
+X-Spam-Score: -3.01
 
-On Wed, Nov 12, 2025 at 09:15:00AM -0800, Sean Christopherson wrote:
-> On Wed, Nov 12, 2025, Borislav Petkov wrote:
-> > On Thu, Oct 30, 2025 at 05:30:36PM -0700, Sean Christopherson wrote:
-> > > @@ -137,6 +138,12 @@ SYM_FUNC_START(__vmx_vcpu_run)
-> > >  	/* Load @regs to RAX. */
-> > >  	mov (%_ASM_SP), %_ASM_AX
-> > >  
-> > > +	/* Stash "clear for MMIO" in EFLAGS.ZF (used below). */
-> > 
-> > Oh wow. Alternatives interdependence. What can go wrong. :)
+On 11/10/25 23:21, Lorenzo Stoakes wrote:
+> There's an established convention in the kernel that we treat PTEs as
+> containing swap entries (and the unfortunately named non-swap swap entries)
+> should they be neither empty (i.e. pte_none() evaluating true) nor present
+> (i.e. pte_present() evaluating true).
 > 
-> Nothing, it's perfect. :-D
-
-Yeah. :-P
-
+> However, there is some inconsistency in how this is applied, as we also
+> have the is_swap_pte() helper which explicitly performs this check:
 > 
-> > > +	ALTERNATIVE_2 "",								\
-> > > +		      __stringify(test $VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO, %ebx), 	\
-> > 
-> > So this VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO bit gets set here:
-> > 
-> >         if (cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF_MMIO) &&
-> >             kvm_vcpu_can_access_host_mmio(&vmx->vcpu))
-> >                 flags |= VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO;
-> > 
-> > So how static and/or dynamic is this?
+> 	/* check whether a pte points to a swap entry */
+> 	static inline int is_swap_pte(pte_t pte)
+> 	{
+> 		return !pte_none(pte) && !pte_present(pte);
+> 	}
 > 
-> kvm_vcpu_can_access_host_mmio() is very dynamic.  It can be different between
-> vCPUs in a VM, and can even change on back-to-back runs of the same vCPU.
-
-Hmm, strange. Because looking at those things there:
-
-root->has_mapped_host_mmio and vcpu->kvm->arch.has_mapped_host_mmio
-
-they both read like something that a guest would set up once and that's it.
-But what do I know...
-
-> > IOW, can you stick this into a simple variable which is unconditionally
-> > updated and you can use it in X86_FEATURE_CLEAR_CPU_BUF_MMIO case and
-> > otherwise it simply remains unused?
+> As this represents a predicate, and it's logical to assume that in order to
+> establish that a PTE entry can correctly be manipulated as a swap/non-swap
+> entry, this predicate seems as if it must first be checked.
 > 
-> Can you elaborate?  I don't think I follow what you're suggesting.
+> But we instead, we far more often utilise the established convention of
+> checking pte_none() / pte_present() before operating on entries as if they
+> were swap/non-swap.
+> 
+> This patch works towards correcting this inconsistency by removing all uses
+> of is_swap_pte() where we are already in a position where we perform
+> pte_none()/pte_present() checks anyway or otherwise it is clearly logical
+> to do so.
+> 
+> We also take advantage of the fact that pte_swp_uffd_wp() is only set on
+> swap entries.
+> 
+> Additionally, update comments referencing to is_swap_pte() and
+> non_swap_entry().
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
-So I was thinking if you could set a per-guest variable in
-C - vmx_per_guest_clear_per_mmio or so and then test it in asm:
+LGTM (famous last words)
 
-		testb $1,vmx_per_guest_clear_per_mmio(%rip)
-		jz .Lskip_clear_cpu_buffers;
-		CLEAR_CPU_BUFFERS_SEQ;
+Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
 
-.Lskip_clear_cpu_buffers:
-
-gcc -O3 suggests also
-
-		cmpb   $0x0,vmx_per_guest_clear_per_mmio(%rip)
-
-which is the same insn size...
-
-The idea is to get rid of this first asm stashing things and it'll be a bit
-more robust, I'd say.
-
-And you don't rely on registers...
-
-and when I say that, I now realize this is 32-bit too and you don't want to
-touch regs - that's why you're stashing it - and there's no rip-relative on
-32-bit...
-
-I dunno - it might get hairy but I would still opt for a different solution
-instead of this fragile stashing in ZF. You could do a function which pushes
-and pops a scratch register where you put the value, i.e., you could do
-
-	push %reg
-	mov var, %reg
-	test or cmp ...
-	...
-	jz skip...
-skip:
-	pop %reg
-
-It is still all together in one place instead of spreading it around like
-that.
-
-Oh well.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
