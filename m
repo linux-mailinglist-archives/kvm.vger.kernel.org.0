@@ -1,149 +1,104 @@
-Return-Path: <kvm+bounces-62832-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62833-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47E67C50939
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 06:02:01 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74C57C509D1
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 06:27:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 042E23B1594
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 05:01:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 576884E9E0C
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 05:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE0F2D839C;
-	Wed, 12 Nov 2025 05:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FFA2D9EDD;
+	Wed, 12 Nov 2025 05:26:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hdHaLX7b"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CEPWaH13"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0DD2D6401
-	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 05:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6D1146588;
+	Wed, 12 Nov 2025 05:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762923712; cv=none; b=gt4zWYmwhebDLRyM7azxBlULq3iLVfr+tiXsX4VtNvbcn74utam3hjqn+kPRNDMEia2nR5XeVqDfrbVKWFsqifOHzpYbvC6ZbMW8i5s+3t5F0C7WSl02HvgSj2blb51WtLzFZ1TUCN+MxB9FNkXQohh17xp5Ap8/sK1+cF5x1f4=
+	t=1762925208; cv=none; b=qhX2KpYxvKDD5UI+L+1aQIWIOvImhdgVKC3sldCWDd4xxUUXEU22vCuDAvASfxupiflAcsYjpBEDk9BpeXsyV1Hl7++owt+X3Zf7xSMKPzQg3jovEKt6687WJ+ePFKsx9iP9wBaDANfhQ+/lYGQhoFunCF/ZEb2rFOHwBeMfYhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762923712; c=relaxed/simple;
-	bh=Jl+9ESLVL5FaLytBHXW8P0yViF+1HEK7OXyFbdlKZy4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L/RZydPhplWNT8dsmR81wPI0c8KR4qFCbA4tqy9IY7/J5W0mgk7c+VQzPfMxJFrhxtIqbRclanPG5BMttDSd5xw+bWguAa5HgkBCt+SA3gRjXh0X0SKw9ZPMj72dli3A4w9G+WVY1eRM87L4lQlaewTalexOdt80ildQuPvjFhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hdHaLX7b; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-340e525487eso289559a91.3
-        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 21:01:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762923710; x=1763528510; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=EEqxUrDo4eAGicjXuVUlCuGarl146qcNvuN3jCTjpSM=;
-        b=hdHaLX7bU9zQUBZqP0JDvrMqiWkPWdXqQ0a76XJaErZGshQrnVewIb5Gzj3rFUlfR2
-         CY7ARoad8SM0zXAyeSf6UeVhYRfKmDp1Ls4mfdwicwEl2mHK/BHv1tfeWM8s3MUaAx5Q
-         56BqfOv2+Fb9TwbN748QtgCY/WZuMXNJZXRslQRELK98oyNmw2UQ/yWE8qAHsRCYKf4W
-         8pfOTOCyledYQ/wex6cfUJsnEkBkIPdxDTzGPw8rR5UvNME4NipZHzxqZl/q+7zHeqx9
-         SxCM6wARUovBge0FTUVoiGxIwgRMjcXAh916HeVBeqJC+cbgzfYzI+7rQ2wSqAvDc8ZK
-         VYOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762923710; x=1763528510;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EEqxUrDo4eAGicjXuVUlCuGarl146qcNvuN3jCTjpSM=;
-        b=bSos2z7KeaV0lW9oRK+DwYddHsTxUecOKSd6lvtXTiVGQdh1r+mbetqqaFaXfMJ+Rp
-         cWqn6VmuWObYosIU7e/EyF2YU6ecfQ3AwudfBKkSoc6T4hTDYEYjc1g1AQMC30mR2orR
-         cjI6Zzscr6ulfDSSZIIkN62fDa3T1kSW78UANoFuExKE8vlvO36f3BXxNhBrI/C595xL
-         /MhXWamVsgGBjQFdq/DoznqzTut9QU+QYVTfMFoamdWF89A3PgnGiNPR25mkstSe/itF
-         XgAVLh5Dj7iwSOC6aXnWgeBe3NtvyDemId1W+eHAZHipGy6ZKwq1nLcpSjERGX95z/4j
-         CRcw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVgKR12fkUEYqxV9EpByKpuxO94/sSPb6kOoo+SJQTiIWm1ISuqfR78fgA+8FJiUqly6A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzozwEaSbRhMheTLcJoWRBgEWUs9UnXoL9LYdAeZ0krsXg//0S5
-	CZ9Y7Wc2tCvstbNKPnl48GSnmvrcDVKFnNmFBaD7Lh3IDxgz9I+I0C4Zvl0wR7aiDdr0dNVVYAp
-	5SpPUiOe+kPwC5tHs/3pJCrksgWAhuB8=
-X-Gm-Gg: ASbGncs0tWgdN3uJvn38kIdl2Tw8uGZUY5hrrURucl37LbaSJqLf/E9lz4BxFbeY+VP
-	yUx3SexMqtAIu59qJCxQQ8rFdtPnKolbEMrFqzm8MgDleNEopdAYSCx8zgoKDDRkqXEyeYL02hY
-	2+DGqZZH1rf3HT3l242xq9TNuGa3gjCEWctyZ14GJTpKth3E4U8m6sQsq/X4aZUIHg1G3DixhwA
-	0i0qrFcJqE8JuKqNXIenjp4RtRWboALQRRdNTz/4I4OzpvUzk75ViRM0s/5
-X-Google-Smtp-Source: AGHT+IETiObzHX/VV0cXhzRIj4fxF8f+A6mx5E8ehEokiBSNKi8vQpl+G4sLTeK/RZ4j1aYpnw7SHZ9/20pZW/k7FFM=
-X-Received: by 2002:a17:90b:4b89:b0:343:87b1:272 with SMTP id
- 98e67ed59e1d1-343dde81703mr2078084a91.22.1762923709575; Tue, 11 Nov 2025
- 21:01:49 -0800 (PST)
+	s=arc-20240116; t=1762925208; c=relaxed/simple;
+	bh=J2yCx8gANXEoEptcoVy/jvxBGR0sLdZaZJNtdCJDhDQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gch/8+hOKsq8/aK41tX1OusqUI/zOYQfcoBoElxyUAIaQDstg3lv0lBnNhNVrXM+9k4kSJ0W1WOzvHEKPJKq0yQ3ARWueRpj+uctJgMroP2d8MpZOqVvHEtAWWi3xs3JkkzYHcVSxrCC1Ikf35xL40tr8/XSI+b7PSK2xxrSTs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CEPWaH13; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762925206; x=1794461206;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=J2yCx8gANXEoEptcoVy/jvxBGR0sLdZaZJNtdCJDhDQ=;
+  b=CEPWaH13QuEHeyuMYIU1ab3uCDunT91ibG8+ITiwmGV/4rNBp0FVol4V
+   0z8xBgPDrfPVWk6HdgpC7Defilr/MJa2GtSZlzk/NFTxtJTK4UUlkOSsO
+   p4CnXaCDA+h8F/7Tf801CtamAQhuPe5m4e5ACvbPLk+MIlzHAn7QU+Og6
+   uyfLG5LJSqBnGZkt3qk2HDAHbCGwgxZkk9c9KUjcFXz+5NeM5QArLRCYk
+   BeMQu+wJlrIl3ov+RTlVM+ko2m6a07fPGEKkiiHhCu7le1LXoNVBDOZrQ
+   Qpvk2HC/+VA3cRMgMFkeYN5WIAK95wLxmoWU7QPM3X7qInRxl7nYBrbmB
+   w==;
+X-CSE-ConnectionGUID: 0XBEb4WGQSm14BHCoeKlrw==
+X-CSE-MsgGUID: 4RcpEAYDR3qVrZgGX7I63A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11610"; a="76331295"
+X-IronPort-AV: E=Sophos;i="6.19,298,1754982000"; 
+   d="scan'208";a="76331295"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 21:26:45 -0800
+X-CSE-ConnectionGUID: 2KuqqVv9TuS5cZ/Ryocc5Q==
+X-CSE-MsgGUID: jYiQEfIURoe/1ab0ampM7A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,298,1754982000"; 
+   d="scan'208";a="189381942"
+Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 21:26:41 -0800
+Message-ID: <f6e4ca74-2b76-4662-97eb-a1c5eab62c9a@linux.intel.com>
+Date: Wed, 12 Nov 2025 13:22:38 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251110033232.12538-1-kernellwp@gmail.com> <a1e5a8db-8382-4f52-8ef2-3b62b0c031ab@linux.ibm.com>
-In-Reply-To: <a1e5a8db-8382-4f52-8ef2-3b62b0c031ab@linux.ibm.com>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Wed, 12 Nov 2025 13:01:38 +0800
-X-Gm-Features: AWmQ_blTs6lsj4lMAVntwEn7Aq9KSMnBiJfURBdxfrpnbZr94GZ6piTCM43MK8k
-Message-ID: <CANRm+CzVtzgYYwgaqEMmsOAo7m=Esd9rd-zbB7zXzgL_p5SgxQ@mail.gmail.com>
-Subject: Re: [PATCH 00/10] sched/kvm: Semantics-aware vCPU scheduling for
- oversubscribed KVM
-To: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Ilya Leoshkevich <iii@linux.ibm.com>, Mete Durlu <meted@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 2/5] iommu: Tiny domain for iommu_setup_dma_ops()
+To: Nicolin Chen <nicolinc@nvidia.com>, joro@8bytes.org, afael@kernel.org,
+ bhelgaas@google.com, alex@shazbot.org, jgg@nvidia.com, kevin.tian@intel.com
+Cc: will@kernel.org, robin.murphy@arm.com, lenb@kernel.org,
+ linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org, patches@lists.linux.dev,
+ pjaroszynski@nvidia.com, vsethi@nvidia.com, helgaas@kernel.org,
+ etzhao1900@gmail.com
+References: <cover.1762835355.git.nicolinc@nvidia.com>
+ <431cccb8279eb84376c641981f57e9ceece8febf.1762835355.git.nicolinc@nvidia.com>
+Content-Language: en-US
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <431cccb8279eb84376c641981f57e9ceece8febf.1762835355.git.nicolinc@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Christian,
+On 11/11/25 13:12, Nicolin Chen wrote:
+> This function can only be called on the default_domain. Trivally pass it
+> in. In all three existing cases, the default domain was just attached to
+> the device.
+> 
+> This avoids iommu_setup_dma_ops() calling iommu_get_domain_for_dev() the
+> that will be used by external callers.
+> 
+> Suggested-by: Jason Gunthorpe<jgg@nvidia.com>
+> Signed-off-by: Nicolin Chen<nicolinc@nvidia.com>
+> ---
+>   drivers/iommu/dma-iommu.h | 5 +++--
+>   drivers/iommu/dma-iommu.c | 4 +---
+>   drivers/iommu/iommu.c     | 6 +++---
+>   3 files changed, 7 insertions(+), 8 deletions(-)
 
-On Mon, 10 Nov 2025 at 20:02, Christian Borntraeger
-<borntraeger@linux.ibm.com> wrote:
->
-> Am 10.11.25 um 04:32 schrieb Wanpeng Li:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > This series addresses long-standing yield_to() inefficiencies in
-> > virtualized environments through two complementary mechanisms: a vCPU
-> > debooster in the scheduler and IPI-aware directed yield in KVM.
-> >
-> > Problem Statement
-> > -----------------
-> >
-> > In overcommitted virtualization scenarios, vCPUs frequently spin on locks
-> > held by other vCPUs that are not currently running. The kernel's
-> > paravirtual spinlock support detects these situations and calls yield_to()
-> > to boost the lock holder, allowing it to run and release the lock.
-> >
-> > However, the current implementation has two critical limitations:
-> >
-> > 1. Scheduler-side limitation:
-> >
-> >     yield_to_task_fair() relies solely on set_next_buddy() to provide
-> >     preference to the target vCPU. This buddy mechanism only offers
-> >     immediate, transient preference. Once the buddy hint expires (typically
-> >     after one scheduling decision), the yielding vCPU may preempt the target
-> >     again, especially in nested cgroup hierarchies where vruntime domains
-> >     differ.
-> >
-> >     This creates a ping-pong effect: the lock holder runs briefly, gets
-> >     preempted before completing critical sections, and the yielding vCPU
-> >     spins again, triggering another futile yield_to() cycle. The overhead
-> >     accumulates rapidly in workloads with high lock contention.
->
-> I can certainly confirm that on s390 we do see that yield_to does not always
-> work as expected. Our spinlock code is lock holder aware so our KVM always yield
-> correctly but often enought the hint is ignored our bounced back as you describe.
-> So I am certainly interested in that part.
->
-> I need to look more closely into the other part.
-
-Thanks for the confirmation and interest! It's valuable to hear that
-s390 observes similar yield_to() behavior where the hint gets ignored
-or bounced back despite correct lock holder identification.
-
-Since your spinlock code is already lock-holder-aware and KVM yields
-to the correct target, the scheduler-side improvements (patches 1-5)
-should directly address the ping-pong issue you're seeing. The
-vruntime penalties are designed to sustain the preference beyond the
-transient buddy hint, which should reduce the bouncing effect.
-
-Best regards,
-Wanpeng
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
 
