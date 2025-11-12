@@ -1,198 +1,160 @@
-Return-Path: <kvm+bounces-62949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2538C54742
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 21:31:03 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C72C6C548AE
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 22:07:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B8390343A87
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 20:30:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CE78A4E117C
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 21:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4638C2D2381;
-	Wed, 12 Nov 2025 20:30:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E222D9EE2;
+	Wed, 12 Nov 2025 21:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y6zEPjHL"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k6+bOlBP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F06299927
-	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 20:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D497229DB64
+	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 21:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762979440; cv=none; b=WjGfntWa9olqSTx+E0Vr2KC7UiTBL3ipwy2tFJrvoIza/nj4aTL4gxXtQtRwAkX1AJwEguVgOVQxvMOoEuGnMlVGlga3Nlot1NiQgBMjelPR/LNTVP1mCwXlgyMMSwvHTWWq6xW8S5/uIkF3H82Z4lYRwe86Nf6qCHpwBJgOJ5w=
+	t=1762981649; cv=none; b=LczTjy06A7zR+Qq7Z/rrw7OANQLBFLs45QUZ7s0kKZHQlXx8MnYckV/NpvXSYVNA+tJAOWCB35OIj4dKCiJ/Ay6QgUf3n8S+2KfPmUIylLSsy8r0xO9WuuBP5haP3yLA6ZhZO9TT3N/dvvgBBh3ijpDQeFvTSBamMfko7AFo20M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762979440; c=relaxed/simple;
-	bh=pP25ULvqx4PA1SCsXvq9hbO/tKY4zzuP1G83Y3q2i8k=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RnN8IxpZ/AAE8EG5RaCEeMYH0/MSoOMOmJZOJybYjIjCWSa5SuNG5rtfyD790t3jkFBzzLw/fLTWY/zhF+c6W4D9zyAJZfMtfZ5jJZ60C1bB0DOr1mWqVa+h+P469EnSCJO8XbXa//s0R0zWmG5I+s6fUirKQO8j0DXaxxR8M5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y6zEPjHL; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b609c0f6522so129879a12.3
-        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 12:30:38 -0800 (PST)
+	s=arc-20240116; t=1762981649; c=relaxed/simple;
+	bh=Z2e8DoPZSUlsjdl9QhSqNgJm8pSP3JCCSTrBSJ21Zyw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TSxEOC3IR0Am2/K46Ni19ZIOwWVp/ReHiQ7Yqzqu7p8YQKCsOIPGQWSh7I1WUO7xfLOaL2i4kPLzH7dxZJG57CtIRATLAsGIVrseeH0+2poV9bIYrzPwZcKXKKdoHjbAoI8QfsPr+Eael3YKRUqx8v9eskNb4QfFSTcEPRkovC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=k6+bOlBP; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-42b3c965df5so59942f8f.1
+        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 13:07:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762979438; x=1763584238; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L3dNSj7TiHzSrBzKacws1VRc8Up4SYRhBM3gT9JOJwI=;
-        b=y6zEPjHL+zBXXVQsZ5BUO7efB1QOsJa08mAvWFEhu1znVuf8Hjfaj3oWk/Eh6x4akP
-         umKUNVKZOafUZyJeVID2f7L28CLsOMhSpQqnhG6a3cXWH43JGlL+eVNi4XQBbbO0IaNh
-         sKCMbXSLzHYUmykZNzG0dpC0JqFkylww2epBrE8D8JoCsPAkOdVOum8vaFTtM/w5DeR4
-         axPqGYfQGyARFdpSJLejL5r99u4uegP/TI0hmXTJif/40LY93hLwD+FZ0ybqfolvNeYW
-         p/MJ/nVX4nWtSCzjc7UoZJVeUCgEpy0jPRvQhe7emCG6JRlI9gxh4gIF7MbVkYv/QjdI
-         TUaQ==
+        d=linaro.org; s=google; t=1762981644; x=1763586444; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ndvKFCJtXmZXWNjsWlnfM9pmpLT2hMmXPRvFvrdoK9k=;
+        b=k6+bOlBPL1B2luKR7q0Zb/V2BSIWsLW7brC4lwGUMbbOTTXv2WHp0/WpqBtgTLt4Cj
+         W9WDzvnNLZh+mUvt3gJNP/EGCHdq5eD7WZ4d8B405Kh9v/lFtNMgG3VKaCuR1E5RrH90
+         eGf+4Kx0upYNf7bOhStJi+KznFEt1gSFgboEIlmkYZUfSMHJJXYxTpGb3VcCZLFTMVrj
+         xHPMFZ6CC78dK3t+IiZxpZYgR/W2KWeP2/2YfMqm/fXy9Ujn1SDF2csqKSkJAQJNEYxf
+         HSrVEmeDwh568aa5gCQgE4Gmu7Bo7ae5yk1aCHYaM85PdHuyZCRGbf9Ca5QAGZ8+ZhuG
+         HYLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762979438; x=1763584238;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L3dNSj7TiHzSrBzKacws1VRc8Up4SYRhBM3gT9JOJwI=;
-        b=eMey6IcJ5Kr97Lgxus9UKajw2dT/HN7M8BykXbUdHJZczHxcp3/tcgtu8ieBGsgFte
-         6BEDC8GlRicU4OUcNCDKDhHkd74ESEfcJ9cLGQ4CHyiEeWqSGbJ/4UdvYSNHCwtSk9Ag
-         3WuK9k21Wo58IAES7h+MXm0GphNuxIGotkzmvgcsvNAy17nBi/mNHYWvVVeahhOodgJc
-         A5xK5a3NmdfU7ra8jprYpxJaFWoM4sCXKCoOt4vLEnbsiuqcdAx+R5yVhnvgGPq/aMCH
-         Dx/NMNmo4mLMiO/zSDPdSY23EoO4gaQkpO6P06TTjq6gEyC3fce2gnw0Ap/lGUBR3P44
-         dW/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ9KkEL6lLw4NysTeYfd36zU513OP0R/dINnJmcFxoUEg00frg+zdhFizZeDFw2ZQBnlQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1vJYcCgrNyuSVWhnJKx5IcSgNiqvw91wU9qEr5y+479Qxa9wZ
-	rbTlBaH5ufQnmR9CBxVKluriGvU9VrPwJzgbFrj0QZ/eduNgJ4y7B9iTRJKDTMtR2hruQTyovMy
-	GS9Ax4Q==
-X-Google-Smtp-Source: AGHT+IFHpp7bNY375rv69dfJVKRP14JO7bDZ6Qzp4pJXKIQ9Tx1TN/S1z7ykvM7IVkTTEWv8EepdbXFLQ7U=
-X-Received: from pgbcw3.prod.google.com ([2002:a05:6a02:4283:b0:bac:a20:5eec])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d09:b0:346:331:97e4
- with SMTP id adf61e73a8af0-3590bd0b3e8mr5777964637.56.1762979438181; Wed, 12
- Nov 2025 12:30:38 -0800 (PST)
-Date: Wed, 12 Nov 2025 12:30:36 -0800
-In-Reply-To: <20251112183836.GBaRTULLaMWA5hkfT9@fat_crate.local>
+        d=1e100.net; s=20230601; t=1762981644; x=1763586444;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ndvKFCJtXmZXWNjsWlnfM9pmpLT2hMmXPRvFvrdoK9k=;
+        b=oTE1BMRwyXLIUSxAXbRtlb80DzPkzGQlK460xv9WA78s5k9Ngn21Q2YeAm1pIi0fzZ
+         MY4HNVvMzVZ20anBIL0g4bOTb+1eUw9Zdud06L3RSdt2xZAFZB66jx79p81xCmHnOo37
+         V4Y8ga8T3Gi3qZdnC5TwYE98eTfOQ+k3aerwI2Lt1aDcC2CIvLdjs4qviYXpea5/vZFv
+         cm1n/GOM3ZJwfeCi/Tks5GTH0r4oUxgfb5l+wzqFl41acdWZb5KfOIxBfOh5GYl3HARO
+         XKOq8TbBJRhkET5Qzd5vofTBQwJ1mR9zhUtqBjn/E8ZToaXkNvajkoUDCkCw2/HO9pth
+         wu1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVLi8KVDL6CPhjG6tcdAc6PJkpSMHrBsOkEBoP3TzC+r/1807hayvTLP9qgoJJD+TwdkvA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXY1RXIzpsvDHYmBZS2nTpXosSNTUaF44QxM1M0ALFFrEPFIR+
+	OTfW61lfjBs+HptcTdmrTE7wC6ambsbSNEgiZmvKfNs3hLDbAj4PvKJJtV0HMeVqY6s=
+X-Gm-Gg: ASbGncvX5UlzN9r3kJiSjhmyPS60WwOWbp1AzoXa0veuqNkpjXk6Mpw1EmyyCiCjeuV
+	lPRi3l9TncWnbsCvJdsVNkytJ02Et9De6rniPoIvtrEJKuzapYdJh302jXByR4AgNwDm2ook51f
+	3av+X3xtzAhCKgu6IpEM9H+2XG6VGYyy8ZMYUMYREtGu0ItbfG/2TEGN0mJH1k29bfNSGCywW2m
+	QrANk0aqnAfKTgEzK21tP1xtnaFdyO7S3oAZlefn0C71O2vFVQBXNf2uVN8nv88JdMb/JqRk2vQ
+	5WZKFQeFU9l6o9GtMAmfwLaQ4473VgFPIsjdBD5HHxSKRCeLWC73z1PPNDhc8uMOa5veG06IO2u
+	/P7Vf5LZ+z4lLXxUx1VyW3wNiIcDoRWMThrwuNZYcCzGVP8oSDnCs96JT7S9V4jBX138HqaN4Tn
+	QoKd1DCP4jxA1sCR+R6faeLg1UQ/Oa2GSTlpwt0mxpd2g=
+X-Google-Smtp-Source: AGHT+IGtaSx6QtlDHy/EycHh0/ZhW1Mmm/5WCyQeOiw9mC05LvLWss/kOLCaCs1PZ52vi6bPz95ITQ==
+X-Received: by 2002:a05:6000:310b:b0:42b:3b4c:f411 with SMTP id ffacd0b85a97d-42b4bdb06f1mr4248875f8f.36.1762981643683;
+        Wed, 12 Nov 2025 13:07:23 -0800 (PST)
+Received: from [192.168.69.210] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b2e96441dsm28506596f8f.23.2025.11.12.13.07.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Nov 2025 13:07:23 -0800 (PST)
+Message-ID: <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org>
+Date: Wed, 12 Nov 2025 22:07:07 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251031003040.3491385-1-seanjc@google.com> <20251031003040.3491385-5-seanjc@google.com>
- <20251112164144.GAaRS4yKgF0gQrLSnR@fat_crate.local> <aRTAlEaq-bI5AMFA@google.com>
- <20251112183836.GBaRTULLaMWA5hkfT9@fat_crate.local>
-Message-ID: <aRTubGCENf2oypeL@google.com>
-Subject: Re: [PATCH v4 4/8] KVM: VMX: Handle MMIO Stale Data in VM-Enter
- assembly via ALTERNATIVES_2
-From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Brendan Jackman <jackmanb@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/2] target/arm/kvm: add kvm-psci-version vcpu property
+Content-Language: en-US
+To: Sebastian Ott <sebott@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+References: <20251112181357.38999-1-sebott@redhat.com>
+ <20251112181357.38999-3-sebott@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20251112181357.38999-3-sebott@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 12, 2025, Borislav Petkov wrote:
-> On Wed, Nov 12, 2025 at 09:15:00AM -0800, Sean Christopherson wrote:
-> > On Wed, Nov 12, 2025, Borislav Petkov wrote:
-> > > So this VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO bit gets set here:
-> > > 
-> > >         if (cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF_MMIO) &&
-> > >             kvm_vcpu_can_access_host_mmio(&vmx->vcpu))
-> > >                 flags |= VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO;
-> > > 
-> > > So how static and/or dynamic is this?
-> > 
-> > kvm_vcpu_can_access_host_mmio() is very dynamic.  It can be different between
-> > vCPUs in a VM, and can even change on back-to-back runs of the same vCPU.
-> 
-> Hmm, strange. Because looking at those things there:
-> 
-> root->has_mapped_host_mmio and vcpu->kvm->arch.has_mapped_host_mmio
-> 
-> they both read like something that a guest would set up once and that's it.
-> But what do I know...
+Hi Sebastian,
 
-They're set based on what memory is mapped into the KVM-controlled page tables,
-e.g. into the EPT/NPT tables, that will be used by the vCPU for that VM-Enter.
-root->has_mapped_host_mmio is per page table.  vcpu->kvm->arch.has_mapped_host_mmio
-exists because of nastiness related to shadow paging; for all intents and purposes,
-I would just mentally ignore that one.
-
-> > > IOW, can you stick this into a simple variable which is unconditionally
-> > > updated and you can use it in X86_FEATURE_CLEAR_CPU_BUF_MMIO case and
-> > > otherwise it simply remains unused?
-> > 
-> > Can you elaborate?  I don't think I follow what you're suggesting.
+On 12/11/25 19:13, Sebastian Ott wrote:
+> Provide a kvm specific vcpu property to override the default
+> (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
+> by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
 > 
-> So I was thinking if you could set a per-guest variable in
-> C - vmx_per_guest_clear_per_mmio or so and then test it in asm:
+> Note: in order to support PSCI v0.1 we need to drop vcpu
+> initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
 > 
-> 		testb $1,vmx_per_guest_clear_per_mmio(%rip)
-> 		jz .Lskip_clear_cpu_buffers;
-> 		CLEAR_CPU_BUFFERS_SEQ;
-> 
-> .Lskip_clear_cpu_buffers:
-> 
-> gcc -O3 suggests also
-> 
-> 		cmpb   $0x0,vmx_per_guest_clear_per_mmio(%rip)
-> 
-> which is the same insn size...
-> 
-> The idea is to get rid of this first asm stashing things and it'll be a bit
-> more robust, I'd say.
-
-VMX "needs" to abuse RFLAGS no matter what, because RFLAGS is the only register
-that's available at the time of VMLAUNCH/VMRESUME.  On Intel, only RSP and
-RFLAGS are context switched via the VMCS, all other GPRs need to be context
-switch by software.  Which is why I didn't balk at Pawan's idea to use RFLAGS.ZF
-to track whether or not a VERW for MMIO is needed.
-
-Hmm, actually, @flags is already on the stack because it's needed at VM-Exit.
-Using EBX was a holdover from the conversion from inline asm to "proper" asm,
-e.g. from commit 77df549559db ("KVM: VMX: Pass @launched to the vCPU-run asm via
-standard ABI regs").
-
-Oooh, and if we stop using bt+RFLAGS.CF, then we drop the annoying SHIFT definitions
-in arch/x86/kvm/vmx/run_flags.h.
-
-Very lightly tested at this point, but I think this can all be simplified to
-
-	/*
-	 * Note, ALTERNATIVE_2 works in reverse order.  If CLEAR_CPU_BUF_VM is
-	 * enabled, do VERW unconditionally.  If CPU_BUF_VM_MMIO is enabled,
-	 * check @flags to see if the vCPU has access to host MMIO, and do VERW
-	 * if so.  Else, do nothing (no mitigations needed/enabled).
-	 */
-	ALTERNATIVE_2 "",									  \
-		      __stringify(testl $VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO, WORD_SIZE(%_ASM_SP); \
-				  jz .Lskip_clear_cpu_buffers;					  \
-				  VERW;								  \
-				  .Lskip_clear_cpu_buffers:),					  \
-		      X86_FEATURE_CLEAR_CPU_BUF_VM_MMIO,					  \
-		      __stringify(VERW), X86_FEATURE_CLEAR_CPU_BUF_VM
-
-	/* Check if vmlaunch or vmresume is needed */
-	testl $VMX_RUN_VMRESUME, WORD_SIZE(%_ASM_SP)
-	jz .Lvmlaunch
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> ---
+>   docs/system/arm/cpu-features.rst |  5 +++
+>   target/arm/cpu.h                 |  6 +++
+>   target/arm/kvm.c                 | 64 +++++++++++++++++++++++++++++++-
+>   3 files changed, 74 insertions(+), 1 deletion(-)
 
 
-> And you don't rely on registers...
-> 
-> and when I say that, I now realize this is 32-bit too and you don't want to
-> touch regs - that's why you're stashing it - and there's no rip-relative on
-> 32-bit...
-> 
-> I dunno - it might get hairy but I would still opt for a different solution
-> instead of this fragile stashing in ZF. You could do a function which pushes
-> and pops a scratch register where you put the value, i.e., you could do
-> 
-> 	push %reg
-> 	mov var, %reg
-> 	test or cmp ...
-> 	...
-> 	jz skip...
-> skip:
-> 	pop %reg
-> 
-> It is still all together in one place instead of spreading it around like
-> that.
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 0d57081e69..e91b1abfb8 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
+>       ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+>   }
+>   
+> +struct psci_version {
+> +    uint32_t number;
+> +    const char *str;
+> +};
+> +
+> +static const struct psci_version psci_versions[] = {
+> +    { QEMU_PSCI_VERSION_0_1, "0.1" },
+> +    { QEMU_PSCI_VERSION_0_2, "0.2" },
+> +    { QEMU_PSCI_VERSION_1_0, "1.0" },
+> +    { QEMU_PSCI_VERSION_1_1, "1.1" },
+> +    { QEMU_PSCI_VERSION_1_2, "1.2" },
+> +    { QEMU_PSCI_VERSION_1_3, "1.3" },
+> +    { -1, NULL },
+> +};
 
-FWIW, all GPRs except RSP are off limits.  But as above, getting at @flags via
-RSP is trivial.
+
+> @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+>                                kvm_steal_time_set);
+>       object_property_set_description(obj, "kvm-steal-time",
+>                                       "Set off to disable KVM steal time.");
+> +
+> +    object_property_add_str(obj, "kvm-psci-version", kvm_get_psci_version,
+> +                            kvm_set_psci_version);
+> +    object_property_set_description(obj, "kvm-psci-version",
+> +                                    "Set PSCI version. "
+> +                                    "Valid values are 0.1, 0.2, 1.0, 1.1, 1.2, 1.3");
+
+Could we enumerate from psci_versions[] here?
+
+>   }
+Thanks,
+
+Phil.
 
