@@ -1,108 +1,156 @@
-Return-Path: <kvm+bounces-62913-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5EF1C53D49
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:03:00 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82459C53D7E
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:05:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A0621343AD6
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 18:02:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EE4E2343A07
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 18:05:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74363491CD;
-	Wed, 12 Nov 2025 18:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E25C34A3D8;
+	Wed, 12 Nov 2025 18:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lv7QB2Dt"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="5rZUyUzr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1247082A;
-	Wed, 12 Nov 2025 18:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB8233468A;
+	Wed, 12 Nov 2025 18:04:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762970558; cv=none; b=up7OeaXhlC98VUXd3Cql+yjEB0o7F5LB9CZhfId8lgZIZkW8arWp0KGfwwXFuIMo0vADX2Q4neihMCvVIYzx//tG+DM7DCGGg44epjZpdkZZok5rBdx2mQZUaU7F00XsIVFthpSf42Aok6UJI3VyUwmxSp9KVgMfxkGln2UBFzw=
+	t=1762970698; cv=none; b=S3r5/ZhVVw8/LLqlUj9wkiZThhG+bYvDMRlpgMPARBim++a/qXqOU96VxVAhKP1KDjBh2f90tQUadbqoEUFA0ASW8zYP6tZ7zFY+znb6BXZ9wjFdHPQ2gflZRWk0INm3UKWpcdOdgQRaDRyl4EkDTOjLKrwtgN6OfUfnBoPDzSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762970558; c=relaxed/simple;
-	bh=KnTdiQGGGnjSRqzwMrenCwldrxhYma7VEYYG7jLAEcc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XLU+TLyIkvwjpHeJWvkTJoWZxKrtSbhaJIB6N6cfnugdyQbwn2+bmYLodMnB2Cqc0dMm1ckIhpIgw4KyKZFbSAcx7FF9Herrrh33DMFhzqTcBYUSFQ/orWDyOdAlInrido7l4/79hFrU9/NupYPsydMrFt1kpnvZvPtrT0pr7I0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lv7QB2Dt; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762970556; x=1794506556;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KnTdiQGGGnjSRqzwMrenCwldrxhYma7VEYYG7jLAEcc=;
-  b=lv7QB2DtE8i7jgWRyx3ygRq/qCpLLsC1wNdE48XPdeDrIva2PFlnKgGf
-   H3DlYAfDOnLBtSrtJesKNyknhnj5jCI4heHY9KLCrXQAOXUv7oW+xq6ch
-   KTCDxLkbZLcN/Nds2QdUckZcGa/dS1Upq7f7NO5msgUqJrGrCaxv+pOn5
-   f987m0cFkO4BAlKrJIoOUHDt3nk0vQmLvhbq412ffZoor8q54JrHXiOxp
-   lyPCXTxyOzcOR6gg4h1b4xPEBW9ELjlMXUn0l1WKmE30UQkVXPPQxO7Ds
-   YpbtEQUrHvWv0EgLPoqb02VPx/cxzkNCScx1Ypcfyncdz0+05SAyMUDQi
-   g==;
-X-CSE-ConnectionGUID: KpfbwXolTsSr+WcvZr/Kag==
-X-CSE-MsgGUID: FmiGtiFRSkCeZ4ssHbBRHw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11611"; a="75653525"
-X-IronPort-AV: E=Sophos;i="6.19,300,1754982000"; 
-   d="scan'208";a="75653525"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 10:02:35 -0800
-X-CSE-ConnectionGUID: 3NNGcx4pSYS0LAJdbYXlFg==
-X-CSE-MsgGUID: z6HT8Ee4TDuHE+ieaUhB2Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,300,1754982000"; 
-   d="scan'208";a="189057472"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 10:02:35 -0800
-Date: Wed, 12 Nov 2025 10:02:29 -0800
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Brendan Jackman <jackmanb@google.com>
-Subject: Re: [PATCH v4 1/8] x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
-Message-ID: <20251112180229.qmncwarn2w7edt3i@desk>
-References: <20251031003040.3491385-1-seanjc@google.com>
- <20251031003040.3491385-2-seanjc@google.com>
- <20251107185941.GSaQ5BnYzN_X9J3Qa0@fat_crate.local>
+	s=arc-20240116; t=1762970698; c=relaxed/simple;
+	bh=thaPD+WJ3wmrVp9/rylWOTphTDjNy0S2OUsOypRmUJ4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oj0H0QxL4eNCH6uQuApT6U65NY+PZYM29BG3Zk1NTJeQ+xFrEqLxNEGeJf2q92NnofkSrLgsnunbpMERzXntY222/gjpkTLMEyl3f75e0Bka9l2lPZWCjiIIivAkd5HIleffvoByaend2bNiDAZGTAO15AHX5KbYioQF6hJdr8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=5rZUyUzr; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ACCrah91140123;
+	Wed, 12 Nov 2025 10:04:51 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=5f9Du9Vto8AzV6Fmh5aBZhgsQoxQEjzcPQeDRAHFNWg=; b=5rZUyUzrqiz8
+	1QiVHBAd/AWjgKNsb4bzEYDSIuwG2uMS6u4vtXXLNscWmORGIVTB94yJ7bFMgER9
+	bZ4Eh6ajR0QAuEhNp+ENjKcVs4YGgNO3JeCxrv5fCXGt0q8IA+dJ7JP2MjSKRPQ4
+	XNe7+VFHE2jmzAEDhc6jRue+sWG2tlh5qUWZd4E7nZBJx90m0mHSY6g/6sTOmVFK
+	yXcYp0BRhNY3yfu5USSmL6rV9+Ujq3/WDj7FUoXJQ7EtxDzSs085XeRjxdyc8Iee
+	LqVFwK//7mKbqz/H69J7RJSmgjm06XqDhKzNpwPtqtnjsquNwRs698K7xbbqk61s
+	H7iotA1lIQ==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4actn3jh3y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 12 Nov 2025 10:04:51 -0800 (PST)
+Received: from devgpu015.cco6.facebook.com (2620:10d:c0a8:1b::2d) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Wed, 12 Nov 2025 18:04:49 +0000
+Date: Wed, 12 Nov 2025 10:04:43 -0800
+From: Alex Mastro <amastro@fb.com>
+To: David Matlack <dmatlack@google.com>
+CC: Alex Williamson <alex@shazbot.org>, Shuah Khan <shuah@kernel.org>,
+        Jason
+ Gunthorpe <jgg@ziepe.ca>, <kvm@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 0/4] vfio: selftests: update DMA mapping tests to use
+ queried IOVA ranges
+Message-ID: <aRTMO7GtBTcxaPj5@devgpu015.cco6.facebook.com>
+References: <20251111-iova-ranges-v3-0-7960244642c5@fb.com>
+ <CALzav=cmkiFUjENpYk3TT7czAeoh8jzp4WX_+diERu7JhyGCpA@mail.gmail.com>
+ <aRTGbXB6gtkKVnLo@devgpu015.cco6.facebook.com>
+ <CALzav=fwE2kPqJUiB2J20pK5bH_-1XvONQXz1DpsMSOCKa=X+g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <20251107185941.GSaQ5BnYzN_X9J3Qa0@fat_crate.local>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALzav=fwE2kPqJUiB2J20pK5bH_-1XvONQXz1DpsMSOCKa=X+g@mail.gmail.com>
+X-Proofpoint-ORIG-GUID: gmGOXJurSDtruhadA44ZGG4uiqxlKzIW
+X-Authority-Analysis: v=2.4 cv=PeDyRyhd c=1 sm=1 tr=0 ts=6914cc43 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=FOH2dFAWAAAA:8 a=jP91L4faPYvz1sexuHQA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: gmGOXJurSDtruhadA44ZGG4uiqxlKzIW
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEyMDE0NSBTYWx0ZWRfX7rN/ubatQyMR
+ cAS+m6+9TjvTgRrg5unP29hU1K5axqvnlTEqZlFJNGXLUGhHeRBWSk0o9mk6MFTeM2nPAVgmBiy
+ zgYeNR/DJOkMefiZ0InE+0P3BlmpoDKk8RsYi2SheBVePZg3X0mK9ftc9nbwhjJ/36MBrH0LOks
+ ya3sPoWGACTK+1IOiFf0RqfdvuwYNmUI/vp4IQdZ6tk+JVcotMadppvue3MLCSef6Jxni2IMUxA
+ 1bNH0aP+3txcurtOUGg0BS4MaLHxwu339WbKE239MMDe74nwHtn7J0NZTa8KT1ypOtHyBXbm6mZ
+ pSpT/NwRQCxN6r35pAW2JEBNtlsuTEAAZniPotKfJxDW7pWFtvMAXwgE1ZllKHHJE277wxKEIsF
+ bOV3qL5nnEslcF37DIcpilTYOtVTCA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-12_06,2025-11-11_03,2025-10-01_01
 
-On Fri, Nov 07, 2025 at 07:59:41PM +0100, Borislav Petkov wrote:
-> On Thu, Oct 30, 2025 at 05:30:33PM -0700, Sean Christopherson wrote:
-> > From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> > 
-> > TSA mitigation:
-> > 
-> >   d8010d4ba43e ("x86/bugs: Add a Transient Scheduler Attacks mitigation")
-> > 
-> > introduced VM_CLEAR_CPU_BUFFERS for guests on AMD CPUs. Currently on Intel
-> > CLEAR_CPU_BUFFERS is being used for guests which has a much broader scope
-> > (kernel->user also).
-> > 
-> > Make mitigations on Intel consistent with TSA. This would help handling the
+On Wed, Nov 12, 2025 at 09:51:35AM -0800, David Matlack wrote:
+> On Wed, Nov 12, 2025 at 9:40 AM Alex Mastro <amastro@fb.com> wrote:
+> >
+> > Hey David, is vfio_pci_driver_test known to be in good shape? Both on the base
+> > commit and after my series, I am seeing below, which results in a KSFT_SKIP.
+> > Invoking other tests in a similar way actually runs things with expected
+> > results (my devices are already bound to vfio-pci before running anything).
+> >
+> > base commit: 0ed3a30fd996cb0cac872432cf25185fda7e5316
+> >
+> > $ vfio_pci_driver_test -f 0000:05:00.0
+> > No driver found for device 0000:05:00.0
+> >
+> > Same thing using the run.sh wrapper
+> >
+> > $ sudo ./run.sh -d 0000:05:00.0 ./vfio_pci_driver_test
+> > + echo "0000:05:00.0" > /sys/bus/pci/drivers/vfio-pci/unbind
+> > + echo "vfio-pci" > /sys/bus/pci/devices/0000:05:00.0/driver_override
+> > + echo "0000:05:00.0" > /sys/bus/pci/drivers/vfio-pci/bind
+> >
+> > No driver found for device 0000:05:00.0
+> > + echo "0000:05:00.0" > /sys/bus/pci/drivers/vfio-pci/unbind
+> > + echo "" > /sys/bus/pci/devices/0000:05:00.0/driver_override
+> > + echo "0000:05:00.0" > /sys/bus/pci/drivers/vfio-pci/bind
+> >
+> > device = vfio_pci_device_init(device_bdf, default_iommu_mode);
+> > if (!device->driver.ops) {
+> >         fprintf(stderr, "No driver found for device %s\n", device_bdf);
+> >         return KSFT_SKIP;
+> > }
+> >
+> > Is this meant to be a placeholder for some future testing, or am I holding
+> > things wrong?
 > 
-> "consistent" as in "use the VM-specific buffer clearing variant in VMX too"?
-
-That's correct.
-
-> In any case:
+> What kind of device are you using?
 > 
-> Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
+> This test uses the selftests driver framework, so it requires a driver
+> in tools/testing/selftests/vfio/lib/drivers to function. The driver
+> framework allows tests to trigger real DMA and MSIs from the device in
+> a controlled, generic, way.
 
-Thanks.
+Ah, TIL about that concept. This is with one of our internal compute
+accelerators, so not surprising that I'm seeing a skip then.
+
+> We currently only have drivers for Intel DSA and Intel CBDMA
+> devices.So if you're not using one of those devices,
+> vfio_pci_driver_test exiting with KSFT_SKIP is entirely expected.
+> 
+> I would love to add support for more devices. Jason Gunthrope
+> suggested supporting a driver for mlx5 class hardware, since it's
+> broadly available. I've also had some discussions about adding a
+> simple emulated PCIe device to QEMU for running VFIO selftests within
+> VMs.
+
+I do have access to mlx5 hardware FWIW, so that would be cool.
+
+Thanks for the explanation!
+
+Alex
 
