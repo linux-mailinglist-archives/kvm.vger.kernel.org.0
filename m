@@ -1,79 +1,83 @@
-Return-Path: <kvm+bounces-62904-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62905-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E9BC53BA7
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 18:40:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1564FC53D21
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:00:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 579D43447E4
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 17:40:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 50C794FFD0A
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 17:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9244C348877;
-	Wed, 12 Nov 2025 17:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BAB0348886;
+	Wed, 12 Nov 2025 17:39:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gO8rYmsX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XE6L3XRY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CDA346FB9
-	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 17:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE0F347BD2
+	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 17:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762969189; cv=none; b=eKimAdvHg4A7bxGpkEIdXxtxL1+YYkHTlxIz6MPuv7U0vMnxPyiY6L6vf0TRfZBQIWEqovcTOyil+lsHJHsgD2JyyPE93LD08SHxLVQxhGsZMHWtKUxjghHlxEe5KELUdCZidTR046qGiw1Xb8jrl9e7KAOoQ2KCHRmGbWHLCVA=
+	t=1762969191; cv=none; b=euPi+bbc3/LyCOcsoIy/Sk+kpgpP3clnIjMB8HTiOCd93T5SPh3oM0fOGhW3YBfSAViNQCMUVJaiU/ZHafz/Y2TQ3WPZe1fvR25z/mJY9i7AgPbg1riTlrI4m4shZVmhXi4bQ9n+vVdnXH851RH+dztfqgxRJa9sQK1F44VzG7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762969189; c=relaxed/simple;
-	bh=cQTvfgJcnon9Tazw0uXymglv7tr+UGFUUQGDrTC8H5s=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BArDFVbcaGgN430gu+zsNUYbK7m+QXg688NJv4a0SWmgl7n/sGV2d4mXN4tKiomd0IGW3g0neIfcb71Y0mE0WePzCEj2cmIlqvSVCVlLSjschrAezGiGiJDiFRyHNt0Cc8oERHqSvixE+2lD4aB+ODaLeusblHtnl+WH7/QjI1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gO8rYmsX; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1762969191; c=relaxed/simple;
+	bh=3wjLaIqPwLhtaQu3sd4+Wy6uET4Lt+dOtxB/f9/oZG0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ep8pCl5+Ylih6KdK3K9tXQYqr4XQejB90gRwu11MkIrLbQDnfWRjrDa1bYSFJzU56Oj8KzNNypE1nz2eXv2HZM/n2dnUI7yCezU2/gA0XSiAfTEPZxPgrG0qVBpjPFhnC+E/WO7EBL02MIiMwpVBmcU605tV8Wd1IIyNBe0uv+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XE6L3XRY; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3439fe6229aso1470285a91.1
-        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 09:39:47 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b969f3f5bb1so2784545a12.0
+        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 09:39:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762969187; x=1763573987; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Al8Jq0oWPVD59rhTUTD0bttySyzqdJx7uMImvbMrtTk=;
-        b=gO8rYmsXYqP16oDY9GqSBsWpQRrYgK9+s/Sgnvaqo1md50DnX4oEtQpTxWKe2nBAbD
-         a0FkAtgn9g+pZwBZXyti1UOkZKFJi2p64MFpqXdjGfeXo3tXA1Rq+6SckjQd9l/pHhGP
-         vdE++uICVE/mq39pVcaym2rYA0Wu2Zi8eon//em5ye/4YM5QQx5P1iUByCtPybut7+Gg
-         0VYj0hJhgeTDSU3ulcjlm/Zhz/vC85tL8clVzX67aLigwm4fDkmSz0Q+ct9Xta4BPeeM
-         rrJ9T6LoZZ2XnNOFXMIDpJXqdtmqMTJ2lbv/NDhn0OP0qXy2h9UJj+rCvgxIMGOWAWoM
-         SjQg==
+        d=google.com; s=20230601; t=1762969189; x=1763573989; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=B2W7BhYEA5i1i5woy4wPEVZBPGLjZrrhpv/7K43a+Bc=;
+        b=XE6L3XRYIGnHXqzE2hZSNKwfPkIn+KABRpvnxQEPdhP4eA0mYWv2Mc2BVdivuxLdGC
+         ZyUgylMBRHQymM1eD3cF0fpF5z5nj434JhRQjsYJ1aH/v+rzubvMv1HHU1vXM7BObPU1
+         dLKdhw/05wX81YDE9rPIi6yMiWbYWC2cTVnK86ExM4NQpInpklfh+zQYq3mVYh7lv7ZU
+         mDOXvlacBI6ZSswAXjmtkZAMa81eIEFBTASlnbKDUhjC7SD0EZVUunJzBsmV71JiNh7o
+         G/Slb6srgBDzWkTVnEf7deRzZKKv8sGasq9mDjy5DiIuO4bJEkuOfb5PekIAfo0XX7z3
+         ICtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762969187; x=1763573987;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Al8Jq0oWPVD59rhTUTD0bttySyzqdJx7uMImvbMrtTk=;
-        b=BqS1pWvc2cW9HTOHlb5QLF8DsQogrFBadE5UgebsXsnAHE2/Uhq6s8LXscy8UOxfWP
-         qT8eIlnJH/A3ykundIuVBm8uI225CcnGtSSSq/XraMdMANmEfS5RJGNyC6jfxNvNMgv7
-         yQ31keOqD3JiY9rVGkcSFJu8fsIymIOMc5YxoSebIK4scvwaZfxU8BrMJFWDONTukmzl
-         l1CC4CzvOoy0wJdUfhUXwH7sJ7DnN4URISe2gMkNLugSOMZsCqZ4Ou2+nks9p+Puokf3
-         0OGKohru09P88izyr3gP5RLD2LmOMFYoO7dfXnZzjuRI/Z+yBIMnXwW5uSWC26M1Ek7O
-         KNcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXOkeqcfyh0uMy6LyH5vcnBqABjBCBBUIWhbMpa1r3gVyj2Y9vRtFvWlE35BuZ+zzijCZ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+DsDR5X+TG6q8FdzIMb32hfEXqDAtd2AT291qiF0vxolneE29
-	LI+7ccik3UGCj5svyLfGU+A+FcEnTAqFkrN67FXXzsVuEAUy+0XjS9J5WeblfiuxmhUtS+Y3YEj
-	0W1ypmQ==
-X-Google-Smtp-Source: AGHT+IFPhXy58yihQJ69w+xNEF4NV2MXVm+vSkkcvlcTqNBe2Kw+QHSUNQCz0RwaERkCFBa+qLKJT/z5qkw=
-X-Received: from pjnx3.prod.google.com ([2002:a17:90a:8a83:b0:340:e8f7:1b44])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5201:b0:32e:3592:581a
- with SMTP id 98e67ed59e1d1-343eaca9dbfmr208175a91.17.1762969187027; Wed, 12
- Nov 2025 09:39:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762969189; x=1763573989;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=B2W7BhYEA5i1i5woy4wPEVZBPGLjZrrhpv/7K43a+Bc=;
+        b=QtannmFPV4bsrdnsVWDxsPKLHn+ArQrxyjKclaAbBPYZLN9zcbyd1r6wzbVwyUVdN1
+         RYAuzVhKCALk9+s3cr4rwo924NfqEDMWlrtM8pSe1AkpjlFCzYOgeAiusfxUFudqFJgK
+         9xKTi2E95Yc77akjepMkf/zRUfS8dKgYGfNq/x3UbUtiIlRL/XH2kzc1m/8h6aYqeNYG
+         rd/OjvLJgZKd6fq0ue2EW05160kzPVYHIcvSFmAUWJCgWV2EzYwo9BWr3HmROqGqr1eV
+         PT47mGS5aF1bZuJOLTcAE143FDaqdg5tOgWjmXWNi+C1KPTsIbjQNYCtNc2I1Z81k1kO
+         lTAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWovETS9HhWZ5SF/fORlKkhig+jwEkoSucHSeDHHpF5YjZPJpaA3XqkeAD7AAf4r/nQaF0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpfMk/Pa4J0oGgdX59KWXkc+q7Pioo/YibTUpb8cCbq8Xq2zvl
+	+LV83a2LGHRSZ8Wkb1cwmM6HRA+eS+ZIriXnkLZ5y18jlRzIXGwlQefpsk+d66PteniNKK6RfNU
+	7Vl4nSA==
+X-Google-Smtp-Source: AGHT+IGQoB1Kabu3uhkCb7ua9Zbxd1SwMYzdy0+WZvzbXxJsOOkw0xVig1+MnTLbGmRa1/KiP7NDHIAhv+E=
+X-Received: from plbks6.prod.google.com ([2002:a17:903:846:b0:27d:1f18:78ab])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d2c9:b0:297:e66a:2065
+ with SMTP id d9443c01a7336-2984ee00891mr56835055ad.56.1762969188545; Wed, 12
+ Nov 2025 09:39:48 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 12 Nov 2025 09:39:40 -0800
+Date: Wed, 12 Nov 2025 09:39:41 -0800
+In-Reply-To: <20251112173944.1380633-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20251112173944.1380633-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251112173944.1380633-1-seanjc@google.com>
-Subject: [PATCH 0/4] x86: Restrict KVM-induced symbol exports to KVM
+Message-ID: <20251112173944.1380633-2-seanjc@google.com>
+Subject: [PATCH 1/4] x86/bugs: Drop unnecessary export of "x86_spec_ctrl_base"
 From: Sean Christopherson <seanjc@google.com>
 To: Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
 	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -87,66 +91,28 @@ Cc: linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
 	Kai Huang <kai.huang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Leverage and extend KVM's macro shenanigans to export symbols for KVM if
-and only if kvm{,-amd,intel}.ko is being built as a module, and only for
-the KVM modules that are being built.
+Don't export x86_spec_ctrl_base as it's used only in bugs.c and process.c,
+neither of which can be built into a module.
 
-Note, this approach isn't 100% precise, as exports that are only strictly
-necessary for one of KVM's modules will get exported for all KVM modules.
-But I don't see any value in being super precise as it's not like kvm.ko is
-any more trustworthy tha kvm-{amd,intel}.ko (and it's easy to circumvent
-"for module" exports by abusing module names (in out-of-tree code)).  And
-maintaining precise exports would likely be a nightmare (as would writing
-the macros to get the exports right).
+No functional change intended.
 
-Patches 1-3 drop superfluous exports that I found while digging around for
-KVM-only exports.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kernel/cpu/bugs.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Sean Christopherson (4):
-  x86/bugs: Drop unnecessary export of "x86_spec_ctrl_base"
-  x86/mtrr: Drop unnecessary export of "mtrr_state"
-  x86/mm: Drop unnecessary export of "ptdump_walk_pgd_level_debugfs"
-  x86: Restrict KVM-induced symbol exports to KVM modules where
-    obvious/possible
-
- arch/x86/entry/entry.S             |  7 ++-
- arch/x86/entry/entry_64.S          |  3 +-
- arch/x86/entry/entry_64_fred.S     |  3 +-
- arch/x86/events/amd/core.c         |  5 ++-
- arch/x86/events/core.c             |  7 +--
- arch/x86/events/intel/lbr.c        |  3 +-
- arch/x86/events/intel/pt.c         |  7 +--
- arch/x86/include/asm/kvm_types.h   |  5 +++
- arch/x86/kernel/apic/apic.c        |  3 +-
- arch/x86/kernel/apic/apic_common.c |  3 +-
- arch/x86/kernel/cpu/amd.c          |  4 +-
- arch/x86/kernel/cpu/bugs.c         | 18 ++++----
- arch/x86/kernel/cpu/bus_lock.c     |  3 +-
- arch/x86/kernel/cpu/common.c       |  7 +--
- arch/x86/kernel/cpu/mtrr/generic.c |  1 -
- arch/x86/kernel/cpu/sgx/main.c     |  3 +-
- arch/x86/kernel/cpu/sgx/virt.c     |  5 ++-
- arch/x86/kernel/e820.c             |  3 +-
- arch/x86/kernel/fpu/core.c         | 21 ++++-----
- arch/x86/kernel/fpu/xstate.c       |  7 +--
- arch/x86/kernel/hw_breakpoint.c    |  3 +-
- arch/x86/kernel/irq.c              |  3 +-
- arch/x86/kernel/kvm.c              |  5 ++-
- arch/x86/kernel/nmi.c              |  5 +--
- arch/x86/kernel/process_64.c       |  5 +--
- arch/x86/kernel/reboot.c           |  5 ++-
- arch/x86/kernel/tsc.c              |  1 +
- arch/x86/lib/cache-smp.c           |  9 ++--
- arch/x86/lib/msr.c                 |  5 ++-
- arch/x86/mm/dump_pagetables.c      |  1 -
- arch/x86/mm/pat/memtype.c          |  3 +-
- arch/x86/mm/tlb.c                  |  5 ++-
- arch/x86/virt/vmx/tdx/tdx.c        | 69 +++++++++++++++---------------
- include/linux/kvm_types.h          | 14 ++++++
- 34 files changed, 144 insertions(+), 107 deletions(-)
-
-
-base-commit: 19e2126bba55df9de15d9100b922df1dad6d39a4
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index d7fa03bf51b4..57c1d0ed36a5 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -102,7 +102,6 @@ static void __init vmscape_apply_mitigation(void);
+ 
+ /* The base value of the SPEC_CTRL MSR without task-specific bits set */
+ u64 x86_spec_ctrl_base;
+-EXPORT_SYMBOL_GPL(x86_spec_ctrl_base);
+ 
+ /* The current value of the SPEC_CTRL MSR with task-specific bits set */
+ DEFINE_PER_CPU(u64, x86_spec_ctrl_current);
 -- 
 2.51.2.1041.gc1ab5b90ca-goog
 
