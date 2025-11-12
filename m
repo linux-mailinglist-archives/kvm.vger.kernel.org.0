@@ -1,156 +1,149 @@
-Return-Path: <kvm+bounces-62914-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62915-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82459C53D7E
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:05:08 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABF09C53E57
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:23:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EE4E2343A07
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 18:05:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9673F4F205A
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 18:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E25C34A3D8;
-	Wed, 12 Nov 2025 18:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094B834A3B0;
+	Wed, 12 Nov 2025 18:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="5rZUyUzr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EdVHQASl";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tmer2xaj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB8233468A;
-	Wed, 12 Nov 2025 18:04:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2CB33893A
+	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 18:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762970698; cv=none; b=S3r5/ZhVVw8/LLqlUj9wkiZThhG+bYvDMRlpgMPARBim++a/qXqOU96VxVAhKP1KDjBh2f90tQUadbqoEUFA0ASW8zYP6tZ7zFY+znb6BXZ9wjFdHPQ2gflZRWk0INm3UKWpcdOdgQRaDRyl4EkDTOjLKrwtgN6OfUfnBoPDzSY=
+	t=1762971252; cv=none; b=LQCuO3otAZgL2MIH9Hhn8qRKouqpqCFJz7odBUqCtEu9Xa/Qu6q4t4yFvi97aiouFpPQHQH7/YNUh4u+TaZvcRG1RwR/TVKMA58EZFHFKGOcMnOoO+AeYSGT77bP84Md9gQkTyd8FIAJgFAKIKUKSHJ76bgIZBumyURLzWSs+jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762970698; c=relaxed/simple;
-	bh=thaPD+WJ3wmrVp9/rylWOTphTDjNy0S2OUsOypRmUJ4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Oj0H0QxL4eNCH6uQuApT6U65NY+PZYM29BG3Zk1NTJeQ+xFrEqLxNEGeJf2q92NnofkSrLgsnunbpMERzXntY222/gjpkTLMEyl3f75e0Bka9l2lPZWCjiIIivAkd5HIleffvoByaend2bNiDAZGTAO15AHX5KbYioQF6hJdr8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=5rZUyUzr; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ACCrah91140123;
-	Wed, 12 Nov 2025 10:04:51 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=5f9Du9Vto8AzV6Fmh5aBZhgsQoxQEjzcPQeDRAHFNWg=; b=5rZUyUzrqiz8
-	1QiVHBAd/AWjgKNsb4bzEYDSIuwG2uMS6u4vtXXLNscWmORGIVTB94yJ7bFMgER9
-	bZ4Eh6ajR0QAuEhNp+ENjKcVs4YGgNO3JeCxrv5fCXGt0q8IA+dJ7JP2MjSKRPQ4
-	XNe7+VFHE2jmzAEDhc6jRue+sWG2tlh5qUWZd4E7nZBJx90m0mHSY6g/6sTOmVFK
-	yXcYp0BRhNY3yfu5USSmL6rV9+Ujq3/WDj7FUoXJQ7EtxDzSs085XeRjxdyc8Iee
-	LqVFwK//7mKbqz/H69J7RJSmgjm06XqDhKzNpwPtqtnjsquNwRs698K7xbbqk61s
-	H7iotA1lIQ==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4actn3jh3y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 12 Nov 2025 10:04:51 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Wed, 12 Nov 2025 18:04:49 +0000
-Date: Wed, 12 Nov 2025 10:04:43 -0800
-From: Alex Mastro <amastro@fb.com>
-To: David Matlack <dmatlack@google.com>
-CC: Alex Williamson <alex@shazbot.org>, Shuah Khan <shuah@kernel.org>,
-        Jason
- Gunthorpe <jgg@ziepe.ca>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 0/4] vfio: selftests: update DMA mapping tests to use
- queried IOVA ranges
-Message-ID: <aRTMO7GtBTcxaPj5@devgpu015.cco6.facebook.com>
-References: <20251111-iova-ranges-v3-0-7960244642c5@fb.com>
- <CALzav=cmkiFUjENpYk3TT7czAeoh8jzp4WX_+diERu7JhyGCpA@mail.gmail.com>
- <aRTGbXB6gtkKVnLo@devgpu015.cco6.facebook.com>
- <CALzav=fwE2kPqJUiB2J20pK5bH_-1XvONQXz1DpsMSOCKa=X+g@mail.gmail.com>
+	s=arc-20240116; t=1762971252; c=relaxed/simple;
+	bh=2fL91WULS/rZQmHZyuQUO6TygM4iRQwAhrVr9f1eNTg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MIL3NS0cJrjgkYdPKXhKR1kd9yHGIpVqISDQn9cfmeMDkomdyMMLCNwUra+Z31D0bpydSEmjbkgPTkY+/W57lXLu/D5xOEl+kXb4rwPKk9li7WqfkbqptV5lEdUdzkQKn/yEiP0N3twW9QNVZ/eHauls8tgH2zPkpiADgPgP1so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EdVHQASl; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tmer2xaj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762971249;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=6wkDGLNl95u4gTMNts1lwy5hnz5zbSzJt2V8JBhOwjc=;
+	b=EdVHQASlogO70eec98x6Xu2BHzJt/yYVTnSA+zeNrLELO/uDenHifZU93T6Z32gM+GP5Jz
+	H40gVR+vi1QHCZKu0FjTQTQulGlEGY1yKqwpWXRB1V5GcMcjYBWwWPjED6erApm39CP6Ml
+	Uzzx/tzNC4tW2u4ehjmdBf9REQBndXI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-627-PSvVwQHNPryvIIlPNJ1cwg-1; Wed, 12 Nov 2025 13:14:07 -0500
+X-MC-Unique: PSvVwQHNPryvIIlPNJ1cwg-1
+X-Mimecast-MFC-AGG-ID: PSvVwQHNPryvIIlPNJ1cwg_1762971246
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-46e39567579so116515e9.0
+        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 10:14:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762971246; x=1763576046; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6wkDGLNl95u4gTMNts1lwy5hnz5zbSzJt2V8JBhOwjc=;
+        b=tmer2xajez/YJc1kGstBhatc7bkKiYI7FmN5XKweU2FZAnGDTRjNLsl8UOjcc8+Whg
+         3ujCjSnwijmmIW/Ylw0hbGV/pr4+3IHb3i7qeqXqLEn3Z0fEGxTKhq9Zi4YfR3o3WRk0
+         pqNnRZzgFEPq1PGHUx5pXpXbTmmii+MSEq4O2ILZ5nmdOOkG/I8EeFoebD/5FnqEokVJ
+         U+jetsrr5eCZRwhWhKqryessvh91XDGnIsfxs98xc2cXPtv4XoMbyALFx4hFufVFobWT
+         n8OYwtcAzY16jpY6QPd3+tEaVQyJd1/IeTcWQ9ZsWkMUUYxOyfVK5jeUhduz9srrmBk3
+         MsDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762971246; x=1763576046;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6wkDGLNl95u4gTMNts1lwy5hnz5zbSzJt2V8JBhOwjc=;
+        b=YPwxCeekvsA+YxMNI3FXR1kAgpwsoS1W8lIFANBppkF6+7+LLAYY8LyobY25U2P8TB
+         wqzyL41+inle/oYz7VOfb3DGTPvjkqCiNA/kHJsAZ401s5EeOoMuaU99UM3Iq2OcnUrQ
+         fgkFmslqL45mJiEAU/TydeTVQ5tA6A7F3AOho1c+6Mo+KaPwccNCVnDyviy/iJ9PdlSK
+         vAYvIqRVVdovahUlQAyraiHLJRSUb1YEZ0BB1cnqKqj1R4W/fDJIi7PHhLxVQSILB9wQ
+         78W0G5CwZ3kED4BBzB3AkldXuvXiTbAeZEheWcrcY6HimeDfFewdoiI6o6zeHoETIyK3
+         sHiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUtfOzgDr8RepYaXFmLECK5xdds5G3c+B/CuZaW9BVH7G/gH2u+OVGUvg1k1R2avPI+J24=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeUkWuKJaYCPfM07qDXgHy2RXYhAOQBUWmzoHGBH2lu1sF9Bwt
+	azhtupZxsWtruDs3SHGnG5a/AeSnlqrzUz6ZToGr4SwDsthK30UesLJc+ox3yoYrnHoDeiazazl
+	KUOEOsJSyLUSzGSyJI6jfxpzsAw2sy2Zh67jNVAO770i9hn6n+jo8Tg==
+X-Gm-Gg: ASbGncubmRli5wNuclsHJmfVmoSWZ5kGEibl5wqTeegFQhI+aeDepGhCBQ1KdOejhQQ
+	EtZOoAkfIdxBs3dwFeNcxnMQgS80UKUX8TSgafVxqw9w8xk5H6sT3bdUxAHVpkTTvxfsW0qyMV2
+	1824daFFxhRILRf9DO6tddamb8Xdb1oUfCwGnaNNEBc27kvoFjKCYWMhEF7USQdDjrU4Xoywzfj
+	bSBd9UjHNy6pY14POO0IRE6DXtpBOv5CXdru4btgeQJpzMw8dBIcYRRz9UpgaS9cI097szPszBY
+	nbeoGf3r1YGq8NlrD+N5loeKpSO40i7RmQFZSn2PWzWjlmy1V9wxbaqe9DQi9N/Uhz/dgTaRHtt
+	vRIy4yvILc6/TFAOgOwJCvfWVa9EIx1o3uC++GWCPQzvGVOxVCDdlzByWjkOxhA==
+X-Received: by 2002:a05:600c:4f54:b0:477:7ab8:aba with SMTP id 5b1f17b1804b1-47787071103mr41219905e9.1.1762971246462;
+        Wed, 12 Nov 2025 10:14:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG9+tZW+TZfDNytcYdvgsMKLxtasoyhEGtTeovHC2gFRRAmyVWZ9b21XTXgVv0PcfEXirpotw==
+X-Received: by 2002:a05:600c:4f54:b0:477:7ab8:aba with SMTP id 5b1f17b1804b1-47787071103mr41219625e9.1.1762971246059;
+        Wed, 12 Nov 2025 10:14:06 -0800 (PST)
+Received: from rh.fritz.box (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47787e51e49sm46851355e9.7.2025.11.12.10.14.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 10:14:05 -0800 (PST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>
+Cc: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Sebastian Ott <sebott@redhat.com>
+Subject: [PATCH v3 0/2]  arm: add kvm-psci-version vcpu property
+Date: Wed, 12 Nov 2025 19:13:55 +0100
+Message-ID: <20251112181357.38999-1-sebott@redhat.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALzav=fwE2kPqJUiB2J20pK5bH_-1XvONQXz1DpsMSOCKa=X+g@mail.gmail.com>
-X-Proofpoint-ORIG-GUID: gmGOXJurSDtruhadA44ZGG4uiqxlKzIW
-X-Authority-Analysis: v=2.4 cv=PeDyRyhd c=1 sm=1 tr=0 ts=6914cc43 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=FOH2dFAWAAAA:8 a=jP91L4faPYvz1sexuHQA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: gmGOXJurSDtruhadA44ZGG4uiqxlKzIW
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEyMDE0NSBTYWx0ZWRfX7rN/ubatQyMR
- cAS+m6+9TjvTgRrg5unP29hU1K5axqvnlTEqZlFJNGXLUGhHeRBWSk0o9mk6MFTeM2nPAVgmBiy
- zgYeNR/DJOkMefiZ0InE+0P3BlmpoDKk8RsYi2SheBVePZg3X0mK9ftc9nbwhjJ/36MBrH0LOks
- ya3sPoWGACTK+1IOiFf0RqfdvuwYNmUI/vp4IQdZ6tk+JVcotMadppvue3MLCSef6Jxni2IMUxA
- 1bNH0aP+3txcurtOUGg0BS4MaLHxwu339WbKE239MMDe74nwHtn7J0NZTa8KT1ypOtHyBXbm6mZ
- pSpT/NwRQCxN6r35pAW2JEBNtlsuTEAAZniPotKfJxDW7pWFtvMAXwgE1ZllKHHJE277wxKEIsF
- bOV3qL5nnEslcF37DIcpilTYOtVTCA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-12_06,2025-11-11_03,2025-10-01_01
 
-On Wed, Nov 12, 2025 at 09:51:35AM -0800, David Matlack wrote:
-> On Wed, Nov 12, 2025 at 9:40 AM Alex Mastro <amastro@fb.com> wrote:
-> >
-> > Hey David, is vfio_pci_driver_test known to be in good shape? Both on the base
-> > commit and after my series, I am seeing below, which results in a KSFT_SKIP.
-> > Invoking other tests in a similar way actually runs things with expected
-> > results (my devices are already bound to vfio-pci before running anything).
-> >
-> > base commit: 0ed3a30fd996cb0cac872432cf25185fda7e5316
-> >
-> > $ vfio_pci_driver_test -f 0000:05:00.0
-> > No driver found for device 0000:05:00.0
-> >
-> > Same thing using the run.sh wrapper
-> >
-> > $ sudo ./run.sh -d 0000:05:00.0 ./vfio_pci_driver_test
-> > + echo "0000:05:00.0" > /sys/bus/pci/drivers/vfio-pci/unbind
-> > + echo "vfio-pci" > /sys/bus/pci/devices/0000:05:00.0/driver_override
-> > + echo "0000:05:00.0" > /sys/bus/pci/drivers/vfio-pci/bind
-> >
-> > No driver found for device 0000:05:00.0
-> > + echo "0000:05:00.0" > /sys/bus/pci/drivers/vfio-pci/unbind
-> > + echo "" > /sys/bus/pci/devices/0000:05:00.0/driver_override
-> > + echo "0000:05:00.0" > /sys/bus/pci/drivers/vfio-pci/bind
-> >
-> > device = vfio_pci_device_init(device_bdf, default_iommu_mode);
-> > if (!device->driver.ops) {
-> >         fprintf(stderr, "No driver found for device %s\n", device_bdf);
-> >         return KSFT_SKIP;
-> > }
-> >
-> > Is this meant to be a placeholder for some future testing, or am I holding
-> > things wrong?
-> 
-> What kind of device are you using?
-> 
-> This test uses the selftests driver framework, so it requires a driver
-> in tools/testing/selftests/vfio/lib/drivers to function. The driver
-> framework allows tests to trigger real DMA and MSIs from the device in
-> a controlled, generic, way.
+This series adds a vcpu knob to request a specific PSCI version
+from KVM via the KVM_REG_ARM_PSCI_VERSION FW register.
 
-Ah, TIL about that concept. This is with one of our internal compute
-accelerators, so not surprising that I'm seeing a skip then.
+The use case for this is to support migration between host kernels
+that differ in their default (a.k.a. most recent) PSCI version.
 
-> We currently only have drivers for Intel DSA and Intel CBDMA
-> devices.So if you're not using one of those devices,
-> vfio_pci_driver_test exiting with KSFT_SKIP is entirely expected.
-> 
-> I would love to add support for more devices. Jason Gunthrope
-> suggested supporting a driver for mlx5 class hardware, since it's
-> broadly available. I've also had some discussions about adding a
-> simple emulated PCIe device to QEMU for running VFIO selftests within
-> VMs.
+Note: in order to support PSCI v0.1 we need to drop vcpu
+initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
+Alternatively we could limit support to versions >=0.2 .
 
-I do have access to mlx5 hardware FWIW, so that would be cool.
+Changes since V2 [2]:
+* fix kvm_get_psci_version() when the prop is not specified - thanks Eric!
+* removed the assertion in kvm_get_psci_version() so that this also works
+  with a future kernel/psci version
+* added R-B
+Changes since V1 [1]:
+* incorporated feedback from Peter and Eric
 
-Thanks for the explanation!
+[1] https://lore.kernel.org/kvmarm/20250911144923.24259-1-sebott@redhat.com/
+[2] https://lore.kernel.org/kvmarm/20251030165905.73295-1-sebott@redhat.com/
 
-Alex
+
+Sebastian Ott (2):
+  target/arm/kvm: add constants for new PSCI versions
+  target/arm/kvm: add kvm-psci-version vcpu property
+
+ docs/system/arm/cpu-features.rst |  5 +++
+ target/arm/cpu.h                 |  6 +++
+ target/arm/kvm-consts.h          |  2 +
+ target/arm/kvm.c                 | 64 +++++++++++++++++++++++++++++++-
+ 4 files changed, 76 insertions(+), 1 deletion(-)
+
+-- 
+2.42.0
+
 
