@@ -1,214 +1,179 @@
-Return-Path: <kvm+bounces-62867-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62868-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6864AC51462
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 10:07:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E4C4C514DD
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 10:17:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C2DE3BFC46
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 08:58:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3BCEF4F0AC2
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 09:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F522FE061;
-	Wed, 12 Nov 2025 08:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4519F2FE589;
+	Wed, 12 Nov 2025 09:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n05MXCnw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u3n41DiZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC7023BD1B;
-	Wed, 12 Nov 2025 08:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E782FE061;
+	Wed, 12 Nov 2025 09:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762937916; cv=none; b=O/T8I4qbNogrTZjCMvA+262k8tuJHd+jTu7Q7/rtUGTOSIwMlPlriB8nqq/C6NRpB84h/jA1ZYD8WDSZN7o4c7Dd1Xl69LtxOBEHPwH9UZcEj0mBezE+LiVGSQmtxD5PoWGp1zvTGJNmQQJfRSngkP1FEkW4kLxot8bERHRJ49U=
+	t=1762938804; cv=none; b=lFA78Z4AchpioV98k2XeHXKtS+rhw7t7Da2a+r36qq9s0js/jK2hwVonFusOBBhXWfM0jF9sMBvnyV93vAjMia2XyEgIWNHbuevbUKtH0oW1Rc2hfUATuKw77t0k2bK5jtwDhuTzVOj2TucU8sJMJ4mdKggqd5xisEqCiIbHOZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762937916; c=relaxed/simple;
-	bh=zRDQF4ySYQusOHzc2T1tZsRtG0bPI5An+rv/0D9ldPA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bErVRvqILX+JcKL5a/B/8vy2cB+G9lDrtsLWCYlZwx+eADyCC/hRjQktjuUlXfmAg21LyYX0JJ/+BLlZySzzMUlWK7OtUjwIHCeSOfkQgEHbYaIYuzpjGdQnvLvn0WlJs8qTr/CBFwF5LIUJnyhlKokSLPr4A2990/D3q8aPzF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n05MXCnw; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762937915; x=1794473915;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=zRDQF4ySYQusOHzc2T1tZsRtG0bPI5An+rv/0D9ldPA=;
-  b=n05MXCnwoF3FDYv3miQrqUY/syKVpHg561KFlQRaJfHD0mvgOQwmEDx3
-   uDTk+hD9pCTsCpfbGV/KX63xlUjQAQkeSHAWa54xUlUvthEU7YE4XlJqD
-   hmXwdPlRfKkTZ785dPturti7hAhdBC1MGU+aTQU29/7IzUWTh+6gK16TY
-   //rxvqTMs6KwNex5XFBMXG1aEhDowAZWdusbHmm3BRJRYCdT7sl2+K3wP
-   NZW6vrQPgmVEo9dQoXt7YgzYn48R3bz2c8IOfUD9INWHKh5tX+u09uygY
-   E4erDzqbw3BmDGtKSnfmnYxATluz3K9qTLgK3/NLZ73LKvBce5p+xhfZM
-   Q==;
-X-CSE-ConnectionGUID: IgU1RCQSRgSkJELES+VqJw==
-X-CSE-MsgGUID: 4QwU3wrkT5WjpL55VeY8Ng==
-X-IronPort-AV: E=McAfee;i="6800,10657,11610"; a="52556509"
-X-IronPort-AV: E=Sophos;i="6.19,299,1754982000"; 
-   d="scan'208";a="52556509"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 00:58:33 -0800
-X-CSE-ConnectionGUID: pRO6tdWeROitpi6xfJxcsA==
-X-CSE-MsgGUID: jwxmFvxbSl+/qGbeC5NoOQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,299,1754982000"; 
-   d="scan'208";a="189343307"
-Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 00:58:13 -0800
-Message-ID: <ab3f297e-44d5-4f42-aa17-f2e7c135580e@linux.intel.com>
-Date: Wed, 12 Nov 2025 16:58:10 +0800
+	s=arc-20240116; t=1762938804; c=relaxed/simple;
+	bh=vuWPm/2U1JyrxzTC0qeLHk1VzUelYgaW5HYxZMdAbCA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bAddD+7rrdo1pF9fd0kK/K/j8ryUNe2H6OFcvi1G/rJdWgtqEZFswF5xM3EV9YcP4SME/hh8vJ+v9nirKDxCehOBScqAAZ49QKUknzBoea/JryRl5xlLL93dajXWvRbF5s+Bu3+Cl+JlwAYf+5z0/B0kLeBOZA5SZbNqMOKlPew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u3n41DiZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F8FAC2BCB9;
+	Wed, 12 Nov 2025 09:13:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762938803;
+	bh=vuWPm/2U1JyrxzTC0qeLHk1VzUelYgaW5HYxZMdAbCA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=u3n41DiZ5wXWuZ5rToWsZO3IJB/Yg7TCpqgzCJHoxIuCqy+3GgmV2c9o/thhfCKhF
+	 HQBuWYk8CxwNbtnmQQLyMfbdbxyFFoKOQq+eELWS0f924meNKF2lQX2Y/nSDgLMZde
+	 GOfie1IgRHL5waOSuDucMbUfSpJEZ+tPhtmCy9CHNUpzTuz5cB6Si45riZ5mQZ3Xtq
+	 M7C0Df9cmhZRR8WVdZeVF7qEaccJttnkLStLHMhNA6BP8VZs0viiVTVRWeZ0Eavkg1
+	 0DjrmXH0SORl/Jqb0vl4wH5UUsEFFO8dM5Zsh/zXAWRabPTPMtNnhZXTpkqWMkhnvi
+	 Xkv8UFb33VpNg==
+From: Oliver Upton <oupton@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>
+Subject: Re: [PATCH v2 00/45] KVM: arm64: Add LR overflow infrastructure
+Date: Wed, 12 Nov 2025 01:13:18 -0800
+Message-ID: <176293878773.2048542.1737784114701350028.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251109171619.1507205-1-maz@kernel.org>
+References: <20251109171619.1507205-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 01/37] KVM: guest_memfd: Introduce per-gmem
- attributes, use to guard user mappings
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: cgroups@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-mm@kvack.org,
- linux-trace-kernel@vger.kernel.org, x86@kernel.org,
- akpm@linux-foundation.org, bp@alien8.de, brauner@kernel.org,
- chao.p.peng@intel.com, chenhuacai@kernel.org, corbet@lwn.net,
- dave.hansen@intel.com, dave.hansen@linux.intel.com, david@redhat.com,
- dmatlack@google.com, erdemaktas@google.com, fan.du@intel.com,
- fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, hch@infradead.org,
- hpa@zytor.com, hughd@google.com, ira.weiny@intel.com,
- isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com,
- jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com,
- jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com,
- kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev,
- liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
- mail@maciej.szmigiero.name, maobibo@loongson.cn,
- mathieu.desnoyers@efficios.com, maz@kernel.org, mhiramat@kernel.org,
- mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, mingo@redhat.com,
- mlevitsk@redhat.com, mpe@ellerman.id.au, muchun.song@linux.dev,
- nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
- palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
- pbonzini@redhat.com, peterx@redhat.com, pgonda@google.com, prsampat@amd.com,
- pvorel@suse.cz, qperret@google.com, richard.weiyang@gmail.com,
- rick.p.edgecombe@intel.com, rientjes@google.com, rostedt@goodmis.org,
- roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com,
- shakeel.butt@linux.dev, shuah@kernel.org, steven.price@arm.com,
- steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com,
- tglx@linutronix.de, thomas.lendacky@amd.com, vannapurve@google.com,
- vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com,
- wei.w.wang@intel.com, will@kernel.org, willy@infradead.org,
- wyihan@google.com, xiaoyao.li@intel.com, yan.y.zhao@intel.com,
- yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
-References: <cover.1760731772.git.ackerleytng@google.com>
- <638600e19c6e23959bad60cf61582f387dff6445.1760731772.git.ackerleytng@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <638600e19c6e23959bad60cf61582f387dff6445.1760731772.git.ackerleytng@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
+On Sun, 09 Nov 2025 17:15:34 +0000, Marc Zyngier wrote:
+> This is the 2nd version of the series originally posted at [1]. The
+> series has significantly evolved with a bunch of bug fixes, some
+> additional optimisations, and a number of test cases.
+> 
+> This has now been extensively tested on much of what I have access to,
+> specially on some of the most broken stuff (Apple, Qualcomm, Cavium,
+> ARMv8.0 CPUs without TDIR), but also on some less shitty systems
+> (which are the minority, unsurprisingly).
+> 
+> [...]
 
+Applied to next, thanks!
 
-On 10/18/2025 4:11 AM, Ackerley Tng wrote:
-[...]
->
-> +static int kvm_gmem_init_inode(struct inode *inode, loff_t size, u64 flags)
-> +{
-> +	struct gmem_inode *gi = GMEM_I(inode);
-> +	MA_STATE(mas, &gi->attributes, 0, (size >> PAGE_SHIFT) - 1);
-> +	u64 attrs;
-> +	int r;
-> +
-> +	inode->i_op = &kvm_gmem_iops;
-> +	inode->i_mapping->a_ops = &kvm_gmem_aops;
-> +	inode->i_mode |= S_IFREG;
-> +	inode->i_size = size;
-> +	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
-> +	mapping_set_inaccessible(inode->i_mapping);
-> +	/* Unmovable mappings are supposed to be marked unevictable as well. */
-AS_UNMOVABLE has been removed and got merged into AS_INACCESSIBLE, not sure if
-it's better to use "Inaccessible" instead of "Unmovable"
+[01/45] irqchip/gic: Add missing GICH_HCR control bits
+        https://git.kernel.org/kvmarm/kvmarm/c/435d529bf5cd
+[02/45] irqchip/gic: Expose CPU interface VA to KVM
+        https://git.kernel.org/kvmarm/kvmarm/c/5bebf839b2e7
+[03/45] irqchip/apple-aic: Spit out ICH_MISR_EL2 value on spurious vGIC MI
+        https://git.kernel.org/kvmarm/kvmarm/c/5a9655de7241
+[04/45] KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
+        https://git.kernel.org/kvmarm/kvmarm/c/ca30799f7c2d
+[05/45] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
+        https://git.kernel.org/kvmarm/kvmarm/c/375e16720b4c
+[06/45] KVM: arm64: Repack struct vgic_irq fields
+        https://git.kernel.org/kvmarm/kvmarm/c/10576b2d8652
+[07/45] KVM: arm64: Add tracking of vgic_irq being present in a LR
+        https://git.kernel.org/kvmarm/kvmarm/c/023c81ada994
+[08/45] KVM: arm64: Add LR overflow handling documentation
+        https://git.kernel.org/kvmarm/kvmarm/c/2a69aca33cac
+[09/45] KVM: arm64: GICv3: Drop LPI active state when folding LRs
+        https://git.kernel.org/kvmarm/kvmarm/c/9fc8456206e8
+[10/45] KVM: arm64: GICv3: Preserve EOIcount on exit
+        https://git.kernel.org/kvmarm/kvmarm/c/a3a4ca462fdb
+[11/45] KVM: arm64: GICv3: Decouple ICH_HCR_EL2 programming from LRs
+        https://git.kernel.org/kvmarm/kvmarm/c/417714763ec1
+[12/45] KVM: arm64: GICv3: Extract LR folding primitive
+        https://git.kernel.org/kvmarm/kvmarm/c/7f69d30b7024
+[13/45] KVM: arm64: GICv3: Extract LR computing primitive
+        https://git.kernel.org/kvmarm/kvmarm/c/4b963cd815c0
+[14/45] KVM: arm64: GICv2: Preserve EOIcount on exit
+        https://git.kernel.org/kvmarm/kvmarm/c/fc2fda4298ba
+[15/45] KVM: arm64: GICv2: Decouple GICH_HCR programming from LRs being loaded
+        https://git.kernel.org/kvmarm/kvmarm/c/8ff2bf028907
+[16/45] KVM: arm64: GICv2: Extract LR folding primitive
+        https://git.kernel.org/kvmarm/kvmarm/c/a8306bb15afd
+[17/45] KVM: arm64: GICv2: Extract LR computing primitive
+        https://git.kernel.org/kvmarm/kvmarm/c/d78124a65a03
+[18/45] KVM: arm64: Compute vgic state irrespective of the number of interrupts
+        https://git.kernel.org/kvmarm/kvmarm/c/f9bb784186be
+[19/45] KVM: arm64: Eagerly save VMCR on exit
+        https://git.kernel.org/kvmarm/kvmarm/c/d3c2036861c6
+[20/45] KVM: arm64: Revamp vgic maintenance interrupt configuration
+        https://git.kernel.org/kvmarm/kvmarm/c/877324a1b541
+[21/45] KVM: arm64: Turn kvm_vgic_vcpu_enable() into kvm_vgic_vcpu_reset()
+        https://git.kernel.org/kvmarm/kvmarm/c/df5dfcad48ca
+[22/45] KVM: arm64: Make vgic_target_oracle() globally available
+        https://git.kernel.org/kvmarm/kvmarm/c/0cb4b6d1c73e
+[23/45] KVM: arm64: Invert ap_list sorting to push active interrupts out
+        https://git.kernel.org/kvmarm/kvmarm/c/c6a5d4815634
+[24/45] KVM: arm64: Move undeliverable interrupts to the end of ap_list
+        https://git.kernel.org/kvmarm/kvmarm/c/7fb79d1a03e6
+[25/45] KVM: arm64: Use MI to detect groups being enabled/disabled
+        https://git.kernel.org/kvmarm/kvmarm/c/f259e2c758dc
+[26/45] KVM: arm64: GICv3: Handle LR overflow when EOImode==0
+        https://git.kernel.org/kvmarm/kvmarm/c/81ef83de9440
+[27/45] KVM: arm64: GICv3: Handle deactivation via ICV_DIR_EL1 traps
+        https://git.kernel.org/kvmarm/kvmarm/c/f1d440106c3f
+[28/45] KVM: arm64: GICv3: Add GICv2 SGI handling to deactivation primitive
+        https://git.kernel.org/kvmarm/kvmarm/c/90d527ac928c
+[29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
+        https://git.kernel.org/kvmarm/kvmarm/c/9a2292c50d1c
+[30/45] KVM: arm64: GICv3: Add SPI tracking to handle asymmetric deactivation
+        https://git.kernel.org/kvmarm/kvmarm/c/0f64bed159d2
+[31/45] KVM: arm64: GICv3: Handle in-LR deactivation when possible
+        https://git.kernel.org/kvmarm/kvmarm/c/164dd4bae47b
+[32/45] KVM: arm64: GICv3: Avoid broadcast kick on CPUs lacking TDIR
+        https://git.kernel.org/kvmarm/kvmarm/c/2b36853d7e58
+[33/45] KVM: arm64: GICv2: Handle LR overflow when EOImode==0
+        https://git.kernel.org/kvmarm/kvmarm/c/d4537c8d3116
+[34/45] KVM: arm64: GICv2: Handle deactivation via GICV_DIR traps
+        https://git.kernel.org/kvmarm/kvmarm/c/182853c7680a
+[35/45] KVM: arm64: GICv2: Always trap GICV_DIR register
+        https://git.kernel.org/kvmarm/kvmarm/c/efa05bae8936
+[36/45] KVM: arm64: selftests: gic_v3: Add irq group setting helper
+        https://git.kernel.org/kvmarm/kvmarm/c/0f0e2b4108b3
+[37/45] KVM: arm64: selftests: gic_v3: Disable Group-0 interrupts by default
+        https://git.kernel.org/kvmarm/kvmarm/c/eea5d19518f2
+[38/45] KVM: arm64: selftests: vgic_irq: Fix GUEST_ASSERT_IAR_EMPTY() helper
+        https://git.kernel.org/kvmarm/kvmarm/c/eecb216b2f74
+[39/45] KVM: arm64: selftests: vgic_irq: Change configuration before enabling interrupt
+        https://git.kernel.org/kvmarm/kvmarm/c/9f3f3ddbc730
+[40/45] KVM: arm64: selftests: vgic_irq: Exclude timer-controlled interrupts
+        https://git.kernel.org/kvmarm/kvmarm/c/bbaf6ed67c41
+[41/45] KVM: arm64: selftests: vgic_irq: Remove LR-bound limitation
+        https://git.kernel.org/kvmarm/kvmarm/c/0b7c2f50f3fd
+[42/45] KVM: arm64: selftests: vgic_irq: Perform EOImode==1 deactivation in ack order
+        https://git.kernel.org/kvmarm/kvmarm/c/d64e3140ab5f
+[43/45] KVM: arm64: selftests: vgic_irq: Add asymmetric SPI deaectivation test
+        https://git.kernel.org/kvmarm/kvmarm/c/170b047e15af
+[44/45] KVM: arm64: selftests: vgic_irq: Add Group-0 enable test
+        https://git.kernel.org/kvmarm/kvmarm/c/2423a2369fc1
+[45/45] KVM: arm64: selftests: vgic_irq: Add timer deactivation test
+        https://git.kernel.org/kvmarm/kvmarm/c/eaaaaab4b530
 
-> +	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
-> +
-> +	gi->flags = flags;
-> +
-> +	mt_set_external_lock(&gi->attributes,
-> +			     &inode->i_mapping->invalidate_lock);
-> +
-> +	/*
-> +	 * Store default attributes for the entire gmem instance. Ensuring every
-> +	 * index is represented in the maple tree at all times simplifies the
-> +	 * conversion and merging logic.
-> +	 */
-> +	attrs = gi->flags & GUEST_MEMFD_FLAG_INIT_SHARED ? 0 : KVM_MEMORY_ATTRIBUTE_PRIVATE;
-> +
-> +	/*
-> +	 * Acquire the invalidation lock purely to make lockdep happy. There
-> +	 * should be no races at this time since the inode hasn't yet been fully
-> +	 * created.
-> +	 */
-> +	filemap_invalidate_lock(inode->i_mapping);
-> +	r = mas_store_gfp(&mas, xa_mk_value(attrs), GFP_KERNEL);
-> +	filemap_invalidate_unlock(inode->i_mapping);
-> +
-> +	return r;
-> +}
-> +
-[...]
-> @@ -925,13 +986,39 @@ static struct inode *kvm_gmem_alloc_inode(struct super_block *sb)
->
->   	mpol_shared_policy_init(&gi->policy, NULL);
->
-> +	/*
-> +	 * Memory attributes are protected the filemap invalidation lock, but
-                                      ^
-                                 protected by
-> +	 * the lock structure isn't available at this time.  Immediately mark
-> +	 * maple tree as using external locking so that accessing the tree
-> +	 * before its fully initialized results in NULL pointer dereferences
-> +	 * and not more subtle bugs.
-> +	 */
-> +	mt_init_flags(&gi->attributes, MT_FLAGS_LOCK_EXTERN);
-> +
->   	gi->flags = 0;
->   	return &gi->vfs_inode;
->   }
->
->   static void kvm_gmem_destroy_inode(struct inode *inode)
->   {
-> -	mpol_free_shared_policy(&GMEM_I(inode)->policy);
-> +	struct gmem_inode *gi = GMEM_I(inode);
-> +
-> +	mpol_free_shared_policy(&gi->policy);
-> +
-> +	/*
-> +	 * Note!  Checking for an empty tree is functionally necessary to avoid
-> +	 * explosions if the tree hasn't been initialized, i.e. if the inode is
-
-It makes sense to skip __mt_destroy() when mtree is empty.
-But what explosions it could trigger if mtree is empty?
-It seems __mt_destroy() can handle the case if the external lock is not set.
-
-
-> +	 * being destroyed before guest_memfd can set the external lock.
-> +	 */
-> +	if (!mtree_empty(&gi->attributes)) {
-> +		/*
-> +		 * Acquire the invalidation lock purely to make lockdep happy,
-> +		 * the inode is unreachable at this point.
-> +		 */
-> +		filemap_invalidate_lock(inode->i_mapping);
-> +		__mt_destroy(&gi->attributes);
-> +		filemap_invalidate_unlock(inode->i_mapping);
-> +	}
->   }
->
->   static void kvm_gmem_free_inode(struct inode *inode)
-> --
-> 2.51.0.858.gf9c4a03a3a-goog
-
+--
+Best,
+Oliver
 
