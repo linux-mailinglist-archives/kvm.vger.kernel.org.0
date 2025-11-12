@@ -1,117 +1,126 @@
-Return-Path: <kvm+bounces-62955-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62956-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id F393DC54C15
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 23:54:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DDEDC54C5C
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 00:01:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1CAFF34A2D5
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 22:54:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4806C3A959A
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 23:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D73C2EBB9C;
-	Wed, 12 Nov 2025 22:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515962EB87E;
+	Wed, 12 Nov 2025 23:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="q6+wuVAM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="COEHRRoB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E800C2DC76C;
-	Wed, 12 Nov 2025 22:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE54D186294;
+	Wed, 12 Nov 2025 23:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762988048; cv=none; b=mCyRbvTLTHrLTfCoSud8/0Nx0YFsgKD4w6kt1TnP3Joh33JqnyYl1LR+cZqTMFPQy48jle0w/6FiJ/ZRYk2VyJZ2nq5FbIgSwdkv4WcWWpEBhttPggM+LwaAl1D+cq56tkKQtSLO8B49eQjWgQAyy19PWsqkUthroDsNVAlTy/s=
+	t=1762988506; cv=none; b=YeKGU4Ph/AD1WfCkEAUNojrc6+fl/68vSZqaPB7TLxjyuTa7SdftvubIzw96n53G93Hc2HqfYZm/TyKGIEcVvQO6nr1muTvaDvvUwE71sangamSSDxpVRWrdsJiOrkspYPe4qrFqycPUl4SOyY4GtCZRbCT/11Z6kt/YOWzLweI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762988048; c=relaxed/simple;
-	bh=WmpWtNRGBU0amauqTCw9LraUQrV1H992ZY5WY2RJ5Bk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TUzqOs9T9UYynbz8ml5IHlZFFdkuQKvPGm4tpc6x459lqfx+L7/bVD0g+Dd9DmA2uiLFQqWfVYBaXWR72tBRFDd7zrjAOXwjrHWhLbZHYTrXLcs2rRSEfmXYKY1JiVMWZ8azxGel9lIdcYQKzFIVvgfC0C2wyqbHwTEHzd0M4LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=q6+wuVAM; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ACL10r4048805;
-	Wed, 12 Nov 2025 14:54:01 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=D4W90eTzfDymVTb4Rf9z
-	J0YgQ8mGorBDV+kKWUQ6bcg=; b=q6+wuVAMSRtWFHzbjCr0AZ/4NRPGOHMs4c2B
-	DGA8Vyo9HMfGvtO1wTPpw02merAR44yOBzjUPHLAZVFEt6L3zWot3A9EGI+cIR6k
-	r80SBbsDUvflucoVyZwTQCbVTEhsqXPi3NaJVwNGggMPbSkeffA7fxFwM2SGiOlU
-	GL+oG2BNDywEs8h1XWqsTq1hUjqZRS5Sy3lXKsuJor9Dp4CNeaJ8SmXZpaAJPlIw
-	PpxBC7xneY1zMHv5+569NZhg1Raf5XMNMV3GbWh5wwHHscLruiOMibzA1zrmTm+J
-	N3/ParLyBlABhGjTKEDjypt9w4k99Bt57RnLeKmqgrUV2yfL+g==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ad1sj8u5m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 12 Nov 2025 14:54:00 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Wed, 12 Nov 2025 22:53:59 +0000
-Date: Wed, 12 Nov 2025 14:53:54 -0800
-From: Alex Mastro <amastro@fb.com>
-To: David Matlack <dmatlack@google.com>
-CC: Alex Williamson <alex.williamson@redhat.com>,
-        Alex Williamson
-	<alex@shazbot.org>, Jason Gunthorpe <jgg@nvidia.com>,
-        Josh Hilke
-	<jrhilke@google.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        Raghavendra Rao Ananta
-	<rananta@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Aaron Lewis
-	<aaronlewis@google.com>
-Subject: Re: [PATCH v2 18/18] vfio: selftests: Add
- vfio_pci_device_init_perf_test
-Message-ID: <aRUQAg1kNVzfKkuv@devgpu015.cco6.facebook.com>
-References: <20251112192232.442761-1-dmatlack@google.com>
- <20251112192232.442761-19-dmatlack@google.com>
+	s=arc-20240116; t=1762988506; c=relaxed/simple;
+	bh=ptpQHUkjOPekkiQOHwD58jsF0L267w/KGg8/nZu2zTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qWtO4hlsTd5eMSiDPmifueyxXzKbXiHBCpihDcJxSYyHjI1qDXGY5sGqTtuFJiokyU6XMA0+Hm4Om8YQEBJNXKXvjXRcXMiO24YAP7+B71QzPDo6EpU8OGfIHL/rLgo1P34HPJTZy5sXnqMw6Sh8uK4gzgBkRhGoyAK3VJ+7ASo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=COEHRRoB; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762988505; x=1794524505;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ptpQHUkjOPekkiQOHwD58jsF0L267w/KGg8/nZu2zTM=;
+  b=COEHRRoBGUvkLAx/VFNzBolb23Ugg0bcNOJzpcljxA2zE534odU+4bRv
+   uPC2ZdDrAguIpMoOpcGw3J7k1LdhdxtLE/ovNNCDXpXmeKtzgYqYynWx6
+   OrYHMrcXLIFjdauUP7nuLdQn7b05EUs69WSjGYYageagc2AUAJU9lvOLU
+   ZP4zs5NVg1Lkyfstl4P2gXREvKvX0Qdn2+YhPw37aScqMoQmaNjQ7wWej
+   RvS50sosLLFFxQ+W3jh9M1zDX+u92xlU96CEYakAAKGAO243pc2a0rSt9
+   elH4NGRVWjZWwKXdzXHAU2GcBDp/XVbkWCUqYvnXZcq20qM/6u5gs3rEr
+   w==;
+X-CSE-ConnectionGUID: tZwwttguTJKIKb9oSuh00Q==
+X-CSE-MsgGUID: woettoVLS2KXDXbnjAo1Ug==
+X-IronPort-AV: E=McAfee;i="6800,10657,11611"; a="75371715"
+X-IronPort-AV: E=Sophos;i="6.19,300,1754982000"; 
+   d="scan'208";a="75371715"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 15:01:44 -0800
+X-CSE-ConnectionGUID: /Ik4MOPGRX60m5ZRK8SEQw==
+X-CSE-MsgGUID: CR5Znu9hQVKOq1mhyKZqKQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,300,1754982000"; 
+   d="scan'208";a="193734035"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 15:01:45 -0800
+Date: Wed, 12 Nov 2025 15:01:38 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Borislav Petkov <bp@alien8.de>, Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Brendan Jackman <jackmanb@google.com>
+Subject: Re: [PATCH v4 4/8] KVM: VMX: Handle MMIO Stale Data in VM-Enter
+ assembly via ALTERNATIVES_2
+Message-ID: <20251112230138.nepccbv3wf5em5ra@desk>
+References: <20251031003040.3491385-1-seanjc@google.com>
+ <20251031003040.3491385-5-seanjc@google.com>
+ <20251112164144.GAaRS4yKgF0gQrLSnR@fat_crate.local>
+ <aRTAlEaq-bI5AMFA@google.com>
+ <20251112183836.GBaRTULLaMWA5hkfT9@fat_crate.local>
+ <aRTubGCENf2oypeL@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251112192232.442761-19-dmatlack@google.com>
-X-Authority-Analysis: v=2.4 cv=V6dwEOni c=1 sm=1 tr=0 ts=69151008 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=FOH2dFAWAAAA:8 a=kPA7cs-zk86F02t9bKcA:9 a=CjuIK1q_8ugA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: tOZZeKFQ6He6MMBa4HPEsAxwK67fdZsA
-X-Proofpoint-ORIG-GUID: tOZZeKFQ6He6MMBa4HPEsAxwK67fdZsA
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEyMDE4NiBTYWx0ZWRfX7DWFxnvzsOA8
- bL8oxcB2hYbvCt2+atpk9mtPadF7zEmBBh/8Jp4oBrGdZUtA0tc51zKUC2oKbpUKKOh1eH9QxLi
- Ih8IMuUmB2t94JPU8rCgpKLnJZSRyWWWk3Zo8wzj99DMrQhnSiHn2HHDrndrGDPaAZMCoYxBKmk
- uwlwXmNPhfnhebdeM786Jz0BbD5+QmDFrRxsGKUhKLLr5RJ6v8dmEGrUts/5mJh/XJuZOyr92aO
- du27fa8CBkvbil28qCIETQEFNtXfQGHPjszF9WdNT8cSviACVKWy0lUCJcAmZCRSF+CuEQa785a
- KrGLkwgxrtlhShnuCJeSMnV24DJmpcMe4lFoVIWL1L2oz73/fMK9cq0fu1khE5gzZWGIV4Mtrf1
- mQu+3Q6ZfaqG04eChqcG/Gvlhi6M5w==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-12_06,2025-11-12_01,2025-10-01_01
+In-Reply-To: <aRTubGCENf2oypeL@google.com>
 
-On Wed, Nov 12, 2025 at 07:22:32PM +0000, David Matlack wrote:
-> +static s64 to_ns(struct timespec ts)
-> +{
-> +	return (s64)ts.tv_nsec + 1000000000LL * (s64)ts.tv_sec;
-> +}
-> +
-> +static struct timespec to_timespec(s64 ns)
-> +{
-> +	struct timespec ts = {
-> +		.tv_nsec = ns % 1000000000LL,
-> +		.tv_sec = ns / 1000000000LL,
+On Wed, Nov 12, 2025 at 12:30:36PM -0800, Sean Christopherson wrote:
+> VMX "needs" to abuse RFLAGS no matter what, because RFLAGS is the only register
+> that's available at the time of VMLAUNCH/VMRESUME.  On Intel, only RSP and
+> RFLAGS are context switched via the VMCS, all other GPRs need to be context
+> switch by software.  Which is why I didn't balk at Pawan's idea to use RFLAGS.ZF
+> to track whether or not a VERW for MMIO is needed.
+> 
+> Hmm, actually, @flags is already on the stack because it's needed at VM-Exit.
+> Using EBX was a holdover from the conversion from inline asm to "proper" asm,
+> e.g. from commit 77df549559db ("KVM: VMX: Pass @launched to the vCPU-run asm via
+> standard ABI regs").
+> 
+> Oooh, and if we stop using bt+RFLAGS.CF, then we drop the annoying SHIFT definitions
+> in arch/x86/kvm/vmx/run_flags.h.
+> 
+> Very lightly tested at this point, but I think this can all be simplified to
+> 
+> 	/*
+> 	 * Note, ALTERNATIVE_2 works in reverse order.  If CLEAR_CPU_BUF_VM is
+> 	 * enabled, do VERW unconditionally.  If CPU_BUF_VM_MMIO is enabled,
+> 	 * check @flags to see if the vCPU has access to host MMIO, and do VERW
+> 	 * if so.  Else, do nothing (no mitigations needed/enabled).
+> 	 */
+> 	ALTERNATIVE_2 "",									  \
+> 		      __stringify(testl $VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO, WORD_SIZE(%_ASM_SP); \
 
-nit - I think you can get NSEC_PER_SEC from #include <linux/time64.h>
- 
-Otherwise LGTM
+WORD_SIZE(%_ASM_SP) is still a bit fragile, but this is definitely an
+improvement.
 
-Reviewed-by: Alex Mastro <amastro@fb.com>
+> 				  jz .Lskip_clear_cpu_buffers;					  \
+> 				  VERW;								  \
+> 				  .Lskip_clear_cpu_buffers:),					  \
+> 		      X86_FEATURE_CLEAR_CPU_BUF_VM_MMIO,					  \
+> 		      __stringify(VERW), X86_FEATURE_CLEAR_CPU_BUF_VM
+> 
+> 	/* Check if vmlaunch or vmresume is needed */
+> 	testl $VMX_RUN_VMRESUME, WORD_SIZE(%_ASM_SP)
+> 	jz .Lvmlaunch
 
