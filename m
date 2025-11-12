@@ -1,370 +1,351 @@
-Return-Path: <kvm+bounces-62830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62831-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CE66C50613
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 03:59:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC51DC50920
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 05:55:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CC62C4E515B
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 02:58:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7CAEF4E8379
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 04:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F58E2D2381;
-	Wed, 12 Nov 2025 02:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE6D2D7397;
+	Wed, 12 Nov 2025 04:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="U7VZ1F7S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KNVsMenv"
 X-Original-To: kvm@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010040.outbound.protection.outlook.com [52.101.85.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFF2242D7C;
-	Wed, 12 Nov 2025 02:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762916326; cv=fail; b=kkfC6A4m/zEfJE6FHiiSzSgbIK23xKKvsMDC8NOPqut8fIV5iTaTytdVznr2ha5bcgtOdn8gckBCXfa2UEJsvcZRehuLktgnwq44EJpreGe31Z/CfWe/EqjlZXkJfj2GY7F4D0VlvizElsVkYdcGd/93fGiiTy2Rervvv5ynXuE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762916326; c=relaxed/simple;
-	bh=nwimU4Zp7AoP4CBsoaBv5Qe9mnvXVZk0JvMIkiKsEOM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HOzlffUgVxfVCRF3w3g8ZMJyokRqSA3HZKgFLTJvd2uFEIgNcZIkZSK1KZUpyUYc2kN7PiDzp7dpUd3jhEarTtzU6uD93H4mb22aqgNq33pUKMNE0bxCF3fjuUGQ2dvmSY59I19CEyojaUgRtOE+FYbbTC32iQbUFo/p+aBSyvQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=U7VZ1F7S; arc=fail smtp.client-ip=52.101.85.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rqr8VF28ML9PFRYA/t46MWdVj7dXMeEJpe3H22tiMEKvfEUYDhUpanUSkG6G5cohyUlnYMJqhLQY8F7XNiBo5CEhRjodnT317eZ3LnWGBrwcgMhszSh8GwDlfQCeWGDqyLwXFY2mQmgg8PYgEj+89bts6G2gJNq2/Zcb5tlOXy00SkwxD+YGCx9cJNXq6dQJMw95Tw20hniQLk5v1aWvhYxsrAz7lj6jVRI5dvC2tootwkjyZptupmoCToPlgm3lcaGgmKT4oHqqxQqNHxDPuOMcqq4Uz4N0Gz4sqHRnUFTuNIZ64oPLhWp8gidiWvEH5w0r5MljPjjcdyCHqVDurw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eX52ichgjC044UKTP0yfsUJ91M7raRwWvWEbTKyzhSU=;
- b=bfpNADeneyo3oc91tGt1eGyKp+lGc/akbAmBUbHtnUhf8zhTag8Bd9Awe/xidvl04XRY08C/DrdQMYoOINlut9OiJg3jXCqyf9lPHR+49LzjwqQEhJvqYHMpBsNLdlnADJ8A89XUgTGCWUTVeoyDXeEIePMY6blT0Ifs212U7hISaU+zPSEcniYzzOABueYA42Tkko3PdwyRj17Y0SqXcx6OMx53CG+MNUbHxQTceRRprRiRROpjklZ9G+r4OK1T+njlp6+WDE/Nx2JeQIHf4DAswxg7ntyyiZEqkk6FtNtdt9X+YW9SM9qHsb+HI/KSt0yZ4m/X6dMDICavEtYgmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eX52ichgjC044UKTP0yfsUJ91M7raRwWvWEbTKyzhSU=;
- b=U7VZ1F7Sx68CpaOzVucgCeArbitRNjy5UR0Uc78stGxt4leGR2o0VbOoY7YFvt84ZmylHuEPA86qusci8HVmq0Ngp4dcrTdNouVp2L6C/r/1nL17gAGdFLAbrCktLjnwjG+4jiezsht1drnzrPIt2InCdTjs8kwCWaBo1whxx3S3NUSFss0gFyEpJXYALVnMxT0blyDoqOVpTtuRA2v90shz2aQepv0MqhR8Mokc5XnJ5MGCzUtaCJ19Ck96aGXf9kpy8xB7RvAq+lQpmHylyc3H1d5TcV9RhV16ge2BXKsvAQyCD2Ut6PhbTD/ZiETH6LvPqDq8+zRbaZjaV8XqwA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
- SJ0PR12MB7082.namprd12.prod.outlook.com (2603:10b6:a03:4ae::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.16; Wed, 12 Nov
- 2025 02:58:40 +0000
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a%5]) with mapi id 15.20.9320.013; Wed, 12 Nov 2025
- 02:58:40 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Arnd Bergmann <arnd@arndb.de>, Baolin Wang <baolin.wang@linux.alibaba.com>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache <npache@redhat.com>,
- Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>,
- Barry Song <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>,
- Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
- Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
- Matthew Brost <matthew.brost@intel.com>,
- Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
- Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
- Ying Huang <ying.huang@linux.alibaba.com>,
- Alistair Popple <apopple@nvidia.com>,
- Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
- Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
- Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
- Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
- SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
- Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
- Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
- Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
- Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
-Subject: Re: [PATCH v3 03/16] mm: avoid unnecessary uses of is_swap_pte()
-Date: Tue, 11 Nov 2025 21:58:36 -0500
-X-Mailer: MailMate (2.0r6272)
-Message-ID: <B114F7B2-8EDA-44DC-8458-79E3FF628558@nvidia.com>
-In-Reply-To: <17fd6d7f46a846517fd455fadd640af47fcd7c55.1762812360.git.lorenzo.stoakes@oracle.com>
-References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
- <17fd6d7f46a846517fd455fadd640af47fcd7c55.1762812360.git.lorenzo.stoakes@oracle.com>
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: MN0P220CA0008.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:208:52e::7) To DS7PR12MB9473.namprd12.prod.outlook.com
- (2603:10b6:8:252::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067AB78F5D
+	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 04:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762923309; cv=none; b=oHEj93+InUaI3KMavPjMHZJYbIErYEGZ1odc6F0UR1eJiUcihkMXQS0wee5KtIcSnmDURzrGSmtUYnd423Zkh4lhEZBhycWDlYcWvlyNdnZMnTPCaFuIva4t55FNktNnD6CqgXK0MO0QMLTGzj45Ni8aLm9VPaHBm3HF5AtnBbs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762923309; c=relaxed/simple;
+	bh=l5LGlODZ4xD/2Y15vU5UzbitjXKwIH/KoNWDjovVBvU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IJvB3D2QB21AI5e39I8AuIPNpjfiFrsCqp/6iKPfXuMoVtf7c/9a4jEyEVrLktWBaknc9qecio+egtL1JcigursJgiZfN+bd+qoiHW6lZlz50A1hkcwGztWuQToShzkFi3eQJixr8mGB71Ih/ZYdUNlwUjWHNteH4IOdhhHNJlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KNVsMenv; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3436a97f092so520024a91.3
+        for <kvm@vger.kernel.org>; Tue, 11 Nov 2025 20:55:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762923307; x=1763528107; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x+ZEKdeS8OnccJT/18IWvvdObkq3Vpl4Fxqk4ywgHOU=;
+        b=KNVsMenv/qRTUVSZ1OVie4wucMWhgBGkUVSpNOkTQVj0ytHC+OPTrjO/7FZzra6GGp
+         Ol2iQ4ZDbxxkrm5Z7OoeK0JLvoqfGgxIW+ubgcuH78t4O99B3wLyhDiDrHEMWHHZef6Q
+         2JRbaUjGYlMwBfdzG5uLVfEaWdc84s2piKGyzXKLP36/I4u86pjAsd+v5OoFbqyGqXFv
+         g6omI/PbFohskfWyuygIzINxxqT1jX2Mzv25XiLbFL9wI7+Df6svnYpl/VTXWgrOE+5f
+         qHIHFE6vfseUe1H61OqfZx9fzHwirP/HdTfdSegFOgAFOWj6+FZzZBZKI5sn7xz4vWqx
+         P4QA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762923307; x=1763528107;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=x+ZEKdeS8OnccJT/18IWvvdObkq3Vpl4Fxqk4ywgHOU=;
+        b=XqlEsqdsFRM2ZDMFLaEGmztgIXOOiEQ7xnvySe2gtUyoniFDZ6iSfFL5X16sRdzJ6c
+         XXE/MKNv/o4HDRGZ4WWf+ZxOKRjY5t6wjgjbExdvywvgrbgL/XwAQi+KPjOsxqxPi2Ke
+         3RZ9fxx90FrCeGjdIjmGg11oWI8rcRQyWX7gsYnBEONqKsi//vYww9hegaEINPEVC4rx
+         OA6is4Cwhq7rpuGj/3f6dD7uomzMMC/CPVOKzW/QkA2YWdQbVcz5K9ALcPdQWB02zIeU
+         s2fqUyhkEcW8Pd7Ml2cwkYkT9ojSBfjMMLBsIGLyCgP/3efEivZCwOkY/dEveDl6wqPF
+         DfhA==
+X-Forwarded-Encrypted: i=1; AJvYcCXSkjNjPNWyDIA2u+VteQxeYCD6f2Ek6YpkgssjawyhKagP9/4t7fG2DMQZaeSL97CV/xA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/UsuDNM8QTLErpzUMSSD7mUp7W2L7IfRhm2tBwvatR4LW/1Yx
+	LiChdu5KhABMQRIHnHQ01q/Zf1ybTeA+6qGbr305O4kXwZTU3IsVHSqkpve3d/eHiq+DUHtmzpo
+	JJOPTyM8If8F9IkuI0CmfimgfNowGTbo=
+X-Gm-Gg: ASbGncsL0ASWpwExQNgzRN1eSk1YUKi8z/dBFzayUzp86IGiPkfJmqMr7qHn2evl8Eb
+	5YVpvnLOuPFlpGgd3RgknoII8srOWtYlazJCjTrTlwQviLHSX8pBe7Zn/+I0+JR2dBEGlAeb0RM
+	o0UJaD+x3sUdt8tBN3sjzxUHuoCmweREyG+lF5sdIdQsMbMigcz1raPo5YTkumhavh9HoL82ucm
+	TRx0VI5Osa6WxIJYVs3ZwoRoHeaimsPC/jOWdbsEyczhmGZgSl/G0I1FUFF
+X-Google-Smtp-Source: AGHT+IGezlfWHsutFc7rVUn5xqIPdMjVgQZhCmkOAuauj8q4oRr7GNK9VuedAhMp2Mp+LopXY/EbfZGg46CMy+swljo=
+X-Received: by 2002:a17:90b:510b:b0:32d:a0f7:fa19 with SMTP id
+ 98e67ed59e1d1-343ddeadc69mr2528906a91.17.1762923307226; Tue, 11 Nov 2025
+ 20:55:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|SJ0PR12MB7082:EE_
-X-MS-Office365-Filtering-Correlation-Id: a1a98c80-878b-455d-9b21-08de2197624f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?gMoKcN3fAiCi6MBuaib3VlrZJnEwrrNINKrcdr1c90MAs5athBUtXPQ9regS?=
- =?us-ascii?Q?kJr5kVtIAFeMAFfNp08l5oKSpfhEv6rk+sNwjqGctjbIt/uS/mFTK5AA9YCq?=
- =?us-ascii?Q?b/a0MbQKFHViauS6ra+hDkTa04Jsd4u1tRc1/1DP557eDRPaueI2RaxQDr7w?=
- =?us-ascii?Q?Ggejh3nJyyp2P1+//+yxVMpSLjV7sI9hdsZEbsFbNa+OVKqAyzgBwbDBfDeX?=
- =?us-ascii?Q?PNLZgb3rOq9uS9YcKdFGLs2kbCXVzr64KfkJkT+kdjKQIvaR8ZzoyleiPsxe?=
- =?us-ascii?Q?DMQP78D2r4/bziuPls66EtVofTG8T9llZdVFcwUSrxLpPtJ90ZEKFI36ahkS?=
- =?us-ascii?Q?00dDeB1lM7MUjLb+rlB9CERLA42sTw49eAmsW6xPqCSyuXtBXBWYLSW7xw+c?=
- =?us-ascii?Q?7O7MgcPqHtcmCBEx3zYvGFhYq3y+uT0kRaY6WA0MlSC/QL16mPmZMgUwWLLD?=
- =?us-ascii?Q?35QWqjKW9Q/5uWsFCeq6O76gshKHsjBnf8+JUSzgqoucojat8JebrklRdsT6?=
- =?us-ascii?Q?/FzAiVxgDLYK9gBCXGtX+S8NHdRt26HHcDj8bMdclqMAX0MGJoYq5VXWjCxo?=
- =?us-ascii?Q?KuQPW1TPHIwxadsq27ikO2NuBP7qsab1QQMhIYbqwekwJO9eS5gBonUY4N64?=
- =?us-ascii?Q?trI24DJojo8mimQG6rcG1VwA8NQyAISVxwaSPI3o1GbswD9FOpo/8Ms8diYo?=
- =?us-ascii?Q?5GWgiVnixUfNmXWmgg9UP9qlS54W/fbdrXv5XrAhgnj5w23WgQo6mxFIXIq8?=
- =?us-ascii?Q?Fvz/Ydny0MRG0BDFCN3YRlbM7AphNL6MzKaQrrq1pZtzNYytYodDtZprm/P0?=
- =?us-ascii?Q?GkqQsiIbOr6zJu96KTM8urI/ftJaWs5AdPpsT3hWwnu5vMyo6Q11b5UIwsFB?=
- =?us-ascii?Q?6yDhnZ5XsAKlNDGgSlj3oPrwFEDFS4ccTEuhSbLM4dMnZ904fnmvkrVjkLW3?=
- =?us-ascii?Q?XyWtOJy3jelpa0HUr9erxWE6IxOmQKoH1/owFziLn4HPNA+Y1RC6puMpbYOe?=
- =?us-ascii?Q?8wx8BqadxZRrSKfPwVQ+46YPysI9VugKdVKEDmwP6ptStT8p5Jqcu307PRsp?=
- =?us-ascii?Q?eWmr9o0UOI5mzoFuT9iCPq+RuHSrOD3WLJH1EIvJFLMpfIDnKUEzgnCG69Oj?=
- =?us-ascii?Q?KlZNzLsvkCP2m8rIbg5YFf+HPG5RF1fyU2EYTjG1GUI9SWhV8Yk+y6dMOqT1?=
- =?us-ascii?Q?mH71uPNK8/M3HufTWPwHYsghQA66fd1TW0PkxBTXEq9RzP/PwuQLtNsIOWks?=
- =?us-ascii?Q?EImOFVPDdZZI6BdXgy4Bw0CLebdOoLVQju+Mi9pkX/hPQaXZ2MOD/ZLEjEvM?=
- =?us-ascii?Q?YHNeXdqqrZd1ra/ZCO3vQd2X2MlfzknG1vStR3DWOqH2ApTb1XJgfGkp7FqA?=
- =?us-ascii?Q?DGNbjctILSsc2dG0KMTwfCzKc5gSOGe2Rp0xGmtkjjvOptZgUXOjKG6zG0W1?=
- =?us-ascii?Q?OV2p+N+FIe+W+s36DfVuVvPDyG4u/HVS?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?7B23abkw97vk4lQRjDbiNEK28WuBTCyknHcosT2YxWcTtkz1kg8mF9CenLkC?=
- =?us-ascii?Q?G9noYLGcSipa6Ja6X8jBaj5unWxc0Pwh4tGIaH1DEfKy1LENI0U19ctigAd/?=
- =?us-ascii?Q?axhqAYOxzeh2yjmgh03lS8toCge91q1iQS930Hc7JfPZeFGZlZfKNrrdwC8t?=
- =?us-ascii?Q?nM9O8dYjkXEdnrFDeG6BGxxV105Uzn69CutzbGsI2iPpgsUEixu450Qqhzgz?=
- =?us-ascii?Q?vDUgyhkiAUVm5v+pLISfr/f18ue/BJf+6QDESlsZBFYy0Tv7q2juSM7d8opW?=
- =?us-ascii?Q?jV+KsKPf1URDuKdNs1Zdcfg7L17TOIsTj4GY5KZEfOsgWOmLpI4DmYNQ02LX?=
- =?us-ascii?Q?6LmROBSb7AtSBjHP0c36muBygbhFz2SZ8Ua499wG6VhNULGPt+lYMFYm/+yo?=
- =?us-ascii?Q?weWR4/4wwXc+lhT4SysUuo1MikPOQ0c63rHMKAQp9xr+zgayf15n6rPLnWXJ?=
- =?us-ascii?Q?DT+pC0N2f0r0ddOww9BmK8q9l2u8ipxhXERP+Qyjb4o4qWeZFtla3ER/8L/L?=
- =?us-ascii?Q?4rRtZ0av1Bsn/vtw9f+0H3Gvl9VGPWDb2tmVNWll6hUJd+/cnZujNAgEIVru?=
- =?us-ascii?Q?vR8VXHGTS4YX5X4kgcyBn2LZdFBZxK9mpP6UtAtHexhRBOJDXgQYlxYA7tKC?=
- =?us-ascii?Q?xUe8V52wZ80WZ/NUkG2d03Itg1k4Fxk8yLvDPSlT0e4wUPXm5q/FdgU1dFy4?=
- =?us-ascii?Q?1UkrJ2kYrKbnByBJ52PZhQXlClioHxzt9uUiLravwtcycOCPi5XkTUWnMzwB?=
- =?us-ascii?Q?i5r6YK9w4C9V+yWY9LD9ceUvByi1elxR0ZpOQaAQCSiAwbxUa21z2L4dIFPD?=
- =?us-ascii?Q?NA/qLHJMJ4M6kJT0lTv7eT8sDdNyqzIlgc7fkeXCn4mENPOnir7jqeS155jR?=
- =?us-ascii?Q?eykVNWMK3vBTp+OYHx4w/aq+hvJLraT3nfEjMUBfC5yYcjIw7k3VCnliSK6O?=
- =?us-ascii?Q?tRgQ6nPHTAzBxJGqB2FfsSCuMX+bgKi5YW/117WKUxRegUAucp7mWjMMcgbO?=
- =?us-ascii?Q?9oSe+aONtr7gkdl98V1/Nm9haGhBQXXKJkJu7ZP1X9b/JOrv8pQnSyN7oue0?=
- =?us-ascii?Q?S1qGcfcmu3sziQc/cy/c5knkN6pPNXLODaQOGR2te6rtrfRDRPaOAPqXbYLD?=
- =?us-ascii?Q?B/2IoBFY6ahaeT90ox5vaVLGoPtb0muzRnbbHoePoDe6zMG6J77HQBq3YOMf?=
- =?us-ascii?Q?nN12Duv4g7xPANBguBxkvOwVoxdGQWGweUa47uGlDSmRng/tIPeOPM72cl95?=
- =?us-ascii?Q?D27Ovp3qQVfk+AcB/m9MHbiGkTmjYEx5Ku/Kv+wArQBNWAdF3nWVV9uGziWd?=
- =?us-ascii?Q?4/8L+Vczomi6jeyIOK646T3upVyGS1UT1/qHmjbjGiXPgiWoSB2dT6gjbBE4?=
- =?us-ascii?Q?9T1JPFwqbPPExnJ29gIG6ecO3jcj6VNQCxyJo+thVwa4a7A6kWzTFKO3nPoa?=
- =?us-ascii?Q?KnevEAEk5DOyrqe8TA+rI+fRK4v3BExK+JzATcEGfUPMl7THlM5OENHGaXNJ?=
- =?us-ascii?Q?FFUx9Lp5yBb0oy6ZM4N7eR0rqteYH3ioETmUwIwTqptCavKUaOS+ynF1kq2U?=
- =?us-ascii?Q?x1MQMobNYHBESLkNcJM/VXDnhY3DlWJzUJY+Zim+?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1a98c80-878b-455d-9b21-08de2197624f
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2025 02:58:40.7760
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Jlzq5Z/Is52aqMPPxyMSx7pBIgdC6aNw1msyEBUQ4l0rTBgrDkRwvyRLjMDBv3V/
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7082
+References: <20251110033232.12538-1-kernellwp@gmail.com> <7bc4b0b7-42ea-42fc-ae96-3084f44bdc81@amd.com>
+In-Reply-To: <7bc4b0b7-42ea-42fc-ae96-3084f44bdc81@amd.com>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Wed, 12 Nov 2025 12:54:56 +0800
+X-Gm-Features: AWmQ_bn1qDk9i98u17BRaRFYgjDjEnolIymTBUUZqbFC072gwUWymGKR4ygmP8w
+Message-ID: <CANRm+CxZfFVk=dX3Koi_RUH6ppr_zc6fs3HHPaYkRGwV7h9L7w@mail.gmail.com>
+Subject: Re: [PATCH 00/10] sched/kvm: Semantics-aware vCPU scheduling for
+ oversubscribed KVM
+To: K Prateek Nayak <kprateek.nayak@amd.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Wanpeng Li <wanpengli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10 Nov 2025, at 17:21, Lorenzo Stoakes wrote:
+Hi Prateek,
 
-> There's an established convention in the kernel that we treat PTEs as
-> containing swap entries (and the unfortunately named non-swap swap entr=
-ies)
-> should they be neither empty (i.e. pte_none() evaluating true) nor pres=
-ent
-> (i.e. pte_present() evaluating true).
+On Tue, 11 Nov 2025 at 14:28, K Prateek Nayak <kprateek.nayak@amd.com> wrot=
+e:
 >
-> However, there is some inconsistency in how this is applied, as we also=
+> Hello Wanpeng,
+>
+> I haven't looked at the entire series and the penalty calculation math
+> but I've a few questions looking at the cover-letter.
 
-> have the is_swap_pte() helper which explicitly performs this check:
->
-> 	/* check whether a pte points to a swap entry */
-> 	static inline int is_swap_pte(pte_t pte)
-> 	{
-> 		return !pte_none(pte) && !pte_present(pte);
-> 	}
->
-> As this represents a predicate, and it's logical to assume that in orde=
-r to
-> establish that a PTE entry can correctly be manipulated as a swap/non-s=
-wap
-> entry, this predicate seems as if it must first be checked.
->
-> But we instead, we far more often utilise the established convention of=
+Thanks for the review and the thoughtful questions.
 
-> checking pte_none() / pte_present() before operating on entries as if t=
-hey
-> were swap/non-swap.
 >
-> This patch works towards correcting this inconsistency by removing all =
-uses
-> of is_swap_pte() where we are already in a position where we perform
-> pte_none()/pte_present() checks anyway or otherwise it is clearly logic=
-al
-> to do so.
+> On 11/10/2025 9:02 AM, Wanpeng Li wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > This series addresses long-standing yield_to() inefficiencies in
+> > virtualized environments through two complementary mechanisms: a vCPU
+> > debooster in the scheduler and IPI-aware directed yield in KVM.
+> >
+> > Problem Statement
+> > -----------------
+> >
+> > In overcommitted virtualization scenarios, vCPUs frequently spin on loc=
+ks
+> > held by other vCPUs that are not currently running. The kernel's
+> > paravirtual spinlock support detects these situations and calls yield_t=
+o()
+> > to boost the lock holder, allowing it to run and release the lock.
+> >
+> > However, the current implementation has two critical limitations:
+> >
+> > 1. Scheduler-side limitation:
+> >
+> >    yield_to_task_fair() relies solely on set_next_buddy() to provide
+> >    preference to the target vCPU. This buddy mechanism only offers
+> >    immediate, transient preference. Once the buddy hint expires (typica=
+lly
+> >    after one scheduling decision), the yielding vCPU may preempt the ta=
+rget
+> >    again, especially in nested cgroup hierarchies where vruntime domain=
+s
+> >    differ.
 >
-> We also take advantage of the fact that pte_swp_uffd_wp() is only set o=
-n
-> swap entries.
->
-> Additionally, update comments referencing to is_swap_pte() and
-> non_swap_entry().
->
-> No functional change intended.
->
-> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-> ---
->  fs/proc/task_mmu.c            | 49 ++++++++++++++++++++++++-----------=
+> So what you are saying is there are configurations out there where vCPUs
+> of same guest are put in different cgroups? Why? Does the use case
+> warrant enabling the cpu controller for the subtree? Are you running
 
->  include/linux/userfaultfd_k.h |  3 +--
->  mm/hugetlb.c                  |  6 ++---
->  mm/internal.h                 |  6 ++---
->  mm/khugepaged.c               | 29 +++++++++++----------
->  mm/migrate.c                  |  2 +-
->  mm/mprotect.c                 | 43 ++++++++++++++----------------
->  mm/mremap.c                   |  7 +++--
->  mm/page_table_check.c         | 13 ++++++----
->  mm/page_vma_mapped.c          | 31 +++++++++++-----------
->  10 files changed, 104 insertions(+), 85 deletions(-)
->
+You're right to question this. The problematic scenario occurs with
+nested cgroup hierarchies, which is common when VMs are deployed with
+cgroup-based resource management. Even when all vCPUs of a single
+guest are in the same leaf cgroup, that leaf sits under parent cgroups
+with their own vruntime domains.
 
-<snip>
+The issue manifests when:
+   - set_next_buddy() provides preference at the leaf level
+   - But vruntime competition happens at parent levels
+   - The buddy hint gets "diluted" when pick_task_fair() walks up the hiera=
+rchy
 
-> diff --git a/mm/page_vma_mapped.c b/mm/page_vma_mapped.c
-> index be20468fb5a9..a4e23818f37f 100644
-> --- a/mm/page_vma_mapped.c
-> +++ b/mm/page_vma_mapped.c
-> @@ -16,6 +16,7 @@ static inline bool not_found(struct page_vma_mapped_w=
-alk *pvmw)
->  static bool map_pte(struct page_vma_mapped_walk *pvmw, pmd_t *pmdvalp,=
+The cpu controller is typically enabled in these deployments for quota
+enforcement and weight-based sharing. That said, the debooster
+mechanism is designed to be general-purpose: it handles any scenario
+where yield_to() crosses cgroup boundaries, whether due to nested
+hierarchies or sibling cgroups.
 
->  		    spinlock_t **ptlp)
->  {
-> +	bool is_migration;
->  	pte_t ptent;
->
->  	if (pvmw->flags & PVMW_SYNC) {
-> @@ -26,6 +27,7 @@ static bool map_pte(struct page_vma_mapped_walk *pvmw=
-, pmd_t *pmdvalp,
->  		return !!pvmw->pte;
->  	}
->
-> +	is_migration =3D pvmw->flags & PVMW_MIGRATION;
->  again:
->  	/*
->  	 * It is important to return the ptl corresponding to pte,
-> @@ -41,11 +43,14 @@ static bool map_pte(struct page_vma_mapped_walk *pv=
-mw, pmd_t *pmdvalp,
->
->  	ptent =3D ptep_get(pvmw->pte);
->
-> -	if (pvmw->flags & PVMW_MIGRATION) {
-> -		if (!is_swap_pte(ptent))
+> with the "NEXT_BUDDY" sched feat enabled?
 
-Here, is_migration =3D true and either pte_none() or pte_present()
-would return false, and ...
+Yes, NEXT_BUDDY is enabled. The problem is that set_next_buddy()
+provides only immediate, transient preference. Once the buddy hint is
+consumed (typically after one pick_next_task_fair() call), the
+yielding vCPU can preempt the target again if their vruntime values
+haven't diverged sufficiently.
 
-> +	if (pte_none(ptent)) {
-> +		return false;
-> +	} else if (pte_present(ptent)) {
-> +		if (is_migration)
->  			return false;
-> -	} else if (is_swap_pte(ptent)) {
-> +	} else if (!is_migration) {
->  		swp_entry_t entry;
+>
+> If they are in the same cgroup, the recent optimizations/fixes to
+> yield_task_fair() in queue:sched/core should help remedy some of the
+> problems you might be seeing.
+
+Agreed - the recent yield_task_fair() improvements in queue:sched/core
+(EEVDF-based vruntime =3D deadline with hierarchical walk) are valuable.
+However, our patchset focuses on yield_to() rather than yield(), which
+has different semantics:
+   - yield_task_fair(): "I voluntarily give up CPU, pick someone else"
+=E2=86=92 Recent improvements handle this well with hierarchical walk
+   - yield_to_task_fair(): "I want *this specific task* to run
+instead" =E2=86=92 Requires finding the LCA of yielder and target, then
+applying penalties at that level to influence their relative
+competition
+
+The debooster extends yield_to() to handle cross-cgroup scenarios
+where the yielder and target may be in different subtrees.
+
+>
+> For multiple cgroups, perhaps you can extend yield_task_fair() to do:
+
+Thanks for the suggestion. Your hierarchical walk approach shares
+similarities with our implementation. A few questions on the details:
+
+>
+> ( Only build and boot tested on top of
+>     git.kernel.org/pub/scm/linux/kernel/git/peterz/queue.git sched/core
+>   at commit f82a0f91493f "sched/deadline: Minor cleanup in
+>   select_task_rq_dl()" )
+>
+> diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+> index b4617d631549..87560f5a18b3 100644
+> --- a/kernel/sched/fair.c
+> +++ b/kernel/sched/fair.c
+> @@ -8962,10 +8962,28 @@ static void yield_task_fair(struct rq *rq)
+>          * which yields immediately again; without the condition the vrun=
+time
+>          * ends up quickly running away.
+>          */
+> -       if (entity_eligible(cfs_rq, se)) {
+> +       do {
+> +               cfs_rq =3D cfs_rq_of(se);
 > +
->  		/*
->  		 * Handle un-addressable ZONE_DEVICE memory.
->  		 *
-> @@ -66,8 +71,6 @@ static bool map_pte(struct page_vma_mapped_walk *pvmw=
-, pmd_t *pmdvalp,
->  		if (!is_device_private_entry(entry) &&
->  		    !is_device_exclusive_entry(entry))
->  			return false;
-> -	} else if (!pte_present(ptent)) {
-> -		return false;
+> +               /*
+> +                * Another entity will be selected at next pick.
+> +                * Single entity on cfs_rq can never be ineligible.
+> +                */
+> +               if (!entity_eligible(cfs_rq, se))
+> +                       break;
+> +
+>                 se->vruntime =3D se->deadline;
 
-=2E.. is_migration =3D false and !pte_present() is actually pte_none(),
-because of the is_swap_pte() above the added !is_migration check.
-So pte_none() should return false regardless of is_migration.
+Setting vruntime =3D deadline zeros out lag. Does this cause fairness
+drift with repeated yields? We explicitly recalculate vlag after
+adjustment to preserve EEVDF invariants.
 
-This is a nice cleanup. Thanks.
+>                 se->deadline +=3D calc_delta_fair(se->slice, se);
+> -       }
+> +
+> +               /*
+> +                * If we have more than one runnable task queued below
+> +                * this cfs_rq, the next pick will likely go for a
+> +                * different entity now that we have advanced the
+> +                * vruntime and the deadline of the running entity.
+> +                */
+> +               if (cfs_rq->h_nr_runnable > 1)
 
->  	}
->  	spin_lock(*ptlp);
->  	if (unlikely(!pmd_same(*pmdvalp, pmdp_get_lockless(pvmw->pmd)))) {
-> @@ -113,21 +116,17 @@ static bool check_pte(struct page_vma_mapped_walk=
- *pvmw, unsigned long pte_nr)
->  			return false;
+Stopping at h_nr_runnable > 1 may not handle cross-cgroup yield_to()
+correctly. Shouldn't the penalty apply at the LCA of yielder and
+target? Otherwise the vruntime adjustment might not affect the level
+where they actually compete.
+
+> +                       break;
+> +       } while ((se =3D parent_entity(se)));
+>  }
 >
->  		pfn =3D softleaf_to_pfn(entry);
-> -	} else if (is_swap_pte(ptent)) {
-> -		swp_entry_t entry;
-> +	} else if (pte_present(ptent)) {
-> +		pfn =3D pte_pfn(ptent);
-> +	} else {
-> +		const softleaf_t entry =3D softleaf_from_pte(ptent);
+>  static bool yield_to_task_fair(struct rq *rq, struct task_struct *p)
+> ---
+
+Fixed one-slice penalties underperformed in our testing (dbench:
++14.4%/+9.8%/+6.7% for 2/3/4 VMs). We found adaptive scaling (6.0=C3=97
+down to 1.0=C3=97 based on queue size) necessary to balance effectiveness
+against starvation.
+
 >
->  		/* Handle un-addressable ZONE_DEVICE memory */
-> -		entry =3D pte_to_swp_entry(ptent);
-> -		if (!is_device_private_entry(entry) &&
-> -		    !is_device_exclusive_entry(entry))
-> -			return false;
-> -
-> -		pfn =3D swp_offset_pfn(entry);
-> -	} else {
-> -		if (!pte_present(ptent))
-
-This !pte_present() is pte_none(). It seems that there should be
-
-} else if (pte_none(ptent)) {
-	return false;
-}
-
-before the above "} else {".
-
-> +		if (!softleaf_is_device_private(entry) &&
-> +		    !softleaf_is_device_exclusive(entry))
->  			return false;
+> With that, I'm pretty sure there is a good chance we'll not select the
+> hierarchy that did a yield_to() unless there is a large discrepancy in
+> their weights and just advancing se->vruntime to se->deadline once isn't
+> enough to make it ineligible and you'll have to do it multiple time (at
+> which point that cgroup hierarchy needs to be studied).
 >
-> -		pfn =3D pte_pfn(ptent);
-> +		pfn =3D softleaf_to_pfn(entry);
->  	}
+> As for the problem that NEXT_BUDDY hint is used only once, you can
+> perhaps reintroduce LAST_BUDDY which sets does a set_next_buddy() for
+> the "prev" task during schedule?
+
+That's an interesting idea. However, LAST_BUDDY was removed from the
+scheduler due to concerns about fairness and latency regressions in
+general workloads. Reintroducing it globally might regress non-vCPU
+workloads.
+
+Our approach is more targeted: apply vruntime penalties specifically
+in the yield_to() path (controlled by debugfs flag), avoiding impact
+on general scheduling. The debooster is inert unless explicitly
+enabled and rate-limited to prevent pathological overhead.
+
 >
->  	if ((pfn + pte_nr - 1) < pvmw->pfn)
-> -- =
+> >
+> >    This creates a ping-pong effect: the lock holder runs briefly, gets
+> >    preempted before completing critical sections, and the yielding vCPU
+> >    spins again, triggering another futile yield_to() cycle. The overhea=
+d
+> >    accumulates rapidly in workloads with high lock contention.
+> >
+> > 2. KVM-side limitation:
+> >
+> >    kvm_vcpu_on_spin() attempts to identify which vCPU to yield to throu=
+gh
+> >    directed yield candidate selection. However, it lacks awareness of I=
+PI
+> >    communication patterns. When a vCPU sends an IPI and spins waiting f=
+or
+> >    a response (common in inter-processor synchronization), the current
+> >    heuristics often fail to identify the IPI receiver as the yield targ=
+et.
+>
+> Can't that be solved on the KVM end?
 
-> 2.51.0
+Yes, the IPI tracking is entirely KVM-side (patches 6-10). The
+scheduler-side debooster (patches 1-5) and KVM-side IPI tracking are
+orthogonal mechanisms:
+   - Debooster: sustains yield_to() preference regardless of *who* is
+yielding to whom
+   - IPI tracking: improves *which* target is selected when a vCPU spins
 
-Otherwise, LGTM. With the above issue addressed, feel free to
-add Reviewed-by: Zi Yan <ziy@nvidia.com>
+Both showed independent gains in our testing, and combined effects
+were approximately additive.
 
---
-Best Regards,
-Yan, Zi
+> Also shouldn't Patch 6 be on top with a "Fixes:" tag.
+
+You're right. Patch 6 (last_boosted_vcpu bug fix) is a standalone
+bugfix and should be at the top with a Fixes tag. I'll reorder it in
+v2 with:
+Fixes: 7e513617da71 ("KVM: Rework core loop of kvm_vcpu_on_spin() to
+use a single for-loop")
+
+>
+> >
+> >    Instead, the code may boost an unrelated vCPU based on coarse-graine=
+d
+> >    preemption state, missing opportunities to accelerate actual IPI
+> >    response handling. This is particularly problematic when the IPI rec=
+eiver
+> >    is runnable but not scheduled, as lock-holder-detection logic doesn'=
+t
+> >    capture the IPI dependency relationship.
+>
+> Are you saying the yield_to() is called with an incorrect target vCPU?
+
+Yes - more precisely, the issue is in kvm_vcpu_on_spin()'s target
+selection logic before yield_to() is called. Without IPI tracking, it
+relies on preemption state, which doesn't capture "vCPU waiting for
+IPI response from specific other vCPU."
+
+The IPI tracking records sender=E2=86=92receiver relationships at interrupt
+delivery time (patch 8), enabling kvm_vcpu_on_spin() to directly boost
+the IPI receiver when the sender spins (patch 9). This addresses
+scenarios where the spinning vCPU is waiting for IPI acknowledgment
+rather than lock release.
+
+Performance (16 pCPU host, 16 vCPUs/VM, PARSEC workloads):
+   - Dedup: +47.1%/+28.1%/+1.7% for 2/3/4 VMs
+   - VIPS: +26.2%/+12.7%/+6.0% for 2/3/4 VMs
+
+Gains are most pronounced at moderate overcommit where the IPI
+receiver is often runnable but not scheduled.
+
+Thanks again for the review and suggestions.
+
+Best regards,
+Wanpeng
 
