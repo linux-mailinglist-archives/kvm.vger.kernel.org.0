@@ -1,325 +1,166 @@
-Return-Path: <kvm+bounces-62944-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62945-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 047B4C5437E
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 20:44:16 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97829C54342
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 20:42:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D2BC3BFA1E
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:27:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5C69E4EF72B
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:35:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978F93559FA;
-	Wed, 12 Nov 2025 19:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D196C299A87;
+	Wed, 12 Nov 2025 19:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j6NksHB8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GDniVANR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8BD0355810
-	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 19:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6F121ABB9
+	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 19:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762975395; cv=none; b=oyqYSG1pfEm9tV1iWuPypbLxvcT250YLihAx3wqrq0UahKU7HbxW/jl1cscjM0WZpYIW67HtHzqyyBrlWwdadkTBVK2S2kEfotcbvlEkraddiD0g2nT8upnFYSWFDmnGVaCT13ak7I4lNGXdOaObiqa1Yy3HCHrXDJsIbnaUm6k=
+	t=1762975977; cv=none; b=iGRYJcFwJ0f7LX8HIYiLlP6pzGwkTk4xLZC1AQagdUMnZ6bwXIoeKc+SLdQ9vNGLaJg1yCTSpLloZgInkt7BxnOFeud6yKTUe6ezSbPTh66iSDDuX8EpQZ+zeJrijiWTxTEzAbViOA5r0ZKMLpD6YuQjMVkZJUpCAcjYKWenB8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762975395; c=relaxed/simple;
-	bh=91BJdnU91RfIE/hJq59U7COO8d5lVht0pXvEtkmCCmc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mLpqAWV5r4k+TyRN8jXTix7x6+MA8jglBCl9+zJux3VYGYukmz2NbTinSIvxj1zoxVZAWBE54QcMUTONK0FQzssuzu5L5FVsawfmNkuSEYKT9KI06fyn28MwzcbwBAqu7XkRRysSZYeFxM+fkadHSFADv9AG9ZPtb+A+SjYW1ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j6NksHB8; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7b4933bc4aeso1230032b3a.2
-        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 11:23:12 -0800 (PST)
+	s=arc-20240116; t=1762975977; c=relaxed/simple;
+	bh=SUUhDfoBmuPhmMw0GL7Ir4bt1svau2Ajo0eTYsuBFqU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D5+ogWgNxYrLriIhcXbXl8bHZ4lRX3id5dh1G+WKp8BCLp0JHQ9JawaOefUNonYvcNs9bnjVA7A6F13wyrepnqxUUFVm4SFm7ys0m1gBPN36JJ8dobkGb2FLa+D8yVT3WdA4c5uf4WmmD2DrFZmOD4PSgiTjoaZOLKfEUgiovNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GDniVANR; arc=none smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-63e2cc1ac4aso1159557d50.2
+        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 11:32:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762975392; x=1763580192; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o2e+js0Qy7w6O0gL6/BZx4eVZarhnCcJq/+q0M3UtfI=;
-        b=j6NksHB8XILDLfnhzIeKF/vc+U3FFRqipwTXzqQYFgNrgijzd0NVRMQraOJ1miZm3R
-         mFt7M38YZS5OEOLKWiuXKSoaYi0u0aHel9bWSVjybgvnP8jnZzbXuhCZJdBytXjfnxlB
-         c9Q8LSgL4psSu2K/tiera/35A4uTZRx02A3RGGwplfUhSYGFYgn4JN9j8ao6/yNLZ8iu
-         PuT1E0ehsOtO2G5Z2WFOMS/IVKgKmy4W72JHe6b9SiYJXArqcrnQ6Nz4BPXVRuWmvhFp
-         5qyEWfe482vI28Yt1HFE8L11ZqLpIzumQ+Z6nfkRkPDBoEyht14z3SDTZQO3jutgO0NO
-         ycOA==
+        d=gmail.com; s=20230601; t=1762975974; x=1763580774; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lxubWASL3+7oeSYOF8cRfS3IaF1lf07GjfI/BFusVlo=;
+        b=GDniVANRw7/JIpN8NxtyzRFIGwATa9A2zCRzT3AyV9bYUYVYwu524FQVWDldPls9Sy
+         BpN03Dl612FtbGpNolRLv7VQcy21mEAgyRgKaz8iRgqv93oEknieZ6Y0/RngcZrd9SSC
+         GZNx04VANDM2Cuu0mcyR6voyECGLmNbytUFhlpwNU2hwygi9A3MsbOmnK+GLqGblJC70
+         Y3ZU/AOVaaXFGaQcTxJx45VWlQd1jjjEUDnf2OPYE2bbqLo78IVe58YmFOwQytbkPRWF
+         pfwpadEZKWx9TK1NMR2djxLbPfw4cn5kdJg3xSMPquTNqj/Yxa3mK++zs3NWcntr0n2w
+         ageA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762975392; x=1763580192;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o2e+js0Qy7w6O0gL6/BZx4eVZarhnCcJq/+q0M3UtfI=;
-        b=X22sh5W0dErhfOqhR+KkJAKOcdfPKr3Uaj3t9iG21BBqetxDAjsKeLYOkbOI7WcEkb
-         EEpQaM7rY4VfGT3Bbv7CL/qnu+lHmIxc1BGWT1tXLmnyregniNNvJD5NIuHrDlby0JXE
-         2E4p5PPawopi8Ls6evFj6rmDWXPsFO2uETMzskkaFUXZWnyUsZVcLtXvjqbV7oFV3NBK
-         OwJLUshuVkZTCLgBpYek2IWzxACIABS7CGHymNGiUkHN3UDKdDAW99JoTjGg7lOLYpBq
-         LX1cK0F/gNlVGBZnfKXIPA45MnQ2a3V2Hgp0zRadyhlr76sOEdyzT45FOA4SwCHhAUhX
-         sSQA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDLGd7kJ3jCBY+YDiSgVrtXyRqBme6AUERsZPeJllUlGroqcdHZ2cKRK8O4T8Y1mKgdDE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiRAJE8DJYkVWtJhEjbAd8E3fkAf2+iZ+U0ClxNkBLWevn4AVg
-	jbB/Xcw1nAgiTqt4qsZAlhia0xo4p3b+tSe/0EpM5UJiUzUIrW4ZMYVY+8KYuSV9fG+AKvHthiJ
-	i4wDAyjgLcD/DtA==
-X-Google-Smtp-Source: AGHT+IF8kvsYlmSEbjUQ/k2eUYglNUnLyK7Y7SQjAhLBmOM14SOm1bhd8hAnVvjd1DlYsknFTJKiG6sVMJVM+w==
-X-Received: from pfrj16.prod.google.com ([2002:aa7:8dd0:0:b0:7af:2faf:c3af])
- (user=dmatlack job=prod-delivery.src-stubby-dispatcher) by
- 2002:aa7:88c8:0:b0:7ab:e007:deec with SMTP id d2e1a72fcca58-7b7a53c10cfmr5819330b3a.32.1762975392025;
- Wed, 12 Nov 2025 11:23:12 -0800 (PST)
-Date: Wed, 12 Nov 2025 19:22:32 +0000
-In-Reply-To: <20251112192232.442761-1-dmatlack@google.com>
+        d=1e100.net; s=20230601; t=1762975974; x=1763580774;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lxubWASL3+7oeSYOF8cRfS3IaF1lf07GjfI/BFusVlo=;
+        b=Nm0Gkr8P8B4jlYj9nibhL1EXpzXBHPMBFkXpA1ihdJtHcnw7+lSlRcdtTmrNhBn/nF
+         MIlRdU8BUr/ZNBhEan+MQJAI4sd4TVeUrOGACACyzLMtLE//qMKAgFt+q9qplHNLbdFb
+         XIJ0KnNgD8/bb7uXCK8cCrDpI/yWoBz8QfRQFUAcrjNGsNKsECnPD02Ccjve1WaoCkqo
+         ibiLbNpTJ88aBahKzFfZUwSbzGt2hsLQn4WcrzgzDk3vYOfMqS+6HEEjPXIIhjTWfbcp
+         5sy/6F//sniCEVlqU4TASvD5hFZsqMPagNz/ffr3K2NWi4OQNkXipSILbUtnilpMkxIT
+         KHFA==
+X-Forwarded-Encrypted: i=1; AJvYcCX5Epxl1OwCWoLB9z29eBeY+hFK4960NFNLhZwl4WBzHVKSf/Lb2kFZnwQelw/eq01j4KY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yye0Wi9+r5w1uH2KYywBaLDUYpT84JO7xeTM+9i+VL5vaROStXU
+	bSk72NloJxzwrJemjNSJ8mIwm8rk5Io2ZtHxe1OpsdgMDj5OZjIrgq15
+X-Gm-Gg: ASbGncsAY7swRGj+diCB9e5/JH511OhVlJbOO/kNU+aGCS9clRBA5lWVu9poRAhQv9b
+	o2B1xiaOc7i6ENKmOpH/kujmkvdBvhqN81clwsk0p6hovWky3XVIo39uTGF/KbLvPV2ZwrjPBj1
+	ujW2ImIOa92zh1sNsBqBLj7nErMEJOFEDXQjYJasvaAI4NMMGiKaqv856QmDNFtkTdPHZdofFUa
+	8zD7yQrfFbvjbbxZUd/mW+OLF3SLua2bXDwyIe0QXfRDEBD9eHQFGSC0oA7BM3y6tQ/twjrQj48
+	gkf4DTRQ2h38NkkzEFBE3Jb8rwdD2rc1kv6SeFxFjjsXwWb+R52KqcV//dqnLDDi26ojTiOxGpV
+	++yrYFkcdrCSDGVbO5MSEgyv3yVqx4L2MM0BGA/NwtZLwCSQVVG3alFGsCvdSqPJ8aGbhMWdMDg
+	JnyPTTGEun6z8pscXsLkWV6vhggufwxLPCOY0v
+X-Google-Smtp-Source: AGHT+IG4MyRZebV1Szufgtc9uf8er54fQt94boVEX+HeLHRTnsDHzaHu6bkb0vk12BKBHmbmHT/a7Q==
+X-Received: by 2002:a53:b10f:0:b0:63f:a818:6d34 with SMTP id 956f58d0204a3-64101b29733mr3157363d50.32.1762975973985;
+        Wed, 12 Nov 2025 11:32:53 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:43::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-641015aece9sm1236185d50.3.2025.11.12.11.32.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 11:32:53 -0800 (PST)
+Date: Wed, 12 Nov 2025 11:32:51 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v9 03/14] vsock/virtio: add netns support to
+ virtio transport and virtio common
+Message-ID: <aRTg4/HyOOhYYMzp@devvm11784.nha0.facebook.com>
+References: <20251111-vsock-vmtest-v9-0-852787a37bed@meta.com>
+ <20251111-vsock-vmtest-v9-3-852787a37bed@meta.com>
+ <cah4sqsqbdp52byutxngl3ko44kduesbhan6luhk3ukzml7bs6@hlv4ckunx7jj>
+ <aRSyPqNo1LhqGLBq@devvm11784.nha0.facebook.com>
+ <bhc6s7anskmnnrnpp2r3xzjbesadsex24kmyi5tvsgup7c2rfi@arj4iw5ndnr3>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251112192232.442761-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251112192232.442761-19-dmatlack@google.com>
-Subject: [PATCH v2 18/18] vfio: selftests: Add vfio_pci_device_init_perf_test
-From: David Matlack <dmatlack@google.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Alex Mastro <amastro@fb.com>, Alex Williamson <alex@shazbot.org>, 
-	David Matlack <dmatlack@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Josh Hilke <jrhilke@google.com>, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Raghavendra Rao Ananta <rananta@google.com>, 
-	Vipin Sharma <vipinsh@google.com>, Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bhc6s7anskmnnrnpp2r3xzjbesadsex24kmyi5tvsgup7c2rfi@arj4iw5ndnr3>
 
-Add a new VFIO selftest for measuring the time it takes to run
-vfio_pci_device_init() in parallel for one or more devices.
+On Wed, Nov 12, 2025 at 06:39:22PM +0100, Stefano Garzarella wrote:
+> On Wed, Nov 12, 2025 at 08:13:50AM -0800, Bobby Eshleman wrote:
+> > On Wed, Nov 12, 2025 at 03:18:42PM +0100, Stefano Garzarella wrote:
+> > > On Tue, Nov 11, 2025 at 10:54:45PM -0800, Bobby Eshleman wrote:
+> > > > From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-This test serves as manual regression test for the performance
-improvement of commit e908f58b6beb ("vfio/pci: Separate SR-IOV VF
-dev_set"). For example, when running this test with 64 VFs under the
-same PF:
+[...]
 
-Before:
-
-  $ ./vfio_pci_device_init_perf_test -r vfio_pci_device_init_perf_test.iommufd.init 0000:1a:00.0 0000:1a:00.1 ...
-  ...
-  Wall time: 6.653234463s
-  Min init time (per device): 0.101215344s
-  Max init time (per device): 6.652755941s
-  Avg init time (per device): 3.377609608s
-
-After:
-
-  $ ./vfio_pci_device_init_perf_test -r vfio_pci_device_init_perf_test.iommufd.init 0000:1a:00.0 0000:1a:00.1 ...
-  ...
-  Wall time: 0.122978332s
-  Min init time (per device): 0.108121915s
-  Max init time (per device): 0.122762761s
-  Avg init time (per device): 0.113816748s
-
-This test does not make any assertions about performance, since any such
-assertion is likely to be flaky due to system differences and random
-noise. However this test can be fed into automation to detect
-regressions, and can be used by developers in the future to measure
-performance optimizations.
-
-Suggested-by: Aaron Lewis <aaronlewis@google.com>
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- tools/testing/selftests/vfio/Makefile         |   3 +
- .../vfio/vfio_pci_device_init_perf_test.c     | 167 ++++++++++++++++++
- 2 files changed, 170 insertions(+)
- create mode 100644 tools/testing/selftests/vfio/vfio_pci_device_init_perf_test.c
-
-diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
-index e9e5c6dc63b6..8bb0b1e2d3a3 100644
---- a/tools/testing/selftests/vfio/Makefile
-+++ b/tools/testing/selftests/vfio/Makefile
-@@ -2,6 +2,7 @@ CFLAGS = $(KHDR_INCLUDES)
- TEST_GEN_PROGS += vfio_dma_mapping_test
- TEST_GEN_PROGS += vfio_iommufd_setup_test
- TEST_GEN_PROGS += vfio_pci_device_test
-+TEST_GEN_PROGS += vfio_pci_device_init_perf_test
- TEST_GEN_PROGS += vfio_pci_driver_test
+> > > If it simplifies, I think we can eventually merge all changes to transports
+> > > that depends on virtio_transport_common in a single commit.
+> > > IMO is better to have working commits than better split.
+> > 
+> > That would be so much easier. Much of this patch is just me trying to
+> > find a way to keep total patch size reasonably small for review... if
+> > having them all in one commit is preferred then that makes life easier.
+> > 
+> > The answer to all of the above is that I was just trying to make the
+> > virtio_common changes in one place, but not break bisect/build by
+> > failing to update the transport-level call sites. So the placeholder
+> > values are primarily there to compile.
+> 
+> In theory, they should compile, but they should also properly behave.
+> 
+> BTW I strongly believe that having separate commits is a great thing, but we
+> shouldn't take things to extremes and complicate our lives when things are
+> too closely related, as in this case.
+> 
+> There is a clear dependency between these patches, so IMO, if the patch
+> doesn't become huge, it's better to have everything together. (I mean
+> between dependencies with virtio_transport_common).
  
- TEST_PROGS_EXTENDED := scripts/cleanup.sh
-@@ -15,6 +16,8 @@ CFLAGS += -I$(top_srcdir)/tools/include
- CFLAGS += -MD
- CFLAGS += $(EXTRA_CFLAGS)
- 
-+LDFLAGS += -pthread
-+
- $(TEST_GEN_PROGS): %: %.o $(LIBVFIO_O)
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $< $(LIBVFIO_O) $(LDLIBS) -o $@
- 
-diff --git a/tools/testing/selftests/vfio/vfio_pci_device_init_perf_test.c b/tools/testing/selftests/vfio/vfio_pci_device_init_perf_test.c
-new file mode 100644
-index 000000000000..54e327dadab4
---- /dev/null
-+++ b/tools/testing/selftests/vfio/vfio_pci_device_init_perf_test.c
-@@ -0,0 +1,167 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include <pthread.h>
-+#include <sys/ioctl.h>
-+#include <sys/mman.h>
-+
-+#include <linux/sizes.h>
-+#include <linux/vfio.h>
-+
-+#include <libvfio.h>
-+
-+#include "../kselftest_harness.h"
-+
-+static char **device_bdfs;
-+static int nr_devices;
-+
-+struct thread_args {
-+	struct iommu *iommu;
-+	int device_index;
-+	struct timespec start;
-+	struct timespec end;
-+	pthread_barrier_t *barrier;
-+};
-+
-+FIXTURE(vfio_pci_device_init_perf_test) {
-+	pthread_t *threads;
-+	pthread_barrier_t barrier;
-+	struct thread_args *thread_args;
-+	struct iommu *iommu;
-+};
-+
-+FIXTURE_VARIANT(vfio_pci_device_init_perf_test) {
-+	const char *iommu_mode;
-+};
-+
-+#define FIXTURE_VARIANT_ADD_IOMMU_MODE(_iommu_mode)			\
-+FIXTURE_VARIANT_ADD(vfio_pci_device_init_perf_test, _iommu_mode) {	\
-+	.iommu_mode = #_iommu_mode,					\
-+}
-+
-+FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES();
-+
-+FIXTURE_SETUP(vfio_pci_device_init_perf_test)
-+{
-+	int i;
-+
-+	self->iommu = iommu_init(variant->iommu_mode);
-+	self->threads = calloc(nr_devices, sizeof(self->threads[0]));
-+	self->thread_args = calloc(nr_devices, sizeof(self->thread_args[0]));
-+
-+	pthread_barrier_init(&self->barrier, NULL, nr_devices);
-+
-+	for (i = 0; i < nr_devices; i++) {
-+		self->thread_args[i].iommu = self->iommu;
-+		self->thread_args[i].barrier = &self->barrier;
-+		self->thread_args[i].device_index = i;
-+	}
-+}
-+
-+FIXTURE_TEARDOWN(vfio_pci_device_init_perf_test)
-+{
-+	iommu_cleanup(self->iommu);
-+	free(self->threads);
-+	free(self->thread_args);
-+}
-+
-+static s64 to_ns(struct timespec ts)
-+{
-+	return (s64)ts.tv_nsec + 1000000000LL * (s64)ts.tv_sec;
-+}
-+
-+static struct timespec to_timespec(s64 ns)
-+{
-+	struct timespec ts = {
-+		.tv_nsec = ns % 1000000000LL,
-+		.tv_sec = ns / 1000000000LL,
-+	};
-+
-+	return ts;
-+}
-+
-+static struct timespec timespec_sub(struct timespec a, struct timespec b)
-+{
-+	return to_timespec(to_ns(a) - to_ns(b));
-+}
-+
-+static struct timespec timespec_min(struct timespec a, struct timespec b)
-+{
-+	return to_ns(a) < to_ns(b) ? a : b;
-+}
-+
-+static struct timespec timespec_max(struct timespec a, struct timespec b)
-+{
-+	return to_ns(a) > to_ns(b) ? a : b;
-+}
-+
-+static void *thread_main(void *__args)
-+{
-+	struct thread_args *args = __args;
-+	struct vfio_pci_device *device;
-+
-+	pthread_barrier_wait(args->barrier);
-+
-+	clock_gettime(CLOCK_MONOTONIC, &args->start);
-+	device = vfio_pci_device_init(device_bdfs[args->device_index], args->iommu);
-+	clock_gettime(CLOCK_MONOTONIC, &args->end);
-+
-+	pthread_barrier_wait(args->barrier);
-+
-+	vfio_pci_device_cleanup(device);
-+	return NULL;
-+}
-+
-+TEST_F(vfio_pci_device_init_perf_test, init)
-+{
-+	struct timespec start = to_timespec(INT64_MAX), end = {};
-+	struct timespec min = to_timespec(INT64_MAX);
-+	struct timespec max = {};
-+	struct timespec avg = {};
-+	struct timespec wall_time;
-+	s64 thread_ns = 0;
-+	int i;
-+
-+	for (i = 0; i < nr_devices; i++) {
-+		pthread_create(&self->threads[i], NULL, thread_main,
-+			       &self->thread_args[i]);
-+	}
-+
-+	for (i = 0; i < nr_devices; i++) {
-+		struct thread_args *args = &self->thread_args[i];
-+		struct timespec init_time;
-+
-+		pthread_join(self->threads[i], NULL);
-+
-+		start = timespec_min(start, args->start);
-+		end = timespec_max(end, args->end);
-+
-+		init_time = timespec_sub(args->end, args->start);
-+		min = timespec_min(min, init_time);
-+		max = timespec_max(max, init_time);
-+		thread_ns += to_ns(init_time);
-+	}
-+
-+	avg = to_timespec(thread_ns / nr_devices);
-+	wall_time = timespec_sub(end, start);
-+
-+	printf("Wall time: %lu.%09lus\n",
-+	       wall_time.tv_sec, wall_time.tv_nsec);
-+	printf("Min init time (per device): %lu.%09lus\n",
-+	       min.tv_sec, min.tv_nsec);
-+	printf("Max init time (per device): %lu.%09lus\n",
-+	       max.tv_sec, max.tv_nsec);
-+	printf("Avg init time (per device): %lu.%09lus\n",
-+	       avg.tv_sec, avg.tv_nsec);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	int i;
-+
-+	device_bdfs = vfio_selftests_get_bdfs(&argc, argv, &nr_devices);
-+
-+	printf("Testing parallel initialization of %d devices:\n", nr_devices);
-+	for (i = 0; i < nr_devices; i++)
-+		printf("    %s\n", device_bdfs[i]);
-+
-+	return test_harness_run(argc, argv);
-+}
--- 
-2.52.0.rc1.455.g30608eb744-goog
+Sounds good, let's give the combined commit a go, I think the
+transport-specific pieces are small enough for it to not balloon? 
 
+> What we could perhaps do is have an initial commit where you make the
+> changes, but the behavior remains unchanged (continue to use global
+> everywhere, as for virtio_transport.c in this patch), and then specific
+> commits to just enable support for local/global.
+> 
+> Not sure if it's doable, but I'd like to remove the placeholders if
+> possibile. Let's discuss more about it if there are issues.
+
+Sounds good, I'll come back to this thread if the combined commit
+approach above balloons. For the combined commit, should the change log
+start at "Changes in v10" with any new changes, mention combining +
+links to the v9 patches that were combined?
+
+Best,
+Bobby
 
