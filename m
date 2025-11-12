@@ -1,259 +1,505 @@
-Return-Path: <kvm+bounces-62897-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62898-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90F85C53888
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 17:57:32 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F807C53636
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 17:28:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 204B1586519
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 16:16:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 231203546CA
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 16:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2722346E6D;
-	Wed, 12 Nov 2025 16:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E471A340293;
+	Wed, 12 Nov 2025 16:13:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cMvhAUTq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dDoRNmDR"
 X-Original-To: kvm@vger.kernel.org
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012034.outbound.protection.outlook.com [52.101.53.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8951F4176;
-	Wed, 12 Nov 2025 16:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.34
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762963882; cv=fail; b=XdCmoZiFaclTa7LqSgfqaurs24BjmnJyBjQRaDGdMEyR8h0i5N9XgcWN/wxkC8XHt/V3Jo5NzsCdHIIuFjZVJbmL4cDbeKPgCJCSW2o3nDqH2MuG4JElAvd+xsxehzuUxc88/BkGu6P12gp53Ri6K/2F+v1NYBdD43qJgYlh46A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762963882; c=relaxed/simple;
-	bh=2x7G2m0Uz0LNz3nb1uVJ9Ho6Ozj52mHZ036+3uNWTUY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qJKeAsE5tvM5i7E4OjQWLZ0Lvki1zJhWlGtRtbN2YBMfffL7v3B9NjJc27u6AaKYc6es+7U6RzfqtkriNVbTHOQ11oAdfTedRXQrnVdudjXYEp1kDBFuVRjZIRjG7zpySGi+cCHIze/PWRK4JeRdxFiCbQ+5TrB2LvlSiRRNwxo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cMvhAUTq; arc=fail smtp.client-ip=52.101.53.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bfBT/99gscDFriaaxkKpwdmYPlKGfN1xb9oyZT01kNI/m8jscE5e+fQokVPjpNXMXyvCzgfN/imiq37M/cPjYD4w4/tjyPnD7mKsa6vJPgc93xC970NDcim2phSt7cRBm/Nkx7qV4/LtjZD8FdOitr6otzxOA1Dz1z3QoOQCGbq2W1/Yww+cF3/drH4vM2vxV0OOiWgjTpFEmhUJrnES/utT8NA/DthX+euQ/ZAjlqRRHGVlJnZ2PU7nE/1mAP33J160SukaJijABInRsyOewlnY8ncJgJ4jTtnnPxdeZXqVF+hJXC7KNyobWEp8mdbtw8zKiHZ4L4xx+AKoMN39jA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G3Lxc1rZj8nKGD/MFOCBJGbkR2EsCI4IL4XH2Lxanj4=;
- b=vtszcmf+9I1fkpgR+HZbkd7DMH6+5UxUmUBY2mCMMLxnkFdTGuLcxOJjCFrkfQ+A3hk9IWfCLJZomnW6ORn8XxfAk7qRNgqHzsf0WnMNyfq6YYr86jJMsqVNEJD/rraT/VNRRP1YIIpsRERCw8HK7pJv8vLQ5tuhICCuXwhO2fjI5EpYYeL5IFt+uayUc8RypeOXjLndcinfkDaTo3f/i3pPjsyCjnYSrJ1ChVNaFNzb8fwIlzSRjLagvyNRF1fmgukYGYA3dbT8ixN5odnt4W0TrdoO6a9BQ8mmuAYGHq22GVOhl27Zl4epBDrQiqr5G3LvTkTBGlN17j5oE3b/Jw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G3Lxc1rZj8nKGD/MFOCBJGbkR2EsCI4IL4XH2Lxanj4=;
- b=cMvhAUTqTlN+mUJW/4gZzSThcgBvCAo+IKVmsU3mnhw7d7RzaUDtHqph4If0P3YVMvm+9dgDi3e5aHYGM4xfoLmktcH1jE4FxT+/0mQbEwUd0kVwAMYwCt6mm7hrsDbgkCthFxQDZgGQFNTX7EkZj3ziMGGtE80b1Ma1dpM+N7cbfVpiHFJP8BZq0bFTek+eeh69tpqEvSCavUDn7fi8cuFAi/+TWZwYjwWvUcQU6CkiZCyvwRAkv4UES5sYZtQzrUaQ8Ujy/qI9WsHIVOOgTMVdtsVwFRrjHfBm397O7qDI+Lg9LQbpnil/b66f7CSzPh6DAoXV/HN4FD1tZ69x6A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
- DM4PR12MB7624.namprd12.prod.outlook.com (2603:10b6:8:107::11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9320.15; Wed, 12 Nov 2025 16:11:15 +0000
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a%5]) with mapi id 15.20.9320.013; Wed, 12 Nov 2025
- 16:11:15 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Arnd Bergmann <arnd@arndb.de>, Baolin Wang <baolin.wang@linux.alibaba.com>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache <npache@redhat.com>,
- Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>,
- Barry Song <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>,
- Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
- Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
- Matthew Brost <matthew.brost@intel.com>,
- Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
- Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
- Ying Huang <ying.huang@linux.alibaba.com>,
- Alistair Popple <apopple@nvidia.com>,
- Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
- Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
- Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
- Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
- SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
- Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
- Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
- Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
- Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
- <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
- <linux-s390@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
- <linux-mm@kvack.org>, <linux-arch@vger.kernel.org>, <damon@lists.linux.dev>
-Subject: Re: [PATCH v3 03/16] mm: avoid unnecessary uses of is_swap_pte()
-Date: Wed, 12 Nov 2025 11:11:08 -0500
-X-Mailer: MailMate (2.0r6283)
-Message-ID: <CA6617F2-7EA3-4A2A-8EE1-C9CE098ACB60@nvidia.com>
-In-Reply-To: <B114F7B2-8EDA-44DC-8458-79E3FF628558@nvidia.com>
-References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
- <17fd6d7f46a846517fd455fadd640af47fcd7c55.1762812360.git.lorenzo.stoakes@oracle.com>
- <B114F7B2-8EDA-44DC-8458-79E3FF628558@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: BL0PR01CA0024.prod.exchangelabs.com (2603:10b6:208:71::37)
- To DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CED33A026
+	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 16:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762964038; cv=none; b=jjRzA1L6poqE8MclKgAi+HFUvtjiTDxXfgoiFQNqFyKCgd7gV+xOAVgRsjRKLxJXX/oVV0c2oKWl6jeL2Oc0Th26rjhqP+mOg+UsVknQasBjeUk3ZqraDyClErAdljSuEUVrGEeuV9iqmmRahhaA229x5/RQbBohH4SIwcfVT6g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762964038; c=relaxed/simple;
+	bh=bV+9fG0+Nz41M14zo+PileUvvIjbjVs23HdEOcQZ0lk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f3HoTxWrX3TiFda0tIii3O1TLrT817F2zHKHgn21OZC+HPxU9G+Tl3wNm85B0h8y0Dq/MCLWmhq6Kn1tX5BDs6gUv0CsOFPb609T2r6MGjTWorgp2sLutuZYNciiQms0c64hKP8030GymUZHIMVsPBxVUvFHub6yVr1TiDYU5Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dDoRNmDR; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-787eb2d8663so14877107b3.0
+        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 08:13:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762964035; x=1763568835; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZWXLxch4fPGZbP28s9KbUOromLS9hOdnT1C/CmmWTyg=;
+        b=dDoRNmDRbYKWvT9S2O9LfX6aBxaYUCHF8vgJaM0/G1lr3GlHf2FPiMETk3DIQbEycI
+         5GSX4fQpBXudNwGXlI4081bo1yu4A8YIOPtHMaHaPGWP0YJbVIUkteVvC3LHflHRgw0V
+         ZN6Alomh5tRwFKB/P8UnxrupOFEPxqSH5f9p0Toiu1Zjfi1WF75F2/yUAyJy4nwIQ+Sy
+         cBNsf3+z5l7P95eRcDAiweOBXd6ShnbJFFo9V2wQycwb++JumO8rbf86+dHc9f3WjVom
+         tyhl1IYFjThhf2AMwD7KgKA7PCBVO3p28Q7nTWvVqWpmpwAZOt7Gko7Az4Sq59ive2p/
+         htig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762964035; x=1763568835;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZWXLxch4fPGZbP28s9KbUOromLS9hOdnT1C/CmmWTyg=;
+        b=Xe/1ByOjjeGoorE8JoxD2FBo8pEYfKCPGoLBH0HOrICD7OlHb+2dZtmTwcYrEEUar3
+         QdECtfYNb5y7f4H0H1doYIHCsuPdoE0yac7LfCosGB5Rs2UqAEU9LapnlY/ulnTqpUaF
+         bdrdZLJ7kEMbCFRcuWyKjN2oCL3PCWqkWeLRhK8I6Yyjsn8me7sir32W7isSIT3vcN/9
+         TKTwugpGKNOUhi60Wb02UKwNAPNHhhFjpEtHB2zvUfaodk/KEv4ahVR+A6Gj8FvSDPNW
+         WSqVtEXVNp/dDzr0NHAwE4ACI+qPSRnEFRFHVvbMQZaXe/2/7qgEQm4oeMK2C98i6/74
+         YyIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWBK9x7PLvsUV7GzjaOZqYYsviKzxBsT4bNhujWFRXxZMRULpzOlPCDfamVcvUv7e3UXhY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzm25oim0u1Fxica2+6n59FPIoBXhwonKRJOF6t0+3KN6q6ArwP
+	8LaWWbEbdjBXsinkg08QAYj258wYWpbS5wnLOjnetZ+PySap4wWcNS9i
+X-Gm-Gg: ASbGncsIMv4DIeIsSdiHogOKoD3iphmJjtjSRGe2+8IuMxfXBT4Yau4HyszlTBvmw8y
+	qpX5KEbZkI5/SY9Q+7NtMoAWPknPU0QF1twTK5G94401RSP3uhEmNjqeX+cpv5Ah8FvKsK1QiiM
+	URmLRw/3X16WMAVSrleTg0cRNc5dv1kSFkb43UaR84lotO3HzskA340VLm567NErlZ6+8qyFNZ1
+	mUmkxnCjQn/LlFV0xgVd5aQrDKGmvTHH4i0O1XnvZONF9ia4AvMC9iu8gK6XND/eaurv5GqlYwa
+	4UbA1yBhbwuYGUU3JA4WpMknqqRPkNpBlYvf2h8VD1LFa9LqqyAdM8ix/49m0H6kZBTnYLnvL1Z
+	bG9eEQDCDGVpEcQ92hiVWKzDWBPa7I0wRcdShiuyZn6eAzC/+NgjpoQ2ehcph/h+S3by/AfmG/F
+	efWRG/VVBSh16VL3DvZt3jkuGjZ6p/9xEGBDXY
+X-Google-Smtp-Source: AGHT+IG2G3P30kZcCv3rfJdtjQk8VSMOmNhJqxSYHopRVbIImAuf4PvnQsG3NnVMoqig5hhfdiiIcQ==
+X-Received: by 2002:a05:690c:6c03:b0:787:c44d:4b39 with SMTP id 00721157ae682-78812f5873fmr32756047b3.4.1762964034456;
+        Wed, 12 Nov 2025 08:13:54 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:4c::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-787d6a20dd5sm43280497b3.52.2025.11.12.08.13.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 08:13:54 -0800 (PST)
+Date: Wed, 12 Nov 2025 08:13:50 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v9 03/14] vsock/virtio: add netns support to
+ virtio transport and virtio common
+Message-ID: <aRSyPqNo1LhqGLBq@devvm11784.nha0.facebook.com>
+References: <20251111-vsock-vmtest-v9-0-852787a37bed@meta.com>
+ <20251111-vsock-vmtest-v9-3-852787a37bed@meta.com>
+ <cah4sqsqbdp52byutxngl3ko44kduesbhan6luhk3ukzml7bs6@hlv4ckunx7jj>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|DM4PR12MB7624:EE_
-X-MS-Office365-Filtering-Correlation-Id: 49be0fdc-5ef9-47bc-c34e-08de22061b15
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?hcX7qNoEcUyQDyAT5liB19I4ym1eHfmrlGWuJb/d4sfKDrOd9TnGiVOuuGz2?=
- =?us-ascii?Q?HEv7yi6EN56ILf70L3pDhIZEDrr5TLsDrGME6VXy/Z1jsOaq4U6pPeiLJg1C?=
- =?us-ascii?Q?vjqxTtJbPOOxYMkrmQMwf/ivlpm28vrpN278QmL16y64HWRMuVazZ3u5Jb07?=
- =?us-ascii?Q?hol1WDwgo2wBWyjmtFgm3EMRpwapPZXeViVbTBkzonMp5KuB+ngscCckYD72?=
- =?us-ascii?Q?L7Ta3ty0eGH9YRplQQBt9c6/4v9oOwOtP59PjvH/ugXYPRurffrCJarzG77S?=
- =?us-ascii?Q?R08iQrRvXGKY2WItGP17cfkjyv8QcVhJWQ4xZeQGKRZkKEKjl4lQ6ynu6ywO?=
- =?us-ascii?Q?UQrv6Et2I56PiFs7X55gpjOImjjHiMfQoA9mdHfJiiipZyD468LHey/nhHz1?=
- =?us-ascii?Q?h/uRZrvE1sSJVqBO6cJ8UW7HZXRgtJQecmFw5Sa7mpWxVSOjiVBgAeJ7+dtY?=
- =?us-ascii?Q?UYph+nDFjkHQzDU2IkplWp6BUvKdv5gL4SOjG4j3UycvVbHzaNJgaJLul6Sb?=
- =?us-ascii?Q?35SgjD0wDWF2A4g+NFR4KEBuJr5QSGF07rEDc7iPcEJ88vGH5qPbF0956/wa?=
- =?us-ascii?Q?YiBQZka5mcsxxjJeOV4p8KaEcZo+UBahb9zcRYRX9qiFmrQ6VYRk40PrhBLK?=
- =?us-ascii?Q?wo1MgzRXr0h2DGOU8XO/6gri2xPjb+MqPXttT2f6vtaKsNPSb8oD7E6sBprv?=
- =?us-ascii?Q?wacBmfmNrcLLklRczELLlNyd669KugO2rtyzVvc3+OsefpaVQc82EBWDaJqm?=
- =?us-ascii?Q?bJMfwjfHu2w4GasEi9FYobIZjYdsNj5e3nQSVb25yoAd/bARVzGM0oC0e+r6?=
- =?us-ascii?Q?KJvHa/Xa+EYEZFQWVq+e29zq4OtDJxmMPe2K5vfYffroCPtfmIbIa1xyw+4I?=
- =?us-ascii?Q?CvuaFRQ1Z9vpAxHT5Z46ZT3OJLktW5zmr1eChCODgGYv4897Y+xVh8gfNzJX?=
- =?us-ascii?Q?T2dUxq5vAD9/uLYjUkV59F46YLJNnTIObiVtRYQRRGBmg8vFxJM2qdhJVs5Q?=
- =?us-ascii?Q?shdQ46rbildpBmRnIzC3sud8Ri5k/tElhQRPpnhAoaApC59QEVyJv7aEhWt4?=
- =?us-ascii?Q?0EpQpN6F8RYq/LCfeY830kqSPrXZjrmRQFhYMMf4zAbF60TfLGa2EQU7lVgR?=
- =?us-ascii?Q?dqFWzUJrwYX/Ep4WleqBTFwXNJ10iUelH5wkx5kyjRIie/izfo8cNNn01rxA?=
- =?us-ascii?Q?/+QVq6RKn7qoipkOYrsimEk0lQeOzcs0KSzs5YPhwNOvAAtee3E2HUcKRDFj?=
- =?us-ascii?Q?q+OHiEVyZgtuUo3e74VgMaONSmEJZqQ8lui2qGLi/uJblcsVbedgKtVh2NcO?=
- =?us-ascii?Q?yFZAG1ZH5smvhORmfSO6p6gBSsurrQ++TOLqKadbiUl/M8d8a5qhJznkymXN?=
- =?us-ascii?Q?GjEbPJrzFU/lHH4cS3yj4IaFy1kc64ZdkAQus31vewMdM42DwIJruwwciy+a?=
- =?us-ascii?Q?UJlNj1C5YvO7CHObBhPD9sHoSHufewpH?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?wCmGD+u0lB0nsfBrLLlMAAQBLtdt0vTVu129yme7ohl5Avw+MlBE03Yhxf0q?=
- =?us-ascii?Q?381ej7L60VUtPadZYknrP1mbeWWgeafg9dUkhUzCLUyfLbGlDH5aFDak4oDL?=
- =?us-ascii?Q?cOPDwhD9TvFkHvhcvevEgDHwQmBMefpr3Fr3oWlJVynA67uqyNDRSdOcKz4m?=
- =?us-ascii?Q?iVPq4Rn5bLjot5FpI0ZFbh8pl1QEFnOsZYCHJ/bvVmCxjRhvGNZjVid0170m?=
- =?us-ascii?Q?UvBBhrHX9JJboqUdO6Hr4SZNc8WP5Sd9TXeRIN2pary0dUNCPYdDJ4qyDkRG?=
- =?us-ascii?Q?Dsi5Z4YxtIUELRKlNyZQvIwF4WIpLxN5RLUJZ1YQXq2hOmHJ0Vo1QFTHPDDb?=
- =?us-ascii?Q?uGqyk23+GMl2FkATChV0LEjaS08pGO3CxyZm5j7Z71oXqSNlfISGgZMkJSLb?=
- =?us-ascii?Q?9oqvN43aJNAivrQZSzhcGTmBpXtEP/9VLvgWQHvMf0ZYHziHsPf0FS4rTgRk?=
- =?us-ascii?Q?tF06QiUABnGe5N8oSzPwgLZ+nL2nUqxq4crhjmagJFs1faGwgqGMIy9KbzZ2?=
- =?us-ascii?Q?B8Y5LGVonCvuWCXw8bb45/DbxQGAX/mlMWKGWYBbPzk+VOE+J8rtM5juXxSf?=
- =?us-ascii?Q?9m6yPabgUwauXgycFiwW4G4eDYSfx0gaFh4l9xUz78P6PaJoelpHI+GyN2QO?=
- =?us-ascii?Q?fdwSUdrtwfjY0egrgmz3zfJVvAclsWFPsle7dS1eNSM9dMziS5z+zT/SlZsl?=
- =?us-ascii?Q?26+klYKCsKugzFgXVOkmM7vmhwdX81ceB+BzSmT8iBYapMdKu9zUm888ljGf?=
- =?us-ascii?Q?y09ZLBx8fqhyeax0kX1LNQaql+xNHQoA9kiL62IBpdtCXFlEs1b3jrlonOZt?=
- =?us-ascii?Q?BIC4oZS36wvKWhHBKsIQ15zd5Z8VIU/0Jz0co5jm6JpVnwBv3lWpMf8eq1I7?=
- =?us-ascii?Q?z2PeXR8hdyEPx4BLbGhy9oa0fm11gE4GhIvdtCpCh8WOgxT6MMjpDfXvjO92?=
- =?us-ascii?Q?xIcnWLgp/dZCUEb4bYXvnnRDIxvlUgqlR1/pUg1z6j4A+FjOBzcDuBp/RYwV?=
- =?us-ascii?Q?cqr1OO44B6RQv6ZSVJJd3HwYzyZ6sZfxSqUx9fIixrLwidtu+zOJiBphWRha?=
- =?us-ascii?Q?z0xQgD2/yqhClyzOGz/cHVOMSF3DMpvy3eg50OcAhgjlDG1uipZw4SQ4e0zm?=
- =?us-ascii?Q?Doer5azKbMjY86DSvPlMCbgkG/WeRTLlCCXr9YArMzsA4s2NCkChQGrs3/JG?=
- =?us-ascii?Q?4t9+3BT0EfpeNbsqBCZuwJEdAEp4L/PFAsy03UCJyBHPjc4U6DiS+FRGBcMT?=
- =?us-ascii?Q?//+zBhq1klIukApRv8HBx3YOkZe9qKn8MG/ODPx/f++iENoQhMsifX949639?=
- =?us-ascii?Q?kvmPO8yTB9Fx1ehNiJ5ujccEVi0KEr3kDAR0DrUa2b91nyMKDNhVl1svRUdZ?=
- =?us-ascii?Q?MpqGDJAcrCdU/b6pnS5N1ldS7jWfThqmYYa3DwFWwReOT7IDvT/Fwo3zb0Xm?=
- =?us-ascii?Q?U6h57fQb4bYqQZE/855EhkZGRnz2Ebu79UCrF8d/mbynXMGqGT8NjU46JiIU?=
- =?us-ascii?Q?o9uLU7wJ4ufUlgQ23Yp+9Tobd/qjMgZ4kaVOxw89f6JjDGnOTGYL7pAXTpDL?=
- =?us-ascii?Q?YB0+e7CvkW+ZYqSjzuK4VRFp/dW4wiR1jWFwArkT?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49be0fdc-5ef9-47bc-c34e-08de22061b15
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2025 16:11:15.4335
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: beQ1gPhz5dfNqbQk/Fut70SV2Mb6s8QrKsngHRT6SQwp7ZEDfBvY5wUYBKhS4tdr
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7624
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cah4sqsqbdp52byutxngl3ko44kduesbhan6luhk3ukzml7bs6@hlv4ckunx7jj>
 
-On 11 Nov 2025, at 21:58, Zi Yan wrote:
+On Wed, Nov 12, 2025 at 03:18:42PM +0100, Stefano Garzarella wrote:
+> On Tue, Nov 11, 2025 at 10:54:45PM -0800, Bobby Eshleman wrote:
+> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > 
+> > Enable network namespace support in the virtio-vsock and common
+> > transport layer.
+> > 
+> > The changes include:
+> 
+> This list seems to have been generated by AI. I have nothing against it, but
+> I don't think it's important to list all the things that have changed, but
+> rather to explain why.
 
-> On 10 Nov 2025, at 17:21, Lorenzo Stoakes wrote:
->
->> There's an established convention in the kernel that we treat PTEs as
->> containing swap entries (and the unfortunately named non-swap swap entries)
->> should they be neither empty (i.e. pte_none() evaluating true) nor present
->> (i.e. pte_present() evaluating true).
->>
->> However, there is some inconsistency in how this is applied, as we also
->> have the is_swap_pte() helper which explicitly performs this check:
->>
->> 	/* check whether a pte points to a swap entry */
->> 	static inline int is_swap_pte(pte_t pte)
->> 	{
->> 		return !pte_none(pte) && !pte_present(pte);
->> 	}
->>
->> As this represents a predicate, and it's logical to assume that in order to
->> establish that a PTE entry can correctly be manipulated as a swap/non-swap
->> entry, this predicate seems as if it must first be checked.
->>
->> But we instead, we far more often utilise the established convention of
->> checking pte_none() / pte_present() before operating on entries as if they
->> were swap/non-swap.
->>
->> This patch works towards correcting this inconsistency by removing all uses
->> of is_swap_pte() where we are already in a position where we perform
->> pte_none()/pte_present() checks anyway or otherwise it is clearly logical
->> to do so.
+Sounds good, I'll keep that in mind on why vs what. I have been
+experimenting with AI in my process, but sadly this list was mostly
+hand-rolled. I guess exhaustive listing is an over-correction for too
+sparse of commit messages on my part.
 
-BTW, I wonder if we could use switch + enum and compiler to prevent future
-inconsistencies.
+> 
+> > 1. Add a 'net' field to virtio_vsock_pkt_info to carry the namespace
+> >   pointer for outgoing packets.
+> 
+> Why?
+> 
+> > 2. Add 'net' and 'net_mode' to t->send_pkt() and
+> >   virtio_transport_recv_pkt() functions
+> 
+> Why?
+> 
+> > 3. Modify callback functions to accept placeholder values
+> >   (NULL and 0) for net and net_mode. The placeholders will be
+> 
+> Why 0 ? I mean VSOCK_NET_MODE_GLOBAL is also 0, no?
+> So I don't understand if you want to specify an invalid value (like NULL) or
+> VSOCK_NET_MODE_GLOBAL.
+> 
+> >   replaced when later patches in this series add namespace support
+> >   to transports.
+> > 4. Set virtio-vsock to global mode unconditionally, instead of using
+> >   placeholders. This is done in this patch because virtio-vsock won't
+> >   have any additional changes to choose the net/net_mode, unlike the
+> >   other transports. Same complexity as placeholders.
+> > 5. Pass net and net_mode to virtio_transport_reset_no_sock() directly.
+> >   This ensures that the outgoing RST packets are scoped based on the
+> >   namespace of the receiver of the failed request.
+> 
+> "Receiver" is confusing IMO, see the comment on
+> virtio_transport_reset_no_sock().
+> 
+> > 6. Pass net and net_mode to socket lookup functions using
+> >   vsock_find_{bound,connected}_socket_net().
+> 
+> mmmm, are those functions working fine with the placeholders?
 
-Basically,
+They should resolve everything to global mode as this is why
+virtio-vsock does by the end of this series, but I didn't run the
+tests specifically on this patch.
+> 
+> If it simplifies, I think we can eventually merge all changes to transports
+> that depends on virtio_transport_common in a single commit.
+> IMO is better to have working commits than better split.
 
-enum PTE_State {
-	PTE_PRESENT,
-	PTE_NONE,
-	PTE_SOFTLEAF,
-};
+That would be so much easier. Much of this patch is just me trying to
+find a way to keep total patch size reasonably small for review... if
+having them all in one commit is preferred then that makes life easier.
 
-enum PTE_State get_pte_state(pte_t pte)
-{
-	if (pte_present(pte))
-		return PTE_PRESENT;
-	if (pte_none(pte))
-		return PTE_NONE;
-	return PTE_SOFTLEAF;
-}
+The answer to all of the above is that I was just trying to make the
+virtio_common changes in one place, but not break bisect/build by
+failing to update the transport-level call sites. So the placeholder
+values are primarily there to compile.
 
-in any code handling pte:
+> 
+> I mean, is this commit working (at runtime) well?
 
-switch (get_pte_state(pte)):
-	case PTE_PRESENT:
-		break;
-	case PTE_NONE:
-		break;
-	case PTE_SOFTLEAF:
-		break;
-}
+In theory it should, but I only build checked it.
 
-And compiler will yell at you if any enum is missing in the switch case.
+> > 
+> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > ---
+> > Changes in v9:
+> > - include/virtio_vsock.h: send_pkt() cb takes net and net_mode
+> > - virtio_transport reset_no_sock() takes net and net_mode
+> > - vhost-vsock: add placeholders to recv_pkt() for compilation
+> > - loopback: add placeholders to recv_pkt() for compilation
+> > - remove skb->cb net/net_mode usage, pass as arguments to
+> >  t->send_pkt() and virtio_transport_recv_pkt() functions instead.
+> >  Note that skb->cb will still be used by loopback, but only internal
+> >  to loopback and never passing it to virtio common.
+> > - remove virtio_vsock_alloc_rx_skb(), it is not needed after removing
+> >  skb->cb usage.
+> > - pass net and net_mode to virtio_transport_reset_no_sock()
+> > 
+> > Changes in v8:
+> > - add the virtio_vsock_alloc_rx_skb(), to be in same patch that fields
+> > are read (Stefano)
+> > 
+> > Changes in v7:
+> > - add comment explaining the !vsk case in virtio_transport_alloc_skb()
+> > ---
+> > drivers/vhost/vsock.c                   |  6 ++--
+> > include/linux/virtio_vsock.h            |  8 +++--
+> > net/vmw_vsock/virtio_transport.c        | 10 ++++--
+> > net/vmw_vsock/virtio_transport_common.c | 57 ++++++++++++++++++++++++---------
+> > net/vmw_vsock/vsock_loopback.c          |  5 +--
+> > 5 files changed, 62 insertions(+), 24 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > index 34adf0cf9124..0a0e73405532 100644
+> > --- a/drivers/vhost/vsock.c
+> > +++ b/drivers/vhost/vsock.c
+> > @@ -269,7 +269,8 @@ static void vhost_transport_send_pkt_work(struct vhost_work *work)
+> > }
+> > 
+> > static int
+> > -vhost_transport_send_pkt(struct sk_buff *skb)
+> > +vhost_transport_send_pkt(struct sk_buff *skb, struct net *net,
+> > +			 enum vsock_net_mode net_mode)
+> > {
+> > 	struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
+> > 	struct vhost_vsock *vsock;
+> > @@ -537,7 +538,8 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
+> > 		if (le64_to_cpu(hdr->src_cid) == vsock->guest_cid &&
+> > 		    le64_to_cpu(hdr->dst_cid) ==
+> > 		    vhost_transport_get_local_cid())
+> > -			virtio_transport_recv_pkt(&vhost_transport, skb);
+> > +			virtio_transport_recv_pkt(&vhost_transport, skb, NULL,
+> > +						  0);
+> > 		else
+> > 			kfree_skb(skb);
+> > 
+> > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> > index 0c67543a45c8..5ed6136a4ed4 100644
+> > --- a/include/linux/virtio_vsock.h
+> > +++ b/include/linux/virtio_vsock.h
+> > @@ -173,6 +173,8 @@ struct virtio_vsock_pkt_info {
+> > 	u32 remote_cid, remote_port;
+> > 	struct vsock_sock *vsk;
+> > 	struct msghdr *msg;
+> > +	struct net *net;
+> > +	enum vsock_net_mode net_mode;
+> > 	u32 pkt_len;
+> > 	u16 type;
+> > 	u16 op;
+> > @@ -185,7 +187,8 @@ struct virtio_transport {
+> > 	struct vsock_transport transport;
+> > 
+> > 	/* Takes ownership of the packet */
+> > -	int (*send_pkt)(struct sk_buff *skb);
+> > +	int (*send_pkt)(struct sk_buff *skb, struct net *net,
+> > +			enum vsock_net_mode net_mode);
+> > 
+> > 	/* Used in MSG_ZEROCOPY mode. Checks, that provided data
+> > 	 * (number of buffers) could be transmitted with zerocopy
+> > @@ -280,7 +283,8 @@ virtio_transport_dgram_enqueue(struct vsock_sock *vsk,
+> > void virtio_transport_destruct(struct vsock_sock *vsk);
+> > 
+> > void virtio_transport_recv_pkt(struct virtio_transport *t,
+> > -			       struct sk_buff *skb);
+> > +			       struct sk_buff *skb, struct net *net,
+> > +			       enum vsock_net_mode net_mode);
+> > void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct sk_buff *skb);
+> > u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 wanted);
+> > void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+> > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> > index f92f23be3f59..9395fd875823 100644
+> > --- a/net/vmw_vsock/virtio_transport.c
+> > +++ b/net/vmw_vsock/virtio_transport.c
+> > @@ -231,7 +231,8 @@ static int virtio_transport_send_skb_fast_path(struct virtio_vsock *vsock, struc
+> > }
+> > 
+> > static int
+> > -virtio_transport_send_pkt(struct sk_buff *skb)
+> > +virtio_transport_send_pkt(struct sk_buff *skb, struct net *net,
+> > +			  enum vsock_net_mode net_mode)
+> > {
+> > 	struct virtio_vsock_hdr *hdr;
+> > 	struct virtio_vsock *vsock;
+> > @@ -660,7 +661,12 @@ static void virtio_transport_rx_work(struct work_struct *work)
+> > 				virtio_vsock_skb_put(skb, payload_len);
+> > 
+> > 			virtio_transport_deliver_tap_pkt(skb);
+> > -			virtio_transport_recv_pkt(&virtio_transport, skb);
+> > +
+> > +			/* Force virtio-transport into global mode since it
+> > +			 * does not yet support local-mode namespacing.
+> > +			 */
+> > +			virtio_transport_recv_pkt(&virtio_transport, skb,
+> > +						  NULL, VSOCK_NET_MODE_GLOBAL);
+> > 		}
+> > 	} while (!virtqueue_enable_cb(vq));
+> > 
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index dcc8a1d5851e..f4e09cb1567c 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -413,7 +413,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+> > 
+> > 		virtio_transport_inc_tx_pkt(vvs, skb);
+> > 
+> > -		ret = t_ops->send_pkt(skb);
+> > +		ret = t_ops->send_pkt(skb, info->net, info->net_mode);
+> > 		if (ret < 0)
+> > 			break;
+> > 
+> > @@ -527,6 +527,8 @@ static int virtio_transport_send_credit_update(struct vsock_sock *vsk)
+> > 	struct virtio_vsock_pkt_info info = {
+> > 		.op = VIRTIO_VSOCK_OP_CREDIT_UPDATE,
+> > 		.vsk = vsk,
+> > +		.net = sock_net(sk_vsock(vsk)),
+> > +		.net_mode = vsk->net_mode,
+> > 	};
+> > 
+> > 	return virtio_transport_send_pkt_info(vsk, &info);
+> > @@ -1067,6 +1069,8 @@ int virtio_transport_connect(struct vsock_sock *vsk)
+> > 	struct virtio_vsock_pkt_info info = {
+> > 		.op = VIRTIO_VSOCK_OP_REQUEST,
+> > 		.vsk = vsk,
+> > +		.net = sock_net(sk_vsock(vsk)),
+> > +		.net_mode = vsk->net_mode,
+> > 	};
+> > 
+> > 	return virtio_transport_send_pkt_info(vsk, &info);
+> > @@ -1082,6 +1086,8 @@ int virtio_transport_shutdown(struct vsock_sock *vsk, int mode)
+> > 			 (mode & SEND_SHUTDOWN ?
+> > 			  VIRTIO_VSOCK_SHUTDOWN_SEND : 0),
+> > 		.vsk = vsk,
+> > +		.net = sock_net(sk_vsock(vsk)),
+> > +		.net_mode = vsk->net_mode,
+> > 	};
+> > 
+> > 	return virtio_transport_send_pkt_info(vsk, &info);
+> > @@ -1108,6 +1114,8 @@ virtio_transport_stream_enqueue(struct vsock_sock *vsk,
+> > 		.msg = msg,
+> > 		.pkt_len = len,
+> > 		.vsk = vsk,
+> > +		.net = sock_net(sk_vsock(vsk)),
+> > +		.net_mode = vsk->net_mode,
+> > 	};
+> > 
+> > 	return virtio_transport_send_pkt_info(vsk, &info);
+> > @@ -1145,6 +1153,8 @@ static int virtio_transport_reset(struct vsock_sock *vsk,
+> > 		.op = VIRTIO_VSOCK_OP_RST,
+> > 		.reply = !!skb,
+> > 		.vsk = vsk,
+> > +		.net = sock_net(sk_vsock(vsk)),
+> > +		.net_mode = vsk->net_mode,
+> > 	};
+> > 
+> > 	/* Send RST only if the original pkt is not a RST pkt */
+> > @@ -1156,15 +1166,27 @@ static int virtio_transport_reset(struct vsock_sock *vsk,
+> > 
+> > /* Normally packets are associated with a socket.  There may be no socket if an
+> >  * attempt was made to connect to a socket that does not exist.
+> > + *
+> > + * net and net_mode refer to the net and mode of the receiving device (e.g.,
+> > + * vhost_vsock). For loopback, they refer to the sending socket net/mode. This
+> > + * way the RST packet is sent back to the same namespace as the bad request.
+> 
+> Could this be a problem, should we split this function?
+> 
+> BTW, I'm a bit confused. For vhost-vsock, this is the namespace of the
+> device, so the namespace of the guest, so also in that case the namespace of
+> the sender, no?
+> 
+> Maybe sender/receiver are confusing. What you want to highlight with this
+> comment?
+> 
 
-Just an idea came to my mind when I am reading the commit message.
-Feel free to ignore it. :)
+Sounds good, I'll try to update it with clarification. The namespace
+passed in needs to be the namespace of whoever sent the bad message.
+For vhost-vsock (and probably virtio-vsock eventually) that will be the
+device/guest namespace. For loopback, it is just the namespace of the
+socket that sent the bad message.
 
-Best Regards,
-Yan, Zi
+> >  */
+> > static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
+> > -					  struct sk_buff *skb)
+> > +					  struct sk_buff *skb, struct net *net,
+> > +					  enum vsock_net_mode net_mode)
+> > {
+> > 	struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
+> > 	struct virtio_vsock_pkt_info info = {
+> > 		.op = VIRTIO_VSOCK_OP_RST,
+> > 		.type = le16_to_cpu(hdr->type),
+> > 		.reply = true,
+> > +
+> > +		/* net or net_mode are not defined here because we pass
+> > +		 * net and net_mode directly to t->send_pkt(), instead of
+> > +		 * relying on virtio_transport_send_pkt_info() to pass them to
+> > +		 * t->send_pkt(). They are not needed by
+> > +		 * virtio_transport_alloc_skb().
+> > +		 */
+> > 	};
+> > 	struct sk_buff *reply;
+> > 
+> > @@ -1183,7 +1205,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
+> > 	if (!reply)
+> > 		return -ENOMEM;
+> > 
+> > -	return t->send_pkt(reply);
+> > +	return t->send_pkt(reply, net, net_mode);
+> > }
+> > 
+> > /* This function should be called with sk_lock held and SOCK_DONE set */
+> > @@ -1465,6 +1487,8 @@ virtio_transport_send_response(struct vsock_sock *vsk,
+> > 		.remote_port = le32_to_cpu(hdr->src_port),
+> > 		.reply = true,
+> > 		.vsk = vsk,
+> > +		.net = sock_net(sk_vsock(vsk)),
+> > +		.net_mode = vsk->net_mode,
+> > 	};
+> > 
+> > 	return virtio_transport_send_pkt_info(vsk, &info);
+> > @@ -1507,12 +1531,12 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+> > 	int ret;
+> > 
+> > 	if (le16_to_cpu(hdr->op) != VIRTIO_VSOCK_OP_REQUEST) {
+> > -		virtio_transport_reset_no_sock(t, skb);
+> > +		virtio_transport_reset_no_sock(t, skb, sock_net(sk), vsk->net_mode);
+> > 		return -EINVAL;
+> > 	}
+> > 
+> > 	if (sk_acceptq_is_full(sk)) {
+> > -		virtio_transport_reset_no_sock(t, skb);
+> > +		virtio_transport_reset_no_sock(t, skb, sock_net(sk), vsk->net_mode);
+> > 		return -ENOMEM;
+> > 	}
+> > 
+> > @@ -1520,13 +1544,13 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+> > 	 * Subsequent enqueues would lead to a memory leak.
+> > 	 */
+> > 	if (sk->sk_shutdown == SHUTDOWN_MASK) {
+> > -		virtio_transport_reset_no_sock(t, skb);
+> > +		virtio_transport_reset_no_sock(t, skb, sock_net(sk), vsk->net_mode);
+> > 		return -ESHUTDOWN;
+> > 	}
+> > 
+> > 	child = vsock_create_connected(sk);
+> > 	if (!child) {
+> > -		virtio_transport_reset_no_sock(t, skb);
+> > +		virtio_transport_reset_no_sock(t, skb, sock_net(sk), vsk->net_mode);
+> > 		return -ENOMEM;
+> > 	}
+> > 
+> > @@ -1548,7 +1572,7 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+> > 	 */
+> > 	if (ret || vchild->transport != &t->transport) {
+> > 		release_sock(child);
+> > -		virtio_transport_reset_no_sock(t, skb);
+> > +		virtio_transport_reset_no_sock(t, skb, sock_net(sk), vsk->net_mode);
+> > 		sock_put(child);
+> > 		return ret;
+> > 	}
+> > @@ -1576,7 +1600,8 @@ static bool virtio_transport_valid_type(u16 type)
+> >  * lock.
+> >  */
+> > void virtio_transport_recv_pkt(struct virtio_transport *t,
+> > -			       struct sk_buff *skb)
+> > +			       struct sk_buff *skb, struct net *net,
+> > +			       enum vsock_net_mode net_mode)
+> > {
+> > 	struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
+> > 	struct sockaddr_vm src, dst;
+> > @@ -1599,24 +1624,24 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+> > 					le32_to_cpu(hdr->fwd_cnt));
+> > 
+> > 	if (!virtio_transport_valid_type(le16_to_cpu(hdr->type))) {
+> > -		(void)virtio_transport_reset_no_sock(t, skb);
+> > +		(void)virtio_transport_reset_no_sock(t, skb, net, net_mode);
+> > 		goto free_pkt;
+> > 	}
+> > 
+> > 	/* The socket must be in connected or bound table
+> > 	 * otherwise send reset back
+> > 	 */
+> > -	sk = vsock_find_connected_socket(&src, &dst);
+> > +	sk = vsock_find_connected_socket_net(&src, &dst, net, net_mode);
+> 
+> Here `net` can be null, right? Is this okay?
+> 
+
+Yes, it can be null. net_eq() comparisons pointers (returns false), and
+then the modes evaluate w/ GLOBAL == GLOBAL.
+
+This goes away if we combine patches though.
+
+Thanks again for the review!
+
+Best,
+Bobby
 
