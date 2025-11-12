@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-62905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62906-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1564FC53D21
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:00:30 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9544C53BCB
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 18:41:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 50C794FFD0A
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 17:40:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7B874344E41
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 17:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BAB0348886;
-	Wed, 12 Nov 2025 17:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B4734B1A7;
+	Wed, 12 Nov 2025 17:39:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XE6L3XRY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y3tyoGdq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE0F347BD2
-	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 17:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8F63491D5
+	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 17:39:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762969191; cv=none; b=euPi+bbc3/LyCOcsoIy/Sk+kpgpP3clnIjMB8HTiOCd93T5SPh3oM0fOGhW3YBfSAViNQCMUVJaiU/ZHafz/Y2TQ3WPZe1fvR25z/mJY9i7AgPbg1riTlrI4m4shZVmhXi4bQ9n+vVdnXH851RH+dztfqgxRJa9sQK1F44VzG7c=
+	t=1762969192; cv=none; b=bPrxzsvtXHT7AkuhzLF3olHTmynaZpi2DrOl5m6A0CyEsHIiUIYbi8VHZH4niA2mjNrYYbthVepqhSKh2zISkvzFcjz9CAxVqqwHuVvgbihTNr9EHsT3pP8u0rjjHttbfTjiUSC/c6fO+Zhee43IvjbQPYPY0+eCBR9Gl7A45AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762969191; c=relaxed/simple;
-	bh=3wjLaIqPwLhtaQu3sd4+Wy6uET4Lt+dOtxB/f9/oZG0=;
+	s=arc-20240116; t=1762969192; c=relaxed/simple;
+	bh=WiNWbvfwoo+8EdAa9Uz8Q0T/2sNuMxxs4D8jJ5u/WA8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ep8pCl5+Ylih6KdK3K9tXQYqr4XQejB90gRwu11MkIrLbQDnfWRjrDa1bYSFJzU56Oj8KzNNypE1nz2eXv2HZM/n2dnUI7yCezU2/gA0XSiAfTEPZxPgrG0qVBpjPFhnC+E/WO7EBL02MIiMwpVBmcU605tV8Wd1IIyNBe0uv+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XE6L3XRY; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=G9jAF49byqrnP/ObLYNZqckbjXkHfBtvkrwEYaKYrJ9vBc/vg6N+05lJwPmKzWYSVKiGiwzGCg+iwQXP/HcJl/CnJSliv6CyhiTH+4TJ4sjQcuqvQdA3on2swK7/X05ZobxiznQseaLrahBS2fDW5iPcBCmBo7FyEqWVWC60Suw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y3tyoGdq; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b969f3f5bb1so2784545a12.0
-        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 09:39:49 -0800 (PST)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-78105c10afdso1216136b3a.1
+        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 09:39:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762969189; x=1763573989; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762969190; x=1763573990; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=B2W7BhYEA5i1i5woy4wPEVZBPGLjZrrhpv/7K43a+Bc=;
-        b=XE6L3XRYIGnHXqzE2hZSNKwfPkIn+KABRpvnxQEPdhP4eA0mYWv2Mc2BVdivuxLdGC
-         ZyUgylMBRHQymM1eD3cF0fpF5z5nj434JhRQjsYJ1aH/v+rzubvMv1HHU1vXM7BObPU1
-         dLKdhw/05wX81YDE9rPIi6yMiWbYWC2cTVnK86ExM4NQpInpklfh+zQYq3mVYh7lv7ZU
-         mDOXvlacBI6ZSswAXjmtkZAMa81eIEFBTASlnbKDUhjC7SD0EZVUunJzBsmV71JiNh7o
-         G/Slb6srgBDzWkTVnEf7deRzZKKv8sGasq9mDjy5DiIuO4bJEkuOfb5PekIAfo0XX7z3
-         ICtQ==
+        bh=3jB11KRi3IX+N8TsZocIARdIpUY/Xl/OcZwePjrIV+8=;
+        b=Y3tyoGdqbebJ/iYR0RzdyQOMJr0PQXO1K+T54w9ajGBsNzvAQIOcBxd34sb3SDUIN1
+         Uwewv+rSjoTz6PjZUjw/rKVp/F7PhrPhbnrYNRuvauRVAoJM/LPX6c94P+2iuSNuit4x
+         1G7wra4+l+EBsIWMFo7nqrlZ1YRlbMai2sCAIgd5duYJpW7UI/qq7WutrL1uYaAt5a7j
+         HifApJZMfD9Lx9xGEp9p3Sm3fjPREK0f2jQ10Qdl+ubFz6RVvhhL/ycu0BUGXItqgK5s
+         ZS8q1cX7Tw1Hx4YfprbeMtf14uVFawUce+uc6m1QnlPTWsyE/yVMnZJV0vDd7PsWrXBI
+         8f0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762969189; x=1763573989;
+        d=1e100.net; s=20230601; t=1762969190; x=1763573990;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=B2W7BhYEA5i1i5woy4wPEVZBPGLjZrrhpv/7K43a+Bc=;
-        b=QtannmFPV4bsrdnsVWDxsPKLHn+ArQrxyjKclaAbBPYZLN9zcbyd1r6wzbVwyUVdN1
-         RYAuzVhKCALk9+s3cr4rwo924NfqEDMWlrtM8pSe1AkpjlFCzYOgeAiusfxUFudqFJgK
-         9xKTi2E95Yc77akjepMkf/zRUfS8dKgYGfNq/x3UbUtiIlRL/XH2kzc1m/8h6aYqeNYG
-         rd/OjvLJgZKd6fq0ue2EW05160kzPVYHIcvSFmAUWJCgWV2EzYwo9BWr3HmROqGqr1eV
-         PT47mGS5aF1bZuJOLTcAE143FDaqdg5tOgWjmXWNi+C1KPTsIbjQNYCtNc2I1Z81k1kO
-         lTAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWovETS9HhWZ5SF/fORlKkhig+jwEkoSucHSeDHHpF5YjZPJpaA3XqkeAD7AAf4r/nQaF0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpfMk/Pa4J0oGgdX59KWXkc+q7Pioo/YibTUpb8cCbq8Xq2zvl
-	+LV83a2LGHRSZ8Wkb1cwmM6HRA+eS+ZIriXnkLZ5y18jlRzIXGwlQefpsk+d66PteniNKK6RfNU
-	7Vl4nSA==
-X-Google-Smtp-Source: AGHT+IGQoB1Kabu3uhkCb7ua9Zbxd1SwMYzdy0+WZvzbXxJsOOkw0xVig1+MnTLbGmRa1/KiP7NDHIAhv+E=
-X-Received: from plbks6.prod.google.com ([2002:a17:903:846:b0:27d:1f18:78ab])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d2c9:b0:297:e66a:2065
- with SMTP id d9443c01a7336-2984ee00891mr56835055ad.56.1762969188545; Wed, 12
- Nov 2025 09:39:48 -0800 (PST)
+        bh=3jB11KRi3IX+N8TsZocIARdIpUY/Xl/OcZwePjrIV+8=;
+        b=AdhMOy08q+X0FEEV+hq20IUcxc5dAsYMmBoW84oPC70zY2boMDdY7YdS0cGfGDkwtu
+         74KP4ItFBeAf2LrHhcJYdF1KbBDkIH7RNU5a7WmUVoVMaLmU9vezpHrzlpQghHnitb8d
+         gZ5eWnbX11S4VK7zE9KcynqyUWdHO/kpxSaYqv3KeUGvPXhbiNjJaX8wscVT5IXMHqFI
+         xov/5NiyX7g1o7s9Vf68DKQvQuIR61I3I0dOcTy+r5B7L42IvqJJ5Yd+NCTboXg+HyZf
+         ZCqyzekUoH1DqC1KN5VcKtSlW0yDoku20O5rsTk6fjLnnCTjBWQqi+ctJJklDSg0TBFa
+         J+0g==
+X-Forwarded-Encrypted: i=1; AJvYcCUp48pd0abR4AmrQZWN7FqRvXa/5rT5qo1ge0D8KXN6W5Y+vivVQW1lce/0scX5AjqyohM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTEZcab7YBAZZJbOQcdSY+znZnIz/4T+fQovqwZhFS8sBF/cTF
+	jqtaUvvFGi9fsLXM8+4gdX+YakpHmJy7A87GkTw8Qt0/iMb4fCxmYUUeyJLhPAyiN0enrUyxjvv
+	HsryQkw==
+X-Google-Smtp-Source: AGHT+IEzUdshi4KJh5WFIAXko+n+YEgi4OqqdjsC4s4GZ3jRZGaScEAL16+P4T3e1ewsgL1T8TGXhgEoctI=
+X-Received: from pge1.prod.google.com ([2002:a05:6a02:2d01:b0:bac:6acd:817e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:4305:b0:343:9397:c4d5
+ with SMTP id adf61e73a8af0-3590908eb63mr5330693637.12.1762969190457; Wed, 12
+ Nov 2025 09:39:50 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 12 Nov 2025 09:39:41 -0800
+Date: Wed, 12 Nov 2025 09:39:42 -0800
 In-Reply-To: <20251112173944.1380633-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251112173944.1380633-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251112173944.1380633-2-seanjc@google.com>
-Subject: [PATCH 1/4] x86/bugs: Drop unnecessary export of "x86_spec_ctrl_base"
+Message-ID: <20251112173944.1380633-3-seanjc@google.com>
+Subject: [PATCH 2/4] x86/mtrr: Drop unnecessary export of "mtrr_state"
 From: Sean Christopherson <seanjc@google.com>
 To: Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
 	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -91,28 +91,28 @@ Cc: linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
 	Kai Huang <kai.huang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Don't export x86_spec_ctrl_base as it's used only in bugs.c and process.c,
-neither of which can be built into a module.
+Don't export "mtrr_state" as usage is limited to arch/x86/kernel/cpu/mtrr
+(and nothing outside of that directory even includes the local mtrr.h).
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kernel/cpu/bugs.c | 1 -
+ arch/x86/kernel/cpu/mtrr/generic.c | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index d7fa03bf51b4..57c1d0ed36a5 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -102,7 +102,6 @@ static void __init vmscape_apply_mitigation(void);
+diff --git a/arch/x86/kernel/cpu/mtrr/generic.c b/arch/x86/kernel/cpu/mtrr/generic.c
+index 8c18327eb10b..0863733858dc 100644
+--- a/arch/x86/kernel/cpu/mtrr/generic.c
++++ b/arch/x86/kernel/cpu/mtrr/generic.c
+@@ -89,7 +89,6 @@ static int mtrr_state_set;
+ u64 mtrr_tom2;
  
- /* The base value of the SPEC_CTRL MSR without task-specific bits set */
- u64 x86_spec_ctrl_base;
--EXPORT_SYMBOL_GPL(x86_spec_ctrl_base);
+ struct mtrr_state_type mtrr_state;
+-EXPORT_SYMBOL_GPL(mtrr_state);
  
- /* The current value of the SPEC_CTRL MSR with task-specific bits set */
- DEFINE_PER_CPU(u64, x86_spec_ctrl_current);
+ /* Reserved bits in the high portion of the MTRRphysBaseN MSR. */
+ u32 phys_hi_rsvd;
 -- 
 2.51.2.1041.gc1ab5b90ca-goog
 
