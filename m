@@ -1,184 +1,113 @@
-Return-Path: <kvm+bounces-62870-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62871-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6200EC5186F
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 11:00:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F04BC51AC0
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 11:33:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C168F1885E0D
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 09:57:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 320483AA009
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 10:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A4130146D;
-	Wed, 12 Nov 2025 09:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599CB302CA2;
+	Wed, 12 Nov 2025 10:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MGuvBuka"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="QCLCeGU4"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2CA2FF15A;
-	Wed, 12 Nov 2025 09:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35192FD1D5;
+	Wed, 12 Nov 2025 10:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762941392; cv=none; b=a53xJ89JXqCUv0HKLmChgs/0OmCQtGGNSgRspKTevIUOeEt7M1Zb2016pMZd7F6pVazVduQe+AfF3nkZdw31vG53A1awrAjnGE6/TFl7NintxWXhjDHyGCbE7tV4EYEQ6gHwX/H25/HGvh6BJgEZMg3yLsWoL2US1jqMa9TNBM0=
+	t=1762943042; cv=none; b=tDS+LsKIl01/58+taCi87VU4atHZg2FLJzEjLF893jUKwyHdsEX4NDnzQbV/CNGc/U4SBoO2Sz7AGA3ecL9xIAHpcV/riZ8TxNEXpreFuvXRkRiuHfF19TFmcpmTn3RWogwaziPJyu6d650545EhPLWDAm/f0eGLJCYmHaUEs3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762941392; c=relaxed/simple;
-	bh=gRCZf9Ayfo1qLWyDTVQsRixm5fKxDCpVixnU+WvPMQY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NWfEE8IivenXuIAkzCCC4oakKJ1RQ/mmUfG/j3PEfyqenzhh8bTlIKmMcUo3pXtmjf9Jh7Cw0T05Gsskc7+Kp7EPhw086eejIpwISbUSG0ZbiC0s8n1eS0mwwMzOkNb0X+Vg5d7atKTJYV1co+ki7qsrL/A/86d96zD/iKKCNQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MGuvBuka; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89091C4CEF8;
-	Wed, 12 Nov 2025 09:56:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762941391;
-	bh=gRCZf9Ayfo1qLWyDTVQsRixm5fKxDCpVixnU+WvPMQY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MGuvBukaozndXY9PPPIcpdwaZghXipBbs2p/7qKye1qXFeh4Ra1K2Nwak5Pzu5rHr
-	 ZQMiJbpAQF6L1ydSe6Bq4gE7Rc1CgXSh81/tBq1eV1h0W6uORAaDetyoq90G/VgagA
-	 1VCKAcaELm7O3cmUZ0cDuxeIEH/M87q+2yqvejLNSQeHoNEU3KgW8aTb0zjHuCp5Tp
-	 WY7HtvoRjbVhdzsDM4y087TGX4E6Zo9GvkE+6ruDUdzZTgaegSp2w3I1BglFBei0as
-	 WTsemcZLKJhx30CAH5AJ3SnRuu+ho9yG6y/OQmzL0fLWVxzK1ODe8dZd1wM2z43bYY
-	 zXyeMNwo+DWJg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vJ7aX-00000004UXd-0dxm;
-	Wed, 12 Nov 2025 09:56:29 +0000
-Date: Wed, 12 Nov 2025 09:56:28 +0000
-Message-ID: <86wm3vtvzn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 20/45] KVM: arm64: Revamp vgic maintenance interrupt configuration
-In-Reply-To: <aRRJOSNnvD1B0ZfJ@kernel.org>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-21-maz@kernel.org>
-	<aRPQBQVPLVXGOxU-@kernel.org>
-	<86y0obtzt9.wl-maz@kernel.org>
-	<aRRJOSNnvD1B0ZfJ@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1762943042; c=relaxed/simple;
+	bh=hMphcSWzvjciJLgu8O9mNBZ6tS/PYXaz6WZrCbUlq6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EH0lh76CE2cOviV+sh1i0ZS7HruUF84311pIZaRSkIFHLrj1hgf/WFlhE9LyEh8aMD3kfTRl6uk9lWrdbLqlHxFiAsc8RFGaantYNlW1k8CyuU4bueXRTKmQ1Qzw4hTDK8awKO7RFqeeadYvXa7FkLN4K1jL8vvE43cGWkwVM0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=QCLCeGU4; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 107B840E0191;
+	Wed, 12 Nov 2025 10:23:56 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id cEK6losoTe2o; Wed, 12 Nov 2025 10:23:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1762943032; bh=DcWrLzxh17tqGrEc3eGZpJOg3tUTZgcl6XBpECD3q3I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QCLCeGU4V+yvIzX5bcSbdkHOamA01FY2W275TAbREMQo0bCVVP6kaf7H0LVUN0R/a
+	 6WLPS2YEeC2IKT22s37kdUwhgIEQbZzkc+kSt+CFdGltJhuVdVSNd5pilnz/pJzOQ8
+	 bg/Jy6t//rvWs6wafimEELgl/y+N6aHRznna0a0IZoUSOFRrlOI6dLRtj6521yxv8g
+	 jQe2OA7RDPOUZVQp5vETlKjmFlOr4WQrRHfLLiGCFLJ9glf37K3HVKj/t6PNAiIjvV
+	 LNsLBkhXh9B3EJuecxXFKnw/1pj82Ef2Ivl/tWFX5d8qLb+yo3JAixv5zXmU9zF3Zq
+	 evZ5MQqhDYnWnEwNyKwKNt41dnHIydEl5d0MR40gPt/LcIZmpc06UzVZHtnIa0rhgY
+	 fR3uTShVgMjmzANFYidcgPO5mOuCaDR58l+hwEoa9SiBn7Pa9t/4hlNrnIBNaAoc8U
+	 mgnVZBZUNyQv6UisC75CNhCBxS9cJlvN0TsCirkCJ58HAfF3yAQR3Bb9dzqTNYPZYA
+	 qRNe6FydRNa1610zpJprke3I3CrEh1Isi91a5p5SNVVXhLMnsuEXnHnwGZOCEpsH82
+	 hxFmUTkM4K3Lgbz3FBKU+MudGNp9hPd8Ov/4sUqH+zWN7NDzo/HUwkNxaIpNrzPDyi
+	 RiUvpJtg8HJvniTT1lTy4Szc=
+Received: from zn.tnic (pd9530da1.dip0.t-ipconnect.de [217.83.13.161])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 6F29740E01CD;
+	Wed, 12 Nov 2025 10:23:43 +0000 (UTC)
+Date: Wed, 12 Nov 2025 11:23:36 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Brendan Jackman <jackmanb@google.com>
+Subject: Re: [PATCH v4 1/8] x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
+Message-ID: <20251112102336.GAaRRgKJ6lHCKQgxdd@fat_crate.local>
+References: <20251031003040.3491385-1-seanjc@google.com>
+ <20251031003040.3491385-2-seanjc@google.com>
+ <20251103181840.kx3egw5fwgzpksu4@desk>
+ <20251107190534.GTaQ5C_l_UsZmQR1ph@fat_crate.local>
+ <aROyvB0kZSQYmCh0@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aROyvB0kZSQYmCh0@google.com>
 
-On Wed, 12 Nov 2025 08:45:45 +0000,
-Oliver Upton <oupton@kernel.org> wrote:
+On Tue, Nov 11, 2025 at 02:03:40PM -0800, Sean Christopherson wrote:
+> How about:
 > 
-> On Wed, Nov 12, 2025 at 08:33:54AM +0000, Marc Zyngier wrote:
-> > On Wed, 12 Nov 2025 00:08:37 +0000,
-> > Oliver Upton <oupton@kernel.org> wrote:
-> > > 
-> > > On Sun, Nov 09, 2025 at 05:15:54PM +0000, Marc Zyngier wrote:
-> > > > +static void summarize_ap_list(struct kvm_vcpu *vcpu,
-> > > > +			      struct ap_list_summary *als)
-> > > >  {
-> > > >  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> > > >  	struct vgic_irq *irq;
-> > > > -	int count = 0;
-> > > > -
-> > > > -	*multi_sgi = false;
-> > > >  
-> > > >  	lockdep_assert_held(&vgic_cpu->ap_list_lock);
-> > > >  
-> > > > -	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-> > > > -		int w;
-> > > > +	*als = (typeof(*als)){};
-> > > >  
-> > > > -		raw_spin_lock(&irq->irq_lock);
-> > > > -		/* GICv2 SGIs can count for more than one... */
-> > > > -		w = vgic_irq_get_lr_count(irq);
-> > > > -		raw_spin_unlock(&irq->irq_lock);
-> > > > +	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-> > > > +		scoped_guard(raw_spinlock, &irq->irq_lock) {
-> > > > +			if (vgic_target_oracle(irq) != vcpu)
-> > > > +				continue;
-> > > 
-> > > From our conversation about this sort of thing a few weeks ago, wont
-> > > this 'continue' interact pooly with the for loop that scoped_guard()
-> > > expands to?
-> > 
-> > Gahhh... I was sure I had killed that everywhere, but obviously failed
-> > to. I wish there was a coccinelle script to detect this sort of broken
-> > constructs (where are the script kiddies when you really need them?).
-> > 
-> > Thanks for spotting it!
-> > 
-> > > Consistent with the other checks against the destination oracle you'll
-> > > probably want a branch hint too.
-> > 
-> > Yup, I'll add that.
-> 
-> I can take care of it when applying. These patches need to bake :)
+> /* If necessary, emit VERW on exit-to-userspace to clear CPU buffers. */
+> #define CLEAR_CPU_BUFFERS \
+> 	ALTERNATIVE "", __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF
 
-Yes, they do. Here's the current state of additional changes I have
-(compile tested only).
+By the "If necessary" you mean whether X86_FEATURE_CLEAR_CPU_BUF is set or
+not, I presume...
 
-Thanks,
+I was just wondering whether this macro is going to be used somewhere else
+*except* on the kernel->user vector.
 
-	M.
+> Ya, and this goes away (moved into SVM) by the end of the series.
 
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index bd67ad1fcad5e..28184582f23d3 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -851,15 +851,15 @@ static void summarize_ap_list(struct kvm_vcpu *vcpu,
- 	*als = (typeof(*als)){};
- 
- 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
--		scoped_guard(raw_spinlock, &irq->irq_lock) {
--			if (vgic_target_oracle(irq) != vcpu)
--				continue;
--
--			if (!irq->active)
--				als->nr_pend++;
--			else
--				als->nr_act++;
--		}
-+		guard(raw_spinlock)(&irq->irq_lock);
-+
-+		if (unlikely(vgic_target_oracle(irq) != vcpu))
-+			continue;
-+
-+		if (!irq->active)
-+			als->nr_pend++;
-+		else
-+			als->nr_act++;
- 
- 		if (irq->intid < VGIC_NR_SGIS)
- 			als->nr_sgi++;
-@@ -915,8 +915,8 @@ static void summarize_ap_list(struct kvm_vcpu *vcpu,
-  *
-  *      - deactivation can happen in any order, and we cannot rely on
-  *	  EOImode=0's coupling of priority-drop and deactivation which
-- *	  imposes strict reverse Ack order. This means that DIR must be set
-- *	  if we have active interrupts outside of the LRs.
-+ *	  imposes strict reverse Ack order. This means that DIR must
-+ *	  trap if we have active interrupts outside of the LRs.
-  *
-  *      - deactivation of SPIs can occur on any CPU, while the SPI is only
-  *	  present in the ap_list of the CPU that actually ack-ed it. In that
+Aha, lemme look at the rest too then.
+
+Thx.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
