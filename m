@@ -1,187 +1,162 @@
-Return-Path: <kvm+bounces-62890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77948C52E57
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 16:09:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 972A2C53263
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 16:47:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 004D8502BD6
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 14:57:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6A43427F17
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 15:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC90347FD3;
-	Wed, 12 Nov 2025 14:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8D233AD9A;
+	Wed, 12 Nov 2025 15:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3YuHf5SR"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="K7oK3++D";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kKiWXRvT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-b4-smtp.messagingengine.com (flow-b4-smtp.messagingengine.com [202.12.124.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799C9335544
-	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 14:47:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8442C1593;
+	Wed, 12 Nov 2025 15:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762958878; cv=none; b=DJiScCDl5n5P9gCwPHGIFJWqUjnlwNbOHC8cNYBSjNuLA/20U6K1ukMR2nFCxbnSnNDS6bf/kg6RPcRC+S7l5fb8cGEQgG2wItO2Hq4ukQBU4zpOinc4CFjrrpudyOXuh/Zacpf0o3FBsOk3Dp1z6hhSI6IIG0nUvudPsnJqVjU=
+	t=1762961413; cv=none; b=QksUi8G4sNjoofFhL2M/FzQV1LJ1JkzT1fbywhKXoRwbhyzd5ceZ4mKjqUI2XsKXZNM7ZZqh/VHGEL4AL9yS8NmLCRu57H2GNu4YmDmNyHwef/YkxoSDrexCgeNx1kF/d5uhxAcSgWNsnpNCLwZDYRuOb9DYxYCXNb7ZhjH06Eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762958878; c=relaxed/simple;
-	bh=YDzjPhwh/YmcA6SqNpLTKOVVeIo20EydY7pnz2FTKKA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=umNKayd6pxF9CKEC2+9N9ghxF7iJ2IGuBmDLWEe74JHBwrGXSRnbCdGjhSEPvvu0suedfzE2xOxRQllp5om94rbXT6TBxQaL3kyg8fTExBhO6MKVuLKPDISMyfY9D2R7Eev3ZCGFTpoqWsCRRz8udBbwwWMGiYFD7YaizbDwPAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3YuHf5SR; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b99f6516262so2372146a12.3
-        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 06:47:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762958876; x=1763563676; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mZN98J6jRf1XQ1vL4VVbjTVCscmeEznPH5HyoPAKAoA=;
-        b=3YuHf5SR6raGLIp6G9cNF1ftMAWS3uUyODQP7QkY1TzWuNO2j1WCtjJ3fTp9Tbe+hy
-         Bxqr1daq2HimDlJty5FZxN3m5uC3ocqfuEzbrvTFm6aF5Tci+cYHKTPO2/XUJ7cK4fyR
-         8HLazX5U4DUogXVhtAaZ5MRtQXij0z+tct8SbVA4hA57YnMiIBK75cv8rKiOQGLNBbEg
-         5BUqPHmCXJUUhJQZqYE2yOne+syJkkNj/JlXk4FXOO1EA0GLVnfR5qziZxUeksgUKrJI
-         KwdVQ35aRWXIRnwpPyF56hS/cI2WkgphGZc3tBZZ/nyqM7X6hlBE20RqBUa1e95a43Ee
-         31kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762958876; x=1763563676;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mZN98J6jRf1XQ1vL4VVbjTVCscmeEznPH5HyoPAKAoA=;
-        b=fa6xD8+JI1ly2N+kyjIlE91I7FiHBKbdfy8UvcHuOF2jAvnN+Z72ygE5qU2S3b7T6v
-         wD72u+y7fcXXGAe7LAjHTxzonQXFY20gbrT1/Uow/1LTYvoL1ccu6n9LPWkG/vvV0IyF
-         KxkwfspEf4KTgmADkCn3UaeN8jNaVUR9d86T2Lfw96zoR7ctwlAKvp0QeOlq8hmcl1nv
-         WGLk0S4pC0whL9n5H1wiYpu+HlzpFoj4RcWsqXKQv0MlQeK5gzc64RIiXTUJiITlntQ5
-         jTWFNkiGThiqj2XBj+nz4HpiFMigzSa4VtYiws/t8RbFtPpu8qj8vbIpMLgCNmQHuxlF
-         gwyw==
-X-Gm-Message-State: AOJu0Yx8PohFNSpJ9FJu3d19iKii31aSUQiupxvME7V6Z9ezDayZhId9
-	FQp+bNIvPGeFWFZ6crv0CbFFBYSXUzFSNg+WZk/9paoPatsa3pCSWqsOKUVdYSDcOkS19IHI9ai
-	qkmrK/w==
-X-Google-Smtp-Source: AGHT+IEJQY+2nepVgKrdsQRjbtkTvRt1EmAqv3YmsLcQnJsTwrWBXxD/UMCNxR4bYISKXGGAoW4cTuYzLhg=
-X-Received: from pgve25.prod.google.com ([2002:a65:6499:0:b0:b55:6eb3:fd4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:99a0:b0:359:c3:c2ec
- with SMTP id adf61e73a8af0-3590ae34159mr4418503637.35.1762958875737; Wed, 12
- Nov 2025 06:47:55 -0800 (PST)
-Date: Wed, 12 Nov 2025 06:47:54 -0800
-In-Reply-To: <20251110063212.34902-1-dongli.zhang@oracle.com>
+	s=arc-20240116; t=1762961413; c=relaxed/simple;
+	bh=001wyCEKrO3mqSIGETLIkf6QND/1jgkqpT40N1/GwCI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DaIhvJby/VcUwHl6dN19tNiuw4vOK0+MwTiRVdlQMBoBVXcqd1LZfJe8Keltm488f9rdT7FYieGZng6LAowP7IlGR9M9NdV2VwOzQ24oahUL2h/m3HsVw3/i3Vn2JdMqoM9Jw+RqWVXYQwXvKkFaBCK2OAWQCWsBhURp1tDt8Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=K7oK3++D; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kKiWXRvT; arc=none smtp.client-ip=202.12.124.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
+	by mailflow.stl.internal (Postfix) with ESMTP id 7391C1300CAD;
+	Wed, 12 Nov 2025 10:30:08 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-07.internal (MEProxy); Wed, 12 Nov 2025 10:30:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1762961408;
+	 x=1762968608; bh=uArHWjw+8HGdLtfQCvoLqxfM9tZpffpVJb80hFO/JPY=; b=
+	K7oK3++Diz89tOqK4vLR34LtpL4guiH4VYfUr2+FOAlIXPpXTu52xGjdCMr7+t+U
+	MjiMotHHCBsFTLiMcqOQ9axpjzdodCxKkUWvzggFDy+/89yZQ89V/1wLg3GqHOIr
+	+Jl30tNJ/8f/QjG4nrk2qfE42bimaAzGqOFdbc2FOUNzHuyrqb9o2Tva+vLSbjeB
+	GJcmaK4fEoj7X63vBQoeO//hXZheR9nWToGm6BQRjvK3m76KTqGML6Bd0U50VaN+
+	eRY3RjYcoHE08XPl1TWM8cSeN3AruR+k/1NnMpqlaWGG4Su8jn7ZP3pqrwYbev5L
+	7Mjz0hvxpfOYCegPSYOY1Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762961408; x=
+	1762968608; bh=uArHWjw+8HGdLtfQCvoLqxfM9tZpffpVJb80hFO/JPY=; b=k
+	KiWXRvTXj4iBFjd5BF+dLoJdwhsiiifYfF9IHuIzMZ889HrKN0swoL9BhCHsjCJ3
+	35l2Hy/MoSMrgGVJjNd1h7OrZBMMPXcupz7iA0rFBnrfYpuC9ntI6z6WUA5h7FIj
+	BU2vAcYGZhwmkhevyU0cd9L59bdTHs0oCnqB1knBOmmCKTjREjoR+r8bYx+W76od
+	wNxnVArchTkgkhuIVYYwQP9iauH6ikxAq1N07qG4eGtSa1fEaqhwt0I1uEMbsUUl
+	vJH0GwGC9ZHLs2ZFJ1CkiNEhgSpqd6NqzK9oC5Lq2B4tr5GkEReOmxLQf+OE3aAy
+	cRAevJwc+kw0G64Agk8SQ==
+X-ME-Sender: <xms:_6cUaSWYGo_-gHTbAw8mGrukwNYtHyVRVZ5xhQclMkJdk3YXSU0u1A>
+    <xme:_6cUaYplbX1atmIhLxyVP-uOv4Jd-pY9661ZK9Djaq-M_vYjzAfUwP6weErWEN0SY
+    aTFeI_D60UHNfXqrVnCOfZo1uxmdajjG-TciH36gF3kBUd3OLbA>
+X-ME-Received: <xmr:_6cUaWST4GsfR4lCo6DjP8CUeYiMVLJrIVrDOGqzK7Tb7p1TyTmy37rb>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvtdeggeefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucfrhhhishhhihhnghdqkffkrfgprhhtucdliedtjedmne
+    cujfgurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgig
+    ucghihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrf
+    grthhtvghrnhephedvtdeuveejudffjeefudfhueefjedvtefgffdtieeiudfhjeejhffh
+    feeuvedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhr
+    ghdpnhgspghrtghpthhtohepjedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprg
+    hmrghsthhrohesfhgsrdgtohhmpdhrtghpthhtohepughmrghtlhgrtghksehgohhoghhl
+    vgdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehjghhgseiiihgvphgvrdgtrgdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhhsvghlfhhtvghsthesvhhgvghrrd
+    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghr
+    rdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:_6cUaa2Uo9m4B140EgKN0QSmdo1sM7m4pFAbPsmqhUyTjxx4fZ9n6Q>
+    <xmx:_6cUaaB5QksbqJfc8OMTw2VYkHX75peXOe1C73ZYYZO_wkdwJXR1MQ>
+    <xmx:_6cUaeim_BiZZLF29jHdpni83Fj1yloWMIPwDMyKUdE_dUpHCB8reA>
+    <xmx:_6cUaUMPptfUksNmez_0H1PHfG1pFpCvK4nZOGZUdCBDgByJ3BIoOg>
+    <xmx:AKgUaRlJBH8Emgdm1l8wsI3hfP68KV44G-IiKaYLpIuoOZhRV6Jwo7Dl>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 12 Nov 2025 10:30:07 -0500 (EST)
+Date: Wed, 12 Nov 2025 08:30:05 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: Alex Mastro <amastro@fb.com>
+Cc: David Matlack <dmatlack@google.com>, Shuah Khan <shuah@kernel.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, <kvm@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 0/4] vfio: selftests: update DMA mapping tests to use
+ queried IOVA ranges
+Message-ID: <20251112083005.542e0b7f.alex@shazbot.org>
+In-Reply-To: <20251111-iova-ranges-v3-0-7960244642c5@fb.com>
+References: <20251111-iova-ranges-v3-0-7960244642c5@fb.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251110063212.34902-1-dongli.zhang@oracle.com>
-Message-ID: <aRScMffMkpsdi5vs@google.com>
-Subject: Re: [PATCH v2 1/1] KVM: VMX: configure SVI during runtime APICv activation
-From: Sean Christopherson <seanjc@google.com>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	chao.gao@intel.com, pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, 
-	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, joe.jin@oracle.com, 
-	alejandro.j.jimenez@oracle.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 09, 2025, Dongli Zhang wrote:
-> ---
-> Changed since v2:
->   - Add support for guest mode (suggested by Chao Gao).
->   - Add comments in the code (suggested by Chao Gao).
->   - Remove WARN_ON_ONCE from vmx_hwapic_isr_update().
->   - Edit commit message "AMD SVM APICv" to "AMD SVM AVIC"
->     (suggested by Alejandro Jimenez).
+On Tue, 11 Nov 2025 10:48:23 -0800
+Alex Mastro <amastro@fb.com> wrote:
+
+> Not all IOMMUs support the same virtual address width as the processor,
+> for instance older Intel consumer platforms only support 39-bits of
+> IOMMU address space. On such platforms, using the virtual address as the
+> IOVA and mappings at the top of the address space both fail.
 > 
->  arch/x86/kvm/vmx/vmx.c | 9 ---------
->  arch/x86/kvm/x86.c     | 7 +++++++
->  2 files changed, 7 insertions(+), 9 deletions(-)
+> VFIO and IOMMUFD have facilities for retrieving valid IOVA ranges,
+> VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE and IOMMU_IOAS_IOVA_RANGES,
+> respectively. These provide compatible arrays of ranges from which we
+> can construct a simple allocator.
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index f87c216d976d..d263dbf0b917 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6878,15 +6878,6 @@ void vmx_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
->  	 * VM-Exit, otherwise L1 with run with a stale SVI.
->  	 */
->  	if (is_guest_mode(vcpu)) {
-> -		/*
-> -		 * KVM is supposed to forward intercepted L2 EOIs to L1 if VID
-> -		 * is enabled in vmcs12; as above, the EOIs affect L2's vAPIC.
-> -		 * Note, userspace can stuff state while L2 is active; assert
-> -		 * that VID is disabled if and only if the vCPU is in KVM_RUN
-> -		 * to avoid false positives if userspace is setting APIC state.
-> -		 */
-> -		WARN_ON_ONCE(vcpu->wants_to_run &&
-> -			     nested_cpu_has_vid(get_vmcs12(vcpu)));
->  		to_vmx(vcpu)->nested.update_vmcs01_hwapic_isr = true;
->  		return;
->  	}
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index b4b5d2d09634..08b34431c187 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10878,9 +10878,16 @@ void __kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
->  	 * pending. At the same time, KVM_REQ_EVENT may not be set as APICv was
->  	 * still active when the interrupt got accepted. Make sure
->  	 * kvm_check_and_inject_events() is called to check for that.
-> +	 *
-> +	 * When APICv gets enabled, updating SVI is necessary; otherwise,
-> +	 * SVI won't reflect the highest bit in vISR and the next EOI from
-> +	 * the guest won't be virtualized correctly, as the CPU will clear
-> +	 * the SVI bit from vISR.
->  	 */
->  	if (!apic->apicv_active)
->  		kvm_make_request(KVM_REQ_EVENT, vcpu);
-> +	else
-> +		kvm_apic_update_hwapic_isr(vcpu);
+> Use this new allocator in place of reusing the virtual address, and
+> incorporate the maximum supported IOVA into the limit testing.  This
+> latter change doesn't test quite the same absolute end-of-address space
+> behavior but still seems to have some value.
+> 
+> This series is based on Alex Williamson's "Incorporate IOVA range info"
+> [1] along with feedback from the discussion in David Matlack's "Skip
+> vfio_dma_map_limit_test if mapping returns -EINVAL" [2].
+> 
+> Given David's plans to split IOMMU concerns from devices as described
+> in [3], this series' home for `struct iova_allocator` and IOVA
+> range helpers are likely to be short lived, since they reside in
+> vfio_pci_device.c. I assume that the rework can move this functionality
+> to a more appropriate location next to other IOMMU-focused code, once
+> such a place exists.
+> 
+> [1] https://lore.kernel.org/all/20251108212954.26477-1-alex@shazbot.org/#t
+> [2] https://lore.kernel.org/all/20251107222058.2009244-1-dmatlack@google.com/
+> [3] https://lore.kernel.org/all/aRIoKJk0uwLD-yGr@google.com/
+> 
+> To: Alex Williamson <alex@shazbot.org>
+> To: David Matlack <dmatlack@google.com>
+> To: Shuah Khan <shuah@kernel.org>
+> To: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kselftest@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Alex Mastro <amastro@fb.com>
+> 
+> Changes in v3:
+> - Update capability chain cycle detection
+> - Clarify the iova=vaddr commit message
+> - Link to v2: https://lore.kernel.org/r/20251111-iova-ranges-v2-0-0fa267ff9b78@fb.com
 
-Rather than trigger the update from x86.c, what if we let VMX make the call?
-Then we don't need to drop the WARN, and in the unlikely scenario L2 is active,
-we'll save a pointless scan of the vISR (VMX will defer the update until L1 is
-active).
+Applied to vfio for-linus branch for v6.18.  Thanks for the quick
+resolution on this!
 
-We could even have kvm_apic_update_hwapic_isr() WARN if L2 is active.  E.g. with
-an opportunistic typo fix in vmx_hwapic_isr_update()'s comment (completely untested):
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 0ae7f913d782..786ccfc24252 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -774,7 +774,8 @@ void kvm_apic_update_hwapic_isr(struct kvm_vcpu *vcpu)
- {
-        struct kvm_lapic *apic = vcpu->arch.apic;
- 
--       if (WARN_ON_ONCE(!lapic_in_kernel(vcpu)) || !apic->apicv_active)
-+       if (WARN_ON_ONCE(!lapic_in_kernel(vcpu)) || !apic->apicv_active ||
-+                        is_guest_mode(vcpu))
-                return;
- 
-        kvm_x86_call(hwapic_isr_update)(vcpu, apic_find_highest_isr(apic));
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 91b6f2f3edc2..653b8b713547 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4430,6 +4430,14 @@ void vmx_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
-                                                 kvm_vcpu_apicv_active(vcpu));
- 
-        vmx_update_msr_bitmap_x2apic(vcpu);
-+
-+       /*
-+        * Refresh SVI if APICv is enabled, as any changes KVM made to vISR
-+        * while APICv was disabled need to be reflected in SVI, e.g. so that
-+        * the next accelerated EOI will clear the correct vector in vISR.
-+        */
-+       if (kvm_vcpu_apicv_active(vcpu))
-+               kvm_apic_update_hwapic_isr(vcpu);
- }
- 
- static u32 vmx_exec_control(struct vcpu_vmx *vmx)
-@@ -6880,7 +6888,7 @@ void vmx_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
- 
-        /*
-         * If L2 is active, defer the SVI update until vmcs01 is loaded, as SVI
--        * is only relevant for if and only if Virtual Interrupt Delivery is
-+        * is only relevant for L2 if and only if Virtual Interrupt Delivery is
-         * enabled in vmcs12, and if VID is enabled then L2 EOIs affect L2's
-         * vAPIC, not L1's vAPIC.  KVM must update vmcs01 on the next nested
-         * VM-Exit, otherwise L1 with run with a stale SVI.
+Alex
 
