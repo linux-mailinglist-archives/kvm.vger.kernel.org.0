@@ -1,186 +1,220 @@
-Return-Path: <kvm+bounces-62925-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62926-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A9A2C540D1
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 20:03:27 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4530BC5419E
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 20:22:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D67673ABB45
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:03:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D82F04E17C7
+	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 19:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AACA34C815;
-	Wed, 12 Nov 2025 19:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFC734B1A9;
+	Wed, 12 Nov 2025 19:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jgu3fLh2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MWme/AGa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3819234847B
-	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 19:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F7E2DECBA
+	for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 19:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762974182; cv=none; b=Djz/F9kBm6CP5LQYqz+ro6I0VKa+1sBS/tCXTRXx0DQDBzZlTAc1tr8WJ3c+2DadqD88ZaVk5De7vGHogn1K8qwrh4+y1iDFtwESvxDmyck74DIVG4h4BCBqbtEfZIXp36bj7X6HT9+lY4sTcC60OVaXRfpMr9Cy98AR127z7Cg=
+	t=1762975366; cv=none; b=m5srbJZnpRPDhaU5RGx+cN6xmDEt5mjxr0NQ3MgBQwsdTUfz+aDgDGRPmHs999MB5hodKxUYhyJGGg9I73X9xPToOt11chWSSjEOyyF4UlqnQnE5CTV0fKwli5y6GlomVbOu5ejnkpdDzZ4pw/oJmbrigLpb4/HATcUy9ZGTuLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762974182; c=relaxed/simple;
-	bh=LGlxXNTw28kq+Z+gfE/ybRjGWQx2KDGhBKmCSMdpiVQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jQZbgF8Knbb9s8gesb0sjEhbOVpAxzcrbtQEXjQ9JmxXFIxPlevvINpPdow7VnniTu+i4RkNoK7eVpKeBfEIRj/lbVblOuEFngaljetYHkJwNqd1ViGFmZ5hvgZKLp3d3tlKrdpNx6aPqEyUA1SPYdsydyWsXuiOMf7HFYiMXs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jgu3fLh2; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1762975366; c=relaxed/simple;
+	bh=Ccvj/cRp9n0EA6bkrqI5xtjsqnLnKFQTubzZPPbdasU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hBdUbcEOI/Qqc21MdXAMTg6QOvP756pAM15R/mo9EJgk7obr0zM+HDLMd/0OGTT9+l5MmfXrj52qLBTNT9UgjYJM0LPwlkxidd+rhR+JpWqL5a8i0SrN3G0SI+1B7Y3clQUFWj+DLOIzcfKjWOVIpaleiKaqaSrTuS8RVKhoxNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MWme/AGa; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340d3b1baafso2076203a91.3
-        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 11:03:01 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b5533921eb2so12219a12.0
+        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 11:22:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762974180; x=1763578980; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A4mmGVlaK5jYxixMUv2ahQBTt1kS7CUbCMOJEAOujJI=;
-        b=jgu3fLh2B5oMgKswTPBqfUZSeiofuRkJvFit/rSmyjUWmcGc9GcGwkt4qpRxn5Zt+f
-         8gPWSHEkjHEh5LNIEfOz/gz8otajwi1+A/bps9u7e3LOrFBQ/tXVp4W9MfEwSrGbIe2w
-         4r26NztFPJoANiFNtvakr9kRv2b3gZBTLlceN8G+JCrOcsTdI/BDDG+xNCajh1LAsULD
-         RGvznyUdin9n+5oPpdRAyIf7HaCGbdntrhqcz6X31nw6YnOoYy1Ryrd7jbEoXtzL0PGM
-         cy7TdF/2VsYSDDhR2qnThNswHPaSMtFriFK733dv08ln4PBuCs2ADAPOOxcCpnq2wJ+d
-         Dk1w==
+        d=google.com; s=20230601; t=1762975364; x=1763580164; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=shIl0TIKVpe45THPC9KaAUk5YHo0sJQy7q0J5waB4K0=;
+        b=MWme/AGaQuopx2cBIZlR5S09vHyCX7+lVcCP3UpC2OWjztHkQ81SWUF4L7CXVyJs65
+         1zjKdbkSMSH967UItVhx8d8bka8zOFq5GRIOwtrMPGcUo6SsWgalLwkJlId2pPuITw4q
+         84yMbV4yFG/uNwrQ3rHJ1A9yJltPocTF3Xlqd4vJqZ7EexD9HSCvPm6SKucFIWU/Ra8C
+         QjLPO89y7H41+dix6YrbPnOrTUuM8kvEy5abz/5CCuBTYwq5GIk1mrDSLxUrRAPNK3L4
+         VIRdsCKWn9NKa4uH1j8uqycpZK1sq/9EyTgc+opI2Vr89ejurz4Gv3HuaDKwXp9Na/f+
+         kupQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762974180; x=1763578980;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A4mmGVlaK5jYxixMUv2ahQBTt1kS7CUbCMOJEAOujJI=;
-        b=KZzlpdofE4YyGJh4TrOau3Pz5ViCBj46cVG9TpGbI6v31k5L2aU8e9dSmUqJ8Ac4Sv
-         XkaAHORbx6idTtGGwpDRkP8kxgj9A5PuLFEvjPjj868zk0CvR6OnnngXqsoFPrWe6rij
-         oerQqA6jDuOFZxE4UdeSDL1JW3NiqJwjbxNcLHW2rUls5m+Zdo1XbPYAgE5lEMvfShS2
-         vrB9CJIqe2UnAYCmruLAlxb7oiudpJmZM7rcrRmwHT+Z8O4Q35lUdbSNhcCteGDA06Ae
-         ZNt2TNp17FopyChj1NUNyp9k85Os7Ym5zPia+AiQ5U90qd3eR8dj7wesUwaYA4zwPTmf
-         nD9w==
-X-Forwarded-Encrypted: i=1; AJvYcCWQftPhSDL0JE05CI/uy3eWmZK3utsin+kjB2T9AnMvFsLrPpIfuzc2HD8hxhG/C9tjZy8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwleNCJV+SvwCFK/X13uBAW6uHkp9StMK2ZefuQoeXDm3wIzgfs
-	AWXvLm9r6A6j/6QxIQhBdDLQWSBWpX4SyKZLghDTxLcWuJBKAyw/b4AqadmWuF77/WUPCkup6E5
-	YubtdoA==
-X-Google-Smtp-Source: AGHT+IHuvqhQEZ7hNdQkPZD4rJuUDRtujSfP/ARhp39mznKnaO/RO83SQKd3cGLtzFtwhfz/COPT78mlV1Y=
-X-Received: from pjbpm18.prod.google.com ([2002:a17:90b:3c52:b0:340:6b70:821e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d0a:b0:340:c4dc:4b70
- with SMTP id 98e67ed59e1d1-343dde1a5f9mr5487061a91.6.1762974180495; Wed, 12
- Nov 2025 11:03:00 -0800 (PST)
-Date: Wed, 12 Nov 2025 11:02:58 -0800
-In-Reply-To: <20250916172247.610021-1-jon@nutanix.com>
+        d=1e100.net; s=20230601; t=1762975364; x=1763580164;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=shIl0TIKVpe45THPC9KaAUk5YHo0sJQy7q0J5waB4K0=;
+        b=D/+z2q2PU/nsw+7rc9kcJDdrgBdtNIFFBQ7dgga+di97EN7Qzt5FrfHOX7kyTYp8rv
+         dDX/RZQUz/H0vqsVrcs7KYs4EuI0zzoDq8x4zfHT5CYdVtwkVUEYZNYvNK2MVtGAFA5D
+         XAXt8MaFmyNvOLX4qdeNbdEsaVo/QuRZ09VofvUO4odDMwhQKVZui0QtYuqO00X93JkF
+         5kXVW0ugFS6wJxaDl7g0rwcdtrgAGII6x4j1kRVzO6v5V0X1/Dz3qZUMZLO1pAOb1isD
+         kSpoeqPte24nPIJ8+X+Iiu3JWv8U0yGY13dujadqXn8LKmbhDR2mOqocEd26HAFOWxSn
+         QhwA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+J22rStkV+aO+lRu7u2VnUT3p83szw8mD81okE/WI2tfr43lscIJpV0kaW7fmdciR7S0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrdF3Y2lMHvTVbyfMEQke9PhHm4utlyae5oHHri3Qyxfjvyj/4
+	YUl7IWm9GlF3ERq8hWPLMQFlcW0YzPS+9yAYdFotsN9kGlOo2czz0UnzaN9mYA8qoMcFiprtckf
+	6V+djVejDk7vHww==
+X-Google-Smtp-Source: AGHT+IGR//a8agPfDAwBFFBJx10c8t4zrHuAwiJ6OeZd6iTS7BUi0a30+mYQXlV8qKbJhI6KF/l9alGEjvpTDA==
+X-Received: from pgww11.prod.google.com ([2002:a05:6a02:2c8b:b0:bac:a20:5f17])
+ (user=dmatlack job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:9186:b0:358:dc7d:a2d0 with SMTP id adf61e73a8af0-359090919dcmr5178408637.7.1762975363943;
+ Wed, 12 Nov 2025 11:22:43 -0800 (PST)
+Date: Wed, 12 Nov 2025 19:22:14 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250916172247.610021-1-jon@nutanix.com>
-Message-ID: <aRTZ4oqqIqDlMS6d@google.com>
-Subject: Re: [kvm-unit-tests PATCH 00/17] x86/vmx: align with Linux kernel VMX definitions
-From: Sean Christopherson <seanjc@google.com>
-To: Jon Kohler <jon@nutanix.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
+Message-ID: <20251112192232.442761-1-dmatlack@google.com>
+Subject: [PATCH v2 00/18] vfio: selftests: Support for multi-device tests
+From: David Matlack <dmatlack@google.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Alex Mastro <amastro@fb.com>, Alex Williamson <alex@shazbot.org>, 
+	David Matlack <dmatlack@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Josh Hilke <jrhilke@google.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Raghavendra Rao Ananta <rananta@google.com>, 
+	Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 16, 2025, Jon Kohler wrote:
-> This series modernizes VMX definitions to align with the canonical ones
-> within Linux kernel source. Currently, kvm-unit-tests uses custom VMX
-> constant definitions that have grown organically and have diverged from
-> the kernel, increasing the overhead to grok from one code base to
-> another.
-> 
-> This alignment provides several benefits:
-> - Reduces maintenance overhead by using authoritative definitions
-> - Eliminates potential bugs from definition mismatches
-> - Makes the test suite more consistent with kernel code
-> - Simplifies future updates when new VMX features are added
-> 
-> Given the lines touched, I've broken this up into two groups within the
-> series:
-> 
-> Group 1: Import various headers from Linux kernel 6.16 (P01-04)
+This series adds support for tests that use multiple devices, and adds
+one new test, vfio_pci_device_init_perf_test, which measures parallel
+device initialization time to demonstrate the improvement from commit
+e908f58b6beb ("vfio/pci: Separate SR-IOV VF dev_set").
 
-Hrm.  I'm definitely in favor of aligning names, and not opposed to pulling
-information from the kernel, but I don't think I like the idea of doing a straight
-copy+paste.  The arch/x86/include/asm/vmxfeatures.h insanity in particular is pure
-overhead/noise in KUT.  E.g. the layer of indirection to find out the bit number is
-_really_ annoying, and the shifting done for VMFUNC is downright gross, but at
-least in the kernel we get pretty printing in /proc/cpuinfo.
+This series also breaks apart the monolithic vfio_util.h and
+vfio_pci_device.c into separate files, to account for all the new code.
+This required quite a bit of code motion so the diffstat looks large.
+The final layout is more granular and provides a better separation of
+the IOMMU code from the device code.
 
-Similarly, I don't want to pull in trapnr.h verbatim, because KVM already provides
-<nr>_VECTOR in a uapi header, and I strongly prefer the <nr>_VECTOR macros
-("trap" is very misleading when considering fault-like vs. trap-like exceptions).
+Final layout:
 
-This is also a good opportunity to align the third player: KVM selftests.  Which
-kinda sorta copy the kernel headers, but with stale and annoying differences.
+  C files:
+    - tools/testing/selftests/vfio/lib/iommu.c
+    - tools/testing/selftests/vfio/lib/iova_allocator.c
+    - tools/testing/selftests/vfio/lib/libvfio.c
+    - tools/testing/selftests/vfio/lib/vfio_pci_device.c
+    - tools/testing/selftests/vfio/lib/vfio_pci_driver.c
 
-Lastly, if we're going to pull from the kernel, ideally we would have a script to
-semi-automate updating the KUT side of things.
+  H files:
+   - tools/testing/selftests/vfio/lib/include/libvfio.h
+   - tools/testing/selftests/vfio/lib/include/libvfio/assert.h
+   - tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
+   - tools/testing/selftests/vfio/lib/include/libvfio/iova_allocator.h
+   - tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
+   - tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_driver.h
 
-So, I think/hope we can kill a bunch of birds at once by creating a script to
-parse the kernel's vmxfeatures.h, vmx.h, trapnr.h, msr-index.h (to replace lib/x86/msr.h),
-and generate the pieces we want.  And if we do that for KVM selftests, then we
-can commit the script to the kernel repo, i.e. we can make it the kernel's
-responsibility to keep the script up-to-date, e.g. if there's a big rename or
-something.
+Notably, vfio_util.h is now gone and replaced with libvfio.h.
 
-> Headers were brought in with minimal adaptation outside of minor tweaks
-> for includes, etc.
-> 
-> Group 2: Mechanically replace existing constants with equivalents (P05-17)
-> 
-> Replace custom VMX constant definitions in x86/vmx.h with Linux kernel
-> equivalents from lib/linux/vmx.h. This systematic replacement covers:
-> 
-> - Pin-based VM-execution controls (PIN_* -> PIN_BASED_*)
-> - CPU-based VM-execution controls (CPU_* -> CPU_BASED_*, SECONDARY_EXEC_*)
-> - VM-exit controls (EXI_* -> VM_EXIT_*)
-> - VM-entry controls (ENT_* -> VM_ENTRY_*)
-> - VMCS field names (custom enum -> standard Linux enum)
-> - VMX exit reasons (VMX_* -> EXIT_REASON_*)
-> - Interrupt/exception type definitions
-> 
-> All functional behavior is preserved - only the constant names and
-> values change to match Linux kernel definitions. All existing VMX tests
-> pass with no functional changes.
-> 
-> There is still a bit of bulk in x86/vmx.h, which can be addressed in
-> future patches as needed.
-> 
-> Jon Kohler (17):
->   lib: add linux vmx.h clone from 6.16
->   lib: add linux trapnr.h clone from 6.16
->   lib: add vmxfeatures.h clone from 6.16
->   lib: define __aligned() in compiler.h
->   x86/vmx: basic integration for new vmx.h
->   x86/vmx: switch to new vmx.h EPT violation defs
->   x86/vmx: switch to new vmx.h EPT RWX defs
->   x86/vmx: switch to new vmx.h EPT access and dirty defs
->   x86/vmx: switch to new vmx.h EPT capability and memory type defs
->   x86/vmx: switch to new vmx.h primary processor-based VM-execution
->     controls
->   x86/vmx: switch to new vmx.h secondary execution control bit
->   x86/vmx: switch to new vmx.h secondary execution controls
->   x86/vmx: switch to new vmx.h pin based VM-execution controls
->   x86/vmx: switch to new vmx.h exit controls
->   x86/vmx: switch to new vmx.h entry controls
->   x86/vmx: switch to new vmx.h interrupt defs
->   x86/vmx: align exit reasons with Linux uapi
-> 
->  lib/linux/compiler.h    |    1 +
->  lib/linux/trapnr.h      |   44 ++
->  lib/linux/vmx.h         |  672 ++++++++++++++++++
->  lib/linux/vmxfeatures.h |   93 +++
->  lib/x86/msr.h           |   14 +
->  x86/vmx.c               |  230 +++---
->  x86/vmx.h               |  356 ++--------
->  x86/vmx_tests.c         | 1489 ++++++++++++++++++++++-----------------
->  8 files changed, 1876 insertions(+), 1023 deletions(-)
->  create mode 100644 lib/linux/trapnr.h
->  create mode 100644 lib/linux/vmx.h
->  create mode 100644 lib/linux/vmxfeatures.h
-> 
-> base-commit: 890498d834b68104e79b57a801fa11fc6ce82846
-> 
-> -- 
-> 2.43.0
-> 
+This series is based on vfio/next plus Alex Mastro's series to add the
+IOVA allocator [1]. It should apply cleanly to vfio/next once Alex's
+series is merged into 6.18 and then into vfio/next.
+
+This series can be found on GitHub:
+
+  https://github.com/dmatlack/linux/tree/vfio/selftests/init_perf_test/v2
+
+[1] https://lore.kernel.org/kvm/20251111-iova-ranges-v3-0-7960244642c5@fb.com/
+
+Cc: Alex Mastro <amastro@fb.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Josh Hilke <jrhilke@google.com>
+Cc: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Vipin Sharma <vipinsh@google.com>
+
+v2:
+ - Require tests to call iommu_init() and manage struct iommu objects
+   rather than implicitly doing it in vfio_pci_device_init().
+ - Drop all the device wrappers for IOMMU methods and require tests to
+   interact with the iommu_*() helper functions directly.
+ - Add a commit to eliminate INVALID_IOVA. This is a simple cleanup I've
+   been meaning to make.
+ - Upgrade some driver logging to error (Raghavendra)
+ - Remove plurality from helper function that fetches BDF from
+   environment variable (Raghavendra)
+ - Fix cleanup.sh to only delete the device directory when cleaning up
+   all devices (Raghavendra)
+
+v1: https://lore.kernel.org/kvm/20251008232531.1152035-1-dmatlack@google.com/
+
+David Matlack (18):
+  vfio: selftests: Move run.sh into scripts directory
+  vfio: selftests: Split run.sh into separate scripts
+  vfio: selftests: Allow passing multiple BDFs on the command line
+  vfio: selftests: Rename struct vfio_iommu_mode to iommu_mode
+  vfio: selftests: Introduce struct iommu
+  vfio: selftests: Support multiple devices in the same
+    container/iommufd
+  vfio: selftests: Eliminate overly chatty logging
+  vfio: selftests: Prefix logs with device BDF where relevant
+  vfio: selftests: Upgrade driver logging to dev_err()
+  vfio: selftests: Rename struct vfio_dma_region to dma_region
+  vfio: selftests: Move IOMMU library code into iommu.c
+  vfio: selftests: Move IOVA allocator into iova_allocator.c
+  vfio: selftests: Stop passing device for IOMMU operations
+  vfio: selftests: Rename vfio_util.h to libvfio.h
+  vfio: selftests: Move vfio_selftests_*() helpers into libvfio.c
+  vfio: selftests: Split libvfio.h into separate header files
+  vfio: selftests: Eliminate INVALID_IOVA
+  vfio: selftests: Add vfio_pci_device_init_perf_test
+
+ tools/testing/selftests/vfio/Makefile         |   9 +-
+ .../selftests/vfio/lib/drivers/dsa/dsa.c      |  36 +-
+ .../selftests/vfio/lib/drivers/ioat/ioat.c    |  18 +-
+ .../selftests/vfio/lib/include/libvfio.h      |  26 +
+ .../vfio/lib/include/libvfio/assert.h         |  54 ++
+ .../vfio/lib/include/libvfio/iommu.h          |  76 +++
+ .../vfio/lib/include/libvfio/iova_allocator.h |  23 +
+ .../lib/include/libvfio/vfio_pci_device.h     | 125 ++++
+ .../lib/include/libvfio/vfio_pci_driver.h     |  97 +++
+ .../selftests/vfio/lib/include/vfio_util.h    | 331 -----------
+ tools/testing/selftests/vfio/lib/iommu.c      | 465 +++++++++++++++
+ .../selftests/vfio/lib/iova_allocator.c       |  94 +++
+ tools/testing/selftests/vfio/lib/libvfio.c    |  78 +++
+ tools/testing/selftests/vfio/lib/libvfio.mk   |   5 +-
+ .../selftests/vfio/lib/vfio_pci_device.c      | 555 +-----------------
+ .../selftests/vfio/lib/vfio_pci_driver.c      |  16 +-
+ tools/testing/selftests/vfio/run.sh           | 109 ----
+ .../testing/selftests/vfio/scripts/cleanup.sh |  41 ++
+ tools/testing/selftests/vfio/scripts/lib.sh   |  42 ++
+ tools/testing/selftests/vfio/scripts/run.sh   |  16 +
+ tools/testing/selftests/vfio/scripts/setup.sh |  48 ++
+ .../selftests/vfio/vfio_dma_mapping_test.c    |  46 +-
+ .../selftests/vfio/vfio_iommufd_setup_test.c  |   2 +-
+ .../vfio/vfio_pci_device_init_perf_test.c     | 167 ++++++
+ .../selftests/vfio/vfio_pci_device_test.c     |  12 +-
+ .../selftests/vfio/vfio_pci_driver_test.c     |  51 +-
+ 26 files changed, 1479 insertions(+), 1063 deletions(-)
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio.h
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/assert.h
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/iova_allocator.h
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_driver.h
+ delete mode 100644 tools/testing/selftests/vfio/lib/include/vfio_util.h
+ create mode 100644 tools/testing/selftests/vfio/lib/iommu.c
+ create mode 100644 tools/testing/selftests/vfio/lib/iova_allocator.c
+ create mode 100644 tools/testing/selftests/vfio/lib/libvfio.c
+ delete mode 100755 tools/testing/selftests/vfio/run.sh
+ create mode 100755 tools/testing/selftests/vfio/scripts/cleanup.sh
+ create mode 100755 tools/testing/selftests/vfio/scripts/lib.sh
+ create mode 100755 tools/testing/selftests/vfio/scripts/run.sh
+ create mode 100755 tools/testing/selftests/vfio/scripts/setup.sh
+ create mode 100644 tools/testing/selftests/vfio/vfio_pci_device_init_perf_test.c
+
+
+base-commit: 0ed3a30fd996cb0cac872432cf25185fda7e5316
+prerequisite-patch-id: dcf23dcc1198960bda3102eefaa21df60b2e4c54
+prerequisite-patch-id: e32e56d5bf7b6c7dd40d737aa3521560407e00f5
+prerequisite-patch-id: 4f79a41bf10a4c025ba5f433551b46035aa15878
+prerequisite-patch-id: f903a45f0c32319138cd93a007646ab89132b18c
+-- 
+2.52.0.rc1.455.g30608eb744-goog
+
 
