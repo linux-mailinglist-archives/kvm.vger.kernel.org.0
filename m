@@ -1,80 +1,79 @@
-Return-Path: <kvm+bounces-63037-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63038-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D441C5991E
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 19:52:38 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17472C59942
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 19:55:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 510903A8259
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 18:52:14 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 86E0E3435E2
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 18:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E09314D05;
-	Thu, 13 Nov 2025 18:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2AC3112BC;
+	Thu, 13 Nov 2025 18:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rGYOArWL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wI8zZZW/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609A33112BC
-	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 18:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACC031281C
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 18:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763059926; cv=none; b=ppffdnmkiZUF5ZUhLS2xzBOkgoK9R9ugsOCn6D12wJIm4LIrANNPdWC0sxBFPo6gQ4xzPXSXhceOH88emBk2cKZEGq1vTrGAuW6PF04ye705lhDUutRWChFfLbP+KJm/cjRzjl9zsirqzoF/xD7xJUpjideDBg5H+havemHJY4w=
+	t=1763060060; cv=none; b=u4yrzcVLmok/pjHHIIRZXJMmYKEo0GPldP3Kn8PrdnSE0VRjKleD5Xww23fATGnBXJoYSfSs83c5/nuni78jdSuAwqeUSjzaziaPvIbSUyqNxFPFijrSKcP6+QxUaWg0J/p3wWdD7h2Djhws9doXlhUEfqMsqQZeOludvwupGzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763059926; c=relaxed/simple;
-	bh=1I81ZMh2flMGmGHT9awFaIU8CTiz5EtPfzZ60BaJIQg=;
+	s=arc-20240116; t=1763060060; c=relaxed/simple;
+	bh=FMPyLvuUt/PZ/G5WxsY1vXR+Y88MXaoP25kSbGbbODI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eU7GvzYZtW6r68GIMzfTJ3eg7dmtBjQCtVU5QAgi5xccobSx3BoWL+Bqn1jMGW7IR99NgqKm4Fv8gsmhQ7aUSH0ICw1TfzwchLJ1SH02P1rO1r37PdpOH/LXMCwE8nGikbRJi0E2nF6svrC6NgkFsD3G5i6AUXjtXatbRdeHLG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rGYOArWL; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=QRaU/jW2S0ehJof4ev/Sna2rMTwkhqJeNPdoxOi/oBvt/rez3IXDvXuH5A5hdtCzrx3PsKyhVutq+PYB/8ltVoKdK862Ws7TcvsTtRfhY+QUv7fqMqgVhbbBwZs3IPSWrzf0KiZzLewV/wc1L7tE/8vvb7pVzqZSbff/6vqEOY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wI8zZZW/; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2956cdcdc17so12829365ad.3
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 10:52:05 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-29848363458so27757655ad.2
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 10:54:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763059925; x=1763664725; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763060058; x=1763664858; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cIVgrZy+vZcCrxI7QYJ8hXcnFmjFjPoiu79u6DzwfMA=;
-        b=rGYOArWLBoU/z7s2/0AFUplNEZJlfgGZoFD0CPngpcrsVtURCpOHU5T8W1uWSDnD72
-         i3QCs2ESzUzudtmienyD0J/nc2O1Hr2cBHB8R/hFhTOKyDmFrcJz4uT5vPE0DXjGAXSB
-         wREraRFWzCZDCHB+BPFQ4rFo/+DXMm8tsocoX0sGhLP417QhH+NWf2oY46zCW2m7HX5C
-         tLqjkfLLECu3yBngKAbDa5img1EVRvDarrs64s5HBy+qaqWDDv7hNdTDBAzmDOwJ8c4z
-         zWp3HwaXx0wecl8fQRwf8zp0yjLf3nRFP4hOjSCUfXD+C5wvSD+gx6itbQTBKAnirHdH
-         kcGA==
+        bh=8n1/s9RaZEcOt9m3QKGZKQE6sB/YqrRhU3punAll4EM=;
+        b=wI8zZZW/VF8Oqchn4RmT5CMgfJc7cIhrIaP5VP04ocNyNIp/6fdsjQMxoglbZpcc+T
+         QCMrPhRiwmjUALSNFoWp9hdMPTEKMt7E5J5LQiOpm+7oEnCMqCLfzOfSIdj1uWF3FZcq
+         DuxY1rmn1dGoj2BtpBGXMS6xpPBNSGDi9u7TbaQ4D/8Il868LHgZVGKIuP74/oTp4M5R
+         49RWsHRpk1cCqroalz2R3tb9YE16d2N5F0HxbRhb/8rrirVxXWawj+hxmdffvL6v9J3f
+         2bR8Gyrfh5dvz24OJM5Sz3Og3+0bfqAc+225RX3ePc1h4uypR81DHPoOl95YocGfZ8iO
+         B8kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763059925; x=1763664725;
+        d=1e100.net; s=20230601; t=1763060058; x=1763664858;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cIVgrZy+vZcCrxI7QYJ8hXcnFmjFjPoiu79u6DzwfMA=;
-        b=D5mZsQIS0/6H1db37uWAZdtqUMC1erBDugrWgFue9WjfDUmEbRn1jsOVRZrVJW7uPl
-         0FGBGx/buzLL/DoRJTyniTmuxI64PEmdUjU6CdU0JBLQ/jMBfjNwqwRyIgAzsSJkVfZP
-         JxDZV6Pm0whVdfbC3GacWgaVJBaZLOFbtkX4yy+m3NcmKPEVom0yKKj07v29s/6PrgQG
-         7VsuoIhv3DOHuU/SyWwCyq6oJRxv70xPJLCk8RmMkxvg6X2i3Kz9yWPKJqJfyM1cfEkK
-         CzcPGGuE7dprKDkWyjjGQ8B6jWZVQ0Sozj/FTxY2BOJ4Ku9wnuZXMub05fboZwqplyne
-         8kFQ==
-X-Gm-Message-State: AOJu0Yx+3uf/R3xCMZ4+bvl7jFQr/RD3kc4Q6AzTltfBTmZf9JmeGyhP
-	PyCniMs36ixJNtc6ijWDO5OLOqxZdiX6oNoXWY6nn5yCT18KA2dJTQIeQN3alSvRQ25ud+z+hNz
-	4ZTagRA==
-X-Google-Smtp-Source: AGHT+IELLdvnYt/gi3DBJs5U+itYxHk4SoCPsQR2iLQbi7s7Ha6OS3ZSPCJ4OFt28AA30gan8pj0zZ6ieKk=
-X-Received: from plbkp5.prod.google.com ([2002:a17:903:2805:b0:297:fd8b:fe1e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ecc7:b0:297:db6a:a82f
- with SMTP id d9443c01a7336-2986a6d27fcmr422445ad.24.1763059924664; Thu, 13
- Nov 2025 10:52:04 -0800 (PST)
-Date: Thu, 13 Nov 2025 10:52:03 -0800
-In-Reply-To: <e3f711366ddc22e3dd215c987fd2e28dc1c07f54.1761593632.git.thomas.lendacky@amd.com>
+        bh=8n1/s9RaZEcOt9m3QKGZKQE6sB/YqrRhU3punAll4EM=;
+        b=wvaEuobF8GMZLp8jXkWphlYUiM8wVqGuAJnaoeGYiLMuig4wroEE+7V1mlb6LF3vqg
+         BatgwfCv7VFK7ANcatQfG+fJUdmDqkUL2xRDQs8ZD0LQ2+SlP+lo21Q/sPnx/c7TjZgN
+         /+hmRI48eBWy/zsUuRPim6bRERFumafnT4NTyTwxsyxbnAkw3NNH4i5ICv8m8+5nK0xy
+         JTu8/RGr+TFF3Z6PggY21xyPAw1+zrXvcop2hVZ4kaPP+PhM4izhFwASmtOqPoNF2CHz
+         6jojGImdT+fuFUg0/v8eoNuky5kZqxsbGIvPXyzTwubmuQ5rvT06smkNwo6KS3+pRdqz
+         o/Ww==
+X-Gm-Message-State: AOJu0Yxw0v80xfMcb1QUy4Mrt1VJ8wid1fwltuq+SF+dqoV4BCZ85JU2
+	Q+KUN/V7Q4lniDR2n6u2LSGelVql1bxkA6V1P3l23vxJFAtSAQ4jiIIZk4C5S2xl9QlW0HDuHQc
+	cqsFjig==
+X-Google-Smtp-Source: AGHT+IEvsarrirvmCeHl1ineeicRUqdZYmQTIKm6UrYT7suNIHa17FzvX/dSYhupzGO5pgYCgT7nAj0KE/M=
+X-Received: from plbkw15.prod.google.com ([2002:a17:902:f90f:b0:290:bd15:24ab])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1107:b0:297:e1e1:beb1
+ with SMTP id d9443c01a7336-2986a6d684bmr712255ad.16.1763060058279; Thu, 13
+ Nov 2025 10:54:18 -0800 (PST)
+Date: Thu, 13 Nov 2025 10:54:16 -0800
+In-Reply-To: <cover.1761593631.git.thomas.lendacky@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1761593631.git.thomas.lendacky@amd.com> <e3f711366ddc22e3dd215c987fd2e28dc1c07f54.1761593632.git.thomas.lendacky@amd.com>
-Message-ID: <aRYo05KMsaNdj59U@google.com>
-Subject: Re: [PATCH v4 2/4] crypto: ccp - Add an API to return the supported
- SEV-SNP policy bits
+References: <cover.1761593631.git.thomas.lendacky@amd.com>
+Message-ID: <aRYpWLUn5IABs1Vx@google.com>
+Subject: Re: [PATCH v4 0/4] SEV-SNP guest policy bit support updates
 From: Sean Christopherson <seanjc@google.com>
 To: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
@@ -86,30 +85,26 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Mon, Oct 27, 2025, Tom Lendacky wrote:
-> Supported policy bits are dependent on the level of SEV firmware that is
-> currently running. Create an API to return the supported policy bits for
-> the current level of firmware.
-> 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
+> This series aims to allow more flexibility in specifying SEV-SNP policy
+> bits by improving discoverability of supported policy bits from userspace
+> and enabling support for newer policy bits.
 
 ...
 
-> @@ -1014,6 +1031,7 @@ void *snp_alloc_firmware_page(gfp_t mask);
->  void snp_free_firmware_page(void *addr);
->  void sev_platform_shutdown(void);
->  bool sev_is_snp_ciphertext_hiding_supported(void);
-> +u64 sev_get_snp_policy_bits(void);
->  
->  #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
->  
-> @@ -1052,6 +1070,8 @@ static inline void sev_platform_shutdown(void) { }
->  
->  static inline bool sev_is_snp_ciphertext_hiding_supported(void) { return false; }
->  
-> +static inline u64 sev_get_snp_policy_bits(void) { return 0; }
+> Tom Lendacky (4):
+>   KVM: SEV: Consolidate the SEV policy bits in a single header file
+>   crypto: ccp - Add an API to return the supported SEV-SNP policy bits
+>   KVM: SEV: Publish supported SEV-SNP policy bits
+>   KVM: SEV: Add known supported SEV-SNP policy bits
+> 
+>  arch/x86/include/uapi/asm/kvm.h |  1 +
+>  arch/x86/kvm/svm/sev.c          | 45 ++++++++++++++++++++-------------
+>  arch/x86/kvm/svm/svm.h          |  3 ---
+>  drivers/crypto/ccp/sev-dev.c    | 37 +++++++++++++++++++++++++++
+>  include/linux/psp-sev.h         | 39 ++++++++++++++++++++++++++++
+>  5 files changed, 105 insertions(+), 20 deletions(-)
 
-As called out in the RFC[*], this stub is unnecesary.
-
-[*] https://lore.kernel.org/all/aMHP5EO-ucJGdHXz@google.com
+Looks good overall, just the one minor nit.  Given that this adds new KVM uAPI,
+and the CCP changes are fairly minor in the grand scheme, my preference would be
+to take the entire series through kvm-x86 (with Acks as appropriate).
 
