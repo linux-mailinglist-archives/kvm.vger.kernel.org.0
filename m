@@ -1,254 +1,184 @@
-Return-Path: <kvm+bounces-63115-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AC13C5AAB9
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:46:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5739C5AA89
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:42:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1475C4E82D2
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:40:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BA183BF208
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5049D335094;
-	Thu, 13 Nov 2025 23:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F9A329E7F;
+	Thu, 13 Nov 2025 23:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T6utw3ea"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Pe8FqAMF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010043.outbound.protection.outlook.com [40.93.198.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7C032B99D
-	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 23:38:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763077086; cv=none; b=QFEq8uoX0lNhv6L7wgUTZRXZADTIpAmecO+8vUsDAIG0nq8XfPDFIeuztj2ZOTqhZG62zy3zw5sjJYda8P/cKEAyLq1Qu6bWnKY8iHeaume1a03Tb8tpvvKSTxXGaH1kOTw/XhiKSpBnsbZ3ra9ppqDAmdcUlXYP67lLmRLnpgI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763077086; c=relaxed/simple;
-	bh=B/Y8IL0u/Yf38qiKxxW8J1SjwRx9A+pqtBMgpmG/tKg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RULOSGOmT32br/SQh3jlSCtGMnx+9zrLBK2M1Lj1p88ut9GyuriI2NA/xt+DJatOlbrXd/XzP/5kj304uoDBtAim1ekpI15BYBcXR0Ct1vJNM4FiSQc4aeMoPU7KbMi2dldc9JOOnsjhsSJbnzpYeuxH7gzoWmqKIUAGJHAkI88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T6utw3ea; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7b9090d9f2eso1643716b3a.0
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 15:38:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763077084; x=1763681884; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=KaHHeo0MEFYI+GLNe9ECI/Oiz1Zlq+iHNt9JMoNWhqk=;
-        b=T6utw3eaZqI/ohqwyyXLLXM+vWu51dH1JDFdULg7up0h61ln1vmLEzE8dEtblifaKb
-         VCTYfF8asBoOJgN41wQmE2SN+Ew9kMu35d3OgY+k69QLrQ1Y/hp59q9jqwyKQcUTZLBs
-         fYRO3JUn6EQtLTK9bg6vmxzpHM37gGBKAwo4+o1hPivz0XTI/YDQ5zk3SApmBehkG63S
-         30abG8rm2jvuYHdInQ/pApPXmNS1NuhDyv2oFAh4wXe14wkZ0+dTMSNwEb+YA4BIcsO8
-         EymLTyA/UV9cnAL43+LXdzV0iv4OgI4VePV+0rpWCoOYPxnmkdMpFuGMfugTKt3vuzkF
-         qLrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763077084; x=1763681884;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KaHHeo0MEFYI+GLNe9ECI/Oiz1Zlq+iHNt9JMoNWhqk=;
-        b=qtjIKEGdq9FLIEvrnxjkz4MieU9hifwba3jE76WmjAO/MsQbzkpUOiZxatkxyPd/oi
-         l+FpSII17rFRxignSLctKwYoWr365GYrfJFYxZjiwBC5bvq5EYEmVM7BLxza6ciy7CdK
-         FJqt8ozWwLDrUJTU2t+tK8tq/UBYF2XCQiSkl6vQptgBmInyfWu3bwVAIRSP5ecNkGD5
-         qUr4vlGed8rEyHhCwiXSy25cExdzDRPpUNQymeFntJ87j3L3HlftbjRa/PgJnuDn0D5u
-         we7dVrE2iSudqU7PPV/C1ps1VFjxNd6VaUg4eaC7O88ssaAbaTs2lmrJKJAV6+mfDkB6
-         0hCQ==
-X-Gm-Message-State: AOJu0YyAs4YxffPxBooo58YwNsRkxMumjQeOIQlA9A+RDRx947liuzx4
-	VSWYUssjFXRr3OZ5QnW+HPdFll8uiks9EKdHL6tX6hGN9FpWq2eskN4Wecmip/Tz+dgqx4CvPxQ
-	Yqqysnw==
-X-Google-Smtp-Source: AGHT+IFA8/ID3yDfg8RK0jOw1iuj/Ls2AuCdSB9aT9rjOost0RLXhPoKOAPIKzNF+CYaofznnWFFajEs85s=
-X-Received: from pgbee13.prod.google.com ([2002:a05:6a02:458d:b0:bac:6acd:818b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3382:b0:304:313a:4bcd
- with SMTP id adf61e73a8af0-35ba19a0b46mr1460781637.30.1763077083720; Thu, 13
- Nov 2025 15:38:03 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 13 Nov 2025 15:37:46 -0800
-In-Reply-To: <20251113233746.1703361-1-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2609C2E6127;
+	Thu, 13 Nov 2025 23:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763077208; cv=fail; b=q3a4oUdQRn19oihkMrX1HX7cZktfjseaR2zZzp1zLtTJUCe+9oktYrkFseV7zMK2nEn2y7qgGp1pw3iNzx0FCwYYhkgxElX90jgbbH0mwlXsgMRj9KDwh0xvgtqjvUexud7rxStXO8fzJFu33a3U0fzCwum7hh+68+7yM6hw0Cc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763077208; c=relaxed/simple;
+	bh=s7QNuOn3+3l3QzV8aPOhoZmkIpdhHeTEkPisGex+L0Y=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jar8z7MPBfZh3+KabaZ0aLuipLk5xbUr+s3WjLBKKIUDBdx2wbwWJ3/bJd5rnE0VoYCEMKMLd8U3roE/Q9CvHIOupWV3NhW+4nOGuhmUR6Utc7j3F+tk3oUiLXLNHwiCKrhCcciUNCz6PaFzRUhVtcqOSOhPnLxRth0UupEsU8E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Pe8FqAMF; arc=fail smtp.client-ip=40.93.198.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pNck+hVSfhPWQH2GGbcBwkIf1JXt+dZoCfCeXjxajucbrID2sFivwinxJNGMFsQXCA1zRjcoAb8Nj0fZjHYjSuitGLvdorX02q85wBbpWyhPrsX4sfDz+gqc+a43I4ZLcWcc/aPwZ0n1rMBQPDbkfSyTPnYevizgRc5b4sHKtCBiXXvjgunz/jVELTeVjb7Rfa78i6wVvg7U3IR7ux/aFyMZ/G9rjVrYLF30ttBAuqYSOh4inNUwLQptNkGrIUJHmzNm4Q2peWt1KxbjIIzwx29nLrJePUeDBE0n0g7HCmlRovmw174NgKHnFO3Llz/klmK5nfTEsjX9q1+CCXfcIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eO92hLuyDoP9P3o/yiwXYsE/DVzHsz1TagtVXhGQVVo=;
+ b=PVQAKGZfV4sYXPSqLXVRddEcRQwciYB5KeskvvizdzhvPwmrEvsCA27fMqHJEUWzjNIhaoaZ95tH4UO4kPU+Lh+muPS8r/CbnmE1L8Z3ZYkROhN5o0J4FSiTdieGVCope72Y79hZxh614UQC9l0mF0j/t3+yMg0gsVyDnrVLkbUmL+DRbEjBrjMcqCgQWZxUv0GpH2EXqZz6sbn1BNtKs4tIEJAonTlK1Rld5e8wa3vHWXo77LBCx1sDNulT4O/p4tERA6paioyV/XglIOTn5iMj77QMtLcVFz2MxFlZoOyPjDsb5mdu5RuNRGlH/3KAa+rAEqYhPRNrvK0GPgRWeQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=ffwll.ch smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eO92hLuyDoP9P3o/yiwXYsE/DVzHsz1TagtVXhGQVVo=;
+ b=Pe8FqAMFgaTO1YlVsi9wGXJK+xJO48v5wzuAwZhLqqcgA1hTkWDlTfmx+A3Hu1YS2tqbekt9C348VmITpLWbc1YjRUSP0UOShn7MZUeXfvcJ5HQKchGeeYeDHUvH6wOqvVD4UdK2th0uxFb+3IUSLLVzd7hghWBmimnK6ea2OUAXPDSDStXXRVcq6EE1RpcTcinAq+SMaX3/AZGeqrLkKRZkDA0gyyVp1G6ZOclvOvVKXDVdHH/X1eGvU4u+jiMo0p4136toAluh6mRFLNBm3BEAcGTKzns96iuNufasO2+Vv6EhNjnvRCGl29tvTYrALtn5ubYq+YaKdVaM+nIPuw==
+Received: from SJ0PR13CA0227.namprd13.prod.outlook.com (2603:10b6:a03:2c1::22)
+ by DM4PR12MB6087.namprd12.prod.outlook.com (2603:10b6:8:b1::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.17; Thu, 13 Nov
+ 2025 23:40:03 +0000
+Received: from SJ5PEPF00000203.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c1:cafe::7f) by SJ0PR13CA0227.outlook.office365.com
+ (2603:10b6:a03:2c1::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.6 via Frontend Transport; Thu,
+ 13 Nov 2025 23:40:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ5PEPF00000203.mail.protection.outlook.com (10.167.244.36) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9320.13 via Frontend Transport; Thu, 13 Nov 2025 23:40:02 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 13 Nov
+ 2025 15:39:49 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 13 Nov
+ 2025 15:39:49 -0800
+Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Thu, 13 Nov 2025 15:39:47 -0800
+Date: Thu, 13 Nov 2025 15:39:46 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Alex Williamson <alex@shazbot.org>, Christian =?iso-8859-1?Q?K=F6nig?=
+	<christian.koenig@amd.com>, <dri-devel@lists.freedesktop.org>,
+	<iommu@lists.linux.dev>, Joerg Roedel <joro@8bytes.org>, Kevin Tian
+	<kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+	<linaro-mm-sig@lists.linaro.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-media@vger.kernel.org>, Robin Murphy <robin.murphy@arm.com>, "Shuah
+ Khan" <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, Will Deacon
+	<will@kernel.org>, Krishnakant Jaju <kjaju@nvidia.com>, Leon Romanovsky
+	<leon@kernel.org>, Matt Ochs <mochs@nvidia.com>, <patches@lists.linux.dev>,
+	Simona Vetter <simona.vetter@ffwll.ch>, Vivek Kasireddy
+	<vivek.kasireddy@intel.com>, Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [PATCH 6/9] iommufd: Have pfn_reader process DMABUF iopt_pages
+Message-ID: <aRZsQvvEfAD2vpcW@Asurada-Nvidia>
+References: <0-v1-af84a3ab44f5+f68-iommufd_buf_jgg@nvidia.com>
+ <6-v1-af84a3ab44f5+f68-iommufd_buf_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251113233746.1703361-1-seanjc@google.com>
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251113233746.1703361-10-seanjc@google.com>
-Subject: [PATCH v5 9/9] KVM: x86: Unify L1TF flushing under per-CPU variable
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Brendan Jackman <jackmanb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <6-v1-af84a3ab44f5+f68-iommufd_buf_jgg@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF00000203:EE_|DM4PR12MB6087:EE_
+X-MS-Office365-Filtering-Correlation-Id: 325659a1-81fc-4829-8f4f-08de230df785
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|1800799024|7416014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?lMRhnaA5Bl9dpfQwFiGQ6C++A1RoVxuwl22LkxrAGaDmvB6Bfsyvm4faqaTC?=
+ =?us-ascii?Q?fKNHoiE0kcRMQY94fsap8/BdUASQ7ZNYSy0YeIsCSCvswhKZbJIj/7CksTiy?=
+ =?us-ascii?Q?iU42caMvFFtvIyLMgciHej8TgPV10lPAB9R0j4X/Y9WI1vgGULIjerXA8xgn?=
+ =?us-ascii?Q?etwbKgzrFk3MJwxVVdehr2PcUYBKLgTBVEmd9ya4nYCOD/quIwyoEez8+ImL?=
+ =?us-ascii?Q?0kWlUHfmKEMyGJ5Ksfz4rPcvEu48l+fzi+wZB3LxA7SnC7ohyRRHJTj3t+VK?=
+ =?us-ascii?Q?kTTOCNViJD+xSh6YgDcTePgjAOTxu+TyRWfyRYf1i4bivpp7emUAd+o3j7pl?=
+ =?us-ascii?Q?sYMdh4LwjWGDxYRx7fIdEswdrGrGAVHV57WN2y7mKpkSx1HLimeNpXSZ76dB?=
+ =?us-ascii?Q?m1Ui41dOtVdyE6QPexvNlHpvBZMDVKPXDcS3CJ/ajMEFk4CVeBKBvEz6CXbR?=
+ =?us-ascii?Q?24/rEpEOm7U+OeEn9Eh3I9BCgi/KGFoYBZYn1Bl5YWl03x1nsfNFdDeObPk5?=
+ =?us-ascii?Q?QaLKU9EnWzA1YzedpzYSlHKhOD9YUcEoIu9bkAUqmHQNvEIvW6I85S04odbV?=
+ =?us-ascii?Q?T5KwLwAaxworPHp0u8JHEE8k+H9gBBvPqbl7RBabZ7TM+Qf5e0Jsrsg3lQzo?=
+ =?us-ascii?Q?Zo/EyKe7zRoT+JGoACnvj3MAMsY67Dr1um77DZxrvFUdyQjHFVpVP8g5nQVy?=
+ =?us-ascii?Q?peaNIK3FwLIBI7WwhGdXw6RnhGLuJ61SH3P0gaprne5KpwHLsdgqTv0EJHBf?=
+ =?us-ascii?Q?ImAClyFtfPHxc+uka03zxPZ2GK2NZn3MFqYXmfgOAwD907Q/TGAe3H3c8PIq?=
+ =?us-ascii?Q?QM8DjfK47LQzvL6N06mL3cSnSwbaSuNebloxllGZZdG6whW/paFfFc4ZCLd5?=
+ =?us-ascii?Q?iBfFK8Fcrm18WcxntE2NAUNyPj3YhCZ/zPjNyjvs7rvxZvmA2J51leYsfCYc?=
+ =?us-ascii?Q?z/6VGwd1glIHQvBTkoiO3mYLImjA8MnltffrQA1ByzbiId+L7I2ewaTwXPaX?=
+ =?us-ascii?Q?GPbVJvz+0pilidyHfwMwaWkwCvT0ntkOhoeZ9F7XtcEselv2G+S6EZ8NuFRS?=
+ =?us-ascii?Q?Z1D9s6j05/F2YusUmxHStsvlnHri5EdLT/974J+yRKd4ULDvdI3ePAG4gKYz?=
+ =?us-ascii?Q?JH1MaQnACskA3Whi4IDZDWh+zxe6IwP7os7wFPTMbCUZHYJy8jSlmO/9os2K?=
+ =?us-ascii?Q?DB6KX440y1klR0QjxwyIhIoCBKH64mAAdhrH7IfnrwpLyHuKUskgi68fGkvo?=
+ =?us-ascii?Q?9p88fTKckZmA32kTIGrECCy+XEFDAU+53QBH52zKVtzdDuFU1BQXSjNdgPAO?=
+ =?us-ascii?Q?5IGogt0mdWjcJ2xHbXVQ2Flg040aU27P0I76z8/VIwCu+fQvEy6uEzddw25X?=
+ =?us-ascii?Q?ZmMEfaOQm4lWkmHn8PGDm5BiyQ/d7FWbdr/1HVmfSMpL99brmR8/VePRNEpH?=
+ =?us-ascii?Q?gswr2CWVg3Mjoquk+cxHXI4AMupUZIs/f/YiaMzo0mpg9XRMErT1W/Vr5/5w?=
+ =?us-ascii?Q?KUOthJ/HuEDbbj3zcmL52iI0QdGWAqEB/E5oHBVU1cd/ZVuAaNmEU8zA4805?=
+ =?us-ascii?Q?TRB/CUEfg23A1OfBEvs=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(7416014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2025 23:40:02.7112
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 325659a1-81fc-4829-8f4f-08de230df785
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF00000203.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6087
 
-From: Brendan Jackman <jackmanb@google.com>
+On Fri, Nov 07, 2025 at 12:49:38PM -0400, Jason Gunthorpe wrote:
+> Make another sub implementation of pfn_reader for DMABUF. This version
+> will fill the batch using the struct phys_vec recorded during the
+> attachment.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Currently the tracking of the need to flush L1D for L1TF is tracked by
-two bits: one per-CPU and one per-vCPU.
+Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
 
-The per-vCPU bit is always set when the vCPU shows up on a core, so
-there is no interesting state that's truly per-vCPU. Indeed, this is a
-requirement, since L1D is a part of the physical CPU.
+> @@ -1687,6 +1737,12 @@ static void __iopt_area_unfill_domain(struct iopt_area *area,
+>  
+>  	lockdep_assert_held(&pages->mutex);
+>  
+> +	if (iopt_is_dmabuf(pages)) {
+> +		iopt_area_unmap_domain_range(area, domain, start_index,
+> +					     last_index);
+> +		return;
+> +	}
 
-So simplify this by combining the two bits.
+Should it be:
+	if (iopt_is_dmabuf(pages) && !iopt_dmabuf_revoked(pages)) {
+?
 
-The vCPU bit was being written from preemption-enabled regions.  To play
-nice with those cases, wrap all calls from KVM and use a raw write so that
-request a flush with preemption enabled doesn't trigger what would
-effectively be DEBUG_PREEMPT false positives.  Preemption doesn't need to
-be disabled, as kvm_arch_vcpu_load() will mark the new CPU as needing a
-flush if the vCPU task is migrated, or if userspace runs the vCPU on a
-different task.
-
-Signed-off-by: Brendan Jackman <jackmanb@google.com>
-[sean: put raw write in KVM instead of in a hardirq.h variant]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h |  3 ---
- arch/x86/kvm/mmu/mmu.c          |  2 +-
- arch/x86/kvm/vmx/nested.c       |  2 +-
- arch/x86/kvm/vmx/vmx.c          | 20 +++++---------------
- arch/x86/kvm/x86.c              |  6 +++---
- arch/x86/kvm/x86.h              | 14 ++++++++++++++
- 6 files changed, 24 insertions(+), 23 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1a8ea5dc6699..9f9839bbce13 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1055,9 +1055,6 @@ struct kvm_vcpu_arch {
- 	/* be preempted when it's in kernel-mode(cpl=0) */
- 	bool preempted_in_kernel;
- 
--	/* Flush the L1 Data cache for L1TF mitigation on VMENTER */
--	bool l1tf_flush_l1d;
--
- 	/* Host CPU on which VM-entry was most recently attempted */
- 	int last_vmentry_cpu;
- 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 3cfabfbdd843..02c450686b4a 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4859,7 +4859,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
- 	 */
- 	BUILD_BUG_ON(lower_32_bits(PFERR_SYNTHETIC_MASK));
- 
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_request_l1tf_flush_l1d();
- 	if (!flags) {
- 		trace_kvm_page_fault(vcpu, fault_address, error_code);
- 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 564f5af5ae86..40777278eabb 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3828,7 +3828,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 		goto vmentry_failed;
- 
- 	/* Hide L1D cache contents from the nested guest.  */
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_request_l1tf_flush_l1d();
- 
- 	/*
- 	 * Must happen outside of nested_vmx_enter_non_root_mode() as it will
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ae6b102b1570..df4cfcc6591a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -395,26 +395,16 @@ static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
- 	 * 'always'
- 	 */
- 	if (static_branch_likely(&vmx_l1d_flush_cond)) {
--		bool flush_l1d;
--
- 		/*
--		 * Clear the per-vcpu flush bit, it gets set again if the vCPU
-+		 * Clear the per-cpu flush bit, it gets set again if the vCPU
- 		 * is reloaded, i.e. if the vCPU is scheduled out or if KVM
- 		 * exits to userspace, or if KVM reaches one of the unsafe
--		 * VMEXIT handlers, e.g. if KVM calls into the emulator.
-+		 * VMEXIT handlers, e.g. if KVM calls into the emulator,
-+		 * or from the interrupt handlers.
- 		 */
--		flush_l1d = vcpu->arch.l1tf_flush_l1d;
--		vcpu->arch.l1tf_flush_l1d = false;
--
--		/*
--		 * Clear the per-cpu flush bit, it gets set again from
--		 * the interrupt handlers.
--		 */
--		flush_l1d |= kvm_get_cpu_l1tf_flush_l1d();
-+		if (!kvm_get_cpu_l1tf_flush_l1d())
-+			return;
- 		kvm_clear_cpu_l1tf_flush_l1d();
--
--		if (!flush_l1d)
--			return;
- 	}
- 
- 	vcpu->stat.l1d_flush++;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9c2e28028c2b..ae774519b701 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5209,7 +5209,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_request_l1tf_flush_l1d();
- 
- 	if (vcpu->scheduled_out && pmu->version && pmu->event_count) {
- 		pmu->need_cleanup = true;
-@@ -8032,7 +8032,7 @@ int kvm_write_guest_virt_system(struct kvm_vcpu *vcpu, gva_t addr, void *val,
- 				unsigned int bytes, struct x86_exception *exception)
- {
- 	/* kvm_write_guest_virt_system can pull in tons of pages. */
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_request_l1tf_flush_l1d();
- 
- 	return kvm_write_guest_virt_helper(addr, val, bytes, vcpu,
- 					   PFERR_WRITE_MASK, exception);
-@@ -9440,7 +9440,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		return handle_emulation_failure(vcpu, emulation_type);
- 	}
- 
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_request_l1tf_flush_l1d();
- 
- 	if (!(emulation_type & EMULTYPE_NO_DECODE)) {
- 		kvm_clear_exception_queue(vcpu);
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 24c754b0db2e..fdab0ad49098 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -420,6 +420,20 @@ static inline bool kvm_check_has_quirk(struct kvm *kvm, u64 quirk)
- 	return !(kvm->arch.disabled_quirks & quirk);
- }
- 
-+static __always_inline void kvm_request_l1tf_flush_l1d(void)
-+{
-+#if IS_ENABLED(CONFIG_CPU_MITIGATIONS) && IS_ENABLED(CONFIG_KVM_INTEL)
-+	/*
-+	 * Use a raw write to set the per-CPU flag, as KVM will ensure a flush
-+	 * even if preemption is currently enabled..  If the current vCPU task
-+	 * is migrated to a different CPU (or userspace runs the vCPU on a
-+	 * different task) before the next VM-Entry, then kvm_arch_vcpu_load()
-+	 * will request a flush on the new CPU.
-+	 */
-+	raw_cpu_write(irq_stat.kvm_cpu_l1tf_flush_l1d, 1);
-+#endif
-+}
-+
- void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip);
- 
- u64 get_kvmclock_ns(struct kvm *kvm);
--- 
-2.52.0.rc1.455.g30608eb744-goog
-
+Nicolin
 
