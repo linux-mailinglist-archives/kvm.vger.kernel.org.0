@@ -1,248 +1,203 @@
-Return-Path: <kvm+bounces-63009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63010-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4A01C5751C
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 13:02:43 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0E8EC57558
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 13:08:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C874F3B8EC4
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 12:00:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D2976341AC1
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 12:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6125E34DB7F;
-	Thu, 13 Nov 2025 12:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6297834D38A;
+	Thu, 13 Nov 2025 12:05:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBk8bIqm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DqyrN580";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bs10BSpL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020D4333739
-	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 12:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D1F21348
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 12:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763035235; cv=none; b=kccdX21MV6LYQ6MVna4XgMIRwCighiUDXNlhm/IeAWjxJv5cNVDCj9ghTepDkpSpj5eUlXGvj+kk5IqyRPrqi+nQSxYwoe+LoEwpmgDcxkC0Hx9k3aYxz9W7mBcpLo++pp+Rg3UmakGfPLEF6eC0ay1GleslwCSZAcZzn5ywSCc=
+	t=1763035549; cv=none; b=Dkp0eFRwRj/C1w3zMgH/9VtdTlu5fiNmSR9dz51PQxNLubZQ971FrzYa/fzoUedPTxOi2THfkQBtHVrRu/8MPDSKekFEseVfRn5QSefCQl+5Joxa52iDoqZvgeqEeojUGDveSI1EzwVlvQ4zZ9sg3HcQiGe4F6lRagbYm/K782k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763035235; c=relaxed/simple;
-	bh=4P4LhGMXNDpOMLzkgSnNvj8G+OXHvtlSD4CrCtiKVM4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L9ppSWYiim+h5Odu9ntur36gORoqpINBFzuW+807HyLvQ09k0dlxXvHYBXnVFdZRWOHhQXI3d81JWRnnUHMrAbQ/sXkCdDV7yTbJb0kVfYeOiTrz2E28bb4unFL1kzzTSEg2tpo3Y57kWqH0E72ek+By23/aT02b1G/5oNsUjtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBk8bIqm; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-340a5c58bf1so496911a91.2
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 04:00:33 -0800 (PST)
+	s=arc-20240116; t=1763035549; c=relaxed/simple;
+	bh=94BURugg/MQ5M20T3CsuvIMe9pNv4ndJk6pUBYNEZz4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=lcJOkA06Zl4wCeeJHvxwBCOkjAYHHSfQk4OmnYnNhIWefTVZ0ZkHo6h0QqZDxHqefdSDqFR2gzyFhUfqGm9Y6LI2oKzZwAhFjUXN7ONuLe7nlwsXeiTSY7RDuh90H5hpJFpAsEKr4TprW6NU9lyivI/GU98USpiB0E2DDVkmBk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DqyrN580; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bs10BSpL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763035545;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tI2/OYtW6mgwxijeu2yFHVnaEg8ys2MTvM8mvkzh7dM=;
+	b=DqyrN580ANHWKRLwiMr6e14BStI5Q4lurZhTdK+42r+nrqySaBndtjnIJ9dnqzWyW0JEd/
+	gp+GcYKo8NHjfw7oPMCGgOR27jMKiNikFR/6c1BP1Zd9Ii5WUgcK9URvKDHXprDh65MjDl
+	aHlt+eRbzJI+JNPDSmBeXs6OzxDhstw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-370-wx-ocCs6OsiIJPuZ2cOafw-1; Thu, 13 Nov 2025 07:05:42 -0500
+X-MC-Unique: wx-ocCs6OsiIJPuZ2cOafw-1
+X-Mimecast-MFC-AGG-ID: wx-ocCs6OsiIJPuZ2cOafw_1763035541
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42b3ed2c3e3so691023f8f.1
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 04:05:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763035233; x=1763640033; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VMbZe017tqsUHZpQ2QjARaQuit2dg0zAawqoQ3eFuRM=;
-        b=eBk8bIqm4A2dQDXlFI/NG+b82jOhbvl6/xQehWcEWuZS7pJeHVAehMQZLOi+UACtO3
-         4Op2eR2/eCjS7mfhhKpF0VHuBA51iwu2PUMh1moYR1ka8fyFXdM1G897+NAoDJQpKY3z
-         2iJdpworRIZwfFeQyzQllzanrWrTAAXCMLYc17EzC9GpIBOxppD6nrIZQYsoX3ePqqAR
-         DEfP7BD6oC7ese65TnBmff2J5ymszsIIOI3kZskzfysvvrac9ShEpKH6IrQmaAtFuMKt
-         g9ZRD+EdrOnfiCCbbLxiot5DeeBOBUL6AUUkqJY9xMrx31c9YF46BJf/LRFimyA2DxSV
-         Ptbg==
+        d=redhat.com; s=google; t=1763035541; x=1763640341; darn=vger.kernel.org;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tI2/OYtW6mgwxijeu2yFHVnaEg8ys2MTvM8mvkzh7dM=;
+        b=bs10BSpL4V928O+qSzpFsC4DVx9MqhIPx4LUyzoxjLijghD8M8BmW50zmm0MJOsjJK
+         OTL+LkhtRXXktJPlN1DNIz0ufACaVjp4hjWHvXNVpIunsLeZLUj9chZV2NKip/mUkntL
+         pESx9T60Pz3xLOZA0P0ay/s3GNbbdgeoOyjqUm1dLMnhc01bpqoLfdM2XPF4EAY+LKED
+         mxT48atgJgcfl2kq0tU7SuVCpUbAKl/CACikLfG5LJ32SIgGd1O+wjhb1HQgc5eFydCD
+         jep0er4UMuQIZiTDQe/RfhhBVyaM6uzgCOidH/Ctyxdl2KqEUrG32AVFpOlgXAhOXk8g
+         hfQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763035233; x=1763640033;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=VMbZe017tqsUHZpQ2QjARaQuit2dg0zAawqoQ3eFuRM=;
-        b=Zq8/6KLbWbY1Gq3huCCR0/yYmNcnGxuQ2qPAUBH+OoyvPJo6/H+3tSFf5ifdIgcwI6
-         HKOTcttD1B2/WKEw1+xMdpI+Spx5KrjJkSEDSxFCsqa140rN+XKaVDrtUjypdDBAeb3v
-         Zv6BdKEN47rhag9MkzZ4bdmyM9UBHIPP1dwq+M2NWs71BRK1UBlCxwkX6S58luLQMLF9
-         HLZ/Rxn+TbQ91sX/Pud1AXda+6jxou21+TsUjS12NwZCe/x4Nl2ef1ZX1+yPbaEq0Ye5
-         1+OA3VdGJue0Cgjn8xbRsTJ0utQSGNgD338vQ+tiTnrWx82k2rZOND+OtpUwre1fGdM7
-         eI7g==
-X-Forwarded-Encrypted: i=1; AJvYcCUHMRsJspvXMyMxv6qZPJjMlGbCfd8a3rpfNc1/YsYlkdIRjialCY0n8slQI9FCx5BT/CM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ/D7nBRTZ2okHD9cr6p5M1j7T5ssqJRFdNFnjQqFBUwH7FTtF
-	GeHsHHjZDxj0gpPwaFbp1Z+CDT9Fu8WyzFy4qHspG+GgUSr2LU92VD9PlOI17TqbU8bSNq9hLhB
-	pQTtoePggxGZPKsQr4HrSO5Q+mai2jqU=
-X-Gm-Gg: ASbGncu23gPDqYkixvSgf0jdc1KrSWCLT9WeSlMACJXvYF0neCX3QQIgq83Lx37jZ25
-	saVhE5g9tRUa5zHxXSIM7x54rnKYDnZjVtv7tFy3lLLRlrT6DAlVHyArzQ6C1YOhhTrFM27B+hb
-	qFcQJKdQkAh4kwUDllqwMaLTJHCTcQD9c/YxIFtoDFoJwb3IrbQjLaINBGDCm6Dj1GtfLa0e5hI
-	+X01G7253INY1WXq1a1TcFJ5ZCuRSG/7gWuMtqVG/oTj5RDs88psJwHQevA
-X-Google-Smtp-Source: AGHT+IEI2/ETIyN+HIgY1WEvq69lhMhuMqrT7htmjzbXfUhWwBXWYHygAT11nF7Fs+GljLoWjfY7MsHoOczG1GMYc8c=
-X-Received: by 2002:a17:90a:d448:b0:340:f7d6:dc70 with SMTP id
- 98e67ed59e1d1-343dde13826mr7620363a91.13.1763035233051; Thu, 13 Nov 2025
- 04:00:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763035541; x=1763640341;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tI2/OYtW6mgwxijeu2yFHVnaEg8ys2MTvM8mvkzh7dM=;
+        b=u0/481pB6G7ei9ZmJ7kWlwzs7ah1xXKkdEdz8BlqzU8u7PxCbZjxCXqwPjuw92LQ4/
+         cdXypfuvtHPof8GOFuU0X3HUOIny7K5Q3Tg9XYQSkdRY9qs06Poo0tAtx8iVGDT1zRCN
+         0avL6eMYEzeldeeKU7fNt1MSrMCZVoPJfd63cUv9TGLsc3FdTAi5dYnoNfB1LgvrT6x9
+         1hEE2l8y3BhbILaaXHM8ex+Ctxef20uUnBktVa+LxIXEDiYnEiBVC1B5rK0cGnZ+9PXl
+         /S3VIYk8VYs6R+xo8Nhizhulkdqg8ZTSqZwJ+3wFBAbAhs1pJsnYZVeQ0/yerFcEF3YJ
+         nZ0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU5G7NND1t3MaEnHL+MqkTPKF30LtHJXBhyO/GEqVcrzIA+3y5uElI14F1dUtRbPyP8oV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkS5OnxxYd5pmCFKASth4oX45LRttCNpeaa1mSK2Pd+OIyDotz
+	F9C9IOCZx0ysskrhIINUpU8JkYf9wAq7Dl1PtaM2L2KcsVtlci9uXLvwPv80JwtYVunz9HRRbIp
+	3wisqm4RGwM5pnO1xBuuTQ6Ipy6ryVdgdvoBclWNgNj1TJza4aDqssQ==
+X-Gm-Gg: ASbGnctBe+PL3FN70s/as0QEL6aZbSSQ3RyYWf4BCytIVr73xghM/ZjorLqGKj5X5jT
+	zZHaJwZjn/uhpo6K9CFyb2gvNxEepiUD71QsApOa7ztCxmc+a+aMW03pAnYhAJFNPkXUevGDPm1
+	/Lr/kQ4XXkhW+AzJyT4J7rfn6mSaMOBpnqNQgOEqQ9x8vX4Vk2D/xjyIKlhvIgCR5aRlmy2MCxl
+	mdysLsCLcXAOVRw+7zUUkzeSHH4gIRI+nvz8yUtTVN+GS/HUOK923VMa0tsBpq6w/JajzVe1yHP
+	7Kr8oEsGZU+cZtWcW4jW38z8naO1Qj7FuDeYJOSsk+gET4WySmIzTC66k3cow8UJ1IOz79e07EH
+	UtzG8hdXEWBWbTa5qE2WV57S6COGwkd176up5BMMxTWmAn5QH
+X-Received: by 2002:a05:6000:1885:b0:42b:3680:3567 with SMTP id ffacd0b85a97d-42b4bb91b2cmr5895238f8f.18.1763035541149;
+        Thu, 13 Nov 2025 04:05:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE3IIBIBt8q03GbcoIy980NO1o7f47Eyz3eGrQw/lEHfvAJ2mJpS0tJ8SI1nFL6EYhPZo1J9g==
+X-Received: by 2002:a05:6000:1885:b0:42b:3680:3567 with SMTP id ffacd0b85a97d-42b4bb91b2cmr5895217f8f.18.1763035540713;
+        Thu, 13 Nov 2025 04:05:40 -0800 (PST)
+Received: from rh (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f23a1asm3522001f8f.45.2025.11.13.04.05.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 04:05:40 -0800 (PST)
+Date: Thu, 13 Nov 2025 13:05:39 +0100 (CET)
+From: Sebastian Ott <sebott@redhat.com>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>
+cc: Peter Maydell <peter.maydell@linaro.org>, 
+    Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
+    qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, 
+    kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 2/2] target/arm/kvm: add kvm-psci-version vcpu
+ property
+In-Reply-To: <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org>
+Message-ID: <c082340f-31b1-e690-8c29-c8d39edf8d35@redhat.com>
+References: <20251112181357.38999-1-sebott@redhat.com> <20251112181357.38999-3-sebott@redhat.com> <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251110033232.12538-1-kernellwp@gmail.com> <20251110033232.12538-3-kernellwp@gmail.com>
- <015bfa4d-d89c-4d4e-be06-d6e46aec28cb@amd.com>
-In-Reply-To: <015bfa4d-d89c-4d4e-be06-d6e46aec28cb@amd.com>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Thu, 13 Nov 2025 20:00:21 +0800
-X-Gm-Features: AWmQ_bm9GFF_fVDEXPJNSBQ91hN0PH9vClzZfoOKcy5ZG0d_ttlXsdzXEocsdlQ
-Message-ID: <CANRm+CzsjNyd9-QjUupszpULNkJ31U+wPWC81A5jaTFRFdPfMg@mail.gmail.com>
-Subject: Re: [PATCH 02/10] sched/fair: Add rate-limiting and validation helpers
-To: K Prateek Nayak <kprateek.nayak@amd.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Wanpeng Li <wanpengli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed; boundary="-1463806286-853068444-1763035540=:13840"
 
-Hi Prateek=EF=BC=8C
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-On Wed, 12 Nov 2025 at 14:40, K Prateek Nayak <kprateek.nayak@amd.com> wrot=
-e:
->
-> Hello Wanpeng,
->
-> On 11/10/2025 9:02 AM, Wanpeng Li wrote:
-> > +/*
-> > + * High-frequency yield gating to reduce overhead on compute-intensive=
- workloads.
-> > + * Returns true if the yield should be skipped due to frequency limits=
-.
-> > + *
-> > + * Optimized: single threshold with READ_ONCE/WRITE_ONCE, refresh time=
-stamp on every call.
-> > + */
-> > +static bool yield_deboost_rate_limit(struct rq *rq, u64 now_ns)
-> > +{
-> > +     u64 last =3D READ_ONCE(rq->yield_deboost_last_time_ns);
-> > +     bool limited =3D false;
-> > +
-> > +     if (last) {
-> > +             u64 delta =3D now_ns - last;
-> > +             limited =3D (delta <=3D 6000ULL * NSEC_PER_USEC);
-> > +     }
-> > +
-> > +     WRITE_ONCE(rq->yield_deboost_last_time_ns, now_ns);
->
-> We only look at local rq so READ_ONCE()/WRITE_ONCE() seems
-> unnecessary.
+---1463806286-853068444-1763035540=:13840
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-You're right. Since we're under rq->lock and only accessing the local
-rq's fields, READ_ONCE()/WRITE_ONCE() provide no benefit here. Will
-simplify to direct access.
+Hi Philippe,
 
+On Wed, 12 Nov 2025, Philippe Mathieu-Daudé wrote:
+> On 12/11/25 19:13, Sebastian Ott wrote:
+>>  Provide a kvm specific vcpu property to override the default
+>>  (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
+>>  by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+>>
+>>  Note: in order to support PSCI v0.1 we need to drop vcpu
+>>  initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
+>>
+>>  Signed-off-by: Sebastian Ott <sebott@redhat.com>
+>>  ---
+>>    docs/system/arm/cpu-features.rst |  5 +++
+>>    target/arm/cpu.h                 |  6 +++
+>>    target/arm/kvm.c                 | 64 +++++++++++++++++++++++++++++++-
+>>    3 files changed, 74 insertions(+), 1 deletion(-)
 >
-> > +     return limited;
-> > +}
-> > +
-> > +/*
-> > + * Validate tasks and basic parameters for yield deboost operation.
-> > + * Performs comprehensive safety checks including feature enablement,
-> > + * NULL pointer validation, task state verification, and same-rq requi=
-rement.
-> > + * Returns false with appropriate debug logging if any validation fail=
-s,
-> > + * ensuring only safe and meaningful yield operations proceed.
-> > + */
-> > +static bool __maybe_unused yield_deboost_validate_tasks(struct rq *rq,=
- struct task_struct *p_target,
-> > +                                       struct task_struct **p_yielding=
-_out,
-> > +                                       struct sched_entity **se_y_out,
-> > +                                       struct sched_entity **se_t_out)
-> > +{
-> > +     struct task_struct *p_yielding;
-> > +     struct sched_entity *se_y, *se_t;
-> > +     u64 now_ns;
-> > +
-> > +     if (!sysctl_sched_vcpu_debooster_enabled)
-> > +             return false;
-> > +
-> > +     if (!rq || !p_target)
-> > +             return false;
-> > +
-> > +     now_ns =3D rq->clock;
 >
-> Brief look at Patch 5 suggests we are under the rq_lock so might
-> as well use the rq_clock(rq) helper. Also, you have to do a
-> update_rq_clock() since it isn't done until yield_task_fair().
+>>  diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>>  index 0d57081e69..e91b1abfb8 100644
+>>  --- a/target/arm/kvm.c
+>>  +++ b/target/arm/kvm.c
+>>  @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool
+>>  value, Error **errp)
+>>        ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON :
+>>    ON_OFF_AUTO_OFF;
+>>    }
+>>
+>>  +struct psci_version {
+>>  +    uint32_t number;
+>>  +    const char *str;
+>>  +};
+>>  +
+>>  +static const struct psci_version psci_versions[] = {
+>>  +    { QEMU_PSCI_VERSION_0_1, "0.1" },
+>>  +    { QEMU_PSCI_VERSION_0_2, "0.2" },
+>>  +    { QEMU_PSCI_VERSION_1_0, "1.0" },
+>>  +    { QEMU_PSCI_VERSION_1_1, "1.1" },
+>>  +    { QEMU_PSCI_VERSION_1_2, "1.2" },
+>>  +    { QEMU_PSCI_VERSION_1_3, "1.3" },
+>>  +    { -1, NULL },
+>>  +};
+>
+>
+>>  @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+>>                                 kvm_steal_time_set);
+>>        object_property_set_description(obj, "kvm-steal-time",
+>>                                        "Set off to disable KVM steal
+>>  time.");
+>>  +
+>>  +    object_property_add_str(obj, "kvm-psci-version",
+>>  kvm_get_psci_version,
+>>  +                            kvm_set_psci_version);
+>>  +    object_property_set_description(obj, "kvm-psci-version",
+>>  +                                    "Set PSCI version. "
+>>  +                                    "Valid values are 0.1, 0.2, 1.0, 1.1,
+>>  1.2, 1.3");
+>
+> Could we enumerate from psci_versions[] here?
+>
 
-Good catch. Since yield_to() holds rq_lock but doesn't call
-update_rq_clock() before invoking yield_to_task(), I need to call
-update_rq_clock(rq) at the start of yield_to_deboost() and use
-rq_clock(rq) instead of direct rq->clock access. This ensures the
-clock is current before rate limiting checks.
+Hm, we'd need to concatenate these. Either manually:
+"Valid values are " psci_versions[0].str ", " psci_versions[1].str ", " ... 
+which is not pretty and still needs to be touched for a new version.
 
->
-> > +
-> > +     if (yield_deboost_rate_limit(rq, now_ns))
-> > +             return false;
-> > +
-> > +     p_yielding =3D rq->curr;
-> > +     if (!p_yielding || p_yielding =3D=3D p_target ||
-> > +         p_target->sched_class !=3D &fair_sched_class ||
-> > +         p_yielding->sched_class !=3D &fair_sched_class)
-> > +             return false;
->
-> yield_to() in syscall.c has already checked for the sched
-> class matching under double_rq_lock. That cannot change by the
-> time we are here.
+Or by a helper function that puts these in a new array and uses smth like
+g_strjoinv(", ", array);
+But that's quite a bit of extra code that needs to be maintained without
+much gain.
 
-Correct. The sched_class checks are redundant since yield_to() already
-validates curr->sched_class =3D=3D p->sched_class under double_rq_lock(),
-and sched_class cannot change while holding the lock. Will remove.
+Or we shy away from the issue and rephrase that to:
+"Valid values include 1.0, 1.1, 1.2, 1.3"
 
->
-> > +
-> > +     se_y =3D &p_yielding->se;
-> > +     se_t =3D &p_target->se;
-> > +
-> > +     if (!se_t || !se_y || !se_t->on_rq || !se_y->on_rq)
-> > +             return false;
-> > +
-> > +     if (task_rq(p_yielding) !=3D rq || task_rq(p_target) !=3D rq)
->
-> yield_to() has already checked for this under double_rq_lock()
-> so this too should be unnecessary.
+Since the intended use case is via machine types and I don't expect a
+lot of users setting the psci version manually - I vote for option 3.
 
-Right. yield_to() already ensures both tasks are on their expected run
-queues under double_rq_lock(), so the task_rq(p_yielding) !=3D rq ||
-task_rq(p_target) !=3D rq check is redundant. Will remove.
+Opinions?
 
->
-> > +             return false;
-> > +
-> > +     *p_yielding_out =3D p_yielding;
-> > +     *se_y_out =3D se_y;
-> > +     *se_t_out =3D se_t;
->
-> Why do we need these pointers? Can't the caller simply do:
->
->     if (!yield_deboost_validate_tasks(rq, target))
->         return;
->
->     p_yielding =3D rq->donor;
->     se_y_out =3D &p_yielding->se;
->     se_t =3D &target->se;
+Sebastian
+---1463806286-853068444-1763035540=:13840--
 
-You're right, the output parameters are unnecessary. The caller can
-derive them directly:
-   p_yielding =3D rq->donor (accounting for proxy exec)
-   se_y =3D &p_yielding->se
-   se_t =3D &target->se
-I'll simplify yield_deboost_validate_tasks() to just return bool and
-let the caller obtain these pointers.
-
->
-> That reminds me - now that we have proxy execution, you need
-> to re-evaluate the usage of rq->curr (running context) vs
-> rq->donor (vruntime context) when looking at all this.
-
-Good catch. Since we're manipulating vruntime/deadline/vlag, I should
-use rq->donor (scheduling context) instead of rq->curr (execution
-context). In the yield_to() path, curr should equal donor (the
-yielding task is running), but using donor makes the vruntime
-semantics clearer and consistent with
-update_curr_fair()/check_preempt_wakeup_fair().
-
-Regards,
-Wanpeng
 
