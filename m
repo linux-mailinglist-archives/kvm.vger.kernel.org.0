@@ -1,157 +1,133 @@
-Return-Path: <kvm+bounces-63043-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63044-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CA9BC59E84
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 21:10:31 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FEABC5A03F
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 21:52:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAFCA3B246E
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 20:10:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 269D94E636F
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 20:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB8FD311C30;
-	Thu, 13 Nov 2025 20:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E85320CDF;
+	Thu, 13 Nov 2025 20:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uFR0yht4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bDSSWlBI"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE29E218AD4;
-	Thu, 13 Nov 2025 20:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711D7320A2C
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 20:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763064622; cv=none; b=mWBaLn95MgsbTBvdqBJghK/H3hIjf+N8DhqxOc5+uMIdpRKBxSV6cwQ61V1iEpoasjD7Lb4Uo2A5fgQEKR3UGowcQZZT2uk20tQW5CaKHs5/XPaiiixGbteCRFMcG5jUfeZvLWPDxTEn1SfaTBMis4Cphk5SeW1PZPNaQYrg3Zw=
+	t=1763067079; cv=none; b=I45XQ7pWUznqAjfyaYFAj4Xoi97hPuFoEXFng+6FQV8dHYIpMjaaTosoReT2/GC4jW/hsL1pKf7If9xxRJAyP34GX+zMnw58pvinOhWjE9wj4uJU/8EtybsLL/S2m+4RKZVkqCvpF/+vgO4DC97ZF0VL6Ui0Lr+0nGyt70wicwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763064622; c=relaxed/simple;
-	bh=XhW7cUeN8WBhvszpm+5UwRt9sdZlZPSmEzfCXizuFPU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JW7rMr0g+lIaB5YHQjqS2PHDu9eNK6I2ETKMKE/+/hparM6oxHw2WTyMzt0R5+A2iHyK20t4N/OWrn9IM3wNuxKtTXWhR3AaNfJyahAuaslt6GaeMtAJJcTitEnar37nq1x+eZrHM7U9b5R3X0E0+H9xa7p24CSs5kIvM6CmSkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uFR0yht4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 884A4C4CEFB;
-	Thu, 13 Nov 2025 20:10:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763064621;
-	bh=XhW7cUeN8WBhvszpm+5UwRt9sdZlZPSmEzfCXizuFPU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uFR0yht4IbiXsgAESdOfYzJ4m/HcgROH6oLpQ+yKbpqYYNFSZn2HxN26zEJT4NQgD
-	 rqqc9gif+X6AN/mSMbaJ8vtL28nHq3gG/BxuP1qZHOIZu5PPsRuzEqHa9IMOGJI18o
-	 3KinGzRd3xvz+XQI9txqamOo6ErdJKo58oItGiFTjIjDPcXR8P+dplgaPfYC/ytQh9
-	 rvUm3zOhrTxJ+6NnQp5PF+PeRrdVuiD3LTu7EH+N1Y4A/B+y0zm9Tl1EPPt8bcdABd
-	 9Q+haHBl06AraG5BsT99BI4Vdqz73hQ6QFuKePG1Ghx4oWVW3pBd4QrePubi7F6+kN
-	 2993WUen4SDPQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vJde7-0000000503W-11X2;
-	Thu, 13 Nov 2025 20:10:19 +0000
-Date: Thu, 13 Nov 2025 20:10:18 +0000
-Message-ID: <86frahu21h.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	Aishwarya.TCV@arm.com, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 05/45] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
-In-Reply-To: <7ea5c49d-b093-475e-9f27-ad92dcc4b560@sirena.org.uk>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-6-maz@kernel.org>
-	<7ae5874e-366f-4abd-9142-ffbe21fed3a8@sirena.org.uk>
-	<86ikfdu7cu.wl-maz@kernel.org>
-	<7ea5c49d-b093-475e-9f27-ad92dcc4b560@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763067079; c=relaxed/simple;
+	bh=nVsUbWX55uzgK6J9Yr/ClgQLgZwSXQ/StMxuzBhlwgY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MdVjCNd6c8p8XWx/0kgLgqEFlqc/DpcSJZgaiWtnZH9u4sgiElCsoyC204yWH9V9NtwK2NnX/b4y8zUNDq1YCEoXHV+vhb8XrhXyR0YvkYIJJMpL1OtrqGtY9lhH0czGPQN0XDWW4exJhraFcQ8o3JpHu5LqxS95+MmlQ2sZcGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bDSSWlBI; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-297e1cf9aedso33048605ad.2
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 12:51:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763067077; x=1763671877; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X7hRy0HCt1Eng7MibclXDrxk+TeuJTxt4V4onb3K574=;
+        b=bDSSWlBIggC54kXndDCReuxD2baBwxE3tXejU/TzDdh65q1DnwnR/IO7oXoAgkJcrr
+         cjTN6hNHVcbeSQI1jcAyXI8B8ryvtmqAqIimWoGxsZbpYYNw+x1pvlUOZ+BHN/quLArr
+         6LhF9VLp0NCF2sj1s79HbhZxCkVzy5eNS/jc7P8LyKUZlHv32uwQA0iw/l0EPfGfsHG5
+         MAeQyC5scQzTvd+aDJsjo0sEl0r4V9FboQsuOK5Gn/fZbMhZ4b4JsUo+Le1chEwKtDSk
+         GloDrCa2Cxfs0P7OFofCQ5wX+JCyDlioTIWBMLTSEsB4Xo9L+/RLEYfsuV9bF8i/ORBT
+         gBCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763067077; x=1763671877;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X7hRy0HCt1Eng7MibclXDrxk+TeuJTxt4V4onb3K574=;
+        b=Cemu/0G2i954iCggTRdftysDzZxfc3KxmrOk6XcpmXeb+d57tz58rqoauZ3udjltM0
+         BJHGexJZN5hakuqo4RpHKIrE0ZyT6WFsWQ/JcZdAJB9ZT/PSBMgSRH8ksoIUKVHU7f5X
+         4cGpBcv03vXhJNWx6wAriKNMrC4oFzfhM6+ct135L69fJvfHssSbmrV0ppEj7JNX4waZ
+         BHI4xAeuOJV/4aksyfv5np8setb8yzcSx5m4bEauZfe5Pno9xDFW7Bd2F1P/1ygd+gnO
+         jHfGnJNhMhXcCNwmdMjxIqdM3/3hLpvx4nRxqmvtNlhbqm/o4gsCi1p1/4o6UvBFLVbI
+         UY7Q==
+X-Gm-Message-State: AOJu0YxrJqYNukl3Q2GmiTLtHeCCEBLvXSvGAMC6tPHli5BJ6/T5yETR
+	KsBimmCtgng+OxIff72Y/bDYi/28ZZa25v9BxiBOjYD9ZzUzxyAwT0ksDd5QDhVAJdF7XBRG9fi
+	OkfRxYw==
+X-Google-Smtp-Source: AGHT+IG6geoTDL6Wj81P7NtMvy8iWkplDZ/kI/8hgap463dB9GTsfnlAA5hWB/AQ64zzPBaSgRslbMtOwDI=
+X-Received: from pllo10.prod.google.com ([2002:a17:902:778a:b0:296:18d:ea1a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:11c6:b0:295:592e:7633
+ with SMTP id d9443c01a7336-2986a72e2bcmr4097805ad.29.1763067077362; Thu, 13
+ Nov 2025 12:51:17 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 13 Nov 2025 12:51:10 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com, Aishwarya.TCV@arm.com, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
+Message-ID: <20251113205114.1647493-1-seanjc@google.com>
+Subject: [PATCH v6 0/4] KVM: x86: Fix hard lockup with periodic timer in guest
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	fuqiang wang <fuqiang.wng@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-+Fuad
+fuqiang's patch/series to fix a bug in KVM's local APIC timer emulation where
+it can trigger a hard lockup due to restarting an hrtimer with an expired
+deadline over and over (and over).
 
-On Thu, 13 Nov 2025 19:06:31 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Thu, Nov 13, 2025 at 06:15:29PM +0000, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > The arch_timer case bisects to this patch in -next, regular nVHE mode
-> > > runs this test happily.
-> 
-> > My hunch is that we're missing something like the hack below, but I
-> > haven't tried it yet.
-> 
-> > I'll probably get to it tomorrow.
-> 
-> That still fails FWIW.
+v6:
+ - Split the apic_timer_fn() change to a separate patch (mainly for a
+   bisection point).
+ - Handle (and WARN on) period=0 in apic_timer_fn().
+ - Add a patch to grab a pointer to the kvm_timer struct locally.
+ - Tag the fixes (and prep work) for stable@.
 
-Yup, this has uncovered yet another pKVM bug, which doesn't preserve
-the vgic_model in its private kvm structure. I'm able to make it work
-with this:
+v5:
+ - https://lore.kernel.org/all/20251107034802.39763-1-fuqiang.wng@gmail.com
+ - Add more details in commit messages and letters.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 43bde061b65de..8911338961c5b 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -337,6 +337,9 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
- 	/* CTR_EL0 is always under host control, even for protected VMs. */
- 	hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
- 
-+	/* Preserve the vgic model so that GICv3 emulation works */
-+	hyp_vm->kvm.arch.vgic.vgic_model = host_kvm->arch.vgic.vgic_model;
-+
- 	if (test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &host_kvm->arch.flags))
- 		set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags);
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 82da9b03692d4..3108b5185c204 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -444,6 +444,8 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 
- 	/* Scalable Vector Registers are restricted. */
- 
-+	HOST_HANDLED(SYS_ICC_PMR_EL1),
-+
- 	RAZ_WI(SYS_ERRIDR_EL1),
- 	RAZ_WI(SYS_ERRSELR_EL1),
- 	RAZ_WI(SYS_ERXFR_EL1),
-@@ -457,9 +459,12 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 
- 	/* Limited Ordering Regions Registers are restricted. */
- 
-+	HOST_HANDLED(SYS_ICC_DIR_EL1),
-+	HOST_HANDLED(SYS_ICC_RPR_EL1),
- 	HOST_HANDLED(SYS_ICC_SGI1R_EL1),
- 	HOST_HANDLED(SYS_ICC_ASGI1R_EL1),
- 	HOST_HANDLED(SYS_ICC_SGI0R_EL1),
-+	HOST_HANDLED(SYS_ICC_CTLR_EL1),
- 	{ SYS_DESC(SYS_ICC_SRE_EL1), .access = pvm_gic_read_sre, },
- 
- 	HOST_HANDLED(SYS_CCSIDR_EL1),
+v4:
+ - https://lore.kernel.org/all/20251105135340.33335-1-fuqiang.wng@gmail.com
+ - merge two patch into one
 
-Thanks,
+v3:
+ - https://lore.kernel.org/all/20251022150055.2531-1-fuqiang.wng@gmail.com
+ - Fix: advanced SW timer (hrtimer) expiration does not catch up to current
+   time.
+ - optimize the commit message of patch 2
 
-	M.
+v2:
+ - https://lore.kernel.org/all/20251021154052.17132-1-fuqiang.wng@gmail.com
+ - Added a bugfix for hardlockup in v2
 
+v1: https://lore.kernel.org/all/20251013125117.87739-1-fuqiang.wng@gmail.com
+
+Sean Christopherson (2):
+  KVM: x86: WARN if hrtimer callback for periodic APIC timer fires with
+    period=0
+  KVM: x86: Grab lapic_timer in a local variable to cleanup periodic
+    code
+
+fuqiang wang (2):
+  KVM: x86: Explicitly set new periodic hrtimer expiration in
+    apic_timer_fn()
+  KVM: x86: Fix VM hard lockup after prolonged inactivity with periodic
+    HV timer
+
+ arch/x86/kvm/lapic.c | 44 +++++++++++++++++++++++++++++++-------------
+ 1 file changed, 31 insertions(+), 13 deletions(-)
+
+
+base-commit: 16ec4fb4ac95d878b879192d280db2baeec43272
 -- 
-Without deviation from the norm, progress is not possible.
+2.52.0.rc1.455.g30608eb744-goog
+
 
