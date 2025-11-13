@@ -1,148 +1,109 @@
-Return-Path: <kvm+bounces-63048-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63049-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB94BC5A05D
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 21:54:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFE77C5A0C5
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 22:04:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 861554EA50F
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 20:52:10 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BA8033511A6
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 21:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58FB9322A29;
-	Thu, 13 Nov 2025 20:51:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150E0322A28;
+	Thu, 13 Nov 2025 21:02:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B0MPILvC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pJgXktwd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAEC324B1F
-	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 20:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1BF320A38
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 21:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763067086; cv=none; b=VDMBkyFJPH0dA6HECKs0tdvsMWUXaKsATA3NfGHvMbzZsxSyQTKyYQQgiMl4nF2nBJ8k3vbIsDvNueVB9f3/WcIfUAATWhh8QwOscdRJ7TsKEQGGL0iAHhFpzeChvb7L3OLSD0N7Bzgf8QIjJTAsQaiWSML7a3fpRXZtcNwu+aU=
+	t=1763067774; cv=none; b=HbVs4xhOFmRS7RoBHdRo5qv/s6rcoeqJ+gN7W+XPosw3Om1tqwTOY+CstpbXz9wyHTBU8Mf5pwvoUG6u6+Sh+Y1pMWA+K1hgIRb+DQ8zQrc6a+P1fDW831egpH0dXU8PP3evrdN1DwWOW0hPVmcqoVr9pYAvx1yxKsWbSSBnD2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763067086; c=relaxed/simple;
-	bh=eAhyJbLqUXlwQlucntSBQU+UA5T0/Z2bvA4Pjea03G0=;
+	s=arc-20240116; t=1763067774; c=relaxed/simple;
+	bh=JJMmcUtZJp8Q17nld1BqpwgAO2U2Da66BAIpwFh59GE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ivY/hzs25JHbgeWW3W41G9ej2gnt0NdnuEW1RVfNqHpCDWkkMsaNp3uv2r6nn55MLabHC2j7uDIiJDxhSi2Hte0IRPQS3Jomg6fBKNEutNuLqj2Hi4lS5qoCGaUz02edvK3FdY2dT4qJDNQ/zmq/IbFkmtPNN+1D4XGGSKF4qUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B0MPILvC; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=IoD55KSZ555Fa38sLcH0ZCd+M4VYlDdByoV6nr77wyIkR0BQ1sObVMTOKu1W6V5B9n4JrOeZ2G7WQ33P/tqCVYwUTVxWcapA9oXjc/kac+8gJASCmG9Bq7nPrff54F/pNxk6iU57ZUwVfWVQCbO9H2XQXzZfT90PP9I4KgPltc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pJgXktwd; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-297dfae179bso29898115ad.1
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 12:51:24 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-343e262230eso1623979a91.2
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 13:02:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763067084; x=1763671884; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763067771; x=1763672571; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=C7fYJA4HWXsvtk3lehp2/p12kOlA15qEdCD6I2JDssg=;
-        b=B0MPILvC44cJuscNyamdQu+kKF0fqGhkMkip9WS7b0do7Hm+0CRS87MfZgAYJqdzgB
-         1ZqORR7WMPmtMrhCP+LsHR5RDtXEJBpU5iSkjhHy6o9TwnHsVzDazwCX5aYkZ8wGCMEl
-         gnxkk/m5DPadMK3CsMrlgaMpqDrSAmxrybiey/qcbaYIAmIcpmGmw9xmq1aNozNIHvtW
-         Vf2r6dBJRhXq/+0PvcYu1D51z4M8oNt2MQcQjQgssYuwa6u4xjo4UtXQqd9n8Fc1yJu2
-         aE5+QN0UomNpOJiuGTDJm8i1dv0mHEVBAYUCIeRxAbaG17Xx6DEcNp+zbCe1FSggjtYJ
-         bS+g==
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=a7uBxDd7R+0ljt93BFkiA/Yx0vDhWSjlZQEH3Y9tQqs=;
+        b=pJgXktwdp6HrNeZBlKRTlyTwF56c66JASo7/qDcXW2VBYHpf2JWjaVVjWUjzHVAbBu
+         wxniwqrEM9I0MQTX8FTTl/MfhoQH20/f8PQCftGdqYPqxc5jAdLGlCE65LR8SdZi7bqr
+         5eVHDE3uvjW7e2WUF9kuUYMQ1rc6RgEqMsYP23CqRNcBDsIFoLT0a41mZkufXwitf+Lb
+         isKNoVy1o9xOjnlQP0gg72IzgbB3pCoZUBPGNOwms+bR54D8mm871PNb+Z9vMpXB672J
+         ckzOv5ez9Po93rPWzo3Ejgm3jcfVzyv4EzsOMZa6/RjoZF/tsMBOlf719CFMjkPpeiV2
+         TWDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763067084; x=1763671884;
+        d=1e100.net; s=20230601; t=1763067771; x=1763672571;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C7fYJA4HWXsvtk3lehp2/p12kOlA15qEdCD6I2JDssg=;
-        b=eBzH67W7oLLkE6TIeL3EkfiIvV+bCHQSicLD611qGq3htZroDiYK+jwFfec8O4k0W5
-         krA7Z19KUlDMKwUbzg/wl/aKBszSLnb9lnSalM5LpFtfEtXZCC3M9exCWLjLsm9hylAZ
-         hk5iaZo023K5DBrbIyn4mg808SLgwPQG+iwMRp0Tk/riYkHm7ZTibv81qyf6Q7/cEARD
-         sjPWcwcSp1FuAmXAaDiaVfh3ge75btmTPbYAYrBwptx8MSYinj7jrF9L7U/DLpIPZJJs
-         FWni+YVdQgdqMdmUf7wz3YvwU+jOzTGIiccZKi5eNWRU4ZZH10ldF/k12POzDxs27sTj
-         ANig==
-X-Gm-Message-State: AOJu0YxjixwQ02fFnxv1PbfC1wvw4PDsFgyO6VL1EoArnBIb15jbAA1H
-	IKhARzIGlyTgKSZ17BRIgZHGReepUPmYSJEREAXDz05RVaHSzhiFbTpFomYLRWtIDCW/NTGi2Wf
-	aAtdGqQ==
-X-Google-Smtp-Source: AGHT+IFcKCPvjnTbeCT8KN8m2AR8BSXmhvS7vXQLw6Thu8ciwldiBuq98W7UYmI82opbMJksxR+2zZr76OU=
-X-Received: from plau6.prod.google.com ([2002:a17:903:3046:b0:258:dc43:b015])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:b0d:b0:295:4d50:aab8
- with SMTP id d9443c01a7336-2986a6c3747mr3264535ad.24.1763067084383; Thu, 13
- Nov 2025 12:51:24 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 13 Nov 2025 12:51:14 -0800
-In-Reply-To: <20251113205114.1647493-1-seanjc@google.com>
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a7uBxDd7R+0ljt93BFkiA/Yx0vDhWSjlZQEH3Y9tQqs=;
+        b=SskswyNZwookginAB5hTVVxDc9zcIPmwMBsrVpjrmmlTUud8WfWn1ZvGh4Q9pgzal9
+         8LTd2eKoXCE8ZQONltlzvcKLJWlPMUH0Gb55Z81FzVoukcVqgsfCthwWpTubECfPs0JM
+         9vCHCgurUj4kVDVDJ6/9jjpdmnlEFX+NzznRvn6I5tboWaF8skPo1TDwEKNSQkzVQb0z
+         +9JjxpGT4syAtOAuvCI9mGR1isNrTFtEE16dQoEyppQLmV78yi74vfocft4frkhNYL65
+         Wuem13lPE6qmGgJsIfmBEpfXqstd8rPztuudwawoR1/PzFV1estoOCGnMJGv1mAiPa2K
+         LZ+A==
+X-Forwarded-Encrypted: i=1; AJvYcCXbpfC0C7fGBh5LF+6ogM3Gil1KGsY0unRXJVnBi1q4JxAjyjS4tZ5fJsNUY1/aCuIVnuk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXWLu/nfovQsy2GwyFp8HEzyJSoLnRreXZ05jtOHcAEUSn86z0
+	fX+AeRGK3BWsLCMSzi0f0U6t8UaNvXTgPIzn2H6XBTXj3lF1dPFxGpkm69yUYObvQPKm0mAjSOI
+	46tgKcQ==
+X-Google-Smtp-Source: AGHT+IF8Q/p7fFdV9MiImezpF9mKOY/uB6kSCpqMVPn6O8zg7LXO9eBP9jm0kD68oKRw55JkZXnSS7LXjkM=
+X-Received: from plkn5.prod.google.com ([2002:a17:902:6a85:b0:295:1ab8:c43c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1b10:b0:296:3f23:b93b
+ with SMTP id d9443c01a7336-2986a6b7b8emr4493805ad.2.1763067771151; Thu, 13
+ Nov 2025 13:02:51 -0800 (PST)
+Date: Thu, 13 Nov 2025 13:02:49 -0800
+In-Reply-To: <aRGOu3eJoRnsaV+n@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251113205114.1647493-1-seanjc@google.com>
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251113205114.1647493-5-seanjc@google.com>
-Subject: [PATCH v6 4/4] KVM: x86: Grab lapic_timer in a local variable to
- cleanup periodic code
+References: <20251108013601.902918-1-seanjc@google.com> <aRGOu3eJoRnsaV+n@intel.com>
+Message-ID: <aRZHeTNW9o5SlQSK@google.com>
+Subject: Re: [PATCH] KVM: x86: Allocate/free user_return_msrs at kvm.ko
+ (un)loading time
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	fuqiang wang <fuqiang.wng@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Stash apic->lapic_timer in a local "ktimer" variable in
-advance_periodic_target_expiration() to eliminate a few unaligned wraps,
-and to make the code easier to read overall.
+On Mon, Nov 10, 2025, Chao Gao wrote:
+> >-static int kvm_init_user_return_msrs(void)
+> >+static void kvm_destroy_user_return_msrs(void)
+> > {
+> >-	user_return_msrs = alloc_percpu(struct kvm_user_return_msrs);
+> >-	if (!user_return_msrs) {
+> >-		pr_err("failed to allocate percpu user_return_msrs\n");
+> >-		return -ENOMEM;
+> >-	}
+> >+	int cpu;
+> >+
+> >+	for_each_possible_cpu(cpu)
+> >+		WARN_ON_ONCE(per_cpu(user_return_msrs, cpu).registered);
+> 
+> Could this warning be triggered if the forced shutdown path didn't
+> unregister the user return callback (i.e., with the patch [*] applied),
+> and then vendor modules got unloaded immediately after the forced shutdown
+> (before the CPU exits to the userspace)?
 
-No functional change intended.
+Probably?  But that's more of a feature than a bug, e.g. gives the (privileged!)
+user the heads up of how exactly they broke their system when they forced a
+reboot.  I'd prefer not to condition it on e.g. !kvm_rebooting unless it's truly
+necessary, because it's "just" a WARN, i.e. shouldn't crash the system.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/lapic.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 8b6ec3304100..1597dd0b0cc6 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2126,6 +2126,7 @@ static bool set_target_expiration(struct kvm_lapic *apic, u32 count_reg)
- 
- static void advance_periodic_target_expiration(struct kvm_lapic *apic)
- {
-+	struct kvm_timer *ktimer = &apic->lapic_timer;
- 	ktime_t now = ktime_get();
- 	u64 tscl = rdtsc();
- 	ktime_t delta;
-@@ -2137,9 +2138,8 @@ static void advance_periodic_target_expiration(struct kvm_lapic *apic)
- 	 * over time as differences in the periods accumulate, e.g. due to
- 	 * differences in the underlying clocks or numerical approximation errors.
- 	 */
--	apic->lapic_timer.target_expiration =
--		ktime_add_ns(apic->lapic_timer.target_expiration,
--				apic->lapic_timer.period);
-+	ktimer->target_expiration = ktime_add_ns(ktimer->target_expiration,
-+						 ktimer->period);
- 
- 	/*
- 	 * If the new expiration is in the past, e.g. because userspace stopped
-@@ -2150,17 +2150,17 @@ static void advance_periodic_target_expiration(struct kvm_lapic *apic)
- 	 * past will do nothing more than waste host cycles, and can even lead
- 	 * to a hard lockup in extreme cases.
- 	 */
--	if (ktime_before(apic->lapic_timer.target_expiration, now))
--		apic->lapic_timer.target_expiration = now;
-+	if (ktime_before(ktimer->target_expiration, now))
-+		ktimer->target_expiration = now;
- 
- 	/*
- 	 * Note, ensuring the expiration isn't in the past also prevents delta
- 	 * from going negative, which could cause the TSC deadline to become
- 	 * excessively large due to it an unsigned value.
- 	 */
--	delta = ktime_sub(apic->lapic_timer.target_expiration, now);
--	apic->lapic_timer.tscdeadline = kvm_read_l1_tsc(apic->vcpu, tscl) +
--		nsec_to_cycles(apic->vcpu, delta);
-+	delta = ktime_sub(ktimer->target_expiration, now);
-+	ktimer->tscdeadline = kvm_read_l1_tsc(apic->vcpu, tscl) +
-+			      nsec_to_cycles(apic->vcpu, delta);
- }
- 
- static void start_sw_period(struct kvm_lapic *apic)
--- 
-2.52.0.rc1.455.g30608eb744-goog
-
+> [*]: https://lore.kernel.org/kvm/20251030191528.3380553-4-seanjc@google.com/
 
