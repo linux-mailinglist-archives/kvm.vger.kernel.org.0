@@ -1,203 +1,326 @@
-Return-Path: <kvm+bounces-63010-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63011-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0E8EC57558
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 13:08:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0747DC57D19
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 15:00:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D2976341AC1
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 12:05:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3693502B2F
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 13:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6297834D38A;
-	Thu, 13 Nov 2025 12:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06948352959;
+	Thu, 13 Nov 2025 13:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DqyrN580";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bs10BSpL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aSiKQUzD"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D1F21348
-	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 12:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894D63446AA
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 13:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763035549; cv=none; b=Dkp0eFRwRj/C1w3zMgH/9VtdTlu5fiNmSR9dz51PQxNLubZQ971FrzYa/fzoUedPTxOi2THfkQBtHVrRu/8MPDSKekFEseVfRn5QSefCQl+5Joxa52iDoqZvgeqEeojUGDveSI1EzwVlvQ4zZ9sg3HcQiGe4F6lRagbYm/K782k=
+	t=1763040336; cv=none; b=m97t6CbpLztvKYQW5RFLwUtbVFQv2MWiaC9PocezPa1k8igrbk6ZfHXZtUhIwX9CqAvFPINxAB43SR8uPJWT3BO3U146mAA9E7j5eYys6O9+YOqMpiFbAJ+rgSVCOo58vQt2COKYbTFbu8dnmuGfzAPosn7g/xs+ir5R/oW+JGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763035549; c=relaxed/simple;
-	bh=94BURugg/MQ5M20T3CsuvIMe9pNv4ndJk6pUBYNEZz4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=lcJOkA06Zl4wCeeJHvxwBCOkjAYHHSfQk4OmnYnNhIWefTVZ0ZkHo6h0QqZDxHqefdSDqFR2gzyFhUfqGm9Y6LI2oKzZwAhFjUXN7ONuLe7nlwsXeiTSY7RDuh90H5hpJFpAsEKr4TprW6NU9lyivI/GU98USpiB0E2DDVkmBk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DqyrN580; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bs10BSpL; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763035545;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tI2/OYtW6mgwxijeu2yFHVnaEg8ys2MTvM8mvkzh7dM=;
-	b=DqyrN580ANHWKRLwiMr6e14BStI5Q4lurZhTdK+42r+nrqySaBndtjnIJ9dnqzWyW0JEd/
-	gp+GcYKo8NHjfw7oPMCGgOR27jMKiNikFR/6c1BP1Zd9Ii5WUgcK9URvKDHXprDh65MjDl
-	aHlt+eRbzJI+JNPDSmBeXs6OzxDhstw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-370-wx-ocCs6OsiIJPuZ2cOafw-1; Thu, 13 Nov 2025 07:05:42 -0500
-X-MC-Unique: wx-ocCs6OsiIJPuZ2cOafw-1
-X-Mimecast-MFC-AGG-ID: wx-ocCs6OsiIJPuZ2cOafw_1763035541
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42b3ed2c3e3so691023f8f.1
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 04:05:42 -0800 (PST)
+	s=arc-20240116; t=1763040336; c=relaxed/simple;
+	bh=ZP6dcd7IlPR4hcT0m5FYuFluPw7uPRCzakl+xsoN6cA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q70L17QdKDpRIP2aJDVEfpjj1ZXysUJ5CwZ+f1Kx9dFTjFcGvNthKNuyYmAp2M0HDKLNCr3yHawee5jB63rCwmxjS9j8ErEwXFTZtFWIEZ0OODJu/tj6rQFqc0sBYCSjGzMWdEGtCMeqeHv12BwItbQefV3fUG6Pv3uRz67XDcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aSiKQUzD; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3437af8444cso771075a91.2
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 05:25:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763035541; x=1763640341; darn=vger.kernel.org;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tI2/OYtW6mgwxijeu2yFHVnaEg8ys2MTvM8mvkzh7dM=;
-        b=bs10BSpL4V928O+qSzpFsC4DVx9MqhIPx4LUyzoxjLijghD8M8BmW50zmm0MJOsjJK
-         OTL+LkhtRXXktJPlN1DNIz0ufACaVjp4hjWHvXNVpIunsLeZLUj9chZV2NKip/mUkntL
-         pESx9T60Pz3xLOZA0P0ay/s3GNbbdgeoOyjqUm1dLMnhc01bpqoLfdM2XPF4EAY+LKED
-         mxT48atgJgcfl2kq0tU7SuVCpUbAKl/CACikLfG5LJ32SIgGd1O+wjhb1HQgc5eFydCD
-         jep0er4UMuQIZiTDQe/RfhhBVyaM6uzgCOidH/Ctyxdl2KqEUrG32AVFpOlgXAhOXk8g
-         hfQQ==
+        d=gmail.com; s=20230601; t=1763040333; x=1763645133; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=miKoKkS0E4DDQTU4ZoQVZaIJ9BfwANPVz6M1P6aM+RY=;
+        b=aSiKQUzDCCMDoor9rPQZ13MxzX4A//lq7f/RAjzgok2hpP/RKM/b5lwjC4/A8B98Ma
+         gsWOIpV8dWtDCFVALcJdjZm5klixxzBpad7DuKBHcSVvNIcfLSwnymipFzt3xzoPs3oD
+         qdlmOPP1ev4GYso1kD8YfVm+be8llDquEpjzLsezxMaKEXWYzkBsWDHTRWnLmChyQ0C8
+         ucsL4AsQ/46I02VhYLin7FIiIqqv3tWTbP9YCNlqyHGz7lOfQcDp0hCDVdQOLmYme0zl
+         djdvZfDdZ8NYlLSwOeVHjQPahCusQ9lWAu9FbMiPk0JLRbTFPUzLru6v7ORKCQr9n/Th
+         tL6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763035541; x=1763640341;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tI2/OYtW6mgwxijeu2yFHVnaEg8ys2MTvM8mvkzh7dM=;
-        b=u0/481pB6G7ei9ZmJ7kWlwzs7ah1xXKkdEdz8BlqzU8u7PxCbZjxCXqwPjuw92LQ4/
-         cdXypfuvtHPof8GOFuU0X3HUOIny7K5Q3Tg9XYQSkdRY9qs06Poo0tAtx8iVGDT1zRCN
-         0avL6eMYEzeldeeKU7fNt1MSrMCZVoPJfd63cUv9TGLsc3FdTAi5dYnoNfB1LgvrT6x9
-         1hEE2l8y3BhbILaaXHM8ex+Ctxef20uUnBktVa+LxIXEDiYnEiBVC1B5rK0cGnZ+9PXl
-         /S3VIYk8VYs6R+xo8Nhizhulkdqg8ZTSqZwJ+3wFBAbAhs1pJsnYZVeQ0/yerFcEF3YJ
-         nZ0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU5G7NND1t3MaEnHL+MqkTPKF30LtHJXBhyO/GEqVcrzIA+3y5uElI14F1dUtRbPyP8oV4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkS5OnxxYd5pmCFKASth4oX45LRttCNpeaa1mSK2Pd+OIyDotz
-	F9C9IOCZx0ysskrhIINUpU8JkYf9wAq7Dl1PtaM2L2KcsVtlci9uXLvwPv80JwtYVunz9HRRbIp
-	3wisqm4RGwM5pnO1xBuuTQ6Ipy6ryVdgdvoBclWNgNj1TJza4aDqssQ==
-X-Gm-Gg: ASbGnctBe+PL3FN70s/as0QEL6aZbSSQ3RyYWf4BCytIVr73xghM/ZjorLqGKj5X5jT
-	zZHaJwZjn/uhpo6K9CFyb2gvNxEepiUD71QsApOa7ztCxmc+a+aMW03pAnYhAJFNPkXUevGDPm1
-	/Lr/kQ4XXkhW+AzJyT4J7rfn6mSaMOBpnqNQgOEqQ9x8vX4Vk2D/xjyIKlhvIgCR5aRlmy2MCxl
-	mdysLsCLcXAOVRw+7zUUkzeSHH4gIRI+nvz8yUtTVN+GS/HUOK923VMa0tsBpq6w/JajzVe1yHP
-	7Kr8oEsGZU+cZtWcW4jW38z8naO1Qj7FuDeYJOSsk+gET4WySmIzTC66k3cow8UJ1IOz79e07EH
-	UtzG8hdXEWBWbTa5qE2WV57S6COGwkd176up5BMMxTWmAn5QH
-X-Received: by 2002:a05:6000:1885:b0:42b:3680:3567 with SMTP id ffacd0b85a97d-42b4bb91b2cmr5895238f8f.18.1763035541149;
-        Thu, 13 Nov 2025 04:05:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE3IIBIBt8q03GbcoIy980NO1o7f47Eyz3eGrQw/lEHfvAJ2mJpS0tJ8SI1nFL6EYhPZo1J9g==
-X-Received: by 2002:a05:6000:1885:b0:42b:3680:3567 with SMTP id ffacd0b85a97d-42b4bb91b2cmr5895217f8f.18.1763035540713;
-        Thu, 13 Nov 2025 04:05:40 -0800 (PST)
-Received: from rh (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f23a1asm3522001f8f.45.2025.11.13.04.05.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Nov 2025 04:05:40 -0800 (PST)
-Date: Thu, 13 Nov 2025 13:05:39 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>
-cc: Peter Maydell <peter.maydell@linaro.org>, 
-    Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
-    qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, 
-    kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 2/2] target/arm/kvm: add kvm-psci-version vcpu
- property
-In-Reply-To: <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org>
-Message-ID: <c082340f-31b1-e690-8c29-c8d39edf8d35@redhat.com>
-References: <20251112181357.38999-1-sebott@redhat.com> <20251112181357.38999-3-sebott@redhat.com> <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org>
+        d=1e100.net; s=20230601; t=1763040333; x=1763645133;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=miKoKkS0E4DDQTU4ZoQVZaIJ9BfwANPVz6M1P6aM+RY=;
+        b=OOxZ/rpDBvYUNpL25+t9pSY6y8jQFjrM6bhstWIMCOVzrZwzNujJSNfz88CJJJGzOp
+         zM9+orVRhL6VvWolaxNPvqHS/B44WBY3ISSwbRvKWFsb7VKKeCgW6ObtjsTY07K3NqcT
+         WoV4ovYO+presGtZr4TtSRpY2P+ZZQjJ/W4PrSQQa4ZPZibI7UHzAiuez5zaSho0Xihy
+         iIhmuKIDepCjmS4l8zSfIk9sicPn/8l6x/Ct9yBAZSlxa9/zulSxnqWYCFTLS5RugTj8
+         OkVRGHK+Uq5r5ldICrMCYKjElcJ57gPZn5fOOjRNCxNscxVmqtw+YqhHYnpyHRp07RR+
+         GK1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVx+J4UUdDAvQ3sRZ2i20WmeYsTcPTod6s2sEWvIa+u1NhFTr5aNbBq2e43cglacmfMm4o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLFqwqE+t4hk+RdgGLBM2yEIkUSBf7PzDrePAQMfbprhF2PWFy
+	lvj4J86d/yjYbSD2NioauPONIO/B8fpnfpKP0vOWYjV009enuvtqszFXTKC/z+XSbNwVSc64gxn
+	M857r3RZWLb5P/Kv7xnmEYPbrkhgbjwwCvzj/ROA=
+X-Gm-Gg: ASbGncvMF61pMjQ0Cts4vkhqiH7OObYgTDuPOBnZZ2RtnSTNFT/3k4HjeZO0x8ABKZ2
+	JEEtE+aKgrgMg/umHHoqMANM36srzns9xhGmHD1JGo18DQPVWzxIG29WKwCb3Z5WLCISfjEz3Rm
+	u1lmkmt4EJOp5FQjpGdy+WED+tiXPt6uTdqW1QXSJw27DJYmi33MaOAbC1/wxOUJt7IFqytdmOl
+	xbO//CljrxgpUeKgV1XMPDSIP1mMBQ0zJdO+31P0jcR99EOvZdVuvAIT8roMddKoNmYB40=
+X-Google-Smtp-Source: AGHT+IGnUhe7zmpxv88QqqSBQbbROBjgIpHvXD3nGhc2Tm9cAcc2hKjlJ6TKSDJ2dgbArgeGAoOg2zK9RANuA7mFLVs=
+X-Received: by 2002:a17:90b:184d:b0:32e:5646:d448 with SMTP id
+ 98e67ed59e1d1-343dde821a5mr6886548a91.21.1763040332768; Thu, 13 Nov 2025
+ 05:25:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="-1463806286-853068444-1763035540=:13840"
+References: <20251110033232.12538-1-kernellwp@gmail.com> <20251110033232.12538-5-kernellwp@gmail.com>
+ <ef7d974e-7fcd-4e30-8a0d-8b97e00478bc@amd.com>
+In-Reply-To: <ef7d974e-7fcd-4e30-8a0d-8b97e00478bc@amd.com>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Thu, 13 Nov 2025 21:25:21 +0800
+X-Gm-Features: AWmQ_bk3OSe7ErsOfPbY7FWe1XcWAd_DsbRR6d73waCp4y01FUk_mR4moqTSaPQ
+Message-ID: <CANRm+CxZCkF-1Vy5bxAsFuAM99euUtQVmNwJzb+4SWRa47T4LQ@mail.gmail.com>
+Subject: Re: [PATCH 04/10] sched/fair: Add penalty calculation and application logic
+To: K Prateek Nayak <kprateek.nayak@amd.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Wanpeng Li <wanpengli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Hi Prateek=EF=BC=8C
 
----1463806286-853068444-1763035540=:13840
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8BIT
-
-Hi Philippe,
-
-On Wed, 12 Nov 2025, Philippe Mathieu-Daudé wrote:
-> On 12/11/25 19:13, Sebastian Ott wrote:
->>  Provide a kvm specific vcpu property to override the default
->>  (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
->>  by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
->>
->>  Note: in order to support PSCI v0.1 we need to drop vcpu
->>  initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
->>
->>  Signed-off-by: Sebastian Ott <sebott@redhat.com>
->>  ---
->>    docs/system/arm/cpu-features.rst |  5 +++
->>    target/arm/cpu.h                 |  6 +++
->>    target/arm/kvm.c                 | 64 +++++++++++++++++++++++++++++++-
->>    3 files changed, 74 insertions(+), 1 deletion(-)
+On Wed, 12 Nov 2025 at 15:25, K Prateek Nayak <kprateek.nayak@amd.com> wrot=
+e:
 >
+> Hello Wanpeng,
 >
->>  diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->>  index 0d57081e69..e91b1abfb8 100644
->>  --- a/target/arm/kvm.c
->>  +++ b/target/arm/kvm.c
->>  @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool
->>  value, Error **errp)
->>        ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON :
->>    ON_OFF_AUTO_OFF;
->>    }
->>
->>  +struct psci_version {
->>  +    uint32_t number;
->>  +    const char *str;
->>  +};
->>  +
->>  +static const struct psci_version psci_versions[] = {
->>  +    { QEMU_PSCI_VERSION_0_1, "0.1" },
->>  +    { QEMU_PSCI_VERSION_0_2, "0.2" },
->>  +    { QEMU_PSCI_VERSION_1_0, "1.0" },
->>  +    { QEMU_PSCI_VERSION_1_1, "1.1" },
->>  +    { QEMU_PSCI_VERSION_1_2, "1.2" },
->>  +    { QEMU_PSCI_VERSION_1_3, "1.3" },
->>  +    { -1, NULL },
->>  +};
+> On 11/10/2025 9:02 AM, Wanpeng Li wrote:
+> > +/*
+> > + * Calculate penalty with debounce logic for EEVDF yield deboost.
+> > + * Computes vruntime penalty based on fairness gap (need) plus granula=
+rity,
+> > + * applies queue-size-based caps to prevent excessive penalties in sma=
+ll queues,
+> > + * and implements reverse-pair debounce (~300us) to reduce ping-pong e=
+ffects.
+> > + * Returns 0 if no penalty needed, otherwise returns clamped penalty v=
+alue.
+> > + */
+> > +static u64 __maybe_unused yield_deboost_calculate_penalty(struct rq *r=
+q, struct sched_entity *se_y_lca,
+> > +                                 struct sched_entity *se_t_lca, struct=
+ sched_entity *se_t,
+> > +                                 int nr_queued)
+> > +{
+> > +     u64 gran, need, penalty, maxp;
+> > +     u64 gran_floor;
+> > +     u64 weighted_need, base;
+> > +
+> > +     gran =3D calc_delta_fair(sysctl_sched_base_slice, se_y_lca);
+> > +     /* Low-bound safeguard for gran when slice is abnormally small */
+> > +     gran_floor =3D calc_delta_fair(sysctl_sched_base_slice >> 1, se_y=
+_lca);
+> > +     if (gran < gran_floor)
 >
+> Is this even possible?
+
+No. Both use the same weight denominator in calc_delta_fair(), the
+check is redundant. Will remove.
+
 >
->>  @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
->>                                 kvm_steal_time_set);
->>        object_property_set_description(obj, "kvm-steal-time",
->>                                        "Set off to disable KVM steal
->>  time.");
->>  +
->>  +    object_property_add_str(obj, "kvm-psci-version",
->>  kvm_get_psci_version,
->>  +                            kvm_set_psci_version);
->>  +    object_property_set_description(obj, "kvm-psci-version",
->>  +                                    "Set PSCI version. "
->>  +                                    "Valid values are 0.1, 0.2, 1.0, 1.1,
->>  1.2, 1.3");
+> > +             gran =3D gran_floor;
+> > +
+> > +     need =3D 0;
+> > +     if (se_t_lca->vruntime > se_y_lca->vruntime)
+> > +             need =3D se_t_lca->vruntime - se_y_lca->vruntime;
 >
-> Could we enumerate from psci_versions[] here?
+> So I'm assuming you want the yielding task's vruntime to
+> cross the target's vruntime simply because one task somewhere
+> down the hierarchy said so.
+
+Yes, this is a known tradeoff. We apply the penalty at the LCA where A
+and B compete to make B schedulable immediately. Side effect:
+independent task C in CG0 loses CPU time. In practice, VMs place all
+vCPUs in one cgroup (no independent C). If C exists and shares the
+lock, the penalty helps. If C is truly independent, it loses ~one
+scheduling slice. Your natural convergence approach avoids this but
+needs multiple yield cycles before B gets sustained preference.
+
 >
+> > +
+> > +     /* Apply 10% boost to need when positive (weighted_need =3D need =
+* 1.10) */
+> > +     penalty =3D gran;
+>
+> So at the very least I see it getting weighted(base_slice / 2) penalty
+> ...
+>
+> > +     if (need) {
+> > +             /* weighted_need =3D need + 10% */
+> > +             weighted_need =3D need + need / 10;
+> > +             /* clamp to avoid overflow when adding to gran (still cap=
+ped later) */
+> > +             if (weighted_need > U64_MAX - penalty)
+> > +                     weighted_need =3D U64_MAX - penalty;
+> > +             penalty +=3D weighted_need;
+>
+> ... if not more ...
 
-Hm, we'd need to concatenate these. Either manually:
-"Valid values are " psci_versions[0].str ", " psci_versions[1].str ", " ... 
-which is not pretty and still needs to be touched for a new version.
+Yes, the floor is gran (weighted ~700=C2=B5s). Empirically, smaller values
+didn't sustain preference=E2=80=94the yielder would re-preempt the target
+within 1-2 decisions in dbench testing. This is a workload-specific
+heuristic. If too aggressive for general use, I can lower it or tie it
+to h_nr_queued . Thoughts?
 
-Or by a helper function that puts these in a new array and uses smth like
-g_strjoinv(", ", array);
-But that's quite a bit of extra code that needs to be maintained without
-much gain.
+>
+> > +     }
+> > +
+> > +     /* Apply debounce via helper to avoid ping-pong */
+> > +     penalty =3D yield_deboost_apply_debounce(rq, se_t, penalty, need,=
+ gran);
+>
+> ... since without debounce, penalty remains same.
+>
+> > +
+> > +     /* Upper bound (cap): slightly more aggressive for mid-size queue=
+s */
+> > +     if (nr_queued =3D=3D 2)
+> > +             maxp =3D gran * 6;                /* Strongest push for 2=
+-task ping-pong */
+> > +     else if (nr_queued =3D=3D 3)
+> > +             maxp =3D gran * 4;                /* 4.0 * gran */
+> > +     else if (nr_queued <=3D 6)
+> > +             maxp =3D (gran * 5) / 2;          /* 2.5 * gran */
+> > +     else if (nr_queued <=3D 8)
+> > +             maxp =3D gran * 2;                /* 2.0 * gran */
+> > +     else if (nr_queued <=3D 12)
+> > +             maxp =3D (gran * 3) / 2;          /* 1.5 * gran */
+> > +     else
+> > +             maxp =3D gran;                    /* 1.0 * gran */
+>
+> And all the nr_queued calculations are based on the entities queued
+> and not the "h_nr_queued" so we can have a boat load of tasks to
+> run above but since one task decided to call yield_to() let us make
+> them all starve a little?
 
-Or we shy away from the issue and rephrase that to:
-"Valid values include 1.0, 1.1, 1.2, 1.3"
+You're absolutely right. Using nr_queued (entity count) instead of
+h_nr_queued (hierarchical task count) is wrong:
+CG0 (nr_queued=3D2, h_nr_queued=3D100)
+  =E2=94=9C=E2=94=80 CG1 (50 tasks)
+  =E2=94=94=E2=94=80 CG2 (50 tasks)
+My code sees 2 entities and applies maxp =3D 6=C3=97gran (strongest penalty=
+),
+but 100 tasks are competing. This starves unrelated tasks. Will switch
+to cfs_rq_common->h_nr_queued . The caps should reflect actual task
+count, not group count.
 
-Since the intended use case is via machine types and I don't expect a
-lot of users setting the psci version manually - I vote for option 3.
+>
+> > +
+> > +     if (penalty < gran)
+> > +             penalty =3D gran;
+> > +     if (penalty > maxp)
+> > +             penalty =3D maxp;
+> > +
+> > +     /* If no need, apply refined baseline push (low risk + mid risk c=
+ombined). */
+> > +     if (need =3D=3D 0) {
+> > +             /*
+> > +              * Baseline multiplier for need=3D=3D0:
+> > +              *   2        -> 1.00 * gran
+> > +              *   3        -> 0.9375 * gran
+> > +              *   4=E2=80=936      -> 0.625 * gran
+> > +              *   7=E2=80=938      -> 0.50  * gran
+> > +              *   9=E2=80=9312     -> 0.375 * gran
+> > +              *   >12      -> 0.25  * gran
+> > +              */
+> > +             base =3D gran;
+> > +             if (nr_queued =3D=3D 3)
+> > +                     base =3D (gran * 15) / 16;        /* 0.9375 */
+> > +             else if (nr_queued >=3D 4 && nr_queued <=3D 6)
+> > +                     base =3D (gran * 5) / 8;          /* 0.625 */
+> > +             else if (nr_queued >=3D 7 && nr_queued <=3D 8)
+> > +                     base =3D gran / 2;                /* 0.5 */
+> > +             else if (nr_queued >=3D 9 && nr_queued <=3D 12)
+> > +                     base =3D (gran * 3) / 8;          /* 0.375 */
+> > +             else if (nr_queued > 12)
+> > +                     base =3D gran / 4;                /* 0.25 */
+> > +
+> > +             if (penalty < base)
+> > +                     penalty =3D base;
+> > +     }
+> > +
+> > +     return penalty;
+> > +}
+> > +
+> > +/*
+> > + * Apply penalty and update EEVDF fields for scheduler consistency.
+> > + * Safely applies vruntime penalty with overflow protection, then upda=
+tes
+> > + * EEVDF-specific fields (deadline, vlag) and cfs_rq min_vruntime to m=
+aintain
+> > + * scheduler state consistency. Returns true on successful application=
+,
+> > + * false if penalty cannot be safely applied.
+> > + */
+> > +static void __maybe_unused yield_deboost_apply_penalty(struct rq *rq, =
+struct sched_entity *se_y_lca,
+> > +                              struct cfs_rq *cfs_rq_common, u64 penalt=
+y)
+> > +{
+> > +     u64 new_vruntime;
+> > +
+> > +     /* Overflow protection */
+> > +     if (se_y_lca->vruntime > (U64_MAX - penalty))
+> > +             return;
+> > +
+> > +     new_vruntime =3D se_y_lca->vruntime + penalty;
+> > +
+> > +     /* Validity check */
+> > +     if (new_vruntime <=3D se_y_lca->vruntime)
+> > +             return;
+> > +
+> > +     se_y_lca->vruntime =3D new_vruntime;
+> > +     se_y_lca->deadline =3D se_y_lca->vruntime + calc_delta_fair(se_y_=
+lca->slice, se_y_lca);
+>
+> And with that we update vruntime to an arbitrary value simply
+> because one task in the hierarchy decided to call yield_to().
 
-Opinions?
+Yes, modifying vruntime at se_y_lca affects the entire hierarchy
+beneath it, not just the calling task. This is the cost of making
+yield_to() work in hierarchical scheduling. Is it worth it? We believe
+yes, because:
+1. Yield_to() is already a hierarchy-wide decision: When vCPU-A yields
+to vCPU-B, it's not just task-A helping task-B=E2=80=94it's the entire VM (=
+the
+hierarchy) requesting another vCPU to make progress. Lock-holder
+scenarios are VM-wide problems, not individual task problems.
+2. The alternative is broken semantics: Without hierarchy-level
+adjustment, yield_to() silently fails in cgroup configurations. Users
+call yield_to() expecting it to work, but it doesn't=E2=80=94that's worse t=
+han
+documented unfairness.
+3. Bounded impact: The penalty scales conservatively with h_nr_queued
+(larger hierarchies get 1.0=C3=97 gran, not 6.0=C3=97), limiting blast radi=
+us.
+If the position is that hierarchy-wide vruntime perturbation is never
+acceptable regardless of use case, then yield_to() should explicitly
+fail or be disabled in cgroup configurations rather than pretending to
+work.
 
-Sebastian
----1463806286-853068444-1763035540=:13840--
+>
+> Since we are on the topic, you are also missing an update_curr()
+> which is only done in yield_task_fair() so you are actually
+> looking at old vruntime for the yielding entity.
 
+ Will fix it.
+
+Regards,
+Wanpeng
 
