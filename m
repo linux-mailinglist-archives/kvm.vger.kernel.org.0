@@ -1,180 +1,185 @@
-Return-Path: <kvm+bounces-63023-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63024-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AB2BC5888F
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 16:58:36 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B5E2C58AAF
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 17:20:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BB254A8292
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 15:35:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 47AB64ECFBE
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 15:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97FD7346A10;
-	Thu, 13 Nov 2025 15:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632842F6190;
+	Thu, 13 Nov 2025 15:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aaCrJlPl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZqQIL5/3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wts+n/uy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB1D34677F;
-	Thu, 13 Nov 2025 15:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F5A2F60AC
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 15:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763047606; cv=none; b=nkkvMfpNM3cPTAlDJpArjneRSJw6CzLKs8kX+XS5WCcqTpk/5p2RCO8gUBZnsMoziGR9YzZf8BOHeyD+17IKpJXt5dziYo9I6D8zfSPmqLfuu3j6PzByjSvNSXitXzjSVfFeVoULY1t80Y5dU05cCfVCQQsKiK1j9yVO4RVwdP8=
+	t=1763047900; cv=none; b=Igh7wJ5cyd7c8Il5hSsA0MLxU+WH0gNinHS6kJIaajDV4fgzvLcnZIiCQ2Nlpqc6hiad31veLAT+d96CH2XuDQvo8bP2Y9XKn8pakTyOKaKEaSlC65Fxz6Qr9pnAhQKYO63mswDoPgfzF+JNRX4GFKC9MTxca9TBWz3Kr60rNwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763047606; c=relaxed/simple;
-	bh=KL0lzQAv3cy8PVayRvP5QDusRGFnsWks23GTe7Q6uFY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WmKqzI1w0ebeKEyyoy3y9lfSmCK66REoOg9z475/YDml+qyc92WqVj/uoLsEv8LpVvkGCRyw7KntxPAyoW2tCLA4V3wHPKbZ7P6GdEfbNoiaFdL2gGJF9/KfYeP5sDyw/MSplAJlLuG7i8GuLcDr9sulje/EtKU4u+uNzJSiHvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aaCrJlPl; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763047606; x=1794583606;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=KL0lzQAv3cy8PVayRvP5QDusRGFnsWks23GTe7Q6uFY=;
-  b=aaCrJlPlM3JBgZvJyBEau9LAFARkEK62K/CPO3xbaKz0PLvWpkTT1nP0
-   LhJul51nMnGOlVslQEwdz3yboQDZf9SFwt67jMYbea64RtToQIEeqdbyv
-   0varUhapA1+5ilbWkUSyC+eIBqxkzcKVlJXRz9NCxyZkkF9vJbA4/+Dg7
-   N1lPX0nVeHy0dKvGWVWk3h5dEDPoh0oCzYsXaIxz8W6/HsVyuVDhmvQxs
-   iQ+7tgttjHIyUf4hv7PXmfrPzlCmXIBl+bn/ZD5bRMCGKScMggDFkYf8i
-   NlSJ6kW/SsX97gkBn/hAJtKqDs5+UjjpmI86xqTGBiLUuCsyU4E0+sSrC
-   w==;
-X-CSE-ConnectionGUID: HIk2triMSGOL7+9ofyXt7w==
-X-CSE-MsgGUID: O9idYbIyQsKoAqqxhmQAwQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11612"; a="75741474"
-X-IronPort-AV: E=Sophos;i="6.19,302,1754982000"; 
-   d="scan'208";a="75741474"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2025 07:26:45 -0800
-X-CSE-ConnectionGUID: 8BP79HrgT3WLVJDpPhUafw==
-X-CSE-MsgGUID: 06lbx2lXQKmnQfMyhZWeWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,302,1754982000"; 
-   d="scan'208";a="189793622"
-Received: from ldmartin-desk2.corp.intel.com (HELO [10.125.108.80]) ([10.125.108.80])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2025 07:26:44 -0800
-Message-ID: <745d70bf-feec-46d5-b3f7-2bb86cd8bbb1@intel.com>
-Date: Thu, 13 Nov 2025 07:26:43 -0800
+	s=arc-20240116; t=1763047900; c=relaxed/simple;
+	bh=cmUw5fQytCW5K8CgA+45UI+EqXpRzL3G2UrLV2MjQf4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=icut120aZfVoQwH8RTTIAa+jpDZNF0BI/NS2P/7ihgd7YHDfDXcxpeQp3tCZ9gpqv35+JcTs8QIkJkl6wPnFtQZi7kx4FoiLo/1/HcE4pfOyLOTODAeXEtMpCELs1zIc+p9RaAybXVlXXfYgG8ryMfM+GdsqrFFU11S6JqzMSJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZqQIL5/3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wts+n/uy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763047898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z7XY31OsyOl8v7j52xmkmb5uEiW5I0tIphYxwIfznBM=;
+	b=ZqQIL5/3UTREq+0mfpv6OtJWi17VumrYh3NOh5gTr46SWoFYNsCu3Wt2zFsfOkKDxt/WEH
+	qzVwtd9JiiSztULsRmCqbVwM3awgaOhBKGKJvaQpdFg9i/kDVIqFUPvfxZ+GMJanUJUO38
+	z7a0t4H5IRaE37JyQj3+aYEsGLh25NE=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-213-67xLNZYvPeyS4rMwTes6mg-1; Thu, 13 Nov 2025 10:31:36 -0500
+X-MC-Unique: 67xLNZYvPeyS4rMwTes6mg-1
+X-Mimecast-MFC-AGG-ID: 67xLNZYvPeyS4rMwTes6mg_1763047896
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b72a8546d73so115958966b.2
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 07:31:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763047895; x=1763652695; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=z7XY31OsyOl8v7j52xmkmb5uEiW5I0tIphYxwIfznBM=;
+        b=Wts+n/uyvcUEotTfun8PRRCrASIZGOOHVkTuyYceI7X8bx2pYg0FLaS8sVQGFNTYp7
+         AjZFRDNBL6HVJTcTmZmjNQfUsXT4E/+IfRDUPGEuOd69Jfzcx48g6LYVBz/QZ+NtLU8W
+         OS8KVPe4lmiJh0brRUYwjj46Sehjg0U/pmOk1h1wreE8QJGBrdGHjU2BaKQ035SfgOOc
+         YWS/sP5RCj1xE6S158ZsLv+wXrsaBNsV9ap1T5U+SL6cnsAGb/n7MetzoGVKD98FoPTI
+         08vyJEP4MYxeeBKRekzgXZIxolO5mAHhk06b2wfyZIl9Aq2AqtJvIyFT4/WPsXalKB/8
+         fnrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763047895; x=1763652695;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z7XY31OsyOl8v7j52xmkmb5uEiW5I0tIphYxwIfznBM=;
+        b=o3y8fKwPTEq9y241eqfsYlJaiB0RT2ncnVVUSQxYaQOXONivhNZcu/Ejqkt9AGfMgd
+         0CenQ6rr1HOucdXwRshLL4WawY9/uKIN+ooka2FXvMcTYdgpAQ62Anoum8fcPgTt1L0A
+         2WJehmLfgpO1x4Wx7GA8FnOl7tpSJMusBAgCUvoAguobyLzo6mYO19nyuKCNRT1H+9Mn
+         CDQ1m0zJJiMJ/x3andHJ9BVw1y36RIVRS6LYKzqMW+Al1OwShlwuoIQQiLFoAu2yABY8
+         I6damB+7rWgRHGa1WXI289FGh3Uz4lFRli4OeWY4frgtfXhJaq6/Q8YLBTx6ATF5XmjR
+         VeMA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDvAGprlUepUdjQJnDoV3Wwv2Uf58J7aowaaO3yavHTcNs55rEYD2BbxNYcKOCNHi0ENE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyj6Qo3tUJolwh6YBpIFWIMESfzKm4USQSQH5P/HLtLJsT0HGA7
+	vs/MYQRACmSOslZmDqLtWj+N7fNLvi7mX6qkK/38WicCZ8DamGq2GTdrD1wq3GEfrkSTIES6O5Z
+	UG/X1xRxdzqxp8UzRhP2xxs2kcxMZVqncxCAIcvRcFIn4XJJSxbjGFQ==
+X-Gm-Gg: ASbGncuQY0nNlMEt+w/9RS2cChj6IPtlASkeKLHjnwMCWOPdVYqXYhztxwIpMLGf2Jg
+	NcVEUdwTn/nJXBz/ccw/dluGevX6/nQ2KKuqYXFRYWQMCP9SO/kN7igYTjF49yCBza/GL2Oz3a7
+	/8eC7DH0/0Pm0EtNzHOYkhHO+hzQzcNu8o72EY9XRxOHmwNNQ/7vdUzzGzKdgfGC7wHoIHdQMz8
+	hPBk9+kiEXt9CuwXMR7l5rQ2NR0j5ILtb4N5ERby7mS9PR4MwKZWiRK3y6y3fC0VZp7hAYGasfM
+	AvtZagfORORn9OAcslGSu44HuFNtkQN6hc+ialIhyxd9u9oHaJMTngeW0ZebZxlaabsTUU/dtLl
+	OsB8l0hr2NBi36NZX/7hBNxOZqY6KdQYnDoFa2ok/2tMh+K1iFQM=
+X-Received: by 2002:a17:907:c06:b0:b70:6d3a:a08b with SMTP id a640c23a62f3a-b733192f5c5mr808714366b.10.1763047895382;
+        Thu, 13 Nov 2025 07:31:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF8lpe22E3h1TC8hEnHCzisPSR4qLMl80qiAEbaySsAUvtzhvgQRLYBeX2TaGg4WnRojfXASw==
+X-Received: by 2002:a17:907:c06:b0:b70:6d3a:a08b with SMTP id a640c23a62f3a-b733192f5c5mr808708566b.10.1763047894844;
+        Thu, 13 Nov 2025 07:31:34 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fad3edasm184936266b.17.2025.11.13.07.31.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 07:31:34 -0800 (PST)
+Date: Thu, 13 Nov 2025 16:31:28 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com, 
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v9 03/14] vsock/virtio: add netns support to
+ virtio transport and virtio common
+Message-ID: <ym7us45wytkmibod5fkxoyss3nl4kxzehlchdm4pqnvvnzreey@dvuwn7olusc2>
+References: <20251111-vsock-vmtest-v9-0-852787a37bed@meta.com>
+ <20251111-vsock-vmtest-v9-3-852787a37bed@meta.com>
+ <cah4sqsqbdp52byutxngl3ko44kduesbhan6luhk3ukzml7bs6@hlv4ckunx7jj>
+ <aRSyPqNo1LhqGLBq@devvm11784.nha0.facebook.com>
+ <bhc6s7anskmnnrnpp2r3xzjbesadsex24kmyi5tvsgup7c2rfi@arj4iw5ndnr3>
+ <aRTg4/HyOOhYYMzp@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 03/23] x86/tdx: Enhance
- tdh_phymem_page_wbinvd_hkid() to invalidate huge pages
-To: "Huang, Kai" <kai.huang@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Cc: "Du, Fan" <fan.du@intel.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "david@redhat.com" <david@redhat.com>,
- "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
- "tabba@google.com" <tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
- "kas@kernel.org" <kas@kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "seanjc@google.com" <seanjc@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>,
- "michael.roth@amd.com" <michael.roth@amd.com>,
- "Weiny, Ira" <ira.weiny@intel.com>, "Peng, Chao P" <chao.p.peng@intel.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "Annapurve, Vishal" <vannapurve@google.com>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "Miao, Jun" <jun.miao@intel.com>, "x86@kernel.org" <x86@kernel.org>,
- "pgonda@google.com" <pgonda@google.com>
-References: <20250807093950.4395-1-yan.y.zhao@intel.com>
- <20250807094202.4481-1-yan.y.zhao@intel.com>
- <fe09cfdc575dcd86cf918603393859b2dc7ebe00.camel@intel.com>
- <aRRItGMH0ttfX63C@yzhao56-desk.sh.intel.com>
- <858777470674b2ddd594997e94116167dee81705.camel@intel.com>
- <aRVD4fAB7NISgY+8@yzhao56-desk.sh.intel.com>
- <01731a9a0346b08577fad75ae560c650145c7f39.camel@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <01731a9a0346b08577fad75ae560c650145c7f39.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <aRTg4/HyOOhYYMzp@devvm11784.nha0.facebook.com>
 
-On 11/12/25 23:37, Huang, Kai wrote:
-> Sure.  But it seems you will need to wait all patches that you mentioned to
-> be merged to safely use 'page++' for pages in a folio?
-> 
-> And if you do:
-> 
-> 	for (i = 0; i < npages; i++)
-> 	{
-> 		struct page *p = folio_page(folio, start_idx + i);
-> 		struct tdx_module_args args = {};
-> 
-> 		args.rcx = mk_keyed_paddr(hkid, p);
-> 		...
-> 	}
-> 
-> It should work w/o any dependency?
-> 
-> Anyway, I don't have any strong opinion, as long as it works.  You may
-> choose what you want. 🙂
+On Wed, Nov 12, 2025 at 11:32:51AM -0800, Bobby Eshleman wrote:
+>On Wed, Nov 12, 2025 at 06:39:22PM +0100, Stefano Garzarella wrote:
+>> On Wed, Nov 12, 2025 at 08:13:50AM -0800, Bobby Eshleman wrote:
+>> > On Wed, Nov 12, 2025 at 03:18:42PM +0100, Stefano Garzarella wrote:
+>> > > On Tue, Nov 11, 2025 at 10:54:45PM -0800, Bobby Eshleman wrote:
+>> > > > From: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+>[...]
+>
+>> > > If it simplifies, I think we can eventually merge all changes to transports
+>> > > that depends on virtio_transport_common in a single commit.
+>> > > IMO is better to have working commits than better split.
+>> >
+>> > That would be so much easier. Much of this patch is just me trying to
+>> > find a way to keep total patch size reasonably small for review... if
+>> > having them all in one commit is preferred then that makes life easier.
+>> >
+>> > The answer to all of the above is that I was just trying to make the
+>> > virtio_common changes in one place, but not break bisect/build by
+>> > failing to update the transport-level call sites. So the placeholder
+>> > values are primarily there to compile.
+>>
+>> In theory, they should compile, but they should also properly behave.
+>>
+>> BTW I strongly believe that having separate commits is a great thing, but we
+>> shouldn't take things to extremes and complicate our lives when things are
+>> too closely related, as in this case.
+>>
+>> There is a clear dependency between these patches, so IMO, if the patch
+>> doesn't become huge, it's better to have everything together. (I mean
+>> between dependencies with virtio_transport_common).
+>
+>Sounds good, let's give the combined commit a go, I think the
+>transport-specific pieces are small enough for it to not balloon?
 
-Folks, I'll make it easy: Do what Kai suggested above. It works
-universally and it's obvious. Saving an "i" variable only makes the code
-harder to read.
+Yeah, I think so.
 
-If anyone thinks that:
+>
+>> What we could perhaps do is have an initial commit where you make the
+>> changes, but the behavior remains unchanged (continue to use global
+>> everywhere, as for virtio_transport.c in this patch), and then specific
+>> commits to just enable support for local/global.
+>>
+>> Not sure if it's doable, but I'd like to remove the placeholders if
+>> possibile. Let's discuss more about it if there are issues.
+>
+>Sounds good, I'll come back to this thread if the combined commit
+>approach above balloons. For the combined commit, should the change log
+>start at "Changes in v10" with any new changes, mention combining +
+>links to the v9 patches that were combined?
 
-	while (npages--)
+Yep, that would be great. Plus exaplaining why we decided to do that (I 
+mean just in the changelog).
 
-Is easier to understand than the most common C idiom on the planet:
+Thanks,
+Stefano
 
-	for (i = 0; i < npages; i++)
-
-... then I don't know what to tell them.
 
