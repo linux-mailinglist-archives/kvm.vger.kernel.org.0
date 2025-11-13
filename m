@@ -1,247 +1,442 @@
-Return-Path: <kvm+bounces-62988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77179C5614C
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 08:38:38 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA66BC5635A
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 09:18:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9150E3B912A
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 07:38:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 85BD635134D
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 08:13:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64F7832938F;
-	Thu, 13 Nov 2025 07:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94E5330B14;
+	Thu, 13 Nov 2025 08:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lJPncspN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CXT2YJTY";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tQ8ygYT2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486873246E3;
-	Thu, 13 Nov 2025 07:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763019462; cv=fail; b=MS4Cz9luRg+oLdxmdxae9r2CiSO0+Uj8R8aBGMexXa0PXNYsKiSBKYde0JCrXJpIWcbvE1ekZCzMlrS5T44Smcq4zKKu5CMMPLuaY0gJWFK8JiAyN5ExeSyXXiqJkTD58izTOC8G0QWbyFZYGzEsvQbmDt5cU/YGoZCX5rb9DPo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763019462; c=relaxed/simple;
-	bh=CHHiE/2RvaHufm5KHgpDuXlVk58K5MKSJpgyFAnyXuU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KNyjwi/6nsNQOWY7A0cnd92G25AcHpEHqJaUz3mJocD4HoromLxL24JGYMFNyhNsxvfp+6A2Yr3mqYZyOBdd704nPC8t5vd3dIPpu/SUn8gNe3NbxJvgaUeyD6JwgmHNs3tqQIQXI+R5p9LjDRxwdyKBTvHgofKSfMjbjkwDeUQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lJPncspN; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763019458; x=1794555458;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=CHHiE/2RvaHufm5KHgpDuXlVk58K5MKSJpgyFAnyXuU=;
-  b=lJPncspNOfoT3Y6qO1jggJcV0k984/k/At6TDgYCJCpOuYSDqR+Uk1FK
-   7v39pCYZSPPkGZENVA/7ka4LNUGOuNEjO1EU5Ud99OOQn6j2A7mSAjLpO
-   iwhqd0htWfUbOHXdS/cX1gMH5rUI5XQ3Iad9O+H3lnKB2fkzzvoZS67He
-   /BqlyUIXD6DL82AwwRDS94M223mxN28PmSiM7ysCZ2ul/YiWGfK0ZffSI
-   tQ3yexC7vLV8O+ZMsmNUl2OZmza4QigbyVlRx5yH1HOGNcAuqKMUpQNvV
-   UP2trDJVX5e38nzKXy7KJNkF9ltrj/qOy4MKDKpr6urFi6gHW+JPYglSO
-   A==;
-X-CSE-ConnectionGUID: eaTzMmGsQJGj0QKyBx0vTw==
-X-CSE-MsgGUID: Hdb+h8tUQiqivdeHttCTyw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11611"; a="64098495"
-X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
-   d="scan'208";a="64098495"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 23:37:33 -0800
-X-CSE-ConnectionGUID: S59AZVLJQLKzo25/b9+17Q==
-X-CSE-MsgGUID: cjx5NdKnTP24GhQ6PH+jNQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
-   d="scan'208";a="193849063"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 23:37:33 -0800
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 12 Nov 2025 23:37:32 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Wed, 12 Nov 2025 23:37:32 -0800
-Received: from CH4PR04CU002.outbound.protection.outlook.com (40.107.201.19) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 12 Nov 2025 23:37:32 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=weywIlqd7UMGc5Co5qAIs3QM6oNdNWAV1C+7He+IjXXPkDMj7R8gU19uYpWQBOjg059Ycnue9ME3PI/Dfwpb+4Uextz/YBGppLd/mUZrFaoIU720FFsa42kEG42Mn5rmNtkuoXegVd/4gez85Vh8HDZJF/iPNUp3zuakF2Hwvldr1zSA6uJm/HFJRnMCZ0lxddPXjqXO2jSZO3Se1AJhMf2v3P6lrOTxmrDdLHtSJmjWT1fnjogibvnod55gi1+DxVyj1PxjJrODwCpOBwYeO3BHD+1gZhTyjwR0OYijraibAGcwG14+mnFmTCja3gXPI4qJbXxV4G4sD1X1b9tT7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CHHiE/2RvaHufm5KHgpDuXlVk58K5MKSJpgyFAnyXuU=;
- b=iq1BJkXr/TT2COxMl8ya1T5mptyRmuxeWTcDo09IQliBMGUZgkuecBb6lFNiRpq2mJ4PGhCncfWrcL+F9SNFoCyasypbAxDDyJJjGJAwgEB9VtzIY82j/a50zfWNvt3HabBt4i3WSUy46+Al1Tj0bLj0enjRgWirRYwZujPZEzMJXO3YVp1MDHpEhu0UI5Ve3806tDbmkX++OFdb8+da3zKXEnN+oHSpzhKuhXC/HFFVkpORD0hiFprVmlSXo1EmH5F+zPcxCldt1PB7+m+te48q0UfyjOKmfyH1zyto+EfSVw9qvcNSZTjJGw/CJ2abdZ92lnHWLYHH/0PrhX7ZmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com (2603:10b6:208:31f::10)
- by DM6PR11MB4692.namprd11.prod.outlook.com (2603:10b6:5:2aa::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.17; Thu, 13 Nov
- 2025 07:37:29 +0000
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66]) by BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66%6]) with mapi id 15.20.9320.013; Thu, 13 Nov 2025
- 07:37:29 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "Zhao, Yan Y" <yan.y.zhao@intel.com>
-CC: "Du, Fan" <fan.du@intel.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Hansen, Dave"
-	<dave.hansen@intel.com>, "david@redhat.com" <david@redhat.com>,
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "tabba@google.com"
-	<tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>, "kas@kernel.org"
-	<kas@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "binbin.wu@linux.intel.com"
-	<binbin.wu@linux.intel.com>, "ackerleytng@google.com"
-	<ackerleytng@google.com>, "michael.roth@amd.com" <michael.roth@amd.com>,
-	"Weiny, Ira" <ira.weiny@intel.com>, "Peng, Chao P" <chao.p.peng@intel.com>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "Annapurve, Vishal"
-	<vannapurve@google.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"Miao, Jun" <jun.miao@intel.com>, "x86@kernel.org" <x86@kernel.org>,
-	"pgonda@google.com" <pgonda@google.com>
-Subject: Re: [RFC PATCH v2 03/23] x86/tdx: Enhance
- tdh_phymem_page_wbinvd_hkid() to invalidate huge pages
-Thread-Topic: [RFC PATCH v2 03/23] x86/tdx: Enhance
- tdh_phymem_page_wbinvd_hkid() to invalidate huge pages
-Thread-Index: AQHcB3+qgPjJH8tKFUSGhVyOSb/37LTtyqyAgAGHLgCAAB2CgIABDeuAgABUcYA=
-Date: Thu, 13 Nov 2025 07:37:29 +0000
-Message-ID: <01731a9a0346b08577fad75ae560c650145c7f39.camel@intel.com>
-References: <20250807093950.4395-1-yan.y.zhao@intel.com>
-	 <20250807094202.4481-1-yan.y.zhao@intel.com>
-	 <fe09cfdc575dcd86cf918603393859b2dc7ebe00.camel@intel.com>
-	 <aRRItGMH0ttfX63C@yzhao56-desk.sh.intel.com>
-	 <858777470674b2ddd594997e94116167dee81705.camel@intel.com>
-	 <aRVD4fAB7NISgY+8@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aRVD4fAB7NISgY+8@yzhao56-desk.sh.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.56.2 (3.56.2-2.fc42) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5525:EE_|DM6PR11MB4692:EE_
-x-ms-office365-filtering-correlation-id: d46e1640-e011-44d7-3731-08de2287801c
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700021;
-x-microsoft-antispam-message-info: =?utf-8?B?SHVYWDlhL3Q3NnJjcUE0RE13cXltWk5hZE9ualBCWUxJbC8zdm1tZjdDQS96?=
- =?utf-8?B?RnRnVGc2djVlUVNXQWdFcHpkWWxIR2QxTnpRVmZlWk9uS2xVOEdSY2o4UjVX?=
- =?utf-8?B?OGV1S2lkVkZLNmt2dmV2MFFnZkE1TnUra3llemFKbUg4UnV5YVNjNU1zZ1Vy?=
- =?utf-8?B?VmVYU2FsSTBpaW43TjlnTXJxQkRZMGxUcHhyVkdHR0dtWVVmTmdtV1hhSzI2?=
- =?utf-8?B?bHV5czVnTlZwYjArWFpHdmFYRjAvMzM4MGF1M1Z6SmIvdWxBMWJzTU53bE5U?=
- =?utf-8?B?TDYvVWtSaEV4Z2U0TWJoTHN0UFRXSDFpaXBwUk1vUWtUUlBPSlB0eUhVc3JN?=
- =?utf-8?B?ZGNRVHlXR3hNdm43MGZ6RHFFY1hTVlhYaWt2WExjZGRia1BaL3FjL1RZa1Vp?=
- =?utf-8?B?MkpJRmp4LzlNWlpSNnFJd2tmVWNCTVR0TEJPTVM3Y2F6aGp0L2lFNk92U2N3?=
- =?utf-8?B?OUVIWmxwaXRNWTduYWVCc3NLV1lxUXQ4RGY4NzRTL3ZSSXZtaEdLelFyY0tq?=
- =?utf-8?B?YVlycFE2VFJ5WDNRTFVIUkl2dFA2U0hGcGl4L3NDNithMG5qcnhlWWVrZ0x2?=
- =?utf-8?B?bEJ5eE5EaCtPRUI2cHN3NnBDK2dHTTlHOGhxaEZ3OWZMcWt2dlA4ZEtwZU1C?=
- =?utf-8?B?RVBLdFJrKzlhU2JPQUxMdmpKYnhXaHVDMFlEV0VsRGcwL25wdWJYRElET1lC?=
- =?utf-8?B?czM1T0tENGZYZ1ZvYk5IclBzOGRtVmdvZGRCRVhaYi9kZ2xjMWFXbWJueks5?=
- =?utf-8?B?VG1KdllrVUkvYmkrcHR4TVVxSEZhUkthS3hJOWNTaE9uRUNxNVY4dVR4bUJo?=
- =?utf-8?B?Ry82cWVNZHRYdWdIZGFKSjZjeXNYRG1DUlZleE1FRTVQSHRHVFRVN0ViRzVB?=
- =?utf-8?B?ek9KRTlLZ1RmQ2RUY2lzaHBIOTlWWTdHMG9Vd2UyZjNPaXNJazF5UlJpVnNX?=
- =?utf-8?B?UnZGd2p6K3VKNHg3ZkY0dUlkRlIzQnBKYmRadUtiWW4wRVFHRURleVp2SXpz?=
- =?utf-8?B?Snl3cGZxNDBuR2Zkd2tVTmZDdXlhSlcwd25EVlRWUy9hNFBxTFVRYUR0VzlU?=
- =?utf-8?B?S2xzejAyd0hWUU83M2lCTlk3blQxK2ZtdGVjeVJOMWZJRlNQQzNCcE4vbFdK?=
- =?utf-8?B?eDd0Q1pqR3FZRkV0a0ZEeTVodTNOaFJxSlJCVHBITjFTSlF4UFZjSnZmbCtM?=
- =?utf-8?B?V3QxL3RHdnMzWUhqUWxkeUtuNnNncHdLVUhLL0FwMHU4ZzN3aCtZNmx5QXZY?=
- =?utf-8?B?cDRyZzhoTXQ0N0kvTHRTZFdEL1cralIzL2JpbEN3dUM2OGo4dDlRdERweEI3?=
- =?utf-8?B?L2ZSK2ZyWk0vck14SVVzUEgvTm9UcEVYa2dwOHNmQTZobE5pN1VJd2tWc2l0?=
- =?utf-8?B?QU42dThvcUdBbTJqYkoySXRtaG1jK3NwT0dZVDNKQnJSZTllNWV4ZThCT1du?=
- =?utf-8?B?UHZUSjFaQ0hISGk3M1pJaDF1dDAzd0JaTjJwTWRDOUJ3VkRUcHJRUHl5MWhP?=
- =?utf-8?B?ZzYrb1NlSTVMTGZGRmRGK2poVm5wWUlQWkREeTAzbG9WMit4TCtjR1ZRclpQ?=
- =?utf-8?B?ZCtjU3Z5c3lZL1lCK09JYkZjblFJbnp1T2ZtNDB3MWwxVzRkMWZ1R3UyUmhR?=
- =?utf-8?B?UnR4NTRXeHBSbUVFSXprVWFUZEVSSlJmOFRlOTk5Rkc4S01vdkF2NFFWYVpW?=
- =?utf-8?B?TmlhMGp6UFF3amlRMmdFRFNXeDBBdGhzc1hvWVgrWVZNK3hpcmlYNVpsb1Ux?=
- =?utf-8?B?Yi9RRDFHay9FclpoeHlrSG1hdW9SL3hhQitMdURuTjVRRTRZNllzbkhCVlZn?=
- =?utf-8?B?UEhZMXdmZEVwY2JVMXQ1QW5ZSWJWbmFLM2RrdGV2eVlFaEZmSFVsSC9lZWg3?=
- =?utf-8?B?SzFCWjd6KytLaEk2YTlZUytKeXFHQmxqUVF0Vi9tTTIzNVZieVJKcEs0bW9y?=
- =?utf-8?B?TkgyeTc2Z0FqZE43eFNzeEs1eC8xMjM0dTczNzF0ckhPbnUxYzVRWHdsUGY3?=
- =?utf-8?B?RHFSY0ZpcVZHbGFtSmlMZWk0RS9INmIwbnhGNExZUWpIOWY1WlYrRGJVZHRK?=
- =?utf-8?Q?naNKzv?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5525.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?c3IrbVgxbnZSc3ZzZHNKNGxURjlLNTBYVG5EbnA3S0lIN2hVd3djM2hudk9Q?=
- =?utf-8?B?c04rUVlBTXdvOFU3VGROcHhBdC9PU201Vzg0MnJ5QVM5aDI1TWFvM1hVS2RT?=
- =?utf-8?B?UUNBNHc4N0FPOEJYajViYUdnSTdqcm9wQ3U3bUtXMXNocmt1V3NuZXhWN01Z?=
- =?utf-8?B?ZTZTU0V4UnQwcVoyanlQTzVCK0RKNXJXVlZ1TTVuY2ZZU2x3T0g4R3BrNVlL?=
- =?utf-8?B?NjZ2K2lxZ2RRWThzeFdKTmM0V29iVUNIZWZtcGFTUHZmRkM5YTJFN1JrT1dM?=
- =?utf-8?B?VUZTbnhGZ2FvVkthd1YzcGtVVU94SWZ6bzJOQ0todHRpREFva2lsaGRrUHQx?=
- =?utf-8?B?VVNHb3ozd2Izd2RUMXlPcmRwNUNHNW4yLzE2dExsL3ZNc1pnSkR1YXZ5eCtH?=
- =?utf-8?B?bHFKUVUxNnlTYzd1c21YN2pNUHVzcGRpaUpzODBRVjhzWEI4MUthK2h5WjUr?=
- =?utf-8?B?Vzh6MkRZb3VCNDBpSkxzWmF5WmxZUUZGMVF2NHdwTVo2aERITmc4d2h2alJo?=
- =?utf-8?B?RHkzaytMamE0WDZJWUxmOW5HWFhJU1lOZlFuWTVRVkNGZVNpSi9JUTljVzV4?=
- =?utf-8?B?UXNMMUZ2MFc2Ui9tLzFnZzZwcUxRTElrMFJSUGpuR05VQ2lYdzJLMWp2YmFT?=
- =?utf-8?B?OStRVEh5bk9JM2d0QW5zVkcvRXBSYnVVZE5FNEhwTlM1OEdlNTJsTVVJa294?=
- =?utf-8?B?WmtLNkFkcTE5clZzMWErVXQwenpGSng4NGdyd3MxZVBFTGZaWXJIVHRRcmZl?=
- =?utf-8?B?N3ZIUDhpSGJlck44bEt4VWFZc1M0YVNTZVF6alB6N2hBYkJQUi96c2c4N21x?=
- =?utf-8?B?VWp4MkdRZHArUk8xMndFMFQrTDdLeG44cnRVQnBTWmIveEdKa1BpUkJOYVpF?=
- =?utf-8?B?UUM4MFdaQVZoMUZldmxxanYzRzFjTHFCb1VkWG5aMVhzd29vbGpoTjdBU2J2?=
- =?utf-8?B?YXl0dVQ2c3RZdktrQkZ0OC9RUWdMTm1KQUV0c3hja3FRU3g2cGd5WHpGSlQr?=
- =?utf-8?B?VU9VWXhEdW13ZXcvWHJqTTZSNUdXSEgvc2Voa3JEUXhPdzZqaDZYazBDMHlQ?=
- =?utf-8?B?RTZDOHJWK0lYZjdJU3N2QTkzWmZDVXhkYnFVNVpzM2Vpc2k2bGRBT2grT3hP?=
- =?utf-8?B?NnZFSEdYaStxTk42b1lBU2dZWkZJNWsydWU1dkVUZWFHbWhtaHR4WnpIRHhL?=
- =?utf-8?B?eWhRVWVndTVCN1krWE5tMGx5aHBHaW5mVkxvY21KZnBWdzVTT2NUK3NNM1JI?=
- =?utf-8?B?MmhhSzM3aXBOSnk1Mk9uR0dUd2R0UEM3NmxkNVF5NDRhY29yS2ZvS3BDalZB?=
- =?utf-8?B?K1doNkErS09vU3ZjRHBFNkVKRkN6SE9TSnVSWnNnRWtLNjZac1FLVzdCM1Fy?=
- =?utf-8?B?M3RBaDhubzNOaEFQM0c2UUdiY1dHNElRMmVxN2w0UWJRRzYvWGg4VHlNbmdu?=
- =?utf-8?B?WXh1S0d2aDI2T2E2NzNISEJ0cHJOZGdORzBqY1VUc0VzRVZNV0FFT1RYbFVZ?=
- =?utf-8?B?UmJlSks0Z1BjR3VPMEcwZzVXTlMzSXFDUVBmbmhJajRsdXUwV2puQm1QUG55?=
- =?utf-8?B?K3BwVUdBVHZRcUdxc0VGY2hZeld6cmlBeVBsVzdHOG1UMk93MXZQbFVqT3dO?=
- =?utf-8?B?cXR3SkQ1eU5BTDZjbGVYM29xWTNLZ21GK3gveG80MTZYWVBLbHU1TmltOXF0?=
- =?utf-8?B?eHFtaENVeTZvek9GL1haeEJRbWtZUkdLaytUS1pqRGZFcmFHZXpYamUvZjB3?=
- =?utf-8?B?SW0wb2l6bWgvYS9NamxLNWQzb2JNSXQ0UEhnSnJzNCt3N0h4S21DcnJQYjRY?=
- =?utf-8?B?RkZBTFdmc1haRnI3Q1VmQkpwN1hoSmliSHhYNGN0Y1R1bUFnMFNtT1l5MnZh?=
- =?utf-8?B?bW9BRkZ4UkRNR1d4bTBKVnJOU3VmMkJpaXBSbmZVZU1EQk1sWEJDcmJYZUdy?=
- =?utf-8?B?V0k5YWYrVkNxU2RreTh1NVdXY3RqMGJOd25RUDhjOXZOSUZjWk1WNDVHdnlv?=
- =?utf-8?B?N0NJd1dBZnZTampGa2NaZCtEUUk1djlGajB2cGF0bFdhdDVGT3AyTEJMaHpU?=
- =?utf-8?B?bHBpMXpEakZmaS9pYmRSVHRYT0FnQitMSHpubVVaejJ4QVBoY2ovV0liZVVW?=
- =?utf-8?Q?qORxUApStNsevbXLAu6ZKu6Ka?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <857A958B917AD44EBE4212F24C011645@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03C82F3618
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 08:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763021591; cv=none; b=DN4Vs7ONbBojyzlOArM04NJ0/L7Ree8A/+OBwaz4ntKOo4sYMRirgl3QncRG3ET4/HqoPOqfmqELFLnLeNWaIHAMf44ESG17uWseCwOzQel7KTR5FmEy0xCrHBG07v5M5StNRDpG17D0m/Ncmn//sIQidZf97ylIZv5+T0c66zI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763021591; c=relaxed/simple;
+	bh=Ap2yBhzXTU6O9fGE+Hj6HPv06KYwiyh5Yi2mJXSIy64=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=an8Nm1n2H20kMdubBt80yXDMnIA8T/C8Dz6D3O57YlRKtrYrN103qE1pphVnSz0t1zoW62Wl9BhwOb5yBxB933l84W4ByZtnfbpPRGf6TGmlNoXRPeEFbAxvGQkibpaTp6a0rGfz1kpUSOJ5UPDrdNUE4onAdaEhZ3xVMdr3m4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CXT2YJTY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tQ8ygYT2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763021588;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4DGVaSw4kPeGIDKxD03tfYFZ4BdD6dssNRKM1w0msCk=;
+	b=CXT2YJTY1Nqk/lRMblEf1ThTmZhqk+8CDp6xVJiLsccz5izRRKz1GAssE17iBPgQwl0yy+
+	oTtGgPrQ9MJyIFlK/we2QuBsSuldxlFYqYbGLWeGZtg9FwZK4iy3wMhRlVZvgJRpdgnE6j
+	Ebd9Wwv+deY7u9OdakQxUYs985309G0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-83-4qU_L2rKNYCkmhNxfakWTg-1; Thu, 13 Nov 2025 03:13:06 -0500
+X-MC-Unique: 4qU_L2rKNYCkmhNxfakWTg-1
+X-Mimecast-MFC-AGG-ID: 4qU_L2rKNYCkmhNxfakWTg_1763021586
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-477563e531cso4744725e9.1
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 00:13:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763021585; x=1763626385; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4DGVaSw4kPeGIDKxD03tfYFZ4BdD6dssNRKM1w0msCk=;
+        b=tQ8ygYT2KXIVLTxEqOnYpfU84+aeEYs/ynC0ksVdF7l5gHr1901LuF71ejSpa1I+6V
+         96EYNgfnxsR9WBD+c3aq3cuG3VN7C93KyPQvMmrdBnqjysj0Te5uSw9oFKXHexaRUN4f
+         BujKbbWoF/YQgeK+Y7bGxC1bit36qBhgHp4UQB86ynuRDpyrvsyBfxiS7hTl9utNeuus
+         s1htUObCPi4RUWNzMUUaX1XWWfyxkaEp2n7o1LE6cE9Cfp+PhuOrxFVaSXjJcnIgEkDR
+         dgBXwVZwanH0/Eor2PD8irjT2aeYJTWYJeS6I2rB0NaDvJ2cQhq+7bAHQQKfilAghTya
+         Xd5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763021585; x=1763626385;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4DGVaSw4kPeGIDKxD03tfYFZ4BdD6dssNRKM1w0msCk=;
+        b=rEioCXqvljTqj1Osqki5fZvgUQpDzA2bZymHWQmxToVpE1f/o+32sESaqSuEW3Y3um
+         vnWNp90QU8G1eucYwo9WGhoqS4jC4grLx3CeanH/CDczml43+GDUTHaIcojWT6C2Ngbz
+         DQy8mI+i2ogLcdTUSa8Kv/R1EuHG4rWhtHArzl8g1+GXKdZRfiZTnBlwsZPt3D8L2MsN
+         cSls+A4bAiIjBjJAjyKYR1DG75K+LKLCyTAHPX6gH8utYevjiTb3n5XvFe2kAxp9S5BQ
+         70y/Rdq2NT49DJ9YWDRkC0z1h5iqP37cWuXCU0fMw+CYKmSKU81OMHzpURKCEXCMFcVv
+         5guw==
+X-Gm-Message-State: AOJu0YylLhXJi9SHeXvbXt9rQ7o66XWFSk+gxqCUNtEGALP9FlIL/NYZ
+	8emLv/NdvjphEAnr9ky9H0gBfSAM5/MCcIuSgCx5n6SNss4BoFoJ1hN2+vHsofmk5Rjl+EbBnis
+	f4eU3G3oHXm8hh1AAHx8wPD/ScV8D1I/dPqAKya+y66qyadeWxoHu9g==
+X-Gm-Gg: ASbGnctG6mgMRVwn7Yr/MsemWP7km+8OMSBSVvM+v8j4yTsICfs0s6YJmCjYjdzdQgp
+	eamDeBTC1MchUX2LQ4saHjanE1abo5aWiaIianvc9r5tCDThipdX5HLtlJEQ/Krl9tlh5rk6atp
+	4v6s+UdAz1agEw70gtdikUK14t/t9bNMQYgV4jPestvm91Lnp7CORphlUMF6AyPpJ0hlqdDEcWi
+	H9G4SdkSWeRlc1c03RlZWv/OOD0WKl6y+I6BiBvqWOcOkVnRk9HvulnUQgcCsSa7ZMc7ee4cnkJ
+	lckqcnCkCB2P1EeGZawYdViERBE0PsDvma+cD5n+RhpMYG+wmEtgkYSHoh3yqG4uPQ+svvysuoB
+	+ytHb/A0SdMejDPRK09o=
+X-Received: by 2002:a05:600c:a44:b0:477:832c:86ae with SMTP id 5b1f17b1804b1-4778707ca20mr55192355e9.12.1763021585445;
+        Thu, 13 Nov 2025 00:13:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGIQgN138Wh9SyzvdeVmx3/FSQLTRYGtc1iBG+F/973cdwN4YYhSCw6TLEU3JsjzbHZAdvt9g==
+X-Received: by 2002:a05:600c:a44:b0:477:832c:86ae with SMTP id 5b1f17b1804b1-4778707ca20mr55191905e9.12.1763021584764;
+        Thu, 13 Nov 2025 00:13:04 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4778c8a992bsm20321275e9.16.2025.11.13.00.13.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 00:13:04 -0800 (PST)
+Date: Thu, 13 Nov 2025 03:13:01 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] vhost: rewind next_avail_head while discarding
+ descriptors
+Message-ID: <20251113030230-mutt-send-email-mst@kernel.org>
+References: <20251113015420.3496-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5525.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d46e1640-e011-44d7-3731-08de2287801c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Nov 2025 07:37:29.8132
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YZMt6OorL69H3TJYVO1L0mx8jE+v1vsPlh0qHKRv6c8Kzg2/CmwDQ82XzsiWbRY5YWDGICvmGmAMbBhY2z3gew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4692
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251113015420.3496-1-jasowang@redhat.com>
 
-DQpUaGFua3MgZm9yIGFsbCB0aGUgZXhwbGFuYXRpb24uDQoNClsuLi5dDQoNCg0KPiBJbiBbNl0s
-IHRoZSBuZXcgZm9saW9fcGFnZSgpIGltcGxlbWVudGF0aW9uIGlzDQo+IA0KPiBzdGF0aWMgaW5s
-aW5lIHN0cnVjdCBwYWdlICpmb2xpb19wYWdlKHN0cnVjdCBmb2xpbyAqZm9saW8sIHVuc2lnbmVk
-IGxvbmcgbikNCj4gew0KPiAJcmV0dXJuICZmb2xpby0+cGFnZSArIG47DQo+IH0NCj4gDQo+IFNv
-LCBpbnZva2luZyBmb2xpb19wYWdlKCkgc2hvdWxkIGJlIGVxdWFsIHRvIHBhZ2UrKyBpbiBvdXIg
-Y2FzZS4NCj4gDQo+IFs2XSBodHRwczovL2xvcmUua2VybmVsLm9yZy9rdm0vMjAyNTA5MDExNTAz
-NTkuODY3MjUyLTEzLWRhdmlkQHJlZGhhdC5jb20NCg0KU3VyZS4gIEJ1dCBpdCBzZWVtcyB5b3Ug
-d2lsbCBuZWVkIHRvIHdhaXQgYWxsIHBhdGNoZXMgdGhhdCB5b3UgbWVudGlvbmVkIHRvDQpiZSBt
-ZXJnZWQgdG8gc2FmZWx5IHVzZSAncGFnZSsrJyBmb3IgcGFnZXMgaW4gYSBmb2xpbz8NCg0KQW5k
-IGlmIHlvdSBkbzoNCg0KCWZvciAoaSA9IDA7IGkgPCBucGFnZXM7IGkrKykNCgl7DQoJCXN0cnVj
-dCBwYWdlICpwID0gZm9saW9fcGFnZShmb2xpbywgc3RhcnRfaWR4ICsgaSk7DQoJCXN0cnVjdCB0
-ZHhfbW9kdWxlX2FyZ3MgYXJncyA9IHt9Ow0KDQoJCWFyZ3MucmN4ID0gbWtfa2V5ZWRfcGFkZHIo
-aGtpZCwgcCk7DQoJCS4uLg0KCX0NCg0KSXQgc2hvdWxkIHdvcmsgdy9vIGFueSBkZXBlbmRlbmN5
-Pw0KDQpBbnl3YXksIEkgZG9uJ3QgaGF2ZSBhbnkgc3Ryb25nIG9waW5pb24sIGFzIGxvbmcgYXMg
-aXQgd29ya3MuICBZb3UgbWF5DQpjaG9vc2Ugd2hhdCB5b3Ugd2FudC4gOi0pDQo=
+On Thu, Nov 13, 2025 at 09:54:20AM +0800, Jason Wang wrote:
+> When discarding descriptors with IN_ORDER, we should rewind
+> next_avail_head otherwise it would run out of sync with
+> last_avail_idx. This would cause driver to report
+> "id X is not a head".
+> 
+> Fixing this by returning the number of descriptors that is used for
+> each buffer via vhost_get_vq_desc_n() so caller can use the value
+> while discarding descriptors.
+> 
+> Fixes: 67a873df0c41 ("vhost: basic in order support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+
+Wow that change really caused a lot of fallout.
+
+Thanks for the patch! Yet something to improve:
+
+
+> ---
+>  drivers/vhost/net.c   | 53 ++++++++++++++++++++++++++-----------------
+>  drivers/vhost/vhost.c | 43 ++++++++++++++++++++++++-----------
+>  drivers/vhost/vhost.h |  9 +++++++-
+>  3 files changed, 70 insertions(+), 35 deletions(-)
+> 
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 35ded4330431..8f7f50acb6d6 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -592,14 +592,15 @@ static void vhost_net_busy_poll(struct vhost_net *net,
+>  static int vhost_net_tx_get_vq_desc(struct vhost_net *net,
+>  				    struct vhost_net_virtqueue *tnvq,
+>  				    unsigned int *out_num, unsigned int *in_num,
+> -				    struct msghdr *msghdr, bool *busyloop_intr)
+> +				    struct msghdr *msghdr, bool *busyloop_intr,
+> +				    unsigned int *ndesc)
+>  {
+>  	struct vhost_net_virtqueue *rnvq = &net->vqs[VHOST_NET_VQ_RX];
+>  	struct vhost_virtqueue *rvq = &rnvq->vq;
+>  	struct vhost_virtqueue *tvq = &tnvq->vq;
+>  
+> -	int r = vhost_get_vq_desc(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
+> -				  out_num, in_num, NULL, NULL);
+> +	int r = vhost_get_vq_desc_n(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
+> +				    out_num, in_num, NULL, NULL, ndesc);
+>  
+>  	if (r == tvq->num && tvq->busyloop_timeout) {
+>  		/* Flush batched packets first */
+> @@ -610,8 +611,8 @@ static int vhost_net_tx_get_vq_desc(struct vhost_net *net,
+>  
+>  		vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, false);
+>  
+> -		r = vhost_get_vq_desc(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
+> -				      out_num, in_num, NULL, NULL);
+> +		r = vhost_get_vq_desc_n(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
+> +					out_num, in_num, NULL, NULL, ndesc);
+>  	}
+>  
+>  	return r;
+> @@ -642,12 +643,14 @@ static int get_tx_bufs(struct vhost_net *net,
+>  		       struct vhost_net_virtqueue *nvq,
+>  		       struct msghdr *msg,
+>  		       unsigned int *out, unsigned int *in,
+> -		       size_t *len, bool *busyloop_intr)
+> +		       size_t *len, bool *busyloop_intr,
+> +		       unsigned int *ndesc)
+>  {
+>  	struct vhost_virtqueue *vq = &nvq->vq;
+>  	int ret;
+>  
+> -	ret = vhost_net_tx_get_vq_desc(net, nvq, out, in, msg, busyloop_intr);
+> +	ret = vhost_net_tx_get_vq_desc(net, nvq, out, in, msg,
+> +				       busyloop_intr, ndesc);
+>  
+>  	if (ret < 0 || ret == vq->num)
+>  		return ret;
+> @@ -766,6 +769,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+>  	int sent_pkts = 0;
+>  	bool sock_can_batch = (sock->sk->sk_sndbuf == INT_MAX);
+>  	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
+> +	unsigned int ndesc = 0;
+>  
+>  	do {
+>  		bool busyloop_intr = false;
+> @@ -774,7 +778,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+>  			vhost_tx_batch(net, nvq, sock, &msg);
+>  
+>  		head = get_tx_bufs(net, nvq, &msg, &out, &in, &len,
+> -				   &busyloop_intr);
+> +				   &busyloop_intr, &ndesc);
+>  		/* On error, stop handling until the next kick. */
+>  		if (unlikely(head < 0))
+>  			break;
+> @@ -806,7 +810,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+>  				goto done;
+>  			} else if (unlikely(err != -ENOSPC)) {
+>  				vhost_tx_batch(net, nvq, sock, &msg);
+> -				vhost_discard_vq_desc(vq, 1);
+> +				vhost_discard_vq_desc(vq, 1, ndesc);
+>  				vhost_net_enable_vq(net, vq);
+>  				break;
+>  			}
+> @@ -829,7 +833,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+>  		err = sock->ops->sendmsg(sock, &msg, len);
+>  		if (unlikely(err < 0)) {
+>  			if (err == -EAGAIN || err == -ENOMEM || err == -ENOBUFS) {
+> -				vhost_discard_vq_desc(vq, 1);
+> +				vhost_discard_vq_desc(vq, 1, ndesc);
+>  				vhost_net_enable_vq(net, vq);
+>  				break;
+>  			}
+> @@ -868,6 +872,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+>  	int err;
+>  	struct vhost_net_ubuf_ref *ubufs;
+>  	struct ubuf_info_msgzc *ubuf;
+> +	unsigned int ndesc = 0;
+>  	bool zcopy_used;
+>  	int sent_pkts = 0;
+>  
+> @@ -879,7 +884,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+>  
+>  		busyloop_intr = false;
+>  		head = get_tx_bufs(net, nvq, &msg, &out, &in, &len,
+> -				   &busyloop_intr);
+> +				   &busyloop_intr, &ndesc);
+>  		/* On error, stop handling until the next kick. */
+>  		if (unlikely(head < 0))
+>  			break;
+> @@ -941,7 +946,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+>  					vq->heads[ubuf->desc].len = VHOST_DMA_DONE_LEN;
+>  			}
+>  			if (retry) {
+> -				vhost_discard_vq_desc(vq, 1);
+> +				vhost_discard_vq_desc(vq, 1, ndesc);
+>  				vhost_net_enable_vq(net, vq);
+>  				break;
+>  			}
+> @@ -1045,11 +1050,12 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+>  		       unsigned *iovcount,
+>  		       struct vhost_log *log,
+>  		       unsigned *log_num,
+> -		       unsigned int quota)
+> +		       unsigned int quota,
+> +		       unsigned int *ndesc)
+>  {
+>  	struct vhost_virtqueue *vq = &nvq->vq;
+>  	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
+> -	unsigned int out, in;
+> +	unsigned int out, in, desc_num, n = 0;
+>  	int seg = 0;
+>  	int headcount = 0;
+>  	unsigned d;
+> @@ -1064,9 +1070,9 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+>  			r = -ENOBUFS;
+>  			goto err;
+>  		}
+> -		r = vhost_get_vq_desc(vq, vq->iov + seg,
+> -				      ARRAY_SIZE(vq->iov) - seg, &out,
+> -				      &in, log, log_num);
+> +		r = vhost_get_vq_desc_n(vq, vq->iov + seg,
+> +					ARRAY_SIZE(vq->iov) - seg, &out,
+> +					&in, log, log_num, &desc_num);
+>  		if (unlikely(r < 0))
+>  			goto err;
+>  
+> @@ -1093,6 +1099,7 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+>  		++headcount;
+>  		datalen -= len;
+>  		seg += in;
+> +		n += desc_num;
+>  	}
+>  
+>  	*iovcount = seg;
+> @@ -1113,9 +1120,11 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+>  		nheads[0] = headcount;
+>  	}
+>  
+> +	*ndesc = n;
+> +
+>  	return headcount;
+>  err:
+> -	vhost_discard_vq_desc(vq, headcount);
+> +	vhost_discard_vq_desc(vq, headcount, n);
+
+So here ndesc and n are the same, but below in vhost_discard_vq_desc
+they are different. Fun.
+
+>  	return r;
+>  }
+>  
+> @@ -1151,6 +1160,7 @@ static void handle_rx(struct vhost_net *net)
+>  	struct iov_iter fixup;
+>  	__virtio16 num_buffers;
+>  	int recv_pkts = 0;
+> +	unsigned int ndesc;
+>  
+>  	mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
+>  	sock = vhost_vq_get_backend(vq);
+> @@ -1182,7 +1192,8 @@ static void handle_rx(struct vhost_net *net)
+>  		headcount = get_rx_bufs(nvq, vq->heads + count,
+>  					vq->nheads + count,
+>  					vhost_len, &in, vq_log, &log,
+> -					likely(mergeable) ? UIO_MAXIOV : 1);
+> +					likely(mergeable) ? UIO_MAXIOV : 1,
+> +					&ndesc);
+>  		/* On error, stop handling until the next kick. */
+>  		if (unlikely(headcount < 0))
+>  			goto out;
+> @@ -1228,7 +1239,7 @@ static void handle_rx(struct vhost_net *net)
+>  		if (unlikely(err != sock_len)) {
+>  			pr_debug("Discarded rx packet: "
+>  				 " len %d, expected %zd\n", err, sock_len);
+> -			vhost_discard_vq_desc(vq, headcount);
+> +			vhost_discard_vq_desc(vq, headcount, ndesc);
+>  			continue;
+>  		}
+>  		/* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
+> @@ -1252,7 +1263,7 @@ static void handle_rx(struct vhost_net *net)
+>  		    copy_to_iter(&num_buffers, sizeof num_buffers,
+>  				 &fixup) != sizeof num_buffers) {
+>  			vq_err(vq, "Failed num_buffers write");
+> -			vhost_discard_vq_desc(vq, headcount);
+> +			vhost_discard_vq_desc(vq, headcount, ndesc);
+>  			goto out;
+>  		}
+>  		nvq->done_idx += headcount;
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 8570fdf2e14a..b56568807588 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -2792,18 +2792,11 @@ static int get_indirect(struct vhost_virtqueue *vq,
+>  	return 0;
+>  }
+>  
+> -/* This looks in the virtqueue and for the first available buffer, and converts
+> - * it to an iovec for convenient access.  Since descriptors consist of some
+> - * number of output then some number of input descriptors, it's actually two
+> - * iovecs, but we pack them into one and note how many of each there were.
+> - *
+> - * This function returns the descriptor number found, or vq->num (which is
+> - * never a valid descriptor number) if none was found.  A negative code is
+> - * returned on error. */
+
+A new module API with no docs at all is not good.
+Please add documentation to this one. vhost_get_vq_desc
+is a subset and could refer to it.
+
+> -int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+> -		      struct iovec iov[], unsigned int iov_size,
+> -		      unsigned int *out_num, unsigned int *in_num,
+> -		      struct vhost_log *log, unsigned int *log_num)
+> +int vhost_get_vq_desc_n(struct vhost_virtqueue *vq,
+> +			struct iovec iov[], unsigned int iov_size,
+> +			unsigned int *out_num, unsigned int *in_num,
+> +			struct vhost_log *log, unsigned int *log_num,
+> +			unsigned int *ndesc)
+
+>  {
+>  	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
+>  	struct vring_desc desc;
+> @@ -2921,16 +2914,40 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+>  	vq->last_avail_idx++;
+>  	vq->next_avail_head += c;
+>  
+> +	if (ndesc)
+> +		*ndesc = c;
+> +
+>  	/* Assume notifications from guest are disabled at this point,
+>  	 * if they aren't we would need to update avail_event index. */
+>  	BUG_ON(!(vq->used_flags & VRING_USED_F_NO_NOTIFY));
+>  	return head;
+>  }
+> +EXPORT_SYMBOL_GPL(vhost_get_vq_desc_n);
+> +
+> +/* This looks in the virtqueue and for the first available buffer, and converts
+> + * it to an iovec for convenient access.  Since descriptors consist of some
+> + * number of output then some number of input descriptors, it's actually two
+> + * iovecs, but we pack them into one and note how many of each there were.
+> + *
+> + * This function returns the descriptor number found, or vq->num (which is
+> + * never a valid descriptor number) if none was found.  A negative code is
+> + * returned on error.
+> + */
+> +int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+> +		      struct iovec iov[], unsigned int iov_size,
+> +		      unsigned int *out_num, unsigned int *in_num,
+> +		      struct vhost_log *log, unsigned int *log_num)
+> +{
+> +	return vhost_get_vq_desc_n(vq, iov, iov_size, out_num, in_num,
+> +				   log, log_num, NULL);
+> +}
+>  EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
+>  
+>  /* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
+> -void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
+> +void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n,
+> +			   unsigned int ndesc)
+
+ndesc is number of descriptors? And n is what, in that case?
+
+
+>  {
+> +	vq->next_avail_head -= ndesc;
+>  	vq->last_avail_idx -= n;
+>  }
+>  EXPORT_SYMBOL_GPL(vhost_discard_vq_desc);
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index 621a6d9a8791..69a39540df3d 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -230,7 +230,14 @@ int vhost_get_vq_desc(struct vhost_virtqueue *,
+>  		      struct iovec iov[], unsigned int iov_size,
+>  		      unsigned int *out_num, unsigned int *in_num,
+>  		      struct vhost_log *log, unsigned int *log_num);
+> -void vhost_discard_vq_desc(struct vhost_virtqueue *, int n);
+> +
+> +int vhost_get_vq_desc_n(struct vhost_virtqueue *vq,
+> +			struct iovec iov[], unsigned int iov_size,
+> +			unsigned int *out_num, unsigned int *in_num,
+> +			struct vhost_log *log, unsigned int *log_num,
+> +			unsigned int *ndesc);
+> +
+> +void vhost_discard_vq_desc(struct vhost_virtqueue *, int n, unsigned int ndesc);
+>  
+>  bool vhost_vq_work_queue(struct vhost_virtqueue *vq, struct vhost_work *work);
+>  bool vhost_vq_has_work(struct vhost_virtqueue *vq);
+> -- 
+> 2.31.1
+
 
