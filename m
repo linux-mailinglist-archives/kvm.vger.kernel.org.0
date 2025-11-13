@@ -1,180 +1,155 @@
-Return-Path: <kvm+bounces-63032-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63033-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4E43C596E4
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 19:23:25 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFDB5C596D2
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 19:22:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 973703B83DF
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 18:15:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 30F1B35164A
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 18:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510213587D6;
-	Thu, 13 Nov 2025 18:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D31265CBE;
+	Thu, 13 Nov 2025 18:22:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VwrWQnDR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KYaFV0zd"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709BD345CBA;
-	Thu, 13 Nov 2025 18:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403F2186284
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 18:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763057733; cv=none; b=fPkAhHHtBBddMhTeZINF7kI3uFrcVfHO4YspTz6WWjus67oFwqdU0Qn7nIa8tXmx5w/5q9yFNUl9WWDylEQtGHbYVkq+3lnaeZx/+8w/Tnakxlti+rhSlcHgRxm8LPJibM42afkl2ahZzWTwRzZ3LYq4a7viqfioKj4cAxD8rz4=
+	t=1763058130; cv=none; b=fowLUuGdBNAJEneWGECO3BSHWoVpyUXO2mN0gcUkiufEkllWo7KdcYUTuwv9U92HgjKCtnf2DhGjFVSHEeOSCDFBC93nd2sN1v/2XF+vG32gnnxdVJeu8mW86tM1lG3zQ6XOy7ha4qB07Bw2YLNYFY16c9iujfryBfRIbXtvX6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763057733; c=relaxed/simple;
-	bh=ZH1Vb+6y/P0bhQpaACvsGQx+4Pw+NOxnF0TR28s/Uzw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YpoEqtGCqJyqcdlOtcY/bLOVvxYN93DnlFLHD7lKxP8SeooQSBTCfpSRZXAMT1t26LRLwEniCYoguT2NZpfIPQU9u+rwu/yFs9xAPoTx7CPxyOeDKyKBMomhzLxd8jZ4ULlUmlz/5beB2a+beGGS0DwO+vgIe4X3zzYKlsthQdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VwrWQnDR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7F53C19421;
-	Thu, 13 Nov 2025 18:15:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763057733;
-	bh=ZH1Vb+6y/P0bhQpaACvsGQx+4Pw+NOxnF0TR28s/Uzw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VwrWQnDR7Z5C+cHvxQpIpvCRn0BFq7STAgYoyi78ZLBHA6CEOKiKytf3PDpMtIcVM
-	 vSh3TCvRIcu6IeAe1WAowfnDofnPUzLnyYBXY17ZOfh5A48VannBXPcOqXeZo0qIhX
-	 5OylOkfQIjUuTqwL7D/Y+hJeiZCGV4JlB0lppswDMoLKZ8JEkv5YOSLVS6oeIhselb
-	 ipNXQultFvSUn/IpUhWTi24+dakr63JVavjJxVX8CPiJ3EWLn6gMUcOTTGXE1foMiQ
-	 hnMaW2kL3RRF/w0crYpnhDZPt6uaN3NdvMaKz0dfN4tgPOYCKBIq9SN9c7iohVemYl
-	 9/YUhlEtkCGkQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vJbr0-00000004yF0-1rTR;
-	Thu, 13 Nov 2025 18:15:30 +0000
-Date: Thu, 13 Nov 2025 18:15:29 +0000
-Message-ID: <86ikfdu7cu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	Aishwarya.TCV@arm.com
-Subject: Re: [PATCH v2 05/45] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
-In-Reply-To: <7ae5874e-366f-4abd-9142-ffbe21fed3a8@sirena.org.uk>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-6-maz@kernel.org>
-	<7ae5874e-366f-4abd-9142-ffbe21fed3a8@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763058130; c=relaxed/simple;
+	bh=M1YRC3EZuqhEa+vddm/0lZ0BSjtWI8L6D1eAzYbvdV8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=djZgbKtYwt9QJNxfqX8+ex79LGcL0aodAiShBmidOxGzGBwJdoDYSk4BnJ53Tir7raVn8tskh5SBIPlajQPSFX5/mPF0qaxHCDrlz/RLvvhSmkv2ATe3bHELnCR1cmZVe0qZKmDEMamPgTdrO553SIik5KdicRshgXdYpVHT56A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KYaFV0zd; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 13 Nov 2025 10:21:34 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763058114;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NUDmGsLuzt7y0qWak8NiOpLtPu0rSZCLo1L1cHvQHAU=;
+	b=KYaFV0zdSrAsy3+bs3d+Njo5HH7l5LDFC+vVwJNgeam5lFDlKGiqBaEIq/Pop6uDctz6CU
+	K0dpQsv9myUU67EubhxWDnd2mb53KLfuGzpRQG4ohGsdzYHYWBxrjKy/RUU++EuOdUrsuF
+	dh8lf+UmmKCYpFgOfbnxuQ8tAnSn+/U=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Jiaqi Yan <jiaqiyan@google.com>, Jason Gunthorpe <jgg@nvidia.com>,
+	maz@kernel.org, duenwen@google.com, rananta@google.com,
+	jthoughton@google.com, vsethi@nvidia.com, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com,
+	corbet@lwn.net, shuah@kernel.org, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 0/3] VMM can handle guest SEA via KVM_EXIT_ARM_SEA
+Message-ID: <aRYhrmLz__AbnCFN@linux.dev>
+References: <20251013185903.1372553-1-jiaqiyan@google.com>
+ <20251020144646.GT316284@nvidia.com>
+ <CACw3F528D6odL3MJWb28Y4HVOLo56tMQXBpvti5nhczdpMxOdQ@mail.gmail.com>
+ <wuuvrqxezybzdnijarlom4wvxlfgzgjoakwt7ixittz2jb4mal@ngjvq2rrt2ps>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com, Aishwarya.TCV@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <wuuvrqxezybzdnijarlom4wvxlfgzgjoakwt7ixittz2jb4mal@ngjvq2rrt2ps>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 13 Nov 2025 14:33:02 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On Thu, Nov 13, 2025 at 02:54:33PM +0100, Mauro Carvalho Chehab wrote:
+> Hi,
 > 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Sun, Nov 09, 2025 at 05:15:39PM +0000, Marc Zyngier wrote:
-> > A long time ago, an unsuspecting architect forgot to add a trap
-> > bit for ICV_DIR_EL1 in ICH_HCR_EL2. Which was unfortunate, but
-> > what's a bit of spec between friends? Thankfully, this was fixed
-> > in a later revision, and ARM "deprecates" the lack of trapping
-> > ability.
+> On Mon, Nov 10, 2025 at 09:41:33AM -0800, Jiaqi Yan wrote:
+> > On Mon, Oct 20, 2025 at 7:46 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > >
+> > > On Mon, Oct 13, 2025 at 06:59:00PM +0000, Jiaqi Yan wrote:
+> > > > Problem
+> > > > =======
+> > > >
+> > > > When host APEI is unable to claim a synchronous external abort (SEA)
+> > > > during guest abort, today KVM directly injects an asynchronous SError
+> > > > into the VCPU then resumes it. The injected SError usually results in
+> > > > unpleasant guest kernel panic.
+> > > >
+> > > > One of the major situation of guest SEA is when VCPU consumes recoverable
+> > > > uncorrected memory error (UER), which is not uncommon at all in modern
+> > > > datacenter servers with large amounts of physical memory. Although SError
+> > > > and guest panic is sufficient to stop the propagation of corrupted memory,
+> > > > there is room to recover from an UER in a more graceful manner.
+> > > >
+> > > > Proposed Solution
+> > > > =================
+> > > >
+> > > > The idea is, we can replay the SEA to the faulting VCPU. If the memory
+> > > > error consumption or the fault that cause SEA is not from guest kernel,
+> > > > the blast radius can be limited to the poison-consuming guest process,
+> > > > while the VM can keep running.
 > 
-> I'm seeing a regression on i.MX8MP-EVK and Toradax AM625+Mallow boards
-> (both 4xA53+GICv3) in protected mode only with a bunch of the KVM
-> selftests, including the arch_timer one:
+> I like the idea of having a "guest-first"/"host-first" approach for APEI,
+> letting userspace (likely rasdaemon) to decide to handle hardware errors
+> either at the guest or at the host. Yet, it sounds wrong to have a flag
+> called KVM_EXIT_ARM_SEA, as:
 > 
-> # selftests: kvm: arch_timer
-> # Random seed: 0x6b8b4567
-> # ==== Test Assertion Failure ====
-> #   lib/arm64/processor.c:487: false
-> #   pid=4469 tid=4473 errno=4 - Interrupted system call
-> # ==== Test Assertion Failure ====
-> #   lib/arm64/processor.c:487: false
-> #   pid=4469 tid=4471 errno=4 - Interrupted system call
-> # ==== Test Assertion Failure ====
-> #   lib/arm64/processor.c:487: false
-> #   pid=4469 tid=4472 errno=4 - Interrupted system call
-> # ==== Test Assertion Failure ====
-> #   lib/arm64/processor.c:487: false
-> #   pid=4469 tid=4470 errno=4 - Interrupted system call
-> #      1	0x0000000000414387: assert_on_unhandled_exception at processor.c:487
-> #      2	0x000000000040727f: _vcpu_run at kvm_util.c:1699
-> #      3	 (inlined by) vcpu_run at kvm_util.c:1710
-> #      4	0x0000000000402b07: test_vcpu_run at arch_timer.c:55
-> #      5	0x0000ffffb12f2f9b: ?? ??:0
-> #      6	0x0000ffffb135e58b: ?? ??:0
-> #      1	0x0000000000414387: assert_on_unhandled_exception at processor.c:487
-> #      2	0x000000000040727f: _vcpu_run at kvm_util.c:1699
-> #      3	 (inlined by) vcpu_run at kvm_util.c:1710
-> #      4	0x0000000000402b07: test_vcpu_run at arch_timer.c:55
-> #      5	0x0000ffffb12f2f9b: ?? ??:0
-> #      6	0x0000ffffb135e58b: ?? ??:0
-> #   Unexpected exception (vector:0x4, ec:0x0)
-> #      1	0x0000000000414387: assert_on_unhandled_exception at processor.c:487
-> #      2	0x000000000040727f: _vcpu_run at kvm_util.c:1699
-> #      3	 (inlined by) vcpu_run at kvm_util.c:1710
-> #      4	0x0000000000402b07: test_vcpu_run at arch_timer.c:55
-> #      5	0x0000ffffb12f2f9b: ?? ??:0
-> #      6	0x0000ffffb135e58b: ?? ??:0
-> #      1	0x0000000000414387: assert_on_unhandled_exception at processor.c:487
-> #      2	0x000000000040727f: _vcpu_run at kvm_util.c:1699
-> #      3	 (inlined by) vcpu_run at kvm_util.c:1710
-> #      4	0x0000000000402b07: test_vcpu_run at arch_timer.c:55
-> #      5	0x0000ffffb12f2f9b: ?? ??:0
-> #      6	0x0000ffffb135e58b: ?? ??:0
-> not ok 28 selftests: kvm: arch_timer # exit=254
+>     1. This is not exclusive to ARM;
+>     2. There are other notification mechanisms that can rise an APEI
+>        errors. For instance QEMU code defines:
 > 
-> The arch_timer case bisects to this patch in -next, regular nVHE mode
-> runs this test happily.
+>     ACPI_GHES_NOTIFY_POLLED = 0,
+>     ACPI_GHES_NOTIFY_EXTERNAL = 1,
+>     ACPI_GHES_NOTIFY_LOCAL = 2,
+>     ACPI_GHES_NOTIFY_SCI = 3,
+>     ACPI_GHES_NOTIFY_NMI = 4,
+>     ACPI_GHES_NOTIFY_CMCI = 5,
+>     ACPI_GHES_NOTIFY_MCE = 6,
+>     ACPI_GHES_NOTIFY_GPIO = 7,
+>     ACPI_GHES_NOTIFY_SEA = 8,
+>     ACPI_GHES_NOTIFY_SEI = 9,
+>     ACPI_GHES_NOTIFY_GSIV = 10,
+>     ACPI_GHES_NOTIFY_SDEI = 11,
+>     ACPI_GHES_NOTIFY_RESERVED = 12
+> 
+>  - even on arm. QEMU currently implements two mechanisms (SEA and GPIO);
+>  - once we implement the same feature on Intel, it will likely use
+>    NMI, MCE and/or SCI.
+> 
+> So, IMO, the best would be to use a more generic name like
+> KVM_EXIT_APEI or KVM_EXIT_GHES - or maybe even name it the way it really
+> is meant: KVM_EXIT_ACPI_GUEST_FIRST.
 
-My hunch is that we're missing something like the hack below, but I
-haven't tried it yet.
+This is not the sort of thing that I'd like to seen dressed up as an
+arch-generic interface.
 
-I'll probably get to it tomorrow.
+What Jiaqi is dealing with is the very sorry state of RAS on arm64,
+giving userspace the opportunity to decide how an SEA is handled when a
+platform's firmware couldn't be bothered to do so. The SEA is an
+architecture-specific event so we provide the hardware context to
+the VMM to sort things out.
 
-	M.
+If the APEI driver actually registers to handle the SEA then it will
+continue to handle the SEA before ever involving the VMM. I'm not
+aware of any system that does this. If you're lucky you'll take an
+*asynchronous* vector after to process a CPER and still have to deal
+with a 'bare' SEA.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 82da9b03692d4..3108b5185c204 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -444,6 +444,8 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 
- 	/* Scalable Vector Registers are restricted. */
- 
-+	HOST_HANDLED(SYS_ICC_PMR_EL1),
-+
- 	RAZ_WI(SYS_ERRIDR_EL1),
- 	RAZ_WI(SYS_ERRSELR_EL1),
- 	RAZ_WI(SYS_ERXFR_EL1),
-@@ -457,9 +459,12 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 
- 	/* Limited Ordering Regions Registers are restricted. */
- 
-+	HOST_HANDLED(SYS_ICC_DIR_EL1),
-+	HOST_HANDLED(SYS_ICC_RPR_EL1),
- 	HOST_HANDLED(SYS_ICC_SGI1R_EL1),
- 	HOST_HANDLED(SYS_ICC_ASGI1R_EL1),
- 	HOST_HANDLED(SYS_ICC_SGI0R_EL1),
-+	HOST_HANDLED(SYS_ICC_CTLR_EL1),
- 	{ SYS_DESC(SYS_ICC_SRE_EL1), .access = pvm_gic_read_sre, },
- 
- 	HOST_HANDLED(SYS_CCSIDR_EL1),
+And of course, none of this even matters for the several billion
+DT-based hosts out in the wild.
 
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
 
