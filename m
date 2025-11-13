@@ -1,148 +1,171 @@
-Return-Path: <kvm+bounces-62998-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62999-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 356C9C56CFD
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 11:23:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BB5DC57115
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 12:02:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 55AD74E6806
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 10:19:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 543433A4EC0
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 10:57:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F606314A86;
-	Thu, 13 Nov 2025 10:18:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D00335073;
+	Thu, 13 Nov 2025 10:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Jdmo17yd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JTpcO1k0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13BA914AD20;
-	Thu, 13 Nov 2025 10:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FF633436A;
+	Thu, 13 Nov 2025 10:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763029137; cv=none; b=knYYk0rTpq3q9M0PG4r8xbUW9n/COT+HjeM9J9koPUTDuMLMdbhXokYf8zIhfX5SQ12kMLC746PmecMCnH5wLf3bSbveCkDSulMhAPuQ39x2ZjTSiGc/KUu3ymAEBVAjtxU2uS/iHk95L53D3zWi9Dwt/bRHnKho8MhqwbF+iWA=
+	t=1763031416; cv=none; b=r42+j2sAEabnZkwTV+33E0zwJYXEiv73r1PSxbfAWpNbKvof98k17VIWmv+xaF19FEgfGpJOmPn7Ku2nBRW6uB+4Kj9WorXrQAjUCt4TekFx0bnAmrYpE0ho6F0KlNfbcCPjxQb665qfVb9DvoZGqYGM9dgNsBHJjR9hZhqLn6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763029137; c=relaxed/simple;
-	bh=XyHOGRyLyTBRyQsxtR1tnGdoFyijF2WgBu/BGuiL+U4=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Subject:From:Cc:
-	 References:In-Reply-To; b=NP/yv/Bl3P6koN3rLUzx88mUNNYcNH51APpq4Rq9kAGnFHLcVRGkmt/Qw1KcMZA/Q0ufj7Ige0W3+z992m0TF+cyCnNiiJuj4P8miqt+kio9KFsoju5du8MMeOrHo1IIe2tJlV2arL4KQCuKEp0o2hLMd/DL5/8q7ZPb/e6YHLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Jdmo17yd; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AD5ZXad009449;
-	Thu, 13 Nov 2025 10:18:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=0mKJmP
-	AETsGmfv3UOpULntHIsQEeG1GgBH8GJm96EEI=; b=Jdmo17ydqWXkOkdq59jzAx
-	zWDgypTPjnJ9DskJHqdjbN9PeXZUEHvBGg0b/cQLmGjvrglcBUooWP4ny4reNw1W
-	FSxx9eUEJQdhxdrunG7d0kui6MdUdrJPxczPXhFWKtf/emzZjNp+xV3cE7RX1oFX
-	W15K1Z7IF342FUidOKjZXmYPe/MvTaYokSTQZuk3/2PrcqBwJVsMulxK378OPK39
-	BWNoBVc4DH4T/QdBEgj5eKcvilcRm2ncwmi99Nw1mLV7EUYZ4myKG1axVAP3itDY
-	BytQWNLTrWdKKLdKt0UsjqA2GEtx00xWgT8UsE7lNTJ1bbKQMc8bty746JEX9WFw
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a9wk8fb9g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Nov 2025 10:18:53 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AD8cxi3028859;
-	Thu, 13 Nov 2025 10:18:52 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aag6sncva-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Nov 2025 10:18:52 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ADAImxa62456162
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Nov 2025 10:18:48 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BE64820043;
-	Thu, 13 Nov 2025 10:18:48 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 96A8F20040;
-	Thu, 13 Nov 2025 10:18:48 +0000 (GMT)
-Received: from darkmoore (unknown [9.111.1.139])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 13 Nov 2025 10:18:48 +0000 (GMT)
+	s=arc-20240116; t=1763031416; c=relaxed/simple;
+	bh=RwaVnsdgpISyeE4GiZ82KJN1s6WkXDzSwm4Kq3Nfw3M=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lxRlFJeNqjyOvKw5lgmLuDOWw3q2abvhi4RMcguWGXx8mJC7q68mDFxdgSL7fYmbYSmocTXVPoYEdHUjlRpxl0+me+179beUloi0PoItEV9AV7A0zYIlHORAQpbgyNozEN1Om2Srm8vMm1k5iLMQko3OJtvxznpBgO+RJFbH+fY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JTpcO1k0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1AA2C4CEF1;
+	Thu, 13 Nov 2025 10:56:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763031416;
+	bh=RwaVnsdgpISyeE4GiZ82KJN1s6WkXDzSwm4Kq3Nfw3M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JTpcO1k0Rctuhgx/PJZVV5iU65CxvhM5w2CTGGYt4dyI3ZD9EqNSzmIbqxoO4329k
+	 IcFgrQ5ljyvAi9cjuHHuQ2IJTCZGpFYNLU4Dgwk0pl2IsA7SJ6p5fE6sqID5Yx+Gr+
+	 86pnBGy9nS1OsdBoerc8ur+EkOxmRbhrYgZ//+MOlXyw7zMoLLsC8a6yX9oklMrklZ
+	 Bgoiw2qc1f8HZAO/iaIWPbracGoNwAYi+MPCsiF8rj0cKaJhiCkB9H8EFQNPjY252Q
+	 XZ4DkU6FtyhH2EYiK51JwFkiMeO6DFJrHnaSNByuggAZhBzvokbuR6IqF61B/znBmL
+	 5kowCzCR1vBGA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vJV0X-00000004qPg-1fAd;
+	Thu, 13 Nov 2025 10:56:53 +0000
+Date: Thu, 13 Nov 2025 10:56:52 +0000
+Message-ID: <86seeitd3f.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose
+	<suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu
+	<yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	Yao Yuan
+	<yaoyuan@linux.alibaba.com>
+Subject: Re: [PATCH v2 04/45] KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
+In-Reply-To: <b618732b-fd26-49e0-84c5-bfd54be09cd2@samsung.com>
+References: <20251109171619.1507205-1-maz@kernel.org>
+	<20251109171619.1507205-5-maz@kernel.org>
+	<CGME20251113095225eucas1p261508e40d5b802f6e5be58600bb4a02c@eucas1p2.samsung.com>
+	<b618732b-fd26-49e0-84c5-bfd54be09cd2@samsung.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 13 Nov 2025 11:18:43 +0100
-Message-Id: <DE7HNY4I79TM.1EAA75D8OW13C@linux.ibm.com>
-To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v3 07/23] KVM: s390: KVM-specific bitfields and helper
- functions
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <borntraeger@de.ibm.com>, <frankja@linux.ibm.com>, <nsg@linux.ibm.com>,
-        <nrb@linux.ibm.com>, <seiden@linux.ibm.com>,
-        <schlameuss@linux.ibm.com>, <hca@linux.ibm.com>, <svens@linux.ibm.com>,
-        <agordeev@linux.ibm.com>, <gor@linux.ibm.com>, <david@redhat.com>,
-        <gerald.schaefer@linux.ibm.com>
-X-Mailer: aerc 0.21.0
-References: <20251106161117.350395-1-imbrenda@linux.ibm.com>
- <20251106161117.350395-8-imbrenda@linux.ibm.com>
-In-Reply-To: <20251106161117.350395-8-imbrenda@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDAyMiBTYWx0ZWRfX+EJ0nH+bMoWd
- VB5IAUfJHUVhxTLV9i18peLzF0pg1YB4lT09gKo3RnSOHPhK7kjC27CdNs7E/uTaauGQaP6zBWk
- wO7rj/cdA9RgLe0Aw8XQ0+X8PCDe4Sm4EeB8iNtxoWfGEkLjmq+uFUfup2MIx5hNqjGsQyLXHgf
- imZpqd3NbUD7HA7ZsnYl58b50AOE13GxpY84Eu+YKFR/wdfzWCc8+eppUxsGsGk2If9XFKfabIq
- UT6f6XGGTk1o746PLH62GgmGrEUlcqoNfoJ0F8ltae7URovm/XOQIogC8062u7NRzyWSHcW8XHG
- ex7M0kfG/jJrBzB/BFsHR758+CBpQKJ3wYjvGLb3wLjiJg3PxCnXKvCNmGEF8PMqxvTxE0I+K7H
- joybQljdGPX2d3axUqPRuswekUIqSw==
-X-Authority-Analysis: v=2.4 cv=ZK3aWH7b c=1 sm=1 tr=0 ts=6915b08d cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=1VCRT6WqKb7475BWb5YA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: BQeDGuVaLkAloej7Wate6MvldPMBh_On
-X-Proofpoint-GUID: BQeDGuVaLkAloej7Wate6MvldPMBh_On
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-13_01,2025-11-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0
- phishscore=0 impostorscore=0 spamscore=0 bulkscore=0 adultscore=0
- clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
- definitions=main-2511080022
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: m.szyprowski@samsung.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu Nov 6, 2025 at 5:11 PM CET, Claudio Imbrenda wrote:
-> Add KVM-s390 specific bitfields and helper functions to manipulate DAT
-> tables.
->
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  arch/s390/kvm/dat.h | 726 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 726 insertions(+)
->  create mode 100644 arch/s390/kvm/dat.h
->
-> diff --git a/arch/s390/kvm/dat.h b/arch/s390/kvm/dat.h
-> new file mode 100644
-> index 000000000000..9d10b615b83c
-> --- /dev/null
-> +++ b/arch/s390/kvm/dat.h
-> @@ -0,0 +1,726 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + *  KVM guest address space mapping code
-> + *
-> + *    Copyright IBM Corp. 2007, 2024
-> + *    Author(s): Claudio Imbrenda <imbrenda@linux.ibm.com>
-> + *               Martin Schwidefsky <schwidefsky@de.ibm.com>
+Hi Marek,
 
-nit:
-As this is a new file with new content.
-Remove Martin here and set the copyright to 2025?
+On Thu, 13 Nov 2025 09:52:23 +0000,
+Marek Szyprowski <m.szyprowski@samsung.com> wrote:
+>=20
+> On 09.11.2025 18:15, Marc Zyngier wrote:
+> > The trap bits are currently only set to manage CPU errata. However,
+> > we are about to make use of them for purposes beyond beating broken
+> > CPUs into submission.
+> >
+> > For this purpose, turn these errata-driven bits into a patched-in
+> > constant that is merged with the KVM-driven value at the point of
+> > programming the ICH_HCR_EL2 register, rather than being directly
+> > stored with with the shadow value..
+> >
+> > This allows the KVM code to distinguish between a trap being handled
+> > for the purpose of an erratum workaround, or for KVM's own need.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+>=20
+> This patch landed in today's linux-next as commit ca30799f7c2d ("KVM:=20
+> arm64: Turn vgic-v3 errata traps into a patched-in constant"). In my=20
+> tests I found that it triggers oops and breaks booting on Raspberry Pi5=20
+> and Amlogic SM1 based boards: Odroid-C4 and Khadas VIM3l. Here is the=20
+> failure log:
+>=20
+> alternatives: applying system-wide alternatives
+> Internal error: Oops - Undefined instruction: 0000000002000000 [#1]=C2=A0=
+ SMP
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 18 Comm: migration/0 Not tainted 6.18.0-rc3+ #11665=20
+> PREEMPT
+> Hardware name: Raspberry Pi 5 Model B Rev 1.0 (DT)
+> Stopper: multi_cpu_stop+0x0/0x178 <- __stop_cpus.constprop.0+0x7c/0xc8
+> pstate: 604000c9 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
+> pc : vgic_v3_broken_seis+0x14/0x44
+> lr : kvm_compute_ich_hcr_trap_bits+0x48/0xd8
+> ...
+> Call trace:
+>  =C2=A0vgic_v3_broken_seis+0x14/0x44 (P)
+>  =C2=A0__apply_alternatives+0x1b4/0x200
+>  =C2=A0__apply_alternatives_multi_stop+0xac/0xc8
+>  =C2=A0multi_cpu_stop+0x90/0x178
+>  =C2=A0cpu_stopper_thread+0x8c/0x11c
+>  =C2=A0smpboot_thread_fn+0x160/0x32c
+>  =C2=A0kthread+0x150/0x228
+>  =C2=A0ret_from_fork+0x10/0x20
+> Code: 52800000 f100203f 54000040 d65f03c0 (d53ccb21)
+> ---[ end trace 0000000000000000 ]---
+> note: migration/0[18] exited with irqs disabled
+> note: migration/0[18] exited with preempt_count 1
+> rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> rcu:=C2=A0=C2=A0=C2=A0=C2=A0 1-...0: (7 ticks this GP) idle=3D0124/1/0x40=
+00000000000000=20
+> softirq=3D9/10 fqs=3D3250
+> rcu:=C2=A0=C2=A0=C2=A0=C2=A0 2-...0: (7 ticks this GP) idle=3D0154/1/0x40=
+00000000000000=20
+> softirq=3D9/10 fqs=3D3250
+> rcu:=C2=A0=C2=A0=C2=A0=C2=A0 3-...0: (7 ticks this GP) idle=3D018c/1/0x40=
+00000000000000=20
+> softirq=3D9/10 fqs=3D3250
+> rcu:=C2=A0=C2=A0=C2=A0=C2=A0 (detected by 0, t=3D6502 jiffies, g=3D-1179,=
+ q=3D2 ncpus=3D4)
+> Sending NMI from CPU 0 to CPUs 1:
+> Sending NMI from CPU 0 to CPUs 2:
+> Sending NMI from CPU 0 to CPUs 3:
+>=20
+> Let me know how I can help in debugging this issue.
 
-...
+I think the common thing between these machines is that although they
+run VHE, they are stuck with a GICv2, and should never get to this
+code path.
+
+Can you dump the kernel log until this point? Something must be
+screwed in the detection logic.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
 
