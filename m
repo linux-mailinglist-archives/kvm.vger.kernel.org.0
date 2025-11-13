@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-62999-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63000-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BB5DC57115
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 12:02:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 729FAC5712A
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 12:03:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 543433A4EC0
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 10:57:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DA963BA24D
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 10:59:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D00335073;
-	Thu, 13 Nov 2025 10:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA75C33507B;
+	Thu, 13 Nov 2025 10:59:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JTpcO1k0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rgAn7lju"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FF633436A;
-	Thu, 13 Nov 2025 10:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063FD1F5EA;
+	Thu, 13 Nov 2025 10:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763031416; cv=none; b=r42+j2sAEabnZkwTV+33E0zwJYXEiv73r1PSxbfAWpNbKvof98k17VIWmv+xaF19FEgfGpJOmPn7Ku2nBRW6uB+4Kj9WorXrQAjUCt4TekFx0bnAmrYpE0ho6F0KlNfbcCPjxQb665qfVb9DvoZGqYGM9dgNsBHJjR9hZhqLn6I=
+	t=1763031556; cv=none; b=sdd1JtHtWZ+4oN4w1bZsu28NhqQBpj2fKtKbrMP2tUlJC5eO86xLuDywC+opEt0nbtiFfu6Eu1sE5MS4dNgsPKgATZAzfJP4bKuOTI/tXU2yfREoA37z9pfXz8/S5yHH+J6jpH8uoSTcUzl3Mm6c3wpVvmnOUK3Y8x2T56Ftdso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763031416; c=relaxed/simple;
-	bh=RwaVnsdgpISyeE4GiZ82KJN1s6WkXDzSwm4Kq3Nfw3M=;
+	s=arc-20240116; t=1763031556; c=relaxed/simple;
+	bh=Zvdweb7sPHEeEOATLYg5ZKE15WfGNFkQDUUENT+CM2M=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lxRlFJeNqjyOvKw5lgmLuDOWw3q2abvhi4RMcguWGXx8mJC7q68mDFxdgSL7fYmbYSmocTXVPoYEdHUjlRpxl0+me+179beUloi0PoItEV9AV7A0zYIlHORAQpbgyNozEN1Om2Srm8vMm1k5iLMQko3OJtvxznpBgO+RJFbH+fY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JTpcO1k0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1AA2C4CEF1;
-	Thu, 13 Nov 2025 10:56:55 +0000 (UTC)
+	 MIME-Version:Content-Type; b=eTpL+Q8IIdjJjLzOrqGEBc7BA3UecnrXAjM/tHYxBSnjkHH+zMyHYgKGX1tQe1lWMZLOeNPW5cdKI9jY4sl5MRyhfEZz91M351qLSNNoXTvbJFsy3HW8DJ6AQpuSdsqlIdNheGKJbzTl7Kn+WvE0GBsnkh64PNxrramjZ4SYAoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rgAn7lju; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B6EDC4CEF8;
+	Thu, 13 Nov 2025 10:59:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763031416;
-	bh=RwaVnsdgpISyeE4GiZ82KJN1s6WkXDzSwm4Kq3Nfw3M=;
+	s=k20201202; t=1763031555;
+	bh=Zvdweb7sPHEeEOATLYg5ZKE15WfGNFkQDUUENT+CM2M=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JTpcO1k0Rctuhgx/PJZVV5iU65CxvhM5w2CTGGYt4dyI3ZD9EqNSzmIbqxoO4329k
-	 IcFgrQ5ljyvAi9cjuHHuQ2IJTCZGpFYNLU4Dgwk0pl2IsA7SJ6p5fE6sqID5Yx+Gr+
-	 86pnBGy9nS1OsdBoerc8ur+EkOxmRbhrYgZ//+MOlXyw7zMoLLsC8a6yX9oklMrklZ
-	 Bgoiw2qc1f8HZAO/iaIWPbracGoNwAYi+MPCsiF8rj0cKaJhiCkB9H8EFQNPjY252Q
-	 XZ4DkU6FtyhH2EYiK51JwFkiMeO6DFJrHnaSNByuggAZhBzvokbuR6IqF61B/znBmL
-	 5kowCzCR1vBGA==
+	b=rgAn7ljucc1JPWaouEyA8zXhdLpPmZmFbDbjO4S3nTHajpiLuhplgiWIlOw+pwCaB
+	 5DKkwciq0/+d9fuSjkTT7YegU+jC5E0sNoZaQVvZRsi9Dvr81nsG2Cke1fCje2fJjU
+	 8/2iVkzdSSNG3y3k0zRC+13VHg7VASh0UQICb50YmzY1uJQmTUHbs/P4cs37ZtxcrX
+	 7dCblITogY7v2CfelGJJ3kbzmNOpZviCSwDUpGGu1adTcG+ijz6pDlCdHnNVQewEO4
+	 Uy2Ia2FV6WmEQDG8kozDJvRZftMvVpRbwjzF6GmvBIBIaD1SmHTk09FNZ0Pr93Bsz+
+	 OOz8LUCx0PJBA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vJV0X-00000004qPg-1fAd;
-	Thu, 13 Nov 2025 10:56:53 +0000
-Date: Thu, 13 Nov 2025 10:56:52 +0000
-Message-ID: <86seeitd3f.wl-maz@kernel.org>
+	id 1vJV2n-00000004qU6-0pnK;
+	Thu, 13 Nov 2025 10:59:13 +0000
+Date: Thu, 13 Nov 2025 10:59:12 +0000
+Message-ID: <86qzu2tczj.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Marek Szyprowski <m.szyprowski@samsung.com>
 Cc: kvmarm@lists.linux.dev,
@@ -85,8 +85,6 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: m.szyprowski@samsung.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-
-Hi Marek,
 
 On Thu, 13 Nov 2025 09:52:23 +0000,
 Marek Szyprowski <m.szyprowski@samsung.com> wrote:
@@ -155,16 +153,25 @@ Marek Szyprowski <m.szyprowski@samsung.com> wrote:
 >=20
 > Let me know how I can help in debugging this issue.
 
-I think the common thing between these machines is that although they
-run VHE, they are stuck with a GICv2, and should never get to this
-code path.
-
-Can you dump the kernel log until this point? Something must be
-screwed in the detection logic.
-
-Thanks,
+Wild guess. Can you try this (untested)?
 
 	M.
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index fc7a4cb8e231d..598621b14a30d 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -829,8 +829,8 @@ static const struct midr_range broken_seis[] =3D {
+ static bool vgic_v3_broken_seis(void)
+ {
+ 	return (is_kernel_in_hyp_mode() &&
+-		(read_sysreg_s(SYS_ICH_VTR_EL2) & ICH_VTR_EL2_SEIS) &&
+-		is_midr_in_range_list(broken_seis));
++		is_midr_in_range_list(broken_seis) &&
++		(read_sysreg_s(SYS_ICH_VTR_EL2) & ICH_VTR_EL2_SEIS));
+ }
+=20
+ void noinstr kvm_compute_ich_hcr_trap_bits(struct alt_instr *alt,
 
 --=20
 Without deviation from the norm, progress is not possible.
