@@ -1,252 +1,248 @@
-Return-Path: <kvm+bounces-63008-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63009-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FAC9C574C8
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 13:00:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4A01C5751C
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 13:02:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA56C3B7F37
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 11:58:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C874F3B8EC4
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 12:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B34B34D4D4;
-	Thu, 13 Nov 2025 11:58:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6125E34DB7F;
+	Thu, 13 Nov 2025 12:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="UcDjy4r1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBk8bIqm"
 X-Original-To: kvm@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011026.outbound.protection.outlook.com [40.93.194.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B2333D6F9;
-	Thu, 13 Nov 2025 11:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.26
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763035108; cv=fail; b=QRIt7G681XiP8dsyJ5kiQubYLGDvRShOFkbvE3SxfSG9aEYsKl31Of50Ksp71GnF79LyGD2KOr2V8JS+nUXIFW+vwtqhElqNXjwZunfotxewJVfo9f6XL+LP6D4FAARheE+uLjQIi7ZDexl2icPa0unOXp4mVyj32Dak+YTMe3M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763035108; c=relaxed/simple;
-	bh=1Cx50zctEONqefLPHiZnsthKGwF//2RYUKV+y8S5Tkw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Kx9dziDNP1riPl+n39pWou8OCYiDFBbGlRwj3f6s3cK3kCGeT+z9Nx6k41R6P6XaEQ5+05Px/qN6iSiSovTewmn4X8hd2H2Ctp5wbOdk67lSMeo9QQBh4rC/FafciiL0HqqvT9LX/yaxKvkqApIFX2XRkL8AOsgXpn/btGMbMPI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=UcDjy4r1; arc=fail smtp.client-ip=40.93.194.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=piXKQxvJL5AogsA6CW4msQDjU0P7xWUm2wwqBWdPUkk7uE8/UF8fR43fg6Fh3Wv79gEwIEG/QFYb8M0tXeHc/XS6795q4gB+vkCPtfflkt1toUCgrtXp8S9DWjP3ag+bQZo9HD6V/mLak+2y99Q+Ux7KQ0KRNhc+CDvl1gaTkKnEzhaEtEkmd9AnHtBWbkJONu0kU7xvWOmtOEdp6NGGXHtX8eRBxQXiKYp2o78aAyvxq8sNwuNm6hha6LdlV6iuZ/zmUAOxIl1LzVWtm3qxMYBjnftLR4xXLOU+hqFOKKVVNWn1WBhlLAnNjUd1VN2kTc18f6hVw/rBQMhozPXTXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CNzkxJpEtbEfot+Bix7y83KXkacAkmVq2QVi+bvk6zM=;
- b=J9Fcqzf2fB1mv+FXiX/d8tkGngFoIJ/EV4eKXtC2kZqY3lWCiWKZG/G3FOl0LzpeaoKY1zq8aCC8ez5EoMyZuQJbKBp68XPpoRc8PZYxL7snwFDR75PcmJ2PhQpE0hlBZxzkh3MmX78qBvd/NP/rrbxlr7QPz4zm1ONvRvGa0qeBuVMg+vN9PAmpgXbtqNDC5KPWRRksuTSwXgE960s/92NKLMzsBzdXXnOUr75yIXmLf3SpfVrODykYcSCj4+HQZHpbLpOnAXenTnpPqc7pd+yr040W77bAMq82fWf3N2Hp+Tox83ipI6fTtmN9XBlBaiZCbIrChcmm70D+LB1kAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=linux.dev smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CNzkxJpEtbEfot+Bix7y83KXkacAkmVq2QVi+bvk6zM=;
- b=UcDjy4r1I1SPqxuEEtwm9DbBX4AkDJDOqRvKr937qlIEWm1ZvtzPaCDIClYEBYE8yK/XudkVGYm86UX18yK08sIiqOX0LIb9l0U4FgHccdWjYf25YztgoUokhNEmCeADBsD17jkhqXtvxuE7x6VpqeSfxY9+JNdL5fup9NBkdeM=
-Received: from BYAPR05CA0017.namprd05.prod.outlook.com (2603:10b6:a03:c0::30)
- by DS7PR12MB6046.namprd12.prod.outlook.com (2603:10b6:8:85::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.17; Thu, 13 Nov
- 2025 11:58:21 +0000
-Received: from MWH0EPF000971E3.namprd02.prod.outlook.com
- (2603:10b6:a03:c0:cafe::cf) by BYAPR05CA0017.outlook.office365.com
- (2603:10b6:a03:c0::30) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.6 via Frontend Transport; Thu,
- 13 Nov 2025 11:58:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
-Received: from satlexmb08.amd.com (165.204.84.17) by
- MWH0EPF000971E3.mail.protection.outlook.com (10.167.243.70) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9320.13 via Frontend Transport; Thu, 13 Nov 2025 11:58:20 +0000
-Received: from SATLEXMB06.amd.com (10.181.40.147) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Thu, 13 Nov
- 2025 03:58:19 -0800
-Received: from satlexmb08.amd.com (10.181.42.217) by SATLEXMB06.amd.com
- (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 13 Nov
- 2025 05:58:19 -0600
-Received: from [10.252.220.243] (10.180.168.240) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Thu, 13 Nov 2025 03:58:17 -0800
-Message-ID: <1f39d5a3-e728-4b2b-a9c6-50cbc4fffd17@amd.com>
-Date: Thu, 13 Nov 2025 17:28:11 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020D4333739
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 12:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763035235; cv=none; b=kccdX21MV6LYQ6MVna4XgMIRwCighiUDXNlhm/IeAWjxJv5cNVDCj9ghTepDkpSpj5eUlXGvj+kk5IqyRPrqi+nQSxYwoe+LoEwpmgDcxkC0Hx9k3aYxz9W7mBcpLo++pp+Rg3UmakGfPLEF6eC0ay1GleslwCSZAcZzn5ywSCc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763035235; c=relaxed/simple;
+	bh=4P4LhGMXNDpOMLzkgSnNvj8G+OXHvtlSD4CrCtiKVM4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L9ppSWYiim+h5Odu9ntur36gORoqpINBFzuW+807HyLvQ09k0dlxXvHYBXnVFdZRWOHhQXI3d81JWRnnUHMrAbQ/sXkCdDV7yTbJb0kVfYeOiTrz2E28bb4unFL1kzzTSEg2tpo3Y57kWqH0E72ek+By23/aT02b1G/5oNsUjtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBk8bIqm; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-340a5c58bf1so496911a91.2
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 04:00:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763035233; x=1763640033; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VMbZe017tqsUHZpQ2QjARaQuit2dg0zAawqoQ3eFuRM=;
+        b=eBk8bIqm4A2dQDXlFI/NG+b82jOhbvl6/xQehWcEWuZS7pJeHVAehMQZLOi+UACtO3
+         4Op2eR2/eCjS7mfhhKpF0VHuBA51iwu2PUMh1moYR1ka8fyFXdM1G897+NAoDJQpKY3z
+         2iJdpworRIZwfFeQyzQllzanrWrTAAXCMLYc17EzC9GpIBOxppD6nrIZQYsoX3ePqqAR
+         DEfP7BD6oC7ese65TnBmff2J5ymszsIIOI3kZskzfysvvrac9ShEpKH6IrQmaAtFuMKt
+         g9ZRD+EdrOnfiCCbbLxiot5DeeBOBUL6AUUkqJY9xMrx31c9YF46BJf/LRFimyA2DxSV
+         Ptbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763035233; x=1763640033;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=VMbZe017tqsUHZpQ2QjARaQuit2dg0zAawqoQ3eFuRM=;
+        b=Zq8/6KLbWbY1Gq3huCCR0/yYmNcnGxuQ2qPAUBH+OoyvPJo6/H+3tSFf5ifdIgcwI6
+         HKOTcttD1B2/WKEw1+xMdpI+Spx5KrjJkSEDSxFCsqa140rN+XKaVDrtUjypdDBAeb3v
+         Zv6BdKEN47rhag9MkzZ4bdmyM9UBHIPP1dwq+M2NWs71BRK1UBlCxwkX6S58luLQMLF9
+         HLZ/Rxn+TbQ91sX/Pud1AXda+6jxou21+TsUjS12NwZCe/x4Nl2ef1ZX1+yPbaEq0Ye5
+         1+OA3VdGJue0Cgjn8xbRsTJ0utQSGNgD338vQ+tiTnrWx82k2rZOND+OtpUwre1fGdM7
+         eI7g==
+X-Forwarded-Encrypted: i=1; AJvYcCUHMRsJspvXMyMxv6qZPJjMlGbCfd8a3rpfNc1/YsYlkdIRjialCY0n8slQI9FCx5BT/CM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJ/D7nBRTZ2okHD9cr6p5M1j7T5ssqJRFdNFnjQqFBUwH7FTtF
+	GeHsHHjZDxj0gpPwaFbp1Z+CDT9Fu8WyzFy4qHspG+GgUSr2LU92VD9PlOI17TqbU8bSNq9hLhB
+	pQTtoePggxGZPKsQr4HrSO5Q+mai2jqU=
+X-Gm-Gg: ASbGncu23gPDqYkixvSgf0jdc1KrSWCLT9WeSlMACJXvYF0neCX3QQIgq83Lx37jZ25
+	saVhE5g9tRUa5zHxXSIM7x54rnKYDnZjVtv7tFy3lLLRlrT6DAlVHyArzQ6C1YOhhTrFM27B+hb
+	qFcQJKdQkAh4kwUDllqwMaLTJHCTcQD9c/YxIFtoDFoJwb3IrbQjLaINBGDCm6Dj1GtfLa0e5hI
+	+X01G7253INY1WXq1a1TcFJ5ZCuRSG/7gWuMtqVG/oTj5RDs88psJwHQevA
+X-Google-Smtp-Source: AGHT+IEI2/ETIyN+HIgY1WEvq69lhMhuMqrT7htmjzbXfUhWwBXWYHygAT11nF7Fs+GljLoWjfY7MsHoOczG1GMYc8c=
+X-Received: by 2002:a17:90a:d448:b0:340:f7d6:dc70 with SMTP id
+ 98e67ed59e1d1-343dde13826mr7620363a91.13.1763035233051; Thu, 13 Nov 2025
+ 04:00:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 12/14] x86/svm: Cleanup LBRV tests
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
-	<seanjc@google.com>, Kevin Cheng <chengkev@google.com>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20251110232642.633672-1-yosry.ahmed@linux.dev>
- <20251110232642.633672-13-yosry.ahmed@linux.dev>
-Content-Language: en-US
-From: Shivansh Dhiman <shivansh.dhiman@amd.com>
-In-Reply-To: <20251110232642.633672-13-yosry.ahmed@linux.dev>
+References: <20251110033232.12538-1-kernellwp@gmail.com> <20251110033232.12538-3-kernellwp@gmail.com>
+ <015bfa4d-d89c-4d4e-be06-d6e46aec28cb@amd.com>
+In-Reply-To: <015bfa4d-d89c-4d4e-be06-d6e46aec28cb@amd.com>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Thu, 13 Nov 2025 20:00:21 +0800
+X-Gm-Features: AWmQ_bm9GFF_fVDEXPJNSBQ91hN0PH9vClzZfoOKcy5ZG0d_ttlXsdzXEocsdlQ
+Message-ID: <CANRm+CzsjNyd9-QjUupszpULNkJ31U+wPWC81A5jaTFRFdPfMg@mail.gmail.com>
+Subject: Re: [PATCH 02/10] sched/fair: Add rate-limiting and validation helpers
+To: K Prateek Nayak <kprateek.nayak@amd.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Wanpeng Li <wanpengli@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E3:EE_|DS7PR12MB6046:EE_
-X-MS-Office365-Filtering-Correlation-Id: 49fa27e9-9957-4862-c72b-08de22abf0b0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MjNoVGFzak0vQXdYMm5qWnhJWW1ZeGdsL0FMYnlueU1NVjNHelN5eldObWlH?=
- =?utf-8?B?Rkx4OHdUN010QkFDeW5vNTh6UUp6UEIxanlFeWxocHlZcWYxeFdQdmZhdlha?=
- =?utf-8?B?OGowMXBzYjMvTC9uTzB4OFpoR3Jzc1VYMnk5d0lrU2QrMWl1ZGRlT0NtbU9q?=
- =?utf-8?B?bHFTRFVGcENEVmJOOTRYcWJMakNuQm5TcEF5SERKVW5nV2xpTGMzN2JvUEl1?=
- =?utf-8?B?NFl2WDZFTEdGeTRzNmc4N3BCNDJIVTdCOE5ibFRPbUhJZG5lMGo2L1hiTWht?=
- =?utf-8?B?bWNSOFZVcUNzODc0MlZEeDVvS1pEUlJEN0l1Q05MTWtWcGIyWUk5bnVOc0Uz?=
- =?utf-8?B?YmFUbTZmUTA2bkRadkxTSlhvRi9wdzJCYjBKa2JMSE9MUDIyeVNLRVQ2eXFY?=
- =?utf-8?B?U25oUHprR0VyY1d6RTAzdWxzS2xMT1R4VWNRMXI2WWllU25qbHQ5Yzg3TEdr?=
- =?utf-8?B?aGt6cTVVNVBpU1FTSDYyb2tkWCsrZjkxcURJYnVPcVhHdnRPNGk5aklUM3hu?=
- =?utf-8?B?MnowUDRRZjRBQVFqTHJGZHRFN2ZHQVlETVhkYXRxYkYydGhraFY0UmUyYlF6?=
- =?utf-8?B?cW9leTRFL0VFQ21ock9zZVlDVjZMNWJWZUNSR1pBWnN0SFNnb29FeEFHbmNz?=
- =?utf-8?B?WHpCQ0orWkYxeDlJNG1NanpRekZYSW9zc2NGSk8vYWxpdC9LOERheU9lUGFU?=
- =?utf-8?B?RUttbjFYcGNGY3VvaWdGUjFMQ3d2UFYvUk02S3JYU3QycmR1NGV1dXBsbHdP?=
- =?utf-8?B?SHlwUlZNTGk2RXZ5dFlKbTNTV25PZ0ZsTkdKZk0vNjVkZXdJZGxsK05aT3Fo?=
- =?utf-8?B?RGdtNE93QkV1dFZLM0tIczA2dHNIelVySFpBYktIVERZRFVtYnYrcXFkSkQy?=
- =?utf-8?B?QVcreWFUMWVPNHFZdUs1cWV4clRwSHNDaVRTdVdEdmJHOGE5Q1Z4TzBpMlVW?=
- =?utf-8?B?ZlM2L3VCUWZDdkUrRXB1TlRXeWttN05rVnliaW9NWWRPdkd1WG1ISHhscUtP?=
- =?utf-8?B?ODRRRDVtZE5pRnJYdDJQSFRsdFR6NUw0czl2QnpNYUxwdTNtVi9CQWswMzZD?=
- =?utf-8?B?Z0Ryazh3K2Q4WlUzNWI4U0tua2lpcVlUNGF6Mk1Hbkt1akh3dVFZWWl0TTZP?=
- =?utf-8?B?aUVlZmpzTW9wMHVNa3NZNVpmRG5UTVpnUm0wRUo5L0ZjRHVWaGJKVTgzMlZF?=
- =?utf-8?B?ZHlrVlI4a0VtMlU2cjVWamZ0NFErYS84ckNUcC8rZFoxN2ZjMnRPZlY2YnBZ?=
- =?utf-8?B?YkRzOGowdGsxam52RHJkUmdvOUVyaW55YjhrTjdJSm1TVzR0a1ZlMFJwVGlG?=
- =?utf-8?B?c0JQd05XZUFJNUhQbTNRSjFxbDh6Y2Y2Ym84T1lzeW9YaStrWmQwKzFzamlS?=
- =?utf-8?B?YXpqSDlIL0twMEkvelVQVjlVQVVFaDBvZnAzYWF3RklBQW1jWW0rU3JpbEs1?=
- =?utf-8?B?U08zSDNab2JuS29HNjd4dWF2RW9pMG9tM01OOU93NnozYy9MYlB3RVNZWEVF?=
- =?utf-8?B?MFFaRVFLK3pTdUdmV3ZLZkE5cG5aZDdPOUduQlQ3RHZoUU5RNWdGcElCWExZ?=
- =?utf-8?B?VVFHVmJMcHBhRGJibUtpRitmQkErUlRnQjJ1RU9zUzR4MnhPMnE0VEtSZ3pp?=
- =?utf-8?B?SkVINkljZjFnTTNXVzhOcjR0bDNPUU9NOUY0T2daelo1R0xLb0NNNWYwTG92?=
- =?utf-8?B?UUdReHNoK0tyY3ROalpWM2RYZXZVTmhmNkg2WThsaG5EUXRyczhxRndLd3Bs?=
- =?utf-8?B?RkJ4aml6aXFrR0UxZGdaanZZSzZ0ZnFqekFJY2tDcHVPWDVoTHhmUHZQc05U?=
- =?utf-8?B?ejlMNGZkLzdUQXp0WllrSk9XdlVhZXZzZzdMZXdiaEN5dHR4OSs0MURxSUwx?=
- =?utf-8?B?VGl4UG96MmhJejFqQ1U5TTZMOFRSMktxWUpUZkhXWFlVWkJwK1BYT1ZYLzl3?=
- =?utf-8?B?SXZuVVh1VFB0RVdkT3UzcDlXQTcvSm5KdnVNUFIyOFdlVlpXMm55R0xpS0V2?=
- =?utf-8?B?UVpIcUVhSE16TjVOU1VTL0s3dDlDZXRZOFpuY2Z2b0k4MURsTmZocGd4VS9v?=
- =?utf-8?B?Y0tGNDdMc1dzekN6Y2dTaWtKSmJxajFJSFZ4SmdaT2xzaENoNEJvL1dLblNO?=
- =?utf-8?Q?rUSQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2025 11:58:20.4720
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49fa27e9-9957-4862-c72b-08de22abf0b0
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E3.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6046
+Content-Transfer-Encoding: quoted-printable
 
-Hi Yosry,
+Hi Prateek=EF=BC=8C
 
-I tested this on EPYC-Turin and found that some tests seem to be a bit flaky.
-See below.
+On Wed, 12 Nov 2025 at 14:40, K Prateek Nayak <kprateek.nayak@amd.com> wrot=
+e:
+>
+> Hello Wanpeng,
+>
+> On 11/10/2025 9:02 AM, Wanpeng Li wrote:
+> > +/*
+> > + * High-frequency yield gating to reduce overhead on compute-intensive=
+ workloads.
+> > + * Returns true if the yield should be skipped due to frequency limits=
+.
+> > + *
+> > + * Optimized: single threshold with READ_ONCE/WRITE_ONCE, refresh time=
+stamp on every call.
+> > + */
+> > +static bool yield_deboost_rate_limit(struct rq *rq, u64 now_ns)
+> > +{
+> > +     u64 last =3D READ_ONCE(rq->yield_deboost_last_time_ns);
+> > +     bool limited =3D false;
+> > +
+> > +     if (last) {
+> > +             u64 delta =3D now_ns - last;
+> > +             limited =3D (delta <=3D 6000ULL * NSEC_PER_USEC);
+> > +     }
+> > +
+> > +     WRITE_ONCE(rq->yield_deboost_last_time_ns, now_ns);
+>
+> We only look at local rq so READ_ONCE()/WRITE_ONCE() seems
+> unnecessary.
 
-On 11-11-2025 04:56, Yosry Ahmed wrote:
-> @@ -3058,55 +3041,64 @@ u64 dbgctl;
->  
->  static void svm_lbrv_test_guest1(void)
->  {
-> +	u64 from_ip, to_ip;
-> +
->  	/*
->  	 * This guest expects the LBR to be already enabled when it starts,
->  	 * it does a branch, and then disables the LBR and then checks.
->  	 */
-> +	dbgctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
-> +	TEST_EXPECT_EQ(dbgctl, DEBUGCTLMSR_LBR);
+You're right. Since we're under rq->lock and only accessing the local
+rq's fields, READ_ONCE()/WRITE_ONCE() provide no benefit here. Will
+simplify to direct access.
 
-This TEST_EXPECT_EQ is run when LBR is enabled, causing it to change last
-branch. I tried to move it below wrmsr(MSR_IA32_DEBUGCTLMSR, 0) and it works
-fine that way.
+>
+> > +     return limited;
+> > +}
+> > +
+> > +/*
+> > + * Validate tasks and basic parameters for yield deboost operation.
+> > + * Performs comprehensive safety checks including feature enablement,
+> > + * NULL pointer validation, task state verification, and same-rq requi=
+rement.
+> > + * Returns false with appropriate debug logging if any validation fail=
+s,
+> > + * ensuring only safe and meaningful yield operations proceed.
+> > + */
+> > +static bool __maybe_unused yield_deboost_validate_tasks(struct rq *rq,=
+ struct task_struct *p_target,
+> > +                                       struct task_struct **p_yielding=
+_out,
+> > +                                       struct sched_entity **se_y_out,
+> > +                                       struct sched_entity **se_t_out)
+> > +{
+> > +     struct task_struct *p_yielding;
+> > +     struct sched_entity *se_y, *se_t;
+> > +     u64 now_ns;
+> > +
+> > +     if (!sysctl_sched_vcpu_debooster_enabled)
+> > +             return false;
+> > +
+> > +     if (!rq || !p_target)
+> > +             return false;
+> > +
+> > +     now_ns =3D rq->clock;
+>
+> Brief look at Patch 5 suggests we are under the rq_lock so might
+> as well use the rq_clock(rq) helper. Also, you have to do a
+> update_rq_clock() since it isn't done until yield_task_fair().
 
->  
->  	DO_BRANCH(guest_branch0);
->  
-> -	dbgctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
-> +	/* Disable LBR before the checks to avoid changing the last branch */
->  	wrmsr(MSR_IA32_DEBUGCTLMSR, 0);> +	dbgctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
-> +	TEST_EXPECT_EQ(dbgctl, 0);
->  
-> -	if (dbgctl != DEBUGCTLMSR_LBR)
-> -		asm volatile("ud2\n");
-> -	if (rdmsr(MSR_IA32_DEBUGCTLMSR) != 0)
-> -		asm volatile("ud2\n");
-> +	get_lbr_ips(&from_ip, &to_ip);
-> +	TEST_EXPECT_EQ((u64)&guest_branch0_from, from_ip);
-> +	TEST_EXPECT_EQ((u64)&guest_branch0_to, to_ip);
->  
-> -	GUEST_CHECK_LBR(&guest_branch0_from, &guest_branch0_to);
->  	asm volatile ("vmmcall\n");
->  }
->  
->  static void svm_lbrv_test_guest2(void)
->  {
-> +	u64 from_ip, to_ip;
-> +
->  	/*
->  	 * This guest expects the LBR to be disabled when it starts,
->  	 * enables it, does a branch, disables it and then checks.
->  	 */
-> -
-> -	DO_BRANCH(guest_branch1);
->  	dbgctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
-> +	TEST_EXPECT_EQ(dbgctl, 0);
->  
-> -	if (dbgctl != 0)
-> -		asm volatile("ud2\n");
-> +	DO_BRANCH(guest_branch1);
->  
-> -	GUEST_CHECK_LBR(&host_branch2_from, &host_branch2_to);
-> +	get_lbr_ips(&from_ip, &to_ip);
-> +	TEST_EXPECT_EQ((u64)&host_branch2_from, from_ip);
-> +	TEST_EXPECT_EQ((u64)&host_branch2_to, to_ip);
->  
->  	wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
->  	dbgctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
-> +	TEST_EXPECT_EQ(dbgctl, DEBUGCTLMSR_LBR);
+Good catch. Since yield_to() holds rq_lock but doesn't call
+update_rq_clock() before invoking yield_to_task(), I need to call
+update_rq_clock(rq) at the start of yield_to_deboost() and use
+rq_clock(rq) instead of direct rq->clock access. This ensures the
+clock is current before rate limiting checks.
 
-Same thing here as well.
+>
+> > +
+> > +     if (yield_deboost_rate_limit(rq, now_ns))
+> > +             return false;
+> > +
+> > +     p_yielding =3D rq->curr;
+> > +     if (!p_yielding || p_yielding =3D=3D p_target ||
+> > +         p_target->sched_class !=3D &fair_sched_class ||
+> > +         p_yielding->sched_class !=3D &fair_sched_class)
+> > +             return false;
+>
+> yield_to() in syscall.c has already checked for the sched
+> class matching under double_rq_lock. That cannot change by the
+> time we are here.
 
-> +
->  	DO_BRANCH(guest_branch2);
->  	wrmsr(MSR_IA32_DEBUGCTLMSR, 0);
->  
-> -	if (dbgctl != DEBUGCTLMSR_LBR)
-> -		asm volatile("ud2\n");
-> -	GUEST_CHECK_LBR(&guest_branch2_from, &guest_branch2_to);
-> +	get_lbr_ips(&from_ip, &to_ip);
-> +	TEST_EXPECT_EQ((u64)&guest_branch2_from, from_ip);
-> +	TEST_EXPECT_EQ((u64)&guest_branch2_to, to_ip);
->  
->  	asm volatile ("vmmcall\n");
->  }
-Reviewed-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
+Correct. The sched_class checks are redundant since yield_to() already
+validates curr->sched_class =3D=3D p->sched_class under double_rq_lock(),
+and sched_class cannot change while holding the lock. Will remove.
 
-Other tests look good to me, and work fine.
+>
+> > +
+> > +     se_y =3D &p_yielding->se;
+> > +     se_t =3D &p_target->se;
+> > +
+> > +     if (!se_t || !se_y || !se_t->on_rq || !se_y->on_rq)
+> > +             return false;
+> > +
+> > +     if (task_rq(p_yielding) !=3D rq || task_rq(p_target) !=3D rq)
+>
+> yield_to() has already checked for this under double_rq_lock()
+> so this too should be unnecessary.
 
-Tested-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
+Right. yield_to() already ensures both tasks are on their expected run
+queues under double_rq_lock(), so the task_rq(p_yielding) !=3D rq ||
+task_rq(p_target) !=3D rq check is redundant. Will remove.
 
+>
+> > +             return false;
+> > +
+> > +     *p_yielding_out =3D p_yielding;
+> > +     *se_y_out =3D se_y;
+> > +     *se_t_out =3D se_t;
+>
+> Why do we need these pointers? Can't the caller simply do:
+>
+>     if (!yield_deboost_validate_tasks(rq, target))
+>         return;
+>
+>     p_yielding =3D rq->donor;
+>     se_y_out =3D &p_yielding->se;
+>     se_t =3D &target->se;
 
+You're right, the output parameters are unnecessary. The caller can
+derive them directly:
+   p_yielding =3D rq->donor (accounting for proxy exec)
+   se_y =3D &p_yielding->se
+   se_t =3D &target->se
+I'll simplify yield_deboost_validate_tasks() to just return bool and
+let the caller obtain these pointers.
 
+>
+> That reminds me - now that we have proxy execution, you need
+> to re-evaluate the usage of rq->curr (running context) vs
+> rq->donor (vruntime context) when looking at all this.
+
+Good catch. Since we're manipulating vruntime/deadline/vlag, I should
+use rq->donor (scheduling context) instead of rq->curr (execution
+context). In the yield_to() path, curr should equal donor (the
+yielding task is running), but using donor makes the vruntime
+semantics clearer and consistent with
+update_curr_fair()/check_preempt_wakeup_fair().
+
+Regards,
+Wanpeng
 
