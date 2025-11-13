@@ -1,123 +1,174 @@
-Return-Path: <kvm+bounces-63105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6530C5AA3E
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:38:09 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D424C5AA59
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:40:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DF7F3AFE01
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:36:29 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0CAEA342FF9
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA2F32C92A;
-	Thu, 13 Nov 2025 23:35:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1947329C69;
+	Thu, 13 Nov 2025 23:37:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S1I3YAKE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G+YpiXtY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06F131D380
-	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 23:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC022C21F0
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 23:37:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763076945; cv=none; b=rJ3f0JneKSK8a3AGh7otqm4xUdFCCegZ+vhzKdpIi7FIQry+QpfLMvttN7HqW7tsCw7pJDEdDW5FIIcJTDz8esVKJQ5Dk3aQXEuQFYYt2pVk+LsPVskqq/ChHnjpQWx9o9uaVReeBG0gIc/EdA2LY8wiyz0NDRZCqYs+8yhuwCA=
+	t=1763077070; cv=none; b=Prg2Sj0HOuoCg4quI8lp+6uajSEHnBr4KKS4WlDuWfvzU/dqH+HuOLYUXAenUnTp+LR39LH9URK3l+QHN33DDONXBrWVAEcbqJOA6aKnFzd6KGxjWYN0hatciNT6kkCSmzM6kstyTGKZHYuZ76D1zMhCYgUIVANFo1DIOSpif7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763076945; c=relaxed/simple;
-	bh=iZwbsjBlUGB/L7Tt4aRhcCGUMR1cTPa3EF2l5Ki/nAc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UYCv71vs93uEkJ/VxtfCWS++8AJ+YC1uQKmYUOBTit6EAvBW+QM+/NRYqHl+E8UnPigz8jISYt4TZ0pBxL8L8VzhvFdsVbtQ2MFKeaLuVrNadLegdUCKdbpfoK/WV4nYe+eaz5IuCW3U0jN9aoYD1q84AwNOSn9/FhjqsGuFmgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S1I3YAKE; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1763077070; c=relaxed/simple;
+	bh=903kH64MTPH0FrxO2I20SFsP3QXq7CDc5tgGcADtgls=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lNBr8yp5m7dcax6f0ieMzQJPJQCBvh6GyssqwWVf40MhB6ym7c9CI5aAjO5Zk0xwQH9QpnGzY6ag/tAEQ5YgGdH0qKnwZiE/jzBHdAAO6rPHe0sRStxwxcERZg+R39bxzni5tvm92gYFutTs6BRyM9xAu+3T2mto/lq02syhUms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G+YpiXtY; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29848363458so33820975ad.2
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 15:35:43 -0800 (PST)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7b90740249dso2790819b3a.0
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 15:37:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763076943; x=1763681743; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U9bY2qG6GLBD8ld0AXT/mnVjS4VslzGu1FqILp2o5yc=;
-        b=S1I3YAKEZsS++gGiW8sOcYMb/z+O5sa7y3n8DBcn/d4nC2HNrrcvhdCMFq7CI7NZHx
-         tm/71h4w9Z8HCfOisDmMCyLJc+yuKvBXDPAlv1PwXVo89zMvtdoCmJHMcql6wdbM25Ls
-         nTHwLjdjpf8IK6gCsYC/3Nk0Gp+7u7o2uY3kroeqFn71vC6uyNIJhSX0hPvurP/Bx9sM
-         eO4KHTPIdiadJukFXs2671wv0oetY6SIlQW8ugN/EOC1s7q2pWxrCA6DkXu4MXiZhzsR
-         x54fti7caG0eQP3Cg1XG0MCjnUH4dzwzfUpKaU1JjwOBoPxPNpMQybcfv289iodKwll6
-         oxbg==
+        d=google.com; s=20230601; t=1763077069; x=1763681869; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xkbtepi4QW5KzyC1xYbQMyK3Quk4zx3aODNb7TaxfU4=;
+        b=G+YpiXtYtBrPyA5SUwm7NkHEpmRHio6/kTWLJAIugl4pE+j1SZHNy1GMWkG8Nop/FZ
+         IDeuV/yYVbopkKuRz/+3kT1N6+4+MFiNPca06t6MvH3G4w4L2LAj4BMtQosmt67MJZAd
+         M7vK+FsEaiWkaFq7ZgNfR4535NcdTv540fvyGeUPeIB0axJVIODrx5RQQhiVnXrZSrfT
+         CL3cOxYmQNqCqrKrTXL9+SCNxlHlGerI1+qhIA+sS6OkfBLJHijMPjbisLbmjCUXFK1N
+         z9Gm8MVnQxcjvfjLVVuYLuLU6R5ulQc0WM2RLri5WkJr32yV8j6gGJQOhlVNQpi2Yib/
+         Mc2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763076943; x=1763681743;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U9bY2qG6GLBD8ld0AXT/mnVjS4VslzGu1FqILp2o5yc=;
-        b=gINRlcuLnFa6GF0NhV18Ofye43dAOgKtXENgHCW80WnCFS7XQXqYVC/jM4Mb58CvO5
-         Pa67QtSVHlfWZMFIGjGf1Vu52in6I4d595YQUePEmHaNdtigyvZihHi2aBDNaEVodCMm
-         w8/v4z6jKuxM7xfERMcrUJMNPVre0Y+RS3Ike+Px5ZV96hpsuMmebbT6hkNgSLIjH0jG
-         ND/05AL7S675hovh/T7wyJGaJhxham/S2a59X5YA7lJBzIVJXpAjgIpTR8YUkxPO3xvy
-         wiHngCwkq0iwfrmz0AchiuPj7fE71j2Duj1zf/d5qmdhL0/raeF8H89jxI+akMXCLhwD
-         0O2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWz12bCf9jegbGexigfRreGrkWvk4r31a0dt76GBQkgSANlo7xJcZwXMUZcdYm6ZCbeLc0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJOKZKMtuuX9kasHYGz2XQfxVeq9V8efb0EH21B1O8OfQyjIOK
-	DtZHnbv3dPDm6e6cMQmc+a26X6MExzM+fii1Hy1a6/eHPMXWEnhNGDum28h03uwPvw/DSg3DzVX
-	7mvxAZw==
-X-Google-Smtp-Source: AGHT+IHiEXultMrBzWQBw6MQatdUadNItuUPOf3mN9tETlZpsd9HGNR80a/bTNqX66s75+oFG4xEuoH7iS4=
-X-Received: from plcz19.prod.google.com ([2002:a17:903:4093:b0:297:d486:2aa3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e783:b0:262:cd8c:bfa8
- with SMTP id d9443c01a7336-2986a741baemr8297665ad.34.1763076943007; Thu, 13
- Nov 2025 15:35:43 -0800 (PST)
-Date: Thu, 13 Nov 2025 15:35:41 -0800
-In-Reply-To: <ellmjkhqmgpsbhc4if3emhn3fzbqd3ji4u2dnyvmub6bjgfnti@vtvjhn5cjwrs>
+        d=1e100.net; s=20230601; t=1763077069; x=1763681869;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xkbtepi4QW5KzyC1xYbQMyK3Quk4zx3aODNb7TaxfU4=;
+        b=rGL7Hsct+HSn8m1ft5mfENdJ7yvoQ4sBI1K7DZ0Q97EQFArRVKCXx+jDbNADul8jHb
+         QBcfFetEdMtU56HEBs1njZpexDWTxOAKaCvNpmMFpcgKt8LgnueRzm6JqkXrM84bb7en
+         3gKS+65TwmUNHbJg3UxpfQujEpG+j5acN9lK4SIIzTXzarUsxh8A95At7xcXGMpwQb3E
+         S6CE5ROtXwpeidUBGJQMaeIRWAj4EPa5xiA/yGLbzcOCZ0atb7+YzyeWYOwMEi1fRwrP
+         HVsBmBquxwoxu1W0jcHVqqJCt7JcXxUxTy9Xv+kT6wnsb2/kb3MVojx3KWzYDA7fdfVx
+         D1xA==
+X-Gm-Message-State: AOJu0Yy5GRgDluM3TizBt8SvBklJhH3tYkMCoMBks2upiG4jg7kuHscE
+	LUSR0bc/m1HqjZANNUzWNgHd0pADtCJicg/23UHi3cMAzKNqFH9rR8Jvava99FKzVOyaV5hQPpG
+	nv1nZsw==
+X-Google-Smtp-Source: AGHT+IE58RfmRBXykqVVjWdyfAqYsq5Vc+2tQaoSIgGjVQwUWponWGs2XzQBYvFCrtYDYQ+KnLfCzVvOkDI=
+X-Received: from pgna19.prod.google.com ([2002:a63:7053:0:b0:bc3:57f1:bc8e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7349:b0:34e:1009:4216
+ with SMTP id adf61e73a8af0-35ba057f8ebmr1598941637.24.1763077068543; Thu, 13
+ Nov 2025 15:37:48 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 13 Nov 2025 15:37:37 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251113225621.1688428-1-seanjc@google.com> <20251113225621.1688428-4-seanjc@google.com>
- <ellmjkhqmgpsbhc4if3emhn3fzbqd3ji4u2dnyvmub6bjgfnti@vtvjhn5cjwrs>
-Message-ID: <aRZrTdgOagDSjrUO@google.com>
-Subject: Re: [PATCH 3/9] KVM: SVM: Add a helper to detect VMRUN failures
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
+Message-ID: <20251113233746.1703361-1-seanjc@google.com>
+Subject: [PATCH v5 0/9] x86/bugs: KVM: L1TF and MMIO Stale Data cleanups
 From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Brendan Jackman <jackmanb@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Nov 13, 2025, Yosry Ahmed wrote:
-> On Thu, Nov 13, 2025 at 02:56:15PM -0800, Sean Christopherson wrote:
-> > Add a helper to detect VMRUN failures so that KVM can guard against its
-> > own long-standing bug, where KVM neglects to set exitcode[63:32] when
-> > synthesizing a nested VMFAIL_INVALID VM-Exit.  This will allow fixing
-> > KVM's mess of treating exitcode as two separate 32-bit values without
-> > breaking KVM-on-KVM when running on an older, unfixed KVM.
-> > 
-> > Cc: Jim Mattson <jmattson@google.com>
-> > Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/svm/nested.c | 16 +++++++---------
-> >  arch/x86/kvm/svm/svm.c    |  4 ++--
-> >  arch/x86/kvm/svm/svm.h    |  5 +++++
-> >  3 files changed, 14 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index ba0f11c68372..8070e20ed5a7 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -1134,7 +1134,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
-> >  	vmcb12->control.exit_info_1       = vmcb02->control.exit_info_1;
-> >  	vmcb12->control.exit_info_2       = vmcb02->control.exit_info_2;
-> >  
-> > -	if (vmcb12->control.exit_code != SVM_EXIT_ERR)
-> > +	if (svm_is_vmrun_failure(vmcb12->control.exit_code))
-> 
-> This was flipped, wasn't it?
+Clean up KVM's handling of L1TF and MMIO Stale data, as the code has bit
+rotted a bit and is harder than it should be to understand, and has a few
+warts.
 
-Ugh, yes.  Hrm, I'm surprised this wasn't caught by svm_nested_soft_inject_test.c.
+TL;DR:
 
-Oof.  We should probably also extend svm_is_vmrun_failure() (in the future) to
-detect any failure, e.g. VMEXIT_INVALID_PMC might be relevant soon?
+ - Unify L1TF flushing under per-CPU variable
+ - Bury L1TF L1D flushing under CONFIG_CPU_MITIGATIONS=y
+ - Move MMIO Stale Data into asm, and do VERW at most once per VM-Enter
 
-> >  		nested_save_pending_event_to_vmcb12(svm, vmcb12);
+To allow VMX to use ALTERNATIVE_2 to select slightly different flows for doing
+VERW, tweak the low lever macros in nospec-branch.h to define the instruction
+sequence, and then wrap it with __stringify() as needed.
+
+As before, the non-VMX code is lightly tested (but there's far less chance
+for breakage there).  For the VMX code, I verified the KVM side of things by
+hacking the code to force/clear various mitigations, and using ud2 to confirm
+the right path got selected.
+
+v5:
+ - Collect reviews and acks.
+ - Add/improve comments for various macros and flows. [Everyone]
+ - s/CLEAR_CPU_BUFFERS_SEQ/VERW [Pawan, Boris]
+ - Use the on-stack copy of @flags instead of stashing information in
+   RFLAGS' arithmetic flags. [Boris]
+ - Fix typos (hopefully). [Boris]
+
+v4:
+ - https://lore.kernel.org/all/20251031003040.3491385-1-seanjc@google.com
+ - Drop the patch to fallback to handling the MMIO mitigation if
+   vmx_l1d_flush() doesn't flush, and instead use Pawan's approach of
+   decoupling the two entirely.
+ - Replace the static branch with X86_FEATURE_CLEAR_CPU_BUF_MMIO so that
+   it can be referenced in ALTERNATIVE macros.
+ - Decouple X86_FEATURE_CLEAR_CPU_BUF_VM from X86_FEATURE_CLEAR_CPU_BUF_MMIO
+   (though they still interact and can both be set)
+
+v3:
+ - https://lore.kernel.org/all/20251016200417.97003-1-seanjc@google.com
+ - [Pawan's series] https://lore.kernel.org/all/20251029-verw-vm-v1-0-babf9b961519@linux.intel.com
+ - Put the "raw" variant in KVM, dress it up with KVM's "request" terminology,
+   and add a comment explaining why _KVM_ knows its usage doesn't need to
+   disable virtualization.
+ - Add the prep patches.
+
+v2:
+ - https://lore.kernel.org/all/20251015-b4-l1tf-percpu-v2-1-6d7a8d3d40e9@google.com
+ - Moved the bit back to irq_stat
+ - Fixed DEBUG_PREEMPT issues by adding a _raw variant
+
+v1: https://lore.kernel.org/r/20251013-b4-l1tf-percpu-v1-1-d65c5366ea1a@google.com
+
+Brendan Jackman (1):
+  KVM: x86: Unify L1TF flushing under per-CPU variable
+
+Pawan Gupta (1):
+  x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
+
+Sean Christopherson (7):
+  KVM: VMX: Use on-stack copy of @flags in __vmx_vcpu_run()
+  x86/bugs: Decouple ALTERNATIVE usage from VERW macro definition
+  x86/bugs: Use an x86 feature to track the MMIO Stale Data mitigation
+  KVM: VMX: Handle MMIO Stale Data in VM-Enter assembly via
+    ALTERNATIVES_2
+  x86/bugs: KVM: Move VM_CLEAR_CPU_BUFFERS into SVM as
+    SVM_CLEAR_CPU_BUFFERS
+  KVM: VMX: Bundle all L1 data cache flush mitigation code together
+  KVM: VMX: Disable L1TF L1 data cache flush if CONFIG_CPU_MITIGATIONS=n
+
+ arch/x86/include/asm/cpufeatures.h   |   5 +
+ arch/x86/include/asm/hardirq.h       |   4 +-
+ arch/x86/include/asm/kvm_host.h      |   3 -
+ arch/x86/include/asm/nospec-branch.h |  25 ++-
+ arch/x86/kernel/cpu/bugs.c           |  22 +--
+ arch/x86/kvm/mmu/mmu.c               |   2 +-
+ arch/x86/kvm/mmu/spte.c              |   2 +-
+ arch/x86/kvm/svm/vmenter.S           |   6 +-
+ arch/x86/kvm/vmx/nested.c            |   2 +-
+ arch/x86/kvm/vmx/run_flags.h         |  10 +-
+ arch/x86/kvm/vmx/vmenter.S           |  29 ++--
+ arch/x86/kvm/vmx/vmx.c               | 235 ++++++++++++++-------------
+ arch/x86/kvm/x86.c                   |   6 +-
+ arch/x86/kvm/x86.h                   |  14 ++
+ 14 files changed, 193 insertions(+), 172 deletions(-)
+
+
+base-commit: 16ec4fb4ac95d878b879192d280db2baeec43272
+-- 
+2.52.0.rc1.455.g30608eb744-goog
+
 
