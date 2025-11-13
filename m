@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-63080-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63081-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C7ABC5A7DF
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:14:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B99CC5A825
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:19:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0A754354CDE
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:14:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DA02F4E9597
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:14:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5175319617;
-	Thu, 13 Nov 2025 23:14:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DDC332860B;
+	Thu, 13 Nov 2025 23:14:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z/zFbC4x"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JUHQ2zpP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2B62E1747
-	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 23:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AA532694A
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 23:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763075666; cv=none; b=iHQCia1hlag3jEW5ybBxHoRlFSRCXKop2zx7GanNWy2lWw2h91AscvrtX3emj1a6Dv/6FXn+JguEwujcTGIWgRDZwy7VqUKyJ2JNSJSKFZPjsLlQbO5ysC1DNsIoKeh4KZY9c/Z7woX+/A7R3WYs3twy2Sw4nggCNd0cS78ZrbQ=
+	t=1763075668; cv=none; b=nGyrnZSE2R0T8X9Q/TGt3tTDHMNtu6CPgPq93w2tA7jszMJgvd/yaurtOSxmUxGHORZtA/QEJVSkjnoHUEJo6N9avp5+u3toHQDcbeOp/hTsXxNRejZ8o8BaArLpb2G1zEiavyJOuE7tl6JZoXKD7j6U9i8hcWNFCrCSBU4VNn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763075666; c=relaxed/simple;
-	bh=1Ug4NZTEkBDsYl1zyrkpie035MkE/Yu9FxatwqEx2Yg=;
+	s=arc-20240116; t=1763075668; c=relaxed/simple;
+	bh=JR4i55EnnwraNLvBXNuXt3Al4l9/hHQFLfZmXRr4mAk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YAT6/60niSDegM6WktaRMCzeMAV5G1vv7RLBPwKJrxs/uz4g5100IgxXJ/D6T4EyZQ+BitHiYqfUICZ9bVuMgJImo9Dl6o3cel/QBWSPIcV956/etC7/6MZaAW/jRX1YcCpqCRa9/PvDgKGi9+uwGLy8iav0KKl/+6QTUQssOSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z/zFbC4x; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=YbMPftSYH6UFhr+aumfRH3ciZY/7akIGI8+QB32wX9zULUEZobGR9n2SEBmU2PsbT3mikf3R8NBUIdFzgmY5801Qwl3PXHtQEC2c+Ikt5xxzX0iXEmwDzMMH4iHcV/9YyLvgzhW96aMPKb06aEkjVAgHsDLNdjGaFoT8fs2XjeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JUHQ2zpP; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3437b43eec4so2355447a91.3
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 15:14:25 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-297d50cd8c4so39382565ad.0
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 15:14:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763075665; x=1763680465; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763075666; x=1763680466; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=vCo8Zg1Lol/2z7vSj/8+cq61xRbdddn2wswjFAmZyfk=;
-        b=Z/zFbC4xEuj32qWbtHHdBcsbo2YCaxNfqf2o9QDf/Z9X2E0k2h7iicw9on8bLQ7BXG
-         XTTox7ZkQRNrjGPvRJkdA0IBBqDYf2epKsfrUkrXNfRLVh/ZY3uN1Ejr2kkQ4dCbdBLd
-         qasUEpRdhCFFPJgKBEdc3LalBwbpwcxLSSjUBpjIWGI+yJIRv4MO3InBH1UpT5iF8RGJ
-         8P6+N0H9a/hlHLoU3DAWXxP118NYxB8Hd/1KLG9CM5jpY/fvAC8+wRvKAmrG1SedBK15
-         gfDIzP9syq0ay/A5FvhLCrlG6cSWT5rX61TJ2wci9fLJrCb/o+KKcZ/3hNUt3yOzxrff
-         z8nA==
+        bh=6K4XIzmbFVcYaCmdHrcIwA8jDGId4vqxczM/Pzema7s=;
+        b=JUHQ2zpP9NuhT0pskUkThRuPgvq0wttnR+WBrXnpk3nezLvGPDcdufgYEMG6dV6f/T
+         F9AeB3CZLmCbAkO0vH9yoPhl++w4/RbgyHxKnGAz7EcXxVa++Vy79jt/tnnxof8DECEA
+         PkQ8852FpssR5B0A2vF9zfPDq4y0VqY29DxDGdT8udoc8hJRfojjii5BMdUu8EOf3wat
+         9riHDiz01BcgOccK9/yX/3duAPkepn8c/c5dpeg+yHbbv2pFbWNqUACScgaICxqkXPp0
+         P2vw3e0HraPGKVWwo3s5qKsQllb1WXZqYeAjDdoo0O9VwAKoGNCKNSw1LI9wohrgZc73
+         qjpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763075665; x=1763680465;
+        d=1e100.net; s=20230601; t=1763075666; x=1763680466;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=vCo8Zg1Lol/2z7vSj/8+cq61xRbdddn2wswjFAmZyfk=;
-        b=iQyq2PrzSYuqZQxa/welAXQHk7VBpBxrbyLr4bcRHR/DkxLkGhj3Z/eI8q4CVT5WFj
-         tOm9Ak4G/8coIdsURUGiYjcTW3sMpdtPGbcFkwk2rbOYj3/N+0tVm/5iy3ZRUqLMWdnV
-         t06CVBp9/ADynFdeE3gHXVd8En9cGEhmB1rh53YNvWA2/yLOGNO2jdao6ftkQFw1R5w/
-         TyO1SjEipG5XTJazfBupKAl1M880r6W92PJDNvdWiKfeIw7VjeEGXtSCCt6t9t/ZDRMF
-         bdDUx8xkeJoevg4WqEdH2zNPzsYGg+qYOKWeC+7fkCH+/wb+AK2/uTKNxb/HL+3hEAJX
-         0Nzw==
-X-Gm-Message-State: AOJu0YwhvIN+XEI9WZVsp1P+oVF3shhd9999o46px/IWIsjGzcNQVOx4
-	la2Uf6WjBIlOo2f/MBOEyRFMcS8Wn/OUnPUT6Wy449QOEMkphvWhBXmhh+QKF0aA70/NhsZcbw2
-	z18QNOA==
-X-Google-Smtp-Source: AGHT+IEFwvnN7d2SCi3Xn3bEw9b3VihFAGbMKQStxBMCtqnE7tAxZvBuVANAwKnHuBD3pCb1qrR0SthNMvM=
-X-Received: from pjbha6.prod.google.com ([2002:a17:90a:f3c6:b0:33b:dccb:b328])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:43:b0:343:6a79:6c75
- with SMTP id 98e67ed59e1d1-343fa75c570mr989265a91.29.1763075664710; Thu, 13
- Nov 2025 15:14:24 -0800 (PST)
+        bh=6K4XIzmbFVcYaCmdHrcIwA8jDGId4vqxczM/Pzema7s=;
+        b=T0T8C3cVl5sdwDGTuL6XHkqtE1Xfoph4a/dzoOxb4IAmEKd1ioW6OCeo1KZYnyP4Fx
+         Vu9v+AD7fcB46ZdbHX0jwhQTKXxDe9D/wtJOPR65nYp3uy5BTxWvjaiHAojdgDm1zgT/
+         /eCsW9zZcOMUrgYAck5UzXGkbzFCHRkW/U+ZN+SuU1YHwyKFDv9c/v7PbcMaMdfLfaud
+         Qn6/Q5TmpSPDlwbshhXO+J5ag4NkDVc2M4Fq3X/T/L51paCXCKJdGpN59dyiR5XF33Fj
+         Zar/l9sn+7sSO+AuYno44bB97XM5NzduNrTKntVd9rL/d+rPbrcpFOUWWl5CbFqxS6Kc
+         6JmA==
+X-Gm-Message-State: AOJu0YwVwhArw707pJxCQqlRpcQMr6dR21zbYOP3x0b32u1905PalS7w
+	iX97mjZFkamH5XlM95l9jLMUsc/ZXHUBmrTNoydwGbjg1fHshJ4yShKItUoYWaeY26LS+kx0m+E
+	pnsxwLw==
+X-Google-Smtp-Source: AGHT+IFAK+eKvSrfTNmaiAxotef2w19Cda5fxb9lmk5FZGG6GVNdwG91t7Ninl+LU2MbQ4i0F9ARclXTR0A=
+X-Received: from plbkn8.prod.google.com ([2002:a17:903:788:b0:290:95df:d050])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:7c7:b0:298:616a:bae9
+ with SMTP id d9443c01a7336-2986a73af36mr5556575ad.28.1763075666276; Thu, 13
+ Nov 2025 15:14:26 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 13 Nov 2025 15:14:16 -0800
+Date: Thu, 13 Nov 2025 15:14:17 -0800
 In-Reply-To: <20251113231420.1695919-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,66 +75,57 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251113231420.1695919-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251113231420.1695919-2-seanjc@google.com>
-Subject: [PATCH 1/5] KVM: SVM: Serialize updates to global OS-Visible
- Workarounds variables
+Message-ID: <20251113231420.1695919-3-seanjc@google.com>
+Subject: [PATCH 2/5] KVM: SVM: Skip OSVW MSR reads if KVM is treating all
+ errata as present
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Guard writes to the global osvw_status and osvw_len variables with a
-spinlock to ensure enabling virtualization on multiple CPUs in parallel
-doesn't effectively drop any writes due to writing back stale data.  Don't
-bother taking the lock when the boot CPU doesn't support the feature, as
-that check is constant for all CPUs, i.e. racing writes will always write
-the same value (zero).
+Don't bother reading the OSVW MSRs if osvw_len is already zero, i.e. if
+KVM is already treating all errata as present, in which case the positive
+path of the if-statement is one giant nop.
 
-Note, the bug was inadvertently "fixed" by commit 9a798b1337af ("KVM:
-Register cpuhp and syscore callbacks when enabling hardware"), which
-effectively serialized calls to enable virtualization due to how the cpuhp
-framework "brings up" CPU.  But KVM shouldn't rely on the mechanics of
-cphup to provide serialization.
+Opportunistically update the comment to more thoroughly explain how the
+MSRs work and why the code does what it does.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/svm.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index fc42bcdbb520..5612e46e481c 100644
+index 5612e46e481c..0101da1a3c26 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -77,6 +77,7 @@ static bool erratum_383_found __read_mostly;
-  * are published and we know what the new status bits are
-  */
- static uint64_t osvw_len = 4, osvw_status;
-+static DEFINE_SPINLOCK(osvw_lock);
+@@ -539,15 +539,25 @@ static int svm_enable_virtualization_cpu(void)
  
- static DEFINE_PER_CPU(u64, current_tsc_ratio);
  
-@@ -554,16 +555,19 @@ static int svm_enable_virtualization_cpu(void)
- 		if (!err)
- 			err = native_read_msr_safe(MSR_AMD64_OSVW_STATUS, &status);
- 
--		if (err)
-+		guard(spinlock)(&osvw_lock);
-+
-+		if (err) {
- 			osvw_status = osvw_len = 0;
--		else {
-+		} else {
- 			if (len < osvw_len)
- 				osvw_len = len;
- 			osvw_status |= status;
- 			osvw_status &= (1ULL << osvw_len) - 1;
- 		}
--	} else
-+	} else {
- 		osvw_status = osvw_len = 0;
-+	}
- 
- 	svm_init_erratum_383();
+ 	/*
+-	 * Get OSVW bits.
++	 * Get OS-Visible Workarounds (OSVW) bits.
+ 	 *
+ 	 * Note that it is possible to have a system with mixed processor
+ 	 * revisions and therefore different OSVW bits. If bits are not the same
+ 	 * on different processors then choose the worst case (i.e. if erratum
+ 	 * is present on one processor and not on another then assume that the
+ 	 * erratum is present everywhere).
++	 *
++	 * Note #2!  The OSVW MSRs are used to communciate that an erratum is
++	 * NOT present!  Software must assume erratum as present if its bit is
++	 * set in OSVW_STATUS *or* the bit number exceeds OSVW_ID_LENGTH.  If
++	 * either RDMSR fails, simply zero out the length to treat all errata
++	 * as being present.  Similarly, use the *minimum* length across all
++	 * CPUs, not the maximum length.
++	 *
++	 * If the length is zero, then is KVM already treating all errata as
++	 * being present and there's nothing left to do.
+ 	 */
+-	if (cpu_has(&boot_cpu_data, X86_FEATURE_OSVW)) {
++	if (osvw_len && cpu_has(&boot_cpu_data, X86_FEATURE_OSVW)) {
+ 		u64 len, status = 0;
+ 		int err;
  
 -- 
 2.52.0.rc1.455.g30608eb744-goog
