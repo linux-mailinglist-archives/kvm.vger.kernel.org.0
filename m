@@ -1,149 +1,133 @@
-Return-Path: <kvm+bounces-63075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63079-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C7A4C5A794
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:08:57 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85C2CC5A816
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:19:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3338F353040
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:08:51 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 298DD4E4759
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D000242AA6;
-	Thu, 13 Nov 2025 23:08:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECAC932549D;
+	Thu, 13 Nov 2025 23:14:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="FEpkeBXo";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="vyWCLJmz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1qM5XqUG"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7536A2D73B4;
-	Thu, 13 Nov 2025 23:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A672025F797
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 23:14:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763075320; cv=none; b=WJT/VFM0d5n6QajmAW9FXJSFzXgF4VLdjF6X/yiw3nZYh59aKrX8j77iu7VaMf4mfCGaVLoiMkvs89XwQmtp4dQSn0IKHmXUomTt/6H8CeNJD5XUhC5PAh5MJEGp+upWC7yzHdF+jDLwCJsAb3SfXfG9PtOWQr2F3B/9SUAOD9U=
+	t=1763075665; cv=none; b=ql9RG3PvPTBEj9laLq+AOUdca8iHpUWzjQIRnx8JJfVvhA55h7bLRYNLoTp1olXF5ZEVpWiIjs9aXHR/PKyTEOaJqi+9/sCBtTFtDfXpaqeiyqxtjpCCyzgUSzxQsYGmQOj5oKrsjl0WzVAHx8OLvq4m+oOSwwaFU3BylBWRTrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763075320; c=relaxed/simple;
-	bh=8uDsGqET8+NyvFPxGAFe5D3fK58fc0TPIHvDxbbSRwI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=k7PKUcP9Lb5GMGfq7Xu2+0CF9WDcPqibh5BDw+VOm6qXwt9PPHB7e9nIl2ZCVGwRch5HAuQUQWKdrUtNpxYZ6VhdhFkXj0MhgYzwcbcu4u0YBWDmpYZjxsI/92+v1yNFk6A5qf+azyf1Wfw11vux201dNCB/9c/TpS55SFxg/MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=FEpkeBXo; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=vyWCLJmz; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 871A3EC01CD;
-	Thu, 13 Nov 2025 18:08:35 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Thu, 13 Nov 2025 18:08:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:message-id:mime-version:reply-to
-	:subject:subject:to:to; s=fm2; t=1763075315; x=1763161715; bh=2d
-	pn2d4/Pb1rJ8t1cOb1bvqpeuXgS2YBECPmGW3t7lQ=; b=FEpkeBXoqkjlWGGvll
-	3nWrhJg4yUKdM94QKqx4/iaTMx32gZgXqVah5bmSqHp+gU4gLLMmP00qkP9Rn86h
-	1WOjVXUY1Pcj+yZgiho2VhmGBtKivHyT4O9kmcgdX0ArSnxj/ZrmS2mD3LFVSJO6
-	rQNbOQg4GtETdyIWDYsQFWgVKV8Igq7tXaQnxwfWgXc1er9NR7fFCm1TcKKxMxJF
-	Ch08TfUVSRgXALJyqm5ppYpFatj7Fdvpz1nNQXMi9gajT5ycTTjds1OsrUDPISB9
-	sx4tUuJZVJXEpO5JEVEBsgLex4iQO/C5eRreAQg8fEvzjeEJelnMskgKWduZvAbY
-	JtHA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1763075315; x=1763161715; bh=2dpn2d4/Pb1rJ8t1cOb1bvqpeuXg
-	S2YBECPmGW3t7lQ=; b=vyWCLJmzo9VkJ1QDc/FNPcmr8er1evoC6Bktqj9ikpmV
-	z0bDlZUzRKf9ocQEO5bUK1mh2q4i/UXXn0342zOAqAJuorRSY0D4uvDA87itc7HV
-	nohtKJfuS8lb7TlRIrXBo07ynVdKJWh1h7ebfoVWIf2owwDAUOnJfwaKjmXfXs5w
-	soRPFh+AwmAXZj9O9gOsWDIOrh19aLASw7ZuM+mcDIy5DNwApPR6yxJDVgMyITaI
-	2aFrTQmrsV9is4GdPvey8zXZaJoFGic15Rm/Wv1bt+WGP/et3hI3itONBhS6wTOW
-	tXkV1JeCyFyU0VReu35QutLoPnzXp7CKUX4cqDPxjg==
-X-ME-Sender: <xms:8mQWaaY9P5OUiP_XnOSJwox-j5v6p2rOQisaMTiNHBByiS460lb4Bw>
-    <xme:8mQWae6N-dGDGhqYxfvHaZ5ZMG9UXFMEnxxUrtoQlOdx9mscqlSu0ktEaSNxRhLx5
-    9h-cG3UzXJwcp3JIoc-PBLr6jpjJ1Td7jYRP5sFIgcgVQhJm-j6>
-X-ME-Received: <xmr:8mQWaVD_Qg2fp6WnwkRECHySRb2tL00IbfMQci2TQ3G8Fkg43KbskXMG>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvtdekvdduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucghihhl
-    lhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrthhtvg
-    hrnhepieefgeeileehheeuhefghefhgfehvdfgtdeiffeuhfdvvdekhefhueeuudfffeel
-    necuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgs
-    pghrtghpthhtohephedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepthhorhhvrg
-    hlughssehlihhnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopehlihhn
-    uhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvh
-    hmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghmrghsthhrohesfhgs
-    rdgtohhmpdhrtghpthhtohepughmrghtlhgrtghksehgohhoghhlvgdrtghomh
-X-ME-Proxy: <xmx:82QWacfupJhwYRSchnqG7eWMDMTy3oxTa4cxiJj-5oMGxQMp5bBH4Q>
-    <xmx:82QWacK8bTSYWtNGmaJQlIGZsE-JDaemKP8crFKSVhdha2BEwh4Nsw>
-    <xmx:82QWaf3rmCA59KYGdNtsOQ2GQYwfd-oi5D9hr-nAJgN5mC0HZ_E3sg>
-    <xmx:82QWaWgjIYG2YIdAsu9-rlGNCLGcaBiqu0DD3en4fEWon9gnJTr_RA>
-    <xmx:82QWaQXkXHH5RmtuaLwUjT662hdnD8ibT0YkhlSXQOTGgBjPwkSbHZ4X>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 13 Nov 2025 18:08:34 -0500 (EST)
-Date: Thu, 13 Nov 2025 16:08:31 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Alex Mastro <amastro@fb.com>,
- David Matlack <dmatlack@google.com>
-Subject: [GIT PULL] VFIO fixes for v6.18-rc6
-Message-ID: <20251113160831.775d61dd.alex@shazbot.org>
+	s=arc-20240116; t=1763075665; c=relaxed/simple;
+	bh=mn8GVQsW19Ick+Xm2YxzYB2fwo0JYhu91nF/XucEWIw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=n4pFAuqFaKmh9sKPXePqLvZGCD111SaE2uZYs2XYwWSXsXHk8pLRKkEGcsZPb8bZ2QeYnRkRZ9ZXrVdvgPkATuceRbBbdFwo34WYXBzi7flz4TR7d9srS/evaSBOgVe3XIT+cMCP4YXyV9hcnSnxn6oYMAsA3FFUUPmpgXZ57aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1qM5XqUG; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-343806688cbso1957429a91.3
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 15:14:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763075663; x=1763680463; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E5/UTn8bTtJTVg4Qd62Iha30XVgFf5+QbZgjq/H2S+M=;
+        b=1qM5XqUGEr3eIGxJqE9jU3FvQXZjVhETxJUCtbW+VA64VjXkq9xrIY965rHDlBRXvO
+         oHx0xV+rvZKfC88/7TWIIfeioHOIgmYyolFIa7jN4MCVT8n3UiERJsPHcqFSEXB44EGC
+         aTk7PcjLrKZeJGJEV581EVH5ZdS1pT6CeG0rQbw2bKtkzWO8vicdaH2bq+b8GCcySdr2
+         c85/KqCM20WyNSvmsWw1sj3sFPjbGXOBN8E1L6LPkiSXHD4Lza/zuT2eXUmd9cTVpSa8
+         eP8YzLf3GJC3cZgf/LQTHslnIvuz8h7gG2dJk4TYghAUfiuTTNXW4dAiysx0wI3EZroj
+         AfOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763075663; x=1763680463;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E5/UTn8bTtJTVg4Qd62Iha30XVgFf5+QbZgjq/H2S+M=;
+        b=KYnGdaIRN5R2UtnUC8iWff8T7opxQEa4f1VJuLxlyKI8Ve17qxMM5NX9KK26h6+3IT
+         1ad98sODZtplYZ6noBLE2xEWXSi9b46iDh++en2EK/lNYOGwznCsfr8b7iwzaxlH1Mnp
+         oB7I2qzlboLJ9ZOgvdXn4XBgUnt1fiPXexWMDLfNJGJTZ/9Alr6A4UNm1nZ+CP+sai00
+         5SI6ikea6nn1zYnDpa9Ktec1J2gznDocoxx2uceLoQ9TI8Q6sTc6ae4nSZNsETp5pivr
+         3x9vu+OHTnMOIHeIaR8FfxoeuN24gd1teGdWQ2aK8tutRtJyZ/0O/hyADT1VarAwM7pB
+         z2gg==
+X-Gm-Message-State: AOJu0YzT/YztgVXHnyyN4BXUEmfAz9PtM8LH2LIg+y+uV7/0OWAes72P
+	UF2d9J/CYx63QMJjeTK59YXB7qJNGbgEt3p2eG73JtDPWwZfW9QnZSQybpYTZBE4XKRgTEoJ6rS
+	f/DU2MQ==
+X-Google-Smtp-Source: AGHT+IGNgmeFlzSISc40y3tWMWrs8kvowjPqYMHL4csER25f6Rt+Kd7D0+iRgGX7761r68Kab45/rCMo2Og=
+X-Received: from pjrn4.prod.google.com ([2002:a17:90a:b804:b0:340:ad90:c946])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3806:b0:340:5c27:a096
+ with SMTP id 98e67ed59e1d1-343f9e92a24mr1035029a91.6.1763075662950; Thu, 13
+ Nov 2025 15:14:22 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 13 Nov 2025 15:14:15 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
+Message-ID: <20251113231420.1695919-1-seanjc@google.com>
+Subject: [PATCH 0/5] KVM: SVM: Fix and clean up OSVW handling
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Linus,
+Fix a long-standing bug where KVM could clobber its OS-visible workarounds
+handling (not that anyone would notice), and then clean up the code to make
+it easier understand and maintain (I didn't even know what "osvw" stood for
+until I ran into this code when trying to moving actual SVM pieces of
+svm_enable_virtualization_cpu() out of KVM (for TDX purposes)).
 
-Here are a few last fixes for the new vfio selftests for v6.18.  This
-hopefully starts us off with a good precedent that the tests will
-generally pass by removing some assumptions about the IOMMU address
-width.  Thanks,
+Tested by running in a VM and generating unique per-vCPU MSR values in the
+host (see below), and verifying KVM ended up with the right values.
 
-Alex
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c9c2aa6f4705..d8b8eff733d8 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4631,12 +4631,20 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+        case MSR_AMD64_OSVW_ID_LENGTH:
+                if (!guest_cpu_cap_has(vcpu, X86_FEATURE_OSVW))
+                        return 1;
++
++               if (vcpu->vcpu_idx == 64)
++                       return 1;
++
+                msr_info->data = vcpu->arch.osvw.length;
++               if (vcpu->vcpu_idx < 64)
++                       msr_info->data = max(vcpu->vcpu_idx, 8);
+                break;
+        case MSR_AMD64_OSVW_STATUS:
+                if (!guest_cpu_cap_has(vcpu, X86_FEATURE_OSVW))
+                        return 1;
+                msr_info->data = vcpu->arch.osvw.status;
++               if (vcpu->vcpu_idx < 64)
++                       msr_info->data |= BIT_ULL(vcpu->vcpu_idx);
+                break;
+        case MSR_PLATFORM_INFO:
+                if (!msr_info->host_initiated &&
 
-The following changes since commit 6146a0f1dfae5d37442a9ddcba012add260bceb0:
+Sean Christopherson (5):
+  KVM: SVM: Serialize updates to global OS-Visible Workarounds variables
+  KVM: SVM: Skip OSVW MSR reads if KVM is treating all errata as present
+  KVM: SVM: Extract OS-visible workarounds setup to helper function
+  KVM: SVM: Skip OSVW variable updates if current CPU's errata are a
+    subset
+  KVM: SVM: Skip OSVW MSR reads if current CPU doesn't support the
+    feature
 
-  Linux 6.18-rc4 (2025-11-02 11:28:02 -0800)
+ arch/x86/kvm/svm/svm.c | 72 ++++++++++++++++++++++++++----------------
+ 1 file changed, 44 insertions(+), 28 deletions(-)
 
-are available in the Git repository at:
 
-  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.18-rc6
+base-commit: 16ec4fb4ac95d878b879192d280db2baeec43272
+-- 
+2.52.0.rc1.455.g30608eb744-goog
 
-for you to fetch changes up to d323ad739666761646048fca587734f4ae64f2c8:
-
-  vfio: selftests: replace iova=vaddr with allocated iovas (2025-11-12 08:04:42 -0700)
-
-----------------------------------------------------------------
-VFIO fixes for v6.18-rc6
-
- - Fix vfio selftests to remove the expectation that the IOMMU
-   supports a 64-bit IOVA space.  These manifest both in the original
-   set of tests introduced this development cycle in identity mapping
-   the IOVA to buffer virtual address space, as well as the more
-   recent boundary testing.  Implement facilities for collecting the
-   valid IOVA ranges from the backend, implement a simple IOVA
-   allocator, and use the information for determining extents.
-   (Alex Mastro)
-
-----------------------------------------------------------------
-Alex Mastro (4):
-      vfio: selftests: add iova range query helpers
-      vfio: selftests: fix map limit tests to use last available iova
-      vfio: selftests: add iova allocator
-      vfio: selftests: replace iova=vaddr with allocated iovas
-
- .../testing/selftests/vfio/lib/include/vfio_util.h |  19 +-
- tools/testing/selftests/vfio/lib/vfio_pci_device.c | 246 ++++++++++++++++++++-
- .../testing/selftests/vfio/vfio_dma_mapping_test.c |  20 +-
- .../testing/selftests/vfio/vfio_pci_driver_test.c  |  12 +-
- 4 files changed, 288 insertions(+), 9 deletions(-)
 
