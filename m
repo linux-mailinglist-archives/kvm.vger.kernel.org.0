@@ -1,137 +1,133 @@
-Return-Path: <kvm+bounces-63055-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63056-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 793CBC5A479
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:08:05 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AA39C5A4A6
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:14:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CF213BA5D2
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 22:01:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1E73C4E3101
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 22:14:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880DE325730;
-	Thu, 13 Nov 2025 22:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC15325729;
+	Thu, 13 Nov 2025 22:14:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BrI0emK1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q6Ilp+n7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E4B30FC21
-	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 22:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2901A2C0293
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 22:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763071289; cv=none; b=sDVzVyzrsKHwv/hFIY3DokGR01JGgS4Wnie5gloKKMwXO55aWqXthNl6VjUAKGKrICs3G+0pRYb/b30KcWtGumvltDgc6hMg8DGT+Eha4PI/E86z7t4K6ODv8ccGIs8DzTRffjXgvb2QL4HSp1PpAUAjTz1domXGj43FGbQMio0=
+	t=1763072064; cv=none; b=DqNLaWlizG9DuNLWyZQSCBoHarYjNg0JqtvmhkusIPZPnjUmdNg3zqoP2MPmvh8rICSH3lT1cCtrfAQRghIRGUdNFek34oJ/r0VRMBEmjGSd+93L5ztQ4+SIT9Xz0rrmXzWtKTu7V0GT0Sa0/AytGkkFIfVB2HgmqOQBW0PysEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763071289; c=relaxed/simple;
-	bh=cFo/2FWZAefgnCwiQcYKQrwsDw+guU7l0RE0dn492Xc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=saz1lkKPge3FPxoqGStsGByFVrYlpeoaUcQpylEclHjWOTUPDmxgDoW4Yd+X2bIHHCgoMR9Z9i7ItEYUyURAtduCpYg5s9UvlCWkFI/R7h8qjhF5F52O56mHUEXqt0hannSfMJ3QgJvcGvJ61570JQJpNq+rr2myh3+GfH8MB+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BrI0emK1; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1763072064; c=relaxed/simple;
+	bh=vg2n9jgyf6Un8yroS0eZ9RJEclmxHEAIxafM2FtYloU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B5QReJ0OYRrHF1DEdx5hHpXKGEt8t9mBsBcFGdgQH+WQZse+UaaJ2rIWqAKptqa+GGg/9jp6EblGD9ams5mmmxPBcNh8nHSKrpMU3wVX9eEOkjkcEEmTyWjX+zGQBXVQoKwI0R6rVnWZYU+Q7TaGk3o3WNIM/ZW4pjv9bWlFnQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q6Ilp+n7; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-29846a9efa5so32304255ad.0
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 14:01:28 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4770d4df4deso7945e9.1
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 14:14:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763071287; x=1763676087; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1BDlpkIBziB9BZysiW/dDWMpz8bsQ1z6Y1o8U9LGSA0=;
-        b=BrI0emK18mvnDctzlLBLMxIjrcFCvQf7yWyTdgngMdTHD8qaBAEEr9/nRgcs4/p/Fz
-         OaOQRgwqLlTU/T6T4qiCHHpGAnqaLwMdI9jEhr65zPmplSFwobiYOTksoccJ/dW0p/w4
-         fbZ/YtT4+BTuUFXZk6rkNuJ7tYbYbsxVBirX+LBpIBnhsUATaDOdlTOYoJkC5dhI9Chb
-         WJHziXrAGSS9/h6HWSJuOC6P3GTZm02GZ+spEV7cJYCJFMp7a/jmTsy6bPXE5/T5xciN
-         KTKqjOVy3jt3XgZsUnZZHJh5LPesMXhJtT2kC/VIKSueHiurm9YfaPfR1oLrV8YEVRi9
-         PmlA==
+        d=google.com; s=20230601; t=1763072060; x=1763676860; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f7JRornaiplk0uZKMqz9STwhUMyLeMRJwxelXDphyMs=;
+        b=q6Ilp+n7pTN4+s4aQsfVwd8VdZlJEgIq9zdYAR/33q19ER0geRYo1QEysrFMwV2E3l
+         pXWZBeQxzsFBvjBEyAoWSqnJcCpWaA1WiOwjXHZgAxuLQfeSKWo3wy94l5EfwuOjQ0DR
+         C0EnayLvOwdjaCa7dJeaR743KyE4+C+scFCHI+NDi2azRKiJcp1JfhDPaDk/coIb3fAa
+         fEERTY6L9K253ca9ik2xF0Zxx2SZpjGWvq6wmDzVXj7kV7Vid2VPyfuPHgDbyYHvNOM3
+         YyYriFbnqgeb0ZFOhN7rYO8GMMACLXRFkX2fO6hsSD/6lYR4PKJzcIRH88qHDTxWTwPQ
+         U1oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763071287; x=1763676087;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1BDlpkIBziB9BZysiW/dDWMpz8bsQ1z6Y1o8U9LGSA0=;
-        b=YMWCo0D79qKm43fHBq2+Ma7xhDqzKWksMNgNnBfj31sZM+dg/cM9ICdKk2VGvUI8qj
-         RYatqtTuac239hlHxMkRFtCNmylsk/XSHNukudYIUOrbg+uODb8Tn+zEpMQxLNZQBq6P
-         bKe4xOKFyRz4lF3A/Syxtce7Vel09SYglG3A4uxypztnrt24UUVugPk+W59zbQ7Qjp+Q
-         hCyLQEOakltXEQgadVb4A0aH1TaazAmH/0wCul2vmrk3ViKtGCafHOblORin1PD/cJ/q
-         8pCw9LEPza0sWUpZUKIOZAgpexiciwv2CR0nhYj8Y9ZpOUBwRrfyzVISWcHa3UuS2gWe
-         57UA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKcQaPjbpXxLJtThxHFIRnMuMoSqsViSDVxjVOEZ4isZDY87W+DDDa8fQmt1loXCQoa6I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKFksVxnG2p1QTd801DQUB+kEyS1LPL+UuD06lAcMCdSCj7Duk
-	Uc+cApYCXIJbQ2PzeyOx4DUfR/eHvRsoM2KfDNorVDjL5qR3f2NbwgxuWJ5y9Aaqw323+5gvS9R
-	YM3Z5Lg==
-X-Google-Smtp-Source: AGHT+IFASVlzdNPPzhpykWWag2D93vCUrtxksdAEQWFHLBzEFdqSOYWn6d17jOWheOtfse9Hw/kZF1RRSzY=
-X-Received: from plhe11.prod.google.com ([2002:a17:903:1cb:b0:290:28e2:ce54])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d60d:b0:297:f2f1:6711
- with SMTP id d9443c01a7336-2986a757cc7mr5814155ad.56.1763071287488; Thu, 13
- Nov 2025 14:01:27 -0800 (PST)
-Date: Thu, 13 Nov 2025 14:01:25 -0800
-In-Reply-To: <20251113142000.GAaRXpEKHh1oQgN65e@fat_crate.local>
+        d=1e100.net; s=20230601; t=1763072060; x=1763676860;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=f7JRornaiplk0uZKMqz9STwhUMyLeMRJwxelXDphyMs=;
+        b=cBINxKw7AdDoOdHsefImjtoCwBKj9qiR/9Q4I0/ZkNDfHryEGkYzYXKAfmgLsYtEeH
+         hJUYiPZBAZHC5Q5CP1P3kYDi45JnOFeiKfmybqn0nQX0ksUj2IftSwBjMaHkLJLe241w
+         pIzure3fICgCeGITAxSew1CMP/Oadd0hQB6w9ED/4iY9nyYoFH2eH9Vp7k87TRIE7NrU
+         9iaIdEbDDlh6vJxckOz89q7ssJtdc092HpLsrBu7qaIQ//Nrn4LimuP8nWouHqr3KM3o
+         SaNkjoPe6iahmHhRa07Pl/w2s1T6Iuv9A7faCoWx1EYWpqnnNFiD9tdo9iq24Ie0+vBZ
+         2UDA==
+X-Forwarded-Encrypted: i=1; AJvYcCV23fVWcrYKjQQaZ4C4gWJ9QEUfitBvSaeA4UTkk21HnyVDJl+RSjvuhTWbs9Vd4sWazEM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/5KgxETq/CKuODs/AGoud3zCJQ4/KfOk3oQt2OHWVStszMl2Z
+	NTNsrd84Oig5BaBWsJk+ucXWoNvJXGuMXpyLqTcwCVoyEqSTDye21gd1bEUbMoYVLuf7GrFBIeW
+	xIWCZAcorBlHq/sobZ54oK7+O3T3cwIKq2ke6q2Es
+X-Gm-Gg: ASbGnctmMa4Rw2/wPjGELsYhyCiS76ZVc1BbyQKOEeCl0JqqAqtGbLBhDznIJ/sOfro
+	i0v8MPbxuK3JoN+UVcU1xE0yResB9FdnthrWXAug8KtXriR7EYbKh5cFdvzTgfx+G7FuV9w2y4/
+	YonWbNzYUnxVi67vwvBsKkeAg8RUiwJBdxs7BodbvXqLimTP2/OPmGOvBNKNHaF66/BfCDUMr3G
+	k7cB4UDSVqGZAQY857HAGNNy3wibD1yLzLV7HasUafAIwRPUBtk4vBZzuRmxXI35cPnRCjWoz1+
+	okZBWIG8umzXSVZkvD69W5JSUQ==
+X-Google-Smtp-Source: AGHT+IH1dTN9h9lNDnRTlh4UyFd6aH1+EDMlfhkx9gNk7p2AjcKqv19bBUUeTsmBJjRKqPU2Xh2SmzFkyX1KkJheFqs=
+X-Received: by 2002:a7b:cc99:0:b0:477:772e:9b76 with SMTP id
+ 5b1f17b1804b1-47790b11bbdmr102735e9.7.1763072060296; Thu, 13 Nov 2025
+ 14:14:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251031003040.3491385-1-seanjc@google.com> <20251031003040.3491385-5-seanjc@google.com>
- <20251112164144.GAaRS4yKgF0gQrLSnR@fat_crate.local> <aRTAlEaq-bI5AMFA@google.com>
- <20251112183836.GBaRTULLaMWA5hkfT9@fat_crate.local> <aRTubGCENf2oypeL@google.com>
- <20251113142000.GAaRXpEKHh1oQgN65e@fat_crate.local>
-Message-ID: <aRZVNWFBPAQAtlWL@google.com>
-Subject: Re: [PATCH v4 4/8] KVM: VMX: Handle MMIO Stale Data in VM-Enter
- assembly via ALTERNATIVES_2
-From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Brendan Jackman <jackmanb@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20251013185903.1372553-1-jiaqiyan@google.com> <176305834766.2137300.8747261213603076982.b4-ty@kernel.org>
+In-Reply-To: <176305834766.2137300.8747261213603076982.b4-ty@kernel.org>
+From: Jiaqi Yan <jiaqiyan@google.com>
+Date: Thu, 13 Nov 2025 14:14:08 -0800
+X-Gm-Features: AWmQ_bk6n8j-0ORtQ1jAf-pM3nvvAf6VB8V4V3Ju58iczpjKI42PYMXub9cNtfk
+Message-ID: <CACw3F51cxSgd-=D46A6X6GptEZS8-JZ_MnB_yK_ZR1wktunYRA@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] VMM can handle guest SEA via KVM_EXIT_ARM_SEA
+To: Oliver Upton <oupton@kernel.org>, oliver.upton@linux.dev
+Cc: maz@kernel.org, duenwen@google.com, rananta@google.com, 
+	jthoughton@google.com, vsethi@nvidia.com, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Jason Gunthorpe <jgg@ziepe.ca>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 13, 2025, Borislav Petkov wrote:
-> On Wed, Nov 12, 2025 at 12:30:36PM -0800, Sean Christopherson wrote:
-> > They're set based on what memory is mapped into the KVM-controlled page tables,
-> > e.g. into the EPT/NPT tables, that will be used by the vCPU for that VM-Enter.
-> > root->has_mapped_host_mmio is per page table.  vcpu->kvm->arch.has_mapped_host_mmio
-> > exists because of nastiness related to shadow paging; for all intents and purposes,
-> > I would just mentally ignore that one.
-> 
-> And you say they're very dynamic because the page table will ofc very likely
-> change before each VM-Enter. Or rather, as long as the fact that the guest has
-> mapped host MMIO ranges changes. Oh well, I guess that's dynamic enough...
+On Thu, Nov 13, 2025 at 1:06=E2=80=AFPM Oliver Upton <oupton@kernel.org> wr=
+ote:
+>
+> On Mon, 13 Oct 2025 18:59:00 +0000, Jiaqi Yan wrote:
+> > Problem
+> > =3D=3D=3D=3D=3D=3D=3D
+> >
+> > When host APEI is unable to claim a synchronous external abort (SEA)
+> > during guest abort, today KVM directly injects an asynchronous SError
+> > into the VCPU then resumes it. The injected SError usually results in
+> > unpleasant guest kernel panic.
+> >
+> > [...]
+>
+> I've gone ahead and done some cleanups, especially around documentation.
+>
+> Applied to next, thanks!
 
-In practice, the flag will be quite static for a given vCPU.  The issue is that
-it _could_ be extremely volatile depending on VMM and/or guest behavior, and so
-I don't want to try and optimize for any particular behavior/pattern, because
-KVM effectively doesn't have any control over whether or not the vCPU can access
-MMIO.
+Many thanks, Oliver!
 
-> > Very lightly tested at this point, but I think this can all be simplified to
-> > 
-> > 	/*
-> > 	 * Note, ALTERNATIVE_2 works in reverse order.  If CLEAR_CPU_BUF_VM is
-> > 	 * enabled, do VERW unconditionally.  If CPU_BUF_VM_MMIO is enabled,
-> > 	 * check @flags to see if the vCPU has access to host MMIO, and do VERW
-> > 	 * if so.  Else, do nothing (no mitigations needed/enabled).
-> > 	 */
-> > 	ALTERNATIVE_2 "",									  \
-> > 		      __stringify(testl $VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO, WORD_SIZE(%_ASM_SP); \
-> > 				  jz .Lskip_clear_cpu_buffers;					  \
-> > 				  VERW;								  \
-> > 				  .Lskip_clear_cpu_buffers:),					  \
-> 
-> And juse because that label is local to this statement only, you can simply
-> call it "1" and reduce clutter even more.
+I assume I still need to send out v5 with typo fixed, comments
+addressed, and your cleanups applied? If so, what specific tag/release
+you want me to rebase v5 onto?
 
-Eh, sort of.  In the past, this code used "simple" numeric labels, and it became
-nearly impossible to maintain.  This is quite contained code and so isn't likely
-to cause maintenance problems, but unless someone feels *really* strongly about
-numeric labels, I'll keep a named label to match the rest of the code.
-
-Though with it just being VERW, I can shorten it a wee bit and make it more
-precise at the same time:
-
-		      __stringify(testl $VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO, WORD_SIZE(%_ASM_SP); \
-				  jz .Lskip_mmio_verw;						  \
-				  VERW;								  \
-				  .Lskip_mmio_verw:),					  	  \
+>
+> [1/3] KVM: arm64: VM exit to userspace to handle SEA
+>       https://git.kernel.org/kvmarm/kvmarm/c/ad9c62bd8946
+> [2/3] KVM: selftests: Test for KVM_EXIT_ARM_SEA
+>       https://git.kernel.org/kvmarm/kvmarm/c/feee9ef7ac16
+> [3/3] Documentation: kvm: new UAPI for handling SEA
+>       https://git.kernel.org/kvmarm/kvmarm/c/4debb5e8952e
+>
+> --
+> Best,
+> Oliver
 
