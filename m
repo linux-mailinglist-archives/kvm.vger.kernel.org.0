@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-63071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63072-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5243AC5A6D8
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:58:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8E4BC5A708
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:00:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 962AA3535E9
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 22:58:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E6363BC074
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 22:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7E832ABDB;
-	Thu, 13 Nov 2025 22:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355D032BF38;
+	Thu, 13 Nov 2025 22:56:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jAI+VEn9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XLF/H1se"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F275F326D76
-	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 22:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA36332AACD
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 22:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763074603; cv=none; b=LgZNF27v1p5XZqcrOLNH2JoyJqZ6NziOwhJ/xsq/vcRcxc/tOHbxvD/1cCwZS6313b79rlnTPfbpN0SOabhdDWfB6StfJXJLlfwlHQxlFE7flPB/xfi0vDOqpx2rwfobJmOaklGspe7iM/h9Amc6W+a/m3RcBrEHn5weBzFDiME=
+	t=1763074605; cv=none; b=rZexfBbga0r72isfIZlfkCjoDvUKcCBp4vqq/CxlCtFYJjT4oxVIkRCdKSWYt3VqQjf38iMiFTJLeFsqqgAvO+TsK3jpqWh7J/c+yWZvqSYHUdqw+gjkqiBMgerKEP2tv0/MZf/QBfIv3RQ8ZMQLbc8Hf+hSZAnChcAQcezJBFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763074603; c=relaxed/simple;
-	bh=84mlhZ3JM5RfxlKomoAAeHn9Bvqc4zqHVGnlMIN+Dl0=;
+	s=arc-20240116; t=1763074605; c=relaxed/simple;
+	bh=a+s6sZNkgEmBhyZ1wdOGRI7wiOUgOGhVQHVBCdK4J8Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uKdGuoOoOqNvEWCAmbMGdyBCmZkR26vyLzKBkzdb/GacBetFfVeSDcxXPgkrIRo2e6Sa+RkEcyWNjbeYKGJGx1SoeQGDWOQ3GZN56gt1WOTzVA/qwbjSfC0hflTobhf59lUOk7mrI2lbYnD5jYRvdz9QMoP/jaU+T62h0NmCil0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jAI+VEn9; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=eUqmUGaRSWtUjhAE08k+6cE5l42RkJaWUom2qfRtzPKHJ2JHVZC2Cg4hBh7MPqWkftRYmYOaH1qHcBwP4Rlbre7hdx88euPlXoFfeKLZoV0Qhpylc5Av/GeYa0lPzuvbb0zd83NZTfNIDeYxxNl3i1/Yv0MnKt0M0OBQ9MIA+jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XLF/H1se; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b6097ca315bso3042186a12.3
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 14:56:41 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-298389232c4so16254615ad.2
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 14:56:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763074601; x=1763679401; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763074603; x=1763679403; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=yAZ8dC0cSBzCHy+Gncv2WYa1BW9ysI8EoXwobyv3AdE=;
-        b=jAI+VEn9/DCv7c9s80EI/zOj/Tvs3p5UzyZvFsejJTjus68hnNQtEZpGhY34vI2rJt
-         M3diu0V2ar5rxDzXIw03inVQ/kAO+l2p0584qpwnhFENWyUMjRkxf/00aMTe/vaQSuIW
-         OJz7Ksda6rjoqN1OF0eiEAp3gFrjJ20qsbJXMb715CK0zNKAzuEcuAKNyuNFlkOk7Kzs
-         YcWgZy2g4LVe1jZZhqA8v/4zjTWYInc9SYAPQXBHsDgftaTEr9HRB1squX7RWYM8Yo6T
-         QyFllCf7kPhOe/ZqMWktnCM7zncbg3DhofTIg/64XotUPRJJqGdf3/IOL1whi7U+/OHa
-         NBfQ==
+        bh=mHz4oN+bRmjr/Tq43pRV+YXBpy16+hTvzgAeUQ/5hJU=;
+        b=XLF/H1sefUQgRYonaKzLHXfznh62AUf/0YB9jSmqZTcAkl7VhloeCFlB2ERuiZPfs4
+         y8WI96oxdZ1ITX3nZnuhOISOrrR42wAXoTifeLtqxPZNZM1XixfhWqbaKho46bpDeIMX
+         sLzI0+gSxhbxqUupSCDnmD1UUtjCWRPB0I9MeddDeVYmC92gjDfMzGbAxpimaHJsnvgJ
+         Qm2JPWaUjjQRYH2oQxj21XlEZKCH7bfZ7XcPdUCX8DqxCmcQCXH6dRflCar68VVlIfbN
+         McxW/ChMNMaPD82QZB0IZUJJP1Xg/N3k4azzN5VPJF2rbfUjoxjJw5TFEWqZHFe0g0IS
+         tw7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763074601; x=1763679401;
+        d=1e100.net; s=20230601; t=1763074603; x=1763679403;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yAZ8dC0cSBzCHy+Gncv2WYa1BW9ysI8EoXwobyv3AdE=;
-        b=fcZofcPzixq71Z9fGRsWyJBwLqjqhtQkfoMLfcgsp1n/zoqIPRZmHwcjbVRaBA49Dt
-         RBPz1//8jUGiinU2DPPB97o8qajAswGmmuf8g0/GCPXaCL2/inmd6q0BDXWdlz67KfZd
-         kuexr0RyEoXl4sZ7biv5S2hjefQxrBFcah5KpqRsxsRkfDpRRAKbTxdyYkNXpfW6of+z
-         mp8CQcjKE20x/U9e/EQon6EqL5dEQeVbmhqQ772Nq1yo6FWpEA698iAzeVsR/bDn73+8
-         7cCIAAuTORUezBGq86C9Vt5aA+RV34Eo7bFkjlZYAbJSBm4DKnF3SEyVph7LSVT1d1FY
-         zaRA==
-X-Gm-Message-State: AOJu0YxYUGG1Z0Sqo2XfuPndi5+Ax7/UH/M3AMfvr+sGTHgUGPOKooLj
-	i3w4Xso9bLn27fjicvLzvrcw6kAMW9hHt6qoI2wn7nuhzozyx4tkYa6R9+1R0z+bJhdKuzCQsgi
-	aM2yqlg==
-X-Google-Smtp-Source: AGHT+IF96SyhX4OSFYPPUcMMzzakOIf9y26xhAXkhopdVA6dBw1xWXKKHbc/n2cOWm2tylO2zP96XfNZ/fw=
-X-Received: from pgdj7.prod.google.com ([2002:a05:6a02:5207:b0:bc5:3be0:b497])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3294:b0:342:5901:fd9f
- with SMTP id adf61e73a8af0-35ba16a47f6mr1429299637.28.1763074601451; Thu, 13
- Nov 2025 14:56:41 -0800 (PST)
+        bh=mHz4oN+bRmjr/Tq43pRV+YXBpy16+hTvzgAeUQ/5hJU=;
+        b=rNUAANd0juLG6fTqWAiICnL/tVUo05KU3sArROccasta9zCDOqk4cqZUU0zyJJF87/
+         Sl1J/9u3tUtBNIPeQ5MefAuy8y2Q/7GLAuQTaO560G44zxLjiJwMH2mNxk5Ppxgiw1sM
+         tH+gdVbF6thOcLME3fBvTUn26pmqa/S2yT1iYxMPlsn3XGCUAN1sGvmz7d3Y+6kTou3h
+         Zhu2YplV9GaILUqr+KJXU+nZAi47esl9db0N7o1XC/zCvcM3fMlaArNvV0f+4z3d/z9q
+         j50TkodNABuKYnx0Ep+gyJfSHHTiKKL1D4TdrCJPz8nmGT3228amBRAH0HD74aoKgEA4
+         cjGQ==
+X-Gm-Message-State: AOJu0YxL279vpBMvYhvKXX7/6igO0leIWcIJ8krutLd7lC7Rvilru+8l
+	4K8ey2/76MHC8Ndry1FWMUa/G9YA6qkfahFRDhkN3LVRWQT17/Kq+oXHo2r7wnxgEInYc9A1++T
+	b/P6pVg==
+X-Google-Smtp-Source: AGHT+IEO37c5pwPK2cMLUV9F0xRjUgNCC9Jy0Xa4OyxYda5fCXX6UpbBlg6x0BhMofP9nToBEj/Ouj9X0QU=
+X-Received: from plot13.prod.google.com ([2002:a17:902:8c8d:b0:295:fb8:7fb1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d502:b0:295:586d:677d
+ with SMTP id d9443c01a7336-2986a74185fmr6475565ad.41.1763074603172; Thu, 13
+ Nov 2025 14:56:43 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 13 Nov 2025 14:56:20 -0800
+Date: Thu, 13 Nov 2025 14:56:21 -0800
 In-Reply-To: <20251113225621.1688428-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251113225621.1688428-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251113225621.1688428-9-seanjc@google.com>
-Subject: [PATCH 8/9] KVM: SVM: Limit incorrect check on SVM_EXIT_ERR to
- running as a VM
+Message-ID: <20251113225621.1688428-10-seanjc@google.com>
+Subject: [PATCH 9/9] KVM: SVM: Harden exit_code against being used in
+ Spectre-like attacks
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Vitaly Kuznetsov <vkuznets@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
@@ -88,37 +88,38 @@ Cc: kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 
-Limit KVM's incorrect check for VMXEXIT_INVALID, a.k.a. SVM_EXIT_ERR, to
-running as a VM, as detected by X86_FEATURE_HYPERVISOR.  The exit_code and
-all failure codes, e.g. VMXEXIT_INVALID, are 64-bit values, and so checking
-only bits 31:0 could result in false positives when running on non-broken
-hardware, e.g. in the extremely unlikely scenario exit code 0xffffffffull
-is ever generated by hardware.
+Explicitly clamp the exit code used to index KVM's exit handlers to guard
+against Spectre-like attacks, mainly to provide consistency between VMX
+and SVM (VMX was given the same treatment by commit c926f2f7230b ("KVM:
+x86: Protect exit_reason from being used in Spectre-v1/L1TF attacks").
 
-Keep the 32-bit check to play nice with running on broken KVM (for years,
-KVM has not set bits 63:32 when synthesizing nested SVM VM-Exits).
+For normal VMs, it's _extremely_ unlikely the exit code could be used to
+exploit a speculation vulnerability, as the exit code is set by hardware
+and unexpected/unknown exit codes should be quite well bounded (as is/was
+the case with VMX).  But with SEV-ES+, the exit code is guest-controlled
+as it comes from the GHCB, not from hardware, i.e. an attack from the
+guest is at least somewhat plausible.
+
+Irrespective of SEV-ES+, hardening KVM is easy and inexpensive, and such
+an attack is theoretically possible.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/x86/kvm/svm/svm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 31ee4f65dcc2..801dcfc64d0b 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -427,7 +427,10 @@ static __always_inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 85bc99f93275..308c70b6924e 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3467,6 +3467,7 @@ int svm_invoke_exit_handler(struct kvm_vcpu *vcpu, u64 __exit_code)
+ 	if (exit_code >= ARRAY_SIZE(svm_exit_handlers))
+ 		goto unexpected_vmexit;
  
- static inline bool svm_is_vmrun_failure(u64 exit_code)
- {
--	return (u32)exit_code == (u32)SVM_EXIT_ERR;
-+	if (cpu_feature_enabled(X86_FEATURE_HYPERVISOR))
-+		return (u32)exit_code == (u32)SVM_EXIT_ERR;
-+
-+	return exit_code == SVM_EXIT_ERR;
- }
++	exit_code = array_index_nospec(exit_code, ARRAY_SIZE(svm_exit_handlers));
+ 	if (!svm_exit_handlers[exit_code])
+ 		goto unexpected_vmexit;
  
- /*
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
