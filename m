@@ -1,126 +1,117 @@
-Return-Path: <kvm+bounces-62956-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62958-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DDEDC54C5C
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 00:01:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8820DC54EBB
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 01:37:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4806C3A959A
-	for <lists+kvm@lfdr.de>; Wed, 12 Nov 2025 23:01:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5EC5E4E2001
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 00:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515962EB87E;
-	Wed, 12 Nov 2025 23:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3715E14D29B;
+	Thu, 13 Nov 2025 00:35:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="COEHRRoB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="viNgrp3B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE54D186294;
-	Wed, 12 Nov 2025 23:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8E318E3F
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 00:35:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762988506; cv=none; b=YeKGU4Ph/AD1WfCkEAUNojrc6+fl/68vSZqaPB7TLxjyuTa7SdftvubIzw96n53G93Hc2HqfYZm/TyKGIEcVvQO6nr1muTvaDvvUwE71sangamSSDxpVRWrdsJiOrkspYPe4qrFqycPUl4SOyY4GtCZRbCT/11Z6kt/YOWzLweI=
+	t=1762994119; cv=none; b=QlDZh/kxYLiAZQ/vRivv6c5lDmGyGPTeGKRlNtEeZDwqSrlJFGWwb7kG5odBEdBdmHwrCnKeD1O19dM+uR+jaUwD2q2468NzBUraZ+r2LlU71jAlfgzJm+7baDiVNGz5HKUtIrEgsS6O1qlHTGh7crI8Pbyuwtpykl9A+kj5g8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762988506; c=relaxed/simple;
-	bh=ptpQHUkjOPekkiQOHwD58jsF0L267w/KGg8/nZu2zTM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qWtO4hlsTd5eMSiDPmifueyxXzKbXiHBCpihDcJxSYyHjI1qDXGY5sGqTtuFJiokyU6XMA0+Hm4Om8YQEBJNXKXvjXRcXMiO24YAP7+B71QzPDo6EpU8OGfIHL/rLgo1P34HPJTZy5sXnqMw6Sh8uK4gzgBkRhGoyAK3VJ+7ASo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=COEHRRoB; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762988505; x=1794524505;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ptpQHUkjOPekkiQOHwD58jsF0L267w/KGg8/nZu2zTM=;
-  b=COEHRRoBGUvkLAx/VFNzBolb23Ugg0bcNOJzpcljxA2zE534odU+4bRv
-   uPC2ZdDrAguIpMoOpcGw3J7k1LdhdxtLE/ovNNCDXpXmeKtzgYqYynWx6
-   OrYHMrcXLIFjdauUP7nuLdQn7b05EUs69WSjGYYageagc2AUAJU9lvOLU
-   ZP4zs5NVg1Lkyfstl4P2gXREvKvX0Qdn2+YhPw37aScqMoQmaNjQ7wWej
-   RvS50sosLLFFxQ+W3jh9M1zDX+u92xlU96CEYakAAKGAO243pc2a0rSt9
-   elH4NGRVWjZWwKXdzXHAU2GcBDp/XVbkWCUqYvnXZcq20qM/6u5gs3rEr
-   w==;
-X-CSE-ConnectionGUID: tZwwttguTJKIKb9oSuh00Q==
-X-CSE-MsgGUID: woettoVLS2KXDXbnjAo1Ug==
-X-IronPort-AV: E=McAfee;i="6800,10657,11611"; a="75371715"
-X-IronPort-AV: E=Sophos;i="6.19,300,1754982000"; 
-   d="scan'208";a="75371715"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 15:01:44 -0800
-X-CSE-ConnectionGUID: /Ik4MOPGRX60m5ZRK8SEQw==
-X-CSE-MsgGUID: CR5Znu9hQVKOq1mhyKZqKQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,300,1754982000"; 
-   d="scan'208";a="193734035"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 15:01:45 -0800
-Date: Wed, 12 Nov 2025 15:01:38 -0800
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Borislav Petkov <bp@alien8.de>, Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Brendan Jackman <jackmanb@google.com>
-Subject: Re: [PATCH v4 4/8] KVM: VMX: Handle MMIO Stale Data in VM-Enter
- assembly via ALTERNATIVES_2
-Message-ID: <20251112230138.nepccbv3wf5em5ra@desk>
-References: <20251031003040.3491385-1-seanjc@google.com>
- <20251031003040.3491385-5-seanjc@google.com>
- <20251112164144.GAaRS4yKgF0gQrLSnR@fat_crate.local>
- <aRTAlEaq-bI5AMFA@google.com>
- <20251112183836.GBaRTULLaMWA5hkfT9@fat_crate.local>
- <aRTubGCENf2oypeL@google.com>
+	s=arc-20240116; t=1762994119; c=relaxed/simple;
+	bh=pqaWapcSx1fG/eg63jrW4womW8bqwrPCzR9rpSBWqUU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SulFgJFc0UnUcbbYY0XuKq4ipeWr+32u2KlF+MnOvp9l5nmKQMY9vOKCV5gtXrkcmPirpKCxKFVhyX14a9nwYTUVGmcparbVd/8Xm/qPyBujvkemzuscOlelZUVAseypHzbsIqTUyeiZYOagg3SVYlUaedFfKMTe72+kRN+1aFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=viNgrp3B; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5957c929a5eso290206e87.1
+        for <kvm@vger.kernel.org>; Wed, 12 Nov 2025 16:35:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762994116; x=1763598916; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tkmP58eOOzM61HVymH4b01vkY2iRcbp7BM0yKv/+Lgg=;
+        b=viNgrp3BaPYr7S6e0enLdqUp6skcvv3zmFX8C2ErAvx9kB+AOwOgXfPam6Yy0i9wf/
+         n/Jde2Of5BoduLoucZUhHRoS4meM79cwQQmj/kHvgmimr853dri4T+2AzdHQpqxeEZbE
+         mXn2GTv9oMWw/nCp2AIOI6I6ktZz5F16NLxy9K4vUi2Bp4ZWfPd6IAPRzkVeDLWCug/B
+         zXWJgGR7IDtnfmcj0Np9B1DR/ZZnyfmCmRlMTNrisZFRUu8qJ1IAyTs47MOT/xlX4FKc
+         QqXxr9hrNahE2eHpSytr3qH3R5U8nANCsgs7YquxpCFiQWTkgP+1Lau2OassQS4K/jBZ
+         zdAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762994116; x=1763598916;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=tkmP58eOOzM61HVymH4b01vkY2iRcbp7BM0yKv/+Lgg=;
+        b=RDRyBvM6+FUjqtW/gzlpi8ZrrG8sviGYEkC0CoFrgIoxmba2YfmRi9Oq5Mn5I6tqwY
+         nTazfjtyxWUvHGui0XxlGm/WIy0sXf20J1yi6hUDH5/Qsk8AYRbFC6YlgO5zcXbVLrHd
+         LHfkuaVQTiZsuALB4TArR93jYLXs54l28xqZICVX65xOtluhHbnA1E9dfiNt4z/MRD4w
+         mUGE6KgVIy2yw2rJPQbHG0Lrl2PnizpHztieULY49Lb54jrIsNFbfu12NTLQJN8+NbqQ
+         5a70kNsnDhALOT0wAxuq++TbPcc+GHOzZgF2OgZA45f0z4re75Vzqk2mBKixor3S12mR
+         dNlw==
+X-Forwarded-Encrypted: i=1; AJvYcCXlCDiHeGWdBGw84JU858F2ZFLG5TkmpnaEu0pVfjdiiL3qbDC4zaceKA9i97LaUw4PU6Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZWWxVCxs9Tqy/q0UqTRxLZ8KA97TDIwj/8nKOunop+Yagljzo
+	zhrMRI7dBXsMfpTj7YGutwdfPVLwwIYJOVL368xg80RefwwVSxyG2OFJ2zz/l/rb871Vax+ksT2
+	5C0syf0p+edocAvvaE2ZPDaduG15zvm50iTQ/86Kh
+X-Gm-Gg: ASbGncuR7hOD+Pjw75DCmF//qltZdkMyc6zHOBQlhF+Mn1p15RINBD4V0gnWNVIo33R
+	8SfqBlKsfkIGmGEqjCUN1dwLLUQu0cMmioko3wSTV+Ue/Y4jRQi3qjAY1XQqfoErI276wwD/WNJ
+	9oBr0W89jhZEE17TDC1uxFTvJ4iWHyRPVHj7zyL74SkcYq7ZsAkjXLl2jHt8MPUzGV156R92Y2j
+	w15V+556h4+WX3lsMXTgDLKfE903OH2UY7ugPPNlrRYr4T6ziCVdGfZdOFfj5H8B3g+Cjs=
+X-Google-Smtp-Source: AGHT+IHS/Kzh0J9JYNHr2D3ULKDt78ThxpCQIIKEBGFx1+HIJhZiigh8difVsCMYmuVEig16Ad6HrnNP542iimGxtQI=
+X-Received: by 2002:a05:6512:2c90:b0:595:78e2:fbe9 with SMTP id
+ 2adb3069b0e04-59578e2fdc4mr1629903e87.4.1762994115701; Wed, 12 Nov 2025
+ 16:35:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRTubGCENf2oypeL@google.com>
+References: <20251112192232.442761-1-dmatlack@google.com> <20251112192232.442761-19-dmatlack@google.com>
+ <aRUQAg1kNVzfKkuv@devgpu015.cco6.facebook.com>
+In-Reply-To: <aRUQAg1kNVzfKkuv@devgpu015.cco6.facebook.com>
+From: David Matlack <dmatlack@google.com>
+Date: Wed, 12 Nov 2025 16:34:47 -0800
+X-Gm-Features: AWmQ_blBM6dOH1o_M6QHhvqvhltx_Al5yFrg6jKCV2WNKsSpZRUCPCb5OssgibQ
+Message-ID: <CALzav=e3ZQsVEGmRFAZ1dmMg+SVkBpEzgzpUMJw3LSA6NZJw1Q@mail.gmail.com>
+Subject: Re: [PATCH v2 18/18] vfio: selftests: Add vfio_pci_device_init_perf_test
+To: Alex Mastro <amastro@fb.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Alex Williamson <alex@shazbot.org>, 
+	Jason Gunthorpe <jgg@nvidia.com>, Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Raghavendra Rao Ananta <rananta@google.com>, Vipin Sharma <vipinsh@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 12, 2025 at 12:30:36PM -0800, Sean Christopherson wrote:
-> VMX "needs" to abuse RFLAGS no matter what, because RFLAGS is the only register
-> that's available at the time of VMLAUNCH/VMRESUME.  On Intel, only RSP and
-> RFLAGS are context switched via the VMCS, all other GPRs need to be context
-> switch by software.  Which is why I didn't balk at Pawan's idea to use RFLAGS.ZF
-> to track whether or not a VERW for MMIO is needed.
-> 
-> Hmm, actually, @flags is already on the stack because it's needed at VM-Exit.
-> Using EBX was a holdover from the conversion from inline asm to "proper" asm,
-> e.g. from commit 77df549559db ("KVM: VMX: Pass @launched to the vCPU-run asm via
-> standard ABI regs").
-> 
-> Oooh, and if we stop using bt+RFLAGS.CF, then we drop the annoying SHIFT definitions
-> in arch/x86/kvm/vmx/run_flags.h.
-> 
-> Very lightly tested at this point, but I think this can all be simplified to
-> 
-> 	/*
-> 	 * Note, ALTERNATIVE_2 works in reverse order.  If CLEAR_CPU_BUF_VM is
-> 	 * enabled, do VERW unconditionally.  If CPU_BUF_VM_MMIO is enabled,
-> 	 * check @flags to see if the vCPU has access to host MMIO, and do VERW
-> 	 * if so.  Else, do nothing (no mitigations needed/enabled).
-> 	 */
-> 	ALTERNATIVE_2 "",									  \
-> 		      __stringify(testl $VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO, WORD_SIZE(%_ASM_SP); \
+On Wed, Nov 12, 2025 at 2:54=E2=80=AFPM Alex Mastro <amastro@fb.com> wrote:
+>
+> On Wed, Nov 12, 2025 at 07:22:32PM +0000, David Matlack wrote:
+> > +static s64 to_ns(struct timespec ts)
+> > +{
+> > +     return (s64)ts.tv_nsec + 1000000000LL * (s64)ts.tv_sec;
+> > +}
+> > +
+> > +static struct timespec to_timespec(s64 ns)
+> > +{
+> > +     struct timespec ts =3D {
+> > +             .tv_nsec =3D ns % 1000000000LL,
+> > +             .tv_sec =3D ns / 1000000000LL,
+>
+> nit - I think you can get NSEC_PER_SEC from #include <linux/time64.h>
 
-WORD_SIZE(%_ASM_SP) is still a bit fragile, but this is definitely an
-improvement.
+Thanks for the tip. I'll include that in v3.
 
-> 				  jz .Lskip_clear_cpu_buffers;					  \
-> 				  VERW;								  \
-> 				  .Lskip_clear_cpu_buffers:),					  \
-> 		      X86_FEATURE_CLEAR_CPU_BUF_VM_MMIO,					  \
-> 		      __stringify(VERW), X86_FEATURE_CLEAR_CPU_BUF_VM
-> 
-> 	/* Check if vmlaunch or vmresume is needed */
-> 	testl $VMX_RUN_VMRESUME, WORD_SIZE(%_ASM_SP)
-> 	jz .Lvmlaunch
+>
+> Otherwise LGTM
+>
+> Reviewed-by: Alex Mastro <amastro@fb.com>
 
