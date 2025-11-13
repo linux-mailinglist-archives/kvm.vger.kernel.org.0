@@ -1,108 +1,107 @@
-Return-Path: <kvm+bounces-63041-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63042-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E11C5997F
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 20:02:07 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56171C59A8D
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 20:13:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD0D23B6BD4
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 19:01:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A0B5C4EAB36
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 19:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A90C316902;
-	Thu, 13 Nov 2025 19:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6D4E3191AF;
+	Thu, 13 Nov 2025 19:06:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRYWWgdo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FBF1FrJs"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225A3312830;
-	Thu, 13 Nov 2025 19:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5EF3191DE;
+	Thu, 13 Nov 2025 19:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763060508; cv=none; b=KtXjTl8KeZcNz2PNMS35edxJ2tdykZv5VYoq9CHkDkynH61akIF5mbZCV55X/9+BKg4GxetnqWHgk9cKF80CKCToo9Jh7W3xUYqAa7JL/DJlCiN4X0VV/hkhv6fJ7MiFsKVxT9HT4yFzQJiGgNLZa7JusXWul63BmmgU89m4aYg=
+	t=1763060798; cv=none; b=Aea+iWbVfKYZUegeFNRnBVgeXlg9xwP9xsZRwvTi/AwKv9SnATASwZoFf/PHa4IfU/4aD4Dd5XMAgDqYv757GpLhTW9a3C3heOfY5NWjj3JYZgJC/teD1sXke8W6lqXH0SA5vh55Fv0xVxrwhXdJFtDIgTg7Szq0BXkEvSAstKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763060508; c=relaxed/simple;
-	bh=oDRRct8+8e6d4sESV9pqEb3O+7eJ3tDiXPVRXj0oYHY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZdekaZjMkHy9IKCczDXGyMHp2HKM+g+IPk4NYztYgTPZfk6NuJ+9Uvd7tq9thCEuw4oK0at+24eiuHSXMqljfz54f4yww8lN6XqhfPRQMHVDV00e6+z+NiNty9hSebrQVjUfBT17eLt8Ssjb+XoBsR7rdZdjgZyUDTjOFN+1ItY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRYWWgdo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A7EBC4CEF7;
-	Thu, 13 Nov 2025 19:01:44 +0000 (UTC)
+	s=arc-20240116; t=1763060798; c=relaxed/simple;
+	bh=c4o0ryZTMkuy62CEXa12XiKN4UsmvuV0qmwiIssY1rc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f3KCtNBryB/LVrqKtv4vj1O3KiNFeABUZohMF1qQXnbJMISxPBcxuxGmNRAsC4Aw5N3AtmLrT4IjsORlQks33kz1OOVQH5k5bEo0MyOYubowIzK8tGLTWR4cJKV4YAanBLOZU0LHu9s9J3PNl7M0OApMM7WMweH9g9TB+Oo6MgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FBF1FrJs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAB13C19421;
+	Thu, 13 Nov 2025 19:06:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763060507;
-	bh=oDRRct8+8e6d4sESV9pqEb3O+7eJ3tDiXPVRXj0oYHY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pRYWWgdoyK2Dmc0eMVR+VL0/Vx4QMjFcxrj04kxA/BT4Lt61IAlsv99RJPGUKKhff
-	 eEjsWbyKvdZsFnKoyMY844jlKQy9iSsnUFNznMjCBoBDKNZcZnL979tB9c+Q2cCJRe
-	 UkPfJtmfbwO+Ovz0DNsbRyI7yXvXQgBHp6oRyzItZVPcCq5hv0ilCmLlGYjM2vYY2H
-	 9kFD7vF2dX66DyAX6EDbh534uwno29thYSmTgZW6uHRa/VBfgzSOmhkNGiKW92hnuM
-	 LHyS+0QxIV/rLr9DCrC/Q/B7m5wvTDxD4yYMAnfARapORcVrQaIweqF9j+DeGp74/E
-	 9ztwxzRv30XBg==
-From: Catalin Marinas <cmarinas@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	nd <nd@arm.com>,
-	Mark Rutland <Mark.Rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Catalin Marinas <Catalin.Marinas@arm.com>,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	yuzenghui@huawei.com,
-	lpieralisi@kernel.org
-Subject: Re: (subset) [PATCH v3 0/5] arm64/sysreg: Introduce Prefix descriptor and generated ICH_VMCR_EL2 support
-Date: Thu, 13 Nov 2025 19:01:00 +0000
-Message-ID: <176306037418.2469077.5379528252615859360.b4-ty@arm.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251022134526.2735399-1-sascha.bischoff@arm.com>
-References: <20251022134526.2735399-1-sascha.bischoff@arm.com>
+	s=k20201202; t=1763060797;
+	bh=c4o0ryZTMkuy62CEXa12XiKN4UsmvuV0qmwiIssY1rc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FBF1FrJsur20m/Sikm1MD0deGRjb2V1j7lLOlUSAewPjJ91BsoD2M1dS392jnYW22
+	 tpB8BSWlGdYSTpz3aleB9TbWGT4BXJFvy9iZ5KRcqX9/nf+xEYtpZ+X0T+jr/WuVEq
+	 ScEGsNK9XKfCkXjK15/58K3vufm+oGxVlWGmUVuTK9KacRCyHD+O/Q7DBf3z3Hi0wM
+	 4VG7cQIAlgOXgKAn3wHvfZLqWKbGeUCA1u+gNwn2EdiDt71J8ujBOt6BzsUhK7py92
+	 Y3UJgmmunkGGlOrNy95Qt6B9lZc7XVO1cNKDZW++wySH8oL/iB6xr3gj7402pCa3Ir
+	 c/V8fuAVoBcvA==
+Date: Thu, 13 Nov 2025 19:06:31 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>, Aishwarya.TCV@arm.com
+Subject: Re: [PATCH v2 05/45] KVM: arm64: GICv3: Detect and work around the
+ lack of ICV_DIR_EL1 trapping
+Message-ID: <7ea5c49d-b093-475e-9f27-ad92dcc4b560@sirena.org.uk>
+References: <20251109171619.1507205-1-maz@kernel.org>
+ <20251109171619.1507205-6-maz@kernel.org>
+ <7ae5874e-366f-4abd-9142-ffbe21fed3a8@sirena.org.uk>
+ <86ikfdu7cu.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="IqwhI93WVr97nscY"
+Content-Disposition: inline
+In-Reply-To: <86ikfdu7cu.wl-maz@kernel.org>
+X-Cookie: An idle mind is worth two in the bush.
 
-From: Catalin Marinas <catalin.marinas@arm.com>
 
-On Wed, 22 Oct 2025 13:45:35 +0000, Sascha Bischoff wrote:
-> This series introduces support for conditional field encodings in the
-> sysreg description framework and migrates the vGIC-v3 code to use
-> generated definitions for ICH_VMCR_EL2, in part as an example of how
-> the Prefix descriptor can be used. In addition, it fixes an issue with
-> the tracking of incomplete system register definitions.
-> 
-> Together, these patches complete the migration of ICH_VMCR_EL2 to the
-> sysreg framework and establish the infrastructure needed to describe
-> registers with multiple field encodings.
-> 
-> [...]
+--IqwhI93WVr97nscY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Applied to arm64 (for-next/sysreg), thanks!
+On Thu, Nov 13, 2025 at 06:15:29PM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-[1/5] arm64/sysreg: Fix checks for incomplete sysreg definitions
-      https://git.kernel.org/arm64/c/0aab5772a53d
-[2/5] arm64/sysreg: Support feature-specific fields with 'Prefix' descriptor
-      https://git.kernel.org/arm64/c/fe2ef46995d5
-[3/5] arm64/sysreg: Move generation of RES0/RES1/UNKN to function
-      https://git.kernel.org/arm64/c/a0b130eedde0
-[4/5] arm64/sysreg: Add ICH_VMCR_EL2
-      https://git.kernel.org/arm64/c/a04fbfb8a175
+> > The arch_timer case bisects to this patch in -next, regular nVHE mode
+> > runs this test happily.
 
-I left the last patch to Marc/Oliver.
+> My hunch is that we're missing something like the hack below, but I
+> haven't tried it yet.
 
--- 
-Catalin
+> I'll probably get to it tomorrow.
 
+That still fails FWIW.
+
+--IqwhI93WVr97nscY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmkWLDcACgkQJNaLcl1U
+h9CHwAf/T+DZlAAEflS6H6jO+BA36LhxPkjMUd+GbOOat4+PEXU0sJf3AtFWB2WK
+aIQlFqC7YpzBL7UxoqajhZzrGK26TZFr3hyuVCL9wo5gRhqSPbH2JVTyqQ6I5rrE
+gF9vdJdeWmLYVdEOj+UAtnFwNqqZdm3hiSZaAANBxcr1C6C9u7OUlZhxlKMYGUkf
+PzQpwZzBudtqiRHCo2uRLEeNQffLLhO/MmQJeLo1r/BGAf9LHNLZ/Jj+YpUkyjHp
+zuUYITl4AfLiyyzcuLSi0CzEawlU6OLLHf+cdaryobUa+DzIIsXzcYr2orVum7Xl
+6Mkc3eWj3QdABeeu4lRGQ7fTyD7b8g==
+=Moc7
+-----END PGP SIGNATURE-----
+
+--IqwhI93WVr97nscY--
 
