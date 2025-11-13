@@ -1,262 +1,330 @@
-Return-Path: <kvm+bounces-62990-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-62991-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2020C5652A
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 09:42:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 412C8C56885
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 10:15:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A23CD4E7A6B
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 08:37:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E68CE4F21A4
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 09:01:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B48C335542;
-	Thu, 13 Nov 2025 08:34:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB4E334C07;
+	Thu, 13 Nov 2025 08:56:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bC9lajH9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C+insMSZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF433334C26
-	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 08:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763022849; cv=none; b=OTHBAqWoET4bN/6VgG3ob4IIRXr2ahhuRhaLJUgjp4HnsmWOmufBKjy9HPsPRkJpx6YtdCStzrrTiMd2ganbNgoPner9xvIm48LhFXslYFunekZ5MfhZLncQrnTVdPu5yG4Y6bK0RzoFFx8xMEXkvL/SxAZ1g2Ys3WZsqQuFyng=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763022849; c=relaxed/simple;
-	bh=Yxcu7/KUCWyU777GRqO1bMQ6Ax1NjVKJEGuZpno+whY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B6//XU0mrf48w1gC7ohQJ9Qr+cf9vgx0CTGXjpVojLjLewstmUzTRVoYhg2R8FSybZLrMR5jcdcqUOV8hCJ0q8vH6NE01EGjme39AcJN/8ulaEj6B51RRr2SRywXBE7ENiflxG7sY+lUTbXgkFJAaGEzw6+4Zlz3cErUcAbA408=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bC9lajH9; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-343d73d08faso588151a91.0
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 00:34:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763022847; x=1763627647; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VfufakeYQV6Eei1VDjFOp/g9ltD15I/RsjxykQDBAqM=;
-        b=bC9lajH9ZFKXNrNSoLM1GE1ZP4vpzhSqRpDXgR66fKoZ1jPmkYryU9Aw3lFR6nOPdK
-         KfP/93zt4dklhKVDr5ka0/6Uy9kFHzWJBN4xVHVt0sPzB9KDieqAlD2fRDUrUaYHgz7N
-         EilhicH/lC/2Lic+UshlNNBzuhUapUhtpS5tgc87MLhEQ12uNKy2ci3zhJennpzAKPuT
-         LQIdrMcXxmK5pqUiHPW85hyi1WGjMD2tF4276sD6S5K8LCnqbpBPkiTc9GWsvSQQ9UaS
-         F/tg60d9v2Oy9E0z8Jbzlq3QyfPIqFJ2oJNpAwgybmSTgsIoYd+KJC0a9f4RRmfhbSgq
-         UhCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763022847; x=1763627647;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=VfufakeYQV6Eei1VDjFOp/g9ltD15I/RsjxykQDBAqM=;
-        b=OUfZp/YRjJQ5kacwW0VCCDpV4nBebDkNUYZfNzSZ0Qg3GPG/YgkhtQHsKnTg0H2etB
-         noTRzTaKZ8XlUi9DadyP1tN6Etb11kkJ0HCZpa6do70gsA7ZH0oU+rrTE8eTjhysLn9t
-         60G177xAWFcQN+SSngQd8J5LjXW0k5Sw0SN8+b2wDvvd860K00cyZFFGWAJqhNRK0Va1
-         ko0zbJ/C8Adl2+gF3U2xIaFxwQiKlmUyPeTRwCVon/Zr4++R+fwjaMkCK7Ci86OR9852
-         JHNXaqRWOuIiWRA7z2KivnJc8OfnysskPEvU66iyROsGcJWVF2tEjRTkjvICu5yqfKUX
-         166A==
-X-Forwarded-Encrypted: i=1; AJvYcCX9uMu9C5eSEB3LjPFnJM7d9iEtqk4kz4uRkS8b2b8VUm3YTOdm5BSiDvjtdeS3Ym3wIl0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvO9p82E2lrYbAWJSDh/ghooaD9R5JAiMsNLqLFRr5Xi6C1oPV
-	Hk/0xJpnakf19Ng1SqCT/qeCGqHvat9zbeeNbh9bIY0f0a9lZAHYiXy/BQIPmKBt4M8ktycliNT
-	y8wVRSNb2tU+jgzam2fGgjK/cD8KM+Ms=
-X-Gm-Gg: ASbGncvGGo/GwKYZB5KY+iNmFAMkFJ+qA+Htvcib/R4ykBYsM5rwsN5UJ7kCw+P0Avr
-	IDye1l0AovDx1msixEVRU6j2DXb5N7KXKcvE7CScxFOh14zwjqyBJ/UP45XkmB/+iZaekleXmXB
-	/GBrvU/ZbJKv8r17vYAJTVEWlS1wq2ZX1tTYDNYiS/59AdJMzYFNk7nAsfZkDZQOaFD3zOkDQY0
-	0zvaUbeQZo8eT96TjzB97iw4ALx9Ni3454nzqFJP7hPgZOnTZuluCeOpzp0
-X-Google-Smtp-Source: AGHT+IF5k9bRBw6aUvmMV9a5V3ovOi3p+Dv/JFpSd4YAX7k2lQXxjPgszX9upu1ck3Dp2nEU0kQr1BDf0CdUmHFmCVk=
-X-Received: by 2002:a17:90b:1e07:b0:340:dd63:3fd5 with SMTP id
- 98e67ed59e1d1-343eacd0972mr3230974a91.17.1763022846898; Thu, 13 Nov 2025
- 00:34:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48E3331A6F;
+	Thu, 13 Nov 2025 08:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763024206; cv=fail; b=AaiyZBSkRd4nNVZmh5ICNYvRb2qK9D9MZmA960/uT2BNe0QhqdQlOYKFFNWAzC7eUKKlESO4fcuAUFlT3MFJZk9SeKnKm4ElMONEbIlsvKN8rxQFhfMWe68/AtUsickxrrW9DT3JwDTitcnTCf52U94FAEWGpW3XYBHVNYAawHU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763024206; c=relaxed/simple;
+	bh=JDRgbBupjgsl+ZCxszPfmDPChIlpJdpSMNhnGPQ4ayE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=BHYLU0GxIr0A+UKTtCJEVl3tINTsQlD7vo8otAqQcEgnz7obD0uYTDGwZqyo5+SlqkUdSRxB8DeP2FBBWP3fOV6+X8wd+yEEG7jPgy8Aybx/PA+EygVpjO8Atn+5UAJCtbhxG/xO2tsIgzaAHqGlJ6Wl2pqGd9kpeDX7J5FgpfM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C+insMSZ; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763024205; x=1794560205;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=JDRgbBupjgsl+ZCxszPfmDPChIlpJdpSMNhnGPQ4ayE=;
+  b=C+insMSZeGf16EmDjD+SqCcR5NwNTQgOgdhFZBGK/dEPf0MJrZAF+weR
+   vB1gPf9gbq8gbHvfzdnETTQAcNUoY0B8M3ODLT6cSAMo7NsGEWWDFfotk
+   Kmzpt7Zs4d0d/FuRLdYfWdywNmaYdg9U+PJf3+MNHsvKpR3Wrrdb1YGUl
+   0YSz3QddsgAI7g8XcpvBTUNjjYm8UxYVkuhUaMCXs9+Mr7n56Hb2rY7GT
+   T9MjwAAnave1DKMZDYPsDRo7vUXNs29Kp3Ft6u6UYd9W8H4Cqzdj2UM21
+   4/8VX92mjRfCu+547R/XnCV1xXCfJ/B4/mQDon+nOCov6biWJjitXTp0V
+   w==;
+X-CSE-ConnectionGUID: f2kR5ChVQaa8qMff2Npfyw==
+X-CSE-MsgGUID: +aCv3uK+TtCb9fLW5havQQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11611"; a="75413419"
+X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
+   d="scan'208";a="75413419"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2025 00:56:44 -0800
+X-CSE-ConnectionGUID: pDSntdAVTzqI3xpNKo7pKw==
+X-CSE-MsgGUID: RrPNM7W0SrGMSgLUR6p4xA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
+   d="scan'208";a="220221437"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2025 00:56:44 -0800
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 13 Nov 2025 00:56:43 -0800
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Thu, 13 Nov 2025 00:56:43 -0800
+Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.17) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 13 Nov 2025 00:56:43 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AkZmTzWENRCpeWc2VExKWt5NQvpurn6YXuVYwu3OHsVgvndIIHwiUZHSoeOrpMG95nkA3zVwVewz4XxN3vVTtbDDC0XAzqbvCz3SQ/fTuO6c/JPAnJjDziYQx/hb4ibRyN9ByTQq2A29WmCOLFG2myLyOIStwQHnu02wuAkLeOc/MPUl813H6+qPIw2wSPw89RsCwUgGFqhoRhITokRjVN7fnv14qAcu14hoEQIB2zu89jZi12L1wCQTi/jdwLzvyKivmNlrLijQj2OOGi23m2TAu7uaZkU4zYRB3ViKRC2Uh6sa6lIoQ23OpOA37BFb1AbGleH3c1T8mcFhUHeaCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Vi2o0O9PQs0U4SMEz8cLzIXSZ0KzZhyajplDD8449Tw=;
+ b=HW1y3fKD+/h4h95wgW+NRke0PgnQBfTKYTxcIRsCkbmDVd8A129uFJNRsE3AI/FXM5ilhAyG6HXDtjWExNGCh6RQfW8o96nnm0kPCJG8MIi/Zlw1ov3pK5mCnr2OVuOKp5Q3f/kmL0PvwrbryLR9ogVUtNIJ8pCzyhZyBfYrTLV3032AclhXXvlAmTOQ5RZEdhhnKs2JQWdu1B5fHCLIQnQVwu40GyZAOlul9A28VUASLJ3UonJkczr01X2HOL9480N6G5xk0J0Twx8KLxwjw5S8gcr0H+FQpVhRAM2FGbXespwIR2bW+BZxX4NoxNzNBf1/NvtLiOtc+Up1nEPovg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ BL1PR11MB5288.namprd11.prod.outlook.com (2603:10b6:208:316::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.17; Thu, 13 Nov
+ 2025 08:56:40 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.9298.012; Thu, 13 Nov 2025
+ 08:56:40 +0000
+Date: Thu, 13 Nov 2025 16:54:33 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com"
+	<seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Li,
+ Xiaoyao" <xiaoyao.li@intel.com>, "Du, Fan" <fan.du@intel.com>, "Hansen, Dave"
+	<dave.hansen@intel.com>, "david@redhat.com" <david@redhat.com>,
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "vbabka@suse.cz"
+	<vbabka@suse.cz>, "tabba@google.com" <tabba@google.com>, "kas@kernel.org"
+	<kas@kernel.org>, "michael.roth@amd.com" <michael.roth@amd.com>, "Weiny, Ira"
+	<ira.weiny@intel.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "binbin.wu@linux.intel.com"
+	<binbin.wu@linux.intel.com>, "ackerleytng@google.com"
+	<ackerleytng@google.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Peng, Chao P" <chao.p.peng@intel.com>, "Annapurve, Vishal"
+	<vannapurve@google.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+	"Miao, Jun" <jun.miao@intel.com>, "x86@kernel.org" <x86@kernel.org>,
+	"pgonda@google.com" <pgonda@google.com>
+Subject: Re: [RFC PATCH v2 12/23] KVM: x86/mmu: Introduce
+ kvm_split_cross_boundary_leafs()
+Message-ID: <aRWcyf0TOQMEO77Y@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20250807093950.4395-1-yan.y.zhao@intel.com>
+ <20250807094358.4607-1-yan.y.zhao@intel.com>
+ <0929fe0f36d8116142155cb2c983fd4c4ae55478.camel@intel.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0929fe0f36d8116142155cb2c983fd4c4ae55478.camel@intel.com>
+X-ClientProxiedBy: SI1PR02CA0019.apcprd02.prod.outlook.com
+ (2603:1096:4:1f4::15) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251110033232.12538-1-kernellwp@gmail.com> <7bc4b0b7-42ea-42fc-ae96-3084f44bdc81@amd.com>
- <CANRm+CxZfFVk=dX3Koi_RUH6ppr_zc6fs3HHPaYkRGwV7h9L7w@mail.gmail.com> <079d48d9-a663-49d5-9bc6-f6518eb54810@amd.com>
-In-Reply-To: <079d48d9-a663-49d5-9bc6-f6518eb54810@amd.com>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Thu, 13 Nov 2025 16:33:54 +0800
-X-Gm-Features: AWmQ_bkcRk45qp8zPBFOlSHohDQtsVbxrxDqJ_rGnpK03CjKPK1a3mzqSOJAb88
-Message-ID: <CANRm+Cy2O9j_itDmJcAwUebV2h=2hvfZxuxtHqKD-vF1XohGAw@mail.gmail.com>
-Subject: Re: [PATCH 00/10] sched/kvm: Semantics-aware vCPU scheduling for
- oversubscribed KVM
-To: K Prateek Nayak <kprateek.nayak@amd.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Wanpeng Li <wanpengli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|BL1PR11MB5288:EE_
+X-MS-Office365-Filtering-Correlation-Id: 80bcc8df-8f33-4851-f925-08de22928f42
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?iso-8859-1?Q?NxZw0qsRskMVR1vFU0qM2Vkbu8oA9VyP7PY5QTEOhS/dgAXy50fxKLebjT?=
+ =?iso-8859-1?Q?WXfQZRvbD+1ryZg5Id9cYTua6MvfVatRb9awjh/F6ExVv3eKgYaXZEIqDT?=
+ =?iso-8859-1?Q?q97wtpFig5kHH+CF56sioMUoi7WZSN+wcAi39YF/TxMC50VrUiQnACLw37?=
+ =?iso-8859-1?Q?Lzu0qg4TlMS/Arom5v6JQFMZ+ezNiLJ8vl49uSC245yJdu9O5dsBI0Wl1a?=
+ =?iso-8859-1?Q?Jvyj6CwHf8k0UsX2cTayRcY1PJrxj51D9ViOKwl2AdlmZj9JiqHwYgStG1?=
+ =?iso-8859-1?Q?1VwkOGIIpN7c5rPK+t7N8mjPC6FZfI94JoERfOr/oNr8Vvp8hO/tukJ5Oe?=
+ =?iso-8859-1?Q?tR8kKJNS1qx4lyXfEA8ZQi8WDiXS7UZSQwDhSOiUqtyGGWPodQ2JeksV9p?=
+ =?iso-8859-1?Q?UcsdWFVfCVF6A9Grz2s/rijpNHqoGHiGwsfnSEw3LuNW1j3C8romr+t7Lm?=
+ =?iso-8859-1?Q?03+deXmctCxSNPNbVU1p4wv+8d9cCRSNDICAhpWrZGZ7WjM4POP9wFETIx?=
+ =?iso-8859-1?Q?DRuTaVMoukZqGBqEvzmseaYyUvtkyz1zvgxo0L5NgFjsSdhUmYaniNDGGx?=
+ =?iso-8859-1?Q?GjnE8SkBUpW5WRyw7a4nCfaYqWgSYCrdo1i51fyEsj0JPLOINKa2iWcL1y?=
+ =?iso-8859-1?Q?1kP48F5w9m3Kgz2ElQovLG/UuthDuQe83KFFZCNbMo4vmsmSVUaMOLxff8?=
+ =?iso-8859-1?Q?9qU216omtt7b21ekMHWdozcqJaLbY9uz2hME5/l/AG6PfFWDpflYCpC0fq?=
+ =?iso-8859-1?Q?wxzq+OgSJkcyIcVdG7pUC0zDWlX8/+Rb65WUTkCNgEvkH8UWqJHalteWxN?=
+ =?iso-8859-1?Q?3Cvf9RAujVctWOmTeaD/6BKXxJrgRdBO8UclrdZC8/R6IDpm3bmQHR4bII?=
+ =?iso-8859-1?Q?7OPZzuVvUwfS8qVtkrveqTYALVatfQJ9LLe6X7G975jZUvKDJaxPvb/jyx?=
+ =?iso-8859-1?Q?wP3LQcQboHoVvlwZ4akh1rOYeM+u95gznOHKZwhqyoj2WpnGxDJ8pvBQ4V?=
+ =?iso-8859-1?Q?hffUnqQNT8EENXK1nOQYiSsS0KdIIZduLZzMVRUCbG2Vmr0QzW4bcyULg5?=
+ =?iso-8859-1?Q?Dbr4r57kWSEDByvX6EPB+GxFWFIy57JKN98QOt7iCTc5HZ7idEh2D1H14q?=
+ =?iso-8859-1?Q?gTua/+uU7tSRipt6W7En+IM5qzvpnLQzfoUIjUhOTgRdN9sgEUtiI9O/P8?=
+ =?iso-8859-1?Q?7FJcJ4kzvtrNPjLY7GI1zHh/GgfpWJjgjc/IT0acV7A/26dN/uCDkax3eF?=
+ =?iso-8859-1?Q?XVWIH/Mpy9jr86ZjVBzIJQ77qDdbTpoa5R7t43lz85Q6qispI0Y0UGAFri?=
+ =?iso-8859-1?Q?9pgB39gH7RiHf80o7q8mujgsxwFCXFBDmMrWpv9HgAIvTVOVzM29l2+P0r?=
+ =?iso-8859-1?Q?9UQVAZYa93jdLZPmEzUspRx6tPJD9Zj+a2kHMIsnDs3qqzXUGEq1fhbm6D?=
+ =?iso-8859-1?Q?CS6x5jiQ52zFhoITZvb7vn38Kmxb4GZWA79EpvrzZVfCD7gh0Uu5YT42t7?=
+ =?iso-8859-1?Q?11VnNyp43dSvrarn6hTRD6?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?6tJL0SXXYMzuy2WW0IPgbZM9V5grMCWAmuenUN8JGD1hTRsKMFHZRYkOeP?=
+ =?iso-8859-1?Q?LHTxIomjUvg1EpBPtntjuZh4nYxQTj1bwDRY99zPeuwmerkzJIyt5Ybb0Q?=
+ =?iso-8859-1?Q?b8CBJ68reiBp+/PYumqdw/NG25wweqGbpWxuXZh/nDzQj85Suzm4jwwcbJ?=
+ =?iso-8859-1?Q?TxEq6EHkHB8R8TwELzKCJLkIrNTbd4LwIs4yVwat8CGNAdIyTedvXTlPcI?=
+ =?iso-8859-1?Q?QqwNSnibcsVe25W9QWzb9jev5nt620p3d8E+TpckteHwFAuIjQXubTr8M4?=
+ =?iso-8859-1?Q?pPiH8fHSuro0hTeRX7v1cYxVh+J9r6fkAf7S63Y3RkgvwqARcG109vSYy2?=
+ =?iso-8859-1?Q?Hf7CTSAoaeuRtl5oo1TYx9JfLjlvXBP9ggQBJrA/nozV0G/1UU6YHvcBHK?=
+ =?iso-8859-1?Q?SvyVFnRO/anTi5FDZibX9YeylOC1/XhpiUQtTAs0OkcuV97Lgfm1qZDKJk?=
+ =?iso-8859-1?Q?OaiySBSDp0cy7pJEuaZPfSYvx46zujFtnmJCdBtU+4eLw67T6Wh1OROOwf?=
+ =?iso-8859-1?Q?Y+e6XeOVPx2FNr7gT6gQYv/Dmz4Y3hQxO5aHP9rx6VdrLvR6dGbC4ZFwuv?=
+ =?iso-8859-1?Q?RE3cB6TBHtfTB2Ve6zZtwT+veF7f79tyoqkKiBVbkOgSbaWHtz9KyVTvmB?=
+ =?iso-8859-1?Q?p2nr37a3mmxsgjzVF4GeTnYWOIQKdXtAPtSfi+vziEX22CVZrV5D1m58NS?=
+ =?iso-8859-1?Q?ZdZ8WfMIFE9uMgjKyQ4g8HfDp1a4QqNeQqybWne+yj6LnnkmNabt1F+TsU?=
+ =?iso-8859-1?Q?s5UTCfO2pfmzjRvCFzuZ6XfBJIUP6gKUGlhPBYLZ8um2P6LHpibtRVaxqP?=
+ =?iso-8859-1?Q?Np3tB75vWaR6vgJR6OeZxk+W6LAsg+j866L7syzAbf4jKdJxNAM5OahlG8?=
+ =?iso-8859-1?Q?0s8nhRU7o+tSFdGPHWI62E1ssWZV9t8vCwDg+4uLZKxwvNONNie4CcBlIc?=
+ =?iso-8859-1?Q?+bPkLLpUI5AADU4adBv2RcEN89meLRRy8fXTGosL1DHnt0LMjTfLv8nEJq?=
+ =?iso-8859-1?Q?p2GPtDVCFYRj01sTP9lIB8N7SWYgzyiUCmw7If9yXfEFatSuLkSGmfOdo2?=
+ =?iso-8859-1?Q?M7hrIxKUAQ6YKKcm+c1jAORoeF39WGJXOnFxAfCOkyqOuil1aHpQnk48ue?=
+ =?iso-8859-1?Q?KFHlp69rtUZJtpA/PLVTixVFXB2BwvwBTL8y/Aeeguas0Dt+6hH3jn0c40?=
+ =?iso-8859-1?Q?IFdDYUyL6VFPqFOzCRLsPk2/1pm1rtFYf3u9PRAKQC2Whn+TEAgh4JJJii?=
+ =?iso-8859-1?Q?n33efJuA00hLdjg1SKmR5E6197tFzKOQRncHq+znMQ5IflgyplwRbV3nMN?=
+ =?iso-8859-1?Q?IwLJCKXc2gnWEpEcjBo3ci4cXAS37C6CzyRzXA8Bu+ZWi44akh24TTEP1s?=
+ =?iso-8859-1?Q?mxFCJBjxBwgM3MGKObJ5bEZvqulV2VmpGpUPIA4DIzj1OpWh4XmK6Phhcd?=
+ =?iso-8859-1?Q?Gb0pHxOR8wTP6Bucs5tdQi33o80GAAg8Tn9SsijiQSfWoYSRqwSZQG+1Tc?=
+ =?iso-8859-1?Q?Ct1UuBPcd5fXfXe0fovvtV8ZwfmaczKGLEanqfvDKHVHJfSHL4NHGkDqWj?=
+ =?iso-8859-1?Q?hkhI2NiTxufAtQR4/5p1JkUKrXZC3tcNCY62G0WmjUyxtJ7d4mXx+nmzpR?=
+ =?iso-8859-1?Q?VhOrbJNhC9RW0QY1LiPGGfWFuvMu04wg01?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 80bcc8df-8f33-4851-f925-08de22928f42
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2025 08:56:39.9383
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6ZPy4xHqXBdZc1O/0yThpvQw4k4lgLoFlMIZ6HHw/QIwfXP67l31JMLkSqVoD3W+2aQGaffQbh4ujLZ4eGfsPg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5288
+X-OriginatorOrg: intel.com
 
-Hi Prateek,
+On Tue, Nov 11, 2025 at 06:42:55PM +0800, Huang, Kai wrote:
+> On Thu, 2025-08-07 at 17:43 +0800, Yan Zhao wrote:
+> >  static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
+> >  					 struct kvm_mmu_page *root,
+> >  					 gfn_t start, gfn_t end,
+> > -					 int target_level, bool shared)
+> > +					 int target_level, bool shared,
+> > +					 bool only_cross_bounday, bool *flush)
+> >  {
+> >  	struct kvm_mmu_page *sp = NULL;
+> >  	struct tdp_iter iter;
+> > @@ -1589,6 +1596,13 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
+> >  	 * level into one lower level. For example, if we encounter a 1GB page
+> >  	 * we split it into 512 2MB pages.
+> >  	 *
+> > +	 * When only_cross_bounday is true, just split huge pages above the
+> > +	 * target level into one lower level if the huge pages cross the start
+> > +	 * or end boundary.
+> > +	 *
+> > +	 * No need to update @flush for !only_cross_bounday cases, which rely
+> > +	 * on the callers to do the TLB flush in the end.
+> > +	 *
+> 
+> s/only_cross_bounday/only_cross_boundary
+> 
+> From tdp_mmu_split_huge_pages_root()'s perspective, it's quite odd to only
+> update 'flush' when 'only_cross_bounday' is true, because
+> 'only_cross_bounday' can only results in less splitting.
+I have to say it's a reasonable point.
 
-On Thu, 13 Nov 2025 at 12:42, K Prateek Nayak <kprateek.nayak@amd.com> wrot=
-e:
->
-> Hello Wanpeng,
->
-> On 11/12/2025 10:24 AM, Wanpeng Li wrote:
-> >>
-> >> ( Only build and boot tested on top of
-> >>     git.kernel.org/pub/scm/linux/kernel/git/peterz/queue.git sched/cor=
-e
-> >>   at commit f82a0f91493f "sched/deadline: Minor cleanup in
-> >>   select_task_rq_dl()" )
-> >>
-> >> diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-> >> index b4617d631549..87560f5a18b3 100644
-> >> --- a/kernel/sched/fair.c
-> >> +++ b/kernel/sched/fair.c
-> >> @@ -8962,10 +8962,28 @@ static void yield_task_fair(struct rq *rq)
-> >>          * which yields immediately again; without the condition the v=
-runtime
-> >>          * ends up quickly running away.
-> >>          */
-> >> -       if (entity_eligible(cfs_rq, se)) {
-> >> +       do {
-> >> +               cfs_rq =3D cfs_rq_of(se);
-> >> +
-> >> +               /*
-> >> +                * Another entity will be selected at next pick.
-> >> +                * Single entity on cfs_rq can never be ineligible.
-> >> +                */
-> >> +               if (!entity_eligible(cfs_rq, se))
-> >> +                       break;
-> >> +
-> >>                 se->vruntime =3D se->deadline;
-> >
-> > Setting vruntime =3D deadline zeros out lag. Does this cause fairness
-> > drift with repeated yields? We explicitly recalculate vlag after
-> > adjustment to preserve EEVDF invariants.
->
-> We only push deadline when the entity is eligible. Ineligible entity
-> will break out above. Also I don't get how adding a penalty to an
-> entity in the cgroup hierarchy of the yielding task when there are
-> other runnable tasks considered as "preserve(ing) EEVDF invariants".
+> I understand this is because splitting S-EPT mapping needs flush (at least
+> before non-block DEMOTE is implemented?).  Would it better to also let the
+Actually the flush is only required for !TDX cases.
 
-Our penalty preserves EEVDF invariants by recalculating all scheduler state=
-:
-   se->vruntime =3D new_vruntime;
-   se->deadline =3D se->vruntime + calc_delta_fair(se->slice, se);
-   se->vlag =3D avg_vruntime(cfs_rq) - se->vruntime;
-   update_min_vruntime(cfs_rq); // maintains cfs_rq consistency
-This is the same update pattern used in update_curr(). The EEVDF
-relationship lag =3D (V - v) * w remains valid=E2=80=94vlag becomes more
-negative as vruntime increases. The presence of other runnable tasks
-doesn't affect the mathematical correctness; each entity's lag is
-computed independently relative to avg_vruntime.
+For TDX, either the flush has been performed internally within
+tdx_sept_split_private_spt() or the flush is not required for future non-block
+DEMOTE. So, the flush in KVM core on the mirror root may be skipped as a future
+optimization for TDX if necessary.
 
->
-> >
-> >>                 se->deadline +=3D calc_delta_fair(se->slice, se);
-> >> -       }
-> >> +
-> >> +               /*
-> >> +                * If we have more than one runnable task queued below
-> >> +                * this cfs_rq, the next pick will likely go for a
-> >> +                * different entity now that we have advanced the
-> >> +                * vruntime and the deadline of the running entity.
-> >> +                */
-> >> +               if (cfs_rq->h_nr_runnable > 1)
-> >
-> > Stopping at h_nr_runnable > 1 may not handle cross-cgroup yield_to()
-> > correctly. Shouldn't the penalty apply at the LCA of yielder and
-> > target? Otherwise the vruntime adjustment might not affect the level
-> > where they actually compete.
->
-> So here is the case I'm going after - consider the following
-> hierarchy:
->
->      root
->     /    \
->   CG0   CG1
->    |     |
->    A     B
->
->   CG* are cgroups and, [A-Z]* are tasks
->
-> A decides to yield to B, and advances its deadline on CG0's timeline.
-> Currently, if CG0 is eligible and CG1 isn't, pick will still select
-> CG0 which will in-turn select task A and it'll yield again. This
-> cycle repeates until vruntime of CG0 turns large enough to make itself
-> ineligible and route the EEVDF pick to CG1.
+> caller to decide whether TLB flush is needed?  E.g., we can make
+> tdp_mmu_split_huge_pages_root() return whether any split has been done or
+> not.  I think this should also work?
+Do you mean just skipping the changes in the below "Hunk 1"?
 
-Yes, natural convergence works, but requires multiple cycles. Your
-h_nr_runnable > 1 stops propagation when another entity might be
-picked, but "might" depends on vruntime ordering which needs time to
-develop. Our penalty forces immediate ineligibility at the LCA. One
-penalty application vs N natural yield cycles.
+Since tdp_mmu_split_huge_pages_root() originally did not do flush by itself,
+which relied on the end callers (i.e.,kvm_mmu_slot_apply_flags(),
+kvm_clear_dirty_log_protect(), and kvm_get_dirty_log_protect()) to do the flush
+unconditionally, tdp_mmu_split_huge_pages_root() previously did not return
+whether any split has been done or not.
 
->
-> Now consider:
->
->
->        root
->       /    \
->     CG0   CG1
->    /   \   |
->   A     C  B
->
-> Same scenario: A yields to B. A advances its vruntime and deadline
-> as a prt of yield. Now, why should CG0 sacrifice its fair share of
-> runtime for A when task B is runnable? Just because one task decided
-> to yield to another task in a different cgroup doesn't mean other
-> waiting tasks on that hierarchy suffer.
+So, if we want callers of kvm_split_cross_boundary_leafs() to do flush only
+after splitting occurs, we have to return whether flush is required.
 
-You're right that C suffers unfairly if it's independent work. This is
-a known tradeoff. The rationale: when A spins on B's lock, we apply
-the penalty at the LCA (root in your example) because that's where A
-and B compete. This ensures B gets scheduled. The side effect is C
-loses CPU time even though it's not involved in the dependency. In
-practice: VMs typically put all vCPUs in one cgroup=E2=80=94no independent =
-C
-exists. If C exists and is affected by the same lock, the penalty
-helps overall progress. If C is truly independent, it loses one
-scheduling slice worth of time.
+Then, in this patch, seems only the changes in "Hunk 1" can be dropped.
 
->
-> >
-> >> +                       break;
-> >> +       } while ((se =3D parent_entity(se)));
-> >>  }
-> >>
-> >>  static bool yield_to_task_fair(struct rq *rq, struct task_struct *p)
-> >> ---
-> >
-> > Fixed one-slice penalties underperformed in our testing (dbench:
-> > +14.4%/+9.8%/+6.7% for 2/3/4 VMs). We found adaptive scaling (6.0=C3=97
-> > down to 1.0=C3=97 based on queue size) necessary to balance effectivene=
-ss
-> > against starvation.
->
-> If all vCPUs of a VM are in the same cgroup - yield_to() should work
-> just fine. If this "target" task is not selected then either some
-> entity in the hierarchy, or the task is ineligible and EEVDF pick has
-> decided to go with something else.
->
-> It is not "starvation" but rather you've received you for fair share
-> of "proportional runtime" and now you wait. If you really want to
-> follow EEVDF maybe you compute the vlag and if it is behind the
-> avg_vruntime, you account it to the "target" task - that would be
-> in the spirit of the EEVDF algorithm.
+Hunk 1
+-------------------------------
+        for_each_tdp_pte_min_level(iter, kvm, root, target_level + 1, start, end) {
+ retry:
+-               if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
++               if (tdp_mmu_iter_cond_resched(kvm, &iter, *flush, shared)) {
++                       if (only_cross_bounday)
++                               *flush = false;
+                        continue;
++               }
 
-You're right about the terminology=E2=80=94it's priority inversion, not
-starvation. On crediting the target: this is philosophically
-interesting but has practical issues. 1) Only helps if the target's
-vlag < 0 (already lagging). If the lock holder is ahead (vlag > 0), no
-effect. 2) Doesn't prevent the yielder from being re-picked at the LCA
-if it's still most eligible. Accounting-wise: the spinner consumes
-real CPU cycles. Our penalty charges that consumption. Crediting the
-target gives service it didn't receive=E2=80=94arguably less consistent wit=
-h
-proportional fairness.
+                if (!is_shadow_present_pte(iter.old_spte) || !is_large_pte(iter.old_spte))
+                        continue;
 
-Regards,
-Wanpeng
+Hunk 2 
+-------------------------------
++               if (only_cross_bounday &&
++                   !iter_cross_boundary(&iter, start, end))
++                       continue;
++
+                if (!sp) {
+                        rcu_read_unlock();
+
+Hunk 3 
+-------------------------------
+@@ -1637,6 +1658,8 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
+                        goto retry;
+
+                sp = NULL;
++               if (only_cross_bounday)
++                       *flush = true;
+        }
+
+
+Do you think dropping of "Hunk 1" is worthwhile?
+Would it be less odd if I make the following change?
+
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 9f479832a981..7bc1d1a5f3ce 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1589,6 +1589,7 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
+ {
+        struct kvm_mmu_page *sp = NULL;
+        struct tdp_iter iter;
++       bool caller_unconditional_flush = !only_cross_bounday;
+
+        rcu_read_lock();
+
+@@ -1613,7 +1614,7 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
+        for_each_tdp_pte_min_level(iter, kvm, root, target_level + 1, start, end) {
+ retry:
+                if (tdp_mmu_iter_cond_resched(kvm, &iter, *flush, shared)) {
+-                       if (only_cross_bounday)
++                       if (!caller_unconditional_flush)
+                                *flush = false;
+                        continue;
+                }
+@@ -1659,7 +1660,7 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
+                        goto retry;
+
+                sp = NULL;
+-               if (only_cross_bounday)
++               if (!caller_unconditional_flush)
+                        *flush = true;
+        }
+
+
 
