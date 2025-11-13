@@ -1,88 +1,105 @@
-Return-Path: <kvm+bounces-63053-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63054-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E359FC5A3E9
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 22:53:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 713F4C5A461
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 23:06:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 971FE4FAFAB
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 21:38:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFDAF3AD778
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 21:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2219E30EF6E;
-	Thu, 13 Nov 2025 21:37:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA3C3254A9;
+	Thu, 13 Nov 2025 21:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GvkUI3zh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bt1HFehq"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A103246F3;
-	Thu, 13 Nov 2025 21:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF463324B3C;
+	Thu, 13 Nov 2025 21:59:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763069868; cv=none; b=Uk+eCAI/LlGCKZ4rniMVI40mjYdZfYExDzyX4X9PS133MsHysyQIpM8uhDNyDCcyhpA126IMcVLsIgXryV+kLK42KmAoO794iEU2Sph/1ZnsOfpXbCvB0U4Kot6Sq5DA0e7pbLezpX2kr+0lzNl0Oz/ONgFo3CN2feBTWmF7Y/w=
+	t=1763071177; cv=none; b=ZLiNTMMwdw03Gza5LtngwXv3t5n3ICZCW6bK9dREYxqmiRYvhGYqGCfurxah6f/04CiRvJxxZ0Bk789ciJE5p7mwnuUPYcp1cIda9FeEDvbJdzTu6U50cwzO6rl6fzLrTzOtafhClKJGi8gpVNJbq9Ika48/U1bGYUM+jMRD5Og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763069868; c=relaxed/simple;
-	bh=rxL7Gci2ztB1l+oHFBXQu9xc4TlmQwnasATOD0+gSsA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m2Ynpk23OpE+V2I0a5vO6aF1nzs+F7Os+wBrYFFq0cQwXpdmVjhg5LiCDvhZUV360iR9J7uz47d3ZC1lUHa9U+Kw0UX6Xwj6suOOK0AWmojjp+lAXdNUnl0fBnLZWK9npsPwmFGDtBNiHXVHAiOcE9qzcEtPMB+0BXulqCQKsrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GvkUI3zh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AC1DC113D0;
-	Thu, 13 Nov 2025 21:37:47 +0000 (UTC)
+	s=arc-20240116; t=1763071177; c=relaxed/simple;
+	bh=UnZOEY9cSyoxchmU4I4ZbyI1+seIbFOun8eX8HryMlQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=phq/41zF3MkQw7TVnOPfDax7YbbCAcqLWTrBKyhxZ8Y77jYf0gw1Uk9Uu9LvwibFyU81SkdYnH3OAdSkLVnZ2qxGAdI/oe4pJLbPaeRaP0X5YPS/IHMyh3NARFGOn3RhqEYWnzY83P/mUL9mtda2LnQDJMfBvY/0siypvK/EanM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bt1HFehq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EA6AC4CEF8;
+	Thu, 13 Nov 2025 21:59:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763069867;
-	bh=rxL7Gci2ztB1l+oHFBXQu9xc4TlmQwnasATOD0+gSsA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GvkUI3zh4TXQWAF/jkz1rD8ACMooMrT6gTt6F7LqLMW0pIbenBrms060ck2KP7zLm
-	 5Qg6dNO4uS5dUXXfrC2ZSdYAR1Oe2qhtLoF64+aaRC9q1iD0QlGn6+LgoweHYF2iXq
-	 PM7/Ey2rJpvQUR4ofpCIfRTxVeI3rq6OBU3D2iHnXWljtJKoQ/+aMB6vxTQWQf2Lih
-	 c8jH5OjwrC4pdKMeR7Kjo7m8aSonT3vptbPfqXgc/4/8nBMPWd2eHVllqhY/+0S2/u
-	 8uetADDxajYTDLYQevWVJ4pXGiXpmYMGgvf81FEhuecA1cz/YDODAjLZP6weJ6hODn
-	 GFjPZZ12zK7Hw==
+	s=k20201202; t=1763071177;
+	bh=UnZOEY9cSyoxchmU4I4ZbyI1+seIbFOun8eX8HryMlQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Bt1HFehqN+Es/5TQWa0IXHbiptw4nRqIqt1PyD4C47kF5v281LoeHwiC2xMoJ12eY
+	 06DSzN8q/p0QvuBNE3kPhjI7C4lppN71hEQLXNyP35bt575ilt3trvdavSArqM1gVf
+	 uXRM73grYNc+ws/jr0I51YEbl2+3jqEfqbsOWcBow6c1Zz61FGe1GTfVQ6U5aQbidc
+	 xOgA7tPNdFcyjIhdXFhhQ66vmJ/c8DLpAJHVeLvjiiiQ5H1EwpxOaBEoAPw2nFWL3Y
+	 YfitVFLlTu3eggDBs/TuK3BomDp86SiyQq8XpmGz3rL80g8T2jTfB3TokcFXRmcsCl
+	 4T4iotV2r/+hw==
+Date: Thu, 13 Nov 2025 13:59:35 -0800
 From: Oliver Upton <oupton@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>
-Subject: Re: [PATCH] KVM: arm64: GICv3: Check the implementation before accessing ICH_VTR_EL2
-Date: Thu, 13 Nov 2025 13:37:45 -0800
-Message-ID: <176306986138.2184993.9505471875702043816.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251113172524.2795158-1-maz@kernel.org>
-References: <20251113172524.2795158-1-maz@kernel.org>
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>, Aishwarya.TCV@arm.com,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 05/45] KVM: arm64: GICv3: Detect and work around the
+ lack of ICV_DIR_EL1 trapping
+Message-ID: <aRZUx1WkyKdFQgYy@kernel.org>
+References: <20251109171619.1507205-1-maz@kernel.org>
+ <20251109171619.1507205-6-maz@kernel.org>
+ <7ae5874e-366f-4abd-9142-ffbe21fed3a8@sirena.org.uk>
+ <86ikfdu7cu.wl-maz@kernel.org>
+ <7ea5c49d-b093-475e-9f27-ad92dcc4b560@sirena.org.uk>
+ <86frahu21h.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86frahu21h.wl-maz@kernel.org>
 
-On Thu, 13 Nov 2025 17:25:24 +0000, Marc Zyngier wrote:
-> The ICH_HCR_EL2 patching code is generally GIC implementation agnostic,
-> except when checking for broken Apple HW, which imposes to read
-> ICH_VTR_EL2.
+On Thu, Nov 13, 2025 at 08:10:18PM +0000, Marc Zyngier wrote:
+> +Fuad
 > 
-> It is therefore important to check whether we are running on such
-> HW before reading this register, as it will otherwise UNDEF when
-> run on HW that doesn't have GICv3.
+> On Thu, 13 Nov 2025 19:06:31 +0000,
+> Mark Brown <broonie@kernel.org> wrote:
+> > 
+> > [1  <text/plain; us-ascii (7bit)>]
+> > On Thu, Nov 13, 2025 at 06:15:29PM +0000, Marc Zyngier wrote:
+> > > Mark Brown <broonie@kernel.org> wrote:
+> > 
+> > > > The arch_timer case bisects to this patch in -next, regular nVHE mode
+> > > > runs this test happily.
+> > 
+> > > My hunch is that we're missing something like the hack below, but I
+> > > haven't tried it yet.
+> > 
+> > > I'll probably get to it tomorrow.
+> > 
+> > That still fails FWIW.
 > 
-> [...]
+> Yup, this has uncovered yet another pKVM bug, which doesn't preserve
+> the vgic_model in its private kvm structure. I'm able to make it work
+> with this:
 
-Applied to next, thanks!
+Thanks for debugging this Marc. I've added a patch on top of kvmarm/next
+with this. I don't have any A53 machines around but I was able to repro
+using kvm-arm.vgic_v3_common_trap=1 on QEMU.
 
-[1/1] KVM: arm64: GICv3: Check the implementation before accessing ICH_VTR_EL2
-      https://git.kernel.org/kvmarm/kvmarm/c/8ed2ae76f20c
-
---
-Best,
+Thanks,
 Oliver
 
