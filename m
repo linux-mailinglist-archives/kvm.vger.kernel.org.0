@@ -1,178 +1,308 @@
-Return-Path: <kvm+bounces-63021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02DC5C58776
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 16:45:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C78DC58719
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 16:42:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1E0584E4769
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 15:34:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 84E3D4EAC6E
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 15:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1029330BB81;
-	Thu, 13 Nov 2025 15:24:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11DC30149D;
+	Thu, 13 Nov 2025 15:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nLDpNvwS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NN3H6Fph";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PV7HTG7s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D762FD665;
-	Thu, 13 Nov 2025 15:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E542E2FF148
+	for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 15:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763047495; cv=none; b=LsSpBxBj+h5nfLW3HbPgaysiU7FWZ/R6NAB/leFCUgV3yhuTzlZb7fbdYwZcWaUROimhEodhE+PviIGk5EWhDdwjdih3bBeW9WqSiXRyRR09tbUYQ7CE04lvdYIWuZmrkFh4Hy+K+Az3VrC8XIafNKYemwc6FX2DRTzQfRXQHzA=
+	t=1763047496; cv=none; b=OnUw5uONgRZ3pbs/jAtwMAPLiRxOT+8DPCXCDCD0EsBjlfS9DiVWodUXjzeB4SUgvOp2LNSV4iBRs/e58yqf05SifpD6gOvCX0WY4H7S3XZj/WxXo4KVSWhw6K7iSmlZ8ghvpO9I8CSwAbkwcR7t54zo4RdHKBPBimlzR2fX8PE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763047495; c=relaxed/simple;
-	bh=JD28YP4hrzRfPCihPUriwdhYMRXlpBO3JlRw55gb8gI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PmQileg/Ugrql7lbUDNTKmatqKk75n4rchz5AeiRVGJBLHCTZlEdIZMwTz7X2Cdtz7HMcG5zptVPfCWflaC75ny9bskgt+nXzx+VTvRDi//2m07181Snixz98A9b6ytaTqPxKsFSEJko2KqRWqtM/jLYllinxaYZ0tKHpJOW2g0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nLDpNvwS; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5ADBaQDg005109;
-	Thu, 13 Nov 2025 15:24:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=faWynz
-	GXTuSWugXbNO0631jjCqafyE3DJPF+n7heK7s=; b=nLDpNvwSxryW4zSDhx05T2
-	3/PrFvaEkS5QIevv0siAPW12rnKVoH2ilN7EpCrKZLhRiheQnF1Z3Fvcv4qHBI/0
-	lr7hXfWq055x4ovM/MFoVOytOrM1Y9CJqTHDieBGyy9CzgPlfDdmNQ4NkF0HWagn
-	SEDE/81KWL5cxMWYj6xtF6sXTZ8RxDQBA65ZyBr9JC/Lq6ib7KUkW34KWkLWobEC
-	fduyh0hdrU1KGtnt3jbyVqqFK8fRmyZpVKEhxxaOU3iV0yKNPaPulrmw3JYfCIrq
-	1djVDayIqWxOINAgCFxK6j8l2wC3ySHEGpCB6V4RO0y+OMX1fNGIKxpDw5idM0HA
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa3m8e9w3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Nov 2025 15:24:49 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5ADCNp7c007309;
-	Thu, 13 Nov 2025 15:24:48 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aajdjpapu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Nov 2025 15:24:48 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ADFOinq41615764
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Nov 2025 15:24:44 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6C1DD20043;
-	Thu, 13 Nov 2025 15:24:44 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E5C9720040;
-	Thu, 13 Nov 2025 15:24:43 +0000 (GMT)
-Received: from [9.111.27.190] (unknown [9.111.27.190])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 13 Nov 2025 15:24:43 +0000 (GMT)
-Message-ID: <ef706435-834f-45c8-a0ae-0b2eb53c0556@linux.ibm.com>
-Date: Thu, 13 Nov 2025 16:24:43 +0100
+	s=arc-20240116; t=1763047496; c=relaxed/simple;
+	bh=RWmdUrg02H6f+aep4jIDFyNZk5wA5k2aihRICtWoOEQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GALLEAQbd9dXz+B5lsSOj2I43IWUcdBrU0y9L06d0BTT6KI5JrySC6rz6izhAChNzhuPz7F14aJg0+ZRemB8AzPkgDY69gYmATqQ6PMDzisrzlN4cJOG4LrsnmSdhcUStHFxAA2o0WuTtroOxqMXqqoCgI5YjeiP5I3bmBsnhYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NN3H6Fph; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PV7HTG7s; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763047493;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+6KSIoS5LmlMULcY0rSH3odgewvUTbNtCV5m3STvge8=;
+	b=NN3H6FphYabUoE/hWZhY6AHZT+tJF2udbt6qDtApDMvBb9f6q39su7mldV1L2rwIzYo5j6
+	70XgPYLdZkzRE4XTi43bkm//BMpCaayN6RUXZim+0EAmdo7ZJNv94+G800UndMcdvEic/Q
+	85QVp7gWvmdRPclVucja75ZR0Y/EghY=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-493-nehlg7aHO-6YCWquFzTx6w-1; Thu, 13 Nov 2025 10:24:52 -0500
+X-MC-Unique: nehlg7aHO-6YCWquFzTx6w-1
+X-Mimecast-MFC-AGG-ID: nehlg7aHO-6YCWquFzTx6w_1763047491
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-641632b8825so1790920a12.0
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 07:24:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763047491; x=1763652291; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+6KSIoS5LmlMULcY0rSH3odgewvUTbNtCV5m3STvge8=;
+        b=PV7HTG7sLgXc7EV1zPc2q1hyjYQ+iQ7j2Al/2LlmnCnvO08F4m7NBpx7SnkOnI5OI/
+         5wk4tPfwRvsSEPib1SjCuF+HUUx9afNI8leHkjtHFgd5HrE69B3V7YWFIlwwlckjL79U
+         3YFOeqZSbJLIjm97dxkqI554PCUDMEdIjKIHn+9gY0vslWr15qRllLmYvi23i4T6aqqr
+         iCL8eL0pwtiUmd4TvXTbkjcSO5tVU7KYrtd9xoxWKIh9Rg8K35UjtJt+8c4cjIXqC8Ay
+         56HqCS2YY5LV54Nufo6aQNxGu2/Ki3jXfs/johv00BKNdtVZ08GNjrJgC6HZ4oj2N/PL
+         4OWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763047491; x=1763652291;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+6KSIoS5LmlMULcY0rSH3odgewvUTbNtCV5m3STvge8=;
+        b=mzHuEvoVrW3v9RH5RwzhMuheriQccV96VTb/CY8fi6u8sMBEfrW1lbsvdcgJ4tZ7Ai
+         c0CPuXs7UPGbeSsive1igtBJJa/7PWgRxMutfmWEi/XZp4o0h5Veee3LeW72wuWWgFwu
+         aIhu5mEndd4wvWOpuSqzrII9v9cb04PyvJJnEbwYjDROFp4kXmOSv5sfXO6ApGs8JPTB
+         tHQ92zI2gnuGsn3S551vLkUyeJKYG4ZimZtz7sIPug+mJ8BAMHUZNCeCvKPOD5xeDStE
+         rA3pA/URrJbvspTW87oHhjRxjzZ2r9KggG7Po0VEp6rX4tLP7Rb1k8/OlWnlHIQmFcdJ
+         THLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVBZV4myC6GOa9IaHVTSuXdfjGBBDsuFcG75+8R0tez8oKPNE7KcDBAhIsR9Y69zGUeXa4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzr3KEc9RUjs9l1J/N3tlmwawYfoHn/qcytFTBV9vPBeAkFsfEu
+	yjIZYFtn9Ku8Oejtzg6DjpkqGjx7/UI1W/ZHHbVpgmU1wvlagtV0plWQXA/8w0dw4VFp7ZijfHu
+	u4Q46idJ9C5q4CFQUuzpiE5Pu2dy5WMG9H0mLhW/sCaDtA+2+5VnCkw==
+X-Gm-Gg: ASbGnctACPf77bJYFwJ4lVhIFZsveApAzgL1O/UGiqjXPjflm+HS/T5XPt++45Nl9oh
+	GsJrfxfeEPOxSDS93J7eCR501f09pKr2nLRnPg3OvzDRPoF7Wxq4plZn6tDvL/VfrE7TGjyWUHU
+	tGEkhRjIx503Wq5YIUcfcE+2DgVCQci22AtrnTW2g57uwy6YPNTXFfUs04/jyhWjuriYk9jexrF
+	Yg1xM/MP0+gyVATAnd9Df2d3aARm1Oc4mCs7VwDY96e+7JkcCHlCeE0WLDqALXKG8cRJ7BDOp4m
+	xkhDmDDMRM6JmPs8V79BkptTyqp9goxEjTkdh5xynFSotYllUZlbuaZLt7DVQwvfWuZic32GA8/
+	xzv1M9JaV/Z70kikaVehZdGQu2VjiCu3wVCOKPJ+M4CN/Bu8Lkk0=
+X-Received: by 2002:a05:6402:3510:b0:63c:eb6:65e8 with SMTP id 4fb4d7f45d1cf-6431a56938amr6157372a12.30.1763047491184;
+        Thu, 13 Nov 2025 07:24:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFlKgqnCe8xOA2ZWxmxvwtxL2cKocqyC9cwwbKOiPr8xF8kOeK/j8WX7lSpFb7Tuv717eLwhg==
+X-Received: by 2002:a05:6402:3510:b0:63c:eb6:65e8 with SMTP id 4fb4d7f45d1cf-6431a56938amr6157323a12.30.1763047490676;
+        Thu, 13 Nov 2025 07:24:50 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6433a497fc5sm1661218a12.22.2025.11.13.07.24.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 07:24:50 -0800 (PST)
+Date: Thu, 13 Nov 2025 16:24:44 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com, 
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v9 06/14] vsock/loopback: add netns support
+Message-ID: <g5dcyor4aryvtcnqxm5aekldbettetlmog3c7sj7sjx3yp2pgy@hcpxyubied2n>
+References: <20251111-vsock-vmtest-v9-0-852787a37bed@meta.com>
+ <20251111-vsock-vmtest-v9-6-852787a37bed@meta.com>
+ <g6bxp6hketbjrddzni2ln37gsezqvxbu2orheorzh7fs66roll@hhcrgsos3ui3>
+ <aRTRhk/ok06YKTEu@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 06/11] KVM: s390: Add helper to pin multiple guest
- pages
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
-References: <20251110-vsieie-v2-0-9e53a3618c8c@linux.ibm.com>
- <20251110-vsieie-v2-6-9e53a3618c8c@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
- qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
- 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
- zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
- lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
- Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
- 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
- cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
- Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
- HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABzSVKYW5vc2NoIEZy
- YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+wsF3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
- CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
- AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
- bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
- eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
- CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
- EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
- rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
- UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
- RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
- dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
- jJbazsFNBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
- cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
- JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
- iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
- tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
- 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
- v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
- HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
- 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
- gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABwsFfBBgBCAAJ
- BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
- 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
- jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
- IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
- katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
- dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
- FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
- DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
- Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
- phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20251110-vsieie-v2-6-9e53a3618c8c@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=MtZfKmae c=1 sm=1 tr=0 ts=6915f841 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=ZPIKKrjTowzvZ-ttemEA:9 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: 4Llg3b3eoZm8DCyQQh2X__9jD0f6fpho
-X-Proofpoint-ORIG-GUID: 4Llg3b3eoZm8DCyQQh2X__9jD0f6fpho
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA3OSBTYWx0ZWRfXzTyU7ILs3B/E
- GSovnYMxN47Si8SAppvWmuBDpmNKMCzfr9tigMNL4Yh7cC78fCRzCo54yjEY/tcrDQicysaS7JZ
- kP28xrOFMCV3XPGfW77n7nTGf8gC+19KFDZNhJkGHdfjwbTpoVgq5LZb+107jiE5s7iODKIy61T
- Vv1lr7udJZrtbi5uPbDWTgEeetvdgcqv+6lWCD/vJfc5esm7s18BCnZ+UEgSVDBKnYrH4B44iJX
- o4KUnBl6lU+qeq5rx/bdv2950HVwjeTHvLwXgpjNyqDbzVilHwoPKzB6LgGdgWhiO6bEmAfJklT
- rnYGTIne01vUfNwmZtF5CH7Wzx6wFHulkPPONHj0EkIsYPJoxCPinvgwloTSbTx18FMdvfKEfqs
- PHAqUTC9978DRU4QKZiV5Tuxe+iRCg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-13_02,2025-11-13_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0 impostorscore=0
- suspectscore=0 lowpriorityscore=0 clxscore=1015 phishscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080079
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <aRTRhk/ok06YKTEu@devvm11784.nha0.facebook.com>
 
-On 11/10/25 18:16, Christoph Schlameuss wrote:
-> In the main patch of this set we need to pin and unpin multiple
-> consecutive guest-2 pages in guest-1. As these might not be consecutive
-> in guest-1 it is necessary to iterate over all pages and store guest and
-> host addresses for later use.
-> 
-> As the new methods to use the existing {,un}pin_guest_page() methods
-> these are moved up unchanged in the file to prevent to have to resort to
-> forward declarations later on.
-> 
+On Wed, Nov 12, 2025 at 10:27:18AM -0800, Bobby Eshleman wrote:
+>On Wed, Nov 12, 2025 at 03:19:47PM +0100, Stefano Garzarella wrote:
+>> On Tue, Nov 11, 2025 at 10:54:48PM -0800, Bobby Eshleman wrote:
+>> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+>> >
+>> > Add NS support to vsock loopback. Sockets in a global mode netns
+>> > communicate with each other, regardless of namespace. Sockets in a local
+>> > mode netns may only communicate with other sockets within the same
+>> > namespace.
+>> >
+>> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>> > ---
+>> > Changes in v9:
+>> > - remove per-netns vsock_loopback and workqueues, just re-using
+>> >  the net and net_mode in skb->cb achieved the same result in a simpler
+>> >  way. Also removed need for pernet_subsys.
+>> > - properly track net references
+>> >
+>> > Changes in v7:
+>> > - drop for_each_net() init/exit, drop net_rwsem, the pernet registration
+>> >  handles this automatically and race-free
+>> > - flush workqueue before destruction, purge pkt list
+>> > - remember net_mode instead of current net mode
+>> > - keep space after INIT_WORK()
+>> > - change vsock_loopback in netns_vsock to ->priv void ptr
+>> > - rename `orig_net_mode` to `net_mode`
+>> > - remove useless comment
+>> > - protect `register_pernet_subsys()` with `net_rwsem`
+>> > - do cleanup before releasing `net_rwsem` when failure happens
+>> > - call `unregister_pernet_subsys()` in `vsock_loopback_exit()`
+>> > - call `vsock_loopback_deinit_vsock()` in `vsock_loopback_exit()`
+>> >
+>> > Changes in v6:
+>> > - init pernet ops for vsock_loopback module
+>> > - vsock_loopback: add space in struct to clarify lock protection
+>> > - do proper cleanup/unregister on vsock_loopback_exit()
+>> > - vsock_loopback: use virtio_vsock_skb_net()
+>> >
+>> > Changes in v5:
+>> > - add callbacks code to avoid reverse dependency
+>> > - add logic for handling vsock_loopback setup for already existing
+>> >  namespaces
+>> > ---
+>> > net/vmw_vsock/vsock_loopback.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+>> > 1 file changed, 40 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+>> > index d3ac056663ea..e62f6c516992 100644
+>> > --- a/net/vmw_vsock/vsock_loopback.c
+>> > +++ b/net/vmw_vsock/vsock_loopback.c
+>> > @@ -32,6 +32,9 @@ static int vsock_loopback_send_pkt(struct sk_buff *skb, struct net *net,
+>> > 	struct vsock_loopback *vsock = &the_vsock_loopback;
+>> > 	int len = skb->len;
+>> >
+>> > +	virtio_vsock_skb_set_net(skb, net);
+>> > +	virtio_vsock_skb_set_net_mode(skb, net_mode);
+>> > +
+>> > 	virtio_vsock_skb_queue_tail(&vsock->pkt_queue, skb);
+>> > 	queue_work(vsock->workqueue, &vsock->pkt_work);
+>> >
+>> > @@ -116,8 +119,10 @@ static void vsock_loopback_work(struct work_struct *work)
+>> > {
+>> > 	struct vsock_loopback *vsock =
+>> > 		container_of(work, struct vsock_loopback, pkt_work);
+>> > +	enum vsock_net_mode net_mode;
+>> > 	struct sk_buff_head pkts;
+>> > 	struct sk_buff *skb;
+>> > +	struct net *net;
+>> >
+>> > 	skb_queue_head_init(&pkts);
+>> >
+>> > @@ -131,7 +136,41 @@ static void vsock_loopback_work(struct work_struct *work)
+>> > 		 */
+>> > 		virtio_transport_consume_skb_sent(skb, false);
+>> > 		virtio_transport_deliver_tap_pkt(skb);
+>> > -		virtio_transport_recv_pkt(&loopback_transport, skb, NULL, 0);
+>> > +
+>> > +		/* In the case of virtio_transport_reset_no_sock(), the skb
+>> > +		 * does not hold a reference on the socket, and so does not
+>> > +		 * transitively hold a reference on the net.
+>> > +		 *
+>> > +		 * There is an ABA race condition in this sequence:
+>> > +		 * 1. the sender sends a packet
+>> > +		 * 2. worker calls virtio_transport_recv_pkt(), using the
+>> > +		 *    sender's net
+>> > +		 * 3. virtio_transport_recv_pkt() uses t->send_pkt() passing the
+>> > +		 *    sender's net
+>> > +		 * 4. virtio_transport_recv_pkt() free's the skb, dropping the
+>> > +		 *    reference to the socket
+>> > +		 * 5. the socket closes, frees its reference to the net
+>> > +		 * 6. Finally, the worker for the second t->send_pkt() call
+>> > +		 *    processes the skb, and uses the now stale net pointer for
+>> > +		 *    socket lookups.
+>> > +		 *
+>> > +		 * To prevent this, we acquire a net reference in vsock_loopback_send_pkt()
+>> > +		 * and hold it until virtio_transport_recv_pkt() completes.
+>> > +		 *
+>> > +		 * Additionally, we must grab a reference on the skb before
+>> > +		 * calling virtio_transport_recv_pkt() to prevent it from
+>> > +		 * freeing the skb before we have a chance to release the net.
+>> > +		 */
+>> > +		net_mode = virtio_vsock_skb_net_mode(skb);
+>> > +		net = virtio_vsock_skb_net(skb);
+>>
+>> Wait, we are adding those just for loopback (in theory used only for
+>> testing/debugging)? And only to support virtio_transport_reset_no_sock() use
+>> case?
+>
+>Yes, exactly, only loopback + reset_no_sock(). The issue doesn't exist
+>for vhost-vsock because vhost_vsock holds a net reference, and it
+>doesn't exist for non-reset_no_sock calls because after looking up the
+>socket we transfer skb ownership to it, which holds down the skb -> sk ->
+>net reference chain.
+>
+>>
+>> Honestly I don't like this, do we have any alternative?
+>>
+>> I'll also try to think something else.
+>>
+>> Stefano
+>
+>
+>I've been thinking about this all morning... maybe
+>we can do something like this:
+>
+>```
+>
+>virtio_transport_recv_pkt(...,  struct sock *reply_sk) {... }
+>
+>virtio_transport_reset_no_sock(..., reply_sk)
+>{
+>	if (reply_sk)
+>		skb_set_owner_sk_safe(reply, reply_sk)
 
+Interesting, but what about if we call skb_set_owner_sk_safe() in 
+vsock_loopback.c just before calling virtio_transport_recv_pkt() for 
+every skb?
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Maybe we should refactor a bit virtio_transport_recv_pkt() e.g. moving 
+`skb_set_owner_sk_safe()` to be sure it's called only when we are sure 
+it's the right socket (e.g. after checking SOCK_DONE).
+
+WDYT?
+
+>
+>	t->send_pkt(reply);
+>}
+>
+>vsock_loopback_work(...)
+>{
+>	virtio_transport_recv_pkt(..., skb, skb->sk);
+>}
+>
+>
+>for other transports:
+>
+>	virtio_transport_recv_pkt(..., skb, NULL);
+>
+>```
+>
+>This way 'reply' keeps the sk and sk->net alive even after
+>virtio_transport_recv_pkt() frees 'skb'. The net won't be released until
+>after 'reply' is freed back on the other side, removing the race.
+>
+>It makes semantic sense too... for loopback, we already know which sk
+>the reply is going back to. For other transports, we don't because
+>they're across the virt boundary.
+>
+>WDYT?
+>
+>I hate to suggest this, but another option might be to just do nothing?
+>In order for this race to have any real effect, a loopback socket must
+>send a pkt to a non-existent socket, immediately close(), then the
+>namespace deleted, a new namespace created with the same pointer
+>address, and finally a new socket with the same port created in that
+>namespace, all before the reply RST reaches recv_pkt()... at which point
+>the newly created socket would wrongfully receive the RST.
+
+Yeah, let's keep this as plan B for now :-)
+
+Thanks,
+Stefano
+
 
