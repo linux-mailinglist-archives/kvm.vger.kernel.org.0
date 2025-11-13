@@ -1,140 +1,180 @@
-Return-Path: <kvm+bounces-63031-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63032-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BB3DC59822
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 19:37:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4E43C596E4
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 19:23:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 710A8503815
-	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 18:03:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 973703B83DF
+	for <lists+kvm@lfdr.de>; Thu, 13 Nov 2025 18:15:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62E89345CC5;
-	Thu, 13 Nov 2025 18:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510213587D6;
+	Thu, 13 Nov 2025 18:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qRYJZsx2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VwrWQnDR"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D3030BF66;
-	Thu, 13 Nov 2025 18:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709BD345CBA;
+	Thu, 13 Nov 2025 18:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763056923; cv=none; b=HWRv6AtV6f3pe3HuforYBFCoLZfv0NqD8T+y5c0r4w5Ib6uNxAF/lHsgC0aoMzbFxguwp8Cn8T1l3mxyJf1n88kcyFA+g+pJu2Yfrt7BFX1ROAiSIzn51FusnZjrWIe0GFemRPUuor272DJwJs0m+O3qHkDPTR7yClBPGkdYnXs=
+	t=1763057733; cv=none; b=fPkAhHHtBBddMhTeZINF7kI3uFrcVfHO4YspTz6WWjus67oFwqdU0Qn7nIa8tXmx5w/5q9yFNUl9WWDylEQtGHbYVkq+3lnaeZx/+8w/Tnakxlti+rhSlcHgRxm8LPJibM42afkl2ahZzWTwRzZ3LYq4a7viqfioKj4cAxD8rz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763056923; c=relaxed/simple;
-	bh=pefRbuYJ4cIwww2DTcSFGlDLKpPtGWwLfORT21um08k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CnsFujsqpeRYQp1fefBV4t8zp/MEy+RSY/pUQfd9tnwg4qJbU22QcSTnRIbfigY0K3AOyw9NcmFCvBLzq5ZykrBhjPruqen0jNaGFVDapFRLCA/gbvDvdyXe096KB5h0ZHdMl4V9JkCq2R4wpVttL6ZEHggWc58B2UdKI5KHejo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qRYJZsx2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50B45C4CEF8;
-	Thu, 13 Nov 2025 18:01:59 +0000 (UTC)
+	s=arc-20240116; t=1763057733; c=relaxed/simple;
+	bh=ZH1Vb+6y/P0bhQpaACvsGQx+4Pw+NOxnF0TR28s/Uzw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YpoEqtGCqJyqcdlOtcY/bLOVvxYN93DnlFLHD7lKxP8SeooQSBTCfpSRZXAMT1t26LRLwEniCYoguT2NZpfIPQU9u+rwu/yFs9xAPoTx7CPxyOeDKyKBMomhzLxd8jZ4ULlUmlz/5beB2a+beGGS0DwO+vgIe4X3zzYKlsthQdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VwrWQnDR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7F53C19421;
+	Thu, 13 Nov 2025 18:15:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763056923;
-	bh=pefRbuYJ4cIwww2DTcSFGlDLKpPtGWwLfORT21um08k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qRYJZsx2w43hy0S+72gbKKMc/zciGp0kmjazlFFcrbx4ca7kWF2USySYUFmicDs/7
-	 a4O8H2EMZa9pMbwGypr3qrmOCgzTS4X25nEI/JcGnuCT0kMf4QaE8HKf0CXCN2rmqU
-	 RGvGNlwE1L2JLWVvWyBhg0+13XN6dHkbMP/9pCtr8viqDFhLBszebnitjHqMcE8WwH
-	 FG2Nxsop+q/ZdZGgd6nUt7AOd5mFEL757RjwvHkaBDtN1YDK5lEl4/aEEtLg38IdZn
-	 NMQvgwfLjOJZnysAhU7ttmwj6yqS1wgNmaYbIM/qbE2mAHSFBwuEYzeo/M37UJd9jC
-	 52yHrUb4EvuEQ==
-Date: Thu, 13 Nov 2025 18:01:57 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	s=k20201202; t=1763057733;
+	bh=ZH1Vb+6y/P0bhQpaACvsGQx+4Pw+NOxnF0TR28s/Uzw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VwrWQnDR7Z5C+cHvxQpIpvCRn0BFq7STAgYoyi78ZLBHA6CEOKiKytf3PDpMtIcVM
+	 vSh3TCvRIcu6IeAe1WAowfnDofnPUzLnyYBXY17ZOfh5A48VannBXPcOqXeZo0qIhX
+	 5OylOkfQIjUuTqwL7D/Y+hJeiZCGV4JlB0lppswDMoLKZ8JEkv5YOSLVS6oeIhselb
+	 ipNXQultFvSUn/IpUhWTi24+dakr63JVavjJxVX8CPiJ3EWLn6gMUcOTTGXE1foMiQ
+	 hnMaW2kL3RRF/w0crYpnhDZPt6uaN3NdvMaKz0dfN4tgPOYCKBIq9SN9c7iohVemYl
+	 9/YUhlEtkCGkQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vJbr0-00000004yF0-1rTR;
+	Thu, 13 Nov 2025 18:15:30 +0000
+Date: Thu, 13 Nov 2025 18:15:29 +0000
+Message-ID: <86ikfdu7cu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>, Aishwarya.TCV@arm.com
-Subject: Re: [PATCH v2 04/45] KVM: arm64: Turn vgic-v3 errata traps into a
- patched-in constant
-Message-ID: <72e1e8b5-e397-4dc5-9cd6-a32b6af3d739@sirena.org.uk>
+	Aishwarya.TCV@arm.com
+Subject: Re: [PATCH v2 05/45] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
+In-Reply-To: <7ae5874e-366f-4abd-9142-ffbe21fed3a8@sirena.org.uk>
 References: <20251109171619.1507205-1-maz@kernel.org>
- <20251109171619.1507205-5-maz@kernel.org>
+	<20251109171619.1507205-6-maz@kernel.org>
+	<7ae5874e-366f-4abd-9142-ffbe21fed3a8@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4mHS3LPUsnt5TA9O"
-Content-Disposition: inline
-In-Reply-To: <20251109171619.1507205-5-maz@kernel.org>
-X-Cookie: Live Free or Live in Massachusetts.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com, Aishwarya.TCV@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Thu, 13 Nov 2025 14:33:02 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (quoted-printable)>]
+> On Sun, Nov 09, 2025 at 05:15:39PM +0000, Marc Zyngier wrote:
+> > A long time ago, an unsuspecting architect forgot to add a trap
+> > bit for ICV_DIR_EL1 in ICH_HCR_EL2. Which was unfortunate, but
+> > what's a bit of spec between friends? Thankfully, this was fixed
+> > in a later revision, and ARM "deprecates" the lack of trapping
+> > ability.
+> 
+> I'm seeing a regression on i.MX8MP-EVK and Toradax AM625+Mallow boards
+> (both 4xA53+GICv3) in protected mode only with a bunch of the KVM
+> selftests, including the arch_timer one:
+> 
+> # selftests: kvm: arch_timer
+> # Random seed: 0x6b8b4567
+> # ==== Test Assertion Failure ====
+> #   lib/arm64/processor.c:487: false
+> #   pid=4469 tid=4473 errno=4 - Interrupted system call
+> # ==== Test Assertion Failure ====
+> #   lib/arm64/processor.c:487: false
+> #   pid=4469 tid=4471 errno=4 - Interrupted system call
+> # ==== Test Assertion Failure ====
+> #   lib/arm64/processor.c:487: false
+> #   pid=4469 tid=4472 errno=4 - Interrupted system call
+> # ==== Test Assertion Failure ====
+> #   lib/arm64/processor.c:487: false
+> #   pid=4469 tid=4470 errno=4 - Interrupted system call
+> #      1	0x0000000000414387: assert_on_unhandled_exception at processor.c:487
+> #      2	0x000000000040727f: _vcpu_run at kvm_util.c:1699
+> #      3	 (inlined by) vcpu_run at kvm_util.c:1710
+> #      4	0x0000000000402b07: test_vcpu_run at arch_timer.c:55
+> #      5	0x0000ffffb12f2f9b: ?? ??:0
+> #      6	0x0000ffffb135e58b: ?? ??:0
+> #      1	0x0000000000414387: assert_on_unhandled_exception at processor.c:487
+> #      2	0x000000000040727f: _vcpu_run at kvm_util.c:1699
+> #      3	 (inlined by) vcpu_run at kvm_util.c:1710
+> #      4	0x0000000000402b07: test_vcpu_run at arch_timer.c:55
+> #      5	0x0000ffffb12f2f9b: ?? ??:0
+> #      6	0x0000ffffb135e58b: ?? ??:0
+> #   Unexpected exception (vector:0x4, ec:0x0)
+> #      1	0x0000000000414387: assert_on_unhandled_exception at processor.c:487
+> #      2	0x000000000040727f: _vcpu_run at kvm_util.c:1699
+> #      3	 (inlined by) vcpu_run at kvm_util.c:1710
+> #      4	0x0000000000402b07: test_vcpu_run at arch_timer.c:55
+> #      5	0x0000ffffb12f2f9b: ?? ??:0
+> #      6	0x0000ffffb135e58b: ?? ??:0
+> #      1	0x0000000000414387: assert_on_unhandled_exception at processor.c:487
+> #      2	0x000000000040727f: _vcpu_run at kvm_util.c:1699
+> #      3	 (inlined by) vcpu_run at kvm_util.c:1710
+> #      4	0x0000000000402b07: test_vcpu_run at arch_timer.c:55
+> #      5	0x0000ffffb12f2f9b: ?? ??:0
+> #      6	0x0000ffffb135e58b: ?? ??:0
+> not ok 28 selftests: kvm: arch_timer # exit=254
+> 
+> The arch_timer case bisects to this patch in -next, regular nVHE mode
+> runs this test happily.
 
---4mHS3LPUsnt5TA9O
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+My hunch is that we're missing something like the hack below, but I
+haven't tried it yet.
 
-On Sun, Nov 09, 2025 at 05:15:38PM +0000, Marc Zyngier wrote:
-> The trap bits are currently only set to manage CPU errata. However,
-> we are about to make use of them for purposes beyond beating broken
-> CPUs into submission.
->=20
-> For this purpose, turn these errata-driven bits into a patched-in
-> constant that is merged with the KVM-driven value at the point of
-> programming the ICH_HCR_EL2 register, rather than being directly
-> stored with with the shadow value..
+I'll probably get to it tomorrow.
 
-We're seeing the no-vgic-v3 failures in -next with slightly different
-symptoms to those that were seen in mainline and fixed with Sacha's
-change da888524c393 ("KVM: arm64: vgic-v3: Trap all if no in-kernel
-irqchip").  That change generated a conflict with this patch which
-Stephen resolved in what looks like a reasonable fashion tactically but
-I suspect needs some wider changes.  The test now fails with:
+	M.
 
-# selftests: kvm: no-vgic-v3
-# Random seed: 0x6b8b4567
-# =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
-#   lib/arm64/processor.c:487: false
-#   pid=3D2080 tid=3D2080 errno=3D4 - Interrupted system call
-#      1	0x0000000000413d27: assert_on_unhandled_exception at processor.c:4=
-87
-#      2	0x0000000000406c1f: _vcpu_run at kvm_util.c:1699
-#      3	 (inlined by) vcpu_run at kvm_util.c:1710
-#      4	0x000000000040308b: test_run_vcpu at no-vgic-v3.c:124
-#      5	0x0000000000402253: test_guest_no_gicv3 at no-vgic-v3.c:155
-#      6	 (inlined by) main at no-vgic-v3.c:174
-#      7	0x0000ffff9dc17543: ?? ??:0
-#      8	0x0000ffff9dc17617: ?? ??:0
-#      9	0x000000000040242f: _start at ??:?
-#   Unexpected exception (vector:0x4, ec:0x18)
-not ok 25 selftests: kvm: no-vgic-v3 # exit=3D254
+diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+index 82da9b03692d4..3108b5185c204 100644
+--- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
++++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+@@ -444,6 +444,8 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
+ 
+ 	/* Scalable Vector Registers are restricted. */
+ 
++	HOST_HANDLED(SYS_ICC_PMR_EL1),
++
+ 	RAZ_WI(SYS_ERRIDR_EL1),
+ 	RAZ_WI(SYS_ERRSELR_EL1),
+ 	RAZ_WI(SYS_ERXFR_EL1),
+@@ -457,9 +459,12 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
+ 
+ 	/* Limited Ordering Regions Registers are restricted. */
+ 
++	HOST_HANDLED(SYS_ICC_DIR_EL1),
++	HOST_HANDLED(SYS_ICC_RPR_EL1),
+ 	HOST_HANDLED(SYS_ICC_SGI1R_EL1),
+ 	HOST_HANDLED(SYS_ICC_ASGI1R_EL1),
+ 	HOST_HANDLED(SYS_ICC_SGI0R_EL1),
++	HOST_HANDLED(SYS_ICC_CTLR_EL1),
+ 	{ SYS_DESC(SYS_ICC_SRE_EL1), .access = pvm_gic_read_sre, },
+ 
+ 	HOST_HANDLED(SYS_CCSIDR_EL1),
 
-Log showing the failure:
-
-   https://lava.sirena.org.uk/scheduler/job/2079953#L2994
-
-This is on i.MX8MP-EVK, 4xA53 and a GICv3.
-
-No bisect or anything, between unrelated DRM breakage in -next and the
-same test failing in Linus' tree in -rc3 which the kvm-arm tree is based
-on it's a bit of a mess.
-
---4mHS3LPUsnt5TA9O
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmkWHRQACgkQJNaLcl1U
-h9CkFwf7BHSBpu13Gl2dKmMGEJ2tarZfJaanGVTIuXwd3MufzE8sMiFiUs9RDduR
-K6xSxs+YogP46QjHrhJn6PkamnE9JsJ7AWCbuf5mkw74ON7ROFXcuCqBXlSxL8w/
-l2jFp2sBgQRLYhMPJAnrIoVDgRhmPfnHVtafsg4vutmLxRcN4+wOQuL21J578KDA
-M2Id7VjL0JupztKELzp9pbVblX65VJgu/nFduWrn7qPbdtF5LLPvotyXRp0MoAHn
-yb1RdvDkjyasDHHuJSMXtX1COI2oTRWgky2VifAh2gTLVtUy9GKQC+ki5pLGgehs
-S+j6wno6JUxOJXzCBkr6A8pwb+3wtA==
-=waEM
------END PGP SIGNATURE-----
-
---4mHS3LPUsnt5TA9O--
+-- 
+Without deviation from the norm, progress is not possible.
 
