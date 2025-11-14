@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-63268-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63269-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 138DEC5F47A
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 21:52:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1010C5F47F
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 21:52:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E1C042021B
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 20:52:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED9263B0911
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 20:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7962B2FBE05;
-	Fri, 14 Nov 2025 20:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D023491EB;
+	Fri, 14 Nov 2025 20:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Of79wNUo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mjiFPhJT"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452EC328274
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 20:51:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A8F284672
+	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 20:51:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763153488; cv=none; b=rgfyOmuxw3glCeK7giASjl3FgJwlsBwPQTKiRlewK/13Wo9F/gAnHQd1gN781E1rhFqntSSA4wuPY/602AFclTHNaqZz16JmoOovVQ8Y7VGFAqJ7yDlK45FSNJdiK8osUVdkrqFShqhGRtJEfj+46FG59bzBWypcn5XdrXTYAAw=
+	t=1763153490; cv=none; b=sSrpFOkgXgcGYyRs82hPdia2dncJVQ4MvinYUcLqnKB0DRAhbfUY0X2V/fumdEggMXuFSqPZxP2CI1sHJ8c0Vr3T8lpLOKRKZqlMmYH/Ujg6yACS97Kcpe5t2mWxxzNiWi3oPQDG5HdyYMjeiEJ4PJSDfkJeibbXws5S9d/xERU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763153488; c=relaxed/simple;
-	bh=Up7F4n6gbsSj0LmGDH4ugVgi4MHUsh3K1T5NxM6ybmY=;
+	s=arc-20240116; t=1763153490; c=relaxed/simple;
+	bh=XCrHqD9GjTPNn92L/8S5s1AW95ZGtOTnAD8PpkaGoTE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Nod7zW1adyCF7cZWaz4MPiJq9zuISffTiSyII89u5LR9mgstcWe7xI4EltL/EvTucnnBKKrW5ROrVXqCsEmk2/nGGEdvbvs5trDBbWO2U/lYN3hKmuQJ5aXvJW6K5ehS3VgTmPK90YoU1pF+UOZx8A4+8eFZAAPw/brzn7aU14E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Of79wNUo; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=SGvIIo6qeRdI5OxVTseBLABXVFi8EuopEl6C1ZApzT3jxVkzpeSWbNhoDIftT7y0clS88LsYkewsDy7wmYWeQW31zLaODY9jk0PkWogY0jZCgv1ngjlnlmluJhDExvrB9jceSfcX3Panz47/Ib9mocXksSBamSjTFyj3TRi7xzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mjiFPhJT; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2980ef53fc5so6297355ad.1
-        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 12:51:27 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2956f09f382so21759865ad.1
+        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 12:51:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763153487; x=1763758287; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763153488; x=1763758288; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ajkwxsnw8UTLLCmio2wEKxdJJ0yhub7uVnVKnmR9rjw=;
-        b=Of79wNUoR0J09J7iqeAtcazIX2J9uOjjJWbDUS0aUZg+jv9gvSxAU2x8W1k2iEqYny
-         mWB82y2jVA4CVVf7slBc4w0lu/5lvZ6+B5I/XHTYHiYts7dZ9aC1r+AT+w+JGFDnejkX
-         /bVvGp12Rib2Fpa1JwhWIkX7AXJBTVQunt38sQ2X+Xd3WcgOxtjMfnUzkvo11liTvmst
-         OY2KIzM55cOebR5Uy+OiCJ3buFwLxT9GAqrzBtLw+C3g7Fs9Kib0HzToUlVJx6LCo/oy
-         q5A6DEiLXETCbSyBZQiEALB+uZYo6blNByrpaZn1QtPZv+pLPe2ZR3Mnb6cVDjFfzM+u
-         Ujmg==
+        bh=kc6z8GEEtUED4OVhB6yMpknBzIAKKVnLcxWzRC5HWSM=;
+        b=mjiFPhJTp9z+Oz97WJoHxW10u0Cp+dKR1ynKcuRQLQOj/OMYloQQNY2kACGFRJsyb8
+         OHFjSbOa8IUj6xE/3erBVKkGdIcwFfrbNrhj7t6cqXd7U+kz3QDa1EIzHh72pMMIjQhA
+         YBaTfmVfJb0cv8s8WaMJPqRZn1RgH43HHQP8dYUDJhBb7sjGVB16ZT1CLRhEK0Gx+yfz
+         xek28jEHKAqqDuBBZU7muBpRyg/5cz2v/pMCjMb2sENsFDS8yQIY+xq9DAjuHlqknpof
+         baEZ+GaWQ+z7rACwvbOy9ItiMtfPXcXRuFvr4KClYUp7F+O2jY0xuYbr2dhoyakCWjgD
+         hMaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763153487; x=1763758287;
+        d=1e100.net; s=20230601; t=1763153488; x=1763758288;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Ajkwxsnw8UTLLCmio2wEKxdJJ0yhub7uVnVKnmR9rjw=;
-        b=P5d0Gx9iKGa9wpfH566MLZPNKkY/bXbvvWfjkmTPOHqEl/K/jjR8b267qZTnQ1ICg0
-         dQ+JxYDQbWDVz8VjFCcs1nLxAAQA2t1iE8R//zA+qhhzVHfsC2IkYv4NonAsKWE3YR81
-         JzP4Rm3vndNtq3TpYvmZzJyfeYdi79cizCMpoUjPWODU+Blp8BCxS2sGogu4qqiYRpd4
-         FXKElqY4Hgv9N/DMy/oCKytFIc1kCSxyBWIUdm1yIgEAKGLAhF4l2zQSa++sGTrSZfT3
-         Bs+yTTpd/acRiMRpQPYvsrlhn/GjZIHdWNWxpGV/BhxoqzQgqxL3WFIKHt+cXrmYLuwl
-         icoQ==
-X-Gm-Message-State: AOJu0YyxeG+E7KDOfG8ob0JG6LfPi4gQ3h8cjQpJdRgWakbrd3N4TjJD
-	30NGqGeyHnlKZEHHZzmIk/SZytXUarOQ4SnfB256XxbAR4fdAfqHJM3O+IgHQt5Qd8jKYZTr0qM
-	bGwWD0w==
-X-Google-Smtp-Source: AGHT+IGzvUGxeLQMA40CqMvPY04l4OFj/gw03FfmgR/FLCvFe9hKHPUdUlzL4xbkVdJASvzfWTzykSb+jms=
-X-Received: from plbi1.prod.google.com ([2002:a17:903:20c1:b0:297:e887:3f69])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:daca:b0:294:9813:4512
- with SMTP id d9443c01a7336-2986a6ba40bmr58236255ad.3.1763153486598; Fri, 14
- Nov 2025 12:51:26 -0800 (PST)
+        bh=kc6z8GEEtUED4OVhB6yMpknBzIAKKVnLcxWzRC5HWSM=;
+        b=OacCkrIoFPaSqzPnub1Qst1dDv3JZz9d96HA+M2UydYD4DwvQyq793AqDTJgJOPSXH
+         U5eZ/Fwzazi9ayTnkE71LArThSPLoDfvtJjVDSAM6wAKeoRjHNBifoUYSqlJAb38r//r
+         lLR7j+t/jCogijXxfVVtlU4410SAp9sqH5QX70jeZg5Dl4ICkGMJS4A+9S+fE8K1s9e/
+         7uS9oEMqT3ID8rpLThN3xuLrZlbVLJcJOFXo0bP2VeDs82VmeoLEUZdb4j1AUZ+Yh8zD
+         p4t7Qkz/6gTG3hkC9I2hLDZTFs1zdErtXRPg8i8adRnoYJCfhWZ0Jy6/HzndSgfSNwqz
+         PxTA==
+X-Gm-Message-State: AOJu0YzUic665ARsAV1qDxawaw0WcH+uS7iaAKUWoXeU7EM0/AxX+mbL
+	O5L6sc116VyVXhBKV4ba3qB2klMfIuyTNFXw6lwZIrm30jqvSFE8XnHgWPaWYj/H7mzUIwWX3Q5
+	cYlQDAA==
+X-Google-Smtp-Source: AGHT+IETogoZY3/mWU0x93YMSh1/8m88+p2DiqaO1OKIhXP8dc9wx7N8DPW/NISvw4+HLLNZjWIuKKzoYnY=
+X-Received: from pllw9.prod.google.com ([2002:a17:902:7b89:b0:295:5d05:b2b9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ced0:b0:283:f19a:bffe
+ with SMTP id d9443c01a7336-29867eeb17bmr55375415ad.7.1763153488335; Fri, 14
+ Nov 2025 12:51:28 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 14 Nov 2025 12:50:54 -0800
+Date: Fri, 14 Nov 2025 12:50:55 -0800
 In-Reply-To: <20251114205100.1873640-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251114205100.1873640-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251114205100.1873640-13-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v4 12/18] x86: cet: Test far returns too
+Message-ID: <20251114205100.1873640-14-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v4 13/18] x86: Avoid top-most page for vmalloc
+ on x86-64
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>, 
@@ -85,66 +86,63 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Mathias Krause <minipli@grsecurity.net>
 
-Add a test for far returns which has a dedicated error code.
+The x86-64 implementation of setup_mmu() doesn't initialize 'vfree_top'
+and leaves it at its zero-value. This isn't wrong per se, however, it
+leads to odd configurations when the first vmalloc/vmap page gets
+allocated. It'll be the very last page in the virtual address space --
+which is an interesting corner case -- but its boundary will probably
+wrap. It does so, for CET's shadow stack, at least, which loads the
+shadow stack pointer with the base address of the mapped page plus its
+size, i.e. 0xffffffff_fffff000 + 4096, which wraps to 0x0.
 
-Tested-by: Chao Gao <chao.gao@intel.com>
+The CPU seems to handle such configurations just fine. However, it feels
+odd to set the shadow stack pointer to "NULL".
+
+To avoid the wrapping, ignore the top most page by initializing
+'vfree_top' to just one page below.
+
+Reviewed-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
-[sean: use lretl instead of bare lret]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/cet.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ lib/x86/vm.c |  2 ++
+ x86/lam.c    | 10 +++++-----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/x86/cet.c b/x86/cet.c
-index f19ceb22..eeab5901 100644
---- a/x86/cet.c
-+++ b/x86/cet.c
-@@ -31,6 +31,34 @@ static uint64_t cet_shstk_func(void)
- 	return 0;
- }
+diff --git a/lib/x86/vm.c b/lib/x86/vm.c
+index 90f73fbb..27e7bb40 100644
+--- a/lib/x86/vm.c
++++ b/lib/x86/vm.c
+@@ -191,6 +191,8 @@ void *setup_mmu(phys_addr_t end_of_memory, void *opt_mask)
+         end_of_memory = (1ul << 32);  /* map mmio 1:1 */
  
-+static uint64_t cet_shstk_far_ret(void)
-+{
-+	struct far_pointer32 fp = {
-+		.offset = (uintptr_t)&&far_func,
-+		.selector = USER_CS,
-+	};
-+
-+	if (fp.offset != (uintptr_t)&&far_func) {
-+		printf("Code address too high.\n");
-+		return -1;
-+	}
-+
-+	printf("Try to temper the return-address of far-called function...\n");
-+
-+	/* The NOP isn't superfluous, the called function tries to skip it. */
-+	asm goto ("lcall *%0; nop" : : "m" (fp) : : far_func);
-+
-+	printf("Uhm... how did we get here?! This should have #CP'ed!\n");
-+
-+	return 0;
-+far_func:
-+	asm volatile (/* mess with the ret addr, make it point past the NOP */
-+		      "incq (%rsp)\n\t"
-+		      /* 32-bit return, just as we have been called */
-+		      "lretl");
-+	__builtin_unreachable();
-+}
-+
- static uint64_t cet_ibt_func(void)
- {
- 	unsigned long tmp;
-@@ -104,6 +132,10 @@ int main(int ac, char **av)
- 	report(rvc && exception_error_code() == CP_ERR_NEAR_RET,
- 	       "NEAR RET shadow-stack protection test");
+     setup_mmu_range(cr3, 0, end_of_memory);
++    /* skip the last page for out-of-bound and wrap-around reasons */
++    init_alloc_vpage((void *)(~(PAGE_SIZE - 1)));
+ #else
+     setup_mmu_range(cr3, 0, (2ul << 30));
+     setup_mmu_range(cr3, 3ul << 30, (1ul << 30));
+diff --git a/x86/lam.c b/x86/lam.c
+index 1af6c5fd..87efc5dd 100644
+--- a/x86/lam.c
++++ b/x86/lam.c
+@@ -197,11 +197,11 @@ static void test_lam_sup(void)
+ 	int vector;
  
-+	run_in_user(cet_shstk_far_ret, CP_VECTOR, 0, 0, 0, 0, &rvc);
-+	report(rvc && exception_error_code() == CP_ERR_FAR_RET,
-+	       "FAR RET shadow-stack protection test");
-+
- 	/* Enable indirect-branch tracking */
- 	wrmsr(MSR_IA32_U_CET, ENABLE_IBT_BIT);
- 
+ 	/*
+-	 * KUT initializes vfree_top to 0 for X86_64, and each virtual address
+-	 * allocation decreases the size from vfree_top. It's guaranteed that
+-	 * the return value of alloc_vpage() is considered as kernel mode
+-	 * address and canonical since only a small amount of virtual address
+-	 * range is allocated in this test.
++	 * KUT initializes vfree_top to -PAGE_SIZE for X86_64, and each virtual
++	 * address allocation decreases the size from vfree_top. It's
++	 * guaranteed that the return value of alloc_vpage() is considered as
++	 * kernel mode address and canonical since only a small amount of
++	 * virtual address range is allocated in this test.
+ 	 */
+ 	vaddr = alloc_vpage();
+ 	vaddr_mmio = alloc_vpage();
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
