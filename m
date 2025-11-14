@@ -1,146 +1,116 @@
-Return-Path: <kvm+bounces-63221-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63222-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE035C5E4BC
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 17:43:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0266DC5E0E8
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 17:02:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5AC2D384F10
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 15:38:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E914B4A11E6
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 15:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F4332D0F0;
-	Fri, 14 Nov 2025 15:27:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C86191F84;
+	Fri, 14 Nov 2025 15:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hD8rCw8G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sYzPddv/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A4E32C954
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 15:27:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CEC328260;
+	Fri, 14 Nov 2025 15:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763134063; cv=none; b=hO12waiEdSRxOixhpk6FqnsTCGebwoc0dIjMAa5U3m/cJ83KZuUbgJww/1cTDHrEb9jTm0fdAVQFmQd99TZF7ay5ojQzPpFV4RJcusJHKyxe3V5QUqF/XfBHbQMG0lGiPHdFmFTbaQGKg1EmwrrScOA3lSaYK7YSVxi7MDhDmVo=
+	t=1763134730; cv=none; b=soqeDawXNBPWByFsaretgstcjQacHYo/1liT3zasAkOaVEqaUPXeAu0RHuBby/07cqAxhHtNnFgy/wPXZWBabfLtKhAkUaMTDgpNGu6BD2+1n3etaPK469IOlJmohSiGhhzx7UMjP94i7NTyraKqBZVA3z5nh5f6YjWSHm26Pcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763134063; c=relaxed/simple;
-	bh=Js8j/NG9gqdlcvCQlJveM0zst979u1fWcjgGE8CbeDM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=jU7SXhQN6GqwAORcExFfx85VuV/Z9giLN6aZiMESza1mrjFp9pzDBDTRJBGZKB7oSdXe4aLZysMPfsGmYmX4NCJPp0RdBmaGBAYAzsr+hYg0p3+zt+fl7TiKOWqVaS4F/NMOz2NtXudncHpl1mUTKIcy8oS0WH/5Pqy1esIeoR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hD8rCw8G; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3438744f11bso2977384a91.2
-        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 07:27:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763134061; x=1763738861; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P7qur3oNJDjn0ufieeTMCoxJ9koWZdOXvP4VkDtArKY=;
-        b=hD8rCw8GtND9oje3xhdCOQOLibtfYhx3FpA3wxm494z2o5mZugDhPz/Q5xFFUlwIxH
-         CRcyRQrVsCt2obW/qn5ZDdOywbZUISCCcsYAO0m/VQrFEsxFmOxsW1D0sKGOjvHopYUZ
-         O+KcudTGXpMmicXibIuLrDZuSomBseKX9tp5xpiJswAv4xdkKgAI9qyBNH+gYepnHUJ2
-         +17M3QqAO4R+hB9f8nL8JompXAaEMK1gimOq15pxoaHmw+O5SKYm151HnaqBtNdE48kn
-         5bpHwz/sBtkFXIaubm/sbBCIPUu4+MbnE3yBtJ8j9wYeSiMdSaN47twyLMNAyJH8v2pA
-         biAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763134061; x=1763738861;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P7qur3oNJDjn0ufieeTMCoxJ9koWZdOXvP4VkDtArKY=;
-        b=Ibg0mRolFYdhBcRKAjufXGRwdqaeI4p2jT5SM3YwuYGuV2OPWrLigRCI9N3aa9usv2
-         LyN+9DmI3h21Q10Ja5OvxwUkD1xgkcOC4jvGkw9dUHgpYt2aRJYDMgjwoVb20oQ13RcF
-         JzjgsdRhcAB9brtcse9IyDypAFXHbijiLNDSsS9p7TKxg67JszCYp2Aif6dk2mk/mvyl
-         e28kpEehISWk8/pnGqCvMzidIxZKkekYvPEuqryGy3JY1pvKLolganHlGQdOwfHY7Ea3
-         ZTZi8vqo+/JG4u3QZOEJPpxeOyMOcOvN+OhoX4ahiEJkZ9uuAqqQ43Qr2PAAj0OrP9ly
-         96ig==
-X-Forwarded-Encrypted: i=1; AJvYcCWTEtMPB4YWkiAeInwksGCbXZdxfViohcB0LA0XJHrg13GKnwfV+7sbHcvOd3HZfArQ32Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVXmXeyCYcG10M2N99FkbUKH4rCcecBHakPBx57rzTEm+chylt
-	78w/aJ3WRlYz6L0gdIXB/cXlPQctFK3le/g4IpudnkwZHEqXCzdPvfu722HXP91TxQuEl8Rvm08
-	PqC1cfQ==
-X-Google-Smtp-Source: AGHT+IGaZMsok9zj7+AIZxZQZifyj8jg6T9CJOKyvCnzF6EFugGvhUwNvNxHTPEHPKDJPPYyf/bpN+dPvCQ=
-X-Received: from pjoa6.prod.google.com ([2002:a17:90a:8c06:b0:342:b238:e0ad])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2685:b0:33b:b078:d6d3
- with SMTP id 98e67ed59e1d1-343fa62bf74mr3886801a91.23.1763134061288; Fri, 14
- Nov 2025 07:27:41 -0800 (PST)
-Date: Fri, 14 Nov 2025 07:27:39 -0800
-In-Reply-To: <20251113225621.1688428-8-seanjc@google.com>
+	s=arc-20240116; t=1763134730; c=relaxed/simple;
+	bh=J45c/s19KG5BRrKbkkO8elgq2nUpoF6T9W4M2wJwxIg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=d3eJd3wUQSunKxw2g9wFM2kcVNSUrDjYpVuEfF0qDc7tIb/+QqHSbPRcdBCgScr4NEZVtoZqiwpFnaj4zI2UfJvBUjOzvXoB887OPQgs5WEiG1cfQWSetjKcH5AyW5uHQSH7H9TYwsUo4G+kZEFThiE6x48qxtaMtQFE4AxXqYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sYzPddv/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1D78C113D0;
+	Fri, 14 Nov 2025 15:38:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763134729;
+	bh=J45c/s19KG5BRrKbkkO8elgq2nUpoF6T9W4M2wJwxIg=;
+	h=From:Subject:Date:To:Cc:From;
+	b=sYzPddv/oyC4fyRjzIbV4LUbG7tuVcGoEtaqEdOSgNCYfiIB7NXyfAh3oUOmGuJSK
+	 Wbth6vCLlEyQRBghE7FCZ6JyIfmPLguDbCVlrrIjOY3vu3h0FB5joa/9NSQi0pa+V0
+	 vd9WLyxem65B+bq14jTosrdWkjFD9YepT/PjMmUEj8fGl8Iai4ZgMzd0me+p85cpdW
+	 Kc5Mx5u2d+2CxWAj6jQDn8+1iSmFrnFkUr6q19+p9xubqlLiWYTIt1gGFU6y+jdFZZ
+	 GN9roLcEP9rVCYqa08oPnTSrLHJL8sJsF7gtq2EgrS52C5VtTOjkP8KWn5xgUNAxHV
+	 D5WYf4EVTm10w==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v2 0/4] KVM: selftests: arm64: Improve diagnostics from
+ set_id_regs
+Date: Fri, 14 Nov 2025 15:35:33 +0000
+Message-Id: <20251114-kvm-arm64-set-id-regs-aarch64-v2-0-672f214f41bf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251113225621.1688428-1-seanjc@google.com> <20251113225621.1688428-8-seanjc@google.com>
-Message-ID: <aRdKa9jVMt0Rn5tj@google.com>
-Subject: Re: [PATCH 7/9] KVM: SVM: Treat exit_code as an unsigned 64-bit value
- through all of KVM
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEVMF2kC/4WNyw6CMBBFf4XM2jFtxfJY+R+GRSkDNAg1U9JoC
+ P9uJe5dnnOTczcIxI4C1NkGTNEF55cE6pSBHc0yELouMSihrlKoEqc4o+FZ5xhoTSMyDQGNYTs
+ mR21bFJWuciEtpMaTqXevo39vEo8urJ7fx12UX/srX8SfcpQosNI9iU61sijpNhEv9Dh7HqDZ9
+ /0Dwl+2WMsAAAA=
+X-Change-ID: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-88d78
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1592; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=J45c/s19KG5BRrKbkkO8elgq2nUpoF6T9W4M2wJwxIg=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBpF00CvVNN1ixu1R00fyRsa8mf54xwdC9j31NOL
+ DOsaLUnhwSJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaRdNAgAKCRAk1otyXVSH
+ 0A0KB/sGtgmfnFGBZsCQ8KRHczYKmHn8xbMTbhdwyps3Tux2tF9yJ4rubWo0HO1JMd3yY0qqqvp
+ JJMahVCsnI45Sp2Iw9ix9Ya5INP0R8lQ4qMSbLb1YN29PX2cieTkr3ZZkvRY5+wNk8/tjueNWri
+ H/Vsx3ma6ZXdaJ6ZaXt3sRwrIZ1SdVapRo4Ngj97XuLyF/MaOPMB9qyky34K244ynsCVog4qBWP
+ 0CcwUKa8YGdbCQWq4GOPPlJ0n7TM2P7aXZ+OPrVHspSalZcEGZRNNFlz/b7Uyh6XjLaeHovK63B
+ NNPoC69lV0c6S1Hrq83EDSxwDncgDu083/9aeXaZLXcMlAfW
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Thu, Nov 13, 2025, Sean Christopherson wrote:
-> Fix KVM's long-standing buggy handling of SVM's exit_code as a 32-bit
-> value.  Per the APM and Xen commit d1bd157fbc ("Big merge the HVM
-> full-virtualisation abstractions.") (which is arguably more trustworthy
-> than KVM), offset 0x70 is a single 64-bit value:
-> 
->   070h 63:0 EXITCODE
-> 
-> Track exit_code as a single u64 to prevent reintroducing bugs where KVM
-> neglects to correctly set bits 63:32.
-> 
-> Fixes: 6aa8b732ca01 ("[PATCH] kvm: userspace interface")
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
+While debugging issues related to aarch64 only systems I ran into
+speedbumps due to the lack of detail in the results reported when the
+guest register read and reset value preservation tests were run, they
+generated an immediately fatal assert without indicating which register
+was being tested. Update these tests to report a result per register,
+making it much easier to see what the problem being reported is.
 
-...
+A similar, though less severe, issue exists with the validation of the
+individual bitfields in registers due to the use of immediately fatal
+asserts. Update those asserts to be standard kselftest reports.
 
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index e79bc9cb7162..4c7a5cd10990 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -781,7 +781,7 @@ TRACE_EVENT_KVM_EXIT(kvm_nested_vmexit);
->   * Tracepoint for #VMEXIT reinjected to the guest
->   */
->  TRACE_EVENT(kvm_nested_vmexit_inject,
-> -	    TP_PROTO(__u32 exit_code,
-> +	    TP_PROTO(__u64 exit_code,
->  		     __u64 exit_info1, __u64 exit_info2,
->  		     __u32 exit_int_info, __u32 exit_int_info_err, __u32 isa),
->  	    TP_ARGS(exit_code, exit_info1, exit_info2,
+Finally we have a fix for spurious errors on some NV systems.
 
-As pointed out by the test bot[*], the trace macro to print exit reasons needs
-to use 64-bit variants to play nice with 32-bit builds.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v2:
+- Add a fix for spurious failures with 64 bit only guests.
+- Link to v1: https://patch.msgid.link/20251030-kvm-arm64-set-id-regs-aarch64-v1-0-96fe0d2b178e@kernel.org
 
-And now I'm questioning all of my testing, because my build setup detects that
-as well, _and_ the hyperv_svm_test selftest fails.  *sigh*
+---
+Mark Brown (4):
+      KVM: selftests: arm64: Report set_id_reg reads of test registers as tests
+      KVM: selftests: arm64: Report register reset tests individually
+      KVM: selftests: arm64: Make set_id_regs bitfield validatity checks non-fatal
+      KVM: selftests: arm64: Skip all 32 bit IDs when set_id_regs is aarch64 only
 
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 4c7a5cd10990..0fd72ce83926 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -383,10 +383,10 @@ TRACE_EVENT(kvm_apic,
- #define kvm_print_exit_reason(exit_reason, isa)                                \
-        (isa == KVM_ISA_VMX) ?                                          \
-        __print_symbolic(exit_reason & 0xffff, VMX_EXIT_REASONS) :      \
--       __print_symbolic(exit_reason, SVM_EXIT_REASONS),                \
-+       __print_symbolic64(exit_reason, SVM_EXIT_REASONS),              \
-        (isa == KVM_ISA_VMX && exit_reason & ~0xffff) ? " " : "",       \
-        (isa == KVM_ISA_VMX) ?                                          \
--       __print_flags(exit_reason & ~0xffff, " ", VMX_EXIT_REASON_FLAGS) : ""
-+       __print_flags64(exit_reason & ~0xffff, " ", VMX_EXIT_REASON_FLAGS) : ""
- 
- #define TRACE_EVENT_KVM_EXIT(name)                                          \
- TRACE_EVENT(name,  
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 150 ++++++++++++++++++------
+ 1 file changed, 111 insertions(+), 39 deletions(-)
+---
+base-commit: 211ddde0823f1442e4ad052a2f30f050145ccada
+change-id: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
 
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
 
-[*] https://lore.kernel.org/all/202511141707.t4ad044J-lkp@intel.com
 
