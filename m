@@ -1,169 +1,128 @@
-Return-Path: <kvm+bounces-63234-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63235-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 807AFC5EA20
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 18:46:17 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD66C5E52E
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 17:48:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 389C9383194
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 16:40:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B79D64F1A33
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 16:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D1B3370F7;
-	Fri, 14 Nov 2025 16:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE5533555C;
+	Fri, 14 Nov 2025 16:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BRh4zlpJ"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="IbDmIahP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7D4334C22
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 16:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B60A314D2E;
+	Fri, 14 Nov 2025 16:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763138406; cv=none; b=dIWQsvkoz5joEznEq0HByheAKH1kW8VcI0Bc/DwyOndMcfvmygM+53O2V4Y1uex2rxsTTey3r+PcCY83Go6gK9GH5IAZHTBc5+dG5+xEx8SZnuRXcaX2FMoAadle7K/Q/naTbslu6nuSDetM9ZJUqimldJfATesPcpDP0NigM5M=
+	t=1763138473; cv=none; b=CGWVagAHundaXaZhroQ5b8jP0VDUcgzhXzZu1x6KwifN/MnOyXUfmfnmpTrLxouIBs2gh246l1fI1eyfzVUUAApGLDiZzVjU19xf1bEh26ONGOKvFRIFnQ6fNMh/C1ZFxg9SZPIHdwHnQ4k3qv9EeIi70cixqr7M/lMbmZEGZFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763138406; c=relaxed/simple;
-	bh=0q1LSTNcWfhRhxo9wwTNWh/KOxbev5bnQ/8Wdz5tUuc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ipA80qB/BfX4HdTph5Nawh7Da/3PfJXn0ddnlse/btIvN0nLzggxWfa2AhhYgNdydV8OnKACjVdL2G+/ZnXekKXWqlEXyVrK1wI+46A6Kzymuh3CLWy1RBBqguhlKk/6zNKLtLAivuGOFY6PrlAghglp0cACvhW5gYdjvggLyh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BRh4zlpJ; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29555415c09so28734915ad.0
-        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 08:40:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763138404; x=1763743204; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KTMohZMjF0LmDk1TElNZL5EIXiLhl+OzBkAAJL2pM6g=;
-        b=BRh4zlpJopspjWt6Vg+B0nyV00QWz0NKlvl+yTS9I1lY2E6wqTP2VrDJrjr9PXoqFx
-         rTmQCuQaIqTFcPMR9Roce2REf0Y1VVjamgISEcQ/P3Bic6aES02FSJlJUa68iQzbYOmh
-         WtGbezadAnt/7NGXtVqboqDVLzBJWGouceGc5QSrLWYvf/6OV+t3HhcaRPTvJ/Wvc6lV
-         MbJ3UwENrv3cEnNp/qlX/1jnWeAgVYw3cUoGbAmeIBQ8Trfn7eTfGu3L5Le3mBFAEkqa
-         5Aw9tZAalPbRFi/XXEvg0JCtQRahpUGzrNaKd3Ye7h3rDXjmMXIJJ/gzdRzLAHtDLvvD
-         oYwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763138404; x=1763743204;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KTMohZMjF0LmDk1TElNZL5EIXiLhl+OzBkAAJL2pM6g=;
-        b=WfUcP6rwjT4Y3uCuSHTj0EOGQO0nKnyF+CyFsYVW1jCblND/2P0nPF5A/Vs7WLxVKB
-         PwPXGJke4kAn8e2BoZjRSoNpMzm8vjgAbBo/ALCRX/npKWES8lVzr6Eb+n5fBqOjMhET
-         B0pl/ZRwEeUzJR9yy6GTZJBD1sbK0hwIEBQC7YjwEh1VXIW4l0l4awceF/G0cMmAmNPC
-         0pGggelteVGIecwaIlyjeUfglJM+1GRf4gdSLiWnvhXVlNm1gv35NzJQHHEO79ZlMFOu
-         S0M5DmOAN1w8H+QNN9OKnRSva481ei7O0CmalgzIBCFMizmvrC8NCrfw6SP+SGmwl6Vh
-         Mypg==
-X-Gm-Message-State: AOJu0Yydv8oOyd6IFfh3HJMPBkoGDJaAcus/YzloGYQy0jw6esWCFpCE
-	Xn67ChtdSzUoZTKvB0Cx5bw/H2o2W40eor1hGaofjniXdBZsXcpJ3rsccZwFe+WiiRHq66vLKMO
-	FcJsr3w==
-X-Google-Smtp-Source: AGHT+IGA7G1A0VmYSd0Eo9Xq1AOJbGmNJ/+oU6KUlAGTk5vw5hoj9x9MGGqCLYmTDTDqmV0H8SYZbnqUSqQ=
-X-Received: from pjwo13.prod.google.com ([2002:a17:90a:d24d:b0:33b:c211:1fa9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f647:b0:298:42ba:c422
- with SMTP id d9443c01a7336-2986a73303amr42123035ad.31.1763138404137; Fri, 14
- Nov 2025 08:40:04 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 14 Nov 2025 08:40:01 -0800
+	s=arc-20240116; t=1763138473; c=relaxed/simple;
+	bh=c77v2lreVHd8pT7KjMdH3CEH7CQsd+suRbc3fGPdpUI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kgvD6xf3xOW3VitxmCUkvM/yKaVwoo0ZhXhtrRs4wyjYUqsqMU90QQSehR1dgPjZ4CDIDn/7/wCKOb12vFwo6VgK0lGX2vnL7lHfP6QDniUZ+9Tjb+2/EP5rz3sdjczIh0w5V5KI2y092OkPrfB41ULstXZEsze4GOl56AXJ6PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=IbDmIahP; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 22CEF40E022F;
+	Fri, 14 Nov 2025 16:41:01 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id Sl3Ki4_HsH0x; Fri, 14 Nov 2025 16:40:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1763138455; bh=6STHzNly2lww8z9RJvHcPTI+uLTRLxHtfn3Q7w+Zwu0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IbDmIahPUj0MksrVyuWS1lYxet4gREij22Ze4z/wlqPGkjQhTdpNy6t7gSuroIAcc
+	 Zo4E4ULRpnyySgG1Leu9ZYoWpdE294tj1057lbXPQpiBZuoioz6nsFW1koF9PZlxQ6
+	 OVdoG/l4kLL6yKpDxS0ufJvbEFSivSIY7rogXupAcJ2mMM+ObKX1FbCCWRhYDqH2qN
+	 eK6HUQ4O/0hMWKhn2eglTAEKU66UE/kJ9Yv6k/BI+UX5rNnYtjDKvN4cK/VO1q1fom
+	 z4Rurlj1uSsFNQiw6hfLtNOHClbgj/RZq6PU579Dpb2Ey8Q4p8bEIXiDU8dx10qtvl
+	 4v77C3AOBdPKUnqc9/nAIsJk6jqIf+lfCl9XujGD1EHvSoieD/Rk9ZrO+2PduuYiXt
+	 +UrXEkiDq9YETZtnkAFTGg36jXzflx4IBpCBN7t3b+QQqYkuqsedT8YyFnwk8nvweO
+	 Ju6whImIav3nNseLeSNvsRfOqMqf+riY/O6aQ5FSwlt+k2XuHpyjRHlk/pA3fZgEmO
+	 5+7gBba6emphirylf5Y8vl4OnC6+hxvW482gX2wVc0bv3X/c9YN2ha0FVwRfMr9dPq
+	 h7qFfts8hRJxlOMpQkTmg65YLvUiAmmxeUw2Rrlpk/qCdqhmkOIn7PM41XKtLRXhf4
+	 mzbHHPnVYPy8rQ+maurE6Vjg=
+Received: from zn.tnic (pd9530da1.dip0.t-ipconnect.de [217.83.13.161])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id BE8CE40E016E;
+	Fri, 14 Nov 2025 16:40:45 +0000 (UTC)
+Date: Fri, 14 Nov 2025 17:40:38 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Brendan Jackman <jackmanb@google.com>
+Subject: Re: [PATCH v5 1/9] KVM: VMX: Use on-stack copy of @flags in
+ __vmx_vcpu_run()
+Message-ID: <20251114164038.GDaRdbhpoLbiq02vDu@fat_crate.local>
+References: <20251113233746.1703361-1-seanjc@google.com>
+ <20251113233746.1703361-2-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251114164001.1791718-1-seanjc@google.com>
-Subject: [PATCH] KVM: selftests: Use GUEST_ASSERT_EQ() to check exit codes in
- Hyper-V SVM test
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251113233746.1703361-2-seanjc@google.com>
 
-Use GUEST_ASSERT_EQ() instead of GUEST_ASSERT(x == SVM_EXIT_<code>) in the
-Hyper-V SVM test so that the test prints the actual vs. expected values on
-failure.  E.g. instead of printing:
+On Thu, Nov 13, 2025 at 03:37:38PM -0800, Sean Christopherson wrote:
+> Suggested-by: Borislav Petkov <bp@alien8.de>
 
-  vmcb->control.exit_code == SVM_EXIT_VMMCALL
+Bah, I didn't suggest that - that's all your effort :)
 
-print:
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/vmx/run_flags.h | 10 +++-------
+>  arch/x86/kvm/vmx/vmenter.S   | 13 ++++---------
+>  2 files changed, 7 insertions(+), 16 deletions(-)
 
- 0x7c != 0x81 (vmcb->control.exit_code != SVM_EXIT_VMMCALL)
+...
 
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../testing/selftests/kvm/x86/hyperv_svm_test.c  | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+> @@ -173,8 +167,9 @@ SYM_FUNC_START(__vmx_vcpu_run)
+>  	/* Clobbers EFLAGS.ZF */
+>  	CLEAR_CPU_BUFFERS
+>  
+> -	/* Check EFLAGS.CF from the VMX_RUN_VMRESUME bit test above. */
+> -	jnc .Lvmlaunch
+> +	/* Check @flags to see if vmlaunch or vmresume is needed. */
 
-diff --git a/tools/testing/selftests/kvm/x86/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86/hyperv_svm_test.c
-index 0ddb63229bcb..7fb988df5f55 100644
---- a/tools/testing/selftests/kvm/x86/hyperv_svm_test.c
-+++ b/tools/testing/selftests/kvm/x86/hyperv_svm_test.c
-@@ -94,7 +94,7 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm,
- 
- 	GUEST_SYNC(2);
- 	run_guest(vmcb, svm->vmcb_gpa);
--	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_VMMCALL);
- 	GUEST_SYNC(4);
- 	vmcb->save.rip += 3;
- 
-@@ -102,13 +102,13 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm,
- 	vmcb->control.intercept |= 1ULL << INTERCEPT_MSR_PROT;
- 	__set_bit(2 * (MSR_FS_BASE & 0x1fff), svm->msr + 0x800);
- 	run_guest(vmcb, svm->vmcb_gpa);
--	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_MSR);
- 	vmcb->save.rip += 2; /* rdmsr */
- 
- 	/* Enable enlightened MSR bitmap */
- 	hve->hv_enlightenments_control.msr_bitmap = 1;
- 	run_guest(vmcb, svm->vmcb_gpa);
--	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_MSR);
- 	vmcb->save.rip += 2; /* rdmsr */
- 
- 	/* Intercept RDMSR 0xc0000101 without telling KVM about it */
-@@ -117,13 +117,13 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm,
- 	vmcb->control.clean |= HV_VMCB_NESTED_ENLIGHTENMENTS;
- 	run_guest(vmcb, svm->vmcb_gpa);
- 	/* Make sure we don't see SVM_EXIT_MSR here so eMSR bitmap works */
--	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_VMMCALL);
- 	vmcb->save.rip += 3; /* vmcall */
- 
- 	/* Now tell KVM we've changed MSR-Bitmap */
- 	vmcb->control.clean &= ~HV_VMCB_NESTED_ENLIGHTENMENTS;
- 	run_guest(vmcb, svm->vmcb_gpa);
--	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_MSR);
- 	vmcb->save.rip += 2; /* rdmsr */
- 
- 
-@@ -132,16 +132,16 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm,
- 	 * no VMCALL exit expected.
- 	 */
- 	run_guest(vmcb, svm->vmcb_gpa);
--	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_MSR);
- 	vmcb->save.rip += 2; /* rdmsr */
- 	/* Enable synthetic vmexit */
- 	*(u32 *)(hv_pages->partition_assist) = 1;
- 	run_guest(vmcb, svm->vmcb_gpa);
--	GUEST_ASSERT(vmcb->control.exit_code == HV_SVM_EXITCODE_ENL);
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code,  HV_SVM_EXITCODE_ENL);
- 	GUEST_ASSERT(vmcb->control.exit_info_1 == HV_SVM_ENL_EXITCODE_TRAP_AFTER_FLUSH);
- 
- 	run_guest(vmcb, svm->vmcb_gpa);
--	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_VMMCALL);
- 	GUEST_SYNC(6);
- 
- 	GUEST_DONE();
+VMRESUME/VMLAUNCH in caps, like the rest of the file. We like our x86 insns in
+all caps. :)
 
-base-commit: 16ec4fb4ac95d878b879192d280db2baeec43272
+> +	testl $VMX_RUN_VMRESUME, WORD_SIZE(%_ASM_SP)
+> +	jz .Lvmlaunch
+>  
+>  	/*
+>  	 * After a successful VMRESUME/VMLAUNCH, control flow "magically"
+> -- 
+
+But yeah, AFAIU this code, that's a nice cleanup.
+
+Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
+
 -- 
-2.52.0.rc1.455.g30608eb744-goog
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
