@@ -1,56 +1,55 @@
-Return-Path: <kvm+bounces-63236-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63237-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0349C5E640
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 18:02:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47746C5E81A
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 18:19:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 243314FA43D
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 16:53:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BD9234E2160
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 17:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF76B2C21D0;
-	Fri, 14 Nov 2025 16:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 504E2335BDC;
+	Fri, 14 Nov 2025 16:59:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YnW5BDIY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BsyHlbba"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA0028D84F
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 16:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377BB2BE7B4
+	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 16:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763139168; cv=none; b=OlVgJcajUplTl3DLPTtxp7AlL+nF08iDPpnJnGB/951lgyGgkbtTGadB4HAb+P8g1ziRiZk5GC0PFLNNSknnLiHZ3N7ZGfROgzx0W1tac8BbUP/wu3qjd9jZOzDS2R0yfxtvKhqe7iN15JOr8lMtzzZW01x541D1/gR1Ij+3TMI=
+	t=1763139556; cv=none; b=HOn1UbfIfBjrvQgNZ61ZLqWPNawKNiGK7zQtlX80QlOkC7piZyzzQfqprGqsGkov22AOk6tRww4gs9VWXSeTWxb4qfShbEGbM9ENQzp7xGCYdpLtL75/rPKeNFCNCQSfMmbFo7WdRD+9WirDHO3fo/gasuKd9PixXqTdKMjT1dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763139168; c=relaxed/simple;
-	bh=J+woEYepazJSNt9YNRNQTE0n0oqUmlct4V9a+jNg6SI=;
+	s=arc-20240116; t=1763139556; c=relaxed/simple;
+	bh=+dOQ7jRG4S/0pvgJaFhI7M+3TShnbhUgsgzHa+LjAJA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NA+07xlaFlQwnyIn2GOMR0W/UkHbtufSNPPR3pDmhbBkx3rcb86EEdgSy4E+5UWTnNa31+tabWg0SbiMobLKBEuQJuMTL2vSzDmbjRYyB5ym7VpaEh1/y1Ws2MvNp66ELhP6hrsW8kLtSX2jB47UiZaaLeGYLVUEsODPFH7gMdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YnW5BDIY; arc=none smtp.client-ip=95.215.58.186
+	 Content-Type:Content-Disposition:In-Reply-To; b=dx8SPTG5v+bhiOuEBfNGQ79XW5gbCMt/s9f86gD7uWJob02aV3z/Dm7/nq68HgFoG9g9cxI27OcYV8B6X5amL/dtlkhOkxNoN8xHqFvvorp0R5VXiym65sfrOPHYIU6tQ6/5IClopWVZLv6VkRDstaqghSz4AQUzQT0uMK5cXYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BsyHlbba; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 14 Nov 2025 16:52:10 +0000
+Date: Fri, 14 Nov 2025 16:58:49 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763139162;
+	t=1763139552;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=//sw+C17RnFVza/MgpE+dbMHlRJchErAG8BGBLaOJ8Q=;
-	b=YnW5BDIY6QcylpUO5hEnexNGhRyCTK4m7GP1M2Pa62Na6fFFlCq4P1dB2+Z1Ws7olatMly
-	SAkh4EvhNQwiyHXX7QGBBCBl8Gp+HTCT0YJONQZEBVxj5nBs2CCwhNI5HFMBOcu35zQLk7
-	I3w9nKOoCFTkTUoGdxWxgxb+ixxFL+Q=
+	bh=HDFxcpDYjv5rvsXJWGP4wSDpRQhQscs1GzAfSTNXJq0=;
+	b=BsyHlbba0J+QOdz3E0yVUG6D90OoOnaFtW/Ek/w0q9+bHR7DdoKb+mSzRgIEkV0UMzG3f8
+	xjHzAjUWMQYR9w/xthw1Px8uINzOJwBtU8LExCN7bfoALQSoZu2Alm9jtDAUwUsJ5hTW3G
+	syDagLyT+xtWevN4zHBAT+eK8olBOWw=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: SVM: Fix redundant updates of LBR MSR intercepts
-Message-ID: <ei6cdmnvhzyavfobamjkcq2ghdrxcv7ruxhcbzzycqlvaty7zr@5cjkfczxiqom>
-References: <20251112013017.1836863-1-yosry.ahmed@linux.dev>
- <aRdaLrnQ8Xt77S8Y@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Use GUEST_ASSERT_EQ() to check exit
+ codes in Hyper-V SVM test
+Message-ID: <ukijxjc4bprwhls6c2v3i7l7ghxqhabe42lje2fgke7rnuxocs@5nakwleh3wiw>
+References: <20251114164001.1791718-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -59,131 +58,119 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aRdaLrnQ8Xt77S8Y@google.com>
+In-Reply-To: <20251114164001.1791718-1-seanjc@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, Nov 14, 2025 at 08:34:54AM -0800, Sean Christopherson wrote:
-> On Wed, Nov 12, 2025, Yosry Ahmed wrote:
-> > svm_update_lbrv() always updates LBR MSRs intercepts, even when they are
-> > already set correctly. This results in force_msr_bitmap_recalc always
-> > being set to true on every nested transition,
+On Fri, Nov 14, 2025 at 08:40:01AM -0800, Sean Christopherson wrote:
+> Use GUEST_ASSERT_EQ() instead of GUEST_ASSERT(x == SVM_EXIT_<code>) in the
+> Hyper-V SVM test so that the test prints the actual vs. expected values on
+> failure.  E.g. instead of printing:
 > 
-> Nit, it's only on VMRUN, not on every transition (i.e. not on nested #VMEXIT).
-
-How so? svm_update_lbrv() will also be called in nested_svm_vmexit(),
-and it will eventually lead to force_msr_bitmap_recalc being set to
-true.
-
-I guess what you meant is the "undoing the Hyper-V optimization" part.
-That is indeed only affected by the svm_update_lbrv() call in the nested
-VMRUN path.
-
-So we do set force_msr_bitmap_recalc on nested #VMEXIT, but it doesn't
-really matter because we set it again on nested VMRUN before
-nested_svm_merge_msrpm() is called.
-
-> 
-> > essentially undoing the hyperv optimization in nested_svm_merge_msrpm().
-> 
-> When something fixes a KVM test failures (selftests or KUT), please call that
-> out in the changelog.  That way when other people encounter the failure, they'll
-> get search hits and won't have to waste their time bisecting and/or debugging.
-> 
-> If you hadn't mentioned off-list that this was detected by hyperv_svm_test, I
-> wouldn't have had the first clue as to why that test started failing.  Even with
-> the hint, it still took me a few minutes to connect the dots.
-
-Noted, makes sense. I thought the fix and the original patch are in such
-quick succession that hopefully no one will run into it.
-
-> 
-> In general, be more explicit/detailed, e.g. "undoing the hyperv optimization" is
-> unnecessarily vague, as the reader has to go look at the code to understand what
-> you're talking about.  My philosophy with changelogs is that they are write-once,
-> read-many, and so if you can save any time/effort for readers, it's almost always
-> worth the extra time/effort on the "write" side.
-> 
-> And a nit: my strong preference is to lead with what is being changed, and then
-> dive into the details of why, what's breaking, etc.  This is one of the few
-> divergences from the tip-tree preferences.  From  Documentation/process/maintainer-kvm-x86.rst:
-> 
->   Stating what a patch does before diving into details is preferred by KVM x86
->   for several reasons.  First and foremost, what code is actually being changed
->   is arguably the most important information, and so that info should be easy to
->   find. Changelogs that bury the "what's actually changing" in a one-liner after
->   3+ paragraphs of background make it very hard to find that information.
-
-Noted.
-
-> 
-> E.g.
-> 
-> --
-> Don't update the LBR MSR intercept bitmaps if they're already up-to-date,
-> as unconditionally updating the intercepts forces KVM to recalculate the
-> MSR bitmaps for vmcb02 on every nested VMRUN.  Functionally, the redundant
-> updates are benign, but forcing an update neuters the Hyper-V optimization
-> that allows KVM to skip refreshing the vmcb12 MSR bitmap if L1 marked the
-> "nested enlightenments" as being clean, i.e. if L1 told KVM that no
-> changes were made to the MSR bitmap since the last VMRUN.
-> 
-> Clobbering the Hyper-V optimization manifests as a failure in the
-> hyperv_svm_test KVM selftest, which intentionally changes the MSR bitmap
-> "without telling KVM about it" to verify that KVM honors the clean hint.
-> 
->   ==== Test Assertion Failure ====
->   x86/hyperv_svm_test.c:120: vmcb->control.exit_code == 0x081
->   pid=193558 tid=193558 errno=4 - Interrupted system call
->      1	0x0000000000411361: assert_on_unhandled_exception at processor.c:659
->      2	0x0000000000406186: _vcpu_run at kvm_util.c:1699
->      3	 (inlined by) vcpu_run at kvm_util.c:1710
->      4	0x0000000000401f2a: main at hyperv_svm_test.c:175
->      5	0x000000000041d0d3: __libc_start_call_main at libc-start.o:?
->      6	0x000000000041f27c: __libc_start_main_impl at ??:?
->      7	0x00000000004021a0: _start at ??:?
 >   vmcb->control.exit_code == SVM_EXIT_VMMCALL
 > 
-> Avoid using ....
-> --  
-
-Thanks!
-
+> print:
 > 
-> > Fix it by keeping track of whether LBR MSRs are intercepted or not and
-> > only doing the update if needed, similar to x2avic_msrs_intercepted.
-> > 
-> > Avoid using svm_test_msr_bitmap_*() to check the status of the
-> > intercepts, as an arbitrary MSR will need to be chosen as a
-> > representative of all LBR MSRs, and this could theoretically break if
-> > some of the MSRs intercepts are handled differently from the rest.
+>  0x7c != 0x81 (vmcb->control.exit_code != SVM_EXIT_VMMCALL)
 > 
-> For posterity, Yosry originally proposed (off-list) fixing this by having
-> svm_set_intercept_for_msr() check for redundant updates, but I voted against
-> that because updating MSR interception _should_ be rare (full CPUID updates and
-> explicit MSR filter updates), and I don't want to risk hiding a bug/flaw elsewhere.
-> I.e. if something is triggering frequent/unexpected MSR bitmap changes, I want
-> that to be surfaced, not squashed/handled by the low level helpers.
+> Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Hmm, that was on-list though :P
+LGTM:
+Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 
-https://lore.kernel.org/kvm/aRO5ItX_--ZDfnfM@google.com/
+For the record, there are a few more instances:
 
+$ git grep "GUEST_ASSERT(vmcb->control.exit_code"
+tools/testing/selftests/kvm/x86/hyperv_svm_test.c:      GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+tools/testing/selftests/kvm/x86/hyperv_svm_test.c:      GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
+tools/testing/selftests/kvm/x86/hyperv_svm_test.c:      GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
+tools/testing/selftests/kvm/x86/hyperv_svm_test.c:      GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+tools/testing/selftests/kvm/x86/hyperv_svm_test.c:      GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
+tools/testing/selftests/kvm/x86/hyperv_svm_test.c:      GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
+tools/testing/selftests/kvm/x86/hyperv_svm_test.c:      GUEST_ASSERT(vmcb->control.exit_code == HV_SVM_EXITCODE_ENL);
+tools/testing/selftests/kvm/x86/hyperv_svm_test.c:      GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+tools/testing/selftests/kvm/x86/state_test.c:   GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+tools/testing/selftests/kvm/x86/state_test.c:   GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+tools/testing/selftests/kvm/x86/svm_int_ctl_test.c:     GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+tools/testing/selftests/kvm/x86/svm_nested_soft_inject_test.c:  __GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL,
+tools/testing/selftests/kvm/x86/svm_nested_soft_inject_test.c:  __GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_HLT,
+tools/testing/selftests/kvm/x86/svm_vmcall_test.c:      GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+
+There's also a lot for VMX, you can find all/most of them by running git
+grep "vmreadz(VM_EXIT_REASON)".
+
+> ---
+>  .../testing/selftests/kvm/x86/hyperv_svm_test.c  | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 > 
+> diff --git a/tools/testing/selftests/kvm/x86/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86/hyperv_svm_test.c
+> index 0ddb63229bcb..7fb988df5f55 100644
+> --- a/tools/testing/selftests/kvm/x86/hyperv_svm_test.c
+> +++ b/tools/testing/selftests/kvm/x86/hyperv_svm_test.c
+> @@ -94,7 +94,7 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm,
 >  
-> > Also, using svm_test_msr_bitmap_*() makes backports difficult as it was
-> > only recently introduced with no direct alternatives in older kernels.
-> > 
-> > Fixes: fbe5e5f030c2 ("KVM: nSVM: Always recalculate LBR MSR intercepts in svm_update_lbrv()")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+>  	GUEST_SYNC(2);
+>  	run_guest(vmcb, svm->vmcb_gpa);
+> -	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+> +	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_VMMCALL);
+>  	GUEST_SYNC(4);
+>  	vmcb->save.rip += 3;
+>  
+> @@ -102,13 +102,13 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm,
+>  	vmcb->control.intercept |= 1ULL << INTERCEPT_MSR_PROT;
+>  	__set_bit(2 * (MSR_FS_BASE & 0x1fff), svm->msr + 0x800);
+>  	run_guest(vmcb, svm->vmcb_gpa);
+> -	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
+> +	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_MSR);
+>  	vmcb->save.rip += 2; /* rdmsr */
+>  
+>  	/* Enable enlightened MSR bitmap */
+>  	hve->hv_enlightenments_control.msr_bitmap = 1;
+>  	run_guest(vmcb, svm->vmcb_gpa);
+> -	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
+> +	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_MSR);
+>  	vmcb->save.rip += 2; /* rdmsr */
+>  
+>  	/* Intercept RDMSR 0xc0000101 without telling KVM about it */
+> @@ -117,13 +117,13 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm,
+>  	vmcb->control.clean |= HV_VMCB_NESTED_ENLIGHTENMENTS;
+>  	run_guest(vmcb, svm->vmcb_gpa);
+>  	/* Make sure we don't see SVM_EXIT_MSR here so eMSR bitmap works */
+> -	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+> +	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_VMMCALL);
+>  	vmcb->save.rip += 3; /* vmcall */
+>  
+>  	/* Now tell KVM we've changed MSR-Bitmap */
+>  	vmcb->control.clean &= ~HV_VMCB_NESTED_ENLIGHTENMENTS;
+>  	run_guest(vmcb, svm->vmcb_gpa);
+> -	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
+> +	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_MSR);
+>  	vmcb->save.rip += 2; /* rdmsr */
+>  
+>  
+> @@ -132,16 +132,16 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm,
+>  	 * no VMCALL exit expected.
+>  	 */
+>  	run_guest(vmcb, svm->vmcb_gpa);
+> -	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
+> +	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_MSR);
+>  	vmcb->save.rip += 2; /* rdmsr */
+>  	/* Enable synthetic vmexit */
+>  	*(u32 *)(hv_pages->partition_assist) = 1;
+>  	run_guest(vmcb, svm->vmcb_gpa);
+> -	GUEST_ASSERT(vmcb->control.exit_code == HV_SVM_EXITCODE_ENL);
+> +	GUEST_ASSERT_EQ(vmcb->control.exit_code,  HV_SVM_EXITCODE_ENL);
+>  	GUEST_ASSERT(vmcb->control.exit_info_1 == HV_SVM_ENL_EXITCODE_TRAP_AFTER_FLUSH);
+>  
+>  	run_guest(vmcb, svm->vmcb_gpa);
+> -	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+> +	GUEST_ASSERT_EQ(vmcb->control.exit_code,  SVM_EXIT_VMMCALL);
+>  	GUEST_SYNC(6);
+>  
+>  	GUEST_DONE();
 > 
-> With an updated changelog,
+> base-commit: 16ec4fb4ac95d878b879192d280db2baeec43272
+> -- 
+> 2.52.0.rc1.455.g30608eb744-goog
 > 
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> Tested-by: Sean Christopherson <seanjc@google.com>
-
-Thanks!
-
-Paolo, do you prefer a updated patch with the updated changelog, or
-fixing it up when you apply it?
 
