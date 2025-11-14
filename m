@@ -1,142 +1,199 @@
-Return-Path: <kvm+bounces-63219-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63220-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D598AC5E097
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 16:58:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1843DC5DF8E
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 16:48:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 13BFE5019F3
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 15:36:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05A14427EA7
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 15:36:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC825345CC1;
-	Fri, 14 Nov 2025 15:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE9A326D4C;
+	Fri, 14 Nov 2025 15:23:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R62pJoTG"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="C4yJqLAl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.197.217.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D506632E757
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 15:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0034332693D;
+	Fri, 14 Nov 2025 15:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.197.217.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763133766; cv=none; b=K/sy8zkQGOw0N+wjI+ryjG6eoyukrIGrYHpSTUwI4Q1huTCRwM5IjiENEh+sbvWKHk2R6vgAzycSv89ukZe5Qv3rWOMd6yJXgzD1dREVZZG4mgMZjsTGGZ3Qv/VZnic4lCujsJiBNEUjAVHLvlj1FrXvLHYtU4KThRLNsa0AGlo=
+	t=1763133831; cv=none; b=GIwMjgcNqRNONNbtYOQbDifTyxDHnztnYwNZt/LtiSbCGyQzY92UrkxZ1tMt+jYr+noalwhbLt3k2SgjMsSdib/zwX7pG6EjSoWzevp5VxL5uH8/qos6DbZQ+fqwwAAo29qYKumQ4c+ezDPV8L2FoKbu/hnxj/WnKxSjwJFZvEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763133766; c=relaxed/simple;
-	bh=DpbKWxIyQ9KxrGiVD7t8GJpBnIreph23Cp44p8dMSM8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aSVZ2W4W12QgW9tUsiP/NRQ6Uu8T3RaKjDzSLtJcrMBsOdj3ECHMP1IAlW63ceqJMkyvHUjLXWfhoDMGzj0tF5prO8qtUQkqb6dRei0whZPnR2BsTw7kZCm+EPsBnstKWWp8oUgP3SxCFr8noCNc2KvJigAL0EgB6jTXg+TdvcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R62pJoTG; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-341616a6fb7so2723819a91.0
-        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 07:22:43 -0800 (PST)
+	s=arc-20240116; t=1763133831; c=relaxed/simple;
+	bh=8iXEx2CLjiwY94KKGaxPDwvdfOXrmpBx5HwJrBR3X/Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=CXUUr50NlpvI8F96L3dKDS8Gxu/UskLiJr3/QFuQ1pZTFSqztAeyovVMZNNZ+V2v/XE/ipmd2aBhA8sffyRgQNpN//UvS/AdBBN0WDo71RdA5ChrEzqQ6DoLee0AeGrYjobIyvs5jsChUcTFlywV0D3Cwp1yTVUOafwLGk/+tyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=C4yJqLAl; arc=none smtp.client-ip=18.197.217.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763133763; x=1763738563; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eKSpfoYNgcderQopBxLm/p146foAdZqVSD0ikjtaERA=;
-        b=R62pJoTGeQuuLr0U2gT9vGARADabcJgf+cHzzeqgDUNHmDFLyEDMNoXZKNutEUJ4XV
-         zDjsgxgXOryctn6yBIg4JvUr97aVuvRCPzYUAnPcjL6LMqz5pyoJCGIMUFcRj59ewbDG
-         meODFMnifggCzuCI4r9bUL1DCtCMoKu0usimemmAMLLdY0FzYmtGw58i6b3XbJK9jZXX
-         ofIGMayQtXWSubbERwlGmbnFo8a0PxgXgRgmcej0Z50g9WNXujkujM6vAjfL8zCnY5Fh
-         Y/9ZNYYXl7dbCphfu4vwyFMpPgd31ZncasPpk3EV6qnknX0s7bW9XJZ+UJTYoqrXj6ID
-         6EWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763133763; x=1763738563;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eKSpfoYNgcderQopBxLm/p146foAdZqVSD0ikjtaERA=;
-        b=pcHlVKeOHjd5GLK1u5THl2vrqSpPAY6F/O1C09A9I3EzO606vEd6V7r8Qq7r5Dl2j2
-         ipKU5Hu/1GoR+AtT7wusxymS7wAFTo6nb2A5wF5eWiQG1epMUTKrY4OQoHkKu71i5EEr
-         Yom4KpkMvuo3ooWx14D3L/vfSPAJ70zudDVyw9WC27tqnzjqmxgqZZtgTb/ocL7T4HZO
-         bsFrliZVmq132DfYtU9kV/Fv1MdDeZeMbDkgkf098O9jCGJsRBUlF3+8ZqZJLy5mMS8j
-         OwtC/8T/rV9B/pT94cR6hIySJmdrTcohSnq4Ff/MLGQYSO/RyrApO7b1j5LhiFW7NvHy
-         9YHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXF2AeVH0mRUnwab6iAWcDHcMg3TvwScCHkdgbaDSCwo8nEAOWpSx7FAt6XxdQHsmY1wlI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBWyrkIhB31pgBCJt9XDXEcuR0BdIAmw/F9G3kGfwbkxzH8HCM
-	Mcg7v/PIKLslqyyXujb9hBz/Dt8F1TbrKbXcxISNjEFtUJ72l8Rz/4aoCR6buJj+miERoDh0vqZ
-	+JgqDwg==
-X-Google-Smtp-Source: AGHT+IHguiFlQ0z5dlRYfgNcEgqZOl8+CF7sD5lgZUJiizDuYK4N6jAChUXIGNOe8U4ks8AdguhO7M/4KMw=
-X-Received: from pjtz18.prod.google.com ([2002:a17:90a:cb12:b0:340:b1b5:eb5e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e18c:b0:336:b60f:3936
- with SMTP id 98e67ed59e1d1-343f9e9f23bmr4797401a91.12.1763133763161; Fri, 14
- Nov 2025 07:22:43 -0800 (PST)
-Date: Fri, 14 Nov 2025 07:22:41 -0800
-In-Reply-To: <SN6PR02MB4157AF057CC8539AD47F6D66D4CAA@SN6PR02MB4157.namprd02.prod.outlook.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1763133829; x=1794669829;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=EUoO6J2leH6QyEyATqXK9S7J0nGwRasaU1ZmVSNZ7CA=;
+  b=C4yJqLAlmdoQ72gwwXhmAzxThRPqTIdRMrAlwjVAEcvl2ct+XgnXrkKm
+   spNEGtUWOW986e/n+c5cfw9BJkH/pvluGCCckHJc3F2pLG6td6SQIOMkP
+   oW8nwC6Oi5Jbb8HUpZNXr46MBpdD8oID7qr/S7gd+1sEMdLeO4yl5oKdB
+   l63S9MQHvpb3+nBH42/ItMkgOdXCGb+ARTqfa9ZhlJ0qIdzXKTHj8kDTY
+   lJF3m+K4dvsiSg0xTYH3Ky+mMPxDZj0sCTqZrbvl0Eu244A6ARilyI0gp
+   apQVAEirFuixPujuLg2G77wOfMY+Uf+BOhExFFLHbWK7Q9RBOFXExD4PM
+   w==;
+X-CSE-ConnectionGUID: /djZmy2xSO2XERS/5Ex6AA==
+X-CSE-MsgGUID: CrUFLED8SeWcShqJ1sSsig==
+X-IronPort-AV: E=Sophos;i="6.19,305,1754956800"; 
+   d="scan'208";a="5188973"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 15:23:32 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [54.240.197.232:16887]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.0.213:2525] with esmtp (Farcaster)
+ id 9ba66533-212b-42f6-a462-52bbbfe88db4; Fri, 14 Nov 2025 15:23:31 +0000 (UTC)
+X-Farcaster-Flow-ID: 9ba66533-212b-42f6-a462-52bbbfe88db4
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Fri, 14 Nov 2025 15:23:29 +0000
+Received: from [192.168.11.73] (10.106.82.12) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Fri, 14 Nov 2025
+ 15:23:28 +0000
+Message-ID: <6b79711c-ee0f-47aa-b42f-51f13ac0bd5c@amazon.com>
+Date: Fri, 14 Nov 2025 15:23:22 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251113225621.1688428-1-seanjc@google.com> <20251113225621.1688428-8-seanjc@google.com>
- <SN6PR02MB4157AF057CC8539AD47F6D66D4CAA@SN6PR02MB4157.namprd02.prod.outlook.com>
-Message-ID: <aRdJQQ7_j6RcHwjJ@google.com>
-Subject: Re: [PATCH 7/9] KVM: SVM: Treat exit_code as an unsigned 64-bit value
- through all of KVM
-From: Sean Christopherson <seanjc@google.com>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Nuno Das Neves <nunodasneves@linux.microsoft.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v7 0/2] KVM: guest_memfd: use write for population
+To: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "shuah@kernel.org" <shuah@kernel.org>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>, "david@kernel.org"
+	<david@kernel.org>, "jthoughton@google.com" <jthoughton@google.com>,
+	"ackerleytng@google.com" <ackerleytng@google.com>, "vannapurve@google.com"
+	<vannapurve@google.com>, "jackmanb@google.com" <jackmanb@google.com>,
+	"patrick.roy@linux.dev" <patrick.roy@linux.dev>, "Thomson, Jack"
+	<jackabt@amazon.co.uk>, "Itazuri, Takahiro" <itazur@amazon.co.uk>,
+	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
+	<xmarcalx@amazon.co.uk>
+References: <20251114151828.98165-1-kalyazin@amazon.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <20251114151828.98165-1-kalyazin@amazon.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D002EUC002.ant.amazon.com (10.252.51.235) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-On Fri, Nov 14, 2025, Michael Kelley wrote:
-> From: Sean Christopherson <seanjc@google.com> Sent: Thursday, November 13, 2025 2:56 PM
-> > 
+
+
+On 14/11/2025 15:18, Kalyazin, Nikita wrote:
+> On systems that support shared guest memory, write() is useful, for
+> example, for population of the initial image.  Even though the same can
+> also be achieved via userspace mapping and memcpying from userspace,
+> write() provides a more performant option because it does not need to
+> set user page tables and it does not cause a page fault for every page
+> like memcpy would.  Note that memcpy cannot be accelerated via
+> MADV_POPULATE_WRITE as it is not supported by guest_memfd and relies on
+> GUP.
 > 
-> Adding Microsoft's Nuno Das Neves to the "To:" line since he
-> originated the work to keep the Linux headers such as hvgdk.h in
-> sync with the Windows counterparts from which they originate.
-
-...
-
-> >  /* Exit code reserved for hypervisor/software use */
-> > -#define SVM_EXIT_SW				0xf0000000
-> > +#define SVM_EXIT_SW				0xf0000000ull
-> > 
-> > -#define SVM_EXIT_ERR           -1
-> > +#define SVM_EXIT_ERR           -1ull
-> > 
+> Populating 512MiB of guest_memfd on a x86 machine:
+>   - via memcpy: 436 ms
+>   - via write:  202 ms (-54%)
 > 
-> [snip]
+> Only PAGE_ALIGNED offset and len are allowed.  Even though non-aligned
+> writes are technically possible, when in-place conversion support is
+> implemented [1], the restriction makes handling of mixed shared/private
+> huge pages simpler.  write() will only be allowed to populate shared
+> pages.
 > 
-> > diff --git a/include/hyperv/hvgdk.h b/include/hyperv/hvgdk.h
-> > index dd6d4939ea29..56b695873a72 100644
-> > --- a/include/hyperv/hvgdk.h
-> > +++ b/include/hyperv/hvgdk.h
-> > @@ -281,7 +281,7 @@ struct hv_vmcb_enlightenments {
-> >  #define HV_VMCB_NESTED_ENLIGHTENMENTS		31
-> > 
-> >  /* Synthetic VM-Exit */
-> > -#define HV_SVM_EXITCODE_ENL			0xf0000000
-> > +#define HV_SVM_EXITCODE_ENL			0xf0000000u
+> When direct map removal is implemented [2]
+>   - write() will not be allowed to access pages that have already
+>     been removed from direct map
+>   - on completion, write() will remove the populated pages from
+>     direct map
 > 
-> Is there a reason for making this Hyper-V code just "u", while
-> making the SVM_VMGEXIT_* values "ull"? I don't think
-> "u" vs. "ull" shouldn't make any difference when assigning to a
-> u64, but the inconsistency piqued my interest ....
+> While it is technically possible to implement read() syscall on systems
+> with shared guest memory, it is not supported as there is currently no
+> use case for it.
+> 
+> [1]
+> https://lore.kernel.org/kvm/cover.1760731772.git.ackerleytng@google.com
+> [2]
+> https://lore.kernel.org/kvm/20250924151101.2225820-1-patrick.roy@campus.lmu.de
 
-I hedged and went for a more "minimal" change because it isn't KVM code, and at
-the time because I thought the value isn't defined by the APM.  Though looking
-again at the APM, it does reserve that value for software
+I failed to include links to previous versions:
 
-  F000_000h    Unused    Reserved for Host.
+v7:
+  - Sean: add GUEST_MEMFD_FLAG_WRITE and documentation for it
+  - Ackerley: only allow PAGE_ALIGNED offset and len
+  - Sean/Ackerley: formatting fixes
 
-and I can't find anything in the TLFS.  Ah, my PDF copy is just stale, it's indeed
-defined as a synthetic exit.
+v6:
+  - https://lore.kernel.org/kvm/20251020161352.69257-1-kalyazin@amazon.com
+  - Make write support conditional on mmap support instead of relying on
+    the up-to-date flag to decide whether writing to a page is allowed
+  - James: Remove dependencies on folio_test_large
+  - James: Remove page alignment restriction
+  - James: Formatting fixes
 
-  https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/nested-virtualization#synthetic-vm-exit
+v5:
+  - https://lore.kernel.org/kvm/20250902111951.58315-1-kalyazin@amazon.com
+  - Replace the call to the unexported filemap_remove_folio with
+    zeroing the bytes that could not be copied
+  - Fix checkpatch findings
 
-Anyways, I'm in favor of making HV_SVM_EXITCODE_ENL an ull, though part of me
-wonders if we should do:
+v4:
+  - https://lore.kernel.org/kvm/20250828153049.3922-1-kalyazin@amazon.com
+  - Switch from implementing the write callback to write_iter
+  - Remove conditional compilation
 
-  #define HV_SVM_EXITCODE_ENL	SVM_EXIT_SW
+v3:
+  - https://lore.kernel.org/kvm/20250303130838.28812-1-kalyazin@amazon.com
+  - David/Mike D: Only compile support for the write syscall if
+    CONFIG_KVM_GMEM_SHARED_MEM (now gone) is enabled.
+v2:
+  - https://lore.kernel.org/kvm/20241129123929.64790-1-kalyazin@amazon.com
+  - Switch from an ioctl to the write syscall to implement population
+
+v1:
+  - https://lore.kernel.org/kvm/20241024095429.54052-1-kalyazin@amazon.com
+
+> 
+> Nikita Kalyazin (2):
+>    KVM: guest_memfd: add generic population via write
+>    KVM: selftests: update guest_memfd write tests
+> 
+>   Documentation/virt/kvm/api.rst                |  2 +
+>   include/linux/kvm_host.h                      |  2 +-
+>   include/uapi/linux/kvm.h                      |  1 +
+>   .../testing/selftests/kvm/guest_memfd_test.c  | 58 +++++++++++++++++--
+>   virt/kvm/guest_memfd.c                        | 52 +++++++++++++++++
+>   5 files changed, 108 insertions(+), 7 deletions(-)
+> 
+> 
+> base-commit: 8a4821412cf2c1429fffa07c012dd150f2edf78c
+> --
+> 2.50.1
+> 
+
 
