@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-63131-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63132-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17EEEC5AB9C
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29A18C5AB9D
 	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 01:13:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 49BB4353A70
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:13:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B03EC4E6AA2
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 648C822127E;
-	Fri, 14 Nov 2025 00:13:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A50322B5A5;
+	Fri, 14 Nov 2025 00:13:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="reYcJrhe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1xwDwIC4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB6120F08C
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 00:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FEB221F0A
+	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 00:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763079191; cv=none; b=YQOWmSeKiLeeRx9KwuCR9n8tFq5gMdEBxHO93/86309nMLAmmbvdbTbRFlx/m3Rcp8oMf1/uG7P1SxXYlVIpmFKjpFsZlQq50b3wL4g92i5sj8iWXuwaBEj84dmqIAlmvLfLqeNgENR3Zb28IzjY6ZC/V+YVLUNSmsQ6lk9biyY=
+	t=1763079194; cv=none; b=gdtgDZZ+jFuzQ3xNkoew1GJWHLPx29ZY3VkvpHs/tgCU6eozGEjS6bTJMEjwzPM55wcmnTXbOafM9Dwip95OfzEXFrvqZoeLQxhUNWrGpN5bdI7iCRy+fH2e1cOh0BRAcPOOv6UJ6iQo7NXt3DsMGi4eVCF/sEWDytFjbSbZnv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763079191; c=relaxed/simple;
-	bh=MAk8y+gtQTrxhH3LcXBH86mYdGq1s9/k7ZB8dWktOxo=;
+	s=arc-20240116; t=1763079194; c=relaxed/simple;
+	bh=jdSKjrHVw1kD1z76pWRk/bHYsHbnRs+JKfYF1XRkQzo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DUW0m3jyFyVcYfneybKgpxaEvt5VdJNTDFgfUq1KC8oifQFTiyiI4QGsAa8t/GHRY2dMdbQgBy0wBJOkjA132OhOc+G5fnXW4ru9h9/70ykSNi1JZlEVCWTsXPinO6Lwouz3RfBcNzxsjurn7/KVzu0krZ0e1cNNwPbP+8hjRzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=reYcJrhe; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=KOUG0iV1JTQgTepO7NKn36yzSGtHpGcpLXHBb7VOgHEgJlQgOxVs24Pv0AvgX1ZoiaaqNZGt9GD85xo81IL7oryXJ9k/xvjB5byO+5YUIgbmageUQjd5MmKp4Odqqdyurs/5X6iboy2TfowvxcTddT996vNuftT7Cxhbkjh7MvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1xwDwIC4; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7a432101881so2554330b3a.0
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 16:13:10 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-341616a6fb7so1815438a91.0
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 16:13:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763079189; x=1763683989; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763079191; x=1763683991; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=20w0wSRi6nuY11bnVrIiaoX3b7W/7OkuX2j3VH3XSds=;
-        b=reYcJrhekeckNnOwT5mQ7AfaP0m+6QrOa7Hjzgp9bC8/ZD/wKEB1wx6IZIf8v7fJjk
-         nGEYnaBJh6ZU5zwNzvtdCwpUk6U1fyzEIU0ftsgS3NnBvtmn7vhPe+6lJAmKBkHLY8KH
-         FZv/M3+JXbvfvbNezqVYqn2ZhEnefhqq3VrG8fRDCNjYIX+iIsuHexRQHRMHCtLgzT83
-         0HwDKhz9D8eEwZNtfxWzVEn6UvsyD4qmg4dHhBvuwdDP44d/MoZKyAcp3V2DEcPa8kf3
-         foz6aHHJXhoCmRtHbL6gRiLUkJFVnqd0nQWPDB1ctlyZJY0dc2rW/Rsw5c+f/AICCsjk
-         VjMA==
+        bh=wt+ZxcJaGvnwjfF/rLmeGe7gA9vGkxC3E/uhiQD8M/M=;
+        b=1xwDwIC4OG3Fdx7wgRwNLQSfKgL4OK+T662yQX5tpYNUpmMFT0JTDFPkhGq4Qr7ljg
+         Ft6kKvJBsFJ8SI5T5S2wwHoa1fSIO9PYDWvXBOJsXf96Rb5q3UjsNR3CIaioBJv1HnOP
+         ES2FSpDopesojHrTm1a88vJ9i91UW8ugNodH0i9+fJqLZ1nzIVwvx01RDhrOutDWbqUC
+         JFeBs9Crxk0kfd/LMMknvla4kG48ZGhoy5dZxBDKEVm+zyMwZlbySpoDzs3mnSZhR7Ux
+         odvMa6gvqrVHLeDwpXsA/TKqsMKjftocu1IboHIxfJF1dAexbSed3oytEP8e5Sr3oRrQ
+         18GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763079189; x=1763683989;
+        d=1e100.net; s=20230601; t=1763079191; x=1763683991;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=20w0wSRi6nuY11bnVrIiaoX3b7W/7OkuX2j3VH3XSds=;
-        b=fSGqUjnG4bWZTMoFGtNslSjm/wAl8fzFZrBBa8Ue7p88El/bvmvbes3t74KHahsBmS
-         hREvg4UmAhcf8gtUXwUASu7XpA8V3JL/rH+S3piFgaQF3j2OaIRioZBwisahI22bBLXz
-         pSuQsUXaYG9CwJfocHo4FIUndJRu2eTN1ZURrqIhrslgrpTkvJ4tf/IBpj1hysVM0ehm
-         dUIC1XmYDHAv4ingIFIkSLTNrpiDxaxmn1dw89yMg1JTei2bIRpYTnDzipg1WPCz6j1E
-         sbJYhKnk6j8TPAIuqAxDhvSefW+02+AhrneWnjJNhISJj0tq/A6d8YEu9ursdOJshSbO
-         U6jg==
-X-Gm-Message-State: AOJu0YzNH5w/Hal8eGXOmx5/lkdPPpRevdrGIo16eveXzRyl+yQ4dy6r
-	XG5ZWS8Ksn8DZ5ErVs9GwSY2t+voaU0uWGibvnqsQouCKhHVoOCRt5M4KOjJg3/0upOyZhNfPuh
-	uEm7fzg==
-X-Google-Smtp-Source: AGHT+IEJ2zN1ODdO+hzxghH3spGFPsf9crgVwVAdHt6mHn/6W3oGTufEuTGk/oM7CYnixgPwqgZxXq/Z0uU=
-X-Received: from pgc28.prod.google.com ([2002:a05:6a02:2f9c:b0:bac:a20:5f18])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:ed14:20b0:343:3d3c:4685
- with SMTP id adf61e73a8af0-35bae215308mr1143985637.18.1763079189530; Thu, 13
- Nov 2025 16:13:09 -0800 (PST)
+        bh=wt+ZxcJaGvnwjfF/rLmeGe7gA9vGkxC3E/uhiQD8M/M=;
+        b=g+eAxDffS8vTYMBEmPiaOuIKx0ZFnnrMq0AHxfXPIG3J19p59Gs/dBhF2M5+FAa1OU
+         2fFyzEotUBmX8qh7hTar7G7SU+hvdeF2c6VK4yB4sL6gNcvdfsObJ5X5SrmYbTObfgYG
+         bppcf09eaOA06ceae5ROVAP9XZVctwCEgWcRxZueL0AlzkzsL7yuFSPhLT1VmlrI5TpB
+         67F4QSBaNtgFQVbS+8hQ12uQOATRbUJz5DNKPhVmSZ4brqyQgYvO+kFLPDwpI19JfASE
+         Rt7TNZkgGuirRaKsaSNqkKrTfrqJs0m6ZAi151w0nAkO0uXt5l7jqLD1OpC+mCp8rk4/
+         6b9Q==
+X-Gm-Message-State: AOJu0Ywm0uqndB/J8k6eQkF+HihGdvyDbA5qPxrL/yWEUeImjl141f4Y
+	jnhWva1yeib0cbxF42YvbkQbuCcjRY9sBjuuB4x7LkAS8uGuaXk0AxfgmVOJxHo5rD5n6teyuBH
+	NwhB8MA==
+X-Google-Smtp-Source: AGHT+IHs8zMlt6kUbb9tg35AK3OXmGHABc3H2Jic93c3nwnrxf+XNPNUcQBhcNSJqiMgsJbEJWArXUddMhA=
+X-Received: from pjbnm16.prod.google.com ([2002:a17:90b:19d0:b0:33b:8aa1:75ed])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b04:b0:340:d578:f2a2
+ with SMTP id 98e67ed59e1d1-343f9d906c9mr1104363a91.6.1763079191094; Thu, 13
+ Nov 2025 16:13:11 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 13 Nov 2025 16:12:46 -0800
+Date: Thu, 13 Nov 2025 16:12:47 -0800
 In-Reply-To: <20251114001258.1717007-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251114001258.1717007-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251114001258.1717007-6-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v3 05/17] x86: cet: Validate #CP error code
+Message-ID: <20251114001258.1717007-7-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v3 06/17] x86: cet: Use report_skip()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>, 
@@ -85,59 +85,44 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Chao Gao <chao.gao@intel.com>
 
-The #CP exceptions include an error code that provides additional
-information about how the exception occurred. Previously, CET tests simply
-printed these error codes without validation.
+report_skip() function is preferred for skipping inapplicable tests when
+the necessary hardware features are unavailable. For example, with this
+patch applied, the test output is as follows if IBT is not supported:
 
-Enhance the CET tests to validate the #CP error code.
+SKIP: IBT not enabled
+SUMMARY: 1 tests, 1 skipped
 
-This requires the run_in_user() infrastructure to catch the exception
-vector, error code, and rflags, similar to what check_exception_table()
-does.
+Previously, it printed:
+
+IBT not enabled
+SUMMARY: 0 tests
 
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/usermode.c | 4 ++++
- x86/cet.c          | 4 ++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ x86/cet.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
-index f4ba0af4..69dd64ff 100644
---- a/lib/x86/usermode.c
-+++ b/lib/x86/usermode.c
-@@ -23,6 +23,10 @@ static void restore_exec_to_jmpbuf(void)
- 
- static void restore_exec_to_jmpbuf_exception_handler(struct ex_regs *regs)
- {
-+	this_cpu_write_exception_vector(regs->vector);
-+	this_cpu_write_exception_rflags_rf((regs->rflags >> 16) & 1);
-+	this_cpu_write_exception_error_code(regs->error_code);
-+
- 	/* longjmp must happen after iret, so do not do it now.  */
- 	regs->rip = (unsigned long)&restore_exec_to_jmpbuf;
- 	regs->cs = KERNEL_CS;
 diff --git a/x86/cet.c b/x86/cet.c
-index 7635fe34..0452851d 100644
+index 0452851d..d6ca5dd8 100644
 --- a/x86/cet.c
 +++ b/x86/cet.c
-@@ -94,13 +94,13 @@ int main(int ac, char **av)
+@@ -59,12 +59,12 @@ int main(int ac, char **av)
+ 	bool rvc;
  
- 	printf("Unit test for CET user mode...\n");
- 	run_in_user((usermode_func)cet_shstk_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
--	report(rvc, "Shadow-stack protection test.");
-+	report(rvc && exception_error_code() == 1, "Shadow-stack protection test.");
+ 	if (!this_cpu_has(X86_FEATURE_SHSTK)) {
+-		printf("SHSTK not enabled\n");
++		report_skip("SHSTK not enabled");
+ 		return report_summary();
+ 	}
  
- 	/* Enable indirect-branch tracking */
- 	wrmsr(MSR_IA32_U_CET, ENABLE_IBT_BIT);
+ 	if (!this_cpu_has(X86_FEATURE_IBT)) {
+-		printf("IBT not enabled\n");
++		report_skip("IBT not enabled");
+ 		return report_summary();
+ 	}
  
- 	run_in_user((usermode_func)cet_ibt_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
--	report(rvc, "Indirect-branch tracking test.");
-+	report(rvc && exception_error_code() == 3, "Indirect-branch tracking test.");
- 
- 	write_cr4(read_cr4() & ~X86_CR4_CET);
- 	wrmsr(MSR_IA32_U_CET, 0);
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
