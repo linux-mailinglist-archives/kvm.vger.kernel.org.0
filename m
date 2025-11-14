@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-63205-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63206-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E826C5D28A
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 13:44:40 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 678E3C5D2F6
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 13:55:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 02BC54E2A6D
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 12:40:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B6146352D20
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 12:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C44EB1C5F10;
-	Fri, 14 Nov 2025 12:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E02C24503B;
+	Fri, 14 Nov 2025 12:55:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VtN5a8Wk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sXI29/qw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349E81C84BB
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 12:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1E42147E5
+	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 12:55:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763124028; cv=none; b=n3Ec185G7nAv8+ia/tNlNRyeGkXLR6y4QrAvpG5vc5YnN8R/KDbvV8oELrXr6+Fh1dxlbaB0GnBHTDM2DAAYdLZtrRVdoGt6DuJ7A0MRTt7MsGfTPydKiznADI1UNAI/Wqgqk+OGYQTRgtSi+aSVACx1lxOiIwLSndMO1udHvaw=
+	t=1763124913; cv=none; b=TssadFzAuOPhh3zCl7jLWgU2eM63DWFFkDEH5xVdY+Tlb4vkYEpVWSsne9BohvCHytbxcfq8R0TtM2AhdHzzLhaM/KdNUDYq9mcjHSWywEThIszoc92MUpxkwbB53aku6MbATtv0u09+ElxzSYa8boyhyXiztuhQHAtPixgjgS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763124028; c=relaxed/simple;
-	bh=1S7oMaiMrQhbrBE5JZaaD3PrCA7SNK04RmgkbjRg6zA=;
+	s=arc-20240116; t=1763124913; c=relaxed/simple;
+	bh=sySqVUk457bLkhWa1tebcUxVXEN11B88TtIPHU4/kCA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=E5lnwxdfexYLEu5sUbKbFBZBERuLfoUgd+PZAmI6jbitK3lLTTWRO6eJEFmPKpVICGMpbwkBCPj/VuAnu+nNjqX3A6BNA5Vgkk6U6f7sPWCBo9ouMbSdaQUcgb4kNEMH4sOhWQ0OjjtGUM6dnztlFuzyNO1cXNbkcwSHlQOjq9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VtN5a8Wk; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=phhuDvCkPdsRcBvK3fxSt9MD7Aif+4IjdfJuTxswlvKnMrVc1LgfuzJq85cN+I1qDFj8vNN2kXE1f03gCIS6cLqeyNnP9kVIziBBq2kqRjaqTccVSiqbbgVRjPYSzX6JqSQuMBRi+jhyLMZ5991rjEFj/BALaRGrPzyl85i7upw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sXI29/qw; arc=none smtp.client-ip=209.85.218.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4710d174c31so18987375e9.0
-        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 04:40:27 -0800 (PST)
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b73599315adso120117566b.2
+        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 04:55:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763124026; x=1763728826; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763124910; x=1763729710; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+mnkKCVTFBypK6JgR4pPkzvAmtwTh/tLRTgr+WHrD5Q=;
-        b=VtN5a8WkpibviBOENU2EobEtxaW5KYk8vBneVGJPtHg695Otpx21pniKPZDdmL+ZDg
-         3BNC2SvJmC8hkO4EHelmBT6nofPnVjpiev7UBA3z10GPgU3/Hh2vIcXLg60bhomU4ZQz
-         QcFX4kZCcJ1O5o2MSRQiKkSoRrFgCWrpCd7QSff70mgpO/W9b7xjTMJp2MxG6ec3jrgS
-         hBarAr0mqWZDRMkD+H4PxEImuwjygmW052RyLGpPfyphuQd/pvUUu+40LQEb43PUIah+
-         DOtn7yTehM47JarTi+7L34sWIelHeTB3elHRxcmc4BfQA22+mE2vyZALSxHyRWhe6iwE
-         /Mcg==
+        bh=2HxCD0Qsgw0zxEHnyBGjV1RcHkNO4co8KVcOu35c6Ak=;
+        b=sXI29/qw6RAfNMYnl56IGo1Ub/R2UXNbQO1TduF6XrGZxARpDplXkNp9nhUCjVHV3/
+         kDtUQtgLQaCWKeyZoTSrex+QsqQxd/3z8H57j3Yzhvr52Rj4Hr04LioQ5ZjQfigqgAQE
+         S2UixjlQylfxdhtHsWDvpuwQHRRXtrzJhzvGKOuHec297Dm4RV7WZkcuIZ2zFTNLQAoP
+         DHEtfBu6f46Zj+6IEytXkE8D3pJtZF/L/WbzNIWFremtiB/5CDGso7ItZCo9XKvW/i7o
+         cM2T7NLtB6hPpCIR1eQtwBHDmKQ+/7xU6Avpwq6dFRsPxL0EddHVsnXKrL7xtGI9LFy1
+         4W9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763124026; x=1763728826;
+        d=1e100.net; s=20230601; t=1763124910; x=1763729710;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+mnkKCVTFBypK6JgR4pPkzvAmtwTh/tLRTgr+WHrD5Q=;
-        b=xJov5+I0PrFHn/c3AdqvjMKb9v+xLDqGRFh1jfiS6N6b2NhF7GJoaDTjgjjSBovElJ
-         rC/RAjsz8oMM082f1NQHVHBdBFH65aHH6aCCjfj5n5YC2MvqumGJu6h7JYxWU0YYKp/D
-         YuDXbAItdg9+SXw3+tQpFAgTkS/U7+/7iRuZ3I3kmemBpVXA03JI4DFjQIOsjhPRCq2G
-         p8ZD9zBKpb7Ut1fAWnaMH+D2zNi+mIsfrvnq/Ai2+oOD/WS6WG1V5ZK9ccaB190T4fin
-         lFJ4P/oEOcqNHv91yDv88ch8Pyx10sxB3g5yLkXf6dMF4W8OytIUBXEHAwH4we9YNWuG
-         BZeg==
-X-Gm-Message-State: AOJu0YzqfLlDNNlYcXZWs8F+o2SqId9rZZbtDKfpJxV/igNpL7vwuP22
-	H3Q4eygWJjKB/yfLSadFj7xzRGVqBHEL9uKrSe4n5VkWRBDomThmLUNvvzfOclMqoMrE9cbT4Ik
-	whozUscy5/XsbzQ==
-X-Google-Smtp-Source: AGHT+IE3n1k80MuyIwex32RymBBJ3wkzNS9chxunz1u2NCAGwFePOCUhGXCOZClPfDc3vS+fOvbMrhUciWJf9Q==
-X-Received: from wmlu9.prod.google.com ([2002:a05:600c:2109:b0:477:3fdf:4c24])
+        bh=2HxCD0Qsgw0zxEHnyBGjV1RcHkNO4co8KVcOu35c6Ak=;
+        b=VRZBkwRA8fr+cnYjqYgsOvQBi5+couVTsN3Lj82Djh9bGh5FKbfcHA/LSPoK6YmvRV
+         ljwtEnhMyuK2O6iEWv2do4NSSVVsCkO8AYXAEbsyXvLaaXVMzsrBR8Z10uBYntbNYexr
+         3pXR+JDFGF7PSGsVTiuQmNphcL68uPhITJ4PFqdJIPwoygdCI1ZvGgrMlx+pY8P4pmh4
+         cEKiSxxSKF7MAcMaUb3TQVbuI18gAol6Od3iyy1BCuXzwkuBp9pvhBkWdfhq0x4yaiqf
+         NT2yupXIzMCxaz/1q9jc6BRHUy+n8bVcIeI0devId4ev4m0ZWuhaddeoTZVGv3M7zmYA
+         CiSg==
+X-Gm-Message-State: AOJu0Yxs/WxQByClYTYCyRTILc2kgXYFayEl5bAC+JDCYSmttc4ZNq5V
+	gZPRkSJSiL1EfrTHOzuTgjulP87Zh0XI91h6TWCvn1cfR6tGcOEKJ6F7EjyAN91hF7LbESw+y6E
+	NXXGzE7fkphkaNA==
+X-Google-Smtp-Source: AGHT+IEYjPBWhz3rzNNbkakQj9ptp4kfVtNX/+ZocC5LUv3BmWKToHZPCwYhsFf7lsQT6XRasLB0eZNdlcjtJw==
+X-Received: from ejctb22.prod.google.com ([2002:a17:907:8b96:b0:b72:41e4:7562])
  (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4f93:b0:477:5c58:3d42 with SMTP id 5b1f17b1804b1-4778fe588a9mr27893345e9.10.1763124025773;
- Fri, 14 Nov 2025 04:40:25 -0800 (PST)
-Date: Fri, 14 Nov 2025 12:40:25 +0000
-In-Reply-To: <20251113233746.1703361-3-seanjc@google.com>
+ 2002:a17:906:f299:b0:b73:6d2f:4bb8 with SMTP id a640c23a62f3a-b736d2f577bmr150843766b.2.1763124910000;
+ Fri, 14 Nov 2025 04:55:10 -0800 (PST)
+Date: Fri, 14 Nov 2025 12:55:09 +0000
+In-Reply-To: <20251113233746.1703361-6-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251113233746.1703361-1-seanjc@google.com> <20251113233746.1703361-3-seanjc@google.com>
+References: <20251113233746.1703361-1-seanjc@google.com> <20251113233746.1703361-6-seanjc@google.com>
 X-Mailer: aerc 0.21.0
-Message-ID: <DE8FAZGMBD9I.25XFWIKK74DI@google.com>
-Subject: Re: [PATCH v5 2/9] x86/bugs: Use VM_CLEAR_CPU_BUFFERS in VMX as well
+Message-ID: <DE8FM9N4GKKL.1ZXGVZA48O31X@google.com>
+Subject: Re: [PATCH v5 5/9] KVM: VMX: Handle MMIO Stale Data in VM-Enter
+ assembly via ALTERNATIVES_2
 From: Brendan Jackman <jackmanb@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
@@ -84,22 +85,40 @@ Cc: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 
 On Thu Nov 13, 2025 at 11:37 PM UTC, Sean Christopherson wrote:
-> From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> Rework the handling of the MMIO Stale Data mitigation to clear CPU buffers
+> immediately prior to VM-Enter, i.e. in the same location that KVM emits a
+> VERW for unconditional (at runtime) clearing.  Co-locating the code and
+> using a single ALTERNATIVES_2 makes it more obvious how VMX mitigates the
+> various vulnerabilities.
 >
-> TSA mitigation:
+> Deliberately order the alternatives as:
 >
->   d8010d4ba43e ("x86/bugs: Add a Transient Scheduler Attacks mitigation")
+>  0. Do nothing
+>  1. Clear if vCPU can access MMIO
+>  2. Clear always
 >
-> introduced VM_CLEAR_CPU_BUFFERS for guests on AMD CPUs. Currently on Intel
-> CLEAR_CPU_BUFFERS is being used for guests which has a much broader scope
-> (kernel->user also).
+> since the last alternative wins in ALTERNATIVES_2(), i.e. so that KVM will
+> honor the strictest mitigation (always clear CPU buffers) if multiple
+> mitigations are selected.  E.g. even if the kernel chooses to mitigate
+> MMIO Stale Data via X86_FEATURE_CLEAR_CPU_BUF_VM_MMIO, another mitigation
+> may enable X86_FEATURE_CLEAR_CPU_BUF_VM, and that other thing needs to win.
 >
-> Make mitigations on Intel consistent with TSA. This would help handling the
-> guest-only mitigations better in future.
+> Note, decoupling the MMIO mitigation from the L1TF mitigation also fixes
+> a mostly-benign flaw where KVM wouldn't do any clearing/flushing if the
+> L1TF mitigation is configured to conditionally flush the L1D, and the MMIO
+> mitigation but not any other "clear CPU buffers" mitigation is enabled.
+> For that specific scenario, KVM would skip clearing CPU buffers for the
+> MMIO mitigation even though the kernel requested a clear on every VM-Enter.
 >
-> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> [sean: make CLEAR_CPU_BUF_VM mutually exclusive with the MMIO mitigation]
-> Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
+> Note #2, the flaw goes back to the introduction of the MDS mitigation.  The
+> MDS mitigation was inadvertently fixed by commit 43fb862de8f6 ("KVM/VMX:
+> Move VERW closer to VMentry for MDS mitigation"), but previous kernels
+> that flush CPU buffers in vmx_vcpu_enter_exit() are affected (though it's
+> unlikely the flaw is meaningfully exploitable even older kernels).
+>
+> Fixes: 650b68a0622f ("x86/kvm/vmx: Add MDS protection when L1D Flush is not active")
+> Suggested-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> Reviewed-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 Reviewed-by: Brendan Jackman <jackmanb@google.com>
