@@ -1,172 +1,93 @@
-Return-Path: <kvm+bounces-63227-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63228-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7559C5E41D
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 17:34:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 076EFC5E142
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 17:05:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6991D35E3DA
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 15:54:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 287A1424664
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 15:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97870334C1D;
-	Fri, 14 Nov 2025 15:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C87337115;
+	Fri, 14 Nov 2025 15:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6MXteKI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M8PzqMn5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B261F33439D;
-	Fri, 14 Nov 2025 15:42:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D7E337111
+	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 15:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763134954; cv=none; b=KQaoGpacW/d0yBCA0ES/lnxK1FACGfr4BQ5x9JNTdQsHP6PnriV77H7ANhs0SjnsF305izSrHpsIZpzyI2NvvTgF3w9SDvfQt4QWVijxA837DkG5a2+XUnuIOXJWX1WZfsa47CVA6WS394KJqXFblv/XX7rtPSsMad0TCYw+vrE=
+	t=1763135256; cv=none; b=qwFp6U7wZp7fc2YOci7o2ZBUBTjjbKqkGSAlsCP8S/F7RIBWGTdlkphqp2Isx9fMPrysHye5I9XcH3EI9mPbfBnNWmbNNvKpEoUFHaguaH90yuI5963SdOxflrM/7adADNE2htb59xFnlzrAqCI1VvD5XOxCk/eahJAQ58E9/WQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763134954; c=relaxed/simple;
-	bh=/YV/NDL8G+NnwKpf6JduT0mxliwb3hgm6r5W350c8dc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H8sPxQwVCLrqIL2aU7HzfVsNGJmllD+xdSO3N4DPBzERo3RK1YlgwvNfD78EACf0BNXr+usbY9diW52kWi4sVMJ7E5lKs/jlSIleVQ8MWnDcif7oFuK13xqG0Rs878N7C7WfnIOo+n/bV6TkM1QHMKv9puBLAQZuWPMR8rBiaTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6MXteKI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26FE4C4CEF5;
-	Fri, 14 Nov 2025 15:42:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763134953;
-	bh=/YV/NDL8G+NnwKpf6JduT0mxliwb3hgm6r5W350c8dc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V6MXteKI2Hzpfl6Dxbuj+zMhLd47lr1GFmk39zEhPt/TFWRu+B0mi5lFA+flFmLjp
-	 qHBoGR34u1qYDMrbVeCGCooDE3pB4STyChmI+l0gAq9hMSg2Fw0nmtNX1Ycgb4vMhv
-	 FzX1iB/1EjdqE1Qd0Lep6nUEsrJrTrr/YT4150tzZ/35I/NlnPEIzCUpjMsmJmWBH1
-	 EmleZd1EEFW9w5Ly0GnXYMtyfj/j9391L6cFFOv5NSbybSbgtc/oV+LD+ezk0f9NRV
-	 cKXLN0ei/yxh19szflJbY8b1uhkWbI5DzT5lnjFtgRaQxL5sQU0SM9sQmwpLto0kAj
-	 My42yp/sR2igw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vJvwU-00000005G01-2hlJ;
-	Fri, 14 Nov 2025 15:42:30 +0000
-Date: Fri, 14 Nov 2025 15:42:30 +0000
-Message-ID: <86bjl4tyc9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Maximilian Dittgen <mdittgen@amazon.de>
-Cc: <oliver.upton@linux.dev>,
-	<pbonzini@redhat.com>,
-	<shuah@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>,
-	<kvm@vger.kernel.org>,
-	<lilitj@amazon.de>,
-	<nh-open-source@amazon.com>
-Subject: Re: [PATCH] KVM: selftests: Add SYNC after guest ITS setup in vgic_lpi_stress
-In-Reply-To: <20251114143902.30435-1-mdittgen@amazon.de>
-References: <20251114143902.30435-1-mdittgen@amazon.de>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763135256; c=relaxed/simple;
+	bh=GOO3wfMsD8xMrynd0VaTlbVF069hyj1iI813x4ydm2A=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Content-Type; b=AmA3Yy+RZMu+D432OnGFhNxML+V/gIImkY38/Q+SbdIoj1FCSU+TydgT2Bi9N3ng4FcFHRYocPvbLgqD4czwW0LOLaFsgYgiTIY6tAmft72+i1J+mbHZQYAaCRigdeDjNGWab5Bhd4rGqHkvsYTD+UmpDWkfu88jce9KTAC6Ntk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M8PzqMn5; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3437f0760daso5331970a91.1
+        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 07:47:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763135254; x=1763740054; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=heBeYHJOLj8+/qTp+grjTVtU5A1aEwQDuOhI6nPQQBU=;
+        b=M8PzqMn5M1tk/9ytM+gEY0BBzxcXo+zbGZxGz4GT9Wo+SKGqOb33HTDmfYdwr5rZ6T
+         DQ0oQNf+BSukXDbXIj3K8YV3p2PQmX9vMuRCyLL9irFWLv2tyA9HRWmBexV7e3dTmZ0w
+         fwM6QpupAzSGPQ8j3KWWrK0qMaMA1ObdB6gG7n6Jn/rWiOi7R+ri1UyLnjegBLVH2uFR
+         eBkAovaJlqpOyHRTy+gytKQLEOiNhDsN7LGZjbDtKBXxxyhZJ3HFO1ru7/kq2jIb9qD0
+         PCFeNZCSQr/tQRwKkM36VObupKuMtEMM34wl8ROp+tfsewwPJNuDr3bu/3TW0CMjMXk4
+         Y5yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763135254; x=1763740054;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=heBeYHJOLj8+/qTp+grjTVtU5A1aEwQDuOhI6nPQQBU=;
+        b=qOjtiH1Wb/n4eHgBM32XmQxARVlf9tDhlfARLsRq14ozPaONsxuFY3+qtkOviJ6OH0
+         srBtlw+X+YJWauxgxDOSJ654TqbKuQTVekHWsj4FAtWVXXFP1psXjem8S5yIo5ZM6ywa
+         3Mm99IqJtgApiQ3/463q2DaTuypfGRWWfBE3y/m44P6UgukRdUrsEOUL/HNG7P3LbTZB
+         NQzUZ/xIEJmFucI2iF5vce9Q0He2SvbeOin1qaioRr+r9wC4yTGuiQ9cQ/OvKpr7BdQC
+         BTIPXqaJ+5T9edHppoBfH21NUYWH8EIgAX8L/ZNzPOP/8eiIWlclaJikYWtQDhSCFCeF
+         Z2Qw==
+X-Forwarded-Encrypted: i=1; AJvYcCUUyNGjGgocIH2zatLs4IQXfGMhkaVa8kSv/T3NjGMzHbhkLjKFavA2BMsdenVCmOyYY18=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdXtIGYsWg4zJFsMnWtMjOtIFxOUumjkQKqdwa3Pvbu2NtW3zi
+	6LxGp746MLxwqYO7Tl9GZsyK8y/Pb4tUz0dLrSZLY3DLT/3BqFog8Frd4nBSD6vC0+klKcAd54a
+	ENQOTJg==
+X-Google-Smtp-Source: AGHT+IGIYZcT5u9nbOtd9YML18W8Ko3CKgWeqcBXWxA6E9yCrbdnMoXwj99UvMUQpdMGahG7aUUxfvwx6K8=
+X-Received: from pjblt11.prod.google.com ([2002:a17:90b:354b:b0:33b:51fe:1a83])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:55cf:b0:32e:7bbc:bf13
+ with SMTP id 98e67ed59e1d1-343fa76af6dmr3644471a91.34.1763135254562; Fri, 14
+ Nov 2025 07:47:34 -0800 (PST)
+Date: Fri, 14 Nov 2025 07:47:32 -0800
+In-Reply-To: <aRdKa9jVMt0Rn5tj@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mdittgen@amazon.de, oliver.upton@linux.dev, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, lilitj@amazon.de, nh-open-source@amazon.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20251113225621.1688428-1-seanjc@google.com> <20251113225621.1688428-8-seanjc@google.com>
+ <aRdKa9jVMt0Rn5tj@google.com>
+Message-ID: <aRdPFEF0XS7Zz5Fx@google.com>
+Subject: Re: [PATCH 7/9] KVM: SVM: Treat exit_code as an unsigned 64-bit value
+ through all of KVM
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 14 Nov 2025 14:39:02 +0000,
-Maximilian Dittgen <mdittgen@amazon.de> wrote:
-> 
-> vgic_lpi_stress sends MAPTI and MAPC commands during guest GIC
-> setup to map interrupt events to ITT entries and collection IDs
-> to redistributors, respectively.
-> 
-> Theoretically, we have no guarantee that the ITS will
-> finish handling these mapping commands before the selftest
-> calls KVM_SIGNAL_MSI to inject LPIs to the guest. If LPIs
-> are injected before ITS mapping completes, the ITS cannot
-> properly pass the interrupt on to the redistributor.
-> 
-> In practice, KVM processes ITS commands synchronously, so
-> SYNC calls are functionally unnecessary and ignored in
-> vgic_its_handle_command().
-> 
-> However, selftests should test based on ARM specification and
-> be blind to KVM-specific implementation optimizations. Thus,
+On Fri, Nov 14, 2025, Sean Christopherson wrote:
+> _and_ the hyperv_svm_test selftest fails.  *sigh*
 
-That's hardly an optimisation. Quite the opposite, really. This is an
-implementation choice to make it simple (well, simple for an ITS
-emulation...) and not racy.
-
-> we must update the test to be architecturally compliant and
-> logically correct.
-> 
-> Fix by adding a SYNC command to the selftests ITS library,
-> then calling SYNC after ITS mapping to ensure mapping
-> completes before signal_lpi() writes to GITS_TRANSLATER.
-> 
-> This patch depends on commit a24f7afce048 ("KVM: selftests:
-> fix MAPC RDbase target formatting in vgic_lpi_stress"), which
-> is queued in kvmarm/fixes.
-
-This sentence has no place in a commit message.
-
-> 
- Signed-off-by: Maximilian Dittgen <mdittgen@amazon.de>
-> ---
-> Validated by the following debug logging to the GITS_CMD_SYNC handler
-> in vgic_its_handle_command():
-> 
->         kvm_info("ITS SYNC command: %016llx %016llx %016llx %016llx\n",
->             its_cmd[0], its_cmd[1], its_cmd[2], its_cmd[3]);
-> 
-> Initialized a selftest guest with 4 vCPUs by:
-> 
->         ./vgic_lpi_stress -v 4
-> 
-> Confirmed that an ITS SYNC was successfully called for all 4 vCPUs:
-> 
->         kvm [5094]: ITS SYNC command: 0000000000000005 0000000000000000 0000000000000000 0000000000000000
->         kvm [5094]: ITS SYNC command: 0000000000000005 0000000000000000 0000000000010000 0000000000000000
->         kvm [5094]: ITS SYNC command: 0000000000000005 0000000000000000 0000000000020000 0000000000000000
->         kvm [5094]: ITS SYNC command: 0000000000000005 0000000000000000 0000000000030000 0000000000000000
-> ---
->  tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c   |  4 ++++
->  .../testing/selftests/kvm/include/arm64/gic_v3_its.h  |  1 +
->  tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c    | 11 +++++++++++
->  3 files changed, 16 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
-> index 687d04463983..e857a605f577 100644
-> --- a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
-> +++ b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
-> @@ -118,6 +118,10 @@ static void guest_setup_gic(void)
->  
->  	guest_setup_its_mappings();
->  	guest_invalidate_all_rdists();
-> +
-> +	/* SYNC to ensure ITS setup is complete */
-> +	for (cpuid = 0; cpuid < test_data.nr_cpus; cpuid++)
-> +		its_send_sync_cmd(test_data.cmdq_base_va, cpuid);
-
-You are making an implementation assumption here. There is nothing in
-the spec that says that the GICR_TYPER.Processor_Number associated
-with a given CPU is the same thing as the CPU number that the
-selftests infrastructure give you.
-
-It turns out that KVM makes it so that vcpu_id and Processor_Number
-are the same thing. But given the blurb above about sticking to the
-architecture and not relying on implementation details, this is not
-what I'd expect.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+And the weekend can't come soon enough.  The kernel I'm testing doesn't even have
+these patches.  /facepalm
 
