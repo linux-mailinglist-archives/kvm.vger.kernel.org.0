@@ -1,132 +1,94 @@
-Return-Path: <kvm+bounces-63200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63202-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4154EC5C6F5
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 11:05:37 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A0DDC5C815
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 11:16:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BDC054F6506
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 09:38:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5CAFE35CC3D
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 10:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE2830C355;
-	Fri, 14 Nov 2025 09:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 512B730DD2A;
+	Fri, 14 Nov 2025 10:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iDw/z3R4"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="JAF4+/hk"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0173090C6;
-	Fri, 14 Nov 2025 09:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F5630749A;
+	Fri, 14 Nov 2025 10:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763113061; cv=none; b=nEGSFNdQH9csDK627dNPPjCJqJDYwTxX+xxtq4452+2Nlk5F+ZbcwatEGlUIfMRNgR5YzphVypAF1qnf5/2RN3w/zqjlmgGRrUmKjkLy7i+GyZQW2qeEaXatdF5or5x8c0qj50n+9KA0H8aZwxh+OZZyFf/ZgjbTuAUSzhg7wxM=
+	t=1763115031; cv=none; b=MSqknu8YGPA64yoftu9tlJsQP8sW4b7b/XbouP0gwhy/jXrimenWPwVZ+Hcp78N47QDpTe3yNOoSItDpmpwZrmvC+MgxILFg4td85QzY2vF9fZkTxIVFUX+M4fBuAKrQBjlha3fOmr7p7FetKRLVT1zVzsdMTFEbfSwJOLSzNDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763113061; c=relaxed/simple;
-	bh=3N2qHHebaLsgIZzS0J6BkkzTUjzTAKRxRZhlf8ATkdM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tSqickdApl9AG80DJ9ksqDnH78g/Gx21ZWAqeJm3a1k4EsqfMGifMYmAwQjPNeJm58JjzIHo47fzbkiXV1aqs8EfCD6pgIBzV+k2Qv0f3cK/qb1Koa04LQ8u7YIImrmvntFcu5TtyYWMyeB4UdBvTA7xnFs2XMHt1RCQI47FQew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iDw/z3R4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DF62C2BC87;
-	Fri, 14 Nov 2025 09:37:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763113060;
-	bh=3N2qHHebaLsgIZzS0J6BkkzTUjzTAKRxRZhlf8ATkdM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iDw/z3R4erxFbJeQbSJ4uRNPlm751QKbaX9se6e/Fz+n1PfHRHkqL2VltD4nw+Gua
-	 bWSyF3IJyTNN26VB1RCQRfYuWPJiueheKVkUSHt/4Yf0GjblMVtCclIg+8zDuIfiDA
-	 7HrtlBolMF9Glva2+hCtQcWV+JpFs9aGDdHMhBMAj4OWcv2H2XbrBKctH0ZCOcWJla
-	 jvQN3BWwV5ncQjFOK6rZm6/bPuSb0BPlq8YqpMeifSV/pU+sxQL701brSRoNPFb1O3
-	 WLaEe2MJUZI/0x8lOg6HRhJLum+cy7kKh/4c5/4aubrkdoGAK/tyvH8Uv/46CuRItE
-	 JD+Dm3gOyINAg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vJqFN-000000059uW-3oqS;
-	Fri, 14 Nov 2025 09:37:38 +0000
-Date: Fri, 14 Nov 2025 09:37:37 +0000
-Message-ID: <86ecq1t0ny.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Aishwarya.TCV@arm.com
-Subject: Re: [PATCH v2 04/45] KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
-In-Reply-To: <72e1e8b5-e397-4dc5-9cd6-a32b6af3d739@sirena.org.uk>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-5-maz@kernel.org>
-	<72e1e8b5-e397-4dc5-9cd6-a32b6af3d739@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763115031; c=relaxed/simple;
+	bh=GLFtpjtJuopvO268pseNyWlZ2YMxSBCGJjmnlf4AZUw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u18kzf2uo9wl0FAp33Ewn9djZruJJWHK10kh+Xa5sVP5OJII/X05utK3VuHfnhX+b0i7YTYACLq0Lk7nVtCbgQhvqpb2kQbvL0nYj0CDqC4XOghtzaJXvyk0DFag6pfOsixR1X/I0aPc5mpl++QrN4x3bmMldy6vRp4cKbvlLNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=JAF4+/hk; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=32q2hc7/9G/MIfSp616FjspbGcq4sVJbCdOWT3fi2JE=; 
+	b=JAF4+/hkDGFoHkQ25yGG8EKeSRSUowSI2GxlEpO5NlVDNwLuuqZEfwNAmj8X+bS3x5xpNADbdYz
+	eEFJoiOg9rSiuLeHgda97XdWOp5Fla22GgBpHx7N8gJi+hbvYq1NG3jhynXhAEHj75FTn0DUdBVyx
+	SZMgQzyJldSvnjG+9pnVGszpHsIeW75Ay/OaajGbp53oxIOWofkd5rTRzoyXUuF8mTG2PMeU39wCm
+	rUQZmM+ipmNYCAdiMgJA2/tYnwDUGlpmlJfKxhOoEJMNTyLQ02JTyoseYcZxGWTuyTyYv8atb5cmi
+	JAhB8RSR1gLJnNak9XciuLWVpq0CkAalUNpg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vJqFZ-002xpA-28;
+	Fri, 14 Nov 2025 17:37:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Nov 2025 17:37:49 +0800
+Date: Fri, 14 Nov 2025 17:37:49 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+	linux-crypto@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Michael Roth <michael.roth@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	David Miller <davem@davemloft.net>
+Subject: Re: [PATCH v4 2/4] crypto: ccp - Add an API to return the supported
+ SEV-SNP policy bits
+Message-ID: <aRb4bRhdnw0Yi-Zl@gondor.apana.org.au>
+References: <cover.1761593631.git.thomas.lendacky@amd.com>
+ <e3f711366ddc22e3dd215c987fd2e28dc1c07f54.1761593632.git.thomas.lendacky@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com, Sascha.Bischoff@arm.com, sfr@canb.auug.org.au, Aishwarya.TCV@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e3f711366ddc22e3dd215c987fd2e28dc1c07f54.1761593632.git.thomas.lendacky@amd.com>
 
-On Thu, 13 Nov 2025 18:01:57 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On Mon, Oct 27, 2025 at 02:33:50PM -0500, Tom Lendacky wrote:
+> Supported policy bits are dependent on the level of SEV firmware that is
+> currently running. Create an API to return the supported policy bits for
+> the current level of firmware.
 > 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Sun, Nov 09, 2025 at 05:15:38PM +0000, Marc Zyngier wrote:
-> > The trap bits are currently only set to manage CPU errata. However,
-> > we are about to make use of them for purposes beyond beating broken
-> > CPUs into submission.
-> > 
-> > For this purpose, turn these errata-driven bits into a patched-in
-> > constant that is merged with the KVM-driven value at the point of
-> > programming the ICH_HCR_EL2 register, rather than being directly
-> > stored with with the shadow value..
-> 
-> We're seeing the no-vgic-v3 failures in -next with slightly different
-> symptoms to those that were seen in mainline and fixed with Sacha's
-> change da888524c393 ("KVM: arm64: vgic-v3: Trap all if no in-kernel
-> irqchip").  That change generated a conflict with this patch which
-> Stephen resolved in what looks like a reasonable fashion tactically but
-> I suspect needs some wider changes.  The test now fails with:
-> 
-> # selftests: kvm: no-vgic-v3
-> # Random seed: 0x6b8b4567
-> # ==== Test Assertion Failure ====
-> #   lib/arm64/processor.c:487: false
-> #   pid=2080 tid=2080 errno=4 - Interrupted system call
-> #      1	0x0000000000413d27: assert_on_unhandled_exception at processor.c:487
-> #      2	0x0000000000406c1f: _vcpu_run at kvm_util.c:1699
-> #      3	 (inlined by) vcpu_run at kvm_util.c:1710
-> #      4	0x000000000040308b: test_run_vcpu at no-vgic-v3.c:124
-> #      5	0x0000000000402253: test_guest_no_gicv3 at no-vgic-v3.c:155
-> #      6	 (inlined by) main at no-vgic-v3.c:174
-> #      7	0x0000ffff9dc17543: ?? ??:0
-> #      8	0x0000ffff9dc17617: ?? ??:0
-> #      9	0x000000000040242f: _start at ??:?
-> #   Unexpected exception (vector:0x4, ec:0x18)
-> not ok 25 selftests: kvm: no-vgic-v3 # exit=254
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 37 ++++++++++++++++++++++++++++++++++++
+>  include/linux/psp-sev.h      | 20 +++++++++++++++++++
+>  2 files changed, 57 insertions(+)
 
-Fix at 20251114093541.3216162-1-maz@kernel.org based on kvmarm/next. I
-haven't tried -next.
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-	M.
-
+Thanks,
 -- 
-Without deviation from the norm, progress is not possible.
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
