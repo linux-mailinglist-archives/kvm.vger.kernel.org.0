@@ -1,148 +1,98 @@
-Return-Path: <kvm+bounces-63144-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63145-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B719BC5AC79
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 01:33:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49D1DC5AC82
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 01:34:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4DFD6351F67
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:32:44 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4200D351956
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:34:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5257221ADB7;
-	Fri, 14 Nov 2025 00:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394E724A076;
+	Fri, 14 Nov 2025 00:34:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UcTYMdGH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OUC2+or0"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64564A02
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 00:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD9523BCED
+	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 00:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763080356; cv=none; b=KlMKCfUbBYAx6G4vrH80O8oerw3iUyOYobkseEWdfd4QhSgU3floTX2VaP5hPqYYX4MYmBRvXW4ZG286l0WTIj3Gp1j2JUCCNxifaZPkFWVnSlIJk6bIoJek+Kb4FKn9DoYk5hY1E/xQdRSamMCq+6SjhDrhyo6fmFnUl810udo=
+	t=1763080482; cv=none; b=VoAN/jSQkrwx2I07fpB1S+wruV7Xey7sB/MMGkCuUynF7b9Oiz7JveGY3Z7j/GIg/Y6whYGtbwt0rpWpAZMS+ihONfUpyL/cuOv3YNMKCbSRBrlIWeEhr9tNL4a33ggCop6oIMaNL+OReb5XH9bZChgvXuhDrDzstdXL3JHI1kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763080356; c=relaxed/simple;
-	bh=aZPWNgQi3FNPEeRabHkEo9eLl+efgRdZPiOS7w/z/mY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KydRHvLLCj+SR/zT3AgafdmdIc5kDd5/g25Tf3m6LcfuOmwmIIh4MpsM1T7mHcZbK4JpffOfhHsWasEn5Ul0PL+eCnNW2RI7NF9vrQBE/QiI/8T7X82WTNbxjJo88tlhbQzyoLNvJXZNzIdjIFLyg56VkaPmV5m49YX3IpiVX7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UcTYMdGH; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763080354;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=cwScgguf1cuymzI2NQXDUxRJxBMZCYwifQYw0aZhyQA=;
-	b=UcTYMdGHovqAxu/5JgWsrPt2KySx/KnMtNUdlAs98bWUdJ/DnSxvswjw0+P5J67nulZj5X
-	Fw1Qy+6I8HNKInWhBXO+QQBitnl1s427vFO6jdLc3zSFlXx3RsGBG4uTmYD/wcNVQKPYky
-	va60hu8fMyhRIraZUGR3LRkchaDndog=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-512-Rwz-UB-GPBG5dJo_gae-lA-1; Thu,
- 13 Nov 2025 19:32:30 -0500
-X-MC-Unique: Rwz-UB-GPBG5dJo_gae-lA-1
-X-Mimecast-MFC-AGG-ID: Rwz-UB-GPBG5dJo_gae-lA_1763080349
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BDF6B1800447;
-	Fri, 14 Nov 2025 00:32:29 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5965D180049F;
-	Fri, 14 Nov 2025 00:32:29 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: kvm@vger.kernel.org
-Cc: kbusch@kernel.org
-Subject: [PATCH kvm-unit-tests] xsave: add testcase for emulation of AVX instructions
-Date: Thu, 13 Nov 2025 19:32:28 -0500
-Message-ID: <20251114003228.60592-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1763080482; c=relaxed/simple;
+	bh=h4IIGtUwg2zfQLlgqSuzTJ14YwbK9UnHqRaoE6Y4Amw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iWBxnJw0PDCtJQgH22ZNMW60gyJ2yBpnuoZtfu8ojL4TFamFDGbF3ZgVixRn8PV1Cufb6fwT9/F7ZHiQLfs+TZq4IzOY4I1uGeDXxgS7uAFBxJzSRGJ/MLeHQPnil791k/mW6tmt347OlLWOtKk7tQPBEQHXYzzsyXXQG8vwZlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OUC2+or0; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340ad9349b3so3389024a91.1
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 16:34:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763080480; x=1763685280; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+LHuB8xIRgaS8JdU4+Im4g3U/MNFjG6h6raen6xbSHw=;
+        b=OUC2+or0QrpYj80HnsJipfY1AGYBgOUnsYc4sxhuFeQgMbmXmd3uIjCVmEOQmVgp98
+         GjQ0gHVUewOAWdgTe2mby9PSWhy6/vRruKgMyb31Ij7ZjkOB5YbAObT3i3pQvXgNI4o7
+         Mx4UdiQm3qt3LH0guOkrFd6YZJZYmuc+F8FXz+FWCaNUwN9sSykutMz6v30sE8dsjgpz
+         UZDs0b5qdo5CjDBkSXy1SWJH5L4eJtcFnHe7DLQZ//n0lgCSiId/sWHvIKDlTS4Ds1JC
+         /eqYTn+PtCqsny9SsMWRyHxOv4hS2LExMe344/ylWnFCdGTsWLKBsh62U2UjTa5WdhNh
+         oSKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763080480; x=1763685280;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+LHuB8xIRgaS8JdU4+Im4g3U/MNFjG6h6raen6xbSHw=;
+        b=lBWAJv5Dnd2m7mm5s/wxStzHecr3djfszgRuroZ0zzm6QPf6sp4uMFcXkew7757RHl
+         w7sF6YqhmnSUzZhc4PmIM8uHDFmuNR+3Pkjzhr96ucE/Nj3bwZ6pEGhm7nl+V9snUt4W
+         bO9cr1z3VP0L14gZ9N0rJTAqeVDyEXF5yXXQHMofOJbZR+/Z+yCu1gbWKew+enKT3xub
+         dMZo8yYTsa7W2IIMyDg409jecWhtbtiBSY7W0lQOS6F+u+5mj9drAuu14Uc2ibh1adDj
+         AoY2ULwMtrunVO8q27l1h46zA3aj9hDHY7XkI1lP8WKH5sdMAdeYl+tokrKOyT/P8q3g
+         i8rA==
+X-Forwarded-Encrypted: i=1; AJvYcCUF8FyP8NNfky7RydIqsDvc1t16CbD1ESddGQOKqrKT4bDYtyYeefTaGdawwdq+93qri7A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEL2RsrLceTUwTm6gO50XL/KFRnXaGWliduA84Rc/0UwdJnuts
+	NzV6dZ/rKlj4IdijwHPc/ZKqYmrfHAvlYvVhOh7UnAHgnbgstf8SCIQ0hIILk7zUjaeFL1dbjmk
+	FtUAFxg==
+X-Google-Smtp-Source: AGHT+IGMe9Nh974AZHgvnwuhOflFpS2qGBRz4ejDlIY+jCOIYlRX8kP36jsF47mvsnpylL4SvqRZOZBbBJg=
+X-Received: from pjbms19.prod.google.com ([2002:a17:90b:2353:b0:341:7640:eb1e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:35d0:b0:33b:cfae:3621
+ with SMTP id 98e67ed59e1d1-343fa7611b6mr1152459a91.32.1763080480391; Thu, 13
+ Nov 2025 16:34:40 -0800 (PST)
+Date: Thu, 13 Nov 2025 16:34:35 -0800
+In-Reply-To: <20251110232642.633672-10-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Mime-Version: 1.0
+References: <20251110232642.633672-1-yosry.ahmed@linux.dev> <20251110232642.633672-10-yosry.ahmed@linux.dev>
+Message-ID: <aRZ5G6GSMnbHxx_K@google.com>
+Subject: Re: [PATCH v3 09/14] x86/svm: Deflake svm_tsc_scale_test
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Cheng <chengkev@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Companion patch to the emulator changes in KVM.  Funnily enough,
-no valid combination involving AVX was tried.
+On Mon, Nov 10, 2025, Yosry Ahmed wrote:
+> On an AMT Turin (EPYC Zen 5), svm_tsc_scale_test flakes on the last test
+> case with 0.0001 TSC scaling ratio, even with the 24-bit shift for
+> stability. On failure, the actual value is 49 instead of the expected
+> 50.
+> 
+> Use a higher scaling ratio, 0.001, which makes the test pass
+> consistently.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/xsave.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+Top-tier analysis right here :-D
 
-diff --git a/x86/xsave.c b/x86/xsave.c
-index cc8e3a0a..e6d15938 100644
---- a/x86/xsave.c
-+++ b/x86/xsave.c
-@@ -15,6 +15,34 @@
- #define XSTATE_SSE      0x2
- #define XSTATE_YMM      0x4
- 
-+char __attribute__((aligned(32))) v32_1[32] = {
-+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-+    128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143,
-+};
-+char __attribute__((aligned(32))) v32_2[32] = { 0 };
-+
-+static __attribute__((target("avx"))) void
-+test_avx_fep(void)
-+{
-+	asm volatile("vzeroall\n"
-+	    KVM_FEP "vmovdqa v32_1, %%ymm0\n"
-+	    KVM_FEP "vmovdqa %%ymm0, v32_2\n" : : :
-+	    "memory",
-+	    "%ymm0", "%ymm1", "%ymm2", "%ymm3", "%ymm4", "%ymm5", "%ymm6", "%ymm7",
-+	    "%ymm8", "%ymm9", "%ymm10", "%ymm11", "%ymm12", "%ymm13", "%ymm14", "%ymm15");
-+}
-+
-+static __attribute__((target("avx"))) void
-+test_avx(void)
-+{
-+	asm volatile("vzeroall\n"
-+	    "vmovdqa v32_1, %%ymm0\n"
-+	    "vmovdqa %%ymm0, v32_2\n" : : :
-+	    "memory",
-+	    "%ymm0", "%ymm1", "%ymm2", "%ymm3", "%ymm4", "%ymm5", "%ymm6", "%ymm7",
-+	    "%ymm8", "%ymm9", "%ymm10", "%ymm11", "%ymm12", "%ymm13", "%ymm14", "%ymm15");
-+}
-+
- static void test_xsave(void)
- {
-     unsigned long cr4;
-@@ -45,7 +73,22 @@ static void test_xsave(void)
-     report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == 0,
-            "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP | XSTATE_SSE)");
-     report(xgetbv_safe(XCR_XFEATURE_ENABLED_MASK, &xcr0) == 0,
--           "        xgetbv(XCR_XFEATURE_ENABLED_MASK)");
-+           "\t\txgetbv(XCR_XFEATURE_ENABLED_MASK)");
-+
-+    if (supported_xcr0 & XSTATE_YMM) {
-+        test_bits = XSTATE_FP | XSTATE_SSE | XSTATE_YMM;
-+        report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == 0,
-+               "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FS | XSTATE_SSE | XSTATE_YMM)");
-+        xgetbv_safe(XCR_XFEATURE_ENABLED_MASK, &xcr0);
-+        if (xcr0 == test_bits) {
-+            if (is_fep_available)
-+                test_avx_fep();
-+            else
-+                test_avx();
-+            report(memcmp(v32_1, v32_2, 32) == 0,
-+                   "vmovdqa emulation");
-+        }
-+    }
- 
-     printf("\tIllegal tests\n");
-     test_bits = 0;
--- 
-2.43.5
+I'm going to take Jim's version instead of papering over the bug.
 
+https://lore.kernel.org/all/CALMp9eQep3H-OtqmLe3O2MsOT-Vx4y0-LordKgN+pkp04VLSWw@mail.gmail.com
 
