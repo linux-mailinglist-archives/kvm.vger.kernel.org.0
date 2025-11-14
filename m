@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-63273-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63274-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D108C5F488
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 21:52:42 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAC85C5F4C1
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 21:55:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 730FA3A5DC6
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 20:52:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CBE23346BF4
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 20:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8AD2FC890;
-	Fri, 14 Nov 2025 20:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE2B34B669;
+	Fri, 14 Nov 2025 20:51:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mw9709YW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rhSUMwU7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B32334B1A6
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 20:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAE334BA5B
+	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 20:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763153497; cv=none; b=ER6FK/gLMjIYjQHrgJijvGatqfXofxMhs5xfWkUg1Co8HWOQ80n96lZiiLko/LCR4k6RAsod/pSlANu05hvd4MEO/z7sGkR02swkK9fBeI17kRxLWSkDzBGPE+XPnbxr1qeN+9cEhScVal733G1WhxmhRMqW8VHtGHPAA/EIWFg=
+	t=1763153499; cv=none; b=nOOazrNzW+JBpbEdZGeXMhQc9q/benEWQpkdgh84sPSdsVi2x8fALYKHoS6YdDUl7JBU6srFkRYnf9BmhENTPB3xdCtWHuXEeMwCFzWlRVAew0CxLPUHIgCu1utQKmnKSyPze3Qhgd2J1fo6FVb9ySRXhM6Ko94dsrF0BtJwD0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763153497; c=relaxed/simple;
-	bh=nTNIyLwcv0yPx/eVPgn1VQWhSPT1MxsMDrQFHIIN348=;
+	s=arc-20240116; t=1763153499; c=relaxed/simple;
+	bh=uQTA6COeZ6DjcNcFJEPi6q937JKUyll/LvCwssVxKkM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gmbRRZytqVxF/vYMXM29waUvG4bTfpux2ncDaoghHPAvB/nn970bAAPxSFhF3B7DDQCqh0ySSDcs3l0mNPEsiXjo+oLvX0TZ0C3nL/K1xu0A6MMZH3UziSY2l+uhOF2m3g9NXRBgrkaZZky958HGzaN6lMzN36CSLemKyBEinFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mw9709YW; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=K57TFyQYtyzxb24M1dH+gjsGCVfGz9N1o7YaUeO/WL6HB1ySPuXWZ9UpCB/rUp9Pm1EE8PTOTn1OqUXhbANAmPxee6XVqNUQoWW9iL1y/p/bW1LnIL3FHYYYoUFxCEcQRmGEqP6vGAaos+XTax3pC/RVaRsXJQhfQCwU126VnLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rhSUMwU7; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340d3b1baafso4401076a91.3
-        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 12:51:35 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-297b35951b7so33266525ad.3
+        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 12:51:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763153495; x=1763758295; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763153497; x=1763758297; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mz6aPFFcTFdQiASleExCvHlK1FPEgPeWcQjtN1TDbFQ=;
-        b=mw9709YWOro3M685vFUq9AB+ju+SAc4VwmXT9MWumaiMLyqN1eJxuYsUZ6oRskk4Jm
-         JQ5WKgC32hsFOkL3wKoahphVzefET4JhFcSbOuR+9A+CP2d6c6K4PcUAeq/KDK13a0XM
-         +/1wdOi1xb0UydfHlhyThl+vrn6Hs+sdKVRcxjvrZ3hhTglqQqdKre1kXzMzvdeZ1BHW
-         rx1dT0/W3G55ZWueiFsotEbxtLfyY/bHURt5Pc/KYJzCp4cg9IfBgRfehbA68Dq2W1ky
-         8t9unfuwjfg7kOFF7mk3NX2MoXbY4SRV4so5mXJ1U9vrgZ/oeIko3tI/HRTJWE8mM7Jv
-         bxfg==
+        bh=fbuFuuD62CvDPHvWSRvvmZQr/l8oke3jB2nA1E1KeBk=;
+        b=rhSUMwU7reXBjXzgRF94+EvMKkNlqh+kaK3OWXXTX2VV30YAgSzk3jdWV6tiA8n1PT
+         6b4OhxfcTelOlzkyQAF5TvGXTDSoynFXPzm8EqCUK5G5WdMVSALuBCd2fMy1RSIENLmy
+         ud6rWV09EX0NGmOXxULLX1pVaR0o0NjGVPSiVXDKFv1XeOn7o13IZNgUkP6w1Z1w/XlO
+         5ALD79fs1czUFAyd+hfEuHpkeco+j2TvdYffvpwmRCDoj27cnNjLa28QeZ0Dyg2xvoQS
+         ndkHikvE6xU9u2ixnQzpajwd6S0CWaJdM+byxrrl2+wT++YHl7mMaeSR4o6gr09m40op
+         ByxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763153495; x=1763758295;
+        d=1e100.net; s=20230601; t=1763153497; x=1763758297;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Mz6aPFFcTFdQiASleExCvHlK1FPEgPeWcQjtN1TDbFQ=;
-        b=b8Al5yXyBrGOLRvVsf9PmdUTwHBJbJajF75Y5AWOkJw8tSgY17Zda3YbnqYqws/hTw
-         vzJvB6Wa2DfHuMPeYegaj27a1JFVpTLKTF2luL9tkXc0F52F00N9AOMrXBMEExvOfuBo
-         9ZchTP5iSb5HS3T+OZF5I69wv8jWRTVNx3I5hDGIiuzPEEiYZvxj/IB9dSUDtfDvYCTz
-         n99ou4MAtRL77KS5MdCNJiKiXxDV3xD6uAPnoSpteqLEfq2Kuc2B2eTk2k2Alo3/AFX7
-         Z6XMWMws+Sn1KoNc8MYvTIIolxAky5zu2uzDQJyI7dGK4WHuppXX3H59YSPERIVVD/i1
-         z4Sw==
-X-Gm-Message-State: AOJu0YwoG4Zb8wE+iCM3I7ar4ajIeroZ5m+9TgFf1V0wCwzE9qYMz3+N
-	EEXL5x9AvBapNlhcMtlSUFRK41pHpPKialrnHtRBdGjNBavGJjUKv3KNj4iUej4CLdnVCI+64JY
-	RVSYbaQ==
-X-Google-Smtp-Source: AGHT+IEVVpB0f1lFNGNS9yi0q18o6t+1Lhsj0KDAVC85nxCamGf6TA5M1ymzXAQZxGrxjaYHw6bguLah1as=
-X-Received: from pjbnl15.prod.google.com ([2002:a17:90b:384f:b0:339:ae3b:2bc7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3fc8:b0:343:a631:28b1
- with SMTP id 98e67ed59e1d1-343fa0e07e2mr6003603a91.16.1763153495410; Fri, 14
- Nov 2025 12:51:35 -0800 (PST)
+        bh=fbuFuuD62CvDPHvWSRvvmZQr/l8oke3jB2nA1E1KeBk=;
+        b=A1P0fqQNblc7duvww37zD/9eZ3kc6EMgOxemJ9Ai3aUTi8PLklk03pXojmn8QJnVX/
+         hRR217iqSxRx2wNu9brE2daQu65SR4lL6eKwyO3NvRBJR+5EGb6NA3iLd1WbjVdiqG+4
+         MZscEJN3SKzZuH/gDdbXxVMEuf8j2VkBipkVub5oPIZukZKHqfTNXHQzbQUL0zFDBUTB
+         C+kFUKqPoLDZVKM16mlFeATPnFbn/tk9GyjHIyG8wNiw3mtEemZn8ZC0ffoIgSy/UMCA
+         ygrJ4D7sejUwreqY3zfgNJ0XlKeYRMTcI1BzdgPRr9Xl7iHKKf7rWVVRQf15ePI3ISgi
+         xioQ==
+X-Gm-Message-State: AOJu0YxtNQOtXZxRDtZ+GalSl4/ZfG0BicZTCFm+k1oGRkOEdWVyLFTz
+	4xkJpr9pvqevlOdDl6fSjwGkOO6NEXVFdxHH09RHYfMp73RzzEeptvQN9biePcfr+0b3XTSUibN
+	ZhCB+Ig==
+X-Google-Smtp-Source: AGHT+IH18O5LFBdsLpktwCroTuMJlwOF6iTEArIOyRVsqpUOs7BQNUt+beK6fLDuiL/mHelE097xid8WOuk=
+X-Received: from pgct2.prod.google.com ([2002:a05:6a02:5282:b0:bac:a20:5f05])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:350d:b0:290:94ed:184c
+ with SMTP id d9443c01a7336-2986a6be347mr47118365ad.15.1763153497641; Fri, 14
+ Nov 2025 12:51:37 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 14 Nov 2025 12:50:59 -0800
+Date: Fri, 14 Nov 2025 12:51:00 -0800
 In-Reply-To: <20251114205100.1873640-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,161 +75,189 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251114205100.1873640-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251114205100.1873640-18-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v4 17/18] x86: cet: Reset IBT tracker state on
- #CP violations
+Message-ID: <20251114205100.1873640-19-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v4 18/18] x86: cet: Add testcases to verify KVM
+ rejects emulation of CET instructions
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>, 
 	Mathias Krause <minipli@grsecurity.net>, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Reset the IBT tracker state back to IDLE on #CP violations to not
-influence follow-up tests with a poisoned starting state.
+Add SHSTK and IBT testcases to verify that KVM rejects (forced) emulation
+of instructions that interact with SHSTK and/or IBT state, as KVM doesn't
+support emulating SHSTK or IBT (rejecting emulation is preferable to
+compromising guest security).
 
-Opportunistically rename "rvc" to "got_cp" to make it more obvious what
-the flag tracks ("rvc" is presumably "raised vector CP"?).
-
-Signed-off-by: Mathias Krause <minipli@grsecurity.net>
-[sean: add helper, align indentation, use handler+callback instead of "extra"]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/usermode.c | 12 +++++++++---
- lib/x86/usermode.h | 13 ++++++++++---
- x86/cet.c          | 31 +++++++++++++++++++++++++++----
- 3 files changed, 46 insertions(+), 10 deletions(-)
+ x86/cet.c | 125 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 124 insertions(+), 1 deletion(-)
 
-diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
-index f896e3bd..b65c5378 100644
---- a/lib/x86/usermode.c
-+++ b/lib/x86/usermode.c
-@@ -21,12 +21,17 @@ static void restore_exec_to_jmpbuf(void)
- 	longjmp(jmpbuf, 1);
- }
- 
-+static handler ex_callback;
-+
- static void restore_exec_to_jmpbuf_exception_handler(struct ex_regs *regs)
- {
- 	this_cpu_write_exception_vector(regs->vector);
- 	this_cpu_write_exception_rflags_rf((regs->rflags >> 16) & 1);
- 	this_cpu_write_exception_error_code(regs->error_code);
- 
-+	if (ex_callback)
-+		ex_callback(regs);
-+
- 	/* longjmp must happen after iret, so do not do it now.  */
- 	regs->rip = (unsigned long)&restore_exec_to_jmpbuf;
- 	regs->cs = KERNEL_CS;
-@@ -35,9 +40,9 @@ static void restore_exec_to_jmpbuf_exception_handler(struct ex_regs *regs)
- #endif
- }
- 
--uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
--		uint64_t arg1, uint64_t arg2, uint64_t arg3,
--		uint64_t arg4, bool *raised_vector)
-+uint64_t run_in_user_ex(usermode_func func, unsigned int fault_vector,
-+			uint64_t arg1, uint64_t arg2, uint64_t arg3,
-+			uint64_t arg4, bool *raised_vector, handler ex_handler)
- {
- 	extern char ret_to_kernel;
- 	volatile uint64_t rax = 0;
-@@ -45,6 +50,7 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
- 	handler old_ex;
- 
- 	*raised_vector = 0;
-+	ex_callback = ex_handler;
- 	set_idt_entry(RET_TO_KERNEL_IRQ, &ret_to_kernel, 3);
- 	old_ex = handle_exception(fault_vector,
- 				  restore_exec_to_jmpbuf_exception_handler);
-diff --git a/lib/x86/usermode.h b/lib/x86/usermode.h
-index 04e358e2..7eca9079 100644
---- a/lib/x86/usermode.h
-+++ b/lib/x86/usermode.h
-@@ -20,11 +20,18 @@ typedef uint64_t (*usermode_func)(void);
-  * Supports running functions with up to 4 arguments.
-  * fault_vector: exception vector that might get thrown during the function.
-  * raised_vector: outputs true if exception occurred.
-+ * ex_handler: optiona handler to call when handling @fault_vector exceptions
-  *
-  * returns: return value returned by function, or 0 if an exception occurred.
-  */
--uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
--		uint64_t arg1, uint64_t arg2, uint64_t arg3,
--		uint64_t arg4, bool *raised_vector);
-+uint64_t run_in_user_ex(usermode_func func, unsigned int fault_vector,
-+			uint64_t arg1, uint64_t arg2, uint64_t arg3,
-+			uint64_t arg4, bool *raised_vector, handler ex_handler);
- 
-+static inline uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
-+				   uint64_t arg1, uint64_t arg2, uint64_t arg3,
-+				   uint64_t arg4, bool *raised_vector)
-+{
-+	return run_in_user_ex(func, fault_vector, arg1, arg2, arg3, arg4, raised_vector, NULL);
-+}
- #endif
 diff --git a/x86/cet.c b/x86/cet.c
-index 74d3f701..7ffe234b 100644
+index 7ffe234b..e94ffb72 100644
 --- a/x86/cet.c
 +++ b/x86/cet.c
-@@ -1,4 +1,3 @@
--
- #include "libcflat.h"
- #include "x86/desc.h"
- #include "x86/processor.h"
-@@ -85,6 +84,8 @@ static uint64_t cet_ibt_func(void)
- #define CET_ENABLE_SHSTK			BIT(0)
- #define CET_ENABLE_IBT				BIT(2)
- #define CET_ENABLE_NOTRACK			BIT(4)
-+#define CET_IBT_SUPPRESS			BIT(10)
-+#define CET_IBT_TRACKER_WAIT_FOR_ENDBRANCH	BIT(11)
- 
- static void test_shstk(void)
- {
-@@ -132,9 +133,31 @@ static void test_shstk(void)
- 	report(vector == GP_VECTOR, "MSR_IA32_PL3_SSP alignment test.");
+@@ -74,6 +74,116 @@ static uint64_t cet_ibt_func(void)
+ 	return 0;
  }
  
-+static void ibt_tracker_cp_fixup(struct ex_regs *regs)
-+{
-+	u64 cet_u = rdmsr(MSR_IA32_U_CET);
++#define __CET_TEST_UNSUPPORTED_INSTRUCTION(insn)			\
++({									\
++	struct far_pointer32 fp = {					\
++		.offset = 0,						\
++		.selector = USER_CS,					\
++	};								\
++									\
++	asm volatile ("push %%rax\n"					\
++		      ASM_TRY_FEP("1f") insn "\n\t"			\
++		      "1:"						\
++		      "pop %%rax\n"					\
++		      : : "m" (fp), "a" (NONCANONICAL) : "memory");	\
++									\
++	exception_vector();					\
++})
 +
-+	/*
-+	 * Switch the IBT tracker state to IDLE to have a clean state for
-+	 * following tests.
-+	 */
-+	if (cet_u & CET_IBT_TRACKER_WAIT_FOR_ENDBRANCH) {
-+		cet_u &= ~CET_IBT_TRACKER_WAIT_FOR_ENDBRANCH;
-+		printf("CET: suppressing IBT WAIT_FOR_ENDBRANCH state at RIP: %lx\n",
-+		       regs->rip);
-+		wrmsr(MSR_IA32_U_CET, cet_u);
-+	}
++#define SHSTK_TEST_UNSUPPORTED_INSTRUCTION(insn)			\
++do {									\
++	uint8_t vector = __CET_TEST_UNSUPPORTED_INSTRUCTION(insn);	\
++									\
++	report(vector == UD_VECTOR, "SHSTK: Wanted #UD on %s, got %s",	\
++	       insn, exception_mnemonic(vector));			\
++} while (0)
++
++/*
++ * Treat IRET as unsupported with IBT even though the minimal interactions with
++ * IBT _could_ be easily emulated by KVM, as KVM doesn't support emulating IRET
++ * outside of Real Mode.
++ */
++#define CET_TEST_UNSUPPORTED_INSTRUCTIONS(CET)				\
++do {									\
++	CET##_TEST_UNSUPPORTED_INSTRUCTION("callq *%%rax");		\
++	CET##_TEST_UNSUPPORTED_INSTRUCTION("lcall *%0");		\
++	CET##_TEST_UNSUPPORTED_INSTRUCTION("syscall");			\
++	CET##_TEST_UNSUPPORTED_INSTRUCTION("sysenter");			\
++	CET##_TEST_UNSUPPORTED_INSTRUCTION("iretq");			\
++} while (0)
++
++static uint64_t cet_shstk_emulation(void)
++{
++	CET_TEST_UNSUPPORTED_INSTRUCTIONS(SHSTK);
++
++	SHSTK_TEST_UNSUPPORTED_INSTRUCTION("call 1f");
++	SHSTK_TEST_UNSUPPORTED_INSTRUCTION("retq");
++	SHSTK_TEST_UNSUPPORTED_INSTRUCTION("retq $10");
++	SHSTK_TEST_UNSUPPORTED_INSTRUCTION("lretq");
++	SHSTK_TEST_UNSUPPORTED_INSTRUCTION("lretq $10");
++
++	/* Do a handful of JMPs to verify they aren't impacted by SHSTK. */
++	asm volatile(KVM_FEP "jmp 1f\n\t"
++		     "1:\n\t"
++		     KVM_FEP "lea 2f(%%rip), %%rax\n\t"
++		     KVM_FEP "jmp *%%rax\n\t"
++		     "2:\n\t"
++		     KVM_FEP "push $" xstr(USER_CS) "\n\t"
++		     KVM_FEP "lea 3f(%%rip), %%rax\n\t"
++		     KVM_FEP "push %%rax\n\t"
++		     /*
++		      * Manually encode ljmpq, which gas doesn't recognize due
++		      * to AMD not supporting the instruction (64-bit JMP FAR).
++		      */
++		     KVM_FEP ".byte 0x48\n\t"
++		     "ljmpl *(%%rsp)\n\t"
++		     "3:\n\t"
++		     KVM_FEP "pop %%rax\n\t"
++		     KVM_FEP "pop %%rax\n\t"
++		     ::: "eax");
++
++	return 0;
 +}
 +
-+static uint64_t ibt_run_in_user(usermode_func func, bool *got_cp)
++/*
++ * Don't invoke printf() or report() in the IBT testcase, as it will likely
++ * generate an indirect branch without an endbr64 annotation and thus #CP.
++ * Return the line number of the macro invocation to signal failure.
++ */
++#define IBT_TEST_UNSUPPORTED_INSTRUCTION(insn)				\
++do {									\
++	uint8_t vector = __CET_TEST_UNSUPPORTED_INSTRUCTION(insn);	\
++									\
++	report(vector == UD_VECTOR, "IBT: Wanted #UD on %s, got %s",	\
++	       insn, exception_mnemonic(vector));			\
++} while (0)
++
++static uint64_t cet_ibt_emulation(void)
 +{
-+	return run_in_user_ex(func, CP_VECTOR, 0, 0, 0, 0, got_cp,
-+			      ibt_tracker_cp_fixup);
++	CET_TEST_UNSUPPORTED_INSTRUCTIONS(IBT);
++
++	IBT_TEST_UNSUPPORTED_INSTRUCTION("jmp *%%rax");
++	IBT_TEST_UNSUPPORTED_INSTRUCTION("ljmpl *%0");
++
++	/* Verify direct CALLs and JMPs, and all RETs aren't impacted by IBT. */
++	asm volatile(KVM_FEP "jmp 2f\n\t"
++		     "1: " KVM_FEP " ret\n\t"
++		     "2: " KVM_FEP " call 1b\n\t"
++		     KVM_FEP "push $" xstr(USER_CS) "\n\t"
++		     KVM_FEP "lea 3f(%%rip), %%rax\n\t"
++		     KVM_FEP "push %%rax\n\t"
++		     KVM_FEP "lretq\n\t"
++		     "3:\n\t"
++		     KVM_FEP "push $0x55555555\n\t"
++		     KVM_FEP "push $" xstr(USER_CS) "\n\t"
++		     KVM_FEP "lea 4f(%%rip), %%rax\n\t"
++		     KVM_FEP "push %%rax\n\t"
++		     KVM_FEP "lretq $8\n\t"
++		     "4:\n\t"
++		     ::: "eax");
++	return 0;
 +}
 +
+ #define CP_ERR_NEAR_RET	0x0001
+ #define CP_ERR_FAR_RET	0x0002
+ #define CP_ERR_ENDBR	0x0003
+@@ -119,7 +229,7 @@ static void test_shstk(void)
+ 	/* Store shadow-stack pointer. */
+ 	wrmsr(MSR_IA32_PL3_SSP, (u64)(shstk_virt + 0x1000));
+ 
+-	printf("Unit tests for CET user mode...\n");
++	printf("Running user mode Shadow Stack tests\n");
+ 	run_in_user(cet_shstk_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
+ 	report(rvc && exception_error_code() == CP_ERR_NEAR_RET,
+ 	       "NEAR RET shadow-stack protection test");
+@@ -128,6 +238,12 @@ static void test_shstk(void)
+ 	report(rvc && exception_error_code() == CP_ERR_FAR_RET,
+ 	       "FAR RET shadow-stack protection test");
+ 
++	if (is_fep_available &&
++	    (run_in_user(cet_shstk_emulation, CP_VECTOR, 0, 0, 0, 0, &rvc) || rvc))
++		report_fail("Forced emulation with SHSTK generated %s(%u)",
++			    exception_mnemonic(exception_vector()),
++			    exception_error_code());
++
+ 	/* SSP should be 4-Byte aligned */
+ 	vector = wrmsr_safe(MSR_IA32_PL3_SSP, 0x1);
+ 	report(vector == GP_VECTOR, "MSR_IA32_PL3_SSP alignment test.");
+@@ -158,6 +274,7 @@ static uint64_t ibt_run_in_user(usermode_func func, bool *got_cp)
  static void test_ibt(void)
  {
--	bool rvc;
-+	bool got_cp;
+ 	bool got_cp;
++	uint64_t l;
  
  	if (!this_cpu_has(X86_FEATURE_IBT)) {
  		report_skip("IBT not supported");
-@@ -144,8 +167,8 @@ static void test_ibt(void)
- 	/* Enable indirect-branch tracking (notrack handling for jump tables) */
- 	wrmsr(MSR_IA32_U_CET, CET_ENABLE_IBT | CET_ENABLE_NOTRACK);
- 
--	run_in_user(cet_ibt_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
--	report(rvc && exception_error_code() == CP_ERR_ENDBR,
-+	ibt_run_in_user(cet_ibt_func, &got_cp);
-+	report(got_cp && exception_error_code() == CP_ERR_ENDBR,
+@@ -170,6 +287,12 @@ static void test_ibt(void)
+ 	ibt_run_in_user(cet_ibt_func, &got_cp);
+ 	report(got_cp && exception_error_code() == CP_ERR_ENDBR,
  	       "Indirect-branch tracking test");
++
++	if (is_fep_available &&
++	    ((l = ibt_run_in_user(cet_ibt_emulation, &got_cp)) || got_cp))
++		report_fail("Forced emulation with IBT generated %s(%u) at line %lu",
++			    exception_mnemonic(exception_vector()),
++			    exception_error_code(), l);
  }
  
+ int main(int ac, char **av)
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
