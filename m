@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-63133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63134-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E14C5ABAE
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 01:14:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31E23C5ABA5
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 01:14:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F0E15354319
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:13:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7948E3B8D46
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC99E22FE0D;
-	Fri, 14 Nov 2025 00:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41211E7C18;
+	Fri, 14 Nov 2025 00:13:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h+K5mbli"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fYSzj09+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809A02236F2
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 00:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6395922D4DC
+	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 00:13:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763079194; cv=none; b=IbEOj4VdhymUwPUoY5RBuE6S0Pv4pnkEVk3GxsNW77ne7itu0FaPk4DTRKo2KxrAfNZuIYjYW/AqeFNinnSRdtt3TeoFwj16vsQfrR31jQirpnkSCw5VwtlGn5trLrAh+eLFCVY3c/OIXgvLZ76PRbN0WK1a+R0MUwnVk7dOJCY=
+	t=1763079196; cv=none; b=oWTCLVih/GjHB883yYApp4BrhbfWoUSMhFU636++3lBOaF9/CtuTMUOr9iX6nhF6s4uhhMuqlfxy/3LLiHgm2fks1bi/ODDTKJ/NE6SmV7EOI9xR4+XrOyl7FENSLHpZE+TRrENFuFgjRPP9rC7rUpzX8xldXG0h+HiMm0Vb3Xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763079194; c=relaxed/simple;
-	bh=PL3Qhn7iqi/F3cJTiDIoK+i7tq0WNOMmbjMemBAGU5o=;
+	s=arc-20240116; t=1763079196; c=relaxed/simple;
+	bh=drnhf4HWccfdCRAqsv6Wpb1qqqVWH2tm3oJf1ZUDKTk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=T8rGOuuFd8oWkLr4NDrmj37ud4BcBndDjH4nGoi/y2JnodyG8G6Mcj1CJI3+rgwhCA9NCcbWTGJHJ5XWXvySsboUcy78VQd3iAtLIMX0+xaKydyX9Pu59mCQt1vSA1J7b/U/w10vgtZ04Uplrp/f95RILQJgrA5szOqjiJr7qOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h+K5mbli; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=YRIUKbcW0z+1E6zOh/qFPQ08n0xmhwvJt7/ccfx5vHpqCRBZFsqEsiA36A+pJiMRgzcFZ+c4GNCHAq+bqDFI+7hPMhJ4A0EFy1QjKvquPAmtYg85ClxnWy/HYwNIOgqrTXWtHcDf6/jO0jTFliBSMStRvCmSsp/0Xn1V27bPclQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fYSzj09+; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7b80de683efso2818212b3a.3
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 16:13:13 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34374bfbcccso1604598a91.0
+        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 16:13:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763079193; x=1763683993; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763079194; x=1763683994; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=AlrJv6PsuPgoMU2zaUNJTWd5rKIuTNoQ9zZEmw0g4i8=;
-        b=h+K5mbliZtV48NwqivkTB7eLzq2hfTYjfZWk07EgvZXRCoAR47KO/t4TH866RWnoYj
-         hQo6lBwrh8Zw28t9504Ix2c60Kdrh72g61h5rFxC26NC55JS8i8HKJwuvGs1jfsbRipA
-         8Wy3LuTvr1SOL3oFb+TwpSMc2h0BJJftdXJzwv+59A7vce25PyRC+avKaTKMPFwtGSds
-         Xr/t0sFFye4MGWZTAlMrszPOqOP+73iVUk2H7KQCOPiwr/q54puXNZL+Fm1ZW2bWrAkh
-         rGRjxNmXQqfkp7iCSKTvyBlwU44uLqTpoHx0vTE7KvYyblf7bjVXEDe1xqx4wwoxQEKb
-         Oc8Q==
+        bh=QwhkZoiw2YNzZ9paPLFlvXCeWSMScaZEgEdXJUEBb0c=;
+        b=fYSzj09+zZN2pZ4AskcORSMC7RHLAEz+u1ay2B9P1TGhAUhYak2onJoRfrBUv9q5Ed
+         YS7YYN/SbiJlzzpqzp+M/QIdy9NrsJ2JHOpfChCmx556QAK7pHg/emFsgIkZ98A1z3Wi
+         S+MhfRt/3G1Uqxh8B/nBgu/edR3QxO3MyyW2+yjNvDHj4j0gj0nvWvWZKr7Io+mO0DE3
+         gn03VqtRxntg77WYKtzO1brX8gUuakTPBARl70y9pFvtw4uSN5Lc3KM4nykmEufTeGiw
+         2MnnFxKWERrt+wb+4Dtr2Yi9xAHVeBieAejZoYEdMZVB2TLIPN0yvio1aiEszqinojLl
+         Z+9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763079193; x=1763683993;
+        d=1e100.net; s=20230601; t=1763079194; x=1763683994;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=AlrJv6PsuPgoMU2zaUNJTWd5rKIuTNoQ9zZEmw0g4i8=;
-        b=hrPOHBWX54AN0OPpuuiPWQ34FBHdrA548lXvr816crd30/6afP6LyazTZswbEbNmZO
-         GELVjY8nY61F/nJ52pKY7pyevlVhz8i5ILf33wdZMWg5dO/9Ro7jyYvVPlckbKeA6Q0u
-         6itx5+bUwI+BJbV/E4Q/ps3A0F0nKIqZGR1maPdLKFdKTbPbYWBmL3rfrBDz8Ie0ZMz+
-         CE029lcwTU/c9Ktf36MiXhNVB01g6cjSrNxg8KETWgW24a5Pe3c6gu142abbWEQQ5TI0
-         HT/vGaxpKbukUjkUGYuQxGqHyjiSJlsMHQKra3e4H/XhQPN7bIpjuCBa9zIbOWA88/27
-         Mo+w==
-X-Gm-Message-State: AOJu0YxERV8HXUxbBoSuscIp5xuMBLpa3dxs76qGY9F5yQ2kA2JhYgsi
-	lQLhUjNuvRaQae6r4ITLPS0J0ZNEreZDj+S34bp+edrgnn/H+xkn7SZwz4T/gYDL93tak3Bk20+
-	xGNj2gw==
-X-Google-Smtp-Source: AGHT+IFb3k6uPfeU14k1uBHTXBwUr50SK27oeBh3kc6eIgEd//VSIwtIHClAKwLnITgKJN2mgLxA2KxsMXM=
-X-Received: from pfwy4.prod.google.com ([2002:a05:6a00:1c84:b0:7b8:fc17:3960])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3290:b0:2ca:1b5:9d45
- with SMTP id adf61e73a8af0-35ba17ad16cmr1737350637.32.1763079192700; Thu, 13
- Nov 2025 16:13:12 -0800 (PST)
+        bh=QwhkZoiw2YNzZ9paPLFlvXCeWSMScaZEgEdXJUEBb0c=;
+        b=X13GzO90QMjrYuVkfXxH5u4WPp241wr6ZozJ9ED7rO9D6NB2pRCiwpnfmfCYs1Msnx
+         hRwD6nypicrX2IihAzOkeHHeD1Q5y0ne9j2CrZDa7Q0BILDlVvbsh+pB5cabCFG1RP8W
+         Wx+RA5hV13UDJuphvao2lQ8oa0qBNd6ibIgTLrIMF72h24E4pVLryuIk3PoIQRgMF+xj
+         3zm8EoBebUanKsg32HMbMgdDqUjZkeck55HJYWmIbgjxBNeRSRTvlK85u43osE1pTYs5
+         7HTZ1H8q3WPdcFr4qUnKW0S/SKEn8uNZdHJe0XKJstV0p9aPDvJ+dj2I+A0TeH7gtc3h
+         ujAg==
+X-Gm-Message-State: AOJu0Yyr+tlaRUWYzX7jO9VOs4jn3jhh18rwgAea/yCTgtKOhQ/iqq/g
+	cZeibT1QNaR7ShzOtBOB655xJrDTUGzuJ/oB87q9/GrGPQxivJtZI7hXNj5TJeDzNi3tkMC6QVG
+	Pcy5csQ==
+X-Google-Smtp-Source: AGHT+IH86zxg8hv+XzfU8hOiC42ANK3GMR05Mz4qsYPbP8SFw+oqKmZkeTDezE/T/QdOp5ozGCVz4z7deJo=
+X-Received: from pjo8.prod.google.com ([2002:a17:90b:5668:b0:33b:5907:81cb])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:51c4:b0:32e:9da9:3e60
+ with SMTP id 98e67ed59e1d1-343fa74fd8cmr1121120a91.36.1763079194571; Thu, 13
+ Nov 2025 16:13:14 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 13 Nov 2025 16:12:48 -0800
+Date: Thu, 13 Nov 2025 16:12:49 -0800
 In-Reply-To: <20251114001258.1717007-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251114001258.1717007-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251114001258.1717007-8-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v3 07/17] x86: cet: Drop unnecessary casting
+Message-ID: <20251114001258.1717007-9-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v3 08/17] x86: cet: Validate writing unaligned
+ values to SSP MSR causes #GP
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>, 
@@ -85,55 +86,39 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Chao Gao <chao.gao@intel.com>
 
-cet_shstk_func() and cet_ibt_func() have the same type as usermode_func.
-So, remove the unnecessary casting.
+Validate that writing invalid values to SSP MSRs triggers a #GP exception.
+This verifies that necessary validity checks are performed by the hardware
+or the underlying VMM.
 
 Signed-off-by: Chao Gao <chao.gao@intel.com>
-[mks: make the types really equal by using uint64_t]
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/cet.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ x86/cet.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/x86/cet.c b/x86/cet.c
-index d6ca5dd8..8c2cf8c6 100644
+index 8c2cf8c6..80864fb1 100644
 --- a/x86/cet.c
 +++ b/x86/cet.c
-@@ -8,7 +8,7 @@
- #include "alloc_page.h"
- #include "fault_test.h"
+@@ -56,6 +56,7 @@ int main(int ac, char **av)
+ 	char *shstk_virt;
+ 	unsigned long shstk_phys;
+ 	pteval_t pte = 0;
++	u8 vector;
+ 	bool rvc;
  
--static u64 cet_shstk_func(void)
-+static uint64_t cet_shstk_func(void)
- {
- 	unsigned long *ret_addr, *ssp;
- 
-@@ -31,7 +31,7 @@ static u64 cet_shstk_func(void)
- 	return 0;
- }
- 
--static u64 cet_ibt_func(void)
-+static uint64_t cet_ibt_func(void)
- {
- 	/*
- 	 * In below assembly code, the first instruction at label 2 is not
-@@ -93,13 +93,13 @@ int main(int ac, char **av)
- 	write_cr4(read_cr4() | X86_CR4_CET);
- 
- 	printf("Unit test for CET user mode...\n");
--	run_in_user((usermode_func)cet_shstk_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
-+	run_in_user(cet_shstk_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
- 	report(rvc && exception_error_code() == 1, "Shadow-stack protection test.");
- 
- 	/* Enable indirect-branch tracking */
- 	wrmsr(MSR_IA32_U_CET, ENABLE_IBT_BIT);
- 
--	run_in_user((usermode_func)cet_ibt_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
-+	run_in_user(cet_ibt_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
- 	report(rvc && exception_error_code() == 3, "Indirect-branch tracking test.");
- 
+ 	if (!this_cpu_has(X86_FEATURE_SHSTK)) {
+@@ -105,5 +106,9 @@ int main(int ac, char **av)
  	write_cr4(read_cr4() & ~X86_CR4_CET);
+ 	wrmsr(MSR_IA32_U_CET, 0);
+ 
++	/* SSP should be 4-Byte aligned */
++	vector = wrmsr_safe(MSR_IA32_PL3_SSP, 0x1);
++	report(vector == GP_VECTOR, "MSR_IA32_PL3_SSP alignment test.");
++
+ 	return report_summary();
+ }
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
