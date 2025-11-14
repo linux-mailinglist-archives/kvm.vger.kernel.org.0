@@ -1,209 +1,176 @@
-Return-Path: <kvm+bounces-63239-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63240-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99113C5E9ED
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 18:41:21 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DDDBC5EAEC
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 18:57:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49A373B2204
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 17:41:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 39B674F87F6
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 17:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83C73341ACA;
-	Fri, 14 Nov 2025 17:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1199347BB5;
+	Fri, 14 Nov 2025 17:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QZjmmVxT"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Rb0DIDpw"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9612D3EF8;
-	Fri, 14 Nov 2025 17:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683833446CF
+	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 17:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763142074; cv=none; b=OFmMcuepXBOcBsL4KYE4+7EN0FYn0AQRdGz/7LIhoHtqoRz0TEz7WgPFSsGDhTnhJj+c0e57pPknQbszRv1x5SI1oV7Og2Hpe/0C5VN18Nyo1tbL1m2Imc6OdgI7YkwFY0zY3OJMzoATWj8Eir5ckPQp1aKgd97tISYZP6H4QXw=
+	t=1763142504; cv=none; b=SyxxxdyX1oDDJ+i5yK7g/zjsnJRyp2lGe49MBm1MPwZPjz1LE1d5VhTeExwIkVLeAT9FOg4xfNqmGm1FKp4QeLdUyz/48UtU0t2bg2IwlRg1a7OjtfqvBVjsu7JKnci/Mke4W3DiGf4Y73WvkU1YsEw8L5rDzvRU8DXMvdC/haw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763142074; c=relaxed/simple;
-	bh=/RQWg1MUgwhS9EZg+jb/ASLDoPZeUTGyXQGlnxWumDo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BowFnNxSFX3QURgzUSHm7Af1QYsqIIqBk3aCWYFt4eMR7dUkA7StFK7SFrpigHIboSAmURlr0P5U4c6OXURiuar9d+I1Fxy5xbe4+NlKD7mI2z0AGjjpeLvkQIyCCuTU8sPnpBe7rea6rlJgFp654pysMDxKSbt+Wr8EhSS7tiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QZjmmVxT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15639C4CEF5;
-	Fri, 14 Nov 2025 17:41:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763142073;
-	bh=/RQWg1MUgwhS9EZg+jb/ASLDoPZeUTGyXQGlnxWumDo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QZjmmVxTxDYya/03MhG03dKGTmac+EBA4829fy2mzheBL46Hy0aMDfnwGJqNVRD6l
-	 0UShIdnYB1FLyvq95DrsVMSFkbocIb29UgWUOBpQmULNneK14HFYFxyb3e/7diU0mL
-	 iN3HrhoRhiBv7MMfyyQ/6g0yMnfvzhQqcAb7gJwf5OvMIhNApUZBG3bdO1b4Di35uN
-	 5pwkB1yaGKiRTLBxdAlx4TOe30jrS+DwpdSSEEcUeX0i6t9GKsjbyIfNW29FxrF6eZ
-	 PG7PSFKGcNitRpeycZl6AaZP1VRToGPpFp08w8Dm80Nci+fYWN4ce+0bYJCNPUo3vd
-	 OGLf1ZtBYDizA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vJxnK-00000005J5w-1yC9;
-	Fri, 14 Nov 2025 17:41:10 +0000
-Date: Fri, 14 Nov 2025 17:41:10 +0000
-Message-ID: <86a50otsuh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
-In-Reply-To: <CA+EHjTzi9Q9hqAu1Xk51hO3uz0FdUGjdPSViN4RAD6tuXJkvYQ@mail.gmail.com>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-30-maz@kernel.org>
-	<CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
-	<86cy5ku06v.wl-maz@kernel.org>
-	<CA+EHjTzi9Q9hqAu1Xk51hO3uz0FdUGjdPSViN4RAD6tuXJkvYQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763142504; c=relaxed/simple;
+	bh=M3lRJLmEZ7JGwWTvf6UoV64DNFaFI5lqaxXQ8tgqiIk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=onJ6H7MQurNz40wxb9ooOroRsKGAoN5/qLX3DjXxqA8sK4e2l6reKR25qKFHk+ikdDelIgbUklrmm9uPL3ECdEtRjGbljnFV6Tlfj2rW0+eMTsQL1SV0mVoLDe/pADhiG2BYBBRFUeWbgI5r+jt2BOvQWfkouMQgTj+E9F2qnYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Rb0DIDpw; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b3e7cc84b82so365062566b.0
+        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 09:48:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1763142500; x=1763747300; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zg7DjlCq7wS0LcCCJEhlzHEukmpZjrkwro9CVQtSZwo=;
+        b=Rb0DIDpwklbLQYFDjYQo8wBKZ7R4t6Lt28tfOx7AlVJ3XcE+sUI/KwSG+XZLPbixiR
+         U4TNgFO3Ec1fh5jsI6DSxYkAm3FcswDm4DtIYx/HTw5jiCihP4CR21ULKbhe25eIiBOI
+         LVO8WzEVdPtEfyFB6FdIWhdEcCtzLPP6p7ITQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763142500; x=1763747300;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Zg7DjlCq7wS0LcCCJEhlzHEukmpZjrkwro9CVQtSZwo=;
+        b=gKCnzG9YdwscG3zlKIfovVzSC5MNrCooDnXku6w/74GDdXlJMRQCmD6Oz5QTHDmhwk
+         sB9+7Bkkpg/1pg7ObE5oK/4PfFy6VKvaDkmz0bZY2I5bcDKw0kSzT20e8hPckYMbeiUy
+         kk2sdxxU3j+QM/8OUdZbm6Ie+fe8QT6B7yxK1rBzPynMT/Fo3xl2O0EFl0WK6ot4vRmQ
+         LBHfAU3Si14AnYP2eeA9KnZBYuvDM+AQA9hKNkhULd0egDStymZlPNsHLMnbFU7x5r03
+         r+lTZOdFg3M/TXp7rAGmWUpNIVLZ0B52e+O6+Kvq1bNLqVbdOyLpG6xLYAGHdcw/XrZk
+         7gig==
+X-Forwarded-Encrypted: i=1; AJvYcCUxq28xQniixv19qHbdHCqNK/0IMiAXTbIUiEzmGsNVRyiqBTjy6fw/ZAK/Y+1iuIVH49Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsM2uaVU1F2nXYS9Wdk0oehWorEM3dZtKruwPGUGXgLxD091eU
+	Rdvf7bMrm+gv0Lsub4baESuMKWjaLkIFH01y8nfTwJh+Z5equ7SAcCoY8orc+DOjbe15C4OoU5g
+	QmZWAsoM=
+X-Gm-Gg: ASbGnct1ORS6Tfl+Gh6DI7QId1ImueULya712o1hKbv0k2SoyvbDjK/ghwUieUgaDb6
+	lvJzQAhzvOH9mC/BifbEMpVwhyQTfcSoP4svkshtZqsV1pDCfJQcDmCS9S0qAECDpBPsFHEW7De
+	zjmXIH6tiqey3BEV8NZBViO3LWMIdx0rLcf4SdYLVBhQtA34EaSkW4WNpQk//ZVGxSYRgzrfwDP
+	mxjKm+BeGuqPypTQwJu/0ZvyWQtqwkq/psD0R+D89Mwrh8Mhy1SjsK9G4+qteAw/ITrGDHG3YWK
+	guRnY7BNdOwFFq7lURCYAsTlYVmuVSSd16B0woc1MhkBzfWky6EUz9zdfxkUx+qzxgorV5OxmCe
+	w/UxMmd141VkYKV6nfDhAubIA2CDbq1v4Z7YzguVanfwZBC/1+bxlEBhgm83W0FxVhGcMdx4atw
+	zJ9jf1NEIBMsIVqbQpjVF4ZQMuaOViXIX2+AEcM4zSH2ykavpWwA==
+X-Google-Smtp-Source: AGHT+IFpCU6uCCRFmIe2cBCsRyEr+H+eL+uGiUFlnpYC3Q3L261u5vtLHY2ln+U9/ZsgHWb3aG8kXA==
+X-Received: by 2002:a17:907:3da5:b0:b40:5752:16b7 with SMTP id a640c23a62f3a-b7367bd14d2mr414732866b.51.1763142500300;
+        Fri, 14 Nov 2025 09:48:20 -0800 (PST)
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com. [209.85.208.42])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fed90c0sm431631266b.65.2025.11.14.09.48.18
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Nov 2025 09:48:18 -0800 (PST)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6406f3dcc66so3949984a12.3
+        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 09:48:18 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVaIN+k57nNRH8QScgnl8P5reY1+7/YWZHq86DClXDYNUAL3lp7zJOAqMPvzytkbO1FCKs=@vger.kernel.org
+X-Received: by 2002:a17:907:a0b:b0:b72:5e2c:9e97 with SMTP id
+ a640c23a62f3a-b7367b8b6bfmr305496966b.36.1763142498394; Fri, 14 Nov 2025
+ 09:48:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20251113005529.2494066-1-jon@nutanix.com> <CACGkMEtQZ3M-sERT2P8WV=82BuXCbBHeJX+zgxx+9X7OUTqi4g@mail.gmail.com>
+ <E1226897-C6D1-439C-AB3B-012F8C4A72DF@nutanix.com>
+In-Reply-To: <E1226897-C6D1-439C-AB3B-012F8C4A72DF@nutanix.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 14 Nov 2025 09:48:02 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whkVPGpfNFLnBv7YG__P4uGYWtG6AXLS5xGpjXGn8=orA@mail.gmail.com>
+X-Gm-Features: AWmQ_bk0jgyM9fIRt_Ee0fGAZtYocBkhM5AivJHg1mQmAcGyfeiZb7v3Ov-HW6k
+Message-ID: <CAHk-=whkVPGpfNFLnBv7YG__P4uGYWtG6AXLS5xGpjXGn8=orA@mail.gmail.com>
+Subject: Re: [PATCH net-next] vhost: use "checked" versions of get_user() and put_user()
+To: Jon Kohler <jon@nutanix.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 14 Nov 2025 15:53:33 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Fri, 14 Nov 2025 at 15:02, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Fri, 14 Nov 2025 14:20:46 +0000,
-> > Fuad Tabba <tabba@google.com> wrote:
-> > >
-> > > Hi Marc,
-> > >
-> > > On Sun, 9 Nov 2025 at 17:17, Marc Zyngier <maz@kernel.org> wrote:
-> > > >
-> > > > Now that we are ready to handle deactivation through ICV_DIR_EL1,
-> > > > set the trap bit if we have active interrupts outside of the LRs.
-> > > >
-> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > ---
-> > > >  arch/arm64/kvm/vgic/vgic-v3.c | 7 +++++++
-> > > >  1 file changed, 7 insertions(+)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > index 1026031f22ff9..26e17ed057f00 100644
-> > > > --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > @@ -42,6 +42,13 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
-> > > >                 ICH_HCR_EL2_VGrp0DIE : ICH_HCR_EL2_VGrp0EIE;
-> > > >         cpuif->vgic_hcr |= (cpuif->vgic_vmcr & ICH_VMCR_ENG1_MASK) ?
-> > > >                 ICH_HCR_EL2_VGrp1DIE : ICH_HCR_EL2_VGrp1EIE;
-> > > > +
-> > > > +       /*
-> > > > +        * Note that we set the trap irrespective of EOIMode, as that
-> > > > +        * can change behind our back without any warning...
-> > > > +        */
-> > > > +       if (irqs_active_outside_lrs(als))
-> > > > +               cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
-> > > >  }
-> > >
-> > > I just tested these patches as they are on kvmarm/next
-> > > 2ea7215187c5759fc5d277280e3095b350ca6a50 ("Merge branch
-> > > 'kvm-arm64/vgic-lr-overflow' into kvmarm/next"), without any
-> > > additional pKVM patches. I tried running it with pKVM (non-protected)
-> > > and with just plain nVHE. In both cases, I get a trap to EL2 (0x18)
-> > > when booting a non-protected guest, which triggers a bug in
-> > > handle_trap() arch/arm64/kvm/hyp/nvhe/hyp-main.c:706
-> > >
-> > > This trap is happening because of setting this particular trap (TDIR).
-> > > Just removing this trap from vgic_v3_configure_hcr() from the ToT on
-> > > kvmarm/next boots fine.
-> >
-> > This is surprising, as I'm not hitting this on actual HW. Are you
-> > getting a 0x18 trap? If so, is it coming from the host? Can you
-> > correlate the PC with what the host is doing?
-> 
-> I should have given you that earlier, sorry.
-> 
-> Yes, it's an 0x18 trap from the host (although it happens when I boot
-> a guest). Here is the relevant part of the backtrace addr2lined and
-> the full one below.
+On Fri, 14 Nov 2025 at 06:53, Jon Kohler <jon@nutanix.com> wrote:
 >
-> handle_percpu_devid_irq+0x90/0x120 (kernel/irq/chip.c:930)
-> generic_handle_domain_irq+0x40/0x64 (include/linux/irqdesc.h:?)
-> gic_handle_irq+0x4c/0x110 (include/linux/irqdesc.h:?)
-> call_on_irq_stack+0x30/0x48 (arch/arm64/kernel/entry.S:893)
-> 
-> [   28.454804] Code: d65f03c0 92800008 f9000008 17fffffa (d4210000)
-> [   28.454873] kvm [266]: Hyp Offset: 0xfff1205c3fe00000
-> [   28.455157] Kernel panic - not syncing: HYP panic:
-> [   28.455157] PS:204023c9 PC:000e5fa4413e39bc ESR:00000000f2000800
-> [   28.455157] FAR:ffff800082733d3c HPFAR:0000000000500000 PAR:0000000000000000
-
-I expect you have a write to ICC_DIR_EL1 at this address?
-
-> [   28.455157] VCPU:0000000000000000
-> [   28.459703] CPU: 5 UID: 0 PID: 266 Comm: kvm-vcpu-0 Not tainted
-> 6.18.0-rc3-g2ea7215187c5 #8 PREEMPT
-> [   28.460247] Hardware name: linux,dummy-virt (DT)
-> [   28.460615] Call trace:
-> [   28.460900]  show_stack+0x18/0x24 (C)
-> [   28.461234]  dump_stack_lvl+0x40/0x84
-> [   28.461421]  dump_stack+0x18/0x24
-> [   28.461566]  vpanic+0x11c/0x364
-> [   28.461698]  vpanic+0x0/0x364
-> [   28.461838]  nvhe_hyp_panic_handler+0x118/0x190
-> [   28.462056]  handle_percpu_devid_irq+0x90/0x120
-> [   28.462248]  handle_percpu_devid_irq+0x90/0x120
-> [   28.462439]  generic_handle_domain_irq+0x40/0x64
-> [   28.462643]  gic_handle_irq+0x4c/0x110
-> [   28.462814]  call_on_irq_stack+0x30/0x48
-> [   28.463003]  do_interrupt_handler+0x4c/0x6c
-> [   28.463184]  el1_interrupt+0x3c/0x60
-> [   28.463348]  el1h_64_irq_handler+0x18/0x24
-> [   28.463525]  el1h_64_irq+0x6c/0x70
-> [   28.463799]  local_daif_restore+0x8/0xc (P)
-> [   28.463980]  el0t_64_sync_handler+0x84/0x12c
-> [   28.464164]  el0t_64_sync+0x198/0x19c
-> 
-> > It would indicate that we are leaking trap bits on exit, and that QEMU
-> > is trapping ICC_DIR_EL1 on top of ICV_DIR_EL1 (which the HW I have
-> > access to doesn't seem to do).
+> > On Nov 12, 2025, at 8:09=E2=80=AFPM, Jason Wang <jasowang@redhat.com> w=
+rote:
 > >
-> > > I'm running this on QEMU with '-machine virt,gic-version=3 -cpu max'
-> > > and the kernel with 'kvm-arm.mode=protected' and with
-> > > 'kvm-arm.mode=nvhe'.
-> > >
-> > > Let me know if you need any more info or help testing.
-> >
-> > On top of the above, could you give the hack below a go? I haven't
-> > tested it at all (I'm in the middle of a bisect from hell...)
-> 
-> With the hack it boots, both nvhe and protected mode.
+> > It has been used even before this commit.
+>
+> Ah, thanks for the pointer. I=E2=80=99d have to go dig to find its genesi=
+s, but
+> its more to say, this existed prior to the LFENCE commit.
 
-OK. At least we know what the issue is, and it shouldn't be too hard
-to fix. I guess there is an opportunity for cleanup here, and I'll
-look into it shortly (probably not before Monday though).
+It might still be worth pointing out that the LFENCE is what made
+__get_user() and friends much slower, but the *real* issue is that
+__get_user() and friends became *pointless* before that due to SMAP.
 
-Thanks again,
+Because the whole - and only - point of the __get_user() interface is
+the historical issue of "it translates to a single load instruction
+and gets inlined".
 
-	M.
+So back in the dark ages before SMAP, a regular "get_user()" was a
+function call and maybe six instructions worth over code. But a
+"__get_user()" was inlined to be a single instruction, and the
+difference between the two was quite noticeable if you did things in a
+loop.
 
--- 
-Without deviation from the norm, progress is not possible.
+End result: we have a number of old historic __get_user() calls
+because people cared and it was noticeable.
+
+But then SMAP happens, and user space accesses aren't just a simple
+single load instruction, but a "enable user space access, do the
+access, then disable user space accesses" for safety and robustness
+reasons.
+
+That's actually true on non-x86 architectures too: on arm64 you also
+have TTBR0_PAN, and user space accesses can be quite the mess of
+instructions.
+
+And in that whole change, now __get_user() is not only no longer
+inlined, the performance advantage isn't relevant any more. Sure, it
+still avoided the user address space range check, but that check just
+is no longer relevant. It's a couple of (very cheap) instructions, but
+the big reason to use __get_user() has simply gone away. The real
+costs of user space accesses are elsewhere, and __get_user() and
+get_user() are basically the same performance in reality.
+
+But the historical uses of __get_user() remain, even though now they
+are pretty much pointless.
+
+Then LFENCE comes around due to the whole speculation issue, and
+initially __get_user() and get_user() *both* get it, and it only
+reinforces the whole "the address check is not the most expensive part
+of the operation" thing, but __get_user() is still technically a cycle
+or two faster.
+
+But then get_user() gets optimized to do the address space check using
+a data dependency instead of the "access_ok()" control dependency, and
+so get_user() doesn't need LFENCE at all, and now get_user() is
+*faster* than __get_user().
+
+End result: __get_user() has been a historical artifact for a long
+time. It's been discouraged because it's pointless. But with the
+LFENCE it's not only pointless, it's actively detrimental not just for
+safety but even for performance.
+
+So __get_user() should die. The LFENCE is not the primary reason it
+should be retired, it's only the last nail in the coffin.
+
+             Linus
 
