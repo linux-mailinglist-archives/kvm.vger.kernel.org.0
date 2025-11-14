@@ -1,96 +1,121 @@
-Return-Path: <kvm+bounces-63167-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63166-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8134C5AD75
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 01:49:49 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49FF6C5ADA8
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 01:53:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15E333AE2F8
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:48:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 249244F05FD
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 00:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6754D246335;
-	Fri, 14 Nov 2025 00:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85916163;
+	Fri, 14 Nov 2025 00:48:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g+0aVsWJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h3gxrIWF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADA61C28E
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 00:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201F521ADB7
+	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 00:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763081330; cv=none; b=V+A5S0gr2FNgGltThW5EmRVnhN6BRtBTm7r3ktc51unr8zMz/Kpiw9T3A1lhC7CG4FOCYv1cn6ZWvfRkTCdWJQlMkwjjLH2cIyeJwFVLeX16iupijcVwhStpELagkQ3DE8ikMLastW0brYP3tM/46j502Wxheg8X2H1U9FOqPbE=
+	t=1763081306; cv=none; b=hqHUxTYPV8hC8L6iI3g2TzA461Rt3RC9lvwk1lYfxCDZ6TZzNBtVuyGKbO8luqY9so7MlhmrsMQqaWou2sUNhi+zysYJAAUvM8xoNoqddZP5V4GnzyNSHiouR5bugUsAKYv1YKPDhoK4fpicPlnD2LhhWE7aKa3FavlazYQccuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763081330; c=relaxed/simple;
-	bh=/yxZzSCUr+WwcFJiPBAEvRAv6B+69x8f6/mrQo4lv3o=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RAcbDgUjKfhMTdNnpPbMlaxEYZzQStHxP8OBXwvtfmbVqKv7S4rtarz1syqKDaW0rF3VQMio5LOI6mam98c2sGFBaT9peXMgQFBgEk2v1I52v6HUYelIEnKXPl/FzGlmS9bF9TDIXzL2KC1Kukglb94AbEcAOC3rw4q9uZWoono=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g+0aVsWJ; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3437f0760daso3607581a91.1
-        for <kvm@vger.kernel.org>; Thu, 13 Nov 2025 16:48:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763081329; x=1763686129; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OU3M65yfjgAgQasfUOmEFLutB5uFULte4qGqRuq7ngY=;
-        b=g+0aVsWJAGa14ZpFkireedZkzknKebRiaXfxOYKuQQUobE+8zYLuTOlrlERBJlhjfq
-         QDzhAiMJoAFgGfgT94EsKanNJUbNPVLGQw94uZLLxJnfssfcCsXzg/rbpNWFBmeSNvjO
-         F89QkkCMoEMeZVHCYtBYyIHWE5p6ttZwLO6I5SvXWCPhBWC4BQ+Xwni/Yc54BnMr2RQ6
-         A39Ku4l7JQg71X+hqjku00VSA2G0z3hWsQ767nSJWabLbx9s4DRH7hw1g4rZ5CpJOotM
-         UaNlkiSYK9a/+d5vvPdVqGJzZRksDtrMnxOFzQ8EZQXVd9BTrDUMxmDOjwuTh43ZF8N3
-         o0KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763081329; x=1763686129;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OU3M65yfjgAgQasfUOmEFLutB5uFULte4qGqRuq7ngY=;
-        b=dUE+KFpcHpgfIdcaRP+YPeO9LGMCegUFdMLmPpW2Mg4YX8Lgom3v4uDOocKlzNVTu0
-         +bgVYm+CCCjIIbTHT82uiB0kKjNdh/cprG0MNS+aWQNiHvpNrH23myYJNPRf5yoRh1P+
-         kVoLKk40kZG/T0uZxDftiPQ12fGvmdyyYYR+Ubsq5gYweh9Hi6IOuxc7iELakd4wkQed
-         bDaG20eKWd+WJvo50NY56Z77K72JigtGtUOQ55Rw9QW4nCpUFMmCLBBc5tgLPLJi5E/o
-         IBaX6zHDOa4x9DvoFy5/rJt6bxLuntEcn4VnHlVuhfIYkePofqu4tsG32mPt66ESFLOY
-         h41g==
-X-Gm-Message-State: AOJu0Yz6Lul9mx2rGUQNs/kdt4QEJtSVhDhBaM5nZ5rE/DoUBd1WNaQO
-	E79dICIBDEzN7OV82AvuTeu/YaGU7FvLpZ6nd5nty+6lCUdapBsJy0X8yFbqWkO7qTlXU0zIvg3
-	RgalD4g==
-X-Google-Smtp-Source: AGHT+IEmAPQT/T7JzDVscIDI618GNw3PpC2N6GbhIE3cHYhn/zzHxtmhKTIewdI4dUzp/ZFrLjSmG34NgU0=
-X-Received: from pjbgc20.prod.google.com ([2002:a17:90b:3114:b0:340:bb32:f5cf])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a45:b0:340:d569:d295
- with SMTP id 98e67ed59e1d1-343fa62fbb3mr1416586a91.24.1763081328657; Thu, 13
- Nov 2025 16:48:48 -0800 (PST)
-Date: Thu, 13 Nov 2025 16:46:17 -0800
-In-Reply-To: <20251106205114.218226-1-seanjc@google.com>
+	s=arc-20240116; t=1763081306; c=relaxed/simple;
+	bh=a4QXijgvqBr7v4vZWfQe+sv6VTbjhHi8C7mLEuG5cBU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AqAyJDtryTIVrXDKAZqWb1EPYL/kQ/sF9GJT1OMTaeyUtfFKWCWK6Tq0b+dfblbYoeHeFTfVC2XDeaPuAN4h8/8uBHWKl+dI8enK8oyCAONXgex8RLlPrdWkdUDOf7y3Ls1ESM9fK0gzwHZ4txSpCvXZ8U/QFKbAzXLVBrBiY+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h3gxrIWF; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 14 Nov 2025 00:47:19 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763081301;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=awKBPmBE8+R/sDQQkpEY6ofOBRFl9vt/VG/aDp1ugu4=;
+	b=h3gxrIWF52TyPo2koaQbr3Mfw0YXsHHTczzQIaZthqET6fN4gEQu+OLreabU5f2XZq4wDF
+	hRlR6n91P+cwfu8632R5AgqZKJ/qe3NPrUoxxpGI3QIIaeqqdnkiq6U18jjOKeKv+vjShB
+	Cfev1W5EulwqNkBITaSI6l2W/OxLu/E=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Cheng <chengkev@google.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 02/14] x86/vmx: Skip vmx_pf_exception_test_fep early
+ if FEP is not available
+Message-ID: <axcelxpkwmqht3lq7gpmp4idkcyujyr4jjtf5gh5usp7gxnl3v@rxckldu4iup7>
+References: <20251110232642.633672-1-yosry.ahmed@linux.dev>
+ <20251110232642.633672-3-yosry.ahmed@linux.dev>
+ <aRZ6bM_yVo9-zyDT@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251106205114.218226-1-seanjc@google.com>
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <176305662913.1602433.2540496540311423211.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: VMX: Make loaded_vmcs_clear() static in vmx.c
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aRZ6bM_yVo9-zyDT@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 06 Nov 2025 12:51:14 -0800, Sean Christopherson wrote:
-> Make loaded_vmcs_clear() local to vmx.c as there are no longer any
-> external callers.
+On Thu, Nov 13, 2025 at 04:40:12PM -0800, Sean Christopherson wrote:
+> On Mon, Nov 10, 2025, Yosry Ahmed wrote:
+> > The check to skip the test is currently performed in the guest code.
+> > There a few TEST_ASSERTs that happen before the guest is run, which
+> > internally call report_passed(). The latter increases the number of
+> > passed tests.
+> > 
+> > Hence, when vmx_pf_exception_test_fep is run, report_summary() does not
+> > return a "skip" error code because the total number of tests is larger
+> > than the number of skipped tests.
+> > 
+> > Skip early if FEP is not available, before any assertions, such that
+> > report_summary() finds exactly 1 skipped test and returns the
+> > appropriate error code.
+> > 
+> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > ---
+> >  x86/vmx_tests.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> > index 0b3cfe50c6142..4f214ebdbe1d9 100644
+> > --- a/x86/vmx_tests.c
+> > +++ b/x86/vmx_tests.c
+> > @@ -10644,7 +10644,10 @@ static void vmx_pf_exception_test(void)
+> >  
+> >  static void vmx_pf_exception_forced_emulation_test(void)
+> >  {
+> > -	__vmx_pf_exception_test(NULL, NULL, vmx_pf_exception_forced_emulation_test_guest);
+> > +	if (is_fep_available)
+> > +		__vmx_pf_exception_test(NULL, NULL, vmx_pf_exception_forced_emulation_test_guest);
+> > +	else
+> > +		report_skip("Forced emulation prefix (FEP) not available\n");
 > 
-> No functional change intended.
+> To be consistent with other tests, and the kernel's general pattern of:
+> 
+> 	if (<error>) {
+> 		<react>
+> 		return;
+> 	}
+> 
+> 	<do useful stuff>
+> 
+> I'll tweak this to
+> 
+> 	if (!is_fep_available) {
+> 		report_skip("Forced emulation prefix (FEP) not available\n");
+> 		return;
+> 	}
+> 
+> 	__vmx_pf_exception_test(NULL, NULL, vmx_pf_exception_forced_emulation_test_guest);
+> 
+> when applying.
 
-Applied to kvm-x86 vmx, thanks!
-
-[1/1] KVM: VMX: Make loaded_vmcs_clear() static in vmx.c
-      https://github.com/kvm-x86/linux/commit/dfd1572a64c9
-
---
-https://github.com/kvm-x86/linux/tree/next
+LGTM, thanks!
 
