@@ -1,150 +1,195 @@
-Return-Path: <kvm+bounces-63208-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63209-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D21EC5D93A
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 15:27:30 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5640BC5DB52
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 15:59:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 36A234EC394
-	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 14:21:33 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0553D355DF0
+	for <lists+kvm@lfdr.de>; Fri, 14 Nov 2025 14:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA0C32470A;
-	Fri, 14 Nov 2025 14:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256593203B5;
+	Fri, 14 Nov 2025 14:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MH3t1hp2"
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="q73BjU05"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.42.203.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D29E320A38
-	for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 14:21:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA421D90AD;
+	Fri, 14 Nov 2025 14:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.42.203.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763130086; cv=none; b=AAsm9IQq/vqve0K1vV/YxWvQNlMIswG1bn3L08m5dT+Qp1DVbfQgQgRx4kkrz4jPgSDxLb4/7JLZQmSIZmWc49BhA4nKoBeGVX4uKY3WZ48fvbAcnEOYAVEeD0KyYTNIByXLXBuJWqTUL4ImoBiqzCoh+ue/QTsMpiLGaTaBN6o=
+	t=1763131157; cv=none; b=AqB6EnToIDncJ8W1b+H5o0QVSxNi7LQL3y1+PECFalbNKzCFb9E6SJCX7rweeIoww3jL3sFyyrxjCwZodW925POUIf4vXo7mifqC7IfeDGp9BH5k7JEZ87W+QMMDUuCTPp9f2d3ZodWSRRGUfQitsPe5b03EtC1GDmEleNEKC+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763130086; c=relaxed/simple;
-	bh=CRbKex889t15hNnEaJZ2L2WSxzJx+xzomjJ8renljCA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d/oZXRvcpj5FQzjObyuuPaw4cm3DeVzytUNzx0mFC/kwC0yy4uR2KgJ8uFmKS2T+zqXb4fs2rHNNIdQ9mEw96M8liKrDoB4UTOazy/XqUxC/dazW1k89CobcPVC1O8YcPLPc1JFzpmv20KIq366CweCJqE33MT1iekZXTYufoGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MH3t1hp2; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ede12521d4so298781cf.1
-        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 06:21:24 -0800 (PST)
+	s=arc-20240116; t=1763131157; c=relaxed/simple;
+	bh=NGFFU+LKpCz9295CO6ZOvL2+UNvHNkjvPJl3mMW4TF8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XmreyV/0UttddXP9qMdV/X3nzuKnMCPKAW0efh7wMjjT2TJWul2siMskAbqFLtxoR7gyIdc6pwt8VWfiDeh9uKyT3RxDyx1eeDVSlDwmHcEwHZzg0DnW9miAJ2wVT53rl4GxGpiVyMMtAkmcm1SHpOPXZl/R/FITVN8jeKdtqmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=q73BjU05; arc=none smtp.client-ip=52.42.203.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763130083; x=1763734883; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=iebc9wAbiB5E5IOqak411hyeSp97Jf8NhK9FIOstGQ4=;
-        b=MH3t1hp25nh3VeAzi7vIWsyB3FV80OTcOyRErIs/uWAzRmCvjNz3elzW58gO1lkBxf
-         u8BxPftE5D2AZGdTEe6CEFz/0FaLZP9H85xh/qSQTJV4t8X0qXisgfFmmTkkLjhGafOk
-         bQcha5eDPL6vOSQfb4BKJv36zRBDn/3y/fX8Na9/AOh0Q6B5IMzzK79U++p7IC9EHPfK
-         Vke55TwXRkINT/JCQ71FDj5UMEINETlA5hGi5VcSm0eVzGYkp9ofKfb4toP9DLoark2T
-         Ad4VixExe67UNj3wNHK1J3zf+XX6KZhU/ygbyOLwib81FeOYNvxpwIdj2xuRFk0q9HMj
-         dV9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763130083; x=1763734883;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iebc9wAbiB5E5IOqak411hyeSp97Jf8NhK9FIOstGQ4=;
-        b=lTBQsQtGzbPT2UZsmTE1qlrjW4a8FwPxF0bHtU2fCvf3lIMovG+VJgedyeERDgoY7z
-         eoaYVEGMxNSvXtapyls/+bM/AaX/6Qhx37KFF76LB6Iyu46837GrEikup2q57KMk0AVy
-         hjJ0zozDM5uqYv37jhHU4jKxYaHr/GWBacQFiataflLqhlI8vbNNeWtWH4CnsLjk8ioX
-         /xV+CCgBq7hqkfcsOs1j8BPAmUvhYGY1FpEdXv/p3f8IyOe94qr35t73ZPXrACIu/E4+
-         AcADoSfR99T+MowvxI3DKNNAWqdM5kS+f/p58YQOaLmtZEFNErGdKJd828V7eMeoRFPg
-         Uyvw==
-X-Forwarded-Encrypted: i=1; AJvYcCUliEID4W5p4yCi0HgBxvr3yyCkvLZnqqNn6pE0gl3r2qacRPqbwgJRz1uvyLfuaZ59KIk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqfM3wKQj1KxV7Ww3op61vkrvbIkDXTKp4sVSX3pf7XWbZzG6A
-	yqCP8f4iHWrBe8vx0ajJB5VS0/C4chHIEiOq8LQMdvHfoYgIID1mXz9wz7A5vWpWCc0LM1U5GbC
-	NpSNm7KYFNJRcAG9U3eBnI8eDeSP/v23UKk15TXg2
-X-Gm-Gg: ASbGncsY7icVAMIOml3pwAn1hGqq48JQKmZ/ayDKmL3eMxsk/UxzSWEjFmUivEwzAwZ
-	k469RSQbaabNnIYvff220rReefC3xqneoalhNxU0jl4i/IQxWJZ0Ne0qU/WnZNk+HT1Tw1BI+T6
-	oQO/y2y8Db5KK3wtb7xrRodsKL9MuwASfoGJXd991amnSQu/BkmzmrlOCEuU+DoIyrNg55B0sDi
-	V/Dlck6n5CoorLm0cAxzoAOA/tC/3FJ3ttFmwJpcDgCM9nam7sDA1XIcy1/ISeGyiMQ2QKN8b1R
-	x7VlVTCrCBel52IO
-X-Google-Smtp-Source: AGHT+IE5Oe19RaLFBsVRY5odgzBmRaaiSdzxsgMGjxiUojw4mI94n9CHnCtVAFThAGs6iI94m/QfSBQkFZ6pjRXMhQg=
-X-Received: by 2002:ac8:580f:0:b0:4e5:7827:f4b9 with SMTP id
- d75a77b69052e-4edf47135camr5213031cf.3.1763130082793; Fri, 14 Nov 2025
- 06:21:22 -0800 (PST)
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1763131155; x=1794667155;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tuugdbs4qPrYJbDgPmXQJ06XmUfS38Y/AWsXOl8uN2E=;
+  b=q73BjU05PE7oFnpkPPHtk/njk15Q6DlnUWPIW+SovLHJHH/JSUlrS113
+   /q2sOOhuPW7a0+mY3RI4D34gAOFa6ckezIZhwcWwsMEtcb4qN2BcmAAyI
+   hHC5+3BxMjml6rpIapQaQAKkk60QmMlWyaWTPpm4haxFqB3vB10KZIJRi
+   9pMQNmWnhINtuyQ4XC9HycLnbAgU25EorSfq7rWeF1HtxgX0GEiIvv5ar
+   PsX0GkfzUlKeII8B8cfD3WeiIiq1WpTLXJZqCkha8wKK0hIVaD8Svxt1a
+   NKR8ZBN5ZcE30RE9Pe/Y62gwPDn5UnEgQqVDwUAXRUBIt7Pui/5O4vsmk
+   A==;
+X-CSE-ConnectionGUID: o5a+tyeIR5G2RJUtFkkssQ==
+X-CSE-MsgGUID: YR9i1iJSQ9qI4StgXjCJZw==
+X-IronPort-AV: E=Sophos;i="6.19,305,1754956800"; 
+   d="scan'208";a="7112465"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 14:39:12 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.51:4363]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.62.84:2525] with esmtp (Farcaster)
+ id f4ae6c68-9432-4b5a-b747-c7b52eb56619; Fri, 14 Nov 2025 14:39:12 +0000 (UTC)
+X-Farcaster-Flow-ID: f4ae6c68-9432-4b5a-b747-c7b52eb56619
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Fri, 14 Nov 2025 14:39:12 +0000
+Received: from amazon.com (10.1.212.32) by EX19D001UWA001.ant.amazon.com
+ (10.13.138.214) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Fri, 14 Nov 2025
+ 14:39:09 +0000
+From: Maximilian Dittgen <mdittgen@amazon.de>
+To: <maz@kernel.org>, <oliver.upton@linux.dev>
+CC: <pbonzini@redhat.com>, <shuah@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-kselftest@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<mdittgen@amazon.de>, <lilitj@amazon.de>, <nh-open-source@amazon.com>
+Subject: [PATCH] KVM: selftests: Add SYNC after guest ITS setup in vgic_lpi_stress
+Date: Fri, 14 Nov 2025 15:39:02 +0100
+Message-ID: <20251114143902.30435-1-mdittgen@amazon.de>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251109171619.1507205-1-maz@kernel.org> <20251109171619.1507205-30-maz@kernel.org>
-In-Reply-To: <20251109171619.1507205-30-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 14 Nov 2025 14:20:46 +0000
-X-Gm-Features: AWmQ_bkph9z6RWKdMnig0aZ2huiMgSjHMys0UY_nuIP5-xDzsPT50bNsv9UL6s8
-Message-ID: <CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
-Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when
- interrupts overflow LR capacity
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>, Yao Yuan <yaoyuan@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
+X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-Hi Marc,
+vgic_lpi_stress sends MAPTI and MAPC commands during guest GIC
+setup to map interrupt events to ITT entries and collection IDs
+to redistributors, respectively.
 
-On Sun, 9 Nov 2025 at 17:17, Marc Zyngier <maz@kernel.org> wrote:
->
-> Now that we are ready to handle deactivation through ICV_DIR_EL1,
-> set the trap bit if we have active interrupts outside of the LRs.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/vgic/vgic-v3.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 1026031f22ff9..26e17ed057f00 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -42,6 +42,13 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
->                 ICH_HCR_EL2_VGrp0DIE : ICH_HCR_EL2_VGrp0EIE;
->         cpuif->vgic_hcr |= (cpuif->vgic_vmcr & ICH_VMCR_ENG1_MASK) ?
->                 ICH_HCR_EL2_VGrp1DIE : ICH_HCR_EL2_VGrp1EIE;
-> +
-> +       /*
-> +        * Note that we set the trap irrespective of EOIMode, as that
-> +        * can change behind our back without any warning...
-> +        */
-> +       if (irqs_active_outside_lrs(als))
-> +               cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
->  }
+Theoretically, we have no guarantee that the ITS will
+finish handling these mapping commands before the selftest
+calls KVM_SIGNAL_MSI to inject LPIs to the guest. If LPIs
+are injected before ITS mapping completes, the ITS cannot
+properly pass the interrupt on to the redistributor.
 
-I just tested these patches as they are on kvmarm/next
-2ea7215187c5759fc5d277280e3095b350ca6a50 ("Merge branch
-'kvm-arm64/vgic-lr-overflow' into kvmarm/next"), without any
-additional pKVM patches. I tried running it with pKVM (non-protected)
-and with just plain nVHE. In both cases, I get a trap to EL2 (0x18)
-when booting a non-protected guest, which triggers a bug in
-handle_trap() arch/arm64/kvm/hyp/nvhe/hyp-main.c:706
+In practice, KVM processes ITS commands synchronously, so
+SYNC calls are functionally unnecessary and ignored in
+vgic_its_handle_command().
 
-This trap is happening because of setting this particular trap (TDIR).
-Just removing this trap from vgic_v3_configure_hcr() from the ToT on
-kvmarm/next boots fine.
+However, selftests should test based on ARM specification and
+be blind to KVM-specific implementation optimizations. Thus,
+we must update the test to be architecturally compliant and
+logically correct.
 
-I'm running this on QEMU with '-machine virt,gic-version=3 -cpu max'
-and the kernel with 'kvm-arm.mode=protected' and with
-'kvm-arm.mode=nvhe'.
+Fix by adding a SYNC command to the selftests ITS library,
+then calling SYNC after ITS mapping to ensure mapping
+completes before signal_lpi() writes to GITS_TRANSLATER.
 
-Let me know if you need any more info or help testing.
+This patch depends on commit a24f7afce048 ("KVM: selftests:
+fix MAPC RDbase target formatting in vgic_lpi_stress"), which
+is queued in kvmarm/fixes.
 
-Cheers,
-/fuad
+Signed-off-by: Maximilian Dittgen <mdittgen@amazon.de>
+---
+Validated by the following debug logging to the GITS_CMD_SYNC handler
+in vgic_its_handle_command():
+
+        kvm_info("ITS SYNC command: %016llx %016llx %016llx %016llx\n",
+            its_cmd[0], its_cmd[1], its_cmd[2], its_cmd[3]);
+
+Initialized a selftest guest with 4 vCPUs by:
+
+        ./vgic_lpi_stress -v 4
+
+Confirmed that an ITS SYNC was successfully called for all 4 vCPUs:
+
+        kvm [5094]: ITS SYNC command: 0000000000000005 0000000000000000 0000000000000000 0000000000000000
+        kvm [5094]: ITS SYNC command: 0000000000000005 0000000000000000 0000000000010000 0000000000000000
+        kvm [5094]: ITS SYNC command: 0000000000000005 0000000000000000 0000000000020000 0000000000000000
+        kvm [5094]: ITS SYNC command: 0000000000000005 0000000000000000 0000000000030000 0000000000000000
+---
+ tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c   |  4 ++++
+ .../testing/selftests/kvm/include/arm64/gic_v3_its.h  |  1 +
+ tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c    | 11 +++++++++++
+ 3 files changed, 16 insertions(+)
+
+diff --git a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
+index 687d04463983..e857a605f577 100644
+--- a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
++++ b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
+@@ -118,6 +118,10 @@ static void guest_setup_gic(void)
+ 
+ 	guest_setup_its_mappings();
+ 	guest_invalidate_all_rdists();
++
++	/* SYNC to ensure ITS setup is complete */
++	for (cpuid = 0; cpuid < test_data.nr_cpus; cpuid++)
++		its_send_sync_cmd(test_data.cmdq_base_va, cpuid);
+ }
+ 
+ static void guest_code(size_t nr_lpis)
+diff --git a/tools/testing/selftests/kvm/include/arm64/gic_v3_its.h b/tools/testing/selftests/kvm/include/arm64/gic_v3_its.h
+index 3722ed9c8f96..58feef3eb386 100644
+--- a/tools/testing/selftests/kvm/include/arm64/gic_v3_its.h
++++ b/tools/testing/selftests/kvm/include/arm64/gic_v3_its.h
+@@ -15,5 +15,6 @@ void its_send_mapc_cmd(void *cmdq_base, u32 vcpu_id, u32 collection_id, bool val
+ void its_send_mapti_cmd(void *cmdq_base, u32 device_id, u32 event_id,
+ 			u32 collection_id, u32 intid);
+ void its_send_invall_cmd(void *cmdq_base, u32 collection_id);
++void its_send_sync_cmd(void *cmdq_base, u32 vcpu_id);
+ 
+ #endif // __SELFTESTS_GIC_V3_ITS_H__
+diff --git a/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c b/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c
+index 0e2f8ed90f30..d9ee331074ea 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c
++++ b/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c
+@@ -253,3 +253,14 @@ void its_send_invall_cmd(void *cmdq_base, u32 collection_id)
+ 
+ 	its_send_cmd(cmdq_base, &cmd);
+ }
++
++void its_send_sync_cmd(void *cmdq_base, u32 vcpu_id)
++{
++	struct its_cmd_block cmd = {};
++
++	its_encode_cmd(&cmd, GITS_CMD_SYNC);
++	its_encode_target(&cmd, procnum_to_rdbase(vcpu_id));
++
++	its_send_cmd(cmdq_base, &cmd);
++}
++
+-- 
+2.50.1 (Apple Git-155)
 
 
->  static bool lr_signals_eoi_mi(u64 lr_val)
-> --
-> 2.47.3
->
->
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Christof Hellmis
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
+
 
