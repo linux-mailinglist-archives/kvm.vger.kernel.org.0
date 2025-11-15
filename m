@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-63284-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63285-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2194C60011
-	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 05:57:09 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E85A5C60018
+	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 06:09:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCA2D3BA50F
-	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 04:57:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B346E4E10A5
+	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 05:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F78119F137;
-	Sat, 15 Nov 2025 04:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E564B1ACDFD;
+	Sat, 15 Nov 2025 05:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="Z+quzMak"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="Nr1KZ8IK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A49527732
-	for <kvm@vger.kernel.org>; Sat, 15 Nov 2025 04:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5431B35CBC5
+	for <kvm@vger.kernel.org>; Sat, 15 Nov 2025 05:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763182621; cv=none; b=lOa378qxjfBRt4dzKCOER0Ki2MXll/R+r31mL0uHKsn/JRX2BFc/mtLeaPezHWBpvU/HkNNo5sew8zAWt9Z5uTcf25Z3aJ79IUj5mB0xjI2w4bphTPjjbvYwFQQXlYZKrX15NxaSy9z/VafW8Mb+gwBk+sH+dS0xMNlQoYh6/Us=
+	t=1763183382; cv=none; b=WpabK+iNwIfJZ0F9dvG0kFNO6kS2oVufCwOcxq+phpDP1EwuyXH0ELJeCPyi5oR8MRJRmoR5ilBXDYERALsYdQV9Ix2ztXtYluYcJz6sLRyz0+9c6DKHTmmbzuFaE4Fk318Exva/bwCxPE5ShxpZjQ9VSHrMveQccpTVLr6KCz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763182621; c=relaxed/simple;
-	bh=Ue8W9wz7bNY1Oxv+sfUYzlidX9qH9jMkO/z1LnNKOhM=;
+	s=arc-20240116; t=1763183382; c=relaxed/simple;
+	bh=Y5l4LXuIo9Ut8kD4BxdTLUvk9B10HCXPkbcL3moAxR0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gF2/FdACtUglXXCkTa3ynKqvSbePMMlcyWHK8QnvZ+Pdckr0Ztxn49upWjSC224KtJsCMYM5+I/9e2o38MjTdUeZNVszR5108q2tBxBwWhDui5dwK7eJ5Vix4RGzPrVRpKXaY7Il2EEDkf/SjYM46jm4pUuIgvmW0mf1KHe40/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=Z+quzMak; arc=none smtp.client-ip=209.85.128.53
+	 In-Reply-To:Content-Type; b=Bg2k5eqRrv3iwQNCtmd58ocV49bSSfOTRWO0Yh2N5eMJH0M3QxeK8uNH43BDFUZCjyc/r6l3C7AbToSYVhFrMgLFJVPSOoMsIHalgu1GcA7T7OzZZt2XxDQwmJulh5iCS4jWfWVx6bG4BQK87/wYBl8DhNFLQdPRQGwm/SiydFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=Nr1KZ8IK; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4775ae77516so28838205e9.1
-        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 20:56:59 -0800 (PST)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-429c8632fcbso1822825f8f.1
+        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 21:09:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1763182618; x=1763787418; darn=vger.kernel.org;
+        d=grsecurity.net; s=grsec; t=1763183379; x=1763788179; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yQ5s1rExmV8qLnvUKMhTxOfSSYufGuTPKFcxFC9k02U=;
-        b=Z+quzMakKvoiUhDyzjVDlqMDQWT23wJlP9VXRGjj4YM+CuZuZefm7QpPezf/Jkk7dM
-         TID+0rXHVLjNe8OueBhO2k6gxIxqfABIIaVt2xaptyTu095lRZQFWD+Qc4siplom9/G0
-         qqBAsPLlxbojwfmAmC58UKriXzNCApK2XMh2Br/WV4l2rnmtqBeg06LEDDujTMSuHPUX
-         ggBfNKoi1k7YsUhtJkOlflsZVQfQwkhvh3jBX5v/IF/PfZjtWNJ/PnqU/sylJLMS+G0f
-         k+JHfLAaym6G13YjGnCOSb2jE2unPtnP+v/ODuvmG0XhJhYU1YxjdB+PbvyHww/mx2Oq
-         fwoA==
+        bh=2SM8vJaCP6gM3RIX0En3VS26T9A8FE5y76lajobq/KE=;
+        b=Nr1KZ8IKzLap3x1gY15RyHMxhu3Jsn95gyOvyEdiJGK/kiMk4P7/ViIYIXMUy/vVUq
+         B5CiQIt2piRL/SzNMOhc4HC/UW94Wkm+UkabRWUnJWMwPffMew3aByOy/bcbe3th3QvK
+         HZl2B29PWtcSbJom7JPyoMytpNO8VcIIinkOhzF2A2OSBbPENzC4NnxRItiBIFXXABbC
+         gXOdgR4XTGNgWGk8OOY0z7HcZoSVYXwDBBVdTvXwwjdDzC3wqd+Y7jj3fsNKjKMrs3Dy
+         GfOf0cpPPpJ2mW7dV2s8UcIcRfTlVaCiCkiltSedwE+rjYWhjKtshMFFc5voNSGAx18R
+         BSFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763182618; x=1763787418;
+        d=1e100.net; s=20230601; t=1763183379; x=1763788179;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yQ5s1rExmV8qLnvUKMhTxOfSSYufGuTPKFcxFC9k02U=;
-        b=qkKFNjt9d9xQw0rH9w/3TnuqyMpq2HsM1uL7um6V5E4mB9YCXRdhftcA4N6xWFYJau
-         CkLv1BUhruAaS+nV4aq3IILKlU+NweEVYqL1z8O3zMlvTCeiBQDM/MjXsBUMoGJbn5z5
-         63OgPx54A1xUAbxs2EZnigFT9d2/BgVg+r3tipcx3gqAvLBUZNU+Rj8H1j+rvfi2158D
-         Rnl6nBXhBdGGEHHvkU3PswOOKoC2Q0FlsnmhmeATmxINuuauTCYLSffmUOWoUqTcO+vd
-         PSJoroqwqwb7Ws16bbws3U7lecHcwkezJS9ypyX03WGCuazwqe0f+bvd4TQDlAahtceq
-         JL5A==
-X-Gm-Message-State: AOJu0Yw0jHw26CkcHQOtrBkT8Pfzb/REwQZkfhK0g5vVGxi1cMfY0lrc
-	YOtd6qOk+/uw6oUaFtbtCm693+WYrLy2ebvVn8462TO7h5t5Lv3yo4zy81E57WTi9L0=
-X-Gm-Gg: ASbGncuKOzgGdkKaoBUy7NhaBBEiePW21Sk/OY2sgugy1i/1wv57eV+h6opcsAMM0eX
-	6Wd2HqzkMqmflsmPK8lSbyUEGW6KksY2m+mIweNZLdPTbrhUtEHWG7aQslhVYOTVRxHg/WWidWV
-	ZoECOQbz1116TGNQwCD3xfzdRKzF73/G3EdzZEj4hWWgrKrRJo77juvL8uP/iG2QoMK5XhfXpIr
-	gAzTRQBYIhEitXe1jRJqv5JlBYQ3oOQD9PP3hDIoj6/aMzoIOhk75UQiYzGgIVcFrE5pfnjigAR
-	2TbEXAUsTzcjcY2rQ3FAmkb5FwkXbrmYIUltWqznlWirMnrwotNwjWyJ7A0Ne+X/Sgruc+pEzeA
-	NFef2Ifwh7xxuAH89W5ZbNRFmX+oKnXgZyi4mMMGOoKVesBYIkfxHG9MM3mEoW+NE0NMCKsc2As
-	5ho88yQNpF8q4MXQOkt54INNEe5lCiRQIImmNLJsQFK6XKwj3EF3ov4l1foHO6ypZi+fEexi6k0
-	2ewhY3cQkLPKTGsSB6k8vDvR3bdqLBNALPir4U+wlsuqg==
-X-Google-Smtp-Source: AGHT+IFfYKxHq+8CrgTHwrllYhNaYxZwba+UfoQ7YL1zovfcPCVBHzTrJpu7J+qt7oExABqAqeDw0w==
-X-Received: by 2002:a05:600c:3586:b0:477:7b16:5f87 with SMTP id 5b1f17b1804b1-4778fe121famr55216465e9.0.1763182617554;
-        Fri, 14 Nov 2025 20:56:57 -0800 (PST)
+        bh=2SM8vJaCP6gM3RIX0En3VS26T9A8FE5y76lajobq/KE=;
+        b=r1YK7Opw5EMhbSEAMTl4GXqauM6Nwdh41RAPG4Jqdq2dkfc7k+B9xKUmIDukGZtFZs
+         iiJFGIohqt5Y1F7CztmKSPvQ3ylHI2cz3G/qfucLKrViXic+DKtpRnBULtOHddO5QjWp
+         flOOjSnLfZsJqqLzIH/lTcVXqoKxha+C0UQmHXSk30DHT9iUnxwQdvwk0gXagifLP5ck
+         L7kBJJC6zhfLhjrtVww5b9JjCdR6N2g/HHruNvJ2xc5I2hhZ9srbZ+GuNihLDLbaIzBV
+         Lg2NALSQJOK1nMgdMbFalNTiSKB6FwDIadXFFBqvfeBVWln/WX7a8TLTcU/1iEJ6UgAl
+         mtUg==
+X-Gm-Message-State: AOJu0Yx6RZsaxasYskp++iqxWUMieuG+BDY6u2bPHPl0oPTbgKBGUZ0N
+	spxYGAtjpYSW4RLAHaSW5iEbjMmBkTiderKe1WQoZP1xciZa7G+U4TbqERKMc2qB8Xw=
+X-Gm-Gg: ASbGncvgQtxWUJQdmkcBVahv1qafKCUdAJNXsz5RObf9GUho/AlD7o/X2vfT9Bey4hR
+	Snbsf8PE0kFXoFrfwEHPAMA1c3Wx6e0a8eVpruvPYPTx7YnlkKUXzh8yCypEMrcxEGfhgCnN8O8
+	ESQCfQKS5q04hDe/sfz6QPGa23Shj7iSzwtzTQSzvOO4W5KNExmllVn0xarkTK1nhAhHIJj5uwE
+	755yCf2Kn9GHSjf0cVTPYuOt1Tnu4wRIcVyz2nvSBpclDimccJb0eq8n8eBBYe3gb17VlZU9UF3
+	8EW1Ql1nFyl+boP8emGlgXe4mIFuKDAlqev2PSUvOoKDs9mkXEU298plIeqfl/9laTX2y+m6vMf
+	xTX6g4z49lEOcif7/reXiDUC0ofBA7cvPhP8JPNjO4Px5LNg9jmzjW+xN7DGY/JhUsCIXEB8HGf
+	ab5u4suud3b+P26nevvcfcu/VIWRVEKpXG0JHC4mqaYQ2T3SPmK8k2hmIjN3FKC1cq2UDdu4ofU
+	BqB7YYPULKM6UOEJDykZh2AH4v27/0b0Kc=
+X-Google-Smtp-Source: AGHT+IFA6Ht5Z3LA0vnNN3PteOmWcpqypx7ObBpK936IWzAZs4muXPzNKwLVRBN6h4UjoM3G0gqCRA==
+X-Received: by 2002:a5d:5885:0:b0:42b:3bc4:16c9 with SMTP id ffacd0b85a97d-42b59373ee4mr4642971f8f.51.1763183378686;
+        Fri, 14 Nov 2025 21:09:38 -0800 (PST)
 Received: from ?IPV6:2003:fa:af29:b100:e8b2:7dbf:b11:65fc? (p200300faaf29b100e8b27dbf0b1165fc.dip0.t-ipconnect.de. [2003:fa:af29:b100:e8b2:7dbf:b11:65fc])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477975022ecsm23159855e9.4.2025.11.14.20.56.56
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f174afsm13496601f8f.33.2025.11.14.21.09.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Nov 2025 20:56:57 -0800 (PST)
-Message-ID: <15788499-87c6-4e57-b3ae-86d3cc61a278@grsecurity.net>
-Date: Sat, 15 Nov 2025 05:56:57 +0100
+        Fri, 14 Nov 2025 21:09:38 -0800 (PST)
+Message-ID: <7d84127d-f7ee-435f-8a77-923b74a695a6@grsecurity.net>
+Date: Sat, 15 Nov 2025 06:09:38 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,15 +84,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf
- functions
+Subject: Re: [kvm-unit-tests PATCH v3 01/17] x86/run_in_user: Add an "end
+ branch" marker on the user_mode destination
 To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Andrew Jones <andrew.jones@linux.dev>, Eric Auger <eric.auger@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20250915215432.362444-1-minipli@grsecurity.net>
- <176314469132.1828515.1099412303366772472.b4-ty@google.com>
+Cc: kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20251114001258.1717007-1-seanjc@google.com>
+ <20251114001258.1717007-2-seanjc@google.com>
+ <dbe12f67-79d0-4d92-b510-56f32401e330@grsecurity.net>
+ <aReVN65Tgaanqd_l@google.com>
 Content-Language: en-US, de-DE
 From: Mathias Krause <minipli@grsecurity.net>
 Autocrypt: addr=minipli@grsecurity.net; keydata=
@@ -129,42 +129,85 @@ Autocrypt: addr=minipli@grsecurity.net; keydata=
  zz3lozuC5nsm1nIbY62mR25Kikx7N6uL7TAZQWazURzVRe1xq2MqcF+18JTDdjzn53PEbg7L
  VeNDGqQ5lJk+rATW2VAy8zasP2/aqCPmSjlCogC6vgCot9mj+lmMkRUxspxCHDEms13K41tH
  RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <176314469132.1828515.1099412303366772472.b4-ty@google.com>
+In-Reply-To: <aReVN65Tgaanqd_l@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 14.11.25 19:25, Sean Christopherson wrote:
-> On Mon, 15 Sep 2025 23:54:28 +0200, Mathias Krause wrote:
->> This is v2 of [1], trying to enhance backtraces involving leaf
->> functions.
->>
->> This version fixes backtraces on ARM and ARM64 as well, as ARM currently
->> fails hard for leaf functions lacking a proper stack frame setup, making
->> it dereference invalid pointers. ARM64 just skips frames, much like x86
->> does.
->>
+On 14.11.25 21:46, Sean Christopherson wrote:
+> On Fri, Nov 14, 2025, Mathias Krause wrote:
 >> [...]
+>>
+>> Attached is a patch on top of [1] that does that but is, admitted, a
+>> little hacky and evolved. However, it shows that above ENDBR64 is, in
+>> fact, not needed.
 > 
-> Applied to kvm-x86 next, thanks!
+> You say hacky, I say clever and correct. :-)
+> 
+>> diff --git a/x86/cet.c b/x86/cet.c
+>> index 801d8da6e929..bcf1ca6d740a 100644
+>> --- a/x86/cet.c
+>> +++ b/x86/cet.c
+>> @@ -1,4 +1,3 @@
+>> -
+>>  #include "libcflat.h"
+>>  #include "x86/desc.h"
+>>  #include "x86/processor.h"
+>> @@ -192,6 +191,10 @@ static uint64_t cet_ibt_emulation(void)
+>>  #define CET_ENABLE_SHSTK	BIT(0)
+>>  #define CET_ENABLE_IBT		BIT(2)
+>>  #define CET_ENABLE_NOTRACK	BIT(4)
+>> +#define CET_IBT_SUPPRESS	BIT(10)
+>> +#define CET_IBT_TRACKER_STATE	BIT(11)
+>> +#define     IBT_TRACKER_IDLE			0
+>> +#define     IBT_TRACKER_WAIT_FOR_ENDBRANCH	BIT(11)
+> 
+> For this, I think it makes sense to diverge slightly from the SDM and just do
+> 
+>   #define CET_IBT_TRACKER_WAIT_FOR_ENDBRANCH	BIT(11)
+> 
+> because...
+> 
+>>  static void test_shstk(void)
+>>  {
+>> @@ -244,6 +247,22 @@ static void test_shstk(void)
+>>  	report(vector == GP_VECTOR, "MSR_IA32_PL3_SSP alignment test.");
+>>  }
+>>  
+>> +static void ibt_tracker_fixup(struct ex_regs *regs)
+>> +{
+>> +	u64 cet_u = rdmsr(MSR_IA32_U_CET);
+>> +
+>> +	/*
+>> +	 * Switch the IBT tracker state to IDLE to have a clean state for
+>> +	 * following tests.
+>> +	 */
+>> +	if ((cet_u & CET_IBT_TRACKER_STATE) == IBT_TRACKER_WAIT_FOR_ENDBRANCH) {
+>> +		cet_u &= ~IBT_TRACKER_WAIT_FOR_ENDBRANCH;
+> 
+> ...this is quite weird/confusing.  It relies on CET_IBT_TRACKER_STATE being a
+> single bit, and "(x & y) == z)" is very un-idiomatic for a single bit.
 
-Thanks a lot, Sean!
+Well, it doesn't rely on IBT_TRACKER_WAIT_FOR_ENDBRANCH being a single
+bit, but a value with all ones.
 
-> P.S. This also prompted me to get pretty_print_stacks.py working in my
->      environment, so double thanks!
+Essentially what I wanted to do was (in pseudo-code):
 
-Haha, you're welcome! :D
+  if cet_u.tracker_state == WAIT_FOR_ENDBRANCH:
+     cet_u.tracker_state = IDLE
+     wrmsr(MSR_IA32_U_CET, cet_u)
+
+I tried to make clear that it's the IBT tracker state, the code is
+interested in. But yeah, it's a single bit with only two states so just
+testing and toggling that single bit is fine.
+
+Initially I thought that setting CET_IBT_SUPPRESS is needed was well,
+but it's not. It's related to the "legacy handling" which is yet another
+can of worms we haven't opened yet ;)
 
 > 
-> [1/4] Makefile: Provide a concept of late CFLAGS
->       https://github.com/kvm-x86/kvm-unit-tests/commit/816fe2d45aed
-> [2/4] x86: Better backtraces for leaf functions
->       https://github.com/kvm-x86/kvm-unit-tests/commit/f01ea38a385a
-> [3/4] arm64: Better backtraces for leaf functions
->       https://github.com/kvm-x86/kvm-unit-tests/commit/da1804215c8e
-> [4/4] arm: Fix backtraces involving leaf functions
->       https://github.com/kvm-x86/kvm-unit-tests/commit/c885c94f523e
-> 
-> --
-> https://github.com/kvm-x86/kvm-unit-tests/tree/next
-
+>> +		printf("CET: suppressing IBT WAIT_FOR_ENDBRANCH state at RIP: %lx\n",
+>> +		       regs->rip);
+>> +		wrmsr(MSR_IA32_U_CET, cet_u);
+>> +	}
+>> +}
 
