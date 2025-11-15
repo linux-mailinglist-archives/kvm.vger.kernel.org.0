@@ -1,393 +1,170 @@
-Return-Path: <kvm+bounces-63283-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63284-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4BE5C5FFB7
-	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 05:11:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2194C60011
+	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 05:57:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B9B46358630
-	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 04:11:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCA2D3BA50F
+	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 04:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF64224AED;
-	Sat, 15 Nov 2025 04:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F78119F137;
+	Sat, 15 Nov 2025 04:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FrvJiNUs"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="Z+quzMak"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A690C19F12A
-	for <kvm@vger.kernel.org>; Sat, 15 Nov 2025 04:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A49527732
+	for <kvm@vger.kernel.org>; Sat, 15 Nov 2025 04:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763179856; cv=none; b=sXcsSWAP7CI7xb2fsy8vOBoUab9T7VPXKqp30j3poKCDdNqwLWP9DDwqRoSimL6hoazo3wJqFWs6/+BPH8MnWV+ctVOwRzgTAGpve+nMDv1YH0Xs1NZ/rm+YiI/wyE/q9n5e8Vj6Q6Ef0X2bon4eujdXTSsYgkydEyEP9+gOrwQ=
+	t=1763182621; cv=none; b=lOa378qxjfBRt4dzKCOER0Ki2MXll/R+r31mL0uHKsn/JRX2BFc/mtLeaPezHWBpvU/HkNNo5sew8zAWt9Z5uTcf25Z3aJ79IUj5mB0xjI2w4bphTPjjbvYwFQQXlYZKrX15NxaSy9z/VafW8Mb+gwBk+sH+dS0xMNlQoYh6/Us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763179856; c=relaxed/simple;
-	bh=c7teKy4ItZgyp3xlcjtkDbDVM0QGblBeLWyazUqKWFY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j2G0DeJ5N254MAb/wO5q65TW+wK+iEGplfAS0R/ROUW931sFaGHaRqLKKIYrEanOoZJ3uPiFSL2wSs+kqFVhP/E+w/9dmkcDnebQMoOmLaI4AbSwjfmQgvw0yXngQdvPEkC+HgVmCtNuYsg/wRAXCKolsU9YqGELQl578k8pzkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FrvJiNUs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B3DAC2BC87
-	for <kvm@vger.kernel.org>; Sat, 15 Nov 2025 04:10:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763179856;
-	bh=c7teKy4ItZgyp3xlcjtkDbDVM0QGblBeLWyazUqKWFY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=FrvJiNUslYpFoo3W32AN14HpG5TypwMDCwIry/sJj313bGQ6kG6KcQnvNwDYbK9oX
-	 Q2rbIuWhRfr5bOZc9HRtg8kwoVVzoUxvaypfZ84fxvKeVbkUSUIlF+rbQkzVxiWuuT
-	 q/h0u4Ehs9E/eHxbqiuwQceQjvxIwZww7Q8NqWi+Tj+ZVsEV3MtxHAYGSTShwSHRml
-	 IRdhCV3uUaXAxTwRr7IS3k8A0gsXJjcmuYdS+1lsRIILZ7APtvQbLj/mWJ7eNMw8Xz
-	 0hsosv3eNNjtrhNaU8Vbrehf4g8j78OBKIIUBWrAWitgrf7fDkChbrRdX8V2MSOiGr
-	 yJiGnZeiiA1dw==
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6418738efa0so4240608a12.1
-        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 20:10:56 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXDHVfYkCABtAswSprOoj0em12Rx4hRAPPQxKQczWp33nrqL1z6wcxddjN53ZziTtepEKo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzB4so+8nufOySPJLbsEV32sV+wui1fIgqNRB/cMovjBCj2LScJ
-	rj9kFLMRO6vIYP2TjWLA+VCGFKBp0FdSce2Vq0p4xp4iaN/DSRcA9aib5JPznM4evMaUbP5E4WF
-	TLODs2D5p9sa7a4wo11fgUQK1qXKTKAg=
-X-Google-Smtp-Source: AGHT+IG0XKHIXfZdA9rJ7CjF/zMBjgNVny3+MRhH7TEbhoDkyNXLkt1iqlvGMujQLRoKFiNZggkH746hb4BKjrkUjjg=
-X-Received: by 2002:a05:6402:13cd:b0:640:a26e:3d86 with SMTP id
- 4fb4d7f45d1cf-64350deef65mr4600478a12.1.1763179854945; Fri, 14 Nov 2025
- 20:10:54 -0800 (PST)
+	s=arc-20240116; t=1763182621; c=relaxed/simple;
+	bh=Ue8W9wz7bNY1Oxv+sfUYzlidX9qH9jMkO/z1LnNKOhM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gF2/FdACtUglXXCkTa3ynKqvSbePMMlcyWHK8QnvZ+Pdckr0Ztxn49upWjSC224KtJsCMYM5+I/9e2o38MjTdUeZNVszR5108q2tBxBwWhDui5dwK7eJ5Vix4RGzPrVRpKXaY7Il2EEDkf/SjYM46jm4pUuIgvmW0mf1KHe40/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=Z+quzMak; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4775ae77516so28838205e9.1
+        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 20:56:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1763182618; x=1763787418; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=yQ5s1rExmV8qLnvUKMhTxOfSSYufGuTPKFcxFC9k02U=;
+        b=Z+quzMakKvoiUhDyzjVDlqMDQWT23wJlP9VXRGjj4YM+CuZuZefm7QpPezf/Jkk7dM
+         TID+0rXHVLjNe8OueBhO2k6gxIxqfABIIaVt2xaptyTu095lRZQFWD+Qc4siplom9/G0
+         qqBAsPLlxbojwfmAmC58UKriXzNCApK2XMh2Br/WV4l2rnmtqBeg06LEDDujTMSuHPUX
+         ggBfNKoi1k7YsUhtJkOlflsZVQfQwkhvh3jBX5v/IF/PfZjtWNJ/PnqU/sylJLMS+G0f
+         k+JHfLAaym6G13YjGnCOSb2jE2unPtnP+v/ODuvmG0XhJhYU1YxjdB+PbvyHww/mx2Oq
+         fwoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763182618; x=1763787418;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yQ5s1rExmV8qLnvUKMhTxOfSSYufGuTPKFcxFC9k02U=;
+        b=qkKFNjt9d9xQw0rH9w/3TnuqyMpq2HsM1uL7um6V5E4mB9YCXRdhftcA4N6xWFYJau
+         CkLv1BUhruAaS+nV4aq3IILKlU+NweEVYqL1z8O3zMlvTCeiBQDM/MjXsBUMoGJbn5z5
+         63OgPx54A1xUAbxs2EZnigFT9d2/BgVg+r3tipcx3gqAvLBUZNU+Rj8H1j+rvfi2158D
+         Rnl6nBXhBdGGEHHvkU3PswOOKoC2Q0FlsnmhmeATmxINuuauTCYLSffmUOWoUqTcO+vd
+         PSJoroqwqwb7Ws16bbws3U7lecHcwkezJS9ypyX03WGCuazwqe0f+bvd4TQDlAahtceq
+         JL5A==
+X-Gm-Message-State: AOJu0Yw0jHw26CkcHQOtrBkT8Pfzb/REwQZkfhK0g5vVGxi1cMfY0lrc
+	YOtd6qOk+/uw6oUaFtbtCm693+WYrLy2ebvVn8462TO7h5t5Lv3yo4zy81E57WTi9L0=
+X-Gm-Gg: ASbGncuKOzgGdkKaoBUy7NhaBBEiePW21Sk/OY2sgugy1i/1wv57eV+h6opcsAMM0eX
+	6Wd2HqzkMqmflsmPK8lSbyUEGW6KksY2m+mIweNZLdPTbrhUtEHWG7aQslhVYOTVRxHg/WWidWV
+	ZoECOQbz1116TGNQwCD3xfzdRKzF73/G3EdzZEj4hWWgrKrRJo77juvL8uP/iG2QoMK5XhfXpIr
+	gAzTRQBYIhEitXe1jRJqv5JlBYQ3oOQD9PP3hDIoj6/aMzoIOhk75UQiYzGgIVcFrE5pfnjigAR
+	2TbEXAUsTzcjcY2rQ3FAmkb5FwkXbrmYIUltWqznlWirMnrwotNwjWyJ7A0Ne+X/Sgruc+pEzeA
+	NFef2Ifwh7xxuAH89W5ZbNRFmX+oKnXgZyi4mMMGOoKVesBYIkfxHG9MM3mEoW+NE0NMCKsc2As
+	5ho88yQNpF8q4MXQOkt54INNEe5lCiRQIImmNLJsQFK6XKwj3EF3ov4l1foHO6ypZi+fEexi6k0
+	2ewhY3cQkLPKTGsSB6k8vDvR3bdqLBNALPir4U+wlsuqg==
+X-Google-Smtp-Source: AGHT+IFfYKxHq+8CrgTHwrllYhNaYxZwba+UfoQ7YL1zovfcPCVBHzTrJpu7J+qt7oExABqAqeDw0w==
+X-Received: by 2002:a05:600c:3586:b0:477:7b16:5f87 with SMTP id 5b1f17b1804b1-4778fe121famr55216465e9.0.1763182617554;
+        Fri, 14 Nov 2025 20:56:57 -0800 (PST)
+Received: from ?IPV6:2003:fa:af29:b100:e8b2:7dbf:b11:65fc? (p200300faaf29b100e8b27dbf0b1165fc.dip0.t-ipconnect.de. [2003:fa:af29:b100:e8b2:7dbf:b11:65fc])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477975022ecsm23159855e9.4.2025.11.14.20.56.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Nov 2025 20:56:57 -0800 (PST)
+Message-ID: <15788499-87c6-4e57-b3ae-86d3cc61a278@grsecurity.net>
+Date: Sat, 15 Nov 2025 05:56:57 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251104113700.1561752-1-maobibo@loongson.cn> <20251104113700.1561752-5-maobibo@loongson.cn>
-In-Reply-To: <20251104113700.1561752-5-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sat, 15 Nov 2025 12:10:43 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H7S5AQXb35iEL3at3nmXx68cKoM9s1bGUvJE-WCeb6Ufg@mail.gmail.com>
-X-Gm-Features: AWmQ_bmV5vLhAgM4oaNjM3999HpiR-0a6Eu5NK8a7013QNIrGY3qTGN7e_1Gzu8
-Message-ID: <CAAhV-H7S5AQXb35iEL3at3nmXx68cKoM9s1bGUvJE-WCeb6Ufg@mail.gmail.com>
-Subject: Re: [PATCH v2 4/7] KVM: LoongArch: selftests: Add timer test case
- with one-shot mode
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Shuah Khan <shuah@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf
+ functions
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andrew Jones <andrew.jones@linux.dev>, Eric Auger <eric.auger@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20250915215432.362444-1-minipli@grsecurity.net>
+ <176314469132.1828515.1099412303366772472.b4-ty@google.com>
+Content-Language: en-US, de-DE
+From: Mathias Krause <minipli@grsecurity.net>
+Autocrypt: addr=minipli@grsecurity.net; keydata=
+ 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
+ RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
+In-Reply-To: <176314469132.1828515.1099412303366772472.b4-ty@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi, Bibo,
+On 14.11.25 19:25, Sean Christopherson wrote:
+> On Mon, 15 Sep 2025 23:54:28 +0200, Mathias Krause wrote:
+>> This is v2 of [1], trying to enhance backtraces involving leaf
+>> functions.
+>>
+>> This version fixes backtraces on ARM and ARM64 as well, as ARM currently
+>> fails hard for leaf functions lacking a proper stack frame setup, making
+>> it dereference invalid pointers. ARM64 just skips frames, much like x86
+>> does.
+>>
+>> [...]
+> 
+> Applied to kvm-x86 next, thanks!
 
-On Tue, Nov 4, 2025 at 7:37=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrote=
-:
->
-> Add timer test case based on common arch_timer code, one-shot mode
-> is tested with timer interrupt.
->
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> ---
->  tools/testing/selftests/kvm/Makefile.kvm      | 10 +-
->  .../kvm/include/loongarch/arch_timer.h        | 79 +++++++++++++++
->  .../kvm/include/loongarch/processor.h         | 10 ++
->  .../selftests/kvm/lib/loongarch/processor.c   |  4 +-
->  .../selftests/kvm/loongarch/arch_timer.c      | 98 +++++++++++++++++++
->  5 files changed, 196 insertions(+), 5 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/include/loongarch/arch_ti=
-mer.h
->  create mode 100644 tools/testing/selftests/kvm/loongarch/arch_timer.c
->
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/sel=
-ftests/kvm/Makefile.kvm
-> index 148d427ff24b..662adf8f309b 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -183,6 +183,8 @@ TEST_GEN_PROGS_arm64 +=3D memslot_perf_test
->  TEST_GEN_PROGS_arm64 +=3D mmu_stress_test
->  TEST_GEN_PROGS_arm64 +=3D rseq_test
->  TEST_GEN_PROGS_arm64 +=3D steal_time
-> +SPLIT_TESTS_arm64    +=3D arch_timer
-> +SPLIT_TESTS_arm64    +=3D get-reg-list
->
->  TEST_GEN_PROGS_s390 =3D $(TEST_GEN_PROGS_COMMON)
->  TEST_GEN_PROGS_s390 +=3D s390/memop
-> @@ -209,6 +211,8 @@ TEST_GEN_PROGS_riscv +=3D memslot_perf_test
->  TEST_GEN_PROGS_riscv +=3D mmu_stress_test
->  TEST_GEN_PROGS_riscv +=3D rseq_test
->  TEST_GEN_PROGS_riscv +=3D steal_time
-> +SPLIT_TESTS_riscv    +=3D arch_timer
-> +SPLIT_TESTS_riscv    +=3D get-reg-list
->
->  TEST_GEN_PROGS_loongarch +=3D coalesced_io_test
->  TEST_GEN_PROGS_loongarch +=3D demand_paging_test
-> @@ -222,10 +226,10 @@ TEST_GEN_PROGS_loongarch +=3D kvm_page_table_test
->  TEST_GEN_PROGS_loongarch +=3D memslot_modification_stress_test
->  TEST_GEN_PROGS_loongarch +=3D memslot_perf_test
->  TEST_GEN_PROGS_loongarch +=3D set_memory_region_test
-> +TEST_GEN_PROGS_loongarch +=3D arch_timer
-These tests should be in alpha-betical order.
+Thanks a lot, Sean!
 
-Huacai
+> P.S. This also prompted me to get pretty_print_stacks.py working in my
+>      environment, so double thanks!
 
-> +SPLIT_TESTS_loongarch    =3D arch_timer
->
-> -SPLIT_TESTS +=3D arch_timer
-> -SPLIT_TESTS +=3D get-reg-list
-> -
-> +SPLIT_TESTS +=3D $(SPLIT_TESTS_$(ARCH))
->  TEST_PROGS +=3D $(TEST_PROGS_$(ARCH))
->  TEST_GEN_PROGS +=3D $(TEST_GEN_PROGS_$(ARCH))
->  TEST_GEN_PROGS_EXTENDED +=3D $(TEST_GEN_PROGS_EXTENDED_$(ARCH))
-> diff --git a/tools/testing/selftests/kvm/include/loongarch/arch_timer.h b=
-/tools/testing/selftests/kvm/include/loongarch/arch_timer.h
-> new file mode 100644
-> index 000000000000..94b1cba2744d
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/loongarch/arch_timer.h
-> @@ -0,0 +1,79 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * LoongArch Constant Timer specific interface
-> + */
-> +#ifndef SELFTEST_KVM_ARCH_TIMER_H
-> +#define SELFTEST_KVM_ARCH_TIMER_H
-> +
-> +#include "processor.h"
-> +/* LoongArch timer frequency is constant 100MHZ */
-> +#define        TIMER_FREQ              (100UL << 20)
-> +#define msec_to_cycles(msec)    (TIMER_FREQ * (unsigned long)(msec) / 10=
-00)
-> +#define usec_to_cycles(usec)   (TIMER_FREQ * (unsigned long)(usec) / 100=
-0000)
-> +#define cycles_to_usec(cycles) ((unsigned long)(cycles) * 1000000 / TIME=
-R_FREQ)
-> +
-> +static inline unsigned long timer_get_cycles(void)
-> +{
-> +       unsigned long val =3D 0;
-> +
-> +       __asm__ __volatile__(
-> +               "rdtime.d %0, $zero\n\t"
-> +               : "=3Dr"(val)
-> +               :
-> +       );
-> +
-> +       return val;
-> +}
-> +
-> +static inline void timer_set_next_cmp_ms(unsigned int msec, bool period)
-> +{
-> +       unsigned long val;
-> +
-> +       val =3D msec_to_cycles(msec) & CSR_TCFG_VAL;
-> +       val |=3D CSR_TCFG_EN;
-> +       if (period)
-> +               val |=3D CSR_TCFG_PERIOD;
-> +       csr_write(val, LOONGARCH_CSR_TCFG);
-> +}
-> +
-> +static inline unsigned long timer_get_val(void)
-> +{
-> +       return csr_read(LOONGARCH_CSR_TVAL);
-> +}
-> +
-> +static inline unsigned long timer_get_cfg(void)
-> +{
-> +       return csr_read(LOONGARCH_CSR_TCFG);
-> +}
-> +
-> +static inline void timer_irq_enable(void)
-> +{
-> +       unsigned long val;
-> +
-> +       val =3D csr_read(LOONGARCH_CSR_ECFG);
-> +       val |=3D ECFGF_TIMER;
-> +       csr_write(val, LOONGARCH_CSR_ECFG);
-> +}
-> +
-> +static inline void timer_irq_disable(void)
-> +{
-> +       unsigned long val;
-> +
-> +       val =3D csr_read(LOONGARCH_CSR_ECFG);
-> +       val &=3D ~ECFGF_TIMER;
-> +       csr_write(val, LOONGARCH_CSR_ECFG);
-> +}
-> +
-> +static inline void __delay(uint64_t cycles)
-> +{
-> +       uint64_t start =3D timer_get_cycles();
-> +
-> +       while ((timer_get_cycles() - start) < cycles)
-> +               cpu_relax();
-> +}
-> +
-> +static inline void udelay(unsigned long usec)
-> +{
-> +       __delay(usec_to_cycles(usec));
-> +}
-> +#endif /* SELFTEST_KVM_ARCH_TIMER_H */
-> diff --git a/tools/testing/selftests/kvm/include/loongarch/processor.h b/=
-tools/testing/selftests/kvm/include/loongarch/processor.h
-> index b027f8f4dac7..61f6e215046b 100644
-> --- a/tools/testing/selftests/kvm/include/loongarch/processor.h
-> +++ b/tools/testing/selftests/kvm/include/loongarch/processor.h
-> @@ -83,6 +83,8 @@
->  #define LOONGARCH_CSR_PRMD             0x1
->  #define LOONGARCH_CSR_EUEN             0x2
->  #define LOONGARCH_CSR_ECFG             0x4
-> +#define  ECFGB_TIMER                   11
-> +#define  ECFGF_TIMER                   (BIT_ULL(ECFGB_TIMER))
->  #define LOONGARCH_CSR_ESTAT            0x5  /* Exception status */
->  #define  CSR_ESTAT_EXC_SHIFT           16
->  #define  CSR_ESTAT_EXC_WIDTH           6
-> @@ -111,6 +113,14 @@
->  #define LOONGARCH_CSR_KS1              0x31
->  #define LOONGARCH_CSR_TMID             0x40
->  #define LOONGARCH_CSR_TCFG             0x41
-> +#define  CSR_TCFG_VAL                  (BIT_ULL(48) - BIT_ULL(2))
-> +#define  CSR_TCFG_PERIOD_SHIFT         1
-> +#define  CSR_TCFG_PERIOD               (0x1UL << CSR_TCFG_PERIOD_SHIFT)
-> +#define  CSR_TCFG_EN                   (0x1UL)
-> +#define LOONGARCH_CSR_TVAL             0x42
-> +#define LOONGARCH_CSR_TINTCLR          0x44 /* Timer interrupt clear */
-> +#define  CSR_TINTCLR_TI_SHIFT          0
-> +#define  CSR_TINTCLR_TI                        (1 << CSR_TINTCLR_TI_SHIF=
-T)
->  /* TLB refill exception entry */
->  #define LOONGARCH_CSR_TLBRENTRY                0x88
->  #define LOONGARCH_CSR_TLBRSAVE         0x8b
-> diff --git a/tools/testing/selftests/kvm/lib/loongarch/processor.c b/tool=
-s/testing/selftests/kvm/lib/loongarch/processor.c
-> index 20ba476ccb72..436990258068 100644
-> --- a/tools/testing/selftests/kvm/lib/loongarch/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/loongarch/processor.c
-> @@ -271,8 +271,8 @@ static void loongarch_vcpu_setup(struct kvm_vcpu *vcp=
-u)
->                 TEST_FAIL("Unknown guest mode, mode: 0x%x", vm->mode);
->         }
->
-> -       /* user mode and page enable mode */
-> -       val =3D PLV_USER | CSR_CRMD_PG;
-> +       /* kernel mode and page enable mode */
-> +       val =3D PLV_KERN | CSR_CRMD_PG;
->         loongarch_set_csr(vcpu, LOONGARCH_CSR_CRMD, val);
->         loongarch_set_csr(vcpu, LOONGARCH_CSR_PRMD, val);
->         loongarch_set_csr(vcpu, LOONGARCH_CSR_EUEN, 1);
-> diff --git a/tools/testing/selftests/kvm/loongarch/arch_timer.c b/tools/t=
-esting/selftests/kvm/loongarch/arch_timer.c
-> new file mode 100644
-> index 000000000000..2a2cebcf3885
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/loongarch/arch_timer.c
-> @@ -0,0 +1,98 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + *
-> + * The test validates one-shot constant timer IRQ using CSR_TCFG and
-> + * CSR_TVAL registers.
-> + */
-> +#include "arch_timer.h"
-> +#include "kvm_util.h"
-> +#include "processor.h"
-> +#include "timer_test.h"
-> +#include "ucall_common.h"
-> +
-> +static void guest_irq_handler(struct ex_regs *regs)
-> +{
-> +       uint64_t xcnt, val, cfg, xcnt_diff_us;
-> +       unsigned int intid;
-> +       uint32_t cpu =3D guest_get_vcpuid();
-> +       struct test_vcpu_shared_data *shared_data =3D &vcpu_shared_data[c=
-pu];
-> +
-> +       intid =3D !!(regs->estat & BIT(INT_TI));
-> +
-> +       /* Make sure we are dealing with the correct timer IRQ */
-> +       GUEST_ASSERT_EQ(intid, 1);
-> +
-> +       cfg =3D timer_get_cfg();
-> +
-> +       /*
-> +        * On physical machine, value of LOONGARCH_CSR_TVAL is BIT_ULL(48=
-) - 1
-> +        * On virtual machine, its value counts down from BIT_ULL(48) - 1
-> +        */
-> +       val =3D timer_get_val();
-> +       xcnt =3D timer_get_cycles();
-> +       xcnt_diff_us =3D cycles_to_usec(xcnt - shared_data->xcnt);
-> +
-> +       /* Basic 'timer condition met' check */
-> +       __GUEST_ASSERT(val > cfg,
-> +                       "val =3D 0x%lx, cfg =3D 0x%lx, xcnt_diff_us =3D 0=
-x%lx",
-> +                       val, cfg, xcnt_diff_us);
-> +
-> +       csr_write(CSR_TINTCLR_TI, LOONGARCH_CSR_TINTCLR);
-> +       WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
-> +}
-> +
-> +static void guest_test_oneshot_timer(uint32_t cpu)
-> +{
-> +       uint32_t irq_iter, config_iter;
-> +       uint64_t us;
-> +       struct test_vcpu_shared_data *shared_data =3D &vcpu_shared_data[c=
-pu];
-> +
-> +       shared_data->nr_iter =3D 0;
-> +       shared_data->guest_stage =3D 0;
-> +       us =3D msecs_to_usecs(test_args.timer_period_ms) + test_args.time=
-r_err_margin_us;
-> +       for (config_iter =3D 0; config_iter < test_args.nr_iter; config_i=
-ter++) {
-> +               shared_data->xcnt =3D timer_get_cycles();
-> +
-> +               /* Setup the next interrupt */
-> +               timer_set_next_cmp_ms(test_args.timer_period_ms, false);
-> +               /* Setup a timeout for the interrupt to arrive */
-> +               udelay(us);
-> +
-> +               irq_iter =3D READ_ONCE(shared_data->nr_iter);
-> +               __GUEST_ASSERT(config_iter + 1 =3D=3D irq_iter,
-> +                               "config_iter + 1 =3D 0x%x, irq_iter =3D 0=
-x%x.\n"
-> +                               "  Guest timer interrupt was not triggere=
-d within the specified\n"
-> +                               "  interval, try to increase the error ma=
-rgin by [-e] option.\n",
-> +                               config_iter + 1, irq_iter);
-> +       }
-> +}
-> +
-> +static void guest_code(void)
-> +{
-> +       uint32_t cpu =3D guest_get_vcpuid();
-> +
-> +       timer_irq_enable();
-> +       local_irq_enable();
-> +       guest_test_oneshot_timer(cpu);
-> +
-> +       GUEST_DONE();
-> +}
-> +
-> +struct kvm_vm *test_vm_create(void)
-> +{
-> +       struct kvm_vm *vm;
-> +       int nr_vcpus =3D test_args.nr_vcpus;
-> +
-> +       vm =3D vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
-> +       vm_init_descriptor_tables(vm);
-> +       vm_install_exception_handler(vm, EXCCODE_INT, guest_irq_handler);
-> +
-> +       /* Make all the test's cmdline args visible to the guest */
-> +       sync_global_to_guest(vm, test_args);
-> +       return vm;
-> +}
-> +
-> +void test_vm_cleanup(struct kvm_vm *vm)
-> +{
-> +       kvm_vm_free(vm);
-> +}
+Haha, you're welcome! :D
+
+> 
+> [1/4] Makefile: Provide a concept of late CFLAGS
+>       https://github.com/kvm-x86/kvm-unit-tests/commit/816fe2d45aed
+> [2/4] x86: Better backtraces for leaf functions
+>       https://github.com/kvm-x86/kvm-unit-tests/commit/f01ea38a385a
+> [3/4] arm64: Better backtraces for leaf functions
+>       https://github.com/kvm-x86/kvm-unit-tests/commit/da1804215c8e
+> [4/4] arm: Fix backtraces involving leaf functions
+>       https://github.com/kvm-x86/kvm-unit-tests/commit/c885c94f523e
+> 
 > --
-> 2.39.3
->
+> https://github.com/kvm-x86/kvm-unit-tests/tree/next
+
 
