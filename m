@@ -1,163 +1,186 @@
-Return-Path: <kvm+bounces-63281-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63282-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E899C5FC85
-	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 01:56:09 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCC44C5FFB1
+	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 05:09:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B4E26360ECE
-	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 00:53:28 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B53F74E4813
+	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 04:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BBE917A2E6;
-	Sat, 15 Nov 2025 00:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B72A2253FF;
+	Sat, 15 Nov 2025 04:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KssO1vHO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kdx/c78r"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21696155326
-	for <kvm@vger.kernel.org>; Sat, 15 Nov 2025 00:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7574C19CCF5
+	for <kvm@vger.kernel.org>; Sat, 15 Nov 2025 04:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763167980; cv=none; b=Jk2wnlvxzM9u2Is0jpovD2HENaV1hzHCcAAEMkkFU70U7F66Ntm/ON4Qw1Afb1SOZes2ot9ZfK+0ll+kCxxJcTK5pwbX5KhP2PWdgQ3Ojj52RavffMjRRlGR9MykbaOY8mejVmk1E6Uxu/CPxVGlbE/lFqi6C8ukG1Q2yvnXgEw=
+	t=1763179723; cv=none; b=e8OzIPRlCrthfCCM6nxzll8BWT/sRQtKJpbvqRRE4Le8SRA6G/YTfyER/Ry5yWaMZIlIzoO0q2PMXN85pQhHBJYTIcrCDlN5kl2aW/cPYj9oCm9CVEvj9yKJRb4PYL2S8TtTb8NMGiOTxnar3oyitolyev2nGjyzUWZLK7eIdwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763167980; c=relaxed/simple;
-	bh=Zt6gL3AszafFvMRDqHPmrtZZuuPTg89Q67zHxC/2ZRw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QL32jtKyG1BaAMHN/LIHfuU7jAlcnz6qMZha1ztXZcKLRAQ+vDzJWHTDntqO8iP2hjynAM1yfT7jD2sCesgJbxjbK/seX+zLVOxXeX5ukXQrLKzRXvWu7HzkMdpGLpY4vCx6HYxL6DulgKwhlEB1yd7BwX5gehWZY0BTH18vJMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KssO1vHO; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34378c914b4so4275125a91.1
-        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 16:52:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763167977; x=1763772777; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U9SSTkCfK9gXlKFXxpFitF3UmgPFfqReOkQFg2JXAv8=;
-        b=KssO1vHOaxB0iZyyyzHkQoFSFHxdym+y7nD/4/2IFsnqBdOnGAozASkzlk5qsBgw7C
-         RmwOUA2hlrauPMZU7y6qzvx3oH0nQVwyOlRR4dtHb1DGJfxa74mWSDvQSd0nP99OM541
-         y/AObdqYNBmYLifTZK6m5T7SmHFHkoBjSjsXqhOo/rmxZ/IY5FU9xUOB5GYqa30liK8j
-         qWlYplMet9f7a+DBMVbcOUqGavFSUEGKdH/uzLku8KWKCBfIEITxraeKpX8bC8M+Gwpe
-         DmAWLVCjttbF2v0+6J5rGWFaQZyIjxhd0y3hI0YRIWLu87TVdDpUH835MdkjPQfQJzbA
-         E5PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763167977; x=1763772777;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U9SSTkCfK9gXlKFXxpFitF3UmgPFfqReOkQFg2JXAv8=;
-        b=vug1tXgXFHhlFsa11dBqyMvnT4Ovv5tXCR9ZvaftT1ILniuuBqLVsm+/xRANS66mR/
-         hf9DkmCc9cpRGpD6bdanA4JX+aJUb7nGDfc+txm3rv8pYv6fVmgYKA2jhg1lUS3FUE7H
-         QkkTdjPifMXrOxqDNtGSHxFcRp3iWHmKX5DpYst2wwlze0grdu/oVHHt15hnfWDClTiI
-         LHFWlH/9sBp+FjH9rgwztz8IZvty9uP8We20ArGPZtDn/q30OU2eCqbyA83li6rCy9wT
-         w4vpXg7lD2b+Fy8PzulL51reN2+mp8n6G1LFJ1aTix8AWLbpNhNNakUBExJEHmxHh8jI
-         XcPA==
-X-Forwarded-Encrypted: i=1; AJvYcCXz+VaC7PidJVdcC9+02DQ5qM2cviow1VHEwAVLJUV0Rx5UiH1g6VMknSjhtpddUeRy1zQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJNvVNtVFyL88PJt073qSNYVotatsjs0EZS3pX6CT1m5iM1atf
-	ta4lLmDyyy8pAZg61WbWLjTALpKJ+LJqsi55jEd/iQOwOx576WsT/Z/izE17bbVI8uGBPz3aTLN
-	knSCoNfPtzFqoaua2ZovAk1Y4rQ==
-X-Google-Smtp-Source: AGHT+IFQ6ztt0EQFHe4KI+3WuxtLaazXI8OcEuS0OZM8dxl+4bnHUaopiO2H4ku8y1VZu9JaoG1ZZurdE58bMYL0dA==
-X-Received: from pjbpm10.prod.google.com ([2002:a17:90b:3c4a:b0:340:a9b3:320c])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:3c89:b0:339:cece:a99 with SMTP id 98e67ed59e1d1-343f9eb3128mr5188244a91.13.1763167977228;
- Fri, 14 Nov 2025 16:52:57 -0800 (PST)
-Date: Fri, 14 Nov 2025 16:52:55 -0800
-In-Reply-To: <aRG35j3OhMvQo85n@yzhao56-desk.sh.intel.com>
+	s=arc-20240116; t=1763179723; c=relaxed/simple;
+	bh=KZGqL2Ezl0HG8L3ZKNB+3v2T5VnKNS3msnMQ+mBqZBY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fG/OTAWZboxANoTPRszMlSLHPJCs/ubb1oyDsfLGNh/ln8eyqvlgWxReMm9pEDLeuvwuCUUS/japaLjFj0+F+cHQXEhh/KeYTrntTS6nUhN4gndtR/YnS8tFGZzz/m91g/Y6tRiMuAUnNzQvPvg4bA4Obq9E557wEllt/J8lkC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kdx/c78r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08667C4CEF7
+	for <kvm@vger.kernel.org>; Sat, 15 Nov 2025 04:08:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763179723;
+	bh=KZGqL2Ezl0HG8L3ZKNB+3v2T5VnKNS3msnMQ+mBqZBY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Kdx/c78r7wuHriNVNHW5bfwCSFqYvYcHnuJcdhAREmfpSvpc9Datzo1GQ784ItIV8
+	 vWXGy3xOp2fbx5NPYsojEJkxKC2KhQ/stcmi8EMrOW+6AfGJBUD0LWIxs/x6/lw5SZ
+	 qcuV3/gTi+btPR2H8v/w6iCrKGTK3tjNle1G9ez0/aZ5N4V7+e9WPmXWG5l40PmkWP
+	 ZznLGCkHHQX9RYYglhsDeeCqO8LPNFPgiz3c/3WjRdalRVlclYWACOAsCETiuyPR/2
+	 JIjleG0XLOY8L3GQsYbOx8P3/Y36vok/nxP4Hu2JK1fKUWvIISFxslBhyVlJbk123x
+	 cqpGGej89kFMQ==
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-64312565c10so4073333a12.2
+        for <kvm@vger.kernel.org>; Fri, 14 Nov 2025 20:08:42 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVc0lcqIWta9Y7rQzXwKkWarPYxac7ui42ZQOSA0O4gixMHkc5dCS9wjmMVw+R2aOabA5s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNPMpUfk6YEDH9Sg73z0rG7H97EtAoyweoBKs3N6fyh4sLBoFF
+	WkCFIHmUTdRjHn1Hm8we8B1ZYY4pK5EjUKLSekoKBkyqoF9oQfhYIsgFL3L/6hAR+PgsOOuspqN
+	PN+i1DNh1YmXgcg5RwEnqnjwYqQxftp0=
+X-Google-Smtp-Source: AGHT+IG9cQ3842nU2X96hW6f/gkC+5SQGjvtKdtQOMK6m2HstYAXMYIkvNvxji/TrvC80TdUeDVdiXrTNf1BUzk4eTg=
+X-Received: by 2002:a17:907:9603:b0:b72:5d9c:b47b with SMTP id
+ a640c23a62f3a-b73678ed0a1mr518109066b.36.1763179721512; Fri, 14 Nov 2025
+ 20:08:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1760731772.git.ackerleytng@google.com> <a3795f7fb4f785ced19abe18c2f33aa478c4d202.1760731772.git.ackerleytng@google.com>
- <aRG35j3OhMvQo85n@yzhao56-desk.sh.intel.com>
-Message-ID: <diqzzf8oazh4.fsf@google.com>
-Subject: Re: [RFC PATCH v1 06/37] KVM: guest_memfd: Update kvm_gmem_populate()
- to use gmem attributes
-From: Ackerley Tng <ackerleytng@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: cgroups@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, 
-	linux-trace-kernel@vger.kernel.org, x86@kernel.org, akpm@linux-foundation.org, 
-	binbin.wu@linux.intel.com, bp@alien8.de, brauner@kernel.org, 
-	chao.p.peng@intel.com, chenhuacai@kernel.org, corbet@lwn.net, 
-	dave.hansen@intel.com, dave.hansen@linux.intel.com, david@redhat.com, 
-	dmatlack@google.com, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
-	haibo1.xu@intel.com, hannes@cmpxchg.org, hch@infradead.org, hpa@zytor.com, 
-	hughd@google.com, ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
-	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
-	jhubbard@nvidia.com, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com, 
-	mail@maciej.szmigiero.name, maobibo@loongson.cn, 
-	mathieu.desnoyers@efficios.com, maz@kernel.org, mhiramat@kernel.org, 
-	mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, mingo@redhat.com, 
-	mlevitsk@redhat.com, mpe@ellerman.id.au, muchun.song@linux.dev, 
-	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
-	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
-	peterx@redhat.com, pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, 
-	qperret@google.com, richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, 
-	rientjes@google.com, rostedt@goodmis.org, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shakeel.butt@linux.dev, shuah@kernel.org, 
-	steven.price@arm.com, suzuki.poulose@arm.com, tabba@google.com, 
-	tglx@linutronix.de, thomas.lendacky@amd.com, vannapurve@google.com, 
-	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, will@kernel.org, 
-	willy@infradead.org, wyihan@google.com, xiaoyao.li@intel.com, 
-	yilun.xu@intel.com, yuzenghui@huawei.com
+MIME-Version: 1.0
+References: <20251104113700.1561752-1-maobibo@loongson.cn> <20251104113700.1561752-4-maobibo@loongson.cn>
+In-Reply-To: <20251104113700.1561752-4-maobibo@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Sat, 15 Nov 2025 12:08:28 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5TNk-pxVthnau=GgfB=5K9fUQsFnKKKH=VqLaLmENFtA@mail.gmail.com>
+X-Gm-Features: AWmQ_bnuZb7NbZ1VUmGJms5OOq9ewjA1_-hRujqnV8OhCjjyH6ZWv0RIiUblj2g
+Message-ID: <CAAhV-H5TNk-pxVthnau=GgfB=5K9fUQsFnKKKH=VqLaLmENFtA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/7] KVM: LoongArch: selftests: Add basic interfaces
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Yan Zhao <yan.y.zhao@intel.com> writes:
+Hi, Bibo,
 
->>  #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_POPULATE
->> +static bool kvm_gmem_range_is_private(struct gmem_inode *gi, pgoff_t index,
->> +				      size_t nr_pages, struct kvm *kvm, gfn_t gfn)
->> +{
->> +	pgoff_t end = index + nr_pages - 1;
->> +	void *entry;
->> +
->> +	if (vm_memory_attributes)
->> +		return kvm_range_has_vm_memory_attributes(kvm, gfn, gfn + nr_pages,
->> +						       KVM_MEMORY_ATTRIBUTE_PRIVATE,
->> +						       KVM_MEMORY_ATTRIBUTE_PRIVATE);
-> Can't compile kvm_range_has_vm_memory_attributes() if
-> CONFIG_KVM_VM_MEMORY_ATTRIBUTES is not set.
+On Tue, Nov 4, 2025 at 7:37=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrote=
+:
+>
+> Add some basic function interfaces such as CSR register access,
+> local irq enable or disable APIs.
+This is "basic interfaces", so better to be before Patch-2 (or keep
+the order but change the subject)?
 
-Thanks! I will fix this in the next revision.
+Huacai
 
-
-We've been discussing HugeTLB support in the guest_memfd upstream calls
-and I'd like to add a quick follow up here, with code, for anyone who
-might be interested. Here's a WIP tree:
-
-https://github.com/googleprodkernel/linux-cc/tree/wip-gmem-conversions-hugetlb-restructuring
-
-This tree was based off kvm-next (as of 2025-10-08), and includes
-
-+ Mmap fixes from Sean
-+ NUMA mempolicy support from Shivank Garg (AMD)
-+ Some cleanup patches from Sean
-+ Conversion series [1] with some cleanups (Thanks for the comments and
-  reviews on this series! Haven't had time to figure out all of it,
-  addressed some first)
-+ st_blocks fix for guest_memfd, which was discussed at the guest_memfd
-  upstream call: slides [2]
-+ HugeTLB support without conversion: this stage does not yet take into
-  account comments from the upstream call. This stage provides support
-  for HugeTLB to be used through guest_memfd for private memory. This
-  has to be used with the KVM parameter vm_memory_attributes set to
-  true. This stage can be used to test Yan's TDX huge page support by
-  setting up guest_memfd with HugeTLB just for private memory, with
-  shared memory being taken from elsewhere.
-+ HugeTLB support with conversion and folio restructuring: this stage
-  also does not take into account comments from the upstream call, so it
-  still disables the INIT_SHARED flag, although HugeTLB can now be used
-  with in-place conversion for both shared and private memory. This can
-  be used to test Yan's TDX huge page support.
-
-[1] https://lore.kernel.org/all/cover.1760731772.git.ackerleytng@google.com/T/
-[2] https://lpc.events/event/18/contributions/1764/attachments/1409/3715/2025-10-30%20guest_memfd%20upstream%20call_%20guest_memfd%20HugeTLB%20support%20overview.pdf
+>
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+>  .../kvm/include/loongarch/processor.h         | 52 +++++++++++++++++++
+>  .../selftests/kvm/lib/loongarch/processor.c   |  5 ++
+>  2 files changed, 57 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/include/loongarch/processor.h b/=
+tools/testing/selftests/kvm/include/loongarch/processor.h
+> index a18ac7bff303..b027f8f4dac7 100644
+> --- a/tools/testing/selftests/kvm/include/loongarch/processor.h
+> +++ b/tools/testing/selftests/kvm/include/loongarch/processor.h
+> @@ -118,6 +118,28 @@
+>  #define  CSR_TLBREHI_PS_SHIFT          0
+>  #define  CSR_TLBREHI_PS                        (0x3fUL << CSR_TLBREHI_PS=
+_SHIFT)
+>
+> +#define csr_read(csr)                          \
+> +({                                             \
+> +       register unsigned long __v;             \
+> +       __asm__ __volatile__(                   \
+> +               "csrrd %[val], %[reg]\n\t"      \
+> +               : [val] "=3Dr" (__v)              \
+> +               : [reg] "i" (csr)               \
+> +               : "memory");                    \
+> +       __v;                                    \
+> +})
+> +
+> +#define csr_write(v, csr)                      \
+> +({                                             \
+> +       register unsigned long __v =3D v;         \
+> +       __asm__ __volatile__ (                  \
+> +               "csrwr %[val], %[reg]\n\t"      \
+> +               : [val] "+r" (__v)              \
+> +               : [reg] "i" (csr)               \
+> +               : "memory");                    \
+> +       __v;                                    \
+> +})
+> +
+>  #define EXREGS_GPRS                    (32)
+>
+>  #ifndef __ASSEMBLER__
+> @@ -147,6 +169,36 @@ struct handlers {
+>  void vm_init_descriptor_tables(struct kvm_vm *vm);
+>  void vm_install_exception_handler(struct kvm_vm *vm, int vector, handler=
+_fn handler);
+>
+> +static inline void local_irq_enable(void)
+> +{
+> +       unsigned int flags =3D CSR_CRMD_IE;
+> +
+> +       register unsigned int mask asm("$t0") =3D CSR_CRMD_IE;
+> +
+> +       __asm__ __volatile__(
+> +               "csrxchg %[val], %[mask], %[reg]\n\t"
+> +               : [val] "+r" (flags)
+> +               : [mask] "r" (mask), [reg] "i" (LOONGARCH_CSR_CRMD)
+> +               : "memory");
+> +}
+> +
+> +static inline void local_irq_disable(void)
+> +{
+> +       unsigned int flags =3D 0;
+> +
+> +       register unsigned int mask asm("$t0") =3D CSR_CRMD_IE;
+> +
+> +       __asm__ __volatile__(
+> +               "csrxchg %[val], %[mask], %[reg]\n\t"
+> +               : [val] "+r" (flags)
+> +               : [mask] "r" (mask), [reg] "i" (LOONGARCH_CSR_CRMD)
+> +               : "memory");
+> +}
+> +
+> +static inline void cpu_relax(void)
+> +{
+> +       asm volatile("nop" ::: "memory");
+> +}
+>  #else
+>  #define PC_OFFSET_EXREGS               ((EXREGS_GPRS + 0) * 8)
+>  #define ESTAT_OFFSET_EXREGS            ((EXREGS_GPRS + 1) * 8)
+> diff --git a/tools/testing/selftests/kvm/lib/loongarch/processor.c b/tool=
+s/testing/selftests/kvm/lib/loongarch/processor.c
+> index be537c5ff74e..20ba476ccb72 100644
+> --- a/tools/testing/selftests/kvm/lib/loongarch/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/loongarch/processor.c
+> @@ -373,3 +373,8 @@ void vcpu_arch_set_entry_point(struct kvm_vcpu *vcpu,=
+ void *guest_code)
+>         regs.pc =3D (uint64_t)guest_code;
+>         vcpu_regs_set(vcpu, &regs);
+>  }
+> +
+> +uint32_t guest_get_vcpuid(void)
+> +{
+> +       return csr_read(LOONGARCH_CSR_CPUID);
+> +}
+> --
+> 2.39.3
+>
 
