@@ -1,134 +1,183 @@
-Return-Path: <kvm+bounces-63289-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63290-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E906FC6039F
-	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 12:09:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A5C5C610C8
+	for <lists+kvm@lfdr.de>; Sun, 16 Nov 2025 07:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8BFA14E42BC
-	for <lists+kvm@lfdr.de>; Sat, 15 Nov 2025 11:08:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 890773B137A
+	for <lists+kvm@lfdr.de>; Sun, 16 Nov 2025 06:32:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94650298CC4;
-	Sat, 15 Nov 2025 11:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E34723D29F;
+	Sun, 16 Nov 2025 06:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QQk7llZh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AgHvFnpK";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WIfugPI5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5837D27586C
-	for <kvm@vger.kernel.org>; Sat, 15 Nov 2025 11:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AFC8231858
+	for <kvm@vger.kernel.org>; Sun, 16 Nov 2025 06:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763204927; cv=none; b=lj0kTVCpFVgaAnAOlgs3gy5z9SyQOY+Drq49ifyyxTBDPlZomCPb53wn5xGmWEW2k/RkRzn/oi6Zm0jW2CMSeTRMwX9rpzQngD3c9E2zLAiyPuomh4G5d95p4QgyFvQjhfvAtGBxxg29LBoJ8yHo3wj6fA26sUmZXhxLwDFRzNU=
+	t=1763274743; cv=none; b=pTLhUchlDYvg7f6o6GM/CSr1/jLBD+uz76QkeI4ptSLBHpPFXwer+VC4s6i/zpwMEeR5IttlJFcBJKxlsNUrxDj/D6Bx9BQaqI/GCOwv82RWP4TnA/nz9whYxh2l2Mu8BaC2ygozJ1Yp+Scs3oTMvn7xtFJtnJmudn6vKPgVjb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763204927; c=relaxed/simple;
-	bh=QtvTn81Ua3FPrkbPOmPO0Brx/q079uamkttCqZ3CW1M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cHQ9RJGNYP+g+w0Vk6b8g4XHUF66zfgWXzAIsczA/hE3AZMqvj/IDphmvntL+6s91UgWlVmhYc4K6a3Ba7POLmdGm45b3NRQ3KLF2GC9OUlHuNMTGkJW5TLlaiY6h0aXCpsJ9EbpxZqCXfRt8K3wZ649Kn5MG/9TaSkcEhzSw5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QQk7llZh; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-29808a9a96aso27396435ad.1
-        for <kvm@vger.kernel.org>; Sat, 15 Nov 2025 03:08:46 -0800 (PST)
+	s=arc-20240116; t=1763274743; c=relaxed/simple;
+	bh=9J5ZanlTR5MbI7H/PM8zBqnWF1m30dsYYnGd+HHXpsI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gisvg0dygKB0q50NxI62hivlaTdrXypAIxKKhtPV/GXzTa02316rUE1uoitUApQeucXkVGYn9peyJz1/fowgYtWL4yd9aJB00fpKV1utmeB3rgEh1ij+yzaeubvJAGR13A23wT+/VNiMVdhALuTJN4Au/z1u6D74I2R6ovE0/eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AgHvFnpK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WIfugPI5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763274740;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ONdbfWw8hd11o6VVpJ9FO1hpF1iyjC0aAQGdHwbR22w=;
+	b=AgHvFnpKc9rsH1qRlT31M742zF90yt97OM4gqgZXJC+kpcELz+ITktCIO472MGPsTCB907
+	ZFYNjDD5nkGFXBwdCT0HSVYXLF5bxumO2jXG/btyR63zDr4zkD8ERRm4o3Y61OihYoWjGN
+	QlocHT4e2/p2Qz+k/Oe8Hpfp03VRFO4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-267-r5wwN0-UOQKm5CeZwxKW7g-1; Sun, 16 Nov 2025 01:32:18 -0500
+X-MC-Unique: r5wwN0-UOQKm5CeZwxKW7g-1
+X-Mimecast-MFC-AGG-ID: r5wwN0-UOQKm5CeZwxKW7g_1763274737
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4775d110fabso25902425e9.1
+        for <kvm@vger.kernel.org>; Sat, 15 Nov 2025 22:32:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763204926; x=1763809726; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rDnL4NHaav+5ZUQoJnC9lyriFUqkD8Usoc9H6SDFlGg=;
-        b=QQk7llZh8JWGVi90vuDrQ4AFX/S1+4PWCJ32xdlj6yU5W2NDXz/Va/YjvrVzLIAvBh
-         zlNN6dtsbdO3rEwkpKiX5VMXwuyhjqcooxiabpYKpKw8BuDsmNq+Mmv3gSmfcSHy59hA
-         cM1J9ow0jJgwFtG09bdGVDxaQouzyiO+jd9UCxZm0kOAzXCfb226UN3yIVFJel7Mr8uD
-         wIHtLBVQIi32f0hnvY2Er/WrthQ4Ceab6OxVp2rFxtC68PBA4dui+7p5Uffh3fOQlv7f
-         Eb8RDcahEU9G0TCDnMNetP4bLXbVnhIPtOMNQJ96d16agZ6JYbd19MTEFSsOGNoWFH5l
-         4CgA==
+        d=redhat.com; s=google; t=1763274737; x=1763879537; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ONdbfWw8hd11o6VVpJ9FO1hpF1iyjC0aAQGdHwbR22w=;
+        b=WIfugPI54hoYAZIZc4HXbxYa69ttBV4QlHE2OzA1WOLLlUoy9bTE4PcxOsG4SnPlnb
+         AN0oxU8yfBmlTsWp964m6rHCTAgkjI4S9pcoSmY0vX6fO+gadnNA3B4D2jVBAfkvzDTR
+         IR7Wc4nAKpTDr+bOZBOxmy9PHRt0W4jmgBXmPSUINgH93S8XtSmBY6ZhYuw6sSMcQHJP
+         bgWv/FMrMb14Xj3oRD1Mmzz+n/GA/os0eMnlRxOckI5t8dUYIhdT58XVdWKyWumMAm7G
+         2Nt7o++FimoaTrUKrMzudWAjb0WTbzUSWF/DJJUcihDg9FBxtxCLdpjSt3StTmiY5tcD
+         aWNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763204926; x=1763809726;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rDnL4NHaav+5ZUQoJnC9lyriFUqkD8Usoc9H6SDFlGg=;
-        b=VIwlE07BfYVJa9TN3XIbQ+Tc8xNI0aMOqd2FUOTB4ejEekgCNLYw/59gLt9P9xMGqB
-         vpIsLUKWzEJujmYj0bMw6ot1XblbIJnsQfZwDz7oZG/t7JSe+ljTOM70S0XQTq+zHUNt
-         ENqQK+lsUOl8avAojLTXdRxg4aOLO735ISGN01jwXKYzPDXmtof8RWLabSjr3e3HLpI3
-         uF9J6x5HUqq+RIWV0HTea7u2ZvRMBWrHaWRJ5uSJtPyjMbRECJmh9gy2nqieCtGZtZBy
-         GF8oKmeBurWLSPb5GetkasY9n8xF74JGa7QeEmIBP7WGaWUyTJGcY+D690rS0DDLE2VH
-         GZ2Q==
-X-Gm-Message-State: AOJu0YxkCqx002ZWMVRUp+zMSVT8/HJ7X3wvv9LnUj+ngWSgE/NLhvwi
-	d+gIYByyKh2PYWm99U5xPQ6BRa195tnqyr9LLujDUkNlXP/7YRAN6Lmg
-X-Gm-Gg: ASbGncvP8iRvB/njXqTUnxpV0H28U+eOjQmVVNvrOovh42DXpAMf7DGaAax0uCcpzEm
-	zjIQP+MCaj8MXCudZM8sQzykYBw1EUX9oEfN0wTqoMVAh4rP3k5YxmkSb0H9kTL/7dmA9f9f18c
-	fS+Sj30gB5dHUcBvfJ8liHPdtawB8PGndCO7rCLpzLQpqZBiNMDKtH4j9nINwzoPCBT2ruFOrKB
-	PlN1N64Q+WlHM3YY+9vr1/OrutLQt4HQs8WVgdjIuwP2NCj+qs0o4cWTvLxONYwlqA8Bezwn88W
-	okQOhjcZHWiY1phiQxGCOMoMCYOlrzNmB8sz91hcH6K+jKrjN/2fGeKGP3SKt8KWZCHdZTD9i0G
-	IQc9cE6q0+EJqj6TkzXo96jbrlj1qKcrl/wiSBH1Nav2sDhBdQm0ieaV/+tWQWC4qE4rzViNJ1x
-	jS6fJhdnQhiE7hehrwNDY=
-X-Google-Smtp-Source: AGHT+IFIJ8mHDNSkemnB2t7aJI0eDgMICqUE0flQlOmzI1znoGOCkGrq0gi0iwMEPY6C4gHGcgK06A==
-X-Received: by 2002:a17:903:196b:b0:267:f7bc:673c with SMTP id d9443c01a7336-2986a752a74mr61755755ad.44.1763204925585;
-        Sat, 15 Nov 2025 03:08:45 -0800 (PST)
-Received: from fedora ([103.120.31.122])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2bed5asm83839075ad.88.2025.11.15.03.08.41
+        d=1e100.net; s=20230601; t=1763274737; x=1763879537;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ONdbfWw8hd11o6VVpJ9FO1hpF1iyjC0aAQGdHwbR22w=;
+        b=Mz7R8jzTwr27+lHVpHBFyKNV6uMxJ1TTiJeAPtZtSTIJGfSgknUV9Dv2oaJPseWuL8
+         z1osB8JTUGs1CPiyja9nROWCQdJhKlII9aOg9leF+FIMuIWrewkZxfkckFFruaU+JnWv
+         5dztHkytL8sfXTEw/5/tON3q5O/VGjSPGfgrTLsjtzFraXbmok7AxJTDmLC3tq76jOY7
+         h+ZZKa7P5ZPnWyz5d6GwnW3B0jlSg0rJ3QekUjZzxbHbG5kuI7ssDebe8iR23dt6jZsz
+         vpUsTDvAlYDEYZycNFzGqL8vlg9+dbSfcIzbXOOv6CgPbAr5VmVncMBc03vrSjL5HPc+
+         x3WQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWBeIIEOmd8M3aDnW4w4HqP1qclZ22qxbQeF5o6bUT1WABs/+8B4ivCpTGr1SnmSXgMxrI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGLJ+AwWSIJn3Y/yvr8Nf/dHa1OMe+SDhB0tiXnERQHuUMS2YT
+	XzLJCLeUUtgJMFmSSXEmgNF5aK5do45Arh2KORpri5Fzbzjwe2JwRnijpt0F4vQjmfy8KLiVTJt
+	L0TfANfI5HbqfyXLtrjOiTuspOLlCfhp32INRpWBIDt0L8kas/8GdOw==
+X-Gm-Gg: ASbGncunpvMc10c+zG8R2VJ/upP2R5+bPdVu2vcOsdA43C9oSXpqc+COkN37wYlJQ4S
+	MrVva1VI6kYTTiBEglRevfpCohXo8eyvJaaY/epupMq/QD1bSE4bhXUM0rGpD6BN+cJe394L1/B
+	JKyKO7s+PChc0P2xoubdpoQKoM+KtIttQncQHWPrTPk3sxva0XQ44iMjsQdbUUVUBucf3esLOyF
+	nnMMVpvnIMtlBlRq3x0oVxOGF9NOcVZbJXQ2j1g6SQrzJvikUZpzX4g/WRaioQs3FV/uWNqALZ7
+	G48Ev7QCEuBKJW9HMnMG4V2ghteGkcvzqV7Tfmz/m/9tDJMuzr+iq49BFKsCo8/fNGHZiZglrpb
+	CJvEgJQlbw6cri0JpfFc=
+X-Received: by 2002:a05:600c:450f:b0:477:76bf:e1fb with SMTP id 5b1f17b1804b1-4778fe4a05emr84091615e9.16.1763274737042;
+        Sat, 15 Nov 2025 22:32:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFeRI/yezHZxOP1x7mKLvN6v76+5MYb3nziZ0TDSQOyL2+hNz6X/UXawre7ClVnkphXS6dc2Q==
+X-Received: by 2002:a05:600c:450f:b0:477:76bf:e1fb with SMTP id 5b1f17b1804b1-4778fe4a05emr84091395e9.16.1763274736503;
+        Sat, 15 Nov 2025 22:32:16 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e84a4fsm19190559f8f.11.2025.11.15.22.32.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Nov 2025 03:08:45 -0800 (PST)
-From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@vger.kernel.org,
-	Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-Subject: [PATCH] KVM: selftests: Include missing uapi header for *_VECTOR definitions
-Date: Sat, 15 Nov 2025 16:38:29 +0530
-Message-ID: <20251115110830.26792-1-ankitkhushwaha.linux@gmail.com>
-X-Mailer: git-send-email 2.51.1
+        Sat, 15 Nov 2025 22:32:16 -0800 (PST)
+Date: Sun, 16 Nov 2025 01:32:13 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jon Kohler <jon@nutanix.com>
+Cc: David Laight <david.laight.linux@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH net-next] vhost: use "checked" versions of get_user() and
+ put_user()
+Message-ID: <20251116013201-mutt-send-email-mst@kernel.org>
+References: <20251113005529.2494066-1-jon@nutanix.com>
+ <20251114185424.354133ae@pumpkin>
+ <2CD22CA1-FAFA-493A-8F41-A5798C33D103@nutanix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <2CD22CA1-FAFA-493A-8F41-A5798C33D103@nutanix.com>
 
-The exception vector constants CP_VECTOR, HV_VECTOR, VC_VECTOR, and
-SX_VECTOR are used in ex_str(), but the header that defines
-them is not included. Other exception vectors are picked up through
-indirect includes, but these four are not, which leads to unresolved
-identifiers during selftest builds.
+On Fri, Nov 14, 2025 at 07:30:32PM +0000, Jon Kohler wrote:
+> 
+> 
+> > On Nov 14, 2025, at 1:54 PM, David Laight <david.laight.linux@gmail.com> wrote:
+> > 
+> > !-------------------------------------------------------------------|
+> >  CAUTION: External Email
+> > 
+> > |-------------------------------------------------------------------!
+> > 
+> > On Wed, 12 Nov 2025 17:55:28 -0700
+> > Jon Kohler <jon@nutanix.com> wrote:
+> > 
+> >> vhost_get_user and vhost_put_user leverage __get_user and __put_user,
+> >> respectively, which were both added in 2016 by commit 6b1e6cc7855b
+> >> ("vhost: new device IOTLB API"). In a heavy UDP transmit workload on a
+> >> vhost-net backed tap device, these functions showed up as ~11.6% of
+> >> samples in a flamegraph of the underlying vhost worker thread.
+> >> 
+> >> Quoting Linus from [1]:
+> >>    Anyway, every single __get_user() call I looked at looked like
+> >>    historical garbage. [...] End result: I get the feeling that we
+> >>    should just do a global search-and-replace of the __get_user/
+> >>    __put_user users, replace them with plain get_user/put_user instead,
+> >>    and then fix up any fallout (eg the coco code).
+> >> 
+> >> Switch to plain get_user/put_user in vhost, which results in a slight
+> >> throughput speedup. get_user now about ~8.4% of samples in flamegraph.
+> >> 
+> >> Basic iperf3 test on a Intel 5416S CPU with Ubuntu 25.10 guest:
+> >> TX: taskset -c 2 iperf3 -c <rx_ip> -t 60 -p 5200 -b 0 -u -i 5
+> >> RX: taskset -c 2 iperf3 -s -p 5200 -D
+> >> Before: 6.08 Gbits/sec
+> >> After:  6.32 Gbits/sec
+> >> 
+> >> As to what drives the speedup, Sean's patch [2] explains:
+> >> Use the normal, checked versions for get_user() and put_user() instead of
+> >> the double-underscore versions that omit range checks, as the checked
+> >> versions are actually measurably faster on modern CPUs (12%+ on Intel,
+> >> 25%+ on AMD).
+> > 
+> > Is there an associated access_ok() that can also be removed?
+> > 
+> > David
+> 
+> Hey David - IIUC, the access_ok() for non-iotlb setups is done at
+> initial setup time, not per event, see vhost_vring_set_addr and
+> for the vhost net side see vhost_net_set_backend -> 
+> vhost_vq_access_ok.
+> 
+> Will lean on MST/Jason to help sanity check my understanding.
 
-    lib/x86/processor.c: In function ‘ex_str’:
-    lib/x86/processor.c:52:17: error: ‘CP_VECTOR’ undeclared
-    lib/x86/processor.c:53:17: error: ‘HV_VECTOR’ undeclared
-    lib/x86/processor.c:54:17: error: ‘VC_VECTOR’ undeclared
-    lib/x86/processor.c:55:17: error: ‘SX_VECTOR’ undeclared
+Right.
 
-These vector definitions live in:
-
-    tools/arch/x86/include/uapi/asm/kvm.h
-
-Add the missing include the userspace API exception vector constants.
-
-Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
----
- tools/testing/selftests/kvm/lib/x86/processor.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-index b418502c5ecc..fb589f07f2a4 100644
---- a/tools/testing/selftests/kvm/lib/x86/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-@@ -4,6 +4,7 @@
-  */
-
- #include "linux/bitmap.h"
-+#include "uapi/asm/kvm.h"
- #include "test_util.h"
- #include "kvm_util.h"
- #include "pmu.h"
---
-2.51.1
+> In the iotlb case, that’s handled differently (Jason can speak to
+> that side), but I dont think there is something we’d remove there?
 
 
