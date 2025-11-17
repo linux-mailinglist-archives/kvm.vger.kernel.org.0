@@ -1,163 +1,174 @@
-Return-Path: <kvm+bounces-63402-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63403-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48232C65948
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:44:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10B9EC65A07
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:56:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A44DF4E5482
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 17:42:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id AD3F924240
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 17:56:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC23A30AAD4;
-	Mon, 17 Nov 2025 17:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A71309EE4;
+	Mon, 17 Nov 2025 17:56:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j0qGRv2n"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="nPHFR4UM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.74.81.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D37F26F46F
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 17:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7D32BDC09;
+	Mon, 17 Nov 2025 17:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.74.81.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763401297; cv=none; b=ua6bOwaNxT1WJYg130MjiNHqaDfP5F2oLh2Qwapfy5PFXKCQbNDPrS+YdF9c1ZifSDzPB6AlXlXmgfpLLNFtOweiT/Li6USmxMRvqZei6rNBioButumLU8Ekc6WZUz/TmQPEdMvt+UNpopokqAn4NBIi1HjTeXt2YJu7JmfRFaQ=
+	t=1763402170; cv=none; b=hQaauuuPCiMDLsw9O6xhl7kgMjZlcpisHKyz8bdBOrCtyqiefKSiy5Te4w0nfD78DEdZIm7i/Px3OZGSMV4XXXEbNhB2qkKZLQ/Eyc/Pzcq2vRrrOjjWyZzhXsiGMR81XncSYjKBjDZE+8IiN7QH3AqBobZRdJA9auk4rQ/ntUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763401297; c=relaxed/simple;
-	bh=JSrFjAm2X9O7/FnmG4/kYtbZnibi5Bf18Pm4QJXz7sI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KTSB4MHQMkMahRy6NNKk+vtrjwWRGsSqJ7uP+3UOuXT48l1kuMwm4xlThdyUueAQ6Slt26P4g97bdnoRgGI9h2FWqvN/2yqll5Dre0EYC+szS0jFcLP4gNfSs3ry8e7zXsHBObbPbXQyeJVn3eNr+qMYHn6LTuOAN9B7xC3hFtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j0qGRv2n; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-340c261fb38so9282025a91.0
-        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 09:41:36 -0800 (PST)
+	s=arc-20240116; t=1763402170; c=relaxed/simple;
+	bh=6aBRxvsB8FcK8Ggd9JrGhsno6+pnPVxSCu6we9Ym6Pc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=b5mKv1XXekVb6/CRbFcrgaOcOtvMtTbBdn0r4fVQm0qbBnjZgfAheywfKvR5ob4w2RgCSnphKa3QW1Hv9pmFpjCazg7DQYgBWaLYyudM4Pki2h54BmFpw8CZB+mFG6nIR+7vN/wbyWny/gzEcNT+QUUMNfhwm4ynrFAMEgyQXqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=nPHFR4UM; arc=none smtp.client-ip=3.74.81.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763401295; x=1764006095; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pqUWVJBl+gE0Et3dBiQwwEVGgXHkUnd572mRvHvD8ig=;
-        b=j0qGRv2nZvISyQlTcr+qW4YecFodP7k9eXItK9c8C5syata3d2X+pdBFgskPfvuA4M
-         wjw1DRK9azY+g5KQ/QpnDuJEI+FMucGjoSqyRi6UJ0MtQ6v5dttjX7p1mW5c2Q1DSip8
-         gYKRCUUalfJhYNHJ55t4eyHDLMd/3As4zFoBQcXhuSDsZ6hQE80MUrxziOjlwwGLK3G/
-         hernB7Sno8d5frsTJZMA3kZLXDEXYqZcUCTnn7b2lhLbfr/ImaGgiDgI7+OptJiCtDcH
-         MmmyvXzajHf1Lrs3sGj9Sf1naimC1yGbIhGr7n4zgADT/zvbDlhXt1jNaaQTFIoqmpj2
-         BaNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763401295; x=1764006095;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pqUWVJBl+gE0Et3dBiQwwEVGgXHkUnd572mRvHvD8ig=;
-        b=bpd009iyFEha+SzT+HYWPD67JmWNTQfE2LfnGGCSmAcXeXf0scwYh37r67b2+NsxM5
-         WdE7eOBIPtgr6B0UurRuVZQzAn9DbIhdBFFboyeJK+qsAHBclVCeZMONUnqdV95w3F9N
-         rfLjJUZqWX2r9FWB42p69yj5eefKTU4MED2ytPIcKYAGJR0bRxkFtVh/onivDJ7zhRpl
-         c46fDvF2w2VXBTsF8KcCTRJifW5b129+PWInDkE6O+9dx4p08qIZBvac3AWF34C7d3lt
-         JwnnO+eYMdeRSZBOyzowFt3rha2aBeCSzjuyl9Lu1GTj3R5Gt5sSZ0ezSQjdxH9J1J0x
-         wtwg==
-X-Forwarded-Encrypted: i=1; AJvYcCXuHaczOTVf+iitelEGbr4SpEQl0d+6yNwpafAwMV6hLLRcJ1qyiVHacNhxTIwZY8yjcws=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv382Dd+RMtSppOIQCzI9PtGae2Za6jIQNdnjMbgERO4STMy/j
-	f53OJv5rbP+1FI99xDnbwJGgDbJlJGIh5WEN3owwhM+4zWPTnjNoAHfiZ39ZlGSxevbM8Bvmb73
-	yNZFLVQ==
-X-Google-Smtp-Source: AGHT+IEcsmUH9PIRUNHE9sQ8kqw6dSSkzaQkcJNKGEB2A+vOVIa43Yxot3SgVI3qTcVWr1fNTDoMmFy+nQU=
-X-Received: from pjvc17.prod.google.com ([2002:a17:90a:d911:b0:341:7640:eb1e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:586d:b0:340:e4fb:130b
- with SMTP id 98e67ed59e1d1-343f9eb6167mr13840284a91.14.1763401295493; Mon, 17
- Nov 2025 09:41:35 -0800 (PST)
-Date: Mon, 17 Nov 2025 09:41:33 -0800
-In-Reply-To: <E413E048-EA97-4386-8A88-B9552A823AE3@nutanix.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1763402168; x=1794938168;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=1+C5a3uEh6uVhE5CwBjGHueg7GAsDN4q94fBn9c2N+U=;
+  b=nPHFR4UMC8nvNHo4Fnw9rOi4kaQ2UntLOJmp34d63Go0B086RuyGNxTI
+   9Ups/aIMG/+fpDnsKnRvx3i1LNe4lvbVtOI/faG9wpv+mMWqYief6gtxl
+   CD9nODGsAoxjZqkdwHOS2cNcfwN7/ieomLSEe4E+JOtKC6GLWaN77PCAj
+   ezA7A5fCgKAGSy5F7aQe5n4IzQkHKq+Ni6YMHyyAC2V1awrcxksmXcthT
+   m28xfCt/5BI2j2FDGNX8X6q1ZuXxXT4N/xt7CJed4L/HOkqSm7yl8pphs
+   5lO8oPJcxfPYC0PNaVpf5xditTgPEA1T30QvZRN6fEFTjnNAj/8CU6hAz
+   w==;
+X-CSE-ConnectionGUID: AE5RMGScSNWxUyM+wG0ARw==
+X-CSE-MsgGUID: caTuEcgcSBqoUTH9RXgYZg==
+X-IronPort-AV: E=Sophos;i="6.19,312,1754956800"; 
+   d="scan'208";a="5331311"
+Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
+  by internal-fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 17:55:50 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:23472]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.42.72:2525] with esmtp (Farcaster)
+ id 7f414123-7287-41e0-add1-f6f5cca5cd00; Mon, 17 Nov 2025 17:55:50 +0000 (UTC)
+X-Farcaster-Flow-ID: 7f414123-7287-41e0-add1-f6f5cca5cd00
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Mon, 17 Nov 2025 17:55:48 +0000
+Received: from [192.168.14.35] (10.106.82.32) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Mon, 17 Nov 2025
+ 17:55:47 +0000
+Message-ID: <a5531d06-dd11-402b-a701-a7c6a62186a7@amazon.com>
+Date: Mon, 17 Nov 2025 17:55:46 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250916172247.610021-1-jon@nutanix.com> <aRTZ4oqqIqDlMS6d@google.com>
- <E413E048-EA97-4386-8A88-B9552A823AE3@nutanix.com>
-Message-ID: <aRteTRY2Z5Z3fL51@google.com>
-Subject: Re: [kvm-unit-tests PATCH 00/17] x86/vmx: align with Linux kernel VMX definitions
-From: Sean Christopherson <seanjc@google.com>
-To: Jon Kohler <jon@nutanix.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [RFC PATCH 0/4] mm, kvm: add guest_memfd support for uffd minor
+ faults
+To: Mike Rapoport <rppt@kernel.org>, <linux-mm@kvack.org>
+CC: Andrea Arcangeli <aarcange@redhat.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Baolin Wang <baolin.wang@linux.alibaba.com>,
+	David Hildenbrand <david@redhat.com>, Hugh Dickins <hughd@google.com>, "Liam
+ R. Howlett" <Liam.Howlett@oracle.com>, Lorenzo Stoakes
+	<lorenzo.stoakes@oracle.com>, Michal Hocko <mhocko@suse.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Sean Christopherson
+	<seanjc@google.com>, Shuah Khan <shuah@kernel.org>, Suren Baghdasaryan
+	<surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20251117114631.2029447-1-rppt@kernel.org>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <20251117114631.2029447-1-rppt@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D002EUA001.ant.amazon.com (10.252.50.66) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-On Fri, Nov 14, 2025, Jon Kohler wrote:
-> > On Nov 12, 2025, at 2:02=E2=80=AFPM, Sean Christopherson <seanjc@google=
-.com> wrote:
-> > On Tue, Sep 16, 2025, Jon Kohler wrote:
-> >> This series modernizes VMX definitions to align with the canonical one=
-s
-> >> within Linux kernel source. Currently, kvm-unit-tests uses custom VMX
-> >> constant definitions that have grown organically and have diverged fro=
-m
-> >> the kernel, increasing the overhead to grok from one code base to
-> >> another.
-> >>=20
-> >> This alignment provides several benefits:
-> >> - Reduces maintenance overhead by using authoritative definitions
-> >> - Eliminates potential bugs from definition mismatches
-> >> - Makes the test suite more consistent with kernel code
-> >> - Simplifies future updates when new VMX features are added
-> >>=20
-> >> Given the lines touched, I've broken this up into two groups within th=
-e
-> >> series:
-> >>=20
-> >> Group 1: Import various headers from Linux kernel 6.16 (P01-04)
-> >=20
-> > Hrm.  I'm definitely in favor of aligning names, and not opposed to pul=
-ling
-> > information from the kernel, but I don't think I like the idea of doing=
- a straight
-> > copy+paste.  The arch/x86/include/asm/vmxfeatures.h insanity in particu=
-lar is pure
-> > overhead/noise in KUT.  E.g. the layer of indirection to find out the b=
-it number is
-> > _really_ annoying, and the shifting done for VMFUNC is downright gross,=
- but at
-> > least in the kernel we get pretty printing in /proc/cpuinfo.
-> >=20
-> > Similarly, I don't want to pull in trapnr.h verbatim, because KVM alrea=
-dy provides
-> > <nr>_VECTOR in a uapi header, and I strongly prefer the <nr>_VECTOR mac=
-ros
-> > ("trap" is very misleading when considering fault-like vs. trap-like ex=
-ceptions).
-> >=20
-> > This is also a good opportunity to align the third player: KVM selftest=
-s.  Which
-> > kinda sorta copy the kernel headers, but with stale and annoying differ=
-ences.
-> >=20
-> > Lastly, if we're going to pull from the kernel, ideally we would have a=
- script to
-> > semi-automate updating the KUT side of things.
-> >=20
-> > So, I think/hope we can kill a bunch of birds at once by creating a scr=
-ipt to
-> > parse the kernel's vmxfeatures.h, vmx.h, trapnr.h, msr-index.h (to repl=
-ace lib/x86/msr.h),
-> > and generate the pieces we want.  And if we do that for KVM selftests, =
-then we
-> > can commit the script to the kernel repo, i.e. we can make it the kerne=
-l's
-> > responsibility to keep the script up-to-date, e.g. if there's a big ren=
-ame or
-> > something.
->=20
-> Thanks, Sean - Happy to take a swing at if you don=E2=80=99t already have=
- something
-> cooked up to magic that into existence. Any chance any other subsystems d=
-o
-> something similar? Want to make sure we don=E2=80=99t re-invent the wheel=
- if so.
 
-AFAIK, there's no prior art.  :-/
 
-People do have scripts to manage headers, but they're for simple use cases =
-of
-copying kernel headers elsewhere.
+On 17/11/2025 11:46, Mike Rapoport wrote:
+> From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
+> 
+> Hi,
+> 
+> These patches allow guest_memfd to notify userspace about minor page
+> faults using userfaultfd and let userspace to resolve these page faults
+> using UFFDIO_CONTINUE.
+> 
+> To allow UFFDIO_CONTINUE outside of the core mm I added a
+> get_pagecache_folio() callback to vm_ops that allows an address space
+> backing a VMA to return a folio that exists in it's page cache (patch 2)
+> 
+> In order for guest_memfd to notify userspace about page faults, it has to
+> call handle_userfault() and since guest_memfd may be a part of kvm module,
+> handle_userfault() is exported for kvm module (patch 3).
+> 
+> Note that patch 3 changelog does not provide motivation for enabling uffd
+> in guest_memfd, mainly because I can't say I understand why is that
+> required :)
+> Would be great to hear from KVM folks about it.
+
+Hi Mike,
+
+Thanks for posting it!
+
+In our use case, Firecracker snapshot-restore using UFFD [1], we will 
+use UFFD minor/continue to respond to guest_memfd faults in user 
+mappings primarily due to VMM accesses that are required for PV (virtio) 
+device emulation and also KVM accesses when decoding MMIO operations on x86.
+
+Nikita
+
+[1] 
+https://github.com/firecracker-microvm/firecracker/blob/main/docs/snapshotting/handling-page-faults-on-snapshot-resume.md
+
+> 
+> This series is the minimal change I've been able to come up with to allow
+> integration of guest_memfd with uffd and while refactoring uffd and making
+> mfill_atomic() flow more linear would have been a nice improvement, it's
+> way out of the scope of enabling uffd with guest_memfd.
+> 
+> Mike Rapoport (Microsoft) (3):
+>    userfaultfd: move vma_can_userfault out of line
+>    userfaultfd, shmem: use a VMA callback to handle UFFDIO_CONTINUE
+>    userfaultfd, guest_memfd: support userfault minor mode in guest_memfd
+> 
+> Nikita Kalyazin (1):
+>    KVM: selftests: test userfaultfd minor for guest_memfd
+> 
+>   fs/userfaultfd.c                              |   4 +-
+>   include/linux/mm.h                            |   9 ++
+>   include/linux/userfaultfd_k.h                 |  36 +-----
+>   include/uapi/linux/userfaultfd.h              |   8 +-
+>   mm/shmem.c                                    |  20 ++++
+>   mm/userfaultfd.c                              |  88 ++++++++++++---
+>   .../testing/selftests/kvm/guest_memfd_test.c  | 103 ++++++++++++++++++
+>   virt/kvm/guest_memfd.c                        |  30 +++++
+>   8 files changed, 245 insertions(+), 53 deletions(-)
+> 
+> 
+> base-commit: 6146a0f1dfae5d37442a9ddcba012add260bceb0
+> --
+> 2.50.1
+> 
+
 
