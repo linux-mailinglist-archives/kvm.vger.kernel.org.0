@@ -1,260 +1,182 @@
-Return-Path: <kvm+bounces-63398-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63399-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 110BBC6573E
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:23:20 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1056DC657C8
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:29:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2205D3A0A5E
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 17:15:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AA4163A214E
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 17:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12B6313E1B;
-	Mon, 17 Nov 2025 17:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AF13093A0;
+	Mon, 17 Nov 2025 17:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ehKeqUsj"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="St0q6+iO"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABCC304BBC;
-	Mon, 17 Nov 2025 17:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B25130504D
+	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 17:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763399344; cv=none; b=phd5GLJ393PEnJSw8PPMpvKSamVu2MNpIkuvtuqls2jCew8KZ4MWmoDyFgTQENlzYIbecj0tRzbIL7cXJbAr6B8bS6DfbOeA4fgjuB0iRuhhmfhUV/q1NODrAu1pEnDnOAKp2QpUELtOJWTd6A+LgyGOUNE/141NiIG01yep294=
+	t=1763399785; cv=none; b=DrSufqeWBdpkYM+t8liD3mbjtgmPpHiK+K+Y4ZzRpm/QpOf7LD5xdeXVL9z59FOiyhNC+vVTHiJR8Hym3D61w+vHZmogeRnKAsx1j6CTsZ0MioAkJHAY5Zi6XMV/n2GGwTiOT3Gij0WXaHD/EPPpDPiJdN9ZpprmnC0PCo88iUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763399344; c=relaxed/simple;
-	bh=RuS09nJyeqNS8Db0pvG4BOuHVgtzKyDFtBIV37Zz3OY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=udEve/xP67xGJ0l2FW08mlztNN2EnIwVQ+uns2oxjnbDfNmPFyfemZFCaP/tJkXoNHf2f1etid0Qwykxot2O2mVL2zXpAB1vNxHh2YnvoF+9Yl29WfeaU+gJeBMbF3p5TqEI8n10dGGpZzaPTp7HltC6IWwQPRQnSuGrEQ79aQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ehKeqUsj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79107C4CEF1;
-	Mon, 17 Nov 2025 17:08:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763399343;
-	bh=RuS09nJyeqNS8Db0pvG4BOuHVgtzKyDFtBIV37Zz3OY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ehKeqUsjA8DloYD0X8DNYblCUZB3qIRIlB9+2dqOC1p/8Qa9CCGGCW+1t/ltXQgDt
-	 5OBn9R76l0aDrReC4cD25v5Q9WWbeBZUzO9tfInbVvA70ywWrLmfH13JplaoHoZ8gl
-	 RPMjj+zX9g961agbLV/++/j8252BXeu3IahHFFW3NRFTeL5v9KTwJrz1RY587W6nmp
-	 tCjFr4SeqdXZrXnFjxR5TZUQliuX9f5YcUK9I1TXHM4CTRYjIJtW3NNORwORPCZKH+
-	 A2mN7i4dg+OQ9m/+/vC239WZLil7+E7R+qeZPIN/zC5tw7bBLNZcAf+7DP8X3rpEEd
-	 Cl7SfHIEbl3MQ==
-Message-ID: <94fcc32f-574a-4934-b7a9-1ed8bd32a97f@kernel.org>
-Date: Mon, 17 Nov 2025 18:08:57 +0100
+	s=arc-20240116; t=1763399785; c=relaxed/simple;
+	bh=2sNLnkk8V5VHxiND7V+FoGQrjFZ2T5dAZtQ/cFM2bC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=evrdp7vDfAwOcCsQknGzGvkfURZzjKjXiCsX0xWD09iEqB3bqdrPwP/OSVCR9qYg3A3sFwXBz9KAywGKbhG6RVOeJdItjc4NlevQrLamgZEcjTNzyU+vXAL26M84QBa6z3LCH4qBK0NMfydlrc35KXk6pnP3BASzqP/2l3SvXok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=St0q6+iO; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ee1a3ef624so10487081cf.0
+        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 09:16:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1763399780; x=1764004580; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=P1EKuTl21MaZwOVAnrWkECo68IZFcqZRr/UNlppTPmo=;
+        b=St0q6+iOpxbQP/6k4YKopb2b5abxIoNmFDBUjCQhyPHK+h7d8HKH6xaNs1SrXfm6OZ
+         SX3+iU7AfSkVpcl9Oh20UsDOxLGNyrTJJc60M57mpWVYDN6AnVbBn3x/F0Pr/nl/c57p
+         5jOlIOnA23o0k+wKKWoTyTffzSAy9/U+iWg/cLqgA3zQq/msJHRR/LgxbQaTSBBwO6MZ
+         HKzAgSbvvmGmW1PFfxSgqU9DWWWbgWBmTKIdeGJueyBjy9frttHn2vvAydk/HIgrAZxw
+         cGoTxy1YwOwm3TyCYh3mvEIbvhY1xGP7VBnVqBapoxOOhc2WUKsxkMK9G0cuu6VQah0D
+         A6aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763399780; x=1764004580;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P1EKuTl21MaZwOVAnrWkECo68IZFcqZRr/UNlppTPmo=;
+        b=Qvql9eaE5dSCAR5ZEljpreFvW82RRb5v5rbVqcTENJEP95lHs7zweJ8b62Nmt2zPu8
+         l33iWwYoNgmssA9OfcgiLwCkNSt2MXI6M2TPkG92rPbBxZO5DoLdmaQmWCBF6QyIPEnP
+         fWPTJ/+8BSbdREJVqOoAqBcemQN48YOrk4FsyEWQ7qOlqfePt1BWW/gF83J51Ww1bToi
+         +nTuunN+Lgcq1C1dOOilnYEBS9ce6gPZnoi+X/WmY+U1rhULQB4xTKk1/XmIvrgc45LZ
+         bil8qbDq2Yk8AiUqPxysD5r1f4FGexjZ6BNABUomGkj5W5QEdNieK0pibWPlkb7v5HCR
+         OxzA==
+X-Forwarded-Encrypted: i=1; AJvYcCWs2K8TFgPUznoDzMSSLn+zDdVOvD/OJac5ORMIROqlAS/UjmNy6XkO4aFPR51EwlfH1YA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrHv3NfJ+rzmY5lMN3ZmGr2XKFz65hpHn5YeNyByf6ejJ5Geqq
+	n7CUj5vaRH46kMJqPH2yWZxvMGWSFQ5z8+Wr4/KRRb5/a+C6uAsUKeghAHcxCJYhYXM=
+X-Gm-Gg: ASbGncuxvGuz07Dx6Lw+igE7mazpQ+gKJzBJYmqg+taJPj7xb2Dm+/QHhMEZMrRU7HW
+	+N86rlHZ9tNcyTLO9AYfxTMNcK2JPCYzTiCCFkGIR1U0IATmftvQ0g31OquBzr7hpK8c00yOMcX
+	YySiuirkCIf2bI01YHBn3BFw2teU57p5JnnlPZ8zEUk8sFF73nfXDt5pYZBUMQmpL1THbW3jmys
+	qHRvFctsB6Vbf5HQZkop+xAsIo0Fu5HTZ8MypFl/U6DbntP4fa+2RTnjK8UeAu5wuMUhTO7h+rM
+	b+uObfL+DH06Bn7eiI2Ac7VNklva2o+nWA9Hpkm/qDMcX8tD1vY2yLIcfdSdsJWEUA8/JesMBZ9
+	vMZFpC1D5UH/GuC+H7R8zaXP/h9fBKkrUnelPf0nSeULjnj3bYxjwbWhDWJ2DKSfDnoE421IUUL
+	WX/t745rDuS90C6J+URGl6x2GRkk3wb6/HzTRVt3VXiy/3XNn6flfP0Hyd
+X-Google-Smtp-Source: AGHT+IHdomOA3fXFLRj5Qifi24Z8ILoy1R2tZQWL9HXByV1pnhKykseLX/aaxM1vhUTUzCoPwrvJjg==
+X-Received: by 2002:a05:622a:22aa:b0:4ec:ef20:ac52 with SMTP id d75a77b69052e-4edfc87511cmr159168241cf.79.1763399780286;
+        Mon, 17 Nov 2025 09:16:20 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee1c21ea34sm32656311cf.30.2025.11.17.09.16.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 09:16:19 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vL2pv-000000005PX-0G4a;
+	Mon, 17 Nov 2025 13:16:19 -0400
+Date: Mon, 17 Nov 2025 13:16:19 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alex Williamson <alex@shazbot.org>
+Cc: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, iommu@lists.linux.dev,
+	linux-mm@kvack.org, linux-doc@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
+	linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>
+Subject: Re: [PATCH v7 00/11] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Message-ID: <20251117171619.GB17968@ziepe.ca>
+References: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
+ <20251110134218.5e399b0f.alex@shazbot.org>
+ <da399efa-ad5b-4bdc-964d-b6cc4a4fc55d@amd.com>
+ <20251117083620.4660081a.alex@shazbot.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 2/4] userfaultfd, shmem: use a VMA callback to handle
- UFFDIO_CONTINUE
-To: Mike Rapoport <rppt@kernel.org>, linux-mm@kvack.org
-Cc: Andrea Arcangeli <aarcange@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Baolin Wang <baolin.wang@linux.alibaba.com>, Hugh Dickins
- <hughd@google.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Michal Hocko
- <mhocko@suse.com>, Nikita Kalyazin <kalyazin@amazon.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20251117114631.2029447-1-rppt@kernel.org>
- <20251117114631.2029447-3-rppt@kernel.org>
-From: "David Hildenbrand (Red Hat)" <david@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20251117114631.2029447-3-rppt@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251117083620.4660081a.alex@shazbot.org>
 
-On 17.11.25 12:46, Mike Rapoport wrote:
-> From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
+On Mon, Nov 17, 2025 at 08:36:20AM -0700, Alex Williamson wrote:
+> On Tue, 11 Nov 2025 09:54:22 +0100
+> Christian König <christian.koenig@amd.com> wrote:
 > 
-> When userspace resolves a page fault in a shmem VMA with UFFDIO_CONTINUE
-> it needs to get a folio that already exists in the pagecache backing
-> that VMA.
+> > On 11/10/25 21:42, Alex Williamson wrote:
+> > > On Thu,  6 Nov 2025 16:16:45 +0200
+> > > Leon Romanovsky <leon@kernel.org> wrote:
+> > >   
+> > >> Changelog:
+> > >> v7:
+> > >>  * Dropped restore_revoke flag and added vfio_pci_dma_buf_move
+> > >>    to reverse loop.
+> > >>  * Fixed spelling errors in documentation patch.
+> > >>  * Rebased on top of v6.18-rc3.
+> > >>  * Added include to stddef.h to vfio.h, to keep uapi header file independent.  
+> > > 
+> > > I think we're winding down on review comments.  It'd be great to get
+> > > p2pdma and dma-buf acks on this series.  Otherwise it's been posted
+> > > enough that we'll assume no objections.  Thanks,  
+> > 
+> > Already have it on my TODO list to take a closer look, but no idea when that will be.
+> > 
+> > This patch set is on place 4 or 5 on a rather long list of stuff to review/finish.
 > 
-> Instead of using shmem_get_folio() for that, add a get_pagecache_folio()
-> method to 'struct vm_operations_struct' that will return a folio if it
-> exists in the VMA's pagecache at given pgoff.
+> Hi Christian,
 > 
-> Implement get_pagecache_folio() method for shmem and slightly refactor
-> userfaultfd's mfill_atomic() and mfill_atomic_pte_continue() to support
-> this new API.
-> 
-> Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
-> ---
->   include/linux/mm.h |  9 +++++++
->   mm/shmem.c         | 20 ++++++++++++++++
->   mm/userfaultfd.c   | 60 ++++++++++++++++++++++++++++++----------------
->   3 files changed, 69 insertions(+), 20 deletions(-)
-> 
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index d16b33bacc32..c35c1e1ac4dd 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -690,6 +690,15 @@ struct vm_operations_struct {
->   	struct page *(*find_normal_page)(struct vm_area_struct *vma,
->   					 unsigned long addr);
->   #endif /* CONFIG_FIND_NORMAL_PAGE */
-> +#ifdef CONFIG_USERFAULTFD
-> +	/*
-> +	 * Called by userfault to resolve UFFDIO_CONTINUE request.
-> +	 * Should return the folio found at pgoff in the VMA's pagecache if it
-> +	 * exists or ERR_PTR otherwise.
-> +	 */
+> Gentle nudge.  Leon posted v8[1] last week, which is not drawing any
+> new comments.  Do you foresee having time for review that I should
+> still hold off merging for v6.19 a bit longer?  Thanks,
 
-What are the locking +refcount rules? Without looking at the code, I 
-would assume we return with a folio reference held and the folio locked?
+I really want this merged this cycle, along with the iommufd part,
+which means it needs to go into your tree by very early next week on a
+shared branch so I can do the iommufd part on top.
 
-> +	struct folio *(*get_pagecache_folio)(struct vm_area_struct *vma,
-> +					     pgoff_t pgoff);
+It is the last blocking kernel piece to conclude the viommu support
+roll out into qemu for iommufd which quite a lot of people have been
+working on for years now.
 
+IMHO there is nothing profound in the dmabuf patch, it was written by
+the expert in the new DMA API operation, and doesn't form any
+troublesome API contracts. It is also the same basic code as from the
+v1 in July just moved into dmabuf .c files instead of vfio .c files at
+Christoph's request.
 
-The combination of VMA + pgoff looks weird at first. Would vma + addr or 
-vma+vma_offset into vma be better?
+My hope is DRM folks will pick up the baton and continue to improve
+this to move other drivers away from dma_map_resource(). Simona told
+me people have wanted DMA API improvements for ages, now we have them,
+now is the time!
 
-But it also makes me wonder if the callback would ever even require the 
-VMA, or actually only vma->vm_file?
+Any remarks after the fact can be addressed incrementally.
 
+If there are no concrete technical remarks please take it. 6 months is
+long enough to wait for feedback.
 
-Thinking out loud, I wonder if one could just call that "get_folio" or 
-"get_shared_folio" (IOW, never an anon folio in a MAP_PRIVATE mapping).
-
-> +#endif
->   };
->   
->   #ifdef CONFIG_NUMA_BALANCING
-> diff --git a/mm/shmem.c b/mm/shmem.c
-> index b9081b817d28..4ac122284bff 100644
-> --- a/mm/shmem.c
-> +++ b/mm/shmem.c
-> @@ -3260,6 +3260,20 @@ int shmem_mfill_atomic_pte(pmd_t *dst_pmd,
->   	shmem_inode_unacct_blocks(inode, 1);
->   	return ret;
->   }
-> +
-> +static struct folio *shmem_get_pagecache_folio(struct vm_area_struct *vma,
-> +					       pgoff_t pgoff)
-> +{
-> +	struct inode *inode = file_inode(vma->vm_file);
-> +	struct folio *folio;
-> +	int err;
-> +
-> +	err = shmem_get_folio(inode, pgoff, 0, &folio, SGP_NOALLOC);
-> +	if (err)
-> +		return ERR_PTR(err);
-> +
-> +	return folio;
-> +}
->   #endif /* CONFIG_USERFAULTFD */
->   
->   #ifdef CONFIG_TMPFS
-> @@ -5292,6 +5306,9 @@ static const struct vm_operations_struct shmem_vm_ops = {
->   	.set_policy     = shmem_set_policy,
->   	.get_policy     = shmem_get_policy,
->   #endif
-> +#ifdef CONFIG_USERFAULTFD
-> +	.get_pagecache_folio	= shmem_get_pagecache_folio,
-> +#endif
->   };
->   
->   static const struct vm_operations_struct shmem_anon_vm_ops = {
-> @@ -5301,6 +5318,9 @@ static const struct vm_operations_struct shmem_anon_vm_ops = {
->   	.set_policy     = shmem_set_policy,
->   	.get_policy     = shmem_get_policy,
->   #endif
-> +#ifdef CONFIG_USERFAULTFD
-> +	.get_pagecache_folio	= shmem_get_pagecache_folio,
-> +#endif
->   };
->   
->   int shmem_init_fs_context(struct fs_context *fc)
-> diff --git a/mm/userfaultfd.c b/mm/userfaultfd.c
-> index 8dc964389b0d..60b3183a72c0 100644
-> --- a/mm/userfaultfd.c
-> +++ b/mm/userfaultfd.c
-> @@ -382,21 +382,17 @@ static int mfill_atomic_pte_continue(pmd_t *dst_pmd,
->   				     unsigned long dst_addr,
->   				     uffd_flags_t flags)
->   {
-> -	struct inode *inode = file_inode(dst_vma->vm_file);
->   	pgoff_t pgoff = linear_page_index(dst_vma, dst_addr);
->   	struct folio *folio;
->   	struct page *page;
->   	int ret;
->   
-> -	ret = shmem_get_folio(inode, pgoff, 0, &folio, SGP_NOALLOC);
-> +	folio = dst_vma->vm_ops->get_pagecache_folio(dst_vma, pgoff);
->   	/* Our caller expects us to return -EFAULT if we failed to find folio */
-> -	if (ret == -ENOENT)
-> -		ret = -EFAULT;
-> -	if (ret)
-> -		goto out;
-> -	if (!folio) {
-> -		ret = -EFAULT;
-> -		goto out;
-> +	if (IS_ERR_OR_NULL(folio)) {
-> +		if (PTR_ERR(folio) == -ENOENT || !folio)
-> +			return -EFAULT;
-> +		return PTR_ERR(folio);
->   	}
->   
->   	page = folio_file_page(folio, pgoff);
-> @@ -411,13 +407,12 @@ static int mfill_atomic_pte_continue(pmd_t *dst_pmd,
->   		goto out_release;
->   
->   	folio_unlock(folio);
-> -	ret = 0;
-> -out:
-> -	return ret;
-> +	return 0;
-> +
->   out_release:
->   	folio_unlock(folio);
->   	folio_put(folio);
-> -	goto out;
-> +	return ret;
->   }
->   
->   /* Handles UFFDIO_POISON for all non-hugetlb VMAs. */
-> @@ -694,6 +689,22 @@ static __always_inline ssize_t mfill_atomic_pte(pmd_t *dst_pmd,
->   	return err;
->   }
->   
-> +static __always_inline bool vma_can_mfill_atomic(struct vm_area_struct *vma,
-> +						 uffd_flags_t flags)
-> +{
-> +	if (uffd_flags_mode_is(flags, MFILL_ATOMIC_CONTINUE)) {
-> +		if (vma->vm_ops && vma->vm_ops->get_pagecache_folio)
-> +			return true;
-> +		else
-> +			return false;
-
-Probably easier to read is
-
-	return vma->vm_ops && vma->vm_ops->get_pagecache_folio;
-
-> +	}
-> +
-> +	if (vma_is_anonymous(vma) || vma_is_shmem(vma))
-> +		return true;
-> +
-> +	return false;
-
-
-Could also be simplified to:
-
-return vma_is_anonymous(vma) || vma_is_shmem(vma);
-
-
--- 
-Cheers
-
-David
+Thanks,
+Jason
 
