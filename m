@@ -1,164 +1,136 @@
-Return-Path: <kvm+bounces-63426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63427-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B57B0C666BE
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 23:19:17 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C8F1C66816
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 00:00:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 5446E29885
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 22:19:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3C33A34AE68
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 22:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5864328B7C;
-	Mon, 17 Nov 2025 22:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C7834A3D6;
+	Mon, 17 Nov 2025 22:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ay5gOt95"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jo7u/QNd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EBB3093BF
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 22:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AA12F39A0;
+	Mon, 17 Nov 2025 22:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763417947; cv=none; b=pC2JOQTvuRgvdERZ4ymrMg/kIQu9u1qChFZHQDGAwaabXk151rtd8ACKCOSHB0g44WI3CDUktQPYxIyjb3S3oWOAKHrYAd/POgNpINzbbYB1xtJlgxEIqTyfyL5yBIDj8ffqXN62yG7WuIJYjlEXouaD0lr59EpRqqWqUDFfu/s=
+	t=1763420335; cv=none; b=bNK+SYsdvnuwrq3Irmhkzaw3NiVYTz21RKYoe/SQ1KXqysgeQ206CCDds67sVK1Sr5F3+sPmUvZON/LANkQmSkDvmvqwdIc1DcP5Z8lPkRTRIbsuUPQzDgC5p5D0r07uqzztsYG+43D+8Qw5xmatTH3a/S1xvvHfnuAJy6dY00c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763417947; c=relaxed/simple;
-	bh=m+SUNOSsRGNg6e4fertlZE3XZICpzyYhXKuDwT0ifo4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HcRMjgEvO3Y6EHxZe6+9mhtmJ13ipE6YnKFtmOwFJrGH9v8P0p7wtTWzkD7/7NE1TIcu7Qe+eIjK7ZuSaia+AVqS2Uyja1t32xdMRdidvIrZGFCnt8dHtVXakT4vtyIt5GbyXQ5elYX5f/thC+1CNfcIkJWoa80QW1t7xtZtU5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ay5gOt95; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29806c42760so173209105ad.2
-        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 14:19:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763417945; x=1764022745; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jketl0ykgqH6CHwpfbMW0pLhEMzOqTEcodUiqzB4Vy0=;
-        b=ay5gOt95NJG0eyq5BmKYG0JYQzAk4CpYrvJeoTU97Ov6f3sHWZuVTdPPQkyk8jHtmB
-         yeYb2uYTELW4UaXCA24n0uVX+IM+ix6aNqaMBPKoAvVG0C0NT9MsXfYJBJci/uWeJXR6
-         Ym05liNKL7p99SB8dFZLIxx1lCnWCvQqcgk+64zSCDIpjHGAyUWaiVvW30Pb7b4M1EkQ
-         uC3VCHwsFQfsyeHtM4Hv/hXMWIef6IxZv+KwwkW+rOjXKH48Tn2IZ0RbxnWteA7Vt5K6
-         U0GTWPbba4d9niJiFbt7bf7fXkPDP2ujIGJyk5xnu38mNbZeqehM0o2thqwXuCgNf9fk
-         HKgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763417945; x=1764022745;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jketl0ykgqH6CHwpfbMW0pLhEMzOqTEcodUiqzB4Vy0=;
-        b=VPyt+LRSYtk2i/qUO/dE6UXIjMLZ+ieX1AKScArTMePna1BJBFh0Ow3GVJgGUGYTwS
-         GibYr+gTIHI0D9EcCMjJiOwRWvoGLy1RSx5E2XKODO7kGNlsFWVieVpEUChFXmcCvPwP
-         ZDwSkw/hIAWO2feaJMXlRuYMNPi8yU5AfTqk4spidebOF2e8Ck0Ap3y+taH3I4p53BPm
-         6KNCmF7ao5Dzxq9bUWp1IJc1bYBRgyjA9j96B19sf2GcFIc2E1h21d8E4TZj8JSsq1gJ
-         yc8ecKXk+tnNlmlcsTfPLAYoGBeEdhQAm5T1zpOlmVjatx4oveHmNn92H3OCJAKEd1OJ
-         C8Ww==
-X-Gm-Message-State: AOJu0Yx02HEx8/D/z6NsYngqLUqDcDOCmNvoxQJJzXsy6IJG6ubKvP6M
-	OHymcMWqsWFHeCC30DcTW0S7JIqetxT00W0Y+j6DyRWFGg+O41M8vqirxwUcgCEyFo7D6dsqlhg
-	zuqmx3g==
-X-Google-Smtp-Source: AGHT+IHcdd0ArWlATEcfj8BU5F82GWD1Li5aCx6PmaH0PInTm//H/NUZ3GqyQdoRB02rIu9vl/OLgCgIy78=
-X-Received: from plgn12.prod.google.com ([2002:a17:902:f60c:b0:297:e1db:fee5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e951:b0:298:46a9:df1f
- with SMTP id d9443c01a7336-2986a6b88fbmr168676665ad.12.1763417944666; Mon, 17
- Nov 2025 14:19:04 -0800 (PST)
-Date: Mon, 17 Nov 2025 14:19:03 -0800
-In-Reply-To: <15788499-87c6-4e57-b3ae-86d3cc61a278@grsecurity.net>
+	s=arc-20240116; t=1763420335; c=relaxed/simple;
+	bh=yfF05U4RF+SjY7Vvy+25AHoW6V6B9W7JtUipFLOoZAY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=q7XHf4UebNEw1DI130+OgGgvI7l0q9yrBwXwEv7pcRT8Sjg0Sn2/Bd/ey353SvbtG9zzlMnq86jKwngN51iBZ/SmFbYk72Z5mGO38LZ9+5BElZ0WuWp0DCp7ZZd7MwEn6M8Bp6liDyCi1Cn3Eu/PQXERcwoeJGoeqcQ+pSCO48w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jo7u/QNd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80D04C19423;
+	Mon, 17 Nov 2025 22:58:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763420334;
+	bh=yfF05U4RF+SjY7Vvy+25AHoW6V6B9W7JtUipFLOoZAY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=jo7u/QNdMQcZ0HiLdmqU1BcI9yil/ZZRFOvlLcWSCOYpykU32AJPrFgqSxPjOC5WU
+	 p5ALUsyQswJELk4yY0ZiwBezUvJswC+0mFC/CZ4CI5WRnqdEXynrrjzuWh5KkldHbz
+	 aWnza2wNr+rbBJ3iChBxI84YXKVCQyM3sYO8ypMcz2PnbBialFEXMZ2zpgCQzfNWgo
+	 Rf+DPvQRgYH9EbvUlzi/dpVeOoFpuHgYMeaTOzIr23sYK6elAa2c5oOz6nWIxEGIUv
+	 FQPmCqAXV7PU+5F+zU3DJIXmr90rdfesgtKl7ueFJHtH3lLwaDp+3kapjBq9dRPm+x
+	 KjijbvlphfhIQ==
+Date: Mon, 17 Nov 2025 16:58:52 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: joro@8bytes.org, rafael@kernel.org, bhelgaas@google.com,
+	alex@shazbot.org, jgg@nvidia.com, kevin.tian@intel.com,
+	will@kernel.org, robin.murphy@arm.com, lenb@kernel.org,
+	baolu.lu@linux.intel.com, linux-arm-kernel@lists.infradead.org,
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-acpi@vger.kernel.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, patches@lists.linux.dev,
+	pjaroszynski@nvidia.com, vsethi@nvidia.com, etzhao1900@gmail.com
+Subject: Re: [PATCH v5 5/5] pci: Suspend iommu function prior to resetting a
+ device
+Message-ID: <20251117225659.GA2536275@bhelgaas>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250915215432.362444-1-minipli@grsecurity.net>
- <176314469132.1828515.1099412303366772472.b4-ty@google.com> <15788499-87c6-4e57-b3ae-86d3cc61a278@grsecurity.net>
-Message-ID: <aRufV8mPlW3uKMo4@google.com>
-Subject: Re: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf functions
-From: Sean Christopherson <seanjc@google.com>
-To: Mathias Krause <minipli@grsecurity.net>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Andrew Jones <andrew.jones@linux.dev>, 
-	Eric Auger <eric.auger@redhat.com>, Thomas Huth <thuth@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a166b07a254d3becfcb0f86e4911af556acbe2a9.1762835355.git.nicolinc@nvidia.com>
 
-On Sat, Nov 15, 2025, Mathias Krause wrote:
-> On 14.11.25 19:25, Sean Christopherson wrote:
-> > On Mon, 15 Sep 2025 23:54:28 +0200, Mathias Krause wrote:
-> >> This is v2 of [1], trying to enhance backtraces involving leaf
-> >> functions.
-> >>
-> >> This version fixes backtraces on ARM and ARM64 as well, as ARM currently
-> >> fails hard for leaf functions lacking a proper stack frame setup, making
-> >> it dereference invalid pointers. ARM64 just skips frames, much like x86
-> >> does.
-> >>
-> >> [...]
-> > 
-> > Applied to kvm-x86 next, thanks!
-> 
-> Thanks a lot, Sean!
-> 
-> > P.S. This also prompted me to get pretty_print_stacks.py working in my
-> >      environment, so double thanks!
-> 
-> Haha, you're welcome! :D
-> 
-> > 
-> > [1/4] Makefile: Provide a concept of late CFLAGS
-> >       https://github.com/kvm-x86/kvm-unit-tests/commit/816fe2d45aed
-> > [2/4] x86: Better backtraces for leaf functions
-> >       https://github.com/kvm-x86/kvm-unit-tests/commit/f01ea38a385a
+On Mon, Nov 10, 2025 at 09:12:55PM -0800, Nicolin Chen wrote:
 
-Spoke too soon :-(
+Run "git log --oneline drivers/pci/pci.c" and match the subject line
+style.
 
-The x86 change breaks the realmode test.  I didn't try hard to debug, as that
-test is brittle, e.g. see https://lore.kernel.org/all/20240604143507.1041901-1-pbonzini@redhat.com.
+> PCIe permits a device to ignore ATS invalidation TLPs, while processing a
+> reset. This creates a problem visible to the OS where an ATS invalidation
+> command will time out: e.g. an SVA domain will have no coordination with a
+> reset event and can racily issue ATS invalidations to a resetting device.
 
-I can't for the life of me figure out how to get Makefile variables to do what I
-want, so for now I'm going to drop the x86 change so as not to block the rest of
-the stuff I've got applied.
+s/TLPs, while/TLPs while/
 
-I'll keep the rest applied, so just resubmit the x86 patch against kvm-x86/next.
+> The PCIe spec in sec 10.3.1 IMPLEMENTATION NOTE recommends to disable and
+> block ATS before initiating a Function Level Reset. It also mentions that
+> other reset methods could have the same vulnerability as well.
 
-FWIW, conceptually I think we want something like this:
+Include spec revision, e.g., "PCIe r7.0, sec 10.3.1".
 
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index be18a77a..65e41578 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -44,6 +44,7 @@ COMMON_CFLAGS += -O1
- KEEP_FRAME_POINTER := y
- 
- ifneq ($(KEEP_FRAME_POINTER),)
-+ifneq ($(no_profiling),y)
- # Fake profiling to force the compiler to emit a frame pointer setup also in
- # leaf function (-mno-omit-leaf-frame-pointer doesn't work, unfortunately).
- #
-@@ -53,6 +54,7 @@ ifneq ($(KEEP_FRAME_POINTER),)
- # during compilation makes this do "The Right Thing."
- LATE_CFLAGS += $(call cc-option, -pg -mnop-mcount, "")
- endif
-+endif
- 
- FLATLIBS = lib/libcflat.a
- 
-@@ -120,6 +122,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o $(SRCDIR)/$(TEST_DIR)/realmode.
-        $(LD) -m elf_i386 -nostdlib -o $@ \
-              -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $(filter %.o, $^)
- 
-+$(TEST_DIR)/realmode.o: no_profiling = y
- $(TEST_DIR)/realmode.o: bits = $(realmode_bits)
- 
- $(TEST_DIR)/access_test.$(bin): $(TEST_DIR)/access.o
+> Now iommu_dev_reset_prepare/done() helpers are introduced for this matter.
 
-> > [3/4] arm64: Better backtraces for leaf functions
-> >       https://github.com/kvm-x86/kvm-unit-tests/commit/da1804215c8e
-> > [4/4] arm: Fix backtraces involving leaf functions
-> >       https://github.com/kvm-x86/kvm-unit-tests/commit/c885c94f523e
-> > 
-> > --
-> > https://github.com/kvm-x86/kvm-unit-tests/tree/next
-> 
+s/Now ... are introduced for this matter/Add ...helpers/
+
+> Use them in all the existing reset functions, which will attach the device
+> to an IOMMU_DOMAIN_BLOCKED during a reset, so as to allow IOMMU driver to:
+>  - invoke pci_disable_ats() and pci_enable_ats(), if necessary
+>  - wait for all ATS invalidations to complete
+>  - stop issuing new ATS invalidations
+>  - fence any incoming ATS queries
+
+Thanks for addressing this problem.
+
+> +++ b/drivers/pci/pci-acpi.c
+> @@ -971,6 +971,7 @@ void pci_set_acpi_fwnode(struct pci_dev *dev)
+>  int pci_dev_acpi_reset(struct pci_dev *dev, bool probe)
+>  {
+>  	acpi_handle handle = ACPI_HANDLE(&dev->dev);
+> +	int ret = 0;
+
+Unnecessary initialization.
+
+> +int pci_reset_iommu_prepare(struct pci_dev *dev)
+> +{
+> +	if (pci_ats_supported(dev))
+> +		return iommu_dev_reset_prepare(&dev->dev);
+
+Why bother checking pci_ats_supported() here?  That could be done
+inside iommu_dev_reset_prepare(), since iommu.c already uses
+dev_is_pci() and pci_ats_supported() is already exported outside
+drivers/pci/.
+
+> +void pci_reset_iommu_done(struct pci_dev *dev)
+> +{
+> +	if (pci_ats_supported(dev))
+> +		iommu_dev_reset_done(&dev->dev);
+
+And here.
+
+>  int pcie_flr(struct pci_dev *dev)
+>  {
+> +	int ret = 0;
+
+Unnecessary initialization.
+
+>  static int pci_af_flr(struct pci_dev *dev, bool probe)
+>  {
+> +	int ret = 0;
+
+Unnecessary initialization.
 
