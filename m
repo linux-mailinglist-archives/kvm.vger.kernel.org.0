@@ -1,152 +1,108 @@
-Return-Path: <kvm+bounces-63406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63407-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EFF3C65B98
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 19:30:50 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF5C6C65BB9
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 19:35:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C06F8351E68
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:30:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id E9A2E29323
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65453314B9A;
-	Mon, 17 Nov 2025 18:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C83313526;
+	Mon, 17 Nov 2025 18:35:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cgay6iP4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pqUvZRa4"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8D42D24BD
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 18:30:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A173C262FD0
+	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 18:35:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763404243; cv=none; b=Oz6UUVMIAhUy/Tx1VhG5TfjAzmoItq7kW8F9bf82lrgA6Yh3AjBGpLK8ihfb4vGTEcvUmRZ5Bx/jPWH39hIVA+ZZG57AlFvOJtF/c1TJ1tWuxTmRXcRVSYcG2nDWrwbocTzDZ3UPGOGT08qMyjD/LOLoMHnfNXwTQzjQ+3utRX8=
+	t=1763404504; cv=none; b=YEpRRjNLLhhhwAPXHfGDGATY/kkTEwOQzF0BBXlcQIeLjg3arG+87rAOY+qz1NqDIi7OxJ3SF8Ki/EdEYLW9TuGDMfOuIz+iGfPWSUTKp5/m3qxd22taNL/dicrodoJBc7VOlEcjK0xqOg6DY9QsgZo8v/+tCumHJMkhDmFHbZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763404243; c=relaxed/simple;
-	bh=crBrVMcARTLN+tszMn7sUtzu6jZSkSuiZqTLZkZwlwI=;
+	s=arc-20240116; t=1763404504; c=relaxed/simple;
+	bh=vUii/Zjd0EOYd9XofJayFPbD87AGj7mAEd1nALCQxkc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LEIULgDG4IyMiHRBY7/+tG14VzOWegzmHcUYzoMgXCOkcLpqRPymMpqgISn4khEYR0xJ0LgWIjJsNAJx3RCLp9/C9PPItFam6Nc51j5oKL6VZ4tPoRXfEnqyFn1Ek+5aWUsmqvfFrpC4P6+CdPoqSc6oUV0NnBzwYKZ/t13ZGzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cgay6iP4; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=tWSQaQmjj5Yn95U1ExxFtCuHVrG9BJ0Jk2X4IH7wxKPwzO5Q7mX/EyWLrchfQzPHVjCPYRrdG91j/WsAJD3Z+61DP96HX91/6RTzU5Zn08xPADpQj11Xgb3BaC6MmQDdhNdaUo0hxY7z7JSAtr4rY+lbhe7SUBE4jQpcUFczm4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pqUvZRa4; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29848363458so126462805ad.2
-        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 10:30:41 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2956cdcdc17so55099735ad.3
+        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 10:35:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763404241; x=1764009041; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763404502; x=1764009302; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PqN8C9clzsOl1ksbgrNP+zoJl87PgEGW12GrGJzU/bU=;
-        b=cgay6iP4D5YSGNE07nhv/2MkkmbLXOHPlV6z4TCsQtc9aqOJbj0nK5O+MwI4GcJcmA
-         +IZvXrb8uzv2FIztPOolswiVTEf5/hbqYr+TqbUUgm6W5Cy3ON5PrWD32EnxiiqMZBPr
-         IKcuT6ioKLOC/FhzphQoEQ1nFZ1D1ZfTOhW7SzWgy+1DGhHwgXA9yZQWOgUoDOUlalB8
-         OENOy/EdbmPA4vSiTTwVQkMYcgHk7JvMRttRSogQngzgX3l/U+Gm+7WRB46Q0KCzlF7D
-         XoftVJnlLMS+gmT+/7/zBbzdCG2g6XkCyHEPzxOq5jz5fv4acA9476Ik8nXYLv31o4FT
-         DVvg==
+        bh=+tWsc2Xr4SAZkzREfxWG5yQF2KiQKxMP5ZVYXfBNuLo=;
+        b=pqUvZRa48F2Ykze+od3CSf+wa0zjsZD+PRcTe/s6dm5NzoTqhCg9RjiyCl8A3HfGXT
+         DIuKaqy1hDuM0sfPYa0RtoG7ZyaqCH5dHb8zFPU+nSbXsEaSiWKhcss/XAtiguFpW2pM
+         LgRFxq6Posm22RukSRbHnlb3pOSnO3ytnwuml7hE6sBLoz/LSDlFX4n+NNy8KirqJAjo
+         2ByjmSEw7LP9nxIrq5XwsX9NJlKOqO0KGRY74XeJl4Hpre+1BDlpdSt+urh38CYpp54Z
+         KjDpZxwdXhCsRe/3llLfcmabwzC6KB8F84o2tbuqbQJtjl+5N1x1KMSVCfIaZ5v9bG3f
+         mpKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763404241; x=1764009041;
+        d=1e100.net; s=20230601; t=1763404502; x=1764009302;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PqN8C9clzsOl1ksbgrNP+zoJl87PgEGW12GrGJzU/bU=;
-        b=NBfVhi5Jl0iJAXzkIcMlVEzg86oli/MA+rBlE5NylG7gT6v2ZSZ4w9S4peeCskn83N
-         KxcUiidaPynDzpVUeek25dRHXjcA2D8sfzMAsvSV7IZodV1frubcH1ryB7v2wHUaxBEE
-         eNIwJew2UY//xQk5acK5hMQKzhFhRJK4/YB+O3LSCfvAQlBAxS7YzSSyvAgPM2Ghvm0X
-         FRG0RrVug/TVye1veukY9tuaK6mpv0mRFdjjYzPc2g0PcLHjRr+vCrAV3Ogv7xC+JCxc
-         iUAsCsa06AoQe6J9cmgx1DgRA9RBnu9p/1bvi28TM4QkSwdUNaCUSAM5aoHTItBao8jh
-         X1KA==
-X-Gm-Message-State: AOJu0Yygc6+RNiIB32emdPd5WgT2o9CxHRGhLmIjfntPA6BIW5Bnt19t
-	Png+QMwuKtY6wsXmXZwEygX5sXTRsyWrpoXeUuz2NfxV3B/XHLfYA9vQvSAjT5J+0RIyrzsBG7q
-	OxNXpTg==
-X-Google-Smtp-Source: AGHT+IGtAKWzla+LvbUBQljGRDvgZ19CjPQfJCV2x2B7bJDCN6LWQOMTZOFXtvrJxDcDv+gwLBUffZ6dcPg=
-X-Received: from pgbcr8.prod.google.com ([2002:a05:6a02:4108:b0:bc3:57f1:bc8e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ce8b:b0:282:eea8:764d
- with SMTP id d9443c01a7336-2986a741ac5mr137317915ad.35.1763404241048; Mon, 17
- Nov 2025 10:30:41 -0800 (PST)
-Date: Mon, 17 Nov 2025 10:30:39 -0800
-In-Reply-To: <20250910085156.1419090-1-griffoul@gmail.com>
+        bh=+tWsc2Xr4SAZkzREfxWG5yQF2KiQKxMP5ZVYXfBNuLo=;
+        b=H8KTGN9fF5/ILocS722zSM+eih2mB2GZ25eeHrAcDlZzT0+OJdlymwrlgPE67Oib1B
+         hnC7ZcZv4E+bSbT1x5rNcI95wU/wVirHK2LcK4vzKf8k3E7KnTsxred8165n8jnze5om
+         vvCWlo12GtZ7OXupAnF9VAmACqlM88XutZFai3+YZbHpTaRSI/SyMayAIMJtlVlsFe/n
+         KheKZZPlY2I8DjkY0tJGiuZkNpHlQChsJEjBzqAa/uFk1S9rzXHjIPprQbxdDt9Akjxb
+         N0esbPjf5T7JqSm68UB72TcP5XOkwoIAGSQ/DD1vkwkIVSuRrcCaP5GAkWa4V1qLANeM
+         fQBA==
+X-Gm-Message-State: AOJu0YxQ8lMSuHCDSu0J7tCQ6DvKDgmGHwLRHyMoA9JY/ERhSb7LD1I+
+	jipKuN7mxe22Kl6g2Y5ajUDKh3167DFOd7WjKFeeqIV48MDaFa5VRsOULg6J2gWY0GuA51BbR8o
+	OmpXOsQ==
+X-Google-Smtp-Source: AGHT+IEVPv++CcNWV2sW0QiDjD2p2AvLdb5RBh0+M72kaH92cSzSHfGJK9aCnIfjTTtPv8O3gsPnENjpCNc=
+X-Received: from plkq3.prod.google.com ([2002:a17:902:edc3:b0:298:321b:1fa8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d60d:b0:27d:c542:fe25
+ with SMTP id d9443c01a7336-2986a7509eamr129818835ad.41.1763404501920; Mon, 17
+ Nov 2025 10:35:01 -0800 (PST)
+Date: Mon, 17 Nov 2025 10:35:00 -0800
+In-Reply-To: <176254658743.821204.2042588290407024138.b4-ty@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250910085156.1419090-1-griffoul@gmail.com>
-Message-ID: <aRtpzxkVfY1g-Llp@google.com>
-Subject: Re: [PATCH v2] KVM: nVMX: Mark APIC access page dirty when syncing
- vmcs12 pages
+References: <20251030224246.3456492-1-seanjc@google.com> <176254658743.821204.2042588290407024138.b4-ty@google.com>
+Message-ID: <aRtq1BUthxWcAYLT@google.com>
+Subject: Re: [PATCH 0/4] KVM: x86: Cleanup #MC and XCR0/XSS/PKRU handling
 From: Sean Christopherson <seanjc@google.com>
-To: Fred Griffoul <griffoul@gmail.com>
-Cc: kvm@vger.kernel.org, Fred Griffoul <fgriffo@amazon.co.uk>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jon Kohler <jon@nutanix.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Sep 10, 2025, Fred Griffoul wrote:
-> From: Fred Griffoul <fgriffo@amazon.co.uk>
+On Mon, Nov 10, 2025, Sean Christopherson wrote:
+> On Thu, 30 Oct 2025 15:42:42 -0700, Sean Christopherson wrote:
+> > This series is the result of the recent PUCK discussion[*] on optimizing the
+> > XCR0/XSS loads that are currently done on every VM-Enter and VM-Exit.  My
+> > initial thought that swapping XCR0/XSS outside of the fastpath was spot on;
+> > turns out the only reason they're swapped in the fastpath is because of a
+> > hack-a-fix that papered over an egregious #MC handling bug where the kernel #MC
+> > handler would call schedule() from an atomic context.  The resulting #GP due to
+> > trying to swap FPU state with a guest XCR0/XSS was "fixed" by loading the host
+> > values before handling #MCs from the guest.
+> > 
+> > [...]
 > 
-> For consistency with commit 7afe79f5734a ("KVM: nVMX: Mark vmcs12's APIC
-> access page dirty when unmapping"), which marks the page dirty during
-> unmap operations, also mark it dirty during vmcs12 page synchronization.
+> Applied to kvm-x86 misc, thanks!
 > 
-> Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
-> ---
-> v2: Fix commit ID to use 12 chars instead of 11 (checkpatch warning)
-> 
->  arch/x86/kvm/vmx/nested.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index b8ea1969113d..02aee6dd1698 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3916,10 +3916,10 @@ void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu)
->  	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
->  	gfn_t gfn;
-> 
-> -	/*
-> -	 * Don't need to mark the APIC access page dirty; it is never
-> -	 * written to by the CPU during APIC virtualization.
-> -	 */
-> +	if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
-> +		gfn = vmcs12->apic_access_addr >> PAGE_SHIFT;
-> +		kvm_vcpu_mark_page_dirty(vcpu, gfn);
+> [1/4] KVM: SVM: Handle #MCs in guest outside of fastpath
+>       https://github.com/kvm-x86/linux/commit/6e640bb5caab
+> [2/4] KVM: VMX: Handle #MCs on VM-Enter/TD-Enter outside of the fastpath
+>       https://github.com/kvm-x86/linux/commit/8934c592bcbf
+> [3/4] KVM: x86: Load guest/host XCR0 and XSS outside of the fastpath run loop
+>       https://github.com/kvm-x86/linux/commit/3377a9233d30
+> [4/4] KVM: x86: Load guest/host PKRU outside of the fastpath run loop
+>       https://github.com/kvm-x86/linux/commit/7df3021b622f
 
-Hrm, marking the page dirty in vmx_complete_nested_posted_interrupt() is
-unnecessary, because that function is marking the vAPIC and PID pages as dirty
-because it explicitly writes those pages.  Not the end of the world, but I think
-we can clean up another over-dirtying issue at the same time.
-
-If nested_get_vmcs12_pages() didn't actually map memory into the guest, there's
-no need to mark the gfn dirty, as the underlying page is unreachable.  If we add
-a helper too fix that flag:
-
-static inline void kvm_vcpu_map_mark_dirty(struct kvm_vcpu *vcpu,
-					   struct kvm_host_map *map)
-{
-	if (kvm_vcpu_mapped(map))
-		kvm_vcpu_mark_page_dirty(vcpu, map->gfn);
-}
-
-then we can have vmx_complete_nested_posted_interrupt() mark exactly the pages
-it writes as dirty (which for me is more about documenting what the code is doing
-as opposed to caring about spuriously marking a page dirty).
-
-	kvm_vcpu_map_mark_dirty(vcpu, &vmx->nested.virtual_apic_map);
-	kvm_vcpu_map_mark_dirty(vcpu, &vmx->nested.pi_desc_map);
-
-Ugh, and looking at the details made me realize __kvm_vcpu_map() is buggy.  It
-uses gfn_to_memslot() instead of kvm_vcpu_gfn_to_memslot().  Luckily, it's benign
-as __kvm_vcpu_map() isn't reachable while the vCPU is "in" SMM.
-
-I'll send a v2 as a small series, i.e. with this as the final patch.
-
-> +	}
-> 
->  	if (nested_cpu_has(vmcs12, CPU_BASED_TPR_SHADOW)) {
->  		gfn = vmcs12->virtual_apic_page_addr >> PAGE_SHIFT;
-> --
-> 2.43.0
-> 
+I've dropped these for now as patch 2 broke TDX.  I'll send a v2 shortly.
 
