@@ -1,65 +1,63 @@
-Return-Path: <kvm+bounces-63393-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63394-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86615C6535D
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 17:41:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70DF4C6544D
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 17:56:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 40E1C29120
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 16:41:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 22DA64EFA8E
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 16:54:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA322DF13F;
-	Mon, 17 Nov 2025 16:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F1D30102B;
+	Mon, 17 Nov 2025 16:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U+Z4Mpkz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YSxPmttc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922372DEA8F;
-	Mon, 17 Nov 2025 16:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED8229993F;
+	Mon, 17 Nov 2025 16:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763397708; cv=none; b=QLyrTk2YE0NhmOmtginUQilE7Sn6mW/dj9TGEjUr7Ljw2oi8bLhrSPsTonHB1n4mxsSTolEJvbYTXMS0mmqAqpGcMCGJxPamCaF5m6Hsjd2v8y2APA/ZRM+uSc+vdTAsFBxO1IDX2utrtUOJDyC2yFv5jBgthJFqPPnC5fRmGDA=
+	t=1763398366; cv=none; b=quMXo0/C7e9Fi5+VvrM4PhEO3Lt1jwwcOKy8fYI3yb7/VloPFgWk3qOMoCDWDFCgatFfuoyQObYVq6Ev3ZtSDRcwQ04zYjQg1cG8fbHpeZPTX6LdW/Z1uR0LgMf6ScusUf8og5qJwsLQEqCRw7KQzu5/006GrIlfTk3bRwp1aHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763397708; c=relaxed/simple;
-	bh=lHBneE7jlVuRFMvm3BTfoDmJOllftmroA4PV9f01yFg=;
+	s=arc-20240116; t=1763398366; c=relaxed/simple;
+	bh=bKujbumiMtG0QwgexkoYwFkbNiG9F7VnIFSueeVhi30=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y+V7qICXGNTwv9tRObrGjNNfhgz/7D5YoqZs8rNiRSBp4LTg0Tlj154iteHTRqu3uYV/x3QQ7Fsl5EPfCQq4kGxDbDUnZZCXsvhAMY3u/KGEafG40oAfE8BAgHW4yIlieaFOKuWWGI7rF6HT35VWV3NqXBsM9GHe8Yd8g0G9bkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U+Z4Mpkz; arc=none smtp.client-ip=192.198.163.10
+	 In-Reply-To:Content-Type; b=Uv3ALo3BrgxNePp6lIgHSTYsVXRrNKaKqteP/b2FM3Aihhr20hpxOCZbtEXmYk8YVu9jx+/eABoRFmFPfQbjnZ+w0VwT1Rx5xx7KC/uMcFkTa/nKOqwneB+doPEhGeMx9aeKzVgbBrCNv7YxHkoCL7iIv4CJM86SMIRLhZ7Jlhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YSxPmttc; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763397707; x=1794933707;
+  t=1763398363; x=1794934363;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=lHBneE7jlVuRFMvm3BTfoDmJOllftmroA4PV9f01yFg=;
-  b=U+Z4MpkzhG6NjfY73ARu+jPtFCXYVNruWdGgs4X5zyCOSRrLKmp3BN68
-   hC2NHSl2tqbN3dkTsFPJ0nct+k8T+Yt3IYvapYGFnpJ8yhD9sq8g4juuz
-   w20YhGAsU1TJSVdBlaaunyN+G7kdAikK9Rh05d2sby25QTLkiM5l8fMAs
-   dNSx/gY1boahjMRjPj9w/TCHvDiKMw7cTfx9KZSdeq1EVX1XNN2WbJoU1
-   ovFhIB2uOtkYdoK1vGFyaEubmqjVIZnUn+OQ4Fj1Drnu06f7x8BgNc9Sn
-   MZ2IAw/mO3VXsvJfAVK0XsxAt3Npq3f2rDJPyzQfsBSbF52PyrM01kxcU
-   A==;
-X-CSE-ConnectionGUID: 9Nh8uLE6R6aPzAoOof+cag==
-X-CSE-MsgGUID: riiJs/JDSU+TQFzktJn8bA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="76752375"
+  bh=bKujbumiMtG0QwgexkoYwFkbNiG9F7VnIFSueeVhi30=;
+  b=YSxPmttcaSNJfB1FTdbjtv09qahi8/ryRecnepngreOYjndyuzAMmkyG
+   f/7FMo0EWV5hhBr/Im1aA1htAPBSVt/qI1MPVbQcKNzl/2rHXE2eLW5RC
+   NqUUsnFP45PnLWC7NIXHUjFJ3egAwVk0R0AgneShTbIs1NsKgyBHgea/o
+   tuoNwfuijoSg22m+Et3u/+V9WQsHx/uYKbLZXnVw4CJHWAV6/C+I+7LcU
+   tnp99cculYmRZ4JBYIDF5SX2R5De6jmemXYVlVLWaeC04y6/A2gUaepfk
+   43bQZCl99ZOoFWqmrt+vDfKVoJ5sRiOMhyXlvGsQsR6KQE5+YaHKW8EVs
+   w==;
+X-CSE-ConnectionGUID: 1e6nD7zsQm+UB8dzqDyTgA==
+X-CSE-MsgGUID: yHBwi5vqRh6fAj8CIXLK/w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="69251793"
 X-IronPort-AV: E=Sophos;i="6.19,312,1754982000"; 
-   d="scan'208";a="76752375"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 08:41:46 -0800
-X-CSE-ConnectionGUID: Igju4QJpSEi4mMLw/3rs2w==
-X-CSE-MsgGUID: dY5XSvOWRDSSA0qkl+6OFw==
+   d="scan'208";a="69251793"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 08:52:42 -0800
+X-CSE-ConnectionGUID: 8y0xm0IKSp2+knMhrg5ngw==
+X-CSE-MsgGUID: AkD/AF2wQ4G1NyY26NR/zw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,312,1754982000"; 
-   d="scan'208";a="190170757"
 Received: from aschofie-mobl2.amr.corp.intel.com (HELO [10.125.109.33]) ([10.125.109.33])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 08:41:45 -0800
-Message-ID: <96d66314-a0f8-4c63-8f0d-1d392882e007@intel.com>
-Date: Mon, 17 Nov 2025 08:41:37 -0800
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 08:52:41 -0800
+Message-ID: <89a4e42d-b0fd-49b0-8d51-df7bac0d5e5b@intel.com>
+Date: Mon, 17 Nov 2025 08:52:36 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +65,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 06/26] x86/virt/tdx: Add tdx_page_array helpers for new
- TDX Module objects
+Subject: Re: [PATCH v1 07/26] x86/virt/tdx: Read TDX global metadata for TDX
+ Module Extensions
 To: Xu Yilun <yilun.xu@linux.intel.com>, linux-coco@lists.linux.dev,
  linux-pci@vger.kernel.org
 Cc: chao.gao@intel.com, dave.jiang@intel.com, baolu.lu@linux.intel.com,
@@ -76,9 +74,9 @@ Cc: chao.gao@intel.com, dave.jiang@intel.com, baolu.lu@linux.intel.com,
  rick.p.edgecombe@intel.com, dave.hansen@linux.intel.com,
  dan.j.williams@intel.com, kas@kernel.org, x86@kernel.org
 References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
- <20251117022311.2443900-7-yilun.xu@linux.intel.com>
-Content-Language: en-US
+ <20251117022311.2443900-8-yilun.xu@linux.intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
  oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
@@ -122,18 +120,50 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20251117022311.2443900-7-yilun.xu@linux.intel.com>
+In-Reply-To: <20251117022311.2443900-8-yilun.xu@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 11/16/25 18:22, Xu Yilun wrote:
-> +	struct page *root __free(__free_page) = alloc_page(GFP_KERNEL |
-> +							   __GFP_ZERO);
-> +	if (!root)
-> +		return NULL;
+> +static __init int get_tdx_sys_info_ext(struct tdx_sys_info_ext *sysinfo_ext)
+> +{
+> +	int ret = 0;
+> +	u64 val;
+> +
+> +	if (!ret && !(ret = read_sys_metadata_field(0x3100000100000000, &val)))
+> +		sysinfo_ext->memory_pool_required_pages = val;
+> +	if (!ret && !(ret = read_sys_metadata_field(0x3100000100000001, &val)))
+> +		sysinfo_ext->ext_required = val;
+> +
+> +	return ret;
+> +}
 
-Why don't you just kcalloc() this like the rest of them?
+These were OK-ish when they were being generated by a script.
 
-Then you won't need "mm: Add __free() support for __free_page()" either,
-right?
+Now that they're being generated by and edited by humans, they
+need to actually be readable.
+
+Can we please get this down to something that looks more like:
+
+	MACRO(&sysinfo_ext->memory_pool_required_pages, 0x3100000100000000);
+	MACRO(&sysinfo_ext->ext_required,		0x3100000100000001);
+
+You can generate code in that macro, or generate a struct like
+this:
+
+static __init int get_tdx_sys_info_ext(struct tdx_sys_info_ext *sysinfo_ext)
+{
+	int ret = 0;
+	struct tdx_metadata_init[] = {
+		MACRO(&sysinfo_ext->memory_pool_required_pages, 0x3100000100000000),
+		MACRO(&sysinfo_ext->ext_required,		0x3100000100000001),
+		{},
+	};
+
+	return tdx_...(sysinfo_ext, tdx_metadata_init);
+}
+
+and have the helper parse the structure.
+
+But, either way, the method that's being proposed here needs to go.
 
