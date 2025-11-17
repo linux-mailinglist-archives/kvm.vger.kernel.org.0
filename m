@@ -1,147 +1,125 @@
-Return-Path: <kvm+bounces-63364-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63365-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E824C63E58
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:46:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60CBEC63EB6
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:50:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6DBCB346921
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 11:42:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C18E3AEC0C
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 11:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023C7326D5F;
-	Mon, 17 Nov 2025 11:42:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC8A32BF52;
+	Mon, 17 Nov 2025 11:46:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QlAizD59"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rcATjcN+"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042DA231A55;
-	Mon, 17 Nov 2025 11:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01D032939C;
+	Mon, 17 Nov 2025 11:46:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763379731; cv=none; b=t7nkbEyqWjef2OmSOokgBSysHEELgME83TQKi5YPVTW1j68989H8PObJKwyADYTicud7KBsYaPeKhSbb2J669AeNGCAgl6OwgN7xzqqRMvPWKWcIfo86/85CsrUn+P49oAwJZW+R4ByVxA1Z1cSK1nMkwtn09v8Qyeet99oKeU4=
+	t=1763380000; cv=none; b=omtqq5c3vQYbBfsOHjTxeTo4hDqB2XCXZ4ucoJAR8NkLVsuAg0MYDNb7Nxy9WbhL1RzSa2gwtI2yb1/pnFNq1iZ/tRWyRT4XHOHHq0RgZAHMTi5t8R9HIRFAwguA3vnt5/tBr1WzNXTZyTgr7ha6B+rDZcAxkEfJCgauS6Pc9rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763379731; c=relaxed/simple;
-	bh=5ETZ/xsJIiiJXPNlKfTLQqlNr6gkrtL9MFCO72St8jg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b/L7OTUmNIK9E0XZ7vELYWuWiFXdFMRu8jkioim5C9UuZHIwym5/QAxD1FTcPaMjKz9D3bg57TLCvOaRGb9vjAcOq+INV3DaPnaQmoDDiMfAhOzEep7PjvxI9BWXT5ZGOpOlj+2di4xY+SAU2MsZEOEXU8+KjIY62rov6eI/iVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QlAizD59; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66121C4CEF1;
-	Mon, 17 Nov 2025 11:42:10 +0000 (UTC)
+	s=arc-20240116; t=1763380000; c=relaxed/simple;
+	bh=OK5ygqxzdiotqq5cLz9n/2U+IWjx65elS/OUqG7ov5g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PCMrR3ZIYusV5iDWjCgZEVDrls1j/DZxcsSaqeO2wDCt04ISfiamXA25coibtOnliU/M3XjPeGMbxmoyR2vYAZo8hIWSASaWwqez4PgNLOrR381CC76W9Gtl0kqub3k92PaoyJb60lySL9RAW23bI8zCeplvAo04vfBxD1tyklE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rcATjcN+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BA51C4CEF5;
+	Mon, 17 Nov 2025 11:46:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763379730;
-	bh=5ETZ/xsJIiiJXPNlKfTLQqlNr6gkrtL9MFCO72St8jg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QlAizD59c1ViktlhrkWvbVOHxJKDa00aV6fhEBSxqZmdSzaY+ROEU9gGRp97btDRV
-	 Fpr3CqJz8bvTEjDsGsnsIglFN1RR+oGAUMnq0kZo4soXvktJYnm0MlsUTzAg4tc8K/
-	 BV4aC4NN8cBf47f7k9YuKcQxPzYZk+dXe5zEzsB+VH1wu48R657pK4ufLnN0n3+fAt
-	 rHu+UpmPAvxhMKsryC/CY0Evv1n4iV9IycZpdQ0OraNoYUDWZ/1r9flsT6MwwT8lf2
-	 q1sRlpqv6vdUJmvslSd5SSXZGVz4kiyfCMqtHahh+anLP7TqxZ5Z8m6ad0CF2MwUoG
-	 LGl8OVhwF1PvQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vKxcW-00000005o26-1Y51;
-	Mon, 17 Nov 2025 11:42:08 +0000
-Date: Mon, 17 Nov 2025 11:42:07 +0000
-Message-ID: <86346cubqo.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+	s=k20201202; t=1763380000;
+	bh=OK5ygqxzdiotqq5cLz9n/2U+IWjx65elS/OUqG7ov5g=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rcATjcN+iuAISKl4OnTLnlAd5/bHbRBxnHEgJhCvLwjUEWn9lSdRTL8vTVIy5Q+77
+	 4b90DdLwSGv5KWZ3um2LjzQo8SuRQ8x0bL0j44Rc+wadMo7fT5q3niEw6gjlaFD5wl
+	 fAlbtcFN3Sk6jzrfsRbm6TH4WUAP0FAosPJgb1zn6jaeoQbsgffZIOIDSarPmT/8Pu
+	 FWlR/ARZaxrvBLhHCBbkco9pw+oD3v74RG1KOqLtmAjOT2e6Hwcb9KoBn+TcScCHid
+	 wDeaBHn7AueWPh8+zTkJZ+daPjt/kJXdkW1Cx1V+wvPf6t+r2+BKVnE/VQY4i2Nzfx
+	 O+U3Hb2SFkIoA==
+From: Mike Rapoport <rppt@kernel.org>
+To: linux-mm@kvack.org
+Cc: Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	David Hildenbrand <david@redhat.com>,
+	Hugh Dickins <hughd@google.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Peter Xu <peterx@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 5/5] KVM: arm64: GICv3: Force exit to sync ICH_HCR_EL2.En
-In-Reply-To: <CA+EHjTxVr7uk8Ofhb2VHjDw+LfC4ZSz4dDun5+xLcnRQy5AKaQ@mail.gmail.com>
-References: <20251117091527.1119213-1-maz@kernel.org>
-	<20251117091527.1119213-6-maz@kernel.org>
-	<CA+EHjTxVr7uk8Ofhb2VHjDw+LfC4ZSz4dDun5+xLcnRQy5AKaQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-kselftest@vger.kernel.org
+Subject: [RFC PATCH 0/4] mm, kvm: add guest_memfd support for uffd minor faults
+Date: Mon, 17 Nov 2025 13:46:27 +0200
+Message-ID: <20251117114631.2029447-1-rppt@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 17 Nov 2025 11:35:18 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Mon, 17 Nov 2025 at 09:22, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > FEAT_NV2 is pretty terrible for anything that tries to enforce immediate
-> > effects, and writing to ICH_HCR_EL2 in the hope to disable a maintenance
-> > interrupt is vain. This only hits memory, and the guest hasn't cleared
-> > anything -- the MI will fire.
-> >
-> > For example, running the vgic_irq test under NV results in about 800
-> > maintenance interrupts being actually handled by the L1 guest,
-> > when none were expected.
-> >
-> > As a cheap workaround, read back ICH_MISR_EL2 after writing 0 to
-> > ICH_HCR_EL2. This is very cheap on real HW, and causes a trap to
-> > the host in NV, giving it the opportunity to retire the pending
-> > MI. With this, the above test tuns to completion without any MI
-> > being actually handled.
-> 
-> nit: tuns->runs
-> 
-> 
-> >
-> > Yes, this is really poor...
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/vgic-v3-sr.c      | 7 +++++++
-> >  arch/arm64/kvm/vgic/vgic-v3-nested.c | 6 ++++--
-> >  2 files changed, 11 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > index 99342c13e1794..f503cf01ac82c 100644
-> > --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > @@ -244,6 +244,13 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
-> >         }
-> >
-> >         write_gicreg(0, ICH_HCR_EL2);
-> > +
-> > +       /*
-> > +        * Hack alert: On NV, this results in a trap so that the above
-> > +        * write actually takes effect...
-> > +        */
-> > +       isb();
-> > +       read_gicreg(ICH_MISR_EL2);
-> >  }
-> 
-> nit: is it worth gating this with "ARM64_HAS_NESTED_VIRT"?
+From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
 
-This is in a *guest*, which knows nothing about being virtualised!
+Hi,
 
-> Otherwise,
-> Reviewed-by: Fuad Tabba <tabba@google.com>
+These patches allow guest_memfd to notify userspace about minor page
+faults using userfaultfd and let userspace to resolve these page faults
+using UFFDIO_CONTINUE.
 
-Thanks!
+To allow UFFDIO_CONTINUE outside of the core mm I added a
+get_pagecache_folio() callback to vm_ops that allows an address space
+backing a VMA to return a folio that exists in it's page cache (patch 2)
 
-	M.
+In order for guest_memfd to notify userspace about page faults, it has to
+call handle_userfault() and since guest_memfd may be a part of kvm module,
+handle_userfault() is exported for kvm module (patch 3).
 
+Note that patch 3 changelog does not provide motivation for enabling uffd
+in guest_memfd, mainly because I can't say I understand why is that
+required :)
+Would be great to hear from KVM folks about it.
+
+This series is the minimal change I've been able to come up with to allow
+integration of guest_memfd with uffd and while refactoring uffd and making
+mfill_atomic() flow more linear would have been a nice improvement, it's
+way out of the scope of enabling uffd with guest_memfd.
+
+Mike Rapoport (Microsoft) (3):
+  userfaultfd: move vma_can_userfault out of line
+  userfaultfd, shmem: use a VMA callback to handle UFFDIO_CONTINUE
+  userfaultfd, guest_memfd: support userfault minor mode in guest_memfd
+
+Nikita Kalyazin (1):
+  KVM: selftests: test userfaultfd minor for guest_memfd
+
+ fs/userfaultfd.c                              |   4 +-
+ include/linux/mm.h                            |   9 ++
+ include/linux/userfaultfd_k.h                 |  36 +-----
+ include/uapi/linux/userfaultfd.h              |   8 +-
+ mm/shmem.c                                    |  20 ++++
+ mm/userfaultfd.c                              |  88 ++++++++++++---
+ .../testing/selftests/kvm/guest_memfd_test.c  | 103 ++++++++++++++++++
+ virt/kvm/guest_memfd.c                        |  30 +++++
+ 8 files changed, 245 insertions(+), 53 deletions(-)
+
+
+base-commit: 6146a0f1dfae5d37442a9ddcba012add260bceb0
 -- 
-Without deviation from the norm, progress is not possible.
+2.50.1
+
 
