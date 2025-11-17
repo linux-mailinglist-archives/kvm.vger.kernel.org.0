@@ -1,193 +1,115 @@
-Return-Path: <kvm+bounces-63371-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63372-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0AABC63F45
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:57:10 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D866C64015
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 13:12:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A8153A8810
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 11:57:00 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8D27135DD2F
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3F432936A;
-	Mon, 17 Nov 2025 11:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4C8C32C956;
+	Mon, 17 Nov 2025 12:12:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aSN0iYkk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ali2Rdai"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f195.google.com (mail-lj1-f195.google.com [209.85.208.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA92126C02;
-	Mon, 17 Nov 2025 11:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBD932C305
+	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 12:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763380614; cv=none; b=L/lmC7thTpY5s9NPdb1dlpiLIMUfjT4w9d3SL7XY2l2gctjLCNNPsbzGRiOWoJP4/x99UQqNFPFcGbNDIkf4uDisbMTktwOpYjKtmplDvhHEvxoo5EcBWDc2rTVHlORuOfuM3h9x6NfZB8rpG98ZXLRBuMqbh7PpkxdoNlHq2T8=
+	t=1763381561; cv=none; b=VrSzbOjJvv31DiGvyY6olhZhtwyuSr00LtxP2O9OdTfTsNzGMcWg0q/hQg5BaRCmXE9MCozEkCqhDuZdJ5vZaqKQyLU7BQq4WKBJAP6SZzTTjRZOg1m3thT1ZLfd23sRjarZy9fRFBW0Nt+tAo2KmUdlse5b7hAE9/8OtoF2vOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763380614; c=relaxed/simple;
-	bh=kB9ZXKohVrn5IEX6S+MiFF63aw8Py7ecNIx3DP7Yi+E=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BHWPJ5vwQa67aQ3XOQDiquBAWFkM/9ZHeYm3NVDNxg0vEGPIDGhRIKCW72BlK/5DsGdH+/3D8tuMZV+vrvF5lvkTgjQLcoLo7X84X+oEsVfyWAyNABaC+AHIFOorM+4VwGaqR+lcj4b2d+1AM8UjmbkcjwgSDcoT0Uu4lKpSYQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSN0iYkk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FF00C4CEF1;
-	Mon, 17 Nov 2025 11:56:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763380614;
-	bh=kB9ZXKohVrn5IEX6S+MiFF63aw8Py7ecNIx3DP7Yi+E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aSN0iYkknKkvL0mij60oWERa1I1nFDaXLZGicletaKLuv+pgGNmTLofH7Xf409+u2
-	 0SGzgm1GEyLD3Sn/ZtmvWY/mSdJ94pmrBc5Y0NmFUosSrN6kuTZjDd8HFDK056E5xe
-	 rRSubGAb3LKV1vwS/S4rbVoG4QGoTSQRTBrldmLUwfG7Bm6wHZNepJiO1emO/1/Ohn
-	 AS6ykqNckSmvEwmPREXaC3xg/QTrxhdi4fOJ1s9IBRhoQpB23WVGvY8zQTibIRJstd
-	 pIELReB4DkVkdcwBN+17uFx2D0/QEPLfCaOaog1rh2nooNzKLpiwQvbTQgLLRqweh6
-	 RVj+Pp0Q9Anlw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vKxql-00000005oR5-4B8h;
-	Mon, 17 Nov 2025 11:56:52 +0000
-Date: Mon, 17 Nov 2025 11:56:51 +0000
-Message-ID: <861plwub24.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
-In-Reply-To: <CA+EHjTwcf7HXypmt-1gS2G8GK5iBt3VQrpmRiHysr571J96VvA@mail.gmail.com>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-30-maz@kernel.org>
-	<CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
-	<86cy5ku06v.wl-maz@kernel.org>
-	<CA+EHjTzi9Q9hqAu1Xk51hO3uz0FdUGjdPSViN4RAD6tuXJkvYQ@mail.gmail.com>
-	<86a50otsuh.wl-maz@kernel.org>
-	<CA+EHjTwcf7HXypmt-1gS2G8GK5iBt3VQrpmRiHysr571J96VvA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763381561; c=relaxed/simple;
+	bh=E7+86nXZJJZWn/7xzDlAAPZqRxbe9WlVvWJxhTPMAAs=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=HrSUIb3Hd5LmKiRuaVwF47Jg/qtpaj5vOfxrwPeQpXvT83jiv9NBoWWUxiH8fGNTzl8RnTh7KWPvxxiuUrKXqAZFyB+uxvxgW1qdgYnnv3ek5LFJ1xcQ8l80ikt+Qoz14ha4yOxieYo+mlzxv+x1G7LrjHV9Msa28VIZFg0I8Zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ali2Rdai; arc=none smtp.client-ip=209.85.208.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f195.google.com with SMTP id 38308e7fff4ca-37bac34346dso22249501fa.2
+        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 04:12:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763381558; x=1763986358; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=E7+86nXZJJZWn/7xzDlAAPZqRxbe9WlVvWJxhTPMAAs=;
+        b=ali2RdaiB+PmiBB8rNHxnkHrpBAZaioaXqQwcy5vf4CY5ojDte+J85lR51+AgQ6z6C
+         nNpZJBFrttvnGT0Y71tht8/yeDvHPF6Tc9N7i6QJp7/i+sf6L9kXaJROmRaVScaL4lSV
+         6nY2Bh88inNhhE1O5WrTG8lErxxNAhqmoy6lyAAqk2LNy/yX8n56U7R+eGdPcqtXwyK0
+         EHv5/7YYpj0dh3D0xjNQU0gvMPDkL6sgECKyiUWPPBvY2bLCjDp/tWXPxAlQDlTlrZTd
+         dV9Y4qjVEhb85UB3kc5ARDASA8OpHgarPjeQ4YrTAxq5kqaBkCPnb1mQ8VQuKTis9I8M
+         8BXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763381558; x=1763986358;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E7+86nXZJJZWn/7xzDlAAPZqRxbe9WlVvWJxhTPMAAs=;
+        b=S08+F63ObYD2XqhTm2uhPHoaYQ6xfhC9V1uOaYLIo+d6S/GFU6ZOqU9aVO9ujEJw6u
+         bM/lX9v3KMOq905Ead52n6DE5OJzgJIL1Ehuvpg+pN0VcbzT1nhGsKR+Qjgu8aj7RxlU
+         0rd0ETXBZX31fww2HjY5nlLYyWsHcFYu8HzzuCQ6j99ZDZJ72BAbglEp2O/EMetfDQNw
+         b8U5lrve0qPQ3eYL44XfzvDI9uH4tdHJd2q2Im1HtVIIc7i/p6Ngh2QGZWkIC9MvTFj3
+         Net7Lqpa1Z3lBND0ttokgfLbap5Fw7GIGMM2HAjBUxzz/31QhFlD7AEfIK4JDcxiwUU6
+         Wkww==
+X-Gm-Message-State: AOJu0Yyn8uqhmyRuYtzQ/BODzbcC68FaN8mX0ZrzEs7xco7LeCcim+8l
+	/b/1O/WCn/H60n+Mv7C5thVxMfyh15oFgXzpMaEkDrsuUbLRf/3mV7eUpNNoBzqi0m/zD4z7VY1
+	OPI/xsLzAwpgkc1wDOqFa7dJyA5fYJpBi0S01LeA=
+X-Gm-Gg: ASbGncsFvzeT59+pVLNwAWHIKzqbm9hZnjLM2twiOWfd/znwEobRfdDNtw2+YnB6WoF
+	Z/Typfqe3JsGzUhT9UxN7d0LkBatP/EBC6wJAr04FQsbHwMUcQUNLRLjbxWZVnlPL56hqYGyRZJ
+	A57YOMQzdcS3wb8Wn7B9CjJTC9wi+S/VezOCyPcpDnWF1cROpboQsLmJiKa2vuVuNrtOEtZV8lc
+	p/gEBi24Qj7TT3kZ/psZOKe9DYXnTNYiHGa8QovZg07XU6L6LtCqkHXbBk5E8R9Xpa8E8ut+LyG
+	vdBa7FSYQJE=
+X-Google-Smtp-Source: AGHT+IEfo5CgAeJLZzKdBiFBn38iawJgBJFcXrFz+/mOlHQT8hFZ4fMPdsD9/XcP14+SL4ANbJtQYytDLLmYSLqryJQ=
+X-Received: by 2002:a05:651c:2450:10b0:37b:9110:21c4 with SMTP id
+ 38308e7fff4ca-37babd5cbb8mr25763441fa.31.1763381557521; Mon, 17 Nov 2025
+ 04:12:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+From: yw yao <ywyao898@gmail.com>
+Date: Mon, 17 Nov 2025 20:12:25 +0800
+X-Gm-Features: AWmQ_bld6LSw6jaPZQG3-XdoPPKfK3S4_7n3klNu9KtEtMieN-nD81-5cNH8Giw
+Message-ID: <CAMVsw8x5J+sxJy0E5mFEyBypt4K-jDBYK1NoFh8=P22+2xqBRQ@mail.gmail.com>
+Subject: Question about shared GPA visibility between L1 and L2 in TDX TD-partitioning
+To: kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 17 Nov 2025 08:22:05 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Fri, 14 Nov 2025 at 17:41, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Fri, 14 Nov 2025 15:53:33 +0000,
-> > Fuad Tabba <tabba@google.com> wrote:
-> > >
-> > > Hi Marc,
-> > >
-> > > On Fri, 14 Nov 2025 at 15:02, Marc Zyngier <maz@kernel.org> wrote:
-> > > >
-> > > > On Fri, 14 Nov 2025 14:20:46 +0000,
-> > > > Fuad Tabba <tabba@google.com> wrote:
-> > > > >
-> > > > > Hi Marc,
-> > > > >
-> > > > > On Sun, 9 Nov 2025 at 17:17, Marc Zyngier <maz@kernel.org> wrote:
-> > > > > >
-> > > > > > Now that we are ready to handle deactivation through ICV_DIR_EL1,
-> > > > > > set the trap bit if we have active interrupts outside of the LRs.
-> > > > > >
-> > > > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > > > ---
-> > > > > >  arch/arm64/kvm/vgic/vgic-v3.c | 7 +++++++
-> > > > > >  1 file changed, 7 insertions(+)
-> > > > > >
-> > > > > > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > > > index 1026031f22ff9..26e17ed057f00 100644
-> > > > > > --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > > > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > > > @@ -42,6 +42,13 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
-> > > > > >                 ICH_HCR_EL2_VGrp0DIE : ICH_HCR_EL2_VGrp0EIE;
-> > > > > >         cpuif->vgic_hcr |= (cpuif->vgic_vmcr & ICH_VMCR_ENG1_MASK) ?
-> > > > > >                 ICH_HCR_EL2_VGrp1DIE : ICH_HCR_EL2_VGrp1EIE;
-> > > > > > +
-> > > > > > +       /*
-> > > > > > +        * Note that we set the trap irrespective of EOIMode, as that
-> > > > > > +        * can change behind our back without any warning...
-> > > > > > +        */
-> > > > > > +       if (irqs_active_outside_lrs(als))
-> > > > > > +               cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
-> > > > > >  }
-> > > > >
-> > > > > I just tested these patches as they are on kvmarm/next
-> > > > > 2ea7215187c5759fc5d277280e3095b350ca6a50 ("Merge branch
-> > > > > 'kvm-arm64/vgic-lr-overflow' into kvmarm/next"), without any
-> > > > > additional pKVM patches. I tried running it with pKVM (non-protected)
-> > > > > and with just plain nVHE. In both cases, I get a trap to EL2 (0x18)
-> > > > > when booting a non-protected guest, which triggers a bug in
-> > > > > handle_trap() arch/arm64/kvm/hyp/nvhe/hyp-main.c:706
-> > > > >
-> > > > > This trap is happening because of setting this particular trap (TDIR).
-> > > > > Just removing this trap from vgic_v3_configure_hcr() from the ToT on
-> > > > > kvmarm/next boots fine.
-> > > >
-> > > > This is surprising, as I'm not hitting this on actual HW. Are you
-> > > > getting a 0x18 trap? If so, is it coming from the host? Can you
-> > > > correlate the PC with what the host is doing?
-> > >
-> > > I should have given you that earlier, sorry.
-> > >
-> > > Yes, it's an 0x18 trap from the host (although it happens when I boot
-> > > a guest). Here is the relevant part of the backtrace addr2lined and
-> > > the full one below.
-> > >
-> > > handle_percpu_devid_irq+0x90/0x120 (kernel/irq/chip.c:930)
-> > > generic_handle_domain_irq+0x40/0x64 (include/linux/irqdesc.h:?)
-> > > gic_handle_irq+0x4c/0x110 (include/linux/irqdesc.h:?)
-> > > call_on_irq_stack+0x30/0x48 (arch/arm64/kernel/entry.S:893)
-> > >
-> > > [   28.454804] Code: d65f03c0 92800008 f9000008 17fffffa (d4210000)
-> > > [   28.454873] kvm [266]: Hyp Offset: 0xfff1205c3fe00000
-> > > [   28.455157] Kernel panic - not syncing: HYP panic:
-> > > [   28.455157] PS:204023c9 PC:000e5fa4413e39bc ESR:00000000f2000800
-> > > [   28.455157] FAR:ffff800082733d3c HPFAR:0000000000500000 PAR:0000000000000000
-> >
-> > I expect you have a write to ICC_DIR_EL1 at this address?
-> 
-> It almost surely must be, but tracking it down hasn't been that easy.
-> That said, I think it's ending up in gic_eoimode1_eoi_irq(), which
-> calls gic_write_dir() if !gic_arm64_erratum_2941627_needed(d).
-> 
-> I wonder if your hardware needs that erratum.
+Hello TDX/KVM maintainers,
 
-No, it doesn't. And this erratum only kicks in if the deactivated
-interrupt is an SPI that has been moved to another CPU while being
-handled (i.e. never).
+I am working on TD partitioning (TDX nested virtualization), using
+kernels from the Intel td-partitioning repo:
+https://github.com/intel/td-partitioning
 
-It really isn't related to the GIC itself (which the erratum above is
-about), but to the CPU interface, and whether TDIR applies to
-ICC_DIR_EL1 on top of the virtual variant.
+My setup:
+- L1 TDX guest/VMM running TDX enlightened KVM
+- L2 nested VMs launched by L1 VMM
+- L2 invokes TDVMCALL_MAP_GPA to convert a private GPA range into shared pages
+- L1 handles this in td_part_map_gpa() and sets the pages to decrypted
+- L2 writes 0xAA patterns into the shared GPA using ioremap() + memset()
+- L1 observes all-zero data when reading the same GPA through __va()
+direct mapping
 
-The architecture "deprecates" not trapping, and QEMU abides by this
-deprecation. HW that predates the deprecation didn't get the message,
-oddly enough... Neither did I, until you reported the crash!
+The issue:
+L1 cannot observe any data written by L2 on the shared pages, even
+though the GPA range is successfully converted to shared state.
+
+My expectation:
+According to TDX Module Spec, MAP_GPA should invalidate the Secure EPT
+entry and convert the page to shared. Therefore L1 should be able to
+see the raw/unencrypted data written by L2.
+
+My questions:
+1. In TD partitioning, is L1 able to observe data written by L2 into
+the shared GPA after MAP_GPA?
+2. Is there any additional steps required to make the shared page
+state consistent between L1 and L2?
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Yiwen
 
