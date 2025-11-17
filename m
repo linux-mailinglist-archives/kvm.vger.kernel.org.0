@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-63319-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63320-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA020C621EE
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 03:41:10 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BF3AC62203
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 03:41:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 53EEC4E6045
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 02:41:06 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 042CE36036E
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 02:41:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C42263C8F;
-	Mon, 17 Nov 2025 02:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A641C277011;
+	Mon, 17 Nov 2025 02:39:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ACAEfR//"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XWtzSNj2"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90410262D27;
-	Mon, 17 Nov 2025 02:39:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD47262D27;
+	Mon, 17 Nov 2025 02:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763347145; cv=none; b=h6EylOlX9hRSZ9Oaxz3tuGeJ8NTMmUZGXjpLte0pTYMlzfVSljUyC6XY2SKfxkMvRvoE62c8jXmFpYsgV23A8CkKardiBh7a9cFtIgHebCbJ7+u/SdlDV4aNpU5agdFfneGklSBtVTqVlOwuiQAvXiZILYEUybqBF1On2sVz3O0=
+	t=1763347148; cv=none; b=WKo6nB0k/OU3AJDHZKsZxdkqWNoQBK0yIqc8Ghg1XM5bxMF8Z+2Ww/mcbOT0ltzNaxlRQRxtU9/70/yT2CjWQEQa/KHsjCLgdVKtZ28Vfsg8kucojpQMoqbJDWdrQM2SR821LFSU0z3QHGZU6/l6Ez79y89BOirMtJ45ySYQuLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763347145; c=relaxed/simple;
-	bh=JB/3HGjul33CthZt+KNgO9pBuJ24i8vcRNY77ORswB0=;
+	s=arc-20240116; t=1763347148; c=relaxed/simple;
+	bh=1myzAhFF47JneeHorRvc+LNCA5N/wiuGMhgNApYfCJA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uvV4KBb7B0dUKQgY7QuXWskbl2lRK5LSwumPWhmo3iQ6L4l3xrQbEV6fiGCKyZy//HMdBV3+m7g8sn3YMbFocvCmU6+FK5JVRXmZHqQHnp9CBQR+HYPWAs53p+wl4ZKD36YNy1NwocD44rnEq1z7Tei1SAaOcUUl3KQiIMyUGwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ACAEfR//; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=Hp+44jPv9I6/5vwKtwsPXUmnT4KKrwFACfFwDvmuWJJt1jmZNUKOQOOJpV9cYly5AKEeQOQWj4BUi01vAJeDBTiVLzNiRPKhnuc2+WuNMm8V+ZEPpLiWa30dxqnsj3PTF16EglJ2FyiR3hTa49bDn6uv/kMBs4a56KJa0AkXVaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XWtzSNj2; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763347144; x=1794883144;
+  t=1763347148; x=1794883148;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=JB/3HGjul33CthZt+KNgO9pBuJ24i8vcRNY77ORswB0=;
-  b=ACAEfR//+v3zI/LPhfznd889RngCKgLDpZ9v2U+8NfoC+hmvRGSCV2Na
-   Qbe0wLtMCdkcnx4T6EfWpt/QEuE+wXrp3GXRQGzU9Y4jBcZ4Z0rFOB9R1
-   z9Xkl5kwuII6G5A96QAHM75tYk2VD637LFtPhocQKSctCAc1HFT5ZyKRW
-   rzV4+BvR15LBwtO/d3KWa1kcEmY8oKEqGSKH9V+/HJZiefhbkJp6DPEN3
-   Gtwi5t0i01GTOhjTsS+d7e3tIeJtRne1auVpi5/Mff3/FzsOd8z4s9T26
-   K78D6RDDih5kHKtt9R2L87iw8AIoYTcWFvtoT/DXu7Jnr8zsvshxpez1n
-   g==;
-X-CSE-ConnectionGUID: mSZ2Bs7kRoG28eV7g2UxxQ==
-X-CSE-MsgGUID: WZJKiAyORlW8FAdTbfI89A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11615"; a="82729592"
+  bh=1myzAhFF47JneeHorRvc+LNCA5N/wiuGMhgNApYfCJA=;
+  b=XWtzSNj2mxipK9nq6VW60K1ZzKkcrvT5ij1P0A9t9my8dq8/kp0yqhr4
+   eaeeDJF+YvRwlYjusWLjsBlRBkwIYSPSPeF7NtZhg4sVCWahxJM7c9iEO
+   Q4sUb5sBWHyfdXErpOGlDtDV8eHvWzVP3z15ddMmGbvfLdJGLTiR3XBjm
+   OvAyuX6sQWwAgcN8WVyJuawrUuko8oGdSkLyFEjS+PXkSNQszbu5pfPrV
+   oSD8DaZYRZCDqupXDGKucrfZ4MEnnFNAAouASByyOcK1mVYEF02YnJeLg
+   P6gRTZYMWpG/qbu+B2PqchHvjef4NvJZwKd7XUgNBoFexPDFNnkN1Lbqt
+   A==;
+X-CSE-ConnectionGUID: 3B14zE1jR3etzeJZJEDXig==
+X-CSE-MsgGUID: QNlmmtb+TninjYnLcfcvEg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11615"; a="82729598"
 X-IronPort-AV: E=Sophos;i="6.19,310,1754982000"; 
-   d="scan'208";a="82729592"
+   d="scan'208";a="82729598"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2025 18:39:04 -0800
-X-CSE-ConnectionGUID: p0Fu15xyTwq1Jpx/tUVlmg==
-X-CSE-MsgGUID: k356ZpA5Rpq/u4iJzvRfiw==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2025 18:39:08 -0800
+X-CSE-ConnectionGUID: VTJ68gS7RJOlP4MVFQabUQ==
+X-CSE-MsgGUID: 1dD9Jf/QQa6sw3OFk2geNg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,310,1754982000"; 
-   d="scan'208";a="227658435"
+   d="scan'208";a="227658477"
 Received: from yilunxu-optiplex-7050.sh.intel.com ([10.239.159.165])
-  by orviesa001.jf.intel.com with ESMTP; 16 Nov 2025 18:39:00 -0800
+  by orviesa001.jf.intel.com with ESMTP; 16 Nov 2025 18:39:03 -0800
 From: Xu Yilun <yilun.xu@linux.intel.com>
 To: linux-coco@lists.linux.dev,
 	linux-pci@vger.kernel.org
@@ -73,9 +73,9 @@ Cc: chao.gao@intel.com,
 	dan.j.williams@intel.com,
 	kas@kernel.org,
 	x86@kernel.org
-Subject: [PATCH v1 19/26] coco/tdx-host: Setup all trusted IOMMUs on TDX Connect init
-Date: Mon, 17 Nov 2025 10:23:03 +0800
-Message-Id: <20251117022311.2443900-20-yilun.xu@linux.intel.com>
+Subject: [PATCH v1 20/26] coco/tdx-host: Add a helper to exchange SPDM messages through DOE
+Date: Mon, 17 Nov 2025 10:23:04 +0800
+Message-Id: <20251117022311.2443900-21-yilun.xu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
 References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
@@ -87,135 +87,109 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Setup all trusted IOMMUs on TDX Connect initialization and clear all on
-TDX Connect removal.
+From: Zhenzhong Duan <zhenzhong.duan@intel.com>
 
-Trusted IOMMU setup is the pre-condition for all following TDX Connect
-operations such as SPDM/IDE setup. It is more of a platform
-configuration than a standalone IOMMU configuration, so put the
-implementation in tdx-host driver.
+TDX host uses this function to exchange TDX Module encrypted data with
+devices via SPDM. It is unfortunate that TDX passes raw DOE frames with
+headers included and the PCI DOE core wants payloads separated from
+headers.
 
-There is no dedicated way to enumerate which IOMMU devices support
-trusted operations. The host has to call TDH.IOMMU.SETUP on all IOMMU
-devices and tell their trusted capability by the return value.
+This conversion code is about the same amount of work as teaching the PCI
+DOE driver to support raw frames. Unless and until another raw frame use
+case shows up, just do this conversion in the TDX TSM driver.
 
-Suggested-by: Lu Baolu <baolu.lu@linux.intel.com>
+Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
+Co-developed-by: Xu Yilun <yilun.xu@linux.intel.com>
 Signed-off-by: Xu Yilun <yilun.xu@linux.intel.com>
 Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 ---
- drivers/virt/coco/tdx-host/tdx-host.c | 85 +++++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
+ drivers/virt/coco/tdx-host/tdx-host.c | 61 +++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
 diff --git a/drivers/virt/coco/tdx-host/tdx-host.c b/drivers/virt/coco/tdx-host/tdx-host.c
-index 982c928fae86..3cd19966a61b 100644
+index 3cd19966a61b..f0151561e00e 100644
 --- a/drivers/virt/coco/tdx-host/tdx-host.c
 +++ b/drivers/virt/coco/tdx-host/tdx-host.c
-@@ -5,6 +5,7 @@
+@@ -5,10 +5,12 @@
   * Copyright (C) 2025 Intel Corporation
   */
  
-+#include <linux/dmar.h>
++#include <linux/bitfield.h>
+ #include <linux/dmar.h>
  #include <linux/module.h>
  #include <linux/mod_devicetable.h>
  #include <linux/pci.h>
-@@ -122,6 +123,82 @@ static void unregister_link_tsm(void *link)
- 	tsm_unregister(link);
++#include <linux/pci-doe.h>
+ #include <linux/pci-tsm.h>
+ #include <linux/tsm.h>
+ #include <linux/device/faux.h>
+@@ -41,6 +43,65 @@ static struct tdx_link *to_tdx_link(struct pci_tsm *tsm)
+ 	return container_of(tsm, struct tdx_link, pci.base_tsm);
  }
  
-+static DEFINE_XARRAY(tlink_iommu_xa);
++#define PCI_DOE_DATA_OBJECT_HEADER_1_OFFSET	0
++#define PCI_DOE_DATA_OBJECT_HEADER_2_OFFSET	4
++#define PCI_DOE_DATA_OBJECT_HEADER_SIZE		8
++#define PCI_DOE_DATA_OBJECT_PAYLOAD_OFFSET	PCI_DOE_DATA_OBJECT_HEADER_SIZE
 +
-+static void tdx_iommu_clear(u64 iommu_id, struct tdx_page_array *iommu_mt)
++#define PCI_DOE_PROTOCOL_SECURE_SPDM		2
++
++static int __maybe_unused tdx_spdm_msg_exchange(struct tdx_link *tlink,
++						void *request, size_t request_sz,
++						void *response, size_t response_sz)
 +{
-+	u64 r;
-+
-+	r = tdh_iommu_clear(iommu_id, iommu_mt);
-+	if (r) {
-+		pr_err("%s fail to clear tdx iommu\n", __func__);
-+		goto leak;
-+	}
-+
-+	if (tdx_page_array_ctrl_release(iommu_mt, iommu_mt->nr_pages,
-+					page_to_phys(iommu_mt->root))) {
-+		pr_err("%s fail to release metadata pages\n", __func__);
-+		goto leak;
-+	}
-+
-+	return;
-+
-+leak:
-+	tdx_page_array_ctrl_leak(iommu_mt);
-+}
-+
-+static int tdx_iommu_enable_one(struct dmar_drhd_unit *drhd)
-+{
-+	unsigned int nr_pages = tdx_sysinfo->connect.iommu_mt_page_count;
-+	u64 r, iommu_id;
++	struct pci_dev *pdev = tlink->pci.base_tsm.pdev;
++	void *req_pl_addr, *resp_pl_addr;
++	size_t req_pl_sz, resp_pl_sz;
++	u32 data, len;
++	u16 vendor;
++	u8 type;
 +	int ret;
 +
-+	struct tdx_page_array *iommu_mt __free(tdx_page_array_free) =
-+		tdx_page_array_create_iommu_mt(1, nr_pages);
-+	if (!iommu_mt)
-+		return -ENOMEM;
++	/*
++	 * pci_doe() accept DOE PAYLOAD only but request carries DOE HEADER so
++	 * shift the buffers, skip DOE HEADER in request buffer, and fill DOE
++	 * HEADER in response buffer manually.
++	 */
 +
-+	r = tdh_iommu_setup(drhd->reg_base_addr, iommu_mt, &iommu_id);
-+	/* This drhd doesn't support tdx mode, skip. */
-+	if ((r & TDX_SEAMCALL_STATUS_MASK)  == TDX_OPERAND_INVALID)
-+		return 0;
++	data = le32_to_cpu(*(__le32 *)(request + PCI_DOE_DATA_OBJECT_HEADER_1_OFFSET));
++	vendor = FIELD_GET(PCI_DOE_DATA_OBJECT_HEADER_1_VID, data);
++	type = FIELD_GET(PCI_DOE_DATA_OBJECT_HEADER_1_TYPE, data);
 +
-+	if (r) {
-+		pr_err("fail to enable tdx mode for DRHD[0x%llx]\n",
-+		       drhd->reg_base_addr);
-+		return -EFAULT;
-+	}
++	data = le32_to_cpu(*(__le32 *)(request + PCI_DOE_DATA_OBJECT_HEADER_2_OFFSET));
++	len = FIELD_GET(PCI_DOE_DATA_OBJECT_HEADER_2_LENGTH, data);
 +
-+	ret = xa_insert(&tlink_iommu_xa, (unsigned long)iommu_id,
-+			no_free_ptr(iommu_mt), GFP_KERNEL);
-+	if (ret) {
-+		tdx_iommu_clear(iommu_id, iommu_mt);
++	req_pl_sz = len * sizeof(__le32) - PCI_DOE_DATA_OBJECT_HEADER_SIZE;
++	resp_pl_sz = response_sz - PCI_DOE_DATA_OBJECT_HEADER_SIZE;
++	req_pl_addr = request + PCI_DOE_DATA_OBJECT_HEADER_SIZE;
++	resp_pl_addr = response + PCI_DOE_DATA_OBJECT_HEADER_SIZE;
++
++	ret = pci_tsm_doe_transfer(pdev, type, req_pl_addr, req_pl_sz,
++				   resp_pl_addr, resp_pl_sz);
++	if (ret < 0) {
++		pci_err(pdev, "spdm msg exchange fail %d\n", ret);
 +		return ret;
 +	}
 +
-+	return 0;
-+}
++	data = FIELD_PREP(PCI_DOE_DATA_OBJECT_HEADER_1_VID, vendor) |
++	       FIELD_PREP(PCI_DOE_DATA_OBJECT_HEADER_1_TYPE, type);
++	*(__le32 *)(response + PCI_DOE_DATA_OBJECT_HEADER_1_OFFSET) = cpu_to_le32(data);
 +
-+static void tdx_iommu_disable_all(void *data)
-+{
-+	struct tdx_page_array *iommu_mt;
-+	unsigned long iommu_id;
++	len = (ret + PCI_DOE_DATA_OBJECT_HEADER_SIZE) / sizeof(__le32);
++	data = FIELD_PREP(PCI_DOE_DATA_OBJECT_HEADER_2_LENGTH, len);
++	*(__le32 *)(response + PCI_DOE_DATA_OBJECT_HEADER_2_OFFSET) = cpu_to_le32(data);
 +
-+	xa_for_each(&tlink_iommu_xa, iommu_id, iommu_mt)
-+		tdx_iommu_clear(iommu_id, iommu_mt);
-+}
++	ret += PCI_DOE_DATA_OBJECT_HEADER_SIZE;
 +
-+static int tdx_iommu_enable_all(void)
-+{
-+	int ret;
-+
-+	ret = do_for_each_drhd_unit(tdx_iommu_enable_one);
-+	if (ret)
-+		tdx_iommu_disable_all(NULL);
-+
++	pci_dbg(pdev, "%s complete: vendor 0x%x type 0x%x rsp_sz %d\n",
++		__func__, vendor, type, ret);
 +	return ret;
 +}
 +
- static int __maybe_unused tdx_connect_init(struct device *dev)
+ static int tdx_link_connect(struct pci_dev *pdev)
  {
- 	struct tsm_dev *link;
-@@ -151,6 +228,14 @@ static int __maybe_unused tdx_connect_init(struct device *dev)
- 	if (ret)
- 		return dev_err_probe(dev, ret, "Enable extension failed\n");
- 
-+	ret = tdx_iommu_enable_all();
-+	if (ret)
-+		return dev_err_probe(dev, ret, "Enable tdx iommu failed\n");
-+
-+	ret = devm_add_action_or_reset(dev, tdx_iommu_disable_all, NULL);
-+	if (ret)
-+		return ret;
-+
- 	link = tsm_register(dev, &tdx_link_ops);
- 	if (IS_ERR(link))
- 		return dev_err_probe(dev, PTR_ERR(link),
+ 	return -ENXIO;
 -- 
 2.25.1
 
