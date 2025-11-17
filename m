@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-63300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81B93C62179
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 03:38:11 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1C84C62182
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 03:38:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 65C504E611C
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 02:38:08 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0E53835BBA4
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 02:38:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC1B23536B;
-	Mon, 17 Nov 2025 02:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458E5253340;
+	Mon, 17 Nov 2025 02:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KQ4WA0h8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i5ugzd8o"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C6C1F4CA9;
-	Mon, 17 Nov 2025 02:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0DB524CEEA;
+	Mon, 17 Nov 2025 02:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763347078; cv=none; b=GYvMJoDbmUZfkjvo1WWp7W39FkXIrPjaGSoDdqWVdGvWxYzwJWkdcmQi277pF9hHysV/rnI9EQD8j5EIWvw7pWriez8CuJQfj/rApF3+rjEp1GdeQeIFM+o8NIqI7YYf4uxZf1foi4fDY9IygrIuIbaw1WwHEb0jIWSGGzjUjKw=
+	t=1763347081; cv=none; b=SW7q5UjR52BpezJp27Q/aQTYLG+CX2griKEmQtXc71TEV9C+C5K9EIMy0cko36f6CYeLCqK+t93hOSyhap/sHgTs0I0xBdPBtQycArVA/LgnuMxL4PBuvxZdrSQiKGArWcRgD0MmMub12ibHo0s3veZzdZfjtuVXP/b+8tuyRJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763347078; c=relaxed/simple;
-	bh=riT9o6mRwJYJ3rwmNmwc350Zx8TCQXNFFSt3YNL3IcU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=qpmiuIfdF8fgeDK/+anrBnSwkmWHulqQCmNcTajgVRzb4mkRBJOhBpp0JEzkhsP5buoVuMqo6HylOIUw91HRav/1RuXfeNr9c9KN6bc+9p/vempDmCeG19GsAJVJ/C5/zexkqv4QJPBq9cYM5pQ6Nop92898izGlg7kfIg/iU8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KQ4WA0h8; arc=none smtp.client-ip=198.175.65.10
+	s=arc-20240116; t=1763347081; c=relaxed/simple;
+	bh=v+pyHzW6JqlnLLWUJNv4fpVmMB+OF0GIphxXLaAR6NI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=jngmEdidWEO6mFLa5hOmCM/kT+7wr6AqbtwxFpfNIm4yOWQUbvJCbJMERuRrli3hJ/+Z6moLh1E+CCG3WkeUq37whK2s2cwaf/6U0bDX8LGwebVyk0a+zvXPt/n6CC04TRgu3JBXvGbgEnNO0s2icgUmSWk87JsnIaWyaEEn76I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i5ugzd8o; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763347077; x=1794883077;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=riT9o6mRwJYJ3rwmNmwc350Zx8TCQXNFFSt3YNL3IcU=;
-  b=KQ4WA0h80/onQ7jyNq/ouDsOv6g0EXAf85A05SAB8iH5VhT4EcsadjVG
-   8gEtcj2kZn9Cn6/X4LDLpcuHpRxh+u3K71xX0hnsyo8svKLWz53ZbB95u
-   lAqDxP1cIcgX5+MC6ljvZEur+EgZyOoxMVr94N2bi809PZlNnPt6Sd66I
-   +8szPKvEryVwLwEWtPbi2IQ4DGH82fCFt2uhmsN9oz7M8+5R6XE9lsVC4
-   l3nNanjIl1giagwIsRg8mI5vDR9fAg3V66qawVorPjkY6F+j2ch/ta/5Y
-   Zy6nxWGihxvtgFW+k1JnX3dgDDHIuCSM3HiLygNd4F++x5dmAITQNGaVH
+  t=1763347080; x=1794883080;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=v+pyHzW6JqlnLLWUJNv4fpVmMB+OF0GIphxXLaAR6NI=;
+  b=i5ugzd8oVFdE+FeMHXtucIabpF43FnOFjIrTf5o2pds6T9ewMK5/q5sp
+   A3nXJSaCdLBJcWl1KWQOWII7zTu/VXXF1ve2+ZS1gXp3zy8v+X1S0r9dP
+   2CDHnMfDV+kYqclTzGrqqOuWvGQ7bJoyBdMyQkgCi27lhWQgmZicb4QSg
+   ADMrkCAUqzDAaTc/2/1NDLvuinpbz5geu/xjt/5zR5kLArIYCVfyN1TJ6
+   DzuRPeJTLU1iR4/JMNxoIZ000OqLlqUbXEwfk8GKNrTzUt/E9chdJnP4E
+   ycBKvUG9+PQ6jQ6hhSNOW/c3ZThb+XPZt5KDHeCLq6i93yTfCbLPtgZ1t
    A==;
-X-CSE-ConnectionGUID: HqPqsCOuTuem/ILARTs0OQ==
-X-CSE-MsgGUID: +kwclOz+Rp+S2bbTIZwAUg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11615"; a="82729485"
+X-CSE-ConnectionGUID: 0YsOCGgcQzuLX4tq4ygKPg==
+X-CSE-MsgGUID: ulKV1opHRRW/DeMF3mNLTA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11615"; a="82729489"
 X-IronPort-AV: E=Sophos;i="6.19,310,1754982000"; 
-   d="scan'208";a="82729485"
+   d="scan'208";a="82729489"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2025 18:37:56 -0800
-X-CSE-ConnectionGUID: T8dTDpjdQZWPAQvFD1y/BQ==
-X-CSE-MsgGUID: scpoBf/USc2MpeAtPUMpmg==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2025 18:38:00 -0800
+X-CSE-ConnectionGUID: MTp8KZUfSgm1My/vr+8TZw==
+X-CSE-MsgGUID: 8fAS1E6ZTdCBTO9w5QH0Zw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,310,1754982000"; 
-   d="scan'208";a="227658067"
+   d="scan'208";a="227658100"
 Received: from yilunxu-optiplex-7050.sh.intel.com ([10.239.159.165])
-  by orviesa001.jf.intel.com with ESMTP; 16 Nov 2025 18:37:52 -0800
+  by orviesa001.jf.intel.com with ESMTP; 16 Nov 2025 18:37:56 -0800
 From: Xu Yilun <yilun.xu@linux.intel.com>
 To: linux-coco@lists.linux.dev,
 	linux-pci@vger.kernel.org
@@ -72,161 +73,164 @@ Cc: chao.gao@intel.com,
 	dan.j.williams@intel.com,
 	kas@kernel.org,
 	x86@kernel.org
-Subject: [PATCH v1 00/26] PCI/TSM: TDX Connect: SPDM Session and IDE Establishment
-Date: Mon, 17 Nov 2025 10:22:44 +0800
-Message-Id: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
+Subject: [PATCH v1 01/26] coco/tdx-host: Introduce a "tdx_host" device
+Date: Mon, 17 Nov 2025 10:22:45 +0800
+Message-Id: <20251117022311.2443900-2-yilun.xu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
+References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This is a new version of the RFC [1]. It is based on Dan's
-"Link" TSM Core infrastructure [2][3] + Sean's VMXON RFC [4]. All
-together they enable the SPDM Session and IDE Establishment for TDX
-Connect. This series and its base commits are available in Dan's
-tsm.git#staging [5].
+From: Chao Gao <chao.gao@intel.com>
 
-Changes since public RFC:
-- No tdx_enable() needed in tdx-host
-- Simplify tdx_page_array kAPI, no singleton mode input
-- Refactor the handling of TDX_INTERRUPTED_RESUMABLE
-- Refine the usage of scope-based cleanup in tdx-host
-- Set nr_stream_id in tdx-host, not in PCI ACPI initialization
-- Use KEYP table + ECAP bit50 to decide Domain ID reservation
-- Refactor IDE Address Association Register setup
-- Remove prototype patches
-- Refactor tdx_enable_ext() locking because of Sean's change
-- Pick ACPICA KEYP patch from ACPICA repo
-- Select TDX Connect feature for TDH.SYS.CONFIG, remove temporary
-  solution for TDH.SYS.INIT
-- Use Rick's tdx_errno.h movement patch [6]
-- Factor out scope-based cleanup patches in mm
-- Remove redunant header files, add header files only when first used
-- Use dev_err_probe() when possible
-- keyp_info_match() refactor
-- Use bitfield.h macros for PAGE_LIST_INFO & HPA_ARRAY_T raw value
-- Remove reserved fields for spdm_config_info_t
-- Simplify return for tdh_ide_stream_block()
-- Other small fixes for Jonathan's comments
+TDX depends on a platform firmware module that is invoked via instructions
+similar to vmenter (i.e. enter into a new privileged "root-mode" context to
+manage private memory and private device mechanisms). It is a software
+construct that depends on the CPU vmxon state to enable invocation of
+TDX-module ABIs. Unlike other Trusted Execution Environment (TEE) platform
+implementations that employ a firmware module running on a PCI device with
+an MMIO mailbox for communication, TDX has no hardware device to point to
+as the TEE Secure Manager (TSM).
 
-[1]: https://lore.kernel.org/linux-coco/20250919142237.418648-1-dan.j.williams@intel.com/
-[2]: https://lore.kernel.org/linux-coco/20251031212902.2256310-1-dan.j.williams@intel.com/
-[3]: https://lore.kernel.org/linux-coco/20251105040055.2832866-1-dan.j.williams@intel.com/
-[4]: https://lore.kernel.org/all/20251010220403.987927-1-seanjc@google.com/
-[5]: https://git.kernel.org/pub/scm/linux/kernel/git/devsec/tsm.git/log/?h=staging
-[6]: https://lore.kernel.org/all/20250918232224.2202592-2-rick.p.edgecombe@intel.com/
+Create a virtual device not only to align with other implementations but
+also to make it easier to
 
+ - expose metadata (e.g., TDX module version, seamldr version etc) to
+   the userspace as device attributes
 
-Trimmed Original Cover letter:
--------------------------------
+ - implement firmware uploader APIs which are tied to a device. This is
+   needed to support TDX module runtime updates
 
-Add a PCI/TSM low-level driver implemenation for TDX Connect (the TEE
-I/O architecture for Intel platforms). Recall that PCI/TSM is the
-Linux PCI core subsystem for interfacing with platform Trusted Execution
-Environment (TEE) Security Managers (TSMs). TSMs establish secure
-sessions with PCIe devices (SPDM over Data Object Exchange (DOE)
-mailboxes) and establish PCIe link Integrity and Data Encryption (IDE).
+ - enable TDX Connect which will share a common infrastructure with other
+   platform implementations. In the TDX Connect context, every
+   architecture has a TSM, represented by a PCIe or virtual device. The
+   new "tdx_host" device will serve the TSM role.
 
-This SPDM and IDE facility is enabled with TDX via a new capability
-called a TDX Module Extension. An extension, as might be expected, is a
-family of new seamcalls. Unlike typical base module seamcalls, an
-extension supports preemptible calls for long running flows like SPDM
-session establishment. This extension capability was added in response
-to Intel Linux team feedback and in support of reducing the complexity
-of the Linux implementation. The result is sequences like the following:
+A faux device is used as for TDX because the TDX module is singular within
+the system and lacks associated platform resources. Using a faux device
+eliminates the need to create a stub bus.
 
-        guard(mutex)(&tdx_ext_lock);
-        do {
-                r = tdh_spdm_connect(tlink->spdm_id, tlink->spdm_conf,
-                                     tlink->in_msg, tlink->out_msg,
-                                     dev_info, &out_msg_sz);
-                ret = tdx_link_event_handler(tlink, r, out_msg_sz);
-        } while (ret == -EAGAIN);
+The call to tdx_enable() makes the new module independent of kvm_intel.ko.
+For example, TDX Connect may be used to established to PCIe link encryption
+even if a TVM is never launched.  For now, just create the common loading
+infrastructure.
 
-...where tdh_spdm_connect() is a seamcall that may return early if this
-CPU takes a hardirq or if the module needs a DOE message marshalled to
-the device. tdx_link_event_handler() marshals the message and the
-extension is resumed to continue the flow. In this case the TDX Connect
-extension supports 1 caller at a time, think of it like a queue-depth of
-one device-firmware command queue, so concurrency is managed with
-@tdx_ext_lock.
-
-
-Chao Gao (1):
-  coco/tdx-host: Introduce a "tdx_host" device
-
-Dave Jiang (2):
-  ACPICA: Add KEYP table definition
-  acpi: Add KEYP support to fw_table parsing
-
-Kirill A. Shutemov (1):
-  x86/tdx: Move all TDX error defines into <asm/shared/tdx_errno.h>
-
-Lu Baolu (2):
-  iommu/vt-d: Cache max domain ID to avoid redundant calculation
-  iommu/vt-d: Reserve the MSB domain ID bit for the TDX module
-
-Xu Yilun (15):
-  x86/virt/tdx: Move bit definitions of TDX_FEATURES0 to public header
-  coco/tdx-host: Support Link TSM for TDX host
-  mm: Add __free() support for __free_page()
-  x86/virt/tdx: Add tdx_page_array helpers for new TDX Module objects
-  x86/virt/tdx: Read TDX global metadata for TDX Module Extensions
-  x86/virt/tdx: Read TDX Connect global metadata for TDX Connect
-  mm: Add __free() support for folio_put()
-  x86/virt/tdx: Extend tdx_page_array to support IOMMU_MT
-  x86/virt/tdx: Add a helper to loop on TDX_INTERRUPTED_RESUMABLE
-  iommu/vt-d: Export a helper to do function for each dmar_drhd_unit
-  coco/tdx-host: Setup all trusted IOMMUs on TDX Connect init
-  coco/tdx-host: Parse ACPI KEYP table to init IDE for PCI host bridges
-  x86/virt/tdx: Add SEAMCALL wrappers for IDE stream management
-  coco/tdx-host: Implement IDE stream setup/teardown
-  coco/tdx-host: Finally enable SPDM session and IDE Establishment
-
-Zhenzhong Duan (5):
-  x86/virt/tdx: Add tdx_enable_ext() to enable of TDX Module Extensions
-  x86/virt/tdx: Add SEAMCALL wrappers for trusted IOMMU setup and clear
-  coco/tdx-host: Add a helper to exchange SPDM messages through DOE
-  x86/virt/tdx: Add SEAMCALL wrappers for SPDM management
-  coco/tdx-host: Implement SPDM session setup
-
- drivers/virt/coco/Kconfig                     |   2 +
- drivers/virt/coco/tdx-host/Kconfig            |  17 +
- drivers/virt/coco/Makefile                    |   1 +
- drivers/virt/coco/tdx-host/Makefile           |   1 +
- arch/x86/include/asm/shared/tdx.h             |   1 +
- .../vmx => include/asm/shared}/tdx_errno.h    |  29 +-
- arch/x86/include/asm/tdx.h                    |  76 +-
- arch/x86/include/asm/tdx_global_metadata.h    |  14 +
- arch/x86/kvm/vmx/tdx.h                        |   1 -
- arch/x86/virt/vmx/tdx/tdx.h                   |  16 +-
- drivers/iommu/intel/iommu.h                   |   2 +
- include/acpi/actbl2.h                         |  59 ++
- include/linux/acpi.h                          |   3 +
- include/linux/dmar.h                          |   2 +
- include/linux/fw_table.h                      |   1 +
- include/linux/gfp.h                           |   1 +
- include/linux/mm.h                            |   2 +
- include/linux/pci-ide.h                       |   2 +
- arch/x86/virt/vmx/tdx/tdx.c                   | 740 ++++++++++++-
- arch/x86/virt/vmx/tdx/tdx_global_metadata.c   |  32 +
- drivers/acpi/tables.c                         |  12 +-
- drivers/iommu/intel/dmar.c                    |  67 ++
- drivers/iommu/intel/iommu.c                   |  10 +-
- drivers/pci/ide.c                             |   5 +-
- drivers/virt/coco/tdx-host/tdx-host.c         | 969 ++++++++++++++++++
- lib/fw_table.c                                |   9 +
- 26 files changed, 2027 insertions(+), 47 deletions(-)
+[ Yilun: Remove unnecessary head files ]
+Co-developed-by: Xu Yilun <yilun.xu@linux.intel.com>
+Signed-off-by: Xu Yilun <yilun.xu@linux.intel.com>
+Signed-off-by: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+---
+ drivers/virt/coco/Kconfig             |  2 ++
+ drivers/virt/coco/tdx-host/Kconfig    | 10 +++++++
+ drivers/virt/coco/Makefile            |  1 +
+ drivers/virt/coco/tdx-host/Makefile   |  1 +
+ drivers/virt/coco/tdx-host/tdx-host.c | 41 +++++++++++++++++++++++++++
+ 5 files changed, 55 insertions(+)
  create mode 100644 drivers/virt/coco/tdx-host/Kconfig
  create mode 100644 drivers/virt/coco/tdx-host/Makefile
- rename arch/x86/{kvm/vmx => include/asm/shared}/tdx_errno.h (62%)
  create mode 100644 drivers/virt/coco/tdx-host/tdx-host.c
 
+diff --git a/drivers/virt/coco/Kconfig b/drivers/virt/coco/Kconfig
+index bb0c6d6ddcc8..b9fb0760e917 100644
+--- a/drivers/virt/coco/Kconfig
++++ b/drivers/virt/coco/Kconfig
+@@ -15,5 +15,7 @@ source "drivers/virt/coco/arm-cca-guest/Kconfig"
+ 
+ source "drivers/virt/coco/guest/Kconfig"
+ 
++source "drivers/virt/coco/tdx-host/Kconfig"
++
+ config TSM
+ 	bool
+diff --git a/drivers/virt/coco/tdx-host/Kconfig b/drivers/virt/coco/tdx-host/Kconfig
+new file mode 100644
+index 000000000000..bf6be0fc0879
+--- /dev/null
++++ b/drivers/virt/coco/tdx-host/Kconfig
+@@ -0,0 +1,10 @@
++config TDX_HOST_SERVICES
++	tristate "TDX Host Services Driver"
++	depends on INTEL_TDX_HOST
++	default m if INTEL_TDX_HOST
++	help
++	  Enable access to TDX host services like module update and
++	  extensions (e.g. TDX Connect).
++
++	  Say y or m if enabling support for confidential virtual machine
++	  support (CONFIG_INTEL_TDX_HOST). The module is called tdx_host.ko
+diff --git a/drivers/virt/coco/Makefile b/drivers/virt/coco/Makefile
+index cb52021912b3..b323b0ae4f82 100644
+--- a/drivers/virt/coco/Makefile
++++ b/drivers/virt/coco/Makefile
+@@ -6,6 +6,7 @@ obj-$(CONFIG_EFI_SECRET)	+= efi_secret/
+ obj-$(CONFIG_ARM_PKVM_GUEST)	+= pkvm-guest/
+ obj-$(CONFIG_SEV_GUEST)		+= sev-guest/
+ obj-$(CONFIG_INTEL_TDX_GUEST)	+= tdx-guest/
++obj-$(CONFIG_INTEL_TDX_HOST)	+= tdx-host/
+ obj-$(CONFIG_ARM_CCA_GUEST)	+= arm-cca-guest/
+ obj-$(CONFIG_TSM) 		+= tsm-core.o
+ obj-$(CONFIG_TSM_GUEST)		+= guest/
+diff --git a/drivers/virt/coco/tdx-host/Makefile b/drivers/virt/coco/tdx-host/Makefile
+new file mode 100644
+index 000000000000..e61e749a8dff
+--- /dev/null
++++ b/drivers/virt/coco/tdx-host/Makefile
+@@ -0,0 +1 @@
++obj-$(CONFIG_TDX_HOST_SERVICES) += tdx-host.o
+diff --git a/drivers/virt/coco/tdx-host/tdx-host.c b/drivers/virt/coco/tdx-host/tdx-host.c
+new file mode 100644
+index 000000000000..ced1c980dc6f
+--- /dev/null
++++ b/drivers/virt/coco/tdx-host/tdx-host.c
+@@ -0,0 +1,41 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * TDX host user interface driver
++ *
++ * Copyright (C) 2025 Intel Corporation
++ */
++
++#include <linux/module.h>
++#include <linux/mod_devicetable.h>
++#include <linux/device/faux.h>
++#include <asm/cpu_device_id.h>
++
++static const struct x86_cpu_id tdx_host_ids[] = {
++	X86_MATCH_FEATURE(X86_FEATURE_TDX_HOST_PLATFORM, NULL),
++	{}
++};
++MODULE_DEVICE_TABLE(x86cpu, tdx_host_ids);
++
++static struct faux_device *fdev;
++
++static int __init tdx_host_init(void)
++{
++	if (!x86_match_cpu(tdx_host_ids))
++		return -ENODEV;
++
++	fdev = faux_device_create(KBUILD_MODNAME, NULL, NULL);
++	if (!fdev)
++		return -ENODEV;
++
++	return 0;
++}
++module_init(tdx_host_init);
++
++static void __exit tdx_host_exit(void)
++{
++	faux_device_destroy(fdev);
++}
++module_exit(tdx_host_exit);
++
++MODULE_DESCRIPTION("TDX Host Services");
++MODULE_LICENSE("GPL");
 -- 
 2.25.1
 
