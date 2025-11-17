@@ -1,92 +1,104 @@
-Return-Path: <kvm+bounces-63396-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63397-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A089C65599
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:09:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32294C65602
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:12:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 515C2380DB1
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 17:02:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id B92452A94A
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 17:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 273CF305067;
-	Mon, 17 Nov 2025 17:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72DB833DEEB;
+	Mon, 17 Nov 2025 17:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DXRkM0oz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rYpEo30R"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41430304BAF;
-	Mon, 17 Nov 2025 17:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6F330BB89
+	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 17:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763398811; cv=none; b=CEzMq6gETk/E1WFlZINnuddkEZRtcBijbgAIEE95NzxR5vgoI1WWQ7E5WUt0ZR+IN4RgPWSrwJvWK+m8RfX04juqrukeCG+VaTMyI4/T5q1p1hVKwf6Vr32gEyebPOMmNnJzRFu2OCVJUmZai3xcPAGOwemCt/X6Fv4OlUStJeI=
+	t=1763399025; cv=none; b=Y+RqYE723HKG0iQ6FnPuqRdPQ/bKZnw75SYcpcAsbHiaruc8y/m78CAVfFzp+6pkjMgLtVchVxVdVWyupB8QgIL7D/+rkjzVyLsqsMLImvAOHPPMrgYW4829v26LwJyc5xCb/bq+Sbu7O4SRFoXZV2Yuc50mtMlBkQ8uce62M3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763398811; c=relaxed/simple;
-	bh=DD5aJ0CYO5FJNOi0XizsUc+cIpf1vb2XlK1BACSazP0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=clCuyGRUzVmsXFt4qNPBblFgQal+kMYSBGZ+OzhaO8zKAROVIACgOQPtyhyeGLZW2Kw6+JmuwuxEOMt023Fvsr/90wzpAFU+tMvRSe72+2pDHkCppwOoqQL/11Kao66IpttyXYIhbhEXUHa7FNQjY4q8218BtFgOsA1m8LR62Jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DXRkM0oz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74A21C19423;
-	Mon, 17 Nov 2025 17:00:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763398810;
-	bh=DD5aJ0CYO5FJNOi0XizsUc+cIpf1vb2XlK1BACSazP0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=DXRkM0ozBdjtfmku47EUoC5aecIc/EhtwKbfV03r6i/hnVF43NpNJqwcS5qsIM4sZ
-	 avJzaJxVZPsWIk57vzZFBdJ8qMZwHaZgWPw2J8z1rcKS6opHRvYWcSampBtKJNuyi+
-	 8LbTFQqizNyKlp3G/TpTx3az3+xSzmy585HKNQKygHRc95Spvxd4mCuwtv20Ol0uZ9
-	 0/W56NbOhupcwU+sCxTDUbL9FQ321StUqwAvFcpMbdKax710y+6ZE+Oz+xrxJ/laew
-	 y+8QoolAbRNF4F6Hq9e7TkPvEUMYzfDVNhvgt5o3x+z4NagMG8v7lKnxf7vJF5NP5y
-	 rkUHC+7R4jnJw==
-Message-ID: <4c5a9201-b2dc-4765-bfc7-f89ec095b629@kernel.org>
-Date: Mon, 17 Nov 2025 18:00:04 +0100
+	s=arc-20240116; t=1763399025; c=relaxed/simple;
+	bh=bkVMcDwSIQqPy3ppwR3++s+E7Tde5RHH8Gep/ihy9i8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pap21Aggjrvpmij08/NF9m+G8CmXmsg0uuOsazuWbYobSAW5SCZniWKFZ5nMX/5mrhIqNXOTOgvbsyhw/vdPVmV12Xa2KuxnyeMHFs0hc949hq9QtQX8QzrHVgYQAs9SFSBOPGr2nzyRhm8QMjPVqlL+s7FKg0vEpfkzX370Jjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rYpEo30R; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7b80de683efso9450992b3a.3
+        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 09:03:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763399023; x=1764003823; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0hq6Uia9RhmITs3Fm5C1ux3TB78rTa2oGwDQ4IOSjBE=;
+        b=rYpEo30RpXd7WtfTxTPw2DJWdaW4wEeNOB3FAF7M0R5noH4kkvp8HWqItfRFJOM9wq
+         yDZxvZDGuh8yDkX30Qo/zsQGZWivVa9tNmS8Xnaa9Vdp6Pptcgm7+qJ9kCEBBpT8rH19
+         /Y9yS5gfQ/GwfSJZLV82KQuLlRekzS+3H4k2Y81rjV2YxFZPNXqHxvTNXczrS4ePzJhq
+         DEX28q03BISuirAF9Osw5xq4/K0U7B2q7H4Jwb9lJJcig/PjoU4uXGnVvqMdazCtDmmt
+         /g808ppriT3eD0opreVJZklP0gYh1Es5AGYv/o3cnbKx/hk99I4PZ3Ei+oFlUavCmLor
+         FZEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763399023; x=1764003823;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0hq6Uia9RhmITs3Fm5C1ux3TB78rTa2oGwDQ4IOSjBE=;
+        b=baMyB2EBeY0bqMuEpvz29u2eH+AjVwQr0riMKDE90TdBGT3V11HQTf/cYR+lyhqcxl
+         3M49n2efEJjjWyYo4l/nftEP2GciQM2ccJEhPR9Q1vlzayQOclhGT6I6IpQw88v7U6Of
+         0ttSqilPBz4XG5Nniahpduwn6wvvm8db63eAmKMfaIsFxFX+oC3Dt5eSS5A2UzMhEnak
+         apZOBw1S+jgZvQFOS9x1jlqYWcAyNlk07+2Dpcmcp260aC4i+wdLvkWE9LpP36uOmYUV
+         A+bSGySlHMEMDXyqRmcBsAVRtIyiI6fcjVIPECZ0zbwODjWvZMMBK5oq6D/3h0g7XT1S
+         RGPg==
+X-Forwarded-Encrypted: i=1; AJvYcCXiwOiCJryvWMSCcHwJqYnzQGg0JDUYUuMUjETmir8z2OTFepb0W+APG8aVkijZPjZgg2g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGATbW1IhqLJy33L/imNDWu1hT1mlSipFjfhVKxA4yAjFptFag
+	KJu3HThp/lAcG0qgrGleU5sduo3LBj2sdJBN6tjh3YA1m1qpqLif80rBJtQIwlBVj57uF87a4z7
+	QEtHETQ==
+X-Google-Smtp-Source: AGHT+IGkp5EJaeics9rfr6OPoTNm9TOyUmNPfmPd5OleLPcrSezjyK79L0sxbr8BzPRbpMbixTLjg2AYM2E=
+X-Received: from pgnc22.prod.google.com ([2002:a63:7256:0:b0:bc3:7d57:2ea2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:999f:b0:35e:7605:56a4
+ with SMTP id adf61e73a8af0-35e76055d0cmr7231438637.51.1763399023245; Mon, 17
+ Nov 2025 09:03:43 -0800 (PST)
+Date: Mon, 17 Nov 2025 09:03:41 -0800
+In-Reply-To: <ei6cdmnvhzyavfobamjkcq2ghdrxcv7ruxhcbzzycqlvaty7zr@5cjkfczxiqom>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/4] userfaultfd: move vma_can_userfault out of line
-To: Mike Rapoport <rppt@kernel.org>, linux-mm@kvack.org
-Cc: Andrea Arcangeli <aarcange@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Baolin Wang <baolin.wang@linux.alibaba.com>, Hugh Dickins
- <hughd@google.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Michal Hocko
- <mhocko@suse.com>, Nikita Kalyazin <kalyazin@amazon.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20251117114631.2029447-1-rppt@kernel.org>
- <20251117114631.2029447-2-rppt@kernel.org>
-From: "David Hildenbrand (Red Hat)" <david@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20251117114631.2029447-2-rppt@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20251112013017.1836863-1-yosry.ahmed@linux.dev>
+ <aRdaLrnQ8Xt77S8Y@google.com> <ei6cdmnvhzyavfobamjkcq2ghdrxcv7ruxhcbzzycqlvaty7zr@5cjkfczxiqom>
+Message-ID: <aRtVbeVHe5ZFOPQW@google.com>
+Subject: Re: [PATCH] KVM: SVM: Fix redundant updates of LBR MSR intercepts
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On 17.11.25 12:46, Mike Rapoport wrote:
-> From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
+On Fri, Nov 14, 2025, Yosry Ahmed wrote:
+> On Fri, Nov 14, 2025 at 08:34:54AM -0800, Sean Christopherson wrote:
+> > On Wed, Nov 12, 2025, Yosry Ahmed wrote:
+> > > svm_update_lbrv() always updates LBR MSRs intercepts, even when they are
+> > > already set correctly. This results in force_msr_bitmap_recalc always
+> > > being set to true on every nested transition,
+> > 
+> > Nit, it's only on VMRUN, not on every transition (i.e. not on nested #VMEXIT).
 > 
-> vma_can_userfault() has grown pretty big and it's not called on
-> performance critical path.
+> How so? svm_update_lbrv() will also be called in nested_svm_vmexit(),
+> and it will eventually lead to force_msr_bitmap_recalc being set to
+> true.
 > 
-> Move it out of line.
-> 
-> No functional changes.
-> 
-> Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+> I guess what you meant is the "undoing the Hyper-V optimization" part.
+> That is indeed only affected by the svm_update_lbrv() call in the nested
+> VMRUN path.
 
-Reviewed-by: David Hildenbrand (Red Hat) <david@kernel.org>
-
--- 
-Cheers
-
-David
+Ooh, yeah, my mind was fully on when the intercepts would be recomputed, not on
+when the flag could be set.
 
