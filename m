@@ -1,234 +1,205 @@
-Return-Path: <kvm+bounces-63334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63335-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2134C62E19
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 09:24:05 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03AE6C62F3A
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 09:47:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 55FE83526BD
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 08:22:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 2ED9028B2C
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 08:46:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0C831AF1E;
-	Mon, 17 Nov 2025 08:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e2CPJRaE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546052877FE;
+	Mon, 17 Nov 2025 08:46:49 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Atcsqr.andestech.com (60-248-80-70.hinet-ip.hinet.net [60.248.80.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE4B30EF68
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 08:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEC6265632
+	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 08:46:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.248.80.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763367765; cv=none; b=XSC2MjurU9xUHj0yOeOxm0hz9+yolbhZ21aH1uc+vH7eKS2fh27uQ4cf5PjqxrBAX+qbCzpl1LVkpRgpWJXJw+FWpFZUJBYYWF697DwcFV0+wTHO/OWVZNsnajGy4NQQu19k3VY7y/U2c47Tq4JR8rOl8QK3jdCnsfJIaEAY4UE=
+	t=1763369208; cv=none; b=qzv4o1mSYlpsSIHzwwmT3t92QyD4TjOTFi5RPOz7V/8YC/J1hrLYasDI7JmbIPpY6JwBeqbzJK7BAvomkGzv1E1gqrufm6ZgyEj13T0SVD2Nr+6Q/uuvwcKV8TcRKE5+Qti/4Jqi3j3pTU5krN0n7lw56OOKhLP7GZCaCsHjYhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763367765; c=relaxed/simple;
-	bh=33xNOYm4zTfF2BJPSq4BbTwUMZIYNP78A9yQW2BR168=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j/u37d4T0ev9EpElbgJG0mA2J5N8P7k71MaEtxFtJ1ZTYy0sqEh698FO74G3Oz4IBUpPpgiWXUIQ/TeichuxMJO4GmlcrE41prGo3W7o0I5JTMdxRsFx5HVbFM4rYP4ndVLmLphB94o9p54SSZYZkxva4sMNDrmVj1naZqvbbdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e2CPJRaE; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4ee147baf7bso355541cf.1
-        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 00:22:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763367762; x=1763972562; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=F4mw/d+cHuQSW2nKT/VCWC66VyQfn5ntftKqNloGog0=;
-        b=e2CPJRaE89U44jHB/TU1O3aStL/ZSZ0CZJQCTp9u1xyyZrfnUEDJD1WhOgP/ccO+5V
-         8l2DmaL70qIOMEbavssPjMhMrtCN1wTuJTzZ3ZoNgX1CWfpTeHMoWvigaZ1G5tzlW8gt
-         bozjKD7VARdQoL/96OoZwYUJaQS5XnPRU3Ljg3f99uUOPUg6kMyetQZpg3oJD73iTTS9
-         P31VCoT/k6n96on4FIEfXfzlqd76heLboFkX9hxmLoJ8fHwM8A2+b5mf23k97zijpscf
-         ldgsadsTD7HtMDXNWaeyN3VLoD59kZP3JwXeOy4iGJwKHgtGKFVQ4DbIyBxkf/ffPQLw
-         SnnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763367762; x=1763972562;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F4mw/d+cHuQSW2nKT/VCWC66VyQfn5ntftKqNloGog0=;
-        b=MJQlt+0oyjHoFqx1xUcsqH5Rqt+3HtP5YrD0hDBsdRlaX31BZbgpZ6kVOUpFjXOYr2
-         DSb0FInK7dByU6qe3Q8iR6yql8mEWSRxUnaDoief9wqkveVaHXnFH61sr2Bm5THJ7S8e
-         IxLQ8RVABcvrXEYmaNmLhIJPFNWu28ZVy+YCPTV6hUcT+eFKMuMTYZIiRngaTuUPOigr
-         /H15a7Hfk0dNGbpLmevFBGNsJ1kkdC4inQslmGnbkiftD8F/ThZNyaPuCsCnAGsUYKIQ
-         7E209Ieqvg2ATZJ50rJjH0PdTAprAm/agY1VeVlJKMbqenKrumBStTlQX4YBYgxTotpl
-         yqfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOnguzfxLpx+pgQyB/sr5gwyGOvjdwt0O6hJrXB29d0S11a2LDd+9SQzAywWiP8RquKPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUZkffG2y71TdbLE3iIL9gaO7IUvFlXL/h7k8d5sFjQzi5z98j
-	DfKSNQF6895y2a1AE1w5edaOdrQ0Lak7OxSdrmpmKzeDmyIAcmtLt/5LscyNWsx06N81M5L9UuZ
-	ZV0fkJEskV3BE6/US3s3FIkhOwL43AUA231DQp3TE
-X-Gm-Gg: ASbGncsEACvt5UzDF5M6q2Op3JClNYkjXpQmkQr4akh7L+Yghixi+21sqHSiToNzikJ
-	bLea0RjOgoQ78suVTRLacNzteks4UmhJLkWdUT9FqTI7ICf/2n7uEClM+HqMs7wHZmJF5skt3pF
-	3t6Ekise780b+LEEo6aIkz2dcsrm3mNQ7qZaUKIQ1X3BKn5RN7CnKEFvCZIzRmCe4H6EADFcRtr
-	GAtrYsPooMufPw+o5T9ScA17YL3PGirhljaqxWlJ50w0e6qHVVhp4CJCVMt0LMDbOx2Bqw=
-X-Google-Smtp-Source: AGHT+IEwrJtjWNdFAKXP4Cq6tm8luNUUXLzjFmpWEc5T/ifpGhnOTJaKY/1iZ6Vy1SGx0WQsbM+vgRDsvnbfJpkP4eE=
-X-Received: by 2002:ac8:5893:0:b0:4ed:341a:5499 with SMTP id
- d75a77b69052e-4ee02c20affmr10129241cf.11.1763367762168; Mon, 17 Nov 2025
- 00:22:42 -0800 (PST)
+	s=arc-20240116; t=1763369208; c=relaxed/simple;
+	bh=5rq7hC+3whNZCqhr0ZHxQujF367+hptZaUKGj/4QSIE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DJszJ7ao95W2j6qHBC6GXR9F3DRDj338afjV6x+4mwJhvCVgQ/xvnYaW2YLxA47wao+51Xu3QwW6DDLAx+R+XGwEe5wkhR0r9jFiijz+K5VFUQ23WW/MJKVO1AHuEfQCIZzQlXu4ubvnhP6P5QK74k684RI1QX7U4K6kSSdErQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=andestech.com; spf=pass smtp.mailfrom=andestech.com; arc=none smtp.client-ip=60.248.80.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=andestech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=andestech.com
+Received: from mail.andestech.com (ATCPCS34.andestech.com [10.0.1.134])
+	by Atcsqr.andestech.com with ESMTPS id 5AH8kHmt097165
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=OK);
+	Mon, 17 Nov 2025 16:46:17 +0800 (+08)
+	(envelope-from minachou@andestech.com)
+Received: from swlinux02.andestech.com (10.0.15.183) by ATCPCS34.andestech.com
+ (10.0.1.134) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 17 Nov
+ 2025 16:46:17 +0800
+From: Hui Min Mina Chou <minachou@andestech.com>
+To: <anup@brainfault.org>, <atish.patra@linux.dev>, <pjw@kernel.org>,
+        <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <alex@ghiti.fr>
+CC: <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
+        <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <tim609@andestech.com>, <minachou@andestech.com>,
+        <ben717@andestech.com>, <az70021@gmail.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=
+	<rkrcmar@ventanamicro.com>
+Subject: [PATCH v4] RISC-V: KVM: Flush VS-stage TLB after VCPU migration for split two-stage TLBs
+Date: Mon, 17 Nov 2025 16:45:55 +0800
+Message-ID: <20251117084555.157642-1-minachou@andestech.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251109171619.1507205-1-maz@kernel.org> <20251109171619.1507205-30-maz@kernel.org>
- <CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
- <86cy5ku06v.wl-maz@kernel.org> <CA+EHjTzi9Q9hqAu1Xk51hO3uz0FdUGjdPSViN4RAD6tuXJkvYQ@mail.gmail.com>
- <86a50otsuh.wl-maz@kernel.org>
-In-Reply-To: <86a50otsuh.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 17 Nov 2025 08:22:05 +0000
-X-Gm-Features: AWmQ_bmqi9yyjBAanZdrMqxT0R_6WY6hFkqKJWlr94OwYemsxfqLBAjqPjPKDzk
-Message-ID: <CA+EHjTwcf7HXypmt-1gS2G8GK5iBt3VQrpmRiHysr571J96VvA@mail.gmail.com>
-Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when
- interrupts overflow LR capacity
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>, Yao Yuan <yaoyuan@linux.alibaba.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ATCPCS33.andestech.com (10.0.1.100) To
+ ATCPCS34.andestech.com (10.0.1.134)
+X-DKIM-Results: atcpcs34.andestech.com; dkim=none;
+X-DNSRBL: 
+X-SPAM-SOURCE-CHECK: pass
+X-MAIL:Atcsqr.andestech.com 5AH8kHmt097165
 
-Hi Marc,
+Most implementations cache the combined result of two-stage
+translation, but some, like Andes cores, use split TLBs that
+store VS-stage and G-stage entries separately.
 
-On Fri, 14 Nov 2025 at 17:41, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 14 Nov 2025 15:53:33 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Fri, 14 Nov 2025 at 15:02, Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > On Fri, 14 Nov 2025 14:20:46 +0000,
-> > > Fuad Tabba <tabba@google.com> wrote:
-> > > >
-> > > > Hi Marc,
-> > > >
-> > > > On Sun, 9 Nov 2025 at 17:17, Marc Zyngier <maz@kernel.org> wrote:
-> > > > >
-> > > > > Now that we are ready to handle deactivation through ICV_DIR_EL1,
-> > > > > set the trap bit if we have active interrupts outside of the LRs.
-> > > > >
-> > > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > > ---
-> > > > >  arch/arm64/kvm/vgic/vgic-v3.c | 7 +++++++
-> > > > >  1 file changed, 7 insertions(+)
-> > > > >
-> > > > > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > > index 1026031f22ff9..26e17ed057f00 100644
-> > > > > --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > > @@ -42,6 +42,13 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
-> > > > >                 ICH_HCR_EL2_VGrp0DIE : ICH_HCR_EL2_VGrp0EIE;
-> > > > >         cpuif->vgic_hcr |= (cpuif->vgic_vmcr & ICH_VMCR_ENG1_MASK) ?
-> > > > >                 ICH_HCR_EL2_VGrp1DIE : ICH_HCR_EL2_VGrp1EIE;
-> > > > > +
-> > > > > +       /*
-> > > > > +        * Note that we set the trap irrespective of EOIMode, as that
-> > > > > +        * can change behind our back without any warning...
-> > > > > +        */
-> > > > > +       if (irqs_active_outside_lrs(als))
-> > > > > +               cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
-> > > > >  }
-> > > >
-> > > > I just tested these patches as they are on kvmarm/next
-> > > > 2ea7215187c5759fc5d277280e3095b350ca6a50 ("Merge branch
-> > > > 'kvm-arm64/vgic-lr-overflow' into kvmarm/next"), without any
-> > > > additional pKVM patches. I tried running it with pKVM (non-protected)
-> > > > and with just plain nVHE. In both cases, I get a trap to EL2 (0x18)
-> > > > when booting a non-protected guest, which triggers a bug in
-> > > > handle_trap() arch/arm64/kvm/hyp/nvhe/hyp-main.c:706
-> > > >
-> > > > This trap is happening because of setting this particular trap (TDIR).
-> > > > Just removing this trap from vgic_v3_configure_hcr() from the ToT on
-> > > > kvmarm/next boots fine.
-> > >
-> > > This is surprising, as I'm not hitting this on actual HW. Are you
-> > > getting a 0x18 trap? If so, is it coming from the host? Can you
-> > > correlate the PC with what the host is doing?
-> >
-> > I should have given you that earlier, sorry.
-> >
-> > Yes, it's an 0x18 trap from the host (although it happens when I boot
-> > a guest). Here is the relevant part of the backtrace addr2lined and
-> > the full one below.
-> >
-> > handle_percpu_devid_irq+0x90/0x120 (kernel/irq/chip.c:930)
-> > generic_handle_domain_irq+0x40/0x64 (include/linux/irqdesc.h:?)
-> > gic_handle_irq+0x4c/0x110 (include/linux/irqdesc.h:?)
-> > call_on_irq_stack+0x30/0x48 (arch/arm64/kernel/entry.S:893)
-> >
-> > [   28.454804] Code: d65f03c0 92800008 f9000008 17fffffa (d4210000)
-> > [   28.454873] kvm [266]: Hyp Offset: 0xfff1205c3fe00000
-> > [   28.455157] Kernel panic - not syncing: HYP panic:
-> > [   28.455157] PS:204023c9 PC:000e5fa4413e39bc ESR:00000000f2000800
-> > [   28.455157] FAR:ffff800082733d3c HPFAR:0000000000500000 PAR:0000000000000000
->
-> I expect you have a write to ICC_DIR_EL1 at this address?
+On such systems, when a VCPU migrates to another CPU, an additional
+HFENCE.VVMA is required to avoid using stale VS-stage entries, which
+could otherwise cause guest faults.
 
-It almost surely must be, but tracking it down hasn't been that easy.
-That said, I think it's ending up in gic_eoimode1_eoi_irq(), which
-calls gic_write_dir() if !gic_arm64_erratum_2941627_needed(d).
+Introduce a static key to identify CPUs with split two-stage TLBs.
+When enabled, KVM issues an extra HFENCE.VVMA on VCPU migration to
+prevent stale VS-stage mappings.
 
-I wonder if your hardware needs that erratum.
+Signed-off-by: Hui Min Mina Chou <minachou@andestech.com>
+Signed-off-by: Ben Zong-You Xie <ben717@andestech.com>
+Reviewed-by: Radim Krčmář <rkrcmar@ventanamicro.com>
+---
+Changelog:
 
-> > [   28.455157] VCPU:0000000000000000
-> > [   28.459703] CPU: 5 UID: 0 PID: 266 Comm: kvm-vcpu-0 Not tainted
-> > 6.18.0-rc3-g2ea7215187c5 #8 PREEMPT
-> > [   28.460247] Hardware name: linux,dummy-virt (DT)
-> > [   28.460615] Call trace:
-> > [   28.460900]  show_stack+0x18/0x24 (C)
-> > [   28.461234]  dump_stack_lvl+0x40/0x84
-> > [   28.461421]  dump_stack+0x18/0x24
-> > [   28.461566]  vpanic+0x11c/0x364
-> > [   28.461698]  vpanic+0x0/0x364
-> > [   28.461838]  nvhe_hyp_panic_handler+0x118/0x190
-> > [   28.462056]  handle_percpu_devid_irq+0x90/0x120
-> > [   28.462248]  handle_percpu_devid_irq+0x90/0x120
-> > [   28.462439]  generic_handle_domain_irq+0x40/0x64
-> > [   28.462643]  gic_handle_irq+0x4c/0x110
-> > [   28.462814]  call_on_irq_stack+0x30/0x48
-> > [   28.463003]  do_interrupt_handler+0x4c/0x6c
-> > [   28.463184]  el1_interrupt+0x3c/0x60
-> > [   28.463348]  el1h_64_irq_handler+0x18/0x24
-> > [   28.463525]  el1h_64_irq+0x6c/0x70
-> > [   28.463799]  local_daif_restore+0x8/0xc (P)
-> > [   28.463980]  el0t_64_sync_handler+0x84/0x12c
-> > [   28.464164]  el0t_64_sync+0x198/0x19c
-> >
-> > > It would indicate that we are leaking trap bits on exit, and that QEMU
-> > > is trapping ICC_DIR_EL1 on top of ICV_DIR_EL1 (which the HW I have
-> > > access to doesn't seem to do).
-> > >
-> > > > I'm running this on QEMU with '-machine virt,gic-version=3 -cpu max'
-> > > > and the kernel with 'kvm-arm.mode=protected' and with
-> > > > 'kvm-arm.mode=nvhe'.
-> > > >
-> > > > Let me know if you need any more info or help testing.
-> > >
-> > > On top of the above, could you give the hack below a go? I haven't
-> > > tested it at all (I'm in the middle of a bisect from hell...)
-> >
-> > With the hack it boots, both nvhe and protected mode.
->
-> OK. At least we know what the issue is, and it shouldn't be too hard
-> to fix. I guess there is an opportunity for cleanup here, and I'll
-> look into it shortly (probably not before Monday though).
+v4:
+ - Rename the patch subject
+ - Remove the Fixes tag
+ - Add a static key so that HFENCE.VVMA is issued only on CPUs with
+   split two-stage TLBs
+ - Add kvm_riscv_setup_vendor_features() to detect mvendorid/marchid
+   and enable the key when required
 
-No hurry on my part. I'm just here for the reviews :)
+v3:
+ - Resolved build warning; updated header declaration and call side to
+   kvm_riscv_local_tlb_sanitize
+ - Add Radim Krčmář's Reviewed-by tag
+ (https://lore.kernel.org/all/20251023032517.2527193-1-minachou@andestech.com/)
 
-Cheers,
-/fuad
+v2:
+ - Updated Fixes commit to 92e450507d56
+ - Renamed function to kvm_riscv_local_tlb_sanitize
+ (https://lore.kernel.org/all/20251021083105.4029305-1-minachou@andestech.com/)
+---
+ arch/riscv/include/asm/kvm_host.h |  2 ++
+ arch/riscv/include/asm/kvm_vmid.h |  2 +-
+ arch/riscv/kvm/main.c             | 14 ++++++++++++++
+ arch/riscv/kvm/vcpu.c             |  2 +-
+ arch/riscv/kvm/vmid.c             |  6 +++++-
+ 5 files changed, 23 insertions(+), 3 deletions(-)
 
-> Thanks again,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index d71d3299a335..21abac2f804e 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -323,4 +323,6 @@ bool kvm_riscv_vcpu_stopped(struct kvm_vcpu *vcpu);
+ 
+ void kvm_riscv_vcpu_record_steal_time(struct kvm_vcpu *vcpu);
+ 
++DECLARE_STATIC_KEY_FALSE(kvm_riscv_tlb_split_mode);
++
+ #endif /* __RISCV_KVM_HOST_H__ */
+diff --git a/arch/riscv/include/asm/kvm_vmid.h b/arch/riscv/include/asm/kvm_vmid.h
+index ab98e1434fb7..75fb6e872ccd 100644
+--- a/arch/riscv/include/asm/kvm_vmid.h
++++ b/arch/riscv/include/asm/kvm_vmid.h
+@@ -22,6 +22,6 @@ unsigned long kvm_riscv_gstage_vmid_bits(void);
+ int kvm_riscv_gstage_vmid_init(struct kvm *kvm);
+ bool kvm_riscv_gstage_vmid_ver_changed(struct kvm_vmid *vmid);
+ void kvm_riscv_gstage_vmid_update(struct kvm_vcpu *vcpu);
+-void kvm_riscv_gstage_vmid_sanitize(struct kvm_vcpu *vcpu);
++void kvm_riscv_local_tlb_sanitize(struct kvm_vcpu *vcpu);
+ 
+ #endif
+diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+index 67c876de74ef..bf0e4f1abe0f 100644
+--- a/arch/riscv/kvm/main.c
++++ b/arch/riscv/kvm/main.c
+@@ -15,6 +15,18 @@
+ #include <asm/kvm_nacl.h>
+ #include <asm/sbi.h>
+ 
++DEFINE_STATIC_KEY_FALSE(kvm_riscv_tlb_split_mode);
++
++static void kvm_riscv_setup_vendor_features(void)
++{
++	/* Andes AX66: split two-stage TLBs */
++	if (riscv_cached_mvendorid(0) == ANDES_VENDOR_ID &&
++	    (riscv_cached_marchid(0) & 0xFFFF) == 0x8A66) {
++		static_branch_enable(&kvm_riscv_tlb_split_mode);
++		kvm_info("using split two-stage TLBs requiring extra HFENCE.VVMA\n");
++	}
++}
++
+ long kvm_arch_dev_ioctl(struct file *filp,
+ 			unsigned int ioctl, unsigned long arg)
+ {
+@@ -159,6 +171,8 @@ static int __init riscv_kvm_init(void)
+ 		kvm_info("AIA available with %d guest external interrupts\n",
+ 			 kvm_riscv_aia_nr_hgei);
+ 
++	kvm_riscv_setup_vendor_features();
++
+ 	kvm_register_perf_callbacks(NULL);
+ 
+ 	rc = kvm_init(sizeof(struct kvm_vcpu), 0, THIS_MODULE);
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index 3ebcfffaa978..796218e4a462 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -968,7 +968,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 * Note: This should be done after G-stage VMID has been
+ 		 * updated using kvm_riscv_gstage_vmid_ver_changed()
+ 		 */
+-		kvm_riscv_gstage_vmid_sanitize(vcpu);
++		kvm_riscv_local_tlb_sanitize(vcpu);
+ 
+ 		trace_kvm_entry(vcpu);
+ 
+diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+index 3b426c800480..1dbd50c67a88 100644
+--- a/arch/riscv/kvm/vmid.c
++++ b/arch/riscv/kvm/vmid.c
+@@ -125,7 +125,7 @@ void kvm_riscv_gstage_vmid_update(struct kvm_vcpu *vcpu)
+ 		kvm_make_request(KVM_REQ_UPDATE_HGATP, v);
+ }
+ 
+-void kvm_riscv_gstage_vmid_sanitize(struct kvm_vcpu *vcpu)
++void kvm_riscv_local_tlb_sanitize(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long vmid;
+ 
+@@ -146,4 +146,8 @@ void kvm_riscv_gstage_vmid_sanitize(struct kvm_vcpu *vcpu)
+ 
+ 	vmid = READ_ONCE(vcpu->kvm->arch.vmid.vmid);
+ 	kvm_riscv_local_hfence_gvma_vmid_all(vmid);
++
++	/* For split TLB designs, flush VS-stage entries also */
++	if (static_branch_unlikely(&kvm_riscv_tlb_split_mode))
++		kvm_riscv_local_hfence_vvma_all(vmid);
+ }
+-- 
+2.34.1
+
 
