@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-63356-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63357-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECDA2C63CF0
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:28:59 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02F19C63CCC
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:27:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DFED3AE0D3
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 11:25:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C7BBE4EA156
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 11:26:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A8028727C;
-	Mon, 17 Nov 2025 11:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D83C31E0F7;
+	Mon, 17 Nov 2025 11:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eTjPGGDS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yZlRkk9m"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265CA23C8C7
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 11:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9BCE283FF9
+	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 11:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763378704; cv=none; b=KBxvaSQVmEYnpCf7DaG/xrnNBu3710tYwCMGBr5xVtKF7/ENSr1Uz8MveF8LKJl2pf+56mYXnn0BDTuwJ2u/HmWhVxmEA5ZFuSMDVzure5TjGovotLRTkmtXdJ+JuhHuRPbn+cf97lppnC6IYwU7yEbsyfOrRBxBmTid6N5/C98=
+	t=1763378791; cv=none; b=TdwDiLzNZ8WzzTWi+KsbKrZJ2SbTp8pXJXl3+WvJhm1yupqq/TqgrZvuP4X0OSkMecqZbSD/Q/PCHbr5fGrPIdqk9Vx6AXXInEvQ15YZCRxd0bfp2CrYl5AzaXCtW0bKCYpp2FY0DuWiOaRXMsVbFuDuOM2nOApfE9RH+6NSrZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763378704; c=relaxed/simple;
-	bh=c4m/kEIh6bMfVQeYggVSp5zyP57nzMAJzqU58v1Byo4=;
+	s=arc-20240116; t=1763378791; c=relaxed/simple;
+	bh=/rhf9hmgiMKFdWRnE5GdTAp4asqaldwnLnA3FvpRkxY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o1w0oDz6w+GZIec07+nG/CFnWAbfXkGygdejIhmSdsd9zdIU5zpB1fzEag4nzNG1sZo2weBICBfroVnLhv/mTKLdjkNGgcwqZ1Cucf3yiAC+NoMMPPPwDsZOxDsdfXXcEkN/TCLyI3krYPSKvs5Y3XzjiHoq1hVBGtWklGPrPsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eTjPGGDS; arc=none smtp.client-ip=209.85.160.182
+	 To:Cc:Content-Type; b=OpXKzEfjk327Ui0MakuTmnJgT6KUc0+y7HNNDOd582Ddtfro2cKQYXwTomH/trozKdRVnIUn9adRO7yTFZQ95bt3r1RUbeiqPJd7uugVhGHt2/YZUrhHsl9AZcidDnNk/N63+D0uWdkQZDOGHUiW18tpOqVauNKm81f7N434ALw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yZlRkk9m; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ee243b98caso185061cf.1
-        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 03:25:02 -0800 (PST)
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4edb8d6e98aso673191cf.0
+        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 03:26:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763378702; x=1763983502; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763378789; x=1763983589; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rh5FOFkRpNnkl1U5y71aKAQjA3wCgCmL0rpsiL+tc+I=;
-        b=eTjPGGDS2a3rPYSFUfrTqfG4mN0xnPuboP+bliaxzFMF7sylpS5AktmkQMY6/a73wQ
-         SWC+byTpmVIvJiOuPmNmQMOOtHOnPARqryBmHKv0yUAgDM2ZZXotItvslxDE/ohgEEaS
-         mG78WyTjawm177sTj+sL5p3Eijwqs81whYvCt1WwOmsoHDK9TnKX8lJl9pgkzOv9IvP5
-         zLaHq3S5DtVG3oVRu7ihckwN4edQKsQNTsLS9uuzBcICxk7e8iOgjDdLx6cZazY4x4V7
-         8qsCVsl7KkKFm0wjyrY89z8sK+/Zuei88Y7NDmhPJNGfw/zYiyJh3wEKH56RdHdFlbwi
-         mXsw==
+        bh=49ctbnqVDAwIBJX5k40l0vJpezvfhKgkxScmbFVG3vs=;
+        b=yZlRkk9mOvRKCPRCxAqDXhMJ98xUYbOE8ooRdGY6wGXACZ9n0pkCzC4fMjT3ML9kjC
+         xeb8ZIJpwyQmux2swxNnI/xw3e4DikiLHBaKpJQ7fijgEpFlDs7a9d8GEU/qNDpZ9zL7
+         M2FCeCs/+/acnnxiKx/PpAQvXVRBRxi41OuUQAtriYXor/tz91PM8vdUZCQ0/UL7L4L4
+         HxcYZH/yvMS83wuwE6so1xUcMNghZpj0T2Ba0qluTiBS8vF5KexBqQmI4HPSpv04x2VL
+         FZPCjhp7dj7YhShRrnWZXNPlJ0WvpI8l3T7L526eUPhfoZB6mQTi5fZhDt/llyC7lfwu
+         VtOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763378702; x=1763983502;
+        d=1e100.net; s=20230601; t=1763378789; x=1763983589;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Rh5FOFkRpNnkl1U5y71aKAQjA3wCgCmL0rpsiL+tc+I=;
-        b=DUJ44tP/GNSkfTAD28O4X5mX5I6P0OkeFC/ErhX7Vo36i6Y6lEpOFgIZejcMF9PkbM
-         5PoRhxLl14t4ZizDBtAI7Kp6aNaQxjM5Vw0BgWzP4edEjC6/jsTtUkpH+CpB/d58g+AX
-         etcfoANuuLtiYXtrjblwxX+djb2rxTvoucC8ZEg2psvRXiXM9JmEE0aWpgMVXtUHTfAx
-         GahE+vx9w6sKd/xIEsQxsPMmQs2cFwEtResyYhGpsEWy1tByTlgxCsW29Zq6bnGDDbFZ
-         KjWjSwvwNKG+jYma78n/TXPpzP2wAJmOF9e2LtwvPiXJnXPZSRoTndPXo6uIoPT+Cv6J
-         yieg==
-X-Forwarded-Encrypted: i=1; AJvYcCW157U7/s8Iy8xLEkqoSrbvbA/KdmU1oi4X66q0a31cZ5grF/cmgmV8GDUBH3hYa3nphHI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+icEbLRBJ6XQyt3q86vrlskl0HgKHXTuRgdhG2iroymYdIQ/2
-	uXp7mAwpSBpeCjvda/fxsXB0EKsp0GV2WhhXF5z16KS9bAvU/aF4fLC1WnMZoB842mMMt1Zyz7z
-	75BkAh/WFqT8KfctIpmLsE+P9cDKHYLsnfgIDyLVN
-X-Gm-Gg: ASbGncvC3QktWnSCm+vP0ZmivSqB27o4PSKT6s5LKu7844B6hpu7GEmn7jQBWbUfKDl
-	JYw15ryzipLUWMwJg0+orqYDx6PJHDZPzAMSrd5/1gG+jkRv0yi+wos5H0R+mZQ6hyqgBmt87GG
-	02yKRXuGumGQLreczoveuk2VyoK8GcdlAwLDU+biaRuVuiq+mf/GvKFHXeLg9x1E5rTmVDZA3JN
-	dq2fHfgLnQ9zxxO5wDwahLrQ2FElK/t5371BoFXRCzmBC3U1JTx9aRYEfBlBNi8p2d14uvH+rlG
-	G5w/UQ==
-X-Google-Smtp-Source: AGHT+IGwkc3akTfjxN7uaclrAjJAN7V5lyAsbd6yOQTpU6wfC6v+tBlTHC2ToYwZiyuRZDHzeitdDIyTlVINs/6Q2RM=
-X-Received: by 2002:a05:622a:1911:b0:4ed:b4e3:cfa9 with SMTP id
- d75a77b69052e-4ee029e2217mr11285621cf.5.1763378701641; Mon, 17 Nov 2025
- 03:25:01 -0800 (PST)
+        bh=49ctbnqVDAwIBJX5k40l0vJpezvfhKgkxScmbFVG3vs=;
+        b=Bj70qBteB1PdFfTwFAm5T5AG5hKa80w1e2K1tVLFat4Q5PDN2FAzsUtpo+WitwQoql
+         j8fbq3KqEv2GYWDEZ2ycZDCZGU/bUqHHIt05F1kArtyRjw2KA5ZqiEM5n39YjthcafUF
+         VxBdRlyUXtYLetgmswqqY+N/9WNY7NV7OmWvXmWgIaUuOdVehzS5xWliszVl7B58Jfm7
+         mjfaRFxlrZ3aprBz+XzyWx0lWUqFvZPZgDf48HVzhh5AwZ8CnL+mQXIPqh/gc6uNY1Oh
+         lKN1tucE9up7hoC5604WSzIs5V9nb0OFlmQmYws/nNmCRmqsKY01GwWwboMTdMfKz/L8
+         +Vcw==
+X-Forwarded-Encrypted: i=1; AJvYcCXGtg1FQ/8VDFwoEJrJ7SkWk9YP5JQq++JFTGxJMFIpaKSUJ6LNJy+IjFZPnXf+kpsY5MQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPjUxiArWHHkFKDy69IWPODrsD7BBi4fh0ricB9hg0TIOXWphp
+	uVAG1sN8mGI/D+A6lO6/K8t+1OlM/yeByvvq3EyhQ0BbizsbPjzixr1id6vOohEjMEQvSpWi2lW
+	D9trEu+33xfno0Kl9KQavQqfO25VWjAKVKQXKYzyY
+X-Gm-Gg: ASbGncvu9UMPjjmF5fXDmkK3Yu1Ta1Fw7yNSGFfu7U8ocQdwVHtcMWAq9ANM9gKFNkF
+	19sycOUgQed8QNXhCKX38wX0m2xhMd3Tjoanm0G26+V0l1WVBXl1vehsEZJ5PBDb26oJB8pNd0Y
+	Syzdrj3riv2z7rEmHbt5Q7YRM/RVGhV4wnViqOVmnj5GH/Wep6lbJNHow7SnVLmRv7cA0Pw0Ifx
+	v+OzsJanvWcpNCYwVmY6bhZvgH8oBLZL92i6Btd2oAAvbBPIS5Nt+eqx67DZWnQl17OpxBs8lfQ
+	Cr+0sEUFw6pGm19x
+X-Google-Smtp-Source: AGHT+IEioMYFsqCc/4jnG0fmbEwZ6LA1WtQ/uRrIvwVWDiUcLFKyLiTmWE933E92hMBlL3D5tgBe1zTgaGIOHcn1qNw=
+X-Received: by 2002:a05:622a:1191:b0:4b7:9b06:ca9f with SMTP id
+ d75a77b69052e-4ee0279d624mr12602131cf.2.1763378788577; Mon, 17 Nov 2025
+ 03:26:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251117091527.1119213-1-maz@kernel.org> <20251117091527.1119213-4-maz@kernel.org>
-In-Reply-To: <20251117091527.1119213-4-maz@kernel.org>
+References: <20251117091527.1119213-1-maz@kernel.org> <20251117091527.1119213-5-maz@kernel.org>
+In-Reply-To: <20251117091527.1119213-5-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 17 Nov 2025 11:24:24 +0000
-X-Gm-Features: AWmQ_bkAIiTZwAs3rbIEKnLyWq8pHNEA9ts5ZOERyIIpUJHaY0fSVfCHfMladg8
-Message-ID: <CA+EHjTwn7PUykGngWRpK3T9gQ_w8=3+BrmEk9GthH0MgMi3FVw@mail.gmail.com>
-Subject: Re: [PATCH v3 3/5] KVM: arm64: GICv3: nv: Resync LRs/VMCR/HCR early
- for better MI emulation
+Date: Mon, 17 Nov 2025 11:25:52 +0000
+X-Gm-Features: AWmQ_bmeFv51Sa8WTg6Ls1D8vjiLqQnByeUS2NLYDYoerk0mUC01snRaXzO25Vg
+Message-ID: <CA+EHjTwEj_-tDvq2+2x9MxTom2yw7Rx0ZZg7XuBOWxFxBJ-n9Q@mail.gmail.com>
+Subject: Re: [PATCH v3 4/5] KVM: arm64: GICv3: Remove vgic_hcr workaround
+ handling leftovers
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
@@ -91,234 +91,40 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Mark Brown <broonie@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Marc,
-
-
-On Mon, 17 Nov 2025 at 09:15, Marc Zyngier <maz@kernel.org> wrote:
+On Mon, 17 Nov 2025 at 09:20, Marc Zyngier <maz@kernel.org> wrote:
 >
-> The current approach to nested GICv3 support is to not do anything
-> while L2 is running, wait a transition from L2 to L1 to resync
-> LRs, VMCR and HCR, and only then evaluate the state to decide
-> whether to generate a maintenance interrupt.
+> There's a bizarre or'ing of a 0 with the guest's ICH_HCR_EL2's
+> value, which is a leftover from the host workaround merging
+> code. Just kill it.
 >
-> This doesn't provide a good quality of emulation, and it would be
-> far preferable to find out early that we need to perform a switch.
->
-> Move the LRs/VMCR and HCR resync into vgic_v3_sync_nested(), so
-> that we have most of the state available. As we turning the vgic
-> off at this stage to avoid a screaming host MI, add a new helper
-> vgic_v3_flush_nested() that switches the vgic on again. The MI can
-> then be directly injected as required.
->
+> Fixes: ca30799f7c2d0 ("KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant")
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_hyp.h     |  1 +
->  arch/arm64/kvm/hyp/vgic-v3-sr.c      |  2 +-
->  arch/arm64/kvm/vgic/vgic-v3-nested.c | 69 ++++++++++++++++------------
->  arch/arm64/kvm/vgic/vgic.c           |  6 ++-
->  arch/arm64/kvm/vgic/vgic.h           |  1 +
->  5 files changed, 46 insertions(+), 33 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index dbf16a9f67728..76ce2b94bd97e 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -77,6 +77,7 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->  int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
->
->  u64 __gic_v3_get_lr(unsigned int lr);
-> +void __gic_v3_set_lr(u64 val, int lr);
->
->  void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
->  void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
-> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> index 71199e1a92940..99342c13e1794 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> @@ -60,7 +60,7 @@ u64 __gic_v3_get_lr(unsigned int lr)
->         unreachable();
->  }
->
-> -static void __gic_v3_set_lr(u64 val, int lr)
-> +void __gic_v3_set_lr(u64 val, int lr)
->  {
->         switch (lr & 0xf) {
->         case 0:
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> index 17bceef83269e..bf37fd3198ba7 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> @@ -70,13 +70,14 @@ static int lr_map_idx_to_shadow_idx(struct shadow_if *shadow_if, int idx)
->   * - on L2 put: perform the inverse transformation, so that the result of L2
->   *   running becomes visible to L1 in the VNCR-accessible registers.
->   *
-> - * - there is nothing to do on L2 entry, as everything will have happened
-> - *   on load. However, this is the point where we detect that an interrupt
-> - *   targeting L1 and prepare the grand switcheroo.
-> + * - there is nothing to do on L2 entry apart from enabling the vgic, as
-> + *   everything will have happened on load. However, this is the point where
-> + *   we detect that an interrupt targeting L1 and prepare the grand
-> + *   switcheroo.
->   *
-> - * - on L2 exit: emulate the HW bit, and deactivate corresponding the L1
-> - *   interrupt. The L0 active state will be cleared by the HW if the L1
-> - *   interrupt was itself backed by a HW interrupt.
-> + * - on L2 exit: resync the LRs and VMCR, emulate the HW bit, and deactivate
-> + *   corresponding the L1 interrupt. The L0 active state will be cleared by
-> + *   the HW if the L1 interrupt was itself backed by a HW interrupt.
->   *
->   * Maintenance Interrupt (MI) management:
->   *
-> @@ -265,15 +266,30 @@ static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu,
->         s_cpu_if->used_lrs = hweight16(shadow_if->lr_map);
->  }
->
-> +void vgic_v3_flush_nested(struct kvm_vcpu *vcpu)
-> +{
-> +       u64 val = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
-> +
-> +       write_sysreg_s(val | vgic_ich_hcr_trap_bits(), SYS_ICH_HCR_EL2);
-> +}
-> +
->  void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
->  {
->         struct shadow_if *shadow_if = get_shadow_if();
->         int i;
->
->         for_each_set_bit(i, &shadow_if->lr_map, kvm_vgic_global_state.nr_lr) {
-> -               u64 lr = __vcpu_sys_reg(vcpu, ICH_LRN(i));
-> +               u64 val, host_lr, lr;
->                 struct vgic_irq *irq;
->
-> +               host_lr = __gic_v3_get_lr(lr_map_idx_to_shadow_idx(shadow_if, i));
-> +
-> +               /* Propagate the new LR state */
-> +               lr = __vcpu_sys_reg(vcpu, ICH_LRN(i));
-> +               val = lr & ~ICH_LR_STATE;
-> +               val |= host_lr & ICH_LR_STATE;
-> +               __vcpu_assign_sys_reg(vcpu, ICH_LRN(i), val);
-> +
 
-As I said before, I am outside of my comfort zone here. However,
-should the following check be changed to use the merged 'val', rather
-than the guest lr as it was?
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
 Cheers,
 /fuad
 
->                 if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
->                         continue;
+>  arch/arm64/kvm/vgic/vgic-v3-nested.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 >
-> @@ -286,12 +302,21 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
->                 if (WARN_ON(!irq)) /* Shouldn't happen as we check on load */
->                         continue;
->
-> -               lr = __gic_v3_get_lr(lr_map_idx_to_shadow_idx(shadow_if, i));
-> -               if (!(lr & ICH_LR_STATE))
-> +               if (!(host_lr & ICH_LR_STATE))
->                         irq->active = false;
->
->                 vgic_put_irq(vcpu->kvm, irq);
->         }
-> +
-> +       /* We need these to be synchronised to generate the MI */
-> +       __vcpu_assign_sys_reg(vcpu, ICH_VMCR_EL2, read_sysreg_s(SYS_ICH_VMCR_EL2));
-> +       __vcpu_rmw_sys_reg(vcpu, ICH_HCR_EL2, &=, ~ICH_HCR_EL2_EOIcount);
-> +       __vcpu_rmw_sys_reg(vcpu, ICH_HCR_EL2, |=, read_sysreg_s(SYS_ICH_HCR_EL2) & ICH_HCR_EL2_EOIcount);
-> +
-> +       write_sysreg_s(0, SYS_ICH_HCR_EL2);
-> +       isb();
-> +
-> +       vgic_v3_nested_update_mi(vcpu);
->  }
->
->  static void vgic_v3_create_shadow_state(struct kvm_vcpu *vcpu,
-> @@ -325,7 +350,8 @@ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
->         __vgic_v3_restore_vmcr_aprs(cpu_if);
->         __vgic_v3_activate_traps(cpu_if);
->
-> -       __vgic_v3_restore_state(cpu_if);
-> +       for (int i = 0; i < cpu_if->used_lrs; i++)
-> +               __gic_v3_set_lr(cpu_if->vgic_lr[i], i);
->
->         /*
->          * Propagate the number of used LRs for the benefit of the HYP
-> @@ -338,36 +364,19 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> index bf37fd3198ba7..40f7a37e0685c 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> @@ -323,10 +323,9 @@ static void vgic_v3_create_shadow_state(struct kvm_vcpu *vcpu,
+>                                         struct vgic_v3_cpu_if *s_cpu_if)
 >  {
->         struct shadow_if *shadow_if = get_shadow_if();
->         struct vgic_v3_cpu_if *s_cpu_if = &shadow_if->cpuif;
-> -       u64 val;
+>         struct vgic_v3_cpu_if *host_if = &vcpu->arch.vgic_cpu.vgic_v3;
+> -       u64 val = 0;
 >         int i;
 >
->         __vgic_v3_save_aprs(s_cpu_if);
-> -       __vgic_v3_deactivate_traps(s_cpu_if);
-> -       __vgic_v3_save_state(s_cpu_if);
-> -
-> -       /*
-> -        * Translate the shadow state HW fields back to the virtual ones
-> -        * before copying the shadow struct back to the nested one.
-> -        */
-> -       val = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
-> -       val &= ~ICH_HCR_EL2_EOIcount_MASK;
-> -       val |= (s_cpu_if->vgic_hcr & ICH_HCR_EL2_EOIcount_MASK);
-> -       __vcpu_assign_sys_reg(vcpu, ICH_HCR_EL2, val);
-> -       __vcpu_assign_sys_reg(vcpu, ICH_VMCR_EL2, s_cpu_if->vgic_vmcr);
+> -       s_cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2) | val;
+> +       s_cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
+>         s_cpu_if->vgic_vmcr = __vcpu_sys_reg(vcpu, ICH_VMCR_EL2);
+>         s_cpu_if->vgic_sre = host_if->vgic_sre;
 >
->         for (i = 0; i < 4; i++) {
->                 __vcpu_assign_sys_reg(vcpu, ICH_AP0RN(i), s_cpu_if->vgic_ap0r[i]);
->                 __vcpu_assign_sys_reg(vcpu, ICH_AP1RN(i), s_cpu_if->vgic_ap1r[i]);
->         }
->
-> -       for_each_set_bit(i, &shadow_if->lr_map, kvm_vgic_global_state.nr_lr) {
-> -               val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
-> -
-> -               val &= ~ICH_LR_STATE;
-> -               val |= s_cpu_if->vgic_lr[lr_map_idx_to_shadow_idx(shadow_if, i)] & ICH_LR_STATE;
-> +       for (i = 0; i < s_cpu_if->used_lrs; i++)
-> +               __gic_v3_set_lr(0, i);
->
-> -               __vcpu_assign_sys_reg(vcpu, ICH_LRN(i), val);
-> -       }
-> +       __vgic_v3_deactivate_traps(s_cpu_if);
->
->         vcpu->arch.vgic_cpu.vgic_v3.used_lrs = 0;
->  }
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index a2f408754774e..4e4db52008c10 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -1056,8 +1056,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
->          *   abort the entry procedure and inject the exception at the
->          *   beginning of the run loop.
->          *
-> -        * - Otherwise, do exactly *NOTHING*. The guest state is
-> -        *   already loaded, and we can carry on with running it.
-> +        * - Otherwise, do exactly *NOTHING* apart from enabling the virtual
-> +        *   CPU interface. The guest state is already loaded, and we can
-> +        *   carry on with running it.
->          *
->          * If we have NV, but are not in a nested state, compute the
->          * maintenance interrupt state, as it may fire.
-> @@ -1066,6 +1067,7 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
->                 if (kvm_vgic_vcpu_pending_irq(vcpu))
->                         kvm_make_request(KVM_REQ_GUEST_HYP_IRQ_PENDING, vcpu);
->
-> +               vgic_v3_flush_nested(vcpu);
->                 return;
->         }
->
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index ec3a61e8e6b30..5f0fc96b4dc29 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -446,6 +446,7 @@ static inline bool kvm_has_gicv3(struct kvm *kvm)
->         return kvm_has_feat(kvm, ID_AA64PFR0_EL1, GIC, IMP);
->  }
->
-> +void vgic_v3_flush_nested(struct kvm_vcpu *vcpu);
->  void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
->  void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
->  void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
 > --
 > 2.47.3
 >
