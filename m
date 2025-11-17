@@ -1,140 +1,197 @@
-Return-Path: <kvm+bounces-63353-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63354-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54F30C63995
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 11:41:26 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 999F3C639C4
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 11:48:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EBC464ECEFC
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 10:37:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8D3BE3561F6
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 10:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02DE328B5B;
-	Mon, 17 Nov 2025 10:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RkN8TNXh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C3D328B7F;
+	Mon, 17 Nov 2025 10:44:28 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587A4326D62
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 10:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A72E31A55E
+	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 10:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763375843; cv=none; b=BERYPIGu/x/J5n8SauIr3iIY1XJAVjgIuzEAMYlBBUPSnivv05Vmo2x1JedRC+dOlMZE2nddt9Shz2E2ZeVsdPztiH1zZXLMnnazkp3gs2P/a3k/6LHJR0cIhSTl8MikgeXSOjMYJFIM79QD1NTeDnJvLg5pF/7O0OcsvyHo+zE=
+	t=1763376267; cv=none; b=n1qVAlRIJ9f5lZSt+GozuySuNdWSlycJSj8o9fiR7bqV4Jk9dI993o6Lot0oXjBzu6Igs/XGIXun57GLf2VOztEknnQDUz21wqWJino3SSEscegQnm1JMvIHqhzFDmed1Y4+vhUnYIXfGB3S2kScVjdyNlVwvR94E4nhiSbXi/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763375843; c=relaxed/simple;
-	bh=jU6y13VHOFy3Pi7WNXNgmgLs1immGWngiyX609zJHLw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GMYI03MuGyFmJcEkoOb0BieHDhc/zVu4LLz3//zihe+pkqdL4AxhJOlRUMOxrih3z7WbgbUyTGIrpRUA4MXXFOIR5P7hZNIeOWOtVj6iHZyPgzvC75qA38S9/Xu9bWyK+wLFMt49axxW87WVV1IfIQrXwsSib6yfq8w6b0XTAEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RkN8TNXh; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4ed67a143c5so543911cf.0
-        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 02:37:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763375841; x=1763980641; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=cSCczuntyrjypJFmPl75f311GtN50oo2b0NuRkLWiBY=;
-        b=RkN8TNXhHB6BaUrNdTcAxYk9WuflxcOzdlF5XPJpPPZ9IF0UywOcjCCyOrgFw3xB7t
-         td4122mZHM7c5UUVpmi3OlBx4rYNTDMiZ5hPM6SWYBnQkGbq4AKdCVT4TyML3HqbImQt
-         H8wCRKn1yS8VHOIa6NkKKCeQiQUyXc7iHcITTdqSX9EhGWqq8C6RiwYdZCoE4DpQG+hH
-         w8pC+VHN7N90TwPFcgwIGENMb8a5VKXJJw4yv2KzaFUkKhBLj+qmdgk05cCN5LahQYgF
-         MIryNRrkVI/+kn1eR5bO/w9iz6q864WmXuYCN4Z8HqQx4+qnanVPhBw4OrVB2Ccfekw5
-         TWvQ==
+	s=arc-20240116; t=1763376267; c=relaxed/simple;
+	bh=jaYR214fbwWMVmH/D4J33ikkYRDliintKt3GuxVd/aQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=bKvQD1Jcl/xURDf5SspPJ+SRl7bY5BhWSAluh+hbgwB847czIL5wgMKIUW92J0Uyy/tCN5XS/OnV355eLA3NX6P9ic7VHhJheMqWdxVgwxKPdzYto2602Ss7dAxOwurkPVk/PoEKii+u5FbS5j9LEijxkDzpldjUCxW80C+lZjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-94908fb82e0so82111039f.3
+        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 02:44:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763375841; x=1763980641;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cSCczuntyrjypJFmPl75f311GtN50oo2b0NuRkLWiBY=;
-        b=IgYY9V3aThOp7Y1b7OZcnNYTpVVw8/xcqSGItv7mzPxOc5KO0+02Jtxjh7+DA+qf5A
-         9tOVtLXK8Zm9s1Ltpl1xb9TCgyKnCwV6KuyfEmI+WfalLvP+aMoNFv0Pn4yAFnSbnKLf
-         vEJ6ObFmEPFEfKSOImE0QWoe7HhSklWvOP+jqBo4Sa+U1Yqjs+rfiwUBzU1sLrnY2ug3
-         pATO1/HY1mMG7R2Imy7ryAeix0pYAF7rlFRKR0IKmfnqgp+Vh+wCRcy6RvMI0GrQ/Tmk
-         2JsnS0AqUA7T84und8bS87C1FSQTpPEpB1GDrJpx54uQeS77/WcOyuZdssCR7NAPazVU
-         n37Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUxWY/qNhgHbGIQPqE2wjhfkntsRUnlI8ymy+jIAj2F5iAT0QaWnibju09ewMAF1wc628k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsatlY9qVIKDNJitqB8TOrzxAlVXwbtk2yb4u8mxnxHFyyRaAh
-	SPhbyvHmm7CicSuOq3Fj9/V3EQaSZpkZD8pE11MEEL1ryzoMO6SDERtjPlQaHaDYWdUFP9wc3uJ
-	RM+ZCpG0e+IynnQ/PaDaFXKBptO4XNy9wNJ1xe5Q9
-X-Gm-Gg: ASbGncuD4s1LF81Y1/oGBmkAErl7ZlhV1z8sc94zC72j05d9kgG6YcZosylCd04GuDz
-	4gfvO6jVrn47hmmMSUoAcDLWXB0Dd7O8CvM57krQ/jd5OzMnBeUfhZkQXPD11ZT7ZZ9g+vZ/aa7
-	CEIghc0jHwt44CYulMz46KdDHJxQaz23U/Db4Bk4m35uEpu7Xqun2nlYJf/TecBFQUEhSrGCsj5
-	H/XlbgnYvMU1leZ6LOR2TA6v5pBjzkXQFDD/mHrLfuz6C2bsOpdcl0M29oTkq7gk7IGHJtPNjiQ
-	XJP7hA==
-X-Google-Smtp-Source: AGHT+IFFM24GESKuymha8lz4kxmnQKTDe1ajE7ALZIAlCW3kwiBwOHxbJvkmtglaccu5bdOdgggOwWj6OAOtjgUpEJU=
-X-Received: by 2002:a05:622a:1196:b0:4ed:7c45:9908 with SMTP id
- d75a77b69052e-4ee02abc1c8mr11423671cf.10.1763375841094; Mon, 17 Nov 2025
- 02:37:21 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763376265; x=1763981065;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RoiSHQ95L8ivg00U2CqwFDdEW5EuyvMqF//3zpqLyC0=;
+        b=Ii2JjYq4gzMjxOOLLdpTVxNvMUDSx95Ulh7KCNwSBxoCChKs2kTh8TGbIpvO1FpBcj
+         dKY1b3yNtmuf0GmUw+BvczqtgDdCnIohi5w1L4weyelwxr5zfQiIu/Q1wBaVvx0nKVjz
+         28uCw2ly/RrVqzrODSPzTwNDbmWJFeKTIXYHeBN4Vv2zWF6DbE5hRb5OA4WLO7s0ypGv
+         nwVRbHJsuJqNE1BJgtfJN+mQhs5EvP6baxYF3AO/R9XfjpGNeXpo0dT0RsFh4h5iEOCB
+         yuovoqDIAeQaQVK3TFYTzS1li6BJnbp2XOveKihkP9v8gTLdhs9pm0Z8lhFFnbdaruXA
+         cahQ==
+X-Gm-Message-State: AOJu0Yw6pBSvFMWglyfsxSxGmXE+czroa0ebWGzidIWAeE28e7QGAlzU
+	DVDZXAXYqlGX0Xc0PC/TWE6MngpXFUQ7dB5tWryjBufAPRqA1YWB1tMY3wRQ/2XI7V7aPao34lS
+	e6kVew6liE39AuM730R1dsORYPGAyKoIgkJhv6iPZfMZHWu6USpqmt4vNQ93TUw==
+X-Google-Smtp-Source: AGHT+IE0Lyt59OpKxP18HPk9o9J9B7146rZ0ZOuAHbNmnZTgwJcuJ1S03+UuQ3H1q5D1ttTE/QjXgD04srezgZ6EFTUoSvjL4T5x
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251117091527.1119213-1-maz@kernel.org> <20251117091527.1119213-3-maz@kernel.org>
-In-Reply-To: <20251117091527.1119213-3-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 17 Nov 2025 10:36:44 +0000
-X-Gm-Features: AWmQ_bkOHIvxxrAN0Ta8I3LCFjnIE-AQuTMgHtHd82ZTpr8YLnfGv1xtAWeYWMw
-Message-ID: <CA+EHjTy-vmMrOR_-BAd4q2JG99afzd3cisvf-VP6uM+M9Pg2=g@mail.gmail.com>
-Subject: Re: [PATCH v3 2/5] KVM: arm64: GICv3: Completely disable trapping on
- vcpu exit
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Mark Brown <broonie@kernel.org>
+X-Received: by 2002:a05:6e02:3713:b0:433:5a5c:5d75 with SMTP id
+ e9e14a558f8ab-4348c937a17mr155242035ab.18.1763376265249; Mon, 17 Nov 2025
+ 02:44:25 -0800 (PST)
+Date: Mon, 17 Nov 2025 02:44:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <691afc89.a70a0220.3124cb.009a.GAE@google.com>
+Subject: [syzbot] [kvm?] INFO: task hung in kvm_swap_active_memslots (2)
+From: syzbot <syzbot+5c566b850d6ab6f0427a@syzkaller.appspotmail.com>
+To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Marc,
+Hello,
 
-On Mon, 17 Nov 2025 at 09:20, Marc Zyngier <maz@kernel.org> wrote:
->
-> Fuad reports that on QEMU, the DIR trapping is still effective after
-> a vcpu exit and that the host is running nVHE, resulting in a BUG()
-> (we only expect DIR to be trapped for the guest, and never the host).
->
-> As it turns out, this is an implementation-dependent behaviour, which
-> the architecture allows, but that seem to be relatively uncommon across
-> implementations.
->
-> Fix this by completely zeroing the ICH_HCR_EL2 register when the
-> vcpu exits.
->
-> Reported-by: Fuad Tabba <tabba@google.com>
+syzbot found the following issue on:
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
+HEAD commit:    3a8660878839 Linux 6.18-rc1
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=160a05e2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e854293d7f44b5a5
+dashboard link: https://syzkaller.appspot.com/bug?extid=5c566b850d6ab6f0427a
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-Cheers,
-/fuad
+Unfortunately, I don't have any reproducer for this issue yet.
 
-> Fixes: ca30799f7c2d0 ("KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant")
-> Closes: https://lore.kernel.org/r/CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/vgic-v3-sr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> index e950efa225478..71199e1a92940 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> @@ -243,7 +243,7 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
->                 cpu_if->vgic_hcr |= val & ICH_HCR_EL2_EOIcount;
->         }
->
-> -       write_gicreg(compute_ich_hcr(cpu_if) & ~ICH_HCR_EL2_En, ICH_HCR_EL2);
-> +       write_gicreg(0, ICH_HCR_EL2);
->  }
->
->  void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
-> --
-> 2.47.3
->
->
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/87a66406ce1a/disk-3a866087.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7c3300da5269/vmlinux-3a866087.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b4fcefdaf57b/bzImage-3a866087.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5c566b850d6ab6f0427a@syzkaller.appspotmail.com
+
+INFO: task syz.2.1185:11790 blocked for more than 143 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.2.1185      state:D stack:25976 pid:11790 tgid:11789 ppid:5836   task_flags:0x400140 flags:0x00080002
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5325 [inline]
+ __schedule+0x1190/0x5de0 kernel/sched/core.c:6929
+ __schedule_loop kernel/sched/core.c:7011 [inline]
+ schedule+0xe7/0x3a0 kernel/sched/core.c:7026
+ kvm_swap_active_memslots+0x2ea/0x7d0 virt/kvm/kvm_main.c:1642
+ kvm_activate_memslot virt/kvm/kvm_main.c:1786 [inline]
+ kvm_create_memslot virt/kvm/kvm_main.c:1852 [inline]
+ kvm_set_memslot+0xd3b/0x1380 virt/kvm/kvm_main.c:1964
+ kvm_set_memory_region+0xe53/0x1610 virt/kvm/kvm_main.c:2120
+ kvm_set_internal_memslot+0x9f/0xe0 virt/kvm/kvm_main.c:2143
+ __x86_set_memory_region+0x2f6/0x740 arch/x86/kvm/x86.c:13242
+ kvm_alloc_apic_access_page+0xc5/0x140 arch/x86/kvm/lapic.c:2788
+ vmx_vcpu_create+0x503/0xbd0 arch/x86/kvm/vmx/vmx.c:7599
+ kvm_arch_vcpu_create+0x688/0xb20 arch/x86/kvm/x86.c:12706
+ kvm_vm_ioctl_create_vcpu virt/kvm/kvm_main.c:4207 [inline]
+ kvm_vm_ioctl+0xfec/0x3fd0 virt/kvm/kvm_main.c:5158
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f3c9978eec9
+RSP: 002b:00007f3c9a676038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f3c999e5fa0 RCX: 00007f3c9978eec9
+RDX: 0000000000000000 RSI: 000000000000ae41 RDI: 0000000000000003
+RBP: 00007f3c99811f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f3c999e6038 R14: 00007f3c999e5fa0 R15: 00007ffda33577e8
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/31:
+ #0: ffffffff8e3c42e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #0: ffffffff8e3c42e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:867 [inline]
+ #0: ffffffff8e3c42e0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x36/0x1c0 kernel/locking/lockdep.c:6775
+2 locks held by getty/8058:
+ #0: ffff88803440d0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
+ #1: ffffc9000e0cd2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x41b/0x14f0 drivers/tty/n_tty.c:2222
+2 locks held by syz.2.1185/11790:
+ #0: ffff888032d640a8 (&kvm->slots_lock){+.+.}-{4:4}, at: class_mutex_constructor include/linux/mutex.h:228 [inline]
+ #0: ffff888032d640a8 (&kvm->slots_lock){+.+.}-{4:4}, at: kvm_alloc_apic_access_page+0x27/0x140 arch/x86/kvm/lapic.c:2782
+ #1: ffff888032d64138 (&kvm->slots_arch_lock){+.+.}-{4:4}, at: kvm_set_memslot+0x34/0x1380 virt/kvm/kvm_main.c:1915
+4 locks held by kworker/u8:44/13722:
+ #0: ffff88801ba9f148 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work+0x12a2/0x1b70 kernel/workqueue.c:3238
+ #1: ffffc9000b6cfd00 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work+0x929/0x1b70 kernel/workqueue.c:3239
+ #2: ffffffff900e8630 (pernet_ops_rwsem){++++}-{4:4}, at: cleanup_net+0xad/0x8b0 net/core/net_namespace.c:669
+ #3: ffffffff8e3cf878 (rcu_state.exp_mutex){+.+.}-{4:4}, at: exp_funnel_lock+0x1a3/0x3c0 kernel/rcu/tree_exp.h:343
+4 locks held by syz-executor/14037:
+ #0: ffff888056654dc8 (&hdev->req_lock){+.+.}-{4:4}, at: hci_dev_do_close+0x26/0x90 net/bluetooth/hci_core.c:499
+ #1: ffff8880566540b8 (&hdev->lock){+.+.}-{4:4}, at: hci_dev_close_sync+0x3ae/0x11d0 net/bluetooth/hci_sync.c:5291
+ #2: ffffffff90371248 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:2118 [inline]
+ #2: ffffffff90371248 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_conn_hash_flush+0xbb/0x260 net/bluetooth/hci_conn.c:2602
+ #3: ffff88803179c338 (&conn->lock#2){+.+.}-{4:4}, at: l2cap_conn_del+0x80/0x730 net/bluetooth/l2cap_core.c:1762
+1 lock held by syz.0.1905/15421:
+ #0: ffffffff900e8630 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x2d6/0x690 net/core/net_namespace.c:576
+1 lock held by syz.0.1905/15423:
+ #0: ffffffff900e8630 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x2d6/0x690 net/core/net_namespace.c:576
+2 locks held by syz.1.1908/15436:
+ #0: ffff88807a444dc8 (&hdev->req_lock){+.+.}-{4:4}, at: hci_dev_do_close+0x26/0x90 net/bluetooth/hci_core.c:499
+ #1: ffff88807a4440b8 (&hdev->lock){+.+.}-{4:4}, at: hci_dev_close_sync+0x3ae/0x11d0 net/bluetooth/hci_sync.c:5291
+
+=============================================
+
+NMI backtrace for cpu 1
+CPU: 1 UID: 0 PID: 31 Comm: khungtaskd Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x27b/0x390 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x29c/0x300 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:332 [inline]
+ watchdog+0xf3f/0x1170 kernel/hung_task.c:495
+ kthread+0x3c5/0x780 kernel/kthread.c:463
+ ret_from_fork+0x675/0x7d0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
