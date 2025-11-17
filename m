@@ -1,115 +1,116 @@
-Return-Path: <kvm+bounces-63372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D866C64015
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 13:12:54 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14BC3C64238
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 13:45:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8D27135DD2F
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:12:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7C8FD4EE0EC
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4C8C32C956;
-	Mon, 17 Nov 2025 12:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4437332D7DE;
+	Mon, 17 Nov 2025 12:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ali2Rdai"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EPJVjdJ2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f195.google.com (mail-lj1-f195.google.com [209.85.208.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBD932C305
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 12:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D2332D0DE;
+	Mon, 17 Nov 2025 12:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763381561; cv=none; b=VrSzbOjJvv31DiGvyY6olhZhtwyuSr00LtxP2O9OdTfTsNzGMcWg0q/hQg5BaRCmXE9MCozEkCqhDuZdJ5vZaqKQyLU7BQq4WKBJAP6SZzTTjRZOg1m3thT1ZLfd23sRjarZy9fRFBW0Nt+tAo2KmUdlse5b7hAE9/8OtoF2vOM=
+	t=1763383134; cv=none; b=aRtXXfFGWhUn6Rb56eE9mYBk1pktmYYDOpEkZdUJBGGutSQ8G5Xyk1TgIsjcl6FHe3MxHvEEHiSYVG4YHXQpZKzxlLhJjPV9oFOmE0k1iPjhJL/zO9PhNc2ZwwRHA/fXI7hZmbreZUGkAKpT58MeGzfkboNpLhUKFTmj4Z+Dpx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763381561; c=relaxed/simple;
-	bh=E7+86nXZJJZWn/7xzDlAAPZqRxbe9WlVvWJxhTPMAAs=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=HrSUIb3Hd5LmKiRuaVwF47Jg/qtpaj5vOfxrwPeQpXvT83jiv9NBoWWUxiH8fGNTzl8RnTh7KWPvxxiuUrKXqAZFyB+uxvxgW1qdgYnnv3ek5LFJ1xcQ8l80ikt+Qoz14ha4yOxieYo+mlzxv+x1G7LrjHV9Msa28VIZFg0I8Zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ali2Rdai; arc=none smtp.client-ip=209.85.208.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f195.google.com with SMTP id 38308e7fff4ca-37bac34346dso22249501fa.2
-        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 04:12:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763381558; x=1763986358; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=E7+86nXZJJZWn/7xzDlAAPZqRxbe9WlVvWJxhTPMAAs=;
-        b=ali2RdaiB+PmiBB8rNHxnkHrpBAZaioaXqQwcy5vf4CY5ojDte+J85lR51+AgQ6z6C
-         nNpZJBFrttvnGT0Y71tht8/yeDvHPF6Tc9N7i6QJp7/i+sf6L9kXaJROmRaVScaL4lSV
-         6nY2Bh88inNhhE1O5WrTG8lErxxNAhqmoy6lyAAqk2LNy/yX8n56U7R+eGdPcqtXwyK0
-         EHv5/7YYpj0dh3D0xjNQU0gvMPDkL6sgECKyiUWPPBvY2bLCjDp/tWXPxAlQDlTlrZTd
-         dV9Y4qjVEhb85UB3kc5ARDASA8OpHgarPjeQ4YrTAxq5kqaBkCPnb1mQ8VQuKTis9I8M
-         8BXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763381558; x=1763986358;
-        h=to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E7+86nXZJJZWn/7xzDlAAPZqRxbe9WlVvWJxhTPMAAs=;
-        b=S08+F63ObYD2XqhTm2uhPHoaYQ6xfhC9V1uOaYLIo+d6S/GFU6ZOqU9aVO9ujEJw6u
-         bM/lX9v3KMOq905Ead52n6DE5OJzgJIL1Ehuvpg+pN0VcbzT1nhGsKR+Qjgu8aj7RxlU
-         0rd0ETXBZX31fww2HjY5nlLYyWsHcFYu8HzzuCQ6j99ZDZJ72BAbglEp2O/EMetfDQNw
-         b8U5lrve0qPQ3eYL44XfzvDI9uH4tdHJd2q2Im1HtVIIc7i/p6Ngh2QGZWkIC9MvTFj3
-         Net7Lqpa1Z3lBND0ttokgfLbap5Fw7GIGMM2HAjBUxzz/31QhFlD7AEfIK4JDcxiwUU6
-         Wkww==
-X-Gm-Message-State: AOJu0Yyn8uqhmyRuYtzQ/BODzbcC68FaN8mX0ZrzEs7xco7LeCcim+8l
-	/b/1O/WCn/H60n+Mv7C5thVxMfyh15oFgXzpMaEkDrsuUbLRf/3mV7eUpNNoBzqi0m/zD4z7VY1
-	OPI/xsLzAwpgkc1wDOqFa7dJyA5fYJpBi0S01LeA=
-X-Gm-Gg: ASbGncsFvzeT59+pVLNwAWHIKzqbm9hZnjLM2twiOWfd/znwEobRfdDNtw2+YnB6WoF
-	Z/Typfqe3JsGzUhT9UxN7d0LkBatP/EBC6wJAr04FQsbHwMUcQUNLRLjbxWZVnlPL56hqYGyRZJ
-	A57YOMQzdcS3wb8Wn7B9CjJTC9wi+S/VezOCyPcpDnWF1cROpboQsLmJiKa2vuVuNrtOEtZV8lc
-	p/gEBi24Qj7TT3kZ/psZOKe9DYXnTNYiHGa8QovZg07XU6L6LtCqkHXbBk5E8R9Xpa8E8ut+LyG
-	vdBa7FSYQJE=
-X-Google-Smtp-Source: AGHT+IEfo5CgAeJLZzKdBiFBn38iawJgBJFcXrFz+/mOlHQT8hFZ4fMPdsD9/XcP14+SL4ANbJtQYytDLLmYSLqryJQ=
-X-Received: by 2002:a05:651c:2450:10b0:37b:9110:21c4 with SMTP id
- 38308e7fff4ca-37babd5cbb8mr25763441fa.31.1763381557521; Mon, 17 Nov 2025
- 04:12:37 -0800 (PST)
+	s=arc-20240116; t=1763383134; c=relaxed/simple;
+	bh=to5FSmCxcR8ncCUrVa9GhTYI/Go6IIIA2pm5lhCNvJY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lkyDn/UVOEvLkiLBCrbRu86QjvBXX3WKtzk2zg6yo3S7EU/95z5Z28Hku/iTeZcsOfN7Yi07eTkfVJQowAf4eij80y09nvdAZsX2v/WtUJT0YmHlGqX52lgx4kQZL+AxioKjy0DMtP7fGaZrd+8ZhR41cVlGA0L4VGAiNvaWt34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EPJVjdJ2; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763383132; x=1794919132;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=to5FSmCxcR8ncCUrVa9GhTYI/Go6IIIA2pm5lhCNvJY=;
+  b=EPJVjdJ2645uehp0CgJPa+uIsHWhAMMbzARWsVffGgSQ1Zv0hM2wXZZ7
+   FHuYdNuVMYAfwziZuJhRigLmMAX7lK1B7FSAmwcuFHnSRN3yaJTnBp98y
+   pj5mJ5dh/fcCzm0NbUwkbha7ejF0oFkNTwH/AUNqNoc6YrnxWraW3l/fg
+   /0wiA1GIBvVwpooZTNuHkzjD3CSRdnC/nqiBcWnAS0494eAny0sFCvJzI
+   cfFIc3bll0hu35fJVYJryMs7DEB792KBS6+monTaIQ50MwugS0ZWQbsy/
+   V3M+BHUEtG3VXld1q+z3TWjTFMofkSfB7qfuS9NQyMEUXyB/34FCfT9zE
+   w==;
+X-CSE-ConnectionGUID: JgT8GysoTbCWl0zlJuCXOw==
+X-CSE-MsgGUID: Lu3Rl9BDR8KBMDzwG+jE3w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11615"; a="65313723"
+X-IronPort-AV: E=Sophos;i="6.19,311,1754982000"; 
+   d="scan'208";a="65313723"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 04:38:51 -0800
+X-CSE-ConnectionGUID: oxWl3IshRmSTvmh87ONQNg==
+X-CSE-MsgGUID: IQr/93GgT3Kbd056GBz7Bw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,311,1754982000"; 
+   d="scan'208";a="190238911"
+Received: from lfiedoro-mobl.ger.corp.intel.com (HELO localhost) ([10.245.246.22])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 04:38:49 -0800
+Date: Mon, 17 Nov 2025 14:38:46 +0200
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>,
+	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jon Kohler <jon@nutanix.com>
+Subject: Re: [PATCH 2/4] KVM: VMX: Handle #MCs on VM-Enter/TD-Enter outside
+ of the fastpath
+Message-ID: <aRsXVvDHsdCjEgPM@tlindgre-MOBL1>
+References: <20251030224246.3456492-1-seanjc@google.com>
+ <20251030224246.3456492-3-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: yw yao <ywyao898@gmail.com>
-Date: Mon, 17 Nov 2025 20:12:25 +0800
-X-Gm-Features: AWmQ_bld6LSw6jaPZQG3-XdoPPKfK3S4_7n3klNu9KtEtMieN-nD81-5cNH8Giw
-Message-ID: <CAMVsw8x5J+sxJy0E5mFEyBypt4K-jDBYK1NoFh8=P22+2xqBRQ@mail.gmail.com>
-Subject: Question about shared GPA visibility between L1 and L2 in TDX TD-partitioning
-To: kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251030224246.3456492-3-seanjc@google.com>
 
-Hello TDX/KVM maintainers,
+Hi,
 
-I am working on TD partitioning (TDX nested virtualization), using
-kernels from the Intel td-partitioning repo:
-https://github.com/intel/td-partitioning
+On Thu, Oct 30, 2025 at 03:42:44PM -0700, Sean Christopherson wrote:
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -608,6 +608,17 @@ static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+>  	vmx_load_mmu_pgd(vcpu, root_hpa, pgd_level);
+>  }
+>  
+> +static void vt_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+> +{
+> +	if (unlikely((u16)vmx_get_exit_reason(vcpu).basic == EXIT_REASON_MCE_DURING_VMENTRY))
+> +		kvm_machine_check();
+> +
+> +	if (is_td_vcpu(vcpu))
+> +		return;
+> +
+> +	return vmx_handle_exit_irqoff(vcpu);
+> +}
 
-My setup:
-- L1 TDX guest/VMM running TDX enlightened KVM
-- L2 nested VMs launched by L1 VMM
-- L2 invokes TDVMCALL_MAP_GPA to convert a private GPA range into shared pages
-- L1 handles this in td_part_map_gpa() and sets the pages to decrypted
-- L2 writes 0xAA patterns into the shared GPA using ioremap() + memset()
-- L1 observes all-zero data when reading the same GPA through __va()
-direct mapping
+I bisected kvm-x86/next down to this change for a TDX guest not booting
+and host producing errors like:
 
-The issue:
-L1 cannot observe any data written by L2 on the shared pages, even
-though the GPA range is successfully converted to shared state.
+watchdog: CPU118: Watchdog detected hard LOCKUP on cpu 118
 
-My expectation:
-According to TDX Module Spec, MAP_GPA should invalidate the Secure EPT
-entry and convert the page to shared. Therefore L1 should be able to
-see the raw/unencrypted data written by L2.
+Dropping the is_td_vcpu(vcpu) check above fixes the issue. Earlier the
+call for vmx_handle_exit_irqoff() was unconditional.
 
-My questions:
-1. In TD partitioning, is L1 able to observe data written by L2 into
-the shared GPA after MAP_GPA?
-2. Is there any additional steps required to make the shared page
-state consistent between L1 and L2?
+Probably the (u16) cast above can be dropped too? It was never used for
+TDX looking at the patch.
 
-Thanks,
-Yiwen
+Regards,
+
+Tony
 
