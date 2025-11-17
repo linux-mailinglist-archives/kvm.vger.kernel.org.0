@@ -1,182 +1,549 @@
-Return-Path: <kvm+bounces-63399-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63400-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1056DC657C8
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:29:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 638A2C6596C
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:46:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AA4163A214E
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 17:19:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9E4BD350E80
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 17:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AF13093A0;
-	Mon, 17 Nov 2025 17:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9913112BD;
+	Mon, 17 Nov 2025 17:34:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="St0q6+iO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AksLsWzF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B25130504D
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 17:16:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3659030EF76;
+	Mon, 17 Nov 2025 17:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763399785; cv=none; b=DrSufqeWBdpkYM+t8liD3mbjtgmPpHiK+K+Y4ZzRpm/QpOf7LD5xdeXVL9z59FOiyhNC+vVTHiJR8Hym3D61w+vHZmogeRnKAsx1j6CTsZ0MioAkJHAY5Zi6XMV/n2GGwTiOT3Gij0WXaHD/EPPpDPiJdN9ZpprmnC0PCo88iUY=
+	t=1763400875; cv=none; b=FZoMqMkkn5UC4iU7BEei36Aez7MRf/nNZ15MDG+QW+yzymMLWmUWOs/HK404oZ4I4nFlN5CpYpPhG7Q5QY8iwQ+Fv/0C5dlXL1jV6LGEur7LYkWaVgLITbLLlc7rf18v57mPUyavjJ3UkoGvi4mG11daF9SNGj7qSyDK1vV6oL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763399785; c=relaxed/simple;
-	bh=2sNLnkk8V5VHxiND7V+FoGQrjFZ2T5dAZtQ/cFM2bC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=evrdp7vDfAwOcCsQknGzGvkfURZzjKjXiCsX0xWD09iEqB3bqdrPwP/OSVCR9qYg3A3sFwXBz9KAywGKbhG6RVOeJdItjc4NlevQrLamgZEcjTNzyU+vXAL26M84QBa6z3LCH4qBK0NMfydlrc35KXk6pnP3BASzqP/2l3SvXok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=St0q6+iO; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ee1a3ef624so10487081cf.0
-        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 09:16:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1763399780; x=1764004580; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=P1EKuTl21MaZwOVAnrWkECo68IZFcqZRr/UNlppTPmo=;
-        b=St0q6+iOpxbQP/6k4YKopb2b5abxIoNmFDBUjCQhyPHK+h7d8HKH6xaNs1SrXfm6OZ
-         SX3+iU7AfSkVpcl9Oh20UsDOxLGNyrTJJc60M57mpWVYDN6AnVbBn3x/F0Pr/nl/c57p
-         5jOlIOnA23o0k+wKKWoTyTffzSAy9/U+iWg/cLqgA3zQq/msJHRR/LgxbQaTSBBwO6MZ
-         HKzAgSbvvmGmW1PFfxSgqU9DWWWbgWBmTKIdeGJueyBjy9frttHn2vvAydk/HIgrAZxw
-         cGoTxy1YwOwm3TyCYh3mvEIbvhY1xGP7VBnVqBapoxOOhc2WUKsxkMK9G0cuu6VQah0D
-         A6aA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763399780; x=1764004580;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P1EKuTl21MaZwOVAnrWkECo68IZFcqZRr/UNlppTPmo=;
-        b=Qvql9eaE5dSCAR5ZEljpreFvW82RRb5v5rbVqcTENJEP95lHs7zweJ8b62Nmt2zPu8
-         l33iWwYoNgmssA9OfcgiLwCkNSt2MXI6M2TPkG92rPbBxZO5DoLdmaQmWCBF6QyIPEnP
-         fWPTJ/+8BSbdREJVqOoAqBcemQN48YOrk4FsyEWQ7qOlqfePt1BWW/gF83J51Ww1bToi
-         +nTuunN+Lgcq1C1dOOilnYEBS9ce6gPZnoi+X/WmY+U1rhULQB4xTKk1/XmIvrgc45LZ
-         bil8qbDq2Yk8AiUqPxysD5r1f4FGexjZ6BNABUomGkj5W5QEdNieK0pibWPlkb7v5HCR
-         OxzA==
-X-Forwarded-Encrypted: i=1; AJvYcCWs2K8TFgPUznoDzMSSLn+zDdVOvD/OJac5ORMIROqlAS/UjmNy6XkO4aFPR51EwlfH1YA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrHv3NfJ+rzmY5lMN3ZmGr2XKFz65hpHn5YeNyByf6ejJ5Geqq
-	n7CUj5vaRH46kMJqPH2yWZxvMGWSFQ5z8+Wr4/KRRb5/a+C6uAsUKeghAHcxCJYhYXM=
-X-Gm-Gg: ASbGncuxvGuz07Dx6Lw+igE7mazpQ+gKJzBJYmqg+taJPj7xb2Dm+/QHhMEZMrRU7HW
-	+N86rlHZ9tNcyTLO9AYfxTMNcK2JPCYzTiCCFkGIR1U0IATmftvQ0g31OquBzr7hpK8c00yOMcX
-	YySiuirkCIf2bI01YHBn3BFw2teU57p5JnnlPZ8zEUk8sFF73nfXDt5pYZBUMQmpL1THbW3jmys
-	qHRvFctsB6Vbf5HQZkop+xAsIo0Fu5HTZ8MypFl/U6DbntP4fa+2RTnjK8UeAu5wuMUhTO7h+rM
-	b+uObfL+DH06Bn7eiI2Ac7VNklva2o+nWA9Hpkm/qDMcX8tD1vY2yLIcfdSdsJWEUA8/JesMBZ9
-	vMZFpC1D5UH/GuC+H7R8zaXP/h9fBKkrUnelPf0nSeULjnj3bYxjwbWhDWJ2DKSfDnoE421IUUL
-	WX/t745rDuS90C6J+URGl6x2GRkk3wb6/HzTRVt3VXiy/3XNn6flfP0Hyd
-X-Google-Smtp-Source: AGHT+IHdomOA3fXFLRj5Qifi24Z8ILoy1R2tZQWL9HXByV1pnhKykseLX/aaxM1vhUTUzCoPwrvJjg==
-X-Received: by 2002:a05:622a:22aa:b0:4ec:ef20:ac52 with SMTP id d75a77b69052e-4edfc87511cmr159168241cf.79.1763399780286;
-        Mon, 17 Nov 2025 09:16:20 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee1c21ea34sm32656311cf.30.2025.11.17.09.16.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 09:16:19 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vL2pv-000000005PX-0G4a;
-	Mon, 17 Nov 2025 13:16:19 -0400
-Date: Mon, 17 Nov 2025 13:16:19 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Williamson <alex@shazbot.org>
-Cc: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <skolothumtho@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, iommu@lists.linux.dev,
-	linux-mm@kvack.org, linux-doc@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
-	linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>
-Subject: Re: [PATCH v7 00/11] vfio/pci: Allow MMIO regions to be exported
- through dma-buf
-Message-ID: <20251117171619.GB17968@ziepe.ca>
-References: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
- <20251110134218.5e399b0f.alex@shazbot.org>
- <da399efa-ad5b-4bdc-964d-b6cc4a4fc55d@amd.com>
- <20251117083620.4660081a.alex@shazbot.org>
+	s=arc-20240116; t=1763400875; c=relaxed/simple;
+	bh=oeTn00A7A4orN8LyUXiqAvW9aE1W8uyYgcBTVb8y/qA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CP4lN3WxItMgoUigOJCSXaGYIsJ+ImC8nlAAq4ux52cNUKZWIpCjEFHpoe2Rl/aGNnfSBAkd56wGI+vdoEGPGqx+ra3ZUKFOVZYUBSlMi7VTpnR3uyeYvJ+qG2VfJSIZ0uiRSCp3dXgN+6qJEnrbp/L5ONSyDg3CkBWnu2mEFF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AksLsWzF; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763400872; x=1794936872;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=oeTn00A7A4orN8LyUXiqAvW9aE1W8uyYgcBTVb8y/qA=;
+  b=AksLsWzFkCBYE3a9UYSeBuI/eQ6KdGm3snzeseOIgaSe+S8xLrrKYVjv
+   E9xQ7PABZR62zhvY1G1iWy5IHRcIDWAxif3J764kE1D/30FThmR7iVmOA
+   CzuTIUHN81+Qa7UK2QWo0RSqEDOSaBaVoNn0N5vrUhoP9q11A/YoskXVX
+   Kk95/zveGCpSzmJLDgyg3hM5EtLXHV3PKWkVRXmJmPzopCjLXR2uLwu8M
+   8sSRzNMIlTRqnljdWqNbEHuNEMAIQycypztwdR6MYKrFZb0GywoOquHde
+   s70hdAfWFw5lBAh+OHKrJS1zH6ZaF+olP7pB37AzolavOlenFeNkM/uf3
+   A==;
+X-CSE-ConnectionGUID: +DSRdRO0T3OZHaZ++egvLw==
+X-CSE-MsgGUID: zFWmAOfOR/e7Sjp5KrOCjw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="65447774"
+X-IronPort-AV: E=Sophos;i="6.19,312,1754982000"; 
+   d="scan'208";a="65447774"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 09:34:32 -0800
+X-CSE-ConnectionGUID: QC+PLg5rTZa5PIalvlKOvg==
+X-CSE-MsgGUID: U1rE4C1sRvWNj9E8w3kemg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,312,1754982000"; 
+   d="scan'208";a="213905629"
+Received: from aschofie-mobl2.amr.corp.intel.com (HELO [10.125.109.33]) ([10.125.109.33])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 09:34:31 -0800
+Message-ID: <cfcfb160-fcd2-4a75-9639-5f7f0894d14b@intel.com>
+Date: Mon, 17 Nov 2025 09:34:30 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251117083620.4660081a.alex@shazbot.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 08/26] x86/virt/tdx: Add tdx_enable_ext() to enable of
+ TDX Module Extensions
+To: Xu Yilun <yilun.xu@linux.intel.com>, linux-coco@lists.linux.dev,
+ linux-pci@vger.kernel.org
+Cc: chao.gao@intel.com, dave.jiang@intel.com, baolu.lu@linux.intel.com,
+ yilun.xu@intel.com, zhenzhong.duan@intel.com, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, dave.hansen@linux.intel.com,
+ dan.j.williams@intel.com, kas@kernel.org, x86@kernel.org
+References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
+ <20251117022311.2443900-9-yilun.xu@linux.intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20251117022311.2443900-9-yilun.xu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 17, 2025 at 08:36:20AM -0700, Alex Williamson wrote:
-> On Tue, 11 Nov 2025 09:54:22 +0100
-> Christian König <christian.koenig@amd.com> wrote:
+I really dislike subjects like this. I honestly don't need to know what
+the function's name is. The _rest_ of the subject is just words that
+don't tell me _anything_ about what this patch does.
+
+In this case, I suspect it's because the patch is doing about 15
+discrete things and it's impossible to write a subject that's anything
+other than some form of:
+
+	x86/virt/tdx: Implement $FOO by making miscellaneous changes
+
+So it's a symptom of the real disease.
+
+On 11/16/25 18:22, Xu Yilun wrote:
+> From: Zhenzhong Duan <zhenzhong.duan@intel.com>
 > 
-> > On 11/10/25 21:42, Alex Williamson wrote:
-> > > On Thu,  6 Nov 2025 16:16:45 +0200
-> > > Leon Romanovsky <leon@kernel.org> wrote:
-> > >   
-> > >> Changelog:
-> > >> v7:
-> > >>  * Dropped restore_revoke flag and added vfio_pci_dma_buf_move
-> > >>    to reverse loop.
-> > >>  * Fixed spelling errors in documentation patch.
-> > >>  * Rebased on top of v6.18-rc3.
-> > >>  * Added include to stddef.h to vfio.h, to keep uapi header file independent.  
-> > > 
-> > > I think we're winding down on review comments.  It'd be great to get
-> > > p2pdma and dma-buf acks on this series.  Otherwise it's been posted
-> > > enough that we'll assume no objections.  Thanks,  
-> > 
-> > Already have it on my TODO list to take a closer look, but no idea when that will be.
-> > 
-> > This patch set is on place 4 or 5 on a rather long list of stuff to review/finish.
+> Add a kAPI tdx_enable_ext() for kernel to enable TDX Module Extensions
+> after basic TDX Module initialization.
 > 
-> Hi Christian,
+> The extension initialization uses the new TDH.EXT.MEM.ADD and
+> TDX.EXT.INIT seamcalls. TDH.EXT.MEM.ADD add pages to a shared memory
+> pool for extensions to consume.
+
+"Shared memory" is an exceedingly unfortunate term to use here. They're
+TDX private memory, right?
+
+> The number of pages required is
+> published in the MEMORY_POOL_REQUIRED_PAGES field from TDH.SYS.RD. Then
+> on TDX.EXT.INIT, the extensions consume from the pool and initialize.
+
+This all seems backwards to me. I don't need to read the ABI names in
+the changelog. I *REALLY* don't need to read the TDX documentation names
+for them. If *ANYTHING* these names should be trivialy mappable to the
+patch that sits below this changelog. They're not.
+
+This changelog _should_ begin:
+
+	Currently, TDX module memory use is relatively static. But, some
+	new features (called "TDX Module Extensions") need to use memory
+	more dynamically.
+
+How much memory does this consume?
+
+> TDH.EXT.MEM.ADD is the first user of tdx_page_array. It provides pages
+> to TDX Module as control (private) pages. A tdx_clflush_page_array()
+> helper is introduced to flush shared cache before SEAMCALL, to avoid
+> shared cache write back damages these private pages.
+
+First, this talks about "control pages". But I don't know what a control
+page is.
+
+Second, these all need to be in imperative voice. Not:
+
+	It provides pages to TDX Module as control (private) pages.
+
+Do this:
+
+	Provide pages to TDX Module as control (private) pages.
+
+> TDH.EXT.MEM.ADD uses HPA_LIST_INFO as parameter so could leverage the
+> 'first_entry' field to simplify the interrupted - retry flow. Host
+> don't have to care about partial page adding and 'first_entry'.
 > 
-> Gentle nudge.  Leon posted v8[1] last week, which is not drawing any
-> new comments.  Do you foresee having time for review that I should
-> still hold off merging for v6.19 a bit longer?  Thanks,
+> Use a new version TDH.SYS.CONFIG for VMM to tell TDX Module which
+> optional features (e.g. TDX Connect, and selecting TDX Connect implies
+> selecting TDX Module Extensions) to use and let TDX Module update its
+> global metadata (e.g. memory_pool_required_pages for TDX Module
+> Extensions). So after calling this new version TDH.SYS.CONFIG, VMM
+> updates the cached tdx_sysinfo.
+> 
+> Note that this extension initialization does not impact existing
+> in-flight SEAMCALLs that are not implemented by the extension. So only
+> the first user of an extension-seamcall needs invoke this helper.
 
-I really want this merged this cycle, along with the iommufd part,
-which means it needs to go into your tree by very early next week on a
-shared branch so I can do the iommufd part on top.
+Ahh, so this is another bit of very useful information buried deep in
+this changelog.
 
-It is the last blocking kernel piece to conclude the viommu support
-roll out into qemu for iommufd which quite a lot of people have been
-working on for years now.
+Extensions consume memory, but they're *optional*.
 
-IMHO there is nothing profound in the dmabuf patch, it was written by
-the expert in the new DMA API operation, and doesn't form any
-troublesome API contracts. It is also the same basic code as from the
-v1 in July just moved into dmabuf .c files instead of vfio .c files at
-Christoph's request.
+> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+> index 3a3ea3fa04f2..1eeb77a6790a 100644
+> --- a/arch/x86/include/asm/tdx.h
+> +++ b/arch/x86/include/asm/tdx.h
+> @@ -125,11 +125,13 @@ static __always_inline u64 sc_retry(sc_func_t func, u64 fn,
+>  #define seamcall(_fn, _args)		sc_retry(__seamcall, (_fn), (_args))
+>  #define seamcall_ret(_fn, _args)	sc_retry(__seamcall_ret, (_fn), (_args))
+>  #define seamcall_saved_ret(_fn, _args)	sc_retry(__seamcall_saved_ret, (_fn), (_args))
+> +int tdx_enable_ext(void);
+>  const char *tdx_dump_mce_info(struct mce *m);
+>  
+>  /* Bit definitions of TDX_FEATURES0 metadata field */
+>  #define TDX_FEATURES0_TDXCONNECT	BIT_ULL(6)
+>  #define TDX_FEATURES0_NO_RBP_MOD	BIT_ULL(18)
+> +#define TDX_FEATURES0_EXT		BIT_ULL(39)
+>  
+>  const struct tdx_sys_info *tdx_get_sysinfo(void);
+>  
+> @@ -223,6 +225,7 @@ u64 tdh_phymem_page_wbinvd_tdr(struct tdx_td *td);
+>  u64 tdh_phymem_page_wbinvd_hkid(u64 hkid, struct page *page);
+>  #else
+>  static inline void tdx_init(void) { }
+> +static inline int tdx_enable_ext(void) { return -ENODEV; }
+>  static inline u32 tdx_get_nr_guest_keyids(void) { return 0; }
+>  static inline const char *tdx_dump_mce_info(struct mce *m) { return NULL; }
+>  static inline const struct tdx_sys_info *tdx_get_sysinfo(void) { return NULL; }
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+> index 4370d3d177f6..b84678165d00 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.h
+> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+> @@ -46,6 +46,8 @@
+>  #define TDH_PHYMEM_PAGE_WBINVD		41
+>  #define TDH_VP_WR			43
+>  #define TDH_SYS_CONFIG			45
+> +#define TDH_EXT_INIT			60
+> +#define TDH_EXT_MEM_ADD			61
+>  
+>  /*
+>   * SEAMCALL leaf:
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index 9a5c32dc1767..bbf93cad5bf2 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -59,6 +59,9 @@ static LIST_HEAD(tdx_memlist);
+>  static struct tdx_sys_info tdx_sysinfo __ro_after_init;
+>  static bool tdx_module_initialized __ro_after_init;
+>  
+> +static DEFINE_MUTEX(tdx_module_ext_lock);
+> +static bool tdx_module_ext_initialized;
+> +
+>  typedef void (*sc_err_func_t)(u64 fn, u64 err, struct tdx_module_args *args);
+>  
+>  static inline void seamcall_err(u64 fn, u64 err, struct tdx_module_args *args)
+> @@ -517,7 +520,7 @@ EXPORT_SYMBOL_GPL(tdx_page_array_ctrl_release);
+>  #define HPA_LIST_INFO_PFN		GENMASK_U64(51, 12)
+>  #define HPA_LIST_INFO_LAST_ENTRY	GENMASK_U64(63, 55)
+>  
+> -static u64 __maybe_unused hpa_list_info_assign_raw(struct tdx_page_array *array)
+> +static u64 hpa_list_info_assign_raw(struct tdx_page_array *array)
+>  {
+>  	return FIELD_PREP(HPA_LIST_INFO_FIRST_ENTRY, 0) |
+>  	       FIELD_PREP(HPA_LIST_INFO_PFN, page_to_pfn(array->root)) |
+> @@ -1251,7 +1254,14 @@ static __init int config_tdx_module(struct tdmr_info_list *tdmr_list,
+>  	args.rcx = __pa(tdmr_pa_array);
+>  	args.rdx = tdmr_list->nr_consumed_tdmrs;
+>  	args.r8 = global_keyid;
+> -	ret = seamcall_prerr(TDH_SYS_CONFIG, &args);
+> +
+> +	if (tdx_sysinfo.features.tdx_features0 & TDX_FEATURES0_TDXCONNECT) {
+> +		args.r9 |= TDX_FEATURES0_TDXCONNECT;
+> +		args.r11 = ktime_get_real_seconds();
+> +		ret = seamcall_prerr(TDH_SYS_CONFIG | (1ULL << TDX_VERSION_SHIFT), &args);
+> +	} else {
+> +		ret = seamcall_prerr(TDH_SYS_CONFIG, &args);
+> +	}
 
-My hope is DRM folks will pick up the baton and continue to improve
-this to move other drivers away from dma_map_resource(). Simona told
-me people have wanted DMA API improvements for ages, now we have them,
-now is the time!
+I'm in the first actual hunk of code and I'm lost. I don't have any idea
+what the "(1ULL << TDX_VERSION_SHIFT)" is doing.
 
-Any remarks after the fact can be addressed incrementally.
+Also, bifurcating code paths is discouraged. It's much better to not
+copy and paste the code and instead name your variables and change
+*them* in a single path:
 
-If there are no concrete technical remarks please take it. 6 months is
-long enough to wait for feedback.
+    u64 module_function = TDH_SYS_CONFIG;
+    u64 features = 0;
+    u64 timestamp = 0;
 
-Thanks,
-Jason
+    if (tdx_sysinfo.features.tdx_features0 & TDX_FEATURES0_TDXCONNECT) {
+	features |= TDX_FEATURES0_TDXCONNECT;
+	timestamp = ktime_get_real_seconds();
+	module_function |= 1ULL << TDX_VERSION_SHIFT;
+    }
+
+    ret = seamcall_prerr(module_function, &args);
+
+This would also provide a place to say what the heck is going on with
+the whole "(1ULL << TDX_VERSION_SHIFT)" thing. Just hacking it in and
+open-coding makes it actually harder to comment and describe it.
+
+>  	/* Free the array as it is not required anymore. */
+>  	kfree(tdmr_pa_array);
+> @@ -1411,6 +1421,11 @@ static __init int init_tdx_module(void)
+>  	if (ret)
+>  		goto err_free_pamts;
+>  
+> +	/* configuration to tdx module may change tdx_sysinfo, update it */
+> +	ret = get_tdx_sys_info(&tdx_sysinfo);
+> +	if (ret)
+> +		goto err_reset_pamts;
+> +
+>  	/* Config the key of global KeyID on all packages */
+>  	ret = config_global_keyid();
+>  	if (ret)
+> @@ -1488,6 +1503,160 @@ static __init int tdx_enable(void)
+>  }
+>  subsys_initcall(tdx_enable);
+>  
+> +static int enable_tdx_ext(void)
+> +{
+
+Comments, please. "ext" can mean too many things. What does this do and
+why can it fail?
+
+> +	struct tdx_module_args args = {};
+> +	u64 r;
+> +
+> +	if (!tdx_sysinfo.ext.ext_required)
+> +		return 0;
+
+Is this an optimization or is it functionally required?
+
+> +	do {
+> +		r = seamcall(TDH_EXT_INIT, &args);
+> +		cond_resched();
+> +	} while (r == TDX_INTERRUPTED_RESUMABLE);
+> +
+> +	if (r != TDX_SUCCESS)
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+> +static void tdx_ext_mempool_free(struct tdx_page_array *mempool)
+> +{
+> +	/*
+> +	 * Some pages may have been touched by the TDX module.
+> +	 * Flush cache before returning these pages to kernel.
+> +	 */
+> +	wbinvd_on_all_cpus();
+> +	tdx_page_array_free(mempool);
+> +}
+> +
+> +DEFINE_FREE(tdx_ext_mempool_free, struct tdx_page_array *,
+> +	    if (!IS_ERR_OR_NULL(_T)) tdx_ext_mempool_free(_T))
+> +
+> +/*
+> + * The TDX module exposes a CLFLUSH_BEFORE_ALLOC bit to specify whether
+> + * a CLFLUSH of pages is required before handing them to the TDX module.
+> + * Be conservative and make the code simpler by doing the CLFLUSH
+> + * unconditionally.
+> + */
+> +static void tdx_clflush_page(struct page *page)
+> +{
+> +	clflush_cache_range(page_to_virt(page), PAGE_SIZE);
+> +}
+
+arch/x86/virt/vmx/tdx/tdx.c has:
+
+static void tdx_clflush_page(struct page *page)
+{
+        clflush_cache_range(page_to_virt(page), PAGE_SIZE);
+}
+
+Seems odd to see this here.
+
+> +static void tdx_clflush_page_array(struct tdx_page_array *array)
+> +{
+> +	for (int i = 0; i < array->nents; i++)
+> +		tdx_clflush_page(array->pages[array->offset + i]);
+> +}
+> +
+> +static int tdx_ext_mem_add(struct tdx_page_array *mempool)
+> +{
+
+I just realized the 'mempool' has nothing to do with 'struct mempool',
+which makes this a rather unfortunate naming choice.
+
+> +	struct tdx_module_args args = {
+> +		.rcx = hpa_list_info_assign_raw(mempool),
+> +	};
+> +	u64 r;
+> +
+> +	tdx_clflush_page_array(mempool);
+> +
+> +	do {
+> +		r = seamcall_ret(TDH_EXT_MEM_ADD, &args);
+> +		cond_resched();
+> +	} while (r == TDX_INTERRUPTED_RESUMABLE);
+> +
+> +	if (r != TDX_SUCCESS)
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+> +static struct tdx_page_array *tdx_ext_mempool_setup(void)
+> +{
+> +	unsigned int nr_pages, nents, offset = 0;
+> +	int ret;
+> +
+> +	nr_pages = tdx_sysinfo.ext.memory_pool_required_pages;
+> +	if (!nr_pages)
+> +		return NULL;
+> +
+> +	struct tdx_page_array *mempool __free(tdx_page_array_free) =
+> +		tdx_page_array_alloc(nr_pages);
+> +	if (!mempool)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	while (1) {
+> +		nents = tdx_page_array_fill_root(mempool, offset);
+
+This is really difficult to understand. It's not really filling a
+"root", it's populating an array. The structure of the loop is also
+rather non-obvious. It's doing:
+
+	while (1) {
+		fill(&array);
+		tell_tdx_module(&array);
+	}
+
+Why can't it be:
+
+	while (1)
+		fill(&array);
+	while (1)
+		tell_tdx_module(&array);
+
+for example?
+
+> +		if (!nents)
+> +			break;
+> +
+> +		ret = tdx_ext_mem_add(mempool);
+> +		if (ret)
+> +			return ERR_PTR(ret);
+> +
+> +		offset += nents;
+> +	}
+> +
+> +	return no_free_ptr(mempool);
+> +}
+
+This patch is getting waaaaaaaaaaaaaaay too long. I'd say it needs to be
+4 or 5 patches, just eyeballing it.
+
+Call be old fashioned, but I suspect the use of __free() here is atually
+hurting readability.
+
+> +static int init_tdx_ext(void)
+> +{
+> +	int ret;
+> +
+> +	if (!(tdx_sysinfo.features.tdx_features0 & TDX_FEATURES0_EXT))
+> +		return -EOPNOTSUPP;
+> +
+> +	struct tdx_page_array *mempool __free(tdx_ext_mempool_free) =
+> +		tdx_ext_mempool_setup();
+> +	/* Return NULL is OK, means no need to setup mempool */
+> +	if (IS_ERR(mempool))
+> +		return PTR_ERR(mempool);
+
+That's a somewhat odd comment to put above an if() that doesn't return NULL.
+
+> +	ret = enable_tdx_ext();
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Extension memory is never reclaimed once assigned */
+> +	if (mempool)
+> +		tdx_page_array_ctrl_leak(no_free_ptr(mempool));
+> +
+> +	return 0;
+> +}
+
+
+
+> +/**
+> + * tdx_enable_ext - Enable TDX module extensions.
+> + *
+> + * This function can be called in parallel by multiple callers.
+> + *
+> + * Return 0 if TDX module extension is enabled successfully, otherwise error.
+> + */
+> +int tdx_enable_ext(void)
+> +{
+> +	int ret;
+> +
+> +	if (!tdx_module_initialized)
+> +		return -ENOENT;
+> +
+> +	guard(mutex)(&tdx_module_ext_lock);
+> +
+> +	if (tdx_module_ext_initialized)
+> +		return 0;
+> +
+> +	ret = init_tdx_ext();
+> +	if (ret) {
+> +		pr_debug("module extension initialization failed (%d)\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	pr_debug("module extension initialized\n");
+> +	tdx_module_ext_initialized = true;
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_enable_ext);
+> +
+>  static bool is_pamt_page(unsigned long phys)
+>  {
+>  	struct tdmr_info_list *tdmr_list = &tdx_tdmr_list;
+> @@ -1769,17 +1938,6 @@ static inline u64 tdx_tdr_pa(struct tdx_td *td)
+>  	return page_to_phys(td->tdr_page);
+>  }
+>  
+> -/*
+> - * The TDX module exposes a CLFLUSH_BEFORE_ALLOC bit to specify whether
+> - * a CLFLUSH of pages is required before handing them to the TDX module.
+> - * Be conservative and make the code simpler by doing the CLFLUSH
+> - * unconditionally.
+> - */
+> -static void tdx_clflush_page(struct page *page)
+> -{
+> -	clflush_cache_range(page_to_virt(page), PAGE_SIZE);
+> -}
+
+Ahh, here's the code move.
+
+This should be in its own patch.
+
+
 
