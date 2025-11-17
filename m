@@ -1,85 +1,85 @@
-Return-Path: <kvm+bounces-63377-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63374-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE61C6438E
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 13:58:33 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6A2DC6434C
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 13:55:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 080F936416B
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:51:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 94C234EDE2E
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C44339B20;
-	Mon, 17 Nov 2025 12:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA313375B9;
+	Mon, 17 Nov 2025 12:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bXk1LGbD"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Sle6qN+X"
 X-Original-To: kvm@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013021.outbound.protection.outlook.com [40.93.201.21])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012064.outbound.protection.outlook.com [40.93.195.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA743375D1;
-	Mon, 17 Nov 2025 12:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A2D3375A0;
+	Mon, 17 Nov 2025 12:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.64
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763383350; cv=fail; b=URMG23gyS+Skxpc2UJjpQm6Y0kQ9BmviZE2ijqfLiQvOJBAgABGRgMVi23GufvWe2GJ5hiVSUx5ZNyDPWzmEkYTAW9eiWbHsROJtdkWi0ukrBqXWswsdnrJfVIXNAR64/nXtT2IwQBxst5EvTBX5rgHuTgJHNK5AscIEsiejWBM=
+	t=1763383342; cv=fail; b=QU+wjVAUz+6t1KrwuJb9O4q70Y2b7IUaNclnCmIMIaEdtlSqaECuDgNZjuuzPIx9TCQYLkJVhn4hx/2YATtnsCxhGcmonG4nFBDntlRZoo7otWQeRIn41r2wDpje6HX5an1lp4q7b/+yOKv03F6s3RctnkwmoOxYRKJ5BEf77xI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763383350; c=relaxed/simple;
-	bh=g6AMwCLfc5a7zci494G1NRGy9JIzS0WNKYLoOLKUp1Q=;
+	s=arc-20240116; t=1763383342; c=relaxed/simple;
+	bh=s4HOoPpw+F+uz/UUWetkyfr/GLjgmA2Hy6U7sCP17qM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cfNf8Sk8hbGw+OrPBs7jeAR/KGOb9QM3LVi9VqUclrCK5Mk4HhKqDJfvoupzYjPRYvpt+Yyh/tC53l4w9WDZXeVR28vQesBjXHrsdlZS4zb+8gxx3jhrGAH0CB60aGkj8UreKqMFNpGznKG/XwGsO68owp9aHgdqflShs22J6Sg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bXk1LGbD; arc=fail smtp.client-ip=40.93.201.21
+	 MIME-Version:Content-Type; b=m0vXqEI1DD37yc7/1q1pdfk6OPyg0nnGtXHiGuIAp7g+ueFsirNJdkA5TYwbBEWBo5/hioPLJrw2gWFZX0r9ita+FhFTTJwMX93atxruKht8wwtLxQ004bbQmmUyhygmTIW+cw0kFuYcus+XY6GhRvKJZLLCqmZlfEZ+fNymkUE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Sle6qN+X; arc=fail smtp.client-ip=40.93.195.64
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vf0gbFAAbmcl2OhkPIa9A7nAr61tYpQzrp1pbqO8oSxXZJhvvBUnZBsVV4G4I1l0tZKLD1Rrxzcc1qxrO7XJn4J0wxN55uYyhz3Q8QM3GSuN465nhm9O+icSA1kLOu303qwqFGWJTxowQr+WQR3IgD2+rPkg/KY9FHCCKwYZOLSmquK96jMep6DG3sAcfxH/jE17z6O0Xm1sZ9FwlVWxZTmHXmHOUv/zuNabeLyh7thPU++UloT7n4qMu6Mpkr5pBTUhI9ZDiaudbdmQgHSvrSA1gzLBHPUiPj+ikCPUTKjrTJP6Ne/npHChvup3q2DXN4tI7hjRzWuVa3k2Bi2sGw==
+ b=iIu7mryTfngQNatfZIyK9HVYOtOJbIoCtcr4Pyx3LSuoW497Xhuqx3i7T2dr772roxlmn7uEmHr84evlUvxo2LUiPUA8l0E0vTgU8CIBPY2ynCgEcyeP4k0E8n8zxcZUwQeHK0ojmuPFBreBqCdk1bluLyyq5btXKkquhCDuoOlqnNiZb6esnDNubWs55vdHyQ6EiADOUiOCc7ZHnPcFzwr5+G2GyWlEKWExW40hm1IFKwJfZTK6N+kZIf5/5JI63sOkj+sJUVczonePPHA8sFEMbmxzozi/+svFwUSK6RYmfLdR2q52at0Jv2UYL9/L/qXv6YkNmzyh2B3DJ5BUNg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UX+yDiEszkqqKiQpnoloD7v6MJNEffQxbLbhM6vRI/U=;
- b=mnB5seMXxXky4J406paZBueKTfsLm148DhpOmA5TmeQ352DaCcIacw0r/lEM4LX72TTjEZS7hXWhUJ9wxZteqUWngqunSW5AhOG1K0qaMlVHoKA7YFj4EqX2ZRqjjsET/nqx5jtYRrful/TLibj/LJRwO2ZZI8qyoqRNtRBWvSbmztP9Vi0MvnM+azbQdmDHaQaSoKdeJi6AhFTLMp+kvL3AwICRBlAYRTSEC15zrvu/RHcZPqH4EcTEyc1NQT5J5e6CAXqQKS7NqG5VsHU3lPHkfDPyF4Hvmtb2Muc0u9xZhVzy9PmreOgmiyFJc1w8/nQIOrb2qqmvq2I5WTaatw==
+ bh=r+jXZfFaj/mBZfU6QapQukJMNEemAubukfYwvP8TYRI=;
+ b=inLbAo/TTZJ+iJY2dkje/75+ZGFdGg1zKfMMuVWWpqQhQrNKTlJVCQG8075SX5SfT6bBfxK3NHrTpJ6vGLOdic5Krlj5ZFAeo4+jxZLmHq9BwbcUybpj6FLCDPsHvLXfVlWOXXYB6QmbiIQgGhgKeRL7SlMPgir0sU4JKheptLbOqPPP3CJ68IGEBBAgKeldK0joAwkorkZtr1m0CgEhOPCl3H30CvNLrKKaejELVlXUuViKye/MHKZnpn+o3wCPvpjL6KEA0u9HWfZG5WUJQxqW+7hmo37vPICBkqWGuMnKOXeel9QrUF/lKipNpOF0I/Q3gngDdjF12wYilqOJHg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UX+yDiEszkqqKiQpnoloD7v6MJNEffQxbLbhM6vRI/U=;
- b=bXk1LGbDELowQUdHCKzXMNmuSAXLWCHHXULMAlrH7KNAD7YjFdH4Tema7elGrjuNTLyjqHHtig0EbOBxB9kfCAJnd4FLPCws/KPlfkREWOst9hSAjdpUZueKuZmpd3I5TUj0d8AE+bA40vl42asTaNMLisSWk4ZX7O6jRN6cf2EZMcNg+phNiJeqeBw3mgE5Wa7cReC+6/Zi63ZpjofS0BVoi0WY+r2WTu9id6FFvBlqcf8tE3xsKYDXeWnzTcVk2meaWzF5d3n+J9hVTEBTAD3hjrRWYVU9+F+6S3993SbNfJ8cv/Oe0SfXwDw+ax2+mHtePtubAqNL2ZIqm086EA==
-Received: from MN2PR05CA0062.namprd05.prod.outlook.com (2603:10b6:208:236::31)
- by PH0PR12MB5632.namprd12.prod.outlook.com (2603:10b6:510:14c::17) with
+ bh=r+jXZfFaj/mBZfU6QapQukJMNEemAubukfYwvP8TYRI=;
+ b=Sle6qN+XVkA3UxvGYWKFQYg/F1ySTgpDKVywG9k4FgdNwl0YlX1UUurHt+YNvPguMQDhoMyUm1Vz+xcZHywA+BYQ+MLQcHYr9AKkWFythNPwvcf1u4SkCkHhyauiQ7+HTG87p7gvn8V+dWIhpyYz+JbQbLCXCl7ZzqmpqgkJi0b0mM1AGLS6DbQEKtfP87TqGUyPwUuhd6Iqq3A2yn4QButBYArpnjuemop+xZmdhRrlCi9K7nKJvgLkne/ybKJ3FVvr3JJTP06Qi0y/Jz2fodtKn7rnTVaAnatR6PrxesTXVJlIEjUnLwlEMJu2kv3Y+3xHKoDAA/7mW2AKwaMfVQ==
+Received: from SN6PR08CA0009.namprd08.prod.outlook.com (2603:10b6:805:66::22)
+ by IA0PR12MB8645.namprd12.prod.outlook.com (2603:10b6:208:48f::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.21; Mon, 17 Nov
- 2025 12:42:23 +0000
-Received: from MN1PEPF0000ECD8.namprd02.prod.outlook.com
- (2603:10b6:208:236:cafe::46) by MN2PR05CA0062.outlook.office365.com
- (2603:10b6:208:236::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Mon,
- 17 Nov 2025 12:42:04 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.18; Mon, 17 Nov
+ 2025 12:42:15 +0000
+Received: from SN1PEPF0002636C.namprd02.prod.outlook.com
+ (2603:10b6:805:66:cafe::8b) by SN6PR08CA0009.outlook.office365.com
+ (2603:10b6:805:66::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9320.20 via Frontend Transport; Mon,
+ 17 Nov 2025 12:42:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- MN1PEPF0000ECD8.mail.protection.outlook.com (10.167.242.137) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SN1PEPF0002636C.mail.protection.outlook.com (10.167.241.137) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9343.9 via Frontend Transport; Mon, 17 Nov 2025 12:42:22 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9343.9 via Frontend Transport; Mon, 17 Nov 2025 12:42:15 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 17 Nov
- 2025 04:42:04 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ 2025 04:42:03 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 17 Nov
- 2025 04:42:01 -0800
+ 2025 04:42:02 -0800
 Received: from
  gb-nvl-073-compute01.l16.internal032k18.bmc032b17.internal032f11.internal032huang.bmc032l04.bmc
  (10.127.8.11) by mail.nvidia.com (10.129.68.7) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20 via Frontend Transport; Mon, 17 Nov 2025 04:42:00 -0800
+ 15.2.2562.20 via Frontend Transport; Mon, 17 Nov 2025 04:42:02 -0800
 From: <ankita@nvidia.com>
 To: <ankita@nvidia.com>, <jgg@ziepe.ca>, <yishaih@nvidia.com>,
 	<skolothumtho@nvidia.com>, <kevin.tian@intel.com>, <alex@shazbot.org>,
@@ -90,9 +90,9 @@ CC: <Yunxiang.Li@amd.com>, <yi.l.liu@intel.com>,
 	<apopple@nvidia.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<cjia@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
 	<zhiw@nvidia.com>, <danw@nvidia.com>, <dnigam@nvidia.com>, <kjaju@nvidia.com>
-Subject: [PATCH v1 1/6] vfio/nvgrace-gpu: Use faults to map device memory
-Date: Mon, 17 Nov 2025 12:41:54 +0000
-Message-ID: <20251117124159.3560-2-ankita@nvidia.com>
+Subject: [PATCH v1 2/6] vfio: export function to map the VMA
+Date: Mon, 17 Nov 2025 12:41:55 +0000
+Message-ID: <20251117124159.3560-3-ankita@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251117124159.3560-1-ankita@nvidia.com>
 References: <20251117124159.3560-1-ankita@nvidia.com>
@@ -107,161 +107,144 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD8:EE_|PH0PR12MB5632:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94a6c11c-6ac1-4345-ecc0-08de25d6c16c
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002636C:EE_|IA0PR12MB8645:EE_
+X-MS-Office365-Filtering-Correlation-Id: c617dd2e-b96e-4aa9-f951-08de25d6bcad
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|36860700013|1800799024|82310400026;
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|7416014|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?dRBmo6p1aUdPmV7eRLOnHnkFc8t2r/rIMJNqdXsZBWuyUw2YXeMKQ01yKksI?=
- =?us-ascii?Q?vVm4vbRDJZXGWcASE2Qym4uiHwhdr2UjiuRAn5RHynPRhI3XMOXCWO2VigQh?=
- =?us-ascii?Q?HxwT1bnQFLj09DHfSyTqk7JV74a9rethIScQXgLNpO3uSSq302VEqDQaxGvd?=
- =?us-ascii?Q?yLCvYCG8ywuSv+49yMXg2z2JENlWZQx1wwT7hGexK2hlzZHPs66BEqNfj+qc?=
- =?us-ascii?Q?yeaUmccRD3Jn9VASdMZlHKi0zO5L5/Md29wTYx/ZbpXuuU4LrD/Txnp5NGrZ?=
- =?us-ascii?Q?jgQzPS9M5O5CHtVnPY0CcuJh1t7tiTql2tf7mFXigL5Eu1K1Ar+foCJmKhTO?=
- =?us-ascii?Q?mF8jrT2lG9t5Iv40oiw35YLTn7c3Eudhpmxl/sM8OmpkmSrFrL38fsLp2DZ+?=
- =?us-ascii?Q?7fMyw2iOgkQmUuEK/vij2qWL8l7NIwpbEMqDLzBAtmgm48XCTX6KJpflHNMd?=
- =?us-ascii?Q?gbvsJvGdureHQ9GUDXjW1O2hy+pCTBfeflgXL0snc2XHb49HjXujMVn5PeYd?=
- =?us-ascii?Q?hEA9bbWsFEAyLNZw1HVrLUNR5YqDzKjQ73nnbuVz8xsZI0bmD/w5HMdHp/tI?=
- =?us-ascii?Q?f/TzTTd8RYon5csDGJHHwSyQlrCnDDGwxot5A6bzXqCGZydd43eU93e5GgRz?=
- =?us-ascii?Q?eKnlu4A7zV0XFPfwER61SLEVxseEpX69c1nonl8X3IRB7R0OTYj11w8YZBto?=
- =?us-ascii?Q?XuW9lSS1yo0k+T1/n1QmXPoH6MhQMJNjw2iBFpWEiVL1oYL45UJWNNrmXrS5?=
- =?us-ascii?Q?AjYUB553bCW73iebeUZnsxxgCrLiWeyeWoG60f7RUSV6G7yE1yOL9H3Q+IVk?=
- =?us-ascii?Q?POyg5UQZ8BKUOvUk6dIwXgNDXPdIdVgG8hmoLuN3xOxVoCfKz9ReY9oVq9uV?=
- =?us-ascii?Q?SE2E6X1tsvy6Xlk9HNcWXnwQO0qXf1Ani5Q1WVCe0pJLC3ONtdzS8B6wEssz?=
- =?us-ascii?Q?PEecLNU4G4aQgvP/Lh4I1bGxRf5uiJzYZkRRM6li6z7mnD/gOUQn/9IqBQxf?=
- =?us-ascii?Q?KsnX5jfkM+r81rmOJCkggWYuJxaV/gBJi3xmufO8nc7hHQ43KQ2JC0C7zxDc?=
- =?us-ascii?Q?t51scV5Eb/IbbJ0FLmnxD/3oKsLtbsne6zDdC96fsynSK0JEhXfcXTEK0Chn?=
- =?us-ascii?Q?bhUHjuO/cRc95+nFKRQVwRvj5vCBb7vKzFApylQp7BKvF1e16br52T372RaD?=
- =?us-ascii?Q?5NMS2fYpxtiLcJAt2UVLSAIUBUgRFVCNd+CKg14gZcEQHras7CtaTn+v3hXg?=
- =?us-ascii?Q?biQVRBKOxw7jq2KIHPO8v/eUmYYQKuQENGJYRoHM6GRxAx641HasohcSs7+b?=
- =?us-ascii?Q?taMzNj/hSalxOs/1Cm+PkD1M1HrLTRHYmlCaTqACCuEn/DKqa7738n28lbK+?=
- =?us-ascii?Q?v4Q3S9P8WF3eL8q+LbonvKSpqIgN6QMzhKvJ2d+DntkNbqvzOHvTo2UH3YQl?=
- =?us-ascii?Q?pUCcca/94kvpZJjmXobchFv8sBeynwEzScUP3dTPNLt883CyVVLMWi0UqRPL?=
- =?us-ascii?Q?yHa9VgbAaQh9BNDEISF7Wb80hcUm/00k3+ZGmBVE6LMGHhKEz/OChTMOE54b?=
- =?us-ascii?Q?mro6VhkQrbwl4p/H9AQ=3D?=
+	=?us-ascii?Q?BYHRvTuCw3cuqCQiORb8u54LdAXoNrvruewxm2vzBbTCuAx5WDT/kNHHWoeG?=
+ =?us-ascii?Q?ALguFCBhN6huIwAzlcRds4OH99b65XlvLTICGXuKnaQU5fXq7fzmoPDxI690?=
+ =?us-ascii?Q?uH1iMQCvSLYgWr3UoI4exzPSSNuvOO9D+2a5sDZGZBNdJAZuz9SagOhupYe5?=
+ =?us-ascii?Q?q1rAbaD07cHpzbburrG6bfvNKL6jAXx+IMBgmaxfZAa0ccZhRW6RyQWaAgD6?=
+ =?us-ascii?Q?/kUz5chbUX//Tt3yIHaluWrN3NnTfuIe2LGhQnXoCuslvVEOYtiCvDhPrDt3?=
+ =?us-ascii?Q?/ckvbGSNSxsR9iNQaLzoFi09kt131JnShlxd292qy7re/Xb0KiO8NcNklzlx?=
+ =?us-ascii?Q?Qox3PX1nCouUSw2NjaMd14/8GU6dU2hxqDXlxJ/BqANRqsk640cGawXvhtWq?=
+ =?us-ascii?Q?wJRi/yW4qpVk7qhIyQtzIf0+cs8NP588+5Q21wLOT/2oSDVLgArEh7DC9M8r?=
+ =?us-ascii?Q?NEee6b7zi7oUOLtxuCueycTFACZGyb0oly1ubeHv/8m2u51+ITsj0XwlSRcH?=
+ =?us-ascii?Q?Ub0QJY7QqiTshcpX/15R7UJsOZIN0KNtfOEKZ+ESQrdtqOhadtkUlJxEW7q2?=
+ =?us-ascii?Q?oz8jxSIVuAiR4wClgil6uVYynTgEFmchQS8NdSzHgNssW/u+OfnZ70dBzN2q?=
+ =?us-ascii?Q?KsYbuYSjuJev24KAeYOKLojc8ZMIdjQlFdiAG8Pg2Y3g/iBRLjNKvrzOh2/G?=
+ =?us-ascii?Q?LDXb3RpH9obixrBO1LUa63+LP9ePeGSUSIeev9Q9E1OCjV3OoQp84LPxQtl7?=
+ =?us-ascii?Q?e+TKkqnfhw7DzCHhjFwexQBrh83JES0vW12dGNxe0we5XLTK8Zde8LAtvJTI?=
+ =?us-ascii?Q?VZ9hmk5PAG5iuyC/vVxu65bZouSVWpPrQz9zsA5TL+vWhRWd3++JGZNV0tPg?=
+ =?us-ascii?Q?yRN+L6BZhiNFbvnXbyJRDTtNdS8p9fRf3dWxvW9CIiWjeXREiBF5zNXQDINP?=
+ =?us-ascii?Q?LO4TmpCEc6Vp3bi0R//AOnX9ayPh9aBsCwRndx3V9Q82Ca4RDkGRR8dsuoRN?=
+ =?us-ascii?Q?LMV9PPiMZPnOrl/Qjybhw5L65FQYMBh06E4Tu+NHixFQ2Hm0KqG4h1gR6VPG?=
+ =?us-ascii?Q?NMwFavZU37uG3k18avNB+R7SLwEunrmzQ3nTeQZjN+AMfPlx3xtZtUkXV6qz?=
+ =?us-ascii?Q?ufxQTJDuXiRYl0ovFly1pVRLiqWdqPkMHXjIWUFLQu4F6Si8s82wrSZDaS4d?=
+ =?us-ascii?Q?7pyQueZgaHHyMp2f1mbFIPUU8Z4CXKI4Dcq4FCbrtSvIFRPEVnVrYNGrK4oy?=
+ =?us-ascii?Q?PcMc5rhW15i03Sh8a0XFwHZZNG8RjOBFWzCgFdHMG9MAmdPdvxEs5Smv6VGE?=
+ =?us-ascii?Q?RNcInmwIqj/RYC+E4scunJat2p8QJFHHkdKoXblqVYZEGzgcRvdRPuft9LpP?=
+ =?us-ascii?Q?DXW2jlbPxwbATgiDKcOT797mPPKo18kSB63XWch5cwl2A5/RTCcCoDHd1ysz?=
+ =?us-ascii?Q?1VaN3kA7zf5dERyJHUILnhIFCIZdzW3lv++Lj1o0ZtT1yMJwdrMbm06L/eoF?=
+ =?us-ascii?Q?1A12vv8cDykvuLAYDwAS0a2QyM0dTohxksjABraRXbJZWv/E+I+WT11lI+bz?=
+ =?us-ascii?Q?troVTVdHKTtPGYLlRmU=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2025 12:42:22.9729
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2025 12:42:15.0615
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94a6c11c-6ac1-4345-ecc0-08de25d6c16c
+X-MS-Exchange-CrossTenant-Network-Message-Id: c617dd2e-b96e-4aa9-f951-08de25d6bcad
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECD8.namprd02.prod.outlook.com
+	SN1PEPF0002636C.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5632
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8645
 
 From: Ankit Agrawal <ankita@nvidia.com>
 
-To make use of the huge pfnmap support and to support zap/remap
-sequence, fault/huge_fault ops based mapping mechanism needs to
-be implemented.
+Take out the implementation to map the VMA to the PTE/PMD/PUD
+as a separate function.
 
-Currently nvgrace-gpu module relies on remap_pfn_range to do
-the mapping during VM bootup. Replace it to instead rely on fault
-and use vmf_insert_pfn to setup the mapping.
+Export the function to be used by nvgrace-gpu module.
 
 Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 ---
- drivers/vfio/pci/nvgrace-gpu/main.c | 50 ++++++++++++++++++-----------
- 1 file changed, 31 insertions(+), 19 deletions(-)
+ drivers/vfio/pci/vfio_pci_core.c | 46 ++++++++++++++++++++------------
+ include/linux/vfio_pci_core.h    |  2 ++
+ 2 files changed, 31 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-index e346392b72f6..ecfecd0916c9 100644
---- a/drivers/vfio/pci/nvgrace-gpu/main.c
-+++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-@@ -130,6 +130,33 @@ static void nvgrace_gpu_close_device(struct vfio_device *core_vdev)
- 	vfio_pci_core_close_device(core_vdev);
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 7dcf5439dedc..29dcf78905a6 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -1640,6 +1640,34 @@ static unsigned long vma_to_pfn(struct vm_area_struct *vma)
+ 	return (pci_resource_start(vdev->pdev, index) >> PAGE_SHIFT) + pgoff;
  }
  
-+static vm_fault_t nvgrace_gpu_vfio_pci_fault(struct vm_fault *vmf)
++vm_fault_t vfio_pci_map_pfn(struct vm_fault *vmf,
++			    unsigned long pfn,
++			    unsigned int order)
 +{
-+	struct vm_area_struct *vma = vmf->vma;
-+	struct nvgrace_gpu_pci_core_device *nvdev = vma->vm_private_data;
-+	int index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
-+	vm_fault_t ret = VM_FAULT_SIGBUS;
-+	struct mem_region *memregion;
-+	unsigned long pgoff, pfn;
++	vm_fault_t ret;
 +
-+	memregion = nvgrace_gpu_memregion(index, nvdev);
-+	if (!memregion)
-+		return ret;
-+
-+	pgoff = (vmf->address - vma->vm_start) >> PAGE_SHIFT;
-+	pfn = PHYS_PFN(memregion->memphys) + pgoff;
-+
-+	down_read(&nvdev->core_device.memory_lock);
-+	ret = vmf_insert_pfn(vmf->vma, vmf->address, pfn);
-+	up_read(&nvdev->core_device.memory_lock);
++	switch (order) {
++	case 0:
++		ret = vmf_insert_pfn(vmf->vma, vmf->address, pfn);
++		break;
++#ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
++	case PMD_ORDER:
++		ret = vmf_insert_pfn_pmd(vmf, pfn, false);
++		break;
++#endif
++#ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
++	case PUD_ORDER:
++		ret = vmf_insert_pfn_pud(vmf, pfn, false);
++		break;
++#endif
++	default:
++		ret = VM_FAULT_FALLBACK;
++	}
 +
 +	return ret;
 +}
++EXPORT_SYMBOL_GPL(vfio_pci_map_pfn);
 +
-+static const struct vm_operations_struct nvgrace_gpu_vfio_pci_mmap_ops = {
-+	.fault = nvgrace_gpu_vfio_pci_fault,
-+};
-+
- static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
- 			    struct vm_area_struct *vma)
+ static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
+ 					   unsigned int order)
  {
-@@ -137,10 +164,8 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
- 		container_of(core_vdev, struct nvgrace_gpu_pci_core_device,
- 			     core_device.vdev);
- 	struct mem_region *memregion;
--	unsigned long start_pfn;
- 	u64 req_len, pgoff, end;
- 	unsigned int index;
--	int ret = 0;
+@@ -1662,23 +1690,7 @@ static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
+ 	if (vdev->pm_runtime_engaged || !__vfio_pci_memory_enabled(vdev))
+ 		goto out_unlock;
  
- 	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+-	switch (order) {
+-	case 0:
+-		ret = vmf_insert_pfn(vma, vmf->address, pfn);
+-		break;
+-#ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
+-	case PMD_ORDER:
+-		ret = vmf_insert_pfn_pmd(vmf, pfn, false);
+-		break;
+-#endif
+-#ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
+-	case PUD_ORDER:
+-		ret = vmf_insert_pfn_pud(vmf, pfn, false);
+-		break;
+-#endif
+-	default:
+-		ret = VM_FAULT_FALLBACK;
+-	}
++	ret = vfio_pci_map_pfn(vmf, pfn, order);
  
-@@ -157,7 +182,6 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
- 		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
- 
- 	if (check_sub_overflow(vma->vm_end, vma->vm_start, &req_len) ||
--	    check_add_overflow(PHYS_PFN(memregion->memphys), pgoff, &start_pfn) ||
- 	    check_add_overflow(PFN_PHYS(pgoff), req_len, &end))
- 		return -EOVERFLOW;
- 
-@@ -168,6 +192,8 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
- 	if (end > memregion->memlength)
- 		return -EINVAL;
- 
-+	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
-+
- 	/*
- 	 * The carved out region of the device memory needs the NORMAL_NC
- 	 * property. Communicate as such to the hypervisor.
-@@ -184,23 +210,9 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
- 		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
- 	}
- 
--	/*
--	 * Perform a PFN map to the memory and back the device BAR by the
--	 * GPU memory.
--	 *
--	 * The available GPU memory size may not be power-of-2 aligned. The
--	 * remainder is only backed by vfio_device_ops read/write handlers.
--	 *
--	 * During device reset, the GPU is safely disconnected to the CPU
--	 * and access to the BAR will be immediately returned preventing
--	 * machine check.
--	 */
--	ret = remap_pfn_range(vma, vma->vm_start, start_pfn,
--			      req_len, vma->vm_page_prot);
--	if (ret)
--		return ret;
- 
--	vma->vm_pgoff = start_pfn;
-+	vma->vm_ops = &nvgrace_gpu_vfio_pci_mmap_ops;
-+	vma->vm_private_data = nvdev;
- 
- 	return 0;
- }
+ out_unlock:
+ 	up_read(&vdev->memory_lock);
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index f541044e42a2..058acded858b 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -119,6 +119,8 @@ ssize_t vfio_pci_core_read(struct vfio_device *core_vdev, char __user *buf,
+ 		size_t count, loff_t *ppos);
+ ssize_t vfio_pci_core_write(struct vfio_device *core_vdev, const char __user *buf,
+ 		size_t count, loff_t *ppos);
++vm_fault_t vfio_pci_map_pfn(struct vm_fault *vmf, unsigned long pfn,
++			    unsigned int order);
+ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma);
+ void vfio_pci_core_request(struct vfio_device *core_vdev, unsigned int count);
+ int vfio_pci_core_match(struct vfio_device *core_vdev, char *buf);
 -- 
 2.34.1
 
