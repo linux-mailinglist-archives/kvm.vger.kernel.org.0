@@ -1,131 +1,138 @@
-Return-Path: <kvm+bounces-63350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A05FC637CD
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 11:19:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31218C63809
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 11:21:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AFD04353DDE
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 10:12:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13DCA3B20E6
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 10:21:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA673271F0;
-	Mon, 17 Nov 2025 10:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308D132B9A8;
+	Mon, 17 Nov 2025 10:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="iTonU8BO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PvEz8Wi5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602CC31987B;
-	Mon, 17 Nov 2025 10:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A918532A3D7
+	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 10:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763374321; cv=none; b=Tjix8/oP6IxMSBIkiHTCVPg0wetEOjRWMgoWHZvld+vkzsLdUWi8FAIyPUXZgjRI0y9YaNYKec1tekJcCq5Aeso4wsELLzk0jUFamzISrI0OcIf77KO2C7ISKHxKeDj4+Cs1g0c2MaSPjC/AjebqDBirqbgeR1U1CEv1GA0trrY=
+	t=1763374749; cv=none; b=IGnZ6ALryMqv8tLjCkdy5fKKSAfYLOTz+115y3YDsGW8QlO1V7udS3HcdQKZNgL0Ua5sVXhzfxVCTeZWDFazr3MHDFiI2JpL6uIq3qiQ9hAbrp2pLSuw+KCi4Wcr7xImHnDMtpc0KEdTwe+sA8ElBh3xtzZ84pfj9kmiQcQ7zFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763374321; c=relaxed/simple;
-	bh=a32IPbQO1Mgl/oSPLb6qxxdCXXZLqY9DSskcM01V2KA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LsXjaQzRMJl5oYX9JKUSjtap9Jyyj2NFBfb0XotZzIIm08SZhilvNZ9iKewbf7WLX4qpZ1+MDsu1VJ7b04xAJ8Triwvwv5v/bRM7Az6TUqspifBAI5SkKzSvN37miL/+q/RTPbUU1EGh0gNDiJiTSpvosIWKdAqU/3xOlRNpwLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=iTonU8BO; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8D2D040E0219;
-	Mon, 17 Nov 2025 10:11:54 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id mnX7Jc-uYqfr; Mon, 17 Nov 2025 10:11:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1763374309; bh=HN0R0aJupgW53096iWjC4OxwThJjtFzlar3yJ8+c0oM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iTonU8BOip2eVRNpLHuUtiSexqZOoIDZMzDX5hovQjximsTjUilrrucT5bxojJJo2
-	 o4ySYJeHxKctFBKWEZ4k0sd6RvLrKSRbzR8ex2mZXEdabkJtFwN/hfiOHcbYRHpXVM
-	 1Fz981YL+Dh6gD2JztHyj2Y+CR2ZCPKhwuUnNWKkTGtpVjOZGp59VfJBz87w555pkX
-	 HJpBZH9HozINpgwf5yQqDQNoPU/uES+zGn8I7fKG2JcDpCEsS9SKzyjTYIPz7P6bvN
-	 teuoTOa7UUrlGZx1B+ndAijXCH5nVV9Hl4AnStkPIunUqJTDh5EhomSKUC+WF/sQm6
-	 wuLgTuUa8IcBHe14m/3FZMvEaR7pXo58vXGZv5zIVOicaIl2bYFPw5ve/VquHw7znT
-	 8X1NTR+XdyfGpLxb4gj1lmtFXBZ1nlfwQFKXft9f/IEMudcEciaXl1tcYzRhhLVrfd
-	 W9jQyuUUq5/TQu6B5kxt8aBBn4ix2VrGoZEROHDKo0mtdiy187Y5MjVcXjrAVv3jyq
-	 mklfdg9F0XSMBYZzJCEEwHYuREDUqFwx4lyTfcR9hHEY2wJa0azc/nQ1WAR/XSf9RK
-	 peqLK4UgBSA32PnZLmBoujtNw3ojs//qZMA2AKt5dhrj04/xa5xb+GCkGzG3Y2N7zH
-	 Iqn+lqh194ZRbhP2faepyBNs=
-Received: from zn.tnic (pd9530da1.dip0.t-ipconnect.de [217.83.13.161])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id F0A4B40E022E;
-	Mon, 17 Nov 2025 10:11:39 +0000 (UTC)
-Date: Mon, 17 Nov 2025 11:11:29 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	Brendan Jackman <jackmanb@google.com>
-Subject: Re: [PATCH v5 3/9] x86/bugs: Decouple ALTERNATIVE usage from VERW
- macro definition
-Message-ID: <20251117101129.GGaRr00XgEln3XzR5N@fat_crate.local>
-References: <20251113233746.1703361-1-seanjc@google.com>
- <20251113233746.1703361-4-seanjc@google.com>
+	s=arc-20240116; t=1763374749; c=relaxed/simple;
+	bh=zPYvPpxWU6t3N3nrbTSIJZK1EyfAajwNVGCdUHzuU1s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l7SNxMsErVd0ec0GR5TlcnuVbTeso9qLHbm1Mxo4m/WCzm5tI5RNl1uJIp1Pdhgy4Zu0kn7K0YWuTc5B9igFjG5fKZsTjZBPDaXAPTF7QIpzpi3wu/OpfKynkFh11I7u/zXJiwsZsz7w7xvpe7+CXOhqLLYrsK04+aYWZj4n1cY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PvEz8Wi5; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ee243b98caso166531cf.1
+        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 02:19:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763374745; x=1763979545; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7dSZwG+Ut4tx3N9fD6TcZFfeIFY+rAbw7tsG6scq/hU=;
+        b=PvEz8Wi59rvbf2ATlUse4yyiBSKBboHKN5rkNl/jwwqrQwSJxaSYA/v1hT3w6vFID2
+         1NCFskJ5Rhv3MKzAKTibbRlzyUso4tQlWi9tWDwhv3NPsgpf3LQ/My8tg0n27FpxDD9D
+         a/nRb+gexrpA35cbo3roPmzQMwZw0sqQYUj2YEo4E0KGcj4RS91ATQghi4yJqRTBbgHi
+         N1bG+pI2RTnr3NpF0OKDpEQjeLrzUi0wew74Um9416hYw/JjrtvMPx99m79EujIHE09f
+         rVoV54Gxkaf4mg1TBeIPK6C25uX3d+YkcJMnlt3YkhouuYJL75atTA3DlQ2BNcwPjiRP
+         VX/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763374745; x=1763979545;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7dSZwG+Ut4tx3N9fD6TcZFfeIFY+rAbw7tsG6scq/hU=;
+        b=XoiFIhP72ceqMYJ9Zz7MjAPa5+9fswEgG1yMsqZgI/ZbVG8m4VrqG2Zi8Deifq3tDE
+         cWBXOGwO5b5K4zuRjtlc4NSBC1CC6qDjo559X+RAhNNRHeiGKllTYVF89H6KCpO7tnXN
+         YfO6WkLuk5GMx2if5P/MBKyT8eU78fR+0vPhGwiHQ785Vms8JISqhV/2UsCQRe+jIJCA
+         RAF00SfZIndxH2QHRQ3DBmJO3QLknIA25F7vwQVXJ4LHAawoIgxhifNB8RHNSHcnzbKI
+         iNnHewIiyxB/4Hq139ediiG463xB2lY9q8aeTzAZYJudu34A2uqF96jSB+IkLSFIe/2D
+         gG0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVcGvQv7IliLP0G37OUnzwMkp/Z1uOtPc4P+7nrBndnLzDuTUVfEZNBlL9tPRzgyEWcmAU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxlVM7T6lOefFgU0qM7ZnyC1FR4kf/Y3TkfRGSTqJjIwNwwcLY
+	ojLmrLrvXXnB5Npe8w1YZetnYjDdwRpcOD2Hqu+d9n8rZDu+D+9zF97KTaX+O5XZD0g5rErtrbB
+	rgulBXbzdM3AjOm8wz7jzOkIwDN5SIQkcT2dw944g
+X-Gm-Gg: ASbGncsqbPv6Tdz8r/Or8rQ+vxDN7PV4aqKHlY9MwR91Bcpjn2v7t54yXmnMhJBIRk2
+	TmpqnbYkH7+wGRjDLqpmogaqE8T51RnAtcF/6Nx5Aq2WxfhiDYHdf7yCc++7/U0i4c6yKJV77qw
+	pjmcrTqsVGa8nQP8jgt/ffpPIhZ7y6egotKWibVQPwJvME41Ayiv0G5eXz93petbUy4GG8nlgGu
+	6uOW6e+f23d/yn0kPKs5eY1V15EDUeKC//bxBJ0g8WRrfWhPzTLZ60Khafy6BqYmfVtL1bMtwnN
+	c9+rLg==
+X-Google-Smtp-Source: AGHT+IFNmczB2ds9iTzz5FRf7oU0BYqq8SdTaWadzkP1SRAFOc8Pnz8a3JfCCCKf6Zz2U+3uKM0Q8RAviooSDsFqVnQ=
+X-Received: by 2002:a05:622a:9:b0:4ed:70d6:6618 with SMTP id
+ d75a77b69052e-4ee0292790emr11283261cf.10.1763374745320; Mon, 17 Nov 2025
+ 02:19:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251113233746.1703361-4-seanjc@google.com>
+References: <20251117091527.1119213-1-maz@kernel.org> <CA+EHjTzudrep2hEno4RPwh8H88txiVYFoU7AyJYVWG9SFSk87Q@mail.gmail.com>
+ <867bvpt25u.wl-maz@kernel.org>
+In-Reply-To: <867bvpt25u.wl-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 17 Nov 2025 10:18:28 +0000
+X-Gm-Features: AWmQ_bkalvPmo1B-rqo9IVXjMt6TjFkbAXf4VPzF4RKYlhIEuPNWjQgsoTvi3Ag
+Message-ID: <CA+EHjTyLGFUDbyr_B1uj5ZpxQA9ypCBy0ZUNRQ8M8VdLmXimnw@mail.gmail.com>
+Subject: Re: [PATCH v3 0/5] KVM: arm64: Add LR overflow infrastructure (the
+ dregs, the bad and the ugly)
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Mark Brown <broonie@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Nov 13, 2025 at 03:37:40PM -0800, Sean Christopherson wrote:
-> +#define __CLEAR_CPU_BUFFERS	__stringify(VERW)
+Hi Marc,
 
-Let's get rid of one indirection level pls:
+On Mon, 17 Nov 2025 at 09:54, Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Fuad,
+>
+> On Mon, 17 Nov 2025 09:40:47 +0000,
+> Fuad Tabba <tabba@google.com> wrote:
+> >
+> > Hi Marc,
+> >
+> > On Mon, 17 Nov 2025 at 09:15, Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > This is a follow-up to the original series [1] (and fixes [2][3])
+> > > with a bunch of bug-fixes and improvements. At least one patch has
+> > > already been posted, but I thought I might repost it as part of a
+> > > series, since I accumulated more stuff:
+> >
+> > I'd like to test this series as well. Do you have it applied in one of
+> > your branches at
+> > https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git
+> > , or which commit is it based on?
+>
+> I just pushed a new branch
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vgic-lr-overflow-fixes
+>
+> that is based on -rc5, kvmarm/next, kvmarm-fixes-6.18-rc3 plus these
+> patches. Let me know how this fares for you.
 
-diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-index 8b4885a1b2ef..59945cb5e5f9 100644
---- a/arch/x86/include/asm/nospec-branch.h
-+++ b/arch/x86/include/asm/nospec-branch.h
-@@ -309,23 +309,21 @@
-  * Note: Only the memory operand variant of VERW clears the CPU buffers.
-  */
- #ifdef CONFIG_X86_64
--#define VERW	verw x86_verw_sel(%rip)
-+#define VERW	__stringify(verw x86_verw_sel(%rip))
- #else
- /*
-  * In 32bit mode, the memory operand must be a %cs reference. The data segments
-  * may not be usable (vm86 mode), and the stack segment may not be flat (ESPFIX32).
-  */
--#define VERW	verw %cs:x86_verw_sel
-+#define VERW	__stringify(verw %cs:x86_verw_sel)
- #endif
- 
--#define __CLEAR_CPU_BUFFERS	__stringify(VERW)
--
- /* If necessary, emit VERW on exit-to-userspace to clear CPU buffers. */
- #define CLEAR_CPU_BUFFERS \
--	ALTERNATIVE "", __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF
-+	ALTERNATIVE "", VERW, X86_FEATURE_CLEAR_CPU_BUF
- 
- #define VM_CLEAR_CPU_BUFFERS \
--	ALTERNATIVE "", __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF_VM
-+	ALTERNATIVE "", VERW, X86_FEATURE_CLEAR_CPU_BUF_VM
- 
- #ifdef CONFIG_X86_64
- .macro CLEAR_BRANCH_HISTORY
+Great! I've applied the pKVM patches on top of it. So far so good.
+I'll test this series more thoroughly and review it as well. Stay tuned...
 
--- 
-Regards/Gruss,
-    Boris.
+Cheers,
+/fuad
 
-https://people.kernel.org/tglx/notes-about-netiquette
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
