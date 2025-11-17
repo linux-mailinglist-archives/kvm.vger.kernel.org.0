@@ -1,92 +1,93 @@
-Return-Path: <kvm+bounces-63430-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63431-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9961AC668DF
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 00:29:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B683C668EB
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 00:33:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7DDE34E18BC
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 23:29:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 9AC8D2988B
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 23:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A66C30DD30;
-	Mon, 17 Nov 2025 23:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D97953090E8;
+	Mon, 17 Nov 2025 23:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KBKmvsRm";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtlAYLjG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bDBEnV1v";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="W0+qvAsY"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-inbound-delivery-1.mimecast.com (us-smtp-inbound-delivery-1.mimecast.com [170.10.132.61])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF83D30DD2A
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 23:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.132.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CB716D9C2
+	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 23:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763422190; cv=none; b=VQYCIRTPxeFeXPCe/Tdq6FGlzADmrDEWODTjxkZ9N/UkVZvqrUYPnF1Pm9ACsrs2A3T2XaSujllgJMbyNNoFpClrIklTdYDzjvt9JhmlfO1ufBw1Rhzg5rmaAAKGu7Kyn7a2h2VbwYYYHEdy1B1Uyr1bYU2R5bMxMkJHJtqgAEQ=
+	t=1763422421; cv=none; b=SFe0GK28rszGzaR/i+Wl4ojU0u0EvD75VB6pVJsB0fb6C/YSTHgCW+vmGAxTY1kh02UBJyafOQjYOMibnK8gI9bz9RXBJNjmBoYESLKGruesy1iFAVaw3jXI+EkOM5ujSMkAQ4OpTyIMaMQBd8wO1+/J67QxHrc/YHVvT2i15aE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763422190; c=relaxed/simple;
-	bh=bkPXYP2kx9/yyMtwm/qyBxA2lGPazdEHS6YP4CDLRLs=;
+	s=arc-20240116; t=1763422421; c=relaxed/simple;
+	bh=fCV+MIravNPiFakCDvEWNy0tcox/CryPOQTio8ybjZQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o0dRNxsN3wzB/KwupXSdfuLBVqoSEAmU/IVYYF8Svs4XbcAaETYwK17eNu4rIZb4XNfN23oNlJW9O1r9mOQyUC9lbvtWiOC43j4hhr0PIiWooIxJ3AP3FWLI6dDphcTabBY6EMGWvgzYg8Dg7Emfcon9lZT10OzqiJIVz4QleX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KBKmvsRm; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HtlAYLjG; arc=none smtp.client-ip=170.10.132.61
+	 To:Cc:Content-Type; b=uzRNdlUlhKAa0QOMOB/Nt6MtsWxxRtZ0jLcPaXwRg9VWZPADrl9tkU/xjo0GNp9yRwRtGOX8zuil1YHujn/ZhGcWe0W/Pe9DmB45bXTpFqq9z2VnSx5TEBLRCLJ4DoGYZxegk7OrwqmmguTDLuhBmiHGm7WkEtR5nYMDEYhB8GI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bDBEnV1v; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=W0+qvAsY; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763422181;
+	s=mimecast20190719; t=1763422418;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bkPXYP2kx9/yyMtwm/qyBxA2lGPazdEHS6YP4CDLRLs=;
-	b=KBKmvsRma/ZYAVikDzicn2MhT1eHX6LqQrtupAraAVWh9F2kIXZdAPWq83K0FPH9STCLNm
-	PG2nC2Ps+Ve5G77KRNUcd2qbk4WKOGDE06RxsXq5uSY85tWMrKL4BXSAZwCq7IKvxK4nGt
-	BZQxa9QfhqOFHD+NEtOhF9L+NyG1/eg=
+	bh=DTmPCWP5yUG6kt1lSRM5JqSWIVqSKscA3TRQG2EFuec=;
+	b=bDBEnV1vq526PioMN7dHDA0DYBeMRfBytPgxO4JB2VV1Tsswtt7ajlYKnrRgD0q6mwBIg6
+	t2fEvEcyHlZ7BjD6WcTxtEqbTShRNunDwgdZ0C8faewBYFqhiAdFG3wmXO2Olmtuy8qXBP
+	O9bETZxG+AelXzWDlYU8srP63LJ/4Fs=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-XgK7YzhKP7aqSbqFnCIkcw-1; Mon, 17 Nov 2025 18:29:38 -0500
-X-MC-Unique: XgK7YzhKP7aqSbqFnCIkcw-1
-X-Mimecast-MFC-AGG-ID: XgK7YzhKP7aqSbqFnCIkcw_1763422172
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42b2ad29140so2220533f8f.0
-        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 15:29:32 -0800 (PST)
+ us-mta-543-cOva8WDCNhyqlJ9QdKbL7w-1; Mon, 17 Nov 2025 18:33:36 -0500
+X-MC-Unique: cOva8WDCNhyqlJ9QdKbL7w-1
+X-Mimecast-MFC-AGG-ID: cOva8WDCNhyqlJ9QdKbL7w_1763422415
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42b2ffe9335so5352689f8f.1
+        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 15:33:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763422172; x=1764026972; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bkPXYP2kx9/yyMtwm/qyBxA2lGPazdEHS6YP4CDLRLs=;
-        b=HtlAYLjG0kiukeLaer/SM8YCAlpT8gavvqtT7DuTAD5N93IIQiu+sju3Cek+MTGlPq
-         4y70Qexd0tvGFkZpG3CgqPNZ+ecO1vm5f27GpGYBksQxKDoWV091djtxWf1WeCCwzfLM
-         oibCOFUEuDYU2CpJfyfGJvBzC4y4kR85kb5lwPc22i/bX1ja4WE8E3Nz08UKappfF+Oc
-         anim5VijiXS53yibqGwbMyPcTOt3UkuoiGbvak6Dii3vx3Xojoz6LUCVgHSuvjrZWRb4
-         EDJ2nk7FaN0CJNGK+Rmipx+NbZW2IU++lowqgGMx6hKfouYOQMwqZQKA/jBdMwKY0pxF
-         A8hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763422172; x=1764026972;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=redhat.com; s=google; t=1763422415; x=1764027215; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bkPXYP2kx9/yyMtwm/qyBxA2lGPazdEHS6YP4CDLRLs=;
-        b=h8wzoUo6jk3xSyiBKM+WBhYz8joa5weNlPnD6Bj9BG1g/t/3oet/T3hOFCSZATrIb2
-         Ryd/bovWaXEYkI+MW0R9IWXYIDd2/ZAPf8U0QW2p6O3KkbCKM/qZGvKvyerY4tWAO/ia
-         XxDUPRnRcrv/8N4+Df4qWew4XIK6YLRn0orba6Hc7PTJJ1qYTKFvSuEcGXlQ7TVmnYzf
-         Zvya88g3OlyDUG041sFjGBErnu9AemUZb0/ZKcoh1yksu/bsc5M2LzQHa3tQJQL6RJ2X
-         Xq9QE+OeitUrBBD5DyZcZjX41Tfs38nvubkJn+gzqKik+66RdBEun6iDQHS85z7eRKMk
-         NHrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX5/GLcobIQaGTnKUasJW1OtfbgVZQNLrjH4c/pwZkNZS9yLGsLsc1H7ViMjhP4lnM/RIg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJjJ0oo9NWbT+KTv/yvZGbhotPPcRJdEp3qdBJ29VJO8jHmDrA
-	yXyaFPDP+G72YGGPaVVSd7iygs8XA8dH1KnSD+pAlKOJBcWqBb1OoQ7nIX+wBruR6zklGzkjWd2
-	CNZ9tNtjNqigbJUbfcGH9UBVBK4jlLg9ktgYt5xitMX7dSe0rj7kNm4kTlmdzOd+S66AE+0Guam
-	wnpIQxHVB7Jw2aDY19OWtU0iRksPoF
-X-Gm-Gg: ASbGncu4VLLLdTaTS7+a9DIz3/qP877OnNstpWe49nG/x9JCqdIvxTdA63fwV4D9cxw
-	qe4hfVj7pA0zhWHUqy7IIwExsM4qN/b6tZA7mstTuDTXe0oEAuNyYtN/unEBY7hNORciRLJBD09
-	Am9fyG0PPeATd8cA8Sk7WsJXrAn3Fz958NowPfUWDSCCIhXYbilmeEeZESWVu1zRzLi25oB0Yas
-	afjJILEajrIaauif392Km3wc339wOS8NCGWvGYDWghD+BDqJuFXJBMmiyTFHZOSAGK1zQw=
-X-Received: by 2002:a05:6000:2f83:b0:429:d3e9:694 with SMTP id ffacd0b85a97d-42b5932360dmr12702707f8f.5.1763422171942;
-        Mon, 17 Nov 2025 15:29:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGhnUlvOHa1iFL3+WfCN4m7hL8e8VU9+w9pQP/qII9z1T6nsBIDPwU15+5B/5ky0jr2KyPwZLxo/OOzyJa7I2s=
-X-Received: by 2002:a05:6000:2f83:b0:429:d3e9:694 with SMTP id
- ffacd0b85a97d-42b5932360dmr12702695f8f.5.1763422171638; Mon, 17 Nov 2025
- 15:29:31 -0800 (PST)
+        bh=DTmPCWP5yUG6kt1lSRM5JqSWIVqSKscA3TRQG2EFuec=;
+        b=W0+qvAsYITYLsvS8E8ekwmN8Kt/lE5h1hQmvzJaH3y2adN/x7GrE5NW0fG/ddsFeFv
+         oOzrcnZUMlbep2J2eJeJFgsMpliQcEDwI60jR5SK1ai7xj304oIJWv/8uYtIgKp0hInK
+         J3wslmeJvNXtLh4ePZTifhZEe1oL1vVEw7kxds6uH98AmOtH/AF3K/u8wDdqWehOROhS
+         FQbfRC5I57rF2zJgrptLdgUyPuVnWPs0EGylNzfa/Pgcb9rHTLH9lgcuy1S6TqO7CRn/
+         0O5JGiYJ1vgZXI4Ptrl5nYlzNAzsXKBVTL40p+zty0BjNjHQSOxkli1q+4Sf8wXO344h
+         UvDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763422415; x=1764027215;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=DTmPCWP5yUG6kt1lSRM5JqSWIVqSKscA3TRQG2EFuec=;
+        b=JOxPvtybn5w5T3lQwit0L3l5i4EZXtkt2/z52jfCJase0ZFQ1IDaaU1nr6B16sei6Z
+         Cm3zY4rIFzA1TNlPAV3+lX8UK3oNAPVOq3LED/54k1zZeZymjLJXyq7xHryo4rDA2hgX
+         RTQA0KZtStyYE7DSl3Yo8yLnCZme9dbpMbVlOg8eKIn8XIpOPDkSVMiXCOZ9/VOjVyNH
+         jR3HjNDBsd3e27T3nVTCx+d0UOaR+7oUOZ8LHab2nhnjj2N9E4c5l88BaYO0hrTmjPj5
+         P7gHiciwrAPh2buQkwJDh9IOHFe4x7LvmHY5mBqgEWo340lMXGPpFP6lTohm8E9RVo/U
+         Rd1Q==
+X-Gm-Message-State: AOJu0YwWwafeyuTVXWiWRBXH8ipr6jee3uzLyTVhl1nfRVEPRafavCcD
+	hb7zZUhYKEeP4ckH7mfxB6viQ7ovr37eQ787xh4QSzj9W7uNe/PBiI3WfRAQ736mGC8vY8K4HSP
+	2kbw59NWxW8zeVxq6pOoaUwG6r7Qnk6jp5hpspiz5zQior1BZIcSMVF1D0vTo5TsZYtkcKcA+Vo
+	Nwmm/XT2todoUNyEaRMSpyI40OEhcF
+X-Gm-Gg: ASbGncthM9CaDO8gbz9DgSoGvd38rms8WvcFYcch07MqvAV0ttUXdi27cX9FqInYOpY
+	qfTN1XPlfmtOsIavjs6ZHQTCB+jUqFvBOhWhmqH+Ex+tmFv/WxyNcZtqtAy2spcIrxzMvQ7DSeO
+	FvhTl2J3J922oIzwVD7LKdDhCkhYTauo1k8Ggidv6lH7iCc4HSv9rg31kMIUa8gpmiPxNS769g2
+	LGYFvEYhNPBTskG8NYrwnfd2QYD+aVZ8EZoZivLhsPhmaY70dshv9tdmQkX/b/kxle0sR4=
+X-Received: by 2002:a05:6000:616:b0:42b:483f:da8b with SMTP id ffacd0b85a97d-42b5934b2c8mr14759345f8f.25.1763422415453;
+        Mon, 17 Nov 2025 15:33:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEgvslnctD2U8vA8ojf7TmLw21OP9/9/xmd+6CayAR0TnqhEB2EVhpZQGFD9kbAQILEh1Ei7Zcowbj5JFaBaEQ=
+X-Received: by 2002:a05:6000:616:b0:42b:483f:da8b with SMTP id
+ ffacd0b85a97d-42b5934b2c8mr14759333f8f.25.1763422415105; Mon, 17 Nov 2025
+ 15:33:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -94,29 +95,53 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20251110180131.28264-1-chang.seok.bae@intel.com>
- <20251110180131.28264-8-chang.seok.bae@intel.com> <ebda0c03-b21e-48df-a885-8543882a3f3b@redhat.com>
- <aRPo2oxGGEG5LEWv@intel.com>
-In-Reply-To: <aRPo2oxGGEG5LEWv@intel.com>
+ <20251110180131.28264-17-chang.seok.bae@intel.com> <6a093929-5e35-485a-934c-e0913d14ac14@redhat.com>
+ <25c8c533-73a3-4cc1-9fbf-4301b2155f11@intel.com> <a4058352-2628-45d6-86d6-92ac1eef4cad@intel.com>
+In-Reply-To: <a4058352-2628-45d6-86d6-92ac1eef4cad@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 18 Nov 2025 00:29:19 +0100
-X-Gm-Features: AWmQ_blKLejt7XCcy-t3FDiFh-DfWGvsJYaexJvWoQKmnEdetXUT5N61iu96nfM
-Message-ID: <CABgObfaF4YO0Zd5PKJ3u7kRB0engmsSywnzztV8BKm5yUyQdmQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 07/20] KVM: nVMX: Support the extended instruction
- info field
-To: Chao Gao <chao.gao@intel.com>
-Cc: "Chang S. Bae" <chang.seok.bae@intel.com>, kvm <kvm@vger.kernel.org>, 
+Date: Tue, 18 Nov 2025 00:33:23 +0100
+X-Gm-Features: AWmQ_bniz2NO3dTEBO0HP5wM74EVYeKGF2exiFaiE_Agih7iEQ94P1JnZ7P9lU8
+Message-ID: <CABgObfYYGTvkYpeyqLSr9JgKMDA_STSff2hXBNchLZuKFU+MMA@mail.gmail.com>
+Subject: Re: [PATCH RFC v1 16/20] KVM: x86: Decode REX2 prefix in the emulator
+To: "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc: kvm <kvm@vger.kernel.org>, 
 	"Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Zhao Liu <zhao1.liu@intel.com>
+	"Gao, Chao" <chao.gao@intel.com>, Zhao Liu <zhao1.liu@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Il mer 12 nov 2025, 02:54 Chao Gao <chao.gao@intel.com> ha scritto:
+Il lun 17 nov 2025, 21:01 Chang S. Bae <chang.seok.bae@intel.com> ha scritt=
+o:
 >
-> Shouldn't we check guest's capabilities rather than host's,
+> While rebasing onto your VEX series, I noticed a couple of missings:
 >
-> i.e., guest_cpu_cap_has(X86_FEATURE_APX)?
+>    (1) Jumping directly to the decode path skips the ctxt->op_bytes
+>        setup.
+>    (2) It also removes the logic that detects the invalid sequence:
+>        REX2->REX (unless intentional).
+>
+> Perhaps it makes sense to simply continue prefix parsing. Then, at
+> 'done_prefixes', we can check the M bit next to the W-bit check and jump
+> to the two-byte decode path.
+>
+> I=E2=80=99ve attached a revised diff on top of the VEX series.
 
-As the manual says, you're free to use the extended field if
-available, and it's faster.
+Yes, that works for me with one change---after REX2 is processed there
+should be a "ctxt->b =3D insn_fetch(u8, ctxt); goto done_prefixes;"
+because REX2 is always the last prefix.
+
+This also means that checking "(ctxt->rex_prefix =3D=3D REX2_PREFIX &&
+!(ctxt->rex_bits & REX_M))" is unnecessary. Instead the second REX2
+prefix's 0xd5 byte can be treated as a No64 opcode and will trigger
+#UD. In fact this is what the manual says: "a REX prefix byte (0x4*),
+a VEX prefix byte (0xC4 or 0xC5), an EVEX prefix byte (0x62), or
+another REX2 prefix byte (0xD5) following a REX2 prefix with REX2.M0 =3D
+0 must #UD, because none of those bytes is the opcode of a valid
+instruction in legacy map 0 in 64-bit mode".
+
+So all you need to do is add the No64 flag to entries 0x40...0x4F of
+the opcode_table, and then "goto done_prefixes" will cover that
+sentence nicely.
 
 Paolo
 
