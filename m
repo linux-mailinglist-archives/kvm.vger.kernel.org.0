@@ -1,277 +1,150 @@
-Return-Path: <kvm+bounces-63332-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63333-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A48DC627E1
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 07:15:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE931C62BD2
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 08:35:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 600074E758A
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 06:15:40 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7C04D4ED497
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 07:32:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B786314D38;
-	Mon, 17 Nov 2025 06:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294E8318143;
+	Mon, 17 Nov 2025 07:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hD5ezsw9"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="wYHuu64M"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7870930C631
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 06:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E5035CBB7
+	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 07:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763360134; cv=none; b=nO8QrZ5/fKOxgwFU/E/dXI82J/ud7c7+UJUd8u85l843F/cnxQyeg60yik+HEshyyLIChY4sX1AHwB+bae2BJ9/xWQtaHNIkX4oOtnl7QYj73KPUr952vuCP2oZbTlKcXwQtcjHFB4hi69KaUTPjNhkM24sA81IwHhe7Xy7/agg=
+	t=1763364733; cv=none; b=mk856fv7MMqGAxc8UHveDWbJdBJGS7z5R/7ioB2GoCmX3Iogxvc2IoHwY6WkT3NabhDnEi9mbcRVDp6rYx6mvbJHQ0jezwqnIKhNyalyx52T+Td9AOD6E4/mC3cwzYBsZcyO1t4TgkkrbR8H+K1s+At5LlBpt2sX5Gnv3cUz58E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763360134; c=relaxed/simple;
-	bh=341jL4+GbKEcWnd2PzWxd7DEeJ8xXVvnV7m1i0R7X+g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pbiHT0TztFBs/05KA97AR06zNnkhgyG5OFGr+ZdI4ffNIKlFKKVN4qu7b37Rse1KOtC8LdyKdZ9SrQVefcaMap4ydtLUcErL8YYLTSI6FfAwfXXsQGen1NtErjlhQLYxgDg+49GL6joqPAfFqxATvQrbju3Shcu8N8EO3ph8ZcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hD5ezsw9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 287A8C4AF0B
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 06:15:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763360134;
-	bh=341jL4+GbKEcWnd2PzWxd7DEeJ8xXVvnV7m1i0R7X+g=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=hD5ezsw9gRX3ERVV5/LnZtts3PfIGpvrfwejjwpH1lO6D/Mu0OyLAYUryarlE9P0j
-	 5LWVNXqj0xpTjCS9AWEOZ6tupS22tLBpwsQPKXjXWco7ER8Aq1tG5EU2u99nr277/i
-	 OVjGU+eWNcdUFTMobdXgcW8VXicOOgArX4rFDHBhiE1p2AiSk03JUq91AsvEJOO1lV
-	 cPoTMGHUovrxlhFxZgoOyc6UJ+x10xAk2MMAFNG5GnfiVv5QXHe4vyc4oZUfvWh+vq
-	 BdlJclSC4OlmzH6YznsaEHT/z+9NaCxte7WyPCT+BJUhiUQH/zwI/3HurUR4PFmB6N
-	 m/HgBkLj8Y+HQ==
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b7355f6ef12so628844266b.3
-        for <kvm@vger.kernel.org>; Sun, 16 Nov 2025 22:15:34 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUIObJz0wxgVa+g6AnR10+yr5MAtpBrRTimvBnxTVkDFjT9lNrAwB93b8k0d38h0B7nulk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVbnJ5jPGtuH/dSDW8zc3bBpKiiu0U1hDyYkgppkRaJhGjWPFN
-	/w9s8xPAvfXVIwrGblBTrkG7uAxRsYlO0uAv8oL3Lj6R4/koGPrZLB0/6z6xe0piTo53al1LBtq
-	HFW53NSW8B7exKkDdARdnU6TRtbJ8a8Q=
-X-Google-Smtp-Source: AGHT+IHAo8f77ovsIeRwd3r5qOsUX3bRRKkomFO//en+L/J37ffF6hEYQfR+SAD8cqpLPahuy9s0BYd/l3RRF/nNdZk=
-X-Received: by 2002:a17:907:1c82:b0:b73:4006:1884 with SMTP id
- a640c23a62f3a-b7367b8d999mr1175498366b.37.1763360132707; Sun, 16 Nov 2025
- 22:15:32 -0800 (PST)
+	s=arc-20240116; t=1763364733; c=relaxed/simple;
+	bh=YoV/7dSf69+guJ8u+9SV89QGhtMlNWEqjZcrVMCNmI0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MlFDPzbqoD91/NIvnqvM3l2v+azl3i3AxJcl8R5Q65HkkenoC8UTQ0rG+9hB9oUOmUD4TBe/TmVWgM7MNAShT1S6epPzdynB6/3e/APgIvqTAsZyc6xbSpJN+23TXpDHkcOga/sbwkpn5Us+oOLQrxJGjVbNM4W3v2KmMYu4WcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=wYHuu64M; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ee1879e6d9so14779201cf.1
+        for <kvm@vger.kernel.org>; Sun, 16 Nov 2025 23:32:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1763364730; x=1763969530; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4p8nfBMplL1MMFjoLuwTkabV7IoOO9xmiP0+6aCowlY=;
+        b=wYHuu64MM9IzLOJShOgHn5TtTmS43L2fNnzbFutBzzR0WZzY6oDK5F1bipJ2zWDj5i
+         ofsn3sXcDsZQ+BcBCGBdpvNu+I4kf1x/MNaYxW/DSf5xO0kZOFqrD7R/z8ZvIkQ5any2
+         VkkBUQPtrGzTxjCz0dLQg6Smb7agvvNT3aSAwZhg2YK54WobtRNUKJTeGJLHsN5Bltqa
+         /69Qln08hOStUmzD5T6iLkD2fX9EsrXGb4TCECC1nRrVJSAhwYwYB6mzU7i0rudXSizd
+         N7GpwrKzkFAFmX1JdLdrDtyT1hLNseBOkbQm0Vq/reCHc9IAYUhzgWSWx5rEafHGBSrc
+         GdzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763364730; x=1763969530;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4p8nfBMplL1MMFjoLuwTkabV7IoOO9xmiP0+6aCowlY=;
+        b=cOz4NdX1tk0z1XVMoxxwIni80qE6mGjyUrPeHfwgt+fHwbRE93iKaA8qYZCzQrKSaK
+         9PORvQq7wsKBqB7AtTEzYGlL7r7xCNVBkvJfykrN4+WXPB9jUtX7LDfBRrxSc9IDppdO
+         S8989wtYpC30vsPeM/OwcZOu5dogfIAB5/hw5kct1R3MyCgvNdigEo0UJeO94NckpCv+
+         DVUOD2/o+COhFMQBW0nCA3yteK+Jk3g2OyolZDR5LBuX3nf6XVhXC3EI7zxIYcsodFUa
+         ik2BA9ryHq/0jKc7clIqu7iOcFSJ+DwPAGXY207+USE3fybHLgDxws9QAS82qicqdWic
+         As8w==
+X-Gm-Message-State: AOJu0YxBcV6T08eANRC9PNkG8PP2e0cFQVOlzU/WpWdxyWlB7qsd+Jbh
+	khrV5mpqfyjtTue6uEJ28ItPcrkfUplxqphFWJ02OcBKq5ps8ub6EAqiEJzhfiQLpEI=
+X-Gm-Gg: ASbGncujNveWFVhKC1zHN8DunQKZrh1iqwgHfiTn1Zdwrx8X618e7HN9cjVabyOCuhw
+	C9ghOkbh2nuAbpyopiMl6CYXcuGL0KSJBV+mAJE9zxpngRGNPnr+QyalWpGje89HehbQOHAkyRZ
+	N0Ps2j7W5TtfuNUPSLAcGbjVRxOXX1B3HBu8p3lK8DMRrbC8YT23i7wMsDHtkTQ/1HSi0xojidq
+	mwPcRHV3rXG9TS1ilGmyuHXvp7c6uj9dB1NBL/iO+4f7zn3W0hgV2ZtYk/9zmCMFZx1Ep0RixLC
+	LqulVxJo7ZxUNZf64z7r9+dGjcHQo7xboMP62UP8yRDn/hJ9ORO57GvuUTjFu2NQsXQZ/hBsgEF
+	3YqRNcVRIpYtWXpmjj9XaBWK+y+GnvVCt2UEx3nMchmD8D7LZs/GRTvHUZUMWonsJFECgKuLnYX
+	vyjiyPpC7Q8IwgM6Ai6SLOyMlMR+SXtUULs6EaJtvyucLuoeGD0oa6pXnUrp01sQpIbxBmb0mA3
+	iA7yqeKdaaPn/efkQDuxE3bp8KzALzJT5wfrO/0+vdp+g==
+X-Google-Smtp-Source: AGHT+IH36/RlucfVUFJn79UZhVqr6Oxrguj0dhZDGZoV2D87KD/l4v1AnyEXdu4Z27GsBFvDrUo4fw==
+X-Received: by 2002:a05:622a:1aa7:b0:4ee:1913:9616 with SMTP id d75a77b69052e-4ee191398f0mr56268111cf.51.1763364730290;
+        Sun, 16 Nov 2025 23:32:10 -0800 (PST)
+Received: from ?IPV6:2003:fa:af29:b100:e8b2:7dbf:b11:65fc? (p200300faaf29b100e8b27dbf0b1165fc.dip0.t-ipconnect.de. [2003:fa:af29:b100:e8b2:7dbf:b11:65fc])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b2aeeb2522sm921823685a.23.2025.11.16.23.32.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 16 Nov 2025 23:32:09 -0800 (PST)
+Message-ID: <aa192757-f6be-49ca-a2fb-38b9784c255e@grsecurity.net>
+Date: Mon, 17 Nov 2025 08:32:07 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251015060626.3915824-1-gaosong@loongson.cn> <28fff8cb-d436-78c7-1836-2fc0f71f806b@loongson.cn>
-In-Reply-To: <28fff8cb-d436-78c7-1836-2fc0f71f806b@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Mon, 17 Nov 2025 14:15:32 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H7wY1hV3syErZkY2d+dV3iy02n+67V1oBxfWjyDONGXPA@mail.gmail.com>
-X-Gm-Features: AWmQ_bmXBIbLGofFYdra-KaYoBYaJ5DrW6PHww26oFzDI316URMnY7RodRjdeRk
-Message-ID: <CAAhV-H7wY1hV3syErZkY2d+dV3iy02n+67V1oBxfWjyDONGXPA@mail.gmail.com>
-Subject: Re: [PATCH v3] LoongArch: KVM: Add AVEC support
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Song Gao <gaosong@loongson.cn>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kernel@xen0n.name, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v4 18/18] x86: cet: Add testcases to verify
+ KVM rejects emulation of CET instructions
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20251114205100.1873640-1-seanjc@google.com>
+ <20251114205100.1873640-19-seanjc@google.com>
+Content-Language: en-US, de-DE
+From: Mathias Krause <minipli@grsecurity.net>
+Autocrypt: addr=minipli@grsecurity.net; keydata=
+ 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
+ RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
+In-Reply-To: <20251114205100.1873640-19-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Applied with some modifications:
-https://github.com/chenhuacai/linux/commit/95e73e623cf7d9404ecc6040c8a568d8=
-56b84efb
+On 14.11.25 21:51, Sean Christopherson wrote:
+> Add SHSTK and IBT testcases to verify that KVM rejects (forced) emulation
+> of instructions that interact with SHSTK and/or IBT state, as KVM doesn't
+> support emulating SHSTK or IBT (rejecting emulation is preferable to
+> compromising guest security).
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+> [...]
 
-Because a preparation patch is upstream now:
-https://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson.g=
-it/commit/?h=3Dloongarch-next&id=3Df28abb9f96e65a28d46885afd6b70cfc4d5df5a2
+Successfully tested on v6.18-rc6:
 
-Huacai
+Tested-by: Mathias Krause <minipli@grsecurity.net>
 
-On Wed, Oct 15, 2025 at 4:25=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
->
->
-> On 2025/10/15 =E4=B8=8B=E5=8D=882:06, Song Gao wrote:
-> > Add cpu_has_msgint() to check whether the host cpu supported avec,
-> > and restore/save CSR_MSGIS0-CSR_MSGIS3.
-> >
-> > Signed-off-by: Song Gao <gaosong@loongson.cn>
-> > ---
-> >   arch/loongarch/include/asm/kvm_host.h |  4 ++++
-> >   arch/loongarch/include/asm/kvm_vcpu.h |  1 +
-> >   arch/loongarch/include/uapi/asm/kvm.h |  1 +
-> >   arch/loongarch/kvm/interrupt.c        | 15 +++++++++++++--
-> >   arch/loongarch/kvm/vcpu.c             | 19 +++++++++++++++++--
-> >   arch/loongarch/kvm/vm.c               |  4 ++++
-> >   6 files changed, 40 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inc=
-lude/asm/kvm_host.h
-> > index 0cecbd038bb3..827e204bdeb3 100644
-> > --- a/arch/loongarch/include/asm/kvm_host.h
-> > +++ b/arch/loongarch/include/asm/kvm_host.h
-> > @@ -283,6 +283,10 @@ static inline bool kvm_guest_has_lbt(struct kvm_vc=
-pu_arch *arch)
-> >       return arch->cpucfg[2] & (CPUCFG2_X86BT | CPUCFG2_ARMBT | CPUCFG2=
-_MIPSBT);
-> >   }
-> >
-> > +static inline bool cpu_has_msgint(void)
-> > +{
-> > +     return read_cpucfg(LOONGARCH_CPUCFG1) & CPUCFG1_MSGINT;
-> > +}
-> >   static inline bool kvm_guest_has_pmu(struct kvm_vcpu_arch *arch)
-> >   {
-> >       return arch->cpucfg[6] & CPUCFG6_PMP;
-> > diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/inc=
-lude/asm/kvm_vcpu.h
-> > index f1efd7cfbc20..3784ab4ccdb5 100644
-> > --- a/arch/loongarch/include/asm/kvm_vcpu.h
-> > +++ b/arch/loongarch/include/asm/kvm_vcpu.h
-> > @@ -15,6 +15,7 @@
-> >   #define CPU_PMU                             (_ULCAST_(1) << 10)
-> >   #define CPU_TIMER                   (_ULCAST_(1) << 11)
-> >   #define CPU_IPI                             (_ULCAST_(1) << 12)
-> > +#define CPU_AVEC                        (_ULCAST_(1) << 14)
-> >
-> >   /* Controlled by 0x52 guest exception VIP aligned to estat bit 5~12 *=
-/
-> >   #define CPU_IP0                             (_ULCAST_(1))
-> > diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/inc=
-lude/uapi/asm/kvm.h
-> > index 57ba1a563bb1..de6c3f18e40a 100644
-> > --- a/arch/loongarch/include/uapi/asm/kvm.h
-> > +++ b/arch/loongarch/include/uapi/asm/kvm.h
-> > @@ -104,6 +104,7 @@ struct kvm_fpu {
-> >   #define  KVM_LOONGARCH_VM_FEAT_PV_IPI               6
-> >   #define  KVM_LOONGARCH_VM_FEAT_PV_STEALTIME 7
-> >   #define  KVM_LOONGARCH_VM_FEAT_PTW          8
-> > +#define  KVM_LOONGARCH_VM_FEAT_MSGINT                9
-> >
-> >   /* Device Control API on vcpu fd */
-> >   #define KVM_LOONGARCH_VCPU_CPUCFG   0
-> > diff --git a/arch/loongarch/kvm/interrupt.c b/arch/loongarch/kvm/interr=
-upt.c
-> > index 8462083f0301..f586f421bc19 100644
-> > --- a/arch/loongarch/kvm/interrupt.c
-> > +++ b/arch/loongarch/kvm/interrupt.c
-> > @@ -21,6 +21,7 @@ static unsigned int priority_to_irq[EXCCODE_INT_NUM] =
-=3D {
-> >       [INT_HWI5]      =3D CPU_IP5,
-> >       [INT_HWI6]      =3D CPU_IP6,
-> >       [INT_HWI7]      =3D CPU_IP7,
-> > +     [INT_AVEC]      =3D CPU_AVEC,
-> >   };
-> >
-> >   static int kvm_irq_deliver(struct kvm_vcpu *vcpu, unsigned int priori=
-ty)
-> > @@ -31,6 +32,11 @@ static int kvm_irq_deliver(struct kvm_vcpu *vcpu, un=
-signed int priority)
-> >       if (priority < EXCCODE_INT_NUM)
-> >               irq =3D priority_to_irq[priority];
-> >
-> > +     if (cpu_has_msgint() && (priority =3D=3D INT_AVEC)) {
-> > +             set_gcsr_estat(irq);
-> > +             return 1;
-> > +     }
-> > +
-> >       switch (priority) {
-> >       case INT_TI:
-> >       case INT_IPI:
-> > @@ -58,6 +64,11 @@ static int kvm_irq_clear(struct kvm_vcpu *vcpu, unsi=
-gned int priority)
-> >       if (priority < EXCCODE_INT_NUM)
-> >               irq =3D priority_to_irq[priority];
-> >
-> > +     if (cpu_has_msgint() && (priority =3D=3D INT_AVEC)) {
-> > +             clear_gcsr_estat(irq);
-> > +             return 1;
-> > +     }
-> > +
-> >       switch (priority) {
-> >       case INT_TI:
-> >       case INT_IPI:
-> > @@ -83,10 +94,10 @@ void kvm_deliver_intr(struct kvm_vcpu *vcpu)
-> >       unsigned long *pending =3D &vcpu->arch.irq_pending;
-> >       unsigned long *pending_clr =3D &vcpu->arch.irq_clear;
-> >
-> > -     for_each_set_bit(priority, pending_clr, INT_IPI + 1)
-> > +     for_each_set_bit(priority, pending_clr, EXCCODE_INT_NUM)
-> >               kvm_irq_clear(vcpu, priority);
-> >
-> > -     for_each_set_bit(priority, pending, INT_IPI + 1)
-> > +     for_each_set_bit(priority, pending, EXCCODE_INT_NUM)
-> >               kvm_irq_deliver(vcpu, priority);
-> >   }
-> >
-> > diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> > index 30e3b089a596..226c735155be 100644
-> > --- a/arch/loongarch/kvm/vcpu.c
-> > +++ b/arch/loongarch/kvm/vcpu.c
-> > @@ -657,8 +657,7 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
-> >               *v =3D GENMASK(31, 0);
-> >               return 0;
-> >       case LOONGARCH_CPUCFG1:
-> > -             /* CPUCFG1_MSGINT is not supported by KVM */
-> > -             *v =3D GENMASK(25, 0);
-> > +             *v =3D GENMASK(26, 0);
-> >               return 0;
-> >       case LOONGARCH_CPUCFG2:
-> >               /* CPUCFG2 features unconditionally supported by KVM */
-> > @@ -726,6 +725,10 @@ static int kvm_check_cpucfg(int id, u64 val)
-> >               return -EINVAL;
-> >
-> >       switch (id) {
-> > +     case LOONGARCH_CPUCFG1:
-> > +             if ((val & CPUCFG1_MSGINT) && (!cpu_has_msgint()))
-> > +                     return -EINVAL;
-> > +             return 0;
-> >       case LOONGARCH_CPUCFG2:
-> >               if (!(val & CPUCFG2_LLFTP))
-> >                       /* Guests must have a constant timer */
-> > @@ -1658,6 +1661,12 @@ static int _kvm_vcpu_load(struct kvm_vcpu *vcpu,=
- int cpu)
-> >       kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
-> >       kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
-> >       kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_LLBCTL);
-> > +     if (cpu_has_msgint()) {
-> > +             kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR0);
-> > +             kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR1);
-> > +             kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR2);
-> > +             kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR3);
-> > +     }
-> >
-> >       /* Restore Root.GINTC from unused Guest.GINTC register */
-> >       write_csr_gintc(csr->csrs[LOONGARCH_CSR_GINTC]);
-> > @@ -1747,6 +1756,12 @@ static int _kvm_vcpu_put(struct kvm_vcpu *vcpu, =
-int cpu)
-> >       kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN1);
-> >       kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
-> >       kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
-> > +     if (cpu_has_msgint()) {
-> > +             kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR0);
-> > +             kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR1);
-> > +             kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR2);
-> > +             kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR3);
-> > +     }
-> >
-> >       vcpu->arch.aux_inuse |=3D KVM_LARCH_SWCSR_LATEST;
-> >
-> > diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
-> > index a49b1c1a3dd1..ec92e6f3cf92 100644
-> > --- a/arch/loongarch/kvm/vm.c
-> > +++ b/arch/loongarch/kvm/vm.c
-> > @@ -150,6 +150,10 @@ static int kvm_vm_feature_has_attr(struct kvm *kvm=
-, struct kvm_device_attr *attr
-> >               if (cpu_has_ptw)
-> >                       return 0;
-> >               return -ENXIO;
-> > +     case KVM_LOONGARCH_VM_FEAT_MSGINT:
-> > +             if (cpu_has_msgint())
-> > +                     return 0;
-> > +             return -ENXIO;
-> >       default:
-> >               return -ENXIO;
-> >       }
-> >
-> > base-commit: 9b332cece987ee1790b2ed4c989e28162fa47860
-> >
-> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
->
->
+Thanks,
+Mathias
 
