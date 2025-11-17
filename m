@@ -1,549 +1,281 @@
-Return-Path: <kvm+bounces-63400-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63404-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 638A2C6596C
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:46:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 682EBC65A5E
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 19:02:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9E4BD350E80
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 17:35:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8D8BB4E9462
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 18:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9913112BD;
-	Mon, 17 Nov 2025 17:34:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8612D6E6A;
+	Mon, 17 Nov 2025 18:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AksLsWzF"
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="ioltG/OS";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="No0YbZ+V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3659030EF76;
-	Mon, 17 Nov 2025 17:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763400875; cv=none; b=FZoMqMkkn5UC4iU7BEei36Aez7MRf/nNZ15MDG+QW+yzymMLWmUWOs/HK404oZ4I4nFlN5CpYpPhG7Q5QY8iwQ+Fv/0C5dlXL1jV6LGEur7LYkWaVgLITbLLlc7rf18v57mPUyavjJ3UkoGvi4mG11daF9SNGj7qSyDK1vV6oL8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763400875; c=relaxed/simple;
-	bh=oeTn00A7A4orN8LyUXiqAvW9aE1W8uyYgcBTVb8y/qA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CP4lN3WxItMgoUigOJCSXaGYIsJ+ImC8nlAAq4ux52cNUKZWIpCjEFHpoe2Rl/aGNnfSBAkd56wGI+vdoEGPGqx+ra3ZUKFOVZYUBSlMi7VTpnR3uyeYvJ+qG2VfJSIZ0uiRSCp3dXgN+6qJEnrbp/L5ONSyDg3CkBWnu2mEFF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AksLsWzF; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763400872; x=1794936872;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=oeTn00A7A4orN8LyUXiqAvW9aE1W8uyYgcBTVb8y/qA=;
-  b=AksLsWzFkCBYE3a9UYSeBuI/eQ6KdGm3snzeseOIgaSe+S8xLrrKYVjv
-   E9xQ7PABZR62zhvY1G1iWy5IHRcIDWAxif3J764kE1D/30FThmR7iVmOA
-   CzuTIUHN81+Qa7UK2QWo0RSqEDOSaBaVoNn0N5vrUhoP9q11A/YoskXVX
-   Kk95/zveGCpSzmJLDgyg3hM5EtLXHV3PKWkVRXmJmPzopCjLXR2uLwu8M
-   8sSRzNMIlTRqnljdWqNbEHuNEMAIQycypztwdR6MYKrFZb0GywoOquHde
-   s70hdAfWFw5lBAh+OHKrJS1zH6ZaF+olP7pB37AzolavOlenFeNkM/uf3
-   A==;
-X-CSE-ConnectionGUID: +DSRdRO0T3OZHaZ++egvLw==
-X-CSE-MsgGUID: zFWmAOfOR/e7Sjp5KrOCjw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="65447774"
-X-IronPort-AV: E=Sophos;i="6.19,312,1754982000"; 
-   d="scan'208";a="65447774"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 09:34:32 -0800
-X-CSE-ConnectionGUID: QC+PLg5rTZa5PIalvlKOvg==
-X-CSE-MsgGUID: U1rE4C1sRvWNj9E8w3kemg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,312,1754982000"; 
-   d="scan'208";a="213905629"
-Received: from aschofie-mobl2.amr.corp.intel.com (HELO [10.125.109.33]) ([10.125.109.33])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 09:34:31 -0800
-Message-ID: <cfcfb160-fcd2-4a75-9639-5f7f0894d14b@intel.com>
-Date: Mon, 17 Nov 2025 09:34:30 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6FA19005E;
+	Mon, 17 Nov 2025 18:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.151.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763402481; cv=fail; b=swfI4ya5HDSX2wzNmNkiEScMlZcPcQYz72E0zIqeZ73HBxZowuS1R1f5T5Z5RNxH/WvcvcjN8GPexPLs0AAn2IoFCH++fq9Wnfq8aoje4eQrcEo77n1z46oavzcrBOiOe8SaEyi4d5iW7iWsoH5tokow/PJ5i3Yws9hRNOxgll8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763402481; c=relaxed/simple;
+	bh=vNlld6GWqYXhTRG6GWmLdQHIDN2PrV/9yqJFmJXWtWc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=iOoAkcqhl88b58IUL9RsoLWDMpUNLovGdie90mApzCvTKEI2qqnG1Io9k5+jDTAV7kyZNlC+Bx+6TJmpvTmA2uQYHtqI86CXGZupcSQI8HbAfVFfbPbNTusTsZyR+4OIaHlaetoNbDIFe6TXstclxYqzxKuQcHr6BSQp/bp/NEQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=ioltG/OS; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=No0YbZ+V; arc=fail smtp.client-ip=148.163.151.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
+Received: from pps.filterd (m0127837.ppops.net [127.0.0.1])
+	by mx0a-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AHAhbeu456137;
+	Mon, 17 Nov 2025 09:34:58 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
+	cc:content-id:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	proofpoint20171006; bh=vNlld6GWqYXhTRG6GWmLdQHIDN2PrV/9yqJFmJXWt
+	Wc=; b=ioltG/OSjsEH+joGr+AN+epVYW3+BGEkvzri8UFYTus66pQGmG+U4yyAH
+	WEK9WRcsbg/1R1xqSvFceHOoWTlwzzxyjOdDuYf0K/7ihI71JR2X0et/lEjgDK4K
+	2Lvxw8SFd/IBg/JxrBI5Ewqp9gyuJuPhRttQG6XWq+m3VAS9XowByfHGTBBsMMs4
+	yMxmGf0/LfMU0JMZ1BC1RbbnKqllHmWeM0Fbw68z0IZYs4cyOya9uMzdtXZniH2u
+	9MUcLdd5/iQIfOpm/oFkiuVGSRx5FO7Qb8NiKjbxLfyJgWR/Ph2KXU196zs8iB0T
+	DH0boMKm3WSZzIWiKdlUH4mf9Heqw==
+Received: from ph8pr06cu001.outbound.protection.outlook.com (mail-westus3azon11022114.outbound.protection.outlook.com [40.107.209.114])
+	by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 4aepa8kxgv-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 17 Nov 2025 09:34:57 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XRS5Bd1LWCa+DtqcdIDhLDdVz0SRtNvH+2rpaVOGg5mhbLVX5b9AJZwAdzRO3oE3oywGK+q9t16ajBd/7YkYL3WKVDEqXCxcD9RZTE9DHOrgIol6mDT3txvtVlymR1N5FmZIvlcPz81aoe/LPGmV0BF0E9OEPnriRjDrpCPlTD8h9uWH7YKlYVOveBkqvwNwyJ8A+6WDEgTbDhbnRXGvhiPHEC6SZY5rxtl7BI5DdTvaIO7R+YCLYfRMVkYb6WcxHqw1FKRyeXFqO2xswWpe3bgJshh+YvFa1Y+GF8tXiTw7UKDlrkvGuphSkyoyzQA32FwWKU3hCO4qCf94I0cZsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vNlld6GWqYXhTRG6GWmLdQHIDN2PrV/9yqJFmJXWtWc=;
+ b=r5KWafTYbIYqgnXWQQWMwfGkrYJHEFT12mwk4CgMhh17nfXKMMx7hUYodFcA8pUQbfUcRsM9sGwoAQ4a7SAvuPXsMsDbN+nPtXWpqfzCIOm34FLLNVnNoHYbDfZtlAD6v6yq7vB+tN9LO6TzX9V7QHhU4yM/zFS+FpS6LsZ7X+SGneSbwtqu+M+sO+8XaeDgCiIs+TXOS8GcKDFVR9miZiB66+EJQoMrVPNkq5c9rKlbc5Cl1MXSykfUy9SSqhJjO4LL8IcpOqk0L47eG1lLUOcZmAr84KAzpAw65/O7gFP2qUTkPmZpXaqsPYdHKfNzl9ivrSOCpzcJ+Wk6xo7gpw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vNlld6GWqYXhTRG6GWmLdQHIDN2PrV/9yqJFmJXWtWc=;
+ b=No0YbZ+V4XQswXsoqAmEqxTgbfWq0LI/bArqxS0MWou6doViOw97ScXisqYkcaIbb9wNYOKzUhHdiGWF0zOS4EXjOgQph/QNP+v9EOYBQ/t/MKJ90zPMpyAB2cHFgXw5xG0Av9wtBg4nnXZipA0C+U6cUQFF8JTvgeTYrW9ZucZJuNH06QpDONABAa6EbvFUYbprdIuZ2tX7MZaO/Q9tqaR0fBo53+07CMRjZKzimKO9G43g/TNfdAjtmkhiEMYwQt7WscsKptpZ9o+skIXQy/XrGt2K1+thCf/COuSb2A4gEStP9qAhwt1k1b/Pj0Ym0OdcEJdR/RHMi4qJtzeVLg==
+Received: from LV0PR02MB11133.namprd02.prod.outlook.com
+ (2603:10b6:408:333::18) by IA0PR02MB9898.namprd02.prod.outlook.com
+ (2603:10b6:208:48c::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.22; Mon, 17 Nov
+ 2025 17:34:55 +0000
+Received: from LV0PR02MB11133.namprd02.prod.outlook.com
+ ([fe80::10e5:8031:1b1b:b2dc]) by LV0PR02MB11133.namprd02.prod.outlook.com
+ ([fe80::10e5:8031:1b1b:b2dc%4]) with mapi id 15.20.9320.019; Mon, 17 Nov 2025
+ 17:34:55 +0000
+From: Jon Kohler <jon@nutanix.com>
+To: Jason Wang <jasowang@redhat.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>,
+        =?utf-8?B?RXVnZW5pbyBQw6lyZXo=?=
+	<eperezma@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linus Torvalds
+	<torvalds@linux-foundation.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Sean
+ Christopherson <seanjc@google.com>
+Subject: Re: [PATCH net-next] vhost: use "checked" versions of get_user() and
+ put_user()
+Thread-Topic: [PATCH net-next] vhost: use "checked" versions of get_user() and
+ put_user()
+Thread-Index: AQHcVDJryQXjlObInEG9J4YkYYZKUbTvzAyAgAJ4RQCABAmigIAA2pWA
+Date: Mon, 17 Nov 2025 17:34:55 +0000
+Message-ID: <A0AFD371-1FA3-48F7-A259-6503A6F052E5@nutanix.com>
+References: <20251113005529.2494066-1-jon@nutanix.com>
+ <CACGkMEtQZ3M-sERT2P8WV=82BuXCbBHeJX+zgxx+9X7OUTqi4g@mail.gmail.com>
+ <E1226897-C6D1-439C-AB3B-012F8C4A72DF@nutanix.com>
+ <CACGkMEuPK4=Tf3x-k0ZHY1rqL=2rg60-qdON8UJmQZTqpUryTQ@mail.gmail.com>
+In-Reply-To:
+ <CACGkMEuPK4=Tf3x-k0ZHY1rqL=2rg60-qdON8UJmQZTqpUryTQ@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: Apple Mail (2.3826.700.81)
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV0PR02MB11133:EE_|IA0PR02MB9898:EE_
+x-ms-office365-filtering-correlation-id: 849275d4-f59c-42c6-7747-08de25ff9f79
+x-proofpoint-crosstenant: true
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|10070799003|1800799024|366016|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?bmxnbGpQRW9vajNSR1l2RnBUbjdoQnEva1M2Z0JJa05nY1B3SnBlOG1HcFRT?=
+ =?utf-8?B?SjRjaDFONEhiSlZvNENPS045MUlCb1pLYXpPLzYxdi9zRXZOYy9DV1RSUnRV?=
+ =?utf-8?B?Y25qaWcySWExNEozN0FEUXQyOEYzQ0QvZ3RkSUNwN3ZPb3BtL0N0dmorazZE?=
+ =?utf-8?B?dGNFbk5lTW5mWnppaXhLK3JsS1hMNGIyTm0wYUNLbThDUEtlUm04UExMYjNC?=
+ =?utf-8?B?dEFLUzA4cHBaYUwwc2UxWHV5VkQ5cklLWTlOcC9VamhiUXlIN2FDTXhyZ2Ny?=
+ =?utf-8?B?ZXpkR1Y3VjlaVU80WXFlQkszME1kdGQ5bDZFbjZMWjlaVHlnaFo0TG5zUlYv?=
+ =?utf-8?B?YnVKQXJBYVN3aW9USlo0VHZPaXk2RUtJYTIyRkpSWEcvekNabzRBRExydGk1?=
+ =?utf-8?B?WDNTcmJBS1lVV1hkYmtOenkyZHpjbStUYlB1eW9JMTY4STd5VTlkdU5sWFZF?=
+ =?utf-8?B?SHRQaVZNNi9HeWpRWFRneXZQWVJTWExzTEs3M1lnb1VVR0pibE5Kb2NpbWdk?=
+ =?utf-8?B?TGU4MkV6U1locnZTbWdEblUvK1JWOWI0eUQ3VldTVHE3cnhLaW5PSm4zK2hQ?=
+ =?utf-8?B?OTNPbjRRcWJPS0c3aStHdmwzblM1WjVFL01EaUh6cGhONGJHYVJnSytHQ2Fw?=
+ =?utf-8?B?UXl5d0tQTEFVbngwR3pwaVNYTUVnb21sYTFSOGR2UTYxTkg3K0xLNnRZa0FT?=
+ =?utf-8?B?TEFXbjRVWU9tNmFmM1AwREYxSzBRakxYazl1NUp6ZHlMUUltVDQ5TmZrcXRS?=
+ =?utf-8?B?QmNvS0VmWXd6ZEIxcUhjOUUrZTI4Y1A0Y0hBNldhUU1iWVp0ak0zYjVXbllW?=
+ =?utf-8?B?c1BmZGRDQ0ErZFQ3MXNuYXlMMjNNUlRSVG5laGxJNXBpaFAvVVUzT1JxTjhl?=
+ =?utf-8?B?VkF6K0xGd2t2Tm5sN1l5RVhkMUFTWHZJUUkvbW5kK0YzdkpaTjRDcUViOUJq?=
+ =?utf-8?B?STFIYkIvTnFadWRqTnhWcmRQdXJrdytVdzNYK1d5V2ZpK0l0TnR2T3NZeDhW?=
+ =?utf-8?B?YjlJUDhkaUdGRTE3NXd0ZGhsZHM5aUxSWU0xRlRyU3BsUGFMeGEvSzhNS0Rs?=
+ =?utf-8?B?VGEwVm1udWdFOFFiZUg2MzJOYzBzdVRaeVk5aFJnNWlvUFdEajZFRXVXZ2pt?=
+ =?utf-8?B?TWpGVlMvMDE3NSs1SHFkb2FKNkd4TVV0c2lKREJlUUY2cWs4TUhKNTdnTk9n?=
+ =?utf-8?B?TUpiTVF3dmpZazM2OG8wbStHcDlZdy9lc3NveitYdTc1VUh3ODBzV3hmck0x?=
+ =?utf-8?B?aFl2NUtmVXFGYlh1SFB6L0owSXliTnZzVjV4OGxsZU1TNnB2amJ0T0syNCtT?=
+ =?utf-8?B?VnF1L3RtQTBnd2pTWFdzaC9uL3ZXQVFWWGl4YUpGdmlMRmhJUFFESHZBMk4x?=
+ =?utf-8?B?enN1L1ZuU2p6RG1CNDJNRVI0eWcrdVRRQVY3cDJKS3lwU2diMmpUQVhDcVJv?=
+ =?utf-8?B?ZHJ4RG1hcFZTWjJoTUZIYmJMc1JEd0prK25UM3VQeW5lcFNQZ2x0bEx2Ym8y?=
+ =?utf-8?B?Q080RERBUUlVRFlzVlFCTlZBNHpSenBBUEU3VDlETFVCT1lJcDlWeTdLeGFB?=
+ =?utf-8?B?YURlOU9UV2ptcXJkZjNESCtjWXNLUjZTaDhTMWtRMVVlRnhpZGNSeXNtRUwv?=
+ =?utf-8?B?OUhhazZnWCtiTTNMcHpBQ0VVZDdxdlk5Q3UxVDlleUVxTGNMVVRkeTRYb0lF?=
+ =?utf-8?B?cXhOZSs5QkcvNnFzS3NhY0o1NFVNT3ZHSkVRNlB3K1IraklBenliU29manMx?=
+ =?utf-8?B?dFhZNWtXeHRIMGp5MUc0bVZwS0c3bVp6S3oyWmVCRFQ3SGFBeVU4T2pxUlIv?=
+ =?utf-8?B?Q3Vqc0srTDJOTFAvUGRjSjhCZXh1RjZRazgyOHdOSk1BZDdSZE5JZVEzTjdn?=
+ =?utf-8?B?NzB5WkFNSVRBNEd2VGxFVmRlMXV2MER3dE5LZkl5T25tYjAzczNhd0ZnZ3VC?=
+ =?utf-8?B?YUcrc3B3UkllVTJnbWdyUDNySTFPNmxPM3JjajZ1VVhBQ20vS1ljNCtzN2Rh?=
+ =?utf-8?B?eUNoaG5IckdjTytvY0xHc1EwU3FYcDFja2F4MC8zVzFnOWFjdzFiUnhzUjVq?=
+ =?utf-8?Q?WvTkBV?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV0PR02MB11133.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(10070799003)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?LzdPSmdIcnFGTmxHQ0I3Q0NUU0U3SW1SbWErQ1Jlc24zdXVod3RkYkRvcHQz?=
+ =?utf-8?B?ZWF5THo2bG5pTzQyYWFZNkVtQWFpeGlzTGpURk5aVVp4NjJVdDZhVjBGMjN6?=
+ =?utf-8?B?S0VyRVp5bWs4MldqeW1xUUFkTzZLdk9NVnFTd2FPTkdTSGUxeGZpR3RJb3hM?=
+ =?utf-8?B?RVVrYXJyREhCK1JiYXVsTHBZb0MwbXBHS3Z2dm54anNCRDR5YmN4R3U1VXBk?=
+ =?utf-8?B?U1g5SnFmODdRQzNRTTV0QW5RenhybjFONktoc0V0VEFheVRRMGNJbDUxRFVU?=
+ =?utf-8?B?Qm5wWDZDWFRMNC9zeGh1NmYzNGZCR3NsSXhtTDdadXhUQ1BPRm9xeWFzV0FQ?=
+ =?utf-8?B?RzRnajJFQXdkQ29DQWx1TS8zVVdyMjBWMHlHL1E5M0tCTTlieDVSVTJsZ0xQ?=
+ =?utf-8?B?TDZhUGp2Sm1rMk5IZGxtTjZKUTlFQ3FvSVBFWU8yRjRGYlpMK2dJTm5xTDFR?=
+ =?utf-8?B?SERCNWowZ0Q5NkJkSnltdEZzekZnVUpYN1JZVzg3MkF3MkpPYjJxbEticC9R?=
+ =?utf-8?B?aU5tcy90bmNCU3hTWmNkMmVXTVh6ejZoM1d5L0FqTnRLalZ4OTdVNjhWS3dH?=
+ =?utf-8?B?T2FhcG9tUEFDZ201S1ZWSTNkdDFSTHhJckxmQVEzQU51VWZHZCtDNzBlUnd6?=
+ =?utf-8?B?aTAwekthRFJ3cGhBemNoVlUyVVZxcHh4eXNDanJrR1VwaWQ3MEpOQTNyeStt?=
+ =?utf-8?B?dkR3MHZPc3dyTDJ1ckFTamZ2bVB5NFE4ZE1wTUFOc3FKNGl2T0VFZzVUdXIr?=
+ =?utf-8?B?LzhBVlJUK1pPNTNVRjBwL3dreEhaeXZwWGFmaHl6LzFWOGFUNUdrNnc5Q0V4?=
+ =?utf-8?B?ZWFqWTMwQ0xKVGZ0ZWpHblhvbGkzT2pZcUpiNXlIK1laOFg1R09YVEViZ1Yy?=
+ =?utf-8?B?cDlNN0YzYW54aXlnMzFNZzhsbys1UUh6RERhR2NieTZxZktoaGlvMnVHRW5u?=
+ =?utf-8?B?QlJoSmsvSlVUTlJOQW9VbmhMV2pxU0hJQ3ZIWWxkWFJ6RDhTVmxHeUcxUjZk?=
+ =?utf-8?B?VktxM3JiWUwvbzdKdXdMNmIxRExmOFJQSi9CZFJtb1JzWTRFMWZxWXcxWGFz?=
+ =?utf-8?B?SHF1RlNvYzhnYWNmM1NpeGhmODh0Rnl2OS9UNkg3L3J0MXBHai9XRTdDamYr?=
+ =?utf-8?B?SFFmQjJoZ09ybXFxeGFqczdwQ0pYTXcrNlU0NnROZmVIR0hsSUpXSnZkc05O?=
+ =?utf-8?B?WlFsY2Fmay9Dbm50d3JUaE5CQXVrZmgyTWJDR3NNOXdEZDc5TEl6a0xDT1JT?=
+ =?utf-8?B?bkt0WDZQZjZLVmJrcmZHZkZBajFQZmtUNFpTMGg0eG1KcDladitGVUlqWEJO?=
+ =?utf-8?B?WTJSTWhoMERvWWllS1NTaXJaR1V1WEdKeDFraHkxMVNoVFJQNVh5Z0NLVFBm?=
+ =?utf-8?B?bWlMVC9mR1NEV3V0S0JOaVJmNjlzaktRcGlxVDhtUVM5OTBBU3BySlhsVkE3?=
+ =?utf-8?B?dWZ0L3J0MkxZQU5DOHUxckhCWGlYbEdLM1h5SytmRGV1eFRpazJhb0dHNkI4?=
+ =?utf-8?B?Y1VhQUF0d1hPNnNFS21BVHFnZEhteC9MRDZJcW15U1lqSzF4Y05MTTNvdWpt?=
+ =?utf-8?B?YTlLOEVGUjBDckgvOWNIaE5icmN5NnNTeHlZV0tHdmNvSTZyWVRHeU9WWVRi?=
+ =?utf-8?B?RmcxT0ZUQjRGaGt1V3JLWE1IREpnTi9XNlhVL3ZiYmYxb2ZacXl3QXY5MTdK?=
+ =?utf-8?B?MGl4cDB0aTRoREs5ZlNjeTBVRjB4YWlLVTVkQW9CeTIwUUhZN0hodFpUbmR3?=
+ =?utf-8?B?cTI0TDJwUm0yblMyUkVkZVQ0ak5YempIUnlDc1BCb1FmTnkyU3hlbWpLNy9B?=
+ =?utf-8?B?ejhEYUFhTU45SmtPUVE2MVhEOWpyR0hTYnFQaEZuVnZuZTR5RDZxME1saDFr?=
+ =?utf-8?B?V2tRM2FIRmlGUE5xN09xanBhakYzRWt4THNQNnBubGlEOGozQXlUZHBXcTcv?=
+ =?utf-8?B?SFAvbXNkU004b3ppaGo4ci9wQnUxOVVRTk1xdWhMZTlNTGVKNWJ5QkwrWmF4?=
+ =?utf-8?B?QW9DNzhHQ21Ccytvem1OMkNqL2dtUllWZC9vQ0VaZWtnY3owNDFKY0d1bmNB?=
+ =?utf-8?B?YzRDR0R2Z2V3T3FnZ2NJOHRjUFZJclJlR2Q2d0RuWUFuTFI2U2FUelQzVjhV?=
+ =?utf-8?B?Z2x5QWJlMitmSmNnd0xveGsrSFFTakdxNDlqRFdtZlBiUzBDa1RKSUhFdDFz?=
+ =?utf-8?B?K3N5Wm5BWVpjeFUvYmpsb2NFM3dSa2FuWFNiSm9IUnF4Qkp3TGdTbk5BK05y?=
+ =?utf-8?B?MHVCUjBkRjNuZUhmVndBMXE2MTR3PT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <56DB871389AF284A83E7DE9AADC9795B@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 08/26] x86/virt/tdx: Add tdx_enable_ext() to enable of
- TDX Module Extensions
-To: Xu Yilun <yilun.xu@linux.intel.com>, linux-coco@lists.linux.dev,
- linux-pci@vger.kernel.org
-Cc: chao.gao@intel.com, dave.jiang@intel.com, baolu.lu@linux.intel.com,
- yilun.xu@intel.com, zhenzhong.duan@intel.com, kvm@vger.kernel.org,
- rick.p.edgecombe@intel.com, dave.hansen@linux.intel.com,
- dan.j.williams@intel.com, kas@kernel.org, x86@kernel.org
-References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
- <20251117022311.2443900-9-yilun.xu@linux.intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20251117022311.2443900-9-yilun.xu@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV0PR02MB11133.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 849275d4-f59c-42c6-7747-08de25ff9f79
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Nov 2025 17:34:55.5074
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: u+FTNTRzmD5mrnliYA0P5gnYlR2V06ALkCELXMLS3HZWHOo140rmzVkPba0SJSeXA4ktk00G9h1pzlKpCEOtPCSFyw81MXftGpnE9F5tLe4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR02MB9898
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE3MDE0OSBTYWx0ZWRfX++49tQ7gzI2G
+ JPWXRTHi7Dljechb9LwyLwv0N6HbjZRGr5CwP1b0e5pOQfKVBJS9z36EU7Afd/CHCUryKvbZk3a
+ dNycT0IByL8Ht8AQlRVJJA2ZHKXyrOK9+DyUg/iU/app8nTB3b0NBrY151lhhW7I1P8rdQxfZ5O
+ SQ8wjUhQBNV62FnJ+bnWJLW9QqeTcnCXw03mzQDkRE0+kRSnUOtdW9JZgMp7zHpFck3rkDmxzhB
+ TWBiwr4Zb5vRsrQxXmcsmSY5iYK3ytOS6t0JZ+fzNLY3Tdqyf9na2PlPWMcKMRUbfftYBeFlecE
+ 8EMJVvymEWaLTOEZrmzmulCQ/Qqw13luuqw0rGO5AtutQZNto3s1ssdq98yTkwFthzzxSfTJzuL
+ DMiIk5AU1vTJqT5Py3MZpgDjwkgdPQ==
+X-Proofpoint-ORIG-GUID: -b3ksOTk4MM_8NWOhX4HoDjXhTAf_h4_
+X-Authority-Analysis: v=2.4 cv=PaPyRyhd c=1 sm=1 tr=0 ts=691b5cc1 cx=c_pps
+ a=4EVvFC7fyiOjnGrcsbJlsg==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=6UeiqGixMTsA:10 a=0kUYKlekyDsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=20KFwNOVAAAA:8 a=64Cc0HZtAAAA:8 a=BtCJtR0DzrmPStnaoQcA:9 a=QEXdDO2ut3YA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: -b3ksOTk4MM_8NWOhX4HoDjXhTAf_h4_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-17_03,2025-11-13_02,2025-10-01_01
+X-Proofpoint-Spam-Reason: safe
 
-I really dislike subjects like this. I honestly don't need to know what
-the function's name is. The _rest_ of the subject is just words that
-don't tell me _anything_ about what this patch does.
-
-In this case, I suspect it's because the patch is doing about 15
-discrete things and it's impossible to write a subject that's anything
-other than some form of:
-
-	x86/virt/tdx: Implement $FOO by making miscellaneous changes
-
-So it's a symptom of the real disease.
-
-On 11/16/25 18:22, Xu Yilun wrote:
-> From: Zhenzhong Duan <zhenzhong.duan@intel.com>
-> 
-> Add a kAPI tdx_enable_ext() for kernel to enable TDX Module Extensions
-> after basic TDX Module initialization.
-> 
-> The extension initialization uses the new TDH.EXT.MEM.ADD and
-> TDX.EXT.INIT seamcalls. TDH.EXT.MEM.ADD add pages to a shared memory
-> pool for extensions to consume.
-
-"Shared memory" is an exceedingly unfortunate term to use here. They're
-TDX private memory, right?
-
-> The number of pages required is
-> published in the MEMORY_POOL_REQUIRED_PAGES field from TDH.SYS.RD. Then
-> on TDX.EXT.INIT, the extensions consume from the pool and initialize.
-
-This all seems backwards to me. I don't need to read the ABI names in
-the changelog. I *REALLY* don't need to read the TDX documentation names
-for them. If *ANYTHING* these names should be trivialy mappable to the
-patch that sits below this changelog. They're not.
-
-This changelog _should_ begin:
-
-	Currently, TDX module memory use is relatively static. But, some
-	new features (called "TDX Module Extensions") need to use memory
-	more dynamically.
-
-How much memory does this consume?
-
-> TDH.EXT.MEM.ADD is the first user of tdx_page_array. It provides pages
-> to TDX Module as control (private) pages. A tdx_clflush_page_array()
-> helper is introduced to flush shared cache before SEAMCALL, to avoid
-> shared cache write back damages these private pages.
-
-First, this talks about "control pages". But I don't know what a control
-page is.
-
-Second, these all need to be in imperative voice. Not:
-
-	It provides pages to TDX Module as control (private) pages.
-
-Do this:
-
-	Provide pages to TDX Module as control (private) pages.
-
-> TDH.EXT.MEM.ADD uses HPA_LIST_INFO as parameter so could leverage the
-> 'first_entry' field to simplify the interrupted - retry flow. Host
-> don't have to care about partial page adding and 'first_entry'.
-> 
-> Use a new version TDH.SYS.CONFIG for VMM to tell TDX Module which
-> optional features (e.g. TDX Connect, and selecting TDX Connect implies
-> selecting TDX Module Extensions) to use and let TDX Module update its
-> global metadata (e.g. memory_pool_required_pages for TDX Module
-> Extensions). So after calling this new version TDH.SYS.CONFIG, VMM
-> updates the cached tdx_sysinfo.
-> 
-> Note that this extension initialization does not impact existing
-> in-flight SEAMCALLs that are not implemented by the extension. So only
-> the first user of an extension-seamcall needs invoke this helper.
-
-Ahh, so this is another bit of very useful information buried deep in
-this changelog.
-
-Extensions consume memory, but they're *optional*.
-
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index 3a3ea3fa04f2..1eeb77a6790a 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -125,11 +125,13 @@ static __always_inline u64 sc_retry(sc_func_t func, u64 fn,
->  #define seamcall(_fn, _args)		sc_retry(__seamcall, (_fn), (_args))
->  #define seamcall_ret(_fn, _args)	sc_retry(__seamcall_ret, (_fn), (_args))
->  #define seamcall_saved_ret(_fn, _args)	sc_retry(__seamcall_saved_ret, (_fn), (_args))
-> +int tdx_enable_ext(void);
->  const char *tdx_dump_mce_info(struct mce *m);
->  
->  /* Bit definitions of TDX_FEATURES0 metadata field */
->  #define TDX_FEATURES0_TDXCONNECT	BIT_ULL(6)
->  #define TDX_FEATURES0_NO_RBP_MOD	BIT_ULL(18)
-> +#define TDX_FEATURES0_EXT		BIT_ULL(39)
->  
->  const struct tdx_sys_info *tdx_get_sysinfo(void);
->  
-> @@ -223,6 +225,7 @@ u64 tdh_phymem_page_wbinvd_tdr(struct tdx_td *td);
->  u64 tdh_phymem_page_wbinvd_hkid(u64 hkid, struct page *page);
->  #else
->  static inline void tdx_init(void) { }
-> +static inline int tdx_enable_ext(void) { return -ENODEV; }
->  static inline u32 tdx_get_nr_guest_keyids(void) { return 0; }
->  static inline const char *tdx_dump_mce_info(struct mce *m) { return NULL; }
->  static inline const struct tdx_sys_info *tdx_get_sysinfo(void) { return NULL; }
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-> index 4370d3d177f6..b84678165d00 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.h
-> +++ b/arch/x86/virt/vmx/tdx/tdx.h
-> @@ -46,6 +46,8 @@
->  #define TDH_PHYMEM_PAGE_WBINVD		41
->  #define TDH_VP_WR			43
->  #define TDH_SYS_CONFIG			45
-> +#define TDH_EXT_INIT			60
-> +#define TDH_EXT_MEM_ADD			61
->  
->  /*
->   * SEAMCALL leaf:
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 9a5c32dc1767..bbf93cad5bf2 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -59,6 +59,9 @@ static LIST_HEAD(tdx_memlist);
->  static struct tdx_sys_info tdx_sysinfo __ro_after_init;
->  static bool tdx_module_initialized __ro_after_init;
->  
-> +static DEFINE_MUTEX(tdx_module_ext_lock);
-> +static bool tdx_module_ext_initialized;
-> +
->  typedef void (*sc_err_func_t)(u64 fn, u64 err, struct tdx_module_args *args);
->  
->  static inline void seamcall_err(u64 fn, u64 err, struct tdx_module_args *args)
-> @@ -517,7 +520,7 @@ EXPORT_SYMBOL_GPL(tdx_page_array_ctrl_release);
->  #define HPA_LIST_INFO_PFN		GENMASK_U64(51, 12)
->  #define HPA_LIST_INFO_LAST_ENTRY	GENMASK_U64(63, 55)
->  
-> -static u64 __maybe_unused hpa_list_info_assign_raw(struct tdx_page_array *array)
-> +static u64 hpa_list_info_assign_raw(struct tdx_page_array *array)
->  {
->  	return FIELD_PREP(HPA_LIST_INFO_FIRST_ENTRY, 0) |
->  	       FIELD_PREP(HPA_LIST_INFO_PFN, page_to_pfn(array->root)) |
-> @@ -1251,7 +1254,14 @@ static __init int config_tdx_module(struct tdmr_info_list *tdmr_list,
->  	args.rcx = __pa(tdmr_pa_array);
->  	args.rdx = tdmr_list->nr_consumed_tdmrs;
->  	args.r8 = global_keyid;
-> -	ret = seamcall_prerr(TDH_SYS_CONFIG, &args);
-> +
-> +	if (tdx_sysinfo.features.tdx_features0 & TDX_FEATURES0_TDXCONNECT) {
-> +		args.r9 |= TDX_FEATURES0_TDXCONNECT;
-> +		args.r11 = ktime_get_real_seconds();
-> +		ret = seamcall_prerr(TDH_SYS_CONFIG | (1ULL << TDX_VERSION_SHIFT), &args);
-> +	} else {
-> +		ret = seamcall_prerr(TDH_SYS_CONFIG, &args);
-> +	}
-
-I'm in the first actual hunk of code and I'm lost. I don't have any idea
-what the "(1ULL << TDX_VERSION_SHIFT)" is doing.
-
-Also, bifurcating code paths is discouraged. It's much better to not
-copy and paste the code and instead name your variables and change
-*them* in a single path:
-
-    u64 module_function = TDH_SYS_CONFIG;
-    u64 features = 0;
-    u64 timestamp = 0;
-
-    if (tdx_sysinfo.features.tdx_features0 & TDX_FEATURES0_TDXCONNECT) {
-	features |= TDX_FEATURES0_TDXCONNECT;
-	timestamp = ktime_get_real_seconds();
-	module_function |= 1ULL << TDX_VERSION_SHIFT;
-    }
-
-    ret = seamcall_prerr(module_function, &args);
-
-This would also provide a place to say what the heck is going on with
-the whole "(1ULL << TDX_VERSION_SHIFT)" thing. Just hacking it in and
-open-coding makes it actually harder to comment and describe it.
-
->  	/* Free the array as it is not required anymore. */
->  	kfree(tdmr_pa_array);
-> @@ -1411,6 +1421,11 @@ static __init int init_tdx_module(void)
->  	if (ret)
->  		goto err_free_pamts;
->  
-> +	/* configuration to tdx module may change tdx_sysinfo, update it */
-> +	ret = get_tdx_sys_info(&tdx_sysinfo);
-> +	if (ret)
-> +		goto err_reset_pamts;
-> +
->  	/* Config the key of global KeyID on all packages */
->  	ret = config_global_keyid();
->  	if (ret)
-> @@ -1488,6 +1503,160 @@ static __init int tdx_enable(void)
->  }
->  subsys_initcall(tdx_enable);
->  
-> +static int enable_tdx_ext(void)
-> +{
-
-Comments, please. "ext" can mean too many things. What does this do and
-why can it fail?
-
-> +	struct tdx_module_args args = {};
-> +	u64 r;
-> +
-> +	if (!tdx_sysinfo.ext.ext_required)
-> +		return 0;
-
-Is this an optimization or is it functionally required?
-
-> +	do {
-> +		r = seamcall(TDH_EXT_INIT, &args);
-> +		cond_resched();
-> +	} while (r == TDX_INTERRUPTED_RESUMABLE);
-> +
-> +	if (r != TDX_SUCCESS)
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
-> +static void tdx_ext_mempool_free(struct tdx_page_array *mempool)
-> +{
-> +	/*
-> +	 * Some pages may have been touched by the TDX module.
-> +	 * Flush cache before returning these pages to kernel.
-> +	 */
-> +	wbinvd_on_all_cpus();
-> +	tdx_page_array_free(mempool);
-> +}
-> +
-> +DEFINE_FREE(tdx_ext_mempool_free, struct tdx_page_array *,
-> +	    if (!IS_ERR_OR_NULL(_T)) tdx_ext_mempool_free(_T))
-> +
-> +/*
-> + * The TDX module exposes a CLFLUSH_BEFORE_ALLOC bit to specify whether
-> + * a CLFLUSH of pages is required before handing them to the TDX module.
-> + * Be conservative and make the code simpler by doing the CLFLUSH
-> + * unconditionally.
-> + */
-> +static void tdx_clflush_page(struct page *page)
-> +{
-> +	clflush_cache_range(page_to_virt(page), PAGE_SIZE);
-> +}
-
-arch/x86/virt/vmx/tdx/tdx.c has:
-
-static void tdx_clflush_page(struct page *page)
-{
-        clflush_cache_range(page_to_virt(page), PAGE_SIZE);
-}
-
-Seems odd to see this here.
-
-> +static void tdx_clflush_page_array(struct tdx_page_array *array)
-> +{
-> +	for (int i = 0; i < array->nents; i++)
-> +		tdx_clflush_page(array->pages[array->offset + i]);
-> +}
-> +
-> +static int tdx_ext_mem_add(struct tdx_page_array *mempool)
-> +{
-
-I just realized the 'mempool' has nothing to do with 'struct mempool',
-which makes this a rather unfortunate naming choice.
-
-> +	struct tdx_module_args args = {
-> +		.rcx = hpa_list_info_assign_raw(mempool),
-> +	};
-> +	u64 r;
-> +
-> +	tdx_clflush_page_array(mempool);
-> +
-> +	do {
-> +		r = seamcall_ret(TDH_EXT_MEM_ADD, &args);
-> +		cond_resched();
-> +	} while (r == TDX_INTERRUPTED_RESUMABLE);
-> +
-> +	if (r != TDX_SUCCESS)
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
-> +static struct tdx_page_array *tdx_ext_mempool_setup(void)
-> +{
-> +	unsigned int nr_pages, nents, offset = 0;
-> +	int ret;
-> +
-> +	nr_pages = tdx_sysinfo.ext.memory_pool_required_pages;
-> +	if (!nr_pages)
-> +		return NULL;
-> +
-> +	struct tdx_page_array *mempool __free(tdx_page_array_free) =
-> +		tdx_page_array_alloc(nr_pages);
-> +	if (!mempool)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	while (1) {
-> +		nents = tdx_page_array_fill_root(mempool, offset);
-
-This is really difficult to understand. It's not really filling a
-"root", it's populating an array. The structure of the loop is also
-rather non-obvious. It's doing:
-
-	while (1) {
-		fill(&array);
-		tell_tdx_module(&array);
-	}
-
-Why can't it be:
-
-	while (1)
-		fill(&array);
-	while (1)
-		tell_tdx_module(&array);
-
-for example?
-
-> +		if (!nents)
-> +			break;
-> +
-> +		ret = tdx_ext_mem_add(mempool);
-> +		if (ret)
-> +			return ERR_PTR(ret);
-> +
-> +		offset += nents;
-> +	}
-> +
-> +	return no_free_ptr(mempool);
-> +}
-
-This patch is getting waaaaaaaaaaaaaaay too long. I'd say it needs to be
-4 or 5 patches, just eyeballing it.
-
-Call be old fashioned, but I suspect the use of __free() here is atually
-hurting readability.
-
-> +static int init_tdx_ext(void)
-> +{
-> +	int ret;
-> +
-> +	if (!(tdx_sysinfo.features.tdx_features0 & TDX_FEATURES0_EXT))
-> +		return -EOPNOTSUPP;
-> +
-> +	struct tdx_page_array *mempool __free(tdx_ext_mempool_free) =
-> +		tdx_ext_mempool_setup();
-> +	/* Return NULL is OK, means no need to setup mempool */
-> +	if (IS_ERR(mempool))
-> +		return PTR_ERR(mempool);
-
-That's a somewhat odd comment to put above an if() that doesn't return NULL.
-
-> +	ret = enable_tdx_ext();
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Extension memory is never reclaimed once assigned */
-> +	if (mempool)
-> +		tdx_page_array_ctrl_leak(no_free_ptr(mempool));
-> +
-> +	return 0;
-> +}
-
-
-
-> +/**
-> + * tdx_enable_ext - Enable TDX module extensions.
-> + *
-> + * This function can be called in parallel by multiple callers.
-> + *
-> + * Return 0 if TDX module extension is enabled successfully, otherwise error.
-> + */
-> +int tdx_enable_ext(void)
-> +{
-> +	int ret;
-> +
-> +	if (!tdx_module_initialized)
-> +		return -ENOENT;
-> +
-> +	guard(mutex)(&tdx_module_ext_lock);
-> +
-> +	if (tdx_module_ext_initialized)
-> +		return 0;
-> +
-> +	ret = init_tdx_ext();
-> +	if (ret) {
-> +		pr_debug("module extension initialization failed (%d)\n", ret);
-> +		return ret;
-> +	}
-> +
-> +	pr_debug("module extension initialized\n");
-> +	tdx_module_ext_initialized = true;
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(tdx_enable_ext);
-> +
->  static bool is_pamt_page(unsigned long phys)
->  {
->  	struct tdmr_info_list *tdmr_list = &tdx_tdmr_list;
-> @@ -1769,17 +1938,6 @@ static inline u64 tdx_tdr_pa(struct tdx_td *td)
->  	return page_to_phys(td->tdr_page);
->  }
->  
-> -/*
-> - * The TDX module exposes a CLFLUSH_BEFORE_ALLOC bit to specify whether
-> - * a CLFLUSH of pages is required before handing them to the TDX module.
-> - * Be conservative and make the code simpler by doing the CLFLUSH
-> - * unconditionally.
-> - */
-> -static void tdx_clflush_page(struct page *page)
-> -{
-> -	clflush_cache_range(page_to_virt(page), PAGE_SIZE);
-> -}
-
-Ahh, here's the code move.
-
-This should be in its own patch.
-
-
+DQoNCj4gT24gTm92IDE2LCAyMDI1LCBhdCAxMTozMuKAr1BNLCBKYXNvbiBXYW5nIDxqYXNvd2Fu
+Z0ByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+IE9uIEZyaSwgTm92IDE0LCAyMDI1IGF0IDEwOjUz
+4oCvUE0gSm9uIEtvaGxlciA8am9uQG51dGFuaXguY29tPiB3cm90ZToNCj4+IA0KPj4gDQo+PiAN
+Cj4+PiBPbiBOb3YgMTIsIDIwMjUsIGF0IDg6MDnigK9QTSwgSmFzb24gV2FuZyA8amFzb3dhbmdA
+cmVkaGF0LmNvbT4gd3JvdGU6DQo+Pj4gDQo+Pj4gIS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS18DQo+Pj4gQ0FVVElPTjog
+RXh0ZXJuYWwgRW1haWwNCj4+PiANCj4+PiB8LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSENCj4+PiANCj4+PiBPbiBUaHUs
+IE5vdiAxMywgMjAyNSBhdCA4OjE04oCvQU0gSm9uIEtvaGxlciA8am9uQG51dGFuaXguY29tPiB3
+cm90ZToNCj4+Pj4gDQo+Pj4+IHZob3N0X2dldF91c2VyIGFuZCB2aG9zdF9wdXRfdXNlciBsZXZl
+cmFnZSBfX2dldF91c2VyIGFuZCBfX3B1dF91c2VyLA0KPj4+PiByZXNwZWN0aXZlbHksIHdoaWNo
+IHdlcmUgYm90aCBhZGRlZCBpbiAyMDE2IGJ5IGNvbW1pdCA2YjFlNmNjNzg1NWINCj4+Pj4gKCJ2
+aG9zdDogbmV3IGRldmljZSBJT1RMQiBBUEkiKS4NCj4+PiANCj4+PiBJdCBoYXMgYmVlbiB1c2Vk
+IGV2ZW4gYmVmb3JlIHRoaXMgY29tbWl0Lg0KPj4gDQo+PiBBaCwgdGhhbmtzIGZvciB0aGUgcG9p
+bnRlci4gSeKAmWQgaGF2ZSB0byBnbyBkaWcgdG8gZmluZCBpdHMgZ2VuZXNpcywgYnV0DQo+PiBp
+dHMgbW9yZSB0byBzYXksIHRoaXMgZXhpc3RlZCBwcmlvciB0byB0aGUgTEZFTkNFIGNvbW1pdC4N
+Cj4+IA0KPj4+IA0KPj4+PiBJbiBhIGhlYXZ5IFVEUCB0cmFuc21pdCB3b3JrbG9hZCBvbiBhDQo+
+Pj4+IHZob3N0LW5ldCBiYWNrZWQgdGFwIGRldmljZSwgdGhlc2UgZnVuY3Rpb25zIHNob3dlZCB1
+cCBhcyB+MTEuNiUgb2YNCj4+Pj4gc2FtcGxlcyBpbiBhIGZsYW1lZ3JhcGggb2YgdGhlIHVuZGVy
+bHlpbmcgdmhvc3Qgd29ya2VyIHRocmVhZC4NCj4+Pj4gDQo+Pj4+IFF1b3RpbmcgTGludXMgZnJv
+bSBbMV06DQo+Pj4+ICAgQW55d2F5LCBldmVyeSBzaW5nbGUgX19nZXRfdXNlcigpIGNhbGwgSSBs
+b29rZWQgYXQgbG9va2VkIGxpa2UNCj4+Pj4gICBoaXN0b3JpY2FsIGdhcmJhZ2UuIFsuLi5dIEVu
+ZCByZXN1bHQ6IEkgZ2V0IHRoZSBmZWVsaW5nIHRoYXQgd2UNCj4+Pj4gICBzaG91bGQganVzdCBk
+byBhIGdsb2JhbCBzZWFyY2gtYW5kLXJlcGxhY2Ugb2YgdGhlIF9fZ2V0X3VzZXIvDQo+Pj4+ICAg
+X19wdXRfdXNlciB1c2VycywgcmVwbGFjZSB0aGVtIHdpdGggcGxhaW4gZ2V0X3VzZXIvcHV0X3Vz
+ZXIgaW5zdGVhZCwNCj4+Pj4gICBhbmQgdGhlbiBmaXggdXAgYW55IGZhbGxvdXQgKGVnIHRoZSBj
+b2NvIGNvZGUpLg0KPj4+PiANCj4+Pj4gU3dpdGNoIHRvIHBsYWluIGdldF91c2VyL3B1dF91c2Vy
+IGluIHZob3N0LCB3aGljaCByZXN1bHRzIGluIGEgc2xpZ2h0DQo+Pj4+IHRocm91Z2hwdXQgc3Bl
+ZWR1cC4gZ2V0X3VzZXIgbm93IGFib3V0IH44LjQlIG9mIHNhbXBsZXMgaW4gZmxhbWVncmFwaC4N
+Cj4+Pj4gDQo+Pj4+IEJhc2ljIGlwZXJmMyB0ZXN0IG9uIGEgSW50ZWwgNTQxNlMgQ1BVIHdpdGgg
+VWJ1bnR1IDI1LjEwIGd1ZXN0Og0KPj4+PiBUWDogdGFza3NldCAtYyAyIGlwZXJmMyAtYyA8cnhf
+aXA+IC10IDYwIC1wIDUyMDAgLWIgMCAtdSAtaSA1DQo+Pj4+IFJYOiB0YXNrc2V0IC1jIDIgaXBl
+cmYzIC1zIC1wIDUyMDAgLUQNCj4+Pj4gQmVmb3JlOiA2LjA4IEdiaXRzL3NlYw0KPj4+PiBBZnRl
+cjogIDYuMzIgR2JpdHMvc2VjDQo+Pj4gDQo+Pj4gSSB3b25kZXIgaWYgd2UgbmVlZCB0byB0ZXN0
+IG9uIGFyY2hzIGxpa2UgQVJNLg0KPj4gDQo+PiBBcmUgeW91IHRoaW5raW5nIGZyb20gYSBwZXJm
+b3JtYW5jZSBwZXJzcGVjdGl2ZT8gT3IgYSBjb3JyZWN0bmVzcyBvbmU/DQo+IA0KPiBQZXJmb3Jt
+YW5jZSwgSSB0aGluayB0aGUgcGF0Y2ggaXMgY29ycmVjdC4NCj4gDQo+IFRoYW5rcw0KPiANCg0K
+T2sgZ290Y2hhLiBJZiBhbnlvbmUgaGFzIGFuIEFSTSBzeXN0ZW0gc3R1ZmZlZCBpbiB0aGVpcg0K
+ZnJvbnQgcG9ja2V0IGFuZCBjYW4gZ2l2ZSB0aGlzIGEgcG9rZSwgSeKAmWQgYXBwcmVjaWF0ZSBp
+dCwgYXMNCkkgZG9u4oCZdCBoYXZlIHJlYWR5IGFjY2VzcyB0byBvbmUgcGVyc29uYWxseS4NCg0K
+VGhhdCBzYWlkLCBJIHRoaW5rIHRoaXMgbWlnaHQgZW5kIHVwIGluIOKAnHdlbGwsIGl0IGlzIHdo
+YXQgaXQgaXPigJ0NCnRlcnJpdG9yeSBhcyBMaW51cyB3YXMgYWxsdWRpbmcgdG8sIGkuZS4gaWYg
+cGVyZm9ybWFuY2UgZGlwcyBvbg0KQVJNIGZvciB2aG9zdCwgdGhlbiB0aGF0cyBhIGNvbXBlbGxp
+bmcgcG9pbnQgdG8gb3B0aW1pemUgd2hhdGV2ZXINCmVuZHMgdXAgYmVpbmcgdGhlIGN1bHByaXQg
+Zm9yIGdldC9wdXQgdXNlcj8NCg0KU2FpZCBhbm90aGVyIHdheSwgd291bGQgQVJNIHBlcmYgdGVz
+dGluZyAob3IgYW55IG90aGVyIGFyY2gpIGJlIGENCmJsb2NrZXIgdG8gdGFraW5nIHRoaXMgY2hh
+bmdlPw0KDQpUaGFua3MgLSBKb24NCg0K
 
