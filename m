@@ -1,228 +1,174 @@
-Return-Path: <kvm+bounces-63360-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63361-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C53E9C63D7A
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:36:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45591C63E04
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 12:42:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7C4D94EC6FD
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 11:34:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 704003B1E48
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 11:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0037F328B50;
-	Mon, 17 Nov 2025 11:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28EEA32BF38;
+	Mon, 17 Nov 2025 11:35:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PFMfQHpJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xJqVTnSe"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E0128640B;
-	Mon, 17 Nov 2025 11:34:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F6032A3EC
+	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 11:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763379244; cv=none; b=qyeOpm7jYI51whSpqttCXWiFoqOOLS3tP1toCY9q0WQcDU7gIhHUsfLcRUBxbB+a4vutWb/HwDQ0UdfoknurC8hdPkI7YupdQWpbZPMFMjJJud2Cxn5k0Y2yAftMeVk609e5ssDxOUY4IW2g9EW9LH3bA8gt0YENtyhvMl/0s1w=
+	t=1763379358; cv=none; b=cf/0JKlUlnDbU3IJtUk4QbKTKseQXLVtQceuszMgRfaQ0RRFj2sIACbxx97uK5iVafb/eUwrtPvCPGp9wR6gmQkxl7xvnM7GEGMie+gn9+9zhQu+8QjVKd8Yoc5PQmurkiXBotYpTuaz+vkHuUSb8bN/zb8kAt3RD6JWcUsGKGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763379244; c=relaxed/simple;
-	bh=G2XSX5R44t4v3J1yTweOP2/+Y1hZ5/nw0s9qbif0Qfc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I8HVJUq3X7gmGrNQYq7CVFW9GZrfEp1nQzz5c7nT/TjQyazubm3h07N4jkxXRXuhRYprRzMHNVpQ5Q8vVkZqM8qrT3beebfkCyUoSJFFv32VMBYpACrVGFCFEWqRN7v9J+JE4wAmqaHZIkwBV600mDCfiImH7FWe0OikLZ+RWMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PFMfQHpJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 813E1C4CEF1;
-	Mon, 17 Nov 2025 11:34:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763379243;
-	bh=G2XSX5R44t4v3J1yTweOP2/+Y1hZ5/nw0s9qbif0Qfc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PFMfQHpJkJGwZcolZSlLrjAkA9oxFJCSCweqjn4iO/bO6kIT9NR0HLEidaLBpPS9j
-	 zR/cT6zCVA/WpBEk59z+2xr1TTonTJ54la/5bMHDqygs+mAZA9FARd0qYyPomI7QJE
-	 nqWewcacHQN1HF8kw9E/91Pg2ioGxBAOvSDKDo5zRiQCEJ2G/9pycR060yCwP24q2A
-	 x1d26vScEaVVSfK5zVpRsDkKyTry//DlTTxWFh2aOUQczKRY9uFveV9Ffhx25pkldA
-	 +4hr/NsLH3NHG1EWkNygRupWhXebdzj8/4D+X1oJQyuwMABbGBsaIrpM6kyOxRDTQU
-	 QBYcw59HJMGwQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vKxUf-00000005nnE-2NPR;
-	Mon, 17 Nov 2025 11:34:01 +0000
-Date: Mon, 17 Nov 2025 11:34:01 +0000
-Message-ID: <864iqsuc46.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 3/5] KVM: arm64: GICv3: nv: Resync LRs/VMCR/HCR early for better MI emulation
-In-Reply-To: <CA+EHjTwn7PUykGngWRpK3T9gQ_w8=3+BrmEk9GthH0MgMi3FVw@mail.gmail.com>
-References: <20251117091527.1119213-1-maz@kernel.org>
-	<20251117091527.1119213-4-maz@kernel.org>
-	<CA+EHjTwn7PUykGngWRpK3T9gQ_w8=3+BrmEk9GthH0MgMi3FVw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763379358; c=relaxed/simple;
+	bh=FiVg8HIoSq1vAMera7LlyWAWAwVwtwqzruYByVnF+ss=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V2wTmFCXnjz5K90nblGGoreGEPxkAHS35pUtPtWPyRmGUgjK1o3GRYzh6z3qZl4HdB6/zqC3NFOWTCgNIq/pXT+GdSOvgqdEtDp15Ygu0DuvXlkG/trncKbU4Z7TEjdkRfFhTbIli6SuTR2QPoUwJ1is9YEc+MdiC7sVXTSFejs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xJqVTnSe; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ed67a143c5so563051cf.0
+        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 03:35:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763379355; x=1763984155; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=InxzUv4fZ1uU4fFpdnx0a5dxJKeuOiNcfcnGKmmDKis=;
+        b=xJqVTnSeg84JQYp5tSq21wo56OXUX//V+ZLVfGdlpebWIeAxOklb8IPjrFW0sne6lT
+         BfIcFAQ/HRyv73GmKDSSMjXPtNt3+7XmBHaSairSHDrp+Ubx78XKYaQw5Zxm+F3ZWyJC
+         9tWmM0/OC7Ty+ItFHfQBoKGEssp6keL+eSB1Zg2h2QW9n+9swufC+b/u2LMrdzujbmdM
+         LI/M7T0ln0aWxipcSXZUgs4F0ullgDWhSIdymW+vwJGnRuVjjLwucwWhjo9VBEkBH+Pi
+         WytDlmmJ+uhdFylsEMmEPJzKQb1FoUyUPr6syIqF51UWU9qvK+bmGhNKqn9Pf4o4cZ7K
+         cUJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763379355; x=1763984155;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=InxzUv4fZ1uU4fFpdnx0a5dxJKeuOiNcfcnGKmmDKis=;
+        b=ie93C+eiq7byjuTs43Z0jnQjtTAALJnzEwnE7T+U+D4GqbwPnuPVPHNIjh3L+fdrOM
+         FIbe1LtfdqLDXCqic1vmFO6xUZY80Jxqoo528FYTM+qKUAd5JjlreqpUAdpFKmEHDsgM
+         YJ1DNdIA6myNnVjT1/j5vEJn4X57rQBvZRjOpXBDOHFAhODRLsGmiCfJfNRtmpuFZMk7
+         A0+AO79W1vhX3MxYEGuuVbnT7A3xIwiQTtKJbOkf/HgM489dnSqImXG90ShB62v+TD20
+         5u3sFRXWhQGNanD+B50gglGJWt21r8tU8Q1xluSnreHP48eZZjdgLpofI3zzaLdL1HeC
+         GpNw==
+X-Forwarded-Encrypted: i=1; AJvYcCXY+DQZ7GU724BumluWMv1anl3IFYQvvsojc4ik8I/dgyx0E/2qw4qU1iRutUoaLyKeZRc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygBZZj8kYCyjk5c1G+2pB9f+OShUuWMhh7yJwgZ2A5W6dAhg4W
+	pWg64bhDTOEeQvHAT8PBzG82FVSnTwdH/1freH0QodFVvYvuhJCjqcWgxQxuzg+5uY/VwVdpv6s
+	8yJxT1qhZkroh82+vAPuOnPmMOB+0aD4EHlBehxi2
+X-Gm-Gg: ASbGncuA8t1ig/WTcgqp20C6hjM0Lew3vCWsKuGmuv7Ju96Nw6z/HXpwLGfWvxiXjRu
+	bZsFgIYP3S3/Az/ypn6BG47WqTtdC3dFNv1ChIcGgO7OKnM/RkrL8g4V1CtvgzcFHJ2A8thkWwC
+	qPGdgTwaeDK9XrCoq3d2AY03veJsNGmLASxnG25f0XybcSAk9beBqVJqNjvpnteLEknOegxMEf0
+	qIz6k5bSWgEB6nG8t72qboFoWj6yOeN2ySTpQKKSmffg7GchhjhdJWjKar/qfqAxloodtUt5CnB
+	e/00IQ==
+X-Google-Smtp-Source: AGHT+IEeSiW3i7KxR/7PtZwLbRJe4Rt/AuAzXIflTZcma7G9RYj/Byd8sqTWf75xRzlbievXcmfG+TwcqMMRZMTyoY0=
+X-Received: by 2002:ac8:7fcd:0:b0:4ed:ff79:e678 with SMTP id
+ d75a77b69052e-4ee02b0dba6mr11656171cf.18.1763379355279; Mon, 17 Nov 2025
+ 03:35:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20251117091527.1119213-1-maz@kernel.org> <20251117091527.1119213-6-maz@kernel.org>
+In-Reply-To: <20251117091527.1119213-6-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 17 Nov 2025 11:35:18 +0000
+X-Gm-Features: AWmQ_bnrhZokZgmcow0lXNWcucVmFJ-Nro-VXQIq3EmXDZs9hFHaUagkAg0JMFQ
+Message-ID: <CA+EHjTxVr7uk8Ofhb2VHjDw+LfC4ZSz4dDun5+xLcnRQy5AKaQ@mail.gmail.com>
+Subject: Re: [PATCH v3 5/5] KVM: arm64: GICv3: Force exit to sync ICH_HCR_EL2.En
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Mark Brown <broonie@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 17 Nov 2025 11:24:24 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> 
-> On Mon, 17 Nov 2025 at 09:15, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > The current approach to nested GICv3 support is to not do anything
-> > while L2 is running, wait a transition from L2 to L1 to resync
-> > LRs, VMCR and HCR, and only then evaluate the state to decide
-> > whether to generate a maintenance interrupt.
-> >
-> > This doesn't provide a good quality of emulation, and it would be
-> > far preferable to find out early that we need to perform a switch.
-> >
-> > Move the LRs/VMCR and HCR resync into vgic_v3_sync_nested(), so
-> > that we have most of the state available. As we turning the vgic
-> > off at this stage to avoid a screaming host MI, add a new helper
-> > vgic_v3_flush_nested() that switches the vgic on again. The MI can
-> > then be directly injected as required.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_hyp.h     |  1 +
-> >  arch/arm64/kvm/hyp/vgic-v3-sr.c      |  2 +-
-> >  arch/arm64/kvm/vgic/vgic-v3-nested.c | 69 ++++++++++++++++------------
-> >  arch/arm64/kvm/vgic/vgic.c           |  6 ++-
-> >  arch/arm64/kvm/vgic/vgic.h           |  1 +
-> >  5 files changed, 46 insertions(+), 33 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> > index dbf16a9f67728..76ce2b94bd97e 100644
-> > --- a/arch/arm64/include/asm/kvm_hyp.h
-> > +++ b/arch/arm64/include/asm/kvm_hyp.h
-> > @@ -77,6 +77,7 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-> >  int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
-> >
-> >  u64 __gic_v3_get_lr(unsigned int lr);
-> > +void __gic_v3_set_lr(u64 val, int lr);
-> >
-> >  void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
-> >  void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
-> > diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > index 71199e1a92940..99342c13e1794 100644
-> > --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > @@ -60,7 +60,7 @@ u64 __gic_v3_get_lr(unsigned int lr)
-> >         unreachable();
-> >  }
-> >
-> > -static void __gic_v3_set_lr(u64 val, int lr)
-> > +void __gic_v3_set_lr(u64 val, int lr)
-> >  {
-> >         switch (lr & 0xf) {
-> >         case 0:
-> > diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> > index 17bceef83269e..bf37fd3198ba7 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> > @@ -70,13 +70,14 @@ static int lr_map_idx_to_shadow_idx(struct shadow_if *shadow_if, int idx)
-> >   * - on L2 put: perform the inverse transformation, so that the result of L2
-> >   *   running becomes visible to L1 in the VNCR-accessible registers.
-> >   *
-> > - * - there is nothing to do on L2 entry, as everything will have happened
-> > - *   on load. However, this is the point where we detect that an interrupt
-> > - *   targeting L1 and prepare the grand switcheroo.
-> > + * - there is nothing to do on L2 entry apart from enabling the vgic, as
-> > + *   everything will have happened on load. However, this is the point where
-> > + *   we detect that an interrupt targeting L1 and prepare the grand
-> > + *   switcheroo.
-> >   *
-> > - * - on L2 exit: emulate the HW bit, and deactivate corresponding the L1
-> > - *   interrupt. The L0 active state will be cleared by the HW if the L1
-> > - *   interrupt was itself backed by a HW interrupt.
-> > + * - on L2 exit: resync the LRs and VMCR, emulate the HW bit, and deactivate
-> > + *   corresponding the L1 interrupt. The L0 active state will be cleared by
-> > + *   the HW if the L1 interrupt was itself backed by a HW interrupt.
-> >   *
-> >   * Maintenance Interrupt (MI) management:
-> >   *
-> > @@ -265,15 +266,30 @@ static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu,
-> >         s_cpu_if->used_lrs = hweight16(shadow_if->lr_map);
-> >  }
-> >
-> > +void vgic_v3_flush_nested(struct kvm_vcpu *vcpu)
-> > +{
-> > +       u64 val = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
-> > +
-> > +       write_sysreg_s(val | vgic_ich_hcr_trap_bits(), SYS_ICH_HCR_EL2);
-> > +}
-> > +
-> >  void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
-> >  {
-> >         struct shadow_if *shadow_if = get_shadow_if();
-> >         int i;
-> >
-> >         for_each_set_bit(i, &shadow_if->lr_map, kvm_vgic_global_state.nr_lr) {
-> > -               u64 lr = __vcpu_sys_reg(vcpu, ICH_LRN(i));
-> > +               u64 val, host_lr, lr;
-> >                 struct vgic_irq *irq;
-> >
-> > +               host_lr = __gic_v3_get_lr(lr_map_idx_to_shadow_idx(shadow_if, i));
-> > +
-> > +               /* Propagate the new LR state */
-> > +               lr = __vcpu_sys_reg(vcpu, ICH_LRN(i));
-> > +               val = lr & ~ICH_LR_STATE;
-> > +               val |= host_lr & ICH_LR_STATE;
-> > +               __vcpu_assign_sys_reg(vcpu, ICH_LRN(i), val);
-> > +
-> 
-> As I said before, I am outside of my comfort zone here. However,
-> should the following check be changed to use the merged 'val', rather
-> than the guest lr as it was?
+Hi Marc,
 
-[...]
+On Mon, 17 Nov 2025 at 09:22, Marc Zyngier <maz@kernel.org> wrote:
+>
+> FEAT_NV2 is pretty terrible for anything that tries to enforce immediate
+> effects, and writing to ICH_HCR_EL2 in the hope to disable a maintenance
+> interrupt is vain. This only hits memory, and the guest hasn't cleared
+> anything -- the MI will fire.
+>
+> For example, running the vgic_irq test under NV results in about 800
+> maintenance interrupts being actually handled by the L1 guest,
+> when none were expected.
+>
+> As a cheap workaround, read back ICH_MISR_EL2 after writing 0 to
+> ICH_HCR_EL2. This is very cheap on real HW, and causes a trap to
+> the host in NV, giving it the opportunity to retire the pending
+> MI. With this, the above test tuns to completion without any MI
+> being actually handled.
+
+nit: tuns->runs
+
 
 >
-> >                 if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
-> >                         continue;
+> Yes, this is really poor...
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/vgic-v3-sr.c      | 7 +++++++
+>  arch/arm64/kvm/vgic/vgic-v3-nested.c | 6 ++++--
+>  2 files changed, 11 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> index 99342c13e1794..f503cf01ac82c 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> @@ -244,6 +244,13 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
+>         }
+>
+>         write_gicreg(0, ICH_HCR_EL2);
+> +
+> +       /*
+> +        * Hack alert: On NV, this results in a trap so that the above
+> +        * write actually takes effect...
+> +        */
+> +       isb();
+> +       read_gicreg(ICH_MISR_EL2);
+>  }
 
-No, this decision must be taken based on the *original* state, before
-the L2 guest was run. If the LR was in an invalid state the first
-place, there is nothing to do.
+nit: is it worth gating this with "ARM64_HAS_NESTED_VIRT"?
 
-> >
-> > @@ -286,12 +302,21 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
-> >                 if (WARN_ON(!irq)) /* Shouldn't happen as we check on load */
-> >                         continue;
-> >
-> > -               lr = __gic_v3_get_lr(lr_map_idx_to_shadow_idx(shadow_if, i));
-> > -               if (!(lr & ICH_LR_STATE))
-> > +               if (!(host_lr & ICH_LR_STATE))
-> >                         irq->active = false;
+Otherwise,
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-And here, if we see that the *new* state (as fished out of the HW LRs)
-is now invalid, this means that a deactivation has taken place in L2,
-and we must propagate it to L1.
+Cheers,
+/fuad
 
-Thanks,
 
-	M.
 
--- 
-Without deviation from the norm, progress is not possible.
+
+>  void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> index 40f7a37e0685c..d6797632157a0 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> @@ -94,8 +94,10 @@ static int lr_map_idx_to_shadow_idx(struct shadow_if *shadow_if, int idx)
+>   *
+>   * - because most of the ICH_*_EL2 registers live in the VNCR page, the
+>   *   quality of emulation is poor: L1 can setup the vgic so that an MI would
+> - *   immediately fire, and not observe anything until the next exit. Trying
+> - *   to read ICH_MISR_EL2 would do the trick, for example.
+> + *   immediately fire, and not observe anything until the next exit.
+> + *   Similarly, a pending MI is not immediately disabled by clearing
+> + *   ICH_HCR_EL2.En. Trying to read ICH_MISR_EL2 would do the trick, for
+> + *   example.
+>   *
+>   * System register emulation:
+>   *
+> --
+> 2.47.3
+>
+>
 
