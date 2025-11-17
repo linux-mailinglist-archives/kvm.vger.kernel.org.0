@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-63311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09322C621C1
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 03:40:26 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4922C621CD
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 03:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F118C360149
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 02:39:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 643E535C014
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 02:40:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A17E26CE23;
-	Mon, 17 Nov 2025 02:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97A8026F289;
+	Mon, 17 Nov 2025 02:38:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bf1IbFRt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Id5s7XlG"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15DF26E6F6;
-	Mon, 17 Nov 2025 02:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28ADB26E6F6;
+	Mon, 17 Nov 2025 02:38:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763347117; cv=none; b=BHs1s6utwNXPGbJBjXfxi+Q+wYY7CUizE75FT1Q9Ht4twBbkJTEGqHsD88KfZR+Cxt4Kw/Vg3V58Jin0+LOGp8GJLoTgiLKXD9q/l7Z5ZorleMOwmdpV2cksJqzEyywrffpc2c2FDUcLGtL29wmgnOL9ZztX9MO0Cu5GrfNciTs=
+	t=1763347120; cv=none; b=DqgwdWalzLRS0qOLjgHk+gx99Y4fR4x1eHO0h3WBi/wGUtGXp1ge2Ps3/5vKAQtn0Dl1ARyH/ftusDvZQzhOHQKNEb9ryVPxRNLviQfN31fery8IuTHlw+1otfUMgHI+qtuua9Wv1rmgohSufKWXl5Xyfx3/L/cFcWwbzqPMDJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763347117; c=relaxed/simple;
-	bh=GXluFpReQE+Xxdq2pkCoFp5c4SwUoYGgLpfSR7eyUsM=;
+	s=arc-20240116; t=1763347120; c=relaxed/simple;
+	bh=Ukvo5fXxaMmqG2S/FiToJVlF+feB7VsXyz40jCz8Fq0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Yj5zahuB1XqmWjdMjRrm0ykvi+GgnJJoKoPcwawiWGrBqtPPX4DhKsdVn7qED5ywgWPNG8g5T9a74rOi7kSKy1+cqTpNqH2C4oDavtdfzPcAKFwS2nqBHb5xE0OCMw17BBuETy7KP2Rq7dzIayD9kaSCGZhmrE6K9pm6JAlZllE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bf1IbFRt; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version:Content-Type; b=d1ETFFBtSDrcYJIFzQlBXZmdmf4rOZtUTfbZCM7ZITgkgRbzuolwIv9VDl8vg773fnhvwmyeTNta1lHvpcbRpqhKAA+d/QtbQBUxJRNZh6F+BkXJiRXIgRgOsgQHxDYX9+SBG1kGVIuCoT4FurrkNlS6QaECZ7AR1ZDCd2MDQKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Id5s7XlG; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763347116; x=1794883116;
+  t=1763347120; x=1794883120;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GXluFpReQE+Xxdq2pkCoFp5c4SwUoYGgLpfSR7eyUsM=;
-  b=bf1IbFRtRE0pbboWDgXHKMzuAuaC7RSFHAmgLZAq/8lx1t/iASn/n4a8
-   uQGt93XJrDFx2gS+KLfvq1FU1HmzAkBEGAc0aDoCOkzu1Xgg4y1zxRMKu
-   lmeSaj8I8X+Mdlp9jMb3zyTWADdbpZqyoiaKeHAKNFQjG8ZFa5rzyrJTd
-   Rk0pJYJp3rcc0IQZaVdZ1KyPuhL8Qr14c0hPj9wOPm8Oo5M4soun53OQT
-   dhdUjaM7gnOnFkjx/cHaogzZAdK6gfnk0y4S3DP9YsCMsq5vBJC7hL4YF
-   tCCivnfxxZmZeS4p+MOacJMa3O0VbfkztFeXl0WIusSVpXqf+tovjtdAy
-   Q==;
-X-CSE-ConnectionGUID: 5cx3fWNYRSm0k3xHrr4SzA==
-X-CSE-MsgGUID: 0atItbrvQB6/I6Gk09laCg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11615"; a="82729539"
+  bh=Ukvo5fXxaMmqG2S/FiToJVlF+feB7VsXyz40jCz8Fq0=;
+  b=Id5s7XlGizbV7fEGRrwvdMbaiCcwIMR2nyIScsZ3XhSxl+NVFiiPT4Fu
+   pd+bHnPVrmgqnigeTFkNb3nR4D0dTnnvIOEtigBQZgqNZFcjxSd+r4JCu
+   TgwIrdLghAjU3K/mdyo5zX7ycnDk2GFJV0ykhayqUogOFzUfWhmdlfW8t
+   yrmd1ynyULevnMs/zdxQ8zOCSmm0qPaDZIm+p0wu2tqTk2gy2phf1gMbX
+   fW6bEDhxIxKqDXyTeuNkfTMvRoH+PTFEd58RtKf3lFMP7FbPDJLcaWNIi
+   2QFKmhT8xHzffFteKQ95XhstffiF32i6xZ+LtH9wbvNBkt1zSijdlMUOG
+   g==;
+X-CSE-ConnectionGUID: 7dr7AX3iSy+USz3CUAJxjg==
+X-CSE-MsgGUID: 8UcpqADiSXCXYxdPhM0Fhg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11615"; a="82729544"
 X-IronPort-AV: E=Sophos;i="6.19,310,1754982000"; 
-   d="scan'208";a="82729539"
+   d="scan'208";a="82729544"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2025 18:38:36 -0800
-X-CSE-ConnectionGUID: KBsaphOKSKCrEL5PuAldTQ==
-X-CSE-MsgGUID: 1YC+Zx/bTnas3qHdXf/7EQ==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2025 18:38:39 -0800
+X-CSE-ConnectionGUID: PKdhenjrQaO/RjR88jPYqQ==
+X-CSE-MsgGUID: wPHz3SLXTdig6IFG82WY1g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,310,1754982000"; 
-   d="scan'208";a="227658276"
+   d="scan'208";a="227658292"
 Received: from yilunxu-optiplex-7050.sh.intel.com ([10.239.159.165])
-  by orviesa001.jf.intel.com with ESMTP; 16 Nov 2025 18:38:32 -0800
+  by orviesa001.jf.intel.com with ESMTP; 16 Nov 2025 18:38:35 -0800
 From: Xu Yilun <yilun.xu@linux.intel.com>
 To: linux-coco@lists.linux.dev,
 	linux-pci@vger.kernel.org
@@ -73,9 +73,9 @@ Cc: chao.gao@intel.com,
 	dan.j.williams@intel.com,
 	kas@kernel.org,
 	x86@kernel.org
-Subject: [PATCH v1 11/26] iommu/vt-d: Cache max domain ID to avoid redundant calculation
-Date: Mon, 17 Nov 2025 10:22:55 +0800
-Message-Id: <20251117022311.2443900-12-yilun.xu@linux.intel.com>
+Subject: [PATCH v1 12/26] iommu/vt-d: Reserve the MSB domain ID bit for the TDX module
+Date: Mon, 17 Nov 2025 10:22:56 +0800
+Message-Id: <20251117022311.2443900-13-yilun.xu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
 References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
@@ -85,99 +85,115 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Lu Baolu <baolu.lu@linux.intel.com>
 
-The cap_ndoms() helper calculates the maximum available domain ID from
-the value of capability register, which can be inefficient if called
-repeatedly. Cache the maximum supported domain ID in max_domain_id field
-during initialization to avoid redundant calls to cap_ndoms() throughout
-the IOMMU driver.
+The Intel TDX Connect Architecture Specification defines some enhancements
+for the VT-d architecture to introduce IOMMU support for TEE-IO requests.
+Section 2.2, 'Trusted DMA' states that:
 
-No functionality change.
+"I/O TLB and DID Isolation – When IOMMU is enabled to support TDX
+Connect, the IOMMU restricts the VMM’s DID setting, reserving the MSB bit
+for the TDX module. The TDX module always sets this reserved bit on the
+trusted DMA table. IOMMU tags IOTLB, PASID cache, and context entries to
+indicate whether they were created from TEE-IO transactions, ensuring
+isolation between TEE and non-TEE requests in translation caches."
+
+Reserve the MSB in the domain ID for the TDX module's use if the
+enhancement is required, which is detected if the ECAP.TDXCS bit in the
+VT-d extended capability register is set and the TVM Usable field of the
+ACPI KEYP table is set.
 
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
  drivers/iommu/intel/iommu.h |  1 +
- drivers/iommu/intel/dmar.c  |  1 +
- drivers/iommu/intel/iommu.c | 10 +++++-----
- 3 files changed, 7 insertions(+), 5 deletions(-)
+ drivers/iommu/intel/dmar.c  | 52 ++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 52 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/iommu/intel/iommu.h b/drivers/iommu/intel/iommu.h
-index 3056583d7f56..66c3aa549fd4 100644
+index 66c3aa549fd4..836777d7645d 100644
 --- a/drivers/iommu/intel/iommu.h
 +++ b/drivers/iommu/intel/iommu.h
-@@ -724,6 +724,7 @@ struct intel_iommu {
- 	/* mutex to protect domain_ida */
- 	struct mutex	did_lock;
- 	struct ida	domain_ida; /* domain id allocator */
-+	unsigned long	max_domain_id;
- 	unsigned long	*copied_tables; /* bitmap of copied tables */
- 	spinlock_t	lock; /* protect context, domain ids */
- 	struct root_entry *root_entry; /* virtual address */
+@@ -192,6 +192,7 @@
+  */
+ 
+ #define ecap_pms(e)		(((e) >> 51) & 0x1)
++#define ecap_tdxc(e)		(((e) >> 50) & 0x1)
+ #define ecap_rps(e)		(((e) >> 49) & 0x1)
+ #define ecap_smpwc(e)		(((e) >> 48) & 0x1)
+ #define ecap_flts(e)		(((e) >> 47) & 0x1)
 diff --git a/drivers/iommu/intel/dmar.c b/drivers/iommu/intel/dmar.c
-index ec975c73cfe6..a54934c0536f 100644
+index a54934c0536f..e9d65b26ad64 100644
 --- a/drivers/iommu/intel/dmar.c
 +++ b/drivers/iommu/intel/dmar.c
-@@ -1099,6 +1099,7 @@ static int alloc_iommu(struct dmar_drhd_unit *drhd)
+@@ -1033,6 +1033,56 @@ static int map_iommu(struct intel_iommu *iommu, struct dmar_drhd_unit *drhd)
+ 	return err;
+ }
+ 
++static int keyp_config_unit_tvm_usable(union acpi_subtable_headers *header,
++				       void *arg, const unsigned long end)
++{
++	struct acpi_keyp_config_unit *acpi_cu =
++		(struct acpi_keyp_config_unit *)&header->keyp;
++	int *tvm_usable = arg;
++
++	if (acpi_cu->flags & ACPI_KEYP_F_TVM_USABLE)
++		*tvm_usable = true;
++
++	return 0;
++}
++
++static bool platform_is_tdxc_enhanced(void)
++{
++	static int tvm_usable = -1;
++	int ret;
++
++	/* only need to parse once */
++	if (tvm_usable != -1)
++		return tvm_usable;
++
++	tvm_usable = false;
++	ret = acpi_table_parse_keyp(ACPI_KEYP_TYPE_CONFIG_UNIT,
++				    keyp_config_unit_tvm_usable, &tvm_usable);
++	if (ret < 0)
++		tvm_usable = false;
++
++	return tvm_usable;
++}
++
++static unsigned long iommu_max_domain_id(struct intel_iommu *iommu)
++{
++	unsigned long ndoms = cap_ndoms(iommu->cap);
++
++	/*
++	 * Intel TDX Connect Architecture Specification, Section 2.2 Trusted DMA
++	 *
++	 * When IOMMU is enabled to support TDX Connect, the IOMMU restricts
++	 * the VMM’s DID setting, reserving the MSB bit for the TDX module. The
++	 * TDX module always sets this reserved bit on the trusted DMA table.
++	 */
++	if (ecap_tdxc(iommu->ecap) && platform_is_tdxc_enhanced()) {
++		pr_info_once("Most Significant Bit of domain ID reserved.\n");
++		return ndoms >> 1;
++	}
++
++	return ndoms;
++}
++
+ static int alloc_iommu(struct dmar_drhd_unit *drhd)
+ {
+ 	struct intel_iommu *iommu;
+@@ -1099,7 +1149,7 @@ static int alloc_iommu(struct dmar_drhd_unit *drhd)
  	spin_lock_init(&iommu->lock);
  	ida_init(&iommu->domain_ida);
  	mutex_init(&iommu->did_lock);
-+	iommu->max_domain_id = cap_ndoms(iommu->cap);
+-	iommu->max_domain_id = cap_ndoms(iommu->cap);
++	iommu->max_domain_id = iommu_max_domain_id(iommu);
  
  	ver = readl(iommu->reg + DMAR_VER_REG);
  	pr_info("%s: reg_base_addr %llx ver %d:%d cap %llx ecap %llx\n",
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index e236c7ec221f..848b300da63e 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -1356,7 +1356,7 @@ int domain_attach_iommu(struct dmar_domain *domain, struct intel_iommu *iommu)
- 	}
- 
- 	num = ida_alloc_range(&iommu->domain_ida, IDA_START_DID,
--			      cap_ndoms(iommu->cap) - 1, GFP_KERNEL);
-+			      iommu->max_domain_id - 1, GFP_KERNEL);
- 	if (num < 0) {
- 		pr_err("%s: No free domain ids\n", iommu->name);
- 		goto err_unlock;
-@@ -1420,7 +1420,7 @@ static void copied_context_tear_down(struct intel_iommu *iommu,
- 	did_old = context_domain_id(context);
- 	context_clear_entry(context);
- 
--	if (did_old < cap_ndoms(iommu->cap)) {
-+	if (did_old < iommu->max_domain_id) {
- 		iommu->flush.flush_context(iommu, did_old,
- 					   PCI_DEVID(bus, devfn),
- 					   DMA_CCMD_MASK_NOBIT,
-@@ -1986,7 +1986,7 @@ static int copy_context_table(struct intel_iommu *iommu,
- 			continue;
- 
- 		did = context_domain_id(&ce);
--		if (did >= 0 && did < cap_ndoms(iommu->cap))
-+		if (did >= 0 && did < iommu->max_domain_id)
- 			ida_alloc_range(&iommu->domain_ida, did, did, GFP_KERNEL);
- 
- 		set_context_copied(iommu, bus, devfn);
-@@ -2902,7 +2902,7 @@ static ssize_t domains_supported_show(struct device *dev,
- 				      struct device_attribute *attr, char *buf)
- {
- 	struct intel_iommu *iommu = dev_to_intel_iommu(dev);
--	return sysfs_emit(buf, "%ld\n", cap_ndoms(iommu->cap));
-+	return sysfs_emit(buf, "%ld\n", iommu->max_domain_id);
- }
- static DEVICE_ATTR_RO(domains_supported);
- 
-@@ -2913,7 +2913,7 @@ static ssize_t domains_used_show(struct device *dev,
- 	unsigned int count = 0;
- 	int id;
- 
--	for (id = 0; id < cap_ndoms(iommu->cap); id++)
-+	for (id = 0; id < iommu->max_domain_id; id++)
- 		if (ida_exists(&iommu->domain_ida, id))
- 			count++;
- 
 -- 
 2.25.1
 
