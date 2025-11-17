@@ -1,156 +1,169 @@
-Return-Path: <kvm+bounces-63386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBF5DC64E32
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 16:34:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C74CC64E96
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 16:39:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BE6DE4EB8C7
-	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 15:33:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 59CB94EE181
+	for <lists+kvm@lfdr.de>; Mon, 17 Nov 2025 15:38:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB1B26FA50;
-	Mon, 17 Nov 2025 15:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AECAB284898;
+	Mon, 17 Nov 2025 15:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GviMYg7O"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="bTgByaG4";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="a3V3ZZ/H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9ED26A1A7
-	for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 15:33:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B727027280A;
+	Mon, 17 Nov 2025 15:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763393596; cv=none; b=tTJoPLi+DtjDwooCjMnOOR7kQgg7KF7Cz1rH+yk2T56TuQvCujry8mVVT84mMAKPqBo56pQ4s5927LPQLZmYEcRoREhNaAEm1KNmiXM5XyQKDKy9e/xCWECEu796vEnJEgi6tl1+2fiNQ5WFKCxqT42lwjZJmzdbMKonpvaoEdI=
+	t=1763393790; cv=none; b=aAoxtY3CTGDP933OoZ3oRBZZBgvuTdWTFR0QjvA679C4CZj0l1xw2Ms3+e5gTcafYTEAd54r7yecG2XHmfMRv21w1R3aKkDvriraqnxhSHKMCpv5mHlS+uw8yj4P6eV5/20o3YwLXR67XP6ZSAohz+AeehnfWgxjWcydqRGCAZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763393596; c=relaxed/simple;
-	bh=vfPBrJeS2zy3Pr5qUbo3c9/th+wmOm9aNfjfH1EDVuo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z2bQi/Xu4nF4+5W65sq9Fn0S0SYMpFPFGmcgziQdjkyNdlcB00z85VnwX0EE3xMRzzvLl07tD83x6HTtiVAd4OcHxVa0c37ihm+KNiCgTUSbtdCXtYCULmLv/txnScBNBdkDA2ymYkHOgTX0dKA/wNItMN9NWfYQPjrAoF0II/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GviMYg7O; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-297e1cf9aedso112292355ad.2
-        for <kvm@vger.kernel.org>; Mon, 17 Nov 2025 07:33:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763393594; x=1763998394; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jZVnU6sEl/ZvXIBOWZZgUqq535OZa3/OaAIZTP1Sqpg=;
-        b=GviMYg7OvxWvhlRXZz2gGXVOw6B0wEblGw6H6b1QSS2pp5TvljiW0cPEdUTCj47UVP
-         U0PTx4Wsnak721/b5EaSmPUy38p5smrGnXDOVlOqUtEZJw7iHPu1It7tw0W21N3Bar/d
-         J22e0WBzl85jKFGLkfAJQcBbUcfg/bYZpUr+zzbgSUSaVcALmXkOL/JAru75CEdF0FHm
-         D1sYK5FU4vLBbNtX0Q1nM7ysqluBPJgwGPBwyu2dj7ZsYKaoGcN+FQCl7YRi5PCQVYCR
-         adJKW3NS3dAE3eSjp5lVwFvxt4pvi4C+nrHYE78x7sUB/sbn5ziJTrt55EOTJR4gR8pM
-         A7cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763393594; x=1763998394;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jZVnU6sEl/ZvXIBOWZZgUqq535OZa3/OaAIZTP1Sqpg=;
-        b=lhraVXLkpee2CbuwkrIMGa1NHUtWjohhog9uuDFUEgFx0O4Mo+XdSh5+ytpkZ+9pp6
-         Gx6KYt/Cl4kba09veEypb508WIXL8Nxeo4+1mqKvOSxu5YpWvgLsPN0vxiSyCAsd01zl
-         oBm1MqX0oVkftbQPNjjL0k5mZIrwFZ9bKPt42D7LjP0B7wYUASp08hJcxibgWtl3gocY
-         EklIsHT7Uba8KZPyGsufwz72bw1ZSsmYzwIuI9U8qxVDlIPcxwty/WHT2wzfbqH6i2EY
-         L6XoL9E/7PXH2T5tFcospgsCnxqu7ZpgYy9kmNQQrfVqxSQWbDwqU4mbVDLeRasihJfP
-         UKyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKu42yZiU5i7LDjznd5Zj6slhDSG02vIJO5vD9n+yU92mbyrPC3uQaLHs3FSR3ZRnR2OM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjHC3vgZ98izi8MtHIOUOGdtEu0W41uTy2to04boBIh4ShkTtp
-	TIpWICMqufxVg20hScbyLEGpu6EqaFx/TLKSKRMJ3qGC3Za0ssM+bocojQ8LAtq/TJ61hiNX6YF
-	vMi/h5A==
-X-Google-Smtp-Source: AGHT+IFcgfANbxH+X/dUGfVq/aeS1cRKeejyd5VPubS9BUqqZdUmhH8BQp318t3RcHruJkyP4bWYEAY+/cc=
-X-Received: from plblv16.prod.google.com ([2002:a17:903:2a90:b0:297:eb04:dff7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ec83:b0:297:fec4:1557
- with SMTP id d9443c01a7336-2986a7598abmr139975895ad.60.1763393594305; Mon, 17
- Nov 2025 07:33:14 -0800 (PST)
-Date: Mon, 17 Nov 2025 07:33:12 -0800
-In-Reply-To: <20251117101129.GGaRr00XgEln3XzR5N@fat_crate.local>
+	s=arc-20240116; t=1763393790; c=relaxed/simple;
+	bh=e4u3eYmUgkB0Kz0goGsy4ER6DXTGROhUPStI4UwkDYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ozb81FXn+kkJiga9NZiPgvMZd27FZEXzh2QIDaxI4T5ufaR8NN9Eb51laINM1HZT3Q7KyBVmafKWyYq2nycYsRLdIPrDkUSSslrk/+8rT1dW0w1q7pj7BDuu75seInUsyhAV4PwX3UCzAZgm130QkqXI2MVvzFE7mQNgZy52nL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=bTgByaG4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=a3V3ZZ/H; arc=none smtp.client-ip=103.168.172.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id AEDCD14001CD;
+	Mon, 17 Nov 2025 10:36:26 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Mon, 17 Nov 2025 10:36:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1763393786;
+	 x=1763480186; bh=dumULOFDFktDrAv/FEHp3FtDy5iDmeMi8WaBMWjFFc0=; b=
+	bTgByaG40HRwAAQHrZmUb1QxjoIKG692YfpeDBRFe9Iu6ybe//AfCHpW3mIPsM1M
+	WYnkzK8lh2vXojzl2+qseUFiMvxqQKr0IYjFET9zskLG20I8YPQxfkYQYgftEyWx
+	jeD3gXXQIl0ubwQsOnRCneY9Ee+d3+FyAnOe8/ZEXTNbJBdR9zsD/Uqm6CFnrieJ
+	60m+mV6mdpdJNLWAtv0sUtz2nkHnAVCeUhvAsXprKWeJ9SeFuthsuY3OGDw1Tpsw
+	ZMjmSiwEFqUDMvWqfBkZB2f2ikmXmb74OaRGArj1p0panyj3vvVWtNAew6f7EjEB
+	kku47rytqu0faY0bmEgdRA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763393786; x=
+	1763480186; bh=dumULOFDFktDrAv/FEHp3FtDy5iDmeMi8WaBMWjFFc0=; b=a
+	3V3ZZ/HrTsgG7BZQp9uEsbe6TdQbscGPUzzV1ucmE75P+RX148fjF6z3+eDtfxE/
+	+LIsnQGcry5t2eP9DsugDIxSRuHjQL4Pa48vQlCFL4Aj9/mvHNagLk5oliXqjZiN
+	P7d9HhnMs2X2J530B8bl9/HIJt7CTkAoGK83TiPn4Am8w3vpm2woXXyidHxnjDmy
+	AoDIYJqVBQO7kNTSKqZlkxYHdKM38pK6DV5BLhEpHopJc14gJ9bdwbzb1CECdFQ4
+	29UG0a8x0Qak4XNvR1lJ563e3TxaNlVHCoAPZmYQcpWw6cJWVjhYMw/XcXCtUO7+
+	0XyIT5kl1gHE9x0NMHR1g==
+X-ME-Sender: <xms:-EAbaWyQ-WAwnluLWHzIZSr0mg8fK4EjRWclwqn4UadFrYR9CFAq3A>
+    <xme:-EAbaYnO_OBUD04HGAVXLl5Y0sdGgCgZ0LkU9JWquhPnnfcmXV8ZdkOcf5KlVUEak
+    U9OYBBXPjLciDkkfhjTYgSLsu-_gFaVGAR6arDrg1_4BpjJyD5n4g>
+X-ME-Received: <xmr:-EAbaeV7CxOi5NsfI_0iHooQtOGJov1ufXfnaa1D97FrNVc9zEAX-2Uc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvudekkeegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfgggtgfesthhqredttddtjeenucfhrhhomheptehlvgigucgh
+    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
+    htvghrnhepgffggfegffffhffhhefftdeikedtueefkefghfehledtkedvvddtieehveej
+    fffgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdp
+    nhgspghrtghpthhtohepfeehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegthh
+    hrihhsthhirghnrdhkohgvnhhighesrghmugdrtghomhdprhgtphhtthhopehlvghonhes
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepsghhvghlghgrrghssehgohhoghhlvgdrtg
+    homhdprhgtphhtthhopehlohhgrghnghesuggvlhhtrghtvggvrdgtohhmpdhrtghpthht
+    oheprgigsghovgeskhgvrhhnvghlrdgukhdprhgtphhtthhopehrohgsihhnrdhmuhhrph
+    hhhiesrghrmhdrtghomhdprhgtphhtthhopehjohhroheskegshihtvghsrdhorhhgpdhr
+    tghpthhtohepfihilhhlsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrdhsiiihph
+    hrohifshhkihesshgrmhhsuhhnghdrtghomh
+X-ME-Proxy: <xmx:-EAbaZ0fTJm_ATpV97jWOpcVupVrX5qYHi8qRNGt3G3rqeBOTipOKQ>
+    <xmx:-EAbaekY7TK2z-tERLv9vPNj8oV4GTGLaugTF_hEpglIkqI0gqjajw>
+    <xmx:-EAbaQEqElQCUqBqS26kmOTvil5W3KYOkdSQUnH2TTqyeLc7k0jBCw>
+    <xmx:-EAbabl0qbHJHfqmS6yt46qZ4Q6MuXUoWNyxiao6TOaw-x3l0mdFoA>
+    <xmx:-kAbaVsEtsMVur8JcMzBXoqZTmuBVUtCij-s3rV4asHdXPXnRrkBls7n>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 17 Nov 2025 10:36:22 -0500 (EST)
+Date: Mon, 17 Nov 2025 08:36:20 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+ Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Jonathan Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Kees Cook <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Ankit Agrawal <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+ Shameer Kolothum <skolothumtho@nvidia.com>,
+ Kevin Tian <kevin.tian@intel.com>, Krishnakant Jaju <kjaju@nvidia.com>,
+ Matt Ochs <mochs@nvidia.com>, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ iommu@lists.linux.dev, linux-mm@kvack.org, linux-doc@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
+ linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
+ Nicolin Chen <nicolinc@nvidia.com>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>
+Subject: Re: [PATCH v7 00/11] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Message-ID: <20251117083620.4660081a.alex@shazbot.org>
+In-Reply-To: <da399efa-ad5b-4bdc-964d-b6cc4a4fc55d@amd.com>
+References: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
+	<20251110134218.5e399b0f.alex@shazbot.org>
+	<da399efa-ad5b-4bdc-964d-b6cc4a4fc55d@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251113233746.1703361-1-seanjc@google.com> <20251113233746.1703361-4-seanjc@google.com>
- <20251117101129.GGaRr00XgEln3XzR5N@fat_crate.local>
-Message-ID: <aRtAOM040vM9RGfK@google.com>
-Subject: Re: [PATCH v5 3/9] x86/bugs: Decouple ALTERNATIVE usage from VERW
- macro definition
-From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Brendan Jackman <jackmanb@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 17, 2025, Borislav Petkov wrote:
-> On Thu, Nov 13, 2025 at 03:37:40PM -0800, Sean Christopherson wrote:
-> > +#define __CLEAR_CPU_BUFFERS	__stringify(VERW)
-> 
-> Let's get rid of one indirection level pls:
-> 
-> diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-> index 8b4885a1b2ef..59945cb5e5f9 100644
-> --- a/arch/x86/include/asm/nospec-branch.h
-> +++ b/arch/x86/include/asm/nospec-branch.h
-> @@ -309,23 +309,21 @@
->   * Note: Only the memory operand variant of VERW clears the CPU buffers.
->   */
->  #ifdef CONFIG_X86_64
-> -#define VERW	verw x86_verw_sel(%rip)
-> +#define VERW	__stringify(verw x86_verw_sel(%rip))
->  #else
->  /*
->   * In 32bit mode, the memory operand must be a %cs reference. The data segments
->   * may not be usable (vm86 mode), and the stack segment may not be flat (ESPFIX32).
->   */
-> -#define VERW	verw %cs:x86_verw_sel
-> +#define VERW	__stringify(verw %cs:x86_verw_sel)
->  #endif
+On Tue, 11 Nov 2025 09:54:22 +0100
+Christian K=C3=B6nig <christian.koenig@amd.com> wrote:
 
-Brendan also brought this up in v4[*].  Unless there's a way to coerce ALTERNATIVE_2
-into working with multiple strings, the layer of indirection is needed so that KVM
-can emit __stringify() for the entire sequence.
+> On 11/10/25 21:42, Alex Williamson wrote:
+> > On Thu,  6 Nov 2025 16:16:45 +0200
+> > Leon Romanovsky <leon@kernel.org> wrote:
+> >  =20
+> >> Changelog:
+> >> v7:
+> >>  * Dropped restore_revoke flag and added vfio_pci_dma_buf_move
+> >>    to reverse loop.
+> >>  * Fixed spelling errors in documentation patch.
+> >>  * Rebased on top of v6.18-rc3.
+> >>  * Added include to stddef.h to vfio.h, to keep uapi header file indep=
+endent. =20
+> >=20
+> > I think we're winding down on review comments.  It'd be great to get
+> > p2pdma and dma-buf acks on this series.  Otherwise it's been posted
+> > enough that we'll assume no objections.  Thanks, =20
+>=20
+> Already have it on my TODO list to take a closer look, but no idea when t=
+hat will be.
+>=20
+> This patch set is on place 4 or 5 on a rather long list of stuff to revie=
+w/finish.
 
-  : Heh, I tried that, and AFAICT it simply can't work with the way ALTERNATIVE and
-  : friends are implemented, as each paramater needs to be a single unbroken string.
-  : 
-  : E.g. this 
-  : 
-  : diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-  : index 61a809790a58..ffa6bc2345e3 100644
-  : --- a/arch/x86/kvm/vmx/vmenter.S
-  : +++ b/arch/x86/kvm/vmx/vmenter.S
-  : @@ -63,6 +63,8 @@
-  :         RET
-  :  .endm
-  :  
-  : +#define CLEAR_CPU_BUFFERS_SEQ_STRING  "verw x86_verw_sel(%rip)"
-  : +
-  :  .section .noinstr.text, "ax"
-  :  
-  :  /**
-  : @@ -169,9 +171,9 @@ SYM_FUNC_START(__vmx_vcpu_run)
-  :  
-  :         /* Clobbers EFLAGS.ZF */
-  :         ALTERNATIVE_2 "",                                                       \
-  : -                     __stringify(jz .Lskip_clear_cpu_buffers;                  \
-  : -                                 CLEAR_CPU_BUFFERS_SEQ;                        \
-  : -                                 .Lskip_clear_cpu_buffers:),                   \
-  : +                     "jz .Lskip_clear_cpu_buffers; "                           \
-  : +                     CLEAR_CPU_BUFFERS_SEQ_STRING;                             \
-  : +                     ".Lskip_clear_cpu_buffers:",                              \
-  :                       X86_FEATURE_CLEAR_CPU_BUF_MMIO,                           \
-  :                       __CLEAR_CPU_BUFFERS, X86_FEATURE_CLEAR_CPU_BUF_VM
-  :  
-  : yields wonderfully helpful error messages like so:
-  : 
-  :   arch/x86/kvm/vmx/vmenter.S: Assembler messages:
-  :   arch/x86/kvm/vmx/vmenter.S:173: Error: too many positional arguments
-  : 
-  : If there's a magic incanation to get things to work, it's unknown to me.
+Hi Christian,
 
-[*] https://lore.kernel.org/all/aQT1JgdgiNae3Ybl@google.com
+Gentle nudge.  Leon posted v8[1] last week, which is not drawing any
+new comments.  Do you foresee having time for review that I should
+still hold off merging for v6.19 a bit longer?  Thanks,
+
+Alex
+
+
+[1]https://lore.kernel.org/all/20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidi=
+a.com/
 
