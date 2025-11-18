@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-63561-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63562-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1735DC6ADF6
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 18:15:32 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F957C6AE6A
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 18:20:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 9FA692C414
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 17:13:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 168833A3C6F
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 17:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422E23A79C0;
-	Tue, 18 Nov 2025 17:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C8331ED6E;
+	Tue, 18 Nov 2025 17:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BvFGrTQ4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gsr/KvOk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BD53A79A2
-	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 17:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6410393DF8
+	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 17:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763485884; cv=none; b=nE80iI5rwNOF/zw6vcW7LgEBwbLS582h440fMZYwUbrLrxx7JXYLFKu97gfPCfSh5JuySoJxbAPLXyiEoeKR0l7CKAz/OPoeoQQR2U5k23XMH4s8WChQMR2Y5c9ZFWBQrKOIl4WmQB0Rz8Z6uuLGYzsBADbq/+qi923Ux8pS4VE=
+	t=1763485888; cv=none; b=J6s7NwFXLh/yfyG/zfUNP8EURChpX9sFMO0cmtE3H4iBMBMJd+AugOWeQxXJIJQGfksfDciO4hwi8NXrooTqS3lCyHiB+X0J3sChHO1MTPVRpsUuTW+GYiMN7rBf5bsB37D938ItTThsqOJmRmkDBtJymoqq4FVIPZ197dSlSfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763485884; c=relaxed/simple;
-	bh=GTh03DnovL1IfXrIJWOOWsXVB4KulpyzdpPOxbFjAXc=;
+	s=arc-20240116; t=1763485888; c=relaxed/simple;
+	bh=NuQn3OfYxineh0KWDf920OOndHNl13nMc1XXtPNfvQY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IeVDcSFbruvkJWcQoc/Tn9mNurXGWv8tQj9PfDPemquAIFR8XrpgvNICHDNXjeO0pSX3kNd/6cHEViGUNFcNaCVCAOEZJ92Xu6fY8OO9fkg4JMDWAL/rICtdLdgg5fB+AC3HC1NmtwkdJAq4c2NodL2CHokurCzqulI8wZyRPUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BvFGrTQ4; arc=none smtp.client-ip=209.85.128.47
+	 MIME-Version; b=GhO4PNpYzqgn3qY/9kvXx4BmnjfoV+6+SDxFObKajZZ2FPLpLIntwWNqvrmbSgIrmmAxyrsNk4ECVGJMalX8hMY7SZSG6sEFarJ4thkn82IxsBb+goH7/fhiZgjgCfEBZXgEb3TrxM4601tptsSR0T/o5/KcZSa48O1nI8ws/fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gsr/KvOk; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47795f6f5c0so26422075e9.1
-        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 09:11:21 -0800 (PST)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-477a219db05so17988845e9.2
+        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 09:11:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763485880; x=1764090680; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763485882; x=1764090682; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2msaF/pghuykVBiKeYLpA2uXeztIpV3HBLG8Kfba9b0=;
-        b=BvFGrTQ4pfCkJK65Z3g55lBEsQMtMyGz69ZKdp69o9CBY3fJVWw4hKuJLPc7tniSFf
-         IZZNuD1qJCkpht/w23hiHkZmloleFvxU+1uBZYhLt3MxilNGX+QIoNiHeFhh2eLzQ+tN
-         1Q8Cj+BbRzXmht8P1idLA0gEnbhabA4+cXlpt1BIpZrIovBmmvZEr0/xu6TCtExfh2R7
-         cMyFMC/LkB9+V6fmjeCQ1ySs2V0CX7TtC8uO16Foz8tSQ9RMcZRcBicJ1e0tUeA185Ql
-         5fyQDPba8jatX0HUScKhXa+B73rSgOR3pWEgXK1Jhq/ztvdLtsBH3JYuRvOW/r7P/WL/
-         JMHQ==
+        bh=H/+N5QsX2rcNo+FLul8FJV25DAtd4OsYln3zlGw8aLQ=;
+        b=gsr/KvOkK4dVgr6eKSsL4WCDdNej0G+7iw3SwD/LyJlX9Dl75Cc5E+tNHEHcfPICut
+         rlhqVs3OtKKgvQR6gP3moIqVVVtnkOAqaPh7mwKde4D0w0TQSIGtX+nFFCpZ5CT1gwkL
+         wADn6EPHw0VbBmVb4yxAzojBse7CdBjRdUeU18FbHr1GTLWqrGKVw7zNTG83uihysAgc
+         nu5NlpBDsewR/MGH3SlUodMLhR3TDT4SyGwJdYxu8aTdOc7WOeDLI/A6h5871/DK4Ler
+         B8rowsCtqDoMKvYBx8QzeaMFSR8enX9WbG+FDKq1F5mUri5A+LbM+IWUT+/ADMzHShTX
+         dH5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763485880; x=1764090680;
+        d=1e100.net; s=20230601; t=1763485882; x=1764090682;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=2msaF/pghuykVBiKeYLpA2uXeztIpV3HBLG8Kfba9b0=;
-        b=SwlRj4ZgyQt2VPqdE3k1CPR+/rtZYhmFLcVHjMaTrgTaKUxo6ExgO8umyiY/eiFpzJ
-         Fqw/huFVVKEMSrute0Snnp+uiIFB80iHOhhM0dmeFH+ZAsgOXU7tZgL1lAzjbPnbuSX2
-         R5uQy1hAK7A4ZZmNlbjR1/BS/N5O569vBVytqBUFqXHbfiSGJFn8zYTG/ZaACwpMtaEt
-         1UR7n6Ck5zZVz6wdrl88foQHYl7dy3Td0wdknAm2dqGS3ViTGzaRJoX6UY29Zpgsja53
-         oEHpIjTKQZcjyiLauSmDSFPudir4l4JSelsCHW4H6xGhG7Xtt9ZgPtheC7Zs/NbRpnMS
-         72nQ==
-X-Gm-Message-State: AOJu0YwT41+qXni0GOwWz6w7hEOMsAORrEVI+CmPngVFZY00+kENxNZA
-	Tju17FBWHQDaQBC208gfbC7UCbM0+qWmDzDH1R5wAX2qD6bOs7bGuPNwimSEjSvcuA9BVA==
-X-Gm-Gg: ASbGncu+3lp85qXjRwAvhHkQHDVv1qOyAW0mkO/j5s/bu74DIUJDUr4o6hg2n0m2YyL
-	nxcvbVf2TeJICciV9UMLpHu3H8Ii+eK4eyNMtCQvVt6pAIUdd2NVzo3Nu4JUpE7ov2at8HPQXu9
-	f5RF8hEKOqF5kN60GQ8PDTNMNJ+yeuCN47Zt9/jvh8Yu+KXjqA5KVRS6MBd2xUPXNq8+lz9Ib6s
-	OTuvqzWhb1qERvxIzhub52NfSF4JX75lK3bZhp+h3USsmFyjhxzh7tVMRibDlXZ2hdiUGB5neLp
-	1T69ybC2WD/6W2kG+IPQQvv1SpT/7D7JytBI0/Gdgky7Dd/R7d//TeFPey5cRWyIc5O+zgXrJyx
-	iXN1zk9W2eNUgBZCe5OtTmevIXj130nJayUJxigLFWTKZq5BaPtW1D3ca4ysiSdtljWfeGgFjaG
-	1dsp0kdFV3PFNvHXY8xBZdUYLY15J3O/3DepKW3COX5y3rGAhOkDKtow6RWdPbgep6FFgCSdz6a
-	EYOeWPpVO+XBa9YMQvCmjqws1haWbGD/VIbZiQKjmI=
-X-Google-Smtp-Source: AGHT+IHdXnNaex4ngSMgitg8wwk6Na5e/foyybWKk5KGf3oOduiN1nkUwKeEG02d7fZ9hcGJWmLqmg==
-X-Received: by 2002:a05:600c:3baa:b0:477:54b3:3484 with SMTP id 5b1f17b1804b1-4778febd2eamr153120225e9.37.1763485879789;
-        Tue, 18 Nov 2025 09:11:19 -0800 (PST)
+        bh=H/+N5QsX2rcNo+FLul8FJV25DAtd4OsYln3zlGw8aLQ=;
+        b=wf58IRDw+L2TPfqIE4nRMtmTlmpjjV0fKdhmFZYvujvlc5yfGltO/4ej6BjFXv0c6Y
+         gy7dQyvS+cNzHQCtsGJYXWoDnZOCiYHmmFepzUdYwuyhklH1FOuaorsNekZAOsnAgQ/Z
+         0wRNLaBxIiIPDyw0aliVp6otmtIuf6dQQV6zfQrlxdayA7hqoufbsglebSRmVo+E2A6Y
+         buk3sfBJluE+wwx35WY8D4+URdZCzGq0/310NoBB0/v6BhaSZ27OhUoL51pv+FivXJ4Y
+         l44w7d/mnKPszduRZ+jn2peC0Dazm6U52O5IpuI8DCPbLlWWdA2Cf5FCzrRwNpttYbjK
+         1XSA==
+X-Gm-Message-State: AOJu0YxMhQ6YrtbuyOjRPbC8hfqJqe0RbJZPOkH46aV/5wad7ULhOaRe
+	eIdHzNxC/Zku5QppZDG6uv1hEkBe98mvULYfs+HlLlD10ixKblFUevk9cUMx7POG8eWqSA==
+X-Gm-Gg: ASbGncthzHN0zKDlHGokS5m6HRjdvsjhUvdhtE7TZqESNxrxnOYqDgoDjBAG2dAlnSk
+	h1xffWKavQYG67o0C/V5bkHOAnqD+P5v6wl3gO7hXpPmKQm3ReV0XFhXK8jZEYHdoWekm6C/2mU
+	26Op9ON6+o1yhhaPLDl80wZAfLNQj+TRGHUolk8z9ZXt/IHe8aZp7K4mkMU7B5kBA2jbjL4tcXb
+	hhYlqNSgRIeK1xmJTS7tGgsXnZ4KIJop41oV+DdfoaDjjbb0D5G6jsPpAOPhYzK4U+5D0kWKBEA
+	C+v7OkAWLGV0S+og6NH+J35eZvteijBytl4p+rpvXEoTPwqmUpNgFUA1kDLDRFK9cqz/DqpkNVm
+	RX7IipZY0Z/eSWHSx7QnbOOy1H8Ydp41SYmhbP7n4KN8ab0Lqmr5Gojho5vHserrMjEBY5RxXGG
+	eHMMhlVfTjYbkna9M7odVWt112d8XHySCt10ltekMI/J320iiBlDjBXfmB0aB9oNyVcg1E09vku
+	5Qr6n6TRh722uaXweaVtmzCnQ27Cvl1Yhunw0kSh94=
+X-Google-Smtp-Source: AGHT+IHzxclG4jBwiQp70vxCA2ZAiQghW7Y5GZpasp1HpOszP3Zzx0IMeOTCiRFywIuJghT3KdWqlw==
+X-Received: by 2002:a05:600c:1d16:b0:477:7c45:87b1 with SMTP id 5b1f17b1804b1-4778feb78e1mr160881775e9.36.1763485881445;
+        Tue, 18 Nov 2025 09:11:21 -0800 (PST)
 Received: from ip-10-0-150-200.eu-west-1.compute.internal (ec2-52-49-196-232.eu-west-1.compute.amazonaws.com. [52.49.196.232])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b103d312sm706385e9.13.2025.11.18.09.11.19
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b103d312sm706385e9.13.2025.11.18.09.11.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 09:11:19 -0800 (PST)
+        Tue, 18 Nov 2025 09:11:20 -0800 (PST)
 From: griffoul@gmail.com
 X-Google-Original-From: griffoul@gmail.org
 To: kvm@vger.kernel.org
@@ -85,9 +85,9 @@ Cc: seanjc@google.com,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Fred Griffoul <fgriffo@amazon.co.uk>
-Subject: [PATCH v2 01/10] KVM: nVMX: Implement cache for L1 MSR bitmap
-Date: Tue, 18 Nov 2025 17:11:04 +0000
-Message-ID: <20251118171113.363528-2-griffoul@gmail.org>
+Subject: [PATCH v2 02/10] KVM: pfncache: Restore guest-uses-pfn support
+Date: Tue, 18 Nov 2025 17:11:05 +0000
+Message-ID: <20251118171113.363528-3-griffoul@gmail.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251118171113.363528-1-griffoul@gmail.org>
 References: <20251118171113.363528-1-griffoul@gmail.org>
@@ -101,127 +101,218 @@ Content-Transfer-Encoding: 8bit
 
 From: Fred Griffoul <fgriffo@amazon.co.uk>
 
-Introduce a gfn_to_pfn_cache to optimize L1 MSR bitmap access by
-replacing map/unmap operations. This optimization reduces overhead
-during L2 VM-entry where nested_vmx_prepare_msr_bitmap() merges L1's MSR
-intercepts with L0's requirements.
+Restore functionality for guest page access tracking in pfncache,
+enabling automatic vCPU request generation when cache invalidation
+occurs through MMU notifier events.
 
-Current implementation using kvm_vcpu_map_readonly() and
-kvm_vcpu_unmap() creates significant performance impact, mostly with
-unmanaged guest memory.
+This feature is critical for nested VMX operations where both KVM and L2
+guest access guest-provided pages, such as APIC pages and posted
+interrupt descriptors.
 
-The cache is initialized when entering VMX operation and deactivated
-when VMX operation ends.
+This change:
+
+- Reverts commit eefb85b3f031 ("KVM: Drop unused @may_block param from
+  gfn_to_pfn_cache_invalidate_start()")
+
+- Partially reverts commit a4bff3df5147 ("KVM: pfncache: remove
+  KVM_GUEST_USES_PFN usage"). Adds kvm_gpc_init_for_vcpu() to
+  initialize pfncache for guest mode access, instead of the
+  usage-specific flag approach.
 
 Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
 ---
- arch/x86/kvm/vmx/nested.c | 42 +++++++++++++++++++++++++++++++++++----
- arch/x86/kvm/vmx/vmx.h    |  2 ++
- 2 files changed, 40 insertions(+), 4 deletions(-)
+ include/linux/kvm_host.h  | 29 +++++++++++++++++++++++++-
+ include/linux/kvm_types.h |  1 +
+ virt/kvm/kvm_main.c       |  3 ++-
+ virt/kvm/kvm_mm.h         |  6 ++++--
+ virt/kvm/pfncache.c       | 43 ++++++++++++++++++++++++++++++++++++---
+ 5 files changed, 75 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 8b131780e981..0de84b30c41d 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -315,6 +315,34 @@ static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
- 	vcpu->arch.regs_dirty = 0;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 19b8c4bebb9c..6253cf1c38c1 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1402,6 +1402,9 @@ int kvm_vcpu_write_guest(struct kvm_vcpu *vcpu, gpa_t gpa, const void *data,
+ 			 unsigned long len);
+ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
+ 
++void __kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm,
++		    struct kvm_vcpu *vcpu);
++
+ /**
+  * kvm_gpc_init - initialize gfn_to_pfn_cache.
+  *
+@@ -1412,7 +1415,11 @@ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
+  * immutable attributes.  Note, the cache must be zero-allocated (or zeroed by
+  * the caller before init).
+  */
+-void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm);
++
++static inline void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm)
++{
++	__kvm_gpc_init(gpc, kvm, NULL);
++}
+ 
+ /**
+  * kvm_gpc_activate - prepare a cached kernel mapping and HPA for a given guest
+@@ -1494,6 +1501,26 @@ int kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, unsigned long len);
+  */
+ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc);
+ 
++/**
++ * kvm_gpc_init_for_vcpu - initialize gfn_to_pfn_cache for pin/unpin usage
++ *
++ * @gpc:        struct gfn_to_pfn_cache object.
++ * @vcpu:       vCPU that will pin and directly access this cache.
++ * @req:        request to send when cache is invalidated while pinned.
++ *
++ * This sets up a gfn_to_pfn_cache for use by a vCPU that will directly access
++ * the cached physical address. When the cache is invalidated while pinned,
++ * the specified request will be sent to the associated vCPU to force cache
++ * refresh.
++ *
++ * Note, the cache must be zero-allocated (or zeroed by the caller before init).
++ */
++static inline void kvm_gpc_init_for_vcpu(struct gfn_to_pfn_cache *gpc,
++					 struct kvm_vcpu *vcpu)
++{
++	__kvm_gpc_init(gpc, vcpu->kvm, vcpu);
++}
++
+ static inline bool kvm_gpc_is_gpa_active(struct gfn_to_pfn_cache *gpc)
+ {
+ 	return gpc->active && !kvm_is_error_gpa(gpc->gpa);
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index 490464c205b4..445170ea23e4 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -74,6 +74,7 @@ struct gfn_to_pfn_cache {
+ 	struct kvm_memory_slot *memslot;
+ 	struct kvm *kvm;
+ 	struct list_head list;
++	struct kvm_vcpu *vcpu;
+ 	rwlock_t lock;
+ 	struct mutex refresh_lock;
+ 	void *khva;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 226faeaa8e56..88de1eac5baf 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -760,7 +760,8 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+ 	 * mn_active_invalidate_count (see above) instead of
+ 	 * mmu_invalidate_in_progress.
+ 	 */
+-	gfn_to_pfn_cache_invalidate_start(kvm, range->start, range->end);
++	gfn_to_pfn_cache_invalidate_start(kvm, range->start, range->end,
++					  hva_range.may_block);
+ 
+ 	/*
+ 	 * If one or more memslots were found and thus zapped, notify arch code
+diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
+index 31defb08ccba..f1ba02084bd9 100644
+--- a/virt/kvm/kvm_mm.h
++++ b/virt/kvm/kvm_mm.h
+@@ -58,11 +58,13 @@ kvm_pfn_t hva_to_pfn(struct kvm_follow_pfn *kfp);
+ #ifdef CONFIG_HAVE_KVM_PFNCACHE
+ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
+ 				       unsigned long start,
+-				       unsigned long end);
++				       unsigned long end,
++				       bool may_block);
+ #else
+ static inline void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
+ 						     unsigned long start,
+-						     unsigned long end)
++						     unsigned long end,
++						     bool may_block)
+ {
+ }
+ #endif /* HAVE_KVM_PFNCACHE */
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index 728d2c1b488a..543466ff40a0 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -23,9 +23,11 @@
+  * MMU notifier 'invalidate_range_start' hook.
+  */
+ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
+-				       unsigned long end)
++				       unsigned long end, bool may_block)
+ {
++	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
+ 	struct gfn_to_pfn_cache *gpc;
++	bool evict_vcpus = false;
+ 
+ 	spin_lock(&kvm->gpc_lock);
+ 	list_for_each_entry(gpc, &kvm->gpc_list, list) {
+@@ -46,8 +48,21 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
+ 
+ 			write_lock_irq(&gpc->lock);
+ 			if (gpc->valid && !is_error_noslot_pfn(gpc->pfn) &&
+-			    gpc->uhva >= start && gpc->uhva < end)
++			    gpc->uhva >= start && gpc->uhva < end) {
+ 				gpc->valid = false;
++
++				/*
++				 * If a guest vCPU could be using the physical address,
++				 * it needs to be forced out of guest mode.
++				 */
++				if (gpc->vcpu) {
++					if (!evict_vcpus) {
++						evict_vcpus = true;
++						bitmap_zero(vcpu_bitmap, KVM_MAX_VCPUS);
++					}
++					__set_bit(gpc->vcpu->vcpu_idx, vcpu_bitmap);
++				}
++			}
+ 			write_unlock_irq(&gpc->lock);
+ 			continue;
+ 		}
+@@ -55,6 +70,27 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
+ 		read_unlock_irq(&gpc->lock);
+ 	}
+ 	spin_unlock(&kvm->gpc_lock);
++
++	if (evict_vcpus) {
++		/*
++		 * KVM needs to ensure the vCPU is fully out of guest context
++		 * before allowing the invalidation to continue.
++		 */
++		unsigned int req = KVM_REQ_OUTSIDE_GUEST_MODE;
++		bool called;
++
++		/*
++		 * If the OOM reaper is active, then all vCPUs should have
++		 * been stopped already, so perform the request without
++		 * KVM_REQUEST_WAIT and be sad if any needed to be IPI'd.
++		 */
++		if (!may_block)
++			req &= ~KVM_REQUEST_WAIT;
++
++		called = kvm_make_vcpus_request_mask(kvm, req, vcpu_bitmap);
++
++		WARN_ON_ONCE(called && !may_block);
++	}
  }
  
-+/*
-+ * Maps a single guest page starting at @gpa and lock the cache for access.
-+ */
-+static int nested_gpc_lock(struct gfn_to_pfn_cache *gpc, gpa_t gpa)
-+{
-+	int err;
-+
-+	if (!PAGE_ALIGNED(gpa))
-+		return -EINVAL;
-+retry:
-+	read_lock(&gpc->lock);
-+	if (!kvm_gpc_check(gpc, PAGE_SIZE) || (gpc->gpa != gpa)) {
-+		read_unlock(&gpc->lock);
-+		err = kvm_gpc_activate(gpc, gpa, PAGE_SIZE);
-+		if (err)
-+			return err;
-+
-+		goto retry;
-+	}
-+
-+	return 0;
-+}
-+
-+static void nested_gpc_unlock(struct gfn_to_pfn_cache *gpc)
-+{
-+	read_unlock(&gpc->lock);
-+}
-+
- static void nested_put_vmcs12_pages(struct kvm_vcpu *vcpu)
+ static bool kvm_gpc_is_valid_len(gpa_t gpa, unsigned long uhva,
+@@ -382,7 +418,7 @@ int kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, unsigned long len)
+ 	return __kvm_gpc_refresh(gpc, gpc->gpa, uhva);
+ }
+ 
+-void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm)
++void __kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm, struct kvm_vcpu *vcpu)
  {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -344,6 +372,9 @@ static void free_nested(struct kvm_vcpu *vcpu)
- 	vmx->nested.vmxon = false;
- 	vmx->nested.smm.vmxon = false;
- 	vmx->nested.vmxon_ptr = INVALID_GPA;
-+
-+	kvm_gpc_deactivate(&vmx->nested.msr_bitmap_cache);
-+
- 	free_vpid(vmx->nested.vpid02);
- 	vmx->nested.posted_intr_nv = -1;
- 	vmx->nested.current_vmptr = INVALID_GPA;
-@@ -625,7 +656,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 	int msr;
- 	unsigned long *msr_bitmap_l1;
- 	unsigned long *msr_bitmap_l0 = vmx->nested.vmcs02.msr_bitmap;
--	struct kvm_host_map map;
-+	struct gfn_to_pfn_cache *gpc;
+ 	rwlock_init(&gpc->lock);
+ 	mutex_init(&gpc->refresh_lock);
+@@ -391,6 +427,7 @@ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm)
+ 	gpc->pfn = KVM_PFN_ERR_FAULT;
+ 	gpc->gpa = INVALID_GPA;
+ 	gpc->uhva = KVM_HVA_ERR_BAD;
++	gpc->vcpu = vcpu;
+ 	gpc->active = gpc->valid = false;
+ }
  
- 	/* Nothing to do if the MSR bitmap is not in use.  */
- 	if (!cpu_has_vmx_msr_bitmap() ||
-@@ -648,10 +679,11 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 			return true;
- 	}
- 
--	if (kvm_vcpu_map_readonly(vcpu, gpa_to_gfn(vmcs12->msr_bitmap), &map))
-+	gpc = &vmx->nested.msr_bitmap_cache;
-+	if (nested_gpc_lock(gpc, vmcs12->msr_bitmap))
- 		return false;
- 
--	msr_bitmap_l1 = (unsigned long *)map.hva;
-+	msr_bitmap_l1 = (unsigned long *)gpc->khva;
- 
- 	/*
- 	 * To keep the control flow simple, pay eight 8-byte writes (sixteen
-@@ -739,7 +771,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
- 					 MSR_IA32_PL3_SSP, MSR_TYPE_RW);
- 
--	kvm_vcpu_unmap(vcpu, &map);
-+	nested_gpc_unlock(gpc);
- 
- 	vmx->nested.force_msr_bitmap_recalc = false;
- 
-@@ -5490,6 +5522,8 @@ static int enter_vmx_operation(struct kvm_vcpu *vcpu)
- 
- 	vmx->nested.vpid02 = allocate_vpid();
- 
-+	kvm_gpc_init(&vmx->nested.msr_bitmap_cache, vcpu->kvm);
-+
- 	vmx->nested.vmcs02_initialized = false;
- 	vmx->nested.vmxon = true;
- 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index ea93121029f9..d76621403c28 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -152,6 +152,8 @@ struct nested_vmx {
- 
- 	struct loaded_vmcs vmcs02;
- 
-+	struct gfn_to_pfn_cache msr_bitmap_cache;
-+
- 	/*
- 	 * Guest pages referred to in the vmcs02 with host-physical
- 	 * pointers, so we must keep them pinned while L2 runs.
 -- 
 2.43.0
 
