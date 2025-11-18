@@ -1,147 +1,207 @@
-Return-Path: <kvm+bounces-63545-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63546-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C831C69D3B
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 15:09:12 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE0D3C69F12
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 15:27:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E53294F75AC
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 14:03:17 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0F13234AF8F
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 14:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91DF36402D;
-	Tue, 18 Nov 2025 13:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7E335BDCD;
+	Tue, 18 Nov 2025 14:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n46aGFuP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CT2vs3iY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB76363C54
-	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 13:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B6F32E6A9
+	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 14:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763474395; cv=none; b=ECgs5SJ6iBh+QJKQSQLyNViHMCjo8JWYAXMRkKBXXIV2TyaUpY3bbJ+Y+2N18CNQMWTp31YUCTjqWjsm9/rp2YNmkndXx5PJN0+Kw9+8aTG1Sn92Yy2JRg56ZxQ+hSDY4ozHUlpWla7S5OAZ/1eA0vxkfNfv1GRz5btn0/o8ns4=
+	t=1763475611; cv=none; b=Mf0hi78h1YF6rl41p1NHo9zu5xX1ke+NzajMrJ7uNRcxOQlOLrfT3llLonftXC/l67SB5sGOCpsXbG5o9hKq3eN+aY9cKlaCQeLL8g12GHoGSnOY709AyryQU4aVyZZUaSt3QMYAGr1ul76MPGjuuZshG7A8D7VUE6W7a17tNd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763474395; c=relaxed/simple;
-	bh=a4l6UmF6YkipJmQfu6Xj5itRRy/apLU9qhpssM5sf3Q=;
+	s=arc-20240116; t=1763475611; c=relaxed/simple;
+	bh=VNXsIUNhy+3XDUlMUkL7Q+4iGshuTfgpRMOfuGpJ1OM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UX0KQ0QZnBm8OrWUGSM/0KpkHSMKGVqyqSNzPPj15jQ1rhCRKZ5F+pBGMwnhk78JZhg+nZ8687oqhvnGTk37ySXNpvhPbEd6QBA5aB9/pddZwYx5Kkw5ph3TYad7HeUrf5jlfjL1K2anta67++njr0oQ2UnvPDOvbwn4WQbbdXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n46aGFuP; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ee147baf7bso291581cf.1
-        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 05:59:52 -0800 (PST)
+	 To:Cc:Content-Type; b=BHpKTtEcpxEYhoHvPLnT39OjDt44IZDD5U8fsgOn5Jnm81MLHXUh+abtI2jIyCcZ5RXQoPRi8BxHnNagiKLQg3cD19eRU3tIkTUDdm8h3Ya+ruAJCP29VEVWktMkDkRASv0bexUfFUGB+t+Fg1EUZ0fNkgnjUi9T/MZgEfrJGk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CT2vs3iY; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-343dfb673a8so5273650a91.0
+        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 06:20:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763474392; x=1764079192; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=R2GwSQ++DitICmTZEwHDVEkQZZItGNz+IuoJwTCHLm0=;
-        b=n46aGFuPqhooEC+9uOJWaLFu9tbQQN1luwefvxdWPikzNCxvHX+B0LYYJYHwfz1Smo
-         Z5N4GDOxIXa/wR5Bv/8VhgongTHMIGlUQkQ2YA5K8vlMM253a/fnpzgJDGo4DuwNWeXu
-         Q837S7Q/B+BCVgtwintm+zCkYo+hV0T3RCG1DI/5ShxKi+pwC2L2hi6WWhdHLEwSw1qR
-         jykzTkFuMcnInEoXhzHtjii131K1k/Ct/EQ763elQjkvo0Y5Q8CU6fLe8eu6UosND64I
-         9edse6Uo4+krqL4zM0xIok3ayiQhEp9YL4TlQGTLudc4XvC6SHU7fBPTf/QYfdTDbJHG
-         296Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763474392; x=1764079192;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1763475609; x=1764080409; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R2GwSQ++DitICmTZEwHDVEkQZZItGNz+IuoJwTCHLm0=;
-        b=k/v/b7xgBqsPWj8Z9+kFov2jiuSHMvl/BzF4s7SGo5EP0hh6TfBG1XqT8caP6fnrUf
-         YoNyaouQszzA1J9XiCzzChKfJBUv51iuqM6aqi/UXdBiHjpo6RM55z7YjcnXnX8ZzJmS
-         gY3DYfdrh/Jj72qv/OfnVm375LQ6nwy5PLyY/8HBhi7vfR1w6QvySCqQsxOc/3hYasZU
-         vewFnlfVee6E4G5HRtQWgIi8Ug7PmX59bJDOnqD+MWOP4cNzG1og7g3kIzPXQxyIbOXn
-         ud2aQqlSsCfOj8Q7/Pxnt7kO+WhEFd+SyrLJ7Aa3JL2a2wHuKhDkGxQmTcfShcIMCyJ/
-         NDVA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTOXW4kYv811WZBk65kJEZAAPCq3b1hcE49EBumLvRIeQKYfUXyrH/Asahnoab9eWl4WI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywi2fM7quwCMdeiRcGvA64cbFUPTh+dAG6Pz2oPHD39OE+Bj4mL
-	m07ItDJQhsnrbVUkadb7FHM9porQvoDFA4SnTKWhUFDRw4b5YP1rcXq4Shf1F1P9elNBk60b8Ti
-	1o3nC4bmtIqceTMvr45gKcVDwG+L2OGhEgi+zUuy9gtmTx7BBEV/44m9u
-X-Gm-Gg: ASbGnctmoFVzCDiDhIo2NKCcjUbuft7ip2vv395yDTcbbC+2EkflLJKpWeVMAwOzhmi
-	SCwMBOaDA+cKZqWqW2vIR3yuTEeffiNAVLTdkXVdiGYLDG8RHIHSf6D7RSP2B0qBbl6RD6Szg7D
-	tu/mUO6beXREop7LpYS6VsNO0IRC2Pdfyo+olw9of2sLYWpHAcxEHCM/TR72deD1JsQgWWFXqZO
-	A0of3zlPYgQF6EM5Sl8nx/QtsAZdDLuVGJ7mvcySbFVGyzYDoBGJIloN/TT5C5aLioCHyhyyv3W
-	1i83jFnCir/tKOfc9HaoAJsh
-X-Google-Smtp-Source: AGHT+IHCyANdQgsaiOtaga2HnBxQXXGPzcCZ4Ohf00BEMrBIOJ7VpUX3rg5vryaN2JUlMoGY94TIkE6SWzKp36uqz+s=
-X-Received: by 2002:a05:622a:1455:b0:4b2:ecb6:e6dd with SMTP id
- d75a77b69052e-4ee37321ee7mr2670321cf.1.1763474391448; Tue, 18 Nov 2025
- 05:59:51 -0800 (PST)
+        bh=niYvXJCoZg2Gp2Q/RvXbbH7B9mh1SgoAyvVJXLvgGCg=;
+        b=CT2vs3iYpjzBkAcpU1qnIGV6dMqW9Covr9MYLyLmyuGUBoi67csnH/1ZJV7HxMH9xD
+         BPv/Z8SiDZNcmiB+dnyfuNl2LTlZjHykfR/qLa9SUelshrZGKiK22E0BSB7uEGIDmpHY
+         XUUTdXIYikO8AXlmfOHB0GNNx4F1f6ubChHvvlBAUecnMJM7vfyUdBiyTMCxoJanZrmx
+         MOQzBJpxQcwG9UF/pb8lfjhBYhEu54iEciUOV9soeKDi5i36o42/l3GannXMDNNcq5WN
+         xHl11cQHJkkLktMxbMXfcpWww5VdVZ7jjJEuSta/wkeam2yK2Qr0eRhYU0CoJg4+rvS9
+         77vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763475609; x=1764080409;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=niYvXJCoZg2Gp2Q/RvXbbH7B9mh1SgoAyvVJXLvgGCg=;
+        b=XJSWTkG1pdT1xqD86dyit6/p1uSTluHnqG3gKFMm/VzOH/Q9lhGSOBLy3TYP9liYoB
+         lxmiP5I75pjPNJlaYT8SexTLJjHy0JttbcUaHAQtxhsMQK5XBFKZ868wygAziqfUy5Oc
+         8BVOihAvC/BeQm4wEzpCuwMnIr9/AEjIP3p6STV+yxEMuEdfnBD8H28ea0RoaUr2bXek
+         xiFGC+JNvUoCAN4WQZonbbXIrppp33NhdwrX2VlnkZAc7QsCdo0ZMf26qbk8gVfDrZyj
+         Ow7ZYdMnS/M7ore9HjCi3v8BT63Mi3iKAOeZ54zsR3rphhkrSbd9ow80G4mL/wxOYv2Q
+         R6Kw==
+X-Forwarded-Encrypted: i=1; AJvYcCWv9Rmaoe6FKBVfO/mlMZ8hnsiCUYZDhyV4HZ1W1R5ncULadeC7zwen51Itd8H/kPtl6ko=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYSfAC0cQQr5sEOu83LUopVaNovTKrsZQOwzll1ejMMP4UMz9I
+	KHdF1nOeUWSj85j/nywul5ZdoRMjVoQPVTaUwU+m/6za7pR1Fs6QkEDlAdxBdq+NGcWKLe5CiPc
+	aNWiY0jtQozcCKpuPQSOfG8tAyicZ1lg=
+X-Gm-Gg: ASbGnctnEuaeeg45TmoaZPC3jhlNdJ0hvaHsJg8nRC9mHTVN40ZFWtLlTndFRuz6LwP
+	GP76449SZmgJFU6O754/DTKsWvkbC9z2hhymLB2FKwyOzGk24xKF/Oc+EqKxvo3Er0ixZTWYH3V
+	p7eCWoTwF9bgVX4Dzf+9W0r1wgGf8QPbKh5ZDy8o+Zbf6jFCbNxsaIleK1zFuNSlEGDVky4BpNG
+	VZclL4Qe/Ji4H/lctuddrVzRNR0O2hKOU9JLbbL1QgWC6sLebHB1+l7X4VT/uYeagERi+gByFXf
+	ot/Bnw==
+X-Google-Smtp-Source: AGHT+IGn1uQVe7kftT3d3TYcFj6nKpYdAM/gW4eGkSIyZh9HxqyQyXuPtFluAR2SW+6iWYEv70DkQRqziTTTzQYjfSI=
+X-Received: by 2002:a17:90b:3841:b0:340:6f9c:b25b with SMTP id
+ 98e67ed59e1d1-343f9ec8d41mr19164615a91.11.1763475608506; Tue, 18 Nov 2025
+ 06:20:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251117091527.1119213-1-maz@kernel.org> <aRweUM4O71ecPvVr@kernel.org>
-In-Reply-To: <aRweUM4O71ecPvVr@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 18 Nov 2025 13:59:14 +0000
-X-Gm-Features: AWmQ_bkF-6pn3IYOEpn92xj1HYWHcPhO6SZ_J8WYU-pS4TiyeHoHMyN4vCkYXBs
-Message-ID: <CA+EHjTzJQOTTSUoXVKpGdWO8vz9Vc-2AL3zRyzG4DkUPz+wBBQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/5] KVM: arm64: Add LR overflow infrastructure (the
- dregs, the bad and the ugly)
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Mark Brown <broonie@kernel.org>
+References: <20251110033232.12538-1-kernellwp@gmail.com> <a1e5a8db-8382-4f52-8ef2-3b62b0c031ab@linux.ibm.com>
+ <CANRm+CzVtzgYYwgaqEMmsOAo7m=Esd9rd-zbB7zXzgL_p5SgxQ@mail.gmail.com> <2a57185c-dce1-46c6-96f6-f51a81cd42a8@linux.ibm.com>
+In-Reply-To: <2a57185c-dce1-46c6-96f6-f51a81cd42a8@linux.ibm.com>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Tue, 18 Nov 2025 22:19:56 +0800
+X-Gm-Features: AWmQ_bmFJJlapkwOVPBX13UXydPqzDGoGmpsdoq1crmYnD_8Jmn6tnBn9Dzg_OM
+Message-ID: <CANRm+CzPE+7UVtQuT-R9kfh5NJYx5h9j=-if4fUM-9M9xHjX0Q@mail.gmail.com>
+Subject: Re: [PATCH 00/10] sched/kvm: Semantics-aware vCPU scheduling for
+ oversubscribed KVM
+To: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Ilya Leoshkevich <iii@linux.ibm.com>, Mete Durlu <meted@linux.ibm.com>, Axel Busch <axel.busch@ibm.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 18 Nov 2025 at 07:20, Oliver Upton <oupton@kernel.org> wrote:
+Hi Christian=EF=BC=8C
+
+On Tue, 18 Nov 2025 at 16:12, Christian Borntraeger
+<borntraeger@linux.ibm.com> wrote:
 >
-> On Mon, Nov 17, 2025 at 09:15:22AM +0000, Marc Zyngier wrote:
-> > This is a follow-up to the original series [1] (and fixes [2][3])
-> > with a bunch of bug-fixes and improvements. At least one patch has
-> > already been posted, but I thought I might repost it as part of a
-> > series, since I accumulated more stuff:
+> Am 12.11.25 um 06:01 schrieb Wanpeng Li:
+> > Hi Christian,
 > >
-> > - The first patch addresses Mark's observation that the no-vgic-v3
-> >   test has been broken once more. At some point, we'll have to retire
-> >   that functionality, because even if we keep fixing the SR handling,
-> >   nobody tests the actual interrupt state exposure to userspace, which
-> >   I'm pretty sure has badly been broken for at least 5 years.
+> > On Mon, 10 Nov 2025 at 20:02, Christian Borntraeger
+> > <borntraeger@linux.ibm.com> wrote:
+> >>
+> >> Am 10.11.25 um 04:32 schrieb Wanpeng Li:
+> >>> From: Wanpeng Li <wanpengli@tencent.com>
+> >>>
+> >>> This series addresses long-standing yield_to() inefficiencies in
+> >>> virtualized environments through two complementary mechanisms: a vCPU
+> >>> debooster in the scheduler and IPI-aware directed yield in KVM.
+> >>>
+> >>> Problem Statement
+> >>> -----------------
+> >>>
+> >>> In overcommitted virtualization scenarios, vCPUs frequently spin on l=
+ocks
+> >>> held by other vCPUs that are not currently running. The kernel's
+> >>> paravirtual spinlock support detects these situations and calls yield=
+_to()
+> >>> to boost the lock holder, allowing it to run and release the lock.
+> >>>
+> >>> However, the current implementation has two critical limitations:
+> >>>
+> >>> 1. Scheduler-side limitation:
+> >>>
+> >>>      yield_to_task_fair() relies solely on set_next_buddy() to provid=
+e
+> >>>      preference to the target vCPU. This buddy mechanism only offers
+> >>>      immediate, transient preference. Once the buddy hint expires (ty=
+pically
+> >>>      after one scheduling decision), the yielding vCPU may preempt th=
+e target
+> >>>      again, especially in nested cgroup hierarchies where vruntime do=
+mains
+> >>>      differ.
+> >>>
+> >>>      This creates a ping-pong effect: the lock holder runs briefly, g=
+ets
+> >>>      preempted before completing critical sections, and the yielding =
+vCPU
+> >>>      spins again, triggering another futile yield_to() cycle. The ove=
+rhead
+> >>>      accumulates rapidly in workloads with high lock contention.
+> >>
+> >> I can certainly confirm that on s390 we do see that yield_to does not =
+always
+> >> work as expected. Our spinlock code is lock holder aware so our KVM al=
+ways yield
+> >> correctly but often enought the hint is ignored our bounced back as yo=
+u describe.
+> >> So I am certainly interested in that part.
+> >>
+> >> I need to look more closely into the other part.
 > >
-> > - The second one addresses a report from Fuad that on QEMU,
-> >   ICH_HCR_EL2.TDIR traps ICC_DIR_EL1 on top of ICV_DIR_EL1, leading to
-> >   the host exploding on deactivating an interrupt. This behaviour is
-> >   allowed by the spec, so make sure we clear all trap bits
+> > Thanks for the confirmation and interest! It's valuable to hear that
+> > s390 observes similar yield_to() behavior where the hint gets ignored
+> > or bounced back despite correct lock holder identification.
 > >
-> > - Running vgic_irq in an L1 guest (the test being an L2) results in a
-> >   MI storm on the host, as the state synchronisation is done at the
-> >   wrong place, much like it was on the non-NV path before it was
-> >   reworked. Apply the same methods to the NV code, and enjoy much
-> >   better MI emulation, now tested all the way into an L3.
-> >
-> > - Nuke a small leftover from previous rework.
-> >
-> > - Force a read-back of ICH_MISR_EL2 when disabling the vgic, so that
-> >   the trap prevents too many spurious MIs in an L1 guest, as the write
-> >   to ICH_HCR_EL2 does exactly nothing on its own when running under
-> >   FEAT_NV2.
-> >
-> > Oliver: this is starting to be a large series of fixes on top of the
-> > existing series, plus the two patches you have already added. I'd be
-> > happy to respin a full v4 with the fixes squashed into their original
-> > patches. On the other hand, if you want to see the history in its full
-> > glory, that also works for me.
+> > Since your spinlock code is already lock-holder-aware and KVM yields
+> > to the correct target, the scheduler-side improvements (patches 1-5)
+> > should directly address the ping-pong issue you're seeing. The
+> > vruntime penalties are designed to sustain the preference beyond the
+> > transient buddy hint, which should reduce the bouncing effect.
 >
-> I'll pick up these patches in a moment but at this point I'd prefer a
-> clean history. Plan is to send out the 6.19 pull sometime next week so
-> any time before then would be great for v4.
-
-I'm happy to take that for another spin Marc before you send it, if
-it's different from the ToT I tested. In that case, just send me a
-pointer to the branch.
-
-Cheers,
-/fuad
-
-> Thanks for ironing out all the quirks :)
+> So we will play a bit with the first patches and check for performance im=
+provements.
 >
-> Best,
-> Oliver
+> I am curious, I did a quick unit test with 2 CPUs ping ponging on a count=
+er. And I do
+> see "more than count" numbers of the yield hypercalls with that testcase =
+(as before).
+> Something like 40060000 yields instead of 4000000 for a perfect ping pong=
+. If I comment
+> out your rate limit code I hit exactly the 4000000.
+> Can you maybe outline a bit why the rate limit is important and needed?
+
+Good catch! The 10=C3=97 inflation is actually expected behavior. The key
+insight is that rate limit filters penalty applications, not yield
+hypercalls. In your ping-pong test with 4M counter increments, PLE
+hardware fires multiple times per lock acquisition (roughly 10 times
+based on your numbers), and each triggers kvm_vcpu_on_spin() . Without
+rate limit, every yield immediately applies vruntime penalty. In tight
+ping-pong, this causes over-penalization where the skip vCPU becomes
+so deprioritized it effectively starves, which paradoxically
+neutralizes the debooster effect. You see "exactly 4M" not because
+it's working optimally, but because excessive penalties create a
+pathological equilibrium where subsequent yields are suppressed by
+starvation. With a 6ms rate limit, all 40M hypercalls still occur (PLE
+still fires), but only the first yield in each burst applies a penalty
+while subsequent ones are filtered. This gives you roughly 4M
+penalties (one per actual lock acquisition) instead of 40M, providing
+sustained advantage without over-penalization. The 6ms threshold was
+empirically tuned as roughly 2=C3=97 typical timeslice to filter intra-lock
+PLE bursts while preserving responsiveness to legitimate contention.
+Your test validates the design by showing rate limit prevents penalty
+amplification even in the tightest ping-pong scenario.
+
+I'll post v2 after the merge window with code comments addressing this
+and other review feedback, which should be more suitable for
+performance evaluation.
+
+Wanpeng
 
