@@ -1,135 +1,153 @@
-Return-Path: <kvm+bounces-63587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59A8EC6B4D1
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 19:54:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0708EC6B5CE
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 20:11:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6E81835C164
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 18:53:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id B43B92AB6E
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 19:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E562DC323;
-	Tue, 18 Nov 2025 18:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0D42E8B6C;
+	Tue, 18 Nov 2025 19:06:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="iM96ixMF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PtPxeFps"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774922773EC
-	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 18:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE58E2E62C6;
+	Tue, 18 Nov 2025 19:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763492010; cv=none; b=sTGun4NsMYq9gBamTEMSVuYwOXhD8q5EmLzdy+hb0VXB6HYipePhkipdRzRXkILzSYMyDmKReJ/quYg0NArMaNQBGYkthlHeTsFSrXJflZ7XcQh8m4nkykEenlVJha7qKlqDKl7rmspDuHPt8WkWYbs2k4oQTW22tIDGRQWsy54=
+	t=1763492804; cv=none; b=rXWDE8YEO7eRYXT1csmC014dH70eajcKQZiPbvdKOinUr1Vbk7S5LaZY8X7kYeCIxc8pd6g+KT/XBwcqqoEh9Q5CTzkfwf0BIoHX1PJJL8iAK51b1PaFbjXB+xc4rf3VfQ2J6/8ghU9GSaaTN3LF3hMFfOBOPSuQgpluMYzQgM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763492010; c=relaxed/simple;
-	bh=UItmGhUaQ55ZwKA03ZJgnZgKPXfjMN+emOntxAadXTM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PLGnKlda94BGpZdr4MjfouxEzMePchWL9edQ33CNXaZE/jUsNj/lVio2i/g21VEy+3XMDe5l6xd9DCQ1kzr3T5wY8LkV3FtcFpWgpJiDsKyOZT4WFUuFeSkuzHSmyouE5OG+ExsMO9h4ewg1Qicn/q9mkG0TiQRtDC5dqejfFXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=iM96ixMF; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-4332381ba9bso41692745ab.1
-        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 10:53:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1763492007; x=1764096807; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8GLwJmWvrt4bcGSSoXGY/Vb9/ivbKv9lxIJWO+fpSjI=;
-        b=iM96ixMFCzwxBBN6uN8uryVzVWrBb3wTGNBpMcJN3F2ZbUfjmy2LQQ6TY/bQCQ4mP+
-         TEOEPboEjnb9cq8oHuKy4S2BtO3zA5E67e/J6a+/W4RTZa0IvYIIwPPoTYpNiEaLq7GZ
-         HYv2XrVBYZFxMvZMpY6s317J+57h5zuJVrd6PpZ75TZqvpwcWfYoWwP6YNrarXyRcHtn
-         xEioVtuRyC79rc9xr5GcoCA3dRoGEfwO4xkJB6AE/PDNwJsvKlappKpbi6DYWbOngAqg
-         lBNXKjDRC4FU0UBEBojZ2wq9dHl5l6A01CDYtV/ga6RHaQWbgIiIzSOv6mhHplIeGQ6u
-         pC8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763492007; x=1764096807;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8GLwJmWvrt4bcGSSoXGY/Vb9/ivbKv9lxIJWO+fpSjI=;
-        b=vzZy+VByDW6sYMaLlbEtY83l20CzZTnOVUCuwtbdAb8scsAH/r0bfBpnOmOT1dOUNg
-         C/qLj8VsMP53u8JSpdIC8t4IjFbUcKvLLuIRi3PzShW5hNNS6IajMy6syMGrcqFaQRg7
-         C4YdeTgjBqVNl8Qn2MlkMAGPEicsUuehATbcTwBS6wy4g0HIfSkTcGYs9h5TwlNjS/4J
-         6QX5WrBkqiTF24ersGLkX6Jucv5vwxF+kEDP22fGqsPHArWu4C18vQwugxTsCtWM9Kjn
-         FGMYncgd2/xxCHrv0J3H3rRHMeojpv/XaSaodz8ikDmIdk6nE8s6jQfkCPVDdktUGHtS
-         DiLg==
-X-Gm-Message-State: AOJu0YyaHDgbSvQBFPpPGpt61HE7JNGiLYGaxPUsGK+e29jP8BlqrtaP
-	TvtrDPhb2Js5KPT1xTjTusYaZsjUVcUuLWaYzmC7sTCaS751itFk7R+zhZqe/Zj8f8M=
-X-Gm-Gg: ASbGncsrO2bDVzZ4UoKPZFZIjGnV9H84rGM+nH/ijxXcC2JhD2sAg3IqKELdKxuYbrL
-	IYUgZPoe/o6xmFMrRLIBpSCFWENjHqbIy21J/S4jJWwsRmAWlihygJNmv9RGgJNxkn5aQhXcCpa
-	r6WysjYLZkqyg5DnoMMes/q3BIZFernOtLml03WZt26qULcuK5Z0PIjOXhRdDZhBpHZJUcpQogT
-	ttpTJIzOwtacsmOqOcu6fGqXUbCL1ydXQDRVA0AAz5UaE77Iharwq1USL8nePCyD1Zws6akLumx
-	02YRSBRpHuZ/lalj/RDaekj8v1uHmRtvnT2zlt8m9TSilBSrvybyYCuBGe83KKnnVdwXqr4KZZL
-	g7oBM2plllBWYaYiEwOnvdgGeTrPYakIE9sfLSuKO/A7Pw89VIJ3KZ6P0NHq6f14yC+4JLmubHh
-	8TFhvNDeBYJXA/mvkquYJQE+A=
-X-Google-Smtp-Source: AGHT+IEWlFg/itUVM5Nvd3f/pHC8HhckQFg8kaLgzbRmqMQqRO364KskAjZI0HfwYtXDT/vzSXxBRg==
-X-Received: by 2002:a05:6e02:33a0:b0:433:3487:ea1d with SMTP id e9e14a558f8ab-4348c86dbfbmr229227265ab.7.1763492007516;
-        Tue, 18 Nov 2025 10:53:27 -0800 (PST)
-Received: from localhost ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-948d2b4265esm763154339f.4.2025.11.18.10.53.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 10:53:26 -0800 (PST)
-Date: Tue, 18 Nov 2025 12:53:26 -0600
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Kevin Cheng <chengkev@google.com>
-Cc: kvm@vger.kernel.org, yosryahmed@google.com, andrew.jones@linux.dev, 
-	thuth@redhat.com, pbonzini@redhat.com, seanjc@google.com
-Subject: Re: [kvm-unit-tests PATCH V2] scripts/runtime.bash: Fix TIMEOUT env
- var override
-Message-ID: <20251118-b33d4fb548706933d73d4c49@orel>
-References: <20251118173401.2079382-1-chengkev@google.com>
+	s=arc-20240116; t=1763492804; c=relaxed/simple;
+	bh=7Uej8vFQyBecna9Eft7O2XmvApuSK/EcttFDPNfpMfs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MpdLms5S/iF7H50K1h3Nsxlpzpid26CG86/JZMfJA38f4iOt/Gy8NWjzFjVj6HFF3WKOD69PZVIvlxAi0cjLWag05faW9RWPvkz9AzWZ6F/RhZLkBWtxrKbeQEaFX52BBD94euq94HorADVifu4khw6jLKxprncoBvNaw7c4ghU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PtPxeFps; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6BB3C19421;
+	Tue, 18 Nov 2025 19:06:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763492804;
+	bh=7Uej8vFQyBecna9Eft7O2XmvApuSK/EcttFDPNfpMfs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PtPxeFpsTCUMy3B0/s9eZJtRfBN3Woqf70pKAph9EK0jd7Puhx2BUzOL+w4mV9IJb
+	 p/zsH5NWOhE3LPrQ1BkdpfvVuRG2BQDcR2aseYYXSAtheJnJa2Xcs7eyrwOWfqDzfF
+	 Tz/pCtMOkFC8LkHZMM8WFzaoBq7iEYvu5tbyb7VeEEH5gcgiBibU250YiQwgZXvpn6
+	 NnG5Ht4yrgzDOFHp9hjw9qZ+RYcrFflJfIVnK5QHkz2CUeWSMKr5cr3QKTes64/8Qm
+	 Y4TQte2J0EUMApdinQOenZwP0oE1IWuYVoTLYrPsZSn1Qpf9jfMBaq7GMscAivG8Ej
+	 YVkWR8TGwxseA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vLR2G-00000006Im4-42i7;
+	Tue, 18 Nov 2025 19:06:41 +0000
+Date: Tue, 18 Nov 2025 19:06:40 +0000
+Message-ID: <86ms4jrwhr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 0/5] KVM: arm64: Add LR overflow infrastructure (the dregs, the bad and the ugly)
+In-Reply-To: <CA+EHjTzJQOTTSUoXVKpGdWO8vz9Vc-2AL3zRyzG4DkUPz+wBBQ@mail.gmail.com>
+References: <20251117091527.1119213-1-maz@kernel.org>
+	<aRweUM4O71ecPvVr@kernel.org>
+	<CA+EHjTzJQOTTSUoXVKpGdWO8vz9Vc-2AL3zRyzG4DkUPz+wBBQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251118173401.2079382-1-chengkev@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, christoffer.dall@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Nov 18, 2025 at 05:34:01PM +0000, Kevin Cheng wrote:
-> According to unittests.txt timeout deinition, the TIMEOUT environment
-> variable should override the optional timeout specified in
-> unittests.cfg. Fix this by defaulting the timeout in run() to the
-> TIMEOUT env var, followed by the timeout in unittests.cfg, and lastly by
-> the previously defined default of 90s.
-> 
-> Fixes: fd149358c491 ("run scripts: add timeout support")
-> Signed-off-by: Kevin Cheng <chengkev@google.com>
-> ---
->  scripts/runtime.bash | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 6805e97f90c8f..0704a390bfe1e 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -1,6 +1,5 @@
->  : "${RUNTIME_arch_run?}"
->  : "${MAX_SMP:=$(getconf _NPROCESSORS_ONLN)}"
-> -: "${TIMEOUT:=90s}"
-> 
->  PASS() { echo -ne "\e[32mPASS\e[0m"; }
->  SKIP() { echo -ne "\e[33mSKIP\e[0m"; }
-> @@ -82,7 +81,7 @@ function run()
->      local machine="$8"
->      local check="${CHECK:-$9}"
->      local accel="${10}"
-> -    local timeout="${11:-$TIMEOUT}" # unittests.cfg overrides the default
-> +    local timeout="${TIMEOUT:-${11:-90s}}" # TIMEOUT env var overrides unittests.cfg
->      local disabled_if="${12}"
-> 
->      if [ "${CONFIG_EFI}" == "y" ]; then
-> --
-> 2.52.0.rc1.455.g30608eb744-goog
->
+Hi Fuad,
 
-Merged.
+On Tue, 18 Nov 2025 13:59:14 +0000,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> On Tue, 18 Nov 2025 at 07:20, Oliver Upton <oupton@kernel.org> wrote:
+> >
+> > On Mon, Nov 17, 2025 at 09:15:22AM +0000, Marc Zyngier wrote:
+> > > This is a follow-up to the original series [1] (and fixes [2][3])
+> > > with a bunch of bug-fixes and improvements. At least one patch has
+> > > already been posted, but I thought I might repost it as part of a
+> > > series, since I accumulated more stuff:
+> > >
+> > > - The first patch addresses Mark's observation that the no-vgic-v3
+> > >   test has been broken once more. At some point, we'll have to retire
+> > >   that functionality, because even if we keep fixing the SR handling,
+> > >   nobody tests the actual interrupt state exposure to userspace, which
+> > >   I'm pretty sure has badly been broken for at least 5 years.
+> > >
+> > > - The second one addresses a report from Fuad that on QEMU,
+> > >   ICH_HCR_EL2.TDIR traps ICC_DIR_EL1 on top of ICV_DIR_EL1, leading to
+> > >   the host exploding on deactivating an interrupt. This behaviour is
+> > >   allowed by the spec, so make sure we clear all trap bits
+> > >
+> > > - Running vgic_irq in an L1 guest (the test being an L2) results in a
+> > >   MI storm on the host, as the state synchronisation is done at the
+> > >   wrong place, much like it was on the non-NV path before it was
+> > >   reworked. Apply the same methods to the NV code, and enjoy much
+> > >   better MI emulation, now tested all the way into an L3.
+> > >
+> > > - Nuke a small leftover from previous rework.
+> > >
+> > > - Force a read-back of ICH_MISR_EL2 when disabling the vgic, so that
+> > >   the trap prevents too many spurious MIs in an L1 guest, as the write
+> > >   to ICH_HCR_EL2 does exactly nothing on its own when running under
+> > >   FEAT_NV2.
+> > >
+> > > Oliver: this is starting to be a large series of fixes on top of the
+> > > existing series, plus the two patches you have already added. I'd be
+> > > happy to respin a full v4 with the fixes squashed into their original
+> > > patches. On the other hand, if you want to see the history in its full
+> > > glory, that also works for me.
+> >
+> > I'll pick up these patches in a moment but at this point I'd prefer a
+> > clean history. Plan is to send out the 6.19 pull sometime next week so
+> > any time before then would be great for v4.
+> 
+> I'm happy to take that for another spin Marc before you send it, if
+> it's different from the ToT I tested. In that case, just send me a
+> pointer to the branch.
+
+I've just pushed out a full branch at [1]. Please make sure to merge
+kvmarm-fixes-6.18-3 in, as it fixes a couple of nasties (small
+conflict expected, but the resolution should be obvious).
+
+For my own testing, I added -rc6 on top.
+
+Note that I didn't take your Tested-by: tags, as you are about to
+retest the whole thing anyway. If all goes well (fingers crossed),
+Oliver will be able to apply any further tag once I post these
+patches.
 
 Thanks,
-drew
+
+	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vgic-lr-overflow
+
+-- 
+Without deviation from the norm, progress is not possible.
 
