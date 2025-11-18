@@ -1,252 +1,285 @@
-Return-Path: <kvm+bounces-63526-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63527-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0507BC68676
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 10:01:55 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78501C686FB
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 10:10:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 938D32A88B
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 09:01:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 87B472A68E
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 09:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE36329C60;
-	Tue, 18 Nov 2025 08:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A863090E2;
+	Tue, 18 Nov 2025 09:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mKRfFgxF"
+	dkim=pass (2048-bit key) header.d=jaguarmicro.com header.i=@jaguarmicro.com header.b="qOgfQ9+p"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11023124.outbound.protection.outlook.com [40.107.44.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072B2304BAF;
-	Tue, 18 Nov 2025 08:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763456372; cv=none; b=SMjWJ33bsG0lhHchoEWbQ0RmZIsnvsTFdLLqcbTvG20TZ+/w73kWR8IT9i/83LjXp8TGpJ9fbsCqlsEWuW+iMdEPIbJkJu02v97MuuCmSL/UOut97A9kGaKJRXQ7h9cNs1C1Gw+H2UTPCaNLvr61uJhNAT9Akr7dxY+d2MFrGDY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763456372; c=relaxed/simple;
-	bh=txFvhR2GSvG/fSic/DnF957pN+uvPclb/rdd8YhTQ+Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OpJ7CXnmqkb6ZhLywFTzvDXo1pZAScb5UGMjT7I8bV1uwSWLmzRxuBFSWgK7ZdrVQuNy+rGV7LL49MM+wIRsbXpN3sTteQCqn5XkGbti9oIkDbzoNauCOJvJ2gDcXgZDpSCiK+rDtqUFrqmrw2bTm8WadhUaclsUK5+KhJODGF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mKRfFgxF; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763456370; x=1794992370;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=txFvhR2GSvG/fSic/DnF957pN+uvPclb/rdd8YhTQ+Y=;
-  b=mKRfFgxF1nAQH6Fs+AMMHOQXSzqsUy1I+XfuY6lJ0qzR2TcXJQhPIPPc
-   qi7ZMP3mZ+9jmLB2ZJbg0ukimo6qjYN7HBPtH/6vWOPL7sQkgXWmClQ+L
-   ZVecfsg3AnPAt5wrWsB6GudniRwbe4jOQj8Vt2yQ4EwjIfCKM5Ax9PT22
-   m3EzDm9ezbK/TQHvDNSkp5+g38l41vSqRM7g/5LVFptrey/pThQM3E6LE
-   Cbfg6IJFql/8aKFcy698irWrzZSP5dNoHFyYu9V+27d/RDJjAPQUlbyEh
-   yy3zbrTzAyZm7KaXL56wYRzEK8HEo84HCBAQBjiC05PYrzST0fuBS80WI
-   A==;
-X-CSE-ConnectionGUID: iDy3DWmVTpORhff4sg63mQ==
-X-CSE-MsgGUID: JicMchiTQ6W8Z8SEwqg7gw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="69340913"
-X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
-   d="scan'208";a="69340913"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 00:59:28 -0800
-X-CSE-ConnectionGUID: Yy5PW6EPRBS3albwIXsngQ==
-X-CSE-MsgGUID: j0DyO1GfR9+T/dNgHLpbKQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
-   d="scan'208";a="221365795"
-Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 00:59:22 -0800
-Message-ID: <c0b086cc-3ae3-47ed-8d6f-7f7abf488f9f@linux.intel.com>
-Date: Tue, 18 Nov 2025 16:59:19 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27ECF2571BD;
+	Tue, 18 Nov 2025 09:10:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763457011; cv=fail; b=fuQiKmmztk5se9MIVl8rCGQUyzTP7bi7EOzMpYnlflD7djbbz5EEIoSnwuizv50xWdUst7bwd+WMqO0sgWFWqUo2FObBJjKRNb/YQYv12zlcGJMo0MQpDCAVykO9i/hf/heqTVbvCOjYMeeuUmMXFJDz7mJN8xY5EkvmAm/bbMo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763457011; c=relaxed/simple;
+	bh=XxkEVvZj1DwAdW0jek5MKiALkGnKzeoeoUVHKy2k0Cc=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=XfGRge96lE+nCopaIv6H6gylXPPKEcpmSLqd/0GjbGlHDnp96yLVqYce+HtVAU9YSRFyJE/nYXf/k+GcdxFDmxOP4AKqELvY6RlCqBtWpk3Dh+scGxwVN0sc/iWvmE+EVxVgF28pBD/a4zc/Bfw/KVYY+m0T/BJvfY2KKPscuQ0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jaguarmicro.com; spf=pass smtp.mailfrom=jaguarmicro.com; dkim=pass (2048-bit key) header.d=jaguarmicro.com header.i=@jaguarmicro.com header.b=qOgfQ9+p; arc=fail smtp.client-ip=40.107.44.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jaguarmicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jaguarmicro.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NBDh/UQzWGEWrp56FDntFj9Gqhm6s4k/6RJg9iHfsST+5wZUBMihTW9zNDDA+l5gMGzE8oic1zstLSk9T/RnfhfjTV5pxlsCBZN6lq+bBd5ebBLbO8lniVikmnfIL3EYedExkv2c4pnqixsqsDjbmgW0stL7ExkS/VXPbNgYwdr98NU4aVXlbDwrX2LgVGzBDM2PdsWdTMXVxgNGfsLqdZ7VYqTCkr1LO90aunwHfajj0X5fXjIwcKGBLQeI5AlrViMhd8PJcVB2uBjCB9+T/H2nWT9kFS0HZV5XVj3E9un7/9HcpwrlMQ1eUJtI6b0omre0oApjKn1GAQiwKAl6aA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J3JbsAmV5B+NeJFmwJdE0LYXLLtQ+bT1fMQhjvhrKTo=;
+ b=QNVbMvkgkkM2LVw6R/C/BmRj8Io3e4U68+90pKj1RgQA3lUEZV9QsyEQMJ9l39tPOWcCoB79nEghLiDzgKErpOYu/Ax1KSCcb7s6nPiWhMtcunWLBWVQtegd0NlgWI33h7DEWW4nfAcimK76YFg1pmqBQ1GNUpCgPhAYaUpi3fbBrEb3NHyKCpLs4rswfWiLvAbfcnmx6jVY1ANSWCGLRfmIMc7H4UtJOVx8ah/XS1gt+gagUtfyacbz3y+cQyDWEmMmg5DgJzgWdWL4XlzKTnx69HAi52FY4esrwm9zmKidqnfYj0daRgS/S+zC5bcFfW30OyaFbMZy1QdUrn7UlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=jaguarmicro.com; dmarc=pass action=none
+ header.from=jaguarmicro.com; dkim=pass header.d=jaguarmicro.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaguarmicro.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J3JbsAmV5B+NeJFmwJdE0LYXLLtQ+bT1fMQhjvhrKTo=;
+ b=qOgfQ9+pOHY7ZfsVK/03Iqgl+pRLXXy4wYkhqJI0OZm+znw5Z8XG1d1X4jdfJkoNEvQQIYUdt2rXKDR2LdHq66LGUG9x7o5HLdfTDipVaGcMZj+S+kOpp6/aEXqb/q8gvi8jKQSzLpaHjhRvhiogTquOJS6aXtnwgRqx17EL8UT/q8nJyxtdzND8rxLV8O3wUDR0O4SDjiKJfVqDw6eNpOBbC6ZUAKwbz+edbTCwmwoP5p2m+nzD9NbVPrxQ8R5bk/3ZAs6BtveIkKLh12hR8zFEs8zeSCuAVYUnRwrszM0SaFEYNZmgtgvcJ5cN8crTIrnXJJV7tqmK7bt7oNf+pw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=jaguarmicro.com;
+Received: from PSAPR06MB3942.apcprd06.prod.outlook.com (2603:1096:301:2b::5)
+ by PUZPR06MB5902.apcprd06.prod.outlook.com (2603:1096:301:119::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.22; Tue, 18 Nov
+ 2025 09:10:00 +0000
+Received: from PSAPR06MB3942.apcprd06.prod.outlook.com
+ ([fe80::9b95:32e5:8e63:7881]) by PSAPR06MB3942.apcprd06.prod.outlook.com
+ ([fe80::9b95:32e5:8e63:7881%5]) with mapi id 15.20.9320.013; Tue, 18 Nov 2025
+ 09:10:00 +0000
+From: liming.wu@jaguarmicro.com
+To: "Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+Cc: kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	angus.chen@jaguarmicro.com,
+	Liming Wu <liming.wu@jaguarmicro.com>
+Subject: [PATCH] virtio_net: enhance wake/stop tx queue statistics accounting
+Date: Tue, 18 Nov 2025 17:09:42 +0800
+Message-ID: <20251118090942.1369-1-liming.wu@jaguarmicro.com>
+X-Mailer: git-send-email 2.49.0.windows.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: KUZPR01CA0005.apcprd01.prod.exchangelabs.com
+ (2603:1096:d10:34::18) To PSAPR06MB3942.apcprd06.prod.outlook.com
+ (2603:1096:301:2b::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 12/23] KVM: x86/mmu: Introduce
- kvm_split_cross_boundary_leafs()
-To: Yan Zhao <yan.y.zhao@intel.com>, "Huang, Kai" <kai.huang@intel.com>
-Cc: "Du, Fan" <fan.du@intel.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Hansen, Dave" <dave.hansen@intel.com>, "david@redhat.com"
- <david@redhat.com>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "tabba@google.com" <tabba@google.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "seanjc@google.com" <seanjc@google.com>, "kas@kernel.org" <kas@kernel.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>,
- "michael.roth@amd.com" <michael.roth@amd.com>,
- "Weiny, Ira" <ira.weiny@intel.com>, "Peng, Chao P" <chao.p.peng@intel.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "Annapurve, Vishal" <vannapurve@google.com>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "Miao, Jun" <jun.miao@intel.com>, "x86@kernel.org" <x86@kernel.org>,
- "pgonda@google.com" <pgonda@google.com>
-References: <20250807093950.4395-1-yan.y.zhao@intel.com>
- <20250807094358.4607-1-yan.y.zhao@intel.com>
- <0929fe0f36d8116142155cb2c983fd4c4ae55478.camel@intel.com>
- <aRWcyf0TOQMEO77Y@yzhao56-desk.sh.intel.com>
- <31c58b990d2c838552aa92b3c0890fa5e72c53a4.camel@intel.com>
- <aRbHtnMcoqM1gmL9@yzhao56-desk.sh.intel.com>
- <f2fb7c2ed74f37fdf8ce69f593e9436acbdd93ee.camel@intel.com>
- <aRwSkc10XQqY8RfE@yzhao56-desk.sh.intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <aRwSkc10XQqY8RfE@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PSAPR06MB3942:EE_|PUZPR06MB5902:EE_
+X-MS-Office365-Filtering-Correlation-Id: 66c5b884-76d7-46e4-aa59-08de26823fb5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|52116014|376014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?9A8+7xEIuhspZTUq9sfaf2R0AqLE3O0cpbHiJuj3uW91zXhTwd7HsCdxNOdO?=
+ =?us-ascii?Q?o3F91L6YMs9TvQ4eEb2zEKEJo8LR1/69U2bW5kFP8rwgzahXUJAWg1Adde+0?=
+ =?us-ascii?Q?X2NsfP/jEiq7UWDUmu56BehoA6Om7MnDeNWBdSJigdcfKPLGoxN1Vd8xEvam?=
+ =?us-ascii?Q?QgvU1S6bWtJjpBlOpwga5FIC+vZXNq4ANOToggtu5NpOCYaWjm7fU+Zmkduf?=
+ =?us-ascii?Q?6AlQbv4iwmS9OcB0x0nUc2cq45rDddyO+MD6xzFr0zFRWLU0pPSqbyvZyeKb?=
+ =?us-ascii?Q?N6AClRC3rOmckvr/h4RvD3CC9NJQGQ1Auxh/HeepljPQiV6096eNpKx56e3M?=
+ =?us-ascii?Q?SXdyTY6svNGzI2/shxdu7gvbdqREeGm2zcmlCxWa/8S1Ak0kMXMsxrM59ecr?=
+ =?us-ascii?Q?06eWlSGH9pE6+tS09kVTf8u1T1ejIpUDZ8sKP5fux8z/TZb8tqEzig9lCctS?=
+ =?us-ascii?Q?AB/9xrkKL+W6Km+17VWjo+PkcXps2lttNh2EoF6gL3+uil9dGXIqusi8Q1ov?=
+ =?us-ascii?Q?fxmOh8JgEvLS9xqzXoskdfgbWxNmOaQYV68ypRMdmuIxwSMkSwWBEg/VsUkT?=
+ =?us-ascii?Q?JPEWe3Med4pRv0+QSdglASKpsb15t1VK1y77d0KJYSGy7XaFViJaL9A1YDel?=
+ =?us-ascii?Q?WbhJvBSGWZXAUDzISfb0ZkELnOiiMVETURdSE/ErxVlVG/pQitBfBgeE0hCv?=
+ =?us-ascii?Q?EYJSoazmzo3poBKcHKvQiCc95DsDC7Lfm4j8McteoGb+dPQegU+R0onLtYsL?=
+ =?us-ascii?Q?+5Xc9l0dE9pQqjMdet7ly6r+UtGGEZ/8m1G6QhyCELXchRP4+1qvMZKwamKq?=
+ =?us-ascii?Q?/5mEvs4ClzD1RRe3FWWLb8CNVhiIqDYY5Al/yaifZbv9I6ancxNUt/QnWMJm?=
+ =?us-ascii?Q?ibvIJ7A4qgumaS7GhiY6E9Uc3/oTM3JxUvDRDisr60PRT2HJDUvE8O8NOpNi?=
+ =?us-ascii?Q?T89m9ojV6q1QNXU6BpE46RWBXdhd0wCp+AauGDxxEQ9/cDhsaZ+L2P5q56wY?=
+ =?us-ascii?Q?HYJcfluRC5ePjyt+hgP6bvWMcGRcfwVarWGzfNCKc20nLCRdBApB2PS0r1n+?=
+ =?us-ascii?Q?jHq1MeYi8CLDJ4R2TVrABIYCKt88L3GjzZfit0IIQpG6c3o82LV7bXvjBcv/?=
+ =?us-ascii?Q?C5Ncm6q/2C4ZpWL2YDaPlC8AAz9wsPzBccMo84xoFwJpSceznGqC0sN55nUc?=
+ =?us-ascii?Q?lvFYQzt+udUrKsxsfZKY8GGmbTiAoYC8m9jmzDtrkuQtso6R7R8FxIbLqY+T?=
+ =?us-ascii?Q?6byuJY+b4zs1dp4eKT31x55o3jSqfGnj+iBJMjcCOgp2vXn/AVHJ+fGgmwrn?=
+ =?us-ascii?Q?pMdJWPr2SLkwcPNzHfSqGMyan+/1eXEGIFGqmlrR0LwEpvJewDDwAcqB9VV1?=
+ =?us-ascii?Q?SEtg9yZIGeqArt2pO/OQkAqsYfnZ3nrZgCz3L6+IdjNrIU0agKMrZTBAqnvD?=
+ =?us-ascii?Q?4RbU0TIyzniAF/G9cdd0FwqsUiTJJ77cgOWjXkxJz2pKWCFtfI6KdLzeNwwZ?=
+ =?us-ascii?Q?FjBtJ/nepSw4j58VZZWncM9ahKrTfKqzud0F?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PSAPR06MB3942.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(52116014)(376014)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?kWaiVluYrVtpkUxnJX9Xn7a2cfayvXOUZ2ETcdOneayRxmC/qQCrJBPn2a8s?=
+ =?us-ascii?Q?OUJrIUPpyHU0g6NQxM2/0B3DN/rQc9Th2FJLTAAuosy1OQYGiJ9u/+zxrj9Q?=
+ =?us-ascii?Q?8Hvh6tGsIiLhlo1me0UUhvN/sNkvV0KY6SFf7BRmTHQNjEd/NJufulP6GTqN?=
+ =?us-ascii?Q?JGgJb3DC4HwDV77pgVSKQd4xdfoIbJStZSwr13IV67EyEoGaICltXFuah0DJ?=
+ =?us-ascii?Q?OVhnXdL3H+B1NDdSxUKHnt/ApUtl0fapRQBDGZgkwC5aAw8pQAihHjaSfYUe?=
+ =?us-ascii?Q?HxcVyl9UjuInwZFiv/dKE2dyFicrxwQ7Qv972mTE+GtP2wgKNN70dBzbLJZM?=
+ =?us-ascii?Q?97YmY44V3I8FsvExgv0rV51Hn9k4gEKS6zbudc7KK0WQUIbfLtvPWYXd2FXw?=
+ =?us-ascii?Q?WT7V9cZiiEdTCUbSggpHJ1n7FujXiDj+whjUwucCXPXp2F3ln5k8RwScb1IP?=
+ =?us-ascii?Q?8NSjOAoYVEfa2Vo8YJVQ+4JKH3ThkYK63v2tbRtk9HzHHyGX/zmnnPXPBGgx?=
+ =?us-ascii?Q?hn6X/abC95S8coHtF6JqfTKplH1kEzJeJ0XXDfT2+pLswDt/ZJl61AaHeX7J?=
+ =?us-ascii?Q?0XJlFYqsoDv7yDdYwa1eBfbCRKzPPq/PRgJ9lcTD20CCcz9awH+snZE9SVbu?=
+ =?us-ascii?Q?nAowrVK4ySMe3VKQssp07uF1NABu1Zx5SoGX27Vj2bJnq9cfV81YcBDTf4XI?=
+ =?us-ascii?Q?C9FpUxaAFdVMHXbDnJTziKR+fjz46ciw3JMKVeHsP3fiseqwdVEPH+1by83Z?=
+ =?us-ascii?Q?DBLXhGNgk3GQ7FwxaOih4+R94TnKN46ucdWd7kk92DlvNanVA8Yu5tRJjF/q?=
+ =?us-ascii?Q?Iwby/ZgEQMdHDxYva2OyrkIE7/6tZp2KDFB/OkerW2RQWW3JN37+9x19waVW?=
+ =?us-ascii?Q?LTGZqAANplkbkANXCBk6NT7taKTRjqQn1SGsQAQ8apj4LVcpsCY/NgmrgMqd?=
+ =?us-ascii?Q?RysL/nPsymW+0Ns5fdkxfmKVqEitAMpY6dsuL7TCGVZ8MOit+X3lxfeObrJ0?=
+ =?us-ascii?Q?nvr0Nxip3g+0l3c/2GALmALpgTzgHT/Cv4vvhBHin7GYt9Uh9F+GU09Elspz?=
+ =?us-ascii?Q?rFE2KJcjOC0M9gWWvE4IeRAsYw7ShzbyhFPvWwqqt9Zb2KDFir/ngdFmTb5s?=
+ =?us-ascii?Q?OMk6N4vko6/y91+1DhlRaAweR6l5JuUvH16uctJxHeIf+Dg9J4NC+94JXkyA?=
+ =?us-ascii?Q?xptgfDd78mR4lefcadovxruYJXl4sHjQSLFWHJPpoqy5kPfNz6Idi2mhzTyD?=
+ =?us-ascii?Q?pXVe39TT71gK5KhgRgS5xMZisyHE42rXlYN8/f05mu9K/aPzs7HzWbusur9q?=
+ =?us-ascii?Q?qUQaXsW1tgxBmoKhLRdzD4R8QomKIzvhFJW5Nu4UXI6rNT4vto3fatCUQis7?=
+ =?us-ascii?Q?1ogekf1nQGE6JgWrG7wn5vmF+bEbrJLjBs403yZFzybZ+7lzpWJj5LCBhOKr?=
+ =?us-ascii?Q?dWZ/Uzi+5SGo8xGUzTcjSPodY7dobxqRxY5o8XsU1LZeo2mnEXXTEnoTUXW2?=
+ =?us-ascii?Q?lZ8ugiAYWBr0D7z03cfjYNUrJ6cbAeTn9x9rroQo3mGHrKDwTVMgtesMBAq9?=
+ =?us-ascii?Q?gv1ArmHPFp3DSj3mwOk8gQWvaVa4Z5bh37NyvDJFokns0K9bVaT/J1TdL7jb?=
+ =?us-ascii?Q?cQ=3D=3D?=
+X-OriginatorOrg: jaguarmicro.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66c5b884-76d7-46e4-aa59-08de26823fb5
+X-MS-Exchange-CrossTenant-AuthSource: PSAPR06MB3942.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2025 09:09:59.8641
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 1e45a5c2-d3e1-46b3-a0e6-c5ebf6d8ba7b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uWRMa2oAeoETjSGKVTTl/icQJTLTnc2Z0BHpmStNX5NcmgF9igOC2X/oPJ0t2c84yZoaQahfIhpLJvdQdbXTmO1BH8DaQuptxEuBxJxYqmY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZPR06MB5902
 
+From: Liming Wu <liming.wu@jaguarmicro.com>
 
+This patch refines and strengthens the statistics collection of TX queue
+wake/stop events introduced by a previous patch.
 
-On 11/18/2025 2:30 PM, Yan Zhao wrote:
-[...]
->>>> Something like below:
->>>>
->>>> @@ -1558,7 +1558,9 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct
->>>> tdp_iter *iter,
->>>>   static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
->>>>                                           struct kvm_mmu_page *root,
->>>>                                           gfn_t start, gfn_t end,
->>>> -                                        int target_level, bool shared)
->>>> +                                        int target_level, bool shared,
->>>> +                                        bool only_cross_boundary,
->>>> +                                        bool *split)
->>>>   {
->>>>          struct kvm_mmu_page *sp = NULL;
->>>>          struct tdp_iter iter;
->>>> @@ -1584,6 +1586,9 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
->>>>                  if (!is_shadow_present_pte(iter.old_spte) ||
->>>> !is_large_pte(iter.old_spte))
->>>>                          continue;
->>>>   
->>>> +               if (only_cross_boundary && !iter_cross_boundary(&iter, start,
->>>> end))
->>>> +                       continue;
->>>> +
->>>>                  if (!sp) {
->>>>                          rcu_read_unlock();
->>>>   
->>>> @@ -1618,6 +1623,7 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
->>>>                          goto retry;
->>>>   
->>>>                  sp = NULL;
->>>> +               *split = true;
->>>>          }
->>>>   
->>>>          rcu_read_unlock();
->>> This looks more reasonable for tdp_mmu_split_huge_pages_root();
->>>
->>> Given that splitting only adds a new page to the paging structure (unlike page
->>> merging), I currently can't think of any current use cases that would be broken
->>> by the lack of TLB flush before tdp_mmu_iter_cond_resched() releases the
->>> mmu_lock.
->>>
->>> This is because:
->>> 1) if the split is triggered in a fault path, the hardware shouldn't have cached
->>>     the old huge translation.
->>> 2) if the split is triggered in a zap or convert path,
->>>     - there shouldn't be concurrent faults on the range due to the protection of
->>>       mmu_invalidate_range*.
->>>     - for concurrent splits on the same range, though the other vCPUs may
->>>       temporally see stale huge TLB entries after they believe they have
->>>       performed a split, they will be kicked off to flush the cache soon after
->>>       tdp_mmu_split_huge_pages_root() returns in the first vCPU/host thread.
->>>       This should be acceptable since I don't see any special guest needs that
->>>       rely on pure splits.
->> Perhaps we should just go straight to the point:
->>
->>    What does "hugepage split" do, and what's the consequence of not flushing TLB.
->>
->> Per make_small_spte(), the new child PTEs will carry all bits of hugepage PTE
->> except they clear the 'hugepage bit (obviously)', and set the 'X' bit for NX
->> hugepage thing.
->>
->> That means if we leave the stale hugepage TLB, the CPU is still able to find the
->> correct PFN and AFAICT there shouldn't be any other problem here.
-The comments in tdp_mmu_split_huge_page() echo this.
+Previously, the driver only recorded partial wake/stop statistics
+for TX queues. Some wake events triggered by 'skb_xmit_done()' or resume
+operations were not counted, which made the per-queue metrics incomplete.
 
-     /*
-      * Replace the huge spte with a pointer to the populated lower level
-      * page table. Since we are making this change without a TLB flush vCPUs
-      * will see a mix of the split mappings and the original huge mapping,
-      * depending on what's currently in their TLB. This is fine from a
-      * correctness standpoint since the translation will be the same either
-      * way.
-      */
+Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
+---
+ drivers/net/virtio_net.c | 49 ++++++++++++++++++++++------------------
+ 1 file changed, 27 insertions(+), 22 deletions(-)
 
->>    For any fault
->> due to the stale hugepage TLB missing the 'X' permission, AFAICT KVM will just
->> treat this as a spurious fault, which isn't nice but should have no harm.
-> Right, that isn't nice, though no harm.
-According to SDM "Operations that Invalidate Cached Mappings":
-The following operations invalidate cached mappings as indicated:
-   - ...
-   - An EPT violation invalidates any guest-physical mappings (associated with
-     the current EPTRTA) that would be used to translate the guest-physical
-     address that caused the EPT violation. If that guest-physical address was
-     the translation of a linear address, the EPT violation also invalidates any
-     combined mappings for that linear address associated with the current PCID,
-     the current VPID and the current EPTRTA.
-   - ...
-
-If other CPUs have the stale hugepage TLB entry, there may be one spurious
-fault each.
-Agree that it's not nice, but no harm.
-
-
->
-> Besides, I'm thinking of a scenario which is not currently existing though.
->
->      CPU 0                                 CPU 1
-> a1. split pages
-> a2. write protect pages
->                                         b1. split pages
->                                         b2. write protect pages
->                                         b3. start dirty page tracking
-> a3. flush TLB
-> a4. start dirty page tracking
->
->
-> If CPU 1 does not flush TLB after b2 (e.g., due to it finds the pages have been
-> split and write protected by a1&a2), it will miss some dirty pages.
->
-> Currently CPU 1 always flush TLB before b3 unconditionally, so there's no
-> problem.
-
-Yes, for this write protection case, the TLB should be flushed.
-And currently, all (indirect) callers of tdp_mmu_split_huge_pages_root() do the
-TLB flush unconditionally.
-
-For the TDX case, the TLB flush is done via the hook of secure EPT hugepage
-split.
-
-It seems that the callers can decide whether the TLB flush is needed or not
-based on the following actions after hugepage split, may be with the info of
-whether split actually occurs or not.
-
-
->
->>> So I tend to agree with your suggestion though the implementation in this patch
->>> is safer.
->> I am perhaps still missing something, as I am still trying to precisely
->> understand in what cases you want to flush TLB when splitting hugepage.
->>
->> I kinda tend to think you eventually want to flush TLB because eventually you
->> want to _ZAP_.  But needing to flush due to zap and needing to flush due to
->> split is kinda different I think.
-> Though I currently couldn't find any use cases that depend on split alone, e.g.
-> if there's any feature requiring the pages must be 4KB without any additional
-> permission changes, I just wanted to make the code safer in case I missed any
-> edge cases.
->
-> We surely don't want the window for CPUs to see huge pages and small pages lasts
-> long.
->
-> Flushing TLB before releasing the mmu_lock allows other threads operating on the
-> same range to see updated translations timely.
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 8e8a179aaa49..f92a90dde2b3 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -775,10 +775,26 @@ static bool virtqueue_napi_complete(struct napi_struct *napi,
+ 	return false;
+ }
+ 
++static void virtnet_tx_wake_queue(struct virtnet_info *vi,
++				struct send_queue *sq)
++{
++	unsigned int index = vq2txq(sq->vq);
++	struct netdev_queue *txq = netdev_get_tx_queue(vi->dev, index);
++
++	if (netif_tx_queue_stopped(txq)) {
++		u64_stats_update_begin(&sq->stats.syncp);
++		u64_stats_inc(&sq->stats.wake);
++		u64_stats_update_end(&sq->stats.syncp);
++		netif_tx_wake_queue(txq);
++	}
++}
++
+ static void skb_xmit_done(struct virtqueue *vq)
+ {
+ 	struct virtnet_info *vi = vq->vdev->priv;
+-	struct napi_struct *napi = &vi->sq[vq2txq(vq)].napi;
++	unsigned int index = vq2txq(vq);
++	struct send_queue *sq = &vi->sq[index];
++	struct napi_struct *napi = &sq->napi;
+ 
+ 	/* Suppress further interrupts. */
+ 	virtqueue_disable_cb(vq);
+@@ -786,8 +802,7 @@ static void skb_xmit_done(struct virtqueue *vq)
+ 	if (napi->weight)
+ 		virtqueue_napi_schedule(napi, vq);
+ 	else
+-		/* We were probably waiting for more output buffers. */
+-		netif_wake_subqueue(vi->dev, vq2txq(vq));
++		virtnet_tx_wake_queue(vi, sq);
+ }
+ 
+ #define MRG_CTX_HEADER_SHIFT 22
+@@ -1166,10 +1181,7 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
+ 			/* More just got used, free them then recheck. */
+ 			free_old_xmit(sq, txq, false);
+ 			if (sq->vq->num_free >= MAX_SKB_FRAGS + 2) {
+-				netif_start_subqueue(dev, qnum);
+-				u64_stats_update_begin(&sq->stats.syncp);
+-				u64_stats_inc(&sq->stats.wake);
+-				u64_stats_update_end(&sq->stats.syncp);
++				virtnet_tx_wake_queue(vi, sq);
+ 				virtqueue_disable_cb(sq->vq);
+ 			}
+ 		}
+@@ -3068,13 +3080,8 @@ static void virtnet_poll_cleantx(struct receive_queue *rq, int budget)
+ 			free_old_xmit(sq, txq, !!budget);
+ 		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+ 
+-		if (sq->vq->num_free >= MAX_SKB_FRAGS + 2 &&
+-		    netif_tx_queue_stopped(txq)) {
+-			u64_stats_update_begin(&sq->stats.syncp);
+-			u64_stats_inc(&sq->stats.wake);
+-			u64_stats_update_end(&sq->stats.syncp);
+-			netif_tx_wake_queue(txq);
+-		}
++		if (sq->vq->num_free >= MAX_SKB_FRAGS + 2)
++			virtnet_tx_wake_queue(vi, sq);
+ 
+ 		__netif_tx_unlock(txq);
+ 	}
+@@ -3264,13 +3271,8 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+ 	else
+ 		free_old_xmit(sq, txq, !!budget);
+ 
+-	if (sq->vq->num_free >= MAX_SKB_FRAGS + 2 &&
+-	    netif_tx_queue_stopped(txq)) {
+-		u64_stats_update_begin(&sq->stats.syncp);
+-		u64_stats_inc(&sq->stats.wake);
+-		u64_stats_update_end(&sq->stats.syncp);
+-		netif_tx_wake_queue(txq);
+-	}
++	if (sq->vq->num_free >= MAX_SKB_FRAGS + 2)
++		virtnet_tx_wake_queue(vi, sq);
+ 
+ 	if (xsk_done >= budget) {
+ 		__netif_tx_unlock(txq);
+@@ -3521,6 +3523,9 @@ static void virtnet_tx_pause(struct virtnet_info *vi, struct send_queue *sq)
+ 
+ 	/* Prevent the upper layer from trying to send packets. */
+ 	netif_stop_subqueue(vi->dev, qindex);
++	u64_stats_update_begin(&sq->stats.syncp);
++	u64_stats_inc(&sq->stats.stop);
++	u64_stats_update_end(&sq->stats.syncp);
+ 
+ 	__netif_tx_unlock_bh(txq);
+ }
+@@ -3537,7 +3542,7 @@ static void virtnet_tx_resume(struct virtnet_info *vi, struct send_queue *sq)
+ 
+ 	__netif_tx_lock_bh(txq);
+ 	sq->reset = false;
+-	netif_tx_wake_queue(txq);
++	virtnet_tx_wake_queue(vi, sq);
+ 	__netif_tx_unlock_bh(txq);
+ 
+ 	if (running)
+-- 
+2.34.1
 
 
