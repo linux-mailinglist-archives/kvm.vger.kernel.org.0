@@ -1,209 +1,137 @@
-Return-Path: <kvm+bounces-63542-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63544-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B67BC69768
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 13:48:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4AADC698F5
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 14:15:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 96F7A2ACCC
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 12:48:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id C09E42ACDB
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 13:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E17523CEF9;
-	Tue, 18 Nov 2025 12:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DAEF342C9D;
+	Tue, 18 Nov 2025 13:14:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="myoeeqSp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mAGIomI2"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBEB236A70
-	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 12:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26368329E46;
+	Tue, 18 Nov 2025 13:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763470122; cv=none; b=Cgl5ct/LcgkXwsgW9gRFuB3vsC3kB3bIe6CN0TmaclU0k5V08Ry4leFvtk/U9CQQYd9+xsb2R9uZo+/dP8EmrTKj1gMNjO8IJ3XfePuAv5U0cEfd5frd6eTfG4FG5TR5MFKd+Saq6OVGfLg6vbZUfsZgATLELiQGVgrZqtU+msc=
+	t=1763471694; cv=none; b=BVyvMDLsdbExqfx6uL0+aH/YDr6zeUYJhTotkIgNayZGUqsxE92L1gMGgkuT10/+d5MB7Ndnq7YDohh+yT54FMK3WYrqMOTJuB2hlMSAih+B4xwGOKOk1VMHm2FjHw6Q18ilHczTgvyhP+/WgnvSHvvflHp0sgZKfwq8fElV2jA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763470122; c=relaxed/simple;
-	bh=pFdS3qA9WYaaq00VcckqdlanD8dVirrH/4YapO6gIKU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mzYGPJv/cgrhsbd/Mblrk+9+p3hHO4r2eezqMXWj+CdTuyRoXClV1203MrCFAT/jO4SG8oYuEu1/cRa0KB4UX5uwYvGQsR6t0a6gTZL9cBL1+bkDJOeoHvfqXuQTdL4+FzXhmZfkm3hSipfXWOw/FDzewebOPWz5QulRh19kpxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=myoeeqSp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 206C8C16AAE
-	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 12:48:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763470122;
-	bh=pFdS3qA9WYaaq00VcckqdlanD8dVirrH/4YapO6gIKU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=myoeeqSpH6pW78m/Ndkzd3U8DjNF/t1HC43NAn5CmDRMeJ9/blyhxfMPm47q4vWU2
-	 R688ttJjsZOP5Ara+YdG1pDi3FnmHDZaRwfjMhsG5ekaglB+icVddjkmBW5nVx5qrN
-	 //ngDE/HupY/OMAxsLkojibdV9uhQLPQRYQZbNrQB9Nb1phIq6AqbFdDnsZBbEuXbj
-	 Z5Qt6H4fs039V+wq/Awh3W0EocjT68aQAfZtLnFx9ByZXU6IUghdT0utlUNozfOUMv
-	 yJv3BsWXVMqTm0ax2Po9wrCiq+U1JO/NfgsoW/ng4v03RvfC3GBzHVdMdkyWuBfhOL
-	 3WWaKNyeg3h2Q==
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b73875aa527so404085066b.3
-        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 04:48:42 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV5MEiBpCqP2SgOtn29Y1Xirl83itRPVVwHnVPN2MJjD/vVYBa5YkpjjCH/oZVsDi1ibK8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQH0gvoMd0eOxJd1RujSKEBoC9a7ixM51OZy2xV+tz0Ags+cbg
-	ucFaxuKalvlHBSSjtPImwi9m3BLeLPWhJw7ydJfGt4p9ZJOpTOFxgAsJkkrAJFZRurQ6Si51ns2
-	zFX4FlYosuMSjPFttXs/hUoHPP222Pb4=
-X-Google-Smtp-Source: AGHT+IEDrP2TdyUTahNPJRfPwcoYAoS5gMqEHUbAvm5d4Dycw7x0zFNGBRQFdUMDmaXX2ULGwzkJBFq6jE806ti0w0o=
-X-Received: by 2002:a17:907:a44:b0:b73:544d:ba2e with SMTP id
- a640c23a62f3a-b736780d5bamr1948345866b.25.1763470120092; Tue, 18 Nov 2025
- 04:48:40 -0800 (PST)
+	s=arc-20240116; t=1763471694; c=relaxed/simple;
+	bh=6eM5MEhpy8qjHBQhtFNZN0yn242L+U7uvd1kx4IHV/E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MYUp9yzvI1henfpViH0mQctxBPFjCUwoedFjK7r9e6uB7i4gD6mSRd7FZXY9vmbjhNmjT7Vy0FxhfvCZAHpE99PL5diCRaJDsbMNqxyCd18H8uIDLLxpX1yrIYe5/Jp/hB0LgEON4jmRMGws5lAiQZQzwGjAcj0ybwjYTNOBJyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mAGIomI2; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763471692; x=1795007692;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6eM5MEhpy8qjHBQhtFNZN0yn242L+U7uvd1kx4IHV/E=;
+  b=mAGIomI2GRIWPp9ms0iyg8NbaUUnxz3aMLg433BKBwVsPVBBIijM5K9v
+   CTEIumnBSTPbwvGiwp2qVLoQqvmtz9NoOtnfZGaFID8s5ehm4yKSxWB3A
+   sKhK/GbmzvyuYF0gtxGn5bk1Ef3NUIEH2nY8dZaXF37IJrVALHFtZMWlf
+   57eVq3mLqZH12jg0lLgMtRdQp2Z/QoZ7hwP2QfgLx38mZN0SdEYqQtpJY
+   M0eN/5XZIpQy4oVlGw4EngWsZbQFWWOANp9/J/hASX12h+sGZOzB619N8
+   ByY+6QkKzt+WY5QjMdOI5U7f1C2jlgSLUaz4BD71P6w8y+NMc580RYjl3
+   A==;
+X-CSE-ConnectionGUID: RfNB7KOSQ1axWoMPtoSNMw==
+X-CSE-MsgGUID: JtSW52ERRfSR96apoBEtRg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="69361867"
+X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
+   d="scan'208";a="69361867"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 05:14:51 -0800
+X-CSE-ConnectionGUID: q0noG09pSv+jtV0xmXaiGA==
+X-CSE-MsgGUID: NncBD5WsSnCq7CwXI6o+VA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
+   d="scan'208";a="194870125"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa003.jf.intel.com with ESMTP; 18 Nov 2025 05:14:48 -0800
+Date: Tue, 18 Nov 2025 21:00:02 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: linux-coco@lists.linux.dev, linux-pci@vger.kernel.org,
+	chao.gao@intel.com, dave.jiang@intel.com, baolu.lu@linux.intel.com,
+	yilun.xu@intel.com, zhenzhong.duan@intel.com, kvm@vger.kernel.org,
+	rick.p.edgecombe@intel.com, dave.hansen@linux.intel.com,
+	dan.j.williams@intel.com, kas@kernel.org, x86@kernel.org
+Subject: Re: [PATCH v1 07/26] x86/virt/tdx: Read TDX global metadata for TDX
+ Module Extensions
+Message-ID: <aRxt0prMKusEEt2+@yilunxu-OptiPlex-7050>
+References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
+ <20251117022311.2443900-8-yilun.xu@linux.intel.com>
+ <89a4e42d-b0fd-49b0-8d51-df7bac0d5e5b@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251118080656.2012805-1-maobibo@loongson.cn> <20251118080656.2012805-3-maobibo@loongson.cn>
-In-Reply-To: <20251118080656.2012805-3-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Tue, 18 Nov 2025 20:48:41 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4hoS0Wo3TS+FdikXMkb7qjWNFSPDoajQr0bzdeROJwGw@mail.gmail.com>
-X-Gm-Features: AWmQ_bkSeXCgy-qK2rzvP-hL92k0XNXRWWttKpPo-xMdgC-eo-zjb1mltVmpNY4
-Message-ID: <CAAhV-H4hoS0Wo3TS+FdikXMkb7qjWNFSPDoajQr0bzdeROJwGw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] LoongArch: Add paravirt support with vcpu_is_preempted()
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, WANG Xuerui <kernel@xen0n.name>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>, 
-	Juergen Gross <jgross@suse.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
-	Alexey Makhalov <alexey.makhalov@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <89a4e42d-b0fd-49b0-8d51-df7bac0d5e5b@intel.com>
 
-Hi, Bibo,
+On Mon, Nov 17, 2025 at 08:52:36AM -0800, Dave Hansen wrote:
+> On 11/16/25 18:22, Xu Yilun wrote:
+> > +static __init int get_tdx_sys_info_ext(struct tdx_sys_info_ext *sysinfo_ext)
+> > +{
+> > +	int ret = 0;
+> > +	u64 val;
+> > +
+> > +	if (!ret && !(ret = read_sys_metadata_field(0x3100000100000000, &val)))
+> > +		sysinfo_ext->memory_pool_required_pages = val;
+> > +	if (!ret && !(ret = read_sys_metadata_field(0x3100000100000001, &val)))
+> > +		sysinfo_ext->ext_required = val;
+> > +
+> > +	return ret;
+> > +}
+> 
+> These were OK-ish when they were being generated by a script.
+> 
+> Now that they're being generated by and edited by humans, they
+> need to actually be readable.
 
-On Tue, Nov 18, 2025 at 4:07=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
-> Function vcpu_is_preempted() is used to check whether vCPU is preempted
-> or not. Here add implementation with vcpu_is_preempted() when option
-> CONFIG_PARAVIRT is enabled.
->
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> ---
->  arch/loongarch/include/asm/smp.h      |  1 +
->  arch/loongarch/include/asm/spinlock.h |  5 +++++
->  arch/loongarch/kernel/paravirt.c      | 16 ++++++++++++++++
->  arch/loongarch/kernel/smp.c           |  6 ++++++
->  4 files changed, 28 insertions(+)
->
-> diff --git a/arch/loongarch/include/asm/smp.h b/arch/loongarch/include/as=
-m/smp.h
-> index 3a47f52959a8..5b37f7bf2060 100644
-> --- a/arch/loongarch/include/asm/smp.h
-> +++ b/arch/loongarch/include/asm/smp.h
-> @@ -18,6 +18,7 @@ struct smp_ops {
->         void (*init_ipi)(void);
->         void (*send_ipi_single)(int cpu, unsigned int action);
->         void (*send_ipi_mask)(const struct cpumask *mask, unsigned int ac=
-tion);
-> +       bool (*vcpu_is_preempted)(int cpu);
->  };
->  extern struct smp_ops mp_ops;
->
-> diff --git a/arch/loongarch/include/asm/spinlock.h b/arch/loongarch/inclu=
-de/asm/spinlock.h
-> index 7cb3476999be..c001cef893aa 100644
-> --- a/arch/loongarch/include/asm/spinlock.h
-> +++ b/arch/loongarch/include/asm/spinlock.h
-> @@ -5,6 +5,11 @@
->  #ifndef _ASM_SPINLOCK_H
->  #define _ASM_SPINLOCK_H
->
-> +#ifdef CONFIG_PARAVIRT
-> +#define vcpu_is_preempted      vcpu_is_preempted
-> +bool vcpu_is_preempted(int cpu);
-> +#endif
-Maybe paravirt.h is a better place?
+I agree. Further more, let me figure out if we could require minimum
+boilerplate code when a new field is added.
 
-> +
->  #include <asm/processor.h>
->  #include <asm/qspinlock.h>
->  #include <asm/qrwlock.h>
-> diff --git a/arch/loongarch/kernel/paravirt.c b/arch/loongarch/kernel/par=
-avirt.c
-> index b1b51f920b23..b99404b6b13f 100644
-> --- a/arch/loongarch/kernel/paravirt.c
-> +++ b/arch/loongarch/kernel/paravirt.c
-> @@ -52,6 +52,13 @@ static u64 paravt_steal_clock(int cpu)
->  #ifdef CONFIG_SMP
->  static struct smp_ops native_ops;
->
-> +static bool pv_vcpu_is_preempted(int cpu)
-> +{
-> +       struct kvm_steal_time *src =3D &per_cpu(steal_time, cpu);
-> +
-> +       return !!(src->preempted & KVM_VCPU_PREEMPTED);
-> +}
-> +
->  static void pv_send_ipi_single(int cpu, unsigned int action)
->  {
->         int min, old;
-> @@ -308,6 +315,9 @@ int __init pv_time_init(void)
->                 pr_err("Failed to install cpu hotplug callbacks\n");
->                 return r;
->         }
-> +
-> +       if (kvm_para_has_feature(KVM_FEATURE_PREEMPT_HINT))
-> +               mp_ops.vcpu_is_preempted =3D pv_vcpu_is_preempted;
->  #endif
->
->         static_call_update(pv_steal_clock, paravt_steal_clock);
-> @@ -332,3 +342,9 @@ int __init pv_spinlock_init(void)
->
->         return 0;
->  }
-> +
-> +bool notrace vcpu_is_preempted(int cpu)
-> +{
-> +       return mp_ops.vcpu_is_preempted(cpu);
-> +}
+> 
+> Can we please get this down to something that looks more like:
+> 
+> 	MACRO(&sysinfo_ext->memory_pool_required_pages, 0x3100000100000000);
+> 	MACRO(&sysinfo_ext->ext_required,		0x3100000100000001);
+> 
+> You can generate code in that macro, or generate a struct like
+> this:
+> 
+> static __init int get_tdx_sys_info_ext(struct tdx_sys_info_ext *sysinfo_ext)
+> {
+> 	int ret = 0;
+> 	struct tdx_metadata_init[] = {
+> 		MACRO(&sysinfo_ext->memory_pool_required_pages, 0x3100000100000000),
+> 		MACRO(&sysinfo_ext->ext_required,		0x3100000100000001),
+> 		{},
+> 	};
+> 
+> 	return tdx_...(sysinfo_ext, tdx_metadata_init);
+> }
+> 
+> and have the helper parse the structure.
+> 
+> But, either way, the method that's being proposed here needs to go.
 
-We can simplify the whole patch like this, then we don't need to touch
-smp.c, and we can merge Patch-2/3.
+I'll try and may need a seperate refactoring patch for the existing
+code.
 
-+bool notrace vcpu_is_preempted(int cpu)
-+{
-+  if (!kvm_para_has_feature(KVM_FEATURE_PREEMPT_HINT))
-+     return false;
-+ else {
-+     struct kvm_steal_time *src =3D &per_cpu(steal_time, cpu);
-+     return !!(src->preempted & KVM_VCPU_PREEMPTED);
-+ }
-+}
-Huacai
 
-> +EXPORT_SYMBOL(vcpu_is_preempted);
-> diff --git a/arch/loongarch/kernel/smp.c b/arch/loongarch/kernel/smp.c
-> index 46036d98da75..f04192fedf8d 100644
-> --- a/arch/loongarch/kernel/smp.c
-> +++ b/arch/loongarch/kernel/smp.c
-> @@ -307,10 +307,16 @@ static void loongson_init_ipi(void)
->                 panic("IPI IRQ request failed\n");
->  }
->
-> +static bool loongson_vcpu_is_preempted(int cpu)
-> +{
-> +       return false;
-> +}
-> +
->  struct smp_ops mp_ops =3D {
->         .init_ipi               =3D loongson_init_ipi,
->         .send_ipi_single        =3D loongson_send_ipi_single,
->         .send_ipi_mask          =3D loongson_send_ipi_mask,
-> +       .vcpu_is_preempted      =3D loongson_vcpu_is_preempted,
->  };
->
->  static void __init fdt_smp_setup(void)
-> --
-> 2.39.3
->
->
 
