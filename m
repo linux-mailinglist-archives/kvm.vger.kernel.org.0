@@ -1,104 +1,161 @@
-Return-Path: <kvm+bounces-63605-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63606-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90474C6BDD6
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 23:28:35 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FAC9C6BDE5
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 23:30:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AD9F84EC0DC
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 22:27:13 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3B7CE368433
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 22:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45F32FABEE;
-	Tue, 18 Nov 2025 22:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078E5309F1B;
+	Tue, 18 Nov 2025 22:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Vai/k3v"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="plB1W6l+"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0042DC774
-	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 22:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC993702F8
+	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 22:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763504825; cv=none; b=AZBaa2hSxAy3X/JinkM5IDlTZiHTxIxPgrd8OPw8e9duNrXIvL+N7eJGcMR6uB9TGXUvw+mNpFGUMsNyF2pTxhFdYw5no0sgbzqlvW7wCfcG+aqdUeg70OVpnu5fHR/yO8h6jCaez/i6zFEhHTtjUk/NHbnJQwfy+OjlllIeL4M=
+	t=1763504991; cv=none; b=C0TngPK8+uprDHowJuAMmJ/ruZGoGW/tgf/OwB08XVjdmK7QQ2HA5X+L0XqLjGJumtIRDGN7O/FIDo6n8UlEedhIvVbbLBvxkZYWwsXuafJ7ofdvjftjL6CRsG6FZ1kenrZJr+8eweIVNWS4BVBA+Vy15QlPxcbkdOL+/ysdmKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763504825; c=relaxed/simple;
-	bh=KrHQQv+zUECEQxbHLQhixzohmgdjIRyjJktB1mDjqyc=;
+	s=arc-20240116; t=1763504991; c=relaxed/simple;
+	bh=L5NQD2nPKZ6LQfoSJLfrfvmHC+Bf4NqaUyhiPjDujC8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RdB6WBClNWdDQWs88qNbhp0KK/AedCI7ncmd6Lk2kkRZ9gXLZ8fSHSMsO7ISNJ4uF/edAi+QeaV/XQKHZ2oEtvfPLSA2tej1XcOZrQVhsbmY92Ayk+IO6m9bG1OT4aPK+l5kXBvw0vPotuPElIfeGgBblVQxdZwXOEzPdHBo2+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Vai/k3v; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=tGJeb71RJkofBMoFjGx4yR5XU9JB0BIzPg4kl2/8brodyEI/Il8lxMWykuIiEEs8il6/2QvmssH3nkleQH3e2ZrX6HtoV1QoR+8WxoewkTuhq93qgEJy39vD2ATO+iDMnYRbAZhgGJhaMwcxEEI0buC1m4eXlyussMexDtaCowI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=plB1W6l+; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340ad9349b3so14976831a91.1
-        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 14:27:03 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-343daf0f488so7304924a91.1
+        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 14:29:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763504823; x=1764109623; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TXaTcBoElt2xSkz4aQrYGSyiRPLODYJmIxU96prgAJA=;
-        b=4Vai/k3v38VaaGvyBXVCS9NfjEg596jGsvCIeh8/yAUbOiGs0vClFGU52NNl2vpIXD
-         FyHwPYNWOEWjSIxduWNs9655eN+f9rYUl40S0lF+qBhLODfCnB6+JkBrvNb7J7wxsGwk
-         S9iHyz5puPp6pNsx6NjQ3bkUlaiF6S5gJwJUiC+PGbP01vW4LkMO4fMx95vMEOjTN3bk
-         7KpgArtL/qHW6X5lddILNuLqnc3wJG9Pk5AkfnNjaor4p2KA6prrYc0lY+S/Y0J4JT01
-         p29jEPHey4oz80DNU/GZaimlmnTFlCA9dVzGBsTyZkMvN/ipVF6NOiOo6xLxQee5Y0eP
-         KZmw==
+        d=google.com; s=20230601; t=1763504988; x=1764109788; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UR/UiRBGaXeOcEGTaK7f4Tp0RFu7bFA33F9OkLJf3mo=;
+        b=plB1W6l+PauDIytvh2Anx0MsavQ7fMK4G+vtBjuamp8gnAlmqS+2Q7dGb1LM5W64mi
+         awQ7sNIkJzQ5eiJg65tibDqIhYzKq1I8WE9ZnLo9iFBm3qVMfcLlLFcdg28p5dT8LfOS
+         EkDmY8A8LQJ7/FIShoiYxu3brzdhCXEmZzvOsBDsRpQyoDvhCitgpGlFjJUIFuitIPm7
+         wQUHdQRAHMJXv1y7oNPersRYxKzDfGUpp94Zim8PBxnAWnbGLLhaM59u0aL+xtzAZU3t
+         y0E1/5mF0nVnYuVWgqZcJsjkOzm95MroV9d5bKqgdTNnfhk46po8IJlR+NNBz+oMxjyg
+         mYDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763504823; x=1764109623;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TXaTcBoElt2xSkz4aQrYGSyiRPLODYJmIxU96prgAJA=;
-        b=Ys7CDfCPDE9CLzoqVPzDXNRe1/F0B8oCyexK0H/5rGFrjFee6UULEQryofKROoIbwm
-         nUf0hsKLBCLYuJgRF8xG9gIYuItzxhzuc/vjZLVYTnNd6XTYLWouYMQEn4qssA9KN2PI
-         5U4LjFvj+yWMjPIXSbIr5ht8arCiyWSkouVjFegVIW3FIPB8k9lX/PIGPLyN7JHFFCW4
-         d6+4IPoX20+UV8VQt70GHqRlhnZi/NuEMU4S4NKU9Zqy/NtleTS8vdwtXuO4izugIxbE
-         qsiClVvUwZ18/8H1I52Btecu5BBec905tgfFMjII1zQHLPvZY546M8WY5mr8NcbYE68N
-         P1iw==
-X-Gm-Message-State: AOJu0YzwHoMyH0r0FXMofpLXf5nskJiYxofXOnkLXoAYD7nm10RKWKlR
-	u2KoT6PhbGXoBTTkrIndC+OypNTrVnEOnJuK4OChIvzFp7SLMM27iW7uYoW+YTdFTDDshdNz8vv
-	lYL8Gew==
-X-Google-Smtp-Source: AGHT+IFkUcdrfiK1F/sHcOIiVjP4BtUdviA5SPGy0bgwKKjDLTFSAAmlrgBstzBZom8xTr8SEWWmcWbdYaA=
-X-Received: from pjua17.prod.google.com ([2002:a17:90a:cb91:b0:343:5259:2292])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2dc6:b0:33b:c9b6:1cd
- with SMTP id 98e67ed59e1d1-343fa739bbemr20522979a91.19.1763504822985; Tue, 18
- Nov 2025 14:27:02 -0800 (PST)
-Date: Tue, 18 Nov 2025 14:26:42 -0800
-In-Reply-To: <20251113235946.1710922-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1763504988; x=1764109788;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UR/UiRBGaXeOcEGTaK7f4Tp0RFu7bFA33F9OkLJf3mo=;
+        b=QRWuDiPwvw2OMAt1ACVJ/fRatVtge7aBTQWemJeoqgVpRNvc6vjizf4rNqyU9gIChN
+         3m9VmGM9gtWxYtekVKYs2QNLPqlhBgpkRbhpLirTYMW3jzJT+P999faWphng7TOeNCF4
+         +9g0Utd2FSLBtaZAsFVW+4UHiWbrkrcy7HyFQZ5hM/9ODWrMsEPCvfq5h6SzlLRmy4LM
+         qHhCOWlhXEVDVSBy8c8sYlmfLp0x0xdlCQpNWTagIKthmPG+EhWdDTDjEq2bVwt371Dn
+         bnDx19c5xu5MhhelW5yi1hiDxqATl/oPIpONkPJAqDuOqSmeIYiGDn4y9Mt9Cqs3jNKJ
+         PTXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXEDIbm3VMXfzSlHqHwsCwY1rLo7Gtfax1CnXU52N7fjrpAAYrciA2RZXVvkCLG7icL3q0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaSJQopilJxHVggmWcDgmuubG/976z9PwnFRhK1pvv6nUraWEj
+	irOFuGedh79JT4NgOczfL3d4vTCGXwNnowDDZi/JSkbNgfL3s8G4ogdvNRRhvcjiJ26Vy4o5KuU
+	SeGoEqg==
+X-Google-Smtp-Source: AGHT+IHn/8d0et5POMDaR9LBwlh/WjSxa7F5aGP4HsqMVLOgiA1YOIcsSxqDCiWkCpLqUh9Jy9U8sF/mO98=
+X-Received: from pjboe3.prod.google.com ([2002:a17:90b:3943:b0:340:d583:8695])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f4f:b0:33b:bed8:891c
+ with SMTP id 98e67ed59e1d1-343fa527eb0mr20659650a91.23.1763504988037; Tue, 18
+ Nov 2025 14:29:48 -0800 (PST)
+Date: Tue, 18 Nov 2025 14:29:46 -0800
+In-Reply-To: <CALMp9eQep3H-OtqmLe3O2MsOT-Vx4y0-LordKgN+pkp04VLSWw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251113235946.1710922-1-seanjc@google.com>
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <176350466174.2266226.9705773210624467195.b4-ty@google.com>
-Subject: Re: [kvm-unit-tests PATCH] x86/vmexit: Add WBINVD and INVD VM-Exit
- latency testcases
+References: <f156887a-a747-455f-a06e-9029ba58b8cc@amd.com> <aG2GRzQPMM3tmMZc@google.com>
+ <CALMp9eQep3H-OtqmLe3O2MsOT-Vx4y0-LordKgN+pkp04VLSWw@mail.gmail.com>
+Message-ID: <aRzzWrghCDzdKGKD@google.com>
+Subject: Re: KVM Unit Test Suite Regression on AMD EPYC Turin (Zen 5)
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
+To: Jim Mattson <jmattson@google.com>
+Cc: Srikanth Aithal <sraithal@amd.com>, KVM <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 13 Nov 2025 15:59:46 -0800, Sean Christopherson wrote:
-> Add WBINVD and INVD testcase to the VM-Exit performance/latency test so
-> that it's easy to measure latency of VM-Exits that are handled in KVM's
-> fastpath on both Intel and AMD (INVD), and so that a direct comparison can
-> be made to an exit with no meaningful emulation (WBINVD).
-> 
-> Don't create entries in x86/unittests.cfg, as running the INVD test on
-> bare metal (or a hypervisor that emulates INVD) would likely corrupt
-> memory (and similarly, WBINVD can have a massively negative impact on the
-> system).
-> 
-> [...]
+On Wed, Jul 23, 2025, Jim Mattson wrote:
+> On Tue, Jul 8, 2025 at 1:58=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
+> > On Tue, Jul 08, 2025, Srikanth Aithal wrote:
+> > > Hello all,
+> > > KVM unit test suite for SVM is regressing on the AMD EPYC Turin platf=
+orm
+> > > (Zen 5) for a while now, even on latest linux-next[https://git.kernel=
+.org/pub/scm/linux/kernel/git/next/linux-next.git/tag/?h=3D
+> > > next-20250704]. The same seem to work fine with linux-next tag
+> > > next-20250505.
+> > > The TSC delay test fails intermittently (approximately once in three =
+runs)
+> > > with an unexpected result (expected: 50, actual: 49). This test passe=
+d
+> > > consistently on earlier tags (e.g., next-20250505) and on non-Turin
+> > > platforms.
+> >
+> > Stating the obvious to some extent, I suspect it's something to do with=
+ Turin,
+> > not a KVM issue.  This fails on our Turin hosts as far back as v6.12, i=
+.e. long
+> > before next-20250505 (I haven't bothered checking earlier builds), and =
+AFAICT
+> > the KUT test isn't doing anything to actually stress KVM itself.  I.e. =
+I would
+> > expect KVM bugs to manifest as blatant, 100% reproducible failures, not=
+ random
+> > TSC slop.
+>=20
+> I think the final test case is broken, actually.
+>=20
+> The test case is:
+>=20
+>     svm_tsc_scale_run_testcase(50, 0.0001, rdrand());
+>=20
+> So, guest_tsc_delay_value is (u64)((50 << 24) * 0.0001), which is
+> 83886. Note that this is 83886.080000000002 truncated.
+>=20
+> If L2 exits after 83886 scaled TSC cycles, the "duration" spent in L2
+> will be (u64)(83886 / 0.0001) >> 24, which is 49. To get up to 50, we
+> have to accumulate an additional (0.080000000002 / 0.0001 =3D
+> 800.0000000199999) cycles between the two rdtsc() operations
+> bracketing the svm_vmrun() in L1 .
+>=20
+> The test probably passes on other CPUs because emulated VMRUN and
+> #VMEXIT add those 800 cycles.
+>=20
+> Instead of truncating ((50 << 24) * 0.0001), I think we should
+> calculate guest_tsc_delay_value as ceil((50 << 24) * 0.0001).
+> Something like this:
+>=20
+> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+> index 9358c1f0383a..1bfe11045bd1 100644
+> --- a/x86/svm_tests.c
+> +++ b/x86/svm_tests.c
+> @@ -891,6 +891,8 @@ static void svm_tsc_scale_run_testcase(u64 duration,
+>         u64 start_tsc, actual_duration;
+>=20
+>         guest_tsc_delay_value =3D (duration << TSC_SHIFT) * tsc_scale;
+> +       if (guest_tsc_delay_value < (duration << TSC_SHIFT) * tsc_scale)
+> +               guest_tsc_delay_value++;
+>=20
+>         test_set_guest(svm_tsc_scale_guest);
+>         vmcb->control.tsc_offset =3D tsc_offset;
+>=20
+> Even then, equality of duration and actual_duration is only guaranteed
+> if there are no significant delays during the measurement.
 
-Applied to kvm-x86 next, thanks!
+Wrote a changelog and applied this to kvm-x86 next.  Thanks Jim!
 
-[1/1] x86/vmexit: Add WBINVD and INVD VM-Exit latency testcases
-      https://github.com/kvm-x86/kvm-unit-tests/commit/70e7bc408e10
-
---
-https://github.com/kvm-x86/kvm-unit-tests/tree/next
+[1/1] x86/svm: Account for numerical rounding errors in TSC scaling test
+      https://github.com/kvm-x86/linux/commit/5465145a
 
