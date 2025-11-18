@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-63460-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63461-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61E40C671B0
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 04:20:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 525BBC671B3
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 04:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EBDB4362393
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 03:20:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 4DBA529C7D
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 03:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F92320CA7;
-	Tue, 18 Nov 2025 03:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3794326D67;
+	Tue, 18 Nov 2025 03:20:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S8WlOZK4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cRZYg1e2"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06F02D1F6B
-	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 03:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AF5322A1F
+	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 03:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763436019; cv=none; b=cbcUHefwf7lJu1N9XQKgpCn3XHz/e62xM3Z7HFTbG7FWsoJoS+jDNsb2HFVhEA9dR9B0OwtCIOi7dGFsHu8kR0g1zdtPusgPRXLQZLoLPe2KRSzN9uFRENdLzj9dsSWkSeBQpKgb0UdEjv+5kAWModCMZZC2btFcpuSSzEg3K+I=
+	t=1763436022; cv=none; b=VL5iuHTeb4NhUBx5Rt+2BiVwKTfT6fdkQGlZ3CqCPxSfbJHXaXABbJ+hRAfA2/AJzk82Qjw9E7GCluapg6vRwpvCrOjnmK+6HYyLJ5cA6rlpxaJHOdH7yXwM+YjuMXsMQlgPiDfyyqvp42WIiFtmnjaVMtEEsjvlk98hM3Cs8g4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763436019; c=relaxed/simple;
-	bh=e7ZuP6IJXLFF9a7BOtF/YskQsXWAUPGXOl3UUkfR6iA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CBNgtksUVh1sa7tDQuUeHmvUyQMmUYcB8IVQdhWiVOKVbNAp9ogXrXQBMTR1/etzYSlaA0pVEKOQ7UFH7aK+Fxl7bwB4ct5ijSeqC2uESTmOD1VCF4Ax+vJqGpN3Ch4kaqJxtcOIuxKU26Dk4ICsF5JVD8ScwHjEJ7pWLUfGy9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S8WlOZK4; arc=none smtp.client-ip=192.198.163.13
+	s=arc-20240116; t=1763436022; c=relaxed/simple;
+	bh=i0sp4wj5rSSd6tZSRimjqOo45WUYte6rhpv/w5HY6HQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=L24pMeK3qx0MGoC+d6WCHZes7o1RR9J0OPLEpAfZl+5Xf40OclgDugR6IHBHL9WcM6iw4CgUAbLHczK6GtrHbfCbUGxZxFpk5pI44kcL8t3yqcdZlQmTpnjCA2oOGQ2WrjTzo/IHYnETkCESpH62UYIrw0C+csvNqqPLjx8YKD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cRZYg1e2; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763436018; x=1794972018;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=e7ZuP6IJXLFF9a7BOtF/YskQsXWAUPGXOl3UUkfR6iA=;
-  b=S8WlOZK4xFnGnChV5bw23uKISGyibPMU89kAk9nP1sJvvXOp8EDd4+G3
-   6tusLK/Rn8vwtg0wO5bV0clsDeGW0y1YgVl7ENxFzhh6WrPOdnMZDEAtZ
-   OMTRlNo3ieSpj5x/QrLAiOAFk3RdNdOCNyTw7sYJeiKhJyMP6RwNBiqwQ
-   h6rRWNqDth+76NTTQ7VbTXM+v9WiVI+RavFZFPgaTsKhKfgV528WzhmJ2
-   9Zq5RjZc0E2BTfx8j2X2TN6yqnLPOvAxojsrRN95ucPsSGZo/uETdo2UE
-   gdZPsHKi8HPLEQ/LjsXQn3B51X/wmCe4o69YnE50fPlB5r16cjDam44xK
-   A==;
-X-CSE-ConnectionGUID: mRh/8Px8RMyD2/kYe0V+UA==
-X-CSE-MsgGUID: 2M6BLI9QTLaka8TsFTL0pw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="68053714"
+  t=1763436021; x=1794972021;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=i0sp4wj5rSSd6tZSRimjqOo45WUYte6rhpv/w5HY6HQ=;
+  b=cRZYg1e29tHW6ox/D2GoliTRos9EKE0TQK+rqB+kUfJhnm/bkXFTwdhD
+   w8qwhB/CDW2Y7zMm6KSJS2EEiE+zvrSvh+sVcfxvzMzAgAi4WWleF7hYF
+   Gg+o4FJKIWJz9+rKpmxqGUBE8hLaKxviJ8pnGGkGrMm+WRpSzNsjLVK2j
+   b9Gg0CkmpMkhClLJn7i3JSAjCp2P3jUqNaOxfMzsFhcGp1klQFHuV0NhI
+   uTdLX7zw0zqFWJrfWU+bW1PchzN1ZASmPhahyr6SZjJ3rvPAWDwwgq577
+   SQJJMkjEsHb7Y5GABD9en7ENW+iIupoB1E0RtDNFASjVaqvuHWzbwQem+
+   g==;
+X-CSE-ConnectionGUID: 8LBbmyRzTRuP8KleOCAReQ==
+X-CSE-MsgGUID: 58hmkvBAQzyc7CnWDeV++A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="68053723"
 X-IronPort-AV: E=Sophos;i="6.19,313,1754982000"; 
-   d="scan'208";a="68053714"
+   d="scan'208";a="68053723"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 19:20:17 -0800
-X-CSE-ConnectionGUID: EV1Ij9I/T+OobmynnrHDpQ==
-X-CSE-MsgGUID: ymzuKz1cSNW2o8WJr2gSKA==
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 19:20:20 -0800
+X-CSE-ConnectionGUID: jryimD4CS16MurwiigIJLg==
+X-CSE-MsgGUID: P4zwZAEkRfKOyfaRWxrCAA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,313,1754982000"; 
-   d="scan'208";a="221537123"
+   d="scan'208";a="221537132"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by fmviesa001.fm.intel.com with ESMTP; 17 Nov 2025 19:20:13 -0800
+  by fmviesa001.fm.intel.com with ESMTP; 17 Nov 2025 19:20:17 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>
@@ -73,10 +74,12 @@ Cc: qemu-devel@nongnu.org,
 	Chenyi Qiang <chenyi.qiang@intel.com>,
 	Farrah Chen <farrah.chen@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v4 00/23] i386: Support CET for KVM
-Date: Tue, 18 Nov 2025 11:42:08 +0800
-Message-Id: <20251118034231.704240-1-zhao1.liu@intel.com>
+Subject: [PATCH v4 01/23] i386/cpu: Clean up indent style of x86_ext_save_areas[]
+Date: Tue, 18 Nov 2025 11:42:09 +0800
+Message-Id: <20251118034231.704240-2-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251118034231.704240-1-zhao1.liu@intel.com>
+References: <20251118034231.704240-1-zhao1.liu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,113 +88,92 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+The indentation style in `x86_ext_save_areas[]` is extremely
+inconsistent. Clean it up to ensure a uniform style.
 
-This the v4 series to support CET (CET-SHSTK & CET-IBT) in QEMU, which
-is based on the master branch at the commit 9febfa94b69b ("Merge tag
-'for-upstream' of https://repo.or.cz/qemu/kevin into staging"). And you
-can also find the code here:
-
-https://gitlab.com/zhao.liu/qemu/-/tree/i386-all-for-dmr-v1.1-11-17-2025
-
-Compared to v3 [1], v4 mainly considers pl0 SSP MSR for FRED, and fixes
-migratable_flags for FEAT_XSAVE_XSS_LO. More details, pls refer Change
-Log in the following.
-
-Thanks for your review!
-
-Overview
-========
-
-Control-flow enforcement technology includes 2 x86-architectural
-features:
- - CET shadow stack (CET-SHSTK or CET-SS).
- - CET indirect branch tracking (CET-IBT).
-
-Intel has implemented both 2 features since Sapphire Rapids (P-core) &
-Sierra Forest (E-core).
-
-AMD also implemented shadow stack since Zen3 [2] - this series has
-considerred only-shstk case and is supposed to work on AMD platform, but
-I hasn't tested this on AMD.
-
-The basic CET support (patch 12-20) includes:
- * CET-S & CET-U supervisor xstates support.
- * CET CPUIDs enumeration.
- * CET MSRs save & load.
- * CET guest SSP register (KVM treats this as a special internal
-   register - KVM_REG_GUEST_SSP) save & load.
- * Vmstates for MSRs & guest SSP.
-
-But before CET support, there's a lot of cleanup work needed for
-supervisor xstate.
-
-Before CET-S/CET-U, QEMU has already supports arch lbr as the 1st
-supervisor xstate. Although arch LBR has not yet been merged into KVM
-(still planned), this series cleans up supervisor state-related support
-and avoids breaking the current arch LBR in QEMU - that's what patch
-2-11 are doing.
-
-Additionally, besides KVM, this series also supports CET for TDX.
-
-Change Log
-==========
-
-Changes Since v3:
- - Fill CPUID 0xD subleaves from KVM CPUID instead of host CPUID for
-   non-dynamic xstates (i.e., except AMX xstates for now).
- - Save/restore/migrate MSR_IA32_PL0_SSP for FRED.
- - Fix migratable_flags for FEAT_XSAVE_XSS_LO.
- - Refine commit message for CET TDX support.
-
-[1]: https://lore.kernel.org/qemu-devel/20251024065632.1448606-1-zhao1.liu@intel.com/
-[2]: https://lore.kernel.org/all/20250908201750.98824-1-john.allen@amd.com/
-
-Thanks and Best Regards,
-Zhao
+Tested-by: Farrah Chen <farrah.chen@intel.com>
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-Chao Gao (1):
-  i386/cpu: Fix supervisor xstate initialization
+ target/i386/cpu.c | 58 +++++++++++++++++++++++++++--------------------
+ 1 file changed, 33 insertions(+), 25 deletions(-)
 
-Chenyi Qiang (1):
-  i386/tdx: Add CET SHSTK/IBT into the supported CPUID by XFAM
-
-Xin Li (Intel) (2):
-  i386/cpu: Save/restore SSP0 MSR for FRED
-  i386/cpu: Migrate MSR_IA32_PL0_SSP for FRED and CET-SHSTK
-
-Yang Weijiang (5):
-  i386/cpu: Enable xsave support for CET states
-  i386/kvm: Add save/restore support for CET MSRs
-  i386/kvm: Add save/restore support for KVM_REG_GUEST_SSP
-  i386/machine: Add vmstate for cet-shstk and cet-ibt
-  i386/cpu: Advertise CET related flags in feature words
-
-Zhao Liu (14):
-  i386/cpu: Clean up indent style of x86_ext_save_areas[]
-  i386/cpu: Clean up arch lbr xsave struct and comment
-  i386/cpu: Reorganize arch lbr structure definitions
-  i386/cpu: Make ExtSaveArea store an array of dependencies
-  i386/cpu: Add avx10 dependency for Opmask/ZMM_Hi256/Hi16_ZMM
-  i386/kvm: Initialize x86_ext_save_areas[] based on KVM support
-  i386/cpu: Use x86_ext_save_areas[] for CPUID.0XD subleaves
-  i386/cpu: Reorganize dependency check for arch lbr state
-  i386/cpu: Drop pmu check in CPUID 0x1C encoding
-  i386/cpu: Add missing migratable xsave features
-  i386/cpu: Add CET support in CR4
-  i386/cpu: Mark cet-u & cet-s xstates as migratable
-  i386/cpu: Enable cet-ss & cet-ibt for supported CPU models
-  i386/tdx: Fix missing spaces in tdx_xfam_deps[]
-
- target/i386/cpu.c         | 256 +++++++++++++++++++++++++++-----------
- target/i386/cpu.h         | 110 ++++++++++++----
- target/i386/helper.c      |  12 ++
- target/i386/kvm/kvm-cpu.c |  23 +++-
- target/i386/kvm/kvm.c     | 117 +++++++++++++++++
- target/i386/kvm/tdx.c     |  20 +--
- target/i386/machine.c     |  78 ++++++++++++
- 7 files changed, 501 insertions(+), 115 deletions(-)
-
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 641777578637..c598f09f3d50 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2028,38 +2028,46 @@ ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
+         .feature = FEAT_1_ECX, .bits = CPUID_EXT_XSAVE,
+         .size = sizeof(X86LegacyXSaveArea) + sizeof(X86XSaveHeader),
+     },
+-    [XSTATE_YMM_BIT] =
+-          { .feature = FEAT_1_ECX, .bits = CPUID_EXT_AVX,
+-            .size = sizeof(XSaveAVX) },
+-    [XSTATE_BNDREGS_BIT] =
+-          { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_MPX,
+-            .size = sizeof(XSaveBNDREG)  },
+-    [XSTATE_BNDCSR_BIT] =
+-          { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_MPX,
+-            .size = sizeof(XSaveBNDCSR)  },
+-    [XSTATE_OPMASK_BIT] =
+-          { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
+-            .size = sizeof(XSaveOpmask) },
+-    [XSTATE_ZMM_Hi256_BIT] =
+-          { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
+-            .size = sizeof(XSaveZMM_Hi256) },
+-    [XSTATE_Hi16_ZMM_BIT] =
+-          { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
+-            .size = sizeof(XSaveHi16_ZMM) },
+-    [XSTATE_PKRU_BIT] =
+-          { .feature = FEAT_7_0_ECX, .bits = CPUID_7_0_ECX_PKU,
+-            .size = sizeof(XSavePKRU) },
++    [XSTATE_YMM_BIT] = {
++        .feature = FEAT_1_ECX, .bits = CPUID_EXT_AVX,
++        .size = sizeof(XSaveAVX),
++    },
++    [XSTATE_BNDREGS_BIT] = {
++        .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_MPX,
++        .size = sizeof(XSaveBNDREG),
++    },
++    [XSTATE_BNDCSR_BIT] = {
++        .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_MPX,
++        .size = sizeof(XSaveBNDCSR),
++    },
++    [XSTATE_OPMASK_BIT] = {
++        .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
++        .size = sizeof(XSaveOpmask),
++    },
++    [XSTATE_ZMM_Hi256_BIT] = {
++        .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
++        .size = sizeof(XSaveZMM_Hi256),
++    },
++    [XSTATE_Hi16_ZMM_BIT] = {
++        .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_AVX512F,
++        .size = sizeof(XSaveHi16_ZMM),
++    },
++    [XSTATE_PKRU_BIT] = {
++        .feature = FEAT_7_0_ECX, .bits = CPUID_7_0_ECX_PKU,
++        .size = sizeof(XSavePKRU),
++    },
+     [XSTATE_ARCH_LBR_BIT] = {
+-            .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_ARCH_LBR,
+-            .offset = 0 /*supervisor mode component, offset = 0 */,
+-            .size = sizeof(XSavesArchLBR) },
++        .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_ARCH_LBR,
++        .offset = 0 /*supervisor mode component, offset = 0 */,
++        .size = sizeof(XSavesArchLBR),
++    },
+     [XSTATE_XTILE_CFG_BIT] = {
+         .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_AMX_TILE,
+         .size = sizeof(XSaveXTILECFG),
+     },
+     [XSTATE_XTILE_DATA_BIT] = {
+         .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_AMX_TILE,
+-        .size = sizeof(XSaveXTILEDATA)
++        .size = sizeof(XSaveXTILEDATA),
+     },
+ };
+ 
 -- 
 2.34.1
 
