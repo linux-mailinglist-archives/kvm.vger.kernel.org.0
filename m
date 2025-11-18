@@ -1,235 +1,206 @@
-Return-Path: <kvm+bounces-63601-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63602-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7959DC6BDA6
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 23:25:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CA33C6BDD0
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 23:28:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B08954E29E3
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 22:25:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 973A24EA53B
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 22:26:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE5C325739;
-	Tue, 18 Nov 2025 22:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F93E311588;
+	Tue, 18 Nov 2025 22:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gYqAVY++"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ko6ePUq3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EF231B12D
-	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 22:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A1F30FF27
+	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 22:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763504620; cv=none; b=MDyb1NVHXYO0y5Su0iSa0bR0kYbB40Tj0bWezDnMQCWRfAHCPjOoQOZ57+CyS0VheugMcjmbTMsdqABWrD+vYnuQi24VMjncvCPzPuuUb0bEtairMFcYxChx0Q7LYOc5URFpzIIB90gN4XW9821b0RK3j2OlV4sgoGVfjrHdTJw=
+	t=1763504767; cv=none; b=brt2ncq47VYCQbIF61/B3AvxZspMvNXUECR0aVkACNZoAcoag5oQHZ+cgtdlWC7drdRPjdjn8HECN3udfptvaizqhd/tYqF7FtIGcsZvx2wUHZluAJWGbXFqCcSpqBMYQVu5O+QuM7bqf5EI6+gZBo/sg+Nk9yTziL+KArNQWIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763504620; c=relaxed/simple;
-	bh=Z/DjTbMxxtwfS6uS1n7NXBorkMmU7tvMoEYXRuGPlFQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lOWF2NaHigJIm6IuOKc8zmCPDbtLdjxygz838lktl14UHuLBxOLkGhhaCCKunq6hJrEDQHHHE0EkTb9etn5d/DbUqz3lY+hsM23eHQ2yRtwG1IjvZKiCUtCZjIoN7uRxhy3x3PrYJbFR+/WhyJPv9Rqo0Wc5U/oznr3IWLt96Pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gYqAVY++; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-297dfae179bso147049825ad.1
-        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 14:23:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763504618; x=1764109418; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=k6abdiQWX2NNeyGNyymJ5zH7pnooPhs4/ECKEvEmQik=;
-        b=gYqAVY++AYmR9LlTNHqD4/4FxcCOidwUoSPEoZQO19ddolzD/G9brsKUTsaGedrO8j
-         wrIvaTJj3WJkhKKngxgKUbFOp9jI8aie3+N4h6c0ZkJ+NragRcu57M+g/lqXRJkHZU9h
-         xhQ00FxtTPYcGxxg8pKRErllfVKDrWszmj2MXx0p2hKWwrFSw2YffwCjXogRdue4P/zo
-         lAiQhCYUHH7v5+NHHq3VWmCCR2q4iRFBPf3wFAgwsGf0km/+qJy7hcu46olV6NuXghZl
-         0xj+zP8Ln9CjrU8SX4frSKrkIg+QYqE4TMmgVzgW0bt+4CWmQemEUCEJ/qrCqcGS3m73
-         QyJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763504618; x=1764109418;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=k6abdiQWX2NNeyGNyymJ5zH7pnooPhs4/ECKEvEmQik=;
-        b=Vt6kXDUC46+S/Yn/DLyC8nDmNwZdMkDp44a/8qs6IbXXLRH9Vz/3tVwD00sBA+sxLw
-         hRntNHHULDofEoSxB+1+5v/jhLUn/3/HEbKadAgl5KCeK4DPfjcfqyDo0XqH0zLRx7Cv
-         7UkThzPGPZZz2LHmBuGKqvTOacB84IH19pKq/jh2TLSeBarbDDnLDOUJ0Gccjr6nlA2Y
-         F/xAogzb8JdYmw/1Ya5NvQ21WvGw2xkM78empBs3iR6UjHaMIRwARmUOKgCQm6DeDfeu
-         xcQ0id8K3cavxA0ndX/JDwtEYyI7dSCxUjOZVOu+a/YyqWLNMiAJCUnmLf+dYvCcYpPR
-         C58Q==
-X-Gm-Message-State: AOJu0YzfVoOWHNFFwrN95JrV0Dawqq4CDhS0HImiRCzxquMjC5mVAvzO
-	QVwHVnLFNEjzGsdatMBqS1kTiyD97NYIqnfZcGddcCQCkwqHMCddIZI+lI5lZpQJnxf/EuncghR
-	Ql8f4oQ==
-X-Google-Smtp-Source: AGHT+IGDcfTyticzqgBK5utKn+m9UElTi2gzKfFB2rNfhe1Y5J2SFjpR1n1x5g/sAvVBxZxGoKfHROFByYI=
-X-Received: from plbko13.prod.google.com ([2002:a17:903:7cd:b0:297:ddac:51ad])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2b0e:b0:295:9d7f:9296
- with SMTP id d9443c01a7336-29a054a857amr6014265ad.45.1763504617836; Tue, 18
- Nov 2025 14:23:37 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 18 Nov 2025 14:23:28 -0800
-In-Reply-To: <20251118222328.2265758-1-seanjc@google.com>
+	s=arc-20240116; t=1763504767; c=relaxed/simple;
+	bh=alNgAGPvUNBhPxs8YkcGDHtoFORtX4BmEf5MMsOuSbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qU8sZL2EN/Vl5RuAfrb1qp3J9PkGUVmETp1hNkavPaJFPaFuN1/nzDvo4yx3XIPA9PQ1U55AZk9JiKYvb0fcq77V+H/UTSIWq6ui8frUlRamHG12x1MmZg1merrMPo9HqqhG4NuXNMcLbhwMwTcFRd12sSqm/gJzBoEX1DubBRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ko6ePUq3; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 18 Nov 2025 22:25:40 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763504751;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B+jRD8r/6yuvVVSUWkL8O+XOv4tLyvq+g+/BE2dB56E=;
+	b=Ko6ePUq3sDjB6n7ffm1q29+s2QTLhGlYx3IskImAv/lREVjBX9usNTYb6EQaHOoSJK/rzE
+	J08oR4EaAb94q/F26/ImBE2Tmw+hGKFE9Sfkr098NIw9obXKpXDC8ktP4xrNPTchBBesNS
+	Pw+G892+KOIEXUS7RYAe9oMml3jLDTA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 00/23] Extend test coverage for nested SVM
+Message-ID: <n5cjwr3klovu7tqcchptvmr6yieyhvnv5muv7zyvcbo5itskew@6rzo4ohctdhv>
+References: <20251021074736.1324328-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251118222328.2265758-1-seanjc@google.com>
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251118222328.2265758-5-seanjc@google.com>
-Subject: [PATCH v2 4/4] KVM: x86: Load guest/host PKRU outside of the fastpath
- run loop
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"Kirill A. Shutemov" <kas@kernel.org>
-Cc: kvm@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Jon Kohler <jon@nutanix.com>, Tony Lindgren <tony.lindgren@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251021074736.1324328-1-yosry.ahmed@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-Move KVM's swapping of PKRU outside of the fastpath loop, as there is no
-KVM code anywhere in the fastpath that accesses guest/userspace memory,
-i.e. that can consume protection keys.
+On Tue, Oct 21, 2025 at 07:47:13AM +0000, Yosry Ahmed wrote:
+> There are multiple selftests exercising nested VMX that are not specific
+> to VMX (at least not anymore). Extend their coverage to nested SVM.
+> 
+> This version is significantly different (and longer) than v1 [1], mainly
+> due to the change of direction to reuse __virt_pg_map() for nested EPT/NPT
+> mappings instead of extending the existing nested EPT infrastructure. It
+> also has a lot more fixups and cleanups.
+> 
+> This series depends on two other series:
+> - "KVM: SVM: GIF and EFER.SVME are independent" [2]
+> - "KVM: selftests: Add test of SET_NESTED_STATE with 48-bit L2 on 57-bit L1" [3]
 
-As documented by commit 1be0e61c1f25 ("KVM, pkeys: save/restore PKRU when
-guest/host switches"), KVM just needs to ensure the host's PKRU is loaded
-when KVM (or the kernel at-large) may access userspace memory.  And at the
-time of commit 1be0e61c1f25, KVM didn't have a fastpath, and PKU was
-strictly contained to VMX, i.e. there was no reason to swap PKRU outside
-of vmx_vcpu_run().
+v2 of Jim's series switches all tests to use 57-bit by default when
+available:
+https://lore.kernel.org/kvm/20251028225827.2269128-4-jmattson@google.com/
 
-Over time, the "need" to swap PKRU close to VM-Enter was likely falsely
-solidified by the association with XFEATUREs in commit 37486135d3a7
-("KVM: x86: Fix pkru save/restore when guest CR4.PKE=0, move it to x86.c"),
-and XFEATURE swapping was in turn moved close to VM-Enter/VM-Exit as a
-KVM hack-a-fix ution for an #MC handler bug by commit 1811d979c716
-("x86/kvm: move kvm_load/put_guest_xcr0 into atomic context").
+This breaks moving nested EPT mappings to use __virt_pg_map() because
+nested EPTs are hardcoded to use 4-level paging, while __virt_pg_map()
+will assume we're using 5-level paging.
 
-Deferring the PKRU loads shaves ~40 cycles off the fastpath for Intel,
-and ~60 cycles for AMD.  E.g. using INVD in KVM-Unit-Test's vmexit.c,
-with extra hacks to enable CR4.PKE and PKRU=(-1u & ~0x3), latency numbers
-for AMD Turin go from ~1560 => ~1500, and for Intel Emerald Rapids, go
-from ~810 => ~770.
+Patch #16 ("KVM: selftests: Use __virt_pg_map() for nested EPTs") will
+need the following diff to make nested EPTs use the same paging level as
+the guest:
 
-Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Reviewed-by: Jon Kohler <jon@nutanix.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/svm.c |  2 --
- arch/x86/kvm/vmx/vmx.c |  4 ----
- arch/x86/kvm/x86.c     | 14 ++++++++++----
- arch/x86/kvm/x86.h     |  2 --
- 4 files changed, 10 insertions(+), 12 deletions(-)
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+index 358143bf8dd0d..8bacb74c00053 100644
+--- a/tools/testing/selftests/kvm/lib/x86/vmx.c
++++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
+@@ -203,7 +203,7 @@ static inline void init_vmcs_control_fields(struct vmx_pages *vmx)
+                uint64_t ept_paddr;
+                struct eptPageTablePointer eptp = {
+                        .memory_type = X86_MEMTYPE_WB,
+-                       .page_walk_length = 3, /* + 1 */
++                       .page_walk_length = get_cr4() & X86_CR4_LA57 ? 4 : 3, /* + 1 */
+                        .ad_enabled = ept_vpid_cap_supported(VMX_EPT_VPID_CAP_AD_BITS),
+                        .address = vmx->eptp_gpa >> PAGE_SHIFT_4K,
+                };
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index bf34378ebe2d..1c67c1a6771d 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4246,7 +4246,6 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
- 		svm_set_dr6(vcpu, DR6_ACTIVE_LOW);
- 
- 	clgi();
--	kvm_load_guest_xsave_state(vcpu);
- 
- 	/*
- 	 * Hardware only context switches DEBUGCTL if LBR virtualization is
-@@ -4289,7 +4288,6 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
- 	    vcpu->arch.host_debugctl != svm->vmcb->save.dbgctl)
- 		update_debugctlmsr(vcpu->arch.host_debugctl);
- 
--	kvm_load_host_xsave_state(vcpu);
- 	stgi();
- 
- 	/* Any pending NMI will happen here */
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f369c499b2c3..9b8a6405da95 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7475,8 +7475,6 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
- 	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
- 		vmx_set_interrupt_shadow(vcpu, 0);
- 
--	kvm_load_guest_xsave_state(vcpu);
--
- 	pt_guest_enter(vmx);
- 
- 	atomic_switch_perf_msrs(vmx);
-@@ -7520,8 +7518,6 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
- 
- 	pt_guest_exit(vmx);
- 
--	kvm_load_host_xsave_state(vcpu);
--
- 	if (is_guest_mode(vcpu)) {
- 		/*
- 		 * Track VMLAUNCH/VMRESUME that have made past guest state
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d8d547c5e014..9586a26eb27e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1246,7 +1246,7 @@ static void kvm_load_host_xfeatures(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
-+static void kvm_load_guest_pkru(struct kvm_vcpu *vcpu)
- {
- 	if (vcpu->arch.guest_state_protected)
- 		return;
-@@ -1257,9 +1257,8 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
- 	     kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE)))
- 		wrpkru(vcpu->arch.pkru);
- }
--EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_load_guest_xsave_state);
- 
--void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
-+static void kvm_load_host_pkru(struct kvm_vcpu *vcpu)
- {
- 	if (vcpu->arch.guest_state_protected)
- 		return;
-@@ -1272,7 +1271,6 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
- 			wrpkru(vcpu->arch.host_pkru);
- 	}
- }
--EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_load_host_xsave_state);
- 
- #ifdef CONFIG_X86_64
- static inline u64 kvm_guest_supported_xfd(struct kvm_vcpu *vcpu)
-@@ -11350,6 +11348,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 
- 	guest_timing_enter_irqoff();
- 
-+	/*
-+	 * Swap PKRU with hardware breakpoints disabled to minimize the number
-+	 * of flows where non-KVM code can run with guest state loaded.
-+	 */
-+	kvm_load_guest_pkru(vcpu);
-+
- 	for (;;) {
- 		/*
- 		 * Assert that vCPU vs. VM APICv state is consistent.  An APICv
-@@ -11378,6 +11382,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		++vcpu->stat.exits;
- 	}
- 
-+	kvm_load_host_pkru(vcpu);
-+
- 	/*
- 	 * Do this here before restoring debug registers on the host.  And
- 	 * since we do this before handling the vmexit, a DR access vmexit
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index f3dc77f006f9..24c754b0db2e 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -622,8 +622,6 @@ static inline void kvm_machine_check(void)
- #endif
- }
- 
--void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
--void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
- int kvm_spec_ctrl_test_value(u64 value);
- int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
- 			      struct x86_exception *e);
--- 
-2.52.0.rc1.455.g30608eb744-goog
 
+Which will conflict at patch #17, and should end up looking like this:
+
+	uint64_t eptp = vmx->eptp_gpa | EPTP_WB;
+
+	eptp |= get_cr4() & X86_CR4_LA57 ? EPTP_PWL_5 : EPTP_PWL_4;
+
+Sean, let me know if you prefer that I rebase this series on top of
+Jim's v2 and resend, or if you'll fix it up while applying.
+
+> 
+> The dependency on the former is because set_nested_state_test is now
+> also a regression test for that fix. The dependency on the latter is
+> purely to avoid conflicts.
+> 
+> The patch ordering is not perfect, I did some cleanups toward the end
+> that arguably should have been moved to the beginning, but I had to stop
+> rebasing and send the patches out at some point:
+> 
+> Block #1 (patch 1 to patch 7):
+> - Direct successors to the first 6 patches in v1, addressing review
+>   comments from Jim and collecting his review tags. These patch extend 5
+>   of the nVMX tests to cover nSVM.
+> 
+> Block #2 (patch 8 to patch 11):
+> - Miscellaneous fixups and cleanups.
+> 
+> Block #3 (patch 11 to patch 17):
+> - Moving nested EPT mapping functions to use __virt_pg_map(), patches 11
+>   to 15 do the prep work, and patch 16 does the switch. Patch 17 is a
+>   minor cleanup on top (which arguably fits better in block #2).
+> 
+> Block #4 (patch 18 to 23):
+> - Patches 18 to 22 are prep work to generalize the nested EPT mapping
+>   code to work with nested NPT, and patch 23 finally extends the nested
+>   dirty logging test to work with nSVM using the nested NPT
+>   infrastructure. Patch 19 is admittedly an imposter in this block and
+>   should have been in block #2.
+> 
+> [1]https://lore.kernel.org/kvm/20251001145816.1414855-1-yosry.ahmed@linux.dev/
+> [2]https://lore.kernel.org/kvm/20251009223153.3344555-1-jmattson@google.com/
+> [3]https://lore.kernel.org/kvm/20250917215031.2567566-1-jmattson@google.com/
+> 
+> Yosry Ahmed (23):
+>   KVM: selftests: Minor improvements to asserts in
+>     test_vmx_nested_state()
+>   KVM: selftests: Extend vmx_set_nested_state_test to cover SVM
+>   KVM: selftests: Extend vmx_close_while_nested_test to cover SVM
+>   KVM: selftests: Extend vmx_nested_tsc_scaling_test to cover SVM
+>   KVM: selftests: Move nested invalid CR3 check to its own test
+>   KVM: selftests: Extend nested_invalid_cr3_test to cover SVM
+>   KVM: selftests: Extend vmx_tsc_adjust_test to cover SVM
+>   KVM: selftests: Stop hardcoding PAGE_SIZE in x86 selftests
+>   KVM: selftests: Remove the unused argument to prepare_eptp()
+>   KVM: selftests: Stop using __virt_pg_map() directly in tests
+>   KVM: selftests: Make sure vm->vpages_mapped is always up-to-date
+>   KVM: selftests: Parameterize the PTE bitmasks for virt mapping
+>     functions
+>   KVM: selftests: Pass the root GPA into virt_get_pte()
+>   KVM: selftests: Pass the root GPA into __virt_pg_map()
+>   KVM: selftests: Stop setting AD bits on nested EPTs on creation
+>   KVM: selftests: Use __virt_pg_map() for nested EPTs
+>   KVM: selftests: Kill eptPageTablePointer
+>   KVM: selftests: Generalize nested mapping functions
+>   KVM: selftests: Move nested MMU mapping functions outside of vmx.c
+>   KVM: selftests: Stop passing a memslot to nested_map_memslot()
+>   KVM: selftests: Allow kvm_cpu_has_ept() to be called on AMD CPUs
+>   KVM: selftests: Set the user bit on nested MMU PTEs
+>   KVM: selftests: Extend vmx_dirty_log_test to cover SVM
+> 
+>  tools/testing/selftests/kvm/Makefile.kvm      |  11 +-
+>  .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+>  .../selftests/kvm/include/x86/processor.h     |  34 ++-
+>  .../selftests/kvm/include/x86/svm_util.h      |   8 +
+>  tools/testing/selftests/kvm/include/x86/vmx.h |  15 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |   3 -
+>  .../testing/selftests/kvm/lib/x86/memstress.c |   6 +-
+>  .../testing/selftests/kvm/lib/x86/processor.c | 184 +++++++++++---
+>  tools/testing/selftests/kvm/lib/x86/svm.c     |  19 ++
+>  tools/testing/selftests/kvm/lib/x86/vmx.c     | 232 +++---------------
+>  tools/testing/selftests/kvm/mmu_stress_test.c |   6 +-
+>  ...ested_test.c => close_while_nested_test.c} |  42 +++-
+>  .../selftests/kvm/x86/hyperv_features.c       |   2 +-
+>  tools/testing/selftests/kvm/x86/hyperv_ipi.c  |  18 +-
+>  .../selftests/kvm/x86/hyperv_tlb_flush.c      |   2 +-
+>  ...rty_log_test.c => nested_dirty_log_test.c} | 102 +++++---
+>  .../kvm/x86/nested_invalid_cr3_test.c         | 118 +++++++++
+>  ...adjust_test.c => nested_tsc_adjust_test.c} |  79 +++---
+>  ...aling_test.c => nested_tsc_scaling_test.c} |  48 +++-
+>  ...d_state_test.c => set_nested_state_test.c} | 135 +++++++++-
+>  .../selftests/kvm/x86/sev_smoke_test.c        |   2 +-
+>  tools/testing/selftests/kvm/x86/state_test.c  |   2 +-
+>  .../selftests/kvm/x86/userspace_io_test.c     |   2 +-
+>  23 files changed, 695 insertions(+), 376 deletions(-)
+>  rename tools/testing/selftests/kvm/x86/{vmx_close_while_nested_test.c => close_while_nested_test.c} (64%)
+>  rename tools/testing/selftests/kvm/x86/{vmx_dirty_log_test.c => nested_dirty_log_test.c} (57%)
+>  create mode 100644 tools/testing/selftests/kvm/x86/nested_invalid_cr3_test.c
+>  rename tools/testing/selftests/kvm/x86/{vmx_tsc_adjust_test.c => nested_tsc_adjust_test.c} (61%)
+>  rename tools/testing/selftests/kvm/x86/{vmx_nested_tsc_scaling_test.c => nested_tsc_scaling_test.c} (83%)
+>  rename tools/testing/selftests/kvm/x86/{vmx_set_nested_state_test.c => set_nested_state_test.c} (67%)
+> 
+> -- 
+> 2.51.0.869.ge66316f041-goog
+> 
 
