@@ -1,168 +1,287 @@
-Return-Path: <kvm+bounces-63540-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63541-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7419C6953A
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 13:17:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C34CC69750
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 13:47:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8A6BA3652C9
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 12:10:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 2F19B2B462
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 12:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2F3353899;
-	Tue, 18 Nov 2025 12:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7A1238C16;
+	Tue, 18 Nov 2025 12:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="Nvl3z/sr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pjo54oMU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91092D1936
-	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 12:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE3C217F27
+	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 12:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763467840; cv=none; b=dTSIl0v9zLEj6ZT+yW2Rtk5dLs/TCdVFcZJAq2xT/4hsVfqQxQzaZrDLvFzk6dRUpXmf1VGuDZkBsTUPbXTcOuWyg0bwyGw+qH9y6KrxDP51qC/FeIIietWEk9jupPuq/iPsZCdxAzEUCnmC+C2D7ri1hRjg95ME7afhKxiOip0=
+	t=1763470014; cv=none; b=onahtfpYdjYwrtEmqLTHRM0722dwQk5J3LFr0JBeazcqWwyqkoNu3WH1VR7O8AqE1NNbzb5q5G3doFt6FuJKKA5KJe34kZ+I/kc5teAsQuvDb6sy0ufoVEsTrJjG8rm5WRGVEN/i2gWRjX3rijSOhZbKfaoKGcR2ANHmWmILRng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763467840; c=relaxed/simple;
-	bh=1xz4uIVI+a44YEnI3ELHhMFnRvFbV3PbJPceLwJkXrE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=aKFHmtVry1vL/zUz8eo4iUzDMC6nCm1ERnLOEj1O+GOx30sPfv6GKwSVa3j2fOh1V6Ta/lfvLE7iZYeQaQ6/ynGwr69Jqtl16FUdy+0fA9tnJ6kBvLav48MrUyJPV7uk0FePv98DfVNi1Ngm9vVHTo9tUlta1LkRnu2fteoazPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=Nvl3z/sr; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ed82ee9e57so72268171cf.0
-        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 04:10:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1763467837; x=1764072637; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5cTSPvZXig8oNiEd2LL42DAJa1gzVENjQJ573LEoR0w=;
-        b=Nvl3z/sr2zigyC29Gn0RMc08t5aWaPN0bxsLLlKiTbRtvXlK1bXFd+ZAvz4BwFgImt
-         3OlG3sY26md79L5iZA0C35+uZCyirLLYtg2rNO1umgMpp9w//Fl97wHK/sAG4UDsnAG8
-         BRUP0gQnCWRVUn9np6R5jwl8TmJ7gpkxuh7m+EsOE+PHCHwBQGcnnqxlSCez9hadfwQX
-         GytnMSZaVkuoM6abDUjVQ6jXT23TStqu++z+WSHrjI6vC9R4PTkT9/bklwkETxM90HQB
-         KpCWm88kIOzNNS79OItKft6tDXDrEQSBTbKtRj7Dvq1up1KwPi34SjyvLJftV/ssAIiD
-         JV6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763467837; x=1764072637;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5cTSPvZXig8oNiEd2LL42DAJa1gzVENjQJ573LEoR0w=;
-        b=LkEp+89fAAWgjT8g+RRXkbXLdZJ55txYZpmfRPiVJ1RE/t/pAZJd8eq58FdxBDCowD
-         RjDSw/bIygMprQ5B/+dXC73pHtkv0NuOyy2UyXn5nxSt8LYpN3ADEu+CY1tifEDAqx17
-         VadbWFa7+Dd1Uh6vZpYhw0eGkVq8CUobcPXPT0O0jBnY4M8z0FsHjr2ADLty+3GO5Y8j
-         +R76vpMc4cttoJpMrp6AxSdyZJmiF1jfLJ+LjpKL4KkQKy2rv+s1Q8Gs9ITPEXRVvSMv
-         xpIg9qcRnhBG7RxCmqAp4j9ozkzzbaUWYpRYSViwWU+/55ex5HqyQefHVge9t57Mnb64
-         NLXQ==
-X-Gm-Message-State: AOJu0Yyqu56Bc0g2qc5R3i6QJWN+DCIYoJ6qgdAanF3RNK8vT3lA3L5A
-	MZjNwMI6ptHuKSpmY24prkJFjfroDdzrIxxQl0oCBUj/DpflNGTCzZcayUcPxKR1plk=
-X-Gm-Gg: ASbGncsHL8ylLKTPkv7mjo+uvWW3CxbFSgYjF5ABabE2OYDzPdnCK8T/6AMT6LfTBIE
-	Be+uL0bZLWIUfkTC01xcSlDOZEYBNR2rIvPkYzFdYeeTCVtWa1aPsqfgj3k+eyY7sJI6WvLYfmI
-	wFp4jR8UsOw0udgP93apNUFfnqT/zqDNlpYImL3XcTZEnLlpY96BMoI0ctQpUmSOu2x6JE+rLXm
-	GuU5IHp1VK2Kzy3OWwc46EjO5lBBPGSyJcnIWcUfOtQ0zcACAjmzXG5dIiOWQB2R84COIkRitmF
-	PVEAHHZBuEw+GIl+QRAYjW10eXgxtondWnGbeEReGbUuXckpV7JGpLkLYb7I56VxnwYPZjnu1t1
-	N259CAUDDV5Y/AERcKiRapd8CVIEWYYt+52eeme+k+7CCKaYBFi9UXci27nGKXNJ2mqUXgjDXpX
-	XSbw7HL8NOFHo1N4tK/FBQfzIodpQvMxYhYOfIzD8vakKaK2eyT/RyBbYLjBTKMogJYCumZrnIn
-	51mA2kNBj3KDmn+Ctl4ny4YssLcyJfeDurWIbqWJBIDIQ==
-X-Google-Smtp-Source: AGHT+IGnfIxYe0h8UJDvO2bTv0cB8Y+k2CPXm6yvL/pdxTSqThcSgQe3TSeCNyndw81MbiRhfVsgAA==
-X-Received: by 2002:a05:622a:47c4:b0:4ee:bff:69e0 with SMTP id d75a77b69052e-4ee0bff6b5fmr121032551cf.9.1763467836825;
-        Tue, 18 Nov 2025 04:10:36 -0800 (PST)
-Received: from ?IPV6:2003:fa:af29:b100:e8b2:7dbf:b11:65fc? (p200300faaf29b100e8b27dbf0b1165fc.dip0.t-ipconnect.de. [2003:fa:af29:b100:e8b2:7dbf:b11:65fc])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee1bc0667bsm49625071cf.33.2025.11.18.04.10.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Nov 2025 04:10:36 -0800 (PST)
-Message-ID: <8c930616-05ab-4406-8b57-26fa55031026@grsecurity.net>
-Date: Tue, 18 Nov 2025 13:10:33 +0100
+	s=arc-20240116; t=1763470014; c=relaxed/simple;
+	bh=1Vx5zDIrUHe6525T1N4BHsoVznReo7/uJUmQjilLE5w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XtQ/UhuHfDKDkpjETAkTWyNJqMKbsnZbhdqHS6szM1G3ljUrB88/SfZNPSk3NHIQ49GX4j5h564OycFzEuSCwTqjc4mrdIQHR3s3qahB9G+0wRHWdMV83D/XxyT7wGjS5JJ4nVeLXj6i9JuaSVazgW0WepN63mLHXfg96TeAjLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pjo54oMU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FF1FC4CEFB
+	for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 12:46:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763470013;
+	bh=1Vx5zDIrUHe6525T1N4BHsoVznReo7/uJUmQjilLE5w=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Pjo54oMUS9XO2PRPjo5UH3GSpT0q60pUj+6blcR3Ms/i1OkhFZDKNPUIpbDhWq+SK
+	 4T8q+A6R0aA1uEtMwlVymVt7jIoI9U+LkghMQ3kV7DsTwhuaIZ5on1UBfFpPUkb4Jh
+	 HEhIHFyXycQOMrt1UHxAkM4f1SyiErBriuGs7BCznMG9/x1DBMskHgSGtqKFE6RADS
+	 rK+YIZ/YQ1XrWaRSZ02u7Lk56qeUfxfhpqJg5ycWtrT123f4C/ef98rZBwFxBJ00+O
+	 Vn9JROc/2iBDy+eoyqb8YJ+sYMByfq6U01vjmftHanuOlHesGxPsrS7Qftuhz0/qD5
+	 l0fNp160ggc7A==
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b7370698a8eso541138566b.0
+        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 04:46:53 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWXwrUcv3Ektbge8gmtJmagL0dcCqIuM3GNmOrCkOA7K9aR62o7Uisy/C8FU9AUFmeIM3Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9zCGWbbgm5OPPWsq8gR/eCN4BI8NUrEComLfw57oDPUFpyzb5
+	UdwTl0CSg5K6YUuHp0X+V73yFI7U3LSDdv+yTGQ54zdBWH8hsmYotZ9KcW1pgDI1WE5PBjOvZHw
+	5/hSr5mYIMPvf6BW5XifgDIwWSIqOnYk=
+X-Google-Smtp-Source: AGHT+IGtdp36AFp+DoS6ZpCiCJV51yKskUUbXD/ZQmhyZaRqm+V1iZPjh1uXIfTOOK2SAbRhvMRcdW7sb918gxJJLhE=
+X-Received: by 2002:a17:907:983:b0:b71:df18:9fb6 with SMTP id
+ a640c23a62f3a-b736792f1dfmr1773592166b.26.1763470011118; Tue, 18 Nov 2025
+ 04:46:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf
- functions
-From: Mathias Krause <minipli@grsecurity.net>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Andrew Jones <andrew.jones@linux.dev>, Eric Auger <eric.auger@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20250915215432.362444-1-minipli@grsecurity.net>
- <176314469132.1828515.1099412303366772472.b4-ty@google.com>
- <15788499-87c6-4e57-b3ae-86d3cc61a278@grsecurity.net>
- <aRufV8mPlW3uKMo4@google.com>
- <083276ef-ff1b-4ac3-af19-3f73b1581d39@grsecurity.net>
- <0274322e-e28c-4511-a565-6bb85bfade8b@grsecurity.net>
- <d67ede24-0b75-4bdb-bdc9-272b9608f632@grsecurity.net>
- <8a42b563-71b7-4bab-9f1d-248c81295704@grsecurity.net>
-Content-Language: en-US, de-DE
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <8a42b563-71b7-4bab-9f1d-248c81295704@grsecurity.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251118080656.2012805-1-maobibo@loongson.cn> <20251118080656.2012805-2-maobibo@loongson.cn>
+In-Reply-To: <20251118080656.2012805-2-maobibo@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Tue, 18 Nov 2025 20:46:52 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5qZ3_KTvkZ-zQni6Lg-6W5y9oBXDb9+2VAeFV82BEzhA@mail.gmail.com>
+X-Gm-Features: AWmQ_bknqpyGjG5hIRRFCLAPFjiuy7TGEfINhZrD6MmsmDSsayAkFn1F04oiX-g
+Message-ID: <CAAhV-H5qZ3_KTvkZ-zQni6Lg-6W5y9oBXDb9+2VAeFV82BEzhA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] LoongArch: KVM: Add preempt hint feature in
+ hypervisor side
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 18.11.25 12:56, Mathias Krause wrote:
-> On 18.11.25 05:04, Mathias Krause wrote:
-> [...]> After some sleep it makes lot more sense. Well, not really, but
-it's a
-> race that f01ea38a385a, apparently, makes easier to hit.
-> 
->>
->> Below debug diff shows the issue:
->>
->> diff --git a/x86/vmx.c b/x86/vmx.c
->> index c803eaa67ac6..e49668f5ff95 100644
->> --- a/x86/vmx.c
->> +++ b/x86/vmx.c
->> @@ -806,4 +806,5 @@ asm(
->>         "       mov $1, %edi\n\t"
->>         "       call hypercall\n\t"
->> +       "       ud2"
->>  );
-> That hypercall call shouldn't return, as it's HYPERCALL_VMEXIT which
-> makes vmx_run() return and not re-enter the guest. But, apparently, it
-> does so and it does so because the guest/VMM shared variable
-> 'hypercall_field' to communicate to the VMM what to do can also be
-> modified concurrently by the other CPU/guest #2 after it was written by
-> CPU/guest #1 but before read by the VMM. Bummer!
+Hi, Bibo,
 
-Bleh, I messed up my test setup and it's not it. Back to square one.
+On Tue, Nov 18, 2025 at 4:07=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
+e:
+>
+> Feature KVM_FEATURE_PREEMPT_HINT is added to show whether vCPU is
+> preempted or not. It is to help guest OS scheduling or lock checking
+> etc. Here add KVM_FEATURE_PREEMPT_HINT feature and use one byte as
+> preempted flag in steal time structure.
+>
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+>  arch/loongarch/include/asm/kvm_host.h      |  2 +
+>  arch/loongarch/include/asm/kvm_para.h      |  5 +-
+>  arch/loongarch/include/uapi/asm/kvm.h      |  1 +
+>  arch/loongarch/include/uapi/asm/kvm_para.h |  1 +
+>  arch/loongarch/kvm/vcpu.c                  | 54 +++++++++++++++++++++-
+>  arch/loongarch/kvm/vm.c                    |  5 +-
+>  6 files changed, 65 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inclu=
+de/asm/kvm_host.h
+> index 0cecbd038bb3..04c6dd171877 100644
+> --- a/arch/loongarch/include/asm/kvm_host.h
+> +++ b/arch/loongarch/include/asm/kvm_host.h
+> @@ -163,6 +163,7 @@ enum emulation_result {
+>  #define LOONGARCH_PV_FEAT_UPDATED      BIT_ULL(63)
+>  #define LOONGARCH_PV_FEAT_MASK         (BIT(KVM_FEATURE_IPI) |         \
+>                                          BIT(KVM_FEATURE_STEAL_TIME) |  \
+> +                                        BIT(KVM_FEATURE_PREEMPT_HINT) |\
+>                                          BIT(KVM_FEATURE_USER_HCALL) |  \
+>                                          BIT(KVM_FEATURE_VIRT_EXTIOI))
+>
+> @@ -250,6 +251,7 @@ struct kvm_vcpu_arch {
+>                 u64 guest_addr;
+>                 u64 last_steal;
+>                 struct gfn_to_hva_cache cache;
+> +               u8  preempted;
+>         } st;
+>  };
+>
+> diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/inclu=
+de/asm/kvm_para.h
+> index 3e4b397f423f..d8592a7f5922 100644
+> --- a/arch/loongarch/include/asm/kvm_para.h
+> +++ b/arch/loongarch/include/asm/kvm_para.h
+> @@ -37,8 +37,11 @@ struct kvm_steal_time {
+>         __u64 steal;
+>         __u32 version;
+>         __u32 flags;
+> -       __u32 pad[12];
+> +       __u8  preempted;
+> +       __u8  u8_pad[3];
+> +       __u32 pad[11];
+Maybe a single __u8 pad[47] is enough?
+
+>  };
+> +#define KVM_VCPU_PREEMPTED             (1 << 0)
+>
+>  /*
+>   * Hypercall interface for KVM hypervisor
+> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/inclu=
+de/uapi/asm/kvm.h
+> index 57ba1a563bb1..bca7154aa651 100644
+> --- a/arch/loongarch/include/uapi/asm/kvm.h
+> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+> @@ -104,6 +104,7 @@ struct kvm_fpu {
+>  #define  KVM_LOONGARCH_VM_FEAT_PV_IPI          6
+>  #define  KVM_LOONGARCH_VM_FEAT_PV_STEALTIME    7
+>  #define  KVM_LOONGARCH_VM_FEAT_PTW             8
+> +#define KVM_LOONGARCH_VM_FEAT_PV_PREEMPT_HINT  10
+From the name it is a "hint", from include/linux/kvm_para.h we know
+features and hints are different. If preempt is really a feature,
+rename it?
+
+>
+>  /* Device Control API on vcpu fd */
+>  #define KVM_LOONGARCH_VCPU_CPUCFG      0
+> diff --git a/arch/loongarch/include/uapi/asm/kvm_para.h b/arch/loongarch/=
+include/uapi/asm/kvm_para.h
+> index 76d802ef01ce..fe4107869ce6 100644
+> --- a/arch/loongarch/include/uapi/asm/kvm_para.h
+> +++ b/arch/loongarch/include/uapi/asm/kvm_para.h
+> @@ -15,6 +15,7 @@
+>  #define CPUCFG_KVM_FEATURE             (CPUCFG_KVM_BASE + 4)
+>  #define  KVM_FEATURE_IPI               1
+>  #define  KVM_FEATURE_STEAL_TIME                2
+> +#define  KVM_FEATURE_PREEMPT_HINT      3
+>  /* BIT 24 - 31 are features configurable by user space vmm */
+>  #define  KVM_FEATURE_VIRT_EXTIOI       24
+>  #define  KVM_FEATURE_USER_HCALL                25
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 1245a6b35896..33a94b191b5d 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -180,6 +180,11 @@ static void kvm_update_stolen_time(struct kvm_vcpu *=
+vcpu)
+>         }
+>
+>         st =3D (struct kvm_steal_time __user *)ghc->hva;
+> +       if (kvm_guest_has_pv_feature(vcpu, KVM_FEATURE_PREEMPT_HINT)) {
+> +               unsafe_put_user(0, &st->preempted, out);
+> +               vcpu->arch.st.preempted =3D 0;
+> +       }
+> +
+>         unsafe_get_user(version, &st->version, out);
+>         if (version & 1)
+>                 version +=3D 1; /* first time write, random junk */
+> @@ -1757,11 +1762,58 @@ static int _kvm_vcpu_put(struct kvm_vcpu *vcpu, i=
+nt cpu)
+>         return 0;
+>  }
+>
+> +static void _kvm_set_vcpu_preempted(struct kvm_vcpu *vcpu)
+Just using kvm_set_vcpu_preempted() is enough, no "_".
+
+> +{
+> +       struct gfn_to_hva_cache *ghc;
+> +       struct kvm_steal_time __user *st;
+> +       struct kvm_memslots *slots;
+> +       static const u8 preempted =3D KVM_VCPU_PREEMPTED;
+I'm not sure whether "static" is right, it's not reentrant.
+
+
+Huacai
+
+> +       gpa_t gpa;
+> +
+> +       gpa =3D vcpu->arch.st.guest_addr;
+> +       if (!(gpa & KVM_STEAL_PHYS_VALID))
+> +               return;
+> +
+> +       /* vCPU may be preempted for many times */
+> +       if (vcpu->arch.st.preempted)
+> +               return;
+> +
+> +       /* This happens on process exit */
+> +       if (unlikely(current->mm !=3D vcpu->kvm->mm))
+> +               return;
+> +
+> +       gpa &=3D KVM_STEAL_PHYS_MASK;
+> +       ghc =3D &vcpu->arch.st.cache;
+> +       slots =3D kvm_memslots(vcpu->kvm);
+> +       if (slots->generation !=3D ghc->generation || gpa !=3D ghc->gpa) =
+{
+> +               if (kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, gpa, sizeof=
+(*st))) {
+> +                       ghc->gpa =3D INVALID_GPA;
+> +                       return;
+> +               }
+> +       }
+> +
+> +       st =3D (struct kvm_steal_time __user *)ghc->hva;
+> +       unsafe_put_user(preempted, &st->preempted, out);
+> +       vcpu->arch.st.preempted =3D KVM_VCPU_PREEMPTED;
+> +out:
+> +       mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->=
+gpa));
+> +}
+> +
+>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  {
+> -       int cpu;
+> +       int cpu, idx;
+>         unsigned long flags;
+>
+> +       if (vcpu->preempted && kvm_guest_has_pv_feature(vcpu, KVM_FEATURE=
+_PREEMPT_HINT)) {
+> +               /*
+> +                * Take the srcu lock as memslots will be accessed to che=
+ck the gfn
+> +                * cache generation against the memslots generation.
+> +                */
+> +               idx =3D srcu_read_lock(&vcpu->kvm->srcu);
+> +               _kvm_set_vcpu_preempted(vcpu);
+> +               srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> +       }
+> +
+>         local_irq_save(flags);
+>         cpu =3D smp_processor_id();
+>         vcpu->arch.last_sched_cpu =3D cpu;
+> diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
+> index a49b1c1a3dd1..b8879110a0a1 100644
+> --- a/arch/loongarch/kvm/vm.c
+> +++ b/arch/loongarch/kvm/vm.c
+> @@ -45,8 +45,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long ty=
+pe)
+>
+>         /* Enable all PV features by default */
+>         kvm->arch.pv_features =3D BIT(KVM_FEATURE_IPI);
+> -       if (kvm_pvtime_supported())
+> +       if (kvm_pvtime_supported()) {
+>                 kvm->arch.pv_features |=3D BIT(KVM_FEATURE_STEAL_TIME);
+> +               kvm->arch.pv_features |=3D BIT(KVM_FEATURE_PREEMPT_HINT);
+> +       }
+>
+>         /*
+>          * cpu_vabits means user address space only (a half of total).
+> @@ -143,6 +145,7 @@ static int kvm_vm_feature_has_attr(struct kvm *kvm, s=
+truct kvm_device_attr *attr
+>         case KVM_LOONGARCH_VM_FEAT_PV_IPI:
+>                 return 0;
+>         case KVM_LOONGARCH_VM_FEAT_PV_STEALTIME:
+> +       case KVM_LOONGARCH_VM_FEAT_PV_PREEMPT_HINT:
+>                 if (kvm_pvtime_supported())
+>                         return 0;
+>                 return -ENXIO;
+> --
+> 2.39.3
+>
+>
 
