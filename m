@@ -1,153 +1,181 @@
-Return-Path: <kvm+bounces-63588-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63589-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0708EC6B5CE
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 20:11:18 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9ACC6B656
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 20:20:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id B43B92AB6E
-	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 19:11:16 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B9800342C0A
+	for <lists+kvm@lfdr.de>; Tue, 18 Nov 2025 19:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0D42E8B6C;
-	Tue, 18 Nov 2025 19:06:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61976369203;
+	Tue, 18 Nov 2025 19:09:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PtPxeFps"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e+mGwKal"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE58E2E62C6;
-	Tue, 18 Nov 2025 19:06:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB942366DD8;
+	Tue, 18 Nov 2025 19:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763492804; cv=none; b=rXWDE8YEO7eRYXT1csmC014dH70eajcKQZiPbvdKOinUr1Vbk7S5LaZY8X7kYeCIxc8pd6g+KT/XBwcqqoEh9Q5CTzkfwf0BIoHX1PJJL8iAK51b1PaFbjXB+xc4rf3VfQ2J6/8ghU9GSaaTN3LF3hMFfOBOPSuQgpluMYzQgM0=
+	t=1763492956; cv=none; b=N1STid2Nm20UMya3BwU2D8ixiEpb9L/bHQM59tC1K4tMBV0FVlWkdDKtWn/vviLQqznt8CkUb9XJTQ88FB6wyNx1WwZCu+LxXiP1bQyQeBYAtVF1/3Q6uUvEG4rLUTZHDkm7gsdY1Qc8n9pSpmhHFlY+5c98mAcRyDki2/BEjro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763492804; c=relaxed/simple;
-	bh=7Uej8vFQyBecna9Eft7O2XmvApuSK/EcttFDPNfpMfs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MpdLms5S/iF7H50K1h3Nsxlpzpid26CG86/JZMfJA38f4iOt/Gy8NWjzFjVj6HFF3WKOD69PZVIvlxAi0cjLWag05faW9RWPvkz9AzWZ6F/RhZLkBWtxrKbeQEaFX52BBD94euq94HorADVifu4khw6jLKxprncoBvNaw7c4ghU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PtPxeFps; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6BB3C19421;
-	Tue, 18 Nov 2025 19:06:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763492804;
-	bh=7Uej8vFQyBecna9Eft7O2XmvApuSK/EcttFDPNfpMfs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PtPxeFpsTCUMy3B0/s9eZJtRfBN3Woqf70pKAph9EK0jd7Puhx2BUzOL+w4mV9IJb
-	 p/zsH5NWOhE3LPrQ1BkdpfvVuRG2BQDcR2aseYYXSAtheJnJa2Xcs7eyrwOWfqDzfF
-	 Tz/pCtMOkFC8LkHZMM8WFzaoBq7iEYvu5tbyb7VeEEH5gcgiBibU250YiQwgZXvpn6
-	 NnG5Ht4yrgzDOFHp9hjw9qZ+RYcrFflJfIVnK5QHkz2CUeWSMKr5cr3QKTes64/8Qm
-	 Y4TQte2J0EUMApdinQOenZwP0oE1IWuYVoTLYrPsZSn1Qpf9jfMBaq7GMscAivG8Ej
-	 YVkWR8TGwxseA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vLR2G-00000006Im4-42i7;
-	Tue, 18 Nov 2025 19:06:41 +0000
-Date: Tue, 18 Nov 2025 19:06:40 +0000
-Message-ID: <86ms4jrwhr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 0/5] KVM: arm64: Add LR overflow infrastructure (the dregs, the bad and the ugly)
-In-Reply-To: <CA+EHjTzJQOTTSUoXVKpGdWO8vz9Vc-2AL3zRyzG4DkUPz+wBBQ@mail.gmail.com>
-References: <20251117091527.1119213-1-maz@kernel.org>
-	<aRweUM4O71ecPvVr@kernel.org>
-	<CA+EHjTzJQOTTSUoXVKpGdWO8vz9Vc-2AL3zRyzG4DkUPz+wBBQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763492956; c=relaxed/simple;
+	bh=5ln9yQLShanL8HNdyhz0x5apv7YrZKXZwF/7CPu5SOg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z8EmW3K9KqffyCU7vijdHuU/MHAhY1t2iZDC0PqYcignEfnAN4zVSR4ZkuXZYcOu1Vl2LulLScxgvBvWg5fjoIBaUuOX+b9btEObP+IjFNZMPbLd9V7o2VE6827icTyisnMx4BGeQ2aIBcBmKiAmHcXLmaqw2bQZq/b675DD81o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e+mGwKal; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763492954; x=1795028954;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=5ln9yQLShanL8HNdyhz0x5apv7YrZKXZwF/7CPu5SOg=;
+  b=e+mGwKalova8uMYo8AY0iQXfjeMtFcu8KxBK3Hoei18AlGgNXmW47xn3
+   S15B7eIlWwrrczbgRrXpZ2u0Y2MeviTmEo9UyikmK8z23IJT5pf7UcJdv
+   y1IjBgWmib0HIBaYEGFR3tzR2akAcSGSEgAqvh/NOvpIT70+8dhBRQ7Vg
+   jPM/GIn3bxk87hG5F3GEhvz89ZWnsU/XcYFxSwMmZnGGhoRH5WMBuIUZ3
+   Ae9sxirGzDLnkcTSh3KBd8jirq/1xt/UWX/urTNlbf8x2vAkXzluqu38m
+   swVMJ13ZNDihHjOHyatb092OLrJTADnp5WX4toLgBFpZiJTXzJqge5YmH
+   w==;
+X-CSE-ConnectionGUID: 49RHZw4PQo2R5VCdRVGuKA==
+X-CSE-MsgGUID: KVnkh934TmGStFvPyyjyWw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11617"; a="68132427"
+X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
+   d="scan'208";a="68132427"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 11:09:13 -0800
+X-CSE-ConnectionGUID: 14Dg1cXzThuvCVYU85e6uw==
+X-CSE-MsgGUID: YpnGESm+S/a5CSITpAygFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
+   d="scan'208";a="191627364"
+Received: from tslove-mobl4.amr.corp.intel.com (HELO [10.125.109.142]) ([10.125.109.142])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 11:09:12 -0800
+Message-ID: <70056924-1702-4020-b805-014efb87afdd@intel.com>
+Date: Tue, 18 Nov 2025 11:09:12 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, christoffer.dall@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 06/26] x86/virt/tdx: Add tdx_page_array helpers for new
+ TDX Module objects
+To: Xu Yilun <yilun.xu@linux.intel.com>, linux-coco@lists.linux.dev,
+ linux-pci@vger.kernel.org
+Cc: chao.gao@intel.com, dave.jiang@intel.com, baolu.lu@linux.intel.com,
+ yilun.xu@intel.com, zhenzhong.duan@intel.com, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, dave.hansen@linux.intel.com,
+ dan.j.williams@intel.com, kas@kernel.org, x86@kernel.org
+References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
+ <20251117022311.2443900-7-yilun.xu@linux.intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20251117022311.2443900-7-yilun.xu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Fuad,
+On 11/16/25 18:22, Xu Yilun wrote:
+...> +	struct tdx_page_array *array __free(kfree) = kzalloc(sizeof(*array),
+> +							     GFP_KERNEL);
+> +	if (!array)
+> +		return NULL;
 
-On Tue, 18 Nov 2025 13:59:14 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> On Tue, 18 Nov 2025 at 07:20, Oliver Upton <oupton@kernel.org> wrote:
-> >
-> > On Mon, Nov 17, 2025 at 09:15:22AM +0000, Marc Zyngier wrote:
-> > > This is a follow-up to the original series [1] (and fixes [2][3])
-> > > with a bunch of bug-fixes and improvements. At least one patch has
-> > > already been posted, but I thought I might repost it as part of a
-> > > series, since I accumulated more stuff:
-> > >
-> > > - The first patch addresses Mark's observation that the no-vgic-v3
-> > >   test has been broken once more. At some point, we'll have to retire
-> > >   that functionality, because even if we keep fixing the SR handling,
-> > >   nobody tests the actual interrupt state exposure to userspace, which
-> > >   I'm pretty sure has badly been broken for at least 5 years.
-> > >
-> > > - The second one addresses a report from Fuad that on QEMU,
-> > >   ICH_HCR_EL2.TDIR traps ICC_DIR_EL1 on top of ICV_DIR_EL1, leading to
-> > >   the host exploding on deactivating an interrupt. This behaviour is
-> > >   allowed by the spec, so make sure we clear all trap bits
-> > >
-> > > - Running vgic_irq in an L1 guest (the test being an L2) results in a
-> > >   MI storm on the host, as the state synchronisation is done at the
-> > >   wrong place, much like it was on the non-NV path before it was
-> > >   reworked. Apply the same methods to the NV code, and enjoy much
-> > >   better MI emulation, now tested all the way into an L3.
-> > >
-> > > - Nuke a small leftover from previous rework.
-> > >
-> > > - Force a read-back of ICH_MISR_EL2 when disabling the vgic, so that
-> > >   the trap prevents too many spurious MIs in an L1 guest, as the write
-> > >   to ICH_HCR_EL2 does exactly nothing on its own when running under
-> > >   FEAT_NV2.
-> > >
-> > > Oliver: this is starting to be a large series of fixes on top of the
-> > > existing series, plus the two patches you have already added. I'd be
-> > > happy to respin a full v4 with the fixes squashed into their original
-> > > patches. On the other hand, if you want to see the history in its full
-> > > glory, that also works for me.
-> >
-> > I'll pick up these patches in a moment but at this point I'd prefer a
-> > clean history. Plan is to send out the 6.19 pull sometime next week so
-> > any time before then would be great for v4.
-> 
-> I'm happy to take that for another spin Marc before you send it, if
-> it's different from the ToT I tested. In that case, just send me a
-> pointer to the branch.
+I just reworked this to use normal goto's. It looks a billion times
+better. Please remove all these __free()'s unless you have specific
+evidence that they make the code better.
 
-I've just pushed out a full branch at [1]. Please make sure to merge
-kvmarm-fixes-6.18-3 in, as it fixes a couple of nasties (small
-conflict expected, but the resolution should be obvious).
+Maybe I'm old fashioned, but I don't see anything wrong with:
 
-For my own testing, I added -rc6 on top.
+static struct tdx_pglist *tdx_pglist_alloc(unsigned int nr_pages)
+{
+        struct tdx_page_array *array = NULL;
+        struct page **pages = NULL;
+        struct page *root = NULL;
+        int ret;
 
-Note that I didn't take your Tested-by: tags, as you are about to
-retest the whole thing anyway. If all goes well (fingers crossed),
-Oliver will be able to apply any further tag once I post these
-patches.
+        if (!nr_pages)
+                return NULL;
 
-Thanks,
+        array = kzalloc(sizeof(*array), GFP_KERNEL);
+        if (!array)
+                goto out_free;
 
-	M.
+        root = kzalloc(PAGE_SIZE, GFP_KERNEL);
+        if (!root)
+                goto out_free;
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vgic-lr-overflow
+        pages = kcalloc(nr_pages, sizeof(*pages), GFP_KERNEL);
+        if (!pages)
+                goto out_free;
 
--- 
-Without deviation from the norm, progress is not possible.
+        ret = tdx_alloc_pages_bulk(nr_pages, pages);
+        if (ret)
+                goto out_free;
+
+        array->nr_pages	= nr_pages;
+        array->pages	= pages;
+        array->root	= root;
+
+        return array;
+
+out_free:
+        kfree(array);
+        kfree(root);
+        kfree(pages);
+
+        return NULL;
+}
+
 
