@@ -1,556 +1,206 @@
-Return-Path: <kvm+bounces-63693-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63694-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8919C6DEA8
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 11:14:10 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48226C6E04C
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 11:39:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id CA7062D6F2
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 10:14:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C5FC04ECBD1
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 10:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4201369B4;
-	Wed, 19 Nov 2025 10:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57EA34D91D;
+	Wed, 19 Nov 2025 10:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="JJPU4V5X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9F232D455;
-	Wed, 19 Nov 2025 10:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006CC34B1A0
+	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 10:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763547237; cv=none; b=KHatQSpgTr5PCopO+R5pzpkqEfx1bvoLYrgm0ltBlqETwPvL7Zw+d6pAhANWdpJ8tMs70EUom+6ueLUU+PZ72H64PF6YRjUlK+tDgZRLZInUXAYgYCvdX+w8CGQBNCp0rh/9MkGJL+sF9atjlZu4zYDYKh+bUv4SECpSoJiYNFE=
+	t=1763548396; cv=none; b=QJMedinHzNEbiRW3t27eE8Tgc9irKk0FhNM+X+T0GM/J4DvWryxOGk5zTIYfBdICVpKRKPICq3lEVC8vgOmbquSunEP5bE3w0dSbgf1tYaOTWqOHbl5FE5MmPy/Dd/iue1jKy/ExtAi5CodIitpnmT6nOOlAVT8oyr5q+op7Uck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763547237; c=relaxed/simple;
-	bh=Qpojm0pccVwIfvfgj9xXP/o5lYomdV6NY+FjS2yhGzo=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=pfnxJOn78IhMjd16+A1GC5qVjvjYTAzX9CHhBXdEynIKLsv+4qLNdAGazU9jcx8sDUpsetfw3L5T+S/lJ7vGpu2E0jUONl60YpxgrOriMlTNMnhQsw6vgD52cykZN8AMAM+cnDgI7V1zntYaSqu/nv/tQgouO5W/5tOpNHb2QQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8AxjdJbmB1pun8lAA--.10199S3;
-	Wed, 19 Nov 2025 18:13:47 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJDxQ+RYmB1pH1Q4AQ--.30106S3;
-	Wed, 19 Nov 2025 18:13:47 +0800 (CST)
-Subject: Re: [PATCH] LoongArch: KVM: Add AVEC support irqchip in kernel
-To: Song Gao <gaosong@loongson.cn>, chenhuacai@kernel.org
-Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev, kernel@xen0n.name,
- linux-kernel@vger.kernel.org
-References: <20251119083946.1864543-1-gaosong@loongson.cn>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <6cabc0c2-fb96-236f-5cc0-7bdda1c27826@loongson.cn>
-Date: Wed, 19 Nov 2025 18:11:20 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1763548396; c=relaxed/simple;
+	bh=KYLRHghd1Ft3FmD8U8yM89qqJxbzVYC92BGjSGnyaOI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k7gVPfOVVvVYy5tnwolnufdRDmSTGOd2R5DstWfGsfRoNdE5kFKcuW4cVb5JOyc+dxeYuRrFsc5ayQY5J+XFrRX0+2mGhDDZeGLya3SUGF++AYiQudOR8ue4kAIEXobUrCjbCi+glyiLtQHiQFmycPJpcNzFL8OkfV7t4B5ZL/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=JJPU4V5X; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-640aa1445c3so10213292a12.1
+        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 02:33:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1763548390; x=1764153190; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=B0YdXtRcS8os3PJL3hVj9G4DxbppYK6sYzqe/7yQaRo=;
+        b=JJPU4V5XEN3+RlWWVAgBqFtNinERbNdCkhVBejK6tYR3v6u3y+wfYE7y/S5Uit4mSV
+         swMKqz9q0jojv29X9Cx/klTlbq17vtalIkaZ1D3oGK5UW53xoBEMebhELNqGNECmTDeN
+         pGCgG+ARh2EywOT5hnDH9d+ZRAUjws+Pno6gvCtjHBGyBBl9FMOPTSeQTp9P6SK2RDZb
+         v+3s78062vlVoJjtbn8jQi2VWIoUeb+JUctN+FkgG3Q1kQAweEHUme+GOBTw69Eri6rY
+         2Z3SwXMiveG78Bnfu60nhN+LuJbbFrJrS3QC9TMHFE2hI6Tbv47ImT6ypVzmZ3X+S/NE
+         /84A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763548390; x=1764153190;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B0YdXtRcS8os3PJL3hVj9G4DxbppYK6sYzqe/7yQaRo=;
+        b=qXw62fzfUT8hwYX9hnLA+F8wyOKuTktrLbkHOrEG0fR9JFSIzKU0V3f7HKTV7mJFyC
+         tc3UnQGhNHW1Dgv+NUj2sRyImMfPpk//fOO+K8MG0b88m7JdRDKiYE/qS7y86MhbiOir
+         dwg2syyvBeeT56oPNh1CjOnPcTNQFbL+CciPaRO3kFegmcwaP4WnCf2chADUkKMQb4Wu
+         q0ukMVw09cKT4fiispiOcYPBdqeBEquTv1EJlNBbpoN3sJRe6SrDYXyyCKHC5ipOneAY
+         LVliT+zqpnOYgSLymf6OmBJFaakhqi4cqSYf9no8rEjcl6fBZ2BnvOtKeZR5n6YhqRqj
+         OhCw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4ISJorzwY1LO0mRbd2uuq4wp5aY4q3SV56LHk1a4YXCXi0TVg5b+o0pVozKN+f6MpBHE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFaInBDSB7yVhmX+I9fj394yvL1PTIHlOEw5Y27ZAgxMCcuBW0
+	VQ0E86Se84YmG7NjcD4i1m9otdlBaJAyHPu6Est4rwStcDNxE8rqyzjyVWPvZrK0Iw4=
+X-Gm-Gg: ASbGnctgPC/rXvV4iy42vC0cO7woFIRRzpXxrzqXR5mrkUgOtTHjwdroOStt4dKOqPD
+	MSEv38u4ir8mH01eKwB9Moa5weqOkk8GmZ7ltk/FFKtGy35ZJBwqQOcwOHfOJy9rz0mxPJW2FFI
+	Nnezdnw86Qq2ufdVrZyvUROYL2u5uU5em05/UfDWiSzLiIUbtIDgOWD4u8n5GKPQ6Jq65TqYhti
+	CmgpNviRqUpbadSnlomM/vKaJpM35+G4uJEhZQlqQRRkN+ewBQpblvdM3ywPA8efIcnX4ml0wNr
+	3ac2O0smpPNabf8bjODZmlLLTiIpP+kGobt35xRsbcV8xpUYBzJiPtno826O6SI3TUPMKR6Gpsq
+	WELByVsCJTYHZVrMVVgX2tKs9tBqkLIYwn9OITEKjlNT9p/iyc8oWUrCUIXrIPt7FY4apxqARLh
+	gfTuk9imDABxu8q6ChOk1zAiHwxjXFIJaYQgRwp+fUe2Ven8s=
+X-Google-Smtp-Source: AGHT+IHZOSQ73VV5I/Rb482rwGQgTOMYTFla03maKxSXUiAVVdb6oiAo9BjkAhQbR7/07nMvHenlUg==
+X-Received: by 2002:a17:906:b357:b0:b73:780d:2bcf with SMTP id a640c23a62f3a-b73780d2d63mr1326634266b.16.1763548389512;
+        Wed, 19 Nov 2025 02:33:09 -0800 (PST)
+Received: from [192.168.0.20] (nborisov.ddns.nbis.net. [85.187.216.236])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fedb2eesm1577294066b.68.2025.11.19.02.33.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Nov 2025 02:33:08 -0800 (PST)
+Message-ID: <6a7ad323-657d-4cda-83e2-58492394f44c@suse.com>
+Date: Wed, 19 Nov 2025 12:33:05 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20251119083946.1864543-1-gaosong@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/3] x86/vmscape: Replace IBPB with branch history
+ clear on exit to userspace
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+ Dave Hansen <dave.hansen@intel.com>
+Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ Josh Poimboeuf <jpoimboe@kernel.org>, David Kaplan <david.kaplan@amd.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
+ Tao Zhang <tao1.zhang@intel.com>
+References: <20251027-vmscape-bhb-v3-0-5793c2534e93@linux.intel.com>
+ <20251027-vmscape-bhb-v3-2-5793c2534e93@linux.intel.com>
+ <b808c532-44aa-47a0-8fb8-2bdf5b27c3e4@intel.com>
+ <20251106234055.ftahbvqxrfzjwr6t@desk>
+From: Nikolay Borisov <nik.borisov@suse.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJDxQ+RYmB1pH1Q4AQ--.30106S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj9fXoW3Cr43tr4xXr4UGr1kAw45XFc_yoW8Xw1fCo
-	W3tF1Igr48WrWYkrWjy3sIqa4j9F10k3yDA3y3Z3y3Za17A34Ygr1UGw4YyFy7Xw4kKrWx
-	C342gan7Xa97tw1kl-sFpf9Il3svdjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8wcxFpf
-	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
-	UjIYCTnIWjp_UUUYI7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
-	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUGVWUXwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
-	wI0_Gr1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI
-	0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280
-	aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2
-	xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
-	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r
-	1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
-	7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
-	W8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU
-	2ID7UUUUU
+Autocrypt: addr=nik.borisov@suse.com; keydata=
+ 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
+In-Reply-To: <20251106234055.ftahbvqxrfzjwr6t@desk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-this patch is big and hard to review :)
-suggest to split to smaller patch-set, such as avec device create, 
-intterrupt injection etc.
 
-On 2025/11/19 下午4:39, Song Gao wrote:
-> Add a dintc device to set dintc msg base and msg size.
-> implement deliver the msi to vcpu and inject irq to dest vcpu.
-> add some macros for AVEC.
+
+On 11/7/25 01:40, Pawan Gupta wrote:
+> [ I drafted the reply this this email earlier, but forgot to send it, sorry. ]
 > 
-> Signed-off-by: Song Gao <gaosong@loongson.cn>
-> ---
->   arch/loongarch/include/asm/irq.h       |   7 ++
->   arch/loongarch/include/asm/kvm_dintc.h |  22 +++++
->   arch/loongarch/include/asm/kvm_host.h  |   8 ++
->   arch/loongarch/include/uapi/asm/kvm.h  |   4 +
->   arch/loongarch/kvm/Makefile            |   1 +
->   arch/loongarch/kvm/intc/dintc.c        | 115 +++++++++++++++++++++++++
->   arch/loongarch/kvm/interrupt.c         |   1 +
->   arch/loongarch/kvm/irqfd.c             |  35 +++++++-
->   arch/loongarch/kvm/main.c              |   5 ++
->   arch/loongarch/kvm/vcpu.c              |  51 +++++++++++
->   drivers/irqchip/irq-loongarch-avec.c   |   5 +-
->   include/uapi/linux/kvm.h               |   2 +
->   12 files changed, 252 insertions(+), 4 deletions(-)
->   create mode 100644 arch/loongarch/include/asm/kvm_dintc.h
->   create mode 100644 arch/loongarch/kvm/intc/dintc.c
+> On Mon, Nov 03, 2025 at 12:31:09PM -0800, Dave Hansen wrote:
+>> On 10/27/25 16:43, Pawan Gupta wrote:
+>>> IBPB mitigation for VMSCAPE is an overkill for CPUs that are only affected
+>>> by the BHI variant of VMSCAPE. On such CPUs, eIBRS already provides
+>>> indirect branch isolation between guest and host userspace. But, a guest
+>>> could still poison the branch history.
+>>
+>> This is missing a wee bit of background about how branch history and
+>> indirect branch prediction are involved in VMSCAPE.
 > 
-> diff --git a/arch/loongarch/include/asm/irq.h b/arch/loongarch/include/asm/irq.h
-> index 12bd15578c33..5ab8b91e9ae8 100644
-> --- a/arch/loongarch/include/asm/irq.h
-> +++ b/arch/loongarch/include/asm/irq.h
-> @@ -50,6 +50,13 @@ void spurious_interrupt(void);
->   #define NR_LEGACY_VECTORS	16
->   #define IRQ_MATRIX_BITS		NR_VECTORS
->   
-> +#define AVEC_VIRQ_SHIFT		4
-> +#define AVEC_VIRQ_BIT		8
-> +#define AVEC_VIRQ_MASK		GENMASK(AVEC_VIRQ_BIT - 1, 0)
-> +#define AVEC_CPU_SHIFT		12
-> +#define AVEC_CPU_BIT		16
-> +#define AVEC_CPU_MASK		GENMASK(AVEC_CPU_BIT - 1, 0)
-> +
->   #define arch_trigger_cpumask_backtrace arch_trigger_cpumask_backtrace
->   void arch_trigger_cpumask_backtrace(const struct cpumask *mask, int exclude_cpu);
->   
-> diff --git a/arch/loongarch/include/asm/kvm_dintc.h b/arch/loongarch/include/asm/kvm_dintc.h
-> new file mode 100644
-> index 000000000000..0ec301fbb638
-> --- /dev/null
-> +++ b/arch/loongarch/include/asm/kvm_dintc.h
-> @@ -0,0 +1,22 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2025 Loongson Technology Corporation Limited
-> + */
-> +
-> +#ifndef __ASM_KVM_DINTC_H
-> +#define __ASM_KVM_DINTC_H
-> +
-> +
-> +struct loongarch_dintc  {
-> +	spinlock_t lock;
-> +	struct kvm *kvm;
-> +	uint64_t msg_addr_base;
-> +	uint64_t msg_addr_size;
-> +};
-> +
-> +struct dintc_state {
-> +	atomic64_t vector_map[4];
-> +};
-do we need atomic64_t here? unsigned long type seems ok.
-> +
-> +int kvm_loongarch_register_dintc_device(void);
-> +#endif
-> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-> index 0cecbd038bb3..3806a71658c1 100644
-> --- a/arch/loongarch/include/asm/kvm_host.h
-> +++ b/arch/loongarch/include/asm/kvm_host.h
-> @@ -22,6 +22,7 @@
->   #include <asm/kvm_ipi.h>
->   #include <asm/kvm_eiointc.h>
->   #include <asm/kvm_pch_pic.h>
-> +#include <asm/kvm_dintc.h>
->   #include <asm/loongarch.h>
->   
->   #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-> @@ -132,6 +133,7 @@ struct kvm_arch {
->   	struct loongarch_ipi *ipi;
->   	struct loongarch_eiointc *eiointc;
->   	struct loongarch_pch_pic *pch_pic;
-> +	struct loongarch_dintc *dintc;
->   };
->   
->   #define CSR_MAX_NUMS		0x800
-> @@ -242,6 +244,7 @@ struct kvm_vcpu_arch {
->   	struct kvm_mp_state mp_state;
->   	/* ipi state */
->   	struct ipi_state ipi_state;
-> +	struct dintc_state dintc_state;
->   	/* cpucfg */
->   	u32 cpucfg[KVM_MAX_CPUCFG_REGS];
->   
-> @@ -253,6 +256,11 @@ struct kvm_vcpu_arch {
->   	} st;
->   };
->   
-> +void loongarch_dintc_inject_irq(struct kvm_vcpu *vcpu);
-> +int kvm_loongarch_deliver_msi_to_vcpu(struct kvm *kvm,
-> +				      struct kvm_vcpu *vcpu,
-> +				      u32 vector, int level);
-> +
->   static inline unsigned long readl_sw_gcsr(struct loongarch_csrs *csr, int reg)
->   {
->   	return csr->csrs[reg];
-> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
-> index de6c3f18e40a..07da84f7002c 100644
-> --- a/arch/loongarch/include/uapi/asm/kvm.h
-> +++ b/arch/loongarch/include/uapi/asm/kvm.h
-> @@ -154,4 +154,8 @@ struct kvm_iocsr_entry {
->   #define KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL	        0x40000006
->   #define KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT	        0
->   
-> +#define KVM_DEV_LOONGARCH_DINTC_CTRL			0x40000007
-> +#define KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_BASE		0x0
-> +#define KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_SIZE		0x1
-> +
->   #endif /* __UAPI_ASM_LOONGARCH_KVM_H */
-> diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
-> index cb41d9265662..fe984bf1cbdb 100644
-> --- a/arch/loongarch/kvm/Makefile
-> +++ b/arch/loongarch/kvm/Makefile
-> @@ -19,6 +19,7 @@ kvm-y += vm.o
->   kvm-y += intc/ipi.o
->   kvm-y += intc/eiointc.o
->   kvm-y += intc/pch_pic.o
-> +kvm-y += intc/dintc.o
->   kvm-y += irqfd.o
->   
->   CFLAGS_exit.o	+= $(call cc-disable-warning, override-init)
-> diff --git a/arch/loongarch/kvm/intc/dintc.c b/arch/loongarch/kvm/intc/dintc.c
-> new file mode 100644
-> index 000000000000..376c6e20ec04
-> --- /dev/null
-> +++ b/arch/loongarch/kvm/intc/dintc.c
-> @@ -0,0 +1,115 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2025 Loongson Technology Corporation Limited
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +#include <asm/kvm_dintc.h>
-> +#include <asm/kvm_vcpu.h>
-> +
-> +static int kvm_dintc_ctrl_access(struct kvm_device *dev,
-> +				 struct kvm_device_attr *attr,
-> +				 bool is_write)
-> +{
-> +	int addr = attr->attr;
-> +	void __user *data;
-> +	struct loongarch_dintc *s = dev->kvm->arch.dintc;
-> +
-> +	data = (void __user *)attr->addr;
-> +	switch (addr) {
-> +	case KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_BASE:
-> +		if (is_write) {
-> +			if (copy_from_user(&(s->msg_addr_base), data, sizeof(s->msg_addr_base)))
-Do you need check duplicated writing here?
-> +				return -EFAULT;
-> +		}
-> +		break;
-> +	case KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_SIZE:
-> +		if (is_write) {
-> +			if (copy_from_user(&(s->msg_addr_size), data, sizeof(s->msg_addr_size)))
-Ditto
-> +				return -EFAULT;
-> +		}
-> +		break;
-> +	default:
-> +		kvm_err("%s: unknown dintc register, addr = %d\n", __func__, addr);
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int kvm_dintc_get_attr(struct kvm_device *dev,
-> +			struct kvm_device_attr *attr)
-when dintc attr get is used?
-> +{
-> +	switch (attr->group) {
-> +	case KVM_DEV_LOONGARCH_DINTC_CTRL:
-> +		return kvm_dintc_ctrl_access(dev, attr, false);
-> +	default:
-> +		kvm_err("%s: unknown group (%d)\n", __func__, attr->group);
-> +		return -EINVAL;
-> +	}
-> +}
-> +
-> +static int kvm_dintc_set_attr(struct kvm_device *dev,
-> +			      struct kvm_device_attr *attr)
-> +{
-> +	switch (attr->group) {
-> +	case KVM_DEV_LOONGARCH_DINTC_CTRL:
-> +		return kvm_dintc_ctrl_access(dev, attr, true);
-> +	default:
-> +		kvm_err("%s: unknown group (%d)\n", __func__, attr->group);
-> +		return -EINVAL;
-> +	}
-> +}
-> +
-> +static int kvm_dintc_create(struct kvm_device *dev, u32 type)
-> +{
-> +	struct kvm *kvm;
-> +	struct loongarch_dintc *s;
-> +
-> +	if (!dev) {
-> +		kvm_err("%s: kvm_device ptr is invalid!\n", __func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	kvm = dev->kvm;
-> +	if (kvm->arch.dintc) {
-> +		kvm_err("%s: LoongArch DINTC has already been created!\n", __func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	s = kzalloc(sizeof(struct loongarch_dintc), GFP_KERNEL);
-> +	if (!s)
-> +		return -ENOMEM;
-> +
-> +	spin_lock_init(&s->lock);
-> +	s->kvm = kvm;
-> +
-unnecessary blank line.
-> +	kvm->arch.dintc = s;
-> +	return 0;
-> +}
-> +
-> +static void kvm_dintc_destroy(struct kvm_device *dev)
-> +{
-> +	struct kvm *kvm;
-> +	struct loongarch_dintc *dintc;
-> +
-> +	if (!dev || !dev->kvm || !dev->kvm->arch.dintc)
-> +		return;
-> +
-> +	kvm = dev->kvm;
-> +	dintc = kvm->arch.dintc;
-> +	kfree(dintc);
-kfree(dev->kvm->arch.dintc) for simple.
-> +}
-> +
-> +static struct kvm_device_ops kvm_dintc_dev_ops = {
-> +	.name = "kvm-loongarch-dintc",
-> +	.create = kvm_dintc_create,
-> +	.destroy = kvm_dintc_destroy,
-> +	.set_attr = kvm_dintc_set_attr,
-> +	.get_attr = kvm_dintc_get_attr,
-> +};
-> +
-> +int kvm_loongarch_register_dintc_device(void)
-> +{
-> +	return kvm_register_device_ops(&kvm_dintc_dev_ops, KVM_DEV_TYPE_LOONGARCH_DINTC);
-> +}
-> diff --git a/arch/loongarch/kvm/interrupt.c b/arch/loongarch/kvm/interrupt.c
-> index a6d42d399a59..c74e7af3e772 100644
-> --- a/arch/loongarch/kvm/interrupt.c
-> +++ b/arch/loongarch/kvm/interrupt.c
-> @@ -33,6 +33,7 @@ static int kvm_irq_deliver(struct kvm_vcpu *vcpu, unsigned int priority)
->   		irq = priority_to_irq[priority];
->   
->   	if (cpu_has_msgint && (priority == INT_AVEC)) {
-> +		loongarch_dintc_inject_irq(vcpu);
->   		set_gcsr_estat(irq);
->   		return 1;
->   	}
-> diff --git a/arch/loongarch/kvm/irqfd.c b/arch/loongarch/kvm/irqfd.c
-> index 9a39627aecf0..a6f9342eaba1 100644
-> --- a/arch/loongarch/kvm/irqfd.c
-> +++ b/arch/loongarch/kvm/irqfd.c
-> @@ -2,7 +2,6 @@
->   /*
->    * Copyright (C) 2024 Loongson Technology Corporation Limited
->    */
-> -
->   #include <linux/kvm_host.h>
->   #include <trace/events/kvm.h>
->   #include <asm/kvm_pch_pic.h>
-> @@ -16,6 +15,27 @@ static int kvm_set_pic_irq(struct kvm_kernel_irq_routing_entry *e,
->   	return 0;
->   }
->   
-> +static int kvm_dintc_set_msi_irq(struct kvm *kvm, u32 addr, int data, int level)
-> +{
-> +	unsigned int virq, dest, cpu_bit;
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	cpu_bit = find_first_bit((unsigned long *)&(kvm->arch.dintc->msg_addr_base), 64)
-> +				- AVEC_CPU_SHIFT;
-> +	cpu_bit = min(cpu_bit, AVEC_CPU_BIT);
-> +
-> +	virq = (addr >> AVEC_VIRQ_SHIFT)&AVEC_VIRQ_MASKspace needed around &
-> +	dest = (addr >> AVEC_CPU_SHIFT)&GENMASK(cpu_bit - 1, 0);
-space needed around &
-Also cpu_bit can be calculated at beginning in function 
-kvm_dintc_ctrl_access()
-
-> +	if (dest > KVM_MAX_VCPUS)
-> +		return -EINVAL;
-> +	vcpu = kvm_get_vcpu_by_id(kvm, dest);
-dest is physical cpu id, kvm_get_vcpu_by_cpuid() should be used here.
-
-> +
-> +	if (!vcpu)
-> +		return -EINVAL;
-> +	return kvm_loongarch_deliver_msi_to_vcpu(kvm, vcpu, virq, level);
-> +}
-> +
-> +
->   /*
->    * kvm_set_msi: inject the MSI corresponding to the
->    * MSI routing entry
-> @@ -26,10 +46,21 @@ static int kvm_set_pic_irq(struct kvm_kernel_irq_routing_entry *e,
->   int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
->   		struct kvm *kvm, int irq_source_id, int level, bool line_status)
->   {
-> +	u64 msg_addr;
-> +
->   	if (!level)
->   		return -1;
->   
-> -	pch_msi_set_irq(kvm, e->msi.data, level);
-> +	msg_addr = (((u64)e->msi.address_hi) << 32) | e->msi.address_lo;
-> +	if (cpu_has_msgint &&
-> +		msg_addr > kvm->arch.dintc->msg_addr_base &&
-msg_addr >= kvm->arch.dintc->msg_addr_base ?
-> +		msg_addr <= (kvm->arch.dintc->msg_addr_base  + kvm->arch.dintc->msg_addr_size)) {
-msg_addr < (kvm->arch.dintc->msg_addr_base  + 
-kvm->arch.dintc->msg_addr_size)
-
-Also do we need check whether kvm->arch.dintc is NULL? or it is already 
-checked before kvm_set_msi() is called?
-> +		return kvm_dintc_set_msi_irq(kvm, e->msi.address_lo, e->msi.data, level);
-why only e->msi.address_lo?
-should be kvm_dintc_set_msi_irq(kvm, msg_addr, e->msi.data, level) ?
-> +	} else if (e->msi.address_lo  == 0) {
-ditto, if (msg_addr == 0)
-> +		pch_msi_set_irq(kvm, e->msi.data, level);
-> +	} else {
-> +		return 0;
-unnecessary else here.
-> +	}
->   
->   	return 0;
->   }
-> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
-> index 80ea63d465b8..d18d9f4d485c 100644
-> --- a/arch/loongarch/kvm/main.c
-> +++ b/arch/loongarch/kvm/main.c
-> @@ -408,6 +408,11 @@ static int kvm_loongarch_env_init(void)
->   
->   	/* Register LoongArch PCH-PIC interrupt controller interface. */
->   	ret = kvm_loongarch_register_pch_pic_device();
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Register LoongArch DINTC interrupt contrroller interface */
-> +	ret = kvm_loongarch_register_dintc_device();
->   
->   	return ret;
->   }
-> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> index 1e7590fc1b47..4f13161be107 100644
-> --- a/arch/loongarch/kvm/vcpu.c
-> +++ b/arch/loongarch/kvm/vcpu.c
-> @@ -13,6 +13,57 @@
->   #define CREATE_TRACE_POINTS
->   #include "trace.h"
->   
-> +void loongarch_dintc_inject_irq(struct kvm_vcpu *vcpu)
-> +{
-> +	struct dintc_state *ds = &vcpu->arch.dintc_state;
-> +	unsigned int i;
-> +	unsigned long temp[4], old;
-> +
-> +	if (!ds)
-> +		return;
-> +
-
-> +	for (i = 0; i < 4; i++) {
-> +		old = atomic64_read(&(ds->vector_map[i]));
-> +		if (old)
-> +			temp[i] = atomic64_xchg(&(ds->vector_map[i]), 0);
-> +	}
-how about
-  for_each_set_bit(vector, ds->vector_map, 256) {
-     clear_bit(vector, ds->vector_map);
-
-     old = kvm_read_hw_gcsr(LOONGARCH_CSR_ISR0 + vector/BITS_PER_LONG);
-     old |= BIT_ULL(vector & (BITS_PER_LONG - 1);
-     kvm_write_hw_gcsr(LOONGARCH_CSR_ISR0+ vector/BITS_PER_LONG, old);
- > +		
- > +		
-> +
-> +	if (temp[0]) {
-> +		old = kvm_read_hw_gcsr(LOONGARCH_CSR_ISR0);
-> +		kvm_write_hw_gcsr(LOONGARCH_CSR_ISR0, temp[0]|old);
-> +	}
-> +	if (temp[1]) {
-> +		old = kvm_read_hw_gcsr(LOONGARCH_CSR_ISR1);
-> +		kvm_write_hw_gcsr(LOONGARCH_CSR_ISR1, temp[1]|old);
-> +	}
-> +	if (temp[2]) {
-> +		old = kvm_read_hw_gcsr(LOONGARCH_CSR_ISR2);
-> +		kvm_write_hw_gcsr(LOONGARCH_CSR_ISR2, temp[2]|old);
-> +	}
-> +	if (temp[3]) {
-> +		old = kvm_read_hw_gcsr(LOONGARCH_CSR_ISR3);
-> +		kvm_write_hw_gcsr(LOONGARCH_CSR_ISR3, temp[3]|old);
-> +	}
-> +}
-> +int  kvm_loongarch_deliver_msi_to_vcpu(struct kvm *kvm,
-> +					struct kvm_vcpu *vcpu,
-> +					u32 vector, int level)
-> +{
-> +	struct kvm_interrupt vcpu_irq;
-> +	struct dintc_state *ds;
-> +
-> +	if (!vcpu || vector >= 256)
-> +		return -EINVAL;
-> +	ds = &vcpu->arch.dintc_state;
-> +	if (!ds)
-> +		return -ENODEV;
-> +	set_bit(vector, (unsigned long *)&ds->vector_map);
-> +	vcpu_irq.irq = level ? INT_AVEC : -INT_AVEC;
-if leve == 0, it should skip at beginning. Rather than set_bit and 
-inject irq.
-
-Regards
-Bibo Mao
-> +	kvm_vcpu_ioctl_interrupt(vcpu, &vcpu_irq);
-> +	kvm_vcpu_kick(vcpu);
-> +	return 0;
-> +}
-> +
->   const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
->   	KVM_GENERIC_VCPU_STATS(),
->   	STATS_DESC_COUNTER(VCPU, int_exits),
-> diff --git a/drivers/irqchip/irq-loongarch-avec.c b/drivers/irqchip/irq-loongarch-avec.c
-> index bf52dc8345f5..2f0f704cfebb 100644
-> --- a/drivers/irqchip/irq-loongarch-avec.c
-> +++ b/drivers/irqchip/irq-loongarch-avec.c
-> @@ -209,8 +209,9 @@ static void avecintc_compose_msi_msg(struct irq_data *d, struct msi_msg *msg)
->   	struct avecintc_data *adata = irq_data_get_irq_chip_data(d);
->   
->   	msg->address_hi = 0x0;
-> -	msg->address_lo = (loongarch_avec.msi_base_addr | (adata->vec & 0xff) << 4)
-> -			  | ((cpu_logical_map(adata->cpu & 0xffff)) << 12);
-> +	msg->address_lo = (loongarch_avec.msi_base_addr |
-> +			  (adata->vec & AVEC_VIRQ_MASK) << AVEC_VIRQ_SHIFT) |
-> +			  ((cpu_logical_map(adata->cpu & AVEC_CPU_MASK)) << AVEC_CPU_SHIFT);
->   	msg->data = 0x0;
->   }
->   
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 52f6000ab020..738dd8d626a4 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1198,6 +1198,8 @@ enum kvm_device_type {
->   #define KVM_DEV_TYPE_LOONGARCH_EIOINTC	KVM_DEV_TYPE_LOONGARCH_EIOINTC
->   	KVM_DEV_TYPE_LOONGARCH_PCHPIC,
->   #define KVM_DEV_TYPE_LOONGARCH_PCHPIC	KVM_DEV_TYPE_LOONGARCH_PCHPIC
-> +	KVM_DEV_TYPE_LOONGARCH_DINTC,
-> +#define KVM_DEV_TYPE_LOONGARCH_DINTC	KVM_DEV_TYPE_LOONGARCH_DINTC
->   
->   	KVM_DEV_TYPE_MAX,
->   
+> Adding more background to this.
 > 
+>>> To mitigate that, use the recently added clear_bhb_long_loop() to isolate
+>>> the branch history between guest and userspace. Add cmdline option
+>>> 'vmscape=on' that automatically selects the appropriate mitigation based
+>>> on the CPU.
+>>
+>> Is "=on" the right thing here as opposed to "=auto"?
+> 
+> v1 had it as =auto, David Kaplan made a point that for attack vector controls
+> "auto" means "defer to attack vector controls":
+> 
+>    https://lore.kernel.org/all/LV3PR12MB9265B1C6D9D36408539B68B9941EA@LV3PR12MB9265.namprd12.prod.outlook.com/
+> 
+>    "Maybe a better solution instead is to add a new option 'vmscape=on'.
+> 
+>    If we look at the other most recently added bugs like TSA and ITS, neither
+>    have an explicit 'auto' cmdline option.  But they do have 'on' cmdline
+>    options.
+> 
+>    The difference between 'auto' and 'on' is that 'auto' defers to the attack
+>    vector controls while 'on' means 'enable this mitigation if the CPU is
+>    vulnerable' (as opposed to 'force' which will enable it even if not
+>    vulnerable).
+> 
+>    An explicit 'vmscape=on' could give users an option to ensure the
+>    mitigation is used (regardless of attack vectors) and could choose the best
+>    mitigation (BHB clear if available, otherwise IBPB).
 
+I thought the whole idea of attack vectors was because the gazillion 
+options for gazillion mitigation became untenable over time. Now, what 
+you are saying is - on top of the simplification, let's add yet more 
+options to override the attack vectors o_O. IMO, having 'force' is 
+sufficient to cover scenarios where people really want this mitigation - 
+either because they know better, or because they want to test something.
+
+Force also covers the "on" case, so let's leave it at "on" for attack 
+vector support, and 'force' for everything else
+
+<snip>
 
