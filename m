@@ -1,559 +1,358 @@
-Return-Path: <kvm+bounces-63649-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63650-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD3F5C6C558
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 03:08:27 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E5C4C6C574
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 03:10:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D2281350AD0
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 02:07:58 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 74A2334FDC3
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 02:09:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E562726CE2F;
-	Wed, 19 Nov 2025 02:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87450266B6B;
+	Wed, 19 Nov 2025 02:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hb5lc6Q3";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xn3wJseE"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="n4srWwif";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="jaRFpgAO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90B214A4CC
-	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 02:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763518064; cv=none; b=lqvCfvQSLeoRzGzQOcM2SgGFicyb0hpIQIFvl/+LRYm9Phh1qbVRPwhoZ6sSWpKwFnhPqA2ms71KxgS8bAWmMv2vZjY7RpoXeq2hJJcuGP4pIfpiD4B8uhUfOT8zqBEN/1H+JSZs8uZ94McW/adw2ndAncKfzfEU4nyrE2ftoGo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763518064; c=relaxed/simple;
-	bh=qCPvjbPyrqEz/TADGcfkQrklmfu8vszx3E4BBHEcAEw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fMBTisK0+TmnV3e3uNSoqErT4GwxHX1IM0O6E5BzYguR+qNGNSkx+wiXVi5pQIYV0o8rE40r0UzTGvhKtxhfhxMy4/3uMbTVfmqpizHioMZti7mw2rEoMjLoCxgEq6w1SLjO1vrP4SJmE3DsBKwQVXtrcXSu/SFE0AuC7mOj7V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hb5lc6Q3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xn3wJseE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763518060;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z4eFjpzST/7FqskG5nkglbLK48aXe7h6Rso97yeE/nI=;
-	b=hb5lc6Q3Re9O38S7EazLM6+klOIDO6cwQJM4nJpMJQoiI8Uu23zTMd+6UX8kbPVNT2RTja
-	cQZZrh6SiR9ijxykwO5lJQKJUYudBPRHZUeGfuGNROPRtGNLuVFxcQoshrmMUeHpHV+wYG
-	UVyfZdD5TMaluggUDVb5vX2xGtfbCg8=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-137-g7322WJSPIOEo5tlzfQ_uA-1; Tue, 18 Nov 2025 21:07:39 -0500
-X-MC-Unique: g7322WJSPIOEo5tlzfQ_uA-1
-X-Mimecast-MFC-AGG-ID: g7322WJSPIOEo5tlzfQ_uA_1763518058
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-29806c42760so222640815ad.2
-        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 18:07:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0FB2512DE
+	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 02:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763518133; cv=fail; b=MNw1mI1y1v4Km5r4Y5A50BlGZzLfixVGxnmlgEG7Khn1pU0me12lANSlgbK38xzTm3+PZWC8wjdEhICEXjezK8FT4Ewy13VkTj1Yni4r1OCn+1bFx9tohnu0vkVLFizgt0Iw3gw76X2ieOVYM3itai95j0ab1qYh01kul7rWLy4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763518133; c=relaxed/simple;
+	bh=EOUpn8OhZLBzE256tVP3u7MWNl0QKmltvlM8uyjPCa0=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nMH6MXjFIC3jfjt1dfeaWpozAtmvoPI58KcVuq2xUh4IrcPwe4khrStDzsZvbFp2tyJoKWlFz1cSDgeKP2dNAcWv+u2pok8S2697JpQLu4Pnt9gSF2eAgGQv244wPdeN/lrNoAZp1yjZ3shN94ZeFBU98uBhUVjYNlMAPc4MXxQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=n4srWwif; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=jaRFpgAO; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AILO0xL022375;
+	Wed, 19 Nov 2025 02:08:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=rh+f3/l88NrnHEeLMrVNNmFYpvHeD0Oq9AX7GtbhzMY=; b=
+	n4srWwifKYSLGFJRWAdYM3JCH5xIS1TYJGhD/RKjBqtEY/usI5pTvod6J4fE9Dn4
+	AldhzfV6aIPEp9fdL92IVx+fDtBiQOFY+hJnBzaWWwL2brd2aKDxWUUoIjuuv0/2
+	n+nTfg9VCPMid6Vw9dNliDug4LnWpWtySQvOvUrsyo4tcFFhEYcuACOMLJZ00AZf
+	e6TqXNtzqkhFlRQZ39kFMTLdwHRISpLmgT6UneJccSbUXBc+yskRJ3OhDB7vTxs3
+	UAxEgQ6fLbRNuQZSv2ol/OCOiFkIMGkKWhO2NCgBhIO+Ywd23rHFd91Ol1Y82+mU
+	ZxPHUh09e+W4ZAOqeMzXHQ==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4aej9068e2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 19 Nov 2025 02:08:25 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AJ1twdW002381;
+	Wed, 19 Nov 2025 02:08:24 GMT
+Received: from ch1pr05cu001.outbound.protection.outlook.com (mail-northcentralusazon11010066.outbound.protection.outlook.com [52.101.193.66])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4aefy9y603-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 19 Nov 2025 02:08:24 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=p2zbhl3x6dRZ/+l/V722Mbx0oVvpqJXUCzwcY7rhJszEsUMthWZUMUh3voTbL3b3pqF2FVyREnAMwQvZXHhFtjblnQSUj3o8hDyxA8Bx27ddrwITZit+dWkBX9OaYzmZrITNjBsNpn8VRsGLapUXZzcC0+5TbavDmgUMxoPG5vVUQzGc+BfmEffAFHZh40UpzDEWcMmia5ZmqVnWvCA3PoWhNWAt2G0CQ4tKG0J30UI2H7wqaWWO98W+T6JNERIrQoWtDNTNAd+C/onNeSZTvwDxpK7yU2flcIRsnZ1PiTrJcL7/jxdCxFtOyS8ORXl7hVNJkrMnzOwbYjqzFGPwhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rh+f3/l88NrnHEeLMrVNNmFYpvHeD0Oq9AX7GtbhzMY=;
+ b=e22oGMCJvek9NEOiRHRXorIs2to0WJBD+OAcAiwLL3tKZZCapcPcNhVgmAOVvnDmzzmpfKXOENYqiTFiORpqWdY8P36IbavUnG+a5O7swlw3P+TsA4HkAafyDCieON6r+RWY/JuWp5MEtzBx3S78wRtltLOQmvFViuf+lLADMQ0Km/UcVh8pOj4I/glYmAB8HSJ3HBDNS+fNpJqI26fRmZDfpfS5XpzaTRzq/QHvU0Ua4RB7e05abayfn4GFY/1WlBnYCcDH9Dk8a5+5hyLs6nv5hfaV5J8rKMcH/PWDBAFi7jvq6F/ExwBKQPzVuky0iX7BEPHAXYF8boqO4AlXvg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763518058; x=1764122858; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z4eFjpzST/7FqskG5nkglbLK48aXe7h6Rso97yeE/nI=;
-        b=Xn3wJseEf9R5flb9sZByjsu4IH8AUl32IpdaN8BXCNdkpkskD9Ja0nysuNptX60oiF
-         j62cDkFhf3fjR6Tsu/CUkD5060XVaXtm5p5o/FYQaaxGlweKUIU4aq/bZOB3IGYCbBzE
-         C1hyL0Z/iQtKwjngpBNHX/EYxjJsmo7JpWX8DKz70ZE0DIz+pd7NAlYkBnpiIJqGghET
-         ajkKfL4whwGKaMrq2fttxBCllwk5rw2kPxaDWYhiGvGo7gGHcKReSaA3HYNptja6ccQH
-         zhGdQB0Qm3OrjIs1fWQsAN9wtWtVB2WNZzDyCqKGofsXMxVaH6GjZUix6HL9CiYWswHv
-         bHsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763518058; x=1764122858;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Z4eFjpzST/7FqskG5nkglbLK48aXe7h6Rso97yeE/nI=;
-        b=nIaB6lJkYS4FXnfYF3+LfYFI9d6fz6N5IhayatEN5CEAYF7ApuAYagboSSch159xt6
-         QsONBTelVV8CAN7E+HYfkBpP7trojBcPYM5bg9fFi/NNNqCaDkV3HRtQJJXLGh8NC7az
-         VnnlMJ8hsTx0p6VJVxfsJ2WZ3rRFGox7hWhiLqgtXkMrE4hfXQOe4XX7y6zVNchrNHFg
-         N91t9UYEiOh1Zidy5z/owuJFJDiYY1fNdPDKuJFaq7Ivp1dxesM601KiMN87at7mZzss
-         kkQOFhiH3U1njV+XCKTqFx//Yk7ao8Cc5Bern8pjv1N1tgyF4Z1DWkKezIWOFILEDXjd
-         1g4A==
-X-Gm-Message-State: AOJu0YzM4PA/rrMD9bUcpR8dV4HiIBW9NxVJIFXvdR5Ffkh0tJrZVKNP
-	SoAOz9jBvWMADhPFCOF579NBSmNHGK107cT4j5X+n5rf6mvKvR+YBTemj3Mk/d0v4F7B/uzriYh
-	10v0aS68GOZPWA+XoNiU62zQXpTbvSgZu/vvvKcZ8/ZSQUrdmRfyWWlCGvW8tcBsPi5/j1w07AT
-	jjj/QNHgHNPllZc2moWsPCgo3K2qql
-X-Gm-Gg: ASbGncsCiadLRe7MpOVSgKvVJ1ah3ZC6DEyYDeR3wdDd90uiER6lcKzKKz35ka02nzJ
-	TgW70cNc2vWULrLxbJHTMyx3GqcDMRaO0V+ZZhu6QjwUbmOuK8vGk2epm8BY1j6daEvXfNh8sBU
-	rQZtJ7hBRUX/WVAKaKR9EAs+m7l8JNKV2N83YPNB/7fbKrBqEItgmHQty9uqnmZQc=
-X-Received: by 2002:a17:902:d506:b0:294:f30f:ea4b with SMTP id d9443c01a7336-2986a6b876dmr182238605ad.8.1763518058040;
-        Tue, 18 Nov 2025 18:07:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGeNmmVfrrspl6rGIc3D9CV7NqJozv/OQZ7x2GYHJcSke+eR1q39k1K+UiJUfQ97cov5THZVM1u3R8wVQVhXxE=
-X-Received: by 2002:a17:902:d506:b0:294:f30f:ea4b with SMTP id
- d9443c01a7336-2986a6b876dmr182238245ad.8.1763518057445; Tue, 18 Nov 2025
- 18:07:37 -0800 (PST)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rh+f3/l88NrnHEeLMrVNNmFYpvHeD0Oq9AX7GtbhzMY=;
+ b=jaRFpgAONoy6RwZou8Ed4dmPw1frEDiD4hS/PNCzujSDh3+ThIHL5OU4FRSe/1quct9AyduHE3NuQ5mce26WGtyAerHt0yT5KgnLYFsWHC2hqnpT5F+qGG8BYOLOOeBdc3Cx6lmttEFVC2KQ7oUbsfmmyqdzGZPz5tk+fVHwUqU=
+Received: from DS7PR10MB7129.namprd10.prod.outlook.com (2603:10b6:8:e6::5) by
+ SA1PR10MB6295.namprd10.prod.outlook.com (2603:10b6:806:252::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.10; Wed, 19 Nov 2025 02:08:02 +0000
+Received: from DS7PR10MB7129.namprd10.prod.outlook.com
+ ([fe80::721c:7e49:d8c5:799c]) by DS7PR10MB7129.namprd10.prod.outlook.com
+ ([fe80::721c:7e49:d8c5:799c%3]) with mapi id 15.20.9320.013; Wed, 19 Nov 2025
+ 02:08:02 +0000
+Message-ID: <e7498cc4-445d-494a-8ca6-5bdb73fe0505@oracle.com>
+Date: Tue, 18 Nov 2025 18:07:59 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 0/9] target/i386/kvm/pmu: PMU Enhancement, Bugfix and
+ Cleanup
+From: Dongli Zhang <dongli.zhang@oracle.com>
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com
+Cc: zhao1.liu@intel.com, mtosatti@redhat.com, sandipan.das@amd.com,
+        babu.moger@amd.com, likexu@tencent.com, like.xu.linux@gmail.com,
+        groug@kaod.org, khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com,
+        den@virtuozzo.com, davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
+        dapeng1.mi@linux.intel.com, joe.jin@oracle.com, ewanhai-oc@zhaoxin.com,
+        ewanhai@zhaoxin.com
+References: <20251111061532.36702-1-dongli.zhang@oracle.com>
+Content-Language: en-US
+In-Reply-To: <20251111061532.36702-1-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PH8P223CA0022.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:510:2db::27) To DS7PR10MB7129.namprd10.prod.outlook.com
+ (2603:10b6:8:e6::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251113015420.3496-1-jasowang@redhat.com> <20251113030230-mutt-send-email-mst@kernel.org>
- <CACGkMEtnihOt=g+zs0gVQ=wnx8_YF_F=QSuLQ4RGWBVuOeFi7w@mail.gmail.com>
- <20251114012141-mutt-send-email-mst@kernel.org> <CACGkMEuqPtrCotXRcP2kzdaJ50L3oY7U-LVAKNuXOFJP_h1_PQ@mail.gmail.com>
- <20251117034446-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20251117034446-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 19 Nov 2025 10:07:25 +0800
-X-Gm-Features: AWmQ_blKbntcqNTR-p4W8w_fljr4MW0-vt2uxGDqpZFsxDx5iKHoNZJAujuIHy4
-Message-ID: <CACGkMEtoKYrv5A9GAq_KcrpvN03SkoYPRkxnb20NhBVcOHp3jg@mail.gmail.com>
-Subject: Re: [PATCH net] vhost: rewind next_avail_head while discarding descriptors
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR10MB7129:EE_|SA1PR10MB6295:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5e7404fe-674d-4780-51fc-08de27107841
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Rjk0WTlJaHJRV0lYWks1dWoxZEI3ZVdrbGhnbDhhQlIvekdTVEFqQnlvNzg0?=
+ =?utf-8?B?YUJONlZ1V09QVndsVVpuQmZHeURyQVZUMGRFNXJkVHJVK3JPNk1Pd2lsTnFJ?=
+ =?utf-8?B?Sy80ZmJVaTI5UlBuRmhPRGszNVpKMUgxb2pwSm9oNWFMNjFNcEwybGUrSDhq?=
+ =?utf-8?B?TU5lZVJSbGhkZElmLzdFdkV5UlR1M3NJR240eERxVTZGam5tY0ZOTDk1L2Iz?=
+ =?utf-8?B?UHVGSzN0b1FXSmRWUjQzYTJBWGJzWXJpRi94Y0xjbkxDTVVuSUJCUW5pWDVC?=
+ =?utf-8?B?YkJiZzlFY3dZVmtIUkdVU2MwS1djdDlmajFrZFg4U29NaWw5czI0L2VjaVNG?=
+ =?utf-8?B?QVcvNm5FQ1hOOU9ndStSU3Q5S1d6YW5RTjJ2QmliYmVJdzRsRE9CUUJpM3Fr?=
+ =?utf-8?B?NnM0UFJUZXRuc0I0Vzlva2w0R1ZrTjlsVHErVlhhNGRzV25jdTloTDliNS82?=
+ =?utf-8?B?ME1DOHkraXZGODBGa2FWdndmTm5Ub0V4R2ZPWnFYTUdKR3NhbVl6MExqSUFh?=
+ =?utf-8?B?UGVWczgzdExrWWF6a0pYbm5tYTNSTFg2UlZnazlhZVJuT0s1ZVdyQ0R6TGNu?=
+ =?utf-8?B?b2Z4RTBmTFg5RjFwRDd2WEVUdFdXRHVUZ1VEN3pabTJjMUpZdENVQkFoSkZx?=
+ =?utf-8?B?RmRUTFIrZ3k0Tm91azBMSnNYejNTRzhTYlQ2SHJORHRUdUVSRTZqL2pIbitj?=
+ =?utf-8?B?OUdtbloxbkZnN1NEMVFtdHNnNEdyTTBuZnp5TTN5NkdaSG5WK1N6RlUvUnNJ?=
+ =?utf-8?B?ZmJzNGNXbWcwMDRGRnl4QUZ1U245VTlIRnZKOC83MDg3dDZRSTRlQ2dHU0Nx?=
+ =?utf-8?B?TXQrSkxGcS92WFJxaG9oY3RjbGM5MkczUkYyWkRhY3NtU1l3cXNaczUybXBX?=
+ =?utf-8?B?Q3VuOXptVFUvS1FFMVVkS0lwbW0rVWVlVHhsanBFY0V4R09GZnREYmwyQXhD?=
+ =?utf-8?B?alptY2pPN1F4dmFtK3A0KzZrMERhUUhzSzRqYnpqVzdWZnA0Z0J1dFdIOHMv?=
+ =?utf-8?B?NGFpd285YWRLVUZkSDdhRS9ibTFmdzlrMDkzNlpINU5wZTk4NjNKd21VWVVJ?=
+ =?utf-8?B?N2tJdDlPdUlMZmlOV2R5bU40K2EwQnEzZU4wOC9TTE5zWWVnVGE2Y0FtUWQ0?=
+ =?utf-8?B?eCtWTWxZNDQ5VUQyRHIyMW00N003bklSVlprUGZuNlY0SnIvaTZjWVpuaGNQ?=
+ =?utf-8?B?eGJpQWN0d1d5RElXeEdZTUJTa0VEZ3BKZFRXb2R4bWNKZUVwMDN3RWVsT05G?=
+ =?utf-8?B?b3poenRhOGFjS3lWWExkdFM3R0o5K3pyR051dnRGbVo3TGsrcjQ2aTdwWmRZ?=
+ =?utf-8?B?dkRLbGlUMHFuS1NpMU5zUkY0SW9KdzN3QVJiQ1E2dmNCS2RoL3o1ZUo4QmMv?=
+ =?utf-8?B?dEFNYm1Ybzh4OU9taDRCc1VBVW1KUjlNN0w5d3hJUG40a2wveWl5Wk5Ddlpw?=
+ =?utf-8?B?eHptcWUxQk5GcDlVc0h6cU1iMzJlaFpFZUtZdEZFU2hhYlZZeGhnT2RRM1Ax?=
+ =?utf-8?B?M3dXUlYzanAvc205cS9BcmwwVFBtdXNYTVphdGIyVURTei9jZzU0cmRNbVJx?=
+ =?utf-8?B?a25PczFuazlpcjFQL3pPbnVNSkxBQmdVZS9PRFNCREFka1I4MDFjOFVMM2J2?=
+ =?utf-8?B?dVhaOU1Gczhad0hONWxwNUQwUDZFaGJaYldNSDk3TllycnF5dkdYNVJQTjBy?=
+ =?utf-8?B?MEU4VllGMG5VZHAvdkZyQ2dGQlo5UGx3MVloelFseE93N0RPSEkyeC9tQytn?=
+ =?utf-8?B?UFVpVkQydG9qSjBkSU5vNnlJZDdPR2xlaUVIanZYNjJhbkZMNENGWTNhajhL?=
+ =?utf-8?B?RDhhZ0ZrbFd4RTZiK0pqSlQzZ3lFQ1UzSEdRKzFRc0ljVGZFYjVmZFEweDBU?=
+ =?utf-8?B?aDZJSmE1eHhtM2dTVGI1QXRGN1B1d3dlTUtPY2pDMkpPcnhGei9SZGtRVGtI?=
+ =?utf-8?Q?WM+c55UywSXiQ2QmNpD/klppPXQB9EPw?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB7129.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OGowNkxhWks3eTJsSHVyWGZsQ3Y1NnhsNHpmUGwzOUtnMDZLYUhlVXdpQkJh?=
+ =?utf-8?B?OVN1Tm4vdHJtdFgrOEZBTGRFUWVESWozajVKbTR5enJ5dHFtdzlRMEVOSGl2?=
+ =?utf-8?B?UVBxN25HUXpJU0FlL2FOVmE3THlQWlFLVndTVjFtYWVyZDhOYS8xZUl5U1Fm?=
+ =?utf-8?B?anJxd2VZYUo4SlhPWTJCUTRKalJvbFVDVGtjcFVadDIyNkpNcC9GWXZZbXB3?=
+ =?utf-8?B?dlFsbVJLdnZGcFhocjZUWTNIZ1pxYndlZEh2VnRQZmRvdlhHTExNclNYcVIw?=
+ =?utf-8?B?eHI2UzlJcFBpc1VJam8vWjZDNElKcG5VN1lTejZuUEVOelFKT1NJR2pqb3Fo?=
+ =?utf-8?B?ZThMOG5sempHZXlDZzcrREdsMTlHMy9wemJmR09haG4zNExLc0NZTTZRekJQ?=
+ =?utf-8?B?UVlCdlg1dHNDZXZoZTFwSGdONENVMm9aSXBQbEl0enVsZHB2NU92RlZwenhp?=
+ =?utf-8?B?ZHk0VzdlMmJIbklXZVZFdWlpTFc4U2U1dlBTN0w5U0FpdEdrR0VqL3RMWm12?=
+ =?utf-8?B?MHYrcUl0bTJDaERFV0VJZU41Y1ZZMFphMm1tWUVhZitGbTM4bEcvNitpcGs2?=
+ =?utf-8?B?MXczK1pGUlJMZHowRCtjc3paU0JuVDk2UDhyYjgvYyt2S2Z5Q3hJYUtGbkRa?=
+ =?utf-8?B?T1pCTzFJZFk1RFRqSkIrUnloQmVGTVk0NnJPbkFvUVUzYXprYSt6SzBwQXJ6?=
+ =?utf-8?B?MGNYVmNKNFB5QkVscEtNeDQvdGZvc3lkVFBpTjdyYjRhUmRrQ1JMZktucnVC?=
+ =?utf-8?B?eWYyRkNGWENJWHAyU2YzMmVFSG9XSmQ3YVJxT083QWMvaDlKN25FallCVXdp?=
+ =?utf-8?B?cDJuQzY2NCtOWGdDWFJjeExZeG1PWk1ZWkF4T292QW1CakxhZTZhNnFDK3Jk?=
+ =?utf-8?B?QzJMRS9XY3Zaa3Qzb0pHOWRxS0UxamprdElHN0tqTTNMNkNKKzZHcm56Mm04?=
+ =?utf-8?B?UEUyYmpUNzlCSkI4VFlxekFCazUvdFl5OU5ldmh5SDMwWkNmejBab1R1b1BR?=
+ =?utf-8?B?L2tFY2loL0Q3UU1KQk94S2MrUExQUjd5blpBTW0zK0VIWFBGaGxoSWVhRU8z?=
+ =?utf-8?B?SDFjaWZRb3dTTFZPVmI1TkVRdzl4ekZwV1E0a3RXUmVicGxtYU54d3F1QTBk?=
+ =?utf-8?B?SUkrRzVoVUp5MWE4eENra3dESWJSc0JHdjhyWlg3dmZTT1l0WDVaMzd4NkdB?=
+ =?utf-8?B?UVVOUjU5YXM0MkxsOUJuekFvYlAweVFIbmtVSFpRTTlJcU9tWmZxVHJzUWJx?=
+ =?utf-8?B?elMwczBzK2luT2k0cXl6Yi8raVdoa0FkeUQrUnkrajEzZlpubnI5cjhiaTNw?=
+ =?utf-8?B?aWtPTXNySU9IMjVDTUtRWWEwK1Y3bGljNEZPSDYyN0FDZUo0b0l4WEdCbmJC?=
+ =?utf-8?B?VHN0bk9RUjM2VDNnN1RiejdoV2psVnNvR2dGUnBHMFJKa242aGJQNkpuRzRX?=
+ =?utf-8?B?Z09kWk5HdUFXUG5xanFWbWovbTZoTFFhTHNOUHNNYnBHVjQzdU10SzlBMTFN?=
+ =?utf-8?B?UUZleURFcjNNVHd0K24wUGtNU1hHaGxmOGwvelRpKzIvSXo4YkpYVUhGRi9D?=
+ =?utf-8?B?eTZ0bFUvQkNxVE5LQ0RZQnYzQndRcWgyRklGUXdINWRkUzRuczhWOHNUQVBi?=
+ =?utf-8?B?QWxXbVFtdzVBbDA1L2ZDamNaNm5aTlJ1ZHNJTU1hdzFtVGlhbTJ4YmUxUmxY?=
+ =?utf-8?B?cE92allIb0swYWVpbHFaV2ZOOVBnR0VORjhxUkUrUVRSM1Nabm83T2hDOXVC?=
+ =?utf-8?B?eFRXRjNNSmhYZ1F2ZlZJajBqUjdmOWdTMGFzcXJUakwrcDkxTUlrbmpLR3Iz?=
+ =?utf-8?B?V0xBVFhwNG1aRndrK2RjZkxkbncvZ1c1dTV0N3dGdVhVTjBURU9GUy9JTi9a?=
+ =?utf-8?B?ZkZncEdXTnNpMEZKN0N2WVlxbkQ2aENyU2V5NlhrcXczNjEyQWdsTVJhRWUw?=
+ =?utf-8?B?Y05Hd2FCdDBvNTRLK3dOYjZMeitHZ0piOEMvYlA5SG13eGNCM3dKcERCdGxS?=
+ =?utf-8?B?YnJhdXpkenJIVmpSaGJHN1FLUGVxWk1nU2daN2lQVDFtR1dzZWxkRUhTU2da?=
+ =?utf-8?B?Y3FteVFWRVU3QkFTekExT1JFUnZLV1poNUxLYVpBakxDczhyaGllazBSOWd1?=
+ =?utf-8?B?U1RkNXh1Y043RllYOWdaN0ZMUUpaQUh6ck80SVBkaWlGOEdzL1pNaW93NFRy?=
+ =?utf-8?B?NHc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	aWWlZIfMiXqu6/Lpd75S+HSO+dg5B2EsVuU3948O0xz+VqrHA7m4v/8grfd9zacSqJx/CsO1AJ2BTQ5tMEAn3EpDlvOpQoxkdIM/Jst8XAqY5YBDiaNIdPASEdn3+lpk0WI+zyIyU7QaROPA3CxnVup8UGXYshYV8Pz5NGMIuBbxJoIh8/BbCcunfF/DrD/kaIdmq1xgkJfPqbSR1QNjYmtzvtSQfWpd/x2w/zF5boZjJX6dXZyZgPT5tFySPbTok9bqFfO2dOIJDHPBJReWWxsbqcyD4VChIBXijUaZ1dJn1BgC++CEBt+5DbX+wKtipfoV0QIok0+Qgy6N+/vq9o9LS6+9jX8C5HDcXpSl6GkE5NoWgVXXKMKSPabGkhODRGWJ0x8sOqfKUz490FhaMj4GGcCSjkYQ694adp3+qBKvL+E8BBkUn7ezBqis695vJZcJFk6sqp1o/3k5Ci2DCyPR+j/nPeggIMQs8Q3ySuG+vusRNYKX8XdkMMcwPbmQe7ttTAL0r/YW2N7+WdR9zjobpU88kVTuefP4pN1kk6L6YNzZHuG2xVEO1cWj0YCCND8kYcEwyS5DNDjV51TiK3OyqStPnzra3n4RQmcFNo4=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e7404fe-674d-4780-51fc-08de27107841
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB7129.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 02:08:02.5925
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bkJwq9kzm3hnu4URy5hTc6pl0gC4MAjXsc513e3BdGL753Z46PkklI/vww+Qi30qPpABQx+x1hyvWbmZAoPc4g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB6295
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-19_01,2025-11-18_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
+ malwarescore=0 suspectscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2510240000 definitions=main-2511190015
+X-Authority-Analysis: v=2.4 cv=OMAqHCaB c=1 sm=1 tr=0 ts=691d2699 b=1 cx=c_pps
+ a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=6UeiqGixMTsA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Z1coTuTpIt5psuWBCRIA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: SMQm9JWDd24pKDUD2NMwt68Ws7Feg2F2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMSBTYWx0ZWRfX1nnDtFSClWdG
+ 8FVt65RHSpikVlqnH1p/rANgMt6Srji4Sgs5+Qr2+WAN4Wu3TfB4DRMsvzkr13+5BuAe+WiqhwW
+ s0l5pnduzPEhPD9Te+tqHgjoX+SSGXwPIX0PphTK0QOzaV37hSvxkqU9PnVV/Ip7NQ9t8yxcoxf
+ 3zARJxpZ9TnpNj/VEbKEw0qR5CWqGkOp6HCjwcNHcJDTQMFL5c3lgyoNwiJnr0UZHGGI8zdnThj
+ caoEA/KSt9B7IjqpSCM57RSi4EuFSoHZvQ7JWD88p2JwaAdYQMlAnSW4c/p+JmGnebtTDly0TN+
+ BN56ztQ9goz9Nrqd3lXLlbtvY53Aoxf09vkWy9kgpYx4HzDuwAAgd1I6qDoXSC3Zk0ZmMTT9gK4
+ AN5WBmO0xx067AaoEaCBYi2DlCmB2g==
+X-Proofpoint-GUID: SMQm9JWDd24pKDUD2NMwt68Ws7Feg2F2
 
-On Mon, Nov 17, 2025 at 4:49=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Mon, Nov 17, 2025 at 12:26:51PM +0800, Jason Wang wrote:
-> > On Fri, Nov 14, 2025 at 2:25=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
-com> wrote:
-> > >
-> > > On Fri, Nov 14, 2025 at 09:53:12AM +0800, Jason Wang wrote:
-> > > > On Thu, Nov 13, 2025 at 4:13=E2=80=AFPM Michael S. Tsirkin <mst@red=
-hat.com> wrote:
-> > > > >
-> > > > > On Thu, Nov 13, 2025 at 09:54:20AM +0800, Jason Wang wrote:
-> > > > > > When discarding descriptors with IN_ORDER, we should rewind
-> > > > > > next_avail_head otherwise it would run out of sync with
-> > > > > > last_avail_idx. This would cause driver to report
-> > > > > > "id X is not a head".
-> > > > > >
-> > > > > > Fixing this by returning the number of descriptors that is used=
- for
-> > > > > > each buffer via vhost_get_vq_desc_n() so caller can use the val=
-ue
-> > > > > > while discarding descriptors.
-> > > > > >
-> > > > > > Fixes: 67a873df0c41 ("vhost: basic in order support")
-> > > > > > Cc: stable@vger.kernel.org
-> > > > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > > >
-> > > > > Wow that change really caused a lot of fallout.
-> > > > >
-> > > > > Thanks for the patch! Yet something to improve:
-> > > > >
-> > > > >
-> > > > > > ---
-> > > > > >  drivers/vhost/net.c   | 53 ++++++++++++++++++++++++++---------=
---------
-> > > > > >  drivers/vhost/vhost.c | 43 ++++++++++++++++++++++++-----------
-> > > > > >  drivers/vhost/vhost.h |  9 +++++++-
-> > > > > >  3 files changed, 70 insertions(+), 35 deletions(-)
-> > > > > >
-> > > > > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > > > > > index 35ded4330431..8f7f50acb6d6 100644
-> > > > > > --- a/drivers/vhost/net.c
-> > > > > > +++ b/drivers/vhost/net.c
-> > > > > > @@ -592,14 +592,15 @@ static void vhost_net_busy_poll(struct vh=
-ost_net *net,
-> > > > > >  static int vhost_net_tx_get_vq_desc(struct vhost_net *net,
-> > > > > >                                   struct vhost_net_virtqueue *t=
-nvq,
-> > > > > >                                   unsigned int *out_num, unsign=
-ed int *in_num,
-> > > > > > -                                 struct msghdr *msghdr, bool *=
-busyloop_intr)
-> > > > > > +                                 struct msghdr *msghdr, bool *=
-busyloop_intr,
-> > > > > > +                                 unsigned int *ndesc)
-> > > > > >  {
-> > > > > >       struct vhost_net_virtqueue *rnvq =3D &net->vqs[VHOST_NET_=
-VQ_RX];
-> > > > > >       struct vhost_virtqueue *rvq =3D &rnvq->vq;
-> > > > > >       struct vhost_virtqueue *tvq =3D &tnvq->vq;
-> > > > > >
-> > > > > > -     int r =3D vhost_get_vq_desc(tvq, tvq->iov, ARRAY_SIZE(tvq=
-->iov),
-> > > > > > -                               out_num, in_num, NULL, NULL);
-> > > > > > +     int r =3D vhost_get_vq_desc_n(tvq, tvq->iov, ARRAY_SIZE(t=
-vq->iov),
-> > > > > > +                                 out_num, in_num, NULL, NULL, =
-ndesc);
-> > > > > >
-> > > > > >       if (r =3D=3D tvq->num && tvq->busyloop_timeout) {
-> > > > > >               /* Flush batched packets first */
-> > > > > > @@ -610,8 +611,8 @@ static int vhost_net_tx_get_vq_desc(struct =
-vhost_net *net,
-> > > > > >
-> > > > > >               vhost_net_busy_poll(net, rvq, tvq, busyloop_intr,=
- false);
-> > > > > >
-> > > > > > -             r =3D vhost_get_vq_desc(tvq, tvq->iov, ARRAY_SIZE=
-(tvq->iov),
-> > > > > > -                                   out_num, in_num, NULL, NULL=
-);
-> > > > > > +             r =3D vhost_get_vq_desc_n(tvq, tvq->iov, ARRAY_SI=
-ZE(tvq->iov),
-> > > > > > +                                     out_num, in_num, NULL, NU=
-LL, ndesc);
-> > > > > >       }
-> > > > > >
-> > > > > >       return r;
-> > > > > > @@ -642,12 +643,14 @@ static int get_tx_bufs(struct vhost_net *=
-net,
-> > > > > >                      struct vhost_net_virtqueue *nvq,
-> > > > > >                      struct msghdr *msg,
-> > > > > >                      unsigned int *out, unsigned int *in,
-> > > > > > -                    size_t *len, bool *busyloop_intr)
-> > > > > > +                    size_t *len, bool *busyloop_intr,
-> > > > > > +                    unsigned int *ndesc)
-> > > > > >  {
-> > > > > >       struct vhost_virtqueue *vq =3D &nvq->vq;
-> > > > > >       int ret;
-> > > > > >
-> > > > > > -     ret =3D vhost_net_tx_get_vq_desc(net, nvq, out, in, msg, =
-busyloop_intr);
-> > > > > > +     ret =3D vhost_net_tx_get_vq_desc(net, nvq, out, in, msg,
-> > > > > > +                                    busyloop_intr, ndesc);
-> > > > > >
-> > > > > >       if (ret < 0 || ret =3D=3D vq->num)
-> > > > > >               return ret;
-> > > > > > @@ -766,6 +769,7 @@ static void handle_tx_copy(struct vhost_net=
- *net, struct socket *sock)
-> > > > > >       int sent_pkts =3D 0;
-> > > > > >       bool sock_can_batch =3D (sock->sk->sk_sndbuf =3D=3D INT_M=
-AX);
-> > > > > >       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER=
-);
-> > > > > > +     unsigned int ndesc =3D 0;
-> > > > > >
-> > > > > >       do {
-> > > > > >               bool busyloop_intr =3D false;
-> > > > > > @@ -774,7 +778,7 @@ static void handle_tx_copy(struct vhost_net=
- *net, struct socket *sock)
-> > > > > >                       vhost_tx_batch(net, nvq, sock, &msg);
-> > > > > >
-> > > > > >               head =3D get_tx_bufs(net, nvq, &msg, &out, &in, &=
-len,
-> > > > > > -                                &busyloop_intr);
-> > > > > > +                                &busyloop_intr, &ndesc);
-> > > > > >               /* On error, stop handling until the next kick. *=
-/
-> > > > > >               if (unlikely(head < 0))
-> > > > > >                       break;
-> > > > > > @@ -806,7 +810,7 @@ static void handle_tx_copy(struct vhost_net=
- *net, struct socket *sock)
-> > > > > >                               goto done;
-> > > > > >                       } else if (unlikely(err !=3D -ENOSPC)) {
-> > > > > >                               vhost_tx_batch(net, nvq, sock, &m=
-sg);
-> > > > > > -                             vhost_discard_vq_desc(vq, 1);
-> > > > > > +                             vhost_discard_vq_desc(vq, 1, ndes=
-c);
-> > > > > >                               vhost_net_enable_vq(net, vq);
-> > > > > >                               break;
-> > > > > >                       }
-> > > > > > @@ -829,7 +833,7 @@ static void handle_tx_copy(struct vhost_net=
- *net, struct socket *sock)
-> > > > > >               err =3D sock->ops->sendmsg(sock, &msg, len);
-> > > > > >               if (unlikely(err < 0)) {
-> > > > > >                       if (err =3D=3D -EAGAIN || err =3D=3D -ENO=
-MEM || err =3D=3D -ENOBUFS) {
-> > > > > > -                             vhost_discard_vq_desc(vq, 1);
-> > > > > > +                             vhost_discard_vq_desc(vq, 1, ndes=
-c);
-> > > > > >                               vhost_net_enable_vq(net, vq);
-> > > > > >                               break;
-> > > > > >                       }
-> > > > > > @@ -868,6 +872,7 @@ static void handle_tx_zerocopy(struct vhost=
-_net *net, struct socket *sock)
-> > > > > >       int err;
-> > > > > >       struct vhost_net_ubuf_ref *ubufs;
-> > > > > >       struct ubuf_info_msgzc *ubuf;
-> > > > > > +     unsigned int ndesc =3D 0;
-> > > > > >       bool zcopy_used;
-> > > > > >       int sent_pkts =3D 0;
-> > > > > >
-> > > > > > @@ -879,7 +884,7 @@ static void handle_tx_zerocopy(struct vhost=
-_net *net, struct socket *sock)
-> > > > > >
-> > > > > >               busyloop_intr =3D false;
-> > > > > >               head =3D get_tx_bufs(net, nvq, &msg, &out, &in, &=
-len,
-> > > > > > -                                &busyloop_intr);
-> > > > > > +                                &busyloop_intr, &ndesc);
-> > > > > >               /* On error, stop handling until the next kick. *=
-/
-> > > > > >               if (unlikely(head < 0))
-> > > > > >                       break;
-> > > > > > @@ -941,7 +946,7 @@ static void handle_tx_zerocopy(struct vhost=
-_net *net, struct socket *sock)
-> > > > > >                                       vq->heads[ubuf->desc].len=
- =3D VHOST_DMA_DONE_LEN;
-> > > > > >                       }
-> > > > > >                       if (retry) {
-> > > > > > -                             vhost_discard_vq_desc(vq, 1);
-> > > > > > +                             vhost_discard_vq_desc(vq, 1, ndes=
-c);
-> > > > > >                               vhost_net_enable_vq(net, vq);
-> > > > > >                               break;
-> > > > > >                       }
-> > > > > > @@ -1045,11 +1050,12 @@ static int get_rx_bufs(struct vhost_net=
-_virtqueue *nvq,
-> > > > > >                      unsigned *iovcount,
-> > > > > >                      struct vhost_log *log,
-> > > > > >                      unsigned *log_num,
-> > > > > > -                    unsigned int quota)
-> > > > > > +                    unsigned int quota,
-> > > > > > +                    unsigned int *ndesc)
-> > > > > >  {
-> > > > > >       struct vhost_virtqueue *vq =3D &nvq->vq;
-> > > > > >       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER=
-);
-> > > > > > -     unsigned int out, in;
-> > > > > > +     unsigned int out, in, desc_num, n =3D 0;
-> > > > > >       int seg =3D 0;
-> > > > > >       int headcount =3D 0;
-> > > > > >       unsigned d;
-> > > > > > @@ -1064,9 +1070,9 @@ static int get_rx_bufs(struct vhost_net_v=
-irtqueue *nvq,
-> > > > > >                       r =3D -ENOBUFS;
-> > > > > >                       goto err;
-> > > > > >               }
-> > > > > > -             r =3D vhost_get_vq_desc(vq, vq->iov + seg,
-> > > > > > -                                   ARRAY_SIZE(vq->iov) - seg, =
-&out,
-> > > > > > -                                   &in, log, log_num);
-> > > > > > +             r =3D vhost_get_vq_desc_n(vq, vq->iov + seg,
-> > > > > > +                                     ARRAY_SIZE(vq->iov) - seg=
-, &out,
-> > > > > > +                                     &in, log, log_num, &desc_=
-num);
-> > > > > >               if (unlikely(r < 0))
-> > > > > >                       goto err;
-> > > > > >
-> > > > > > @@ -1093,6 +1099,7 @@ static int get_rx_bufs(struct vhost_net_v=
-irtqueue *nvq,
-> > > > > >               ++headcount;
-> > > > > >               datalen -=3D len;
-> > > > > >               seg +=3D in;
-> > > > > > +             n +=3D desc_num;
-> > > > > >       }
-> > > > > >
-> > > > > >       *iovcount =3D seg;
-> > > > > > @@ -1113,9 +1120,11 @@ static int get_rx_bufs(struct vhost_net_=
-virtqueue *nvq,
-> > > > > >               nheads[0] =3D headcount;
-> > > > > >       }
-> > > > > >
-> > > > > > +     *ndesc =3D n;
-> > > > > > +
-> > > > > >       return headcount;
-> > > > > >  err:
-> > > > > > -     vhost_discard_vq_desc(vq, headcount);
-> > > > > > +     vhost_discard_vq_desc(vq, headcount, n);
-> > > > >
-> > > > > So here ndesc and n are the same, but below in vhost_discard_vq_d=
-esc
-> > > > > they are different. Fun.
-> > > >
-> > > > Not necessarily the same, a buffer could contain more than 1 descri=
-ptor.
-> > >
-> > >
-> > > *ndesc =3D n kinda guarantees it's the same, no?
-> >
-> > I misread your comment, in the error path the ndesc is left unused.
->
->
->
->
-> > Would this be a problem?
-> > >
-> > > > >
-> > > > > >       return r;
-> > > > > >  }
-> > > > > >
-> > > > > > @@ -1151,6 +1160,7 @@ static void handle_rx(struct vhost_net *n=
-et)
-> > > > > >       struct iov_iter fixup;
-> > > > > >       __virtio16 num_buffers;
-> > > > > >       int recv_pkts =3D 0;
-> > > > > > +     unsigned int ndesc;
-> > > > > >
-> > > > > >       mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
-> > > > > >       sock =3D vhost_vq_get_backend(vq);
-> > > > > > @@ -1182,7 +1192,8 @@ static void handle_rx(struct vhost_net *n=
-et)
-> > > > > >               headcount =3D get_rx_bufs(nvq, vq->heads + count,
-> > > > > >                                       vq->nheads + count,
-> > > > > >                                       vhost_len, &in, vq_log, &=
-log,
-> > > > > > -                                     likely(mergeable) ? UIO_M=
-AXIOV : 1);
-> > > > > > +                                     likely(mergeable) ? UIO_M=
-AXIOV : 1,
-> > > > > > +                                     &ndesc);
-> > > > > >               /* On error, stop handling until the next kick. *=
-/
-> > > > > >               if (unlikely(headcount < 0))
-> > > > > >                       goto out;
-> > > > > > @@ -1228,7 +1239,7 @@ static void handle_rx(struct vhost_net *n=
-et)
-> > > > > >               if (unlikely(err !=3D sock_len)) {
-> > > > > >                       pr_debug("Discarded rx packet: "
-> > > > > >                                " len %d, expected %zd\n", err, =
-sock_len);
-> > > > > > -                     vhost_discard_vq_desc(vq, headcount);
-> > > > > > +                     vhost_discard_vq_desc(vq, headcount, ndes=
-c);
-> > > > > >                       continue;
-> > > > > >               }
-> > > > > >               /* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NE=
-T_HDR */
-> > > > > > @@ -1252,7 +1263,7 @@ static void handle_rx(struct vhost_net *n=
-et)
-> > > > > >                   copy_to_iter(&num_buffers, sizeof num_buffers=
-,
-> > > > > >                                &fixup) !=3D sizeof num_buffers)=
- {
-> > > > > >                       vq_err(vq, "Failed num_buffers write");
-> > > > > > -                     vhost_discard_vq_desc(vq, headcount);
-> > > > > > +                     vhost_discard_vq_desc(vq, headcount, ndes=
-c);
-> > > > > >                       goto out;
-> > > > > >               }
-> > > > > >               nvq->done_idx +=3D headcount;
-> > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > > > > index 8570fdf2e14a..b56568807588 100644
-> > > > > > --- a/drivers/vhost/vhost.c
-> > > > > > +++ b/drivers/vhost/vhost.c
-> > > > > > @@ -2792,18 +2792,11 @@ static int get_indirect(struct vhost_vi=
-rtqueue *vq,
-> > > > > >       return 0;
-> > > > > >  }
-> > > > > >
-> > > > > > -/* This looks in the virtqueue and for the first available buf=
-fer, and converts
-> > > > > > - * it to an iovec for convenient access.  Since descriptors co=
-nsist of some
-> > > > > > - * number of output then some number of input descriptors, it'=
-s actually two
-> > > > > > - * iovecs, but we pack them into one and note how many of each=
- there were.
-> > > > > > - *
-> > > > > > - * This function returns the descriptor number found, or vq->n=
-um (which is
-> > > > > > - * never a valid descriptor number) if none was found.  A nega=
-tive code is
-> > > > > > - * returned on error. */
-> > > > >
-> > > > > A new module API with no docs at all is not good.
-> > > > > Please add documentation to this one. vhost_get_vq_desc
-> > > > > is a subset and could refer to it.
-> > > >
-> > > > Fixed.
-> > > >
-> > > > >
-> > > > > > -int vhost_get_vq_desc(struct vhost_virtqueue *vq,
-> > > > > > -                   struct iovec iov[], unsigned int iov_size,
-> > > > > > -                   unsigned int *out_num, unsigned int *in_num=
-,
-> > > > > > -                   struct vhost_log *log, unsigned int *log_nu=
-m)
-> > > > > > +int vhost_get_vq_desc_n(struct vhost_virtqueue *vq,
-> > > > > > +                     struct iovec iov[], unsigned int iov_size=
-,
-> > > > > > +                     unsigned int *out_num, unsigned int *in_n=
-um,
-> > > > > > +                     struct vhost_log *log, unsigned int *log_=
-num,
-> > > > > > +                     unsigned int *ndesc)
-> > > > >
-> > > > > >  {
-> > > > > >       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER=
-);
-> > > > > >       struct vring_desc desc;
-> > > > > > @@ -2921,16 +2914,40 @@ int vhost_get_vq_desc(struct vhost_virt=
-queue *vq,
-> > > > > >       vq->last_avail_idx++;
-> > > > > >       vq->next_avail_head +=3D c;
-> > > > > >
-> > > > > > +     if (ndesc)
-> > > > > > +             *ndesc =3D c;
-> > > > > > +
-> > > > > >       /* Assume notifications from guest are disabled at this p=
-oint,
-> > > > > >        * if they aren't we would need to update avail_event ind=
-ex. */
-> > > > > >       BUG_ON(!(vq->used_flags & VRING_USED_F_NO_NOTIFY));
-> > > > > >       return head;
-> > > > > >  }
-> > > > > > +EXPORT_SYMBOL_GPL(vhost_get_vq_desc_n);
-> > > > > > +
-> > > > > > +/* This looks in the virtqueue and for the first available buf=
-fer, and converts
-> > > > > > + * it to an iovec for convenient access.  Since descriptors co=
-nsist of some
-> > > > > > + * number of output then some number of input descriptors, it'=
-s actually two
-> > > > > > + * iovecs, but we pack them into one and note how many of each=
- there were.
-> > > > > > + *
-> > > > > > + * This function returns the descriptor number found, or vq->n=
-um (which is
-> > > > > > + * never a valid descriptor number) if none was found.  A nega=
-tive code is
-> > > > > > + * returned on error.
-> > > > > > + */
-> > > > > > +int vhost_get_vq_desc(struct vhost_virtqueue *vq,
-> > > > > > +                   struct iovec iov[], unsigned int iov_size,
-> > > > > > +                   unsigned int *out_num, unsigned int *in_num=
-,
-> > > > > > +                   struct vhost_log *log, unsigned int *log_nu=
-m)
-> > > > > > +{
-> > > > > > +     return vhost_get_vq_desc_n(vq, iov, iov_size, out_num, in=
-_num,
-> > > > > > +                                log, log_num, NULL);
-> > > > > > +}
-> > > > > >  EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
-> > > > > >
-> > > > > >  /* Reverse the effect of vhost_get_vq_desc. Useful for error h=
-andling. */
-> > > > > > -void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
-> > > > > > +void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n,
-> > > > > > +                        unsigned int ndesc)
-> > > > >
-> > > > > ndesc is number of descriptors? And n is what, in that case?
-> > > >
-> > > > The semantic of n is not changed which is the number of buffers, nd=
-esc
-> > > > is the number of descriptors.
-> > >
-> > > History is not that relevant. To make the core readable pls
-> > > change the names to readable ones.
-> > >
-> > > Specifically n is really nbufs, maybe?
-> >
-> > Right.
-> >
-> > Thanks
->
-> All I am asking for is that in the API the parameter is named in a way
-> that makes it clear what it is counting.
->
-> vhost_get_vq_desc_n is the function you want to document, making it
-> clear what is returned in ndesc and how it's different from the return
-> value.
+Hi Paolo,
 
-Will do.
+Apologies if this causes any inconvenience.
 
-Thanks
+Would you consider this patchset? It resolves several QEMU AMD vPMU issues, and
+each patch has received a Reviewed-by from at least two reviewers.
 
->
->
->
-> --
-> MST
->
+Thank you very much!
+
+Dongli Zhang
+
+On 11/10/25 10:14 PM, Dongli Zhang wrote:
+> This patchset addresses four bugs related to AMD PMU virtualization.
+> 
+> 1. The PerfMonV2 is still available if PERCORE if disabled via
+> "-cpu host,-perfctr-core".
+> 
+> 2. The VM 'cpuid' command still returns PERFCORE although "-pmu" is
+> configured.
+> 
+> 3. The third issue is that using "-cpu host,-pmu" does not disable AMD PMU
+> virtualization. When using "-cpu EPYC" or "-cpu host,-pmu", AMD PMU
+> virtualization remains enabled. On the VM's Linux side, you might still
+> see:
+> 
+> [    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
+> 
+> instead of:
+> 
+> [    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
+> [    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
+> 
+> To address this, KVM_CAP_PMU_CAPABILITY is used to set KVM_PMU_CAP_DISABLE
+> when "-pmu" is configured.
+> 
+> 4. The fourth issue is that unreclaimed performance events (after a QEMU
+> system_reset) in KVM may cause random, unwanted, or unknown NMIs to be
+> injected into the VM.
+> 
+> The AMD PMU registers are not reset during QEMU system_reset.
+> 
+> (1) If the VM is reset (e.g., via QEMU system_reset or VM kdump/kexec) while
+> running "perf top", the PMU registers are not disabled properly.
+> 
+> (2) Despite x86_cpu_reset() resetting many registers to zero, kvm_put_msrs()
+> does not handle AMD PMU registers, causing some PMU events to remain
+> enabled in KVM.
+> 
+> (3) The KVM kvm_pmc_speculative_in_use() function consistently returns true,
+> preventing the reclamation of these events. Consequently, the
+> kvm_pmc->perf_event remains active.
+> 
+> (4) After a reboot, the VM kernel may report the following error:
+> 
+> [    0.092011] Performance Events: Fam17h+ core perfctr, Broken BIOS detected, complain to your hardware vendor.
+> [    0.092023] [Firmware Bug]: the BIOS has corrupted hw-PMU resources (MSR c0010200 is 530076)
+> 
+> (5) In the worst case, the active kvm_pmc->perf_event may inject unknown
+> NMIs randomly into the VM kernel:
+> 
+> [...] Uhhuh. NMI received for unknown reason 30 on CPU 0.
+> 
+> To resolve these issues, we propose resetting AMD PMU registers during the
+> VM reset process
+> 
+> 
+> Changed since v1:
+>   - Use feature_dependencies for CPUID_EXT3_PERFCORE and
+>     CPUID_8000_0022_EAX_PERFMON_V2.
+>   - Remove CPUID_EXT3_PERFCORE when !cpu->enable_pmu.
+>   - Pick kvm_arch_pre_create_vcpu() patch from Xiaoyao Li.
+>   - Use "-pmu" but not a global "pmu-cap-disabled" for KVM_PMU_CAP_DISABLE.
+>   - Also use sysfs kvm.enable_pmu=N to determine if PMU is supported.
+>   - Some changes to PMU register limit calculation.
+> Changed since v2:
+>   - Change has_pmu_cap to pmu_cap.
+>   - Use cpuid_find_entry() instead of cpu_x86_cpuid().
+>   - Rework the code flow of PATCH 07 related to kvm.enable_pmu=N following
+>     Zhao's suggestion.
+>   - Use object_property_get_int() to get CPU family.
+>   - Add support to Zhaoxin.
+> Changed since v3:
+>   - Re-base on top of Zhao's queued patch.
+>   - Use host_cpu_vendor_fms() from Zhao's patch.
+>   - Pick new version of kvm_arch_pre_create_vcpu() patch from Xiaoyao.
+>   - Re-split the cases into enable_pmu and !enable_pmu, following Zhao's
+>     suggestion.
+>   - Check AMD directly makes the "compat" rule clear.
+>   - Some changes on commit message and comment.
+>   - Bring back global static variable 'kvm_pmu_disabled' read from
+>     /sys/module/kvm/parameters/enable_pmu.
+> Changed since v4:
+>   - Re-base on top of most recent mainline QEMU.
+>   - Add more Reviewed-by.
+>   - All patches are reviewed.
+> Changed since v5:
+>   - Re-base on top of most recent mainline QEMU.
+>   - Remove patch "kvm: Introduce kvm_arch_pre_create_vcpu()" as it is
+>     already merged.
+>   - To resolve conflicts in new [PATCH v6 3/9] , move the PMU related code
+>     before the call site of is_tdx_vm().
+> Changed since v6:
+>   - Re-base on top of most recent mainline QEMU (staging branch).
+>   - Add more Reviewed-by from Dapeng and Sandipan.
+> 
+> 
+> Dongli Zhang (9):
+>   target/i386: disable PerfMonV2 when PERFCORE unavailable
+>   target/i386: disable PERFCORE when "-pmu" is configured
+>   target/i386/kvm: set KVM_PMU_CAP_DISABLE if "-pmu" is configured
+>   target/i386/kvm: extract unrelated code out of kvm_x86_build_cpuid()
+>   target/i386/kvm: rename architectural PMU variables
+>   target/i386/kvm: query kvm.enable_pmu parameter
+>   target/i386/kvm: reset AMD PMU registers during VM reset
+>   target/i386/kvm: support perfmon-v2 for reset
+>   target/i386/kvm: don't stop Intel PMU counters
+> 
+>  target/i386/cpu.c     |   8 +
+>  target/i386/cpu.h     |  16 ++
+>  target/i386/kvm/kvm.c | 355 +++++++++++++++++++++++++++++++++++++++------
+>  3 files changed, 332 insertions(+), 47 deletions(-)
+> 
+> branch: remotes/origin/staging
+> base-commit: 593aee5df98b4a862ff8841a57ea3dbf22131a5f
+> 
+> Thank you very much!
+> 
+> Dongli Zhang
+> 
+> 
 
 
