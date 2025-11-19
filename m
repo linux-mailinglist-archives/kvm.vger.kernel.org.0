@@ -1,184 +1,177 @@
-Return-Path: <kvm+bounces-63698-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63697-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD758C6E1F6
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 12:05:43 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44831C6E270
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 12:10:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id D165A2E28B
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 11:05:42 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4CA14352CA6
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 11:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4FE3538A5;
-	Wed, 19 Nov 2025 11:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D74C352F82;
+	Wed, 19 Nov 2025 11:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XAxaz9si";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="a34AVZsN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QqbYJs9W";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="uEVn1Wcs"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358B2352FA2
-	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 11:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5A7350A0A
+	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 11:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763550283; cv=none; b=Dq6rKK4j7mel7ZlkQXzHYZ1Ml1emiNWBoUg9zmODNM49i3ZK3ys5Ic8mg/a6KcvFXcDzE3UksK2ROXjZxELUqn1fD6hGE03p5KW2gxpOFqz62buUCleWszc4Guga4khuxqH4t6gFqyK7wuW+x5WbMEKhXFVulg/68TduVZ1KxCI=
+	t=1763550261; cv=none; b=aTvcTiSs4pgKrgFIIFdVNBJ9Ip6X/8Pm/qIEfmvoH46X9jKmdv6pBeeo0iHZxv/KZPqau5k7+EDQYAGdhZPgHnRgNL7dORyDA+9GwsOS/iARx6OAKMP3ayn1MkKsiYajZ3roC/yNECUmHFyovZppEdNWoTzF/3L6z5nYlLo02Cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763550283; c=relaxed/simple;
-	bh=QJRpxNJ6nM55oUProzvGLMXrymnGB0HzC7vMJLxqOVg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uCYxBxJSIrs5YGNJYL4BMo4HOJA3eaRBkGX5vMH1rAVCbxUpBp0jK+DmAYHdS46kJixNpileuPH2IKbSHVkLaoPxfaLfaH1+j5SZ5sJJo12QzR/3LO2ttC4sjaYEAJ2o2gzxV5Qq5hr+N9ityltQNf1QRoo7HjmR4JTIItjgEC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XAxaz9si; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=a34AVZsN; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1763550261; c=relaxed/simple;
+	bh=Or/iFwMt+BMeSO1coYhZawNSolBDuL6LbxtDXCET8WI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hcAZ+h1UBM9OV7sZL82ETmbNHyq46sCv+GUwGKgkM0YBOEoYe5Y/6mGSQWbvAnT7OFtKiMy/yzqyVEdyj8hF45zbwvZmVuuHxCsIZF4VlpfV/DWYD6Z154twOhXASa+wdFoRDj68xg29qH7/SDFBaVPc1jw595xJ8ZaNkNY69EE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QqbYJs9W; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=uEVn1Wcs; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763550280;
+	s=mimecast20190719; t=1763550257;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=42XSTDD+Tw2WVGrVsFAsxHT5sZ/yd8/fKSBACD6leIQ=;
-	b=XAxaz9siEu3dufMJtmuP2Lkb8OtZenxaH9Ko5MrLjkpsJNqwEpli5c/qSu5vUW5ZFqRrKR
-	z7IcJvqDdtkpB/S0pmp8ejyHHLH9Nrte5J03RX7sgcx69Lrrb8Mm9NiJMby06Nj7gu1tXT
-	fQIIl68vG83Bjh5SNp1xy8IP2ATt9k8=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=vKuBd2HW8nRsL/d/yhqkB0zqQvQiI6NwLHvu1csy0yA=;
+	b=QqbYJs9WyPur5F6SVXW39FmkvRxqjh2CM3mEN8+7L2gOsbr0Pj3L0MvqTRw/XX3rbCwZJd
+	FXYNt3OxXhnmtDmFprqfBlVisAP6yDdkxR0VB/RdpkxZzd33TtfdiFbYn9Nf2cgiDd+6X9
+	S3ijME4kkGK2hBPlfg3xJXT/KzHMSo8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-660-hi5u9ncuOj-yZwyulBh7Ag-1; Wed, 19 Nov 2025 06:04:38 -0500
-X-MC-Unique: hi5u9ncuOj-yZwyulBh7Ag-1
-X-Mimecast-MFC-AGG-ID: hi5u9ncuOj-yZwyulBh7Ag_1763550278
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-8824292911cso17070896d6.1
-        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 03:04:38 -0800 (PST)
+ us-mta-353-Y_vYN0GJO1ivfrdIUhnYog-1; Wed, 19 Nov 2025 06:04:16 -0500
+X-MC-Unique: Y_vYN0GJO1ivfrdIUhnYog-1
+X-Mimecast-MFC-AGG-ID: Y_vYN0GJO1ivfrdIUhnYog_1763550255
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42b56125e77so3345690f8f.3
+        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 03:04:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763550278; x=1764155078; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=42XSTDD+Tw2WVGrVsFAsxHT5sZ/yd8/fKSBACD6leIQ=;
-        b=a34AVZsNXjM+XWUSGb+JUGfhIezMxetxPfQJ0LdxM7JD1Gl+NCL5TmaahNwA3W51ns
-         /EaCg9C+LnFwmXWUyuQ2u/ddDQZ3Y+1dHaj4amrNQcxJQ/ky7nJeUoGMTAsHdzvbLFpy
-         t5TW7is2qMykSe024ldj23RxSkrKEUx3Bjrz7O54avbzCBWBc5JsMGjG7C4XNsARb1S1
-         OeM7bIuYZlkofsxLfG2rrWrWyGuHCPSGYysxJtoijUYtYMupPQTXmtvRl9VwLAsga2CY
-         HZTki6YU50vGVV/0wYNFdWStCDWEzzWEnY/ZaJHzuontkR7MRF3EcBhKTaExzUV08q6C
-         wZoQ==
+        d=redhat.com; s=google; t=1763550255; x=1764155055; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vKuBd2HW8nRsL/d/yhqkB0zqQvQiI6NwLHvu1csy0yA=;
+        b=uEVn1WcsaTqMiRrKNZiy6NqgGLAEyAQeKJKvxdH9sw7zKLmC7HJuLg6Ihu0MPLA/A+
+         S34IHb1FSNSZo1sH6oQ7iFK60B0HkN7x0qXzxwPuNHzU3h/fkpXMss6fUSW20zTWR2ss
+         XGyQUfKd7i7aJrVm7r853a3oGjbTRcj9BrLUQA0dn1OhqRTCnIB2ZwB0mkAc6/9N7hxQ
+         wDaxlXSZQJ8DeDvcbrJXXP/+kFXqB2UFhx7rwii40Rf9+mZ7jJ5RpYLMxqVyvNnK4Y1M
+         s5kOV9y1MaqyqZ2mSVhVq6F9miKPhLuY5Y0hJrX21ViM/fgdmmlS6X0xYf/L4XfI0+qZ
+         FvbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763550278; x=1764155078;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=42XSTDD+Tw2WVGrVsFAsxHT5sZ/yd8/fKSBACD6leIQ=;
-        b=qtNpJFvSqbbRsWjSAxhQvvDGI5XGxAZ1AUlqBujDh44CMBsyCqK3r1/tNwZg9NNJgX
-         LD/Gg7xgmvyn9b2owTPyIRNLeVkg9TseSBsVTFoRNg+pLILxF1gDF9GOLSXJJyWw5RGe
-         yG+JCSMiAEYMl0o9SYmIeDAGjsIIJzzGLCaOAedAocjZ9rZOwHTXKA81nkRx2QD2eftW
-         pa50+S0wnc2Y7TpHoBNE3FtpDivf1QQGwDMG6zgn67huljpOef60+ND0SnFQe7fsRRig
-         cA+hZj7SO2P7XMCdtGFNW24ABBXRqcu9vq/Tx3g2iv6QPkgIAeNwZUydJG4C5krH/Fp+
-         BuAA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpmlMxq7MvCFZohpqsodn1VHa+6sAFrg87FG5t+0JnEOFhMHW81HKly0hFnCYiuwPPOHY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzjt5xApr6f65W8Bj683zUcHluXtVFQ/1m4Df30x9O4/6l0h7XS
-	zGBtXQh/Cbq1jHqtweXpeq9adsleYiWq7vg6R623q9sZgMRiI8WbFnA5AY3RD0TktDtANrLYX5j
-	G9Pv4fVfRNrZAo7ARoeVXCMH+HiKfxXHRsiui6EQUcLoGmRd2i0eQCA==
-X-Gm-Gg: ASbGncudlWajqfgjB26cfQ2gXRJQ8Ac4fHs+rzLTn3GYYtR1aTEpODRHBxRvEHvQxou
-	AI6+9Cwl3CnJILoKaTozIU28b2OYZBKMhyAAUN+nG8vUr87WDhh2RBOkzvFz3GOiJU9Gz50cJGe
-	IW8DFdzYFVJ0nbt0WZtfhx/zUhtgMB0FZDsC2NsuwunpJbsQopJgpXDayF5N+mzOR8QBubZZ7GM
-	gLAa8dXaww+OkVeLD7TY1zF9iSXS8ouj+XK3aFs9ejNRHxSs9GIhHlhqzQQui0wA3AIv+hpGNv5
-	r3B/Ssymu8K56l7ibQG7qpLCzz6OyNc7tpf+MFJA5t1NXOTjHorezgr6JCP5jEhsmMieiUGNX9l
-	518Wq+l0tB9HWoXrYBUcQC2s6AxZ6DxVSAcByIqYEl8rrlPdH05xEyFFyCr/njA==
-X-Received: by 2002:a05:6214:5e88:b0:882:760e:822e with SMTP id 6a1803df08f44-8845ffd1671mr19255846d6.2.1763550278371;
-        Wed, 19 Nov 2025 03:04:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGUx18S7QU3TAKJCuch0iU57e5cRCXq8XDSG2cx+/NGC5m+qevE8BVa0OMVsBGaSQSjDNVFOQ==
-X-Received: by 2002:a05:6214:5e88:b0:882:760e:822e with SMTP id 6a1803df08f44-8845ffd1671mr19255436d6.2.1763550277970;
-        Wed, 19 Nov 2025 03:04:37 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8828613962esm132823926d6.0.2025.11.19.03.04.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 03:04:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763550255; x=1764155055;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vKuBd2HW8nRsL/d/yhqkB0zqQvQiI6NwLHvu1csy0yA=;
+        b=E0uwGhWvb7iHJe/F2gbEVtmOM0h8hExF5WW1Ef4925xVh1xVe47gj+GwIj9Z41axv7
+         hA3erxkGkLk9TGtODVUGPzUse5typoqhMAmLPtqIkuHwrkprDNG8ltByZ1RHC2vBMK3w
+         7QIOpgMBwt17uV2IxoCQ/g0lV/y6kycCrUoiqGYRhnYxV55q6+4cxJSN+Kt1994Xm4qK
+         7HT65yOcVHdI+pZ95yrOi3n/4QyaBiFv067e08zCiK4gtLgTvawuAVOCbUOtwjXTlxWN
+         brPMJItVIV4Jwf98LUEbwyVr4ghA0SfEdcOaL2+D4jkI872GuoEqznZJakXLfckBlaT0
+         dQkA==
+X-Forwarded-Encrypted: i=1; AJvYcCWxj++iVvtApDKVOQKK3lF2nlHI4vtMfi6VobY6cJw5VMNZuw/72CQ0EEiMmOTH1HYfJFQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfJIZsS4h9UIJp93UuVivQsxAR7rfgL/r3hqLJxRNSYdBK/Egi
+	hqo05HyDuit1Rzx3q3mHtBMt0OVZBWOD9FW+z4DLdrggRlmFlLNYsKm+9XnhePMZKJADbw4hzJN
+	RfOlebu+Dktwa7fMhAZhZpFah5HugAbbRg/ssRYlgDSySzEYJ459BqQ==
+X-Gm-Gg: ASbGnct8qX3jDlp43s0YRiDmYYB+F5PoSCZYckSphsEmZc0zfZWi4VXjkEgSwg/UOQn
+	tWkrRpTg03OEtbXULjTjO53O6tzFiNod9PBZnTX2ARhTS9My/irBA/KFPIKOjz1Vn7PNjV7rpU1
+	ZyvpmCmg2GSuJwc42KqEXLKiSlatlxRzfym2AL5of1v2lqjWnB1P+CUSYYcwoZcqhciK/KwaPcD
+	DJN/fZnYioSKh7oEhi9SrTpAhXd+2ZLhk2fQdqptIfhqCqbv42+EY8KLrzyix1yiF/HLL79bz5+
+	SEhrH+nCVNY17g3FnFUsmaFL7aLbDc2JJIqgrc5rLn/1hhp2RRluBdm709IrduIEEuD9oCbylyZ
+	RFjEgr6J8ILE0
+X-Received: by 2002:a05:6000:1ac9:b0:42b:2e65:655e with SMTP id ffacd0b85a97d-42b5935a880mr17671088f8f.27.1763550255264;
+        Wed, 19 Nov 2025 03:04:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHnOndlVgs3mj8Ki0CtCTtbt0/DkKKE/b2cx4wA0ZToqoDYX1G7zSXdvoOnOMWxyBTwFXC8VQ==
+X-Received: by 2002:a05:6000:1ac9:b0:42b:2e65:655e with SMTP id ffacd0b85a97d-42b5935a880mr17671049f8f.27.1763550254851;
+        Wed, 19 Nov 2025 03:04:14 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.41])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e84a4fsm37236036f8f.11.2025.11.19.03.04.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Nov 2025 03:04:14 -0800 (PST)
+Message-ID: <4204ed4b-0da1-407f-84e0-e23e2ce65fc7@redhat.com>
 Date: Wed, 19 Nov 2025 12:04:12 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v10 03/11] vsock: reject bad
- VSOCK_NET_MODE_LOCAL configuration for G2H
-Message-ID: <tfrb7l3cguctjl5jbd7ykon4aqav4ognxndtnohs7ukmvk7wkm@tpaaicknwwhq>
-References: <20251117-vsock-vmtest-v10-0-df08f165bf3e@meta.com>
- <20251117-vsock-vmtest-v10-3-df08f165bf3e@meta.com>
- <vsyzveqyufaquwx3xgahsh3stb6i5u3xa4kubpvesfzcuj6dry@sn4kx5ctgpbz>
- <aR0arw2F/DmbIrzY@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <aR0arw2F/DmbIrzY@devvm11784.nha0.facebook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 2/2] vhost: switch to arrays of feature bits
+To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Mike Christie <michael.christie@oracle.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
+References: <cover.1763535083.git.mst@redhat.com>
+ <fbf51913a243558ddfee96d129d37d570fa23946.1763535083.git.mst@redhat.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <fbf51913a243558ddfee96d129d37d570fa23946.1763535083.git.mst@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 18, 2025 at 05:17:35PM -0800, Bobby Eshleman wrote:
->On Tue, Nov 18, 2025 at 07:10:28PM +0100, Stefano Garzarella wrote:
->> On Mon, Nov 17, 2025 at 06:00:26PM -0800, Bobby Eshleman wrote:
->> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+On 11/19/25 7:55 AM, Michael S. Tsirkin wrote:
+> @@ -1720,6 +1720,7 @@ static long vhost_net_set_owner(struct vhost_net *n)
+>  static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+>  			    unsigned long arg)
+>  {
+> +	const DEFINE_VHOST_FEATURES_ARRAY(features_array, vhost_net_features);
 
-[...]
+I'm sorry for the late feedback, I was drowning in other stuff.
 
->> > diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
->> > index 7eccd6708d66..da7c52ad7b2a 100644
->> > --- a/net/vmw_vsock/vmci_transport.c
->> > +++ b/net/vmw_vsock/vmci_transport.c
->> > @@ -2033,6 +2033,12 @@ static u32 vmci_transport_get_local_cid(void)
->> > 	return vmci_get_context_id();
->> > }
->> >
->> > +static bool vmci_transport_supports_local_mode(void)
->> > +{
->> > +	/* Local mode is supported only when no device is present. */
->> > +	return vmci_transport_get_local_cid() == VMCI_INVALID_ID;
->>
->> IIRC vmci can be registered both as H2G and G2H, so should we filter out
->> the H2G case?
->
->In fact, I'm realizing now that this should probably just be:
->
->static bool vmci_transport_supports_local_mode(void)
->{
->	return false;
->}
->
->
->... because even for H2G there is no mechanism for attaching a namespace
->to a VM (unlike w/ vhost_vsock device open).
->
->Does that seem right?
+I have just a couple of non blocking suggestions, feel free to ignore.
 
-tl;dr   yes
+I think that if you rename `vhost_net_features` as
+`vhost_net_features_bits` and `features_array` as `vhost_net_features`
+the diffstat could be smaller and possibly clearer.
 
+>  	u64 all_features[VIRTIO_FEATURES_U64S];
+>  	struct vhost_net *n = f->private_data;
+>  	void __user *argp = (void __user *)arg;
+> @@ -1734,14 +1735,14 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+>  			return -EFAULT;
+>  		return vhost_net_set_backend(n, backend.index, backend.fd);
+>  	case VHOST_GET_FEATURES:
+> -		features = vhost_net_features[0];
+> +		features = VHOST_FEATURES_U64(vhost_net_features, 0);
 
-vmci_transport.c has MODULE_ALIAS_NETPROTO(PF_VSOCK) for historical 
-reasons. This means that the module is automatically loaded the first 
-time PF_VSOCK is requested by the user if af_vsock is not loaded.
+Here and below you could use directly:
 
-This was the case before vsock was generalized to support multiple 
-transports and has remained so for historical reasons.
+		features = features_array[0];
 
-So today, we can have that module loaded, registered only for F_DGRAM 
-but not registered for F_G2H and F_H2G, so maybe it could work for now 
-and if the H2G is also not supporting it, maybe is the right thing to 
-do. (with a better comment there on the reason why both G2H and H2G 
-doesn't support it).
+if you apply the rename mentioned above, this chunk and the following 3
+should not be needed.
 
-Sorry for the long reply, maybe just `yes` was fine, but I dumped what I 
-thought because I feel it might be useful to you.
+[...]> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> index 42c955a5b211..af727fccfe40 100644
+> --- a/drivers/vhost/test.c
+> +++ b/drivers/vhost/test.c
+> @@ -308,6 +308,12 @@ static long vhost_test_set_backend(struct vhost_test *n, unsigned index, int fd)
+>  	return r;
+>  }
+>  
+> +static const int vhost_test_features[] = {
+> +	VHOST_FEATURES
+> +};
+> +
+> +#define VHOST_TEST_FEATURES VHOST_FEATURES_U64(vhost_test_features, 0)
+
+If you rename `VHOST_FEATURES` to `VHOST_FEATURES_BITS` and
+`VHOST_TEST_FEATURES` to `VHOST_FEATURES`, the following two chunks
+should not be needed.
 
 Thanks,
-Stefano
+
+Paolo
 
 
