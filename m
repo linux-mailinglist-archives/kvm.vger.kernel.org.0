@@ -1,131 +1,185 @@
-Return-Path: <kvm+bounces-63718-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63719-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D76F4C6F131
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 14:56:23 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A56EC6F0C2
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 14:52:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DE10F349BE1
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 13:48:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 3FD8A2F00E
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 13:49:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940AB35F8CE;
-	Wed, 19 Nov 2025 13:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139C8364054;
+	Wed, 19 Nov 2025 13:48:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nWBoq1Bi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KA20TCoH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4C335E544
-	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 13:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C7A35FF6C;
+	Wed, 19 Nov 2025 13:48:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763560110; cv=none; b=jj/Y8M1hmPLGEJBH8Gk6dHs4hY1Q6uH5Wvgt4aVj9aRegKWR0GaFDUOWymx6Gw5d30vubDHuxXnIpWBh0cI6/NAatJadXMUVqMPhcXGO4vadngAb13PCdmaaRYPW3MKKOF6MAyMOe8lEQk/EYj6/2il3K7sCxBNfweA+nUqIOhw=
+	t=1763560122; cv=none; b=VD9p+uybpNwr/pZyTpcduXDajHXuEUcXq98C0/fGgCn7kCT9uEKyVnCexVpq+DKpr3hiQsGDic8JYH2mlqIk277SyG946o4FtzwHfdUYPjGmhsepTAM3bm+B/N8ippfJ4FNM9YWayTgnhSTEONQGQeM58lgC10cN3jDQwKCydVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763560110; c=relaxed/simple;
-	bh=dUZz/EGTXNyXTJb3zRKoJd5YmLpYLOqdOWG1Mal/clY=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=lR+DBv6N2Y2U9/It8+FjUjoZacnT9+avh+qFJ51p+G9uWAtfe6UL6hxTV3d8X5hSWC+haXAPCaQ9hRikUbsMqImdmE4wnYLLkUyUZhU+KwcVbsfD5Sk717e9VeqsI3plKPpAO89FnQ+ab7K/p4xgaGhOTEgvw1GA/n/7lIveWZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nWBoq1Bi; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-47798ded6fcso17322805e9.1
-        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 05:48:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763560107; x=1764164907; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dUZz/EGTXNyXTJb3zRKoJd5YmLpYLOqdOWG1Mal/clY=;
-        b=nWBoq1Bip1HXMWEwnLwcO2PNyZXrlnvUmsjW0xpZoKP/trXQq0gNV2SLFqop0iF4rC
-         WDfOdvMch3j9UL6yHA9vqWjJCHx8ga5m5OP2cOpl/4sY/UNw72EVHhAdKjgzOk4sWd0W
-         wEgPiDHraLmMbNCZ7iJ4z5N80d6K+sz8EqgRpdNuSE1raV/ivi6gNVGWks3i8mDfhqCk
-         QQbM+N8pKVmGfjPIsZy+xMrqRXbZT+UbIg7YIghjJw+QcS0PxG8qfhDAHPHOAZshX+h3
-         kmtT/h06gq3ORt3mzcaDb/cgDWddNZlJ7IOTS0iam4j0TBHgrsjj0zmcg3sR7Z5yY8zl
-         hEpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763560107; x=1764164907;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dUZz/EGTXNyXTJb3zRKoJd5YmLpYLOqdOWG1Mal/clY=;
-        b=flg5yckQFU1bP3B+Y1MsGnwy2l+8Seeryh/PH73Z1MWsjnO2hbpd5bspM3y7vyJ+/7
-         KS0lrr/Ft+qHbe+E6nuwtdMcxrtNP+UMPQ49JyVEKmR4loKf2P4YEFywSbaEZKY+6+XX
-         cKXh49am4VGYXyt1NbZFoWO1KYlIGHa77mprd5Z3efcxKFYIcm738/D+RtejopNDlfnv
-         NJJus1QY91WZmMnxP3WvLYZuWMqVnzOIfg/IyyVBUSs4BpknOSYLa0joC4AwYLmi/5qz
-         WtKTymw8CPKdE0lGHWcLZYZekJTTwFClA7gCXKy9iPMI3sDdx/ug36c+1oLVF3WvbXsK
-         iyXA==
-X-Gm-Message-State: AOJu0YyVLsAwh6nbvwWVUeQAiNXQt4tOKcl8NqUC/2VEdUVprIchqd+7
-	9bEGiEK98RM1c/iObWikJQkZbLhk4QzT83y6iDaiFApackZ/0UBQjIJV
-X-Gm-Gg: ASbGnctqxO9WTzpMjw9r4lFWVm0E0RVURcPwxIp2BltO6F9YdEskw5/L0nnt6BO+TC3
-	dvvGO8qKhjPpODdXRknU2i+fSzpOnsQjci9pWgSkxgOfGKzkQskP6ROholjlxh0vP3IKuXWPoVO
-	JeDORAt4DfB+P/xGolhtwMT+FIcWwMo25KSMPeG26/7pZ0dqk8C2n0MkTN7FOiyLnw6+UsjetVD
-	fOpo/VndFesQkkhSBpn2rAZhy1xgwcHA7w5LMOw1/rl/ycJ5h7++/Qedk67F/rkSQuaXrsQKcBQ
-	Nzna2sH85rhYgo0pRgRNfEK1GzB9/pNNsbuK9zO+Fui7D3jV99jAFlVHt/RqD5/ewYHCsM4aopt
-	TJ14DTC8ERfalFJ6NylrMjJwuwJqaWBLAAC3mtWgPeYCON1TfhjKczMJwR4JVIAx6EgLq03JVf3
-	SBwb/EZXf3MheXGOkjsKFNF3EdYP5AjSQ=
-X-Google-Smtp-Source: AGHT+IEO/r2yjXRo1vsrIYmRAWR3LX5xjMNvgtEI6xtFpDqm0QsABV6tIyV/TEUGoCBLoYPW7a2THw==
-X-Received: by 2002:a05:600c:3b19:b0:475:daba:d03c with SMTP id 5b1f17b1804b1-4778fe62088mr166989585e9.13.1763560107125;
-        Wed, 19 Nov 2025 05:48:27 -0800 (PST)
-Received: from smtpclient.apple ([132.68.46.63])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b106b03bsm50714925e9.9.2025.11.19.05.48.25
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 19 Nov 2025 05:48:25 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1763560122; c=relaxed/simple;
+	bh=WBVxdPHFlyOgnD3YarukkHOdXbptm0KrfxkS3OxiyOA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fefCQ6x2ExQHqX9kN9w2TX9PZd57SEWWMGkIJrvlO9ZRnYHUY4aYJKRHb0yF2vI6m7+Zny9ibO4YzX6Tm6ih2lWr24ZG7KgM8qw7DU3+lsj80OSekR+IFX+78qmEnzu5ZW9fsu5UMk2HE3hX/wXTt42D34iAkP1trn3qXu1/pgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KA20TCoH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92F90C2BCB3;
+	Wed, 19 Nov 2025 13:48:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763560121;
+	bh=WBVxdPHFlyOgnD3YarukkHOdXbptm0KrfxkS3OxiyOA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KA20TCoHh4xBpJsET+frUdvFAC1/PD10QEHBCIMaao0WAnseVamH90obusp+eQ5o2
+	 JrhR8HX77yzaqJbG7RbbqAQs3awsq4Yvi7P4lQEZ99DLZaMLoKH1/O5e8/LLveXrkv
+	 HCKoHyda54qc27+KsHvuXB6+0wPcCgAO6rsNtdaEMFdpPZjPGtqLRxBnqe3Arlb9EG
+	 osGef8+spXexQcAOPEgMRnoYG//AXXDg2MNWYqsnZOs0wHsYLRrmAJ/9zE8Pdo+dbS
+	 CMLK4jt8qhrjL3QY8uNgMZwKArml4umHyJINrVhyQzJ9qdxF59lBOeH32HAdcfhxrX
+	 lBCpSzaidWhXw==
+Date: Wed, 19 Nov 2025 15:48:36 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, iommu@lists.linux.dev,
+	linux-mm@kvack.org, linux-doc@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
+	linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
+	Nicolin Chen <nicolinc@nvidia.com>
+Subject: Re: [Linaro-mm-sig] [PATCH v8 06/11] dma-buf: provide phys_vec to
+ scatter-gather mapping routine
+Message-ID: <20251119134836.GF18335@unreal>
+References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
+ <20251111-dmabuf-vfio-v8-6-fd9aa5df478f@nvidia.com>
+ <8a11b605-6ac7-48ac-8f27-22df7072e4ad@amd.com>
+ <20251119132511.GK17968@ziepe.ca>
+ <69436b2a-108d-4a5a-8025-c94348b74db6@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.200.81.1.6\))
-Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm64: EL2 support
-From: Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20251119131827.GA2206028@e124191.cambridge.arm.com>
-Date: Wed, 19 Nov 2025 15:48:13 +0200
-Cc: kvm@vger.kernel.org,
- alexandru.elisei@arm.com,
- andrew.jones@linux.dev,
- kvmarm@lists.linux.dev,
- Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D63D4CE9-431B-4F76-B769-C4FFB37B76AF@gmail.com>
-References: <20250925141958.468311-1-joey.gouly@arm.com>
- <20251119131827.GA2206028@e124191.cambridge.arm.com>
-To: Joey Gouly <joey.gouly@arm.com>
-X-Mailer: Apple Mail (2.3864.200.81.1.6)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <69436b2a-108d-4a5a-8025-c94348b74db6@amd.com>
 
+On Wed, Nov 19, 2025 at 02:42:18PM +0100, Christian König wrote:
+> On 11/19/25 14:25, Jason Gunthorpe wrote:
+> > On Wed, Nov 19, 2025 at 02:16:57PM +0100, Christian König wrote:
+> >>> +/**
+> >>> + * dma_buf_map - Returns the scatterlist table of the attachment from arrays
+> >>> + * of physical vectors. This funciton is intended for MMIO memory only.
+> >>> + * @attach:	[in]	attachment whose scatterlist is to be returned
+> >>> + * @provider:	[in]	p2pdma provider
+> >>> + * @phys_vec:	[in]	array of physical vectors
+> >>> + * @nr_ranges:	[in]	number of entries in phys_vec array
+> >>> + * @size:	[in]	total size of phys_vec
+> >>> + * @dir:	[in]	direction of DMA transfer
+> >>> + *
+> >>> + * Returns sg_table containing the scatterlist to be returned; returns ERR_PTR
+> >>> + * on error. May return -EINTR if it is interrupted by a signal.
+> >>> + *
+> >>> + * On success, the DMA addresses and lengths in the returned scatterlist are
+> >>> + * PAGE_SIZE aligned.
+> >>> + *
+> >>> + * A mapping must be unmapped by using dma_buf_unmap().
+> >>> + */
+> >>> +struct sg_table *dma_buf_map(struct dma_buf_attachment *attach,
+> >>
+> >> That is clearly not a good name for this function. We already have overloaded the term *mapping* with something completely different.
+> >>
+> >>> +			     struct p2pdma_provider *provider,
+> >>> +			     struct dma_buf_phys_vec *phys_vec,
+> >>> +			     size_t nr_ranges, size_t size,
+> >>> +			     enum dma_data_direction dir)
+> >>> +{
+> >>> +	unsigned int nents, mapped_len = 0;
+> >>> +	struct dma_buf_dma *dma;
+> >>> +	struct scatterlist *sgl;
+> >>> +	dma_addr_t addr;
+> >>> +	size_t i;
+> >>> +	int ret;
+> >>> +
+> >>> +	dma_resv_assert_held(attach->dmabuf->resv);
+> >>> +
+> >>> +	if (WARN_ON(!attach || !attach->dmabuf || !provider))
+> >>> +		/* This function is supposed to work on MMIO memory only */
+> >>> +		return ERR_PTR(-EINVAL);
+> >>> +
+> >>> +	dma = kzalloc(sizeof(*dma), GFP_KERNEL);
+> >>> +	if (!dma)
+> >>> +		return ERR_PTR(-ENOMEM);
+> >>> +
+> >>> +	switch (pci_p2pdma_map_type(provider, attach->dev)) {
+> >>> +	case PCI_P2PDMA_MAP_BUS_ADDR:
+> >>> +		/*
+> >>> +		 * There is no need in IOVA at all for this flow.
+> >>> +		 */
+> >>> +		break;
+> >>> +	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+> >>> +		dma->state = kzalloc(sizeof(*dma->state), GFP_KERNEL);
+> >>> +		if (!dma->state) {
+> >>> +			ret = -ENOMEM;
+> >>> +			goto err_free_dma;
+> >>> +		}
+> >>> +
+> >>> +		dma_iova_try_alloc(attach->dev, dma->state, 0, size);
+> >>
+> >> Oh, that is a clear no-go for the core DMA-buf code.
+> >>
+> >> It's intentionally up to the exporter how to create the DMA
+> >> addresses the importer can work with.
+> > 
+> > I can't fully understand this remark?
+> 
+> The exporter should be able to decide if it actually wants to use P2P when the transfer has to go through the host bridge (e.g. when IOMMU/bridge routing bits are enabled).
+> 
+> Thinking more about it exporters can now probably call pci_p2pdma_map_type(provider, attach->dev) before calling this function so that is probably ok.
+> 
+> >> We could add something like a dma_buf_sg_helper.c or similar and put it in there.
+> > 
+> > Yes, the intention is this function is an "exporter helper" that an
+> > exporter can call if it wants to help generate the scatterlist.
+> > 
+> > So your "no-go" is just about what file it is in, not anything about
+> > how it works?
+> 
+> Yes, exactly that. Just move it into a separate file somewhere and it's probably good to go as far as I can see.
+> 
+> But only take that as Acked-by, I would need at least a day (or week) of free time to wrap my head around all the technical details again. And that is something I won't have before January or even later.
 
+If it helps, we can meet at LPC. Jason and/or I will be happy to assist.
 
-> On 19 Nov 2025, at 15:18, Joey Gouly <joey.gouly@arm.com> wrote:
->=20
-> On Thu, Sep 25, 2025 at 03:19:48PM +0100, Joey Gouly wrote:
->> Hi all,
->>=20
->> This series is for adding support to running the kvm-unit-tests at =
-EL2. These
->> have been tested with Linux 6.17-rc6 KVM nested virt.
->>=20
->> This latest round I also tested using the run_tests.sh script with =
-QEMU TCG,
->> running at EL2.
->>=20
->> The goal is to later extend and add new tests for Nested =
-Virtualisation,
->> however they should also work with bare metal as well.
->=20
-> Any comments on this series, would be nice to get it merged.
+Thanks
 
-I wonder, does kvm-unit-tests run on bare-metal arm64 these days?
-
-I ran it in-house some time ago (fixing several issues on the way),
-but IIRC this issue was never fixed upstream:
-
-=
-https://lore.kernel.org/all/C812A718-DCD6-4485-BB5A-B24DE73A0FD3@gmail.com=
-/
-
+> 
+> Regards,
+> Christian.
+> 
+> > 
+> > Thanks,
+> > Jason
+> 
 
