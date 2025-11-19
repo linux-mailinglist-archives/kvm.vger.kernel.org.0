@@ -1,190 +1,173 @@
-Return-Path: <kvm+bounces-63753-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63754-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79E41C71266
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 22:31:44 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCCFDC7137D
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 23:05:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F25E94E1A08
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 21:31:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 771F429E11
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 22:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A478288C30;
-	Wed, 19 Nov 2025 21:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93D0305948;
+	Wed, 19 Nov 2025 22:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dwY5SH/K"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3CWiI2n/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AC682652A2
-	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 21:31:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3FF220698
+	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 22:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763587889; cv=none; b=siuE8RrKvzYSdAS9DpSQ+d12/X3AA42TJDWm5oec8kcsUP4wq+4KTQQMCQ8jJq2PqWpxhEtD2VpYSoGsN7IQ4FOZbdc4DMMLKZ6owM4brtiiTSxiXTjMNg2qT4zkXZf4h8QMWDiHmOZIIaU58l+QZHITfdLMB06U/LL7USm0YzE=
+	t=1763589907; cv=none; b=AjP7ZDl0DHR84zS7bOFsWo8uI6JYgQKNDIH7TC6at8FGW02Lcx4zqkgnPo/EnMbI5q9U5cAnkmeJJPvrgof9AmGRVJFSYq7V+iBzULKF4a1CNLUtBUb2qARiNGlDGE85PRtw3x2JEIE6r94cxoBv/3YcMyyFC+1ZXPxANxnD4us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763587889; c=relaxed/simple;
-	bh=xnVWHoRf7o0NcxPQfVQjG9xcAOWFFNXm2zL7SdEXGTY=;
+	s=arc-20240116; t=1763589907; c=relaxed/simple;
+	bh=v//uOr2tHb8dcjd8beHYgnv1kgNWrlfObycDOhed1Go=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rSKNGWgkEtQ6bXCAVqLG2GzEbTJWZH4dUvIimxntd3yK1m96z3gWSfx2qBxC1K9FJdxGWrQujV2QWfEoipcjNyQGa8p4xaZCqxH8BgbpZDSTP7q4HCX+N4hUWuv9eUUGd1pGUAkzppZ1jq3mW6B1aiTfDZPF9Fsk/+lmHrbHJXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dwY5SH/K; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=DUgMRp4SN35Zoth78B/PrOOFvBgcVIIKzv5VUfaOcig/ZONPXM67a+zzzkIw16fcR6DiWE1kFRsZrEv70yXx0YSaFB6Fnge+GetYRhqV7SGg+pU2TqWsfTtRJffW7yVMh7t2gNERwMXveQ9aB2AD60TdiCuymic1vmVorjN1kgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3CWiI2n/; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-298389232c4so4228335ad.2
-        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 13:31:27 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3436e9e3569so320087a91.2
+        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 14:05:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763587887; x=1764192687; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763589906; x=1764194706; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tRlBn8hNsoLzEGGI6zV1NxPFQ/eFHCg8PaMSNSKYawI=;
-        b=dwY5SH/K3B1spsCJkHaaYy5Yes1+n5M/uUUXpP6+AiKQ1vPFlfifPIezxVF9DpMOlT
-         5t2mMbaMfU8DKLv0ZtLiegnpd/BTVj7Y4UnwnRttNhIk5YEFY1dXgOUU0nNCF7tOngYl
-         vYCwMUt/BOluXDxwHobpmWQw6bH7eZPlEk6Pk3fwmT/KlOPq4L4CZxmlk0ufc7husBQw
-         5B4Wo9c9Bl9aDsR6ckIHSf8n+L8OveGt3RFVQHcrfOapjNXqU3pjT21TbEZzKikfZV4x
-         gOIEFau6vKPXmaiyoutWZWQ9aqe9cwsvlAfRymaN+zCvFFH9uUKkwt6+3MnhDvzDoZkI
-         qISQ==
+        bh=sWB7b7gK6U7hKIAe1hY9O5TYN/81WKTU25YszuIj9Y0=;
+        b=3CWiI2n/6HOPhuRGR+u1MStufqyDs0x6xSqRhQ5NGKVxVYzKwOcdZ0qAyWYGZZ4+5L
+         VtmzVA/T/Y0eZS4G20Mu6Mx/SMdtN2NShhPqroBu+jhif5kT0+RPJ251w0epm7J1Qu/7
+         AdoiL0KJT/E4FacQINPK+cjkyZ/ikambyeOHvedujdqD9LXpWsLIyUVKuNkWwaHB8Ub+
+         8hGH2v9d6PJB2Lzf5hYbLu8lmCiVNgwa8bNEHc54PAlkCCBn93FKi6O6R/McYWtkrjqm
+         JcIEaR71HsjFBxr8O7YpMlbiAQEAen3+CcJqisEv4iKch4kkS4xGE1J12IOm0fBSBV9J
+         wkBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763587887; x=1764192687;
+        d=1e100.net; s=20230601; t=1763589906; x=1764194706;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tRlBn8hNsoLzEGGI6zV1NxPFQ/eFHCg8PaMSNSKYawI=;
-        b=LD18pY015opZ0l9vWYlD3CvBQNmo04QWn8IrOGF+qOzqPvJU8wtWjErSyAyiHTGfTo
-         loz9fH5fFSShdC/tCLrnF81j07HWr1fkZ22RF+PqFtyJQru7Z1j0POHuSB41qSarGC96
-         Vv/PK+eNKB2U7OUsriCf3mheakFuqdYBluFY81lNGPmgyJ/63UdFcKiD6VReC/BR7WCv
-         cxCG5tLa+bqaTmHRkaSMw5zR3badBr8KniWqJkl/p9em+s0FtA0us3lQ6zJXQ5sCqoHQ
-         r+a30hUnMdqwXPa/unm74R0Np2YnIUeoXX0N270rnvStoOMIpqeyXWJ3RiLHSAy5QKLS
-         zqhw==
-X-Forwarded-Encrypted: i=1; AJvYcCWCbUOPwr328p3P3kZxAn+Bu841gd1sevuTucBdIgk/6evRHQlMZ4LXlRvCRZwfoSvIorY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWHJ7+0+rBnc5OuhoDypefCBly4QSVQpwj+3wcxpOok2rqRMzx
-	Mt4Au7iWpMAuGfQo6dScMbkHdGTifDDTNDaqpesrUk4XN/Ehl5wgH+HthIC1lFxBgoO0QOZPrCr
-	/yJPENA==
-X-Google-Smtp-Source: AGHT+IEd+gfd++T3e2i6Z4dBj2glGk6LJnNjNrz24WgF1sqa+HmClxx9J2N7UBfKQW53wCFECS0cLQGpQb0=
-X-Received: from plot18.prod.google.com ([2002:a17:902:8c92:b0:298:9ac:cfe9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ccc7:b0:298:49db:a9c5
- with SMTP id d9443c01a7336-29b5b136462mr7336255ad.43.1763587887332; Wed, 19
- Nov 2025 13:31:27 -0800 (PST)
-Date: Wed, 19 Nov 2025 13:31:26 -0800
-In-Reply-To: <aKNF7jc4qr9ab-Es@google.com>
+        bh=sWB7b7gK6U7hKIAe1hY9O5TYN/81WKTU25YszuIj9Y0=;
+        b=bPEx4KeNswrIGJnQ3qfHE4NtcOUuJMZwyyKq8r938IcBqblN850YoV7RB+3hxbMjWW
+         2b4OXslTy1vx6YCqUEukkJQIzho0m/BBUSCd/vwZ01cgZBsDWJSuTm5c3iqDnSkac5GL
+         ybuUeYkg/fMjzdigHm5gknSaJysZgReVH0g2o6np1mZJ82nGup8mC6IpwzIb3pWakChA
+         omAQDOImkjRtKLyZ3W/PejTSt0CtTFP6+AsOlh50Zw21C9c0kcGRFIZdDoi0Go4TAwmr
+         YTxXphBesksdaD/k6nxQki47DEgT3IxW3aTIZuNyNRdUdaoQ9i4x/7lwMaZSgR7ta4eg
+         xqZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWxaLMM6tfiQkvpfGHNRmtDvKkucCVeFy8ademOU1GX+1tydlog65Qd34Q9jhBuO2nsPM8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiKerU+jIdddWmt7WxOTFKWx4Ao0u/dTNQ3sRxf5/A3k0oVMnf
+	h63vN+P70tMakfComkOMhy1zjAtmlTRO1b62nbVar/EFWoEbFSE1Q2Ubc5U51+OycKfpIVPF2Xe
+	lQBnCow==
+X-Google-Smtp-Source: AGHT+IGXXe2mly3I9lTqRU7DTze6Hy00otxS9GrKuAXQF5ObAvA8SksetaJS6WQra0+gzJ6P5IIGDOGM8jw=
+X-Received: from pjbpd13.prod.google.com ([2002:a17:90b:1dcd:b0:341:8b58:bbce])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:558c:b0:340:d578:f299
+ with SMTP id 98e67ed59e1d1-34728368940mr563956a91.3.1763589905749; Wed, 19
+ Nov 2025 14:05:05 -0800 (PST)
+Date: Wed, 19 Nov 2025 14:05:04 -0800
+In-Reply-To: <60f7c9b3-312f-41e2-ab47-c4361df1d825@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250806195706.1650976-1-seanjc@google.com> <20250806195706.1650976-10-seanjc@google.com>
- <20250815113951.GC4067720@noisy.programming.kicks-ass.net>
- <aJ9VQH87ytkWf1dH@google.com> <aJ9YbZTJAg66IiVh@google.com>
- <20250818143204.GH3289052@noisy.programming.kicks-ass.net> <aKNF7jc4qr9ab-Es@google.com>
-Message-ID: <aR43LoV1ti5-2WRD@google.com>
-Subject: Re: [PATCH v5 09/44] perf/x86: Switch LVTPC to/from mediated PMI
- vector on guest load/put context
+References: <20251113225621.1688428-1-seanjc@google.com> <20251113225621.1688428-7-seanjc@google.com>
+ <60f7c9b3-312f-41e2-ab47-c4361df1d825@redhat.com>
+Message-ID: <aR4_EM5bWKSQ4iOS@google.com>
+Subject: Re: [PATCH 6/9] KVM: SVM: Filter out 64-bit exit codes when invoking
+ exit handlers on bare metal
 From: Sean Christopherson <seanjc@google.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>, 
-	Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Aug 18, 2025, Sean Christopherson wrote:
-> On Mon, Aug 18, 2025, Peter Zijlstra wrote:
-> > On Fri, Aug 15, 2025 at 08:55:25AM -0700, Sean Christopherson wrote:
-> > > On Fri, Aug 15, 2025, Sean Christopherson wrote:
-> > > > On Fri, Aug 15, 2025, Peter Zijlstra wrote:
-> > > So if we're confident that switching the host LVTPC outside of
-> > > perf_{load,put}_guest_context() is functionally safe, I'm a-ok with it.
+On Sat, Nov 15, 2025, Paolo Bonzini wrote:
+> On 11/13/25 23:56, Sean Christopherson wrote:
+> > Explicitly filter out 64-bit exit codes when invoking exit handlers, as
+> > svm_exit_handlers[] will never be sized with entries that use bits 63:32.
 > > 
-> > Let me see. So the hardware sets Masked when it raises the interrupt.
+> > Processing the non-failing exit code as a 32-bit value will allow tracking
+> > exit_code as a single 64-bit value (which it is, architecturally).  This
+> > will also allow hardening KVM against Spectre-like attacks without needing
+> > to do silly things to avoid build failures on 32-bit kernels
+> > (array_index_nospec() rightly asserts that the index fits in an "unsigned
+> > long").
 > > 
-> > The interrupt handler clears it from software -- depending on uarch in 3
-> > different places:
-> >  1) right at the start of the PMI
-> >  2) in the middle, right before enabling the PMU (writing global control)
-> >  3) at the end of the PMI
+> > Omit the check when running as a VM, as KVM has historically failed to set
+> > bits 63:32 appropriately when synthesizing VM-Exits, i.e. KVM could get
+> > false positives when running as a VM on an older, broken KVM/kernel.  From
+> > a functional perspective, omitting the check is "fine", as any unwanted
+> > collision between e.g. VMEXIT_INVALID and a 32-bit exit code will be
+> > fatal to KVM-on-KVM regardless of what KVM-as-L1 does.
 > > 
-> > the various changelogs adding that code mention spurious PMIs and
-> > malformed PEBS records.
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/svm/svm.c | 18 ++++++++++++++++--
+> >   1 file changed, 16 insertions(+), 2 deletions(-)
 > > 
-> > So the fun all happens when the guest is doing PMI and gets a VM-exit
-> > while still Masked.
-> > 
-> > At that point, we can come in and completely rewrite the PMU state,
-> > reroute the PMI and enable things again. Then later, we 'restore' the
-> > PMU state, re-set LVTPC masked to the guest interrupt and 'resume'.
-> > 
-> > What could possibly go wrong :/ Kan, I'm assuming, but not knowing, that
-> > writing all the PMU MSRs is somehow serializing state sufficient to not
-> > cause the above mentioned fails? Specifically, clearing PEBS_ENABLE
-> > should inhibit those malformed PEBS records or something? What if the
-> > host also has PEBS and we don't actually clear the bit?
-> > 
-> > The current order ensures we rewrite LVTPC when global control is unset;
-> > I think we want to keep that.
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index 202a4d8088a2..3b05476296d0 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -3433,8 +3433,22 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
+> >   		sev_free_decrypted_vmsa(vcpu, save);
+> >   }
+> > -int svm_invoke_exit_handler(struct kvm_vcpu *vcpu, u64 exit_code)
+> > +int svm_invoke_exit_handler(struct kvm_vcpu *vcpu, u64 __exit_code)
+> >   {
+> > +	u32 exit_code = __exit_code;
+> > +
+> > +	/*
+> > +	 * SVM uses negative values, i.e. 64-bit values, to indicate that VMRUN
+> > +	 * failed.  Report all such errors to userspace (note, VMEXIT_INVALID,
+> > +	 * a.k.a. SVM_EXIT_ERR, is special cased by svm_handle_exit()).  Skip
+> > +	 * the check when running as a VM, as KVM has historically left garbage
+> > +	 * in bits 63:32, i.e. running KVM-on-KVM would hit false positives if
+> > +	 * the underlying kernel is buggy.
+> > +	 */
+> > +	if (!cpu_feature_enabled(X86_FEATURE_HYPERVISOR) &&
+> > +	    (u64)exit_code != __exit_code)
+> > +		goto unexpected_vmexit;
 > 
-> Yes, for sure.
-> 
-> > While staring at this, I note that perf_load_guest_context() will clear
-> > global ctrl, clear all the counter programming, and re-enable an empty
-> > pmu. Now, an empty PMU should result in global control being zero --
-> > there is nothing run after all.
-> > 
-> > But then kvm_mediated_pmu_load() writes an explicit 0 again. Perhaps
-> > replace this with asserting it is 0 instead?
-> 
-> Yeah, I like that idea, a lot.  This?
-> 
-> 	perf_load_guest_context();
-> 
-> 	/*
-> 	 * Sanity check that "loading" guest context disabled all counters, as
-> 	 * modifying the LVTPC while host perf is active will cause explosions,
-> 	 * as will loading event selectors and PMCs with guest values.
-> 	 *
-> 	 * VMX will enable/disable counters at VM-Enter/VM-Exit by atomically
-> 	 * loading PERF_GLOBAL_CONTROL.  SVM effectively performs the switch by
-> 	 * configuring all events to be GUEST_ONLY.
-> 	 */
-> 	WARN_ON_ONCE(rdmsrq(kvm_pmu_ops.PERF_GLOBAL_CTRL));
+> I reviewed the series and it looks good, but with respect to this patch and
+> patch 8, is it really worth it?  While there is a possibility that code
+> 0x00000000ffffffff is used, or that any high 32-bit values other than
+> all-zeros or all-ones are used, they'd be presumably enabled by some control
+> bits in the VMCB or some paravirt thing in the hypervisor.
 
-This doesn't actually work, because perf_load_guest_context() doesn't guarantee
-PERF_GLOBAL_CTRL is '0', it only guarantees all events are disabled.  E.g. if
-there are no perf events, perf_load_guest_context() is one big nop (I think).
+Maybe.  E.g. TDCALL and SEAMCALL VM-Exits on Intel show up without any enablement
+in software (beyond VMXON).  I completely agree that it's extremely unlikely that
+AMD will add a on-negative exit code with bits 63:32 != 0, i.e. that we could get
+a false positive when truncating exit_code to a u32, but it also seems harmless
+to be paranoid.
 
-And while it might seem reasonable to expect PERF_GLOBAL_CTRL to be '0' if
-there are no perf events, that doesn't hold true today.  E.g. amd_pmu_reload_virt()
-unconditionally sets all supported MSR_AMD64_PERF_CNTR_GLOBAL_CTL bits.
+FWIW, I was assuming VMEXIT_INVALID_PMC (-4) was a generic vPMU thing, but it
+looks like that one is also SEV-ES+ specific.
 
-I'm sure we could massage perf to really truly ensure PERF_GLOBAL_CTRL is '0',
-but I don't see any value in explicitly doing that in perf_load_guest_context()
-(versus simply doing it in KVM), and I would rather not play whack-a-mole in perf
-as part of this series.
+As for e57b84699534 ("KVM: SVM: Limit incorrect check on SVM_EXIT_ERR to running
+as a VM"), I agree that being paranoid probably doesn't do anything in practice,
+but I like being consistent. :-)
 
-So unless someone really, really wants to lean on perf to clear PERF_GLOBAL_CTRL,
-I'll go with this:
+> What really matters is that SEV-ES's kvm_get_cached_sw_exit_code() is
+> reading the full 64 bits and discarding invalid codes before reaching
+> svm_invoke_exit_handler().
 
-	/*
-	 * Explicitly clear PERF_GLOBAL_CTRL, as "loading" the guest's context
-	 * disables all individual counters (if any were enabled), but doesn't
-	 * globally disable the entire PMU.  Loading event selectors and PMCs
-	 * with guest values while PERF_GLOBAL_CTRL is non-zero will generate
-	 * unexpected events and PMIs.
-	 *
-	 * VMX will enable/disable counters at VM-Enter/VM-Exit by atomically
-	 * loading PERF_GLOBAL_CONTROL.  SVM effectively performs the switch by
-	 * configuring all events to be GUEST_ONLY.  Clear PERF_GLOBAL_CONTROL
-	 * even for SVM to minimize the damage if a perf event is left enabled,
-	 * and to ensure a consistent starting state.
-	 */
-	wrmsrq(kvm_pmu_ops.PERF_GLOBAL_CTRL, 0);
+No?  sev_handle_vmgexit() only handles SVM_VMGEXIT_xxx exit codes, everything
+else is punted to svm_invoke_exit_handler()
+
+	exit_code = kvm_get_cached_sw_exit_code(control);
+	switch (exit_code) {
+	case SVM_VMGEXIT_<0>
+	...
+	case SVM_VMGEXIT_<N>
+	default:
+		ret = svm_invoke_exit_handler(vcpu, exit_code);
+	}
+
+And I don't see anything that filters/modifies exit_code_hi.
 
