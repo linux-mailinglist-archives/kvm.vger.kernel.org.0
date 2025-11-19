@@ -1,97 +1,97 @@
-Return-Path: <kvm+bounces-63680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63681-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BE52C6CFEB
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 07:56:54 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44D2FC6D00A
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 07:59:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 601924F0453
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 06:56:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E542D4F0D7E
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 06:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B35D321F42;
-	Wed, 19 Nov 2025 06:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817033246E6;
+	Wed, 19 Nov 2025 06:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CV1ZJtxG";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MUFnFMmi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q86+p7wd";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fbtqs4Bf"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0AB31ED80
-	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 06:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA72532142D
+	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 06:55:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763535320; cv=none; b=gAihdAHc9zv7xSjl9xsS1oXr0D0Kl8vaLLtWnMI28WbqQIWRIYBHrlsdZSjUFmYqj289zGXqwd7307X4OMeRFWiZBhImZSmByC2aqZckzQY0v6M4Sm9hs9TNM5VY5NVBTG23y52IGmItuXBW6tcOsMkWWgcCG8j+Jv6X0zVgM9o=
+	t=1763535322; cv=none; b=oQyeKYKvbnpWtXGK9QCUGz2GpVXRzRJy4zH4sNz//z4hUZmMysOEbUUa0ZXrkYBKtu2Mi0kdmPIplLu3sEkeg8fWXWrZmoYlg1LqgUFcEuUoOQkrZS31b2U9q8C+fby4N84dIE7alH3mmd/nRm+tAxBZo7fR+rjRWsd24ioJ2uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763535320; c=relaxed/simple;
-	bh=ivUXO36DJq1dbC9CAEPa5O93ZoCOFhDovxe/PoQeME4=;
+	s=arc-20240116; t=1763535322; c=relaxed/simple;
+	bh=5iCO5cgXDbfIKEXyC1bd0mdDH+xAR3kAZ5VJbmIKI/Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AqQRSrdKmSW4AVLoXUS7YvHMs8JnAqvAgsh8IQdNMDD37bYGZ1Xio6uc2iZTToWJ9EVkU30iuPonMK0qyXgzRSY7XT8cyo/fpVp3E44o17Ss+4V61GXEw1BiV6HHsejk3tktVAg2IP8LVxmUObJOP+SSXZK9cQ87WygQreLv8bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CV1ZJtxG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MUFnFMmi; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=QlaK9vIL5rjZX88RyhaEgT51F0X3+A1wqEtd2roR1BmEf+D0yrGPCK1/7WhO2aUPa4YgMyabgfaQ+JZok06dHiHz1aL/llzs18jPYrpZxZeTTzF4ST9dGPKeeQ0+nmUWHGRq64kavMFDA3EvcgXyps8fAx9xycvRNFIAFen1Tq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q86+p7wd; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fbtqs4Bf; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763535317;
+	s=mimecast20190719; t=1763535319;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ixkqHa7UY4id+SD0ZRwvgJtg9ZQCnNOZWuNc83xEvBE=;
-	b=CV1ZJtxG3UrW2ZAi0Yftk6a9lTjHBJydpGfnYETNRs3z1wGl6IWPnjtKOpZZ+qGGqmvxxE
-	uDjGXO16Wou8yhI5GMvvClse0025QCwSkW7mxC94hzUJuGIBjeBVcE527G8LjaC+olV/y5
-	+xglnadkcbMXMRq9tiVYKfiMTMWpegc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Zrc/sZ7wD+ZBOSRNsS/SZIC54PvyBbg7yzBkzkUFz30=;
+	b=Q86+p7wdcXQ47syeDY9yBFcPu1BAJ6AYdOt8Emm6xEnliAWh6Sqcts/SCzU4FqcSpGQ1ex
+	W/Bq1tWjOVqhVIJQ5ERdXrtefL81JELyKh41Uh7zfnAB6ryK9Lfc8VinDZFoqJtf/y4BAF
+	giR1oAoLoI08US0p/vQIiAge5NvYynE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-L4mzAhXAOuOPutZKgMDbkg-1; Wed, 19 Nov 2025 01:55:15 -0500
-X-MC-Unique: L4mzAhXAOuOPutZKgMDbkg-1
-X-Mimecast-MFC-AGG-ID: L4mzAhXAOuOPutZKgMDbkg_1763535314
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4779edba8f3so21938025e9.3
-        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 22:55:15 -0800 (PST)
+ us-mta-613-FfrFuAGaPeql2Pjn8QDD2g-1; Wed, 19 Nov 2025 01:55:18 -0500
+X-MC-Unique: FfrFuAGaPeql2Pjn8QDD2g-1
+X-Mimecast-MFC-AGG-ID: FfrFuAGaPeql2Pjn8QDD2g_1763535317
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42b3086a055so4169226f8f.3
+        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 22:55:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763535314; x=1764140114; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1763535317; x=1764140117; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ixkqHa7UY4id+SD0ZRwvgJtg9ZQCnNOZWuNc83xEvBE=;
-        b=MUFnFMmiiTXJLZqgQL0+crtoFg/VOapaSMtoE1AMfuW1UGO7r6boYJsfUmNK+swzkx
-         HlhjGgwm+zGVQe07d8lCsRzNs9eaKiBWdTDauUqDAE65usDYxdybyx0GL5TTTnNUVUzQ
-         kGcTBmAInjtFKhUAEj9pw9/hF3ZWBmTZiNkT8SZM+7z54zYbkrC/3UgmdG9G15Vesd7d
-         uODM57FnQX2fBdhGArz+k7cJ9gutdH28wI1JB2DmnlES+3gMQbj8kvhnxAbEfAnVzzh3
-         M9S00kdreU5Vsu58OWqrH+KaA9FqWj0xmwk/1AceYG/jLOApOyDNoZOImFJwUs6MSrRW
-         pAJQ==
+        bh=Zrc/sZ7wD+ZBOSRNsS/SZIC54PvyBbg7yzBkzkUFz30=;
+        b=fbtqs4BfPZDQiLLY9MS5ObUcpOBENbzsVmj8Nz4+qy/jiC9Ddr6yAfhodS0TV0fYsi
+         37vek+juO70btI6DjgF6+3e1h+S8AKEuRlUSusKqNuRDu8bJ5HvHq0LUyZ5jfCwDThQa
+         mPvFRDSc/DBy8WgLmvNMVFs2mNuW+3mteHOBax149AYSlulL9rYcWoQ0FqQD6XkvYTof
+         KWf2wGQCvBXI/HnFrQs56Cfq6CionuUL+7hEsMISd52sv30/Ze/Q9vE8FAedkhyEaAxc
+         SYM4TJWwZmaU751xxGOoiFybZCJwFfu29vEJx+pwb9VaGtept8EbbrBCDYd1bhzBLkzO
+         J1Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763535314; x=1764140114;
+        d=1e100.net; s=20230601; t=1763535317; x=1764140117;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ixkqHa7UY4id+SD0ZRwvgJtg9ZQCnNOZWuNc83xEvBE=;
-        b=d0l5YCONhQPmhw1hnwTWSJ4gBK736iWBljbddfMYnWVwXN8Kt1vdzSHWp5W0UIIx1H
-         s0ofm2NECmfehTPtbAXkg2u/LjpTqrMxZM4u7vEmk5j90hWzgcAgAVyYvbAveDgzCVfx
-         /a6qTiFd5gHZe1IC+lc1T2nEmXQ0eObpE1DJ2z3RF24gYMx7BVFX42hhR4PAE6MmrZEh
-         gPzBPSH38qSh0uJOqWB5znwHzolUpO2wu0Af8AM8v6UpPhWYWhZZbz5pkT+izsjBAF0T
-         ZRUvafxRO80CwlVBvVtefsrf2GX3o3khULw9cFWPtelt5mitI+QLppiNQb3f2F3iLrXg
-         7KVw==
-X-Forwarded-Encrypted: i=1; AJvYcCXPKDbnLqL3rRY31hjOE10rPrtssajMpASsjqHZWTGFwp0KbJ/jFCS5c+6SiRGd9hw7LjU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0/pci6klH6pP3VkBuUkgh92TwcSZ0UO/DaL+KU18tQZPah9My
-	h8p3BKR3UtToSNi9eaDannFc2hw/pp1wktzoPJ//YwXL9dCmdU5cnBgw85op3sRx0fg3mqwFvDU
-	6ePzEwxcTw/rWXwk8dZrB5ggdw8soxGdy4JIgt88+7cIgrcrCGaBadw==
-X-Gm-Gg: ASbGncvMwmCOfIhlHE/4AG9v6csK+Ol0HCicfss9nE/GnHVCuaFCsbdoRHGXNrsOWbw
-	tL7LrJzECK/9lrL2GJ0OXbtk1h9Izb5QRBcIBn/NMQ3gXP8CmAzYJseKsjVboeknangy6P5gyem
-	Rx81Jlgu0JPUdttwKWTjaczJygttMt8jG4m/UgcEOXWicc7tHfdySDcfT0iYxCICLQd/ISy0yPs
-	nA7Wk3Rq/MLT9cifVRCanWyJ3GAtYq9BVn5J3f1I1vBw7ETsKMy1SwqpnDecMTBPLeKF9eyo/EJ
-	fZI9SQsR2r2HxGHvxZkk31/EAo2V/OHfcNL5UQbfmmKjEkxVZtDhIKjDEqm4Bgf4yCvyVRzdLN1
-	YiHKCUjsI5rxGlHw63jTuy2+scHcN9A==
-X-Received: by 2002:a05:600c:138b:b0:46d:ba6d:65bb with SMTP id 5b1f17b1804b1-4778fea17e2mr193768865e9.31.1763535314125;
-        Tue, 18 Nov 2025 22:55:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGwZUMmM1xymr+Oo89BjgIHEkrE/oTIdG1u/pn4nzmzAOOBUMmjou9Wy/ntIuJ9HdvNJYj2Cg==
-X-Received: by 2002:a05:600c:138b:b0:46d:ba6d:65bb with SMTP id 5b1f17b1804b1-4778fea17e2mr193768575e9.31.1763535313604;
-        Tue, 18 Nov 2025 22:55:13 -0800 (PST)
+        bh=Zrc/sZ7wD+ZBOSRNsS/SZIC54PvyBbg7yzBkzkUFz30=;
+        b=GTArXrbai+dtbfg1EX6EIkkeZpzjhZDFYA1zvn71iBL06bCXJqOBwIMCR97kRLraB8
+         U99NkGMZlmYdV+H1z2bn8VOAB9CknXLP/bUJa+EsLgxpe91dlA5vKJScMH+33iDetb9F
+         xZPBfyKaoYokyQSBFPiLOh+0rFIGD0rvTW87nh0ZE93dSj+ByPeJUaFfeqCR3HdSEsFR
+         5XwFOi93hdiRj95GVeX307YkD0bstDFjF4FWwwZ/bNz8ot6eptXsFA1iBWbCCNwwdmoq
+         3WnqYzBQBQZTHw5/aN7z7ILFTeQQyouaYscTTHHxZ6P3+gS41zBtKUiiE9HuWmkyO5Rn
+         kG1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUA0C9bXEd7ml+qXITADhCcEmY29qNebouhW4Fvdea1XdiAU+hlCqGv/g81KY6Bj8qvPuI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzah8yPNopzUxBQ2kWYLAAdTKe3m6SXQNwRj2z9lyqyVYPz+e0T
+	z6DRWsMwUd7TvqWGTrbK5H6YOtuwIbQaPDurb1HNSZwgTWFxAdVx1eEg1XS4DE97oYvQXyHyuUF
+	NratmfgQRIJECZp1RPyrWE/nGQEMb1wskn7/7PyhDG56SXFVGDNlUSw==
+X-Gm-Gg: ASbGncvDoDFUQ4/aD8w+24M4YgVDl+LKP1H1khZDFWg3SV6D8R6MT9+J8FRi5ZG4QOl
+	+ATyAX8GbKdD4/djiItuYNm6Vc2i9KfIiFjvg6zw3LEDNa4lQv8VqBKIuD91FrIiBHUIYY6abqE
+	uF/3DT7zkLVMvuopz7ZXDnqQC0XXzlZne8eW22Dl1EwVi3BlFdP6qJhv7QCiOZy1m3R3DSpZxyb
+	Jb4meoPHBr6vOEz0yZXgUpY5dNyGKWrAhGNXnjDgMMKlunKUJej5oJYJnSHyRSHJEf8vIPqJbhZ
+	BtMV9+B4uUF89ssEZKYm1CIgP9ZA3YkGfu1+OvsQeFfMTk9s+PTpFMlrMmurLjmkwhp0nb80tF/
+	tAdfZD3odt1ODxVscU2FXBbFGDleWtg==
+X-Received: by 2002:a05:6000:2f85:b0:429:9323:2bec with SMTP id ffacd0b85a97d-42b593869a5mr18324477f8f.40.1763535316810;
+        Tue, 18 Nov 2025 22:55:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFRW82UuLQi25W/cQGXxbC4zhS0AtsqTnIUUKMrow7dNSoBHx8kFNZOLj0xBxxurb7UU0psGg==
+X-Received: by 2002:a05:6000:2f85:b0:429:9323:2bec with SMTP id ffacd0b85a97d-42b593869a5mr18324445f8f.40.1763535316367;
+        Tue, 18 Nov 2025 22:55:16 -0800 (PST)
 Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a9d21591sm35528635e9.2.2025.11.18.22.55.12
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e7ae88sm35392413f8f.6.2025.11.18.22.55.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 22:55:13 -0800 (PST)
-Date: Wed, 19 Nov 2025 01:55:11 -0500
+        Tue, 18 Nov 2025 22:55:15 -0800 (PST)
+Date: Wed, 19 Nov 2025 01:55:13 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
@@ -100,9 +100,13 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
 	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
 	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
 	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v5 1/2] virtio: clean up features qword/dword terms
-Message-ID: <ad53b7b6be87fc524f45abaeca0bb05fb3633397.1763535083.git.mst@redhat.com>
+	linux-doc@vger.kernel.org,
+	Mike Christie <michael.christie@oracle.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>
+Subject: [PATCH v5 2/2] vhost: switch to arrays of feature bits
+Message-ID: <fbf51913a243558ddfee96d129d37d570fa23946.1763535083.git.mst@redhat.com>
 References: <cover.1763535083.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -116,368 +120,233 @@ In-Reply-To: <cover.1763535083.git.mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 
-virtio pci uses word to mean "16 bits". mmio uses it to mean
-"32 bits".
+The current interface where caller has to know in which 64 bit chunk
+each bit is, is inelegant and fragile.
+Let's simply use arrays of bits.
+By using unroll macros text size grows only slightly.
 
-To avoid confusion, let's avoid the term in core virtio
-altogether. Just say U64 to mean "64 bit".
-
-Fixes: e7d4c1c5a546 ("virtio: introduce extended features")
-Cc: Paolo Abeni <pabeni@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- drivers/vhost/net.c                    | 12 +++++------
- drivers/virtio/virtio.c                | 12 +++++------
- drivers/virtio/virtio_debug.c          | 10 ++++-----
- drivers/virtio/virtio_pci_modern_dev.c |  6 +++---
- include/linux/virtio.h                 |  2 +-
- include/linux/virtio_config.h          |  2 +-
- include/linux/virtio_features.h        | 29 +++++++++++++-------------
- include/linux/virtio_pci_modern.h      |  8 +++----
- 8 files changed, 41 insertions(+), 40 deletions(-)
+ drivers/vhost/net.c   | 29 +++++++++++++++--------------
+ drivers/vhost/scsi.c  |  9 ++++++---
+ drivers/vhost/test.c  | 10 ++++++++--
+ drivers/vhost/vhost.h | 42 ++++++++++++++++++++++++++++++++++--------
+ drivers/vhost/vsock.c | 10 ++++++----
+ 5 files changed, 69 insertions(+), 31 deletions(-)
 
 diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 35ded4330431..d057ea55f5ad 100644
+index d057ea55f5ad..cb778f2bf8f8 100644
 --- a/drivers/vhost/net.c
 +++ b/drivers/vhost/net.c
-@@ -69,7 +69,7 @@ MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero Copy TX;"
+@@ -69,15 +69,15 @@ MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero Copy TX;"
  
  #define VHOST_DMA_IS_DONE(len) ((__force u32)(len) >= (__force u32)VHOST_DMA_DONE_LEN)
  
--static const u64 vhost_net_features[VIRTIO_FEATURES_DWORDS] = {
-+static const u64 vhost_net_features[VIRTIO_FEATURES_U64S] = {
- 	VHOST_FEATURES |
- 	(1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
- 	(1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-@@ -1720,7 +1720,7 @@ static long vhost_net_set_owner(struct vhost_net *n)
+-static const u64 vhost_net_features[VIRTIO_FEATURES_U64S] = {
+-	VHOST_FEATURES |
+-	(1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
+-	(1ULL << VIRTIO_NET_F_MRG_RXBUF) |
+-	(1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+-	(1ULL << VIRTIO_F_RING_RESET) |
+-	(1ULL << VIRTIO_F_IN_ORDER),
+-	VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
+-	VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
++static const int vhost_net_features[] = {
++	VHOST_FEATURES,
++	VHOST_NET_F_VIRTIO_NET_HDR,
++	VIRTIO_NET_F_MRG_RXBUF,
++	VIRTIO_F_ACCESS_PLATFORM,
++	VIRTIO_F_RING_RESET,
++	VIRTIO_F_IN_ORDER,
++	VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO,
++	VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO
+ };
+ 
+ enum {
+@@ -1720,6 +1720,7 @@ static long vhost_net_set_owner(struct vhost_net *n)
  static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
  			    unsigned long arg)
  {
--	u64 all_features[VIRTIO_FEATURES_DWORDS];
-+	u64 all_features[VIRTIO_FEATURES_U64S];
++	const DEFINE_VHOST_FEATURES_ARRAY(features_array, vhost_net_features);
+ 	u64 all_features[VIRTIO_FEATURES_U64S];
  	struct vhost_net *n = f->private_data;
  	void __user *argp = (void __user *)arg;
- 	u64 __user *featurep = argp;
-@@ -1752,7 +1752,7 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+@@ -1734,14 +1735,14 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+ 			return -EFAULT;
+ 		return vhost_net_set_backend(n, backend.index, backend.fd);
+ 	case VHOST_GET_FEATURES:
+-		features = vhost_net_features[0];
++		features = VHOST_FEATURES_U64(vhost_net_features, 0);
+ 		if (copy_to_user(featurep, &features, sizeof features))
+ 			return -EFAULT;
+ 		return 0;
+ 	case VHOST_SET_FEATURES:
+ 		if (copy_from_user(&features, featurep, sizeof features))
+ 			return -EFAULT;
+-		if (features & ~vhost_net_features[0])
++		if (features & ~VHOST_FEATURES_U64(vhost_net_features, 0))
+ 			return -EOPNOTSUPP;
  
+ 		virtio_features_from_u64(all_features, features);
+@@ -1753,8 +1754,8 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
  		/* Copy the net features, up to the user-provided buffer size */
  		argp += sizeof(u64);
--		copied = min(count, VIRTIO_FEATURES_DWORDS);
-+		copied = min(count, (u64)VIRTIO_FEATURES_U64S);
- 		if (copy_to_user(argp, vhost_net_features,
- 				 copied * sizeof(u64)))
- 			return -EFAULT;
-@@ -1767,13 +1767,13 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 
- 		virtio_features_zero(all_features);
- 		argp += sizeof(u64);
--		copied = min(count, VIRTIO_FEATURES_DWORDS);
-+		copied = min(count, (u64)VIRTIO_FEATURES_U64S);
- 		if (copy_from_user(all_features, argp, copied * sizeof(u64)))
+ 		copied = min(count, (u64)VIRTIO_FEATURES_U64S);
+-		if (copy_to_user(argp, vhost_net_features,
+-				 copied * sizeof(u64)))
++
++		if (copy_to_user(argp, features_array, copied * sizeof(u64)))
  			return -EFAULT;
  
- 		/*
- 		 * Any feature specified by user-space above
--		 * VIRTIO_FEATURES_MAX is not supported by definition.
-+		 * VIRTIO_FEATURES_BITS is not supported by definition.
- 		 */
- 		for (i = copied; i < count; ++i) {
- 			if (copy_from_user(&features, featurep + 1 + i,
-@@ -1783,7 +1783,7 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 				return -EOPNOTSUPP;
+ 		/* Zero the trailing space provided by user-space, if any */
+@@ -1784,7 +1785,7 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
  		}
  
--		for (i = 0; i < VIRTIO_FEATURES_DWORDS; i++)
-+		for (i = 0; i < VIRTIO_FEATURES_U64S; i++)
- 			if (all_features[i] & ~vhost_net_features[i])
+ 		for (i = 0; i < VIRTIO_FEATURES_U64S; i++)
+-			if (all_features[i] & ~vhost_net_features[i])
++			if (all_features[i] & ~VHOST_FEATURES_U64(vhost_net_features, i))
  				return -EOPNOTSUPP;
  
-diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-index a09eb4d62f82..5bdc6b82b30b 100644
---- a/drivers/virtio/virtio.c
-+++ b/drivers/virtio/virtio.c
-@@ -53,7 +53,7 @@ static ssize_t features_show(struct device *_d,
- 
- 	/* We actually represent this as a bitstring, as it could be
- 	 * arbitrary length in future. */
--	for (i = 0; i < VIRTIO_FEATURES_MAX; i++)
-+	for (i = 0; i < VIRTIO_FEATURES_BITS; i++)
- 		len += sysfs_emit_at(buf, len, "%c",
- 			       __virtio_test_bit(dev, i) ? '1' : '0');
- 	len += sysfs_emit_at(buf, len, "\n");
-@@ -272,8 +272,8 @@ static int virtio_dev_probe(struct device *_d)
- 	int err, i;
- 	struct virtio_device *dev = dev_to_virtio(_d);
- 	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
--	u64 device_features[VIRTIO_FEATURES_DWORDS];
--	u64 driver_features[VIRTIO_FEATURES_DWORDS];
-+	u64 device_features[VIRTIO_FEATURES_U64S];
-+	u64 driver_features[VIRTIO_FEATURES_U64S];
- 	u64 driver_features_legacy;
- 
- 	/* We have a driver! */
-@@ -286,7 +286,7 @@ static int virtio_dev_probe(struct device *_d)
- 	virtio_features_zero(driver_features);
- 	for (i = 0; i < drv->feature_table_size; i++) {
- 		unsigned int f = drv->feature_table[i];
--		if (!WARN_ON_ONCE(f >= VIRTIO_FEATURES_MAX))
-+		if (!WARN_ON_ONCE(f >= VIRTIO_FEATURES_BITS))
- 			virtio_features_set_bit(driver_features, f);
- 	}
- 
-@@ -303,7 +303,7 @@ static int virtio_dev_probe(struct device *_d)
- 	}
- 
- 	if (virtio_features_test_bit(device_features, VIRTIO_F_VERSION_1)) {
--		for (i = 0; i < VIRTIO_FEATURES_DWORDS; ++i)
-+		for (i = 0; i < VIRTIO_FEATURES_U64S; ++i)
- 			dev->features_array[i] = driver_features[i] &
- 						 device_features[i];
- 	} else {
-@@ -325,7 +325,7 @@ static int virtio_dev_probe(struct device *_d)
- 		goto err;
- 
- 	if (drv->validate) {
--		u64 features[VIRTIO_FEATURES_DWORDS];
-+		u64 features[VIRTIO_FEATURES_U64S];
- 
- 		virtio_features_copy(features, dev->features_array);
- 		err = drv->validate(dev);
-diff --git a/drivers/virtio/virtio_debug.c b/drivers/virtio/virtio_debug.c
-index d58713ddf2e5..ccf1955a1183 100644
---- a/drivers/virtio/virtio_debug.c
-+++ b/drivers/virtio/virtio_debug.c
-@@ -8,12 +8,12 @@ static struct dentry *virtio_debugfs_dir;
- 
- static int virtio_debug_device_features_show(struct seq_file *s, void *data)
- {
--	u64 device_features[VIRTIO_FEATURES_DWORDS];
-+	u64 device_features[VIRTIO_FEATURES_U64S];
- 	struct virtio_device *dev = s->private;
- 	unsigned int i;
- 
- 	virtio_get_features(dev, device_features);
--	for (i = 0; i < VIRTIO_FEATURES_MAX; i++) {
-+	for (i = 0; i < VIRTIO_FEATURES_BITS; i++) {
- 		if (virtio_features_test_bit(device_features, i))
- 			seq_printf(s, "%u\n", i);
- 	}
-@@ -26,7 +26,7 @@ static int virtio_debug_filter_features_show(struct seq_file *s, void *data)
- 	struct virtio_device *dev = s->private;
- 	unsigned int i;
- 
--	for (i = 0; i < VIRTIO_FEATURES_MAX; i++) {
-+	for (i = 0; i < VIRTIO_FEATURES_BITS; i++) {
- 		if (virtio_features_test_bit(dev->debugfs_filter_features, i))
- 			seq_printf(s, "%u\n", i);
- 	}
-@@ -50,7 +50,7 @@ static int virtio_debug_filter_feature_add(void *data, u64 val)
- {
- 	struct virtio_device *dev = data;
- 
--	if (val >= VIRTIO_FEATURES_MAX)
-+	if (val >= VIRTIO_FEATURES_BITS)
- 		return -EINVAL;
- 
- 	virtio_features_set_bit(dev->debugfs_filter_features, val);
-@@ -64,7 +64,7 @@ static int virtio_debug_filter_feature_del(void *data, u64 val)
- {
- 	struct virtio_device *dev = data;
- 
--	if (val >= VIRTIO_FEATURES_MAX)
-+	if (val >= VIRTIO_FEATURES_BITS)
- 		return -EINVAL;
- 
- 	virtio_features_clear_bit(dev->debugfs_filter_features, val);
-diff --git a/drivers/virtio/virtio_pci_modern_dev.c b/drivers/virtio/virtio_pci_modern_dev.c
-index 9e503b7a58d8..413a8c353463 100644
---- a/drivers/virtio/virtio_pci_modern_dev.c
-+++ b/drivers/virtio/virtio_pci_modern_dev.c
-@@ -401,7 +401,7 @@ void vp_modern_get_extended_features(struct virtio_pci_modern_device *mdev,
- 	int i;
- 
- 	virtio_features_zero(features);
--	for (i = 0; i < VIRTIO_FEATURES_WORDS; i++) {
-+	for (i = 0; i < VIRTIO_FEATURES_BITS / 32; i++) {
- 		u64 cur;
- 
- 		vp_iowrite32(i, &cfg->device_feature_select);
-@@ -427,7 +427,7 @@ vp_modern_get_driver_extended_features(struct virtio_pci_modern_device *mdev,
- 	int i;
- 
- 	virtio_features_zero(features);
--	for (i = 0; i < VIRTIO_FEATURES_WORDS; i++) {
-+	for (i = 0; i < VIRTIO_FEATURES_BITS / 32; i++) {
- 		u64 cur;
- 
- 		vp_iowrite32(i, &cfg->guest_feature_select);
-@@ -448,7 +448,7 @@ void vp_modern_set_extended_features(struct virtio_pci_modern_device *mdev,
- 	struct virtio_pci_common_cfg __iomem *cfg = mdev->common;
- 	int i;
- 
--	for (i = 0; i < VIRTIO_FEATURES_WORDS; i++) {
-+	for (i = 0; i < VIRTIO_FEATURES_BITS / 32; i++) {
- 		u32 cur = features[i >> 1] >> (32 * (i & 1));
- 
- 		vp_iowrite32(i, &cfg->guest_feature_select);
-diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-index 96c66126c074..132a474e5914 100644
---- a/include/linux/virtio.h
-+++ b/include/linux/virtio.h
-@@ -177,7 +177,7 @@ struct virtio_device {
- 	union virtio_map vmap;
- #ifdef CONFIG_VIRTIO_DEBUG
- 	struct dentry *debugfs_dir;
--	u64 debugfs_filter_features[VIRTIO_FEATURES_DWORDS];
-+	u64 debugfs_filter_features[VIRTIO_FEATURES_U64S];
- #endif
+ 		return vhost_net_set_features(n, all_features);
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index 98e4f68f4e3c..04fcbe7efd77 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -197,11 +197,14 @@ enum {
  };
  
-diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
-index a1af2676bbe6..69f84ea85d71 100644
---- a/include/linux/virtio_config.h
-+++ b/include/linux/virtio_config.h
-@@ -80,7 +80,7 @@ struct virtqueue_info {
-  *	Returns the first 64 feature bits.
-  * @get_extended_features:
-  *      vdev: the virtio_device
-- *      Returns the first VIRTIO_FEATURES_MAX feature bits (all we currently
-+ *      Returns the first VIRTIO_FEATURES_BITS feature bits (all we currently
-  *      need).
-  * @finalize_features: confirm what device features we'll be using.
-  *	vdev: the virtio_device
-diff --git a/include/linux/virtio_features.h b/include/linux/virtio_features.h
-index f748f2f87de8..ea2ad8717882 100644
---- a/include/linux/virtio_features.h
-+++ b/include/linux/virtio_features.h
-@@ -4,15 +4,16 @@
+ /* Note: can't set VIRTIO_F_VERSION_1 yet, since that implies ANY_LAYOUT. */
+-enum {
+-	VHOST_SCSI_FEATURES = VHOST_FEATURES | (1ULL << VIRTIO_SCSI_F_HOTPLUG) |
+-					       (1ULL << VIRTIO_SCSI_F_T10_PI)
++static const int vhost_scsi_features[] = {
++	VHOST_FEATURES,
++	VIRTIO_SCSI_F_HOTPLUG,
++	VIRTIO_SCSI_F_T10_PI
+ };
  
- #include <linux/bits.h>
- 
--#define VIRTIO_FEATURES_DWORDS	2
--#define VIRTIO_FEATURES_MAX	(VIRTIO_FEATURES_DWORDS * 64)
--#define VIRTIO_FEATURES_WORDS	(VIRTIO_FEATURES_DWORDS * 2)
-+#define VIRTIO_FEATURES_U64S	2
-+#define VIRTIO_FEATURES_BITS	(VIRTIO_FEATURES_U64S * 64)
++#define VHOST_SCSI_FEATURES VHOST_FEATURES_U64(vhost_scsi_features, 0)
 +
- #define VIRTIO_BIT(b)		BIT_ULL((b) & 0x3f)
--#define VIRTIO_DWORD(b)		((b) >> 6)
-+#define VIRTIO_U64(b)		((b) >> 6)
+ #define VHOST_SCSI_MAX_TARGET	256
+ #define VHOST_SCSI_MAX_IO_VQ	1024
+ #define VHOST_SCSI_MAX_EVENT	128
+diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+index 42c955a5b211..af727fccfe40 100644
+--- a/drivers/vhost/test.c
++++ b/drivers/vhost/test.c
+@@ -308,6 +308,12 @@ static long vhost_test_set_backend(struct vhost_test *n, unsigned index, int fd)
+ 	return r;
+ }
+ 
++static const int vhost_test_features[] = {
++	VHOST_FEATURES
++};
 +
- #define VIRTIO_DECLARE_FEATURES(name)			\
- 	union {						\
- 		u64 name;				\
--		u64 name##_array[VIRTIO_FEATURES_DWORDS];\
-+		u64 name##_array[VIRTIO_FEATURES_U64S];\
- 	}
- 
- static inline bool virtio_features_chk_bit(unsigned int bit)
-@@ -22,9 +23,9 @@ static inline bool virtio_features_chk_bit(unsigned int bit)
- 		 * Don't care returning the correct value: the build
- 		 * will fail before any bad features access
- 		 */
--		BUILD_BUG_ON(bit >= VIRTIO_FEATURES_MAX);
-+		BUILD_BUG_ON(bit >= VIRTIO_FEATURES_BITS);
- 	} else {
--		if (WARN_ON_ONCE(bit >= VIRTIO_FEATURES_MAX))
-+		if (WARN_ON_ONCE(bit >= VIRTIO_FEATURES_BITS))
- 			return false;
- 	}
- 	return true;
-@@ -34,26 +35,26 @@ static inline bool virtio_features_test_bit(const u64 *features,
- 					    unsigned int bit)
++#define VHOST_TEST_FEATURES VHOST_FEATURES_U64(vhost_test_features, 0)
++
+ static long vhost_test_ioctl(struct file *f, unsigned int ioctl,
+ 			     unsigned long arg)
  {
- 	return virtio_features_chk_bit(bit) &&
--	       !!(features[VIRTIO_DWORD(bit)] & VIRTIO_BIT(bit));
-+	       !!(features[VIRTIO_U64(bit)] & VIRTIO_BIT(bit));
- }
+@@ -328,14 +334,14 @@ static long vhost_test_ioctl(struct file *f, unsigned int ioctl,
+ 			return -EFAULT;
+ 		return vhost_test_set_backend(n, backend.index, backend.fd);
+ 	case VHOST_GET_FEATURES:
+-		features = VHOST_FEATURES;
++		features = VHOST_TEST_FEATURES;
+ 		if (copy_to_user(featurep, &features, sizeof features))
+ 			return -EFAULT;
+ 		return 0;
+ 	case VHOST_SET_FEATURES:
+ 		if (copy_from_user(&features, featurep, sizeof features))
+ 			return -EFAULT;
+-		if (features & ~VHOST_FEATURES)
++		if (features & ~VHOST_TEST_FEATURES)
+ 			return -EOPNOTSUPP;
+ 		return vhost_test_set_features(n, features);
+ 	case VHOST_RESET_OWNER:
+diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+index 621a6d9a8791..c7b92730668e 100644
+--- a/drivers/vhost/vhost.h
++++ b/drivers/vhost/vhost.h
+@@ -14,6 +14,7 @@
+ #include <linux/atomic.h>
+ #include <linux/vhost_iotlb.h>
+ #include <linux/irqbypass.h>
++#include <linux/unroll.h>
  
- static inline void virtio_features_set_bit(u64 *features,
- 					   unsigned int bit)
- {
- 	if (virtio_features_chk_bit(bit))
--		features[VIRTIO_DWORD(bit)] |= VIRTIO_BIT(bit);
-+		features[VIRTIO_U64(bit)] |= VIRTIO_BIT(bit);
- }
+ struct vhost_work;
+ struct vhost_task;
+@@ -279,14 +280,39 @@ void vhost_iotlb_map_free(struct vhost_iotlb *iotlb,
+ 				eventfd_signal((vq)->error_ctx);\
+ 	} while (0)
  
- static inline void virtio_features_clear_bit(u64 *features,
- 					     unsigned int bit)
- {
- 	if (virtio_features_chk_bit(bit))
--		features[VIRTIO_DWORD(bit)] &= ~VIRTIO_BIT(bit);
-+		features[VIRTIO_U64(bit)] &= ~VIRTIO_BIT(bit);
- }
+-enum {
+-	VHOST_FEATURES = (1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) |
+-			 (1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
+-			 (1ULL << VIRTIO_RING_F_EVENT_IDX) |
+-			 (1ULL << VHOST_F_LOG_ALL) |
+-			 (1ULL << VIRTIO_F_ANY_LAYOUT) |
+-			 (1ULL << VIRTIO_F_VERSION_1)
+-};
++#define VHOST_FEATURES \
++	VIRTIO_F_NOTIFY_ON_EMPTY, \
++	VIRTIO_RING_F_INDIRECT_DESC, \
++	VIRTIO_RING_F_EVENT_IDX, \
++	VHOST_F_LOG_ALL, \
++	VIRTIO_F_ANY_LAYOUT, \
++	VIRTIO_F_VERSION_1
++
++static inline u64 vhost_features_u64(const int *features, int size, int idx)
++{
++	u64 res = 0;
++
++	unrolled_count(VIRTIO_FEATURES_BITS)
++	for (int i = 0; i < size; ++i) {
++		int bit = features[i];
++
++		if (virtio_features_chk_bit(bit) && VIRTIO_U64(bit) == idx)
++			res |= VIRTIO_BIT(bit);
++	}
++	return res;
++}
++
++#define VHOST_FEATURES_U64(features, idx) \
++	vhost_features_u64(features, ARRAY_SIZE(features), idx)
++
++#define DEFINE_VHOST_FEATURES_ARRAY_ENTRY(idx, features) \
++	[idx] = VHOST_FEATURES_U64(features, idx),
++
++#define DEFINE_VHOST_FEATURES_ARRAY(array, features) \
++	u64 array[VIRTIO_FEATURES_U64S] = { \
++		UNROLL(VIRTIO_FEATURES_U64S, \
++		       DEFINE_VHOST_FEATURES_ARRAY_ENTRY, features) \
++	}
  
- static inline void virtio_features_zero(u64 *features)
- {
--	memset(features, 0, sizeof(features[0]) * VIRTIO_FEATURES_DWORDS);
-+	memset(features, 0, sizeof(features[0]) * VIRTIO_FEATURES_U64S);
- }
+ /**
+  * vhost_vq_set_backend - Set backend.
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index ae01457ea2cd..16662f2b87c1 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -29,12 +29,14 @@
+  */
+ #define VHOST_VSOCK_PKT_WEIGHT 256
  
- static inline void virtio_features_from_u64(u64 *features, u64 from)
-@@ -66,7 +67,7 @@ static inline bool virtio_features_equal(const u64 *f1, const u64 *f2)
- {
- 	int i;
+-enum {
+-	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
+-			       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+-			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET)
++static const int vhost_vsock_features[] = {
++	VHOST_FEATURES,
++	VIRTIO_F_ACCESS_PLATFORM,
++	VIRTIO_VSOCK_F_SEQPACKET
+ };
  
--	for (i = 0; i < VIRTIO_FEATURES_DWORDS; ++i)
-+	for (i = 0; i < VIRTIO_FEATURES_U64S; ++i)
- 		if (f1[i] != f2[i])
- 			return false;
- 	return true;
-@@ -74,14 +75,14 @@ static inline bool virtio_features_equal(const u64 *f1, const u64 *f2)
- 
- static inline void virtio_features_copy(u64 *to, const u64 *from)
- {
--	memcpy(to, from, sizeof(to[0]) * VIRTIO_FEATURES_DWORDS);
-+	memcpy(to, from, sizeof(to[0]) * VIRTIO_FEATURES_U64S);
- }
- 
- static inline void virtio_features_andnot(u64 *to, const u64 *f1, const u64 *f2)
- {
- 	int i;
- 
--	for (i = 0; i < VIRTIO_FEATURES_DWORDS; i++)
-+	for (i = 0; i < VIRTIO_FEATURES_U64S; i++)
- 		to[i] = f1[i] & ~f2[i];
- }
- 
-diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
-index 48bc12d1045b..9a3f2fc53bd6 100644
---- a/include/linux/virtio_pci_modern.h
-+++ b/include/linux/virtio_pci_modern.h
-@@ -107,7 +107,7 @@ void vp_modern_set_extended_features(struct virtio_pci_modern_device *mdev,
- static inline u64
- vp_modern_get_features(struct virtio_pci_modern_device *mdev)
- {
--	u64 features_array[VIRTIO_FEATURES_DWORDS];
-+	u64 features_array[VIRTIO_FEATURES_U64S];
- 
- 	vp_modern_get_extended_features(mdev, features_array);
- 	return features_array[0];
-@@ -116,11 +116,11 @@ vp_modern_get_features(struct virtio_pci_modern_device *mdev)
- static inline u64
- vp_modern_get_driver_features(struct virtio_pci_modern_device *mdev)
- {
--	u64 features_array[VIRTIO_FEATURES_DWORDS];
-+	u64 features_array[VIRTIO_FEATURES_U64S];
- 	int i;
- 
- 	vp_modern_get_driver_extended_features(mdev, features_array);
--	for (i = 1; i < VIRTIO_FEATURES_DWORDS; ++i)
-+	for (i = 1; i < VIRTIO_FEATURES_U64S; ++i)
- 		WARN_ON_ONCE(features_array[i]);
- 	return features_array[0];
- }
-@@ -128,7 +128,7 @@ vp_modern_get_driver_features(struct virtio_pci_modern_device *mdev)
- static inline void
- vp_modern_set_features(struct virtio_pci_modern_device *mdev, u64 features)
- {
--	u64 features_array[VIRTIO_FEATURES_DWORDS];
-+	u64 features_array[VIRTIO_FEATURES_U64S];
- 
- 	virtio_features_from_u64(features_array, features);
- 	vp_modern_set_extended_features(mdev, features_array);
++#define VHOST_VSOCK_FEATURES VHOST_FEATURES_U64(vhost_vsock_features, 0)
++
+ enum {
+ 	VHOST_VSOCK_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
+ };
 -- 
 MST
 
