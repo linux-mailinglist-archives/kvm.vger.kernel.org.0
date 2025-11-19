@@ -1,355 +1,233 @@
-Return-Path: <kvm+bounces-63664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10709C6C870
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 04:11:07 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCDEBC6C9A9
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 04:31:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C3CEF4E7516
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 03:11:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1E7D2383375
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 03:26:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A04D2D9EF2;
-	Wed, 19 Nov 2025 03:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB9C2EAB6B;
+	Wed, 19 Nov 2025 03:24:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KAe3etuP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32C415A86D;
-	Wed, 19 Nov 2025 03:10:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763521854; cv=none; b=JNiV7qY5vavVPPIFUr/S648pv/rxfKq+OMWjzfCTfVmuKBV2D1mznJSkRFi9LIBHPhj0uccPAHiJlWynfBCG5PDePQl3Yc1584qrkXiNG0wFvwLJ3Crv9HKKqfY0cbCHSxWtB6csLZV8PiGLC8TrylVffj4O+VuoBV2gtLZauK0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763521854; c=relaxed/simple;
-	bh=47LJCfN08bkIm00LG9Iy9e+3EfRwh03jcljG5dejSqY=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=kEEO4BPNMysdP2n8yl/B2uPqnu557vCj/j5yd7UTLlqfGZ7llLYOpWtsPgzGKpBGzRxWBzjgFAiOwTeJ0z8W4lyL7tmEg/SETpINRd49bZAtjUfhOwZdoTswJu9utKpE+oMa0ltEaAMUNUu2YOkkkMzUNbGBh1vN8Ljoz+OY25A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Cxf9M4NR1pxFMlAA--.14336S3;
-	Wed, 19 Nov 2025 11:10:48 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJBxicAzNR1pKgU4AQ--.3066S3;
-	Wed, 19 Nov 2025 11:10:46 +0800 (CST)
-Subject: Re: [PATCH 2/3] LoongArch: Add paravirt support with
- vcpu_is_preempted()
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, WANG Xuerui <kernel@xen0n.name>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
- Waiman Long <longman@redhat.com>, Juergen Gross <jgross@suse.com>,
- Ajay Kaher <ajay.kaher@broadcom.com>,
- Alexey Makhalov <alexey.makhalov@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, kvm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, x86@kernel.org
-References: <20251118080656.2012805-1-maobibo@loongson.cn>
- <20251118080656.2012805-3-maobibo@loongson.cn>
- <CAAhV-H4hoS0Wo3TS+FdikXMkb7qjWNFSPDoajQr0bzdeROJwGw@mail.gmail.com>
- <db8a26ca-8430-9e7d-4ad1-9b7743c4cfd1@loongson.cn>
- <CAAhV-H7uU6U9okJKqkUEXRT9OATpdMRgzZ8a7x0Xr6_bzD-x4A@mail.gmail.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <c14346a5-37ec-0fef-f143-c18227fec635@loongson.cn>
-Date: Wed, 19 Nov 2025 11:08:19 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA12B247280;
+	Wed, 19 Nov 2025 03:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763522664; cv=fail; b=cmIhUzBlQBXOsltKjjOOmFzafRyqwiUTZIjGZ+yxTR4NuY95/8z7d5MSWGNYgK5AHxxOy7l/gxrzmuzy9rcXMnANzUcGoi/qDoy3vJkpDqhJ3zudDwJh91dFmhPgDIx3Wz6SitvOgrIELScxAzO3wziZ4aFuXsG8yc8y+DTOXVY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763522664; c=relaxed/simple;
+	bh=PhBFaTE/Y4BVZJtgdgi4LXggRtWd2/5TFKyTpcwoOWo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=H3Zqx+QuY9MOM8MBmusg5/7apJXsgj5eNBD3e7I7R1T6JhDNiA4koYM/BE4fXhix1RFUx8+gOP6vn0wiwQczhb2oOTFa8Yu/LE18+W2o+d1K3jylKW7qaXy9fw/5chD/U39rRkFINUlQ2+wnEiZkLlOBw0ou5ZjE1+1bKL6gwNY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KAe3etuP; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763522663; x=1795058663;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=PhBFaTE/Y4BVZJtgdgi4LXggRtWd2/5TFKyTpcwoOWo=;
+  b=KAe3etuPRgM8ICER//0unDA1SmVPNyjwQWac/JP7ZKrZMR9oYE3sjQcA
+   8yKu8utYRdkrBT5tGDlF5IpCJGOQYKYJaTKptfeSpqql/BGSuo6c2PXzK
+   Zclw05eGE4y0GIlUdUTACPxNcm2jNKuQ0LN/jAAKUadmBLoUSZ56pwIxm
+   8fOtqi3z8laZP6QGJpojlFYnL/UJmL71CKdwwJ1J+8PZwPrPtyb3gkfLo
+   Bcblh7Ow4+lVBK7XwlKO3fc0SJksZopK8a/GJF/IOeSc9rINoX3l8HMGJ
+   p9ZwanvgpFql+IbLqPk/R9BwKT6ao2gEme1JgjMSFQ5W95mmQVRh5MxNa
+   A==;
+X-CSE-ConnectionGUID: mB7vyodRSqeFzvV/IberPg==
+X-CSE-MsgGUID: cwg089oHQ4W0ruKA5lMooA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11617"; a="65437655"
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="65437655"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 19:24:22 -0800
+X-CSE-ConnectionGUID: CZ1m/bNPT0i6YzfrAFcEMw==
+X-CSE-MsgGUID: hFkPUjnnTP67oZMXS+0Oxw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="191375551"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 19:24:21 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 18 Nov 2025 19:24:21 -0800
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Tue, 18 Nov 2025 19:24:21 -0800
+Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.45) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 18 Nov 2025 19:24:21 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=U7GanqetnJ3U7nACuv6rIvvp/XmkHwPxEAQnv3UnEBK1bnqWfkIqfXW9vXCP//kgoFZRJtkoOea90yeMcJXsI2q5uaoCeBhGMqFuv5If448a/CBSNoLvJ+4KpTVl7owLo2kQyxWGwQyoR7KXSn94awCZDVuOcEtBaJnG75RS+dADPq0IjT1LNIqs47pfkXjhPUQ0td7R0h3I5JCEWhiCWpSQALN6XY1XXkKFvePM06dehs+H1ICDqyAXsBJX/rLN4sMuatr92i4mUy6KIQaRmZ5JHtvWG2iqCx1tp6J9wQ0VlWtJcPfK3L1cpz3t3f30+P21TiitNPNLJsQRT7awGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XEPMSMXu2WnFlvlGxzaGTPEtGWEizwhVhdNo4DhLMqU=;
+ b=wnYMRxJpeEPc8N/zJ+JXnPpYc27tKkaZo+r5H3sRuxVil1vyZnDKlBoar6qsQEa4eb+dQJuoAslws3UZZYAbi2kRwQULqJ7esnhbcBP5vapLdf9zFE9XKemb8Lom5N3m9hqikjztXIU08L3setMVrGf+Vj1ZYM8+jScPlpejKxHbxLw7UzPC3uWP/23ArGao8ae1mBWmeF2Hh7YmCYGBVQ0WgXoLwDl/MSwD7F9pJ3yZi2FDX6pMzWHwiSb40FJO1Bz9BHZWohgZCvsXXfuBN7OYYj88YmbD9ZLXFd/Ivi98ThqTZT/hii6YZUn95Xmb5mxcGn/c9a/scx8fpkb/Cw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by DS4PPF708A6BB3E.namprd11.prod.outlook.com (2603:10b6:f:fc02::30) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Wed, 19 Nov
+ 2025 03:24:19 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::fdc2:40ba:101d:40bf]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::fdc2:40ba:101d:40bf%6]) with mapi id 15.20.9343.009; Wed, 19 Nov 2025
+ 03:24:17 +0000
+Date: Wed, 19 Nov 2025 11:24:07 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: "Xin Li (Intel)" <xin@zytor.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+	<corbet@lwn.net>, <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+	<luto@kernel.org>, <peterz@infradead.org>, <andrew.cooper3@citrix.com>,
+	<hch@infradead.org>, <sohil.mehta@intel.com>
+Subject: Re: [PATCH v9 12/22] KVM: VMX: Virtualize FRED event_data
+Message-ID: <aR04V4VVg+p4RsdT@intel.com>
+References: <20251026201911.505204-1-xin@zytor.com>
+ <20251026201911.505204-13-xin@zytor.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20251026201911.505204-13-xin@zytor.com>
+X-ClientProxiedBy: TPYP295CA0055.TWNP295.PROD.OUTLOOK.COM
+ (2603:1096:7d0:8::15) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H7uU6U9okJKqkUEXRT9OATpdMRgzZ8a7x0Xr6_bzD-x4A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBxicAzNR1pKgU4AQ--.3066S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3JF4UAr1DuFWfGFWxtrWkuFX_yoWfXr18pF
-	ykAFWv9a18Ww1xAw4aqFyj9r98tr95C3WIqa4agFyYyrnFgrnrJr1qyryY9Fy09w4UW3W0
-	qr97Gan3KF1aywcCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
-	6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-	1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxG
-	rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVW8ZVWrXwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jr9NsUUU
-	UU=
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|DS4PPF708A6BB3E:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0a59cfd9-d57f-48bf-e56b-08de271b1ef7
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?6IsDkC36V2MFdUuwyysNQcodDsCzVVn0/SmJU4D33kxTeGgSDObghbY7VZ3Z?=
+ =?us-ascii?Q?YLAeh+v7Mdv3B3dSZVjJqhB4+SC3oGKg6dYa21S6nymJC4Lr7xO3DygrT87R?=
+ =?us-ascii?Q?Dman6R7eHJ4/t/qGLeXTP3++n8qkNEakwe1pWpockMZrrRBAVpz8Rm4u4/HS?=
+ =?us-ascii?Q?UA300axdjJLcQT0EspTqbtRHJQF6vZdyHP15jKu9GzldpVlGyfJfUsNtzydF?=
+ =?us-ascii?Q?lMyPKPWqUZYYf5SbA1idv+yTEK6TxkPv/H3o7LfVUR+zR6KZ2U1evRs7TZdR?=
+ =?us-ascii?Q?ir8LTGt5CLGUcoyJxYupbsMt2Ld9py6SoI1QPz9JqCkjb2Zl/uKB+cdu2SHC?=
+ =?us-ascii?Q?4S2jg3IhelePKvurqeMb8Qn1MNGxkzJojRlGD8GXrZhiNA+bntBQ5kJ8zSP1?=
+ =?us-ascii?Q?r/LilDhZpczDyz3o0OBFPSJcnZTA5bP2DUrqEFglcBDpBso5TnKxvvdlcLzw?=
+ =?us-ascii?Q?lu+iMS4GAICuTI53IBjOpiS8MO+bbNf4akBr3cd+t+tb+2kU2QCBLd75LYvM?=
+ =?us-ascii?Q?bj5YQre8sM8wyM47s1qkANMw+AvlontMZipi/o9hwlVX/qWXHluU0vNjGmph?=
+ =?us-ascii?Q?3OZS4tNcMCu+X4bAT47tpx9gUzmg6h5IEjf9ahtZgG2bTGF3k7m+n9ihb7HO?=
+ =?us-ascii?Q?T2v0YZkaTwzkiLm4WZ5qfi5O1dKWBIDSwQnI1o3nxHOHRSolmlJ5FXqsOHd2?=
+ =?us-ascii?Q?/R82aj6ots8U0rfdo0EkgopADxAxi1fFnDbPupNsI0/YLiKJT+Ts4v3lm4zj?=
+ =?us-ascii?Q?jy+bRYZ37ugZaGB+si6qbigZzlxDLrkScdG/Q4hG77ExCbavFJfoure3lpkU?=
+ =?us-ascii?Q?ytBjlQWiqvctQxlysBD9tYiUXeUA3XF41DFXz3u0XRtrz9BWVNIjrnkNBlWI?=
+ =?us-ascii?Q?aCqadcSZ2TJCAsAweKmeJ4Znn//G56Gf9zYsg20vn6HcJxpsZDuvu9Td+zto?=
+ =?us-ascii?Q?1TQjwUi/riWrsdYaLQLtwu41Tk5JHFhcZHWbANtcpVNksmjymIZF6vgnoz8+?=
+ =?us-ascii?Q?ZCFmaaUlPahKaX7FCPuAKqviKZ0SrXkKSRYXGp/eXxepylV0qWbJhDC2VYLr?=
+ =?us-ascii?Q?y8CB+7bi+SKDr8qEKjWN9zlzBLD4rUFVnMGr922K49N1M9o+yr1Igd4Uzaeu?=
+ =?us-ascii?Q?4379TDFtN0HmOkTKbrISLSLqT7gyhKiXrw9bFCap2PqIS2OnlmCWLh4w6dyM?=
+ =?us-ascii?Q?8E8BMDue8h+dGkAy88wWrUQq/hpAINlKlMj8bSA1d8/s3+gIhnXSOhl6ZCHX?=
+ =?us-ascii?Q?6AZG80xA6wJvZUS90d6OhWeCY0dxzOKHcXknvn8fEMv6TefmsgNIQac2VEKU?=
+ =?us-ascii?Q?LP06KA7gqcvGc2QI3Raxflnpa9awCEu568uLFuPFmWV6mfv/L74ccsopDaeJ?=
+ =?us-ascii?Q?JHndxLvJUWC4GXKtq6I6rOdUnzhQORXKsuqgnjSHiUUUk2faWH2SGi/oUUv/?=
+ =?us-ascii?Q?OwkfGXZ+j5f1XHCA84qeg9e2K/TK/tG4?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5OiFB+cPpztkcJANYSnJy6K7jocAoJ44mXNkS7tTieCuF+xHt1sIbsOJSl14?=
+ =?us-ascii?Q?02gqeIp0izXuTxHC6MR/b/KUUQIg965/zQfenteDcFvZkb/x9815Bmsxk6jn?=
+ =?us-ascii?Q?nMlfYcObBlt1lMeMzRzOMGND4k4hyxcjQ/Am17N8k+pmdtvfalVMcyi7n8R9?=
+ =?us-ascii?Q?aslY7LuqKJeypWlewVsyrTzeXjn0iwT2GzdmiKe5fo/FHsKEzMmUoSLflNCo?=
+ =?us-ascii?Q?EPLVLByAS6zn/IcgLlxly+mn7WQ7dKuAvrg6n+tk69qmICEeSB3stJ/fCNxA?=
+ =?us-ascii?Q?QxxGi6uTqg+FQ/s2cVqCqc8+y1VpkDXuPjMz/cEG4XWxCcNnG1wX5FZ7+iwt?=
+ =?us-ascii?Q?CD3uw9c7w4AFBmxXTGjM0kyYPCccZNsKGMaw8k16XdJoNIhng51OL8F2UI8Z?=
+ =?us-ascii?Q?f+vLmXvxfeqWxFs39wZrDXTZ3gbYt0eRVTCfH8ZaqtkHm/GbcTmYsJe9YhFx?=
+ =?us-ascii?Q?p9RQQOja1vwuXsf7MV/uocJAk81o3NVVeW7EbmPFv5k/eOxva92dRl3ZNgWY?=
+ =?us-ascii?Q?kxpZs2q0/4Ka+Wi1fDr8wqoOFLn6ytOMreDcCdBRjCMewqpA+62scXnqiJOJ?=
+ =?us-ascii?Q?n/up/8FZ8qCMeJMzjk9pp1+G91A/Tq2URoLzeIqfmecRUZLVemwhhT2U+y3W?=
+ =?us-ascii?Q?g+KydTmKpSYi8M3plYnxIm+zDZYWSU6PMVNSAmcn0EqKP2UlTyCrAUsfRG9w?=
+ =?us-ascii?Q?gXuD1wDopSPjwakWGqWh01d4BQSFJpbWugIeNMuLnXM5iIC6H/uK5KbcfZ8Y?=
+ =?us-ascii?Q?eA3HJe96h5j/4C8ShzGvMB4fxPLArlk7JfoGeMy8LKYEy95TeVpnnSIUZfdE?=
+ =?us-ascii?Q?8u87YXyGuH771O56JlWGR98dQ7guQBgoVWuMoJQcn1x3ccP2gH0GwzUsMwIF?=
+ =?us-ascii?Q?NZEPnOrlpsWP7FouEMSxRgErHvyj8Wzp+Is/Il27R46/AdpaRuzHDQ61PogJ?=
+ =?us-ascii?Q?fbGiyCVhDSwooxgqbUhfkCpKYa5Oglum+hw9WWkzjWCE1g6E2vrerQ4ptbbV?=
+ =?us-ascii?Q?F4HO5g0a3spMr358d+2tK6AW9mgvL9Gbb0xYUGqPXh0w1cVXBM/4Tp86TIRs?=
+ =?us-ascii?Q?7VtS3b6mK6FLu9qpIDtLwNnlmGgKYWsOSIovMEen/c9o5rCoWCNKEWW6gcuu?=
+ =?us-ascii?Q?l/lloM3UwTAyC9NyZhME1TFdEGV/2GLfEZMbj3sBtv10NvqIFCja8hYBZo/L?=
+ =?us-ascii?Q?6Df61sl6KuM/r+yJHQK8QJNGaECWVsIY8ZnHHtMFAwav1Sm/Ce2OFtNbRbtJ?=
+ =?us-ascii?Q?2bMhFmlCeAyJisI7ffU6mJf7srKRfcvUpbBUP1r9pdpDf4ZqmIrbZ4OaXB+C?=
+ =?us-ascii?Q?YVaA771jG8HYtM9Aaxd/d8XVGcS79r2q/RBb5qgrQ8t0WslESgLMWYfGPKIZ?=
+ =?us-ascii?Q?AnOIJ+OctmgQPaG6dyWS9sf1/gz9Fj0UFXA7/wK0w4i/FMJdlbgOOw26/T0N?=
+ =?us-ascii?Q?OhMvVoPX7XCEvMITbiAOJmsgnZQ0nZM8UkX58UdczYrsci7esKI+zxZJrVDA?=
+ =?us-ascii?Q?pBLe/wU179jriKQlJBeLtoa53qc+ugp+HMJszr5GDvLfUyHFocnA7RYLwiGo?=
+ =?us-ascii?Q?lAeNbMNi9cCqmKz4ty5xI799lknquYTu1lxVZmqI?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a59cfd9-d57f-48bf-e56b-08de271b1ef7
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 03:24:17.5600
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: czUDVfiR3GFO0okiUuF4ruN7JJxIoENcCH+Am3DaDlmdKTAbpOI385gEatjuElEB3OZCL6xjFSmYk9KxIfctPQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPF708A6BB3E
+X-OriginatorOrg: intel.com
 
-
-
-On 2025/11/19 上午10:58, Huacai Chen wrote:
-> On Wed, Nov 19, 2025 at 10:01 AM Bibo Mao <maobibo@loongson.cn> wrote:
->>
->>
->>
->> On 2025/11/18 下午8:48, Huacai Chen wrote:
->>> Hi, Bibo,
->>>
->>> On Tue, Nov 18, 2025 at 4:07 PM Bibo Mao <maobibo@loongson.cn> wrote:
->>>>
->>>> Function vcpu_is_preempted() is used to check whether vCPU is preempted
->>>> or not. Here add implementation with vcpu_is_preempted() when option
->>>> CONFIG_PARAVIRT is enabled.
->>>>
->>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->>>> ---
->>>>    arch/loongarch/include/asm/smp.h      |  1 +
->>>>    arch/loongarch/include/asm/spinlock.h |  5 +++++
->>>>    arch/loongarch/kernel/paravirt.c      | 16 ++++++++++++++++
->>>>    arch/loongarch/kernel/smp.c           |  6 ++++++
->>>>    4 files changed, 28 insertions(+)
->>>>
->>>> diff --git a/arch/loongarch/include/asm/smp.h b/arch/loongarch/include/asm/smp.h
->>>> index 3a47f52959a8..5b37f7bf2060 100644
->>>> --- a/arch/loongarch/include/asm/smp.h
->>>> +++ b/arch/loongarch/include/asm/smp.h
->>>> @@ -18,6 +18,7 @@ struct smp_ops {
->>>>           void (*init_ipi)(void);
->>>>           void (*send_ipi_single)(int cpu, unsigned int action);
->>>>           void (*send_ipi_mask)(const struct cpumask *mask, unsigned int action);
->>>> +       bool (*vcpu_is_preempted)(int cpu);
->>>>    };
->>>>    extern struct smp_ops mp_ops;
->>>>
->>>> diff --git a/arch/loongarch/include/asm/spinlock.h b/arch/loongarch/include/asm/spinlock.h
->>>> index 7cb3476999be..c001cef893aa 100644
->>>> --- a/arch/loongarch/include/asm/spinlock.h
->>>> +++ b/arch/loongarch/include/asm/spinlock.h
->>>> @@ -5,6 +5,11 @@
->>>>    #ifndef _ASM_SPINLOCK_H
->>>>    #define _ASM_SPINLOCK_H
->>>>
->>>> +#ifdef CONFIG_PARAVIRT
->>>> +#define vcpu_is_preempted      vcpu_is_preempted
->>>> +bool vcpu_is_preempted(int cpu);
->>>> +#endif
->>> Maybe paravirt.h is a better place?
->>
->> It is actually a little strange to add macro CONFIG_PARAVIRT in file
->> asm/spinlock.h
->>
->> vcpu_is_preempted is originally defined in header file
->> include/linux/sched.h like this
->> #ifndef vcpu_is_preempted
->> static inline bool vcpu_is_preempted(int cpu)
->> {
->>           return false;
->> }
->> #endif
->>
->> that requires that header file is included before sched.h, file
->> asm/spinlock.h can meet this requirement, however header file paravirt.h
->> maybe it is not included before sched.h in generic.
->>
->> Here vcpu_is_preempted definition is added before the following including.
->>      #include <asm/processor.h>
->>      #include <asm/qspinlock.h>
->>      #include <asm/qrwlock.h>
->> Maybe it is better to be added after the above header files including
->> sentences, but need further investigation.
-> powerpc put it in paravirt.h, so I think it is possible.
-paravirt.h is included by header file asm/qspinlock.h on powerpc, 
-however it is not so on loongarch :)
-
-# grep paravirt.h arch/powerpc/* -r
-arch/powerpc/include/asm/paravirt_api_clock.h:#include <asm/paravirt.h>
-arch/powerpc/include/asm/qspinlock.h:#include <asm/paravirt.h>
-arch/powerpc/include/asm/simple_spinlock.h:#include <asm/paravirt.h>
-
-$ grep paravirt.h arch/loongarch/* -r
-arch/loongarch/include/asm/paravirt_api_clock.h:#include <asm/paravirt.h>
+>diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>index 4a74c9f64f90..0b5d04c863a8 100644
+>--- a/arch/x86/kvm/vmx/vmx.c
+>+++ b/arch/x86/kvm/vmx/vmx.c
+>@@ -1860,6 +1860,9 @@ void vmx_inject_exception(struct kvm_vcpu *vcpu)
 > 
->>>
->>>> +
->>>>    #include <asm/processor.h>
->>>>    #include <asm/qspinlock.h>
->>>>    #include <asm/qrwlock.h>
->>>> diff --git a/arch/loongarch/kernel/paravirt.c b/arch/loongarch/kernel/paravirt.c
->>>> index b1b51f920b23..b99404b6b13f 100644
->>>> --- a/arch/loongarch/kernel/paravirt.c
->>>> +++ b/arch/loongarch/kernel/paravirt.c
->>>> @@ -52,6 +52,13 @@ static u64 paravt_steal_clock(int cpu)
->>>>    #ifdef CONFIG_SMP
->>>>    static struct smp_ops native_ops;
->>>>
->>>> +static bool pv_vcpu_is_preempted(int cpu)
->>>> +{
->>>> +       struct kvm_steal_time *src = &per_cpu(steal_time, cpu);
->>>> +
->>>> +       return !!(src->preempted & KVM_VCPU_PREEMPTED);
->>>> +}
->>>> +
->>>>    static void pv_send_ipi_single(int cpu, unsigned int action)
->>>>    {
->>>>           int min, old;
->>>> @@ -308,6 +315,9 @@ int __init pv_time_init(void)
->>>>                   pr_err("Failed to install cpu hotplug callbacks\n");
->>>>                   return r;
->>>>           }
->>>> +
->>>> +       if (kvm_para_has_feature(KVM_FEATURE_PREEMPT_HINT))
->>>> +               mp_ops.vcpu_is_preempted = pv_vcpu_is_preempted;
->>>>    #endif
->>>>
->>>>           static_call_update(pv_steal_clock, paravt_steal_clock);
->>>> @@ -332,3 +342,9 @@ int __init pv_spinlock_init(void)
->>>>
->>>>           return 0;
->>>>    }
->>>> +
->>>> +bool notrace vcpu_is_preempted(int cpu)
->>>> +{
->>>> +       return mp_ops.vcpu_is_preempted(cpu);
->>>> +}
->>>
->>> We can simplify the whole patch like this, then we don't need to touch
->>> smp.c, and we can merge Patch-2/3.
->>>
->>> +bool notrace vcpu_is_preempted(int cpu)
->>> +{
->>> +  if (!kvm_para_has_feature(KVM_FEATURE_PREEMPT_HINT))
->>> +     return false;
->>> + else {
->>> +     struct kvm_steal_time *src = &per_cpu(steal_time, cpu);
->>> +     return !!(src->preempted & KVM_VCPU_PREEMPTED);
->>> + }
->>> +}
->> 1. there is assembly output about relative vcpu_is_preempted
->>    <loongson_vcpu_is_preempted>:
->>                  move    $r4,$r0
->>                  jirl    $r0,$r1,0
->>
->>    <pv_vcpu_is_preempted>:
->>           pcalau12i       $r13,8759(0x2237)
->>           slli.d  $r4,$r4,0x3
->>           addi.d  $r13,$r13,-1000(0xc18)
->>           ldx.d   $r13,$r13,$r4
->>           pcalau12i       $r12,5462(0x1556)
->>           addi.d  $r12,$r12,384(0x180)
->>           add.d   $r12,$r13,$r12
->>           ld.bu   $r4,$r12,16(0x10)
->>           andi    $r4,$r4,0x1
->>           jirl    $r0,$r1,0
->>
->>    <vcpu_is_preempted>:
->>           pcalau12i       $r12,8775(0x2247)
->>           ld.d    $r12,$r12,-472(0xe28)
->>           jirl    $r0,$r12,0
->>           andi    $r0,$r0,0x0
->>
->>    <vcpu_is_preempted_new>:
->>           pcalau12i       $r12,8151(0x1fd7)
->>           ld.d    $r12,$r12,-1008(0xc10)
->>           bstrpick.d      $r12,$r12,0x1a,0x1a
->>           beqz    $r12,188(0xbc) # 900000000024ec60
->>           pcalau12i       $r12,11802(0x2e1a)
->>           addi.d  $r12,$r12,-1400(0xa88)
->>           ldptr.w $r14,$r12,36(0x24)
->>           beqz    $r14,108(0x6c) # 900000000024ec20
->>           addi.w  $r13,$r0,1(0x1)
->>           bne     $r14,$r13,164(0xa4) # 900000000024ec60
->>           ldptr.w $r13,$r12,40(0x28)
->>           bnez    $r13,24(0x18) # 900000000024ebdc
->>           lu12i.w $r14,262144(0x40000)
->>           ori     $r14,$r14,0x4
->>           cpucfg  $r14,$r14
->>           slli.w  $r13,$r14,0x0
->>           st.w    $r14,$r12,40(0x28)
->>           bstrpick.d      $r13,$r13,0x3,0x3
->>           beqz    $r13,128(0x80) # 900000000024ec60
->>           pcalau12i       $r13,8759(0x2237)
->>           slli.d  $r4,$r4,0x3
->>           addi.d  $r13,$r13,-1000(0xc18)
->>           ldx.d   $r13,$r13,$r4
->>           pcalau12i       $r12,5462(0x1556)
->>           addi.d  $r12,$r12,384(0x180)
->>           add.d   $r12,$r13,$r12
->>           ld.bu   $r4,$r12,16(0x10)
->>           andi    $r4,$r4,0x1
->>           jirl    $r0,$r1,0
->>           andi    $r0,$r0,0x0
->>           andi    $r0,$r0,0x0
->>           andi    $r0,$r0,0x0
->>           andi    $r0,$r0,0x0
->>           andi    $r0,$r0,0x0
->>           lu12i.w $r13,262144(0x40000)
->>           cpucfg  $r13,$r13
->>           lu12i.w $r15,1237(0x4d5)
->>           ori     $r15,$r15,0x64b
->>           slli.w  $r13,$r13,0x0
->>           bne     $r13,$r15,-124(0x3ff84) # 900000000024ebb8
->>           addi.w  $r13,$r0,1(0x1)
->>           st.w    $r13,$r12,36(0x24)
->>           b       -128(0xfffff80) # 900000000024ebc0
->>           andi    $r0,$r0,0x0
->>           andi    $r0,$r0,0x0
->>           andi    $r0,$r0,0x0
->>           andi    $r0,$r0,0x0
->>           andi    $r0,$r0,0x0
->>           andi    $r0,$r0,0x0
->>           andi    $r0,$r0,0x0
->>           move    $r4,$r0
->>           jirl    $r0,$r1,0
->>
->> With vcpu_is_preempted(), there is one memory load and one jirl jump,
->> with vcpu_is_preempted_new(), there is two memory load and two beq
->> compare instructions.
-> Is vcpu_is_preempted() performance critical (we need performance data
-> here)? It seems the powerpc version is also complex.
+> 	vmcs_write32(VM_ENTRY_INTR_INFO_FIELD, intr_info);
 > 
->>
->> 2. In some scenery such nr_cpus == 1, loongson_vcpu_is_preempted() is
->> better than pv_vcpu_is_preempted() even if the preempt feature is enabled.
-> In your original patch, "mp_ops.vcpu_is_preempted =
-> pv_vcpu_is_preempted" if the preempt feature is enabled. Why is
-> loongson_vcpu_is_preempted() called when nr_cpus=1?
-> 
-> Huacai
-> 
->>
->> Regards
->> Bibo Mao
->>> Huacai
->>>
->>>> +EXPORT_SYMBOL(vcpu_is_preempted);
->>>> diff --git a/arch/loongarch/kernel/smp.c b/arch/loongarch/kernel/smp.c
->>>> index 46036d98da75..f04192fedf8d 100644
->>>> --- a/arch/loongarch/kernel/smp.c
->>>> +++ b/arch/loongarch/kernel/smp.c
->>>> @@ -307,10 +307,16 @@ static void loongson_init_ipi(void)
->>>>                   panic("IPI IRQ request failed\n");
->>>>    }
->>>>
->>>> +static bool loongson_vcpu_is_preempted(int cpu)
->>>> +{
->>>> +       return false;
->>>> +}
->>>> +
->>>>    struct smp_ops mp_ops = {
->>>>           .init_ipi               = loongson_init_ipi,
->>>>           .send_ipi_single        = loongson_send_ipi_single,
->>>>           .send_ipi_mask          = loongson_send_ipi_mask,
->>>> +       .vcpu_is_preempted      = loongson_vcpu_is_preempted,
->>>>    };
->>>>
->>>>    static void __init fdt_smp_setup(void)
->>>> --
->>>> 2.39.3
->>>>
->>>>
->>
->>
+>+	if (is_fred_enabled(vcpu))
+>+		vmcs_write64(INJECTED_EVENT_DATA, ex->event_data);
 
+I think event_data should be reset to 0 in kvm_clear_exception_queue().
+Otherwise, ex->event_data may be stale here, i.e., the event_data from the
+previous event may be injected along with the next event.
+
+<snip>
+
+>+
+> 	vmx_clear_hlt(vcpu);
+> }
+> 
+
+> 	/*
+>@@ -950,6 +963,7 @@ void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned int nr,
+> 	vcpu->arch.exception.error_code = error_code;
+> 	vcpu->arch.exception.has_payload = false;
+> 	vcpu->arch.exception.payload = 0;
+>+	vcpu->arch.exception.event_data = event_data;
+
+If userspace saves guest events (via kvm_vcpu_ioctl_x86_get_vcpu_events())
+right after an event is requeued, event_data will be lost (as that uAPI only
+saves the payload and KVM doesn't convert the event_data back to a payload
+there). So this event will be delivered with incorrect event_data if the
+event is restored on another system after migration.
+
+> }
+> EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_requeue_exception);
+> 
+>-- 
+>2.51.0
+>
 
