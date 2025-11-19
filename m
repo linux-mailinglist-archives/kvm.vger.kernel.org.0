@@ -1,560 +1,252 @@
-Return-Path: <kvm+bounces-63726-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63727-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 656C7C6F4D5
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 15:32:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D490DC6F7EC
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 16:01:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 68CCD2E455
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 14:31:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 106794F652D
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 14:53:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2560B34AAF7;
-	Wed, 19 Nov 2025 14:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363BF36998B;
+	Wed, 19 Nov 2025 14:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0J46IyH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LcrsNEP/"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE573101DE
-	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 14:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B544A36920F;
+	Wed, 19 Nov 2025 14:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763562593; cv=none; b=Umy4qmZTXGqEsIDVhjR0ZhBdicMx85eOxb7K3rMOaKDxEu34Wjtu3zDvC3s4PsNhTtvU+32T4bbynOfpdNpQYpwD7rUayRdjGwC3CBu+GGUn3T8M4F8t+FYjBeb/SfUfwopNHNbbKm4KsIpAbnsPh95ZWmhcsY6D3PK4mLY3b8E=
+	t=1763563814; cv=none; b=VN221qGwVrPBRfsNY/5qwEer20HC2dHn6Ia3GOfHj+0dyhICrDcGB/Vd0RJdk4Wdu7BERWUnaQB6MJ1Sio+ZUd5a5B5Po6lE5EiuN5iBjnldwzKHXGXpUmK3gAUVcaTmkiOR9xVdbrq3p2vOuVBa2eOF+5P2QSfUzE2dEd6pq+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763562593; c=relaxed/simple;
-	bh=QWwxLCo65YI6EUJ9QN5enxExOzudpPi/1Zek2Yl7Ll8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YWUaGGo/QDCbBb4Va0Nvjtf6vzjFHwOyUs8e+4q9jMUYurUpwNi2pnNTuyu+f5qfsOHAVWIjABvEhmhVfvYOddZn23i/SjWwO0t15AmwDXoQb02uwMP9MzY5lhqhrEkM8+e3hyV4/ClvPDOkttc0njDqbiHRQ4VusoVyelYFO+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0J46IyH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5997C2BCB4
-	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 14:29:52 +0000 (UTC)
+	s=arc-20240116; t=1763563814; c=relaxed/simple;
+	bh=pmpKDnH2uKvstiaClRjE20PveVTzDLqcJ5J5KfQb6S8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MAVfccOW+ZCCGPh4odYYL/vbgM+U/AJaDMZTAXFjHKxxHuVXOgx9jspQWf1TxQtCWc72QX74pDJOWbYhOO3CmJ60YFu8Kz8z6JMH0T7GcDc3VFJkuagy2UqZmTbBMrZybX7R6tgVnHNZqQUMyLLbpm5qFlmEPBgygl1Jxkc6+jQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LcrsNEP/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3938C4AF10;
+	Wed, 19 Nov 2025 14:50:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763562592;
-	bh=QWwxLCo65YI6EUJ9QN5enxExOzudpPi/1Zek2Yl7Ll8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=L0J46IyHhB1W9BqCju+ZfMAU9EC7AcpgXV9tasCW9WB2arzl3QOYOlWZd0mrbRvwP
-	 OD0j/b8ebmd4bXJevsTvbwhLTN6ouP2IU4Fbdo7ODSv9ncFZy/8/aMHBUoQC9B1ogs
-	 lyZlo7W/KvbC34cmb/COzysXA6sRT7VIeWsDd58TS85uiuqkIxSPMLI+CzGi77jJel
-	 0dfUUM7vhK5F8W3KCBkRa0LL1XPAmynluzNdPnSxrCGaFgaC+SA4tKWsrPVOYVulmy
-	 V4JOhiuxNOqOaC8Ml8uFJ8XEXKWSSiace9tXjSG3tftdyphor+osEjGlVcWbv/if4W
-	 L3Z1lUbr24PIA==
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b7277324204so944437066b.0
-        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 06:29:52 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWDUcOUXT6s+xPLV1sCoThG91PpgwWtb2j/SsThEKyv23aSzQk9PFuzRCbcWQGFoQDjh/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4Uw7Jy7rx2I9eVdDV6ZQwT3RsEiOsNdpPlYSBHSlT9skk6mwu
-	OdCuh2DKM2wcGYSHV3R+cMsO4IVZjQygGiQ3BonWX00chV3RwawpGWzBQ46wAr28cGByJVs0O1q
-	c7rXTBhFahdi/rku6EDIKOc0rfovUXtU=
-X-Google-Smtp-Source: AGHT+IGfTzHUp+TW4sMtzYrxbtCFB5b3MWEE37MvJ5eZTm+bam0bmZi/HVodQz4qkFvFkoK8JJOpk12cPNoSLyxzcgQ=
-X-Received: by 2002:a17:907:1c9c:b0:b6d:7b77:ff33 with SMTP id
- a640c23a62f3a-b736782c351mr1826184966b.19.1763562589628; Wed, 19 Nov 2025
- 06:29:49 -0800 (PST)
+	s=k20201202; t=1763563813;
+	bh=pmpKDnH2uKvstiaClRjE20PveVTzDLqcJ5J5KfQb6S8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LcrsNEP/cYavn31vXsC8q8kxUgGv+46Et2MVwTZ8gF77SMbTjkF4nB2wQBaMxNKGU
+	 i+/2o+bM64GJu+BLuW6zLkjUKBtHHlYMzXlzM4pjSA67NNU6s8zYkBNJUnTexK17Bp
+	 6Lp7os/5KlQKtqIhtjEsdU8wY04+SUaC7u9XgDC4zc+2soLqxFspe2w73PrOMeKxNt
+	 AUg0MlRp4Bmlt8WgpdK3oISI5amq2WLKRQY3kuFLVW4pYtnU4Msh1vXWt5/EM/PsUq
+	 aa9jiHbd1oaJWuoqBo+qGbB2tVoKiV6ppNZF0P5h52bxUi4hyZv7/jqxC0VtZW9jWG
+	 EHx9C2fLK2a/w==
+Date: Wed, 19 Nov 2025 16:50:07 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, iommu@lists.linux.dev,
+	linux-mm@kvack.org, linux-doc@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
+	linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
+	Nicolin Chen <nicolinc@nvidia.com>
+Subject: Re: [Linaro-mm-sig] [PATCH v8 06/11] dma-buf: provide phys_vec to
+ scatter-gather mapping routine
+Message-ID: <20251119145007.GJ18335@unreal>
+References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
+ <20251111-dmabuf-vfio-v8-6-fd9aa5df478f@nvidia.com>
+ <8a11b605-6ac7-48ac-8f27-22df7072e4ad@amd.com>
+ <20251119134245.GD18335@unreal>
+ <6714dc49-6b5c-4d58-9a43-95bb95873a97@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251119083946.1864543-1-gaosong@loongson.cn>
-In-Reply-To: <20251119083946.1864543-1-gaosong@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Wed, 19 Nov 2025 22:29:38 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H6Q+uxjcr=2LkBRAd=X4zjXeuwKTsJMBvD6bfbMsSHUcA@mail.gmail.com>
-X-Gm-Features: AWmQ_bm-zlvJKTuA1HX09Y8lxL95iJ6rRX5X2gJfLv2WVXAdahlvgzSmDr24QEI
-Message-ID: <CAAhV-H6Q+uxjcr=2LkBRAd=X4zjXeuwKTsJMBvD6bfbMsSHUcA@mail.gmail.com>
-Subject: Re: [PATCH] LoongArch: KVM: Add AVEC support irqchip in kernel
-To: Song Gao <gaosong@loongson.cn>
-Cc: maobibo@loongson.cn, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kernel@xen0n.name, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6714dc49-6b5c-4d58-9a43-95bb95873a97@amd.com>
 
-Hi, Song,
+On Wed, Nov 19, 2025 at 03:11:01PM +0100, Christian König wrote:
+> On 11/19/25 14:42, Leon Romanovsky wrote:
+> > On Wed, Nov 19, 2025 at 02:16:57PM +0100, Christian König wrote:
+> >>
+> >>
+> >> On 11/11/25 10:57, Leon Romanovsky wrote:
+> >>> From: Leon Romanovsky <leonro@nvidia.com>
+> >>>
+> >>> Add dma_buf_map() and dma_buf_unmap() helpers to convert an array of
+> >>> MMIO physical address ranges into scatter-gather tables with proper
+> >>> DMA mapping.
+> >>>
+> >>> These common functions are a starting point and support any PCI
+> >>> drivers creating mappings from their BAR's MMIO addresses. VFIO is one
+> >>> case, as shortly will be RDMA. We can review existing DRM drivers to
+> >>> refactor them separately. We hope this will evolve into routines to
+> >>> help common DRM that include mixed CPU and MMIO mappings.
+> >>>
+> >>> Compared to the dma_map_resource() abuse this implementation handles
+> >>> the complicated PCI P2P scenarios properly, especially when an IOMMU
+> >>> is enabled:
+> >>>
+> >>>  - Direct bus address mapping without IOVA allocation for
+> >>>    PCI_P2PDMA_MAP_BUS_ADDR, using pci_p2pdma_bus_addr_map(). This
+> >>>    happens if the IOMMU is enabled but the PCIe switch ACS flags allow
+> >>>    transactions to avoid the host bridge.
+> >>>
+> >>>    Further, this handles the slightly obscure, case of MMIO with a
+> >>>    phys_addr_t that is different from the physical BAR programming
+> >>>    (bus offset). The phys_addr_t is converted to a dma_addr_t and
+> >>>    accommodates this effect. This enables certain real systems to
+> >>>    work, especially on ARM platforms.
+> >>>
+> >>>  - Mapping through host bridge with IOVA allocation and DMA_ATTR_MMIO
+> >>>    attribute for MMIO memory regions (PCI_P2PDMA_MAP_THRU_HOST_BRIDGE).
+> >>>    This happens when the IOMMU is enabled and the ACS flags are forcing
+> >>>    all traffic to the IOMMU - ie for virtualization systems.
+> >>>
+> >>>  - Cases where P2P is not supported through the host bridge/CPU. The
+> >>>    P2P subsystem is the proper place to detect this and block it.
+> >>>
+> >>> Helper functions fill_sg_entry() and calc_sg_nents() handle the
+> >>> scatter-gather table construction, splitting large regions into
+> >>> UINT_MAX-sized chunks to fit within sg->length field limits.
+> >>>
+> >>> Since the physical address based DMA API forbids use of the CPU list
+> >>> of the scatterlist this will produce a mangled scatterlist that has
+> >>> a fully zero-length and NULL'd CPU list. The list is 0 length,
+> >>> all the struct page pointers are NULL and zero sized. This is stronger
+> >>> and more robust than the existing mangle_sg_table() technique. It is
+> >>> a future project to migrate DMABUF as a subsystem away from using
+> >>> scatterlist for this data structure.
+> >>>
+> >>> Tested-by: Alex Mastro <amastro@fb.com>
+> >>> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> >>> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> >>> ---
+> >>>  drivers/dma-buf/dma-buf.c | 235 ++++++++++++++++++++++++++++++++++++++++++++++
+> >>>  include/linux/dma-buf.h   |  18 ++++
+> >>>  2 files changed, 253 insertions(+)
+> >>>
+> >>> diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
+> >>> index 2bcf9ceca997..cb55dff1dad5 100644
+> >>> --- a/drivers/dma-buf/dma-buf.c
+> >>> +++ b/drivers/dma-buf/dma-buf.c
+> >>> @@ -1254,6 +1254,241 @@ void dma_buf_unmap_attachment_unlocked(struct dma_buf_attachment *attach,
+> >>>  }
+> >>>  EXPORT_SYMBOL_NS_GPL(dma_buf_unmap_attachment_unlocked, "DMA_BUF");
+> >>>  
+> >>> +static struct scatterlist *fill_sg_entry(struct scatterlist *sgl, size_t length,
+> >>> +					 dma_addr_t addr)
+> >>> +{
+> >>> +	unsigned int len, nents;
+> >>> +	int i;
+> >>> +
+> >>> +	nents = DIV_ROUND_UP(length, UINT_MAX);
+> >>> +	for (i = 0; i < nents; i++) {
+> >>> +		len = min_t(size_t, length, UINT_MAX);
+> >>> +		length -= len;
+> >>> +		/*
+> >>> +		 * DMABUF abuses scatterlist to create a scatterlist
+> >>> +		 * that does not have any CPU list, only the DMA list.
+> >>> +		 * Always set the page related values to NULL to ensure
+> >>> +		 * importers can't use it. The phys_addr based DMA API
+> >>> +		 * does not require the CPU list for mapping or unmapping.
+> >>> +		 */
+> >>> +		sg_set_page(sgl, NULL, 0, 0);
+> >>> +		sg_dma_address(sgl) = addr + i * UINT_MAX;
+> >>> +		sg_dma_len(sgl) = len;
+> >>> +		sgl = sg_next(sgl);
+> >>> +	}
+> >>> +
+> >>> +	return sgl;
+> >>> +}
+> >>> +
+> >>> +static unsigned int calc_sg_nents(struct dma_iova_state *state,
+> >>> +				  struct dma_buf_phys_vec *phys_vec,
+> >>> +				  size_t nr_ranges, size_t size)
+> >>> +{
+> >>> +	unsigned int nents = 0;
+> >>> +	size_t i;
+> >>> +
+> >>> +	if (!state || !dma_use_iova(state)) {
+> >>> +		for (i = 0; i < nr_ranges; i++)
+> >>> +			nents += DIV_ROUND_UP(phys_vec[i].len, UINT_MAX);
+> >>> +	} else {
+> >>> +		/*
+> >>> +		 * In IOVA case, there is only one SG entry which spans
+> >>> +		 * for whole IOVA address space, but we need to make sure
+> >>> +		 * that it fits sg->length, maybe we need more.
+> >>> +		 */
+> >>> +		nents = DIV_ROUND_UP(size, UINT_MAX);
+> >>> +	}
+> >>> +
+> >>> +	return nents;
+> >>> +}
+> >>> +
+> >>> +/**
+> >>> + * struct dma_buf_dma - holds DMA mapping information
+> >>> + * @sgt:    Scatter-gather table
+> >>> + * @state:  DMA IOVA state relevant in IOMMU-based DMA
+> >>> + * @size:   Total size of DMA transfer
+> >>> + */
+> >>> +struct dma_buf_dma {
+> >>> +	struct sg_table sgt;
+> >>> +	struct dma_iova_state *state;
+> >>> +	size_t size;
+> >>> +};
+> >>> +
+> >>> +/**
+> >>> + * dma_buf_map - Returns the scatterlist table of the attachment from arrays
+> >>> + * of physical vectors. This funciton is intended for MMIO memory only.
+> >>> + * @attach:	[in]	attachment whose scatterlist is to be returned
+> >>> + * @provider:	[in]	p2pdma provider
+> >>> + * @phys_vec:	[in]	array of physical vectors
+> >>> + * @nr_ranges:	[in]	number of entries in phys_vec array
+> >>> + * @size:	[in]	total size of phys_vec
+> >>> + * @dir:	[in]	direction of DMA transfer
+> >>> + *
+> >>> + * Returns sg_table containing the scatterlist to be returned; returns ERR_PTR
+> >>> + * on error. May return -EINTR if it is interrupted by a signal.
+> >>> + *
+> >>> + * On success, the DMA addresses and lengths in the returned scatterlist are
+> >>> + * PAGE_SIZE aligned.
+> >>> + *
+> >>> + * A mapping must be unmapped by using dma_buf_unmap().
+> >>> + */
+> >>> +struct sg_table *dma_buf_map(struct dma_buf_attachment *attach,
+> >>
+> >> That is clearly not a good name for this function. We already have overloaded the term *mapping* with something completely different.
+> > 
+> > This function performs DMA mapping, so what name do you suggest instead of dma_buf_map()?
+> 
+> Something like dma_buf_phys_vec_to_sg_table(). I'm not good at naming either.
 
-On Wed, Nov 19, 2025 at 5:04=E2=80=AFPM Song Gao <gaosong@loongson.cn> wrot=
-e:
->
-> Add a dintc device to set dintc msg base and msg size.
-> implement deliver the msi to vcpu and inject irq to dest vcpu.
-> add some macros for AVEC.
->
-> Signed-off-by: Song Gao <gaosong@loongson.cn>
-> ---
->  arch/loongarch/include/asm/irq.h       |   7 ++
->  arch/loongarch/include/asm/kvm_dintc.h |  22 +++++
->  arch/loongarch/include/asm/kvm_host.h  |   8 ++
->  arch/loongarch/include/uapi/asm/kvm.h  |   4 +
->  arch/loongarch/kvm/Makefile            |   1 +
->  arch/loongarch/kvm/intc/dintc.c        | 115 +++++++++++++++++++++++++
->  arch/loongarch/kvm/interrupt.c         |   1 +
->  arch/loongarch/kvm/irqfd.c             |  35 +++++++-
->  arch/loongarch/kvm/main.c              |   5 ++
->  arch/loongarch/kvm/vcpu.c              |  51 +++++++++++
->  drivers/irqchip/irq-loongarch-avec.c   |   5 +-
->  include/uapi/linux/kvm.h               |   2 +
->  12 files changed, 252 insertions(+), 4 deletions(-)
->  create mode 100644 arch/loongarch/include/asm/kvm_dintc.h
->  create mode 100644 arch/loongarch/kvm/intc/dintc.c
->
-> diff --git a/arch/loongarch/include/asm/irq.h b/arch/loongarch/include/as=
-m/irq.h
-> index 12bd15578c33..5ab8b91e9ae8 100644
-> --- a/arch/loongarch/include/asm/irq.h
-> +++ b/arch/loongarch/include/asm/irq.h
-> @@ -50,6 +50,13 @@ void spurious_interrupt(void);
->  #define NR_LEGACY_VECTORS      16
->  #define IRQ_MATRIX_BITS                NR_VECTORS
->
-> +#define AVEC_VIRQ_SHIFT                4
-> +#define AVEC_VIRQ_BIT          8
-> +#define AVEC_VIRQ_MASK         GENMASK(AVEC_VIRQ_BIT - 1, 0)
-> +#define AVEC_CPU_SHIFT         12
-> +#define AVEC_CPU_BIT           16
-> +#define AVEC_CPU_MASK          GENMASK(AVEC_CPU_BIT - 1, 0)
-> +
->  #define arch_trigger_cpumask_backtrace arch_trigger_cpumask_backtrace
->  void arch_trigger_cpumask_backtrace(const struct cpumask *mask, int excl=
-ude_cpu);
->
-> diff --git a/arch/loongarch/include/asm/kvm_dintc.h b/arch/loongarch/incl=
-ude/asm/kvm_dintc.h
-> new file mode 100644
-> index 000000000000..0ec301fbb638
-> --- /dev/null
-> +++ b/arch/loongarch/include/asm/kvm_dintc.h
-> @@ -0,0 +1,22 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2025 Loongson Technology Corporation Limited
-> + */
-> +
-> +#ifndef __ASM_KVM_DINTC_H
-> +#define __ASM_KVM_DINTC_H
-> +
-> +
-> +struct loongarch_dintc  {
-> +       spinlock_t lock;
-> +       struct kvm *kvm;
-> +       uint64_t msg_addr_base;
-> +       uint64_t msg_addr_size;
-> +};
-> +
-> +struct dintc_state {
-> +       atomic64_t vector_map[4];
-> +};
-> +
-> +int kvm_loongarch_register_dintc_device(void);
-> +#endif
-> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inclu=
-de/asm/kvm_host.h
-> index 0cecbd038bb3..3806a71658c1 100644
-> --- a/arch/loongarch/include/asm/kvm_host.h
-> +++ b/arch/loongarch/include/asm/kvm_host.h
-> @@ -22,6 +22,7 @@
->  #include <asm/kvm_ipi.h>
->  #include <asm/kvm_eiointc.h>
->  #include <asm/kvm_pch_pic.h>
-> +#include <asm/kvm_dintc.h>
->  #include <asm/loongarch.h>
->
->  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-> @@ -132,6 +133,7 @@ struct kvm_arch {
->         struct loongarch_ipi *ipi;
->         struct loongarch_eiointc *eiointc;
->         struct loongarch_pch_pic *pch_pic;
-> +       struct loongarch_dintc *dintc;
->  };
->
->  #define CSR_MAX_NUMS           0x800
-> @@ -242,6 +244,7 @@ struct kvm_vcpu_arch {
->         struct kvm_mp_state mp_state;
->         /* ipi state */
->         struct ipi_state ipi_state;
-> +       struct dintc_state dintc_state;
->         /* cpucfg */
->         u32 cpucfg[KVM_MAX_CPUCFG_REGS];
->
-> @@ -253,6 +256,11 @@ struct kvm_vcpu_arch {
->         } st;
->  };
->
-> +void loongarch_dintc_inject_irq(struct kvm_vcpu *vcpu);
-> +int kvm_loongarch_deliver_msi_to_vcpu(struct kvm *kvm,
-> +                                     struct kvm_vcpu *vcpu,
-> +                                     u32 vector, int level);
-> +
->  static inline unsigned long readl_sw_gcsr(struct loongarch_csrs *csr, in=
-t reg)
->  {
->         return csr->csrs[reg];
-> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/inclu=
-de/uapi/asm/kvm.h
-> index de6c3f18e40a..07da84f7002c 100644
-> --- a/arch/loongarch/include/uapi/asm/kvm.h
-> +++ b/arch/loongarch/include/uapi/asm/kvm.h
-> @@ -154,4 +154,8 @@ struct kvm_iocsr_entry {
->  #define KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL             0x40000006
->  #define KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT            0
->
-> +#define KVM_DEV_LOONGARCH_DINTC_CTRL                   0x40000007
-> +#define KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_BASE          0x0
-> +#define KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_SIZE          0x1
-> +
->  #endif /* __UAPI_ASM_LOONGARCH_KVM_H */
-> diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
-> index cb41d9265662..fe984bf1cbdb 100644
-> --- a/arch/loongarch/kvm/Makefile
-> +++ b/arch/loongarch/kvm/Makefile
-> @@ -19,6 +19,7 @@ kvm-y +=3D vm.o
->  kvm-y +=3D intc/ipi.o
->  kvm-y +=3D intc/eiointc.o
->  kvm-y +=3D intc/pch_pic.o
-> +kvm-y +=3D intc/dintc.o
->  kvm-y +=3D irqfd.o
->
->  CFLAGS_exit.o  +=3D $(call cc-disable-warning, override-init)
-> diff --git a/arch/loongarch/kvm/intc/dintc.c b/arch/loongarch/kvm/intc/di=
-ntc.c
-> new file mode 100644
-> index 000000000000..376c6e20ec04
-> --- /dev/null
-> +++ b/arch/loongarch/kvm/intc/dintc.c
-> @@ -0,0 +1,115 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2025 Loongson Technology Corporation Limited
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +#include <asm/kvm_dintc.h>
-> +#include <asm/kvm_vcpu.h>
-> +
-> +static int kvm_dintc_ctrl_access(struct kvm_device *dev,
-> +                                struct kvm_device_attr *attr,
-> +                                bool is_write)
-> +{
-> +       int addr =3D attr->attr;
-> +       void __user *data;
-> +       struct loongarch_dintc *s =3D dev->kvm->arch.dintc;
-> +
-> +       data =3D (void __user *)attr->addr;
-> +       switch (addr) {
-> +       case KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_BASE:
-> +               if (is_write) {
-> +                       if (copy_from_user(&(s->msg_addr_base), data, siz=
-eof(s->msg_addr_base)))
-> +                               return -EFAULT;
-> +               }
-> +               break;
-> +       case KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_SIZE:
-> +               if (is_write) {
-> +                       if (copy_from_user(&(s->msg_addr_size), data, siz=
-eof(s->msg_addr_size)))
-> +                               return -EFAULT;
-> +               }
-> +               break;
-> +       default:
-> +               kvm_err("%s: unknown dintc register, addr =3D %d\n", __fu=
-nc__, addr);
-> +               return -EINVAL;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static int kvm_dintc_get_attr(struct kvm_device *dev,
-> +                       struct kvm_device_attr *attr)
-> +{
-> +       switch (attr->group) {
-> +       case KVM_DEV_LOONGARCH_DINTC_CTRL:
-> +               return kvm_dintc_ctrl_access(dev, attr, false);
-> +       default:
-> +               kvm_err("%s: unknown group (%d)\n", __func__, attr->group=
-);
-> +               return -EINVAL;
-> +       }
-> +}
-> +
-> +static int kvm_dintc_set_attr(struct kvm_device *dev,
-> +                             struct kvm_device_attr *attr)
-> +{
-> +       switch (attr->group) {
-> +       case KVM_DEV_LOONGARCH_DINTC_CTRL:
-> +               return kvm_dintc_ctrl_access(dev, attr, true);
-> +       default:
-> +               kvm_err("%s: unknown group (%d)\n", __func__, attr->group=
-);
-> +               return -EINVAL;
-> +       }
-> +}
-> +
-> +static int kvm_dintc_create(struct kvm_device *dev, u32 type)
-> +{
-> +       struct kvm *kvm;
-> +       struct loongarch_dintc *s;
-> +
-> +       if (!dev) {
-> +               kvm_err("%s: kvm_device ptr is invalid!\n", __func__);
-> +               return -EINVAL;
-> +       }
-> +
-> +       kvm =3D dev->kvm;
-> +       if (kvm->arch.dintc) {
-> +               kvm_err("%s: LoongArch DINTC has already been created!\n"=
-, __func__);
-> +               return -EINVAL;
-> +       }
-> +
-> +       s =3D kzalloc(sizeof(struct loongarch_dintc), GFP_KERNEL);
-> +       if (!s)
-> +               return -ENOMEM;
-> +
-> +       spin_lock_init(&s->lock);
-> +       s->kvm =3D kvm;
-> +
-> +       kvm->arch.dintc =3D s;
-> +       return 0;
-> +}
-> +
-> +static void kvm_dintc_destroy(struct kvm_device *dev)
-> +{
-> +       struct kvm *kvm;
-> +       struct loongarch_dintc *dintc;
-> +
-> +       if (!dev || !dev->kvm || !dev->kvm->arch.dintc)
-> +               return;
-> +
-> +       kvm =3D dev->kvm;
-> +       dintc =3D kvm->arch.dintc;
-> +       kfree(dintc);
-> +}
-> +
-> +static struct kvm_device_ops kvm_dintc_dev_ops =3D {
-> +       .name =3D "kvm-loongarch-dintc",
-> +       .create =3D kvm_dintc_create,
-> +       .destroy =3D kvm_dintc_destroy,
-> +       .set_attr =3D kvm_dintc_set_attr,
-> +       .get_attr =3D kvm_dintc_get_attr,
-> +};
-> +
-> +int kvm_loongarch_register_dintc_device(void)
-> +{
-> +       return kvm_register_device_ops(&kvm_dintc_dev_ops, KVM_DEV_TYPE_L=
-OONGARCH_DINTC);
-> +}
-> diff --git a/arch/loongarch/kvm/interrupt.c b/arch/loongarch/kvm/interrup=
-t.c
-> index a6d42d399a59..c74e7af3e772 100644
-> --- a/arch/loongarch/kvm/interrupt.c
-> +++ b/arch/loongarch/kvm/interrupt.c
-> @@ -33,6 +33,7 @@ static int kvm_irq_deliver(struct kvm_vcpu *vcpu, unsig=
-ned int priority)
->                 irq =3D priority_to_irq[priority];
->
->         if (cpu_has_msgint && (priority =3D=3D INT_AVEC)) {
-> +               loongarch_dintc_inject_irq(vcpu);
->                 set_gcsr_estat(irq);
->                 return 1;
->         }
-> diff --git a/arch/loongarch/kvm/irqfd.c b/arch/loongarch/kvm/irqfd.c
-> index 9a39627aecf0..a6f9342eaba1 100644
-> --- a/arch/loongarch/kvm/irqfd.c
-> +++ b/arch/loongarch/kvm/irqfd.c
-> @@ -2,7 +2,6 @@
->  /*
->   * Copyright (C) 2024 Loongson Technology Corporation Limited
->   */
-> -
->  #include <linux/kvm_host.h>
->  #include <trace/events/kvm.h>
->  #include <asm/kvm_pch_pic.h>
-> @@ -16,6 +15,27 @@ static int kvm_set_pic_irq(struct kvm_kernel_irq_routi=
-ng_entry *e,
->         return 0;
->  }
->
-> +static int kvm_dintc_set_msi_irq(struct kvm *kvm, u32 addr, int data, in=
-t level)
-> +{
-> +       unsigned int virq, dest, cpu_bit;
-> +       struct kvm_vcpu *vcpu;
-> +
-> +       cpu_bit =3D find_first_bit((unsigned long *)&(kvm->arch.dintc->ms=
-g_addr_base), 64)
-> +                               - AVEC_CPU_SHIFT;
-> +       cpu_bit =3D min(cpu_bit, AVEC_CPU_BIT);
-> +
-> +       virq =3D (addr >> AVEC_VIRQ_SHIFT)&AVEC_VIRQ_MASK;
-> +       dest =3D (addr >> AVEC_CPU_SHIFT)&GENMASK(cpu_bit - 1, 0);
-> +       if (dest > KVM_MAX_VCPUS)
-> +               return -EINVAL;
-> +       vcpu =3D kvm_get_vcpu_by_id(kvm, dest);
-> +
-> +       if (!vcpu)
-> +               return -EINVAL;
-> +       return kvm_loongarch_deliver_msi_to_vcpu(kvm, vcpu, virq, level);
-> +}
-> +
-> +
->  /*
->   * kvm_set_msi: inject the MSI corresponding to the
->   * MSI routing entry
-> @@ -26,10 +46,21 @@ static int kvm_set_pic_irq(struct kvm_kernel_irq_rout=
-ing_entry *e,
->  int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
->                 struct kvm *kvm, int irq_source_id, int level, bool line_=
-status)
->  {
-> +       u64 msg_addr;
-> +
->         if (!level)
->                 return -1;
->
-> -       pch_msi_set_irq(kvm, e->msi.data, level);
-> +       msg_addr =3D (((u64)e->msi.address_hi) << 32) | e->msi.address_lo=
-;
-> +       if (cpu_has_msgint &&
-> +               msg_addr > kvm->arch.dintc->msg_addr_base &&
-> +               msg_addr <=3D (kvm->arch.dintc->msg_addr_base  + kvm->arc=
-h.dintc->msg_addr_size)) {
-> +               return kvm_dintc_set_msi_irq(kvm, e->msi.address_lo, e->m=
-si.data, level);
-> +       } else if (e->msi.address_lo  =3D=3D 0) {
-> +               pch_msi_set_irq(kvm, e->msi.data, level);
-> +       } else {
-> +               return 0;
-> +       }
->
->         return 0;
->  }
-> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
-> index 80ea63d465b8..d18d9f4d485c 100644
-> --- a/arch/loongarch/kvm/main.c
-> +++ b/arch/loongarch/kvm/main.c
-> @@ -408,6 +408,11 @@ static int kvm_loongarch_env_init(void)
->
->         /* Register LoongArch PCH-PIC interrupt controller interface. */
->         ret =3D kvm_loongarch_register_pch_pic_device();
-> +       if (ret)
-> +               return ret;
-> +
-> +       /* Register LoongArch DINTC interrupt contrroller interface */
-> +       ret =3D kvm_loongarch_register_dintc_device();
->
->         return ret;
->  }
-> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> index 1e7590fc1b47..4f13161be107 100644
-> --- a/arch/loongarch/kvm/vcpu.c
-> +++ b/arch/loongarch/kvm/vcpu.c
-> @@ -13,6 +13,57 @@
->  #define CREATE_TRACE_POINTS
->  #include "trace.h"
->
-> +void loongarch_dintc_inject_irq(struct kvm_vcpu *vcpu)
-> +{
-> +       struct dintc_state *ds =3D &vcpu->arch.dintc_state;
-> +       unsigned int i;
-> +       unsigned long temp[4], old;
-> +
-> +       if (!ds)
-> +               return;
-> +
-> +       for (i =3D 0; i < 4; i++) {
-> +               old =3D atomic64_read(&(ds->vector_map[i]));
-> +               if (old)
-> +                       temp[i] =3D atomic64_xchg(&(ds->vector_map[i]), 0=
-);
-> +       }
-> +
-> +       if (temp[0]) {
-> +               old =3D kvm_read_hw_gcsr(LOONGARCH_CSR_ISR0);
-> +               kvm_write_hw_gcsr(LOONGARCH_CSR_ISR0, temp[0]|old);
-> +       }
-> +       if (temp[1]) {
-> +               old =3D kvm_read_hw_gcsr(LOONGARCH_CSR_ISR1);
-> +               kvm_write_hw_gcsr(LOONGARCH_CSR_ISR1, temp[1]|old);
-> +       }
-> +       if (temp[2]) {
-> +               old =3D kvm_read_hw_gcsr(LOONGARCH_CSR_ISR2);
-> +               kvm_write_hw_gcsr(LOONGARCH_CSR_ISR2, temp[2]|old);
-> +       }
-> +       if (temp[3]) {
-> +               old =3D kvm_read_hw_gcsr(LOONGARCH_CSR_ISR3);
-> +               kvm_write_hw_gcsr(LOONGARCH_CSR_ISR3, temp[3]|old);
-> +       }
-> +}
-> +int  kvm_loongarch_deliver_msi_to_vcpu(struct kvm *kvm,
-> +                                       struct kvm_vcpu *vcpu,
-> +                                       u32 vector, int level)
-> +{
-> +       struct kvm_interrupt vcpu_irq;
-> +       struct dintc_state *ds;
-> +
-> +       if (!vcpu || vector >=3D 256)
-> +               return -EINVAL;
-> +       ds =3D &vcpu->arch.dintc_state;
-> +       if (!ds)
-> +               return -ENODEV;
-> +       set_bit(vector, (unsigned long *)&ds->vector_map);
-> +       vcpu_irq.irq =3D level ? INT_AVEC : -INT_AVEC;
-> +       kvm_vcpu_ioctl_interrupt(vcpu, &vcpu_irq);
-> +       kvm_vcpu_kick(vcpu);
-> +       return 0;
-> +}
-> +
->  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
->         KVM_GENERIC_VCPU_STATS(),
->         STATS_DESC_COUNTER(VCPU, int_exits),
-> diff --git a/drivers/irqchip/irq-loongarch-avec.c b/drivers/irqchip/irq-l=
-oongarch-avec.c
-> index bf52dc8345f5..2f0f704cfebb 100644
-> --- a/drivers/irqchip/irq-loongarch-avec.c
-> +++ b/drivers/irqchip/irq-loongarch-avec.c
-> @@ -209,8 +209,9 @@ static void avecintc_compose_msi_msg(struct irq_data =
-*d, struct msi_msg *msg)
->         struct avecintc_data *adata =3D irq_data_get_irq_chip_data(d);
->
->         msg->address_hi =3D 0x0;
-> -       msg->address_lo =3D (loongarch_avec.msi_base_addr | (adata->vec &=
- 0xff) << 4)
-> -                         | ((cpu_logical_map(adata->cpu & 0xffff)) << 12=
-);
-> +       msg->address_lo =3D (loongarch_avec.msi_base_addr |
-> +                         (adata->vec & AVEC_VIRQ_MASK) << AVEC_VIRQ_SHIF=
-T) |
-> +                         ((cpu_logical_map(adata->cpu & AVEC_CPU_MASK)) =
-<< AVEC_CPU_SHIFT);
->         msg->data =3D 0x0;
->  }
-As Bibo said, this patch should be splitted. At least this part
-(together with the macro definition) should be splitted out as a
-preparation patch and sent to the irqchip list.
+Can I call it simply dma_buf_mapping() as I plan to put that function in dma_buf_mapping.c
+file per-your request.
 
-This small part should be done as soon as possible, because we hope it
-will be merged to irqchip tree in the 6.19 cycle.
+Regarding SG, the long term plan is to remove SG table completely, so at
+least external users of DMABUF shouldn't be exposed to internal implementation
+details (SG table).
 
-
-Huacai
-
->
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 52f6000ab020..738dd8d626a4 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1198,6 +1198,8 @@ enum kvm_device_type {
->  #define KVM_DEV_TYPE_LOONGARCH_EIOINTC KVM_DEV_TYPE_LOONGARCH_EIOINTC
->         KVM_DEV_TYPE_LOONGARCH_PCHPIC,
->  #define KVM_DEV_TYPE_LOONGARCH_PCHPIC  KVM_DEV_TYPE_LOONGARCH_PCHPIC
-> +       KVM_DEV_TYPE_LOONGARCH_DINTC,
-> +#define KVM_DEV_TYPE_LOONGARCH_DINTC   KVM_DEV_TYPE_LOONGARCH_DINTC
->
->         KVM_DEV_TYPE_MAX,
->
-> --
-> 2.39.3
->
->
+Thanks
 
