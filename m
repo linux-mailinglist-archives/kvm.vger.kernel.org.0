@@ -1,177 +1,169 @@
-Return-Path: <kvm+bounces-63697-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63699-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44831C6E270
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 12:10:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 932E7C6E235
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 12:07:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4CA14352CA6
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 11:04:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 4B2442DC5C
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 11:07:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D74C352F82;
-	Wed, 19 Nov 2025 11:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD1F352952;
+	Wed, 19 Nov 2025 11:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QqbYJs9W";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="uEVn1Wcs"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tHc52Usx"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5A7350A0A
-	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 11:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC7D2F5A3C;
+	Wed, 19 Nov 2025 11:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763550261; cv=none; b=aTvcTiSs4pgKrgFIIFdVNBJ9Ip6X/8Pm/qIEfmvoH46X9jKmdv6pBeeo0iHZxv/KZPqau5k7+EDQYAGdhZPgHnRgNL7dORyDA+9GwsOS/iARx6OAKMP3ayn1MkKsiYajZ3roC/yNECUmHFyovZppEdNWoTzF/3L6z5nYlLo02Cg=
+	t=1763550384; cv=none; b=IQchq4VO+Wjp2H+0TAgmhggms5sgJcSwoVCMU832YNUB/sDwx55kZzUBoykt4W2cDpkoS88MqhPy5lrw+21aepiB8UQ9gXui0/p5igtyaSo5IdfD0zx7OVodTWgmAj7LGj5+HwFATThmdVy1NeqvF/dvDHhHEnKunYB4i19Aoek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763550261; c=relaxed/simple;
-	bh=Or/iFwMt+BMeSO1coYhZawNSolBDuL6LbxtDXCET8WI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hcAZ+h1UBM9OV7sZL82ETmbNHyq46sCv+GUwGKgkM0YBOEoYe5Y/6mGSQWbvAnT7OFtKiMy/yzqyVEdyj8hF45zbwvZmVuuHxCsIZF4VlpfV/DWYD6Z154twOhXASa+wdFoRDj68xg29qH7/SDFBaVPc1jw595xJ8ZaNkNY69EE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QqbYJs9W; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=uEVn1Wcs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763550257;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vKuBd2HW8nRsL/d/yhqkB0zqQvQiI6NwLHvu1csy0yA=;
-	b=QqbYJs9WyPur5F6SVXW39FmkvRxqjh2CM3mEN8+7L2gOsbr0Pj3L0MvqTRw/XX3rbCwZJd
-	FXYNt3OxXhnmtDmFprqfBlVisAP6yDdkxR0VB/RdpkxZzd33TtfdiFbYn9Nf2cgiDd+6X9
-	S3ijME4kkGK2hBPlfg3xJXT/KzHMSo8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-353-Y_vYN0GJO1ivfrdIUhnYog-1; Wed, 19 Nov 2025 06:04:16 -0500
-X-MC-Unique: Y_vYN0GJO1ivfrdIUhnYog-1
-X-Mimecast-MFC-AGG-ID: Y_vYN0GJO1ivfrdIUhnYog_1763550255
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42b56125e77so3345690f8f.3
-        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 03:04:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763550255; x=1764155055; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vKuBd2HW8nRsL/d/yhqkB0zqQvQiI6NwLHvu1csy0yA=;
-        b=uEVn1WcsaTqMiRrKNZiy6NqgGLAEyAQeKJKvxdH9sw7zKLmC7HJuLg6Ihu0MPLA/A+
-         S34IHb1FSNSZo1sH6oQ7iFK60B0HkN7x0qXzxwPuNHzU3h/fkpXMss6fUSW20zTWR2ss
-         XGyQUfKd7i7aJrVm7r853a3oGjbTRcj9BrLUQA0dn1OhqRTCnIB2ZwB0mkAc6/9N7hxQ
-         wDaxlXSZQJ8DeDvcbrJXXP/+kFXqB2UFhx7rwii40Rf9+mZ7jJ5RpYLMxqVyvNnK4Y1M
-         s5kOV9y1MaqyqZ2mSVhVq6F9miKPhLuY5Y0hJrX21ViM/fgdmmlS6X0xYf/L4XfI0+qZ
-         FvbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763550255; x=1764155055;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vKuBd2HW8nRsL/d/yhqkB0zqQvQiI6NwLHvu1csy0yA=;
-        b=E0uwGhWvb7iHJe/F2gbEVtmOM0h8hExF5WW1Ef4925xVh1xVe47gj+GwIj9Z41axv7
-         hA3erxkGkLk9TGtODVUGPzUse5typoqhMAmLPtqIkuHwrkprDNG8ltByZ1RHC2vBMK3w
-         7QIOpgMBwt17uV2IxoCQ/g0lV/y6kycCrUoiqGYRhnYxV55q6+4cxJSN+Kt1994Xm4qK
-         7HT65yOcVHdI+pZ95yrOi3n/4QyaBiFv067e08zCiK4gtLgTvawuAVOCbUOtwjXTlxWN
-         brPMJItVIV4Jwf98LUEbwyVr4ghA0SfEdcOaL2+D4jkI872GuoEqznZJakXLfckBlaT0
-         dQkA==
-X-Forwarded-Encrypted: i=1; AJvYcCWxj++iVvtApDKVOQKK3lF2nlHI4vtMfi6VobY6cJw5VMNZuw/72CQ0EEiMmOTH1HYfJFQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfJIZsS4h9UIJp93UuVivQsxAR7rfgL/r3hqLJxRNSYdBK/Egi
-	hqo05HyDuit1Rzx3q3mHtBMt0OVZBWOD9FW+z4DLdrggRlmFlLNYsKm+9XnhePMZKJADbw4hzJN
-	RfOlebu+Dktwa7fMhAZhZpFah5HugAbbRg/ssRYlgDSySzEYJ459BqQ==
-X-Gm-Gg: ASbGnct8qX3jDlp43s0YRiDmYYB+F5PoSCZYckSphsEmZc0zfZWi4VXjkEgSwg/UOQn
-	tWkrRpTg03OEtbXULjTjO53O6tzFiNod9PBZnTX2ARhTS9My/irBA/KFPIKOjz1Vn7PNjV7rpU1
-	ZyvpmCmg2GSuJwc42KqEXLKiSlatlxRzfym2AL5of1v2lqjWnB1P+CUSYYcwoZcqhciK/KwaPcD
-	DJN/fZnYioSKh7oEhi9SrTpAhXd+2ZLhk2fQdqptIfhqCqbv42+EY8KLrzyix1yiF/HLL79bz5+
-	SEhrH+nCVNY17g3FnFUsmaFL7aLbDc2JJIqgrc5rLn/1hhp2RRluBdm709IrduIEEuD9oCbylyZ
-	RFjEgr6J8ILE0
-X-Received: by 2002:a05:6000:1ac9:b0:42b:2e65:655e with SMTP id ffacd0b85a97d-42b5935a880mr17671088f8f.27.1763550255264;
-        Wed, 19 Nov 2025 03:04:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHnOndlVgs3mj8Ki0CtCTtbt0/DkKKE/b2cx4wA0ZToqoDYX1G7zSXdvoOnOMWxyBTwFXC8VQ==
-X-Received: by 2002:a05:6000:1ac9:b0:42b:2e65:655e with SMTP id ffacd0b85a97d-42b5935a880mr17671049f8f.27.1763550254851;
-        Wed, 19 Nov 2025 03:04:14 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.41])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e84a4fsm37236036f8f.11.2025.11.19.03.04.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Nov 2025 03:04:14 -0800 (PST)
-Message-ID: <4204ed4b-0da1-407f-84e0-e23e2ce65fc7@redhat.com>
-Date: Wed, 19 Nov 2025 12:04:12 +0100
+	s=arc-20240116; t=1763550384; c=relaxed/simple;
+	bh=1uV1vmMeM6tA/4abIrzulGX4cdatfChnd623tezCQwY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GpnZ1sHOSoDKjWMeymaoO/pwJsW6bm75j79vJtHbTxbdldA7EYpmYahT3dGVqpA8TbKsc/Vg6gHga4vVF7p63d5sOkQz0WsjAwgKNGGyowEITOVWKK+L3I1nnzqVhe0rGRW776E1fhQhgAMaXtPLzVLKB0ASt9QLDjre+SvrHbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tHc52Usx; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AJ4SPoa017684;
+	Wed, 19 Nov 2025 11:06:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=WObmAZ
+	cEfsNWs6IKlnP++yHGWelEOCF2wjJBKwoNZmA=; b=tHc52UsxZJX3XK9m4oFhoL
+	sEFRGYhw4gOn5gAU0ZiogLNpigGnQVkNah30ovAHpIPgJqtUm8Cza4zDrigbkXrO
+	fwfpaZp/VNkmCjN/ZUPev9zA97KEWEOo20jX4XH7+wG5PzEgk6L5QPNScHH7Glvc
+	+uMB/HOFyg8A2DD31fy7n25PbIszpc1LQjmvCbL0eK7WnAnJzJPBjRKmYr/k/rQD
+	zapiutB8fox0VxamJU4mdXhnwsM7q2H0V3EMlX0oAvZn1WMBXALiFzVrqDRX7Uqe
+	nsijsm2RBhZbiDCU/V7yNF1Oye/tPeLb9v3Ns2ufypPPEab7aUq3GUezH/9r+qiw
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejk9yy1n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Nov 2025 11:06:20 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AJ7Pp0O005244;
+	Wed, 19 Nov 2025 11:06:19 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4af5bk867h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Nov 2025 11:06:18 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AJB6EVU42336752
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 19 Nov 2025 11:06:15 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E1FEE2004B;
+	Wed, 19 Nov 2025 11:06:14 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0B00F20040;
+	Wed, 19 Nov 2025 11:06:13 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.87.156.96])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Wed, 19 Nov 2025 11:06:12 +0000 (GMT)
+Date: Wed, 19 Nov 2025 12:06:09 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Heiko Carstens <hca@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
+        seiden@linux.ibm.com, schlameuss@linux.ibm.com, svens@linux.ibm.com,
+        agordeev@linux.ibm.com, gor@linux.ibm.com, david@redhat.com,
+        gerald.schaefer@linux.ibm.com
+Subject: Re: [PATCH v3 15/23] KVM: s390: Add helper functions for fault
+ handling
+Message-ID: <20251119120609.4a4bf008@p-imbrenda>
+In-Reply-To: <20251118151005.9674Af1-hca@linux.ibm.com>
+References: <20251106161117.350395-1-imbrenda@linux.ibm.com>
+	<20251106161117.350395-16-imbrenda@linux.ibm.com>
+	<20251118151005.9674Af1-hca@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 2/2] vhost: switch to arrays of feature bits
-To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Jason Wang <jasowang@redhat.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>,
- kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Mike Christie <michael.christie@oracle.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
-References: <cover.1763535083.git.mst@redhat.com>
- <fbf51913a243558ddfee96d129d37d570fa23946.1763535083.git.mst@redhat.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <fbf51913a243558ddfee96d129d37d570fa23946.1763535083.git.mst@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: PCZXa7uLXtCC8Dgv-qApYf4PvvbyofZT
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfXxmj9TFKMiS4F
+ ktazYnXCQlNcjDjmGRyGjqAi5+DrXiuD7Zf0BUvheAaa1vLfh9WLWPD9LIx3HyNxw5cLtsybWcC
+ AmvBRQ+nyEs+Pt+OHnwUVMVubf6onF/vipNpIyhEJ9JQQrqsmQiD7rToCMUK99HONfYmyuyUFU6
+ B5ASyXfRlM0p772z5WvfQn+y00gIW7yKsEbeTSjJVSLoIDj7wjCtukKBZlg/qmA0hBjqdtOReEa
+ sP2KZhCyiMAnJRXSrbF6tN19Uv0Kae1sgB0Gk6+JCF3QcQx0FaKqCxQl2rzIRBQ8kYh3LEtTPtJ
+ Qwsy1A8rRG4MWlxYwtHYSJ67uWK00SIraxrJVmoAXSh3tznMbHs1CeQDoWn9RuW/3SFGFLU75xr
+ uZpu45xAM5cxfyr9zfB2hO9/rMoHyQ==
+X-Proofpoint-ORIG-GUID: PCZXa7uLXtCC8Dgv-qApYf4PvvbyofZT
+X-Authority-Analysis: v=2.4 cv=XtL3+FF9 c=1 sm=1 tr=0 ts=691da4ac cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VnNF1IyMAAAA:8 a=W69JXFrg6a1OFCXWetkA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-19_03,2025-11-18_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 spamscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
+ adultscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511150032
 
-On 11/19/25 7:55 AM, Michael S. Tsirkin wrote:
-> @@ -1720,6 +1720,7 @@ static long vhost_net_set_owner(struct vhost_net *n)
->  static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->  			    unsigned long arg)
->  {
-> +	const DEFINE_VHOST_FEATURES_ARRAY(features_array, vhost_net_features);
+On Tue, 18 Nov 2025 16:10:05 +0100
+Heiko Carstens <hca@linux.ibm.com> wrote:
 
-I'm sorry for the late feedback, I was drowning in other stuff.
+> On Thu, Nov 06, 2025 at 05:11:09PM +0100, Claudio Imbrenda wrote:
+> > Add some helper functions for handling multiple guest faults at the
+> > same time.
+> > 
+> > This will be needed for VSIE, where a nested guest access also needs to
+> > access all the page tables that map it.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > ---
+> >  arch/s390/include/asm/kvm_host.h |   1 +
+> >  arch/s390/kvm/Makefile           |   2 +-
+> >  arch/s390/kvm/faultin.c          | 148 +++++++++++++++++++++++++++++++
+> >  arch/s390/kvm/faultin.h          |  92 +++++++++++++++++++
+> >  arch/s390/kvm/kvm-s390.c         |   2 +-
+> >  arch/s390/kvm/kvm-s390.h         |   2 +
+> >  6 files changed, 245 insertions(+), 2 deletions(-)
+> >  create mode 100644 arch/s390/kvm/faultin.c
+> >  create mode 100644 arch/s390/kvm/faultin.h  
+> 
+> ...
+> 
+> > +int kvm_s390_faultin_gfn(struct kvm_vcpu *vcpu, struct kvm *kvm, struct guest_fault *f)
+> > +{  
+> 
+> ...
+> 
+> > +		scoped_guard(read_lock, &kvm->mmu_lock) {
+> > +			if (!mmu_invalidate_retry_gfn(kvm, inv_seq, f->gfn)) {
+> > +				f->valid = true;
+> > +				rc = gmap_link(mc, kvm->arch.gmap, f);
+> > +				kvm_release_faultin_page(kvm, f->page, !!rc, f->write_attempt);
+> > +				f->page = NULL;
+> > +			}
+> > +		}
+> > +		kvm_release_faultin_page(kvm, f->page, true, false);
+> > +
+> > +		if (rc == -ENOMEM) {
+> > +			rc = kvm_s390_mmu_cache_topup(mc);  
+> 
+> If I'm not mistaken then gmap_link() -> dat_link() maps the possible -ENOMEM
+> return value of dat_entry() to -EAGAIN. So the case where -ENOMEM leads to a
+> kvm_s390_mmu_cache_topup() call will never happen.
 
-I have just a couple of non blocking suggestions, feel free to ignore.
+oops, you're right
 
-I think that if you rename `vhost_net_features` as
-`vhost_net_features_bits` and `features_array` as `vhost_net_features`
-the diffstat could be smaller and possibly clearer.
-
->  	u64 all_features[VIRTIO_FEATURES_U64S];
->  	struct vhost_net *n = f->private_data;
->  	void __user *argp = (void __user *)arg;
-> @@ -1734,14 +1735,14 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->  			return -EFAULT;
->  		return vhost_net_set_backend(n, backend.index, backend.fd);
->  	case VHOST_GET_FEATURES:
-> -		features = vhost_net_features[0];
-> +		features = VHOST_FEATURES_U64(vhost_net_features, 0);
-
-Here and below you could use directly:
-
-		features = features_array[0];
-
-if you apply the rename mentioned above, this chunk and the following 3
-should not be needed.
-
-[...]> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-> index 42c955a5b211..af727fccfe40 100644
-> --- a/drivers/vhost/test.c
-> +++ b/drivers/vhost/test.c
-> @@ -308,6 +308,12 @@ static long vhost_test_set_backend(struct vhost_test *n, unsigned index, int fd)
->  	return r;
->  }
->  
-> +static const int vhost_test_features[] = {
-> +	VHOST_FEATURES
-> +};
-> +
-> +#define VHOST_TEST_FEATURES VHOST_FEATURES_U64(vhost_test_features, 0)
-
-If you rename `VHOST_FEATURES` to `VHOST_FEATURES_BITS` and
-`VHOST_TEST_FEATURES` to `VHOST_FEATURES`, the following two chunks
-should not be needed.
-
-Thanks,
-
-Paolo
-
+I'll fix dat_link() accordingly
 
