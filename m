@@ -1,112 +1,108 @@
-Return-Path: <kvm+bounces-63738-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63739-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 749B6C70424
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 17:56:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62257C7068F
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 18:19:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B74CD3C3EA8
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 16:36:48 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5B5B23C0F86
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 17:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E57935FF76;
-	Wed, 19 Nov 2025 16:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08B430148A;
+	Wed, 19 Nov 2025 17:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mafG8ZOF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hI/werp+"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530EE366DAF;
-	Wed, 19 Nov 2025 16:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7A42FDC55
+	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 17:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763570012; cv=none; b=U51JieKwrHARvUpu+V6rWx7tBOASc8FMgAWfzbfKWCIvx3z8QEpGBDCN9PyZS0W3jWsOtV8bYkskPRvbsb3MtLMve5VpK/XcO1ibYF+qqH5cURaHVNt43rqCO9K/O0XlHwunFa6xL/Qso1J2nZlz0oeKQzInhZuH+VzFaoE3Gxs=
+	t=1763571822; cv=none; b=nFJCrBt8P+haIcs2uNPf+hy68WOOOZ9Ztp2vrdx9VZGYPnGz1a4DD/U4c3mYQPeCOqVBv8q7hxQrZg5ZILWIx1ldR5b8IEcsaDL1euwghPiWmLj7WcqIJ7p08FdV1iH82cnx7K/IojEePOGc1whK41C2byX7yjefiltKXfGReJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763570012; c=relaxed/simple;
-	bh=SQB43V1lcm01gCfrVBWXeZWkfWYzDLNLnZu9KWeWJcg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mWVcMbYRgRQ0OxvJt5Q2L1zzYl59np6SjBhwVxDw4WjuLxelLFVtRQzu3BbLVx0QMpzBE5Jc/EFv6pZgX+iBz1EzJhZqFRn6l+x4dAck7hnLLnG3J0Um6sX6K/qia/WLgO0SiV6gevGzh6cfZLjbc2PpuMeiTKWSqO6xFAIFIgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mafG8ZOF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48D05C116B1;
-	Wed, 19 Nov 2025 16:33:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763570012;
-	bh=SQB43V1lcm01gCfrVBWXeZWkfWYzDLNLnZu9KWeWJcg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mafG8ZOF8WzHpM0Ap0HV10HNQ+V26iii16RmNEh8xlVGt/3Fyif1MM/ooh0K/pfIz
-	 szK/RWtsKgEJUAwJCF4Ei2amklh14ZMnM9irxppUQrCUJkvt/EZVFJcbPn28NcqEGY
-	 H5mQcoOTZFTUtioKEvXhb//Hd+eC/e25r6Py2bHgQa/vmQ3b9ezpxZIBWcXV9ncmwt
-	 7e2asxChIzWsMtQIBzyz1HCL0UngdmumU3R+J6sfLJMWs0oS7ZF4iSIBsph8VRgCK0
-	 +t4iS375piSkus/kTsSOX82JCK0IrwbeeJvL9xKC8TF2BvGIttU+8sQ9kfioC2gTlg
-	 KCxDuQf1gZvsw==
-Date: Wed, 19 Nov 2025 18:33:26 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <skolothumtho@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, iommu@lists.linux.dev,
-	linux-mm@kvack.org, linux-doc@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
-	linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
-	Nicolin Chen <nicolinc@nvidia.com>
-Subject: Re: [Linaro-mm-sig] [PATCH v8 06/11] dma-buf: provide phys_vec to
- scatter-gather mapping routine
-Message-ID: <20251119163326.GL18335@unreal>
-References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
- <20251111-dmabuf-vfio-v8-6-fd9aa5df478f@nvidia.com>
- <8a11b605-6ac7-48ac-8f27-22df7072e4ad@amd.com>
- <20251119134245.GD18335@unreal>
- <6714dc49-6b5c-4d58-9a43-95bb95873a97@amd.com>
- <20251119145007.GJ18335@unreal>
- <26d7ecab-33ed-4aab-82d5-954b0d1d1718@amd.com>
+	s=arc-20240116; t=1763571822; c=relaxed/simple;
+	bh=Joz8s/dxni9sL2elLvsu4hbVWZHfP5iY9H5gppebmlQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=grKd33ZfBi6lA3SGz/orrS3EmwHHDr/aEjHaI+ltpa5UxbxeqsaqkQgU5ltS18ZDIcVfugJqpRGWFlLVk+aeI9VI+muVgnJwB9LUoudday2GMmnCOKtr4ytKr1H4QHj4QAQQPejMB1lL0iA8l6Kd5iRcoB/AC49Z2gaU1ZajHto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hI/werp+; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5957d7e0bf3so1136460e87.0
+        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 09:03:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763571819; x=1764176619; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Joz8s/dxni9sL2elLvsu4hbVWZHfP5iY9H5gppebmlQ=;
+        b=hI/werp+0Bw10BKjLRjo6Du7NgDTtNFN/s9Y1bFstY3+NcDgQjQd6l6Im2IFE54JpX
+         qPldxqlRubHscTCNtLqdq3ibIlEd7pFTs2k8ufsw/yYe8+gPVebrb2Km5qsARlb6W8ve
+         0b1Llg1rInMrFfMWe7h34uB5lTVhAhszFUM3KnUDlW4W1sLeKgbzAJTUgbTHQqVGb0oJ
+         8PDdjEfuxty4QzwEd3Dz1rCi9VVT1HMufkZXDSYsA2MGzRPTYIvIdJcuQL4QBciGfCUX
+         e7EM/OkIoOmMMaw7rY+c8Ah8ybH7jzFzfncmeiJbrKr0pEnG+GMyxf1LOsGWBizRiGb1
+         C+fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763571819; x=1764176619;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Joz8s/dxni9sL2elLvsu4hbVWZHfP5iY9H5gppebmlQ=;
+        b=jNNm4u0YJZAIp2XEfzm+IJO024pGAFArkTteX0R1GwLaPvLV/uc/KkpeciKxJhsCPE
+         9V0XSET2Hc0eYtOxv9A5F6yRDXzZOVz0tb3cEKkZUkbstpFK85Deco3ioMbPYkravpPV
+         uDcUrl/CkdX5t8aHhoicROMUZD6qe1a5eX4ABKPZ7TPYwgdfrL42ATjqZWJPAFCIEbIv
+         sczDY6SDHBr2SjussX2OofkfMHchkFB60+2h2Pw5mZPY3G3HvobQqcJjJ4ewLFw2Up1y
+         EKtF6BYdxeIUvrMOuuwAFf2zTPAlVd7xPM6HLIv4tjzTuUSru3z42ZGD9jqmohO8wBYS
+         pUXw==
+X-Forwarded-Encrypted: i=1; AJvYcCXYxJuTxnavqasxslIQ0Hv1sRB5Ec+RiTvrdODvSnu9ZNeDyfAMhv9ZDKYNzSXeAd3Mfq8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSNAFAg0GIqOStkVM1kOxmzQR2KMYa78FYOPFceRuiuHRTexm3
+	Cce4SoYA839y9NFMVOt8jAZpmBS+QXlM0Tv0vLKadun+aEmMLy85bMGc7wSOb5EL97r0hCbg6l7
+	BEWmPKF0umVfVZb8L8fYYMANDiBeelJJM683uPgAg
+X-Gm-Gg: ASbGnct3z1x/MAfXOW1DurKwFP+LS7rabcEjSe6GCjYIEllEkf/8rxAkDsvcZrqNqsR
+	AKNeYKWNaGm4LXLt37JCFMzMrr2VpHwtBmUCSYjF+xL2mZVORkAT1Jb8DdxVUZltO0dZvPOU4ZO
+	/yKcoDLeeetcgfjrh1U4tV0rXrqiKyOsZlPNE/BYQA7IRMHnkEsDIqhkzco6Cw6+I8ZW2rIdPR3
+	BYxgAaOph62LMKotzxwAA9o8rxemGzPzqOOYDHlp5IbMdFlV7xe6o7afO2aGlE7Z5hMiyg=
+X-Google-Smtp-Source: AGHT+IHLnfFMB79mkG+6/o9cMHX6tnmLJ/qLfKaDy79MvHc48DxMublMslXondrAnHRz/vxgrdeuGlBqo3D+UMEcLug=
+X-Received: by 2002:a05:6512:239e:b0:595:9989:16fd with SMTP id
+ 2adb3069b0e04-5963c6ebb4cmr1183399e87.11.1763571818694; Wed, 19 Nov 2025
+ 09:03:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <26d7ecab-33ed-4aab-82d5-954b0d1d1718@amd.com>
+References: <20251112192232.442761-1-dmatlack@google.com> <aRuB45aR1LVGO1If@devgpu015.cco6.facebook.com>
+In-Reply-To: <aRuB45aR1LVGO1If@devgpu015.cco6.facebook.com>
+From: David Matlack <dmatlack@google.com>
+Date: Wed, 19 Nov 2025 09:03:11 -0800
+X-Gm-Features: AWmQ_bl4OFVMea1wDth-sxqYlydIYD_u1bMxVsbbLDnyANu2bUVfhbsszPNqIjQ
+Message-ID: <CALzav=eHne7TihNmskg9ctv1N+F0snKVmifwOdtmrU8LQwcDsg@mail.gmail.com>
+Subject: Re: [PATCH v2 00/18] vfio: selftests: Support for multi-device tests
+To: Alex Mastro <amastro@fb.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Alex Williamson <alex@shazbot.org>, 
+	Jason Gunthorpe <jgg@nvidia.com>, Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Raghavendra Rao Ananta <rananta@google.com>, Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 19, 2025 at 03:53:30PM +0100, Christian König wrote:
+On Mon, Nov 17, 2025 at 12:13=E2=80=AFPM Alex Mastro <amastro@fb.com> wrote=
+:
+>
+> On Wed, Nov 12, 2025 at 07:22:14PM +0000, David Matlack wrote:
+> > This series adds support for tests that use multiple devices, and adds
+> > one new test, vfio_pci_device_init_perf_test, which measures parallel
+> > device initialization time to demonstrate the improvement from commit
+> > e908f58b6beb ("vfio/pci: Separate SR-IOV VF dev_set").
+>
+> Aside from the Makefile assignment issue in "Split run.sh into separate
+> scripts", LGTM.
+>
+> Reviewed-by: Alex Mastro <amastro@fb.com>
 
-<...>
-
-> >>>>> +struct sg_table *dma_buf_map(struct dma_buf_attachment *attach,
-> >>>>
-> >>>> That is clearly not a good name for this function. We already have overloaded the term *mapping* with something completely different.
-> >>>
-> >>> This function performs DMA mapping, so what name do you suggest instead of dma_buf_map()?
-> >>
-> >> Something like dma_buf_phys_vec_to_sg_table(). I'm not good at naming either.
-> > 
-> > Can I call it simply dma_buf_mapping() as I plan to put that function in dma_buf_mapping.c
-> > file per-your request.
-> 
-> No, just completely drop the term "mapping" here. This is about phys_vector to sg_table conversion and nothing else.
-
-In order to progress, I renamed these functions to be
-dma_buf_phys_vec_to_sgt() and dma_buf_free_sgt(), and put everything in dma_buf_mapping.c file.
-
-Thanks
+Thanks for the review. I'll send a v3 this week to address your comments.
 
