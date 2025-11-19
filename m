@@ -1,181 +1,184 @@
-Return-Path: <kvm+bounces-63695-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63698-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F32C8C6E0AC
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 11:46:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD758C6E1F6
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 12:05:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2AA94E9107
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 10:38:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id D165A2E28B
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 11:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4A334D924;
-	Wed, 19 Nov 2025 10:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4FE3538A5;
+	Wed, 19 Nov 2025 11:04:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SYoy/uJG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XAxaz9si";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="a34AVZsN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA223347FFA
-	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 10:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358B2352FA2
+	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 11:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763548699; cv=none; b=lRE4abD6IzmrcFFnNjUN4XvMnkjA+b8dfrLr0NmcDEjeNQqhIAELB4PWs9GDNV2lrynhSwQh/NUciAq19jpgREEOqrt8pM1bcnLCR0LeJnTtk212n9qg7/RMReLc4+KlP9VdQkVyhoPm+/ktt2nZYj/DBf5paMnBQoPso4CYWVA=
+	t=1763550283; cv=none; b=Dq6rKK4j7mel7ZlkQXzHYZ1Ml1emiNWBoUg9zmODNM49i3ZK3ys5Ic8mg/a6KcvFXcDzE3UksK2ROXjZxELUqn1fD6hGE03p5KW2gxpOFqz62buUCleWszc4Guga4khuxqH4t6gFqyK7wuW+x5WbMEKhXFVulg/68TduVZ1KxCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763548699; c=relaxed/simple;
-	bh=qWJmc0Xb6IbyOw8w8OA9A8sY8tyZ294+v84mJLscPjU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BiboorSPvo4qxlInrsZ10oRwdc0A2cnjD+IRJIgfWh6krynurkIl0Z716eLi+9RGxo7j1VPFM1yOP9hnm4jSRirkXpA4JCSfFxyQ89BZsTHD3sWVjWISaDfFpxfv/kEo4n9X4BnThhqSTliRT+Ay2ub01ENAXc67KQJ6LKBD/sM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SYoy/uJG; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4edb8d6e98aso318721cf.0
-        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 02:38:17 -0800 (PST)
+	s=arc-20240116; t=1763550283; c=relaxed/simple;
+	bh=QJRpxNJ6nM55oUProzvGLMXrymnGB0HzC7vMJLxqOVg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uCYxBxJSIrs5YGNJYL4BMo4HOJA3eaRBkGX5vMH1rAVCbxUpBp0jK+DmAYHdS46kJixNpileuPH2IKbSHVkLaoPxfaLfaH1+j5SZ5sJJo12QzR/3LO2ttC4sjaYEAJ2o2gzxV5Qq5hr+N9ityltQNf1QRoo7HjmR4JTIItjgEC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XAxaz9si; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=a34AVZsN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763550280;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=42XSTDD+Tw2WVGrVsFAsxHT5sZ/yd8/fKSBACD6leIQ=;
+	b=XAxaz9siEu3dufMJtmuP2Lkb8OtZenxaH9Ko5MrLjkpsJNqwEpli5c/qSu5vUW5ZFqRrKR
+	z7IcJvqDdtkpB/S0pmp8ejyHHLH9Nrte5J03RX7sgcx69Lrrb8Mm9NiJMby06Nj7gu1tXT
+	fQIIl68vG83Bjh5SNp1xy8IP2ATt9k8=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-660-hi5u9ncuOj-yZwyulBh7Ag-1; Wed, 19 Nov 2025 06:04:38 -0500
+X-MC-Unique: hi5u9ncuOj-yZwyulBh7Ag-1
+X-Mimecast-MFC-AGG-ID: hi5u9ncuOj-yZwyulBh7Ag_1763550278
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-8824292911cso17070896d6.1
+        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 03:04:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763548697; x=1764153497; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ajPJXKSb6EvakAv/OuhuRvH8YRFIbHznazB/0gEJ+2M=;
-        b=SYoy/uJGNFg97q//gi107l7bEebyW+GxrjNsAtH50NjBo3JlJVTOQV4T6n8Zg9MGrS
-         z3qAlc1N5pNd76AC+Q76C+dBQRxmFnUiEy2FPHr1aHz5bINIoHQIj/i9XiEBERqnhgYa
-         GZC/4xddHIekpKFagJ5aVn9uqIV66UhPw/FcP8tB/3EYCno8QWV/W95Qn5rZTeDMz+Oy
-         +SKoy8s+00J0xpWW80bRF4IVibqSx65gtxS8a4rosKoABOGIzeOLMhx8FQnTLFwhb8Z1
-         oPqSluHy4IlyDaCXdCDNwZ3IHblvvSGJFGbGpFSfBfEkUdlmOOrgNDpZ+UHoN7SeBPMp
-         rpkg==
+        d=redhat.com; s=google; t=1763550278; x=1764155078; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=42XSTDD+Tw2WVGrVsFAsxHT5sZ/yd8/fKSBACD6leIQ=;
+        b=a34AVZsNXjM+XWUSGb+JUGfhIezMxetxPfQJ0LdxM7JD1Gl+NCL5TmaahNwA3W51ns
+         /EaCg9C+LnFwmXWUyuQ2u/ddDQZ3Y+1dHaj4amrNQcxJQ/ky7nJeUoGMTAsHdzvbLFpy
+         t5TW7is2qMykSe024ldj23RxSkrKEUx3Bjrz7O54avbzCBWBc5JsMGjG7C4XNsARb1S1
+         OeM7bIuYZlkofsxLfG2rrWrWyGuHCPSGYysxJtoijUYtYMupPQTXmtvRl9VwLAsga2CY
+         HZTki6YU50vGVV/0wYNFdWStCDWEzzWEnY/ZaJHzuontkR7MRF3EcBhKTaExzUV08q6C
+         wZoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763548697; x=1764153497;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ajPJXKSb6EvakAv/OuhuRvH8YRFIbHznazB/0gEJ+2M=;
-        b=cgDhdOef5J4Q8AT/Q469u0mn1QKMoQl0Wj66QjE/wjOfqJoR92W3o2gSf1jGBdKm9F
-         LdFNhPsBvKBZEVtdEmMhUjvHj3QtmDc24ysHwTCvhtm8z5kamJc4rcl1o8g4uVKLI5x1
-         yhugemjnJHwpflE1eAIciAehBB/II0BDhc/kVNwOzNoIvK6DldyjJwTM+rlhXb3Jh/Tk
-         cuU61UqTQiKmPlv7/dn+NRnQFmUO9fBmPUfuCqM/jzLfJU5JkNuwhbUZ1aE3Yg0KWqT/
-         FQNOgn+p1+NEaK5JrYGE2LTAVo2oSaNnAPTeEu9JrAny35NUvxJfFFmnIsIl5gwihskf
-         4sCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUTFFmWoR7C4gSxIC6lBvomkayqL78LfZE40NgJY2Aw7+Q2GSSMWGyXUJwTgwBi1CS5paI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNLGaLRaz0ThN3JpK5b6tWckBLD4ZxCMMIdJz4sB7W0E3eyek2
-	jT4+TvGtZx4TsdfUmSZ1AFCsap9Di8bkMpSIqnr+u7gbaGeldW5rQcBeG1VMGxI3kIN9nHoKfjG
-	v6nZj9cImqTb1s8IprSH26VQCaoge+Iq/0GT846ke
-X-Gm-Gg: ASbGncsaRxug3tXG7jSy5yGflV1H95akEKXE3qXz46xR4YP+cX4imXWLezV+RuWxnZd
-	/xwqG/c97Ie06XkHct1abhP76aD6v0VZam8Cw+pkqxeYDVq8OFGQziDa3+4tnWq7+0P0TKYDuc0
-	4v+vCGJknL1LGoKeOWX0chHv3nZ6DuXCJLAk0A+BLWwBX709Ah6SsRM1azebt1TyoGBZVDAcRF+
-	yPbdjdvwJu4hJgXvlZt6DXYz1OP/4gvUFPgVnjRK3AjHd+lJLBTOqKXKYBRAInG8vog4OH4Gp6M
-	cbIcB/hL8kVlaSM5v1v2UtYiSlOSg078ClA=
-X-Google-Smtp-Source: AGHT+IHyZj1mHlRoqcMVEK+Ke9v+QKN/GTCdvCboTV8ytrHFav/L7x1i8RWg43NziKnKMj+gWGYsCAB6fcyxt7vblr4=
-X-Received: by 2002:a05:622a:1b88:b0:4ed:18ef:4060 with SMTP id
- d75a77b69052e-4ee3ec3080cmr5005131cf.8.1763548696534; Wed, 19 Nov 2025
- 02:38:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763550278; x=1764155078;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=42XSTDD+Tw2WVGrVsFAsxHT5sZ/yd8/fKSBACD6leIQ=;
+        b=qtNpJFvSqbbRsWjSAxhQvvDGI5XGxAZ1AUlqBujDh44CMBsyCqK3r1/tNwZg9NNJgX
+         LD/Gg7xgmvyn9b2owTPyIRNLeVkg9TseSBsVTFoRNg+pLILxF1gDF9GOLSXJJyWw5RGe
+         yG+JCSMiAEYMl0o9SYmIeDAGjsIIJzzGLCaOAedAocjZ9rZOwHTXKA81nkRx2QD2eftW
+         pa50+S0wnc2Y7TpHoBNE3FtpDivf1QQGwDMG6zgn67huljpOef60+ND0SnFQe7fsRRig
+         cA+hZj7SO2P7XMCdtGFNW24ABBXRqcu9vq/Tx3g2iv6QPkgIAeNwZUydJG4C5krH/Fp+
+         BuAA==
+X-Forwarded-Encrypted: i=1; AJvYcCWpmlMxq7MvCFZohpqsodn1VHa+6sAFrg87FG5t+0JnEOFhMHW81HKly0hFnCYiuwPPOHY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzjt5xApr6f65W8Bj683zUcHluXtVFQ/1m4Df30x9O4/6l0h7XS
+	zGBtXQh/Cbq1jHqtweXpeq9adsleYiWq7vg6R623q9sZgMRiI8WbFnA5AY3RD0TktDtANrLYX5j
+	G9Pv4fVfRNrZAo7ARoeVXCMH+HiKfxXHRsiui6EQUcLoGmRd2i0eQCA==
+X-Gm-Gg: ASbGncudlWajqfgjB26cfQ2gXRJQ8Ac4fHs+rzLTn3GYYtR1aTEpODRHBxRvEHvQxou
+	AI6+9Cwl3CnJILoKaTozIU28b2OYZBKMhyAAUN+nG8vUr87WDhh2RBOkzvFz3GOiJU9Gz50cJGe
+	IW8DFdzYFVJ0nbt0WZtfhx/zUhtgMB0FZDsC2NsuwunpJbsQopJgpXDayF5N+mzOR8QBubZZ7GM
+	gLAa8dXaww+OkVeLD7TY1zF9iSXS8ouj+XK3aFs9ejNRHxSs9GIhHlhqzQQui0wA3AIv+hpGNv5
+	r3B/Ssymu8K56l7ibQG7qpLCzz6OyNc7tpf+MFJA5t1NXOTjHorezgr6JCP5jEhsmMieiUGNX9l
+	518Wq+l0tB9HWoXrYBUcQC2s6AxZ6DxVSAcByIqYEl8rrlPdH05xEyFFyCr/njA==
+X-Received: by 2002:a05:6214:5e88:b0:882:760e:822e with SMTP id 6a1803df08f44-8845ffd1671mr19255846d6.2.1763550278371;
+        Wed, 19 Nov 2025 03:04:38 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGUx18S7QU3TAKJCuch0iU57e5cRCXq8XDSG2cx+/NGC5m+qevE8BVa0OMVsBGaSQSjDNVFOQ==
+X-Received: by 2002:a05:6214:5e88:b0:882:760e:822e with SMTP id 6a1803df08f44-8845ffd1671mr19255436d6.2.1763550277970;
+        Wed, 19 Nov 2025 03:04:37 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8828613962esm132823926d6.0.2025.11.19.03.04.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Nov 2025 03:04:36 -0800 (PST)
+Date: Wed, 19 Nov 2025 12:04:12 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v10 03/11] vsock: reject bad
+ VSOCK_NET_MODE_LOCAL configuration for G2H
+Message-ID: <tfrb7l3cguctjl5jbd7ykon4aqav4ognxndtnohs7ukmvk7wkm@tpaaicknwwhq>
+References: <20251117-vsock-vmtest-v10-0-df08f165bf3e@meta.com>
+ <20251117-vsock-vmtest-v10-3-df08f165bf3e@meta.com>
+ <vsyzveqyufaquwx3xgahsh3stb6i5u3xa4kubpvesfzcuj6dry@sn4kx5ctgpbz>
+ <aR0arw2F/DmbIrzY@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251117091527.1119213-1-maz@kernel.org> <aRweUM4O71ecPvVr@kernel.org>
- <CA+EHjTzJQOTTSUoXVKpGdWO8vz9Vc-2AL3zRyzG4DkUPz+wBBQ@mail.gmail.com> <86ms4jrwhr.wl-maz@kernel.org>
-In-Reply-To: <86ms4jrwhr.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 19 Nov 2025 10:37:39 +0000
-X-Gm-Features: AWmQ_bnZDu_VkCPXAw-nz27IkT05jj1DSam5-p8uzswdO8xX2NqMq69pMVBt_H4
-Message-ID: <CA+EHjTyiM+BNP+iRTYP7968np=y0+Vn38GtAfiTtg=JcUzjPpQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/5] KVM: arm64: Add LR overflow infrastructure (the
- dregs, the bad and the ugly)
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Mark Brown <broonie@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <aR0arw2F/DmbIrzY@devvm11784.nha0.facebook.com>
 
-Hi Marc,
+On Tue, Nov 18, 2025 at 05:17:35PM -0800, Bobby Eshleman wrote:
+>On Tue, Nov 18, 2025 at 07:10:28PM +0100, Stefano Garzarella wrote:
+>> On Mon, Nov 17, 2025 at 06:00:26PM -0800, Bobby Eshleman wrote:
+>> > From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-On Tue, 18 Nov 2025 at 19:06, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+
+>> > diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+>> > index 7eccd6708d66..da7c52ad7b2a 100644
+>> > --- a/net/vmw_vsock/vmci_transport.c
+>> > +++ b/net/vmw_vsock/vmci_transport.c
+>> > @@ -2033,6 +2033,12 @@ static u32 vmci_transport_get_local_cid(void)
+>> > 	return vmci_get_context_id();
+>> > }
+>> >
+>> > +static bool vmci_transport_supports_local_mode(void)
+>> > +{
+>> > +	/* Local mode is supported only when no device is present. */
+>> > +	return vmci_transport_get_local_cid() == VMCI_INVALID_ID;
+>>
+>> IIRC vmci can be registered both as H2G and G2H, so should we filter out
+>> the H2G case?
 >
-> Hi Fuad,
+>In fact, I'm realizing now that this should probably just be:
 >
-> On Tue, 18 Nov 2025 13:59:14 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > On Tue, 18 Nov 2025 at 07:20, Oliver Upton <oupton@kernel.org> wrote:
-> > >
-> > > On Mon, Nov 17, 2025 at 09:15:22AM +0000, Marc Zyngier wrote:
-> > > > This is a follow-up to the original series [1] (and fixes [2][3])
-> > > > with a bunch of bug-fixes and improvements. At least one patch has
-> > > > already been posted, but I thought I might repost it as part of a
-> > > > series, since I accumulated more stuff:
-> > > >
-> > > > - The first patch addresses Mark's observation that the no-vgic-v3
-> > > >   test has been broken once more. At some point, we'll have to retire
-> > > >   that functionality, because even if we keep fixing the SR handling,
-> > > >   nobody tests the actual interrupt state exposure to userspace, which
-> > > >   I'm pretty sure has badly been broken for at least 5 years.
-> > > >
-> > > > - The second one addresses a report from Fuad that on QEMU,
-> > > >   ICH_HCR_EL2.TDIR traps ICC_DIR_EL1 on top of ICV_DIR_EL1, leading to
-> > > >   the host exploding on deactivating an interrupt. This behaviour is
-> > > >   allowed by the spec, so make sure we clear all trap bits
-> > > >
-> > > > - Running vgic_irq in an L1 guest (the test being an L2) results in a
-> > > >   MI storm on the host, as the state synchronisation is done at the
-> > > >   wrong place, much like it was on the non-NV path before it was
-> > > >   reworked. Apply the same methods to the NV code, and enjoy much
-> > > >   better MI emulation, now tested all the way into an L3.
-> > > >
-> > > > - Nuke a small leftover from previous rework.
-> > > >
-> > > > - Force a read-back of ICH_MISR_EL2 when disabling the vgic, so that
-> > > >   the trap prevents too many spurious MIs in an L1 guest, as the write
-> > > >   to ICH_HCR_EL2 does exactly nothing on its own when running under
-> > > >   FEAT_NV2.
-> > > >
-> > > > Oliver: this is starting to be a large series of fixes on top of the
-> > > > existing series, plus the two patches you have already added. I'd be
-> > > > happy to respin a full v4 with the fixes squashed into their original
-> > > > patches. On the other hand, if you want to see the history in its full
-> > > > glory, that also works for me.
-> > >
-> > > I'll pick up these patches in a moment but at this point I'd prefer a
-> > > clean history. Plan is to send out the 6.19 pull sometime next week so
-> > > any time before then would be great for v4.
-> >
-> > I'm happy to take that for another spin Marc before you send it, if
-> > it's different from the ToT I tested. In that case, just send me a
-> > pointer to the branch.
+>static bool vmci_transport_supports_local_mode(void)
+>{
+>	return false;
+>}
 >
-> I've just pushed out a full branch at [1]. Please make sure to merge
-> kvmarm-fixes-6.18-3 in, as it fixes a couple of nasties (small
-> conflict expected, but the resolution should be obvious).
+>
+>... because even for H2G there is no mechanism for attaching a namespace
+>to a VM (unlike w/ vhost_vsock device open).
+>
+>Does that seem right?
 
-For this branch [1]:
-Tested-by: Fuad Tabba <tabba@google.com>
-
-On QEMU, nVHE, hVHE protected mode (non-protected VMs with and without
-the Android pKVM patches), and protected VMs (with the Android pKVM
-patches).
-
-Cheers,
-/fuad
+tl;dr   yes
 
 
+vmci_transport.c has MODULE_ALIAS_NETPROTO(PF_VSOCK) for historical 
+reasons. This means that the module is automatically loaded the first 
+time PF_VSOCK is requested by the user if af_vsock is not loaded.
 
-> For my own testing, I added -rc6 on top.
->
-> Note that I didn't take your Tested-by: tags, as you are about to
-> retest the whole thing anyway. If all goes well (fingers crossed),
-> Oliver will be able to apply any further tag once I post these
-> patches.
->
-> Thanks,
->
->         M.
->
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vgic-lr-overflow
->
-> --
-> Without deviation from the norm, progress is not possible.
+This was the case before vsock was generalized to support multiple 
+transports and has remained so for historical reasons.
+
+So today, we can have that module loaded, registered only for F_DGRAM 
+but not registered for F_G2H and F_H2G, so maybe it could work for now 
+and if the H2G is also not supporting it, maybe is the right thing to 
+do. (with a better comment there on the reason why both G2H and H2G 
+doesn't support it).
+
+Sorry for the long reply, maybe just `yes` was fine, but I dumped what I 
+thought because I feel it might be useful to you.
+
+Thanks,
+Stefano
+
 
