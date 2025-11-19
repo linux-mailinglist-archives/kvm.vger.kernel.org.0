@@ -1,375 +1,293 @@
-Return-Path: <kvm+bounces-63643-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63644-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C541C6C39C
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 02:17:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFC47C6C3D5
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 02:25:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B96744E6F7F
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 01:17:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C16014EBBA1
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 01:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8343222E406;
-	Wed, 19 Nov 2025 01:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K0Giw+JM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DFF924111D;
+	Wed, 19 Nov 2025 01:23:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1245E1B0413
-	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 01:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A54923C513;
+	Wed, 19 Nov 2025 01:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763515061; cv=none; b=DmOTUDoPqrJDGNcvgSksAmZ4LC/v34USNYJ1ES3x2lnbknMbkokGK0YWGhgNNbCDz/l6kb1X7WiKaQ+YVIpS9m4TcYda0d2cdzElNOhsVt1OWaqDQzacryaXNa52gwK4naw74WojlMmMVUqyQqK4p0YIX7/L2s+TYGEixScXJ+s=
+	t=1763515404; cv=none; b=KweO06CXaRflgOJIHmqU/XcHTJpZDkgKM1aY9UFWFcGpS8ACsGOE2VBXxE3YsOpWhdAEofTBSyxoYos03ZBgf6wREes5OCYnKfg/PokhWgnVw8rbVwL56HnoRdfaY/DjVrt/PAkz6P7SLX/RheWsByoIW46ZyhJj7kBYsqZVYis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763515061; c=relaxed/simple;
-	bh=rT7Doq+l7z7hbFLJv3oOESobuNgHarGO6IKGTw8AtDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sEU3HQJVTIEVV8HGaKFUcSHGpRYuomdCgHcFxJ6bXPh3xxKEBVsMdQdKgGrRocLllAfUpcvKuDOjAPfyVCcqqY489hVrd6dCz/+nwAdaeutDquiMIE9Kd8ObZH8v5/CTnh1zn5ykKss9xW9EPKaut6z49gBYltDlXouHCfEMkT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K0Giw+JM; arc=none smtp.client-ip=74.125.224.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-63fca769163so5795023d50.2
-        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 17:17:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763515058; x=1764119858; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2sqe8ncDEknCOi4UhxwOn5EBWZJsrkPpNEM6tqbGLh4=;
-        b=K0Giw+JM9QeeH5Z2m9F2bFtocDz/lC2+BjkNUf8VQxjPcn/VeVzKCCaf54jfdAabgc
-         1nUF+OsFDHkKUJHG+q8VTQ/j1zhvsJtaWXUCH3pkj/KwOW1qo8bfPikvxt6g5cacG60Y
-         YyuM6RsmftBZypBKj9JnI0+1ABHiLLvOTdSNJVuHPilyZqDKz7ZURUTsJ63iRfSR6FM7
-         QhUpB7g6k98OlPiiY3hORzd3XDmZk/K9XU5ltyNAPGBm6JQrQuPd0RYRwQUpXaDagZin
-         5piIoqZ51v1AGtPQJXGTa0ZkA8T7nMhbYEjOUtTdno8lUz3q1ipTT329WWiN+jfgoBYk
-         /5NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763515058; x=1764119858;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2sqe8ncDEknCOi4UhxwOn5EBWZJsrkPpNEM6tqbGLh4=;
-        b=mA6zOBlUDtVRei58ZXRWY9xX1arOUxXlCfrd0krtopPa4lQFFwVWjjt9tISgFPdkJz
-         81N03ESgWku5wkSMsPTh0/f7m+7KvdQCQN9xjQ1jLKcAoZJ8Glp1wEQ8+NfnCTZ5T/kf
-         qcmTzJprpuoEL71Bo071Ua/wbgxmQo35GeNtA0PFOye7H4tnK1DvZdxP0amtoPLQxpnf
-         0KMP3mdd7cJGUDWglwfqWUctKBF8GT24ci373xUX6xnl4Q/25tPvKZfZqWL12ECTdcLc
-         zlSCVGVWvBBbrUHshk9tUh6NXP8BGbjJCgpk6wU1eBcg5ls8+P42seQaGOadl4ijybky
-         AaEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXazmt5fatNK5Kb76OE8+gXSubW1IP6/jEmOVIVF+sv+aQQOlHMxDhnNyRJ3+dnCmlxspw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCNUsZTfOIYnuy0GpAO8Gef+AeelG5svwNpkHTpcCA/jsH0bhx
-	r8kDDn/AFfVnT1zDIPs7OVYcVEVhtxF732HnF1Fqk2xIpvFx1S6B99Zv
-X-Gm-Gg: ASbGncsKu2xbCVzhpugQTOaqFQduTRT4xffoNk5F4tUNbzh2vbanWfoGQp/ZNaKeCAz
-	/p4q6smYNmwDiCSxIuTcq0zTCbp34bWA4UhowF0NMcjGrUwXoukHiC7txUnJiDiPSRdloV6EFJZ
-	p9mizf/pxPOtIQSvGDbGwdXfrt9E+mhU2UoYaEraRn81IPPfshvTFexUEJyPOij0fbf9Z+TCh5Q
-	mwy6qp4a1ybExywMx3mvirP13WofUs0p515FZ7vu4zfUoU0nZP8CyAeVUcz4GzeqJtr2X7W0DLv
-	B9Yv9FxRma+LkcWAcw5rFj9KLAuKQFayBqawi9sBUWzgGOxxfwPs3f7i1FH6UmqkbDlc+3H/sb5
-	t3/zDUvD3iu0T4I2pvEleGjXh4bONEgHQnr7nVt+KtPvf5RyF2xOig65slCcMkZvxuJ0Uy6e97q
-	8OJLs5AO9JGcqIoejGDLNqbR1QZ+C9Ce1rmIQX7Iw9rHp0dOziaYbJI4IX4w==
-X-Google-Smtp-Source: AGHT+IE+l2e227udRixUaMV1OD0fbSyMRTRhSYspYsqsrhrAm7qQBfwUi7+G0snVl8c4IqgyshR/vA==
-X-Received: by 2002:a05:690e:240c:b0:63f:ba88:e8f9 with SMTP id 956f58d0204a3-641e75e62f4mr11153561d50.41.1763515058001;
-        Tue, 18 Nov 2025 17:17:38 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:54::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6410e9e8f76sm6410956d50.4.2025.11.18.17.17.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 17:17:37 -0800 (PST)
-Date: Tue, 18 Nov 2025 17:17:35 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Sargun Dhillon <sargun@sargun.me>,
-	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v10 03/11] vsock: reject bad
- VSOCK_NET_MODE_LOCAL configuration for G2H
-Message-ID: <aR0arw2F/DmbIrzY@devvm11784.nha0.facebook.com>
-References: <20251117-vsock-vmtest-v10-0-df08f165bf3e@meta.com>
- <20251117-vsock-vmtest-v10-3-df08f165bf3e@meta.com>
- <vsyzveqyufaquwx3xgahsh3stb6i5u3xa4kubpvesfzcuj6dry@sn4kx5ctgpbz>
+	s=arc-20240116; t=1763515404; c=relaxed/simple;
+	bh=N7nO7rejQQkKmp2+i1NlmyNPNxUaUfv/RGpzzvliWV0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=nnNo5qfgJwX7DtvSpJKL4ISVaYgGn/Zpz336aM5yX23Bfe4brz3NtbqTBiQSML9qwLMLpHRXq2fc6epE3xQcLuzdyUbMro2QT5EPNCNkjkfegr3yvPd0ro08CKPXcu0g1Pj6EXAz494zTpVcLbdbUpW1Hyl0w1zoKfKPOriANDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Cxrr8DHB1pfkwlAA--.13318S3;
+	Wed, 19 Nov 2025 09:23:15 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJAxfcH_Gx1p1vI3AQ--.34531S3;
+	Wed, 19 Nov 2025 09:23:13 +0800 (CST)
+Subject: Re: [PATCH 1/3] LoongArch: KVM: Add preempt hint feature in
+ hypervisor side
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20251118080656.2012805-1-maobibo@loongson.cn>
+ <20251118080656.2012805-2-maobibo@loongson.cn>
+ <CAAhV-H5qZ3_KTvkZ-zQni6Lg-6W5y9oBXDb9+2VAeFV82BEzhA@mail.gmail.com>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <3e36f507-a907-7143-41a7-58dbefb73fb5@loongson.cn>
+Date: Wed, 19 Nov 2025 09:20:46 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <vsyzveqyufaquwx3xgahsh3stb6i5u3xa4kubpvesfzcuj6dry@sn4kx5ctgpbz>
-
-On Tue, Nov 18, 2025 at 07:10:28PM +0100, Stefano Garzarella wrote:
-> On Mon, Nov 17, 2025 at 06:00:26PM -0800, Bobby Eshleman wrote:
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > index 2c937a2df83b..c8319cd1c232 100644
-> > --- a/drivers/vhost/vsock.c
-> > +++ b/drivers/vhost/vsock.c
-> > @@ -64,6 +64,11 @@ static u32 vhost_transport_get_local_cid(void)
-> > 	return VHOST_VSOCK_DEFAULT_HOST_CID;
-> > }
-> > 
-> > +static bool vhost_transport_supports_local_mode(void)
-> > +{
-> > +	return true;
-> 
-> Should we enable this later, when we really add support, or it doesn't
-> affect anything if vhost-vsock is not really supporting it in this PR
-> (thinking about bisection issues).
-
-sgtm!
-
-> 
-> > +}
-> > +
-> > /* Callers that dereference the return value must hold vhost_vsock_mutex or the
-> >  * RCU read lock.
-> >  */
-> > @@ -412,6 +417,7 @@ static struct virtio_transport vhost_transport = {
-> > 		.module                   = THIS_MODULE,
-> > 
-> > 		.get_local_cid            = vhost_transport_get_local_cid,
-> > +		.supports_local_mode	  = vhost_transport_supports_local_mode,
-> > 
-> > 		.init                     = virtio_transport_do_socket_init,
-> > 		.destruct                 = virtio_transport_destruct,
-> > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> > index 59d97a143204..824d89657d41 100644
-> > --- a/include/net/af_vsock.h
-> > +++ b/include/net/af_vsock.h
-> > @@ -180,6 +180,11 @@ struct vsock_transport {
-> > 	/* Addressing. */
-> > 	u32 (*get_local_cid)(void);
-> > 
-> > +	/* Return true if this transport supports VSOCK_NET_MODE_LOCAL.
-> 
-> nit: Here I would make it clearer that rather than supporting MODE_LOCAL,
-> the transport is not compatible with it, etc.
-> A summary of the excellent description we have in the commit.
-> 
-
-sounds good!
-
-> > +	 * Otherwise, return false.
-> > +	 */
-> > +	bool (*supports_local_mode)(void);
-> > +
-> > 	/* Read a single skb */
-> > 	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
-> > 
-> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> > index 54373ae101c3..7a235bb94437 100644
-> > --- a/net/vmw_vsock/af_vsock.c
-> > +++ b/net/vmw_vsock/af_vsock.c
-> > @@ -91,6 +91,12 @@
-> >  *   and locked down by a namespace manager. The default is "global". The mode
-> >  *   is set per-namespace.
-> >  *
-> > + *   Note: LOCAL mode is only supported when using namespace-aware transports
-> > + *   (vhost-vsock, loopback). If a guest-to-host transport (virtio-vsock,
-> > + *   hyperv-vsock, vmci-vsock) is loaded, attempts to set LOCAL mode will fail
-> > + *   with EOPNOTSUPP, as these transports do not support per-namespace
-> > + *   isolation.
-> 
-> Okay, maybe this is fine, so if you don't need to resend, feel free to
-> ignore the previous comment.
-> 
-> > + *
-> >  *   The modes affect the allocation and accessibility of CIDs as follows:
-> >  *
-> >  *   - global - access and allocation are all system-wide
-> > @@ -2765,17 +2771,30 @@ static int vsock_net_mode_string(const struct ctl_table *table, int write,
-> > 	if (*lenp >= sizeof(data))
-> > 		return -EINVAL;
-> > 
-> > -	if (!strncmp(data, VSOCK_NET_MODE_STR_GLOBAL, sizeof(data)))
-> > +	ret = 0;
-> 
-> IIUC `ret` should already be 0 at this point, no?
-> 
-> > +	mutex_lock(&vsock_register_mutex);
-> 
-> I honestly don't like to mix the parsing, with this new check, so what
-> about leaving the parsing as before this patch (also without the mutex),
-> then just (untested):
-> 
-> 	mutex_lock(&vsock_register_mutex);
-> 	if (mode == VSOCK_NET_MODE_LOCAL && transport_g2h &&
-> 	    transport_g2h->supports_local_mode &&
-> 	    !transport_g2h->supports_local_mode()) {
-> 		ret = -EOPNOTSUPP;
-> 		goto out;
-> 	}
-> 
-> 	if (!vsock_net_write_mode(net, mode)) {
-> 		ret = -EPERM;
-> 	}
-> out:
-> 	mutex_unlock(&vsock_register_mutex);
-> 	return ret;
-> }
-
-Makes sense, I can move that around for next rev.
-
-> 
-> > +	if (!strncmp(data, VSOCK_NET_MODE_STR_GLOBAL, sizeof(data))) {
-> > 		mode = VSOCK_NET_MODE_GLOBAL;
-> > -	else if (!strncmp(data, VSOCK_NET_MODE_STR_LOCAL, sizeof(data)))
-> > +	} else if (!strncmp(data, VSOCK_NET_MODE_STR_LOCAL, sizeof(data))) {
-> > +		if (transport_g2h && transport_g2h->supports_local_mode &&
-> > +		    !transport_g2h->supports_local_mode()) {
-> > +			ret = -EOPNOTSUPP;
-> > +			goto out;
-> > +		}
-> > 		mode = VSOCK_NET_MODE_LOCAL;
-> > -	else
-> > -		return -EINVAL;
-> > +	} else {
-> > +		ret = -EINVAL;
-> > +		goto out;
-> > +	}
-> > 
-> > -	if (!vsock_net_write_mode(net, mode))
-> > -		return -EPERM;
-> > +	if (!vsock_net_write_mode(net, mode)) {
-> > +		ret = -EPERM;
-> > +		goto out;
-> > +	}
-> > 
-> > -	return 0;
-> > +out:
-> > +	mutex_unlock(&vsock_register_mutex);
-> > +	return ret;
-> > }
-> > 
-> > static struct ctl_table vsock_table[] = {
-> > @@ -2916,6 +2935,7 @@ int vsock_core_register(const struct vsock_transport *t, int features)
-> > {
-> > 	const struct vsock_transport *t_h2g, *t_g2h, *t_dgram, *t_local;
-> > 	int err = mutex_lock_interruptible(&vsock_register_mutex);
-> > +	struct net *net;
-> > 
-> > 	if (err)
-> > 		return err;
-> > @@ -2938,6 +2958,22 @@ int vsock_core_register(const struct vsock_transport *t, int features)
-> > 			err = -EBUSY;
-> > 			goto err_busy;
-> > 		}
-> > +
-> > +		/* G2H sockets break in LOCAL mode namespaces because G2H
-> > +		 * transports don't support them yet. Block registering new G2H
-> > +		 * transports if we already have local mode namespaces on the
-> > +		 * system.
-> > +		 */
-> > +		rcu_read_lock();
-> > +		for_each_net_rcu(net) {
-> > +			if (vsock_net_mode(net) == VSOCK_NET_MODE_LOCAL) {
-> > +				rcu_read_unlock();
-> > +				err = -EOPNOTSUPP;
-> > +				goto err_busy;
-> > +			}
-> > +		}
-> > +		rcu_read_unlock();
-> > +
-> > 		t_g2h = t;
-> > 	}
-> > 
-> > diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
-> > index 432fcbbd14d4..279f04fcd81a 100644
-> > --- a/net/vmw_vsock/hyperv_transport.c
-> > +++ b/net/vmw_vsock/hyperv_transport.c
-> > @@ -833,10 +833,16 @@ int hvs_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
-> > 	return -EOPNOTSUPP;
-> > }
-> > 
-> > +static bool hvs_supports_local_mode(void)
-> > +{
-> > +	return false;
-> > +}
-> > +
-> > static struct vsock_transport hvs_transport = {
-> > 	.module                   = THIS_MODULE,
-> > 
-> > 	.get_local_cid            = hvs_get_local_cid,
-> > +	.supports_local_mode      = hvs_supports_local_mode,
-> > 
-> > 	.init                     = hvs_sock_init,
-> > 	.destruct                 = hvs_destruct,
-> > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> > index 5d379ccf3770..e585cb66c6f5 100644
-> > --- a/net/vmw_vsock/virtio_transport.c
-> > +++ b/net/vmw_vsock/virtio_transport.c
-> > @@ -94,6 +94,18 @@ static u32 virtio_transport_get_local_cid(void)
-> > 	return ret;
-> > }
-> > 
-> > +static bool virtio_transport_supports_local_mode(void)
-> > +{
-> > +	struct virtio_vsock *vsock;
-> > +
-> > +	rcu_read_lock();
-> > +	vsock = rcu_dereference(the_virtio_vsock);
-> > +	rcu_read_unlock();
-> > +
-> > +	/* Local mode is supported only when no G2H device is present. */
-> > +	return vsock ? false : true;
-> > +}
-> > +
-> > /* Caller need to hold vsock->tx_lock on vq */
-> > static int virtio_transport_send_skb(struct sk_buff *skb, struct virtqueue *vq,
-> > 				     struct virtio_vsock *vsock, gfp_t gfp)
-> > @@ -544,6 +556,7 @@ static struct virtio_transport virtio_transport = {
-> > 		.module                   = THIS_MODULE,
-> > 
-> > 		.get_local_cid            = virtio_transport_get_local_cid,
-> > +		.supports_local_mode      = virtio_transport_supports_local_mode,
-> > 
-> > 		.init                     = virtio_transport_do_socket_init,
-> > 		.destruct                 = virtio_transport_destruct,
-> > diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
-> > index 7eccd6708d66..da7c52ad7b2a 100644
-> > --- a/net/vmw_vsock/vmci_transport.c
-> > +++ b/net/vmw_vsock/vmci_transport.c
-> > @@ -2033,6 +2033,12 @@ static u32 vmci_transport_get_local_cid(void)
-> > 	return vmci_get_context_id();
-> > }
-> > 
-> > +static bool vmci_transport_supports_local_mode(void)
-> > +{
-> > +	/* Local mode is supported only when no device is present. */
-> > +	return vmci_transport_get_local_cid() == VMCI_INVALID_ID;
-> 
-> IIRC vmci can be registered both as H2G and G2H, so should we filter out
-> the H2G case?
-
-In fact, I'm realizing now that this should probably just be:
-
-static bool vmci_transport_supports_local_mode(void)
-{
-	return false;
-}
+In-Reply-To: <CAAhV-H5qZ3_KTvkZ-zQni6Lg-6W5y9oBXDb9+2VAeFV82BEzhA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJAxfcH_Gx1p1vI3AQ--.34531S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxKr4DGrWfZr47GFW7Gr48uFX_yoW3GFyrpF
+	97AF4kGF4xGr1fCwn7trZI9rW5Wrs7Kr1Iga47KayYyFsFvrykAr10kr98CF98Jw48XayI
+	vF1Fqw4avFs0q3cCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
+	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AK
+	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
+	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
+	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
+	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
+	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
+	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8zwZ7UU
+	UUU==
 
 
-... because even for H2G there is no mechanism for attaching a namespace
-to a VM (unlike w/ vhost_vsock device open).
 
-Does that seem right?
+On 2025/11/18 下午8:46, Huacai Chen wrote:
+> Hi, Bibo,
+> 
+> On Tue, Nov 18, 2025 at 4:07 PM Bibo Mao <maobibo@loongson.cn> wrote:
+>>
+>> Feature KVM_FEATURE_PREEMPT_HINT is added to show whether vCPU is
+>> preempted or not. It is to help guest OS scheduling or lock checking
+>> etc. Here add KVM_FEATURE_PREEMPT_HINT feature and use one byte as
+>> preempted flag in steal time structure.
+>>
+>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>> ---
+>>   arch/loongarch/include/asm/kvm_host.h      |  2 +
+>>   arch/loongarch/include/asm/kvm_para.h      |  5 +-
+>>   arch/loongarch/include/uapi/asm/kvm.h      |  1 +
+>>   arch/loongarch/include/uapi/asm/kvm_para.h |  1 +
+>>   arch/loongarch/kvm/vcpu.c                  | 54 +++++++++++++++++++++-
+>>   arch/loongarch/kvm/vm.c                    |  5 +-
+>>   6 files changed, 65 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+>> index 0cecbd038bb3..04c6dd171877 100644
+>> --- a/arch/loongarch/include/asm/kvm_host.h
+>> +++ b/arch/loongarch/include/asm/kvm_host.h
+>> @@ -163,6 +163,7 @@ enum emulation_result {
+>>   #define LOONGARCH_PV_FEAT_UPDATED      BIT_ULL(63)
+>>   #define LOONGARCH_PV_FEAT_MASK         (BIT(KVM_FEATURE_IPI) |         \
+>>                                           BIT(KVM_FEATURE_STEAL_TIME) |  \
+>> +                                        BIT(KVM_FEATURE_PREEMPT_HINT) |\
+>>                                           BIT(KVM_FEATURE_USER_HCALL) |  \
+>>                                           BIT(KVM_FEATURE_VIRT_EXTIOI))
+>>
+>> @@ -250,6 +251,7 @@ struct kvm_vcpu_arch {
+>>                  u64 guest_addr;
+>>                  u64 last_steal;
+>>                  struct gfn_to_hva_cache cache;
+>> +               u8  preempted;
+>>          } st;
+>>   };
+>>
+>> diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/include/asm/kvm_para.h
+>> index 3e4b397f423f..d8592a7f5922 100644
+>> --- a/arch/loongarch/include/asm/kvm_para.h
+>> +++ b/arch/loongarch/include/asm/kvm_para.h
+>> @@ -37,8 +37,11 @@ struct kvm_steal_time {
+>>          __u64 steal;
+>>          __u32 version;
+>>          __u32 flags;
+>> -       __u32 pad[12];
+>> +       __u8  preempted;
+>> +       __u8  u8_pad[3];
+>> +       __u32 pad[11];
+> Maybe a single __u8 pad[47] is enough?
+yes, pad[47] seems better unless there is definitely __u32 type 
+requirement in future.
 
-Best,
-Bobby
+Will do in next version.
+> 
+>>   };
+>> +#define KVM_VCPU_PREEMPTED             (1 << 0)
+>>
+>>   /*
+>>    * Hypercall interface for KVM hypervisor
+>> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
+>> index 57ba1a563bb1..bca7154aa651 100644
+>> --- a/arch/loongarch/include/uapi/asm/kvm.h
+>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+>> @@ -104,6 +104,7 @@ struct kvm_fpu {
+>>   #define  KVM_LOONGARCH_VM_FEAT_PV_IPI          6
+>>   #define  KVM_LOONGARCH_VM_FEAT_PV_STEALTIME    7
+>>   #define  KVM_LOONGARCH_VM_FEAT_PTW             8
+>> +#define KVM_LOONGARCH_VM_FEAT_PV_PREEMPT_HINT  10
+>  From the name it is a "hint", from include/linux/kvm_para.h we know
+> features and hints are different. If preempt is really a feature,
+> rename it?
+It is a feature. yes, in generic hint is suggestion for VM and VM can 
+selectively do or not.
+
+Will rename it with KVM_LOONGARCH_VM_FEAT_PV_PREEMPT.
+> 
+>>
+>>   /* Device Control API on vcpu fd */
+>>   #define KVM_LOONGARCH_VCPU_CPUCFG      0
+>> diff --git a/arch/loongarch/include/uapi/asm/kvm_para.h b/arch/loongarch/include/uapi/asm/kvm_para.h
+>> index 76d802ef01ce..fe4107869ce6 100644
+>> --- a/arch/loongarch/include/uapi/asm/kvm_para.h
+>> +++ b/arch/loongarch/include/uapi/asm/kvm_para.h
+>> @@ -15,6 +15,7 @@
+>>   #define CPUCFG_KVM_FEATURE             (CPUCFG_KVM_BASE + 4)
+>>   #define  KVM_FEATURE_IPI               1
+>>   #define  KVM_FEATURE_STEAL_TIME                2
+>> +#define  KVM_FEATURE_PREEMPT_HINT      3
+>>   /* BIT 24 - 31 are features configurable by user space vmm */
+>>   #define  KVM_FEATURE_VIRT_EXTIOI       24
+>>   #define  KVM_FEATURE_USER_HCALL                25
+>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+>> index 1245a6b35896..33a94b191b5d 100644
+>> --- a/arch/loongarch/kvm/vcpu.c
+>> +++ b/arch/loongarch/kvm/vcpu.c
+>> @@ -180,6 +180,11 @@ static void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+>>          }
+>>
+>>          st = (struct kvm_steal_time __user *)ghc->hva;
+>> +       if (kvm_guest_has_pv_feature(vcpu, KVM_FEATURE_PREEMPT_HINT)) {
+>> +               unsafe_put_user(0, &st->preempted, out);
+>> +               vcpu->arch.st.preempted = 0;
+>> +       }
+>> +
+>>          unsafe_get_user(version, &st->version, out);
+>>          if (version & 1)
+>>                  version += 1; /* first time write, random junk */
+>> @@ -1757,11 +1762,58 @@ static int _kvm_vcpu_put(struct kvm_vcpu *vcpu, int cpu)
+>>          return 0;
+>>   }
+>>
+>> +static void _kvm_set_vcpu_preempted(struct kvm_vcpu *vcpu)
+> Just using kvm_set_vcpu_preempted() is enough, no "_".
+> 
+>> +{
+>> +       struct gfn_to_hva_cache *ghc;
+>> +       struct kvm_steal_time __user *st;
+>> +       struct kvm_memslots *slots;
+>> +       static const u8 preempted = KVM_VCPU_PREEMPTED;
+> I'm not sure whether "static" is right, it's not reentrant.
+I think static is better here, it saves one cycle with assignment here.
+
+Regards
+Bibo Mao
+> 
+> 
+> Huacai
+> 
+>> +       gpa_t gpa;
+>> +
+>> +       gpa = vcpu->arch.st.guest_addr;
+>> +       if (!(gpa & KVM_STEAL_PHYS_VALID))
+>> +               return;
+>> +
+>> +       /* vCPU may be preempted for many times */
+>> +       if (vcpu->arch.st.preempted)
+>> +               return;
+>> +
+>> +       /* This happens on process exit */
+>> +       if (unlikely(current->mm != vcpu->kvm->mm))
+>> +               return;
+>> +
+>> +       gpa &= KVM_STEAL_PHYS_MASK;
+>> +       ghc = &vcpu->arch.st.cache;
+>> +       slots = kvm_memslots(vcpu->kvm);
+>> +       if (slots->generation != ghc->generation || gpa != ghc->gpa) {
+>> +               if (kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, gpa, sizeof(*st))) {
+>> +                       ghc->gpa = INVALID_GPA;
+>> +                       return;
+>> +               }
+>> +       }
+>> +
+>> +       st = (struct kvm_steal_time __user *)ghc->hva;
+>> +       unsafe_put_user(preempted, &st->preempted, out);
+>> +       vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
+>> +out:
+>> +       mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
+>> +}
+>> +
+>>   void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>   {
+>> -       int cpu;
+>> +       int cpu, idx;
+>>          unsigned long flags;
+>>
+>> +       if (vcpu->preempted && kvm_guest_has_pv_feature(vcpu, KVM_FEATURE_PREEMPT_HINT)) {
+>> +               /*
+>> +                * Take the srcu lock as memslots will be accessed to check the gfn
+>> +                * cache generation against the memslots generation.
+>> +                */
+>> +               idx = srcu_read_lock(&vcpu->kvm->srcu);
+>> +               _kvm_set_vcpu_preempted(vcpu);
+>> +               srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>> +       }
+>> +
+>>          local_irq_save(flags);
+>>          cpu = smp_processor_id();
+>>          vcpu->arch.last_sched_cpu = cpu;
+>> diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
+>> index a49b1c1a3dd1..b8879110a0a1 100644
+>> --- a/arch/loongarch/kvm/vm.c
+>> +++ b/arch/loongarch/kvm/vm.c
+>> @@ -45,8 +45,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>>
+>>          /* Enable all PV features by default */
+>>          kvm->arch.pv_features = BIT(KVM_FEATURE_IPI);
+>> -       if (kvm_pvtime_supported())
+>> +       if (kvm_pvtime_supported()) {
+>>                  kvm->arch.pv_features |= BIT(KVM_FEATURE_STEAL_TIME);
+>> +               kvm->arch.pv_features |= BIT(KVM_FEATURE_PREEMPT_HINT);
+>> +       }
+>>
+>>          /*
+>>           * cpu_vabits means user address space only (a half of total).
+>> @@ -143,6 +145,7 @@ static int kvm_vm_feature_has_attr(struct kvm *kvm, struct kvm_device_attr *attr
+>>          case KVM_LOONGARCH_VM_FEAT_PV_IPI:
+>>                  return 0;
+>>          case KVM_LOONGARCH_VM_FEAT_PV_STEALTIME:
+>> +       case KVM_LOONGARCH_VM_FEAT_PV_PREEMPT_HINT:
+>>                  if (kvm_pvtime_supported())
+>>                          return 0;
+>>                  return -ENXIO;
+>> --
+>> 2.39.3
+>>
+>>
+
 
