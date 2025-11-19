@@ -1,329 +1,252 @@
-Return-Path: <kvm+bounces-63659-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63656-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584BBC6C804
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 04:01:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0A2AC6C7DA
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 04:00:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B28283679EB
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 02:58:52 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 044C8344519
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 02:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E854A2DAFDB;
-	Wed, 19 Nov 2025 02:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C742D1905;
+	Wed, 19 Nov 2025 02:56:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bu0Jm5HU";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZXBYrMFC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B252D5C61;
-	Wed, 19 Nov 2025 02:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5902D4816
+	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 02:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763521093; cv=none; b=lQgT1zLz8Bm4HqAI4Dm8ShCypBn+ABkdt3nJJUqfD7rVZKcLfNZ/h9tP15HV3jrVHK7fg7CheyCWX9/JU5Okh0IsEC9fxWSxuhjYGbtHDyuS3d82U0RU6HMIupZPK9zfxOhCeE6AQvNsGJxsQL0lzaazHLiunO8zzzv5n+D96H4=
+	t=1763520996; cv=none; b=GEkvJHuntaxyFRnqc5RNkHus2KNYpJSwcEvAdL3XBH7S0+44nHgHTwI/SrHbGcg523RMSCruKHIvNoUiuSPMKNYQ6FwpPW6xy04zHupQ3h1SeCtqTPm1RGZtnxlud9vIvyOQ3z4pWJlFDWhQc7OZiiQqP1UmIdysMEVtU1ng/sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763521093; c=relaxed/simple;
-	bh=8b6Nn8XSUDWrgIFjX7sFV6/wgeQ7XUcqHmdirfRcl4s=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Ja1dK7bmaztg0z3uAB2TU63Np4Ovc9R2+tmy6Naa0OxDLs8s7Cdxir4ku8URVG3YR2lMyZUOS0Et8Ym46qf8q0fOWXUf3N2aXlK/PK/t9bfQJEas1v8hCQqybbQ1Hq1zCmxRTlOlUXUmu/qNmroLpqWVcKxqWVv09xPl0jVH3bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Axz788Mh1p_VIlAA--.12568S3;
-	Wed, 19 Nov 2025 10:58:04 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJDx_8M1Mh1pSAM4AQ--.27336S3;
-	Wed, 19 Nov 2025 10:57:59 +0800 (CST)
-Subject: Re: [PATCH 1/3] LoongArch: KVM: Add preempt hint feature in
- hypervisor side
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20251118080656.2012805-1-maobibo@loongson.cn>
- <20251118080656.2012805-2-maobibo@loongson.cn>
- <CAAhV-H5qZ3_KTvkZ-zQni6Lg-6W5y9oBXDb9+2VAeFV82BEzhA@mail.gmail.com>
- <3e36f507-a907-7143-41a7-58dbefb73fb5@loongson.cn>
- <CAAhV-H7CEhk9tNGr9sOzhoPAE+UtA2AtogBg8+HQCko31YUc2A@mail.gmail.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <f8ad1ecb-0272-f027-807c-98d2511c2871@loongson.cn>
-Date: Wed, 19 Nov 2025 10:55:33 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1763520996; c=relaxed/simple;
+	bh=G12hxObS9vVdQSHOVQsEwJdya84pJfSeHUQ2pXezb/M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DyLghZCqAkDVMsV2CDqQGy+0m378Qt+pXQ0TGCjAZL1FtlkejZyFCGZCiGny10olczdNO0wfeF0iB+RDsTDE8FI9FFufeZMyigPWxbovIerVdqfY4Ck9qfb8i7d2ZgKTYYK13OWzuvy5rTZTFKL8vCpKxOm5kcCISLJbcQmMuuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bu0Jm5HU; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZXBYrMFC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763520993;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jDvPTx8od/LRicGRV59Ci5CqBppmh/yq9CH+cOE9Xiw=;
+	b=Bu0Jm5HUvWXy2aT0LbgwZdQYUPGq1IqUqoc0oi50oLNLTDOj+CWsxMDKmNuLrtZdslSVll
+	hP5OW1Zh4s/guy+xx0i909+jKQNb+Qi6+9g+kAZF5q4zYya9bXaYZqn/vvdFol5pbgq/sU
+	ZoJa4bY80WLv4rTtnRCi/edLjRLfRf0=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-144-N_nvdy9CMlSFxEn16AMl4Q-1; Tue, 18 Nov 2025 21:56:32 -0500
+X-MC-Unique: N_nvdy9CMlSFxEn16AMl4Q-1
+X-Mimecast-MFC-AGG-ID: N_nvdy9CMlSFxEn16AMl4Q_1763520991
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-9372401215fso13318373241.3
+        for <kvm@vger.kernel.org>; Tue, 18 Nov 2025 18:56:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763520990; x=1764125790; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jDvPTx8od/LRicGRV59Ci5CqBppmh/yq9CH+cOE9Xiw=;
+        b=ZXBYrMFC4R3upu86JqxrnKc8pUwc541fOUIcr2lW83OWb7MyiGlakRT3DQh/NNaklx
+         DuI0W82eWlyIfqQgWwvw3aZX99ngVnxCH4UEU4Om8/bCaIEO0sZhrL2fsSRXOMXvVRBO
+         X3Z4uIZXaKSeiduiMyfySKcmUQILVfqnXW0vePUqWdvjUv9JDXuRM1iZJKRPUEXGif8E
+         1dGc16Bs3uXdqAsvoaJdlFquFjQdEQVB/zz+QvWFbS/Obb4vmUotnaF24u/v9fqxQa0J
+         7ma96TyOM2OnZynw7Trsld6H4EpG/uZWGcGkaWVMK2PcFdXm2X2O4knA933oiINc05nV
+         qoVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763520990; x=1764125790;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=jDvPTx8od/LRicGRV59Ci5CqBppmh/yq9CH+cOE9Xiw=;
+        b=vTHqUrh6YmL2OBAeZrMMNwgMhGdt1zJFRFOiQbIv8Sud3qExammI2ExrV39akDo4dt
+         ET2/JIeAJFULmr6ZduZnx8sUX3w4p7sqjrP26aytRZxJfftgU6gY//884CHOEwU3+mG8
+         LtB5RE+BBZd12lK0OiC+HjXXnUnrGecbxqkdCqH1CC6Y2GrPEh1yKpFx6yN70ktZ1xxu
+         sQEEo9JHoQ7glnRcflwyTIYhxV2PTqe4+SpdQ9k3qYHTVN1nseIZ20l9Il2+H2QJvbKl
+         gRce08Tal6mk6kPA57GkoKLj3vR9nsIE9DLaeZF84xKwpngcgpCkq8fO/A8xiJkPu60v
+         pM3w==
+X-Forwarded-Encrypted: i=1; AJvYcCWLdfNj3y8N8JGee8xbngojgqJ+b+ppiH1ebf6jtTVnnaAJQP7qb/3IW79FrDrb6eWoUrI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGEakVVYOmEJ3DfeCOUC+3ATOBTJnPLJBtOm0LDHAnlIBszple
+	Y1jdB1EH84X+aS01ms2QTdeC0f1J02nP9wN2WiJ3pr5NFt8IahK60RPt9OCKkDhtsIVmxDGNJeJ
+	FaU/iWml9T1a5usRFPts5xOIzQKju+yPnqWueNyRLxqvszYDbu3rcoPzAEfxTGXuL0FR7ANMz/v
+	bv6TTLDiy5ip8uprb5nZ/sNIjRq9FbARbHK/f9zYM=
+X-Gm-Gg: ASbGncvuz53jhsvKhkUrH3dwOstj0+/HydLcVi30x4VVtsA+wHXIQCUHC8Mt6Idatyz
+	Xr6I6xu2z4f/Rrg0aYVOPeZket+120RS3W0H2shCLLpdu7639tibtLuDTw7HsqWUin5/AaJ1W3+
+	BXJK/b9yEKFwdATFntYDmQ3a6grNk4KD2i1DtetYInUaUx+MF4GZwlpsAtTxDgsf0=
+X-Received: by 2002:a05:6102:e0a:b0:5db:ef3f:6c7d with SMTP id ada2fe7eead31-5dfc5556bf8mr6112208137.14.1763520990178;
+        Tue, 18 Nov 2025 18:56:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEMHvc8TbnsY8T2F+eiw7C0cSgj9lMpJACXTR8AzjwZ2GrCglhiRk/Pmo0QAEu0HhMJS9z+SDjksvQGpkSmyfk=
+X-Received: by 2002:a05:6102:e0a:b0:5db:ef3f:6c7d with SMTP id
+ ada2fe7eead31-5dfc5556bf8mr6112195137.14.1763520989781; Tue, 18 Nov 2025
+ 18:56:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H7CEhk9tNGr9sOzhoPAE+UtA2AtogBg8+HQCko31YUc2A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJDx_8M1Mh1pSAM4AQ--.27336S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3WF4UKr43Wr1UGryUAr4DWrX_yoWfAr4xpF
-	W8AF4kJF48Gr1fCw1Iq3sI9rnIgr97Kr1IqFy7GayYyF1qqFy3Ar10kryDCF98Xw18Xa4I
-	vFn5tr43uF45twbCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1ln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
-	6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-	1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
-	JVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
-	vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IY
-	x2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26c
-	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAF
-	wI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jz2NtUUUUU=
+References: <20251118090942.1369-1-liming.wu@jaguarmicro.com>
+In-Reply-To: <20251118090942.1369-1-liming.wu@jaguarmicro.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 19 Nov 2025 10:56:17 +0800
+X-Gm-Features: AWmQ_bmKFv4JLlor4jL7WLrkrIdgod9abx7FeAA8sB4t9HbQcF1R97xzgCvVagE
+Message-ID: <CACGkMEvwedzRrMd9hYm7PbDezBu1GM3q-YcUhsvfYJVv=bNSdw@mail.gmail.com>
+Subject: Re: [PATCH] virtio_net: enhance wake/stop tx queue statistics accounting
+To: liming.wu@jaguarmicro.com
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, angus.chen@jaguarmicro.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Nov 18, 2025 at 5:10=E2=80=AFPM <liming.wu@jaguarmicro.com> wrote:
+>
+> From: Liming Wu <liming.wu@jaguarmicro.com>
+>
+> This patch refines and strengthens the statistics collection of TX queue
+> wake/stop events introduced by a previous patch.
 
+It would be better to add commit id here.
 
-On 2025/11/19 上午10:45, Huacai Chen wrote:
-> On Wed, Nov 19, 2025 at 9:23 AM Bibo Mao <maobibo@loongson.cn> wrote:
->>
->>
->>
->> On 2025/11/18 下午8:46, Huacai Chen wrote:
->>> Hi, Bibo,
->>>
->>> On Tue, Nov 18, 2025 at 4:07 PM Bibo Mao <maobibo@loongson.cn> wrote:
->>>>
->>>> Feature KVM_FEATURE_PREEMPT_HINT is added to show whether vCPU is
->>>> preempted or not. It is to help guest OS scheduling or lock checking
->>>> etc. Here add KVM_FEATURE_PREEMPT_HINT feature and use one byte as
->>>> preempted flag in steal time structure.
->>>>
->>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->>>> ---
->>>>    arch/loongarch/include/asm/kvm_host.h      |  2 +
->>>>    arch/loongarch/include/asm/kvm_para.h      |  5 +-
->>>>    arch/loongarch/include/uapi/asm/kvm.h      |  1 +
->>>>    arch/loongarch/include/uapi/asm/kvm_para.h |  1 +
->>>>    arch/loongarch/kvm/vcpu.c                  | 54 +++++++++++++++++++++-
->>>>    arch/loongarch/kvm/vm.c                    |  5 +-
->>>>    6 files changed, 65 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
->>>> index 0cecbd038bb3..04c6dd171877 100644
->>>> --- a/arch/loongarch/include/asm/kvm_host.h
->>>> +++ b/arch/loongarch/include/asm/kvm_host.h
->>>> @@ -163,6 +163,7 @@ enum emulation_result {
->>>>    #define LOONGARCH_PV_FEAT_UPDATED      BIT_ULL(63)
->>>>    #define LOONGARCH_PV_FEAT_MASK         (BIT(KVM_FEATURE_IPI) |         \
->>>>                                            BIT(KVM_FEATURE_STEAL_TIME) |  \
->>>> +                                        BIT(KVM_FEATURE_PREEMPT_HINT) |\
->>>>                                            BIT(KVM_FEATURE_USER_HCALL) |  \
->>>>                                            BIT(KVM_FEATURE_VIRT_EXTIOI))
->>>>
->>>> @@ -250,6 +251,7 @@ struct kvm_vcpu_arch {
->>>>                   u64 guest_addr;
->>>>                   u64 last_steal;
->>>>                   struct gfn_to_hva_cache cache;
->>>> +               u8  preempted;
->>>>           } st;
->>>>    };
->>>>
->>>> diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/include/asm/kvm_para.h
->>>> index 3e4b397f423f..d8592a7f5922 100644
->>>> --- a/arch/loongarch/include/asm/kvm_para.h
->>>> +++ b/arch/loongarch/include/asm/kvm_para.h
->>>> @@ -37,8 +37,11 @@ struct kvm_steal_time {
->>>>           __u64 steal;
->>>>           __u32 version;
->>>>           __u32 flags;
->>>> -       __u32 pad[12];
->>>> +       __u8  preempted;
->>>> +       __u8  u8_pad[3];
->>>> +       __u32 pad[11];
->>> Maybe a single __u8 pad[47] is enough?
->> yes, pad[47] seems better unless there is definitely __u32 type
->> requirement in future.
->>
->> Will do in next version.
->>>
->>>>    };
->>>> +#define KVM_VCPU_PREEMPTED             (1 << 0)
->>>>
->>>>    /*
->>>>     * Hypercall interface for KVM hypervisor
->>>> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
->>>> index 57ba1a563bb1..bca7154aa651 100644
->>>> --- a/arch/loongarch/include/uapi/asm/kvm.h
->>>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
->>>> @@ -104,6 +104,7 @@ struct kvm_fpu {
->>>>    #define  KVM_LOONGARCH_VM_FEAT_PV_IPI          6
->>>>    #define  KVM_LOONGARCH_VM_FEAT_PV_STEALTIME    7
->>>>    #define  KVM_LOONGARCH_VM_FEAT_PTW             8
->>>> +#define KVM_LOONGARCH_VM_FEAT_PV_PREEMPT_HINT  10
->>>   From the name it is a "hint", from include/linux/kvm_para.h we know
->>> features and hints are different. If preempt is really a feature,
->>> rename it?
->> It is a feature. yes, in generic hint is suggestion for VM and VM can
->> selectively do or not.
->>
->> Will rename it with KVM_LOONGARCH_VM_FEAT_PV_PREEMPT.
->>>
->>>>
->>>>    /* Device Control API on vcpu fd */
->>>>    #define KVM_LOONGARCH_VCPU_CPUCFG      0
->>>> diff --git a/arch/loongarch/include/uapi/asm/kvm_para.h b/arch/loongarch/include/uapi/asm/kvm_para.h
->>>> index 76d802ef01ce..fe4107869ce6 100644
->>>> --- a/arch/loongarch/include/uapi/asm/kvm_para.h
->>>> +++ b/arch/loongarch/include/uapi/asm/kvm_para.h
->>>> @@ -15,6 +15,7 @@
->>>>    #define CPUCFG_KVM_FEATURE             (CPUCFG_KVM_BASE + 4)
->>>>    #define  KVM_FEATURE_IPI               1
->>>>    #define  KVM_FEATURE_STEAL_TIME                2
->>>> +#define  KVM_FEATURE_PREEMPT_HINT      3
->>>>    /* BIT 24 - 31 are features configurable by user space vmm */
->>>>    #define  KVM_FEATURE_VIRT_EXTIOI       24
->>>>    #define  KVM_FEATURE_USER_HCALL                25
->>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
->>>> index 1245a6b35896..33a94b191b5d 100644
->>>> --- a/arch/loongarch/kvm/vcpu.c
->>>> +++ b/arch/loongarch/kvm/vcpu.c
->>>> @@ -180,6 +180,11 @@ static void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
->>>>           }
->>>>
->>>>           st = (struct kvm_steal_time __user *)ghc->hva;
->>>> +       if (kvm_guest_has_pv_feature(vcpu, KVM_FEATURE_PREEMPT_HINT)) {
->>>> +               unsafe_put_user(0, &st->preempted, out);
->>>> +               vcpu->arch.st.preempted = 0;
->>>> +       }
->>>> +
->>>>           unsafe_get_user(version, &st->version, out);
->>>>           if (version & 1)
->>>>                   version += 1; /* first time write, random junk */
->>>> @@ -1757,11 +1762,58 @@ static int _kvm_vcpu_put(struct kvm_vcpu *vcpu, int cpu)
->>>>           return 0;
->>>>    }
->>>>
->>>> +static void _kvm_set_vcpu_preempted(struct kvm_vcpu *vcpu)
->>> Just using kvm_set_vcpu_preempted() is enough, no "_".
->>>
->>>> +{
->>>> +       struct gfn_to_hva_cache *ghc;
->>>> +       struct kvm_steal_time __user *st;
->>>> +       struct kvm_memslots *slots;
->>>> +       static const u8 preempted = KVM_VCPU_PREEMPTED;
->>> I'm not sure whether "static" is right, it's not reentrant.
->> I think static is better here, it saves one cycle with assignment here.
-> I know, but I want to know whether the logic is correct.
-> vcpu->arch.st.preempted is per-cpu, but the local variable "preempted"
-> can be used across multiple VCPU? I'm not sure.
-It is read-only, of course can be used by multiple vCPUs. or remove it 
-directly?
+>
+> Previously, the driver only recorded partial wake/stop statistics
+> for TX queues. Some wake events triggered by 'skb_xmit_done()' or resume
+> operations were not counted, which made the per-queue metrics incomplete.
+>
+> Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
+> ---
+>  drivers/net/virtio_net.c | 49 ++++++++++++++++++++++------------------
+>  1 file changed, 27 insertions(+), 22 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 8e8a179aaa49..f92a90dde2b3 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -775,10 +775,26 @@ static bool virtqueue_napi_complete(struct napi_str=
+uct *napi,
+>         return false;
+>  }
+>
+> +static void virtnet_tx_wake_queue(struct virtnet_info *vi,
+> +                               struct send_queue *sq)
+> +{
+> +       unsigned int index =3D vq2txq(sq->vq);
+> +       struct netdev_queue *txq =3D netdev_get_tx_queue(vi->dev, index);
+> +
+> +       if (netif_tx_queue_stopped(txq)) {
+> +               u64_stats_update_begin(&sq->stats.syncp);
+> +               u64_stats_inc(&sq->stats.wake);
+> +               u64_stats_update_end(&sq->stats.syncp);
+> +               netif_tx_wake_queue(txq);
+> +       }
+> +}
+> +
+>  static void skb_xmit_done(struct virtqueue *vq)
+>  {
+>         struct virtnet_info *vi =3D vq->vdev->priv;
+> -       struct napi_struct *napi =3D &vi->sq[vq2txq(vq)].napi;
+> +       unsigned int index =3D vq2txq(vq);
+> +       struct send_queue *sq =3D &vi->sq[index];
+> +       struct napi_struct *napi =3D &sq->napi;
+>
+>         /* Suppress further interrupts. */
+>         virtqueue_disable_cb(vq);
+> @@ -786,8 +802,7 @@ static void skb_xmit_done(struct virtqueue *vq)
+>         if (napi->weight)
+>                 virtqueue_napi_schedule(napi, vq);
+>         else
+> -               /* We were probably waiting for more output buffers. */
+> -               netif_wake_subqueue(vi->dev, vq2txq(vq));
+> +               virtnet_tx_wake_queue(vi, sq);
+>  }
+>
+>  #define MRG_CTX_HEADER_SHIFT 22
+> @@ -1166,10 +1181,7 @@ static void check_sq_full_and_disable(struct virtn=
+et_info *vi,
+>                         /* More just got used, free them then recheck. */
+>                         free_old_xmit(sq, txq, false);
+>                         if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2) {
+> -                               netif_start_subqueue(dev, qnum);
+> -                               u64_stats_update_begin(&sq->stats.syncp);
+> -                               u64_stats_inc(&sq->stats.wake);
+> -                               u64_stats_update_end(&sq->stats.syncp);
+> +                               virtnet_tx_wake_queue(vi, sq);
 
-@@ -1767,7 +1767,6 @@ static void _kvm_set_vcpu_preempted(struct 
-kvm_vcpu *vcpu)
-         struct gfn_to_hva_cache *ghc;
-         struct kvm_steal_time __user *st;
-         struct kvm_memslots *slots;
--       static const u8 preempted = KVM_VCPU_PREEMPTED;
-         gpa_t gpa;
+This is suspicious, netif_tx_wake_queue() will schedule qdisc, or is
+this intended?
 
-         gpa = vcpu->arch.st.guest_addr;
-@@ -1793,7 +1792,7 @@ static void _kvm_set_vcpu_preempted(struct 
-kvm_vcpu *vcpu)
-         }
+>                                 virtqueue_disable_cb(sq->vq);
+>                         }
+>                 }
+> @@ -3068,13 +3080,8 @@ static void virtnet_poll_cleantx(struct receive_qu=
+eue *rq, int budget)
+>                         free_old_xmit(sq, txq, !!budget);
+>                 } while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+>
+> -               if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2 &&
+> -                   netif_tx_queue_stopped(txq)) {
+> -                       u64_stats_update_begin(&sq->stats.syncp);
+> -                       u64_stats_inc(&sq->stats.wake);
+> -                       u64_stats_update_end(&sq->stats.syncp);
+> -                       netif_tx_wake_queue(txq);
+> -               }
+> +               if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2)
+> +                       virtnet_tx_wake_queue(vi, sq);
+>
+>                 __netif_tx_unlock(txq);
+>         }
+> @@ -3264,13 +3271,8 @@ static int virtnet_poll_tx(struct napi_struct *nap=
+i, int budget)
+>         else
+>                 free_old_xmit(sq, txq, !!budget);
+>
+> -       if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2 &&
+> -           netif_tx_queue_stopped(txq)) {
+> -               u64_stats_update_begin(&sq->stats.syncp);
+> -               u64_stats_inc(&sq->stats.wake);
+> -               u64_stats_update_end(&sq->stats.syncp);
+> -               netif_tx_wake_queue(txq);
+> -       }
+> +       if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2)
+> +               virtnet_tx_wake_queue(vi, sq);
+>
+>         if (xsk_done >=3D budget) {
+>                 __netif_tx_unlock(txq);
+> @@ -3521,6 +3523,9 @@ static void virtnet_tx_pause(struct virtnet_info *v=
+i, struct send_queue *sq)
+>
+>         /* Prevent the upper layer from trying to send packets. */
+>         netif_stop_subqueue(vi->dev, qindex);
+> +       u64_stats_update_begin(&sq->stats.syncp);
+> +       u64_stats_inc(&sq->stats.stop);
+> +       u64_stats_update_end(&sq->stats.syncp);
+>
+>         __netif_tx_unlock_bh(txq);
+>  }
+> @@ -3537,7 +3542,7 @@ static void virtnet_tx_resume(struct virtnet_info *=
+vi, struct send_queue *sq)
+>
+>         __netif_tx_lock_bh(txq);
+>         sq->reset =3D false;
+> -       netif_tx_wake_queue(txq);
+> +       virtnet_tx_wake_queue(vi, sq);
+>         __netif_tx_unlock_bh(txq);
+>
+>         if (running)
+> --
+> 2.34.1
+>
 
-         st = (struct kvm_steal_time __user *)ghc->hva;
--       unsafe_put_user(preempted, &st->preempted, out);
-+       unsafe_put_user(KVM_VCPU_PREEMPTED, &st->preempted, out);
-         vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
-
-> 
-> Huacai
-> 
->>
->> Regards
->> Bibo Mao
->>>
->>>
->>> Huacai
->>>
->>>> +       gpa_t gpa;
->>>> +
->>>> +       gpa = vcpu->arch.st.guest_addr;
->>>> +       if (!(gpa & KVM_STEAL_PHYS_VALID))
->>>> +               return;
->>>> +
->>>> +       /* vCPU may be preempted for many times */
->>>> +       if (vcpu->arch.st.preempted)
->>>> +               return;
->>>> +
->>>> +       /* This happens on process exit */
->>>> +       if (unlikely(current->mm != vcpu->kvm->mm))
->>>> +               return;
->>>> +
->>>> +       gpa &= KVM_STEAL_PHYS_MASK;
->>>> +       ghc = &vcpu->arch.st.cache;
->>>> +       slots = kvm_memslots(vcpu->kvm);
->>>> +       if (slots->generation != ghc->generation || gpa != ghc->gpa) {
->>>> +               if (kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, gpa, sizeof(*st))) {
->>>> +                       ghc->gpa = INVALID_GPA;
->>>> +                       return;
->>>> +               }
->>>> +       }
->>>> +
->>>> +       st = (struct kvm_steal_time __user *)ghc->hva;
->>>> +       unsafe_put_user(preempted, &st->preempted, out);
->>>> +       vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
->>>> +out:
->>>> +       mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
->>>> +}
->>>> +
->>>>    void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>>>    {
->>>> -       int cpu;
->>>> +       int cpu, idx;
->>>>           unsigned long flags;
->>>>
->>>> +       if (vcpu->preempted && kvm_guest_has_pv_feature(vcpu, KVM_FEATURE_PREEMPT_HINT)) {
->>>> +               /*
->>>> +                * Take the srcu lock as memslots will be accessed to check the gfn
->>>> +                * cache generation against the memslots generation.
->>>> +                */
->>>> +               idx = srcu_read_lock(&vcpu->kvm->srcu);
->>>> +               _kvm_set_vcpu_preempted(vcpu);
->>>> +               srcu_read_unlock(&vcpu->kvm->srcu, idx);
->>>> +       }
->>>> +
->>>>           local_irq_save(flags);
->>>>           cpu = smp_processor_id();
->>>>           vcpu->arch.last_sched_cpu = cpu;
->>>> diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
->>>> index a49b1c1a3dd1..b8879110a0a1 100644
->>>> --- a/arch/loongarch/kvm/vm.c
->>>> +++ b/arch/loongarch/kvm/vm.c
->>>> @@ -45,8 +45,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->>>>
->>>>           /* Enable all PV features by default */
->>>>           kvm->arch.pv_features = BIT(KVM_FEATURE_IPI);
->>>> -       if (kvm_pvtime_supported())
->>>> +       if (kvm_pvtime_supported()) {
->>>>                   kvm->arch.pv_features |= BIT(KVM_FEATURE_STEAL_TIME);
->>>> +               kvm->arch.pv_features |= BIT(KVM_FEATURE_PREEMPT_HINT);
->>>> +       }
->>>>
->>>>           /*
->>>>            * cpu_vabits means user address space only (a half of total).
->>>> @@ -143,6 +145,7 @@ static int kvm_vm_feature_has_attr(struct kvm *kvm, struct kvm_device_attr *attr
->>>>           case KVM_LOONGARCH_VM_FEAT_PV_IPI:
->>>>                   return 0;
->>>>           case KVM_LOONGARCH_VM_FEAT_PV_STEALTIME:
->>>> +       case KVM_LOONGARCH_VM_FEAT_PV_PREEMPT_HINT:
->>>>                   if (kvm_pvtime_supported())
->>>>                           return 0;
->>>>                   return -ENXIO;
->>>> --
->>>> 2.39.3
->>>>
->>>>
->>
->>
+Thanks
 
 
