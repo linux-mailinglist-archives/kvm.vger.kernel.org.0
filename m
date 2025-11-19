@@ -1,169 +1,258 @@
-Return-Path: <kvm+bounces-63699-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63696-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 932E7C6E235
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 12:07:58 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 643B9C6E0BE
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 11:47:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 4B2442DC5C
-	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 11:07:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 943AA342534
+	for <lists+kvm@lfdr.de>; Wed, 19 Nov 2025 10:44:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD1F352952;
-	Wed, 19 Nov 2025 11:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A85834D4D9;
+	Wed, 19 Nov 2025 10:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tHc52Usx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O1gPaO1o"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC7D2F5A3C;
-	Wed, 19 Nov 2025 11:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EF2346FA2
+	for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 10:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763550384; cv=none; b=IQchq4VO+Wjp2H+0TAgmhggms5sgJcSwoVCMU832YNUB/sDwx55kZzUBoykt4W2cDpkoS88MqhPy5lrw+21aepiB8UQ9gXui0/p5igtyaSo5IdfD0zx7OVodTWgmAj7LGj5+HwFATThmdVy1NeqvF/dvDHhHEnKunYB4i19Aoek=
+	t=1763549078; cv=none; b=pxN8cTFkjjzKpJfc27+gf0OPqu0n5dewGoX74Qd4dfDe4xjoA+Nwnxm7vMdT3KyQsWuQ55y6HTHBhdknw1DKmJItIsYyGQywYuDNHtwOzUwt2otJY27UVdL74JmuoVI9dIlv9X66SDmt9BjsG0fxtzzDu0tkfoY0kS+zTTh/40k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763550384; c=relaxed/simple;
-	bh=1uV1vmMeM6tA/4abIrzulGX4cdatfChnd623tezCQwY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GpnZ1sHOSoDKjWMeymaoO/pwJsW6bm75j79vJtHbTxbdldA7EYpmYahT3dGVqpA8TbKsc/Vg6gHga4vVF7p63d5sOkQz0WsjAwgKNGGyowEITOVWKK+L3I1nnzqVhe0rGRW776E1fhQhgAMaXtPLzVLKB0ASt9QLDjre+SvrHbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tHc52Usx; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AJ4SPoa017684;
-	Wed, 19 Nov 2025 11:06:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=WObmAZ
-	cEfsNWs6IKlnP++yHGWelEOCF2wjJBKwoNZmA=; b=tHc52UsxZJX3XK9m4oFhoL
-	sEFRGYhw4gOn5gAU0ZiogLNpigGnQVkNah30ovAHpIPgJqtUm8Cza4zDrigbkXrO
-	fwfpaZp/VNkmCjN/ZUPev9zA97KEWEOo20jX4XH7+wG5PzEgk6L5QPNScHH7Glvc
-	+uMB/HOFyg8A2DD31fy7n25PbIszpc1LQjmvCbL0eK7WnAnJzJPBjRKmYr/k/rQD
-	zapiutB8fox0VxamJU4mdXhnwsM7q2H0V3EMlX0oAvZn1WMBXALiFzVrqDRX7Uqe
-	nsijsm2RBhZbiDCU/V7yNF1Oye/tPeLb9v3Ns2ufypPPEab7aUq3GUezH/9r+qiw
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejk9yy1n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Nov 2025 11:06:20 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AJ7Pp0O005244;
-	Wed, 19 Nov 2025 11:06:19 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4af5bk867h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Nov 2025 11:06:18 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AJB6EVU42336752
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Nov 2025 11:06:15 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E1FEE2004B;
-	Wed, 19 Nov 2025 11:06:14 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0B00F20040;
-	Wed, 19 Nov 2025 11:06:13 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.87.156.96])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Wed, 19 Nov 2025 11:06:12 +0000 (GMT)
-Date: Wed, 19 Nov 2025 12:06:09 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
-        seiden@linux.ibm.com, schlameuss@linux.ibm.com, svens@linux.ibm.com,
-        agordeev@linux.ibm.com, gor@linux.ibm.com, david@redhat.com,
-        gerald.schaefer@linux.ibm.com
-Subject: Re: [PATCH v3 15/23] KVM: s390: Add helper functions for fault
- handling
-Message-ID: <20251119120609.4a4bf008@p-imbrenda>
-In-Reply-To: <20251118151005.9674Af1-hca@linux.ibm.com>
-References: <20251106161117.350395-1-imbrenda@linux.ibm.com>
-	<20251106161117.350395-16-imbrenda@linux.ibm.com>
-	<20251118151005.9674Af1-hca@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1763549078; c=relaxed/simple;
+	bh=WhK5P4cuobRv3bMhRyzWkwxWn+7RqWPfiO66DzwlRZg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NUe6PpwZOUo8o+upsDimoH7mvcQ34TlqvH8myXS9AoeCAWq+/kT0o7JKeLNu53fObUcR0mhJcVy718zq8QXOOVXEm2xD2DJk/z5A2joNft5vFnApikALdd3PCw22A07G5GX0pj/Jsm6CxCyP/EY9TB/QpVmK9W3UZyfM9I6bvLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O1gPaO1o; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763549076; x=1795085076;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WhK5P4cuobRv3bMhRyzWkwxWn+7RqWPfiO66DzwlRZg=;
+  b=O1gPaO1o0D+dzbMNmue/c11DvmHptZb6rvQdAwxBALNIhtTjMKrxnK0l
+   wupQaBEnXePh+oyPkvyRG383nJ5pu0ewQUCgRyb7UEV8Y5x3yn5X5XErj
+   rV56YgjURufoYSOsMEFUMKOit/luC2iONY4XAkJ24WaVQrww2kuHfJjyE
+   IInZkB4bnYmR9E6jOjEKH/w2Qaagd7A58754pMZ6S7Uap070wq81RXbu6
+   P928uMOsdZjY24qilkD78/i9tS9l6BJ8ltuyFcZC00yyVNjX4KcMnrTkl
+   +kRA+VqCyPTjDo5ibQbI5eRYfpICWUcWwexHTzsyXX8aTt7ZqSkUSi0Mv
+   A==;
+X-CSE-ConnectionGUID: fz3xAOHYRbeq+/Pted8tJw==
+X-CSE-MsgGUID: ko8YeIGgRXmHI7gdL5PHhg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11617"; a="65483370"
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="65483370"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 02:44:35 -0800
+X-CSE-ConnectionGUID: mItufiZIQR2Hevf9RtiK1g==
+X-CSE-MsgGUID: USMTkdqxSGGJc3gf0UXzbg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="195971496"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by fmviesa004.fm.intel.com with ESMTP; 19 Nov 2025 02:44:31 -0800
+Date: Wed, 19 Nov 2025 19:06:51 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
+	mtosatti@redhat.com, sandipan.das@amd.com, babu.moger@amd.com,
+	likexu@tencent.com, like.xu.linux@gmail.com, groug@kaod.org,
+	khorenko@virtuozzo.com, alexander.ivanov@virtuozzo.com,
+	den@virtuozzo.com, davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
+	dapeng1.mi@linux.intel.com, joe.jin@oracle.com,
+	ewanhai-oc@zhaoxin.com, ewanhai@zhaoxin.com, zhao1.liu@intel.com
+Subject: Re: [PATCH v7 2/9] target/i386: disable PERFCORE when "-pmu" is
+ configured
+Message-ID: <aR2ky5WU8CqH8+lS@intel.com>
+References: <20251111061532.36702-1-dongli.zhang@oracle.com>
+ <20251111061532.36702-3-dongli.zhang@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: PCZXa7uLXtCC8Dgv-qApYf4PvvbyofZT
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfXxmj9TFKMiS4F
- ktazYnXCQlNcjDjmGRyGjqAi5+DrXiuD7Zf0BUvheAaa1vLfh9WLWPD9LIx3HyNxw5cLtsybWcC
- AmvBRQ+nyEs+Pt+OHnwUVMVubf6onF/vipNpIyhEJ9JQQrqsmQiD7rToCMUK99HONfYmyuyUFU6
- B5ASyXfRlM0p772z5WvfQn+y00gIW7yKsEbeTSjJVSLoIDj7wjCtukKBZlg/qmA0hBjqdtOReEa
- sP2KZhCyiMAnJRXSrbF6tN19Uv0Kae1sgB0Gk6+JCF3QcQx0FaKqCxQl2rzIRBQ8kYh3LEtTPtJ
- Qwsy1A8rRG4MWlxYwtHYSJ67uWK00SIraxrJVmoAXSh3tznMbHs1CeQDoWn9RuW/3SFGFLU75xr
- uZpu45xAM5cxfyr9zfB2hO9/rMoHyQ==
-X-Proofpoint-ORIG-GUID: PCZXa7uLXtCC8Dgv-qApYf4PvvbyofZT
-X-Authority-Analysis: v=2.4 cv=XtL3+FF9 c=1 sm=1 tr=0 ts=691da4ac cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=W69JXFrg6a1OFCXWetkA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-19_03,2025-11-18_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
- adultscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511150032
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251111061532.36702-3-dongli.zhang@oracle.com>
 
-On Tue, 18 Nov 2025 16:10:05 +0100
-Heiko Carstens <hca@linux.ibm.com> wrote:
+Hi Dongli,
 
-> On Thu, Nov 06, 2025 at 05:11:09PM +0100, Claudio Imbrenda wrote:
-> > Add some helper functions for handling multiple guest faults at the
-> > same time.
-> > 
-> > This will be needed for VSIE, where a nested guest access also needs to
-> > access all the page tables that map it.
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > ---
-> >  arch/s390/include/asm/kvm_host.h |   1 +
-> >  arch/s390/kvm/Makefile           |   2 +-
-> >  arch/s390/kvm/faultin.c          | 148 +++++++++++++++++++++++++++++++
-> >  arch/s390/kvm/faultin.h          |  92 +++++++++++++++++++
-> >  arch/s390/kvm/kvm-s390.c         |   2 +-
-> >  arch/s390/kvm/kvm-s390.h         |   2 +
-> >  6 files changed, 245 insertions(+), 2 deletions(-)
-> >  create mode 100644 arch/s390/kvm/faultin.c
-> >  create mode 100644 arch/s390/kvm/faultin.h  
-> 
-> ...
-> 
-> > +int kvm_s390_faultin_gfn(struct kvm_vcpu *vcpu, struct kvm *kvm, struct guest_fault *f)
-> > +{  
-> 
-> ...
-> 
-> > +		scoped_guard(read_lock, &kvm->mmu_lock) {
-> > +			if (!mmu_invalidate_retry_gfn(kvm, inv_seq, f->gfn)) {
-> > +				f->valid = true;
-> > +				rc = gmap_link(mc, kvm->arch.gmap, f);
-> > +				kvm_release_faultin_page(kvm, f->page, !!rc, f->write_attempt);
-> > +				f->page = NULL;
-> > +			}
-> > +		}
-> > +		kvm_release_faultin_page(kvm, f->page, true, false);
-> > +
-> > +		if (rc == -ENOMEM) {
-> > +			rc = kvm_s390_mmu_cache_topup(mc);  
-> 
-> If I'm not mistaken then gmap_link() -> dat_link() maps the possible -ENOMEM
-> return value of dat_entry() to -EAGAIN. So the case where -ENOMEM leads to a
-> kvm_s390_mmu_cache_topup() call will never happen.
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 3653f8953e..4fcade89bc 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -8360,6 +8360,10 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>              !(env->hflags & HF_LMA_MASK)) {
+>              *edx &= ~CPUID_EXT2_SYSCALL;
+>          }
+> +
+> +        if (!cpu->enable_pmu) {
+> +            *ecx &= ~CPUID_EXT3_PERFCORE;
+> +        }
 
-oops, you're right
+Learned the lessons from PDCM [*]:
 
-I'll fix dat_link() accordingly
+[*] https://lore.kernel.org/qemu-devel/20250923104136.133875-3-pbonzini@redhat.com/
+
+Directly masking CPUID bit off is not a good idea... modifying the
+CPUID, even when fixing or adding dependencies, can easily break
+migration.
+
+So a safe way is to add a compat option. And I think it would be better
+if patch 1 also has a compat option. A single compat option could cover
+patch 1 & 2.
+
+I have these thoughts:
+
+* For "-pmu" dependency, it can be checked as [*] did.
+* For normal feature bit dependency (patch 1), it seems possible to add
+  compat_prop condition in feature_dependencies[].
+
+I attached a draft for discussion (which is on the top of the whole
+series).
+
+Note, we are currently in the RC phase for v10.2, and the
+pc_compat_10_2[] array is not yet added, which will be added before the
+release of v10.2. Therefore, we have enough time for discussion I think.
+
+If you think it's fine, I'll post compat_prop support separately as an
+RFC. The specific compat option can be left to this series.
+
+Although wait for a while, in a way, it is lucky :) - there's an
+opportunity to avoid making mistakes for us.
+
+Regards,
+Zhao
+
+------------------------------------------------
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f8b919cb6c47..d2b8e83e556d 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -83,6 +83,7 @@
+
+ GlobalProperty pc_compat_10_1[] = {
+     { "mch", "extended-tseg-mbytes", "16" },
++    { TYPE_X86_CPU, "x-amd-perfmon-always-on", "true" }, // This should be added to pc_compat_10_2!
+ };
+ const size_t pc_compat_10_1_len = G_N_ELEMENTS(pc_compat_10_1);
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 4fcade89bcea..8c56789eb296 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1997,6 +1997,8 @@ static FeatureDep feature_dependencies[] = {
+     {
+         .from = { FEAT_8000_0001_ECX,       CPUID_EXT3_PERFCORE },
+         .to = { FEAT_8000_0022_EAX,         CPUID_8000_0022_EAX_PERFMON_V2 },
++        .compat_prop =
++            { "x-amd-perfmon-always-on",    "false" },
+     },
+ };
+
+@@ -8998,15 +9000,36 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+         }
+     }
+
+-    if (!cpu->pdcm_on_even_without_pmu) {
++    if (!cpu->enable_pmu) {
+         /* PDCM is fixed1 bit for TDX */
+-        if (!cpu->enable_pmu && !is_tdx_vm()) {
++        if (!cpu->pdcm_on_even_without_pmu && !is_tdx_vm()) {
+             env->features[FEAT_1_ECX] &= ~CPUID_EXT_PDCM;
+         }
++
++        if (!cpu->amd_perfmon_always_on) {
++            env->features[FEAT_8000_0001_ECX] &= ~CPUID_EXT3_PERFCORE;
++        }
+     }
+
+     for (i = 0; i < ARRAY_SIZE(feature_dependencies); i++) {
+         FeatureDep *d = &feature_dependencies[i];
++        bool compat_omit = false;
++        PropValue *prop = &d->compat_prop;
++
++        if (prop->value) {
++            char *v = object_property_print(OBJECT(cpu), prop->prop, false, NULL);
++            if (v) {
++                compat_omit = !strcmp(prop->value, v);
++                printf("feature_dependencies: v: %s, value: %s, omit: %d\n",
++                       v, prop->value, compat_omit);
++                g_free(v);
++            }
++
++            if (compat_omit) {
++                continue;
++            }
++        }
++
+         if (!(env->features[d->from.index] & d->from.mask)) {
+             uint64_t unavailable_features = env->features[d->to.index] & d->to.mask;
+
+@@ -10065,6 +10088,8 @@ static const Property x86_cpu_properties[] = {
+                      arch_cap_always_on, false),
+     DEFINE_PROP_BOOL("x-pdcm-on-even-without-pmu", X86CPU,
+                      pdcm_on_even_without_pmu, false),
++    DEFINE_PROP_BOOL("x-amd-perfmon-always-on", X86CPU,
++                     amd_perfmon_always_on, false),
+ };
+
+ #ifndef CONFIG_USER_ONLY
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 6d78f3995b6b..ac8dd92efc59 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -696,8 +696,14 @@ typedef struct FeatureMask {
+     uint64_t mask;
+ } FeatureMask;
+
++typedef struct PropValue {
++    const char *prop, *value;
++} PropValue;
++
+ typedef struct FeatureDep {
+     FeatureMask from, to;
++    /* Once set, only when prop is satisfied, dependency can be checked. */
++    PropValue compat_prop;
+ } FeatureDep;
+
+ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+@@ -2353,6 +2359,16 @@ struct ArchCPU {
+      */
+     bool pdcm_on_even_without_pmu;
+
++    /*
++     * Backwards compatibility with QEMU <10.2. (TODO: change 10.2 to 11.0!)
++     * This flag covers 2 parts:
++     * - The PERFCORE feature is now disabled when PMU is not available, but prior to
++     *   10.2 it was enabled even if PMU is off.
++     * - The PerfMonV2 feature is now disabled when PERFCORE is disabled, but prior to
++     *   10.2 it was enabled even if PERFCORE is off.
++     */
++    bool amd_perfmon_always_on;
++
+     /* Number of physical address bits supported */
+     uint32_t phys_bits;
+
+@@ -2579,9 +2595,7 @@ bool cpu_x86_xrstor(CPUX86State *s, void *host, size_t len, uint64_t rbfm);
+ /* cpu.c */
+ void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+                               uint32_t vendor2, uint32_t vendor3);
+-typedef struct PropValue {
+-    const char *prop, *value;
+-} PropValue;
++
+ void x86_cpu_apply_props(X86CPU *cpu, PropValue *props);
+
+ void x86_cpu_after_reset(X86CPU *cpu);
+
+
 
