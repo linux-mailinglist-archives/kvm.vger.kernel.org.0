@@ -1,118 +1,177 @@
-Return-Path: <kvm+bounces-63868-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63869-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95EC9C74AD1
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 15:54:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E3BDC74AC8
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 15:54:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 421AD345619
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 14:51:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 3E01030E54
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 14:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9875C30CD95;
-	Thu, 20 Nov 2025 14:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA79E343D71;
+	Thu, 20 Nov 2025 14:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vBz3rTp4"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Nlop4bDN"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8E62EDD63;
-	Thu, 20 Nov 2025 14:51:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D15B2D7398
+	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 14:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763650307; cv=none; b=g7VFGRPlUgf0ID0NRa1iPkwD6OZeuzpj0vkaXeyzxPN+dU7/uWPsVNsiHHlXy8IXOfoT9RkWcAUVJQ6A7AZRaw1mpQMIzCwbjDwZFRZ79Icmrq+BHEH/zAWVA/Fj0bVRpT2JAR09K1EXmn1etx11RDM++kgnfjcI9cvjEYc8vtw=
+	t=1763650371; cv=none; b=FLGGz4JlTDoTGjn40xCjiHM6CNYNOcOQqhQ66OU9mMjWbH5sg/M51GzPh9SySFPKCZ7HK2UrdEP/PFWyHL5KnL32Y7/eh52fLK/dEdLJODBkHJ9HDgzNiUT+ZWdre3zDqJ+QcAQUfITv8h0n2or9YbI0xU90OnYcJg/rCVpdJaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763650307; c=relaxed/simple;
-	bh=ouZCDzXe0QkWeDXoCSvcmRScnrUHUe4hSuaj1XU5F+U=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C55zcRuk/gVUaIed6bYLPKUCrhu/+U50fObC2vNhterrI6OIDdKjq5CqaK/M/hPYewqB1d+3fvpzfEJIx9M2J5OMUcSxcV5SsBt+docmBHUhSWYWUbxXvRN7nKkxFwRTWx/8GKyvWShy3JSxVWFXQxGMHNduDIebnlD1BoevvDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vBz3rTp4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40641C4CEF1;
-	Thu, 20 Nov 2025 14:51:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763650307;
-	bh=ouZCDzXe0QkWeDXoCSvcmRScnrUHUe4hSuaj1XU5F+U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vBz3rTp4TiwEolvj0ix9cNHs80qhWuY1pphniGXdk7OUuT0hg+2TsimukVjy6ql3D
-	 QJMdBcGQzA33jyQewLfOsZG5ASrvHM615jFGVo/qqFuk2jirrZv6K5lRxkYIB00R5A
-	 eqE+DxBzRO+TN11Fil+w0ImoCFxw0kPOcQbBgR3HqQbfE1tye6avqD91wx/kehw33N
-	 E0/p5nwWN6PveN3aNWy9t8BcA4aEM0v7Hoa9aqyOEvX7zgOHqPgHjf13B3SJt1gLPe
-	 NYovawPF1wppFuXDSiEePvlozSLB3ASUUw0GrQ9JE+ica4luV6/5mEsP5TzdJNKOh1
-	 VKd3osOrKYubw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vM60f-00000006v9Y-0d3d;
-	Thu, 20 Nov 2025 14:51:45 +0000
-Date: Thu, 20 Nov 2025 14:51:44 +0000
-Message-ID: <865xb4sqnz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 2/5] KVM: arm64: Force trap of GMID_EL1 when the guest doesn't have MTE
-In-Reply-To: <20251120143419.GA2325986@e124191.cambridge.arm.com>
-References: <20251120133202.2037803-1-maz@kernel.org>
-	<20251120133202.2037803-3-maz@kernel.org>
-	<20251120143419.GA2325986@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763650371; c=relaxed/simple;
+	bh=fJNbQYu7PoiJLsEPpjUYNqAPI6k2geFEJacIKnsv5a4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=TXEbB1eUVH8L+Wqj3NukzdLW62EdATs19OO06AS62AA7UzWjrBUAwca31HpTr8qEllkXGun+KRTffmPkcgcE/3ElBggV2ebDTP2vsvad/oXCRyUXDN/AIZmFPOizXnNV6w+jcChXuRoF26+mckDfLcYpa+hV6Z6edCSo+JVsMdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Nlop4bDN; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-43346da8817so5269595ab.0
+        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 06:52:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763650367; x=1764255167; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mIp1emodWmrQX+c6TjoXmEBGWcecINECr9nK+dGHBUw=;
+        b=Nlop4bDNIOkjuo0pMhzaqc0ODrEsmRo7XtLqwhp00uyFASxw+sbIvvfDKg63/0WNIr
+         Irgw7i1L5c7f3KspyZuRfY76O51HffIuodvQy5ZIcDN4No7WwIxUOGZ9dpes/M6K+nsd
+         SNLzENdMcdkRpJUmuFjuM9BMlGaR61DPmsUMatu7aVJzbpi7Z/RO6GbliOgOscpBha8S
+         DnzFtV5phPRpPEJgf98WlMFKyzL6CdLykV3ZnkTgBAq3ZRb9M24771+6fglXYKmcEHuj
+         JwzMwrRMP1iOEu/PZF6XSo/nxjqLzdvmfaif9TGvKGR4YXIy2m1LIpokuAZvSHGS7C+s
+         olCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763650367; x=1764255167;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mIp1emodWmrQX+c6TjoXmEBGWcecINECr9nK+dGHBUw=;
+        b=nhCg+x+pfpNu4/Yq2pAyEKFHmmb1ow2xT1BZWThghoaKX+I+FHqrnxQpPJmvDsVxjV
+         6rfDpTcHYq3K/QcmAv+a8M8pNU1h6R0ZB59Qz9tEC3ZUW4Sqly9Hn3xLZjRYHWKbRoCQ
+         Iup67E4wn5LlSjQjAdmr2hJTub4IIa8nQ/iTPATPhg/+hPs8U25YssnbVWAiY3VY8YAH
+         7cJR8dE3r+MsMvwaWIByGAswr3FM/oPg68v/Kl4XqDRAQVVqST7rXubDudbpuFllsQBr
+         AGZqCb7uwstrGm8W7LZSuLns4OCLZskcsEqTOQZLmOPtd/3WX+iXJYkNBHNduyvZR2jB
+         h13Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXFZBxsu0hh+rxwiW2q0msvSqDcAOhne0AkCZIayTOPvp6hV6KAHGNcJm50/hrfpIK1QbM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqp/SzdH6LD//w8RX6DPlwy+FA3aljpRzxX8l3ZLgX+k/7cmfS
+	jF19ixVQkzllHIvoMqoHQ+zgdrfqq3q8lWkEWSE2Hy+I4r8WLkd/FjuMXMw8wad/2wY=
+X-Gm-Gg: ASbGncs7yDIR/ggEP6+kWMsMuBsHXHVdmRx89WzQejyGKBrQMT08/9igJt5BenUVrlD
+	9qN7vigmnJ2V/XwftWt7MknTNbj3lC0Np5CJHo7fBXofdBwknQFIl/HT1cN0j/z2p0NGvlwiQjE
+	shZ3VVjwOEZLVciT8Vk3aiM3ZXla70EEtq3bm6WlhrByyABL+y92++jkTSAUi710qfAwhqNIZNA
+	og10Y1E4RIO6YAl5Wc98fviUmByoumYPYJlo/lZNTOHawny2liGySExtoJysDdYmM8b02eeBBPN
+	xbgu2o+EYZq+XXld5QTz3UPNuyQsfbeaoF9S2s2d/8E9hT+yW6ZTEi9CjHtuS2y7WDtXrUpVTzX
+	ot2oCAUbRI+kBDJQ4MGymAJcaBOaUzuHlM2wMJ7y6ePBp2KGi5+7RxaQshRQQOhR3krkOjS4dvB
+	6ihA==
+X-Google-Smtp-Source: AGHT+IEmRlVKCe07qbgo1t2w3uFpBKsqx62crTftDC+8sZ0oUBIrcGL53VTRakva//fmnWvcfQrQww==
+X-Received: by 2002:a05:6e02:1c01:b0:433:1d5a:5157 with SMTP id e9e14a558f8ab-435aa88e822mr21434775ab.6.1763650367018;
+        Thu, 20 Nov 2025 06:52:47 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b954b207d7sm1008611173.33.2025.11.20.06.52.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Nov 2025 06:52:46 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-kernel@vger.kernel.org, david.laight.linux@gmail.com
+Cc: Alan Stern <stern@rowland.harvard.edu>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Alexei Starovoitov <ast@kernel.org>, Andi Shyti <andi.shyti@kernel.org>, 
+ Andreas Dilger <adilger.kernel@dilger.ca>, Andrew Lunn <andrew@lunn.ch>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Ard Biesheuvel <ardb@kernel.org>, 
+ Arnaldo Carvalho de Melo <acme@kernel.org>, 
+ Bjorn Helgaas <bhelgaas@google.com>, Borislav Petkov <bp@alien8.de>, 
+ Christian Brauner <brauner@kernel.org>, 
+ =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ Christoph Hellwig <hch@lst.de>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Dan Williams <dan.j.williams@intel.com>, 
+ Dave Hansen <dave.hansen@linux.intel.com>, 
+ Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>, 
+ Davidlohr Bueso <dave@stgolabs.net>, 
+ "David S. Miller" <davem@davemloft.net>, Dennis Zhou <dennis@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Jakub Sitnicki <jakub@cloudflare.com>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+ Jarkko Sakkinen <jarkko@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
+ Jiri Slaby <jirislaby@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+ John Allen <john.allen@amd.com>, 
+ Jonathan Cameron <jonathan.cameron@huawei.com>, 
+ Juergen Gross <jgross@suse.com>, Kees Cook <kees@kernel.org>, 
+ KP Singh <kpsingh@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+ Mika Westerberg <westeri@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+ Miklos Szeredi <miklos@szeredi.hu>, Namhyung Kim <namhyung@kernel.org>, 
+ Neal Cardwell <ncardwell@google.com>, nic_swsd@realtek.com, 
+ OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+ Olivia Mackall <olivia@selenic.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Peter Huewe <peterhuewe@gmx.de>, 
+ Peter Zijlstra <peterz@infradead.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Sean Christopherson <seanjc@google.com>, 
+ Srinivas Kandagatla <srini@kernel.org>, 
+ Stefano Stabellini <sstabellini@kernel.org>, 
+ Steven Rostedt <rostedt@goodmis.org>, Tejun Heo <tj@kernel.org>, 
+ Theodore Ts'o <tytso@mit.edu>, Thomas Gleixner <tglx@linutronix.de>, 
+ Tom Lendacky <thomas.lendacky@amd.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, x86@kernel.org, 
+ Yury Norov <yury.norov@gmail.com>, amd-gfx@lists.freedesktop.org, 
+ bpf@vger.kernel.org, cgroups@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, io-uring@vger.kernel.org, 
+ kvm@vger.kernel.org, linux-acpi@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ linux-cxl@vger.kernel.org, linux-efi@vger.kernel.org, 
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+ linux-integrity@vger.kernel.org, linux-mm@kvack.org, 
+ linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, 
+ linux-perf-users@vger.kernel.org, linux-scsi@vger.kernel.org, 
+ linux-serial@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+ linux-usb@vger.kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
+ usb-storage@lists.one-eyed-alien.net, David Hildenbrand <david@kernel.org>
+In-Reply-To: <20251119224140.8616-1-david.laight.linux@gmail.com>
+References: <20251119224140.8616-1-david.laight.linux@gmail.com>
+Subject: Re: (subset) [PATCH 00/44] Change a lot of min_t() that might mask
+ high bits
+Message-Id: <176365036384.566630.2992984118137417732.b4-ty@kernel.dk>
+Date: Thu, 20 Nov 2025 07:52:43 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On Thu, 20 Nov 2025 14:34:19 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+
+On Wed, 19 Nov 2025 22:40:56 +0000, david.laight.linux@gmail.com wrote:
+> It in not uncommon for code to use min_t(uint, a, b) when one of a or b
+> is 64bit and can have a value that is larger than 2^32;
+> This is particularly prevelant with:
+> 	uint_var = min_t(uint, uint_var, uint64_expression);
 > 
-> On Thu, Nov 20, 2025 at 01:31:59PM +0000, Marc Zyngier wrote:
-> > If our host has MTE, but the guest doesn't, make sure we set HCR_EL2.TID5
-> > to force GMID_EL1 being trapped.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 84e6f04220589..40f32b017f107 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -5558,6 +5558,8 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
-> >  
-> >  	if (kvm_has_mte(vcpu->kvm))
-> >  		vcpu->arch.hcr_el2 |= HCR_ATA;
-> > +	else if (id_aa64pfr1_mte(read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1)))
-> > +		vcpu->arch.hcr_el2 |= HCR_TID5;
+> Casts to u8 and u16 are very likely to discard significant bits.
 > 
-> This is because we want to enable the trapping regardless of CONFIG_ARM64_MTE
-> (so we can't use system_supports_mte()).
+> [...]
 
-Indeed. In general, we cannot rely on the kernel's own configuration,
-since the guest sees most of the actual HW.
+Applied, thanks!
 
-> 
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+[12/44] block: use min() instead of min_t()
+        commit: 9420e720ad192c53c8d2803c5a2313b2d586adbd
 
-Thanks!
-
-	M.
-
+Best regards,
 -- 
-Without deviation from the norm, progress is not possible.
+Jens Axboe
+
+
+
 
