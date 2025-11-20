@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-63899-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6313C75A74
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 18:27:01 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6189DC75AA1
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 18:28:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 54CFD4EB574
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:20:50 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7413C4EBCE6
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FA53A9C01;
-	Thu, 20 Nov 2025 17:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001EB3242C9;
+	Thu, 20 Nov 2025 17:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZT0MELUx"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DUpNpBSI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA8EF377E9C;
-	Thu, 20 Nov 2025 17:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE763AA1AA;
+	Thu, 20 Nov 2025 17:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763658978; cv=none; b=X2lrjKSOAuR6QiOEy6d5qK1o0mIomOB6//9pZ9YkX1jRoEzm67w7+xlTvq6uIBzYn0dEjwwfEfbL1Kx4jn8zYwzyWbVeaAGY/qaFDtcte4Eayoy66zNMNmFQpQkRaHKbzLPJSQcsOe3xkRJVtXjBVM1gb2j6XGHjQD05NmBD+vU=
+	t=1763658985; cv=none; b=k2L4LbkOawVoDqlYzoiT78+E6k2xmk2NsL6laavywbUwp/H3wm8f8uV3VYKwpzvpk3i5a7G586+xYhFxkxpXKeJMaQZtG7BqQVDhlkL80h+ypIs5S9K0xJ4MZ1f9Su1C+3G54yoao5mbCdClofzXyIlTOzgLuWjR5ioQakAuj/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763658978; c=relaxed/simple;
-	bh=YgWFM24ZgeoBOmj0T3wFA+RmJ7JyziVkHiE2wUwE9Nc=;
+	s=arc-20240116; t=1763658985; c=relaxed/simple;
+	bh=XQOuLoTSkecG+KCjP3MBVF58HAw9g0zCJ4PnklcCyC4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bfGuFoiqPFPI/y/f493M2ZQMHAOh87cx9KTZaPoMrh1bfx2I5cDvYbE6HKIPhE3ekRebyeinD61UoSHISQR17dawrcb8kgvlPm7iVMWiKGnnpTUORnPgefGSRX9UKlEvE6lpZGfLbDIkSOrBjFDBe6OWflwt993fjyFmBqO/rp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZT0MELUx; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=npTT98vNImHjtg8wHNKHJmCUTaO9tHCNA/sWTJoHW9dXk5IUGYtnNGipi1ZWB5J/qu2PDYeoG+TAeV0FLtcWADjS2rLIMsKYxSzQDAx6A0ngSg8rWuY4abtZDghDYXAqHX0jysqcf+xnjdbv60dQgrLVGxnQmHlmhmDqHJwOYBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DUpNpBSI; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKBRtgK021553;
-	Thu, 20 Nov 2025 17:16:08 GMT
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKCVGqk004022;
+	Thu, 20 Nov 2025 17:16:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=rjdyBPkqJpI6MWf8t
-	mW68B0spU3vJ3MctslbddyriDo=; b=ZT0MELUxfvunQUoC/xSfSMB2GOVhSgFWU
-	119r2roIRS0gNJzYhmitEOh6iihnT5SFi8Bi02DmnmI25rVSNYDTLJLGYjFzjWjG
-	9AXUXpVG0rwZUXV4SS3FObDFoQicL/nFJLNeyQm5/LfDb4zSU9Kl2SXzhRbtFJXy
-	3jJPgmkYF+ZZunNP0bemrPCGhO8JIbyRfnR/ol4rE51y69hy7d1aYyeGlHXqk36v
-	G1/JEWyhxWqsivXM1gs/9qU6DPEZcZCTVaDhJnFl9fmSa2QcOC588pB8ZbzQbMtd
-	HUG/1JjKZlca4yP9F+3ILb1XcqMU9mq9fspJpqKuawOm8QMOkS3Xw==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejjwfrbh-1
+	:mime-version:references:subject:to; s=pp1; bh=FU0MAMuzkO9E5WdOF
+	bQT6ipdvRj5oGgyDE6crOYjvjQ=; b=DUpNpBSICmpNU9386B5d1xi+VU44aF2S3
+	eyF+yngRrMALWh4A2avT3PKNxqOB8KVr0G/Oywe7lsl4iFk3cCZa4y5MJT4+VyEk
+	dmAht4n61nmU67mG5qsMOuBeqeOzkn+xv94C54Gs0P15doo+zqh2z9/cgWGss/r7
+	PQ2aRJSKopKVAnq0nVUsrDoLtszCpIhcuWBRTHbl91RUT3EHh7SOCoTY3S7ZaS06
+	TvUsELuIbQjXHjTRGo6SJLxIEFTdhalc01JXFF+SIsnvvpseymTNR/aWnL839KCO
+	5q/FikH8IqXRKVZWLaeT7ITnZujRAMkESLsCxNbmE0yHVO6umyI9g==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejju684t-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Nov 2025 17:16:08 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKEBuPm006959;
-	Thu, 20 Nov 2025 17:16:07 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4af62jqdmw-1
+	Thu, 20 Nov 2025 17:16:10 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKGbDv6030813;
+	Thu, 20 Nov 2025 17:16:09 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4af47y7qr2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Nov 2025 17:16:07 +0000
+	Thu, 20 Nov 2025 17:16:09 +0000
 Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AKHG36Y38666620
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AKHG5r840763846
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 20 Nov 2025 17:16:03 GMT
+	Thu, 20 Nov 2025 17:16:05 GMT
 Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 99FED20043;
+	by IMSVA (Postfix) with ESMTP id 821872004D;
+	Thu, 20 Nov 2025 17:16:05 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C70472004B;
 	Thu, 20 Nov 2025 17:16:03 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F0BB42004D;
-	Thu, 20 Nov 2025 17:16:01 +0000 (GMT)
 Received: from p-imbrenda.ibmuc.com (unknown [9.111.12.33])
 	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 20 Nov 2025 17:16:01 +0000 (GMT)
+	Thu, 20 Nov 2025 17:16:03 +0000 (GMT)
 From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 To: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -75,9 +75,9 @@ Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         schlameuss@linux.ibm.com, hca@linux.ibm.com, svens@linux.ibm.com,
         agordeev@linux.ibm.com, gor@linux.ibm.com, david@redhat.com,
         gerald.schaefer@linux.ibm.com
-Subject: [PATCH v4 09/23] KVM: s390: KVM page table management functions: clear and replace
-Date: Thu, 20 Nov 2025 18:15:30 +0100
-Message-ID: <20251120171544.96841-10-imbrenda@linux.ibm.com>
+Subject: [PATCH v4 10/23] KVM: s390: KVM page table management functions: walks
+Date: Thu, 20 Nov 2025 18:15:31 +0100
+Message-ID: <20251120171544.96841-11-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251120171544.96841-1-imbrenda@linux.ibm.com>
 References: <20251120171544.96841-1-imbrenda@linux.ibm.com>
@@ -89,226 +89,498 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=BanVE7t2 c=1 sm=1 tr=0 ts=691f4cd8 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+X-Proofpoint-GUID: AHShuXbgTES0yt9jznvFGmj4j1Ucv8zA
+X-Proofpoint-ORIG-GUID: AHShuXbgTES0yt9jznvFGmj4j1Ucv8zA
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfXwkaUARxGfRX4
+ EUOmMWCN+eBaY90psgS4Gh4/wQ7U6djvFi7Konnnw/gNqwyvE5hhPIVWz2vh95kPO5GjseFUEgR
+ sy10K0VpGJMvzhyZrCwdTDCokEY7K3kovs18oBg8M/741ZcavvQY1Ea9E32V3931Yhri2IdW6eM
+ 3si121PzhKGwm5/4QDkTpITHf7ZQ/8HqBhHlwGkOGlPQ5wXVDmEACbOZXHw88m8jcmn8CU8PY+A
+ 5MdPrlCN3RQa5Mley/tViMV9xiB2QnZdIe6Ilzu0BORsvPHjg5C59wujTYn7SVQQeqiPACg0Xgz
+ TUMdQdQ+MqVGtEKGah8ciD8t1GyuEVf36+/3EqfEmZ+e1hPlyaRBYGpGcidgv/adjd6o38o9jW5
+ 7yG57EodG8yigui+Ukg7OmeVgSgTug==
+X-Authority-Analysis: v=2.4 cv=SvOdKfO0 c=1 sm=1 tr=0 ts=691f4cda cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
  a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=cTj5uL8xXfUXbJxEK6wA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfX4nlUcpShGNrL
- 1pmctcLqQWB258SbrTzf5Exap0VeGG+B1IFHvf5srevl8rGru/A3vs0M4nSTwIXvgDyFY+ini1v
- fAZSxHIFg5aSyPG4l3nEk7MOw1KAmQZsdgkHgRAEfWvjFJL6Bv4wcukS2AGxGrGO/jei7nI3XfR
- ZeaDlrzQWSmJAbnQiUvfJMNAbTpOtH7tPhq97AtI+qcwWEgAgGOkxATX+Lw5omfr3LBSbstd9fO
- dQEVfLt7TDFkKlhQD0Yn6YQo232F8wV2FEyk1WFn6RF60fgjeeW+Grrs+EioxJE4BDli6LQS32Y
- 2N+DrIQrMUhtj0XHJLL+Ol91VY04Acap7V/ROKTbfBRm6l83TQa/tW+hbh6WeHIPx89lO8gJatU
- qY+4yZLi0O51QzU2vUJ0O0SOBIWqzw==
-X-Proofpoint-GUID: dxMC7KIXmruieVjbKRoc4Bp0XFnzvVU9
-X-Proofpoint-ORIG-GUID: dxMC7KIXmruieVjbKRoc4Bp0XFnzvVU9
+ a=FjFqaoouhZgXAMKSwZQA:9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-20_06,2025-11-20_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 lowpriorityscore=0 suspectscore=0 spamscore=0 impostorscore=0
- priorityscore=1501 clxscore=1015 phishscore=0 bulkscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511150032
+ priorityscore=1501 lowpriorityscore=0 spamscore=0 clxscore=1015
+ suspectscore=0 phishscore=0 adultscore=0 bulkscore=0 impostorscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2511150032
 
 Add page table management functions to be used for KVM guest (gmap)
 page tables.
 
-This patch adds functions to clear, replace or exchange DAT table
-entries.
+This patch adds functions to walk to specific table entries, or to
+perform actions on a range of entries.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- arch/s390/kvm/dat.c | 118 ++++++++++++++++++++++++++++++++++++++++++++
- arch/s390/kvm/dat.h |  40 +++++++++++++++
- 2 files changed, 158 insertions(+)
+ arch/s390/kvm/dat.c | 383 ++++++++++++++++++++++++++++++++++++++++++++
+ arch/s390/kvm/dat.h |  39 +++++
+ 2 files changed, 422 insertions(+)
 
 diff --git a/arch/s390/kvm/dat.c b/arch/s390/kvm/dat.c
-index c324a27f379f..a9d5b49ac411 100644
+index a9d5b49ac411..3b74bf5463f4 100644
 --- a/arch/s390/kvm/dat.c
 +++ b/arch/s390/kvm/dat.c
-@@ -101,3 +101,121 @@ void dat_free_level(struct crst_table *table, bool owns_ptes)
- 	}
- 	dat_free_crst(table);
+@@ -219,3 +219,386 @@ union pgste __dat_ptep_xchg(union pte *ptep, union pgste pgste, union pte new, g
+ 	WRITE_ONCE(*ptep, new);
+ 	return pgste;
  }
 +
++/*
++ * dat_split_ste - Split a segment table entry into page table entries
++ *
++ * Context: This function is assumed to be called with kvm->mmu_lock held.
++ *
++ * Return: 0 in case of success, -ENOMEM if running out of memory.
++ */
++static int dat_split_ste(struct kvm_s390_mmu_cache *mc, union pmd *pmdp, gfn_t gfn,
++			 union asce asce, bool uses_skeys)
++{
++	union pgste pgste_init;
++	struct page_table *pt;
++	union pmd new, old;
++	union pte init;
++	int i;
++
++	BUG_ON(!mc);
++	old = READ_ONCE(*pmdp);
++
++	/* Already split, nothing to do */
++	if (!old.h.i && !old.h.fc)
++		return 0;
++
++	pt = dat_alloc_pt_noinit(mc);
++	if (!pt)
++		return -ENOMEM;
++	new.val = virt_to_phys(pt);
++
++	while (old.h.i || old.h.fc) {
++		init.val = pmd_origin_large(old);
++		init.h.p = old.h.p;
++		init.h.i = old.h.i;
++		init.s.d = old.s.fc1.d;
++		init.s.w = old.s.fc1.w;
++		init.s.y = old.s.fc1.y;
++		init.s.sd = old.s.fc1.sd;
++		init.s.pr = old.s.fc1.pr;
++		pgste_init.val = 0;
++		if (old.h.fc) {
++			for (i = 0; i < _PAGE_ENTRIES; i++)
++				pt->ptes[i].val = init.val | i * PAGE_SIZE;
++			/* no need to take locks as the page table is not installed yet */
++			pgste_init.prefix_notif = old.s.fc1.prefix_notif;
++			pgste_init.pcl = uses_skeys && init.h.i;
++			dat_init_pgstes(pt, pgste_init.val);
++		} else {
++			dat_init_page_table(pt, init.val, 0);
++		}
++
++		if (dat_pmdp_xchg_atomic(pmdp, old, new, gfn, asce)) {
++			if (!pgste_init.pcl)
++				return 0;
++			for (i = 0; i < _PAGE_ENTRIES; i++) {
++				union pgste pgste = pt->pgstes[i];
++
++				pgste = dat_save_storage_key_into_pgste(pt->ptes[i], pgste);
++				pgste_set_unlock(pt->ptes + i, pgste);
++			}
++			return 0;
++		}
++		old = READ_ONCE(*pmdp);
++	}
++
++	dat_free_pt(pt);
++	return 0;
++}
++
++/*
++ * dat_split_crste - Split a crste into smaller crstes
++ *
++ * Context: This function is assumed to be called with kvm->mmu_lock held.
++ *
++ * Return: 0 in case of success, -ENOMEM if running out of memory.
++ */
++static int dat_split_crste(struct kvm_s390_mmu_cache *mc, union crste *crstep,
++			   gfn_t gfn, union asce asce, bool uses_skeys)
++{
++	struct crst_table *table;
++	union crste old, new, init;
++	int i;
++
++	old = READ_ONCE(*crstep);
++	if (is_pmd(old))
++		return dat_split_ste(mc, &crstep->pmd, gfn, asce, uses_skeys);
++
++	BUG_ON(!mc);
++
++	/* Already split, nothing to do */
++	if (!old.h.i && !old.h.fc)
++		return 0;
++
++	table = dat_alloc_crst_noinit(mc);
++	if (!table)
++		return -ENOMEM;
++
++	new.val = virt_to_phys(table);
++	new.h.tt = old.h.tt;
++	new.h.fc0.tl = _REGION_ENTRY_LENGTH;
++
++	while (old.h.i || old.h.fc) {
++		init = old;
++		init.h.tt--;
++		if (old.h.fc) {
++			for (i = 0; i < _CRST_ENTRIES; i++)
++				table->crstes[i].val = init.val | i * HPAGE_SIZE;
++		} else {
++			crst_table_init((void *)table, init.val);
++		}
++		if (dat_crstep_xchg_atomic(crstep, old, new, gfn, asce))
++			return 0;
++		old = READ_ONCE(*crstep);
++	}
++
++	dat_free_crst(table);
++	return 0;
++}
++
 +/**
-+ * dat_crstep_xchg - exchange a gmap CRSTE with another
-+ * @crstep: pointer to the CRST entry
-+ * @new: replacement entry
-+ * @gfn: the affected guest address
++ * dat_entry_walk() - walk the gmap page tables
++ * @gfn: guest frame
 + * @asce: the ASCE of the address space
++ * @flags: flags from WALK_* macros
++ * @level: level to walk to, from LEVEL_* macros
++ * @last: will be filled the last visited non-pte DAT entry
++ * @ptepp: will be filled the last visited pte entry, if any, otherwise NULL
 + *
-+ * Context: This function is assumed to be called with kvm->mmu_lock held.
++ * Returns a table entry pointer for the given guest address and @level
++ *
++ * The @flags have the following meanings:
++ * * @DAT_WALK_IGN_HOLES: consider holes as normal table entries
++ * * @DAT_WALK_ALLOC: allocate new tables to reach the requested level, if needed
++ * * @DAT_WALK_SPLIT: split existing large pages to reach the requested level, if needed
++ * * @DAT_WALK_LEAF: return successfully whenever a large page is encountered
++ * * @DAT_WALK_ANY: return successfully even if the requested level could not be reached
++ * * @DAT_WALK_CONTINUE: walk to the requested level with the specified flags, and then try to
++ *                       continue walking to ptes with only DAT_WALK_ANY
++ *
++ * Context: called with kvm->mmu_lock held.
++ *
++ * Return:
++ * * PGM_ADDRESSING if the requested address lies outside memory
++ * * a PIC number if the requested address lies in a memory hole of type _DAT_TOKEN_PIC
++ * * -EFAULT if the requested address lies inside a memory hole of a different type
++ * * -EINVAL if the given ASCE is not compatible with the requested level
++ * * -EFBIG if the requested level could not be reached because a larger frame was found
++ * * -ENOENT if the requested level could not be reached for other reasons
++ * * -ENOMEM if running out of memory while allocating or splitting a table
 + */
-+void dat_crstep_xchg(union crste *crstep, union crste new, gfn_t gfn, union asce asce)
++int dat_entry_walk(struct kvm_s390_mmu_cache *mc, gfn_t gfn, union asce asce, int flags,
++		   int walk_level, union crste **last, union pte **ptepp)
 +{
-+	if (crstep->h.i) {
-+		WRITE_ONCE(*crstep, new);
-+		return;
-+	} else if (cpu_has_edat2()) {
-+		crdte_crste(crstep, *crstep, new, gfn, asce);
-+		return;
++	union vaddress vaddr = { .addr = gfn_to_gpa(gfn) };
++	bool continue_anyway = flags & DAT_WALK_CONTINUE;
++	bool uses_skeys = flags & DAT_WALK_USES_SKEYS;
++	bool ign_holes = flags & DAT_WALK_IGN_HOLES;
++	bool allocate = flags & DAT_WALK_ALLOC;
++	bool split = flags & DAT_WALK_SPLIT;
++	bool leaf = flags & DAT_WALK_LEAF;
++	bool any = flags & DAT_WALK_ANY;
++	struct page_table *pgtable;
++	struct crst_table *table;
++	union crste entry;
++	int rc;
++
++	*last = NULL;
++	*ptepp = NULL;
++	if (WARN_ON_ONCE(unlikely(!asce.val)))
++		return -EINVAL;
++	if (WARN_ON_ONCE(unlikely(walk_level > asce.dt)))
++		return -EINVAL;
++	if (!asce_contains_gfn(asce, gfn))
++		return PGM_ADDRESSING;
++
++	table = dereference_asce(asce);
++	if (asce.dt >= ASCE_TYPE_REGION1) {
++		*last = table->crstes + vaddr.rfx;
++		entry = READ_ONCE(**last);
++		if (WARN_ON_ONCE(entry.h.tt != TABLE_TYPE_REGION1))
++			return -EINVAL;
++		if (crste_hole(entry) && !ign_holes)
++			return entry.tok.type == _DAT_TOKEN_PIC ? entry.tok.par : -EFAULT;
++		if (walk_level == TABLE_TYPE_REGION1)
++			return 0;
++		if (entry.pgd.h.i) {
++			if (!allocate)
++				return any ? 0 : -ENOENT;
++			rc = dat_split_crste(mc, *last, gfn, asce, uses_skeys);
++			if (rc)
++				return rc;
++			entry = READ_ONCE(**last);
++		}
++		table = dereference_crste(entry.pgd);
 +	}
 +
-+	if (machine_has_tlb_guest())
-+		idte_crste(crstep, gfn, IDTE_GUEST_ASCE, asce, IDTE_GLOBAL);
-+	else
-+		idte_crste(crstep, gfn, 0, NULL_ASCE, IDTE_GLOBAL);
-+	WRITE_ONCE(*crstep, new);
++	if (asce.dt >= ASCE_TYPE_REGION2) {
++		*last = table->crstes + vaddr.rsx;
++		entry = READ_ONCE(**last);
++		if (WARN_ON_ONCE(entry.h.tt != TABLE_TYPE_REGION2))
++			return -EINVAL;
++		if (crste_hole(entry) && !ign_holes)
++			return entry.tok.type == _DAT_TOKEN_PIC ? entry.tok.par : -EFAULT;
++		if (walk_level == TABLE_TYPE_REGION2)
++			return 0;
++		if (entry.p4d.h.i) {
++			if (!allocate)
++				return any ? 0 : -ENOENT;
++			rc = dat_split_crste(mc, *last, gfn, asce, uses_skeys);
++			if (rc)
++				return rc;
++			entry = READ_ONCE(**last);
++		}
++		table = dereference_crste(entry.p4d);
++	}
++
++	if (asce.dt >= ASCE_TYPE_REGION3) {
++		*last = table->crstes + vaddr.rtx;
++		entry = READ_ONCE(**last);
++		if (WARN_ON_ONCE(entry.h.tt != TABLE_TYPE_REGION3))
++			return -EINVAL;
++		if (crste_hole(entry) && !ign_holes)
++			return entry.tok.type == _DAT_TOKEN_PIC ? entry.tok.par : -EFAULT;
++		if (walk_level == TABLE_TYPE_REGION3 &&
++		    continue_anyway && !entry.pud.h.fc && !entry.h.i) {
++			walk_level = TABLE_TYPE_PAGE_TABLE;
++			allocate = false;
++		}
++		if (walk_level == TABLE_TYPE_REGION3 || ((leaf || any) && entry.pud.h.fc))
++			return 0;
++		if (entry.pud.h.i && !entry.pud.h.fc) {
++			if (!allocate)
++				return any ? 0 : -ENOENT;
++			rc = dat_split_crste(mc, *last, gfn, asce, uses_skeys);
++			if (rc)
++				return rc;
++			entry = READ_ONCE(**last);
++		}
++		if (walk_level <= TABLE_TYPE_SEGMENT && entry.pud.h.fc) {
++			if (!split)
++				return -EFBIG;
++			rc = dat_split_crste(mc, *last, gfn, asce, uses_skeys);
++			if (rc)
++				return rc;
++			entry = READ_ONCE(**last);
++		}
++		table = dereference_crste(entry.pud);
++	}
++
++	*last = table->crstes + vaddr.sx;
++	entry = READ_ONCE(**last);
++	if (WARN_ON_ONCE(entry.h.tt != TABLE_TYPE_SEGMENT))
++		return -EINVAL;
++	if (crste_hole(entry) && !ign_holes)
++		return entry.tok.type == _DAT_TOKEN_PIC ? entry.tok.par : -EFAULT;
++	if (continue_anyway && !entry.pmd.h.fc && !entry.h.i) {
++		walk_level = TABLE_TYPE_PAGE_TABLE;
++		allocate = false;
++	}
++	if (walk_level == TABLE_TYPE_SEGMENT || ((leaf || any) && entry.pmd.h.fc))
++		return 0;
++
++	if (entry.pmd.h.i && !entry.pmd.h.fc) {
++		if (!allocate)
++			return any ? 0 : -ENOENT;
++		rc = dat_split_ste(mc, &(*last)->pmd, gfn, asce, uses_skeys);
++		if (rc)
++			return rc;
++		entry = READ_ONCE(**last);
++	}
++	if (walk_level <= TABLE_TYPE_PAGE_TABLE && entry.pmd.h.fc) {
++		if (!split)
++			return -EFBIG;
++		rc = dat_split_ste(mc, &(*last)->pmd, gfn, asce, uses_skeys);
++		if (rc)
++			return rc;
++		entry = READ_ONCE(**last);
++	}
++	pgtable = dereference_pmd(entry.pmd);
++	*ptepp = pgtable->ptes + vaddr.px;
++	if (pte_hole(**ptepp) && !ign_holes)
++		return (*ptepp)->tok.type == _DAT_TOKEN_PIC ? (*ptepp)->tok.par : -EFAULT;
++	return 0;
++}
++
++static long dat_pte_walk_range(gfn_t gfn, gfn_t end, struct page_table *table, struct dat_walk *w)
++{
++	unsigned int idx = gfn & (_PAGE_ENTRIES - 1);
++	long rc = 0;
++
++	for ( ; gfn < end; idx++, gfn++) {
++		if (pte_hole(READ_ONCE(table->ptes[idx]))) {
++			if (!(w->flags & DAT_WALK_IGN_HOLES))
++				return -EFAULT;
++			if (!(w->flags & DAT_WALK_ANY))
++				continue;
++		}
++
++		rc = w->ops->pte_entry(table->ptes + idx, gfn, gfn + 1, w);
++		if (rc)
++			break;
++	}
++	return rc;
++}
++
++static long dat_crste_walk_range(gfn_t start, gfn_t end, struct crst_table *table,
++				 struct dat_walk *walk)
++{
++	unsigned long idx, cur_shift, cur_size;
++	dat_walk_op the_op;
++	union crste crste;
++	gfn_t cur, next;
++	long rc = 0;
++
++	cur_shift = 8 + table->crstes[0].h.tt * 11;
++	idx = (start >> cur_shift) & (_CRST_ENTRIES - 1);
++	cur_size = 1UL << cur_shift;
++
++	for (cur = ALIGN_DOWN(start, cur_size); cur < end; idx++, cur = next) {
++		next = cur + cur_size;
++		walk->last = table->crstes + idx;
++		crste = READ_ONCE(*walk->last);
++
++		if (crste_hole(crste)) {
++			if (!(walk->flags & DAT_WALK_IGN_HOLES))
++				return -EFAULT;
++			if (!(walk->flags & DAT_WALK_ANY))
++				continue;
++		}
++
++		the_op = walk->ops->crste_ops[crste.h.tt];
++		if (the_op) {
++			rc = the_op(walk->last, cur, next, walk);
++			crste = READ_ONCE(*walk->last);
++		}
++		if (rc)
++			break;
++		if (!crste.h.i && !crste.h.fc) {
++			if (!is_pmd(crste))
++				rc = dat_crste_walk_range(max(start, cur), min(end, next),
++							  _dereference_crste(crste), walk);
++			else if (walk->ops->pte_entry)
++				rc = dat_pte_walk_range(max(start, cur), min(end, next),
++							dereference_pmd(crste.pmd), walk);
++		}
++	}
++	return rc;
 +}
 +
 +/**
-+ * dat_crstep_xchg_atomic - atomically exchange a gmap CRSTE with another
-+ * @crstep: pointer to the CRST entry
-+ * @old: expected old value
-+ * @new: replacement entry
-+ * @gfn: the affected guest address
-+ * @asce: the asce of the address space
++ * _dat_walk_gfn_range() - walk DAT tables
++ * @start: the first guest page frame to walk
++ * @end: the guest page frame immediately after the last one to walk
++ * @asce: the ASCE of the guest mapping
++ * @ops: the gmap_walk_ops that will be used to perform the walk
++ * @flags: flags from WALK_* (currently only WALK_IGN_HOLES is supported)
++ * @priv: will be passed as-is to the callbacks
 + *
-+ * This function should only be called on invalid crstes, or on crstes with
-+ * FC = 1, as that guarantees the presence of CSPG.
++ * Any callback returning non-zero causes the walk to stop immediately.
 + *
-+ * This function is needed to atomically exchange a CRSTE that potentially
-+ * maps a prefix area, without having to invalidate it inbetween.
-+ *
-+ * Context: This function is assumed to be called with kvm->mmu_lock held.
-+ *
-+ * Return: true if the exchange was successful.
++ * Return: -EINVAL in case of error, -EFAULT if @start is too high for the given
++ *         asce unless the DAT_WALK_IGN_HOLES flag is specified, otherwise it
++ *         returns whatever the callbacks return.
 + */
-+bool dat_crstep_xchg_atomic(union crste *crstep, union crste old, union crste new, gfn_t gfn,
-+			    union asce asce)
++long _dat_walk_gfn_range(gfn_t start, gfn_t end, union asce asce,
++			 const struct dat_walk_ops *ops, int flags, void *priv)
 +{
-+	if (old.h.i)
-+		return arch_try_cmpxchg((long *)crstep, &old.val, new.val);
-+	if (cpu_has_edat2())
-+		return crdte_crste(crstep, old, new, gfn, asce);
-+	return cspg_crste(crstep, old, new);
-+}
++	struct crst_table *table = dereference_asce(asce);
++	struct dat_walk walk = {
++		.ops	= ops,
++		.asce	= asce,
++		.priv	= priv,
++		.flags	= flags,
++		.start	= start,
++		.end	= end,
++	};
 +
-+static void dat_set_storage_key_from_pgste(union pte pte, union pgste pgste)
-+{
-+	union skey nkey = { .acc = pgste.acc, .fp = pgste.fp };
++	if (WARN_ON_ONCE(unlikely(!asce.val)))
++		return -EINVAL;
++	if (!asce_contains_gfn(asce, start))
++		return (flags & DAT_WALK_IGN_HOLES) ? 0 : -EFAULT;
 +
-+	page_set_storage_key(pte_origin(pte), nkey.skey, 0);
-+}
-+
-+static void dat_move_storage_key(union pte old, union pte new)
-+{
-+	page_set_storage_key(pte_origin(new), page_get_storage_key(pte_origin(old)), 1);
-+}
-+
-+static union pgste dat_save_storage_key_into_pgste(union pte pte, union pgste pgste)
-+{
-+	union skey skey;
-+
-+	skey.skey = page_get_storage_key(pte_origin(pte));
-+
-+	pgste.acc = skey.acc;
-+	pgste.fp = skey.fp;
-+	pgste.gr |= skey.r;
-+	pgste.gc |= skey.c;
-+
-+	return pgste;
-+}
-+
-+union pgste __dat_ptep_xchg(union pte *ptep, union pgste pgste, union pte new, gfn_t gfn,
-+			    union asce asce, bool uses_skeys)
-+{
-+	union pte old = READ_ONCE(*ptep);
-+
-+	/* Updating only the software bits while holding the pgste lock */
-+	if (!((ptep->val ^ new.val) & ~_PAGE_SW_BITS)) {
-+		WRITE_ONCE(ptep->swbyte, new.swbyte);
-+		return pgste;
-+	}
-+
-+	if (!old.h.i) {
-+		unsigned long opts = IPTE_GUEST_ASCE | (pgste.nodat ? IPTE_NODAT : 0);
-+
-+		if (machine_has_tlb_guest())
-+			__ptep_ipte(gfn_to_gpa(gfn), (void *)ptep, opts, asce.val, IPTE_GLOBAL);
-+		else
-+			__ptep_ipte(gfn_to_gpa(gfn), (void *)ptep, 0, 0, IPTE_GLOBAL);
-+	}
-+
-+	if (uses_skeys) {
-+		if (old.h.i && !new.h.i)
-+			/* Invalid to valid: restore storage keys from PGSTE */
-+			dat_set_storage_key_from_pgste(new, pgste);
-+		else if (!old.h.i && new.h.i)
-+			/* Valid to invalid: save storage keys to PGSTE */
-+			pgste = dat_save_storage_key_into_pgste(old, pgste);
-+		else if (!old.h.i && !new.h.i)
-+			/* Valid to valid: move storage keys */
-+			if (old.h.pfra != new.h.pfra)
-+				dat_move_storage_key(old, new);
-+		/* Invalid to invalid: nothing to do */
-+	}
-+
-+	WRITE_ONCE(*ptep, new);
-+	return pgste;
++	return dat_crste_walk_range(start, min(end, asce_end(asce)), table, &walk);
 +}
 diff --git a/arch/s390/kvm/dat.h b/arch/s390/kvm/dat.h
-index 486b7dfc5df2..6a336c3c6f62 100644
+index 6a336c3c6f62..5488bdc1a79b 100644
 --- a/arch/s390/kvm/dat.h
 +++ b/arch/s390/kvm/dat.h
-@@ -430,6 +430,12 @@ struct kvm_s390_mmu_cache {
- 	short int n_rmaps;
- };
+@@ -45,6 +45,7 @@ enum {
+ #define TABLE_TYPE_PAGE_TABLE -1
  
-+union pgste __must_check __dat_ptep_xchg(union pte *ptep, union pgste pgste, union pte new,
-+					 gfn_t gfn, union asce asce, bool uses_skeys);
-+bool dat_crstep_xchg_atomic(union crste *crstep, union crste old, union crste new, gfn_t gfn,
-+			    union asce asce);
-+void dat_crstep_xchg(union crste *crstep, union crste new, gfn_t gfn, union asce asce);
+ enum dat_walk_flags {
++	DAT_WALK_USES_SKEYS	= 0x40,
+ 	DAT_WALK_CONTINUE	= 0x20,
+ 	DAT_WALK_IGN_HOLES	= 0x10,
+ 	DAT_WALK_SPLIT		= 0x08,
+@@ -332,6 +333,34 @@ struct page_table {
+ static_assert(sizeof(struct crst_table) == _CRST_TABLE_SIZE);
+ static_assert(sizeof(struct page_table) == PAGE_SIZE);
+ 
++struct dat_walk;
 +
++typedef long (*dat_walk_op)(union crste *crste, gfn_t gfn, gfn_t next, struct dat_walk *w);
++
++struct dat_walk_ops {
++	union {
++		dat_walk_op crste_ops[4];
++		struct {
++			dat_walk_op pmd_entry;
++			dat_walk_op pud_entry;
++			dat_walk_op p4d_entry;
++			dat_walk_op pgd_entry;
++		};
++	};
++	long (*pte_entry)(union pte *pte, gfn_t gfn, gfn_t next, struct dat_walk *w);
++};
++
++struct dat_walk {
++	const struct dat_walk_ops *ops;
++	union crste *last;
++	union pte *last_pte;
++	union asce asce;
++	gfn_t start;
++	gfn_t end;
++	int flags;
++	void *priv;
++};
++
+ /**
+  * _pte() - Useful constructor for union pte
+  * @pfn: the pfn this pte should point to.
+@@ -436,6 +465,11 @@ bool dat_crstep_xchg_atomic(union crste *crstep, union crste old, union crste ne
+ 			    union asce asce);
+ void dat_crstep_xchg(union crste *crstep, union crste new, gfn_t gfn, union asce asce);
+ 
++long _dat_walk_gfn_range(gfn_t start, gfn_t end, union asce asce,
++			 const struct dat_walk_ops *ops, int flags, void *priv);
++
++int dat_entry_walk(struct kvm_s390_mmu_cache *mc, gfn_t gfn, union asce asce, int flags,
++		   int walk_level, union crste **last, union pte **ptepp);
  void dat_free_level(struct crst_table *table, bool owns_ptes);
  struct crst_table *dat_alloc_crst_sleepable(unsigned long init);
  
-@@ -757,6 +763,21 @@ static inline void pgste_set_unlock(union pte *ptep, union pgste pgste)
- 	WRITE_ONCE(*pgste_of(ptep), pgste);
+@@ -834,4 +868,9 @@ static inline void dat_crstep_clear(union crste *crstep, gfn_t gfn, union asce a
+ 	dat_crstep_xchg(crstep, newcrste, gfn, asce);
  }
  
-+static inline void dat_ptep_xchg(union pte *ptep, union pte new, gfn_t gfn, union asce asce,
-+				 bool has_skeys)
++static inline int get_level(union crste *crstep, union pte *ptep)
 +{
-+	union pgste pgste;
-+
-+	pgste = pgste_get_lock(ptep);
-+	pgste = __dat_ptep_xchg(ptep, pgste, new, gfn, asce, has_skeys);
-+	pgste_set_unlock(ptep, pgste);
-+}
-+
-+static inline void dat_ptep_clear(union pte *ptep, gfn_t gfn, union asce asce, bool has_skeys)
-+{
-+	dat_ptep_xchg(ptep, _PTE_EMPTY, gfn, asce, has_skeys);
-+}
-+
- static inline void dat_free_pt(struct page_table *pt)
- {
- 	free_page((unsigned long)pt);
-@@ -794,4 +815,23 @@ static inline struct kvm_s390_mmu_cache *kvm_s390_new_mmu_cache(void)
- 	return NULL;
- }
- 
-+static inline bool dat_pmdp_xchg_atomic(union pmd *pmdp, union pmd old, union pmd new,
-+					gfn_t gfn, union asce asce)
-+{
-+	return dat_crstep_xchg_atomic(_CRSTEP(pmdp), _CRSTE(old), _CRSTE(new), gfn, asce);
-+}
-+
-+static inline bool dat_pudp_xchg_atomic(union pud *pudp, union pud old, union pud new,
-+					gfn_t gfn, union asce asce)
-+{
-+	return dat_crstep_xchg_atomic(_CRSTEP(pudp), _CRSTE(old), _CRSTE(new), gfn, asce);
-+}
-+
-+static inline void dat_crstep_clear(union crste *crstep, gfn_t gfn, union asce asce)
-+{
-+	union crste newcrste = _CRSTE_EMPTY(crstep->h.tt);
-+
-+	dat_crstep_xchg(crstep, newcrste, gfn, asce);
++	return ptep ? TABLE_TYPE_PAGE_TABLE : crstep->h.tt;
 +}
 +
  #endif /* __KVM_S390_DAT_H */
