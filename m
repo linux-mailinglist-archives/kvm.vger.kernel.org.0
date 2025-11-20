@@ -1,140 +1,117 @@
-Return-Path: <kvm+bounces-63987-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A71C767EF
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 23:28:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2CB9C767FB
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 23:31:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B10BB345013
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 22:28:27 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E0F7234FC27
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 22:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C6C302766;
-	Thu, 20 Nov 2025 22:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4387F302CBD;
+	Thu, 20 Nov 2025 22:29:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LiTaIXeY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g238RRGp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F0F2E6106
-	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 22:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1653428371
+	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 22:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763677700; cv=none; b=umlWZFZu1Pd+fKQGhuZ7Y8S4jfIt9GaSMnvvpkrnvzCho38jVEhPj/0V+LjLj1139wQc9Hl0+I0ul0PViZy9UZ5ysp+rFJ8q2KMc7jOxaLMyPFD3PDL2ggrUVZo6sXz4RqhMRbK9Zx56e3Sdou3DY6htuYy2vjOH2Y/wIBcwuyE=
+	t=1763677754; cv=none; b=k9Q0VQNajTF1U1eTOsyOLm94f9Ua/LnL9wYb34DqYTy1mBAwKxCuZpC63yNxfFdd35aRkPOJYhYZvxXb+JwEiw/9DvLEW+9xTq/uPaJeKV5YKJQrdc3zQ/1F1+0uMdjuc5Wt1qO7nbLB/6r9qgEYFP+m9dyQEI3i9QudtXifAhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763677700; c=relaxed/simple;
-	bh=gHkndrwE3aeOl5dKHNZlNMtlYpGRZdT0ebvgHoBIsAY=;
+	s=arc-20240116; t=1763677754; c=relaxed/simple;
+	bh=u9djnIZP8rkJaMKS6N2nKQ6riCgkdBBe+AZcnUNvHKc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G9M8KssEoXfT9psQhSAMyTNRDV4UJ3p2imeXDyQ/ZuFofQx6erA2dwkKdjplvHeXPw/HET58QTXItovI3Ttw8mewdstBX+dGw+J5vw9WUhmPGWsdScWUcNAyXnmY3zONu7P8n7xP+jHUaWtl191k7pvKNrDY0b8Re+sS4OhLSPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LiTaIXeY; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=SaCN2bX/RzFa0fvA5wJ4FNCbmvBFscyHpYdMts2lPY69CwObUvMy+3kPjtDTTI1b0J5+suP4L0RHmzb+LZQyVHeIgXvIB/pL7Joym93zgPMQMZeY84qmIot6MsEZID5ZpLphbpuPdzmuv0ObWSHomhcXZGI8dwafsPLkwNgL8iY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g238RRGp; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3437f0760daso3253523a91.1
-        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 14:28:18 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b5edecdf94eso2768482a12.2
+        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 14:29:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763677698; x=1764282498; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763677752; x=1764282552; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O+Pj8EeLfFWjLLVIPwvJQtCu/Nn8pyxPWAQRnkUACEM=;
-        b=LiTaIXeYrxx7wn+0ZG2J3+krct+soeiS4XkV/E9FFH7zWj6SoC05SQIjwUUd5O9rPG
-         Ly46h+t1qZChNe/REKrEQ9BprStUvaOMZwtz0WGznU1k4tApSPAq8dK2l+RzRIcFS+Qs
-         le8Pg1M5GRu4loHpmO9H9a3y3E3Ky8S5z/cizfkYr1fl3kgwep4pQjkswbx5uGzEP1hz
-         OdQ51oTqpnIBuW0aHustagqjvvUJc+eFIKZG1BqTjH/V0s72jjbIeugDx3fob5V3UJWn
-         h8EhSzyN+vRNLyuldCenKkLoGPlOJjFwOovNPNMXEk8fUDCdVOsi+BYefUIi49MTlHXd
-         siwg==
+        bh=U1nH3sEHynbJU8mF+4VQIdR6a9jUJRLv0PEESVETGbE=;
+        b=g238RRGpglHmZNXjzgUIr12MGNGC4BhdUlfUzNF5ptgaSIwoEfGJIhcseQcbj0izAL
+         C8ft+bYv2mRFzdUPTCkSQ1qGcvpdzf7HHnFFTVEhkcTFWPq6a7FzUB7yKK4lIrTcMHsn
+         ieCGOrXMtSYnZVMOn1ZY/4KqT72ZjNI34jhKfLIY4rxy+AJbDybAGFsVgsspA6sLHL7P
+         3JfC+d0NDrb02pl4rzoDpNVS4Tq7tFJPZx9KX3FWsLwHD03BsEi/cVYAska3aMYbdNLp
+         xKSMGCpbtfa4Wh/UUWCTVPYWH2MdIzZaiQO67DwWcSVtYRohVO66Dvi/DdE/gMkdp6xJ
+         K/RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763677698; x=1764282498;
+        d=1e100.net; s=20230601; t=1763677752; x=1764282552;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O+Pj8EeLfFWjLLVIPwvJQtCu/Nn8pyxPWAQRnkUACEM=;
-        b=puoWPApGJMclBAlqBTeK3oBAL65F+tdrTxwLS4hc5SpY2Uu0mxEDD7g52UIBdymRt2
-         82yXix3tWiyyrn41K3Dus4DtvD62KRdrO/+jfDmlcekCNPpSc47nCma1XU7p6PopFAaq
-         O1Z4f0V7kPgwpEd0tvVMBkZpZ+CE1r5jzXmmiDxvibBT1OjsgzQ5l7JSnwjvq3UZgGyk
-         7iTM6pI2TX/L9rZKJl8Ya8T1uAyNOGkTPuvDJcoTfRouflWUPC2daDsBJM5M9gqAPawB
-         PtK5latQcCbakFXX9HwyP0d5cak65Rdw7NKKfueGX8PKOnhi9VoKq84Jk1IOvMUV3g0F
-         2nPg==
-X-Forwarded-Encrypted: i=1; AJvYcCWs+Xr0o6GiM40cTyqxZ0xUZsIzqmnNvIKDZeLh6njYzgTHd9Ckd+bjUwZpg56Idx8C/QI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFwRVkSYc92IeoWzvDO349SoV6G6D4xm3PCA3wmsB+srtAF/A8
-	4VvxKVyBZ23EhFdLnxtxnO4a1JKh4L+doy1Na+VGzV0XyLjPGAZvnHVRYgmFjvH6avdSyYhmjx2
-	CYume+A==
-X-Google-Smtp-Source: AGHT+IH0eSK5wJNozGCkR5ENA56F1JpPTsyure8RWeLLRXMvsUoQd8vkhCL5grjBX7xJ018NnMgWkzKNwQc=
-X-Received: from pjbpd15.prod.google.com ([2002:a17:90b:1dcf:b0:340:bc7b:2b2f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:390a:b0:341:88c9:6eb2
- with SMTP id 98e67ed59e1d1-34733e4cb5emr69727a91.1.1763677698306; Thu, 20 Nov
- 2025 14:28:18 -0800 (PST)
-Date: Thu, 20 Nov 2025 14:28:16 -0800
-In-Reply-To: <20250903064601.32131-4-dapeng1.mi@linux.intel.com>
+        bh=U1nH3sEHynbJU8mF+4VQIdR6a9jUJRLv0PEESVETGbE=;
+        b=UK0v7b9zIBxLhGfqIrAptmIW8+JFnZCESeo17TUj/IhXbE+/0Gsn0jmVSDXCqrZ2YY
+         0pXPxeIEeUkklPunmLsQfSZS7fNQHzOKnIQj21nI5Dt/G3N9DMPpIjkWE+xh6vhd+Zmk
+         xo5MCuufX4T47bgo2UH0ISqFr/woPob8+WszSeenP15axSTOy7bj9rW7qCdR+6iSTaQc
+         orC5xGaGJcU9/dTZdQWd9lfLXR65prBMAOE6N8A798OWQdWy7R4cIxfuZYCLYx+0Pg1L
+         LPI6wKAo9Ft96lwmj/eTNgfj+eeNUIw6AuCUc7rskpj83wX7eClmsl4Ryotdy3a1wP6J
+         iyzA==
+X-Forwarded-Encrypted: i=1; AJvYcCV5Es0HuKbfplFrEOJ2+MCanBWd53D6ElB+uNmDGokCuH/1MtFxDaR7TMciQ933a8BadY0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9WD54DTFaPoUPQEwhR+jP+STnvOr4fCMVTWSYKvjE9TJ8sedg
+	4DsnEzx+HZX94QIsHNKlircdrGsvmGCjy65AkHVAGr2gszQII5aCegX3t5hBQVvGf7tJZ4YwWOt
+	nJ3j57Q==
+X-Google-Smtp-Source: AGHT+IHM7B7UQ/zDV3Mpvlvaoxs6EXCH8k0nw52IjX+0zmGH5Z7erln6xW7Q16O5gL1Xy7YiKMtRYIxGYoY=
+X-Received: from pftb19.prod.google.com ([2002:a05:6a00:2d3:b0:7b0:bc2e:959b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:12c2:b0:341:5d9f:8007
+ with SMTP id adf61e73a8af0-3614eea27aamr358504637.57.1763677752250; Thu, 20
+ Nov 2025 14:29:12 -0800 (PST)
+Date: Thu, 20 Nov 2025 14:29:10 -0800
+In-Reply-To: <20250903064601.32131-6-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250903064601.32131-1-dapeng1.mi@linux.intel.com> <20250903064601.32131-4-dapeng1.mi@linux.intel.com>
-Message-ID: <aR-WAGVNZwNh7Xo8@google.com>
-Subject: Re: [kvm-unit-tests patch v3 3/8] x86/pmu: Fix incorrect masking of
- fixed counters
+References: <20250903064601.32131-1-dapeng1.mi@linux.intel.com> <20250903064601.32131-6-dapeng1.mi@linux.intel.com>
+Message-ID: <aR-WNu8iFfP1AKBX@google.com>
+Subject: Re: [kvm-unit-tests patch v3 5/8] x86/pmu: Relax precise count check
+ for emulated instructions tests
 From: Sean Christopherson <seanjc@google.com>
 To: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Jim Mattson <jmattson@google.com>, Mingwei Zhang <mizhang@google.com>, 
 	Zide Chen <zide.chen@intel.com>, Das Sandipan <Sandipan.Das@amd.com>, 
 	Shukla Manali <Manali.Shukla@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Dapeng Mi <dapeng1.mi@intel.com>, dongsheng <dongsheng.x.zhang@intel.com>, 
-	Yi Lai <yi1.lai@intel.com>
+	Dapeng Mi <dapeng1.mi@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
 On Wed, Sep 03, 2025, Dapeng Mi wrote:
-> From: dongsheng <dongsheng.x.zhang@intel.com>
+> Relax precise count check for emulated instructions tests on these
+> platforms with HW overcount issues.
 > 
-> The current implementation mistakenly limits the width of fixed counters
-> to the width of GP counters. Corrects the logic to ensure fixed counters
-> are properly masked according to their own width.
-> 
-> Opportunistically refine the GP counter bitwidth processing code.
-> 
-> Signed-off-by: dongsheng <dongsheng.x.zhang@intel.com>
-> Co-developed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 > Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> Tested-by: Yi Lai <yi1.lai@intel.com>
 > ---
->  x86/pmu.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+>  x86/pmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/x86/pmu.c b/x86/pmu.c
-> index 04946d10..44c728a5 100644
+> index c54c0988..6bf6eee3 100644
 > --- a/x86/pmu.c
 > +++ b/x86/pmu.c
-> @@ -556,18 +556,16 @@ static void check_counter_overflow(void)
->  		int idx;
+> @@ -790,7 +790,7 @@ static void check_emulated_instr(void)
 >  
->  		cnt.count = overflow_preset;
-> -		if (pmu_use_full_writes())
-> -			cnt.count &= (1ull << pmu.gp_counter_width) - 1;
-> -
->  		if (i == pmu.nr_gp_counters) {
->  			if (!pmu.is_intel)
->  				break;
->  
->  			cnt.ctr = fixed_events[0].unit_sel;
-> -			cnt.count = measure_for_overflow(&cnt);
+>  	// Check that the end count - start count is at least the expected
+>  	// number of instructions and branches.
+> -	if (this_cpu_has_perf_global_ctrl()) {
+> +	if (this_cpu_has_perf_global_ctrl() && !intel_inst_overcount_flags) {
 
-Per commit 7ec3b67a ("x86/pmu: Reset the expected count of the fixed counter 0
-when i386"), re-measuring for the fixed counter is necessary when running a 32-bit
-guests.  I didn't see failures (spotted this by inspection), but I don't see any
-point in making this change without good reason.
+This skips precise checking if _either_ errata is present.  IIUC, we can still do
+a precise check for branches retired on Clearwater Forest, but not for instructions
+retired.
 
-> -			cnt.count &= (1ull << pmu.gp_counter_width) - 1;
-> +			cnt.count &= (1ull << pmu.fixed_counter_width) - 1;
->  		} else {
->  			cnt.ctr = MSR_GP_COUNTERx(i);
-> +			if (pmu_use_full_writes())
-> +				cnt.count &= (1ull << pmu.gp_counter_width) - 1;
->  		}
->  
->  		if (i % 2)
+>  		report(instr_cnt.count - instr_start == KVM_FEP_INSNS,
+>  		       "instruction count");
+>  		report(brnch_cnt.count - brnch_start == KVM_FEP_BRANCHES,
 > -- 
 > 2.34.1
 > 
