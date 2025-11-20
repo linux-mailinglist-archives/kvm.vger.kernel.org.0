@@ -1,206 +1,424 @@
-Return-Path: <kvm+bounces-63762-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63763-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A59C71BD9
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 02:57:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC703C71DA8
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 03:30:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 1E4A029A17
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 01:57:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 859BF29C91
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 02:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB60268C42;
-	Thu, 20 Nov 2025 01:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368A8284B36;
+	Thu, 20 Nov 2025 02:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XXmDlSWq";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hBGTOCf/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y21U6Qbm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0251DE8AE
-	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 01:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90FF118FDAF
+	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 02:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763603847; cv=none; b=KFTE2v/mLuGwwf2Rylig2/GvtLSRgQkTrNsSMVsUm3wOS+hJUv+Pal7zPpCBGC6Cgts2Oz8COKJ5z6Nl4rFesffuRLS1LaJyHPq2ADm6MaAz1YzYbtHdDbGT3kq94yZDU3SJJ3nK/zBLhKYVc0tRhgTZjC/iZEOuy/Tkfh2oIrY=
+	t=1763605806; cv=none; b=szmoqbdHsztHFiOHW1aJGABelPNbPTsipzAA91Bvw0XZbCfJQfrdkbgJ8WM5C9KUpto9hfgVzbDxMtxrVlPtUtUOl4mz6vN225AL8QFcYpy6FkzohchF//pRKkWe7hhTtb4NT0hkzA44vxuLuKNo2tO+pn+hah4bRDHsGyrnjtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763603847; c=relaxed/simple;
-	bh=2WNbzwLyVV6yh0b9rLN6fCx7T6MdWJyCfYho6Zl5BSI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OUgWX2vid1qY3TG/MKWnT+AX2bnYIM1GJxvGGGu9dZ0o5/wW926bPgktV4XSg4FrOBxZzsgnGsBCX3tXuRPsbZ1y5vs2LMtBLZu8PjK4+KY32dlNypON8Ei6cuWt3dE7cu/BKtNoYznfk9+gKigb2KUtISfO5qFzclEX+52XW38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XXmDlSWq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hBGTOCf/; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1763605806; c=relaxed/simple;
+	bh=jbcjPw7iQANl5xattw18Z7FYSHFYLvJ02/spOMtwxLo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q9oo6/Rnl4ar5Nd6MnQa7aGFkKAUYkwc/Gwb0A1eHgZjxC5QMP6TzVR3ZEUPFISlVXTHuFAMP3hXNeZhqqPbBP8G/Y9zlKkOSW7XTb00XNX4qR6+tqDD77pktaLCN5pBqokdeYS0LkBCLNcqEIYuCxXA5a9MqiEolBQ+ifZbhAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y21U6Qbm; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763603844;
+	s=mimecast20190719; t=1763605802;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TgC+wxOBycuCmMOntc5tfhr1/4wD43qqUekchTy+Stc=;
-	b=XXmDlSWqRuuCVNcY+JqjvEJtyQPWU79pZjoJIsJm7qybw8Y091Pu2Z0VM5RLow3lncMEzZ
-	XS0lrRKHhiRCATOZAcETnFdTo2OBSfPH3dDjrZpkgSn+W/gJyDJXXv/7MPigvFfPJKBhB5
-	H8cqgc4OKE6jm663+lyD+pjbBN1KKWA=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-512--rFmiWyNPa27RzbJqe_RsQ-1; Wed, 19 Nov 2025 20:57:23 -0500
-X-MC-Unique: -rFmiWyNPa27RzbJqe_RsQ-1
-X-Mimecast-MFC-AGG-ID: -rFmiWyNPa27RzbJqe_RsQ_1763603842
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-343fb64cea6so910774a91.3
-        for <kvm@vger.kernel.org>; Wed, 19 Nov 2025 17:57:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763603842; x=1764208642; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TgC+wxOBycuCmMOntc5tfhr1/4wD43qqUekchTy+Stc=;
-        b=hBGTOCf/UhoNA4rLMeV9+HtV1xW6CCUBqaSFLX6RxOHrgEn5sjvXkJn28+a3QztEfZ
-         quy1BaHq061eEmRWhR/T1b3cDFobcR+f197NAUm69muH591kM6yP/HZDKGbWMZiXnI09
-         /nb105iGYikVu4YSBIRAkqe8k4dcQ03rGJ9DsnoKQlVMI+HL/zAS6itx1BP2W0HS2S4N
-         tOP5irGfE9duXF3iHtwR2QviZzuMXzm2NbR++x7wwcxLo+htY65+eXzBEbXTRCMznULu
-         H+izYCMsiRnhDcgk8pjOkNO1EDwPYJemNqGors5WMclljkkP2A7UGkKccu4uaj31EDdx
-         srcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763603842; x=1764208642;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=TgC+wxOBycuCmMOntc5tfhr1/4wD43qqUekchTy+Stc=;
-        b=tjOrxAw/QAt1/cwHi+lgQ7Yujux8QMYN5F4otyOEO84FdmniErj++DdXJTi4/T3ioF
-         iuxzVapYfdjWQ1pSudsn1EuAbPJk6Ee95eKgSPPeCddgjk+0yG5j2++whjQZ0pZO9XNh
-         i3u7z0Kfn13nVeX5yNeqRuaryPyQoU0G6Zv2z6P9l1ikfN3zIY/X3JnbpPbuAJPYMKk1
-         AXIYl8uaz9ssERjfuRORLSlp6rXnFYiiJu/IK5Q68L0yyZtURiL9IBbVFLka+sM78MpR
-         XwVYlnLnkBrhZRfjWHTCf9YIQZ9q6EIIMc27xYK+ukUBV+rkN4qTJ21KtvozrB6iWsLY
-         YmYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVGjGQnKrKYO2GrqTWEIN3Vt9Ha1OULopfjQ7Hcd5Q/FePMDAwOtNYDN/WCloVmee45r3A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx17DeSmfTzrKB0Qn3IY8AJUJGBzwd84pDXhd0AoSd2xz9VhoKq
-	rwykmZ1Hq2ZGXb6iB8AkZrJAmXVTzzXMKOjRKrsht0OU07vCam1rpRVcuRaKKBWalYIYudY57Oo
-	XT4H/kndGXkJJx18HAo8J0RiILo1mTI2+vYlKccR+Xs+kTW8g1TyFJXUROs8YZE9UBgAMFwDbSJ
-	JY822iI9NcoG2hFtHAoXMlsrYFvbxb
-X-Gm-Gg: ASbGncvNfQrPG7PNCI/8RrUgqTVZLWHQt5AEBUWY65tGRfGuFFAQUxbqjwuQt6LKYyJ
-	8iDGd72FL2W3ewXgIy0PWl+7Kel0HNWRpIzg1mMAMgCuOwcIvqIdKNspw+5pWiELXp/czv10P08
-	lG7sZc5bHMMJHokG5xk18AXEcQ1G/b6g0F9srMRAdrrp3Nv9Jfy7fBkYVXx56+u4M=
-X-Received: by 2002:a17:90a:c110:b0:340:f05a:3ebd with SMTP id 98e67ed59e1d1-34727c5a321mr1248030a91.28.1763603842264;
-        Wed, 19 Nov 2025 17:57:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFiOBx5TtGT/ofIvTzG4rvjAW5DLBaw7wYScD05ecl8tqaojALyu5Wx2zCrUNx+TEAVc448NdvTDVTmBdWDDT0=
-X-Received: by 2002:a17:90a:c110:b0:340:f05a:3ebd with SMTP id
- 98e67ed59e1d1-34727c5a321mr1248009a91.28.1763603841887; Wed, 19 Nov 2025
- 17:57:21 -0800 (PST)
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oSEAcwvBbnU41KFxXCibX38Fw+XZQB9H/cXftMyuneo=;
+	b=Y21U6QbmHZdyXKpwqFbYersbxlaX5ySb27f9fYMza2R3v3JOYBCZ3drYij5GPWaIL/Sqb9
+	x/cZ7oxgUSxz9FvimVX/H3ahdGkNbiEyb9K6jyhznECWSRKkcds16bfLNszmTMS6IpY7qZ
+	fusWVKkqQYIr4WS+GT0C4zzQpYV101Y=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-411-E8uSJzt8MJmIwDVVx0aRvQ-1; Wed,
+ 19 Nov 2025 21:30:01 -0500
+X-MC-Unique: E8uSJzt8MJmIwDVVx0aRvQ-1
+X-Mimecast-MFC-AGG-ID: E8uSJzt8MJmIwDVVx0aRvQ_1763605800
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D09B219560A5;
+	Thu, 20 Nov 2025 02:29:59 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.72.120.25])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9DC9F19560B0;
+	Thu, 20 Nov 2025 02:29:55 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	eperezma@redhat.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org
+Cc: stable@vger.kernel.org
+Subject: [PATCH net V2] vhost: rewind next_avail_head while discarding descriptors
+Date: Thu, 20 Nov 2025 10:29:50 +0800
+Message-ID: <20251120022950.10117-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251113005529.2494066-1-jon@nutanix.com> <CACGkMEtQZ3M-sERT2P8WV=82BuXCbBHeJX+zgxx+9X7OUTqi4g@mail.gmail.com>
- <E1226897-C6D1-439C-AB3B-012F8C4A72DF@nutanix.com> <CACGkMEuPK4=Tf3x-k0ZHY1rqL=2rg60-qdON8UJmQZTqpUryTQ@mail.gmail.com>
- <A0AFD371-1FA3-48F7-A259-6503A6F052E5@nutanix.com>
-In-Reply-To: <A0AFD371-1FA3-48F7-A259-6503A6F052E5@nutanix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 20 Nov 2025 09:57:10 +0800
-X-Gm-Features: AWmQ_bkp3-p1ykT07gW2-3QafOCuEJ3dN95qJ-5YwVEPAGAlLFk5vJNIKwB0qOY
-Message-ID: <CACGkMEvD16y2rt+cXupZ-aEcPZ=nvU7+xYSYBkUj7tH=ER3f-A@mail.gmail.com>
-Subject: Re: [PATCH net-next] vhost: use "checked" versions of get_user() and put_user()
-To: Jon Kohler <jon@nutanix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Borislav Petkov <bp@alien8.de>, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Tue, Nov 18, 2025 at 1:35=E2=80=AFAM Jon Kohler <jon@nutanix.com> wrote:
->
->
->
-> > On Nov 16, 2025, at 11:32=E2=80=AFPM, Jason Wang <jasowang@redhat.com> =
-wrote:
-> >
-> > On Fri, Nov 14, 2025 at 10:53=E2=80=AFPM Jon Kohler <jon@nutanix.com> w=
-rote:
-> >>
-> >>
-> >>
-> >>> On Nov 12, 2025, at 8:09=E2=80=AFPM, Jason Wang <jasowang@redhat.com>=
- wrote:
-> >>>
-> >>> !-------------------------------------------------------------------|
-> >>> CAUTION: External Email
-> >>>
-> >>> |-------------------------------------------------------------------!
-> >>>
-> >>> On Thu, Nov 13, 2025 at 8:14=E2=80=AFAM Jon Kohler <jon@nutanix.com> =
-wrote:
-> >>>>
-> >>>> vhost_get_user and vhost_put_user leverage __get_user and __put_user=
-,
-> >>>> respectively, which were both added in 2016 by commit 6b1e6cc7855b
-> >>>> ("vhost: new device IOTLB API").
-> >>>
-> >>> It has been used even before this commit.
-> >>
-> >> Ah, thanks for the pointer. I=E2=80=99d have to go dig to find its gen=
-esis, but
-> >> its more to say, this existed prior to the LFENCE commit.
-> >>
-> >>>
-> >>>> In a heavy UDP transmit workload on a
-> >>>> vhost-net backed tap device, these functions showed up as ~11.6% of
-> >>>> samples in a flamegraph of the underlying vhost worker thread.
-> >>>>
-> >>>> Quoting Linus from [1]:
-> >>>>   Anyway, every single __get_user() call I looked at looked like
-> >>>>   historical garbage. [...] End result: I get the feeling that we
-> >>>>   should just do a global search-and-replace of the __get_user/
-> >>>>   __put_user users, replace them with plain get_user/put_user instea=
-d,
-> >>>>   and then fix up any fallout (eg the coco code).
-> >>>>
-> >>>> Switch to plain get_user/put_user in vhost, which results in a sligh=
-t
-> >>>> throughput speedup. get_user now about ~8.4% of samples in flamegrap=
-h.
-> >>>>
-> >>>> Basic iperf3 test on a Intel 5416S CPU with Ubuntu 25.10 guest:
-> >>>> TX: taskset -c 2 iperf3 -c <rx_ip> -t 60 -p 5200 -b 0 -u -i 5
-> >>>> RX: taskset -c 2 iperf3 -s -p 5200 -D
-> >>>> Before: 6.08 Gbits/sec
-> >>>> After:  6.32 Gbits/sec
-> >>>
-> >>> I wonder if we need to test on archs like ARM.
-> >>
-> >> Are you thinking from a performance perspective? Or a correctness one?
-> >
-> > Performance, I think the patch is correct.
-> >
-> > Thanks
-> >
->
-> Ok gotcha. If anyone has an ARM system stuffed in their
-> front pocket and can give this a poke, I=E2=80=99d appreciate it, as
-> I don=E2=80=99t have ready access to one personally.
->
-> That said, I think this might end up in =E2=80=9Cwell, it is what it is=
-=E2=80=9D
-> territory as Linus was alluding to, i.e. if performance dips on
-> ARM for vhost, then thats a compelling point to optimize whatever
-> ends up being the culprit for get/put user?
->
-> Said another way, would ARM perf testing (or any other arch) be a
-> blocker to taking this change?
+When discarding descriptors with IN_ORDER, we should rewind
+next_avail_head otherwise it would run out of sync with
+last_avail_idx. This would cause driver to report
+"id X is not a head".
 
-Not a must but at least we need to explain the implication for other
-archs as the discussion you quoted are all for x86.
+Fixing this by returning the number of descriptors that is used for
+each buffer via vhost_get_vq_desc_n() so caller can use the value
+while discarding descriptors.
 
-Thanks
+Fixes: 67a873df0c41 ("vhost: basic in order support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+Changes since V1:
+- Add the function document
+- Tweak the variable name
+---
+ drivers/vhost/net.c   | 53 ++++++++++++++++++------------
+ drivers/vhost/vhost.c | 76 +++++++++++++++++++++++++++++++++++--------
+ drivers/vhost/vhost.h | 10 +++++-
+ 3 files changed, 103 insertions(+), 36 deletions(-)
 
->
-> Thanks - Jon
->
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 35ded4330431..8f7f50acb6d6 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -592,14 +592,15 @@ static void vhost_net_busy_poll(struct vhost_net *net,
+ static int vhost_net_tx_get_vq_desc(struct vhost_net *net,
+ 				    struct vhost_net_virtqueue *tnvq,
+ 				    unsigned int *out_num, unsigned int *in_num,
+-				    struct msghdr *msghdr, bool *busyloop_intr)
++				    struct msghdr *msghdr, bool *busyloop_intr,
++				    unsigned int *ndesc)
+ {
+ 	struct vhost_net_virtqueue *rnvq = &net->vqs[VHOST_NET_VQ_RX];
+ 	struct vhost_virtqueue *rvq = &rnvq->vq;
+ 	struct vhost_virtqueue *tvq = &tnvq->vq;
+ 
+-	int r = vhost_get_vq_desc(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
+-				  out_num, in_num, NULL, NULL);
++	int r = vhost_get_vq_desc_n(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
++				    out_num, in_num, NULL, NULL, ndesc);
+ 
+ 	if (r == tvq->num && tvq->busyloop_timeout) {
+ 		/* Flush batched packets first */
+@@ -610,8 +611,8 @@ static int vhost_net_tx_get_vq_desc(struct vhost_net *net,
+ 
+ 		vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, false);
+ 
+-		r = vhost_get_vq_desc(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
+-				      out_num, in_num, NULL, NULL);
++		r = vhost_get_vq_desc_n(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
++					out_num, in_num, NULL, NULL, ndesc);
+ 	}
+ 
+ 	return r;
+@@ -642,12 +643,14 @@ static int get_tx_bufs(struct vhost_net *net,
+ 		       struct vhost_net_virtqueue *nvq,
+ 		       struct msghdr *msg,
+ 		       unsigned int *out, unsigned int *in,
+-		       size_t *len, bool *busyloop_intr)
++		       size_t *len, bool *busyloop_intr,
++		       unsigned int *ndesc)
+ {
+ 	struct vhost_virtqueue *vq = &nvq->vq;
+ 	int ret;
+ 
+-	ret = vhost_net_tx_get_vq_desc(net, nvq, out, in, msg, busyloop_intr);
++	ret = vhost_net_tx_get_vq_desc(net, nvq, out, in, msg,
++				       busyloop_intr, ndesc);
+ 
+ 	if (ret < 0 || ret == vq->num)
+ 		return ret;
+@@ -766,6 +769,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+ 	int sent_pkts = 0;
+ 	bool sock_can_batch = (sock->sk->sk_sndbuf == INT_MAX);
+ 	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
++	unsigned int ndesc = 0;
+ 
+ 	do {
+ 		bool busyloop_intr = false;
+@@ -774,7 +778,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+ 			vhost_tx_batch(net, nvq, sock, &msg);
+ 
+ 		head = get_tx_bufs(net, nvq, &msg, &out, &in, &len,
+-				   &busyloop_intr);
++				   &busyloop_intr, &ndesc);
+ 		/* On error, stop handling until the next kick. */
+ 		if (unlikely(head < 0))
+ 			break;
+@@ -806,7 +810,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+ 				goto done;
+ 			} else if (unlikely(err != -ENOSPC)) {
+ 				vhost_tx_batch(net, nvq, sock, &msg);
+-				vhost_discard_vq_desc(vq, 1);
++				vhost_discard_vq_desc(vq, 1, ndesc);
+ 				vhost_net_enable_vq(net, vq);
+ 				break;
+ 			}
+@@ -829,7 +833,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+ 		err = sock->ops->sendmsg(sock, &msg, len);
+ 		if (unlikely(err < 0)) {
+ 			if (err == -EAGAIN || err == -ENOMEM || err == -ENOBUFS) {
+-				vhost_discard_vq_desc(vq, 1);
++				vhost_discard_vq_desc(vq, 1, ndesc);
+ 				vhost_net_enable_vq(net, vq);
+ 				break;
+ 			}
+@@ -868,6 +872,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+ 	int err;
+ 	struct vhost_net_ubuf_ref *ubufs;
+ 	struct ubuf_info_msgzc *ubuf;
++	unsigned int ndesc = 0;
+ 	bool zcopy_used;
+ 	int sent_pkts = 0;
+ 
+@@ -879,7 +884,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+ 
+ 		busyloop_intr = false;
+ 		head = get_tx_bufs(net, nvq, &msg, &out, &in, &len,
+-				   &busyloop_intr);
++				   &busyloop_intr, &ndesc);
+ 		/* On error, stop handling until the next kick. */
+ 		if (unlikely(head < 0))
+ 			break;
+@@ -941,7 +946,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+ 					vq->heads[ubuf->desc].len = VHOST_DMA_DONE_LEN;
+ 			}
+ 			if (retry) {
+-				vhost_discard_vq_desc(vq, 1);
++				vhost_discard_vq_desc(vq, 1, ndesc);
+ 				vhost_net_enable_vq(net, vq);
+ 				break;
+ 			}
+@@ -1045,11 +1050,12 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+ 		       unsigned *iovcount,
+ 		       struct vhost_log *log,
+ 		       unsigned *log_num,
+-		       unsigned int quota)
++		       unsigned int quota,
++		       unsigned int *ndesc)
+ {
+ 	struct vhost_virtqueue *vq = &nvq->vq;
+ 	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
+-	unsigned int out, in;
++	unsigned int out, in, desc_num, n = 0;
+ 	int seg = 0;
+ 	int headcount = 0;
+ 	unsigned d;
+@@ -1064,9 +1070,9 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+ 			r = -ENOBUFS;
+ 			goto err;
+ 		}
+-		r = vhost_get_vq_desc(vq, vq->iov + seg,
+-				      ARRAY_SIZE(vq->iov) - seg, &out,
+-				      &in, log, log_num);
++		r = vhost_get_vq_desc_n(vq, vq->iov + seg,
++					ARRAY_SIZE(vq->iov) - seg, &out,
++					&in, log, log_num, &desc_num);
+ 		if (unlikely(r < 0))
+ 			goto err;
+ 
+@@ -1093,6 +1099,7 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+ 		++headcount;
+ 		datalen -= len;
+ 		seg += in;
++		n += desc_num;
+ 	}
+ 
+ 	*iovcount = seg;
+@@ -1113,9 +1120,11 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+ 		nheads[0] = headcount;
+ 	}
+ 
++	*ndesc = n;
++
+ 	return headcount;
+ err:
+-	vhost_discard_vq_desc(vq, headcount);
++	vhost_discard_vq_desc(vq, headcount, n);
+ 	return r;
+ }
+ 
+@@ -1151,6 +1160,7 @@ static void handle_rx(struct vhost_net *net)
+ 	struct iov_iter fixup;
+ 	__virtio16 num_buffers;
+ 	int recv_pkts = 0;
++	unsigned int ndesc;
+ 
+ 	mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
+ 	sock = vhost_vq_get_backend(vq);
+@@ -1182,7 +1192,8 @@ static void handle_rx(struct vhost_net *net)
+ 		headcount = get_rx_bufs(nvq, vq->heads + count,
+ 					vq->nheads + count,
+ 					vhost_len, &in, vq_log, &log,
+-					likely(mergeable) ? UIO_MAXIOV : 1);
++					likely(mergeable) ? UIO_MAXIOV : 1,
++					&ndesc);
+ 		/* On error, stop handling until the next kick. */
+ 		if (unlikely(headcount < 0))
+ 			goto out;
+@@ -1228,7 +1239,7 @@ static void handle_rx(struct vhost_net *net)
+ 		if (unlikely(err != sock_len)) {
+ 			pr_debug("Discarded rx packet: "
+ 				 " len %d, expected %zd\n", err, sock_len);
+-			vhost_discard_vq_desc(vq, headcount);
++			vhost_discard_vq_desc(vq, headcount, ndesc);
+ 			continue;
+ 		}
+ 		/* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
+@@ -1252,7 +1263,7 @@ static void handle_rx(struct vhost_net *net)
+ 		    copy_to_iter(&num_buffers, sizeof num_buffers,
+ 				 &fixup) != sizeof num_buffers) {
+ 			vq_err(vq, "Failed num_buffers write");
+-			vhost_discard_vq_desc(vq, headcount);
++			vhost_discard_vq_desc(vq, headcount, ndesc);
+ 			goto out;
+ 		}
+ 		nvq->done_idx += headcount;
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 8570fdf2e14a..a78226b37739 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -2792,18 +2792,34 @@ static int get_indirect(struct vhost_virtqueue *vq,
+ 	return 0;
+ }
+ 
+-/* This looks in the virtqueue and for the first available buffer, and converts
+- * it to an iovec for convenient access.  Since descriptors consist of some
+- * number of output then some number of input descriptors, it's actually two
+- * iovecs, but we pack them into one and note how many of each there were.
++/**
++ * vhost_get_vq_desc_n - Fetch the next available descriptor chain and build iovecs
++ * @vq: target virtqueue
++ * @iov: array that receives the scatter/gather segments
++ * @iov_size: capacity of @iov in elements
++ * @out_num: the number of output segments
++ * @in_num: the number of input segments
++ * @log: optional array to record addr/len for each writable segment; NULL if unused
++ * @log_num: optional output; number of entries written to @log when provided
++ * @ndesc: optional output; number of descriptors consumed from the available ring
++ *         (useful for rollback via vhost_discard_vq_desc)
+  *
+- * This function returns the descriptor number found, or vq->num (which is
+- * never a valid descriptor number) if none was found.  A negative code is
+- * returned on error. */
+-int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+-		      struct iovec iov[], unsigned int iov_size,
+-		      unsigned int *out_num, unsigned int *in_num,
+-		      struct vhost_log *log, unsigned int *log_num)
++ * Extracts one available descriptor chain from @vq and translates guest addresses
++ * into host iovecs.
++ *
++ * On success, advances @vq->last_avail_idx by 1 and @vq->next_avail_head by the
++ * number of descriptors consumed (also stored via @ndesc when non-NULL).
++ *
++ * Return:
++ * - head index in [0, @vq->num) on success;
++ * - @vq->num if no descriptor is currently available;
++ * - negative errno on failure
++ */
++int vhost_get_vq_desc_n(struct vhost_virtqueue *vq,
++			struct iovec iov[], unsigned int iov_size,
++			unsigned int *out_num, unsigned int *in_num,
++			struct vhost_log *log, unsigned int *log_num,
++			unsigned int *ndesc)
+ {
+ 	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
+ 	struct vring_desc desc;
+@@ -2921,17 +2937,49 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+ 	vq->last_avail_idx++;
+ 	vq->next_avail_head += c;
+ 
++	if (ndesc)
++		*ndesc = c;
++
+ 	/* Assume notifications from guest are disabled at this point,
+ 	 * if they aren't we would need to update avail_event index. */
+ 	BUG_ON(!(vq->used_flags & VRING_USED_F_NO_NOTIFY));
+ 	return head;
+ }
++EXPORT_SYMBOL_GPL(vhost_get_vq_desc_n);
++
++/* This looks in the virtqueue and for the first available buffer, and converts
++ * it to an iovec for convenient access.  Since descriptors consist of some
++ * number of output then some number of input descriptors, it's actually two
++ * iovecs, but we pack them into one and note how many of each there were.
++ *
++ * This function returns the descriptor number found, or vq->num (which is
++ * never a valid descriptor number) if none was found.  A negative code is
++ * returned on error.
++ */
++int vhost_get_vq_desc(struct vhost_virtqueue *vq,
++		      struct iovec iov[], unsigned int iov_size,
++		      unsigned int *out_num, unsigned int *in_num,
++		      struct vhost_log *log, unsigned int *log_num)
++{
++	return vhost_get_vq_desc_n(vq, iov, iov_size, out_num, in_num,
++				   log, log_num, NULL);
++}
+ EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
+ 
+-/* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
+-void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
++/**
++ * vhost_discard_vq_desc - Reverse the effect of vhost_get_vq_desc_n()
++ * @vq: target virtqueue
++ * @nbufs: number of buffers to roll back
++ * @ndesc: number of descriptors to roll back
++ *
++ * Rewinds the internal consumer cursors after a failed attempt to use buffers
++ * returned by vhost_get_vq_desc_n().
++ */
++void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int nbufs,
++			   unsigned int ndesc)
+ {
+-	vq->last_avail_idx -= n;
++	vq->next_avail_head -= ndesc;
++	vq->last_avail_idx -= nbufs;
+ }
+ EXPORT_SYMBOL_GPL(vhost_discard_vq_desc);
+ 
+diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+index 621a6d9a8791..b49f08e4a1b4 100644
+--- a/drivers/vhost/vhost.h
++++ b/drivers/vhost/vhost.h
+@@ -230,7 +230,15 @@ int vhost_get_vq_desc(struct vhost_virtqueue *,
+ 		      struct iovec iov[], unsigned int iov_size,
+ 		      unsigned int *out_num, unsigned int *in_num,
+ 		      struct vhost_log *log, unsigned int *log_num);
+-void vhost_discard_vq_desc(struct vhost_virtqueue *, int n);
++
++int vhost_get_vq_desc_n(struct vhost_virtqueue *vq,
++			struct iovec iov[], unsigned int iov_size,
++			unsigned int *out_num, unsigned int *in_num,
++			struct vhost_log *log, unsigned int *log_num,
++			unsigned int *ndesc);
++
++void vhost_discard_vq_desc(struct vhost_virtqueue *, int nbuf,
++			   unsigned int ndesc);
+ 
+ bool vhost_vq_work_queue(struct vhost_virtqueue *vq, struct vhost_work *work);
+ bool vhost_vq_has_work(struct vhost_virtqueue *vq);
+-- 
+2.31.1
 
 
