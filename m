@@ -1,180 +1,199 @@
-Return-Path: <kvm+bounces-63985-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63986-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 436A7C76639
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 22:36:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21110C767E0
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 23:27:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CE2574E1B73
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 21:36:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E93B74E29CF
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 22:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB54622259F;
-	Thu, 20 Nov 2025 21:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36C6302172;
+	Thu, 20 Nov 2025 22:27:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XzX3FUQs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="veqzfZ/c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720A1302774;
-	Thu, 20 Nov 2025 21:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7A42DBF78
+	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 22:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763674588; cv=none; b=U7rgVX1RIjs+Upct/wajWOMPQxVaaiHyo3wYprbnxrfNl6SZNeKgdKf4whYRzK8+NEBiVLCAhT4n+MyzK2Ipm0gu6dTZ8G4hXtNoTlNzdA8YbUj64/I6vlv+HTVmZTzY2mOxjkt6xXpiMqUHGWZExN65VnWZFcRgY5QZ6HAwfF4=
+	t=1763677626; cv=none; b=gG7YmyIgicJieM92gew1vKHJb0xuSSCn8nNzjExseNjCJVoHz15Zz50omEa2t/Wspldyahbv6XfWAkUcWL6cZnH3Zyw8OIJHi7aBAQIfJxZsnuAjymCE8FYIMBnQijWrvJ0oBv0awBqz3yQvXKbeY2SWveEGVg4geM/LgDtTszI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763674588; c=relaxed/simple;
-	bh=pZ8ivgqMDkOJbGubFInE/45I1Jd0L9jrqG0Z1uaW19Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UYtL4f00lbmUvBIWB7tr8LqQP20r9lxcR0Nf0pJfqInjbtg9NuHPpRyiw3VVxunJI3E7t4ct6pN6YK8uURgeUxB2R5KZRSptQKrf5RsU5xwIGyKJ2SbwwaBLH6Oi/CCoo6bUd7AP7zISK00Wtv+2qxmhlu8ujXHZY/rQ5ceMkCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XzX3FUQs; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763674586; x=1795210586;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pZ8ivgqMDkOJbGubFInE/45I1Jd0L9jrqG0Z1uaW19Q=;
-  b=XzX3FUQsOXxPB2h6+8fOdKugPep7oPSJmSaRpSHywjcMwtnA+GEx6iqo
-   0H7LvdecW+jR9fVeB1mdpZ/lesD9alXsobYfNWsM/NDd3ucNfxqUVwIr1
-   b39351TIdlxqNQYD54ufwiTuLzzzlp5ioRE67tGuBxjQcP3KqbeK+D/99
-   0cyeE9++nRDkt/G1OMZcl5Q307TcOhKJPjnGj64OYA95wYWAoKIZ3FgiA
-   Qxa5nAXZvluv650tqyvMsSxJESjPCbzkaMA00d34MYW1NQyi7MsJcFNtm
-   kCOCfrjrsJkPGbcqL/j+nUuhPKow4Pkr08tsz0b/Uco3Zk8RxbjUSiq69
-   g==;
-X-CSE-ConnectionGUID: fhRI6N2/Rc6Z2QGt/QyfJA==
-X-CSE-MsgGUID: EA5nORtWTaSBmz0kXvhtJw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="76864709"
-X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
-   d="scan'208";a="76864709"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 13:36:25 -0800
-X-CSE-ConnectionGUID: KqDocwj6RnWMdsLi4JMTFg==
-X-CSE-MsgGUID: r/Me6OORQda8xGobvBAfeA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
-   d="scan'208";a="191591619"
-Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 20 Nov 2025 13:36:22 -0800
-Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vMCKB-0004bH-2v;
-	Thu, 20 Nov 2025 21:36:19 +0000
-Date: Fri, 21 Nov 2025 05:35:21 +0800
-From: kernel test robot <lkp@intel.com>
-To: griffoul@gmail.com, kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, seanjc@google.com, pbonzini@redhat.com,
-	vkuznets@redhat.com, shuah@kernel.org, dwmw@amazon.co.uk,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Fred Griffoul <fgriffo@amazon.co.uk>
-Subject: Re: [PATCH v2 08/10] KVM: x86: Add nested context management
-Message-ID: <202511210515.8L9NBb1R-lkp@intel.com>
-References: <20251118171113.363528-9-griffoul@gmail.org>
+	s=arc-20240116; t=1763677626; c=relaxed/simple;
+	bh=/K3s0pscS/haF+4ncnaGGaMkqpu4JLMANZf3wfh48o8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=o+0PQaLMRkouDW+L2TMc4zrqSzYsUX4ADLhHgdLUP0YFBDzbvh0lQaFfEBlTG7oEoMNw8oqG8dgqzjjspMkN2MPxre3btwIKNDXGnHnCVfF7CotjGSg1h9jHRItlm17wD/BsiKn2HpxdZLTFgDsqbBds84crV3/7NdlRFVJploY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=veqzfZ/c; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-297e66542afso52203495ad.3
+        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 14:27:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763677624; x=1764282424; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eGFTpRUsW1Pp+jEd+v3ug7mu4QrYVAMAujn3cigLF98=;
+        b=veqzfZ/cDpJr7ZbRdXKbqaqPawzCpBvYZaYNyrN9HBeozSwGsn8GLx5WVfM33B1Hy5
+         XEPIVJIPoDf/ikkcwXebC5WbYpn1uoa0Ja1grV/PN1ZYIgF1/dzl8WFoVPP7pZkE+iVq
+         g7PcHLuaN0JWRpTpkmMzv9vGa2E75Vhq9KKAaoYdzomLSepUDWYOB88b/Tjd2WX2NUPR
+         8A1wQ/jd69oFLfXkiz2bl+SwjOA7ee8HxtJo8pfGihV2Dx/ELA7OzRleRUxL5PE7+Dso
+         rRvKRu6Ws2b5HzExQ+p9CNMyij9IGjCnMXpOZTnZPR1uuwMGsxGGfs4E4qV90myIK654
+         4uUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763677624; x=1764282424;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eGFTpRUsW1Pp+jEd+v3ug7mu4QrYVAMAujn3cigLF98=;
+        b=noJcqBo5x0f+c6Z4fKQVO2C2BxqQNMUbgAiju8mwgpcJRf2Wr92Ou8LxqVxdovC+kH
+         9pXPrlrxD86tscVJFOshvF4CDIo5UK5X2ZIAEYQzksXxf7mNLCJL3YtCKpfSgIh+IwYJ
+         3VmThwZvp4CvCVNLVpSMauzqt0GQ/K3KPk0lCRlP41wiVm0lKMuxK8GxSrr0NgpUQZCu
+         lhJVnq7ffz2bQGKDYbIPgYSNrQuu/IGkyziBJ1iQYRegOiuhXVAWHt6ouVbvKTBAnuQf
+         NMoDr7Ws3S5xjBiNyFn0/RHKd4Hz1POZerW2fO9hUNLhAUAhky72g4Ejqwc3j6WKd9p0
+         lxGA==
+X-Forwarded-Encrypted: i=1; AJvYcCW0jo4ocvrXXF7J/5xSiUftLSgSzIvvJKrNqXmFk7bZ5F00Lgv0jvIrJw+zMO93+n16Q+4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yye+kTeyLvd0+pbQAFNZ77KN9f4V41HvKFnuUMgVkmcwxJvH8cw
+	mBDZrfObLqezG+hw8QdEiRKJc7qiOOjRMMEeHnTipD3RtQ1hnn1/uuo/rW30gQ5iNwqACNq+JPw
+	K2pxA2w==
+X-Google-Smtp-Source: AGHT+IGlaDUtwJDvDwb1Pa/FFMGXk9r4pFh9EvTNO/Z/rASKT9JYbxX3lZuUoockY57dBy0AkBbgaS8KMxE=
+X-Received: from plblf11.prod.google.com ([2002:a17:902:fb4b:b0:290:28e2:ce59])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d54a:b0:295:ed0:f7bf
+ with SMTP id d9443c01a7336-29b6bf7f2a9mr2465825ad.58.1763677623748; Thu, 20
+ Nov 2025 14:27:03 -0800 (PST)
+Date: Thu, 20 Nov 2025 14:27:02 -0800
+In-Reply-To: <20250903064601.32131-2-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251118171113.363528-9-griffoul@gmail.org>
+Mime-Version: 1.0
+References: <20250903064601.32131-1-dapeng1.mi@linux.intel.com> <20250903064601.32131-2-dapeng1.mi@linux.intel.com>
+Message-ID: <aR-VtupdTy4vHvSz@google.com>
+Subject: Re: [kvm-unit-tests patch v3 1/8] x86/pmu: Add helper to detect Intel
+ overcount issues
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>, Mingwei Zhang <mizhang@google.com>, 
+	Zide Chen <zide.chen@intel.com>, Das Sandipan <Sandipan.Das@amd.com>, 
+	Shukla Manali <Manali.Shukla@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Dapeng Mi <dapeng1.mi@intel.com>, dongsheng <dongsheng.x.zhang@intel.com>, 
+	Yi Lai <yi1.lai@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi,
+On Wed, Sep 03, 2025, Dapeng Mi wrote:
+> From: dongsheng <dongsheng.x.zhang@intel.com>
+> 
+> For Intel Atom CPUs, the PMU events "Instruction Retired" or
+> "Branch Instruction Retired" may be overcounted for some certain
+> instructions, like FAR CALL/JMP, RETF, IRET, VMENTRY/VMEXIT/VMPTRLD
+> and complex SGX/SMX/CSTATE instructions/flows.
+> 
+> The detailed information can be found in the errata (section SRF7):
+> https://edc.intel.com/content/www/us/en/design/products-and-solutions/processors-and-chipsets/sierra-forest/xeon-6700-series-processor-with-e-cores-specification-update/errata-details/
+> 
+> For the Atom platforms before Sierra Forest (including Sierra Forest),
+> Both 2 events "Instruction Retired" and "Branch Instruction Retired" would
+> be overcounted on these certain instructions, but for Clearwater Forest
+> only "Instruction Retired" event is overcounted on these instructions.
+> 
+> So add a helper detect_inst_overcount_flags() to detect whether the
+> platform has the overcount issue and the later patches would relax the
+> precise count check by leveraging the gotten overcount flags from this
+> helper.
+> 
+> Signed-off-by: dongsheng <dongsheng.x.zhang@intel.com>
+> [Rewrite comments and commit message - Dapeng]
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Tested-by: Yi Lai <yi1.lai@intel.com>
+> ---
+>  lib/x86/processor.h | 27 ++++++++++++++++++++++++++
+>  x86/pmu.c           | 47 +++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 74 insertions(+)
+> 
+> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+> index 62f3d578..937f75e4 100644
+> --- a/lib/x86/processor.h
+> +++ b/lib/x86/processor.h
+> @@ -1188,4 +1188,31 @@ static inline bool is_lam_u57_enabled(void)
+>  	return !!(read_cr3() & X86_CR3_LAM_U57);
+>  }
+>  
+> +/* Copy from kernel arch/x86/lib/cpu.c */
 
-kernel test robot noticed the following build warnings:
+Eh, just drop this, we don't care if the kernel code changes, this is all based
+on architectural behavior.
 
-[auto build test WARNING on kvm/queue]
-[also build test WARNING on kvm/next mst-vhost/linux-next linus/master v6.18-rc6 next-20251120]
-[cannot apply to kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> +static inline u32 x86_family(u32 sig)
+> +{
+> +	u32 x86;
+> +
+> +	x86 = (sig >> 8) & 0xf;
+> +
+> +	if (x86 == 0xf)
+> +		x86 += (sig >> 20) & 0xff;
+> +
+> +	return x86;
+> +}
+> +
+> +static inline u32 x86_model(u32 sig)
+> +{
+> +	u32 fam, model;
+> +
+> +	fam = x86_family(sig);
+> +
+> +	model = (sig >> 4) & 0xf;
+> +
+> +	if (fam >= 0x6)
+> +		model += ((sig >> 16) & 0xf) << 4;
+> +
+> +	return model;
+> +}
 
-url:    https://github.com/intel-lab-lkp/linux/commits/griffoul-gmail-com/KVM-nVMX-Implement-cache-for-L1-MSR-bitmap/20251119-012332
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20251118171113.363528-9-griffoul%40gmail.org
-patch subject: [PATCH v2 08/10] KVM: x86: Add nested context management
-config: i386-randconfig-141-20251120 (https://download.01.org/0day-ci/archive/20251121/202511210515.8L9NBb1R-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251121/202511210515.8L9NBb1R-lkp@intel.com/reproduce)
+We should place these up near is_intel() so that it's more obviously what "family"
+and "model" mean (should be obvious already, but it's an easy thing to do).
+> +/*
+> + * For Intel Atom CPUs, the PMU events "Instruction Retired" or
+> + * "Branch Instruction Retired" may be overcounted for some certain
+> + * instructions, like FAR CALL/JMP, RETF, IRET, VMENTRY/VMEXIT/VMPTRLD
+> + * and complex SGX/SMX/CSTATE instructions/flows.
+> + *
+> + * The detailed information can be found in the errata (section SRF7):
+> + * https://edc.intel.com/content/www/us/en/design/products-and-solutions/processors-and-chipsets/sierra-forest/xeon-6700-series-processor-with-e-cores-specification-update/errata-details/
+> + *
+> + * For the Atom platforms before Sierra Forest (including Sierra Forest),
+> + * Both 2 events "Instruction Retired" and "Branch Instruction Retired" would
+> + * be overcounted on these certain instructions, but for Clearwater Forest
+> + * only "Instruction Retired" event is overcounted on these instructions.
+> + */
+> +static u32 detect_inst_overcount_flags(void)
+> +{
+> +	u32 flags = 0;
+> +	struct cpuid c = cpuid(1);
+> +
+> +	if (x86_family(c.a) == 0x6) {
+> +		switch (x86_model(c.a)) {
+> +		case 0xDD: /* Clearwater Forest */
+> +			flags = INST_RETIRED_OVERCOUNT;
+> +			break;
+> +
+> +		case 0xAF: /* Sierra Forest */
+> +		case 0x4D: /* Avaton, Rangely */
+> +		case 0x5F: /* Denverton */
+> +		case 0x86: /* Jacobsville */
+> +			flags = INST_RETIRED_OVERCOUNT | BR_RETIRED_OVERCOUNT;
+> +			break;
+> +		}
+> +	}
+> +
+> +	return flags;
+> +}
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511210515.8L9NBb1R-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> arch/x86/kvm/nested.c:133:10: warning: expression which evaluates to zero treated as a null pointer constant of type 'struct kvm_nested_context *' [-Wnon-literal-null-conversion]
-     133 |                 return false;
-         |                        ^~~~~
-   1 warning generated.
-
-
-vim +133 arch/x86/kvm/nested.c
-
-   122	
-   123	struct kvm_nested_context *kvm_nested_context_load(struct kvm_vcpu *vcpu,
-   124							   gpa_t gpa)
-   125	{
-   126		struct kvm_nested_context_table *table;
-   127		struct kvm_nested_context *ctx, *new_ctx = NULL;
-   128		struct kvm *vm = vcpu->kvm;
-   129		bool reset = false;
-   130	
-   131		table = vcpu->kvm->arch.nested_context_table;
-   132		if (WARN_ON_ONCE(!table))
- > 133			return false;
-   134	retry:
-   135		spin_lock(&table->lock);
-   136		ctx = kvm_nested_context_find(table, vcpu, gpa);
-   137		if (!ctx) {
-   138			/* At capacity? Recycle the LRU context */
-   139			if (table->count >= kvm_nested_context_max(vcpu->kvm)) {
-   140				ctx = kvm_nested_context_recycle(table);
-   141				if (unlikely(!ctx))
-   142					goto finish;
-   143	
-   144				kvm_nested_context_insert(table, ctx, gpa);
-   145				++vm->stat.nested_context_recycle;
-   146				reset = true;
-   147	
-   148			} else if (new_ctx) {
-   149				++table->count;
-   150				ctx = new_ctx;
-   151				kvm_nested_context_insert(table, ctx, gpa);
-   152				new_ctx = NULL;
-   153	
-   154			} else {
-   155				/* Allocate a new context without holding the lock */
-   156				spin_unlock(&table->lock);
-   157				new_ctx = kvm_x86_ops.nested_ops->alloc_context(vcpu);
-   158				if (unlikely(!new_ctx))
-   159					return NULL;
-   160	
-   161				goto retry;
-   162			}
-   163		} else
-   164			++vm->stat.nested_context_reuse;
-   165	
-   166		ctx->vcpu = vcpu;
-   167	finish:
-   168		spin_unlock(&table->lock);
-   169	
-   170		if (new_ctx)
-   171			kvm_x86_ops.nested_ops->free_context(new_ctx);
-   172	
-   173		if (reset)
-   174			kvm_x86_ops.nested_ops->reset_context(ctx);
-   175	
-   176		return ctx;
-   177	}
-   178	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+The errata tracking definitely belongs "struct pmu_caps pmu", and the init in
+pmu_init().
 
