@@ -1,260 +1,373 @@
-Return-Path: <kvm+bounces-63842-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63843-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D1EC74018
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 13:40:37 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54143C7409C
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 13:52:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id E25852ACB9
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 12:40:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3BD074E0373
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 12:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B028337104;
-	Thu, 20 Nov 2025 12:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C0A337B86;
+	Thu, 20 Nov 2025 12:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dUS0M4Jt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EjR5Y0fr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DB51F0995;
-	Thu, 20 Nov 2025 12:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763642429; cv=fail; b=RUocVEqyB3p7t+PwhrGWVkjgtOsn3foSkcNVG+UfpRXnHTXi9b4baKBK3OcrE3vuJlQOx0mDqTv//30nOfnGuJyKw9pnYjJ0G4AQKABPXWQTEyHY3eywwDJ8m1AsmiKUI6lJci3ZOboRcO6miY8ugh7e3WLA/ro9BZF3J6p4w18=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763642429; c=relaxed/simple;
-	bh=y62bSidFLj4fqSMO33+xEJA7nerP/KmH4nx3r3ne2C8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=AHO5LugXML0SFPf9v6tr+AN7alOxC1voOCgPfXPgTEBmeiuOXvyIvxlWRRZU7XB3rrkJgTj2mAeeFXwodBAHs7PSVm5zdpUNUeKXpkR6KROJ64vjaTtxmORP7Ijv3RvVQIRdAW0ZeIETn0z5yx5L2/jG0psuEmERtDKv4J6gctU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dUS0M4Jt; arc=fail smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2DF336ED9;
+	Thu, 20 Nov 2025 12:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763643135; cv=none; b=kdmCMK4HLHnLOliBRsSvCX7eCJlu/bF9Ung/dvPhb2F59CBkwwafIpBmD4PtRJiBhr4ClxNE/b+8HBdquuIsTdrbAM11xio7DMK7VmS7nRumnyTCtXR9H9kKNYG6yyZG5ln+fzgOAlPJlkZJ5JtDNsFEwVzzorf3j2sXXsR0rJo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763643135; c=relaxed/simple;
+	bh=jnVwPxCw2gfFolAW4sJRwUYBqtMf1DB5IvWbM2ZFPPU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QlO3ZAz/+BmLlrZbn9wGF/clbXLTxNm5kQZAlyn1JdtdwRrQld7D83rzkRt9YlHJsi83nN9l4d9XTON4UhJOP23MKQz2PZws8jbG5FVTQnIEuTLJInJYXhMJ6X6ggtKnW8iA4YTMlCrWAHTPbXZJrP4Q6MGOGnkJi9Q+Il14p30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EjR5Y0fr; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763642428; x=1795178428;
+  t=1763643133; x=1795179133;
   h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=y62bSidFLj4fqSMO33+xEJA7nerP/KmH4nx3r3ne2C8=;
-  b=dUS0M4JtBHSQrItIbzuC4QYbq+fP8/OPw8XetYa7iMRguabF4/EsdsLn
-   S9f4iHfpql1RKPwAzAvLLKVamYDBlCB9aeN49cvpygPc8bTgX4csTJJuT
-   +19x75btms+/60Bady45jA20d+Uar4dOQWOlNzcaLUxfAtUTnsU7rl8vS
-   jADJiSU64mzmJhUDxR2Wer5KOPOTyN2Tf1kPgwjW/oYDfk0XVGDpTiGt0
-   LGvW4sfuLEXQuDsxQj8n7ocjHDfNdBZ8duvljtW9jaMQ4rIvAMU0wNpVg
-   lq5eLSIq6flppLsQGF0ScxjyAz02e2VTbtCHyjFkk7GuHMF5cAYOFMkUl
-   g==;
-X-CSE-ConnectionGUID: wMT7KFZtQSm2g0F0/H2jbw==
-X-CSE-MsgGUID: szKsjLNzRDmBfuY4uSg1Pw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="69565503"
+   mime-version:in-reply-to;
+  bh=jnVwPxCw2gfFolAW4sJRwUYBqtMf1DB5IvWbM2ZFPPU=;
+  b=EjR5Y0frLKTmt2daCiAKP2Rn2hvt/aBDj5D0lkeq7egzKrtWh9TGgxZ+
+   MYQtVXyNz4PzLr35rl24+QQYYw+Hy2fXFzU/w16IloZp5B8AU22jqGKSJ
+   CRMH5uLB5L7xBRW+P6YhbbFZLjHTi8jcxXr+tQem4zfhCrgArrQXXoaGY
+   TAbuqqMkw7LLYjhiPW9FW7gmdcXMoxfv6SlB2eGxN6+H2Ci7Ww34qcSuS
+   t8xu9PdU84qo6hrjfoIYfLpXSmOLfC5fIEyjGpbmq7RqvTGqqBo7CQ6SF
+   7YZvUkLfRi1ORPK7S0yFAYSeix3FQDo/PMJFl/1PfvRrO97WCEeAxdKoL
+   w==;
+X-CSE-ConnectionGUID: XNM1kOeaQXegk4E8oHxhng==
+X-CSE-MsgGUID: 7TA/HEUBSZSCKaIHR0jx7g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="65603356"
 X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="69565503"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 04:40:27 -0800
-X-CSE-ConnectionGUID: l5eN4PA3RuyLAFKa+Ufo3g==
-X-CSE-MsgGUID: T/7gPNK8RoiQ5mzOLKLW3Q==
+   d="scan'208";a="65603356"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 04:52:13 -0800
+X-CSE-ConnectionGUID: GpkprCGXSD2ZghouaLwCXQ==
+X-CSE-MsgGUID: NTjDsxbhQ3qs06StPHCSrQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="196325732"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 04:40:27 -0800
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 20 Nov 2025 04:40:26 -0800
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Thu, 20 Nov 2025 04:40:26 -0800
-Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.2) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 20 Nov 2025 04:40:26 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=C6rs7m18jGRicq48CoSZlVEH0HuTMsbTYcs6ELLFe9dlGCa/MyrRpmnV42INJ6ulTu90W6EuJpDPjk7F/9va+P92JadlB3IlxZfzqSx9abszqZiT8NEIt/mc6+WBI37Otlan+fED86/ID6H5HcAM/MWhkmthc5eHkX+MrWKUKPhotCzxwpqivOAJvH+zG+4237b79YjI6Xi/7Ga1dg5h4Yyq6Fj3a9mbEoaZsu1gDXhamS5BEf+oNINGuW/eXeMiveipH8cCgBawP21ntX+kmoKgGWLp7aaklvX442sinOhWlVrkAd4jZAN3fqNJXahl5xNHpWm3w64DXkane7hZ2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o87SLbhKg/14Zo1HKjdWR2O6gFz+ni0tPfvH6uOHpTc=;
- b=WFQyo+Zc//w7Q0KDU6pciytvZxTupa2vpaCtjGY5DoaYL3XM4igiskmgSKkKpIVqbMLEtb9/BUnA0hZKl/HHn/3Cx+LGMP9jZTaWu7+E+ip3uS/ipLbcDzCIdTnUG8G/zArZUpIXZUiFnznu9hWnJ37dsjX2G5sFJDODglZH6yL4JyYFVvsEV7I7E6oLisVCcvFlx9bZdPDPOVR5WxcggbQw0cx2v9Olo/BYs+mq46kMIem7eTp+OCAkyO0EIo+cuTdgDOHPa3Q25fKKYZIioTfzrosiwLHMqS2//OnI6PvtsLeWoHYbByxwIg7kcLn13V8kKqxm2sG8IvRXkZ0AMQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB5373.namprd11.prod.outlook.com (2603:10b6:5:394::7) by
- PH7PR11MB6031.namprd11.prod.outlook.com (2603:10b6:510:1d2::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.11; Thu, 20 Nov
- 2025 12:40:18 +0000
-Received: from DM4PR11MB5373.namprd11.prod.outlook.com
- ([fe80::927a:9c08:26f7:5b39]) by DM4PR11MB5373.namprd11.prod.outlook.com
- ([fe80::927a:9c08:26f7:5b39%5]) with mapi id 15.20.9343.011; Thu, 20 Nov 2025
- 12:40:18 +0000
-Date: Thu, 20 Nov 2025 13:40:14 +0100
-From: "Winiarski, Michal" <michal.winiarski@intel.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-CC: "Tian, Kevin" <kevin.tian@intel.com>, Alex Williamson <alex@shazbot.org>,
-	"De Marchi, Lucas" <lucas.demarchi@intel.com>, Thomas
- =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, "Vivi,
- Rodrigo" <rodrigo.vivi@intel.com>, Yishai Hadas <yishaih@nvidia.com>,
-	"Shameer Kolothum" <skolothumtho@nvidia.com>,
-	"intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Brost, Matthew"
-	<matthew.brost@intel.com>, "Wajdeczko, Michal" <Michal.Wajdeczko@intel.com>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, Jani
- Nikula <jani.nikula@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Laguna,
- Lukasz" <lukasz.laguna@intel.com>, "Christoph Hellwig" <hch@infradead.org>
-Subject: Re: [PATCH v5 28/28] vfio/xe: Add device specific vfio_pci driver
- variant for Intel graphics
-Message-ID: <5idiblmgmuervob3inen2abfkwmru7aqrqmzjmg3jyjqfhdsig@cokyf522niow>
-References: <20251111010439.347045-1-michal.winiarski@intel.com>
- <20251111010439.347045-29-michal.winiarski@intel.com>
- <BN9PR11MB527638018267BA3AF8CD49678CCFA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <7ig24norebemzdih64rcpvdj22xee23ha7bndiltkgjlpmoau2@25usxq7teedz>
- <DM4PR11MB52784CBB6C5AF6F19E373A278CCFA@DM4PR11MB5278.namprd11.prod.outlook.com>
- <ndd4kt4elbm7ixzyouhorgatjwv73ldyjo6bmrbipxvaqzccjs@ssavf6b5ric3>
- <20251117174117.GD17968@ziepe.ca>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251117174117.GD17968@ziepe.ca>
-X-ClientProxiedBy: BE1P281CA0439.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:81::23) To DM4PR11MB5373.namprd11.prod.outlook.com
- (2603:10b6:5:394::7)
+   d="scan'208";a="191478467"
+Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 20 Nov 2025 04:52:10 -0800
+Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vM48t-00040N-1o;
+	Thu, 20 Nov 2025 12:52:07 +0000
+Date: Thu, 20 Nov 2025 20:52:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: griffoul@gmail.com, kvm@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, seanjc@google.com, pbonzini@redhat.com,
+	vkuznets@redhat.com, shuah@kernel.org, dwmw@amazon.co.uk,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Fred Griffoul <fgriffo@amazon.co.uk>
+Subject: Re: [PATCH v2 07/10] KVM: nVMX: Replace evmcs kvm_host_map with
+ pfncache
+Message-ID: <202511202058.xwqVHqfx-lkp@intel.com>
+References: <20251118171113.363528-8-griffoul@gmail.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB5373:EE_|PH7PR11MB6031:EE_
-X-MS-Office365-Filtering-Correlation-Id: eaa44755-f7f9-4a1c-f941-08de2831f583
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Vm1pcktYcjlGM1lGd3FkY2dsSXdOWk4wdUxpbVd0K2s1SG1KckNTSktady91?=
- =?utf-8?B?Z0U2MXRzbEliRXpBdHRmcGxsZXZnSlh5d25aUDFIdElzWE5LRnFCNFhvQ1Jh?=
- =?utf-8?B?VlBKbklLQWlqVkZWbG9ITnBjVE5heUM2Rmx5ei9ia0Y0M04xOGdOMjN1ZHZV?=
- =?utf-8?B?eFdYV2N5bUVzSmpVcXQxZEQ4MzBoR3NzRWJOazY0MnQzL29XS0ZhVVJyU1Zw?=
- =?utf-8?B?MEhzZEVETUFORXJRWXRoTTduYzI0THhJZGtQbHA5WXgrQ1VRakRiK09RVEtm?=
- =?utf-8?B?NVNYTm8wQVdjSEdrem1JdSs3d1NzakthUjhQNVIrV3dDZysvV2plNXJCejlY?=
- =?utf-8?B?UHlod1VjUlY0VWtweVBFU29DTVVQeEhzcFhVczlacXI4bUNsQW8xYnNmL2ZU?=
- =?utf-8?B?UGd2a0JZRndCbmVXaStWQ2VmdVNiUFliWjljYkpPNElKMWorLyt2cU5IYjN5?=
- =?utf-8?B?QzNjRlU5ZDBmaHNqNFF4SUVDR25lRGRLd2lwVGt5OEZpN1lyRUkyMWRuMndF?=
- =?utf-8?B?MldjT2ZZTGVpK3JsV3czcEZIUHRQcFBtU2dYdnNkeDlKNVhuaXI0dEhXMXk0?=
- =?utf-8?B?VGVoaGhxbVo1bU1NRDRSaXZRVFBwTVc4dEpJWWRPU3dTVDBxMmYvY2lnZWFD?=
- =?utf-8?B?Vk5ad0tERmtIS2lYbm51c0VkYUo1Rm1VR0s1Vk9jMFVwMDB5MDVCcGtoMklJ?=
- =?utf-8?B?WWhQNjhGaUUrb3pPc0xQaWJXdmYrM2RiaGdWcnMyOFhET0RCNWp1QlBnTHBT?=
- =?utf-8?B?UWdkbmFsSmRTdjFLVHB6eGp2Q2xLcjQ0ZW9kbGN4K29sNmRkVFZETWRvckF0?=
- =?utf-8?B?dmJhYjBpOE9ZMnFoSE4xd1R5NnVYY1NOTEFRT25hS2s0QWU5RlczRjN1Rlpw?=
- =?utf-8?B?SHQ3a0tHOCtIMXZ1WmkzVElPWUREby9uSXpFK3hqM1dhK2RlenR0dmlkN2g0?=
- =?utf-8?B?RXpYRFdKdFhiVDlTRE1mWUxseW1ENmZtMnR2MktydGdhaTh6UUdYQ1l4NnVT?=
- =?utf-8?B?b3pVSGdwdnNPY0Z5aXNrSUFKOXE5NmVXUmI1OThWTURKUkliRzU2Y0dIZFpa?=
- =?utf-8?B?eUtIM01uNHA3SVN6bnJyYkRtUXAwdDJCN3JscGFic0xZdFpXMVhmaEh6MTUr?=
- =?utf-8?B?YVAwVll0Z0ExY1F4bDV0U3pNem4rZG5TZlI2RWJqbjNNQ21BdkFUK016LzZm?=
- =?utf-8?B?cHJneWlQZDJUWllXUFR4V1B3eEwzK09sU1dmUHk4Unh5cVowbnFtNmQvbFRG?=
- =?utf-8?B?MlgrSFd4SW1SRy9ndWJ2ZFNMTnZVcUR1SWU4VGxxUnJPVmczb29WSWk0T3RB?=
- =?utf-8?B?SmtoWlB0SnlRRjdGTUdTT2t2Ri90R0NOTUN6a1BoWHhHdk1uU251WTJRQmZh?=
- =?utf-8?B?WlJreUhieHhuZURaUFhQdTlsZ2FVL0JIdXluRWlWOXlxcWpKY1p3OHN5NnZh?=
- =?utf-8?B?VlFEa09xWFp5NzdTUGgzblRhTENaeWVpTGNXeFBoeUFwVjh3d09mN056Mm11?=
- =?utf-8?B?TTFUSWZFd2hIby9zaHdXTThYd0drdVpCQmdFSjk0a280VDRSejIxYjRRZ2Ny?=
- =?utf-8?B?TUs1Zlh4ZnBKbUk3cFdKSFNQOHdrYmpvYlB5eTBLK1JhTmJoOFptc3E5cWV1?=
- =?utf-8?B?WnJmVEFJWjZ2alNCcFp6UmVFMEFFRi9kdGxxeVdhTHJaY1N1UHpDZVdJTm5S?=
- =?utf-8?B?T0VPWUFuM21aUFQwS05wUEJBU0NUZUJBMXgyOFFQQm43aEhHMVZIaFNBRzh2?=
- =?utf-8?B?aHA4QkpVMGQzdW5zWGk3UUE5Umd2V3M0ZmxMUUpWWEVrc2toMk41OGkyNkZv?=
- =?utf-8?B?Uk1OZWFCTkY0clhxM2NnODg1NmN1ZGI3MGdoVlRxZVp5Y0E4N0FFWE1mUXVw?=
- =?utf-8?B?ZWpjbS9FZGVCL1lIbThPaWxNd1JZeVNBOEI0S2paSlFGQjZMT2xWY1FWNW9n?=
- =?utf-8?B?MTNVa0NxZDNNUHBBclkxTStHQUdpOVNCeUl1QldFNkZIUEpoNHh0WmpoV0Iy?=
- =?utf-8?B?SGJzalMrMWNRPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eVB5TTdjYzExM040UnlwaWw3cXpBQ201NWFTMTRndm05YmlBTDQxZE42NnYz?=
- =?utf-8?B?Nlh4MzZwblIyamJkY3VkVU42aU0yQzhCa2NicVlzdXl0R01DT2phcTBaZEdK?=
- =?utf-8?B?RUlXWlZ1SUpNSHJQOUpuL3RhNUJneUxhc2duV2hpVnF6Z0Eyc2Z0aXhLdW1L?=
- =?utf-8?B?NjBRdktWT0tRTzBSNE9aRnZXQ0ZNSXhkaVBWa3NLZUJqcitZOGVZT3lYeXVC?=
- =?utf-8?B?OFhYSEZXR3JzTXBhNGtrVVVkMGdLQk8vbXlWc1RyOElGYWErbFBBTllmQzhT?=
- =?utf-8?B?UjJmZjRJK0dzSFFWcm5UVm0raVdkdmt4cERDRFBFcG9zQThqV3hrc0wxa0ty?=
- =?utf-8?B?eEZlZHJCbEMrV2M4ck1tN1JmaFBkRjZ2alRJWlhOaFZUbmRnQVRUY0w5MGJs?=
- =?utf-8?B?QWlVVW02RU9xNFZpNnl3ZGw3NDdaNGVwY3luM1cyL1MySEJJK0p5anpTUDZJ?=
- =?utf-8?B?TzNVS0RCQXdWQklZd2FWQmFxclJsOVFiNGNzazhqN3JkSHNkdVZaVUltUktM?=
- =?utf-8?B?b096ekR2emlLcFlWNzFzaDcwYWtsWHgwYmZCaTQ1YWhYVlVhZHBqbnJ2Tkc4?=
- =?utf-8?B?SWZQdGJoUXBNWjVLdllPSTJoekhoK213dW5yOG5mZVZETVRQL1p4MUJCeHlx?=
- =?utf-8?B?VEJ1UGdTdVUyYTE1L0dWbEtKZ054WnpZenpyM01iN01laE4wbnc3UlEyT2ZB?=
- =?utf-8?B?N0N5ektmS09xZmVGWFh5ZkJDN0ZuVHUva1BES2ZKZXFVT0g2bVJMb0phc0ZR?=
- =?utf-8?B?RjAwZjBDeGNRSWRnczBENEl2aFhTVHIwb0d5bDRNRWR6dVlkZWJrVG9NZzJr?=
- =?utf-8?B?cFFhM0UrQ3Q1bjZQN0oyMmtDRUxodWY1S0JxRlQ3TXVpMmxPTmR0YWIrVFU1?=
- =?utf-8?B?c0FOcnVYNm01NFAxU3RHeEYwMmFMbnkwZ3VjL3c4Mjl6cWxSb0xqMjE2b0Fs?=
- =?utf-8?B?KzVJRk1ENmRvTUR1NDk1dStBOGduUUMya0o0Ulk3U0NPYWc2QnZlcDFnZ1Z4?=
- =?utf-8?B?cW40MmtyWVZrRTM0NmpVYjBSRklYV2h0Mmk3MG9LN2llaC9PcDlKR3JFdVdj?=
- =?utf-8?B?ZEs0QzN6SHM3MTgxMS9wTFhXTnV2d05BNm94K0NWd25GNi9YeElsemhzQmZK?=
- =?utf-8?B?Q2p2Wjd3M1lpS2JZOHVEV29GdVhVbnd0RGoxOUZIenEwNnVsQ01lWnZIRVpX?=
- =?utf-8?B?KzducVN3R2g4b1dkUE1UaUhTTVFNaXJ1U3IxWk8zUzBRVjhVUGJHb2RqeDdz?=
- =?utf-8?B?TmZDWWNHbXlqWTZLY0dJSXBMQ2JucDNFK3hqdGNxamxwWkpPcDdrUUx1K1V6?=
- =?utf-8?B?R2JHeU5mWjVTdTFpcjA0amNsZTJvelU2WVQ5WTFJVHFtU1JyYkd1TUg3WWNP?=
- =?utf-8?B?cldhVFU0MmN6Q3hDeGluTklhZTFadW5TcnZNUndzOExkYmJ5dEsxUU5YQU90?=
- =?utf-8?B?Z3UxZEM3eEJTNmtiRlBHdkpaRzVUR1hGMEhtbDJFRmh2UGlPUnlCeHE1ZC9j?=
- =?utf-8?B?UlI4KzZTMDdjY3pSNld3SFRDN3dHdW5FdjFuUkx4U05zZ0p0NEJkT1MvTmlT?=
- =?utf-8?B?N1gwNksraFhUMUc4VG4zNStSVDM3ZXFVVGNTbDNLNjV4MEwvcXUyWDIwM2RK?=
- =?utf-8?B?MHVPQXNoeWRrZDMzTFhTYWJtNERxY0NHcHRuZXUvdUZIZExkd3o3STNEbHI2?=
- =?utf-8?B?VXRJOUtobkVEcGZ3VkczaEdxYmcxak1jN1JrZ05CYTlSa0V2cVZFTWlxOXZV?=
- =?utf-8?B?YUJxQnl2aW1hcUdZelF5TDQyNHpuVG84WTRvM09PRHpNWmlDcTRjMVZnbG53?=
- =?utf-8?B?NEtHNEt5ZmNXZ3BzdzVhamZKWTBPR2twaXVWUDRvbjNacjVEN2FrK0JsWEJI?=
- =?utf-8?B?STFzOUF4emVqYk5XUTBTOFBWc3E2SDhYMnA0RjNheDNGeUNSWEYyTlcvTW9Y?=
- =?utf-8?B?Q3RJUmN1bi9rRTRqVEN1MG4zWU9qSGNnWndlVkNmb3Z2dFRUZ0JGTjlIYjZY?=
- =?utf-8?B?ZXdhRUdBbmQzNGFhWGxtQWMwVDRGTzYrT3dXM3N0aG1yU2YwaGsrTzE0NEo0?=
- =?utf-8?B?d3FtRXpqc2JzNGFTVWFWbzFJdUYzSGZMUXRYRURBWVJ4QzVLTEdzL1YxSzlC?=
- =?utf-8?B?U1RQckRSd1NJNlpnT1NJMWc3UFBIZHR4dVd3eHBDMFQ0WXRWRTh4MC91SWRS?=
- =?utf-8?B?Mmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: eaa44755-f7f9-4a1c-f941-08de2831f583
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5373.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2025 12:40:17.9907
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ApoaX53qn2tasI6b2y7Dz9brUvw25S7lbOKlCEDGKKnEz8j0qs3aqFs89Un1eEL2ONIGXtdXxETsDj0/gWYjwTZVNXycWCNCi1uGLpAQvYk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6031
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251118171113.363528-8-griffoul@gmail.org>
 
-On Mon, Nov 17, 2025 at 01:41:17PM -0400, Jason Gunthorpe wrote:
-> On Wed, Nov 12, 2025 at 02:46:08PM +0100, Winiarski, Michal wrote:
-> > > > I agree that it should be done in the core eventually.
-> > > > I didn't view it as something blocking next revision, as the discussion
-> > > > was in the context of converting every driver, which is something that
-> > > > probably shouldn't be done as part of this series.
-> > > 
-> > > well it doesn't make much sense to push a new driver specific
-> > > implementation when the core approach is preferred.
-> > 
-> > This would generally mean that accepting any new VFIO driver variant
-> > would be blocked until core approach materializes.
-> > 
-> > Jason, can you confirm that this is indeed what you have in mind?
-> > Just to determine how urgent the core-side changes are, and whether
-> > there's anything we can do to help with that.
-> 
-> A core approach would be nice, but I also haven't looked at what it
-> would be like.
-> 
-> I think if you post a small series trying to build one and convert
-> some of the existing drivers it would be sufficient to let this go
-> ahead.
-> 
-> Jason
+Hi,
 
-I posted a series that attempts to do just that.
-https://lore.kernel.org/lkml/20251120123647.3522082-1-michal.winiarski@intel.com/
+kernel test robot noticed the following build warnings:
 
-I would appreciate if we could move forward with the review of this
-series independently. It should be relatively straightforward to convert
-this driver once we're able to get an alignment on specific core-side
-solution.
+[auto build test WARNING on kvm/queue]
+[also build test WARNING on kvm/next mst-vhost/linux-next linus/master v6.18-rc6 next-20251120]
+[cannot apply to kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
--Michał
+url:    https://github.com/intel-lab-lkp/linux/commits/griffoul-gmail-com/KVM-nVMX-Implement-cache-for-L1-MSR-bitmap/20251119-012332
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20251118171113.363528-8-griffoul%40gmail.org
+patch subject: [PATCH v2 07/10] KVM: nVMX: Replace evmcs kvm_host_map with pfncache
+config: x86_64-randconfig-101-20251120 (https://download.01.org/0day-ci/archive/20251120/202511202058.xwqVHqfx-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251120/202511202058.xwqVHqfx-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511202058.xwqVHqfx-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> arch/x86/kvm/vmx/nested.c:1739:13: warning: 'copy_enlightened_to_vmcs12' defined but not used [-Wunused-function]
+    1739 | static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx,
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/copy_enlightened_to_vmcs12 +1739 arch/x86/kvm/vmx/nested.c
+
+  1738	
+> 1739	static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx,
+  1740					       struct hv_enlightened_vmcs *evmcs,
+  1741					       u32 hv_clean_fields)
+  1742	{
+  1743	#ifdef CONFIG_KVM_HYPERV
+  1744		struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
+  1745		struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(&vmx->vcpu);
+  1746	
+  1747		/* HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE */
+  1748		vmcs12->tpr_threshold = evmcs->tpr_threshold;
+  1749		vmcs12->guest_rip = evmcs->guest_rip;
+  1750	
+  1751		if (unlikely(!(hv_clean_fields &
+  1752			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_ENLIGHTENMENTSCONTROL))) {
+  1753			hv_vcpu->nested.pa_page_gpa = evmcs->partition_assist_page;
+  1754			hv_vcpu->nested.vm_id = evmcs->hv_vm_id;
+  1755			hv_vcpu->nested.vp_id = evmcs->hv_vp_id;
+  1756		}
+  1757	
+  1758		if (unlikely(!(hv_clean_fields &
+  1759			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC))) {
+  1760			vmcs12->guest_rsp = evmcs->guest_rsp;
+  1761			vmcs12->guest_rflags = evmcs->guest_rflags;
+  1762			vmcs12->guest_interruptibility_info =
+  1763				evmcs->guest_interruptibility_info;
+  1764			/*
+  1765			 * Not present in struct vmcs12:
+  1766			 * vmcs12->guest_ssp = evmcs->guest_ssp;
+  1767			 */
+  1768		}
+  1769	
+  1770		if (unlikely(!(hv_clean_fields &
+  1771			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_PROC))) {
+  1772			vmcs12->cpu_based_vm_exec_control =
+  1773				evmcs->cpu_based_vm_exec_control;
+  1774		}
+  1775	
+  1776		if (unlikely(!(hv_clean_fields &
+  1777			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EXCPN))) {
+  1778			vmcs12->exception_bitmap = evmcs->exception_bitmap;
+  1779		}
+  1780	
+  1781		if (unlikely(!(hv_clean_fields &
+  1782			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_ENTRY))) {
+  1783			vmcs12->vm_entry_controls = evmcs->vm_entry_controls;
+  1784		}
+  1785	
+  1786		if (unlikely(!(hv_clean_fields &
+  1787			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EVENT))) {
+  1788			vmcs12->vm_entry_intr_info_field =
+  1789				evmcs->vm_entry_intr_info_field;
+  1790			vmcs12->vm_entry_exception_error_code =
+  1791				evmcs->vm_entry_exception_error_code;
+  1792			vmcs12->vm_entry_instruction_len =
+  1793				evmcs->vm_entry_instruction_len;
+  1794		}
+  1795	
+  1796		if (unlikely(!(hv_clean_fields &
+  1797			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1))) {
+  1798			vmcs12->host_ia32_pat = evmcs->host_ia32_pat;
+  1799			vmcs12->host_ia32_efer = evmcs->host_ia32_efer;
+  1800			vmcs12->host_cr0 = evmcs->host_cr0;
+  1801			vmcs12->host_cr3 = evmcs->host_cr3;
+  1802			vmcs12->host_cr4 = evmcs->host_cr4;
+  1803			vmcs12->host_ia32_sysenter_esp = evmcs->host_ia32_sysenter_esp;
+  1804			vmcs12->host_ia32_sysenter_eip = evmcs->host_ia32_sysenter_eip;
+  1805			vmcs12->host_rip = evmcs->host_rip;
+  1806			vmcs12->host_ia32_sysenter_cs = evmcs->host_ia32_sysenter_cs;
+  1807			vmcs12->host_es_selector = evmcs->host_es_selector;
+  1808			vmcs12->host_cs_selector = evmcs->host_cs_selector;
+  1809			vmcs12->host_ss_selector = evmcs->host_ss_selector;
+  1810			vmcs12->host_ds_selector = evmcs->host_ds_selector;
+  1811			vmcs12->host_fs_selector = evmcs->host_fs_selector;
+  1812			vmcs12->host_gs_selector = evmcs->host_gs_selector;
+  1813			vmcs12->host_tr_selector = evmcs->host_tr_selector;
+  1814			vmcs12->host_ia32_perf_global_ctrl = evmcs->host_ia32_perf_global_ctrl;
+  1815			/*
+  1816			 * Not present in struct vmcs12:
+  1817			 * vmcs12->host_ia32_s_cet = evmcs->host_ia32_s_cet;
+  1818			 * vmcs12->host_ssp = evmcs->host_ssp;
+  1819			 * vmcs12->host_ia32_int_ssp_table_addr = evmcs->host_ia32_int_ssp_table_addr;
+  1820			 */
+  1821		}
+  1822	
+  1823		if (unlikely(!(hv_clean_fields &
+  1824			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1))) {
+  1825			vmcs12->pin_based_vm_exec_control =
+  1826				evmcs->pin_based_vm_exec_control;
+  1827			vmcs12->vm_exit_controls = evmcs->vm_exit_controls;
+  1828			vmcs12->secondary_vm_exec_control =
+  1829				evmcs->secondary_vm_exec_control;
+  1830		}
+  1831	
+  1832		if (unlikely(!(hv_clean_fields &
+  1833			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_IO_BITMAP))) {
+  1834			vmcs12->io_bitmap_a = evmcs->io_bitmap_a;
+  1835			vmcs12->io_bitmap_b = evmcs->io_bitmap_b;
+  1836		}
+  1837	
+  1838		if (unlikely(!(hv_clean_fields &
+  1839			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP))) {
+  1840			vmcs12->msr_bitmap = evmcs->msr_bitmap;
+  1841		}
+  1842	
+  1843		if (unlikely(!(hv_clean_fields &
+  1844			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2))) {
+  1845			vmcs12->guest_es_base = evmcs->guest_es_base;
+  1846			vmcs12->guest_cs_base = evmcs->guest_cs_base;
+  1847			vmcs12->guest_ss_base = evmcs->guest_ss_base;
+  1848			vmcs12->guest_ds_base = evmcs->guest_ds_base;
+  1849			vmcs12->guest_fs_base = evmcs->guest_fs_base;
+  1850			vmcs12->guest_gs_base = evmcs->guest_gs_base;
+  1851			vmcs12->guest_ldtr_base = evmcs->guest_ldtr_base;
+  1852			vmcs12->guest_tr_base = evmcs->guest_tr_base;
+  1853			vmcs12->guest_gdtr_base = evmcs->guest_gdtr_base;
+  1854			vmcs12->guest_idtr_base = evmcs->guest_idtr_base;
+  1855			vmcs12->guest_es_limit = evmcs->guest_es_limit;
+  1856			vmcs12->guest_cs_limit = evmcs->guest_cs_limit;
+  1857			vmcs12->guest_ss_limit = evmcs->guest_ss_limit;
+  1858			vmcs12->guest_ds_limit = evmcs->guest_ds_limit;
+  1859			vmcs12->guest_fs_limit = evmcs->guest_fs_limit;
+  1860			vmcs12->guest_gs_limit = evmcs->guest_gs_limit;
+  1861			vmcs12->guest_ldtr_limit = evmcs->guest_ldtr_limit;
+  1862			vmcs12->guest_tr_limit = evmcs->guest_tr_limit;
+  1863			vmcs12->guest_gdtr_limit = evmcs->guest_gdtr_limit;
+  1864			vmcs12->guest_idtr_limit = evmcs->guest_idtr_limit;
+  1865			vmcs12->guest_es_ar_bytes = evmcs->guest_es_ar_bytes;
+  1866			vmcs12->guest_cs_ar_bytes = evmcs->guest_cs_ar_bytes;
+  1867			vmcs12->guest_ss_ar_bytes = evmcs->guest_ss_ar_bytes;
+  1868			vmcs12->guest_ds_ar_bytes = evmcs->guest_ds_ar_bytes;
+  1869			vmcs12->guest_fs_ar_bytes = evmcs->guest_fs_ar_bytes;
+  1870			vmcs12->guest_gs_ar_bytes = evmcs->guest_gs_ar_bytes;
+  1871			vmcs12->guest_ldtr_ar_bytes = evmcs->guest_ldtr_ar_bytes;
+  1872			vmcs12->guest_tr_ar_bytes = evmcs->guest_tr_ar_bytes;
+  1873			vmcs12->guest_es_selector = evmcs->guest_es_selector;
+  1874			vmcs12->guest_cs_selector = evmcs->guest_cs_selector;
+  1875			vmcs12->guest_ss_selector = evmcs->guest_ss_selector;
+  1876			vmcs12->guest_ds_selector = evmcs->guest_ds_selector;
+  1877			vmcs12->guest_fs_selector = evmcs->guest_fs_selector;
+  1878			vmcs12->guest_gs_selector = evmcs->guest_gs_selector;
+  1879			vmcs12->guest_ldtr_selector = evmcs->guest_ldtr_selector;
+  1880			vmcs12->guest_tr_selector = evmcs->guest_tr_selector;
+  1881		}
+  1882	
+  1883		if (unlikely(!(hv_clean_fields &
+  1884			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2))) {
+  1885			vmcs12->tsc_offset = evmcs->tsc_offset;
+  1886			vmcs12->virtual_apic_page_addr = evmcs->virtual_apic_page_addr;
+  1887			vmcs12->xss_exit_bitmap = evmcs->xss_exit_bitmap;
+  1888			vmcs12->encls_exiting_bitmap = evmcs->encls_exiting_bitmap;
+  1889			vmcs12->tsc_multiplier = evmcs->tsc_multiplier;
+  1890		}
+  1891	
+  1892		if (unlikely(!(hv_clean_fields &
+  1893			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR))) {
+  1894			vmcs12->cr0_guest_host_mask = evmcs->cr0_guest_host_mask;
+  1895			vmcs12->cr4_guest_host_mask = evmcs->cr4_guest_host_mask;
+  1896			vmcs12->cr0_read_shadow = evmcs->cr0_read_shadow;
+  1897			vmcs12->cr4_read_shadow = evmcs->cr4_read_shadow;
+  1898			vmcs12->guest_cr0 = evmcs->guest_cr0;
+  1899			vmcs12->guest_cr3 = evmcs->guest_cr3;
+  1900			vmcs12->guest_cr4 = evmcs->guest_cr4;
+  1901			vmcs12->guest_dr7 = evmcs->guest_dr7;
+  1902		}
+  1903	
+  1904		if (unlikely(!(hv_clean_fields &
+  1905			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER))) {
+  1906			vmcs12->host_fs_base = evmcs->host_fs_base;
+  1907			vmcs12->host_gs_base = evmcs->host_gs_base;
+  1908			vmcs12->host_tr_base = evmcs->host_tr_base;
+  1909			vmcs12->host_gdtr_base = evmcs->host_gdtr_base;
+  1910			vmcs12->host_idtr_base = evmcs->host_idtr_base;
+  1911			vmcs12->host_rsp = evmcs->host_rsp;
+  1912		}
+  1913	
+  1914		if (unlikely(!(hv_clean_fields &
+  1915			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_XLAT))) {
+  1916			vmcs12->ept_pointer = evmcs->ept_pointer;
+  1917			vmcs12->virtual_processor_id = evmcs->virtual_processor_id;
+  1918		}
+  1919	
+  1920		if (unlikely(!(hv_clean_fields &
+  1921			       HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1))) {
+  1922			vmcs12->vmcs_link_pointer = evmcs->vmcs_link_pointer;
+  1923			vmcs12->guest_ia32_debugctl = evmcs->guest_ia32_debugctl;
+  1924			vmcs12->guest_ia32_pat = evmcs->guest_ia32_pat;
+  1925			vmcs12->guest_ia32_efer = evmcs->guest_ia32_efer;
+  1926			vmcs12->guest_pdptr0 = evmcs->guest_pdptr0;
+  1927			vmcs12->guest_pdptr1 = evmcs->guest_pdptr1;
+  1928			vmcs12->guest_pdptr2 = evmcs->guest_pdptr2;
+  1929			vmcs12->guest_pdptr3 = evmcs->guest_pdptr3;
+  1930			vmcs12->guest_pending_dbg_exceptions =
+  1931				evmcs->guest_pending_dbg_exceptions;
+  1932			vmcs12->guest_sysenter_esp = evmcs->guest_sysenter_esp;
+  1933			vmcs12->guest_sysenter_eip = evmcs->guest_sysenter_eip;
+  1934			vmcs12->guest_bndcfgs = evmcs->guest_bndcfgs;
+  1935			vmcs12->guest_activity_state = evmcs->guest_activity_state;
+  1936			vmcs12->guest_sysenter_cs = evmcs->guest_sysenter_cs;
+  1937			vmcs12->guest_ia32_perf_global_ctrl = evmcs->guest_ia32_perf_global_ctrl;
+  1938			/*
+  1939			 * Not present in struct vmcs12:
+  1940			 * vmcs12->guest_ia32_s_cet = evmcs->guest_ia32_s_cet;
+  1941			 * vmcs12->guest_ia32_lbr_ctl = evmcs->guest_ia32_lbr_ctl;
+  1942			 * vmcs12->guest_ia32_int_ssp_table_addr = evmcs->guest_ia32_int_ssp_table_addr;
+  1943			 */
+  1944		}
+  1945	
+  1946		/*
+  1947		 * Not used?
+  1948		 * vmcs12->vm_exit_msr_store_addr = evmcs->vm_exit_msr_store_addr;
+  1949		 * vmcs12->vm_exit_msr_load_addr = evmcs->vm_exit_msr_load_addr;
+  1950		 * vmcs12->vm_entry_msr_load_addr = evmcs->vm_entry_msr_load_addr;
+  1951		 * vmcs12->page_fault_error_code_mask =
+  1952		 *		evmcs->page_fault_error_code_mask;
+  1953		 * vmcs12->page_fault_error_code_match =
+  1954		 *		evmcs->page_fault_error_code_match;
+  1955		 * vmcs12->cr3_target_count = evmcs->cr3_target_count;
+  1956		 * vmcs12->vm_exit_msr_store_count = evmcs->vm_exit_msr_store_count;
+  1957		 * vmcs12->vm_exit_msr_load_count = evmcs->vm_exit_msr_load_count;
+  1958		 * vmcs12->vm_entry_msr_load_count = evmcs->vm_entry_msr_load_count;
+  1959		 */
+  1960	
+  1961		/*
+  1962		 * Read only fields:
+  1963		 * vmcs12->guest_physical_address = evmcs->guest_physical_address;
+  1964		 * vmcs12->vm_instruction_error = evmcs->vm_instruction_error;
+  1965		 * vmcs12->vm_exit_reason = evmcs->vm_exit_reason;
+  1966		 * vmcs12->vm_exit_intr_info = evmcs->vm_exit_intr_info;
+  1967		 * vmcs12->vm_exit_intr_error_code = evmcs->vm_exit_intr_error_code;
+  1968		 * vmcs12->idt_vectoring_info_field = evmcs->idt_vectoring_info_field;
+  1969		 * vmcs12->idt_vectoring_error_code = evmcs->idt_vectoring_error_code;
+  1970		 * vmcs12->vm_exit_instruction_len = evmcs->vm_exit_instruction_len;
+  1971		 * vmcs12->vmx_instruction_info = evmcs->vmx_instruction_info;
+  1972		 * vmcs12->exit_qualification = evmcs->exit_qualification;
+  1973		 * vmcs12->guest_linear_address = evmcs->guest_linear_address;
+  1974		 *
+  1975		 * Not present in struct vmcs12:
+  1976		 * vmcs12->exit_io_instruction_ecx = evmcs->exit_io_instruction_ecx;
+  1977		 * vmcs12->exit_io_instruction_esi = evmcs->exit_io_instruction_esi;
+  1978		 * vmcs12->exit_io_instruction_edi = evmcs->exit_io_instruction_edi;
+  1979		 * vmcs12->exit_io_instruction_eip = evmcs->exit_io_instruction_eip;
+  1980		 */
+  1981	
+  1982		return;
+  1983	#else /* CONFIG_KVM_HYPERV */
+  1984		KVM_BUG_ON(1, vmx->vcpu.kvm);
+  1985	#endif /* CONFIG_KVM_HYPERV */
+  1986	}
+  1987	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
