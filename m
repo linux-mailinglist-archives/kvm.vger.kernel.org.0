@@ -1,347 +1,677 @@
-Return-Path: <kvm+bounces-63983-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63984-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F3EEC76156
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 20:32:13 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07B81C76246
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 21:11:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D69FD34FE7C
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 19:32:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B910B4E100A
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 20:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F4A27A477;
-	Thu, 20 Nov 2025 19:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FAD306B17;
+	Thu, 20 Nov 2025 20:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FwF/gUdT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zf/i2IMf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C0136D4F1;
-	Thu, 20 Nov 2025 19:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763667123; cv=fail; b=i0syR8NmHxUKQiDV3fBIpS+lKt/HyOAdrqZDoamh3C5p/YnQA/0F7sdvKyzsfLCUwba7t+splI94RweSwIFFrShxnuRpGri72XVISHYdFqBzCfm4In/mzDH3Wh48nJf3FOMWcbYkhRPJ2wFYzgmTQIiUszgk4P8Za+dewLLj3VM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763667123; c=relaxed/simple;
-	bh=1yJJDSWy2YuNYJtGFPkkqM2MNTynxWh0MtzahlWJFcI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=M/sgG63opc/yhVB5V/8ZM7m0RBdwuB428Pzk91dazc8oggQ6KKRtIPLIRD+0ca9HltbjvcibwN9qyFNplSfwEf9eX6dBQ6jq0+5Ajw2rLr56WDm7mOiPIVg+5QR4AhjvlTrihS/zMKzIlzqVwHnFlLNqKwei3dZHqc0eXGzCdHk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FwF/gUdT; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763667120; x=1795203120;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=1yJJDSWy2YuNYJtGFPkkqM2MNTynxWh0MtzahlWJFcI=;
-  b=FwF/gUdTpSLDHRDUvcLr59egaB4UuIG+Ajrh6/oo5DYo69s1OdLAkxGV
-   MqOnaum/s60OmBBH23tHKAMiJsRB/MVWySfKtlxNqjUXdq2gXjvbUqgm7
-   rKCAR10TsuKremqeMbd1Rd1r8ysz4LlHEUmnqn7U/LfLmu1DGzHVddTvM
-   fUo2mW3YoDQL/+j0lLUqwA3/qb5zavdVEcSfQtcDmsdDft9yOlO09J/KW
-   uoS0Xx4rO2so3TXBEJDxJDeLFx6JKTw08NfEWz4dJs6AkSSM4stuDeKSV
-   zDoZahYVu7isNuzxQ+d023AKD0EiL1xKIE0TWpDUx4G7DN6CJLpiThqhF
-   Q==;
-X-CSE-ConnectionGUID: mLU3GLZXSs63UB7d32wRTg==
-X-CSE-MsgGUID: zFqzBkeOQp2kcOLClUFAoQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="83373605"
-X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="83373605"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 11:31:59 -0800
-X-CSE-ConnectionGUID: z2nGeUxKRgiXhiKrSvXGVg==
-X-CSE-MsgGUID: US7qYMWvRx+K9joKofFY1w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="228761942"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 11:32:00 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 20 Nov 2025 11:31:58 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Thu, 20 Nov 2025 11:31:58 -0800
-Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.70) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 20 Nov 2025 11:31:58 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=unN+ZtpauUHXL+Qq49yMEQTFAR9xZfG1kwZLBiiebQH2tGa190JNe9a9BWPRv3+rAn0t4R7qjZebcdSUfQ7ZbGnzlaEtJuSlP6vB9yOzJYEuf53BZW2uUWI9JEAsRA2KqXiaW21Pio/ohoqFTPjckYnF67dxPLYk+aQ44wlmL1YnAqcegz7U/IUeN+eFnaOUnI6Rl8f3Z6EpNZavOy59wuBSyGsbkrj2HI3JKe7va5AmkL1I3t6ShCxwpvbXXioTElYiPrQFq0ik8NgzCwqvp8ItpVanxuoNS2Z0JN9MlmR+0ptiDBOmu1VvDYq8EG4m//p8WJr3M5Ujm+ps4HJRIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iafKm1SUx+qHsFjzzKAIciZVN1uy05IrM2CS31pYoRI=;
- b=o4U2NPGmkFoos97qhGEnaQ74u7ZoXRWuchNYR+282dGvmY69GWmbDhslLyoWXhz2BaafXD2Vfy+aBUdKGE8KzzTctgayzYpa1JsXFZWdy4Z+xoyUgAcRFeESoCqeuq9kd35sFrDD9e/hoCItRui9QXR1xJzZALTUsS6Q9pyPAv0PUpVnLzJIwqEEh7gOpZIsZ9VobimwenKoPN/KPSRmSEzu5lTKE8FcIkp+0SXV7H7J9z5jJ58VKIBl/rZ2TFCzxlLwJZpZfrhkhLaOQ4DeniLQbIzNFPWAwBrLQ9YvBwgX5suwxSIVPNx63om0jqDJkCEJprowr3us1M8XLcqBcQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH3PPF9E162731D.namprd11.prod.outlook.com
- (2603:10b6:518:1::d3c) by CY5PR11MB6344.namprd11.prod.outlook.com
- (2603:10b6:930:3b::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Thu, 20 Nov
- 2025 19:31:54 +0000
-Received: from PH3PPF9E162731D.namprd11.prod.outlook.com
- ([fe80::8289:cecc:ea5b:f0c]) by PH3PPF9E162731D.namprd11.prod.outlook.com
- ([fe80::8289:cecc:ea5b:f0c%8]) with mapi id 15.20.9343.009; Thu, 20 Nov 2025
- 19:31:54 +0000
-Date: Thu, 20 Nov 2025 13:34:21 -0600
-From: Ira Weiny <ira.weiny@intel.com>
-To: Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
-CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-kernel@vger.kernel.org>, <thomas.lendacky@amd.com>,
-	<pbonzini@redhat.com>, <seanjc@google.com>, <vbabka@suse.cz>,
-	<ashish.kalra@amd.com>, <liam.merwick@oracle.com>, <david@redhat.com>,
-	<vannapurve@google.com>, <ackerleytng@google.com>, <aik@amd.com>,
-	<ira.weiny@intel.com>, <yan.y.zhao@intel.com>
-Subject: Re: [PATCH 3/3] KVM: guest_memfd: GUP source pages prior to
- populating guest memory
-Message-ID: <691f6d3d93231_502d810036@iweiny-mobl.notmuch>
-References: <20251113230759.1562024-1-michael.roth@amd.com>
- <20251113230759.1562024-4-michael.roth@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251113230759.1562024-4-michael.roth@amd.com>
-X-ClientProxiedBy: BYAPR11CA0108.namprd11.prod.outlook.com
- (2603:10b6:a03:f4::49) To PH3PPF9E162731D.namprd11.prod.outlook.com
- (2603:10b6:518:1::d3c)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDD32FD66E
+	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 20:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763669474; cv=none; b=bDB/D4/IBUYK7fcq/CN2iKgFQXAfgXjdMJURe4tVIDLM+aMw4XRomxtyXkna4djtVXTtghMMG9k8CoqGqsXIslbazxHVSznqMO8h/ucu9K1uPls54FdYi2adS4dK++xw3V61/MeIXw4Mn126RzaM8Xfvtm7YArR1Zu8Ab8TruYM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763669474; c=relaxed/simple;
+	bh=/N91MQkT4hirPp48GVavg7Gl10a/lhArrXXn8s2xfy8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gQ1ot4f8xZtOcpvIqUv6cj2sgPy88dgZhECkJZuJz799kIVoESjQ5qSyQQDa8GZOnqMNatsB3qaoGfvMtaUD/7dxdXPf3I+C9yvlCHbyT94xzvm/jrpxcmwJaIbKaQ5XYr9igK7RV4gKH5sJ8NRdqCPg/xVd6QyYjae++oYnB38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zf/i2IMf; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b969f3f5c13so1237900a12.0
+        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 12:11:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763669471; x=1764274271; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0kd5gopvx3Cs928Gispk22ZOd+uJO9mD6SmSdOIrX3k=;
+        b=zf/i2IMftEtkjxBqb3yqc7VJn5cV0AW+PVNGaEMlsOPUc8fsKaYxBbjyxTSMl7xTYa
+         oSpaoI4rIBGr9O3H2bZeyZea0eoHakLnpj30WBaEzqB4r4lkFG0BLCZcD1+wBTJmALj1
+         nlMhZFXqtMOtTOOs0U9OzgCton222tTvsLpSMaejRzrR0tTvkqAn9QHcFyd9znS23lH8
+         qSU2nQ5TXiUr3EBX3BHfMJTY4XoZE492Wy1LLtLQK+Kp6DCxc2MyHykM9opSBiLPIhPS
+         8G52MQxayEBCDBtNcM4+or/0kHnftI+3IPU4N3w6BqXr3mLgweFPqttJLimBdAz1NRx7
+         q2dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763669471; x=1764274271;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0kd5gopvx3Cs928Gispk22ZOd+uJO9mD6SmSdOIrX3k=;
+        b=E0/7U0S+rhOM+rLO+ygmRE4m+Eif1bGrgjoV+2y2SWZkWv0hXWYpSQPVVs96tBT3RX
+         UI7X0mvtogbXKzUGmWTE6WfSvpM37q6FFf+7KfHU96SbO8tSJsTRjPUP1oDJf2y3xZXo
+         w5CbY4LgCMQAfodhiN4pADrPJ3O5HuoEAPu0he7R+IJlyD7Nl9N+CNU1CKLKFhr/8baz
+         VT1qf4Sm12RpHWgoYDo1mIzYlYBM+6FWylL2TwVZLTrnzJ5kc1QsfNZbEE/sDJwmJQJd
+         P5MPX4T5G3GP9ySb/I5PXE9ZQlF5sFOMS2Exs9ZQ0sgfz3YBpJ3xzIOReEA34UhBb3MB
+         vtJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrKiQsh+bT/s+ClsroVWbQt/EYf8sqRHAPlazyW6mXjGhvjplEHn3wpvPAAmYjZyt6w5s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGSAK7o4LDMg+MeSBKC3Uy8Fo8jxuoOdX9YV04SOqHUnY+vHlF
+	EP1jd7XbfRtyUQ/BKvcG1zld/tkTL/VjenrzJEe06jir3mPreDveG4RhVvgM7/J8XV6tafaR0A4
+	hk9JzLA==
+X-Google-Smtp-Source: AGHT+IFq0zl+KKWiwS6oGlFzB8Gt6K80lJBaxXVbTTl9srEVwchDqj3bDxEfDvavtm6P1Jmvy2zmXIvE+Ig=
+X-Received: from pfbho11.prod.google.com ([2002:a05:6a00:880b:b0:76b:651e:a69c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:939e:b0:343:5d53:c0ab
+ with SMTP id adf61e73a8af0-3613b519f50mr5937926637.20.1763669470559; Thu, 20
+ Nov 2025 12:11:10 -0800 (PST)
+Date: Thu, 20 Nov 2025 12:11:09 -0800
+In-Reply-To: <20251107093239.67012-2-amit@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH3PPF9E162731D:EE_|CY5PR11MB6344:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c46c5a8-3968-47af-663b-08de286b764c
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Hx566/TbUSpBne1ll22J/BIgXiZ86PyAMSNGGxjcf9g0HYRmZqKzzWEOC40g?=
- =?us-ascii?Q?L2Rt9D1MO8lf9pSzRGtmswtzks4gEX4Mw/XFprUh1Xb0rP3G5847W0ZRqHWu?=
- =?us-ascii?Q?VyI4P+NqoYisVhdFJ1Qj4jUn0etp+iA6Bv0Gc5eHZfo0Xq9CVOsvn7BoTsJ4?=
- =?us-ascii?Q?jv1xoiWNZz2cVGUpylyZFzd7m2x1k0276VhZxIDP+PSpWkEajoQWyRPzXEEK?=
- =?us-ascii?Q?6wA8+ngjJ9dnNHfz4R8W4KIwfAAeWKdA/YP1jkdZLNi87T6Jb3pdf7B68BCZ?=
- =?us-ascii?Q?WSjmtZ1jtaXHjTDEv8Q7xkczo72sHhfkVdS1s9jQqcH4SO3YRBK/ts6pkmae?=
- =?us-ascii?Q?peh0lIkiIUXtnYKrX6DnH0zBVO9sbBJLOyiDxdZ4Gy1scMpykK/Ov/nrMJaB?=
- =?us-ascii?Q?KWTdXmeDuJ6Ih23Ptd17JhxeGjCtno4jgJSSDNA4cYHpo6WD8w/G3DDBk3Wx?=
- =?us-ascii?Q?gZbma8BdvnG5WjjeLXR8VJKdJWYCVlBrLC9M8rQ4RMKzLg89VKj4Q4XCwA+U?=
- =?us-ascii?Q?XexOIB6gnC/m6m2BbRaFNCAPkN0IC19iOifmRIXVQ8SJdoMe73LBiZEnB9mN?=
- =?us-ascii?Q?woBx/zX9tHGov6RBdOr+/NrN//cTCsXEhDxDY1yw+wV8SRlI3AYgT5eoAgz2?=
- =?us-ascii?Q?fbFuhR/PiKRLZi4QHQ6qbooOU4yMpcm5fydzBUknDu0tK0VS2axq12+A8RA1?=
- =?us-ascii?Q?xZiaQ7AExNaL9gEpXFGAgwJtJmHa8NjSfNjgrRJ6EK+lKbTqd8BLUANIkmk6?=
- =?us-ascii?Q?Whhd8sn95Z/KV3nSqR5BSI9cYZZINIgqkyuEeymvuL7nJIthYNkl3Eoy+9ki?=
- =?us-ascii?Q?ovGiEYVNj/OFpJuSshFf7bVM4/SXWlYeWppfTapUdxWTpqWuaA2mAcvjogxY?=
- =?us-ascii?Q?5Wllxk23eGCaYN+uNn/OhTLHem1HiYjYXE4mFjScjKwdkbaT9/tQ+Vk+qpZ3?=
- =?us-ascii?Q?oLqGaBk1rJS9IqYlbZ6WfUHEfmFmxNp0KTQBH0i1GLVT5EXiyhKiI9qubTUu?=
- =?us-ascii?Q?x3s/UjfrdiV0iehBY4xDa4PlsTsSyYFE/6mEP/Q7Q4vRlHkJoMS/XrzfFdXp?=
- =?us-ascii?Q?Dj5UzSM+zq81IxqR6olsHwhiEemtt5U/DTn0kMNk1uaOM9Tohc9kLQ2GzC2C?=
- =?us-ascii?Q?Y0haXRI57MfFH1NsZKyf/Ntz7UpAxkmzWj47Eol8vgDvSvgIQHiZigMviDRH?=
- =?us-ascii?Q?qu0WtIbiX4ZjCOZ5Fq2AKHS1sI8IRklPX+W8VAy7FPEKK2Gfnh4n/xnsSdSN?=
- =?us-ascii?Q?yg1uCY0EatUO/yv/9tl7eHbXdJB0r4/T6u3n5AT4tagAzyuZUGXu3n6tyiTX?=
- =?us-ascii?Q?YbFHICZkzjaxx5NECZ0kPKNY+ftCqOswpWeDyvAJKlx+qSlnXE7cJYIhwcBl?=
- =?us-ascii?Q?Qp5zWI79m5AxJEsx63X0w7KIi1iJxdLsfUb8FaVZAJPAUQBOIJMYlnDu07uc?=
- =?us-ascii?Q?sakQFvlNYZdUKuU0F7dnPMA1nPK6lqpG?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH3PPF9E162731D.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?IXdi3O2qq2BB1WKCR4hojWUWmKipyxYbqQjW4IyyWMVDWSTkyAsj1f4Seh1K?=
- =?us-ascii?Q?j8b/6lykrZrlRZT/09BIzVStnKgtGQzULyPSmknmX2tdaFNytpYQMTM1LMZO?=
- =?us-ascii?Q?4bUNCoC2vH3XBEqsRNCH+U3lvr+asdfD/c7uEKP3hHZ6GAJ/CH4sYXOFoEk3?=
- =?us-ascii?Q?/b6Z9srIGEaFOXELNv6V6ZoM6F4ONj1EoEACmVCzj5XOMJKlqIImpbo1UiwX?=
- =?us-ascii?Q?5xr6ZIB8UJNL08umBgK8x6VfTVP9+EeETV/jT9fd74Rnp+Tw2JfFXJG4iE6g?=
- =?us-ascii?Q?nmCRvvMFZvWmssbGGXDGhN8R7H3ds4Vmyx+xSS6Z13++//gpe2MzE0Ai+sfe?=
- =?us-ascii?Q?zrZhXVf9ydweCmrJuofwv/XdGVxlozJwF7g9eDgDfjU8dSeouK7K9XrjDHRG?=
- =?us-ascii?Q?89LuqB5RwcwNCk5etuVTh2/OGdlLVPkHHBoKwla9MFdDys7qzfQdPQdMFUdh?=
- =?us-ascii?Q?cZl4aSeKuuiHdkMsUgIaiPdTo7lW3PbCfV0hkK9rx6pnsRUMoZoSBhHnwwo/?=
- =?us-ascii?Q?xgwzmcDZnXrFXChRM7OIN8oiXB1u7URKv/tvZzT3/Uq5HHBxwhRoAneHcxiA?=
- =?us-ascii?Q?qs01kMj36/NcnSupD8KWRpUmbi05uqlV8rTi7FNfwpAuOMjw+kNGY2N/Q0Lv?=
- =?us-ascii?Q?n4BS2tReP1bCdTC1FgTPsDhK/1NXo+FMOghaZfhBe02xTXqRkBqCUBjkVhLa?=
- =?us-ascii?Q?ghcxk4hPouG2IprSdNdnBy8K7hGDI7TZ5uBsDQR7Gzs7Og+J75NgBhWXr9tI?=
- =?us-ascii?Q?AIMgc66EoODTkViBGvfCrMYcf0sHru98pEZaY3qd48qH+zRfcc5NxL58rVUL?=
- =?us-ascii?Q?uZgFHq1zjzyrl6w1FlryWRDWGKxwvAAc0picsgS8L1qddF95GQpnGYnZ7RIG?=
- =?us-ascii?Q?5MkxJmHHxdKmvqf4moskp8pzLCokQoJYi3g0uhjhC8ESVxBvcKrMp85PNPDr?=
- =?us-ascii?Q?ujfyOTU+sqQMEij26b9cjKpC/ftLXvtPjkyPC98ftvbfj6CSo1MKk9VBuuOb?=
- =?us-ascii?Q?sLk0cqVd1Lk5B6vl3Qp8wOT0YDoNtyJEBiZI4VKujKgYRYu6AF5k3pgUWpGK?=
- =?us-ascii?Q?7jc/cFCG7mzjARvsM72gNdonjTR4SQYZvrnfQpRDH/xFhRO6r7vwXYyJ4Dwy?=
- =?us-ascii?Q?9646G/DxmC6wg3g+ktrCkEm2qLKoe5wNPPrZct7V7LpbMs6o47oFFws84yW3?=
- =?us-ascii?Q?0TOGVGOp6Zvquzp1sk4nNQhRD9vyknAIwBBHbTRpEAXmAQLA5+gkWWVh6wgw?=
- =?us-ascii?Q?i3WJprRJJnvS563S63Fk7BKdm9WgjGkMD/1C+MTA+IhrLlXxp7Yu/OKZbOsD?=
- =?us-ascii?Q?F4yYEj4mKW+DkQ58/I3vg3v0TxMphICKF/OpYR+uG3yOAKDxGW35HUM+Eoja?=
- =?us-ascii?Q?ZfjY3Mx/2mb6HQsEEdu6lTWqIlgsamCBY+geuB2MJs6k9s1bIu2DfKhBMnRy?=
- =?us-ascii?Q?T4uxpazPWLrUaw/r6hgb/OD9M4Jshdd8WpekfHgSizOjWo+FGboNPL4VrJzA?=
- =?us-ascii?Q?FAIxRssoTkZbuRaJI4UaZhDRthkAB+5R2h8+ymeWE+O4V9WV2SDkqdUMQO6o?=
- =?us-ascii?Q?01W/FLyHIJivmemAQ/cviUQZ/KpSRucQZhSg/FhB?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c46c5a8-3968-47af-663b-08de286b764c
-X-MS-Exchange-CrossTenant-AuthSource: PH3PPF9E162731D.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2025 19:31:54.7947
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2m7iWXYswwDxkn7YiKsmO9WD03OSf38L6T5+myEKUXVbSYST1RJzQpjma5QoBIycHV6lSSPsWima6Q8ZSdMuAg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6344
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+References: <20251107093239.67012-1-amit@kernel.org> <20251107093239.67012-2-amit@kernel.org>
+Message-ID: <aR913X8EqO6meCqa@google.com>
+Subject: Re: [PATCH v6 1/1] x86: kvm: svm: set up ERAPS support for guests
+From: Sean Christopherson <seanjc@google.com>
+To: Amit Shah <amit@kernel.org>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
+	linux-doc@vger.kernel.org, amit.shah@amd.com, thomas.lendacky@amd.com, 
+	bp@alien8.de, tglx@linutronix.de, peterz@infradead.org, jpoimboe@kernel.org, 
+	pawan.kumar.gupta@linux.intel.com, corbet@lwn.net, mingo@redhat.com, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, pbonzini@redhat.com, 
+	daniel.sneddon@linux.intel.com, kai.huang@intel.com, sandipan.das@amd.com, 
+	boris.ostrovsky@oracle.com, Babu.Moger@amd.com, david.kaplan@amd.com, 
+	dwmw@amazon.co.uk, andrew.cooper3@citrix.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Michael Roth wrote:
-> Currently the post-populate callbacks handle copying source pages into
-> private GPA ranges backed by guest_memfd, where kvm_gmem_populate()
-> acquires the filemap invalidate lock, then calls a post-populate
-> callback which may issue a get_user_pages() on the source pages prior to
-> copying them into the private GPA (e.g. TDX).
-> 
-> This will not be compatible with in-place conversion, where the
-> userspace page fault path will attempt to acquire filemap invalidate
-> lock while holding the mm->mmap_lock, leading to a potential ABBA
-> deadlock[1].
-> 
-> Address this by hoisting the GUP above the filemap invalidate lock so
-> that these page faults path can be taken early, prior to acquiring the
-> filemap invalidate lock.
-> 
-> It's not currently clear whether this issue is reachable with the
-> current implementation of guest_memfd, which doesn't support in-place
-> conversion, however it does provide a consistent mechanism to provide
-> stable source/target PFNs to callbacks rather than punting to
-> vendor-specific code, which allows for more commonality across
-> architectures, which may be worthwhile even without in-place conversion.
+KVM: SVM:
 
-After thinking on the alignment issue:
+On Fri, Nov 07, 2025, Amit Shah wrote:
+> From: Amit Shah <amit.shah@amd.com>
+>=20
+> AMD CPUs with the Enhanced Return Address Predictor (ERAPS) feature
 
-In the direction we are going, in-place conversion, I'm struggling to
-see why keeping the complexity of allowing a miss-aligned src pointer for
-the data (which BTW seems to require at least an aligned size to (x *
-PAGE_SIZE to not leak data?) is valuable.
+Enhanced Return Address Predictor Security.  The 'S' matters.
 
-Once in-place is complete the entire page needs to be converted to private
-and so it seems keeping that alignment just makes things cleaner without
-really restricting any known use cases.
+> Zen5+) obviate the need for FILL_RETURN_BUFFER sequences right after
+> VMEXITs.  The feature adds guest/host tags to entries in the RSB (a.k.a.
+> RAP).  This helps with speculation protection across the VM boundary,
+> and it also preserves host and guest entries in the RSB that can improve
+> software performance (which would otherwise be flushed due to the
+> FILL_RETURN_BUFFER sequences).  This feature also extends the size of
+> the RSB from the older standard (of 32 entries) to a new default
+> enumerated in CPUID leaf 0x80000021:EBX bits 23:16 -- which is 64
+> entries in Zen5 CPUs.
+>=20
+> The hardware feature is always-on, and the host context uses the full
+> default RSB size without any software changes necessary.  The presence
+> of this feature allows software (both in host and guest contexts) to
+> drop all RSB filling routines in favour of the hardware doing it.
+>=20
+> There are two guest/host configurations that need to be addressed before
+> allowing a guest to use this feature: nested guests, and hosts using
+> shadow paging (or when NPT is disabled):
+>=20
+> 1. Nested guests: the ERAPS feature adds host/guest tagging to entries
+>    in the RSB, but does not distinguish between the guest ASIDs.  To
+>    prevent the case of an L2 guest poisoning the RSB to attack the L1
+>    guest, the CPU exposes a new VMCB bit (CLEAR_RAP).  The next
+>    VMRUN with a VMCB that has this bit set causes the CPU to flush the
+>    RSB before entering the guest context.  Set the bit in VMCB01 after a
+>    nested #VMEXIT to ensure the next time the L1 guest runs, its RSB
+>    contents aren't polluted by the L2's contents.  Similarly, before
+>    entry into a nested guest, set the bit for VMCB02, so that the L1
+>    guest's RSB contents are not leaked/used in the L2 context.
+>=20
+> 2. Hosts that disable NPT: the ERAPS feature flushes the RSB entries on
+>    several conditions, including CR3 updates.  Emulating hardware
+>    behaviour on RSB flushes is not worth the effort for NPT=3Doff case,
+>    nor is it worthwhile to enumerate and emulate every trigger the
+>    hardware uses to flush RSB entries.  Instead of identifying and
+>    replicating RSB flushes that hardware would have performed had NPT
+>    been ON, do not let NPT=3Doff VMs use the ERAPS features.
 
-General comments below.
+The emulation requirements are not limited to shadow paging.  From the APM:
 
-[snip]
+  The ERAPS feature eliminates the need to execute CALL instructions to cle=
+ar
+  the return address predictor in most cases. On processors that support ER=
+APS,
+  return addresses from CALL instructions executed in host mode are not use=
+d in
+  guest mode, and vice versa. Additionally, the return address predictor is
+  cleared in all cases when the TLB is implicitly invalidated (see Section =
+5.5.3 =E2=80=9CTLB
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Management,=E2=80=9D on page 159) and in the following cases:
 
-> @@ -2284,14 +2285,21 @@ static int sev_gmem_post_populate(struct kvm *kvm, gfn_t gfn_start, kvm_pfn_t pf
->  			goto err;
+  =E2=80=A2 MOV CR3 instruction
+  =E2=80=A2 INVPCID other than single address invalidation (operation type =
+0)
+
+Yes, KVM only intercepts MOV CR3 and INVPCID when NPT is disabled (or INVPC=
+ID is
+unsupported per guest CPUID), but that is an implementation detail, the ins=
+tructions
+are still reachable via emulator, and KVM needs to emulate implicit TLB flu=
+sh
+behavior.
+
+So punting on emulating RAP clearing because it's too hard is not an option=
+.  And
+AFAICT, it's not even that hard.
+
+The changelog also needs to include the architectural behavior, otherwise "=
+is not
+worth the effort" is even more subjective since there's no documentation of=
+ what
+the effort would actually be.
+
+As for emulating the RAP clears, a clever idea is to piggyback and alias di=
+rty
+tracking for VCPU_EXREG_CR3, as VCPU_EXREG_ERAPS.  I.e. mark the vCPU as ne=
+eding
+a RAP clear if CR3 is written to, and then let common x86 also set VCPU_EXR=
+EG_ERAPS
+as needed, e.g. when handling INVPCID.
+
+> This patch to KVM ensures both those caveats are addressed, and sets the
+
+No "This patch".
+
+> new ALLOW_LARGER_RAP VMCB bit that allows the CPU to operate with ERAPS
+> enabled in guest contexts.
+>=20
+> This feature is documented in AMD APM Vol 2 (Pub 24593), in revisions
+> 3.43 and later.
+>=20
+> Signed-off-by: Amit Shah <amit.shah@amd.com>
+> ---
+>  arch/x86/include/asm/cpufeatures.h |  1 +
+>  arch/x86/include/asm/svm.h         |  6 +++++-
+>  arch/x86/kvm/cpuid.c               |  8 +++++++-
+>  arch/x86/kvm/svm/nested.c          |  6 ++++++
+>  arch/x86/kvm/svm/svm.c             | 11 +++++++++++
+>  5 files changed, 30 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cp=
+ufeatures.h
+> index 4091a776e37a..edc76a489aae 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -467,6 +467,7 @@
+>  #define X86_FEATURE_GP_ON_USER_CPUID	(20*32+17) /* User CPUID faulting *=
+/
+> =20
+>  #define X86_FEATURE_PREFETCHI		(20*32+20) /* Prefetch Data/Instruction t=
+o Cache Level */
+> +#define X86_FEATURE_ERAPS		(20*32+24) /* Enhanced Return Address Predict=
+or Security */
+>  #define X86_FEATURE_SBPB		(20*32+27) /* Selective Branch Prediction Barr=
+ier */
+>  #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushe=
+s all branch type predictions */
+>  #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO *=
+/
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index 17f6c3fedeee..d4602ee4cf1f 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -131,7 +131,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area=
+ {
+>  	u64 tsc_offset;
+>  	u32 asid;
+>  	u8 tlb_ctl;
+> -	u8 reserved_2[3];
+> +	u8 erap_ctl;
+> +	u8 reserved_2[2];
+>  	u32 int_ctl;
+>  	u32 int_vector;
+>  	u32 int_state;
+> @@ -182,6 +183,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area=
+ {
+>  #define TLB_CONTROL_FLUSH_ASID 3
+>  #define TLB_CONTROL_FLUSH_ASID_LOCAL 7
+> =20
+> +#define ERAP_CONTROL_ALLOW_LARGER_RAP BIT(0)
+> +#define ERAP_CONTROL_CLEAR_RAP BIT(1)
+> +
+>  #define V_TPR_MASK 0x0f
+> =20
+>  #define V_IRQ_SHIFT 8
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 52524e0ca97f..93934d4f8f11 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1795,8 +1795,14 @@ static inline int __do_cpuid_func(struct kvm_cpuid=
+_array *array, u32 function)
+>  		entry->eax =3D entry->ebx =3D entry->ecx =3D entry->edx =3D 0;
+>  		break;
+>  	case 0x80000021:
+> -		entry->ebx =3D entry->edx =3D 0;
+> +		entry->edx =3D 0;
+>  		cpuid_entry_override(entry, CPUID_8000_0021_EAX);
+> +
+> +		if (kvm_cpu_cap_has(X86_FEATURE_ERAPS))
+> +			entry->ebx &=3D GENMASK(23, 16);
+> +		else
+> +			entry->ebx =3D 0;
+> +
+>  		cpuid_entry_override(entry, CPUID_8000_0021_ECX);
+>  		break;
+>  	/* AMD Extended Performance Monitoring and Debug */
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index a6443feab252..de51595e875c 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -869,6 +869,9 @@ static void nested_vmcb02_prepare_control(struct vcpu=
+_svm *svm,
 >  		}
->  
-> -		if (src) {
-> -			void *vaddr = kmap_local_pfn(pfn + i);
-> +		if (src_pages) {
-> +			void *src_vaddr = kmap_local_pfn(page_to_pfn(src_pages[i]));
-> +			void *dst_vaddr = kmap_local_pfn(pfn + i);
->  
-> -			if (copy_from_user(vaddr, src + i * PAGE_SIZE, PAGE_SIZE)) {
-> -				ret = -EFAULT;
-> -				goto err;
-> +			memcpy(dst_vaddr, src_vaddr + src_offset, PAGE_SIZE - src_offset);
-> +			kunmap_local(src_vaddr);
-> +
-> +			if (src_offset) {
-> +				src_vaddr = kmap_local_pfn(page_to_pfn(src_pages[i + 1]));
-> +
-> +				memcpy(dst_vaddr + PAGE_SIZE - src_offset, src_vaddr, src_offset);
-                                                                                      ^^^^^^^^^^
-									PAGE_SIZE - src_offset?
-
-> +				kunmap_local(src_vaddr);
->  			}
-> -			kunmap_local(vaddr);
-> +
-> +			kunmap_local(dst_vaddr);
->  		}
->  
->  		ret = rmp_make_private(pfn + i, gfn << PAGE_SHIFT, PG_LEVEL_4K,
-> @@ -2331,12 +2339,20 @@ static int sev_gmem_post_populate(struct kvm *kvm, gfn_t gfn_start, kvm_pfn_t pf
->  	if (!snp_page_reclaim(kvm, pfn + i) &&
->  	    sev_populate_args->type == KVM_SEV_SNP_PAGE_TYPE_CPUID &&
->  	    sev_populate_args->fw_error == SEV_RET_INVALID_PARAM) {
-> -		void *vaddr = kmap_local_pfn(pfn + i);
-> +		void *src_vaddr = kmap_local_pfn(page_to_pfn(src_pages[i]));
-> +		void *dst_vaddr = kmap_local_pfn(pfn + i);
->  
-> -		if (copy_to_user(src + i * PAGE_SIZE, vaddr, PAGE_SIZE))
-> -			pr_debug("Failed to write CPUID page back to userspace\n");
-> +		memcpy(src_vaddr + src_offset, dst_vaddr, PAGE_SIZE - src_offset);
-> +		kunmap_local(src_vaddr);
-> +
-> +		if (src_offset) {
-> +			src_vaddr = kmap_local_pfn(page_to_pfn(src_pages[i + 1]));
-> +
-> +			memcpy(src_vaddr, dst_vaddr + PAGE_SIZE - src_offset, src_offset);
-                                                                                      ^^^^^^^^^^
-									PAGE_SIZE - src_offset?
-> +			kunmap_local(src_vaddr);
-> +		}
->  
-> -		kunmap_local(vaddr);
-> +		kunmap_local(dst_vaddr);
 >  	}
->  
->  	/* pfn + i is hypervisor-owned now, so skip below cleanup for it. */
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 57ed101a1181..dd5439ec1473 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -3115,37 +3115,26 @@ struct tdx_gmem_post_populate_arg {
->  };
->  
->  static int tdx_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
-> -				  void __user *src, int order, void *_arg)
-> +				  struct page **src_pages, loff_t src_offset,
-> +				  int order, void *_arg)
->  {
->  	struct tdx_gmem_post_populate_arg *arg = _arg;
->  	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
->  	u64 err, entry, level_state;
->  	gpa_t gpa = gfn_to_gpa(gfn);
-> -	struct page *src_page;
->  	int ret, i;
->  
->  	if (KVM_BUG_ON(kvm_tdx->page_add_src, kvm))
->  		return -EIO;
->  
-> -	if (KVM_BUG_ON(!PAGE_ALIGNED(src), kvm))
-> +	/* Source should be page-aligned, in which case src_offset will be 0. */
-> +	if (KVM_BUG_ON(src_offset))
+> =20
+> +	if (kvm_cpu_cap_has(X86_FEATURE_ERAPS))
 
-This failed to compile, need the kvm parameter in the macro.
+My bad, this should be=20
 
->  		return -EINVAL;
->  
-> -	/*
-> -	 * Get the source page if it has been faulted in. Return failure if the
-> -	 * source page has been swapped out or unmapped in primary memory.
-> -	 */
-> -	ret = get_user_pages_fast((unsigned long)src, 1, 0, &src_page);
-> -	if (ret < 0)
-> -		return ret;
-> -	if (ret != 1)
-> -		return -ENOMEM;
-> -
-> -	kvm_tdx->page_add_src = src_page;
-> +	kvm_tdx->page_add_src = src_pages[i];
+	if (guest_cpu_cap_has(vcpu, X86_FEATURE_ERAPS))
 
-i is uninitialized here.  src_pages[0] should be fine.
+because KVM doesn't need to flush the RAP if the virtual isn't ERAPS-capabl=
+e
+(L1 is responsible for manually clearing the RAP).
 
-All the src_offset stuff in the rest of the patch would just go away if we
-made that restriction for SNP.  You mentioned there was not a real use
-case for it.  Also technically I think TDX _could_ do the same thing SNP
-populate is doing.  The kernel could map the buffer do the offset copy to
-the destination page and do the in-place encryption.  But I've not tried
-it because I really think this is more effort than the whole kernel needs
-to do.  If a use case becomes necessary it may be better to have that in
-the gmem core once TDX is tested.
+Ditto for setting ERAP_CONTROL_ALLOW_LARGER_RAP in init_vmcb() and below.  =
+If
+userspace decides not to expose ERAPS to L1 for whatever reason, then KVM s=
+hould
+honor that.
 
-Thoughts?
-Ira
+> +		vmcb02->control.erap_ctl |=3D ERAP_CONTROL_CLEAR_RAP;
 
-[snip]
+Suspiciously absent is support for running L2 with ERAP_CONTROL_ALLOW_LARGE=
+R_RAP.
+init_vmcb() always operates on vmcb01.  In theory, we could set ALLOW_LARGE=
+R_RAP
+in vmcb02 if it's supported in the virtual CPU, regardless of what vmcb12 s=
+ays.
+But given that this is security related, I think it makes sense to honor L1=
+'s
+wishes, even though that means L1 also needs to be updated to fully benefit=
+ from
+ERAPS.
+
+Compile tested only at this point, but this?
+
+--
+From: Amit Shah <amit.shah@amd.com>
+Date: Fri, 7 Nov 2025 10:32:39 +0100
+Subject: [PATCH] KVM: SVM: Virtualize and advertise support for ERAPS
+MIME-Version: 1.0
+Content-Type: text/plain; charset=3DUTF-8
+Content-Transfer-Encoding: 8bit
+
+AMD CPUs with the Enhanced Return Address Predictor Security (ERAPS)
+feature (available on Zen5+) obviate the need for FILL_RETURN_BUFFER
+sequences right after VMEXITs.  ERAPS adds guest/host tags to entries in
+the RSB (a.k.a. RAP).  This helps with speculation protection across the
+VM boundary, and it also preserves host and guest entries in the RSB that
+can improve software performance (which would otherwise be flushed due to
+the FILL_RETURN_BUFFER sequences).
+
+Importantly, ERAPS also improves cross-domain security by clearing the RAP
+in certain situations.  Specifically, the RAP is cleared in response to
+actions that are typically tied to software context switching between
+tasks.  Per the APM:
+
+  The ERAPS feature eliminates the need to execute CALL instructions to
+  clear the return address predictor in most cases. On processors that
+  support ERAPS, return addresses from CALL instructions executed in host
+  mode are not used in guest mode, and vice versa. Additionally, the
+  return address predictor is cleared in all cases when the TLB is
+  implicitly invalidated and in the following cases:
+
+  =E2=80=A2 MOV CR3 instruction
+  =E2=80=A2 INVPCID other than single address invalidation (operation type =
+0)
+
+ERAPS also allows CPUs to extends the size of the RSB/RAP from the older
+standard (of 32 entries) to a new size, enumerated in CPUID leaf
+0x80000021:EBX bits 23:16 (64 entries in Zen5 CPUs).
+
+In hardware, ERAPS is always-on, when running in host context, the CPU
+uses the full RSB/RAP size without any software changes necessary.
+However, when running in guest context, the CPU utilizes the full size of
+the RSB/RAP if and only if the new ALLOW_LARGER_RAP flag is set in the
+VMCB; if the flag is not set, the CPU limits itself to the historical size
+of 32 entires.
+
+Requiring software to opt-in for guest usage of RAPs larger than 32 entries
+allows hypervisors, i.e. KVM, to emulate the aforementioned conditions in
+which the RAP is cleared as well as the guest/host split.  E.g. if the CPU
+unconditionally used the full RAP for guests, failure to clear the RAP on
+transitions between L1 or L2, or on emulated guest TLB flushes, would
+expose the guest to RAP-based attacks as a guest without support for ERAPS
+wouldn't know that its FILL_RETURN_BUFFER sequence is insufficient.
+
+Address the ~two broad categories of ERAPS emulation, and advertise
+ERAPS support to userspace, along with the RAP size enumerated in CPUID.
+
+1. Architectural RAP clearing: as above, CPUs with ERAPS clear RAP entries
+   on several conditions, including CR3 updates.  To handle scenarios
+   where a relevant operation is handled in common code (emulation of
+   INVPCID and to a lesser extent MOV CR3), piggyback VCPU_EXREG_CR3 and
+   create an alias, VCPU_EXREG_ERAPS.  SVM doesn't utilize CR3 dirty
+   tracking, and so for all intents and purposes VCPU_EXREG_CR3 is unused.
+   Aliasing VCPU_EXREG_ERAPS ensures that any flow that writes CR3 will
+   also clear the guest's RAP, and allows common x86 to mark ERAPS vCPUs
+   as needing a RAP clear without having to add a new request (or other
+   mechanism).
+
+2. Nested guests: the ERAPS feature adds host/guest tagging to entries
+   in the RSB, but does not distinguish between the guest ASIDs.  To
+   prevent the case of an L2 guest poisoning the RSB to attack the L1
+   guest, the CPU exposes a new VMCB bit (CLEAR_RAP).  The next
+   VMRUN with a VMCB that has this bit set causes the CPU to flush the
+   RSB before entering the guest context.  Set the bit in VMCB01 after a
+   nested #VMEXIT to ensure the next time the L1 guest runs, its RSB
+   contents aren't polluted by the L2's contents.  Similarly, before
+   entry into a nested guest, set the bit for VMCB02, so that the L1
+   guest's RSB contents are not leaked/used in the L2 context.
+
+Enable ALLOW_LARGER_RAP (and emulate RAP clears) if and only if ERAPS is
+exposed to the guest.  Enabling ALLOW_LARGER_RAP unconditionally wouldn't
+cause any functional issues, but ignoring userspace's (and L1's) desires
+would put KVM into a grey area, which is especially undesirable due to the
+potential security implications.  E.g. if a use case wants to have L1 do
+manual RAP clearing even when ERAPS is present in hardware, enabling
+ALLOW_LARGER_RAP could result in L1 leaving stale entries in the RAP.
+
+ERAPS is documented in AMD APM Vol 2 (Pub 24593), in revisions 3.43 and
+later.
+
+Signed-off-by: Amit Shah <amit.shah@amd.com>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/cpufeatures.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  8 ++++++++
+ arch/x86/include/asm/svm.h         |  6 +++++-
+ arch/x86/kvm/cpuid.c               |  9 ++++++++-
+ arch/x86/kvm/svm/nested.c          | 18 ++++++++++++++++++
+ arch/x86/kvm/svm/svm.c             | 25 ++++++++++++++++++++++++-
+ arch/x86/kvm/svm/svm.h             |  1 +
+ arch/x86/kvm/x86.c                 | 12 ++++++++++++
+ 8 files changed, 77 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpuf=
+eatures.h
+index 646d2a77a2e2..31ab1e4e70f3 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -468,6 +468,7 @@
+ #define X86_FEATURE_GP_ON_USER_CPUID	(20*32+17) /* User CPUID faulting */
+=20
+ #define X86_FEATURE_PREFETCHI		(20*32+20) /* Prefetch Data/Instruction to =
+Cache Level */
++#define X86_FEATURE_ERAPS		(20*32+24) /* Enhanced Return Address Predictor=
+ Security */
+ #define X86_FEATURE_SBPB		(20*32+27) /* Selective Branch Prediction Barrie=
+r */
+ #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushes =
+all branch type predictions */
+ #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO */
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_hos=
+t.h
+index 5a3bfa293e8b..0353d8b6988c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -195,7 +195,15 @@ enum kvm_reg {
+=20
+ 	VCPU_EXREG_PDPTR =3D NR_VCPU_REGS,
+ 	VCPU_EXREG_CR0,
++	/*
++	 * Alias AMD's ERAPS (not a real register) to CR3 so that common code
++	 * can trigger emulation of the RAP (Return Address Predictor) with
++	 * minimal support required in common code.  Piggyback CR3 as the RAP
++	 * is cleared on writes to CR3, i.e. marking CR3 dirty will naturally
++	 * mark ERAPS dirty as well.
++	 */
+ 	VCPU_EXREG_CR3,
++	VCPU_EXREG_ERAPS =3D VCPU_EXREG_CR3,
+ 	VCPU_EXREG_CR4,
+ 	VCPU_EXREG_RFLAGS,
+ 	VCPU_EXREG_SEGMENTS,
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index e69b6d0dedcf..348957bda488 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -131,7 +131,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ 	u64 tsc_offset;
+ 	u32 asid;
+ 	u8 tlb_ctl;
+-	u8 reserved_2[3];
++	u8 erap_ctl;
++	u8 reserved_2[2];
+ 	u32 int_ctl;
+ 	u32 int_vector;
+ 	u32 int_state;
+@@ -182,6 +183,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define TLB_CONTROL_FLUSH_ASID 3
+ #define TLB_CONTROL_FLUSH_ASID_LOCAL 7
+=20
++#define ERAP_CONTROL_ALLOW_LARGER_RAP BIT(0)
++#define ERAP_CONTROL_CLEAR_RAP BIT(1)
++
+ #define V_TPR_MASK 0x0f
+=20
+ #define V_IRQ_SHIFT 8
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index d563a948318b..8bed1224635d 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -1216,6 +1216,7 @@ void kvm_set_cpu_caps(void)
+ 		/* PrefetchCtlMsr */
+ 		/* GpOnUserCpuid */
+ 		/* EPSF */
++		F(ERAPS),
+ 		SYNTHESIZED_F(SBPB),
+ 		SYNTHESIZED_F(IBPB_BRTYPE),
+ 		SYNTHESIZED_F(SRSO_NO),
+@@ -1796,8 +1797,14 @@ static inline int __do_cpuid_func(struct kvm_cpuid_a=
+rray *array, u32 function)
+ 		entry->eax =3D entry->ebx =3D entry->ecx =3D entry->edx =3D 0;
+ 		break;
+ 	case 0x80000021:
+-		entry->ebx =3D entry->edx =3D 0;
++		entry->edx =3D 0;
+ 		cpuid_entry_override(entry, CPUID_8000_0021_EAX);
++
++		if (kvm_cpu_cap_has(X86_FEATURE_ERAPS))
++			entry->ebx &=3D GENMASK(23, 16);
++		else
++			entry->ebx =3D 0;
++
+ 		cpuid_entry_override(entry, CPUID_8000_0021_ECX);
+ 		break;
+ 	/* AMD Extended Performance Monitoring and Debug */
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index c81005b24522..5dc6b8915809 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -417,6 +417,7 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcp=
+u *vcpu,
+ 	to->msrpm_base_pa       =3D from->msrpm_base_pa;
+ 	to->tsc_offset          =3D from->tsc_offset;
+ 	to->tlb_ctl             =3D from->tlb_ctl;
++	to->erap_ctl            =3D from->erap_ctl;
+ 	to->int_ctl             =3D from->int_ctl;
+ 	to->int_vector          =3D from->int_vector;
+ 	to->int_state           =3D from->int_state;
+@@ -866,6 +867,19 @@ static void nested_vmcb02_prepare_control(struct vcpu_=
+svm *svm,
+ 		}
+ 	}
+=20
++	/*
++	 * Take ALLOW_LARGER_RAP from vmcb12 even though it should be safe to
++	 * let L2 use a larger RAP since KVM will emulate the necessary clears,
++	 * as it's possible L1 deliberately wants to restrict L2 to the legacy
++	 * RAP size.  Unconditionally clear the RAP on nested VMRUN, as KVM is
++	 * responsible for emulating the host vs. guest tags (L1 is the "host",
++	 * L2 is the "guest").
++	 */
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_ERAPS))
++		vmcb02->control.erap_ctl =3D (svm->nested.ctl.erap_ctl &
++					    ERAP_CONTROL_ALLOW_LARGER_RAP) |
++					   ERAP_CONTROL_CLEAR_RAP;
++
+ 	/*
+ 	 * Merge guest and host intercepts - must be called with vcpu in
+ 	 * guest-mode to take effect.
+@@ -1161,6 +1175,9 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+=20
+ 	kvm_nested_vmexit_handle_ibrs(vcpu);
+=20
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_ERAPS))
++		vmcb01->control.erap_ctl |=3D ERAP_CONTROL_CLEAR_RAP;
++
+ 	svm_switch_vmcb(svm, &svm->vmcb01);
+=20
+ 	/*
+@@ -1667,6 +1684,7 @@ static void nested_copy_vmcb_cache_to_control(struct =
+vmcb_control_area *dst,
+ 	dst->tsc_offset           =3D from->tsc_offset;
+ 	dst->asid                 =3D from->asid;
+ 	dst->tlb_ctl              =3D from->tlb_ctl;
++	dst->erap_ctl             =3D from->erap_ctl;
+ 	dst->int_ctl              =3D from->int_ctl;
+ 	dst->int_vector           =3D from->int_vector;
+ 	dst->int_state            =3D from->int_state;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index f56c2d895011..4f1407b9d0a2 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1141,6 +1141,9 @@ static void init_vmcb(struct kvm_vcpu *vcpu, bool ini=
+t_event)
+ 		svm_clr_intercept(svm, INTERCEPT_PAUSE);
+ 	}
+=20
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_ERAPS))
++		svm->vmcb->control.erap_ctl |=3D ERAP_CONTROL_ALLOW_LARGER_RAP;
++
+ 	if (kvm_vcpu_apicv_active(vcpu))
+ 		avic_init_vmcb(svm, vmcb);
+=20
+@@ -3271,6 +3274,7 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
+ 	pr_err("%-20s%016llx\n", "tsc_offset:", control->tsc_offset);
+ 	pr_err("%-20s%d\n", "asid:", control->asid);
+ 	pr_err("%-20s%d\n", "tlb_ctl:", control->tlb_ctl);
++	pr_err("%-20s%d\n", "erap_ctl:", control->erap_ctl);
+ 	pr_err("%-20s%08x\n", "int_ctl:", control->int_ctl);
+ 	pr_err("%-20s%08x\n", "int_vector:", control->int_vector);
+ 	pr_err("%-20s%08x\n", "int_state:", control->int_state);
+@@ -3982,6 +3986,13 @@ static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu,=
+ gva_t gva)
+ 	invlpga(gva, svm->vmcb->control.asid);
+ }
+=20
++static void svm_flush_tlb_guest(struct kvm_vcpu *vcpu)
++{
++	kvm_register_mark_dirty(vcpu, VCPU_EXREG_ERAPS);
++
++	svm_flush_tlb_asid(vcpu);
++}
++
+ static inline void sync_cr8_to_lapic(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm =3D to_svm(vcpu);
+@@ -4240,6 +4251,10 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm=
+_vcpu *vcpu, u64 run_flags)
+ 	}
+ 	svm->vmcb->save.cr2 =3D vcpu->arch.cr2;
+=20
++	if (guest_cpu_cap_has(vcpu, X86_FEATURE_ERAPS) &&
++	    kvm_register_is_dirty(vcpu, VCPU_EXREG_ERAPS))
++		svm->vmcb->control.erap_ctl |=3D ERAP_CONTROL_CLEAR_RAP;
++
+ 	svm_hv_update_vp_id(svm->vmcb, vcpu);
+=20
+ 	/*
+@@ -4317,6 +4332,14 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm=
+_vcpu *vcpu, u64 run_flags)
+ 	}
+=20
+ 	svm->vmcb->control.tlb_ctl =3D TLB_CONTROL_DO_NOTHING;
++
++	/*
++	 * Unconditionally mask off the CLEAR_RAP bit, the AND is just as cheap
++	 * as the TEST+Jcc to avoid it.
++	 */
++	if (cpu_feature_enabled(X86_FEATURE_ERAPS))
++		svm->vmcb->control.erap_ctl &=3D ~ERAP_CONTROL_CLEAR_RAP;
++
+ 	vmcb_mark_all_clean(svm->vmcb);
+=20
+ 	/* if exit due to PF check for async PF */
+@@ -5071,7 +5094,7 @@ struct kvm_x86_ops svm_x86_ops __initdata =3D {
+ 	.flush_tlb_all =3D svm_flush_tlb_all,
+ 	.flush_tlb_current =3D svm_flush_tlb_current,
+ 	.flush_tlb_gva =3D svm_flush_tlb_gva,
+-	.flush_tlb_guest =3D svm_flush_tlb_asid,
++	.flush_tlb_guest =3D svm_flush_tlb_guest,
+=20
+ 	.vcpu_pre_run =3D svm_vcpu_pre_run,
+ 	.vcpu_run =3D svm_vcpu_run,
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 9e151dbdef25..96eab58830ce 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -156,6 +156,7 @@ struct vmcb_ctrl_area_cached {
+ 	u64 tsc_offset;
+ 	u32 asid;
+ 	u8 tlb_ctl;
++	u8 erap_ctl;
+ 	u32 int_ctl;
+ 	u32 int_vector;
+ 	u32 int_state;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0c6d899d53dd..98c177ebf2a2 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -14123,6 +14123,13 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsi=
+gned long type, gva_t gva)
+ 			return 1;
+ 		}
+=20
++		/*
++		 * When ERAPS is supported, invalidating a specific PCID clears
++		 * the RAP (Return Address Predicator).
++		 */
++		if (guest_cpu_cap_has(vcpu, X86_FEATURE_ERAPS))
++			kvm_register_is_dirty(vcpu, VCPU_EXREG_ERAPS);
++
+ 		kvm_invalidate_pcid(vcpu, operand.pcid);
+ 		return kvm_skip_emulated_instruction(vcpu);
+=20
+@@ -14136,6 +14143,11 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsi=
+gned long type, gva_t gva)
+=20
+ 		fallthrough;
+ 	case INVPCID_TYPE_ALL_INCL_GLOBAL:
++		/*
++		 * Don't bother marking VCPU_EXREG_ERAPS dirty, SVM will take
++		 * care of doing so when emulating the full guest TLB flush
++		 * (the RAP is cleared on all implicit TLB flushes).
++		 */
+ 		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
+ 		return kvm_skip_emulated_instruction(vcpu);
+=20
+
+base-commit: 0c3b67dddd1051015f5504389a551ecd260488a5
+--
 
