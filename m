@@ -1,179 +1,184 @@
-Return-Path: <kvm+bounces-63882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B084C75540
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:24:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE63C754BA
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:19:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 63DCB4E0F7A
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 16:15:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 442162C022
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 16:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A1D3624D6;
-	Thu, 20 Nov 2025 16:15:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A170363C44;
+	Thu, 20 Nov 2025 16:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="TuIfBSq9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MCG19c7v"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0C4362142
-	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 16:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF462357A25;
+	Thu, 20 Nov 2025 16:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763655339; cv=none; b=uADTH8LNnc0a8vjYxpJkGS2X9Zo2HrPm/e37kUT7+vmASdPCzs3c7VYYuAD5FxO96VEIygpzzAJbVnfoFfZASV+24u+iq6G7v3h0pTenznN/TsTD8nAIWOhINMk7l26FGRWnGxgZ/vMmysxxKA1+MerIKf6BdwqmaIV7hV6ipK4=
+	t=1763655520; cv=none; b=IDYYt/XveXVtJKcgNWAIzruUfdITSPlKYjj12ViuLKTZrcTMuSTk+xfK3dDOaOd3cWIY49Kmh4UuLvx2Br8ErRey56+1UcFXkwuD1P4Q2q/Qqqx42R3uCDdEpU14RCsAnvg2Yf7ftQ+j9CDDER9C+E+ElebQJ7lFdHyEiIpTER8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763655339; c=relaxed/simple;
-	bh=x+AJVK3obNH3Mt+i7P/+UHsHFumyeWfW7CNquNQYotM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tPop14icQQcafVBvk/jc1R4xToYOLrtstM/ijb7KKSxmIJPiCNoGXuCzNkZGlD8QcjsHxmFfyjF0je+LiKNDvRQVts5q0B+jMZY3jrle4jcpqcfzny5s/ArMOzAf6mvWH1zOMJFnwpFCC86IsGVuECtt4MQ6PdFo9+e92zgGHPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=TuIfBSq9; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-640b06fa959so1761349a12.3
-        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 08:15:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1763655335; x=1764260135; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pPNRYnbjkyS1ahsgMDJMNSyZvjLf47VuYi+Dp4Yl22g=;
-        b=TuIfBSq9TSzd1yL8riW+62z9MVyvOYe6deavbG3Y5e50Y9h77EU6AsUiq8AYIVyYdx
-         KIW1arlh9cUF9FrzeQF9bq7ejSyy0mRs4YrjdXyTQOXvzUmAl+Y+zJKEAIOj925yhHwG
-         8PJfI5ZrOUH8XH2mx1ZEuHVozRifOtKtQUEWPlPjFaW9rVh1b7JqF3JiD3iynsduBeYd
-         SU8l6JS366W9301q2mi6dQa0vk25kILt1FYAz+0mwZhHpkhbWl6HAhthDMG/3Fv8yMGo
-         0bCyU7KtAvOBIQ8DSxuCl6A+t61kUJHs57iz0435D/bvpuisZ2jjdcHHa6NlefuECtc5
-         kzoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763655335; x=1764260135;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pPNRYnbjkyS1ahsgMDJMNSyZvjLf47VuYi+Dp4Yl22g=;
-        b=YVUG431Cx0vl5edbOrV3up1AQQ66Ca51Mwgca4JdEYUkqNPE6jOoBpHJ14Yc4gXwV7
-         OY7Q1yNYQgQQxqO+7XRjxXUn2pCpfR+XDV5iwkcVsaDZR/XnTNojgFgVAK+A20BkDWL4
-         ILg3Q7leOEJMmgpCyq06+0UQWJNSPgv8ZgB+yKp5rd6GwpOeCL9MPQVV7LaqbF+K5FKf
-         onFterfdaljM9W0EjELu2zTIj6OYIHLB3mYweMZdwje9sEXxGxDjWTj/Cxdk9TnBOpwz
-         yQ4pWpo9swaLlhbgmUzlrPWltPf6shKfoBAwdYR6IbtAc6qPvhcyPvMpOI3vsbn8lojI
-         toUg==
-X-Forwarded-Encrypted: i=1; AJvYcCV2viYmYdQqWYhyF18Nh59zxKCpKTnEoL1sQoV3StFn5XJcveI+b39YxHHJsFmrKiv9nlo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrSbkJErfQLDhJqx4BHkGk8zrBGxi2FDmgGGTGgvLb/rR8kq4Q
-	8vn9IlUTxpJYz0+geoLe1K5OTcoNYmgKS9ia4SnaJaa3wO4UcOKvoiROErEV+Bj4PH4=
-X-Gm-Gg: ASbGnculN8HofDtjoa9/HNTSLqMpjS9A4RdPC2mqZL73276EoTWUSQN119JVNqVM8wd
-	c870SKlGEHLdLkMAj5YwRTpcNQCcTge138aFidO8wqRfQOJrG1ORufoGUnXmGF51agngVOmDdT6
-	ubXNg96it4sgqa8XCtFUo301v+CFU8XKJnh3AXSkbyN2Ojvnn2coIS/AwtvCB/q+inGypQFofsQ
-	AYxiq+t4YHJQjK4+4lAagXC1WmK/4+zgKZ8dl7leLmBcE6bnT9YfUW3Wj/epUkCC8GzKHQfvDq5
-	/V3eSPB5OoFTBNK/AkNbDf+Sd8Ko+T7tRGBuY+tNrzfp3cTRmd/U9Mv3LiiltNwVAR5awVn/rft
-	0k+8MTRkPwoV4u4P5K+qKZqx2GVpvK0dBM9IOhsAkviXvCxEJGZAECE+eRHHYPgIyrUX1zZ1sUg
-	R50I1QWhQYhNn+7ALCV+FOTWS8a5HCQ4oL0wKB
-X-Google-Smtp-Source: AGHT+IFqkV7lMvevUcTeEUpDBuop6rPRv6/J4m2A8RRXNaq9M3ifnhEsRgJ1y/Dnc2tEm7hAFb6Smg==
-X-Received: by 2002:a17:907:3e0c:b0:b71:df18:9fba with SMTP id a640c23a62f3a-b76587b1df5mr312696166b.15.1763655334530;
-        Thu, 20 Nov 2025 08:15:34 -0800 (PST)
-Received: from [192.168.0.20] (nborisov.ddns.nbis.net. [85.187.216.236])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654fd43a6sm231210666b.32.2025.11.20.08.15.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 08:15:34 -0800 (PST)
-Message-ID: <abe6849b-4bed-4ffc-ae48-7bda3ab0c996@suse.com>
-Date: Thu, 20 Nov 2025 18:15:32 +0200
+	s=arc-20240116; t=1763655520; c=relaxed/simple;
+	bh=KwZ0JhnSDCNZyZyVN2OkoVg0lxuvRbqfuZ3B6h7NGRg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=np0ChZucCjk5bW3x4mKajAwtKKFCmB2cMSAqCN5cyuAjn9aSUNtq/G+3/oNO2JomY6Qr/moA8XpODZZ3+bkl6nCJhamCSj5hBD8Yeotn8mETUrlo+3ZrHW3YpMPhqkg6rWDnPSCmGm5bXQM5/A/21WEV16XKNGMmCZnFpKtbIJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MCG19c7v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3344DC4CEF1;
+	Thu, 20 Nov 2025 16:18:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763655520;
+	bh=KwZ0JhnSDCNZyZyVN2OkoVg0lxuvRbqfuZ3B6h7NGRg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MCG19c7vrB14C6fJ+JhzzKXYDKpEsqcAEaaJONS7bVM706UHdAmzQmi6Cb3od5awI
+	 WRw4jQH663YReAPOCN1shTzYGWuEan0maY0zVHg6X/AOE2k2rsI+HfYDQPXjzSeRiF
+	 Fk/rAuUySTn8H38h+yJEmVTMzrTXBnsd87zsW6g9B3TH1wnn6ArRc/6IMorry3cgcE
+	 huPOZdYkq4T25oR8OUMHtrj2mYVkT4mkiajE72ylz7TjVCyaj0NIGpT8qytz4rbiVp
+	 yh/jzx84pAzuxwooUxaP6B8h3FuX8fzsJfj8SGgtCE8VkS5brlkFCuk/TjKVlsewCt
+	 X0FVYGbc88fzw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vM7Mj-00000006wt3-47F0;
+	Thu, 20 Nov 2025 16:18:38 +0000
+Date: Thu, 20 Nov 2025 16:18:37 +0000
+Message-ID: <864iqosmn6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Maximilian Dittgen <mdittgen@amazon.de>
+Cc: <oliver.upton@linux.dev>,
+	<pbonzini@redhat.com>,
+	<shuah@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<linux-kselftest@vger.kernel.org>,
+	<kvm@vger.kernel.org>,
+	<lilitj@amazon.de>,
+	<sauravsc@amazon.de>,
+	<nh-open-source@amazon.com>
+Subject: Re: [RFC PATCH 01/13] KVM: Introduce config option for per-vCPU vLPI enablement
+In-Reply-To: <20251120140305.63515-2-mdittgen@amazon.de>
+References: <20251120140305.63515-1-mdittgen@amazon.de>
+	<20251120140305.63515-2-mdittgen@amazon.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 01/11] x86/bhi: x86/vmscape: Move LFENCE out of
- clear_bhb_loop()
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
- David Kaplan <david.kaplan@amd.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Sean Christopherson
- <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>
-References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
- <20251119-vmscape-bhb-v4-1-1adad4e69ddc@linux.intel.com>
-From: Nikolay Borisov <nik.borisov@suse.com>
-Content-Language: en-US
-Autocrypt: addr=nik.borisov@suse.com; keydata=
- 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
-In-Reply-To: <20251119-vmscape-bhb-v4-1-1adad4e69ddc@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mdittgen@amazon.de, oliver.upton@linux.dev, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, lilitj@amazon.de, sauravsc@amazon.de, nh-open-source@amazon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Thu, 20 Nov 2025 14:02:50 +0000,
+Maximilian Dittgen <mdittgen@amazon.de> wrote:
+>=20
+> Add CONFIG_ARM_GIC_V3_PER_VCPU_VLPI to control whether vLPI direct
+> injection is to be enabled on a system-wide or a per-vCPU basis.
+>=20
+> When enabled, vPEs can be allocated/deallocated to vCPUs on an ad-hoc,
+> per-vCPU basis in runtime. When disabled, keep current vgic_v4_init
+> behavior of automatic vCPU vPE allocation upon VM initialization.
+>=20
+> We declare three ioctls numbers to manage per-vCPU vLPI enablement:
+> - KVM_ENABLE_VCPU_VLPI, which given a vCPU ID, allocates a vPE and
+> initializes the vCPU for receiving direct vLPI interrupts.
+> - KVM_DISABLE_VCPU_VLPI, which given a vCPU ID, disables the vCPU=E2=80=
+=99s
+> ability to receive direct vLPI interrupts and frees its underlying vPE
+> structure.
+> - KVM_QUERY_VCPU_VLPI, which given a vCPU ID, returns a boolean
+> describing whether the vCPU is configured to receive direct vLPI
+> interrupts.
+>=20
+> This commit declares the kconfig, ioctl numbers, and documentation.
+> Implementation will come throughout this patch set.
+>=20
+> Signed-off-by: Maximilian Dittgen <mdittgen@amazon.de>
+> ---
+>  Documentation/virt/kvm/api.rst | 56 ++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/arm.c           | 15 +++++++++
+>  arch/arm64/kvm/vgic/vgic-v4.c  |  9 ++++++
+>  arch/arm64/kvm/vgic/vgic.h     |  2 ++
+>  drivers/irqchip/Kconfig        | 13 ++++++++
+>  include/uapi/linux/kvm.h       |  6 ++++
+>  6 files changed, 101 insertions(+)
+>=20
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index 27f726ff8fe0..dcfb326dff10 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6517,6 +6517,62 @@ the capability to be present.
+> =20
+>  `flags` must currently be zero.
+> =20
+> +4.XXX KVM_ENABLE_VCPU_VLPI
+> +--------------------------
+> +
+> +:Capability: KVM_CAP_ARM_PER_VCPU_VLPI
+> +:Architectures: arm64
+> +:Type: vm ioctl
+> +:Parameters: int vcpu_id (in)
+> +:Returns: 0 on success, negative value on error
+> +
+> +This ioctl enables GICv4 direct vLPI injection for the specified vCPU.
+> +Allocates vPE structures (doorbell IRQ, vPE table entry, virtual pending
+> +table, vPEID) and upgrades existing software-forwarded LPIs targeting
+> +this vCPU to hardware-forwarded vLPIs.
+> +
+> +If GICv4.1 is supported and vSGIs are disabled on the specified vCPU,
+> +this ioctl enables vCPU vSGI support.
+> +
+> +Requires CONFIG_ARM_GIC_V3_PER_VCPU_VLPI and GICv4 hardware support.
+> +
+> +Returns -EINVAL if vGICv4 is not initialized or if the passed vcpu_id
+> +does not map to a vCPU.
+> +
+> +4.XXX KVM_DISABLE_VCPU_VLPI
+> +---------------------------
+> +
+> +:Capability: KVM_CAP_ARM_PER_VCPU_VLPI
+> +:Architectures: arm64
+> +:Type: vm ioctl
+> +:Parameters: int vcpu_id (in)
+> +:Returns: 0 on success, negative value on error
+> +
+> +This ioctl disables GICv4 direct vLPI injection for the specified vCPU.
+> +Downgrades hardware-forwarded vLPIs to software-forwarded LPIs and frees
+> +vPE structures. Pending interrupts in the virtual pending table may be
+> +lost.
 
+I'm going to put my foot down on that immediately.
 
-On 11/20/25 08:17, Pawan Gupta wrote:
-> Currently, BHB clearing sequence is followed by an LFENCE to prevent
-> transient execution of subsequent indirect branches prematurely. However,
-> LFENCE barrier could be unnecessary in certain cases. For example, when
-> kernel is using BHI_DIS_S mitigation, and BHB clearing is only needed for
-> userspace. In such cases, LFENCE is redundant because ring transitions
-> would provide the necessary serialization.
-> 
-> Below is a quick recap of BHI mitigation options:
-> 
->    On Alder Lake and newer
-> 
->    - BHI_DIS_S: Hardware control to mitigate BHI in ring0. This has low
->                 performance overhead.
->    - Long loop: Alternatively, longer version of BHB clearing sequence
-> 	       on older processors can be used to mitigate BHI. This
-> 	       is not yet implemented in Linux.
+There is no conceivable case where losing interrupts in acceptable.
+Ever. If that's what you want, please write your own hypervisor. I
+wish you luck!
 
-I find this description of the Long loop on "ALder lake and newer" 
-somewhat confusing, as you are also referring "older processors". 
-Shouldn't the longer sequence bet moved under "On older CPUs" heading? 
-Or perhaps it must be expanded to say that the long sequence could work 
-on Alder Lake and newer CPUs as well as on older cpus?
+> +
+> +If vSGIs are enabled on the specified vCPU, this ioctl disables them.
 
-> 
->    On older CPUs
-> 
->    - Short loop: Clears BHB at kernel entry and VMexit.
+So what? Something that didn't have an active state now has one that
+the guest doesn't know about? There is exactly *one* bit that defines
+that, and it doesn't exist in some quantum superposition.
 
-<snip>
+This whole thing is completely insane, has not been thought out at
+all, is ignoring the basis of the architecture, and I'm really sorry
+that you wasted your time on that.
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
 
