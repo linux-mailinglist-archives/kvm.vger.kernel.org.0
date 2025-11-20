@@ -1,89 +1,89 @@
-Return-Path: <kvm+bounces-63828-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63829-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ACADC7367E
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 11:13:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7774C7365D
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 11:12:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2B8554ECA38
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 10:10:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id A1BAC2F665
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 10:12:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0981930E82E;
-	Thu, 20 Nov 2025 10:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145C9313267;
+	Thu, 20 Nov 2025 10:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hMu2yIsU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LusjTbi6"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F32921FF28
-	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 10:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895AD272E45
+	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 10:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763633435; cv=none; b=UIgeWVPvx+YdlsEEMsR7lCDMN9dHawh1tPEtHxmCt8+PnmpbbIzb6y04EJwG3nj/f1a/SDQGk5AD7GVrnNubGgdsoWMKQWcYOK6zwZieeFx5HhqbzRmHNINcPNAR2dGrWFvBbYZKiErcbPC3CSUH2C6pCETmTJ6pp+GmDYdEFy4=
+	t=1763633515; cv=none; b=MCEaMFHondR6Fv2++zBKYEkiY1mtpTmSp4vCcF1+XS1ce2vIRVHovYKIrW6yT9ZLsCXcVG+SDaBG3rdqenFubAT3TXJzi1+c7zG98yI4DIvV6n1NzEPDf5wU3rVJDIbQUjml/FubBH46R9niu1reE/6dTgol9ysSz8p+mNWSv30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763633435; c=relaxed/simple;
-	bh=HeoDb+vlF915PRVllvP6sQ90CREKCg4bhArXpU7WssA=;
+	s=arc-20240116; t=1763633515; c=relaxed/simple;
+	bh=eUZYgOFXqsq/wpUZk85PZ8AHLCMX6xa08fvCRqbQMys=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=feesyrfveJY5BD8EXJDrO5USejgT2wr6CNID1YgiE1sc76g9NfRRbKnhkCBfe1UUKVxamhCuTxJEYTUvZOFb6M75Xaowq0OJYuxQmzHujH3ghgz9F+TFfdI+iKrZDWU+6Q37Ga1cQAqpktrxcaoCN7prVAV3JXg/4QAw6KSkcB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hMu2yIsU; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=Q1ReWhYLPlMR90QMxmxPjnyiE6WvCr/sPR93+BoUr7eH1x6f5I7bJjS57H2e+EJJq6MI58/8Q/WiyPRedK4WuOUMHwbjjp6fB3PrP4zGd7jfy5spLOyvQ+UUGBt4PgHORwuCfF9fhpQY5b+YeG3NwWkfaqo5rVeTvfj9WAjWyqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LusjTbi6; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763633432;
+	s=mimecast20190719; t=1763633512;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HeoDb+vlF915PRVllvP6sQ90CREKCg4bhArXpU7WssA=;
-	b=hMu2yIsUqdFfENqzpl+UZDV/K4XXos+QfFgtQnVkKcJxV4ABoyZvPvGpL4xAgQoFwjLwy9
-	8HBbuhvbUPFgIbLLN0RqjIPEEAPIk42f6m882AA2n3NwjUhyCFclaNb3VFswpEakiCHwhJ
-	sezuJ/obmhXGpwZN0C8u7koawztJ408=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=wiSt72GIoNCo+Zbs/Mg7U6K+qgO5xzGmnbJap4V+VSA=;
+	b=LusjTbi6Dqq3559Nxrt9wbhfdgegWI2g11UHsuNRAaW9z3ybSGuoEuSRNlp25Sn84ANfRd
+	c7FmDmOxw2T0DRUTYIPEv1Q5FFdsl2ADdbpXJASg6mfRPOsCd5KECxgvxRGjbxqYmxYRyT
+	vEnqr3ZN4P/NzyjzG14zmVtkyC5RFlk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-643-cMA8gCDJOnqDg5FSJJxFpQ-1; Thu, 20 Nov 2025 05:10:29 -0500
-X-MC-Unique: cMA8gCDJOnqDg5FSJJxFpQ-1
-X-Mimecast-MFC-AGG-ID: cMA8gCDJOnqDg5FSJJxFpQ_1763633428
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47106720618so6614515e9.1
-        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 02:10:29 -0800 (PST)
+ us-mta-187-twQ69RNiPzuUmfG8-W_y5A-1; Thu, 20 Nov 2025 05:11:50 -0500
+X-MC-Unique: twQ69RNiPzuUmfG8-W_y5A-1
+X-Mimecast-MFC-AGG-ID: twQ69RNiPzuUmfG8-W_y5A_1763633509
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4775e00b16fso4706735e9.2
+        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 02:11:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763633428; x=1764238228;
+        d=1e100.net; s=20230601; t=1763633509; x=1764238309;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HeoDb+vlF915PRVllvP6sQ90CREKCg4bhArXpU7WssA=;
-        b=cXzGn/sT7GeGJ0yvMzT9Ox3f2MMpmzRao4ElhnKiHv+4Y9KeXIq6pN13L4BRIGv2hj
-         Tk+DzCrUEuhiOQcDcXOBy8ePtyjvfd4Febox/Hy7PrteHZGCujd0Cm9T0DpCcamNRSCq
-         ZZNP23mGvUX6dt/vNMOh32GpTPSOxfaJd4y+yoRIPTGg8wkZ8eACq+iu1jl1OGKkUlJX
-         Es2YejQxoAP3WnTqRgeUWtrCA1Ute0F59Vec/PAGCZKK+yJeNLOaGSzfnWwyCH0pnRLC
-         qhZtUHiT87bTbthTnaDt0LYcnwdGkxuN5VSMbE1ASjZ3C7ZTd4EdvaymdzJDNj/8O4kJ
-         gg8g==
-X-Forwarded-Encrypted: i=1; AJvYcCU6YHkd2Zc7N3tAFBBnGj+ZMwLj10kgrFWd/2g0O7QxqnjcHc+GbIzedcNLzbGkptNSWm0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAFt/HUg/OhL4PUKOclmAXZJb8yuRzuP5biO2rtvb6q9gVrbSE
-	2BUAvdKVk41p6iTR1ZfWYzw1w4JjaRSHJj0vstQ3pr/CPG7nXOfl1AnLLOQCMOlBi9O6MbdGLZT
-	CJFXkDaqfRjzgrh1f8/OQvN7tNrj96gNCTUH3I0uY83PRgANTxoPqiOdeDz4wDA==
-X-Gm-Gg: ASbGncugvMVEJggKpihJuTVhw3BWxij/q1AguiWW34Ne2VGKypYPol1/l416lLA5HI0
-	/A7hLwftYM1I8wQ4PPN+wkY7pAsKLJMMUegz14B/4I4AOC8dbEnmVuc5XhgI8T8hrJzHVeRPL0g
-	VCp5b34kUv+SwOenyJag+ks/S7PliIYNZZPwr/F0ObSHsdR5nzfP/NUM6KKcyoUtcjxi6utoVYN
-	iYcMfeAY7IBTYqFGaFP/1j8aBLynQ9/+o2i2dejrwHWthZTzW/57PV3n4lA0FZH+wQRtgAB/FTB
-	Ay0kEcSQwBRRa2nN5NGxPgc1fCsj17TkYBKk9MA3Mn/HAJXh1lneZkdz/YBUoa/TBCzaqWY6BRK
-	iD/0YhnzGphsvvdsmgt9pQNV7JrwJ25tJsbZhpZ3RpJm+2qOEeKWx9B/wsg==
-X-Received: by 2002:a05:600c:1d26:b0:471:1717:411 with SMTP id 5b1f17b1804b1-477b9e2bcb6mr19350405e9.24.1763633428204;
-        Thu, 20 Nov 2025 02:10:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHn8i/nIi7fng7vNcKrFRWxYoraaRwDoQuaqyZbsNoVahq6dZkJgw5xsH9XpdRKx7HNqjDlIA==
-X-Received: by 2002:a05:600c:1d26:b0:471:1717:411 with SMTP id 5b1f17b1804b1-477b9e2bcb6mr19349995e9.24.1763633427742;
-        Thu, 20 Nov 2025 02:10:27 -0800 (PST)
+        bh=wiSt72GIoNCo+Zbs/Mg7U6K+qgO5xzGmnbJap4V+VSA=;
+        b=XQMO+TTR4P9P7deX5wdu89WGbt1txAK+mcmgfH1vlmbgnYyuAX7zJUcYacSeJQ+pWB
+         GEE5r8ZXoxhTiSuuvF9wgiYMMHpuzyDcka6SpDcQuKa+z0xAIth3g0m1fHpzDN2wrMYr
+         93pEwkTiiWLUqCZmO5GoL+XtVooGGTGNMLwPu6suiMdXJHjJj6DU7E6n1vuLmScWzlaN
+         VMvnIR0gxQaHkj7Jos35XESPZk0CMOoTY1jyzmYtFMqj87NBmjm0qhlMoDi3JLvM+XmB
+         9vr73wufAcggPrVmgbQdCZCMVCd81kgoaQ400pUI/HwSj+Yfa7Q7ICedImDN18MDB/3l
+         WFPA==
+X-Forwarded-Encrypted: i=1; AJvYcCVuOrPsbU65limU5tindrEbzEntnaqt1oUEtQsYIkNv6UvWjcoaOzHophBoFXsF0r2zqzk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaCVhEYMCHop8wPCAgMqAaQPr+5qXZexwg/ZcfbphcD+wBp2vZ
+	TvwaPze8L2SOHeHKCSK69vsYPh8nPt14gJ16qJ2lAYdxQp+4a49RBVOtlhoiTCtjtuob2mliW5h
+	/me6Nl4TQXloEnSt3+GEYpoXwhzkdD6sBmAhxeXO+HtU5FfxyjCvhGw==
+X-Gm-Gg: ASbGncvGmhrs0hlAFFpFTgZcVG8T7RrUQFN87hfjdqnRcQw78vY8hmhBzw+fd8fc/bX
+	+4qdXP8+ZeOiSjEwbTNSLZNq4+V1hT8i6IPP0G9bt0VLys7As9ghH8canEDk80uLzJtGzuTDjRt
+	mYmqBFsbyjK7gU/8kEg4Yrcq7PiNCqJGuqHEoyapGbtPgWz5cJvrMiki5WgxGngLpiobxLOSZTK
+	vyN+sqJw5/lcJis5yySYiRPmHJiDPAhn98dj3WFYRQVu44APe9wVIRwIl7eFEM9EHopH0hP9WTg
+	4pqwYnOarQRKYHWkgYo6j9UExMoeom7cbctThtygrU9M4RXeYnBztRUFER4V8GL3T0MobJRGs/d
+	mo/iVpV8FOhI3h0Gww4f17RX+xtUY89d/Ps7cdJs40BFls0sMUo1CQzuAKg==
+X-Received: by 2002:a05:600c:4f4c:b0:477:7479:f081 with SMTP id 5b1f17b1804b1-477b895aff7mr32256115e9.12.1763633508840;
+        Thu, 20 Nov 2025 02:11:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEyZsKxZ7eOZkXPyWcc4qYqZdgL9i/jMwKRrzVg9ugodScsHxJKDhP2GIBuvHdk1RA9oxypdg==
+X-Received: by 2002:a05:600c:4f4c:b0:477:7479:f081 with SMTP id 5b1f17b1804b1-477b895aff7mr32255505e9.12.1763633508319;
+        Thu, 20 Nov 2025 02:11:48 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a96a58c5sm64071555e9.0.2025.11.20.02.10.26
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b1025707sm95706595e9.6.2025.11.20.02.11.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 02:10:26 -0800 (PST)
-Message-ID: <a2d0ddf1-f00c-42dd-851d-53f2ec789986@redhat.com>
-Date: Thu, 20 Nov 2025 11:10:25 +0100
+        Thu, 20 Nov 2025 02:11:47 -0800 (PST)
+Message-ID: <a4e05081-df69-4183-a585-f4bb1d0a6256@redhat.com>
+Date: Thu, 20 Nov 2025 11:11:47 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -95,108 +95,166 @@ Reply-To: eric.auger@redhat.com
 Subject: Re: [PATCH v3 2/2] target/arm/kvm: add kvm-psci-version vcpu property
 Content-Language: en-US
 To: Sebastian Ott <sebott@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
 References: <20251112181357.38999-1-sebott@redhat.com>
  <20251112181357.38999-3-sebott@redhat.com>
- <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org>
- <c082340f-31b1-e690-8c29-c8d39edf8d35@redhat.com>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <c082340f-31b1-e690-8c29-c8d39edf8d35@redhat.com>
+In-Reply-To: <20251112181357.38999-3-sebott@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
+Hi Sebastian,
 
-
-On 11/13/25 1:05 PM, Sebastian Ott wrote:
-> Hi Philippe,
+On 11/12/25 7:13 PM, Sebastian Ott wrote:
+> Provide a kvm specific vcpu property to override the default
+> (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
+> by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
 >
-> On Wed, 12 Nov 2025, Philippe Mathieu-Daudé wrote:
->> On 12/11/25 19:13, Sebastian Ott wrote:
->>>  Provide a kvm specific vcpu property to override the default
->>>  (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
->>>  by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
->>>
->>>  Note: in order to support PSCI v0.1 we need to drop vcpu
->>>  initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
->>>
->>>  Signed-off-by: Sebastian Ott <sebott@redhat.com>
->>>  ---
->>>    docs/system/arm/cpu-features.rst |  5 +++
->>>    target/arm/cpu.h                 |  6 +++
->>>    target/arm/kvm.c                 | 64
->>> +++++++++++++++++++++++++++++++-
->>>    3 files changed, 74 insertions(+), 1 deletion(-)
->>
->>
->>>  diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->>>  index 0d57081e69..e91b1abfb8 100644
->>>  --- a/target/arm/kvm.c
->>>  +++ b/target/arm/kvm.c
->>>  @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool
->>>  value, Error **errp)
->>>        ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON :
->>>    ON_OFF_AUTO_OFF;
->>>    }
->>>
->>>  +struct psci_version {
->>>  +    uint32_t number;
->>>  +    const char *str;
->>>  +};
->>>  +
->>>  +static const struct psci_version psci_versions[] = {
->>>  +    { QEMU_PSCI_VERSION_0_1, "0.1" },
->>>  +    { QEMU_PSCI_VERSION_0_2, "0.2" },
->>>  +    { QEMU_PSCI_VERSION_1_0, "1.0" },
->>>  +    { QEMU_PSCI_VERSION_1_1, "1.1" },
->>>  +    { QEMU_PSCI_VERSION_1_2, "1.2" },
->>>  +    { QEMU_PSCI_VERSION_1_3, "1.3" },
->>>  +    { -1, NULL },
->>>  +};
->>
->>
->>>  @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
->>>                                 kvm_steal_time_set);
->>>        object_property_set_description(obj, "kvm-steal-time",
->>>                                        "Set off to disable KVM steal
->>>  time.");
->>>  +
->>>  +    object_property_add_str(obj, "kvm-psci-version",
->>>  kvm_get_psci_version,
->>>  +                            kvm_set_psci_version);
->>>  +    object_property_set_description(obj, "kvm-psci-version",
->>>  +                                    "Set PSCI version. "
->>>  +                                    "Valid values are 0.1, 0.2,
->>> 1.0, 1.1,
->>>  1.2, 1.3");
->>
->> Could we enumerate from psci_versions[] here?
->>
+> Note: in order to support PSCI v0.1 we need to drop vcpu
+> initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
 >
-> Hm, we'd need to concatenate these. Either manually:
-> "Valid values are " psci_versions[0].str ", " psci_versions[1].str ",
-> " ... which is not pretty and still needs to be touched for a new
-> version.
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> ---
+>  docs/system/arm/cpu-features.rst |  5 +++
+>  target/arm/cpu.h                 |  6 +++
+>  target/arm/kvm.c                 | 64 +++++++++++++++++++++++++++++++-
+>  3 files changed, 74 insertions(+), 1 deletion(-)
 >
-> Or by a helper function that puts these in a new array and uses smth like
-> g_strjoinv(", ", array);
-> But that's quite a bit of extra code that needs to be maintained without
-> much gain.
->
-> Or we shy away from the issue and rephrase that to:
-> "Valid values include 1.0, 1.1, 1.2, 1.3" 
-Personally I would vote for keeping it as is (by the way why did you
-moit 0.1 and 0.2 above?)
-
+> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+> index 37d5dfd15b..1d32ce0fee 100644
+> --- a/docs/system/arm/cpu-features.rst
+> +++ b/docs/system/arm/cpu-features.rst
+> @@ -204,6 +204,11 @@ the list of KVM VCPU features and their descriptions.
+>    the guest scheduler behavior and/or be exposed to the guest
+>    userspace.
+>  
+> +``kvm-psci-version``
+> +  Override the default (as of kernel v6.13 that would be PSCI v1.3)
+> +  PSCI version emulated by the kernel. Current valid values are:
+> +  0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+> +
+>  TCG VCPU Features
+>  =================
+>  
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 39f2b2e54d..c2032070b7 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -981,6 +981,12 @@ struct ArchCPU {
+>       */
+>      uint32_t psci_version;
+>  
+> +    /*
+> +     * Intermediate value used during property parsing.
+> +     * Once finalized, the value should be read from psci_version.
+> +     */
+> +    uint32_t prop_psci_version;
+nit: as it is a kvm only thingy, could could rename it with kvm_ prefix
+and move this along with the other kvm_* elements
+> +
+>      /* Current power state, access guarded by BQL */
+>      ARMPSCIState power_state;
+>  
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 0d57081e69..e91b1abfb8 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
+>      ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+>  }
+>  
+> +struct psci_version {
+> +    uint32_t number;
+> +    const char *str;
+> +};
+> +
+> +static const struct psci_version psci_versions[] = {
+> +    { QEMU_PSCI_VERSION_0_1, "0.1" },
+> +    { QEMU_PSCI_VERSION_0_2, "0.2" },
+> +    { QEMU_PSCI_VERSION_1_0, "1.0" },
+> +    { QEMU_PSCI_VERSION_1_1, "1.1" },
+> +    { QEMU_PSCI_VERSION_1_2, "1.2" },
+> +    { QEMU_PSCI_VERSION_1_3, "1.3" },
+> +    { -1, NULL },
+> +};
+> +
+> +static char *kvm_get_psci_version(Object *obj, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +    const struct psci_version *ver;
+> +
+> +    for (ver = psci_versions; ver->number != -1; ver++) {
+> +        if (ver->number == cpu->psci_version)
+> +            return g_strdup(ver->str);
+> +    }
+> +
+> +    return g_strdup_printf("Unknown PSCI-version: %x", cpu->psci_version);
+> +}
+> +
+> +static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +    const struct psci_version *ver;
+> +
+> +    for (ver = psci_versions; ver->number != -1; ver++) {
+> +        if (!strcmp(value, ver->str)) {
+> +            cpu->prop_psci_version = ver->number;
+> +            return;
+> +        }
+> +    }
+> +
+> +    error_setg(errp, "Invalid PSCI-version value");
+> +}
+> +
+>  /* KVM VCPU properties should be prefixed with "kvm-". */
+>  void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+>  {
+> @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+>                               kvm_steal_time_set);
+>      object_property_set_description(obj, "kvm-steal-time",
+>                                      "Set off to disable KVM steal time.");
+> +
+> +    object_property_add_str(obj, "kvm-psci-version", kvm_get_psci_version,
+> +                            kvm_set_psci_version);
+> +    object_property_set_description(obj, "kvm-psci-version",
+> +                                    "Set PSCI version. "
+> +                                    "Valid values are 0.1, 0.2, 1.0, 1.1, 1.2, 1.3");
+>  }
+>  
+>  bool kvm_arm_pmu_supported(void)
+> @@ -1959,7 +2008,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      if (cs->start_powered_off) {
+>          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
+>      }
+> -    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
+> +    if (cpu->prop_psci_version != QEMU_PSCI_VERSION_0_1 &&
+> +        kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
+> +        /*
+> +         * Versions >= v0.2 are backward compatible with v0.2
+> +         * omit the feature flag for v0.1 .
+> +         */
+>          cpu->psci_version = QEMU_PSCI_VERSION_0_2;
+>          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PSCI_0_2;
+>      }
+> @@ -1998,6 +2052,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          }
+>      }
+>  
+> +    if (cpu->prop_psci_version) {
+> +        psciver = cpu->prop_psci_version;
+> +        ret = kvm_set_one_reg(cs, KVM_REG_ARM_PSCI_VERSION, &psciver);
+> +        if (ret) {
+> +            error_report("PSCI version %"PRIx64" is not supported by KVM", psciver);
+> +            return ret;
+> +        }
+> +    }
+>      /*
+>       * KVM reports the exact PSCI version it is implementing via a
+>       * special sysreg. If it is present, use its contents to determine
+Besides it looks good to me.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Eric
->
-> Since the intended use case is via machine types and I don't expect a
-> lot of users setting the psci version manually - I vote for option 3.
->
-> Opinions?
->
-> Sebastian
 
 
