@@ -1,75 +1,75 @@
-Return-Path: <kvm+bounces-63832-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63833-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 043E7C73A4B
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 12:11:05 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C942FC73AAC
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 12:18:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4F75035D58A
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 11:07:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7ADB74E65B4
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 11:16:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581EA32FA24;
-	Thu, 20 Nov 2025 11:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE9B2FF155;
+	Thu, 20 Nov 2025 11:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Sv3JTd4k"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="J7XsMEsX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02132311C19;
-	Thu, 20 Nov 2025 11:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80B32D192B;
+	Thu, 20 Nov 2025 11:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763636853; cv=none; b=r9IItCctOs8MTf6pcnaCuiFqsV0iTbifY+IUF/NH3l0Ods2gZFeqthanUI7xthEVsf2HNP10DwxEROL+qoA7mgGYpWmNpQ1QyatywcUowOIONj25uZfKSdac8U2BmPua+7S7Q8ctU/BL+R4hsB1bKrOJhSvU3HjlSXUrgh+Xywg=
+	t=1763637358; cv=none; b=A/ikzyBlv1zMUGUKvln18EfGCi3HJzWbgRfm0OLU8ZPcgLeR3rg0AhtY0dG0ZrcHDVYYfE5X2hmcFvhgzs4rjNkqcb0uMDLnp957v33Gi+tnrPvjZms9Ax0kzt1BdgCdefwIEOgeqtbi4hRM557pdI3YqEj+bMljVHoeEFKXyi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763636853; c=relaxed/simple;
-	bh=C0XGW5Ef/UohOHVyLQy9AwkeAAJT5rIc4XgaxniGEsk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o0CJj5ODlLIxbj7ISdTn2ghy9g0ElZ2m9Fu5Wl54WAPFq5rstBk43wlirtvWFy5ahHO99NkFuunohQlFJmNv/UN3YhOhWyBmqNKZb8XC+MQ9E3Fs6fYjjQM3fZJrDEfH/k7DdqwEn89lhup/PgC/4n7tkCQhAYgvPGh9Ko1X6aI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Sv3JTd4k; arc=none smtp.client-ip=148.163.156.1
+	s=arc-20240116; t=1763637358; c=relaxed/simple;
+	bh=cBrk6VrawyPJTRZtMf2Lx1zOo2zBuyFOufvWxfQpV4I=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=l6QMMheXIyhduUANh7qTrMIy6c9rGuQBkHh88ZYLNS00/hDbyQLnt2eZx/PhsGBA8mkGVLvphhP2FhXWghd/TyweGMuFu7D8cZ/zoI/rWtyzB98ErQ3t7ReX1C3W3Ly+TkuKZU/v90W+Gkcv8pacmA1IvmKCQzxTcDtCkDIv4H0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=J7XsMEsX; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AJLkwjL027934;
-	Thu, 20 Nov 2025 11:07:28 GMT
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AJLkwV5012697;
+	Thu, 20 Nov 2025 11:15:44 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=1Djjoa
-	4NHNvv48wg8gxT2nZD15l4CXQoidrCy1FnmOY=; b=Sv3JTd4kVjXmIPLF7lSUFg
-	RFxZ1Qu7W0sfNa91F1NyyjjYYFIy5erj2DiV78TW9i2kk/1PHlQo3gyHLaZU+FCn
-	aostE/Q0sdZrq7Frm7YpdV3P/0oS97DFCEOaH1dmSv+Tv7N+OlB22Fq3Gh0KRFlT
-	D7Ohugj6OQzyrkE1xX3vozO3GSqpYmR2Wf/sIM9Ma0RiUdlWJU4wiLSoBOLCNCXa
-	6edTb9p3DGYK3YKQtYcmh1oy+5+SuURh42IzT5cU9t/ehfLFwPD9VpoR705zAdOh
-	iyuFvjFQmjvI0PNKWBQONolFWd6C/1YPiYXlNX9Dc+/H++lN6/Thrmo28dRvrDGg
+	:message-id:mime-version:references:subject:to; s=pp1; bh=ZtUan9
+	ok1Mu9O/T9A5t2MCMl0ocW9dsom4AVjzTmv60=; b=J7XsMEsX+LWiU2p7PVq2eM
+	DMNBCPgt+vDrW8OPvFjh85lg/Z9K8vALuvRKQTucVUv6ahh8b+Kcs2+Spz/4SLoU
+	7d6MRBSL4SfmNrJFLUUCcemzYXG+s99rwigHBBjXcmLBPq8Q6QyNbZ/zjmCpZMEW
+	TT6b9QCeGax2y7I/onxFMbzEEfcmkheqNVBAkSlmUlpDBjRGNgOdiKLSVZ08EWXe
+	eWel1R08nV8czBfYGcxszN/9Rb70EtpFugcxjtne8eTbEcSkbegELTGy3ijpy0hM
+	5vYkhon/7BJcelcTDletz4UYdfmXE7Q0/UV0XHT7/MkEBbvtJ3n8IUXeFrb8lbIA
 	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejka5vft-1
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejgx4nd3-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Nov 2025 11:07:27 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AK9lwPR022347;
-	Thu, 20 Nov 2025 11:07:26 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4af4un60xw-1
+	Thu, 20 Nov 2025 11:15:43 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKA4TO7005137;
+	Thu, 20 Nov 2025 11:15:43 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4af5bke1q1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Nov 2025 11:07:26 +0000
+	Thu, 20 Nov 2025 11:15:42 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AKB7Ml226739390
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AKBFcLS46399924
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 20 Nov 2025 11:07:22 GMT
+	Thu, 20 Nov 2025 11:15:38 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6257C20040;
-	Thu, 20 Nov 2025 11:07:22 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 3CBC320043;
+	Thu, 20 Nov 2025 11:15:38 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4E63A2004D;
-	Thu, 20 Nov 2025 11:07:19 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 6264020040;
+	Thu, 20 Nov 2025 11:15:35 +0000 (GMT)
 Received: from [9.111.95.204] (unknown [9.111.95.204])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 20 Nov 2025 11:07:19 +0000 (GMT)
-Message-ID: <c9264abb-4bcc-498b-adf9-1167d519b254@linux.ibm.com>
-Date: Thu, 20 Nov 2025 12:07:18 +0100
+	Thu, 20 Nov 2025 11:15:35 +0000 (GMT)
+Message-ID: <058cd342-223c-4a3f-b647-cd119ca3d48a@linux.ibm.com>
+Date: Thu, 20 Nov 2025 12:15:34 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,7 +77,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 11/11] KVM: s390: Add VSIE shadow stat counters
+From: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH RFC v2 07/11] KVM: s390: Shadow VSIE SCA in guest-1
 To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
 Cc: linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
@@ -89,9 +90,8 @@ Cc: linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
         Sven Schnelle <svens@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
 References: <20251110-vsieie-v2-0-9e53a3618c8c@linux.ibm.com>
- <20251110-vsieie-v2-11-9e53a3618c8c@linux.ibm.com>
+ <20251110-vsieie-v2-7-9e53a3618c8c@linux.ibm.com>
 Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
  xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
  qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
@@ -134,127 +134,491 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20251110-vsieie-v2-11-9e53a3618c8c@linux.ibm.com>
+In-Reply-To: <20251110-vsieie-v2-7-9e53a3618c8c@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8HPocnc2zawBRspAVq0x4eAq0qXh7r7-
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfX2Al11zH1IMVs
- P93x2671UU9sT1uzHmATx+nf9nqbGc/BVIWtI34YMNsaJKc28idO+W18zzyC8eni50gK6x6M+9o
- Eo8guy+j8IUke1mdRz/h/thMJMUQADQ5+SfD5vqvbOyjTl/N4gsCiChxpRM5JiI961KhI8yjVAd
- IOY9y7G/sBf+lXwuFi7EGadiIR7j9plO6YZg5Y9EkEjOYLt73HqudueA5e7Jnm76O6Jb3RFhKuN
- 8gF1mfmBDj52m+Cz3ojSgrSEIP08yulsh9W+oKbktrwZTO1k1m4xSKaOZ7bU/tqxbvO7ww4+25X
- Syrxk9N9IBAC9Byl5Y+TDfSRf+li46G6T33Gwx0sPFQ03/ZmS+aJke/I15nh6thUNUpS7auj+4U
- Y4TSapYTP2g3jLWilAsk4YLQXgxV1A==
-X-Proofpoint-ORIG-GUID: 8HPocnc2zawBRspAVq0x4eAq0qXh7r7-
-X-Authority-Analysis: v=2.4 cv=XtL3+FF9 c=1 sm=1 tr=0 ts=691ef66f cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+X-Proofpoint-GUID: FV1_8SfQU2Ijf0ijD7ZRPrQ-rtBpkDas
+X-Authority-Analysis: v=2.4 cv=YqwChoYX c=1 sm=1 tr=0 ts=691ef85f cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
  a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=jG2FwyvNgr7Nj0ZJUgQA:9 a=QEXdDO2ut3YA:10
+ a=VnNF1IyMAAAA:8 a=G-ggXSbbhjAM1VX-Xf8A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: FV1_8SfQU2Ijf0ijD7ZRPrQ-rtBpkDas
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfX9UcqoNlY6lk/
+ J5eFz8IhYURbzL+38T3QPaZ4GTw64Bdq9T/WLv+Vv4Xq0Z92mSnIZjrgXWz2EdoXGy+I0fkLMCt
+ BqA2V2j78GhegitIi+IEuBFiXvQIt6BLQktBT7UDRtY1qO/brd0P7PnqUnBOmovd5dBmLKpHxhN
+ rMUxzJH5Ufr7SHndbFE0/M/JHLRhSOfYQnq23/pH9V+9PuLhgw/M+jSICpBppQ9Fbth/oZCw9v/
+ wz0fvxQXbWpClofRPAxGdINAwswgET0ivTE9+LGRWe3hWQisO/FOn0l6A4zXCPlOhJvuGtSCTqD
+ ICZ4uUQiID911YKVq1ZAf5C8ckFUXDHRq9zTB2Su8Xt6BM3QMTfdofOJajELbUckPJfBQAkdaUk
+ NgJfxpwDM8MbO5apEFfaQ1hGQCKp+w==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-20_03,2025-11-20_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
- adultscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511150032
+ priorityscore=1501 impostorscore=0 lowpriorityscore=0 malwarescore=0
+ clxscore=1015 adultscore=0 bulkscore=0 phishscore=0 spamscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2511150032
 
 On 11/10/25 18:16, Christoph Schlameuss wrote:
-> Add new stat counters to VSIE shadowing to be able to verify and monitor
-> the functionality.
+> Restructure kvm_s390_handle_vsie() to create a guest-1 shadow of the SCA
+> if guest-2 attempts to enter SIE with an SCA. If the SCA is used the
+> vsie_pages are stored in a new vsie_sca struct instead of the arch vsie
+> struct.
+
+I think there should be more focus on this.
+Having scbs tracked in two places is a huge change compared to how it 
+worked before.
+
 > 
-> * vsie_shadow_scb shows the number of allocated SIE control block
->    shadows. Should count upwards between 0 and the max number of cpus.
-> * vsie_shadow_sca shows the number of allocated system control area
->    shadows. Should count upwards between 0 and the max number of cpus.
-> * vsie_shadow_sca_create shows the number of newly allocated system
->    control area shadows.
-> * vsie_shadow_sca_reuse shows the number of reused system control area
->    shadows.
+> When the VSIE-Interpretation-Extension Facility is active (minimum z17)
+> the shadow SCA (ssca_block) will be created and shadows of all CPUs
+> defined in the configuration are created.
+> SCAOL/H in the VSIE control block are overwritten with references to the
+> shadow SCA.
+> 
+> The shadow SCA contains the addresses of the original guest-3 SCA as
+> well as the original VSIE control blocks. With these addresses the
+> machine can directly monitor the intervention bits within the original
+> SCA entries, enabling it to handle SENSE_RUNNING and EXTERNAL_CALL sigp
+> instructions without exiting VSIE.
+> 
+> The original SCA will be pinned in guest-2 memory and only be unpinned
+> before reuse. This means some pages might still be pinned even after the
+> guest 3 VM does no longer exist.
+> 
+> The ssca_blocks are also kept within a radix tree to reuse already
+> existing ssca_blocks efficiently. While the radix tree and array with
+> references to the ssca_blocks are held in the vsie_sca struct.
+> The use of vsie_scas is tracked using an ref_count.
 > 
 > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-> ---
->   arch/s390/include/asm/kvm_host.h | 4 ++++
->   arch/s390/kvm/kvm-s390.c         | 4 ++++
->   arch/s390/kvm/vsie.c             | 9 ++++++++-
->   3 files changed, 16 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index 191b23edf0ac7e9a3e1fd9cdc6fc4c9a9e6769f8..ef7bf2d357f8d289b5f163ec95976c5d270d1380 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -457,6 +457,10 @@ struct kvm_vm_stat {
->   	u64 gmap_shadow_r3_entry;
->   	u64 gmap_shadow_sg_entry;
->   	u64 gmap_shadow_pg_entry;
-> +	u64 vsie_shadow_scb;
-> +	u64 vsie_shadow_sca;
-> +	u64 vsie_shadow_sca_create;
-> +	u64 vsie_shadow_sca_reuse;
->   };
->   
->   struct kvm_arch_memory_slot {
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index e3fc53e33e90be7dab75f73ebd0b949c13d22939..d86bf2206c230ce25fd48610c8305326e260e590 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -79,6 +79,10 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
->   	STATS_DESC_COUNTER(VM, gmap_shadow_r3_entry),
->   	STATS_DESC_COUNTER(VM, gmap_shadow_sg_entry),
->   	STATS_DESC_COUNTER(VM, gmap_shadow_pg_entry),
-> +	STATS_DESC_COUNTER(VM, vsie_shadow_scb),
-> +	STATS_DESC_COUNTER(VM, vsie_shadow_sca),
-> +	STATS_DESC_COUNTER(VM, vsie_shadow_sca_create),
-> +	STATS_DESC_COUNTER(VM, vsie_shadow_sca_reuse),
->   };
->   
->   const struct kvm_stats_header kvm_vm_stats_header = {
-> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-> index cd114df5e119bd289d14037d1f1c5bfe148cf5c7..f7c1a217173cefe93d0914623df08efa14270771 100644
-> --- a/arch/s390/kvm/vsie.c
-> +++ b/arch/s390/kvm/vsie.c
-> @@ -767,6 +767,8 @@ static int shadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
->   out:
->   	if (rc)
->   		unshadow_scb(vcpu, vsie_page);
-> +	else
-> +		vcpu->kvm->stat.vsie_shadow_scb++;
->   	return rc;
->   }
->   
-> @@ -843,8 +845,10 @@ static struct vsie_sca *get_existing_vsie_sca(struct kvm *kvm, hpa_t sca_o_gpa)
+
+I'd like to see more function header comments for the big functions.
+Also think about adding lockdep checks and descriptions about what the 
+lock protects.
+
+I've needed more time to understand this patch than I'd like to admit.
+
+[...]
+
+>   /*
+>    * Get or create a vsie page for a scb address.
+>    *
+> + * Original control blocks are pinned when the vsie_page pointing to them is
+> + * returned.
+> + * Newly created vsie_pages only have vsie_page->scb_gpa and vsie_page->sca_gpa
+> + * set.
+> + *
+>    * Returns: - address of a vsie page (cached or new one)
+>    *          - NULL if the same scb address is already used by another VCPU
+>    *          - ERR_PTR(-ENOMEM) if out of memory
+>    */
+> -static struct vsie_page *get_vsie_page(struct kvm *kvm, unsigned long addr)
+> +static struct vsie_page *get_vsie_page(struct kvm_vcpu *vcpu, unsigned long addr)
 >   {
->   	struct vsie_sca *sca = radix_tree_lookup(&kvm->arch.vsie.osca_to_sca, sca_o_gpa);
+> -	struct vsie_page *vsie_page;
+> -	int nr_vcpus;
+> +	struct vsie_page *vsie_page, *vsie_page_new;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	unsigned int max_vsie_page;
+> +	int rc, pages_idx;
+> +	gpa_t sca_addr;
 >   
-> -	if (sca)
-> +	if (sca) {
->   		WARN_ON_ONCE(atomic_inc_return(&sca->ref_count) < 1);
-> +		kvm->stat.vsie_shadow_sca_reuse++;
+> -	rcu_read_lock();
+>   	vsie_page = radix_tree_lookup(&kvm->arch.vsie.addr_to_page, addr >> 9);
+> -	rcu_read_unlock();
+> -	if (vsie_page) {
+> -		if (try_get_vsie_page(vsie_page)) {
+> -			if (vsie_page->scb_gpa == addr)
+> -				return vsie_page;
+> -			/*
+> -			 * We raced with someone reusing + putting this vsie
+> -			 * page before we grabbed it.
+> -			 */
+> -			put_vsie_page(vsie_page);
+> -		}
+> +	if (vsie_page && try_get_vsie_page(vsie_page)) {
+> +		if (vsie_page->scb_gpa == addr)
+> +			return vsie_page;
+> +		/*
+> +		 * We raced with someone reusing + putting this vsie
+> +		 * page before we grabbed it.
+> +		 */
+> +		put_vsie_page(vsie_page);
+>   	}
+>   
+> -	/*
+> -	 * We want at least #online_vcpus shadows, so every VCPU can execute
+> -	 * the VSIE in parallel.
+> -	 */
+> -	nr_vcpus = atomic_read(&kvm->online_vcpus);
+> +	max_vsie_page = MIN(atomic_read(&kvm->online_vcpus), KVM_S390_MAX_VSIE_VCPUS);
+> +
+> +	/* allocate new vsie_page - we will likely need it */
+> +	if (addr || kvm->arch.vsie.page_count < max_vsie_page) {
+
+Is addr ever NULL?
+
+> +		vsie_page_new = malloc_vsie_page(kvm);
+> +		if (IS_ERR(vsie_page_new))
+> +			return vsie_page_new;
 > +	}
->   	return sca;
+>   
+>   	mutex_lock(&kvm->arch.vsie.mutex);
+> -	if (kvm->arch.vsie.page_count < nr_vcpus) {
+> -		vsie_page = (void *)__get_free_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO | GFP_DMA);
+> -		if (!vsie_page) {
+> -			mutex_unlock(&kvm->arch.vsie.mutex);
+> -			return ERR_PTR(-ENOMEM);
+> -		}adows of all CPUs
+> defined in the configuration are created.
+> -		__set_bit(VSIE_PAGE_IN_USE, &vsie_page->flags);
+> -		kvm->arch.vsie.pages[kvm->arch.vsie.page_count] = vsie_page;
+> +	if (addr || kvm->arch.vsie.page_count < max_vsie_page) {
+> +		pages_idx = kvm->arch.vsie.page_count;
+> +		vsie_page = vsie_page_new;
+> +		vsie_page_new = NULL;
+> +		kvm->arch.vsie.pages[kvm->arch.vsie.page_count] = vsie_page_new;
+>   		kvm->arch.vsie.page_count++;
+>   	} else {
+>   		/* reuse an existing entry that belongs to nobody */
+> +		if (vsie_page_new)
+> +			free_vsie_page(vsie_page_new);
+>   		while (true) {
+>   			vsie_page = kvm->arch.vsie.pages[kvm->arch.vsie.next];
+> -			if (try_get_vsie_page(vsie_page))
+> +			if (try_get_vsie_page(vsie_page)) {
+> +				pages_idx = kvm->arch.vsie.next;
+>   				break;
+> +			}
+>   			kvm->arch.vsie.next++;
+> -			kvm->arch.vsie.next %= nr_vcpus;
+> +			kvm->arch.vsie.next %= max_vsie_page;
+>   		}
+> +
+> +		unpin_scb(kvm, vsie_page);
+>   		if (vsie_page->scb_gpa != ULONG_MAX)
+>   			radix_tree_delete(&kvm->arch.vsie.addr_to_page,
+>   					  vsie_page->scb_gpa >> 9);
+>   	}
+> -	/* Mark it as invalid until it resides in the tree. */
+> -	vsie_page->scb_gpa = ULONG_MAX;
+> +
+> +	vsie_page->scb_gpa = addr;
+> +	rc = pin_scb(vcpu, vsie_page);
+> +	if (rc) {
+> +		vsie_page->scb_gpa = ULONG_MAX;
+> +		free_vsie_page(vsie_page);
+
+free_vsie_page() is a wrapper for free_page(), writing to vsie_page 
+before freeing makes no sense.
+
+> +		mutex_unlock(&kvm->arch.vsie.mutex);
+> +		return ERR_PTR(-ENOMEM);
+> +	}
+> +	sca_addr = read_scao(kvm, vsie_page->scb_o);
+> +	vsie_page->sca_gpa = sca_addr;
+> +	__set_bit(VSIE_PAGE_IN_USE, &vsie_page->flags);
+>   
+>   	/* Double use of the same address or allocation failure. */
+>   	if (radix_tree_insert(&kvm->arch.vsie.addr_to_page, addr >> 9,
+>   			      vsie_page)) {
+> +		unpin_scb(kvm, vsie_page);
+>   		put_vsie_page(vsie_page);
+>   		mutex_unlock(&kvm->arch.vsie.mutex);
+>   		return NULL;
+>   	}
+> -	vsie_page->scb_gpa = addr;
+>   	mutex_unlock(&kvm->arch.vsie.mutex);
+>   
+> +	/*
+> +	 * If the vsie cb does use a sca we store the vsie_page within the
+> +	 * vsie_sca later. But we need to allocate an empty page to leave no
+> +	 * hole in the arch.vsie.pages.
+> +	 */
+> +	if (sca_addr) {
+> +		vsie_page_new = malloc_vsie_page(kvm);
+> +		if (IS_ERR(vsie_page_new)) {
+> +			unpin_scb(kvm, vsie_page);
+> +			put_vsie_page(vsie_page);
+> +			return vsie_page_new;
+> +		}
+> +		kvm->arch.vsie.pages[pages_idx] = vsie_page_new;
+> +		vsie_page_new = NULL;
+> +	}
+> +
+>   	memset(&vsie_page->scb_s, 0, sizeof(struct kvm_s390_sie_block));
+>   	release_gmap_shadow(vsie_page);
+>   	vsie_page->fault_addr = 0;
+> @@ -1529,11 +1855,124 @@ static struct vsie_page *get_vsie_page(struct kvm *kvm, unsigned long addr)
+>   	return vsie_page;
 >   }
 >   
-> @@ -958,6 +962,8 @@ static struct vsie_sca *get_vsie_sca(struct kvm_vcpu *vcpu, struct vsie_page *vs
->   		sca_new = NULL;
+> +static struct vsie_page *get_vsie_page_cpu_nr(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page,
+> +					      gpa_t scb_o_gpa, u16 cpu_nr)
+> +{
+> +	struct vsie_page *vsie_page_n;
+> +
+> +	vsie_page_n = get_vsie_page(vcpu, scb_o_gpa);
+> +	if (IS_ERR(vsie_page_n))
+> +		return vsie_page_n;
+> +	shadow_scb(vcpu, vsie_page_n);
+> +	vsie_page_n->scb_s.eca |= vsie_page->scb_o->eca & ECA_SIGPI;
+> +	vsie_page_n->scb_s.ecb |= vsie_page->scb_o->ecb & ECB_SRSI;
+> +	put_vsie_page(vsie_page_n);
+> +	WARN_ON_ONCE(!((u64)vsie_page_n->scb_gpa & PAGE_MASK));
+> +	WARN_ON_ONCE(!((u64)vsie_page_n & PAGE_MASK));
+> +
+> +	return vsie_page_n;
+> +}
+> +
+> +/*
+> + * Fill the shadow system control area used for vsie sigpif.
+> + */
+> +static int init_ssca(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page, struct vsie_sca *sca)
+> +{
+> +	hpa_t sca_o_entry_hpa, osca = sca->sca_o_pages[0].hpa;
+> +	bool is_esca = sie_uses_esca(vsie_page->scb_o);
+> +	unsigned int cpu_nr, cpu_slots;
+> +	struct vsie_page *vsie_page_n;
+> +	gpa_t scb_o_gpa;
+> +	int i;
+> +
+> +	/* copy mcn to detect updates */
+> +	if (is_esca)
+> +		for (i = 0; i < 4; i++)
+> +			sca->mcn[i] = ((struct esca_block *)phys_to_virt(osca))->mcn[i];
+> +	else
+> +		sca->mcn[0] = ((struct bsca_block *)phys_to_virt(osca))->mcn;
+> +
+> +	/* pin and make minimal shadow for ALL scb in the sca */
+> +	cpu_slots = is_esca ? KVM_S390_MAX_VSIE_VCPUS : KVM_S390_BSCA_CPU_SLOTS;
+> +	for_each_set_bit_inv(cpu_nr, (unsigned long *)&vsie_page->sca->mcn, cpu_slots) {
+> +		get_sca_entry_addr(vcpu->kvm, vsie_page, sca, cpu_nr, NULL, &sca_o_entry_hpa);
+> +		if (is_esca)
+> +			scb_o_gpa = ((struct esca_entry *)sca_o_entry_hpa)->sda;
+> +		else
+> +			scb_o_gpa = ((struct bsca_entry *)sca_o_entry_hpa)->sda;
+> +
+> +		if (vsie_page->scb_s.icpua == cpu_nr)
+> +			vsie_page_n = vsie_page;
+> +		else
+> +			vsie_page_n = get_vsie_page_cpu_nr(vcpu, vsie_page, scb_o_gpa, cpu_nr);
+> +		if (IS_ERR(vsie_page_n))
+> +			goto err;
+> +
+> +		if (!sca->pages[vsie_page_n->scb_o->icpua])
+> +			sca->pages[vsie_page_n->scb_o->icpua] = vsie_page_n;
+> +		WARN_ON_ONCE(sca->pages[vsie_page_n->scb_o->icpua] != vsie_page_n);
+> +		sca->ssca->cpu[cpu_nr].ssda = virt_to_phys(&vsie_page_n->scb_s);
+> +		sca->ssca->cpu[cpu_nr].ossea = sca_o_entry_hpa;
+> +	}
+> +
+> +	sca->ssca->osca = osca;
+> +	return 0;
+> +
+> +err:
+> +	for_each_set_bit_inv(cpu_nr, (unsigned long *)&vsie_page->sca->mcn, cpu_slots) {
+> +		sca->ssca->cpu[cpu_nr].ssda = 0;
+> +		sca->ssca->cpu[cpu_nr].ossea = 0;
+> +	}
+> +	return PTR_ERR(vsie_page_n);
+> +}
+> +
+> +/*
+> + * Shadow the sca on vsie enter.
+> + */
+> +static int shadow_sca(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page, struct vsie_sca *sca)
+> +{
+> +	struct kvm_s390_sie_block *scb_s = &vsie_page->scb_s;
+> +	int rc;
+> +
+> +	vsie_page->sca = sca;
+> +	if (!sca)
+> +		return false;
+> +
+> +	if (!sca->pages[vsie_page->scb_o->icpua])
+> +		sca->pages[vsie_page->scb_o->icpua] = vsie_page;
+> +	WARN_ON_ONCE(sca->pages[vsie_page->scb_o->icpua] != vsie_page);
+> +
+> +	if (!sca->ssca)
+> +		return false;
+> +	if (!use_vsie_sigpif_for(vcpu->kvm, vsie_page))
+> +		return false;
+> +
+> +	/* skip if the guest does not have an usable sca */
+> +	if (!sca->ssca->osca) {
+> +		rc = init_ssca(vcpu, vsie_page, sca);
+> +		if (rc)
+> +			return rc;
+> +	}
+> +
+> +	/*
+> +	 * only shadow sigpif if we actually have a sca that we can properly
+> +	 * shadow with vsie_sigpif
+> +	 */
+> +	scb_s->eca |= vsie_page->scb_o->eca & ECA_SIGPI;
+> +	scb_s->ecb |= vsie_page->scb_o->ecb & ECB_SRSI;
+> +
+> +	WRITE_ONCE(scb_s->osda, virt_to_phys(vsie_page->scb_o));
+> +	write_scao(scb_s, virt_to_phys(sca->ssca));
+> +
+> +	return false;
+> +}
+> +
+>   int kvm_s390_handle_vsie(struct kvm_vcpu *vcpu)
+>   {
+>   	struct vsie_page *vsie_page;
+> -	unsigned long scb_addr;
+> -	int rc;
+> +	struct vsie_sca *sca = NULL;
+> +	gpa_t scb_addr;
+> +	int rc = 0;
 >   
->   		kvm->arch.vsie.scas[kvm->arch.vsie.sca_count] = sca;
-> +		kvm->arch.vsie.sca_count++;
-
-Why are you touching a non-stat variable in this patch?
-
-
-> +		kvm->stat.vsie_shadow_sca++;
->   	} else {
->   		/* reuse previously created vsie_sca allocation for different osca */
->   		sca = get_free_existing_vsie_sca(kvm);
-> @@ -992,6 +998,7 @@ static struct vsie_sca *get_vsie_sca(struct kvm_vcpu *vcpu, struct vsie_page *vs
+>   	vcpu->stat.instruction_sie++;
+>   	if (!test_kvm_cpu_feat(vcpu->kvm, KVM_S390_VM_CPU_FEAT_SIEF2))
+> @@ -1554,31 +1993,45 @@ int kvm_s390_handle_vsie(struct kvm_vcpu *vcpu)
+>   		return 0;
+>   	}
 >   
->   	atomic_set(&sca->ref_count, 1);
->   	radix_tree_insert(&kvm->arch.vsie.osca_to_sca, sca->sca_gpa, sca);
-> +	kvm->stat.vsie_shadow_sca_create++;
+> -	vsie_page = get_vsie_page(vcpu->kvm, scb_addr);
+> +	/* get the vsie_page including the vsie control block */
+> +	vsie_page = get_vsie_page(vcpu, scb_addr);
+>   	if (IS_ERR(vsie_page))
+>   		return PTR_ERR(vsie_page);
+> -	else if (!vsie_page)
+> +	if (!vsie_page)
+>   		/* double use of sie control block - simply do nothing */
+>   		return 0;
 >   
->   out:
->   	up_write(&kvm->arch.vsie.ssca_lock);
+> -	rc = pin_scb(vcpu, vsie_page, scb_addr);
+> -	if (rc)
+> -		goto out_put;
+> +	/* get the vsie_sca including references to the original sca and all cbs */
+> +	if (vsie_page->sca_gpa) {
+> +		sca = get_vsie_sca(vcpu, vsie_page, vsie_page->sca_gpa);
+> +		if (IS_ERR(sca)) {
+> +			rc = PTR_ERR(sca);
+> +			goto out_put_vsie_page;
+> +		}
+> +	}
+> +
+> +	/* shadow scb and sca for vsie_run */
+>   	rc = shadow_scb(vcpu, vsie_page);
+>   	if (rc)
+> -		goto out_unpin_scb;
+> +		goto out_put_vsie_sca;
+> +	rc = shadow_sca(vcpu, vsie_page, sca);
+> +	if (rc)
+> +		goto out_unshadow_scb;
+> +
+>   	rc = pin_blocks(vcpu, vsie_page);
+>   	if (rc)
+> -		goto out_unshadow;
+> +		goto out_unshadow_scb;
+>   	register_shadow_scb(vcpu, vsie_page);
+> +
+>   	rc = vsie_run(vcpu, vsie_page);
+> +
+>   	unregister_shadow_scb(vcpu);
+>   	unpin_blocks(vcpu, vsie_page);
+> -out_unshadow:
+> +out_unshadow_scb:
+>   	unshadow_scb(vcpu, vsie_page);
+> -out_unpin_scb:
+> -	unpin_scb(vcpu, vsie_page, scb_addr);
+> -out_put:
+> +out_put_vsie_sca:
+> +	put_vsie_sca(sca);
+> +out_put_vsie_page:
+>   	put_vsie_page(vsie_page);
+>   
+>   	return rc < 0 ? rc : 0;
+> @@ -1589,27 +2042,58 @@ void kvm_s390_vsie_init(struct kvm *kvm)
+>   {
+>   	mutex_init(&kvm->arch.vsie.mutex);
+>   	INIT_RADIX_TREE(&kvm->arch.vsie.addr_to_page, GFP_KERNEL_ACCOUNT);
+> +	init_rwsem(&kvm->arch.vsie.ssca_lock);
+> +	INIT_RADIX_TREE(&kvm->arch.vsie.osca_to_sca, GFP_KERNEL_ACCOUNT);
+> +}
+> +
+> +static void kvm_s390_vsie_destroy_page(struct kvm *kvm, struct vsie_page *vsie_page)
+> +{
+> +	if (!vsie_page)
+> +		return;
+> +	unpin_scb(kvm, vsie_page);
+> +	release_gmap_shadow(vsie_page);
+> +	/* free the radix tree entry */
+> +	if (vsie_page->scb_gpa != ULONG_MAX)
+> +		radix_tree_delete(&kvm->arch.vsie.addr_to_page,
+> +				  vsie_page->scb_gpa >> 9);
+> +	free_vsie_page(vsie_page);
+>   }
+>   
+>   /* Destroy the vsie data structures. To be called when a vm is destroyed. */
+>   void kvm_s390_vsie_destroy(struct kvm *kvm)
+
+When we arrive at this function all vcpus have been destroyed already.
+All shadow gmaps have received a put as did the parent gmap.
+
+>   {
+>   	struct vsie_page *vsie_page;
+> -	int i;
+> +	struct vsie_sca *sca;
+> +	int i, j;
+>   
+>   	mutex_lock(&kvm->arch.vsie.mutex);
+
+struct kvm's refcount is 0 at this point, what are we protecting against?
+What am I missing?
+
+>   	for (i = 0; i < kvm->arch.vsie.page_count; i++) {
+>   		vsie_page = kvm->arch.vsie.pages[i];
+>   		kvm->arch.vsie.pages[i] = NULL;
+> -		release_gmap_shadow(vsie_page);
+> -		/* free the radix tree entry */
+> -		if (vsie_page->scb_gpa != ULONG_MAX)
+> -			radix_tree_delete(&kvm->arch.vsie.addr_to_page,
+> -					  vsie_page->scb_gpa >> 9);
+> -		free_page((unsigned long)vsie_page);
+> +		kvm_s390_vsie_destroy_page(kvm, vsie_page);
+>   	}
+> -	kvm->arch.vsie.page_count = 0;
+>   	mutex_unlock(&kvm->arch.vsie.mutex);
+> +	down_write(&kvm->arch.vsie.ssca_lock);
+> +	for (i = 0; i < kvm->arch.vsie.sca_count; i++) {
+> +		sca = kvm->arch.vsie.scas[i];
+> +		kvm->arch.vsie.scas[i] = NULL;
+> +
+> +		mutex_lock(&kvm->arch.vsie.mutex);
+> +		for (j = 0; j < KVM_S390_MAX_VSIE_VCPUS; j++) {
+> +			vsie_page = sca->pages[j];
+> +			sca->pages[j] = NULL;
+> +			kvm_s390_vsie_destroy_page(kvm, vsie_page);
+> +		}
+> +		sca->page_count = 0;
+> +		mutex_unlock(&kvm->arch.vsie.mutex);
+> +
+> +		unpin_sca(kvm, sca);
+> +		atomic_set(&sca->ref_count, 0);
+> +		radix_tree_delete(&kvm->arch.vsie.osca_to_sca, sca->sca_gpa);
+> +		free_pages_exact(sca, sizeof(*sca));
+> +	}
+> +	kvm->arch.vsie.sca_count = 0;
+> +	up_write(&kvm->arch.vsie.ssca_lock);
+
+Why do we need to set anything to 0 here?
+
+struct kvm and all struct vsie_page are either freed here or a couple 
+meters down the road.
+
+>   }
+>   
+>   void kvm_s390_vsie_kick(struct kvm_vcpu *vcpu)
 > 
+
+
+
 
