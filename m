@@ -1,243 +1,259 @@
-Return-Path: <kvm+bounces-63914-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63916-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95FD9C75A98
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 18:28:05 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB5C5C75B3F
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 18:34:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id BD5EB2C790
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:27:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BC4EF358900
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:28:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F633242C2;
-	Thu, 20 Nov 2025 17:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745F4346E5B;
+	Thu, 20 Nov 2025 17:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HZVTyq5c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WEdgoaUz"
 X-Original-To: kvm@vger.kernel.org
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012009.outbound.protection.outlook.com [52.101.53.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDAC3242C9;
-	Thu, 20 Nov 2025 17:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763659399; cv=fail; b=Q/zuuiZ+3UuCwvF2Hp6Ydkua4pcKWc5w7pn4SsvJP9Vs0gP41JEFcP1XJcSdylDkmtYD6+moADHmNcdeVBMEB27+SatlN0DZE1VMJ01YiZxcLwRXfGtY9Okm7B9IRZsaKwqvf4jW5YO3OZL1ndnv0JTThESSHO3hRP2loXAYSZQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763659399; c=relaxed/simple;
-	bh=+ZqFC3+8oYwTUAqqaUHWWxxhiicGXHgBaUCU8Y3yVl8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cNs63EoiqUtIPXH7yld+JAdtGgZ+8BfzP9WlaLm7akCQ842kL6bF0naDU8MTeB0G477s6JSI0OKabY1flRKM8DD8CRslprWsnNW/Ozgr8o6y29WwdNnJDmqb9U5BTxOeL9Tqb0mOR3/0z1/ApvSQTBcHfsmkGAyMMTUoceVQRiQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HZVTyq5c; arc=fail smtp.client-ip=52.101.53.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HIz7V006tlFCnmMJXPK8+R9hFHM6YB5OmtXL+yqVF0N006BdgrvuDLKHfI7zUID0H9SvPERSkp/NXAUZhxewWUmWeiZ3ubVMSQvvdQe1Tub2fkg3RbhFuhhLqglLgq4iqDls6inJrD0BPBiXh0En1qHUERZLG15kSL2cJLdaEjxdcC9cX89MeKRMHyOV6YShq5HgqSy/1opr6bnb47Zy/AIYEAyRGyYLNC3Sn6mjfTslxWgsVBAP4kTpjKULrEl8d/++cdW8ab5F1gSNvtgODT1FhvmjSVF9fpQmNYZ5CWxp79UjMgdTJZicPxEgA+W05zJiinpcZq1QhtcB1jMHtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+ZqFC3+8oYwTUAqqaUHWWxxhiicGXHgBaUCU8Y3yVl8=;
- b=u232i4CvhB27conyj66Oae9ckzekm6JyIs5MfAeQsv0pGoymUjmBYSmQ+fbK1aIh5ZI9DAPa7H9dlyQe5cXelwOY2mR97S9XgBLrscR0sqxWZJvH739KDoglDLIAzbQyWdoa65NWk/40yx4P7f/jwPMoAMBQPFhj6ZmAGvGbn0lwhHVCIxgej9YCj7GkNvufXCsq5zCwswCsmb7fPibUbBPcP1qOlLpzjnGDLjTGOxtauneFgYP+tDWLOsgp/kLzNDuiMc6grjcVpAzzezCIxkCTI4zdEBfEUn7Fhzl/8IoWKb9Yi26pjfwYJSPFAkEB240L2hvrRPCL9J3nSPXo2Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+ZqFC3+8oYwTUAqqaUHWWxxhiicGXHgBaUCU8Y3yVl8=;
- b=HZVTyq5cwWsX+FtsPZ8TKRZvuUrMpQZt2lRGm7VcQM9MsjkaeUDYDSvscbh1+jElSdo/bTcxwBt/GqC2VmdgFAznE014rYjg7thZJtjLiB9FP9MHvSieRaNVZ86+wu8w6AWg6BOt6gp9zrj1Psl2JZaczkvYXafXmh97qxDiG/UF5GozYNpMQFZJc9Vfp7q3SHQa/Xv2hD3WlAZJlghrw3SBn/rmFhkEWYEUVo45FdTB+C914zkmYSwR/qPwt17ap6e7zeBtBezRmh4TcYN2wWsEvOYhHG44Uo6xnb5YX4xIX9zRomDFLdp9YKU5J0ip4e3o+Z3ntIM0WdwnxWzxMg==
-Received: from SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21)
- by MN0PR12MB6126.namprd12.prod.outlook.com (2603:10b6:208:3c6::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.11; Thu, 20 Nov
- 2025 17:23:09 +0000
-Received: from SA1PR12MB7199.namprd12.prod.outlook.com
- ([fe80::928c:89d8:e8d6:72dd]) by SA1PR12MB7199.namprd12.prod.outlook.com
- ([fe80::928c:89d8:e8d6:72dd%6]) with mapi id 15.20.9343.009; Thu, 20 Nov 2025
- 17:23:09 +0000
-From: Ankit Agrawal <ankita@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>, Robin
- Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon
-	<will@kernel.org>, Marek Szyprowski <m.szyprowski@samsung.com>, Jason
- Gunthorpe <jgg@ziepe.ca>, Andrew Morton <akpm@linux-foundation.org>, Jonathan
- Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
-	=?iso-8859-1?Q?Christian_K=F6nig?= <christian.koenig@amd.com>, Kees Cook
-	<kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, Yishai
- Hadas <yishaih@nvidia.com>, Shameer Kolothum <skolothumtho@nvidia.com>, Kevin
- Tian <kevin.tian@intel.com>, Alex Williamson <alex@shazbot.org>
-CC: Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, "linux-mm@kvack.org"
-	<linux-mm@kvack.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-media@vger.kernel.org"
-	<linux-media@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
-	<dri-devel@lists.freedesktop.org>, "linaro-mm-sig@lists.linaro.org"
-	<linaro-mm-sig@lists.linaro.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-hardening@vger.kernel.org"
-	<linux-hardening@vger.kernel.org>, Alex Mastro <amastro@fb.com>, Nicolin Chen
-	<nicolinc@nvidia.com>, Vivek Kasireddy <vivek.kasireddy@intel.com>
-Subject: Re: [PATCH v9 00/11] vfio/pci: Allow MMIO regions to be exported
- through dma-buf
-Thread-Topic: [PATCH v9 00/11] vfio/pci: Allow MMIO regions to be exported
- through dma-buf
-Thread-Index: AQHcWgAWTN39XsG3l0G2qITcS04IR7T7uNNp
-Date: Thu, 20 Nov 2025 17:23:09 +0000
-Message-ID:
- <SA1PR12MB71997E0FE7E8CD84586FD7E6B0D4A@SA1PR12MB7199.namprd12.prod.outlook.com>
-References: <20251120-dmabuf-vfio-v9-0-d7f71607f371@nvidia.com>
-In-Reply-To: <20251120-dmabuf-vfio-v9-0-d7f71607f371@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|MN0PR12MB6126:EE_
-x-ms-office365-filtering-correlation-id: 88738be0-af42-418d-280b-08de28597a08
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700021|921020;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?wp1dBGiSZIbWH2sTAthna1qHPdq7H9MwXZgkwRyj7qFgFxngBrEjktp/fW?=
- =?iso-8859-1?Q?UOSPLuYF3FTuOb0pszaabpY3teKnosWeYr/1g74CLSg8uC7ifNa8zry88M?=
- =?iso-8859-1?Q?YvZHJ9X9ArU49ex47WTC+9SAT8ZwVEK25xDG7tdLLJWiuDwa7Da3UvEB40?=
- =?iso-8859-1?Q?S7jBhCkJi/DojY9HXFrux7MNRxvKkIQIeJ4/yQbAhafVqH/O6vP4A/pQpq?=
- =?iso-8859-1?Q?st6FuasiE4qLKyxkp5wGgVFto+HDauXBwLmwGXOTm4tfD2bB3WzD9hj5r4?=
- =?iso-8859-1?Q?pdWagM+08yfUG6yD1wuWCq9PrbBw0ua5zTROI5XtvfWN5Ytvpj9D28M1uG?=
- =?iso-8859-1?Q?MFeANUcUyJt5rbRJ3LyqiGWVwail2UjhuPa2I6odNwKshsYrhK9YNRyYHx?=
- =?iso-8859-1?Q?qYXHb7m85E8Qzi4seA+NXv+jxtHRuzCBiE2cakZngRQStvSDdTdB8hRKIN?=
- =?iso-8859-1?Q?PBhEDka6lc90EGXmDfH2EVsSMWG0U4pX9Hq5ezo9xrToEQFOkXwnKrSRGf?=
- =?iso-8859-1?Q?dZxlyKY55aQcH2+1TmrKdhfjoVguregGvjvFS67RXrsVUs1BfPcfi2w/st?=
- =?iso-8859-1?Q?QHIRNdICfelA21QL83xP+Yh2TJtCATzxkPMJTqM7GyyY4IIxuOZ+hy9M77?=
- =?iso-8859-1?Q?ZQbDd8sCXtiNIl2GmgsHwGuP3QpUrRktEOENgmglQ+cIEfoulvZJMM2a4P?=
- =?iso-8859-1?Q?UGXmKXDVxtqLabqgWOZhh+EM3G7NWLZj3ZIZrdNKwbrQeIjBue9S8/OooE?=
- =?iso-8859-1?Q?413ENrzdQENXPktnmllXAU2ITAJAxL8Zro0JfZCkUaN7V5f51pSV5XQ0ji?=
- =?iso-8859-1?Q?KjilLVh7t5MsVTtASoDhQWaz3SbkwT3kLsT/Fifqr3YlddvRhFLR6SVB88?=
- =?iso-8859-1?Q?vOIWzSJd18HVGLiNDyN/p7AMlOMaEDxVZQkvKdZ1Y2bpquoe2W4CSPfmnQ?=
- =?iso-8859-1?Q?TMN3JkxcyfGML4/fwdX5GYRbYmtphZHa4pAFkOav5TqKxJXKAR4/mktbKg?=
- =?iso-8859-1?Q?WD+RQGiMjbinDUAnz3Mb7MeiWHk684dTIp6oHNuE/J/hIlo8L2oedyPk6p?=
- =?iso-8859-1?Q?hoRkiUZLjaJwB8HKgjmwwSPmJLnL/ywhoHJQwDsAGqhIlK40piQ8f0+i3B?=
- =?iso-8859-1?Q?/isDvfVjtjthKrBlzcnB6o8BXxlzfqp1VF+PPgdzZLMYgTXAYsv7+7aUJ4?=
- =?iso-8859-1?Q?Y6adW1U4nJ+rwFRc+aLc3NihIzIDZ+7C7KQOAfIwQmJn3fQzXz7GK0E1rN?=
- =?iso-8859-1?Q?5FBwq5D4BGZgrqNlLjfAhDYp61PLgLCgVGfFufu1IxQSg3Imb4tGsZjpgJ?=
- =?iso-8859-1?Q?oju/VNVWo42RcBPk5KoxB3Y2taBq1Eg1WiZuZeEK8f7GNQrGoP87/1uYJk?=
- =?iso-8859-1?Q?tYns8XgCJQwpjTzSZwXdXGzWiuGshp2e/MgPZ0fO7/44ZBcTsjUEOQQBUj?=
- =?iso-8859-1?Q?cEk0rhj3guCKI91d3s5Bp0nLdatxbjw0kmVj/+ci51wKIu6BvO2ZhjMeo3?=
- =?iso-8859-1?Q?rL5iYk1fDrAUeRwctaINnWDOgmfH++w6dVLd3md5qNDwrMT18hd+VrvWdY?=
- =?iso-8859-1?Q?FPE+LDFQzHCR7zcBNFLCLbE2J259XCe6Dlqb760q3vjwyOio7w=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB7199.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700021)(921020);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?pdxBDfvEqC7gReBpiKJOX+sk1G575btf9xgxvE6rqbZloGAXUK8D/7uWoQ?=
- =?iso-8859-1?Q?HkwFd6dKo4/z17Ck71pkRSUasFj9iHiSChVoi19lUC/es7z538jOitinNq?=
- =?iso-8859-1?Q?SxYk+A4mW+uygNr0jFUacjSqPDoQR9RKCvedwEC0x/rkn1G7rJjq5HJnoz?=
- =?iso-8859-1?Q?CXDnRs3Vi9i2r6c/d5pUBfxKyN6MScXXBy9Omy+K2IpBxZ1CF691TNkAe2?=
- =?iso-8859-1?Q?L1NQJYby8zR/kdsnvDd9ym/tLVLL2dU5btkW1TxeW9vQTRC20gG7+t/1G8?=
- =?iso-8859-1?Q?yJGPivjsfLPGnEhVNH0fiMiYqi7+eKYG1BYX3PHoaUSybiaHLKCZNN9NSp?=
- =?iso-8859-1?Q?NtIyskTZBjr/L4xzCTkGBvRXOoy0DEPALBaGuDx0jd+6e8C8NiK4uDX4pk?=
- =?iso-8859-1?Q?3OfQ/on4P0ObPqIMGDJ+65+RU+gOj9tyokhi1OpRcbWsXAB5fUUnEatWpm?=
- =?iso-8859-1?Q?5SCjV37Xti0bjGjJoiPbrUqJDj5L3jQqHG5D2/lD9xrGJNEkq6Wc4gZEp+?=
- =?iso-8859-1?Q?ZMQypV/hGNVO8Yg8AalyVJngA4t/d4Qc6edPBgKIrwkH9W7fhYywr+gcve?=
- =?iso-8859-1?Q?9UjH5dIyZdfXBA8aggs2Q7Gy3vYN6L/wD/L87o7IxHZwBnJ2ic0hUf0Wcj?=
- =?iso-8859-1?Q?UveVMTUA4Ygo5ivBWYj8bkDkC1b5jE4Q8R+f7BDNMM74COGEMIPvslmc2P?=
- =?iso-8859-1?Q?AIFbEYJGderMrWcpldyxhrHd2sS0FTwYh6dFayfFEieVsbKF+N7gHzvCAG?=
- =?iso-8859-1?Q?2UQsRT6yFqYJSkz+OzJpO8xID6gYKgzTSOPuaGpxnjEX+DWxcpcZKMEy6R?=
- =?iso-8859-1?Q?w+jR6XDMQjMs7N73fVV3DqBOTAtxF1282UH9Rv321k8fH1d99pd/3HH9T2?=
- =?iso-8859-1?Q?JS6OQ7787EGclviYOTrwjaQPO68JoRjl+D9c/FpKHKtAsDJATASQ2jhByW?=
- =?iso-8859-1?Q?y8J8myc76qLVxrTHE1ncG7R6V1YXHn0iY85ygXFsAmAnXnoEG9Wcvs7vJM?=
- =?iso-8859-1?Q?g6lE2P77ZIv3ESztlrUYZcnncY2yWrzrDa6zP+Q1QHu/nHfzpnzwi5Bh93?=
- =?iso-8859-1?Q?UHyvzzyu6cH/eZs+RzdRufil7j6lOi/8uW3WaA4tG1xcivsp6VKKJv/guo?=
- =?iso-8859-1?Q?MAN8uAwDJx5XQiTYWejnxLUAfKSZLHy6VxU9OB3igkt/wClB2vd72PBNSn?=
- =?iso-8859-1?Q?9dkR4WSmNveAQrueOYbP9DhNuQtuMrhAjyntCwhstpUMOOWKK00gXMh/Zm?=
- =?iso-8859-1?Q?srchV2w6s1hTJ1z0o0NlvyyTbmrgKuqbhWQhCZPxc63EtW/A2atH/H8rSt?=
- =?iso-8859-1?Q?SEck9wfgUY0GisId16xta4YBh4qkg9TVYahkxsSNjtF4ZYI+O1ymMPi4fi?=
- =?iso-8859-1?Q?vSt3eS3cgYUqFsH+Ya8nBrQM6g62ZdK/u0PiN5U8jbVSYSmoaMgcaLXZUo?=
- =?iso-8859-1?Q?0hqcYQVpM07zT1U75h2wS9LrJ0kzHII+bNn77T4SMm9pbXh/eUDpLZE449?=
- =?iso-8859-1?Q?e4oXPo+pPBNIhO69A/6Yl+Oz/JMLP/BTvX2+RibRNrKLwmPd6BmIlIZbyQ?=
- =?iso-8859-1?Q?/QqBJ2cSsEoNu4tGGGOWRdERlWXDEZj8Xth3EchIaTzR48xIUCk8jLbdkD?=
- =?iso-8859-1?Q?/lrCt+vcxH3q8=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8673751BA;
+	Thu, 20 Nov 2025 17:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763659556; cv=none; b=UwqvXJo+/j5BoxrXyuz5agrLT04R9m6/U/Pz6o+bHtJIo+zKkKBV4TojwIPrmoXzecG3fw6P72PMF/hQZ0wQarZbb3Sp5KMcbFzznLtfaML27vtFtcc3AiDACms5dJDPIImdQ12HgAVCSX/uY51ZvFRcKtrFLDvBwI0smN1YP8Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763659556; c=relaxed/simple;
+	bh=MUlNQUsAces9/+6mURE7xgTA3MBnpvq24mdx5b5hI5c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BoSD+IEdd2Uw4qrsjFRcTks18z0phyfgoIMfcXQZTLXqrWLqT+NMgPD82QRUmiSj7PYNN09gi3F6wpgTLZhxpCehaECTNkcSmALmGCmw/U1SiHYhJ2V/Te3nB1Zq+QhCczoVtt10bkHaHzt1VvKNVoE+PwHLT8UzQtO4RQ9cQqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WEdgoaUz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB414C4CEF1;
+	Thu, 20 Nov 2025 17:25:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763659556;
+	bh=MUlNQUsAces9/+6mURE7xgTA3MBnpvq24mdx5b5hI5c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WEdgoaUzYqRn+JYmxwL9SECZoTH3q12geELzliG8M0WYm6z4DKDbhvf2pJ1znwS9Q
+	 2f3deooruStWSmakuPFssbUOnE6/0gZRe3cyTR3+T4wAFcjKpR4VOhnCFeDOZv4+NE
+	 BObK3TmYlIqXQpKKszX4v7H5Ifcy71c2OnJ4+jmycZvKqTOiplbJXLqHNNQbcEPzzc
+	 IBcleZRijqYe/VWgfLDTmLa3XuzTmypwf/O2H9sNj8EHWq2yMTKc8SRrXY6A+Fy7vR
+	 1hgmtAwJt/vW5rpr58gryuRx8yuI339wITrskzI3XoY2W9l4WwYipYZfr8hF4HNkmB
+	 EmUlR1LGg3sHg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vM8Pp-00000006y6g-38k4;
+	Thu, 20 Nov 2025 17:25:53 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH v4 00/49] KVM: arm64: Add LR overflow infrastructure (the final one, I swear!)
+Date: Thu, 20 Nov 2025 17:24:50 +0000
+Message-ID: <20251120172540.2267180-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB7199.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 88738be0-af42-418d-280b-08de28597a08
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Nov 2025 17:23:09.6878
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KC7D/VTeVrmvf6/f0WMVdoJULq3MysawiYlZxIvbVml3VZ7rbr5VCWe3ZVIDsOt01CZgA3sUzKBrwXOKvr1dWA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6126
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, tabba@google.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-> This series extends the VFIO PCI subsystem to support exporting MMIO=0A=
-> regions from PCI device BARs as dma-buf objects, enabling safe sharing of=
-=0A=
-> non-struct page memory with controlled lifetime management. This allows R=
-DMA=0A=
-> and other subsystems to import dma-buf FDs and build them into memory reg=
-ions=0A=
-> for PCI P2P operations.=0A=
->=0A=
-> The series supports a use case for SPDK where a NVMe device will be=0A=
-> owned by SPDK through VFIO but interacting with a RDMA device. The RDMA=
-=0A=
-> device may directly access the NVMe CMB or directly manipulate the NVMe=
-=0A=
-> device's doorbell using PCI P2P.=0A=
->=0A=
-> However, as a general mechanism, it can support many other scenarios with=
-=0A=
-> VFIO. This dmabuf approach can be usable by iommufd as well for generic=
-=0A=
-> and safe P2P mappings.=0A=
->=0A=
-> In addition to the SPDK use-case mentioned above, the capability added=0A=
-> in this patch series can also be useful when a buffer (located in device=
-=0A=
-> memory such as VRAM) needs to be shared between any two dGPU devices or=
-=0A=
-> instances (assuming one of them is bound to VFIO PCI) as long as they=0A=
-> are P2P DMA compatible.=0A=
->=0A=
-> The implementation provides a revocable attachment mechanism using dma-bu=
-f=0A=
-> move operations. MMIO regions are normally pinned as BARs don't change=0A=
-> physical addresses, but access is revoked when the VFIO device is closed=
-=0A=
-> or a PCI reset is issued. This ensures kernel self-defense against=0A=
-> potentially hostile userspace.=0A=
->=0A=
-> The series includes significant refactoring of the PCI P2PDMA subsystem=
-=0A=
-> to separate core P2P functionality from memory allocation features,=0A=
-> making it more modular and suitable for VFIO use cases that don't need=0A=
-> struct page support.=0A=
->=0A=
-> -----------------------------------------------------------------------=
-=0A=
-> The series is based originally on=0A=
-> https://lore.kernel.org/all/20250307052248.405803-1-vivek.kasireddy@intel=
-.com/=0A=
-> but heavily rewritten to be based on DMA physical API.=0A=
-> -----------------------------------------------------------------------=
-=0A=
-> The WIP branch can be found here:=0A=
-> https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?=
-h=3Ddmabuf-vfio-v9=0A=
-=0A=
-Acked-by: Ankit Agrawal <ankita@nvidia.com>=
+As $SUBJECT says, I really hope this is the last dance for this
+particular series -- I'm done with it! It was supposed to be a 5 patch
+job, and we're close to 50. Something went really wrong...
+
+Most of the fixes have now been squashed back into the base patches,
+and the only new patch is plugging the deactivation helper into the NV
+code, making it more correct.
+
+Special thanks to Fuad for going the extra mile and testing this
+series with pKVM.
+
+* From v3 [3]:
+
+  - Squashed most of the previous fixes in their original patch
+
+  - Plug the L1 LR handling into the deactivation helper
+
+* From v2 [2]:
+
+  - Fix no-vgic-v3. Again.
+
+  - Fix clearing of trap bits when running an EL1 host
+
+  - Fix the NV handling of the MI, forcing the synchronising of LRs
+    and VMCR early in order to deliver the MI as early as possible
+
+  - Clean some leftovers of previous rework
+
+  - Force a read-back of ICH_MISR_EL2 when disabling the vgic, making
+    NV2 suck a bit less
+
+  - Extra fixes made it out of the series:
+
+    - Fix pKVM's lack of handling of GICv3 traps, and remember the
+      VM's vgic type
+
+    - Don't explode on non-Apple, non-GICv3 VHE HW by checking
+      ICH_VTR_EL2 when there is none to check
+
+* From v1 [1]:
+
+  - Fixed the ICH_HCR_EL2.TDIR detection code to include the Apple
+    stuff, and to deal with GICv5's legacy mode
+
+  - Fixed compilation issue for old toolchains that don't understand
+    the GICv3 sysreg names
+
+  - Allow GICv3 in-LR deactivation even when DIR trapping is enabled
+
+  - Dropped the split overflow list, once I convinced myself it wasn't
+    bringing much to the table
+
+  - Turned kvm_vgic_vcpu_enable() into a vgic reset helper
+
+  - Remove IPI-ing on GICv3 systems without TDIR
+
+  - Fixed the out-of-LR deactivation when dealing with asymmetric SPI
+    deactivation
+
+  - Fixed broken MMIO offset computation
+
+  - Added group enable to the GIC selftest library
+
+  - Added fixes and improvements to the vgic_irq selftest:
+
+    - Fixed definition of spurious interrupt
+
+    - Fixed config/enable ordering
+
+    - Prevent timer interrupts from being injected from userspace
+
+    - Removed limit of 4 interrupts being injected at any given time
+
+    - Added an asymmetric SPI deactivation test case
+
+    - Added a Group-0 enable test case
+
+    - Added a timer interrupt + SPI interrupt test case
+
+  - Fixed a couple of spelling mistakes (and added many more, I'm sure)
+
+  - Reordered the series slightly
+
+[1] https://lore.kernel.org/r/20251103165517.2960148-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20251109171619.1507205-1-maz@kernel.org
+[3] https://lore.kernel.org/r/20251117091527.1119213-1-maz@kernel.org
+
+Marc Zyngier (49):
+  irqchip/gic: Add missing GICH_HCR control bits
+  irqchip/gic: Expose CPU interface VA to KVM
+  irqchip/apple-aic: Spit out ICH_MISR_EL2 value on spurious vGIC MI
+  KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
+  KVM: arm64: vgic-v3: Fix GICv3 trapping in protected mode
+  KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1
+    trapping
+  KVM: arm64: Repack struct vgic_irq fields
+  KVM: arm64: Add tracking of vgic_irq being present in a LR
+  KVM: arm64: Add LR overflow handling documentation
+  KVM: arm64: GICv3: Drop LPI active state when folding LRs
+  KVM: arm64: GICv3: Preserve EOIcount on exit
+  KVM: arm64: GICv3: Decouple ICH_HCR_EL2 programming from LRs
+  KVM: arm64: GICv3: Extract LR folding primitive
+  KVM: arm64: GICv3: Extract LR computing primitive
+  KVM: arm64: GICv2: Preserve EOIcount on exit
+  KVM: arm64: GICv2: Decouple GICH_HCR programming from LRs being loaded
+  KVM: arm64: GICv2: Extract LR folding primitive
+  KVM: arm64: GICv2: Extract LR computing primitive
+  KVM: arm64: Compute vgic state irrespective of the number of
+    interrupts
+  KVM: arm64: Eagerly save VMCR on exit
+  KVM: arm64: Revamp vgic maintenance interrupt configuration
+  KVM: arm64: Turn kvm_vgic_vcpu_enable() into kvm_vgic_vcpu_reset()
+  KVM: arm64: Make vgic_target_oracle() globally available
+  KVM: arm64: Invert ap_list sorting to push active interrupts out
+  KVM: arm64: Move undeliverable interrupts to the end of ap_list
+  KVM: arm64: Use MI to detect groups being enabled/disabled
+  KVM: arm64: GICv3: Handle LR overflow when EOImode==0
+  KVM: arm64: GICv3: Handle deactivation via ICV_DIR_EL1 traps
+  KVM: arm64: GICv3: Add GICv2 SGI handling to deactivation primitive
+  KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR
+    capacity
+  KVM: arm64: GICv3: Add SPI tracking to handle asymmetric deactivation
+  KVM: arm64: GICv3: Handle in-LR deactivation when possible
+  KVM: arm64: GICv3: Avoid broadcast kick on CPUs lacking TDIR
+  KVM: arm64: GICv3: nv: Resync LRs/VMCR/HCR early for better MI
+    emulation
+  KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive
+  KVM: arm64: GICv3: Force exit to sync ICH_HCR_EL2.En
+  KVM: arm64: GICv2: Handle LR overflow when EOImode==0
+  KVM: arm64: GICv2: Handle deactivation via GICV_DIR traps
+  KVM: arm64: GICv2: Always trap GICV_DIR register
+  KVM: arm64: selftests: gic_v3: Add irq group setting helper
+  KVM: arm64: selftests: gic_v3: Disable Group-0 interrupts by default
+  KVM: arm64: selftests: vgic_irq: Fix GUEST_ASSERT_IAR_EMPTY() helper
+  KVM: arm64: selftests: vgic_irq: Change configuration before enabling
+    interrupt
+  KVM: arm64: selftests: vgic_irq: Exclude timer-controlled interrupts
+  KVM: arm64: selftests: vgic_irq: Remove LR-bound limitation
+  KVM: arm64: selftests: vgic_irq: Perform EOImode==1 deactivation in
+    ack order
+  KVM: arm64: selftests: vgic_irq: Add asymmetric SPI deaectivation test
+  KVM: arm64: selftests: vgic_irq: Add Group-0 enable test
+  KVM: arm64: selftests: vgic_irq: Add timer deactivation test
+
+ arch/arm64/include/asm/kvm_asm.h              |   2 +-
+ arch/arm64/include/asm/kvm_host.h             |   1 +
+ arch/arm64/include/asm/kvm_hyp.h              |   3 +-
+ arch/arm64/include/asm/virt.h                 |   7 +-
+ arch/arm64/kernel/cpufeature.c                |  52 +++
+ arch/arm64/kernel/hyp-stub.S                  |   5 +
+ arch/arm64/kernel/image-vars.h                |   1 +
+ arch/arm64/kvm/arm.c                          |   7 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   7 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                |   3 +
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c            |   5 +
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c      |   4 +
+ arch/arm64/kvm/hyp/vgic-v3-sr.c               |  96 ++--
+ arch/arm64/kvm/sys_regs.c                     |  19 +-
+ arch/arm64/kvm/vgic/vgic-init.c               |   9 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v2.c            |  24 +
+ arch/arm64/kvm/vgic/vgic-mmio.h               |   1 +
+ arch/arm64/kvm/vgic/vgic-v2.c                 | 291 +++++++++---
+ arch/arm64/kvm/vgic/vgic-v3-nested.c          | 104 ++---
+ arch/arm64/kvm/vgic/vgic-v3.c                 | 426 ++++++++++++++----
+ arch/arm64/kvm/vgic/vgic-v4.c                 |   5 +-
+ arch/arm64/kvm/vgic/vgic.c                    | 298 +++++++-----
+ arch/arm64/kvm/vgic/vgic.h                    |  43 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ drivers/irqchip/irq-apple-aic.c               |   7 +-
+ drivers/irqchip/irq-gic.c                     |   3 +
+ include/kvm/arm_vgic.h                        |  29 +-
+ include/linux/irqchip/arm-gic.h               |   6 +
+ include/linux/irqchip/arm-vgic-info.h         |   2 +
+ tools/testing/selftests/kvm/arm64/vgic_irq.c  | 285 +++++++++++-
+ .../testing/selftests/kvm/include/arm64/gic.h |   1 +
+ tools/testing/selftests/kvm/lib/arm64/gic.c   |   6 +
+ .../selftests/kvm/lib/arm64/gic_private.h     |   1 +
+ .../testing/selftests/kvm/lib/arm64/gic_v3.c  |  17 +
+ 34 files changed, 1352 insertions(+), 419 deletions(-)
+
+-- 
+2.47.3
+
 
