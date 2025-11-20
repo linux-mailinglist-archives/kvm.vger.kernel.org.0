@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-63774-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63775-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78590C7250F
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 07:19:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0728AC7253F
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 07:23:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id D455D2F50A
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 06:18:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 37C1D4E75BB
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 06:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4F22E54D6;
-	Thu, 20 Nov 2025 06:18:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9662F12CD;
+	Thu, 20 Nov 2025 06:18:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d/qI+mR/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F5FEP72l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523E5255F52;
-	Thu, 20 Nov 2025 06:18:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A36D0245008;
+	Thu, 20 Nov 2025 06:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763619517; cv=none; b=fInFDcv5jUtMTMEHQ5HQKTuaizSDilWTtI+e6FnNIf0KYFpY3DzZmqXo4R8IREX4Y2gPmKmXp0GEXuHqncoOClyJSRMgr9e3yfs3YWYrlH8RnxtCh6JPfYMSwycxe1y2q/vNS7fmi3D6P3ENK99+cIo1Lf8xPKNHtOEYyzi9E7E=
+	t=1763619532; cv=none; b=THoD3sU1Ph/5jU04o3vsR+NUqOF+vBIpxfVsSA0osRLhJLuKDYLEHlAf9sIau/gJkl1SvxDwQ0q5gQB84Pt2yOU/9QErgd6bh0GJ9InCwOgDQMkq6zIuUsV4699qlWQq6XWBnRytsylx1Og2IlpOrqzDjOu593YZX/nUgaCApPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763619517; c=relaxed/simple;
-	bh=A078uDWWBxMpCRyZUtp0NO+vlPMBgGrOzAyzm3kgiPQ=;
+	s=arc-20240116; t=1763619532; c=relaxed/simple;
+	bh=2kDP/h5XKk2d311MudSRurGHQf2qIocU+MeMeTbQRcE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X3TYgL6ZewebjwVfdCg5BLiSl2wljihrGosolPCEWwKEtGL6N1JIee/I2RXThEROsmc6Lay9aj9RPFMIVbzS2WLettUef0xg26DClMv3Yx3PvKUR9oRSsDnszuDHKvDMqU8qfDZVGmCVU7MFpoyOCw71yBs3hK1o9QO8uARDEEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d/qI+mR/; arc=none smtp.client-ip=198.175.65.11
+	 Content-Type:Content-Disposition:In-Reply-To; b=KT3MCCu6vhp5kocpU3kqHMClx3MuMhePH9oyJbGhTTHeeereyfivyvBRRixoKFdEepaSXSvi0HkOsM7krFpa36aZuykfsM/yElVNDB1GWh57YuLyU8RmujAGZddCc21n27zW6m+6MIaTzUIN8JZe2sDTUxI9EUYYIRObnKCLlPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F5FEP72l; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763619515; x=1795155515;
+  t=1763619530; x=1795155530;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=A078uDWWBxMpCRyZUtp0NO+vlPMBgGrOzAyzm3kgiPQ=;
-  b=d/qI+mR/xLYx/XoDIAIefeathDGYrMCYJMKl0s1Br1ZSuvD0cSwwW3Fd
-   sjNBlnK6y8U8ByzGd0SOhNWFG9gH168Cmr1Ycup7yfeiCBQ5jTaFefiW0
-   z9EN8knoN4YrLZKZp81SIR7h2WEqSpS/hZhxBUlmg58jZEF6p0+5Hd7iG
-   KX3mG0c1b5Y2+vVtjjo91H+EnwhjW2G/UyAnsF+j6AOPvG5OGwMI6UbtE
-   mZZdMZLBevrUagYyzberUgRXyZTsqfJYgrzAPuvFsRDWQhvsXFB1XsUGk
-   LQUQtyWbOfyKS93ACaJEVDk6AZ7n7XBs5OoYHi9BFvv5r7S1Ro3OZNbe9
+  bh=2kDP/h5XKk2d311MudSRurGHQf2qIocU+MeMeTbQRcE=;
+  b=F5FEP72lQsEitc9gZ00uqwJmAd68vpkgxaTt0PWX8StNiQGgA8UdXaQT
+   C+GR9/mcm1HShtkPRCXv4Z5fAIUqHiNqrsFs77HZFLywzY35djVvcLvD2
+   +wvKJ5+sYx1aoVvgq7wz0tTSDm6zQV1P3BtiSY22wUdjgudih4UsG1mRI
+   FccPXkSLRBbzmtP8W+NVy+laYN4KpzFDKpx0GiVF9Uf6Xp6awm4e1NL0Y
+   D0EGcr8cPe5qT8dljmlp8WxzkuLWsSOLE/fTzgVAXgg8tvcGJi+YfwENa
+   oTmRkaGj1f6pLwrS9MMEzqA9GiRvq7abnURsPDRgE77jzOri71IC0WS69
    Q==;
-X-CSE-ConnectionGUID: WPTKKm7PR66tVFq2vfmTYg==
-X-CSE-MsgGUID: VaQ/Jxw/QBSIJCtEkfjcoQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="76005220"
+X-CSE-ConnectionGUID: mDZGSMuPQbuVtM7+y6I9dA==
+X-CSE-MsgGUID: tOSetZHBShG0NapbN8mL3g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="76354629"
 X-IronPort-AV: E=Sophos;i="6.19,317,1754982000"; 
-   d="scan'208";a="76005220"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 22:18:35 -0800
-X-CSE-ConnectionGUID: 4FP6WjdZTOGn59peiLV6NA==
-X-CSE-MsgGUID: m/UcgTrUTreYBTaJHo39hA==
+   d="scan'208";a="76354629"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 22:18:50 -0800
+X-CSE-ConnectionGUID: 9FbUK+DwTNOMexSW/bdARw==
+X-CSE-MsgGUID: 9B4PCwOaS0+sh3c938fvJA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,317,1754982000"; 
-   d="scan'208";a="221918826"
+   d="scan'208";a="191400585"
 Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 22:18:35 -0800
-Date: Wed, 19 Nov 2025 22:18:34 -0800
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 22:18:50 -0800
+Date: Wed, 19 Nov 2025 22:18:49 -0800
 From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 To: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
 	Nikolay Borisov <nik.borisov@suse.com>,
@@ -70,9 +70,9 @@ To: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Asit Mallick <asit.k.mallick@intel.com>,
 	Tao Zhang <tao1.zhang@intel.com>
-Subject: [PATCH v4 04/11] x86/bhi: Make clear_bhb_loop() effective on newer
- CPUs
-Message-ID: <20251119-vmscape-bhb-v4-4-1adad4e69ddc@linux.intel.com>
+Subject: [PATCH v4 05/11] x86/vmscape: Rename x86_ibpb_exit_to_user to
+ x86_predictor_flush_exit_to_user
+Message-ID: <20251119-vmscape-bhb-v4-5-1adad4e69ddc@linux.intel.com>
 X-Mailer: b4 0.14.2
 References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
 Precedence: bulk
@@ -85,57 +85,79 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
 
-As a mitigation for BHI, clear_bhb_loop() executes branches that overwrites
-the Branch History Buffer (BHB). On Alder Lake and newer parts this
-sequence is not sufficient because it doesn't clear enough entries. This
-was not an issue because these CPUs have a hardware control (BHI_DIS_S)
-that mitigates BHI in kernel.
+With the upcoming changes x86_ibpb_exit_to_user will also be used when BHB
+clearing sequence is used. Rename it cover both the cases.
 
-BHI variant of VMSCAPE requires isolating branch history between guests and
-userspace. Note that there is no equivalent hardware control for userspace.
-To effectively isolate branch history on newer CPUs, clear_bhb_loop()
-should execute sufficient number of branches to clear a larger BHB.
+No functional change.
 
-Dynamically set the loop count of clear_bhb_loop() such that it is
-effective on newer CPUs too. Use the hardware control enumeration
-X86_FEATURE_BHI_CTRL to select the appropriate loop count.
-
-Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
 Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 ---
- arch/x86/entry/entry_64.S | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ arch/x86/include/asm/entry-common.h  | 6 +++---
+ arch/x86/include/asm/nospec-branch.h | 2 +-
+ arch/x86/kernel/cpu/bugs.c           | 4 ++--
+ arch/x86/kvm/x86.c                   | 2 +-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-index a2891af416c874349c065160708752c41bc6ba36..6cddd7d6dc927704357d97346fcbb34559608888 100644
---- a/arch/x86/entry/entry_64.S
-+++ b/arch/x86/entry/entry_64.S
-@@ -1563,17 +1563,20 @@ SYM_CODE_END(rewind_stack_and_make_dead)
- .endm
+diff --git a/arch/x86/include/asm/entry-common.h b/arch/x86/include/asm/entry-common.h
+index ce3eb6d5fdf9f2dba59b7bad24afbfafc8c36918..c45858db16c92fc1364fb818185fba7657840991 100644
+--- a/arch/x86/include/asm/entry-common.h
++++ b/arch/x86/include/asm/entry-common.h
+@@ -94,11 +94,11 @@ static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
+ 	 */
+ 	choose_random_kstack_offset(rdtsc());
  
- /*
-- * This should be used on parts prior to Alder Lake. Newer parts should use the
-- * BHI_DIS_S hardware control instead. If a pre-Alder Lake part is being
-- * virtualized on newer hardware the VMM should protect against BHI attacks by
-- * setting BHI_DIS_S for the guests.
-+ * For protecting the kernel against BHI, this should be used on parts prior to
-+ * Alder Lake. Although the sequence works on newer parts, BHI_DIS_S hardware
-+ * control has lower overhead, and should be used instead. If a pre-Alder Lake
-+ * part is being virtualized on newer hardware the VMM should protect against
-+ * BHI attacks by setting BHI_DIS_S for the guests.
+-	/* Avoid unnecessary reads of 'x86_ibpb_exit_to_user' */
++	/* Avoid unnecessary reads of 'x86_predictor_flush_exit_to_user' */
+ 	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER) &&
+-	    this_cpu_read(x86_ibpb_exit_to_user)) {
++	    this_cpu_read(x86_predictor_flush_exit_to_user)) {
+ 		indirect_branch_prediction_barrier();
+-		this_cpu_write(x86_ibpb_exit_to_user, false);
++		this_cpu_write(x86_predictor_flush_exit_to_user, false);
+ 	}
+ }
+ #define arch_exit_to_user_mode_prepare arch_exit_to_user_mode_prepare
+diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+index ec5ebf96dbb9e240f402f39efc6929ae45ec8f0b..df60f9cf51b84e5b75e5db70713188d2e6ad0f5d 100644
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -531,7 +531,7 @@ void alternative_msr_write(unsigned int msr, u64 val, unsigned int feature)
+ 		: "memory");
+ }
+ 
+-DECLARE_PER_CPU(bool, x86_ibpb_exit_to_user);
++DECLARE_PER_CPU(bool, x86_predictor_flush_exit_to_user);
+ 
+ static inline void indirect_branch_prediction_barrier(void)
+ {
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index d7fa03bf51b4517c12cc68e7c441f7589a4983d1..1e9b11198db0fe2483bd17b1327bcfd44a2c1dbf 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -113,8 +113,8 @@ EXPORT_PER_CPU_SYMBOL_GPL(x86_spec_ctrl_current);
+  * be needed to before running userspace. That IBPB will flush the branch
+  * predictor content.
   */
- SYM_FUNC_START(clear_bhb_loop)
- 	ANNOTATE_NOENDBR
- 	push	%rbp
- 	mov	%rsp, %rbp
+-DEFINE_PER_CPU(bool, x86_ibpb_exit_to_user);
+-EXPORT_PER_CPU_SYMBOL_GPL(x86_ibpb_exit_to_user);
++DEFINE_PER_CPU(bool, x86_predictor_flush_exit_to_user);
++EXPORT_PER_CPU_SYMBOL_GPL(x86_predictor_flush_exit_to_user);
  
--	CLEAR_BHB_LOOP_SEQ 5, 5
-+	/* loop count differs based on CPU-gen, see Intel's BHI guidance */
-+	ALTERNATIVE __stringify(CLEAR_BHB_LOOP_SEQ 5, 5),  \
-+		    __stringify(CLEAR_BHB_LOOP_SEQ 12, 7), X86_FEATURE_BHI_CTRL
+ u64 x86_pred_cmd __ro_after_init = PRED_CMD_IBPB;
  
- 	pop	%rbp
- 	RET
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c9c2aa6f4705e1ae257bf94572967a5724a940a7..60123568fba85c8a445f9220d3f4a1d11fd0eb77 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11397,7 +11397,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	 * may migrate to.
+ 	 */
+ 	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
+-		this_cpu_write(x86_ibpb_exit_to_user, true);
++		this_cpu_write(x86_predictor_flush_exit_to_user, true);
+ 
+ 	/*
+ 	 * Consume any pending interrupts, including the possible source of
 
 -- 
 2.34.1
