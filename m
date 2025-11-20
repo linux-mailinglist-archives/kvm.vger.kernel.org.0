@@ -1,37 +1,37 @@
-Return-Path: <kvm+bounces-63873-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63876-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF612C75036
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 16:37:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F9CBC75051
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 16:38:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 97C6630D72
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 15:37:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id C219B30F9E
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 15:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCBE36CE01;
-	Thu, 20 Nov 2025 15:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C3B3A1CE8;
+	Thu, 20 Nov 2025 15:30:13 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE00036C0C3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0558D36C0A1;
 	Thu, 20 Nov 2025 15:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763652611; cv=none; b=uLhIqvypcGIqmW+clK49twDJSdFF4EwpeWHlcslSrEhoHXvKzy361T66Q9rv0YxjCM4QXHEanCQA+tV5dVc+4iNCQvmwVrPOC3EItaaNaNmOKPrFASZ1VYLFhWqUhQZZqQZUOnNcmJ9pm02lLewqjsJzBjSoIPYUIkpefVjQq5A=
+	t=1763652611; cv=none; b=EZJnZ86az7CsLpwp+Bcy0Ls8kimU/ScSCmeOTLkWiB64VDCseyWZnnlE1BdjXlixt1aJdVIToFjEDAvxYJEsV4O318SJiop/tnoq1XyFVtSsRWMBxFbMxnjiMvwMVDqW9vQZamMbNntO53CGTb5B/onxSRzngpP55cx+B3QnQ+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763652611; c=relaxed/simple;
-	bh=u3U6KrFTQ8+Hg5kExDKPXlrC5Dbte/HQZ5K3oWDnE4Q=;
+	bh=xqUVt6XIhPNbPKJPoJJFvfbDFblgtbEC1To91Na6jsU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EzNDb7OgQQLJL7B8IgTY/x2YU/2pGBOsmK6xloIOD6tSU9mVXaclvdvNCSTf3p1RBo00lyT4O0czLFMwfWWpLi72S0MftlxR2DNr28bJylHVUQRJeKKXVU1ZuNzGSnG0vz7odtFyG6fWCqDwRfF/Q45Yo+v0Dsx8WfFgye+sQWc=
+	 MIME-Version; b=g9HWSMlTpoCTzU+nP2axLjRvnAqFnm3krtT+6b/Mryco+rYfznxAn6V/bf+tD3EVhKT7PtyrCBdSHpBAXM3DNNPswyLUlBIvfRCfDaAYIlzITHfzMutHMqCHoMt35dRCpAaY0+6GPxTBW4cmAa46h50uBvy3ZyMM36yLhmBMpn4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; arc=none smtp.client-ip=129.217.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
 Received: from simon-Latitude-5450.cni.e-technik.tu-dortmund.de ([129.217.186.248])
 	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5AKFTu8K005406
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5AKFTu8M005406
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
 	Thu, 20 Nov 2025 16:29:58 +0100 (CET)
 From: Simon Schippers <simon.schippers@tu-dortmund.de>
@@ -42,9 +42,9 @@ To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
         simon.schippers@tu-dortmund.de, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux.dev
-Subject: [PATCH net-next v6 7/8] tun/tap & vhost-net: use {tun|tap}_ring_{consume|produce} to avoid tail drops
-Date: Thu, 20 Nov 2025 16:29:12 +0100
-Message-ID: <20251120152914.1127975-8-simon.schippers@tu-dortmund.de>
+Subject: [PATCH net-next v6 7/8] tun/tap/vhost: use {tun|tap}_ring_{consume|produce} to avoid tail drops
+Date: Thu, 20 Nov 2025 16:29:13 +0100
+Message-ID: <20251120152914.1127975-9-simon.schippers@tu-dortmund.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
 References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
@@ -60,11 +60,12 @@ Switch to {tun|tap}_ring_{consume|produce} in both tun/tap as well as
 vhost_net to avoid ptr_ring tail drops.
 
 For tun, disable dev->lltx to ensure that tun_net_xmit is not called even
-though the netdev queue is stopped. Consequently, the update of
-trans_start in tun_net_xmit is also removed.
+though the netdev queue is stopped (it can happen due to unconsume or
+queue resize). Consequently, the update of trans_start in tun_net_xmit is
+also removed.
 
-Instead of the rx_ring, the vhost-net virtqueue now stores the interface
-type IF_TAP or IF_TUN (or IF_NONE) to call tun/tap wrappers.
+Instead of the rx_ring, the virtqueue now saves the interface type
+IF_TAP, IF_TUN, (or IF_NONE) to call tun/tap wrappers.
 
 +--------------------------------+-----------+----------+
 | pktgen benchmarks to Debian VM | Stock     | Patched  |
