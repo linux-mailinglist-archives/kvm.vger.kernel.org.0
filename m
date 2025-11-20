@@ -1,230 +1,243 @@
-Return-Path: <kvm+bounces-63908-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CEA4C75AB0
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 18:29:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95FD9C75A98
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 18:28:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DF4DA353139
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:24:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id BD5EB2C790
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:27:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03844371A1D;
-	Thu, 20 Nov 2025 17:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F633242C2;
+	Thu, 20 Nov 2025 17:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FIhtWoLL"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HZVTyq5c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012009.outbound.protection.outlook.com [52.101.53.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A38371A22;
-	Thu, 20 Nov 2025 17:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763659007; cv=none; b=O3n9CW6/Gv21esJEfi+UUmX1c0K/OBwSi9FMEmn1Lw8GWc3IPLBq33Y5sTcR+DPj+bj5pEqh6HHyDCIIn8qGyAbQY/aGeOd+KHCAu5K4adz2j9xdYjfwKc0wizXfdMyEhZl6dYD9ulXCyP3uljGy3lpMBvlkHSfUsHyi66bbmxk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763659007; c=relaxed/simple;
-	bh=4CKFDj0hIhd8M0Kkg3C6sDxhR4ruHQPfY+uymnjUbIY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jr2drGRp69sD6rBYiGO2k/l/hQJBaOQ3G7AHSXeo7isLgpjVpTPpWjIj/q1yOZUrgExy+KmiDJv+p9mSbICMWNiforP8PjnR9F1PLwLTHeMhd8TbKaCHAkL8FTF2z+y8EtMnjP7r2W/UgAqbk536tFzTXai9ZVQA8DLrBlhTmj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FIhtWoLL; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKBbR4c027926;
-	Thu, 20 Nov 2025 17:16:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=JBtmXcIba2fi4czF9
-	3NATfwa4x8dAL704MEsd0327Tg=; b=FIhtWoLLQwSAibSqDmN8868HXM6pLjx/B
-	G1Y1w2nn3eENAh7k9tKU9ve2aoa3WAE5M92g/mcpfFbZIC38f0ZotnaJkSFRmFAe
-	3qWjy1n1HRA7LWfVwszzqoQh4cXwoDDpjQrX7lIowquNpjGbiTqGSWdMWLrjivf9
-	pwO0QJLbuALKqXeE0eu0G9GOlFdaiK2IzOfNHnBF615AJUREIgfXuVzLrGuT4wET
-	I5on+E0anbU45a3Shc/dt7XqMlDAzAksfjyWt5aVltetLUnE9vYX4sFY/7RG+cRL
-	R49M8SRcRPLANkOsM8o52x4pBUIAkDDMiyThGoAjEKSuxL+jg47TQ==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejka7n1w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Nov 2025 17:16:42 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKGqd2u010392;
-	Thu, 20 Nov 2025 17:16:36 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4af3usfsht-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Nov 2025 17:16:36 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AKHGXKa40239588
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 20 Nov 2025 17:16:33 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1C4CA2004B;
-	Thu, 20 Nov 2025 17:16:33 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 087E920040;
-	Thu, 20 Nov 2025 17:16:31 +0000 (GMT)
-Received: from p-imbrenda.ibmuc.com (unknown [9.111.12.33])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 20 Nov 2025 17:16:30 +0000 (GMT)
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, nsg@linux.ibm.com,
-        nrb@linux.ibm.com, seiden@linux.ibm.com, gra@linux.ibm.com,
-        schlameuss@linux.ibm.com, hca@linux.ibm.com, svens@linux.ibm.com,
-        agordeev@linux.ibm.com, gor@linux.ibm.com, david@redhat.com,
-        gerald.schaefer@linux.ibm.com
-Subject: [PATCH v4 23/23] KVM: s390: Storage key manipulation IOCTL
-Date: Thu, 20 Nov 2025 18:15:44 +0100
-Message-ID: <20251120171544.96841-24-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251120171544.96841-1-imbrenda@linux.ibm.com>
-References: <20251120171544.96841-1-imbrenda@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDAC3242C9;
+	Thu, 20 Nov 2025 17:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763659399; cv=fail; b=Q/zuuiZ+3UuCwvF2Hp6Ydkua4pcKWc5w7pn4SsvJP9Vs0gP41JEFcP1XJcSdylDkmtYD6+moADHmNcdeVBMEB27+SatlN0DZE1VMJ01YiZxcLwRXfGtY9Okm7B9IRZsaKwqvf4jW5YO3OZL1ndnv0JTThESSHO3hRP2loXAYSZQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763659399; c=relaxed/simple;
+	bh=+ZqFC3+8oYwTUAqqaUHWWxxhiicGXHgBaUCU8Y3yVl8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=cNs63EoiqUtIPXH7yld+JAdtGgZ+8BfzP9WlaLm7akCQ842kL6bF0naDU8MTeB0G477s6JSI0OKabY1flRKM8DD8CRslprWsnNW/Ozgr8o6y29WwdNnJDmqb9U5BTxOeL9Tqb0mOR3/0z1/ApvSQTBcHfsmkGAyMMTUoceVQRiQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HZVTyq5c; arc=fail smtp.client-ip=52.101.53.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HIz7V006tlFCnmMJXPK8+R9hFHM6YB5OmtXL+yqVF0N006BdgrvuDLKHfI7zUID0H9SvPERSkp/NXAUZhxewWUmWeiZ3ubVMSQvvdQe1Tub2fkg3RbhFuhhLqglLgq4iqDls6inJrD0BPBiXh0En1qHUERZLG15kSL2cJLdaEjxdcC9cX89MeKRMHyOV6YShq5HgqSy/1opr6bnb47Zy/AIYEAyRGyYLNC3Sn6mjfTslxWgsVBAP4kTpjKULrEl8d/++cdW8ab5F1gSNvtgODT1FhvmjSVF9fpQmNYZ5CWxp79UjMgdTJZicPxEgA+W05zJiinpcZq1QhtcB1jMHtQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+ZqFC3+8oYwTUAqqaUHWWxxhiicGXHgBaUCU8Y3yVl8=;
+ b=u232i4CvhB27conyj66Oae9ckzekm6JyIs5MfAeQsv0pGoymUjmBYSmQ+fbK1aIh5ZI9DAPa7H9dlyQe5cXelwOY2mR97S9XgBLrscR0sqxWZJvH739KDoglDLIAzbQyWdoa65NWk/40yx4P7f/jwPMoAMBQPFhj6ZmAGvGbn0lwhHVCIxgej9YCj7GkNvufXCsq5zCwswCsmb7fPibUbBPcP1qOlLpzjnGDLjTGOxtauneFgYP+tDWLOsgp/kLzNDuiMc6grjcVpAzzezCIxkCTI4zdEBfEUn7Fhzl/8IoWKb9Yi26pjfwYJSPFAkEB240L2hvrRPCL9J3nSPXo2Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+ZqFC3+8oYwTUAqqaUHWWxxhiicGXHgBaUCU8Y3yVl8=;
+ b=HZVTyq5cwWsX+FtsPZ8TKRZvuUrMpQZt2lRGm7VcQM9MsjkaeUDYDSvscbh1+jElSdo/bTcxwBt/GqC2VmdgFAznE014rYjg7thZJtjLiB9FP9MHvSieRaNVZ86+wu8w6AWg6BOt6gp9zrj1Psl2JZaczkvYXafXmh97qxDiG/UF5GozYNpMQFZJc9Vfp7q3SHQa/Xv2hD3WlAZJlghrw3SBn/rmFhkEWYEUVo45FdTB+C914zkmYSwR/qPwt17ap6e7zeBtBezRmh4TcYN2wWsEvOYhHG44Uo6xnb5YX4xIX9zRomDFLdp9YKU5J0ip4e3o+Z3ntIM0WdwnxWzxMg==
+Received: from SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21)
+ by MN0PR12MB6126.namprd12.prod.outlook.com (2603:10b6:208:3c6::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.11; Thu, 20 Nov
+ 2025 17:23:09 +0000
+Received: from SA1PR12MB7199.namprd12.prod.outlook.com
+ ([fe80::928c:89d8:e8d6:72dd]) by SA1PR12MB7199.namprd12.prod.outlook.com
+ ([fe80::928c:89d8:e8d6:72dd%6]) with mapi id 15.20.9343.009; Thu, 20 Nov 2025
+ 17:23:09 +0000
+From: Ankit Agrawal <ankita@nvidia.com>
+To: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>, Robin
+ Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon
+	<will@kernel.org>, Marek Szyprowski <m.szyprowski@samsung.com>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Andrew Morton <akpm@linux-foundation.org>, Jonathan
+ Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
+	=?iso-8859-1?Q?Christian_K=F6nig?= <christian.koenig@amd.com>, Kees Cook
+	<kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, Yishai
+ Hadas <yishaih@nvidia.com>, Shameer Kolothum <skolothumtho@nvidia.com>, Kevin
+ Tian <kevin.tian@intel.com>, Alex Williamson <alex@shazbot.org>
+CC: Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, "linux-mm@kvack.org"
+	<linux-mm@kvack.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-media@vger.kernel.org"
+	<linux-media@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
+	<dri-devel@lists.freedesktop.org>, "linaro-mm-sig@lists.linaro.org"
+	<linaro-mm-sig@lists.linaro.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-hardening@vger.kernel.org"
+	<linux-hardening@vger.kernel.org>, Alex Mastro <amastro@fb.com>, Nicolin Chen
+	<nicolinc@nvidia.com>, Vivek Kasireddy <vivek.kasireddy@intel.com>
+Subject: Re: [PATCH v9 00/11] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Thread-Topic: [PATCH v9 00/11] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Thread-Index: AQHcWgAWTN39XsG3l0G2qITcS04IR7T7uNNp
+Date: Thu, 20 Nov 2025 17:23:09 +0000
+Message-ID:
+ <SA1PR12MB71997E0FE7E8CD84586FD7E6B0D4A@SA1PR12MB7199.namprd12.prod.outlook.com>
+References: <20251120-dmabuf-vfio-v9-0-d7f71607f371@nvidia.com>
+In-Reply-To: <20251120-dmabuf-vfio-v9-0-d7f71607f371@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|MN0PR12MB6126:EE_
+x-ms-office365-filtering-correlation-id: 88738be0-af42-418d-280b-08de28597a08
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700021|921020;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?wp1dBGiSZIbWH2sTAthna1qHPdq7H9MwXZgkwRyj7qFgFxngBrEjktp/fW?=
+ =?iso-8859-1?Q?UOSPLuYF3FTuOb0pszaabpY3teKnosWeYr/1g74CLSg8uC7ifNa8zry88M?=
+ =?iso-8859-1?Q?YvZHJ9X9ArU49ex47WTC+9SAT8ZwVEK25xDG7tdLLJWiuDwa7Da3UvEB40?=
+ =?iso-8859-1?Q?S7jBhCkJi/DojY9HXFrux7MNRxvKkIQIeJ4/yQbAhafVqH/O6vP4A/pQpq?=
+ =?iso-8859-1?Q?st6FuasiE4qLKyxkp5wGgVFto+HDauXBwLmwGXOTm4tfD2bB3WzD9hj5r4?=
+ =?iso-8859-1?Q?pdWagM+08yfUG6yD1wuWCq9PrbBw0ua5zTROI5XtvfWN5Ytvpj9D28M1uG?=
+ =?iso-8859-1?Q?MFeANUcUyJt5rbRJ3LyqiGWVwail2UjhuPa2I6odNwKshsYrhK9YNRyYHx?=
+ =?iso-8859-1?Q?qYXHb7m85E8Qzi4seA+NXv+jxtHRuzCBiE2cakZngRQStvSDdTdB8hRKIN?=
+ =?iso-8859-1?Q?PBhEDka6lc90EGXmDfH2EVsSMWG0U4pX9Hq5ezo9xrToEQFOkXwnKrSRGf?=
+ =?iso-8859-1?Q?dZxlyKY55aQcH2+1TmrKdhfjoVguregGvjvFS67RXrsVUs1BfPcfi2w/st?=
+ =?iso-8859-1?Q?QHIRNdICfelA21QL83xP+Yh2TJtCATzxkPMJTqM7GyyY4IIxuOZ+hy9M77?=
+ =?iso-8859-1?Q?ZQbDd8sCXtiNIl2GmgsHwGuP3QpUrRktEOENgmglQ+cIEfoulvZJMM2a4P?=
+ =?iso-8859-1?Q?UGXmKXDVxtqLabqgWOZhh+EM3G7NWLZj3ZIZrdNKwbrQeIjBue9S8/OooE?=
+ =?iso-8859-1?Q?413ENrzdQENXPktnmllXAU2ITAJAxL8Zro0JfZCkUaN7V5f51pSV5XQ0ji?=
+ =?iso-8859-1?Q?KjilLVh7t5MsVTtASoDhQWaz3SbkwT3kLsT/Fifqr3YlddvRhFLR6SVB88?=
+ =?iso-8859-1?Q?vOIWzSJd18HVGLiNDyN/p7AMlOMaEDxVZQkvKdZ1Y2bpquoe2W4CSPfmnQ?=
+ =?iso-8859-1?Q?TMN3JkxcyfGML4/fwdX5GYRbYmtphZHa4pAFkOav5TqKxJXKAR4/mktbKg?=
+ =?iso-8859-1?Q?WD+RQGiMjbinDUAnz3Mb7MeiWHk684dTIp6oHNuE/J/hIlo8L2oedyPk6p?=
+ =?iso-8859-1?Q?hoRkiUZLjaJwB8HKgjmwwSPmJLnL/ywhoHJQwDsAGqhIlK40piQ8f0+i3B?=
+ =?iso-8859-1?Q?/isDvfVjtjthKrBlzcnB6o8BXxlzfqp1VF+PPgdzZLMYgTXAYsv7+7aUJ4?=
+ =?iso-8859-1?Q?Y6adW1U4nJ+rwFRc+aLc3NihIzIDZ+7C7KQOAfIwQmJn3fQzXz7GK0E1rN?=
+ =?iso-8859-1?Q?5FBwq5D4BGZgrqNlLjfAhDYp61PLgLCgVGfFufu1IxQSg3Imb4tGsZjpgJ?=
+ =?iso-8859-1?Q?oju/VNVWo42RcBPk5KoxB3Y2taBq1Eg1WiZuZeEK8f7GNQrGoP87/1uYJk?=
+ =?iso-8859-1?Q?tYns8XgCJQwpjTzSZwXdXGzWiuGshp2e/MgPZ0fO7/44ZBcTsjUEOQQBUj?=
+ =?iso-8859-1?Q?cEk0rhj3guCKI91d3s5Bp0nLdatxbjw0kmVj/+ci51wKIu6BvO2ZhjMeo3?=
+ =?iso-8859-1?Q?rL5iYk1fDrAUeRwctaINnWDOgmfH++w6dVLd3md5qNDwrMT18hd+VrvWdY?=
+ =?iso-8859-1?Q?FPE+LDFQzHCR7zcBNFLCLbE2J259XCe6Dlqb760q3vjwyOio7w=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB7199.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700021)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?pdxBDfvEqC7gReBpiKJOX+sk1G575btf9xgxvE6rqbZloGAXUK8D/7uWoQ?=
+ =?iso-8859-1?Q?HkwFd6dKo4/z17Ck71pkRSUasFj9iHiSChVoi19lUC/es7z538jOitinNq?=
+ =?iso-8859-1?Q?SxYk+A4mW+uygNr0jFUacjSqPDoQR9RKCvedwEC0x/rkn1G7rJjq5HJnoz?=
+ =?iso-8859-1?Q?CXDnRs3Vi9i2r6c/d5pUBfxKyN6MScXXBy9Omy+K2IpBxZ1CF691TNkAe2?=
+ =?iso-8859-1?Q?L1NQJYby8zR/kdsnvDd9ym/tLVLL2dU5btkW1TxeW9vQTRC20gG7+t/1G8?=
+ =?iso-8859-1?Q?yJGPivjsfLPGnEhVNH0fiMiYqi7+eKYG1BYX3PHoaUSybiaHLKCZNN9NSp?=
+ =?iso-8859-1?Q?NtIyskTZBjr/L4xzCTkGBvRXOoy0DEPALBaGuDx0jd+6e8C8NiK4uDX4pk?=
+ =?iso-8859-1?Q?3OfQ/on4P0ObPqIMGDJ+65+RU+gOj9tyokhi1OpRcbWsXAB5fUUnEatWpm?=
+ =?iso-8859-1?Q?5SCjV37Xti0bjGjJoiPbrUqJDj5L3jQqHG5D2/lD9xrGJNEkq6Wc4gZEp+?=
+ =?iso-8859-1?Q?ZMQypV/hGNVO8Yg8AalyVJngA4t/d4Qc6edPBgKIrwkH9W7fhYywr+gcve?=
+ =?iso-8859-1?Q?9UjH5dIyZdfXBA8aggs2Q7Gy3vYN6L/wD/L87o7IxHZwBnJ2ic0hUf0Wcj?=
+ =?iso-8859-1?Q?UveVMTUA4Ygo5ivBWYj8bkDkC1b5jE4Q8R+f7BDNMM74COGEMIPvslmc2P?=
+ =?iso-8859-1?Q?AIFbEYJGderMrWcpldyxhrHd2sS0FTwYh6dFayfFEieVsbKF+N7gHzvCAG?=
+ =?iso-8859-1?Q?2UQsRT6yFqYJSkz+OzJpO8xID6gYKgzTSOPuaGpxnjEX+DWxcpcZKMEy6R?=
+ =?iso-8859-1?Q?w+jR6XDMQjMs7N73fVV3DqBOTAtxF1282UH9Rv321k8fH1d99pd/3HH9T2?=
+ =?iso-8859-1?Q?JS6OQ7787EGclviYOTrwjaQPO68JoRjl+D9c/FpKHKtAsDJATASQ2jhByW?=
+ =?iso-8859-1?Q?y8J8myc76qLVxrTHE1ncG7R6V1YXHn0iY85ygXFsAmAnXnoEG9Wcvs7vJM?=
+ =?iso-8859-1?Q?g6lE2P77ZIv3ESztlrUYZcnncY2yWrzrDa6zP+Q1QHu/nHfzpnzwi5Bh93?=
+ =?iso-8859-1?Q?UHyvzzyu6cH/eZs+RzdRufil7j6lOi/8uW3WaA4tG1xcivsp6VKKJv/guo?=
+ =?iso-8859-1?Q?MAN8uAwDJx5XQiTYWejnxLUAfKSZLHy6VxU9OB3igkt/wClB2vd72PBNSn?=
+ =?iso-8859-1?Q?9dkR4WSmNveAQrueOYbP9DhNuQtuMrhAjyntCwhstpUMOOWKK00gXMh/Zm?=
+ =?iso-8859-1?Q?srchV2w6s1hTJ1z0o0NlvyyTbmrgKuqbhWQhCZPxc63EtW/A2atH/H8rSt?=
+ =?iso-8859-1?Q?SEck9wfgUY0GisId16xta4YBh4qkg9TVYahkxsSNjtF4ZYI+O1ymMPi4fi?=
+ =?iso-8859-1?Q?vSt3eS3cgYUqFsH+Ya8nBrQM6g62ZdK/u0PiN5U8jbVSYSmoaMgcaLXZUo?=
+ =?iso-8859-1?Q?0hqcYQVpM07zT1U75h2wS9LrJ0kzHII+bNn77T4SMm9pbXh/eUDpLZE449?=
+ =?iso-8859-1?Q?e4oXPo+pPBNIhO69A/6Yl+Oz/JMLP/BTvX2+RibRNrKLwmPd6BmIlIZbyQ?=
+ =?iso-8859-1?Q?/QqBJ2cSsEoNu4tGGGOWRdERlWXDEZj8Xth3EchIaTzR48xIUCk8jLbdkD?=
+ =?iso-8859-1?Q?/lrCt+vcxH3q8=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7nheCIlC5-cEjh_hXfX5oPVkYVX56mQT
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfX19cd4yieA3qI
- mSF+r5eszTy/g+Lfa2YEWYjQLX6bjeFlOSA8NKg1L9bHlHY5pQZae1DmqZw5CLc3YlpOS/AFpXl
- SNNolliVZPrs5UqEo8q9cX3HvHV3Z36swkUu0RdR99qopKl8daIyUB/vCGrxJ6uEwNQWZqngsuu
- lSmpQSJeYigGgbWloQ5laQPOM8MiHZ9j62JXmvRQ3JioHofxbCfQ/+V+95olEvO0gEDuakXJwQq
- fYgwkTRCD1GRKKrifPsPGsp61GoFcOTv/FQQC9SFDTs/NGqglFWwJbtCKoNoEPFaRrn/CirgAa+
- WNrd+bsujUdjU246FiCC1CJ0kWkzZPQW0+/FqByFc4hPFuglvmHWSPAIcASkxA2IiXZ60sKF3h6
- TSX1tU/qga+YRWe5XG0XqTqu9BtUyA==
-X-Proofpoint-ORIG-GUID: 7nheCIlC5-cEjh_hXfX5oPVkYVX56mQT
-X-Authority-Analysis: v=2.4 cv=XtL3+FF9 c=1 sm=1 tr=0 ts=691f4cfa cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=TEVnKxO-3nxHHAUriJcA:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-20_06,2025-11-20_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
- adultscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511150032
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB7199.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88738be0-af42-418d-280b-08de28597a08
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Nov 2025 17:23:09.6878
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: KC7D/VTeVrmvf6/f0WMVdoJULq3MysawiYlZxIvbVml3VZ7rbr5VCWe3ZVIDsOt01CZgA3sUzKBrwXOKvr1dWA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6126
 
-Add a new IOCTL to allow userspace to manipulate storage keys directly.
-
-This will make it easier to write selftests related to storage keys.
-
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- arch/s390/kvm/kvm-s390.c | 57 ++++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h | 10 +++++++
- 2 files changed, 67 insertions(+)
-
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index b7dc1d601fb8..e8e3c8cf75fa 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -555,6 +555,37 @@ static void __kvm_s390_exit(void)
- 	debug_unregister(kvm_s390_dbf_uv);
- }
- 
-+static int kvm_s390_keyop(struct kvm_s390_mmu_cache *mc, struct kvm *kvm, int op,
-+			  unsigned long addr, union skey skey)
-+{
-+	union asce asce = kvm->arch.gmap->asce;
-+	gfn_t gfn = gpa_to_gfn(addr);
-+	int r;
-+
-+	guard(read_lock)(&kvm->mmu_lock);
-+
-+	switch (op) {
-+	case KVM_S390_KEYOP_SSKE:
-+		r = dat_cond_set_storage_key(mc, asce, gfn, skey, &skey, 0, 0, 0);
-+		if (r >= 0)
-+			return skey.skey;
-+		break;
-+	case KVM_S390_KEYOP_ISKE:
-+		r = dat_get_storage_key(asce, gfn, &skey);
-+		if (!r)
-+			return skey.skey;
-+		break;
-+	case KVM_S390_KEYOP_RRBE:
-+		r = dat_reset_reference_bit(asce, gfn);
-+		if (r > 0)
-+			return r << 1;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	return r;
-+}
-+
- /* Section: device related */
- long kvm_arch_dev_ioctl(struct file *filp,
- 			unsigned int ioctl, unsigned long arg)
-@@ -2930,6 +2961,32 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- 			r = -EFAULT;
- 		break;
- 	}
-+	case KVM_S390_KEYOP: {
-+		struct kvm_s390_mmu_cache *mc;
-+		struct kvm_s390_keyop kop;
-+		union skey skey;
-+
-+		if (copy_from_user(&kop, argp, sizeof(kop))) {
-+			r = -EFAULT;
-+			break;
-+		}
-+		skey.skey = kop.key;
-+
-+		mc = kvm_s390_new_mmu_cache();
-+		if (!mc)
-+			return -ENOMEM;
-+
-+		r = kvm_s390_keyop(mc, kvm, kop.operation, kop.user_addr, skey);
-+		kvm_s390_free_mmu_cache(mc);
-+		if (r < 0)
-+			break;
-+
-+		kop.key = r;
-+		r = 0;
-+		if (copy_to_user(argp, &kop, sizeof(kop)))
-+			r = -EFAULT;
-+		break;
-+	}
- 	case KVM_S390_ZPCI_OP: {
- 		struct kvm_s390_zpci_op args;
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 52f6000ab020..402098d20134 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1208,6 +1208,15 @@ struct kvm_vfio_spapr_tce {
- 	__s32	tablefd;
- };
- 
-+#define KVM_S390_KEYOP_SSKE 0x01
-+#define KVM_S390_KEYOP_ISKE 0x02
-+#define KVM_S390_KEYOP_RRBE 0x03
-+struct kvm_s390_keyop {
-+	__u64 user_addr;
-+	__u8  key;
-+	__u8  operation;
-+};
-+
- /*
-  * KVM_CREATE_VCPU receives as a parameter the vcpu slot, and returns
-  * a vcpu fd.
-@@ -1227,6 +1236,7 @@ struct kvm_vfio_spapr_tce {
- #define KVM_S390_UCAS_MAP        _IOW(KVMIO, 0x50, struct kvm_s390_ucas_mapping)
- #define KVM_S390_UCAS_UNMAP      _IOW(KVMIO, 0x51, struct kvm_s390_ucas_mapping)
- #define KVM_S390_VCPU_FAULT	 _IOW(KVMIO, 0x52, unsigned long)
-+#define KVM_S390_KEYOP           _IOWR(KVMIO, 0x53, struct kvm_s390_keyop)
- 
- /* Device model IOC */
- #define KVM_CREATE_IRQCHIP        _IO(KVMIO,   0x60)
--- 
-2.51.1
-
+> This series extends the VFIO PCI subsystem to support exporting MMIO=0A=
+> regions from PCI device BARs as dma-buf objects, enabling safe sharing of=
+=0A=
+> non-struct page memory with controlled lifetime management. This allows R=
+DMA=0A=
+> and other subsystems to import dma-buf FDs and build them into memory reg=
+ions=0A=
+> for PCI P2P operations.=0A=
+>=0A=
+> The series supports a use case for SPDK where a NVMe device will be=0A=
+> owned by SPDK through VFIO but interacting with a RDMA device. The RDMA=
+=0A=
+> device may directly access the NVMe CMB or directly manipulate the NVMe=
+=0A=
+> device's doorbell using PCI P2P.=0A=
+>=0A=
+> However, as a general mechanism, it can support many other scenarios with=
+=0A=
+> VFIO. This dmabuf approach can be usable by iommufd as well for generic=
+=0A=
+> and safe P2P mappings.=0A=
+>=0A=
+> In addition to the SPDK use-case mentioned above, the capability added=0A=
+> in this patch series can also be useful when a buffer (located in device=
+=0A=
+> memory such as VRAM) needs to be shared between any two dGPU devices or=
+=0A=
+> instances (assuming one of them is bound to VFIO PCI) as long as they=0A=
+> are P2P DMA compatible.=0A=
+>=0A=
+> The implementation provides a revocable attachment mechanism using dma-bu=
+f=0A=
+> move operations. MMIO regions are normally pinned as BARs don't change=0A=
+> physical addresses, but access is revoked when the VFIO device is closed=
+=0A=
+> or a PCI reset is issued. This ensures kernel self-defense against=0A=
+> potentially hostile userspace.=0A=
+>=0A=
+> The series includes significant refactoring of the PCI P2PDMA subsystem=
+=0A=
+> to separate core P2P functionality from memory allocation features,=0A=
+> making it more modular and suitable for VFIO use cases that don't need=0A=
+> struct page support.=0A=
+>=0A=
+> -----------------------------------------------------------------------=
+=0A=
+> The series is based originally on=0A=
+> https://lore.kernel.org/all/20250307052248.405803-1-vivek.kasireddy@intel=
+.com/=0A=
+> but heavily rewritten to be based on DMA physical API.=0A=
+> -----------------------------------------------------------------------=
+=0A=
+> The WIP branch can be found here:=0A=
+> https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?=
+h=3Ddmabuf-vfio-v9=0A=
+=0A=
+Acked-by: Ankit Agrawal <ankita@nvidia.com>=
 
