@@ -1,81 +1,80 @@
-Return-Path: <kvm+bounces-63988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2CB9C767FB
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 23:31:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BEB6BC767FE
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 23:31:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E0F7234FC27
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 22:29:21 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 94C5E34F218
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 22:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4387F302CBD;
-	Thu, 20 Nov 2025 22:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517C9302CBD;
+	Thu, 20 Nov 2025 22:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g238RRGp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fvwdlgLc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1653428371
-	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 22:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 278E32AF1D
+	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 22:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763677754; cv=none; b=k9Q0VQNajTF1U1eTOsyOLm94f9Ua/LnL9wYb34DqYTy1mBAwKxCuZpC63yNxfFdd35aRkPOJYhYZvxXb+JwEiw/9DvLEW+9xTq/uPaJeKV5YKJQrdc3zQ/1F1+0uMdjuc5Wt1qO7nbLB/6r9qgEYFP+m9dyQEI3i9QudtXifAhg=
+	t=1763677848; cv=none; b=pJXLeBeN9eOuCBPNQ0HP/GMWYyPrlFCJ7cti5h/YoRA1HCC1dViQAo+swrgumBDy/0K/QbmM+l+6h6lxd5BK7jaFcA/ySVxnFJp6Rejb7S83+itM3WAKPKn9i2V890FoAWQkhudSZdV0NqMpKRWWG2Xs7ioB28FzSDv7TgHg79k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763677754; c=relaxed/simple;
-	bh=u9djnIZP8rkJaMKS6N2nKQ6riCgkdBBe+AZcnUNvHKc=;
+	s=arc-20240116; t=1763677848; c=relaxed/simple;
+	bh=XM3oHd+NqVO+9+JBUhqkVxk9E1Ox4uBtA/JZ4oZsiW0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SaCN2bX/RzFa0fvA5wJ4FNCbmvBFscyHpYdMts2lPY69CwObUvMy+3kPjtDTTI1b0J5+suP4L0RHmzb+LZQyVHeIgXvIB/pL7Joym93zgPMQMZeY84qmIot6MsEZID5ZpLphbpuPdzmuv0ObWSHomhcXZGI8dwafsPLkwNgL8iY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g238RRGp; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=PdmPDUAck0erLLZmHbSntFPrHF3WORja4WnZGdXjlc9cGQsL/mG5P3y0U/qK58JFb9zT7FopiQiAo7PXO8L/RDQlanZ54S51W0zk3xUjSgsYEmnhKGnDS3E/nMAw1asuXtm5glXMaUFRG3uduFUYm5WMGUiRoEZdQ0ovPJ2xMho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fvwdlgLc; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b5edecdf94eso2768482a12.2
-        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 14:29:12 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-340c261fb38so2502669a91.0
+        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 14:30:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763677752; x=1764282552; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763677845; x=1764282645; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U1nH3sEHynbJU8mF+4VQIdR6a9jUJRLv0PEESVETGbE=;
-        b=g238RRGpglHmZNXjzgUIr12MGNGC4BhdUlfUzNF5ptgaSIwoEfGJIhcseQcbj0izAL
-         C8ft+bYv2mRFzdUPTCkSQ1qGcvpdzf7HHnFFTVEhkcTFWPq6a7FzUB7yKK4lIrTcMHsn
-         ieCGOrXMtSYnZVMOn1ZY/4KqT72ZjNI34jhKfLIY4rxy+AJbDybAGFsVgsspA6sLHL7P
-         3JfC+d0NDrb02pl4rzoDpNVS4Tq7tFJPZx9KX3FWsLwHD03BsEi/cVYAska3aMYbdNLp
-         xKSMGCpbtfa4Wh/UUWCTVPYWH2MdIzZaiQO67DwWcSVtYRohVO66Dvi/DdE/gMkdp6xJ
-         K/RQ==
+        bh=JEByTRD2u24DuAHKArK5iKfifkedyslZaW5KBzyqml8=;
+        b=fvwdlgLcIEfB7aDNobBz79MA4gAvIVR5ull88cNU/lwW1Ygf0U3d0fWiJvdXA6+C8n
+         6MrE+4llfcUAlFLnvlk7u+C7ATQEYvO5Z1DeMfbE3VSeJNVWzMOUtE696+/vYFu0XzUk
+         2nmuRYxIT2kMW17x+Oon574kV55hgmTttkTbzeG7cki25KYlQrFgi1+1BGLx6r0gvcxa
+         oocgBqw4tMZUvyV+CKh9/uQXjA2qWWAuLobeeDzeF7lwDXFITl5jSOToTk+VOjClbUe0
+         3M7+LgLL8CJfIi4Kn4S11gzrkOPMXXyVorA2R9wnPsje00HO85zGUVWNb8YdzkNqXWDK
+         25Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763677752; x=1764282552;
+        d=1e100.net; s=20230601; t=1763677845; x=1764282645;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U1nH3sEHynbJU8mF+4VQIdR6a9jUJRLv0PEESVETGbE=;
-        b=UK0v7b9zIBxLhGfqIrAptmIW8+JFnZCESeo17TUj/IhXbE+/0Gsn0jmVSDXCqrZ2YY
-         0pXPxeIEeUkklPunmLsQfSZS7fNQHzOKnIQj21nI5Dt/G3N9DMPpIjkWE+xh6vhd+Zmk
-         xo5MCuufX4T47bgo2UH0ISqFr/woPob8+WszSeenP15axSTOy7bj9rW7qCdR+6iSTaQc
-         orC5xGaGJcU9/dTZdQWd9lfLXR65prBMAOE6N8A798OWQdWy7R4cIxfuZYCLYx+0Pg1L
-         LPI6wKAo9Ft96lwmj/eTNgfj+eeNUIw6AuCUc7rskpj83wX7eClmsl4Ryotdy3a1wP6J
-         iyzA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5Es0HuKbfplFrEOJ2+MCanBWd53D6ElB+uNmDGokCuH/1MtFxDaR7TMciQ933a8BadY0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9WD54DTFaPoUPQEwhR+jP+STnvOr4fCMVTWSYKvjE9TJ8sedg
-	4DsnEzx+HZX94QIsHNKlircdrGsvmGCjy65AkHVAGr2gszQII5aCegX3t5hBQVvGf7tJZ4YwWOt
-	nJ3j57Q==
-X-Google-Smtp-Source: AGHT+IHM7B7UQ/zDV3Mpvlvaoxs6EXCH8k0nw52IjX+0zmGH5Z7erln6xW7Q16O5gL1Xy7YiKMtRYIxGYoY=
-X-Received: from pftb19.prod.google.com ([2002:a05:6a00:2d3:b0:7b0:bc2e:959b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:12c2:b0:341:5d9f:8007
- with SMTP id adf61e73a8af0-3614eea27aamr358504637.57.1763677752250; Thu, 20
- Nov 2025 14:29:12 -0800 (PST)
-Date: Thu, 20 Nov 2025 14:29:10 -0800
-In-Reply-To: <20250903064601.32131-6-dapeng1.mi@linux.intel.com>
+        bh=JEByTRD2u24DuAHKArK5iKfifkedyslZaW5KBzyqml8=;
+        b=TSWW41V7D0f3zcW33u+e25WywmvrSHUzArjtbx0PnLoRA41EBPy1RHuZ0z1BAjeXa2
+         rRDIBXG7M2clr2Mbaj3caB9az2lSCjVXs23166l/NjzHXrkZ5MVT7Hb46V1CXRXhdZie
+         A6l1x8jJtAwfu11v413mwmp4R/l80MU5uDdDcsNXVDCiZGi76gZE9um2epTJmD+HuoMn
+         ieOQjcrSPIVIp8+c98QJiF+/YnkQzuh67DuBhvseHPsWPpCJCfnYeEKwgu0mHif7xXyo
+         b3l/eiiDi7klfTxAMmkug5TltD9kH7/XAQg0YL4kvrY2lnJc8tLd4eBVKIXfZIW9wieK
+         nsEw==
+X-Forwarded-Encrypted: i=1; AJvYcCU6d1v/+Vy9KpcETfzv0+RQF7SdtTOYJRjz1+U1jycvFf5EHVKUdkDdDpNh2miV3x8yUPk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxw6iz0JIM3kjcI3HLYyrMcFCWSJu4YtpPKXG9RGAiGIT/WSMci
+	goLwsKYy1eGVZT159ymqA+UsuVXAzNs1+ankViT2h37QKvxRDKxj0WBp40l2YcVHPLf8At+K0Z1
+	PxKOPpg==
+X-Google-Smtp-Source: AGHT+IGOHUMOhLjbJL5wUB9ExfxNpdm/8Fi4EmS6SFCFMc4zyuG3C+3CszgvpWEqiat1Yy4ggNtUAhO4taw=
+X-Received: from pjst15.prod.google.com ([2002:a17:90b:18f:b0:340:a575:55db])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f42:b0:32d:d5f1:fe7f
+ with SMTP id 98e67ed59e1d1-34733e937bdmr80623a91.15.1763677845413; Thu, 20
+ Nov 2025 14:30:45 -0800 (PST)
+Date: Thu, 20 Nov 2025 14:30:44 -0800
+In-Reply-To: <20250903064601.32131-1-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250903064601.32131-1-dapeng1.mi@linux.intel.com> <20250903064601.32131-6-dapeng1.mi@linux.intel.com>
-Message-ID: <aR-WNu8iFfP1AKBX@google.com>
-Subject: Re: [kvm-unit-tests patch v3 5/8] x86/pmu: Relax precise count check
- for emulated instructions tests
+References: <20250903064601.32131-1-dapeng1.mi@linux.intel.com>
+Message-ID: <aR-WlHq5HKeLa6Pc@google.com>
+Subject: Re: [kvm-unit-tests patch v3 0/8] Fix pmu test errors on GNR/SRF/CWF
 From: Sean Christopherson <seanjc@google.com>
 To: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -86,33 +85,25 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.
 Content-Type: text/plain; charset="us-ascii"
 
 On Wed, Sep 03, 2025, Dapeng Mi wrote:
-> Relax precise count check for emulated instructions tests on these
-> platforms with HW overcount issues.
+> Dapeng Mi (3):
+>   x86/pmu: Relax precise count check for emulated instructions tests
+>   x86: pmu_pebs: Remove abundant data_cfg_match calculation
+>   x86: pmu_pebs: Support to validate timed PEBS record on GNR/SRF
 > 
-> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> ---
->  x86/pmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> dongsheng (5):
+>   x86/pmu: Add helper to detect Intel overcount issues
+>   x86/pmu: Relax precise count validation for Intel overcounted
+>     platforms
+>   x86/pmu: Fix incorrect masking of fixed counters
+>   x86/pmu: Handle instruction overcount issue in overflow test
+>   x86/pmu: Expand "llc references" upper limit for broader compatibility
 > 
-> diff --git a/x86/pmu.c b/x86/pmu.c
-> index c54c0988..6bf6eee3 100644
-> --- a/x86/pmu.c
-> +++ b/x86/pmu.c
-> @@ -790,7 +790,7 @@ static void check_emulated_instr(void)
->  
->  	// Check that the end count - start count is at least the expected
->  	// number of instructions and branches.
-> -	if (this_cpu_has_perf_global_ctrl()) {
-> +	if (this_cpu_has_perf_global_ctrl() && !intel_inst_overcount_flags) {
+>  lib/x86/pmu.h       |  6 +++
+>  lib/x86/processor.h | 27 +++++++++++++
+>  x86/pmu.c           | 95 ++++++++++++++++++++++++++++++++++++++-------
+>  x86/pmu_pebs.c      |  9 +++--
+>  4 files changed, 120 insertions(+), 17 deletions(-)
 
-This skips precise checking if _either_ errata is present.  IIUC, we can still do
-a precise check for branches retired on Clearwater Forest, but not for instructions
-retired.
-
->  		report(instr_cnt.count - instr_start == KVM_FEP_INSNS,
->  		       "instruction count");
->  		report(brnch_cnt.count - brnch_start == KVM_FEP_BRANCHES,
-> -- 
-> 2.34.1
-> 
+Some minor issues, but otherwise looks good.  I'll take care of all the issues
+(though I'll still post a v4 so that there's a paper trail for what I'm applying).
 
