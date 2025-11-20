@@ -1,124 +1,316 @@
-Return-Path: <kvm+bounces-64009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64019-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04A07C76AFC
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:55:34 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C591C76C59
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 01:26:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 13C2C2B18C
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 23:55:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8305B4E4CFA
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070D231577D;
-	Thu, 20 Nov 2025 23:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C73224A06D;
+	Fri, 21 Nov 2025 00:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0e44B1O3"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="M+mrJZyL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05634C98
-	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 23:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C3626D4C7
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 00:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763682908; cv=none; b=a0Iss4jOLn1jE9JpNzUcvkZ86gn282LZ4Z9Ak1L33kFEpS1X+7S/ITags1Oh05jdC5ZUSYOYYNDY2i3DQ0bm3xB1b1I52zkExFZjB99nW/4Lc00S+yy0v5Nk2VO8mvJ2gH0IggynVC63PrrzJ4DEkD1RSkPpSC8EwdBFLezIRXc=
+	t=1763684636; cv=none; b=YBrWMsKrETcLEBegnv1Rot5caF2/MAVzHHAW66zDab9WRxULeZwo9V8pyxpP5OkLecJtOsdqZuWo+N7dJev6M3J2Bn2wCOUgkIoGfK44uEUhbD+KRysrmSo+XqBvpk1mwtmyluTi82/RS7Tw0qFTyasuqYBdO632RrBZZxSwlgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763682908; c=relaxed/simple;
-	bh=4zjy4k3vgeqSg0Yu40MRWtPhRy4GPFmjoybzqM+g/ic=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=f/9c+sU0zFjtS45PaPP9Cq35HUzgDspmF/AqCZIoZCu++Tn8vft3+4OEcy+OGbQxKNlG1iOWt7NVqBMsSP6UxT04lvbSG4jPdlO2SEuz+cw4mSeJW9ruF5RPBvROofr6qYJznifwjtD3Mn3fVJLPc6VAB58eeZ8Bgfen9W0ZLWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0e44B1O3; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-297df52c960so42277005ad.1
-        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 15:55:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763682906; x=1764287706; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=s68Za4hFCTq+nn0V7gl7AkP7K1rYBg/9xd9l27wex74=;
-        b=0e44B1O3ngmtngm+5a7ViT//h2PwAOj+/IKXBWLCZQ5sT5rtPdLqYospqqNsVfpOqZ
-         II/bZ6ACpj+CzUJqckpsYD3+FupW/AyPnN4/UwnMdoy3SVQrZhC//JYnqQbljG5jEQP4
-         /AVGNNQpoDv8Qge1XRROqmQtVStlWtHTQJLoG9YH5HegSBOgURhcOc0ztiV7NrDKTUXe
-         VcE1oKlyM6YJWiQQybPSbgCz6J6+K+b03iqO2+NMbtTiB2tnEp9/l7bletLTJZZ+mSnq
-         U9ZjDq9SDVxhORZEmS4UQS7a0erNbYVRgMo73Use/YiDPPmNy9zONV6d2HTSaRCcOmhV
-         THiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763682906; x=1764287706;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s68Za4hFCTq+nn0V7gl7AkP7K1rYBg/9xd9l27wex74=;
-        b=rcqG42bX9xqHEuoSfOewlrWiPj67ZE/fJ7DkJKBW5FYPIuuuw2XXLtz2y+7OLTBarH
-         vk2Q3ewdlPpaoKhUyiXC8maRPeIs2UHIZae98ZJv2oKVLnoR9DVryr/cx/WNigv6Z7s5
-         F25By9HkFiu8XIIAQH2n6M7yK3uty4FehiwrpCYEe0M+4uJiK8md2Gvo6LnuUptB97P5
-         1qh8Vftj4blF9rM8IB7AeSrmlqBtuqBgRyss4ETVgvozyyO9KcEBFYLhyOGNN741LN34
-         5uBsdAr4WO3zzKnwnSIf8Y/hdgwB/sNuAZSX5za4/yk5ohtxLr97CCjVi78WmRyQaDTO
-         5CYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ9oMLNCnNty4W46yeCpyn/XPtNd2OPeZZYTK3LZ1bpr5yvnsRx6RersjsMlwEVXxzumQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzo1uY53yDHlQcNmewPvWwIQV7KoZP0nUyNci/D2RuP01U+OIwI
-	HONzL/J5ZJZKGDJZoZ6sigjHF4diVGcV96Q+VksM9JAL18yLVYt//8YzLd7t7GIMwja80UMSrSp
-	PK+WiLg==
-X-Google-Smtp-Source: AGHT+IGnE8+xz+DbZR1KrybADk4tLQE+xfefjHvMcNEQiKhOicLrhsjIp7gqnkx8TjVbUL6zV/W/BzjG2Ps=
-X-Received: from pgac15.prod.google.com ([2002:a05:6a02:294f:b0:bac:a20:5eea])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d502:b0:295:9cb5:ae2a
- with SMTP id d9443c01a7336-29b6be8cb22mr5202385ad.9.1763682906026; Thu, 20
- Nov 2025 15:55:06 -0800 (PST)
-Date: Thu, 20 Nov 2025 15:55:04 -0800
-In-Reply-To: <20251021074736.1324328-6-yosry.ahmed@linux.dev>
+	s=arc-20240116; t=1763684636; c=relaxed/simple;
+	bh=3gw7s3DqJOdM5BTLX/FpZmp5CBMJxHrBk0dd3tGRoWM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uVS/CgrXp6mrSTlrqsMxtm11b1RqFPPmcnZQ5t1sBmRq26J/bU9XWlcLKbJ8/pv14ssEAlviOXQ5cpkSPLvmHBDr/EwWuVDJ8/sdIGfyOJVq1F5bgGNdLrkGD+6vV/KSq+htPJzCpSipiF7Qfdp7IiFi+hhnDz8cWq3/ivRLZaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=M+mrJZyL; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=yLx8/kW/v6qUU6G/CxjaSljuRBbP90sLxOMR5Nm0pKA=; b=M+mrJZyL7werI5IY
+	QaTeVA66JNcc6UmKX+IWfgWcCWSuWyHR7woCz+nK9VH5X6DShYGi0MnnpKdk9R3hWP01DVM9pwSO+
+	0mHysCZkXmXtBm6gneQIoDYy329cHrq4QWGf+FTXK+uautA8L/u+kRXnHzpnKt8s9QlXtYFuaryRY
+	wSIAGNeeevUTUeh/kN6c9EILJCGBnAqKriOxG+2PqaiaQF12+cH853scKM7WMr9MfwqCtDgaZNVtO
+	gXnSKivBzAdvYq5xjXyQrtWf62qjquyoFcKQ+Ozoj8NzsmVeiTGM8WAQHu/FUVhGAqjlsbDzc600R
+	s+g1gljwzFbH36fTkA==;
+Received: from dg by mx.treblig.org with local (Exim 4.98.2)
+	(envelope-from <dg@treblig.org>)
+	id 1vMEWX-00000005cYr-0ztq;
+	Thu, 20 Nov 2025 23:57:13 +0000
+Date: Thu, 20 Nov 2025 23:57:13 +0000
+From: "Dr. David Alan Gilbert" <dave@treblig.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, pizhenwei@bytedance.com,
+	alistair.francis@wdc.com, stefanb@linux.vnet.ibm.com,
+	kwolf@redhat.com, hreitz@redhat.com, sw@weilnetz.de,
+	qemu_oss@crudebyte.com, groug@kaod.org, mst@redhat.com,
+	imammedo@redhat.com, anisinha@redhat.com, kraxel@redhat.com,
+	shentey@gmail.com, npiggin@gmail.com, harshpb@linux.ibm.com,
+	sstabellini@kernel.org, anthony@xenproject.org, paul@xen.org,
+	edgar.iglesias@gmail.com, elena.ufimtseva@oracle.com,
+	jag.raman@oracle.com, sgarzare@redhat.com, pbonzini@redhat.com,
+	fam@euphon.net, philmd@linaro.org, alex@shazbot.org, clg@redhat.com,
+	peterx@redhat.com, farosas@suse.de, lizhijian@fujitsu.com,
+	jasowang@redhat.com, samuel.thibault@ens-lyon.org,
+	michael.roth@amd.com, kkostiuk@redhat.com, zhao1.liu@intel.com,
+	mtosatti@redhat.com, rathc@linux.ibm.com, palmer@dabbelt.com,
+	liwei1518@gmail.com, dbarboza@ventanamicro.com,
+	zhiwei_liu@linux.alibaba.com, marcandre.lureau@redhat.com,
+	qemu-block@nongnu.org, qemu-ppc@nongnu.org,
+	xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+	qemu-riscv@nongnu.org
+Subject: Re: [PATCH 09/14] error: Use error_setg_file_open() for simplicity
+ and consistency
+Message-ID: <aR-q2YeegIEPmk2R@gallifrey>
+References: <20251120191339.756429-1-armbru@redhat.com>
+ <20251120191339.756429-10-armbru@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251021074736.1324328-1-yosry.ahmed@linux.dev> <20251021074736.1324328-6-yosry.ahmed@linux.dev>
-Message-ID: <aR-qWN9uIX3fl5QX@google.com>
-Subject: Re: [PATCH v2 05/23] KVM: selftests: Move nested invalid CR3 check to
- its own test
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20251120191339.756429-10-armbru@redhat.com>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.12.48+deb13-amd64 (x86_64)
+X-Uptime: 23:56:31 up 24 days, 23:32,  2 users,  load average: 0.00, 0.01,
+ 0.00
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-On Tue, Oct 21, 2025, Yosry Ahmed wrote:
-> vmx_tsc_adjust_test currently verifies that a nested VMLAUNCH fails with
-> an invalid CR3. This is irrelevant to TSC scaling, move it to a
-> standalone test.
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Replace
 > 
-> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+>     error_setg_errno(errp, errno, MSG, FNAME);
+> 
+> by
+> 
+>     error_setg_file_open(errp, errno, FNAME);
+> 
+> where MSG is "Could not open '%s'" or similar.
+> 
+> Also replace equivalent uses of error_setg().
+> 
+> A few messages lose prefixes ("net dump: ", "SEV: ", __func__ ": ").
+> We could put them back with error_prepend().  Not worth the bother.
+
+Yeh, I guess you could just do it with another macro using
+the same internal function just with string concatenation.
+
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dave@treblig.org>
+
 > ---
->  tools/testing/selftests/kvm/Makefile.kvm      |  1 +
->  .../kvm/x86/nested_invalid_cr3_test.c         | 81 +++++++++++++++++++
->  .../selftests/kvm/x86/vmx_tsc_adjust_test.c   | 10 ---
->  3 files changed, 82 insertions(+), 10 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86/nested_invalid_cr3_test.c
+>  hw/9pfs/9p-local.c        | 2 +-
+>  hw/acpi/core.c            | 2 +-
+>  hw/core/loader.c          | 2 +-
+>  hw/pci-host/xen_igd_pt.c  | 2 +-
+>  monitor/hmp-cmds-target.c | 2 +-
+>  net/dump.c                | 2 +-
+>  net/tap-bsd.c             | 6 +++---
+>  net/tap-linux.c           | 2 +-
+>  target/i386/sev.c         | 6 ++----
+>  ui/ui-qmp-cmds.c          | 3 +--
+>  util/vfio-helpers.c       | 5 ++---
+>  11 files changed, 15 insertions(+), 19 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> index bb2ff7927ef57..b78700c574fc7 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -88,6 +88,7 @@ TEST_GEN_PROGS_x86 += x86/kvm_pv_test
->  TEST_GEN_PROGS_x86 += x86/kvm_buslock_test
->  TEST_GEN_PROGS_x86 += x86/monitor_mwait_test
->  TEST_GEN_PROGS_x86 += x86/msrs_test
-> +TEST_GEN_PROGS_x86 += x86/nested_invalid_cr3_test
-
-Almost.  A. B. C. D. I? E.  :-D
-
->  TEST_GEN_PROGS_x86 += x86/nested_emulation_test
->  TEST_GEN_PROGS_x86 += x86/nested_exceptions_test
->  TEST_GEN_PROGS_x86 += x86/platform_info_test
-> diff --git a/tools/testing/selftests/kvm/x86/nested_invalid_cr3_test.c b/tools/testing/selftests/kvm/x86/nested_invalid_cr3_test.c
-> new file mode 100644
-> index 0000000000000..b9853ab532cfe
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86/nested_invalid_cr3_test.c
-> @@ -0,0 +1,81 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * nested_invalid_cr3_test
-
-Boooooh.
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index 31e216227c..376b377698 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -1456,7 +1456,7 @@ static int local_init(FsContext *ctx, Error **errp)
+>  
+>      data->mountfd = open(ctx->fs_root, O_DIRECTORY | O_RDONLY);
+>      if (data->mountfd == -1) {
+> -        error_setg_errno(errp, errno, "failed to open '%s'", ctx->fs_root);
+> +        error_setg_file_open(errp, errno, ctx->fs_root);
+>          goto err;
+>      }
+>  
+> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+> index ff16582803..d2677332af 100644
+> --- a/hw/acpi/core.c
+> +++ b/hw/acpi/core.c
+> @@ -277,7 +277,7 @@ void acpi_table_add(const QemuOpts *opts, Error **errp)
+>          int fd = open(*cur, O_RDONLY | O_BINARY);
+>  
+>          if (fd < 0) {
+> -            error_setg(errp, "can't open file %s: %s", *cur, strerror(errno));
+> +            error_setg_file_open(errp, errno, *cur);
+>              goto out;
+>          }
+>  
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index 590c5b02aa..b56e5eb2f5 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -379,7 +379,7 @@ void load_elf_hdr(const char *filename, void *hdr, bool *is64, Error **errp)
+>  
+>      fd = open(filename, O_RDONLY | O_BINARY);
+>      if (fd < 0) {
+> -        error_setg_errno(errp, errno, "Failed to open file: %s", filename);
+> +        error_setg_file_open(errp, errno, filename);
+>          return;
+>      }
+>      if (read(fd, hdr, EI_NIDENT) != EI_NIDENT) {
+> diff --git a/hw/pci-host/xen_igd_pt.c b/hw/pci-host/xen_igd_pt.c
+> index 5dd17ef236..f6016f2cd5 100644
+> --- a/hw/pci-host/xen_igd_pt.c
+> +++ b/hw/pci-host/xen_igd_pt.c
+> @@ -55,7 +55,7 @@ static void host_pci_config_read(int pos, int len, uint32_t *val, Error **errp)
+>  
+>      config_fd = open(path, O_RDWR);
+>      if (config_fd < 0) {
+> -        error_setg_errno(errp, errno, "Failed to open: %s", path);
+> +        error_setg_file_open(errp, errno, path);
+>          goto out;
+>      }
+>  
+> diff --git a/monitor/hmp-cmds-target.c b/monitor/hmp-cmds-target.c
+> index e982061146..ad4ed2167d 100644
+> --- a/monitor/hmp-cmds-target.c
+> +++ b/monitor/hmp-cmds-target.c
+> @@ -331,7 +331,7 @@ static uint64_t vtop(void *ptr, Error **errp)
+>  
+>      fd = open("/proc/self/pagemap", O_RDONLY);
+>      if (fd == -1) {
+> -        error_setg_errno(errp, errno, "Cannot open /proc/self/pagemap");
+> +        error_setg_file_open(errp, errno, "/proc/self/pagemap");
+>          return -1;
+>      }
+>  
+> diff --git a/net/dump.c b/net/dump.c
+> index 581234b775..0c39f09892 100644
+> --- a/net/dump.c
+> +++ b/net/dump.c
+> @@ -111,7 +111,7 @@ static int net_dump_state_init(DumpState *s, const char *filename,
+>  
+>      fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY | O_BINARY, 0644);
+>      if (fd < 0) {
+> -        error_setg_errno(errp, errno, "net dump: can't open %s", filename);
+> +        error_setg_file_open(errp, errno, filename);
+>          return -1;
+>      }
+>  
+> diff --git a/net/tap-bsd.c b/net/tap-bsd.c
+> index bbf84d1828..3fd300d46f 100644
+> --- a/net/tap-bsd.c
+> +++ b/net/tap-bsd.c
+> @@ -68,7 +68,7 @@ int tap_open(char *ifname, int ifname_size, int *vnet_hdr,
+>          }
+>      }
+>      if (fd < 0) {
+> -        error_setg_errno(errp, errno, "could not open %s", dname);
+> +        error_setg_file_open(errp, errno, dname);
+>          return -1;
+>      }
+>  
+> @@ -118,7 +118,7 @@ static int tap_open_clone(char *ifname, int ifname_size, Error **errp)
+>  
+>      fd = RETRY_ON_EINTR(open(PATH_NET_TAP, O_RDWR));
+>      if (fd < 0) {
+> -        error_setg_errno(errp, errno, "could not open %s", PATH_NET_TAP);
+> +        error_setg_file_open(errp, errno, PATH_NET_TAP);
+>          return -1;
+>      }
+>  
+> @@ -166,7 +166,7 @@ int tap_open(char *ifname, int ifname_size, int *vnet_hdr,
+>          snprintf(dname, sizeof dname, "/dev/%s", ifname);
+>          fd = RETRY_ON_EINTR(open(dname, O_RDWR));
+>          if (fd < 0 && errno != ENOENT) {
+> -            error_setg_errno(errp, errno, "could not open %s", dname);
+> +            error_setg_file_open(errp, errno, dname);
+>              return -1;
+>          }
+>      }
+> diff --git a/net/tap-linux.c b/net/tap-linux.c
+> index 2a90b58467..909c4f1fcf 100644
+> --- a/net/tap-linux.c
+> +++ b/net/tap-linux.c
+> @@ -57,7 +57,7 @@ int tap_open(char *ifname, int ifname_size, int *vnet_hdr,
+>      if (fd < 0) {
+>          fd = RETRY_ON_EINTR(open(PATH_NET_TUN, O_RDWR));
+>          if (fd < 0) {
+> -            error_setg_errno(errp, errno, "could not open %s", PATH_NET_TUN);
+> +            error_setg_file_open(errp, errno, PATH_NET_TUN);
+>              return -1;
+>          }
+>      }
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index fd2dada013..8660ecd9e4 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -891,8 +891,7 @@ static SevCapability *sev_get_capabilities(Error **errp)
+>  
+>      fd = open(sev_device, O_RDWR);
+>      if (fd < 0) {
+> -        error_setg_errno(errp, errno, "SEV: Failed to open %s",
+> -                         sev_device);
+> +        error_setg_file_open(errp, errno, sev_device);
+>          g_free(sev_device);
+>          return NULL;
+>      }
+> @@ -1819,8 +1818,7 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+>      devname = object_property_get_str(OBJECT(sev_common), "sev-device", NULL);
+>      sev_common->sev_fd = open(devname, O_RDWR);
+>      if (sev_common->sev_fd < 0) {
+> -        error_setg(errp, "%s: Failed to open %s '%s'", __func__,
+> -                   devname, strerror(errno));
+> +        error_setg_file_open(errp, errno, devname);
+>          g_free(devname);
+>          return -1;
+>      }
+> diff --git a/ui/ui-qmp-cmds.c b/ui/ui-qmp-cmds.c
+> index 74fa6c6ec5..d927121676 100644
+> --- a/ui/ui-qmp-cmds.c
+> +++ b/ui/ui-qmp-cmds.c
+> @@ -371,8 +371,7 @@ qmp_screendump(const char *filename, const char *device,
+>  
+>      fd = qemu_open_old(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0666);
+>      if (fd == -1) {
+> -        error_setg(errp, "failed to open file '%s': %s", filename,
+> -                   strerror(errno));
+> +        error_setg_file_open(errp, errno, filename);
+>          return;
+>      }
+>  
+> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+> index fdff042ab4..8b1b2e2f05 100644
+> --- a/util/vfio-helpers.c
+> +++ b/util/vfio-helpers.c
+> @@ -309,7 +309,7 @@ static int qemu_vfio_init_pci(QEMUVFIOState *s, const char *device,
+>      s->container = open("/dev/vfio/vfio", O_RDWR);
+>  
+>      if (s->container == -1) {
+> -        error_setg_errno(errp, errno, "Failed to open /dev/vfio/vfio");
+> +        error_setg_file_open(errp, errno, "/dev/vfio/vfio");
+>          return -errno;
+>      }
+>      if (ioctl(s->container, VFIO_GET_API_VERSION) != VFIO_API_VERSION) {
+> @@ -333,8 +333,7 @@ static int qemu_vfio_init_pci(QEMUVFIOState *s, const char *device,
+>  
+>      s->group = open(group_file, O_RDWR);
+>      if (s->group == -1) {
+> -        error_setg_errno(errp, errno, "Failed to open VFIO group file: %s",
+> -                         group_file);
+> +        error_setg_file_open(errp, errno, group_file);
+>          g_free(group_file);
+>          ret = -errno;
+>          goto fail_container;
+> -- 
+> 2.49.0
+> 
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
