@@ -1,82 +1,75 @@
-Return-Path: <kvm+bounces-63830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63831-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 160ABC7382B
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 11:44:22 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AC7EC739D2
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 12:05:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4173A4E2CF5
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 10:43:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 080A24E7D11
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 11:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF75332C94A;
-	Thu, 20 Nov 2025 10:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4CD32F777;
+	Thu, 20 Nov 2025 11:03:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qyjqM7N8"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LjhLs1KQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C1130E843
-	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 10:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC43301719;
+	Thu, 20 Nov 2025 11:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763635428; cv=none; b=ddAGfJwszMd7vmUYRpzSaTRvqWeVd8LMBWjMjt84+JapocnI3ZKt8MJ72OzDQ6E71Xa5SsgDLYiEySjEdt+vcRNfHkIsUxf4f8lkz5k5npkXboJGKVLNWCX82b9WZOsTL8vGHcQAZalBy73fRxV9Ful2DPG4TxogsBFows++xh4=
+	t=1763636589; cv=none; b=OF04whESbTcXMQft46bP8YLpKT9+u4ERDYowvhAFwnraCT4cVcBA+964GQaGz7tTthyi+FTFrOwRpPbTtNJoOoJ732isvbsuo2OYLSyFR+Iq96l5MbXuAROZGHzEKj8nh0R6j1wAivbmtFf3iEnCKYhPEU3Vc41LYwqRwfLCM5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763635428; c=relaxed/simple;
-	bh=MbA9H+RwW5ZqdWuv+HONXve++UBdBrFLTUyzU+kGvVk=;
+	s=arc-20240116; t=1763636589; c=relaxed/simple;
+	bh=6Ypco4Dos2O+Wm45cvQnHUqu30OQCMGqt8/0KIodbno=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ntcN4UogHyvIS6UJ8G3uY4yk092dKsrbhAOq8xo/pMC9XzUs6OS3gPUpc+9QCoiPxvtoM83DPUFmhUVguFxdsEfHM6xxuLYiu9Hly5gxLGAOWfs23CaeWmDFKIk5RuMSRe9JW09gDofOaNvkdVuf5gyX2q4gBjDgPJYqNSFbboY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qyjqM7N8; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4779d47be12so5998905e9.2
-        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 02:43:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1763635424; x=1764240224; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7oHOv6TarlQbLUVDxxSIUN/NgK6M7FvSaHEHJevpMjw=;
-        b=qyjqM7N8YEz3NH7mwWsTHv7wf9MJVKZXZ/oVEjmVCpj7AzVR6WeOG6UwDFM6XWAMWT
-         KlCzWcx8W7WMYbHH52aiM2X5tWgxIKI2MltqNH8dEuxz+5yRwRdVaiDW4csJWJStnEiG
-         IPWr6UpYNBb49qPWvC4vV5Q4vEwj7gLJIkFjma4ZSh1hwZiNJijvRPElHt0I/tE5jdn9
-         TlEpSOHSOqtKf4ZCA8mFIDKOo7eSDuQ3JEqbPrUmXaFoGFVYa6JLfpNBonBRD+6qyMQd
-         TMxDAgw07TdqvzOJTNipBIFJupKKcPAt0DdbhMfHCjC/asygo6Vd4uQx8ZR2YzMkEwC2
-         dtPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763635424; x=1764240224;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7oHOv6TarlQbLUVDxxSIUN/NgK6M7FvSaHEHJevpMjw=;
-        b=B0W3KH+97dXGzaZsv7aZDGiFZyGpB/AlZhAKtbY79xTHsHHi3WjOiN4/6aJq2vbICj
-         gECJoNm1z9AO7fvb7g6YMu4OEMhx6F/s4K0qCwq/SYI7n9euFkrL1w8+2+DtbzUVTBue
-         lkp/HFEOpTbKohe8m7ucXK5NcrHmylbs5//6Mz013OINalolOO7xjfS9Cogk6w+dovzh
-         VQ2yngz8TlofHFYGb0kj3Q6Ta2CshGAxWUcSm+LyANTUQ0Ao3vlF99+xnuK4nIhMkBOT
-         wg0NtB/RnK4GVQzIkQpQ7bTkd9GunnAtghSK4q816zTIxQQZZjPH9KGi8Ql6NFElST8P
-         QeaA==
-X-Forwarded-Encrypted: i=1; AJvYcCXL6Z2TrtXcwEkeqzfeIWyxM/sXO1/UXusoCOh8zdvxi7J05DpFheJvJPIEegnufkW53q0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLwVYl95vpAf0/WdAeL7KUCBrAlu4zZYPbgEa+UWsvJnkmejFj
-	UPuMdVA4Gv1vXuTvUDcphofYZzbTFigu/dl3LbLsRd8H5vaDS3pEdNX01KXMm680lVk=
-X-Gm-Gg: ASbGnctIdbVKBvigT0gsvTlAyOvcfwEzO4WQpN+bTb6Ax5XE7CjK64FYTudrDbl5RJZ
-	UKNKvQvIcMdrToFXT6raN3pqHgE6PyMZ+aIhJG25/W6n7jkJJE0GT2wcXFs34V12XayBY3iE4lX
-	0KRuPD9s03ArSA3hD23KwFs2WjO8bE/Dk5aGgBHQtG18GEkjBlHpB+QJl14iL+izDhjzOXfostT
-	eb/jjqHFVCm81eBfI2H/075eY8DVUijOdb0whz1QpkDxQppse5pfHIDBiudUOWp4bYcp0RRdejM
-	lPt6P3C+2ePDY/P6IGlk9mE8PeUt6qjmgJ6rkW1E/GhNXp5EFFYl0GQ2HQnIQFbaqdzRSiWHQXe
-	Npw8nudUCUZSMA1cAZRIuu90Fu1DD9d66VBoP+pDMjRGu2C6fd3W4UA/RI8gEMjcKWWGvWgo0AI
-	X2IsmeInJxvm/Xqvc+SXgbswUmvaSXRNM5VcqlKTyqc9p7aqlmaqsdLw==
-X-Google-Smtp-Source: AGHT+IEMgQ5A/ngM4oB7aYVi/VQg/3amHDLzSn7jIdobyyplBkmG3dA8rWbfZr7EIB9azrG7yf2qjA==
-X-Received: by 2002:a05:600c:1550:b0:477:a54a:acba with SMTP id 5b1f17b1804b1-477b9e1cbe5mr23604595e9.17.1763635424278;
-        Thu, 20 Nov 2025 02:43:44 -0800 (PST)
-Received: from [192.168.69.210] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b831421fsm40121035e9.10.2025.11.20.02.43.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 02:43:43 -0800 (PST)
-Message-ID: <43427fac-db73-43af-bbf6-93bc3d978706@linaro.org>
-Date: Thu, 20 Nov 2025 11:43:42 +0100
+	 In-Reply-To:Content-Type; b=fL25VjNwuBmx4koDVcAEITIlTXyVUH8n0wQzM3ybukWfk04yTCnPlaqEmnum/QnhrfviqkkfZEpVM/yndnw9DP/WP+WkC7X2fHLscKaOqjomvVCTOXGj+PelTfXFqkPSHRdCe7Y+8tAcvxjh5z/xzqUC8ivrQpXNNnPbyMUj+dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LjhLs1KQ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AJLkqxd021518;
+	Thu, 20 Nov 2025 11:02:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=uvgObM
+	lHfwTk8sSxdw2XJe30OxCETzmffZtP8yfETrA=; b=LjhLs1KQPLdmQ8HC+gY+Y9
+	9Uh8j+5TeDCJfeyXQecQewQtYYyRODb9UUXtgDHXGExpG6LG2zNAIDVhwDi1HBBt
+	6DDieGTebGpZn46aNGFN4RjYYx008fpvEpj69RYCUFSK6xSY4luZZ0/iG1j1qFSH
+	MRComfTT/DV3Uck9vvRni4RxQLI0J75nz7a7P6PU5H5aamRZpoLkxS393pvSiE7Q
+	OYQVJi/lDNUw7tRGB0tI6Vn/1C5VMSNGmsdOgJoA7FBTvR42Gk9zQBO21tmxW7qb
+	r6ruFlfwiM56GAgydM/zfMaRkEOC9fszmZ0brix+lxikk2Y90a5JIxgWhT84bScg
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejjwdyaf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 20 Nov 2025 11:02:56 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKARkaq006967;
+	Thu, 20 Nov 2025 11:02:55 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4af62jns86-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 20 Nov 2025 11:02:55 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AKB2qS030015794
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 20 Nov 2025 11:02:52 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 11C6F2004B;
+	Thu, 20 Nov 2025 11:02:52 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5F4B020040;
+	Thu, 20 Nov 2025 11:02:50 +0000 (GMT)
+Received: from [9.111.95.204] (unknown [9.111.95.204])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 20 Nov 2025 11:02:49 +0000 (GMT)
+Message-ID: <2087b6b4-34b4-4509-9cae-bfe719d99992@linux.ibm.com>
+Date: Thu, 20 Nov 2025 12:02:49 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,117 +77,171 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] target/arm/kvm: add kvm-psci-version vcpu property
+Subject: Re: [PATCH RFC v2 10/11] KVM: s390: Add VSIE shadow configuration
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
+References: <20251110-vsieie-v2-0-9e53a3618c8c@linux.ibm.com>
+ <20251110-vsieie-v2-10-9e53a3618c8c@linux.ibm.com>
 Content-Language: en-US
-To: eric.auger@redhat.com, Sebastian Ott <sebott@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-References: <20251112181357.38999-1-sebott@redhat.com>
- <20251112181357.38999-3-sebott@redhat.com>
- <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org>
- <c082340f-31b1-e690-8c29-c8d39edf8d35@redhat.com>
- <a2d0ddf1-f00c-42dd-851d-53f2ec789986@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <a2d0ddf1-f00c-42dd-851d-53f2ec789986@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20251110-vsieie-v2-10-9e53a3618c8c@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=BanVE7t2 c=1 sm=1 tr=0 ts=691ef560 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VnNF1IyMAAAA:8 a=XD9FR2GFIzR7_RmDYLQA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfX7tOkxTLD53Ck
+ 4LRJ1Tnypd9O7ALvHPp9KbXvQ2JvNKqM/uFibGNshES7YpZa1tbUOP69391lrD5J3JS4J4UwXHB
+ RWJX1y2Grx0TyveGp9BHXWYXAQrDcIP0gs0wYvn9M2qXN5YUVPom8A1XI/zIPXMg2KtwloSKWko
+ EGaMJph2T6QJpS19436KM25otGbC2LisX84pL7WAJYTH71utnitpO5qTAqID6QbdqxzpFgTnviv
+ zs9n/bGJ01i7P7SUbrEV86P9wxj55q9B9RSJyb1/qvpeWmkfZhmej5KZ6xTdjZFRL8Qyhq/Rc87
+ chz9ehnBMYQzgedPGW+6YeMQS0WS+ok9hc3b3LOq+WRMpOzgoY23ymEROdF4gAE9SP6FJ8ILVct
+ YX/FHHUibSU2q9Kw8SvQa6CIwpK+TA==
+X-Proofpoint-GUID: _O7NC9J12CxsETds7IDta9I4tySF3Jpc
+X-Proofpoint-ORIG-GUID: _O7NC9J12CxsETds7IDta9I4tySF3Jpc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-20_03,2025-11-20_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 lowpriorityscore=0 suspectscore=0 spamscore=0 impostorscore=0
+ priorityscore=1501 clxscore=1015 phishscore=0 bulkscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511150032
 
-On 20/11/25 11:10, Eric Auger wrote:
+On 11/10/25 18:16, Christoph Schlameuss wrote:
+> Introduce two new module parameters allowing to keep more shadow
+> structures
 > 
-> 
-> On 11/13/25 1:05 PM, Sebastian Ott wrote:
->> Hi Philippe,
->>
->> On Wed, 12 Nov 2025, Philippe Mathieu-Daudé wrote:
->>> On 12/11/25 19:13, Sebastian Ott wrote:
->>>>   Provide a kvm specific vcpu property to override the default
->>>>   (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
->>>>   by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
->>>>
->>>>   Note: in order to support PSCI v0.1 we need to drop vcpu
->>>>   initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
->>>>
->>>>   Signed-off-by: Sebastian Ott <sebott@redhat.com>
->>>>   ---
->>>>     docs/system/arm/cpu-features.rst |  5 +++
->>>>     target/arm/cpu.h                 |  6 +++
->>>>     target/arm/kvm.c                 | 64
->>>> +++++++++++++++++++++++++++++++-
->>>>     3 files changed, 74 insertions(+), 1 deletion(-)
->>>
->>>
->>>>   diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->>>>   index 0d57081e69..e91b1abfb8 100644
->>>>   --- a/target/arm/kvm.c
->>>>   +++ b/target/arm/kvm.c
->>>>   @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool
->>>>   value, Error **errp)
->>>>         ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON :
->>>>     ON_OFF_AUTO_OFF;
->>>>     }
->>>>
->>>>   +struct psci_version {
->>>>   +    uint32_t number;
->>>>   +    const char *str;
->>>>   +};
->>>>   +
->>>>   +static const struct psci_version psci_versions[] = {
->>>>   +    { QEMU_PSCI_VERSION_0_1, "0.1" },
->>>>   +    { QEMU_PSCI_VERSION_0_2, "0.2" },
->>>>   +    { QEMU_PSCI_VERSION_1_0, "1.0" },
->>>>   +    { QEMU_PSCI_VERSION_1_1, "1.1" },
->>>>   +    { QEMU_PSCI_VERSION_1_2, "1.2" },
->>>>   +    { QEMU_PSCI_VERSION_1_3, "1.3" },
->>>>   +    { -1, NULL },
->>>>   +};
->>>
->>>
->>>>   @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
->>>>                                  kvm_steal_time_set);
->>>>         object_property_set_description(obj, "kvm-steal-time",
->>>>                                         "Set off to disable KVM steal
->>>>   time.");
->>>>   +
->>>>   +    object_property_add_str(obj, "kvm-psci-version",
->>>>   kvm_get_psci_version,
->>>>   +                            kvm_set_psci_version);
->>>>   +    object_property_set_description(obj, "kvm-psci-version",
->>>>   +                                    "Set PSCI version. "
->>>>   +                                    "Valid values are 0.1, 0.2,
->>>> 1.0, 1.1,
->>>>   1.2, 1.3");
->>>
->>> Could we enumerate from psci_versions[] here?
->>>
->>
->> Hm, we'd need to concatenate these. Either manually:
->> "Valid values are " psci_versions[0].str ", " psci_versions[1].str ",
->> " ... which is not pretty and still needs to be touched for a new
->> version.
->>
->> Or by a helper function that puts these in a new array and uses smth like
->> g_strjoinv(", ", array);
->> But that's quite a bit of extra code that needs to be maintained without
->> much gain.
->>
->> Or we shy away from the issue and rephrase that to:
->> "Valid values include 1.0, 1.1, 1.2, 1.3"
-> Personally I would vote for keeping it as is
+> * vsie_shadow_scb_max
+>    Override the maximum number of VSIE control blocks / vsie_pages to
+>    shadow in guest-1. KVM will use the maximum of the current number of
+>    vCPUs and a maximum of 256 or this value if it is lower.
+>    This is the number of guest-3 control blocks / CPUs to keep shadowed
+>    to minimize the repeated shadowing effort.
 
-OK.
+KVM will either use this value or the number of current VCPUs. Either 
+way the number will be capped to 256.
 
-> (by the way why did you
-> moit 0.1 and 0.2 above?)
 > 
-> Eric
->>
->> Since the intended use case is via machine types and I don't expect a
->> lot of users setting the psci version manually - I vote for option 3.
->>
->> Opinions?
->>
->> Sebastian
+> * vsie_shadow_sca_max
+>    Override the maximum number of VSIE system control areas to
+>    shadow in guest-1. KVM will use a minimum of the current number of
+>    vCPUs and a maximum of 256 or this value if it is lower.
+>    This is the number of guest-3 system control areas / VMs to keep
+>    shadowed to minimize repeated shadowing effort.
+> 
+> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+Except for the current implementation with arrays, nothing is limiting 
+us from going over 256 in the future by changing the code. I'm not sure 
+if I ever want to see such an environment in practice though.
+
+>   arch/s390/kvm/vsie.c | 18 +++++++++++++++---
+>   1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> index b69ef763b55296875522f2e63169446b5e2d5053..cd114df5e119bd289d14037d1f1c5bfe148cf5c7 100644
+> --- a/arch/s390/kvm/vsie.c
+> +++ b/arch/s390/kvm/vsie.c
+> @@ -98,9 +98,19 @@ struct vsie_sca {
+>   	struct vsie_page	*pages[KVM_S390_MAX_VSIE_VCPUS];
+>   };
+>   
+> +/* maximum vsie shadow scb */
+> +unsigned int vsie_shadow_scb_max;
+
+Don't we need to initialize the variables or mark them static so they are 0?
+
+> +module_param(vsie_shadow_scb_max, uint, 0644);
+> +MODULE_PARM_DESC(vsie_shadow_scb_max, "Maximum number of VSIE shadow control blocks to keep. Values smaller number vcpus uses number of vcpus; maximum 256");
+> +
+> +/* maximum vsie shadow sca */
+> +unsigned int vsie_shadow_sca_max;
+> +module_param(vsie_shadow_sca_max, uint, 0644);
+> +MODULE_PARM_DESC(vsie_shadow_sca_max, "Maximum number of VSIE shadow system control areas to keep. Values smaller number of vcpus uses number of vcpus; 0 to disable sca shadowing; maximum 256");
+> +
+>   static inline bool use_vsie_sigpif(struct kvm *kvm)
+>   {
+> -	return kvm->arch.use_vsie_sigpif;
+> +	return kvm->arch.use_vsie_sigpif && vsie_shadow_sca_max;
+
+This functions as the enablement of vsie_sigpif?
+Is there a reason why we don't want this enabled per default?
+
+>   }
+>   
+>   static inline bool use_vsie_sigpif_for(struct kvm *kvm, struct vsie_page *vsie_page)
+> @@ -907,7 +917,8 @@ static struct vsie_sca *get_vsie_sca(struct kvm_vcpu *vcpu, struct vsie_page *vs
+>   	 * We want at least #online_vcpus shadows, so every VCPU can execute the
+>   	 * VSIE in parallel. (Worst case all single core VMs.)
+>   	 */
+> -	max_sca = MIN(atomic_read(&kvm->online_vcpus), KVM_S390_MAX_VSIE_VCPUS);
+> +	max_sca = MIN(MAX(atomic_read(&kvm->online_vcpus), vsie_shadow_sca_max),
+> +		      KVM_S390_MAX_VSIE_VCPUS);
+>   	if (kvm->arch.vsie.sca_count < max_sca) {
+>   		BUILD_BUG_ON(sizeof(struct vsie_sca) > PAGE_SIZE);
+>   		sca_new = (void *)__get_free_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> @@ -1782,7 +1793,8 @@ static struct vsie_page *get_vsie_page(struct kvm_vcpu *vcpu, unsigned long addr
+>   		put_vsie_page(vsie_page);
+>   	}
+>   
+> -	max_vsie_page = MIN(atomic_read(&kvm->online_vcpus), KVM_S390_MAX_VSIE_VCPUS);
+> +	max_vsie_page = MIN(MAX(atomic_read(&kvm->online_vcpus), vsie_shadow_scb_max),
+> +			    KVM_S390_MAX_VSIE_VCPUS);
+>   
+>   	/* allocate new vsie_page - we will likely need it */
+>   	if (addr || kvm->arch.vsie.page_count < max_vsie_page) {
 > 
 
 
