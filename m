@@ -1,141 +1,104 @@
-Return-Path: <kvm+bounces-63845-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63846-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5C53C742CB
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 14:24:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01066C74487
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 14:37:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 288242B06A
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 13:24:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id E963832334
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 13:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89CA33C19B;
-	Thu, 20 Nov 2025 13:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D2633E375;
+	Thu, 20 Nov 2025 13:32:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jMJVlNB8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwZgB7Cv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A229733A715
-	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 13:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6018C33AD8A;
+	Thu, 20 Nov 2025 13:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763644850; cv=none; b=Ot4/qORwQc6IQiAe95VLYMwgfINU2anoIfbrqrZtkxwpc5/hsoUg9wAru5orGdqpFG08U/RXaBf1CznCgSUcUqyHw+/Am6oXUzIsyVr5bdYSgt2gz2TfSKgB5dGVfVh9rmLgWZjMRu8e1KMUVqp2FXywGTDKS5F8l6uK31BL8N8=
+	t=1763645540; cv=none; b=KHYzDXw0X+BR1PiYKMpTC01QulLUjVEQeEQGdaY4c/3PfbmdDBGkFp5BGmGjCEye9y+4vrB8EutWD+l1r/Z9mrHs7dQF+Mk/Z/TDI4s/I1UhWZe0iskD2gjIskfDa9OheJrP2uH505JxRvyypupA0Qcc5iGoKvhq8DK9HVyn5/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763644850; c=relaxed/simple;
-	bh=FAIy2u4gJscDNGUshiInImCPqOKl3iOKQJH6e6Bc4JI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j73Is1L1y/hYZPTLGyM2b1FX5oE11NPoP8+GHXxjSWSqBJH27j8ZTcBuYQpTPxx8s89sj6hK9gFFbTcg/VLnnJyL8Sm+PsBYyh31534V6ZvDQGhhe6Qsa3um+YLkIJDjJAjQLj+dnsHS2VnMEcHVUFzESOclAKx5+ex52iYODVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=jMJVlNB8; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8b2dcdde698so116999885a.3
-        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 05:20:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1763644847; x=1764249647; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GaI8T1P9V7HUSR5GC1P83jhUObFww+4fRanAKkUJgJM=;
-        b=jMJVlNB8LyM4AYZyl088cBiSIlJ90Q1dm2hb+qOJix1EHdJs4siUbnVhSfjdoo+d8b
-         CpJ6KfO7u7JniZDhdoBs1zVrqavLhdwn31rKFf/kVN8vkyxieUH5wcPJTih/9lZw+PEX
-         fzdm1aYuxKCanV8/aYUVsuP51mR3HV9FaHggDK4qYX5m3Eht6ufYvvO9vptn0SOijTOl
-         cfmQgVoxaFFQaCv0MtR3VFkL7VdP7LsWZJMB5e2tkAY+4CqMtLl57rP2UzUjo5ld0ad3
-         Ew7cnRVtQJOT76Gc3wbQzgtVC/yQSTJ4MullMwUuBOCRwifmwR9JypsEhj+RRVt4akF1
-         VX3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763644847; x=1764249647;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GaI8T1P9V7HUSR5GC1P83jhUObFww+4fRanAKkUJgJM=;
-        b=TwyOoWYz1y7kQ9vs2NwG3rnIJiNy+8tkR1zny0IlIOiiUfR0ssDRaHTfZJQa57TaeM
-         od+RR/yy3jEcu0c4oTZTmrhEiWQm/H82+TQqTH9+XgS3eZf4v+3jn/sXBQtzigkV9j9F
-         qujFldYr3/ZLn6kOHheE1jtG2xOWf+oMPpcFNgUkR/Knhv0dU/MnHVqpmu9AJIWgFZ89
-         Rx80UQAZTTnOH0GqRhKl89SItzkpkBjRV39AHxfVl9jUTh5TNUpbtmvV7GSiyogeF/yy
-         6YuvcS11DVbZ/Bz/LYvdQFFg1t5iUFCxgzX40Rxfce3DGkLa8A02dcqSEZeFopEZPEMn
-         yDtg==
-X-Forwarded-Encrypted: i=1; AJvYcCXTXOJT061wKCApbocXgZWQuj0EQQ7oCwSUhoOK1CjkdrgZbqlkUQmivaVc9eO9byPrNWI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxm1DmJ5gLubCofFxmeTynM4q7NvYz1uYDvPeEExKs1W0H7kQIN
-	F0Yj9WzvrD5ImDGHyTldM/5NFTkLWHxh4NCrxJGekeY4jiFcBsEo7WVNKsLCB7wuEf8=
-X-Gm-Gg: ASbGncuZpWcr31nLYTQVGwdRN4elHne8+JT95ZWS2b+eLHRGFAGZEDiIv/qBMinrC8X
-	tvl6E1UUdtjWpFcMNuljFX0P9mAJDmxkTb94Fkl1FGQ8lEc5osPNF2xG0oa6+qHgNMbc0TBgSJo
-	EJCEQGNmS3i5Pj8ZkJDtNbzofdullsHG/AWMggCWrnHM3fYFAjJCWsJpcMNZx3ON/zfc5ASLNFt
-	rfHllGEpu6TsDQKks3JH2DfGCJIiUQxf6aUKFoc0HFM9o3Wlt7ytTDCHGZbklV0+fMGDoZRB6HC
-	sjF2ik1CqGonRQpPclU4kUeqID8iaQVt7X+6WExmz8o+uI/e7PwgY/51D3cUh8JdHxcxM4uBCec
-	j3OiE1epmxuin7wh0q5ETWvTbo5jfUg3G7Uqmrg76py2xox2SaPv4/m4OdVAVig+/U86unnMLoL
-	+0ixpnlvQVz6w/vJSclV+mDojKrDCs9vwfbRd5zdQSLy6ezoTfaY2IoOGM
-X-Google-Smtp-Source: AGHT+IHQ4fmxCAI4/D2tK1B8sYqUFbudidu6PckWMercsX/iRS90WBjHNHkg95yPWC8b179KW1QKQA==
-X-Received: by 2002:a05:620a:318a:b0:89f:27dc:6536 with SMTP id af79cd13be357-8b32a193b85mr303322785a.54.1763644847316;
-        Thu, 20 Nov 2025 05:20:47 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b3295c13ccsm148498285a.26.2025.11.20.05.20.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 05:20:46 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vM4ac-00000000gLM-0tBz;
-	Thu, 20 Nov 2025 09:20:46 -0400
-Date: Thu, 20 Nov 2025 09:20:46 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <skolothumtho@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, iommu@lists.linux.dev,
-	linux-mm@kvack.org, linux-doc@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
-	linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
-	Nicolin Chen <nicolinc@nvidia.com>
-Subject: Re: [Linaro-mm-sig] [PATCH v8 06/11] dma-buf: provide phys_vec to
- scatter-gather mapping routine
-Message-ID: <20251120132046.GU17968@ziepe.ca>
-References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
- <20251111-dmabuf-vfio-v8-6-fd9aa5df478f@nvidia.com>
- <8a11b605-6ac7-48ac-8f27-22df7072e4ad@amd.com>
- <20251119132511.GK17968@ziepe.ca>
- <69436b2a-108d-4a5a-8025-c94348b74db6@amd.com>
- <20251119193114.GP17968@ziepe.ca>
- <c115432c-b63d-4b99-be18-0bf96398e153@amd.com>
+	s=arc-20240116; t=1763645540; c=relaxed/simple;
+	bh=weqSIwlp3xIIHPIv7fkV+2kNuL/A0SzWqeYwqZ5jLi8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oqtCMZXXQnNSzcg9d+vVQTQ942BNe06TwSvQTqF3s6UxOqFFpEJsNCFpmZBUFf9ZFzXcVw8aJZLtNee9UPvlqG4LDmGxDCE8A31RxtoW/aJw7qddiA5LpnpRhRHzFTISC+WGuOiaoyp8C/W9NKmDObLD+IMnV5OJ0OhQauGZs4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwZgB7Cv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02CB0C4CEF1;
+	Thu, 20 Nov 2025 13:32:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763645540;
+	bh=weqSIwlp3xIIHPIv7fkV+2kNuL/A0SzWqeYwqZ5jLi8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dwZgB7CvdEkFocHnkkkxHfssM84KVXbUrqRzwJB1NVp/V/keQLLD+LHdAgN/KNlz3
+	 B0k9IWy4v7v5ERWdMvWaEu2c+lzN5HOTzOeaA+spGcFcO8rb7hN6MJZ6UMH89ovZHo
+	 /cLmv51TPJXDLk3nf5RaMYchzMFeIfKTWYLz4iNMOAJKXWSNyyZd3RkKfv4N0nHnHV
+	 4DlsnoQJZ80fBTTgYFds4dFcLqcc7V/esF0p+cuwrz4lUQdMY98YFWcH4lfVUhApwX
+	 OWRALzFH6j7CraDI7+yPYM7t7QhWSQjn3TquzZJZcWbT1fRU57Rgtx+UpeYdgP0ip4
+	 6PC4eDdRAaLZA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vM4ll-00000006tUG-2khI;
+	Thu, 20 Nov 2025 13:32:17 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH 0/5] KVM: arm64: Add support for FEAT_IDST
+Date: Thu, 20 Nov 2025 13:31:57 +0000
+Message-ID: <20251120133202.2037803-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <c115432c-b63d-4b99-be18-0bf96398e153@amd.com>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Nov 20, 2025 at 08:08:27AM +0100, Christian König wrote:
-> >> The exporter should be able to decide if it actually wants to use
-> >> P2P when the transfer has to go through the host bridge (e.g. when
-> >> IOMMU/bridge routing bits are enabled).
-> > 
-> > Sure, but this is a simplified helper for exporters that don't have
-> > choices where the memory comes from.
-> 
-> That is extremely questionable as justification to put that in common DMA-buf code.
+FEAT_IDST appeared in ARMv8.4, and allows ID registers to be trapped
+if they are not implemented. This only concerns 3 registers (GMID_EL1,
+CCSIDR2_EL1 and SMIDR_EL1), which are part of features that may not be
+exposed to the guest even if present on the host.
 
-FWIW we already have patches for a RDMA exporter lined up to use it as
-well. That's two users already...
+For these registers, the HW should report them with EC=0x18, even if
+the feature isn't implemented.
 
-Jason
+Add support for this feature by handling these registers in a specific
+way and implementing GMID_EL1 support in the process. A very basic
+selftest checks that these registers behave as expected.
+
+Marc Zyngier (5):
+  KVM: arm64: Add routing/handling for GMID_EL1
+  KVM: arm64: Force trap of GMID_EL1 when the guest doesn't have MTE
+  KVM: arm64: Add a generic synchronous exception injection primitive
+  KVM: arm64: Report optional ID register traps with a 0x18 syndrome
+  KVM: arm64: selftests: Add a test for FEAT_IDST
+
+ arch/arm64/include/asm/kvm_emulate.h          |   1 +
+ arch/arm64/kvm/emulate-nested.c               |   8 ++
+ arch/arm64/kvm/inject_fault.c                 |  10 +-
+ arch/arm64/kvm/sys_regs.c                     |  17 ++-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/arm64/idreg-idst.c  | 117 ++++++++++++++++++
+ 6 files changed, 149 insertions(+), 5 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/arm64/idreg-idst.c
+
+-- 
+2.47.3
+
 
