@@ -1,179 +1,99 @@
-Return-Path: <kvm+bounces-63999-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64000-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4E63C769F9
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:32:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12578C76A01
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:33:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A0F12358876
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 23:32:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 20C6C29EB1
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 23:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E883093CD;
-	Thu, 20 Nov 2025 23:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92A0221739;
+	Thu, 20 Nov 2025 23:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E9OwWVbZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PYAOvzc1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776A930BB8A
-	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 23:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60C836D51C
+	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 23:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763681528; cv=none; b=fr9NaZSnXKd81uA4VakAGHICmcJmmfo7mp1tsbhRZkGzEjoGmwnaE8Q5efOGEIZW45axutYz0IPXNrfIecNbqjwH74oKQkm+lVABE9TmAxxd543nUPv4VzZg9PzAoi1pgDisGvWlOh/y6/RIRJI1HTfjQWhndXh09p/jJ5sIKXU=
+	t=1763681600; cv=none; b=S2guhmGgcHsNhhayCQ+0jjeceOHL8WCGj8XkcWZ0uVV9lpNIEHfsuDxjc9IST8jJkQLU9x6f7+nEQhDPxG38kJvQ10v2o9x7CVR5R+OBYhThnrcSsXUbRJxr39WCUSR4gMvnQgauH5DDxu57pYpmclnHIU5bkR+nMBO66Ob66e4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763681528; c=relaxed/simple;
-	bh=5ZD06AI7zWxET9vAGhukhzeSly5h9OphZxmRgnz1qdU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=h25KcQVPruZuBfwBc255mooUkzTRk5+Ole0kpViRDLyqO/FyDonsCvXVxcRFeBIkF4bY/OcMmRfQIf1ZRJxA590VkpzcwQCMDkpMEyaAP6ZiQfSeMunrkvwdVTHjdv1zSoSsUOh/T0sj708+cjI3lxXPcA4rk44L3QeMx9BLkpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E9OwWVbZ; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3416dc5754fso3287158a91.1
-        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 15:32:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763681526; x=1764286326; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=jyNN0DXXgpzqGWdpOnw2jjdiDkCh9pfualLy36FZJCQ=;
-        b=E9OwWVbZAeLAXHLgnqbHBaHUTQhxN0g7cQY2kIEasc9fnvN119gmOWhs/8CHEqZh8j
-         6vh/UsEBBJwzswieaXn5Uxr3X7ppK1CdfbzYkfReUvusUmszncg4EOsvyYI2U01fJq6V
-         ClPW/5408LErTNIK2vNwAAOb2O5rHdyplGekWIqdQKAtI7OxNvcQRxxdq0WZ8hK5ioD6
-         +3VbG+Rkm2kCCOlxh98b57oX8nuPL1xztrW8Qqbv0JHh04P6MiBXoE+ZJaex2uy3CPXS
-         SR4KIpLCnWuApM5/rVx0jRofvWB0CGaVgs2HaevTVzyzdQscwv+2XUyLLxFWZWFGKZVB
-         LnMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763681526; x=1764286326;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jyNN0DXXgpzqGWdpOnw2jjdiDkCh9pfualLy36FZJCQ=;
-        b=WfAyXtSDFj9V9IkXgZqE7h0x5T5xa2mOiIegJb7eKe1yeG2xMxFRMYrEptMEOHZCD2
-         bjorxLfamxKKjYb8ItNrK3tamG5zz0zskEf9g4G3l+PSMmBij7mF68I0AgrHa6Oc7rkw
-         n9twNQFUrEv93gcTyRS9Kzvm2mUX9dnMDmoAxoAK5I4bHhpbxRLk0dyOBDrdhS1zIsy7
-         VGr+aUJwPCsg3tOtA1a0RSfjYYIrd9kAWzCvreatVqF9B4w3n7A3INJ+mtVgxnwt6RPA
-         U1/0GoXrKfqkHWlMfhYrfNx262vnlAdEsIRIarc3xOZHKW5No+PtygyPAc/pCeGTYuxA
-         dC5Q==
-X-Gm-Message-State: AOJu0YzcSFFyi/dAzO+KURe6ILiLaTiTmHqBz68Zrzqlw/UZg41NxQmw
-	PixH+zurAc2ODanML9XAS5MSksbmBhCEwWLObrE9t/mdDgIJKqsbwj8qCHMLIQf07llokvAzoQJ
-	Oa69IaA==
-X-Google-Smtp-Source: AGHT+IF1OjbBh3fJhT4HiEIhAVO+Z0OlQvlRr/VYLL186xobvzzWOegRQZ5YADW/dRDjLNmUX4MWihbGkcQ=
-X-Received: from pjtv10.prod.google.com ([2002:a17:90a:c90a:b0:340:3e18:b5c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b42:b0:341:8b2b:43c
- with SMTP id 98e67ed59e1d1-34733f236d3mr227432a91.18.1763681525979; Thu, 20
- Nov 2025 15:32:05 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 20 Nov 2025 15:31:49 -0800
-In-Reply-To: <20251120233149.143657-1-seanjc@google.com>
+	s=arc-20240116; t=1763681600; c=relaxed/simple;
+	bh=RAPTcNsb23hxZ7t8bfr68Bf+rgKFXx8H3tX2jK3cEyM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L49ToFhvp/64WQv0a4CkieNKvHnNikSTLEUDK8pmAslp9ZdZnDST/CUDo8FpYGwQvL3oUgguxXt6vAXqXSszHVt6vqcETmjHq2NI7Bdk3FydRdNQNkHwZkPW0kLdDeSO5eRp+cxo3YLgo9D3og+2dVhZTnzS1SaUz9NwKUQouSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PYAOvzc1; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 20 Nov 2025 23:32:58 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763681582;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TJTqeKWqLQa65Gs8lub8DO0oSaBCWOp2hdHEl8lT9d4=;
+	b=PYAOvzc1Mwaf76n8KQv54zxssYN807roiZABHhpTmClUThxiNl7L0xGUtA3uQNAGKm7E9O
+	wjuJls6YfERS9Di9OzdmVNLXCfi4yJsIlgtY71p9L1w48lxvvU1ZJLDK+Rp3ko5Cs1Bdfm
+	2EZiP+Zg12emcYLJAnqJmlasJ9tf7Qc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 00/23] Extend test coverage for nested SVM
+Message-ID: <6r4wdlkfpnmrox2cndrg4t7ixrpqivgsehfdbvirh3skkuikwr@lauuwibj5bd2>
+References: <20251021074736.1324328-1-yosry.ahmed@linux.dev>
+ <aR-i6zFLGV_4VwsZ@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251120233149.143657-1-seanjc@google.com>
-X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
-Message-ID: <20251120233149.143657-9-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v4 8/8] x86: pmu_pebs: Support to validate
- timed PEBS record on GNR/SRF
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Yi Lai <yi1.lai@intel.com>, Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aR-i6zFLGV_4VwsZ@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+On Thu, Nov 20, 2025 at 03:23:23PM -0800, Sean Christopherson wrote:
+> On Tue, Oct 21, 2025, Yosry Ahmed wrote:
+> > There are multiple selftests exercising nested VMX that are not specific
+> > to VMX (at least not anymore). Extend their coverage to nested SVM.
+> > 
+> > This version is significantly different (and longer) than v1 [1], mainly
+> > due to the change of direction to reuse __virt_pg_map() for nested EPT/NPT
+> > mappings instead of extending the existing nested EPT infrastructure. It
+> > also has a lot more fixups and cleanups.
+> > 
+> > This series depends on two other series:
+> > - "KVM: SVM: GIF and EFER.SVME are independent" [2]
+> > - "KVM: selftests: Add test of SET_NESTED_STATE with 48-bit L2 on 57-bit L1" [3]
+> 
+> No, it depends on local commits that are very similar to [3], but not precisely
+> [3].
 
-On Intel GNR/SRF platform, timed PEBS is introduced. Timed PEBS adds
-a new "retired latency" field in basic info group to show the timing
-info. IA32_PERF_CAPABILITIES.PEBS_TIMING_INFO[bit 17] is introduced to
-indicate whether timed PEBS is supported.
+Hmm I just applied that series with b4 without local changes, on top of
+kvm-x86/next at that time, which was kvm-x86-next-2025.09.30.
 
-After introducing timed PEBS, the PEBS record format field shrinks to
-bits[31:0] and  the bits[47:32] is used to record retired latency.
+Maybe you had v2 or it was the patches that landed between
+kvm-x86-next-2025.09.30 and the current tip of kvm-x86/next?
 
-Thus shrink the record format to bits[31:0] accordingly and avoid the
-retired latency field is recognized a part of record format to compare
-and cause failure on GNR/SRF.
+> In the future, please provide a link to a git repo+branch when posting
+> series with dependencies.  It took me several attempts and a bit of conflict
+> resolution to get this series applied.
 
-Please find detailed information about timed PEBS in section 8.4.1
-"Timed Processor Event Based Sampling" of "Intel Architecture
-Instruction Set Extensions and Future Features".
+Yeah I can do that, although I think it wouldn't have helped in this
+case as the same conflicts would apply. Perhaps mentioning that this is
+based on kvm-x86-next-2025.09.30 would have helped?
 
-Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Tested-by: Yi Lai <yi1.lai@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- lib/x86/pmu.h  | 6 ++++++
- x86/pmu_pebs.c | 8 +++++---
- 2 files changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/lib/x86/pmu.h b/lib/x86/pmu.h
-index e84b37dc..cd6091af 100644
---- a/lib/x86/pmu.h
-+++ b/lib/x86/pmu.h
-@@ -20,6 +20,7 @@
- #define PMU_CAP_LBR_FMT	  0x3f
- #define PMU_CAP_FW_WRITES	(1ULL << 13)
- #define PMU_CAP_PEBS_BASELINE	(1ULL << 14)
-+#define PMU_CAP_PEBS_TIMING_INFO	(1ULL << 17)
- #define PERF_CAP_PEBS_FORMAT           0xf00
- 
- #define EVNSEL_EVENT_SHIFT	0
-@@ -193,4 +194,9 @@ static inline bool pmu_has_pebs_baseline(void)
- 	return pmu.perf_cap & PMU_CAP_PEBS_BASELINE;
- }
- 
-+static inline bool pmu_has_pebs_timing_info(void)
-+{
-+	return pmu.perf_cap & PMU_CAP_PEBS_TIMING_INFO;
-+}
-+
- #endif /* _X86_PMU_H_ */
-diff --git a/x86/pmu_pebs.c b/x86/pmu_pebs.c
-index 2848cc1e..bc37e8e3 100644
---- a/x86/pmu_pebs.c
-+++ b/x86/pmu_pebs.c
-@@ -277,6 +277,7 @@ static void check_pebs_records(u64 bitmask, u64 pebs_data_cfg, bool use_adaptive
- 	unsigned int count = 0;
- 	bool expected, pebs_idx_match, pebs_size_match, data_cfg_match;
- 	void *cur_record;
-+	u64 format_mask;
- 
- 	expected = (ds->pebs_index == ds->pebs_buffer_base) && !pebs_rec->format_size;
- 	if (!(rdmsr(MSR_CORE_PERF_GLOBAL_STATUS) & GLOBAL_STATUS_BUFFER_OVF)) {
-@@ -289,6 +290,8 @@ static void check_pebs_records(u64 bitmask, u64 pebs_data_cfg, bool use_adaptive
- 		return;
- 	}
- 
-+	/* Record format shrinks to bits[31:0] after timed PEBS is introduced. */
-+	format_mask = pmu_has_pebs_timing_info() ? GENMASK_ULL(31, 0) : GENMASK_ULL(47, 0);
- 	expected = ds->pebs_index >= ds->pebs_interrupt_threshold;
- 	cur_record = (void *)pebs_buffer;
- 	do {
-@@ -296,8 +299,7 @@ static void check_pebs_records(u64 bitmask, u64 pebs_data_cfg, bool use_adaptive
- 		pebs_record_size = pebs_rec->format_size >> RECORD_SIZE_OFFSET;
- 		pebs_idx_match = pebs_rec->applicable_counters & bitmask;
- 		pebs_size_match = pebs_record_size == get_pebs_record_size(pebs_data_cfg, use_adaptive);
--		data_cfg_match = (pebs_rec->format_size & GENMASK_ULL(47, 0)) ==
--				 (use_adaptive ? pebs_data_cfg : 0);
-+		data_cfg_match = (pebs_rec->format_size & format_mask) == (use_adaptive ? pebs_data_cfg : 0);
- 		expected = pebs_idx_match && pebs_size_match && data_cfg_match;
- 		report(expected,
- 		       "PEBS record (written seq %d) is verified (including size, counters and cfg).", count);
-@@ -327,7 +329,7 @@ static void check_pebs_records(u64 bitmask, u64 pebs_data_cfg, bool use_adaptive
- 			       pebs_record_size, get_pebs_record_size(pebs_data_cfg, use_adaptive));
- 		if (!data_cfg_match)
- 			printf("FAIL: The pebs_data_cfg (0x%lx) doesn't match with the effective MSR_PEBS_DATA_CFG (0x%lx).\n",
--			       pebs_rec->format_size & 0xffffffffffff, use_adaptive ? pebs_data_cfg : 0);
-+			       pebs_rec->format_size & format_mask, use_adaptive ? pebs_data_cfg : 0);
- 	}
- }
- 
--- 
-2.52.0.rc2.455.g230fcf2819-goog
-
+> 
+> > [1]https://lore.kernel.org/kvm/20251001145816.1414855-1-yosry.ahmed@linux.dev/
+> > [2]https://lore.kernel.org/kvm/20251009223153.3344555-1-jmattson@google.com/
+> > [3]https://lore.kernel.org/kvm/20250917215031.2567566-1-jmattson@google.com/
 
