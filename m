@@ -1,79 +1,82 @@
-Return-Path: <kvm+bounces-63782-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63770-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C3C1C7257E
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 07:29:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39265C724FD
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 07:17:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2BE04E73A3
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 06:25:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id CD9522A1F5
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 06:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E2132F1FCA;
-	Thu, 20 Nov 2025 06:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25FA27FD5D;
+	Thu, 20 Nov 2025 06:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q7um5342"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W2Nbt272"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FC019FA93;
-	Thu, 20 Nov 2025 06:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAFC4C98;
+	Thu, 20 Nov 2025 06:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763619891; cv=none; b=YGlmr9yxOPxTm94JWzkE2T0UVpKjNwdPWYoS6Ili1Xh0K7M/W0iRI7pnkHgF473fd+0AIE4jVMlqzG298JE+JNFv6nIVMA938owComf/kJx2lbmk2D8xeOM2HP2UlpzMieOLV3vBpGdJJnJhZ+4XeOoRWiThtw0KmfiqUCP9T2I=
+	t=1763619456; cv=none; b=AvKTmA4dFUcMxCmtFsTRVlqhQMDCUx8BbUsPQ0H8A0e3ODMhJBOK2IbELKNUFOtvsfa13OLZ4p6Bhjlnj9n3UGgku1Al1JaEcmsW9Rt2T2jqV6CxRDgDVfXU9aaXSt2HoZ1/HGUviz9734BIfJcPV054F0WOB0x6QzBm01re18I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763619891; c=relaxed/simple;
-	bh=aACPGRVkqaH1oQa+8g5OVYAMyLjF6z29dLx9YwvlBwU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=STlHaXMDKbmHE21//rJjUGfa5taxS3tEKPVd3bIUjjcaU9gsOH62D00JMSVNu1abpZp2FdYjVmcrOhoK1J2tSdTy7TPutJaJzQUAEd9TyfcTbswLp3L5UeOJKUM+cjL+17P9laxLXQabW1/b0ZXzlJjpu0H28VYGQonfcFpvJw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q7um5342; arc=none smtp.client-ip=198.175.65.19
+	s=arc-20240116; t=1763619456; c=relaxed/simple;
+	bh=XrsQdz2tLAJSqPVnube39kw+4N0HijWoU8dbWY8GeLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=TIz3QaVtdazdDmijLmKRSuesshtG8ZQ6Uxl+ac971kjb7miuJANa/FX0hbgIId/FvbqN+yGX2yhCHTFaFlE7OFGffZ4wHUTQfaTJOqDRkZzY3lb6kIBgP32lUuMXte/r4E7x0IAIEa9cRKZLo2Qd11F7VRvJjOCqCRFegDz0Cug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W2Nbt272; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763619890; x=1795155890;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=aACPGRVkqaH1oQa+8g5OVYAMyLjF6z29dLx9YwvlBwU=;
-  b=Q7um5342Ef1WNa1jsHDn4dUgY44DI1TpxVDAdOwP9AzqxdyxxZP1V9th
-   Y5esRiwuT1awVF4xTM5/CuxWSmd7JuHlMLTWCpWtNmEtZv4zjdBEP2uo0
-   pcRbdL4/Z2ma3JY/F4XM+wXzIx6rZ8gs/yW6OMRe54sG3HCIwasDA6Ts8
-   IV8e8KLHR1P8Z+HqLrH6FKCJmIJhWNpOgtS9D1ZHm4JWY9hgq3rkduXch
-   xVmOexgbp2t1V98atnL2g9KTn5Jqv8cq7bGEpe5ANvOeHtWL5dQF/rIGD
-   VLLO3hFY6AVajpMYyrpWFXtkpzfvKZ66Xe2yy1/yiJWvYSE1WpMoGeew4
-   Q==;
-X-CSE-ConnectionGUID: 9hz4fPhaQOKPmJ43BY2xWQ==
-X-CSE-MsgGUID: DB1l4j0RS4yxj1nY748BTw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="65555069"
+  t=1763619454; x=1795155454;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=XrsQdz2tLAJSqPVnube39kw+4N0HijWoU8dbWY8GeLg=;
+  b=W2Nbt272Yl9TFQW9nlA1GiebLNBWTEFhZZ/+J84jCSwk1kdxa5qeCmJD
+   uiQZVqtEZH7Eum+FfnOKf/LC2jFPWCxvBuPVNe5a1DRcfzWIaC0jHfT1d
+   sJyEYRASMhW8vTtVExNgKETngHLh3KxpJVABmd8Ulv2QnGWfQjs0I6icc
+   xmEdiD//3fren7zHwaqROFxYEeFvHPCN8B898d5/H1Wu8fDV8UhfbWTFu
+   DCFg9NreHnpAwikAa/vWQAnXRzQWC27SF5syB8ASCPVORvGsGTVFI/zet
+   a1RLIDozu/4tGaeeiMsgC+Iycnaz0IW2JuVyl3xpJqOAtac/oHG64hpky
+   w==;
+X-CSE-ConnectionGUID: 0QWWP956RsWfxnXFgf0UQA==
+X-CSE-MsgGUID: nYFp5xUwTQ6KJOAhi4cEQA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="77035454"
 X-IronPort-AV: E=Sophos;i="6.19,317,1754982000"; 
-   d="scan'208";a="65555069"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 22:24:49 -0800
-X-CSE-ConnectionGUID: nK6wBS+QRSOwdw3pTDHSAg==
-X-CSE-MsgGUID: a62DbDRRSNWSCYYiFuyovg==
+   d="scan'208";a="77035454"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 22:17:33 -0800
+X-CSE-ConnectionGUID: sK1rvV/cQkikO7mOknNcxQ==
+X-CSE-MsgGUID: Xa3SI499SlCDj9br0RsE0Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,317,1754982000"; 
-   d="scan'208";a="221919659"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa002.jf.intel.com with ESMTP; 19 Nov 2025 22:24:46 -0800
-Date: Thu, 20 Nov 2025 14:09:55 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: linux-coco@lists.linux.dev, linux-pci@vger.kernel.org,
-	chao.gao@intel.com, dave.jiang@intel.com, baolu.lu@linux.intel.com,
-	yilun.xu@intel.com, zhenzhong.duan@intel.com, kvm@vger.kernel.org,
-	rick.p.edgecombe@intel.com, dave.hansen@linux.intel.com,
-	dan.j.williams@intel.com, kas@kernel.org, x86@kernel.org
-Subject: Re: [PATCH v1 08/26] x86/virt/tdx: Add tdx_enable_ext() to enable of
- TDX Module Extensions
-Message-ID: <aR6ws2yzwQumApb9@yilunxu-OptiPlex-7050>
-References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
- <20251117022311.2443900-9-yilun.xu@linux.intel.com>
- <cfcfb160-fcd2-4a75-9639-5f7f0894d14b@intel.com>
- <aRyphEW2jpB/3Ht2@yilunxu-OptiPlex-7050>
- <62bec236-4716-4326-8342-1863ad8a3f24@intel.com>
+   d="scan'208";a="191532099"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 22:17:33 -0800
+Date: Wed, 19 Nov 2025 22:17:32 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>
+Subject: [PATCH v4 00/11] VMSCAPE optimization for BHI variant
+Message-ID: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
+X-B4-Tracking: v=1; b=H4sIAHCxHmkC/23NvQrCMBQF4FeRzEby23CdFBdHBzdxaJNbG6itN
+ DVUpO9uqCAWHc893O88ScDOYyDrxZN0GH3wbZOCWi6IrfLmgtS7lIlgQjPgGY3XYPMb0qIqqDN
+ OZQDGlKIk6ePWYemHSTuRw/a425NzOlc+9G33mDYin8o3J9SMi5wy6nLNS4YcpHKb2jf3YeWbH
+ uuVba+TFsVH4IzruSCSANwWzoGVOWT/BfklCDMXZBK0AWmFlgpB/grjOL4AH+/+uTcBAAA=
+X-Change-ID: 20250916-vmscape-bhb-d7d469977f2f
+X-Mailer: b4 0.14.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,224 +85,126 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <62bec236-4716-4326-8342-1863ad8a3f24@intel.com>
 
-On Tue, Nov 18, 2025 at 10:32:13AM -0800, Dave Hansen wrote:
-> On 11/18/25 09:14, Xu Yilun wrote:
-> ....>>> The extension initialization uses the new TDH.EXT.MEM.ADD and
-> >>> TDX.EXT.INIT seamcalls. TDH.EXT.MEM.ADD add pages to a shared memory
-> >>> pool for extensions to consume.
-> >>
-> >> "Shared memory" is an exceedingly unfortunate term to use here. They're
-> >> TDX private memory, right?
-> > 
-> > Sorry, they are indeed TDX private memory. Here 'shared' means the
-> > memory in the pool will be consumed by multiple new features but this
-> > is TDX Module internal details that I should not ramble, especially in
-> > TDX context.
-> ... and you'll find a better term in the next revision. Right?
+Sean, David, since this version differs quite a bit from v3, I have not
+included the Ack tag you provided. Please let me know if it is okay to add
+them back.
 
-Yes, I think just "memory pool" is enough.
+v4:
+- Move LFENCE to the callsite, out of clear_bhb_loop(). (Dave)
+- Make clear_bhb_loop() work for larger BHB. (Dave)
+  This now uses hardware enumeration to determine the BHB size to clear.
+- Use write_ibpb() instead of indirect_branch_prediction_barrier() when
+  IBPB is known to be available. (Dave)
+- Use static_call() to simplify mitigation at exit-to-userspace. (Dave)
+- Refactor vmscape_select_mitigation(). (Dave)
+- Fix vmscape=on which was wrongly behaving as AUTO. (Dave)
+- Split the patches. (Dave)
+  - Patch 1-4 prepares for making the sequence flexible for VMSCAPE use.
+  - Patch 5 trivial rename of variable.
+  - Patch 6-8 prepares for deploying BHB mitigation for VMSCAPE.
+  - Patch 9 deploys the mitigation.
+  - Patch 10-11 fixes ON Vs AUTO mode.
 
-> 
-> ...>> How much memory does this consume?
-> > 
-> > 12800 pages.
-> 
-> Oof. That's more than I expected and it's also getting up to the amount
-> that you don't want to just eat without saying seomthing about it.
-> 
-> Could you please at least dump a pr_info() out about how much memory
-> this consumes?
+v3: https://lore.kernel.org/r/20251027-vmscape-bhb-v3-0-5793c2534e93@linux.intel.com
+- s/x86_pred_flush_pending/x86_predictor_flush_exit_to_user/ (Sean).
+- Removed IBPB & BHB-clear mutual exclusion at exit-to-userspace.
+- Collected tags.
 
-Sure.
+v2: https://lore.kernel.org/r/20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com
+- Added check for IBPB feature in vmscape_select_mitigation(). (David)
+- s/vmscape=auto/vmscape=on/ (David)
+- Added patch to remove LFENCE from VMSCAPE BHB-clear sequence.
+- Rebased to v6.18-rc1.
 
-> 
-> >>> TDH.EXT.MEM.ADD is the first user of tdx_page_array. It provides pages
-> >>> to TDX Module as control (private) pages. A tdx_clflush_page_array()
-> >>> helper is introduced to flush shared cache before SEAMCALL, to avoid
-> >>> shared cache write back damages these private pages.
-> >>
-> >> First, this talks about "control pages". But I don't know what a control
-> >> page is.
-> > 
-> > It refers to pages provided to TDX Module to hold all kinds of control
-> > structures or metadata. E.g. TDR, TDCS, TDVPR... With TDX Connect we
-> > have more, SPDM metadata, IDE metadata...
-> 
-> Please *say* that. Explain how existing TDX metadata consumes memory and
-> how this new mechanism is different.
+v1: https://lore.kernel.org/r/20250924-vmscape-bhb-v1-0-da51f0e1934d@linux.intel.com
 
-Yes.
+Hi All,
 
-Existing ways to provide an array of metadata pages to TDX Module
-varies:
+These patches aim to improve the performance of a recent mitigation for
+VMSCAPE[1] vulnerability. This improvement is relevant for BHI variant of
+VMSCAPE that affect Alder Lake and newer processors.
 
- 1. Assign each HPA for each SEAMCALL register.
- 2. Call the same seamcall multiple times.
- 3. Assign the PA of HPA-array in one register and the page number in
-    another register.
+The current mitigation approach uses IBPB on kvm-exit-to-userspace for all
+affected range of CPUs. This is an overkill for CPUs that are only affected
+by the BHI variant. On such CPUs clearing the branch history is sufficient
+for VMSCAPE, and also more apt as the underlying issue is due to poisoned
+branch history.
 
-TDX Module defines new interfaces trying to unify the page array
-provision. It is similar to the 3rd method. The new objects HPA_ARRAY_T
-and HPA_LIST_INFO need a 'root page' which contains a list of HPAs.
-They collapse the HPA of the root page and the number of valid HPAs
-into a 64 bit raw value for one SEAMCALL parameter.
+Below is the iPerf data for transfer between guest and host, comparing IBPB
+and BHB-clear mitigation. BHB-clear shows performance improvement over IBPB
+in most cases.
 
-I think these words should be in:
+Platform: Emerald Rapids
+Baseline: vmscape=off
 
-  x86/virt/tdx: Add tdx_page_array helpers for new TDX Module objects
-> 
-> BTW... Do you see how I'm trimming context as I reply? Could you please
-> endeavor to do the same?
+(pN = N parallel connections)
 
-Yes.
+| iPerf user-net | IBPB    | BHB Clear |
+|----------------|---------|-----------|
+| UDP 1-vCPU_p1  | -12.5%  |   1.3%    |
+| TCP 1-vCPU_p1  | -10.4%  |  -1.5%    |
+| TCP 1-vCPU_p1  | -7.5%   |  -3.0%    |
+| UDP 4-vCPU_p16 | -3.7%   |  -3.7%    |
+| TCP 4-vCPU_p4  | -2.9%   |  -1.4%    |
+| UDP 4-vCPU_p4  | -0.6%   |   0.0%    |
+| TCP 4-vCPU_p4  |  3.5%   |   0.0%    |
 
-> 
-> >>> @@ -1251,7 +1254,14 @@ static __init int config_tdx_module(struct tdmr_info_list *tdmr_list,
-> >>>  	args.rcx = __pa(tdmr_pa_array);
-> >>>  	args.rdx = tdmr_list->nr_consumed_tdmrs;
-> >>>  	args.r8 = global_keyid;
-> >>> -	ret = seamcall_prerr(TDH_SYS_CONFIG, &args);
-> >>> +
-> >>> +	if (tdx_sysinfo.features.tdx_features0 & TDX_FEATURES0_TDXCONNECT) {
-> >>> +		args.r9 |= TDX_FEATURES0_TDXCONNECT;
-> >>> +		args.r11 = ktime_get_real_seconds();
-> >>> +		ret = seamcall_prerr(TDH_SYS_CONFIG | (1ULL << TDX_VERSION_SHIFT), &args);
-> >>> +	} else {
-> >>> +		ret = seamcall_prerr(TDH_SYS_CONFIG, &args);
-> >>> +	}
-> >>
-> >> I'm in the first actual hunk of code and I'm lost. I don't have any idea
-> >> what the "(1ULL << TDX_VERSION_SHIFT)" is doing.
-> > 
-> > TDX Module defines the version field in its leaf to specify updated
-> > parameter set. The existing user is:
-> > 
-> > u64 tdh_vp_init(struct tdx_vp *vp, u64 initial_rcx, u32 x2apicid)
-> > {
-> > 	struct tdx_module_args args = {
-> > 		.rcx = vp->tdvpr_pa,
-> > 		.rdx = initial_rcx,
-> > 		.r8 = x2apicid,
-> > 	};
-> > 
-> > 	/* apicid requires version == 1. */
-> > 	return seamcall(TDH_VP_INIT | (1ULL << TDX_VERSION_SHIFT), &args);
-> > }
-> 
-> OK, so there's a single existing user with this thing open coded.
-> 
-> You're adding a second user, so you just copied and pasted the existing
-> code. Is there a better way to do this? For instance, can we just pass
-> the version number to *ALL* seamcall()s?
+| iPerf bridge-net | IBPB    | BHB Clear |
+|------------------|---------|-----------|
+| UDP 1-vCPU_p1    | -9.4%   |  -0.4%    |
+| TCP 1-vCPU_p1    | -3.9%   |  -0.5%    |
+| UDP 4-vCPU_p16   | -2.2%   |  -3.8%    |
+| TCP 4-vCPU_p4    | -1.0%   |  -1.0%    |
+| TCP 4-vCPU_p4    |  0.5%   |   0.5%    |
+| UDP 4-vCPU_p4    |  0.0%   |   0.9%    |
+| TCP 1-vCPU_p1    |  0.0%   |   0.9%    |
 
-I think it may be too heavy. We have a hundred SEAMCALLs and I expect
-few needs version 1. I actually think v2 is nothing different from a new
-leaf. How about something like:
+| iPerf vhost-net | IBPB    | BHB Clear |
+|-----------------|---------|-----------|
+| UDP 1-vCPU_p1   | -4.3%   |   1.0%    |
+| TCP 1-vCPU_p1   | -3.8%   |  -0.5%    |
+| TCP 1-vCPU_p1   | -2.7%   |  -0.7%    |
+| UDP 4-vCPU_p16  | -0.7%   |  -2.2%    |
+| TCP 4-vCPU_p4   | -0.4%   |   0.8%    |
+| UDP 4-vCPU_p4   |  0.4%   |  -0.7%    |
+| TCP 4-vCPU_p4   |  0.0%   |   0.6%    |
 
---- a/arch/x86/virt/vmx/tdx/tdx.h
-+++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -46,6 +46,7 @@
- #define TDH_PHYMEM_PAGE_WBINVD         41
- #define TDH_VP_WR                      43
- #define TDH_SYS_CONFIG                 45
-+#define TDH_SYS_CONFIG_V1              (TDH_SYS_CONFIG | (1ULL << TDX_VERSION_SHIFT))
+[1] https://comsec.ethz.ch/research/microarch/vmscape-exposing-and-exploiting-incomplete-branch-predictor-isolation-in-cloud-environments/
 
-And if a SEAMCALL needs export, add new tdh_foobar() helper. Anyway
-the parameter list should be different.
+---
+Pawan Gupta (11):
+      x86/bhi: x86/vmscape: Move LFENCE out of clear_bhb_loop()
+      x86/bhi: Move the BHB sequence to a macro for reuse
+      x86/bhi: Make the depth of BHB-clearing configurable
+      x86/bhi: Make clear_bhb_loop() effective on newer CPUs
+      x86/vmscape: Rename x86_ibpb_exit_to_user to x86_predictor_flush_exit_to_user
+      x86/vmscape: Move mitigation selection to a switch()
+      x86/vmscape: Use write_ibpb() instead of indirect_branch_prediction_barrier()
+      x86/vmscape: Use static_call() for predictor flush
+      x86/vmscape: Deploy BHB clearing mitigation
+      x86/vmscape: Override conflicting attack-vector controls with =force
+      x86/vmscape: Add cmdline vmscape=on to override attack vector controls
 
-> 
-> 
-> 
-> ...>> This is really difficult to understand. It's not really filling a
-> >> "root", it's populating an array. The structure of the loop is also
-> > 
-> > It is populating the root page with part (512 pages at most) of the array.
-> > So is it better name the function tdx_page_array_populate_root()?
-> 
-> That's getting a bit verbose.
+ Documentation/admin-guide/hw-vuln/vmscape.rst   |  8 +++
+ Documentation/admin-guide/kernel-parameters.txt |  4 +-
+ arch/x86/Kconfig                                |  1 +
+ arch/x86/entry/entry_64.S                       | 49 +++++++++++-------
+ arch/x86/include/asm/cpufeatures.h              |  2 +-
+ arch/x86/include/asm/entry-common.h             |  9 ++--
+ arch/x86/include/asm/nospec-branch.h            | 11 ++--
+ arch/x86/kernel/cpu/bugs.c                      | 67 +++++++++++++++++++------
+ arch/x86/kvm/x86.c                              |  4 +-
+ arch/x86/net/bpf_jit_comp.c                     |  2 +
+ 10 files changed, 114 insertions(+), 43 deletions(-)
+---
+base-commit: 6a23ae0a96a600d1d12557add110e0bb6e32730c
+change-id: 20250916-vmscape-bhb-d7d469977f2f
 
-tdx_page_array_populate()
-
-> 
-> >> rather non-obvious. It's doing:
-> >>
-> >> 	while (1) {
-> >> 		fill(&array);
-> >> 		tell_tdx_module(&array);
-> >> 	}
-> > 
-> > There is some explanation in Patch #6:
-> 
-> That doesn't really help me, or future reviewers.
-> 
-> >  4. Note the root page contains 512 HPAs at most, if more pages are
-> >    required, refilling the tdx_page_array is needed.
-> > 
-> >  - struct tdx_page_array *array = tdx_page_array_alloc(nr_pages);
-> >  - for each 512-page bulk
-> >    - tdx_page_array_fill_root(array, offset);
-> >    - seamcall(TDH_XXX_ADD, array, ...);
-> 
-> Great! That is useful information to have here, in the code.
-> 
-> >> Why can't it be:
-> >>
-> >> 	while (1)
-> >> 		fill(&array);
-> >> 	while (1)
-> >> 		tell_tdx_module(&array);
-> > 
-> > The consideration is, no need to create as much supporting
-> > structures (struct tdx_page_array *, struct page ** and root page) for
-> > each 512-page bulk. Use one and re-populate it in loop is efficient.
-> 
-> Huh? What is it efficient for? Are you saving a few pages of _temporary_
-> memory?
-
-In this case yes, cause no way to reclaim TDX Module EXT required pages.
-But when reclaimation is needed, will hold these supporting structures
-long time.
-
-Also I want the tdx_page_array object itself not been restricted by 512
-pages, so tdx_page_array users don't have to manage an array of array.
-
-> 
-> I'm not following at all.
-> 
-> >>> +static int init_tdx_ext(void)
-> >>> +{
-> >>> +	int ret;
-> >>> +
-> >>> +	if (!(tdx_sysinfo.features.tdx_features0 & TDX_FEATURES0_EXT))
-> >>> +		return -EOPNOTSUPP;
-> >>> +
-> >>> +	struct tdx_page_array *mempool __free(tdx_ext_mempool_free) =
-> >>> +		tdx_ext_mempool_setup();
-> >>> +	/* Return NULL is OK, means no need to setup mempool */
-> >>> +	if (IS_ERR(mempool))
-> >>> +		return PTR_ERR(mempool);
-> >>
-> >> That's a somewhat odd comment to put above an if() that doesn't return NULL.
-> > 
-> > I meant to explain why using IS_ERR instead of IS_ERR_OR_NULL. I can
-> > impove the comment.
-> 
-> I'd kinda rather the code was improved. Why cram everything into a
-> pointer if you don't need to. This would be just fine, no?
-> 
-> 	ret = tdx_ext_mempool_setup(&mempool);
-> 	if (ret)
-> 		return ret;
-
-It's good.
-
-The usage of pointer is still about __free(). In order to auto-free
-something, we need an object handler for something. I think this is a
-more controversial usage of __free() than pure allocation. We setup
-something and want auto-undo something on failure.
-
+Best regards,
+-- 
 Thanks,
-Yilun
+Pawan
+
+
 
