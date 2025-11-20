@@ -1,215 +1,114 @@
-Return-Path: <kvm+bounces-64001-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64002-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FD9DC76A0A
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:36:59 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6486C76A37
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:41:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E829E35DFDB
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 23:36:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4BC5D4E4A52
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 23:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22A029D268;
-	Thu, 20 Nov 2025 23:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E642F39C7;
+	Thu, 20 Nov 2025 23:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UgXfHQM+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NEYOq12a"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E85419E97F
-	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 23:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2EF19E97A
+	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 23:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763681809; cv=none; b=fXxErkqSPHXxKdk+mrMUPFtpN9keCHCvoVMzj9U0r277XG8seNnSPbdeJQ3nIfigcQhneMmpBTf8l+e1ho93+W6wgVVhabHKNdHJzjYfJL8KgLaggq9T8NYXODDtn60bMqHQXMoZsNeDBnBQYcgxtG0QmRviNq4bhSFceKd1ss8=
+	t=1763682038; cv=none; b=AS4gg/29dSA1vsszalkwZh1fTbxGzbqjXiri1VRXFrkhIiz6H9hbNpsqfSX7CawLAb4I+jCrfam1tbQMu3JuKQ22uHIMiAtn2YkY0Dc1dK7GcIDu+fFzljNujMnAisJGkapbEi361eoS8Cmf8E/8scWOgSsIyqV2HLFxJEo8li8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763681809; c=relaxed/simple;
-	bh=xgZokAZNABaDEkJOi6XbkoiCbaV/hMr2HbQKs7w9K+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UYbP9XF2fzj++BaifzCEPHLno8iKNIdejs8rXkx4j3GvmEUbhpgm3ewtCSSNFEUiF7qGTvk1bPdg4ro95y004i7cEg9kbJQ0eb4JogCqGGZMGf8MPkqAVR1cg/K/v7mI4PHAzo0CsjlcKBUBqjEWe0hVtEtiQAUqAOE49Pg44MU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UgXfHQM+; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7895017c722so14558537b3.2
-        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 15:36:47 -0800 (PST)
+	s=arc-20240116; t=1763682038; c=relaxed/simple;
+	bh=mYdfNS2P7JhMQ/kCLY5MBF1zL8mUzoPVYZB5PRLoDcc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GZTuvpCqAlIzFInj3f+jU6nqUhaNTIBQMZNADN0hq1LNN91ymX1+iEIUO8BqKuY+s0lJWMmMNPxHO0FTBEinP+9/I5tn7/3ptFORiYXWkIUp97nU6Muuxq/VmKw3hg2X82uSdQa5DzHriPcwdUtPs+pvB7xFoRoDtRniKFED6OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NEYOq12a; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34188ba5990so4162851a91.0
+        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 15:40:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763681806; x=1764286606; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7F8K5d92SUopdRevdYJsWlM5dC1gAVlWHDuGfPJviq0=;
-        b=UgXfHQM+VzkoT9pZfTjeVQlBCkbkgN9lOhxDBGbx0kE7YcuvwPUZT0Avoe4dhS9Aqg
-         YCg7oivtWKHNQhRlcbmsCgF9uldDucelEvevo+NCYiL9xGjmR5XmDzkauyVdiZqnmT4V
-         GA2sJQJZhOrvDcF6H6JcxgUfhMj/Ajzp3zwc+ch2yY8P0icYsqJHp8fGajiyWE050y1s
-         UHghG0pqVnXzJZjZl5KCxy/LsGC8CAWsHpWdyDfI1Jd52NpsbkIgWF43Id8wxwmZrDnP
-         YfCB7qi8RKznsBlzAEQ2bUirfrcq/ZRvOpYjuHTr7LwJ/yEqXVUi1/gFM89PAfgM2cvv
-         7IAQ==
+        d=google.com; s=20230601; t=1763682036; x=1764286836; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tz3mL4IK63e/6boEg0RIE/GfKvJh5AvynCJ73h5jjZE=;
+        b=NEYOq12akXiRo6lIJBSD12cAS0Io4xlO7bNnNkrBFblDDPrfBc5cNphsRJFV0PblUR
+         q3b3WCCfz+tBqH+pY1ZELDjyKBPl0kurIIwcjnwrXLi1sB30iP4Z5xyfAdxECjXLA/1K
+         VYeanUzhd+6vCWZOa+3DtLalVhdE7gNEmpKyw+WAwQRjZBVHOvGlYrVhs1JdpWDJEc/L
+         O9fYFPrqq1TG/Sc6zH8G75R+8s7YI11IjPTuzfbYySHYH72u+93buMyeMki+vSn7Ru/m
+         C/bTrHttaaihzC5QVjUayO88jFjQtyk6e7Lsz0kl7Z5QQmm68cbmx2oqeCDl8g01Fbkj
+         icTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763681806; x=1764286606;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7F8K5d92SUopdRevdYJsWlM5dC1gAVlWHDuGfPJviq0=;
-        b=vD//wNr/0rVVWGv25KzMZ67roVKFfS9tak2pO53hB0pLL0cnJKfLJ8nUoYNkhVhTJV
-         UeR7xBDzSD+LUjrZeefsxjb9z5WoeyYHfOPXIb9sveSKAXavgm0gdJdycXqeXvTwKfhR
-         cbJ6S246ynZUs6zs1+ziW3B1NKHxNxtLNaIszlawi+m2TKdBPxXWhKMaSD5QMqCO+9gM
-         sCSeDJ7BVBeiwF9ywtrs9kGikHv7iJmIkPbuK49RhP65XVPXy1Ol9Xdp6eDrhphYkTPe
-         WKQH1heXXlvsa4ZjW2HIS9TZKoV/GZ/mz2Ijx2W/PJoOhHQjqXB7mBbOIE+tWYqlzyv/
-         YuiA==
-X-Forwarded-Encrypted: i=1; AJvYcCUacsxY+6IOmHuSrv4V3XJa8WL8wEXTKt4LrFmUCj90xNdTtxCD/InCZynscFP/WQyUz54=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyost75tY4rC2Z0KkOW8nnymR3vVSsRoN9JH9wu/3XUJh/13pJV
-	+mftStypnGuNsUyyFia3+AMMUkc/BiE2lHKJwOGYxfPyKBUNIGUZoxj6
-X-Gm-Gg: ASbGncuJ1JPHOLkoswGYJzoa7tn2IYmCL68Ip7w2R/Cn6CcxrfPHmm3JVPOETNl3Zcc
-	vwcA3ottppbhRnDSQ/jxBtHO89gxKSYdPSHjScnUe8Xnm4398bPwVUwNd5QFbyY7Naru1KQSZpU
-	/u8Kl9hn6tycAfgPihuOaVhayf9KnUZP5pnVUjePAj+UbrzqYQ7iHsK6xgJD4RI+oMg59MwDIjO
-	WQfA8gN4deeFMJZgEHP56LsaKWDyLKFV+a6IHOg9YYadhzCEDIW9Hau99oscPslfPLUKNEkVuz5
-	eon8o7a2af0COyFDNvs/YVPhhQ5DYVmrmx0nKRxwRI67vAMEzURrJPrMx/ad3QleBLBbaJ47S66
-	GSERCWTMZPyvsIm6O6GshXnSn+FDlLk1aEKC2pafu/0nw5gFyyy2MlFJ5qryhkxMiWosLPVGedF
-	vjiUGRzxNt3qMBZcU52swVB0lJfSNTfuxpKtnmAxUWDWzI/To=
-X-Google-Smtp-Source: AGHT+IG936bzBd2t2ZDaxj9CFy9XI4BtCUEGOQ719Q5cTSLOuBM3YS+5i5WksDX1Mm7w5hHfQZBozg==
-X-Received: by 2002:a05:690c:620e:b0:787:e384:4e7 with SMTP id 00721157ae682-78a8b55db14mr1407957b3.51.1763681806540;
-        Thu, 20 Nov 2025 15:36:46 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:11::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78a798a7f19sm11526177b3.20.2025.11.20.15.36.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 15:36:46 -0800 (PST)
-Date: Thu, 20 Nov 2025 15:36:44 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Sargun Dhillon <sargun@sargun.me>,
-	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v10 10/11] selftests/vsock: add tests for host
- <-> vm connectivity with namespaces
-Message-ID: <aR+mDOF5/NOXa6/h@devvm11784.nha0.facebook.com>
-References: <20251117-vsock-vmtest-v10-0-df08f165bf3e@meta.com>
- <20251117-vsock-vmtest-v10-10-df08f165bf3e@meta.com>
- <s6zhozplsbiodcy77me7xhbhrbrozaanglbvcc474v6q77cc3w@ckaftl4qebwa>
+        d=1e100.net; s=20230601; t=1763682036; x=1764286836;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tz3mL4IK63e/6boEg0RIE/GfKvJh5AvynCJ73h5jjZE=;
+        b=u/mbcpcfxtDZIRxpT/jh390ZK1VXmwfIJ/8WyWmFxM1papS0XsSDIUAWNczwNySwL6
+         qf6+O93UArjSC0wk6ibCMyeu4uVXcVoPvniZ8tkrPFn7S145jWoPBaZKabQgX5UNkHa2
+         lqp8CNUOA6+BKiIuFGk8gb2ysclJL8OHazyFhAOy9r6v7BodCjYh6t/cNcnKCWJBqFXr
+         bvSvbGqsphLIYpGYuQ2dA8W+9vuNh5v1xMZutF52++qvw1tQKyw2AjlTnBwhUxRaHlZB
+         HMJ30h1HSWCBl2tteiDbplWedP9jsRH7VpG09iDSO+FifNG0IUFuCPc3mB8fKpRWGEh1
+         oZ3w==
+X-Forwarded-Encrypted: i=1; AJvYcCUUqVyGjLLRHMH01EiTr8aYcu+hQQfXULgKqKssWhAyqi2uswJibfNJHqICL7wgV7bg3kU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvAPD0vqKA+cDV/J9S8FMBuhiDG5t6ghHUgf7S311yunfshLtn
+	H1cXAX5uozOSFCJ8EFQ0K0r3ywfIIyW0SUJds/7jrVGdsTG9CI99lVL4cvwYUc0AfnIhyPk3W/k
+	j2KH+lQ==
+X-Google-Smtp-Source: AGHT+IEJlKEX1Lo5fr2/obWefb+N5dv3yrF5mObJRdr6qksM1jS9DLvrx305SHZ64+9RjVmAhu+7VAo8ZiQ=
+X-Received: from pjst15.prod.google.com ([2002:a17:90b:18f:b0:340:a575:55db])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:268d:b0:336:9dcf:ed14
+ with SMTP id 98e67ed59e1d1-34733f2a40bmr258634a91.23.1763682036619; Thu, 20
+ Nov 2025 15:40:36 -0800 (PST)
+Date: Thu, 20 Nov 2025 15:40:35 -0800
+In-Reply-To: <20251021074736.1324328-2-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <s6zhozplsbiodcy77me7xhbhrbrozaanglbvcc474v6q77cc3w@ckaftl4qebwa>
+Mime-Version: 1.0
+References: <20251021074736.1324328-1-yosry.ahmed@linux.dev> <20251021074736.1324328-2-yosry.ahmed@linux.dev>
+Message-ID: <aR-m85ZKhRIPB14J@google.com>
+Subject: Re: [PATCH v2 01/23] KVM: selftests: Minor improvements to asserts in test_vmx_nested_state()
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Nov 18, 2025 at 07:15:03PM +0100, Stefano Garzarella wrote:
-> On Mon, Nov 17, 2025 at 06:00:33PM -0800, Bobby Eshleman wrote:
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > Add tests to validate namespace correctness using vsock_test and socat.
-> > The vsock_test tool is used to validate expected success tests, but
-> > socat is used for expected failure tests. socat is used to ensure that
-> > connections are rejected outright instead of failing due to some other
-> > socket behavior (as tested in vsock_test). Additionally, socat is
-> > already required for tunneling TCP traffic from vsock_test. Using only
-> > one of the vsock_test tests like 'test_stream_client_close_client' would
-> > have yielded a similar result, but doing so wouldn't remove the socat
-> > dependency.
-> > 
-> > Additionally, check for the dependency socat. socat needs special
-> > handling beyond just checking if it is on the path because it must be
-> > compiled with support for both vsock and unix. The function
-> > check_socat() checks that this support exists.
-> > 
-> > Add more padding to test name printf strings because the tests added in
-> > this patch would otherwise overflow.
-> > 
-> > Add vm_dmesg_start() and vm_dmesg_check() to encapsulate checking dmesg
-> > for oops and warnings.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> > ---
-> > Changes in v10:
-> > - add vm_dmesg_start() and vm_dmesg_check()
-> > 
-> > Changes in v9:
-> > - consistent variable quoting
-> > ---
-
-...
-
-> > 
-> > +test_ns_diff_global_host_connect_to_global_vm_ok() {
-> > +	local oops_before warn_before
-> > +	local pids pid pidfile
-> > +	local ns0 ns1 port
-> > +	declare -a pids
-> > +	local unixfile
-> > +	ns0="global0"
-> > +	ns1="global1"
-> > +	port=1234
-> > +	local rc
-> > +
-> > +	init_namespaces
-> > +
-> > +	pidfile="$(create_pidfile)"
-> > +
-> > +	if ! vm_start "${pidfile}" "${ns0}"; then
-> > +		return "${KSFT_FAIL}"
-> > +	fi
-> > +
-> > +	vm_wait_for_ssh "${ns0}"
-> > +	oops_before=$(vm_dmesg_oops_count "${ns0}")
-> > +	warn_before=$(vm_dmesg_warn_count "${ns0}")
-> > +
-> > +	unixfile=$(mktemp -u /tmp/XXXX.sock)
+On Tue, Oct 21, 2025, Yosry Ahmed wrote:
+> Display the address as hex if the asserts for the vmxon_pa and vmcs12_pa
+> fail, and assert that the flags are 0 as expected.
 > 
-> Should we remove this file at the end of this test?
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> ---
+>  .../selftests/kvm/x86/vmx_set_nested_state_test.c      | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 > 
+> diff --git a/tools/testing/selftests/kvm/x86/vmx_set_nested_state_test.c b/tools/testing/selftests/kvm/x86/vmx_set_nested_state_test.c
+> index 67a62a5a88951..c4c400d2824c1 100644
+> --- a/tools/testing/selftests/kvm/x86/vmx_set_nested_state_test.c
+> +++ b/tools/testing/selftests/kvm/x86/vmx_set_nested_state_test.c
+> @@ -241,8 +241,14 @@ void test_vmx_nested_state(struct kvm_vcpu *vcpu)
+>  	TEST_ASSERT(state->size >= sizeof(*state) && state->size <= state_sz,
+>  		    "Size must be between %ld and %d.  The size returned was %d.",
+>  		    sizeof(*state), state_sz, state->size);
+> -	TEST_ASSERT(state->hdr.vmx.vmxon_pa == -1ull, "vmxon_pa must be -1ull.");
+> -	TEST_ASSERT(state->hdr.vmx.vmcs12_pa == -1ull, "vmcs_pa must be -1ull.");
+> +	TEST_ASSERT(state->hdr.vmx.vmxon_pa == -1ull,
+> +		    "vmxon_pa must be 0x%llx, but was 0x%llx",
+> +		    -1ull, state->hdr.vmx.vmxon_pa);
+> +	TEST_ASSERT(state->hdr.vmx.vmcs12_pa == -1ull,
+> +		    "vmcs12_pa must be 0x%llx, but was 0x%llx",
+> +		    -1llu, state->hdr.vmx.vmcs12_pa);
+> +	TEST_ASSERT(state->flags == 0,
+> +		    "Flags must be equal to 0, but was 0x%hx", state->flags);
 
-Conveniently, socat does both the create and destroy for us.
-
-> > +test_ns_diff_global_host_connect_to_local_vm_fails() {
-> > +	local oops_before warn_before
-> > +	local ns0="global0"
-> > +	local ns1="local0"
-> > +	local port=12345
-> > +	local dmesg_rc
-> > +	local pidfile
-> > +	local result
-> > +	local pid
-> > +
-> > +	init_namespaces
-> > +
-> > +	outfile=$(mktemp)
-> > +
-> > +	pidfile="$(create_pidfile)"
-> > +	if ! vm_start "${pidfile}" "${ns1}"; then
-> > +		log_host "failed to start vm (cid=${VSOCK_CID}, ns=${ns0})"
-> > +		return "${KSFT_FAIL}"
-> > +	fi
-> > +
-> > +	vm_wait_for_ssh "${ns1}"
-> > +	oops_before=$(vm_dmesg_oops_count "${ns1}")
-> > +	warn_before=$(vm_dmesg_warn_count "${ns1}")
-> > +
-> > +	vm_ssh "${ns1}" -- socat VSOCK-LISTEN:"${port}" STDOUT > "${outfile}" &
-> 
-> Should we wait for the listener here, like we do for TCP sockets?
-> (also in other place where we use VSOCK-LISTEN)
-
-Definitely, I didn't know ss could do this.
-
-Best,
-Bobby
+The error messages aren't adding a whole lot, why not just use TEST_ASSERT_EQ()?
 
