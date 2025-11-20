@@ -1,212 +1,141 @@
-Return-Path: <kvm+bounces-63844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2590FC7419F
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 14:11:52 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5C53C742CB
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 14:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 10E904E3780
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 13:11:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 288242B06A
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 13:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419B433A6E0;
-	Thu, 20 Nov 2025 13:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89CA33C19B;
+	Thu, 20 Nov 2025 13:20:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LJUhJgXq";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IP9uly0r"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jMJVlNB8"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1DB337115
-	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 13:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A229733A715
+	for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 13:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763644303; cv=none; b=ahgM42iDNwPAAjgM0Xxta2z+PP+YnAj9B6XmwqJ75UqXDzV9nnX1X47ha6FT6E8jEpNr9+axO/YRGJHjsiHZ9U5fEpzUylyfUzga2eRLB2FDBVjjeMp9Qc/BJrXVFZ/qVOHFGBcEzqQ3W4RvaockzKVCZZSW2AhTUiZtST5rv5w=
+	t=1763644850; cv=none; b=Ot4/qORwQc6IQiAe95VLYMwgfINU2anoIfbrqrZtkxwpc5/hsoUg9wAru5orGdqpFG08U/RXaBf1CznCgSUcUqyHw+/Am6oXUzIsyVr5bdYSgt2gz2TfSKgB5dGVfVh9rmLgWZjMRu8e1KMUVqp2FXywGTDKS5F8l6uK31BL8N8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763644303; c=relaxed/simple;
-	bh=818AFFduQR+q8eZQrbimT+9rzrOQSVtJdNUKUtqCpt0=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=YpA8hK+8cNCO8gvV7KSeoWcWKf2G7vGddRa6+Al6NiB2w0eIhEAcWtan4yFFlVJ0GcKHDcQjGRjCvy4Lvh55DM1BZa+b9VuRmhSXqkF3clnoxY4zw+hLObBefAOdsRqNLYhsm1KnXiljKgFV5ZSzWk/lrID7p7sm65VEJRKx3jE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LJUhJgXq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IP9uly0r; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763644300;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qyhhdzn0BYMbkUVey/n2YMFPr5fhLGbTZAGvpz5pi1c=;
-	b=LJUhJgXqGxD5tIpcuxdfYFLGqBpM6A4iO2Rwo9AEXQ7TTZaPhei0Clt7eg5b11D2zUSN4Y
-	39mDU2pJe2ML825VR0cOKdO1o3gbqed8fu3WN+BFuK3FgV7toVU+hjAGWLEM7LLM+bL95X
-	Rg2YgZJcmQ1plzzdI9cXglp0LTcyV3c=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-681-VLL2b1I6MRml28KJqxc6Ww-1; Thu, 20 Nov 2025 08:11:39 -0500
-X-MC-Unique: VLL2b1I6MRml28KJqxc6Ww-1
-X-Mimecast-MFC-AGG-ID: VLL2b1I6MRml28KJqxc6Ww_1763644298
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477a60a23adso5828875e9.2
-        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 05:11:39 -0800 (PST)
+	s=arc-20240116; t=1763644850; c=relaxed/simple;
+	bh=FAIy2u4gJscDNGUshiInImCPqOKl3iOKQJH6e6Bc4JI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j73Is1L1y/hYZPTLGyM2b1FX5oE11NPoP8+GHXxjSWSqBJH27j8ZTcBuYQpTPxx8s89sj6hK9gFFbTcg/VLnnJyL8Sm+PsBYyh31534V6ZvDQGhhe6Qsa3um+YLkIJDjJAjQLj+dnsHS2VnMEcHVUFzESOclAKx5+ex52iYODVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=jMJVlNB8; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8b2dcdde698so116999885a.3
+        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 05:20:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763644298; x=1764249098; darn=vger.kernel.org;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qyhhdzn0BYMbkUVey/n2YMFPr5fhLGbTZAGvpz5pi1c=;
-        b=IP9uly0rqqophwW55CDuvK/ugxK/KoMlOflhu0qRXjkFovou8ltH3SXv6VJJvTud1z
-         prHjizUIUUb6kpxzBgmsLrl4x9J6xxhOBz7dgbHd1WIxoZ1E6jquwuqtWAOCgsTopipV
-         8rpkuYMOWI2GrKETHnyKXDUlBxQPFEgzqUsJJKhPDCwa84UHgg/C5GwJFRqn40HmhLfh
-         KLqINjBAdPPL7EJCCbHFA9/fBcojAqoS0peZmgvYh1WwzNUNqjToe0dr0BwJ0qwg+6Yb
-         CtL4qdD1J+P63FtzlRZ2bgGXXSxh4Zb+rF7UPcdUgTL8rmI5NZPSjM+bfiBkoSjkzcfi
-         WBGg==
+        d=ziepe.ca; s=google; t=1763644847; x=1764249647; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=GaI8T1P9V7HUSR5GC1P83jhUObFww+4fRanAKkUJgJM=;
+        b=jMJVlNB8LyM4AYZyl088cBiSIlJ90Q1dm2hb+qOJix1EHdJs4siUbnVhSfjdoo+d8b
+         CpJ6KfO7u7JniZDhdoBs1zVrqavLhdwn31rKFf/kVN8vkyxieUH5wcPJTih/9lZw+PEX
+         fzdm1aYuxKCanV8/aYUVsuP51mR3HV9FaHggDK4qYX5m3Eht6ufYvvO9vptn0SOijTOl
+         cfmQgVoxaFFQaCv0MtR3VFkL7VdP7LsWZJMB5e2tkAY+4CqMtLl57rP2UzUjo5ld0ad3
+         Ew7cnRVtQJOT76Gc3wbQzgtVC/yQSTJ4MullMwUuBOCRwifmwR9JypsEhj+RRVt4akF1
+         VX3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763644298; x=1764249098;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Qyhhdzn0BYMbkUVey/n2YMFPr5fhLGbTZAGvpz5pi1c=;
-        b=JOZbfbnwOq+ryXG4SxfUdMNJS8fJIC9QeubE5ta4hidRZnHCY0zmJjXX7pIvDjfjz/
-         Jc4wwejH9ieTyj+tY4j6pzDl1Yx8pdGpphXv4QrjcfNzUlc/lWr+BBULv6uo4feqSgHA
-         Q4Ul2KwkkuLYtk2FxmXQmpz93TSQaqNztVbhmkNq3U/aLEzOYOrkrOZyDluV1qwGzCsE
-         GnK7b6yb4BBtVb8xx/XepF5O7jAXMlU9tlmfPgHI6Nn5IYaHZzrukTWv+eT8tvjp0a2M
-         D9SDzxgPfsM7F0+GyPJYF1rQss5Vj+pb0fYwtG1sBBpLafm21OqPRnDpr1WjRxXfnP9s
-         4CZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWl6jIJ+5Ri55jjPFsu3UskJ0IJwe4mXTlJJsd+WgGovDfSmGoZM2xhrxKI9Pgmn0Qns6k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkIquWXP445RHwl2/yaAA0j6UaJeBuRi512l2yHhzMgW1fzqiV
-	si7vPihWyzr3eKRFg0/EmzNltwRBKRLEub6+45ua7yfqkiR8XITnDB4Z2oDJzgfTXK4KvdjXV3I
-	X2KKEGbHFopy/zUFU8lzvZWIHs/sXQmuhynU3G3dKnfH1VV55fLehjA==
-X-Gm-Gg: ASbGncsLoeNsC4OLDYfPsF65fdglzQL9PQiD0odvdlHiV5ykPWmzIABpuRQsiTdnAmf
-	BiefOZXPnHeUZxvJdVOGknatURzwBb2uLnwaciEUFCtFydSUALq9VQu4JnFZ3mwRLS00riBOmlC
-	rJVVoEAw5a02Mbqx5t9mJi+tLKumcOmDSnFTTVd1jwlR29lsgZRS1LsKADum0/qGzB2XpIr4Oj1
-	sJDpgpF4iVtGb4cwDvoRTC0c0XwOGWFnZZW7qVwhjqqCB8a4SBgZsUOti/FdMzkgEZvTz+r+Vvd
-	vXpnoYCf6yX9kc9vGAR2KerYwjWe2aZoU5f/TA7+wpvUm4UFsETdESG8kFLX2NaXYRqm8HRypzI
-	iWeaqZi022bs4fpaLWtIP5xdKGJs8epObc3UvVdHb75cOpJcn5wxilOW/WDk=
-X-Received: by 2002:a05:600c:19cf:b0:477:7725:c16a with SMTP id 5b1f17b1804b1-477b9deb5fcmr27551025e9.10.1763644298193;
-        Thu, 20 Nov 2025 05:11:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGqk0rLj6ifgE7tCamOIWPRaEiyBBbqDGCq1Uha6rrPDrmf26u75w870PL6lQD0kcpOCi1brA==
-X-Received: by 2002:a05:600c:19cf:b0:477:7725:c16a with SMTP id 5b1f17b1804b1-477b9deb5fcmr27550685e9.10.1763644297761;
-        Thu, 20 Nov 2025 05:11:37 -0800 (PST)
-Received: from rh (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a974cdc8sm67987845e9.2.2025.11.20.05.11.36
+        d=1e100.net; s=20230601; t=1763644847; x=1764249647;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GaI8T1P9V7HUSR5GC1P83jhUObFww+4fRanAKkUJgJM=;
+        b=TwyOoWYz1y7kQ9vs2NwG3rnIJiNy+8tkR1zny0IlIOiiUfR0ssDRaHTfZJQa57TaeM
+         od+RR/yy3jEcu0c4oTZTmrhEiWQm/H82+TQqTH9+XgS3eZf4v+3jn/sXBQtzigkV9j9F
+         qujFldYr3/ZLn6kOHheE1jtG2xOWf+oMPpcFNgUkR/Knhv0dU/MnHVqpmu9AJIWgFZ89
+         Rx80UQAZTTnOH0GqRhKl89SItzkpkBjRV39AHxfVl9jUTh5TNUpbtmvV7GSiyogeF/yy
+         6YuvcS11DVbZ/Bz/LYvdQFFg1t5iUFCxgzX40Rxfce3DGkLa8A02dcqSEZeFopEZPEMn
+         yDtg==
+X-Forwarded-Encrypted: i=1; AJvYcCXTXOJT061wKCApbocXgZWQuj0EQQ7oCwSUhoOK1CjkdrgZbqlkUQmivaVc9eO9byPrNWI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxm1DmJ5gLubCofFxmeTynM4q7NvYz1uYDvPeEExKs1W0H7kQIN
+	F0Yj9WzvrD5ImDGHyTldM/5NFTkLWHxh4NCrxJGekeY4jiFcBsEo7WVNKsLCB7wuEf8=
+X-Gm-Gg: ASbGncuZpWcr31nLYTQVGwdRN4elHne8+JT95ZWS2b+eLHRGFAGZEDiIv/qBMinrC8X
+	tvl6E1UUdtjWpFcMNuljFX0P9mAJDmxkTb94Fkl1FGQ8lEc5osPNF2xG0oa6+qHgNMbc0TBgSJo
+	EJCEQGNmS3i5Pj8ZkJDtNbzofdullsHG/AWMggCWrnHM3fYFAjJCWsJpcMNZx3ON/zfc5ASLNFt
+	rfHllGEpu6TsDQKks3JH2DfGCJIiUQxf6aUKFoc0HFM9o3Wlt7ytTDCHGZbklV0+fMGDoZRB6HC
+	sjF2ik1CqGonRQpPclU4kUeqID8iaQVt7X+6WExmz8o+uI/e7PwgY/51D3cUh8JdHxcxM4uBCec
+	j3OiE1epmxuin7wh0q5ETWvTbo5jfUg3G7Uqmrg76py2xox2SaPv4/m4OdVAVig+/U86unnMLoL
+	+0ixpnlvQVz6w/vJSclV+mDojKrDCs9vwfbRd5zdQSLy6ezoTfaY2IoOGM
+X-Google-Smtp-Source: AGHT+IHQ4fmxCAI4/D2tK1B8sYqUFbudidu6PckWMercsX/iRS90WBjHNHkg95yPWC8b179KW1QKQA==
+X-Received: by 2002:a05:620a:318a:b0:89f:27dc:6536 with SMTP id af79cd13be357-8b32a193b85mr303322785a.54.1763644847316;
+        Thu, 20 Nov 2025 05:20:47 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b3295c13ccsm148498285a.26.2025.11.20.05.20.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 05:11:37 -0800 (PST)
-Date: Thu, 20 Nov 2025 14:11:35 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>, 
-    Peter Maydell <peter.maydell@linaro.org>, 
-    Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, 
-    qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 2/2] target/arm/kvm: add kvm-psci-version vcpu
- property
-In-Reply-To: <a2d0ddf1-f00c-42dd-851d-53f2ec789986@redhat.com>
-Message-ID: <8c679736-a168-0a33-e44a-4367e9e7b8d4@redhat.com>
-References: <20251112181357.38999-1-sebott@redhat.com> <20251112181357.38999-3-sebott@redhat.com> <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org> <c082340f-31b1-e690-8c29-c8d39edf8d35@redhat.com> <a2d0ddf1-f00c-42dd-851d-53f2ec789986@redhat.com>
+        Thu, 20 Nov 2025 05:20:46 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vM4ac-00000000gLM-0tBz;
+	Thu, 20 Nov 2025 09:20:46 -0400
+Date: Thu, 20 Nov 2025 09:20:46 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, iommu@lists.linux.dev,
+	linux-mm@kvack.org, linux-doc@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
+	linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
+	Nicolin Chen <nicolinc@nvidia.com>
+Subject: Re: [Linaro-mm-sig] [PATCH v8 06/11] dma-buf: provide phys_vec to
+ scatter-gather mapping routine
+Message-ID: <20251120132046.GU17968@ziepe.ca>
+References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
+ <20251111-dmabuf-vfio-v8-6-fd9aa5df478f@nvidia.com>
+ <8a11b605-6ac7-48ac-8f27-22df7072e4ad@amd.com>
+ <20251119132511.GK17968@ziepe.ca>
+ <69436b2a-108d-4a5a-8025-c94348b74db6@amd.com>
+ <20251119193114.GP17968@ziepe.ca>
+ <c115432c-b63d-4b99-be18-0bf96398e153@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="-1463806286-370073406-1763644297=:54158"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c115432c-b63d-4b99-be18-0bf96398e153@amd.com>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Thu, Nov 20, 2025 at 08:08:27AM +0100, Christian König wrote:
+> >> The exporter should be able to decide if it actually wants to use
+> >> P2P when the transfer has to go through the host bridge (e.g. when
+> >> IOMMU/bridge routing bits are enabled).
+> > 
+> > Sure, but this is a simplified helper for exporters that don't have
+> > choices where the memory comes from.
+> 
+> That is extremely questionable as justification to put that in common DMA-buf code.
 
----1463806286-370073406-1763644297=:54158
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+FWIW we already have patches for a RDMA exporter lined up to use it as
+well. That's two users already...
 
-On Thu, 20 Nov 2025, Eric Auger wrote:
-> On 11/13/25 1:05 PM, Sebastian Ott wrote:
->> Hi Philippe,
->>
->> On Wed, 12 Nov 2025, Philippe Mathieu-Daudé wrote:
->>> On 12/11/25 19:13, Sebastian Ott wrote:
->>>>  Provide a kvm specific vcpu property to override the default
->>>>  (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
->>>>  by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
->>>>
->>>>  Note: in order to support PSCI v0.1 we need to drop vcpu
->>>>  initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
->>>>
->>>>  Signed-off-by: Sebastian Ott <sebott@redhat.com>
->>>>  ---
->>>>    docs/system/arm/cpu-features.rst |  5 +++
->>>>    target/arm/cpu.h                 |  6 +++
->>>>    target/arm/kvm.c                 | 64
->>>> +++++++++++++++++++++++++++++++-
->>>>    3 files changed, 74 insertions(+), 1 deletion(-)
->>>
->>>
->>>>  diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->>>>  index 0d57081e69..e91b1abfb8 100644
->>>>  --- a/target/arm/kvm.c
->>>>  +++ b/target/arm/kvm.c
->>>>  @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool
->>>>  value, Error **errp)
->>>>        ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON :
->>>>    ON_OFF_AUTO_OFF;
->>>>    }
->>>>
->>>>  +struct psci_version {
->>>>  +    uint32_t number;
->>>>  +    const char *str;
->>>>  +};
->>>>  +
->>>>  +static const struct psci_version psci_versions[] = {
->>>>  +    { QEMU_PSCI_VERSION_0_1, "0.1" },
->>>>  +    { QEMU_PSCI_VERSION_0_2, "0.2" },
->>>>  +    { QEMU_PSCI_VERSION_1_0, "1.0" },
->>>>  +    { QEMU_PSCI_VERSION_1_1, "1.1" },
->>>>  +    { QEMU_PSCI_VERSION_1_2, "1.2" },
->>>>  +    { QEMU_PSCI_VERSION_1_3, "1.3" },
->>>>  +    { -1, NULL },
->>>>  +};
->>>
->>>
->>>>  @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
->>>>                                 kvm_steal_time_set);
->>>>        object_property_set_description(obj, "kvm-steal-time",
->>>>                                        "Set off to disable KVM steal
->>>>  time.");
->>>>  +
->>>>  +    object_property_add_str(obj, "kvm-psci-version",
->>>>  kvm_get_psci_version,
->>>>  +                            kvm_set_psci_version);
->>>>  +    object_property_set_description(obj, "kvm-psci-version",
->>>>  +                                    "Set PSCI version. "
->>>>  +                                    "Valid values are 0.1, 0.2,
->>>> 1.0, 1.1,
->>>>  1.2, 1.3");
->>>
->>> Could we enumerate from psci_versions[] here?
->>>
->>
->> Hm, we'd need to concatenate these. Either manually:
->> "Valid values are " psci_versions[0].str ", " psci_versions[1].str ",
->> " ... which is not pretty and still needs to be touched for a new
->> version.
->>
->> Or by a helper function that puts these in a new array and uses smth like
->> g_strjoinv(", ", array);
->> But that's quite a bit of extra code that needs to be maintained without
->> much gain.
->>
->> Or we shy away from the issue and rephrase that to:
->> "Valid values include 1.0, 1.1, 1.2, 1.3" 
-> Personally I would vote for keeping it as is
-
-OK, thanks!
-
-> (by the way why did you
-> moit 0.1 and 0.2 above?)
-
-Just to clarify that this is an incomplete list of possible values
-that we don't have to change when a new psci version is introduced.
-
-Sebastian
----1463806286-370073406-1763644297=:54158--
-
+Jason
 
