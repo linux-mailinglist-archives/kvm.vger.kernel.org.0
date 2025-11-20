@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-63894-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63895-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57F69C75A35
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 18:25:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8895BC7599F
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 18:19:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1E5664EB1FC
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:18:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 3BBF52A511
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 005C53A1D19;
-	Thu, 20 Nov 2025 17:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04DAE3A79B4;
+	Thu, 20 Nov 2025 17:16:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="n55X0cHi"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Cv9FkwNC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662D2393DD6;
-	Thu, 20 Nov 2025 17:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEC93A1CF4;
+	Thu, 20 Nov 2025 17:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763658963; cv=none; b=uqKhDLRJDye5bC0ixqXkf361yQ582q0KeyuSa3UJJBfFKwT1Stmiu7BE2ayhSrIPqBlI3cyQsHhfjTDy3xnwsQTy3dO+68GZ5LvZ2YVwrojoPo+11yJLw7wZDJ3DRskbxXOe13PDmxWff+isHa16U/pBbgBZimm9X6aMptesX8k=
+	t=1763658965; cv=none; b=JphYbLKPX+bUJBfudPBoJGHjegNXpdxwGtjuqIryO2Fu9+6yKFpmIIkqDSoYDm5si0tJ8RpxBp5sRBpANepouZw1HFm33RJeI+xeBTr73z9rD8c0kfB4iAcN8EUfYdyDhGQoJW5lN0lVZgbGWnUtBw5uWJjORLzsvIv1w6L8Sno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763658963; c=relaxed/simple;
-	bh=f4WlxBljOVtmnwlVgMtzL1RlxFr/CaVwBAvBr7+4HAM=;
+	s=arc-20240116; t=1763658965; c=relaxed/simple;
+	bh=9/XGXZbVrrrbHZGQm2z3Er12l9KTyaztqVzHuOUY0Yk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V1zNJ9grGiuqSRbqfApIpZyhuG4Z7YG97s54jnNMIPiGvESbj3t/KOe+NHQXexlwEy3e69VjqhtNreBUr+aOiAsrzycxMXHNOK1rghxyEwEPdx2ZC3PDGC8kvdR+hrL1spafBRv7SBG+fyBjADP0TUTmo8G/Q8/DxI7nfU1+eOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=n55X0cHi; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=MJSaCrEsSlCULNDj+c8qQlR3+AgrqfpbE6il8N5bCVxwwRdi1BUdykVDNPebP1j5LlvWnzVBwrEBdkEGdqAIHIewTVtUX0lWdE8AUs/RTRmo/V0gX5XuyFjENJCErS/cxx68uapUbMdqissS0MkIC4dARlo8xJ5vLsu7UwQUEHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Cv9FkwNC; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKCUu2j027962;
-	Thu, 20 Nov 2025 17:15:59 GMT
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKBv8hH007044;
+	Thu, 20 Nov 2025 17:16:01 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=aneBqESSUOFJoQfix
-	DHvr/+qYDTdya7WXTYhXldWWtY=; b=n55X0cHiuZ4ZvALar0BqAJ3pG2bbvB79B
-	x4dhDBaMSNOsTO97c/XXtUflZy3FaKG/6WofN5G1p9vHUEvLG61KGAGZpqFd0+48
-	776VgpuTvNojPAoK/6qm9N0EyR/86TEpyEX7Gl7V2wZwwww4X9xX8reZoLsrCUnP
-	m+1x/hR8jCEE9B5RGk6Zg6HqkZ30tot1xk0AqiXE5vLQqBEx65Ncae7ko6Z2/gpk
-	le5ZJoGnFyyKMaSKq218t1CDA7HmzHOjFRB6+yKbYi5H4pQgzmHZrD/GiDHMmBd+
-	cRrlCJbTpw3f9Y9oKefmrvT+EyWXzW0701hWXUh0Ut1mvAsVWiudQ==
+	:mime-version:references:subject:to; s=pp1; bh=Q5BgJ9yd0kjSFSkjR
+	HUunnRp8UfhNyqvkTWSU8BFoHw=; b=Cv9FkwNCagU/dAiOG2ArKykW8zg3m6BHN
+	aZ//VJGN1YRChwocPbWjvzO2XGvkI/ZYqwlzBojkOBgwvCZ1x2S7jnZvCN1y3Wtj
+	CQ+aHi0KA0z/UX3IOxT1pAs7T3jrYR5sm3dE1R7vdl0i1NNbjQtA5jaQwGJoV/v9
+	3VtpsemymPoO09BYSRoQyQgi3RtromheF1Wc7hDboqr3u/U/jDBmTJKuz8VUx0c6
+	gD3qjMO28qfu/EEDSPPVSBKwzFFa6EEQUftv/QHj4VDypkncR/wyry+EmtOnNQgG
+	rOyc3YFDeiJBp6LOHxg590iG4R1Gsh6I+CyJZEHy7QIqdgb4p7yWA==
 Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejka7mtn-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejmsxbkg-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Nov 2025 17:15:58 +0000 (GMT)
+	Thu, 20 Nov 2025 17:16:00 +0000 (GMT)
 Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKFm5A4010419;
-	Thu, 20 Nov 2025 17:15:58 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4af3usfsbc-1
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AKGUuIo010406;
+	Thu, 20 Nov 2025 17:16:00 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4af3usfsbg-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Nov 2025 17:15:57 +0000
+	Thu, 20 Nov 2025 17:15:59 +0000
 Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AKHFscc37159246
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AKHFuwc57409878
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 20 Nov 2025 17:15:54 GMT
+	Thu, 20 Nov 2025 17:15:56 GMT
 Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 41D7D2004B;
+	by IMSVA (Postfix) with ESMTP id 1D07B2004D;
+	Thu, 20 Nov 2025 17:15:56 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6F19320043;
 	Thu, 20 Nov 2025 17:15:54 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B898420043;
-	Thu, 20 Nov 2025 17:15:52 +0000 (GMT)
 Received: from p-imbrenda.ibmuc.com (unknown [9.111.12.33])
 	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 20 Nov 2025 17:15:52 +0000 (GMT)
+	Thu, 20 Nov 2025 17:15:54 +0000 (GMT)
 From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 To: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -75,9 +75,9 @@ Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         schlameuss@linux.ibm.com, hca@linux.ibm.com, svens@linux.ibm.com,
         agordeev@linux.ibm.com, gor@linux.ibm.com, david@redhat.com,
         gerald.schaefer@linux.ibm.com
-Subject: [PATCH v4 04/23] KVM: s390: Add gmap_helper_set_unused()
-Date: Thu, 20 Nov 2025 18:15:25 +0100
-Message-ID: <20251120171544.96841-5-imbrenda@linux.ibm.com>
+Subject: [PATCH v4 05/23] KVM: s390: Enable KVM_GENERIC_MMU_NOTIFIER
+Date: Thu, 20 Nov 2025 18:15:26 +0100
+Message-ID: <20251120171544.96841-6-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251120171544.96841-1-imbrenda@linux.ibm.com>
 References: <20251120171544.96841-1-imbrenda@linux.ibm.com>
@@ -89,143 +89,131 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: p5lTn8RB8LPrOItvBNpQIqhUAvyZaNtH
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfXxt28MXT5mCJG
- ta94PcSvnqO9pCk/VGQXJP60vIkHu6A5dbmMgAnxyqw26n8xXhHxuOVSWo/VNnJ8bW6DjcWeCsT
- quu4yx70TznwVJsWKFmx3FqWdI52zJiCCngp7PdGr9+YOjDhCMOdXkz070ueI47C7Aki9gf+ZLU
- CcJZ0tFPVe0AONFUwGGz52nSU61bwndBJKqcSUgZ7ok8WeOeqhAf/tRLtxObwksVwrDBbsn1haI
- Bk5CqMm86CikNJpmp3Ta1sKjTYDrJ1j+fD8HGKdSySagmxnLWAsuSae9VbXnwbzhQVmGi55a5VT
- jbYsrDZiR+7/6NW/mzfOvy19THa0EagglTuWtEwccyC9Jyq/pwcA/DVTtwTfGWL+xUNm/PqrpS0
- esqe1wuH/dlgT8YTVwqTZaSVKh8saQ==
-X-Proofpoint-ORIG-GUID: p5lTn8RB8LPrOItvBNpQIqhUAvyZaNtH
-X-Authority-Analysis: v=2.4 cv=XtL3+FF9 c=1 sm=1 tr=0 ts=691f4cce cx=c_pps
+X-Proofpoint-ORIG-GUID: VWY_odSwCPZCI6vvT4d8WTOmTdknijfz
+X-Authority-Analysis: v=2.4 cv=Rv3I7SmK c=1 sm=1 tr=0 ts=691f4cd0 cx=c_pps
  a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
  a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=F2Av9RbSm_i__n-hslAA:9
+ a=sWpJ-_il0aw9mM0vlR0A:9
+X-Proofpoint-GUID: VWY_odSwCPZCI6vvT4d8WTOmTdknijfz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfX21g8tVE+QpPM
+ ks+OZtX+r4BaVOunfDKNIbCAhaIj8fGGYWDQTgfyUVyuo0RmD+MHl98j4881AZatd6xOotumaEs
+ qvZmGL9Rgc7Erbvl+a2HujYdaCb0kqE2surN3H4u3bmB6jvSrAh+/ndIDKWRRqXEFA+iZgoyQgC
+ RLCP0EeAzr0bbNm8NKhmkAXrSSRpJzEjfLsQCcIxm0NHBlammEbdsrBwIjwYP1PoY8hnMIF6Vmu
+ FWoqthUKR84uKFXCOC9/KWLb6LMRUAl7CjCMpgRZkU4lWwSsb7x5vELOZELIBlbO4Sx4iAmgevb
+ 6L+bA3aREUqnjf5PAyRuwByzqwrmkoYuQKtbkXtOYaSUTKzkq1eGweZfVcoAYh8Rm2EELCNLbus
+ Nox62iJ1+O0RD6SngYgUt5EhJpFAMg==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-20_06,2025-11-20_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
- adultscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0 malwarescore=0
+ malwarescore=0 suspectscore=0 clxscore=1015 phishscore=0 priorityscore=1501
+ spamscore=0 lowpriorityscore=0 impostorscore=0 adultscore=0 bulkscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511150032
 
-Add gmap_helper_set_unused() to mark userspace ptes as unused.
+Enable KVM_GENERIC_MMU_NOTIFIER, for now with empty placeholder callbacks.
 
-Core mm code will use that information to discard unused pages instead
-of attempting to swap them.
+Also enable KVM_MMU_LOCKLESS_AGING and define KVM_HAVE_MMU_RWLOCK.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-Tested-by: Nico Boehr <nrb@linux.ibm.com>
-Acked-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 ---
- arch/s390/include/asm/gmap_helpers.h |  1 +
- arch/s390/mm/gmap_helpers.c          | 79 ++++++++++++++++++++++++++++
- 2 files changed, 80 insertions(+)
+ arch/s390/include/asm/kvm_host.h |  1 +
+ arch/s390/kvm/Kconfig            |  3 ++-
+ arch/s390/kvm/kvm-s390.c         | 45 +++++++++++++++++++++++++++++++-
+ 3 files changed, 47 insertions(+), 2 deletions(-)
 
-diff --git a/arch/s390/include/asm/gmap_helpers.h b/arch/s390/include/asm/gmap_helpers.h
-index 5356446a61c4..2d3ae421077e 100644
---- a/arch/s390/include/asm/gmap_helpers.h
-+++ b/arch/s390/include/asm/gmap_helpers.h
-@@ -11,5 +11,6 @@
- void gmap_helper_zap_one_page(struct mm_struct *mm, unsigned long vmaddr);
- void gmap_helper_discard(struct mm_struct *mm, unsigned long vmaddr, unsigned long end);
- int gmap_helper_disable_cow_sharing(void);
-+void gmap_helper_try_set_pte_unused(struct mm_struct *mm, unsigned long vmaddr);
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index c2ba3d4398c5..f5f87dae0dd9 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -27,6 +27,7 @@
+ #include <asm/isc.h>
+ #include <asm/guarded_storage.h>
  
- #endif /* _ASM_S390_GMAP_HELPERS_H */
-diff --git a/arch/s390/mm/gmap_helpers.c b/arch/s390/mm/gmap_helpers.c
-index e14a63119e30..dca783859a73 100644
---- a/arch/s390/mm/gmap_helpers.c
-+++ b/arch/s390/mm/gmap_helpers.c
-@@ -124,6 +124,85 @@ void gmap_helper_discard(struct mm_struct *mm, unsigned long vmaddr, unsigned lo
++#define KVM_HAVE_MMU_RWLOCK
+ #define KVM_MAX_VCPUS 255
+ 
+ #define KVM_INTERNAL_MEM_SLOTS 1
+diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
+index cae908d64550..e86332b26511 100644
+--- a/arch/s390/kvm/Kconfig
++++ b/arch/s390/kvm/Kconfig
+@@ -29,7 +29,8 @@ config KVM
+ 	select HAVE_KVM_INVALID_WAKEUPS
+ 	select HAVE_KVM_NO_POLL
+ 	select KVM_VFIO
+-	select MMU_NOTIFIER
++	select KVM_GENERIC_MMU_NOTIFIER
++	select KVM_MMU_LOCKLESS_AGING
+ 	help
+ 	  Support hosting paravirtualized guest machines using the SIE
+ 	  virtualization capability on the mainframe. This should work
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 16ba04062854..2e34f993e3c5 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4918,7 +4918,7 @@ int __kvm_s390_handle_dat_fault(struct kvm_vcpu *vcpu, gfn_t gfn, gpa_t gaddr, u
+ 	rc = fixup_user_fault(vcpu->arch.gmap->mm, vmaddr, fault_flags, &unlocked);
+ 	if (!rc)
+ 		rc = __gmap_link(vcpu->arch.gmap, gaddr, vmaddr);
+-	scoped_guard(spinlock, &vcpu->kvm->mmu_lock) {
++	scoped_guard(read_lock, &vcpu->kvm->mmu_lock) {
+ 		kvm_release_faultin_page(vcpu->kvm, page, false, writable);
+ 	}
+ 	mmap_read_unlock(vcpu->arch.gmap->mm);
+@@ -6125,6 +6125,49 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 	return;
  }
- EXPORT_SYMBOL_GPL(gmap_helper_discard);
  
 +/**
-+ * gmap_helper_try_set_pte_unused() - mark a pte entry as unused
-+ * @mm: the mm
-+ * @vmaddr: the userspace address whose pte is to be marked
++ * kvm_test_age_gfn() - test young
++ * @kvm: the kvm instance
++ * @range: the range of guest addresses whose young status needs to be cleared
 + *
-+ * Mark the pte corresponding the given address as unused. This will cause
-+ * core mm code to just drop this page instead of swapping it.
-+ *
-+ * This function needs to be called with interrupts disabled (for example
-+ * while holding a spinlock), or while holding the mmap lock. Normally this
-+ * function is called as a result of an unmap operation, and thus KVM common
-+ * code will already hold kvm->mmu_lock in write mode.
-+ *
-+ * Context: Needs to be called while holding the mmap lock or with interrupts
-+ *          disabled.
++ * Context: called by KVM common code without holding the kvm mmu lock
++ * Return: true if any page in the given range is young, otherwise 0.
 + */
-+void gmap_helper_try_set_pte_unused(struct mm_struct *mm, unsigned long vmaddr)
++bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
 +{
-+	pmd_t *pmdp, pmd, pmdval;
-+	pud_t *pudp, pud;
-+	p4d_t *p4dp, p4d;
-+	pgd_t *pgdp, pgd;
-+	spinlock_t *ptl;	/* Lock for the host (userspace) page table */
-+	pte_t *ptep;
-+
-+	pgdp = pgd_offset(mm, vmaddr);
-+	pgd = pgdp_get(pgdp);
-+	if (pgd_none(pgd) || !pgd_present(pgd))
-+		return;
-+
-+	p4dp = p4d_offset(pgdp, vmaddr);
-+	p4d = p4dp_get(p4dp);
-+	if (p4d_none(p4d) || !p4d_present(p4d))
-+		return;
-+
-+	pudp = pud_offset(p4dp, vmaddr);
-+	pud = pudp_get(pudp);
-+	if (pud_none(pud) || pud_leaf(pud) || !pud_present(pud))
-+		return;
-+
-+	pmdp = pmd_offset(pudp, vmaddr);
-+	pmd = pmdp_get_lockless(pmdp);
-+	if (pmd_none(pmd) || pmd_leaf(pmd) || !pmd_present(pmd))
-+		return;
-+
-+	ptep = pte_offset_map_rw_nolock(mm, pmdp, vmaddr, &pmdval, &ptl);
-+	if (!ptep)
-+		return;
-+
-+	/*
-+	 * Several paths exists that takes the ptl lock and then call the
-+	 * mmu_notifier, which takes the mmu_lock. The unmap path, instead,
-+	 * takes the mmu_lock in write mode first, and then potentially
-+	 * calls this function, which takes the ptl lock. This can lead to a
-+	 * deadlock.
-+	 * The unused page mechanism is only an optimization, if the
-+	 * _PAGE_UNUSED bit is not set, the unused page is swapped as normal
-+	 * instead of being discarded.
-+	 * If the lock is contended the bit is not set and the deadlock is
-+	 * avoided.
-+	 */
-+	if (spin_trylock(ptl)) {
-+		/*
-+		 * Make sure the pte we are touching is still the correct
-+		 * one. In theory this check should not be needed, but
-+		 * better safe than sorry.
-+		 * Disabling interrupts or holding the mmap lock is enough to
-+		 * guarantee that no concurrent updates to the page tables
-+		 * are possible.
-+		 */
-+		if (likely(pmd_same(pmdval, pmdp_get_lockless(pmdp))))
-+			__atomic64_or(_PAGE_UNUSED, (long *)ptep);
-+		spin_unlock(ptl);
-+	}
-+
-+	pte_unmap(ptep);
++	return false;
 +}
-+EXPORT_SYMBOL_GPL(gmap_helper_try_set_pte_unused);
 +
- static int find_zeropage_pte_entry(pte_t *pte, unsigned long addr,
- 				   unsigned long end, struct mm_walk *walk)
++/**
++ * kvm_age_gfn() - clear young
++ * @kvm: the kvm instance
++ * @range: the range of guest addresses whose young status needs to be cleared
++ *
++ * Context: called by KVM common code without holding the kvm mmu lock
++ * Return: true if any page in the given range was young, otherwise 0.
++ */
++bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	return false;
++}
++
++/**
++ * kvm_unmap_gfn_range() - Unmap a range of guest addresses
++ * @kvm: the kvm instance
++ * @range: the range of guest page frames to invalidate
++ *
++ * This function always returns false because every DAT table modification
++ * has to use the appropriate DAT table manipulation instructions, which will
++ * keep the TLB coherent, hence no additional TLB flush is ever required.
++ *
++ * Context: called by KVM common code with the kvm mmu write lock held
++ * Return: false
++ */
++bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	return false;
++}
++
+ static inline unsigned long nonhyp_mask(int i)
  {
+ 	unsigned int nonhyp_fai = (sclp.hmfai << i * 2) >> 30;
 -- 
 2.51.1
 
