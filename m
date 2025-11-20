@@ -1,192 +1,307 @@
-Return-Path: <kvm+bounces-63870-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63871-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089B6C74BDE
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 16:08:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1418BC74FA0
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 16:31:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3BAE54EB30F
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 15:00:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id CBF4C2B0F4
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 15:31:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B393446DB;
-	Thu, 20 Nov 2025 14:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B3B35FF53;
+	Thu, 20 Nov 2025 15:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="eVEs8wAV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nd8bwrOy"
 X-Original-To: kvm@vger.kernel.org
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012036.outbound.protection.outlook.com [52.101.53.36])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291B233A027;
-	Thu, 20 Nov 2025 14:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.36
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763650790; cv=fail; b=FAHRhepkRFWnOG06C5Cc5/V1dh8okUTIAqD5QYpETOcAiQOI7kKzmldq9w7+/3rrbF2ripfo7EdXGeCi78BM12WG2vUNE4/BhxCJYSLzT636zZqc5aDEQsixrbpAYmKWMARX585uHtbKATNIPJgioBU/LCbtFZ3dYdGiDx8a4JA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763650790; c=relaxed/simple;
-	bh=aVEUPOVDrep5FNX8ubLMN20bYk4nmPeO7XB6LqnZVLo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ZzR1TJo+ZSr2GcR/O//DQkq0HNyFPF46zqZOeLmJoHEdcK4EYUehs+9NKIsDt9jfav2Q5c6SEdVypfbVcXV8eoLj5M5JcYBiA1t2zDj+Lgo1x3d0m6kTPEqCtQvV0eExvB1cxO7sQ3i+sxrQmTBt2lI15YmucFO37uQntGrwn9Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=eVEs8wAV; arc=fail smtp.client-ip=52.101.53.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oBwLl/5f1YY5+a03Onq7O0EKlacexcVC74tHOp5RfxDBvaNrxFIRtJ4m8KUvW3vGYu/aKSKFH88l2Bo6z9C3ZuaqR1LCzD2wjQOSc+WwDFRYidYqzEaEJpKMbEPJhBpodQ+hUmJc19JDVgtJ8W1UE5kr00I04wQKMZ794OyulWKJ5CaGRKpcBGVetLXbysmWn+zs/uy1HIMXn0iN5nrWgKOZJZUHqGpKi12fLYbdKScQOCWpAUJ6x7JRPRfRBXFvgFVkMU85wmH9xEQ3gqezLFRgDF3+uLYBr+x1lFeU4gdpbBBPXNde9OJPmEOtkX4y+AIhnRTucEY/oMV7lTnrUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=85eUEXCFIH2fJ9ddRbG0jzYyR06m/4rKjpAqPy+Pooc=;
- b=V6G+BN7ZKqAHlKCqX9ygQG8rmUDdbvL9yaEZRPzxSmlBZV10mL/qd8+FyrNng8Kt13GtQmd5zM9UBhxK0e6kJPcO5mICKxQUOX/11MvzLmASx3OM5+vZSWDyjGKG7HYa3FuaAP2pN+VJmoHrc8N8kGrONwhdozpRr8MYATxZmmc1dBx4op9oLCj/a5yBnS0x64hMidymVLws8mKgCXTf0wvQ81gniCYkx6fWkt+dFkRtQtzhyfoRhcidifRjUsAZTWCPWQRLHBPwydErw6LwDRqdApdMcRBsqovH43fOvXNyUzePuQuAjyNaYPE4kavPdY50UNpC6CDK/zUHP/xccQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=85eUEXCFIH2fJ9ddRbG0jzYyR06m/4rKjpAqPy+Pooc=;
- b=eVEs8wAVTi9iHtM/S3Kgd/IpB62lB5HKlocPISmi2U4i96q0vhaLNlGPsfAbsjTho+ld1qodkL51LaLAq0NLaxIrv1owa/v6KJJhXib+3y/2l+ydDW1QOA6vTobarOQqmCkzJ1Z0ZHV+1TSGFtXeiEmA/8invgMWzqMBLMmIntm9cKBAV3Ve6PuzcqVUTKuRtP2iZKcUFtYCjxBEVltrzCTfViiRep9SCrOpUtX/TJwFIDWnO5GqRduyJc8JShT6PohwfCWPfK5idKd/oT/J3EEnpHNKTRCrQAeUBU/u7T2cATttXrhnOU7+TWQIFpaAsQE10q4AyeejqrXpnws68g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
- by DM4PR12MB8569.namprd12.prod.outlook.com (2603:10b6:8:18a::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Thu, 20 Nov
- 2025 14:59:42 +0000
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9343.009; Thu, 20 Nov 2025
- 14:59:42 +0000
-Date: Thu, 20 Nov 2025 10:59:41 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Alex Williamson <alex@shazbot.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	Joerg Roedel <joro@8bytes.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Will Deacon <will@kernel.org>, Krishnakant Jaju <kjaju@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Matt Ochs <mochs@nvidia.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	"patches@lists.linux.dev" <patches@lists.linux.dev>,
-	Simona Vetter <simona.vetter@ffwll.ch>,
-	"Kasireddy, Vivek" <vivek.kasireddy@intel.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: Re: [PATCH 5/9] iommufd: Allow MMIO pages in a batch
-Message-ID: <20251120145941.GC153257@nvidia.com>
-References: <0-v1-af84a3ab44f5+f68-iommufd_buf_jgg@nvidia.com>
- <5-v1-af84a3ab44f5+f68-iommufd_buf_jgg@nvidia.com>
- <BN9PR11MB5276C73B3BA7E689EAB90F648CD4A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276C73B3BA7E689EAB90F648CD4A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN0P223CA0013.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:208:52b::15) To MN2PR12MB3613.namprd12.prod.outlook.com
- (2603:10b6:208:c1::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF9635F8B0;
+	Thu, 20 Nov 2025 15:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763652222; cv=none; b=Mcyak6Vn+5TrTyy2sr2FdKzy0Lve7A/guN8/kXJMKhdviQ2Oh9HuifNYZODTzpbSl6K0JZy8EnZbyvehsT/CLkOOyxzZJJGik4opWckkrZz9pCekphi5ACMEYgvdOy96MoEFu1GuU14mwZPv1OfBSNgUWApO44YfTxtT7/uRzGE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763652222; c=relaxed/simple;
+	bh=bj15Y9VvxernGXOXAHezLeGkYBBoJT0P5MFHGRZHdKY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z579jMy9mcOQGcQLrxitNpnKVLpKbx5A80ghZqQI4EJESljkvF3jW0aTj7HXjvDPVo4laRpQ6CD7cRgxjZiNls2ZtKDdGCbp1XuHb9B62wLdREXoUKaGsCsVHUJmD3MLJEzok28tC65HvodsaYUx9YXz4JqnO9lSX85n7/2pHgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nd8bwrOy; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763652221; x=1795188221;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=bj15Y9VvxernGXOXAHezLeGkYBBoJT0P5MFHGRZHdKY=;
+  b=Nd8bwrOydN4FwZmhwIy3ibXxDazhYoKh41ekJmJy+tk1em/G8KyknPrq
+   Fq2EtNLDyLqZl2PdURXNtG/YcbXWrcuFgaa8ZohAnwkgBOo7wJjTyeCT6
+   +3WPvJocmAOY8dex9bEGZLKzeZzfBWGQEDfFCZ+mNE4baAvDfb7OSD2t6
+   kOEhw+X4GXmKUR32fj6rg6HhhuDwSUWHlR7A/wJ8svagOr8Oj4Z6/0Ssm
+   mJgMOx2ek/LPFmepg6UcZQ3Tuog8HxR1ikDR1BMAvVZ9Il4E1X5llvluL
+   pCSqPIfk82wjU8yCYW2+m5btnoHVfZmYJynGykp5pb0avkhgGRCRxu8dw
+   w==;
+X-CSE-ConnectionGUID: rG0bbul6TK6NskT4S+axbg==
+X-CSE-MsgGUID: +oYp8VDSTAaO8GjdgkI8pw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="65763636"
+X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
+   d="scan'208";a="65763636"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 07:23:41 -0800
+X-CSE-ConnectionGUID: poaTVW1nRHCa58cdzfOw5w==
+X-CSE-MsgGUID: 73x9Rz1PT1qkJmj6xyLN/w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
+   d="scan'208";a="214749631"
+Received: from schen9-mobl4.amr.corp.intel.com (HELO [10.125.109.230]) ([10.125.109.230])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 07:23:40 -0800
+Message-ID: <13e894a8-474f-465a-a13a-5d892efbfadb@intel.com>
+Date: Thu, 20 Nov 2025 07:23:39 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|DM4PR12MB8569:EE_
-X-MS-Office365-Filtering-Correlation-Id: 48893505-3016-4db4-fbdf-08de28456f7e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?uWfTxbN/mDFb18V51OuA+JTg5mVZasQXY8gH4/EbP+99K8aYpRpiLCXPuSZx?=
- =?us-ascii?Q?tvWWkgq14dCwrhPbB5kEM/dHZYbilkulh3ERMiWvP8yVYZKdvVS9DmFDkY3D?=
- =?us-ascii?Q?CMVkcmFgqY1JABtS7cvdybxm0+yOEwh75xM7HCv4lNP5iJ34KbkOokqllMDz?=
- =?us-ascii?Q?WkEtf5e271ede9L8Q+Y6CxCJw1XzvLnYm91wG4E78b5JMsOCit3IgMrtte0S?=
- =?us-ascii?Q?5P7R3S3blTKudL9tuzih/zHuJ0MzKul13aZsq1UqiMhaKo3RemDsethNLzKm?=
- =?us-ascii?Q?tEWK+jCoq70te/6MYgdJ6DnRmKcefq0iQY2BijP1kQNPO1gws4pv0VBNHOpC?=
- =?us-ascii?Q?muVEd4xcnDkm4aHxOJnXwryt+Eq61KTkoN9ZDDq8eUxELs5jBp2pxikebcxU?=
- =?us-ascii?Q?uBjYlJCNvgFLHnI/YPczMZa2qldlNJ9q8zaTcgO5+D18T4KjhA4aBmEFhLk/?=
- =?us-ascii?Q?Fb6Gn9NrwCkJSK38P0TtJqB8IrEK+QZ4VKakiBe3Px3OoMpekelKmLfS1d9t?=
- =?us-ascii?Q?BVMMAQYIVzIHWSUMbE8e9FQy19qTvkhhOrmyTuak22u3IK3SNYHBAd52eUGE?=
- =?us-ascii?Q?FN5gzXTDY/dpYgCQ3HMehNqmhkoARDoZNASsG6QKyUX17hSR0Y0VVNPJ1qIY?=
- =?us-ascii?Q?t+Ds4qaVESdAL5FSEdKCBISLUT6Qv9MZr44uRVySPT2dcfZE0vB8x+vHUZZK?=
- =?us-ascii?Q?V8jZ6aaZE3keaNLcaCCZWhoBjhUv2qbW8lUTXG48K9jtXT4i3hXPHXmnKLAR?=
- =?us-ascii?Q?Ojj8+2ehmzjl1wepAIjfr7IsFK3J6bmn4c3J/b0l5zAlzHA9RakVuq9E1E1E?=
- =?us-ascii?Q?AE1ra2ULmFENBx1qrhPMZL4Ijy7nhcfY3QptuOhjFktIihdBmka5Zqy7O65M?=
- =?us-ascii?Q?jtZR1AN8pUoNU5Vlyhb7P54t3hSa4btKUSDCKbNMQxS5ZnzBnbu7mau8/lml?=
- =?us-ascii?Q?DMzDRo3aycc7+I+mqctlrsDkBKfNE53dIZhJ1AnTVdi3CcAdajXZAje4SzUM?=
- =?us-ascii?Q?K2EGBu18rUb0EUZwFIehg1dnFkKyweWWPS4Nljw9FS7YQYf22ib9qVXHiCRc?=
- =?us-ascii?Q?wQf0dSzr0+CJgjfUOKLzo/9AhCRkTIrFcZo5ruidFBrdR3cZFjRn+Fa6B0Kb?=
- =?us-ascii?Q?ljuURrF8PBI/uxGWIOhRk1+UIvCNBiy6IPxrrNtK4oGY/meVJbpji2Fb2Zko?=
- =?us-ascii?Q?GSg5o6SC4UQKv7a9yqNz3xO6DRnh0cL98RQb/f5iFB3jPYF9QdsrIqPpooqL?=
- =?us-ascii?Q?BGT7rgsRcLNinhQhPBvP6+crn2tVpkHh+WGTCwA8b/jPD5d02K8AgZ5nImaZ?=
- =?us-ascii?Q?xUHbwJhVIFT074njYyhytWQypSyDEqV43PyH1YQlZMMw/FPzAepe9IHUDgx9?=
- =?us-ascii?Q?00fvtajFtVOMkV2v5wLqruzHplJjdOd/x5gN0m+fHGltYKuZuikNuoSYgTsz?=
- =?us-ascii?Q?9QNEyzjIlQ4Sujshv5Xa3rHVnHwodzsm?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?mK+iGE5Rpg+1sFglOZETIDWm0Mkmov0bTguZteqkvDO+OYUT+XTShrksFhba?=
- =?us-ascii?Q?glpJW16pi9hzpqfCXOgJJQJ/HHzAhwUWo0QfwLi6hUzpf7Lj/hzOxXqpvvAl?=
- =?us-ascii?Q?db5NCd5yzORBtq9LSL6/R1HBQbJNNyMBv0kM10kYU/lgtfle9m6ywpk7y0to?=
- =?us-ascii?Q?5D4Htb3w8XaaBFEtQ9iYyHLpHAcP2+H64MqLrhtbDzpYC59m5GWKX77XX//A?=
- =?us-ascii?Q?ndJYJw0WIa6QgivCaYkeCBvolbA6C+bQovlXzWWoTvGe33O4rDIZfTddl/BO?=
- =?us-ascii?Q?dBqrKmx7mSWE83QqxOvnqEKmdEBuEozEA1HehxpiSkBVCPtETIBi/34EslMn?=
- =?us-ascii?Q?c/W7vIoT9fkAM6fA/FDg2l21zPtit1cr8n9Ktod/takCBSOdifSWAPzTf9ed?=
- =?us-ascii?Q?Ug0aYrSW6nyFolUhOL6FgW+hkRGjRHBTcBG/8q9s86Lp2SVyEUkq4Ck7XPU6?=
- =?us-ascii?Q?CJYR8DTMV9jGXzShTKtUZpcDzLlzNnQ1KALl2uECLxQKzp08kYVACtqG+Cft?=
- =?us-ascii?Q?9gaoDQbP/tMcYH0VLX0pVD0JGU+bkAdhP/zXmCILUKtfhpKsgIQrzEvNGqLt?=
- =?us-ascii?Q?q/421TC90EniASbrbzViD8xJP5KvUtG9IwiKGwKS2gQ7Ql3PjgR3RPNjlGyE?=
- =?us-ascii?Q?+o4yz3CN053OK9CRJZHZekZPZ8ZSu4ZIC1YV2S6SxK4YZzqk5dK9Oc3MI0n+?=
- =?us-ascii?Q?/9ZI31ziTgyDgSiVgT12FudaNhnICC0dEBp6q6/obvilw1YZ0VZgGiV+eDmC?=
- =?us-ascii?Q?JQRXUOpGt48MDwLFFi2T5zVQ2xr2fQK/U90eO+33k2gSu4nX15WKbCGnedOj?=
- =?us-ascii?Q?xR1UiMzUewzlj3rsTQAKAdJgFMk9U4UdmKZO3OIqRWs6hkUlDf1WckZf6Eck?=
- =?us-ascii?Q?rA+rY2JM/K4eMmpkHK81xcjRdVYdXvkv571CLEQkS8cYAaztfqZXTQvuf0qM?=
- =?us-ascii?Q?iPbGKsjDHGXXN6Rjfhu39WKwmaKOXAYa5Fpyp9s3EsdjZhxqq8e7eKfKJDen?=
- =?us-ascii?Q?IYpAxQe38Tlh+9uDHRIngHos773KezzyyXGspbiBRJrxOmSet4olUfkkRKv+?=
- =?us-ascii?Q?kPs7djnv0Ye3ZHu9n8ThspmK2id6yWzV5qJahYUPEzJbyMaK4WVwI9ptM8/e?=
- =?us-ascii?Q?YMmIhpLNuWQFtBXn1YGVCcgkyUlwnBWYFZHvBx6bqughcIsugNrslLeoWAnc?=
- =?us-ascii?Q?jfI3haRdvGutB1hez0x1VXDztLCemkpqX62J9Bfz874dcJuBPbtzjzVue19j?=
- =?us-ascii?Q?fyynNqxLF5t+Jo+YPIS94l5l0ZECW0NDz8RFCrVtsi6uNSVEJtuewiaCgUki?=
- =?us-ascii?Q?HBF8NNEbJkZXEwZBVZX/HkHCioVA92XRpdDlS07Dd5BIRPchJP5ONbTeANvi?=
- =?us-ascii?Q?ag74WGu4NU+Q7Xqs00Lv0LaUeSxRTLx0kcVjDGn90XpgNiyYpgZz2ak73/HG?=
- =?us-ascii?Q?ZK5MFVPhiKps7e+Q0X0QOTxtzdrIcB3bGqq25+DvwLryZWrt2qjH/vcy9nZr?=
- =?us-ascii?Q?5WyfB5+vAoLacCBhBg5LZOYBPAToasXQq9oj8I2IjN0jHm/iIx/naVljfKj7?=
- =?us-ascii?Q?0BSsiEbWxCQk8SV9Olg=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48893505-3016-4db4-fbdf-08de28456f7e
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2025 14:59:42.3769
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2Mkr4xX6VI11hK2uIHf89zIOCcv8lw50cYTo0DVUjwDxR3890dW9znzEwTuRU7Ck
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8569
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 08/26] x86/virt/tdx: Add tdx_enable_ext() to enable of
+ TDX Module Extensions
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: linux-coco@lists.linux.dev, linux-pci@vger.kernel.org,
+ chao.gao@intel.com, dave.jiang@intel.com, baolu.lu@linux.intel.com,
+ yilun.xu@intel.com, zhenzhong.duan@intel.com, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, dave.hansen@linux.intel.com,
+ dan.j.williams@intel.com, kas@kernel.org, x86@kernel.org
+References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
+ <20251117022311.2443900-9-yilun.xu@linux.intel.com>
+ <cfcfb160-fcd2-4a75-9639-5f7f0894d14b@intel.com>
+ <aRyphEW2jpB/3Ht2@yilunxu-OptiPlex-7050>
+ <62bec236-4716-4326-8342-1863ad8a3f24@intel.com>
+ <aR6ws2yzwQumApb9@yilunxu-OptiPlex-7050>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <aR6ws2yzwQumApb9@yilunxu-OptiPlex-7050>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 20, 2025 at 07:59:19AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Saturday, November 8, 2025 12:50 AM
-> > 
-> > +enum batch_kind {
-> > +	BATCH_CPU_MEMORY = 0,
-> > +	BATCH_MMIO,
-> > +};
+On 11/19/25 22:09, Xu Yilun wrote:
+> On Tue, Nov 18, 2025 at 10:32:13AM -0800, Dave Hansen wrote:
+...
+>> Please *say* that. Explain how existing TDX metadata consumes memory and
+>> how this new mechanism is different.
 > 
-> with 'CPU_MEMORY' (instead of plain 'MEMORY') implies future
-> support of 'DEV_MEMORY'?
+> Yes.
+> 
+> Existing ways to provide an array of metadata pages to TDX Module
+> varies:
+> 
+>  1. Assign each HPA for each SEAMCALL register.
+>  2. Call the same seamcall multiple times.
+>  3. Assign the PA of HPA-array in one register and the page number in
+>     another register.
+> 
+> TDX Module defines new interfaces trying to unify the page array
+> provision. It is similar to the 3rd method. The new objects HPA_ARRAY_T
+> and HPA_LIST_INFO need a 'root page' which contains a list of HPAs.
+> They collapse the HPA of the root page and the number of valid HPAs
+> into a 64 bit raw value for one SEAMCALL parameter.
+> 
+> I think these words should be in:
+> 
+>   x86/virt/tdx: Add tdx_page_array helpers for new TDX Module objects
 
-Maybe, but I don't have an immediate thought on this. CXL "MMIO" that
-is cachable is a thing but we can also label it as CPU_MEMORY.
+That's not quite what I was hoping for.
 
-We might have something for CC shared/protected memory down the road.
+I want an overview of how this new memory fits into the overall scheme.
+I'd argue that these "control pages" are most similar to the PAMT:
+There's some back-and-forth with the module about how much memory it
+needs, the kernel allocates it, hands it over, and never gets it back.
 
-Thanks,
-Jason
+That's the level that this needs to be presented at: a high-level
+logical overview.
+
+...> I think it may be too heavy. We have a hundred SEAMCALLs and I expect
+> few needs version 1. I actually think v2 is nothing different from a new
+> leaf. How about something like:
+> 
+> --- a/arch/x86/virt/vmx/tdx/tdx.h
+> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+> @@ -46,6 +46,7 @@
+>  #define TDH_PHYMEM_PAGE_WBINVD         41
+>  #define TDH_VP_WR                      43
+>  #define TDH_SYS_CONFIG                 45
+> +#define TDH_SYS_CONFIG_V1              (TDH_SYS_CONFIG | (1ULL << TDX_VERSION_SHIFT))
+> 
+> And if a SEAMCALL needs export, add new tdh_foobar() helper. Anyway
+> the parameter list should be different.
+
+I'd need quite a bit of convincing that this is the right way.
+
+What is the scenario where there's a:
+
+	TDH_SYS_CONFIG_V1
+and
+	TDH_SYS_CONFIG_V2
+
+in the tree at the same time?
+
+Second, does it hurt to pass the version along with other calls, like
+... (naming a random one) ... TDH_PHYMEM_PAGE_WBINVD ?
+
+Even if we did this, we wouldn't copy and paste "(1ULL <<
+TDX_VERSION_SHIFT)" all over the place, right? We'd create a more
+concise, cleaner macro and then use it everywhere. Right?
+	
+>>>> rather non-obvious. It's doing:
+>>>>
+>>>> 	while (1) {
+>>>> 		fill(&array);
+>>>> 		tell_tdx_module(&array);
+>>>> 	}
+>>>
+>>> There is some explanation in Patch #6:
+>>
+>> That doesn't really help me, or future reviewers.
+>>
+>>>  4. Note the root page contains 512 HPAs at most, if more pages are
+>>>    required, refilling the tdx_page_array is needed.
+>>>
+>>>  - struct tdx_page_array *array = tdx_page_array_alloc(nr_pages);
+>>>  - for each 512-page bulk
+>>>    - tdx_page_array_fill_root(array, offset);
+>>>    - seamcall(TDH_XXX_ADD, array, ...);
+>>
+>> Great! That is useful information to have here, in the code.
+
+I asked in my last message, but perhaps it was missed: Could you please
+start clearing irrelevant context in your replies. Like that hunk ^
+
+>>>> Why can't it be:
+>>>>
+>>>> 	while (1)
+>>>> 		fill(&array);
+>>>> 	while (1)
+>>>> 		tell_tdx_module(&array);
+>>>
+>>> The consideration is, no need to create as much supporting
+>>> structures (struct tdx_page_array *, struct page ** and root page) for
+>>> each 512-page bulk. Use one and re-populate it in loop is efficient.
+>>
+>> Huh? What is it efficient for? Are you saving a few pages of _temporary_
+>> memory?
+> 
+> In this case yes, cause no way to reclaim TDX Module EXT required pages.
+> But when reclaimation is needed, will hold these supporting structures
+> long time.
+> 
+> Also I want the tdx_page_array object itself not been restricted by 512
+> pages, so tdx_page_array users don't have to manage an array of array.
+
+I suspect we're not really talking about the same thing here.
+
+In any case, I'm not a super big fan of how tdx_ext_mempool_setup() is
+written. Can you please take another pass at it and try to simplify it
+and make it easier to follow?
+
+This would be a great opportunity to bring in some of your colleagues to
+take a look. You can solicit them for suggestions.
+
+>>>>> +static int init_tdx_ext(void)
+>>>>> +{
+>>>>> +	int ret;
+>>>>> +
+>>>>> +	if (!(tdx_sysinfo.features.tdx_features0 & TDX_FEATURES0_EXT))
+>>>>> +		return -EOPNOTSUPP;
+>>>>> +
+>>>>> +	struct tdx_page_array *mempool __free(tdx_ext_mempool_free) =
+>>>>> +		tdx_ext_mempool_setup();
+>>>>> +	/* Return NULL is OK, means no need to setup mempool */
+>>>>> +	if (IS_ERR(mempool))
+>>>>> +		return PTR_ERR(mempool);
+>>>>
+>>>> That's a somewhat odd comment to put above an if() that doesn't return NULL.
+>>>
+>>> I meant to explain why using IS_ERR instead of IS_ERR_OR_NULL. I can
+>>> impove the comment.
+>>
+>> I'd kinda rather the code was improved. Why cram everything into a
+>> pointer if you don't need to. This would be just fine, no?
+>>
+>> 	ret = tdx_ext_mempool_setup(&mempool);
+>> 	if (ret)
+>> 		return ret;
+> 
+> It's good.
+> 
+> The usage of pointer is still about __free(). In order to auto-free
+> something, we need an object handler for something. I think this is a
+> more controversial usage of __free() than pure allocation. We setup
+> something and want auto-undo something on failure.
+I'm not sure what you are trying to say here. By saying "It's good" are
+you agreeing that my suggested structure is good and that you will use
+it? Or are you saying that the original structure is good?
+
+Second, what is an "object handler"? Are you talking about the function
+that is pointed to by __free()?
+
+Third, are you saying that the original code structure is somehow
+connected to __free()? I thought that all of these were logically
+equivalent:
+
+	void *foo __free(foofree) = alloc_foo();
+
+	void *foo __free(foofree) = NULL:
+	foo = alloc_foo();
+
+	void *foo __free(foofree) = NULL;
+	populate_foo(&foo);
+
+Is there something special about doing the variable assignment at the
+variable declaration spot?
 
