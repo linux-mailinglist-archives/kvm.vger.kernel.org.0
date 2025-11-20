@@ -1,175 +1,192 @@
-Return-Path: <kvm+bounces-63964-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63965-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B1DAC75B4B
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 18:34:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C11EC75BCC
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 18:39:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 9D0E4291AA
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:33:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 4F8492EC9B
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 17:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A0336D4FE;
-	Thu, 20 Nov 2025 17:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFAB12E0939;
+	Thu, 20 Nov 2025 17:35:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NbJbToWR"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ioH1WkcQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011058.outbound.protection.outlook.com [40.107.208.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C613A8D5E;
-	Thu, 20 Nov 2025 17:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763659568; cv=none; b=DfPL+cgkKka98L5tbAeaZQRrvccP6MJ6YdjvU/5s5rnUuXFM6zrJOOTeL6KcvWNweAsM7eG5b4agixsTSrtlokPyjD0UcmBg7mL7IRC84uj80WgrSiA5RHCE/sTMx4PDNNOvbtSLBClHaiXo4bds3thito2jlYBVInZhnlAOveU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763659568; c=relaxed/simple;
-	bh=aut+4Oafn6tB11/ooAwwuBkrUn/fot5spF2GxBcIs7Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z3E4N8ITt0oUfYkhSmsMzteJMKOA/9UQSxUKR2AqOwABHHCzMv4zMk9PXOYb1Y1aVXr5/9EOsPByFFRksxpdOMQRDQ/V+WCiHg5ghE1W5+61AFF733sIquQh/dUvqylOOPrLCfvzPDuF80NAFdtpotANaQSXoI+nR428RTTeXdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NbJbToWR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43BA0C4CEF1;
-	Thu, 20 Nov 2025 17:26:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763659568;
-	bh=aut+4Oafn6tB11/ooAwwuBkrUn/fot5spF2GxBcIs7Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NbJbToWRNgRwkvzsygqIiz0PcursXGfjNIDNxHKHIj5VRa+uRbwlf5HXzvqYs313Y
-	 ojkw1aej+bdTAg0Gy60WiGIGglkaPV0cEJ1LkXnq/kM1tyTS4WATYWTs3phGKXAg58
-	 RnxkZWY8amhU7oFnykOVV//SkNBEV1nh8kpymTQlDeToyNQE8xLKurv7UpeSElJIef
-	 EmIDsqkTMbJJPhPyyVqjIkNQlclRduyL5WFHzZf3Pyf4fLa+siojOyKHtAGc/22OJs
-	 tw/+wxxeyMdNl23FHTG9oRZatmySKH+kbPn/aL7p7Sz1xujJ+DMP0Deyt4TeoVFoHn
-	 A2kAGjgRttuCg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vM8Q2-00000006y6g-1wYF;
-	Thu, 20 Nov 2025 17:26:06 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 49/49] KVM: arm64: selftests: vgic_irq: Add timer deactivation test
-Date: Thu, 20 Nov 2025 17:25:39 +0000
-Message-ID: <20251120172540.2267180-50-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251120172540.2267180-1-maz@kernel.org>
-References: <20251120172540.2267180-1-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A95CF7260F;
+	Thu, 20 Nov 2025 17:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763660121; cv=fail; b=B3/RcEQTOOD1Gk3H8syWsrzQh2mx3fqG8Mco8jK7ReTrsKoiUetcSh8qoN3uuYjVWIQpD7S9bnAAFoWhHOPWNsuegkr4RTi0PWKrFHA9K2mBbCHSsvXK/bWQiD9gRN4Mx/FmYj8Yv+73XderLQ91V0GeY1DzoWt2FE2BkGbX+FY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763660121; c=relaxed/simple;
+	bh=UoK+VOA68Ab0e8XgptwQv3xeVi7cMbw7PH741Cg+Eb4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n1xbKMCe4ZUZ7maA4kugYxaLS1kHpRJr2rW5EklOdMbItNxWIDe96bzui8dPL0qXrpgW/RRpC8HIB935m/LDZmHn+AVugIMgkiWnPbez9HDWa2j6LIcSuoiwCQ6nhbO1Z+qIwx1jXZM2zPoi/0cju/Ks63YJgLOGeZbwY62oshY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ioH1WkcQ; arc=fail smtp.client-ip=40.107.208.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kJBewdhhHx6v1AN/YcSUzGFiDM8QCKcK+8+vjwnvzlKxoVGXDYrgmbPQwES4skdt5lTFdc88QEt81o1uS4gsYF6XEkDittghgWza9sQ8NRgSSP/dOMWx0jUbkjHyPazvhxNyi2z6u2CsDqvzasDQAfH/NL3bghCMs1XDGvQ36lsg3XUnesE3RZ5MTTri81AOAGGNqe3348KfGRf65stX7VXwawYf5sIgglhL3HlzcQTRgrTIflgeJn0mCg8259pHnoY48FaJx8Zxq2s8gR0l9YLVeaK6IYxfErQqv3C4ACv1M8LrGJAZ2UzWhgvt11rBxnqqn0oHTsYPNiqJelxMpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rOwGtsvmUyOAB3WlIZusz9JGYAOR2EypyVZsDmCO6bE=;
+ b=uBTn5Sk2nFIzvof1mdfGxeJajF+hH+BgTr7Ek3ab7buRM/Vd24TkqZiwk7AXLzRVhOsxN9IfPWo+tP4MMlZcoAYe9K1QxtKDlWmyYU2YmwV0Y02TaU0y1pH8pQVqF3ede7dATZP8YfplCoXQNuYzIsBJ7iV5K8T7ACIbiaeTB1YJwIpqi2Y5GKPox9KKPJHcZmbzUTx1R7D09XvNyU5tgs0yxx7gHU1N8TUciVUboDTAXqZ5YeKahGWFwIJR7BSW0LWVHSwsNvCwdtUXLrSCVnpc5OZq7OR3S2j37MV4Pfgx9REHLX3uO6tbMlRpoUDbQLQuGjzjluSoGDA04dYH5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=ffwll.ch smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rOwGtsvmUyOAB3WlIZusz9JGYAOR2EypyVZsDmCO6bE=;
+ b=ioH1WkcQ8miNjomXxvb9rFeVrBmkxJESTE93JFnq6H6EEuCHQxpnK9PUcMfUpsw9zPcZ2l5xdOySgj0L91/1CinA4hhdBluRRIKHsoykgYn9P3lm2TBRc3FEHzHu5N0sf2lAKckVbtjBPvbCfqyhZjPYQsaYosHIuwuVc3loEi9914pJIzI/okFfkutSpA658sJsa7PYd6kSAH4HdxRCa3cvZJ46Rx0DZGaf4TxvpmFQ0eaQ6uOqJwxQ+YBe+1X24bzjPSvt6sTweDSwI2xyzD2giqHskG4S5TxdtJdYWNPPsnlQGMNVzGP0OWbzpc7JCLA301BSyy9LNxOe/MnEmQ==
+Received: from CH0PR03CA0243.namprd03.prod.outlook.com (2603:10b6:610:e5::8)
+ by SA1PR12MB999085.namprd12.prod.outlook.com (2603:10b6:806:4a2::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.11; Thu, 20 Nov
+ 2025 17:35:17 +0000
+Received: from DS3PEPF000099DD.namprd04.prod.outlook.com
+ (2603:10b6:610:e5:cafe::91) by CH0PR03CA0243.outlook.office365.com
+ (2603:10b6:610:e5::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.11 via Frontend Transport; Thu,
+ 20 Nov 2025 17:35:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS3PEPF000099DD.mail.protection.outlook.com (10.167.17.199) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.9 via Frontend Transport; Thu, 20 Nov 2025 17:35:17 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 20 Nov
+ 2025 09:34:59 -0800
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 20 Nov
+ 2025 09:34:58 -0800
+Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Thu, 20 Nov 2025 09:34:57 -0800
+Date: Thu, 20 Nov 2025 09:34:55 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Alex Williamson <alex@shazbot.org>, Christian =?iso-8859-1?Q?K=F6nig?=
+	<christian.koenig@amd.com>, <dri-devel@lists.freedesktop.org>,
+	<iommu@lists.linux.dev>, Joerg Roedel <joro@8bytes.org>, Kevin Tian
+	<kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+	<linaro-mm-sig@lists.linaro.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-media@vger.kernel.org>, Robin Murphy <robin.murphy@arm.com>, "Shuah
+ Khan" <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, Will Deacon
+	<will@kernel.org>, Krishnakant Jaju <kjaju@nvidia.com>, Leon Romanovsky
+	<leon@kernel.org>, Matt Ochs <mochs@nvidia.com>, <patches@lists.linux.dev>,
+	Simona Vetter <simona.vetter@ffwll.ch>, Vivek Kasireddy
+	<vivek.kasireddy@intel.com>, Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [PATCH 1/9] vfio/pci: Add vfio_pci_dma_buf_iommufd_map()
+Message-ID: <aR9RPxtQIsoKgGHk@Asurada-Nvidia>
+References: <0-v1-af84a3ab44f5+f68-iommufd_buf_jgg@nvidia.com>
+ <1-v1-af84a3ab44f5+f68-iommufd_buf_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, tabba@google.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1-v1-af84a3ab44f5+f68-iommufd_buf_jgg@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099DD:EE_|SA1PR12MB999085:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2cb638a1-0534-493b-ff97-08de285b2b9d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?1Lst3yZAVOq3nvPhtnWZzfhIJklW4ZJzf8TcqZuN4P+HbSHTSt0q3YEuP+uH?=
+ =?us-ascii?Q?RjysqBTRWsCMFTEnUR9sjK9/yH699GU9pJaTtAFBqcydk+VON3Vb78aBBW8E?=
+ =?us-ascii?Q?nNEhpN71r1Q+BD9C2GUG8oPB+Lt/OpFGc52L4PR0X2fPmLmu9z1jr05373se?=
+ =?us-ascii?Q?EKajAM3iEpNqay75YCqymqEHBj0orvb2cz3W//Ng8UsWjVpjpf4oHa6RewxN?=
+ =?us-ascii?Q?ZO7Jqh7048wQ5sK7qQUt3g94DqB0Sgs5W6maXcsUywTsImwM1Y2ZVXpa5WrV?=
+ =?us-ascii?Q?MGY+XapkSfpiBzRnCanLPz/XRWACCqkGM0ju3rBx34yq5hGJdrXIvdub1Yv0?=
+ =?us-ascii?Q?XpyCyPMNhKJ5/zlZ6Qn8GpkrDv+/NxCRjtIXQfBsk2Blbkhf6l73SjRLf9O9?=
+ =?us-ascii?Q?ILAI6GYa+8qQ3dMbfm11AJNK6pOFnlfSC7/rQgoJ1gBBnCCIJU7Y5vyGm9FX?=
+ =?us-ascii?Q?lzWxAUkDJcpoyKrz3McEetzCAEkUHt/16UIYRbhObXZS4jDjV/zbN3m0lgQb?=
+ =?us-ascii?Q?XBDiVqD6swal2r/jOcg9Uu3FRq504im7JY1T6bLS6bj7NMxd5Rxr+l2yzxV5?=
+ =?us-ascii?Q?y6YsrdxZtR2QbkmLUxsMV6x9DNvlqVePBm5AQveo+Z/GU5WPKXI/xY6IgomN?=
+ =?us-ascii?Q?I2yt+ZgMVN06poALRchs6aZMVlaxZhrSSjJwAYp57lTFz83fCHEC3qA0Uprs?=
+ =?us-ascii?Q?uvFEziBSv+nCoiz9wqn55seJwMd1lBEh6qQ+checpSdXy+jb3u/6GXxL3VR1?=
+ =?us-ascii?Q?WDUKQJDmyYrEbPMl7D23fEubf/d3kjG9hE/fJlzyL1xIBivtz/tYJl1/LfX6?=
+ =?us-ascii?Q?ns3VjXj1rnVgt+KssFjR8jl/2soBViOp4mugBqBP02naqB+ITi5tCMnz38Zs?=
+ =?us-ascii?Q?D4WYQtcfWH73W2CbdW4FZkl+qOe3qjsoR8MMhfY4e/X/ensIi/8uqMo/00cd?=
+ =?us-ascii?Q?BOFSr8dVQ3t89Mwc0+e8Io1LiVlm1wNjhZ/h53m++XrkWPwp4TWY7j4j1LlJ?=
+ =?us-ascii?Q?LXw8Xnz6L76HY2KlxSZSgbqsgabSbqLsDQTUxTztoyUreJcaqXmbZ9q0YSFG?=
+ =?us-ascii?Q?pgqHLt7tKIhR7tplp+dOtEei9/BvMe7nsDyo6qSzTGalOGba3WFgK7EjBkYG?=
+ =?us-ascii?Q?+LTNBJ+AC7X/y4atQb3phVW9lM5Ge5Q4WPDNUiEZvGLl7LUT3n3/As+kkqhH?=
+ =?us-ascii?Q?ToDfudrS6ELsI/nJltXWtO4I/s2DfJW+4BchASaDcEt3AWSXcheOn2x2fX6G?=
+ =?us-ascii?Q?A0nFc8gT+OJ8pg2UKxnLTWDpOEu/dN1nMatjL7vYUswuzahexwLhapFoXBkR?=
+ =?us-ascii?Q?9t/Cc11pen03Dt/aVfJ2GJ65QmkidRitcY5ajHJkXKnEc9KwYdJZ2/gwozgu?=
+ =?us-ascii?Q?znieIJu7dMxxRoqtNIOHB906it494B5LGqMKi6FFijj6tPi4o9V2W84QsxQC?=
+ =?us-ascii?Q?NVz0ZWb9bN0i2bcb5hXTRXO3eG1cdt5K54uuWIXgNzeKPJ1FyXVkorLeDxdF?=
+ =?us-ascii?Q?u7MH05l9E10J5h1qHE7fyGgWVaxCo2HfO9XPFBTNmxcuSMsHWzjbrAKjoefF?=
+ =?us-ascii?Q?/qeTGlb0WBkiFDYjYO4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2025 17:35:17.0671
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2cb638a1-0534-493b-ff97-08de285b2b9d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099DD.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB999085
 
-Add a new test case that triggers the HW deactivation emulation path
-when trapping ICV_DIR_EL1. This is obviously tied to the way KVM
-works now, but the test follows the expected architectural behaviour.
-
-Tested-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- tools/testing/selftests/kvm/arm64/vgic_irq.c | 65 ++++++++++++++++++++
- 1 file changed, 65 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/arm64/vgic_irq.c b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-index ff2c75749f5c5..9858187c7b6ea 100644
---- a/tools/testing/selftests/kvm/arm64/vgic_irq.c
-+++ b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-@@ -894,6 +894,70 @@ static void guest_code_group_en(struct test_args *args, int cpuid)
- 	GUEST_DONE();
- }
+On Fri, Nov 07, 2025 at 12:49:33PM -0400, Jason Gunthorpe wrote:
+> This function is used to establish the "private interconnect" between the
+> VFIO DMABUF exporter and the iommufd DMABUF importer. This is intended to
+> be a temporary API until the core DMABUF interface is improved to natively
+> support a private interconnect and revocable negotiation.
+> 
+> This function should only be called by iommufd when trying to map a
+> DMABUF. For now iommufd will only support VFIO DMABUFs.
+> 
+> The following improvements are needed in the DMABUF API to generically
+> support more exporters with iommufd/kvm type importers that cannot use the
+> DMA API:
+> 
+>  1) Revoke semantics. VFIO needs to be able to prevent access to the MMIO
+>     during FLR, and so it will use dma_buf_move_notify() to prevent
+>     access. iommmufd does not support fault handling so it cannot
+>     implement the full move_notify. Instead if revoke is negotiated the
+>     exporter promises not to use move_notify() unless the importer can
+>     experiance failures. iommufd will unmap the dmabuf from the iommu page
+>     tables while it is revoked.
+> 
+>  2) Private interconnect negotiation. iommufd will only be able to map
+>     a "private interconnect" that provides a phys_addr_t and a
+>     struct p2pdma_provider * to describe the memory. It cannot use a DMA
+>     mapped scatterlist since it is directly calling iommu_map().
+> 
+>  3) NULL device during dma_buf_dynamic_attach(). Since iommufd doesn't use
+>     the DMA API it doesn't have a DMAable struct device to pass here.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
  
-+static void guest_code_timer_spi(struct test_args *args, int cpuid)
-+{
-+	uint32_t intid;
-+	u64 val;
-+
-+	gic_init(GIC_V3, 2);
-+
-+	gic_set_eoi_split(1);
-+	gic_set_priority_mask(CPU_PRIO_MASK);
-+
-+	/* Add a pending SPI so that KVM starts trapping DIR */
-+	gic_set_priority(MIN_SPI + cpuid, IRQ_DEFAULT_PRIO);
-+	gic_irq_set_pending(MIN_SPI + cpuid);
-+
-+	/* Configure the timer with a higher priority, make it pending */
-+	gic_set_priority(27, IRQ_DEFAULT_PRIO - 8);
-+
-+	isb();
-+	val = read_sysreg(cntvct_el0);
-+	write_sysreg(val, cntv_cval_el0);
-+	write_sysreg(1, cntv_ctl_el0);
-+	isb();
-+
-+	GUEST_ASSERT(gic_irq_get_pending(27));
-+
-+	/* Enable both interrupts */
-+	gic_irq_enable(MIN_SPI + cpuid);
-+	gic_irq_enable(27);
-+
-+	/* The timer must fire */
-+	intid = wait_for_and_activate_irq();
-+	GUEST_ASSERT(intid == 27);
-+
-+	/* Check that we can deassert it */
-+	write_sysreg(0, cntv_ctl_el0);
-+	isb();
-+
-+	GUEST_ASSERT(!gic_irq_get_pending(27));
-+
-+	/*
-+	 * Priority drop, deactivation -- we expect that the host
-+	 * deactivation will have been effective
-+	 */
-+	gic_set_eoi(27);
-+	gic_set_dir(27);
-+
-+	GUEST_ASSERT(!gic_irq_get_active(27));
-+
-+	/* Do it one more time */
-+	isb();
-+	val = read_sysreg(cntvct_el0);
-+	write_sysreg(val, cntv_cval_el0);
-+	write_sysreg(1, cntv_ctl_el0);
-+	isb();
-+
-+	GUEST_ASSERT(gic_irq_get_pending(27));
-+
-+	/* The timer must fire again */
-+	intid = wait_for_and_activate_irq();
-+	GUEST_ASSERT(intid == 27);
-+
-+	GUEST_DONE();
-+}
-+
- static void *test_vcpu_run(void *arg)
- {
- 	struct kvm_vcpu *vcpu = arg;
-@@ -1011,6 +1075,7 @@ int main(int argc, char **argv)
- 		test_vgic(nr_irqs, true /* level */, true /* eoi_split */);
- 		test_vgic_two_cpus(guest_code_asym_dir);
- 		test_vgic_two_cpus(guest_code_group_en);
-+		test_vgic_two_cpus(guest_code_timer_spi);
- 	} else {
- 		test_vgic(nr_irqs, level_sensitive, eoi_split);
- 	}
--- 
-2.47.3
-
+Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
 
