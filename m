@@ -1,72 +1,67 @@
-Return-Path: <kvm+bounces-63867-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-63868-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F2CFC749D2
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 15:40:40 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95EC9C74AD1
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 15:54:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 152B32ACA1
-	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 14:40:39 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 421AD345619
+	for <lists+kvm@lfdr.de>; Thu, 20 Nov 2025 14:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB5D29BDB1;
-	Thu, 20 Nov 2025 14:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9875C30CD95;
+	Thu, 20 Nov 2025 14:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dKLnp1EO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vBz3rTp4"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39EA6256C9E;
-	Thu, 20 Nov 2025 14:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8E62EDD63;
+	Thu, 20 Nov 2025 14:51:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763649631; cv=none; b=UXpCz/rDgBGVLt4L1ylGQVIXnypoWuRCHPIkfJ9A9Vh+Wmrm7h6Is3ICwskqZAtFK8capPauE8lEsoqm2NOolSii4TWK8E9o+C01JHCARNgT+uKvMyCp6TLLdfN0RLSM9cNLx5pZqT/ma5PYCvnU6y5BNKkp3Y6AL2i8Lvg+tGM=
+	t=1763650307; cv=none; b=g7VFGRPlUgf0ID0NRa1iPkwD6OZeuzpj0vkaXeyzxPN+dU7/uWPsVNsiHHlXy8IXOfoT9RkWcAUVJQ6A7AZRaw1mpQMIzCwbjDwZFRZ79Icmrq+BHEH/zAWVA/Fj0bVRpT2JAR09K1EXmn1etx11RDM++kgnfjcI9cvjEYc8vtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763649631; c=relaxed/simple;
-	bh=hP2rrXLl45oNk0vB1/YtmaDxUpumojiwKa4dQyuZ/ZE=;
+	s=arc-20240116; t=1763650307; c=relaxed/simple;
+	bh=ouZCDzXe0QkWeDXoCSvcmRScnrUHUe4hSuaj1XU5F+U=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dkA7qRMDqkIzQRSKVzfXXQzVNaD14fFcqLNukQDX4lXqgzh5tfLTN8kG2Ntb+nC+k2n96I5AriIsRjZEuF5theqlLd1ebrGzU29puN4VdpkYSki+lLNvLelfQGdhWSie7ZOHo9KPdI8Xjkb5IiC38BqFCwRb2+rEntvqLg8FPus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dKLnp1EO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10751C4CEF1;
-	Thu, 20 Nov 2025 14:40:31 +0000 (UTC)
+	 MIME-Version:Content-Type; b=C55zcRuk/gVUaIed6bYLPKUCrhu/+U50fObC2vNhterrI6OIDdKjq5CqaK/M/hPYewqB1d+3fvpzfEJIx9M2J5OMUcSxcV5SsBt+docmBHUhSWYWUbxXvRN7nKkxFwRTWx/8GKyvWShy3JSxVWFXQxGMHNduDIebnlD1BoevvDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vBz3rTp4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40641C4CEF1;
+	Thu, 20 Nov 2025 14:51:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763649631;
-	bh=hP2rrXLl45oNk0vB1/YtmaDxUpumojiwKa4dQyuZ/ZE=;
+	s=k20201202; t=1763650307;
+	bh=ouZCDzXe0QkWeDXoCSvcmRScnrUHUe4hSuaj1XU5F+U=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dKLnp1EOQnEGrX9BJ7gtw/RVIIlOCygiWlne2eGq3Po3mip1OVTa+v4C37f+CeUpT
-	 KtRM1eFoqTAwdcBKpLlrXOI9KNzwT78epRV+541Xp0A/VQ8LAckKYCTVPvZE2hO/BI
-	 jb1iF9oiTwlOUK2hRO2mYpas5bMF+Wt4kCOrg0aNKNHYSAe4Rfq8lQu3G2aEocRGv2
-	 lckQEM6N0gMbk3btuvOHjqSAsFw7iYkHE2ApR1v4Y0UxZTJKuxcAA5vGzKXbEGAWZn
-	 M5SEdH8VfRdHTRfAONiYenMlqZssQrcuseA3rzIWjUJYeRQqJwyq+h38uQOFpKZaL7
-	 Z7SKYrzFdEv9A==
+	b=vBz3rTp4TiwEolvj0ix9cNHs80qhWuY1pphniGXdk7OUuT0hg+2TsimukVjy6ql3D
+	 QJMdBcGQzA33jyQewLfOsZG5ASrvHM615jFGVo/qqFuk2jirrZv6K5lRxkYIB00R5A
+	 eqE+DxBzRO+TN11Fil+w0ImoCFxw0kPOcQbBgR3HqQbfE1tye6avqD91wx/kehw33N
+	 E0/p5nwWN6PveN3aNWy9t8BcA4aEM0v7Hoa9aqyOEvX7zgOHqPgHjf13B3SJt1gLPe
+	 NYovawPF1wppFuXDSiEePvlozSLB3ASUUw0GrQ9JE+ica4luV6/5mEsP5TzdJNKOh1
+	 VKd3osOrKYubw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vM5pk-00000006uwP-3bj9;
-	Thu, 20 Nov 2025 14:40:28 +0000
-Date: Thu, 20 Nov 2025 14:40:28 +0000
-Message-ID: <867bvksr6r.wl-maz@kernel.org>
+	id 1vM60f-00000006v9Y-0d3d;
+	Thu, 20 Nov 2025 14:51:45 +0000
+Date: Thu, 20 Nov 2025 14:51:44 +0000
+Message-ID: <865xb4sqnz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Maximilian Dittgen <mdittgen@amazon.de>
-Cc: <oliver.upton@linux.dev>,
-	<pbonzini@redhat.com>,
-	<shuah@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>,
-	<kvm@vger.kernel.org>,
-	<lilitj@amazon.de>,
-	<sauravsc@amazon.de>,
-	<nh-open-source@amazon.com>,
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <zenghui.yu@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [RFC PATCH 00/13] Introduce per-vCPU vLPI injection control API
-In-Reply-To: <20251120140305.63515-1-mdittgen@amazon.de>
-References: <20251120140305.63515-1-mdittgen@amazon.de>
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 2/5] KVM: arm64: Force trap of GMID_EL1 when the guest doesn't have MTE
+In-Reply-To: <20251120143419.GA2325986@e124191.cambridge.arm.com>
+References: <20251120133202.2037803-1-maz@kernel.org>
+	<20251120133202.2037803-3-maz@kernel.org>
+	<20251120143419.GA2325986@e124191.cambridge.arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -78,99 +73,43 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mdittgen@amazon.de, oliver.upton@linux.dev, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, lilitj@amazon.de, sauravsc@amazon.de, nh-open-source@amazon.com, suzuki.poulose@arm.com, zenghui.yu@linux.dev, joey.gouly@arm.com
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Maximilian: you keep ignoring the reviewers that are listed in
-MAINTAINERS. This isn't acceptable. Next time, I will simply ignore
-your patches.
+On Thu, 20 Nov 2025 14:34:19 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> On Thu, Nov 20, 2025 at 01:31:59PM +0000, Marc Zyngier wrote:
+> > If our host has MTE, but the guest doesn't, make sure we set HCR_EL2.TID5
+> > to force GMID_EL1 being trapped.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 84e6f04220589..40f32b017f107 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -5558,6 +5558,8 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
+> >  
+> >  	if (kvm_has_mte(vcpu->kvm))
+> >  		vcpu->arch.hcr_el2 |= HCR_ATA;
+> > +	else if (id_aa64pfr1_mte(read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1)))
+> > +		vcpu->arch.hcr_el2 |= HCR_TID5;
+> 
+> This is because we want to enable the trapping regardless of CONFIG_ARM64_MTE
+> (so we can't use system_supports_mte()).
 
-On Thu, 20 Nov 2025 14:02:49 +0000,
-Maximilian Dittgen <mdittgen@amazon.de> wrote:
-> 
-> At the moment, the ability to direct-inject vLPIs is only enableable
-> on an all-or-nothing per-VM basis, causing unnecessary I/O performance
-> loss in cases where a VM's vCPU count exceeds available vPEs. This RFC
-> introduces per-vCPU control over vLPI injection to realize potential
-> I/O performance gain in such situations.
-> 
-> Background
-> ----------
-> 
-> The value of dynamically enabling the direct injection of vLPIs on a
-> per-vCPU basis is the ability to run guest VMs with simultaneous
-> hardware-forwarded and software-forwarded message-signaled interrupts.
-> 
-> Currently, hardware-forwarded vLPI direct injection on a KVM guest
-> requires GICv4 and is enabled on a per-VM, all-or-nothing basis. vLPI
-> injection enablment happens in two stages:
-> 
->     1) At vGIC initialization, allocate direct injection structures for
->        each vCPU (doorbell IRQ, vPE table entry, virtual pending table,
->        vPEID).
->     2) When a PCI device is configured for passthrough, map its MSIs to
->        vLPIs using the structures allocated in step 1.
-> 
-> Step 1 is all-or-nothing; if any vCPU cannot be configured with the
-> vPE structures necessary for direct injection, the vPEs of all vCPUs
-> are torn down and direct injection is disabled VM-wide.
-> 
-> This universality of direct vLPI injection enablement sparks several
-> issues, with the most pressing being performance degradation on
-> overcommitted hosts.
-> 
-> VM-wide vLPI enablement creates resource inefficiency when guest
-> VMs have more vCPUs than the host has available vPEIDs. The amount of
-> vPEIDs (and consequently, vPEs) a host can allocate is constrained by
-> hardware and defined by GICD_TYPER2.VID + 1 (ITS_MAX_VPEID). Since
-> direct injection requires a vCPU to be assigned a vPEID, at most
-> ITS_MAX_VPEID vCPUs can be configured for direct injection at a time.
-> Because vLPI direct injection is all-or-nothing on a VM, if a new guest
-> VM would exhaust remaining vPEIDs, all vCPUs on that VM would fall back
-> to hypervisor-forwarded LPIs, causing considerable I/O performance
-> degradation. 
-> 
-> Such performance degradation is exemplified on hosts with CPU
-> overcommitment. Overcommitting an arbitrarily high number of vCPUs
-> enables a VM's vCPU count to easily exceed the host's available vPEIDs.
+Indeed. In general, we cannot rely on the kernel's own configuration,
+since the guest sees most of the actual HW.
 
-Let it be crystal clear: GICv4 and overcommitment is a non-story. It
-isn't designed for that. If that's what you are trying to achieve, you
-clearly didn't get the memo.
-
-> Even with marginally more vCPUs than vPEIDs, the current all-or-nothing
-> vLPI paradigm disables direct injection entirely. This creates two
-> problems: first, a single many-vCPU overcommitted VM loses all direct
-> injection despite having vPEIDs available;
-
-Are you saying that your HW is so undersized that you cannot create a
-*single VM* with direct injection? You really have fewer than 9 bit
-worth of VPEIDs? I'm sorry, but that's laughable. Even a $200 dev
-board does better.
-
-> second, on multi-tenant
-> hosts, VMs booted first consume all vPEIDs, leaving later VMs without
-> direct injection regardless of their I/O intensity. Per-vCPU control
-> would allow userspace to allocate available vPEIDs across VMs based on
-> I/O workload rather than boot order or per-VM vCPU count. This per-vCPU
-> granularity recovers most of the direct injection performance benefit
-> instead of losing it completely.
 > 
-> To allow this per-vCPU granularity, this RFC introduces three new ioctls
-> to the KVM API that enables userspace the ability to activate/deactivate
-> direct vLPI injection capability and resources to vCPUs ad-hoc during VM
-> runtime.
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-How can that even work when changing the affinity of a vLPI (directly
-injected) to a vcpu that doesn't have direct injection enabled? You'd
-have to unmap the vLPI, and plug it back as a normal LPI. Not only
-this is absolutely ridiculous from a performance perspective, but you
-are also guaranteed to lose interrupts that would have fired in the
-meantime. Losing interrupts in a total no-go.
-
-Before I even look at the code, I you to explain how you are dealing
-with this.
+Thanks!
 
 	M.
 
