@@ -1,148 +1,183 @@
-Return-Path: <kvm+bounces-64107-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64108-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43093C78E6A
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:49:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8905C78E9A
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:53:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C4BF64E9816
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 11:46:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 1C61D2E04D
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 11:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DA22FF17D;
-	Fri, 21 Nov 2025 11:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EBE2334C1C;
+	Fri, 21 Nov 2025 11:52:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPkiuCMi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJWq0rI0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714783081B9
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 11:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C573346BF;
+	Fri, 21 Nov 2025 11:52:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763725579; cv=none; b=kteYjYSOhBmQobGc3sEfFtGRc4we+DCx/7Jw00SGHnTPlGY20lQffgkaOxyPpsOQu0xh4DeW4VG0prqtzdaFIw3/uzBrPLJv0povJ6yRH0AR74egiRsWMCkF8NrJPrh+niojiZObW1mxeoz0kSS0Zcjpqq1YgtuuaE/wIb2p9Zc=
+	t=1763725969; cv=none; b=h69gejxA8To613KNvVzQ8mG9k5mOkzhIEyJGqZj9IiADduo9jIvdOrGoZNteSgoMxhpgUqnTN9nhyWz8qvN6DH2KGaU+AcGI9eutFN6D8IbEJahNact2x61fqhH201jMdd1+9nf/gUk7TMH6uaCY2l0u7rSPl4F7tOoRlsL1Id8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763725579; c=relaxed/simple;
-	bh=3qaVjGsnlQhpFQQRtILh7H3V4a7Yra2/+xzfnkZV40c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IwZexuK0ZE4uej+dlvGvMDytMv3wcgZsDEKlDi7RQgZ1YaLacVx0/x0/09E9vh8EUUoChl4HlnMEgz40GwqJvs8uNkHn9mL9EjTMW+pgH/JlLSQewp2itF1dzlIQ8NWXdYgkW8FGglGQLKpYIjKYsNlRYRn43viAu+aIddafebE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPkiuCMi; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-297e264528aso22372195ad.2
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 03:46:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763725574; x=1764330374; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kjDqVqTwk2r7eCk0rkCo36KA72Rh6D0VMi7VIxvc9+Q=;
-        b=DPkiuCMiReIFbCY6uPrj5M1BcUFNRKlQhb4fnH/DXehql5G0PoQmIYiuvw/21ukLpX
-         V27IbaD8OeKXuu0S2XpbydHggdrsZfPmXbHEvKtzqpLUqHnYBFii4B3UgTaCuXNyIrD0
-         SOxXy+s7wP1a5WYcSCjokejqmTotvO/Iyg3bhrC6SsQsJ3zljx/fGTpgQdKoXglnmBos
-         mqZd4DblV4J8gWZG54ENoJs0EY5J8wBmd0W8dl6WIYrqrz54Fp48kjAsSUCg8cq+njc/
-         B0WgQQwtUyIYGGViZOS9Px/Wsjnp+Vb9EhJnqDGz97iLyfS3hLUbLE+uaTvLOpzq96Qj
-         Kruw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763725574; x=1764330374;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kjDqVqTwk2r7eCk0rkCo36KA72Rh6D0VMi7VIxvc9+Q=;
-        b=aeZcUUMm8duVdCfEHywStzFpYkppdtuTpqIE1xJ/ssZWAhI9GsKFI8wxx7e+2cbdNf
-         opHPAqks5ylDjIz/PhCepbOa+lrLMfz4QxZSIPU7B+QRYln2imPYnmgdnCZvv4liCyZA
-         fU948WZuTyKhCFUBki8KvMIAtXJpHlrbBXNO7gCfL4VNw/RvIeaLk8sP1OUhM/ShNiN5
-         ymG5Y7S+0ndMKsYjKqx+J1z/XUBAXsJPrJsDnCBGQIYS2OR7hrSqAwV5raq88+dZO8Ds
-         YYdKTaA63sxFb9MUu2NqTlf1vL1SZvqCuATMdk8AMMpBB4cxw3dQRMoQzs4/FIDTsIOl
-         vAJA==
-X-Forwarded-Encrypted: i=1; AJvYcCVz+83c7BqgFGmxWjnuRI51/jnadrLfV1w5DdrYNAgLjnDWxe2RGOvVbwvrI1qIRqGSozM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+oamX9DLnuq29d/lfDtJh9jTAdD7xwifFTx5eVXygY+Ygxg2x
-	IRkKGdANt4MCHR+qy1xZqFR2kUgf5wAiCmpOBOK2mrD9nqdwhpHnxCexwPc2rMKKxTcPY8aQmzr
-	ZbUdzDrU1K3Po/yHvH8osITsm+vO4XWzgGjeR9qM=
-X-Gm-Gg: ASbGncv1hxC0kA5yH5giLIFVj0AJO37bg42vJR/Zqofo0Yu51AHY1vqW0TAelxFFhv6
-	UEoYLXZb5JtYj0owbZ2kqB+ymsNXNSO6Lr5g1Gf6L0rfuA3AeGMY3kj/OALgSL0/WXzx2BNwSMU
-	puojOR0+BWYVRpgrwxdjzJl58ybGRwziJuSiBfV1q/TD/DXWqxTVNcSH8laAvOt4Sh2buxcEH+I
-	Dx7W/k20UozKRf73vpmNdSC6KuOhiiH99ehLtut9SMdd5O6JAvHq2Gx0mUZpEHDOXW4zaMuwLsG
-	Y4fing==
-X-Google-Smtp-Source: AGHT+IFoPzb2SVgD/COpL5gB8aUWLH4DdvUJvdFg7BI8VeTFdNlaAp3NjbwbrdW76PbuGe3pGc7DTztobcF5u5R7KYk=
-X-Received: by 2002:a17:90b:4c0f:b0:32e:9da9:3e60 with SMTP id
- 98e67ed59e1d1-34733f54393mr2514481a91.36.1763725573765; Fri, 21 Nov 2025
- 03:46:13 -0800 (PST)
+	s=arc-20240116; t=1763725969; c=relaxed/simple;
+	bh=tLDp/5SKdP86hRJlKh1UsL4Iwokqsb7SJ7UfEJPXDKk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PX26llpvKMAGv3r9q6+vo4EL9GRnPVcFuPxPU0pnLDKpqiouIuj0KoUplaosq/jpTBQj8xvSgaA3l2YE82qhXJSOnwYQgDdH5LiXuuSLF0VqsCTs05UqCe+iTVLqa76nqF/t4XYHa/buJcB+uItJ42vh0l7PE1fNAqXRnIhv/eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJWq0rI0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14656C116C6;
+	Fri, 21 Nov 2025 11:52:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763725968;
+	bh=tLDp/5SKdP86hRJlKh1UsL4Iwokqsb7SJ7UfEJPXDKk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MJWq0rI0IQnmD92gczmb0l8dlsvdJ9CWfbgS24/eqNYSbiEK6uVcO3F6a/sMWMiAO
+	 4rYWBjkOX+HEzmZIwIK1Cyrzq+GtBuEmiXT5G3IZ4S/buX6xmzXFziRk7rA28d1BXw
+	 qMHYa02ZrHgnO/9cPFPt6OdLDQQY8TGq66S0XVdH7G8GlQ2O4m8C1Te+7tqMAxgj9t
+	 qI5/f4m6LXLWcvopoA8PFWHCUVx2eJV11WDLrjz3Tuwo0UieaNjEPr9Myv8Tz299i/
+	 vlxOC+v45bFxKAGu9QX8nByI48z4/pxlT/kQ7mn6FlqDrVMfp1UkLiJcZVe3JQvf44
+	 T+nJUudqlLLxg==
+Date: Fri, 21 Nov 2025 13:52:39 +0200
+From: Mike Rapoport <rppt@kernel.org>
+To: "David Hildenbrand (Red Hat)" <david@kernel.org>
+Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Hugh Dickins <hughd@google.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH 2/4] userfaultfd, shmem: use a VMA callback to handle
+ UFFDIO_CONTINUE
+Message-ID: <aSBSh39-ih3rk0Ab@kernel.org>
+References: <20251117114631.2029447-1-rppt@kernel.org>
+ <20251117114631.2029447-3-rppt@kernel.org>
+ <94fcc32f-574a-4934-b7a9-1ed8bd32a97f@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251110033232.12538-1-kernellwp@gmail.com> <20251110033232.12538-7-kernellwp@gmail.com>
- <aR-zxrYATZ4rZZjn@google.com>
-In-Reply-To: <aR-zxrYATZ4rZZjn@google.com>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Fri, 21 Nov 2025 19:46:01 +0800
-X-Gm-Features: AWmQ_bm4pfGHBHiBWWyTyY6CMI9qnOJ05t-mI5pRzvSHayhT4G9zIxDnstGvDUY
-Message-ID: <CANRm+CwaMf64=vAaFdr0hJabtV0CALNBKJgrkooiYQPVuv2UGw@mail.gmail.com>
-Subject: Re: [PATCH 06/10] KVM: Fix last_boosted_vcpu index assignment bug
-To: Sean Christopherson <seanjc@google.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <94fcc32f-574a-4934-b7a9-1ed8bd32a97f@kernel.org>
 
-On Fri, 21 Nov 2025 at 08:35, Sean Christopherson <seanjc@google.com> wrote=
-:
->
-> On Mon, Nov 10, 2025, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > From: Wanpeng Li <wanpengli@tencent.com>
->
-> Something might be off in your email scripts.  Speaking of email, mostly =
-as an
-> FYI, your @tencent email was bouncing as of last year, and prompted commi=
-t
-> b018589013d6 ("MAINTAINERS: Drop Wanpeng Li as a Reviewer for KVM Paravir=
-t support").
+On Mon, Nov 17, 2025 at 06:08:57PM +0100, David Hildenbrand (Red Hat) wrote:
+> On 17.11.25 12:46, Mike Rapoport wrote:
+> > From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
+> > 
+> > When userspace resolves a page fault in a shmem VMA with UFFDIO_CONTINUE
+> > it needs to get a folio that already exists in the pagecache backing
+> > that VMA.
+> > 
+> > Instead of using shmem_get_folio() for that, add a get_pagecache_folio()
+> > method to 'struct vm_operations_struct' that will return a folio if it
+> > exists in the VMA's pagecache at given pgoff.
+> > 
+> > Implement get_pagecache_folio() method for shmem and slightly refactor
+> > userfaultfd's mfill_atomic() and mfill_atomic_pte_continue() to support
+> > this new API.
+> > 
+> > Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+> > ---
+> >   include/linux/mm.h |  9 +++++++
+> >   mm/shmem.c         | 20 ++++++++++++++++
+> >   mm/userfaultfd.c   | 60 ++++++++++++++++++++++++++++++----------------
+> >   3 files changed, 69 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index d16b33bacc32..c35c1e1ac4dd 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -690,6 +690,15 @@ struct vm_operations_struct {
+> >   	struct page *(*find_normal_page)(struct vm_area_struct *vma,
+> >   					 unsigned long addr);
+> >   #endif /* CONFIG_FIND_NORMAL_PAGE */
+> > +#ifdef CONFIG_USERFAULTFD
+> > +	/*
+> > +	 * Called by userfault to resolve UFFDIO_CONTINUE request.
+> > +	 * Should return the folio found at pgoff in the VMA's pagecache if it
+> > +	 * exists or ERR_PTR otherwise.
+> > +	 */
+> 
+> What are the locking +refcount rules? Without looking at the code, I would
+> assume we return with a folio reference held and the folio locked?
 
-Hi Paolo and Sean,
+Right, will add it to the comment
+ 
+> > +	struct folio *(*get_pagecache_folio)(struct vm_area_struct *vma,
+> > +					     pgoff_t pgoff);
+> 
+> 
+> The combination of VMA + pgoff looks weird at first. Would vma + addr or
+> vma+vma_offset into vma be better?
 
-Regarding commit b018589013d6 =E2=80=94 I'm back to active KVM development =
-and
-ready to resume reviewing. Please update my entry to Wanpeng Li
-<kernellwp@gmail.com>. My recent patch series reflects the level of
-engagement you can expect going forward.
+Copied from map_pages() :)
+ 
+> But it also makes me wonder if the callback would ever even require the VMA,
+> or actually only vma->vm_file?
 
->
-> > In kvm_vcpu_on_spin(), the loop counter 'i' is incorrectly written to
-> > last_boosted_vcpu instead of the actual vCPU index 'idx'. This causes
-> > last_boosted_vcpu to store the loop iteration count rather than the
-> > vCPU index, leading to incorrect round-robin behavior in subsequent
-> > directed yield operations.
-> >
-> > Fix this by using 'idx' instead of 'i' in the assignment.
->
-> Fixes: 7e513617da71 ("KVM: Rework core loop of kvm_vcpu_on_spin() to use =
-a single for-loop")
-> Cc: stable@vger.kernel.org
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
->
-> Please, please don't bury fixes like this in a large-ish series, especial=
-ly in a
-> series that's going to be quite contentious and thus likely to linger on-=
-list for
-> quite some time.  It's pretty much dumb luck on my end that I saw this.
+It's actually inode, I'm going to pass that instead of vma.
+ 
+> Thinking out loud, I wonder if one could just call that "get_folio" or
+> "get_shared_folio" (IOW, never an anon folio in a MAP_PRIVATE mapping).
 
-Good point about fixed visibility =E2=80=94 it makes sense to keep them sep=
-arate.
+Naming is hard :)
 
->
-> That said, thank you for fixing my goof :-)
+get_shared_folio() sounds good to me so unless there other suggestions I'll
+stick with it.
+ 
+> > +#endif
+> >   };
+> >   #ifdef CONFIG_NUMA_BALANCING
 
-:)
+...
 
-Regards,
-Wanpeng
+> > +static __always_inline bool vma_can_mfill_atomic(struct vm_area_struct *vma,
+> > +						 uffd_flags_t flags)
+> > +{
+> > +	if (uffd_flags_mode_is(flags, MFILL_ATOMIC_CONTINUE)) {
+> > +		if (vma->vm_ops && vma->vm_ops->get_pagecache_folio)
+> > +			return true;
+> > +		else
+> > +			return false;
+> 
+> Probably easier to read is
+> 
+> 	return vma->vm_ops && vma->vm_ops->get_pagecache_folio;
+> 
+> > +	}
+> > +
+> > +	if (vma_is_anonymous(vma) || vma_is_shmem(vma))
+> > +		return true;
+> > +
+> > +	return false;
+> 
+> 
+> Could also be simplified to:
+> 
+> return vma_is_anonymous(vma) || vma_is_shmem(vma);
+
+Agree with for both of them. 
+ 
+> -- 
+> Cheers
+> 
+> David
+
+-- 
+Sincerely yours,
+Mike.
 
