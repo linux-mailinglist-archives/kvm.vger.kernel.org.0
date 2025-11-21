@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-64099-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64100-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8421CC78B13
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:12:12 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE30C78B30
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:12:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 062F6363276
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 11:12:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EAC014E976A
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 11:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC9034A771;
-	Fri, 21 Nov 2025 11:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B958534B191;
+	Fri, 21 Nov 2025 11:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lNYqPw+N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iApafypM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CEE347BDD
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 11:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD103491DB
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 11:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763723490; cv=none; b=FN7PrEqQqW/Zhil3V7A/WLjneTLNBxHUkqxBQqVv1yDwA35uSVwZniUKwzPVDRF7gWWLtsZTPkF4Gu7su3/3MT9Z1C0v+6U+xouo9SoBrxg83uHHQMFtspkXz295UCtkJYHh6FYqWwbzXFNyPPh7gGbjuw5jGfoTIdnLwCbjJRk=
+	t=1763723493; cv=none; b=bclqYWtU3VJCVQ32sLdBLMbpmG1zL8zzkQMDd2tISVvepvsvKP9uCmNYIP3Tn0oKCfII4w4oHwvuLfxENEK/jjJk8OjTZJlkB7fF0wQdaEymNNjtivWoztgNnISLrX1C+8HBm1Jd9oqr9t4y4W1WnHmJZ+fXILePwPQe7JzAz6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763723490; c=relaxed/simple;
-	bh=PJXfOYUgQ/koH9RKoJHaRKsC+CsEh7NIL8+BGeZYdZc=;
+	s=arc-20240116; t=1763723493; c=relaxed/simple;
+	bh=HrafMklrqoTEF4Rn4QhVKLuftPBVxnPN6Lx5eLic2JY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jVCBXMVdNSeyYXGHgikbTtm/3ZxA8ee41MfIk5wO2dM8RruMoO6fMKwgQu8qLVvxL+qTpxoy3O0tOPji7K98tLxZi+fRBGqCO7nOScaK2WkSBwsnmxaqmbC/1RcfEsATQneW4KVbMKw/cpI5K8+MqMmZ0cA3JXZGISC9dfOfs8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lNYqPw+N; arc=none smtp.client-ip=209.85.221.44
+	 MIME-Version; b=n0Jj1L5RzSATJyOxKd5wcO8PxrJ8BSPo1rJVyAl/n5djcn8VygSawcqFeiGqaUsdCdlzNadN8RRC1Zyxb7ts7s4/VugYp5mAzlkiNQqQoUzOmOtPdZYaiv7I143HEGnIRQJhlsal+H1IAhrt0v8WU0GE7LVyhrhHi7AGYc5HeSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iApafypM; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-42b3c965cc4so996730f8f.0
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 03:11:28 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4779adb38d3so14266335e9.2
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 03:11:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763723487; x=1764328287; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763723489; x=1764328289; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=siFHznuHrhv1xGgfDI5kE0TqLDfCEZnyaPZRcY6rR3Y=;
-        b=lNYqPw+N4EPoEcrfikcCNZxY1lNNAfsKecWuiQ+BUQXp/C+6LbeeQz4IDCEVgRrZRM
-         Dgi4teePinz4GWLy1pVXamMMIwWutpdBHnE2Xuj1nHkfB7xfP79JJ3u4z7uFfTZWOOqr
-         /Nj3+auWHDbSzQEsEQyWK/ZhKzncpPakAiBBGCR+IrND2YOk0/u3rhVyQg4G5EHA1P7S
-         jwy0vRu1tqhhp77XCg0kovGE8mkt8q3/evM1uZgdVnk2CkKvaxlGlnVXsD3ihbhZFzke
-         QqfK1S4bwa75oLpr+LDz1DCaRtxwjgBh+BSnNahIMbEDbQsACFZAwDXZKjceHVW/64bS
-         l5eg==
+        bh=q/xIHpiQQ/Lo5XB08/US8R5a2GUT8/PzNY3ETA2TAw0=;
+        b=iApafypMo/20VGVXEPaMgfh9k8/m0Ks2U7VPZmjS7LIfvTcwEu5trpjAvOSPhoDD77
+         35qFJxMRxGwkb0FCKLQjbaFL5vshARQ+djFbIl1bEJCSM1tMRlCHjbZXsGSWWl9OxIpU
+         EhvLlCRST7qzszHZ5FDbo/C5NhiEcVMr2vNM7C8kW+5BWyVAgIg8VY3JCV4XbIxhRYpO
+         3yTrs/RZIqJI65EeAsuGerfMBS7MlBlAkvhsItEVgI23SOxbv7S6eRWpOYhWr2VhAKWR
+         0bIhqzryTNIDGAF9pKujnl7VGcHRbBkbC2Y/kznD7DxsMOHWOgwMGYA2xCpdfbJfRaEW
+         WyBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763723487; x=1764328287;
+        d=1e100.net; s=20230601; t=1763723489; x=1764328289;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=siFHznuHrhv1xGgfDI5kE0TqLDfCEZnyaPZRcY6rR3Y=;
-        b=Iy0hL6dyLgQMJr5XppeTFNbv0Z9LKzeq1GCcOtiNFOVJD3a5ZuN7eTaU0h2u4efl/G
-         znEgA5ofAQbFOF/PhbQGprgXiYhJX+93/VcnpjFJZ1IU9bcoopfD6DnyobO5BHGuAyw5
-         Xx46DgfAU1OfaoN87kWTyMZgJd8AZXH9ZskfgfwVj+423p2rAoRdn97fc5g8G1JxBGRP
-         P2NgWdO5xaA8cvBA1wGOSyupKZZFo4yb23P8ZXCCYLI1FirRPM6LRe0jhcX3wOti1ou9
-         bgY15rmWCzKrbV0yex2+Ai++hQI+4tO5ZAv4YioCOCmVC9fjkfpZXjqw2gfBiSVN+xiW
-         U/QA==
-X-Gm-Message-State: AOJu0YwpVgRUWn3XS+mPrOSW9jQcPnqD7wQknkd16pWs99I2643bBk6j
-	Y8jeY+tzBxDo1BXsV4dD364kdnW+sApsbdI2TEpoRNUcbkatFP/+3tF/0w8MZU4d/BI7AQ==
-X-Gm-Gg: ASbGncvaaC4+126DGGBLX0ET7qXHCbGbHYmdZLsGep8k8JPrEJ+hREvvgYEE4Cz8b+N
-	x/LBte88+gGgYSnlB5Xwo4oe/bSLE5EtrMxKcOU59gq7JOamCJpeiQG+084ZKkDv0Jxe6KA1c+Z
-	w47q0uaTMPqiP4qnf90RCf0E/RIYPs2l4ejxIu9OPhKgn/ndgkwc4rUkHck1ElDhYOgc/Uzi1x2
-	HZ9zlCUv/OUkPiSzsoI5keEL9zmaFG8sVapzp9cyqIKZPVaWEi4m3/HGmfpKwQ+ap9MSQRMyzPs
-	fF7IkT0m/5GgABwYcBokH0ZGvrCjTkiOwJ0o+3KA8xcEqM2C2ZqbHhgb8OfJ+09sQF+VVBFm3Ze
-	ZfMWhCwim+9DPEuaTETmTNT7V2rkxuT8nXbvI3kPCz0yndo2ufv0JUuhwbeyoi3AqObGFiOzDj8
-	bpAU2yrBgJLIVhftB+St8eKOpSh8hklC3QEL6cGq1RCTDUcTdBYFavpNfpFelX2nifqM/uU6Z7Y
-	dpN3gFdEbkFz3RCSekLb0HOtUvZZ7Pl
-X-Google-Smtp-Source: AGHT+IE5dgFYA+xYxxyFQN3JmCdA/JLY8RAcFtgzm4PUr5ke2lXeNl51iCj4HMCTmRGjYFM/hXQn3A==
-X-Received: by 2002:a05:6000:4305:b0:429:ef72:c33a with SMTP id ffacd0b85a97d-42cba63b5e9mr6506218f8f.3.1763723487033;
-        Fri, 21 Nov 2025 03:11:27 -0800 (PST)
+        bh=q/xIHpiQQ/Lo5XB08/US8R5a2GUT8/PzNY3ETA2TAw0=;
+        b=kqTsQu90MY3Lulz8QH5JHpisZxi7pWeR0WW3N1A6oPIHwa77E3vcPdL7mNVeeTvGpq
+         0Gw7LFt6XnHTl0KERivz8bFenwZPG+c0tCgzQ74ckL6SxHMyhTTq0ergK9OsfWPnNr4h
+         mfLtI3s0sciupz8QHgzkYPH7QfEecBx2kNasa9+E9W0CKTrC9dnl3tpQ5JwTMV0mcSX2
+         uW4bufBIS3Op+eNYXodEE7+TPCNYfeFPbR14JnGY12kUSuDjltqsTyYUHPBkqVyjamm2
+         W/t3ZI2X41SxBWPFxVcF0M7/BItCJWwtinuI0Dm6jsVfXuJW3xbyBGsPthF/1Tfb/zCJ
+         rQ2A==
+X-Gm-Message-State: AOJu0YyABPODG58rUyrnowza/woifVokj57oG4u69CprTUksusDlSidt
+	KBAbwjptjcAITb6nAMOjjJsLcDes73cOFsIr/ZFU0XmsumiWTw9zdGYUmZusGAX+6USzjA==
+X-Gm-Gg: ASbGncsX7IqVmFIQGdLa5+zZVHOguk7uM88mVI03OhGFmr1w0QCywSrD01jmhwp3j2j
+	8gklm1WtLDcHP4mrzYYFrxr/B4iBM15+yWtFAPpfiH1aIzfz+QkEMC00qVlyetouUNTxRiG0lY+
+	c1cTOocJjnTDbUAPBS3dEfaSnrjDokz29l58XAv0gDUkxlmK9M1tKA4ZVJWlVH/VCRf98AuG4tq
+	VTnoyCAKAXBnOcawDL0Z5e+wX6HBu/H/3YJFnMXEwR9ngyYhr8XK399Xl1ReRoQsnCCp/0pxVCF
+	yHbsq0wvLGFCJs7I/Yqq7/KkzGf4R3RaLb1c1rDQ0cJu4q454mviPlhB2L16owmQ1eRDCy+uQ3Y
+	NKo+GICBZxTmwB/SGxGfVk3Q6nT26D2wvEZGcq+lSG6EvimzH2sj8T5ZrLY38seEyQDclyju5Va
+	B5vnSpyV5z2MfynM9rpt8xsERwve38Gc1CuK995MYMHO3CBjWk3pszC0Cz73jRNC2vCMjM/unjm
+	lRBE3/r27ohOlTa4R+/OUe9xUvS5H0SRqsM23GautM=
+X-Google-Smtp-Source: AGHT+IH7H4FBA7WjAQ3UUabqbpl85RgzYy0DRe3lSwmH152nPHYQoDzfP63UrssZaXr+/XP+NNReLg==
+X-Received: by 2002:a05:600c:470e:b0:477:79f8:da9d with SMTP id 5b1f17b1804b1-477c01e9dbemr23954225e9.24.1763723488520;
+        Fri, 21 Nov 2025 03:11:28 -0800 (PST)
 Received: from ip-10-0-150-200.eu-west-1.compute.internal (ec2-52-49-196-232.eu-west-1.compute.amazonaws.com. [52.49.196.232])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f363e4sm10484180f8f.12.2025.11.21.03.11.26
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f363e4sm10484180f8f.12.2025.11.21.03.11.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 03:11:26 -0800 (PST)
+        Fri, 21 Nov 2025 03:11:28 -0800 (PST)
 From: Fred Griffoul <griffoul@gmail.com>
 To: kvm@vger.kernel.org
 Cc: seanjc@google.com,
@@ -84,9 +84,9 @@ Cc: seanjc@google.com,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Fred Griffoul <fgriffo@amazon.co.uk>
-Subject: [PATCH v3 03/10] KVM: x86: Add nested state validation for pfncache support
-Date: Fri, 21 Nov 2025 11:11:06 +0000
-Message-ID: <20251121111113.456628-4-griffoul@gmail.com>
+Subject: [PATCH v3 04/10] KVM: nVMX: Implement cache for L1 APIC pages
+Date: Fri, 21 Nov 2025 11:11:07 +0000
+Message-ID: <20251121111113.456628-5-griffoul@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251121111113.456628-1-griffoul@gmail.com>
 References: <20251121111113.456628-1-griffoul@gmail.com>
@@ -100,92 +100,399 @@ Content-Transfer-Encoding: 8bit
 
 From: Fred Griffoul <fgriffo@amazon.co.uk>
 
-Implement state validation for nested virtualization to enable pfncache
-support for L1 guest pages.
+Replace kvm_host_map usage with gfn_to_pfn_cache for L1 APIC
+virtualization pages (APIC access, virtual APIC, and posted interrupt
+descriptor pages) to improve performance with unmanaged guest memory.
 
-This adds a new nested_ops callback 'is_nested_state_invalid()' that
-detects when KVM needs to reload nested virtualization state. A
-KVM_REQ_GET_NESTED_STATE_PAGES request is triggered to reload affected
-pages before L2 execution when it detects invalid state. The callback
-monitors L1 guest pages during guest entry/exit while the vCPU runs in
-IN_GUEST_MODE.
+The conversion involves several changes:
 
-Currently, VMX implementations return false, with full support planned
-for the next patch.
+- Page loading in nested_get_vmcs12_pages(): load vmcs02 fields with
+  pfncache PFNs after each cache has been checked and possibly activated
+  or refreshed, during OUTSIDE_GUEST_MODE vCPU mode.
+
+- Invalidation window handling: since nested_get_vmcs12_pages() runs in
+  OUTSIDE_GUEST_MODE, there's a window where caches can be invalidated
+  by MMU notifications before entering IN_GUEST_MODE. implement
+  is_nested_state_invalid() callback to monitor cache validity between
+  OUTSIDE_GUEST_MODE and IN_GUEST_MODE transitions. This triggers
+  KVM_REQ_GET_NESTED_STATE_PAGES when needed.
+
+- Cache access in event callbacks: the virtual APIC and posted interrupt
+  descriptor pages are accessed by KVM in has_events() and
+  check_events() nested_ops callbacks. These use the kernel HVA following
+  the pfncache pattern of check/refresh, with both callbacks able to sleep
+  if cache refresh is required.
+
+This eliminates expensive memremap/memunmap cycles for each L2 VM
+entry/exit, providing substantial performance improvements when using
+unmanaged memory.
 
 Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/vmx/nested.c       |  6 ++++++
- arch/x86/kvm/x86.c              | 14 +++++++++++++-
- 3 files changed, 20 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/nested.c | 169 +++++++++++++++++++++++++++++---------
+ arch/x86/kvm/vmx/vmx.h    |   8 +-
+ include/linux/kvm_host.h  |   5 ++
+ 3 files changed, 139 insertions(+), 43 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 48598d017d6f..4675e71b33a7 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1960,6 +1960,7 @@ struct kvm_x86_nested_ops {
- 			 struct kvm_nested_state __user *user_kvm_nested_state,
- 			 struct kvm_nested_state *kvm_state);
- 	bool (*get_nested_state_pages)(struct kvm_vcpu *vcpu);
-+	bool (*is_nested_state_invalid)(struct kvm_vcpu *vcpu);
- 	int (*write_log_dirty)(struct kvm_vcpu *vcpu, gpa_t l2_gpa);
- 
- 	int (*enable_evmcs)(struct kvm_vcpu *vcpu,
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 0de84b30c41d..627a6c24625d 100644
+index 627a6c24625d..1f58b380585b 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -3588,6 +3588,11 @@ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
- 	return true;
+@@ -329,8 +329,18 @@ static int nested_gpc_lock(struct gfn_to_pfn_cache *gpc, gpa_t gpa)
+ 	if (!kvm_gpc_check(gpc, PAGE_SIZE) || (gpc->gpa != gpa)) {
+ 		read_unlock(&gpc->lock);
+ 		err = kvm_gpc_activate(gpc, gpa, PAGE_SIZE);
+-		if (err)
++		if (err) {
++			/*
++			 * Deactivate nested state caches to prevent
++			 * kvm_gpc_invalid() from returning true in subsequent
++			 * is_nested_state_invalid() calls. This prevents an
++			 * infinite loop while entering guest mode.
++			 */
++			if (gpc->vcpu)
++				kvm_gpc_deactivate(gpc);
++
+ 			return err;
++		}
+ 
+ 		goto retry;
+ 	}
+@@ -343,14 +353,17 @@ static void nested_gpc_unlock(struct gfn_to_pfn_cache *gpc)
+ 	read_unlock(&gpc->lock);
  }
  
-+static bool vmx_is_nested_state_invalid(struct kvm_vcpu *vcpu)
-+{
-+	return false;
-+}
+-static void nested_put_vmcs12_pages(struct kvm_vcpu *vcpu)
++static int nested_gpc_hpa(struct gfn_to_pfn_cache *gpc, gpa_t gpa, hpa_t *hpa)
+ {
+-	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	int err;
 +
++	err = nested_gpc_lock(gpc, gpa);
++	if (err)
++		return err;
+ 
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.apic_access_page_map);
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map);
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map);
+-	vmx->nested.pi_desc = NULL;
++	*hpa = pfn_to_hpa(gpc->pfn);
++	nested_gpc_unlock(gpc);
++	return 0;
+ }
+ 
+ /*
+@@ -373,6 +386,9 @@ static void free_nested(struct kvm_vcpu *vcpu)
+ 	vmx->nested.smm.vmxon = false;
+ 	vmx->nested.vmxon_ptr = INVALID_GPA;
+ 
++	kvm_gpc_deactivate(&vmx->nested.pi_desc_cache);
++	kvm_gpc_deactivate(&vmx->nested.virtual_apic_cache);
++	kvm_gpc_deactivate(&vmx->nested.apic_access_page_cache);
+ 	kvm_gpc_deactivate(&vmx->nested.msr_bitmap_cache);
+ 
+ 	free_vpid(vmx->nested.vpid02);
+@@ -389,8 +405,6 @@ static void free_nested(struct kvm_vcpu *vcpu)
+ 	kfree(vmx->nested.cached_shadow_vmcs12);
+ 	vmx->nested.cached_shadow_vmcs12 = NULL;
+ 
+-	nested_put_vmcs12_pages(vcpu);
+-
+ 	kvm_mmu_free_roots(vcpu->kvm, &vcpu->arch.guest_mmu, KVM_MMU_ROOTS_ALL);
+ 
+ 	nested_release_evmcs(vcpu);
+@@ -3477,7 +3491,8 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ {
+ 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	struct kvm_host_map *map;
++	struct gfn_to_pfn_cache *gpc;
++	hpa_t hpa;
+ 
+ 	if (!vcpu->arch.pdptrs_from_userspace &&
+ 	    !nested_cpu_has_ept(vmcs12) && is_pae_paging(vcpu)) {
+@@ -3492,10 +3507,10 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 
+ 
+ 	if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
+-		map = &vmx->nested.apic_access_page_map;
++		gpc = &vmx->nested.apic_access_page_cache;
+ 
+-		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->apic_access_addr), map)) {
+-			vmcs_write64(APIC_ACCESS_ADDR, pfn_to_hpa(map->pfn));
++		if (!nested_gpc_hpa(gpc, vmcs12->apic_access_addr, &hpa)) {
++			vmcs_write64(APIC_ACCESS_ADDR, hpa);
+ 		} else {
+ 			pr_debug_ratelimited("%s: no backing for APIC-access address in vmcs12\n",
+ 					     __func__);
+@@ -3508,10 +3523,10 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	if (nested_cpu_has(vmcs12, CPU_BASED_TPR_SHADOW)) {
+-		map = &vmx->nested.virtual_apic_map;
++		gpc = &vmx->nested.virtual_apic_cache;
+ 
+-		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->virtual_apic_page_addr), map)) {
+-			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, pfn_to_hpa(map->pfn));
++		if (!nested_gpc_hpa(gpc, vmcs12->virtual_apic_page_addr, &hpa)) {
++			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, hpa);
+ 		} else if (nested_cpu_has(vmcs12, CPU_BASED_CR8_LOAD_EXITING) &&
+ 		           nested_cpu_has(vmcs12, CPU_BASED_CR8_STORE_EXITING) &&
+ 			   !nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
+@@ -3534,14 +3549,12 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	if (nested_cpu_has_posted_intr(vmcs12)) {
+-		map = &vmx->nested.pi_desc_map;
++		gpc = &vmx->nested.pi_desc_cache;
+ 
+-		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->posted_intr_desc_addr), map)) {
+-			vmx->nested.pi_desc =
+-				(struct pi_desc *)(((void *)map->hva) +
+-				offset_in_page(vmcs12->posted_intr_desc_addr));
++		if (!nested_gpc_hpa(gpc, vmcs12->posted_intr_desc_addr & PAGE_MASK, &hpa)) {
++			vmx->nested.pi_desc_offset = offset_in_page(vmcs12->posted_intr_desc_addr);
+ 			vmcs_write64(POSTED_INTR_DESC_ADDR,
+-				     pfn_to_hpa(map->pfn) + offset_in_page(vmcs12->posted_intr_desc_addr));
++				     hpa + offset_in_page(vmcs12->posted_intr_desc_addr));
+ 		} else {
+ 			/*
+ 			 * Defer the KVM_INTERNAL_EXIT until KVM tries to
+@@ -3549,7 +3562,6 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 			 * descriptor. (Note that KVM may do this when it
+ 			 * should not, per the architectural specification.)
+ 			 */
+-			vmx->nested.pi_desc = NULL;
+ 			pin_controls_clearbit(vmx, PIN_BASED_POSTED_INTR);
+ 		}
+ 	}
+@@ -3590,7 +3602,16 @@ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
+ 
+ static bool vmx_is_nested_state_invalid(struct kvm_vcpu *vcpu)
+ {
+-	return false;
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++
++	/*
++	 * @vcpu is in IN_GUEST_MODE, eliminating the need for individual gpc
++	 * locks. Since kvm_gpc_invalid() doesn't verify gpc memslot
++	 * generation, we can also skip acquiring the srcu lock.
++	 */
++	return kvm_gpc_invalid(&vmx->nested.apic_access_page_cache) ||
++		kvm_gpc_invalid(&vmx->nested.virtual_apic_cache) ||
++		kvm_gpc_invalid(&vmx->nested.pi_desc_cache);
+ }
+ 
  static int nested_vmx_write_pml_buffer(struct kvm_vcpu *vcpu, gpa_t gpa)
- {
- 	struct vmcs12 *vmcs12;
-@@ -7527,6 +7532,7 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
- 	.get_state = vmx_get_nested_state,
- 	.set_state = vmx_set_nested_state,
- 	.get_nested_state_pages = vmx_get_nested_state_pages,
-+	.is_nested_state_invalid = vmx_is_nested_state_invalid,
- 	.write_log_dirty = nested_vmx_write_pml_buffer,
- #ifdef CONFIG_KVM_HYPERV
- 	.enable_evmcs = nested_enable_evmcs,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4b8138bd4857..1a9c1171df49 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2262,12 +2262,24 @@ int kvm_emulate_monitor(struct kvm_vcpu *vcpu)
+@@ -4091,9 +4112,55 @@ void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu)
+ 	}
  }
- EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_emulate_monitor);
  
-+static inline bool kvm_invalid_nested_state(struct kvm_vcpu *vcpu)
++static void *nested_gpc_lock_if_active(struct gfn_to_pfn_cache *gpc)
 +{
-+	if (is_guest_mode(vcpu) &&
-+	    kvm_x86_ops.nested_ops->is_nested_state_invalid &&
-+	    kvm_x86_ops.nested_ops->is_nested_state_invalid(vcpu)) {
-+		kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-+		return true;
++retry:
++	read_lock(&gpc->lock);
++	if (!gpc->active) {
++		read_unlock(&gpc->lock);
++		return NULL;
 +	}
-+	return false;
++
++	if (!kvm_gpc_check(gpc, PAGE_SIZE)) {
++		read_unlock(&gpc->lock);
++		if (kvm_gpc_refresh(gpc, PAGE_SIZE))
++			return NULL;
++		goto retry;
++	}
++
++	return gpc->khva;
 +}
 +
- static inline bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu)
++static struct pi_desc *nested_lock_pi_desc(struct vcpu_vmx *vmx)
++{
++	u8 *pi_desc_page;
++
++	pi_desc_page = nested_gpc_lock_if_active(&vmx->nested.pi_desc_cache);
++	if (!pi_desc_page)
++		return NULL;
++
++	return (struct pi_desc *)(pi_desc_page + vmx->nested.pi_desc_offset);
++}
++
++static void nested_unlock_pi_desc(struct vcpu_vmx *vmx)
++{
++	nested_gpc_unlock(&vmx->nested.pi_desc_cache);
++}
++
++static void *nested_lock_vapic(struct vcpu_vmx *vmx)
++{
++	return nested_gpc_lock_if_active(&vmx->nested.virtual_apic_cache);
++}
++
++static void nested_unlock_vapic(struct vcpu_vmx *vmx)
++{
++	nested_gpc_unlock(&vmx->nested.virtual_apic_cache);
++}
++
+ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
  {
- 	xfer_to_guest_mode_prepare();
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	struct pi_desc *pi_desc;
+ 	int max_irr;
+ 	void *vapic_page;
+ 	u16 status;
+@@ -4101,22 +4168,29 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+ 	if (!vmx->nested.pi_pending)
+ 		return 0;
  
- 	return READ_ONCE(vcpu->mode) == EXITING_GUEST_MODE ||
--	       kvm_request_pending(vcpu) || xfer_to_guest_mode_work_pending();
-+	       kvm_request_pending(vcpu) || xfer_to_guest_mode_work_pending() ||
-+	       kvm_invalid_nested_state(vcpu);
+-	if (!vmx->nested.pi_desc)
++	pi_desc = nested_lock_pi_desc(vmx);
++	if (!pi_desc)
+ 		goto mmio_needed;
+ 
+ 	vmx->nested.pi_pending = false;
+ 
+-	if (!pi_test_and_clear_on(vmx->nested.pi_desc))
++	if (!pi_test_and_clear_on(pi_desc)) {
++		nested_unlock_pi_desc(vmx);
+ 		return 0;
++	}
+ 
+-	max_irr = pi_find_highest_vector(vmx->nested.pi_desc);
++	max_irr = pi_find_highest_vector(pi_desc);
+ 	if (max_irr > 0) {
+-		vapic_page = vmx->nested.virtual_apic_map.hva;
+-		if (!vapic_page)
++		vapic_page = nested_lock_vapic(vmx);
++		if (!vapic_page) {
++			nested_unlock_pi_desc(vmx);
+ 			goto mmio_needed;
++		}
++
++		__kvm_apic_update_irr(pi_desc->pir, vapic_page, &max_irr);
++
++		nested_unlock_vapic(vmx);
+ 
+-		__kvm_apic_update_irr(vmx->nested.pi_desc->pir,
+-			vapic_page, &max_irr);
+ 		status = vmcs_read16(GUEST_INTR_STATUS);
+ 		if ((u8)max_irr > ((u8)status & 0xff)) {
+ 			status &= ~0xff;
+@@ -4125,6 +4199,7 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
++	nested_unlock_pi_desc(vmx);
+ 	nested_mark_vmcs12_pages_dirty(vcpu);
+ 	return 0;
+ 
+@@ -4244,8 +4319,10 @@ static bool nested_vmx_preemption_timer_pending(struct kvm_vcpu *vcpu)
+ static bool vmx_has_nested_events(struct kvm_vcpu *vcpu, bool for_injection)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	void *vapic = vmx->nested.virtual_apic_map.hva;
++	struct pi_desc *pi_desc;
+ 	int max_irr, vppr;
++	void *vapic;
++	bool res = false;
+ 
+ 	if (nested_vmx_preemption_timer_pending(vcpu) ||
+ 	    vmx->nested.mtf_pending)
+@@ -4264,23 +4341,33 @@ static bool vmx_has_nested_events(struct kvm_vcpu *vcpu, bool for_injection)
+ 	    __vmx_interrupt_blocked(vcpu))
+ 		return false;
+ 
++	vapic = nested_lock_vapic(vmx);
+ 	if (!vapic)
+ 		return false;
+ 
+ 	vppr = *((u32 *)(vapic + APIC_PROCPRI));
+ 
++	nested_unlock_vapic(vmx);
++
+ 	max_irr = vmx_get_rvi();
+ 	if ((max_irr & 0xf0) > (vppr & 0xf0))
+ 		return true;
+ 
+-	if (vmx->nested.pi_pending && vmx->nested.pi_desc &&
+-	    pi_test_on(vmx->nested.pi_desc)) {
+-		max_irr = pi_find_highest_vector(vmx->nested.pi_desc);
+-		if (max_irr > 0 && (max_irr & 0xf0) > (vppr & 0xf0))
+-			return true;
++	if (vmx->nested.pi_pending) {
++		pi_desc = nested_lock_pi_desc(vmx);
++		if (!pi_desc)
++			return false;
++
++		if (pi_test_on(pi_desc)) {
++			max_irr = pi_find_highest_vector(pi_desc);
++			if (max_irr > 0 && (max_irr & 0xf0) > (vppr & 0xf0))
++				res = true;
++		}
++
++		nested_unlock_pi_desc(vmx);
+ 	}
+ 
+-	return false;
++	return res;
  }
  
- static fastpath_t __handle_fastpath_wrmsr(struct kvm_vcpu *vcpu, u32 msr, u64 data)
+ /*
+@@ -5244,7 +5331,7 @@ void __nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 		vmx_update_cpu_dirty_logging(vcpu);
+ 	}
+ 
+-	nested_put_vmcs12_pages(vcpu);
++	nested_mark_vmcs12_pages_dirty(vcpu);
+ 
+ 	if (vmx->nested.reload_vmcs01_apic_access_page) {
+ 		vmx->nested.reload_vmcs01_apic_access_page = false;
+@@ -5529,6 +5616,10 @@ static int enter_vmx_operation(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_gpc_init(&vmx->nested.msr_bitmap_cache, vcpu->kvm);
+ 
++	kvm_gpc_init_for_vcpu(&vmx->nested.apic_access_page_cache, vcpu);
++	kvm_gpc_init_for_vcpu(&vmx->nested.virtual_apic_cache, vcpu);
++	kvm_gpc_init_for_vcpu(&vmx->nested.pi_desc_cache, vcpu);
++
+ 	vmx->nested.vmcs02_initialized = false;
+ 	vmx->nested.vmxon = true;
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index d76621403c28..9a285834ccda 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -158,11 +158,11 @@ struct nested_vmx {
+ 	 * Guest pages referred to in the vmcs02 with host-physical
+ 	 * pointers, so we must keep them pinned while L2 runs.
+ 	 */
+-	struct kvm_host_map apic_access_page_map;
+-	struct kvm_host_map virtual_apic_map;
+-	struct kvm_host_map pi_desc_map;
++	struct gfn_to_pfn_cache apic_access_page_cache;
++	struct gfn_to_pfn_cache virtual_apic_cache;
++	struct gfn_to_pfn_cache pi_desc_cache;
+ 
+-	struct pi_desc *pi_desc;
++	u64 pi_desc_offset;
+ 	bool pi_pending;
+ 	u16 posted_intr_nv;
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 6253cf1c38c1..b05aace9e295 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1531,6 +1531,11 @@ static inline bool kvm_gpc_is_hva_active(struct gfn_to_pfn_cache *gpc)
+ 	return gpc->active && kvm_is_error_gpa(gpc->gpa);
+ }
+ 
++static inline bool kvm_gpc_invalid(struct gfn_to_pfn_cache *gpc)
++{
++	return gpc->active && !gpc->valid;
++}
++
+ void kvm_sigset_activate(struct kvm_vcpu *vcpu);
+ void kvm_sigset_deactivate(struct kvm_vcpu *vcpu);
+ 
 -- 
 2.43.0
 
