@@ -1,163 +1,146 @@
-Return-Path: <kvm+bounces-64051-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64052-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D60A3C772A6
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 04:32:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A9B9C775DE
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 06:28:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id CF4D724194
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 03:32:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A36234E6504
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 05:28:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70411A9B46;
-	Fri, 21 Nov 2025 03:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E9A2F12C0;
+	Fri, 21 Nov 2025 05:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N8rHppXY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZeOKvZZA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1624936D4EE
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 03:32:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B931B85F8
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 05:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763695966; cv=none; b=ZsdovI3IlnO62dQuzEtBoNG4goio8pUKEKef2ohwpi1IofQfydDcZJan+JbnYf3RDUsYAvidW+mVRAJrDYke8uLYQPFXWH5/fG2Q6MFHWBITsyNxqW5QwuGyUPnDiYMv+irBkSOsGBIpLOu+e6DwBnExGjcdzgc8gaDbrsIoN7k=
+	t=1763702912; cv=none; b=FvN7A+69zl+rPCCHfBlrwSUuPMZOonmYY06egsB2T+jAa/nLur8bNmRGljaov/8dnNSzxSZ82BRC1j/xtVmtaEZDB5cW4IOhZlGPiKRpupB7C5x2DJB7ugLiknt1o7DgfdAnQ7lw+cQ6RcxuRn+1wyw5F38w1wti8i4cZH0/9I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763695966; c=relaxed/simple;
-	bh=i9kx5o4swsjYdmf1Hlv51bPGFRmUbFKBWsx0Va8pWjM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qdr+H/oriKR/hRiJXRzfifulqCCHWGxCu26SOHGy9yz11XCQFutv41d3Lzba26NJm9QQluP/XoCYpcHsd1UAYqz59XUWZfkW1YHpTmbRuIf8fSr2RUhVmOC8nYeIyZPZNAeKMvhLaMeeoY4/FhwmS1mLJiTMaf8CrZ2JQozERbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N8rHppXY; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763695965; x=1795231965;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=i9kx5o4swsjYdmf1Hlv51bPGFRmUbFKBWsx0Va8pWjM=;
-  b=N8rHppXYHY+qfg/Mel8UIoACNdnDF5R/lBY7j3HDy/wFIBBv3TYeU7J6
-   fT75Asg32Y4S4QcSMfDehPGsYGuhB8XLdf3QJpnkE7qjCjPzxSAltK4AC
-   oeM4OKGZ8dpBWLVjK9Zm93b5idmUXsMK1CTcgljGjw8N0nbJz4qbThnb4
-   MjgWkj5juLiziTHxPuRzdikUh2UaD3Yo27C4xmLQ2/f4SglIlU/ypYnAJ
-   HjG6twQbCxf+lDZJ4D+vLSg0W6NJiROFVgz0DVviFnjDqrNgNZFnybwi4
-   vPO95gKgTR8/3IV1GyLAw9pGudUTruuqeAi/nljDrb3cJSbCeluo6r7QU
-   w==;
-X-CSE-ConnectionGUID: hGlJ5LakRo+FwhrZ7T2qjg==
-X-CSE-MsgGUID: nB5Cp41lT5mHOkWfzIbnRg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="69641366"
-X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
-   d="scan'208";a="69641366"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 19:32:44 -0800
-X-CSE-ConnectionGUID: ryxBJXD2QCSrfhNJjHmN6Q==
-X-CSE-MsgGUID: uPD6aSI+QgegLBmKVk8IuA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
-   d="scan'208";a="222507624"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.213]) ([10.124.240.213])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 19:32:42 -0800
-Message-ID: <7f7f97c6-8cf2-42fe-a7be-5d7810a2c9d7@linux.intel.com>
-Date: Fri, 21 Nov 2025 11:32:39 +0800
+	s=arc-20240116; t=1763702912; c=relaxed/simple;
+	bh=2FdNfe2rs3p+D0+Ez0qwYShuB/om8qis6O35bKAXV94=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KKxbIKJ/ii4qoTqtPFHzJbCmieXPcBIxlpnuOkAXLgS6dYvHRMozcyvsxoaOioS9//rDafUehPrtG+ZGO1f2vub1415xIK7Rq8ChdPfk38AGLPh3zDdcor24Ac/RqY2tFbMGKRTfIyZNfDSRg1mm2XmVOzXBDkWn7ifZisNbSek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZeOKvZZA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763702909;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BEd9KlDvB7GskRmSaCjimoNXVvT4vORaDdSrmiFotWU=;
+	b=ZeOKvZZA/U1pxUcvAyoFRdl3vID0QNoi472YNodxTuXl5Ox655mfUeUwccD/dahJfWlRyI
+	72aSpUENxZ0VbE0e16G+4oXJ3viYyLIjBit2VJuWECXRbPsigb8opHZjVuBrh8P6QBvdyz
+	mOEnJxGO423yXUevzvPxHu/yT+4/qoY=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-387-m_eSFKIbNuOvbL9nfv2Tzg-1; Fri,
+ 21 Nov 2025 00:28:26 -0500
+X-MC-Unique: m_eSFKIbNuOvbL9nfv2Tzg-1
+X-Mimecast-MFC-AGG-ID: m_eSFKIbNuOvbL9nfv2Tzg_1763702902
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5C049180049F;
+	Fri, 21 Nov 2025 05:28:20 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.45.242.18])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 58D431940E82;
+	Fri, 21 Nov 2025 05:28:17 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id DF74721E6A27; Fri, 21 Nov 2025 06:28:14 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: "Dr. David Alan Gilbert" <dave@treblig.org>
+Cc: qemu-devel@nongnu.org,  arei.gonglei@huawei.com,
+  alistair.francis@wdc.com,  stefanb@linux.vnet.ibm.com,  kwolf@redhat.com,
+  hreitz@redhat.com,  sw@weilnetz.de,  qemu_oss@crudebyte.com,
+  groug@kaod.org,  mst@redhat.com,  imammedo@redhat.com,
+  anisinha@redhat.com,  kraxel@redhat.com,  shentey@gmail.com,
+  npiggin@gmail.com,  harshpb@linux.ibm.com,  sstabellini@kernel.org,
+  anthony@xenproject.org,  paul@xen.org,  edgar.iglesias@gmail.com,
+  elena.ufimtseva@oracle.com,  jag.raman@oracle.com,  sgarzare@redhat.com,
+  pbonzini@redhat.com,  fam@euphon.net,  philmd@linaro.org,
+  alex@shazbot.org,  clg@redhat.com,  peterx@redhat.com,  farosas@suse.de,
+  lizhijian@fujitsu.com,  jasowang@redhat.com,
+  samuel.thibault@ens-lyon.org,  michael.roth@amd.com,
+  kkostiuk@redhat.com,  zhao1.liu@intel.com,  mtosatti@redhat.com,
+  rathc@linux.ibm.com,  palmer@dabbelt.com,  liwei1518@gmail.com,
+  dbarboza@ventanamicro.com,  zhiwei_liu@linux.alibaba.com,
+  marcandre.lureau@redhat.com,  qemu-block@nongnu.org,
+  qemu-ppc@nongnu.org,  xen-devel@lists.xenproject.org,
+  kvm@vger.kernel.org,  qemu-riscv@nongnu.org
+Subject: Re: [PATCH 02/14] hw/usb: Use error_setg_file_open() for a better
+ error message
+In-Reply-To: <aR-1jGX4Ck0f69zG@gallifrey> (David Alan Gilbert's message of
+	"Fri, 21 Nov 2025 00:42:52 +0000")
+References: <20251120191339.756429-1-armbru@redhat.com>
+	<20251120191339.756429-3-armbru@redhat.com>
+	<aR-1jGX4Ck0f69zG@gallifrey>
+Date: Fri, 21 Nov 2025 06:28:14 +0100
+Message-ID: <873468rm35.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v4 0/8] x86/pmu: Fix test errors on
- GNR/SRF/CWF
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Yi Lai <yi1.lai@intel.com>
-References: <20251120233149.143657-1-seanjc@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20251120233149.143657-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Test this patch-set on SPR/SRF/CWF for both legacy vPMU and mediated vPMU,
-no issue is found. Thanks.
+"Dr. David Alan Gilbert" <dave@treblig.org> writes:
 
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> The error message changes from
+>> 
+>>     open FILENAME failed
+>> 
+>> to
+>> 
+>>     Could not open 'FILENAME': REASON
+>> 
+>> where REASON is the value of strerror(errno).
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  hw/usb/bus.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> 
+>> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+>> index 8dd2ce415e..47d42ca3c1 100644
+>> --- a/hw/usb/bus.c
+>> +++ b/hw/usb/bus.c
+>> @@ -262,7 +262,7 @@ static void usb_qdev_realize(DeviceState *qdev, Error **errp)
+>>          int fd = qemu_open_old(dev->pcap_filename,
+>>                                 O_CREAT | O_WRONLY | O_TRUNC | O_BINARY, 0666);
+>>          if (fd < 0) {
+>> -            error_setg(errp, "open %s failed", dev->pcap_filename);
+>> +            error_setg_file_open(errp, errno, dev->pcap_filename);
+>
+> Wouldn't it be easier to flip it to use qemu_open() ?
 
-On 11/21/2025 7:31 AM, Sean Christopherson wrote:
-> Refreshed version of Dapeng's series to address minor flaws in v3.
+Mechanical change; I missed the obvious :)
+
+I'll give it a try, along with the call in ui/ui-qmp-cmd.c [PATCH 09].
+Thanks!
+
 >
-> This patchset fixes the pmu test errors on Granite Rapids (GNR), Sierra
-> Forest (SRF) and Clearwater Forest (CWF).
+> Dave
 >
-> GNR and SRF start to support the timed PEBS. Timed PEBS adds a new
-> "retired latency" field in basic info group to show the timing info and
-> the PERF_CAPABILITIES[17] called "PEBS_TIMING_INFO" bit is added
-> to indicated whether timed PEBS is supported. KVM module doesn't need to
-> do any specific change to support timed PEBS except a perf change adding
-> PERF_CAP_PEBS_TIMING_INFO flag into PERF_CAP_PEBS_MASK[1]. The patch 7/7
-> supports timed PEBS validation in pmu_pebs test.
->
-> On Intel Atom platforms, the PMU events "Instruction Retired" or
-> "Branch Instruction Retired" may be overcounted for some certain
-> instructions, like FAR CALL/JMP, RETF, IRET, VMENTRY/VMEXIT/VMPTRLD
-> and complex SGX/SMX/CSTATE instructions/flows[2].
->
-> In details, for the Atom platforms before Sierra Forest (including
-> Sierra Forest), Both 2 events "Instruction Retired" and
-> "Branch Instruction Retired" would be overcounted on these certain
-> instructions, but for Clearwater Forest only "Instruction Retired" event
-> is overcounted on these instructions.
->
-> As the overcount issue, pmu test would fail to validate the precise
-> count for these 2 events on SRF and CWF. Patches 1-4/7 detects if the
-> platform has this overcount issue, if so relax the precise count
-> validation for these 2 events.
->
-> Besides it looks more LLC references are needed on SRF/CWF, so adjust
-> the "LLC references" event count range.
->
-> Tests:
->   * pmu tests passed on SPR/GNR/SRF/CWF.
->   * pmu_lbr tests is skiped on SPR/GNR/SRF/CWF since mediated vPMU based
->     arch-LBR support is not upstreamed yet.
->   * pmu_pebs test passed on SPR/GNR/SRF and skiped on CWF since CWF
->     introduces architectural PEBS and mediated vPMU based arch-PEBS
->     support is not upstreamed yet.
->
-> v4:
->  - Track the errata in pmu_caps so that the information is available to all
->    tests (even though non-PMU tests are unlikely to care).
->  - Keep the measure_for_overflow() call for fixed counters.
->  - Handle errata independently for precise checks.
->
-> v3:
->  - https://lore.kernel.org/all/20250903064601.32131-1-dapeng1.mi@linux.intel.com
->  - Fix the emulated instruction validation error on SRF/CWF. (Patch 5/8)
->
-> v2:
->  - Fix the flaws on x86_model() helper (Xiaoyao).
->  - Fix the pmu_pebs error on GNR/SRF.
->
-> Dapeng Mi (3):
->   x86/pmu: Relax precise count check for emulated instructions tests
->   x86: pmu_pebs: Remove abundant data_cfg_match calculation
->   x86: pmu_pebs: Support to validate timed PEBS record on GNR/SRF
->
-> dongsheng (5):
->   x86/pmu: Add helper to detect Intel overcount issues
->   x86/pmu: Relax precise count validation for Intel overcounted
->     platforms
->   x86/pmu: Fix incorrect masking of fixed counters
->   x86/pmu: Handle instruction overcount issue in overflow test
->   x86/pmu: Expand "llc references" upper limit for broader compatibility
->
->  lib/x86/pmu.c       | 39 ++++++++++++++++++++++++
->  lib/x86/pmu.h       | 11 +++++++
->  lib/x86/processor.h | 26 ++++++++++++++++
->  x86/pmu.c           | 72 ++++++++++++++++++++++++++++++---------------
->  x86/pmu_pebs.c      |  9 +++---
->  5 files changed, 129 insertions(+), 28 deletions(-)
->
->
-> base-commit: de952a4bf26cb2e93c634445034645523f65d28b
+>>              usb_qdev_unrealize(qdev);
+>>              return;
+>>          }
+>> -- 
+>> 2.49.0
+>> 
+
 
