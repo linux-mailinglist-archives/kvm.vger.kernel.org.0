@@ -1,173 +1,180 @@
-Return-Path: <kvm+bounces-64259-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64260-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BBACC7BC36
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 22:35:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 935E1C7BC48
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 22:36:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 177BE4E03E1
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 21:35:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B80DA4E4985
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 21:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C3622E3F0;
-	Fri, 21 Nov 2025 21:34:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04CD2303A1A;
+	Fri, 21 Nov 2025 21:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N66wTsH4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Uo5eJ729"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B589126ED55;
-	Fri, 21 Nov 2025 21:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD012E6CC6;
+	Fri, 21 Nov 2025 21:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763760891; cv=none; b=uSNGqRcw5MSKcHp4yL6TdkfVWW2VW2MFN2zsxDthVN7YvHScM/u6myZ43kVX99XbY5srs94DPB21tDR+ersVhJGVfXP9krTM8MHoTo8gfXTPlE1/YC5c6BZS4WQ7uslWeV1uJLCKCTMKPbdqwDmaAGYJ8tYF19Ams50ELA9d8+M=
+	t=1763761000; cv=none; b=KwMs9rLmT59FjrbG9VTkZGfSWLCTl3NaLnQPt9DizbKQ/B20m+RNyf6Sy2GwsTjZA9F2ZcWdrJK9iuO+LUrwnYeOm9sRGlQ+/XT5w2oYqolnPD3WquW13Q2TY2yHUT/E37TplrPmO+8FRsiwIb+GdgWeM+TCnP7JEl0q5BNoQ2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763760891; c=relaxed/simple;
-	bh=0Czov/vSnhpAiV6QxdjRhlrpGNFHHnSruDyXbNge7Zk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JZEi1l+GiiSFaaLNQMnVN6B56WuD0OrmZxNQbcEW6ZborrTQTPP4MA+tX3Tpv21BZOw2LXUfWmsIKHuYaudsfd4OyyBTk/MnOW5I3uk+iOML0C2TqLoYHC993S9Gzv46CYf6QVCSfBQcjIeAOOQM5FWv47IvIZxu2Ka5MZyrwLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N66wTsH4; arc=none smtp.client-ip=198.175.65.19
+	s=arc-20240116; t=1763761000; c=relaxed/simple;
+	bh=NNia7pGWG6j3sTU0e30kHB9qk57ca6Op/j47zvwbtFw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eksamJ9gvSpI9t67m5uxyLtRPZhT/j95wNlRJN8qANIakZ5BZVzw0cLjRZSxfNffX4GjTDFl9rplIrO4yDkuJ3J/Aj1ua237I1PzP1fvAouTofNHVPyQ6wNg9jmYxdTRfPFm0Cnc8OLgbfQf7DBf/YUnJ+OHeNM3bVQt+MW+2/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Uo5eJ729; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763760890; x=1795296890;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0Czov/vSnhpAiV6QxdjRhlrpGNFHHnSruDyXbNge7Zk=;
-  b=N66wTsH47MYQcfq+438OlnumTpmJDZc+bpqU/0i9ry0vjbepMy+2ejcL
-   5XhouXPSt8PgoZAn9GLOvRAtDGPZ4c8FuTgwUki1V1d+ElrSzEctWp+T6
-   pOo8e1N8sOd0kTXvFdUY7Wv4rQ1ymzAL7tFoPymRleZOl53vKPop8qvP7
-   H2vA8J0MhoXFEnciRMyYuW1kVaQlPZHDq+RlJFAnpDUHEGdEhblUghS3g
-   1itge39AcAKvdycEQ6bP65fx4lPGM3CkuPpap2CCfGXeCj1Z+BMq940Ie
-   QsJtztzGUdEl3/1MKSfVJTTjQFTL6VUPe8FqEin0ZoyRBRs/YhQV4KKrL
-   g==;
-X-CSE-ConnectionGUID: T9RDbhbCT3OWf0CCcAyACQ==
-X-CSE-MsgGUID: zYem0iVWQCarPNB7e3nYvw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11620"; a="65745494"
+  t=1763760999; x=1795296999;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=NNia7pGWG6j3sTU0e30kHB9qk57ca6Op/j47zvwbtFw=;
+  b=Uo5eJ729hCtUgdDcYWewMImgSEcgheVOg+HrqhYfFpGz3K6lHOJyRmdc
+   V3ABb3Ehz28xeIke2B6sBaS8LmmGGVoy6XE2gOVFjM+nKINCi0nqlM6fG
+   sWd1GHpnzhmvtaexF1YAf1zvhuIZQ2RBEuXUqzvNdaKVF9R6ZkY5A1ODl
+   0RlTZW7LJKNKHITre24yFicfvkVTVI0fsfk5PZ7cRvJnqvZMHc6o4J3CZ
+   uLfCLnDUVk41HZLRKnP6jfG4gSEWHOPbUWQ2MuY5MEIfNLQhd8fnJ49Cu
+   +3071tFKM2ybe4rBcmwGJwyJbm9QGTGjx/1POP3GS+Z6UH19cHgc9VrvU
+   A==;
+X-CSE-ConnectionGUID: i3JLyLFjTsOFsS6QVg0woA==
+X-CSE-MsgGUID: CvUmwxzjRPqKkC5SPU368w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11620"; a="65892829"
 X-IronPort-AV: E=Sophos;i="6.20,216,1758610800"; 
-   d="scan'208";a="65745494"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 13:34:48 -0800
-X-CSE-ConnectionGUID: o8GEBnQYTy+S0wSkrKwIUA==
-X-CSE-MsgGUID: y0CCEHJzQ+qAuFX6PPHeeg==
+   d="scan'208";a="65892829"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 13:36:38 -0800
+X-CSE-ConnectionGUID: PkAJ5vFlRb6fUPv811aExA==
+X-CSE-MsgGUID: iM5W8dVmS4+44tc8xIQ9fg==
 X-ExtLoop1: 1
-Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 21 Nov 2025 13:34:45 -0800
-Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vMYmB-0006tz-0J;
-	Fri, 21 Nov 2025 21:34:43 +0000
-Date: Sat, 22 Nov 2025 05:34:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: griffoul@gmail.com, kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, seanjc@google.com, pbonzini@redhat.com,
-	vkuznets@redhat.com, shuah@kernel.org, dwmw@amazon.co.uk,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Fred Griffoul <fgriffo@amazon.co.uk>
-Subject: Re: [PATCH v2 08/10] KVM: x86: Add nested context management
-Message-ID: <202511220448.n0QXrANz-lkp@intel.com>
-References: <20251118171113.363528-9-griffoul@gmail.org>
+X-IronPort-AV: E=Sophos;i="6.20,216,1758610800"; 
+   d="scan'208";a="191909814"
+Received: from schen9-mobl4.amr.corp.intel.com (HELO [10.125.110.60]) ([10.125.110.60])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 13:36:38 -0800
+Message-ID: <3db1228d-66af-4f2b-8fc3-506203dddf83@intel.com>
+Date: Fri, 21 Nov 2025 13:36:37 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251118171113.363528-9-griffoul@gmail.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 04/11] x86/bhi: Make clear_bhb_loop() effective on
+ newer CPUs
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: Nikolay Borisov <nik.borisov@suse.com>, x86@kernel.org,
+ David Kaplan <david.kaplan@amd.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Josh Poimboeuf <jpoimboe@kernel.org>, Sean Christopherson
+ <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>,
+ Peter Zijlstra <peterz@infradead.org>
+References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
+ <20251119-vmscape-bhb-v4-4-1adad4e69ddc@linux.intel.com>
+ <4ed6763b-1a88-4254-b063-be652176d1af@intel.com>
+ <e9678dd1-7989-4201-8549-f06f6636274b@suse.com>
+ <f7442dc7-be8d-43f8-b307-2004bd149910@intel.com>
+ <20251121181632.czfwnfzkkebvgbye@desk>
+ <e99150f3-62d4-4155-a323-2d81c1d6d47d@intel.com>
+ <20251121212627.6vweba7aehs4cc3h@desk>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20251121212627.6vweba7aehs4cc3h@desk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 11/21/25 13:26, Pawan Gupta wrote:
+> On Fri, Nov 21, 2025 at 10:42:24AM -0800, Dave Hansen wrote:
+>> On 11/21/25 10:16, Pawan Gupta wrote:
+...>>> Also I was preferring constants because load values from global
+variables
+>>> may also be subject to speculation. Although any speculation should be
+>>> corrected before an indirect branch is executed because of the LFENCE after
+>>> the sequence.
+>>
+>> I guess that's a theoretical problem, but it's not a practical one.
+> 
+> Probably yes. But, load from memory would certainly be slower compared to
+> immediates.
 
-kernel test robot noticed the following build warnings:
+Yeah, but it's literally two bytes of data that can almost certainly be
+shoved in a cacheline that's also being read on kernel entry. I suspect
+it would be hard to show a delta between a memory load and an immediate.
 
-[auto build test WARNING on kvm/queue]
-[also build test WARNING on kvm/next mst-vhost/linux-next linus/master v6.18-rc6 next-20251121]
-[cannot apply to kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I'd love to see some actual data.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/griffoul-gmail-com/KVM-nVMX-Implement-cache-for-L1-MSR-bitmap/20251119-012332
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20251118171113.363528-9-griffoul%40gmail.org
-patch subject: [PATCH v2 08/10] KVM: x86: Add nested context management
-config: i386-randconfig-062-20251121 (https://download.01.org/0day-ci/archive/20251122/202511220448.n0QXrANz-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251122/202511220448.n0QXrANz-lkp@intel.com/reproduce)
+>> So I think we have 4-ish options at this point:
+>>
+>> 1. Generate the long and short sequences independently and in their
+>>    entirety and ALTERNATIVE between them (the original patch)
+>> 2. Store the inner/outer loop counts in registers and:
+>>   2a. Load those registers from variables
+>>   2b. Load them from ALTERNATIVES
+> 
+> Both of these look to be good options to me.
+> 
+> 2b. would be my first preference, because it keeps the loop counts as
+> inline constants. The resulting sequence stays the same as it is today.
+> 
+>> 3. Store the inner/outer loop counts in variables in memory
+> 
+> I could be wrong, but this will likely have non-zero impact on performance.
+> I am afraid to cause any regressions in BHI mitigation. That is why I
+> preferred the least invasive approach in my previous attempts.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511220448.n0QXrANz-lkp@intel.com/
+Your magic 8-ball and my crystal ball seem to be disagreeing today.
 
-sparse warnings: (new ones prefixed by >>)
->> arch/x86/kvm/nested.c:133:24: sparse: sparse: Using plain integer as NULL pointer
-
-vim +133 arch/x86/kvm/nested.c
-
-   122	
-   123	struct kvm_nested_context *kvm_nested_context_load(struct kvm_vcpu *vcpu,
-   124							   gpa_t gpa)
-   125	{
-   126		struct kvm_nested_context_table *table;
-   127		struct kvm_nested_context *ctx, *new_ctx = NULL;
-   128		struct kvm *vm = vcpu->kvm;
-   129		bool reset = false;
-   130	
-   131		table = vcpu->kvm->arch.nested_context_table;
-   132		if (WARN_ON_ONCE(!table))
- > 133			return false;
-   134	retry:
-   135		spin_lock(&table->lock);
-   136		ctx = kvm_nested_context_find(table, vcpu, gpa);
-   137		if (!ctx) {
-   138			/* At capacity? Recycle the LRU context */
-   139			if (table->count >= kvm_nested_context_max(vcpu->kvm)) {
-   140				ctx = kvm_nested_context_recycle(table);
-   141				if (unlikely(!ctx))
-   142					goto finish;
-   143	
-   144				kvm_nested_context_insert(table, ctx, gpa);
-   145				++vm->stat.nested_context_recycle;
-   146				reset = true;
-   147	
-   148			} else if (new_ctx) {
-   149				++table->count;
-   150				ctx = new_ctx;
-   151				kvm_nested_context_insert(table, ctx, gpa);
-   152				new_ctx = NULL;
-   153	
-   154			} else {
-   155				/* Allocate a new context without holding the lock */
-   156				spin_unlock(&table->lock);
-   157				new_ctx = kvm_x86_ops.nested_ops->alloc_context(vcpu);
-   158				if (unlikely(!new_ctx))
-   159					return NULL;
-   160	
-   161				goto retry;
-   162			}
-   163		} else
-   164			++vm->stat.nested_context_reuse;
-   165	
-   166		ctx->vcpu = vcpu;
-   167	finish:
-   168		spin_unlock(&table->lock);
-   169	
-   170		if (new_ctx)
-   171			kvm_x86_ops.nested_ops->free_context(new_ctx);
-   172	
-   173		if (reset)
-   174			kvm_x86_ops.nested_ops->reset_context(ctx);
-   175	
-   176		return ctx;
-   177	}
-   178	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Time for science!
 
