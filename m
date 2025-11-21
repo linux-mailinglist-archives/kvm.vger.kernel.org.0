@@ -1,305 +1,241 @@
-Return-Path: <kvm+bounces-64179-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64180-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DE70C7AF92
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:03:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE1DEC7B083
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:17:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D148C35A5F0
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 16:59:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A24C84F1960
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 17:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997222F12C4;
-	Fri, 21 Nov 2025 16:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754C6349B00;
+	Fri, 21 Nov 2025 17:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="f0S/mjwn";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="v29zozUq"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="yDry+OsS";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="SUPBLnRE";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="h7i6TXUY";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="+uR5t++p"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDCB275861;
-	Fri, 21 Nov 2025 16:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6945F33A6E9
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 17:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763744377; cv=none; b=SCDbVotav/HhrvCzM3ip8jtvHnjzVp1/GpnALt8TzuW8Xb1hJI0LkwqzAJjkLYa6S7yXOG6f31F13bWgx/Z9O7hyMr59f0hnruqKMSWTtDire92YYtSLXm/4pPhxisSDSBKx+A6lhZSwCai0X5orKqOuB4O9tD08IVNjQ8qAXxg=
+	t=1763745019; cv=none; b=rSZ9SPlliy4h5qAiYbx6hYQw576V9W4jz8rJvZoBcLMn6zjVpeeAkzudrcOE9q5m0NbVxEvpjW0PITxPiU3bcSBHrVr6M3UN+tcoi/oPmsTuIzxzm4/s8mxk9qY1d4yGfjz69GOC+5hE4ZOofwWi+x3twf47cEUXcDOEvMXZWQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763744377; c=relaxed/simple;
-	bh=aQKU6V1JRH668sbcJH4gp1GCpog2CNat/iF2OOt8G2Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S6QKSl6x+M3n3kbwnM9VdjhWURN54ubrHgn8o3x7fInEICzeQSlA4UQyUqf8ECH67K0HfM8qo2wUtsMOCm6FpJ2j2n3OGOw0oSyL6bSAw8tZQeE50Q4DplNL+VlsmXe2nYEA1J6rhchzp7OeASVFF9dMe8DIGtld1n4F/3UX95o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=f0S/mjwn; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=v29zozUq; arc=none smtp.client-ip=202.12.124.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 688B47A0112;
-	Fri, 21 Nov 2025 11:59:33 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Fri, 21 Nov 2025 11:59:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1763744373;
-	 x=1763830773; bh=NQDfHKLWmqlj9klBa55Uq5LxkyIhHUTxyXA+WdMEM60=; b=
-	f0S/mjwnOAH0n55Ke8Dt4V7RmyZiQDFqlbDtQ9u7e4f8c4vAoflk+QaZFfIxkfpD
-	9+XL+m5Yy/MEFyg1dC7wXwSvrPlEe1W9j/PEWb2+RqMvrJV6ycJ1R/jTh8QaU/i6
-	yQRw7sgLn2Vq/ZMzckQXq9/07Y/zeLGbJ4LmX+5/YF0CgRvw57TkIPFTHTwkJMQf
-	jXOjF9d2m8uE5M4eH1t98bH0bsROxvKOx3OWjJ0dvDsVtEnCQhqXqNbRDINtkKPh
-	8XxOBu39G/hoO9K288UB7HEvWWcGLIOYP+ZlfhAOPkx+ofXv4ALUd6SkRl4BcTHA
-	Wm9R/w9Vbns6ymAPgT1AeQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763744373; x=
-	1763830773; bh=NQDfHKLWmqlj9klBa55Uq5LxkyIhHUTxyXA+WdMEM60=; b=v
-	29zozUq2TH9pHSTqv2XgF+s197ujp1DRzATQK6T5Ub+NKx0taIorchlJcvqcmMd9
-	0S5xD178G/rC0L5tAp2u/aCcz2YT8Ov1+uZ4mX2h5LcmBMYtaSBVkZpNF8wrixKb
-	M3RONoh0y3QIExR50ysG5EYdjbaCGkZGPvUVZOsBxRicRcK5aZ1EU71eO7hbUBk+
-	vxKu7L2H2zAxt4amjcqZiJOwf1h/vkR0DJTTWCceaOx5Q/9XppcicJVFpmI3U5o5
-	5JbM4kkDyla7rheySLRSqXbEGj9YGdjodoNJMTuuoKZdArXS5MdNtibv2Q36zbpu
-	y9KcUpw7b9VXRwNJxXavA==
-X-ME-Sender: <xms:dJogaZ-ejhfierwMrNbQbqpWx-n-uc8-GwtvInx9HjGR68bykIFqpQ>
-    <xme:dJogaV62mBX_eM3PKltQvdcRTnoVfKrSTJKjlG-RGYU4P8l1AjM5g0h2aT4_nj7JC
-    xOkGyzQqmZNBN1uoXHeBOU715ytAfbuY1euFEK--v8ofnIljbsO>
-X-ME-Received: <xmr:dJogaeUrzweu2LNo2OhiH1IkYwStEnT-CI6Ae8JQrD8adgVtirEtsH46>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvfedthedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhggtgfgsehtjeertd
-    dttddvnecuhfhrohhmpeetlhgvgicuhghilhhlihgrmhhsohhnuceorghlvgigsehshhgr
-    iigsohhtrdhorhhgqeenucggtffrrghtthgvrhhnpeetteduleegkeeigedugeeluedvff
-    egheeliedvtdefkedtkeekheffhedutefhhfenucevlhhushhtvghrufhiiigvpedtnecu
-    rfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgspg
-    hrtghpthhtohepvdehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhkihht
-    rgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtg
-    hpthhtohephihishhhrghihhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepshhkohhl
-    ohhthhhumhhthhhosehnvhhiughirgdrtghomhdprhgtphhtthhopehkvghvihhnrdhtih
-    grnhesihhnthgvlhdrtghomhdprhgtphhtthhopegrnhhikhgvthgrsehnvhhiughirgdr
-    tghomhdprhgtphhtthhopehvshgvthhhihesnhhvihguihgrrdgtohhmpdhrtghpthhtoh
-    epmhhotghhshesnhhvihguihgrrdgtohhmpdhrtghpthhtohephihunhigihgrnhhgrdhl
-    ihesrghmugdrtghomh
-X-ME-Proxy: <xmx:dJogabKUstFIMw1gOdjURL9DoEtrrBGvZl779rdU8NsyiFOGQDzsXw>
-    <xmx:dJogabRqW4O8EX0afgiKHxftSW9Ylbg2ewiMWEOYgZn1wdzTdPy4Hw>
-    <xmx:dJogafhyBK5nO_Wi7CUSCMX-fcYB6J8MS2NUV6sNtRjd-qO6zcbB5A>
-    <xmx:dJogadteLLdyxXy5SdnQlFOqa8-ZZioiYov8XnKpUwci5omjSoHH8w>
-    <xmx:dZogaWBxvXC1wUTUdjVP35sRasyu3O1FHd0pgEKVl7rzhrAaL08q8LBc>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 21 Nov 2025 11:59:30 -0500 (EST)
-Date: Fri, 21 Nov 2025 09:59:28 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: <ankita@nvidia.com>
-Cc: <jgg@ziepe.ca>, <yishaih@nvidia.com>, <skolothumtho@nvidia.com>,
- <kevin.tian@intel.com>, <aniketa@nvidia.com>, <vsethi@nvidia.com>,
- <mochs@nvidia.com>, <Yunxiang.Li@amd.com>, <yi.l.liu@intel.com>,
- <zhangdongdong@eswincomputing.com>, <avihaih@nvidia.com>,
- <bhelgaas@google.com>, <peterx@redhat.com>, <pstanner@redhat.com>,
- <apopple@nvidia.com>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
- <targupta@nvidia.com>, <zhiw@nvidia.com>, <danw@nvidia.com>,
- <dnigam@nvidia.com>, <kjaju@nvidia.com>
-Subject: Re: [PATCH v3 7/7] vfio/nvgrace-gpu: wait for the GPU mem to be
- ready
-Message-ID: <20251121095928.4c95c704.alex@shazbot.org>
-In-Reply-To: <20251121141141.3175-8-ankita@nvidia.com>
-References: <20251121141141.3175-1-ankita@nvidia.com>
-	<20251121141141.3175-8-ankita@nvidia.com>
+	s=arc-20240116; t=1763745019; c=relaxed/simple;
+	bh=wQmFGX0rACnVEkJzRZ4LA/53Rteu7arxwxEDaYCi1EQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ieq7NeG3qiBg+5RmmdMUSdAuAO12iWQ8f+7AZ4yrU+ZKPDqRxH+OpqoaUFzABivsRg7CjkM9AJJmJ6krNi3f/pXQU3lDxiss/GuK9gPUuawP1gCIEQIhRRekdQ5emREDWufRGIn0ZlMbdEVc0C1W2eDkqglgP1wAlLW5ZfO4hEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=yDry+OsS; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=SUPBLnRE; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=h7i6TXUY; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=+uR5t++p; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id BDDAD21A02;
+	Fri, 21 Nov 2025 17:10:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1763745012; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=IvYqDYULzOTgnw2r6/zPhQ1WOCd/M0ctrvyFGAsskZc=;
+	b=yDry+OsSnejyGuzZx8imEX/IE/bZ1JI+9hGiDHhoApVCyVWy4brLcy/4fEvxKdettU/z1U
+	Yrh1fY406hc6pvc3VMdcdBbXSsheFsUc3B80UiNhZqc28zCUgFU83IEsXsiizfeylBNWRi
+	3eLJNUyMxQqgfXfqb+XNSd4+W+OTsJU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1763745012;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=IvYqDYULzOTgnw2r6/zPhQ1WOCd/M0ctrvyFGAsskZc=;
+	b=SUPBLnRE9k/UMvWNaR6JMl+N0yIllEWyWk6DnIyiBlkort/SwnhcYXpuoBA9m0ypbug2II
+	rhUOCivyhbTyeaCw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=h7i6TXUY;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=+uR5t++p
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1763745011; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=IvYqDYULzOTgnw2r6/zPhQ1WOCd/M0ctrvyFGAsskZc=;
+	b=h7i6TXUYfSuW0WzRgslqS2fymXU2sXrf4TwD7hQhKpoCs6DePTP5TiNoo6c4LvIA2soF/K
+	Ze7i0tmEB6pW+krbhud8WyH5DsDWQGBn8/UaENHXAmMykWC0hkH9h+PlWnc9KJmgcRp54a
+	ZvXP+/1LRC+58q0lyzVE1M7Otq2a4t0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1763745011;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=IvYqDYULzOTgnw2r6/zPhQ1WOCd/M0ctrvyFGAsskZc=;
+	b=+uR5t++pwYwzlEM/52jTcJFIPrRpraOGnSeM+8XfV0i0K1pjd3rRhta7XuBVtu1y7eVXD7
+	RXFHYrKMt3A/srDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5310E3EA61;
+	Fri, 21 Nov 2025 17:10:11 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id QiXvE/OcIGneMwAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Fri, 21 Nov 2025 17:10:11 +0000
+Message-ID: <e0fb91ad-736f-4ee9-979d-c2512ec0b544@suse.cz>
+Date: Fri, 21 Nov 2025 18:10:10 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 05/16] mm: use leaf entries in debug pgtable + remove
+ is_swap_pte()
+Content-Language: en-US
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache
+ <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+ Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>,
+ Oscar Salvador <osalvador@suse.de>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Matthew Brost <matthew.brost@intel.com>,
+ Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+ Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
+ Ying Huang <ying.huang@linux.alibaba.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
+ Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
+ Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+ Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+ SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
+ Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+ Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
+ Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
+References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
+ <222f352e7a99191b4bdfa77e835f2fc0dd83fa72.1762812360.git.lorenzo.stoakes@oracle.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ xsFNBFZdmxYBEADsw/SiUSjB0dM+vSh95UkgcHjzEVBlby/Fg+g42O7LAEkCYXi/vvq31JTB
+ KxRWDHX0R2tgpFDXHnzZcQywawu8eSq0LxzxFNYMvtB7sV1pxYwej2qx9B75qW2plBs+7+YB
+ 87tMFA+u+L4Z5xAzIimfLD5EKC56kJ1CsXlM8S/LHcmdD9Ctkn3trYDNnat0eoAcfPIP2OZ+
+ 9oe9IF/R28zmh0ifLXyJQQz5ofdj4bPf8ecEW0rhcqHfTD8k4yK0xxt3xW+6Exqp9n9bydiy
+ tcSAw/TahjW6yrA+6JhSBv1v2tIm+itQc073zjSX8OFL51qQVzRFr7H2UQG33lw2QrvHRXqD
+ Ot7ViKam7v0Ho9wEWiQOOZlHItOOXFphWb2yq3nzrKe45oWoSgkxKb97MVsQ+q2SYjJRBBH4
+ 8qKhphADYxkIP6yut/eaj9ImvRUZZRi0DTc8xfnvHGTjKbJzC2xpFcY0DQbZzuwsIZ8OPJCc
+ LM4S7mT25NE5kUTG/TKQCk922vRdGVMoLA7dIQrgXnRXtyT61sg8PG4wcfOnuWf8577aXP1x
+ 6mzw3/jh3F+oSBHb/GcLC7mvWreJifUL2gEdssGfXhGWBo6zLS3qhgtwjay0Jl+kza1lo+Cv
+ BB2T79D4WGdDuVa4eOrQ02TxqGN7G0Biz5ZLRSFzQSQwLn8fbwARAQABzSBWbGFzdGltaWwg
+ QmFia2EgPHZiYWJrYUBzdXNlLmN6PsLBlAQTAQoAPgIbAwULCQgHAwUVCgkICwUWAgMBAAIe
+ AQIXgBYhBKlA1DSZLC6OmRA9UCJPp+fMgqZkBQJnyBr8BQka0IFQAAoJECJPp+fMgqZkqmMQ
+ AIbGN95ptUMUvo6aAdhxaOCHXp1DfIBuIOK/zpx8ylY4pOwu3GRe4dQ8u4XS9gaZ96Gj4bC+
+ jwWcSmn+TjtKW3rH1dRKopvC07tSJIGGVyw7ieV/5cbFffA8NL0ILowzVg8w1ipnz1VTkWDr
+ 2zcfslxJsJ6vhXw5/npcY0ldeC1E8f6UUoa4eyoskd70vO0wOAoGd02ZkJoox3F5ODM0kjHu
+ Y97VLOa3GG66lh+ZEelVZEujHfKceCw9G3PMvEzyLFbXvSOigZQMdKzQ8D/OChwqig8wFBmV
+ QCPS4yDdmZP3oeDHRjJ9jvMUKoYODiNKsl2F+xXwyRM2qoKRqFlhCn4usVd1+wmv9iLV8nPs
+ 2Db1ZIa49fJet3Sk3PN4bV1rAPuWvtbuTBN39Q/6MgkLTYHb84HyFKw14Rqe5YorrBLbF3rl
+ M51Dpf6Egu1yTJDHCTEwePWug4XI11FT8lK0LNnHNpbhTCYRjX73iWOnFraJNcURld1jL1nV
+ r/LRD+/e2gNtSTPK0Qkon6HcOBZnxRoqtazTU6YQRmGlT0v+rukj/cn5sToYibWLn+RoV1CE
+ Qj6tApOiHBkpEsCzHGu+iDQ1WT0Idtdynst738f/uCeCMkdRu4WMZjteQaqvARFwCy3P/jpK
+ uvzMtves5HvZw33ZwOtMCgbpce00DaET4y/UzsBNBFsZNTUBCACfQfpSsWJZyi+SHoRdVyX5
+ J6rI7okc4+b571a7RXD5UhS9dlVRVVAtrU9ANSLqPTQKGVxHrqD39XSw8hxK61pw8p90pg4G
+ /N3iuWEvyt+t0SxDDkClnGsDyRhlUyEWYFEoBrrCizbmahOUwqkJbNMfzj5Y7n7OIJOxNRkB
+ IBOjPdF26dMP69BwePQao1M8Acrrex9sAHYjQGyVmReRjVEtv9iG4DoTsnIR3amKVk6si4Ea
+ X/mrapJqSCcBUVYUFH8M7bsm4CSxier5ofy8jTEa/CfvkqpKThTMCQPNZKY7hke5qEq1CBk2
+ wxhX48ZrJEFf1v3NuV3OimgsF2odzieNABEBAAHCwXwEGAEKACYCGwwWIQSpQNQ0mSwujpkQ
+ PVAiT6fnzIKmZAUCZ8gcVAUJFhTonwAKCRAiT6fnzIKmZLY8D/9uo3Ut9yi2YCuASWxr7QQZ
+ lJCViArjymbxYB5NdOeC50/0gnhK4pgdHlE2MdwF6o34x7TPFGpjNFvycZqccSQPJ/gibwNA
+ zx3q9vJT4Vw+YbiyS53iSBLXMweeVV1Jd9IjAoL+EqB0cbxoFXvnjkvP1foiiF5r73jCd4PR
+ rD+GoX5BZ7AZmFYmuJYBm28STM2NA6LhT0X+2su16f/HtummENKcMwom0hNu3MBNPUOrujtW
+ khQrWcJNAAsy4yMoJ2Lw51T/5X5Hc7jQ9da9fyqu+phqlVtn70qpPvgWy4HRhr25fCAEXZDp
+ xG4RNmTm+pqorHOqhBkI7wA7P/nyPo7ZEc3L+ZkQ37u0nlOyrjbNUniPGxPxv1imVq8IyycG
+ AN5FaFxtiELK22gvudghLJaDiRBhn8/AhXc642/Z/yIpizE2xG4KU4AXzb6C+o7LX/WmmsWP
+ Ly6jamSg6tvrdo4/e87lUedEqCtrp2o1xpn5zongf6cQkaLZKQcBQnPmgHO5OG8+50u88D9I
+ rywqgzTUhHFKKF6/9L/lYtrNcHU8Z6Y4Ju/MLUiNYkmtrGIMnkjKCiRqlRrZE/v5YFHbayRD
+ dJKXobXTtCBYpLJM4ZYRpGZXne/FAtWNe4KbNJJqxMvrTOrnIatPj8NhBVI0RSJRsbilh6TE
+ m6M14QORSWTLRg==
+In-Reply-To: <222f352e7a99191b4bdfa77e835f2fc0dd83fa72.1762812360.git.lorenzo.stoakes@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: BDDAD21A02
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[linux.ibm.com,redhat.com,zeniv.linux.org.uk,kernel.org,suse.cz,arndb.de,nvidia.com,linux.alibaba.com,oracle.com,arm.com,linux.dev,suse.de,google.com,suse.com,intel.com,gmail.com,sk.com,gourry.net,huaweicloud.com,tencent.com,infradead.org,ziepe.ca,zte.com.cn,huawei.com,soleen.com,surriel.com,vger.kernel.org,kvack.org,lists.linux.dev];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_GT_50(0.00)[65];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:email,suse.cz:mid,suse.cz:dkim]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
 
-On Fri, 21 Nov 2025 14:11:41 +0000
-<ankita@nvidia.com> wrote:
-
-> From: Ankit Agrawal <ankita@nvidia.com>
+On 11/10/25 23:21, Lorenzo Stoakes wrote:
+> Remove invocations of is_swap_pte() in mm/debug_vm_pgtable.c and use
+> softleaf_from_pte() and softleaf_is_swap() as necessary to replace this
+> usage.
 > 
-> Speculative prefetches from CPU to GPU memory until the GPU is
-> ready after reset can cause harmless corrected RAS events to
-> be logged on Grace systems. It is thus preferred that the
-> mapping not be re-established until the GPU is ready post reset.
+> We update the test code to use a 'true' swap entry throughout so we are
+> guaranteed this is not a non-swap entry, so all asserts continue to operate
+> correctly.
 > 
-> The GPU readiness can be checked through BAR0 registers similar
-> to the checking at the time of device probe.
-> 
-> It can take several seconds for the GPU to be ready. So it is
-> desirable that the time overlaps as much of the VM startup as
-> possible to reduce impact on the VM bootup time. The GPU
-> readiness state is thus checked on the first fault/huge_fault
-> request which amortizes the GPU readiness time. The first fault
-> is checked using a flag. The flag is unset on every GPU reset
-> request.
-> 
-> Intercept the following calls to the GPU reset, unset gpu_mem_mapped.
-> Then use it to determine whether to wait before mapping.
-> 1. VFIO_DEVICE_RESET ioctl call
-> 2. FLR through config space.
-> 
-> cc: Alex Williamson <alex@shazbot.org>
-> cc: Jason Gunthorpe <jgg@ziepe.ca>
-> cc: Vikram Sethi <vsethi@nvidia.com>
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> ---
->  drivers/vfio/pci/nvgrace-gpu/main.c | 64 ++++++++++++++++++++++++++++-
->  1 file changed, 63 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-> index 7618c3f515cc..23e3278aba25 100644
-> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
-> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-> @@ -58,6 +58,8 @@ struct nvgrace_gpu_pci_core_device {
->  	/* Lock to control device memory kernel mapping */
->  	struct mutex remap_lock;
->  	bool has_mig_hw_bug;
-> +	/* Any GPU memory mapped to the VMA */
-> +	bool gpu_mem_mapped;
->  };
->  
->  static void nvgrace_gpu_init_fake_bar_emu_regs(struct vfio_device *core_vdev)
-> @@ -102,9 +104,15 @@ static int nvgrace_gpu_open_device(struct vfio_device *core_vdev)
->  		mutex_init(&nvdev->remap_lock);
->  	}
->  
-> +	nvdev->gpu_mem_mapped = false;
-> +
->  	vfio_pci_core_finish_enable(vdev);
->  
-> -	return 0;
-> +	/*
-> +	 * The GPU readiness is determined through BAR0 register reads.
-> +	 * Make sure the BAR0 is mapped before any such check occur.
-> +	 */
-> +	return vfio_pci_core_barmap(vdev, 0);
+> With this change in place, we no longer use is_swap_pte() anywhere, so
+> remove it.
 
-I think the idea is that all variant specific open code happens between
-vfio_pci_core_enable() and vfio_pci_core_finish_enable().
+Nice!
 
->  }
->  
->  static void nvgrace_gpu_close_device(struct vfio_device *core_vdev)
-> @@ -158,6 +166,21 @@ static vm_fault_t nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
->  	struct mem_region *memregion;
->  	unsigned long pgoff, pfn, addr;
->  
-> +	/*
-> +	 * If the GPU memory is accessed by the CPU while the GPU is
-> +	 * not ready after reset, it can cause harmless corrected RAS
-> +	 * events to be logged. Make sure the GPU is ready before
-> +	 * establishing the mappings.
-> +	 */
-> +	if (!nvdev->gpu_mem_mapped) {
-> +		struct vfio_pci_core_device *vdev = &nvdev->core_device;
-> +
-> +		if (nvgrace_gpu_wait_device_ready(vdev->barmap[0]))
-> +			return VM_FAULT_SIGBUS;
-> +
-> +		nvdev->gpu_mem_mapped = true;
-> +	}
-> +
->  	memregion = nvgrace_gpu_memregion(index, nvdev);
->  	if (!memregion)
->  		return ret;
-> @@ -354,7 +377,17 @@ static long nvgrace_gpu_ioctl(struct vfio_device *core_vdev,
->  	case VFIO_DEVICE_IOEVENTFD:
->  		return -ENOTTY;
->  	case VFIO_DEVICE_RESET:
-> +		struct nvgrace_gpu_pci_core_device *nvdev =
-> +			container_of(core_vdev, struct nvgrace_gpu_pci_core_device,
-> +				     core_device.vdev);
->  		nvgrace_gpu_init_fake_bar_emu_regs(core_vdev);
-> +
-> +		/*
-> +		 * GPU memory is exposed as device BAR2 (region 4,5).
-> +		 * This would be zapped during GPU reset. Unset
-> +		 * nvdev->gpu_mem_mapped to reflect just that.
-> +		 */
-> +		nvdev->gpu_mem_mapped = false;
+> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
-Why aren't we using a reset_done callback for this, where we then might
-name the flag "reset_done"?  What protects this flag against races,
-is it only valid under memory_lock?  memory_lock is held across reset,
-including .reset_done.
-
-
->  		fallthrough;
->  	default:
->  		return vfio_pci_core_ioctl(core_vdev, cmd, arg);
-> @@ -439,11 +472,14 @@ nvgrace_gpu_write_config_emu(struct vfio_device *core_vdev,
->  	struct nvgrace_gpu_pci_core_device *nvdev =
->  		container_of(core_vdev, struct nvgrace_gpu_pci_core_device,
->  			     core_device.vdev);
-> +	struct vfio_pci_core_device *vdev =
-> +		container_of(core_vdev, struct vfio_pci_core_device, vdev);
->  	u64 pos = *ppos & VFIO_PCI_OFFSET_MASK;
->  	struct mem_region *memregion = NULL;
->  	size_t register_offset;
->  	loff_t copy_offset;
->  	size_t copy_count;
-> +	int cap_start = vfio_find_cap_start(vdev, pos);
->  
->  	if (vfio_pci_core_range_intersect_range(pos, count, PCI_BASE_ADDRESS_2,
->  						sizeof(u64), &copy_offset,
-> @@ -462,6 +498,23 @@ nvgrace_gpu_write_config_emu(struct vfio_device *core_vdev,
->  		return copy_count;
->  	}
->  
-> +	if (vfio_pci_core_range_intersect_range(pos, count, cap_start + PCI_EXP_DEVCTL,
-> +						sizeof(u16), &copy_offset,
-> +						&copy_count, &register_offset)) {
-> +		__le16 val16;
-> +
-> +		if (copy_from_user((void *)&val16, buf, copy_count))
-> +			return -EFAULT;
-> +
-> +		/*
-> +		 * GPU memory is exposed as device BAR2 (region 4,5).
-> +		 * This would be zapped during GPU reset. Unset
-> +		 * nvdev->gpu_mem_mapped to reflect just that.
-> +		 */
-> +		if (val16 & cpu_to_le16(PCI_EXP_DEVCTL_BCR_FLR))
-> +			nvdev->gpu_mem_mapped = false;
-> +	}
-
-reset_done would significantly simplify this and avoid that we need to
-export vfio_find_cap_start().  I think it might be done this way to set
-the flag prior to reset, but as above, the flag seems racy as
-implemented here.
-
-> +
->  	return vfio_pci_core_write(core_vdev, buf, count, ppos);
->  }
->  
-> @@ -478,9 +531,18 @@ static int
->  nvgrace_gpu_map_device_mem(int index,
->  			   struct nvgrace_gpu_pci_core_device *nvdev)
->  {
-> +	struct vfio_pci_core_device *vdev = &nvdev->core_device;
->  	struct mem_region *memregion;
->  	int ret = 0;
->  
-> +	if (!nvdev->gpu_mem_mapped) {
-> +		ret = nvgrace_gpu_wait_device_ready(vdev->barmap[0]);
-> +		if (ret)
-> +			return ret;
-> +
-> +		nvdev->gpu_mem_mapped = true;
-> +	}
-
-Similar to the code in the fault handler, should have a common wrapper?
-Likely need to learn about memory_lock in this path to prevent races as
-well.  Thanks,
-
-Alex
-
-> +
->  	memregion = nvgrace_gpu_memregion(index, nvdev);
->  	if (!memregion)
->  		return -EINVAL;
+Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
 
 
