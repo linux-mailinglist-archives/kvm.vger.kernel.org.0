@@ -1,147 +1,113 @@
-Return-Path: <kvm+bounces-64246-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64248-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74F85C7B87A
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 20:33:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 154BFC7B98D
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 20:56:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2982C3A406B
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:33:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C114C3A631E
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA974305057;
-	Fri, 21 Nov 2025 19:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DCFC304994;
+	Fri, 21 Nov 2025 19:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n5AxN8lJ"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="1gsWB9CG"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33503002A6;
-	Fri, 21 Nov 2025 19:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21ABE2E041A;
+	Fri, 21 Nov 2025 19:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763753553; cv=none; b=gpVjGJQUs8mYKH9RENqWYRurF4Y2u03fvoQIJcXodssvK8lJvPoueYz9J/4swsClCsOHD6c3fFeqw1GpxKlEYu01084eS9ypWTCLJzTpQlZzStzLhsxD4kd9wGRc6D25DppedIWNNp60e2PBW2w0BVhCubzanVh6YCrX1MYN4FE=
+	t=1763754953; cv=none; b=BniwARLWfqQXusplPtyudHW+fFvmU6PFq4x8AGyjfoURnYWuectnn7N1b69OTazzfxpAyYnS+ajXfQins44K5z0DItt8Vg1E0WE1NtBhx86s0nn+g6i2gMTHjvDOufwBPR+V0Vrs50Kzkjq7Djnwnm1Wa2zPcUGE0pUxPcZfNxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763753553; c=relaxed/simple;
-	bh=XTcT2aRIC+bx02fSkf5olHtJ8KjSKocOAdwnrpK8srA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ORpY81RpHaTukZGYAUWQhzhpxX/fteOprm9aSU5lPGwozYeLJEKWAGQMYaDjihfTVV9OdcXNKFDBVehd+4G3TZOVOQa8a2PSdACSAlhdpSmm/eMJNug11l/swRsHAnwHdznl5eM0Lhdtag3kxJYdsauxfhrOIQLOKB0N1V3PDcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n5AxN8lJ; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763753548;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3DqFdYkdQ+nHqF3kgNLYzHfTDGHGl4q58gU1CFuLCXk=;
-	b=n5AxN8lJ67yEwn2BfR3jw7OIm296RqyTe+falzjel5zEwqvjMHAsNos77Zgop2qB8pnfjp
-	bNPgysusRbLlQRxXCMctkF38Ko3XcgyLaaOHjJmgdgTJG/Dh8I53v9ErJliDVVZscoyvHI
-	4QWaCPyX34fZW19Uo5FPTNHQWeVhy6I=
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Ken Hofsass <hofsass@google.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH 3/3] KVM: selftests: Verify CR3 in debug_regs
-Date: Fri, 21 Nov 2025 19:32:04 +0000
-Message-ID: <20251121193204.952988-4-yosry.ahmed@linux.dev>
-In-Reply-To: <20251121193204.952988-1-yosry.ahmed@linux.dev>
-References: <20251121193204.952988-1-yosry.ahmed@linux.dev>
+	s=arc-20240116; t=1763754953; c=relaxed/simple;
+	bh=ZJ2imUn9Mco77w7/pdIgQXc4oF4zUj7dqNGxM1kbtZk=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=olP/WuvwwLqPyMrg9KInwffs2ffsJuruA50IGOcyUT3VQVo9M5AapzSg26qjDuziaDPtIoi/D6QWGZzVF2D1tWQ4sI9PPur+tYOFHV6Hwlo4BBQlV4JuzQhrbPy3V6otxbXbpFTnL8RncIMiIupVCh8xxtY9QOumFRn/yA0TqGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=1gsWB9CG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01299C4CEF1;
+	Fri, 21 Nov 2025 19:55:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1763754952;
+	bh=ZJ2imUn9Mco77w7/pdIgQXc4oF4zUj7dqNGxM1kbtZk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=1gsWB9CGDheDWsUEWoqPq+K2Og2h9mfP0NvvauyDN66X4mW929BZ9UKFHwPQXSfGy
+	 Gg/r2nAupA9992Bws/OHN7TpqhJa/fZ+kEl8obZ1dppTp69FiQnjzoYkWIqOioVhAF
+	 8wQM/kxEwdZcv6ztDi7xcMyEi6B3+NUgFaO93Jbo=
+Date: Fri, 21 Nov 2025 11:55:50 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio
+ Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer
+ <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, Vasily
+ Gorbik <gor@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Peter Xu
+ <peterx@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
+ Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Arnd Bergmann
+ <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>, Baolin Wang
+ <baolin.wang@linux.alibaba.com>, "Liam R . Howlett"
+ <Liam.Howlett@oracle.com>, Nico Pache <npache@redhat.com>, Ryan Roberts
+ <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song
+ <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>, Muchun Song
+ <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, Mike Rapoport
+ <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, Michal Hocko
+ <mhocko@suse.com>, Matthew Brost <matthew.brost@intel.com>, Joshua Hahn
+ <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park
+ <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, Ying Huang
+ <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>, Axel
+ Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei
+ Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>, Kairui
+ Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He
+ <bhe@redhat.com>, Chris Li <chrisl@kernel.org>, SeongJae Park
+ <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>, Jason Gunthorpe
+ <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Xu Xin
+ <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>, Jann Horn
+ <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>, Naoya Horiguchi
+ <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>, Pasha Tatashin
+ <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>, Harry Yoo
+ <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
+Subject: Re: [PATCH v3 07/16] mm: avoid unnecessary use of is_swap_pmd()
+Message-Id: <20251121115550.8a8f9b39189b215849ce165d@linux-foundation.org>
+In-Reply-To: <67c63cce-f1b8-48d3-83a6-6de1f2d86dda@lucifer.local>
+References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
+	<8a1704b36a009c18032d5bea4cb68e71448fbbe5.1762812360.git.lorenzo.stoakes@oracle.com>
+	<a623f785-6928-4037-b4be-5d42b46aa603@suse.cz>
+	<67c63cce-f1b8-48d3-83a6-6de1f2d86dda@lucifer.local>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-If KVM_CAP_X86_GUEST_DEBUG_CR3 is set, check that the value of CR3 in
-struct kvm_run on KVM_EXIT_DEBUG matches that returned by KVM_GET_SREGS.
+On Fri, 21 Nov 2025 19:25:46 +0000 Lorenzo Stoakes <lorenzo.stoakes@oracle.com> wrote:
 
-Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
----
- tools/testing/selftests/kvm/x86/debug_regs.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+> > > To add to the confusion in this terminology we use is_swap_pmd() in an
+> > > inconsistent way similar to how is_swap_pte() was being used - sometimes
+> > > adopting the convention that pmd_none(), !pmd_present() implies PMD 'swap'
+> >
+> > 			       !pmd_none()
+> >
+> > ?
+> 
+> Yeah sorry this is a typo.
+> 
+> Andrew, if it's easy to fix could you?
 
-diff --git a/tools/testing/selftests/kvm/x86/debug_regs.c b/tools/testing/selftests/kvm/x86/debug_regs.c
-index 563e52217cdd..ecad92789182 100644
---- a/tools/testing/selftests/kvm/x86/debug_regs.c
-+++ b/tools/testing/selftests/kvm/x86/debug_regs.c
-@@ -80,8 +80,9 @@ static void vcpu_skip_insn(struct kvm_vcpu *vcpu, int insn_len)
- 
- int main(void)
- {
-+	unsigned long long target_dr6, target_rip, target_cr3;
- 	struct kvm_guest_debug debug;
--	unsigned long long target_dr6, target_rip;
-+	struct kvm_sregs sregs;
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_run *run;
- 	struct kvm_vm *vm;
-@@ -103,6 +104,14 @@ int main(void)
- 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
- 	run = vcpu->run;
- 
-+	if (kvm_has_cap(KVM_CAP_X86_GUEST_DEBUG_CR3)) {
-+		pr_info("Debug info includes guest CR3\n");
-+		vcpu_sregs_get(vcpu, &sregs);
-+		target_cr3 = sregs.cr3;
-+	} else {
-+		target_cr3 = 0;
-+	}
-+
- 	/* Test software BPs - int3 */
- 	pr_info("Testing INT3\n");
- 	memset(&debug, 0, sizeof(debug));
-@@ -112,6 +121,7 @@ int main(void)
- 	TEST_ASSERT_EQ(run->exit_reason, KVM_EXIT_DEBUG);
- 	TEST_ASSERT_EQ(run->debug.arch.exception, BP_VECTOR);
- 	TEST_ASSERT_EQ(run->debug.arch.pc, CAST_TO_RIP(sw_bp));
-+	TEST_ASSERT_EQ(run->debug.arch.cr3, target_cr3);
- 	vcpu_skip_insn(vcpu, 1);
- 
- 	/* Test instruction HW BP over DR[0-3] */
-@@ -128,6 +138,7 @@ int main(void)
- 		TEST_ASSERT_EQ(run->debug.arch.exception, DB_VECTOR);
- 		TEST_ASSERT_EQ(run->debug.arch.pc, CAST_TO_RIP(hw_bp));
- 		TEST_ASSERT_EQ(run->debug.arch.dr6, target_dr6);
-+		TEST_ASSERT_EQ(run->debug.arch.cr3, target_cr3);
- 	}
- 	/* Skip "nop" */
- 	vcpu_skip_insn(vcpu, 1);
-@@ -147,6 +158,7 @@ int main(void)
- 		TEST_ASSERT_EQ(run->debug.arch.exception, DB_VECTOR);
- 		TEST_ASSERT_EQ(run->debug.arch.pc, CAST_TO_RIP(write_data));
- 		TEST_ASSERT_EQ(run->debug.arch.dr6, target_dr6);
-+		TEST_ASSERT_EQ(run->debug.arch.cr3, target_cr3);
- 		/* Rollback the 4-bytes "mov" */
- 		vcpu_skip_insn(vcpu, -7);
- 	}
-@@ -169,6 +181,7 @@ int main(void)
- 		TEST_ASSERT_EQ(run->debug.arch.exception, DB_VECTOR);
- 		TEST_ASSERT_EQ(run->debug.arch.pc, target_rip);
- 		TEST_ASSERT_EQ(run->debug.arch.dr6, target_dr6);
-+		TEST_ASSERT_EQ(run->debug.arch.cr3, target_cr3);
- 	}
- 
- 	/* Finally test global disable */
-@@ -183,6 +196,7 @@ int main(void)
- 	TEST_ASSERT_EQ(run->debug.arch.exception, DB_VECTOR);
- 	TEST_ASSERT_EQ(run->debug.arch.pc, CAST_TO_RIP(bd_start));
- 	TEST_ASSERT_EQ(run->debug.arch.dr6, target_dr6);
-+	TEST_ASSERT_EQ(run->debug.arch.cr3, target_cr3);
- 
- 	/* Disable all debug controls, run to the end */
- 	memset(&debug, 0, sizeof(debug));
--- 
-2.52.0.rc2.455.g230fcf2819-goog
+a few hours ago ;)
 
+> If too late then never mind :)
+
+"too late" is a thing I try to avoid!
 
