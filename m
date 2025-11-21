@@ -1,141 +1,155 @@
-Return-Path: <kvm+bounces-64024-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64025-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 502B2C76C8F
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 01:39:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF930C76CAA
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 01:41:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 47B984E20E8
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:39:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id CEF2F29E7B
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD66A268C40;
-	Fri, 21 Nov 2025 00:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1827C270ED2;
+	Fri, 21 Nov 2025 00:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FOnEgNLs"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="bQ/usSFT";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="W6/D/Imp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E542459E5
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 00:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED34AD5A;
+	Fri, 21 Nov 2025 00:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763685536; cv=none; b=Z5DSdpLpOrEczABfPHgF/hUevenxvztwZnvg1aectkB2xK3WHK7bmzB2G8EvUcr9I0LeXFkhx+tXP3a2RCQBHHmoASTtY55WjlNf5tDgz+RrK68xSKgznyDV3KAJgEWd2t6VMOLBnDtby9nUyWKqrHFBJjW1KezzkgzW7ejNz0Q=
+	t=1763685643; cv=none; b=lfGso0vwobjLiJ849eG46CE1OWwQZom/kXCXM54kqtXVdFL3OY1TcZHNnGcRC1GQ7Sr3ZeK0B3G57EHBPv0mpkIPKst3NzWylARTucReFBbkOakPX3RbQ0YVLgaPVXwNzF7OkDPi4jZQY2qCo8k0YCqzS+dJ1OW9IaLKaWSDm7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763685536; c=relaxed/simple;
-	bh=ZVm9oVg9+oHojYwfCqjOSWTPawiDqofHfvzZVybJeio=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TT/2MdoRwE0e35mWP0bt2JvxHfY5nvm0GnaL689kmAjekS1F+4sFahDDv91ruA2fjM9qmAhzVO3lTedBF2wpD61uqChL3kNJDOw7+k+KOmf0b8W80H1xb3sgNYhXAXWCb2mS+U8ibDHkrz+6RWiMPTWCWUql3FhBFARwTgiN10I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FOnEgNLs; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-295595cd102so37292515ad.3
-        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 16:38:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763685534; x=1764290334; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9yHOty/6mNUkhCHBQeglcNfXba5Wpwpq1aZlNIfnHbs=;
-        b=FOnEgNLsm1yir+BEN6I/gb5qFuDj++EybRuA7xiV2i85p7uK51ZsrlgrNHBkbEDHg/
-         Co22vWBB6ahUYK6bhrnt5SsVcNNe6/SWWoWN2WBiH/9t6Ns6Shqv1ibKEpzHFx6nwlf+
-         aKXOzBm8f8tc0MiK4b5LuwlGytAyH2ZZ/gXdExf6ddjkD2Xlzr8k7N0DU9guFUXAQhr+
-         jOyHV8ph5OJU9Jfji4heeQ2SH/ZcefR2Q1AJJIE+4uPPaxgaP5XZBrzWsnrxQSRQekgh
-         ztd0lQemQo3UpOkObVL/k6Yd4KiOw66Vjs0XN2l+n2Du6ctSgiQJn8e6jYWJN9AjN0qn
-         asKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763685534; x=1764290334;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9yHOty/6mNUkhCHBQeglcNfXba5Wpwpq1aZlNIfnHbs=;
-        b=sr9RBMqauaTa+Ve8EMrWE84QfN29wDIBHQ26PewKOkMIzN9FxXHQ550sHqfjJJj/X2
-         xoTTzXqTaQw8gXU+ijkfUYvNUTNZXcgpJS9899PssVc5cIujzf2A9jSV9ZeWEkMnNOYT
-         jyvxGmH/NL/RSyC8Vr32nnnrMKsrWb6rFkYFcScbCWMiR9MivV0BRv9CRk0/1aIVYGYQ
-         qezGnUyR9rOWevg+1RDADQMdggaLHrYyln9MGaqxs3VrTBefYSerPFHS5qtFKYn3/Rw3
-         LkbCbuTGi8MrtxtxF1jTNqmGvlWCi4ToRohp0HjV+sah01yCCeMc7/8KyyTBpy3/JKQj
-         13Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4vMS354HUyGA7foUNdAepSLSG6AtGlSc+oKej8aGxbVC51AZm1CnAfDPeAnlaoeJ/0BE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyNTgqjQBpj4xbRPC7ka4YpFAL62En5hjVsoykkXEt7e6fdEW0
-	W0N0HSLLSMWBKfo4yh8GNZsBCjXGTpx2jUWkMUGtmMwS2hiNkTdrKkmHMqCsqMPYDfKbhf9NBqO
-	khc3UOA==
-X-Google-Smtp-Source: AGHT+IHAtQ5uOa4zy//oPlSviihcy4vHTC+g1fwm6GKeCXN14PJK2EED5KkhT/Iqwbi3W7eOGEFuceginJY=
-X-Received: from pjbbb10.prod.google.com ([2002:a17:90b:8a:b0:340:53bc:56cb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3c6f:b0:295:8c51:64ff
- with SMTP id d9443c01a7336-29b6bf37d57mr6409455ad.29.1763685533874; Thu, 20
- Nov 2025 16:38:53 -0800 (PST)
-Date: Thu, 20 Nov 2025 16:38:52 -0800
-In-Reply-To: <aR-zxrYATZ4rZZjn@google.com>
+	s=arc-20240116; t=1763685643; c=relaxed/simple;
+	bh=iVVPaKj7SONUFL2eBemOPm2YOD5z0DLJTWCoYsT1zmE=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=sHh7bSlXuhmB/tZWGm5T+uT2pteZESDt5Kznv9GrP2EzorZb6OCLnT/7Zu2YEZNw185CiliEZ5Z3zax1BQ/rneiTB2DAegoim/NvWgdDU9mauLYYgQq00cCZFKW+5suW+VMNyh2/FjyPZ1S/zEkJMYAj5VVJ61oU5jOgHZF3HcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=bQ/usSFT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=W6/D/Imp; arc=none smtp.client-ip=202.12.124.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 4F1D37A014B;
+	Thu, 20 Nov 2025 19:40:38 -0500 (EST)
+Received: from phl-imap-18 ([10.202.2.89])
+  by phl-compute-02.internal (MEProxy); Thu, 20 Nov 2025 19:40:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1763685638;
+	 x=1763772038; bh=BWrF0R3qQL8kwm9npP1EvAhcAZRE+BA2fEO0OQij6hY=; b=
+	bQ/usSFT6o+GWegKvvd8h3PcSB2A1hCVejwJtF7wsEdC7CwzuBGsDiHZbmkxFhTZ
+	d3UIol3MggwYKtr3/7m8xHyYxFZEfi8xy9RcSPvxuCsyc0MdounLwdBO/jy+bF8Q
+	QMRupKehNfw8HmjuvCCa78xT+NL7tm00BrGzRYcDVClQyvRaUh5RVCfj/DJfA9BN
+	x5s86jNR+3qTFD9TYEPKOzH5TaocL4t+30TypdxjRYVGuCBSF89ZL3JYk8ybXWdP
+	2HBXxNDUNKIY52H6XFTtq5eDJxYKvYA3BepZULCxBk8xlDM0LYJhphJ4jbnaB2do
+	BBa9XXH1Lha6uliQ1SziTA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763685638; x=
+	1763772038; bh=BWrF0R3qQL8kwm9npP1EvAhcAZRE+BA2fEO0OQij6hY=; b=W
+	6/D/ImpsP6E8UHOnHw0GHkvwQhWlYdOrwXFehCZFo9BlwYpK5+GOeFWB33eaI72c
+	o2iReqsiKaZ6t9qjAjpN0Xy115KlGnR65KX+g5UzbVBd/rcQlaiz8hiLAqer98qQ
+	XFoirt/2+8WdsP7ETLVokZeBr04/nTxLN1HgtZrk2DDl7wrTRs8onknGjWKUWLnj
+	5TIODtgQLz3kfaCb4wP0kgI7O8Hg2ukyYnBZhW4Sf5Xwx3Si8Z8pE8LMGUWysWV9
+	EbfxOHrI0s9K+yzOiA+ZKd4nSgH24XQr7oMuDcKfWL0sRgLVy6W4btuveDFkKOyb
+	MNY477StKsGD7B911h8LA==
+X-ME-Sender: <xms:BLUfaTcu-W1ZbFNKOZl9hEoK5kM2iKVgFY7hi_qwxdijBO8eYSBaQA>
+    <xme:BLUfaUDr4NrEmO5B9_8l2v3n4jQbNvi6XEqlmD-9LLSydDnUnrnRawFKgPpvTMRYP
+    Y7434dwhOkYoKdQMRD7qq4WJ2pf5tck8RcL6wMx-_En2tJAQ-vQQQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvdekheehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehlvgig
+    ucghihhllhhirghmshhonhdfuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtf
+    frrghtthgvrhhnpefgfeeflefggfffveffteetiedvtedtgfdvieevfeejfeefffevteej
+    tedufffgveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepfeefpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehjohhroheskegshihtvghsrdhorhhgpdhrtg
+    hpthhtoheptghhrhhishhtihgrnhdrkhhovghnihhgsegrmhgurdgtohhmpdhrtghpthht
+    oheprhhosghinhdrmhhurhhphhihsegrrhhmrdgtohhmpdhrtghpthhtoheplhhoghgrnh
+    hgseguvghlthgrthgvvgdrtghomhdprhgtphhtthhopegshhgvlhhgrggrshesghhoohhg
+    lhgvrdgtohhmpdhrtghpthhtohepkhgvvhhinhdrthhirghnsehinhhtvghlrdgtohhmpd
+    hrtghpthhtohepvhhivhgvkhdrkhgrshhirhgvugguhiesihhnthgvlhdrtghomhdprhgt
+    phhtthhopegrgigsohgvsehkvghrnhgvlhdrughkpdhrtghpthhtohepghhushhtrghvoh
+    grrhhssehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:BLUfaf3IMN_DjSt37FnR5cC7cKZKzm-Evis2a5redpwD9gpwNa4Mgw>
+    <xmx:BLUfabfYFOLIxRZxj2GcfZQhMAJrV3AvzpNs5lf-FrATezIBt46vVw>
+    <xmx:BLUfab6kKk0AxJC9j7DElLBpacsb7lCfW4srcPj5EWec1IZ1DQymrg>
+    <xmx:BLUfaYhbHXAT2tIz3nE8TBsZFON8yBhxofv_cAOU6AX3rp4HzrS3QQ>
+    <xmx:BrUfaRbHrZD02fwIphP49SQDR9cZINb17knsJOrpHoo-8nVEkFZAnwDT>
+Feedback-ID: i03f14258:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id BD7C115C0053; Thu, 20 Nov 2025 19:40:36 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251110033232.12538-1-kernellwp@gmail.com> <20251110033232.12538-7-kernellwp@gmail.com>
- <aR-zxrYATZ4rZZjn@google.com>
-Message-ID: <aR-0nGgVuc2EWm2a@google.com>
-Subject: Re: [PATCH 06/10] KVM: Fix last_boosted_vcpu index assignment bug
-From: Sean Christopherson <seanjc@google.com>
-To: Wanpeng Li <kernellwp@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Wanpeng Li <wanpengli@tencent.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-ThreadId: AE6BP-1UiBv7
+Date: Thu, 20 Nov 2025 17:40:15 -0700
+From: "Alex Williamson" <alex@shazbot.org>
+To: "Jason Gunthorpe" <jgg@ziepe.ca>
+Cc: "Leon Romanovsky" <leon@kernel.org>,
+ "Bjorn Helgaas" <bhelgaas@google.com>,
+ "Logan Gunthorpe" <logang@deltatee.com>, "Jens Axboe" <axboe@kernel.dk>,
+ "Robin Murphy" <robin.murphy@arm.com>, "Joerg Roedel" <joro@8bytes.org>,
+ "Will Deacon" <will@kernel.org>,
+ "Marek Szyprowski" <m.szyprowski@samsung.com>,
+ "Andrew Morton" <akpm@linux-foundation.org>,
+ "Jonathan Corbet" <corbet@lwn.net>,
+ "Sumit Semwal" <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ "Kees Cook" <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ "Ankit Agrawal" <ankita@nvidia.com>, "Yishai Hadas" <yishaih@nvidia.com>,
+ "Shameer Kolothum" <skolothumtho@nvidia.com>,
+ "Kevin Tian" <kevin.tian@intel.com>,
+ "Krishnakant Jaju" <kjaju@nvidia.com>, "Matt Ochs" <mochs@nvidia.com>,
+ linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, iommu@lists.linux.dev, linux-mm@kvack.org,
+ linux-doc@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+ kvm@vger.kernel.org, linux-hardening@vger.kernel.org,
+ "Vivek Kasireddy" <vivek.kasireddy@intel.com>
+Message-Id: <cd6f8c6b-6950-4b06-8f2d-bb4ead660ead@app.fastmail.com>
+In-Reply-To: <20251121002344.GC233636@ziepe.ca>
+References: <20251120-dmabuf-vfio-v9-0-d7f71607f371@nvidia.com>
+ <20251120-dmabuf-vfio-v9-10-d7f71607f371@nvidia.com>
+ <20251120170413.050ccbb5.alex@shazbot.org> <20251121002344.GC233636@ziepe.ca>
+Subject: Re: [PATCH v9 10/11] vfio/pci: Add dma-buf export support for MMIO regions
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 20, 2025, Sean Christopherson wrote:
-> On Mon, Nov 10, 2025, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> > 
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> Something might be off in your email scripts.  Speaking of email, mostly as an
-> FYI, your @tencent email was bouncing as of last year, and prompted commit
-> b018589013d6 ("MAINTAINERS: Drop Wanpeng Li as a Reviewer for KVM Paravirt support").
-> 
-> > In kvm_vcpu_on_spin(), the loop counter 'i' is incorrectly written to
-> > last_boosted_vcpu instead of the actual vCPU index 'idx'. This causes
-> > last_boosted_vcpu to store the loop iteration count rather than the
-> > vCPU index, leading to incorrect round-robin behavior in subsequent
-> > directed yield operations.
-> > 
-> > Fix this by using 'idx' instead of 'i' in the assignment.
-> 
-> Fixes: 7e513617da71 ("KVM: Rework core loop of kvm_vcpu_on_spin() to use a single for-loop")
-> Cc: stable@vger.kernel.org
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> 
-> Please, please don't bury fixes like this in a large-ish series, especially in a
-> series that's going to be quite contentious and thus likely to linger on-list for
-> quite some time.  It's pretty much dumb luck on my end that I saw this.
-> 
-> That said, thank you for fixing my goof :-)
-> 
-> Paolo, do you want to grab this for 6.19?  Or just wait for 6.20?
+On Thu, Nov 20, 2025, at 5:23 PM, Jason Gunthorpe wrote:
+> On Thu, Nov 20, 2025 at 05:04:13PM -0700, Alex Williamson wrote:
+>
+>> @@ -2501,7 +2501,7 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+>>  err_undo:
+>>         list_for_each_entry_from_reverse(vdev, &dev_set->device_list,
+>>                                          vdev.dev_set_list) {
+>> -               if (__vfio_pci_memory_enabled(vdev))
+>> +               if (vdev->vdev.open_count && __vfio_pci_memory_enabled(vdev))
+>>                         vfio_pci_dma_buf_move(vdev, false);
+>>                 up_write(&vdev->memory_lock);
+>>         }
+>> 
+>> Any other suggestions?  This should be the only reset path with this
+>> nuance of affecting non-opened devices.  Thanks,
+>
+> Seems reasonable, but should it be in __vfio_pci_memory_enabled() just
+> to be robust?
 
-Err, off-by-one.  6.18 and 6.19....
+__vfio_pci_memory_enabled() currently only requires holding memory_lock, I don't think we want to create a dependency on dev_set->lock for this unique call path.  Thanks,
 
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index b7a0ae2a7b20..cde1eddbaa91 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -4026,7 +4026,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
-> >  
-> >  		yielded = kvm_vcpu_yield_to(vcpu);
-> >  		if (yielded > 0) {
-> > -			WRITE_ONCE(kvm->last_boosted_vcpu, i);
-> > +			WRITE_ONCE(kvm->last_boosted_vcpu, idx);
-> >  			break;
-> >  		} else if (yielded < 0 && !--try) {
-> >  			break;
-> > -- 
-> > 2.43.0
-> > 
+Alex
 
