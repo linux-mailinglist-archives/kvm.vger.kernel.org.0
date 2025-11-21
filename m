@@ -1,113 +1,97 @@
-Return-Path: <kvm+bounces-64248-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64253-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 154BFC7B98D
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 20:56:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 780ADC7BAC3
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 21:50:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C114C3A631E
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:56:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31B503A703C
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 20:50:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DCFC304994;
-	Fri, 21 Nov 2025 19:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21BAF3093DD;
+	Fri, 21 Nov 2025 20:48:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="1gsWB9CG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q6uK37Op"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21ABE2E041A;
-	Fri, 21 Nov 2025 19:55:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B42306B15
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 20:48:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763754953; cv=none; b=BniwARLWfqQXusplPtyudHW+fFvmU6PFq4x8AGyjfoURnYWuectnn7N1b69OTazzfxpAyYnS+ajXfQins44K5z0DItt8Vg1E0WE1NtBhx86s0nn+g6i2gMTHjvDOufwBPR+V0Vrs50Kzkjq7Djnwnm1Wa2zPcUGE0pUxPcZfNxQ=
+	t=1763758119; cv=none; b=EtzbMKYo3QtYQepoKBMJhWxzMD3CCVGWDkAOFhF5JYWfuAV1PTlfGW0rmsNpOWQERB+sUz3D45vVn+0LvFCzoJfqukVZZAosE2c7TNRh5MVphuBrol+mSj09ej6CfbKSVWWSQ9Vi3y581P54VkrrBgV5GVpyk7w0QzBEkeCKfDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763754953; c=relaxed/simple;
-	bh=ZJ2imUn9Mco77w7/pdIgQXc4oF4zUj7dqNGxM1kbtZk=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=olP/WuvwwLqPyMrg9KInwffs2ffsJuruA50IGOcyUT3VQVo9M5AapzSg26qjDuziaDPtIoi/D6QWGZzVF2D1tWQ4sI9PPur+tYOFHV6Hwlo4BBQlV4JuzQhrbPy3V6otxbXbpFTnL8RncIMiIupVCh8xxtY9QOumFRn/yA0TqGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=1gsWB9CG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01299C4CEF1;
-	Fri, 21 Nov 2025 19:55:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1763754952;
-	bh=ZJ2imUn9Mco77w7/pdIgQXc4oF4zUj7dqNGxM1kbtZk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=1gsWB9CGDheDWsUEWoqPq+K2Og2h9mfP0NvvauyDN66X4mW929BZ9UKFHwPQXSfGy
-	 Gg/r2nAupA9992Bws/OHN7TpqhJa/fZ+kEl8obZ1dppTp69FiQnjzoYkWIqOioVhAF
-	 8wQM/kxEwdZcv6ztDi7xcMyEi6B3+NUgFaO93Jbo=
-Date: Fri, 21 Nov 2025 11:55:50 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio
- Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer
- <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, Vasily
- Gorbik <gor@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Peter Xu
- <peterx@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
- Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Arnd Bergmann
- <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>, Baolin Wang
- <baolin.wang@linux.alibaba.com>, "Liam R . Howlett"
- <Liam.Howlett@oracle.com>, Nico Pache <npache@redhat.com>, Ryan Roberts
- <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song
- <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>, Muchun Song
- <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, Mike Rapoport
- <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, Michal Hocko
- <mhocko@suse.com>, Matthew Brost <matthew.brost@intel.com>, Joshua Hahn
- <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park
- <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, Ying Huang
- <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>, Axel
- Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei
- Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>, Kairui
- Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He
- <bhe@redhat.com>, Chris Li <chrisl@kernel.org>, SeongJae Park
- <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>, Jason Gunthorpe
- <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Xu Xin
- <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>, Jann Horn
- <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>, Naoya Horiguchi
- <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>, Pasha Tatashin
- <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>, Harry Yoo
- <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
-Subject: Re: [PATCH v3 07/16] mm: avoid unnecessary use of is_swap_pmd()
-Message-Id: <20251121115550.8a8f9b39189b215849ce165d@linux-foundation.org>
-In-Reply-To: <67c63cce-f1b8-48d3-83a6-6de1f2d86dda@lucifer.local>
-References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
-	<8a1704b36a009c18032d5bea4cb68e71448fbbe5.1762812360.git.lorenzo.stoakes@oracle.com>
-	<a623f785-6928-4037-b4be-5d42b46aa603@suse.cz>
-	<67c63cce-f1b8-48d3-83a6-6de1f2d86dda@lucifer.local>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1763758119; c=relaxed/simple;
+	bh=qyre18cpOKvxwwzmBDasMYxqf6NTszu6HKVwU/jZ7cA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r6Zn+GBCic1A0KDqCvqnu6D7FSP3NP+TpzXH2Z3FDdr9Fiiaw150LbMkzh7p/XioFL0azuM8Dn22EQq7sZw9jcbQQxyAIBugu981gW5msBAvtiZs8L+aqRagrY+a/4C2vEeI26P3i3z/Oq1qjAbjdE700b8E2dIHTpMHd5nmt3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Q6uK37Op; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763758105;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zkkn6Am/KVdd3EYkVVX2Yi8kvfVxaybnM5xNkbH18cY=;
+	b=Q6uK37OpHpOSOOKSRCWoblfsRJKUjwFg6wdRp2Na9VLglN51zpwTOpoUSDR4kc9wzkKIz+
+	WDyE2bJP7pWvwJP0zHOhQL18UNtrtLT9I1MRelu8KDU13tgjhiNAo3HomzII3mjlZcsSG7
+	T5aQWFbddAC3tk3YoV9r7ML0zwi+oUg=
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Jim Mattson <jmattson@google.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Subject: [PATCH v3 0/4] KVM: SVM: GIF and EFER.SVME are independent
+Date: Fri, 21 Nov 2025 20:47:59 +0000
+Message-ID: <20251121204803.991707-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 21 Nov 2025 19:25:46 +0000 Lorenzo Stoakes <lorenzo.stoakes@oracle.com> wrote:
+Clearing EFER.SVME is not architected to set GIF, so GIF may be clear
+even when EFER.SVME is clear.
 
-> > > To add to the confusion in this terminology we use is_swap_pmd() in an
-> > > inconsistent way similar to how is_swap_pte() was being used - sometimes
-> > > adopting the convention that pmd_none(), !pmd_present() implies PMD 'swap'
-> >
-> > 			       !pmd_none()
-> >
-> > ?
-> 
-> Yeah sorry this is a typo.
-> 
-> Andrew, if it's easy to fix could you?
+This is covered in the discussion at [1].
 
-a few hours ago ;)
+v2 -> v3:
+- Keep setting GIF when force-leaving nested (Sean).
+- Moved the relevant selftests patches from the series at [2] here
+  (Sean).
 
-> If too late then never mind :)
+v2: https://lore.kernel.org/kvm/20251009223153.3344555-1-jmattson@google.com/
 
-"too late" is a thing I try to avoid!
+[1]https://lore.kernel.org/all/5b8787b8-16e9-13dc-7fca-0dc441d673f9@citrix.com/
+[2]https://lore.kernel.org/kvm/20251021074736.1324328-1-yosry.ahmed@linux.dev/
+
+Jim Mattson (2):
+  KVM: SVM: Allow KVM_SET_NESTED_STATE to clear GIF when SVME==0
+  KVM: SVM: Don't set GIF when clearing EFER.SVME
+
+Yosry Ahmed (2):
+  KVM: selftests: Use TEST_ASSERT_EQ() in test_vmx_nested_state()
+  KVM: selftests: Extend vmx_set_nested_state_test to cover SVM
+
+ arch/x86/kvm/svm/nested.c                     |   6 +-
+ arch/x86/kvm/svm/svm.c                        |   1 -
+ tools/testing/selftests/kvm/Makefile.kvm      |   2 +-
+ ...d_state_test.c => nested_set_state_test.c} | 128 ++++++++++++++++--
+ 4 files changed, 120 insertions(+), 17 deletions(-)
+ rename tools/testing/selftests/kvm/x86/{vmx_set_nested_state_test.c => nested_set_state_test.c} (70%)
+
+
+base-commit: 115d5de2eef32ac5cd488404b44b38789362dbe6
+-- 
+2.52.0.rc2.455.g230fcf2819-goog
+
 
