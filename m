@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-64104-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64105-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17CD5C78B45
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:13:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20B24C78B4E
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:13:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8AD0236343C
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 11:13:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CE76F346D21
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 11:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314FB34A3D9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA6F34C83D;
 	Fri, 21 Nov 2025 11:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hju2Hlra"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CcrMfjw1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C39234BA4B
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 11:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2D634B41C
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 11:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763723501; cv=none; b=PeB8isEfJ/k/U10p7A0a+eDSB/jVbEvzWc6R1JgiWb0OJg96+xHuXE3vTdl55hoipVqCn3gJQgh+5jwxMTwYEMrACVCvTGndssdyN4VpKr+lzGeACgH+P+Pmmu1lvAa7axhsbJubCsoEwZaZT7XVUuDpbHRIdO9W04wGpfYjcU0=
+	t=1763723503; cv=none; b=mnwu5jcAkO5bvFGfEvBubEjR9hXoFUfaHehZbwpG3S84ShsflSTHcY13b4EAtfbtWdEx/KVM3lvYheqo2wzfW8HDrn0/4JJoWEAp1wAWuHckFpuzhV4W7djEYjDV+VBd07dx7Ego5m2sGH12z4r6g3K14ewhVGzZeS7ZK8kk6I0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763723501; c=relaxed/simple;
-	bh=IuqcEOEbe0+RixX82HnLhcdMi0Mf/0K4mfVR0f073pY=;
+	s=arc-20240116; t=1763723503; c=relaxed/simple;
+	bh=Dm+BEBrm/Ll97dS33rHM/QTSbCa8yrcmrrSYYLlbkL8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hsMVwZgJJD8mHf9NJNbbJaokYQmbDmCSXJ6L1RTMSd/fAoEpKp/Bxicj11A4zJKB5qgUxUukft51uc0QsKyz4WbTF9XMbXepHX1lGV+arevczOZfHevMnbPqWIrMRl0Kd7guaBrmqbuh3I719h/J9LiHYgXkNRiY0Q85FTGBlP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hju2Hlra; arc=none smtp.client-ip=209.85.221.52
+	 MIME-Version; b=SEBC6qs2CST118akuwN4/SGpsQjLxkU9feklDo+DEXK25zpGptUmU/wDzIFDqUtaN8LNeubYt/ZIYu69B+yPSyK/yJ27zOSZZ0DYmtrZUM0NUZ9Sl9/EFof0+7WtoQ6HeFsWCT6azKCXH9IcqjrVIxYLw9IMfBKFflUrwIL2OyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CcrMfjw1; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-42b2e9ac45aso1133006f8f.0
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 03:11:37 -0800 (PST)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42b387483bbso1263328f8f.1
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 03:11:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763723495; x=1764328295; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763723496; x=1764328296; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UwlQx/OWwadt7gEx5Aj743IyAAkdjmoKIV+Gyuhnzno=;
-        b=hju2HlraMTKxSAOEj+aejdFRCSCrnjPAb5+PNCWzEmHxEORtWGEg6qugUO+n4duIWa
-         w33OGBh6w0s4EYPl4JuQbg9EWD9X3FpDvdzXdtVzLFMSwclpPZXKIGhY8Rltp5XBvGzC
-         q3wy7sx9km3FpWLvGLRFwtQAYBxyUbqQigFBqU41p1YNOeBWaDNQhZstu9LP2onEsys8
-         8jVlKnhJadzMXp48BQeZYdeRoU7QTjqtsdDQAPC1yBPY5N5XZO8xqm7DQglH4w03LQ44
-         BLsfmtLyHEnbpqD7VfRipaJlbISsVcFpgvRF+QszkI/qF1R68gs46q60OiMWC09CGqQk
-         HAUw==
+        bh=VOXJSf/3ZicK6X9zkJJPFnaHL2wXDXQgFML1HXxSOA0=;
+        b=CcrMfjw1T1ztlzc3LgAZjU0G1IDWW8sYXTTWQRIseKGjatAlS7ZMqZJdso9w34eGJS
+         kv4paceZvgX3iE20Y2dvUFjyl3TiXYNPE2LBqgJsUnF9XyV5VX5GkyxGB0GnjAdmO5jt
+         tcaodewIB3tJtukjc1cP2GnDtbBQwLtCchI/roiKEfHW52giBkSftCF4ETE9tLF/HyCA
+         5KCRwJ6wVNYQmE99+SGP44G/D4gRsXBWEltFiz3r1ot1Hd6/66di7JcBOBgCQJgLCbVI
+         ZfHaxWGYI9SsdcNCeDfTjHq1P/U5CTnvMPfj20PVLOegPmKefa+kYdUrvgTfE8zRWRlj
+         CPeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763723495; x=1764328295;
+        d=1e100.net; s=20230601; t=1763723496; x=1764328296;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=UwlQx/OWwadt7gEx5Aj743IyAAkdjmoKIV+Gyuhnzno=;
-        b=EPQqfGfQsHP1UXBv3d6+a3JBYX0ukHLAir6fi+2lnU+GDK3FlxzazNGNN0zks8ryNR
-         C8PLferzG4X0XEwYha7mt2ro0cT/LOeL86kt/+wpjkobkoImbBgPtyNs5UPXOGRQfhZx
-         NhC1sg4wXV4zL8JhX+Tw+oaSAy5mwKM3bEqacRN165zJEd9/P/h4JKEd2Kbs4NZCraB5
-         m36GRjn+rnImLLHhUvOOXybQfGnQVIODBRmWqIWZbxYUgVXMNKs2Mu5ZN12R3xfOyUxR
-         EOUNsTeTF6bDwXOPXv0UIXhaeAPXmm7qsFEEouZK1E9UkUAgTUhsuJvEanpVQjdI/2Ui
-         PI1A==
-X-Gm-Message-State: AOJu0Yxfc19JjQqbLkO1P01NxTWMLhzOLg5ejctMiA8EX9/hQ45nlmkr
-	BYsG+n2NY98bShG8Vuc8GRT200fuv0kh+3lTmS8P1zJ7uTWgjypG+sPg24RJhw2a4WXVxw==
-X-Gm-Gg: ASbGncvXR++bIHOdBRCL/Cif8ne2L7MoZ3u/7RBl8tb5nxA1WDnX56BhCI295GOxHln
-	u8O+BW6Yj/SIsZbOai4uPIdTONtmggrjsDm1sm7dAO1bw/JDojbxxNq1b2fe3HIcsIIHjMs/ocw
-	gPMbUJo1wu+73r9zoOBDCwKiJZbGyWNvmFdfv94FX0ToFC+kUTNsbOXvYKq7tRI5ZSq8L7Y71+n
-	PV8uJgDJOeHf3zlPq/A87vsuMFzBP/WISAbsXaWOFc2Uo4OmFCHW7IO5+vTNgShvCv21pAVi2wy
-	0uGQEwUX9XhIkQ4088zS76eZ46TPFste3FDKH0WY9QA4DLyYh/cjPoxP34F3zhqkWeaQGZcsOxZ
-	tSAfA7/agwHb/UrpaUWz/XMhutGnrRZ+PRvML8yDQUh35eZtjcJwViuiTs3/KhKogMDEwIrdd5C
-	x7Vbq0UCnox9pDvcqPYqK3H6TMlywbt5fIOjhUIbCUGbm3f/KOJpnFJGeFK6g+mJ6Y8/c2j69Ve
-	CO7dVceWevzw6fBTsLpK4gmRtjF1nMo
-X-Google-Smtp-Source: AGHT+IHVJpc9/f8dm4MnHiPG8rhAYbdabzUczXwVfUZb1zuYY7xjGjgQXaM7mOC9X5Auu/VvvvBTgQ==
-X-Received: by 2002:a05:6000:1789:b0:42b:40b5:e64c with SMTP id ffacd0b85a97d-42cc1d0c3bdmr1976326f8f.30.1763723494827;
-        Fri, 21 Nov 2025 03:11:34 -0800 (PST)
+        bh=VOXJSf/3ZicK6X9zkJJPFnaHL2wXDXQgFML1HXxSOA0=;
+        b=oV4xYG7MNhYk1CYu62CWgDjkQOijQh+uKLc0nsoMRabuDvWwZ3DDmUoWKMJEmr4JaX
+         t5wt5xEdeWyM6XzOrtjHEJBYGUToGTEriujh9H1oGbaLU/o2lPtQD8KDAK03G81CdWR/
+         PktbtPgxrqecDR0cKPorsoL3CwxZMrgczQqXK+wNMomOGaPx+R43XMsrZeE43ZBspT2v
+         FNHVsdn3Hrb4sih1gwBGYmKeqDiyQpE4mGDezqghzU6vNDWtuv5Yas0DK00cLC2/bmjY
+         HQZKThiP6JkTWSQfmrLF98ULF/yPLBcYxo23TxGWC5gIUPdxNXNqTr7MhVE8gIjE3mmS
+         bk+Q==
+X-Gm-Message-State: AOJu0Yyg08FPqFMhPdkyB5c4j2v3W7tdjVaY7I7pGJwf/fmERvOSpkm4
+	tDx+RKhse0QvxyAqMrK+Q5ktZGC/6cDAnMk2U57nA7fX8ikQ4S5PmPusTg7z1tCaQVsd2g==
+X-Gm-Gg: ASbGncsepcqvdSQ9EVEEJkEiaLTUAE2EUPTL+UNprDF27hXStlaugR3GiNF3K7byiQ2
+	7IiJmeP0LJ25/faXQeZbPMKIuu/XoXkMs/ZxfOlSTUpF7DM/PWAHlx3mCd8wDWYIUaR1Ka1TPBn
+	+iiZnfjkyjrbiRsgm9jlhzr4gng+QYT9h7bswiaAx6WXufnL+kdfkyK6w32f+VHk3Pvg8npb1Cy
+	gTzMm21DkUQ/vO4WcntGxGsFBSOADPMBbqDUuOSmmQ0dRhfmZ4j69i2C4H8pXDH5t0J80OtPeHx
+	MU0gCKr3MjMplyPp9/L4CixmEYJFrNGQMVxcXfukkajtDkq56UejiYxXeWbubaweg00h54aaef6
+	N3CWThFnR2/ctyqicr0L4H2O70o7U5cz2dXrMpXHEO51kaqXo1QtlWubN2CPTQNOEqIdKI7Bevf
+	NhOvPa28pazChxfnP0dtjDf7Jph74M+MKeQ7tYlNP0XKht74MmBxxTxLL1gujzoFh9meVEmAtzI
+	lfXxi38Uj5IYt6ZNl7dOITIThYNOFsiTV9/wZ16DSk=
+X-Google-Smtp-Source: AGHT+IEIAoneRkmmi+OfaqjE525Aae3+kzixRpE0ECciHfimaKXtH3N4PTs7XwRIiOOi7OKuLNVHKg==
+X-Received: by 2002:a05:6000:2084:b0:42b:3b62:cd9b with SMTP id ffacd0b85a97d-42cc1d2d52amr1935469f8f.37.1763723496404;
+        Fri, 21 Nov 2025 03:11:36 -0800 (PST)
 Received: from ip-10-0-150-200.eu-west-1.compute.internal (ec2-52-49-196-232.eu-west-1.compute.amazonaws.com. [52.49.196.232])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f363e4sm10484180f8f.12.2025.11.21.03.11.34
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f363e4sm10484180f8f.12.2025.11.21.03.11.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 03:11:34 -0800 (PST)
+        Fri, 21 Nov 2025 03:11:36 -0800 (PST)
 From: Fred Griffoul <griffoul@gmail.com>
 To: kvm@vger.kernel.org
 Cc: seanjc@google.com,
@@ -84,9 +84,9 @@ Cc: seanjc@google.com,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Fred Griffoul <fgriffo@amazon.co.uk>
-Subject: [PATCH v3 08/10] KVM: x86: Add nested context management
-Date: Fri, 21 Nov 2025 11:11:11 +0000
-Message-ID: <20251121111113.456628-9-griffoul@gmail.com>
+Subject: [PATCH v3 09/10] KVM: nVMX: Use nested context for pfncache persistence
+Date: Fri, 21 Nov 2025 11:11:12 +0000
+Message-ID: <20251121111113.456628-10-griffoul@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251121111113.456628-1-griffoul@gmail.com>
 References: <20251121111113.456628-1-griffoul@gmail.com>
@@ -100,357 +100,407 @@ Content-Transfer-Encoding: 8bit
 
 From: Fred Griffoul <fgriffo@amazon.co.uk>
 
-Add infrastructure to persist nested virtualization state when L2 vCPUs
-are switched on an L1 vCPU or migrated between L1 vCPUs.
+Extend the nested context infrastructure to preserve gfn_to_pfn_cache
+objects for nested VMX using kvm_nested_context_load() and
+kvm_nested_context_clear() functions.
 
-The nested context table uses a hash table for fast lookup by nested
-control block GPA (VMPTR for VMX, VMCB for SVM) and maintains a free
-list for context management.
+The VMX nested context stores gfn_to_pfn_cache structs for:
+- MSR permission bitmaps
+- APIC access page
+- Virtual APIC page
+- Posted interrupt descriptor
+- Enlightened VMCS
 
-The kvm_nested_context_load() function searches for a context indexed by
-the target GPA; if not found, it allocates a new context up to the
-configured maximum. If at capacity, it recycles the oldest context from
-the free list.
+For traditional nested VMX, those pfn caches are loaded upon 'vmptrld'
+instruction emulation and the context is cleared upon 'vmclear'. This
+follows the normal L2 vCPU migration sequence of
+'vmclear/vmptrld/vmlaunch'.
 
-The oversubscription is hardcoded to support up to 8 L2 vCPUs per L1
-vCPU.
+For enlightened VMCS (eVMCS) support, both functions are called when
+detecting a change in the eVMCS GPA, ensuring proper context management
+for Hyper-V nested scenarios.
 
-The kvm_nested_context_clear() function moves the context to the free
-list while keeping it in the hash table for potential reuse.
-
-This allows nested hypervisors to multiplex multiple L2 vCPUs on L1
-vCPUs without losing cached nested state, significantly improving
-performance for workloads with frequent L2 context switches.
-
-This patch adds the basic infrastructure. Subsequent patches will add
-the nested VMX and SVM specific support to populate and utilize the
-cached nested state.
+By preserving the gfn_to_pfn_cache objects across L2 context switches,
+we avoid costly cache refresh operations, significantly improving nested
+virtualization performance for workloads with frequent L2 vCPU
+multiplexing on an L1 vCPU or L2 vCPUs migrations between L1 vCPUs.
 
 Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
 ---
- arch/x86/include/asm/kvm_host.h |  31 +++++
- arch/x86/include/uapi/asm/kvm.h |   2 +
- arch/x86/kvm/Makefile           |   2 +-
- arch/x86/kvm/nested.c           | 199 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.c              |   5 +-
- 5 files changed, 237 insertions(+), 2 deletions(-)
- create mode 100644 arch/x86/kvm/nested.c
+ arch/x86/kvm/vmx/nested.c | 155 +++++++++++++++++++++++++++++---------
+ arch/x86/kvm/vmx/vmx.c    |   8 ++
+ arch/x86/kvm/vmx/vmx.h    |  10 +--
+ include/linux/kvm_host.h  |   2 +-
+ 4 files changed, 134 insertions(+), 41 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 4675e71b33a7..75f3cd82a073 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1379,6 +1379,28 @@ enum kvm_mmu_type {
- 	KVM_NR_MMU_TYPES,
- };
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 207780ef0926..bd600de29031 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -226,6 +226,93 @@ static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
+ 	vmx->nested.need_vmcs12_to_shadow_sync = false;
+ }
  
-+struct kvm_nested_context {
-+	gpa_t gpa;
-+	struct hlist_node hnode;
-+	struct list_head lru_link;
-+	struct kvm_vcpu *vcpu;
++struct vmx_nested_context {
++	struct kvm_nested_context base;
++	struct gfn_to_pfn_cache msr_bitmap_cache;
++	struct gfn_to_pfn_cache apic_access_page_cache;
++	struct gfn_to_pfn_cache virtual_apic_cache;
++	struct gfn_to_pfn_cache pi_desc_cache;
++#ifdef CONFIG_KVM_HYPERV
++	struct gfn_to_pfn_cache evmcs_cache;
++#endif
 +};
 +
-+struct kvm_nested_context_table {
-+	spinlock_t lock;
-+	u32 count;
-+	struct list_head lru_list;
-+	DECLARE_HASHTABLE(hash, 8);
-+};
-+
-+void kvm_nested_context_clear(struct kvm_vcpu *vcpu, gpa_t gpa);
-+struct kvm_nested_context *kvm_nested_context_load(
-+		struct kvm_vcpu *vcpu,
-+		gpa_t gpa);
-+
-+int kvm_nested_context_table_init(struct kvm *kvm);
-+void kvm_nested_context_table_destroy(struct kvm *kvm);
-+
- struct kvm_arch {
- 	unsigned long n_used_mmu_pages;
- 	unsigned long n_requested_mmu_pages;
-@@ -1618,6 +1640,9 @@ struct kvm_arch {
- 	 * current VM.
- 	 */
- 	int cpu_dirty_log_size;
-+
-+	/* Cache for nested contexts */
-+	struct kvm_nested_context_table *nested_context_table;
- };
- 
- struct kvm_vm_stat {
-@@ -1640,6 +1665,8 @@ struct kvm_vm_stat {
- 	u64 nx_lpage_splits;
- 	u64 max_mmu_page_hash_collisions;
- 	u64 max_mmu_rmap_size;
-+	u64 nested_context_recycle;
-+	u64 nested_context_reuse;
- };
- 
- struct kvm_vcpu_stat {
-@@ -1967,6 +1994,10 @@ struct kvm_x86_nested_ops {
- 			    uint16_t *vmcs_version);
- 	uint16_t (*get_evmcs_version)(struct kvm_vcpu *vcpu);
- 	void (*hv_inject_synthetic_vmexit_post_tlb_flush)(struct kvm_vcpu *vcpu);
-+
-+	struct kvm_nested_context *(*alloc_context)(struct kvm_vcpu *vcpu);
-+	void (*free_context)(struct kvm_nested_context *ctx);
-+	void (*reset_context)(struct kvm_nested_context *ctx);
- };
- 
- struct kvm_x86_init_ops {
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index d420c9c066d4..637ed9286f8e 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -1042,4 +1042,6 @@ struct kvm_tdx_init_mem_region {
- 	__u64 nr_pages;
- };
- 
-+#define KVM_NESTED_OVERSUB_RATIO 8
-+
- #endif /* _ASM_X86_KVM_H */
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index c4b8950c7abe..2a5289cb5bd1 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -6,7 +6,7 @@ ccflags-$(CONFIG_KVM_WERROR) += -Werror
- include $(srctree)/virt/kvm/Makefile.kvm
- 
- kvm-y			+= x86.o emulate.o irq.o lapic.o cpuid.o pmu.o mtrr.o \
--			   debugfs.o mmu/mmu.o mmu/page_track.o mmu/spte.o
-+			   debugfs.o nested.o mmu/mmu.o mmu/page_track.o mmu/spte.o
- 
- kvm-$(CONFIG_X86_64) += mmu/tdp_iter.o mmu/tdp_mmu.o
- kvm-$(CONFIG_KVM_IOAPIC) += i8259.o i8254.o ioapic.o
-diff --git a/arch/x86/kvm/nested.c b/arch/x86/kvm/nested.c
-new file mode 100644
-index 000000000000..986820cb525f
---- /dev/null
-+++ b/arch/x86/kvm/nested.c
-@@ -0,0 +1,199 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include <linux/kvm_host.h>
-+
-+static struct kvm_nested_context_table *kvm_nested_context_table_alloc(void)
++static inline struct vmx_nested_context *to_vmx_nested_context(
++		struct kvm_nested_context *base)
 +{
-+	struct kvm_nested_context_table *table;
-+
-+	table = kzalloc(sizeof(*table), GFP_KERNEL_ACCOUNT);
-+	if (!table)
-+		return NULL;
-+
-+	spin_lock_init(&table->lock);
-+	INIT_LIST_HEAD(&table->lru_list);
-+	hash_init(table->hash);
-+	return table;
++	return base ? container_of(base, struct vmx_nested_context, base) : NULL;
 +}
 +
-+static void kvm_nested_context_table_free(struct kvm_nested_context_table
-+					  *table)
++static struct kvm_nested_context *vmx_nested_context_alloc(struct kvm_vcpu *vcpu)
 +{
-+	kfree(table);
-+}
++	struct vmx_nested_context *ctx;
 +
-+int kvm_nested_context_table_init(struct kvm *kvm)
-+{
-+	struct kvm_nested_context_table *table;
-+
-+	if (!kvm_x86_ops.nested_ops->alloc_context ||
-+	    !kvm_x86_ops.nested_ops->free_context ||
-+	    !kvm_x86_ops.nested_ops->reset_context)
-+		return -EINVAL;
-+
-+	table = kvm_nested_context_table_alloc();
-+	if (!table)
-+		return -ENOMEM;
-+
-+	kvm->arch.nested_context_table = table;
-+	return 0;
-+}
-+
-+void kvm_nested_context_table_destroy(struct kvm *kvm)
-+{
-+	struct kvm_nested_context_table *table;
-+	struct kvm_nested_context *ctx;
-+	struct hlist_node *tmp;
-+	int bkt;
-+
-+	table = kvm->arch.nested_context_table;
-+	if (!table)
-+		return;
-+
-+	hash_for_each_safe(table->hash, bkt, tmp, ctx, hnode) {
-+		hash_del(&ctx->hnode);
-+		kvm_x86_ops.nested_ops->free_context(ctx);
-+	}
-+
-+	kvm_nested_context_table_free(table);
-+}
-+
-+static unsigned int kvm_nested_context_max(struct kvm *kvm)
-+{
-+	return KVM_NESTED_OVERSUB_RATIO * atomic_read(&kvm->online_vcpus);
-+}
-+
-+static struct kvm_nested_context *__kvm_nested_context_find(struct kvm_nested_context_table
-+							    *table, gpa_t gpa)
-+{
-+	struct kvm_nested_context *ctx;
-+
-+	hash_for_each_possible(table->hash, ctx, hnode, gpa) {
-+		if (ctx->gpa == gpa)
-+			return ctx;
-+	}
-+
-+	return NULL;
-+}
-+
-+static struct kvm_nested_context *kvm_nested_context_find(struct
-+							  kvm_nested_context_table
-+							  *table,
-+							  struct kvm_vcpu *vcpu,
-+							  gpa_t gpa)
-+{
-+	struct kvm_nested_context *ctx;
-+
-+	ctx = __kvm_nested_context_find(table, gpa);
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL_ACCOUNT);
 +	if (!ctx)
 +		return NULL;
 +
-+	WARN_ON_ONCE(ctx->vcpu && ctx->vcpu != vcpu);
-+
-+	/* Remove from the LRU list if not attached to a vcpu */
-+	if (!ctx->vcpu)
-+		list_del(&ctx->lru_link);
-+
-+	return ctx;
++	kvm_gpc_init(&ctx->msr_bitmap_cache, vcpu->kvm);
++	kvm_gpc_init_for_vcpu(&ctx->apic_access_page_cache, vcpu);
++	kvm_gpc_init_for_vcpu(&ctx->virtual_apic_cache, vcpu);
++	kvm_gpc_init_for_vcpu(&ctx->pi_desc_cache, vcpu);
++#ifdef CONFIG_KVM_HYPERV
++	kvm_gpc_init(&ctx->evmcs_cache, vcpu->kvm);
++#endif
++	return &ctx->base;
 +}
 +
-+static struct kvm_nested_context *kvm_nested_context_recycle(struct
-+							     kvm_nested_context_table
-+							     *table)
++static void vmx_nested_context_reset(struct kvm_nested_context *base)
 +{
-+	struct kvm_nested_context *ctx;
-+
-+	if (list_empty(&table->lru_list))
-+		return NULL;
-+
-+	ctx =
-+	    list_first_entry(&table->lru_list, struct kvm_nested_context,
-+			     lru_link);
-+	list_del(&ctx->lru_link);
-+	hash_del(&ctx->hnode);
-+	return ctx;
++	/*
++	 * Skip pfncache reinitialization: active ones will be refreshed on
++	 * access.
++	 */
 +}
 +
-+static void kvm_nested_context_insert(struct kvm_nested_context_table *table,
-+				      struct kvm_nested_context *ctx, gpa_t gpa)
++static void vmx_nested_context_free(struct kvm_nested_context *base)
 +{
-+	hash_add(table->hash, &ctx->hnode, gpa);
-+	ctx->gpa = gpa;
++	struct vmx_nested_context *ctx = to_vmx_nested_context(base);
++
++	kvm_gpc_deactivate(&ctx->pi_desc_cache);
++	kvm_gpc_deactivate(&ctx->virtual_apic_cache);
++	kvm_gpc_deactivate(&ctx->apic_access_page_cache);
++	kvm_gpc_deactivate(&ctx->msr_bitmap_cache);
++#ifdef CONFIG_KVM_HYPERV
++	kvm_gpc_deactivate(&ctx->evmcs_cache);
++#endif
++	kfree(ctx);
 +}
 +
-+struct kvm_nested_context *kvm_nested_context_load(struct kvm_vcpu *vcpu,
-+						   gpa_t gpa)
++static void vmx_nested_context_load(struct vcpu_vmx *vmx, gpa_t vmptr)
 +{
-+	struct kvm_nested_context_table *table;
-+	struct kvm_nested_context *ctx, *new_ctx = NULL;
-+	struct kvm *vm = vcpu->kvm;
-+	bool reset = false;
++	struct vmx_nested_context *ctx;
 +
-+	table = vcpu->kvm->arch.nested_context_table;
-+	if (WARN_ON_ONCE(!table))
-+		return NULL;
-+retry:
-+	spin_lock(&table->lock);
-+	ctx = kvm_nested_context_find(table, vcpu, gpa);
++	ctx = to_vmx_nested_context(kvm_nested_context_load(&vmx->vcpu, vmptr));
 +	if (!ctx) {
-+		/* At capacity? Recycle the LRU context */
-+		if (table->count >= kvm_nested_context_max(vcpu->kvm)) {
-+			ctx = kvm_nested_context_recycle(table);
-+			if (unlikely(!ctx))
-+				goto finish;
-+
-+			kvm_nested_context_insert(table, ctx, gpa);
-+			++vm->stat.nested_context_recycle;
-+			reset = true;
-+
-+		} else if (new_ctx) {
-+			++table->count;
-+			ctx = new_ctx;
-+			kvm_nested_context_insert(table, ctx, gpa);
-+			new_ctx = NULL;
-+
-+		} else {
-+			/* Allocate a new context without holding the lock */
-+			spin_unlock(&table->lock);
-+			new_ctx = kvm_x86_ops.nested_ops->alloc_context(vcpu);
-+			if (unlikely(!new_ctx))
-+				return NULL;
-+
-+			goto retry;
-+		}
-+	} else
-+		++vm->stat.nested_context_reuse;
-+
-+	ctx->vcpu = vcpu;
-+finish:
-+	spin_unlock(&table->lock);
-+
-+	if (new_ctx)
-+		kvm_x86_ops.nested_ops->free_context(new_ctx);
-+
-+	if (reset)
-+		kvm_x86_ops.nested_ops->reset_context(ctx);
-+
-+	return ctx;
-+}
-+
-+void kvm_nested_context_clear(struct kvm_vcpu *vcpu, gpa_t gpa)
-+{
-+	struct kvm_nested_context_table *table;
-+	struct kvm_nested_context *ctx;
-+
-+	table = vcpu->kvm->arch.nested_context_table;
-+	if (WARN_ON_ONCE(!table))
-+		return;
-+
-+	spin_lock(&table->lock);
-+	ctx = __kvm_nested_context_find(table, gpa);
-+	if (ctx && ctx->vcpu) {
 +		/*
-+		 * Move to LRU list but keep it in the hash table for possible future
-+		 * reuse.
++		 * The cache could not be allocated. In the unlikely case of no
++		 * available memory, an error will be returned to L1 when
++		 * mapping the vmcs12 pages. More likely the current pfncaches
++		 * will be reused (and refreshed since their GPAs do not
++		 * match).
 +		 */
-+		list_add_tail(&ctx->lru_link, &table->lru_list);
-+		ctx->vcpu = NULL;
++		return;
 +	}
-+	spin_unlock(&table->lock);
++
++	vmx->nested.msr_bitmap_cache = &ctx->msr_bitmap_cache;
++	vmx->nested.apic_access_page_cache = &ctx->apic_access_page_cache;
++	vmx->nested.virtual_apic_cache = &ctx->virtual_apic_cache;
++	vmx->nested.pi_desc_cache = &ctx->pi_desc_cache;
++#ifdef CONFIG_KVM_HYPERV
++	vmx->nested.hv_evmcs_cache = &ctx->evmcs_cache;
++#endif
 +}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1a9c1171df49..db13b1921aff 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -255,7 +255,9 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
- 	STATS_DESC_ICOUNTER(VM, pages_1g),
- 	STATS_DESC_ICOUNTER(VM, nx_lpage_splits),
- 	STATS_DESC_PCOUNTER(VM, max_mmu_rmap_size),
--	STATS_DESC_PCOUNTER(VM, max_mmu_page_hash_collisions)
-+	STATS_DESC_PCOUNTER(VM, max_mmu_page_hash_collisions),
-+	STATS_DESC_COUNTER(VM, nested_context_recycle),
-+	STATS_DESC_COUNTER(VM, nested_context_reuse)
- };
++
++static void vmx_nested_context_clear(struct vcpu_vmx *vmx, gpa_t vmptr)
++{
++	kvm_nested_context_clear(&vmx->vcpu, vmptr);
++}
++
+ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+ {
+ #ifdef CONFIG_KVM_HYPERV
+@@ -325,6 +412,9 @@ static int nested_gpc_lock(struct gfn_to_pfn_cache *gpc, gpa_t gpa)
  
- const struct kvm_stats_header kvm_vm_stats_header = {
-@@ -13311,6 +13313,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 	kvm_page_track_cleanup(kvm);
- 	kvm_xen_destroy_vm(kvm);
- 	kvm_hv_destroy_vm(kvm);
-+	kvm_nested_context_table_destroy(kvm);
- 	kvm_x86_call(vm_destroy)(kvm);
+ 	if (!PAGE_ALIGNED(gpa))
+ 		return -EINVAL;
++
++	if (WARN_ON_ONCE(!gpc))
++		return -ENOENT;
+ retry:
+ 	read_lock(&gpc->lock);
+ 	if (!kvm_gpc_check(gpc, PAGE_SIZE) || (gpc->gpa != gpa)) {
+@@ -387,14 +477,6 @@ static void free_nested(struct kvm_vcpu *vcpu)
+ 	vmx->nested.smm.vmxon = false;
+ 	vmx->nested.vmxon_ptr = INVALID_GPA;
+ 
+-	kvm_gpc_deactivate(&vmx->nested.pi_desc_cache);
+-	kvm_gpc_deactivate(&vmx->nested.virtual_apic_cache);
+-	kvm_gpc_deactivate(&vmx->nested.apic_access_page_cache);
+-	kvm_gpc_deactivate(&vmx->nested.msr_bitmap_cache);
+-#ifdef CONFIG_KVM_HYPERV
+-	kvm_gpc_deactivate(&vmx->nested.hv_evmcs_cache);
+-#endif
+-
+ 	free_vpid(vmx->nested.vpid02);
+ 	vmx->nested.posted_intr_nv = -1;
+ 	vmx->nested.current_vmptr = INVALID_GPA;
+@@ -697,7 +779,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+ 			return true;
+ 	}
+ 
+-	gpc = &vmx->nested.msr_bitmap_cache;
++	gpc = vmx->nested.msr_bitmap_cache;
+ 	if (nested_gpc_lock(gpc, vmcs12->msr_bitmap))
+ 		return false;
+ 
+@@ -2186,7 +2268,13 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+ 		return EVMPTRLD_DISABLED;
+ 	}
+ 
+-	gpc = &vmx->nested.hv_evmcs_cache;
++	if (evmcs_gpa != vmx->nested.hv_evmcs_vmptr) {
++		vmx_nested_context_clear(vmx, vmx->nested.hv_evmcs_vmptr);
++		vmx_nested_context_load(vmx, evmcs_gpa);
++		evmcs_gpa_changed = true;
++	}
++
++	gpc = vmx->nested.hv_evmcs_cache;
+ 	if (nested_gpc_lock(gpc, evmcs_gpa)) {
+ 		nested_release_evmcs(vcpu);
+ 		return EVMPTRLD_ERROR;
+@@ -2194,9 +2282,8 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+ 
+ 	evmcs = gpc->khva;
+ 
+-	if (unlikely(evmcs_gpa != vmx->nested.hv_evmcs_vmptr)) {
++	if (evmcs_gpa_changed) {
+ 		vmx->nested.current_vmptr = INVALID_GPA;
+-
+ 		nested_release_evmcs(vcpu);
+ 
+ 		/*
+@@ -2230,7 +2317,6 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+ 
+ 		vmx->nested.hv_evmcs_vmptr = evmcs_gpa;
+ 
+-		evmcs_gpa_changed = true;
+ 		/*
+ 		 * Unlike normal vmcs12, enlightened vmcs12 is not fully
+ 		 * reloaded from guest's memory (read only fields, fields not
+@@ -3538,7 +3624,7 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 
+ 
+ 	if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
+-		gpc = &vmx->nested.apic_access_page_cache;
++		gpc = vmx->nested.apic_access_page_cache;
+ 
+ 		if (!nested_gpc_hpa(gpc, vmcs12->apic_access_addr, &hpa)) {
+ 			vmcs_write64(APIC_ACCESS_ADDR, hpa);
+@@ -3554,7 +3640,7 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	if (nested_cpu_has(vmcs12, CPU_BASED_TPR_SHADOW)) {
+-		gpc = &vmx->nested.virtual_apic_cache;
++		gpc = vmx->nested.virtual_apic_cache;
+ 
+ 		if (!nested_gpc_hpa(gpc, vmcs12->virtual_apic_page_addr, &hpa)) {
+ 			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, hpa);
+@@ -3580,7 +3666,7 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	if (nested_cpu_has_posted_intr(vmcs12)) {
+-		gpc = &vmx->nested.pi_desc_cache;
++		gpc = vmx->nested.pi_desc_cache;
+ 
+ 		if (!nested_gpc_hpa(gpc, vmcs12->posted_intr_desc_addr & PAGE_MASK, &hpa)) {
+ 			vmx->nested.pi_desc_offset = offset_in_page(vmcs12->posted_intr_desc_addr);
+@@ -3640,9 +3726,9 @@ static bool vmx_is_nested_state_invalid(struct kvm_vcpu *vcpu)
+ 	 * locks. Since kvm_gpc_invalid() doesn't verify gpc memslot
+ 	 * generation, we can also skip acquiring the srcu lock.
+ 	 */
+-	return kvm_gpc_invalid(&vmx->nested.apic_access_page_cache) ||
+-		kvm_gpc_invalid(&vmx->nested.virtual_apic_cache) ||
+-		kvm_gpc_invalid(&vmx->nested.pi_desc_cache);
++	return kvm_gpc_invalid(vmx->nested.apic_access_page_cache) ||
++		kvm_gpc_invalid(vmx->nested.virtual_apic_cache) ||
++		kvm_gpc_invalid(vmx->nested.pi_desc_cache);
  }
  
+ static int nested_vmx_write_pml_buffer(struct kvm_vcpu *vcpu, gpa_t gpa)
+@@ -4138,6 +4224,8 @@ void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu)
+ 
+ static void *nested_gpc_lock_if_active(struct gfn_to_pfn_cache *gpc)
+ {
++	if (!gpc)
++		return NULL;
+ retry:
+ 	read_lock(&gpc->lock);
+ 	if (!gpc->active) {
+@@ -4158,12 +4246,12 @@ static void *nested_gpc_lock_if_active(struct gfn_to_pfn_cache *gpc)
+ #ifdef CONFIG_KVM_HYPERV
+ struct hv_enlightened_vmcs *nested_lock_evmcs(struct vcpu_vmx *vmx)
+ {
+-	return nested_gpc_lock_if_active(&vmx->nested.hv_evmcs_cache);
++	return nested_gpc_lock_if_active(vmx->nested.hv_evmcs_cache);
+ }
+ 
+ void nested_unlock_evmcs(struct vcpu_vmx *vmx)
+ {
+-	nested_gpc_unlock(&vmx->nested.hv_evmcs_cache);
++	nested_gpc_unlock(vmx->nested.hv_evmcs_cache);
+ }
+ #endif
+ 
+@@ -4171,7 +4259,7 @@ static struct pi_desc *nested_lock_pi_desc(struct vcpu_vmx *vmx)
+ {
+ 	u8 *pi_desc_page;
+ 
+-	pi_desc_page = nested_gpc_lock_if_active(&vmx->nested.pi_desc_cache);
++	pi_desc_page = nested_gpc_lock_if_active(vmx->nested.pi_desc_cache);
+ 	if (!pi_desc_page)
+ 		return NULL;
+ 
+@@ -4180,17 +4268,17 @@ static struct pi_desc *nested_lock_pi_desc(struct vcpu_vmx *vmx)
+ 
+ static void nested_unlock_pi_desc(struct vcpu_vmx *vmx)
+ {
+-	nested_gpc_unlock(&vmx->nested.pi_desc_cache);
++	nested_gpc_unlock(vmx->nested.pi_desc_cache);
+ }
+ 
+ static void *nested_lock_vapic(struct vcpu_vmx *vmx)
+ {
+-	return nested_gpc_lock_if_active(&vmx->nested.virtual_apic_cache);
++	return nested_gpc_lock_if_active(vmx->nested.virtual_apic_cache);
+ }
+ 
+ static void nested_unlock_vapic(struct vcpu_vmx *vmx)
+ {
+-	nested_gpc_unlock(&vmx->nested.virtual_apic_cache);
++	nested_gpc_unlock(vmx->nested.virtual_apic_cache);
+ }
+ 
+ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+@@ -5649,16 +5737,6 @@ static int enter_vmx_operation(struct kvm_vcpu *vcpu)
+ 		      HRTIMER_MODE_ABS_PINNED);
+ 
+ 	vmx->nested.vpid02 = allocate_vpid();
+-
+-	kvm_gpc_init(&vmx->nested.msr_bitmap_cache, vcpu->kvm);
+-
+-	kvm_gpc_init_for_vcpu(&vmx->nested.apic_access_page_cache, vcpu);
+-	kvm_gpc_init_for_vcpu(&vmx->nested.virtual_apic_cache, vcpu);
+-	kvm_gpc_init_for_vcpu(&vmx->nested.pi_desc_cache, vcpu);
+-
+-#ifdef CONFIG_KVM_HYPERV
+-	kvm_gpc_init(&vmx->nested.hv_evmcs_cache, vcpu->kvm);
+-#endif
+ 	vmx->nested.vmcs02_initialized = false;
+ 	vmx->nested.vmxon = true;
+ 
+@@ -5854,6 +5932,8 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
+ 					   &zero, sizeof(zero));
+ 	}
+ 
++	vmx_nested_context_clear(vmx, vmptr);
++
+ 	return nested_vmx_succeed(vcpu);
+ }
+ 
+@@ -6098,6 +6178,8 @@ static void set_current_vmptr(struct vcpu_vmx *vmx, gpa_t vmptr)
+ 	}
+ 	vmx->nested.dirty_vmcs12 = true;
+ 	vmx->nested.force_msr_bitmap_recalc = true;
++
++	vmx_nested_context_load(vmx, vmptr);
+ }
+ 
+ /* Emulate the VMPTRLD instruction */
+@@ -7687,4 +7769,7 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
+ 	.get_evmcs_version = nested_get_evmcs_version,
+ 	.hv_inject_synthetic_vmexit_post_tlb_flush = vmx_hv_inject_synthetic_vmexit_post_tlb_flush,
+ #endif
++	.alloc_context = vmx_nested_context_alloc,
++	.free_context = vmx_nested_context_free,
++	.reset_context = vmx_nested_context_reset,
+ };
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 546272a5d34d..30b13241ae45 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7666,6 +7666,14 @@ int vmx_vm_init(struct kvm *kvm)
+ 
+ 	if (enable_pml)
+ 		kvm->arch.cpu_dirty_log_size = PML_LOG_NR_ENTRIES;
++
++	if (nested) {
++		int err;
++
++		err = kvm_nested_context_table_init(kvm);
++		if (err)
++			return err;
++	}
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 4da5a42b0c60..56b96e50290f 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -152,15 +152,15 @@ struct nested_vmx {
+ 
+ 	struct loaded_vmcs vmcs02;
+ 
+-	struct gfn_to_pfn_cache msr_bitmap_cache;
++	struct gfn_to_pfn_cache *msr_bitmap_cache;
+ 
+ 	/*
+ 	 * Guest pages referred to in the vmcs02 with host-physical
+ 	 * pointers, so we must keep them pinned while L2 runs.
+ 	 */
+-	struct gfn_to_pfn_cache apic_access_page_cache;
+-	struct gfn_to_pfn_cache virtual_apic_cache;
+-	struct gfn_to_pfn_cache pi_desc_cache;
++	struct gfn_to_pfn_cache *apic_access_page_cache;
++	struct gfn_to_pfn_cache *virtual_apic_cache;
++	struct gfn_to_pfn_cache *pi_desc_cache;
+ 
+ 	u64 pi_desc_offset;
+ 	bool pi_pending;
+@@ -208,7 +208,7 @@ struct nested_vmx {
+ 	u32 hv_clean_fields;
+ 	bool hv_msr_bitmap;
+ 	bool hv_flush_hypercall;
+-	struct gfn_to_pfn_cache hv_evmcs_cache;
++	struct gfn_to_pfn_cache *hv_evmcs_cache;
+ #endif
+ };
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index b05aace9e295..97e0b949e412 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1533,7 +1533,7 @@ static inline bool kvm_gpc_is_hva_active(struct gfn_to_pfn_cache *gpc)
+ 
+ static inline bool kvm_gpc_invalid(struct gfn_to_pfn_cache *gpc)
+ {
+-	return gpc->active && !gpc->valid;
++	return gpc && gpc->active && !gpc->valid;
+ }
+ 
+ void kvm_sigset_activate(struct kvm_vcpu *vcpu);
 -- 
 2.43.0
 
