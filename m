@@ -1,318 +1,215 @@
-Return-Path: <kvm+bounces-64156-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64157-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 473E0C7A783
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 16:19:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B37C9C7A86A
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 16:25:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EC5834EE0F1
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 15:11:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 29A724ED451
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 15:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AB482D9EDD;
-	Fri, 21 Nov 2025 15:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A1F27B35F;
+	Fri, 21 Nov 2025 15:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="h03wW9gY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RVLB8nPd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2948A288C86;
-	Fri, 21 Nov 2025 15:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AD0355815;
+	Fri, 21 Nov 2025 15:15:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763737866; cv=none; b=JfM9CboLFdY6jG8DP4Wpg4+O8/JRHA6AggFDh/YU0X7I/1ikxQpaQ3dMHr8W8wHgs4t0vYQ5bZsPClJT6hAWASMtZUyTpfAJsGq5vB+AW8WQ0gthY9gy52PrBvw1dB91oB7ZwnCXFn63WOA0d0NqCNVBkCAVxLPIjdyaWyBA6VI=
+	t=1763738116; cv=none; b=Pob15daIE+E+6kebs3IcWewW+uJSqYa/T7DUU4Af3gCivFkTrMpmLkoLet/vqPxBdA2jktGNgbfPM3QiuWGy2JLXRTQeiaM3ny7ZdF9TESV7OKYg9w72BHO2IIrBnPeJUpm5OVlBm6EN3ulUNTHFyODwpMrINKfixXJHSxJUCZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763737866; c=relaxed/simple;
-	bh=Gbi8Ncy5CZiM7aZnnYqb5XfnQM+zGFpFUb1CSpVAYHA=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:Cc:To:
-	 References:In-Reply-To; b=gQwSR8TLfw1TlVetwt4O1Pzvlk2ijX76nP0MxhxZJQJrNYPfB3isMFPR3XiLTIU05CDfPJ3QYO9js37q40ZTNpa+pxH0fqwjHyUpuupz8jprEbyqUEizKRKqZWe2qaNs2YrZFWel/gvqvwCFEVCmOw0uCIAW1Np84NhyPwsB5m8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=h03wW9gY; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5ALEWURX023454;
-	Fri, 21 Nov 2025 15:10:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=UBZWGq
-	6deHy/W5Je0L4Ak+pL2cvdRhOVS+aEBwQhdQk=; b=h03wW9gYrsh+w/sVs/SxhP
-	Bx76prxrLXvkg0t2iXjfSJyEibXqI90Rro0X5PViimyLsOt/5JF5WUV+ki+YcRLM
-	wjykfsSewe/kyJAlnCbZl5n+rKZEeNoBJnAUv+j64d1JnbPnlAq9ZvwrKlApI6fm
-	odZpQnQ0Dh1w26W7wmAO9pE+eVbOlP559pLMs8EZbuBlQx4LYivlQACHX04KeGFw
-	CdPvZV7M8CeE60AHTIITtAyMriptlQoV36DQnobYhko/KfL1AymZwJU6KW8QmLPe
-	RPC0wl7+7Ywb1v5bELRP8wKcN5teG3DF2T7i3+ttNU5ijLNjp2vaYP6d6fltW+dw
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejk1vpjh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Nov 2025 15:10:53 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5ALCL3Pd005065;
-	Fri, 21 Nov 2025 15:10:52 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4af5bkmtjt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Nov 2025 15:10:51 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ALFAlmk11469126
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 21 Nov 2025 15:10:47 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A090620043;
-	Fri, 21 Nov 2025 15:10:47 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7309020040;
-	Fri, 21 Nov 2025 15:10:47 +0000 (GMT)
-Received: from darkmoore (unknown [9.111.24.50])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 21 Nov 2025 15:10:47 +0000 (GMT)
+	s=arc-20240116; t=1763738116; c=relaxed/simple;
+	bh=tGkLoaIerxSzCgo8kr0dzfb3bmHGcG6BnOlM4l+YMg4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YYgzcdcrRQEqW1gRY/+8cNrcH+Jw+aTgKyhyQtYny9UehqjJB0NEqlzlI6AqobBWtplt6Y9dQHjj5kj5SyEYypKBdGsuhAExHQnR91wbP2IYdjCSSMbN+1f0QsYO6T+67867D6Ekq5WQHNkSEfc//dgtMJCgC9yesw71TuPAgOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RVLB8nPd; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763738115; x=1795274115;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=tGkLoaIerxSzCgo8kr0dzfb3bmHGcG6BnOlM4l+YMg4=;
+  b=RVLB8nPd70IetbwiaInnhZWFvIykdtPeOD7keAFYtHqvdMDRjGp/HUzS
+   oAKA9Xal0mVs7jFYAPMM6MJnEnTNcHJgWyBZU/5P1BPcNLgRkLcqwQY4c
+   HS8sj/fiaPkw3JQPCG2vwfe6km9mMT0GTtRXw1bnX35VpPgy5YTpNUeZe
+   G7Pdi2G5xMwrQTBcevP7nk3noRvYAbjmra8rBVStfEU3nRkzNCgnPnQkG
+   UbGvEc/I3gnoy4Pn5zSuYgjIH+B5WRSG/b9EKOzzZ9zE2da65KWyz7Iks
+   arS8AZZPMMOuZIT+DBWO507xK5U8oJYaqVHi/j4ScCQDviBKCNCb3CmhO
+   A==;
+X-CSE-ConnectionGUID: 4oOgPnyNRJqiDPrnGzS5aw==
+X-CSE-MsgGUID: M6vZhUK3RaiGj5ridH4ufg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11620"; a="69690052"
+X-IronPort-AV: E=Sophos;i="6.20,216,1758610800"; 
+   d="scan'208";a="69690052"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 07:15:15 -0800
+X-CSE-ConnectionGUID: fpyK4875SNCv4NIwY/lWmQ==
+X-CSE-MsgGUID: amSWJXh2SBCjtU4H+qZSog==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,216,1758610800"; 
+   d="scan'208";a="191499047"
+Received: from jmaxwel1-mobl.amr.corp.intel.com (HELO [10.125.110.33]) ([10.125.110.33])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 07:15:15 -0800
+Message-ID: <ca331aa3-6304-4e07-9ed9-94dc69726382@intel.com>
+Date: Fri, 21 Nov 2025 07:15:13 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 08/26] x86/virt/tdx: Add tdx_enable_ext() to enable of
+ TDX Module Extensions
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: linux-coco@lists.linux.dev, linux-pci@vger.kernel.org,
+ chao.gao@intel.com, dave.jiang@intel.com, baolu.lu@linux.intel.com,
+ yilun.xu@intel.com, zhenzhong.duan@intel.com, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, dave.hansen@linux.intel.com,
+ dan.j.williams@intel.com, kas@kernel.org, x86@kernel.org
+References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
+ <20251117022311.2443900-9-yilun.xu@linux.intel.com>
+ <cfcfb160-fcd2-4a75-9639-5f7f0894d14b@intel.com>
+ <aRyphEW2jpB/3Ht2@yilunxu-OptiPlex-7050>
+ <62bec236-4716-4326-8342-1863ad8a3f24@intel.com>
+ <aR6ws2yzwQumApb9@yilunxu-OptiPlex-7050>
+ <13e894a8-474f-465a-a13a-5d892efbfadb@intel.com>
+ <aSBg+5rS1Y498gHx@yilunxu-OptiPlex-7050>
+Content-Language: en-US
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <aSBg+5rS1Y498gHx@yilunxu-OptiPlex-7050>
 Content-Type: text/plain; charset=UTF-8
-Date: Fri, 21 Nov 2025 16:10:42 +0100
-Message-Id: <DEEGVV2BJUF7.3QYGABJQ3HMV9@linux.ibm.com>
-Subject: Re: [PATCH RFC v2 07/11] KVM: s390: Shadow VSIE SCA in guest-1
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <linux-s390@vger.kernel.org>, "Heiko Carstens" <hca@linux.ibm.com>,
-        "Vasily Gorbik" <gor@linux.ibm.com>,
-        "Alexander Gordeev"
- <agordeev@linux.ibm.com>,
-        "Christian Borntraeger"
- <borntraeger@linux.ibm.com>,
-        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
-        "Nico Boehr" <nrb@linux.ibm.com>,
-        "David Hildenbrand" <david@redhat.com>,
-        "Sven Schnelle" <svens@linux.ibm.com>,
-        "Paolo Bonzini"
- <pbonzini@redhat.com>,
-        "Shuah Khan" <shuah@kernel.org>
-To: "Janosch Frank" <frankja@linux.ibm.com>,
-        "Christoph Schlameuss"
- <schlameuss@linux.ibm.com>,
-        <kvm@vger.kernel.org>
-X-Mailer: aerc 0.21.0
-References: <20251110-vsieie-v2-0-9e53a3618c8c@linux.ibm.com>
- <20251110-vsieie-v2-7-9e53a3618c8c@linux.ibm.com>
- <0bd2c3f1-211e-41b3-a3ce-8d9ccfe2b1c0@linux.ibm.com>
-In-Reply-To: <0bd2c3f1-211e-41b3-a3ce-8d9ccfe2b1c0@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=C/nkCAP+ c=1 sm=1 tr=0 ts=692080fd cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=zLEXaDGtvme6yjfbcSsA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: dvf_s_gMTIPbHJ1bUieaeVi7a2q2ldNr
-X-Proofpoint-ORIG-GUID: dvf_s_gMTIPbHJ1bUieaeVi7a2q2ldNr
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfXwKwwDkDPytOU
- DUQdSS4013ymppv34Rmkc6dNder8nM0qthgdLF4UbkArMj5vi7SBxYflZaAsGAMXE/5sVMTX4VH
- T7CP4rQ9JHRMlCpVtsoGwCXpTrS3stfSe9yugDjLM5gJGQEZmLeKObjVvX210m5hXu9oZTzjbHP
- gG15uh+ObQoKZ35JOrnGrLYXQhvA7t9iPWW5oarqPGNBxNqcEqSeD2+i40EdF5yz0kniGwfOtzo
- hqhWhWmq8I5j0JAix6+jU45c/pxLI3nw6o/KZoszVUL/JkjcQaZXG+fMf13sD5EGzsRl68qLYli
- iReOfTXBLIj2XEE1qfRnt52SIRSCEu5lMS33nf4J1t5h9rrPtvR74itbtrgepeRoAEtWl98RDxq
- OfMJDZ8FrdIyIkX6sm9FgUR+afSS6Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-21_03,2025-11-21_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 spamscore=0 impostorscore=0 bulkscore=0
- malwarescore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511150032
+Content-Transfer-Encoding: 7bit
 
-On Tue Nov 18, 2025 at 5:04 PM CET, Janosch Frank wrote:
-> On 11/10/25 18:16, Christoph Schlameuss wrote:
->> Restructure kvm_s390_handle_vsie() to create a guest-1 shadow of the SCA
->> if guest-2 attempts to enter SIE with an SCA. If the SCA is used the
->> vsie_pages are stored in a new vsie_sca struct instead of the arch vsie
->> struct.
->>=20
->> When the VSIE-Interpretation-Extension Facility is active (minimum z17)
->> the shadow SCA (ssca_block) will be created and shadows of all CPUs
->> defined in the configuration are created.
->> SCAOL/H in the VSIE control block are overwritten with references to the
->> shadow SCA.
->>=20
->> The shadow SCA contains the addresses of the original guest-3 SCA as
->> well as the original VSIE control blocks. With these addresses the
->> machine can directly monitor the intervention bits within the original
->> SCA entries, enabling it to handle SENSE_RUNNING and EXTERNAL_CALL sigp
->> instructions without exiting VSIE.
->>=20
->> The original SCA will be pinned in guest-2 memory and only be unpinned
->> before reuse. This means some pages might still be pinned even after the
->> guest 3 VM does no longer exist.
->>=20
->> The ssca_blocks are also kept within a radix tree to reuse already
->> existing ssca_blocks efficiently. While the radix tree and array with
->> references to the ssca_blocks are held in the vsie_sca struct.
->> The use of vsie_scas is tracked using an ref_count.
->>=20
->> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
->> ---
->>   arch/s390/include/asm/kvm_host.h       |  11 +-
->>   arch/s390/include/asm/kvm_host_types.h |   5 +-
->>   arch/s390/kvm/kvm-s390.c               |   6 +-
->>   arch/s390/kvm/kvm-s390.h               |   2 +-
->>   arch/s390/kvm/vsie.c                   | 672 +++++++++++++++++++++++++=
-+++-----
->>   5 files changed, 596 insertions(+), 100 deletions(-)
->>=20
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kv=
-m_host.h
->> index 647014edd3de8abc15067e7203c4855c066c53ad..191b23edf0ac7e9a3e1fd9cd=
-c6fc4c9a9e6769f8 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -597,13 +597,22 @@ struct sie_page2 {
->>   };
->>  =20
->>   struct vsie_page;
->> +struct vsie_sca;
->>  =20
->> +/*
->> + * vsie_pages, scas and accompanied management vars
->> + */
->>   struct kvm_s390_vsie {
->>   	struct mutex mutex;
->>   	struct radix_tree_root addr_to_page;
->>   	int page_count;
->>   	int next;
->> -	struct vsie_page *pages[KVM_MAX_VCPUS];
->> +	struct vsie_page *pages[KVM_S390_MAX_VSIE_VCPUS];
->> +	struct rw_semaphore ssca_lock;
->
-> Might make sense to name it sca_lock, since we're not locking sscas.
->
->> +	struct radix_tree_root osca_to_sca;
->> +	int sca_count;
->> +	int sca_next;
->> +	struct vsie_sca *scas[KVM_S390_MAX_VSIE_VCPUS];
->>   };
->>  =20
->
-> [...]
->
->> +
->> +/*
->> + * Pin and get an existing or new guest system control area.
->> + *
->> + * May sleep.
->> + */
->> +static struct vsie_sca *get_vsie_sca(struct kvm_vcpu *vcpu, struct vsie=
-_page *vsie_page,
->> +				     gpa_t sca_addr)
->> +{
->> +	struct vsie_sca *sca, *sca_new =3D NULL;
->> +	struct kvm *kvm =3D vcpu->kvm;
->> +	unsigned int max_sca;
->> +	int rc;
->> +
->> +	rc =3D validate_scao(vcpu, vsie_page->scb_o, vsie_page->sca_gpa);
->> +	if (rc)
->> +		return ERR_PTR(rc);
->> +
->> +	/* get existing sca */
->> +	down_read(&kvm->arch.vsie.ssca_lock);
->> +	sca =3D get_existing_vsie_sca(kvm, sca_addr);
->> +	up_read(&kvm->arch.vsie.ssca_lock);
->> +	if (sca)
->> +		return sca;
->> +
->> +	/*
->> +	 * Allocate new ssca, it will likely be needed below.
->> +	 * We want at least #online_vcpus shadows, so every VCPU can execute t=
-he
->> +	 * VSIE in parallel. (Worst case all single core VMs.)
->> +	 */
->
-> We're allocating an SCA and then its SSCA.
->
+On 11/21/25 04:54, Xu Yilun wrote:
+...
+> For now, TDX Module Extensions consume quite large amount of memory
+> (12800 pages), print this readout value on TDX Module Extentions
+> initialization.
 
-Fixed.
+Overall, the description is looking better, thanks!
 
->> +	max_sca =3D MIN(atomic_read(&kvm->online_vcpus), KVM_S390_MAX_VSIE_VCP=
-US);
->> +	if (kvm->arch.vsie.sca_count < max_sca) {
->> +		BUILD_BUG_ON(sizeof(struct vsie_sca) > PAGE_SIZE);
->> +		sca_new =3D (void *)__get_free_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
->> +		if (!sca_new)
->> +			return ERR_PTR(-ENOMEM);
->> +
->> +		if (use_vsie_sigpif(vcpu->kvm)) {
->> +			BUILD_BUG_ON(offsetof(struct ssca_block, cpu) !=3D 64);
->> +			sca_new->ssca =3D alloc_pages_exact(sizeof(*sca_new->ssca),
->> +							  GFP_KERNEL_ACCOUNT | __GFP_ZERO);
->> +			if (!sca_new->ssca) {
->> +				free_page((unsigned long)sca);
->
-> Shouldn't this be sca_new which we just allocated?
-> I think it might have been a mistake to have both sca and sca_new in=20
-> this function even though I understand why you need it.
->
+A few more nits, though. Please don't talk about things in terms of
+number of pages. Just give the usage in megabytes.
 
-Yes it should. But I did already simplify this nested allocation into a sin=
-gle
-allocation for the next version. So it will be simpler.
 
->> +				sca_new =3D NULL;
->
-> Why?
-> We're returning in the next line.
->
+>>> --- a/arch/x86/virt/vmx/tdx/tdx.h
+>>> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+>>> @@ -46,6 +46,7 @@
+>>>  #define TDH_PHYMEM_PAGE_WBINVD         41
+>>>  #define TDH_VP_WR                      43
+>>>  #define TDH_SYS_CONFIG                 45
+>>> +#define TDH_SYS_CONFIG_V1              (TDH_SYS_CONFIG | (1ULL << TDX_VERSION_SHIFT))
+>>>
+>>> And if a SEAMCALL needs export, add new tdh_foobar() helper. Anyway
+>>> the parameter list should be different.
+>>
+>> I'd need quite a bit of convincing that this is the right way.
+>>
+>> What is the scenario where there's a:
+>>
+>> 	TDH_SYS_CONFIG_V1
+>> and
+>> 	TDH_SYS_CONFIG_V2
+>>
+>> in the tree at the same time?
+> 
+> I assume you mean TDH_SYS_CONFIG & TDH_SYS_CONFIG_V1.
 
-Only out of an abundance of cleanup. Will remove these for local variables =
-in
-error paths.
+Sure. But I wasn't being that literal about it. My point was whether we
+need two macros for two simultaneous uses of the same seamcall.
 
->> +				return ERR_PTR(-ENOMEM);
->> +			}
->> +		}
->> +	}
->
-> How about something like:
->
-> Now we're taking the ssca lock in write mode so that we can manipulate=20
-> the radix tree and recheck for existing scas with exclusive access.
->
-> In the next lines we try three things to get an SCA:
->   - Retry getting an existing SCA
->   - Using our newly allocated SCA if we're under the limit
->   - Reusing an SCA with a different osca
->
+> If you want to enable optional features via this seamcall, you must use
+> v1, otherwise v0 & v1 are all good. Mm... I suddenly don't see usecase
+> they must co-exist. Unconditionally use v1 is fine. So does TDH_VP_INIT.
+> 
+> Does that mean we don't have to keep versions, always use the latest is
+> good? (Proper Macro to be used...)
+> 
+>  -#define TDH_SYS_CONFIG                 45
+>  +#define TDH_SYS_CONFIG                 (45 | (1ULL << TDX_VERSION_SHIFT))
 
-Yes, that is a good description. And I see that this is a bit tricky to
-understand to warrant that. Thanks.
+That's my theory: we don't need to keep versions.
 
->> +
->> +	/* enter write lock and recheck to make sure ssca has not been created=
- by other cpu */
->> +	down_write(&kvm->arch.vsie.ssca_lock);
->> +	sca =3D get_existing_vsie_sca(kvm, sca_addr);
->> +	if (sca)
->> +		goto out;
->> +
->> +	/* check again under write lock if we are still under our sca_count li=
-mit */
->> +	if (sca_new && kvm->arch.vsie.sca_count < max_sca) {
->> +		/* make use of vsie_sca just created */
->> +		sca =3D sca_new;
->> +		sca_new =3D NULL;
->> +
->> +		kvm->arch.vsie.scas[kvm->arch.vsie.sca_count] =3D sca;
->> +	} else {
->> +		/* reuse previously created vsie_sca allocation for different osca */
->> +		sca =3D get_free_existing_vsie_sca(kvm);
->> +		/* with nr_vcpus scas one must be free */
->> +		if (IS_ERR(sca))
->> +			goto out;
->> +
->> +		unpin_sca(kvm, sca);
->> +		radix_tree_delete(&kvm->arch.vsie.osca_to_sca, sca->sca_gpa);
->> +		memset(sca, 0, sizeof(struct vsie_sca));
+>> Second, does it hurt to pass the version along with other calls, like
+>> ... (naming a random one) ... TDH_PHYMEM_PAGE_WBINVD ?
+> 
+> I see no runtime hurt, just an extra zero parameter passed around.
+> 
+> And version change always goes with more parameters, if we add version
+> parameter, it looks like:
+> 
+>  u64 tdh_phymem_page_wbinvd_tdr(int version, struct tdx_td *td, int new_param1, int new_param2);
+> 
+> For readability, I prefer the following, they provide clear definitions:
+> 
+>  u64 tdh_phymem_page_wbinvd_tdr(struct tdx_td *td);
+>  u64 tdh_phymem_page_wbinvd_tdr_1(struct tdx_td *td, int new_param1, int new_param2);
+> 
+> But I hope eventually we don't have to keep versions, then we don't have to choose:
+> 
+>  u64 tdh_phymem_page_wbinvd_tdr(struct tdx_td *td, int new_param1, int new_param2);
+
+Sure, but that's not happening today. So for TDX_FEATURES0_TDXCONNECT at
+least, config_tdx_module() doesn't change.
+
+> The TDX Module can only accept one root page (i.e. 512 HPAs at most), while
+> struct tdx_page_array contains the whole EXT memory (12800 pages). So we
+> can't populate all pages into one root page then tell TDX Module. We need to
+> populate one batch, tell tdx module, then populate the next batch, tell
+> tdx module...
+
+That is, indeed, the information that I was looking for. Can you please
+ensure that makes it into code comments?
 
