@@ -1,82 +1,96 @@
-Return-Path: <kvm+bounces-64176-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA3B2C7AEFB
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 17:51:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41DFDC7AED1
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 17:48:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D09644ED61A
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 16:46:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F19F3A3D91
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 16:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 258532F0699;
-	Fri, 21 Nov 2025 16:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA0B34BA31;
+	Fri, 21 Nov 2025 16:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="cBe6vFL5"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="owZ8TKE8";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="5bqFyex+";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="owZ8TKE8";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="5bqFyex+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DE32853E0
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 16:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0158D2F1FCB
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 16:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763743560; cv=none; b=WNqLHkX+V8G2llgcm0zw94YRc61+tcCxWrphQFtA2pkjyvO4OirecWVxbW79z3W8+CFpe5b3euxmDyNyznBnJk7rvsnvdihF/z/zoaIvoXtyxkngI4+NAukSWQQP/eHGSUPGCofs/4YGoKXH6344zZzd+he6djbjbAfr1mCLrAg=
+	t=1763743619; cv=none; b=CdcXJOOfX9PmrDDTi22Ax5gyDd4QSwflozR8xwZo+NyXmB5gvraCkXnngA3QkgRr7W2hi2Q6zlRB+VXJP9EtBTsYdYx4O1CAOPJllfkT3wZHP7HvvLk4ZZvbb3nKau4fHWifqdhEC01PPsumlIJCelVq8gKu3n7rzt2k0WE3lls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763743560; c=relaxed/simple;
-	bh=k/FqFxuRBoSgt8q6bUtFdmNppTd524En0NlEF8Hhe5w=;
+	s=arc-20240116; t=1763743619; c=relaxed/simple;
+	bh=6Qcf6/95TX9jVFioSj7Zc5fKXEhnX1Bc/rO0mYSnoXU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KAIKS1PmHW0Lshy1UaYCzCPle5GFHS/PA3MsaBGSw8U6GjSoibsTWg+KdzGDMJP6AIfggUciSI8EO1usyJ2b/l2efLdoJbaZlq2VzhYN2l2uiDv+RR9kapM+2BHz2sFTJeU7RvyAyF3qhl4pl1ZgUl/0HQEe2rwY1kUTWpgAOIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=cBe6vFL5; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-64198771a9bso4031707a12.2
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 08:45:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1763743556; x=1764348356; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mbdx/pwSTHT2XoZ60wBvSJJHeBLVuIaWD3kGl0+OuSA=;
-        b=cBe6vFL5b1okO7NSV61uA5a3GuvDoEAV5zsSqxF9cl6c+ggRBAMysdq/TcUl3Bfscx
-         F6h5+icS3fbXRaF/vypze6uN9cqRWbA8mrcItnGLZMHdLOGg5b7fYzO9q6d2TdcoaFVK
-         m4R1WS6p2iRvzJG+g8QEIN7yqW2+mzz5GwNKFqflM9jM5AkdiuOQskCe3zO1SekZdK4o
-         3KKWcyidfiFtJmiDhoEXuC2OmsPBXl40RS4329FnYNEMQKCAKUifR1JofAKXhSzudOTI
-         Xs/pRDrCU0mZkpS3eRPHG5BCCL5cN5sNdIjA/5talgBdXeOuw9D1tbyCHzrxjEiz7kYT
-         mufA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763743556; x=1764348356;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mbdx/pwSTHT2XoZ60wBvSJJHeBLVuIaWD3kGl0+OuSA=;
-        b=q4gjusfivb31juZLIKt3JErsW/x392nNa9QYfHYTKOkFEFpB57BF76BvsYhjW5Letl
-         uEl5Obv9WbmGJaMsGkUdISeT0JFMu3pvvaVdIfgHw3JCGFF2TqE50BHo0un5wDazQyLO
-         liiMhOI25r/Wp4LgwA1eOlqsstxHX0MykJj63KoAD5zlNyuIXF6OgevTKKdhyAAvJ7rc
-         4swblA0CCIHFjIWZpMS5G8dDJdqyMx5nxEh2bG5hinNT15gE4Om0JMVZB7D5H1oGUTQw
-         NxU1X+699V9E8lTvzAX8OtZiuBjvLvWtOZYnlAdJExRwJFqg9bMn0zeSOZYosMibvKFn
-         mJPA==
-X-Forwarded-Encrypted: i=1; AJvYcCUXaQM0T8CMEG3Mmp/XCQ7Txw7dz//fOc8ACp5m6cezd3G2Hj7LPOJfuJnmyNdvqLmAuj8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzK+mLSeeMHDfIpxB0BlWAM4B2EII+t3Snk+OC2lZwaSNQ945w
-	8SOxG8wimcAf71Q2E2Yme6Y8dhonWh4ZKHCSq2uQWSo8tkP/n0+e8MzmMNGM9vchVDw=
-X-Gm-Gg: ASbGncsy1XdqaraL+9lgYBjGmpUzqMSoJp/QyumngdiD/aHOnrIhd4b3VUH49xLBVRf
-	OfAvjvVAKVvNzvQmbczxk4YiEtH8NLT3nU08rs+Rg5A5fUC8mL7uVxXFEaMJ4zvZytOxS+VZ8x3
-	K7/Vlsg7OiJa9q5t4ItLLnHtXLMurZZo1xrCZeCwCIV1vFqfajljBl850iCZ3BrzcD37ZBI2gvF
-	ylQKFjecFe4GHNoUo0jeZReaZHCZImfH7YN7ojTY5c3cvl16ahbyJ6POWndt6emTGqOEhRAQwK5
-	3T8Ez3Wk/DtYrE9DwOt7b7SP73o38SzQDTraxHSUHEQN8s79j/Y6ukB9rf4YHDtSVZxM+qgaCUN
-	9M2GP0TxUEiVqVn/3dvBHMQQS9AZ9PSZGKB4aiQOyisb7+8kXQbwftVkPlDExvFXWf6ukFkj4cu
-	kYq9z2N0GfNP4qmKCp07Mm7X9WpHpysTK2mJP+
-X-Google-Smtp-Source: AGHT+IFUhtxnTWEgYbiepq2jGVepveL+2G4t9EyzUqc055PoS6kuHxlSpVbG2sdpiuahMzdaMmfouw==
-X-Received: by 2002:a05:6402:27d3:b0:640:3210:6e48 with SMTP id 4fb4d7f45d1cf-64554339c49mr2575116a12.4.1763743556524;
-        Fri, 21 Nov 2025 08:45:56 -0800 (PST)
-Received: from [192.168.0.20] (nborisov.ddns.nbis.net. [85.187.216.236])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-645363ac96dsm4819572a12.4.2025.11.21.08.45.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Nov 2025 08:45:56 -0800 (PST)
-Message-ID: <e9678dd1-7989-4201-8549-f06f6636274b@suse.com>
-Date: Fri, 21 Nov 2025 18:45:54 +0200
+	 In-Reply-To:Content-Type; b=qeOpQ0zlIfz9Lq3CdZyRCyKYVNCKH2ESGNHMADQ29pFdxkp/x0U85AVu6Vezi+vapCkBfsAiXCfC/EWTAHQK++UvEuGtJYtw0vhNSaNhAfCM3IE9Wm0l2Sl5mjWSrS77bWLL3c3HUMg6EjcQnVU3IxbjcTcu4YMU6Wb/sSgAfKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=owZ8TKE8; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=5bqFyex+; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=owZ8TKE8; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=5bqFyex+; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0749F5BCC6;
+	Fri, 21 Nov 2025 16:46:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1763743615; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=BtvP/Bv21zIJUn/ckdTnSK9vSZ3KC0jdHLL8cUGc008=;
+	b=owZ8TKE8Co04AWk/cw6g+Z+e+j7trgA5vvEbVKBTTFF6L2NUiWWtDca2BfsTo3Y13ZTREI
+	eP4tGlsP68nyzhNx+S8CMq6lpvBDi0Gw4cfVcVBMmwVA6vyOr5exSnQLAD9e3S9FUFuXn1
+	fH/eXQNDUwctqepqYen7/lzDGk8AUZA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1763743615;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=BtvP/Bv21zIJUn/ckdTnSK9vSZ3KC0jdHLL8cUGc008=;
+	b=5bqFyex+miGqXTsQQxOschRQshWw1+ggMbZ+ie9Y7UzNONOuRzdjIZoE0yiud9Y/CAVSxc
+	11OUhTc5VgXS4DDw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=owZ8TKE8;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=5bqFyex+
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1763743615; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=BtvP/Bv21zIJUn/ckdTnSK9vSZ3KC0jdHLL8cUGc008=;
+	b=owZ8TKE8Co04AWk/cw6g+Z+e+j7trgA5vvEbVKBTTFF6L2NUiWWtDca2BfsTo3Y13ZTREI
+	eP4tGlsP68nyzhNx+S8CMq6lpvBDi0Gw4cfVcVBMmwVA6vyOr5exSnQLAD9e3S9FUFuXn1
+	fH/eXQNDUwctqepqYen7/lzDGk8AUZA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1763743615;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=BtvP/Bv21zIJUn/ckdTnSK9vSZ3KC0jdHLL8cUGc008=;
+	b=5bqFyex+miGqXTsQQxOschRQshWw1+ggMbZ+ie9Y7UzNONOuRzdjIZoE0yiud9Y/CAVSxc
+	11OUhTc5VgXS4DDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8A7D53EA61;
+	Fri, 21 Nov 2025 16:46:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id aSd3IX6XIGmhHQAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Fri, 21 Nov 2025 16:46:54 +0000
+Message-ID: <ebbd8d9b-03ca-499f-beae-7e8c4cc16300@suse.cz>
+Date: Fri, 21 Nov 2025 17:46:54 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,114 +98,137 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 04/11] x86/bhi: Make clear_bhb_loop() effective on
- newer CPUs
-To: Dave Hansen <dave.hansen@intel.com>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
- David Kaplan <david.kaplan@amd.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Sean Christopherson
- <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>,
- Peter Zijlstra <peterz@infradead.org>
-References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
- <20251119-vmscape-bhb-v4-4-1adad4e69ddc@linux.intel.com>
- <4ed6763b-1a88-4254-b063-be652176d1af@intel.com>
-From: Nikolay Borisov <nik.borisov@suse.com>
+Subject: Re: [PATCH v3 04/16] mm: eliminate is_swap_pte() when
+ softleaf_from_pte() suffices
 Content-Language: en-US
-Autocrypt: addr=nik.borisov@suse.com; keydata=
- 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
-In-Reply-To: <4ed6763b-1a88-4254-b063-be652176d1af@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache
+ <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+ Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>,
+ Oscar Salvador <osalvador@suse.de>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Matthew Brost <matthew.brost@intel.com>,
+ Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+ Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
+ Ying Huang <ying.huang@linux.alibaba.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
+ Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
+ Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+ Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+ SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
+ Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+ Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
+ Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
+References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
+ <92ebab9567978155116804c67babc3c64636c403.1762812360.git.lorenzo.stoakes@oracle.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <92ebab9567978155116804c67babc3c64636c403.1762812360.git.lorenzo.stoakes@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 0749F5BCC6
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[linux.ibm.com,redhat.com,zeniv.linux.org.uk,kernel.org,suse.cz,arndb.de,nvidia.com,linux.alibaba.com,oracle.com,arm.com,linux.dev,suse.de,google.com,suse.com,intel.com,gmail.com,sk.com,gourry.net,huaweicloud.com,tencent.com,infradead.org,ziepe.ca,zte.com.cn,huawei.com,soleen.com,surriel.com,vger.kernel.org,kvack.org,lists.linux.dev];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_GT_50(0.00)[65];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.cz:mid,suse.cz:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -3.01
 
+On 11/10/25 23:21, Lorenzo Stoakes wrote:
+> In cases where we can simply utilise the fact that softleaf_from_pte()
+> treats present entries as if they were none entries and thus eliminate
+> spurious uses of is_swap_pte(), do so.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
+Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
 
-On 11/21/25 18:40, Dave Hansen wrote:
-> On 11/19/25 22:18, Pawan Gupta wrote:
->> -	CLEAR_BHB_LOOP_SEQ 5, 5
->> +	/* loop count differs based on CPU-gen, see Intel's BHI guidance */
->> +	ALTERNATIVE (CLEAR_BHB_LOOP_SEQ 5, 5),  \
->> +		    __stringify(CLEAR_BHB_LOOP_SEQ 12, 7), X86_FEATURE_BHI_CTRL
-> 
-> There are a million ways to skin this cat. But I'm not sure I really
-> like the end result here. It seems a little overkill to use ALTERNATIVE
-> to rewrite a whole sequence just to patch two constants in there.
-> 
-> What if the CLEAR_BHB_LOOP_SEQ just took its inner and outer loop counts
-> as register arguments? Then this would look more like:
-> 
-> 	ALTERNATIVE "mov  $5, %rdi; mov $5, %rsi",
-> 		    "mov $12, %rdi; mov $7, %rsi",
-> 	...
-> 
-> 	CLEAR_BHB_LOOP_SEQ
-> 
-> Or, even global variables:
-> 
-> 	mov outer_loop_count(%rip), %rdi
-> 	mov inner_loop_count(%rip), %rsi
-
-nit: FWIW I find this rather tacky, because the way the registers are 
-being used (although they do follow the x86-64 calling convention) is 
-obfuscated in the macro itself.
-
-> 
-> and then have some C code somewhere that does:
-> 
-> 	if (cpu_feature_enabled(X86_FEATURE_BHI_CTRL)) {
-> 		outer_loop_count = 5;
-> 		inner_loop_count = 5;
-> 	} else {
-> 		outer_loop_count = 12;
-> 		inner_loop_count = 7;
-> 	}
-
-OTOH: the global variable approach seems saner as in the macro you'd 
-have direct reference to them and so it will be more obvious how things 
-are setup.
-
-<snip>
 
