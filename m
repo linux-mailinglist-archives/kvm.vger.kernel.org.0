@@ -1,65 +1,96 @@
-Return-Path: <kvm+bounces-64224-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64225-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CC93C7B5C3
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:42:38 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B637FC7B5DB
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:43:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BE15D35D71F
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:42:37 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0484335EBD6
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724AB2F3607;
-	Fri, 21 Nov 2025 18:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE032F5465;
+	Fri, 21 Nov 2025 18:42:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V2pubY0g"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="UnKYWy8x";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8ZePVM5W";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="UnKYWy8x";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8ZePVM5W"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A6A29DB65;
-	Fri, 21 Nov 2025 18:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC5A2F5474
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:42:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763750547; cv=none; b=MmhDgy7svLZTILWVPKLImiZv/6gcZSRMX9A67z6FkOqgqQAJggFLXFuVnez3PBlep9yhQlrolosVEDTJWGJKQoVoNd/PKhvZSDopg/Z9lZ/BorD4qM5h7SrQQCphno/tGPc1Znf/bnM7pN8bXBh05vuRoEqxvU2XPvhp8ygWLsg=
+	t=1763750575; cv=none; b=buDtE4fYDhJU8CH3Dm+yimqKMg2KN8SCwdSyMK/678AHxhKH4fy/jHICAiEy1vfNqvfy9suaxdBuSIafG0N0nYQMD7mJ2jTikhl/3ZjzB2ufOGF4CWgKm9QXsyo9w+i+/Rho8fSHbJRQxexTapCrRUOgx6C01V+Yro1kW6ErSXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763750547; c=relaxed/simple;
-	bh=zYnV74MRMo67oSJqtuotpLdsTvzMi3qkwbtQuWkcDno=;
+	s=arc-20240116; t=1763750575; c=relaxed/simple;
+	bh=W4dgOURNudK83HIJKjpjqonBEvCmGgfIsv55zR4rHdo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EhoWavtPPFlBhHgSZgTdMqz7OUmcXeMHskkgDraApukFlpP+VOX5jWtpkqxKW9Rm/q2Q+yNKNGXps2SLWeXXKAf1GQF9Jt3jiqTKT7gGwDISpSzKo5KyvIbGgRpGQYnDLHeizF6jJbjQrflqiF3HcI2Ma+vNa+Dvz+fGc+EgCB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V2pubY0g; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763750546; x=1795286546;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=zYnV74MRMo67oSJqtuotpLdsTvzMi3qkwbtQuWkcDno=;
-  b=V2pubY0gDUWcNgdvUQnxA1wdShT1RAgR+NGwaYigBUQ2Aox+GndI8nq4
-   zeHR27EI9zqmwDG02rDBsb9gx0gbVTofI6KA601MV8dnO/Z4YEEYd9QIL
-   Xrw842gyswM1kRjP1NJyXSbW+OoHBaQphSu455S93gH6gsEctZvKXJYRx
-   OxIyo5xo//ezNJISJWKT/BcY2W511Iix+4Z1qun5Ru2CKjUC9h+GDySUL
-   kjZHdfGuYqGembgXBX9ESKYoCi7ccGTaLoJiJJteg2NMLsLGo/IFqrYhk
-   Nes6UPI9pQpUvaf2l7dUFNnTaD83ZBE3YLlyaOFppLJuv0lowJ8RtsGkG
-   A==;
-X-CSE-ConnectionGUID: M0OWzVjYRJGHwy8jq3Xtag==
-X-CSE-MsgGUID: XYrOuFPaTVan98XWupRHyw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11620"; a="91331591"
-X-IronPort-AV: E=Sophos;i="6.20,216,1758610800"; 
-   d="scan'208";a="91331591"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 10:42:25 -0800
-X-CSE-ConnectionGUID: Bl+k58jRQg27WN84DsuXyA==
-X-CSE-MsgGUID: MsupGgxcQqWFTx5QnD8RKA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,216,1758610800"; 
-   d="scan'208";a="191064106"
-Received: from schen9-mobl4.amr.corp.intel.com (HELO [10.125.110.60]) ([10.125.110.60])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 10:42:25 -0800
-Message-ID: <e99150f3-62d4-4155-a323-2d81c1d6d47d@intel.com>
-Date: Fri, 21 Nov 2025 10:42:24 -0800
+	 In-Reply-To:Content-Type; b=jglr/B4ZMNowY9apg5bvzYreWPVcKFOyTy2nV+PhcfeDV6zza9AxowjEHUnpocxciyituoYYwY9havouBtWVVhzeniwPIhLBz3vESHCokQ3QVdoOnZg5s+cExwjbp/4Iml9dgX+OvGeOh/jqkMm1j8dEHLeEuj+Y8j7vigslmJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=UnKYWy8x; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8ZePVM5W; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=UnKYWy8x; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8ZePVM5W; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 10BDF5BCCD;
+	Fri, 21 Nov 2025 18:42:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1763750571; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ldBKjiorZcKSWMx/nlx25VPXqX0kjWoWAmr1aGdzduM=;
+	b=UnKYWy8x4jc/1mtLqy8WJ6r81TuO/JefeO53rOMwLy+zmuNBfVRphZUpE1wGCOhsS4cEYv
+	6HBq1BSr+g/oTXNPoYJig0a4csUE27c2crKbt1SmYfqdgXBbM6kqKgyXpojSdOK7E4zgs0
+	iyMiFr55bPbvkRA+4zZ9d/q+/QmQV+0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1763750571;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ldBKjiorZcKSWMx/nlx25VPXqX0kjWoWAmr1aGdzduM=;
+	b=8ZePVM5WojCur/oRcjlGiisf/UGtdzxReXY1X2x5xpWvoQOXwKLmN9q2cp1CBtynRysqj+
+	VJOcPx4zykO19hCQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=UnKYWy8x;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=8ZePVM5W
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1763750571; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ldBKjiorZcKSWMx/nlx25VPXqX0kjWoWAmr1aGdzduM=;
+	b=UnKYWy8x4jc/1mtLqy8WJ6r81TuO/JefeO53rOMwLy+zmuNBfVRphZUpE1wGCOhsS4cEYv
+	6HBq1BSr+g/oTXNPoYJig0a4csUE27c2crKbt1SmYfqdgXBbM6kqKgyXpojSdOK7E4zgs0
+	iyMiFr55bPbvkRA+4zZ9d/q+/QmQV+0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1763750571;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ldBKjiorZcKSWMx/nlx25VPXqX0kjWoWAmr1aGdzduM=;
+	b=8ZePVM5WojCur/oRcjlGiisf/UGtdzxReXY1X2x5xpWvoQOXwKLmN9q2cp1CBtynRysqj+
+	VJOcPx4zykO19hCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 974BF3EA61;
+	Fri, 21 Nov 2025 18:42:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id RUSaJKqyIGmdCwAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Fri, 21 Nov 2025 18:42:50 +0000
+Message-ID: <68f18daf-cc45-479f-ac6f-0b4dce153ea7@suse.cz>
+Date: Fri, 21 Nov 2025 19:42:50 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,103 +98,201 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 04/11] x86/bhi: Make clear_bhb_loop() effective on
- newer CPUs
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: Nikolay Borisov <nik.borisov@suse.com>, x86@kernel.org,
- David Kaplan <david.kaplan@amd.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Sean Christopherson
- <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>,
- Peter Zijlstra <peterz@infradead.org>
-References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
- <20251119-vmscape-bhb-v4-4-1adad4e69ddc@linux.intel.com>
- <4ed6763b-1a88-4254-b063-be652176d1af@intel.com>
- <e9678dd1-7989-4201-8549-f06f6636274b@suse.com>
- <f7442dc7-be8d-43f8-b307-2004bd149910@intel.com>
- <20251121181632.czfwnfzkkebvgbye@desk>
-From: Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH v3 10/16] mm: replace pmd_to_swp_entry() with
+ softleaf_from_pmd()
 Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20251121181632.czfwnfzkkebvgbye@desk>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache
+ <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+ Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>,
+ Oscar Salvador <osalvador@suse.de>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Matthew Brost <matthew.brost@intel.com>,
+ Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+ Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
+ Ying Huang <ying.huang@linux.alibaba.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
+ Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
+ Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+ Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+ SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
+ Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+ Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
+ Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
+References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
+ <3fb431699639ded8fdc63d2210aa77a38c8891f1.1762812360.git.lorenzo.stoakes@oracle.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <3fb431699639ded8fdc63d2210aa77a38c8891f1.1762812360.git.lorenzo.stoakes@oracle.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 10BDF5BCCD
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[linux.ibm.com,redhat.com,zeniv.linux.org.uk,kernel.org,suse.cz,arndb.de,nvidia.com,linux.alibaba.com,oracle.com,arm.com,linux.dev,suse.de,google.com,suse.com,intel.com,gmail.com,sk.com,gourry.net,huaweicloud.com,tencent.com,infradead.org,ziepe.ca,zte.com.cn,huawei.com,soleen.com,surriel.com,vger.kernel.org,kvack.org,lists.linux.dev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[65];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
 
-On 11/21/25 10:16, Pawan Gupta wrote:
-> On Fri, Nov 21, 2025 at 08:50:17AM -0800, Dave Hansen wrote:
->> On 11/21/25 08:45, Nikolay Borisov wrote:
->>> OTOH: the global variable approach seems saner as in the macro you'd
->>> have direct reference to them and so it will be more obvious how things
->>> are setup.
->>
->> Oh, yeah, duh. You don't need to pass the variables in registers. They
->> could just be read directly.
+On 11/10/25 23:21, Lorenzo Stoakes wrote:
+> Introduce softleaf_from_pmd() to do the equivalent operation for PMDs that
+> softleaf_from_pte() fulfils, and cascade changes through code base
+> accordingly, introducing helpers as necessary.
+
+Some of that is adding new pte stuff too, so it could have been separate
+patch, but it's not a big deal.
+
+> We are then able to eliminate pmd_to_swp_entry(), is_pmd_migration_entry(),
+> is_pmd_device_private_entry() and is_pmd_non_present_folio_entry().
 > 
-> IIUC, global variables would introduce extra memory loads that may slow
-> things down. I will try to measure their impact. I think those global
-> variables should be in the .entry.text section to play well with PTI.
+> This further establishes the use of leaf operations throughout the code
+> base and further establishes the foundations for eliminating is_swap_pmd().
+> 
+> No functional change intended.
+> 
+> Reviewed-by: SeongJae Park <sj@kernel.org>
+> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
-Really? I didn't look exhaustively, but CLEAR_BRANCH_HISTORY seems to
-get called pretty close to where the assembly jumps into C. Long after
-we're running on the kernel CR3.
+Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
 
-> Also I was preferring constants because load values from global variables
-> may also be subject to speculation. Although any speculation should be
-> corrected before an indirect branch is executed because of the LFENCE after
-> the sequence.
+Assuming the below is fixed. Glad I could demonstrate I'm not just rubber
+stamping all this ;P
+(probably missed stuff anyway, as usual)
 
-I guess that's a theoretical problem, but it's not a practical one.
+> --- a/mm/page_table_check.c
+> +++ b/mm/page_table_check.c
+> @@ -8,7 +8,7 @@
+>  #include <linux/mm.h>
+>  #include <linux/page_table_check.h>
+>  #include <linux/swap.h>
+> -#include <linux/swapops.h>
+> +#include <linux/leafops.h>
+>  
+>  #undef pr_fmt
+>  #define pr_fmt(fmt)	"page_table_check: " fmt
+> @@ -179,10 +179,10 @@ void __page_table_check_pud_clear(struct mm_struct *mm, pud_t pud)
+>  EXPORT_SYMBOL(__page_table_check_pud_clear);
+>  
+>  /* Whether the swap entry cached writable information */
+> -static inline bool swap_cached_writable(swp_entry_t entry)
+> +static inline bool softleaf_cached_writable(softleaf_t entry)
+>  {
+> -	return is_writable_device_private_entry(entry) ||
+> -	       is_writable_migration_entry(entry);
+> +	return softleaf_is_device_private(entry) ||
 
-So I think we have 4-ish options at this point:
+Shouldn't there be softleaf_is_device_private_write(entry) ?
 
-1. Generate the long and short sequences independently and in their
-   entirety and ALTERNATIVE between them (the original patch)
-2. Store the inner/outer loop counts in registers and:
-  2a. Load those registers from variables
-  2b. Load them from ALTERNATIVES
-3. Store the inner/outer loop counts in variables in memory
+> +		softleaf_is_migration_write(entry);
+>  }
+>  
+>  static void page_table_check_pte_flags(pte_t pte)
+> @@ -190,9 +190,9 @@ static void page_table_check_pte_flags(pte_t pte)
+>  	if (pte_present(pte)) {
+>  		WARN_ON_ONCE(pte_uffd_wp(pte) && pte_write(pte));
+>  	} else if (pte_swp_uffd_wp(pte)) {
+> -		const swp_entry_t entry = pte_to_swp_entry(pte);
+> +		const softleaf_t entry = softleaf_from_pte(pte);
+>  
+> -		WARN_ON_ONCE(swap_cached_writable(entry));
+> +		WARN_ON_ONCE(softleaf_cached_writable(entry));
+>  	}
+>  }
+>  
+> @@ -219,9 +219,9 @@ static inline void page_table_check_pmd_flags(pmd_t pmd)
+>  		if (pmd_uffd_wp(pmd))
+>  			WARN_ON_ONCE(pmd_write(pmd));
+>  	} else if (pmd_swp_uffd_wp(pmd)) {
+> -		swp_entry_t entry = pmd_to_swp_entry(pmd);
+> +		const softleaf_t entry = softleaf_from_pmd(pmd);
+>  
+> -		WARN_ON_ONCE(swap_cached_writable(entry));
+> +		WARN_ON_ONCE(softleaf_cached_writable(entry));
+>  	}
+>  }
+>  
 
