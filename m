@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-64101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64102-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2A2AC78B2A
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:12:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA44C78B2D
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:12:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 77FCA363314
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 11:12:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C5292363346
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 11:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EA234C123;
-	Fri, 21 Nov 2025 11:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5A534C141;
+	Fri, 21 Nov 2025 11:11:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jCC1SvJj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F+J0/t5J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C0E345CD5
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 11:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD34D34AB05
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 11:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763723495; cv=none; b=I06REwf0Dp8tCeiJBERIV27JdBHBUOtcRKx9jdQ5n5uhXhh7aloW56mgn8/HRzdu98n/l5CoXzh/Hafi3vQHlppYAbQ39buiiTq62TIrLkVtbL2qd5ehaSxioCWLUGThVz7k1mjthjc8KALBT9ePQlXm25Niqe4/o3CPxbUXrGA=
+	t=1763723496; cv=none; b=IXXP73fgjZSAMPkrkehj3YEqYiUJMuQ1/fE7OnmIF26VRTRNzN2IxbRrVn2XEqJjBDU/CFZ6OO8u121GiO9xR6VDE+910p6x59zHBJeDkHLa+ka6iMhHwS0tKmhgaqu7ctiFHItLch5qp524yv4/avUprEY9mE07uNS5hBfqcQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763723495; c=relaxed/simple;
-	bh=qvVV1+lOsJ9XDAaWR0KsZyjPvFBsVj16xVloKj+rpks=;
+	s=arc-20240116; t=1763723496; c=relaxed/simple;
+	bh=dS2tU290nqAox27OC6Jajp3FZHZfPUPTd5QGznGhFbo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HZzg1khPoJEkrfkVijZIYxkPITR7CV3j7jHHpurwH3XK3EzxhdqdI9PFA1XBt6F1cmWXSbsStc+NnZboHK53AKYIALB5MX8pY6/dgMmlGLwJUePgIdOCenpQQEBtCqKN+M6WoPSLQDmW/lEqMD14s2QQLeqKODC8OJhphscVsbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jCC1SvJj; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version; b=NyQS//4frH4xXCvjkDhcWq1JzL724NPN6UjtENaPFnf/qNsrJG53M/UTOexmU9fEqsYyokmwqNW+XLr7RCgaWCcNlyk7bJTwVdJPekUdo6mLn9UbdBB2zgtOfSPaNmvN8N0NETjpvvwCabuhuOjLdCrd/J//cuWh/C3R0Nc3GVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F+J0/t5J; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-477b1cc8fb4so11636675e9.1
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 03:11:31 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4775ae77516so20919325e9.1
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 03:11:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763723490; x=1764328290; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763723492; x=1764328292; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NWJX5jCMFbHZLR5KOshFREEhHWutM4XlgAjgK/LAhnI=;
-        b=jCC1SvJjWooFbxEkNpG2XXc5esKxz8tJt6lGeQLxlu4diUnk7NLRQ5z/o0tuF4Hp+m
-         FhiydQ3kzAl2D+aU7h8N/KRfTj3AIsOKYO/BdyKBVTYl0brKUmv0QIVlrCk58Bg1yBMO
-         LtCVG6HToMRxqJDWtHj/RvHX7LVdVJwP/P8GLICsnBQifaIvEp0bO8wJIluncHUm5MNX
-         7FLfhdArwqJaA/UJ/DghqoadDNsl0ahVc2xr6cjzIaCu4lzHc+C8G9SJQ1B2N4rfeto4
-         u8JSHTV5iiBjRFG4HQmnx/AWgka1430MOMd0h/ST4KrlYKidPNowqq8HbGIf2mRLbjRL
-         RHNw==
+        bh=z9lfbyfUipLlDYUmoPFufZ/w0ZJAQG/DQOcG0klnz4U=;
+        b=F+J0/t5JXTAI9fZCB1LVmXpGbh3RoXZs+yRZxhE7FZMc8ei2csLj57fpcVVHslNsEJ
+         kV4s6Qv5SZUD2FoGEjXpKQZv6roo2paMIOJsl4PCyM5ErriIkPSO54+TbZlJQII4JG1g
+         MT5P3Yb/xzbEy4Q8EIvleoEpVAa3GLd1mRUK7On4y8Vs+qyl7Wb3cqIf52fF+He9sk7i
+         hSqgl0n6FzGhcvJ97npqRwVb0Vbdt+dOgfsGWoBeX915g+GMrqUh555ET2QZOLyTqedK
+         nU6oZcU5jK8txI8W8nU5G2pJF4Qx1CGZqoUriVGj90DcWhzkkDwFCs6LqEgr5kIL5L1c
+         qqGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763723490; x=1764328290;
+        d=1e100.net; s=20230601; t=1763723492; x=1764328292;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=NWJX5jCMFbHZLR5KOshFREEhHWutM4XlgAjgK/LAhnI=;
-        b=I/L2PUCpgXh8g9lWErLrb15rj7a9uL/T3O6igHqLY6LvZr6F5xiW+tolvoMVrQNcyX
-         wJ/U5bGrhN5jJ5g5rNXkVJqHjPp497sx/SfQhoh+xrN1i8XKF/vN++I6+7CQ6nLM1uS4
-         0K+RJufvG3Q7gewsTwpiy0+gEXHL1H1fkykTUmR7iqouSxXO97E4849us4ZOw5CzEtaI
-         oqdPM2Iu5pqsUSf8w/NUOmw9RS2dOQZRLlElPXgKxHXvBovz8D1YZlu9gEr5hOeyzb26
-         BiDPKqCmHWq9I8MUycOOG0xOiSFH0D8rcFPvb2l/AqGLzPOH9eGFTHPVnrtuCdZqW7/g
-         6dJQ==
-X-Gm-Message-State: AOJu0YxBtTvWRsYTdoYqcWK23CKGrU43fP4KCrfivN/LkYyGaNb3wGjA
-	xVAgHkWzFV0rsk5/Ej6DKRwRxAWYnBUEzmXjjJA1KRtNnBgFpv0UgEGYcuQSLV/3WJohJg==
-X-Gm-Gg: ASbGncuZr4BbTbganSFIEyfp/qbNHqQfHXpq7NXEXzglVzLEhjv2roeKw3oYh++PPKn
-	nzX7BFHjVdiN0jMuH8jYlJIDUe35y3C9zy2SKrxURa35tOOIJIyFkmxC4NjjDhoGO2bqHAwSCI/
-	BKoumj5WIBpnq7s8B5yUG7DhT/kxNXKySHzI167n+adkeJIJCXbdRsbXWfcN54tjndpEL4NAwbd
-	E+L6PUKa6m1D8rE9bySHe8+UTXrp5Kw1DmHkXmhOXEf81mixddhyCs83eD9YzdlvIZdnI7+ARGd
-	GvVoc4HCeWxznGBtXtt1mbl1/8Zinq7Gqzn3bBf1sYnA3e/OlE1fA20xNBa2Y+MP2uzqmPrQ64d
-	zxvqQnECatttszvQBiGki1/Z2MPIwbhwSOMksbrjuY9xa/EOnIKXzdZ4f5X8yNn/xDF8e9s+XGd
-	3CE6XvjGBMQ7G81Wpyi1x6r5T0icJuv7aCut6KPksK5mgZMmkDxnzP5WBE4rMNJ8nqGVgO1foOd
-	RxiXbTEG2eoyIRZJOZ9GyTQT3CbZ3kz
-X-Google-Smtp-Source: AGHT+IGXBHs40wjiJ4FmYuoKhqzHiCE/U2vasQWi77Woq+KAnDevxkqLtbQXFO0ZzYmRmqtSHvc2ow==
-X-Received: by 2002:a05:6000:26ca:b0:42c:b8fd:21b4 with SMTP id ffacd0b85a97d-42cc1d2111dmr2122435f8f.57.1763723490039;
-        Fri, 21 Nov 2025 03:11:30 -0800 (PST)
+        bh=z9lfbyfUipLlDYUmoPFufZ/w0ZJAQG/DQOcG0klnz4U=;
+        b=WeL0PaQXdkFHksFcqwYioaoF7utaTrxAmrOHe9L3WwSTX4Dfi3GHqNldYdGIAZcTas
+         hSXQ63C+Z97mmgFDJszz3dI3Lb6OZSCzvf96MeuwQeWuUhvIHAgphZM+o5IJu3LcSNrj
+         Vl4pbYW1BWUixyoWm95RcXyHASYLwS3Y+Ltz4psMk3bYrZhJXG/9jAuMwReAql+VmBla
+         S8PCqg9lFVJ6YBds0XbBXoxSa7jbxNb0gZ7NDNuODIN+OdlJnoWkds58o6EoBONvr/s2
+         UUxtLWnwS8o3iPLmB2J9f8LUBOA+45OVg/yD0MZMXHTc44FwZ0hF0p7a6QzDXsODgXzc
+         LKBA==
+X-Gm-Message-State: AOJu0Yyx43uYfRHmTmckVfIkSbhzAWL9b8sCG99UQr1mxjKeOtqxu1PJ
+	/hdj+HYjqZ5o1ov7Um9OczGA0FhVu6RtdkBrMh+z8cb3yGWsqNLmuy+BDcVybak2mDtfcg==
+X-Gm-Gg: ASbGnctBbJ0cp4G7Woqzgo32XPOOMHXRbAsZUwvqbKtxbK/hsw5H3ghScwkMAvG+KZ7
+	kjVNrZ7mC3SqfyM9gmD/2+0AoBwMR6/kSoc7LGglCkd7c2+1K1itLvCv34ysgldr0oRgsxXAEqQ
+	vGqpUKC0PMbXL6Wg3xNnvIt3mBxHhEf/wrQ5tKT0sN/D/yrTuzQZkc3VHoqXjDqjfpe4vJaMNPC
+	c/n3NR9BOUnUtNwcOckCJs3C2XDpn6VikyYmpIdSoBWAfJLu2wx4smo2b/pkb870712jx7kylq7
+	M+wQhtirBX+EvE7J7TH81nCHAAWMmZiOHvZL3zvqPspKJNphsK/VCJ0z6+r0byovIZYUFlFo2vC
+	jq9h673YhdqivRpGOwtOBSQQIuRVRzVe14RvQ9qcuIe5knZp4yRh6oAkdNQpSkKkDHx0hV0hipj
+	kV/G8H4JXpgZavP1kegc+5d/NMgvjVDzAPncFZjJBOcQN1kIFpmFS0MaiKpCCP4y/IgPr+qnUY/
+	XE7IAbo1fLGKhqSgy6UPsvD/ThXI0No
+X-Google-Smtp-Source: AGHT+IFS5CVJxsaWzVOowDMAJtzWZgjU5STn25EdkLeEdQN+ZxFOgyISk8523u0BUvpkT7Am/KjKYQ==
+X-Received: by 2002:a5d:64e5:0:b0:427:809:eff5 with SMTP id ffacd0b85a97d-42cc1d51ee7mr1872421f8f.53.1763723491607;
+        Fri, 21 Nov 2025 03:11:31 -0800 (PST)
 Received: from ip-10-0-150-200.eu-west-1.compute.internal (ec2-52-49-196-232.eu-west-1.compute.amazonaws.com. [52.49.196.232])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f363e4sm10484180f8f.12.2025.11.21.03.11.29
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f363e4sm10484180f8f.12.2025.11.21.03.11.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 03:11:29 -0800 (PST)
+        Fri, 21 Nov 2025 03:11:31 -0800 (PST)
 From: Fred Griffoul <griffoul@gmail.com>
 To: kvm@vger.kernel.org
 Cc: seanjc@google.com,
@@ -84,9 +84,9 @@ Cc: seanjc@google.com,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Fred Griffoul <fgriffo@amazon.co.uk>
-Subject: [PATCH v3 05/10] KVM: selftests: Add nested VMX APIC cache invalidation test
-Date: Fri, 21 Nov 2025 11:11:08 +0000
-Message-ID: <20251121111113.456628-6-griffoul@gmail.com>
+Subject: [PATCH v3 06/10] KVM: nVMX: Cache evmcs fields to ensure consistency during VM-entry
+Date: Fri, 21 Nov 2025 11:11:09 +0000
+Message-ID: <20251121111113.456628-7-griffoul@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251121111113.456628-1-griffoul@gmail.com>
 References: <20251121111113.456628-1-griffoul@gmail.com>
@@ -100,352 +100,255 @@ Content-Transfer-Encoding: 8bit
 
 From: Fred Griffoul <fgriffo@amazon.co.uk>
 
-Introduce selftest to verify nested VMX APIC virtualization page cache
-invalidation and refresh mechanisms for pfncache implementation.
+Cache enlightened VMCS control fields to prevent TOCTOU races where the
+guest could modify hv_clean_fields or hv_enlightenments_control between
+multiple accesses during nested VM-entry.
 
-The test exercises the nested VMX APIC cache invalidation path through:
+The cached values ensure consistent behavior across:
+- The evmcs-to-vmcs12 copy operations
+- MSR bitmap validation
+- Clean field checks in prepare_vmcs02_rare()
 
-- L2 guest setup: creates a nested environment where L2 accesses the
-  APIC access page that is cached by KVM using pfncache.
-
-- Cache invalidation triggers: a separate update thread periodically
-  invalidates the cached pages using either:
-   - madvise(MADV_DONTNEED) to trigger MMU notifications.
-   - vm_mem_region_move() to trigger memslot changes.
-
-The test validates that:
-- L2 can successfully access APIC page before and after invalidation.
-- KVM properly handles cache refresh without guest-visible errors.
-- Both MMU notification and memslot change invalidation paths work
-  correctly.
+This eliminates potential guest-induced inconsistencies in nested
+virtualization state management.
 
 Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
 ---
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/x86/vmx_apic_update_test.c  | 302 ++++++++++++++++++
- 2 files changed, 303 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/vmx_apic_update_test.c
+ arch/x86/kvm/vmx/hyperv.c |  5 ++--
+ arch/x86/kvm/vmx/hyperv.h | 20 +++++++++++++
+ arch/x86/kvm/vmx/nested.c | 62 ++++++++++++++++++++++++---------------
+ arch/x86/kvm/vmx/vmx.h    |  5 +++-
+ 4 files changed, 65 insertions(+), 27 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 148d427ff24b..3431568d837e 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -137,6 +137,7 @@ TEST_GEN_PROGS_x86 += x86/max_vcpuid_cap_test
- TEST_GEN_PROGS_x86 += x86/triple_fault_event_test
- TEST_GEN_PROGS_x86 += x86/recalc_apic_map_test
- TEST_GEN_PROGS_x86 += x86/aperfmperf_test
-+TEST_GEN_PROGS_x86 += x86/vmx_apic_update_test
- TEST_GEN_PROGS_x86 += access_tracking_perf_test
- TEST_GEN_PROGS_x86 += coalesced_io_test
- TEST_GEN_PROGS_x86 += dirty_log_perf_test
-diff --git a/tools/testing/selftests/kvm/x86/vmx_apic_update_test.c b/tools/testing/selftests/kvm/x86/vmx_apic_update_test.c
-new file mode 100644
-index 000000000000..1b5b69627a01
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/vmx_apic_update_test.c
-@@ -0,0 +1,302 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * vmx_apic_update_test
-+ *
-+ * Copyright (C) 2025, Amazon.com, Inc. or its affiliates. All Rights Reserved.
-+ *
-+ * Test L2 guest APIC access page writes with concurrent MMU
-+ * notification and memslot move updates.
-+ */
-+#include <pthread.h>
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "vmx.h"
-+
-+#define VAPIC_GPA	0xc0000000
-+#define VAPIC_SLOT	1
-+
-+#define L2_GUEST_STACK_SIZE 64
-+
-+#define L2_DELAY	(100)
-+
-+static void l2_guest_code(void)
+diff --git a/arch/x86/kvm/vmx/hyperv.c b/arch/x86/kvm/vmx/hyperv.c
+index fa41d036acd4..961b91b9bd64 100644
+--- a/arch/x86/kvm/vmx/hyperv.c
++++ b/arch/x86/kvm/vmx/hyperv.c
+@@ -213,12 +213,11 @@ bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
+ 
+-	if (!hv_vcpu || !evmcs)
++	if (!hv_vcpu || !nested_vmx_is_evmptr12_valid(vmx))
+ 		return false;
+ 
+-	if (!evmcs->hv_enlightenments_control.nested_flush_hypercall)
++	if (!vmx->nested.hv_flush_hypercall)
+ 		return false;
+ 
+ 	return hv_vcpu->vp_assist_page.nested_control.features.directhypercall;
+diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
+index 11a339009781..3c7fea501ca5 100644
+--- a/arch/x86/kvm/vmx/hyperv.h
++++ b/arch/x86/kvm/vmx/hyperv.h
+@@ -52,6 +52,16 @@ static inline bool guest_cpu_cap_has_evmcs(struct kvm_vcpu *vcpu)
+ 	       to_vmx(vcpu)->nested.enlightened_vmcs_enabled;
+ }
+ 
++static inline u32 nested_evmcs_clean_fields(struct vcpu_vmx *vmx)
 +{
-+	uint32_t *vapic_addr = (uint32_t *) (VAPIC_GPA + 0x80);
-+
-+	/* Unroll the loop to avoid any compiler side effect */
-+
-+	WRITE_ONCE(*vapic_addr, 1 << 0);
-+	udelay(msecs_to_usecs(L2_DELAY));
-+
-+	WRITE_ONCE(*vapic_addr, 1 << 1);
-+	udelay(msecs_to_usecs(L2_DELAY));
-+
-+	WRITE_ONCE(*vapic_addr, 1 << 2);
-+	udelay(msecs_to_usecs(L2_DELAY));
-+
-+	WRITE_ONCE(*vapic_addr, 1 << 3);
-+	udelay(msecs_to_usecs(L2_DELAY));
-+
-+	WRITE_ONCE(*vapic_addr, 1 << 4);
-+	udelay(msecs_to_usecs(L2_DELAY));
-+
-+	WRITE_ONCE(*vapic_addr, 1 << 5);
-+	udelay(msecs_to_usecs(L2_DELAY));
-+
-+	WRITE_ONCE(*vapic_addr, 1 << 6);
-+	udelay(msecs_to_usecs(L2_DELAY));
-+
-+	WRITE_ONCE(*vapic_addr, 0);
-+	udelay(msecs_to_usecs(L2_DELAY));
-+
-+	/* Exit to L1 */
-+	vmcall();
++	return vmx->nested.hv_clean_fields;
 +}
 +
-+static void l1_guest_code(struct vmx_pages *vmx_pages)
++static inline bool nested_evmcs_msr_bitmap(struct vcpu_vmx *vmx)
 +{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	uint32_t control, exit_reason;
-+
-+	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-+	GUEST_ASSERT(load_vmcs(vmx_pages));
-+	prepare_vmcs(vmx_pages, l2_guest_code,
-+		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	/* Enable APIC access */
-+	control = vmreadz(CPU_BASED_VM_EXEC_CONTROL);
-+	control |= CPU_BASED_ACTIVATE_SECONDARY_CONTROLS;
-+	vmwrite(CPU_BASED_VM_EXEC_CONTROL, control);
-+	control = vmreadz(SECONDARY_VM_EXEC_CONTROL);
-+	control |= SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES;
-+	vmwrite(SECONDARY_VM_EXEC_CONTROL, control);
-+	vmwrite(APIC_ACCESS_ADDR, VAPIC_GPA);
-+
-+	GUEST_SYNC1(0);
-+	GUEST_ASSERT(!vmlaunch());
-+again:
-+	exit_reason = vmreadz(VM_EXIT_REASON);
-+	if (exit_reason == EXIT_REASON_APIC_ACCESS) {
-+		uint64_t guest_rip = vmreadz(GUEST_RIP);
-+		uint64_t instr_len = vmreadz(VM_EXIT_INSTRUCTION_LEN);
-+
-+		vmwrite(GUEST_RIP, guest_rip + instr_len);
-+		GUEST_ASSERT(!vmresume());
-+		goto again;
-+	}
-+
-+	GUEST_SYNC1(exit_reason);
-+	GUEST_ASSERT(exit_reason == EXIT_REASON_VMCALL);
-+	GUEST_DONE();
++	return vmx->nested.hv_msr_bitmap;
 +}
 +
-+static const char *progname;
-+static int update_period_ms = L2_DELAY / 4;
+ u64 nested_get_evmptr(struct kvm_vcpu *vcpu);
+ uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
+ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
+@@ -85,6 +95,16 @@ static inline struct hv_enlightened_vmcs *nested_vmx_evmcs(struct vcpu_vmx *vmx)
+ {
+ 	return NULL;
+ }
 +
-+struct update_control {
-+	pthread_mutex_t mutex;
-+	pthread_cond_t start_cond;
-+	struct kvm_vm *vm;
-+	bool running;
-+	bool started;
-+	int updates;
-+};
-+
-+static void wait_for_start_signal(struct update_control *ctrl)
++static inline u32 nested_evmcs_clean_fields(struct vcpu_vmx *vmx)
 +{
-+	pthread_mutex_lock(&ctrl->mutex);
-+	while (!ctrl->started)
-+		pthread_cond_wait(&ctrl->start_cond, &ctrl->mutex);
-+
-+	pthread_mutex_unlock(&ctrl->mutex);
-+	printf("%s: starting update\n", progname);
-+}
-+
-+static bool is_running(struct update_control *ctrl)
-+{
-+	return READ_ONCE(ctrl->running);
-+}
-+
-+static void set_running(struct update_control *ctrl, bool running)
-+{
-+	WRITE_ONCE(ctrl->running, running);
-+}
-+
-+static void signal_thread_start(struct update_control *ctrl)
-+{
-+	pthread_mutex_lock(&ctrl->mutex);
-+	if (!ctrl->started) {
-+		ctrl->started = true;
-+		pthread_cond_signal(&ctrl->start_cond);
-+	}
-+	pthread_mutex_unlock(&ctrl->mutex);
-+}
-+
-+static void *update_madvise(void *arg)
-+{
-+	struct update_control *ctrl = arg;
-+	void *hva;
-+
-+	wait_for_start_signal(ctrl);
-+
-+	hva = addr_gpa2hva(ctrl->vm, VAPIC_GPA);
-+	memset(hva, 0x45, ctrl->vm->page_size);
-+
-+	while (is_running(ctrl)) {
-+		usleep(update_period_ms * 1000);
-+		madvise(hva, ctrl->vm->page_size, MADV_DONTNEED);
-+		ctrl->updates++;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void *update_move_memslot(void *arg)
-+{
-+	struct update_control *ctrl = arg;
-+	uint64_t gpa = VAPIC_GPA;
-+
-+	wait_for_start_signal(ctrl);
-+
-+	while (is_running(ctrl)) {
-+		usleep(update_period_ms * 1000);
-+		gpa += 0x10000;
-+		vm_mem_region_move(ctrl->vm, VAPIC_SLOT, gpa);
-+		ctrl->updates++;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void run(void * (*update)(void *), const char *name)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	struct vmx_pages *vmx;
-+	struct update_control ctrl;
-+	struct ucall uc;
-+	vm_vaddr_t vmx_pages_gva;
-+	pthread_t update_thread;
-+	bool done = false;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
-+
-+	/* Allocate VMX pages */
-+	vmx = vcpu_alloc_vmx(vm, &vmx_pages_gva);
-+
-+	/* Allocate memory and create VAPIC memslot */
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, VAPIC_GPA,
-+				    VAPIC_SLOT, 1, 0);
-+
-+	/* Allocate guest page table */
-+	virt_map(vm, VAPIC_GPA, VAPIC_GPA, 1);
-+
-+	/* Set up nested EPT */
-+	prepare_eptp(vmx, vm, 0);
-+	nested_map_memslot(vmx, vm, 0);
-+	nested_map_memslot(vmx, vm, VAPIC_SLOT);
-+	nested_map(vmx, vm, VAPIC_GPA, VAPIC_GPA, vm->page_size);
-+
-+	vcpu_args_set(vcpu, 1, vmx_pages_gva);
-+
-+	pthread_mutex_init(&ctrl.mutex, NULL);
-+	pthread_cond_init(&ctrl.start_cond, NULL);
-+	ctrl.vm = vm;
-+	ctrl.running = true;
-+	ctrl.started = false;
-+	ctrl.updates = 0;
-+
-+	pthread_create(&update_thread, NULL, update, &ctrl);
-+
-+	printf("%s: running %s (tsc_khz %lu)\n", progname, name, guest_tsc_khz);
-+
-+	while (!done) {
-+		vcpu_run(vcpu);
-+
-+		switch (vcpu->run->exit_reason) {
-+		case KVM_EXIT_IO:
-+			switch (get_ucall(vcpu, &uc)) {
-+			case UCALL_SYNC:
-+				printf("%s: sync(%ld)\n", progname, uc.args[0]);
-+				if (uc.args[0] == 0)
-+					signal_thread_start(&ctrl);
-+				break;
-+			case UCALL_ABORT:
-+				REPORT_GUEST_ASSERT(uc);
-+				/* NOT REACHED */
-+			case UCALL_DONE:
-+				done = true;
-+				break;
-+			default:
-+				TEST_ASSERT(false, "Unknown ucall %lu", uc.cmd);
-+			}
-+			break;
-+		case KVM_EXIT_MMIO:
-+			/* Handle APIC MMIO access after memslot move */
-+			printf
-+			    ("%s: APIC MMIO access at 0x%llx (memslot move effect)\n",
-+			     progname, vcpu->run->mmio.phys_addr);
-+			break;
-+		default:
-+			TEST_FAIL("%s: Unexpected exit reason: %d (flags 0x%x)",
-+				  progname,
-+				  vcpu->run->exit_reason, vcpu->run->flags);
-+		}
-+	}
-+
-+	set_running(&ctrl, false);
-+	if (!ctrl.started)
-+		signal_thread_start(&ctrl);
-+	pthread_join(update_thread, NULL);
-+	printf("%s: completed with %d updates\n", progname, ctrl.updates);
-+
-+	pthread_mutex_destroy(&ctrl.mutex);
-+	pthread_cond_destroy(&ctrl.start_cond);
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	int opt_madvise = 0;
-+	int opt_memslot_move = 0;
-+
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
-+	TEST_REQUIRE(kvm_cpu_has_ept());
-+
-+	if (argc == 1) {
-+		opt_madvise = 1;
-+		opt_memslot_move = 1;
-+	} else {
-+		int opt;
-+
-+		while ((opt = getopt(argc, argv, "amp:")) != -1) {
-+			switch (opt) {
-+			case 'a':
-+				opt_madvise = 1;
-+				break;
-+			case 'm':
-+				opt_memslot_move = 1;
-+				break;
-+			case 'p':
-+				update_period_ms = atoi(optarg);
-+				break;
-+			default:
-+				exit(1);
-+			}
-+		}
-+	}
-+
-+	TEST_ASSERT(opt_madvise
-+		    || opt_memslot_move, "No update test configured");
-+
-+	progname = argv[0];
-+
-+	if (opt_madvise)
-+		run(update_madvise, "madvise");
-+
-+	if (opt_memslot_move)
-+		run(update_move_memslot, "move memslot");
-+
 +	return 0;
 +}
++
++static inline bool nested_evmcs_msr_bitmap(struct vcpu_vmx *vmx)
++{
++	return false;
++}
+ #endif
+ 
+ #endif /* __KVM_X86_VMX_HYPERV_H */
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 1f58b380585b..aec150612818 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -235,6 +235,9 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+ 	kvm_vcpu_unmap(vcpu, &vmx->nested.hv_evmcs_map);
+ 	vmx->nested.hv_evmcs = NULL;
+ 	vmx->nested.hv_evmcs_vmptr = EVMPTR_INVALID;
++	vmx->nested.hv_clean_fields = 0;
++	vmx->nested.hv_msr_bitmap = false;
++	vmx->nested.hv_flush_hypercall = false;
+ 
+ 	if (hv_vcpu) {
+ 		hv_vcpu->nested.pa_page_gpa = INVALID_GPA;
+@@ -686,10 +689,10 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+ 	 *   and tells KVM (L0) there were no changes in MSR bitmap for L2.
+ 	 */
+ 	if (!vmx->nested.force_msr_bitmap_recalc) {
+-		struct hv_enlightened_vmcs *evmcs = nested_vmx_evmcs(vmx);
+-
+-		if (evmcs && evmcs->hv_enlightenments_control.msr_bitmap &&
+-		    evmcs->hv_clean_fields & HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP)
++		if (nested_vmx_is_evmptr12_valid(vmx) &&
++		    nested_evmcs_msr_bitmap(vmx) &&
++		    (nested_evmcs_clean_fields(vmx)
++		     & HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP))
+ 			return true;
+ 	}
+ 
+@@ -2163,10 +2166,11 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
+  * instruction.
+  */
+ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+-	struct kvm_vcpu *vcpu, bool from_launch)
++	struct kvm_vcpu *vcpu, bool from_launch, bool copy)
+ {
+ #ifdef CONFIG_KVM_HYPERV
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	struct hv_enlightened_vmcs *evmcs;
+ 	bool evmcs_gpa_changed = false;
+ 	u64 evmcs_gpa;
+ 
+@@ -2246,6 +2250,22 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+ 		vmx->nested.force_msr_bitmap_recalc = true;
+ 	}
+ 
++	/* Cache evmcs fields to avoid reading evmcs after copy to vmcs12 */
++	evmcs = vmx->nested.hv_evmcs;
++	vmx->nested.hv_clean_fields = evmcs->hv_clean_fields;
++	vmx->nested.hv_flush_hypercall = evmcs->hv_enlightenments_control.nested_flush_hypercall;
++	vmx->nested.hv_msr_bitmap = evmcs->hv_enlightenments_control.msr_bitmap;
++
++	if (copy) {
++		struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
++
++		if (likely(!vmcs12->hdr.shadow_vmcs)) {
++			copy_enlightened_to_vmcs12(vmx, vmx->nested.hv_clean_fields);
++			/* Enlightened VMCS doesn't have launch state */
++			vmcs12->launch_state = !from_launch;
++		}
++	}
++
+ 	return EVMPTRLD_SUCCEEDED;
+ #else
+ 	return EVMPTRLD_DISABLED;
+@@ -2613,10 +2633,12 @@ static void vmcs_write_cet_state(struct kvm_vcpu *vcpu, u64 s_cet,
+ 
+ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+ {
+-	struct hv_enlightened_vmcs *hv_evmcs = nested_vmx_evmcs(vmx);
++	u32 hv_clean_fields = 0;
+ 
+-	if (!hv_evmcs || !(hv_evmcs->hv_clean_fields &
+-			   HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2)) {
++	if (nested_vmx_is_evmptr12_valid(vmx))
++		hv_clean_fields = nested_evmcs_clean_fields(vmx);
++
++	if (!(hv_clean_fields & HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2)) {
+ 
+ 		vmcs_write16(GUEST_ES_SELECTOR, vmcs12->guest_es_selector);
+ 		vmcs_write16(GUEST_CS_SELECTOR, vmcs12->guest_cs_selector);
+@@ -2658,8 +2680,7 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+ 		vmx_segment_cache_clear(vmx);
+ 	}
+ 
+-	if (!hv_evmcs || !(hv_evmcs->hv_clean_fields &
+-			   HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1)) {
++	if (!(hv_clean_fields & HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1)) {
+ 		vmcs_write32(GUEST_SYSENTER_CS, vmcs12->guest_sysenter_cs);
+ 		vmcs_writel(GUEST_PENDING_DBG_EXCEPTIONS,
+ 			    vmcs12->guest_pending_dbg_exceptions);
+@@ -2750,7 +2771,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 			  enum vm_entry_failure_code *entry_failure_code)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	struct hv_enlightened_vmcs *evmcs = nested_vmx_evmcs(vmx);
++	struct hv_enlightened_vmcs *evmcs;
+ 	bool load_guest_pdptrs_vmcs12 = false;
+ 
+ 	if (vmx->nested.dirty_vmcs12 || nested_vmx_is_evmptr12_valid(vmx)) {
+@@ -2758,7 +2779,8 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 		vmx->nested.dirty_vmcs12 = false;
+ 
+ 		load_guest_pdptrs_vmcs12 = !nested_vmx_is_evmptr12_valid(vmx) ||
+-			!(evmcs->hv_clean_fields & HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1);
++			!(nested_evmcs_clean_fields(vmx)
++			  & HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1);
+ 	}
+ 
+ 	if (vmx->nested.nested_run_pending &&
+@@ -2887,7 +2909,8 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 	 * bits when it changes a field in eVMCS. Mark all fields as clean
+ 	 * here.
+ 	 */
+-	if (nested_vmx_is_evmptr12_valid(vmx))
++	evmcs = nested_vmx_evmcs(vmx);
++	if (evmcs)
+ 		evmcs->hv_clean_fields |= HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL;
+ 
+ 	return 0;
+@@ -3470,7 +3493,7 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+ 	if (guest_cpu_cap_has_evmcs(vcpu) &&
+ 	    vmx->nested.hv_evmcs_vmptr == EVMPTR_MAP_PENDING) {
+ 		enum nested_evmptrld_status evmptrld_status =
+-			nested_vmx_handle_enlightened_vmptrld(vcpu, false);
++			nested_vmx_handle_enlightened_vmptrld(vcpu, false, false);
+ 
+ 		if (evmptrld_status == EVMPTRLD_VMFAIL ||
+ 		    evmptrld_status == EVMPTRLD_ERROR)
+@@ -3864,7 +3887,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+ 	if (!nested_vmx_check_permission(vcpu))
+ 		return 1;
+ 
+-	evmptrld_status = nested_vmx_handle_enlightened_vmptrld(vcpu, launch);
++	evmptrld_status = nested_vmx_handle_enlightened_vmptrld(vcpu, launch, true);
+ 	if (evmptrld_status == EVMPTRLD_ERROR) {
+ 		kvm_queue_exception(vcpu, UD_VECTOR);
+ 		return 1;
+@@ -3890,15 +3913,8 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+ 	if (CC(vmcs12->hdr.shadow_vmcs))
+ 		return nested_vmx_failInvalid(vcpu);
+ 
+-	if (nested_vmx_is_evmptr12_valid(vmx)) {
+-		struct hv_enlightened_vmcs *evmcs = nested_vmx_evmcs(vmx);
+-
+-		copy_enlightened_to_vmcs12(vmx, evmcs->hv_clean_fields);
+-		/* Enlightened VMCS doesn't have launch state */
+-		vmcs12->launch_state = !launch;
+-	} else if (enable_shadow_vmcs) {
++	if (!nested_vmx_is_evmptr12_valid(vmx) && enable_shadow_vmcs)
+ 		copy_shadow_to_vmcs12(vmx);
+-	}
+ 
+ 	/*
+ 	 * The nested entry process starts with enforcing various prerequisites
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 9a285834ccda..87708af502f3 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -205,8 +205,11 @@ struct nested_vmx {
+ 
+ #ifdef CONFIG_KVM_HYPERV
+ 	gpa_t hv_evmcs_vmptr;
+-	struct kvm_host_map hv_evmcs_map;
++	u32 hv_clean_fields;
++	bool hv_msr_bitmap;
++	bool hv_flush_hypercall;
+ 	struct hv_enlightened_vmcs *hv_evmcs;
++	struct kvm_host_map hv_evmcs_map;
+ #endif
+ };
+ 
 -- 
 2.43.0
 
