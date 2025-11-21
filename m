@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-64113-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64124-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BF5DC79006
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 13:18:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8532CC7901B
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 13:19:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 91874361FEB
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:15:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1BED73661F4
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7735F34C9AB;
-	Fri, 21 Nov 2025 12:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 604AE34DB7E;
+	Fri, 21 Nov 2025 12:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MC+oXQIu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gDFYrp2h"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3B3334C2A
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 12:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F0F34D386
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 12:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763727294; cv=none; b=i8UM1IWgvknK01LnmpjIDLVdSZzFmpWD+tcoHtQQdjEROUfG1OcSqND9gos8DL/O8vxxJt7eGan/HQUAX5uIsMH4J4bFzl2jo4M1w8lAD+Rdoj9+7bVVxWyQM8ovGsCWwKsl8eB1EOgDibNpCpbpzPjieyrs0mNvAkT4uCCELc4=
+	t=1763727298; cv=none; b=inH9V5Ol4gM4kI7b9Zd13Yxe6voRBSrAg0FtoGvY6HmAJ2BD2YLbjWFO2RieimwSL6flXbIWd0hJPraJ+Fp8v9jLZPJV0eXO1IShav7uc5XVGBTot5zt/szJYHDxLc9u4MDGxhUSLpTlph3gHNYjOGz0IcREkdbaaslnMFdAHDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763727294; c=relaxed/simple;
-	bh=l15bQKcGnIad+7Uo7xetK0Kko5tXY2PCiJoyy5Bi6yE=;
+	s=arc-20240116; t=1763727298; c=relaxed/simple;
+	bh=n5ieai0oOuZYyNZCJeslW+M/vh4VieMur+A1oVEebmI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iXo3rctc4aDFISXUyOpkucj6Ql5qbfvWwsilSbQohkdaFshBAXUqFHZThmiBE8Zs6t0qPzmUJoTqTBDSOU5dXH7IaHE1TvtZrz5/TaAACKU0dO/WOjIzUuW0gEup+D+ieEj84XsooJkEGvraCRMBh7YXkmw/Optu5sJ9BYsX/WY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MC+oXQIu; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=BrhqedRl2vhSntTjLFt9wJaq/GTiqCCrEItiU8vm8tOZMGDCW+0ZSh6KYyrRf3TmorJMgx98wmNBkw0c7lv+K2t4qkAiULarEGNm+dDjoidu5Q8gHHUEZSqp6DSH+afAot57m9dl1G03buryB8attyoFcqzbg8z7LUD7+OEAuOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gDFYrp2h; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763727292;
+	s=mimecast20190719; t=1763727295;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tDP8FM9QFpX4om5r6DeJVNNuFVvQYDlKs2mHtRlqAfQ=;
-	b=MC+oXQIu5l5AHwlQMDd+p0HBGlPsrIiTcNr6iI0Wn1bEOf/+OCK+uLcu4y1/3wPyNIRArf
-	YVYI4VLpALik01WoSDbfAjVcc8TIgjSZza+4lQCMaV66uTS35YyFk5cNas/y2a39OQyYE3
-	jae140S1bA/b3Oi+a2pQqVnNCXoz0ME=
+	bh=oeDPJTEK/mbRoQ9G1reQyHyjo6pRRwMOwFAV76+b8w0=;
+	b=gDFYrp2hetNotCnwDrusBW9leknAAoD8QxGBwGTuvw4fBQ6TcEDfdmdnXA42738eFJiDCE
+	VV/k9BEFGVnIa9QSed0nbzhB/vU8kBeFP0liye+4Jk1izJIW/APbufxMCRMDchxgUo+cmm
+	BrnlEIEViVa1r0HnDZHDsLwTFzsmXSs=
 Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-115-5hh7LVJnPmWjjIuQzCm6LQ-1; Fri,
- 21 Nov 2025 07:14:50 -0500
-X-MC-Unique: 5hh7LVJnPmWjjIuQzCm6LQ-1
-X-Mimecast-MFC-AGG-ID: 5hh7LVJnPmWjjIuQzCm6LQ_1763727286
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-544-9KVhRz1PNjG4B1qvQhE2_Q-1; Fri,
+ 21 Nov 2025 07:14:53 -0500
+X-MC-Unique: 9KVhRz1PNjG4B1qvQhE2_Q-1
+X-Mimecast-MFC-AGG-ID: 9KVhRz1PNjG4B1qvQhE2_Q_1763727289
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 439A7195605B;
-	Fri, 21 Nov 2025 12:14:46 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F29621956061;
+	Fri, 21 Nov 2025 12:14:48 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.45.242.3])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C40981940E82;
-	Fri, 21 Nov 2025 12:14:45 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A221C1800451;
+	Fri, 21 Nov 2025 12:14:48 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id D147221EC346; Fri, 21 Nov 2025 13:14:38 +0100 (CET)
+	id D6F9B21EC348; Fri, 21 Nov 2025 13:14:38 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: arei.gonglei@huawei.com,
@@ -110,9 +110,9 @@ Cc: arei.gonglei@huawei.com,
 	xen-devel@lists.xenproject.org,
 	kvm@vger.kernel.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v2 14/15] qga/commands-win32: Use error_setg_win32() for better error messages
-Date: Fri, 21 Nov 2025 13:14:37 +0100
-Message-ID: <20251121121438.1249498-15-armbru@redhat.com>
+Subject: [PATCH v2 15/15] block/file-win32: Improve an error message
+Date: Fri, 21 Nov 2025 13:14:38 +0100
+Message-ID: <20251121121438.1249498-16-armbru@redhat.com>
 In-Reply-To: <20251121121438.1249498-1-armbru@redhat.com>
 References: <20251121121438.1249498-1-armbru@redhat.com>
 Precedence: bulk
@@ -122,65 +122,31 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-We include numeric GetLastError() codes in error messages in a few
-places, like this:
-
-    error_setg(errp, "GRIPE: %d", (int)GetLastError());
-
-Show text instead, like this:
-
-    error_setg_win32(errp, GetLastError(), "GRIPE");
+Two out of three calls of CreateFile() use error_setg_win32() to
+report errors.  The third uses error_setg_errno(), mapping
+ERROR_ACCESS_DENIED to EACCES, and everything else to EINVAL, throwing
+away detail.  Switch it to error_setg_win32().
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qga/commands-win32.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ block/file-win32.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index acc2c11589..0fd0c966e4 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -1798,8 +1798,8 @@ void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
-     tf.dwHighDateTime = (DWORD) (time >> 32);
- 
-     if (!FileTimeToSystemTime(&tf, &ts)) {
--        error_setg(errp, "Failed to convert system time %d",
--                   (int)GetLastError());
-+        error_setg_win32(errp, GetLastError(),
-+                         "Failed to convert system time");
-         return;
-     }
- 
-@@ -1810,7 +1810,8 @@ void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
-     }
- 
-     if (!SetSystemTime(&ts)) {
--        error_setg(errp, "Failed to set time to guest: %d", (int)GetLastError());
-+        error_setg_win32(errp, GetLastError(),
-+                         "Failed to set time to guest");
-         return;
-     }
- }
-@@ -1834,13 +1835,12 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
-         (length > sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION))) {
-         ptr = pslpi = g_malloc0(length);
-         if (GetLogicalProcessorInformation(pslpi, &length) == FALSE) {
--            error_setg(&local_err, "Failed to get processor information: %d",
--                       (int)GetLastError());
-+            error_setg_win32(&local_err, GetLastError(),
-+                             "Failed to get processor information");
+diff --git a/block/file-win32.c b/block/file-win32.c
+index 0efb609e1d..78961837c8 100644
+--- a/block/file-win32.c
++++ b/block/file-win32.c
+@@ -904,7 +904,7 @@ static int hdev_open(BlockDriverState *bs, QDict *options, int flags,
+         } else {
+             ret = -EINVAL;
          }
-     } else {
--        error_setg(&local_err,
--                   "Failed to get processor information buffer length: %d",
--                   (int)GetLastError());
-+        error_setg_win32(&local_err, GetLastError(),
-+                         "Failed to get processor information buffer length");
+-        error_setg_errno(errp, -ret, "Could not open device");
++        error_setg_win32(errp, err, "Could not open device");
+         goto done;
      }
  
-     while ((local_err == NULL) && (length > 0)) {
 -- 
 2.49.0
 
