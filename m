@@ -1,194 +1,133 @@
-Return-Path: <kvm+bounces-64087-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64089-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0153C78303
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 10:38:19 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A88AC78264
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 10:27:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id D3AB532F9D
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 09:24:59 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 506DB34539C
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 09:25:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 795403081C6;
-	Fri, 21 Nov 2025 09:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D50FA34253C;
+	Fri, 21 Nov 2025 09:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="IuvGVpB0"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ozJXLhj6"
 X-Original-To: kvm@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571E533C519;
-	Fri, 21 Nov 2025 09:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0D6340279;
+	Fri, 21 Nov 2025 09:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763717012; cv=none; b=Y5qtItLOa47Ygq8y4TvfayHM61im1ijlfyq4gLPSC/cu0uFZNoyM+u5T2NgVqVpvfGgf8LTX7coUOHUNUZbNp/UzCl2nXGJb+LrdGDYuD+aS+/wc6UK5ETdef+EENipyM4mFul8oX50FOBna68bzacAScnr0aqtaDT/7gsYNoiA=
+	t=1763717029; cv=none; b=MlNcyH3d15fhknnXTL1wC67ZLjzRB6QH9SK3QCQLlCqAsofc2mJ3L2HuI3YZ1s3+/iIZ0LdfGRl98f/Ydaobf5ta6yBlsEefneEYeL6S68Z3oQoD1gL0cKSK+s1BgRDiQG2SzHlMvwKOkJgvIbOCgYPzSvIVSb59X9INRPyIHn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763717012; c=relaxed/simple;
-	bh=+5r5M+XjdNfDZF30/xVMNjtVt/AXHifID6EEEYPo0vo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EbraUMHeGy8wQGuF+9pIARlPaAhKSOMfamQetOvdeZ4Gsyq7Z9VVrGrjrbqHv+T3yXsrHiNdOUxb9U1jZJcNvRG+SVqWUGXknbElAFW1VBId2ITEHOr/YQiMUE1hAqz3Z/7/hBET8zTb9Cxx5JSPB6bVm2lgScbhZW56lQra7ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=IuvGVpB0; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.248] ([129.217.186.248])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5AL9MsJG001806
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 21 Nov 2025 10:22:55 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1763716975;
-	bh=+5r5M+XjdNfDZF30/xVMNjtVt/AXHifID6EEEYPo0vo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=IuvGVpB07VG27ZINKrgDMTA4P73PHOzA7V25P23FKBnR1i0KwG7h4v4TSjlXncbtI
-	 cloKvi/kJwGyEFemOy1PI9PuLbuPhzYEKQJRm73haUYW/qO9NHu/I/n4GSIIAcvO9H
-	 4rusZGlWB2wfvEDid7EQo4nTgG6UEex29KfcDhZ4=
-Message-ID: <b9fff8e1-fb96-4b1f-9767-9d89adf31060@tu-dortmund.de>
-Date: Fri, 21 Nov 2025 10:22:54 +0100
+	s=arc-20240116; t=1763717029; c=relaxed/simple;
+	bh=LjrNVB/VDqUyL8RfflBobn4bMQWyFHvx8GB+ANFej34=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UFFub/TnOxfI3oT10svtk08qw/lsn4iG7R2xHmWxBXwbuoYYYp/okn19mEhdtXkTklGZc+OP7hJyxANNl5F9zXTj87W8WNuEkqdwW6xBSdhtaAtz/YjLozDDQiOj0+ozYELa7jFX9O00/+TBaK3U3Npl26nOWMHKkKkXvRsXLvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ozJXLhj6; arc=none smtp.client-ip=113.46.200.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=2FNmGdRA6WNkSW3gQDN3+WluFUlUMpgBNvvjHe+ozws=;
+	b=ozJXLhj6qKROoOq+Bbf5eCE0ySKbEVe0eFVDWD/2NDiAYI7utwPDBHlEEAzurSA2GkdIXdVXT
+	zKejclK2pnorcdLX5muQcRwK9J4d/+pnoQfVEP6sPTiIopiImF0IP81WLWpiUwUujyavJZPrWwU
+	mTG2AV+Dhxw8dUbY0bLSFqk=
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4dCV912sbxz1prkV;
+	Fri, 21 Nov 2025 17:21:57 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 369DA180BCF;
+	Fri, 21 Nov 2025 17:23:43 +0800 (CST)
+Received: from huawei.com (10.50.163.32) by kwepemr100010.china.huawei.com
+ (7.202.195.125) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 21 Nov
+ 2025 17:23:42 +0800
+From: Tian Zheng <zhengtian10@huawei.com>
+To: <maz@kernel.org>, <oliver.upton@linux.dev>, <catalin.marinas@arm.com>,
+	<corbet@lwn.net>, <pbonzini@redhat.com>, <will@kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <zhengtian10@huawei.com>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yezhenyu2@huawei.com>,
+	<xiexiangyou@huawei.com>, <zhengchuan@huawei.com>, <linuxarm@huawei.com>,
+	<joey.gouly@arm.com>, <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
+	<suzuki.poulose@arm.com>
+Subject: [PATCH v2 0/5] Support the FEAT_HDBSS introduced in Armv9.5
+Date: Fri, 21 Nov 2025 17:23:37 +0800
+Message-ID: <20251121092342.3393318-1-zhengtian10@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v6 0/8] tun/tap & vhost-net: netdev queue flow
- control to avoid ptr_ring tail drop
-To: Jason Wang <jasowang@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
-        jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
- <CACGkMEuboys8sCJFUTGxHUeouPFnVqVLGQBefvmxYDe4ooLfLg@mail.gmail.com>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CACGkMEuboys8sCJFUTGxHUeouPFnVqVLGQBefvmxYDe4ooLfLg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-On 11/21/25 07:19, Jason Wang wrote:
-> On Thu, Nov 20, 2025 at 11:30 PM Simon Schippers
-> <simon.schippers@tu-dortmund.de> wrote:
->>
->> This patch series deals with tun/tap and vhost-net which drop incoming
->> SKBs whenever their internal ptr_ring buffer is full. Instead, with this
->> patch series, the associated netdev queue is stopped before this happens.
->> This allows the connected qdisc to function correctly as reported by [1]
->> and improves application-layer performance, see our paper [2]. Meanwhile
->> the theoretical performance differs only slightly:
->>
->> +--------------------------------+-----------+----------+
->> | pktgen benchmarks to Debian VM | Stock     | Patched  |
->> | i5 6300HQ, 20M packets         |           |          |
->> +-----------------+--------------+-----------+----------+
->> | TAP             | Transmitted  | 195 Kpps  | 183 Kpps |
->> |                 +--------------+-----------+----------+
->> |                 | Lost         | 1615 Kpps | 0 pps    |
->> +-----------------+--------------+-----------+----------+
->> | TAP+vhost_net   | Transmitted  | 589 Kpps  | 588 Kpps |
->> |                 +--------------+-----------+----------+
->> |                 | Lost         | 1164 Kpps | 0 pps    |
->> +-----------------+--------------+-----------+----------+
-> 
+This series of patches add support to the Hardware Dirty state tracking
+Structure(HDBSS) feature, which is introduced by the ARM architecture
+in the DDI0601(ID121123) version.
 
-Hi Jason,
+The HDBSS feature is an extension to the architecture that enhances
+tracking translation table descriptors' dirty state, identified as
+FEAT_HDBSS. The goal of this feature is to reduce the cost of surveying
+for dirtied granules, with minimal effect on recording when a granule
+has been dirtied.
 
-thank you for your reply!
+The purpose of this feature is to make the execution overhead of live
+migration lower to both the guest and the host, compared to existing
+approaches (write-protect or search stage 2 tables).
 
-> PPS drops somehow for TAP, any reason for that?
+After these patches, users(such as qemu) can use the
+KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl to enable or disable the HDBSS
+feature before and after the live migration.
 
-I have no explicit explanation for that except general overheads coming
-with this implementation.
+This feature is similar to Intel's Page Modification Logging (PML),
+offering hardware-assisted dirty tracking to reduce live migration
+overhead. With PML support expanding beyond Intel, HDBSS introduces a
+comparable mechanism for ARM.
 
-> 
-> Btw, I had some questions:
-> 
-> 1) most of the patches in this series would introduce non-trivial
-> impact on the performance, we probably need to benchmark each or split
-> the series. What's more we need to run TCP benchmark
-> (throughput/latency) as well as pktgen see the real impact
+eillon (4):
+  arm64/sysreg: Add HDBSS related register information
+  KVM: arm64: Support set the DBM attr during memory abort
+  KVM: arm64: Add support for FEAT_HDBSS
+  KVM: arm64: Enable HDBSS support and handle HDBSSF events
 
-What could be done, IMO, is to activate tun_ring_consume() /
-tap_ring_consume() before enabling tun_ring_produce(). Then we could see
-if this alone drops performance.
+Tian Zheng (1):
+  KVM: arm64: Document HDBSS ioctl
 
-For TCP benchmarks, you mean userspace performance like iperf3 between a
-host and a guest system?
+ Documentation/virt/kvm/api.rst       |  15 ++++
+ arch/arm64/Kconfig                   |  14 ++++
+ arch/arm64/include/asm/cpucaps.h     |   2 +
+ arch/arm64/include/asm/cpufeature.h  |   5 ++
+ arch/arm64/include/asm/esr.h         |   2 +
+ arch/arm64/include/asm/kvm_arm.h     |   1 +
+ arch/arm64/include/asm/kvm_host.h    |  14 ++++
+ arch/arm64/include/asm/kvm_mmu.h     |  17 +++++
+ arch/arm64/include/asm/kvm_pgtable.h |   4 +
+ arch/arm64/include/asm/sysreg.h      |  12 +++
+ arch/arm64/kernel/cpufeature.c       |   9 +++
+ arch/arm64/kvm/arm.c                 | 107 +++++++++++++++++++++++++++
+ arch/arm64/kvm/handle_exit.c         |  45 +++++++++++
+ arch/arm64/kvm/hyp/pgtable.c         |   6 ++
+ arch/arm64/kvm/hyp/vhe/switch.c      |   1 +
+ arch/arm64/kvm/mmu.c                 |  10 +++
+ arch/arm64/kvm/reset.c               |   3 +
+ arch/arm64/tools/cpucaps             |   1 +
+ arch/arm64/tools/sysreg              |  28 +++++++
+ include/linux/kvm_host.h             |   1 +
+ include/uapi/linux/kvm.h             |   1 +
+ tools/include/uapi/linux/kvm.h       |   1 +
+ 22 files changed, 299 insertions(+)
 
-> 
-> 2) I see this:
-> 
->         if (unlikely(tun_ring_produce(&tfile->tx_ring, queue, skb))) {
->                 drop_reason = SKB_DROP_REASON_FULL_RING;
->                 goto drop;
->         }
-> 
-> So there could still be packet drop? Or is this related to the XDP path?
+--
+2.33.0
 
-Yes, there can be packet drops after a ptr_ring resize or a ptr_ring
-unconsume. Since those two happen so rarely, I figured we should just
-drop in this case.
-
-> 
-> 3) The LLTX change would have performance implications, but the
-> benmark doesn't cover the case where multiple transmission is done in
-> parallel
-
-Do you mean multiple applications that produce traffic and potentially
-run on different CPUs?
-
-> 
-> 4) After the LLTX change, it seems we've lost the synchronization with
-> the XDP_TX and XDP_REDIRECT path?
-
-I must admit I did not take a look at XDP and cannot really judge if/how
-lltx has an impact on XDP. But from my point of view, __netif_tx_lock()
-instead of __netif_tx_acquire(), is executed before the tun_net_xmit()
-call and I do not see the impact for XDP, which calls its own methods.
-> 
-> 5) The series introduces various ptr_ring helpers with lots of
-> ordering stuff which is complicated, I wonder if we first have a
-> simple patch to implement the zero packet loss
-
-I personally don't see how a simpler patch is possible without using
-discouraged practices like returning NETDEV_TX_BUSY in tun_net_xmit or
-spin locking between producer and consumer. But I am open for
-suggestions :)
-
-> 
->>
->> This patch series includes tun/tap, and vhost-net because they share
->> logic. Adjusting only one of them would break the others. Therefore, the
->> patch series is structured as follows:
->> 1+2: new ptr_ring helpers for 3
->> 3: tun/tap: tun/tap: add synchronized ring produce/consume with queue
->> management
->> 4+5+6: tun/tap: ptr_ring wrappers and other helpers to be called by
->> vhost-net
->> 7: tun/tap & vhost-net: only now use the previous implemented functions to
->> not break git bisect
->> 8: tun/tap: drop get ring exports (not used anymore)
->>
->> Possible future work:
->> - Introduction of Byte Queue Limits as suggested by Stephen Hemminger
-> 
-> This seems to be not easy. The tx completion depends on the userspace behaviour.
-
-I agree, but I really would like to reduce the buffer bloat caused by the
-default 500 TUN / 1000 TAP packet queue without losing performance.
-
-> 
->> - Adaption of the netdev queue flow control for ipvtap & macvtap
->>
->> [1] Link: https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
->> [2] Link: https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
->>
-> 
-> Thanks
-> 
-
-Thanks! :)
 
