@@ -1,226 +1,253 @@
-Return-Path: <kvm+bounces-64226-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64227-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C644C7B5F6
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:45:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8428C7B638
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:54:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1F4BE35FA90
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:44:25 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C24C2363B52
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965A12F261A;
-	Fri, 21 Nov 2025 18:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628752E22BF;
+	Fri, 21 Nov 2025 18:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kwt3e+yb"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fq3yQJey"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FA43A1C9
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75C12E040E
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763750654; cv=none; b=ajDlx1vfb64ShGRKbh2qMLqlN5MHdPkwSoXpJIUezd8ZyOd00EpNX4QL0ZjX1mzHCJrcXx+RkmNusqolnxi0TyU7WTMbR38lW6dKsSLowfGIfl7Ua48hBkhKOycyv92gkhn1F8bC2vr6c/Xcr6GCvNaa5Gf6XVKsDhqE5ip/aQQ=
+	t=1763751224; cv=none; b=uPu/WeIfmtx1V8/YTusJVgnwNwn0P0V6n28Xr1nFEQNoO+njyuryDOiZBOw+fPhrnl8tW4m6ehpIOxmNTtQ/6viEd6Ea6Q3PsDXpSyYVUs5xnH2y7hnoE242zjvgXlOy8R/pMJErZ5UGyhFGv4oitQHV3jS3mOONc9d6Y0TYWHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763750654; c=relaxed/simple;
-	bh=sTsoBriAcRT8jSD7A4hcif5f79IbeMjA5xydgfIYXmY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FFJqNXfKziElRfZVvC6NlB6+WX9y70GulipM1oi5ZwTcNF7tyyhaK0TioEHjzQSj3A7xKki9SgsycaKC7H59GVJbLgqTWNx94KE2OicI4qWuDWFrXu9usPSk0glmRVNNNVv7Lt0L+sKmTE5yJYe4iffmcXLBke43c4jtQ8yFP5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kwt3e+yb; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3438744f11bso6521517a91.2
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:44:13 -0800 (PST)
+	s=arc-20240116; t=1763751224; c=relaxed/simple;
+	bh=GG+r1J86a8W8oiqwgavGUtd6Y3Yzj26Cpb/I9emdWGQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JR2WVKQerpj/4oGG2/JHpj/+5RRFRzQaYxsknIi9EZmEiVga0+Z8fgu1wkZ0SDKB+mebI/BkLuHjVkNq9t/HuD5v1Jmq19iOjaoj26Ouddun9qKG1sWEYEHBq/LMoYGX51abtKGN9xXzrels/xtY7otkV9KoXKrqdNspvRZBkY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fq3yQJey; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b73545723ebso443408866b.1
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:53:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763750652; x=1764355452; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=scTl7a8sTQ4GEKkbrOBUGir3O6p7Bh2C0OKRu0mDrnU=;
-        b=Kwt3e+ybhFRaWhh32JaolVpwQbYd0ttBKLb7hRd0S7JbcJYN0GgiCwyC1tsknoTw97
-         BFMWdeoTw8/NeNMLBnXe0WIN9eiKEmotAodYd2VaIqxMBULpGKG7XDjdMrT9+JzlpAI+
-         PxonoJ3clgMm73AzJZy0i8ipdEJjEH4YvTWvQ7mCnex8V8nNXA0ZV1zCM3Rj9/y1tg58
-         rVDLybol00DiY5aexMqEZRwjwzCUkPDHjtLQA5jqd/cbZIjOIRJJ3E/oVsilrSEKkif6
-         vo/jMYTgeS4FNjKzD6BvqLvB3RMSGH2Z3xVebcNUHltRBGeTdO1GG29fR42TnmxCKWV4
-         xAAw==
+        d=suse.com; s=google; t=1763751220; x=1764356020; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=DF3TkciJrJV9PrxB3NEf/4Nx5IH0iprQ4Up4rxRZwLY=;
+        b=fq3yQJeyOkktshXWBXWc0P2flsjm4Ia5ro+9Iz5EwgpWNPPkAbFIVscI2TE1x5g0It
+         u4vi5hbx9IEJh/h6vN/8AUUWquCGIpCZ3/mYY+uoZuohzFJYv9EKMiFLfZh59SKXEyPP
+         y7RWKmBhWFrB4zppeYhlEW3uHpMv6NY5FY+qlz+hKllCQxEP2Ti0ddXPjm7RMNrDrWXj
+         /C+ppciIfZQ/xnUks20bg27EtOVaYxzMo4pGGrDMdl5bvcRMtXjUx0oZzTDNR1ILzBwF
+         Dbzv8V0R0bC2l4Iup9ocXP2esD7q42mdC0DIBNKd/SRN/rKH283Jjb0i4i+66SfWeqHM
+         n+dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763750652; x=1764355452;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=scTl7a8sTQ4GEKkbrOBUGir3O6p7Bh2C0OKRu0mDrnU=;
-        b=t33bH2pcCxUVe6zCiQ7IVX/l+M6iWk7BnCGKOuooRMrd6RpFokOoQnqG1Oni7RqT+A
-         9Y/BHCN4bkCEHYzSyX1ZnvdccxiOtEhq0bD4t5qHheRTru67mcKFEXtQD9emylG6jzOm
-         ooJqCoswJd7/a4xIu5M83O9sqDpBaLvN6KHUuA1lorGuLPiXI5QUdrCJQXp8JZwOilkH
-         2jh/8xhWoWuCG4hNZeEt+ay7FeHIz/0xUPqcz/9AllqOpMSLL3aAwBCRzDrcztzwD8Jm
-         nBA3JkriQixvKwYFYfYdqmlqzX/CmCPJEjqiOkycCnH92dXjVJTZIh/K8oJ9SIg6TKvH
-         zaJw==
-X-Gm-Message-State: AOJu0YyyIjxxKK7NtB3Uk4gqYtycRrW0Zi2Z5CGRVrTFH3TGtekVkEsX
-	fRLV1onBBXsVb24JPRHnSB10KHoDLmlZKMpDTDZjkpEbqrBgeGLUp4GDAI7whgENsNx1E+U0dcs
-	he8Pgwg==
-X-Google-Smtp-Source: AGHT+IHqIzI6/eX+M77METO5h1Wu7G1KLCGIOf2BgRfCvA+uMVVvIx+s01MVZzW+quu/0mK3wDzy+JMJrOA=
-X-Received: from pjuf21.prod.google.com ([2002:a17:90a:ce15:b0:340:d03e:4ed9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4906:b0:340:f05a:3ebd
- with SMTP id 98e67ed59e1d1-34733f23548mr2765875a91.28.1763750652533; Fri, 21
- Nov 2025 10:44:12 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 21 Nov 2025 10:44:09 -0800
+        d=1e100.net; s=20230601; t=1763751220; x=1764356020;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DF3TkciJrJV9PrxB3NEf/4Nx5IH0iprQ4Up4rxRZwLY=;
+        b=srwZUP1bKyQbwj0z/jA+g/Rm8IHUNVDqxOQ7vCEP5FTFQLhiYarppQCNAPCTWPkQhV
+         wtaC+Lq3x9GU34PXNtIU78ytnHAJPHbNC6ZWb+a+ZQkhYqFHWnxlJdtlSDFr+lyFAKjB
+         tOM7+nVkO7EvKD3EGLwQFA6DGjQFJ2WHDTQgNVZGiRSSlI5dCfkJeLDf9dIYihPIg7Hy
+         gV9+3NrtnjO11J7SLvcDkI8HPradKFarScyIen5Qb+mPVHcDkM1NSmi4E+gEmCc46o/M
+         pFQsla+AMOgujdowxdvynGLgmoP0CE2ZpBmYeYaDMSBG5ZDzXNrI9ypkeed7u++JsOel
+         pvXg==
+X-Forwarded-Encrypted: i=1; AJvYcCV7odiwRWPFxjPw2vIEn5LYfrzlnt2t771ZZdegVQ3xVOlixGypXZllYUw4n2AfW0vb+zM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwduSxDtm/YWd9HYqcs80MBh84ime8udPYYZK38ojfZTHNs5l5w
+	JHhEnt3+kEisXhK73Ksh1EQasZFxNoDv/dwjgNrSKH7zvRq8lH5FzzskVgk6LK9UsZc=
+X-Gm-Gg: ASbGncsuOEKtx0DuGMDeJBrtRle+di1M4LtZ4kkFJRfXWxQnqybH8ErmGEtCtcsQAyB
+	PUBcq/tddiQeqvwfup8M9JXbzHpGOlCbE05Xn9XLDtMgVkVerUajE6q1Y2Tcx486owc9Zi7xXKZ
+	egI0cMppPlCqYw9XQhO90g59HLdOEAO9uS04EdCN+7qXcpYumOYN3WgpD79vyXjqoUn+XNfRLNO
+	fAZZH302782nGu2ochFJM8OvpIQYQvrmhnkgjgoinJlZQuGcMf+wpThe7k3KiQeGfJxiPhLX+aG
+	xqYQIitL4RuyeHUECcF4cYcggLVw5MIbSASJLh/L+v+ndEn3wtlVRcQjYZ3ZwJJsoseeCgl96o4
+	2irLANkAjfFkh5A65hO3OlC7bOrfOIzVjsJUXDjPqvw4cpbZA1ogrI77XavARgy86g3PB1EtLfR
+	WGyFEW5ataeQLwss6TvEI+F/QPiBhZ975yzY7R
+X-Google-Smtp-Source: AGHT+IEToTYqjdJCl9TwhBBU2DRQPZ1NBUDX8z7CoOnavj5czclk77vuzB8mZ/s7ih7kaVF1L7gpyQ==
+X-Received: by 2002:a17:907:3f22:b0:b76:3548:b73b with SMTP id a640c23a62f3a-b767168f0b8mr358110366b.4.1763751220330;
+        Fri, 21 Nov 2025 10:53:40 -0800 (PST)
+Received: from [192.168.0.20] (nborisov.ddns.nbis.net. [85.187.216.236])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654cdd60csm521074166b.3.2025.11.21.10.53.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Nov 2025 10:53:39 -0800 (PST)
+Message-ID: <7d136f5b-437d-48ce-852d-cc793df4de15@suse.com>
+Date: Fri, 21 Nov 2025 20:53:38 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
-Message-ID: <20251121184409.286650-1-seanjc@google.com>
-Subject: [kvm-unit-tests GIT PULL] x86: A pile of changes
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 09/11] x86/vmscape: Deploy BHB clearing mitigation
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
+ Tao Zhang <tao1.zhang@intel.com>
+References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
+ <20251119-vmscape-bhb-v4-9-1adad4e69ddc@linux.intel.com>
+ <5cdca004-5228-4f07-b9b8-901880f59bb7@suse.com>
+ <20251121184148.hi6ye2trohwjm3oe@desk>
+From: Nikolay Borisov <nik.borisov@suse.com>
+Content-Language: en-US
+Autocrypt: addr=nik.borisov@suse.com; keydata=
+ xsFNBGcrpvIBEAD5cAR5+qu30GnmPrK9veWX5RVzzbgtkk9C/EESHy9Yz0+HWgCVRoNyRQsZ
+ 7DW7vE1KhioDLXjDmeu8/0A8u5nFMqv6d1Gt1lb7XzSAYw7uSWXLPEjFBtz9+fBJJLgbYU7G
+ OpTKy6gRr6GaItZze+r04PGWjeyVUuHZuncTO7B2huxcwIk9tFtRX21gVSOOC96HcxSVVA7X
+ N/LLM2EOL7kg4/yDWEhAdLQDChswhmdpHkp5g6ytj9TM8bNlq9I41hl/3cBEeAkxtb/eS5YR
+ 88LBb/2FkcGnhxkGJPNB+4Siku7K8Mk2Y6elnkOctJcDvk29DajYbQnnW4nhfelZuLNupb1O
+ M0912EvzOVI0dIVgR+xtosp66bYTOpX4Xb0fylED9kYGiuEAeoQZaDQ2eICDcHPiaLzh+6cc
+ pkVTB0sXkWHUsPamtPum6/PgWLE9vGI5s+FaqBaqBYDKyvtJfLK4BdZng0Uc3ijycPs3bpbQ
+ bOnK9LD8TYmYaeTenoNILQ7Ut54CCEXkP446skUMKrEo/HabvkykyWqWiIE/UlAYAx9+Ckho
+ TT1d2QsmsAiYYWwjU8igXBecIbC0uRtF/cTfelNGrQwbICUT6kJjcOTpQDaVyIgRSlUMrlNZ
+ XPVEQ6Zq3/aENA8ObhFxE5PLJPizJH6SC89BMKF3zg6SKx0qzQARAQABzSZOaWtvbGF5IEJv
+ cmlzb3YgPG5pay5ib3Jpc292QHN1c2UuY29tPsLBkQQTAQoAOxYhBDuWB8EJLBUZCPjT3SRn
+ XZEnyhfsBQJnK6byAhsDBQsJCAcCAiICBhUKCQgLAgQWAgMBAh4HAheAAAoJECRnXZEnyhfs
+ XbIQAJxuUnelGdXbSbtovBNm+HF3LtT0XnZ0+DoR0DemUGuA1bZAlaOXGr5mvVbTgaoGUQIJ
+ 3Ejx3UBEG7ZSJcfJobB34w1qHEDO0pN9orGIFT9Bic3lqhawD2r85QMcWwjsZH5FhyRx7P2o
+ DTuUClLMO95GuHYQngBF2rHHl8QMJPVKsR18w4IWAhALpEApxa3luyV7pAAqKllfCNt7tmed
+ uKmclf/Sz6qoP75CvEtRbfAOqYgG1Uk9A62C51iAPe35neMre3WGLsdgyMj4/15jPYi+tOUX
+ Tc7AAWgc95LXyPJo8069MOU73htZmgH4OYy+S7f+ArXD7h8lTLT1niff2bCPi6eiAQq6b5CJ
+ Ka4/27IiZo8tm1XjLYmoBmaCovqx5y5Xt2koibIWG3ZGD2I+qRwZ0UohKRH6kKVHGcrmCv0J
+ YO8yIprxgoYmA7gq21BpTqw3D4+8xujn/6LgndLKmGESM1FuY3ymXgj5983eqaxicKpT9iq8
+ /a1j31tms4azR7+6Dt8H4SagfN6VbJ0luPzobrrNFxUgpjR4ZyQQ++G7oSRdwjfIh1wuCF6/
+ mDUNcb6/kA0JS9otiC3omfht47yQnvod+MxFk1lTNUu3hePJUwg1vT1te3vO5oln8lkUo9BU
+ knlYpQ7QA2rDEKs+YWqUstr4pDtHzwQ6mo0rqP+zzsFNBGcrpvIBEADGYTFkNVttZkt6e7yA
+ LNkv3Q39zQCt8qe7qkPdlj3CqygVXfw+h7GlcT9fuc4kd7YxFys4/Wd9icj9ZatGMwffONmi
+ LnUotIq2N7+xvc4Xu76wv+QJpiuGEfCDB+VdZOmOzUPlmMkcJc/EDSH4qGogIYRu72uweKEq
+ VfBI43PZIGpGJ7TjS3THX5WVI2YNSmuwqxnQF/iVqDtD2N72ObkBwIf9GnrOgxEyJ/SQq2R0
+ g7hd6IYk7SOKt1a8ZGCN6hXXKzmM6gHRC8fyWeTqJcK4BKSdX8PzEuYmAJjSfx4w6DoxdK5/
+ 9sVrNzaVgDHS0ThH/5kNkZ65KNR7K2nk45LT5Crjbg7w5/kKDY6/XiXDx7v/BOR/a+Ryo+lM
+ MffN3XSnAex8cmIhNINl5Z8CAvDLUtItLcbDOv7hdXt6DSyb65CdyY8JwOt6CWno1tdjyDEG
+ 5ANwVPYY878IFkOJLRTJuUd5ltybaSWjKIwjYJfIXuoyzE7OL63856MC/Os8PcLfY7vYY2LB
+ cvKH1qOcs+an86DWX17+dkcKD/YLrpzwvRMur5+kTgVfXcC0TAl39N4YtaCKM/3ugAaVS1Mw
+ MrbyGnGqVMqlCpjnpYREzapSk8XxbO2kYRsZQd8J9ei98OSqgPf8xM7NCULd/xaZLJUydql1
+ JdSREId2C15jut21aQARAQABwsF2BBgBCgAgFiEEO5YHwQksFRkI+NPdJGddkSfKF+wFAmcr
+ pvICGwwACgkQJGddkSfKF+xuuxAA4F9iQc61wvAOAidktv4Rztn4QKy8TAyGN3M8zYf/A5Zx
+ VcGgX4J4MhRUoPQNrzmVlrrtE2KILHxQZx5eQyPgixPXri42oG5ePEXZoLU5GFRYSPjjTYmP
+ ypyTPN7uoWLfw4TxJqWCGRLsjnkwvyN3R4161Dty4Uhzqp1IkNhl3ifTDYEvbnmHaNvlvvna
+ 7+9jjEBDEFYDMuO/CA8UtoVQXjy5gtOhZZkEsptfwQYc+E9U99yxGofDul7xH41VdXGpIhUj
+ 4wjd3IbgaCiHxxj/M9eM99ybu5asvHyMo3EFPkyWxZsBlUN/riFXGspG4sT0cwOUhG2ZnExv
+ XXhOGKs/y3VGhjZeCDWZ+0ZQHPCL3HUebLxW49wwLxvXU6sLNfYnTJxdqn58Aq4sBXW5Un0Q
+ vfbd9VFV/bKFfvUscYk2UKPi9vgn1hY38IfmsnoS8b0uwDq75IBvup9pYFyNyPf5SutxhFfP
+ JDjakbdjBoYDWVoaPbp5KAQ2VQRiR54lir/inyqGX+dwzPX/F4OHfB5RTiAFLJliCxniKFsM
+ d8eHe88jWjm6/ilx4IlLl9/MdVUGjLpBi18X7ejLz3U2quYD8DBAGzCjy49wJ4Di4qQjblb2
+ pTXoEyM2L6E604NbDu0VDvHg7EXh1WwmijEu28c/hEB6DwtzslLpBSsJV0s1/jE=
+In-Reply-To: <20251121184148.hi6ye2trohwjm3oe@desk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Please pull a large pile of (mostly) x86 changes that have accumulated over
-the last few months.  Note, there are arm and arm64 changes in here, Acked-by
-Drew.  They were add-ons to an x86 change, but I had to drop the x86 change
-because of pre-existing test bugs[1].
 
-I didn't include the AVX VMOVDQA series[2] here, to give you (and others) a
-chance to review the changes.  Definitely feel free to apply it directly :-)
 
-[1] https://lore.kernel.org/all/3bac29b9-4c49-4e5d-997e-9e4019a2fceb@grsecurity.net
-[2] http://lore.kernel.org/all/20251121180901.271486-1-seanjc@google.com
+On 11/21/25 20:41, Pawan Gupta wrote:
+> On Fri, Nov 21, 2025 at 04:23:56PM +0200, Nikolay Borisov wrote:
+>>
+>>
+>> On 11/20/25 08:19, Pawan Gupta wrote:
+>>> IBPB mitigation for VMSCAPE is an overkill on CPUs that are only affected
+>>> by the BHI variant of VMSCAPE. On such CPUs, eIBRS already provides
+>>> indirect branch isolation between guest and host userspace. However, branch
+>>> history from guest may also influence the indirect branches in host
+>>> userspace.
+>>>
+>>> To mitigate the BHI aspect, use clear_bhb_loop().
+>>>
+>>> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+>>> ---
+>>>    Documentation/admin-guide/hw-vuln/vmscape.rst |  4 ++++
+>>>    arch/x86/include/asm/nospec-branch.h          |  2 ++
+>>>    arch/x86/kernel/cpu/bugs.c                    | 30 ++++++++++++++++++++-------
+>>>    3 files changed, 29 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/Documentation/admin-guide/hw-vuln/vmscape.rst b/Documentation/admin-guide/hw-vuln/vmscape.rst
+>>> index d9b9a2b6c114c05a7325e5f3c9d42129339b870b..dc63a0bac03d43d1e295de0791dd6497d101f986 100644
+>>> --- a/Documentation/admin-guide/hw-vuln/vmscape.rst
+>>> +++ b/Documentation/admin-guide/hw-vuln/vmscape.rst
+>>> @@ -86,6 +86,10 @@ The possible values in this file are:
+>>>       run a potentially malicious guest and issues an IBPB before the first
+>>>       exit to userspace after VM-exit.
+>>> + * 'Mitigation: Clear BHB before exit to userspace':
+>>> +
+>>> +   As above, conditional BHB clearing mitigation is enabled.
+>>> +
+>>>     * 'Mitigation: IBPB on VMEXIT':
+>>>       IBPB is issued on every VM-exit. This occurs when other mitigations like
+>>> diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+>>> index 15a2fa8f2f48a066e102263513eff9537ac1d25f..1e8c26c37dbed4256b35101fb41c0e1eb6ef9272 100644
+>>> --- a/arch/x86/include/asm/nospec-branch.h
+>>> +++ b/arch/x86/include/asm/nospec-branch.h
+>>> @@ -388,6 +388,8 @@ extern void write_ibpb(void);
+>>>    #ifdef CONFIG_X86_64
+>>>    extern void clear_bhb_loop(void);
+>>> +#else
+>>> +static inline void clear_bhb_loop(void) {}
+>>>    #endif
+>>>    extern void (*x86_return_thunk)(void);
+>>> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+>>> index cbb3341b9a19f835738eda7226323d88b7e41e52..d12c07ccf59479ecf590935607394492c988b2ff 100644
+>>> --- a/arch/x86/kernel/cpu/bugs.c
+>>> +++ b/arch/x86/kernel/cpu/bugs.c
+>>> @@ -109,9 +109,8 @@ DEFINE_PER_CPU(u64, x86_spec_ctrl_current);
+>>>    EXPORT_PER_CPU_SYMBOL_GPL(x86_spec_ctrl_current);
+>>>    /*
+>>> - * Set when the CPU has run a potentially malicious guest. An IBPB will
+>>> - * be needed to before running userspace. That IBPB will flush the branch
+>>> - * predictor content.
+>>> + * Set when the CPU has run a potentially malicious guest. Indicates that a
+>>> + * branch predictor flush is needed before running userspace.
+>>>     */
+>>>    DEFINE_PER_CPU(bool, x86_predictor_flush_exit_to_user);
+>>>    EXPORT_PER_CPU_SYMBOL_GPL(x86_predictor_flush_exit_to_user);
+>>> @@ -3200,13 +3199,15 @@ enum vmscape_mitigations {
+>>>    	VMSCAPE_MITIGATION_AUTO,
+>>>    	VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER,
+>>>    	VMSCAPE_MITIGATION_IBPB_ON_VMEXIT,
+>>> +	VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER,
+>>>    };
+>>>    static const char * const vmscape_strings[] = {
+>>> -	[VMSCAPE_MITIGATION_NONE]		= "Vulnerable",
+>>> +	[VMSCAPE_MITIGATION_NONE]			= "Vulnerable",
+>>>    	/* [VMSCAPE_MITIGATION_AUTO] */
+>>> -	[VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER]	= "Mitigation: IBPB before exit to userspace",
+>>> -	[VMSCAPE_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT",
+>>> +	[VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER]		= "Mitigation: IBPB before exit to userspace",
+>>> +	[VMSCAPE_MITIGATION_IBPB_ON_VMEXIT]		= "Mitigation: IBPB on VMEXIT",
+>>> +	[VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER]	= "Mitigation: Clear BHB before exit to userspace",
+>>>    };
+>>>    static enum vmscape_mitigations vmscape_mitigation __ro_after_init =
+>>> @@ -3253,8 +3254,19 @@ static void __init vmscape_select_mitigation(void)
+>>>    			vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+>>>    		break;
+>>> +	case VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER:
+>>> +		if (!boot_cpu_has(X86_FEATURE_BHI_CTRL))
+>>> +			vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+>>> +		break;
+>>
+>> Am I missing something or this case can never execute because
+>> VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER is only ever set if mitigation is
+>> VMSCAPE_MITIGATION_AUTO in the below branch? Perhaps just remove it? This
+>> just shows how confusing the logic for choosing the mitigations has
+>> become....
+> 
+> The goal was not make any assumptions on what vmscape_parse_cmdline() can
+> and cannot set. If you feel strongly about it, I can remove this case.
 
-The following changes since commit af582a4ebaf7828c200dc7150aa0dbccb60b08a7:
+ From where I'm standing bugs.c is already rather hairy even after 
+multiple rounds of cleanups and brushups, if we can remove code - I'll 
+be up for it. At the very least  in the commit message you can 
+explicitly mention that you handle every case on-principle, and you 
+expect that some of it is dead code. Still, I think the best code is the 
+one which doesn't exist  and you won't have to worry about it.
 
-  lib: make limits.h more Clang friendly (2025-09-16 08:09:00 -0500)
+<snip>
 
-are available in the Git repository at:
-
-  https://github.com/kvm-x86/kvm-unit-tests.git tags/kvm-x86-2025.11.21
-
-for you to fetch changes up to f561b31d3dee01f8be58978be23bb0903543153d:
-
-  x86: pmu_pebs: Support to validate timed PEBS record on GNR/SRF (2025-11-20 16:44:30 -0800)
-
-----------------------------------------------------------------
-KVM-Unit-Tests x86 (and one-off arm+arm64) changes:
-
- - Ensure do_iret() has a valid stack frame for x86_64 (it worked by dumb
-   luck of the top-most page in virtual address space always being mapped).
-
- - Add more selective CR0 write and LMSW testcases for nested SVM.
-
- - Add more LBR virtualization testcases for nested SVM.
-
- - Extend non-canonical memory access tests to verify CR2 isn't clobbered.
-
- - Provide better backtraces for arm and arm64.  Support for x86 is also in
-   the works, but is blocked due to existing test bugs that are exposed by
-   the forced profiling.
-
- - Add (lots) more CET testcases.
-
- - Workaround PMU test failures on Intel CPUs with overcount errata.
-
- - Misc cleanups and fixes.
-
-----------------------------------------------------------------
-Chao Gao (9):
-      x86/eventinj: Use global asm label for nested NMI IP address verification
-      x86/eventinj: Push SS and SP to IRET frame
-      x86: cet: Remove unnecessary memory zeroing for shadow stack
-      x86: cet: Directly check for #CP exception in run_in_user()
-      x86: cet: Validate #CP error code
-      x86: cet: Use report_skip()
-      x86: cet: Drop unnecessary casting
-      x86: cet: Validate writing unaligned values to SSP MSR causes #GP
-      x86: cet: Validate CET states during VMX transitions
-
-Dapeng Mi (3):
-      x86/pmu: Relax precise count check for emulated instructions tests
-      x86: pmu_pebs: Remove abundant data_cfg_match calculation
-      x86: pmu_pebs: Support to validate timed PEBS record on GNR/SRF
-
-Mathias Krause (15):
-      x86: Print error code for unhandled exceptions
-      x86/emulator64: Extend non-canonical memory access tests with CR2 coverage
-      x86: Don't rely on KVM's hypercall patching
-      x86: Provide a macro for extable handling
-      x86/hypercall: Simplify and increase coverage
-      Makefile: Provide a concept of late CFLAGS
-      arm64: Better backtraces for leaf functions
-      arm: Fix backtraces involving leaf functions
-      x86: cet: Make shadow stack less fragile
-      x86: cet: Simplify IBT test
-      x86: cet: Use symbolic values for the #CP error codes
-      x86: cet: Test far returns too
-      x86: Avoid top-most page for vmalloc on x86-64
-      x86: cet: Enable NOTRACK handling for IBT tests
-      x86: cet: Reset IBT tracker state on #CP violations
-
-Sean Christopherson (7):
-      x86/emulator64: Add macro to test emulation of non-canonical accesses
-      x86/svm: Account for numerical rounding errors in TSC scaling test
-      x86: cet: Run SHSTK and IBT tests as appropriate if either feature is supported
-      x86: cet: Drop the "intel_" prefix from the CET testcase
-      x86: cet: Add testcases to verify KVM rejects emulation of CET instructions
-      x86/vmexit: Add WBINVD and INVD VM-Exit latency testcases
-      x86/emulator: Treat DR6_BUS_LOCK as writable if CPU has BUS_LOCK_DETECT
-
-Yang Weijiang (1):
-      x86: cet: Pass virtual addresses to invlpg
-
-Yosry Ahmed (13):
-      scripts: Always return '2' when skipping tests
-      x86/vmx: Skip vmx_pf_exception_test_fep early if FEP is not available
-      x86/svm: Cleanup selective cr0 write intercept test
-      x86/svm: Move CR0 selective write intercept test near CR3 intercept
-      x86/svm: Add FEP helpers for SVM tests
-      x86/svm: Report unsupported SVM tests
-      x86/svm: Move report_svm_guest() to the top of svm_tests.c
-      x86/svm: Print SVM test names before running tests
-      x86/svm: Generalize and improve selective CR0 write intercept test
-      x86/svm: Add more selective CR0 write and LMSW test cases
-      x86/svm: Correctly extract the IP from LBR MSRs
-      x86/svm: Cleanup LBRV tests
-      x86/svm: Add more LBRV test cases
-
-dongsheng (5):
-      x86/pmu: Add helper to detect Intel overcount issues
-      x86/pmu: Relax precise count validation for Intel overcounted platforms
-      x86/pmu: Fix incorrect masking of fixed counters
-      x86/pmu: Handle instruction overcount issue in overflow test
-      x86/pmu: Expand "llc references" upper limit for broader compatibility
-
- Makefile             |   4 +
- arm/Makefile.arm     |   8 +
- arm/Makefile.arm64   |   6 +
- lib/arm/stack.c      |  18 ++-
- lib/x86/desc.c       |   6 +-
- lib/x86/desc.h       |  17 ++-
- lib/x86/msr.h        |   9 +-
- lib/x86/pmu.c        |  39 +++++
- lib/x86/pmu.h        |  11 ++
- lib/x86/processor.h  |  27 ++++
- lib/x86/usermode.c   |  16 +-
- lib/x86/usermode.h   |  13 +-
- lib/x86/vm.c         |   2 +
- scripts/runtime.bash |   4 +-
- x86/apic.c           |   5 +-
- x86/cet.c            | 302 ++++++++++++++++++++++++++++++--------
- x86/emulator.c       |   9 +-
- x86/emulator64.c     |  54 ++++---
- x86/eventinj.c       |  24 ++-
- x86/hypercall.c      | 131 ++++++++---------
- x86/lam.c            |  10 +-
- x86/pmu.c            |  72 ++++++---
- x86/pmu_pebs.c       |   9 +-
- x86/svm.c            |  10 +-
- x86/svm.h            |   1 +
- x86/svm_tests.c      | 402 +++++++++++++++++++++++++++++++++++----------------
- x86/unittests.cfg    |  10 +-
- x86/vmexit.c         |  17 ++-
- x86/vmx.h            |   8 +-
- x86/vmx_tests.c      |  86 +++++++++++
- 30 files changed, 987 insertions(+), 343 deletions(-)
 
