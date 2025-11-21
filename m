@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-64122-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B8BCC78FCF
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 13:16:04 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74F98C7900F
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 13:18:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 9CB322DA26
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:16:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AEF9A4ED51B
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF48F34DB59;
-	Fri, 21 Nov 2025 12:14:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43EBF34D3B3;
+	Fri, 21 Nov 2025 12:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IXHdmD6C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZSkKcqxj"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDE434CFA6
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 12:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA9B34C81E
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 12:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763727297; cv=none; b=tBJPXskTMDBJ+NvzVd8aIQr82XfoQ2qAbPRDedCQdxWc2CdICTA0y6WL4A8buaPMYM5e4P4gtGJ4Vxfq7Rwxa+hjW0zMbJe1lXC2wGgNbtTjcX5L1wARpuYw4mAvhem22pI+ML/cFQkLpa5nCY53epC6XI/BrihU9T68SH+nYdE=
+	t=1763727296; cv=none; b=UFjgNW8RwsxicjWeTq/HRTgGgT+3defAcQSRqNqpOFwws062MT6z0iAxAIUOSVnRBy4Ke/g2Y2s0txkELLeF7SSpkQ1UmwzoYUVam6U4DNEpxGplkt4CJJLDnihSRZQJT3UIxHClSLOapG89etknQL57meBO1y2MTUdm4zI5cmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763727297; c=relaxed/simple;
-	bh=uSumpO7NwKbklubkcj2PmtgMfYl7krDwAT2W4qehON0=;
+	s=arc-20240116; t=1763727296; c=relaxed/simple;
+	bh=WWert2UmtSLR+3S7igH5gRbvlm9O/q3RojWG5DGSyXo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gCnJ7WVIakO7XGEygznLPg3rUqFg7bMyBG44MmdojXjkxvTF3/3JtmgmFAz6h9pPs4aaMy4XFhlnFaKj60/j0Vk37MH0EKZSZv1j0EtdqYuwc0SCcmlefMaOjjwqk5stMRzjrD1PtdYCgNk0uDrDfLeVUvoGnaB+Lm6AeKd+2dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IXHdmD6C; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=BFSOYaqBxEYANHGTJlCTq/ZKeKWEnnuonEoMkP/YNehx/2zDktpDlYr53w4/ayfjVnxiEIm3QEQ5/N0kDcQ01LAw6NjDxf2scnvtamArw4CfeTH2Gv5kQ7AOYPV4qhp/DhU+BpvqGrjaX4B258yaJSgx8vLJGgBFtur6HjLJc8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZSkKcqxj; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763727294;
+	s=mimecast20190719; t=1763727293;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/QEiTeEFvA8zkWAoBuerCa692vNPnWKWwqHvysdpeIs=;
-	b=IXHdmD6CttG9XiWykPb/qlBVomtxnab0mokX9kyxyZdVOUmtk1TuSvL+EyAmvruYgK44Je
-	xDZf6zftDzw17M0NBoGyKnDJZ6Pz19Fs4EsBGLjLu8Crj6kgB17kmNNo5qtBB6nLyFDZY4
-	a1fKBelQ/chsP1x2cRrtaoKxwKxDboY=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=/xtGdog7VgzIfQmeSQKWrv+vlf3j6c1d+FLveMONGz8=;
+	b=ZSkKcqxj2cPAT14EfJLUsQSHA2vqSbd6Poc1rW8ZuTgdha1sDW4qF+dZUOgEjseS0nJxaQ
+	lcHrg8L6qb9uTrkHCEQhKGr4rdxVi7KOczIKihKXkQYKHRm6SS23H+i0pUHdGWi7MwXojG
+	NP14ih9i8joTjiHIuvdm4+wMav3qEt8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-116-_q0zrpcsOni3q2XTxVwVng-1; Fri,
- 21 Nov 2025 07:14:50 -0500
-X-MC-Unique: _q0zrpcsOni3q2XTxVwVng-1
-X-Mimecast-MFC-AGG-ID: _q0zrpcsOni3q2XTxVwVng_1763727286
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-159-vWwfEYL1PsCGkLjkk410QQ-1; Fri,
+ 21 Nov 2025 07:14:51 -0500
+X-MC-Unique: vWwfEYL1PsCGkLjkk410QQ-1
+X-Mimecast-MFC-AGG-ID: vWwfEYL1PsCGkLjkk410QQ_1763727287
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4DA111954B0C;
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C573E19560A1;
 	Fri, 21 Nov 2025 12:14:46 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.45.242.3])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 92CEC1955F1C;
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BA42430044DC;
 	Fri, 21 Nov 2025 12:14:45 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id A194221E66B9; Fri, 21 Nov 2025 13:14:38 +0100 (CET)
+	id A9C7321E660B; Fri, 21 Nov 2025 13:14:38 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: arei.gonglei@huawei.com,
@@ -110,9 +110,9 @@ Cc: arei.gonglei@huawei.com,
 	xen-devel@lists.xenproject.org,
 	kvm@vger.kernel.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v2 06/15] hw/scsi: Use error_setg_file_open() for a better error message
-Date: Fri, 21 Nov 2025 13:14:29 +0100
-Message-ID: <20251121121438.1249498-7-armbru@redhat.com>
+Subject: [PATCH v2 07/15] hw/virtio: Use error_setg_file_open() for a better error message
+Date: Fri, 21 Nov 2025 13:14:30 +0100
+Message-ID: <20251121121438.1249498-8-armbru@redhat.com>
 In-Reply-To: <20251121121438.1249498-1-armbru@redhat.com>
 References: <20251121121438.1249498-1-armbru@redhat.com>
 Precedence: bulk
@@ -122,42 +122,38 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
 The error message changes from
 
-    vhost-scsi: open vhost char device failed: REASON
+    vhost-vsock: failed to open vhost device: REASON
 
 to
 
-    Could not open '/dev/vhost-scsi': REASON
+    Could not open '/dev/vhost-vsock': REASON
 
 I think the exact file name is more useful to know than the file's
 purpose.
 
-We could put back the "vhost-scsi: " prefix with error_prepend().  Not
-worth the bother.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dave@treblig.org>
 ---
- hw/scsi/vhost-scsi.c | 3 +--
+ hw/virtio/vhost-vsock.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index cdf405b0f8..239138c931 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -245,8 +245,7 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
+index 107d88babe..7940b60d8a 100644
+--- a/hw/virtio/vhost-vsock.c
++++ b/hw/virtio/vhost-vsock.c
+@@ -153,8 +153,7 @@ static void vhost_vsock_device_realize(DeviceState *dev, Error **errp)
      } else {
-         vhostfd = open("/dev/vhost-scsi", O_RDWR);
+         vhostfd = open("/dev/vhost-vsock", O_RDWR);
          if (vhostfd < 0) {
--            error_setg(errp, "vhost-scsi: open vhost char device failed: %s",
--                       strerror(errno));
-+            error_setg_file_open(errp, errno, "/dev/vhost-scsi");
+-            error_setg_errno(errp, errno,
+-                             "vhost-vsock: failed to open vhost device");
++            error_setg_file_open(errp, errno, "/dev/vhost-vsock");
              return;
          }
-     }
+ 
 -- 
 2.49.0
 
