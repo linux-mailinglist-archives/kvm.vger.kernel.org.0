@@ -1,150 +1,116 @@
-Return-Path: <kvm+bounces-64021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64020-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AD42C76C4D
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 01:25:06 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28D8BC76C5C
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 01:26:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sto.lore.kernel.org (Postfix) with ESMTPS id E56DB289DE
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:25:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 88A8F3486AC
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50DE267AF2;
-	Fri, 21 Nov 2025 00:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D143E266B6C;
+	Fri, 21 Nov 2025 00:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="eynA8kSm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZaM2nqsK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9FA253951
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 00:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832BF264627
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 00:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763684665; cv=none; b=SuX6AWdog+06+U5WHvjgFvlRdoYHQfFY79ZXCbiA2EcUGmtrHsl8E+dPZ63/b661eCHouuU/i+8vtYnhQHryQ96hjUwSUQPp7qNUkCSWW8XFC1B+W1vpDgq5KgXOEfoI3/WemAvvcUksPhJ8GQrhZh7germhHcJOYx1Eiu0SvcQ=
+	t=1763684664; cv=none; b=H2ro5OlAjuyFtxLvJpE27PExc8pviXorlR8QIlwY7/GEqpFOO0iFArBEDTElt4KavTdg8oMG/tMsjRgqT5qlHuSH0Pp5CTIlXLNjX9HG/LGmdJZEXC8VTo9Xt+pt17qYq5g/Gj3KVFIvcWelLb4Q3oSszRemxW4tuaMAEtT8kEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763684665; c=relaxed/simple;
-	bh=AHcFWUsLYropoR6mkRkWraNUvMOyjYxiRegP129uRpU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XyyE4orpliRo5TqLdil+4blXk99F1ONsyZmvPRb6gcRwpOObZdRCdOAmk4fvkfTas0tzVZOoyeANA9IApq5KflMCf2nWHtVg910+drQ7lEVblYPqxIydecJ5xeYY/n8Smp0XLPLr9NmMsPiUE/Tg2p7X3lkDPQ056nO54jT/+GQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=eynA8kSm; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=KXXaKr3PtFYh8nhHwgchIQAJ3u9wYBNIFydgNDU6Wo4=; b=eynA8kSmvhNEEgT9
-	y0JKtg7iv1DeFQTCEwqE9seSwcVA1Xi7+YLa4mjuKStD0NXdu5S7jQHRij5Rtl9JTltmG+TsTC9Qx
-	lOfNhVdI53+2SguooVed7NpK4gfR+2vbhtKFwSkttQDsraFmllf8Mt/0vctal58hWk1BxvQyIuHeu
-	yCB3kkv3ZI/sZzZy5wcSXhbCuEAwhWxv94eXCJZ1AjXbelxxGWUGT0Ws5Eu3/gJ8ZSKS1ivDgyD9k
-	L2BibqN6dzoj/ed6KSGgmPDpg4ESeaqhl/QfEgTk1Lxhf5r5xJzPuFDmoYjnS5h7I+ddk+xbmKbfj
-	WwRB4DRNuEnYvwwalw==;
-Received: from dg by mx.treblig.org with local (Exim 4.98.2)
-	(envelope-from <dg@treblig.org>)
-	id 1vMEwY-00000005d06-2W0z;
-	Fri, 21 Nov 2025 00:24:06 +0000
-Date: Fri, 21 Nov 2025 00:24:06 +0000
-From: "Dr. David Alan Gilbert" <dave@treblig.org>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, pizhenwei@bytedance.com,
-	alistair.francis@wdc.com, stefanb@linux.vnet.ibm.com,
-	kwolf@redhat.com, hreitz@redhat.com, sw@weilnetz.de,
-	qemu_oss@crudebyte.com, groug@kaod.org, mst@redhat.com,
-	imammedo@redhat.com, anisinha@redhat.com, kraxel@redhat.com,
-	shentey@gmail.com, npiggin@gmail.com, harshpb@linux.ibm.com,
-	sstabellini@kernel.org, anthony@xenproject.org, paul@xen.org,
-	edgar.iglesias@gmail.com, elena.ufimtseva@oracle.com,
-	jag.raman@oracle.com, sgarzare@redhat.com, pbonzini@redhat.com,
-	fam@euphon.net, philmd@linaro.org, alex@shazbot.org, clg@redhat.com,
-	peterx@redhat.com, farosas@suse.de, lizhijian@fujitsu.com,
-	jasowang@redhat.com, samuel.thibault@ens-lyon.org,
-	michael.roth@amd.com, kkostiuk@redhat.com, zhao1.liu@intel.com,
-	mtosatti@redhat.com, rathc@linux.ibm.com, palmer@dabbelt.com,
-	liwei1518@gmail.com, dbarboza@ventanamicro.com,
-	zhiwei_liu@linux.alibaba.com, marcandre.lureau@redhat.com,
-	qemu-block@nongnu.org, qemu-ppc@nongnu.org,
-	xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-	qemu-riscv@nongnu.org
-Subject: Re: [PATCH 03/14] tap-solaris: Use error_setg_file_open() for better
- error messages
-Message-ID: <aR-xJgDErvQaN600@gallifrey>
-References: <20251120191339.756429-1-armbru@redhat.com>
- <20251120191339.756429-4-armbru@redhat.com>
+	s=arc-20240116; t=1763684664; c=relaxed/simple;
+	bh=WFtsWkc6oBiaKbV86QmWbyu+9b6FdCObrST/t8uPvqA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=l0LBqo70liWxbOik9IqEalxFbdWp55UpMSUmZk6D5dPK7Q6ga5WRwgmHt9qug6ImILJZeCxwdbguqcJcH6lRnhFKF82AWEdJRKWBrfjn+JXbk7e9m40ckkCHzbms4rbxafzxyxy8qo8Xw3lfSWfM/uEcYMpNO476IdVk6Ps0WfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZaM2nqsK; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-343fb64cea6so3964332a91.3
+        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 16:24:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763684662; x=1764289462; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oGd96OzltDe2oScYSMy6IxJhoHTysu7llELtM9LMLoc=;
+        b=ZaM2nqsKIyAgl3/YpKjKy6stToMpcFTzFoAkaBgxNbi/4ZeTXWJQpi3lD+CoCbtOwf
+         HPAAHBWk8AFiKjNnTeA3xV7YgaxiUryI9FMvpJxJte1aENxNC1tFp1q0tUldaWNxmcVh
+         Jlcx7fUFItUH/DYLjGJ4LpkvDvUDM5PrVdnoWAl3XhO+AwKrslXF2y6X4nIEs/6KHw8X
+         hF96DS7yXgaSgm9Ip/KAdmsupz8sL+hCHYBqB451klgfM5XfshudmD/rd6Ja0aEvGyZw
+         Lr83Kea0BaUeHHFEU7GRmvOReJAHOd7/fBlViPdRmtY32WesyKSZdkEt7pu2Zb4lYwMp
+         ZpYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763684662; x=1764289462;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oGd96OzltDe2oScYSMy6IxJhoHTysu7llELtM9LMLoc=;
+        b=KxF+1dTvjuiEI/5zOA1me2jMYM8ispRXLlxH20CKwhFfp946zWoJcxSNKtX/Dnbg8a
+         WAbxEcreDKGJ5d1r22lmlkT3fJ7aTBEpg/YcHcf5iJvJ9Ac+HORp09k25k4+JSrJ6AoC
+         fpheJ57S9vTNqMMg6KBNuqUNwkLyyxxuLbGITCRyKn/6abdbtqvePkjPWvKLz/eAvBsu
+         EU2ScxIGw2SfWrvHzO4ubcF/AnvDxr+pLEWAnAbJYooHRofXbdQ7NeeQl6T00vbA2x6K
+         yW2btOmc0tPq2GvG+qe4Zl1se8XDtoo2s55PUPBPgm542amvVlbkdMbQUBfbFewl9kZK
+         4ydQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7hRxIUh11QX/gbFpnacAj/WrDZQ+xhErHyBVcFS1nQJU2B1oMxcJ/Tj1oP/w1Nq+6E5c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNf7EVUeaEcUi2Oh1qy9KRsYIDBsPVIdysL+3yRNonIquArx0O
+	PNyySqELGg/28lc8bL+CR64fmcoJcGix3fMydRVVZ5nXZZnLRHBcCmaehK8+rWe9Hh7oP822IGp
+	TFKh1Pw==
+X-Google-Smtp-Source: AGHT+IGcJW8CLz8xQUpZviFtpcwWxG1D7eJa/+Xzi9UYxz87MzTpWm/PcxpyBZooQN1u8LJlPUFNY5vJavc=
+X-Received: from pjis12.prod.google.com ([2002:a17:90a:5d0c:b0:33b:ab61:4f71])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:ec8f:b0:335:2823:3683
+ with SMTP id 98e67ed59e1d1-34733e4b2ccmr325314a91.9.1763684661676; Thu, 20
+ Nov 2025 16:24:21 -0800 (PST)
+Date: Thu, 20 Nov 2025 16:24:20 -0800
+In-Reply-To: <t4modyzuwzmlmu4hcwpxzsbprhebjwuz3uc2doc6nauepruczw@vray2facmzks>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20251120191339.756429-4-armbru@redhat.com>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.12.48+deb13-amd64 (x86_64)
-X-Uptime: 00:23:09 up 24 days, 23:59,  2 users,  load average: 0.00, 0.00,
- 0.00
-User-Agent: Mutt/2.2.13 (2024-03-09)
+Mime-Version: 1.0
+References: <20251021074736.1324328-1-yosry.ahmed@linux.dev>
+ <aR-pMqVqhgzsERaj@google.com> <t4modyzuwzmlmu4hcwpxzsbprhebjwuz3uc2doc6nauepruczw@vray2facmzks>
+Message-ID: <aR-xNA0l2ybr0UqC@google.com>
+Subject: Re: [PATCH v2 00/23] Extend test coverage for nested SVM
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Error messages change from
+On Fri, Nov 21, 2025, Yosry Ahmed wrote:
+> On Thu, Nov 20, 2025 at 03:50:10PM -0800, Sean Christopherson wrote:
+> >   KVM: selftests: Extend vmx_tsc_adjust_test to cover SVM
+> >   KVM: selftests: Extend nested_invalid_cr3_test to cover SVM
+> >   KVM: selftests: Move nested invalid CR3 check to its own test
+> >   KVM: selftests: Extend vmx_nested_tsc_scaling_test to cover SVM
+> >   KVM: selftests: Extend vmx_close_while_nested_test to cover SVM
 > 
->     Can't open /dev/ip (actually /dev/udp)
->     Can't open /dev/tap
->     Can't open /dev/tap (2)
-> 
-> to
-> 
->     Could not open '/dev/udp': REASON
->     Could not open '/dev/tap': REASON
-> 
-> where REASON is the value of strerror(errno).
+> Not sure I understand how you to proceed. Do you want me to respin these
+> patches separately (as series A), on top of kvm-x86/next, and then
+> respin the rest of the series separately (as series B, with your struct
+> kvm_mmu suggestion)?
 
-I guess the new macro has a __LINE__ so the (2) is redundant.
+I'm going to apply a subset "soon", hopefully they'll show up in kvm-x86/next
+tomorrow.  I think it's patches 3-9?
 
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> As for set_nested_state, if you plan to pickup Jim's EFER fixes I can
+> just include it as-is in series (A). If not, I can include
+> generalization of the test, and send covering Jim's fix separately.
 
-Reviewed-by: Dr. David Alan Gilbert <dave@treblig.org>
+We're likely going to need a v3 of Jim's GIF series no matter what, so let's plan
+on bundling patches 1-2 with v3 of that series.
 
-> ---
->  net/tap-solaris.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/tap-solaris.c b/net/tap-solaris.c
-> index 75397e6c54..faf7922ea8 100644
-> --- a/net/tap-solaris.c
-> +++ b/net/tap-solaris.c
-> @@ -87,13 +87,13 @@ static int tap_alloc(char *dev, size_t dev_size, Error **errp)
->  
->      ip_fd = RETRY_ON_EINTR(open("/dev/udp", O_RDWR, 0));
->      if (ip_fd < 0) {
-> -        error_setg(errp, "Can't open /dev/ip (actually /dev/udp)");
-> +        error_setg_file_open(errp, errno, "/dev/udp");
->          return -1;
->      }
->  
->      tap_fd = RETRY_ON_EINTR(open("/dev/tap", O_RDWR, 0));
->      if (tap_fd < 0) {
-> -        error_setg(errp, "Can't open /dev/tap");
-> +        error_setg_file_open(errp, errno, "/dev/tap");
->          return -1;
->      }
->  
-> @@ -107,7 +107,7 @@ static int tap_alloc(char *dev, size_t dev_size, Error **errp)
->  
->      if_fd = RETRY_ON_EINTR(open("/dev/tap", O_RDWR, 0));
->      if (if_fd < 0) {
-> -        error_setg(errp, "Can't open /dev/tap (2)");
-> +        error_setg_file_open(errp, errno, "/dev/tap");
->          return -1;
->      }
->      if(ioctl(if_fd, I_PUSH, "ip") < 0){
-> -- 
-> 2.49.0
-> 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+That leaves the paging patches.  Unless you're super duper speedy, I should get
+patches 3-9 and Jim's LA57 changes+test pushed to kvm-x86 before you're ready to
+post the next version of those patches.
+
+So:
+  Fold 1-2 into Jim's GIF series.
+  Do nothing for 3-9.
+  Spin a new version of 10+ (the paging patches) after kvm-x86/next is refreshed
 
