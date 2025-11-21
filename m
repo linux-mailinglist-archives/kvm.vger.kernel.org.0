@@ -1,556 +1,148 @@
-Return-Path: <kvm+bounces-64106-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64107-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 280D8C78B48
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:13:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43093C78E6A
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 12:49:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 0602223F42
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 11:13:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C4BF64E9816
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 11:46:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB00A347FE2;
-	Fri, 21 Nov 2025 11:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DA22FF17D;
+	Fri, 21 Nov 2025 11:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XrhE2BdH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPkiuCMi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2309344044
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 11:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714783081B9
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 11:46:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763723505; cv=none; b=NCmoRgkajN+20YNF4Mu6ZUp+VoutR+X2qJMFL4TQRmGA6mTxBC7GnYv4jYGsYUEYjhhtYyzcweqTGUVH644z9FlhHJ5ISBnwqtCojw7+PZrDAXUwCYOJDmFqaGiimDW7U135M5J9ezyDNJq63dGTgt7ZqYQA9YNcYCXPscdSNdQ=
+	t=1763725579; cv=none; b=kteYjYSOhBmQobGc3sEfFtGRc4we+DCx/7Jw00SGHnTPlGY20lQffgkaOxyPpsOQu0xh4DeW4VG0prqtzdaFIw3/uzBrPLJv0povJ6yRH0AR74egiRsWMCkF8NrJPrh+niojiZObW1mxeoz0kSS0Zcjpqq1YgtuuaE/wIb2p9Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763723505; c=relaxed/simple;
-	bh=xzwRLQEcrDtgwyEHwiBCiDScE8JYSDiIrumzHzd6MhM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qCLE2oUsjfj25xxZOmYvRhLvdVGV2zlX69fgOfb/5ljKY0pUVs3JqL0+Uee3fwa4BlDqVybtmILF0Nmg2YOrKwYeivN6+Rf49nIIRwFpl49OQoN9D8uonxeGTa8Oxhd3VqZf1nU07uxj6hgbvlF5+a41ui8ogGP5oq0R0GeHEvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XrhE2BdH; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1763725579; c=relaxed/simple;
+	bh=3qaVjGsnlQhpFQQRtILh7H3V4a7Yra2/+xzfnkZV40c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IwZexuK0ZE4uej+dlvGvMDytMv3wcgZsDEKlDi7RQgZ1YaLacVx0/x0/09E9vh8EUUoChl4HlnMEgz40GwqJvs8uNkHn9mL9EjTMW+pgH/JlLSQewp2itF1dzlIQ8NWXdYgkW8FGglGQLKpYIjKYsNlRYRn43viAu+aIddafebE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPkiuCMi; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-477632d9326so12029035e9.1
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 03:11:41 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-297e264528aso22372195ad.2
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 03:46:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763723498; x=1764328298; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1763725574; x=1764330374; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ezTG0c03OD07wwSaXajwua3oK74Hbi6tRsK/GFCnf+c=;
-        b=XrhE2BdHviXUAmm56XRnPdvYjEGqHBduNSlI2eOB/Lvu20CEDCOef+edGSP4GwDOKy
-         lKZVfgC9Nba18T3Zm+jtjH5rAQb9BqM6PCDgjAJeXbjUe3n7VHAUzn4cANIJYKJvq9/o
-         Qt3aHRk7JcsLJK3VFXfLfZj16BEEP73tbu8b6tD51Z+awE/gDV+hu3cRf368hV01/5A/
-         Pu85FZGQ74vr2bH1QgmFR9owbRLrfsOXku+afUQ50C9f1lI4iOeaGY5hR8PQe9y/58BH
-         mVasaTck492n+76ZE8vZ+y0KFx5hgglet5kojVBGw+4VT4dFBEeE+5QJGhrF1xQwaP/5
-         fUrQ==
+        bh=kjDqVqTwk2r7eCk0rkCo36KA72Rh6D0VMi7VIxvc9+Q=;
+        b=DPkiuCMiReIFbCY6uPrj5M1BcUFNRKlQhb4fnH/DXehql5G0PoQmIYiuvw/21ukLpX
+         V27IbaD8OeKXuu0S2XpbydHggdrsZfPmXbHEvKtzqpLUqHnYBFii4B3UgTaCuXNyIrD0
+         SOxXy+s7wP1a5WYcSCjokejqmTotvO/Iyg3bhrC6SsQsJ3zljx/fGTpgQdKoXglnmBos
+         mqZd4DblV4J8gWZG54ENoJs0EY5J8wBmd0W8dl6WIYrqrz54Fp48kjAsSUCg8cq+njc/
+         B0WgQQwtUyIYGGViZOS9Px/Wsjnp+Vb9EhJnqDGz97iLyfS3hLUbLE+uaTvLOpzq96Qj
+         Kruw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763723498; x=1764328298;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1763725574; x=1764330374;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ezTG0c03OD07wwSaXajwua3oK74Hbi6tRsK/GFCnf+c=;
-        b=vYNgVPhChI6KgLic4qpetkPM21QEQpO1X9DsYEfPaNgmGNKhO+zUZDTJDbMY9i1MnE
-         h016Ln9ANOA3X4cxLQ3BkQuQ2Iedm9lNoZKSV2doyw+21byIIb/s6CAGxz86dGLxJ7dA
-         CFZj5BVSBekvetReVMvd14KPZobEJJdUA86DbNcEXD2wmvEo4t5csJ+HsZD1GdHcSIUQ
-         LwXTP8mcXW1mHPr9P1l7JKM8lrnG1G20xpah/kKxh3Q8v6hNalouYc4N9YqG5XDKe9HG
-         q8MWIkE6SxX63eHOd0A0/e+BnEety1flnXc+nQHBjzOP/0txBsj00V9JTvcsw9038iXK
-         nstQ==
-X-Gm-Message-State: AOJu0Yx+x4ZQW5z/VTPIVva1BZ2fxawPToEQCuGKhjKBOV2DIyI3e+0V
-	IVbdn/GqtnMA070yIW8M+1OTqj8mIYXqxpLpnBpORGeRH4y7GnhU4RbizNuZ9UAzt6jjYA==
-X-Gm-Gg: ASbGncuIne28l+lJk6W5c0wgmeJXSDA/be1Fk6afkexEpMSbk7JFv3k5+qjeCL2k45R
-	om29z00XOlOfouykvuHuQ3N3fF1ZkHMx8wQ4011MJkDSgGhOmus5U5s8awVN8PXOwyH6mzyNCBK
-	eu4/4q9EulC1iteTZQt19WRzgKqaAGzXKoeS9VN4hvwjPU7X0Zq9P+471ACFI6NifK5TtoICaiX
-	7mb7ZE4c4PLfGVWfeP6e/j5truhRKLkRACiCMtenOCbv0KoILG8FLU8mz7yROrpq/hqJ1WtVyqK
-	v+iVNjHWq664tCDiQjO+gCCqQ6WZP9Wxep14r2oAr4SikkrNCeehYzi7eYSg/AAE1axFX3qq/Cd
-	oBjGlyLsquylG+Rc7cbCP3luXy1L2OCAozdvQ/hAe8Co5JN0qG2dGqIC+BHWRWgxEW5TSpYEEfd
-	cIU20qTgtxssbF1pEZvrROQhXClz5DZf6cFkPt/oWzdKWDl83DI4cpN+iwFPXuz+FZpL/GlQX9O
-	T1kSj3rYPy+OOQs2hBlrBoQomg56Y+ska61FMb83qM=
-X-Google-Smtp-Source: AGHT+IHt/kAAQWENOHXpe3yzAVmcIXRSnXZLw0S538PHuVkTpnQN+guqXm5d++Cpovl+Y87I7qmd2Q==
-X-Received: by 2002:a05:600c:354b:b0:46f:b327:ecfb with SMTP id 5b1f17b1804b1-477c0184c45mr19010215e9.9.1763723498088;
-        Fri, 21 Nov 2025 03:11:38 -0800 (PST)
-Received: from ip-10-0-150-200.eu-west-1.compute.internal (ec2-52-49-196-232.eu-west-1.compute.amazonaws.com. [52.49.196.232])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f363e4sm10484180f8f.12.2025.11.21.03.11.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 03:11:37 -0800 (PST)
-From: Fred Griffoul <griffoul@gmail.com>
-To: kvm@vger.kernel.org
-Cc: seanjc@google.com,
-	pbonzini@redhat.com,
-	vkuznets@redhat.com,
-	shuah@kernel.org,
-	dwmw@amazon.co.uk,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fred Griffoul <fgriffo@amazon.co.uk>
-Subject: [PATCH v3 10/10] KVM: selftests: Add L2 vcpu context switch test
-Date: Fri, 21 Nov 2025 11:11:13 +0000
-Message-ID: <20251121111113.456628-11-griffoul@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251121111113.456628-1-griffoul@gmail.com>
-References: <20251121111113.456628-1-griffoul@gmail.com>
+        bh=kjDqVqTwk2r7eCk0rkCo36KA72Rh6D0VMi7VIxvc9+Q=;
+        b=aeZcUUMm8duVdCfEHywStzFpYkppdtuTpqIE1xJ/ssZWAhI9GsKFI8wxx7e+2cbdNf
+         opHPAqks5ylDjIz/PhCepbOa+lrLMfz4QxZSIPU7B+QRYln2imPYnmgdnCZvv4liCyZA
+         fU948WZuTyKhCFUBki8KvMIAtXJpHlrbBXNO7gCfL4VNw/RvIeaLk8sP1OUhM/ShNiN5
+         ymG5Y7S+0ndMKsYjKqx+J1z/XUBAXsJPrJsDnCBGQIYS2OR7hrSqAwV5raq88+dZO8Ds
+         YYdKTaA63sxFb9MUu2NqTlf1vL1SZvqCuATMdk8AMMpBB4cxw3dQRMoQzs4/FIDTsIOl
+         vAJA==
+X-Forwarded-Encrypted: i=1; AJvYcCVz+83c7BqgFGmxWjnuRI51/jnadrLfV1w5DdrYNAgLjnDWxe2RGOvVbwvrI1qIRqGSozM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+oamX9DLnuq29d/lfDtJh9jTAdD7xwifFTx5eVXygY+Ygxg2x
+	IRkKGdANt4MCHR+qy1xZqFR2kUgf5wAiCmpOBOK2mrD9nqdwhpHnxCexwPc2rMKKxTcPY8aQmzr
+	ZbUdzDrU1K3Po/yHvH8osITsm+vO4XWzgGjeR9qM=
+X-Gm-Gg: ASbGncv1hxC0kA5yH5giLIFVj0AJO37bg42vJR/Zqofo0Yu51AHY1vqW0TAelxFFhv6
+	UEoYLXZb5JtYj0owbZ2kqB+ymsNXNSO6Lr5g1Gf6L0rfuA3AeGMY3kj/OALgSL0/WXzx2BNwSMU
+	puojOR0+BWYVRpgrwxdjzJl58ybGRwziJuSiBfV1q/TD/DXWqxTVNcSH8laAvOt4Sh2buxcEH+I
+	Dx7W/k20UozKRf73vpmNdSC6KuOhiiH99ehLtut9SMdd5O6JAvHq2Gx0mUZpEHDOXW4zaMuwLsG
+	Y4fing==
+X-Google-Smtp-Source: AGHT+IFoPzb2SVgD/COpL5gB8aUWLH4DdvUJvdFg7BI8VeTFdNlaAp3NjbwbrdW76PbuGe3pGc7DTztobcF5u5R7KYk=
+X-Received: by 2002:a17:90b:4c0f:b0:32e:9da9:3e60 with SMTP id
+ 98e67ed59e1d1-34733f54393mr2514481a91.36.1763725573765; Fri, 21 Nov 2025
+ 03:46:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251110033232.12538-1-kernellwp@gmail.com> <20251110033232.12538-7-kernellwp@gmail.com>
+ <aR-zxrYATZ4rZZjn@google.com>
+In-Reply-To: <aR-zxrYATZ4rZZjn@google.com>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Fri, 21 Nov 2025 19:46:01 +0800
+X-Gm-Features: AWmQ_bm4pfGHBHiBWWyTyY6CMI9qnOJ05t-mI5pRzvSHayhT4G9zIxDnstGvDUY
+Message-ID: <CANRm+CwaMf64=vAaFdr0hJabtV0CALNBKJgrkooiYQPVuv2UGw@mail.gmail.com>
+Subject: Re: [PATCH 06/10] KVM: Fix last_boosted_vcpu index assignment bug
+To: Sean Christopherson <seanjc@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Juri Lelli <juri.lelli@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Fred Griffoul <fgriffo@amazon.co.uk>
+On Fri, 21 Nov 2025 at 08:35, Sean Christopherson <seanjc@google.com> wrote=
+:
+>
+> On Mon, Nov 10, 2025, Wanpeng Li wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > From: Wanpeng Li <wanpengli@tencent.com>
+>
+> Something might be off in your email scripts.  Speaking of email, mostly =
+as an
+> FYI, your @tencent email was bouncing as of last year, and prompted commi=
+t
+> b018589013d6 ("MAINTAINERS: Drop Wanpeng Li as a Reviewer for KVM Paravir=
+t support").
 
-Add selftest to validate nested VMX context switching between multiple
-L2 vCPUs running on the same L1 vCPU. The test exercises both direct
-VMX interface (using vmptrld/vmclear operations) and enlightened VMCS
-(eVMCS) interface for Hyper-V nested scenarios.
+Hi Paolo and Sean,
 
-The test creates multiple VMCS structures and switches between them to
-verify that the nested_context kvm counters are correct, according to
-the number of L2 vCPUs and the number of switches.
+Regarding commit b018589013d6 =E2=80=94 I'm back to active KVM development =
+and
+ready to resume reviewing. Please update my entry to Wanpeng Li
+<kernellwp@gmail.com>. My recent patch series reflects the level of
+engagement you can expect going forward.
 
-Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/x86/vmx_l2_switch_test.c    | 416 ++++++++++++++++++
- 2 files changed, 417 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/vmx_l2_switch_test.c
+>
+> > In kvm_vcpu_on_spin(), the loop counter 'i' is incorrectly written to
+> > last_boosted_vcpu instead of the actual vCPU index 'idx'. This causes
+> > last_boosted_vcpu to store the loop iteration count rather than the
+> > vCPU index, leading to incorrect round-robin behavior in subsequent
+> > directed yield operations.
+> >
+> > Fix this by using 'idx' instead of 'i' in the assignment.
+>
+> Fixes: 7e513617da71 ("KVM: Rework core loop of kvm_vcpu_on_spin() to use =
+a single for-loop")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+>
+> Please, please don't bury fixes like this in a large-ish series, especial=
+ly in a
+> series that's going to be quite contentious and thus likely to linger on-=
+list for
+> quite some time.  It's pretty much dumb luck on my end that I saw this.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 3431568d837e..5d47afa5789b 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -138,6 +138,7 @@ TEST_GEN_PROGS_x86 += x86/triple_fault_event_test
- TEST_GEN_PROGS_x86 += x86/recalc_apic_map_test
- TEST_GEN_PROGS_x86 += x86/aperfmperf_test
- TEST_GEN_PROGS_x86 += x86/vmx_apic_update_test
-+TEST_GEN_PROGS_x86 += x86/vmx_l2_switch_test
- TEST_GEN_PROGS_x86 += access_tracking_perf_test
- TEST_GEN_PROGS_x86 += coalesced_io_test
- TEST_GEN_PROGS_x86 += dirty_log_perf_test
-diff --git a/tools/testing/selftests/kvm/x86/vmx_l2_switch_test.c b/tools/testing/selftests/kvm/x86/vmx_l2_switch_test.c
-new file mode 100644
-index 000000000000..5ec0da2f8386
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/vmx_l2_switch_test.c
-@@ -0,0 +1,416 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Test nested VMX context switching between multiple VMCS
-+ */
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "vmx.h"
-+
-+#define L2_GUEST_STACK_SIZE 64
-+#define L2_VCPU_MAX 16
-+
-+struct l2_vcpu_config {
-+	vm_vaddr_t hv_pages_gva;	/* Guest VA for eVMCS */
-+	vm_vaddr_t vmx_pages_gva;	/* Guest VA for VMX pages */
-+	unsigned long stack[L2_GUEST_STACK_SIZE];
-+	uint16_t vpid;
-+};
-+
-+struct l1_test_config {
-+	struct l2_vcpu_config l2_vcpus[L2_VCPU_MAX];
-+	uint64_t hypercall_gpa;
-+	uint32_t nr_l2_vcpus;
-+	uint32_t nr_switches;
-+	bool enable_vpid;
-+	bool use_evmcs;
-+	bool sched_only;
-+};
-+
-+static void l2_guest(void)
-+{
-+	while (1)
-+		vmcall();
-+}
-+
-+static void run_l2_guest_evmcs(struct hyperv_test_pages *hv_pages,
-+			       struct vmx_pages *vmx,
-+			       void *guest_rip,
-+			       void *guest_rsp,
-+			       uint16_t vpid)
-+{
-+	GUEST_ASSERT(load_evmcs(hv_pages));
-+	prepare_vmcs(vmx, guest_rip, guest_rsp);
-+	current_evmcs->hv_enlightenments_control.msr_bitmap = 1;
-+	vmwrite(VIRTUAL_PROCESSOR_ID, vpid);
-+
-+	GUEST_ASSERT(!vmlaunch());
-+	GUEST_ASSERT_EQ(vmreadz(VM_EXIT_REASON), EXIT_REASON_VMCALL);
-+	current_evmcs->guest_rip += 3;	/* vmcall */
-+
-+	GUEST_ASSERT(!vmresume());
-+	GUEST_ASSERT_EQ(vmreadz(VM_EXIT_REASON), EXIT_REASON_VMCALL);
-+}
-+
-+static void run_l2_guest_vmx_migrate(struct vmx_pages *vmx,
-+				     void *guest_rip,
-+				     void *guest_rsp,
-+				     uint16_t vpid,
-+				     bool start)
-+{
-+	uint32_t control;
-+
-+	/*
-+	 * Emulate L2 vCPU migration: vmptrld/vmlaunch/vmclear
-+	 */
-+
-+	if (start)
-+		GUEST_ASSERT(load_vmcs(vmx));
-+	else
-+		GUEST_ASSERT(!vmptrld(vmx->vmcs_gpa));
-+
-+	prepare_vmcs(vmx, guest_rip, guest_rsp);
-+
-+	control = vmreadz(CPU_BASED_VM_EXEC_CONTROL);
-+	control |= CPU_BASED_USE_MSR_BITMAPS;
-+	vmwrite(CPU_BASED_VM_EXEC_CONTROL, control);
-+	vmwrite(VIRTUAL_PROCESSOR_ID, vpid);
-+
-+	GUEST_ASSERT(!vmlaunch());
-+	GUEST_ASSERT_EQ(vmreadz(VM_EXIT_REASON), EXIT_REASON_VMCALL);
-+
-+	GUEST_ASSERT(vmptrstz() == vmx->vmcs_gpa);
-+	GUEST_ASSERT(!vmclear(vmx->vmcs_gpa));
-+}
-+
-+static void run_l2_guest_vmx_sched(struct vmx_pages *vmx,
-+				   void *guest_rip,
-+				   void *guest_rsp,
-+				   uint16_t vpid,
-+				   bool start)
-+{
-+	/*
-+	 * Emulate L2 vCPU multiplexing: vmptrld/vmresume
-+	 */
-+
-+	if (start) {
-+		uint32_t control;
-+
-+		GUEST_ASSERT(load_vmcs(vmx));
-+		prepare_vmcs(vmx, guest_rip, guest_rsp);
-+
-+		control = vmreadz(CPU_BASED_VM_EXEC_CONTROL);
-+		control |= CPU_BASED_USE_MSR_BITMAPS;
-+		vmwrite(CPU_BASED_VM_EXEC_CONTROL, control);
-+		vmwrite(VIRTUAL_PROCESSOR_ID, vpid);
-+
-+		GUEST_ASSERT(!vmlaunch());
-+	} else {
-+		GUEST_ASSERT(!vmptrld(vmx->vmcs_gpa));
-+		GUEST_ASSERT(!vmresume());
-+	}
-+
-+	GUEST_ASSERT_EQ(vmreadz(VM_EXIT_REASON), EXIT_REASON_VMCALL);
-+
-+	vmwrite(GUEST_RIP,
-+		vmreadz(GUEST_RIP) + vmreadz(VM_EXIT_INSTRUCTION_LEN));
-+}
-+
-+static void l1_guest_evmcs(struct l1_test_config *config)
-+{
-+	struct hyperv_test_pages *hv_pages;
-+	struct vmx_pages *vmx_pages;
-+	uint32_t i, j;
-+
-+	/* Initialize Hyper-V MSRs */
-+	wrmsr(HV_X64_MSR_GUEST_OS_ID, HYPERV_LINUX_OS_ID);
-+	wrmsr(HV_X64_MSR_HYPERCALL, config->hypercall_gpa);
-+
-+	/* Enable VP assist page */
-+	hv_pages = (struct hyperv_test_pages *)config->l2_vcpus[0].hv_pages_gva;
-+	enable_vp_assist(hv_pages->vp_assist_gpa, hv_pages->vp_assist);
-+
-+	/* Enable evmcs */
-+	evmcs_enable();
-+
-+	vmx_pages = (struct vmx_pages *)config->l2_vcpus[0].vmx_pages_gva;
-+	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-+
-+	for (i = 0; i < config->nr_switches; i++) {
-+		for (j = 0; j < config->nr_l2_vcpus; j++) {
-+			struct l2_vcpu_config *l2 = &config->l2_vcpus[j];
-+
-+			hv_pages = (struct hyperv_test_pages *)l2->hv_pages_gva;
-+			vmx_pages = (struct vmx_pages *)l2->vmx_pages_gva;
-+
-+			run_l2_guest_evmcs(hv_pages, vmx_pages, l2_guest,
-+					   &l2->stack[L2_GUEST_STACK_SIZE],
-+					   l2->vpid);
-+		}
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_guest_vmx(struct l1_test_config *config)
-+{
-+	struct vmx_pages *vmx_pages;
-+	uint32_t i, j;
-+
-+	vmx_pages = (struct vmx_pages *)config->l2_vcpus[0].vmx_pages_gva;
-+	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-+
-+	for (i = 0; i < config->nr_switches; i++) {
-+		for (j = 0; j < config->nr_l2_vcpus; j++) {
-+			struct l2_vcpu_config *l2 = &config->l2_vcpus[j];
-+
-+			vmx_pages = (struct vmx_pages *)l2->vmx_pages_gva;
-+
-+			if (config->sched_only)
-+				run_l2_guest_vmx_sched(vmx_pages, l2_guest,
-+						       &l2->stack[L2_GUEST_STACK_SIZE],
-+						       l2->vpid, i == 0);
-+			else
-+				run_l2_guest_vmx_migrate(vmx_pages, l2_guest,
-+							 &l2->stack[L2_GUEST_STACK_SIZE],
-+							 l2->vpid, i == 0);
-+		}
-+	}
-+
-+	if (config->sched_only) {
-+		for (j = 0; j < config->nr_l2_vcpus; j++) {
-+			struct l2_vcpu_config *l2 = &config->l2_vcpus[j];
-+
-+			vmx_pages = (struct vmx_pages *)l2->vmx_pages_gva;
-+			vmclear(vmx_pages->vmcs_gpa);
-+		}
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+static void vcpu_clone_hyperv_test_pages(struct kvm_vm *vm,
-+					 vm_vaddr_t src_gva,
-+					 vm_vaddr_t *dst_gva)
-+{
-+	struct hyperv_test_pages *src, *dst;
-+	vm_vaddr_t evmcs_gva;
-+
-+	*dst_gva = vm_vaddr_alloc_page(vm);
-+
-+	src = addr_gva2hva(vm, src_gva);
-+	dst = addr_gva2hva(vm, *dst_gva);
-+	memcpy(dst, src, sizeof(*dst));
-+
-+	/* Allocate a new evmcs page */
-+	evmcs_gva = vm_vaddr_alloc_page(vm);
-+	dst->enlightened_vmcs = (void *)evmcs_gva;
-+	dst->enlightened_vmcs_hva = addr_gva2hva(vm, evmcs_gva);
-+	dst->enlightened_vmcs_gpa = addr_gva2gpa(vm, evmcs_gva);
-+}
-+
-+static void prepare_vcpu(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
-+			 uint32_t nr_l2_vcpus, uint32_t nr_switches,
-+			 bool enable_vpid, bool use_evmcs,
-+			 bool sched_only)
-+{
-+	vm_vaddr_t config_gva;
-+	struct l1_test_config *config;
-+	vm_vaddr_t hypercall_page_gva = 0;
-+	uint32_t i;
-+
-+	TEST_ASSERT(nr_l2_vcpus <= L2_VCPU_MAX,
-+		    "Too many L2 vCPUs: %u (max %u)", nr_l2_vcpus, L2_VCPU_MAX);
-+
-+	/* Allocate config structure in guest memory */
-+	config_gva = vm_vaddr_alloc(vm, sizeof(*config), 0x1000);
-+	config = addr_gva2hva(vm, config_gva);
-+	memset(config, 0, sizeof(*config));
-+
-+	if (use_evmcs) {
-+		/* Allocate hypercall page */
-+		hypercall_page_gva = vm_vaddr_alloc_page(vm);
-+		memset(addr_gva2hva(vm, hypercall_page_gva), 0, getpagesize());
-+		config->hypercall_gpa = addr_gva2gpa(vm, hypercall_page_gva);
-+
-+		/* Enable Hyper-V enlightenments */
-+		vcpu_set_hv_cpuid(vcpu);
-+		vcpu_enable_evmcs(vcpu);
-+	}
-+
-+	/* Allocate resources for each L2 vCPU */
-+	for (i = 0; i < nr_l2_vcpus; i++) {
-+		vm_vaddr_t vmx_pages_gva;
-+
-+		/* Allocate VMX pages (needed for both VMX and eVMCS) */
-+		vcpu_alloc_vmx(vm, &vmx_pages_gva);
-+		config->l2_vcpus[i].vmx_pages_gva = vmx_pages_gva;
-+
-+		if (use_evmcs) {
-+			vm_vaddr_t hv_pages_gva;
-+
-+			/* Allocate or clone hyperv_test_pages */
-+			if (i == 0) {
-+				vcpu_alloc_hyperv_test_pages(vm, &hv_pages_gva);
-+			} else {
-+				vm_vaddr_t first_hv_gva =
-+				    config->l2_vcpus[0].hv_pages_gva;
-+				vcpu_clone_hyperv_test_pages(vm, first_hv_gva,
-+							     &hv_pages_gva);
-+			}
-+			config->l2_vcpus[i].hv_pages_gva = hv_pages_gva;
-+		}
-+
-+		/* Set VPID */
-+		config->l2_vcpus[i].vpid = enable_vpid ? (i + 3) : 0;
-+	}
-+
-+	config->nr_l2_vcpus = nr_l2_vcpus;
-+	config->nr_switches = nr_switches;
-+	config->enable_vpid = enable_vpid;
-+	config->use_evmcs = use_evmcs;
-+	config->sched_only = use_evmcs ? false : sched_only;
-+
-+	/* Pass single pointer to config structure */
-+	vcpu_args_set(vcpu, 1, config_gva);
-+
-+	if (use_evmcs)
-+		vcpu_set_msr(vcpu, HV_X64_MSR_VP_INDEX, vcpu->id);
-+}
-+
-+static bool opt_enable_vpid = true;
-+static const char *progname;
-+
-+static void check_stats(struct kvm_vm *vm,
-+			uint32_t nr_l2_vcpus,
-+			uint32_t nr_switches,
-+			bool use_evmcs,
-+			bool sched_only)
-+{
-+	uint64_t reuse = 0;
-+	uint64_t recycle = 0;
-+
-+	reuse = vm_get_stat(vm, nested_context_reuse);
-+	recycle = vm_get_stat(vm, nested_context_recycle);
-+
-+	if (nr_l2_vcpus <= KVM_NESTED_OVERSUB_RATIO) {
-+		GUEST_ASSERT_EQ(reuse, nr_l2_vcpus * (nr_switches - 1));
-+		GUEST_ASSERT_EQ(recycle, 0);
-+	} else {
-+		if (sched_only) {
-+			/*
-+			 * When scheduling only no L2 vCPU vmcs is cleared so
-+			 * we reuse up to the max. number of contexts, but we
-+			 * cannot recycle any of them.
-+			 */
-+			GUEST_ASSERT_EQ(reuse,
-+					KVM_NESTED_OVERSUB_RATIO *
-+					(nr_switches - 1));
-+			GUEST_ASSERT_EQ(recycle, 0);
-+		} else {
-+			/*
-+			 * When migration we cycle in LRU order so no context
-+			 * can be reused they are all recycled.
-+			 */
-+			GUEST_ASSERT_EQ(reuse, 0);
-+			GUEST_ASSERT_EQ(recycle,
-+					(nr_l2_vcpus * nr_switches) -
-+					KVM_NESTED_OVERSUB_RATIO);
-+		}
-+	}
-+
-+	printf("%s %u switches with %u L2 vCPUS (%s) reuse %" PRIu64
-+	       " recycle %" PRIu64 "\n", progname, nr_switches, nr_l2_vcpus,
-+	       use_evmcs ? "evmcs" : (sched_only ? "vmx sched" : "vmx migrate"),
-+	       reuse, recycle);
-+}
-+
-+static void run_test(uint32_t nr_l2_vcpus, uint32_t nr_switches,
-+		     bool use_evmcs, bool sched_only)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, use_evmcs
-+				     ? l1_guest_evmcs : l1_guest_vmx);
-+
-+	prepare_vcpu(vm, vcpu, nr_l2_vcpus, nr_switches,
-+		     opt_enable_vpid, use_evmcs, sched_only);
-+
-+	for (;;) {
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_DONE:
-+			goto done;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+		default:
-+			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
-+		}
-+	}
-+
-+done:
-+	check_stats(vm, nr_l2_vcpus, nr_switches, use_evmcs, sched_only);
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	uint32_t opt_nr_l2_vcpus = 0;
-+	uint32_t opt_nr_switches = 0;
-+	bool opt_sched_only = true;
-+	int opt;
-+	int i;
-+
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
-+
-+	progname = argv[0];
-+
-+	while ((opt = getopt(argc, argv, "c:rs:v")) != -1) {
-+		switch (opt) {
-+		case 'c':
-+			opt_nr_l2_vcpus = atoi_paranoid(optarg);
-+			break;
-+		case 'r':
-+			opt_sched_only = false;
-+			break;
-+		case 's':
-+			opt_nr_switches = atoi_paranoid(optarg);
-+			break;
-+		case 'v':
-+			opt_enable_vpid = false;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	if (opt_nr_l2_vcpus && opt_nr_switches) {
-+		run_test(opt_nr_l2_vcpus, opt_nr_switches, false,
-+			 opt_sched_only);
-+
-+		if (kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS))
-+			run_test(opt_nr_l2_vcpus, opt_nr_switches,
-+				 true, false);
-+	} else {
-+		/* VMX vmlaunch */
-+		for (i = 2; i <= 16; i++)
-+			run_test(i, 4, false, false);
-+
-+		/* VMX vmresume */
-+		for (i = 2; i <= 16; i++)
-+			run_test(i, 4, false, true);
-+
-+		/* eVMCS */
-+		if (kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
-+			for (i = 2; i <= 16; i++)
-+				run_test(i, 4, true, false);
-+		}
-+	}
-+
-+	return 0;
-+}
--- 
-2.43.0
+Good point about fixed visibility =E2=80=94 it makes sense to keep them sep=
+arate.
 
+>
+> That said, thank you for fixing my goof :-)
+
+:)
+
+Regards,
+Wanpeng
 
