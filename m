@@ -1,134 +1,143 @@
-Return-Path: <kvm+bounces-64075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64076-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECCDFC77B6A
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 08:37:49 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75802C77BAA
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 08:43:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 964463607AA
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 07:37:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id CE42929CC9
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 07:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49338337B8B;
-	Fri, 21 Nov 2025 07:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDC933B6D8;
+	Fri, 21 Nov 2025 07:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T/7e/eEo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OCp8Vjg5"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD3A33468E
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 07:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304E8339B4D;
+	Fri, 21 Nov 2025 07:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763710661; cv=none; b=RlfR/mslh4FNzKHiMjgrtVlQ8LiSKi36oX3zwpK6RMvv2YRzadfM4OsKkLhoSV8ylU+aA1cQ1CoFRGyUAaIHEBG1wDrsqXwwmzLaAzL6hI4O/LhsakJyaogalTGEXqoFnU/Xwb7OCUYmp+/cWVGH6yeCYakzw2eBdrCJQEprgIs=
+	t=1763710929; cv=none; b=u3jLKwWlKIUDqsiiQr672vfIiteEprNxmFtPeJXcQMHquCUyTpC7SHT5Sj2tX7UIgwP9ufdlWZvRjsofByKthMrdICh/t/txqQ/kZQz/DjqizFU60j1NeWRKoBsmzpIzinANSX3vTKlrxRrturLRrxRIIlBFs2rel6CODhnl0us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763710661; c=relaxed/simple;
-	bh=O4yUYlstzsGsEo98C5hQ9CTzRlB+xJjn+a0Fg6FDZos=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=bwRbUbRluBg63ntukpcM/HSCYIuSTA3eTno0C6PQG8Kyawh7o9LAVQ1dSVPgPtoGbz4TsTGgDSIY4I4Z3tOzGX9nDjmwxXyZDvzPFCyLqpqqSO1vRlIgkYlPUIWex371NNAm3y9SuKgyGlma3aDlKyU3gbZ4dLv+0Wf0hasf224=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T/7e/eEo; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763710657;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=igDlYyRnPCE7UGrSaq2pRsy2AoYFeSBXmKnGZzjhM+c=;
-	b=T/7e/eEoH6tK6Z6PkSNQOrFuKDSOUOWK05pa2NnadVYhMyvmB9x4c455isesYBscibvHeS
-	jc52ZOeU39Rt8sFzel/M2NCGK9VOL3CMSD8aOD9YbmIuyaQ6kKDjejKOL8+azH6soNwblv
-	U672nkQO1mSd01eygoNRMVPozJaQMX4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-145-4S8p1gJgOD2z9prdQBzToA-1; Fri,
- 21 Nov 2025 02:37:32 -0500
-X-MC-Unique: 4S8p1gJgOD2z9prdQBzToA-1
-X-Mimecast-MFC-AGG-ID: 4S8p1gJgOD2z9prdQBzToA_1763710648
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A617B1956061;
-	Fri, 21 Nov 2025 07:37:26 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.45.242.3])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 23A9E1800877;
-	Fri, 21 Nov 2025 07:37:24 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id ADAC221E6A27; Fri, 21 Nov 2025 08:37:21 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: "Dr. David Alan Gilbert" <dave@treblig.org>
-Cc: qemu-devel@nongnu.org,  arei.gonglei@huawei.com,
-  pizhenwei@bytedance.com,  alistair.francis@wdc.com,
-  stefanb@linux.vnet.ibm.com,  kwolf@redhat.com,  hreitz@redhat.com,
-  sw@weilnetz.de,  qemu_oss@crudebyte.com,  groug@kaod.org,
-  mst@redhat.com,  imammedo@redhat.com,  anisinha@redhat.com,
-  kraxel@redhat.com,  shentey@gmail.com,  npiggin@gmail.com,
-  harshpb@linux.ibm.com,  sstabellini@kernel.org,  anthony@xenproject.org,
-  paul@xen.org,  edgar.iglesias@gmail.com,  elena.ufimtseva@oracle.com,
-  jag.raman@oracle.com,  sgarzare@redhat.com,  pbonzini@redhat.com,
-  fam@euphon.net,  philmd@linaro.org,  alex@shazbot.org,  clg@redhat.com,
-  peterx@redhat.com,  farosas@suse.de,  lizhijian@fujitsu.com,
-  jasowang@redhat.com,  samuel.thibault@ens-lyon.org,
-  michael.roth@amd.com,  kkostiuk@redhat.com,  zhao1.liu@intel.com,
-  mtosatti@redhat.com,  rathc@linux.ibm.com,  palmer@dabbelt.com,
-  liwei1518@gmail.com,  dbarboza@ventanamicro.com,
-  zhiwei_liu@linux.alibaba.com,  marcandre.lureau@redhat.com,
-  qemu-block@nongnu.org,  qemu-ppc@nongnu.org,
-  xen-devel@lists.xenproject.org,  kvm@vger.kernel.org,
-  qemu-riscv@nongnu.org
-Subject: Re: [PATCH 11/14] error: Use error_setg_errno() to improve error
- messages
-In-Reply-To: <87o6owq6ob.fsf@pond.sub.org> (Markus Armbruster's message of
-	"Fri, 21 Nov 2025 06:46:28 +0100")
-References: <20251120191339.756429-1-armbru@redhat.com>
-	<20251120191339.756429-12-armbru@redhat.com>
-	<aR-t5SzR2AdqlJtq@gallifrey> <87o6owq6ob.fsf@pond.sub.org>
-Date: Fri, 21 Nov 2025 08:37:21 +0100
-Message-ID: <87a50fq1ji.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1763710929; c=relaxed/simple;
+	bh=O/owrQ7LTAA9ZbRZu64BC64XoYmRo+uhZTzeo+Ew2jc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VqfAKVNQn6zUXKv+zTzr13JkffqvcsCDPWxFbaAtUgdesYHo+4ZvhD0vS+JfUmuofXGA42X3IU43gJVv7vhV5lwKvGac2txH/SvRZIGk8pi+usr4d+IdRilpUTVjBrzHf2iG3Ve7hm7JM038HxwUBwfxawpk7tCOyUQQ8Ep2BHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OCp8Vjg5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0F4DC4CEF1;
+	Fri, 21 Nov 2025 07:42:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763710928;
+	bh=O/owrQ7LTAA9ZbRZu64BC64XoYmRo+uhZTzeo+Ew2jc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OCp8Vjg5oImfKWfN4GXv7kmUMrNS5krBORtVRTmwcB4DOZvoX+/g/t4vr9ZWu6UJl
+	 1Vj7sFNlUll1T9YUQc4xpzO6PKziNve8YmQzv8+oTDniJ8ihFor/4t6HDeETH7XPnh
+	 0qzUx+skWQwrxymzZd4yqSdRZyo5Qm9O91YykG/j5f61W+s9sbvi1j4nNmvR6DSrSr
+	 IkeXOC0kXEpJjmiSHsc4BSNizwXT4L6AL6eRN87ViuHkHSr6r++BESWVogPdAjx1dI
+	 qCWxiIBByOU5w/PZ6VKwrk97r6+SckIe4Pi/3ecdSozDC1fXrYtDiogYDbOS5uXIBj
+	 XbOkJYPROPYqA==
+Date: Fri, 21 Nov 2025 09:42:03 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex@shazbot.org>
+Cc: Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, iommu@lists.linux.dev,
+	linux-mm@kvack.org, linux-doc@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>
+Subject: Re: [PATCH v9 10/11] vfio/pci: Add dma-buf export support for MMIO
+ regions
+Message-ID: <20251121074203.GX18335@unreal>
+References: <20251120-dmabuf-vfio-v9-0-d7f71607f371@nvidia.com>
+ <20251120-dmabuf-vfio-v9-10-d7f71607f371@nvidia.com>
+ <20251120170413.050ccbb5.alex@shazbot.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251120170413.050ccbb5.alex@shazbot.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
+On Thu, Nov 20, 2025 at 05:04:13PM -0700, Alex Williamson wrote:
+> On Thu, 20 Nov 2025 11:28:29 +0200
+> Leon Romanovsky <leon@kernel.org> wrote:
+> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> > index 142b84b3f225..51a3bcc26f8b 100644
+> > --- a/drivers/vfio/pci/vfio_pci_core.c
+> > +++ b/drivers/vfio/pci/vfio_pci_core.c
+> ...
+> > @@ -2487,8 +2500,11 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+> >  
+> >  err_undo:
+> >  	list_for_each_entry_from_reverse(vdev, &dev_set->device_list,
+> > -					 vdev.dev_set_list)
+> > +					 vdev.dev_set_list) {
+> > +		if (__vfio_pci_memory_enabled(vdev))
+> > +			vfio_pci_dma_buf_move(vdev, false);
+> >  		up_write(&vdev->memory_lock);
+> > +	}
+> 
+> I ran into a bug here.  In the hot reset path we can have dev_sets
+> where one or more devices are not opened by the user.  The vconfig
+> buffer for the device is established on open.  However:
+> 
+> bool __vfio_pci_memory_enabled(struct vfio_pci_core_device *vdev)
+> {
+>         struct pci_dev *pdev = vdev->pdev;
+>         u16 cmd = le16_to_cpu(*(__le16 *)&vdev->vconfig[PCI_COMMAND]);
+> 	...
+> 
+> Leads to a NULL pointer dereference.
+> 
+> I think the most straightforward fix is simply to test the open_count
+> on the vfio_device, which is also protected by the dev_set->lock that
+> we already hold here:
+> 
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -2501,7 +2501,7 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+>  err_undo:
+>         list_for_each_entry_from_reverse(vdev, &dev_set->device_list,
+>                                          vdev.dev_set_list) {
+> -               if (__vfio_pci_memory_enabled(vdev))
+> +               if (vdev->vdev.open_count && __vfio_pci_memory_enabled(vdev))
+>                         vfio_pci_dma_buf_move(vdev, false);
+>                 up_write(&vdev->memory_lock);
+>         }
+> 
+> Any other suggestions?  This should be the only reset path with this
+> nuance of affecting non-opened devices.  Thanks,
 
-> "Dr. David Alan Gilbert" <dave@treblig.org> writes:
->
->> * Markus Armbruster (armbru@redhat.com) wrote:
->>> A few error messages show numeric errno codes.  Use error_setg_errno()
->>> to show human-readable text instead.
->>> 
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>
->> ...
->>
->>> diff --git a/migration/rdma.c b/migration/rdma.c
->>> index 337b415889..ef4885ef5f 100644
->>> --- a/migration/rdma.c
->>> +++ b/migration/rdma.c
->>> @@ -2349,8 +2349,7 @@ static int qemu_get_cm_event_timeout(RDMAContext *rdma,
->>>          error_setg(errp, "RDMA ERROR: poll cm event timeout");
->>>          return -1;
->>>      } else if (ret < 0) {
->>> -        error_setg(errp, "RDMA ERROR: failed to poll cm event, errno=%i",
->>> -                   errno);
->>> +        error_setg_errno(errp, "RDMA ERROR: failed to poll cm event");
->>
->> Hasn't that lost the errno ?
->
-> Yes.  My build tree must have lost the ability to compile this file.  I
-> need to fix that.
+It seems right to me.
 
-Actually a patch splitting accident.  Fixed.
+Thanks
 
-[...]
-
+> 
+> Alex
 
