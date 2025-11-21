@@ -1,220 +1,213 @@
-Return-Path: <kvm+bounces-64027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AD82C76CC6
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 01:47:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D007C76CDD
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 01:52:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F1F5C4E2F9C
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:47:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id DB1A028A51
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:51:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D428626D4C7;
-	Fri, 21 Nov 2025 00:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD41275B18;
+	Fri, 21 Nov 2025 00:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ouWWUU3H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VT2pE56V"
 X-Original-To: kvm@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013050.outbound.protection.outlook.com [40.93.196.50])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6BEBA45;
-	Fri, 21 Nov 2025 00:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763686046; cv=fail; b=dFvWrruAH5cqnzMBTEgHN5vP7nyOuC8wHKP5PtHtiskt03s8v6EBli/xJMBPcqZ/T120mXdBJs0YAX0QQpyZDSSKuqLnxfA8I5iEenak/jgNE5CSzEBqvBcnk8+EDXLJsmCBXOnolAIrLf76SKGiur5QNqhzDVxBBQOJJxxjROE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763686046; c=relaxed/simple;
-	bh=WTvGoOqJt3BgtHvNCSsWwB+stkvb2mtzVLMXY4iNCzY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=joeUbFsl/Ia++B0oM1wcZ9z8s9cfPmKUkEtOJuXwDs9ZZhF3QHkApM+0aYRTND2vQkrJU32jG2SYzaAtyOitZG0GqNAVo6DvX+cDZxFfuD5IP4CSIR4NXvTco4DBCJ98jT76/9rrh4CaK6mCT5ZGSrScUPbYM76fpBgtjQTOw5Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ouWWUU3H; arc=fail smtp.client-ip=40.93.196.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=t/kyiO3lKG54ZoDmqxwXbJTI7Q8nIG1444Sq4DjAV5hicuvvqWHIO9IqMoIcIQk43KlNFgs1TBiZH/TYYjMspkWtSe+Db/WbnZtuoUNEGGkIaA0JYycQIMifA/6bopGe9AAuXhuSfVdG+3mcGbxuOi/cBqqZDT05WDuoEiZHBfKhwBQspAjW9mIkbqzoUbSw3CNsonA3mR8RY77zr6eTLRIdWJW3AMJexNG9tWd2OMV626yROWnXGAJg6AtD1tMC7u6o08r6FrD3/lcCnQD1xSVOK3YgTjlsIcuZTMmI7Ix9semfUEntN+8qXubrS0S8QHpBCJ5kRRkrdZQbGrI9bw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KEeZzbtlfgZ6cibpsf61ef2/aVliNIQUo/35eGVPdr4=;
- b=s5ZGOJyLeq9oCsf6oO1R2lM22Fi62drXGc5B2MMx1MW2zxFlVUA+oCmeDwpaU4cOV6YtCc2IyIMY/I9reF+G2UooQLfrG55H+etb4BtOK9ShL9r7AzMuEm3N26ITOka0hAWucuZO0GLq1SIiZp7YPm5GZsRUk+kaxINfffA8P3cYcbQ+U2Dcky2LHqxFT9Kj8UR6lzabn5G+yt3F+jODqFR0Gq/yJ3JzJN0D7cu9YPOGh9zQelraXAC2LL/3gmS+Yv+fbFFCh9gOMd6fGlaX7sMVRXVmtMFdlqeA1SswISyG22yA9XyMFq4r/lXGrczUJQHscQReudV45tJDAoPE8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KEeZzbtlfgZ6cibpsf61ef2/aVliNIQUo/35eGVPdr4=;
- b=ouWWUU3Hvrtb/PJkOi3R2sh6zyE2ylHe5X4bunxagnDPSSZaVsfn4cF+B2R8OqGjFRoLDCSJRonVKdp8YPShgSEWsj7CleHkbdAhl509SnxYXjk4gDtykVNE5pRSF/RGZtNgXBP+8JvwiiK3lPl/hz4sz3+U8en4qvwMLXJDGT+VsNB0Jl14yzfhq+OsmsuEzuojWaEoEAaD9pHVyQfcntQ45ZmOlNmORG0VOoQqmUhUBEIPgDKb1grqJfWJ6ukHEjtGXjTm7XK+iWux9NXR8kB0NXwud5SYsI+df/udj8senDdTkN/efmSdxtsO8c+olmqdzlkryZX9XZobBlV5QQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
- by PH0PR12MB8774.namprd12.prod.outlook.com (2603:10b6:510:28e::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.11; Fri, 21 Nov
- 2025 00:47:21 +0000
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9343.009; Fri, 21 Nov 2025
- 00:47:21 +0000
-Date: Thu, 20 Nov 2025 20:47:20 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Alex Williamson <alex@shazbot.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	Joerg Roedel <joro@8bytes.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Will Deacon <will@kernel.org>, Krishnakant Jaju <kjaju@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Matt Ochs <mochs@nvidia.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	"patches@lists.linux.dev" <patches@lists.linux.dev>,
-	Simona Vetter <simona.vetter@ffwll.ch>,
-	"Kasireddy, Vivek" <vivek.kasireddy@intel.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: Re: [PATCH 6/9] iommufd: Have pfn_reader process DMABUF iopt_pages
-Message-ID: <20251121004720.GF153257@nvidia.com>
-References: <0-v1-af84a3ab44f5+f68-iommufd_buf_jgg@nvidia.com>
- <6-v1-af84a3ab44f5+f68-iommufd_buf_jgg@nvidia.com>
- <BN9PR11MB52769E70061CE3AB22F9E0618CD4A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB52769E70061CE3AB22F9E0618CD4A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR04CA0017.namprd04.prod.outlook.com
- (2603:10b6:208:d4::30) To MN2PR12MB3613.namprd12.prod.outlook.com
- (2603:10b6:208:c1::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A57C1EEE6;
+	Fri, 21 Nov 2025 00:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763686303; cv=none; b=r6ajDMBkR0aMFeTrKrLiZhNBcHFAAuJGBBl7tYVd5UIOSuLmJaZVdhvp393VGTjMX4IWY02sj/Dnvrx6x1gMJKR5L28sqZ6ki32Fh7dmh9rgF7Di+ZCMIALttC7XG0BKq6vopxMuxtEyicpCp/xzHI1i+I37fFWrdMrnqWqoXyA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763686303; c=relaxed/simple;
+	bh=g1wy0vRd3bkKbK6J2KNFmkL+aCW2Fjm6xnn10vnyoXQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NUhwsJeRPTKLd033RHUYdNT/IoZYc2o9RwsMOWFyt+8x/dK980CYD0XQDtuODS+9g+8am6jgvdqUyKp3NlPiHZrBv677ZziVYcBvZ8Rnsf7PDELONtcHwqca0Dj2xsrylYGbjyNIjhBMXGy81LMWSdGHoWLNVgBgJDeIgwD/vUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VT2pE56V; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763686302; x=1795222302;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=g1wy0vRd3bkKbK6J2KNFmkL+aCW2Fjm6xnn10vnyoXQ=;
+  b=VT2pE56VDV8lCvx2dm0fu/PZAlbwyT6XKUZ+8TNT6vEtUusJ1f+S5FTk
+   T6PUcs+4FwtHfOupvgWzXi4pJu15V/tmW5aZJ9GB2Ga6aKxfIIFDLRn9a
+   RTMFcd6SLqMVjZlOqAK+1eF04zHURyeCHiHsvixHdXUZ+apr/NWuTEdPr
+   Hpwu1906OBYWjMDeWunxbkSSBmKkLCYKhpXLW4FqDElsnVCcWnuZCwvt8
+   GckeZnd8pTY3ivi9BIhejLjhwV832SX/KAKUJ/4HUPYuu4gr4vUYBYzkF
+   Y0Miars+j3mpspDeG6CsMqwKJxqy4LzBfLQMDoH+oA7hBWMl9VROlbTwx
+   A==;
+X-CSE-ConnectionGUID: jH6m2o2RQp2b8sVS9tKErw==
+X-CSE-MsgGUID: uLK56HX7TMy6SBMkJbCxYg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="64780714"
+X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
+   d="scan'208";a="64780714"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 16:51:41 -0800
+X-CSE-ConnectionGUID: AYf5drVFSdavg3SXUQgCzA==
+X-CSE-MsgGUID: tLId5LiEQiS5sNgMIM11jQ==
+X-ExtLoop1: 1
+Received: from rpedgeco-desk.jf.intel.com ([10.88.27.139])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 16:51:41 -0800
+From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+To: bp@alien8.de,
+	chao.gao@intel.com,
+	dave.hansen@intel.com,
+	isaku.yamahata@intel.com,
+	kai.huang@intel.com,
+	kas@kernel.org,
+	kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	mingo@redhat.com,
+	pbonzini@redhat.com,
+	seanjc@google.com,
+	tglx@linutronix.de,
+	vannapurve@google.com,
+	x86@kernel.org,
+	yan.y.zhao@intel.com,
+	xiaoyao.li@intel.com,
+	binbin.wu@intel.com
+Cc: rick.p.edgecombe@intel.com
+Subject: [PATCH v4 00/16] TDX: Enable Dynamic PAMT
+Date: Thu, 20 Nov 2025 16:51:09 -0800
+Message-ID: <20251121005125.417831-1-rick.p.edgecombe@intel.com>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|PH0PR12MB8774:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4bf3d466-c9e7-47df-c7b8-08de2897878c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?9eRDoqkECgi/8n+ut5sQ85pTufvDCMmNkSa2+krjhI7zYwr+KunTeAtrbjBZ?=
- =?us-ascii?Q?UEGuOaGp0YhF3/Qtoa/PgUUpLLVFEWvwf7bG/5BoCb43uXn8ExrYv2HpPSEl?=
- =?us-ascii?Q?vPNj0sxqOUy5suPdrVckMHJSCBlLoZ5l07GWf045KTyyDehbp0PaR4lAFubU?=
- =?us-ascii?Q?rL0oQrpHgJGdE5SaRbbI9eB3MIakxqNF2CI5T123MqYXJPVoqS49C4k1PqSc?=
- =?us-ascii?Q?4o6OXzrmXvkutLmZQoLjsh6GQIDU0SMuffhqKxZqs3S2PV3TjrdUZ3tED7Y6?=
- =?us-ascii?Q?QI421XsLGufFK8WEAMzJ0D80Qf29k43NHlroaNHAE5BLZmsRMuJt0gwerTt9?=
- =?us-ascii?Q?3WMRg/LjVUJxJJG3KI39mJlXPAXBJrznhyNBjm1V37kmDLE2zHlbEbMj29C5?=
- =?us-ascii?Q?8DYT4y/ZTzOe3XSIV19q9HF8lTJOjictJI350HCsMRT/czZlJQtN98k3hIft?=
- =?us-ascii?Q?RKvgw7nZYa+uBXBh3TLrwZQE3rrbu4r0gvdZ9NOZqwoFt1TxRLtd084V2a5c?=
- =?us-ascii?Q?K+W2KNydUOlTC3yAaUj0gg0l1amLT0wmb3pRRFra17knhgOYd8UF3SuI5Ql2?=
- =?us-ascii?Q?5L6uwf+8RrYfIBsQ0kNvS5xyI4PwR54OOco8NFCbdtA90yyt0Mz211o5AHlT?=
- =?us-ascii?Q?K1doqFODrcW+mlTdsb77OhUXwo6sUYBaVqtPGm5LQXGiuEnbms1WQjXd4Zkn?=
- =?us-ascii?Q?OkoqY1OJbnyrMSPrkAvV9d2AAXSM8DVcn2f3gDz6gPMvCkKEPYvQc6m9F69o?=
- =?us-ascii?Q?u5n8uCBUAeUQ0PnwfZ0iy1iX8NrewPadgcBbfOoGIdpmtzwmohupSEyA9vFI?=
- =?us-ascii?Q?4p6w7nG6jBkV+jIc2c/5TUbfd/1aPf8oLmen9FPp7q8Rx/EC0i3tqScuSNWv?=
- =?us-ascii?Q?JulFQnZ9jVPoQUqt5YZ99kGI3SKOs+izAzqE1FUG4VZFICaI05uqZJaWZrMK?=
- =?us-ascii?Q?OG0OLQg5BaFN2BBl2QsrQetJJK4XlRomPEiy5PeJEj/STD4T/BPEhyJfdvIy?=
- =?us-ascii?Q?2AU7hSXgsFAlP/iBc1RNwhcnrB29valsMvnbKU+qoyETGkP+bRzPzCiXE7Y+?=
- =?us-ascii?Q?4VXMi/R670pr3PvNAIPx5zHWnlmSzaIg0ZTSWwiWEzP1VADRk4N6XSner4cK?=
- =?us-ascii?Q?jym5PpB99ghLum4iAqylAMy8JDIZ9IpIc+myQrww03fe7duC26F0Nwu4kHue?=
- =?us-ascii?Q?0yTf4eoiDr1hZOyJ9CsEFr9gfci+vUlFg5GA/uXt6bPauiWAQIvvJYo+KfkY?=
- =?us-ascii?Q?otCzRTMbyWjhIObCA9yOY3hQk4nBrfMiA2NnpLrjIFBFHAqCrgHbSFTHH5P3?=
- =?us-ascii?Q?41QesVsJ6kSAhql1sbz/sLnNtSUho7CdMQlfAJZBO7t0DhtVcIV40KHiN9YG?=
- =?us-ascii?Q?qOFed0UQQ+Jj4dVzyTVrLxuHHqnGR4G7nWI1pvDKf+NWrgeDJ+4qh4XVK2QS?=
- =?us-ascii?Q?QD7BRjml624quTFs9qny2fYjcOOzQA0D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6IA43vWoiiSYBcs6t0cIiNQZW0u6hWcrbb6k/NViupQzjW0S8HQkwvgfeLR6?=
- =?us-ascii?Q?AsgrWjIormW1nPAuEs8FM+keuVbmfsD2LzIkJ+IW7JxHs8ZNfNfXEwR9F75A?=
- =?us-ascii?Q?/65Q26eogM4XqPxwrTSXduZ0q0sazzaZjv4AyCkdd+YBmwY6LyxnJrroPqS6?=
- =?us-ascii?Q?Y3/zbgmQIfnUjSpPC1mcqSYZK4KnFWghMmaaPaQNrfT9It4WCEl0JoZMsWiS?=
- =?us-ascii?Q?1tU4N0c+TDS0uSjHI3G+lTCfvI7m5hQ7FJpUf/cUdOdZfZloKWeRoZb5kDSu?=
- =?us-ascii?Q?oiuzsn/IsHdnxRJNeM1wWb/eBRVMEumCNWjQXLrf04fMcL4qbdXNkDF7MwXf?=
- =?us-ascii?Q?LbUOAdmOe7EVPw98F/eMB/1rZtd3b+uEu6iIikVNO3iWwjki2t05ULj/Jxw6?=
- =?us-ascii?Q?l+ps1qK/NWNGIdA+xAFRXDjt+pUPm89Yl7ca1LD2rULR+5h4OcNypBFjz20d?=
- =?us-ascii?Q?8fNwt2Fq+OqhQzWcCLsoq2CY0KpICLl42dO4jtTT+tiyHZC5FAUM+W3R3Me5?=
- =?us-ascii?Q?YLqAu6sOizzNhfLD1fcQTY5iqwVNPwYI6CPL4KTb/g2zfVocsHbZpvZFm1NO?=
- =?us-ascii?Q?uwaNo9m8Kp8ltNCEPeX1ibHWcUnXRsX1FrEGJtUmKVdam0TWLys5Z6uVA0CP?=
- =?us-ascii?Q?hIBp3I4PSpnSMCUz1iTVilS+61DMK7f40vke9c94Grn3vc3CRBPMXEy4dfTg?=
- =?us-ascii?Q?8ROHbhxGM+fXQ6Enn5AfQPTPXrSyccAIrlw3EH6GCGZSKxtyN4FRHZ3OAFW7?=
- =?us-ascii?Q?kQC9z2a+1Xodu0vn+jdxTkr84VVVw7ia+RHzY0xYseZh5ATwUU6dU83tsYSV?=
- =?us-ascii?Q?mImwZZ8sJGJaXSiqUCJN1JZSHI3vs6vR3mRufpW5ftmlkCuA+5/qnb75s7lP?=
- =?us-ascii?Q?iFWp0fPx0FTiOVofWGD7yzE4u+5BbBYgRb5jiMrLxNcin36VgJ1+YGs2IP2h?=
- =?us-ascii?Q?DVipz4ncyLSBm5lxyJ4lfBzOvCvU1IDOjSdzKGj+Xska8nHta+NUISoXmuvq?=
- =?us-ascii?Q?ObwBptIll0BV9B3mSv5Ayrjl8LZjrpJ5WHdmvzmITqE8smMyZnVUwfHVGFza?=
- =?us-ascii?Q?q82zxcukRSYJSCfq9Hq7NxC/wQyQjXs08+LNnGUr10jMRaYFsj9vnOeNnGcp?=
- =?us-ascii?Q?tcZLjOrStxsUFKNqpNL95TiHjQpal0GXFghmR0U1tLk+URbr08u2ov8gxYai?=
- =?us-ascii?Q?SrSeeSK561u2iwg420Cfvtt8NarpkYVyx14mSDjGu9Fnm//MP+JtlYCmvoWp?=
- =?us-ascii?Q?CToouQDSCjB7xpUkIcdB2c4g3hPRLtmT5srVnE58O8AubicKuLhPN52kwTzM?=
- =?us-ascii?Q?xYfJ/axw/DhPiWSytag626leUC3pmSig+II+n7WLBMYn9bdYhdfvgzv9jOyf?=
- =?us-ascii?Q?F3iVpH+C9m9zw/QoAYNPueNmnt2MpY4pBSNA7XkefPZDgASNglMtwk0sc5pu?=
- =?us-ascii?Q?NoBykzgKRkzUScFK5Z1KiiF8MKNKRDekOEB6WdMJoUM6tYDwl5cJW0bkZ3oz?=
- =?us-ascii?Q?1SXTKV1yr+hWnm37xzsb5fYILpRdRSJr7Tb4PdjhvZJEJB5iuJj1Sa5cV9aN?=
- =?us-ascii?Q?lpdKNKjaYzxWKw1HQ/k=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4bf3d466-c9e7-47df-c7b8-08de2897878c
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2025 00:47:21.6441
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tEo3i9MnaCYKuxo3BCLwCIVglXt+VW5EGMWdztz3xhrNk61SLUwj2afGahbOmgEz
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8774
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 20, 2025 at 08:04:37AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Saturday, November 8, 2025 12:50 AM
-> > +
-> > +static int pfn_reader_fill_dmabuf(struct pfn_reader_dmabuf *dmabuf,
-> > +				  struct pfn_batch *batch,
-> > +				  unsigned long start_index,
-> > +				  unsigned long last_index)
-> > +{
-> > +	unsigned long start = dmabuf->start_offset + start_index * PAGE_SIZE;
-> > +
-> > +	/*
-> > +	 * This works in PAGE_SIZE indexes, if the dmabuf is sliced and
-> > +	 * starts/ends at a sub page offset then the batch to domain code will
-> > +	 * adjust it.
-> > +	 */
-> 
-> dmabuf->start_offset comes from pages->dmabuf.start, which is initialized as:
-> 
-> 	pages->dmabuf.start = start - start_byte;
-> 
-> so it's always page-aligned. Where is the sub-page offset coming from?
+Hi, 
 
-I need to go over this again to check it, this sub-page stuff is
-a bit convoluted. start_offset should include the sub page offset
-here..
+This is 4th revision of Dynamic PAMT, which is a new feature that reduces 
+the memory use of TDX. For background information, see the v3 
+coverletter[0]. V4 mostly consists of incorporating the feedback from v3. 
+Notably what it *doesn’t* change is the solution for pre-allocating DPAMT
+backing pages. (more info below in “Changes”)
 
-> > @@ -1687,6 +1737,12 @@ static void __iopt_area_unfill_domain(struct
-> > iopt_area *area,
-> > 
-> >  	lockdep_assert_held(&pages->mutex);
-> > 
-> > +	if (iopt_is_dmabuf(pages)) {
-> > +		iopt_area_unmap_domain_range(area, domain, start_index,
-> > +					     last_index);
-> > +		return;
-> > +	}
-> > +
-> 
-> this belongs to patch3?
+I think this series isn’t quite ready to ask for merging just yet. I’d 
+appreciate another round of review especially looking for any issues in the
+refcount allocation/mapping and the pamt get/put lock-refcount dance. And
+hopefully collect some RBs.
 
-This is part of programming the domain with the dmabuf, the patch3 was
-about the revoke which is a slightly different topic though they are
-both similar.
+Sean/Paolo, we have mostly banished this all to TDX code except for “KVM: 
+TDX: Add x86 ops for external spt cache” patch. That and “x86/virt/tdx: 
+Add helpers to allow for pre-allocating pages” are probably the remaining 
+possibly controversial parts of your domain. If you only have a short time 
+to spend at this point, I’d point you at those two patches.
 
-Thanks,
-Jason
+Since most of the changes are in arch/x86, I’d think this feature could be
+a candidate for eventually merging through tip with Sean or Paolo’s ack.
+But it is currently based on kvm-x86/next in order to build on top of the 
+post-populate cleanup series. Next time I’ll probably target tip if people 
+think that is a good way forward.
+
+Changes
+=======
+There were two good suggestions around the pre-allocated pages solution
+last time, but neither ended up working out:
+
+1. Dave suggested to use mempool_t instead of the linked list based 
+structure, in order to not re-invent the wheel. This turned out to not 
+quite fit. The problems were that there wasn’t really a “topup” mechanism, 
+or an atomic fallback (which matches the kvm cache behavior). This results 
+in very similar code being built around mempool that was built around the 
+linked list. It was an overall harder to follow solution for not much code 
+savings. 
+
+I strongly considered going back to Kiryl’s original solution which passed 
+a callback function pointer for allocating DPAMT pages, and an opaque
+void * that the callback could use to find the kvm_mmu_memory_cache. I
+thought that readability issues of passing the opaque void * between
+subsystems outweighed the small code duplication in the simple, familiar
+patterned linked list-based code. So I ended up leaving it. 
+
+2. Kai suggested (but later retracted the idea) that since the external 
+page table cache was moved to TDX code, it could simply install DPAMT 
+pages for the cache at topup time. Then the installation of DPAMT backing 
+for S-EPT page tables could be done outside of the mmu_lock. It could also 
+be argued that it makes the design simpler in a way, because the external
+page table cache acts like it did before. Anything in there could be simply
+used. 
+
+At the time my argument against this was that whether a huge page would be 
+installed (and thus, whether DPAMT backing was needed) for the guest 
+private memory would not be known until later, so early install solution
+would need special late handling for TDX huge pages. After some internal
+discussions I at looked how we could simplify the series by punting on TDX
+huge pages needs. 
+
+But it turns out that this other design was actually more complex and had 
+more LOC than the previous solution. So it was dropped, and again, I went 
+back to the original solution. 
+
+
+I’m really starting to think that, while the overall solution here isn’t 
+the most elegant, we might not have much more to squeeze from it. So 
+design-wise, I think we should think about calling it done. 
+
+Testing
+=======
+Based on kvm-x86/next (4531ff85d925). Testing was the usual, except I also 
+tested with TDX modules that don't support DPAMT, and with the two 
+optimization patches removed: “Improve PAMT refcounters allocation for 
+sparse memory” and “x86/virt/tdx: Optimize tdx_alloc/free_page() helpers”.
+
+[0] https://lore.kernel.org/kvm/20250918232224.2202592-1-rick.p.edgecombe@intel.com/ 
+
+
+Kirill A. Shutemov (13):
+  x86/tdx: Move all TDX error defines into <asm/shared/tdx_errno.h>
+  x86/tdx: Add helpers to check return status codes
+  x86/virt/tdx: Allocate page bitmap for Dynamic PAMT
+  x86/virt/tdx: Allocate reference counters for PAMT memory
+  x86/virt/tdx: Improve PAMT refcounts allocation for sparse memory
+  x86/virt/tdx: Add tdx_alloc/free_page() helpers
+  x86/virt/tdx: Optimize tdx_alloc/free_page() helpers
+  KVM: TDX: Allocate PAMT memory for TD control structures
+  KVM: TDX: Allocate PAMT memory for vCPU control structures
+  KVM: TDX: Handle PAMT allocation in fault path
+  KVM: TDX: Reclaim PAMT memory
+  x86/virt/tdx: Enable Dynamic PAMT
+  Documentation/x86: Add documentation for TDX's Dynamic PAMT
+
+Rick Edgecombe (3):
+  x86/virt/tdx: Simplify tdmr_get_pamt_sz()
+  KVM: TDX: Add x86 ops for external spt cache
+  x86/virt/tdx: Add helpers to allow for pre-allocating pages
+
+ Documentation/arch/x86/tdx.rst              |  21 +
+ arch/x86/coco/tdx/tdx.c                     |  10 +-
+ arch/x86/include/asm/kvm-x86-ops.h          |   3 +
+ arch/x86/include/asm/kvm_host.h             |  14 +-
+ arch/x86/include/asm/shared/tdx.h           |   8 +
+ arch/x86/include/asm/shared/tdx_errno.h     | 104 ++++
+ arch/x86/include/asm/tdx.h                  |  78 ++-
+ arch/x86/include/asm/tdx_global_metadata.h  |   1 +
+ arch/x86/kvm/mmu/mmu.c                      |   6 +-
+ arch/x86/kvm/mmu/mmu_internal.h             |   2 +-
+ arch/x86/kvm/vmx/tdx.c                      | 160 ++++--
+ arch/x86/kvm/vmx/tdx.h                      |   3 +-
+ arch/x86/kvm/vmx/tdx_errno.h                |  40 --
+ arch/x86/virt/vmx/tdx/tdx.c                 | 587 +++++++++++++++++---
+ arch/x86/virt/vmx/tdx/tdx.h                 |   5 +-
+ arch/x86/virt/vmx/tdx/tdx_global_metadata.c |   7 +
+ 16 files changed, 854 insertions(+), 195 deletions(-)
+ create mode 100644 arch/x86/include/asm/shared/tdx_errno.h
+ delete mode 100644 arch/x86/kvm/vmx/tdx_errno.h
+
+-- 
+2.51.2
+
 
