@@ -1,119 +1,106 @@
-Return-Path: <kvm+bounces-64235-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64236-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2113FC7B6AB
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 20:00:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51C57C7B6BD
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 20:01:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E7343A71BB
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:59:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 755A73A6059
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55132FD7D5;
-	Fri, 21 Nov 2025 18:56:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC9F2F659C;
+	Fri, 21 Nov 2025 18:59:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R2aANKyP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PwbL58KM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0C52FB625
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:56:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107622EFD9E
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763751410; cv=none; b=FWMepWCvq21HcDzbx+ayV4yVAeMa0OdVd+KGpstl+4/uAC8FPg+RLjwiJRxWiNTEJ1CRuEHmeP+RnVnMNDARqVjqHiwt4N8U8m6U2XJ0pJbllZIPMedLIYiST/I9NjCI5D0jez3Z5MKX9n+xFpyJKy4aKVypfyGWGKfjQS6TA0U=
+	t=1763751542; cv=none; b=KUbbbBf0r0DC35RlNSY/fcAhcRvADcHxIejhzk4Fvmvju1iG6wq4bkSdzDBkKIUZ1VznK3JsrE9pDPF9xYx2Z2dmGCrj1BvnAZemcc7Poc3Mw/rlBdMLla07pPdGE4767B6c3i4b6fuEtJoWNfyga+VRjpxFY8F8Y1jsvRim+Jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763751410; c=relaxed/simple;
-	bh=vFsersr+KZyRzyZQj7BfyS4uix7mvrAgFue+x7up0s8=;
+	s=arc-20240116; t=1763751542; c=relaxed/simple;
+	bh=SU9bNEdaDKh7mOM+mVSGarP0ZpJC5sbY8V/e3Pee0U0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bG/IHGMzMG4cFUe8fAc47QDSZDuO8uzpnLNjc9dpdmyZ8qPc3G80Sl07gXWwM1o0CCgX5i//4uBbdg8V6UODyo1VUaBuZDNe2coPqjvNa/cCAHo4Q0xuL+dhPBGg0umZoJ7q8rVXoZiMBn/6a5AEGCUUUw7O2VK5aZ73i0fgFxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R2aANKyP; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=HEkapi9ahFDUU8h5HsEx3mifA0Gkig14JS+NNBLM1Huo+uYWcIcRVvuknYWxOoRQ0+Amvi9qD+NmKZ6n2nL8+nwvtjux/VrW//bHqGDMyYeNxTp53b1yqE6XWXGfT98xIcwyd4kUADKAL4icU0QLY42J5jemQuVSYpWEQqnRH9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PwbL58KM; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7b9208e1976so5200495b3a.1
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:56:49 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3436e9e3569so5058007a91.2
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:59:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763751409; x=1764356209; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763751540; x=1764356340; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yLhLrehbaRtL8p2Pwik3WRxaVaMyA1WS6mffbYquIug=;
-        b=R2aANKyPUDCMqU6iOinXpECzBlHdseE7/u0695piIArjfVWwM9MYP+r60Gg2CkO4oE
-         L9Mft4FRahKt79qNiy43eoeW5doikfWF+gBISOqIGEUT3mgi9WJmcxCmBUVxkjrTRQde
-         S/jKJiHZuB3l0xZbwg50IpvqWCSaMyVu6rbKXGZ5yQNUpV5aylYSFpK+vumLgODPDNQd
-         uF+efivwCWgzsTwHmWkKKKBL6khDrZ72Ts/p1peZuUszL5fFKCEjKh7TwtdjR8TgzdPs
-         Fa84IkpoWKtciZnMA5XtwxSx0wU4/431sy1v3m6OuJvz1GPT+UVj7UW+t35PlGjSaooT
-         9dEQ==
+        bh=//TKb8hymvAxEf/QRG4A4e2YWKP48bUzqXRB3PNbsfE=;
+        b=PwbL58KMYcqa48l9vd1H4Eobul/hxn/vNrn82Fei9sUZXGxikKdZWmganSwI8q2oIb
+         F0H/exCd7gnuPJoJR/mUMSIZmUPBWj1jCyfuts43vkCAVnzr4G7mK/9Mh+4uDWLuSDSO
+         Eb7GI6fqDqlL787DhOTI4eeQ7ixwx/esZ5dVTyeWRY+2Ym9QEQIkpCdb0lWmeypvZE7D
+         araBo0fh3U7fTIQz4cBkeLEd94kamVBNoxC2OZErOJC7Wq1S4PobDWrflucbZgPjwr2O
+         gXQ5WL6DjmuegKcQn3aLeLoCuuZZPdsBgDz8BkqonPw0ciHuEjKZtXgoZHUTUd+sZeKV
+         SKAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763751409; x=1764356209;
+        d=1e100.net; s=20230601; t=1763751540; x=1764356340;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yLhLrehbaRtL8p2Pwik3WRxaVaMyA1WS6mffbYquIug=;
-        b=ExscToD8MqsNolXacX8BTgYtbz8+0/Vl++8QnzZCiUiTov3awTeXlqrNBQ06iHgYGx
-         LKvRjJFw7SoeU6JkuEkbf0sCvNLQ0nAHOHmd/RZ/vrZn+2I39vb5YiGS//mx5vrDFak0
-         lWI6nMe2uUTHVCQM4P2CLr07gXjYBTCQgGYDLrGHf+rughyqn1PbBNmmkNmebN2GmFzT
-         wmj8YoSWb9zaQoOR77DqxO9DkiJpCGB0oiMjiKbePjctI+F8d5aG4KMhvMuS4CrJzEWt
-         nQZk+Wden14Avv0GnDAcVDClZP4k5ibEWAelWpdtOhgp7Hl1mYWkxxugRRzSw+Qh8cC7
-         FxZw==
-X-Forwarded-Encrypted: i=1; AJvYcCVeoaVefIGD+O6T/qMBxkX984mVX8+8wKadF2XpqJfX0j0/WI6Pbu7gSxfMNhFUskaoSGg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFpDJgQ2euQ8Mc4CJ5RK7ReeyWsf+gZC0DtLoieoYPbfHh+o8B
-	NWlIhZMeJq9GKs5x072A/bofldSca7u6PyEee5p8oaJY0+fAm4Abt2EpmWMntCG0IODi0N+gVYr
-	ZRLjZUg==
-X-Google-Smtp-Source: AGHT+IGgcjBAF5ydvY7dlX6lE9EpleQpiEn9XJLQ449jNuI5NxHwYeyEq5ofeiH0uPmXXIH42/LyqDX7jcY=
-X-Received: from pgbfq6.prod.google.com ([2002:a05:6a02:2986:b0:bd9:a349:94ac])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:99a4:b0:35e:8b76:c94a
- with SMTP id adf61e73a8af0-3614ed95c4fmr4214134637.45.1763751408767; Fri, 21
- Nov 2025 10:56:48 -0800 (PST)
-Date: Fri, 21 Nov 2025 10:55:39 -0800
-In-Reply-To: <20251021074736.1324328-1-yosry.ahmed@linux.dev>
+        bh=//TKb8hymvAxEf/QRG4A4e2YWKP48bUzqXRB3PNbsfE=;
+        b=TM7kTgyuvtBov1pOaop+XxXGURY/Ucc9kFmlhk9lTPqShyt/fLtuSk1Xeu6RV4quT2
+         D5ovTES8tOgKStLqq3xa/H32VS7j9K/PR9aX9/2iXtwSiuuFTjx2fFEZS0CnMoXbUYLa
+         xLzGaNqPcaZI7hAhILY9FHt4bk5iojFf5rIEQqcPQbsK86omPGOSq3akX3iPulc7I+iQ
+         ftfbBvaxduhr1n/hsfs1JUTNBExIVz3UiGl7/GvtwPn05uSrO1QukYlKxgOERFv8diwA
+         uDQBcHhJmcgI9cVEinT6U0ezPiA6bcgye1wUAKuMaqByz4J/rhMiOU6ZoiAYSJJ8pqHS
+         6PKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUv3tdWd6L8lYI+24DLHM3yugJSKeEXBv8ccAfP+6v2q5YSDJH2fS543CBORaLeVQvzjbc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIvdnZnUs11wYF7UmEFawgloQlTnADlimaxwZFmD19Rjoe056l
+	079tHEvC/P0EIsS7gX3kNG7iT3foJlAH+2PZOUO7KjwHL7c71qXJTqKZ0wB8GjboFHLNaE90Exo
+	xR8q9EA==
+X-Google-Smtp-Source: AGHT+IEBvBp8jh0vOplCCD1S1V2MlG3rW1W9lkVPvmTObu/2p/kVSWbhD330IykVz/Yn0SKN5rKC88D+4vs=
+X-Received: from pjbgg24.prod.google.com ([2002:a17:90b:a18:b0:343:4a54:8435])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2fc8:b0:340:776d:f4ca
+ with SMTP id 98e67ed59e1d1-34733f34cfamr4082112a91.26.1763751540452; Fri, 21
+ Nov 2025 10:59:00 -0800 (PST)
+Date: Fri, 21 Nov 2025 10:58:59 -0800
+In-Reply-To: <9098c603-70c0-4a22-a27b-4917ec0601d9@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251021074736.1324328-1-yosry.ahmed@linux.dev>
-X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
-Message-ID: <176375113687.288529.16692886824986000315.b4-ty@google.com>
-Subject: Re: [PATCH v2 00/23] Extend test coverage for nested SVM
+References: <20251118222328.2265758-1-seanjc@google.com> <20251118222328.2265758-3-seanjc@google.com>
+ <9098c603-70c0-4a22-a27b-4917ec0601d9@linux.intel.com>
+Message-ID: <aSC2czXKanvvtcLJ@google.com>
+Subject: Re: [PATCH v2 2/4] KVM: VMX: Handle #MCs on VM-Enter/TD-Enter outside
+ of the fastpath
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Kirill A. Shutemov" <kas@kernel.org>, kvm@vger.kernel.org, 
+	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Jon Kohler <jon@nutanix.com>, 
+	Tony Lindgren <tony.lindgren@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 21 Oct 2025 07:47:13 +0000, Yosry Ahmed wrote:
-> There are multiple selftests exercising nested VMX that are not specific
-> to VMX (at least not anymore). Extend their coverage to nested SVM.
+On Fri, Nov 21, 2025, Binbin Wu wrote:
+> On 11/19/2025 6:23 AM, Sean Christopherson wrote:
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index fdcc519348cd..f369c499b2c3 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -7062,10 +7062,19 @@ void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
 > 
-> This version is significantly different (and longer) than v1 [1], mainly
-> due to the change of direction to reuse __virt_pg_map() for nested EPT/NPT
-> mappings instead of extending the existing nested EPT infrastructure. It
-> also has a lot more fixups and cleanups.
-> 
-> [...]
+> I think the bug in v1 is because the fact that the function is the common path
+> for both VMX and TDX is overlooked. Do you think it is worth a comment to
+> tell the function is the common path for both VMX and TDX?
 
-Applied 3-11 to kvm-x86 selftests, thanks!
-
-[03/23] KVM: selftests: Extend vmx_close_while_nested_test to cover SVM
-        https://github.com/kvm-x86/linux/commit/0a9eb2afa185
-[04/23] KVM: selftests: Extend vmx_nested_tsc_scaling_test to cover SVM
-        https://github.com/kvm-x86/linux/commit/e6bcdd212238
-[05/23] KVM: selftests: Move nested invalid CR3 check to its own test
-        https://github.com/kvm-x86/linux/commit/4d256d00e44e
-[06/23] KVM: selftests: Extend nested_invalid_cr3_test to cover SVM
-        https://github.com/kvm-x86/linux/commit/91423b041d3c
-[07/23] KVM: selftests: Extend vmx_tsc_adjust_test to cover SVM
-        https://github.com/kvm-x86/linux/commit/3c40777f0ed8
-[08/23] KVM: selftests: Stop hardcoding PAGE_SIZE in x86 selftests
-        https://github.com/kvm-x86/linux/commit/28b2dced8ba4
-[09/23] KVM: selftests: Remove the unused argument to prepare_eptp()
-        https://github.com/kvm-x86/linux/commit/ff736dba478c
-[10/23] KVM: selftests: Stop using __virt_pg_map() directly in tests
-        https://github.com/kvm-x86/linux/commit/1de4dc15baa1
-[11/23] KVM: selftests: Make sure vm->vpages_mapped is always up-to-date
-        https://github.com/kvm-x86/linux/commit/d2e50389ab44
-
---
-https://github.com/kvm-x86/linux/tree/next
+Probably not?  Addressing that quirk crossed my mind as well, but there are so
+many dependencies and so much interaction between VMX and TDX code that I think
+we just need get used to things and not assuming TDX is isolated.  I.e. trying
+to add comments and/or tweak names will probably be a game of whack-a-mole, and
+will likely cause confusion, e.g. due to some flows being commented and others
+not.
 
