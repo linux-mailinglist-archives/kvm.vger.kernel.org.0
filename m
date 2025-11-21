@@ -1,134 +1,121 @@
-Return-Path: <kvm+bounces-64199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FD17C7B3FA
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:13:41 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C2C6C7B42D
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:15:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E218C4ED742
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:09:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A95BB34F09B
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D49834F248;
-	Fri, 21 Nov 2025 18:09:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AC82F25F7;
+	Fri, 21 Nov 2025 18:12:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ic7r6UGH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EF6l9RHe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D85826F2A1
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5906F4204E
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763748571; cv=none; b=oTCj1DYki3/DbNbT6yVaJDNc+3lAdPoqTLCtK0nsUe+QTJO2dm0paatTNvalDOopC46Mei03t38VaWhLKFQccEDE7BOqstK3LJrYN7sQKVJu9O2CxSSk8sWLNARj6ZJ99s7GnPq5cLcbDgvu4OTUT5Tc3Wz3M5sjwi0UIoFzbBo=
+	t=1763748763; cv=none; b=gcT5ynBoQaj7X0UCdhC+//xC5DyoVFJYbTRiWc63RRWdKp32hfoi+oJV8fjzaqiAdzANHLOdOGK47y1Yqdpc1JN5/Vg02krZ+lp6EMFxWSFYEPQK/qvbGOE9o4kS2Jt+tzmORuOWIls2ZAC0KD3zXfZfrmhmPjEdynKw9+ZCV5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763748571; c=relaxed/simple;
-	bh=q0tRnmKflb/74DuR7ddJJXDDDoujOOdI1+hKkf528hs=;
+	s=arc-20240116; t=1763748763; c=relaxed/simple;
+	bh=jg+JsrEFRjeHYhh3zZCiCjoA5o+GLFbMmlKrBrQn/ms=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WfweJNDY3sf/nNweKN05um9M1qowllTkmLztv0GkGjzOdVwdmCFMVShkw93cP7KU+iBC7WI5Omfu54JOmMjbxEWwsjnYCBmN+3acCifj//jiVsI6kHxash96cDA9iZIHYTihZF83K/QXg5VPjF+2XROE0XqISuULAbtulpHi9aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ic7r6UGH; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=TB2fXK22ysA2L64mQiJo2ayz7aB7Tdj/cRQRZYxN1p5BXyzkyNXhxtPkifKX5DDHGc9zP00szClbqgVmh40UqWhR8IznXXahM3X6Kq0eZWSs5uTt76oYPzCN5BZQjWxTtXD2IlgAlZS7ivRykA7vtjGoWSeiqYwNLe97PeO/tKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EF6l9RHe; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b62da7602a0so2199246a12.2
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:09:29 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3416dc5752aso6618104a91.1
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:12:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763748569; x=1764353369; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763748761; x=1764353561; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=1CyLwNJhEGzJ5PvjrWl7GrPePFRwVA9zuOO++bFM+XY=;
-        b=ic7r6UGHICIK5ka4Pw0BgNAiomBXoK+FUz9K090S8Lqq69UtFKWHwqC5UA+2XRouAO
-         aqMga2RGrnAcPH5zPQdmBeoeK/8hHZV3m+G/vPxYeUgnazkC4NCwah+7efHz2eTHXOIv
-         UZCqbYxrdsQmCmq7Vc4FYYV+d/zHd5DIVQvZEhD3Ug9LgjESasnn9RuMfetTeNiC643T
-         fkJ0FadUUioaq9gEiqN2rBVzkTQTZT1CvCfDwT640bE+DU6pmxTcxQE9CIJT/S5cdc4o
-         juLmo7jdKgyoGR9dPkpvNM2uPimC+kLV/PzYApA/+L95H6y+OA+yUO7RWnOdUTUO9bsn
-         eksA==
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4r4WJd2OVzlwEapD46M6vHlbLZCHlF49gWRbSAjvOME=;
+        b=EF6l9RHeiEM1ruGvHQNlHObVDmo1ZtgMKKsJKQVtv4S5m0r+wY5ISfWFGK3Kf0c2dN
+         7EzlnLam9xCBjQMlYz3xWFgcU2qE6Hs64v2bn92lbOpQ452VYf9WBAe1eXyFsdZYZbUS
+         9oXxXQnMyMCFSiy+ErWZuNN8gOodj1ZstBr+XXU78/04gvFJasuG6OVP1vTLPNSKKjML
+         cLqG068OqxOTBhqIvENPoQnATNm7weqiaE6Sdpx3l8sg660pdUtHsN7FAxAcyLFVQG4r
+         Y7vN4ERV4vUerescuz/9WsI5BT6g9Gb+GiVtMgZFmXiEWpXD3WIHI8oeBSwDEYlCs5MW
+         GgbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763748569; x=1764353369;
+        d=1e100.net; s=20230601; t=1763748761; x=1764353561;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1CyLwNJhEGzJ5PvjrWl7GrPePFRwVA9zuOO++bFM+XY=;
-        b=qr+7t/Dppgup65uL390hqWQ2I59S9L1KC5nBEkri/64tdpoZ4AKWYwDjrCBw2xvMDF
-         SuOZBouqEDJWhgjLGgex8bJ5Mn7zrJquKhMK5AQTcCaVfNYaVWEnBT20xEGQnx7kbcH+
-         5pLtktSBRj1NiC/gTgJ/Jy4HE6wKiipPX3tL0N+FI4sK3hGygYwAQEnXEn+8GbpJkAbk
-         Gt9w8yTgsEz4PHJGP4OETzG4fZO7Iv4WI6rnuQWqeNJcQQwG5iofdqaiz08of7zff/Do
-         vPsKtyOxKukQSPQf1GH/bktl1HONQXzthlHDkvW8pYrbAgZDbsNGZnDrV5vvHmwlajHQ
-         f5rQ==
-X-Gm-Message-State: AOJu0YxLTOgIG7jmD33UCJjlYQ4WLWXEazWN8e49beKNUXUtK9vt/rXp
-	kFlCO9I1sQiKzHRVeH4OlwVYhUXvTZpdyzAvYbNAnXNM7jMHvmAxR2JNo+d2L2ygqLJyiU/7a3q
-	Ngiwinw==
-X-Google-Smtp-Source: AGHT+IEubJ0H8NDisAuOLlWiV1X+nOunuZEWMgQwuDBMF0rwUBbJipVX7aInsdJPWE+qhW030U4toRRqGy4=
-X-Received: from plhi5.prod.google.com ([2002:a17:903:2ec5:b0:295:cf61:9590])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:19e8:b0:275:81ca:2c5
- with SMTP id d9443c01a7336-29b6c6cfe76mr39095695ad.59.1763748569411; Fri, 21
- Nov 2025 10:09:29 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 21 Nov 2025 10:09:01 -0800
-In-Reply-To: <20251121180901.271486-1-seanjc@google.com>
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4r4WJd2OVzlwEapD46M6vHlbLZCHlF49gWRbSAjvOME=;
+        b=p5ev/uWCDzlzSLvVFB/lTdnZPMl50hOFt8lFQDrbWYeG4neWmFty8ZaRM4Stg0jZZ7
+         liSAO5wJEAHhul+XuuJdxXy+Av3Mnyznjb6HZ3PXQonZQ54R3ff75A4n8Pv3mNnK7WfF
+         PVg7npyVmvWIsqUVf1Nd+cdxCWqbm0n/QtlvwEbZLfc8Toj1Zecp1o+FIXIWv1nItNJR
+         HUO4FZcm4PV8ZKUv3XSYOInQYALTfRW0SPL72dHf3uiitnG5t+R73jKtahXZEX4npc2U
+         XFzH/ADwiVD5wYUH81lj0yTtNTQYN5on41o9YbB+BNrOWolKx8NY7X2uScuhXh8VlHgE
+         qmVg==
+X-Gm-Message-State: AOJu0Yyg6w9pHJaiZMNhPn9Dr4vzZHgnUI9su5vk/4Pt0TiwKX0MOqzu
+	B9OOXUkQJlNBA5P+jNcufeYYgNJoTmrb1mrkEukRsYgR8uMiwcUUvpMZgM6ke0z/41swAGH7r4O
+	z67OWGw==
+X-Google-Smtp-Source: AGHT+IE3G5N6ShxRjZAtBLTiyQ27bOEC77y8TUaVidg0GHVLLY3we0AuM1unUZqNHoKGDkho5K5bFO9Jirc=
+X-Received: from pjtz18.prod.google.com ([2002:a17:90a:cb12:b0:343:387b:f2fb])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2f4b:b0:33f:ebc2:645
+ with SMTP id 98e67ed59e1d1-34733f2a471mr4009857a91.20.1763748761649; Fri, 21
+ Nov 2025 10:12:41 -0800 (PST)
+Date: Fri, 21 Nov 2025 10:12:38 -0800
+In-Reply-To: <20251120233149.143657-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251121180901.271486-1-seanjc@google.com>
+References: <20251120233149.143657-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
-Message-ID: <20251121180901.271486-12-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v2 11/11] x86: xsave: Verify XSETBV and XGETBV
- ignore RCX[63:32]
+Message-ID: <176374874648.273777.10899439469937167588.b4-ty@google.com>
+Subject: Re: [kvm-unit-tests PATCH v4 0/8] x86/pmu: Fix test errors on GNR/SRF/CWF
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
+	Yi Lai <yi1.lai@intel.com>
+Content-Type: text/plain; charset="utf-8"
 
-When testing XCR0 accesses, verify that RCX[63:32] is ignored (X{G,S}ETBV
-have the same register semantics as {RD,WR}MSR);
+On Thu, 20 Nov 2025 15:31:41 -0800, Sean Christopherson wrote:
+> Refreshed version of Dapeng's series to address minor flaws in v3.
+> 
+> This patchset fixes the pmu test errors on Granite Rapids (GNR), Sierra
+> Forest (SRF) and Clearwater Forest (CWF).
+> 
+> GNR and SRF start to support the timed PEBS. Timed PEBS adds a new
+> "retired latency" field in basic info group to show the timing info and
+> the PERF_CAPABILITIES[17] called "PEBS_TIMING_INFO" bit is added
+> to indicated whether timed PEBS is supported. KVM module doesn't need to
+> do any specific change to support timed PEBS except a perf change adding
+> PERF_CAP_PEBS_TIMING_INFO flag into PERF_CAP_PEBS_MASK[1]. The patch 7/7
+> supports timed PEBS validation in pmu_pebs test.
+> 
+> [...]
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- x86/xsave.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+Applied to kvm-x86 next, thanks!
 
-diff --git a/x86/xsave.c b/x86/xsave.c
-index 0763f893..254f9fde 100644
---- a/x86/xsave.c
-+++ b/x86/xsave.c
-@@ -45,10 +45,30 @@ do {									\
- 
- static void test_write_xcr0(u64 val)
- {
-+	u64 xcr0_alias = rdtsc() << 32, cur;
-+	int vector;
-+
-+	/*
-+	 * Verify that RCX[63:32] are ignored by XSETBV and XGETBV.  Use the
-+	 * safe variants as XCR0 will be written "normally" below.
-+	 */
-+	vector = xsetbv_safe(xcr0_alias, val);
-+	report(!vector, "XGETBV(0x%lx) (i.e. XCR0) should succeed (exception = %s)",
-+	       xcr0_alias, vector ? exception_mnemonic(vector) : "none");
-+
-+	vector = xgetbv_safe(xcr0_alias, &cur);
-+	report(!vector, "XGETBV(0x%lx) (i.e. XCR0) should succeed (exception = %s)",
-+	       xcr0_alias, vector ? exception_mnemonic(vector) : "none");
-+	report(cur == val,
-+	       "Wanted aliased XCR0 == 0x%lx, got XCR0 == 0x%lx", val, cur);
-+
-+	cur = read_xcr0();
-+	report(cur == val, "Wanted XCR0 == 0x%lx, got XCR0 == 0x%lx", val, cur);
-+
- 	write_xcr0(val);
- 
--	report(read_xcr0() == val,
--	       "Wanted XCR0 == 0x%lx, got XCR0 == 0x%lx", val, read_xcr0());
-+	cur = read_xcr0();
-+	report(cur == val, "Wanted XCR0 == 0x%lx, got XCR0 == 0x%lx", val, cur);
- }
- 
- static __attribute__((target("avx"))) void test_avx_vmovdqa(void)
--- 
-2.52.0.rc2.455.g230fcf2819-goog
+[1/8] x86/pmu: Add helper to detect Intel overcount issues
+      https://github.com/kvm-x86/kvm-unit-tests/commit/de6d1319b8aa
+[2/8] x86/pmu: Relax precise count validation for Intel overcounted platforms
+      https://github.com/kvm-x86/kvm-unit-tests/commit/89e3f25e00ea
+[3/8] x86/pmu: Fix incorrect masking of fixed counters
+      https://github.com/kvm-x86/kvm-unit-tests/commit/803637b5280d
+[4/8] x86/pmu: Handle instruction overcount issue in overflow test
+      https://github.com/kvm-x86/kvm-unit-tests/commit/1b09357a2737
+[5/8] x86/pmu: Relax precise count check for emulated instructions tests
+      https://github.com/kvm-x86/kvm-unit-tests/commit/e8ad559c361d
+[6/8] x86/pmu: Expand "llc references" upper limit for broader compatibility
+      https://github.com/kvm-x86/kvm-unit-tests/commit/941fcfe6e46f
+[7/8] x86: pmu_pebs: Remove abundant data_cfg_match calculation
+      https://github.com/kvm-x86/kvm-unit-tests/commit/de8cd74ebbaf
+[8/8] x86: pmu_pebs: Support to validate timed PEBS record on GNR/SRF
+      https://github.com/kvm-x86/kvm-unit-tests/commit/f561b31d3dee
 
+--
+https://github.com/kvm-x86/kvm-unit-tests/tree/next
 
