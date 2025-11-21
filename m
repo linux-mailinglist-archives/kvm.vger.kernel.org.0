@@ -1,164 +1,110 @@
-Return-Path: <kvm+bounces-64187-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64188-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3047C7B379
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:07:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51B70C7B3D3
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:12:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FE033A53CF
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:06:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CD1234E96AA
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3861A350D5F;
-	Fri, 21 Nov 2025 18:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4590B26F2A1;
+	Fri, 21 Nov 2025 18:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VsemThie"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Klfv1R21"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656C334F241
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DBF1AF4D5
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763748316; cv=none; b=rRoGW8ac/3hQa6h0fBrWCLPoZXRPhFFl4Mkcc/SlBxNgCMwcfrffXIist1Fta0qStib48mtldBaakNDKWKduEx3MHQM3Q9pUQ0Hay9E1AVQKxKYdV9LUbAosogios4sSlBoGTLS5uu38Qj+Ax/VnelSnVqCJezcbgO5PiGs0NVA=
+	t=1763748549; cv=none; b=GEiYq0uY682RbDl2UPpJoWUAl5m41zu00tW9q+S8KqnEB9fMs/hz/hltv92D7a5k0HsWTtUgdi2ilyGCjbh6qoX/pACtV91qsdOJEsfWsszBWPA+Ua3ncmVVaOFq3J+LCE5flUY4gXUB26amoxoxNuOODiILDmF72DGdmzLrJcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763748316; c=relaxed/simple;
-	bh=n/cMr41l5S+d9PxhzZBTfRwzCYoF6Eae8lHqi6pLdzA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cjCeZe3Lk9h1r/QzGvQ5ooarfFZTsthrZ9KFgKwlZ6pmgIpWYzMDLXKn5t840Nmk0hsBIqBhtFQ7z0/C6bRC8pupakb07K59iiEXDMYPBFwiAcXUEY6UsQaSbqcTZ1Uuqljec2bY/Qhx+CAbT0+PC4bCEMgm5XxJ1+FwI2l189Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VsemThie; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1763748549; c=relaxed/simple;
+	bh=/NaU4lmx3uscTLYLZQMdQzUVIepLpvduQtxZB2H8Gz4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UlVbI0x8WVPsrpYfZD6sKrHa+HcckUdXndd2ISzu6+Vk4cyCBwT9YUKugVym1jh72YJbZiVuD36Pa378rtlYRjEt63OxQdqn5c8/PcyIsywC0gyTT88HGImOsLenCmy75j1Hu5tiLI6WOEFB8bnPMwX/T6kc8To/D+LUuHPZ86Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Klfv1R21; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3438b1220bcso2720871a91.2
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:05:12 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340ad9349b3so4812985a91.1
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:09:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763748311; x=1764353111; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JPIkaMy0Bp2G3Fc2Hk52scy1ehKAAFPWgxTepn4leGE=;
-        b=VsemThiewDlymmetr9W83ZADmj1Z5R8WXv0CJCwsY6OCauRrPki55jnQYItzSw0s/5
-         1xdu1cBI1IAcQu4AnX89FgHMr11DqjiJRXn0sjt8e/wBnudWVkHxfMMReiuQxnCdW7Sf
-         T3OseS5zhSmNlhGVFmhiuy/BxHI0oJkvOtWg6S4DDK+J7btMxQj5RzcA8Pq8+7Rtr6Mx
-         xr+94oFsftqS29aINH7Pw7ChB/3ckukcFZZ2yBhMbk5t+/jlGcGl6Wu30tYcHHlwbjsg
-         MDlOzY7JNgs+YIAt+/fKGyUr3n0qbGxPShSmp1DZluQr85JWYxGcQDXQxKhgiX0K8Xh8
-         3cmQ==
+        d=google.com; s=20230601; t=1763748547; x=1764353347; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rV2Rdr8ijcDqFuCn5kiFm2RGNN8jEP7qleAp3qZdxbE=;
+        b=Klfv1R21tVduQAj8KqCoo+tpaq6mw0xaHupu4rFBd9MvmYNAcrqwaMy3sLxMIJ6dWi
+         5mUvl1VdaAGxt0+TzDXbfEgSjm9FcGb6bRBconVHQJpKoIJTuff2UHfgCK3tLyF35b5k
+         1kQiUHDtNQc8DCWLpQOUMKXdM8sK98zbpd9FkIlIYnuE/AxVOryWnsa0auR7Rimaw20/
+         rhXB4ZVVhCKtutPn2HxtX/FUVBf+kVyOEIo3PbqWV1Ljcm4VLqi5lZgw3pka8Oj0wnWx
+         kuV762R0vV/SqVoZVsjscVk//g4ROjR5BqvSnImFm0jx/2e53EeuY/B8XmM4bgYGe5/8
+         yYBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763748311; x=1764353111;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JPIkaMy0Bp2G3Fc2Hk52scy1ehKAAFPWgxTepn4leGE=;
-        b=egJLgdEOAPAPGszhjWK5SQP7jx9VcD92UG/0KBjO8Qs5VrhoEKFbRqqUYA3stw+L+O
-         fL7RhMfBseCsCSnjVMZwDKUHd6MKUVDnuIJy5AEN8mv71tHJfAFzAuZp9nSoz5BgZRbB
-         Hk6JNP+vxxenkx40VEJ8Zy6v9DN2pqsQ+NegVMGYFYT0CTJsNX7XCly5waR8OwWjQS5R
-         8W05wUc/AOwAnDT3NYK7pZfKKc4LC3Hc3EJkJWnlCbfKRM2QwshF10A8cBY9j/SrZEIO
-         uJK7Dfu3D4iCUNQLoSM8SXQzYjg0bkGDoCm+8tHu6MHkJcdBqTESLLzTdeuI6VY4Wd/F
-         Vlsw==
-X-Gm-Message-State: AOJu0Yz2zuZyxju7AdUYivDafYe5yEfyGbiRea0HlZHRNTjYXfqQ3Ff7
-	02Npg3Z/6K6iEHrCjRmrYztiox+dbEyk60cu2acmxVyHrXmp9CxLlBtNd0Vu1HUtnxWC4QSTwyB
-	km5EUcw==
-X-Google-Smtp-Source: AGHT+IGm9rHpG3vI3Z78wdJXg0Tmfwvs7XOVZlOi4qJcZV5YWhRWSRIaQveVtS3WDp0mzv6j72wl7HH5fyM=
-X-Received: from pjbqi14.prod.google.com ([2002:a17:90b:274e:b0:340:c015:8e31])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2fc8:b0:33f:f22c:8602
- with SMTP id 98e67ed59e1d1-34733f3b7a2mr3951000a91.26.1763748311152; Fri, 21
- Nov 2025 10:05:11 -0800 (PST)
-Date: Fri, 21 Nov 2025 10:05:09 -0800
-In-Reply-To: <20251114003228.60592-1-pbonzini@redhat.com>
+        d=1e100.net; s=20230601; t=1763748547; x=1764353347;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rV2Rdr8ijcDqFuCn5kiFm2RGNN8jEP7qleAp3qZdxbE=;
+        b=omEI45++CoqnpJoBHJcZikb6LNkjw82yamTacWE1i8seplp0/bw5jtYWhG493Ml5R1
+         CG9Xmzvdqamk04c9NAplgt/0SLCco0wYZvY8fEnw8Ca7fgpswQU0dIqrxPkAVpsDOfGL
+         oK0WF8fwxHUAT2rKN0GOTjOuzNtrmS3+Lzzo8P6RdKb8HqfC2OvZ2olphAFQnmGswFx3
+         IAk4qkO29iEnhtx10HjMhuZddv0emxTxAdfWIp0jAy8W7246FcOMCDdpA4h79COnw/CN
+         ckXbnbXusXJjR0nIHm56zF8B9vPX1ttBNtS6tX+YzNsr1D/awoLcs1nVflk57Pxtq3Dy
+         fNiA==
+X-Gm-Message-State: AOJu0YwseA3MlmMZrwOamgGDcryH46htt0DiLZTvSCNAuHodNNAAaOzE
+	CllIu54MWBpy7SJ8B92oDOok7caQ9DsL31I0dKGCzPvWV4OlDStGAMzRJG1jK/ozxuAS1MqzGMO
+	mMQZoYQ==
+X-Google-Smtp-Source: AGHT+IH5AQd2VtAPoNslN7xaE15eO2er6/2UDhfv/4L1bI4prc1/oDliG2zre2eT9YrFC8wesrwtF59w1oA=
+X-Received: from pjtf12.prod.google.com ([2002:a17:90a:c28c:b0:340:c53d:2599])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2d4c:b0:33b:dbdc:65f2
+ with SMTP id 98e67ed59e1d1-34733f0fee5mr3506683a91.22.1763748543619; Fri, 21
+ Nov 2025 10:09:03 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 21 Nov 2025 10:08:50 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251114003228.60592-1-pbonzini@redhat.com>
-Message-ID: <aSCp1f9baI69d4So@google.com>
-Subject: Re: [PATCH kvm-unit-tests] xsave: add testcase for emulation of AVX instructions
+X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
+Message-ID: <20251121180901.271486-1-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v2 00/11] x86: xsave: Cleanups and AVX testing
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, kbusch@kernel.org
-Content-Type: text/plain; charset="us-ascii"
+Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Nov 13, 2025, Paolo Bonzini wrote:
-> Companion patch to the emulator changes in KVM.  Funnily enough,
-> no valid combination involving AVX was tried.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  x86/xsave.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 44 insertions(+), 1 deletion(-)
-> 
-> diff --git a/x86/xsave.c b/x86/xsave.c
-> index cc8e3a0a..e6d15938 100644
-> --- a/x86/xsave.c
-> +++ b/x86/xsave.c
-> @@ -15,6 +15,34 @@
->  #define XSTATE_SSE      0x2
->  #define XSTATE_YMM      0x4
->  
-> +char __attribute__((aligned(32))) v32_1[32] = {
-> +    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-> +    128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143,
-> +};
-> +char __attribute__((aligned(32))) v32_2[32] = { 0 };
-> +
-> +static __attribute__((target("avx"))) void
-> +test_avx_fep(void)
+A "slightly" beefed up version of Paolo's patch to validate KVM's recently
+added AVX VMOVDQA emulation.
 
-Bizarre wrap.
+v1: https://lore.kernel.org/all/20251114003228.60592-1-pbonzini@redhat.com
 
-> +{
-> +	asm volatile("vzeroall\n"
+Paolo Bonzini (1):
+  x86: xsave: Add testcase for emulation of AVX instructions
 
-Why zero all registers?  I can't think of any reason why VZEROALL is needed, and
-clobbering everything for no apparent reason is weird/confusing.
+Sean Christopherson (10):
+  x86: xsave: Replace spaces with tabs
+  x86: xsave: Drop unnecessary and confusing uint64_t overrides
+  x64: xsave: Use non-safe write_cr4() when toggling OSXSAVE
+  x86: xsave: Add and use dedicated XCR0 read/write helpers
+  x86: xsave: Dedup XGETBV and XSETBV #UD tests
+  x86: xsave: Programmatically test more unsupported XCR accesses
+  x86: xsave: Define XFEATURE_MASK_<feature> bits in processor.h
+  x86: xsave: Always verify XCR0 is actually written
+  x86: xsave: Drop remaining indentation quirks and printf markers
+  x86: xsave: Verify XSETBV and XGETBV ignore RCX[63:32]
 
-> +	    KVM_FEP "vmovdqa v32_1, %%ymm0\n"
+ lib/x86/processor.h |  62 ++++++++++
+ x86/xsave.c         | 270 +++++++++++++++++++++++++++++---------------
+ 2 files changed, 239 insertions(+), 93 deletions(-)
 
-These need to use RIP-relative addressing, otherwise EFI builds fail.
 
-> +	    KVM_FEP "vmovdqa %%ymm0, v32_2\n" : : :
-> +	    "memory",
-> +	    "%ymm0", "%ymm1", "%ymm2", "%ymm3", "%ymm4", "%ymm5", "%ymm6", "%ymm7",
-> +	    "%ymm8", "%ymm9", "%ymm10", "%ymm11", "%ymm12", "%ymm13", "%ymm14", "%ymm15");
-> +}
-> +
-> +static __attribute__((target("avx"))) void
-> +test_avx(void)
-> +{
-> +	asm volatile("vzeroall\n"
-> +	    "vmovdqa v32_1, %%ymm0\n"
-> +	    "vmovdqa %%ymm0, v32_2\n" : : :
+base-commit: f561b31d3dee01f8be58978be23bb0903543153d
+-- 
+2.52.0.rc2.455.g230fcf2819-goog
 
-We should also test reg=>reg, registers other than ymm0, and that emulated accesses
-are correctly propagated to hardware.  E.g. with macro shenanigans, it's not too
-hard:
-
-	asm volatile(FEP "vmovdqa v32_1(%%rip), %%" #reg1 "\n"		\
-		     FEP "vmovdqa %%" #reg1 ", %%" #reg2 "\n"		\
-		     FEP "vmovdqa %%" #reg2 ", v32_2(%%rip)\n"		\
-		     "vmovdqa %%" #reg2 ", v32_3(%%rip)\n"		\
-		     ::: "memory", #reg1, #reg2);			\
-
-> +	    "memory",
-> +	    "%ymm0", "%ymm1", "%ymm2", "%ymm3", "%ymm4", "%ymm5", "%ymm6", "%ymm7",
-> +	    "%ymm8", "%ymm9", "%ymm10", "%ymm11", "%ymm12", "%ymm13", "%ymm14", "%ymm15");
-> +}
-> +
->  static void test_xsave(void)
->  {
->      unsigned long cr4;
-> @@ -45,7 +73,22 @@ static void test_xsave(void)
->      report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == 0,
->             "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP | XSTATE_SSE)");
->      report(xgetbv_safe(XCR_XFEATURE_ENABLED_MASK, &xcr0) == 0,
-> -           "        xgetbv(XCR_XFEATURE_ENABLED_MASK)");
-> +           "\t\txgetbv(XCR_XFEATURE_ENABLED_MASK)");
-
-Ugh, this test is ancient and crusty.  We really should have dedicated helpers
-for accessing XCR0, it uses spaces instead of tabs, there's unnecessary code
-duplication, and a handful of other minor issues.
-
-I'll send a series with a pile of cleanups, and better validation of VMOVDQA
-emulation.
 
