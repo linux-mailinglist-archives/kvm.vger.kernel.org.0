@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-64263-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64264-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AA0DC7BDF6
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 23:35:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 170F4C7BDFF
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 23:35:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1A603A7E15
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 22:35:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29DF33A8433
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 22:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1435830BB9F;
-	Fri, 21 Nov 2025 22:34:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D37730C613;
+	Fri, 21 Nov 2025 22:34:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a++AIweF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QV8haDhH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5641B2C15AE
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 22:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D496F30594F
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 22:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763764490; cv=none; b=Vdd5B4AbM++k+99KZVOuGjEo40lS5FSzjvVNBtB0NPU+zwDvxo1xxhwxAhRVPRYMudsgll1YSOqD6lSVzxTFwqv9GjkArVmLH3RlZKN7EsePql7JqlrrFOintrDQVky//c8UTFn4xZDMh1VpKRd0keOwl33hqZioJ1S9RT6QGhU=
+	t=1763764492; cv=none; b=DjsTQ7ogt9zNmHFotwBI5jE5iozDZ00S4J2BSwJtB3/ZVwxLvu8KZ18v0Z/VIeT8c9dolpDyHtoKbo2PhP57XM3PvmCLDxqjdqa33M/iDQaHDyeVSuZKnuOtCh/Rty1YJYmyJAqq94+R32zmXYIqfBD5vWwyHC9+AwoMuTQozMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763764490; c=relaxed/simple;
-	bh=Cm8gNTD5HDKhB/YGSur7bO18CAjWuu8P/nm0G7TmJAI=;
+	s=arc-20240116; t=1763764492; c=relaxed/simple;
+	bh=e7RsKRdyXzqO8wbi+wGlXN2nJr4pNMDA7BM2zx30F3k=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tHAcpdT/GSj/TmtSAAtI7hB0QRm2N+7ojTmz5MGZULhZ0HYzz8FamyqbI015Twp+GoYbpOel4TsS/8utzGBIJMjHQpuA69caHsTJwzQ2QnNZHAPm7gnsX7t1D3sMLRD2Li37jCJReOYHyQObUi/CF9H4BNyJyKQMfTvNZqsh900=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a++AIweF; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=Zg8ZN4C7J4eA7BQFme9yBkXtgHPrDNYZiNIfeGCNvMOORdSek2pn8Fcu8BhJlWUSmUZh3ioV2vpk3meLg31V+8Ow6x96KmZsloVD2ur3qAnHk0royUap2cTxaj75JGHmxnJlbmVPjR2jWdoPtBbxzgpAsjDaAAFRX8AWPdF3frk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QV8haDhH; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340c261fb38so4694045a91.0
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 14:34:49 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3416dc5754fso5829592a91.1
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 14:34:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763764488; x=1764369288; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763764490; x=1764369290; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=fL7AO/YbZegwLET4orHpyrj5KMZ/eiSlht4bCLj4XfI=;
-        b=a++AIweFexP7VfpRBilc1FF4cnSEFgL5Ourd5PPn1p0KN0qKYK0GLL0778623oKbOz
-         STtjn6A6pKS0+1tbat6dZ5IsqJAlX6zwgCX6DzCgnyWiUA/kbc8fv2PJ2TcYkAKpXbsf
-         iUuhxLt97YLncJ5g9SlPM5fg4cx+5OEoc8BqfjgFntbTi8Q+qwlJXM1XtcpvK0yt+h7w
-         IQKxHYgVWIWPaERXaS6Gwo1AzBw4axt8Lu/HY2hcIJ6/t1hQmxURbibwpkVxv/rDdSNT
-         JDjzspo/xyTDKCa+vUsuPOEdD0u7B9KI1I/IYBWv0JGCuoTApErQrrbMc9QMQoCWMT/Q
-         LL5A==
+        bh=gYfQkN9u3Ku3wBXo81BUiJiwGWW8HyZzPi7J/C1YrKM=;
+        b=QV8haDhHD7JsqWAb1z9mCVdTnCOB2VASdXY+Kfbds9JPhzUm/wT7VD+E0WiHqmiJO1
+         QSTo9GQkIYlT4kzTpyAiQl1UvEzsGCYwsMbQLH+09KwJDI8RNULY58JZN+9IY1EOc2eB
+         pCU2i+JNP1XJdk0BFxzeecheVZ/LY0zM6b1y33kkfwre0NtTVD6dFYNx0fvK6hCPXpuW
+         xvDP+NGITmXlM5k7Ew76ND0FYsOE16OowaSMpdkkpe0C5tfXTHA7cHJ0wdqaZDPT1M/T
+         zh2qMwOfFxQ3UZDxI6vw9LbKJDtPDx3wK8LPNc1Q2BwnoDBv7Q20sxn9FODidkd1LsI8
+         3L0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763764488; x=1764369288;
+        d=1e100.net; s=20230601; t=1763764490; x=1764369290;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fL7AO/YbZegwLET4orHpyrj5KMZ/eiSlht4bCLj4XfI=;
-        b=IEKv4xliS5dNvKfBL0yNjU8sM8m7Sj+4JRw1EnFWYZLmqYV3EvfHccz6saubW6NHH4
-         30HSBdOVFLFh0MjsJ2rLS8VKpoXuFZ2sjnqWLpK31C/E5V8rHDQQa94GFGhMq71l1WWw
-         IrPY7B/hKSmLfggcpzTkkvhXbrwdfixPbnS/jvKJTkotqTuyx3AJDgkqef/jnfuNxOVP
-         1rhyRJ388Z/nTpBgO8DqObGoKQGS6CzqNHmXEOH5whmnNm6P9B/Lh/jncqbAMecQS4nX
-         JCVSrBI/i9x+yddm5KvLfumjnUZH7qM7EB/29fjrCbB1rKesWqRUJwqap18OfcjWawUV
-         uxeg==
-X-Gm-Message-State: AOJu0YzqiMz01oR7VzOp6u14fwyGMwzb2Komei3x4RwsYxfqnuTqJPQC
-	D3goPRPnEJPCRYkLr4Ile9nh7CtEEIZBmb0Il86DRBXwpvkxIq3d9GbK4S39yWmdDUua1EHTK9/
-	lTBdshA==
-X-Google-Smtp-Source: AGHT+IFx38F9ERfpPh0lVhU0L2PRJHoxe79c5A/zraSF90gTXT2UYGC9P0VIoAeDIru6h3DDh0xdhuRVZb8=
-X-Received: from pjty8.prod.google.com ([2002:a17:90a:ca88:b0:340:c06f:96e7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2d0c:b0:32e:389b:8762
- with SMTP id 98e67ed59e1d1-34733d845bemr3846543a91.0.1763764488614; Fri, 21
- Nov 2025 14:34:48 -0800 (PST)
+        bh=gYfQkN9u3Ku3wBXo81BUiJiwGWW8HyZzPi7J/C1YrKM=;
+        b=Zz0zcvmCuilcPJclvSPyGZvEdLghMCOd1p3JpqbCIxF5wthTyTO8AvapGstmHJw2FR
+         mMgVYbfN1JB8jzcwDChi0P95Q6S/ROKw3/293cx8o0pSOaNYr83InRoj8CW1uUcswG9K
+         tZ5ODd84zx8vYxITagPQb/tsZiuBOynWGujqwQUiTUkbEOXCs72RD3qXcP3WYsj4etCM
+         tQno30CB7dTRbi6kqemRy4os5YwU8RxCLrxfbY5jYQSYJGeWgJM3CNyakgBedp3w4Tqv
+         nkCL/5foFg4fmTnB62ZnutgPLayuf/8COgwZ0xK0OcIHPLThsNyDfMc3Pkf0Ri7P4xLp
+         eNZg==
+X-Gm-Message-State: AOJu0YyKsBXtfLV2MURWi6tFCJEprmYVv2lQRpBgSH021+A3SGPG9q2x
+	jGUwTIpBGV14Zu9tqfiaAyTRptCBQGDWVr3XwU6PPbLjQRTulbfaAOJ9cTVlXYBHekRBextvyFF
+	9TSE0lw==
+X-Google-Smtp-Source: AGHT+IEXbv9Rr9ebIprQdREDYFBXea2fQri7goRi056aI0TCciVMQ60b3yFhHrSpldN7RkxINC1QgCbQAYU=
+X-Received: from pjuk6.prod.google.com ([2002:a17:90a:d086:b0:339:ee5f:ec32])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:270d:b0:340:2a16:94be
+ with SMTP id 98e67ed59e1d1-34733e5524amr4367353a91.4.1763764490156; Fri, 21
+ Nov 2025 14:34:50 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 21 Nov 2025 14:34:40 -0800
+Date: Fri, 21 Nov 2025 14:34:41 -0800
 In-Reply-To: <20251121223444.355422-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,48 +75,92 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251121223444.355422-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
-Message-ID: <20251121223444.355422-2-seanjc@google.com>
-Subject: [PATCH v3 1/5] KVM: Use vCPU specific memslots in __kvm_vcpu_map()
+Message-ID: <20251121223444.355422-3-seanjc@google.com>
+Subject: [PATCH v3 2/5] KVM: x86: Mark vmcs12 pages as dirty if and only if
+ they're mapped
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Fred Griffoul <fgriffo@amazon.co.uk>
 Content-Type: text/plain; charset="UTF-8"
 
-When establishing a "host access map", lookup the gfn in the vCPU specific
-memslots, as the intent is that the mapping will be established for the
-current vCPU context.  Specifically, using __kvm_vcpu_map() in x86's SMM
-context should create mappings based on the SMM memslots, not the non-SMM
-memslots.
+Mark vmcs12 pages as dirty (in KVM's dirty log bitmap) if and only if the
+page is mapped, i.e. if the page is actually "active" in vmcs02.  For some
+pages, KVM simply disables the associated VMCS control if the vmcs12 page
+is unreachable, i.e. it's possible for nested VM-Enter to succeed with a
+"bad" vmcs12 page.
 
-Luckily, the bug is benign as x86 is the only architecture with multiple
-memslot address spaces, and all of x86's usage is limited to non-SMM.  The
-calls in (or reachable by) {svm,vmx}_enter_smm() are made before
-enter_smm() sets HF_SMM_MASK, and the calls in {svm,vmx}_leave_smm() are
-made after emulator_leave_smm() clears HF_SMM_MASK.
-
-Note, kvm_vcpu_unmap() uses the vCPU specific memslots, only the map() side
-of things is broken.
-
-Fixes: 357a18ad230f ("KVM: Kill kvm_map_gfn() / kvm_unmap_gfn() and gfn_to_pfn_cache")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/kvm_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/vmx/nested.c | 15 +++------------
+ include/linux/kvm_host.h  |  9 ++++++++-
+ 2 files changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9eca084bdcbe..afe13451ce7f 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3118,7 +3118,7 @@ int __kvm_vcpu_map(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map,
- 		   bool writable)
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 40777278eabb..d4ef33578747 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3983,23 +3983,14 @@ static void vmcs12_save_pending_event(struct kvm_vcpu *vcpu,
+ 
+ void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu)
  {
- 	struct kvm_follow_pfn kfp = {
--		.slot = gfn_to_memslot(vcpu->kvm, gfn),
-+		.slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn),
- 		.gfn = gfn,
- 		.flags = writable ? FOLL_WRITE : 0,
- 		.refcounted_page = &map->pinned_page,
+-	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+-	gfn_t gfn;
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 
+ 	/*
+ 	 * Don't need to mark the APIC access page dirty; it is never
+ 	 * written to by the CPU during APIC virtualization.
+ 	 */
+-
+-	if (nested_cpu_has(vmcs12, CPU_BASED_TPR_SHADOW)) {
+-		gfn = vmcs12->virtual_apic_page_addr >> PAGE_SHIFT;
+-		kvm_vcpu_mark_page_dirty(vcpu, gfn);
+-	}
+-
+-	if (nested_cpu_has_posted_intr(vmcs12)) {
+-		gfn = vmcs12->posted_intr_desc_addr >> PAGE_SHIFT;
+-		kvm_vcpu_mark_page_dirty(vcpu, gfn);
+-	}
++	kvm_vcpu_map_mark_dirty(vcpu, &vmx->nested.virtual_apic_map);
++	kvm_vcpu_map_mark_dirty(vcpu, &vmx->nested.pi_desc_map);
+ }
+ 
+ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index d93f75b05ae2..536d05e2726f 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1381,6 +1381,7 @@ bool kvm_vcpu_is_visible_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
+ unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn);
+ void mark_page_dirty_in_slot(struct kvm *kvm, const struct kvm_memory_slot *memslot, gfn_t gfn);
+ void mark_page_dirty(struct kvm *kvm, gfn_t gfn);
++void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
+ 
+ int __kvm_vcpu_map(struct kvm_vcpu *vcpu, gpa_t gpa, struct kvm_host_map *map,
+ 		   bool writable);
+@@ -1398,6 +1399,13 @@ static inline int kvm_vcpu_map_readonly(struct kvm_vcpu *vcpu, gpa_t gpa,
+ 	return __kvm_vcpu_map(vcpu, gpa, map, false);
+ }
+ 
++static inline void kvm_vcpu_map_mark_dirty(struct kvm_vcpu *vcpu,
++					   struct kvm_host_map *map)
++{
++	if (kvm_vcpu_mapped(map))
++		kvm_vcpu_mark_page_dirty(vcpu, map->gfn);
++}
++
+ unsigned long kvm_vcpu_gfn_to_hva(struct kvm_vcpu *vcpu, gfn_t gfn);
+ unsigned long kvm_vcpu_gfn_to_hva_prot(struct kvm_vcpu *vcpu, gfn_t gfn, bool *writable);
+ int kvm_vcpu_read_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn, void *data, int offset,
+@@ -1410,7 +1418,6 @@ int kvm_vcpu_write_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn, const void *data
+ 			      int offset, int len);
+ int kvm_vcpu_write_guest(struct kvm_vcpu *vcpu, gpa_t gpa, const void *data,
+ 			 unsigned long len);
+-void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
+ 
+ /**
+  * kvm_gpc_init - initialize gfn_to_pfn_cache.
 -- 
 2.52.0.rc2.455.g230fcf2819-goog
 
