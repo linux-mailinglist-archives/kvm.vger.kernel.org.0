@@ -1,117 +1,125 @@
-Return-Path: <kvm+bounces-64013-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC4DEC76B5F
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 01:10:43 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA666C76B6B
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 01:11:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 887C128D25
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:10:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0824D356712
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 00:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B484502A;
-	Fri, 21 Nov 2025 00:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7088F126F0A;
+	Fri, 21 Nov 2025 00:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="ilbUYMN0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GvAxDDO6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276CFC2EA
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 00:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1E222301
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 00:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763683835; cv=none; b=RjYvRqZT/AoqW/qt0rdEqXWsp0+gtneqPCWtHVRV5VGEse9gbKMQo9ukVua6nM2UeVQxh6ujpMoJ0Llmee47mYXWQy0jY3vDzJosSt/F0++8Lsz5CbXSOLiqdWUedi7f77r8obkSAx1kggYhU02rFoUSgO/+SBbMBR/TrqiQeXs=
+	t=1763683855; cv=none; b=l1acwWBE66RabgGAjbENN4XxuqaPQreTvjSs44FUniwk1rMqXmcxzNQ5XhQ8npIXVaFX/F5iZmWxUWPQ8egAPsmAjITg3jED25ZsGBbKmyOsx4wMkPmHWKHMTQaPlA6QB4KqDXBaUez5qDTT/tt0JOLK2QZQhh0ApXtii5CSvY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763683835; c=relaxed/simple;
-	bh=q9MRXngO/Fk44Lxrn6ZdUWbjYdM5alzXXaJptUgHiLM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IK1ZHc2yhX0DnnuS8l3C05JRMmhw3vspBCoL/P5aU1SSem4H9mrcVgU7VYVJKkb1q465I2//dRG2W504Z0uRK8IwpA2tMPD3U+G/vpPYdE2RRED/CPzXkml5XI6DP6npaLUj7vxFp7ACGlG2fx5oWaDWMYw7+XXd5e5vuZHaYHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=ilbUYMN0; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=4YAcbiarbzQHvhEzZ63n6RkH46R+BEUGak5gqn7DS+0=; b=ilbUYMN0rKRC6nJC
-	AjVUwVMVW7944N9SN4N3h+IDCtzr87WMNXUIjULXle6L7f2jIHRXFfSFJOhAvPsDh+Z0MgdXaqFzH
-	xtlyavuW6OwPf2BO03CsvX0Ryu0GPXNoJeLboZkxtZVm6GJSOHN/CzhKQQpMqsdK6HpavN34jWfZZ
-	Kt1+prB3CLGVGdrqi5ZXeOePqoNkHL74MhrVFb1qWAECOoiXvaAqik3S9zDCGG3ogy18MMD4PBfRk
-	VNgLVDGImyGZWGiBa95qzFc+pyTfzMMKtajdwOWnCMLk2vMLrIgLH4H3PxDBorM9KvZw7GDP0Hojb
-	9PgYJe97XoKoacFcHw==;
-Received: from dg by mx.treblig.org with local (Exim 4.98.2)
-	(envelope-from <dg@treblig.org>)
-	id 1vMEj7-00000005csx-0Lk8;
-	Fri, 21 Nov 2025 00:10:13 +0000
-Date: Fri, 21 Nov 2025 00:10:13 +0000
-From: "Dr. David Alan Gilbert" <dave@treblig.org>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, pizhenwei@bytedance.com,
-	alistair.francis@wdc.com, stefanb@linux.vnet.ibm.com,
-	kwolf@redhat.com, hreitz@redhat.com, sw@weilnetz.de,
-	qemu_oss@crudebyte.com, groug@kaod.org, mst@redhat.com,
-	imammedo@redhat.com, anisinha@redhat.com, kraxel@redhat.com,
-	shentey@gmail.com, npiggin@gmail.com, harshpb@linux.ibm.com,
-	sstabellini@kernel.org, anthony@xenproject.org, paul@xen.org,
-	edgar.iglesias@gmail.com, elena.ufimtseva@oracle.com,
-	jag.raman@oracle.com, sgarzare@redhat.com, pbonzini@redhat.com,
-	fam@euphon.net, philmd@linaro.org, alex@shazbot.org, clg@redhat.com,
-	peterx@redhat.com, farosas@suse.de, lizhijian@fujitsu.com,
-	jasowang@redhat.com, samuel.thibault@ens-lyon.org,
-	michael.roth@amd.com, kkostiuk@redhat.com, zhao1.liu@intel.com,
-	mtosatti@redhat.com, rathc@linux.ibm.com, palmer@dabbelt.com,
-	liwei1518@gmail.com, dbarboza@ventanamicro.com,
-	zhiwei_liu@linux.alibaba.com, marcandre.lureau@redhat.com,
-	qemu-block@nongnu.org, qemu-ppc@nongnu.org,
-	xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-	qemu-riscv@nongnu.org
-Subject: Re: [PATCH 11/14] error: Use error_setg_errno() to improve error
- messages
-Message-ID: <aR-t5SzR2AdqlJtq@gallifrey>
-References: <20251120191339.756429-1-armbru@redhat.com>
- <20251120191339.756429-12-armbru@redhat.com>
+	s=arc-20240116; t=1763683855; c=relaxed/simple;
+	bh=GTAeV0/U1Id0rOZySfsnYuhPR+q8AtT1fLfd5vOB2yU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Vz4SVaCcnBblPBgXj0Yv1QZzhglA4As4ioDswR0zW9ZQe9RUzt0rP5e4/8SogT7TaU/WSkRPu2kq1oD+Ogt6y2dshCYBJUoy6prrROCHYwoALEw0C6KUw/bagNAXk3gfKV9ieRfqMJolByLtuwI9R6xSc3pvaYig65VcMX1eqHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GvAxDDO6; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-295fbc7d4abso22895715ad.1
+        for <kvm@vger.kernel.org>; Thu, 20 Nov 2025 16:10:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763683853; x=1764288653; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H2Jg5eGCJ4JWQv22m6t6f8HAltv6vrVf9pXQ9eNKNVk=;
+        b=GvAxDDO6Y/OVZM6HzuaQ7LpBw++gdi/hV2OlmszbvJj2EW4RGWkE/bs8artLtMEXaq
+         S4BqEMMTxg3AVTzNy+9wymUmhHvGAWF3x+HBdeP1ZVwbYdx5iceRcJXFXpvSDguKgyvm
+         DNSHgv0Mt1gRHTh9/cJI/xUO5tqH+/7c9m5Eb8tj1QYi9WwypFLdQxQ/lxmKTnkVc/+I
+         W0SDISbznlDntHdbBIoHcFnnvNfcWCIqN/lK1YbAlFQCFXy3ATHc0ysM+saqEYGBlO6q
+         kmnGKbGowimsAyduyYl7NOUy+RFHj+/Wd8+3u7oG4zzVnCgI39X0KPIPpJUqZ0JLs+hQ
+         xlnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763683853; x=1764288653;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H2Jg5eGCJ4JWQv22m6t6f8HAltv6vrVf9pXQ9eNKNVk=;
+        b=she/ultoU2nTZej7zmzvvXTaPitrSTIBgXMnOHpnliWIfnED5i+W4JTlBYNCH+zL3G
+         Ok8FWNXX9jQNBcZnsoFBHDwvH1qUirFaHrG4tKivhhajVPGlXtYpa4RuCAU+ibAoaEAB
+         UmAJaGlfyx5OL44kMw8ILl2hwcPWY+BGkQSwkmKGruogujyeX1KygFG4rkd1nn10GBbQ
+         u1/uBNWqii2iPm+ftb+Dj283n5PUYvlduIW1p/VkjMegeS6j7VsHWzlwqs3Ff9siEs7h
+         ViyJ2iBVkU15g7hUdPTnXtHaBTKyNXioMyVolpBUu8MDrAwGghDcio0meUGH179DqDOK
+         XACg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3H/kfMQuD1seD6VxZhIDSGsI8ZnFbDuHlbr2PnXxmaBYQiEGJGsxjwCYYjxuDTyEawZI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzFwUnJjtVmdD7ZRItVRTmzkIAyFrBoqyrJPM3Ap58ZNDJXfB4
+	gua6NOdXuUNbn9bWDdJbueG4Il6ug57xlkfeePYYQc679MMtAisBga6PVwBoj6MA5k2nj9JaGKd
+	I4z0aEA==
+X-Google-Smtp-Source: AGHT+IHQJw6u93572+5nYVgz+HVD5zQVNxdCoyv5uNHiLP4YNyDD01xIH8qaFDKeb3fG0eRan1ynFEUUq4c=
+X-Received: from plbki15.prod.google.com ([2002:a17:903:68f:b0:293:de:a528])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:903:b0:295:9db1:ff4b
+ with SMTP id d9443c01a7336-29b6be8b66dmr6127945ad.4.1763683853447; Thu, 20
+ Nov 2025 16:10:53 -0800 (PST)
+Date: Thu, 20 Nov 2025 16:10:51 -0800
+In-Reply-To: <20251021074736.1324328-19-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20251120191339.756429-12-armbru@redhat.com>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.12.48+deb13-amd64 (x86_64)
-X-Uptime: 00:09:12 up 24 days, 23:45,  2 users,  load average: 0.03, 0.03,
- 0.00
-User-Agent: Mutt/2.2.13 (2024-03-09)
+Mime-Version: 1.0
+References: <20251021074736.1324328-1-yosry.ahmed@linux.dev> <20251021074736.1324328-19-yosry.ahmed@linux.dev>
+Message-ID: <aR-uC-afVZYKfdLC@google.com>
+Subject: Re: [PATCH v2 18/23] KVM: selftests: Generalize nested mapping functions
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> A few error messages show numeric errno codes.  Use error_setg_errno()
-> to show human-readable text instead.
+On Tue, Oct 21, 2025, Yosry Ahmed wrote:
+> Instead of passing in a pointer to struct vmx_pages, pass in the GPA of
+> the root of the EPTs, as that's the only member being used. Furthermore,
+> only use ept_pte_masks for VMX, and use x86_pte_masks otherwise (which
+> is what NPT uses).
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> This is in preparation of supporting NPTs as well.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> ---
+>  tools/testing/selftests/kvm/include/x86/vmx.h |  6 +++---
+>  .../testing/selftests/kvm/lib/x86/memstress.c |  4 ++--
+>  tools/testing/selftests/kvm/lib/x86/vmx.c     | 20 ++++++++++---------
+>  .../selftests/kvm/x86/vmx_dirty_log_test.c    |  6 +++---
+>  4 files changed, 19 insertions(+), 17 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86/vmx.h b/tools/testing/selftests/kvm/include/x86/vmx.h
+> index 5aa14ceed050a..4429e83e1f52c 100644
+> --- a/tools/testing/selftests/kvm/include/x86/vmx.h
+> +++ b/tools/testing/selftests/kvm/include/x86/vmx.h
+> @@ -561,11 +561,11 @@ bool load_vmcs(struct vmx_pages *vmx);
+>  
+>  bool ept_1g_pages_supported(void);
+>  
+> -void nested_map(struct vmx_pages *vmx, struct kvm_vm *vm,
+> +void nested_map(struct kvm_vm *vm, vm_paddr_t root_gpa,
+>  		 uint64_t nested_paddr, uint64_t paddr, uint64_t size);
+> -void nested_map_memslot(struct vmx_pages *vmx, struct kvm_vm *vm,
+> +void nested_map_memslot(struct kvm_vm *vm, vm_paddr_t root_gpa,
+>  			uint32_t memslot);
+> -void nested_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
+> +void nested_identity_map_1g(struct kvm_vm *vm, vm_paddr_t root_gpa,
+>  			    uint64_t addr, uint64_t size);
 
-...
+Ugh, "nested" is a bad namespace.  Running L2 doesn't strictly require nested
+TDP, and the operations themselves are non-nested, in the sense that we're
+modifying stage-2 / TDP page tables.
 
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index 337b415889..ef4885ef5f 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -2349,8 +2349,7 @@ static int qemu_get_cm_event_timeout(RDMAContext *rdma,
->          error_setg(errp, "RDMA ERROR: poll cm event timeout");
->          return -1;
->      } else if (ret < 0) {
-> -        error_setg(errp, "RDMA ERROR: failed to poll cm event, errno=%i",
-> -                   errno);
-> +        error_setg_errno(errp, "RDMA ERROR: failed to poll cm event");
-
-Hasn't that lost the errno ?
-
-Dave
-
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+My vote would be to do a rename to either stage2_pg_map() or tdp_pg_map()
 
