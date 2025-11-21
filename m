@@ -1,116 +1,129 @@
-Return-Path: <kvm+bounces-64092-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64094-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A1C7C78249
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 10:26:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F36AC78465
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 11:00:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 4A9BC2D546
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 09:26:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 4FE382D1BD
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 10:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D87341054;
-	Fri, 21 Nov 2025 09:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB19334D4C6;
+	Fri, 21 Nov 2025 09:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="JEy7kf+6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cvAIznXb"
 X-Original-To: kvm@vger.kernel.org
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7715340A73;
-	Fri, 21 Nov 2025 09:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33E234D385;
+	Fri, 21 Nov 2025 09:54:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763717030; cv=none; b=tyLS59LrmoQDiwF+EwDONmjJK6ih+9QlVrXNI0PLdN2nkR6pK747kL1yHqxnZeUL0LtZRs6iHzXWR9cWRBVdyEfEvsgJWx4bpr1A7OhRS4f29zKUlJDELKLy8iUO7ov0YxU73RQwgZOdYRqSzPWq7Rx9grpKMFotO08XawnBDE0=
+	t=1763718885; cv=none; b=AN+z8oQJzaZH8skMOkwt0Go6ijosyLK1jFCqohiuAd5NC4pCxc7mMETBDwqdVhhhEk2KbcQL5cxs1IlPOkiIwdnfU7erbIFiNgMpZRqv6dP4MslHsS3Lrntx03dTd1mZEgHIPZQQqLiOS2q08EjZJOWdjBMDkwfjJ4ujp/QJwhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763717030; c=relaxed/simple;
-	bh=UrY+pCES8Lr8ar4CYQXHO9RG4hQV+PjFmGgWq4oPIAA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lRk20IMsw//VGw/Q/aw1B6cl+qYEkcFlzlMrk8U7zWZk0sk/04jzuxioCPUZjWNTjYqfnCkIAahW2nMwQ9s4WIsyOqmCo8FphYjai87B8FZZ/BJeQYo7BVgTGRmMNpHoLgSv4uV2YSIE9YTtVd2YxrCxebRhB/pqdXwpVYHuzfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=JEy7kf+6; arc=none smtp.client-ip=113.46.200.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=UrY+pCES8Lr8ar4CYQXHO9RG4hQV+PjFmGgWq4oPIAA=;
-	b=JEy7kf+6F/tBqxGKMOknAV8OX/p+URTD23jg7dHml3kKmPLxmWb7Q3OnpmdoOkZ+jXnAhxHe4
-	r6wP+AJNXuTiYE+3it6noIqKNu2gqN2hHYsgSlhxPqOMlYYyxdC7exPJXl7wm94Yp2vdfhHoeKv
-	MqwohDLKTjAXmoxMMMhW5Ao=
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dCV9418fTzKmWx;
-	Fri, 21 Nov 2025 17:22:00 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id B206614022D;
-	Fri, 21 Nov 2025 17:23:45 +0800 (CST)
-Received: from huawei.com (10.50.163.32) by kwepemr100010.china.huawei.com
- (7.202.195.125) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 21 Nov
- 2025 17:23:44 +0800
-From: Tian Zheng <zhengtian10@huawei.com>
-To: <maz@kernel.org>, <oliver.upton@linux.dev>, <catalin.marinas@arm.com>,
-	<corbet@lwn.net>, <pbonzini@redhat.com>, <will@kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <zhengtian10@huawei.com>,
-	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yezhenyu2@huawei.com>,
-	<xiexiangyou@huawei.com>, <zhengchuan@huawei.com>, <linuxarm@huawei.com>,
-	<joey.gouly@arm.com>, <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
+	s=arc-20240116; t=1763718885; c=relaxed/simple;
+	bh=ckVGtchhklPTh0H5XGrkBBtZKAvAc7k3gSAzJOeSpQs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b73q+4ed/Ncyjcq6LBFQStS3aqzr9xJOgYnMqWj43f23LO9eGYod4EtPy/Ovxz4DllBnZSJrJedb9k7V5QBOfpPjG0pW//ETedDcThAXdFo3h3Jr9Q2eC7qB+fz6VEZZgjBuFrSRZQgDr15eRyVWEQEpWPsja1+Xr/4Jx+xREaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cvAIznXb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67A69C16AAE;
+	Fri, 21 Nov 2025 09:54:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763718884;
+	bh=ckVGtchhklPTh0H5XGrkBBtZKAvAc7k3gSAzJOeSpQs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cvAIznXbFms3ytp6HoL1PnFgWBzLDmgLo/T51jbEUr3jehiNEqJt/vdlrQR4LwuwO
+	 MBHnNHDT3SqJ55yibghKZZR2GCJIRGmPLQn/F7Gqq/AXRkcGfdEJHXuC5Uadr7eaSc
+	 C1r8aKoEBcLJnTrWIuHzJTY27sqe2FZUxJ+4fzKo9e8R03aioniGyyv0oP+S34uAN2
+	 CTZUEvn8S843psmfy3frwRglXjJjIXmHIur9QCfSVztmkGBFfkCqhMo9T7RnroqV1m
+	 GHXuCqkGYj9+TDpzIuxcjy4Pdsh37gefspsv61zqWjIDOxBR3CsEqVbej9AuysyM2a
+	 +OjJwp2hEUjqw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vMNqk-00000007BJ0-05Ov;
+	Fri, 21 Nov 2025 09:54:42 +0000
+Date: Fri, 21 Nov 2025 09:54:41 +0000
+Message-ID: <86zf8fr9r2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: <oliver.upton@linux.dev>,
+	<catalin.marinas@arm.com>,
+	<corbet@lwn.net>,
+	<pbonzini@redhat.com>,
+	<will@kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<yuzenghui@huawei.com>,
+	<wangzhou1@hisilicon.com>,
+	<yezhenyu2@huawei.com>,
+	<xiexiangyou@huawei.com>,
+	<zhengchuan@huawei.com>,
+	<linuxarm@huawei.com>,
+	<joey.gouly@arm.com>,
+	<kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-doc@vger.kernel.org>,
 	<suzuki.poulose@arm.com>
-Subject: [PATCH v2 5/5] KVM: arm64: Document HDBSS ioctl
-Date: Fri, 21 Nov 2025 17:23:42 +0800
-Message-ID: <20251121092342.3393318-6-zhengtian10@huawei.com>
-X-Mailer: git-send-email 2.33.0
+Subject: Re: [PATCH v2 0/5] Support the FEAT_HDBSS introduced in Armv9.5
 In-Reply-To: <20251121092342.3393318-1-zhengtian10@huawei.com>
 References: <20251121092342.3393318-1-zhengtian10@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: zhengtian10@huawei.com, oliver.upton@linux.dev, catalin.marinas@arm.com, corbet@lwn.net, pbonzini@redhat.com, will@kernel.org, linux-kernel@vger.kernel.org, yuzenghui@huawei.com, wangzhou1@hisilicon.com, yezhenyu2@huawei.com, xiexiangyou@huawei.com, zhengchuan@huawei.com, linuxarm@huawei.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-A new ioctl (KVM_CAP_ARM_HW_DIRTY_STATE_TRACK) provides a mechanism for
-userspace to configure the HDBSS buffer size during live migration,
-enabling hardware-assisted dirty page tracking.
+On Fri, 21 Nov 2025 09:23:37 +0000,
+Tian Zheng <zhengtian10@huawei.com> wrote:
+> 
+> This series of patches add support to the Hardware Dirty state tracking
+> Structure(HDBSS) feature, which is introduced by the ARM architecture
+> in the DDI0601(ID121123) version.
+> 
+> The HDBSS feature is an extension to the architecture that enhances
+> tracking translation table descriptors' dirty state, identified as
+> FEAT_HDBSS. The goal of this feature is to reduce the cost of surveying
+> for dirtied granules, with minimal effect on recording when a granule
+> has been dirtied.
+> 
+> The purpose of this feature is to make the execution overhead of live
+> migration lower to both the guest and the host, compared to existing
+> approaches (write-protect or search stage 2 tables).
+> 
+> After these patches, users(such as qemu) can use the
+> KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl to enable or disable the HDBSS
+> feature before and after the live migration.
+> 
+> This feature is similar to Intel's Page Modification Logging (PML),
+> offering hardware-assisted dirty tracking to reduce live migration
+> overhead. With PML support expanding beyond Intel, HDBSS introduces a
+> comparable mechanism for ARM.
 
-Signed-off-by: eillon <yezhenyu2@huawei.com>
-Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
----
- Documentation/virt/kvm/api.rst | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Where is the change log describing what was changed compared to the
+previous version?
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 57061fa29e6a..25d60ff136e9 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8703,6 +8703,21 @@ This capability indicate to the userspace whether a PFNMAP memory region
- can be safely mapped as cacheable. This relies on the presence of
- force write back (FWB) feature support on the hardware.
+We gave you extensive comments back in March. You never replied to the
+feedback. And you now dump a whole set of patches, 6 months later,
+without the slightest indication of what has changed?
 
-+7.44 KVM_CAP_ARM_HW_DIRTY_STATE_TRACK
-+:Architectures: arm64
-+:Type: VM
-+:Parameters: args[0] is the allocation order determining HDBSS buffer size
-+:Returns: 0 on success, negative value on failure
-+
-+Enables hardware-assisted dirty page tracking via the Hardware Dirty State
-+Tracking Structure (HDBSS).
-+
-+When live migration is initiated, userspace can enable this feature by
-+setting KVM_CAP_ARM_HW_DIRTY_STATE_TRACK through IOCTL. KVM will allocate
-+per-vCPU HDBSS buffers.
-+
-+The feature is disabled by invoking the ioctl again.
-+
- 8. Other capabilities.
- ======================
+Why should we make the effort to review this again?
 
---
-2.33.0
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
 
