@@ -1,56 +1,135 @@
-Return-Path: <kvm+bounces-64268-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64269-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36522C7BEC9
-	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 00:12:55 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAE63C7BF4E
+	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 00:45:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 259084E15AE
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 23:12:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B177B352324
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 23:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF8C30C36F;
-	Fri, 21 Nov 2025 23:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6005330FF34;
+	Fri, 21 Nov 2025 23:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Jlqulff8"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Q+tMdxDI"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454242D3221
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 23:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9525F2FBE01
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 23:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763766766; cv=none; b=o9z0u9gEFr91eMA5RjpRdFKJbn9SBH3vX/mbj8Ayq6NX2LRyTxc4RcEy5DESsRop8X+hXrfSikW6QP3W5fFWpKMrkImuCakXEmUocf7wbQPXqJZm45TpebqE78rYUb/pUeaMIjIxm5AcmeuEeaRgIgF6JIQyHFDmmaDLfxHhuR4=
+	t=1763768700; cv=none; b=YFxdnNj3ld4TRCZzFX3PJ4SQ6Pj+GfIxCQCQQGdpdZKIW84v2OtY4IKqZBg/pGsm2RtAmvxqic+G25ri7siiQwqpyIgYm6aVvj+1vRzsIC5CYH2E340haIJ+i6HgxL5mQRK4/rAhb9evDBADw2nZA9pnHem+qcJCVrJZOHh8b08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763766766; c=relaxed/simple;
-	bh=Fpiw+0aa7nnhMcUOSMMWuEu/qTPVm8EKlePwrXOwE+E=;
+	s=arc-20240116; t=1763768700; c=relaxed/simple;
+	bh=94wkD2Iff42VLMlQNWegA9dtRPkkPQ7m6y0iMS1EKU4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j08NfAoMmis9VnrzVcZ6rI4mXgvY3Tc4wHLPdksw93RLuA8Mfcw7E9HdsOHK/nFs6nWFXbWS4HO+RLATlyDoWRPKAhrqwJG2cyvDrckaKhaOh1r1N6konxHo63SYY52ESTUfrpVdTjitW1I7PxgfYPsdjrgeBulFcQlER5xbko8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Jlqulff8; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 21 Nov 2025 23:12:12 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763766756;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8ySlAh1e2Q0K9i9Vx4U1YzJIhRkLozCNytX/mQJxVVc=;
-	b=Jlqulff8GkacRcPh/hbCIkwZTXutIxzQbfmi+8U43Ddduc7cVeRxmOcp2rFyltABpdedRZ
-	b2/mDtMcR8F1q7lPTImw0eg6WdQSBO/jmuGzo6unysTEpxfnzYONnUQNDbyonbQjAYrE43
-	hRfSIpkJaU1iX/APghPaBARtWUEgmUs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Ken Hofsass <hofsass@google.com>, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: x86: Add CR3 to guest debug info
-Message-ID: <ycaddg27z4z6xsclzklheriy2cr63v6senv7qxh37kvpb7envs@br7durjgj2ux>
-References: <20251121193204.952988-1-yosry.ahmed@linux.dev>
- <20251121193204.952988-2-yosry.ahmed@linux.dev>
- <aSDTNDUPyu6LwvhW@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PVmwGWbh/zepG1RKa/GMbNI4DXPMMANdGjK9ys9wZLxxfqFnyZ1ujYJgyD01RjzeztGTTHYFXSBewj1Q2AZ3Fp1d5kKJfYdph64RveoyoKFmUBNXVo7sdf2slMF7sa2rdWyLik9vzCmzCdd4uPjNJE9BLh5YZtj4YXc438aslDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Q+tMdxDI; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-88246401c9eso29544566d6.1
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 15:44:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1763768697; x=1764373497; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=94wkD2Iff42VLMlQNWegA9dtRPkkPQ7m6y0iMS1EKU4=;
+        b=Q+tMdxDIkYXfhGhbArV0cRrjxNICLqpDxMfcVn6I12tSlGAKpER9GWu29DpBkymHRH
+         8+vkLMXGdoMlRW1a8I3ymoYVhDXsc/zbDPsgk6dDtzh5juXd/l67yjvfrH6E2PCz7eSS
+         0MnjazwGK0NRKyGqz2ACeRLGXyKvPtxTJ44QTasOxTfU2yErAHu4Ks44MCuNoubORnaA
+         NCszOMN2Fla6VYB5ksgTIT29Z+nNac5UtoL3AGZVjOASPrtxjkUtZa4MLYMQCVpwpWT+
+         xGLv13APEgGlkzM7Ys1yHg1j8bxhQAP5ngjohGYQXdfFgg/Iu3KmptXD0DSIe/JPz0hm
+         mf6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763768697; x=1764373497;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=94wkD2Iff42VLMlQNWegA9dtRPkkPQ7m6y0iMS1EKU4=;
+        b=IUz49B0qLgz7I0AYN021N2nBc2tdh3RHs6jS8a+tPTqE6nyoELskPPytW8TMA0t9dF
+         4KBZNH7LHUr7EDa+1gSnOw1Jfkz6IGRsLJmE2amK5FjMiI39Cy//H6PmJrwRjA2yPS5F
+         ZbG/jKJaKpBO3xspbSzP7APYsaeBQt+TTjaGtFtwGbO8Q7cWE2kaM5kncq8eDCtYzX+d
+         cNNZ4CGtKf/pcZ++j3fZstmigw5ciKkpm0gXaFFRdfw5U2V955DF2nt79I7w3Qstas3v
+         wDJl76eElKJi8uycwcrP6VVCOBeHiR+gar6oNLNmUf1vykqyl63H8svJYBmP8QfVC1cP
+         fFsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXtSZiIIc9ULTYHitWFumRbIMZBWN7/zoAIsXykfy5rZSeqcR9dnvrz6y52IWdAxmMWw8s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAi6+KtjjHVxvn/t42+OLTZdbSXIyE7oo9KXvPwB2lBDvEH6WE
+	8quAQqvsXlirkFa6YTNTAb0DvVwl4mbfUi3CidkuFVcACJPRM3CnMrzVFjQTk3eMm9g=
+X-Gm-Gg: ASbGncsYh09ZYC5xAtJa0MZ48RMfJiOz0c4DuRj59hnmVW3CBRTUa/3+nDkWT+xDSTT
+	BZmpLR2clMUg90BmWcByUadjNqktkkm4/67XPUfkKPOz1Iu26k0KY44Et5SRc6g3c+EZ4USTMBS
+	h2rQuJs7/e9eUfTaKUz3Oir1QKSURwxzENt9TgTqHjb6VnVIyO1p8At27Zp6pnozwb4I7Bnw1n9
+	T9p5JWXRSl0uOOouaXeuhtqpfmsfIImKQ2OcqH7lQaxp2p72sOAMrtp/bW2GTCK1XqiC97SkZjW
+	A/EixRYZj00M44aPAX3ZQIWrrag5Z7FdElBEyXCNdz+ueS7TGOEQyVX4Co20wRUO72th8L5B9Ds
+	da+n9Brm/hllKsX0iL4VnznYZcoj7MgfLcmLhANSy+ax/hTGS1YSqv3EZiPsGQDKS8DwSCp26yN
+	Va4TcDp9pDXFkuLZPrzPNDjo30LX9LqSkyYc8UsbqgcGKLe76RQ9DlUmZb
+X-Google-Smtp-Source: AGHT+IEos7T2Axz389Mmy3AFU8+Jfh3PFehz2HfOxc6qgzO/Its691H7QS0uM/0VDIYstKPPxEQUqg==
+X-Received: by 2002:a05:6214:226c:b0:87d:fc3e:6d9b with SMTP id 6a1803df08f44-8847c525de0mr61714186d6.42.1763768697300;
+        Fri, 21 Nov 2025 15:44:57 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8846e54c32csm48350666d6.37.2025.11.21.15.44.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Nov 2025 15:44:56 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vMaoC-00000001bmD-0arX;
+	Fri, 21 Nov 2025 19:44:56 -0400
+Date: Fri, 21 Nov 2025 19:44:56 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+	Lance Yang <lance.yang@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+	Byungchul Park <byungchul@sk.com>,
+	Gregory Price <gourry@gourry.net>,
+	Ying Huang <ying.huang@linux.alibaba.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+	Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+	SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+	Leon Romanovsky <leon@kernel.org>, Xu Xin <xu.xin16@zte.com.cn>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+	Naoya Horiguchi <nao.horiguchi@gmail.com>,
+	Pedro Falcato <pfalcato@suse.de>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
+	Hugh Dickins <hughd@google.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-arch@vger.kernel.org, damon@lists.linux.dev
+Subject: Re: [PATCH v2 00/16] mm: remove is_swap_[pte, pmd]() + non-swap
+ entries, introduce leaf entries
+Message-ID: <20251121234456.GA383361@ziepe.ca>
+References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -59,156 +138,17 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aSDTNDUPyu6LwvhW@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
 
-On Fri, Nov 21, 2025 at 01:01:40PM -0800, Sean Christopherson wrote:
-> On Fri, Nov 21, 2025, Yosry Ahmed wrote:
-> > Add the value of CR3 to the information returned to userspace on
-> > KVM_EXIT_DEBUG. Use KVM_CAP_X86_GUEST_DEBUG_CR3 to advertise this.
-> > 
-> > During guest debugging, the value of CR3 can be used by VM debuggers to
-> > (roughly) identify the process running in the guest. This can be used to
-> > index debugging events by process, or filter events from some processes
-> > and quickly skip them.
-> > 
-> > Currently, debuggers would need to use the KVM_GET_SREGS ioctl on every
-> > event to get the value of CR3, which considerably slows things down.
-> > This can be easily avoided by adding the value of CR3 to the captured
-> > debugging info.
-> > 
-> > Signed-off-by: Ken Hofsass <hofsass@google.com>
-> > Co-developed-by: Ken Hofsass <hofsass@google.com>
-> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > ---
-> >  arch/x86/include/uapi/asm/kvm.h | 1 +
-> >  arch/x86/kvm/svm/svm.c          | 2 ++
-> >  arch/x86/kvm/vmx/vmx.c          | 2 ++
-> >  arch/x86/kvm/x86.c              | 3 +++
-> >  include/uapi/linux/kvm.h        | 1 +
-> >  5 files changed, 9 insertions(+)
-> > 
-> > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> > index 7ceff6583652..c351e458189b 100644
-> > --- a/arch/x86/include/uapi/asm/kvm.h
-> > +++ b/arch/x86/include/uapi/asm/kvm.h
-> > @@ -293,6 +293,7 @@ struct kvm_debug_exit_arch {
-> >  	__u64 pc;
-> >  	__u64 dr6;
-> >  	__u64 dr7;
-> > +	__u64 cr3;
-> >  };
-> 
-> I really, really don't like this.  It "solves" a very specific problem for a very
-> specific use case without any consideration for uAPI, precedence or maintenance.
-> E.g. in most cases, CR3 without CR0, CR4, EFER, etc. is largely meaningless.  The
-> only thing it's really useful for is an opaque guest process identifer.
+On Mon, Nov 10, 2025 at 10:21:18PM +0000, Lorenzo Stoakes wrote:
+> There's an established convention in the kernel that we treat leaf page
+> tables (so far at the PTE, PMD level) as containing 'swap entries' should
+> they be neither empty (i.e. p**_none() evaluating true) nor present
+> (i.e. p**_present() evaluating true).
 
-To be fair, I never advertised it to be anything more than that :P
+I browsed through this series and want to give some encourgement that
+this looks nice and is a big step forward! Lots of details to check
+the conversions so I wouldn't give any tags due to lack of time..
 
-> 
-> KVM already provides kvm_run.kvm_valid_regs to let userspace grab register state
-> on exit to userspace.  If userspace is debugging, why not simply save all regs on
-> exit?
-> 
-> If the answer is "because it slows down all other exits", then I would much rather
-> give userspace the ability to conditionally save registers based on the exit reason,
-> e.g. something like this (completely untested, no CAP, etc.)
-
-I like this approach conceptually, but I think it's an overkill for this
-use case tbh. Especially the memory usage, that's 1K per vCPU for the
-bitmap. I know it can be smaller, but probably not small either because
-it will be a problem if we run out of bits.
-
-I think it may be sufficient for now to add something
-KVM_SYNC_REGS_DEBUG to sync registers on KVM_EXIT_DEBUG. Not very
-generic, but I don't think a lot exit reasons will make use of this.
-
-That being said, let me take a closer look at our VMM and see what
-options could work for us before spending more time on this. We
-currently use CR3 as implemented in this patch, so this would have been
-a drop-in replacement. For anything else I need to make sure our VMM
-will be able to use it first.
-
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 0c6d899d53dd..337043d49ee6 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -127,7 +127,7 @@ static u64 __read_mostly efer_reserved_bits = ~((u64)EFER_SCE);
->  static void update_cr8_intercept(struct kvm_vcpu *vcpu);
->  static void process_nmi(struct kvm_vcpu *vcpu);
->  static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
-> -static void store_regs(struct kvm_vcpu *vcpu);
-> +static void kvm_run_save_regs_on_exit(struct kvm_vcpu *vcpu);
->  static int sync_regs(struct kvm_vcpu *vcpu);
->  static int kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu);
->  
-> @@ -10487,6 +10487,8 @@ static void post_kvm_run_save(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_run *kvm_run = vcpu->run;
->  
-> +       kvm_run_save_regs_on_exit(vcpu);
-> +
->         kvm_run->if_flag = kvm_x86_call(get_if_flag)(vcpu);
->         kvm_run->cr8 = kvm_get_cr8(vcpu);
->         kvm_run->apic_base = vcpu->arch.apic_base;
-> @@ -11978,8 +11980,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  
->  out:
->         kvm_put_guest_fpu(vcpu);
-> -       if (kvm_run->kvm_valid_regs && likely(!vcpu->arch.guest_state_protected))
-> -               store_regs(vcpu);
->         post_kvm_run_save(vcpu);
->         kvm_vcpu_srcu_read_unlock(vcpu);
->  
-> @@ -12598,10 +12598,30 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
->         return 0;
->  }
->  
-> -static void store_regs(struct kvm_vcpu *vcpu)
-> +static void kvm_run_save_regs_on_exit(struct kvm_vcpu *vcpu)
->  {
-> +       struct kvm_run *run = vcpu->run;
-> +       u32 nr_exit_reasons = sizeof(run->kvm_save_regs_on_exit) * BITS_PER_BYTE;
-> +       u64 valid_regs = READ_ONCE(run->kvm_valid_regs);
-> +       u32 exit_reason = READ_ONCE(run->exit_reason);
-> +
->         BUILD_BUG_ON(sizeof(struct kvm_sync_regs) > SYNC_REGS_SIZE_BYTES);
->  
-> +       if (!valid_regs)
-> +               return;
-> +
-> +       if (unlikely(!vcpu->arch.guest_state_protected))
-> +               return;
-> +
-> +       if (valid_regs & KVM_SYNC_REGS_CONDITIONAL) {
-> +               if (exit_reason >= nr_exit_reasons)
-> +                       return;
-> +
-> +               exit_reason = array_index_nospec(exit_reason, nr_exit_reasons);
-> +               if (!test_bit(exit_reason, (void *)run->kvm_save_regs_on_exit))
-> +                       return;
-> +       }
-> +
->         if (vcpu->run->kvm_valid_regs & KVM_SYNC_X86_REGS)
->                 __get_regs(vcpu, &vcpu->run->s.regs.regs);
->  
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 52f6000ab020..452805c1337b 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -494,8 +494,12 @@ struct kvm_run {
->                 struct kvm_sync_regs regs;
->                 char padding[SYNC_REGS_SIZE_BYTES];
->         } s;
-> +
-> +       __u64 kvm_save_regs_on_exit[16];
->  };
->  
-> +#define KVM_SYNC_REGS_CONDITIONAL      _BITULL(63)
-> +
->  /* for KVM_REGISTER_COALESCED_MMIO / KVM_UNREGISTER_COALESCED_MMIO */
->  
->  struct kvm_coalesced_mmio_zone {
+Jason
 
