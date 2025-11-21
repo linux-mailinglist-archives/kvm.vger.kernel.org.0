@@ -1,162 +1,206 @@
-Return-Path: <kvm+bounces-64046-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64047-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B748CC76DB0
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 02:13:29 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A56EC76DC6
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 02:18:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 5E1FD2B902
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 01:13:26 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E1B9834BD21
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 01:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3317C2749C7;
-	Fri, 21 Nov 2025 01:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B273D27144E;
+	Fri, 21 Nov 2025 01:18:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="TDvy2bE0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QA/vz88w"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0F641A8F
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 01:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E95D2773DE;
+	Fri, 21 Nov 2025 01:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763687599; cv=none; b=Wn6MA/XqmVIps2j7ZjPEais7tptWLl1tyA55KukwpQNxJ7Y1nzndcFqMCKKsvimXuc9plKQDezkVp+FtEl/e1aZlPNdEAqi5uy+zIWqxLIQikIQXDCUUewp0eEDtjcgivi6Tfi4BTXX44GBeRjdh5eJCYwypwx9ZYyjMg2uEnQg=
+	t=1763687915; cv=none; b=Nbl9YPpwtHtw4eDBpX0GK49gHW1rT6cH6iFhXRc1/etkpsx0sRUOJxbcgOrJ8hhT4VywDWw0xatEkO/SsyjUUmwtYIUs6XxtrVFxAhfOR0vm4qVWObX2sNxCBmIIb8otbcehtKjfiqOdN3fyPflbzwm79QiB8rlvWj8GDMWnX5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763687599; c=relaxed/simple;
-	bh=7vMskQIEkUuRVwrkNpGItXZ5CTplE6L4P7NpkQUFI0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E7wm4DYamMImbazBgCttmBCHSjwOYMRiXiKF6xOijDafCOkuEuDFJnHwQ5E7BIrwEXl3+PR4BvO1v/wVcAIynwKnomjqCGQyw7pngAbwpKcYBibTEVX8PmwIvNUAWWNeK3BkHXR3Z6HP+XoBQb/KkpfTyzovVoKvK7sAcbHGKw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=TDvy2bE0; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=YkcAcM/gBGVrQp+f5sFqb9ygI3lzdlKVWJYNwKoWEWE=; b=TDvy2bE0sCbJMqGR
-	6RV+TyLxwmEy+Oyz30kcyWScsmg3kqZ1HYnqmwprl/rnCKams9bOEB3LSH/Akpbrnr2ofs5v/uTGc
-	f0Z0rlwOKV6joh0Vy5iuxorodHfXNgMpxdHeZDI5xWGczg0ZiQsLtgLha2rXKgKzRkhOV0q5xRGhu
-	QZuUe+F78WpyiyrINkBBn2cMqAlvDfIXl8bTd1oe9wfcjUydY4ZygIcYfKWaaWIJhTOummUCQmzIu
-	QFgZ0e7UwZRMbOeB/ohDktlQEp86CO54OhmBDBe3IDmwPu7wcBXoJlpUSJAz3GsGpDs3GGQ7Lw9o1
-	EStADm8tf/LhZjsDoQ==;
-Received: from dg by mx.treblig.org with local (Exim 4.98.2)
-	(envelope-from <dg@treblig.org>)
-	id 1vMFho-00000005dQh-2cmY;
-	Fri, 21 Nov 2025 01:12:56 +0000
-Date: Fri, 21 Nov 2025 01:12:56 +0000
-From: "Dr. David Alan Gilbert" <dave@treblig.org>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, pizhenwei@bytedance.com,
-	alistair.francis@wdc.com, stefanb@linux.vnet.ibm.com,
-	kwolf@redhat.com, hreitz@redhat.com, sw@weilnetz.de,
-	qemu_oss@crudebyte.com, groug@kaod.org, mst@redhat.com,
-	imammedo@redhat.com, anisinha@redhat.com, kraxel@redhat.com,
-	shentey@gmail.com, npiggin@gmail.com, harshpb@linux.ibm.com,
-	sstabellini@kernel.org, anthony@xenproject.org, paul@xen.org,
-	edgar.iglesias@gmail.com, elena.ufimtseva@oracle.com,
-	jag.raman@oracle.com, sgarzare@redhat.com, pbonzini@redhat.com,
-	fam@euphon.net, philmd@linaro.org, alex@shazbot.org, clg@redhat.com,
-	peterx@redhat.com, farosas@suse.de, lizhijian@fujitsu.com,
-	jasowang@redhat.com, samuel.thibault@ens-lyon.org,
-	michael.roth@amd.com, kkostiuk@redhat.com, zhao1.liu@intel.com,
-	mtosatti@redhat.com, rathc@linux.ibm.com, palmer@dabbelt.com,
-	liwei1518@gmail.com, dbarboza@ventanamicro.com,
-	zhiwei_liu@linux.alibaba.com, marcandre.lureau@redhat.com,
-	qemu-block@nongnu.org, qemu-ppc@nongnu.org,
-	xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-	qemu-riscv@nongnu.org
-Subject: Re: [PATCH 04/14] qga: Use error_setg_file_open() for better error
- messages
-Message-ID: <aR-8mOKG-rYkjyjh@gallifrey>
-References: <20251120191339.756429-1-armbru@redhat.com>
- <20251120191339.756429-5-armbru@redhat.com>
+	s=arc-20240116; t=1763687915; c=relaxed/simple;
+	bh=zjOUf9QJkGZd50foy5VOeWyGByG+kC56893P8ylR0y4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D1roDSSlMJ1ZWVxpQLh0J8nmUYjNPYGD21nSRIgfrkbjGUEFBLU/CPJeufOCzfA7H62qc4K/8+6PTG27bcDlNf8czxCu+qq49bghvPD8b4kcbilcTxL5QoiVll4FLepJB0I+b8+icKwDJvv733E1R48NyU2Rf+36RoCze40Uh00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QA/vz88w; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763687913; x=1795223913;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zjOUf9QJkGZd50foy5VOeWyGByG+kC56893P8ylR0y4=;
+  b=QA/vz88w+txPGde2zhn5+XARXkW/yy+T9FVhcTHANOavnIDD0hHchb6a
+   oakI2pEi/NWpyamGmUV9pufO5WZ1rrE0tjswlxsHe4sNUDTM+hWhf/K07
+   0b4VcAhh3pQ4arNt+MtgcZkxH6qtEW6QnSqFiR9s+cmNniEdkdR9mTVND
+   7TNu8Z4tkbN6PeS/amEu2n5yYxRanJe1GRVdXKZYxcdRalXnIpAaNvP+s
+   woboBPAzwtHtUdNYmzBrgDWLl1BiyCvKLmkRA7uq1E0dDaE+HEbZVszhv
+   lgODNJnZXWQRJBhN1jWf19+ui52kDwTF45uDbd3FmCU8ClIm5dNvHy8Pt
+   g==;
+X-CSE-ConnectionGUID: 3uKkS8l2Q6S6xeKjaqSHwA==
+X-CSE-MsgGUID: ntKt3hCsTuecRe36UrGvxQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="77138829"
+X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
+   d="scan'208";a="77138829"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 17:18:32 -0800
+X-CSE-ConnectionGUID: I5XrZWPJTmqMhpZuXnQh4g==
+X-CSE-MsgGUID: EuluM552TBunkEKTWAgXnA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
+   d="scan'208";a="190759576"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.213]) ([10.124.240.213])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 17:18:29 -0800
+Message-ID: <45734caa-e058-47c9-a2ee-f49e15557aa0@linux.intel.com>
+Date: Fri, 21 Nov 2025 09:18:26 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20251120191339.756429-5-armbru@redhat.com>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.12.48+deb13-amd64 (x86_64)
-X-Uptime: 01:12:53 up 25 days, 49 min,  2 users,  load average: 0.02, 0.01,
- 0.00
-User-Agent: Mutt/2.2.13 (2024-03-09)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests patch v3 1/8] x86/pmu: Add helper to detect Intel
+ overcount issues
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+ Mingwei Zhang <mizhang@google.com>, Zide Chen <zide.chen@intel.com>,
+ Das Sandipan <Sandipan.Das@amd.com>, Shukla Manali <Manali.Shukla@amd.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>, Dapeng Mi <dapeng1.mi@intel.com>,
+ dongsheng <dongsheng.x.zhang@intel.com>, Yi Lai <yi1.lai@intel.com>
+References: <20250903064601.32131-1-dapeng1.mi@linux.intel.com>
+ <20250903064601.32131-2-dapeng1.mi@linux.intel.com>
+ <aR-VtupdTy4vHvSz@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <aR-VtupdTy4vHvSz@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Error messages change from
-> 
->     open("FNAME"): REASON
-> 
-> to
-> 
->     Could not open 'FNAME': REASON
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dave@treblig.org>
+On 11/21/2025 6:27 AM, Sean Christopherson wrote:
+> On Wed, Sep 03, 2025, Dapeng Mi wrote:
+>> From: dongsheng <dongsheng.x.zhang@intel.com>
+>>
+>> For Intel Atom CPUs, the PMU events "Instruction Retired" or
+>> "Branch Instruction Retired" may be overcounted for some certain
+>> instructions, like FAR CALL/JMP, RETF, IRET, VMENTRY/VMEXIT/VMPTRLD
+>> and complex SGX/SMX/CSTATE instructions/flows.
+>>
+>> The detailed information can be found in the errata (section SRF7):
+>> https://edc.intel.com/content/www/us/en/design/products-and-solutions/processors-and-chipsets/sierra-forest/xeon-6700-series-processor-with-e-cores-specification-update/errata-details/
+>>
+>> For the Atom platforms before Sierra Forest (including Sierra Forest),
+>> Both 2 events "Instruction Retired" and "Branch Instruction Retired" would
+>> be overcounted on these certain instructions, but for Clearwater Forest
+>> only "Instruction Retired" event is overcounted on these instructions.
+>>
+>> So add a helper detect_inst_overcount_flags() to detect whether the
+>> platform has the overcount issue and the later patches would relax the
+>> precise count check by leveraging the gotten overcount flags from this
+>> helper.
+>>
+>> Signed-off-by: dongsheng <dongsheng.x.zhang@intel.com>
+>> [Rewrite comments and commit message - Dapeng]
+>> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+>> Tested-by: Yi Lai <yi1.lai@intel.com>
+>> ---
+>>  lib/x86/processor.h | 27 ++++++++++++++++++++++++++
+>>  x86/pmu.c           | 47 +++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 74 insertions(+)
+>>
+>> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+>> index 62f3d578..937f75e4 100644
+>> --- a/lib/x86/processor.h
+>> +++ b/lib/x86/processor.h
+>> @@ -1188,4 +1188,31 @@ static inline bool is_lam_u57_enabled(void)
+>>  	return !!(read_cr3() & X86_CR3_LAM_U57);
+>>  }
+>>  
+>> +/* Copy from kernel arch/x86/lib/cpu.c */
+> Eh, just drop this, we don't care if the kernel code changes, this is all based
+> on architectural behavior.
+>
+>> +static inline u32 x86_family(u32 sig)
+>> +{
+>> +	u32 x86;
+>> +
+>> +	x86 = (sig >> 8) & 0xf;
+>> +
+>> +	if (x86 == 0xf)
+>> +		x86 += (sig >> 20) & 0xff;
+>> +
+>> +	return x86;
+>> +}
+>> +
+>> +static inline u32 x86_model(u32 sig)
+>> +{
+>> +	u32 fam, model;
+>> +
+>> +	fam = x86_family(sig);
+>> +
+>> +	model = (sig >> 4) & 0xf;
+>> +
+>> +	if (fam >= 0x6)
+>> +		model += ((sig >> 16) & 0xf) << 4;
+>> +
+>> +	return model;
+>> +}
+> We should place these up near is_intel() so that it's more obviously what "family"
+> and "model" mean (should be obvious already, but it's an easy thing to do).
 
-> ---
->  qga/commands-linux.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/qga/commands-linux.c b/qga/commands-linux.c
-> index 4a09ddc760..5cf76ca2d9 100644
-> --- a/qga/commands-linux.c
-> +++ b/qga/commands-linux.c
-> @@ -1502,14 +1502,15 @@ static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
->  
->      dirfd = open(dirpath, O_RDONLY | O_DIRECTORY);
->      if (dirfd == -1) {
-> -        error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
-> +        error_setg_file_open(errp, errno, dirpath);
->          return;
->      }
->  
->      fd = openat(dirfd, fn, sys2vcpu ? O_RDONLY : O_RDWR);
->      if (fd == -1) {
->          if (errno != ENOENT) {
-> -            error_setg_errno(errp, errno, "open(\"%s/%s\")", dirpath, fn);
-> +            error_setg_errno(errp, errno, "could not open %s/%s",
-> +                             dirpath, fn);
->          } else if (sys2vcpu) {
->              vcpu->online = true;
->              vcpu->can_offline = false;
-> @@ -1711,7 +1712,7 @@ static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool sys2memblk,
->      dirfd = open(dirpath, O_RDONLY | O_DIRECTORY);
->      if (dirfd == -1) {
->          if (sys2memblk) {
-> -            error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
-> +            error_setg_file_open(errp, errno, dirpath);
->          } else {
->              if (errno == ENOENT) {
->                  result->response = GUEST_MEMORY_BLOCK_RESPONSE_TYPE_NOT_FOUND;
-> @@ -1936,7 +1937,7 @@ static GuestDiskStatsInfoList *guest_get_diskstats(Error **errp)
->  
->      fp = fopen(diskstats, "r");
->      if (fp  == NULL) {
-> -        error_setg_errno(errp, errno, "open(\"%s\")", diskstats);
-> +        error_setg_file_open(errp, errno, diskstats);
->          return NULL;
->      }
->  
-> @@ -2047,7 +2048,7 @@ GuestCpuStatsList *qmp_guest_get_cpustats(Error **errp)
->  
->      fp = fopen(cpustats, "r");
->      if (fp  == NULL) {
-> -        error_setg_errno(errp, errno, "open(\"%s\")", cpustats);
-> +        error_setg_file_open(errp, errno, cpustats);
->          return NULL;
->      }
->  
-> -- 
-> 2.49.0
-> 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+Yes.
+
+
+>> +/*
+>> + * For Intel Atom CPUs, the PMU events "Instruction Retired" or
+>> + * "Branch Instruction Retired" may be overcounted for some certain
+>> + * instructions, like FAR CALL/JMP, RETF, IRET, VMENTRY/VMEXIT/VMPTRLD
+>> + * and complex SGX/SMX/CSTATE instructions/flows.
+>> + *
+>> + * The detailed information can be found in the errata (section SRF7):
+>> + * https://edc.intel.com/content/www/us/en/design/products-and-solutions/processors-and-chipsets/sierra-forest/xeon-6700-series-processor-with-e-cores-specification-update/errata-details/
+>> + *
+>> + * For the Atom platforms before Sierra Forest (including Sierra Forest),
+>> + * Both 2 events "Instruction Retired" and "Branch Instruction Retired" would
+>> + * be overcounted on these certain instructions, but for Clearwater Forest
+>> + * only "Instruction Retired" event is overcounted on these instructions.
+>> + */
+>> +static u32 detect_inst_overcount_flags(void)
+>> +{
+>> +	u32 flags = 0;
+>> +	struct cpuid c = cpuid(1);
+>> +
+>> +	if (x86_family(c.a) == 0x6) {
+>> +		switch (x86_model(c.a)) {
+>> +		case 0xDD: /* Clearwater Forest */
+>> +			flags = INST_RETIRED_OVERCOUNT;
+>> +			break;
+>> +
+>> +		case 0xAF: /* Sierra Forest */
+>> +		case 0x4D: /* Avaton, Rangely */
+>> +		case 0x5F: /* Denverton */
+>> +		case 0x86: /* Jacobsville */
+>> +			flags = INST_RETIRED_OVERCOUNT | BR_RETIRED_OVERCOUNT;
+>> +			break;
+>> +		}
+>> +	}
+>> +
+>> +	return flags;
+>> +}
+> The errata tracking definitely belongs "struct pmu_caps pmu", and the init in
+> pmu_init().
+
+Yes.
+
+
+>
 
