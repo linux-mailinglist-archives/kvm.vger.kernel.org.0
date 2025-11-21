@@ -1,225 +1,213 @@
-Return-Path: <kvm+bounces-64254-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64255-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E52ACC7BB29
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 21:58:37 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FE10C7BB4B
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 22:01:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E4563A6FC9
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 20:58:36 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EA8EC34D94B
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 21:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC2B52FFDC4;
-	Fri, 21 Nov 2025 20:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAAD7303C8E;
+	Fri, 21 Nov 2025 21:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PODgdyLq";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tr/8dx4Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HvBVKNHP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD7F2E8B8B
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 20:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C2B38DD3
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 21:01:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763758709; cv=none; b=Iq+pbBYC4seCyxgqSBWuwXoNgQai30CLoHNKbu2B8IjSug0ptu5bNkt4eYgoxCCQ0QXK37w7ENl+R+WKvBFwFggiS7bsHKtgqp/P0fliROZeWLamkKpsqa4C0ZaPS82JyHlW4AoscC7pRn8s12XAZEJdVBk9EdKsyQEDp+BCOTM=
+	t=1763758904; cv=none; b=d2lUaEmZN5AGlrCsvaraiOc+ldePp1k8mUemL3CU11L5IRGM5uehbH1eNIAWMOQI/OJI4xR7SdJnpyXz5EqCdUXC7yQJuAuRSA8YnqZacrFHS6VxbuBfCkrxK/rUpwQ7azwzqkNr+/wzQPHoaOYbd0umXcyzfjGwlyNCCBWApPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763758709; c=relaxed/simple;
-	bh=06oXEfhjprUqiQB5deP8QG66ZL/M1lhD7+55HTheX04=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Il0VPJAyvGvq/p6I4ilNBUUSXVicV8l/XBQO9A+IFYcPoJvN4UPJq1KnPnfLe1vMrrFDR5pwc5+n9JKoA5mpx2ayX95smSQpZvUSmVitHlQO58EAqDPLhVawOUTha2cGqceSvOlajppChijlp6eHMFTClySnAI7jS1KrKPNQ4eA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PODgdyLq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tr/8dx4Z; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763758706;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e88HhueZj89DvDALxZLu6Aq2WQkVf8WGiqxl2400ceE=;
-	b=PODgdyLqj/sWDV59KB7KUs7id/+4Tryh/4wMjMR8xrymBqmi5vTMSKK7IeiUcTr8ZVDZB8
-	Sk8vRhqIa72vS8m8voBUeyDjpAoEt/3C3DC5ytYu/UpmYZCsTe2rp+my6t47a90ntDOQHT
-	9xXTz5EIzcso6uMTBWbVFsowUCRyVwU=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-137-bf-WI-VGO9WCMPrCFsU6Tg-1; Fri, 21 Nov 2025 15:58:25 -0500
-X-MC-Unique: bf-WI-VGO9WCMPrCFsU6Tg-1
-X-Mimecast-MFC-AGG-ID: bf-WI-VGO9WCMPrCFsU6Tg_1763758705
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-89ee646359cso724671085a.1
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 12:58:25 -0800 (PST)
+	s=arc-20240116; t=1763758904; c=relaxed/simple;
+	bh=B7YNKrTt0enCvD/EaWKSxNm453HZnVYYtkLLVSDYh38=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LDZKO3FMy1qSIzuVLHfmxp3IsL6kjKQbmga72mtfAJfClvWJN8yZp/MJstR1aHlR9JWk72dUkUTeIpp9Hg7GYmmSPboY0XitIb30yT1dj5nw/uOwjOoKoKs3ULiC47WW8xbEi5ehsVPOmoBv3X6L6e2RV6v+tpLc1q9vZMEuQI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HvBVKNHP; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2958c80fcabso72323465ad.0
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 13:01:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763758705; x=1764363505; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=e88HhueZj89DvDALxZLu6Aq2WQkVf8WGiqxl2400ceE=;
-        b=Tr/8dx4ZEx4i7rTR7eOLeBbWhE4h3do7z0Fy4zAkg2xuO4tyNPBSo7GB1gjiOzDsPD
-         u64oahVPBwvbLDh3qtjVKKK5LUr/+P99nXuaodGhfdIJe/8PrQJ32+HVOPJgX6tTCWSs
-         sBYMZ7pbvFMUcRwe7PwoHlkrd8dCQUDfvUK5gOZdFEgXGvko0WyHaHsc0gTdLobjf5rc
-         AOUGYFeIFq2ogvdC+nw+g5QkMf3JTzeJmYN4ArwBplX1c1jauOYVeURy9ekiBZvl5SBp
-         n+CY/vZSTWX5WqCCmsbCQxBadSUGBGNq3+4/+w7HPDSQzaQ2QZZ9PTRoH5BDkgKXDUDA
-         rZYA==
+        d=google.com; s=20230601; t=1763758902; x=1764363702; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ac4mMM3g/g/BW6I267EGCP3uaTeAwf3nNqGsbiLSgLg=;
+        b=HvBVKNHPevv5WvcyOgGDk+xeG4CN0nCkDc4tMqsAfI6gCYlTH7LkJrYS0Dx8QFuwZi
+         yMgTTukqXIwnyh8LFB08X4BeBRbzzaLeoynYqXgw6o75m5XkO+43/bRb0HMGejH/Xm6O
+         lFlimJn4eiLFlRzWAKnTl74f+ECapJyNutGca3pKSK84IuD/WO+Ql9MAwtSWzhkG6LVb
+         BwG0YEeeObkKO7FPX7pVJpifTxSpdoT6bYOyB/ozIIaeAtkENutHtWW5/ddYL2yQNYKB
+         7xLETcMMc+Cx2L7s/zC8Ta+WqikrY1MxhSzDg5xLwRu9AEHhl485OPn3rSF7n+vXA59+
+         Ul/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763758705; x=1764363505;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e88HhueZj89DvDALxZLu6Aq2WQkVf8WGiqxl2400ceE=;
-        b=ozpsZ/OZDNPklpmDazBEV5JWVFzVp9teSHTHo2lpcjOXqSJfGPCMMUr97KpnwLZiWQ
-         gE1rKY8wt8XeYhLY6ZfRMDMyJ0ogL3k/tZYFgubzjdOr2pVyMg4NoXkW/Aa3zz+0jOAY
-         AXbvgLDRCtZvvfZnNRwLudwcH43KVdooXVm9EzIQVgDvirt8a1jWhPvMzWdI+aIVXT0f
-         pzkwbuNkcrtCc8hVkbovJ57il3HQDJQ/p6/wOP8HzvTpzCNAvbZpWRgi4+UWhVBxKPWK
-         L/bn+iYAdaWYrFgJC8FAwYbWxhmcKgXKlXFsNzUqgHA5IpE64sxiXhoQ2rYF6HfaaoK/
-         3J3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVXWX6BqKv9B+/P94JJ35+ejrsFkqYfa/B+9A5Bx3ts51K/yr4sXm6Iz7+2zoFU11Y1HE4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8+W8FBb+KR5vuMF4Sy7mPau3hCDxaGR/YSLYNHV8pJM6/rbCI
-	2av7mLnfv+eICyR6OOzBx5rhSjdjgviawYX4CVXK96oLUdXHmM50MnIr1ngQlnJYJH8oT6bkHB6
-	LxCbYt7txgT2SbyUNaESx9JBUHplEil0r9JN5uIF8kWsmn00TEl61YQ==
-X-Gm-Gg: ASbGncsfugtW59loCqMPT8gM1b6OmlLZGigKaYP4Ur9HNtIQ6LtHXTYsEUAK/7Yn9rY
-	jV/Kksnh/AeWFMsjYDs0DKgw1YIGRbIj7fLYq82jFHT1jfi/evXcS7FTEFvetdb5cOp66y9kiyn
-	FaEGtaz9P5GQFVoZl9FlFQP7ucLcrx6RI91mmiegRHvnseEVP5K01y2cqMl7q2mdnJp9lLJxXws
-	v5ZGvNdtm/i63kLg7ZSyVgY2i9hHOe5AtbKJOO2nE0XwO8suL3WONCXuBZnfTipl7h6h+A28lw9
-	l6n8e6ScRsfsFgHQME5ZvQyHTgCJizOUme782+jHijchMd08INTuGjkpgqHD1ZG4TgR40HjE4+o
-	wBAb1uwFSyQ==
-X-Received: by 2002:a05:620a:414b:b0:8a3:9bb4:9e4f with SMTP id af79cd13be357-8b33d1fe5e1mr463784885a.30.1763758704709;
-        Fri, 21 Nov 2025 12:58:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGhfkyzY52YJ2bXpl0xvrpFvW8lduyG4EKof39hTidPOL/dpJFOpP6aOif1GUzrwgXScGO24A==
-X-Received: by 2002:a05:620a:414b:b0:8a3:9bb4:9e4f with SMTP id af79cd13be357-8b33d1fe5e1mr463780785a.30.1763758704275;
-        Fri, 21 Nov 2025 12:58:24 -0800 (PST)
-Received: from [192.168.40.164] ([70.105.235.240])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b3295e4b96sm437647485a.45.2025.11.21.12.58.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Nov 2025 12:58:23 -0800 (PST)
-Message-ID: <9b25494c-0271-4469-a7f4-71876eadd4e3@redhat.com>
-Date: Fri, 21 Nov 2025 15:58:19 -0500
+        d=1e100.net; s=20230601; t=1763758902; x=1764363702;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ac4mMM3g/g/BW6I267EGCP3uaTeAwf3nNqGsbiLSgLg=;
+        b=dQQbBJMQgLgGFBkRl2M8LrLvTx7AEXyLPU7aurHizowWPxlP37CFcGdueqOZ2PSH6S
+         XDemigz/4GrpBzORoaL/LzuPpPijH9gig+T/9eWq0A2Q3DqVXgKUo9DsS+wdSz4aBdWK
+         jKDfg+HoDyLeTPL9PzIAPFSB1ebySqcenczu9ydoQoM6j5K+AsG1bTnIhnokw5f9TtPP
+         i89lZXvGUm5JXyX6vlx4G19erR5y4m2omoNypoiScIaI1ZwmBuxUCq3xqRA8kqLSruP/
+         PAPl9LVpvjCqJDHVVO7Mw71Zm1f6Ul0ReVDxn3m/RjnyViweuvcfWQanPeUmKow/2v4Y
+         A8PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWMCeV1iO8wkMbX5wpYynzo3Q1/xMLe2br2kl8AnFQ8oe3pW6zQXYgzd/+/KjWe+1R+its=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUNBIoLY/irDhfopukOr6AGsByMYCSC8G/cVX1Gs8Py3/1MjFd
+	L24HBlsM7ACDqGlKV4DA+uWIhS0cNYRv/ULyBOh6g39pMFbHJAaKByMjtfCTe/C9pOzU5Hbc5jx
+	v+IVL9A==
+X-Google-Smtp-Source: AGHT+IG+D6xVfuLOyYVH8atxIpnhXqnxRFlYbCYlUdYQ4U/01c6opVAwt3tuglj1k/9led+mVyyXzaw1xvU=
+X-Received: from plbla16.prod.google.com ([2002:a17:902:fa10:b0:298:a8:6ab2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:11c3:b0:297:e3f5:4a20
+ with SMTP id d9443c01a7336-29b6bee38ecmr54624235ad.26.1763758901795; Fri, 21
+ Nov 2025 13:01:41 -0800 (PST)
+Date: Fri, 21 Nov 2025 13:01:40 -0800
+In-Reply-To: <20251121193204.952988-2-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/7] vfio: move barmap to a separate function and
- export
-To: Alex Williamson <alex@shazbot.org>, ankita@nvidia.com
-Cc: jgg@ziepe.ca, yishaih@nvidia.com, skolothumtho@nvidia.com,
- kevin.tian@intel.com, aniketa@nvidia.com, vsethi@nvidia.com,
- mochs@nvidia.com, Yunxiang.Li@amd.com, yi.l.liu@intel.com,
- zhangdongdong@eswincomputing.com, avihaih@nvidia.com, bhelgaas@google.com,
- peterx@redhat.com, pstanner@redhat.com, apopple@nvidia.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, cjia@nvidia.com,
- kwankhede@nvidia.com, targupta@nvidia.com, zhiw@nvidia.com, danw@nvidia.com,
- dnigam@nvidia.com, kjaju@nvidia.com
-References: <20251121141141.3175-1-ankita@nvidia.com>
- <20251121141141.3175-6-ankita@nvidia.com>
- <20251121093949.54f647a6.alex@shazbot.org>
-Content-Language: en-US
-From: Donald Dutile <ddutile@redhat.com>
-In-Reply-To: <20251121093949.54f647a6.alex@shazbot.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20251121193204.952988-1-yosry.ahmed@linux.dev> <20251121193204.952988-2-yosry.ahmed@linux.dev>
+Message-ID: <aSDTNDUPyu6LwvhW@google.com>
+Subject: Re: [PATCH 1/3] KVM: x86: Add CR3 to guest debug info
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ken Hofsass <hofsass@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On 11/21/25 11:39 AM, Alex Williamson wrote:
-> On Fri, 21 Nov 2025 14:11:39 +0000
-> <ankita@nvidia.com> wrote:
+On Fri, Nov 21, 2025, Yosry Ahmed wrote:
+> Add the value of CR3 to the information returned to userspace on
+> KVM_EXIT_DEBUG. Use KVM_CAP_X86_GUEST_DEBUG_CR3 to advertise this.
 > 
->> From: Ankit Agrawal <ankita@nvidia.com>
->>
->> Move the code to map the BAR to a separate function.
->>
->> This would be reused by the nvgrace-gpu module.
->>
->> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
->> ---
->>   drivers/vfio/pci/vfio_pci_core.c | 38 ++++++++++++++++++++++----------
->>   include/linux/vfio_pci_core.h    |  1 +
->>   2 files changed, 27 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
->> index 29dcf78905a6..d1ff1c0aa727 100644
->> --- a/drivers/vfio/pci/vfio_pci_core.c
->> +++ b/drivers/vfio/pci/vfio_pci_core.c
->> @@ -1717,6 +1717,29 @@ static const struct vm_operations_struct vfio_pci_mmap_ops = {
->>   #endif
->>   };
->>   
->> +int vfio_pci_core_barmap(struct vfio_pci_core_device *vdev, unsigned int index)
->> +{
->> +	struct pci_dev *pdev = vdev->pdev;
->> +	int ret;
->> +
->> +	if (vdev->barmap[index])
->> +		return 0;
->> +
->> +	ret = pci_request_selected_regions(pdev,
->> +					   1 << index, "vfio-pci");
->> +	if (ret)
->> +		return ret;
->> +
->> +	vdev->barmap[index] = pci_iomap(pdev, index, 0);
->> +	if (!vdev->barmap[index]) {
->> +		pci_release_selected_regions(pdev, 1 << index);
->> +		return -ENOMEM;
->> +	}
->> +
->> +	return 0;
->> +}
->> +EXPORT_SYMBOL_GPL(vfio_pci_core_barmap);
+> During guest debugging, the value of CR3 can be used by VM debuggers to
+> (roughly) identify the process running in the guest. This can be used to
+> index debugging events by process, or filter events from some processes
+> and quickly skip them.
 > 
-> Looks a lot like vfio_pci_core_setup_barmap() ;)
+> Currently, debuggers would need to use the KVM_GET_SREGS ioctl on every
+> event to get the value of CR3, which considerably slows things down.
+> This can be easily avoided by adding the value of CR3 to the captured
+> debugging info.
 > 
-> Thanks,
-> Alex
+> Signed-off-by: Ken Hofsass <hofsass@google.com>
+> Co-developed-by: Ken Hofsass <hofsass@google.com>
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> ---
+>  arch/x86/include/uapi/asm/kvm.h | 1 +
+>  arch/x86/kvm/svm/svm.c          | 2 ++
+>  arch/x86/kvm/vmx/vmx.c          | 2 ++
+>  arch/x86/kvm/x86.c              | 3 +++
+>  include/uapi/linux/kvm.h        | 1 +
+>  5 files changed, 9 insertions(+)
 > 
-+1 ... and below ...
-> 
->> +
->>   int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma)
->>   {
->>   	struct vfio_pci_core_device *vdev =
->> @@ -1761,18 +1784,9 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
->>   	 * Even though we don't make use of the barmap for the mmap,
->>   	 * we need to request the region and the barmap tracks that.
->>   	 */
->> -	if (!vdev->barmap[index]) {
->> -		ret = pci_request_selected_regions(pdev,
->> -						   1 << index, "vfio-pci");
->> -		if (ret)
->> -			return ret;
->> -
->> -		vdev->barmap[index] = pci_iomap(pdev, index, 0);
->> -		if (!vdev->barmap[index]) {
->> -			pci_release_selected_regions(pdev, 1 << index);
->> -			return -ENOMEM;
->> -		}
->> -	}
->> +	ret = vfio_pci_core_barmap(vdev, index);
->> +	if (ret)
->> +		return ret;
->>   
-so, vfio_pci_core_mmap() should be calling vfio_pci_core_setup_barmap() vs. what it does above currently?
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 7ceff6583652..c351e458189b 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -293,6 +293,7 @@ struct kvm_debug_exit_arch {
+>  	__u64 pc;
+>  	__u64 dr6;
+>  	__u64 dr7;
+> +	__u64 cr3;
+>  };
 
---Don
+I really, really don't like this.  It "solves" a very specific problem for a very
+specific use case without any consideration for uAPI, precedence or maintenance.
+E.g. in most cases, CR3 without CR0, CR4, EFER, etc. is largely meaningless.  The
+only thing it's really useful for is an opaque guest process identifer.
 
->>   	vma->vm_private_data = vdev;
->>   	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
->> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
->> index a097a66485b4..75f04d613e0c 100644
->> --- a/include/linux/vfio_pci_core.h
->> +++ b/include/linux/vfio_pci_core.h
->> @@ -121,6 +121,7 @@ ssize_t vfio_pci_core_write(struct vfio_device *core_vdev, const char __user *bu
->>   		size_t count, loff_t *ppos);
->>   vm_fault_t vfio_pci_map_pfn(struct vm_fault *vmf, unsigned long pfn,
->>   			    unsigned int order);
->> +int vfio_pci_core_barmap(struct vfio_pci_core_device *vdev, unsigned int index);
->>   int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma);
->>   void vfio_pci_core_request(struct vfio_device *core_vdev, unsigned int count);
->>   int vfio_pci_core_match(struct vfio_device *core_vdev, char *buf);
-> 
-> 
+KVM already provides kvm_run.kvm_valid_regs to let userspace grab register state
+on exit to userspace.  If userspace is debugging, why not simply save all regs on
+exit?
 
+If the answer is "because it slows down all other exits", then I would much rather
+give userspace the ability to conditionally save registers based on the exit reason,
+e.g. something like this (completely untested, no CAP, etc.)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0c6d899d53dd..337043d49ee6 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -127,7 +127,7 @@ static u64 __read_mostly efer_reserved_bits = ~((u64)EFER_SCE);
+ static void update_cr8_intercept(struct kvm_vcpu *vcpu);
+ static void process_nmi(struct kvm_vcpu *vcpu);
+ static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
+-static void store_regs(struct kvm_vcpu *vcpu);
++static void kvm_run_save_regs_on_exit(struct kvm_vcpu *vcpu);
+ static int sync_regs(struct kvm_vcpu *vcpu);
+ static int kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu);
+ 
+@@ -10487,6 +10487,8 @@ static void post_kvm_run_save(struct kvm_vcpu *vcpu)
+ {
+        struct kvm_run *kvm_run = vcpu->run;
+ 
++       kvm_run_save_regs_on_exit(vcpu);
++
+        kvm_run->if_flag = kvm_x86_call(get_if_flag)(vcpu);
+        kvm_run->cr8 = kvm_get_cr8(vcpu);
+        kvm_run->apic_base = vcpu->arch.apic_base;
+@@ -11978,8 +11980,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 
+ out:
+        kvm_put_guest_fpu(vcpu);
+-       if (kvm_run->kvm_valid_regs && likely(!vcpu->arch.guest_state_protected))
+-               store_regs(vcpu);
+        post_kvm_run_save(vcpu);
+        kvm_vcpu_srcu_read_unlock(vcpu);
+ 
+@@ -12598,10 +12598,30 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+        return 0;
+ }
+ 
+-static void store_regs(struct kvm_vcpu *vcpu)
++static void kvm_run_save_regs_on_exit(struct kvm_vcpu *vcpu)
+ {
++       struct kvm_run *run = vcpu->run;
++       u32 nr_exit_reasons = sizeof(run->kvm_save_regs_on_exit) * BITS_PER_BYTE;
++       u64 valid_regs = READ_ONCE(run->kvm_valid_regs);
++       u32 exit_reason = READ_ONCE(run->exit_reason);
++
+        BUILD_BUG_ON(sizeof(struct kvm_sync_regs) > SYNC_REGS_SIZE_BYTES);
+ 
++       if (!valid_regs)
++               return;
++
++       if (unlikely(!vcpu->arch.guest_state_protected))
++               return;
++
++       if (valid_regs & KVM_SYNC_REGS_CONDITIONAL) {
++               if (exit_reason >= nr_exit_reasons)
++                       return;
++
++               exit_reason = array_index_nospec(exit_reason, nr_exit_reasons);
++               if (!test_bit(exit_reason, (void *)run->kvm_save_regs_on_exit))
++                       return;
++       }
++
+        if (vcpu->run->kvm_valid_regs & KVM_SYNC_X86_REGS)
+                __get_regs(vcpu, &vcpu->run->s.regs.regs);
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 52f6000ab020..452805c1337b 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -494,8 +494,12 @@ struct kvm_run {
+                struct kvm_sync_regs regs;
+                char padding[SYNC_REGS_SIZE_BYTES];
+        } s;
++
++       __u64 kvm_save_regs_on_exit[16];
+ };
+ 
++#define KVM_SYNC_REGS_CONDITIONAL      _BITULL(63)
++
+ /* for KVM_REGISTER_COALESCED_MMIO / KVM_UNREGISTER_COALESCED_MMIO */
+ 
+ struct kvm_coalesced_mmio_zone {
 
