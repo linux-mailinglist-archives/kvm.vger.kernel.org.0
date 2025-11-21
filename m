@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-64189-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64190-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ECDBC7B3D9
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:12:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D9CBC7B3DF
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:12:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 86CB04EC3AC
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:09:15 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 352D34EEF74
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513FD346E46;
-	Fri, 21 Nov 2025 18:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D152F0C74;
+	Fri, 21 Nov 2025 18:09:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DS25VvA+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fnL1TMf4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD78A2ECE9E
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:09:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA6C223DD6
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763748551; cv=none; b=HyLehDV5K0PLaGXC4G4ZwdfZ+kGSN86YA3c3AxfY+s9ansllzJidy9I3ktWprerrrN/qqQTRYhP8eFN1EvEPpjNr8/Uu26HlJ6EV/AlZu87eV9Q3YkDisXZ68tj/aAhp4J5BrRcsZwvKS/5XtZaUjJZ87L156pupQsd0oV0kpvc=
+	t=1763748555; cv=none; b=odEVS3DHUvmT/uCQoTg2ewRjTUkQkK4g3dEz6861XBQhhA09moLOSWbg/OSBzb05nzbXkTbmU3RtrjHPikEt4ty1xLyL3td91M0kDkEpBMXLfZDPVojIjVf4tUX8HdADgmFtwyGAntq9SxXrrdELZNH3A014t5dQBkTCZ/N7upk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763748551; c=relaxed/simple;
-	bh=2Jp7PfybFscpT60rns5vtX6GlJp4pJRYziHrtkEOwdc=;
+	s=arc-20240116; t=1763748555; c=relaxed/simple;
+	bh=G+gi+fEZZQeXHxtEIRq+atDeCesCCCisZ13llVhfMLs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lcV2R/AWghDKTYw1xEriZvYA3ULqT25jGQg++dsr7MrwCzacy/zFp+6vQquvPBoQaNQyWWuSUEYgIGiJDZQC/vU8zqwHzQyM3vlVq8SoOOW56o/dgOnOGtOwPUi13njUl2UwIfc61pzAURSQZkyKMP3ZjR0/YLu5V553HalD7G8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DS25VvA+; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=bHoXGZi/aEYRUIxYGjOfv+l8q+HIYQiYprPXUA7DK6zb6zSxho7A156KpAck6n7ACv6w3pzJRWmP/Z1CPoTSvtUr+g44W4bDU/ap+F1uzujj66Jt3n99GTPQVtMpDhNOq3cz/sdVlOGxb8UFV6YlGhekL0oPe4jdoS3gTC/k8Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fnL1TMf4; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-29806c42760so93214215ad.2
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:09:09 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-343fb64cea6so5741278a91.3
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:09:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763748549; x=1764353349; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763748553; x=1764353353; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=KISUJG5gt6VfSRdAsI/PpXH/vLzc4XFQbCkhNP/fpmY=;
-        b=DS25VvA+xfzxEuXVipFDJ6ysu3c8a/9tEC/v3LeMqZf0dlSlbsBEHAWp3TP9TW6MA1
-         OUdW1yMeE+KMfsTCJ4n6L0gmC7BEIhweyjlrTOyZDjQiYPmPolscO7eI34bBq99qCIP8
-         M5VBYHFs8Q77c0h6NHwo0UInAZZNwFAY+MvHDoJNXp18pwcn5MVAGpkuTbY8+Fne7IwB
-         qlep/uQzhm3NRfiVoV8sTCVDt21LeOH49otcXcO9s7lYuZzKXGkPW9gn8YRxuq1r/Bip
-         glzKojuEe7wsdwlHst8EzIIKQ01t8mUhadbev166vvdTHUSS/liNiTT8JJE+NaQlAl8o
-         RZ6g==
+        bh=i5SVD+dWBU1kQgJRl6C3p5453CgyaUw/X7daFWn/Czs=;
+        b=fnL1TMf4wvanbgw1RhCwvylnTRHGmPWack5ztslGZnUExdno4pjhn49EQiDZV/X5DG
+         sLTNwPrspR/QKtq+FMobnOtiMuWcsZhNTKnkDnOTqWxTlQ87jmbGci5DiFOainSpY343
+         yuF73zSGofQswLzJKpJvtb79wr0Ltjo/x34Sb9yh4f9YQm1FxnWIFai7R/UAh+N0Pv0x
+         TAJnId+s31kpzHtqsoed/E4U/ElvJhRGd5EcV0aVH+n//Aw4MWrMx2MvKZ+9+Bd5xqeZ
+         sgxH3EbGrPu/SymGtwNDz8X4tui2Rnw8DkvTld55jrRi8qZi/gkVcsuMGuuaQ3Va/89m
+         bXsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763748549; x=1764353349;
+        d=1e100.net; s=20230601; t=1763748553; x=1764353353;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KISUJG5gt6VfSRdAsI/PpXH/vLzc4XFQbCkhNP/fpmY=;
-        b=gQNKTI7FKyxSGdbTvrzDiIYH7rXwpvP+VarsSRXMXzMfYSpv7Xxtgez7IGpTgjSLrh
-         ptM5KQGDq0b2LDpLa0hl3g0TqC47W4jiWG4t/ejP0lYi2V81xWkMTSDKVCaLL24sN+EP
-         H8wghBd1EkHpOA9D4pdTXPqKYbwAgXWejynDKhnA54Nxgwa7RafWY5e9IQsPQdjmdJ9y
-         rN0ozBszoVSEMsgHu2xcx8FdN6XL5roDH18bf5wG/fR9gTnTFfUkW/uA/DFdKVHUjUq+
-         YM9BOb11/5isxgdeW4Hatx70r4a5EDZ6nynzNyKVDdq94VwGX1dmY2coiKb6Y2haebjG
-         0CzQ==
-X-Gm-Message-State: AOJu0Yx6Z5v3uGu7HZ76wqwTqmktataOPPpepjaR8XbVFG65yxwe9ooM
-	+bzBnyPOweQxTSlAoo0aYk6sovOjGdJ6aAVTNPGcmYNJ10SBFuApLdiNnQNCfNVEBVFvjfhfIwB
-	ykpx3Tg==
-X-Google-Smtp-Source: AGHT+IFbU3GyI+4+Z/vOcQSWviVOZGO+JWRa4cFq4DXjiw6LoqweKKGcVtek6IcS3eVDI0lrce3cZwRnyuI=
-X-Received: from pgmj22.prod.google.com ([2002:a63:5956:0:b0:bac:a20:5f03])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:988:b0:297:d777:a2d4
- with SMTP id d9443c01a7336-29b6bf3bfffmr46162565ad.46.1763748549099; Fri, 21
- Nov 2025 10:09:09 -0800 (PST)
+        bh=i5SVD+dWBU1kQgJRl6C3p5453CgyaUw/X7daFWn/Czs=;
+        b=uJAKRD13v2YHWwUCFpkexhziJ8oTR5D/R4aBxFhcv/2NAR4Wya8aZRg9ljpAZrtv+p
+         gu/nF3DxtGCZJRyAvfh7Mn2vpbNgu5GfvMFljMqBEH6dHyXbP9t05UrNxZvrXcM6Bn10
+         FrVSHZmQ1MMgaNxwCmoDBFKl16KiIopUAW5QuKZJW1h/d0uU7KPb0Sw7jyuZADys9z/H
+         A2N6WGbui8Zwl9fKVt13b+Vy5LQ/6afm0kUlk2cSoLRhvsntveMItw8Djz5S30QwBWRg
+         MoGyqQ84tPqD70FTY/4cOXWesesJfcMtVTX/Tdb5qYZNPFS558xxmrnQhmqb02jgypeO
+         gFYw==
+X-Gm-Message-State: AOJu0YzK2h43OYk+s3g+go2kFdaQCV+hMX9prABYsVE5OTFi3MiYPkah
+	WVMbx1oPX3UKeLZYhJZjP0w6y4Agidiu6MG2LlfdT/UYMDNYdMpOe81ShiAXpxhJgv2wZQmF/Dt
+	RPAzbrg==
+X-Google-Smtp-Source: AGHT+IHtQNmnx6y2gMn1+a3hREyPeGDsSuIruvneqaa14gwwpgsGQr/sBS3tj3eE0/yvgpsOoWiTjywK6Uc=
+X-Received: from pjbnl12.prod.google.com ([2002:a17:90b:384c:b0:342:b238:e0a5])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1e0d:b0:340:2a3a:71b7
+ with SMTP id 98e67ed59e1d1-34733e4c840mr3636874a91.12.1763748552958; Fri, 21
+ Nov 2025 10:09:12 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 21 Nov 2025 10:08:51 -0800
+Date: Fri, 21 Nov 2025 10:08:52 -0800
 In-Reply-To: <20251121180901.271486-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,247 +75,56 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251121180901.271486-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
-Message-ID: <20251121180901.271486-2-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v2 01/11] x86: xsave: Replace spaces with tabs
+Message-ID: <20251121180901.271486-3-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v2 02/11] x86: xsave: Drop unnecessary and
+ confusing uint64_t overrides
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Replace spaces with tabs in the XSAVE test so that upcoming changes don't
-have to carry forward the non-standard formatting.
+Drop the uint64_t #defines from the XSAVE test, as they are unnecessary
+(typedef'd by stdint-uintn.h) and confusing (the test is 64-bit only).
+
+Opportunistically use "u64" throughout the test, for brevity and for
+consistency (tracking xcr0 as two different types is bizarre).
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/xsave.c | 198 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 99 insertions(+), 99 deletions(-)
+ x86/xsave.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
 
 diff --git a/x86/xsave.c b/x86/xsave.c
-index cc8e3a0a..f18d66a1 100644
+index f18d66a1..fc18a4b0 100644
 --- a/x86/xsave.c
 +++ b/x86/xsave.c
-@@ -8,120 +8,120 @@
- #define uint64_t unsigned long long
- #endif
+@@ -2,12 +2,6 @@
+ #include "desc.h"
+ #include "processor.h"
  
--#define XCR_XFEATURE_ENABLED_MASK       0x00000000
--#define XCR_XFEATURE_ILLEGAL_MASK       0x00000010
-+#define XCR_XFEATURE_ENABLED_MASK	0x00000000
-+#define XCR_XFEATURE_ILLEGAL_MASK	0x00000010
+-#ifdef __x86_64__
+-#define uint64_t unsigned long
+-#else
+-#define uint64_t unsigned long long
+-#endif
+-
+ #define XCR_XFEATURE_ENABLED_MASK	0x00000000
+ #define XCR_XFEATURE_ILLEGAL_MASK	0x00000010
  
--#define XSTATE_FP       0x1
--#define XSTATE_SSE      0x2
--#define XSTATE_YMM      0x4
-+#define XSTATE_FP	0x1
-+#define XSTATE_SSE	0x2
-+#define XSTATE_YMM	0x4
+@@ -17,10 +11,8 @@
  
  static void test_xsave(void)
  {
--    unsigned long cr4;
--    uint64_t supported_xcr0;
--    uint64_t test_bits;
--    u64 xcr0;
--
--    printf("Legal instruction testing:\n");
--
--    supported_xcr0 = this_cpu_supported_xcr0();
--    printf("Supported XCR0 bits: %#lx\n", supported_xcr0);
--
--    test_bits = XSTATE_FP | XSTATE_SSE;
--    report((supported_xcr0 & test_bits) == test_bits,
--           "Check minimal XSAVE required bits");
--
--    cr4 = read_cr4();
--    report(write_cr4_safe(cr4 | X86_CR4_OSXSAVE) == 0, "Set CR4 OSXSAVE");
--    report(this_cpu_has(X86_FEATURE_OSXSAVE),
--           "Check CPUID.1.ECX.OSXSAVE - expect 1");
--
--    printf("\tLegal tests\n");
--    test_bits = XSTATE_FP;
--    report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == 0,
--           "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP)");
--
--    test_bits = XSTATE_FP | XSTATE_SSE;
--    report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == 0,
--           "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP | XSTATE_SSE)");
--    report(xgetbv_safe(XCR_XFEATURE_ENABLED_MASK, &xcr0) == 0,
--           "        xgetbv(XCR_XFEATURE_ENABLED_MASK)");
--
--    printf("\tIllegal tests\n");
--    test_bits = 0;
--    report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == GP_VECTOR,
--           "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, 0) - expect #GP");
--
--    test_bits = XSTATE_SSE;
--    report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == GP_VECTOR,
--           "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_SSE) - expect #GP");
--
--    if (supported_xcr0 & XSTATE_YMM) {
--        test_bits = XSTATE_YMM;
--        report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == GP_VECTOR,
--               "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_YMM) - expect #GP");
--
--        test_bits = XSTATE_FP | XSTATE_YMM;
--        report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == GP_VECTOR,
--               "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP | XSTATE_YMM) - expect #GP");
--    }
--
--    test_bits = XSTATE_SSE;
--    report(xsetbv_safe(XCR_XFEATURE_ILLEGAL_MASK, test_bits) == GP_VECTOR,
--           "\t\txsetbv(XCR_XFEATURE_ILLEGAL_MASK, XSTATE_FP) - expect #GP");
--
--    test_bits = XSTATE_SSE;
--    report(xsetbv_safe(XCR_XFEATURE_ILLEGAL_MASK, test_bits) == GP_VECTOR,
--           "\t\txgetbv(XCR_XFEATURE_ILLEGAL_MASK, XSTATE_FP) - expect #GP");
--
--    cr4 &= ~X86_CR4_OSXSAVE;
--    report(write_cr4_safe(cr4) == 0, "Unset CR4 OSXSAVE");
--    report(this_cpu_has(X86_FEATURE_OSXSAVE) == 0,
--           "Check CPUID.1.ECX.OSXSAVE - expect 0");
--
--    printf("\tIllegal tests:\n");
--    test_bits = XSTATE_FP;
--    report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == UD_VECTOR,
--           "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP) - expect #UD");
--
--    test_bits = XSTATE_FP | XSTATE_SSE;
--    report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == UD_VECTOR,
--           "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP | XSTATE_SSE) - expect #UD");
--
--    printf("\tIllegal tests:\n");
--    report(xgetbv_safe(XCR_XFEATURE_ENABLED_MASK, &xcr0) == UD_VECTOR,
--           "\txgetbv(XCR_XFEATURE_ENABLED_MASK) - expect #UD");
-+	unsigned long cr4;
-+	uint64_t supported_xcr0;
-+	uint64_t test_bits;
-+	u64 xcr0;
-+
-+	printf("Legal instruction testing:\n");
-+
-+	supported_xcr0 = this_cpu_supported_xcr0();
-+	printf("Supported XCR0 bits: %#lx\n", supported_xcr0);
-+
-+	test_bits = XSTATE_FP | XSTATE_SSE;
-+	report((supported_xcr0 & test_bits) == test_bits,
-+	       "Check minimal XSAVE required bits");
-+
-+	cr4 = read_cr4();
-+	report(write_cr4_safe(cr4 | X86_CR4_OSXSAVE) == 0, "Set CR4 OSXSAVE");
-+	report(this_cpu_has(X86_FEATURE_OSXSAVE),
-+	       "Check CPUID.1.ECX.OSXSAVE - expect 1");
-+
-+	printf("\tLegal tests\n");
-+	test_bits = XSTATE_FP;
-+	report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == 0,
-+	       "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP)");
-+
-+	test_bits = XSTATE_FP | XSTATE_SSE;
-+	report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == 0,
-+	       "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP | XSTATE_SSE)");
-+	report(xgetbv_safe(XCR_XFEATURE_ENABLED_MASK, &xcr0) == 0,
-+	       "\t\txgetbv(XCR_XFEATURE_ENABLED_MASK)");
-+
-+	printf("\tIllegal tests\n");
-+	test_bits = 0;
-+	report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == GP_VECTOR,
-+	       "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, 0) - expect #GP");
-+
-+	test_bits = XSTATE_SSE;
-+	report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == GP_VECTOR,
-+	       "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_SSE) - expect #GP");
-+
-+	if (supported_xcr0 & XSTATE_YMM) {
-+		test_bits = XSTATE_YMM;
-+		report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == GP_VECTOR,
-+		       "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_YMM) - expect #GP");
-+
-+		test_bits = XSTATE_FP | XSTATE_YMM;
-+		report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == GP_VECTOR,
-+		       "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP | XSTATE_YMM) - expect #GP");
-+	}
-+
-+	test_bits = XSTATE_SSE;
-+	report(xsetbv_safe(XCR_XFEATURE_ILLEGAL_MASK, test_bits) == GP_VECTOR,
-+	       "\t\txsetbv(XCR_XFEATURE_ILLEGAL_MASK, XSTATE_FP) - expect #GP");
-+
-+	test_bits = XSTATE_SSE;
-+	report(xsetbv_safe(XCR_XFEATURE_ILLEGAL_MASK, test_bits) == GP_VECTOR,
-+	       "\t\txgetbv(XCR_XFEATURE_ILLEGAL_MASK, XSTATE_FP) - expect #GP");
-+
-+	cr4 &= ~X86_CR4_OSXSAVE;
-+	report(write_cr4_safe(cr4) == 0, "Unset CR4 OSXSAVE");
-+	report(this_cpu_has(X86_FEATURE_OSXSAVE) == 0,
-+	       "Check CPUID.1.ECX.OSXSAVE - expect 0");
-+
-+	printf("\tIllegal tests:\n");
-+	test_bits = XSTATE_FP;
-+	report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == UD_VECTOR,
-+	       "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP) - expect #UD");
-+
-+	test_bits = XSTATE_FP | XSTATE_SSE;
-+	report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, test_bits) == UD_VECTOR,
-+	       "\t\txsetbv(XCR_XFEATURE_ENABLED_MASK, XSTATE_FP | XSTATE_SSE) - expect #UD");
-+
-+	printf("\tIllegal tests:\n");
-+	report(xgetbv_safe(XCR_XFEATURE_ENABLED_MASK, &xcr0) == UD_VECTOR,
-+	       "\txgetbv(XCR_XFEATURE_ENABLED_MASK) - expect #UD");
- }
++	u64 supported_xcr0, xcr0, test_bits;
+ 	unsigned long cr4;
+-	uint64_t supported_xcr0;
+-	uint64_t test_bits;
+-	u64 xcr0;
  
- static void test_no_xsave(void)
- {
--    unsigned long cr4;
--    u64 xcr0;
-+	unsigned long cr4;
-+	u64 xcr0;
+ 	printf("Legal instruction testing:\n");
  
--    report(this_cpu_has(X86_FEATURE_OSXSAVE) == 0,
--           "Check CPUID.1.ECX.OSXSAVE - expect 0");
-+	report(this_cpu_has(X86_FEATURE_OSXSAVE) == 0,
-+	       "Check CPUID.1.ECX.OSXSAVE - expect 0");
- 
--    printf("Illegal instruction testing:\n");
-+	printf("Illegal instruction testing:\n");
- 
--    cr4 = read_cr4();
--    report(write_cr4_safe(cr4 | X86_CR4_OSXSAVE) == GP_VECTOR,
--           "Set OSXSAVE in CR4 - expect #GP");
-+	cr4 = read_cr4();
-+	report(write_cr4_safe(cr4 | X86_CR4_OSXSAVE) == GP_VECTOR,
-+	       "Set OSXSAVE in CR4 - expect #GP");
- 
--    report(xgetbv_safe(XCR_XFEATURE_ENABLED_MASK, &xcr0) == UD_VECTOR,
--           "Execute xgetbv - expect #UD");
-+	report(xgetbv_safe(XCR_XFEATURE_ENABLED_MASK, &xcr0) == UD_VECTOR,
-+	       "Execute xgetbv - expect #UD");
- 
--    report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, 0x3) == UD_VECTOR,
--           "Execute xsetbv - expect #UD");
-+	report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, 0x3) == UD_VECTOR,
-+	       "Execute xsetbv - expect #UD");
- }
- 
- int main(void)
- {
--    if (this_cpu_has(X86_FEATURE_XSAVE)) {
--        printf("CPU has XSAVE feature\n");
--        test_xsave();
--    } else {
--        printf("CPU don't has XSAVE feature\n");
--        test_no_xsave();
--    }
--    return report_summary();
-+	if (this_cpu_has(X86_FEATURE_XSAVE)) {
-+		printf("CPU has XSAVE feature\n");
-+		test_xsave();
-+	} else {
-+		printf("CPU don't has XSAVE feature\n");
-+		test_no_xsave();
-+	}
-+	return report_summary();
- }
 -- 
 2.52.0.rc2.455.g230fcf2819-goog
 
