@@ -1,180 +1,192 @@
-Return-Path: <kvm+bounces-64260-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64261-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 935E1C7BC48
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 22:36:58 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B33B5C7BD81
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 23:23:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B80DA4E4985
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 21:36:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E04DE381636
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 22:21:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04CD2303A1A;
-	Fri, 21 Nov 2025 21:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB0730C357;
+	Fri, 21 Nov 2025 22:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Uo5eJ729"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OS6SWsqi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD012E6CC6;
-	Fri, 21 Nov 2025 21:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BBB30BBBA
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 22:20:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763761000; cv=none; b=KwMs9rLmT59FjrbG9VTkZGfSWLCTl3NaLnQPt9DizbKQ/B20m+RNyf6Sy2GwsTjZA9F2ZcWdrJK9iuO+LUrwnYeOm9sRGlQ+/XT5w2oYqolnPD3WquW13Q2TY2yHUT/E37TplrPmO+8FRsiwIb+GdgWeM+TCnP7JEl0q5BNoQ2Y=
+	t=1763763623; cv=none; b=uqFliMGNIc1cCQdmpAdvwsB5npPkdG6ozQbnqbgk8DejjyuTSjckQpgq+yWtlDN3FTFW3rRhRNPE3EVEXPcn2QYC2tYjkoJBjazUp0ioe9GZ4LTXJ+lg9YxyZrFwqwtNfaiII2Bv+dgf20kdKtSnCxG+527dUoQPCkoFSm14/PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763761000; c=relaxed/simple;
-	bh=NNia7pGWG6j3sTU0e30kHB9qk57ca6Op/j47zvwbtFw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eksamJ9gvSpI9t67m5uxyLtRPZhT/j95wNlRJN8qANIakZ5BZVzw0cLjRZSxfNffX4GjTDFl9rplIrO4yDkuJ3J/Aj1ua237I1PzP1fvAouTofNHVPyQ6wNg9jmYxdTRfPFm0Cnc8OLgbfQf7DBf/YUnJ+OHeNM3bVQt+MW+2/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Uo5eJ729; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763760999; x=1795296999;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=NNia7pGWG6j3sTU0e30kHB9qk57ca6Op/j47zvwbtFw=;
-  b=Uo5eJ729hCtUgdDcYWewMImgSEcgheVOg+HrqhYfFpGz3K6lHOJyRmdc
-   V3ABb3Ehz28xeIke2B6sBaS8LmmGGVoy6XE2gOVFjM+nKINCi0nqlM6fG
-   sWd1GHpnzhmvtaexF1YAf1zvhuIZQ2RBEuXUqzvNdaKVF9R6ZkY5A1ODl
-   0RlTZW7LJKNKHITre24yFicfvkVTVI0fsfk5PZ7cRvJnqvZMHc6o4J3CZ
-   uLfCLnDUVk41HZLRKnP6jfG4gSEWHOPbUWQ2MuY5MEIfNLQhd8fnJ49Cu
-   +3071tFKM2ybe4rBcmwGJwyJbm9QGTGjx/1POP3GS+Z6UH19cHgc9VrvU
-   A==;
-X-CSE-ConnectionGUID: i3JLyLFjTsOFsS6QVg0woA==
-X-CSE-MsgGUID: CvUmwxzjRPqKkC5SPU368w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11620"; a="65892829"
-X-IronPort-AV: E=Sophos;i="6.20,216,1758610800"; 
-   d="scan'208";a="65892829"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 13:36:38 -0800
-X-CSE-ConnectionGUID: PkAJ5vFlRb6fUPv811aExA==
-X-CSE-MsgGUID: iM5W8dVmS4+44tc8xIQ9fg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,216,1758610800"; 
-   d="scan'208";a="191909814"
-Received: from schen9-mobl4.amr.corp.intel.com (HELO [10.125.110.60]) ([10.125.110.60])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 13:36:38 -0800
-Message-ID: <3db1228d-66af-4f2b-8fc3-506203dddf83@intel.com>
-Date: Fri, 21 Nov 2025 13:36:37 -0800
+	s=arc-20240116; t=1763763623; c=relaxed/simple;
+	bh=8WpqYiGPCKqUwM2MjhFbv9yhuD0e4K6scqBG5rwtYgk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sVDzfZh3r9IQPpAtwnyA/AVANOzH3TwMlmLzLSwcZuNLco99sBKi8QMIIQOHmdUhxjjAeCm5yNx9XGKHFevvWu4rHA7bB8iEzL/vIDxnEixegqxPvj0GcDKN5msW0XyexD9Mzi6ehVbGyz0SXzXiItG5RFRjXZsuD36LObTZJEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OS6SWsqi; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34385d7c4a7so1735813a91.0
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 14:20:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763763621; x=1764368421; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+gI0WWC5QegPbFsQlBjgG9Al8K6d0pQkeiFW6ExIUFM=;
+        b=OS6SWsqi0/Q2rkm7UjRxx5PZBRdpP/bW8iTlImxE4KUiwRU57KNNdFbsHa7LFDY985
+         EpYimsqfMBFVoRzBJHgfpbU5ooBZRStUjxHuJjCcrtlHgjl2iIwXVTlkHkViuWyYByUi
+         iQ/9VvQE5JsNe2w+uqzUeeVAP9icCVYHQyiPga0bvNnpua9FgRIbu7oha/ETAwzF5YD3
+         KEuMD+F/5T4SSKTZpRFYGCtbfx7LDV/GPeAfsm5hKwwGLiPjesETu205ZUp6/nx7n3sx
+         RmcfRuHpR2B6QwDwZy5/pdHmhiXGHMlX1OkgVJbmilwShUAUqyh+OqUsl6DEtv9g9iSM
+         bxxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763763621; x=1764368421;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+gI0WWC5QegPbFsQlBjgG9Al8K6d0pQkeiFW6ExIUFM=;
+        b=OwsgHznX0dl8+fEvyGZCiJs89Cu3fRgIyhFERIuxqpytdibytXpzL3uXVtrOgQ86lI
+         RiJ0URyClS1UYzT4pI2ro9xEkhFc91fMfF8YHBgCAPvtqdpiiOqVHchQy3dICfUMa39F
+         ljbminUHKJKD4T5QZ1SKi6TLXSRQbDJGQGKUu1X50H9Jrh7Urmt1r9SwmaDFPg2EA2CS
+         QLac+9WA9DGJ7XUzthMXfxiiaxVYjBMFjpGgIEyuUeR4dHVhR8nV2JQwDNoSEPpInYkF
+         nHW9lzNvFM/U8e4yuMSfxZTe7Jj0FJjkd+Lyn5KGRbyVhHBLocp2CdipuKit0TN0cfwq
+         D2Og==
+X-Gm-Message-State: AOJu0YwRKMBya4LqGOjL6D7x0niAEwO39JXcKr3Rf5EZdfYlUFetbNN5
+	jQ0Pd3dTc5TkDM19c7Atlvfi+Y0+8nbhBQs0yK3yERrsE4urjKeA6DuzEKiAiLu14WsgvZpA5AA
+	AdkmHQA==
+X-Google-Smtp-Source: AGHT+IFlHFoDJiHaf8ZaqB6R4bcybwOD+6uqLjYU2d2GeKrU5dbhxs/pYDmnXdotD4hqzCWv7yN8+1L74xw=
+X-Received: from pjbbb13.prod.google.com ([2002:a17:90b:8d:b0:33b:b0fe:e54d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2b8f:b0:343:85eb:4fc7
+ with SMTP id 98e67ed59e1d1-347298501abmr8536259a91.6.1763763620929; Fri, 21
+ Nov 2025 14:20:20 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 21 Nov 2025 14:20:18 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 04/11] x86/bhi: Make clear_bhb_loop() effective on
- newer CPUs
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: Nikolay Borisov <nik.borisov@suse.com>, x86@kernel.org,
- David Kaplan <david.kaplan@amd.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Sean Christopherson
- <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>,
- Peter Zijlstra <peterz@infradead.org>
-References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
- <20251119-vmscape-bhb-v4-4-1adad4e69ddc@linux.intel.com>
- <4ed6763b-1a88-4254-b063-be652176d1af@intel.com>
- <e9678dd1-7989-4201-8549-f06f6636274b@suse.com>
- <f7442dc7-be8d-43f8-b307-2004bd149910@intel.com>
- <20251121181632.czfwnfzkkebvgbye@desk>
- <e99150f3-62d4-4155-a323-2d81c1d6d47d@intel.com>
- <20251121212627.6vweba7aehs4cc3h@desk>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20251121212627.6vweba7aehs4cc3h@desk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
+Message-ID: <20251121222018.348987-1-seanjc@google.com>
+Subject: [PATCH] KVM: VMX: Always reflect SGX EPCM #PFs back into the guest
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kai Huang <kai.huang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/21/25 13:26, Pawan Gupta wrote:
-> On Fri, Nov 21, 2025 at 10:42:24AM -0800, Dave Hansen wrote:
->> On 11/21/25 10:16, Pawan Gupta wrote:
-...>>> Also I was preferring constants because load values from global
-variables
->>> may also be subject to speculation. Although any speculation should be
->>> corrected before an indirect branch is executed because of the LFENCE after
->>> the sequence.
->>
->> I guess that's a theoretical problem, but it's not a practical one.
-> 
-> Probably yes. But, load from memory would certainly be slower compared to
-> immediates.
+When handling intercepted #PFs, reflect EPCM (Enclave Page Cache Map)
+violations, i.e. #PFs with the SGX flag set, back into the guest.  KVM
+doesn't shadow EPCM entries (the EPCM deals only with virtual/linear
+addresses), and so EPCM violation cannot be due to KVM interference,
+and more importantly can't be resolved by KVM.
 
-Yeah, but it's literally two bytes of data that can almost certainly be
-shoved in a cacheline that's also being read on kernel entry. I suspect
-it would be hard to show a delta between a memory load and an immediate.
+On pre-SGX2 hardware, EPCM violations are delivered as #GP(0) faults, but
+on SGX2+ hardware, they are delivered as #PF(SGX).  Failure to account for
+the SGX2 behavior could put a vCPU into an infinite loop due to KVM not
+realizing the #PF is the guest's responsibility.
 
-I'd love to see some actual data.
+Take care to deliver the EPCM violation as a #GP(0) if the _guest_ CPU
+model is only SGX1.
 
->> So I think we have 4-ish options at this point:
->>
->> 1. Generate the long and short sequences independently and in their
->>    entirety and ALTERNATIVE between them (the original patch)
->> 2. Store the inner/outer loop counts in registers and:
->>   2a. Load those registers from variables
->>   2b. Load them from ALTERNATIVES
-> 
-> Both of these look to be good options to me.
-> 
-> 2b. would be my first preference, because it keeps the loop counts as
-> inline constants. The resulting sequence stays the same as it is today.
-> 
->> 3. Store the inner/outer loop counts in variables in memory
-> 
-> I could be wrong, but this will likely have non-zero impact on performance.
-> I am afraid to cause any regressions in BHI mitigation. That is why I
-> preferred the least invasive approach in my previous attempts.
+Fixes: 72add915fbd5 ("KVM: VMX: Enable SGX virtualization for SGX1, SGX2 and LC")
+Cc: Kai Huang <kai.huang@intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
 
-Your magic 8-ball and my crystal ball seem to be disagreeing today.
+SGX side of things is compile tested only.
 
-Time for science!
+ arch/x86/kvm/vmx/vmx.c | 58 ++++++++++++++++++++++++++++++++----------
+ 1 file changed, 44 insertions(+), 14 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4cbe8c84b636..7c4080d780b5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5303,12 +5303,53 @@ static bool is_xfd_nm_fault(struct kvm_vcpu *vcpu)
+ 	       !kvm_is_cr0_bit_set(vcpu, X86_CR0_TS);
+ }
+ 
++static int vmx_handle_page_fault(struct kvm_vcpu *vcpu, u32 error_code)
++{
++	unsigned long cr2 = vmx_get_exit_qual(vcpu);
++
++	if (vcpu->arch.apf.host_apf_flags)
++		goto handle_pf;
++
++	/* When using EPT, KVM intercepts #PF only to detect illegal GPAs. */
++	WARN_ON_ONCE(enable_ept && !allow_smaller_maxphyaddr);
++
++	/*
++	 * On SGX2 hardware, EPCM violations are delivered as #PF with the SGX
++	 * flag set in the error code (SGX1 hardware generates #GP(0)).  EPCM
++	 * violations have nothing to do with shadow paging and can never be
++	 * resolved by KVM; always reflect them into the guest.
++	 */
++	if (error_code & PFERR_SGX_MASK) {
++		WARN_ON_ONCE(!IS_ENABLED(CONFIG_X86_SGX_KVM) ||
++			     !cpu_feature_enabled(X86_FEATURE_SGX2));
++
++		if (guest_cpu_cap_has(vcpu, X86_FEATURE_SGX2))
++			kvm_fixup_and_inject_pf_error(vcpu, cr2, error_code);
++		else
++			kvm_inject_gp(vcpu, 0);
++		return 1;
++	}
++
++	/*
++	 * If EPT is enabled, fixup and inject the #PF.  KVM intercepts #PFs
++	 * only to set PFERR_RSVD as appropriate (hardware won't set RSVD due
++	 * to the GPA being legal with respect to host.MAXPHYADDR).
++	 */
++	if (enable_ept) {
++		kvm_fixup_and_inject_pf_error(vcpu, cr2, error_code);
++		return 1;
++	}
++
++handle_pf:
++	return kvm_handle_page_fault(vcpu, error_code, cr2, NULL, 0);
++}
++
+ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	struct kvm_run *kvm_run = vcpu->run;
+ 	u32 intr_info, ex_no, error_code;
+-	unsigned long cr2, dr6;
++	unsigned long dr6;
+ 	u32 vect_info;
+ 
+ 	vect_info = vmx->idt_vectoring_info;
+@@ -5383,19 +5424,8 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+ 		return 0;
+ 	}
+ 
+-	if (is_page_fault(intr_info)) {
+-		cr2 = vmx_get_exit_qual(vcpu);
+-		if (enable_ept && !vcpu->arch.apf.host_apf_flags) {
+-			/*
+-			 * EPT will cause page fault only if we need to
+-			 * detect illegal GPAs.
+-			 */
+-			WARN_ON_ONCE(!allow_smaller_maxphyaddr);
+-			kvm_fixup_and_inject_pf_error(vcpu, cr2, error_code);
+-			return 1;
+-		} else
+-			return kvm_handle_page_fault(vcpu, error_code, cr2, NULL, 0);
+-	}
++	if (is_page_fault(intr_info))
++		return vmx_handle_page_fault(vcpu, error_code);
+ 
+ 	ex_no = intr_info & INTR_INFO_VECTOR_MASK;
+ 
+
+base-commit: 0c3b67dddd1051015f5504389a551ecd260488a5
+-- 
+2.52.0.rc2.455.g230fcf2819-goog
+
 
