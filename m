@@ -1,121 +1,213 @@
-Return-Path: <kvm+bounces-64200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64201-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C2C6C7B42D
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:15:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21E55C7B418
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 19:14:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A95BB34F09B
-	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:12:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 933B63A3E92
+	for <lists+kvm@lfdr.de>; Fri, 21 Nov 2025 18:14:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AC82F25F7;
-	Fri, 21 Nov 2025 18:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C877334AB18;
+	Fri, 21 Nov 2025 18:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EF6l9RHe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YDy8a3YN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5906F4204E
-	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E9A30AAC8
+	for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 18:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763748763; cv=none; b=gcT5ynBoQaj7X0UCdhC+//xC5DyoVFJYbTRiWc63RRWdKp32hfoi+oJV8fjzaqiAdzANHLOdOGK47y1Yqdpc1JN5/Vg02krZ+lp6EMFxWSFYEPQK/qvbGOE9o4kS2Jt+tzmORuOWIls2ZAC0KD3zXfZfrmhmPjEdynKw9+ZCV5g=
+	t=1763748880; cv=none; b=hw80dNwIixFPVojLUPpX9n045f9km3spIeXdY7Evfjbe5B35dcIcC5yIcPQlkVUfHTxdVPFFutNfbl9rgw6EdZ6rbr0blKiv98zb7agPUwNHzaWvQtP4yhsnVoAEOAouotmTVPx/fYqZOP2/mjUEHRki0K2cIoVGENY5gOEUEZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763748763; c=relaxed/simple;
-	bh=jg+JsrEFRjeHYhh3zZCiCjoA5o+GLFbMmlKrBrQn/ms=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TB2fXK22ysA2L64mQiJo2ayz7aB7Tdj/cRQRZYxN1p5BXyzkyNXhxtPkifKX5DDHGc9zP00szClbqgVmh40UqWhR8IznXXahM3X6Kq0eZWSs5uTt76oYPzCN5BZQjWxTtXD2IlgAlZS7ivRykA7vtjGoWSeiqYwNLe97PeO/tKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EF6l9RHe; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1763748880; c=relaxed/simple;
+	bh=Itj0wALigLttdXVurI38dIRgSbQPqSQZBf8dIpDzGww=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=li+OfYX3MXIajfo/WAr8lLslAyHs+ub2SeokeeyCedVuRweCda3egb9HeKGA/fAtrJdtaIrgccg6BP+AIgVOpnMeu74ONB57N+fwpihybUmpgZS9YmQhESb6Kmx70wI+foSrcJhTFZ7pUntXeo91TmHyAQAkRyOIh1z91Oc9I9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YDy8a3YN; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3416dc5752aso6618104a91.1
-        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:12:42 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7a998ab7f87so4268390b3a.3
+        for <kvm@vger.kernel.org>; Fri, 21 Nov 2025 10:14:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763748761; x=1764353561; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4r4WJd2OVzlwEapD46M6vHlbLZCHlF49gWRbSAjvOME=;
-        b=EF6l9RHeiEM1ruGvHQNlHObVDmo1ZtgMKKsJKQVtv4S5m0r+wY5ISfWFGK3Kf0c2dN
-         7EzlnLam9xCBjQMlYz3xWFgcU2qE6Hs64v2bn92lbOpQ452VYf9WBAe1eXyFsdZYZbUS
-         9oXxXQnMyMCFSiy+ErWZuNN8gOodj1ZstBr+XXU78/04gvFJasuG6OVP1vTLPNSKKjML
-         cLqG068OqxOTBhqIvENPoQnATNm7weqiaE6Sdpx3l8sg660pdUtHsN7FAxAcyLFVQG4r
-         Y7vN4ERV4vUerescuz/9WsI5BT6g9Gb+GiVtMgZFmXiEWpXD3WIHI8oeBSwDEYlCs5MW
-         GgbQ==
+        d=google.com; s=20230601; t=1763748878; x=1764353678; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3OiJR63Hnpv1xw4Pl/ObEOw14HTTU+CVAQSCu0CZ3a8=;
+        b=YDy8a3YNodHLd8NcN6XNHvBdaTIIRwO16Dx5Qm0UgfDhRlKkIVBEgQhPAJs/u7f6Dr
+         IACpVCdIw94ViahNJYe5qX2vrRvIsrPJNEvEBk6BtFBKpKdinre4uhsoRDd4I5Paei40
+         TuPfPcTKCZUKHoE9WbFQPruzVEZvzd2ZVYvfXiv+j+iJkSTLleWycKXvuqW2UPvsq6Qx
+         6JGbUuAi+naxRg0uKwc9Megdg7LMfMsQzjnyO1BwMOlUs2zwGzFDIkZPvn0CS9wkK4Gl
+         O/SeIvfS3qhqHvZ4ii1JdhIb9B2KEOSM8iayDLlRkXNr8CnyC9WFK+g1KTlyGMDN7IaC
+         M0CQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763748761; x=1764353561;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4r4WJd2OVzlwEapD46M6vHlbLZCHlF49gWRbSAjvOME=;
-        b=p5ev/uWCDzlzSLvVFB/lTdnZPMl50hOFt8lFQDrbWYeG4neWmFty8ZaRM4Stg0jZZ7
-         liSAO5wJEAHhul+XuuJdxXy+Av3Mnyznjb6HZ3PXQonZQ54R3ff75A4n8Pv3mNnK7WfF
-         PVg7npyVmvWIsqUVf1Nd+cdxCWqbm0n/QtlvwEbZLfc8Toj1Zecp1o+FIXIWv1nItNJR
-         HUO4FZcm4PV8ZKUv3XSYOInQYALTfRW0SPL72dHf3uiitnG5t+R73jKtahXZEX4npc2U
-         XFzH/ADwiVD5wYUH81lj0yTtNTQYN5on41o9YbB+BNrOWolKx8NY7X2uScuhXh8VlHgE
-         qmVg==
-X-Gm-Message-State: AOJu0Yyg6w9pHJaiZMNhPn9Dr4vzZHgnUI9su5vk/4Pt0TiwKX0MOqzu
-	B9OOXUkQJlNBA5P+jNcufeYYgNJoTmrb1mrkEukRsYgR8uMiwcUUvpMZgM6ke0z/41swAGH7r4O
-	z67OWGw==
-X-Google-Smtp-Source: AGHT+IE3G5N6ShxRjZAtBLTiyQ27bOEC77y8TUaVidg0GHVLLY3we0AuM1unUZqNHoKGDkho5K5bFO9Jirc=
-X-Received: from pjtz18.prod.google.com ([2002:a17:90a:cb12:b0:343:387b:f2fb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2f4b:b0:33f:ebc2:645
- with SMTP id 98e67ed59e1d1-34733f2a471mr4009857a91.20.1763748761649; Fri, 21
- Nov 2025 10:12:41 -0800 (PST)
-Date: Fri, 21 Nov 2025 10:12:38 -0800
-In-Reply-To: <20251120233149.143657-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1763748878; x=1764353678;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3OiJR63Hnpv1xw4Pl/ObEOw14HTTU+CVAQSCu0CZ3a8=;
+        b=A/ubh4MFVrlBj5+FXio4CRcGCEW2PUxDiChHMZFWo8bGeeqm+HBPfRdjVgmJjKyxYS
+         H7A6kksmrXAGxTwwUHwL84sabCYJ2IZ6VyMvLpk+mPtOn/cxpA/pTaSdIqNLjVh57FbJ
+         g3C/QdZLI20SzEQu3tSo2PLWKr6LkRRgtVNALw+TmrwSKU45jYA47TcPDaCU2AW7NZjU
+         6Wz0e6bz99WFdoZ82qrvkFaqA9FGFFzKzXhu9M9jouVkenoY2RhfeWSD0AOb/bqcpCQ+
+         30he4uoJU6knJ7YGXmNQ5uVkqtrAjddLRZC0+Uk1NlcubeaffgvvZiQxcna59PY4P4h/
+         OB0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX2lDQzbX9QoD0H3qUJKf6q80C0uXNo7qvKAJEZcujlQm36iQofAAY4z9bXwQQc4ldTxXc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAju5fvkWItVlXBOQpNswfzI3VvhWb8Syq7I7viJw2UuUgGtUB
+	lqk4o3x7KCAnfu7cGYaZKpg5wUaUt6/tYTJ3tcPM+c/yU4fgRs476NFx1aE4hCJ7ovBls3Ewa5L
+	s6rwEvWVmPiKV1w==
+X-Google-Smtp-Source: AGHT+IFQcELTKtGRXXe0Xp2Vj5kh3UvDCDdGbXoIoSI5e/dZwC1XpXvLDqHWFz7J761kdj6oga1N3KDF4vBpLg==
+X-Received: from pfbdf10.prod.google.com ([2002:a05:6a00:470a:b0:7bf:838:e52e])
+ (user=dmatlack job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:2293:b0:7ad:1e4:bef0 with SMTP id d2e1a72fcca58-7c58c2ab11fmr3362709b3a.4.1763748878524;
+ Fri, 21 Nov 2025 10:14:38 -0800 (PST)
+Date: Fri, 21 Nov 2025 18:14:11 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251120233149.143657-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
-Message-ID: <176374874648.273777.10899439469937167588.b4-ty@google.com>
-Subject: Re: [kvm-unit-tests PATCH v4 0/8] x86/pmu: Fix test errors on GNR/SRF/CWF
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Yi Lai <yi1.lai@intel.com>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <20251121181429.1421717-1-dmatlack@google.com>
+Subject: [PATCH v3 00/18] vfio: selftests: Support for multi-device tests
+From: David Matlack <dmatlack@google.com>
+To: Alex Williamson <alex@shazbot.org>
+Cc: Alex Mastro <amastro@fb.com>, David Matlack <dmatlack@google.com>, 
+	Jason Gunthorpe <jgg@nvidia.com>, Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Raghavendra Rao Ananta <rananta@google.com>, Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 20 Nov 2025 15:31:41 -0800, Sean Christopherson wrote:
-> Refreshed version of Dapeng's series to address minor flaws in v3.
-> 
-> This patchset fixes the pmu test errors on Granite Rapids (GNR), Sierra
-> Forest (SRF) and Clearwater Forest (CWF).
-> 
-> GNR and SRF start to support the timed PEBS. Timed PEBS adds a new
-> "retired latency" field in basic info group to show the timing info and
-> the PERF_CAPABILITIES[17] called "PEBS_TIMING_INFO" bit is added
-> to indicated whether timed PEBS is supported. KVM module doesn't need to
-> do any specific change to support timed PEBS except a perf change adding
-> PERF_CAP_PEBS_TIMING_INFO flag into PERF_CAP_PEBS_MASK[1]. The patch 7/7
-> supports timed PEBS validation in pmu_pebs test.
-> 
-> [...]
+This series adds support for tests that use multiple devices, and adds
+one new test, vfio_pci_device_init_perf_test, which measures parallel
+device initialization time to demonstrate the improvement from commit
+e908f58b6beb ("vfio/pci: Separate SR-IOV VF dev_set").
 
-Applied to kvm-x86 next, thanks!
+This series also breaks apart the monolithic vfio_util.h and
+vfio_pci_device.c into separate files, to account for all the new code.
+This required quite a bit of code motion so the diffstat looks large.
+The final layout is more granular and provides a better separation of
+the IOMMU code from the device code.
 
-[1/8] x86/pmu: Add helper to detect Intel overcount issues
-      https://github.com/kvm-x86/kvm-unit-tests/commit/de6d1319b8aa
-[2/8] x86/pmu: Relax precise count validation for Intel overcounted platforms
-      https://github.com/kvm-x86/kvm-unit-tests/commit/89e3f25e00ea
-[3/8] x86/pmu: Fix incorrect masking of fixed counters
-      https://github.com/kvm-x86/kvm-unit-tests/commit/803637b5280d
-[4/8] x86/pmu: Handle instruction overcount issue in overflow test
-      https://github.com/kvm-x86/kvm-unit-tests/commit/1b09357a2737
-[5/8] x86/pmu: Relax precise count check for emulated instructions tests
-      https://github.com/kvm-x86/kvm-unit-tests/commit/e8ad559c361d
-[6/8] x86/pmu: Expand "llc references" upper limit for broader compatibility
-      https://github.com/kvm-x86/kvm-unit-tests/commit/941fcfe6e46f
-[7/8] x86: pmu_pebs: Remove abundant data_cfg_match calculation
-      https://github.com/kvm-x86/kvm-unit-tests/commit/de8cd74ebbaf
-[8/8] x86: pmu_pebs: Support to validate timed PEBS record on GNR/SRF
-      https://github.com/kvm-x86/kvm-unit-tests/commit/f561b31d3dee
+Final layout:
 
---
-https://github.com/kvm-x86/kvm-unit-tests/tree/next
+  C files:
+    - tools/testing/selftests/vfio/lib/libvfio.c
+    - tools/testing/selftests/vfio/lib/iommu.c
+    - tools/testing/selftests/vfio/lib/iova_allocator.c
+    - tools/testing/selftests/vfio/lib/vfio_pci_device.c
+    - tools/testing/selftests/vfio/lib/vfio_pci_driver.c
+
+  H files:
+   - tools/testing/selftests/vfio/lib/include/libvfio.h
+   - tools/testing/selftests/vfio/lib/include/libvfio/assert.h
+   - tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
+   - tools/testing/selftests/vfio/lib/include/libvfio/iova_allocator.h
+   - tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
+   - tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_driver.h
+
+Notably, vfio_util.h is now gone and replaced with libvfio.h.
+
+This series is based on vfio/next plus Alex Mastro's series to add the
+IOVA allocator [1]. It should apply cleanly to vfio/next once Alex's
+series is merged by Linus into the next 6.18 rc and then merged into
+vfio/next.
+
+This series can be found on GitHub:
+
+  https://github.com/dmatlack/linux/tree/vfio/selftests/init_perf_test/v3
+
+[1] https://lore.kernel.org/kvm/20251111-iova-ranges-v3-0-7960244642c5@fb.com/
+
+Cc: Alex Mastro <amastro@fb.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Josh Hilke <jrhilke@google.com>
+Cc: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Vipin Sharma <vipinsh@google.com>
+
+v3:
+ - Replace literal with NSEC_PER_SEC (Alex Mastro)
+ - Fix Makefile accumulate vs. assignment (Alex Mastro)
+
+v2: https://lore.kernel.org/kvm/20251112192232.442761-1-dmatlack@google.com/
+
+v1: https://lore.kernel.org/kvm/20251008232531.1152035-1-dmatlack@google.com/
+
+David Matlack (18):
+  vfio: selftests: Move run.sh into scripts directory
+  vfio: selftests: Split run.sh into separate scripts
+  vfio: selftests: Allow passing multiple BDFs on the command line
+  vfio: selftests: Rename struct vfio_iommu_mode to iommu_mode
+  vfio: selftests: Introduce struct iommu
+  vfio: selftests: Support multiple devices in the same
+    container/iommufd
+  vfio: selftests: Eliminate overly chatty logging
+  vfio: selftests: Prefix logs with device BDF where relevant
+  vfio: selftests: Upgrade driver logging to dev_err()
+  vfio: selftests: Rename struct vfio_dma_region to dma_region
+  vfio: selftests: Move IOMMU library code into iommu.c
+  vfio: selftests: Move IOVA allocator into iova_allocator.c
+  vfio: selftests: Stop passing device for IOMMU operations
+  vfio: selftests: Rename vfio_util.h to libvfio.h
+  vfio: selftests: Move vfio_selftests_*() helpers into libvfio.c
+  vfio: selftests: Split libvfio.h into separate header files
+  vfio: selftests: Eliminate INVALID_IOVA
+  vfio: selftests: Add vfio_pci_device_init_perf_test
+
+ tools/testing/selftests/vfio/Makefile         |  10 +-
+ .../selftests/vfio/lib/drivers/dsa/dsa.c      |  36 +-
+ .../selftests/vfio/lib/drivers/ioat/ioat.c    |  18 +-
+ .../selftests/vfio/lib/include/libvfio.h      |  26 +
+ .../vfio/lib/include/libvfio/assert.h         |  54 ++
+ .../vfio/lib/include/libvfio/iommu.h          |  76 +++
+ .../vfio/lib/include/libvfio/iova_allocator.h |  23 +
+ .../lib/include/libvfio/vfio_pci_device.h     | 125 ++++
+ .../lib/include/libvfio/vfio_pci_driver.h     |  97 +++
+ .../selftests/vfio/lib/include/vfio_util.h    | 331 -----------
+ tools/testing/selftests/vfio/lib/iommu.c      | 465 +++++++++++++++
+ .../selftests/vfio/lib/iova_allocator.c       |  94 +++
+ tools/testing/selftests/vfio/lib/libvfio.c    |  78 +++
+ tools/testing/selftests/vfio/lib/libvfio.mk   |   5 +-
+ .../selftests/vfio/lib/vfio_pci_device.c      | 555 +-----------------
+ .../selftests/vfio/lib/vfio_pci_driver.c      |  16 +-
+ tools/testing/selftests/vfio/run.sh           | 109 ----
+ .../testing/selftests/vfio/scripts/cleanup.sh |  41 ++
+ tools/testing/selftests/vfio/scripts/lib.sh   |  42 ++
+ tools/testing/selftests/vfio/scripts/run.sh   |  16 +
+ tools/testing/selftests/vfio/scripts/setup.sh |  48 ++
+ .../selftests/vfio/vfio_dma_mapping_test.c    |  46 +-
+ .../selftests/vfio/vfio_iommufd_setup_test.c  |   2 +-
+ .../vfio/vfio_pci_device_init_perf_test.c     | 168 ++++++
+ .../selftests/vfio/vfio_pci_device_test.c     |  12 +-
+ .../selftests/vfio/vfio_pci_driver_test.c     |  51 +-
+ 26 files changed, 1481 insertions(+), 1063 deletions(-)
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio.h
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/assert.h
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/iova_allocator.h
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_driver.h
+ delete mode 100644 tools/testing/selftests/vfio/lib/include/vfio_util.h
+ create mode 100644 tools/testing/selftests/vfio/lib/iommu.c
+ create mode 100644 tools/testing/selftests/vfio/lib/iova_allocator.c
+ create mode 100644 tools/testing/selftests/vfio/lib/libvfio.c
+ delete mode 100755 tools/testing/selftests/vfio/run.sh
+ create mode 100755 tools/testing/selftests/vfio/scripts/cleanup.sh
+ create mode 100755 tools/testing/selftests/vfio/scripts/lib.sh
+ create mode 100755 tools/testing/selftests/vfio/scripts/run.sh
+ create mode 100755 tools/testing/selftests/vfio/scripts/setup.sh
+ create mode 100644 tools/testing/selftests/vfio/vfio_pci_device_init_perf_test.c
+
+
+base-commit: fa804aa4ac1b091ef2ec2981f08a1c28aaeba8e7
+prerequisite-patch-id: dcf23dcc1198960bda3102eefaa21df60b2e4c54
+prerequisite-patch-id: e32e56d5bf7b6c7dd40d737aa3521560407e00f5
+prerequisite-patch-id: 4f79a41bf10a4c025ba5f433551b46035aa15878
+prerequisite-patch-id: f903a45f0c32319138cd93a007646ab89132b18c
+-- 
+2.52.0.rc2.455.g230fcf2819-goog
+
 
