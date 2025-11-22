@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-64285-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64286-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AEEFC7D108
-	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 13:57:31 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD74C7D170
+	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 14:25:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 24BBF344C25
-	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 12:54:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2B6C6353DA2
+	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 13:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D362FB624;
-	Sat, 22 Nov 2025 12:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B19F231A3B;
+	Sat, 22 Nov 2025 13:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="teQPP7OG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MPFqf4s9"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA2835977;
-	Sat, 22 Nov 2025 12:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E850F2147F9;
+	Sat, 22 Nov 2025 13:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763816058; cv=none; b=RrTkQeMHk+sOtew16JZofxf/hzbAD1dKzrcCc9AxR4IL9EPYVxa+arnJz9ibLftsmo3g+02z75tlKNJ/+dRutTAgVPF8ho5J/5WWwkvLbRjVgkBo30ZMGPEc3EP22ys7c4ygDSl8s/B+DD82Df2IsApXsUnfhFwKOXx2jPtzT38=
+	t=1763817928; cv=none; b=RDWHlAjhn7YR6/t6rANWXA9wR5+qLmRwpjFwB7jY6PYZLwWfhrE2xgtdu8Uu0MozTNn9VQXRiBxW519VTMVpojpZLjh8XwkNafczqjk4xFpUL0lV45RUzqD+6/hJdO4hxzTPfsFJLk4+NEku8OGVmraxOX1lA7v3mVxC0fl1Xko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763816058; c=relaxed/simple;
-	bh=FR4E8hZalGj/6XCc4oY1XezvA/TPT41+qYdS/PdvxL4=;
+	s=arc-20240116; t=1763817928; c=relaxed/simple;
+	bh=e5AzHO81/a9aj3GGCW5h753xla0jVym/io664XMZHaI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j9ubjXcgjqZ8EhwcGj6uVKoBF5eA0vIOX9pAaYah8V2dQ3hBDX4tJ7/d+5aINk9bRqQoy5i1XQRkfVyOQSLY5YmrM+ZigRHohQFBpqGxWTKL+xqJ1zZD4NG6u+dw+D1ke3+XKQK+1n//pqR/8O1/wg7B3nRfJdDs7fNMCrA8DDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=teQPP7OG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23D9CC4CEF5;
-	Sat, 22 Nov 2025 12:54:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=awNf2k0T2/BkbBsvZ5xGeuQqQzQTJ9LXk95RkUED6TZB5r4pHtBeW/yZEvK8F2Rcxs+lb3YQoWy7MSqEq+WTRCGWoDE8mOflOB7q/qOQlTFfCLpnnjfjzy5AkYTb7AhtNEnCGjRVuV7OS7QjN2KzIUb1PIbMInMonx/sL4gePJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MPFqf4s9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36870C4CEF5;
+	Sat, 22 Nov 2025 13:25:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763816058;
-	bh=FR4E8hZalGj/6XCc4oY1XezvA/TPT41+qYdS/PdvxL4=;
+	s=k20201202; t=1763817927;
+	bh=e5AzHO81/a9aj3GGCW5h753xla0jVym/io664XMZHaI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=teQPP7OGmS7K1rnsd+7oofZyDlXrWbuIbE4+cZB9/w4V9zBc1VH+Oumfx2SmSWfp9
-	 39TNXqP63o80SY2qBQlGRl5XT6W2CgMB0wWBoF3bgsRpCcO0Knj3eYS/d1dy4kFfY/
-	 EtC1YncnkpY1uzqYMnfxq7Xw7DEeRRMriFbRmvsEv/ERVTFIxpJMHUcQyFvqgbPU0J
-	 h8TPfAmOUPmg8Qij57brvYEgWmVv6HosWEBwOu/qaYdhDGwMvUdk0mm8j2sfM+M/yM
-	 v5GUxus2/M7WJGaEWKCZbI4RdBxRfymBuGBWCBnu5oBdskAkttF2ExQDC7fiRiB3sA
-	 O/ymaH+heZlOw==
+	b=MPFqf4s97YnlpFpPgLeDgfSjRJDbo4g8ily8P1JGPTsEdLK4SavjKLSbGof22Tlsk
+	 1GXUs8Rgj342YdjdSXJMmnxmr5ZY4NScgsmX+lEXlaNAtM8rb5cPv2T2fcAx5VXqKH
+	 xVwo/q0If8WQDQAjb+fB0pD3APpSjI5DgURuyE8Wypb0CTSbSFKttkmBA+q7guCcPV
+	 f1LRXKToE/rvYbj3/ETtCMO599A8X/Yajovd4IYCtDwynCKBgYll4DVNTcJp1bVTxN
+	 ncMnxbsZvW5jK0t+hzsYQf7sAYzUwwOldwOFZe6TKYUEd89fThSlCDm5P5HnPAt951
+	 TsQca6TBCJTOA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vMn84-00000007USt-0CFe;
-	Sat, 22 Nov 2025 12:54:16 +0000
-Date: Sat, 22 Nov 2025 12:54:15 +0000
-Message-ID: <86v7j2qlc8.wl-maz@kernel.org>
+	id 1vMncC-00000007UgK-44UT;
+	Sat, 22 Nov 2025 13:25:25 +0000
+Date: Sat, 22 Nov 2025 13:25:24 +0000
+Message-ID: <86tsymqjwb.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Tian Zheng <zhengtian10@huawei.com>
 Cc: <oliver.upton@linux.dev>,
@@ -69,10 +69,10 @@ Cc: <oliver.upton@linux.dev>,
 	<linux-arm-kernel@lists.infradead.org>,
 	<linux-doc@vger.kernel.org>,
 	<suzuki.poulose@arm.com>
-Subject: Re: [PATCH v2 2/5] KVM: arm64: Support set the DBM attr during memory abort
-In-Reply-To: <20251121092342.3393318-3-zhengtian10@huawei.com>
+Subject: Re: [PATCH v2 3/5] KVM: arm64: Add support for FEAT_HDBSS
+In-Reply-To: <20251121092342.3393318-4-zhengtian10@huawei.com>
 References: <20251121092342.3393318-1-zhengtian10@huawei.com>
-	<20251121092342.3393318-3-zhengtian10@huawei.com>
+	<20251121092342.3393318-4-zhengtian10@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -88,26 +88,172 @@ X-SA-Exim-Rcpt-To: zhengtian10@huawei.com, oliver.upton@linux.dev, catalin.marin
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 21 Nov 2025 09:23:39 +0000,
+On Fri, 21 Nov 2025 09:23:40 +0000,
 Tian Zheng <zhengtian10@huawei.com> wrote:
 > 
 > From: eillon <yezhenyu2@huawei.com>
 > 
-> Add DBM support to automatically promote write-clean pages to
-> write-dirty, preventing users from being trapped in EL2 due to
-> missing write permissions.
+> Armv9.5 introduces the Hardware Dirty Bit State Structure (HDBSS) feature,
+> indicated by ID_AA64MMFR1_EL1.HAFDBS == 0b0100.
 > 
-> Since the DBM attribute was introduced in ARMv8.1 and remains
-> optional in later architecture revisions, including ARMv9.5.
-
-What is the relevance of this statement?
-
+> Add the Kconfig for FEAT_HDBSS and support detecting and enabling the
+> feature. A CPU capability is added to notify the user of the feature.
 > 
-> Support set the DBM attr during user_mem_abort().
+> Add KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl and basic framework for
+> ARM64 HDBSS support. Since the HDBSS buffer size is configurable and
+> cannot be determined at KVM initialization, an IOCTL interface is
+> required.
+> 
+> Actually exposing the new capability to user space happens in a later
+> patch.
+> 
+> Signed-off-by: eillon <yezhenyu2@huawei.com>
+> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> ---
+>  arch/arm64/Kconfig                  | 14 ++++++++++++++
+>  arch/arm64/include/asm/cpucaps.h    |  2 ++
+>  arch/arm64/include/asm/cpufeature.h |  5 +++++
+>  arch/arm64/include/asm/kvm_host.h   |  4 ++++
+>  arch/arm64/include/asm/sysreg.h     | 12 ++++++++++++
+>  arch/arm64/kernel/cpufeature.c      |  9 +++++++++
+>  arch/arm64/tools/cpucaps            |  1 +
+>  include/uapi/linux/kvm.h            |  1 +
+>  tools/include/uapi/linux/kvm.h      |  1 +
+>  9 files changed, 49 insertions(+)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 6663ffd23f25..1edf75888a09 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -2201,6 +2201,20 @@ config ARM64_GCS
+> 
+>  endmenu # "ARMv9.4 architectural features"
+> 
+> +menu "ARMv9.5 architectural features"
+> +
+> +config ARM64_HDBSS
+> +	bool "Enable support for Hardware Dirty state tracking Structure (HDBSS)"
+> +	help
+> +	  Hardware Dirty state tracking Structure(HDBSS) enhances tracking
+> +	  translation table descriptors' dirty state to reduce the cost of
+> +	  surveying for dirtied granules.
+> +
+> +	  The feature introduces new assembly registers (HDBSSBR_EL2 and
+> +	  HDBSSPROD_EL2), which are accessed via generated register accessors.
 
-I don't think this commit message accurately describes what the code
-does. This merely adds support to the page table code to set the DBM
-bit in the S2 PTE, and nothing else.
+This last but means nothing to most people.
+
+But more importantly, I really don't want to see this as a config
+option. KVM comes with "battery included", and all features should be
+available at all times.
+
+> +
+> +endmenu # "ARMv9.5 architectural features"
+> +
+>  config ARM64_SVE
+>  	bool "ARM Scalable Vector Extension support"
+>  	default y
+> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+> index 9d769291a306..5e5a26f28dec 100644
+> --- a/arch/arm64/include/asm/cpucaps.h
+> +++ b/arch/arm64/include/asm/cpucaps.h
+> @@ -48,6 +48,8 @@ cpucap_is_possible(const unsigned int cap)
+>  		return IS_ENABLED(CONFIG_ARM64_GCS);
+>  	case ARM64_HAFT:
+>  		return IS_ENABLED(CONFIG_ARM64_HAFT);
+> +	case ARM64_HAS_HDBSS:
+> +		return IS_ENABLED(CONFIG_ARM64_HDBSS);
+>  	case ARM64_UNMAP_KERNEL_AT_EL0:
+>  		return IS_ENABLED(CONFIG_UNMAP_KERNEL_AT_EL0);
+>  	case ARM64_WORKAROUND_843419:
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index e223cbf350e4..b231415a2b76 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -856,6 +856,11 @@ static inline bool system_supports_haft(void)
+>  	return cpus_have_final_cap(ARM64_HAFT);
+>  }
+> 
+> +static inline bool system_supports_hdbss(void)
+> +{
+> +	return cpus_have_final_cap(ARM64_HAS_HDBSS);
+> +}
+> +
+>  static __always_inline bool system_supports_mpam(void)
+>  {
+>  	return alternative_has_cap_unlikely(ARM64_MPAM);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 64302c438355..d962932f0e5f 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -60,6 +60,10 @@
+> 
+>  #define KVM_HAVE_MMU_RWLOCK
+> 
+> +/* HDBSS entry field definitions */
+> +#define HDBSS_ENTRY_VALID BIT(0)
+> +#define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
+> +
+
+None of this is used here. Move it to the patch where it belongs.
+
+>  /*
+>   * Mode of operation configurable with kvm-arm.mode early param.
+>   * See Documentation/admin-guide/kernel-parameters.txt for more information.
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index c231d2a3e515..3511edea1fbc 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -1129,6 +1129,18 @@
+>  #define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
+>  #define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
+> 
+> +/*
+> + * Definitions for the HDBSS feature
+> + */
+> +#define HDBSS_MAX_SIZE		HDBSSBR_EL2_SZ_2MB
+> +
+> +#define HDBSSBR_EL2(baddr, sz)	(((baddr) & GENMASK(55, 12 + sz)) | \
+> +				 FIELD_PREP(HDBSSBR_EL2_SZ_MASK, sz))
+> +#define HDBSSBR_BADDR(br)	((br) & GENMASK(55, (12 + HDBSSBR_SZ(br))))
+> +#define HDBSSBR_SZ(br)		FIELD_GET(HDBSSBR_EL2_SZ_MASK, br)
+
+This is a bit backward. When would you need to read-back and mask
+random bits off the register?
+
+> +
+> +#define HDBSSPROD_IDX(prod)	FIELD_GET(HDBSSPROD_EL2_INDEX_MASK, prod)
+> +
+
+As previously said, these definitions don't serve any purpose here,
+and would be better in the following patch.
+
+>  #define ARM64_FEATURE_FIELD_BITS	4
+> 
+>  #ifdef __ASSEMBLY__
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index e25b0f84a22d..f39973b68bdb 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2710,6 +2710,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>  		.matches = has_cpuid_feature,
+>  		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HAFT)
+>  	},
+> +#endif
+> +#ifdef CONFIG_ARM64_HDBSS
+> +	{
+> +		.desc = "Hardware Dirty state tracking structure (HDBSS)",
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.capability = ARM64_HAS_HDBSS,
+> +		.matches = has_cpuid_feature,
+> +		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HDBSS)
+> +	},
+
+I think this is one of the features we should restrict to VHE. I don't
+imagine pKVM ever making use of this, and no non-VHE HW will ever
+build this.
+
+Thanks,
 
 	M.
 
