@@ -1,202 +1,268 @@
-Return-Path: <kvm+bounces-64287-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64288-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 664ABC7D1F7
-	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 14:59:09 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49271C7D260
+	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 15:14:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0655C3482FD
-	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 13:59:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6DB304E59C7
+	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 14:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF5222156C;
-	Sat, 22 Nov 2025 13:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2728C26056C;
+	Sat, 22 Nov 2025 14:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="boN+E0WV"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mQTDjnph"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011010.outbound.protection.outlook.com [52.101.62.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7545125A321
-	for <kvm@vger.kernel.org>; Sat, 22 Nov 2025 13:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763819940; cv=none; b=eNdP/GV/Bfi0q1PXt579k6AYIsJhJkLFCZEgUhZqQspB66KPaVXjzB0/x/xA2NQ3xm3WK1zoHvWr6Okomd9SdUh72vHty6ZXzSSkOUNK5K6ArdumOatOijHpguDuHs8hxLFuhM5P4n9O+8rqRYtIfHpt6slzCZkjNLtwS8h5EbQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763819940; c=relaxed/simple;
-	bh=73A2jJ3qDknzfJGHj6IYcBh3403pCBHBU43jtKW6tvc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T3t6l5kQEewEiyeAbeeOXrrOMPPCGQrg1XPOYSDuTGCnVbvk/rqe9W4asQojtMAhhmBYaavN3K9RSznY8wXzEyePTM4wSQMGAYuvAGIvghgzUNQZW9TiraR35KoTiIBnbEdwygJah1N0TAjIN1rEiCmC5de6D6nePZnTsmDKyEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=boN+E0WV; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=AEXZEuTJIE85z2nUo6vGRF6C9CDHEnZEtlKMj8CbeT4=; b=boN+E0WV5PWDs4yp
-	E5QiNikBwzcKxOr9y3ErKBosKi8VqQlyUK8FcpSwKZRZIklWGivPv0b8RSW0Md0mlLqwACbhBB1vJ
-	2xtO1APz5QqCPj2IB1son8z6yI2JWKjc/YisVf8Akz0AYURhVUPEbxbNHOCoqog6ksbOEZ8nbt3AA
-	M8nUp+/I6opgxD3kBK/3L9z07BOWIsUllEtVyMmhMVILtJ3RsJeXEUUUC+EDFUwvaSRJ+Fe7/WWD/
-	ixd0MwL2lJiyApfAIlZlIVvw0uVu6nd+S9a1CmPOP6ZRlcoooeZB+4RWIRymF57ys85smCTeDjJKH
-	Z3Kd2MYnSTr6//8Edg==;
-Received: from dg by mx.treblig.org with local (Exim 4.98.2)
-	(envelope-from <dg@treblig.org>)
-	id 1vMo83-00000005wUV-2FTG;
-	Sat, 22 Nov 2025 13:58:19 +0000
-Date: Sat, 22 Nov 2025 13:58:19 +0000
-From: "Dr. David Alan Gilbert" <dave@treblig.org>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
-	arei.gonglei@huawei.com, pizhenwei@bytedance.com,
-	alistair.francis@wdc.com, stefanb@linux.vnet.ibm.com,
-	kwolf@redhat.com, hreitz@redhat.com, sw@weilnetz.de,
-	qemu_oss@crudebyte.com, groug@kaod.org, mst@redhat.com,
-	imammedo@redhat.com, anisinha@redhat.com, kraxel@redhat.com,
-	shentey@gmail.com, npiggin@gmail.com, harshpb@linux.ibm.com,
-	sstabellini@kernel.org, anthony@xenproject.org, paul@xen.org,
-	edgar.iglesias@gmail.com, elena.ufimtseva@oracle.com,
-	jag.raman@oracle.com, sgarzare@redhat.com, pbonzini@redhat.com,
-	fam@euphon.net, philmd@linaro.org, alex@shazbot.org, clg@redhat.com,
-	peterx@redhat.com, farosas@suse.de, lizhijian@fujitsu.com,
-	jasowang@redhat.com, samuel.thibault@ens-lyon.org,
-	michael.roth@amd.com, kkostiuk@redhat.com, zhao1.liu@intel.com,
-	mtosatti@redhat.com, rathc@linux.ibm.com, palmer@dabbelt.com,
-	liwei1518@gmail.com, dbarboza@ventanamicro.com,
-	zhiwei_liu@linux.alibaba.com, marcandre.lureau@redhat.com,
-	qemu-block@nongnu.org, qemu-ppc@nongnu.org,
-	xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-	qemu-riscv@nongnu.org
-Subject: Re: [PATCH 09/14] error: Use error_setg_file_open() for simplicity
- and consistency
-Message-ID: <aSHBez6kYRagEL1K@gallifrey>
-References: <20251120191339.756429-1-armbru@redhat.com>
- <20251120191339.756429-10-armbru@redhat.com>
- <aR-q2YeegIEPmk2R@gallifrey>
- <87see8q6qm.fsf@pond.sub.org>
- <aSClUIvI2W-PVv6B@gallifrey>
- <87ecpqtt6f.fsf@pond.sub.org>
- <05ef43e5-cc42-8e1c-2619-eb1dea12b02b@eik.bme.hu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A3E1D6DB5;
+	Sat, 22 Nov 2025 14:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763820838; cv=fail; b=c568VvoNgTr4dqRsjIgfNZVXOHwbNHhFMV6V3IHSWLUfWuL+nlurDKrhOmmPiKNF2ZdyiFPpPSklf15wHdkzPxpV/WgucQsK6hrIlTwv7Ll9EVxWDVpagbLz2R+xLaSvnGhV8et+1+XxPuiImg2bj01sUCjhHRfgDtOkKmnvP9c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763820838; c=relaxed/simple;
+	bh=F5RC2MlkPybeFQXqi6wQNCnmliFxtYDR8AMe0qzp/Xg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A621b3GbqRceIiYhqXAjUnqKcNHbiozWlDkUuy6zWK5L/5tl7hGDJXABZMRNDp7hWKZsIdtXOYl9CVGly/EMijGFxbIqBiMWA+NohEE5aT4jepnoyFSIs51oMgtlYmXw7PvQe32FBfDD3ltruOWcASj/r4e6p+n2ycdaoC6p6nM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mQTDjnph; arc=fail smtp.client-ip=52.101.62.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FPytod7LVuFPnRTnqo4wpOtxPC0dZgy94h4NVRx3jPEPinaCL9yrtUBo3tL5nPRFoz+5SOI7026eJ3ePaiqt9OGHplHfM6bYf0ifZEC969mGygfR+17m5KhYX7cRZwvw4KUIpK+lDUuz6sdhiBTdJenPo2jzLX6gJ8HURafEe1I0qHOSOhr7SHxa8IezkNM9d1vLBGZ6ElnL8dCN0yNtITQSm0/OqL/981IzSOPf6loE3ZX8yxvgibaHq3GAC5s3DxqZYeZl9qWgJw3ggrDD7m67SAoPt9u7Bwy5PEWmCsW+kBdaKZYusAW2GxN8GZoD3YyIDGApDJxiBulUXlvQNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/Rwn/DZw4HKm9HtHhqbLg0Ebp52ug0+pNCtnMkE/XXE=;
+ b=dGjhUB2RmT031ys6Wn3EWJtdFknL2r00IkupGvz+X7qek7D+32rfv4OC0yQvAHo6k5/t6vjBTstihIB4/UcDnIBi8eofbXGHN5HjeXKvusjjrEHuf1o03YqPyKOaphCDzgajw5UPj/hAEKhtpEQgpfjdRyXN6fV97Gj6e4/oCOQTQaW8p0gaRX93+MahpDNsLbL4X4hUYT+tG3KeiCfFi5Mr1+Ish5BPKMXqsW8zCmIKYoUCtzrw/fyfNdo2u8m2i6EjVP+o0H1o7zCNvBXWwz/G1I2OnlOMZedUZUJ0R18zBf47YYsZKCQmjfYixnYE5azX31fADV+Gq2xa3g+e7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/Rwn/DZw4HKm9HtHhqbLg0Ebp52ug0+pNCtnMkE/XXE=;
+ b=mQTDjnphQg/kvAoap7a9aBpHgUvopWrOBKS14yVHkiP9YDbx0vew0owyRuIt0OEkhPfFeY/tr9oDx8KqXQ2ko+Bz59qESAr6Z9Hi/gxbogpQ0mNQN1rfcIBXWkLFt0AsQfkRX3zC1VQ4SzqemEt2Q/JFpKBQPU6EThK2Gn0JcZYs+78BAz2JQ9nld39/PQXSIrs568GbR7+r9kIv5iB080Pm+ZMSMHojfWxmCPTxVb3hSpgpGBxGE+Z8IC0xCmynEynoqUQzu2m+rFfespAZ1qsxqrZqRMF2bzS2lhlVtYTBvdM+Nhlp46YO6mzIVoQf+c1wqz+AUGTnE01aRt3zKQ==
+Received: from BLAPR03CA0177.namprd03.prod.outlook.com (2603:10b6:208:32f::30)
+ by SJ0PR12MB8168.namprd12.prod.outlook.com (2603:10b6:a03:4e7::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.14; Sat, 22 Nov
+ 2025 14:13:50 +0000
+Received: from BL02EPF0002992B.namprd02.prod.outlook.com
+ (2603:10b6:208:32f:cafe::5c) by BLAPR03CA0177.outlook.office365.com
+ (2603:10b6:208:32f::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.14 via Frontend Transport; Sat,
+ 22 Nov 2025 14:13:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL02EPF0002992B.mail.protection.outlook.com (10.167.249.56) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9366.7 via Frontend Transport; Sat, 22 Nov 2025 14:13:49 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 22 Nov
+ 2025 06:13:42 -0800
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 22 Nov
+ 2025 06:13:41 -0800
+Received: from
+ gb-nvl-073-compute01.l16.internal032k18.bmc032b17.internal032f11.internal032huang.bmc032l04.bmc
+ (10.127.8.11) by mail.nvidia.com (10.129.68.6) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20 via Frontend Transport; Sat, 22 Nov 2025 06:13:41 -0800
+From: <ankita@nvidia.com>
+To: <ankita@nvidia.com>, <jgg@ziepe.ca>, <yishaih@nvidia.com>,
+	<skolothumtho@nvidia.com>, <kevin.tian@intel.com>, <alex@shazbot.org>,
+	<aniketa@nvidia.com>, <vsethi@nvidia.com>, <mochs@nvidia.com>
+CC: <Yunxiang.Li@amd.com>, <yi.l.liu@intel.com>,
+	<zhangdongdong@eswincomputing.com>, <avihaih@nvidia.com>,
+	<bhelgaas@google.com>, <peterx@redhat.com>, <pstanner@redhat.com>,
+	<apopple@nvidia.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<cjia@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
+	<zhiw@nvidia.com>, <danw@nvidia.com>, <dnigam@nvidia.com>, <kjaju@nvidia.com>
+Subject: [PATCH v4 RESEND 7/7] vfio/nvgrace-gpu: wait for the GPU mem to be ready
+Date: Sat, 22 Nov 2025 14:13:41 +0000
+Message-ID: <20251122141341.3644-1-ankita@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <05ef43e5-cc42-8e1c-2619-eb1dea12b02b@eik.bme.hu>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.12.48+deb13-amd64 (x86_64)
-X-Uptime: 13:56:00 up 26 days, 13:32,  2 users,  load average: 0.00, 0.00,
- 0.00
-User-Agent: Mutt/2.2.13 (2024-03-09)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0002992B:EE_|SJ0PR12MB8168:EE_
+X-MS-Office365-Filtering-Correlation-Id: 787fe85a-7b14-4c50-2931-08de29d15be7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|376014|7416014|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?LJsl+8Y/wxUXFYCDn/RlSCl/y4tVgMY3/zKEqXZdn/dxKioqytYKzWUp74HN?=
+ =?us-ascii?Q?DNkSiCmfqcQDgtKONuKwDE7Hds9TKOyULFEYoSpLFQTzx0ObbmTkLis14QLQ?=
+ =?us-ascii?Q?NePfMmL/M82tyKZB79mv1sjSa3M9RcbyYXi0XEyYSIPRqJRbbhq6OZf62F+4?=
+ =?us-ascii?Q?iZ/7s2M4H8P7f5yqrOZECiMCaGKt2IxNeQ1yhGbKzQTx5PrvUpD1B7qu8HWt?=
+ =?us-ascii?Q?Jp7mqHQ7sBDX+KigQQvaEDzOX0zhdRHvCUXhlh+5DwfTeD08G+DXZ/Ly/uTy?=
+ =?us-ascii?Q?e+HL3/pW/F1K8fdq/YJlIxD5tB1PJ9jE6qdQcpLNOUS+lWkqjRZ88rwEZlvL?=
+ =?us-ascii?Q?IJN1Hn+4RF6CsPISU/VJt4ewqUh0hsJnQArCq4RzPqOLFuCU9EARIVZH8Q38?=
+ =?us-ascii?Q?k2vFXSRQxsEyc/4+DyWSayJ4LwwY41FOHOWorD7df7+14o+t+70I33iR+zoC?=
+ =?us-ascii?Q?KvNxklpsGdAF8COIsTVO0SsC11m9+k2tXd0GcLRWmyAMpu3kymFqFhDGe1pq?=
+ =?us-ascii?Q?yB7wyZKch5HTF/mrAz+J8Nn2YpEu1aDnW8GbqMt+PAdanCvXgD33nPkFEf4m?=
+ =?us-ascii?Q?W/hVDPaSg+nxp6vGf483TR22MA7DQln+UObWOgj/nkgHZy2GohUh6j7wKfWY?=
+ =?us-ascii?Q?GKYUQjMHOBZdz94Snl1MXZAgRrJjn/9hTnpnDdZee9SzbsX9SF7SSsCr4eQn?=
+ =?us-ascii?Q?kxHzw+Yfvjp+OV9/s11GZhh1jG3DkoSKjDwJJkMxne5gTXwUcOMB8TUE3tpD?=
+ =?us-ascii?Q?0p0Af9eQLOMl0iwcpzMFFaOql4So8lEqxIWT0vEQ5DKX/dHjIP4S2zcs1xhQ?=
+ =?us-ascii?Q?/EblOxXqjlpwymUFQIzbM5TZIDbAusvdFnnzX6fFfmFUZ25zHhCOOvJQoFYV?=
+ =?us-ascii?Q?JYSKIwqfgKxPmBVglKH57xzdu7MQnhdu2ylTAizZevSUKF/Z1zuOh4Y++wIH?=
+ =?us-ascii?Q?uDwaWxTVi2vn6y7Nwp3Ruco1lW+gWslqUMzeDhk2ZvyFxBLYLTqc9Zu7JfUc?=
+ =?us-ascii?Q?NHs+bSENYeKWB4SMvff29Wnk6f6y0aLQXFIM0cr3Elgx5cHxKqhifxgLH6D/?=
+ =?us-ascii?Q?Ch8ttQs+KrEp6P7qdwnZzPJr3pMtht5UeVhLqG3lql7cpzgRKdwlH+fcHfyG?=
+ =?us-ascii?Q?BAzBUVGx+1jbU67kRgrrT11eP9NtxZ4HbHiG0KkFkHvsYigKp9LcSz/Vz/+J?=
+ =?us-ascii?Q?OZHWdA693rH5wqhwxA0xSwIP3xq9GgvoaVnZ5jixqL+tiGagsaCILVysnfPI?=
+ =?us-ascii?Q?q4HB17AoAUlrfpFmVaXeODKyclS24rGFrXxjV+vknWmajfEzeve3/sGa4qCv?=
+ =?us-ascii?Q?6OxOYhEYaS4cixd3H63IMNfufY0YD8563CFUxGklGCg4MnjkkfO/kO+WNO2D?=
+ =?us-ascii?Q?5zpu8lWbmztzButIpP/0ris3Dv71X2+vPQnApzbJALTse7pOaSzuMrKOckdA?=
+ =?us-ascii?Q?Gc0bAJtVxkFHU//5SEmreqx8V8c1yGakSh+dBiiPpu9lQFz0ba7tWTZMOeNM?=
+ =?us-ascii?Q?fxXwiHtAs+lmqwQ5YC4qts8t3bF53uPd4qr3jBAe61rgkZT1ZS+PFjyQiLXf?=
+ =?us-ascii?Q?wlZgTabRVvAUgjyE1y4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(7416014)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2025 14:13:49.8239
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 787fe85a-7b14-4c50-2931-08de29d15be7
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0002992B.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8168
 
-* BALATON Zoltan (balaton@eik.bme.hu) wrote:
-> On Sat, 22 Nov 2025, Markus Armbruster wrote:
-> > "Dr. David Alan Gilbert" <dave@treblig.org> writes:
-> > 
-> > > * Markus Armbruster (armbru@redhat.com) wrote:
-> > > > "Dr. David Alan Gilbert" <dave@treblig.org> writes:
-> > > > 
-> > > > > * Markus Armbruster (armbru@redhat.com) wrote:
-> > > > > > Replace
-> > > > > > 
-> > > > > >     error_setg_errno(errp, errno, MSG, FNAME);
-> > > > > > 
-> > > > > > by
-> > > > > > 
-> > > > > >     error_setg_file_open(errp, errno, FNAME);
-> > > > > > 
-> > > > > > where MSG is "Could not open '%s'" or similar.
-> > > > > > 
-> > > > > > Also replace equivalent uses of error_setg().
-> > > > > > 
-> > > > > > A few messages lose prefixes ("net dump: ", "SEV: ", __func__ ": ").
-> > > > > > We could put them back with error_prepend().  Not worth the bother.
-> > > > > 
-> > > > > Yeh, I guess you could just do it with another macro using
-> > > > > the same internal function just with string concatenation.
-> > > > 
-> > > > I'm no fan of such prefixes.  A sign of developers not caring enough to
-> > > > craft a good error message for *users*.  *Especially* in the case of
-> > > > __func__.
-> > > > 
-> > > > The error messages changes in question are:
-> > > > 
-> > > >     net dump: can't open DUMP-FILE: REASON
-> > > >     Could not open 'DUMP-FILE': REASON
-> > > > 
-> > > >     SEV: Failed to open SEV-DEVICE: REASON
-> > > >     Could not open 'SEV-DEVICE': REASON
-> > > > 
-> > > >     sev_common_kvm_init: Failed to open SEV_DEVICE 'REASON'
-> > > >     Could not open 'SEV-DEVICE': REASON
-> > > > 
-> > > > I think these are all improvements, and the loss of the prefix is fine.
-> > > 
-> > > Yeh, although I find the error messages aren't just for users;
-> > > they're often for the first dev to see it to guess which other
-> > > dev to pass the problem to, so a hint about where it's coming
-> > > from can be useful.
-> > 
-> > I agree!  But I think an error message must be make sense to users
-> > *first* and help developers second, and once they make sense to users,
-> > they're often good enough for developers.
-> > 
-> > The common failures I see happen when developers remain caught in the
-> > developer's perspective, and write something that makes sense to *them*.
-> > Strawman form:
-> > 
-> >    prefix: failed op[: reason]
-> > 
-> > where "prefix" is a subsystem tag, or even __func__, and "reason" is
-> > strerror() or similar.
-> > 
-> > To users, this tends to read as
-> > 
-> >    gobbledygook: techbabble[: reason]
-> > 
-> > When we care to replace "failed op" (developer's perspective) by
-> > something that actually makes sense to users, "prefix" often becomes
-> > redundant.
-> > 
-> > The error messages shown above aren't bad to begin with.  "failed to
-> > open FILE", where FILE is something the user specified, should make
-> > sense to the user.  It should also be good enough for developers even
-> > without a prefix: connecting trouble with the DUMP-FILE to dump /
-> > trouble with the SEV-DEVICE to SEV should be straightforward.
-> > 
-> > [...]
-> 
-> I think that
-> 
-> net dump: can't open random-filename: because of some error
-> 
-> shows better where to look for the problem than just
-> 
-> Could not open 'random-filename': because of some error
-> 
-> as the latter does not tell where the file name comes from or what is it. It
-> could be added by a management application or added by the users randomly
-> without really knowing what they are doing so repeating the option or part
-> in the message that the error comes from can help to find out where to
-> correct it. Otherwise it might be difficult to guess what random-filename is
-> related to if it's not named something you'd expect.
+From: Ankit Agrawal <ankita@nvidia.com>
 
-Yeh agreed.  It very much depends if you think of a 'user' as the person
-who typed a qemu command line, or pressed a button on a GUI that triggered
-15 levels of abstraction that eventually ran a qemu.
+Speculative prefetches from CPU to GPU memory until the GPU is
+ready after reset can cause harmless corrected RAS events to
+be logged on Grace systems. It is thus preferred that the
+mapping not be re-established until the GPU is ready post reset.
 
-Or for the support person who has a customer saying 'help I've got this error',
-and now needs to route it to the network person rather than something else.
+The GPU readiness can be checked through BAR0 registers similar
+to the checking at the time of device probe.
 
-Dave
+It can take several seconds for the GPU to be ready. So it is
+desirable that the time overlaps as much of the VM startup as
+possible to reduce impact on the VM bootup time. The GPU
+readiness state is thus checked on the first fault/huge_fault
+request which amortizes the GPU readiness time. The first fault
+is checked using the gpu_mem_mapped flag. The flag is unset on
+every GPU reset request by the reset_done handler.
 
-> Regards,
-> BALATON Zoltan
+cc: Alex Williamson <alex@shazbot.org>
+cc: Jason Gunthorpe <jgg@ziepe.ca>
+cc: Vikram Sethi <vsethi@nvidia.com>
+Suggested-by: Alex Williamson <alex@shazbot.org>
+Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+---
+ drivers/vfio/pci/nvgrace-gpu/main.c | 51 +++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+
+diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+index 5a2799dce417..d6a9f1cc4a25 100644
+--- a/drivers/vfio/pci/nvgrace-gpu/main.c
++++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+@@ -104,6 +104,17 @@ static int nvgrace_gpu_open_device(struct vfio_device *core_vdev)
+ 		mutex_init(&nvdev->remap_lock);
+ 	}
+ 
++	/*
++	 * GPU readiness is checked by reading the BAR0 registers.
++	 *
++	 * ioremap BAR0 to ensure that the BAR0 mapping is present before
++	 * register reads on first fault before establishing any GPU
++	 * memory mapping.
++	 */
++	ret = vfio_pci_core_setup_barmap(vdev, 0);
++	if (ret)
++		return ret;
++
+ 	nvdev->gpu_mem_mapped = false;
+ 
+ 	vfio_pci_core_finish_enable(vdev);
+@@ -152,6 +163,27 @@ static int nvgrace_gpu_wait_device_ready(void __iomem *io)
+ 	return ret;
+ }
+ 
++static int
++nvgrace_gpu_vfio_pci_premap_check(struct nvgrace_gpu_pci_core_device *nvdev)
++{
++	struct vfio_pci_core_device *vdev = &nvdev->core_device;
++	int ret = 0;
++
++	down_write(&vdev->memory_lock);
++	if (nvdev->gpu_mem_mapped)
++		goto premap_exit;
++
++	ret = nvgrace_gpu_wait_device_ready(vdev->barmap[0]);
++	if (ret)
++		goto premap_exit;
++
++	nvdev->gpu_mem_mapped = true;
++
++premap_exit:
++	up_write(&vdev->memory_lock);
++	return ret;
++}
++
+ static vm_fault_t nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
+ 						  unsigned int order)
+ {
+@@ -162,6 +194,15 @@ static vm_fault_t nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
+ 	struct mem_region *memregion;
+ 	unsigned long pgoff, pfn, addr;
+ 
++	/*
++	 * If the GPU memory is accessed by the CPU while the GPU is
++	 * not ready after reset, it can cause harmless corrected RAS
++	 * events to be logged. Make sure the GPU is ready before
++	 * establishing the mappings.
++	 */
++	if (nvgrace_gpu_vfio_pci_premap_check(nvdev))
++		return ret;
++
+ 	memregion = nvgrace_gpu_memregion(index, nvdev);
+ 	if (!memregion)
+ 		return ret;
+@@ -485,6 +526,16 @@ nvgrace_gpu_map_device_mem(int index,
+ 	struct mem_region *memregion;
+ 	int ret = 0;
+ 
++	/*
++	 * If the GPU memory is accessed by the CPU while the GPU is
++	 * not ready after reset, it can cause harmless corrected RAS
++	 * events to be logged. Make sure the GPU is ready before
++	 * establishing the mappings.
++	 */
++	ret = nvgrace_gpu_vfio_pci_premap_check(nvdev);
++	if (ret)
++		return ret;
++
+ 	memregion = nvgrace_gpu_memregion(index, nvdev);
+ 	if (!memregion)
+ 		return -EINVAL;
 -- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+2.34.1
+
 
