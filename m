@@ -1,262 +1,202 @@
-Return-Path: <kvm+bounces-64286-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64287-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FD74C7D170
-	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 14:25:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 664ABC7D1F7
+	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 14:59:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2B6C6353DA2
-	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 13:25:39 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0655C3482FD
+	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 13:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B19F231A3B;
-	Sat, 22 Nov 2025 13:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF5222156C;
+	Sat, 22 Nov 2025 13:59:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MPFqf4s9"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="boN+E0WV"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E850F2147F9;
-	Sat, 22 Nov 2025 13:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7545125A321
+	for <kvm@vger.kernel.org>; Sat, 22 Nov 2025 13:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763817928; cv=none; b=RDWHlAjhn7YR6/t6rANWXA9wR5+qLmRwpjFwB7jY6PYZLwWfhrE2xgtdu8Uu0MozTNn9VQXRiBxW519VTMVpojpZLjh8XwkNafczqjk4xFpUL0lV45RUzqD+6/hJdO4hxzTPfsFJLk4+NEku8OGVmraxOX1lA7v3mVxC0fl1Xko=
+	t=1763819940; cv=none; b=eNdP/GV/Bfi0q1PXt579k6AYIsJhJkLFCZEgUhZqQspB66KPaVXjzB0/x/xA2NQ3xm3WK1zoHvWr6Okomd9SdUh72vHty6ZXzSSkOUNK5K6ArdumOatOijHpguDuHs8hxLFuhM5P4n9O+8rqRYtIfHpt6slzCZkjNLtwS8h5EbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763817928; c=relaxed/simple;
-	bh=e5AzHO81/a9aj3GGCW5h753xla0jVym/io664XMZHaI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=awNf2k0T2/BkbBsvZ5xGeuQqQzQTJ9LXk95RkUED6TZB5r4pHtBeW/yZEvK8F2Rcxs+lb3YQoWy7MSqEq+WTRCGWoDE8mOflOB7q/qOQlTFfCLpnnjfjzy5AkYTb7AhtNEnCGjRVuV7OS7QjN2KzIUb1PIbMInMonx/sL4gePJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MPFqf4s9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36870C4CEF5;
-	Sat, 22 Nov 2025 13:25:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763817927;
-	bh=e5AzHO81/a9aj3GGCW5h753xla0jVym/io664XMZHaI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MPFqf4s97YnlpFpPgLeDgfSjRJDbo4g8ily8P1JGPTsEdLK4SavjKLSbGof22Tlsk
-	 1GXUs8Rgj342YdjdSXJMmnxmr5ZY4NScgsmX+lEXlaNAtM8rb5cPv2T2fcAx5VXqKH
-	 xVwo/q0If8WQDQAjb+fB0pD3APpSjI5DgURuyE8Wypb0CTSbSFKttkmBA+q7guCcPV
-	 f1LRXKToE/rvYbj3/ETtCMO599A8X/Yajovd4IYCtDwynCKBgYll4DVNTcJp1bVTxN
-	 ncMnxbsZvW5jK0t+hzsYQf7sAYzUwwOldwOFZe6TKYUEd89fThSlCDm5P5HnPAt951
-	 TsQca6TBCJTOA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vMncC-00000007UgK-44UT;
-	Sat, 22 Nov 2025 13:25:25 +0000
-Date: Sat, 22 Nov 2025 13:25:24 +0000
-Message-ID: <86tsymqjwb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: <oliver.upton@linux.dev>,
-	<catalin.marinas@arm.com>,
-	<corbet@lwn.net>,
-	<pbonzini@redhat.com>,
-	<will@kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<yuzenghui@huawei.com>,
-	<wangzhou1@hisilicon.com>,
-	<yezhenyu2@huawei.com>,
-	<xiexiangyou@huawei.com>,
-	<zhengchuan@huawei.com>,
-	<linuxarm@huawei.com>,
-	<joey.gouly@arm.com>,
-	<kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-doc@vger.kernel.org>,
-	<suzuki.poulose@arm.com>
-Subject: Re: [PATCH v2 3/5] KVM: arm64: Add support for FEAT_HDBSS
-In-Reply-To: <20251121092342.3393318-4-zhengtian10@huawei.com>
-References: <20251121092342.3393318-1-zhengtian10@huawei.com>
-	<20251121092342.3393318-4-zhengtian10@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763819940; c=relaxed/simple;
+	bh=73A2jJ3qDknzfJGHj6IYcBh3403pCBHBU43jtKW6tvc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T3t6l5kQEewEiyeAbeeOXrrOMPPCGQrg1XPOYSDuTGCnVbvk/rqe9W4asQojtMAhhmBYaavN3K9RSznY8wXzEyePTM4wSQMGAYuvAGIvghgzUNQZW9TiraR35KoTiIBnbEdwygJah1N0TAjIN1rEiCmC5de6D6nePZnTsmDKyEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=boN+E0WV; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=AEXZEuTJIE85z2nUo6vGRF6C9CDHEnZEtlKMj8CbeT4=; b=boN+E0WV5PWDs4yp
+	E5QiNikBwzcKxOr9y3ErKBosKi8VqQlyUK8FcpSwKZRZIklWGivPv0b8RSW0Md0mlLqwACbhBB1vJ
+	2xtO1APz5QqCPj2IB1son8z6yI2JWKjc/YisVf8Akz0AYURhVUPEbxbNHOCoqog6ksbOEZ8nbt3AA
+	M8nUp+/I6opgxD3kBK/3L9z07BOWIsUllEtVyMmhMVILtJ3RsJeXEUUUC+EDFUwvaSRJ+Fe7/WWD/
+	ixd0MwL2lJiyApfAIlZlIVvw0uVu6nd+S9a1CmPOP6ZRlcoooeZB+4RWIRymF57ys85smCTeDjJKH
+	Z3Kd2MYnSTr6//8Edg==;
+Received: from dg by mx.treblig.org with local (Exim 4.98.2)
+	(envelope-from <dg@treblig.org>)
+	id 1vMo83-00000005wUV-2FTG;
+	Sat, 22 Nov 2025 13:58:19 +0000
+Date: Sat, 22 Nov 2025 13:58:19 +0000
+From: "Dr. David Alan Gilbert" <dave@treblig.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+	arei.gonglei@huawei.com, pizhenwei@bytedance.com,
+	alistair.francis@wdc.com, stefanb@linux.vnet.ibm.com,
+	kwolf@redhat.com, hreitz@redhat.com, sw@weilnetz.de,
+	qemu_oss@crudebyte.com, groug@kaod.org, mst@redhat.com,
+	imammedo@redhat.com, anisinha@redhat.com, kraxel@redhat.com,
+	shentey@gmail.com, npiggin@gmail.com, harshpb@linux.ibm.com,
+	sstabellini@kernel.org, anthony@xenproject.org, paul@xen.org,
+	edgar.iglesias@gmail.com, elena.ufimtseva@oracle.com,
+	jag.raman@oracle.com, sgarzare@redhat.com, pbonzini@redhat.com,
+	fam@euphon.net, philmd@linaro.org, alex@shazbot.org, clg@redhat.com,
+	peterx@redhat.com, farosas@suse.de, lizhijian@fujitsu.com,
+	jasowang@redhat.com, samuel.thibault@ens-lyon.org,
+	michael.roth@amd.com, kkostiuk@redhat.com, zhao1.liu@intel.com,
+	mtosatti@redhat.com, rathc@linux.ibm.com, palmer@dabbelt.com,
+	liwei1518@gmail.com, dbarboza@ventanamicro.com,
+	zhiwei_liu@linux.alibaba.com, marcandre.lureau@redhat.com,
+	qemu-block@nongnu.org, qemu-ppc@nongnu.org,
+	xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+	qemu-riscv@nongnu.org
+Subject: Re: [PATCH 09/14] error: Use error_setg_file_open() for simplicity
+ and consistency
+Message-ID: <aSHBez6kYRagEL1K@gallifrey>
+References: <20251120191339.756429-1-armbru@redhat.com>
+ <20251120191339.756429-10-armbru@redhat.com>
+ <aR-q2YeegIEPmk2R@gallifrey>
+ <87see8q6qm.fsf@pond.sub.org>
+ <aSClUIvI2W-PVv6B@gallifrey>
+ <87ecpqtt6f.fsf@pond.sub.org>
+ <05ef43e5-cc42-8e1c-2619-eb1dea12b02b@eik.bme.hu>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: zhengtian10@huawei.com, oliver.upton@linux.dev, catalin.marinas@arm.com, corbet@lwn.net, pbonzini@redhat.com, will@kernel.org, linux-kernel@vger.kernel.org, yuzenghui@huawei.com, wangzhou1@hisilicon.com, yezhenyu2@huawei.com, xiexiangyou@huawei.com, zhengchuan@huawei.com, linuxarm@huawei.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <05ef43e5-cc42-8e1c-2619-eb1dea12b02b@eik.bme.hu>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.12.48+deb13-amd64 (x86_64)
+X-Uptime: 13:56:00 up 26 days, 13:32,  2 users,  load average: 0.00, 0.00,
+ 0.00
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-On Fri, 21 Nov 2025 09:23:40 +0000,
-Tian Zheng <zhengtian10@huawei.com> wrote:
+* BALATON Zoltan (balaton@eik.bme.hu) wrote:
+> On Sat, 22 Nov 2025, Markus Armbruster wrote:
+> > "Dr. David Alan Gilbert" <dave@treblig.org> writes:
+> > 
+> > > * Markus Armbruster (armbru@redhat.com) wrote:
+> > > > "Dr. David Alan Gilbert" <dave@treblig.org> writes:
+> > > > 
+> > > > > * Markus Armbruster (armbru@redhat.com) wrote:
+> > > > > > Replace
+> > > > > > 
+> > > > > >     error_setg_errno(errp, errno, MSG, FNAME);
+> > > > > > 
+> > > > > > by
+> > > > > > 
+> > > > > >     error_setg_file_open(errp, errno, FNAME);
+> > > > > > 
+> > > > > > where MSG is "Could not open '%s'" or similar.
+> > > > > > 
+> > > > > > Also replace equivalent uses of error_setg().
+> > > > > > 
+> > > > > > A few messages lose prefixes ("net dump: ", "SEV: ", __func__ ": ").
+> > > > > > We could put them back with error_prepend().  Not worth the bother.
+> > > > > 
+> > > > > Yeh, I guess you could just do it with another macro using
+> > > > > the same internal function just with string concatenation.
+> > > > 
+> > > > I'm no fan of such prefixes.  A sign of developers not caring enough to
+> > > > craft a good error message for *users*.  *Especially* in the case of
+> > > > __func__.
+> > > > 
+> > > > The error messages changes in question are:
+> > > > 
+> > > >     net dump: can't open DUMP-FILE: REASON
+> > > >     Could not open 'DUMP-FILE': REASON
+> > > > 
+> > > >     SEV: Failed to open SEV-DEVICE: REASON
+> > > >     Could not open 'SEV-DEVICE': REASON
+> > > > 
+> > > >     sev_common_kvm_init: Failed to open SEV_DEVICE 'REASON'
+> > > >     Could not open 'SEV-DEVICE': REASON
+> > > > 
+> > > > I think these are all improvements, and the loss of the prefix is fine.
+> > > 
+> > > Yeh, although I find the error messages aren't just for users;
+> > > they're often for the first dev to see it to guess which other
+> > > dev to pass the problem to, so a hint about where it's coming
+> > > from can be useful.
+> > 
+> > I agree!  But I think an error message must be make sense to users
+> > *first* and help developers second, and once they make sense to users,
+> > they're often good enough for developers.
+> > 
+> > The common failures I see happen when developers remain caught in the
+> > developer's perspective, and write something that makes sense to *them*.
+> > Strawman form:
+> > 
+> >    prefix: failed op[: reason]
+> > 
+> > where "prefix" is a subsystem tag, or even __func__, and "reason" is
+> > strerror() or similar.
+> > 
+> > To users, this tends to read as
+> > 
+> >    gobbledygook: techbabble[: reason]
+> > 
+> > When we care to replace "failed op" (developer's perspective) by
+> > something that actually makes sense to users, "prefix" often becomes
+> > redundant.
+> > 
+> > The error messages shown above aren't bad to begin with.  "failed to
+> > open FILE", where FILE is something the user specified, should make
+> > sense to the user.  It should also be good enough for developers even
+> > without a prefix: connecting trouble with the DUMP-FILE to dump /
+> > trouble with the SEV-DEVICE to SEV should be straightforward.
+> > 
+> > [...]
 > 
-> From: eillon <yezhenyu2@huawei.com>
+> I think that
 > 
-> Armv9.5 introduces the Hardware Dirty Bit State Structure (HDBSS) feature,
-> indicated by ID_AA64MMFR1_EL1.HAFDBS == 0b0100.
+> net dump: can't open random-filename: because of some error
 > 
-> Add the Kconfig for FEAT_HDBSS and support detecting and enabling the
-> feature. A CPU capability is added to notify the user of the feature.
+> shows better where to look for the problem than just
 > 
-> Add KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl and basic framework for
-> ARM64 HDBSS support. Since the HDBSS buffer size is configurable and
-> cannot be determined at KVM initialization, an IOCTL interface is
-> required.
+> Could not open 'random-filename': because of some error
 > 
-> Actually exposing the new capability to user space happens in a later
-> patch.
-> 
-> Signed-off-by: eillon <yezhenyu2@huawei.com>
-> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> ---
->  arch/arm64/Kconfig                  | 14 ++++++++++++++
->  arch/arm64/include/asm/cpucaps.h    |  2 ++
->  arch/arm64/include/asm/cpufeature.h |  5 +++++
->  arch/arm64/include/asm/kvm_host.h   |  4 ++++
->  arch/arm64/include/asm/sysreg.h     | 12 ++++++++++++
->  arch/arm64/kernel/cpufeature.c      |  9 +++++++++
->  arch/arm64/tools/cpucaps            |  1 +
->  include/uapi/linux/kvm.h            |  1 +
->  tools/include/uapi/linux/kvm.h      |  1 +
->  9 files changed, 49 insertions(+)
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 6663ffd23f25..1edf75888a09 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -2201,6 +2201,20 @@ config ARM64_GCS
-> 
->  endmenu # "ARMv9.4 architectural features"
-> 
-> +menu "ARMv9.5 architectural features"
-> +
-> +config ARM64_HDBSS
-> +	bool "Enable support for Hardware Dirty state tracking Structure (HDBSS)"
-> +	help
-> +	  Hardware Dirty state tracking Structure(HDBSS) enhances tracking
-> +	  translation table descriptors' dirty state to reduce the cost of
-> +	  surveying for dirtied granules.
-> +
-> +	  The feature introduces new assembly registers (HDBSSBR_EL2 and
-> +	  HDBSSPROD_EL2), which are accessed via generated register accessors.
+> as the latter does not tell where the file name comes from or what is it. It
+> could be added by a management application or added by the users randomly
+> without really knowing what they are doing so repeating the option or part
+> in the message that the error comes from can help to find out where to
+> correct it. Otherwise it might be difficult to guess what random-filename is
+> related to if it's not named something you'd expect.
 
-This last but means nothing to most people.
+Yeh agreed.  It very much depends if you think of a 'user' as the person
+who typed a qemu command line, or pressed a button on a GUI that triggered
+15 levels of abstraction that eventually ran a qemu.
 
-But more importantly, I really don't want to see this as a config
-option. KVM comes with "battery included", and all features should be
-available at all times.
+Or for the support person who has a customer saying 'help I've got this error',
+and now needs to route it to the network person rather than something else.
 
-> +
-> +endmenu # "ARMv9.5 architectural features"
-> +
->  config ARM64_SVE
->  	bool "ARM Scalable Vector Extension support"
->  	default y
-> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-> index 9d769291a306..5e5a26f28dec 100644
-> --- a/arch/arm64/include/asm/cpucaps.h
-> +++ b/arch/arm64/include/asm/cpucaps.h
-> @@ -48,6 +48,8 @@ cpucap_is_possible(const unsigned int cap)
->  		return IS_ENABLED(CONFIG_ARM64_GCS);
->  	case ARM64_HAFT:
->  		return IS_ENABLED(CONFIG_ARM64_HAFT);
-> +	case ARM64_HAS_HDBSS:
-> +		return IS_ENABLED(CONFIG_ARM64_HDBSS);
->  	case ARM64_UNMAP_KERNEL_AT_EL0:
->  		return IS_ENABLED(CONFIG_UNMAP_KERNEL_AT_EL0);
->  	case ARM64_WORKAROUND_843419:
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index e223cbf350e4..b231415a2b76 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -856,6 +856,11 @@ static inline bool system_supports_haft(void)
->  	return cpus_have_final_cap(ARM64_HAFT);
->  }
-> 
-> +static inline bool system_supports_hdbss(void)
-> +{
-> +	return cpus_have_final_cap(ARM64_HAS_HDBSS);
-> +}
-> +
->  static __always_inline bool system_supports_mpam(void)
->  {
->  	return alternative_has_cap_unlikely(ARM64_MPAM);
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 64302c438355..d962932f0e5f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -60,6 +60,10 @@
-> 
->  #define KVM_HAVE_MMU_RWLOCK
-> 
-> +/* HDBSS entry field definitions */
-> +#define HDBSS_ENTRY_VALID BIT(0)
-> +#define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
-> +
+Dave
 
-None of this is used here. Move it to the patch where it belongs.
-
->  /*
->   * Mode of operation configurable with kvm-arm.mode early param.
->   * See Documentation/admin-guide/kernel-parameters.txt for more information.
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index c231d2a3e515..3511edea1fbc 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -1129,6 +1129,18 @@
->  #define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
->  #define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
-> 
-> +/*
-> + * Definitions for the HDBSS feature
-> + */
-> +#define HDBSS_MAX_SIZE		HDBSSBR_EL2_SZ_2MB
-> +
-> +#define HDBSSBR_EL2(baddr, sz)	(((baddr) & GENMASK(55, 12 + sz)) | \
-> +				 FIELD_PREP(HDBSSBR_EL2_SZ_MASK, sz))
-> +#define HDBSSBR_BADDR(br)	((br) & GENMASK(55, (12 + HDBSSBR_SZ(br))))
-> +#define HDBSSBR_SZ(br)		FIELD_GET(HDBSSBR_EL2_SZ_MASK, br)
-
-This is a bit backward. When would you need to read-back and mask
-random bits off the register?
-
-> +
-> +#define HDBSSPROD_IDX(prod)	FIELD_GET(HDBSSPROD_EL2_INDEX_MASK, prod)
-> +
-
-As previously said, these definitions don't serve any purpose here,
-and would be better in the following patch.
-
->  #define ARM64_FEATURE_FIELD_BITS	4
-> 
->  #ifdef __ASSEMBLY__
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index e25b0f84a22d..f39973b68bdb 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2710,6 +2710,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		.matches = has_cpuid_feature,
->  		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HAFT)
->  	},
-> +#endif
-> +#ifdef CONFIG_ARM64_HDBSS
-> +	{
-> +		.desc = "Hardware Dirty state tracking structure (HDBSS)",
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.capability = ARM64_HAS_HDBSS,
-> +		.matches = has_cpuid_feature,
-> +		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HDBSS)
-> +	},
-
-I think this is one of the features we should restrict to VHE. I don't
-imagine pKVM ever making use of this, and no non-VHE HW will ever
-build this.
-
-Thanks,
-
-	M.
-
+> Regards,
+> BALATON Zoltan
 -- 
-Without deviation from the norm, progress is not possible.
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
