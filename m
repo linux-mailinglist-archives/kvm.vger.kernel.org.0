@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-64284-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64285-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BF6AC7CFF9
-	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 13:40:41 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AEEFC7D108
+	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 13:57:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A1633A92D5
-	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 12:40:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 24BBF344C25
+	for <lists+kvm@lfdr.de>; Sat, 22 Nov 2025 12:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF2B2FA0C6;
-	Sat, 22 Nov 2025 12:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D362FB624;
+	Sat, 22 Nov 2025 12:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="agJf8a7L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="teQPP7OG"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE06207A3A;
-	Sat, 22 Nov 2025 12:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA2835977;
+	Sat, 22 Nov 2025 12:54:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763815230; cv=none; b=E98CogdVFqeiUS2dJvaDcdJtfIlEGvwlkHe47Wr7ObMJPY4aIBSCzRMmrpiMmCQzD/kcVseP6CXF1wXVlQ1ay6esd5vX7HSRmXnZvsjQiBi8UgOE83QZr4u4NSpQeLYaZE0/qKMacuWxc1r8bMuqaL9WTXMRoun0Y0CEuMoJBN4=
+	t=1763816058; cv=none; b=RrTkQeMHk+sOtew16JZofxf/hzbAD1dKzrcCc9AxR4IL9EPYVxa+arnJz9ibLftsmo3g+02z75tlKNJ/+dRutTAgVPF8ho5J/5WWwkvLbRjVgkBo30ZMGPEc3EP22ys7c4ygDSl8s/B+DD82Df2IsApXsUnfhFwKOXx2jPtzT38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763815230; c=relaxed/simple;
-	bh=BdnKYTAKaORHGO2Q/Ihj95imsb6E3FqedhQAygwOtME=;
+	s=arc-20240116; t=1763816058; c=relaxed/simple;
+	bh=FR4E8hZalGj/6XCc4oY1XezvA/TPT41+qYdS/PdvxL4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NvCAX4SuBlYbjU+KsyxMpI20wIl3hwr50amYeTFJEQnQAbFVfs8D57+ZOUavp3sd+/KnWHm/skdiZ8cYKyKoKbvwvsv1HrWLvmiHGfQCceD88aoj2z0JblGAFKp1bHt1tUGffymrXCj6XSesFGr3KO2Lsw/fSGcJJLZCLuo9Jpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=agJf8a7L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1386EC4CEF5;
-	Sat, 22 Nov 2025 12:40:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=j9ubjXcgjqZ8EhwcGj6uVKoBF5eA0vIOX9pAaYah8V2dQ3hBDX4tJ7/d+5aINk9bRqQoy5i1XQRkfVyOQSLY5YmrM+ZigRHohQFBpqGxWTKL+xqJ1zZD4NG6u+dw+D1ke3+XKQK+1n//pqR/8O1/wg7B3nRfJdDs7fNMCrA8DDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=teQPP7OG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23D9CC4CEF5;
+	Sat, 22 Nov 2025 12:54:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763815230;
-	bh=BdnKYTAKaORHGO2Q/Ihj95imsb6E3FqedhQAygwOtME=;
+	s=k20201202; t=1763816058;
+	bh=FR4E8hZalGj/6XCc4oY1XezvA/TPT41+qYdS/PdvxL4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=agJf8a7LyH/iIOyJQTWgVeUmnxNhDQOOQVYulw37B5bbbtdEDM/eyEMHAwCPpEmr2
-	 BNi/CTDYPjU8zu768mBfk8h3mncoDFkUX0vbxoflPmFj+DKw2Yaq1tWYyDktArgl3V
-	 8UL7Dl+nMSEnpTHVtgjNWsbXP7huorjOVkZLn8GU3ywsIewGcdpGF5gzwsloFdrQCV
-	 3JTm3wiV7cPAP+SHF+5abJijTyW1SVbvYuCvWyuLo+fsUIwDCJZGVeJKPK/R2jgEy5
-	 Qm1qe8852o3PGDa7xmR+LRQn13R/rezvVHJDZ2BOG5+kPAOAvV0nVwBbqDQySQb3aL
-	 tlkjsqwx00p9Q==
+	b=teQPP7OGmS7K1rnsd+7oofZyDlXrWbuIbE4+cZB9/w4V9zBc1VH+Oumfx2SmSWfp9
+	 39TNXqP63o80SY2qBQlGRl5XT6W2CgMB0wWBoF3bgsRpCcO0Knj3eYS/d1dy4kFfY/
+	 EtC1YncnkpY1uzqYMnfxq7Xw7DEeRRMriFbRmvsEv/ERVTFIxpJMHUcQyFvqgbPU0J
+	 h8TPfAmOUPmg8Qij57brvYEgWmVv6HosWEBwOu/qaYdhDGwMvUdk0mm8j2sfM+M/yM
+	 v5GUxus2/M7WJGaEWKCZbI4RdBxRfymBuGBWCBnu5oBdskAkttF2ExQDC7fiRiB3sA
+	 O/ymaH+heZlOw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vMmuh-00000007U9L-2jRe;
-	Sat, 22 Nov 2025 12:40:27 +0000
-Date: Sat, 22 Nov 2025 12:40:27 +0000
-Message-ID: <86wm3iqlz8.wl-maz@kernel.org>
+	id 1vMn84-00000007USt-0CFe;
+	Sat, 22 Nov 2025 12:54:16 +0000
+Date: Sat, 22 Nov 2025 12:54:15 +0000
+Message-ID: <86v7j2qlc8.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Tian Zheng <zhengtian10@huawei.com>
 Cc: <oliver.upton@linux.dev>,
@@ -69,10 +69,10 @@ Cc: <oliver.upton@linux.dev>,
 	<linux-arm-kernel@lists.infradead.org>,
 	<linux-doc@vger.kernel.org>,
 	<suzuki.poulose@arm.com>
-Subject: Re: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register information
-In-Reply-To: <20251121092342.3393318-2-zhengtian10@huawei.com>
+Subject: Re: [PATCH v2 2/5] KVM: arm64: Support set the DBM attr during memory abort
+In-Reply-To: <20251121092342.3393318-3-zhengtian10@huawei.com>
 References: <20251121092342.3393318-1-zhengtian10@huawei.com>
-	<20251121092342.3393318-2-zhengtian10@huawei.com>
+	<20251121092342.3393318-3-zhengtian10@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -88,48 +88,26 @@ X-SA-Exim-Rcpt-To: zhengtian10@huawei.com, oliver.upton@linux.dev, catalin.marin
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 21 Nov 2025 09:23:38 +0000,
+On Fri, 21 Nov 2025 09:23:39 +0000,
 Tian Zheng <zhengtian10@huawei.com> wrote:
 > 
 > From: eillon <yezhenyu2@huawei.com>
 > 
-> The ARM architecture added the HDBSS feature and descriptions of
-> related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
-> add them to Linux.
+> Add DBM support to automatically promote write-clean pages to
+> write-dirty, preventing users from being trapped in EL2 due to
+> missing write permissions.
 > 
-> Signed-off-by: eillon <yezhenyu2@huawei.com>
-> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> ---
->  arch/arm64/include/asm/esr.h     |  2 ++
->  arch/arm64/include/asm/kvm_arm.h |  1 +
->  arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
->  3 files changed, 31 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index e1deed824464..a6f3cf0b9b86 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -159,6 +159,8 @@
->  #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
-> 
->  /* ISS2 field definitions for Data Aborts */
-> +#define ESR_ELx_HDBSSF_SHIFT	(11)
-> +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
->  #define ESR_ELx_TnD_SHIFT	(10)
->  #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
->  #define ESR_ELx_TagAccess_SHIFT	(9)
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 1da290aeedce..b71122680a03 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -124,6 +124,7 @@
->  			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
-> 
->  /* VTCR_EL2 Registers bits */
-> +#define VTCR_EL2_HDBSS		(1UL << 45)
+> Since the DBM attribute was introduced in ARMv8.1 and remains
+> optional in later architecture revisions, including ARMv9.5.
 
-I think it is time to convert VTCR_EL2 to the sysreg infrastructure
-instead of adding extra bits here.
+What is the relevance of this statement?
+
+> 
+> Support set the DBM attr during user_mem_abort().
+
+I don't think this commit message accurately describes what the code
+does. This merely adds support to the page table code to set the DBM
+bit in the S2 PTE, and nothing else.
 
 	M.
 
