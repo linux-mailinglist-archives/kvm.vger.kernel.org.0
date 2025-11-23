@@ -1,155 +1,202 @@
-Return-Path: <kvm+bounces-64297-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64298-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A41A4C7DAF5
-	for <lists+kvm@lfdr.de>; Sun, 23 Nov 2025 03:35:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CC26C7DBB7
+	for <lists+kvm@lfdr.de>; Sun, 23 Nov 2025 06:23:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C7161353582
-	for <lists+kvm@lfdr.de>; Sun, 23 Nov 2025 02:35:18 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E773334CA96
+	for <lists+kvm@lfdr.de>; Sun, 23 Nov 2025 05:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E018E21B9D2;
-	Sun, 23 Nov 2025 02:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A6C23EA97;
+	Sun, 23 Nov 2025 05:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zy6HV/LU"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="eQYmvvnj"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C0772617
-	for <kvm@vger.kernel.org>; Sun, 23 Nov 2025 02:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1136E23956E
+	for <kvm@vger.kernel.org>; Sun, 23 Nov 2025 05:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763865204; cv=none; b=CkuI+nOLdv+P1RYkv6I0MoPY+wL00U0Aj5sI4mdSa1Da/8LtXVd3wIuUil56xCciKsWXkkl0yqD9rFtE+cpfP5frMYq3dgu+hRbtks0g+quTOI8ADZ/CU/s6Yj+cHNZfTzjvPAcAQ62jyQkAzvlqqx4gXjVdPunnxoCObpIJDO8=
+	t=1763875381; cv=none; b=lQ/OQv6jl62B6S+v2QKaHQ0I/ysj5w8deI1jmrGCqSevUfaEdTLKaZ3Uu4n18W7fidaaL+VJZn1SP5+4FMlLj6OEDy1a+WmVTEj6KIswxJvqOHgKgm2MLFX91K7/ZZWq/jXgub0txOZH3QWc3ZSUGZI4/ixKQV/hKtuO1zRoUPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763865204; c=relaxed/simple;
-	bh=rCc4nq3PttRA8+0oSgsrW9Mo0xwldTDWGoI5ab8Qu1Q=;
+	s=arc-20240116; t=1763875381; c=relaxed/simple;
+	bh=G6bR0WIE9PKOlK24ZTg7gD7xwOrnUryX5KRCDuX7OLk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rG7P5+yGFApA6DbItUc+u8G5LVDCXPcMWfTEBKYl0I/SBQ99vKK2EqiQ10yHpZS+Pe80JiEKgFcJ2CNuGCE+m98TRZZ9LuEc3RIDQdOhhPwuwZSB2Oa/AYPTU+3FZPGC9ti703QQSqi6TDG+1LDl0S8ID+Myvum+qnLKpL/ekQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zy6HV/LU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A1F1C4AF0B
-	for <kvm@vger.kernel.org>; Sun, 23 Nov 2025 02:33:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763865203;
-	bh=rCc4nq3PttRA8+0oSgsrW9Mo0xwldTDWGoI5ab8Qu1Q=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Zy6HV/LUskZIV9pI7pgm2TEPeb4LQ72q/tyx+nNCuvgxYqPR0TuySDoEP84tsF7Sc
-	 2fuV/mfELjNsy+Af53do+7qiv/M0+cfRDToub2NWq73qYBPT9GfEmJ0UyFikKZgFBG
-	 dDIL5UEZdvDF6Kht6Kt8FlVRCpJYOdlBfCi0Iv+DHUtT+u/DY2z7de1QJOPHXsrDNH
-	 UUbe9MnCRqb4Y4IfaKWLVuNcu12SJgC1A2k5F1Id+yER5cTzJqQAG/rzlcHRExQEtS
-	 DGJEFg3YNoRUVkfYlilLb5CK1Itbo2c2+fayxhfmrUjtgh8vt+I9l3Qk+vUt7oU5P5
-	 UGJnrh6PSDSOA==
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-47775fb6cb4so21037945e9.0
-        for <kvm@vger.kernel.org>; Sat, 22 Nov 2025 18:33:23 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUu0f4hTD2zvCsiQzYEO/CD/rsJW/CLj9V1PR4CSH47Vo0qkfXUfGmJytNHU0s9tBFD06M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLl/ws38EKzsuT7c+6BdcDaXFPtJSjH0p2uZBT20dmVuCQQ+34
-	ez/DUxfXAse9pPHYN2VSHDD5Cox6I6lAfRm8o8Z4c0zcT4/1ZDufwo7LhClqjWSTJtLhhmrrnC4
-	hpYcv4Tjdvia6MTTFMdddzEoab+fro7g=
-X-Google-Smtp-Source: AGHT+IFu8+keWKht8NAR12FzNoKQ1ZakL3uoRUW8Qu35TSMqtSJ2/G6S36LtFGsDYOLOjquBzTcDQ3YJIc/S1fXfwQs=
-X-Received: by 2002:a05:600c:3590:b0:477:54f9:6ac2 with SMTP id
- 5b1f17b1804b1-477c104fc20mr85112725e9.0.1763865201944; Sat, 22 Nov 2025
- 18:33:21 -0800 (PST)
+	 To:Cc:Content-Type; b=sO0UpCREDLXvVWYpdJ5ouWs7fSO2MJFC0MBlWyxprDAG7FupyA3n7476NU+KmPJrdj4Bzj09V0wFihyQ8RrjMeWp+urcBB3NEetB6QJ2Hyes3tzQbQYhQ+PYCz1gdZJn3ivtygOizChnmUo0Hz1o1XP0VDdr4MwNbHWpgL18Gvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=eQYmvvnj; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-433692bbe4fso17653825ab.0
+        for <kvm@vger.kernel.org>; Sat, 22 Nov 2025 21:22:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1763875379; x=1764480179; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9M+bsitxdcyHBcSA8b07GYs4Cob261gapfpxGSvBT4Q=;
+        b=eQYmvvnjl6zjQBI2sOLcvyYllsbatTgErIY/m3xmkE3HGWgVtgKEWRnoxJHpdONLKj
+         bdjkjBdY6eqyze8L/hwgHbeAKMzYyLIDihzl8xi05zo91B9iskIl5foLBU/5cXNB2ZwF
+         CZ01bSQds0mkc0Ou7CSNHR/1EgUQkoQmsHMOWJfOqqdHSGHL5/kArY2A9m8z37uGztj1
+         tAG6RYKxhJgXLny2T/UuHHmgxlx0e9IWkoD/zL+8EZOth8Tr8BoNJljUXki1PwbZESfj
+         COCYOI3SfOE67w0q5m/J45Q99rFXc0jxVgUKhos+7Mbsw6qRT6L9mhN6f+fa+8cqq3Nx
+         PwOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763875379; x=1764480179;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9M+bsitxdcyHBcSA8b07GYs4Cob261gapfpxGSvBT4Q=;
+        b=PrUNN0g+F/E8wefhsj5JYmFLPZhWm/UBlyKLEQL6pPzTDLYDQlTDr9x7zyrPD3QBeJ
+         LV/Bz1t9saH77MVmchMimk2wqcdNvGdK4V9CRhvwz+elmexi2t25dZis/hoV93YW3qVL
+         nUK3LLi5Jh1TB5tXxwHKZiZFEkBA2ZBeS2m9+l7/X/Nd1emY7ykmqmExIjaqMSMXVi+s
+         SATsAEafxGSc81pDq5uMCoNdk5m8Y/SzirDckAuywyX+F9QnuI2FuDepzSENzOh2v5ie
+         2b03Asze7Fa/7dIssWbGAUVyiY+A9gF85CG5Wh54sGPyle15LvD/3WSHpCKa1OkW+Its
+         N0Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCXMVIQBr9aDjs5Ru5sX+Cg6zi4x3WeJjbj54SgrEg8Znd2CtLejTlc/z0biIMP2dpmqIko=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaSR2YWahQOWq4x5XbOskJsoo0Eo7zIRqM7NDWhaLdYGkW19YI
+	m9CaYgpifpRmvWEjH7A91FcSKlAzoiUGjmfK319ihrtvxwaYIkU9D3ToXWk4KHmJJ/9NMyCPMOv
+	2qHRcQ/UqcaSyEYcown5RBn+wpQERFU4eJ/xYujhb/g==
+X-Gm-Gg: ASbGncsecR8wd7yC6Bsor+iZIugkUJ07JCN4U9rwZ5G8d24bbm32G7JyQMWnTGoN+Gg
+	qOW1gjk/FsS9jwP0Rdh7b8aPNUJulFRHrWSSW1IPAHFllIbpMndkU+CNRXdMWN1wbb8138sUz5R
+	C71a7wV9GdfpSzJNvOGAoBilvFw9FmKaSWVl4v1wyZX+G8BZqBVvItoGgp17khLePGitvd1wgi0
+	QXGhmWebtu58bQGLageHyx6KotvSKADeZ29Bw0VVu3LFbIuVWTJio4ID2oSkN6A0hb6GETvfhSj
+	4QCF3Dl3HvjtdOBl/myHIqSTO8YrsQ==
+X-Google-Smtp-Source: AGHT+IEeM18++lwaiORFJZl8Hjs+peRhie1yZlJt5sthIKBDB3m3u408rffnRcPQtJ+QKEExmaV3WTWoC+TcPLmKbAA=
+X-Received: by 2002:a05:6e02:3f09:b0:433:7826:2b69 with SMTP id
+ e9e14a558f8ab-435b8e4fcb7mr70415215ab.11.1763875379029; Sat, 22 Nov 2025
+ 21:22:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251122075023.27589-1-fangyu.yu@linux.alibaba.com>
-In-Reply-To: <20251122075023.27589-1-fangyu.yu@linux.alibaba.com>
-From: Guo Ren <guoren@kernel.org>
-Date: Sun, 23 Nov 2025 10:33:19 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTTRBFTnu2pA5rh16EWLvF_Wo=+vpZMUK9roDkDPes4Fpg@mail.gmail.com>
-X-Gm-Features: AWmQ_bmTGM3DvVj2QLOaGmzVQQuWw2wC2Ygj63d-XxxSA_PqRhUSHSryftk40Qg
-Message-ID: <CAJF2gTTRBFTnu2pA5rh16EWLvF_Wo=+vpZMUK9roDkDPes4Fpg@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: Allow to downgrade HGATP mode via SATP mode
+References: <20251121133543.46822-1-fangyu.yu@linux.alibaba.com>
+In-Reply-To: <20251121133543.46822-1-fangyu.yu@linux.alibaba.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Sun, 23 Nov 2025 10:52:46 +0530
+X-Gm-Features: AWmQ_bmj4zuHx-QBwVeyguW577J_Oqmu-RcG3kza0f4RZhq14OWm6aCQT2gQVtM
+Message-ID: <CAAhSdy2Y=qk27Khy+fzOCidop7+tNqoDb0CFwAJ_p090NV46vQ@mail.gmail.com>
+Subject: Re: [PATCH v3] RISC-V: KVM: Fix guest page fault within HLV* instructions
 To: fangyu.yu@linux.alibaba.com
-Cc: anup@brainfault.org, atish.patra@linux.dev, pjw@kernel.org, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, 
+Cc: atish.patra@linux.dev, pjw@kernel.org, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, alex@ghiti.fr, guoren@kernel.org, 
 	ajones@ventanamicro.com, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 22, 2025 at 3:50=E2=80=AFPM <fangyu.yu@linux.alibaba.com> wrote=
+On Fri, Nov 21, 2025 at 7:06=E2=80=AFPM <fangyu.yu@linux.alibaba.com> wrote=
 :
 >
 > From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
 >
-> Currently, HGATP mode uses the maximum value detected by the hardware
-> but often such a wide GPA is unnecessary, just as a host sometimes
-> doesn't need sv57.
-> It's likely that no additional parameters (like no5lvl and no4lvl) are
-> needed, aligning HGATP mode to SATP mode should meet the requirements
-> of most scenarios.
-Yes, no5/4lvl is not clear about satp or hgatp. So, covering HGPATP is
-reasonable.
-
-Acked-by: Guo Ren <guoren@kernel.org>
-
+> When executing HLV* instructions at the HS mode, a guest page fault
+> may occur when a g-stage page table migration between triggering the
+> virtual instruction exception and executing the HLV* instruction.
 >
+> This may be a corner case, and one simpler way to handle this is to
+> re-execute the instruction where the virtual  instruction exception
+> occurred, and the guest page fault will be automatically handled.
+>
+> Fixes: b91f0e4cb8a3 ("RISC-V: KVM: Factor-out instruction emulation into =
+separate sources")
 > Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+
+LGTM.
+
+Reviewed-by: Anup Patel <anup@brainfault.org>
+
+Queued this patch for Linux-6.19
+
+Regards,
+Anup
+
+>
 > ---
->  arch/riscv/kvm/gstage.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+> Changes in v3:
+> - Add a helper function to avoid repeating the same paragraph(suggested b=
+y drew)
+> - Link to v2: https://lore.kernel.org/linux-riscv/20251111135506.8526-1-f=
+angyu.yu@linux.alibaba.com/
 >
-> diff --git a/arch/riscv/kvm/gstage.c b/arch/riscv/kvm/gstage.c
-> index b67d60d722c2..bff80c80ead3 100644
-> --- a/arch/riscv/kvm/gstage.c
-> +++ b/arch/riscv/kvm/gstage.c
-> @@ -320,7 +320,6 @@ void __init kvm_riscv_gstage_mode_detect(void)
->         csr_write(CSR_HGATP, HGATP_MODE_SV57X4 << HGATP_MODE_SHIFT);
->         if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) =3D=3D HGATP_MODE_S=
-V57X4) {
->                 kvm_riscv_gstage_mode =3D HGATP_MODE_SV57X4;
-> -               kvm_riscv_gstage_pgd_levels =3D 5;
->                 goto done;
->         }
+> Changes in v2:
+> - Remove unnecessary modifications and add comments(suggested by Anup)
+> - Update Fixes tag
+> - Link to v1: https://lore.kernel.org/linux-riscv/20250912134332.22053-1-=
+fangyu.yu@linux.alibaba.com/
+> ---
+>  arch/riscv/kvm/vcpu_insn.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
 >
-> @@ -328,7 +327,6 @@ void __init kvm_riscv_gstage_mode_detect(void)
->         csr_write(CSR_HGATP, HGATP_MODE_SV48X4 << HGATP_MODE_SHIFT);
->         if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) =3D=3D HGATP_MODE_S=
-V48X4) {
->                 kvm_riscv_gstage_mode =3D HGATP_MODE_SV48X4;
-> -               kvm_riscv_gstage_pgd_levels =3D 4;
->                 goto done;
->         }
->
-> @@ -336,7 +334,6 @@ void __init kvm_riscv_gstage_mode_detect(void)
->         csr_write(CSR_HGATP, HGATP_MODE_SV39X4 << HGATP_MODE_SHIFT);
->         if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) =3D=3D HGATP_MODE_S=
-V39X4) {
->                 kvm_riscv_gstage_mode =3D HGATP_MODE_SV39X4;
-> -               kvm_riscv_gstage_pgd_levels =3D 3;
->                 goto done;
->         }
->  #else /* CONFIG_32BIT */
-> @@ -354,6 +351,10 @@ void __init kvm_riscv_gstage_mode_detect(void)
->         kvm_riscv_gstage_pgd_levels =3D 0;
->
->  done:
-> +#ifdef CONFIG_64BIT
-> +       kvm_riscv_gstage_mode =3D min(satp_mode >> SATP_MODE_SHIFT, kvm_r=
-iscv_gstage_mode);
-It's out of the no5/4lvl scope, because we lose (hs-mode)satp=3Dsv39 +
-hgatp=3Dsv48x4 combination.
-
-How about re-parsing no5/4lvl parameters?
-
-> +       kvm_riscv_gstage_pgd_levels =3D kvm_riscv_gstage_mode - HGATP_MOD=
-E_SV39X4 + 3;
-> +#endif
->         csr_write(CSR_HGATP, 0);
->         kvm_riscv_local_hfence_gvma_all();
+> diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
+> index de1f96ea6225..4d89b94128ae 100644
+> --- a/arch/riscv/kvm/vcpu_insn.c
+> +++ b/arch/riscv/kvm/vcpu_insn.c
+> @@ -298,6 +298,22 @@ static int system_opcode_insn(struct kvm_vcpu *vcpu,=
+ struct kvm_run *run,
+>         return (rc <=3D 0) ? rc : 1;
 >  }
+>
+> +static bool is_load_guest_page_fault(unsigned long scause)
+> +{
+> +       /**
+> +        * If a g-stage page fault occurs, the direct approach
+> +        * is to let the g-stage page fault handler handle it
+> +        * naturally, however, calling the g-stage page fault
+> +        * handler here seems rather strange.
+> +        * Considering this is a corner case, we can directly
+> +        * return to the guest and re-execute the same PC, this
+> +        * will trigger a g-stage page fault again and then the
+> +        * regular g-stage page fault handler will populate
+> +        * g-stage page table.
+> +        */
+> +       return (scause =3D=3D EXC_LOAD_GUEST_PAGE_FAULT);
+> +}
+> +
+>  /**
+>   * kvm_riscv_vcpu_virtual_insn -- Handle virtual instruction trap
+>   *
+> @@ -323,6 +339,8 @@ int kvm_riscv_vcpu_virtual_insn(struct kvm_vcpu *vcpu=
+, struct kvm_run *run,
+>                                                           ct->sepc,
+>                                                           &utrap);
+>                         if (utrap.scause) {
+> +                               if (is_load_guest_page_fault(utrap.scause=
+))
+> +                                       return 1;
+>                                 utrap.sepc =3D ct->sepc;
+>                                 kvm_riscv_vcpu_trap_redirect(vcpu, &utrap=
+);
+>                                 return 1;
+> @@ -378,6 +396,8 @@ int kvm_riscv_vcpu_mmio_load(struct kvm_vcpu *vcpu, s=
+truct kvm_run *run,
+>                 insn =3D kvm_riscv_vcpu_unpriv_read(vcpu, true, ct->sepc,
+>                                                   &utrap);
+>                 if (utrap.scause) {
+> +                       if (is_load_guest_page_fault(utrap.scause))
+> +                               return 1;
+>                         /* Redirect trap if we failed to read instruction=
+ */
+>                         utrap.sepc =3D ct->sepc;
+>                         kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+> @@ -504,6 +524,8 @@ int kvm_riscv_vcpu_mmio_store(struct kvm_vcpu *vcpu, =
+struct kvm_run *run,
+>                 insn =3D kvm_riscv_vcpu_unpriv_read(vcpu, true, ct->sepc,
+>                                                   &utrap);
+>                 if (utrap.scause) {
+> +                       if (is_load_guest_page_fault(utrap.scause))
+> +                               return 1;
+>                         /* Redirect trap if we failed to read instruction=
+ */
+>                         utrap.sepc =3D ct->sepc;
+>                         kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
 > --
 > 2.50.1
 >
-
-
---=20
-Best Regards
- Guo Ren
 
