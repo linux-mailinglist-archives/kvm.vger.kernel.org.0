@@ -1,369 +1,279 @@
-Return-Path: <kvm+bounces-64422-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64423-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D514C8221B
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 19:42:11 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF275C8239C
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 20:06:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 580913A5628
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 18:42:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 26EFE4E7CBC
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 19:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17BB31A7F2;
-	Mon, 24 Nov 2025 18:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902D331B839;
+	Mon, 24 Nov 2025 18:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="a42R1vyD"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Hs4wPT+8";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tpL9B7Eb"
 X-Original-To: kvm@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010037.outbound.protection.outlook.com [52.101.46.37])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1BC31985C;
-	Mon, 24 Nov 2025 18:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764009708; cv=fail; b=dxkGqKQfBK3P6u2vL13Fa6mcmVYFyTp1s3SH4wNIBxdxW/FfkALm4Jz4PT6zZ5v4KUv8uKb6rBHqur+rh8rfSM9UdoswcbuCu0T1NYCMmBq3+cNYVHqT7vgFoxmWDbNI3rGZmo3XeaBne4IZpSScsMlckflzviVneS1/UP9WwBE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764009708; c=relaxed/simple;
-	bh=gkQM27A4Y8qz4IYiNOMxYvSLwHTYoqY+2n0lsFjones=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qvTxYRYSygZ2qxwGrBY3iT4b/nqraU5qaWygZktkD9cWDcJqZA+g8wLvdPwlQ1nc83RTVob7l/cXKq7RW0m9YGaeRmvzo7WQVG58d0tMyW1VLMvSxbWCtBJm5uCPzp7DHoNg4+NoZfHG9yjsTnDIAZzS7APzrEu4NHogRTeg6YY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=a42R1vyD; arc=fail smtp.client-ip=52.101.46.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YK+4ZAwUxuNAgKXYxsQjHti6LKfeToybY7NvW90XTCBm5lfk0I6LuRYS1s0zR1MkKRDEW+HHDkJOjRYRrAbsGx7rr5x0KDsYCUdF6wTOkxfsOWBmge1ymHneckEFggFFbqiG9EkvsyAAOAWu5otP+u9MMK571dYFXKWG9ZkvLn2T+f4R4HxJjwwdB0mLoCv5lD6eUClmnu++NfpZdIJ1CCJ14n+sACkDoPzCWE1eHGX2TDYGxytdsrtbP0i/D4L/m4sKn+TSiOZ83ma4UDKRW2839xVCMgrpITEqGQOv1id4RgpbNeNMQ6OsdjJcpWTkunJU7FxbMoF6COCb4d3eRA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ez8fmjCwL4dZgcEha6EiRUqdXAgrNRlw+FxLv/UldCE=;
- b=PF2mJfV3SyeUl9s6yz4Vo/+uXKIQzYZamTRN68yBBFzLrPwpgHEHO9fuLY6x2APkKE/hsBqMiSRJcurj+jLiIxczd0RtSNimSB3EeIzd3tfI15vsNFTPeIyw2UE2RiI247cCP7unCQYFswBbVU/dEwdTGSAVjNq/LYaQm8osTNuHcHRi/q2NjEkGHpQQKOSpkYk9jJ2dnTxfEHW0TIYn0fNyy5GPW/aBzA2HtNpUZTL5pRELxjlWHRDH5WE8O1sGT/WLOFg04ZGsbI6Q/ywanELE5SloUYiK2hyASQ4vXwgTLAaH8+KcssSyWD8p3h+gkffjdm7cRxcsvuZILP6Bog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ez8fmjCwL4dZgcEha6EiRUqdXAgrNRlw+FxLv/UldCE=;
- b=a42R1vyDbMNpq/qOlDQyIOwiJ3LssgeDyujlj3KS3C/1KSqNe+aSZHpmfkcI6m7t7aVcRPVKJrOjmrwZ7hq/rjK6UBqZ8yIThpwZxe26nRxXfU537vsG7UKIIfcNgVeWHUiw+ITTIDI3V6XGaG8o3f2gO7I27ffoxyhNxcXHHXKVQ0RWEHb/P5VZNP1TArUCD4afq8RwNfXSY75LImK6OaxlGz2bdYA3FWHCbmhuaMVC2MX3ro7o4sr1gpM9bpOypuW6RG6ohuztmQfnx8780gn3hvF9BTuVu1JViDeXWoU9g9flZEl4GMcmoENTUpxVz7wcrnVLM8Sw8CVf7i7e8w==
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
- by CY8PR12MB7290.namprd12.prod.outlook.com (2603:10b6:930:55::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.17; Mon, 24 Nov
- 2025 18:41:42 +0000
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::e8c:e992:7287:cb06]) by CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::e8c:e992:7287:cb06%5]) with mapi id 15.20.9343.016; Mon, 24 Nov 2025
- 18:41:42 +0000
-From: Shameer Kolothum <skolothumtho@nvidia.com>
-To: Ankit Agrawal <ankita@nvidia.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, Yishai
- Hadas <yishaih@nvidia.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"alex@shazbot.org" <alex@shazbot.org>, Aniket Agashe <aniketa@nvidia.com>,
-	Vikram Sethi <vsethi@nvidia.com>, Matt Ochs <mochs@nvidia.com>
-CC: "Yunxiang.Li@amd.com" <Yunxiang.Li@amd.com>, "yi.l.liu@intel.com"
-	<yi.l.liu@intel.com>, "zhangdongdong@eswincomputing.com"
-	<zhangdongdong@eswincomputing.com>, Avihai Horon <avihaih@nvidia.com>,
-	"bhelgaas@google.com" <bhelgaas@google.com>, "peterx@redhat.com"
-	<peterx@redhat.com>, "pstanner@redhat.com" <pstanner@redhat.com>, Alistair
- Popple <apopple@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Neo Jia
-	<cjia@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>, "Tarun Gupta
- (SW-GPU)" <targupta@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, Dan Williams
-	<danw@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>, Krishnakant Jaju
-	<kjaju@nvidia.com>
-Subject: RE: [PATCH v5 7/7] vfio/nvgrace-gpu: wait for the GPU mem to be ready
-Thread-Topic: [PATCH v5 7/7] vfio/nvgrace-gpu: wait for the GPU mem to be
- ready
-Thread-Index: AQHcXTnUrE7WBaJrsEqvGwYscgzBc7UCKIjQ
-Date: Mon, 24 Nov 2025 18:41:42 +0000
-Message-ID:
- <CH3PR12MB7548E8A78A55D6693461EDAEABD0A@CH3PR12MB7548.namprd12.prod.outlook.com>
-References: <20251124115926.119027-1-ankita@nvidia.com>
- <20251124115926.119027-8-ankita@nvidia.com>
-In-Reply-To: <20251124115926.119027-8-ankita@nvidia.com>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH3PR12MB7548:EE_|CY8PR12MB7290:EE_
-x-ms-office365-filtering-correlation-id: 958c9c99-5cea-41f9-9f2c-08de2b891cda
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|7416014|1800799024|38070700021|7053199007;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?s2sn4kAAw1vEhVSWzc+l8kp/Rvqy5vkhmP1qy20Ifg14okyCiRGL3NCBsPS+?=
- =?us-ascii?Q?zvZ6tcrHXF29d3hUbthBSQfKBFwixh+ji3i5FppqvricdjBZPUXmLR/CEAXB?=
- =?us-ascii?Q?EZYVGR8SHU26D17DwyQxVOjlyMQ6SFsNuGTZOf9xACXah3EJwdyIGaTm3h7/?=
- =?us-ascii?Q?eX2lNFqvd4PrHzmx0kQGarM7gubgg3h33julatkDJQJP/xsfDhm1jSekCGBT?=
- =?us-ascii?Q?vN5AjfE+JjE7lpdaMZSMPxliswK0vjGaYS17MsziGc4Gokec6KaEV9fQzzxA?=
- =?us-ascii?Q?zy4+qAHjgY8cHbEuf45e9ZEqlSfgG9lxpwT/oxL+3TZoabVTwvjPkzAF3jYj?=
- =?us-ascii?Q?qXAl4GCCyINAC4Nh66u0GZUmuwvYT40w5YOppAM8CLWqtUJ7ZFpY/32sNo4r?=
- =?us-ascii?Q?/60Bq6rmF0KGWKMNRyZxzguPZVhoTSxeGHhHRbq/Ce73PX6MkifLAkC1lwCH?=
- =?us-ascii?Q?dMFFm6ffIL05DO5W61ETw9eP88BTqc6ggVVNHqKBx8Xsh4PSJtHxfLi0B1jk?=
- =?us-ascii?Q?UpfRIbM3cFzbVgU07OvkZPRp8GbFJ/mKPDZofcjQRBlzB/iQsnJUWQV3DMfK?=
- =?us-ascii?Q?l7D2X+HjA5KyMv4miCyO9DxXw2ZMdhXHW8XeQl3frLFKkG+VPwrMMmWDWpVm?=
- =?us-ascii?Q?CTvDSjOqDU8MgW7aYH3dRw3r8vwmJzB2ja7flma7ZfyVp1qk18+ty1k272KM?=
- =?us-ascii?Q?rgpbRpV3JIm16/XV1FBvidf8rCzs+rE15gMW/U9tMkW21XvzcLwCw612D1jX?=
- =?us-ascii?Q?P2Fprw0rb+LisHSflpHC4Rz63mvXjxbmZlnokBOtQRo4sUf6bvHPc3y7tW78?=
- =?us-ascii?Q?2972VotWMKY62Y0b7WYj9oBhV1/MB0cNRz8eRhzdgF2pfTreNtvSnhA12hpm?=
- =?us-ascii?Q?zU/3iqGg18Jtt2rdp2JW23VnrUgpvHvCnm96KrA2a2YGLLBqniOeKev11dE0?=
- =?us-ascii?Q?khgCh1ADLClhQoo3MCIa8arnBJUwW1SCRfDbi9/xxi0U1mDDV4Rt9cugB3eL?=
- =?us-ascii?Q?kjMImMgDBvMdhe7g03ulhVRBxoc53nu6AkKxikf3+SuanapUhQPZ2JLimH+i?=
- =?us-ascii?Q?1K/3SnrksH+p0BUxrahAHUfHvR+oNChgpvkYqW5AMxnTyN9W+oGOgg8Cm1Ow?=
- =?us-ascii?Q?QlAP7ysAFm9DDv1TZYyDiAwGaWlzlJl3I0WJxIkdyVsRbqrpW8rvxbj08KTx?=
- =?us-ascii?Q?pvsxD8a/C58raFToCNmxlscrBn/ns9rI40gSTk4f6DiLLEB6fZgMPfwKIyz8?=
- =?us-ascii?Q?z9ScQT9hLsM/Dfa8zUBFxYKEG9hbltmynCK0Pvc8ahSFeTJQA6cOlgeeQFt0?=
- =?us-ascii?Q?L+G5/yigXGMFW6c1ZlOMzVLcM292L3k08NViYOGglMLYM07VFoDfhBLW7kfu?=
- =?us-ascii?Q?MxqM5cPjnhqH1Mh9YQH1htIwuT7MnP1YGJZyq7mkhfK2e9hZxVFglLqRnaym?=
- =?us-ascii?Q?F6TN2xrUIn0rHnxzF0mwLoYpXLPqcBmDv7FniRvBW9SOUxB2BoeDmWtzhu4Y?=
- =?us-ascii?Q?5f/q96zBo0s3H9slF0BX41HDRcs6Muep4rGz?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(38070700021)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?HhZkj5ouJEVuLN5dz5i128ONzkJnqJteMfJfx3achH0UqLWbQhJN3mzIEU1a?=
- =?us-ascii?Q?1qsImPURfzO167mikhpMPwV3MBxsQ00mh4ylfXpPSJ+mr61m9RJ6/J3oYlLs?=
- =?us-ascii?Q?Mx9X7N7ujllbHhE+GNF/4Z3y5ijHQhdG3TmFTjPWZPVHl7iAXunqWwvu1l6g?=
- =?us-ascii?Q?XsSML8J9DfqIH11sv+MqAIUgay+amOnJLNfUDnvl+THhpN5uW7XpierUTp+N?=
- =?us-ascii?Q?rD3DW210QV1/l8wZjpPwFDZFUxM8/dgA0yzScYUAZYuT/XVx9/keHLm2to2s?=
- =?us-ascii?Q?wheAzCscquqMm/BN26c3FpnNDlRf7QrpJMsQDkTFcE4F392iWcNoZd41NCRk?=
- =?us-ascii?Q?JWVbgp2sS8X3OVuinmFaQWnAfhGPYGT4iuYfhXFTtND5kCxmWi3Trfjs0GBB?=
- =?us-ascii?Q?mAIQynIZMXxKZ2yJ1I8fdUNLReyXcc5Rv8AzfyHZNmSVs0gHHKAbKXf7c8T/?=
- =?us-ascii?Q?dk9slK1GBKLG5Y/hFgIAonyuzt62uP2fAafi2c/u4Ejc8h8vp4KzQDT4kquz?=
- =?us-ascii?Q?gwIk817NEV5YnkS6WQBBBeP3Hy/HhsEFREjOAn2Ka9Wi5bh4/XMLO70nJHjv?=
- =?us-ascii?Q?DXrhPUyhEGCPgERfax/eaNpZxbstpWmy4kbs2iXB4QyZ8BRLHC9pW3Je5oA7?=
- =?us-ascii?Q?aln7YfAjoIEHEV6N0/u7U8BxGwS6Og4j1M9enRDEsSZN6vWMvLCFB26rLYmh?=
- =?us-ascii?Q?CSx9S3cDy8wVGOd1tZ1j+OWwN1tXO2rM7HAKLH2tmUc6yUyH5ChdMhSnv2E+?=
- =?us-ascii?Q?6jHwZEFwkUfARFbmDv9N2FIldQcZDpFVBkvlNsc/6i45THObfJQ/snmtSsmF?=
- =?us-ascii?Q?72d085NrYIB1nwavqlxNvugy0KFI+J76zKtndRPx6gENTFi2INwdkbrBdsyh?=
- =?us-ascii?Q?mCoVEIFw/M9ueKLSW1XgOIITXmOR4CiLw53453tlKulaHiwUy93BdRjcCCLK?=
- =?us-ascii?Q?IxmFUbhqecBIsqCTcYXJ+kX1O6cJl8szbtpcDrF6+Rz44vykY0+/76YKfEoW?=
- =?us-ascii?Q?IRtj9ZMFNbxj3s1zxRckeknEt+ROPZFXesazOTWyZkHKZnLVGMSespHMtIRE?=
- =?us-ascii?Q?zhg+b3UpBSJ9QRJ8BRJwEuX0bvJOBreiQN4PJcR2qR86T4aARuDvXIXJYJC8?=
- =?us-ascii?Q?cuOvfUkGFuh21BsRnIdo5CvR9cYIzGxCp/mocbXPje4mYXb5yomXyWJNoAjD?=
- =?us-ascii?Q?2NImm46cz4zBbm7pbvZP/0qCXWm1YDuyO/NO9JPE3ZIJuqRBFpxlO6mALA4R?=
- =?us-ascii?Q?uJj4z2zSTGWjZHU+8L3xrjOdFpYGQ7pV7NC3BXQLtBwCWc1vNfvddJqwHAjv?=
- =?us-ascii?Q?gpwoMrHfiZY4jgFQiI4S4Xe4YKdLDKdy508ulY38kpNCY69p2kbn0xWMI3Zv?=
- =?us-ascii?Q?C3PWF7U3uAZI24GGYrWT6jzhNdjWQluHx65xHZdtVZqWxA0Cjn0fm15DmWBM?=
- =?us-ascii?Q?bWDWkCLl5szF1ruLNT92QLAwmR9ZgGW4JOavXTwUVaFb21UhPNnwZpHZoibo?=
- =?us-ascii?Q?a5RBdBwwk7b9MOybn8FoPS4kTc6hLKOkgtzkGZXLSucjVa7agOcB9oRAmOiH?=
- =?us-ascii?Q?dsSZl1T5RAGlWqprUpk6BbAzv6702a26G88Kuy/T?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A6631AF3C;
+	Mon, 24 Nov 2025 18:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764010781; cv=none; b=meKMoQxFCMfRwLAMQfKQBh6Bl7S6h3Qau+j7CsxN6eIYLVe1oQ7sNrQVCluUyqMBoVmAB0KNG7yX05RYpPWPiStCx6mV0m9LuuLwD0W45FpgU9i0xBIrj9wMTtZa40UCy9yPkRIX/r9s0AdhFDq0d2LN06Ziz+N5QfGBBC1RX0g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764010781; c=relaxed/simple;
+	bh=WEirBTyw4QbPluwuZC94Anu1P7dJ2zFHBBU/zRjsaDg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=iTXpltP8a6b37Gvcvb/eTdiwG8+MX+f9C9TEUVK9s+LQg1ZVZpyoHT7In5Ki0lcsEZ1bBT8F6vAEZuDDDIyZhjWpCUNenwXbVSlssLcG2Nhv7JyK9VAypJQttEdMsTfVCDaVgxvKfYqWEnxYKXNNMSVsgXoGbmaCmLMLBipy5Z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Hs4wPT+8; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tpL9B7Eb; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1764010776;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3TGm1jTazKtXhqpWzoFCV87Q4ifbrKjw41CVyfgN0DI=;
+	b=Hs4wPT+80CjAslhYclKPkoH9EHovlefF/rZ+AxQmaOcjvxpRq/hPa61MElvKCsBqP8bO8e
+	x1qTnLK8n+IaT+j7YwvFYprbIKN9lDZkEeGEUu5i+eEXYrv2lNw0SyfrK4OI74qswA+JKk
+	15UIvH6KFgFokUBWrGsnzQpGdtvhDae6iBVyBHK9p4p6wzQ56SIeOIKn0P4YgBiPeFLy4h
+	uUi81KRUGov4cT6520B2K/z9/0cIYoi3Vs+L/Dqh1KwxovkKdjv7VRdSnqOvFfYMSmK6qZ
+	aDJCOqVl1Z3PsaILCdMTvJBa3RHkl/W6cdvWLJvCQ8GyTaSZ/GNn+tKUYIKN7A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1764010776;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3TGm1jTazKtXhqpWzoFCV87Q4ifbrKjw41CVyfgN0DI=;
+	b=tpL9B7EbZJwFfWk1resOwaK5udnuh2bPYcw3P8s+MfW+nGB6ZB8dBzEMumsWAw7J36nz9l
+	tfKNR3TGgFzWFGDg==
+To: Luigi Rizzo <lrizzo@google.com>, jacob.jun.pan@linux.intel.com,
+ lrizzo@google.com, rizzo.unipi@gmail.com, seanjc@google.com
+Cc: a.manzanares@samsung.com, acme@kernel.org, axboe@kernel.dk,
+ baolu.lu@linux.intel.com, bp@alien8.de, dan.j.williams@intel.com,
+ dave.hansen@intel.com, guang.zeng@intel.com, helgaas@kernel.org,
+ hpa@zytor.com, iommu@lists.linux.dev, jim.harris@samsung.com,
+ joro@8bytes.org, kevin.tian@intel.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, maz@kernel.org, mingo@redhat.com,
+ oliver.sang@intel.com, paul.e.luse@intel.com, peterz@infradead.org,
+ robert.hoo.linux@gmail.com, robin.murphy@arm.com, x86@kernel.org
+Subject: Re: [PATCH v3  00/12] Coalesced Interrupt Delivery with posted MSI
+In-Reply-To: <20251124104836.3685533-1-lrizzo@google.com>
+References: <20240423174114.526704-1-jacob.jun.pan@linux.intel.com>
+ <20251124104836.3685533-1-lrizzo@google.com>
+Date: Mon, 24 Nov 2025 19:59:35 +0100
+Message-ID: <87a50bi7e0.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 958c9c99-5cea-41f9-9f2c-08de2b891cda
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Nov 2025 18:41:42.7232
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Qv3LJyZXHIc2DzC52t3Rwd4ypiFp3EC6rz+4rRNGocyrY3nRo0SMpNVPyfuEC9AFK+D6R6NJ64LQXiao8px79w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7290
+Content-Type: text/plain
 
+On Mon, Nov 24 2025 at 10:48, Luigi Rizzo wrote:
+> I think there is an inherent race condition when intremap=posted_msi
+> and the IRQ subsystem resends pending interrupts via __apic_send_IPI().
+>
+> In detail:
+> intremap=posted_msi does not process vectors for which the
+> corresponding bit in the PIR register is set.
+>
+> Now say that, for whatever reason, the IRQ infrastructure intercepts
+> an interrupt marking it as PENDING. . handle_edge_irq() and many other
+> places in kernel/irq have sections of code like this:
+>
+>     if (!irq_may_run(desc)) {
+>         desc->istate |= IRQS_PENDING;
+> 	mask_ack_irq(desc);
+> 	goto out_unlock;
+>     }
+>
+> Then eventually check_irq_resend() will try to resend pending interrupts
+>
+>     desc->istate &= ~IRQS_PENDING;
+>     if (!try_retrigger(desc))
+>         err = irq_sw_resend(desc);
+>
+> try_retrigger() on x86 eventually calls apic_retrigger_irq() which
+> uses __apic_send_IPI(). Unfortunately the latter does not seem to
+> set the 'vector' bit in the PIR (nor sends the POSTED_MSI interrupt)
+> thus potentially causing a lost interrupt unless there is some other
+> spontaneous interrupt coming from the device.
 
+It sends an IPI to the actual vector, which invokes the handler
+directly. That works only once because the remap interrupt chip does not
+issue an EOI, so the vector becomes stale.... Clearly nobody ever tested
+that code.
 
-> -----Original Message-----
-> From: Ankit Agrawal <ankita@nvidia.com>
-> Sent: 24 November 2025 11:59
-> To: Ankit Agrawal <ankita@nvidia.com>; jgg@ziepe.ca; Yishai Hadas
-> <yishaih@nvidia.com>; Shameer Kolothum <skolothumtho@nvidia.com>;
-> kevin.tian@intel.com; alex@shazbot.org; Aniket Agashe
-> <aniketa@nvidia.com>; Vikram Sethi <vsethi@nvidia.com>; Matt Ochs
-> <mochs@nvidia.com>
-> Cc: Yunxiang.Li@amd.com; yi.l.liu@intel.com;
-> zhangdongdong@eswincomputing.com; Avihai Horon <avihaih@nvidia.com>;
-> bhelgaas@google.com; peterx@redhat.com; pstanner@redhat.com; Alistair
-> Popple <apopple@nvidia.com>; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; Neo Jia <cjia@nvidia.com>; Kirti Wankhede
-> <kwankhede@nvidia.com>; Tarun Gupta (SW-GPU) <targupta@nvidia.com>;
-> Zhi Wang <zhiw@nvidia.com>; Dan Williams <danw@nvidia.com>; Dheeraj
-> Nigam <dnigam@nvidia.com>; Krishnakant Jaju <kjaju@nvidia.com>
-> Subject: [PATCH v5 7/7] vfio/nvgrace-gpu: wait for the GPU mem to be read=
-y
->=20
-> From: Ankit Agrawal <ankita@nvidia.com>
->=20
-> Speculative prefetches from CPU to GPU memory until the GPU is
-> ready after reset can cause harmless corrected RAS events to
-> be logged on Grace systems. It is thus preferred that the
-> mapping not be re-established until the GPU is ready post reset.
->=20
-> The GPU readiness can be checked through BAR0 registers similar
-> to the checking at the time of device probe.
->=20
-> It can take several seconds for the GPU to be ready. So it is
-> desirable that the time overlaps as much of the VM startup as
-> possible to reduce impact on the VM bootup time. The GPU
-> readiness state is thus checked on the first fault/huge_fault
-> request or read/write access which amortizes the GPU readiness
-> time.
->=20
-> The first fault and read/write checks the GPU state when the
-> reset_done flag - which denotes whether the GPU has just been
-> reset. The memory_lock is taken across map/access to avoid
-> races with GPU reset.
->=20
-> cc: Alex Williamson <alex@shazbot.org>
-> cc: Jason Gunthorpe <jgg@ziepe.ca>
-> cc: Vikram Sethi <vsethi@nvidia.com>
-> Suggested-by: Alex Williamson <alex@shazbot.org>
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> ---
->  drivers/vfio/pci/nvgrace-gpu/main.c | 79 ++++++++++++++++++++++++++-
-> --
->  1 file changed, 72 insertions(+), 7 deletions(-)
->=20
-> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgra=
-ce-
-> gpu/main.c
-> index bef9f25bf8f3..fbc19fe688ca 100644
-> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
-> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-> @@ -104,6 +104,17 @@ static int nvgrace_gpu_open_device(struct
-> vfio_device *core_vdev)
->  		mutex_init(&nvdev->remap_lock);
->  	}
->=20
-> +	/*
-> +	 * GPU readiness is checked by reading the BAR0 registers.
-> +	 *
-> +	 * ioremap BAR0 to ensure that the BAR0 mapping is present before
-> +	 * register reads on first fault before establishing any GPU
-> +	 * memory mapping.
-> +	 */
-> +	ret =3D vfio_pci_core_setup_barmap(vdev, 0);
-> +	if (ret)
-> +		return ret;
-> +
->  	vfio_pci_core_finish_enable(vdev);
->=20
->  	return 0;
-> @@ -150,6 +161,26 @@ static int nvgrace_gpu_wait_device_ready(void
-> __iomem *io)
->  	return ret;
->  }
->=20
-> +static int
-> +nvgrace_gpu_check_device_ready(struct nvgrace_gpu_pci_core_device
-> *nvdev)
-> +{
-> +	struct vfio_pci_core_device *vdev =3D &nvdev->core_device;
-> +	int ret;
-> +
-> +	lockdep_assert_held_read(&vdev->memory_lock);
-> +
-> +	if (!nvdev->reset_done)
-> +		return 0;
-> +
-> +	ret =3D nvgrace_gpu_wait_device_ready(vdev->barmap[0]);
-> +	if (ret)
-> +		return ret;
-> +
-> +	nvdev->reset_done =3D false;
-> +
-> +	return 0;
-> +}
-> +
->  static vm_fault_t nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
->  						  unsigned int order)
+> I could verify the stall (forcing the path that sets IRQS_PENDING),
+> and could verify that the patch below fixes the problem
+
+You can do the same with
+
+    echo trigger > /sys/kernel/debug/irq/irqs/$IRQNR
+
+>  static int apic_retrigger_irq(struct irq_data *irqd)
 >  {
-> @@ -173,8 +204,18 @@ static vm_fault_t
-> nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
->  		      pfn & ((1 << order) - 1)))
->  		return VM_FAULT_FALLBACK;
->=20
-> -	scoped_guard(rwsem_read, &nvdev->core_device.memory_lock)
-> +	scoped_guard(rwsem_read, &nvdev->core_device.memory_lock) {
-> +		/*
-> +		 * If the GPU memory is accessed by the CPU while the GPU is
-> +		 * not ready after reset, it can cause harmless corrected RAS
-> +		 * events to be logged. Make sure the GPU is ready before
-> +		 * establishing the mappings.
-> +		 */
-> +		if (nvgrace_gpu_check_device_ready(nvdev))
-> +			return ret;
-> +
->  		ret =3D vfio_pci_vmf_insert_pfn(vmf, pfn, order);
-> +	}
->=20
->  	return ret;
->  }
-> @@ -593,9 +634,21 @@ nvgrace_gpu_read_mem(struct
-> nvgrace_gpu_pci_core_device *nvdev,
->  	else
->  		mem_count =3D min(count, memregion->memlength -
-> (size_t)offset);
->=20
-> -	ret =3D nvgrace_gpu_map_and_read(nvdev, buf, mem_count, ppos);
-> -	if (ret)
-> -		return ret;
-> +	scoped_guard(rwsem_read, &nvdev->core_device.memory_lock) {
-> +		/*
-> +		 * If the GPU memory is accessed by the CPU while the GPU is
-> +		 * not ready after reset, it can cause harmless corrected RAS
-> +		 * events to be logged. Make sure the GPU is ready before
-> +		 * establishing the mappings.
-> +		 */
-> +		ret =3D nvgrace_gpu_check_device_ready(nvdev);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret =3D nvgrace_gpu_map_and_read(nvdev, buf, mem_count,
-> ppos);
-> +		if (ret)
-> +			return ret;
-> +	}
->=20
->  	/*
->  	 * Only the device memory present on the hardware is mapped, which
-> may
-> @@ -713,9 +766,21 @@ nvgrace_gpu_write_mem(struct
-> nvgrace_gpu_pci_core_device *nvdev,
->  	 */
->  	mem_count =3D min(count, memregion->memlength - (size_t)offset);
->=20
-> -	ret =3D nvgrace_gpu_map_and_write(nvdev, buf, mem_count, ppos);
-> -	if (ret)
-> -		return ret;
-> +	scoped_guard(rwsem_read, &nvdev->core_device.memory_lock) {
-> +		/*
-> +		 * If the GPU memory is accessed by the CPU while the GPU is
-> +		 * not ready after reset, it can cause harmless corrected RAS
-> +		 * events to be logged. Make sure the GPU is ready before
-> +		 * establishing the mappings.
-> +		 */
+>         struct apic_chip_data *apicd = apic_chip_data(irqd);
+>         unsigned long flags;
+> +       uint vec;
+>
+>         raw_spin_lock_irqsave(&vector_lock, flags);
+> +       vec = apicd->vector;
+> +       if (posted_msi_supported() &&
+> +           vec >= FIRST_EXTERNAL_VECTOR && vec < FIRST_SYSTEM_VECTOR) {
+> +               struct pi_desc *pid = per_cpu_ptr(&posted_msi_pi_desc, apicd->cpu);
 
-The comment above is now repeated 3 times. Good to consolidate and add=20
-that comment above nvgrace_gpu_check_device_ready().
+Won't build with CONFIG_X86_POSTED_MSI=n
+
+> +               set_bit(vec, (unsigned long *)pid->pir64);
+> +               __apic_send_IPI(apicd->cpu, POSTED_MSI_NOTIFICATION_VECTOR);
+
+That's wrong as it affects all interrupts and not just the MSI ones
+which are going through the posted vector. As the interrupt chip of
+those other ones is different, that retriggered handler would issue two
+EOIs, which is not what we want.
+
+That's what the interrupt hierarchy is for.
+
+While that _is_ solvable, there is another issue which is not solvable
+by that at all.
+
+If there is ever a stray interrupt on such a vector, then the related
+APIC ISR bit becomes stale due to the lack of EOI, which means all
+vectors below that vector are never serviced again. Unlikely to happen,
+but if it happens it's not debuggable at all.
+
+So instead of playing games with the PIR, this can be actually solved
+for both cases. See below.
 
 Thanks,
-Shameer
 
-> +		ret =3D nvgrace_gpu_check_device_ready(nvdev);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret =3D nvgrace_gpu_map_and_write(nvdev, buf, mem_count,
-> ppos);
-> +		if (ret)
-> +			return ret;
-> +	}
->=20
->  exitfn:
->  	*ppos +=3D count;
-> --
-> 2.34.1
+        tglx
+---
+ arch/x86/include/asm/irq_remapping.h |    7 +++++++
+ arch/x86/kernel/irq.c                |   28 +++++++++++++++++++++++-----
+ drivers/iommu/intel/irq_remapping.c  |    8 ++++----
+ 3 files changed, 34 insertions(+), 9 deletions(-)
+
+--- a/arch/x86/include/asm/irq_remapping.h
++++ b/arch/x86/include/asm/irq_remapping.h
+@@ -87,4 +87,11 @@ static inline void panic_if_irq_remap(co
+ }
+ 
+ #endif /* CONFIG_IRQ_REMAP */
++
++#ifdef CONFIG_X86_POSTED_MSI
++void intel_ack_posted_msi_irq(struct irq_data *irqd);
++#else
++#define intel_ack_posted_msi_irq(irqd)	irq_move_irq(irdq)
++#endif
++
+ #endif /* __X86_IRQ_REMAPPING_H */
+--- a/arch/x86/kernel/irq.c
++++ b/arch/x86/kernel/irq.c
+@@ -396,6 +396,7 @@ DEFINE_IDTENTRY_SYSVEC_SIMPLE(sysvec_kvm
+ 
+ /* Posted Interrupt Descriptors for coalesced MSIs to be posted */
+ DEFINE_PER_CPU_ALIGNED(struct pi_desc, posted_msi_pi_desc);
++static DEFINE_PER_CPU_CACHE_HOT(bool, posted_msi_handler_active);
+ 
+ void intel_posted_msi_init(void)
+ {
+@@ -413,6 +414,24 @@ void intel_posted_msi_init(void)
+ 	this_cpu_write(posted_msi_pi_desc.ndst, destination);
+ }
+ 
++void intel_ack_posted_msi_irq(struct irq_data *irqd)
++{
++	irq_move_irq(irqd);
++	/*
++	 * Handle the rare case that irq_retrigger() raised the actual
++	 * assigned vector on the target CPU, which means that it was not
++	 * invoked via the posted MSI handler below. In that case APIC EOI
++	 * is required as otherwise the ISR entry becomes stale and lower
++	 * priority interrupts are never going to be delivered after that.
++	 *
++	 * If the posted handler invoked the device interrupt handler then
++	 * the EOI would be premature because it would acknowledge the
++	 * posted vector.
++	 */
++	if (unlikely(!this_cpu_read(posted_msi_handler_active)))
++		apic_eoi();
++}
++
+ static __always_inline bool handle_pending_pir(unsigned long *pir, struct pt_regs *regs)
+ {
+ 	unsigned long pir_copy[NR_PIR_WORDS];
+@@ -439,12 +458,10 @@ static __always_inline bool handle_pendi
+  */
+ DEFINE_IDTENTRY_SYSVEC(sysvec_posted_msi_notification)
+ {
++	struct pi_desc *pid = this_cpu_ptr(&posted_msi_pi_desc);
+ 	struct pt_regs *old_regs = set_irq_regs(regs);
+-	struct pi_desc *pid;
+-	int i = 0;
+-
+-	pid = this_cpu_ptr(&posted_msi_pi_desc);
+ 
++	this_cpu_write(posted_msi_handler_active, true);
+ 	inc_irq_stat(posted_msi_notification_count);
+ 	irq_enter();
+ 
+@@ -453,7 +470,7 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_posted_msi
+ 	 * after clearing the outstanding notification bit. Hence, at most
+ 	 * MAX_POSTED_MSI_COALESCING_LOOP - 1 loops are executed here.
+ 	 */
+-	while (++i < MAX_POSTED_MSI_COALESCING_LOOP) {
++	for (int i = 1; i < MAX_POSTED_MSI_COALESCING_LOOP; i++) {
+ 		if (!handle_pending_pir(pid->pir, regs))
+ 			break;
+ 	}
+@@ -473,6 +490,7 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_posted_msi
+ 
+ 	apic_eoi();
+ 	irq_exit();
++	this_cpu_write(posted_msi_handler_active, false);
+ 	set_irq_regs(old_regs);
+ }
+ #endif /* X86_POSTED_MSI */
+--- a/drivers/iommu/intel/irq_remapping.c
++++ b/drivers/iommu/intel/irq_remapping.c
+@@ -1303,17 +1303,17 @@ static struct irq_chip intel_ir_chip = {
+  *	irq_enter();
+  *		handle_edge_irq()
+  *			irq_chip_ack_parent()
+- *				irq_move_irq(); // No EOI
++ *				intel_ack_posted_msi_irq(); // No EOI
+  *			handle_irq_event()
+  *				driver_handler()
+  *		handle_edge_irq()
+  *			irq_chip_ack_parent()
+- *				irq_move_irq(); // No EOI
++ *				intel_ack_posted_msi_irq(); // No EOI
+  *			handle_irq_event()
+  *				driver_handler()
+  *		handle_edge_irq()
+  *			irq_chip_ack_parent()
+- *				irq_move_irq(); // No EOI
++ *				intel_ack_posted_msi_irq(); // No EOI
+  *			handle_irq_event()
+  *				driver_handler()
+  *	apic_eoi()
+@@ -1322,7 +1322,7 @@ static struct irq_chip intel_ir_chip = {
+  */
+ static struct irq_chip intel_ir_chip_post_msi = {
+ 	.name			= "INTEL-IR-POST",
+-	.irq_ack		= irq_move_irq,
++	.irq_ack		= intel_ack_posted_msi_irq,
+ 	.irq_set_affinity	= intel_ir_set_affinity,
+ 	.irq_compose_msi_msg	= intel_ir_compose_msi_msg,
+ 	.irq_set_vcpu_affinity	= intel_ir_set_vcpu_affinity,
 
 
