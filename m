@@ -1,215 +1,100 @@
-Return-Path: <kvm+bounces-64400-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64401-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 518B1C815CB
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 16:34:00 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 291BEC8161F
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 16:37:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83E2F3A85E5
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 15:33:12 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 06373347AEF
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 15:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5255A3148A1;
-	Mon, 24 Nov 2025 15:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23727313E0D;
+	Mon, 24 Nov 2025 15:35:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="SbobbR1h";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="DBmy7H6J"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Vx9KEDft"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E8631352B;
-	Mon, 24 Nov 2025 15:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19975313E09
+	for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 15:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763998376; cv=none; b=X73gmK2EQjbu3gmmOHC3O9FeCX4TuwfLinhNTf1UGONsem54PaG98MYdTQB8e3G9ZdnewbWEm56P0i5SaKY3oAiDJXAXPAga0OyO7DDiqLNvYUgxYLUYW1eHe1QLVEG3ITrBlaQlCb15TrBORsgTOmUtW0XqJNhjgDWPl966/BY=
+	t=1763998543; cv=none; b=p+Th0icyJqgVCwEMcL2WH6+MHYj0TSso0iSzXNRo7aERCTWipMygZJ2mZqpiLQ61BaTVVd7LOR+tIY8O6wTtlisU3SIF7mew6cVkcRDD9api+Z7cxlV2seIHlfAuqUw0mj5WadJbw1F8eOcLS9YtU6w7LC0LnNEf19s3Y8UpDms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763998376; c=relaxed/simple;
-	bh=BSglOdI7ioZXdTTguFqJZ9AXXCnJx9130r2bz+Cfw3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lOs/KyJ0LMcp6sXIY/3IvQ9ucxrY9HjMUctGuBItdoY5NiVfHOTW0vGu6Ua6ozmN2rkytiWK5Wal2MY+im/dPyCUl4MUW7Q8RLu6h/Ie3/CyWzBzl2bUTjE1S0l+2HLKwsplVmrSK5/szTsg+xYfiKWXdaZLtP+BeCqSCDiK/Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=SbobbR1h; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=DBmy7H6J; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfout.phl.internal (Postfix) with ESMTP id 29CF5EC01C1;
-	Mon, 24 Nov 2025 10:32:53 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Mon, 24 Nov 2025 10:32:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1763998373;
-	 x=1764084773; bh=C4HQ3+7K4aq3+WLTK1rbndO5aMEdJcd+K3gbZvEczuk=; b=
-	SbobbR1heygrd85YMmqGHK0ofQZtMsALxwK0avayXHL2Ypvbz5owc9wpcP5v53S8
-	+E0dK1DXeaq++NhuWg1p5WwIq4/O3gPgy7eK4K7DBU90aqf50iVfSBYTzwV6V0Z8
-	b8C+dLuuSPVvi9UX8TU9O7qpPnM6a6ljsL36vEECIJdZ8XIRUM1zftU06fWqwSvD
-	HMInFfIFk9iEGy1/NAGxQw8cXxTi26g61aalPoATtubcg2S5CmDS5eRVL+tQ9k/t
-	6oIRstFyngCwGnzQUN/7YK/7ssMcO0r6mn7kc4fsqlqbvCQEJOv3dhVl+Xjy0maJ
-	lADc5NyGfRyvZZ1BNOR+jA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763998373; x=
-	1764084773; bh=C4HQ3+7K4aq3+WLTK1rbndO5aMEdJcd+K3gbZvEczuk=; b=D
-	Bmy7H6JRkeO6nacTPYsiQJxtVNBm0mE1UrUd9+3QwdrzqL9Y06zL8TcegHDlFjZV
-	RiAMeH0RsTI+WgA0153kNEyh6lOrMRJ72JnXSGyaC9qqpcIf+VAQuhEuj3SaBYgu
-	QzKdXSRVC7SG3dVg/knEgjKlQ44ZcGopgdJ45aioOFVNXkqqnozSc6J7muxF5tS9
-	OkBu5m7anRo/qnGR0qJHJnnqdQzuAqTmpvHgylPgfFBMO9SopL+aTts6/MGwl2YD
-	eT+oFAmvYS8xYyNQCBwQmaonHTRHI16BCM3s22bWdU41HjYrVfTLPY8H2ajKJNXB
-	vq4Jw2h/aBxfUJsfjiNdA==
-X-ME-Sender: <xms:pHokaWzp0MKPGpBV_7s0k26lp1Oz7jQ0prCIXdX9fytWKGnf5dS8QQ>
-    <xme:pHokaae9Akv68YDRmM6Qs7qmHyzq4fb0OiXjiFM_L-mINeZYtQYiX_YVlkr7j2YTe
-    XGgBeCoEJGR2Wui9THcQ_FrZ7NlIs9RK7ODQ023lRE25rShbpgy>
-X-ME-Received: <xmr:pHokafrbyw1AHi1WdQ2uV671p0pm8YdmBGzPhuxzKK5khVylWZ66-rt3>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvfeekleejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhggtgfgsehtjeertd
-    dttddvnecuhfhrohhmpeetlhgvgicuhghilhhlihgrmhhsohhnuceorghlvgigsehshhgr
-    iigsohhtrdhorhhgqeenucggtffrrghtthgvrhhnpeetteduleegkeeigedugeeluedvff
-    egheeliedvtdefkedtkeekheffhedutefhhfenucevlhhushhtvghrufhiiigvpedtnecu
-    rfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgspg
-    hrtghpthhtohepvdehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhkihht
-    rgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtg
-    hpthhtohephihishhhrghihhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepshhkohhl
-    ohhthhhumhhthhhosehnvhhiughirgdrtghomhdprhgtphhtthhopehkvghvihhnrdhtih
-    grnhesihhnthgvlhdrtghomhdprhgtphhtthhopegrnhhikhgvthgrsehnvhhiughirgdr
-    tghomhdprhgtphhtthhopehvshgvthhhihesnhhvihguihgrrdgtohhmpdhrtghpthhtoh
-    epmhhotghhshesnhhvihguihgrrdgtohhmpdhrtghpthhtohephihunhigihgrnhhgrdhl
-    ihesrghmugdrtghomh
-X-ME-Proxy: <xmx:pHokaaNr2O2JX6EWLaGx-kiZgDwUZBRm6GqqUi0aJ3apTcbJQBDAcA>
-    <xmx:pHokaVF1wKKB0IezZtyTvV15aA-ZlTE4ni6YPDObIClReg0jdngnbg>
-    <xmx:pHokadEFT8KnqIGLd7i1UeX85u3zDgJs6CBC-retmXGS0Z_HEMU3Dg>
-    <xmx:pHokaUDb5-g8iS8onjjt0Q6O5BV0BJt5hloBqxiHl1YWE5QQ8zEeOA>
-    <xmx:pXokaXnuZZVSdHb4PusKzXzrXTVc4z3uPUiJcRc4yf0dMqaYIZAP2JCB>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 24 Nov 2025 10:32:51 -0500 (EST)
-Date: Mon, 24 Nov 2025 08:32:49 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: <ankita@nvidia.com>
-Cc: <jgg@ziepe.ca>, <yishaih@nvidia.com>, <skolothumtho@nvidia.com>,
- <kevin.tian@intel.com>, <aniketa@nvidia.com>, <vsethi@nvidia.com>,
- <mochs@nvidia.com>, <Yunxiang.Li@amd.com>, <yi.l.liu@intel.com>,
- <zhangdongdong@eswincomputing.com>, <avihaih@nvidia.com>,
- <bhelgaas@google.com>, <peterx@redhat.com>, <pstanner@redhat.com>,
- <apopple@nvidia.com>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
- <targupta@nvidia.com>, <zhiw@nvidia.com>, <danw@nvidia.com>,
- <dnigam@nvidia.com>, <kjaju@nvidia.com>
-Subject: Re: [PATCH v5 5/7] vfio/nvgrace-gpu: split the code to wait for GPU
- ready
-Message-ID: <20251124083249.3316c6e9.alex@shazbot.org>
-In-Reply-To: <20251124115926.119027-6-ankita@nvidia.com>
-References: <20251124115926.119027-1-ankita@nvidia.com>
-	<20251124115926.119027-6-ankita@nvidia.com>
+	s=arc-20240116; t=1763998543; c=relaxed/simple;
+	bh=al4eSjw/jI9il5wEglA56a9A0jFC0QJmmy+5kJAx530=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JQz8uvFe/12QtR1uGnFIQQere1Lh1WVL0zGLojA6IZZKvLmzcDbL5NciFIbVeZz256MRtwpU1T3b/SNSCNiWQBXI8M/674/5fO6oYqSaxegj34AnBjtFJ2hUL8x3u6CuwO5KQPHGYt69xbxXCKqleKxI0F6/4rkQzjGll1AM/0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Vx9KEDft; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 24 Nov 2025 15:35:17 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763998525;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IWNL+oSvfsRrb2gPobgyncDEgpV54naej9ZTd6hjTNc=;
+	b=Vx9KEDfteQ8ItS14HJbc0klt8KcEx3zfKgzq5eK0jAEEYLYx5ECRwv4ZDDNSUMRwQHlUks
+	rIBw2zx+N5l2RaXvQKKxJJgRUcLg23qRv3cylUgxnVxPQ6wwhf5u2k+qPuhhOLziLoVX6Q
+	dbfT2R7eKXrOdCR9nMJP7AeS01EBliE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ken Hofsass <hofsass@google.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: x86: Add CR3 to guest debug info
+Message-ID: <klvglwa5uxl3xfsmrgvbz7f36nchj57h4jszleabrggayztf53@o3t5g2pau6o2>
+References: <20251121193204.952988-1-yosry.ahmed@linux.dev>
+ <20251121193204.952988-2-yosry.ahmed@linux.dev>
+ <aSDTNDUPyu6LwvhW@google.com>
+ <ycaddg27z4z6xsclzklheriy2cr63v6senv7qxh37kvpb7envs@br7durjgj2ux>
+ <aSRvguLx26AQB25W@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aSRvguLx26AQB25W@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 24 Nov 2025 11:59:24 +0000
-<ankita@nvidia.com> wrote:
-
-> From: Ankit Agrawal <ankita@nvidia.com>
+On Mon, Nov 24, 2025 at 06:45:22AM -0800, Sean Christopherson wrote:
+> On Fri, Nov 21, 2025, Yosry Ahmed wrote:
+> > On Fri, Nov 21, 2025 at 01:01:40PM -0800, Sean Christopherson wrote:
+> > > On Fri, Nov 21, 2025, Yosry Ahmed wrote:
+> > > KVM already provides kvm_run.kvm_valid_regs to let userspace grab register state
+> > > on exit to userspace.  If userspace is debugging, why not simply save all regs on
+> > > exit?
+> > > 
+> > > If the answer is "because it slows down all other exits", then I would much rather
+> > > give userspace the ability to conditionally save registers based on the exit reason,
+> > > e.g. something like this (completely untested, no CAP, etc.)
+> > 
+> > I like this approach conceptually, but I think it's an overkill for this
+> > use case tbh. Especially the memory usage, that's 1K per vCPU for the
+> > bitmap. I know it can be smaller, but probably not small either because
+> > it will be a problem if we run out of bits.
+> > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > > index 52f6000ab020..452805c1337b 100644
+> > > --- a/include/uapi/linux/kvm.h
+> > > +++ b/include/uapi/linux/kvm.h
+> > > @@ -494,8 +494,12 @@ struct kvm_run {
+> > >                 struct kvm_sync_regs regs;
+> > >                 char padding[SYNC_REGS_SIZE_BYTES];
+> > >         } s;
+> > > +
+> > > +       __u64 kvm_save_regs_on_exit[16];
 > 
-> Split the function that check for the GPU device being ready on
-> the probe.
-> 
-> Move the code to wait for the GPU to be ready through BAR0 register
-> reads to a separate function. This would help reuse the code.
-> 
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> ---
->  drivers/vfio/pci/nvgrace-gpu/main.c | 33 ++++++++++++++++++-----------
->  1 file changed, 21 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-> index c84c01954c9e..3e45b8bd1a89 100644
-> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
-> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-> @@ -130,6 +130,24 @@ static void nvgrace_gpu_close_device(struct vfio_device *core_vdev)
->  	vfio_pci_core_close_device(core_vdev);
->  }
->  
-> +static int nvgrace_gpu_wait_device_ready(void __iomem *io)
-> +{
-> +	unsigned long timeout = jiffies + msecs_to_jiffies(POLL_TIMEOUT_MS);
-> +	int ret = -ETIME;
-> +
-> +	do {
-> +		if ((ioread32(io + C2C_LINK_BAR0_OFFSET) == STATUS_READY) &&
-> +		    (ioread32(io + HBM_TRAINING_BAR0_OFFSET) == STATUS_READY)) {
-> +			ret = 0;
-> +			goto ready_check_exit;
-> +		}
-> +		msleep(POLL_QUANTUM_MS);
-> +	} while (!time_after(jiffies, timeout));
-> +
-> +ready_check_exit:
-> +	return ret;
-> +}
-> +
->  static vm_fault_t nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
->  						  unsigned int order)
->  {
-> @@ -930,9 +948,8 @@ static bool nvgrace_gpu_has_mig_hw_bug(struct pci_dev *pdev)
->   * Ensure that the BAR0 region is enabled before accessing the
->   * registers.
->   */
-> -static int nvgrace_gpu_wait_device_ready(struct pci_dev *pdev)
-> +static int nvgrace_gpu_probe_check_device_ready(struct pci_dev *pdev)
->  {
-> -	unsigned long timeout = jiffies + msecs_to_jiffies(POLL_TIMEOUT_MS);
->  	void __iomem *io;
->  	int ret = -ETIME;
->  
-> @@ -950,16 +967,8 @@ static int nvgrace_gpu_wait_device_ready(struct pci_dev *pdev)
->  		goto iomap_exit;
->  	}
->  
-> -	do {
-> -		if ((ioread32(io + C2C_LINK_BAR0_OFFSET) == STATUS_READY) &&
-> -		    (ioread32(io + HBM_TRAINING_BAR0_OFFSET) == STATUS_READY)) {
-> -			ret = 0;
-> -			goto reg_check_exit;
-> -		}
-> -		msleep(POLL_QUANTUM_MS);
-> -	} while (!time_after(jiffies, timeout));
-> +	ret = nvgrace_gpu_wait_device_ready(io);
+> Heh, check your math.  It's 1024 bits, 128 bytes.  Reserving space for 1024 exits
+> is likely extreme overkill given that KVM is sitting at 40 exits after ~18 years,
+> so as you say we could cut that down significantly depending on how willing we are
+> to risk having to add kvm_save_regs_on_exit2 in the future.
 
-I think you're inadvertently fixing a bug here too.  The ret
-initialization to -ETIME is immediately clobbered by
-pci_enable_device(), so exceeding the timeout would never generate an
-error.  Now it will:
-
-Fixes: d85f69d520e6 ("vfio/nvgrace-gpu: Check the HBM training and C2C link status")
-
-Also we should remove the ret initialization.  Otherwise the series
-LGTM.  Thanks,
-
-Alex
-
->  
-> -reg_check_exit:
->  	pci_iounmap(pdev, io);
->  iomap_exit:
->  	pci_release_selected_regions(pdev, 1 << 0);
-> @@ -976,7 +985,7 @@ static int nvgrace_gpu_probe(struct pci_dev *pdev,
->  	u64 memphys, memlength;
->  	int ret;
->  
-> -	ret = nvgrace_gpu_wait_device_ready(pdev);
-> +	ret = nvgrace_gpu_probe_check_device_ready(pdev);
->  	if (ret)
->  		return ret;
->  
-
+Oh well, I am gonna try and blame this one on Friday afternoon :D
 
