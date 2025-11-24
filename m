@@ -1,105 +1,153 @@
-Return-Path: <kvm+bounces-64393-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64394-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C60CBC80F0B
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 15:12:26 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7FE9C81130
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 15:40:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B74B74E324F
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 14:12:25 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7BFED347296
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 14:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC7D30E83A;
-	Mon, 24 Nov 2025 14:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lYlI9cON"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF25280CD2;
+	Mon, 24 Nov 2025 14:40:35 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F6F30CD89;
-	Mon, 24 Nov 2025 14:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71282773F9
+	for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 14:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763993542; cv=none; b=olIlekIO1BqsXj47VXuxjQ92F4XnWuvf/06VeuDFdMAz7CFHJ3x52hPypX2VgN5n+S+h3cVWow1OVZRURfzehtsTTWEVADpnFcS5gHH7wp9tG2jWcr59lCUMLoUTaykoiKsEL5uQt97SvOnoxHcVAwevxT+gkVUKV5WJ7i7IgMM=
+	t=1763995235; cv=none; b=HHyjecnnqjmSDvZLi0GuKTcCRMiIaUMFSUSI1lErBndz/N/c1L0n/G6mImjA0ZtbAlM/NzerbvGsTdYjE8ea1aqTShai1hhvbBfiZa49Z/FN/yY86sfXqV/I0n/feNspCordv3iBVJ99uw4SUW+kf1/32nCw8pFXRSxgIG9imIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763993542; c=relaxed/simple;
-	bh=EQ3IrSxU9ixy8cMHUjletLF6L8CoG51o0Abml8Nr8Ok=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sgbwUAs7x/A+1DcE6gWfl42IE969J2cS6pkwYnwtE14HhJLqVEfWMO0OxYDItCiqLDRa3Z+f3xvlh33fIVwKL557zPB9YDcSeRQS9Xacv75HD/2qht5mYPv6YEYN6VfAl6/1234Q+DYLVgOb4VTNcPIuxMhuOsl/YA2MnEDh3Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lYlI9cON; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70D8DC4CEF1;
-	Mon, 24 Nov 2025 14:12:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763993541;
-	bh=EQ3IrSxU9ixy8cMHUjletLF6L8CoG51o0Abml8Nr8Ok=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lYlI9cONxGOzokkOHF53pJrHJ7D2yC6ma6q+pV2nhsp8ve+1sdF40XbavTNBwsxJU
-	 du92OarhfouJygiW342aACY40yalGgHtEfd0jA4P74hF3bKo6u8OyyDuNdNog6YuRv
-	 Xi6IIGSKauDhUUZoIKed9dJNZRkLORCEZ0oRuOKWhrKOwJP/ubbjH2JhXkHbisER4I
-	 CpXoHPmL6VirUxs7SYylIIWNF64SO7BLBxNkVuI7mHqf9Rvzs5D5lGho/Zra8u0iMr
-	 mwc6wg+iywYqrRLVr1NwOcG3D9rA7ccRJOWaFaoAM+bskfeiCdJx2oMV1ygYD7pfd1
-	 pqN33vHJqJCiA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vNXIh-00000007s51-1lBx;
-	Mon, 24 Nov 2025 14:12:19 +0000
-Date: Mon, 24 Nov 2025 14:12:18 +0000
-Message-ID: <86jyzfr03h.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
-In-Reply-To: <86ldjvr1kc.wl-maz@kernel.org>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-30-maz@kernel.org>
-	<CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
-	<86cy5ku06v.wl-maz@kernel.org>
-	<51f5b5d7-9e98-40b8-8f8b-f50254573f3d@sirena.org.uk>
-	<86o6orr356.wl-maz@kernel.org>
-	<342302ba-5678-408a-ab63-1a854099d4a1@sirena.org.uk>
-	<86ldjvr1kc.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763995235; c=relaxed/simple;
+	bh=WtxjRib8fRyg/a0M3F+nOpaMeaww/wYt2QRfxy4DBXI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BScjN4Rrde/86t1UjAk0589lENuAXWdB/LCFg63XDnZfavNrRYx2XOiWAHmswW6ds+FG2BkDXACV13mCjS/4rsvNIslh8tjm+1yqa/7RxcRxOiham6IhLPsykLcLzO8jG0TKu+ikno5yLAKVeE88XZ8ypaJ9sPBX4satRpT6Zkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-43322fcfae7so42627245ab.1
+        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 06:40:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763995233; x=1764600033;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UFXCAocyaQJYOXiqP6gOl5CvRLfZoqSdu4vxmRyV5B4=;
+        b=hJ7GQLGxwEgn3oO70Nj7jp1lcoE7fMoQ7+uAHSuLWM+nEf560CAwFuTwJBFz4EijGt
+         QPNLc9/XrVmsM/zIpLuw2svCfK9vsrmiPPZhF3PCe+AEslNUdqW84tx8bf78Pi3ECf7E
+         k1YWSNX7vg7qzl0fxmjO3N/AAHHTl5GWMF7KM9qVnMrTA5wrCeTQzBgrVZjt122yy76+
+         zeD+IamS4bCCq2gSdpLJpdrKnABb0FD5qRYvLgIA7m+WNZTNZF2fYnp/jDTjvauEs+bK
+         +IZhIPz7tK+p35eJnq76qr6NLKXr4CqFQVyULf93NBX3QFDEHMl0C76qQdB9rl8uZ5M3
+         7Mnw==
+X-Forwarded-Encrypted: i=1; AJvYcCX20Ta17EEixmAF6Ie83RDdgW5C9CSvhwmkoQr4BTeQ2RFj6uwnMu5g1ebBHLEwrQgMwu8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyfwL0wDNbrC1AhF/w5EyZ7yZ8H07g/m2gE1wOYO/+u1KUCibr
+	fGz1NejlTWbRh19IS8jmz8juZARWbht6SRjryWWZ5LzVO3y4jYybPNFVq7AFibsx351sD+XXxhJ
+	WhvmISZPw4iarT8xcrPq/l6lc9Hh2cY6+SxIe417DErVXie/+rYUVt5uPbIE=
+X-Google-Smtp-Source: AGHT+IG+FIgamX9chgH7c3HkxxSIsPbdchq0UJicuLBINKbqg/JgqmTbA/vPn0sBnkCZ7P1fuJC1YLCB3okPFeRLJxMfIT9PthTf
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:348e:b0:433:7673:1d with SMTP id
+ e9e14a558f8ab-435b8e9acb8mr109337345ab.31.1763995232398; Mon, 24 Nov 2025
+ 06:40:32 -0800 (PST)
+Date: Mon, 24 Nov 2025 06:40:32 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69246e60.a70a0220.d98e3.008e.GAE@google.com>
+Subject: [syzbot] [kvm-x86?] WARNING in x86_emulate_insn (2)
+From: syzbot <syzbot+fa52a184ebce1b30ad49@syzkaller.appspotmail.com>
+To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
+	pbonzini@redhat.com, seanjc@google.com, syzkaller-bugs@googlegroups.com, 
+	tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 24 Nov 2025 13:40:35 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> Something is badly screwed in -next, and I'm not convinced it is KVM.
-> 
-> 	d0f23ccf6ba9e cpumask: Cache num_possible_cpus()
-> 
-> is my current suspect.
+Hello,
 
-Confirmed, and the fix is at 21782b3a5cd40892cb2995aa1ec3e74dd1112f1d.
+syzbot found the following issue on:
 
-	M.
+HEAD commit:    d724c6f85e80 Add linux-next specific files for 20251121
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=11513612580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=763fb984aa266726
+dashboard link: https://syzkaller.appspot.com/bug?extid=fa52a184ebce1b30ad49
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=165638b4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15c00e58580000
 
--- 
-Without deviation from the norm, progress is not possible.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b2f349c65e3c/disk-d724c6f8.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/aba40ae987ce/vmlinux-d724c6f8.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0b98fbfe576f/bzImage-d724c6f8.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fa52a184ebce1b30ad49@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: arch/x86/kvm/emulate.c:5560 at x86_emulate_insn+0x2909/0x41a0 arch/x86/kvm/emulate.c:5560, CPU#1: syz.1.2382/16268
+Modules linked in:
+CPU: 1 UID: 0 PID: 16268 Comm: syz.1.2382 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+RIP: 0010:x86_emulate_insn+0x2909/0x41a0 arch/x86/kvm/emulate.c:5560
+Code: 36 31 ff 44 89 f6 e8 66 99 77 00 45 85 f6 0f 84 05 02 00 00 e8 18 95 77 00 41 bf 01 00 00 00 e9 ef e0 ff ff e8 08 95 77 00 90 <0f> 0b 90 48 8b 44 24 50 42 80 3c 20 00 48 8b 5c 24 48 74 08 48 89
+RSP: 0018:ffffc9000d6ff6c0 EFLAGS: 00010293
+RAX: ffffffff814a8468 RBX: 000304000010220a RCX: ffff88807d930000
+RDX: 0000000000000000 RSI: 00000000000000ff RDI: 000000000000001f
+RBP: ffffc9000d6ff7d0 R08: ffff88807d930000 R09: 0000000000000002
+R10: 0000000000000006 R11: 0000000000000000 R12: dffffc0000000000
+R13: 1ffff92001adfee8 R14: 00000000000000ff R15: ffff888060266780
+FS:  00007f90f1e156c0(0000) GS:ffff888125b6f000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 00000000745ec000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ x86_emulate_instruction+0xea7/0x20b0 arch/x86/kvm/x86.c:9521
+ kvm_arch_vcpu_ioctl_run+0x1404/0x1cd0 arch/x86/kvm/x86.c:11960
+ kvm_vcpu_ioctl+0x99a/0xed0 virt/kvm/kvm_main.c:4477
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f90f0f8f749
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f90f1e15038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f90f11e6090 RCX: 00007f90f0f8f749
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
+RBP: 00007f90f1013f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f90f11e6128 R14: 00007f90f11e6090 R15: 00007ffc7b4d1758
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
