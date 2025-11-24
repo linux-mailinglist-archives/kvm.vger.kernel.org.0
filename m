@@ -1,267 +1,348 @@
-Return-Path: <kvm+bounces-64337-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64338-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CACDC7FCFF
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 11:09:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 633FFC7FD11
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 11:10:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 689863A3099
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 10:09:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E0133A3A2E
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 10:10:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFD32F99AD;
-	Mon, 24 Nov 2025 10:09:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7282F8BD3;
+	Mon, 24 Nov 2025 10:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jUgSejCm";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="J611SLNm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Is9SHJWh";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="G5YnxEjL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76F72F83A7;
-	Mon, 24 Nov 2025 10:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763978953; cv=fail; b=e19IIL35oyEIL20rgQNVpqxaaJlsIwJaDn6fpYYfJlgiDEmMOyXo2qA1T5iSEL0MKt9IxqYmLjafhaDK9Q8LrXfkt33clVglVN3KagxH9D05oIt1PcRK20iupeX/k3l4w7DgKL+Pgd3LARCIKgV3IrhNRwdoEd4/Iwa2qrV7prE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763978953; c=relaxed/simple;
-	bh=mY8qcEsXvxd6EjX0g+sBvjqwL+lJoLSfB1s/4lTwt24=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=rOaXjddQo4TyHpfbDPmZOC1s5t2+2HbVxq7STNcLJkPWreW/n/sIHGC/bJkp51mhqE1MOJi1b0wWK2indNaNZz65g/7LuKEh/8EbR/hkIYkx0fGtpGuWoesxSxnE+50q6K5I5KJHi43bsHjIvd2i5D0vBiLwUQC9AuJ2bBb13j0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=jUgSejCm; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=J611SLNm; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AO8v3rY724785;
-	Mon, 24 Nov 2025 10:06:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2025-04-25; bh=mY8qcEsXvxd6EjX0g+
-	sBvjqwL+lJoLSfB1s/4lTwt24=; b=jUgSejCmFqHN7u9cJShYt3rVi6ixpeBsxY
-	Jsy8tlOzjnZyTY+aNUXkAmlQwrQeAEMLdyYGS2wrbUBKr93nfzYpA6iHg0yG9+0v
-	WClf0RzNXWoKRsc/0DIku3GIPEsxk3YsjlTVkevIbq8gKWLx+f6xw2KQ+Kh+VpTC
-	q3eF3ueRL/QHcWuy+PUT7aA2IUJrTXuXmPvAzKP2HIH/icu80nxfSFVxkqTCInhX
-	fjgU5Y3Mi7G4vnC2aYpIcin08Bc2R30svFEc3ojABqkI7+idW9ODsadDTIG+Cach
-	9ajYkalX0nO+r9jvQ3+ohAqSKOmZyTI4DrV3aPNC/HmAnn6pUkAg==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4ak7xd1qx9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 24 Nov 2025 10:06:47 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AO9FtRi033083;
-	Mon, 24 Nov 2025 10:06:46 GMT
-Received: from sn4pr2101cu001.outbound.protection.outlook.com (mail-southcentralusazon11012035.outbound.protection.outlook.com [40.93.195.35])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4ak3m7ws4b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 24 Nov 2025 10:06:46 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fuokoouSR1tGnvAMc3PfvFVGcnM+HHkdaV0hK2Pt3yQvez93n9sSVZQKx4dlZVCMagTMg8vfUvv7hUqcLbE+il3cmaqLSDti3A4XJn81/6A0Laoifo2l4sxd8bxHhD6+qSnF2EamQQjtN0D+y4WawCcNnvxo5YUj4RXASrg1uZt8KMCEPmWIg4lumG+Wihn1Mms5tRS+pAToyP4nBPvTAgMb/qv+sSaWdIHrn7bQm09PU84BEP155on2E95Q35ArWexAlegy3jm/9tnyZHjrNxQY8wXkAGSLJR5tpHn0kQYdgvl+NETAJKWOcLgL40rmRcwlLR1hc3S3NuXDuADQxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mY8qcEsXvxd6EjX0g+sBvjqwL+lJoLSfB1s/4lTwt24=;
- b=xfG2gtm61T2NHKMxEtJvKmtMqFPySpTE+cKW8PRfAswxVpKLmsZg5VxcIHdhcO+WAjpSZvYy5dxiaM04hoWlzLXlSNiqRx6srcVuCjEhu9pQtNlpUQhKWrE7mbG7CqCvJzBmihW8jYXdh12uQOFS7zj/LwkFwo/fZrt0/3bQelxs8KfWa95iPtat1mQnlNKFlPIwzXeNgECNDkunJb+xrthdi3C25swjyA2PGLaNYhHzwSCyYTTy5BwACKVZRvgYs5o0uYYkqMJkM6p3XDjKjQELAUjTFwgX9mcrlHQa0OrjPl73bTHGlJrJ3uvgo/pDu626+bUbMBK3m6einqosqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B3823BD1A
+	for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 10:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763979033; cv=none; b=ODvWkvL7+kKepwGv5Kpjwj6tsjJvh9R9oVMq9pC39h8sVPsvGzS28TnsBBQgDEKqnuJEQc6XTacOBFnlNwVNF4FwC4GZ/+4ezfWcfLJDvP2ulkgtLFHmXIxYh5mJv//tI9mlcLRzW8/Q8sD+IVYMetBsBF+N+U71MrMjxWlLFms=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763979033; c=relaxed/simple;
+	bh=Ns6LfH0psojXT7Bh+E2CKXpJNrIUwj78AFA2Jq4LOk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JDfEjTytOy0pEvjkt8Qo1huoWfRZbAUbOrzQTacNsU9R2oCts4Q/ktGn5t8FRHTNjiRshMT86ish5T3sZs+22yUyQ3N7f2UEXTzkDzz2e+aCM4Yfhfg24CBeYq0Z6nqzBxztRCyrsXt1AVtiAYGcDf1eXZ1lYPnWVmBCVua4Jrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Is9SHJWh; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=G5YnxEjL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763979030;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5u6sQSNL++dp7mJ0fNqBXPU6F3Qeuu2qX0vGBMLsEc4=;
+	b=Is9SHJWhmhYlVZZRzpkzJVFa+ipQfqyKv2WzUqKO7Kc6qr/l3OOVDKREKnrWERe0haafhO
+	I1BnOG1hj8j26Pb+uSstZWUrHECLtCUwMwB1geS7SnQELI1cVIkgrteai+GjPrqrCMxAmk
+	Ttb+z91slzAWGmS6liGvYXQnE7YZH70=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-641-rleT-rasOc27Enn2z4IS4g-1; Mon, 24 Nov 2025 05:10:28 -0500
+X-MC-Unique: rleT-rasOc27Enn2z4IS4g-1
+X-Mimecast-MFC-AGG-ID: rleT-rasOc27Enn2z4IS4g_1763979028
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-429c93a28ebso2921998f8f.1
+        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 02:10:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mY8qcEsXvxd6EjX0g+sBvjqwL+lJoLSfB1s/4lTwt24=;
- b=J611SLNmBu+PDCvXN1vpKmARdEbDs3fFjolQE3KYTPIFVY60BQtL/HIdJI1trAIGzleoC8QOHDFALsxLywfJEDNTzHe6NTkVjpYu+hcSmOFwlLzKO4d4slCd2rPOyHLrmm+rW1bO3Hbeoi5Dp45YHUGh9gtR86pdks5DkhXsitk=
-Received: from DM4PR10MB8218.namprd10.prod.outlook.com (2603:10b6:8:1cc::16)
- by CH2PR10MB4119.namprd10.prod.outlook.com (2603:10b6:610:ae::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.17; Mon, 24 Nov
- 2025 10:06:42 +0000
-Received: from DM4PR10MB8218.namprd10.prod.outlook.com
- ([fe80::2650:55cf:2816:5f2]) by DM4PR10MB8218.namprd10.prod.outlook.com
- ([fe80::2650:55cf:2816:5f2%7]) with mapi id 15.20.9343.016; Mon, 24 Nov 2025
- 10:06:42 +0000
-Date: Mon, 24 Nov 2025 10:06:35 +0000
-From: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-        Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
-        Baolin Wang <baolin.wang@linux.alibaba.com>,
-        "Liam R . Howlett" <Liam.Howlett@oracle.com>,
-        Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
-        Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
-        Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>,
-        Oscar Salvador <osalvador@suse.de>, Vlastimil Babka <vbabka@suse.cz>,
-        Mike Rapoport <rppt@kernel.org>,
-        Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
-        Matthew Brost <matthew.brost@intel.com>,
-        Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
-        Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
-        Ying Huang <ying.huang@linux.alibaba.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>,
-        Kemeng Shi <shikemeng@huaweicloud.com>,
-        Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
-        Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
-        SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
-        Leon Romanovsky <leon@kernel.org>, Xu Xin <xu.xin16@zte.com.cn>,
-        Chengming Zhou <chengming.zhou@linux.dev>,
-        Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
-        Naoya Horiguchi <nao.horiguchi@gmail.com>,
-        Pedro Falcato <pfalcato@suse.de>,
-        Pasha Tatashin <pasha.tatashin@soleen.com>,
-        Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
-        Hugh Dickins <hughd@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, damon@lists.linux.dev
-Subject: Re: [PATCH v2 00/16] mm: remove is_swap_[pte, pmd]() + non-swap
- entries, introduce leaf entries
-Message-ID: <0d3191b0-9849-4d6f-936f-d950381e9e34@lucifer.local>
-References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
- <20251121234456.GA383361@ziepe.ca>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251121234456.GA383361@ziepe.ca>
-X-ClientProxiedBy: LO4P123CA0545.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:319::13) To DM4PR10MB8218.namprd10.prod.outlook.com
- (2603:10b6:8:1cc::16)
+        d=redhat.com; s=google; t=1763979027; x=1764583827; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5u6sQSNL++dp7mJ0fNqBXPU6F3Qeuu2qX0vGBMLsEc4=;
+        b=G5YnxEjL3fJtNY2LBIbbcQ1URhM6IZRWXMErN/ZZNcW0DOejO08bhXhFEiCb+3Fuen
+         qACF9GiNVAg3uuQVOmTk3dtf6AkLduBT1QAIJxSNu5vDolGKen3tLeHb2zUBgSR9/Z6s
+         V6ElgTSGkxbnuwm/rGqql/4LZ0q7ZmVgHXm9zBaiw07voXIvzqm8bok1SpHS4X31S/4I
+         zPA53zE7pnunb+vcq83ii+yo9SxxqLTZI0AoTV6kB1KWf8U46CT/zBO67ehRb24cMbrI
+         95X9UMcDNeTDI01vPYmjN8kWGQJ2AADyTvr/IK98ldNdaAH2bnvXKQyz13dnOVzQx6J/
+         hzQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763979027; x=1764583827;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5u6sQSNL++dp7mJ0fNqBXPU6F3Qeuu2qX0vGBMLsEc4=;
+        b=PueUYaY+hOiBkvVqHJ3DvUa52EohCh5DXrLYF5wzxo0gUxK/YVelesedZ2OtcJwBIx
+         SFjIzuzj9nIqlPQtllKERnYLarmWOCMYibnYnP8mxBiqd+uuncVeHDvwXVjZthuHo1Rt
+         Y2fOCObQX59R2Cm8IPUyPXVBFOIPyAc5pXPTUovH57dl6J2fvQzk25eLS84KDqwMFMHm
+         vv4bYx/8cdo+a6REYu4izhB8m5AIX2NjnS8wvOcjaMsOjG5v8pkmzMCQPNxfX0ofL+iH
+         7iyZklaoOIzP1+/k53e1mP9OArhYRbJC9mlRx5hc1ARXAywp3Thw+TB7rE8viNyATwH1
+         pw6w==
+X-Forwarded-Encrypted: i=1; AJvYcCVtKxPhcTUAPh0Ag+4FDBuuLvqBIDaU2TlieMzdTMe5c1vH283wNSeE869JHlFD3Gj9GtQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgzeoQbVxXOOU2D0gP17lOZj2WTK8XMcg8/0Wg66mXANIZFEtg
+	3N8xD7GOkvh6MDz8IOpeCR951kzEkRQMNRTqPinbFu0TGsMXUdwyJCAEIJk1swUN3ZIDwdry5oD
+	kf+Osp4m7SCuVr/bACh9I+jrLpYt5bC3B6451WkTEafFbt1Rn8pP2Gg==
+X-Gm-Gg: ASbGncvuf+WtF2+j0A6ykdkXMbqz8hmFh8aGWRazHL5PDzs97LFqXI8ZTXYx5T9RVKB
+	W0/7kd68YhMjRzTI94pLD8pgHyyyYIIUk2B6bL5574Eg4LRbnR68EkmOtOrl2YD/zXFULGMQ4p+
+	G42/6yhDh+GgbOJHDBLUUBdeQgzUKy0nT7f/iWw7Bw2YjGdgDbx3e5NJufDDlEWKHzO22ieyX0N
+	DBzvOVXDihiFGc0au+FdfsJebd6jWc99/uBeA6TtwW4ZmZ5EjuXMHOLmVZlCvYkytITJavmWzlS
+	1uX6vq3DqBrRlEu/eu27UaPcnu41KqEAyzioIRBvnztOW+aAUzH0aFFnQFblPtRtcKc81jWcj8l
+	YRtZnhewvH9Pp+TmS0s8iO+0iZwPcKqGWdh8eFudJr5/adrnUI588EQVXmcpjiw==
+X-Received: by 2002:a05:6000:40da:b0:42b:3e60:18cd with SMTP id ffacd0b85a97d-42cc1cd5cccmr12145479f8f.11.1763979027389;
+        Mon, 24 Nov 2025 02:10:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGyUT90+gJ9f1dKanVENzRuq3J7mmdAzbMAoIPoT3+96b1SckYvJyZjhh16MBsnzjUYf99sZA==
+X-Received: by 2002:a05:6000:40da:b0:42b:3e60:18cd with SMTP id ffacd0b85a97d-42cc1cd5cccmr12145417f8f.11.1763979026810;
+        Mon, 24 Nov 2025 02:10:26 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f2e5a3sm27522572f8f.6.2025.11.24.02.10.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Nov 2025 02:10:26 -0800 (PST)
+Date: Mon, 24 Nov 2025 11:10:19 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, berrange@redhat.com, 
+	Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v11 03/13] vsock: reject bad
+ VSOCK_NET_MODE_LOCAL configuration for G2H
+Message-ID: <g4xir3lupnjybh7fqig6xonp32ubotdf3emmrozdm52tpaxvxn@2t4ueynb7hqr>
+References: <20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com>
+ <20251120-vsock-vmtest-v11-3-55cbc80249a7@meta.com>
+ <swa5xpovczqucynffqgfotyx34lziccwpqomnm5a7iwmeyixfv@uehtzbdj53b4>
+ <aSC3IX81A3UhtD3N@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR10MB8218:EE_|CH2PR10MB4119:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3dbb1e7f-e818-4273-db2e-08de2b412acc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?odsOyqMdOr9ZznWB7gj7VB17358oLZoQwMUfFYwbKYcI0+Fu8Sjm/yUxqZQ2?=
- =?us-ascii?Q?MIPtqHlAia6SRZcnYcHWYGbGtHjWYGwhsqhd8AAkOFEJOcmQMcQBjQPAIqEc?=
- =?us-ascii?Q?/DtkXGsOXJU9mkO1ZNSjk0wmw2j9j3XwCgF0E7C5EU223yehi+e7DARy7r77?=
- =?us-ascii?Q?AGW5MdgG4lrXfkq25hLtqH+tcxLIcj9XnG8ByCMRX0pIhmIj5H6l0oHPXT0t?=
- =?us-ascii?Q?NH13KA4K3fzRR+VNoArQ8zFCcNRXBaNpXuk9eHYgNNlH9RrlR8vxo5ph9lwv?=
- =?us-ascii?Q?C23cFG7Qg3gB93aVDwzsdOIhOuV6mXyQAQ1tX+DGnxGy0MS8L7r3fZ5t9wqk?=
- =?us-ascii?Q?zWmRWVO4ORw02RkFRANGdRKBLnxZfs5ALmII6CwFO+4fMKmatFOay1asEzhD?=
- =?us-ascii?Q?I5IL1FsFUvt/7Z8Jod8pS7LgY7AQjOOjtiM8GzCa2GBqdGb8HrVH+MHKmDHm?=
- =?us-ascii?Q?ZxvVm8yvYvS2Xn9hkJhA8Qdjp7RdXq424AGvtRarre4lsx+02kFgVX71d+OA?=
- =?us-ascii?Q?AqXRJbo0dmHv+5DFZzHn3U1xJU/OAzSdCtnSyRMQqHnuuvtbM4RwBpFyYhlv?=
- =?us-ascii?Q?uPWzCcaD6z5cnflJTCx1icU6Dra156v4Ak/ArbZ52A6cmpCayKLisWgzGqWP?=
- =?us-ascii?Q?hpJhLZcb7S/X4tTgYmoUhSRCiJ0rJvFSoG3X+mgdhDwCJC+A7ffUFOh/OtnQ?=
- =?us-ascii?Q?RVJEE3q5zSDBkIieDO1NeY+5io7a01zRUqdLng29BCa5eMVnVNpkW1nGHLim?=
- =?us-ascii?Q?+P+4eX3CijVkA0lbaTIcRh70AvaHVDWeMCE+tPeBsnuzAARlrwh9JeL1XfJg?=
- =?us-ascii?Q?+pUJ7VYdMA3TUwx6lUUj8GZhrNlaNMijME5uEXaxKcSi79pVP8HnuVNWctED?=
- =?us-ascii?Q?xUCWnicllx72moRlXJpDXpARORSPAmtd5wcfC2aV8zUdkTaG0Lej90FWcY9H?=
- =?us-ascii?Q?zNmoznwoDVxKACibVTsh89dCOSolKllRdjw9FQC3qnWdBeBrC8k82gQ1JhA+?=
- =?us-ascii?Q?7ZnEyW0LmAiisFieTz5aMbAd878uaRqnC0GiPWODRqv1r1JL3sqSLidIgMrF?=
- =?us-ascii?Q?zG9aqOU1cTrCNirTY6S0H7E+ejRvmj+2B+2mhQdzILMOjx5vgPt//+Pzc/Db?=
- =?us-ascii?Q?qBpsSiJBpqTlF4TWQxvq9uOfOB8iCGJcHjXiuN6ayL5NN0EFJwwTTd+0uFKb?=
- =?us-ascii?Q?QQ2Ml7fRdQOz335gWVgPNjAlVItKuzeQKQF0eW5Jh1+n8jV3Qr3ffdVcAdVC?=
- =?us-ascii?Q?UdOroL5U0ty6/OnnCSsqA+99vGaJFWbAEp0cxbLO8aaxXeaKwJ6gcGUwed5s?=
- =?us-ascii?Q?44uCB8UvWc4OT+8Kf8V5n7e7xWG99Nh1uMgKpxyax6TOFk0GwQRhWUI7HpUe?=
- =?us-ascii?Q?+RN0jWkywskdzhLcmmSxvY12bn2SITuBNonqawIw0jOpGGxoTpX6f69I4r4s?=
- =?us-ascii?Q?/qMK+d85eWeApm6xBfzku/e88bYiK8hW?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB8218.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?AW8u8uT8YZ6yflthjZW7yFXDdrl9tUUMgsq6yy+eJfCEhvTgJrs9gemHYY/w?=
- =?us-ascii?Q?2sJ/F2gbwIc5bLsPbHc1wPbmcstnf8uALJtkBiddoapB0I7ntbtMhabB5+bS?=
- =?us-ascii?Q?r5+eouA4dkYpBk70KB4WgbvGzzMrmbyWF/+0hr3QW+boxq8MhmElt2nYW2gc?=
- =?us-ascii?Q?pL8Xa0TGxeuYKQl32qLjn9O5F68uN/ff9L1YmyKYItMml74i7+XethV4SMo1?=
- =?us-ascii?Q?vVq8gqBI7QTWDy6Y/OaMJ3ko5cGrlNkiJJpbyiGQGW+DUIGYNjUAbmcGMCFx?=
- =?us-ascii?Q?SbBZhqgrTCmFYDg4oKkgHLV0MztG+syQ66xqc8IHv6mx8r4WoJZFlpu4jY0i?=
- =?us-ascii?Q?lPf7obbLwYeT0LTyBxgPOaCxuketecsyxd6EQOUXq6+bY1iSzwJa5u8szuSa?=
- =?us-ascii?Q?1eDFbpbMj71YP7Qq3NFyO7PQA5unr5eY0mUmUge/l8IqcPlCMD5KAtkCwl89?=
- =?us-ascii?Q?1rccDLwgSkPk5ACuYxUPmdJolSK6nS7lbn9f5SDqKRb4BVorjKDC8K7fldzK?=
- =?us-ascii?Q?G9uWNUvHrDhJHWjkUq3uy+nMa5DcZ9YVJqMiJbMdGw6bAAZTZIe7C8COc8H4?=
- =?us-ascii?Q?kJCkhoGv05f9+p9uvkPxwxLULAHFCrlON644lnCjnm/094MJiiHCuas+twcD?=
- =?us-ascii?Q?XBN98+Sso7cD2Pobb5+H62tkDiHdUUH81wNPX75B1PFadq1ACJr/ai/hmtR2?=
- =?us-ascii?Q?z/yaBd9LnJbJns1CUpLeCiI+UfkKIo6bOt92CBMPhQdmn9MwR/GV1OcI7DG8?=
- =?us-ascii?Q?76sUzSDTwlgrcCG6rqQQ7KbCedpdOf0OCgulpysHNIWLGWSD7AzmTjE5D5JT?=
- =?us-ascii?Q?JVPp7Mws8yhNYX0H4qHhyrU+tbJGNuWVQ5gPqoQg1bv1F9MHKrSXxAfB5r1S?=
- =?us-ascii?Q?4kXYpAMkjouw1aadD8DdQAbGqWqWPp2ucY4OhL+c0O2uVXQP6TtqAX1icl3e?=
- =?us-ascii?Q?xAzk1KuO2uyvBQoz1NnIRwtB059QIf6YrNRm7t32bWVIrl9yAnrMumMM/OTo?=
- =?us-ascii?Q?6CAdpuI6YSplL/CObJE/++6wkHi4hJtnbw1KplHAV8POm1bWuchelOpdMSK1?=
- =?us-ascii?Q?rvdk6IJx01OShE2yUIe5Ndc1UmeuQONoSpZ98fydTQZomZEVl7z3dqaW1Hnz?=
- =?us-ascii?Q?T1NhwAbp8BR10I0rGp1bEkopmI1AldLLHINGW3bAJJToODMyKYmrxB4ChUsW?=
- =?us-ascii?Q?7b2guP7Vd17ULOnQ//FbLraumvyIUENAXifP5H3kQGIvBgVoNM9/492RIwvh?=
- =?us-ascii?Q?T5mvxgUJE3nwUu8x+MODHGL+WnSgqwfYKe5E6rpNNSXYzaCtU/4iw+BBaOvD?=
- =?us-ascii?Q?fTIzY0h2H6aBCasZLjPFzdWc/byrjOPoExkIHyL56dk/AOwrVlAkaYe+V39c?=
- =?us-ascii?Q?QDAknmGZVPaopneT2a5W7so1nHjfNfwvUIxxabKyeCI22TOYV4Dw40kU1YY3?=
- =?us-ascii?Q?xsln9V+K1oFhdRPhcxTr/e0mP+KN6cGt+HGstGkczfUgK9kyXgWnmW2JRjo5?=
- =?us-ascii?Q?v7dTlPdL94AFQrRd6XNzjik6w6gAxEjXiQwIOTgLz5jgGgG4sBp06pcrTd+S?=
- =?us-ascii?Q?7G47+/4/G6v+oStokb7mwBNyR0r2pmly/21yt/SL5JtqISnXzKQDvOKwUcP+?=
- =?us-ascii?Q?2Q=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	DdXIc/fz58/zcd8Ud8LVkZWStKr3Z7y1GXq53InBLyBS8hUVA7CuDcnoTgGrOfhRBmwaKRDtrKNwAQvOquqdvTf3uSXmRrYLAzPwn+3viylPgz4NU5ohM9VRrw2o2lWINEO1T2emgrHOcNdpCNYqaXhXJd6gF81wAmobdjOdC8m/TPNxu5vDOQbwuSGwz3qElZ2jbEEb7Ccu6trNb1PSP9/bl0h4z6vrGPLMrEhlDhlcaU4+EbaVQN/3JXdiEyGPVn9gqveYN3bBXaIqPzcXgp0T+vRq5RQMd2PuH+AdPWh6Xj2xbrK3jSZRwkqQV0jQg0SJEy/r8aobVM1J8/mNTYr0T84wZaWO9w8OLLjtUI9yYGIaPNOCc222NRYV1vrzHX8LU7LPsgv9V0ehSkc6gOGPJ/4a5B6f5TsfhInh/zmcT2tiHfw0vacTk7V1UFFAEGqu9ugZMKgqBqOCnF036qgNmwUZ1Jenj+zGQxC5RVjKRYRNLBfFB7jUkYirCD/X4kPHCSdrNZYRojtsFa0vYa+qCCkvixUFrS4ZlGKSOS+ycnHh6JlppECY1GvOneuJW8VdP5fbkWn56GMu8ClxNBsLjA2NYLP0cBFZmRgQWQ0=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3dbb1e7f-e818-4273-db2e-08de2b412acc
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB8218.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2025 10:06:42.4884
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ez/1BQtdxa8M1IqkrE48M/1Y0PgP7WRMJWEPNiRe1IDEOcW1ZrYtiUvlleYyN3AMTpSULsDtR3rUtLmBTHPgsGie2HQl68JyvvvwnfmJYkc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4119
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-24_04,2025-11-21_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- malwarescore=0 bulkscore=0 phishscore=0 mlxscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2510240000 definitions=main-2511240089
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI0MDA4OSBTYWx0ZWRfX1R25MLDkJ9Fz
- aGOJVfPoVGzoHMzgQdMjxTmH1zahpX7bh93u6OLlkPalosNOC5Et9ttswPpMSywr7hXE5mD0S8L
- MMyvI/6VqqgXb+Vlja+jlMGsiAer+4LySKZkIA31Q5d2RlGvqe7g/i1OqL8P2req3Fs4zQ90Zbo
- sQmmh4Hocbls7wgyytcChp9RlD+qHC7ZdZR+BbHNDQ8o43vtEbLbqnX8Uf/gAQLcw80Zqz2Q3A9
- 4DGv0P+6WyjpQCedE1grz6EdaWTVGW+V7pqIqqjYthNllL/iy4WknjQsa03cPwGOxxwwW466HRf
- ZF7JepeJ5pimonCi8DwElQM7CeLi+RwOSQEASEQdlDp/anPD0ghs7TIZWnjgPux2zGxbaD2kzEa
- /yJYtuUT3R16LK3zJh673myl7WT9LQ==
-X-Proofpoint-ORIG-GUID: I2iPR9EQ0mIQjQJLFFrKCBDf8IzJ_LhZ
-X-Proofpoint-GUID: I2iPR9EQ0mIQjQJLFFrKCBDf8IzJ_LhZ
-X-Authority-Analysis: v=2.4 cv=K88v3iWI c=1 sm=1 tr=0 ts=69242e37 cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=6UeiqGixMTsA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=DkZWr7lvzT-ektGKoR0A:9 a=CjuIK1q_8ugA:10
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <aSC3IX81A3UhtD3N@devvm11784.nha0.facebook.com>
 
-On Fri, Nov 21, 2025 at 07:44:56PM -0400, Jason Gunthorpe wrote:
-> On Mon, Nov 10, 2025 at 10:21:18PM +0000, Lorenzo Stoakes wrote:
-> > There's an established convention in the kernel that we treat leaf page
-> > tables (so far at the PTE, PMD level) as containing 'swap entries' should
-> > they be neither empty (i.e. p**_none() evaluating true) nor present
-> > (i.e. p**_present() evaluating true).
+On Fri, Nov 21, 2025 at 11:01:53AM -0800, Bobby Eshleman wrote:
+>On Fri, Nov 21, 2025 at 03:24:25PM +0100, Stefano Garzarella wrote:
+>> On Thu, Nov 20, 2025 at 09:44:35PM -0800, Bobby Eshleman wrote:
+>> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+>> >
+>> > Reject setting VSOCK_NET_MODE_LOCAL with -EOPNOTSUPP if a G2H transport
+>> > is operational. Additionally, reject G2H transport registration if there
+>> > already exists a namespace in local mode.
+>> >
+>> > G2H sockets break in local mode because the G2H transports don't support
+>> > namespacing yet. The current approach is to coerce packets coming out of
+>> > G2H transports into VSOCK_NET_MODE_GLOBAL mode, but it is not possible
+>> > to coerce sockets in the same way because it cannot be deduced which
+>> > transport will be used by the socket. Specifically, when bound to
+>> > VMADDR_CID_ANY in a nested VM (both G2H and H2G available), it is not
+>> > until a packet is received and matched to the bound socket that we
+>> > assign the transport. This presents a chicken-and-egg problem, because
+>> > we need the namespace to lookup the socket and resolve the transport,
+>> > but we need the transport to know how to use the namespace during
+>> > lookup.
+>> >
+>> > For that reason, this patch prevents VSOCK_NET_MODE_LOCAL from being
+>> > used on systems that support G2H, even nested systems that also have H2G
+>> > transports.
+>> >
+>> > Local mode is blocked based on detecting the presence of G2H devices
+>> > (when possible, as hyperv is special). This means that a host kernel
+>> > with G2H support compiled in (or has the module loaded), will still
+>> > support local mode if there is no G2H (e.g., virtio-vsock) device
+>> > detected. This enables using the same kernel in the host and in the
+>> > guest, as we do in kselftest.
+>> >
+>> > Systems with only namespace-aware transports (vhost-vsock, loopback) can
+>> > still use both VSOCK_NET_MODE_GLOBAL and VSOCK_NET_MODE_LOCAL modes as
+>> > intended.
+>> >
+>> > Add supports_local_mode() transport callback to indicate
+>> > transport-specific local mode support.
+>> >
+>> > These restrictions can be lifted in a future patch series when G2H
+>> > transports gain namespace support.
+>> >
+>> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>> > ---
+>> > Changes in v11:
+>> > - vhost_transport_supports_local_mode() returns false to keep things
+>> >  disabled until support comes online (Stefano)
+>> > - add comment above supports_local_mode() cb to clarify (Stefano)
+>> > - Remove redundant `ret = 0` initialization in vsock_net_mode_string()
+>> >  (Stefano)
+>> > - Refactor vsock_net_mode_string() to separate parsing from validation
+>> >  (Stefano)
+>> > - vmci returns false for supports_local_mode(), with comment
+>> >
+>> > Changes in v10:
+>> > - move this patch before any transports bring online namespacing (Stefano)
+>> > - move vsock_net_mode_string into critical section (Stefano)
+>> > - add ->supports_local_mode() callback to transports (Stefano)
+>> > ---
+>> > drivers/vhost/vsock.c            |  6 ++++++
+>> > include/net/af_vsock.h           | 11 +++++++++++
+>> > net/vmw_vsock/af_vsock.c         | 32 ++++++++++++++++++++++++++++++++
+>> > net/vmw_vsock/hyperv_transport.c |  6 ++++++
+>> > net/vmw_vsock/virtio_transport.c | 13 +++++++++++++
+>> > net/vmw_vsock/vmci_transport.c   | 12 ++++++++++++
+>> > net/vmw_vsock/vsock_loopback.c   |  6 ++++++
+>> > 7 files changed, 86 insertions(+)
+>> >
+>> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>> > index 69074656263d..4e3856aa2479 100644
+>> > --- a/drivers/vhost/vsock.c
+>> > +++ b/drivers/vhost/vsock.c
+>> > @@ -64,6 +64,11 @@ static u32 vhost_transport_get_local_cid(void)
+>> > 	return VHOST_VSOCK_DEFAULT_HOST_CID;
+>> > }
+>> >
+>> > +static bool vhost_transport_supports_local_mode(void)
+>> > +{
+>> > +	return false;
+>> > +}
+>> > +
+>> > /* Callers that dereference the return value must hold vhost_vsock_mutex or the
+>> >  * RCU read lock.
+>> >  */
+>> > @@ -412,6 +417,7 @@ static struct virtio_transport vhost_transport = {
+>> > 		.module                   = THIS_MODULE,
+>> >
+>> > 		.get_local_cid            = vhost_transport_get_local_cid,
+>> > +		.supports_local_mode	  = vhost_transport_supports_local_mode,
+>> >
+>> > 		.init                     = virtio_transport_do_socket_init,
+>> > 		.destruct                 = virtio_transport_destruct,
+>> > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>> > index 59d97a143204..e24ef1d9fe02 100644
+>> > --- a/include/net/af_vsock.h
+>> > +++ b/include/net/af_vsock.h
+>> > @@ -180,6 +180,17 @@ struct vsock_transport {
+>> > 	/* Addressing. */
+>> > 	u32 (*get_local_cid)(void);
+>> >
+>> > +	/* Return true if the transport is compatible with
+>> > +	 * VSOCK_NET_MODE_LOCAL. Otherwise, return false.
+>> > +	 *
+>> > +	 * Transports should return false if they lack local-mode namespace
+>> > +	 * support (e.g., G2H transports like hyperv-vsock and vmci-vsock).
+>> > +	 * virtio-vsock returns true only if no device is present in order to
+>> > +	 * enable local mode in nested scenarios in which virtio-vsock is
+>> > +	 * loaded or built-in, but nonetheless unusable by sockets.
+>> > +	 */
+>> > +	bool (*supports_local_mode)(void);
+>> > +
+>> > 	/* Read a single skb */
+>> > 	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
+>> >
+>> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> > index 243c0d588682..120adb9dad9f 100644
+>> > --- a/net/vmw_vsock/af_vsock.c
+>> > +++ b/net/vmw_vsock/af_vsock.c
+>> > @@ -91,6 +91,12 @@
+>> >  *   and locked down by a namespace manager. The default is "global". The mode
+>> >  *   is set per-namespace.
+>> >  *
+>> > + *   Note: LOCAL mode is only supported when using namespace-aware transports
+>> > + *   (vhost-vsock, loopback). If a guest-to-host transport (virtio-vsock,
+>> > + *   hyperv-vsock, vmci-vsock) is operational, attempts to set LOCAL mode will
+>> > + *   fail with EOPNOTSUPP, as these transports do not support per-namespace
+>> > + *   isolation.
+>> > + *
+>> >  *   The modes affect the allocation and accessibility of CIDs as follows:
+>> >  *
+>> >  *   - global - access and allocation are all system-wide
+>> > @@ -2794,6 +2800,15 @@ static int vsock_net_mode_string(const struct ctl_table *table, int write,
+>> > 	else
+>> > 		return -EINVAL;
+>> >
+>> > +	mutex_lock(&vsock_register_mutex);
+>> > +	if (mode == VSOCK_NET_MODE_LOCAL &&
+>> > +	    transport_g2h && transport_g2h->supports_local_mode &&
+>> > +	    !transport_g2h->supports_local_mode()) {
+>> > +		mutex_unlock(&vsock_register_mutex);
+>> > +		return -EOPNOTSUPP;
+>> > +	}
+>> > +	mutex_unlock(&vsock_register_mutex);
+>>
+>> Wait, I think we already discussed about this, vsock_net_write_mode() must
+>> be called with the lock held.
+>>
+>> See
+>> https://lore.kernel.org/netdev/aRTTwuuXSz5CvNjt@devvm11784.nha0.facebook.com/
+>>
 >
-> I browsed through this series and want to give some encourgement that
-> this looks nice and is a big step forward! Lots of details to check
-> the conversions so I wouldn't give any tags due to lack of time..
+>Ah right, oversight on my part.
+>
+>> Since I guess we need another version of this patch, can you check the
+>> commit description to see if it reflects what we are doing now
+>> (e.g vhost is not enabled)?
+>>
+>> Also I don't understand why for vhost we will enable it later, but for
+>> virtio_transport and vsock_loopback we are enabling it now, also if this
+>> patch is before the support on that transports. I'm a bit confused.
+>>
+>> If something is unclear, let's discuss it before sending a new version.
+>>
+>>
+>> What I had in mind was, add this patch and explain why we need this new
+>> callback (like you did), but enable the support in the patches that
+>> really enable it for any transport. But maybe what is not clear to me is
+>> that we need this only for G2H. But now I'm confused about the discussion
+>> around vmci H2G. We decided to discard also that one, but here we are not
+>> checking that?
+>> I mean here we are calling supports_local_mode() only on G2H IIUC.
+>
+>Ah right, VMCI broke my original mental model of only needing this check
+>for G2H (originally I didn't realize VMCI was H2G too).
+>
+>I think now, we actually need to do this check for all of the transports
+>no? Including h2g, g2h, local, and dgram?
+>
+>Additionally, the commit description needs to be updated to reflect that.
 
-Thanks a lot, much appreciated :) and of course thank you very much for your
-input which has clearly driven (+ substantially improved) much of what the
-series does!
+Let's take a step back, though, because I tried to understand the 
+problem better and I'm confused.
 
-And absolutely understand re: time, always being behind is something I'm
-gradually learning to accept... :) gradually...
+For example, in vmci (G2H side), when a packet arrives, we always use 
+vsock_find_connected_socket(), which only searches in GLOBAL. So 
+connections originating from the host can only reach global sockets in 
+the guest. In this direction (host -> guest), we should be fine, right?
+
+Now let's consider the other direction, from guest to host, so the 
+connection should be generated via vsock_connect().
+Here I see that we are not doing anything with regard to the source 
+namespace. At this point, my question is whether we should modify 
+vsock_assign_transport() or transport->stream_allow() to do this for 
+each stream, and not prevent loading a G2H module a priori.
+
+For example, stream_allow() could check that the socket namespace is 
+supported by the assigned transport. E.g., vmci can check that if the 
+namespace mode is not GLOBAL, then it returns false. (Same thing in 
+virtio-vsock, I mean the G2H driver).
+
+This should solve the guest -> host direction, but at this point I 
+wonder if I'm missing something.
 
 >
-> Jason
+>With this, we then end up with two commits:
+>
+>	commit 1) This commit which adds the callbacks and gives each
+>	transport stubs to return false. Checks all transports (not just
+>	G2H). Update the commit. Fix vsock_net_write_mode() race above.
+>
+>	commit 2) change the virtio-vsock/vhost-vsock/vsock-loopback to
+>	add the real implementations (vhost + loopback return true,
+>	virtio detects device). The other transports keep their return
+>	false stubs so no changes.
+>
+>Does that seem about right?
 
-Cheers, Lorenzo
+If we really need this approach, this should be fine.
+
+Thanks,
+Stefano
+
 
