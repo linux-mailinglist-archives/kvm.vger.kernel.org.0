@@ -1,186 +1,381 @@
-Return-Path: <kvm+bounces-64440-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64441-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297E6C82B9B
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 23:45:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9523BC82C69
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 00:09:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F3DA3A8A83
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 22:45:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D3563ADDCB
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 23:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C102F691D;
-	Mon, 24 Nov 2025 22:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01092F83AC;
+	Mon, 24 Nov 2025 23:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pkwq5+A6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B8X8kGC1"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208DE2F7456;
-	Mon, 24 Nov 2025 22:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764024246; cv=none; b=GQ7hgCSEwCkdDjK3parzPXHtJAfTAnrFMt6wZ9xOHbapc3dOXH4bjEKdlaUCd4OnIW9AbKwRILes6eN387EfCMuR7RRIBe+Yq1s9HIijuAtplqtZ1R+Xd7q3pcO4ZmFNkq9SLjpsvJDGDZ5MulItWL9F3nPffwBL6xwEQcPRrM4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764024246; c=relaxed/simple;
-	bh=iq+pBVpT6OeYuuhJ6C0yJpr7YyPJWT2pNltOJSC4Pac=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tFAz765MautUEwGJMiK7nHIMEtoUlQjvnzwRPUmDxdXRrihYaCxfZ9Bup11lURHONTYi7VBF2ZBvmXhJ8LVPdhr2kIIPQPCw8dK0hw4auUYkctjTiHHLKaOWkuHBmDmLfC8iip7I8L8QKOF2eCMtu+epZXT+8qjLUvWTwY9qZDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pkwq5+A6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55050C4CEF1;
-	Mon, 24 Nov 2025 22:44:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764024245;
-	bh=iq+pBVpT6OeYuuhJ6C0yJpr7YyPJWT2pNltOJSC4Pac=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Pkwq5+A6/E6eA5+8ydkywqZONDULSBGc7UBLcLjWZMvudaQSNlHetO/ntIefIEX94
-	 rELf0GKjddm9EQ28nRSFsMLBILa76VTIEfVRQSfHY4n0dwatlT+cfb06/01ufKhS+C
-	 zhXTrjOn4c8Ckqwogte8kYCp4joay0q7JcsJ00kwEAM10iNOXUc8HbubTrsnuSa8/6
-	 TM7QPDyDQRhew57iahAs7HxgBlZvozLSYXFuIj/9sdePZTPLy4LyBOpW329GGMA4wy
-	 R8xfMCZSDPjvDUfBugNt12cMtcN9gghx1geU1OZgFUlh+Drsze5gQVdAX1sENZnaU6
-	 3WhX7vk2Wrq0w==
-From: Oliver Upton <oupton@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 00/49] KVM: arm64: Add LR overflow infrastructure (the final one, I swear!)
-Date: Mon, 24 Nov 2025 14:44:01 -0800
-Message-ID: <176402422342.855688.6586598326485098287.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251120172540.2267180-1-maz@kernel.org>
-References: <20251120172540.2267180-1-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2E22F7AC5;
+	Mon, 24 Nov 2025 23:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764025737; cv=fail; b=hHjixVL5ISFWJ7NkGwUtJzy1r1teNah5s44MvYxBGbsTzcf5b2RtMcAX4aipRbPmyQpeMDR9s9p7ZtRHoVrbGXaOazSFpb4UMFw/N93Q4G2bmSgPYaDECfnMwoaKo7Th3W6gUbsoSADwoqbUkXm8XHr7Ct/27cmTaQ9CzT6JmYY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764025737; c=relaxed/simple;
+	bh=IQ2IErFsrT7php/2nWiiqpnCqkht1AthumPoF2w6O6s=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=b8E0DBe8u0k64EDMER6XNDeCwuWjeSo41F36q5NeLtVs+pgYh4Gknvyt/7FcakVV1jDYVJ9jAuukQvt5QZ3bc2W6WdxaF+FpNX9s3CqYDhIcCQDqhvktV6ohJMV450h4mJTUVAnwCBsfb0ebv2hYWpjapWr2lRE6sggmP8usWTQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B8X8kGC1; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764025734; x=1795561734;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=IQ2IErFsrT7php/2nWiiqpnCqkht1AthumPoF2w6O6s=;
+  b=B8X8kGC1m6VfQX9speio5HXsjo9PZ3DONtTe0SmLS3hq9mFiembr8jva
+   9zn530Ca5Bbqki27EFLpwuXoENpg2mWPsSzdNhp8x5ZuvKFYrhwUeUv+J
+   rXlT1/8DgVRuXB0waQZpAtt3vFBS8WfqiHD2wdWEDrID+rgxuTBS6ua7e
+   h2+MlSbLljRbd0UBcmidptOhzQ3hVkJDm6M9MYGLlzs6DYbxRrthyusPa
+   mIlfxAiQwZyCN4VgaWjr2uAhJSX9ah1jp05Qcs6r/VcPD4eCPlnBQSy3s
+   Qg7Y9EgbbesxiXiYiIFk3jKcSYWjVoSRcgOBYRryQrPsbeV4x6fm04mYa
+   w==;
+X-CSE-ConnectionGUID: tbAEuylfTeOivsW8aMBzzw==
+X-CSE-MsgGUID: qSGBHekPSlqNNIPuD7wVRA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11623"; a="77512243"
+X-IronPort-AV: E=Sophos;i="6.20,224,1758610800"; 
+   d="scan'208";a="77512243"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 15:08:53 -0800
+X-CSE-ConnectionGUID: 2uS2FBNlTxu8pbrFkiwc3A==
+X-CSE-MsgGUID: PU01viTvTnCh7TPn67fe4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,224,1758610800"; 
+   d="scan'208";a="192550282"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 15:08:52 -0800
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Mon, 24 Nov 2025 15:08:51 -0800
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Mon, 24 Nov 2025 15:08:51 -0800
+Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.7) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 24 Nov 2025 15:08:51 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rifDkHcsPw/U06ClAqSVy7hOdih/t9P0K/4VV/X+x7Gar0Nf/bD1Qm0PVZHNAjjw5lMp1cqZNHVQbgZ+eqab2hxOYBeDiDmFBWwtqUVhpsHhY8Bw+uaDneRrkaL0/sU/wPt4gx8oLyn4ccxhnFm8Co7B7UrgohsOo3fWZCCbvRsYOjup+wSOKBjKed8uAzL9U77+GpWq3ycp22VTlHxK1AoLkBQxReXzsb7D8eOdiz0n4VpDZUKni5PKUzvsOUfChrM3tSo0e3/J5J4Y4jUF+uSTSuzcCq/JshRFqFVm3XzAr09Nrvq8D/g2oYkQTesyRlXTVLWyLvtjkg13+Yc66g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uzmkXNdmSIa4OnmpAXqllLKXlHNhylPcsDZKLlCYjz8=;
+ b=nQzrT2XI1Hp9EgIeFxsJRyY6rvO9GnCmybwAFfEmMAqtFdSlj53H2fJLK+Db0zSNlWGQ3Oh82qDRVcMwMa+SOvLrixuefXTs+gBf2uLzRe51j7/ZWWXO2YbYT/5u6Ne823vzKMj5QqQEOTqGu/pVx+PesDrxJFvaRxo5mOrmCeuIt5XdrImWm1U0okdpQ+cPrfWgOveCUlIzc8qAlVG3zrIpJYqIbdi8H+wxn8e4SwW3MxaGK/J2S3Crm+oetp0KtgfGR5dskE48x4IQatVheV/o7l+bH4Ig+uXqwf+WH1DZJIzlgKR3AlkjeTRjgcLaucu083vSsxqtayruvlQhrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB5373.namprd11.prod.outlook.com (2603:10b6:5:394::7) by
+ DM3PPF9EFFC957B.namprd11.prod.outlook.com (2603:10b6:f:fc00::f40) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.17; Mon, 24 Nov
+ 2025 23:08:49 +0000
+Received: from DM4PR11MB5373.namprd11.prod.outlook.com
+ ([fe80::927a:9c08:26f7:5b39]) by DM4PR11MB5373.namprd11.prod.outlook.com
+ ([fe80::927a:9c08:26f7:5b39%5]) with mapi id 15.20.9343.016; Mon, 24 Nov 2025
+ 23:08:49 +0000
+From: =?UTF-8?q?Micha=C5=82=20Winiarski?= <michal.winiarski@intel.com>
+To: Alex Williamson <alex@shazbot.org>, Lucas De Marchi
+	<lucas.demarchi@intel.com>, =?UTF-8?q?Thomas=20Hellstr=C3=B6m?=
+	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
+	<kevin.tian@intel.com>, Shameer Kolothum <skolothumtho@nvidia.com>,
+	<intel-xe@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, Matthew Brost <matthew.brost@intel.com>, "Michal
+ Wajdeczko" <michal.wajdeczko@intel.com>
+CC: <dri-devel@lists.freedesktop.org>, Jani Nikula
+	<jani.nikula@linux.intel.com>, Joonas Lahtinen
+	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
+ Laguna" <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>,
+	=?UTF-8?q?Micha=C5=82=20Winiarski?= <michal.winiarski@intel.com>
+Subject: [PATCH v6 0/4] vfio/xe: Add driver variant for Xe VF migration
+Date: Tue, 25 Nov 2025 00:08:37 +0100
+Message-ID: <20251124230841.613894-1-michal.winiarski@intel.com>
+X-Mailer: git-send-email 2.51.2
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: WA0P291CA0013.POLP291.PROD.OUTLOOK.COM (2603:10a6:1d0:1::8)
+ To DM4PR11MB5373.namprd11.prod.outlook.com (2603:10b6:5:394::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5373:EE_|DM3PPF9EFFC957B:EE_
+X-MS-Office365-Filtering-Correlation-Id: cb3b8192-1269-4a6c-250b-08de2bae6d7f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?RDg4V2lsYWxmQUw0ZXBwckF6WXdOTVl4ck1zOFYzdXRPYnh0RHV4N1o1ZmJY?=
+ =?utf-8?B?bzRYanlrenpVMXlSL3djWWIreUphcmRqVW1iRU0rMGdrWUhodkYvczdvNXUy?=
+ =?utf-8?B?TzZLSGl4Y2NaLzZwRGRqNUVQRzdNenpYQjk4OFdMMzVwejJsVTEzbEN1RXlt?=
+ =?utf-8?B?WE1hQXFiOTZzWTRZTTNXLzlxZnQ4KzFxOHphUG1kNHlvbk1qWHhRKzRzaHhv?=
+ =?utf-8?B?UXVlOUFvM0JIaVV2WmM1ZjYvaXN5NGdWdDJtQzRpMkpBeHVRL3FSd2c2eVU3?=
+ =?utf-8?B?Wm5xQm43MUZnUWNtQW9Ca3pOTHlKQndSY0ZKbXNiY1dNb1p3ZE1qV1hTeGVJ?=
+ =?utf-8?B?bHpJbjdOVmdxT1loQVpvNGpnek51SVNNR2R0L2ZOOW5RMFg5cVhrQ3pDNUxP?=
+ =?utf-8?B?SlVkMm1uWHVuRlp0RTdQSXdhWkVVd2tNS3ppOUM4SSttMXZQSUxnVDRNeExY?=
+ =?utf-8?B?d2wyNjZHeWRSVzdDcGRBa013S3pFeWZNRVhaSTd3NkdPSm82Y2tIN0lqa3F2?=
+ =?utf-8?B?OE9NU050cVErMWJMa2NMeFFYWmpsS1ZVQnVnNEpnRjFSWWZmQVlTc1VwRFNw?=
+ =?utf-8?B?eGdpQlQ0Y3hBdGM1aXFqeDdFQlJVRkVPRFJsR09pRmE0a0M1cUVpWjc3UzR0?=
+ =?utf-8?B?QXZ2dzJzU0k3SW1LRTlONFBvb1JmTzdRM3pJR3o5ZG8za1lsbHBEUURXbGVi?=
+ =?utf-8?B?VzhvbXpaNHIxTkhpTzdLQWNrbDRpRWdRNzdQMDZnUktzOVN5b0xBNTNId1Vn?=
+ =?utf-8?B?MHZKd0pSbU1TUldKWkNaRFVONHZRajgxSHlUQTg2ZUZsZE5LUXM0cmI3RHdB?=
+ =?utf-8?B?UjZTYmtDMW4yVEl1OWFURDF1NEt6LzlNN1QvVXpyUzd0d3hLQ1c3UXZyVGR0?=
+ =?utf-8?B?MUR6bHNmaldaQ0dNSGNLM1ZGdnBZR1FoM1lvU2pvTnBNQWhudlFoZ0dpMGpY?=
+ =?utf-8?B?ZjgxdEM1T1R4OU1vV2ZGaENhaU5qQ0FqbGxGL2xsZzRoYmw1RTBxUVFPbWpa?=
+ =?utf-8?B?M1QwMXdJZVNqRjlCV3FOWWxVcVZsR2U3a1h1TWl6bHE1RDZvZU9pR0tiSmsz?=
+ =?utf-8?B?TWFXN29Ielo2bGtiN2JJNXMxWXJXc2FVNFU2UDJXb2RxL2RBV3hDQm5EaWt2?=
+ =?utf-8?B?TWM1cld4ZFRYUEJlR2dTUk0xck8vOWprSnZVYlF4TGhTSjFQQlBlcyszOTNs?=
+ =?utf-8?B?MXE2NXAzYlg5MDlkdUtiQ3pTODdxeVZKdFljSnpEb1AzMFJvOC8wQzZmY2Zm?=
+ =?utf-8?B?MlMrUnhEbWZUQndyUHMzckxBWm1lSnR4SEVTVkJnWm9HUUZFOFNCZ01IYzV1?=
+ =?utf-8?B?VXk1azZ1TXBHbGdpQllqeDBoU21hSVRRcU91aS9QQzl0aGxhc25sWndOV0Mr?=
+ =?utf-8?B?NnJuK2FBZTIwRFhVZHZjQitGOWVEVmNyMGlDWmpGRHJSbjdlWFhLU21mMWtI?=
+ =?utf-8?B?cDVaU0o1QWJ6OVFHUGwvRlA4NUk4N3J0UGlscHd1Y1F5T3JUZWRTS3V6OEFl?=
+ =?utf-8?B?a25wa0w5cTBzZzI3dFE1cHZWUnNCdG5iY1BPMGthZEhBSTd4NGhUTGFabGxO?=
+ =?utf-8?B?MDcwV0g4RzZDQllOWkZqdGJrTHdoUFVuZnNMYUFRYVpQcGZNcW8xaFFscHJD?=
+ =?utf-8?B?Tk5VaFRxZTRrdlVRNjM3UUJ3M3BITFNFSit1dnBtSGdkVThqVk54VHc3alE5?=
+ =?utf-8?B?WVBkK0V2QTV3TkNZU2Z4cE1PODE0ZVE2dEdqMUo2RTJPbjZzT2xNdTJkNUpH?=
+ =?utf-8?B?VTBKa0tYNWN4V0FyNk9wVUZzTHFvSjYxZU1lN1VoTUNaZ3I1REhPcEZrVnNM?=
+ =?utf-8?B?ei8wZ1ppcmNkcTN5SHZoRUhUdnh6VkpnVXMzN1I1TkhnRjZnYnJvV2puK3RD?=
+ =?utf-8?B?VDN0MmVvYTdMMktmRC9GMExZbGV1b2hkTUFnRjFrbWF5Tm5GQ1dTc2g0SkFr?=
+ =?utf-8?B?MWowc01ldGx2djg3amZidjBpQUdTQnFtWXpJMXRzUFhsNFFZeE5ZZlY1a1VU?=
+ =?utf-8?B?d1Z2WitLR0swNVIxMGlqK3JiNms4aVovTThBclk5Rk1Qd0thKzlpRisza1ZL?=
+ =?utf-8?Q?f2052n?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YVlHOGw2RnRzdHl3d0JEdWg4R0EvdGFaR0JLcjZ0UXMycG51UzBPSXAxVXNR?=
+ =?utf-8?B?NjB1TDlIVnV6ZTUvOS82K21BMTM2RC80WVRFSWcrYmcyeWwyUDRsRnhXVjhH?=
+ =?utf-8?B?N1Y0d1ViT21WdlNqMTNOUlczdmMxczFVc0w4WXFTeUpmOWhHUFhTK2ZuQVlF?=
+ =?utf-8?B?N0ltOW83d0h4RUJsOTArU1AvWm1hYURPN0hSZktYRy9QSzY2N3k5UXJuT0pw?=
+ =?utf-8?B?aXJoYm1RbEsyZUs3NWlLTmtCOFdIU25ueFVaNkFmRHhqMTJNVmpCTEY5VFQy?=
+ =?utf-8?B?ZjV5Z0NmYXU2cVZCQlNiaGR6cGl5SnFwSjlXRlF3U2pDRXdOYU1PMzlwaVky?=
+ =?utf-8?B?ZGlPN3EwTHdOZlNVV0JCNlBkTXFEVGtpZHpLTmFJT1A3Vzl2aTZhbDJPWW84?=
+ =?utf-8?B?REdiZjJ6dXBEQms1aFFkRmRDdlBraFpPNHlVc1lJTWpiUTZmZXgwQ1VDZ24y?=
+ =?utf-8?B?QUlnL1FVZEhlVGZpVU1JeHA2b2ttckl2bnpRYmtNaXZSbWc3aW5iQXAyVmVh?=
+ =?utf-8?B?NFdORUlQMjk3NWV5T1NiT2pCR1BTVFNwSWx5MFowM253clcrQ2N5Um41bE9D?=
+ =?utf-8?B?NGY5WVBFNXdGbzVPNGdNMXNoYk16MGRIYVdEUUNta2RFU3BiQm1Bbnd5NWZz?=
+ =?utf-8?B?OEk5dldtTGhtSmVxbEhJcFprOE83VFVaRE1Oc1l1aElJSDZ3Q2RCVzY3NHBz?=
+ =?utf-8?B?VUs0alpNZFg5anFlUHR0d012eDczcU5WNllNZVBsN2pxVTlzZHd3TExaeWxB?=
+ =?utf-8?B?SFdDNW91cUsxYXZMOTdnVS9RT3J1UEVocU1uWVE3TEJkQ3RoditpQnRWRno2?=
+ =?utf-8?B?RnBQbVNiK2dLSXloL1U1bE1BbWJPUmNPNmw5cXlFRDFmdFhIYmh1eTVIbFlX?=
+ =?utf-8?B?TGU4VHJPVVRESm1aYzlGMS9Ea0pXamxDaUgvQ09McGhwSGUrdjBONklZa1FZ?=
+ =?utf-8?B?eW50TjBpSXRhMHZzWnRKVGxEK21hUW9raHhTdmJaSmlPd2x1ejUyTEpkOG1K?=
+ =?utf-8?B?Ukl1K1laYWpxNjRJOXBSWnNOdW1UeEdFVDd5Y2VPa0dhWFBmMThaYklISHN2?=
+ =?utf-8?B?NmpyYVNqVFZoRFVwREwwV2xZaHVYL1g0b0cwWC9JTzRSNS9ZRlBIeTZrT2t3?=
+ =?utf-8?B?WlhHTDdaWGJRdUF6TGtMS0RGbVpuc0M2blZmWVF0S001U1JDbXl3WW96cGNL?=
+ =?utf-8?B?akU0b1hVOXZLRnJ4azczUmIxOUZNZWJEYi9wOGlGT2lOSjZiTW5UQ2NRWGxt?=
+ =?utf-8?B?VTZUQ3NIT1lIOTNkMTFndDJXOEdmUkoyQ0w5eHgxSkRtc08xNkc5ZFI3WElU?=
+ =?utf-8?B?WHF4SGxOMG1TTUtPR2NUZExWYk9HNWl6T28rdlVHSkFENVczMko3VkpTaGRC?=
+ =?utf-8?B?d09TczJ5MVpMSXFTS1lKQkF5RThva1p5V1hZVWhwUXkwQ0Q5SjlodlB1Zy8v?=
+ =?utf-8?B?ODlUVFdEWjcvcVphaFo1ZUFhSlkxcklZcFB4NE1aczlSbEphYXhPbi9Ocm1C?=
+ =?utf-8?B?Ti90WitWRzRXWm1GMXVTeVg4TVhsdlBuTkV4SlNsM2NvSFU4eEFTMlZCR0Rx?=
+ =?utf-8?B?M2tBYlJ4cW5ZcDBncElhMUxpSFIxK25CVGdGbnB4WHd4T3pCUG52b29WVVk2?=
+ =?utf-8?B?cHU3a0JoSlo4UE14YkFTc3Z3b3V2aTlJTEpVNFE3N2p3RVppbGUyR0VnbC9P?=
+ =?utf-8?B?eFVpR3l2RWQ0M2F0VW5XcVREODc1QXJhTHFXOUNuZlFNaVU2WVI0NC9TVG5J?=
+ =?utf-8?B?R1lzNmxIMDZzQXdMYitKZW1jVTR4MkJPc1Y0LzVIZWh1VktpY1orQWdRb0l1?=
+ =?utf-8?B?dys2N1VKRzZSME1UTmYwQ1RnVFIwYzNWeW5zYjJ5bnppODRPSk1jV1pXR0ZU?=
+ =?utf-8?B?bFY0OUc5M0s0d2M3K0YvajBHcEhFZVNKU1BzTWpEOEJML1poRmsvcWJsci8r?=
+ =?utf-8?B?NTBHcHNvOWRMWWYyUGJDVlRnMDBCdUxMWWgySy9YTXIxT3dra0g5a0J2ZzFs?=
+ =?utf-8?B?TE9aY3VqeEVrL2hSbHpMK2JmWm1OWVFvZE01LytjazAyREhlTDg1U0txOWJk?=
+ =?utf-8?B?NXg4OStKRytGclhoS2VQb3VWNDhveFdadFZQRVZ3cGtZenNCOTBXaUpscS9y?=
+ =?utf-8?B?bVdWYXNWZlgwVzdTSDJHOEh4ay9LdWhSc1NCRnQ1SWJwc2E4K0lydDAreEVN?=
+ =?utf-8?B?Unc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: cb3b8192-1269-4a6c-250b-08de2bae6d7f
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5373.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2025 23:08:49.5992
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QWvdknHIfy+gGTjB0hvJg98Jxsic2TEE5I4OB4+9jrZ+HYaJDUZgXnhcSbfn/XqMTZ4M9b2jJqu0G15sJR1ERtFY11y/CuC2EI1UOGroJmU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPF9EFFC957B
+X-OriginatorOrg: intel.com
 
-On Thu, 20 Nov 2025 17:24:50 +0000, Marc Zyngier wrote:
-> As $SUBJECT says, I really hope this is the last dance for this
-> particular series -- I'm done with it! It was supposed to be a 5 patch
-> job, and we're close to 50. Something went really wrong...
-> 
-> Most of the fixes have now been squashed back into the base patches,
-> and the only new patch is plugging the deactivation helper into the NV
-> code, making it more correct.
-> 
-> [...]
+Hi,
 
-Applied to next, thanks!
+We're now at v6, thanks for all the review feedback.
 
-[01/49] irqchip/gic: Add missing GICH_HCR control bits
-        https://git.kernel.org/kvmarm/kvmarm/c/8cb4ecec5e36
-[02/49] irqchip/gic: Expose CPU interface VA to KVM
-        https://git.kernel.org/kvmarm/kvmarm/c/fa8f11e8e183
-[03/49] irqchip/apple-aic: Spit out ICH_MISR_EL2 value on spurious vGIC MI
-        https://git.kernel.org/kvmarm/kvmarm/c/08f4f41c1e95
-[04/49] KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
-        https://git.kernel.org/kvmarm/kvmarm/c/8d3dfab1d305
-[05/49] KVM: arm64: vgic-v3: Fix GICv3 trapping in protected mode
-        https://git.kernel.org/kvmarm/kvmarm/c/567ebfedb5bd
-[06/49] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
-        https://git.kernel.org/kvmarm/kvmarm/c/2a28810cbb8b
-[07/49] KVM: arm64: Repack struct vgic_irq fields
-        https://git.kernel.org/kvmarm/kvmarm/c/a4413a7c31cf
-[08/49] KVM: arm64: Add tracking of vgic_irq being present in a LR
-        https://git.kernel.org/kvmarm/kvmarm/c/879a7fd4fd64
-[09/49] KVM: arm64: Add LR overflow handling documentation
-        https://git.kernel.org/kvmarm/kvmarm/c/0dc433e79ad0
-[10/49] KVM: arm64: GICv3: Drop LPI active state when folding LRs
-        https://git.kernel.org/kvmarm/kvmarm/c/73c9726975af
-[11/49] KVM: arm64: GICv3: Preserve EOIcount on exit
-        https://git.kernel.org/kvmarm/kvmarm/c/f4ded7b0848e
-[12/49] KVM: arm64: GICv3: Decouple ICH_HCR_EL2 programming from LRs
-        https://git.kernel.org/kvmarm/kvmarm/c/00c6d0d4a805
-[13/49] KVM: arm64: GICv3: Extract LR folding primitive
-        https://git.kernel.org/kvmarm/kvmarm/c/438e47b697f7
-[14/49] KVM: arm64: GICv3: Extract LR computing primitive
-        https://git.kernel.org/kvmarm/kvmarm/c/1ae0448ca797
-[15/49] KVM: arm64: GICv2: Preserve EOIcount on exit
-        https://git.kernel.org/kvmarm/kvmarm/c/5ceb3dac8022
-[16/49] KVM: arm64: GICv2: Decouple GICH_HCR programming from LRs being loaded
-        https://git.kernel.org/kvmarm/kvmarm/c/a00c88ac1f90
-[17/49] KVM: arm64: GICv2: Extract LR folding primitive
-        https://git.kernel.org/kvmarm/kvmarm/c/3aa9a50c2007
-[18/49] KVM: arm64: GICv2: Extract LR computing primitive
-        https://git.kernel.org/kvmarm/kvmarm/c/0660bc4a2b70
-[19/49] KVM: arm64: Compute vgic state irrespective of the number of interrupts
-        https://git.kernel.org/kvmarm/kvmarm/c/dd598fc1139f
-[20/49] KVM: arm64: Eagerly save VMCR on exit
-        https://git.kernel.org/kvmarm/kvmarm/c/cf72ee637119
-[21/49] KVM: arm64: Revamp vgic maintenance interrupt configuration
-        https://git.kernel.org/kvmarm/kvmarm/c/6780a756044c
-[22/49] KVM: arm64: Turn kvm_vgic_vcpu_enable() into kvm_vgic_vcpu_reset()
-        https://git.kernel.org/kvmarm/kvmarm/c/f04b8a5a83db
-[23/49] KVM: arm64: Make vgic_target_oracle() globally available
-        https://git.kernel.org/kvmarm/kvmarm/c/76b2eda65ccc
-[24/49] KVM: arm64: Invert ap_list sorting to push active interrupts out
-        https://git.kernel.org/kvmarm/kvmarm/c/05984ba67eb6
-[25/49] KVM: arm64: Move undeliverable interrupts to the end of ap_list
-        https://git.kernel.org/kvmarm/kvmarm/c/33c1f60b3213
-[26/49] KVM: arm64: Use MI to detect groups being enabled/disabled
-        https://git.kernel.org/kvmarm/kvmarm/c/a69e2d6f8934
-[27/49] KVM: arm64: GICv3: Handle LR overflow when EOImode==0
-        https://git.kernel.org/kvmarm/kvmarm/c/3cfd59f81e0f
-[28/49] KVM: arm64: GICv3: Handle deactivation via ICV_DIR_EL1 traps
-        https://git.kernel.org/kvmarm/kvmarm/c/cd4f6ee99b28
-[29/49] KVM: arm64: GICv3: Add GICv2 SGI handling to deactivation primitive
-        https://git.kernel.org/kvmarm/kvmarm/c/295b69216558
-[30/49] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
-        https://git.kernel.org/kvmarm/kvmarm/c/70fd60bdedc9
-[31/49] KVM: arm64: GICv3: Add SPI tracking to handle asymmetric deactivation
-        https://git.kernel.org/kvmarm/kvmarm/c/1c3b3cadcd69
-[32/49] KVM: arm64: GICv3: Handle in-LR deactivation when possible
-        https://git.kernel.org/kvmarm/kvmarm/c/ca3c34da3644
-[33/49] KVM: arm64: GICv3: Avoid broadcast kick on CPUs lacking TDIR
-        https://git.kernel.org/kvmarm/kvmarm/c/84792050e039
-[34/49] KVM: arm64: GICv3: nv: Resync LRs/VMCR/HCR early for better MI emulation
-        https://git.kernel.org/kvmarm/kvmarm/c/eb33ffa2bd3f
-[35/49] KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive
-        https://git.kernel.org/kvmarm/kvmarm/c/6dd333c8942b
-[36/49] KVM: arm64: GICv3: Force exit to sync ICH_HCR_EL2.En
-        https://git.kernel.org/kvmarm/kvmarm/c/78ffc28456f5
-[37/49] KVM: arm64: GICv2: Handle LR overflow when EOImode==0
-        https://git.kernel.org/kvmarm/kvmarm/c/281c6c06e2a7
-[38/49] KVM: arm64: GICv2: Handle deactivation via GICV_DIR traps
-        https://git.kernel.org/kvmarm/kvmarm/c/255de897e7fb
-[39/49] KVM: arm64: GICv2: Always trap GICV_DIR register
-        https://git.kernel.org/kvmarm/kvmarm/c/07bb1c5622a5
-[40/49] KVM: arm64: selftests: gic_v3: Add irq group setting helper
-        https://git.kernel.org/kvmarm/kvmarm/c/a1650de7c160
-[41/49] KVM: arm64: selftests: gic_v3: Disable Group-0 interrupts by default
-        https://git.kernel.org/kvmarm/kvmarm/c/2366295c76c2
-[42/49] KVM: arm64: selftests: vgic_irq: Fix GUEST_ASSERT_IAR_EMPTY() helper
-        https://git.kernel.org/kvmarm/kvmarm/c/27392612c882
-[43/49] KVM: arm64: selftests: vgic_irq: Change configuration before enabling interrupt
-        https://git.kernel.org/kvmarm/kvmarm/c/8b7888c5114d
-[44/49] KVM: arm64: selftests: vgic_irq: Exclude timer-controlled interrupts
-        https://git.kernel.org/kvmarm/kvmarm/c/5053c2ab92a1
-[45/49] KVM: arm64: selftests: vgic_irq: Remove LR-bound limitation
-        https://git.kernel.org/kvmarm/kvmarm/c/fd5fa1c8d09a
-[46/49] KVM: arm64: selftests: vgic_irq: Perform EOImode==1 deactivation in ack order
-        https://git.kernel.org/kvmarm/kvmarm/c/b6c68612ab41
-[47/49] KVM: arm64: selftests: vgic_irq: Add asymmetric SPI deaectivation test
-        https://git.kernel.org/kvmarm/kvmarm/c/d2dee2e84983
-[48/49] KVM: arm64: selftests: vgic_irq: Add Group-0 enable test
-        https://git.kernel.org/kvmarm/kvmarm/c/1c9c71ac1b9f
-[49/49] KVM: arm64: selftests: vgic_irq: Add timer deactivation test
-        https://git.kernel.org/kvmarm/kvmarm/c/de8842327728
+First 24 patches are now already merged through drm-tip tree, and I hope
+we can get the remaining ones through the VFIO tree.
+No major changes worth highlighting in this rev. Full changelog can be
+found below.
 
---
-Best,
-Oliver
+Cover letter from the previous revision:
+
+Xe is a DRM driver supporting Intel GPUs and for SR-IOV capable
+devices, it enables the creation of SR-IOV VFs.
+This series adds xe-vfio-pci driver variant that interacts with Xe
+driver to control VF device state and read/write migration data,
+allowing it to extend regular vfio-pci functionality with VFIO migration
+capability.
+The driver doesn't expose PRE_COPY support, as currently supported
+hardware lacks the capability to track dirty pages.
+
+While Xe driver already had the capability to manage VF device state,
+management of migration data was something that needed to be implemented
+and constitutes the majority of the series.
+
+The migration data is processed asynchronously by the Xe driver, and is
+organized into multiple migration data packet types representing the
+hardware interfaces of the device (GGTT / MMIO / GuC FW / VRAM).
+Since the VRAM can potentially be larger than available system memory,
+it is copied in multiple chunks. The metadata needed for migration
+compatibility decisions is added as part of descriptor packet (currently
+limited to PCI device ID / revision).
+Xe driver abstracts away the internals of packet processing and takes
+care of tracking the position within individual packets.
+The API exported to VFIO is similar to API exported by VFIO to
+userspace, a simple .read()/.write().
+
+Note that some of the VF resources are not virtualized (e.g. GGTT - the
+GFX device global virtual address space). This means that the VF driver
+needs to be aware that migration has occurred in order to properly
+relocate (patching or reemiting data that contains references to GGTT
+addresses) before resuming operation.
+The code to handle that is already present in upstream Linux and in
+production VF drivers for other OSes.
+
+Links to previous revisions for reference.
+v1:
+https://lore.kernel.org/lkml/20251011193847.1836454-1-michal.winiarski@intel.com/
+v2:
+https://lore.kernel.org/lkml/20251021224133.577765-1-michal.winiarski@intel.com/
+v3:
+https://lore.kernel.org/lkml/20251030203135.337696-1-michal.winiarski@intel.com/
+v4:
+https://lore.kernel.org/lkml/20251105151027.540712-1-michal.winiarski@intel.com/
+v5:
+https://lore.kernel.org/lkml/20251111010439.347045-1-michal.winiarski@intel.com/
+
+v5 -> v6:
+* Exclude the patches already merged through drm-tip
+* Add logging when migration is enabled in debug mode (Michał)
+* Rename the xe_pf_get_pf helper (Michał)
+* Don't use "vendor specific" (yet again) (Michał)
+* Kerneldoc tweaks (Michał)
+* Use guard(xe_pm_runtime_noresume) instead of assert (Michał)
+* Check for num_vfs rather than total_vfs (Michał)
+
+v4 -> v5:
+* Require GuC version >= 70.54.0
+* Fix VFIO migration migf disable
+* Fix null-ptr-deref on save_read error
+* Don't use "vendor specific" (again) (Kevin)
+* Introduce xe_sriov_packet_types.h (Michał)
+* Kernel-doc fixes (Michał)
+* Use tile_id / gt_id instead of tile / gt in packet header (Michał)
+* Don't use struct_group() in packet (Michał)
+* And other, more minor changes
+
+v3 -> v4:
+* Add error handling on data_read / data_write path
+* Don't match on PCI class, use PCI_DRIVER_OVERRIDE_DEVICE_VFIO helper
+  instead (Lucas De Marchi)
+* Use proper node VMA size inside GGTT save / restore helper (Michał)
+* Improve data tracking set_bit / clear_bit wrapper names (Michał)
+* Improve packet dump helper (Michał)
+* Use drmm for migration mutex init (Michał)
+* Rename the pf_device access helper (Michał)
+* Use non-interruptible sleep in VRAM copy (Matt)
+* Rename xe_sriov_migration_data to xe_sriov_packet along with relevant
+  functions (Michał)
+* Rename per-vf device-level data to xe_sriov_migration_state (Michał)
+* Use struct name that matches component name instead of anonymous
+  struct (Michał)
+* Don't add XE_GT_SRIOV_STATE_MAX to state enum, use a helper macro
+  instead (Michał)
+* Kernel-doc fixes (Michał)
+
+v2 -> v3:
+* Bind xe-vfio-pci to specific devices instead of using vendor and
+  class (Christoph Hellwig / Jason Gunthorpe)
+* Don't refer to the driver as "vendor specific" (Christoph)
+* Use pci_iov_get_pf_drvdata and change the interface to take xe_device
+  (Jason)
+* Update the RUNNING_P2P comment (Jason / Kevin Tian)
+* Add state_mutex to protect device state transitions (Kevin)
+* Implement .error_detected (Kevin)
+* Drop redundant comments (Kevin)
+* Explain 1-based indexing and wait_flr_done (Kevin)
+* Add a missing get_file() (Kevin)
+* Drop redundant state transitions when p2p is supported (Kevin)
+* Update run/stop naming to match other drivers (Kevin)
+* Fix error state handling (Kevin)
+* Fix SAVE state diagram rendering (Michał Wajdeczko)
+* Control state machine flipping PROCESS / WAIT logic (Michał Wajdeczko)
+* Drop GUC / GGTT / MMIO / VRAM from SAVE control state machine
+* Use devm instead of drmm for migration-related allocations (Michał)
+* Use GGTT node for size calculations (Michał)
+* Use mutex guards consistently (Michał)
+* Fix build break on 32-bit (lkp)
+* Kernel-doc updates (Michał)
+* And other, more minor changes
+
+v1 -> v2:
+* Do not require debug flag to support migration on PTL/BMG
+* Fix PCI class match on VFIO side
+* Reorganized PF Control state machine (Michał Wajdeczko)
+* Kerneldoc tidying (Michał Wajdeczko)
+* Return NULL instead of -ENODATA for produce/consume (Michał Wajdeczko)
+* guc_buf s/sync/sync_read (Matt Brost)
+* Squash patch 03 (Matt Brost)
+* Assert on PM ref instead of taking it (Matt Brost)
+* Remove CCS completely (Matt Brost)
+* Return ptr on guc_buf_sync_read (Michał Wajdeczko)
+* Define default guc_buf size (Michał Wajdeczko)
+* Drop CONFIG_PCI_IOV=n stubs where not needed (Michał Wajdeczko)
+* And other, more minor changes
+
+Michał Winiarski (4):
+  drm/xe/pf: Enable SR-IOV VF migration
+  drm/xe/pci: Introduce a helper to allow VF access to PF xe_device
+  drm/xe/pf: Export helpers for VFIO
+  vfio/xe: Add device specific vfio_pci driver variant for Intel
+    graphics
+
+ MAINTAINERS                                   |   7 +
+ drivers/gpu/drm/xe/Makefile                   |   2 +
+ drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c |   9 +
+ drivers/gpu/drm/xe/xe_pci.c                   |  17 +
+ drivers/gpu/drm/xe/xe_pci.h                   |   3 +
+ drivers/gpu/drm/xe/xe_sriov_pf_migration.c    |  35 +-
+ drivers/gpu/drm/xe/xe_sriov_pf_migration.h    |   1 +
+ .../gpu/drm/xe/xe_sriov_pf_migration_types.h  |   4 +-
+ drivers/gpu/drm/xe/xe_sriov_vfio.c            | 276 +++++++++
+ drivers/vfio/pci/Kconfig                      |   2 +
+ drivers/vfio/pci/Makefile                     |   2 +
+ drivers/vfio/pci/xe/Kconfig                   |  12 +
+ drivers/vfio/pci/xe/Makefile                  |   3 +
+ drivers/vfio/pci/xe/main.c                    | 568 ++++++++++++++++++
+ include/drm/intel/xe_sriov_vfio.h             |  30 +
+ 15 files changed, 964 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/gpu/drm/xe/xe_sriov_vfio.c
+ create mode 100644 drivers/vfio/pci/xe/Kconfig
+ create mode 100644 drivers/vfio/pci/xe/Makefile
+ create mode 100644 drivers/vfio/pci/xe/main.c
+ create mode 100644 include/drm/intel/xe_sriov_vfio.h
+
+-- 
+2.51.2
+
 
