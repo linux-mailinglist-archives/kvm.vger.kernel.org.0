@@ -1,236 +1,202 @@
-Return-Path: <kvm+bounces-64349-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64350-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9C76C802E6
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 12:21:01 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70E0CC80338
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 12:28:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C2AEB344FFA
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 11:20:33 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B0D74341780
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 11:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26BCE2FB0B3;
-	Mon, 24 Nov 2025 11:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="citxw1pm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998162FD1DC;
+	Mon, 24 Nov 2025 11:28:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from baidu.com (mx24.baidu.com [111.206.215.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B23824501B
-	for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 11:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE85F242D6E;
+	Mon, 24 Nov 2025 11:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763983226; cv=none; b=Ut3z1R81hFaxFb0cYKv7/etrnWYzsd/6UZfLWsyJTBPje3RlsAo3nrYQWlJIVrlBRaW0A8CbJhaMTo8US1sMfYl+6L9wrY9FlDSMkZfIXPAMp2LrXm4rvSeHMHqInO97XDqhy8GAXpkdpvkMzK8wUmR7356bZCXso5dq1UYyc8U=
+	t=1763983705; cv=none; b=mnRtYav9ZRFJ/5xEGP6k572WnZyMgK7+F2DPh4CQvMCbPukM+/7d7GWYUlZbKkykC0u3ik+RsI23ymWK/I4tQTc6Ac7LHO3PzrGtxdb3pwLLaw03PhBM2Qi0ELFLDnuv893g/fZfwTPY/wPJLDIYYZqOje3axjiZ6HZVz1Yqfb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763983226; c=relaxed/simple;
-	bh=hc80IWbycNdi4bXg4cEiAnOpyHwnVUy54ihhoIQ9Mjs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iIUxgWLyZYnxKHEj7cNQk8Ex8V/FHwX2QxH7M6x0pxtnZzynDfHKFpAVAQGDzqCJoNvJlue/cgl20v1aamIl1SN4IYlDsXT29C7b7JIfI4dDJfSFxuB7ogewEqYCk08P7/eOXFT2OSN2CR5BIRgzRxasklTSkHoCou++6APB1bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=citxw1pm; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4edb8d6e98aso588131cf.0
-        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 03:20:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763983222; x=1764588022; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mocyEglELKGPtUD52CXloMOUZ7FDRGa7vgCI+p7SF8c=;
-        b=citxw1pm57sPEuyQXVKTGbV4nSI0rVCfyjBPjjRlK8PkodR5wwoplBmvHbfN0ph3Ry
-         pKfwmW/po2GNhkFXwq0hk/QxQ9Et90d2tKkBZLH8xpVRsMpU/d1w2s0PTXrSCMTARFAZ
-         Gin4bKlzS3JIablUcFowFGGWtOZBuKF+8sEEk5i5sJUzsF/ubPgZLIXKnIRUk4e9Hxya
-         uT7go5lQHcG/dcKOUquWGDgWrazzwWTz5g04g+kXKPSlh6oDy4UMK4oltnZ1O/I19604
-         IEfiB1fZrZkxVLXj7BPPnHNdPUoxAMUylboEOgrcGMvvLQ8jkLlN5qfBQIu82PzwcMVb
-         ahrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763983222; x=1764588022;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mocyEglELKGPtUD52CXloMOUZ7FDRGa7vgCI+p7SF8c=;
-        b=MKuR0kYVyOR4JxYAIGbclavuPm/X2i8usTA+07/QOXx2kUYktFIfzzXSmJpbc6I34W
-         ygjf6oC4lWuMTNDAX09KZpFCySe3eBTGEZ1lvTGXqIHTMzHcnpoLsArLbb3vPt0plb6Z
-         p/r/m41PHY9ZCMt0EOTNLkZ/OmpNNa2UXaZ1J0i8ucNbbb3R+fhMYntXcBpbs4GYfZs/
-         1XlMSbk/jsfha4EeNcFJEj7JVREx7ncGA7vCBXHfyeAKpLxQMEBdkNFSFqDk4bNVu5XX
-         d+3OLb3Sz+7aOPA6plY/HR8BdjRg2h9Abjb+X9ZaGH0mfKFtt0ZcFEKeMoz4SKuMy0Vq
-         vxhw==
-X-Forwarded-Encrypted: i=1; AJvYcCXMstlDONles/e3B8deatiXL48vceMOsBcikxt0tZcJ4+AzfhyXICS4NvaE8bacBuDDQHc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxvr2hEMUW1SdhHVI493UKHx7gs6kkeb0bLn/OXeAHly13cuX5G
-	cSK2cTsZt31plmsDw+830Ux9W4Vs2NgE05qI74du7SEzuZRebJmLMPcYs6J2b6Lt6x4YUHPhVNO
-	9VSebWaFmtPv9dODHwfgWwn1SIS3+bZteOx+gxuY0Zzah9RXwxdINoZ5EsbI=
-X-Gm-Gg: ASbGncuegjzThiYdkOkIuBX2ZOIsZ8idn8s8aBU2YIU2ASASnu46UkQwY0sMfj4p0aI
-	s+h0lksc/6+yZN0asXR8Buk6CwNJYp1BdUlFN5Y2Mtu+vlrpBi/tbiY8RQBkkNhnkFjBYqR60vk
-	UI568yiBhqWJTJJhhmlz0xffPupD0AicsCQ2yAm3urTIQkln4PSl7+XpuZBGmssnMoZCnG9VD2h
-	yzZOdkUhtUdBA/mnC2x1KpVNiXL10efZy7R1JKP9ELrmt3q3fuk8vOL+QwMrP+vCWLZ4548hNUM
-	Ncqn2OS6yDUv1+DkDGwxF+N2GFXYrf8t7FZksw==
-X-Google-Smtp-Source: AGHT+IEYKuthTgYcF0297/p1usIVRs9VHHqDLouBHoMJM+52yETF0m4V1pQX/pgjYf7S6mkSTvMr6AhBtPfm5LrpdY4=
-X-Received: by 2002:ac8:5d14:0:b0:4ed:18ef:4060 with SMTP id
- d75a77b69052e-4ee60ecb032mr9204001cf.8.1763983222323; Mon, 24 Nov 2025
- 03:20:22 -0800 (PST)
+	s=arc-20240116; t=1763983705; c=relaxed/simple;
+	bh=bXDCqJlS8eziB5lVX8bXgEcxkKi7kcDyTmoEGp7HWuQ=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HHOCYHbFNLjox/dxSPYWUcmjnC74Y32X4pH7sq9jAx7rQGjk1bzzRYPmPlKM+g/Lfuu5MNcOtn+RmypPnd5rDdJL1xZP9uPTxMDXCBwXMjyepQ3uYb+W0P9rvPFQkpzxLr/O6QQ/YQBsZLBoQd/5XtWnO0vRaR3GQyuP0MI+HW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: "Li,Rongqing" <lirongqing@baidu.com>
+To: "seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] KVM: use call_rcu instead of synchronize_srcu_expedited()
+ for MMIO unregistration
+Thread-Topic: [PATCH] KVM: use call_rcu instead of
+ synchronize_srcu_expedited() for MMIO unregistration
+Thread-Index: AQHcN4iyHY6h+MoBIU6WF9/WlIA9gLUB+5FQ
+Date: Mon, 24 Nov 2025 11:28:01 +0000
+Message-ID: <21c0d48394bb4e549a55f6eb47215881@baidu.com>
+References: <20251007124829.2051-1-lirongqing@baidu.com>
+In-Reply-To: <20251007124829.2051-1-lirongqing@baidu.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121181429.1421717-1-dmatlack@google.com>
-In-Reply-To: <20251121181429.1421717-1-dmatlack@google.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 24 Nov 2025 16:50:09 +0530
-X-Gm-Features: AWmQ_bkS8Oy3tUmymE_QhiSNQ5Y7Ypy-hqW4oeVZiO9msJvv2pmz8CJ_FYdEbqk
-Message-ID: <CAJHc60zkNOrWtzEPr00a6=fHpcW1KmGRu7Txcohe=LHnS6OL_Q@mail.gmail.com>
-Subject: Re: [PATCH v3 00/18] vfio: selftests: Support for multi-device tests
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Williamson <alex@shazbot.org>, Alex Mastro <amastro@fb.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-FEAS-Client-IP: 172.31.3.12
+X-FE-Policy-ID: 52:10:53:SYSTEM
 
-On Fri, Nov 21, 2025 at 11:44=E2=80=AFPM David Matlack <dmatlack@google.com=
-> wrote:
->
-> This series adds support for tests that use multiple devices, and adds
-> one new test, vfio_pci_device_init_perf_test, which measures parallel
-> device initialization time to demonstrate the improvement from commit
-> e908f58b6beb ("vfio/pci: Separate SR-IOV VF dev_set").
->
-> This series also breaks apart the monolithic vfio_util.h and
-> vfio_pci_device.c into separate files, to account for all the new code.
-> This required quite a bit of code motion so the diffstat looks large.
-> The final layout is more granular and provides a better separation of
-> the IOMMU code from the device code.
->
-> Final layout:
->
->   C files:
->     - tools/testing/selftests/vfio/lib/libvfio.c
->     - tools/testing/selftests/vfio/lib/iommu.c
->     - tools/testing/selftests/vfio/lib/iova_allocator.c
->     - tools/testing/selftests/vfio/lib/vfio_pci_device.c
->     - tools/testing/selftests/vfio/lib/vfio_pci_driver.c
->
->   H files:
->    - tools/testing/selftests/vfio/lib/include/libvfio.h
->    - tools/testing/selftests/vfio/lib/include/libvfio/assert.h
->    - tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
->    - tools/testing/selftests/vfio/lib/include/libvfio/iova_allocator.h
->    - tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
->    - tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_driver.h
->
-> Notably, vfio_util.h is now gone and replaced with libvfio.h.
->
-> This series is based on vfio/next plus Alex Mastro's series to add the
-> IOVA allocator [1]. It should apply cleanly to vfio/next once Alex's
-> series is merged by Linus into the next 6.18 rc and then merged into
-> vfio/next.
->
-> This series can be found on GitHub:
->
->   https://github.com/dmatlack/linux/tree/vfio/selftests/init_perf_test/v3
->
-> [1] https://lore.kernel.org/kvm/20251111-iova-ranges-v3-0-7960244642c5@fb=
-.com/
->
-> Cc: Alex Mastro <amastro@fb.com>
-> Cc: Jason Gunthorpe <jgg@nvidia.com>
-> Cc: Josh Hilke <jrhilke@google.com>
-> Cc: Raghavendra Rao Ananta <rananta@google.com>
-> Cc: Vipin Sharma <vipinsh@google.com>
->
-> v3:
->  - Replace literal with NSEC_PER_SEC (Alex Mastro)
->  - Fix Makefile accumulate vs. assignment (Alex Mastro)
->
-> v2: https://lore.kernel.org/kvm/20251112192232.442761-1-dmatlack@google.c=
-om/
->
-> v1: https://lore.kernel.org/kvm/20251008232531.1152035-1-dmatlack@google.=
-com/
->
-> David Matlack (18):
->   vfio: selftests: Move run.sh into scripts directory
->   vfio: selftests: Split run.sh into separate scripts
->   vfio: selftests: Allow passing multiple BDFs on the command line
->   vfio: selftests: Rename struct vfio_iommu_mode to iommu_mode
->   vfio: selftests: Introduce struct iommu
->   vfio: selftests: Support multiple devices in the same
->     container/iommufd
->   vfio: selftests: Eliminate overly chatty logging
->   vfio: selftests: Prefix logs with device BDF where relevant
->   vfio: selftests: Upgrade driver logging to dev_err()
->   vfio: selftests: Rename struct vfio_dma_region to dma_region
->   vfio: selftests: Move IOMMU library code into iommu.c
->   vfio: selftests: Move IOVA allocator into iova_allocator.c
->   vfio: selftests: Stop passing device for IOMMU operations
->   vfio: selftests: Rename vfio_util.h to libvfio.h
->   vfio: selftests: Move vfio_selftests_*() helpers into libvfio.c
->   vfio: selftests: Split libvfio.h into separate header files
->   vfio: selftests: Eliminate INVALID_IOVA
->   vfio: selftests: Add vfio_pci_device_init_perf_test
->
->  tools/testing/selftests/vfio/Makefile         |  10 +-
->  .../selftests/vfio/lib/drivers/dsa/dsa.c      |  36 +-
->  .../selftests/vfio/lib/drivers/ioat/ioat.c    |  18 +-
->  .../selftests/vfio/lib/include/libvfio.h      |  26 +
->  .../vfio/lib/include/libvfio/assert.h         |  54 ++
->  .../vfio/lib/include/libvfio/iommu.h          |  76 +++
->  .../vfio/lib/include/libvfio/iova_allocator.h |  23 +
->  .../lib/include/libvfio/vfio_pci_device.h     | 125 ++++
->  .../lib/include/libvfio/vfio_pci_driver.h     |  97 +++
->  .../selftests/vfio/lib/include/vfio_util.h    | 331 -----------
->  tools/testing/selftests/vfio/lib/iommu.c      | 465 +++++++++++++++
->  .../selftests/vfio/lib/iova_allocator.c       |  94 +++
->  tools/testing/selftests/vfio/lib/libvfio.c    |  78 +++
->  tools/testing/selftests/vfio/lib/libvfio.mk   |   5 +-
->  .../selftests/vfio/lib/vfio_pci_device.c      | 555 +-----------------
->  .../selftests/vfio/lib/vfio_pci_driver.c      |  16 +-
->  tools/testing/selftests/vfio/run.sh           | 109 ----
->  .../testing/selftests/vfio/scripts/cleanup.sh |  41 ++
->  tools/testing/selftests/vfio/scripts/lib.sh   |  42 ++
->  tools/testing/selftests/vfio/scripts/run.sh   |  16 +
->  tools/testing/selftests/vfio/scripts/setup.sh |  48 ++
->  .../selftests/vfio/vfio_dma_mapping_test.c    |  46 +-
->  .../selftests/vfio/vfio_iommufd_setup_test.c  |   2 +-
->  .../vfio/vfio_pci_device_init_perf_test.c     | 168 ++++++
->  .../selftests/vfio/vfio_pci_device_test.c     |  12 +-
->  .../selftests/vfio/vfio_pci_driver_test.c     |  51 +-
->  26 files changed, 1481 insertions(+), 1063 deletions(-)
->  create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio.h
->  create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/asse=
-rt.h
->  create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/iomm=
-u.h
->  create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/iova=
-_allocator.h
->  create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/vfio=
-_pci_device.h
->  create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/vfio=
-_pci_driver.h
->  delete mode 100644 tools/testing/selftests/vfio/lib/include/vfio_util.h
->  create mode 100644 tools/testing/selftests/vfio/lib/iommu.c
->  create mode 100644 tools/testing/selftests/vfio/lib/iova_allocator.c
->  create mode 100644 tools/testing/selftests/vfio/lib/libvfio.c
->  delete mode 100755 tools/testing/selftests/vfio/run.sh
->  create mode 100755 tools/testing/selftests/vfio/scripts/cleanup.sh
->  create mode 100755 tools/testing/selftests/vfio/scripts/lib.sh
->  create mode 100755 tools/testing/selftests/vfio/scripts/run.sh
->  create mode 100755 tools/testing/selftests/vfio/scripts/setup.sh
->  create mode 100644 tools/testing/selftests/vfio/vfio_pci_device_init_per=
-f_test.c
->
->
-> base-commit: fa804aa4ac1b091ef2ec2981f08a1c28aaeba8e7
-> prerequisite-patch-id: dcf23dcc1198960bda3102eefaa21df60b2e4c54
-> prerequisite-patch-id: e32e56d5bf7b6c7dd40d737aa3521560407e00f5
-> prerequisite-patch-id: 4f79a41bf10a4c025ba5f433551b46035aa15878
-> prerequisite-patch-id: f903a45f0c32319138cd93a007646ab89132b18c
+> From: Li RongQing <lirongqing@baidu.com>
+>=20
+> During VM reboot/shutdown, device MMIO unregistration maybe occurs
+> frequently. The current use of synchronize_srcu_expedited() introduces
+> measurable latency in these operations. Replace with call_rcu to defer
+> cleanup asynchronously, speed up VM reboot/shutdown.
+>=20
+> Add a 'dev' field to struct kvm_io_bus to hold the device being unregiste=
+red
+> for the RCU callback. Adjust related code to ensure proper list managemen=
+t
+> before unregistration.
+
+
+Ping
+
+Thanks
+
+-Li
+
+
+>=20
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> ---
+>  include/linux/kvm_host.h  |  1 +
+>  virt/kvm/coalesced_mmio.c |  2 +-
+>  virt/kvm/eventfd.c        |  2 +-
+>  virt/kvm/kvm_main.c       | 13 ++++++++-----
+>  4 files changed, 11 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h index
+> 19b8c4b..38498d9 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -208,6 +208,7 @@ struct kvm_io_bus {
+>  	int dev_count;
+>  	int ioeventfd_count;
+>  	struct rcu_head rcu;
+> +	struct kvm_io_device *dev;
+>  	struct kvm_io_range range[];
+>  };
+>=20
+> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c index
+> 375d628..0db6af2 100644
+> --- a/virt/kvm/coalesced_mmio.c
+> +++ b/virt/kvm/coalesced_mmio.c
+> @@ -82,7 +82,6 @@ static void coalesced_mmio_destructor(struct
+> kvm_io_device *this)  {
+>  	struct kvm_coalesced_mmio_dev *dev =3D to_mmio(this);
+>=20
+> -	list_del(&dev->list);
+>=20
+>  	kfree(dev);
+>  }
+> @@ -169,6 +168,7 @@ int
+> kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
+>  	list_for_each_entry_safe(dev, tmp, &kvm->coalesced_zones, list) {
+>  		if (zone->pio =3D=3D dev->zone.pio &&
+>  		    coalesced_mmio_in_range(dev, zone->addr, zone->size)) {
+> +			list_del(&dev->list);
+>  			r =3D kvm_io_bus_unregister_dev(kvm,
+>  				zone->pio ? KVM_PIO_BUS : KVM_MMIO_BUS,
+> &dev->dev);
+>  			/*
+> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c index 6b1133a..8a2f0=
+e0
+> 100644
+> --- a/virt/kvm/eventfd.c
+> +++ b/virt/kvm/eventfd.c
+> @@ -750,7 +750,6 @@ static void
+>  ioeventfd_release(struct _ioeventfd *p)  {
+>  	eventfd_ctx_put(p->eventfd);
+> -	list_del(&p->list);
+>  	kfree(p);
+>  }
+>=20
+> @@ -949,6 +948,7 @@ kvm_deassign_ioeventfd_idx(struct kvm *kvm,
+> enum kvm_bus bus_idx,
+>  		if (!p->wildcard && p->datamatch !=3D args->datamatch)
+>  			continue;
+>=20
+> +		list_del(&p->list);
+>  		kvm_io_bus_unregister_dev(kvm, bus_idx, &p->dev);
+>  		bus =3D kvm_get_bus(kvm, bus_idx);
+>  		if (bus)
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c index
+> f2e77eb..3ddad34 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -5955,10 +5955,12 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu,
+> enum kvm_bus bus_idx, gpa_t addr,  }
+> EXPORT_SYMBOL_GPL(kvm_io_bus_read);
+>=20
+> -static void __free_bus(struct rcu_head *rcu)
+> +static void __free_bus_dev(struct rcu_head *rcu)
+>  {
+>  	struct kvm_io_bus *bus =3D container_of(rcu, struct kvm_io_bus, rcu);
+>=20
+> +	if (bus->dev)
+> +		kvm_iodevice_destructor(bus->dev);
+>  	kfree(bus);
+>  }
+>=20
+> @@ -6000,7 +6002,8 @@ int kvm_io_bus_register_dev(struct kvm *kvm,
+> enum kvm_bus bus_idx, gpa_t addr,
+>  	memcpy(new_bus->range + i + 1, bus->range + i,
+>  		(bus->dev_count - i) * sizeof(struct kvm_io_range));
+>  	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
+> -	call_srcu(&kvm->srcu, &bus->rcu, __free_bus);
+> +	bus->dev =3D NULL;
+> +	call_srcu(&kvm->srcu, &bus->rcu, __free_bus_dev);
+>=20
+>  	return 0;
+>  }
+> @@ -6036,20 +6039,20 @@ int kvm_io_bus_unregister_dev(struct kvm
+> *kvm, enum kvm_bus bus_idx,
+>  	}
+>=20
+>  	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
+> -	synchronize_srcu_expedited(&kvm->srcu);
+>=20
+>  	/*
+>  	 * If NULL bus is installed, destroy the old bus, including all the
+>  	 * attached devices. Otherwise, destroy the caller's device only.
+>  	 */
+>  	if (!new_bus) {
+> +		synchronize_srcu_expedited(&kvm->srcu);
+>  		pr_err("kvm: failed to shrink bus, removing it completely\n");
+>  		kvm_io_bus_destroy(bus);
+>  		return -ENOMEM;
+>  	}
+>=20
+> -	kvm_iodevice_destructor(dev);
+> -	kfree(bus);
+> +	bus->dev =3D dev;
+> +	call_srcu(&kvm->srcu, &bus->rcu, __free_bus_dev);
+>  	return 0;
+>  }
+>=20
 > --
-> 2.52.0.rc2.455.g230fcf2819-goog
->
-Apart from a couple of minor nits in patch-6:
-Reviewed-by: Raghavendra Rao Ananta <rananta@google.com>
+> 2.9.4
+
 
