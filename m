@@ -1,151 +1,117 @@
-Return-Path: <kvm+bounces-64340-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64347-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27D9DC7FFC4
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 11:49:07 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6054C8018F
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 12:08:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 76A9C4E477E
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 10:48:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 37150346FAE
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 11:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF152777E0;
-	Mon, 24 Nov 2025 10:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120892FB962;
+	Mon, 24 Nov 2025 11:07:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="advJ2CZM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G7eAzWb7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2EB2550D5
-	for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 10:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5500E2F3609;
+	Mon, 24 Nov 2025 11:07:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763981323; cv=none; b=MKuHJVZGGw9zUN4aTVryIkOcNAEP2RHAwfOf9wwnh+iQVSeuHjubj0QKwbkys+DfpzM+IP6L2zOS3nitrIuIg8iETWFuMlvtF2w/4XQ8YR/GYZxt6yg10BiVmvbnSEtyurkAdAdplNcIYl0Gu212X01vpyOL4aIoeDv7TRmXUp8=
+	t=1763982433; cv=none; b=KRRIMmWNAIf1csyV8dR2aHgnURb6YplMUGp2BBWTGGj2//Iiv252rDypkoSKquD8MYj6mOBAPTRbhkvQXVDqoD3ARHVBcnIchrA4PU2hMFO6prmxkM4r5+GkHoZSc997AwcWI9o47cwbWOWdHChM3/CYzGfqkK2htIcuR5R8ouc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763981323; c=relaxed/simple;
-	bh=MHYfe8bGDtNpXB2soBddZZBCJYpkG+5RTuO0JL8Lr+Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=acy4gZXwkuDdLn9cn6vUZfMTGKr9w2BHxJNWiMt4bfEFrjjOMhXQQtnIL4e66EgLV1S0eyGe4s/60ZfkK2YdDOIOZFtffMZuPCZojg5Q9650kx/65QvJ/5d1LymyJK0F0CcGZ+KNAYo7ymaVTFk7kQzeCfy4H5lHuYbWIctuNFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--lrizzo.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=advJ2CZM; arc=none smtp.client-ip=209.85.218.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--lrizzo.bounces.google.com
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b73599315adso309485566b.2
-        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 02:48:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763981320; x=1764586120; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lX+jdToFx/xjPzdH2tpm4CYF/HvbIMVX0oD+xboE4lA=;
-        b=advJ2CZMK1kRBc7lW56l7CBWnUPsK3J/OH98bZrDZB21cs2vCF+Uqx/sHiZ64lt9sZ
-         moQSt2/ALt9kM63TL/dd8YE3PiBkEwY0yoh1+Y+K7Orkyn+dBoFpPlO0Hp8QFD69WdPm
-         enkTCDieWfaNOJblCwtUdeb5YPBoWGzRZszeQhxc3vfRoxFt3CzReD9nwQDHfiQKBSDe
-         k55+Za/LcWb9wHokjFneQnMI+wZ3Bky9NFmWlgCL5sb03YA9mf13pcIPe4yZd8bnbAhS
-         1Kfkw6skkZvldLp1b/FCTez3Ce2W1MC27BT82kKNbDBqqdducia9yM3gifdoaTFKhyln
-         HWNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763981320; x=1764586120;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lX+jdToFx/xjPzdH2tpm4CYF/HvbIMVX0oD+xboE4lA=;
-        b=m9Q2/nC2RfCMCjO5k5FdmR2qef+VHPBB9GGj1h+uN5twc5kwmlIZCc4SkylPMLw70M
-         mCOVGEgFMJEh803pOLg9EsQytLHyeE8Y2nF8pXP/5NOWu6/kXYqEbySuFOVl8ouHbCpR
-         +WheFkaapPSGtdtY38MGwKAnQBQsZE21xX3XetbBmR7ECvZABnGX9fzltD73wy0StFJA
-         XddlIJw4qCBYdNphrGxT4vu6ZExZSs4DTBCrC6ufdhQpMJcVJnAB67tlgSnN9hUU0jYz
-         aIHCXwNpzE/tjHgRo1WGp1ZpSk1LgKnwdAOGhTY/HFSyz4r8FRlorSfL0wcRcT8Af0g9
-         sowQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7t5HxLRQ2vgKS5XWzHtvMK1oaDWewlG3chVR/TEKMf7yDfp3hmHMHvdT/g1ZVRW0WY/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwktJpM+YnXeUqaoWncdPuJ2Zhl+jI0lco2d5J3VP+Br9V+3bJl
-	FySOxRmt7wUsb/MmYFkKzpE6PG/rYvmk7E863unE+GpTdffY9EaAHDZhMmatQam7mouLUmReAUg
-	ZfXkUdw==
-X-Google-Smtp-Source: AGHT+IFoktae1A0BdrqpkwJD+MWHUxshGOT+nbpyXrTVzweW/1e+RqyV/RiSfy7EG3W/P8GjNhl7vPPfcAk=
-X-Received: from ejcst14.prod.google.com ([2002:a17:907:c08e:b0:b73:724e:575e])
- (user=lrizzo job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:4fce:b0:b73:a319:e8be
- with SMTP id a640c23a62f3a-b7671a221cfmr1351585866b.57.1763981320135; Mon, 24
- Nov 2025 02:48:40 -0800 (PST)
-Date: Mon, 24 Nov 2025 10:48:36 +0000
-In-Reply-To: <20240423174114.526704-1-jacob.jun.pan@linux.intel.com>
+	s=arc-20240116; t=1763982433; c=relaxed/simple;
+	bh=1zHIvNEf+NEropyB/UiSTJ/BYa9+kSRseH9TJzhz5aY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L8TUCGnsqtCweVgf/oXjGMUiqZAz9x8xAq2M3B8JdTIXhjCElKIG194GK3lLbGO6xEXrWNQ6h+sCZmSXIKMHe3Kkxii7Sc39H1zeBS3ytIaQaq2O+oY0omTTPx64rg+SfhwFK7JAI+Eq8AeDFzkyKFPe7pSIXtHrw/RVki0MgR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G7eAzWb7; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763982431; x=1795518431;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1zHIvNEf+NEropyB/UiSTJ/BYa9+kSRseH9TJzhz5aY=;
+  b=G7eAzWb7IocJdC9N91G6A7b2CeSfEGC3i8djQ32L0XxqRzO5trXaXtHz
+   fKnRmGdkhEjPd5VY0dlqSCa9UdCn1ffHl6KUsfboEfuseuhCvecwsFUeQ
+   ObaAwdLO7nvrbIjoK8x534mOznHK30Np12ANJ3ozu2sH6WC/s+nIYtZc5
+   zF6FbjnD4B1uidMmNx7mMnn1m8wMMjEfG/bKXLLK49tBpEhAxVYVkZcOR
+   3C/1V8lgRcJ5VeaBwlHdN8tmWdHmQCkceopXZBnD1xw+hSjY0DCS7edQf
+   scefYXK8ufEJwFay+d6yKIfVkWjDmj/bP2ZBLfJZAJ873L10+dXRn4hBl
+   w==;
+X-CSE-ConnectionGUID: uqUv6Bd3Q2KuuLEVzvcHMg==
+X-CSE-MsgGUID: FPGGdLc+SKq15fNIYJ1OSw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11622"; a="66139180"
+X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
+   d="scan'208";a="66139180"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 03:07:11 -0800
+X-CSE-ConnectionGUID: pegE1URWRviKK6oQP8pXLg==
+X-CSE-MsgGUID: d3x5067aS+SRVZGCOqU64w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
+   d="scan'208";a="197230778"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa004.fm.intel.com with ESMTP; 24 Nov 2025 03:07:07 -0800
+Date: Mon, 24 Nov 2025 18:52:05 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: linux-coco@lists.linux.dev, linux-pci@vger.kernel.org,
+	chao.gao@intel.com, dave.jiang@intel.com, baolu.lu@linux.intel.com,
+	yilun.xu@intel.com, zhenzhong.duan@intel.com, kvm@vger.kernel.org,
+	rick.p.edgecombe@intel.com, dave.hansen@linux.intel.com,
+	dan.j.williams@intel.com, kas@kernel.org, x86@kernel.org
+Subject: Re: [PATCH v1 08/26] x86/virt/tdx: Add tdx_enable_ext() to enable of
+ TDX Module Extensions
+Message-ID: <aSQ41bTeYKo29Zim@yilunxu-OptiPlex-7050>
+References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
+ <20251117022311.2443900-9-yilun.xu@linux.intel.com>
+ <cfcfb160-fcd2-4a75-9639-5f7f0894d14b@intel.com>
+ <aRyphEW2jpB/3Ht2@yilunxu-OptiPlex-7050>
+ <62bec236-4716-4326-8342-1863ad8a3f24@intel.com>
+ <aR6ws2yzwQumApb9@yilunxu-OptiPlex-7050>
+ <13e894a8-474f-465a-a13a-5d892efbfadb@intel.com>
+ <aSBg+5rS1Y498gHx@yilunxu-OptiPlex-7050>
+ <ca331aa3-6304-4e07-9ed9-94dc69726382@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240423174114.526704-1-jacob.jun.pan@linux.intel.com>
-X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
-Message-ID: <20251124104836.3685533-1-lrizzo@google.com>
-Subject: Re: [PATCH v3  00/12] Coalesced Interrupt Delivery with posted MSI
-From: Luigi Rizzo <lrizzo@google.com>
-To: jacob.jun.pan@linux.intel.com, lrizzo@google.com, rizzo.unipi@gmail.com, 
-	seanjc@google.com, tglx@linutronix.de
-Cc: a.manzanares@samsung.com, acme@kernel.org, ashok.raj@intel.com, 
-	axboe@kernel.dk, baolu.lu@linux.intel.com, bp@alien8.de, 
-	dan.j.williams@intel.com, dave.hansen@intel.com, guang.zeng@intel.com, 
-	helgaas@kernel.org, hpa@zytor.com, iommu@lists.linux.dev, 
-	jim.harris@samsung.com, joro@8bytes.org, kevin.tian@intel.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, maz@kernel.org, 
-	mingo@redhat.com, oliver.sang@intel.com, paul.e.luse@intel.com, 
-	peterz@infradead.org, robert.hoo.linux@gmail.com, robin.murphy@arm.com, 
-	x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ca331aa3-6304-4e07-9ed9-94dc69726382@intel.com>
 
-I think there is an inherent race condition when intremap=posted_msi
-and the IRQ subsystem resends pending interrupts via __apic_send_IPI().
+> A few more nits, though. Please don't talk about things in terms of
+> number of pages. Just give the usage in megabytes.
 
-In detail:
-intremap=posted_msi does not process vectors for which the
-corresponding bit in the PIR register is set.
+Yes.
 
-Now say that, for whatever reason, the IRQ infrastructure intercepts
-an interrupt marking it as PENDING. . handle_edge_irq() and many other
-places in kernel/irq have sections of code like this:
+...
 
-    if (!irq_may_run(desc)) {
-        desc->istate |= IRQS_PENDING;
-	mask_ack_irq(desc);
-	goto out_unlock;
-    }
+> >  -#define TDH_SYS_CONFIG                 45
+> >  +#define TDH_SYS_CONFIG                 (45 | (1ULL << TDX_VERSION_SHIFT))
+> 
+> That's my theory: we don't need to keep versions.
 
-Then eventually check_irq_resend() will try to resend pending interrupts
+Good to know.
 
-    desc->istate &= ~IRQS_PENDING;
-    if (!try_retrigger(desc))
-        err = irq_sw_resend(desc);
+...
 
-try_retrigger() on x86 eventually calls apic_retrigger_irq() which
-uses __apic_send_IPI(). Unfortunately the latter does not seem to
-set the 'vector' bit in the PIR (nor sends the POSTED_MSI interrupt)
-thus potentially causing a lost interrupt unless there is some other
-spontaneous interrupt coming from the device.
+> > The TDX Module can only accept one root page (i.e. 512 HPAs at most), while
+> > struct tdx_page_array contains the whole EXT memory (12800 pages). So we
+> > can't populate all pages into one root page then tell TDX Module. We need to
+> > populate one batch, tell tdx module, then populate the next batch, tell
+> > tdx module...
+> 
+> That is, indeed, the information that I was looking for. Can you please
+> ensure that makes it into code comments?
 
-I could verify the stall (forcing the path that sets IRQS_PENDING),
-and could verify that the patch below fixes the problem
-
- static int apic_retrigger_irq(struct irq_data *irqd)
- {
-        struct apic_chip_data *apicd = apic_chip_data(irqd);
-        unsigned long flags;
-+       uint vec;
-
-        raw_spin_lock_irqsave(&vector_lock, flags);
-+       vec = apicd->vector;
-+       if (posted_msi_supported() &&
-+           vec >= FIRST_EXTERNAL_VECTOR && vec < FIRST_SYSTEM_VECTOR) {
-+               struct pi_desc *pid = per_cpu_ptr(&posted_msi_pi_desc, apicd->cpu);
-
-+               set_bit(vec, (unsigned long *)pid->pir64);
-+               __apic_send_IPI(apicd->cpu, POSTED_MSI_NOTIFICATION_VECTOR);
-+       } else {
-                __apic_send_IPI(apicd->cpu, apicd->vector);
-+       }
-        raw_spin_unlock_irqrestore(&vector_lock, flags);
-
-        return 1;
-}
-
-Am I missing something ? any better fix ?
-
-cheers
-luigi
+Yes.
 
