@@ -1,50 +1,65 @@
-Return-Path: <kvm+bounces-64330-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64331-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8950C7F98D
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 10:25:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C62B7C7FA1C
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 10:29:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 562BC4E672F
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 09:21:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5DE894E4E15
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 09:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757AF221FA0;
-	Mon, 24 Nov 2025 09:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2AFB2F6199;
+	Mon, 24 Nov 2025 09:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="W1phIZYm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BdsojQxA"
 X-Original-To: kvm@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11792F6164;
-	Mon, 24 Nov 2025 09:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE332F5A0C;
+	Mon, 24 Nov 2025 09:26:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763976005; cv=none; b=aXpY4IIb7+cmlIKUqf6+qPMOkK4l8HirNYaKCoTq1d0mVltTQ+0RVRGy1wHQV2F0thP4e3lUMM4jmCoDT+dg1XBXON73KLbblyOPWJSD5rKfpE7VbdlWQbyRZsTWNCuLAP+eahiVLMpGDbvnYQNNVMPZ2FNPV8MOq01SM2Iw4x0=
+	t=1763976416; cv=none; b=HXkllp7tHUAbGBsqKTH9cDz3xsfNlq8EObkPtPDQj5HAabfxp9LhQzIxG8p77J+O/wd/js3JkmVpIIfkZpNCf/Unnq20EWCJnzGdfAfnyQDb5a8K66n8/MA0Gkk/wKkqfDFTZApUp84NJ1RHMUduyJfzol2QbvErFzQuSJ44G4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763976005; c=relaxed/simple;
-	bh=as0qPCSeuDey2UvPQNoA9nLR+sOxMbVOLPPIjyVNB8I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lrrX6BvIMahdcTpojzpx9Y1iSj44NeMKCmiBPLiXv12JUPFjQBTm9i5TkrE/bBMdDPGNDgbS4QFb49w7npksLyz6Qi8/6W1/1R6kwOZYgQZWhhQAjXBOVIgWkw+IXkivYWJH/U2qbrpT2jUCmY10YTCxXZ2EbAti9CHZUZgusgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=W1phIZYm; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [172.31.100.153] ([172.31.100.153])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5AO9Jgah024669
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 24 Nov 2025 10:19:43 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1763975983;
-	bh=as0qPCSeuDey2UvPQNoA9nLR+sOxMbVOLPPIjyVNB8I=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=W1phIZYmJpZ9so4FdeXZH7HrbyWdXUAcCWBSyenpYO87+ZxAWy8d2SK/FcQc4rYeQ
-	 m9Ehk6rvyCkip1BUGmpzw7On9HMBe7gHEUucQ1/sBi6eZaY8YWvylodRdwmmQzNQH+
-	 ZM0AuOMp2QlUp893dmm1DNXufipApdZX57xE+P60=
-Message-ID: <ebb431f9-fdd3-4db3-bfd5-70af703ef9b5@tu-dortmund.de>
-Date: Mon, 24 Nov 2025 10:19:42 +0100
+	s=arc-20240116; t=1763976416; c=relaxed/simple;
+	bh=9SztITqQ4D3qybTDRMRxELb+sO2S4C65ekZnrR7/ltU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=rZ8EHFVSWPn9S04w7mPR6komJY03US6SXfbost3nFgfNywrQ9eNTyd2nOT7hp+Yt1f0ShK7KiDQzFXQp/7djxIll5tyIWQiXfN5uNhFIhy76YZSwsa8Hs4Gw7XAD6fJ6ytWIEFs2BHVMlF/N4kWMv/3CIK4URCMFSfb3pi6MBHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BdsojQxA; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763976414; x=1795512414;
+  h=message-id:date:mime-version:subject:to:references:cc:
+   from:in-reply-to:content-transfer-encoding;
+  bh=9SztITqQ4D3qybTDRMRxELb+sO2S4C65ekZnrR7/ltU=;
+  b=BdsojQxAGHMNY1XIAQAMT15NtO9qgYK+FfriTERHgfK0gfKM+WHgxQCA
+   GtdD+kLvTGl7G69xMD65SzsRdzbJa1WLqR8Y8zUWUvSHsGvrIOnar2YOs
+   aAbFISMhEDiA9tL8xyCXkecF9lfPDiqazTaq0Gd5tAufVDgUiQL/QoZie
+   9uKypjdfrmsl4hwpvOCNQzHCCYSyQhxL4qfudJ9NhMfRl0HIlCTJNeMV7
+   IKRYA7j/vaw/Bb7KTFXJKTFQsG1O8dmKmXqHAjViMscQUHtOJQjOVHhtr
+   L6fy/38M4a5LfoLE7bCR2214PcLArPim2bHtzWt+qdSB/6w3rDlfF9Zxi
+   g==;
+X-CSE-ConnectionGUID: 01ka626SQmOOfupOz5HZNw==
+X-CSE-MsgGUID: 7s7RIF9nSsq68JUYg8wDdg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11622"; a="66012221"
+X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
+   d="scan'208";a="66012221"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 01:26:53 -0800
+X-CSE-ConnectionGUID: V3jA9flGQ/mn3WvLx5K9Ag==
+X-CSE-MsgGUID: X54GqQKRTIqJ3wxYtORRuQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
+   d="scan'208";a="223251405"
+Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 01:26:48 -0800
+Message-ID: <8eba534b-7fcf-43b2-a304-091993faef1c@linux.intel.com>
+Date: Mon, 24 Nov 2025 17:26:46 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -52,200 +67,103 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 0/8] tun/tap & vhost-net: netdev queue flow
- control to avoid ptr_ring tail drop
-To: Jason Wang <jasowang@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
-        jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
- <CACGkMEuboys8sCJFUTGxHUeouPFnVqVLGQBefvmxYDe4ooLfLg@mail.gmail.com>
- <b9fff8e1-fb96-4b1f-9767-9d89adf31060@tu-dortmund.de>
- <CACGkMEufNLjXj37NBVCW4xdSuVLLV4ZS4WTuRzdaBV-nYgKs8w@mail.gmail.com>
+Subject: Re: [PATCH v4 03/16] x86/virt/tdx: Simplify tdmr_get_pamt_sz()
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+References: <20251121005125.417831-1-rick.p.edgecombe@intel.com>
+ <20251121005125.417831-4-rick.p.edgecombe@intel.com>
 Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CACGkMEufNLjXj37NBVCW4xdSuVLLV4ZS4WTuRzdaBV-nYgKs8w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Cc: bp@alien8.de, chao.gao@intel.com, dave.hansen@intel.com,
+ isaku.yamahata@intel.com, kai.huang@intel.com, kas@kernel.org,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+ seanjc@google.com, tglx@linutronix.de, vannapurve@google.com,
+ x86@kernel.org, yan.y.zhao@intel.com, xiaoyao.li@intel.com,
+ binbin.wu@intel.com
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20251121005125.417831-4-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 11/24/25 02:04, Jason Wang wrote:
-> On Fri, Nov 21, 2025 at 5:23 PM Simon Schippers
-> <simon.schippers@tu-dortmund.de> wrote:
->>
->> On 11/21/25 07:19, Jason Wang wrote:
->>> On Thu, Nov 20, 2025 at 11:30 PM Simon Schippers
->>> <simon.schippers@tu-dortmund.de> wrote:
->>>>
->>>> This patch series deals with tun/tap and vhost-net which drop incoming
->>>> SKBs whenever their internal ptr_ring buffer is full. Instead, with this
->>>> patch series, the associated netdev queue is stopped before this happens.
->>>> This allows the connected qdisc to function correctly as reported by [1]
->>>> and improves application-layer performance, see our paper [2]. Meanwhile
->>>> the theoretical performance differs only slightly:
->>>>
->>>> +--------------------------------+-----------+----------+
->>>> | pktgen benchmarks to Debian VM | Stock     | Patched  |
->>>> | i5 6300HQ, 20M packets         |           |          |
->>>> +-----------------+--------------+-----------+----------+
->>>> | TAP             | Transmitted  | 195 Kpps  | 183 Kpps |
->>>> |                 +--------------+-----------+----------+
->>>> |                 | Lost         | 1615 Kpps | 0 pps    |
->>>> +-----------------+--------------+-----------+----------+
->>>> | TAP+vhost_net   | Transmitted  | 589 Kpps  | 588 Kpps |
->>>> |                 +--------------+-----------+----------+
->>>> |                 | Lost         | 1164 Kpps | 0 pps    |
->>>> +-----------------+--------------+-----------+----------+
->>>
->>
->> Hi Jason,
->>
->> thank you for your reply!
->>
->>> PPS drops somehow for TAP, any reason for that?
->>
->> I have no explicit explanation for that except general overheads coming
->> with this implementation.
-> 
-> It would be better to fix that.
-> 
->>
->>>
->>> Btw, I had some questions:
->>>
->>> 1) most of the patches in this series would introduce non-trivial
->>> impact on the performance, we probably need to benchmark each or split
->>> the series. What's more we need to run TCP benchmark
->>> (throughput/latency) as well as pktgen see the real impact
->>
->> What could be done, IMO, is to activate tun_ring_consume() /
->> tap_ring_consume() before enabling tun_ring_produce(). Then we could see
->> if this alone drops performance.
->>
->> For TCP benchmarks, you mean userspace performance like iperf3 between a
->> host and a guest system?
-> 
-> Yes,
-> 
->>
->>>
->>> 2) I see this:
->>>
->>>         if (unlikely(tun_ring_produce(&tfile->tx_ring, queue, skb))) {
->>>                 drop_reason = SKB_DROP_REASON_FULL_RING;
->>>                 goto drop;
->>>         }
->>>
->>> So there could still be packet drop? Or is this related to the XDP path?
->>
->> Yes, there can be packet drops after a ptr_ring resize or a ptr_ring
->> unconsume. Since those two happen so rarely, I figured we should just
->> drop in this case.
->>
->>>
->>> 3) The LLTX change would have performance implications, but the
->>> benmark doesn't cover the case where multiple transmission is done in
->>> parallel
->>
->> Do you mean multiple applications that produce traffic and potentially
->> run on different CPUs?
-> 
-> Yes.
-> 
->>
->>>
->>> 4) After the LLTX change, it seems we've lost the synchronization with
->>> the XDP_TX and XDP_REDIRECT path?
->>
->> I must admit I did not take a look at XDP and cannot really judge if/how
->> lltx has an impact on XDP. But from my point of view, __netif_tx_lock()
->> instead of __netif_tx_acquire(), is executed before the tun_net_xmit()
->> call and I do not see the impact for XDP, which calls its own methods.
-> 
-> Without LLTX tun_net_xmit is protected by tx lock but it is not the
-> case of tun_xdp_xmit. This is because, unlike other devices, tun
-> doesn't have a dedicated TX queue for XDP, so the queue is shared by
-> both XDP and skb. So XDP xmit path needs to be protected with tx lock
-> as well, and since we don't have queue discipline for XDP, it means we
-> could still drop packets when XDP is enabled. I'm not sure this would
-> defeat the whole idea or not.
 
-Good point.
 
-> 
->>>
->>> 5) The series introduces various ptr_ring helpers with lots of
->>> ordering stuff which is complicated, I wonder if we first have a
->>> simple patch to implement the zero packet loss
->>
->> I personally don't see how a simpler patch is possible without using
->> discouraged practices like returning NETDEV_TX_BUSY in tun_net_xmit or
->> spin locking between producer and consumer. But I am open for
->> suggestions :)
-> 
-> I see NETDEV_TX_BUSY is used by veth:
-> 
-> static int veth_xdp_rx(struct veth_rq *rq, struct sk_buff *skb)
-> {
->         if (unlikely(ptr_ring_produce(&rq->xdp_ring, skb)))
->                 return NETDEV_TX_BUSY; /* signal qdisc layer */
-> 
->         return NET_RX_SUCCESS; /* same as NETDEV_TX_OK */
-> }
-> 
-> Maybe it would be simpler to start from that (probably with a new tun->flags?).
-> 
-> Thanks
+On 11/21/2025 8:51 AM, Rick Edgecombe wrote:
+> For each memory region that the TDX module might use (TDMR), the three
+> separate PAMT allocations are needed. One for each supported page size
+> (1GB, 2MB, 4KB). These store information on each page in the TDMR. In
+> Linux, they are allocated out of one physically contiguous block, in order
+> to more efficiently use some internal TDX module book keeping resources.
+> So some simple math is needed to break the single large allocation into
+> three smaller allocations for each page size.
+>
+> There are some commonalities in the math needed to calculate the base and
+> size for each smaller allocation, and so an effort was made to share logic
+> across the three. Unfortunately doing this turned out naturally tortured,
+> with a loop iterating over the three page sizes, only to call into a
+> function with a case statement for each page size. In the future Dynamic
+> PAMT will add more logic that is special to the 4KB page size, making the
+> benefit of the math sharing even more questionable.
+>
+> Three is not a very high number, so get rid of the loop and just duplicate
+> the small calculation three times. In doing so, setup for future Dynamic
+> PAMT changes and drop a net 33 lines of code.
+>
+> Since the loop that iterates over it is gone, further simplify the code by
+> dropping the array of intermediate size and base storage. Just store the
+> values to their final locations. Accept the small complication of having
+> to clear tdmr->pamt_4k_base in the error path, so that tdmr_do_pamt_func()
+> will not try to operate on the TDMR struct when attempting to free it.
+>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 
-Do you mean that this patchset could be implemented using the same
-approach that was used for veth in [1]?
-This could then also fix the XDP path.
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 
-But is returning NETDEV_TX_BUSY fine in our case?
+One nit below.
 
-Do you mean a flag that enables or disables the no-drop behavior?
+[...]
+> @@ -535,26 +518,18 @@ static int tdmr_set_up_pamt(struct tdmr_info *tdmr,
+>   	 * in overlapped TDMRs.
+>   	 */
+>   	pamt = alloc_contig_pages(tdmr_pamt_size >> PAGE_SHIFT, GFP_KERNEL,
+> -			nid, &node_online_map);
+> -	if (!pamt)
+> +				  nid, &node_online_map);
+> +	if (!pamt) {
+> +		/*
+> +		 * tdmr->pamt_4k_base is zero so the
+> +		 * error path will skip freeing.
+> +		 */
+>   		return -ENOMEM;
+Nit:
+Do you think it's OK to move the comment up so to avoid multiple lines of
+comments as well as the curly braces?
 
-Thanks!
+         /* tdmr->pamt_4k_base is zero so the error path will skip freeing. */
+         if (!pamt)
+             return -ENOMEM;
 
-[1] Link: https://lore.kernel.org/netdev/174559288731.827981.8748257839971869213.stgit@firesoul/T/#u
-
-> 
->>
->>>
->>>>
->>>> This patch series includes tun/tap, and vhost-net because they share
->>>> logic. Adjusting only one of them would break the others. Therefore, the
->>>> patch series is structured as follows:
->>>> 1+2: new ptr_ring helpers for 3
->>>> 3: tun/tap: tun/tap: add synchronized ring produce/consume with queue
->>>> management
->>>> 4+5+6: tun/tap: ptr_ring wrappers and other helpers to be called by
->>>> vhost-net
->>>> 7: tun/tap & vhost-net: only now use the previous implemented functions to
->>>> not break git bisect
->>>> 8: tun/tap: drop get ring exports (not used anymore)
->>>>
->>>> Possible future work:
->>>> - Introduction of Byte Queue Limits as suggested by Stephen Hemminger
->>>
->>> This seems to be not easy. The tx completion depends on the userspace behaviour.
->>
->> I agree, but I really would like to reduce the buffer bloat caused by the
->> default 500 TUN / 1000 TAP packet queue without losing performance.
->>
->>>
->>>> - Adaption of the netdev queue flow control for ipvtap & macvtap
->>>>
->>>> [1] Link: https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
->>>> [2] Link: https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
->>>>
->>>
->>> Thanks
->>>
->>
->> Thanks! :)
->>
-> 
+> -
+> -	/*
+> -	 * Break the contiguous allocation back up into the
+> -	 * individual PAMTs for each page size.
+> -	 */
+> -	tdmr_pamt_base = page_to_pfn(pamt) << PAGE_SHIFT;
+> -	for (pgsz = TDX_PS_4K; pgsz < TDX_PS_NR; pgsz++) {
+> -		pamt_base[pgsz] = tdmr_pamt_base;
+> -		tdmr_pamt_base += pamt_size[pgsz];
+>   	}
+>   
+> -	tdmr->pamt_4k_base = pamt_base[TDX_PS_4K];
+> -	tdmr->pamt_4k_size = pamt_size[TDX_PS_4K];
+> -	tdmr->pamt_2m_base = pamt_base[TDX_PS_2M];
+> -	tdmr->pamt_2m_size = pamt_size[TDX_PS_2M];
+> -	tdmr->pamt_1g_base = pamt_base[TDX_PS_1G];
+> -	tdmr->pamt_1g_size = pamt_size[TDX_PS_1G];
+> +	tdmr->pamt_4k_base = page_to_phys(pamt);
+> +	tdmr->pamt_2m_base = tdmr->pamt_4k_base + tdmr->pamt_4k_size;
+> +	tdmr->pamt_1g_base = tdmr->pamt_2m_base + tdmr->pamt_2m_size;
+>   
+>   	return 0;
+>   }
+>
+[...]
 
