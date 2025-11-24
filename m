@@ -1,133 +1,151 @@
-Return-Path: <kvm+bounces-64339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7E84C7FF46
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 11:42:09 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27D9DC7FFC4
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 11:49:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7D476344A0B
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 10:42:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 76A9C4E477E
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 10:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 838D02FA0DB;
-	Mon, 24 Nov 2025 10:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF152777E0;
+	Mon, 24 Nov 2025 10:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="advJ2CZM"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9632F8BCA
-	for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 10:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2EB2550D5
+	for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 10:48:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763980921; cv=none; b=ZXnSBO+kjAWif1Exnc8XIS1CX47EU9g4kndYmjgqje6ezyRdKLEHYHvWqD3QceejRhaf8Ryg0+DQYRTzNBUIqtUC9CU/+KMs7wTEqq4nvcA/wa8QJv4p+Sgeuzu0nB+x91CVBLNjyY7BVGjtZzuYlpUUdiYLaK2ioXXlij5eMMs=
+	t=1763981323; cv=none; b=MKuHJVZGGw9zUN4aTVryIkOcNAEP2RHAwfOf9wwnh+iQVSeuHjubj0QKwbkys+DfpzM+IP6L2zOS3nitrIuIg8iETWFuMlvtF2w/4XQ8YR/GYZxt6yg10BiVmvbnSEtyurkAdAdplNcIYl0Gu212X01vpyOL4aIoeDv7TRmXUp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763980921; c=relaxed/simple;
-	bh=QTAyOk3PHcd/woJOR7zn+/qpCoKijJfRmeOljShnA3s=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=QIKVkcWgmploW9XKwxt3gIRpiVldMuHbXQUgg0ik8DkTOi166d/W5YkohrNOJSPbvbY4PcMno5tQwWCieASw/Y4bRB4rEhl9Cap2WCuwe9GIQQzPBmJsjfINLReN+bYKTnwFg+Vb28RZEc5cNTYes50tTRMP6AKemQ4Izl9hLds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 612D21477;
-	Mon, 24 Nov 2025 02:41:51 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BA8CB3F6A8;
-	Mon, 24 Nov 2025 02:41:57 -0800 (PST)
-Message-ID: <576d088c-0176-41e5-a66c-8713f5cb09b7@arm.com>
-Date: Mon, 24 Nov 2025 10:41:56 +0000
+	s=arc-20240116; t=1763981323; c=relaxed/simple;
+	bh=MHYfe8bGDtNpXB2soBddZZBCJYpkG+5RTuO0JL8Lr+Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=acy4gZXwkuDdLn9cn6vUZfMTGKr9w2BHxJNWiMt4bfEFrjjOMhXQQtnIL4e66EgLV1S0eyGe4s/60ZfkK2YdDOIOZFtffMZuPCZojg5Q9650kx/65QvJ/5d1LymyJK0F0CcGZ+KNAYo7ymaVTFk7kQzeCfy4H5lHuYbWIctuNFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--lrizzo.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=advJ2CZM; arc=none smtp.client-ip=209.85.218.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--lrizzo.bounces.google.com
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b73599315adso309485566b.2
+        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 02:48:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763981320; x=1764586120; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lX+jdToFx/xjPzdH2tpm4CYF/HvbIMVX0oD+xboE4lA=;
+        b=advJ2CZMK1kRBc7lW56l7CBWnUPsK3J/OH98bZrDZB21cs2vCF+Uqx/sHiZ64lt9sZ
+         moQSt2/ALt9kM63TL/dd8YE3PiBkEwY0yoh1+Y+K7Orkyn+dBoFpPlO0Hp8QFD69WdPm
+         enkTCDieWfaNOJblCwtUdeb5YPBoWGzRZszeQhxc3vfRoxFt3CzReD9nwQDHfiQKBSDe
+         k55+Za/LcWb9wHokjFneQnMI+wZ3Bky9NFmWlgCL5sb03YA9mf13pcIPe4yZd8bnbAhS
+         1Kfkw6skkZvldLp1b/FCTez3Ce2W1MC27BT82kKNbDBqqdducia9yM3gifdoaTFKhyln
+         HWNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763981320; x=1764586120;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lX+jdToFx/xjPzdH2tpm4CYF/HvbIMVX0oD+xboE4lA=;
+        b=m9Q2/nC2RfCMCjO5k5FdmR2qef+VHPBB9GGj1h+uN5twc5kwmlIZCc4SkylPMLw70M
+         mCOVGEgFMJEh803pOLg9EsQytLHyeE8Y2nF8pXP/5NOWu6/kXYqEbySuFOVl8ouHbCpR
+         +WheFkaapPSGtdtY38MGwKAnQBQsZE21xX3XetbBmR7ECvZABnGX9fzltD73wy0StFJA
+         XddlIJw4qCBYdNphrGxT4vu6ZExZSs4DTBCrC6ufdhQpMJcVJnAB67tlgSnN9hUU0jYz
+         aIHCXwNpzE/tjHgRo1WGp1ZpSk1LgKnwdAOGhTY/HFSyz4r8FRlorSfL0wcRcT8Af0g9
+         sowQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW7t5HxLRQ2vgKS5XWzHtvMK1oaDWewlG3chVR/TEKMf7yDfp3hmHMHvdT/g1ZVRW0WY/k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwktJpM+YnXeUqaoWncdPuJ2Zhl+jI0lco2d5J3VP+Br9V+3bJl
+	FySOxRmt7wUsb/MmYFkKzpE6PG/rYvmk7E863unE+GpTdffY9EaAHDZhMmatQam7mouLUmReAUg
+	ZfXkUdw==
+X-Google-Smtp-Source: AGHT+IFoktae1A0BdrqpkwJD+MWHUxshGOT+nbpyXrTVzweW/1e+RqyV/RiSfy7EG3W/P8GjNhl7vPPfcAk=
+X-Received: from ejcst14.prod.google.com ([2002:a17:907:c08e:b0:b73:724e:575e])
+ (user=lrizzo job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:4fce:b0:b73:a319:e8be
+ with SMTP id a640c23a62f3a-b7671a221cfmr1351585866b.57.1763981320135; Mon, 24
+ Nov 2025 02:48:40 -0800 (PST)
+Date: Mon, 24 Nov 2025 10:48:36 +0000
+In-Reply-To: <20240423174114.526704-1-jacob.jun.pan@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Ben Horgan <ben.horgan@arm.com>
-Subject: Re: [PATCH 4/5] KVM: arm64: Report optional ID register traps with a
- 0x18 syndrome
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>,
- Zenghui Yu <yuzenghui@huawei.com>
-References: <20251120133202.2037803-1-maz@kernel.org>
- <20251120133202.2037803-5-maz@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20251120133202.2037803-5-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240423174114.526704-1-jacob.jun.pan@linux.intel.com>
+X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
+Message-ID: <20251124104836.3685533-1-lrizzo@google.com>
+Subject: Re: [PATCH v3  00/12] Coalesced Interrupt Delivery with posted MSI
+From: Luigi Rizzo <lrizzo@google.com>
+To: jacob.jun.pan@linux.intel.com, lrizzo@google.com, rizzo.unipi@gmail.com, 
+	seanjc@google.com, tglx@linutronix.de
+Cc: a.manzanares@samsung.com, acme@kernel.org, ashok.raj@intel.com, 
+	axboe@kernel.dk, baolu.lu@linux.intel.com, bp@alien8.de, 
+	dan.j.williams@intel.com, dave.hansen@intel.com, guang.zeng@intel.com, 
+	helgaas@kernel.org, hpa@zytor.com, iommu@lists.linux.dev, 
+	jim.harris@samsung.com, joro@8bytes.org, kevin.tian@intel.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, maz@kernel.org, 
+	mingo@redhat.com, oliver.sang@intel.com, paul.e.luse@intel.com, 
+	peterz@infradead.org, robert.hoo.linux@gmail.com, robin.murphy@arm.com, 
+	x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Marc,
+I think there is an inherent race condition when intremap=posted_msi
+and the IRQ subsystem resends pending interrupts via __apic_send_IPI().
 
-On 11/20/25 13:32, Marc Zyngier wrote:
-> With FEAT_IDST, unimplemented system registers must be reported using
-> EC=0x18 at the closest handling EL, rather than with an UNDEF.
+In detail:
+intremap=posted_msi does not process vectors for which the
+corresponding bit in the PIR register is set.
 
-I think this needs 'in the feature ID space' adding. Something like:
+Now say that, for whatever reason, the IRQ infrastructure intercepts
+an interrupt marking it as PENDING. . handle_edge_irq() and many other
+places in kernel/irq have sections of code like this:
 
-With FEAT_IDST, unimplemented system registers in the feature ID space
-must be reported using EC=0x18 at the closest handling EL, rather than
-with an UNDEF.
+    if (!irq_may_run(desc)) {
+        desc->istate |= IRQS_PENDING;
+	mask_ack_irq(desc);
+	goto out_unlock;
+    }
 
-> 
-> Most system registers are always implemented thanks to their dependency
+Then eventually check_irq_resend() will try to resend pending interrupts
 
-'Most of these system registers...'
+    desc->istate &= ~IRQS_PENDING;
+    if (!try_retrigger(desc))
+        err = irq_sw_resend(desc);
 
-> on FEAT_AA64, except for a set of (currently) three registers:
-> GMID_EL1 (depending on MTE2), CCSIDR2_EL1 (depending on FEAT_CCIDX),
-> and SMIDR_EL1 (depending on SME).
-I agree that these 3 are currently the only optional system registers in
-the feature ID space.
+try_retrigger() on x86 eventually calls apic_retrigger_irq() which
+uses __apic_send_IPI(). Unfortunately the latter does not seem to
+set the 'vector' bit in the PIR (nor sends the POSTED_MSI interrupt)
+thus potentially causing a lost interrupt unless there is some other
+spontaneous interrupt coming from the device.
 
-> 
-> For these three registers, report their trap as EC=0x18 if they
-> end-up trapping into KVM and that FEAT_IDST is not implemented in the
-> guest. Otherwise, just make them UNDEF.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 40f32b017f107..992137822dcf9 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -82,6 +82,16 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
->  			"sys_reg write to read-only register");
->  }
->  
-> +static bool idst_access(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			const struct sys_reg_desc *r)
-> +{
-> +	if (kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, IDS, 0x0))
-> +		return undef_access(vcpu, p, r);
-> +
-> +	kvm_inject_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> +	return false;
-> +}
-> +
->  enum sr_loc_attr {
->  	SR_LOC_MEMORY	= 0,	  /* Register definitely in memory */
->  	SR_LOC_LOADED	= BIT(0), /* Register on CPU, unless it cannot */
-> @@ -3396,9 +3406,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
->  	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr, reset_clidr, CLIDR_EL1,
->  	  .set_user = set_clidr, .val = ~CLIDR_EL1_RES0 },
-> -	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
-> -	{ SYS_DESC(SYS_GMID_EL1), undef_access },
-> -	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
-> +	{ SYS_DESC(SYS_CCSIDR2_EL1), idst_access },
-> +	{ SYS_DESC(SYS_GMID_EL1), idst_access },
-> +	{ SYS_DESC(SYS_SMIDR_EL1), idst_access },
->  	IMPLEMENTATION_ID(AIDR_EL1, GENMASK_ULL(63, 0)),
->  	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
->  	ID_FILTERED(CTR_EL0, ctr_el0,
+I could verify the stall (forcing the path that sets IRQS_PENDING),
+and could verify that the patch below fixes the problem
 
+ static int apic_retrigger_irq(struct irq_data *irqd)
+ {
+        struct apic_chip_data *apicd = apic_chip_data(irqd);
+        unsigned long flags;
++       uint vec;
 
-Thanks,
+        raw_spin_lock_irqsave(&vector_lock, flags);
++       vec = apicd->vector;
++       if (posted_msi_supported() &&
++           vec >= FIRST_EXTERNAL_VECTOR && vec < FIRST_SYSTEM_VECTOR) {
++               struct pi_desc *pid = per_cpu_ptr(&posted_msi_pi_desc, apicd->cpu);
 
-Ben
++               set_bit(vec, (unsigned long *)pid->pir64);
++               __apic_send_IPI(apicd->cpu, POSTED_MSI_NOTIFICATION_VECTOR);
++       } else {
+                __apic_send_IPI(apicd->cpu, apicd->vector);
++       }
+        raw_spin_unlock_irqrestore(&vector_lock, flags);
 
+        return 1;
+}
+
+Am I missing something ? any better fix ?
+
+cheers
+luigi
 
