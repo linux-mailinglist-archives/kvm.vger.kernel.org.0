@@ -1,132 +1,115 @@
-Return-Path: <kvm+bounces-64390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58E80C80A88
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 14:06:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F106EC80BCD
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 14:24:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D4DF64E5873
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 13:06:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5A6A44E5A8E
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 13:24:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74BDA303CAC;
-	Mon, 24 Nov 2025 13:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B037A18FDBE;
+	Mon, 24 Nov 2025 13:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3V8BGSg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iJ1Hmwx9"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808A22E8E10;
-	Mon, 24 Nov 2025 13:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C40321ABD0;
+	Mon, 24 Nov 2025 13:23:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763989592; cv=none; b=cE1mI3L60jHuAEjQfboXDsLUqWyYUmk//cnFUCYNdNFkXZoAagpo5uKJfv1XdrlE+a4pzqR5UG4v5XvIN+Cw2FXMfq2okpUZ7bJlyZAOjB8U+OHJpfM6OdYnKpYXcqH6tPiGPw/f2R7//9rSUdovXMMVNYa8i2ysMe/bCpJ4xpo=
+	t=1763990594; cv=none; b=b2BpwNqHCvFP4U4DD8fbYZ9F6sMwsEjx8pfYd6XKQBcPYgCmFgaQTpJGiZaPS1r/0oCCpqwqoGmdXnzmiE8a8rWU23G9FXpKx1F4JvTEe1bsHqrmBgovuI1029IF/YZdwqlsm/moh52Nh4LPVL6Ur5bJV9PIDZ6i+06zxbW2Vo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763989592; c=relaxed/simple;
-	bh=5j0CLSvOJClj10Gzqp4SzaePQkmDOy6Vdp6NVHuro04=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BA2/4palBcQfTAv3K787EhhyBguwUlvf5V+WMRT5uRjqRp5Zi4VligdWSspQOmztWOkpP1DJMZe0IFXLKY2bl9uEawkHbxpK3mRPCT5a5FfaG9isQj5i0stpOMCemTT4og44StwqeCFtn9q0lu/IiKzaTJO6IZyzK4/u3bA41Tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3V8BGSg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ACEFC116D0;
-	Mon, 24 Nov 2025 13:06:32 +0000 (UTC)
+	s=arc-20240116; t=1763990594; c=relaxed/simple;
+	bh=ZkveGrdkvCfPZFoOUJbbqtFMDnhuefLqnTOZdpFUeTg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hqnpdNoIZ2UT1DxSltOvIQ1Xs0TcZXDVOagrjnbCDVAklPTy0/Rr/kVGYvzxRZV2WEOdsH6rTlXkXXRhEPzUwhv+niRo6FNVsReI9VJf50GN9AzzQXwv3jXOpXXZIQ30Kp7a2k1Xl6SVEEC5BOPnJuldSF+4Ma+EwmoabizXLck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iJ1Hmwx9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85E1AC116C6;
+	Mon, 24 Nov 2025 13:23:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763989592;
-	bh=5j0CLSvOJClj10Gzqp4SzaePQkmDOy6Vdp6NVHuro04=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=m3V8BGSgC33MuYL+7IJxdicRfHPtObuQIPuR9g/U+fAPn2+3zga2WCZU5KBrGOnGi
-	 1YOgzNXdk2lGlaOLjwjepa0O0YgY204eUo8mcryVjAr6UZF+svSCtGc2MzavsDbviD
-	 US4QliUeH2ZmLsYmYqxJEtM+hMShI0bQIy77+4rCQ0CuNornjXAOtj+77027bYnTFD
-	 mvuL8QA89qMzREMKm/yejISFrfxDViL13NmuDg7D6Q+c3BvUVVr7WezqVDvoltZzCa
-	 KBOPueLvBIgAB/Va8rftGGomNarbKr8cXhIW1xJ2/QiEZyVCJIq8Q0L8H+2RSzy7vp
-	 nx09yKENSacwQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vNWGz-00000007r1G-3j9E;
-	Mon, 24 Nov 2025 13:06:29 +0000
-Date: Mon, 24 Nov 2025 13:06:29 +0000
-Message-ID: <86o6orr356.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
+	s=k20201202; t=1763990593;
+	bh=ZkveGrdkvCfPZFoOUJbbqtFMDnhuefLqnTOZdpFUeTg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iJ1Hmwx9zq6u/cnF1AWukxT1quc2d66mXECA5dl6e16/7bLcnUFeBC4B41HvRk+UD
+	 D4aU5LTRl7k5mw/273TdJmLhqIhN4sJIjtY9G5l29ZQyuvbnyqmZ+yf/CmEnxcmAmP
+	 eQnFIu1E0Pu2VGOXIT8ARfUhq4avwxSjHb98EtCIJaGJoJBEE4YcNmwAIZ1anWYJ2n
+	 OHcT4HtO10dn9eUzFCnYefUIQ0fcJa64sUsJxvyGIhmxKudlURT5moD0SxXxYKFcVW
+	 6VzQK9fc3/Y/3uygosq1OfKSn04to+6Fz/6qr9+NjlxqmuNUfl+yBYpVvz+kA7j2Yj
+	 xVVai9St2BZuQ==
+Date: Mon, 24 Nov 2025 13:23:08 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
-In-Reply-To: <51f5b5d7-9e98-40b8-8f8b-f50254573f3d@sirena.org.uk>
+Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when
+ interrupts overflow LR capacity
+Message-ID: <342302ba-5678-408a-ab63-1a854099d4a1@sirena.org.uk>
 References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-30-maz@kernel.org>
-	<CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
-	<86cy5ku06v.wl-maz@kernel.org>
-	<51f5b5d7-9e98-40b8-8f8b-f50254573f3d@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20251109171619.1507205-30-maz@kernel.org>
+ <CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
+ <86cy5ku06v.wl-maz@kernel.org>
+ <51f5b5d7-9e98-40b8-8f8b-f50254573f3d@sirena.org.uk>
+ <86o6orr356.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="hFXx54rNo6XRJZ1B"
+Content-Disposition: inline
+In-Reply-To: <86o6orr356.wl-maz@kernel.org>
+X-Cookie: Single tasking: Just Say No.
 
-On Mon, 24 Nov 2025 11:52:07 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Fri, Nov 14, 2025 at 03:02:32PM +0000, Marc Zyngier wrote:
-> > Fuad Tabba <tabba@google.com> wrote:
-> > > On Sun, 9 Nov 2025 at 17:17, Marc Zyngier <maz@kernel.org> wrote:
-> 
-> > > > +       /*
-> > > > +        * Note that we set the trap irrespective of EOIMode, as that
-> > > > +        * can change behind our back without any warning...
-> > > > +        */
-> > > > +       if (irqs_active_outside_lrs(als))
-> > > > +               cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
-> > > >  }
-> 
-> > > I just tested these patches as they are on kvmarm/next
-> > > 2ea7215187c5759fc5d277280e3095b350ca6a50 ("Merge branch
-> > > 'kvm-arm64/vgic-lr-overflow' into kvmarm/next"), without any
-> > > additional pKVM patches. I tried running it with pKVM (non-protected)
-> > > and with just plain nVHE. In both cases, I get a trap to EL2 (0x18)
-> > > when booting a non-protected guest, which triggers a bug in
-> > > handle_trap() arch/arm64/kvm/hyp/nvhe/hyp-main.c:706
-> 
-> > > This trap is happening because of setting this particular trap (TDIR).
-> > > Just removing this trap from vgic_v3_configure_hcr() from the ToT on
-> > > kvmarm/next boots fine.
-> 
-> > This is surprising, as I'm not hitting this on actual HW. Are you
-> > getting a 0x18 trap? If so, is it coming from the host? Can you
-> > correlate the PC with what the host is doing?
-> 
-> FWIW I am seeing this on i.MX8MP (4xA53+GICv3):
-> 
->   https://lava.sirena.org.uk/scheduler/job/2118713#L1044
 
-There are worrying errors way before that, in the VMID allocator init,
-and I can't see what the GIC has to do with it. The issue Fuad
-reported was at run time, not boot time. so this really doesn't align
-with what you are seeing.
+--hFXx54rNo6XRJZ1B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-	M.
+On Mon, Nov 24, 2025 at 01:06:29PM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
--- 
-Without deviation from the norm, progress is not possible.
+> > FWIW I am seeing this on i.MX8MP (4xA53+GICv3):
+
+> >   https://lava.sirena.org.uk/scheduler/job/2118713#L1044
+
+> There are worrying errors way before that, in the VMID allocator init,
+> and I can't see what the GIC has to do with it. The issue Fuad
+> reported was at run time, not boot time. so this really doesn't align
+> with what you are seeing.
+
+Yeah, I was just looking further and realising it was probably
+different - sorry about that.  I was checking what else was failing
+after seeing the qemu issue he was, all the platforms aren't booting one
+way or another.  FWIW with earlycon on the AM625 is showing similar
+issues to the i.MX8MP.
+
+--hFXx54rNo6XRJZ1B
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmkkXDwACgkQJNaLcl1U
+h9C2vQf/ZbF4IdL2c4d01zdL9N7tPXlRLDT98/P32kMDIRLhCDDdoBw+Y9fOnYa7
+KEbi4DHROC73/b49D7t63cVaBwBE55FSvyRk/XPWGb/KFUlzapbyEn9p338AojG0
+TIihc0wE3J8q4W3vcJSmwIY+XoZOwQUuL8yxfoa3k+EAlYewtFRT3T7rMwGpvic8
+kd5pt4mIRbTVM3rqOdpfq8xkzFVrQ0SZLrWVtzqPF+sEdjLdw15LH96rl6gzOnxt
+nPeEylyci7LuRB3kPnw7pxYjOstZun3de+aEC0BLaSJxPWCW6y4N87RONHeZ+75j
+jONlJPB3f5zFMqWmcO3lQlNXSnSUyw==
+=fXcl
+-----END PGP SIGNATURE-----
+
+--hFXx54rNo6XRJZ1B--
 
