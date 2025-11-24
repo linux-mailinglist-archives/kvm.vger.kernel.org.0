@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-64392-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64393-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07DB9C80D1D
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 14:41:09 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C60CBC80F0B
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 15:12:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A7153A35F6
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 13:40:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B74B74E324F
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 14:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701DA306D47;
-	Mon, 24 Nov 2025 13:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC7D30E83A;
+	Mon, 24 Nov 2025 14:12:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PlRZR+sp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lYlI9cON"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F5019F40B;
-	Mon, 24 Nov 2025 13:40:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F6F30CD89;
+	Mon, 24 Nov 2025 14:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763991638; cv=none; b=ofZs1tQigpcor6noVrsMnvaJXkrvh/eDm84Kox2cNh/osxDvnGx9BrdMToFix29+w8evBHk3VZa73D6P+DuIPlXaaJmbFzlqkGroa3vtXTZVxHii5yxtuKBPWxRFcaUk2GXpqrJdfevB444eM3MV7m6j8Pm+OJ+27SNtbsA73e4=
+	t=1763993542; cv=none; b=olIlekIO1BqsXj47VXuxjQ92F4XnWuvf/06VeuDFdMAz7CFHJ3x52hPypX2VgN5n+S+h3cVWow1OVZRURfzehtsTTWEVADpnFcS5gHH7wp9tG2jWcr59lCUMLoUTaykoiKsEL5uQt97SvOnoxHcVAwevxT+gkVUKV5WJ7i7IgMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763991638; c=relaxed/simple;
-	bh=yq4uyJZy6izwORe81H0kssAC4st99lLWRqoHxxrv56M=;
+	s=arc-20240116; t=1763993542; c=relaxed/simple;
+	bh=EQ3IrSxU9ixy8cMHUjletLF6L8CoG51o0Abml8Nr8Ok=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CvGmkx1DcgT/sjvYRXOJIgBSIC9pdlE1UicpURHYbZGH27w0vCrKpMyR+pomb9GlMxFMs0T7rrOy9H0LR0bYokqnU0EwrzNVvMjaKOMqEfJI22gooNat1MyqiVuhL3k6yX+u6pt4YZKbyiOTDq7zhejcJAOVDQqksbtCqV8D47g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PlRZR+sp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE9AC4CEF1;
-	Mon, 24 Nov 2025 13:40:38 +0000 (UTC)
+	 MIME-Version:Content-Type; b=sgbwUAs7x/A+1DcE6gWfl42IE969J2cS6pkwYnwtE14HhJLqVEfWMO0OxYDItCiqLDRa3Z+f3xvlh33fIVwKL557zPB9YDcSeRQS9Xacv75HD/2qht5mYPv6YEYN6VfAl6/1234Q+DYLVgOb4VTNcPIuxMhuOsl/YA2MnEDh3Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lYlI9cON; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70D8DC4CEF1;
+	Mon, 24 Nov 2025 14:12:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763991638;
-	bh=yq4uyJZy6izwORe81H0kssAC4st99lLWRqoHxxrv56M=;
+	s=k20201202; t=1763993541;
+	bh=EQ3IrSxU9ixy8cMHUjletLF6L8CoG51o0Abml8Nr8Ok=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PlRZR+spYWLZYU+a02vWj37CgEnGvSCojbXHIYNPktdI1GNayI86yFWfJcwbYDpjc
-	 fAlmkieqZZERfj7K53wor6ylZJzVwjobO6LNC2FO5r1L40MHOGwsAOOPaj6ULo+/Sl
-	 2oAl8DTVFCiHBEDl6iIdBWs2HoMUrZaSV2X/rRqe5kzvcNgg0HFGXexzqO38NxqanX
-	 bWz6Bag54zU8H3x9KlH+MxVY8Rt8HI2IWcL6L8scSE+MjixFjmnxzoCZQM/MD6OJVX
-	 qIuAB/dG2Dz7JNUxHY0aOcOvlZlX+PSFYePXrX5ih8XD03Hfdf/+kxjh0Y0yqdqYA8
-	 +paGMQb6XrsQA==
+	b=lYlI9cONxGOzokkOHF53pJrHJ7D2yC6ma6q+pV2nhsp8ve+1sdF40XbavTNBwsxJU
+	 du92OarhfouJygiW342aACY40yalGgHtEfd0jA4P74hF3bKo6u8OyyDuNdNog6YuRv
+	 Xi6IIGSKauDhUUZoIKed9dJNZRkLORCEZ0oRuOKWhrKOwJP/ubbjH2JhXkHbisER4I
+	 CpXoHPmL6VirUxs7SYylIIWNF64SO7BLBxNkVuI7mHqf9Rvzs5D5lGho/Zra8u0iMr
+	 mwc6wg+iywYqrRLVr1NwOcG3D9rA7ccRJOWaFaoAM+bskfeiCdJx2oMV1ygYD7pfd1
+	 pqN33vHJqJCiA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vNWo0-00000007rbZ-03xP;
-	Mon, 24 Nov 2025 13:40:36 +0000
-Date: Mon, 24 Nov 2025 13:40:35 +0000
-Message-ID: <86ldjvr1kc.wl-maz@kernel.org>
+	id 1vNXIh-00000007s51-1lBx;
+	Mon, 24 Nov 2025 14:12:19 +0000
+Date: Mon, 24 Nov 2025 14:12:18 +0000
+Message-ID: <86jyzfr03h.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Fuad Tabba <tabba@google.com>,
@@ -63,7 +63,7 @@ Cc: Fuad Tabba <tabba@google.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
 Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
-In-Reply-To: <342302ba-5678-408a-ab63-1a854099d4a1@sirena.org.uk>
+In-Reply-To: <86ldjvr1kc.wl-maz@kernel.org>
 References: <20251109171619.1507205-1-maz@kernel.org>
 	<20251109171619.1507205-30-maz@kernel.org>
 	<CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
@@ -71,6 +71,7 @@ References: <20251109171619.1507205-1-maz@kernel.org>
 	<51f5b5d7-9e98-40b8-8f8b-f50254573f3d@sirena.org.uk>
 	<86o6orr356.wl-maz@kernel.org>
 	<342302ba-5678-408a-ab63-1a854099d4a1@sirena.org.uk>
+	<86ldjvr1kc.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -86,94 +87,16 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 24 Nov 2025 13:23:08 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On Mon, 24 Nov 2025 13:40:35 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Mon, Nov 24, 2025 at 01:06:29PM +0000, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
+> Something is badly screwed in -next, and I'm not convinced it is KVM.
 > 
-> > > FWIW I am seeing this on i.MX8MP (4xA53+GICv3):
+> 	d0f23ccf6ba9e cpumask: Cache num_possible_cpus()
 > 
-> > >   https://lava.sirena.org.uk/scheduler/job/2118713#L1044
-> 
-> > There are worrying errors way before that, in the VMID allocator init,
-> > and I can't see what the GIC has to do with it. The issue Fuad
-> > reported was at run time, not boot time. so this really doesn't align
-> > with what you are seeing.
-> 
-> Yeah, I was just looking further and realising it was probably
-> different - sorry about that.  I was checking what else was failing
-> after seeing the qemu issue he was, all the platforms aren't booting one
-> way or another.  FWIW with earlycon on the AM625 is showing similar
-> issues to the i.MX8MP.
+> is my current suspect.
 
-That's the initial warning:
-
-	WARN_ON(NUM_USER_VMIDS - 1 <= num_possible_cpus());
-
-The register state:
-
-[  224.378174] pc : kvm_arm_vmid_alloc_init+0xa0/0xc0
-[  224.382954] lr : kvm_arm_vmid_alloc_init+0x24/0xc0
-[  224.387734] sp : ffff80008009bd40
-[  224.391035] x29: ffff80008009bd40 x28: ffff0020209bd3c0 x27: ffffce5349159068
-[  224.398162] x26: ffffce5349070118 x25: ffffce5348fb8eb8 x24: ffffce5349059128
-[  224.405287] x23: 0000000000000109 x22: ffff0020208ea6c0 x21: 0000000000000004
-[  224.412413] x20: ffffce5349c20b78 x19: 0000000000000000 x18: 00000000ffffffff
-[  224.419538] x17: 00000000e9a61a0d x16: 00000000b1c06f2c x15: 00000000ffffffff
-[  224.426663] x14: 0000000000000000 x13: 7374696220343420 x12: 3a74696d694c2065
-[  224.433789] x11: ffffffffffe00000 x10: ffff00275c260000 x9 : ffffce5348048be0
-[  224.440914] x8 : 00000000fffeffff x7 : ffff00275c260000 x6 : 80000000ffff0000
-[  224.448039] x5 : 0000000000000048 x4 : 0000000000000110 x3 : ffffce5348fc1000
-[  224.455164] x2 : 0000000000000100 x1 : 0000000000000100 x0 : 00000000000000ff
-
-The disassembly:
-
-ffff8000816ff220 <kvm_arm_vmid_alloc_init>:
-ffff8000816ff220:       d503201f        nop
-ffff8000816ff224:       d503201f        nop
-ffff8000816ff228:       d503233f        paciasp
-ffff8000816ff22c:       a9be7bfd        stp     x29, x30, [sp, #-32]!
-ffff8000816ff230:       5280e400        mov     w0, #0x720                      // #1824
-ffff8000816ff234:       910003fd        mov     x29, sp
-ffff8000816ff238:       72a00300        movk    w0, #0x18, lsl #16
-ffff8000816ff23c:       f9000bf3        str     x19, [sp, #16]
-ffff8000816ff240:       97a4a61c        bl      ffff800080028ab0 <read_sanitised_ftr_reg>
-ffff8000816ff244:       d3441c00        ubfx    x0, x0, #4, #4
-ffff8000816ff248:       d0fffa02        adrp    x2, ffff800081641000 <rodata_full>
-ffff8000816ff24c:       d0fffa03        adrp    x3, ffff800081641000 <rodata_full>
-ffff8000816ff250:       f100081f        cmp     x0, #0x2
-ffff8000816ff254:       52800201        mov     w1, #0x10                       // #16
-ffff8000816ff258:       b940f044        ldr     w4, [x2, #240]
-ffff8000816ff25c:       52800102        mov     w2, #0x8                        // #8
-ffff8000816ff260:       d29fffe0        mov     x0, #0xffff                     // #65535
-ffff8000816ff264:       1a820021        csel    w1, w1, w2, eq  // eq = none
-ffff8000816ff268:       d2801fe2        mov     x2, #0xff                       // #255
-ffff8000816ff26c:       b9005061        str     w1, [x3, #80]
-ffff8000816ff270:       9a820000        csel    x0, x0, x2, eq  // eq = none
-ffff8000816ff274:       d2802001        mov     x1, #0x100                      // #256
-ffff8000816ff278:       d2a00022        mov     x2, #0x10000                    // #65536
-ffff8000816ff27c:       9a810042        csel    x2, x2, x1, eq  // eq = none
-ffff8000816ff280:       eb00009f        cmp     x4, x0
-ffff8000816ff284:       540001e2        b.cs    ffff8000816ff2c0 <kvm_arm_vmid_alloc_init+0xa0>  // b.hs, b.nlast
-
-That's the branch to the...
-
-[...]
-
-ffff8000816ff2c0:       d4210000        brk     #0x800
-
-... BRK instruction.
-
-So x0=255 and x4=272. 272 possible CPUs on a machine with only 16?
-Bollocks.
-
-Something is badly screwed in -next, and I'm not convinced it is KVM.
-
-	d0f23ccf6ba9e cpumask: Cache num_possible_cpus()
-
-is my current suspect.
+Confirmed, and the fix is at 21782b3a5cd40892cb2995aa1ec3e74dd1112f1d.
 
 	M.
 
