@@ -1,378 +1,396 @@
-Return-Path: <kvm+bounces-64437-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64438-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CA08C8290C
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 22:44:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 069ECC82ABD
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 23:36:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 112D63478ED
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 21:44:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D7AF3ACD9B
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 22:36:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD19732ED4C;
-	Mon, 24 Nov 2025 21:44:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFE4345724;
+	Mon, 24 Nov 2025 22:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S5gpftp5"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="cRkHV11r";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="L9BFqcxl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F01D32E6BE;
-	Mon, 24 Nov 2025 21:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764020663; cv=fail; b=eooa1ksy0g+vuXL7tDvHI/+VSQ+UuOeUxg8rQd2c5h89VvrGABZoJNpBhtw2ExvMN3V8fkuNICoGHlOdsKGV7yWNLCnOzs3pa+YV+453igFUdIw1jb6R9qgimrMdpskARvgjahKNMRDS2gdX0Mzdw3axqNCeLT5JRkRZGCoWzQw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764020663; c=relaxed/simple;
-	bh=XOfbxwRQ53HEBb8qOdjVGbK/vULhrCuEoPyxnYUozv4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=SYiDqpRHj0BFiMCEqBU8zEFd96Pd+/KJM42PFwVQwhDyxHITa4r+UE1FzO+9Y4/v6KAEjYIuKeBumZcnfmb/YMhNHzyLvCyMMrVPIt4Fm56p259wsgDy6LUyYP0a+1q/PBRw+3oIoXmXN+QxFbDpOt9/NcoGuFTDfjw9BKt0CvU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S5gpftp5; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764020661; x=1795556661;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=XOfbxwRQ53HEBb8qOdjVGbK/vULhrCuEoPyxnYUozv4=;
-  b=S5gpftp5pmlMsG1ckbGMwpiSfKwGeeJykvh4AqG41mMa2L9qSfciiIW7
-   EZP+iLk+oVwW3ltky8LRO2VmXuNAwj0TD69WV7gpN4SjbfNTpxvZshckf
-   05U1JoopximmmzHsbeH20hEo55H5az2QWlBTvYEiQ0ulIOIW79FxSRsoK
-   5QEQd7fsrPJUuchRaRBMfYEFMBSGk50JMzjOk8anMyBjZ7wjZmjU7camH
-   6kb3SvMbkWIEdR7HUnauCP3VQUCdMODNAjkL5RxQrEkV1+s+Chl3LHyY3
-   9vThtgU/HG4cj472m7mWYGc1m1CHpG9o6P2kMFLp3c5jLJlTYhctqtys8
-   g==;
-X-CSE-ConnectionGUID: P/dY9kfxSYuHAeEd80q2Pg==
-X-CSE-MsgGUID: VjmVDaWOR1qYahYGErcnkg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11623"; a="83647571"
-X-IronPort-AV: E=Sophos;i="6.20,223,1758610800"; 
-   d="scan'208";a="83647571"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 13:44:16 -0800
-X-CSE-ConnectionGUID: c06yqfkWRSiafOuVo2E4AA==
-X-CSE-MsgGUID: K/uAVCqBTBmHTYc9Css16w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,223,1758610800"; 
-   d="scan'208";a="191710695"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 13:44:16 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 24 Nov 2025 13:44:15 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Mon, 24 Nov 2025 13:44:15 -0800
-Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.25) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 24 Nov 2025 13:44:14 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=b/ls6JAkLN0E7Q+1Iv6IzyPxgC9U3s2EKgAMB+sgNLXLTocHaKxhX4fBQ4UlMeQm5k/2dSeI1yC2wgrJ6aR4rpGEGRVxRCcJrnNRWrZ+GS+xKyJqYZD5TGymLEvQGjDDddemMSaIcN8tAwLdfXOldCy6vsti3DQysvMnQi5ctNWlJ5dFKEWTVXJvP8T2sADsP8MJv11FtjJk+uZD/e07J6NbRZvEBrqGKu5vUr6mfBWmWSt1tfzIkK3lUbPRilkN9WuPVhvqG3ah/dAf03NVEBQZjCHPVJmJ7VwV/4yOPkd4j+TuQxvHq+iTyBrLVHcE9OKLlELF2mykKWV1FtcywA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K2rmvXQSYs8xMuEgdU6rlbJj4iHEYfJDaeQT5/VVrTY=;
- b=yKXmLZpAYfZvccIrXdHInh7KKqLAFbS2Y25M0HaiCgmGZOQwdKqJ0GOQkPgakK7tDBCDEPm4LyBSAKO1Ig1famp0GYU38XpAYdEulDTA0IMxYPQ231QYgLBwGResFF/vdZt3e9j56rYOptpjC/q67t1Ax0Bfl/3BUUEC4kjwcFV4PxsU79VB0T2F56iYDdoNKilXxlFWpFkk7vGhb6mEIYCeT3Vl4XpUFeJZztR7a7A/yWbBlxXzf3R3damsqve4ZfrEPqOLfl2aNdBDoN2G5g9jq6hD8exHPkSsG/0fanybXIQ80dYzm8jeVRuqH1Yp94ljQnPtzJ3QjVvga5Un2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB5373.namprd11.prod.outlook.com (2603:10b6:5:394::7) by
- SJ2PR11MB7501.namprd11.prod.outlook.com (2603:10b6:a03:4d2::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9343.17; Mon, 24 Nov 2025 21:44:12 +0000
-Received: from DM4PR11MB5373.namprd11.prod.outlook.com
- ([fe80::927a:9c08:26f7:5b39]) by DM4PR11MB5373.namprd11.prod.outlook.com
- ([fe80::927a:9c08:26f7:5b39%5]) with mapi id 15.20.9343.016; Mon, 24 Nov 2025
- 21:44:09 +0000
-Date: Mon, 24 Nov 2025 22:44:06 +0100
-From: =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>
-To: Alex Williamson <alex@shazbot.org>
-CC: Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, "Yishai
- Hadas" <yishaih@nvidia.com>, Longfang Liu <liulongfang@huawei.com>, "Shameer
- Kolothum" <skolothumtho@nvidia.com>, Brett Creeley <brett.creeley@amd.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, <kvm@vger.kernel.org>,
-	<qat-linux@intel.com>, <virtualization@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/6] vfio: Introduce .migration_reset_state() callback
-Message-ID: <i4vq5amjds2xoqablojiwgplrp4uw7xvhk2esibytx25mesekc@q6ajjaexw2pu>
-References: <20251120123647.3522082-1-michal.winiarski@intel.com>
- <20251120123647.3522082-2-michal.winiarski@intel.com>
- <20251121111603.49b1577c.alex@shazbot.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251121111603.49b1577c.alex@shazbot.org>
-X-ClientProxiedBy: VI1PR0102CA0043.eurprd01.prod.exchangelabs.com
- (2603:10a6:803::20) To DM4PR11MB5373.namprd11.prod.outlook.com
- (2603:10b6:5:394::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6739C3446A9;
+	Mon, 24 Nov 2025 22:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764023791; cv=none; b=iv/vBHsyHl8gv7hHJlgkqWFAAw+3GQJWb2DdrFvY4xgYu/jE4JqNhNOH/fC+nvoKNj8B3Tq3gU95WDCWB/tueijKAnQFpgchSwI/wU7e7sYlVELtu/VmcyNcp2jHMckwFD+3DFLXZ75UXQHoUHV/Z5vXhZFV4X9LSAHcKioYDjg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764023791; c=relaxed/simple;
+	bh=D3Kkz6qAsaR+1Ht1I6C4ZlQQCK18GoBmG4AUikwlvSg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ri3620N0v7mIs3sw6heC1rZG3yqSoLJUnpFS3pJ7k0VBm3BPrII+owvh5caTtOuZ/c2zZLPF5cu8R2QKbP79ERyVnKKPJaGGBuP/OkyTX04dusSP/ZxmAcWpCb3OlnqVGK+GxNC36KKV0vVBJEXDKU/CyqkoEpqJDAYCgBVq2l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=cRkHV11r; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=L9BFqcxl; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 78FBEEC01E5;
+	Mon, 24 Nov 2025 17:36:26 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Mon, 24 Nov 2025 17:36:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1764023786; x=1764110186; bh=orlcnj/0SXV+jVYmUXNUa
+	W7k0W1bCXC+Z7sv4OIBdt0=; b=cRkHV11rXqqkRbokZk+i29na6tAV8fNVHCcFb
+	DKAur3zdczCoo0Rupl6VHzbmWJgCSIkQgwwcHpU9G3AzNCr/nGCMKbvw5fpIWu86
+	lrqWQKQz69M8zkVMkjAmpRn5w8bRWmz9xucGE0ZuOlLr/PBefHgq+ZlRbMC5sqKQ
+	OrkTTT5GaQHyMgqQNB/5WZqBxeXpIchfByyfZxiR+IeyYiAavmKMGiHae7TxeQCh
+	q+mnEYjMT3xESiDWWa+Mv73BIInYLE/Ni3/TnpvpSqdC1gKRPUQIUPtybZGYCAgZ
+	/0rbco6MMpEdwhcgc1kyu05QhKNhmWq6DxMgVSWmZu39tt+XQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1764023786; x=1764110186; bh=orlcnj/0SXV+jVYmUXNUaW7k0W1bCXC+Z7s
+	v4OIBdt0=; b=L9BFqcxlnDKargnhdHRutpxhOj6H3FEEw5njJ3z1dZuOvz6kC7M
+	DPq81H7+BbZsHYnhxLplxDrCnU2IQfKRKt5XhmNxo6Fjwlbu90GwYKicCMa9N1uE
+	apULOjm7b3w6offIeGaIfLBdOqIfirc7mJbIs8+WdXvMLTyUVW9uapvKnrGFjrzZ
+	ySAuNSaKEJ7Rv+01E8CVXVpNnShsfjj/72yGFU6Noh1peKbPAaLKZlQx+JA9n6YS
+	xl/bI8QFWZh7pUEIPdMU+rzNuydYuurc2VGPl1nuFvQgPP/mCIfynxSrOL6fD8h9
+	96ROE9oP4H+qIDDcr1CsybqH0x0jFW4vTPQ==
+X-ME-Sender: <xms:6d0kacjCG8eperMc63SiNHNLuhm3VkliUYX9B4TBEGk5l7oXPUBy2g>
+    <xme:6d0kaWjJ0j3vRqoDll912xOcuXxVKXKIRv5muNlpdwApiE-XNTPWP-5Q0aH5Rn7hh
+    O19assU2MSPlf0olmcAYGoiTwD2J9kUD1TA4CwdkTUy4oCtgE4uPQ>
+X-ME-Received: <xmr:6d0kaULuqMTT3wzwdBId4myWhsQZfENZxkiDjq7MXreEJSm7Xxgy2kNlX7tz8cvnTJxZ07MN>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvfeelkedvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucgoteeftdduqddtudculdduhedmnecujfgurhephffvve
+    fufffkofgggfestdekredtredttdenucfhrhhomheptehlvgigucghihhllhhirghmshho
+    nhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrthhtvghrnhepvddvff
+    euvedtgfekvdfhffefgeetleegfeeiheetgeeuieffhffhhfetffeltedvnecuvehluhhs
+    thgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgrii
+    gsohhtrdhorhhgpdhnsggprhgtphhtthhopeehpdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopegrlhgvgiesshhhrgiisghothdrohhrghdprhgtphhtthhopehkvhhmsehvgh
+    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhr
+    tghpthhtohepkhgvvhhinhdrthhirghnsehinhhtvghlrdgtohhmpdhrtghpthhtoheplh
+    hinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:6d0kadEX0Wb2c9rOq9TTz69SO0dEIRsiCpvwe1YiXcc9dFz5Vv9Hpg>
+    <xmx:6d0kaQQyUisULhohZO5HjQVnkS1Xf3yyOCP-A7I0BQudAfgc-nXoDQ>
+    <xmx:6d0kaRclENZ8eD7-2pJbDZ_rvCIa-_znE1FlCQdN0C-n2SHAedb8Fg>
+    <xmx:6d0kaXrPKRJj15FZ28X9QTDXhzOWSvGTrYTD72Rj5UveVqQ8xrL9Aw>
+    <xmx:6t0kad_OrBjL3oGyr1lHwvPFvPOVXN9ShbAgEUE-nUs9YM2DVzwRa2Jo>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 24 Nov 2025 17:36:25 -0500 (EST)
+From: Alex Williamson <alex@shazbot.org>
+To: alex@shazbot.org
+Cc: kvm@vger.kernel.org,
+	jgg@ziepe.ca,
+	kevin.tian@intel.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] vfio/pci: Use RCU for error/request triggers to avoid circular locking
+Date: Mon, 24 Nov 2025 15:36:22 -0700
+Message-ID: <20251124223623.2770706-1-alex@shazbot.org>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB5373:EE_|SJ2PR11MB7501:EE_
-X-MS-Office365-Filtering-Correlation-Id: e08a411b-f461-466d-c15d-08de2ba2999e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?S2xpUkF6eXlTTk4yYkU4eDd1UkRUb054akhVOGFhVzdWYWlOWnEvWjM4Ky85?=
- =?utf-8?B?eUMvOVFPcEQrODV2Zm1IajNNY2dPemZsOXpuc1lTZXpnRkY4Nm8yalRiTVls?=
- =?utf-8?B?Uy9jTzhIdnJzaVM2RWVaTEVHc1A1T3lMbUFLQ2YvTUxRaVE1L1pyZzdzTFZt?=
- =?utf-8?B?bFBnRjNRYlIxbWlYZzV3OHp0S2tvdHFYNEpsQndBQ1dpcGhmT1JjK1ZTaTNY?=
- =?utf-8?B?QVJOR3NudUZqajljdVpTeUV1eUlQTmpQdjA3UDd5TVpiOXg0QStpcVNPaVpO?=
- =?utf-8?B?TnI4alVlZWRsZHVvOVVodGpwY25rSWpscXhBdzJNVitnNEovbHhTMm1RZ2NO?=
- =?utf-8?B?bGQwcjUvRWg3Vm5JUVMzWGhzemVOdTkreEhhb2FDYVpWdVlYWnJCRDc5L3A1?=
- =?utf-8?B?ZHBOYnZVK28yOVQveG5jM1k5S3UrRGJrUzkxSE1lTkpERWFXUFVIZmJoUGNE?=
- =?utf-8?B?TzlDZzlmbE8rNU5MVXBFTGpTcmkwSzBJYXJjMTdmbjlpOEo4cWlndWJJR0J5?=
- =?utf-8?B?MDVqTG5xOXJxM1FsRTBUQWhLZW4yMDVVdVhEWmhaUGIrNDM1aEsyL2RwUFFm?=
- =?utf-8?B?QUI2ZjdNODhVTE5rckE1OEhqcDlCL3pkY0FEaUZyTDdSOW1WMnd1aWg3MVA0?=
- =?utf-8?B?OEFHek8zbU1odExMd0E0V0NlbHc3ZmVJckRNVjZDWThmVkhoeUdFMUpZZU1j?=
- =?utf-8?B?anhWZmZiditvam00NUZsaHYxL0xuaXZpOWpmOGxZZ0RRd3ZMWlMvbDVCMENI?=
- =?utf-8?B?c0xwY2FvU3NqcGVVSU9sRmVhNXRLWVFZckR1TzVrandMdHF1R2JsWEtQOXZv?=
- =?utf-8?B?SlZqcXN6cU81TmlVWll2YTY1VU1EVHBzdU9CcWZ0MUVuYlAxQU8vRVVpOFhq?=
- =?utf-8?B?bk5XczRHaWxuZFBnV240N1FCYnB6d0pxNjJ0MC9Tei9iYkljNlhMVEoyWXNy?=
- =?utf-8?B?QUR1SE0yUXlxWXJMZzdLMHdTbnRYTzhjUG4zeks1Qll5UVZ3VkFxeUFLUS9U?=
- =?utf-8?B?alR5bG1kc1UvQ2gwREl2Yyt3cWtTbjkxZmtBaElwcXVuSEZTT05LUERNWmQ3?=
- =?utf-8?B?VC94SHRpc054UlZ6RFlmbnpPcTlDc1ZJY0ZCNGppckRlSHM3MyswYXVNeVpv?=
- =?utf-8?B?eDRBdnVqeTZ6dUcxYkRiV0tLODZDUUsyS3hVQjJBT21hUUxqbk1oTGVyZWto?=
- =?utf-8?B?TW1mNWRId1ZLUGJGbll4ci9Wem50MjNRelhhNnJ2czZpR3NQNVkwVFBtOFRm?=
- =?utf-8?B?eVFQODhLeXVmZkNvc09RK3NJbzBsQUZaV0s5RE9kU05IQ0ZjOXFRUER0bFJC?=
- =?utf-8?B?MEVZNEVRV200SHhOcmlUT29td2s2OFVtdGszZGlOYktRdVhQcWpvRTZsb2M5?=
- =?utf-8?B?NE1Va0grYXNFV3Raa3RubHZ5M1FZZDNWTkdSZytQVi9NNUQ4SzlWVU5LbjJp?=
- =?utf-8?B?UTlpcXUrckUrWUhVTlRSTVNTZHh6RWpLYkVoQXg0MDNnaVBBNEdMTHloMk1a?=
- =?utf-8?B?d0ZiU3ZtbFU5SG9acjZFMjNubEc3a1FyUVV0eVpKR2dHOWJKWndqT1VVVkwr?=
- =?utf-8?B?VE0waEV5c3VzZHRyU2YveFNQNnNTdThnZlNuWWhHSkdRNUpCZjAyNnRUcmpB?=
- =?utf-8?B?YkZ3YkZjWDhHVlRQODUzOEpHdjZVcE80YU1jbkxrVVBta3hxWVdEcG9nYVNt?=
- =?utf-8?B?Z2tGTVEwaWZsYjZxb1VwaUlWL05TM096OXBDREdRV0JNVm5pbWxsYkV4WW9j?=
- =?utf-8?B?a3g0a2hBRnMwQ0hDbi80MGtVVjlPaCtPcmt4c2tiNWMxbzdBREM5Y2ZTZXBq?=
- =?utf-8?B?b3dPd1hMbm9MYUdvOUlndHZ0SlhWdmpycGxKOVllZ1R5TFIyeUE0d2k5STVI?=
- =?utf-8?B?SDNJbjl0WThoblpLajJwUnJrUUhBMFBmb0N2bDlrWlBYbllFK3J5bVU4STVY?=
- =?utf-8?Q?KIEtpxpCxMLJBbD9LWt2loe/QOQPgPK1?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dkliRkJQcll4TVpOK2ZNTmxweFpxM2lyNmJwaVNlbFU2OVYrSEZHcXpJNVFn?=
- =?utf-8?B?Y29odkVHS1ptUThUOVk1Z3Jma3Y2aHZ5Uk5oQnV2NTR0MkRIR2FmRFNxbTlB?=
- =?utf-8?B?ZVhyZFU4UzFBZmdIZFJmVi9oUUJwdEt4dUY4RC9uRUxQbmI4dzhYQWV5dmUw?=
- =?utf-8?B?Nlk0UWxOZG04TGZ6ZnBjN2xXTnFnUld4MDl4RjFwSWlIcVpxM3RLSElocmtH?=
- =?utf-8?B?cUp0QzV2aTFMWVVUNEVlSjRWd0dHeUtYOUIxZEtYaTJxWFdRZ1JBZklCdmRX?=
- =?utf-8?B?bGxwcXhsUkdTRzFuRmFrT2FpTm51UmxuTklPb2ljQngvakZKWmMxMk5iTVpC?=
- =?utf-8?B?dDNVQmpQZnJDbmJ6VUU3Yko2eWVOTGJVU2thOGJXMUxpdnJpc20wNmZjY0F3?=
- =?utf-8?B?bm5VU29sMjdTZm9JdnNLL2I0SzVVS2tJOS9RWlBUQTJvRXpucEU5TEhta29C?=
- =?utf-8?B?S3JvdHhXQlhsQ2h5NDVkMStIZVFHVGdRaXNyQUZ0S1NxWktjdmQydHdkc1pm?=
- =?utf-8?B?M2JCV2JjeHF1VUd1VmxrNC91dEN3amtUNURqcmYxdnJkb0FkRzhacU42NVdR?=
- =?utf-8?B?RngrNVZXZ0wxQnNmdmFNZk5ob0lvTGJUT3pnaXY3ZnU1VFJvVitvcm5jMENz?=
- =?utf-8?B?OWtqSml0c04xR0VUcklQSkpSdkZsZjZaSEFPL0NJdFBtVUFDV1p4TWJBTTdV?=
- =?utf-8?B?WHJkTW8zaXJ0V2R1WGVQam0xQWpUd2pYeURqL3o4RVlEdkVpV0hHOE15SjVl?=
- =?utf-8?B?b2g3WEJ5Y2toNWFNblc3TGljME5EbEtvTnNPMnZyb29CbVk2OXFkZUlwbFZw?=
- =?utf-8?B?WjRwM0phYVQ1bzlKVHUxTmRxTElETnFPYVBKcWI2dHF1UHEvK0FxVHFnVk82?=
- =?utf-8?B?WXF5Ym0wdEZVZmw0VysyRHlEbU05UFBOd0NHMlF6NlZqU0dQb05OSndLSjRo?=
- =?utf-8?B?WDlMd0VQbm12ZG9USDBKVUhtVnZWQTl6NnFmMjBhSEpPaFpVZUNUaDRIWjF6?=
- =?utf-8?B?ZnVTOUpyYlp1T0MvNW1qblF2aFpVNG92WjM3SlBKRmVUSmhhNHlHNzRjdUhp?=
- =?utf-8?B?UVhuVjhFMGxRRTJtaTBSN0o1QU5WMzEzb0RZcmozczE1U000WStoUVA5ZkdC?=
- =?utf-8?B?TWwxMDVlN1ltcVZzTGNzWTFPelJwaWpJVk9RZ1lSNUx5OU91bVMxcnQwcHIy?=
- =?utf-8?B?YmF5V2lSWHdjNDZXZ3ZPSlBTMzdPYlN1NjZXL0F5VGxZSTBVZ1J5WFFDS2pW?=
- =?utf-8?B?ZURKNTVDQmFnbDV5cUwzTEFnVEhkYml3bnFxbE5BK2dESlBMYlEvL3FMa1pi?=
- =?utf-8?B?c0dYTjFnbVl1YzJEUS90S2dDcFQ4UW5mRDBrS0dmc3dlR2lYWlFiYytoUEhx?=
- =?utf-8?B?N3U0WkhpNlJVV010RGU2QTVmdTk3NGFBUU9xcUFGYzBsVE5sYzkrL0t0L2tG?=
- =?utf-8?B?WnN0cHpUSlVZWFhiY1NOL2pjWXNJcVRhS1dnWlZ3dWNUbmJacVRFY2V6LzBM?=
- =?utf-8?B?Ylh4OFNtOEFzMUpyb2tyMjd3RTJkb3ByditRWnBQSFZxY3hDbVVwa29UaWl5?=
- =?utf-8?B?N1lDU1JCQzZ1WFdBOE9neUcyd21aS1FUenoxZ01BRUtZOGVaVzRjWmd1RzZL?=
- =?utf-8?B?eEM3Q1RtZ0xaRTNtUkYxcDJiWTAzdW43dGZiWmxNZjVTeklzWnp6N1JSa29G?=
- =?utf-8?B?WVN1WUxuWFdEUUlXOXIwZlhQNXdjUHVyUjQweVNkOVVsQ2xRQkZHckQ0K1B0?=
- =?utf-8?B?VTkrMUwrNXVERnd2cWd4REEraDZzS2J4NEdRSEg0UWJydFpMbFk3UFlkcVJy?=
- =?utf-8?B?dVNrRldNckVNSFRDVlZHR01JOVI2RitWcTkyZGwvN3ZWOXVPODl6UXpyZDdT?=
- =?utf-8?B?d0tHSVZPa1k0RmRJWXdzOWdQcDQ1OVowUzBxUndHWEtWd28yNmdMTHBPNFE5?=
- =?utf-8?B?Mk9jMEdrTGdVSlh1S0xwRW9xU1V3T1p3azM2WjJHL0dOZENwbmwxK3ZJT25U?=
- =?utf-8?B?V05jRDY0WlBDalBjRVA1YndJcGZyMnhTc1JFRkdKZWt6OGNJaVZwZ2EwUXVm?=
- =?utf-8?B?REk3MWphUnlrTGdxRGplWlNveDVsbHJacVg2VUtlZ0lWQUpiNzRTQ3Z3MkJm?=
- =?utf-8?B?eGwrYUdaU05qeDk5eFNFcVJTYWxLeWdFU2ZkYVBIZmduR2tRb01EeFNIeGky?=
- =?utf-8?B?amc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e08a411b-f461-466d-c15d-08de2ba2999e
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5373.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2025 21:44:09.6223
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JYm3gcj1/Bq/SAl6ATGly4H+6P70VH+lmW342kqghv+p9WfdSDMEtnTBBVmZ/XtszcBkteu56KybPx2EHcAUuxuW3PfQAFs2KUFmWyQtVNY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7501
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 21, 2025 at 11:16:03AM -0700, Alex Williamson wrote:
-> On Thu, 20 Nov 2025 13:36:42 +0100
-> Michał Winiarski <michal.winiarski@intel.com> wrote:
-> 
-> > Resetting the migration device state is typically delegated to PCI
-> > .reset_done() callback.
-> > With VFIO, reset is usually called under vdev->memory_lock, which causes
-> > lockdep to report a following circular locking dependency scenario:
-> > 
-> > 0: set_device_state
-> > driver->state_mutex -> migf->lock
-> > 1: data_read
-> > migf->lock -> mm->mmap_lock
-> > 2: vfio_pin_dma
-> > mm->mmap_lock -> vdev->memory_lock
-> > 3: vfio_pci_ioctl_reset
-> > vdev->memory_lock -> driver->state_mutex
-> > 
-> > Introduce a .migration_reset_state() callback called outside of
-> > vdev->memory_lock to break the dependency chain.
-> > 
-> > Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci_core.c | 25 ++++++++++++++++++++++---
-> >  include/linux/vfio.h             |  4 ++++
-> >  2 files changed, 26 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> > index 7dcf5439dedc9..d919636558ec8 100644
-> > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -553,6 +553,16 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
-> >  }
-> >  EXPORT_SYMBOL_GPL(vfio_pci_core_enable);
-> >  
-> > +static void vfio_pci_dev_migration_reset_state(struct vfio_pci_core_device *vdev)
-> > +{
-> > +	lockdep_assert_not_held(&vdev->memory_lock);
-> > +
-> > +	if (!vdev->vdev.mig_ops->migration_reset_state)
-> 
-> mig_ops itself is generally NULL.
+From: Alex Williamson <alex.williamson@nvidia.com>
 
-Yeah, I clearly didn't test it with plain vfio_pci.
-I'll fix it in v2.
+Thanks to a device generating an ACS violation during bus reset,
+lockdep reported the following circular locking issue:
 
-> 
-> > +		return;
-> > +
-> > +	vdev->vdev.mig_ops->migration_reset_state(&vdev->vdev);
-> > +}
-> > +
-> >  void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
-> >  {
-> >  	struct pci_dev *pdev = vdev->pdev;
-> > @@ -662,8 +672,10 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
-> >  	 * overwrite the previously restored configuration information.
-> >  	 */
-> >  	if (vdev->reset_works && pci_dev_trylock(pdev)) {
-> > -		if (!__pci_reset_function_locked(pdev))
-> > +		if (!__pci_reset_function_locked(pdev)) {
-> >  			vdev->needs_reset = false;
-> > +			vfio_pci_dev_migration_reset_state(vdev);
-> > +		}
-> >  		pci_dev_unlock(pdev);
-> >  	}
-> >  
-> > @@ -1230,6 +1242,8 @@ static int vfio_pci_ioctl_reset(struct vfio_pci_core_device *vdev,
-> >  	ret = pci_try_reset_function(vdev->pdev);
-> >  	up_write(&vdev->memory_lock);
-> >  
-> > +	vfio_pci_dev_migration_reset_state(vdev);
-> > +
-> >  	return ret;
-> >  }
-> >  
-> > @@ -2129,6 +2143,7 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
-> >  	if (vdev->vdev.mig_ops) {
-> >  		if (!(vdev->vdev.mig_ops->migration_get_state &&
-> >  		      vdev->vdev.mig_ops->migration_set_state &&
-> > +		      vdev->vdev.mig_ops->migration_reset_state &&
-> 
-> For bisection purposes it would be better to enforce this after all the
-> drivers are converted.
+CPU0: SET_IRQS (MSI/X): holds igate, acquires memory_lock
+CPU1: HOT_RESET: holds memory_lock, acquires pci_bus_sem
+CPU2: AER: holds pci_bus_sem, acquires igate
 
-Makes sense. I'll split this patch.
+This results in a potential 3-way deadlock.
 
-> 
-> >  		      vdev->vdev.mig_ops->migration_get_data_size) ||
-> >  		    !(vdev->vdev.migration_flags & VFIO_MIGRATION_STOP_COPY))
-> >  			return -EINVAL;
-> > @@ -2486,8 +2501,10 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
-> >  
-> >  err_undo:
-> >  	list_for_each_entry_from_reverse(vdev, &dev_set->device_list,
-> > -					 vdev.dev_set_list)
-> > +					 vdev.dev_set_list) {
-> >  		up_write(&vdev->memory_lock);
-> > +		vfio_pci_dev_migration_reset_state(vdev);
-> > +	}
-> >  
-> >  	list_for_each_entry(vdev, &dev_set->device_list, vdev.dev_set_list)
-> >  		pm_runtime_put(&vdev->pdev->dev);
-> > @@ -2543,8 +2560,10 @@ static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set)
-> >  		reset_done = true;
-> >  
-> >  	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
-> > -		if (reset_done)
-> > +		if (reset_done) {
-> >  			cur->needs_reset = false;
-> > +			vfio_pci_dev_migration_reset_state(cur);
-> > +		}
-> 
-> This and the core_disable path above are only called in the
-> close/open-error path.  Do we really need this behavior there?  We
-> might need separate reconciliation vs .reset_done for these.
+Remove the pci_bus_sem->igate leg of the triangle by using RCU
+to peek at the eventfd rather than locking it with igate.
 
-Some drivers do the migration state reset explicitly in their, some rely
-on reset (and .reset_done) being invoked.
-We can remove it from here if we just call migration_reset_state
-consistently in each driver.
+Fixes: 3be3a074cf5b ("vfio-pci: Don't use device_lock around AER interrupt setup")
+Signed-off-by: Alex Williamson <alex.williamson@nvidia.com>
+---
+ drivers/vfio/pci/vfio_pci_core.c  | 68 ++++++++++++++++++++++---------
+ drivers/vfio/pci/vfio_pci_intrs.c | 52 ++++++++++++++---------
+ drivers/vfio/pci/vfio_pci_priv.h  |  4 ++
+ include/linux/vfio_pci_core.h     | 10 ++++-
+ 4 files changed, 93 insertions(+), 41 deletions(-)
 
-> 
-> As Kevin also noted, we're missing the non-ioctl reset paths.  This
-> approach seems a bit error prone.  I wonder if instead we need a
-> counterpart of vfio_pci_zap_and_down_write_memory_lock(), ie.
-> vfio_pci_up_write_memory_lock_from_reset().  An equal mouthful, but
-> scopes the problem to be more manageable at memory_lock release.
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 79a1a50a4ef7..2b01bfbce3ea 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -42,6 +42,40 @@ static bool nointxmask;
+ static bool disable_vga;
+ static bool disable_idle_d3;
+ 
++static void vfio_pci_eventfd_rcu_free(struct rcu_head *rcu)
++{
++	struct vfio_pci_eventfd *eventfd =
++		container_of(rcu, struct vfio_pci_eventfd, rcu);
++
++	eventfd_ctx_put(eventfd->ctx);
++	kfree(eventfd);
++}
++
++int vfio_pci_eventfd_replace_locked(struct vfio_pci_core_device *vdev,
++				    struct vfio_pci_eventfd __rcu **peventfd,
++				    struct eventfd_ctx *ctx)
++{
++	struct vfio_pci_eventfd *new = NULL;
++	struct vfio_pci_eventfd *old;
++
++	lockdep_assert_held(&vdev->igate);
++
++	if (ctx) {
++		new = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
++		if (!new)
++			return -ENOMEM;
++
++		new->ctx = ctx;
++	}
++
++	old = rcu_replace_pointer(*peventfd, new,
++				  lockdep_is_held(&vdev->igate));
++	if (old)
++		call_rcu(&old->rcu, vfio_pci_eventfd_rcu_free);
++
++	return 0;
++}
++
+ /* List of PF's that vfio_pci_core_sriov_configure() has been called on */
+ static DEFINE_MUTEX(vfio_pci_sriov_pfs_mutex);
+ static LIST_HEAD(vfio_pci_sriov_pfs);
+@@ -697,14 +731,8 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
+ 	vfio_pci_dma_buf_cleanup(vdev);
+ 
+ 	mutex_lock(&vdev->igate);
+-	if (vdev->err_trigger) {
+-		eventfd_ctx_put(vdev->err_trigger);
+-		vdev->err_trigger = NULL;
+-	}
+-	if (vdev->req_trigger) {
+-		eventfd_ctx_put(vdev->req_trigger);
+-		vdev->req_trigger = NULL;
+-	}
++	vfio_pci_eventfd_replace_locked(vdev, &vdev->err_trigger, NULL);
++	vfio_pci_eventfd_replace_locked(vdev, &vdev->req_trigger, NULL);
+ 	mutex_unlock(&vdev->igate);
+ }
+ EXPORT_SYMBOL_GPL(vfio_pci_core_close_device);
+@@ -1784,21 +1812,21 @@ void vfio_pci_core_request(struct vfio_device *core_vdev, unsigned int count)
+ 	struct vfio_pci_core_device *vdev =
+ 		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+ 	struct pci_dev *pdev = vdev->pdev;
++	struct vfio_pci_eventfd *eventfd;
+ 
+-	mutex_lock(&vdev->igate);
+-
+-	if (vdev->req_trigger) {
++	rcu_read_lock();
++	eventfd = rcu_dereference(vdev->req_trigger);
++	if (eventfd) {
+ 		if (!(count % 10))
+ 			pci_notice_ratelimited(pdev,
+ 				"Relaying device request to user (#%u)\n",
+ 				count);
+-		eventfd_signal(vdev->req_trigger);
++		eventfd_signal(eventfd->ctx);
+ 	} else if (count == 0) {
+ 		pci_warn(pdev,
+ 			"No device request channel registered, blocked until released by user\n");
+ 	}
+-
+-	mutex_unlock(&vdev->igate);
++	rcu_read_unlock();
+ }
+ EXPORT_SYMBOL_GPL(vfio_pci_core_request);
+ 
+@@ -2216,13 +2244,13 @@ pci_ers_result_t vfio_pci_core_aer_err_detected(struct pci_dev *pdev,
+ 						pci_channel_state_t state)
+ {
+ 	struct vfio_pci_core_device *vdev = dev_get_drvdata(&pdev->dev);
++	struct vfio_pci_eventfd *eventfd;
+ 
+-	mutex_lock(&vdev->igate);
+-
+-	if (vdev->err_trigger)
+-		eventfd_signal(vdev->err_trigger);
+-
+-	mutex_unlock(&vdev->igate);
++	rcu_read_lock();
++	eventfd = rcu_dereference(vdev->err_trigger);
++	if (eventfd)
++		eventfd_signal(eventfd->ctx);
++	rcu_read_unlock();
+ 
+ 	return PCI_ERS_RESULT_CAN_RECOVER;
+ }
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 30d3e921cb0d..c76e753b3cec 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -731,21 +731,27 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
+ 	return 0;
+ }
+ 
+-static int vfio_pci_set_ctx_trigger_single(struct eventfd_ctx **ctx,
++static int vfio_pci_set_ctx_trigger_single(struct vfio_pci_core_device *vdev,
++					   struct vfio_pci_eventfd __rcu **peventfd,
+ 					   unsigned int count, uint32_t flags,
+ 					   void *data)
+ {
+ 	/* DATA_NONE/DATA_BOOL enables loopback testing */
+ 	if (flags & VFIO_IRQ_SET_DATA_NONE) {
+-		if (*ctx) {
+-			if (count) {
+-				eventfd_signal(*ctx);
+-			} else {
+-				eventfd_ctx_put(*ctx);
+-				*ctx = NULL;
+-			}
++		struct vfio_pci_eventfd *eventfd;
++
++		eventfd = rcu_dereference_protected(*peventfd,
++						lockdep_is_held(&vdev->igate));
++
++		if (!eventfd)
++			return -EINVAL;
++
++		if (count) {
++			eventfd_signal(eventfd->ctx);
+ 			return 0;
+ 		}
++
++		return vfio_pci_eventfd_replace_locked(vdev, peventfd, NULL);
+ 	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
+ 		uint8_t trigger;
+ 
+@@ -753,8 +759,15 @@ static int vfio_pci_set_ctx_trigger_single(struct eventfd_ctx **ctx,
+ 			return -EINVAL;
+ 
+ 		trigger = *(uint8_t *)data;
+-		if (trigger && *ctx)
+-			eventfd_signal(*ctx);
++
++		if (trigger) {
++			struct vfio_pci_eventfd *eventfd =
++					rcu_dereference_protected(*peventfd,
++					lockdep_is_held(&vdev->igate));
++
++			if (eventfd)
++				eventfd_signal(eventfd->ctx);
++		}
+ 
+ 		return 0;
+ 	} else if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+@@ -765,22 +778,23 @@ static int vfio_pci_set_ctx_trigger_single(struct eventfd_ctx **ctx,
+ 
+ 		fd = *(int32_t *)data;
+ 		if (fd == -1) {
+-			if (*ctx)
+-				eventfd_ctx_put(*ctx);
+-			*ctx = NULL;
++			return vfio_pci_eventfd_replace_locked(vdev,
++							       peventfd, NULL);
+ 		} else if (fd >= 0) {
+ 			struct eventfd_ctx *efdctx;
++			int ret;
+ 
+ 			efdctx = eventfd_ctx_fdget(fd);
+ 			if (IS_ERR(efdctx))
+ 				return PTR_ERR(efdctx);
+ 
+-			if (*ctx)
+-				eventfd_ctx_put(*ctx);
++			ret = vfio_pci_eventfd_replace_locked(vdev,
++							      peventfd, efdctx);
++			if (ret)
++				eventfd_ctx_put(efdctx);
+ 
+-			*ctx = efdctx;
++			return ret;
+ 		}
+-		return 0;
+ 	}
+ 
+ 	return -EINVAL;
+@@ -793,7 +807,7 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_core_device *vdev,
+ 	if (index != VFIO_PCI_ERR_IRQ_INDEX || start != 0 || count > 1)
+ 		return -EINVAL;
+ 
+-	return vfio_pci_set_ctx_trigger_single(&vdev->err_trigger,
++	return vfio_pci_set_ctx_trigger_single(vdev, &vdev->err_trigger,
+ 					       count, flags, data);
+ }
+ 
+@@ -804,7 +818,7 @@ static int vfio_pci_set_req_trigger(struct vfio_pci_core_device *vdev,
+ 	if (index != VFIO_PCI_REQ_IRQ_INDEX || start != 0 || count > 1)
+ 		return -EINVAL;
+ 
+-	return vfio_pci_set_ctx_trigger_single(&vdev->req_trigger,
++	return vfio_pci_set_ctx_trigger_single(vdev, &vdev->req_trigger,
+ 					       count, flags, data);
+ }
+ 
+diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci_priv.h
+index 28a405f8b97c..6681389518a7 100644
+--- a/drivers/vfio/pci/vfio_pci_priv.h
++++ b/drivers/vfio/pci/vfio_pci_priv.h
+@@ -26,6 +26,10 @@ struct vfio_pci_ioeventfd {
+ bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev);
+ void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev);
+ 
++int vfio_pci_eventfd_replace_locked(struct vfio_pci_core_device *vdev,
++				    struct vfio_pci_eventfd __rcu **peventfd,
++				    struct eventfd_ctx *ctx);
++
+ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
+ 			    unsigned index, unsigned start, unsigned count,
+ 			    void *data);
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index 88fd2fd895d0..a1eddd55dab8 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -12,6 +12,7 @@
+ #include <linux/pci.h>
+ #include <linux/vfio.h>
+ #include <linux/irqbypass.h>
++#include <linux/rcupdate.h>
+ #include <linux/types.h>
+ #include <linux/uuid.h>
+ #include <linux/notifier.h>
+@@ -29,6 +30,11 @@ struct vfio_pci_region;
+ struct p2pdma_provider;
+ struct dma_buf_phys_vec;
+ 
++struct vfio_pci_eventfd {
++	struct eventfd_ctx	*ctx;
++	struct rcu_head		rcu;
++};
++
+ struct vfio_pci_regops {
+ 	ssize_t (*rw)(struct vfio_pci_core_device *vdev, char __user *buf,
+ 		      size_t count, loff_t *ppos, bool iswrite);
+@@ -124,8 +130,8 @@ struct vfio_pci_core_device {
+ 	struct pci_saved_state	*pci_saved_state;
+ 	struct pci_saved_state	*pm_save;
+ 	int			ioeventfds_nr;
+-	struct eventfd_ctx	*err_trigger;
+-	struct eventfd_ctx	*req_trigger;
++	struct vfio_pci_eventfd __rcu *err_trigger;
++	struct vfio_pci_eventfd __rcu *req_trigger;
+ 	struct eventfd_ctx	*pm_wake_eventfd_ctx;
+ 	struct list_head	dummy_resources_list;
+ 	struct mutex		ioeventfds_lock;
+-- 
+2.51.1
 
-And it also needs to be called conditionally on certain paths.
-Which means that it will take an extra argument (whether prior reset was
-successful).
-I'll try this approach in v2.
-
-Thanks,
--Michał
-
-> Thanks,
-> 
-> Alex
-> 
-> 
-> >  
-> >  		if (!disable_idle_d3)
-> >  			pm_runtime_put(&cur->pdev->dev);
-> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> > index eb563f538dee5..36aab2df40700 100644
-> > --- a/include/linux/vfio.h
-> > +++ b/include/linux/vfio.h
-> > @@ -213,6 +213,9 @@ static inline bool vfio_device_cdev_opened(struct vfio_device *device)
-> >   * @migration_get_state: Optional callback to get the migration state for
-> >   *         devices that support migration. It's mandatory for
-> >   *         VFIO_DEVICE_FEATURE_MIGRATION migration support.
-> > + * @migration_reset_state: Optional callback to reset the migration state for
-> > + *         devices that support migration. It's mandatory for
-> > + *         VFIO_DEVICE_FEATURE_MIGRATION migration support.
-> >   * @migration_get_data_size: Optional callback to get the estimated data
-> >   *          length that will be required to complete stop copy. It's mandatory for
-> >   *          VFIO_DEVICE_FEATURE_MIGRATION migration support.
-> > @@ -223,6 +226,7 @@ struct vfio_migration_ops {
-> >  		enum vfio_device_mig_state new_state);
-> >  	int (*migration_get_state)(struct vfio_device *device,
-> >  				   enum vfio_device_mig_state *curr_state);
-> > +	void (*migration_reset_state)(struct vfio_device *device);
-> >  	int (*migration_get_data_size)(struct vfio_device *device,
-> >  				       unsigned long *stop_copy_length);
-> >  };
-> 
 
