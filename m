@@ -1,256 +1,329 @@
-Return-Path: <kvm+bounces-64415-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64416-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAD04C81FC2
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 18:55:22 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1219BC82088
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 19:09:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 072103AC568
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 17:55:21 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 71D77349C84
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 18:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9262C178E;
-	Mon, 24 Nov 2025 17:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19C4318152;
+	Mon, 24 Nov 2025 18:08:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1IuLzWL";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="sFsuX66g"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MjG5vecX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013063.outbound.protection.outlook.com [40.93.201.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C062C1786
-	for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 17:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764006908; cv=none; b=J2HdP3TqIFDhpDTAgPOdKzgW5x2R8l7K2EMM6BuHLuoxWl/pYXRmgvZOVvC1c3NTXS7HdYN12ZGi5kVUKIMbhH2DwXvBIxgtSXInHKZXQugH19Qzr6Q1q7bg+NnmWPakZb2Yzn2unz7J8SLolcfCev/fD34/JyOT6BVXbejmXPk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764006908; c=relaxed/simple;
-	bh=wgpVnEJcnomKN/oNfPAgd5k9GgyVHMXvOCPZyfz69j0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XJ8ethiS3Redmxa301qyNFbjSsSkVNGN2MSPYN5FjOobJBz821evymoi5lVYm4PNpCo/NWopUvxlF9uyvNI2gSK2KBVuYb7nhOxuL8ucXxkrwnVWBTm7AZL4jlFe05LuY41eaf6O/BnG6E5otFMdE2Zwe4ktAsDJY41elJYRwZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S1IuLzWL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=sFsuX66g; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764006905;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MWaaNkWE0gvkjn8TKglV+j77gDxp+Cag+Z34d+Rk28I=;
-	b=S1IuLzWLbnCCLWzn3bnEIfkhyqqCOgkB7owQy+BUxdzgG+wAOpiubPTLpoApgwq69u+Q0d
-	MbLn6/RD3Zir4pjr1kphd46Spq7ja8PHzxAvnLu82AftoqH9/njkuLwxhE03WW5KOgd7Sf
-	q124/E+5ovmK80J9ouGR+AbFxXgZo2M=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-573-TJrEFcc4P7qatPicYUTSbg-1; Mon, 24 Nov 2025 12:55:04 -0500
-X-MC-Unique: TJrEFcc4P7qatPicYUTSbg-1
-X-Mimecast-MFC-AGG-ID: TJrEFcc4P7qatPicYUTSbg_1764006904
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4ee2fd41c2aso62050871cf.2
-        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 09:55:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764006904; x=1764611704; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MWaaNkWE0gvkjn8TKglV+j77gDxp+Cag+Z34d+Rk28I=;
-        b=sFsuX66grMVLzij28lmvj3RuFf2VZu0c0RZj5hbgilwQI1qBq/h1T8MVYdXVSZYa3n
-         Pg1KCm1/e/YEHmO42Gq9fOp6ysA/1bgoWgEWyMmDZPEx24w9qVUhhC2dffcRbS1nHybg
-         aw27VWkRwQoaC+iscIT/r3MVND4X0OXteTjNpsAY9TOWjvYuSCCPa+UClzg0uyO/94yR
-         dh/bLdBKjcgYH7le/WDa/awz3XjjOhtOtOKx9OZuY884pYBOyUo7JzIu4ilx9pQwdUVN
-         HbVAWk4rmbtEJP+/T4SUfXo0zj3VmQC561VAZJzDgDnDmEoYS2IdZFpEZnsog3nZ9DJ8
-         1cPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764006904; x=1764611704;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MWaaNkWE0gvkjn8TKglV+j77gDxp+Cag+Z34d+Rk28I=;
-        b=qcbbBSCNQllyqMsvFVB9EwEYQyOZloOMdOhMuJ1lQEF3geNWS2X4bXd2mBKvLMFse9
-         jKhJdRvfT0WeW769fVFUBA0YcSjJ5HDTHWixkaYxSEW5MThVGuIebWgro4vJc41fWmdL
-         Uyr63OOdFMl2rDA4QwU7vFwzlOXOdHfL/UD9FaD7e1sldoUDYDhlSRV+Ew2CaUthg4+c
-         UgE/GpvuxJeKVnT7RY793dx7+Aw6weV1KsLmFg0xphy59f82D4mogvkmc5DjdoHhlMfO
-         8cuX7P2riGDNTvQ+z+Ns5G/Tya2vKArWnF7CDmO8bNveb26dSQU2vA9QeVJTdgVeJLNc
-         tq/g==
-X-Forwarded-Encrypted: i=1; AJvYcCUnmPKPc2r/6cmVXmjJLk7xwx74l6W5XUsFvmgGyWVIatpk0bhFWWv2XntB89DM7Lv9ygI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfOiQP814YLZuQaxyCfCgU2eVZLH0ww11QivBd4vTkcO+9IJ1b
-	XG8HMSMeIIspUMMli4Ap0iV1aWXVWOtktBBcIiztY2GsOwMfeBTJVcOxwTu/7Y0GqsLJxzZtE7t
-	7w9IRIjB2h7fELdzgEH+eqF8+86WOtXk43oSZs5P2myBxv0zpb9OOoPGTeMLmnA==
-X-Gm-Gg: ASbGncuf/YCi+VYYO91cchZn8mdCYfkz2KnEaBLMa5btbetVOxxeHYanVTFA6p6qBNZ
-	W+1FutjWx12p74W2D+4qbQZUqACpMkgDK+wiPsm/FQTris3you0XHquZLrNAdAJn3QfIe0mgG02
-	0G5Y16ImMEubu3UEzkYgCePyTX53vqxSok6y9hwX9W3G8v82fEu+d8BZzpcwpYRZnoadXXzw5jv
-	fldYSxYu/+Q0BirJ695iAr57nhM3yNXBMxXSjZZ9SBjI7OUuxtfurlowue5JbCAv1FsiwHGSKW+
-	bAOO5skQlHmz5bwH9Es41DQBIOPz4WoLN976+5qXpWWvjGr38xoh+ELdI2oY1wT146rWqj982Sl
-	RzNfHrO2r7lX47Yt982XVSU8qscpJsMyXHQPpVvZtG5u7XmnTDQ7lghDGwyX7vA==
-X-Received: by 2002:a05:622a:1b86:b0:4ee:87a:56b3 with SMTP id d75a77b69052e-4ee588cb923mr177167441cf.48.1764006903621;
-        Mon, 24 Nov 2025 09:55:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE8Gf4NTZ93wIDY4fTFcgjXQPdtoiRJrv+CLpyDvCPlHjnxTw3P0ZMr3a2DgpcLW7S43lbwhw==
-X-Received: by 2002:a05:622a:1b86:b0:4ee:87a:56b3 with SMTP id d75a77b69052e-4ee588cb923mr177166801cf.48.1764006903119;
-        Mon, 24 Nov 2025 09:55:03 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee48e65e3bsm90774671cf.17.2025.11.24.09.54.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 09:55:02 -0800 (PST)
-Date: Mon, 24 Nov 2025 18:54:45 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, berrange@redhat.com, 
-	Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v11 03/13] vsock: reject bad
- VSOCK_NET_MODE_LOCAL configuration for G2H
-Message-ID: <qvu2mgxs7scbuwcb2ui7eh3qe3l7mlcjq6e2favd4aqcs52r2r@oqbrlp4gxdwl>
-References: <20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com>
- <20251120-vsock-vmtest-v11-3-55cbc80249a7@meta.com>
- <swa5xpovczqucynffqgfotyx34lziccwpqomnm5a7iwmeyixfv@uehtzbdj53b4>
- <aSC3IX81A3UhtD3N@devvm11784.nha0.facebook.com>
- <g4xir3lupnjybh7fqig6xonp32ubotdf3emmrozdm52tpaxvxn@2t4ueynb7hqr>
- <aSSV4RlRcW+uGy+n@devvm11784.nha0.facebook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBDD314D17;
+	Mon, 24 Nov 2025 18:08:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764007689; cv=fail; b=ZkHG6xjip1hgi9QVXjr7041VV0UinNk8RlOzRhy3s/QNHLX6sh9wmIv7mjRefWb1W/84ZH/VfiTLycKevYjKZk6DF6oQsmPyylQ/RE2vyHF5tMF440HI2DAYY7kS/73mLmWEvFp+J3HUUaJxStYnNo40CRvxif/oLWtRB7gKggQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764007689; c=relaxed/simple;
+	bh=i8pnYE9WloPIMw1gIoEhzh7bh5Hl9Nk9oMzfX+azCYU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=WaD6RGwwNZ459EiNZtYnqJj0yUBUdTB8CnHaOVpN5xoSFlhAoZ3MYh08zduyogffMgwCPuQHYiGxwn2/9+5LzHMPeCMl/zPKau+/oIOvOrfDf9QfnTd372o+VmJeJn/8cprd1PtdRMJSCOdAbjiodgLM42YgIjV1SbB41t6Iuio=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MjG5vecX; arc=fail smtp.client-ip=40.93.201.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PwreFWB5M087zkorMi/FGmjYv//gByrEck8qgxkA186xx8K4LXWZ30SOQVIBdkHSTpaakuGFMJzwWJ6nUW8Rlx4rRVGPa8eRiWtsMc7cz9A7iHLLuOAPlidTLuEF3/bdq+25I36wybjETEXkYA03IOloVpTPeGxDfEqYC8o1uD8tQGmDKJO6kQme1TCJ/Aj2eA6vKu6ecl2FUcwTUjwTNRtf9EZtwPQ9hi4ceSPdQNUpvWeQHAv+eVabMihONKgPkXXvZD1OSsnoRQcXAgVBvPT9yua2p8O5pZxiWnk4YKd3meyiwdlTfGrEJb3Gg4e3Sql4LyFzSDNz8+5l2nsfOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kg+E9LHH/CUJIZbVm7ewHwpCNyB7GTQGqcUuTBIrGvw=;
+ b=Y/w1aZuuTXlT6+EEurQ9XIsggYSOvxOzQTUIrCtNJB01sTAQSN+4f86jSTB/uRRYM3SNGWp3gPmghtKJnv2e95cMofLgqSsCJS3Gen3IRZvX0O1pM/hY6Xdsue7fR6z4CVve2xZHsRdQkM6RiCHALjZf4kkLiXgyhXDok5mkBQgLrtCcCt/DMhh6A17ED4sG/oVw1swkWW1HPGiHE/+CEAAzjKYQSpZYGiU2SknOjFEsEcF0EDtDtQC2JAmfTQh37cDGJqPVjZc91PoeSgjJDFToLFZuoLeAnRjFHxsj9NZy8Hl3+MTw0g6X7MYDawfIGmMHNuUMLgwQS3hFSx0vXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kg+E9LHH/CUJIZbVm7ewHwpCNyB7GTQGqcUuTBIrGvw=;
+ b=MjG5vecXmkosG1D51pvF5dfBV2l5T8uc2NEPHAEAOriumLIsSWuTry0K8yQEhyDjXgnOQhSJgwE7D61RH2unMO989vrBItxD4XltlukiRtXCwSKwnATqi2p5wTWnwF0MI1jO4siz11gaosryfhybk9Dm2Wcb0RMYX8isZ87RajSF3rHRv2/pkc9OxAOjEf4vw1GUXph0ZxWWoKOsBnYKs/FppCijkOSLWc9UXXS5i9K3cWHbK7mEdkdwFiS/+a/QSt4hB+tHOQLBlKDxMf0fPsM68tgr4JXlz1I4BECnFqRyXa+Bk+KytzMz8ye6Ki2zoT4fV4D1i8ytuDq3r2Cqlg==
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
+ by SJ5PPF8AECCE022.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::99c) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.18; Mon, 24 Nov
+ 2025 18:08:02 +0000
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::e8c:e992:7287:cb06]) by CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::e8c:e992:7287:cb06%5]) with mapi id 15.20.9343.016; Mon, 24 Nov 2025
+ 18:08:01 +0000
+From: Shameer Kolothum <skolothumtho@nvidia.com>
+To: Ankit Agrawal <ankita@nvidia.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, Yishai
+ Hadas <yishaih@nvidia.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"alex@shazbot.org" <alex@shazbot.org>, Aniket Agashe <aniketa@nvidia.com>,
+	Vikram Sethi <vsethi@nvidia.com>, Matt Ochs <mochs@nvidia.com>
+CC: "Yunxiang.Li@amd.com" <Yunxiang.Li@amd.com>, "yi.l.liu@intel.com"
+	<yi.l.liu@intel.com>, "zhangdongdong@eswincomputing.com"
+	<zhangdongdong@eswincomputing.com>, Avihai Horon <avihaih@nvidia.com>,
+	"bhelgaas@google.com" <bhelgaas@google.com>, "peterx@redhat.com"
+	<peterx@redhat.com>, "pstanner@redhat.com" <pstanner@redhat.com>, Alistair
+ Popple <apopple@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Neo Jia
+	<cjia@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>, "Tarun Gupta
+ (SW-GPU)" <targupta@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, Dan Williams
+	<danw@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>, Krishnakant Jaju
+	<kjaju@nvidia.com>
+Subject: RE: [PATCH v5 3/7] vfio/nvgrace-gpu: Add support for huge pfnmap
+Thread-Topic: [PATCH v5 3/7] vfio/nvgrace-gpu: Add support for huge pfnmap
+Thread-Index: AQHcXTnUJShiqd2+GU2SWA/+Yd6vO7UCHoXA
+Date: Mon, 24 Nov 2025 18:08:00 +0000
+Message-ID:
+ <CH3PR12MB7548D60ADF0FDB0589ACCDA3ABD0A@CH3PR12MB7548.namprd12.prod.outlook.com>
+References: <20251124115926.119027-1-ankita@nvidia.com>
+ <20251124115926.119027-4-ankita@nvidia.com>
+In-Reply-To: <20251124115926.119027-4-ankita@nvidia.com>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH3PR12MB7548:EE_|SJ5PPF8AECCE022:EE_
+x-ms-office365-filtering-correlation-id: b2e52ba1-d322-4ede-2db8-08de2b8467c5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700021|7053199007;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?woPmktsih6yVvXBpjuvoyp2tCYuJc4VNZG4oI9DQLvzwdy07g8jrJPlpRwee?=
+ =?us-ascii?Q?/Sh0Mls5mAelMhey4xVFXMI1POHSNKzCj4DQ3ILsVw3RWvVu1igevRp0MYd+?=
+ =?us-ascii?Q?UpOBoc81xYhrLvcWH1MAftfJGRL2vmbyKPApT6D5U0WbhOjbnvbWmQQgJNOs?=
+ =?us-ascii?Q?fDW2CHjGJlgB88Iu3FjrQAym47LKLBSoKB0P/dA5PamsmZmrrapz3tzSE+yh?=
+ =?us-ascii?Q?m5OD7Vu8ug7EXBOvt8qKK00bxiaORCXV2Njs22Y9sCpj6qTB4Mw9TZ9dpXBk?=
+ =?us-ascii?Q?FXF02KI3D6dxr6v8mqX03JVv/2Eh3nN2AQcQGeI2CddZd1hLIFlf7ptBrncK?=
+ =?us-ascii?Q?cOImloW9mqGoIpPvxnPkyipKzv5EnZuS/lIUzpvZcc42NDQWMPV8wsYgOYa9?=
+ =?us-ascii?Q?KsFg4Hez4O9Q04B0/1g38Jf7/fpl/QvAu5lWJV8hXNFYvn/U1pq6G/lQyjXk?=
+ =?us-ascii?Q?/IGpiuKap6PhJEXnl1H66UwUgUxJUOo2JC8wUFB/SK6t//tD5dv0GWPXycaq?=
+ =?us-ascii?Q?mRva0Yfhv3nHXQlBCNPh2QNyL0KQ0RJnUGXjHYFuWnKOXVeq8e6Bo2/2puw8?=
+ =?us-ascii?Q?iCUzhwnjbuQmGbFzHf7plVuXMmJO74v2XKkeJLdA5tSoGETcmyLjjeB2lQZa?=
+ =?us-ascii?Q?XBXqfTxsLNh2xIUqg1YIjbd0tDCozw2OzcJejNcwXkFQ/zNTrE+wcAnNUJRV?=
+ =?us-ascii?Q?MnDPhj+0WkRf4H5Zhdoy6JFNrOb4qYd6+LYsLdPCvgl0MjYLywvAPCzmqLTq?=
+ =?us-ascii?Q?cwU/9mKSEBp/w6Sos5t60fkiU4YkFA9KDc0khJyBFOa15yDvyD7VjQkh/4xv?=
+ =?us-ascii?Q?b0I7LPOsrmEGUVj2wXsABrngHWvEqqIXw4Va/NqKt+SVCGN5HLCqVIn2OQkM?=
+ =?us-ascii?Q?FFML4IhXU5bxKpPiT/cAtq3becuO2+DkqqR+wSjYRnn/3tQRdmr/GP/KVFTE?=
+ =?us-ascii?Q?EFn5sbYWFcL4hM80bPqP+8JfkVZfz7TObiXuDBboOlLgV6t+oEGm0CCYcJJ9?=
+ =?us-ascii?Q?7SXHJ93ia3V54Y+mIlWecsC36eMPF8dm+qQwvwSTbuYXjMg6ha9bPoG3Yl8E?=
+ =?us-ascii?Q?hhuUMmX0niJWLna3GXp+nv54u52lsJlk2ZguU0BMz7nFht5pAmdBVVei34oR?=
+ =?us-ascii?Q?/hF7fduR5w1BTL8rjBxCM61ontm10IDuuGWGTSG6VuCiwsrj/Uf2c3ln5IJV?=
+ =?us-ascii?Q?9qGJKza//WEwpwhUQRvuHfJMvjJpXBjBchX8sj+LNVXPPwX8liLjMCHnwI/k?=
+ =?us-ascii?Q?qAyBPgwOhzsz1uIEiD1PiIvmIx04wnCy7foaiTdjUHRIwpRuLFDPzhKDhY3n?=
+ =?us-ascii?Q?GTXx1zJkdcw5KgyiOG23NrEMXRnrhg4AlN+8xRI09nqljFsWItLbft8iuaf7?=
+ =?us-ascii?Q?fPUyHzJYpfin9DUMtGPgSK1DBa0jOwB/EBBJd0s+2OERRKPsYqV3Dmfqu7KY?=
+ =?us-ascii?Q?7bZXWoUE/X2e609jLAyNac0I4qVA9RLgi5XORZE6kZA3ZvSVcaVfv8Ocs+wS?=
+ =?us-ascii?Q?TH5WCV9toKOedOrBRGaC6HJbRshwdVzstlVD?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700021)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Xu6LtDMxXtWU3lE7Qi4EqLWgQWbbWa2yZ5qeCcNtFR8mJYCMG5J49snUr7lX?=
+ =?us-ascii?Q?OJhh1JtmHzHD2iRn4BmEVmZedbGhR6X5lbQIhuGPNF1x02niOQ7+ptOZorzX?=
+ =?us-ascii?Q?9YbG1Q2563qLpOjDJOkD+P3rETNS1bzWvuInxKYAuDlmM7KhXSBQZc+9z4q5?=
+ =?us-ascii?Q?2G/4IeXgwLXlJtkSgfRb6txRIi/3/3GQOl+zqzKk6fkVzPCz74xweJ7T73EH?=
+ =?us-ascii?Q?HIrKcsA/t6rYPDIfiRd4WUWwUNTLEbB6lrHIL/tLPtjh01lMzeS7vV4yIVsQ?=
+ =?us-ascii?Q?Rnqk+lBuO6R7wzbe8tlHHTqQn2JsOFx+VVaB6VjicwABT+yofa+uDT+vLCxx?=
+ =?us-ascii?Q?sDxx9XJdU/P4aek+nPTktPLLglc5xF2b/dubvkC7B37BjE9b98JkofABI5TW?=
+ =?us-ascii?Q?yt+C3oSrFpbrpRCcpVhQgCpuQvAIif9FYvynbCaLYtPYOAQQjFoUFB4Kz7LT?=
+ =?us-ascii?Q?RobXK+Cqbalwo55Z6Ir0PvtEUoLv+IT7ve+qV7+jZWbkU8RcGPEPDc6c5fq6?=
+ =?us-ascii?Q?NDx1VKjLFEwr8VlAQ5BRC85ncrzw+h2gK2w2Ttj1BCkN7cw8fyX4i0AJDVwG?=
+ =?us-ascii?Q?dozb1ILSQi8OuWyvVfxFVtkMp4G1pJ2B8Zwuw6vW3F6iu7Zp5gcX9YkQkL7q?=
+ =?us-ascii?Q?8zh1YQbYp9N7RiOe/d0pmSMBysmOljBvfJyOU03HZwZHNEVKPAfjgJAlFpm+?=
+ =?us-ascii?Q?67xY1RQ5EwjmLsdDN4Pa2A6EZzhNSluC+1AQB3wUZXEsrqeU34SHxUMof2i9?=
+ =?us-ascii?Q?RQi6vli5EQPRwvR3xdOETsDJjnRr70C3Mt0iYQmTSgu3VJ86kYMO+D8OIVme?=
+ =?us-ascii?Q?ETmBlI3nAcd283/p2v/ZVX+lUVt7h1gOsJKlAISVvo1KiRSVDLGD96kJLcfK?=
+ =?us-ascii?Q?kCKLX9ojmO9ABHG30ZgvclOU+JqLNrbVFl24xIQRjZ/9m49R/cIcKRgqFRCg?=
+ =?us-ascii?Q?qFlh5iGo2K+I7fflQaYT8ivGJfjugFSn8ZSiqDBr2OlOQ2iJ7cw/XnUgRBB1?=
+ =?us-ascii?Q?+cU29y2RFyVUCsp5Dv+5mgY2Ww8/WlN2gprtzTLN6aKrH3mrrZgXNJgJstS1?=
+ =?us-ascii?Q?BtdRuLn9PXUhXvVavCYyhuD1Zy0IZF0oW9x739MahTIgl1VPByPWze5K2c4Z?=
+ =?us-ascii?Q?eIN3EBr5sE5V3KhOzJhV7tFXYe3e8tVe0bJdv/MUcYYmVY6JG1+c6OSvSF6c?=
+ =?us-ascii?Q?aPNCwed8uPzlEkBauwU39mtX5m+0agvRew/O6ER6NHPDgJXWGfn4w1fUvs2B?=
+ =?us-ascii?Q?8PowmRODQjWr6E/OVnlUAqH/bdjaq6wdmEE62ZtC3A/ZUq+FsL+e8eza4kWs?=
+ =?us-ascii?Q?s9hYILj2ur1pFGd2v9JufdiqKif2uX1APhD7o1yirWsDWyaGUM9vY72jBdbF?=
+ =?us-ascii?Q?7fRtJAvJwi4kvehNNa12UH+Etli5KyMVHgGWMkwU6SNXcRRN1+M7VEGppIWF?=
+ =?us-ascii?Q?zOepdHPx25ulz2d7jJ+gAfkcXhE+mgqtD1OupzP9iHM1bqTBYXAJEzqY/6df?=
+ =?us-ascii?Q?3fSwQ724E+n74lOwfCY9nTUG5xCv2afuHaA0Fd/k6slsH02iownyK9m6xWsx?=
+ =?us-ascii?Q?9RdMwI1pGhtcumvdAbLn6dzKcxAn5pwbGwDPq2NM?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aSSV4RlRcW+uGy+n@devvm11784.nha0.facebook.com>
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b2e52ba1-d322-4ede-2db8-08de2b8467c5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Nov 2025 18:08:00.9490
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8OcdZAfCHdP/LY4dlHGqrqbuqQGR17okwm/mRERZUwOmcyyJqA3VpJEkcwQa2/4Q226HniHeb3u01xKSXFYbUw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF8AECCE022
 
-On Mon, Nov 24, 2025 at 09:29:05AM -0800, Bobby Eshleman wrote:
->On Mon, Nov 24, 2025 at 11:10:19AM +0100, Stefano Garzarella wrote:
->> On Fri, Nov 21, 2025 at 11:01:53AM -0800, Bobby Eshleman wrote:
->> > On Fri, Nov 21, 2025 at 03:24:25PM +0100, Stefano Garzarella wrote:
->> > > On Thu, Nov 20, 2025 at 09:44:35PM -0800, Bobby Eshleman wrote:
 
-[...]
 
->> >
->> > > Since I guess we need another version of this patch, can you check the
->> > > commit description to see if it reflects what we are doing now
->> > > (e.g vhost is not enabled)?
->> > >
->> > > Also I don't understand why for vhost we will enable it later, but for
->> > > virtio_transport and vsock_loopback we are enabling it now, also if this
->> > > patch is before the support on that transports. I'm a bit confused.
->> > >
->> > > If something is unclear, let's discuss it before sending a new version.
->> > >
->> > >
->> > > What I had in mind was, add this patch and explain why we need this new
->> > > callback (like you did), but enable the support in the patches that
->> > > really enable it for any transport. But maybe what is not clear to me is
->> > > that we need this only for G2H. But now I'm confused about the discussion
->> > > around vmci H2G. We decided to discard also that one, but here we are not
->> > > checking that?
->> > > I mean here we are calling supports_local_mode() only on G2H IIUC.
->> >
->> > Ah right, VMCI broke my original mental model of only needing this check
->> > for G2H (originally I didn't realize VMCI was H2G too).
->> >
->> > I think now, we actually need to do this check for all of the transports
->> > no? Including h2g, g2h, local, and dgram?
->> >
->> > Additionally, the commit description needs to be updated to reflect that.
->>
->> Let's take a step back, though, because I tried to understand the problem
->> better and I'm confused.
->>
->> For example, in vmci (G2H side), when a packet arrives, we always use
->> vsock_find_connected_socket(), which only searches in GLOBAL. So connections
->> originating from the host can only reach global sockets in the guest. In
->> this direction (host -> guest), we should be fine, right?
->>
->> Now let's consider the other direction, from guest to host, so the
->> connection should be generated via vsock_connect().
->> Here I see that we are not doing anything with regard to the source
->> namespace. At this point, my question is whether we should modify
->> vsock_assign_transport() or transport->stream_allow() to do this for each
->> stream, and not prevent loading a G2H module a priori.
->>
->> For example, stream_allow() could check that the socket namespace is
->> supported by the assigned transport. E.g., vmci can check that if the
->> namespace mode is not GLOBAL, then it returns false. (Same thing in
->> virtio-vsock, I mean the G2H driver).
->>
->> This should solve the guest -> host direction, but at this point I wonder if
->> I'm missing something.
->
->For the G2H connect case that is true, but the situation gets a little
->fuzzier on the G2H RX side w/ VMADDR_CID_ANY listeners.
->
->Let's say we have a nested system w/ both virtio-vsock and vhost-vsock.
->We have a listener in namespace local on VMADDR_CID_ANY. So far, no
->transport is assigned, so we can't call t->stream_allow() yet.
->virtio-vsock only knows of global mode, so its lookup will fail (unless
+> -----Original Message-----
+> From: Ankit Agrawal <ankita@nvidia.com>
+> Sent: 24 November 2025 11:59
+> To: Ankit Agrawal <ankita@nvidia.com>; jgg@ziepe.ca; Yishai Hadas
+> <yishaih@nvidia.com>; Shameer Kolothum <skolothumtho@nvidia.com>;
+> kevin.tian@intel.com; alex@shazbot.org; Aniket Agashe
+> <aniketa@nvidia.com>; Vikram Sethi <vsethi@nvidia.com>; Matt Ochs
+> <mochs@nvidia.com>
+> Cc: Yunxiang.Li@amd.com; yi.l.liu@intel.com;
+> zhangdongdong@eswincomputing.com; Avihai Horon <avihaih@nvidia.com>;
+> bhelgaas@google.com; peterx@redhat.com; pstanner@redhat.com; Alistair
+> Popple <apopple@nvidia.com>; kvm@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Neo Jia <cjia@nvidia.com>; Kirti Wankhede
+> <kwankhede@nvidia.com>; Tarun Gupta (SW-GPU) <targupta@nvidia.com>;
+> Zhi Wang <zhiw@nvidia.com>; Dan Williams <danw@nvidia.com>; Dheeraj
+> Nigam <dnigam@nvidia.com>; Krishnakant Jaju <kjaju@nvidia.com>
+> Subject: [PATCH v5 3/7] vfio/nvgrace-gpu: Add support for huge pfnmap
+>=20
+> From: Ankit Agrawal <ankita@nvidia.com>
+>=20
+> NVIDIA's Grace based systems have large device memory. The device
+> memory is mapped as VM_PFNMAP in the VMM VMA. The nvgrace-gpu
+> module could make use of the huge PFNMAP support added in mm [1].
+>=20
+> To achieve this, nvgrace-gpu module is updated to implement huge_fault op=
+s.
+> The implementation establishes mapping according to the order request.
+> Note that if the PFN or the VMA address is unaligned to the order, the
+> mapping fallbacks to the PTE level.
+>=20
+> Link: https://lore.kernel.org/all/20240826204353.2228736-1-
+> peterx@redhat.com/ [1]
+>=20
+> cc: Alex Williamson <alex@shazbot.org>
+> cc: Jason Gunthorpe <jgg@ziepe.ca>
+> cc: Vikram Sethi <vsethi@nvidia.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  drivers/vfio/pci/nvgrace-gpu/main.c | 43 +++++++++++++++++++++++------
+>  1 file changed, 35 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgra=
+ce-
+> gpu/main.c
+> index f74f3d8e1ebe..c84c01954c9e 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
+> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+> @@ -130,32 +130,58 @@ static void nvgrace_gpu_close_device(struct
+> vfio_device *core_vdev)
+>  	vfio_pci_core_close_device(core_vdev);
+>  }
+>=20
+> -static vm_fault_t nvgrace_gpu_vfio_pci_fault(struct vm_fault *vmf)
+> +static vm_fault_t nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
+> +						  unsigned int order)
+>  {
+>  	struct vm_area_struct *vma =3D vmf->vma;
+>  	struct nvgrace_gpu_pci_core_device *nvdev =3D vma->vm_private_data;
+>  	int index =3D vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT -
+> PAGE_SHIFT);
+>  	vm_fault_t ret =3D VM_FAULT_SIGBUS;
+>  	struct mem_region *memregion;
+> -	unsigned long pgoff, pfn;
+> +	unsigned long pgoff, pfn, addr;
+>=20
+>  	memregion =3D nvgrace_gpu_memregion(index, nvdev);
+>  	if (!memregion)
+>  		return ret;
+>=20
+> -	pgoff =3D (vmf->address - vma->vm_start) >> PAGE_SHIFT;
+> +	addr =3D vmf->address & ~((PAGE_SIZE << order) - 1);
+> +	pgoff =3D (addr - vma->vm_start) >> PAGE_SHIFT;
+>  	pfn =3D PHYS_PFN(memregion->memphys) + pgoff;
+>=20
+> +	if (order && (addr < vma->vm_start ||
+> +		      addr + (PAGE_SIZE << order) > vma->vm_end ||
+> +		      pfn & ((1 << order) - 1)))
+> +		return VM_FAULT_FALLBACK;
+> +
+>  	scoped_guard(rwsem_read, &nvdev->core_device.memory_lock)
+> -		ret =3D vmf_insert_pfn(vmf->vma, vmf->address, pfn);
+> +		ret =3D vfio_pci_vmf_insert_pfn(vmf, pfn, order);
+>=20
+>  	return ret;
+>  }
+>=20
+> +static vm_fault_t nvgrace_gpu_vfio_pci_fault(struct vm_fault *vmf)
+> +{
+> +	return nvgrace_gpu_vfio_pci_huge_fault(vmf, 0);
+> +}
+> +
+>  static const struct vm_operations_struct nvgrace_gpu_vfio_pci_mmap_ops =
+=3D
+> {
+>  	.fault =3D nvgrace_gpu_vfio_pci_fault,
+> +#ifdef CONFIG_ARCH_SUPPORTS_HUGE_PFNMAP
+> +	.huge_fault =3D nvgrace_gpu_vfio_pci_huge_fault,
+> +#endif
+>  };
+>=20
+> +static size_t nvgrace_gpu_aligned_devmem_size(size_t memlength)
+> +{
+> +#ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
+> +	return ALIGN(memlength, PMD_SIZE);
+> +#endif
+> +#ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
+> +	return ALIGN(memlength, PUD_SIZE);
+> +#endif
 
-What is the problem of failing in this case?
-I mean, we are documenting that G2H will not be able to reach socket in 
-namespaces with "local" mode. Old (and default) behaviour is still 
-allowing them, right?
-
-I don't think it conflicts with the definition of “local” either, 
-because these connections are coming from outside, and the user doesn't 
-expect to be able to receive them in a “local” namespace, unless there 
-is a way to put the device in the namespace (as with net). But this 
-method doesn't exist yet, and by documenting it sufficiently, we can say 
-that it will be supported in the future, but not for now.
-
->we hack in some special case to virtio_transport_recv_pkt() to scan
->local namespaces). vhost-vsock will work as expected. Letting local mode
->sockets be silently unreachable by virtio-vsock seems potentially
->confusing for users. If the system were not nested, we can pre-resolve
->VMADDR_CID_ANY in bind() and handle things upfront as well. Rejecting
->local mode outright is just a broad guardrail.
-
-Okay, but in that case, we are not supporting “local” mode too, but we 
-are also preventing “global” from being used on these when we are in a 
-nested environment. What is the advantage of this approach?
-
->
->If we're trying to find a less heavy-handed option, we might be able to
->do the following:
->
->- change bind(cid) w/ cid != VMADDR_CID_ANY to directly assign the 
->transport
->  for all socket types (not just SOCK_DGRAM)
-
-That would be nice, but it wouldn't solve the problem with 
-VMADDR_CID_ANY, which I guess is the use case in 99% of cases.
-
->
->- vsock_assign_transport() can outright fail if !t->supports_local_mode()
->  and sock_net(sk) has mode local
-
-But in this case, why not reusing stream_allow() ?
-
->
->- bind(VMADDR_CID_ANY) can maybe print (once) to dmesg a warning that
->  only the H2G transport will land on VMADDR_CID_ANY sockets.
-
-mmm, I'm not sure about that, we should ask net maintainer, but IMO 
-documenting that in af_vsock.c and man pages should be fine, till G2H 
-will support that.
-
->
->I'm certainly open to other suggestions.
-
-IMO we should avoid the failure when loading G2H, which is more 
-confusing than just discard connection from the host to a "local" 
-namespace. We should try at least to support the "global" namespace.
+I think all this should be ALIGN_DOWN to be safe.
 
 Thanks,
-Stefano
+Shameer
+
+> +	return memlength;
+> +}
+> +
+>  static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
+>  			    struct vm_area_struct *vma)
+>  {
+> @@ -185,10 +211,10 @@ static int nvgrace_gpu_mmap(struct vfio_device
+> *core_vdev,
+>  		return -EOVERFLOW;
+>=20
+>  	/*
+> -	 * Check that the mapping request does not go beyond available
+> device
+> -	 * memory size
+> +	 * Check that the mapping request does not go beyond the exposed
+> +	 * device memory size.
+>  	 */
+> -	if (end > memregion->memlength)
+> +	if (end > nvgrace_gpu_aligned_devmem_size(memregion-
+> >memlength))
+>  		return -EINVAL;
+>=20
+>  	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND |
+> VM_DONTDUMP);
+> @@ -258,7 +284,8 @@ nvgrace_gpu_ioctl_get_region_info(struct vfio_device
+> *core_vdev,
+>=20
+>  	sparse->nr_areas =3D 1;
+>  	sparse->areas[0].offset =3D 0;
+> -	sparse->areas[0].size =3D memregion->memlength;
+> +	sparse->areas[0].size =3D
+> +		nvgrace_gpu_aligned_devmem_size(memregion-
+> >memlength);
+>  	sparse->header.id =3D VFIO_REGION_INFO_CAP_SPARSE_MMAP;
+>  	sparse->header.version =3D 1;
+>=20
+> --
+> 2.34.1
 
 
