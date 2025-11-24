@@ -1,260 +1,369 @@
-Return-Path: <kvm+bounces-64421-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64422-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 702F4C82191
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 19:26:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D514C8221B
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 19:42:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60F1A3A7354
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 18:26:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 580913A5628
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 18:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92E131985C;
-	Mon, 24 Nov 2025 18:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17BB31A7F2;
+	Mon, 24 Nov 2025 18:41:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aYs2SJEg"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="a42R1vyD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010037.outbound.protection.outlook.com [52.101.46.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA5D256C84
-	for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 18:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764008760; cv=none; b=EiS5sX0TSynUOmDg6tTQ40Cs3L97nl2wb0xEbXQWMdSkeN94Rnx/70HldSiNrIJy4z4ptjIhQwJpsNUvypq4ebACgB1TY+FOW2XF5ORhMrw3w0NZ3F4xtvDEYPcPzRyyNmpaVVVcynsh0Pgq6ofskutwtw+jiZMOVRXMU6J8dp4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764008760; c=relaxed/simple;
-	bh=6AZSCjx0be8QNYc1b9ABiliBH6YVQDDfi0R5FIkWxp8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SG3TRu5qJBhyrENZMkdGcx7h/7haaYNfbRK3ssSocdtydwUzPuG9nL0+Wn9m8WbtvrfxYBfyT1yw2cO4CQpFs8Ur+oaepuPXaRveYHJhKCGNaeAqus0MB3AZBmKVtGQuZE19j5M1wojwaO+uw4C5yTnLjFSv7KdoOkMY5hX3eFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aYs2SJEg; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-787c9f90eccso47674217b3.3
-        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 10:25:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764008758; x=1764613558; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=TEB0IVYhYkoeWOmDLi9JAiu4Bvgo6alBDSG0PHHn3mY=;
-        b=aYs2SJEgbdLftah9Q6DJVJMu6BeScc9QWlcEvA6WBeSJbZt72ixRMCvqjg49a4U6HS
-         po3S4QhcWgXgsItovmDpnS4GN+d8mVirwSlG8YGNP0vaFVWkyxdzsd2fTFjxj/6PwO2x
-         PgNvChWqHkDfKQJShotCcbqiWH9aVU/fKVjIYxVGGkEy9GhWqxJgcxt+hKxir0Cj+6fV
-         tNmCFMofRG1t1gexRmZtrp1xBZT/uHTzxRphTvnZpTzBa8fqtKaNbuBI+nx+yW5ywjVi
-         hk/TEX7d50YeaiRxicbV8xT4sh4zK/bvsPEf/ZUCJKF/AAKx4glQmOPC8JVvsGihApKw
-         Ei2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764008758; x=1764613558;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TEB0IVYhYkoeWOmDLi9JAiu4Bvgo6alBDSG0PHHn3mY=;
-        b=sglgtkRlUMp2xi5ORmH673ktPNXdAEh10/dXegD4WVCBgiw5cxVP44EpLLcNRYBxCV
-         IUoklwcpKAa8uNsb1ZE4yTtlu71p5yH2VcxUf3gEjjmFgQwZ1ul78+6qxXP5/f8fiRZC
-         azYDiSTUbTYEFAR8+MO6ite7KecRx2dFZ4xe1wscjaGbLzvzor9wIrhyefyDlohIdPQ+
-         aGWpMhhChX90JysMwvfqJYwRiNoijN+Czbi0eCZRKonLL0H+0DRhFnytDMG97TLfmprL
-         +M1yaYtF+o5H5zRYqyIpTP/euktvf0xY4092bXqSaEoXB+/8JkHd5Cg+T2XUmeR6UM85
-         kgWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVMXF6jBag+R/UEWMX+0ZWD6uFG/tjP0AnOC3SVnmbRimZmpt/hOJ23fDOlvY/7lKYgakU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGPNzWTgqLfkaQ9aGoKcLpcGKQuouHrsLdpSiOZipeDBFq7bhX
-	txK3Y9gpS+IXzedBwoteYpgF1A3s6aKQ///BXAmSfQ0Zye6T/8LUVaHd
-X-Gm-Gg: ASbGnctoo2k3DNNNLsg2uWo/CUE8OdV5DEkvCJLNj6BbnfYjCQkqGVAw8XI1asSfKRN
-	Wa+dc5OOvjIPiyPdJpBd3OSlVbZ7wR17kKfx1EnaX4WJ36up+mbTylhkF8ru1se/gW2x+tkBpXK
-	O503fPGaXiPt2fRSLssLeNECyEVj6mp7YAmnOndMykXTiPD7fNfmbnPJOlt4HHvnPO+zZyLUA/k
-	ObdVoTURBuSYxtzeUV0k+8NYD4K+DaLhfEp/tJepUr6+kQ0Sl8I45PZiOwTvQGJHcw87O3TBGLM
-	t9VGdHYXikjVDMa5D1kX87Oy7qE//jGESixseIgWfSGoTyRTvAtY6UbQceekiVX2GmBKpbGlBYb
-	z2czOa+52T/Jpys2mFZ/g4ChofQ2G6jHwCH9oetkHkNbcg2xEVvXQYuZai4dE9RbCjtxc5Q/He4
-	8VhEr8fVHIRRK2dMasRzeziVpHoGhW2bOUu8VNl+heCf+l4w==
-X-Google-Smtp-Source: AGHT+IE0ZjSbPsIZXUiMdmSARGNpUZsggdBivDiPOdxixaSe4XdXku94FoT+/xG3xq+0F2N/k+75ZA==
-X-Received: by 2002:a05:690c:6c0a:b0:787:eca1:50cf with SMTP id 00721157ae682-78a8b55dafemr91578177b3.50.1764008757922;
-        Mon, 24 Nov 2025 10:25:57 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:4::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78a798a8106sm46963977b3.19.2025.11.24.10.25.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 10:25:57 -0800 (PST)
-Date: Mon, 24 Nov 2025 10:25:56 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, berrange@redhat.com,
-	Sargun Dhillon <sargun@sargun.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v11 03/13] vsock: reject bad
- VSOCK_NET_MODE_LOCAL configuration for G2H
-Message-ID: <aSSjNLrRmaOLkuBN@devvm11784.nha0.facebook.com>
-References: <20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com>
- <20251120-vsock-vmtest-v11-3-55cbc80249a7@meta.com>
- <swa5xpovczqucynffqgfotyx34lziccwpqomnm5a7iwmeyixfv@uehtzbdj53b4>
- <aSC3IX81A3UhtD3N@devvm11784.nha0.facebook.com>
- <g4xir3lupnjybh7fqig6xonp32ubotdf3emmrozdm52tpaxvxn@2t4ueynb7hqr>
- <aSSV4RlRcW+uGy+n@devvm11784.nha0.facebook.com>
- <qvu2mgxs7scbuwcb2ui7eh3qe3l7mlcjq6e2favd4aqcs52r2r@oqbrlp4gxdwl>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1BC31985C;
+	Mon, 24 Nov 2025 18:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764009708; cv=fail; b=dxkGqKQfBK3P6u2vL13Fa6mcmVYFyTp1s3SH4wNIBxdxW/FfkALm4Jz4PT6zZ5v4KUv8uKb6rBHqur+rh8rfSM9UdoswcbuCu0T1NYCMmBq3+cNYVHqT7vgFoxmWDbNI3rGZmo3XeaBne4IZpSScsMlckflzviVneS1/UP9WwBE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764009708; c=relaxed/simple;
+	bh=gkQM27A4Y8qz4IYiNOMxYvSLwHTYoqY+2n0lsFjones=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qvTxYRYSygZ2qxwGrBY3iT4b/nqraU5qaWygZktkD9cWDcJqZA+g8wLvdPwlQ1nc83RTVob7l/cXKq7RW0m9YGaeRmvzo7WQVG58d0tMyW1VLMvSxbWCtBJm5uCPzp7DHoNg4+NoZfHG9yjsTnDIAZzS7APzrEu4NHogRTeg6YY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=a42R1vyD; arc=fail smtp.client-ip=52.101.46.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YK+4ZAwUxuNAgKXYxsQjHti6LKfeToybY7NvW90XTCBm5lfk0I6LuRYS1s0zR1MkKRDEW+HHDkJOjRYRrAbsGx7rr5x0KDsYCUdF6wTOkxfsOWBmge1ymHneckEFggFFbqiG9EkvsyAAOAWu5otP+u9MMK571dYFXKWG9ZkvLn2T+f4R4HxJjwwdB0mLoCv5lD6eUClmnu++NfpZdIJ1CCJ14n+sACkDoPzCWE1eHGX2TDYGxytdsrtbP0i/D4L/m4sKn+TSiOZ83ma4UDKRW2839xVCMgrpITEqGQOv1id4RgpbNeNMQ6OsdjJcpWTkunJU7FxbMoF6COCb4d3eRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ez8fmjCwL4dZgcEha6EiRUqdXAgrNRlw+FxLv/UldCE=;
+ b=PF2mJfV3SyeUl9s6yz4Vo/+uXKIQzYZamTRN68yBBFzLrPwpgHEHO9fuLY6x2APkKE/hsBqMiSRJcurj+jLiIxczd0RtSNimSB3EeIzd3tfI15vsNFTPeIyw2UE2RiI247cCP7unCQYFswBbVU/dEwdTGSAVjNq/LYaQm8osTNuHcHRi/q2NjEkGHpQQKOSpkYk9jJ2dnTxfEHW0TIYn0fNyy5GPW/aBzA2HtNpUZTL5pRELxjlWHRDH5WE8O1sGT/WLOFg04ZGsbI6Q/ywanELE5SloUYiK2hyASQ4vXwgTLAaH8+KcssSyWD8p3h+gkffjdm7cRxcsvuZILP6Bog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ez8fmjCwL4dZgcEha6EiRUqdXAgrNRlw+FxLv/UldCE=;
+ b=a42R1vyDbMNpq/qOlDQyIOwiJ3LssgeDyujlj3KS3C/1KSqNe+aSZHpmfkcI6m7t7aVcRPVKJrOjmrwZ7hq/rjK6UBqZ8yIThpwZxe26nRxXfU537vsG7UKIIfcNgVeWHUiw+ITTIDI3V6XGaG8o3f2gO7I27ffoxyhNxcXHHXKVQ0RWEHb/P5VZNP1TArUCD4afq8RwNfXSY75LImK6OaxlGz2bdYA3FWHCbmhuaMVC2MX3ro7o4sr1gpM9bpOypuW6RG6ohuztmQfnx8780gn3hvF9BTuVu1JViDeXWoU9g9flZEl4GMcmoENTUpxVz7wcrnVLM8Sw8CVf7i7e8w==
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
+ by CY8PR12MB7290.namprd12.prod.outlook.com (2603:10b6:930:55::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.17; Mon, 24 Nov
+ 2025 18:41:42 +0000
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::e8c:e992:7287:cb06]) by CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::e8c:e992:7287:cb06%5]) with mapi id 15.20.9343.016; Mon, 24 Nov 2025
+ 18:41:42 +0000
+From: Shameer Kolothum <skolothumtho@nvidia.com>
+To: Ankit Agrawal <ankita@nvidia.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, Yishai
+ Hadas <yishaih@nvidia.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"alex@shazbot.org" <alex@shazbot.org>, Aniket Agashe <aniketa@nvidia.com>,
+	Vikram Sethi <vsethi@nvidia.com>, Matt Ochs <mochs@nvidia.com>
+CC: "Yunxiang.Li@amd.com" <Yunxiang.Li@amd.com>, "yi.l.liu@intel.com"
+	<yi.l.liu@intel.com>, "zhangdongdong@eswincomputing.com"
+	<zhangdongdong@eswincomputing.com>, Avihai Horon <avihaih@nvidia.com>,
+	"bhelgaas@google.com" <bhelgaas@google.com>, "peterx@redhat.com"
+	<peterx@redhat.com>, "pstanner@redhat.com" <pstanner@redhat.com>, Alistair
+ Popple <apopple@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Neo Jia
+	<cjia@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>, "Tarun Gupta
+ (SW-GPU)" <targupta@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, Dan Williams
+	<danw@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>, Krishnakant Jaju
+	<kjaju@nvidia.com>
+Subject: RE: [PATCH v5 7/7] vfio/nvgrace-gpu: wait for the GPU mem to be ready
+Thread-Topic: [PATCH v5 7/7] vfio/nvgrace-gpu: wait for the GPU mem to be
+ ready
+Thread-Index: AQHcXTnUrE7WBaJrsEqvGwYscgzBc7UCKIjQ
+Date: Mon, 24 Nov 2025 18:41:42 +0000
+Message-ID:
+ <CH3PR12MB7548E8A78A55D6693461EDAEABD0A@CH3PR12MB7548.namprd12.prod.outlook.com>
+References: <20251124115926.119027-1-ankita@nvidia.com>
+ <20251124115926.119027-8-ankita@nvidia.com>
+In-Reply-To: <20251124115926.119027-8-ankita@nvidia.com>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH3PR12MB7548:EE_|CY8PR12MB7290:EE_
+x-ms-office365-filtering-correlation-id: 958c9c99-5cea-41f9-9f2c-08de2b891cda
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|7416014|1800799024|38070700021|7053199007;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?s2sn4kAAw1vEhVSWzc+l8kp/Rvqy5vkhmP1qy20Ifg14okyCiRGL3NCBsPS+?=
+ =?us-ascii?Q?zvZ6tcrHXF29d3hUbthBSQfKBFwixh+ji3i5FppqvricdjBZPUXmLR/CEAXB?=
+ =?us-ascii?Q?EZYVGR8SHU26D17DwyQxVOjlyMQ6SFsNuGTZOf9xACXah3EJwdyIGaTm3h7/?=
+ =?us-ascii?Q?eX2lNFqvd4PrHzmx0kQGarM7gubgg3h33julatkDJQJP/xsfDhm1jSekCGBT?=
+ =?us-ascii?Q?vN5AjfE+JjE7lpdaMZSMPxliswK0vjGaYS17MsziGc4Gokec6KaEV9fQzzxA?=
+ =?us-ascii?Q?zy4+qAHjgY8cHbEuf45e9ZEqlSfgG9lxpwT/oxL+3TZoabVTwvjPkzAF3jYj?=
+ =?us-ascii?Q?qXAl4GCCyINAC4Nh66u0GZUmuwvYT40w5YOppAM8CLWqtUJ7ZFpY/32sNo4r?=
+ =?us-ascii?Q?/60Bq6rmF0KGWKMNRyZxzguPZVhoTSxeGHhHRbq/Ce73PX6MkifLAkC1lwCH?=
+ =?us-ascii?Q?dMFFm6ffIL05DO5W61ETw9eP88BTqc6ggVVNHqKBx8Xsh4PSJtHxfLi0B1jk?=
+ =?us-ascii?Q?UpfRIbM3cFzbVgU07OvkZPRp8GbFJ/mKPDZofcjQRBlzB/iQsnJUWQV3DMfK?=
+ =?us-ascii?Q?l7D2X+HjA5KyMv4miCyO9DxXw2ZMdhXHW8XeQl3frLFKkG+VPwrMMmWDWpVm?=
+ =?us-ascii?Q?CTvDSjOqDU8MgW7aYH3dRw3r8vwmJzB2ja7flma7ZfyVp1qk18+ty1k272KM?=
+ =?us-ascii?Q?rgpbRpV3JIm16/XV1FBvidf8rCzs+rE15gMW/U9tMkW21XvzcLwCw612D1jX?=
+ =?us-ascii?Q?P2Fprw0rb+LisHSflpHC4Rz63mvXjxbmZlnokBOtQRo4sUf6bvHPc3y7tW78?=
+ =?us-ascii?Q?2972VotWMKY62Y0b7WYj9oBhV1/MB0cNRz8eRhzdgF2pfTreNtvSnhA12hpm?=
+ =?us-ascii?Q?zU/3iqGg18Jtt2rdp2JW23VnrUgpvHvCnm96KrA2a2YGLLBqniOeKev11dE0?=
+ =?us-ascii?Q?khgCh1ADLClhQoo3MCIa8arnBJUwW1SCRfDbi9/xxi0U1mDDV4Rt9cugB3eL?=
+ =?us-ascii?Q?kjMImMgDBvMdhe7g03ulhVRBxoc53nu6AkKxikf3+SuanapUhQPZ2JLimH+i?=
+ =?us-ascii?Q?1K/3SnrksH+p0BUxrahAHUfHvR+oNChgpvkYqW5AMxnTyN9W+oGOgg8Cm1Ow?=
+ =?us-ascii?Q?QlAP7ysAFm9DDv1TZYyDiAwGaWlzlJl3I0WJxIkdyVsRbqrpW8rvxbj08KTx?=
+ =?us-ascii?Q?pvsxD8a/C58raFToCNmxlscrBn/ns9rI40gSTk4f6DiLLEB6fZgMPfwKIyz8?=
+ =?us-ascii?Q?z9ScQT9hLsM/Dfa8zUBFxYKEG9hbltmynCK0Pvc8ahSFeTJQA6cOlgeeQFt0?=
+ =?us-ascii?Q?L+G5/yigXGMFW6c1ZlOMzVLcM292L3k08NViYOGglMLYM07VFoDfhBLW7kfu?=
+ =?us-ascii?Q?MxqM5cPjnhqH1Mh9YQH1htIwuT7MnP1YGJZyq7mkhfK2e9hZxVFglLqRnaym?=
+ =?us-ascii?Q?F6TN2xrUIn0rHnxzF0mwLoYpXLPqcBmDv7FniRvBW9SOUxB2BoeDmWtzhu4Y?=
+ =?us-ascii?Q?5f/q96zBo0s3H9slF0BX41HDRcs6Muep4rGz?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(38070700021)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?HhZkj5ouJEVuLN5dz5i128ONzkJnqJteMfJfx3achH0UqLWbQhJN3mzIEU1a?=
+ =?us-ascii?Q?1qsImPURfzO167mikhpMPwV3MBxsQ00mh4ylfXpPSJ+mr61m9RJ6/J3oYlLs?=
+ =?us-ascii?Q?Mx9X7N7ujllbHhE+GNF/4Z3y5ijHQhdG3TmFTjPWZPVHl7iAXunqWwvu1l6g?=
+ =?us-ascii?Q?XsSML8J9DfqIH11sv+MqAIUgay+amOnJLNfUDnvl+THhpN5uW7XpierUTp+N?=
+ =?us-ascii?Q?rD3DW210QV1/l8wZjpPwFDZFUxM8/dgA0yzScYUAZYuT/XVx9/keHLm2to2s?=
+ =?us-ascii?Q?wheAzCscquqMm/BN26c3FpnNDlRf7QrpJMsQDkTFcE4F392iWcNoZd41NCRk?=
+ =?us-ascii?Q?JWVbgp2sS8X3OVuinmFaQWnAfhGPYGT4iuYfhXFTtND5kCxmWi3Trfjs0GBB?=
+ =?us-ascii?Q?mAIQynIZMXxKZ2yJ1I8fdUNLReyXcc5Rv8AzfyHZNmSVs0gHHKAbKXf7c8T/?=
+ =?us-ascii?Q?dk9slK1GBKLG5Y/hFgIAonyuzt62uP2fAafi2c/u4Ejc8h8vp4KzQDT4kquz?=
+ =?us-ascii?Q?gwIk817NEV5YnkS6WQBBBeP3Hy/HhsEFREjOAn2Ka9Wi5bh4/XMLO70nJHjv?=
+ =?us-ascii?Q?DXrhPUyhEGCPgERfax/eaNpZxbstpWmy4kbs2iXB4QyZ8BRLHC9pW3Je5oA7?=
+ =?us-ascii?Q?aln7YfAjoIEHEV6N0/u7U8BxGwS6Og4j1M9enRDEsSZN6vWMvLCFB26rLYmh?=
+ =?us-ascii?Q?CSx9S3cDy8wVGOd1tZ1j+OWwN1tXO2rM7HAKLH2tmUc6yUyH5ChdMhSnv2E+?=
+ =?us-ascii?Q?6jHwZEFwkUfARFbmDv9N2FIldQcZDpFVBkvlNsc/6i45THObfJQ/snmtSsmF?=
+ =?us-ascii?Q?72d085NrYIB1nwavqlxNvugy0KFI+J76zKtndRPx6gENTFi2INwdkbrBdsyh?=
+ =?us-ascii?Q?mCoVEIFw/M9ueKLSW1XgOIITXmOR4CiLw53453tlKulaHiwUy93BdRjcCCLK?=
+ =?us-ascii?Q?IxmFUbhqecBIsqCTcYXJ+kX1O6cJl8szbtpcDrF6+Rz44vykY0+/76YKfEoW?=
+ =?us-ascii?Q?IRtj9ZMFNbxj3s1zxRckeknEt+ROPZFXesazOTWyZkHKZnLVGMSespHMtIRE?=
+ =?us-ascii?Q?zhg+b3UpBSJ9QRJ8BRJwEuX0bvJOBreiQN4PJcR2qR86T4aARuDvXIXJYJC8?=
+ =?us-ascii?Q?cuOvfUkGFuh21BsRnIdo5CvR9cYIzGxCp/mocbXPje4mYXb5yomXyWJNoAjD?=
+ =?us-ascii?Q?2NImm46cz4zBbm7pbvZP/0qCXWm1YDuyO/NO9JPE3ZIJuqRBFpxlO6mALA4R?=
+ =?us-ascii?Q?uJj4z2zSTGWjZHU+8L3xrjOdFpYGQ7pV7NC3BXQLtBwCWc1vNfvddJqwHAjv?=
+ =?us-ascii?Q?gpwoMrHfiZY4jgFQiI4S4Xe4YKdLDKdy508ulY38kpNCY69p2kbn0xWMI3Zv?=
+ =?us-ascii?Q?C3PWF7U3uAZI24GGYrWT6jzhNdjWQluHx65xHZdtVZqWxA0Cjn0fm15DmWBM?=
+ =?us-ascii?Q?bWDWkCLl5szF1ruLNT92QLAwmR9ZgGW4JOavXTwUVaFb21UhPNnwZpHZoibo?=
+ =?us-ascii?Q?a5RBdBwwk7b9MOybn8FoPS4kTc6hLKOkgtzkGZXLSucjVa7agOcB9oRAmOiH?=
+ =?us-ascii?Q?dsSZl1T5RAGlWqprUpk6BbAzv6702a26G88Kuy/T?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <qvu2mgxs7scbuwcb2ui7eh3qe3l7mlcjq6e2favd4aqcs52r2r@oqbrlp4gxdwl>
-
-On Mon, Nov 24, 2025 at 06:54:45PM +0100, Stefano Garzarella wrote:
-> On Mon, Nov 24, 2025 at 09:29:05AM -0800, Bobby Eshleman wrote:
-> > On Mon, Nov 24, 2025 at 11:10:19AM +0100, Stefano Garzarella wrote:
-> > > On Fri, Nov 21, 2025 at 11:01:53AM -0800, Bobby Eshleman wrote:
-> > > > On Fri, Nov 21, 2025 at 03:24:25PM +0100, Stefano Garzarella wrote:
-> > > > > On Thu, Nov 20, 2025 at 09:44:35PM -0800, Bobby Eshleman wrote:
-> 
-> [...]
-> 
-> > > >
-> > > > > Since I guess we need another version of this patch, can you check the
-> > > > > commit description to see if it reflects what we are doing now
-> > > > > (e.g vhost is not enabled)?
-> > > > >
-> > > > > Also I don't understand why for vhost we will enable it later, but for
-> > > > > virtio_transport and vsock_loopback we are enabling it now, also if this
-> > > > > patch is before the support on that transports. I'm a bit confused.
-> > > > >
-> > > > > If something is unclear, let's discuss it before sending a new version.
-> > > > >
-> > > > >
-> > > > > What I had in mind was, add this patch and explain why we need this new
-> > > > > callback (like you did), but enable the support in the patches that
-> > > > > really enable it for any transport. But maybe what is not clear to me is
-> > > > > that we need this only for G2H. But now I'm confused about the discussion
-> > > > > around vmci H2G. We decided to discard also that one, but here we are not
-> > > > > checking that?
-> > > > > I mean here we are calling supports_local_mode() only on G2H IIUC.
-> > > >
-> > > > Ah right, VMCI broke my original mental model of only needing this check
-> > > > for G2H (originally I didn't realize VMCI was H2G too).
-> > > >
-> > > > I think now, we actually need to do this check for all of the transports
-> > > > no? Including h2g, g2h, local, and dgram?
-> > > >
-> > > > Additionally, the commit description needs to be updated to reflect that.
-> > > 
-> > > Let's take a step back, though, because I tried to understand the problem
-> > > better and I'm confused.
-> > > 
-> > > For example, in vmci (G2H side), when a packet arrives, we always use
-> > > vsock_find_connected_socket(), which only searches in GLOBAL. So connections
-> > > originating from the host can only reach global sockets in the guest. In
-> > > this direction (host -> guest), we should be fine, right?
-> > > 
-> > > Now let's consider the other direction, from guest to host, so the
-> > > connection should be generated via vsock_connect().
-> > > Here I see that we are not doing anything with regard to the source
-> > > namespace. At this point, my question is whether we should modify
-> > > vsock_assign_transport() or transport->stream_allow() to do this for each
-> > > stream, and not prevent loading a G2H module a priori.
-> > > 
-> > > For example, stream_allow() could check that the socket namespace is
-> > > supported by the assigned transport. E.g., vmci can check that if the
-> > > namespace mode is not GLOBAL, then it returns false. (Same thing in
-> > > virtio-vsock, I mean the G2H driver).
-> > > 
-> > > This should solve the guest -> host direction, but at this point I wonder if
-> > > I'm missing something.
-> > 
-> > For the G2H connect case that is true, but the situation gets a little
-> > fuzzier on the G2H RX side w/ VMADDR_CID_ANY listeners.
-> > 
-> > Let's say we have a nested system w/ both virtio-vsock and vhost-vsock.
-> > We have a listener in namespace local on VMADDR_CID_ANY. So far, no
-> > transport is assigned, so we can't call t->stream_allow() yet.
-> > virtio-vsock only knows of global mode, so its lookup will fail (unless
-> 
-> What is the problem of failing in this case?
-> I mean, we are documenting that G2H will not be able to reach socket in
-> namespaces with "local" mode. Old (and default) behaviour is still allowing
-> them, right?
-> 
-> I don't think it conflicts with the definition of “local” either, because
-> these connections are coming from outside, and the user doesn't expect to be
-> able to receive them in a “local” namespace, unless there is a way to put
-> the device in the namespace (as with net). But this method doesn't exist
-> yet, and by documenting it sufficiently, we can say that it will be
-> supported in the future, but not for now.
-> 
-> > we hack in some special case to virtio_transport_recv_pkt() to scan
-> > local namespaces). vhost-vsock will work as expected. Letting local mode
-> > sockets be silently unreachable by virtio-vsock seems potentially
-> > confusing for users. If the system were not nested, we can pre-resolve
-> > VMADDR_CID_ANY in bind() and handle things upfront as well. Rejecting
-> > local mode outright is just a broad guardrail.
-> 
-> Okay, but in that case, we are not supporting “local” mode too, but we are
-> also preventing “global” from being used on these when we are in a nested
-> environment. What is the advantage of this approach?
-> 
-> > 
-> > If we're trying to find a less heavy-handed option, we might be able to
-> > do the following:
-> > 
-> > - change bind(cid) w/ cid != VMADDR_CID_ANY to directly assign the
-> > transport
-> >  for all socket types (not just SOCK_DGRAM)
-> 
-> That would be nice, but it wouldn't solve the problem with VMADDR_CID_ANY,
-> which I guess is the use case in 99% of cases.
-> 
-> > 
-> > - vsock_assign_transport() can outright fail if !t->supports_local_mode()
-> >  and sock_net(sk) has mode local
-> 
-> But in this case, why not reusing stream_allow() ?
-> 
-> > 
-> > - bind(VMADDR_CID_ANY) can maybe print (once) to dmesg a warning that
-> >  only the H2G transport will land on VMADDR_CID_ANY sockets.
-> 
-> mmm, I'm not sure about that, we should ask net maintainer, but IMO
-> documenting that in af_vsock.c and man pages should be fine, till G2H will
-> support that.
-> 
-> > 
-> > I'm certainly open to other suggestions.
-> 
-> IMO we should avoid the failure when loading G2H, which is more confusing
-> than just discard connection from the host to a "local" namespace. We should
-> try at least to support the "global" namespace.
-> 
-> Thanks,
-> Stefano
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 958c9c99-5cea-41f9-9f2c-08de2b891cda
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Nov 2025 18:41:42.7232
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Qv3LJyZXHIc2DzC52t3Rwd4ypiFp3EC6rz+4rRNGocyrY3nRo0SMpNVPyfuEC9AFK+D6R6NJ64LQXiao8px79w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7290
 
 
-I'm 100% fine with that approach. I just wanted to make sure we landed
-in the right place for how users may encounter places that there is no
-local mode support.
 
-So for next steps, we can drop this patch and add explicit logic in
-->stream_allow() to allow local mode for vhost/loopback and reject for
-others? Plus, add documentation about what happens for VMADDR_CID_ANY
-(will only receive vhost/loopback traffic in local mode)?
+> -----Original Message-----
+> From: Ankit Agrawal <ankita@nvidia.com>
+> Sent: 24 November 2025 11:59
+> To: Ankit Agrawal <ankita@nvidia.com>; jgg@ziepe.ca; Yishai Hadas
+> <yishaih@nvidia.com>; Shameer Kolothum <skolothumtho@nvidia.com>;
+> kevin.tian@intel.com; alex@shazbot.org; Aniket Agashe
+> <aniketa@nvidia.com>; Vikram Sethi <vsethi@nvidia.com>; Matt Ochs
+> <mochs@nvidia.com>
+> Cc: Yunxiang.Li@amd.com; yi.l.liu@intel.com;
+> zhangdongdong@eswincomputing.com; Avihai Horon <avihaih@nvidia.com>;
+> bhelgaas@google.com; peterx@redhat.com; pstanner@redhat.com; Alistair
+> Popple <apopple@nvidia.com>; kvm@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Neo Jia <cjia@nvidia.com>; Kirti Wankhede
+> <kwankhede@nvidia.com>; Tarun Gupta (SW-GPU) <targupta@nvidia.com>;
+> Zhi Wang <zhiw@nvidia.com>; Dan Williams <danw@nvidia.com>; Dheeraj
+> Nigam <dnigam@nvidia.com>; Krishnakant Jaju <kjaju@nvidia.com>
+> Subject: [PATCH v5 7/7] vfio/nvgrace-gpu: wait for the GPU mem to be read=
+y
+>=20
+> From: Ankit Agrawal <ankita@nvidia.com>
+>=20
+> Speculative prefetches from CPU to GPU memory until the GPU is
+> ready after reset can cause harmless corrected RAS events to
+> be logged on Grace systems. It is thus preferred that the
+> mapping not be re-established until the GPU is ready post reset.
+>=20
+> The GPU readiness can be checked through BAR0 registers similar
+> to the checking at the time of device probe.
+>=20
+> It can take several seconds for the GPU to be ready. So it is
+> desirable that the time overlaps as much of the VM startup as
+> possible to reduce impact on the VM bootup time. The GPU
+> readiness state is thus checked on the first fault/huge_fault
+> request or read/write access which amortizes the GPU readiness
+> time.
+>=20
+> The first fault and read/write checks the GPU state when the
+> reset_done flag - which denotes whether the GPU has just been
+> reset. The memory_lock is taken across map/access to avoid
+> races with GPU reset.
+>=20
+> cc: Alex Williamson <alex@shazbot.org>
+> cc: Jason Gunthorpe <jgg@ziepe.ca>
+> cc: Vikram Sethi <vsethi@nvidia.com>
+> Suggested-by: Alex Williamson <alex@shazbot.org>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  drivers/vfio/pci/nvgrace-gpu/main.c | 79 ++++++++++++++++++++++++++-
+> --
+>  1 file changed, 72 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgra=
+ce-
+> gpu/main.c
+> index bef9f25bf8f3..fbc19fe688ca 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
+> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+> @@ -104,6 +104,17 @@ static int nvgrace_gpu_open_device(struct
+> vfio_device *core_vdev)
+>  		mutex_init(&nvdev->remap_lock);
+>  	}
+>=20
+> +	/*
+> +	 * GPU readiness is checked by reading the BAR0 registers.
+> +	 *
+> +	 * ioremap BAR0 to ensure that the BAR0 mapping is present before
+> +	 * register reads on first fault before establishing any GPU
+> +	 * memory mapping.
+> +	 */
+> +	ret =3D vfio_pci_core_setup_barmap(vdev, 0);
+> +	if (ret)
+> +		return ret;
+> +
+>  	vfio_pci_core_finish_enable(vdev);
+>=20
+>  	return 0;
+> @@ -150,6 +161,26 @@ static int nvgrace_gpu_wait_device_ready(void
+> __iomem *io)
+>  	return ret;
+>  }
+>=20
+> +static int
+> +nvgrace_gpu_check_device_ready(struct nvgrace_gpu_pci_core_device
+> *nvdev)
+> +{
+> +	struct vfio_pci_core_device *vdev =3D &nvdev->core_device;
+> +	int ret;
+> +
+> +	lockdep_assert_held_read(&vdev->memory_lock);
+> +
+> +	if (!nvdev->reset_done)
+> +		return 0;
+> +
+> +	ret =3D nvgrace_gpu_wait_device_ready(vdev->barmap[0]);
+> +	if (ret)
+> +		return ret;
+> +
+> +	nvdev->reset_done =3D false;
+> +
+> +	return 0;
+> +}
+> +
+>  static vm_fault_t nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
+>  						  unsigned int order)
+>  {
+> @@ -173,8 +204,18 @@ static vm_fault_t
+> nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
+>  		      pfn & ((1 << order) - 1)))
+>  		return VM_FAULT_FALLBACK;
+>=20
+> -	scoped_guard(rwsem_read, &nvdev->core_device.memory_lock)
+> +	scoped_guard(rwsem_read, &nvdev->core_device.memory_lock) {
+> +		/*
+> +		 * If the GPU memory is accessed by the CPU while the GPU is
+> +		 * not ready after reset, it can cause harmless corrected RAS
+> +		 * events to be logged. Make sure the GPU is ready before
+> +		 * establishing the mappings.
+> +		 */
+> +		if (nvgrace_gpu_check_device_ready(nvdev))
+> +			return ret;
+> +
+>  		ret =3D vfio_pci_vmf_insert_pfn(vmf, pfn, order);
+> +	}
+>=20
+>  	return ret;
+>  }
+> @@ -593,9 +634,21 @@ nvgrace_gpu_read_mem(struct
+> nvgrace_gpu_pci_core_device *nvdev,
+>  	else
+>  		mem_count =3D min(count, memregion->memlength -
+> (size_t)offset);
+>=20
+> -	ret =3D nvgrace_gpu_map_and_read(nvdev, buf, mem_count, ppos);
+> -	if (ret)
+> -		return ret;
+> +	scoped_guard(rwsem_read, &nvdev->core_device.memory_lock) {
+> +		/*
+> +		 * If the GPU memory is accessed by the CPU while the GPU is
+> +		 * not ready after reset, it can cause harmless corrected RAS
+> +		 * events to be logged. Make sure the GPU is ready before
+> +		 * establishing the mappings.
+> +		 */
+> +		ret =3D nvgrace_gpu_check_device_ready(nvdev);
+> +		if (ret)
+> +			return ret;
+> +
+> +		ret =3D nvgrace_gpu_map_and_read(nvdev, buf, mem_count,
+> ppos);
+> +		if (ret)
+> +			return ret;
+> +	}
+>=20
+>  	/*
+>  	 * Only the device memory present on the hardware is mapped, which
+> may
+> @@ -713,9 +766,21 @@ nvgrace_gpu_write_mem(struct
+> nvgrace_gpu_pci_core_device *nvdev,
+>  	 */
+>  	mem_count =3D min(count, memregion->memlength - (size_t)offset);
+>=20
+> -	ret =3D nvgrace_gpu_map_and_write(nvdev, buf, mem_count, ppos);
+> -	if (ret)
+> -		return ret;
+> +	scoped_guard(rwsem_read, &nvdev->core_device.memory_lock) {
+> +		/*
+> +		 * If the GPU memory is accessed by the CPU while the GPU is
+> +		 * not ready after reset, it can cause harmless corrected RAS
+> +		 * events to be logged. Make sure the GPU is ready before
+> +		 * establishing the mappings.
+> +		 */
 
-Best,
-Bobby
+The comment above is now repeated 3 times. Good to consolidate and add=20
+that comment above nvgrace_gpu_check_device_ready().
+
+Thanks,
+Shameer
+
+> +		ret =3D nvgrace_gpu_check_device_ready(nvdev);
+> +		if (ret)
+> +			return ret;
+> +
+> +		ret =3D nvgrace_gpu_map_and_write(nvdev, buf, mem_count,
+> ppos);
+> +		if (ret)
+> +			return ret;
+> +	}
+>=20
+>  exitfn:
+>  	*ppos +=3D count;
+> --
+> 2.34.1
+
 
