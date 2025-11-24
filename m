@@ -1,175 +1,132 @@
-Return-Path: <kvm+bounces-64389-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64390-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB2FEC80A3A
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 14:03:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58E80C80A88
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 14:06:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AED6C4E4F67
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 13:02:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D4DF64E5873
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 13:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49FF92FC88B;
-	Mon, 24 Nov 2025 13:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74BDA303CAC;
+	Mon, 24 Nov 2025 13:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bTT6Rd5u";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="M/3U7RqK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3V8BGSg"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5447F302140
-	for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 13:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808A22E8E10;
+	Mon, 24 Nov 2025 13:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763989365; cv=none; b=etwdfLbQ70vrnJnSw81IyP7RqYThZcyYsd794ILywNjQdeFekK7KI3I21hmAvL+0O2jC4rVDk2mrSDRlljvtlk849EFaC1xrD2xT2qFvU92JsspSePsP7jjtmVPMB47QS+qtb/7Odgy0PJsDfmnyQZGPVKBDqroVVBNFdce70Kg=
+	t=1763989592; cv=none; b=cE1mI3L60jHuAEjQfboXDsLUqWyYUmk//cnFUCYNdNFkXZoAagpo5uKJfv1XdrlE+a4pzqR5UG4v5XvIN+Cw2FXMfq2okpUZ7bJlyZAOjB8U+OHJpfM6OdYnKpYXcqH6tPiGPw/f2R7//9rSUdovXMMVNYa8i2ysMe/bCpJ4xpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763989365; c=relaxed/simple;
-	bh=/PVux6/qhCM5j7QxIjZ3C4HJECU8mM2bPzRAiDoZo58=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kN+Wl8pQP6pwkr+JstOKexymj4ZvVLIS9oNk/rwVkmk45TDQYCp+PY2NEkVukgsaWwEle5Wea4UfhZ3MwtgKqfPUG4ajBQJbesE8/wr0PR+dTGooX+NJ6YEV91/mh67qB7mAwC3P+90iRme0LkgG0jDGSe9COytqO6nve2vkKB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bTT6Rd5u; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=M/3U7RqK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763989361;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S6hJnZw3kn5s0TB1aRyIXGCws54UxhojaW//4vyMORM=;
-	b=bTT6Rd5udepofJVsC+L7PBT8sq55uOovQ3BWHbvelnH3XJKnUi8wKLHrP3BzAqb3kWHTH7
-	SL9CAVrJyv3cvYt6qehKKXInRGRcl8DG+pvFB2xNYN4r0efRIws9v6WfQwJ+ooECJ+riK5
-	g4ORvHliOtCoyaRFZOtiXDCKRFW3aYA=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-641-Dzy8XwvbMAKfUrKskCZbsw-1; Mon, 24 Nov 2025 08:02:39 -0500
-X-MC-Unique: Dzy8XwvbMAKfUrKskCZbsw-1
-X-Mimecast-MFC-AGG-ID: Dzy8XwvbMAKfUrKskCZbsw_1763989358
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b763b24f278so321717166b.3
-        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 05:02:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763989358; x=1764594158; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S6hJnZw3kn5s0TB1aRyIXGCws54UxhojaW//4vyMORM=;
-        b=M/3U7RqKwoX/HQ6+7Z+Hm4PIr+G5jC0MLb61qrWXNCW+jJ8QW4rLemQ5VX4SooPW/N
-         9QpiAyFMEE+gOwQF9rxJa0/d8CiCuvq/8QUYzhy+XMhoNXNDr9O4OlfIvknFF+b2PqW4
-         F/HlCxuyjj6F9Geis6aAICSo6bFY8YSDn1lxNUwin+86ntEaZPE7HWHpnSh6PCXuSpS+
-         s7WobXG29eFEcW92QiHagmY/jIev8ATdzvFjqvoAUrjBOeF+KyIxqN2YeKD9BwpKP/rf
-         9kTWVN/XWqSicoJPnF/MK9EUhVcnOd7F6HZ7+dQ17jyzu0rr/sGNYMDoFliIJcJqOJ2H
-         eDfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763989358; x=1764594158;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S6hJnZw3kn5s0TB1aRyIXGCws54UxhojaW//4vyMORM=;
-        b=Gw5qlCej95I8L3cz/wICYW8MRboUG+TuOa9TujyWFJTdhGuod1jAIIf1Ht5O5ydhzP
-         bJhxUiy8ZBFdoN4IWO6kDuiJZtwmUkciW/vveR15YTnTSqzASMG2BRUPLAMItvmoE0AE
-         P8f9X1mPjgsRyGH+M4OLIx0GLCskWzu7Ee6E6z6OyQWBy28hGKdhQFJ/RxIZ0cRkj+oe
-         n++XA1gU8w2TdbxRQXqETqP44J50lL6nF4EBl7fdkWiSPTST6uCkQmu0EYHZJzdMLgJU
-         m8LvRKf0gWyKB6q/YNT+hsdkKbs6K7VoQI8hGTjoNRJ6jA/5ou6nsF0Mp9MY+tpzelfr
-         9VyA==
-X-Forwarded-Encrypted: i=1; AJvYcCW04wBJv6fT9WwFg2wPPZq5I9DeISHULTC/Jhj8d9iD5LXrLh1jqqnj6u6wiNCZe43QjGE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5F4NEvRxdwfp4H8ygQDEp/hK1khiyVgZYoZd7LTlutVW7uieM
-	to6dFiJCRI+55YznHKsH74JB2s66BE5kbxYO0+NhciSps65N5HzC62G0ZuEqrqDxP3RcAFAS8o2
-	3pWVzgiWpa0qlNBdYcNPgdR9+zZAl90tl/vu/IsCFDj0t8QsbzFfn1A==
-X-Gm-Gg: ASbGncswxHUPWDEQ32Zlu3vTg2jkRnrNOe4qbgvVjFI+2IHwtl3Tdx2+hnYF0tsN6sX
-	+onaK6qMo6babt2ldvnjC8X/noqx97qV1CWT8wtlJsvASFyP73bdo6XoxpBcpeXAU8MQMRDXoFc
-	zeDFGxaLLZbnugmjrO9/rpISPg3LnK9rQK2mDFm8M5+l7Ws606gpamAQqMskaOqm44QSlO0KzG2
-	sRCyvfaOpxfK8CB1P7P1NLxb8nYz/wRXUGBfYiYb4mNwLdkYuRecEX6Z1rWN/v6pwwosE0HgxdX
-	/xzA/EkPrkBzpej5mV4OOW8ZFKxdU63b0Fj6PKxop8il0qgrvPLeiLxfSR8WSrCESF1+EMOfMNl
-	6iMIAzi2CWU6j1FpZfOAvupMJCeIFDUd1qmsoa3djmCYwIsv34UuvlBYzVT2Ikw==
-X-Received: by 2002:a17:907:d93:b0:b73:806c:bab2 with SMTP id a640c23a62f3a-b76716d9e43mr1032884766b.33.1763989357988;
-        Mon, 24 Nov 2025 05:02:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH6ykVWPpSwinXanlRQWJeJ0XHFosSyO4ErfL2/mdTAE1Kjbm2jyYgIoPoi+6fsdx/pUINlNw==
-X-Received: by 2002:a17:907:d93:b0:b73:806c:bab2 with SMTP id a640c23a62f3a-b76716d9e43mr1032879766b.33.1763989357321;
-        Mon, 24 Nov 2025 05:02:37 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b76a6bcfad2sm303348166b.68.2025.11.24.05.02.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 05:02:36 -0800 (PST)
-Date: Mon, 24 Nov 2025 14:02:29 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, berrange@redhat.com, 
-	Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v11 05/13] vsock: add netns support to virtio
- transports
-Message-ID: <fa5j32kwvwitddkhbuenwqygtue3j2i4kquzl4lsnlp42y244z@zijsgsjjvido>
-References: <20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com>
- <20251120-vsock-vmtest-v11-5-55cbc80249a7@meta.com>
- <v6dpp4j4pjnrsa5amw7uubbqtpnxb4odpjhyjksr4mqes2qbzg@3bsjx5ofbwl4>
- <aSC3lwPvj0G6L8Sh@devvm11784.nha0.facebook.com>
+	s=arc-20240116; t=1763989592; c=relaxed/simple;
+	bh=5j0CLSvOJClj10Gzqp4SzaePQkmDOy6Vdp6NVHuro04=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BA2/4palBcQfTAv3K787EhhyBguwUlvf5V+WMRT5uRjqRp5Zi4VligdWSspQOmztWOkpP1DJMZe0IFXLKY2bl9uEawkHbxpK3mRPCT5a5FfaG9isQj5i0stpOMCemTT4og44StwqeCFtn9q0lu/IiKzaTJO6IZyzK4/u3bA41Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3V8BGSg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ACEFC116D0;
+	Mon, 24 Nov 2025 13:06:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763989592;
+	bh=5j0CLSvOJClj10Gzqp4SzaePQkmDOy6Vdp6NVHuro04=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=m3V8BGSgC33MuYL+7IJxdicRfHPtObuQIPuR9g/U+fAPn2+3zga2WCZU5KBrGOnGi
+	 1YOgzNXdk2lGlaOLjwjepa0O0YgY204eUo8mcryVjAr6UZF+svSCtGc2MzavsDbviD
+	 US4QliUeH2ZmLsYmYqxJEtM+hMShI0bQIy77+4rCQ0CuNornjXAOtj+77027bYnTFD
+	 mvuL8QA89qMzREMKm/yejISFrfxDViL13NmuDg7D6Q+c3BvUVVr7WezqVDvoltZzCa
+	 KBOPueLvBIgAB/Va8rftGGomNarbKr8cXhIW1xJ2/QiEZyVCJIq8Q0L8H+2RSzy7vp
+	 nx09yKENSacwQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vNWGz-00000007r1G-3j9E;
+	Mon, 24 Nov 2025 13:06:29 +0000
+Date: Mon, 24 Nov 2025 13:06:29 +0000
+Message-ID: <86o6orr356.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>
+Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
+In-Reply-To: <51f5b5d7-9e98-40b8-8f8b-f50254573f3d@sirena.org.uk>
+References: <20251109171619.1507205-1-maz@kernel.org>
+	<20251109171619.1507205-30-maz@kernel.org>
+	<CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
+	<86cy5ku06v.wl-maz@kernel.org>
+	<51f5b5d7-9e98-40b8-8f8b-f50254573f3d@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <aSC3lwPvj0G6L8Sh@devvm11784.nha0.facebook.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Nov 21, 2025 at 11:03:51AM -0800, Bobby Eshleman wrote:
->On Fri, Nov 21, 2025 at 03:39:25PM +0100, Stefano Garzarella wrote:
->> On Thu, Nov 20, 2025 at 09:44:37PM -0800, Bobby Eshleman wrote:
->> > From: Bobby Eshleman <bobbyeshleman@meta.com>
->> >
->> > Add netns support to loopback and vhost. Keep netns disabled for
->> > virtio-vsock, but add necessary changes to comply with common API
->> > updates.
->> >
->> > This is the patch in the series when vhost-vsock namespaces actually
->> > come online.  Hence, vhost_transport_supports_local_mode() is switched
->> > to return true.
->> >
->> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->> > ---
->> > Changes in v11:
->> > - reorder with the skb ownership patch for loopback (Stefano)
->> > - toggle vhost_transport_supports_local_mode() to true
->> >
->> > Changes in v10:
->> > - Splitting patches complicates the series with meaningless placeholder
->> >  values that eventually get replaced anyway, so to avoid that this
->> >  patch combines into one. Links to previous patches here:
->> >  - Link: https://lore.kernel.org/all/20251111-vsock-vmtest-v9-3-852787a37bed@meta.com/
->> >  - Link: https://lore.kernel.org/all/20251111-vsock-vmtest-v9-6-852787a37bed@meta.com/
->> >  - Link: https://lore.kernel.org/all/20251111-vsock-vmtest-v9-7-852787a37bed@meta.com/
->> > - remove placeholder values (Stefano)
->> > - update comment describe net/net_mode for
->> >  virtio_transport_reset_no_sock()
->> > ---
->> > drivers/vhost/vsock.c                   | 47 ++++++++++++++++++------
->> > include/linux/virtio_vsock.h            |  8 +++--
->> > net/vmw_vsock/virtio_transport.c        | 10 ++++--
->> > net/vmw_vsock/virtio_transport_common.c | 63 ++++++++++++++++++++++++---------
->> > net/vmw_vsock/vsock_loopback.c          |  8 +++--
->> > 5 files changed, 103 insertions(+), 33 deletions(-)
->>
->> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->
->If we move the supports_local_mode() changes into this patch (for virtio
->and loopback, as I bring up in other discussion), should I drop this
->trailer or carry it forward?
+On Mon, 24 Nov 2025 11:52:07 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (quoted-printable)>]
+> On Fri, Nov 14, 2025 at 03:02:32PM +0000, Marc Zyngier wrote:
+> > Fuad Tabba <tabba@google.com> wrote:
+> > > On Sun, 9 Nov 2025 at 17:17, Marc Zyngier <maz@kernel.org> wrote:
+> 
+> > > > +       /*
+> > > > +        * Note that we set the trap irrespective of EOIMode, as that
+> > > > +        * can change behind our back without any warning...
+> > > > +        */
+> > > > +       if (irqs_active_outside_lrs(als))
+> > > > +               cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
+> > > >  }
+> 
+> > > I just tested these patches as they are on kvmarm/next
+> > > 2ea7215187c5759fc5d277280e3095b350ca6a50 ("Merge branch
+> > > 'kvm-arm64/vgic-lr-overflow' into kvmarm/next"), without any
+> > > additional pKVM patches. I tried running it with pKVM (non-protected)
+> > > and with just plain nVHE. In both cases, I get a trap to EL2 (0x18)
+> > > when booting a non-protected guest, which triggers a bug in
+> > > handle_trap() arch/arm64/kvm/hyp/nvhe/hyp-main.c:706
+> 
+> > > This trap is happening because of setting this particular trap (TDIR).
+> > > Just removing this trap from vgic_v3_configure_hcr() from the ToT on
+> > > kvmarm/next boots fine.
+> 
+> > This is surprising, as I'm not hitting this on actual HW. Are you
+> > getting a 0x18 trap? If so, is it coming from the host? Can you
+> > correlate the PC with what the host is doing?
+> 
+> FWIW I am seeing this on i.MX8MP (4xA53+GICv3):
+> 
+>   https://lava.sirena.org.uk/scheduler/job/2118713#L1044
 
-I'll take a second look in any case, so maybe better to remove it if the 
-patch will change.
+There are worrying errors way before that, in the VMID allocator init,
+and I can't see what the GIC has to do with it. The issue Fuad
+reported was at run time, not boot time. so this really doesn't align
+with what you are seeing.
 
-Thanks for asking!
-Stefano
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
 
