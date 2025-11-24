@@ -1,131 +1,256 @@
-Return-Path: <kvm+bounces-64414-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64415-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5EE5C81ED8
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 18:37:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAD04C81FC2
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 18:55:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 422684E8020
-	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 17:36:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 072103AC568
+	for <lists+kvm@lfdr.de>; Mon, 24 Nov 2025 17:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D87314D1E;
-	Mon, 24 Nov 2025 17:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9262C178E;
+	Mon, 24 Nov 2025 17:55:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PXbJGhz9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1IuLzWL";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="sFsuX66g"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508EB2C11D5;
-	Mon, 24 Nov 2025 17:36:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C062C1786
+	for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 17:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764005767; cv=none; b=BBOFZjTtctF+JCjXeioCUe1/X6tJoiT+YDO4JBCqkN7VNkBvUA4MHXrNZRgkNETG08iozaXfUa93LFAdWB0AIh5b+8kmp5nBhAdHj05isEomFBma6B9cmKlhLRT+Rp3cQgeAZR5NnZkUGKcS6xe2ze0GUIyUnbmPxdY2DXAyRIc=
+	t=1764006908; cv=none; b=J2HdP3TqIFDhpDTAgPOdKzgW5x2R8l7K2EMM6BuHLuoxWl/pYXRmgvZOVvC1c3NTXS7HdYN12ZGi5kVUKIMbhH2DwXvBIxgtSXInHKZXQugH19Qzr6Q1q7bg+NnmWPakZb2Yzn2unz7J8SLolcfCev/fD34/JyOT6BVXbejmXPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764005767; c=relaxed/simple;
-	bh=e/oycxQ/8H7/jZ06LoMfFWT6Vzos45lv7jGbtm4/2K4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IeuaBNLDl0oA9GqMm3NliYknA0KouAlQvJbws9qNQVqqK8O+g/ZeQRibpP4OwIwjCNuBeGq2/oUlUw8SylELYrsAGLgss6UIlyKY4J6DblefNX71qWhGp3RqqDX5AcT7qBR3gJkD3N6mC+7zMBeY7UB+PRIy8JGdtr46sminrT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=de.ibm.com; spf=pass smtp.mailfrom=de.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PXbJGhz9; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=de.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=de.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AOF7O7k002998;
-	Mon, 24 Nov 2025 17:36:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=cr0G9s
-	p4L9wvGN7NRxufPm3C//qjm5o8gj8+qxa/2J8=; b=PXbJGhz9pGkF+ucxXOd77v
-	s3zxuouSAkglnMscj09PWaaVZ2K6NPGrg6aexxn3HXEP/qixMvv1Qrz1dTEbgqv2
-	XCt2H9aqX60vOUHOCumR5g0MJcI6CbZtNsIZFYJNLJGss/Po4K6P1s0ull9OOlcS
-	S+Y0Nvf1bXhUWId98oltPH1o5RnKhntRVgIt8bsmlxOOVtdpDPqB6lkvnZ5MJooU
-	l3Z4Ib3dTLtgRUT/KTpJTvErIvAPz45MFcFmSzDK5qD6nuHxAz4hRtZg0oNVoFZ/
-	uykpSV52iqnqct7uHei/eIMizWVh93Y2DfiyQliQSW5NDyNfmo4iW0PUyWdjyd+w
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak4w99dj0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Nov 2025 17:36:01 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AOHFcgx030775;
-	Mon, 24 Nov 2025 17:36:00 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4akqgs7c8c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Nov 2025 17:36:00 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AOHZtFF48234968
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 24 Nov 2025 17:35:55 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2E9A12004B;
-	Mon, 24 Nov 2025 17:35:55 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3DB4120040;
-	Mon, 24 Nov 2025 17:35:54 +0000 (GMT)
-Received: from [9.111.66.87] (unknown [9.111.66.87])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 24 Nov 2025 17:35:54 +0000 (GMT)
-Message-ID: <da705f02-9f8f-4a4c-96c6-b507c88f92b8@de.ibm.com>
-Date: Mon, 24 Nov 2025 18:35:53 +0100
+	s=arc-20240116; t=1764006908; c=relaxed/simple;
+	bh=wgpVnEJcnomKN/oNfPAgd5k9GgyVHMXvOCPZyfz69j0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XJ8ethiS3Redmxa301qyNFbjSsSkVNGN2MSPYN5FjOobJBz821evymoi5lVYm4PNpCo/NWopUvxlF9uyvNI2gSK2KBVuYb7nhOxuL8ucXxkrwnVWBTm7AZL4jlFe05LuY41eaf6O/BnG6E5otFMdE2Zwe4ktAsDJY41elJYRwZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S1IuLzWL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=sFsuX66g; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764006905;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MWaaNkWE0gvkjn8TKglV+j77gDxp+Cag+Z34d+Rk28I=;
+	b=S1IuLzWLbnCCLWzn3bnEIfkhyqqCOgkB7owQy+BUxdzgG+wAOpiubPTLpoApgwq69u+Q0d
+	MbLn6/RD3Zir4pjr1kphd46Spq7ja8PHzxAvnLu82AftoqH9/njkuLwxhE03WW5KOgd7Sf
+	q124/E+5ovmK80J9ouGR+AbFxXgZo2M=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-573-TJrEFcc4P7qatPicYUTSbg-1; Mon, 24 Nov 2025 12:55:04 -0500
+X-MC-Unique: TJrEFcc4P7qatPicYUTSbg-1
+X-Mimecast-MFC-AGG-ID: TJrEFcc4P7qatPicYUTSbg_1764006904
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4ee2fd41c2aso62050871cf.2
+        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 09:55:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764006904; x=1764611704; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MWaaNkWE0gvkjn8TKglV+j77gDxp+Cag+Z34d+Rk28I=;
+        b=sFsuX66grMVLzij28lmvj3RuFf2VZu0c0RZj5hbgilwQI1qBq/h1T8MVYdXVSZYa3n
+         Pg1KCm1/e/YEHmO42Gq9fOp6ysA/1bgoWgEWyMmDZPEx24w9qVUhhC2dffcRbS1nHybg
+         aw27VWkRwQoaC+iscIT/r3MVND4X0OXteTjNpsAY9TOWjvYuSCCPa+UClzg0uyO/94yR
+         dh/bLdBKjcgYH7le/WDa/awz3XjjOhtOtOKx9OZuY884pYBOyUo7JzIu4ilx9pQwdUVN
+         HbVAWk4rmbtEJP+/T4SUfXo0zj3VmQC561VAZJzDgDnDmEoYS2IdZFpEZnsog3nZ9DJ8
+         1cPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764006904; x=1764611704;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MWaaNkWE0gvkjn8TKglV+j77gDxp+Cag+Z34d+Rk28I=;
+        b=qcbbBSCNQllyqMsvFVB9EwEYQyOZloOMdOhMuJ1lQEF3geNWS2X4bXd2mBKvLMFse9
+         jKhJdRvfT0WeW769fVFUBA0YcSjJ5HDTHWixkaYxSEW5MThVGuIebWgro4vJc41fWmdL
+         Uyr63OOdFMl2rDA4QwU7vFwzlOXOdHfL/UD9FaD7e1sldoUDYDhlSRV+Ew2CaUthg4+c
+         UgE/GpvuxJeKVnT7RY793dx7+Aw6weV1KsLmFg0xphy59f82D4mogvkmc5DjdoHhlMfO
+         8cuX7P2riGDNTvQ+z+Ns5G/Tya2vKArWnF7CDmO8bNveb26dSQU2vA9QeVJTdgVeJLNc
+         tq/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUnmPKPc2r/6cmVXmjJLk7xwx74l6W5XUsFvmgGyWVIatpk0bhFWWv2XntB89DM7Lv9ygI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfOiQP814YLZuQaxyCfCgU2eVZLH0ww11QivBd4vTkcO+9IJ1b
+	XG8HMSMeIIspUMMli4Ap0iV1aWXVWOtktBBcIiztY2GsOwMfeBTJVcOxwTu/7Y0GqsLJxzZtE7t
+	7w9IRIjB2h7fELdzgEH+eqF8+86WOtXk43oSZs5P2myBxv0zpb9OOoPGTeMLmnA==
+X-Gm-Gg: ASbGncuf/YCi+VYYO91cchZn8mdCYfkz2KnEaBLMa5btbetVOxxeHYanVTFA6p6qBNZ
+	W+1FutjWx12p74W2D+4qbQZUqACpMkgDK+wiPsm/FQTris3you0XHquZLrNAdAJn3QfIe0mgG02
+	0G5Y16ImMEubu3UEzkYgCePyTX53vqxSok6y9hwX9W3G8v82fEu+d8BZzpcwpYRZnoadXXzw5jv
+	fldYSxYu/+Q0BirJ695iAr57nhM3yNXBMxXSjZZ9SBjI7OUuxtfurlowue5JbCAv1FsiwHGSKW+
+	bAOO5skQlHmz5bwH9Es41DQBIOPz4WoLN976+5qXpWWvjGr38xoh+ELdI2oY1wT146rWqj982Sl
+	RzNfHrO2r7lX47Yt982XVSU8qscpJsMyXHQPpVvZtG5u7XmnTDQ7lghDGwyX7vA==
+X-Received: by 2002:a05:622a:1b86:b0:4ee:87a:56b3 with SMTP id d75a77b69052e-4ee588cb923mr177167441cf.48.1764006903621;
+        Mon, 24 Nov 2025 09:55:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE8Gf4NTZ93wIDY4fTFcgjXQPdtoiRJrv+CLpyDvCPlHjnxTw3P0ZMr3a2DgpcLW7S43lbwhw==
+X-Received: by 2002:a05:622a:1b86:b0:4ee:87a:56b3 with SMTP id d75a77b69052e-4ee588cb923mr177166801cf.48.1764006903119;
+        Mon, 24 Nov 2025 09:55:03 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee48e65e3bsm90774671cf.17.2025.11.24.09.54.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Nov 2025 09:55:02 -0800 (PST)
+Date: Mon, 24 Nov 2025 18:54:45 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, berrange@redhat.com, 
+	Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v11 03/13] vsock: reject bad
+ VSOCK_NET_MODE_LOCAL configuration for G2H
+Message-ID: <qvu2mgxs7scbuwcb2ui7eh3qe3l7mlcjq6e2favd4aqcs52r2r@oqbrlp4gxdwl>
+References: <20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com>
+ <20251120-vsock-vmtest-v11-3-55cbc80249a7@meta.com>
+ <swa5xpovczqucynffqgfotyx34lziccwpqomnm5a7iwmeyixfv@uehtzbdj53b4>
+ <aSC3IX81A3UhtD3N@devvm11784.nha0.facebook.com>
+ <g4xir3lupnjybh7fqig6xonp32ubotdf3emmrozdm52tpaxvxn@2t4ueynb7hqr>
+ <aSSV4RlRcW+uGy+n@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 22/23] KVM: s390: Enable 1M pages for gmap
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
-        seiden@linux.ibm.com, gra@linux.ibm.com, schlameuss@linux.ibm.com,
-        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
-        gor@linux.ibm.com, david@redhat.com, gerald.schaefer@linux.ibm.com
-References: <20251124115554.27049-1-imbrenda@linux.ibm.com>
- <20251124115554.27049-23-imbrenda@linux.ibm.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-In-Reply-To: <20251124115554.27049-23-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIyMDAyMSBTYWx0ZWRfXza/731TfrDiI
- 5L40wnscnsSQOnWAMD8TeMGMdSo3t01ICDX+AtFBbpAK+FR15GD8S+OWfSeue0QeJ16el2FWfUL
- hjDA+rCcm7xurav2ZVFpfwJ6g2wNcACEOuKfp85Csc8dOxkiNoWYfJ1K4XVBfwN+T+y+8Get4FK
- B27T9p4NWm8/IwEvZ5bo/tmM7WjZMLUsR0lfRmB3ZxwTFn9+OFMQy6z/lh9QomgY/WtyCAGtt77
- uq1haiPXDPj81YJfzH1rn7jNW6xXjtqPaHz5YMxXu/V32IGZZc/9JOAl/2SzkTBhhg4JCQ0BHoq
- YCQu7rpqANk+xN2LuBXb5gl9IHcUXE5BJ3j69izCLUAn+6QPjaRtpiH+/M+vChAWGrrlJHbQOxt
- 2ZbxJDU459qwcZnTRNlePKrsXN/zLA==
-X-Proofpoint-ORIG-GUID: jnma2gun4kttsFkuBsXLiryh0XB5LEOz
-X-Proofpoint-GUID: jnma2gun4kttsFkuBsXLiryh0XB5LEOz
-X-Authority-Analysis: v=2.4 cv=TMJIilla c=1 sm=1 tr=0 ts=69249781 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=QnHJmA3E2XFGw8ITv2AA:9 a=QEXdDO2ut3YA:10 a=yzbO-VOS5BcA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-24_06,2025-11-24_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 spamscore=0 phishscore=0 impostorscore=0 clxscore=1015
- adultscore=0 bulkscore=0 suspectscore=0 malwarescore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511220021
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aSSV4RlRcW+uGy+n@devvm11784.nha0.facebook.com>
 
-Am 24.11.25 um 12:55 schrieb Claudio Imbrenda:
+On Mon, Nov 24, 2025 at 09:29:05AM -0800, Bobby Eshleman wrote:
+>On Mon, Nov 24, 2025 at 11:10:19AM +0100, Stefano Garzarella wrote:
+>> On Fri, Nov 21, 2025 at 11:01:53AM -0800, Bobby Eshleman wrote:
+>> > On Fri, Nov 21, 2025 at 03:24:25PM +0100, Stefano Garzarella wrote:
+>> > > On Thu, Nov 20, 2025 at 09:44:35PM -0800, Bobby Eshleman wrote:
+
 [...]
 
-> @@ -5837,11 +5838,6 @@ static int __init kvm_s390_init(void)
->   		return -ENODEV;
->   	}
->   
-> -	if (nested && hpage) {
-> -		pr_info("A KVM host that supports nesting cannot back its KVM guests with huge pages\n");
-> -		return -EINVAL;
-> -	}
-> -
-Yay. As a followup (when things have settled) we should set either set the default of hpage
-to 1 or even remove the hpage kernel parameter alltogether.
+>> >
+>> > > Since I guess we need another version of this patch, can you check the
+>> > > commit description to see if it reflects what we are doing now
+>> > > (e.g vhost is not enabled)?
+>> > >
+>> > > Also I don't understand why for vhost we will enable it later, but for
+>> > > virtio_transport and vsock_loopback we are enabling it now, also if this
+>> > > patch is before the support on that transports. I'm a bit confused.
+>> > >
+>> > > If something is unclear, let's discuss it before sending a new version.
+>> > >
+>> > >
+>> > > What I had in mind was, add this patch and explain why we need this new
+>> > > callback (like you did), but enable the support in the patches that
+>> > > really enable it for any transport. But maybe what is not clear to me is
+>> > > that we need this only for G2H. But now I'm confused about the discussion
+>> > > around vmci H2G. We decided to discard also that one, but here we are not
+>> > > checking that?
+>> > > I mean here we are calling supports_local_mode() only on G2H IIUC.
+>> >
+>> > Ah right, VMCI broke my original mental model of only needing this check
+>> > for G2H (originally I didn't realize VMCI was H2G too).
+>> >
+>> > I think now, we actually need to do this check for all of the transports
+>> > no? Including h2g, g2h, local, and dgram?
+>> >
+>> > Additionally, the commit description needs to be updated to reflect that.
+>>
+>> Let's take a step back, though, because I tried to understand the problem
+>> better and I'm confused.
+>>
+>> For example, in vmci (G2H side), when a packet arrives, we always use
+>> vsock_find_connected_socket(), which only searches in GLOBAL. So connections
+>> originating from the host can only reach global sockets in the guest. In
+>> this direction (host -> guest), we should be fine, right?
+>>
+>> Now let's consider the other direction, from guest to host, so the
+>> connection should be generated via vsock_connect().
+>> Here I see that we are not doing anything with regard to the source
+>> namespace. At this point, my question is whether we should modify
+>> vsock_assign_transport() or transport->stream_allow() to do this for each
+>> stream, and not prevent loading a G2H module a priori.
+>>
+>> For example, stream_allow() could check that the socket namespace is
+>> supported by the assigned transport. E.g., vmci can check that if the
+>> namespace mode is not GLOBAL, then it returns false. (Same thing in
+>> virtio-vsock, I mean the G2H driver).
+>>
+>> This should solve the guest -> host direction, but at this point I wonder if
+>> I'm missing something.
+>
+>For the G2H connect case that is true, but the situation gets a little
+>fuzzier on the G2H RX side w/ VMADDR_CID_ANY listeners.
+>
+>Let's say we have a nested system w/ both virtio-vsock and vhost-vsock.
+>We have a listener in namespace local on VMADDR_CID_ANY. So far, no
+>transport is assigned, so we can't call t->stream_allow() yet.
+>virtio-vsock only knows of global mode, so its lookup will fail (unless
+
+What is the problem of failing in this case?
+I mean, we are documenting that G2H will not be able to reach socket in 
+namespaces with "local" mode. Old (and default) behaviour is still 
+allowing them, right?
+
+I don't think it conflicts with the definition of “local” either, 
+because these connections are coming from outside, and the user doesn't 
+expect to be able to receive them in a “local” namespace, unless there 
+is a way to put the device in the namespace (as with net). But this 
+method doesn't exist yet, and by documenting it sufficiently, we can say 
+that it will be supported in the future, but not for now.
+
+>we hack in some special case to virtio_transport_recv_pkt() to scan
+>local namespaces). vhost-vsock will work as expected. Letting local mode
+>sockets be silently unreachable by virtio-vsock seems potentially
+>confusing for users. If the system were not nested, we can pre-resolve
+>VMADDR_CID_ANY in bind() and handle things upfront as well. Rejecting
+>local mode outright is just a broad guardrail.
+
+Okay, but in that case, we are not supporting “local” mode too, but we 
+are also preventing “global” from being used on these when we are in a 
+nested environment. What is the advantage of this approach?
+
+>
+>If we're trying to find a less heavy-handed option, we might be able to
+>do the following:
+>
+>- change bind(cid) w/ cid != VMADDR_CID_ANY to directly assign the 
+>transport
+>  for all socket types (not just SOCK_DGRAM)
+
+That would be nice, but it wouldn't solve the problem with 
+VMADDR_CID_ANY, which I guess is the use case in 99% of cases.
+
+>
+>- vsock_assign_transport() can outright fail if !t->supports_local_mode()
+>  and sock_net(sk) has mode local
+
+But in this case, why not reusing stream_allow() ?
+
+>
+>- bind(VMADDR_CID_ANY) can maybe print (once) to dmesg a warning that
+>  only the H2G transport will land on VMADDR_CID_ANY sockets.
+
+mmm, I'm not sure about that, we should ask net maintainer, but IMO 
+documenting that in af_vsock.c and man pages should be fine, till G2H 
+will support that.
+
+>
+>I'm certainly open to other suggestions.
+
+IMO we should avoid the failure when loading G2H, which is more 
+confusing than just discard connection from the host to a "local" 
+namespace. We should try at least to support the "global" namespace.
+
+Thanks,
+Stefano
+
 
