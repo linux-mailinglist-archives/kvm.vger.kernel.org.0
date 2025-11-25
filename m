@@ -1,112 +1,105 @@
-Return-Path: <kvm+bounces-64532-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64533-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EAB4C86414
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 18:40:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0FD8C864BF
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 18:46:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97D013B87DD
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 17:39:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B8D63AA5DE
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 17:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B5E32AAC5;
-	Tue, 25 Nov 2025 17:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398A632D0DF;
+	Tue, 25 Nov 2025 17:45:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DW7CYnxR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GdJcVz3/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833CA32824A
-	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 17:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F61632C925;
+	Tue, 25 Nov 2025 17:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764092344; cv=none; b=EqBxb9bbp/Nd5BtJTocnStb0Qjrznegtot8+d5v3Wfa7SACxm0qSfAlSG62l28k5aoNkdNBtP6PiRWzibpxSFJkL7WsiWwCYODeyk16R/HU8ozzkSAl/sYZhTsd0U88BF/1qS2HWqIpxbtQ37++FprRw12u0GUtKHblmkickuXo=
+	t=1764092751; cv=none; b=jPKsU+ziVXAssbtLzbUTfrj+MsxBejmW0m9vTn5VAYvRF3gcbjODFzZqphPa05piXjZQeBfr4ZzyL25XfZGcLMwfH6m8GEnpQrdcBfKQzaBb9iqfD7l7qBc+85XBoQVzNio4aG1qVQP2CGk3S7rjnsxdeZ/oxiGfTw8A+JpFQhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764092344; c=relaxed/simple;
-	bh=hYpKuwg+6qk4P1s0BVsJWxLzFkie37j9EJGGxbty2O4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=flT91Q/Pglufcu4BwX54Gralkt+i9y9qZbsoatYpbWRWhugndqjgqDxtpH4hwLDONcLy6IfzhEsb3e6O1K7kglyoy2tLdRMBW8xdu9xBi3CabpsF6fb4BHWww8XdhzIFSYD0l7A83oX2g+GZ1+VerFN06g4IDD0sBefXE9SpreM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DW7CYnxR; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-37cef3ccb82so22964701fa.2
-        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 09:39:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764092341; x=1764697141; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hYpKuwg+6qk4P1s0BVsJWxLzFkie37j9EJGGxbty2O4=;
-        b=DW7CYnxRNDbpyakHdtjoLBg1YOyAMn2KKBGzKdzTpfQz7B0e28llGf2GO2xej2ocTc
-         tYd55PteEgoj6BeTV/vzzu8dMj/Z3nWaHbXB+CzNpk5XMdFwO60ndxNMsWrW68Ms+vD5
-         lZzNusKARXfjGm+FfViVefDbCo6XAjlu3Ld1SvRSoHMcCOCYdRaveCoat8khQBByI2PQ
-         uQgsRfMmFKeQugdokJTMVgOQmMTaB3D7LPeo2sYnHUUasUxlqCeFWrfL+HJjssrHZzIr
-         ELj1HStCz5kAbBGRLeYSogq6TSKmukp6Zh2V7gaXl8cPEr/rBc94omH79fkPtSnXqhSr
-         XWzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764092341; x=1764697141;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hYpKuwg+6qk4P1s0BVsJWxLzFkie37j9EJGGxbty2O4=;
-        b=xOCHn/DyPzloiaqoFZBgchBEhA9Gn8ZmR0/eK7U1IeasmhM2oLfePHvrGY9Arsm/pc
-         SzsjTodhabOKAVs0FjG+Damu90Z4s5P9haeZtobKEZTV3by9M3xc21UEs2ShXXiNZwv/
-         smls1UZshsUb93N4lra4mH4tq+NnnDqBrR4pUVLYEWP6ZvW4NfUiM/QfaKrtr2ORNyZz
-         LmPfx4n4thrk8txle9q1DPVsslgoVk8hvl6vLWQFzK/GAD+ExOa2SxLCLdQwyxkrRfCL
-         O3gZotktYWLWiaLr5WEf3r5odGFmBCVnkHDiHPg6LnB07+tOX1yPvcJUwo6mESfvaDPl
-         3s2w==
-X-Forwarded-Encrypted: i=1; AJvYcCVZfxjBC56scdlKniilLkOET71wRYVoGiX0/MqCiO5FWe/D4SSUB/cskeBKPRpCYLgP93w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuY2fPhEQiIIt1ha2kXaCLvAvqLcpmldsZ6oQCgVKqZayT9YRu
-	K9MQyCneKeEhpmBJAOCN4HUqWbQ2UqaFoJxrR+k6lPZ1tX0H9Eak0xFokJ3YUR8OgyYslEtNPu7
-	b2nvcjk/MnB+zwTD1EYYjnmUDu2SR6yazn8B+D8r4
-X-Gm-Gg: ASbGnctKMrHr0ipchZKFOAkBE76RzUL5vb+Y8Nk5v5YDAKp5uztbvPeKywiUZIGPoSw
-	fvjMu8bRnHVZzdSy1javPKxrpIJg7rUT3gm0uOtvPMflFXzLtmt1MkA799XmrhLhmAsBXmvQBQx
-	5BgOb8OLV/HA7dfmKhl9y4KzOMA5L7XmmhQx8KH2ctvczH9m0sutD1KCPkaK0FyYSmLDcA/3Jw9
-	M+ZshxVdOQ7QZ2TFkCd33HrP13Ijdg7q+7yyifIFAz77DBccNd8aYqCWjzPztGM0PINQwhH7Wwk
-	m13aOg==
-X-Google-Smtp-Source: AGHT+IFq+pkA9wUXo6O1YuyXrs06FlYpW+bNX4EgX0RqVurgQxcjqXf5OCpjt4Cav6Vv/IGQxFOOMXQu/61PgqQPYgY=
-X-Received: by 2002:a05:6512:2398:b0:594:2654:5e65 with SMTP id
- 2adb3069b0e04-596a3edac23mr5617787e87.26.1764092340301; Tue, 25 Nov 2025
- 09:39:00 -0800 (PST)
+	s=arc-20240116; t=1764092751; c=relaxed/simple;
+	bh=+k1k+0kNP1/FSg/EwboNrPe6JpRIwqq2uHtKXTABx/w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GLucYb+1nhZU8OECOpbtHJwy09qTxauUkKXG6vtox54nYmLi22dZFuFZsISE/mJAn0JC5OwXzJ2y9LFUHhKrOmYIIOnI0l18l5o7gexXmFcusTKM8N9ysNmv8x1uzmWyT8wDAlqjq7xSfgFrT/94TsP/LiXrSmYu6dZZXW0zdCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GdJcVz3/; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764092749; x=1795628749;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+k1k+0kNP1/FSg/EwboNrPe6JpRIwqq2uHtKXTABx/w=;
+  b=GdJcVz3/synrVPe/rKgDYCg7tWVXH5QLI/5t8VKAJz36rfESPPVq8LVh
+   i9rs9XwUPKEdzGG6db0Wkv0RfWkrJtRdTajRUG4zCrIf/YtzP95GQ1M7d
+   2OvcD3KekF7CRdyjnIlFjSYk1QXgxMm0AGQbBWJPkaaBod7xjNnYyGZXI
+   xNX5/X0kWLZxYqfx8jugJ2bHMl4F6FRSZVZ5iiBVWv4ShTI7/m1lYaef7
+   23B1hRSFlrSEDuHcYfP7dlZU9pUBF56qUxX+JUhwSczjdaGNUjjMS8ZRH
+   tVMqL74lDSNtG9j7qKMJwk91mgsTvFMAR9tKOfm3ieVd/Zm6b8FS0vhNr
+   w==;
+X-CSE-ConnectionGUID: pVZVV6nWQeitpzLcR0tY/Q==
+X-CSE-MsgGUID: /b18DgZ8RW2K60LfmA1EAg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="69980689"
+X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
+   d="scan'208";a="69980689"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 09:45:49 -0800
+X-CSE-ConnectionGUID: FM2phuGuQ3WOa80aQAE0QA==
+X-CSE-MsgGUID: kzShMvR1QLqOhXQIXMvntA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
+   d="scan'208";a="223665757"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 09:45:47 -0800
+Date: Tue, 25 Nov 2025 09:45:41 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Nikolay Borisov <nik.borisov@suse.com>
+Cc: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>
+Subject: Re: [PATCH v4 06/11] x86/vmscape: Move mitigation selection to a
+ switch()
+Message-ID: <20251125174541.7lgjdfwws4ios4vg@desk>
+References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
+ <20251119-vmscape-bhb-v4-6-1adad4e69ddc@linux.intel.com>
+ <c8d197cb-bd8d-42b0-a32b-8d8f77c96567@suse.com>
+ <20251124230917.7wxvux5s6j6f5tuz@desk>
+ <c1b67fb1-0ef9-4f23-9e09-c5eecc18f595@suse.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121181429.1421717-1-dmatlack@google.com> <CAJHc60zkNOrWtzEPr00a6=fHpcW1KmGRu7Txcohe=LHnS6OL_Q@mail.gmail.com>
-In-Reply-To: <CAJHc60zkNOrWtzEPr00a6=fHpcW1KmGRu7Txcohe=LHnS6OL_Q@mail.gmail.com>
-From: David Matlack <dmatlack@google.com>
-Date: Tue, 25 Nov 2025 09:38:33 -0800
-X-Gm-Features: AWmQ_bk-F6GfHzkfFixwREJH6feckFCzraz_YXkqd1eUKsaSXAISX2Opcpq0vY0
-Message-ID: <CALzav=dMsiA+a3ZKcQmrYhV+nZvFVUTKifEs2U7hsxVmVWrL3g@mail.gmail.com>
-Subject: Re: [PATCH v3 00/18] vfio: selftests: Support for multi-device tests
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Alex Williamson <alex@shazbot.org>, Alex Mastro <amastro@fb.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c1b67fb1-0ef9-4f23-9e09-c5eecc18f595@suse.com>
 
-On Mon, Nov 24, 2025 at 3:20=E2=80=AFAM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> On Fri, Nov 21, 2025 at 11:44=E2=80=AFPM David Matlack <dmatlack@google.c=
-om> wrote:
-> >
-> > This series adds support for tests that use multiple devices, and adds
-> > one new test, vfio_pci_device_init_perf_test, which measures parallel
-> > device initialization time to demonstrate the improvement from commit
-> > e908f58b6beb ("vfio/pci: Separate SR-IOV VF dev_set").
-> >
-> Apart from a couple of minor nits in patch-6:
-> Reviewed-by: Raghavendra Rao Ananta <rananta@google.com>
+On Tue, Nov 25, 2025 at 12:19:32PM +0200, Nikolay Borisov wrote:
+> > FEATURE_IBPB check is still needed for VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER.
+> > I don't think we can drop that.
+> 
+> But if X86_FEATURE_IBPB is not present then all branches boil down to
+> setting the mitigation to NONE. What I was suggesting is to not remove the
+> that check at the top.
 
-Thanks Raghu!
+BHB_CLEAR mitigation is still possible without IBPB, with that IBPB check cannot
+be at the top. This patch prepares for adding BHB_CLEAR support.
 
-I'll send a v4 addressing your comments and the kernel-test-robot
-issues on riscv and i386. And then hopefully we can get this into
-6.19.
+Sure I can delay moving the IBPB check to later patch, but the intent of
+splitting the patches was to keep the patch that move the existing logic
+separate from the one that adds a new mitigation.
 
