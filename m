@@ -1,162 +1,202 @@
-Return-Path: <kvm+bounces-64495-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64496-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17EE2C84C70
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 12:42:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA9F0C853C1
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 14:48:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2FCBB4EA0DB
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 11:41:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62EE53B161A
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 13:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3EE31619E;
-	Tue, 25 Nov 2025 11:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7B223817D;
+	Tue, 25 Nov 2025 13:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="PgkEP+Ck"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kFEOUjxn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52F92EBB84
-	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 11:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99D95CA5A;
+	Tue, 25 Nov 2025 13:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764070884; cv=none; b=Yak7Qh0eYhVL4LUUA8U6tXJu2H1ZrF7bCo9TlQgm0ATnZOn54RHeWFfNpG3p+KkbtFnAe9x9AzBObaybd9HPomFRE9dUMfvN2zA7uXtFCGH0jdVV4EwlmiO/3jXkfXR/8RZ0DaKTSM8NJHmZnpULgYydj0LOFWtw9oS5oecO6ok=
+	t=1764078487; cv=none; b=aolUfaoUbnOLR/7+of2hRjp2sdy/2XoJXmySTWMe9hLkpl7x3fHO6O1vuh2A7RQJ+P5WnancpjBfFtHFPTa8uKqKIUC+fVMGdE7vDTT+ockTLmJPqnJyAjIJ53BYn3AIVBGocIOD8DrnrY6SHoGU++YHOa0HA5bZZ0GkvCq+MCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764070884; c=relaxed/simple;
-	bh=DtI53OXTlRBHZs+wCJngBpbUxe7ettg+pvM+R/v5cdM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hZFghidxb6mV1aHQrcwTk3TO3XYoZ/ZefxrRlxpI5//YxIbo71gCZNUqgtRVd4k4AJXB43CnsB4+uK17pp4pj0UL2WTSbYRJpdP9WH15NQbDE1lIgIBbaIw2mCyYfSJLiItmDrQ7XFBxfCDbM4LNtF5cgrsTB3KjOlfyf99D63M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=PgkEP+Ck; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-64320b9bb4bso2358051a12.0
-        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 03:41:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1764070880; x=1764675680; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0LTcLhj6ntTCdqIbjV4lT3OOvO84ukZM2W90NMOA1OU=;
-        b=PgkEP+Cku/QN+9WB3Bdw3/ZU3/ZOvJCUmYEw+QhR7gmn64D9I1iFesTIPbXYAJ4Cnx
-         LezASWIfCsBisMh+3uvEQX00ER31K0+bQMe3ZwqHDkW29cHZ/yvEMiu09g8nFLpVeacf
-         N6s+xd+uQMnSYkRQQjkMsZPDbP66xl8Ewtm0gB1Dj1IFFlnG1uv4TWf7RufnvYU4MFZw
-         hib13W8ysK11nyVT6pvMw79ECa28ZszKEN1B5D62n/CIat8avar9J/cLcP6HwTOHquyE
-         StqZxnjfol1UDWH2AvTmw4vAowkRnFCWyh53zxMufK3rphcfhWy1taSzOSNKG0sHu8mF
-         xzpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764070880; x=1764675680;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0LTcLhj6ntTCdqIbjV4lT3OOvO84ukZM2W90NMOA1OU=;
-        b=NQPFj2UG4RC+jjO3CwG/E5TXWNFgs/7pPnnwYA3TcYp/gjIBfLLGVMqI2aAwXte9X9
-         neDJHw1EP7hHjFSa33MCkHxUHVuIHKLJCSctS81CkO2SSaVUKIwJj89svZ4uN3xrwRPN
-         D7nmoiHhtU2sha8urKyoqAhNNloAhgxOyEWDe/xl9yYN1KKv70r23cELYYOQ3GI6RKDO
-         29QtEOdWlIYEumAsFij3M9F/HFwdicQ4/6RThlMnk5YAZasGzFDlfgV2Wfx+egaYLfgO
-         mrqHNkn7TaOUmx7DYiMNUCq2KdyMKiLKpstVFMvvaIFw9+nyNAckPopHCyZwJw7w9Pmr
-         48Rw==
-X-Forwarded-Encrypted: i=1; AJvYcCW6g7Wx+po1Q5jrq+JUBuYR+rpW1/8c9S6ofhNHyo4R8Fuz861mgm7raBJS0vVEbeLWQ40=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbsDXm7fqeTXriZRzHDtUusAQ2vA4V5wdwZACpUJ8I4y30mFx3
-	nyPGnOBOpJ2bhKnJtWhh+Yv4BJCDGyre1XN3+LeuIsIRfdknxoL7D87bFihSJDhPM54=
-X-Gm-Gg: ASbGncvbHh/WgUPy7LPshA2eH28Fq8thHYvcPAvjHSE+3tGCvY1jm2wFwsYSJtcVB7u
-	L2zKxY/5c4HxSxlr0HYlGuaif1AYF4IlY0+C2D2jVeKtH2/EQZddCVyucnwFEwJnEbAGmsZ3wZS
-	/jppv88ZhYKu/KdnNzU6TnS58WzWTmE9tGFWhOFe8X6zZ0f0Rfq6SrgeTsJOL9pQF6O7voHJnfG
-	+kqUlFKgxz3zSurRuLeHh1MtudStKtSWppjJW9jIc0/fB5a1qM3UVu859IlzWk4IFOZlrva99Zi
-	0szmA3sq/tJMCm+dONCNI1SA42/jdq2cfpMIroHp+0Q9dhQRkQYZLpWOxtheVWcxvaADXDDFrus
-	btBSmwihSiAtKRFJUAHNqTwtBavvfxK8W8KdC1hWfFOnItFdKSUowMfXynZ5HPT724lys5Skupt
-	Hu+9ROHh9IGbU8lKlZMwd8OrQaLhzRtB9ouKdf
-X-Google-Smtp-Source: AGHT+IGlOkF2UtrVncRznNgcRYimG5o2vgswCVg/z9Mqcc7GYmiwJ4ita2QTXSAYMfVYORTtgx4Fow==
-X-Received: by 2002:aa7:df0c:0:b0:62f:9091:ff30 with SMTP id 4fb4d7f45d1cf-64539624040mr12540717a12.3.1764070880224;
-        Tue, 25 Nov 2025 03:41:20 -0800 (PST)
-Received: from [192.168.0.20] (nborisov.ddns.nbis.net. [85.187.216.236])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-645363ac996sm14690309a12.7.2025.11.25.03.41.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Nov 2025 03:41:19 -0800 (PST)
-Message-ID: <150c4314-dba4-4137-914e-b1aacf69290e@suse.com>
-Date: Tue, 25 Nov 2025 13:41:18 +0200
+	s=arc-20240116; t=1764078487; c=relaxed/simple;
+	bh=v1vD+BGAe1IfybLjeiZYe5naHAG4W/wc0Z6DAqSf8Tw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BA+usgR9B4KSwIWLiHkh6feAeWQw3yvaE+fowjkPOxdBubwlvQTBmkDNY35GN8hjT+Ug2jTXensW5BidKKwsqqBLRUfs7lVAZLbLQNqs5jA7Ke/sesQN+JVHVMkJOSN9/xAsU3S+yizDAZlU1uVYkWQjh7VD8/9N+ry0RFys1/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kFEOUjxn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67227C116B1;
+	Tue, 25 Nov 2025 13:48:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764078487;
+	bh=v1vD+BGAe1IfybLjeiZYe5naHAG4W/wc0Z6DAqSf8Tw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kFEOUjxncfJmOGX/axqEJ0fQ3xOlt2OKe2bWcrqMJOmJeHoPcUSToOaJq3Pi7jMi1
+	 d+T27+5hJLqJKFtwntWGjlUJlOesEI1GhO08eLcfwBeNlU3PPw/qSp18W6+Jhb0lJU
+	 UV+aYflCUMYPez+kXuAfcSKcGU1YgbO+hHUH4vv+j3zMqVQ+/SaXeOrwUJoApE0lA2
+	 Xk4MjhATfwn6mPrQSvoTzb0y3eXcJ/fb9Dvq20T2AEl6ZIJoVtDFMqbeH9kDL0h35b
+	 wfe1SPv5Bj9pRNZ7RExLiRRVt7aIOcRourBP8wuZ/QG9AgLzwWFHqCxOqSmhV0XQ42
+	 tKviKm5VWq3Xg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vNtOn-00000008AYp-0HiX;
+	Tue, 25 Nov 2025 13:48:05 +0000
+Date: Tue, 25 Nov 2025 13:48:04 +0000
+Message-ID: <86h5uiql4b.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v4 06/49] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
+In-Reply-To: <5df713d4-8b79-4456-8fd1-707ca89a61b6@arm.com>
+References: <20251120172540.2267180-1-maz@kernel.org>
+	<20251120172540.2267180-7-maz@kernel.org>
+	<5df713d4-8b79-4456-8fd1-707ca89a61b6@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 11/11] x86/vmscape: Add cmdline vmscape=on to override
- attack vector controls
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
- David Kaplan <david.kaplan@amd.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Sean Christopherson
- <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>
-References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
- <20251119-vmscape-bhb-v4-11-1adad4e69ddc@linux.intel.com>
-Content-Language: en-US
-From: Nikolay Borisov <nik.borisov@suse.com>
-Autocrypt: addr=nik.borisov@suse.com; keydata=
- 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
-In-Reply-To: <20251119-vmscape-bhb-v4-11-1adad4e69ddc@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, tabba@google.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-On 11/20/25 08:20, Pawan Gupta wrote:
-> In general, individual mitigation controls can be used to override the
-> attack vector controls. But, nothing exists to select BHB clearing
-> mitigation for VMSCAPE. The =force option comes close, but with a
-> side-effect of also forcibly setting the bug, hence deploying the
-> mitigation on unaffected parts too.
+On Tue, 25 Nov 2025 11:26:10 +0000,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> Add a new cmdline option vmscape=on to enable the mitigation based on the
-> VMSCAPE variant the CPU is affected by.
+> On 20/11/2025 17:24, Marc Zyngier wrote:
+> > A long time ago, an unsuspecting architect forgot to add a trap
+> > bit for ICV_DIR_EL1 in ICH_HCR_EL2. Which was unfortunate, but
+> > what's a bit of spec between friends? Thankfully, this was fixed
+> > in a later revision, and ARM "deprecates" the lack of trapping
+> > ability.
+> > 
+> > Unfortuantely, a few (billion) CPUs went out with that defect,
+> > anything ARMv8.0 from ARM, give or take. And on these CPUs,
+> > you can't trap DIR on its own, full stop.
+> > 
+> > As the next best thing, we can trap everything in the common group,
+> > which is a tad expensive, but hey ho, that's what you get. You can
+> > otherwise recycle the HW in the neaby bin.
+> > 
+> > Tested-by: Fuad Tabba <tabba@google.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >   arch/arm64/include/asm/virt.h  |  7 ++++-
+> >   arch/arm64/kernel/cpufeature.c | 52 ++++++++++++++++++++++++++++++++++
+> >   arch/arm64/kernel/hyp-stub.S   |  5 ++++
+> >   arch/arm64/kvm/vgic/vgic-v3.c  |  3 ++
+> >   arch/arm64/tools/cpucaps       |  1 +
+> >   5 files changed, 67 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+> > index aa280f356b96a..8eb63d3294974 100644
+> > --- a/arch/arm64/include/asm/virt.h
+> > +++ b/arch/arm64/include/asm/virt.h
+> > @@ -40,8 +40,13 @@
+> >    */
+> >   #define HVC_FINALISE_EL2	3
+> >   +/*
+> > + * HVC_GET_ICH_VTR_EL2 - Retrieve the ICH_VTR_EL2 value
+> > + */
+> > +#define HVC_GET_ICH_VTR_EL2	4
+> > +
+> >   /* Max number of HYP stub hypercalls */
+> > -#define HVC_STUB_HCALL_NR 4
+> > +#define HVC_STUB_HCALL_NR 5
+> >     /* Error returned when an invalid stub number is passed into x0
+> > */
+> >   #define HVC_STUB_ERR	0xbadca11
+> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > index 5ed401ff79e3e..5de51cb1b8fe2 100644
+> > --- a/arch/arm64/kernel/cpufeature.c
+> > +++ b/arch/arm64/kernel/cpufeature.c
+> > @@ -2303,6 +2303,49 @@ static bool has_gic_prio_relaxed_sync(const struct arm64_cpu_capabilities *entry
+> >   }
+> >   #endif
+> >   +static bool can_trap_icv_dir_el1(const struct
+> > arm64_cpu_capabilities *entry,
+> > +				 int scope)
+> > +{
+> > +	static const struct midr_range has_vgic_v3[] = {
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM),
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM),
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_PRO),
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_PRO),
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_MAX),
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_MAX),
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_PRO),
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
+> > +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
+> > +		{},
+> > +	};
+> > +	struct arm_smccc_res res = {};
+> > +
+> > +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV3_CPUIF);
+> > +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV5_LEGACY);
+> > +	if (!cpus_have_cap(ARM64_HAS_GICV3_CPUIF) &&
+> > +	    !is_midr_in_range_list(has_vgic_v3))
+> > +		return false;
+> > +
+> > +	if (!is_hyp_mode_available())
+> > +		return false;
+> > +
+> > +	if (cpus_have_cap(ARM64_HAS_GICV5_LEGACY))
+> > +		return true;
+> > +
+> > +	if (is_kernel_in_hyp_mode())
+> > +		res.a1 = read_sysreg_s(SYS_ICH_VTR_EL2);
+> > +	else
+> > +		arm_smccc_1_1_hvc(HVC_GET_ICH_VTR_EL2, &res);
 > 
-> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> We are reading the register on the current CPU and this capability,
+> being a SYSTEM_FEATURE, relies on the "probing CPU". If there CPUs
+> with differing values (which I don't think is practical, but hey,
+> never say..). This is would better be a
+> ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE, which would run through all
+> boot CPUs and would set the capability when it matches.
 
-Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
+While I agree that SYSTEM_FEATURE is most probably the wrong thing, I
+can't help but notice that
+
+- ARM64_HAS_GICV3_CPUIF,
+- ARM64_HAS_GIC_PRIO_MASKING
+- ARM64_HAS_GIC_PRIO_RELAXED_SYNC
+
+are all ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE.
+
+On the other ARM64_HAS_GICV5_LEGACY is ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE.
+
+Given that ARM64_HAS_ICH_HCR_EL2_TDIR is dependent on both
+ARM64_HAS_GICV3_CPUIF and ARM64_HAS_GICV5_LEGACY, shouldn't these two
+(and their dependencies) be aligned to have the same behaviour?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
