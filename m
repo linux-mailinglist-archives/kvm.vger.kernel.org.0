@@ -1,207 +1,103 @@
-Return-Path: <kvm+bounces-64498-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64499-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D9E1C8557E
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 15:14:38 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507FFC855BB
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 15:18:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B68953B2A68
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 14:14:34 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8664434E655
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 14:18:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA18324B0A;
-	Tue, 25 Nov 2025 14:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E5632572B;
+	Tue, 25 Nov 2025 14:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xvJzENOU"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B6D3246FE
-	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 14:14:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020AA31BC84;
+	Tue, 25 Nov 2025 14:18:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764080070; cv=none; b=UtMA+o4tBG1zPRyC7JYal1cluxp0ijG7+0421vbI1AKLmsYDgJ+ZoKbEkw3NVJqUZgwPVcqHBE87SFhUFavWCoPjZQSy76ZnayYptEQib3Gb1XMIa/hQMur+rcAAzREX8hbQAToP/rdX89wsEkKYn7A8eo6GtCQsXXpCDiY3yLw=
+	t=1764080310; cv=none; b=YhX59T5ZFhP4MMJDXDs7gi6boz6FMIIP8Q8/OhdsmuaAAtJvriYLj+QJOnivA9un6B2mBh/maAUtJAUJoY+stx1F74Y4E3ns+y8x6z28XXzJagF5vSrOWN/6roX1cBlJLwdeA/AIGW5nl9xL1cMYlMtIGKAGRODyAn8Se0NMp3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764080070; c=relaxed/simple;
-	bh=5WPAAEAVbcWlB/llxwu+yBT/5JsRuhtT4pi9J/qzp+k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RnKIdn1X0lRRT3B4/4GDPO57C3KCGirCr+8nMfI0pr1siqVdK0X33E4g5CmcVlJSFVLieHxVh3Q5H8rgXj4mxIdWdB0K9lEyIpRkGt9h8AToYYRIQtxEYXXsdHV9lIqRnVTOhQFwSILED5kuZFMAuXbsQOeUbB5YhqBKhY9EoZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8B82B168F;
-	Tue, 25 Nov 2025 06:14:20 -0800 (PST)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B6D883F86F;
-	Tue, 25 Nov 2025 06:14:26 -0800 (PST)
-Message-ID: <e67decb6-20a5-4659-8401-8534049f9229@arm.com>
-Date: Tue, 25 Nov 2025 14:14:25 +0000
+	s=arc-20240116; t=1764080310; c=relaxed/simple;
+	bh=/nLaQgrfgV1fF/s4cxpU8v6u4Dcf3qSsNdZfhEYMj+8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BDpi7G9lntK9JvSnlU/gSoYBvH70qRJD96UitqkY9u1qqWvhkuHhEkV23abWw8AwXF6qnpNuYpwC/vxTFDcuoXFK/MjzPV7CFGIfvl1yQFMf5VW9tQj/S9kSxUsouArvH1YwymugpKsjio/+ziX428MugNSGNyMF1sljSfRJ9Ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xvJzENOU; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1764080298; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
+	bh=/nLaQgrfgV1fF/s4cxpU8v6u4Dcf3qSsNdZfhEYMj+8=;
+	b=xvJzENOUMCjeqbuIA+vD6EVDlopmFSv9XWFGHdCIueSQcCyH/GDKQxI0xlWqoXQZAsI1gAGWeUL/jvZpAtaB2S9mGiwAn2TFSgbZaZ8eydZQSY5aRduBk91OovE8NIUB0qOkSoPQ8ql2FU9HubJHw8lXI3UMHogG0ggERlh4huk=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WtOKGV7_1764080296 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 25 Nov 2025 22:18:17 +0800
+From: fangyu.yu@linux.alibaba.com
+To: ajones@ventanamicro.com
+Cc: alex@ghiti.fr,
+	anup@brainfault.org,
+	aou@eecs.berkeley.edu,
+	atish.patra@linux.dev,
+	fangyu.yu@linux.alibaba.com,
+	guoren@kernel.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	palmer@dabbelt.com,
+	pjw@kernel.org
+Subject: Re: [PATCH] RISC-V: KVM: Allow to downgrade HGATP mode via SATP mode
+Date: Tue, 25 Nov 2025 22:18:11 +0800
+Message-Id: <20251125141811.39964-1-fangyu.yu@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+In-Reply-To: <20251124-4ecf1b6b91b8f0688b762698@orel>
+References: <20251124-4ecf1b6b91b8f0688b762698@orel>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 06/49] KVM: arm64: GICv3: Detect and work around the
- lack of ICV_DIR_EL1 trapping
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- Mark Brown <broonie@kernel.org>
-References: <20251120172540.2267180-1-maz@kernel.org>
- <20251120172540.2267180-7-maz@kernel.org>
- <5df713d4-8b79-4456-8fd1-707ca89a61b6@arm.com> <86h5uiql4b.wl-maz@kernel.org>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86h5uiql4b.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 25/11/2025 13:48, Marc Zyngier wrote:
-> On Tue, 25 Nov 2025 11:26:10 +0000,
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>
->> On 20/11/2025 17:24, Marc Zyngier wrote:
->>> A long time ago, an unsuspecting architect forgot to add a trap
->>> bit for ICV_DIR_EL1 in ICH_HCR_EL2. Which was unfortunate, but
->>> what's a bit of spec between friends? Thankfully, this was fixed
->>> in a later revision, and ARM "deprecates" the lack of trapping
->>> ability.
->>>
->>> Unfortuantely, a few (billion) CPUs went out with that defect,
->>> anything ARMv8.0 from ARM, give or take. And on these CPUs,
->>> you can't trap DIR on its own, full stop.
->>>
->>> As the next best thing, we can trap everything in the common group,
->>> which is a tad expensive, but hey ho, that's what you get. You can
->>> otherwise recycle the HW in the neaby bin.
->>>
->>> Tested-by: Fuad Tabba <tabba@google.com>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>> ---
->>>    arch/arm64/include/asm/virt.h  |  7 ++++-
->>>    arch/arm64/kernel/cpufeature.c | 52 ++++++++++++++++++++++++++++++++++
->>>    arch/arm64/kernel/hyp-stub.S   |  5 ++++
->>>    arch/arm64/kvm/vgic/vgic-v3.c  |  3 ++
->>>    arch/arm64/tools/cpucaps       |  1 +
->>>    5 files changed, 67 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
->>> index aa280f356b96a..8eb63d3294974 100644
->>> --- a/arch/arm64/include/asm/virt.h
->>> +++ b/arch/arm64/include/asm/virt.h
->>> @@ -40,8 +40,13 @@
->>>     */
->>>    #define HVC_FINALISE_EL2	3
->>>    +/*
->>> + * HVC_GET_ICH_VTR_EL2 - Retrieve the ICH_VTR_EL2 value
->>> + */
->>> +#define HVC_GET_ICH_VTR_EL2	4
->>> +
->>>    /* Max number of HYP stub hypercalls */
->>> -#define HVC_STUB_HCALL_NR 4
->>> +#define HVC_STUB_HCALL_NR 5
->>>      /* Error returned when an invalid stub number is passed into x0
->>> */
->>>    #define HVC_STUB_ERR	0xbadca11
->>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->>> index 5ed401ff79e3e..5de51cb1b8fe2 100644
->>> --- a/arch/arm64/kernel/cpufeature.c
->>> +++ b/arch/arm64/kernel/cpufeature.c
->>> @@ -2303,6 +2303,49 @@ static bool has_gic_prio_relaxed_sync(const struct arm64_cpu_capabilities *entry
->>>    }
->>>    #endif
->>>    +static bool can_trap_icv_dir_el1(const struct
->>> arm64_cpu_capabilities *entry,
->>> +				 int scope)
->>> +{
->>> +	static const struct midr_range has_vgic_v3[] = {
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM),
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM),
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_PRO),
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_PRO),
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_MAX),
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_MAX),
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_PRO),
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
->>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
->>> +		{},
->>> +	};
->>> +	struct arm_smccc_res res = {};
->>> +
->>> +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV3_CPUIF);
->>> +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV5_LEGACY);
->>> +	if (!cpus_have_cap(ARM64_HAS_GICV3_CPUIF) &&
->>> +	    !is_midr_in_range_list(has_vgic_v3))
->>> +		return false;
->>> +
->>> +	if (!is_hyp_mode_available())
->>> +		return false;
->>> +
->>> +	if (cpus_have_cap(ARM64_HAS_GICV5_LEGACY))
->>> +		return true;
->>> +
->>> +	if (is_kernel_in_hyp_mode())
->>> +		res.a1 = read_sysreg_s(SYS_ICH_VTR_EL2);
->>> +	else
->>> +		arm_smccc_1_1_hvc(HVC_GET_ICH_VTR_EL2, &res);
->>
->> We are reading the register on the current CPU and this capability,
->> being a SYSTEM_FEATURE, relies on the "probing CPU". If there CPUs
->> with differing values (which I don't think is practical, but hey,
->> never say..). This is would better be a
->> ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE, which would run through all
->> boot CPUs and would set the capability when it matches.
-> 
-> While I agree that SYSTEM_FEATURE is most probably the wrong thing, I
-> can't help but notice that
-> 
-> - ARM64_HAS_GICV3_CPUIF,
-> - ARM64_HAS_GIC_PRIO_MASKING
-> - ARM64_HAS_GIC_PRIO_RELAXED_SYNC
-> 
-> are all ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE.
+>> On Sat, Nov 22, 2025 at 3:50 PM <fangyu.yu@linux.alibaba.com> wrote:
+>> >
+>> > From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>> >
+>> > Currently, HGATP mode uses the maximum value detected by the hardware
+>> > but often such a wide GPA is unnecessary, just as a host sometimes
+>> > doesn't need sv57.
+>> > It's likely that no additional parameters (like no5lvl and no4lvl) are
+>> > needed, aligning HGATP mode to SATP mode should meet the requirements
+>> > of most scenarios.
+>> Yes, no5/4lvl is not clear about satp or hgatp. So, covering HGPATP is
+>> reasonable.
+>
+>The documentation should be improved, but I don't think we want to state
+>that these parameters apply to both s- and g-stage. If we need parameters
+>to dictate KVM behavior (g-stage management), then we should add KVM
+>module parameters.
 
-Which means, if GICV3_CPUIF is set any booting CPU must have them.
+Right, adding new parameters for g-stage management is clear.
 
-> 
-> On the other ARM64_HAS_GICV5_LEGACY is ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE.
-> 
-> Given that ARM64_HAS_ICH_HCR_EL2_TDIR is dependent on both
-> ARM64_HAS_GICV3_CPUIF and ARM64_HAS_GICV5_LEGACY, shouldn't these two
-> (and their dependencies) be aligned to have the same behaviour?
+Or we could discuss this topic, from a virtual machine perspective,
+it may not be necessary to provide all hardware configuration
+combinations. For example, when SATP is configured as sv48,
+configuring HGATP as sv57*4 is not very meaningful, Because the
+VM cannot actually use more than 48 bits of GPA range.
 
-Yes, but it also depends on how you are detecting the feature.
+Thanks,
+Fangyu
+>Thanks,
+>drew
 
-BOOT_CPU_FEATURES are finalized with BOOT CPU and thusanything that 
-boots up later must have it. So it is fine, as long
-as a SYSTEM cap depends on it and can do its own additional checks
-in a system wide safe manner.
-
-But in your case, we a have SYSTEM cap, which only performs the check
-on the "running CPU" and not considering a system wide safe value for
-ICH_VTR_EL2_TDS. In order to do this, we need to switch to something
-like the GICV5_LEGACY cap, which chooses to perform the check on all
-booting CPUs (as we don't keep the system wide safe value for the
-bit it is looking for).
-
-e.g., your cap may be incorrectly SET, when the BOOT cpu (which
-mostly runs the SYSTEM scope), but another CPU didn't have the
-ICH_VTR_EL2_TDS.
-
-Does that help ?
-
-Suzuki
-
-> 
-> Thanks,
-> 
-> 	M.
-> 
 
 
