@@ -1,132 +1,251 @@
-Return-Path: <kvm+bounces-64560-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64562-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32A14C8709A
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 21:29:45 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 838F7C8710C
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 21:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1DDBA4E9E21
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 20:29:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 23EAD4EC55D
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 20:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB46633BBA0;
-	Tue, 25 Nov 2025 20:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D76286D40;
+	Tue, 25 Nov 2025 20:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CTs/Y68m"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010063.outbound.protection.outlook.com [52.101.201.63])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72BB2367D1
-	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 20:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764102575; cv=none; b=otpT80/uUAovbKrKP0W42Wzah3mOUIM5VoEAXL3ifu+EIboNzhjf0Cuyy4P2iusPmF7b0z+iLjC/5B9e8eez0fT49I+tWK0LypkRAQUEKqIoAqb8ehRPdJXsb51aw6dT9eAfYH1PwdGmo6g93/denlmC4FMoqMogwctXKpzJC+I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764102575; c=relaxed/simple;
-	bh=OUyUBXnAG9oYinRHzdxSWLiEg7I40n25FlLumq6F0FA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=dwmB3jAMnzXFEKEwQBZZGbbbF1xNovbNagkMmDrzGUEOF7jlgpVvBsB0MHZWOXWEr1n4SLX9RKr243QM5TFp8VW+Am1PefXdK+7dGuUpHbshXB1/yBLFYsuCCChEVjd0CibSm87fDivx3BIU2GnhAL/yhTNYCXRlJ4tDb6Wlm4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-435a145a992so44554755ab.3
-        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 12:29:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764102573; x=1764707373;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EGRbFBGY+j4v+PO+24zcOmYHiPkvq5dreksnw2ehrhk=;
-        b=tyMLMOC5Z+jbxWF3qBaDlp9fJ1O0rhEutRdgpdskStpofvLm/wmVpsetUS6Db5154r
-         ZYWy+0WvT2A3xtjGHvfHrZfAHXyjyAUTjwOncfWRTWNQxdxMjN7k/noB6qefDidbF2qy
-         nbUZVhG2vWjITVnc/osDRUOsfWQVvsJ7JlofVpERc0UPpcmmh/TzhHd99cEaKKyQme1k
-         vorowzm7L0GOX6WPAyRdTD/kCbiQN0PA9B40HKbVoPa8bUuqRe0hrN/Ywuhcv9Gu7CXp
-         PcQhuJz157TnnlPZik/XAXc05s4s7Z1eVGnUoWWA2kBQ/+3WSGhAL4mBhQvCuKI5l2sS
-         +hXA==
-X-Forwarded-Encrypted: i=1; AJvYcCWO2nGfIePCdEslFfGzZATmsVwzxleoSZS9nSeCPippcMuxZhqgV0r3Gz0ubey5WBVUbKw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUB7sdr/BHCilu4TAsg9JxV+gmnuwRTdQWI3liUX1lUScBXQ2Y
-	94F/Jcm+t1fr+U8QDCvuMomBAfV+b+Mk849Rhi+2HtMpo3iER/T8VHK4I6jWsC3Rx+fRPWtuAld
-	DV96J81N+VWNS9pTuXqwzoRRsrrr5BvJMUQXuo50DtcpRVpWPP+E6LXiDgzQ=
-X-Google-Smtp-Source: AGHT+IHzRbnmNJDYVGlbeFMimIOBG2/NLfXER7MzwyuSdhszWuuaI2hX7gA0l86Xx7MiOVQ/RlzUt1NXFoI/AYYSlI8+is1vumoT
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D9636D4E6;
+	Tue, 25 Nov 2025 20:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764102636; cv=fail; b=QrmY6O9mHFQrZgMEf/mN3gV0KamRE4ZdWYue5rTVFbhQx0zvvOIhvVvteP+mWpkw3HPCXWLUWl3yTy2FTwGbgkTdf7BEQhRv1fCG0JHsfvuqTnD2NoLl1tLHiKvwJ76FKkcN4XVzi12auRYeoA3Bo4mfW1Drn/F5R8VXdfGDJ4E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764102636; c=relaxed/simple;
+	bh=lHxiqkzvYWLm7bSAraenJvsv7WjTzlN8w57nl7CMZdE=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fTN9yx0qYIqn/DqSJQm/lFbQKV1wxjQRTC6UnqK6AQdS4X71XXytKvLvjfd1KPDIlwjLPVTTrvL7wrqQ9XSZINPZHAbEdQtZVdow0shoGYxQp5G8R4KM7po/vUcZwleDr8aefCV9mM2Yhg87ZNsZ6pFc0a2oHSh3VMsqvAS1S5A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CTs/Y68m; arc=fail smtp.client-ip=52.101.201.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TmACLkE9FxOC5Ev9AGvsEP7jpwQgHGzyj/J5lgPizk1Xyt0qvydUeouxox9232EWsc6P8IGLX0x+eX9hBxdXh886bBhru0vUR3qCJsD5x937BqfTSAAWOE6GRceZEmugMDuE8HI6FmW2Sw+/pQVTrZKJvDI9NJ+p4hG7N1KiijzWOG49OCmn4mNaiI3hRgJE6o5dJePxLotl8GDp7JuLOJSeRU90BfTZqya2jFlUDQD6wt3kggW/0LqtbSG4T3oSVKk7gc28yHIXTEltVQrzuw9kgBaInKfuZIo0uULzRhoRrLnt3nlzjcbto0oN1q3l82Y7xIH13pG+YypZGxM8Ow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Moluo+VZe+2GfWhppXHJhWMkFabX0VqIv25/Th7Y6K4=;
+ b=R4OyxTXa91+LQteOGReAIeGKRNDCCLYvNmVARGFBV3s7IW+XszLdcZXOtblP3uckP3aIQgGqmhSp1EjvBdszjMH/FN/M/qYSZiEwSkvt9DqFB7+V5c7mWvQ0PQwy15xbk/cXdvkcDNwwjK1L/S/xUG/AIdTS70Z71fG9XcAPp0MI3vnZfvoQePQRf3EPZ8aMVEe5E0jakxhUoPTF0CvnQzIMoQ2HwoMLNIK9QKB8x8KejVS5wHtp8EBovkO2AbcqhXd3LU5v7TTDt4s4SIweDz8z5OyI3XE2NKJ6a8ok/P3BzDHVmJgRwQjIiGh5BPgDrv6bv3sFIPBYHuB9cnRfSw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Moluo+VZe+2GfWhppXHJhWMkFabX0VqIv25/Th7Y6K4=;
+ b=CTs/Y68mVJUDBtu1mK8oDFLhIhjFnZJrpHZaOfLMv1oGv4yI/nZI4owyQjoxwsgLvYx0DjyJEr4eJcgZ5GLCsOEgZ1T5Lc1AeGyzWeKqlhAT/SPk2zAABmVD5kFoPccQax1+X+vvQjoOERvUeqvk9p8/0Z5HgadvZqAZQntiecnmb0oZ4WQ/MlPykmpl1NeOoovr+LkxusVF5EZSIgcB/ze4qQ4674kaGkOkCQ1KmlUVVuIvWJvN3LHWX6Xn9CAI1XNcxVaZrK2Sds4R8sLj/Kfw0qUFODX10JByQKFJZKQt7ZEd+LxFShHnen3gyQfB+k8QUuY3eNw4tBPyEQNYjw==
+Received: from DM6PR07CA0116.namprd07.prod.outlook.com (2603:10b6:5:330::13)
+ by SA1PR12MB5657.namprd12.prod.outlook.com (2603:10b6:806:234::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.11; Tue, 25 Nov
+ 2025 20:30:29 +0000
+Received: from DS1PEPF00017091.namprd03.prod.outlook.com
+ (2603:10b6:5:330:cafe::fe) by DM6PR07CA0116.outlook.office365.com
+ (2603:10b6:5:330::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.12 via Frontend Transport; Tue,
+ 25 Nov 2025 20:30:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ DS1PEPF00017091.mail.protection.outlook.com (10.167.17.133) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9366.7 via Frontend Transport; Tue, 25 Nov 2025 20:30:29 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 25 Nov
+ 2025 12:30:09 -0800
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Tue, 25 Nov 2025 12:30:08 -0800
+Received: from inno-thin-client (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Tue, 25 Nov 2025 12:30:02 -0800
+Date: Tue, 25 Nov 2025 22:30:01 +0200
+From: Zhi Wang <zhiw@nvidia.com>
+To: <ankita@nvidia.com>
+CC: <jgg@ziepe.ca>, <yishaih@nvidia.com>, <skolothumtho@nvidia.com>,
+	<kevin.tian@intel.com>, <alex@shazbot.org>, <aniketa@nvidia.com>,
+	<vsethi@nvidia.com>, <mochs@nvidia.com>, <Yunxiang.Li@amd.com>,
+	<yi.l.liu@intel.com>, <zhangdongdong@eswincomputing.com>,
+	<avihaih@nvidia.com>, <bhelgaas@google.com>, <peterx@redhat.com>,
+	<pstanner@redhat.com>, <apopple@nvidia.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
+	<targupta@nvidia.com>, <danw@nvidia.com>, <dnigam@nvidia.com>,
+	<kjaju@nvidia.com>
+Subject: Re: [PATCH v6 4/6] vfio/nvgrace-gpu: split the code to wait for GPU
+ ready
+Message-ID: <20251125223001.7d05d834.zhiw@nvidia.com>
+In-Reply-To: <20251125173013.39511-5-ankita@nvidia.com>
+References: <20251125173013.39511-1-ankita@nvidia.com>
+	<20251125173013.39511-5-ankita@nvidia.com>
+Organization: NVIDIA
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:19cc:b0:434:7cf6:6d20 with SMTP id
- e9e14a558f8ab-435b8c0991fmr145721565ab.11.1764102572730; Tue, 25 Nov 2025
- 12:29:32 -0800 (PST)
-Date: Tue, 25 Nov 2025 12:29:32 -0800
-In-Reply-To: <6925da1b.a70a0220.d98e3.00b0.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <692611ac.a70a0220.2ea503.0091.GAE@google.com>
-Subject: Re: [syzbot] [kvm-x86?] WARNING in kvm_apic_accept_events (2)
-From: syzbot <syzbot+59f2c3a3fc4f6c09b8cd@syzkaller.appspotmail.com>
-To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
-	pbonzini@redhat.com, seanjc@google.com, syzkaller-bugs@googlegroups.com, 
-	tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017091:EE_|SA1PR12MB5657:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0209bdb3-3e6f-4ee3-0ead-08de2c617968
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Iw8t5MPEiNWbN56i3RrkGr4EQjKClX58k9JOiezhiHuN4E0YBaVpm7zeX21Y?=
+ =?us-ascii?Q?+//S0nPPFNb0LnH/7BJGYgZJhE07PfEOtTT76RPIx9CmPSMpVqBWYW8dToTQ?=
+ =?us-ascii?Q?rX7NawJCg5V+W4wG9rm8fl3IGYNqTyCIjyr2xk8l45g8vf1JpwBZTLbJcv4G?=
+ =?us-ascii?Q?1G2cCF4sGXTMJrHk9qT6zd79+3qno3H9ki6YNEEQB5WGPNpvHMpx0Y7o3Nvs?=
+ =?us-ascii?Q?1Qyr5omo7HS/tYVwWoGJLmXTqVQUxH7jaTIsoY8Cbs1sLQ43q68WdXFhjqUZ?=
+ =?us-ascii?Q?P5O8HOTH/zJdroosCcj6iZMWP1M9bMDEHdjYEo7WVu8bUjBTgKbz0U7z+qcF?=
+ =?us-ascii?Q?laUXShg7o8ukCtdt6vV1mMudf2Kxtr0sbklrNutAKI9cOPYKf8SGsUJzzjGD?=
+ =?us-ascii?Q?OouHp6NzLXI+ou8HoPnW2SBtUZ3bInX7NpSF2q4p9N1+a5XzWfc4rCcPb4VM?=
+ =?us-ascii?Q?kXVJaYFE2grihmHmno/8kI9FuizL7chk6P4yPn9RZTx+ngyonuM0JXd9tvkv?=
+ =?us-ascii?Q?C2LsXah447wAm10LPKTU8qrZy2rz3Zz+fZdi7zjc7E+3k9YSLfQ40vQXqcc+?=
+ =?us-ascii?Q?UtQSoPRT90BkMJJU+NX1m3JkyV+0EYBfvBlHcT1lKd3UvnpbzUv9D4Mm9zux?=
+ =?us-ascii?Q?5A4Gqst/v5hNEfmfBao+BGUzBs5YS77yrJjrFJDWsNmbezlUvCTQJXul19Vj?=
+ =?us-ascii?Q?GadHKxNDY2CxIB+E/6wZnlRoxMpcQ53HZ7oyYP7sqsHniIiKpyTwhBtRPWu9?=
+ =?us-ascii?Q?LkuGCtV2LRbhdwCpVenwZti78gHZBIKIttWRptoAXjb9+2vs5kRTu19STfNt?=
+ =?us-ascii?Q?GKBaYMRGlcL3Skk+L7DbZUP6U11GCd1xYnPZBd2sHHm2kq5t3+UgCBBUJ+Mc?=
+ =?us-ascii?Q?duB2S1kTXr99BOUUSLzLerxiIjktAJE97wS/K29l8fsA5uubRIWuEotMsxKM?=
+ =?us-ascii?Q?KAl40PT7Sz8sre3sv1RBaZbTwUwNpYdD74R5FMhVl9t0oBcE/Am/a5U7dRH3?=
+ =?us-ascii?Q?ZIMMPGi8OOKv2jFdaihe8JNNv/s/I+/z7mDTfCA5i0D18vs+otU2x5sOZZ/s?=
+ =?us-ascii?Q?m/B3jBrgaK/cY4ekjagsRlHWcaQ4DlCzlSHo1Te4ItFSU+bxqCi/3faub3Lu?=
+ =?us-ascii?Q?1aC5wmP95EdzPOmvoA7uHDpyC70SLlZlPv7uT1J/VMmrbI1bZUU/4FguNEYk?=
+ =?us-ascii?Q?94VrXc+R0ybC8mm+SMqJFQcUulqR4bHNEKHgnkp09nbJWMrPcqmixycTAMxW?=
+ =?us-ascii?Q?AgB3ZacOJXEWprlP98oQ24ElKfN/UpzOdH1SzlHWZGUVheTEWkpOOZ4+5/od?=
+ =?us-ascii?Q?o8sq9EGi3qFFcTazXUaW68Op91dIX5zHT5wTmihVWN38WmeUBg/EQHBDH0Nt?=
+ =?us-ascii?Q?j1Zc3DY3+5gN2yYCc+uj4613udzmBGhIERgBGIDax07QEER+cl9OtfxeRm9Y?=
+ =?us-ascii?Q?C957xJ+PmEmLYYcVFHu4cpTdH8SiLMQwaKoFEETjk+y3S8OLuCjF4qQ9TTfb?=
+ =?us-ascii?Q?xgp07V0Auvsmzyf1JJpgqwFp6dLw5wMswHkMz4oQURkFJseE3+wIP0swEkwd?=
+ =?us-ascii?Q?50xk0MxUGFdQN4gLFTw=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(7416014)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2025 20:30:29.2236
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0209bdb3-3e6f-4ee3-0ead-08de2c617968
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS1PEPF00017091.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5657
 
-syzbot has found a reproducer for the following issue on:
+On Tue, 25 Nov 2025 17:30:11 +0000
+<ankita@nvidia.com> wrote:
 
-HEAD commit:    8a2bcda5e139 Merge tag 'for-6.18/dm-fixes' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1604f8b4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a1db0fea040c2a9f
-dashboard link: https://syzkaller.appspot.com/bug?extid=59f2c3a3fc4f6c09b8cd
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13ecf612580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13d9cf42580000
+Looking good to me.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-8a2bcda5.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/fc3f96645396/vmlinux-8a2bcda5.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e20aa7be5d33/bzImage-8a2bcda5.xz
+Reviewed-by: Zhi Wang <zhiw@nvidia.com>
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+59f2c3a3fc4f6c09b8cd@syzkaller.appspotmail.com
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> Split the function that check for the GPU device being ready on
+> the probe.
+> 
+> Move the code to wait for the GPU to be ready through BAR0 register
+> reads to a separate function. This would help reuse the code.
+> 
+> Reviewed-by: Shameer Kolothum <skolothumtho@nvidia.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  drivers/vfio/pci/nvgrace-gpu/main.c | 29
+> +++++++++++++++++------------ 1 file changed, 17 insertions(+), 12
+> deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c
+> b/drivers/vfio/pci/nvgrace-gpu/main.c index
+> 8a982310b188..2b736cb82f38 100644 ---
+> a/drivers/vfio/pci/nvgrace-gpu/main.c +++
+> b/drivers/vfio/pci/nvgrace-gpu/main.c @@ -130,6 +130,20 @@ static
+> void nvgrace_gpu_close_device(struct vfio_device *core_vdev)
+> vfio_pci_core_close_device(core_vdev); }
+>  
+> +static int nvgrace_gpu_wait_device_ready(void __iomem *io)
+> +{
+> +	unsigned long timeout = jiffies +
+> msecs_to_jiffies(POLL_TIMEOUT_MS); +
+> +	do {
+> +		if ((ioread32(io + C2C_LINK_BAR0_OFFSET) ==
+> STATUS_READY) &&
+> +		    (ioread32(io + HBM_TRAINING_BAR0_OFFSET) ==
+> STATUS_READY))
+> +			return 0;
+> +		msleep(POLL_QUANTUM_MS);
+> +	} while (!time_after(jiffies, timeout));
+> +
+> +	return -ETIME;
+> +}
+> +
+>  static unsigned long addr_to_pgoff(struct vm_area_struct *vma,
+>  				   unsigned long addr)
+>  {
+> @@ -933,9 +947,8 @@ static bool nvgrace_gpu_has_mig_hw_bug(struct
+> pci_dev *pdev)
+>   * Ensure that the BAR0 region is enabled before accessing the
+>   * registers.
+>   */
+> -static int nvgrace_gpu_wait_device_ready(struct pci_dev *pdev)
+> +static int nvgrace_gpu_probe_check_device_ready(struct pci_dev *pdev)
+>  {
+> -	unsigned long timeout = jiffies +
+> msecs_to_jiffies(POLL_TIMEOUT_MS); void __iomem *io;
+>  	int ret = -ETIME;
+>  
+> @@ -953,16 +966,8 @@ static int nvgrace_gpu_wait_device_ready(struct
+> pci_dev *pdev) goto iomap_exit;
+>  	}
+>  
+> -	do {
+> -		if ((ioread32(io + C2C_LINK_BAR0_OFFSET) ==
+> STATUS_READY) &&
+> -		    (ioread32(io + HBM_TRAINING_BAR0_OFFSET) ==
+> STATUS_READY)) {
+> -			ret = 0;
+> -			goto reg_check_exit;
+> -		}
+> -		msleep(POLL_QUANTUM_MS);
+> -	} while (!time_after(jiffies, timeout));
+> +	ret = nvgrace_gpu_wait_device_ready(io);
+>  
+> -reg_check_exit:
+>  	pci_iounmap(pdev, io);
+>  iomap_exit:
+>  	pci_release_selected_regions(pdev, 1 << 0);
+> @@ -979,7 +984,7 @@ static int nvgrace_gpu_probe(struct pci_dev *pdev,
+>  	u64 memphys, memlength;
+>  	int ret;
+>  
+> -	ret = nvgrace_gpu_wait_device_ready(pdev);
+> +	ret = nvgrace_gpu_probe_check_device_ready(pdev);
+>  	if (ret)
+>  		return ret;
+>  
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5495 at arch/x86/kvm/lapic.c:3483 kvm_apic_accept_events+0x341/0x490 arch/x86/kvm/lapic.c:3483
-Modules linked in:
-CPU: 0 UID: 0 PID: 5495 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:kvm_apic_accept_events+0x341/0x490 arch/x86/kvm/lapic.c:3483
-Code: eb 0c e8 32 da 71 00 eb 05 e8 2b da 71 00 45 31 ff 44 89 f8 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc cc e8 10 da 71 00 90 <0f> 0b 90 e9 ec fd ff ff 44 89 f9 80 e1 07 80 c1 03 38 c1 0f 8c 4f
-RSP: 0018:ffffc90002b2fbf0 EFLAGS: 00010293
-RAX: ffffffff814e3940 RBX: 0000000000000002 RCX: ffff88801f8ca480
-RDX: 0000000000000000 RSI: 0000000000000002 RDI: 0000000000000002
-RBP: 0000000000000000 R08: 0000000000000000 R09: ffffffff814689b6
-R10: dffffc0000000000 R11: ffffed1002268008 R12: 0000000000000002
-R13: dffffc0000000000 R14: ffff888042c95c00 R15: ffff8880113402d8
-FS:  000055558ab60500(0000) GS:ffff88808d72f000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000002000 CR3: 0000000058d0b000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- kvm_arch_vcpu_ioctl_get_mpstate+0x128/0x480 arch/x86/kvm/x86.c:12147
- kvm_vcpu_ioctl+0x625/0xe90 virt/kvm/kvm_main.c:4539
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f918bd8f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc74a3c2a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f918bfe5fa0 RCX: 00007f918bd8f749
-RDX: 0000000000000000 RSI: 000000008004ae98 RDI: 0000000000000005
-RBP: 00007f918be13f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f918bfe5fa0 R14: 00007f918bfe5fa0 R15: 0000000000000003
- </TASK>
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
