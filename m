@@ -1,207 +1,132 @@
-Return-Path: <kvm+bounces-64561-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64560-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89A40C870A9
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 21:29:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32A14C8709A
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 21:29:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 977723B4A3B
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 20:29:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1DDBA4E9E21
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 20:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C290633C501;
-	Tue, 25 Nov 2025 20:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BzmIHsqM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB46633BBA0;
+	Tue, 25 Nov 2025 20:29:35 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010000.outbound.protection.outlook.com [52.101.46.0])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BADC2737F2;
-	Tue, 25 Nov 2025 20:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.0
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764102575; cv=fail; b=c2bSBjBsRh2gfSug34/bysYeixiNYVBZc00T7yBsZcckub+Z00XYRUV9YvoQ+Pp+owN0XB1dRiEOWcfnXv8LS+au9P3y/2l9v3LcIH0mVYSwRSozF/ypoCfgSTiQRmSM3EPx187VxYx5b42BdpLXoOWqX6Ea/mEiRjvVkPcT99A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72BB2367D1
+	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 20:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764102575; cv=none; b=otpT80/uUAovbKrKP0W42Wzah3mOUIM5VoEAXL3ifu+EIboNzhjf0Cuyy4P2iusPmF7b0z+iLjC/5B9e8eez0fT49I+tWK0LypkRAQUEKqIoAqb8ehRPdJXsb51aw6dT9eAfYH1PwdGmo6g93/denlmC4FMoqMogwctXKpzJC+I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764102575; c=relaxed/simple;
-	bh=5Cdd7qt0jx9OuuRNgLkX1vzcDigu/f//1H5hV4vsncw=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t4l9HbiFti6tiVoGLsJJUx4xEIyYcPa8VqurUmeOV+8u8Ui1Y4f44wgolY+vhhefuakFuk408C7k2iCJsMQEVVwCQ8bC1f8wRxVbf2COApBo0qQ1RZBPF8PG6QzbPSTwM5pNQyrDV7cakqny2EQjuCYiN/hNgWDylHs57/zbc2o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BzmIHsqM; arc=fail smtp.client-ip=52.101.46.0
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=H5WyHRwYqrz++p7xQwS7aZbl+tH6qBG/fDe/ZngQ7aBSInP5y0bFgjx2WyB25ss5940XcHRY7rJsGlAUEcTgFSjrI+lf7Pi1GUr6cgidi+ioLSOwFxIS7JLbIKBMwHG3DEI4Ng3J+wPsHSpE7/FNk7jgsmqoqR+d4J0vEkeWRvZoR16nfIecgi1qGWS+v1KTeWRIJrn/yhxaupr/pNv2CCgvAvm1r9lWg8s+0QLDwaDNkhS6WVeMGWcvEqBZPEcv2IMdZpqcHAT76nZRGzhJ2dscEykxWWwx/+ewjDPuds0toY5IU5UbvlUJhoYsvHQM6gJe5I+xCACInchQTiW66A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fWsiQci2lC15YznIuSRmxlshitVwMJERqgAG7F4tj54=;
- b=CKsxn6KB/Hqe72aMwNbY/qvF1mccGF8Vkt8oSC4M/aKUi01EjdzK3gkUhJ01LLMAoOIHAZTkyoVUHjluxXeDdlgYAcza7l0by3eCRF75aBNi3x5d9gr97hfgTe0o7lnfB5dw0HnxpB9EM9lYFcpDBbTtwpzSoyOB7n+TG4/g/0wZKkDWEyUqHiFa/xFBpaTtpBC+N1iNBv4Z8r2yjWpdN6PcOa1CiaWRAfve2CCH8OmKYnjXg/Q6gmXEeKAux5e1brAhHZq7gkVopegZnKNT9zuSt1HkkbVYVzPZh1JGwJVKPa4I4Sfz0Jrafk9Fhew2pApW1mbpt/CVdS2/Z7UjMQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fWsiQci2lC15YznIuSRmxlshitVwMJERqgAG7F4tj54=;
- b=BzmIHsqMWxR68ttfrTCHoQdIVfGGlHBUL9iZQ4DcDD62ZKpNJqRM2EKpzyOz9QgYpLegwoEMEzPFhEDgYApiNRW0lmZfmBMbzOKGXkxm6U6yl2P54o/8EANHPpI9divHAmKGDF4Ja4cUpLpf44J0ZIr2fNH2Bb2ESsfI+S1PjW8SG1ZXgnSIfqa3t9gicRqiwibuf2dy7H3AP2tqxhhcJUs7qaWflkHIz9pQNDhrAOVenXyH1MK8SHNO0c0gdlP5x68sioL4Y2ZoVEhGkBNNSF/rxr7Wh3TP0eK8/gLGQWiU9zXFu3ST9xlaCdlWyBo+cAfbj6XmqYLuSvbRDEeRmQ==
-Received: from BLAPR03CA0061.namprd03.prod.outlook.com (2603:10b6:208:329::6)
- by BL3PR12MB9051.namprd12.prod.outlook.com (2603:10b6:208:3ba::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.17; Tue, 25 Nov
- 2025 20:29:30 +0000
-Received: from BL6PEPF00022575.namprd02.prod.outlook.com
- (2603:10b6:208:329:cafe::12) by BLAPR03CA0061.outlook.office365.com
- (2603:10b6:208:329::6) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.17 via Frontend Transport; Tue,
- 25 Nov 2025 20:29:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL6PEPF00022575.mail.protection.outlook.com (10.167.249.43) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9366.7 via Frontend Transport; Tue, 25 Nov 2025 20:29:30 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 25 Nov
- 2025 12:29:07 -0800
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 25 Nov
- 2025 12:29:06 -0800
-Received: from inno-thin-client (10.127.8.10) by mail.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Tue, 25
- Nov 2025 12:28:59 -0800
-Date: Tue, 25 Nov 2025 22:28:58 +0200
-From: Zhi Wang <zhiw@nvidia.com>
-To: <ankita@nvidia.com>
-CC: <jgg@ziepe.ca>, <yishaih@nvidia.com>, <skolothumtho@nvidia.com>,
-	<kevin.tian@intel.com>, <alex@shazbot.org>, <aniketa@nvidia.com>,
-	<vsethi@nvidia.com>, <mochs@nvidia.com>, <Yunxiang.Li@amd.com>,
-	<yi.l.liu@intel.com>, <zhangdongdong@eswincomputing.com>,
-	<avihaih@nvidia.com>, <bhelgaas@google.com>, <peterx@redhat.com>,
-	<pstanner@redhat.com>, <apopple@nvidia.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
-	<targupta@nvidia.com>, <danw@nvidia.com>, <dnigam@nvidia.com>,
-	<kjaju@nvidia.com>
-Subject: Re: [PATCH v6 6/6] vfio/nvgrace-gpu: wait for the GPU mem to be
- ready
-Message-ID: <20251125222858.7839ee83.zhiw@nvidia.com>
-In-Reply-To: <20251125173013.39511-7-ankita@nvidia.com>
-References: <20251125173013.39511-1-ankita@nvidia.com>
-	<20251125173013.39511-7-ankita@nvidia.com>
-Organization: NVIDIA
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.33; x86_64-pc-linux-gnu)
+	bh=OUyUBXnAG9oYinRHzdxSWLiEg7I40n25FlLumq6F0FA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=dwmB3jAMnzXFEKEwQBZZGbbbF1xNovbNagkMmDrzGUEOF7jlgpVvBsB0MHZWOXWEr1n4SLX9RKr243QM5TFp8VW+Am1PefXdK+7dGuUpHbshXB1/yBLFYsuCCChEVjd0CibSm87fDivx3BIU2GnhAL/yhTNYCXRlJ4tDb6Wlm4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-435a145a992so44554755ab.3
+        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 12:29:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764102573; x=1764707373;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EGRbFBGY+j4v+PO+24zcOmYHiPkvq5dreksnw2ehrhk=;
+        b=tyMLMOC5Z+jbxWF3qBaDlp9fJ1O0rhEutRdgpdskStpofvLm/wmVpsetUS6Db5154r
+         ZYWy+0WvT2A3xtjGHvfHrZfAHXyjyAUTjwOncfWRTWNQxdxMjN7k/noB6qefDidbF2qy
+         nbUZVhG2vWjITVnc/osDRUOsfWQVvsJ7JlofVpERc0UPpcmmh/TzhHd99cEaKKyQme1k
+         vorowzm7L0GOX6WPAyRdTD/kCbiQN0PA9B40HKbVoPa8bUuqRe0hrN/Ywuhcv9Gu7CXp
+         PcQhuJz157TnnlPZik/XAXc05s4s7Z1eVGnUoWWA2kBQ/+3WSGhAL4mBhQvCuKI5l2sS
+         +hXA==
+X-Forwarded-Encrypted: i=1; AJvYcCWO2nGfIePCdEslFfGzZATmsVwzxleoSZS9nSeCPippcMuxZhqgV0r3Gz0ubey5WBVUbKw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUB7sdr/BHCilu4TAsg9JxV+gmnuwRTdQWI3liUX1lUScBXQ2Y
+	94F/Jcm+t1fr+U8QDCvuMomBAfV+b+Mk849Rhi+2HtMpo3iER/T8VHK4I6jWsC3Rx+fRPWtuAld
+	DV96J81N+VWNS9pTuXqwzoRRsrrr5BvJMUQXuo50DtcpRVpWPP+E6LXiDgzQ=
+X-Google-Smtp-Source: AGHT+IHzRbnmNJDYVGlbeFMimIOBG2/NLfXER7MzwyuSdhszWuuaI2hX7gA0l86Xx7MiOVQ/RlzUt1NXFoI/AYYSlI8+is1vumoT
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00022575:EE_|BL3PR12MB9051:EE_
-X-MS-Office365-Filtering-Correlation-Id: 67e546e3-7e4b-4e84-3b8d-08de2c615667
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|7416014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?gUJLc17ASntMWzoH4kbYv3vJRrUYm3mR9SFaiS7S3DfqzaqHbfvIGM35h5rR?=
- =?us-ascii?Q?72sHZj4/hPGmMcfRh8xsroXzeCAdYlE2NDSUeyhdAWTQ9o3r7VmH2QJWu7p+?=
- =?us-ascii?Q?bRjXejQxf3GvNvqJTklx2SZFQLivHbiEwJUNEY3GofQ0CJoW7Q46ffwBssTv?=
- =?us-ascii?Q?0CpKX3xZPCRC2pldGwy0/kQOghMD/6pYHEGNg688c5V2ig0WHA9fkEaJYcAc?=
- =?us-ascii?Q?NJiyrr6rmp/jyqTHq6CI3OYPEIaAQs14AqqeOHOjYAawX2U4hMmKPPvsNLpT?=
- =?us-ascii?Q?JZWQdAEET2SqvkiJ3etj6eswAY6JfbAjDtGnW4Nfie3BqfgAAcbRYmbekmb8?=
- =?us-ascii?Q?3zwRySXCIkZqb6jlfZxg/dabX5z1kUrLXdqEtteQ7aGPKVeKCRsOgYkr0Thz?=
- =?us-ascii?Q?+x8YVQlk7giu6riG+UuUvIWyPHWqFyEEscJgiUny1jzBTN7RkEeiKymvarKh?=
- =?us-ascii?Q?d6oiTFZTOspbz/ylfP7U6v3fHCh9NYX7m8GXTxbe/UYSYm5I233kSbiSQN4V?=
- =?us-ascii?Q?dGwxpC0njdraFQFGjvERmBhCMC/pT7kqWEmrbv808/DNmHJnDPwgC344iW+c?=
- =?us-ascii?Q?sNtuLXUG/eZg9GrcdHy/U92LKags/+NKJdEssvRjGOu7qmeLWtyfLNlG3FAq?=
- =?us-ascii?Q?kOvVGebylMhYZM3w2R7lYLPjdUGELOZ5cYwchGvpjeEiNDAndPmApCnNKGI6?=
- =?us-ascii?Q?kpC9hzBYbK/oGGvID11xICnTRLsojlfZHpjt9EuGWPHVInJvUEF5BIVpVASh?=
- =?us-ascii?Q?MwgDvJN/y7chDyDF0IGYmZ7jzQJh20bsVpZ1C2ZQXJshpsfaAhGZH0lmoklS?=
- =?us-ascii?Q?BlHaJXSWpiRjvkenHRSHVyIyPM7123t2ZmbHXQeONCWFq6tVfddcqzUrQBIQ?=
- =?us-ascii?Q?rZPepbEdJwUJuYK1rpQvlqcYfyBs3fDe+nX5O2XI2mRZbsjbj04VoT97XSTf?=
- =?us-ascii?Q?EpTv1d2O71+ashLOr25tVUsPm78f0A0tPhJjH/LD2G6hRabyVEZY33NwW9Ez?=
- =?us-ascii?Q?3QNxPxkRwP+DGsN3+JJOE7wiOWgWF7JeeR4+Qqrn1Q/FyNIFF7htFZ6B048I?=
- =?us-ascii?Q?nbNaYLTsByyUKgVxVSRA6QLbPZnji7Ssxhbi4GA9unz2R+K/NYb2dXqBIXin?=
- =?us-ascii?Q?sYCMIbrlmcT44MS51b1ucbRAlxCKVjf3lVuAuy/9Shjf/0ykcNMLRB6PGAmA?=
- =?us-ascii?Q?Ewx9qmiITqsegaIM2/Th2clDvncW+1TuZtGh4qwv1jh3UNpUBkJmZ79L5wm+?=
- =?us-ascii?Q?xX1CPe7jtmQOs3+HSlEAqkcnCItCRqALI5pm8N+o7Qxtxw35obCgD7HvpdSB?=
- =?us-ascii?Q?xhmiEMbiFMGdFzjfnhk/kLXCDUV+zhANH41muPdJTe8Ry554kS5w0cfrtUSy?=
- =?us-ascii?Q?NWlOJAqNHXzvR3yXbHpAF2moykg5FgJybsAkx+0h0mNd77r0gidcKON8PlZC?=
- =?us-ascii?Q?kAYxUH9swwGbVV5koWtwbJLOfqKznaKLgMbDfO99MTD9zeKxoP41JIjCc/jp?=
- =?us-ascii?Q?aBN/rbgBbTmECkbIfuYBhxTlmoLIuxvtiZFUZYvs7mf6xw4vNfbj6knjIPOi?=
- =?us-ascii?Q?xQ5ypS4PC9Tb7b6DtRs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(7416014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2025 20:29:30.3889
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 67e546e3-7e4b-4e84-3b8d-08de2c615667
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00022575.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB9051
+X-Received: by 2002:a05:6e02:19cc:b0:434:7cf6:6d20 with SMTP id
+ e9e14a558f8ab-435b8c0991fmr145721565ab.11.1764102572730; Tue, 25 Nov 2025
+ 12:29:32 -0800 (PST)
+Date: Tue, 25 Nov 2025 12:29:32 -0800
+In-Reply-To: <6925da1b.a70a0220.d98e3.00b0.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <692611ac.a70a0220.2ea503.0091.GAE@google.com>
+Subject: Re: [syzbot] [kvm-x86?] WARNING in kvm_apic_accept_events (2)
+From: syzbot <syzbot+59f2c3a3fc4f6c09b8cd@syzkaller.appspotmail.com>
+To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
+	pbonzini@redhat.com, seanjc@google.com, syzkaller-bugs@googlegroups.com, 
+	tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 25 Nov 2025 17:30:13 +0000
-<ankita@nvidia.com> wrote:
+syzbot has found a reproducer for the following issue on:
 
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> Speculative prefetches from CPU to GPU memory until the GPU is
-> ready after reset can cause harmless corrected RAS events to
-> be logged on Grace systems. It is thus preferred that the
-> mapping not be re-established until the GPU is ready post reset.
-> 
-> The GPU readiness can be checked through BAR0 registers similar
-> to the checking at the time of device probe.
-> 
-> It can take several seconds for the GPU to be ready. So it is
-> desirable that the time overlaps as much of the VM startup as
-> possible to reduce impact on the VM bootup time. The GPU
-> readiness state is thus checked on the first fault/huge_fault
-> request or read/write access which amortizes the GPU readiness
-> time.
-> 
+HEAD commit:    8a2bcda5e139 Merge tag 'for-6.18/dm-fixes' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1604f8b4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a1db0fea040c2a9f
+dashboard link: https://syzkaller.appspot.com/bug?extid=59f2c3a3fc4f6c09b8cd
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13ecf612580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13d9cf42580000
 
-snip
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-8a2bcda5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fc3f96645396/vmlinux-8a2bcda5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e20aa7be5d33/bzImage-8a2bcda5.xz
 
-> @@ -179,8 +215,12 @@ static vm_fault_t
-> nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf, pfn & ((1 <<
-> order) - 1))) return VM_FAULT_FALLBACK;
->  
-> -	scoped_guard(rwsem_read, &vdev->memory_lock)
-> +	scoped_guard(rwsem_read, &vdev->memory_lock) {
-> +		if (nvgrace_gpu_check_device_ready(nvdev))
-> +			return ret;
-> +
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+59f2c3a3fc4f6c09b8cd@syzkaller.appspotmail.com
 
-I would suggest opening the error code if we don't have a "bailing
-out without touching the ret" similar to vfio_pci_mmap_huge_fault(),
-since this looks unnecessarily confusing.
-
-Please also fix the same in PATCH 2. 
-
->  		ret = vfio_pci_vmf_insert_pfn(vdev, vmf, pfn, order);
-> +	}
->  
->  	dev_dbg_ratelimited(&vdev->pdev->dev,
->  			    "%s order = %d pfn 0x%lx: 0x%x\n",
-> @@ -592,9 +632,15 @@ nvgrace_gpu_read_mem(struct
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5495 at arch/x86/kvm/lapic.c:3483 kvm_apic_accept_events+0x341/0x490 arch/x86/kvm/lapic.c:3483
+Modules linked in:
+CPU: 0 UID: 0 PID: 5495 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:kvm_apic_accept_events+0x341/0x490 arch/x86/kvm/lapic.c:3483
+Code: eb 0c e8 32 da 71 00 eb 05 e8 2b da 71 00 45 31 ff 44 89 f8 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc cc e8 10 da 71 00 90 <0f> 0b 90 e9 ec fd ff ff 44 89 f9 80 e1 07 80 c1 03 38 c1 0f 8c 4f
+RSP: 0018:ffffc90002b2fbf0 EFLAGS: 00010293
+RAX: ffffffff814e3940 RBX: 0000000000000002 RCX: ffff88801f8ca480
+RDX: 0000000000000000 RSI: 0000000000000002 RDI: 0000000000000002
+RBP: 0000000000000000 R08: 0000000000000000 R09: ffffffff814689b6
+R10: dffffc0000000000 R11: ffffed1002268008 R12: 0000000000000002
+R13: dffffc0000000000 R14: ffff888042c95c00 R15: ffff8880113402d8
+FS:  000055558ab60500(0000) GS:ffff88808d72f000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000002000 CR3: 0000000058d0b000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ kvm_arch_vcpu_ioctl_get_mpstate+0x128/0x480 arch/x86/kvm/x86.c:12147
+ kvm_vcpu_ioctl+0x625/0xe90 virt/kvm/kvm_main.c:4539
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f918bd8f749
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc74a3c2a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f918bfe5fa0 RCX: 00007f918bd8f749
+RDX: 0000000000000000 RSI: 000000008004ae98 RDI: 0000000000000005
+RBP: 00007f918be13f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f918bfe5fa0 R14: 00007f918bfe5fa0 R15: 0000000000000003
+ </TASK>
 
 
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
