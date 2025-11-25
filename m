@@ -1,284 +1,194 @@
-Return-Path: <kvm+bounces-64472-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64474-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3381FC83C6A
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 08:47:29 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57FA3C83E54
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 09:10:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1B28B4E55BE
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 07:47:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C410434911D
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 08:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E532D2384;
-	Tue, 25 Nov 2025 07:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012092D8387;
+	Tue, 25 Nov 2025 08:10:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V2JKz5a1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ED1jUKaM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28FB1248F66;
-	Tue, 25 Nov 2025 07:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212C42D5C67;
+	Tue, 25 Nov 2025 08:10:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764056813; cv=none; b=Z1ivz+BGa6DdAXXMkck4BvQ/orSDRRZzrI/fDd+mnZmtm5L9WU12aCZaGNY7YTcrQLOjH1KTVVLWjAyuvXvcpkwZvlabTIxUKZSVEL4t/dpJHlEsy+hpJQdqB2CTBVHpM+DVPGHhHH3DK3ZIP6C2R1s0O+0M09G1cd/6LnJWPv0=
+	t=1764058203; cv=none; b=B1gSyZEog5YHLYzG+3rvksjhhtg31cDECYnJLEkEeaW/vDuc3vncHnOmp05t6477CRnTlS768+lPYsb6ku5+PJhvXWd4gzOPyn1Los3Xk9Zk1gcbWwMcOyo4/FbTOZ1HyNLiO50XONcI8pk/m8c4hR2Q4lJDe9loDnoezLPRl6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764056813; c=relaxed/simple;
-	bh=K9z8/SihDEkfmDzEo5CX9O5OBfQeWK8JOc32pj8sytE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=f6TTpFwCFb3OrshcHow7aO1eMD3RAMWdvGC6VQRF3W2fG8NaLYKETW3pi0UAi36JKMdlZW1f+tViO6WZjTW3KbKZkdXn+pY0yzq3SQkVQrDwqkkGufO8Kj4weiI2XOaRf/ETskPCNpTFS1QTPhqGAr7NBkzPkb0qun+/NbFsRyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V2JKz5a1; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AOIaR9k027288;
-	Tue, 25 Nov 2025 07:46:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=b896sJ
-	ZZMc2+LtYePPEd5eL5buUnbpg4X5zsSQ8nhyU=; b=V2JKz5a1aqXlIdWGUdJwYX
-	uw4DlimcEcof/Oi6M6RtYYgXRU+yKT91UW0ZgTP59An1ZdTcHBg3IxFroqgiqEOO
-	RdO2sciHuoxatJSyFaMNEFt/+q7GRKkFzHmANFZfgfAYbzMUQFwXSI3enB0ZY+RC
-	mGWEc9DB0gack9NSPmVeo3cCJPFMv7fOUl0Fbi74QAQm6zEO88pf+MjXB7QCUk5y
-	xw6/nPK8/zOZRhIvYer+LxF95pQnUQm5t9lwiVz1XWnkE4yvMhq814iFd2duTtex
-	IeXNT5m6t3rQGoqgu6sB21PxDQEYJ9Dr08ZqgEDkcug8pHQ1pH2twYwuJbece+Cg
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak4phv4e4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Nov 2025 07:46:44 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AP5qFZZ000857;
-	Tue, 25 Nov 2025 07:46:32 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4akqvxtg8c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Nov 2025 07:46:32 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AP7kUg719464954
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 25 Nov 2025 07:46:31 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E5FEE58052;
-	Tue, 25 Nov 2025 07:46:30 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 43DDB58056;
-	Tue, 25 Nov 2025 07:46:24 +0000 (GMT)
-Received: from jarvis.ozlabs.ibm.com (unknown [9.150.29.34])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 25 Nov 2025 07:46:23 +0000 (GMT)
-From: Andrew Donnellan <ajd@linux.ibm.com>
-Date: Tue, 25 Nov 2025 18:45:54 +1100
-Subject: [PATCH 3/3] KVM: s390: Use generic VIRT_XFER_TO_GUEST_WORK
- functions
+	s=arc-20240116; t=1764058203; c=relaxed/simple;
+	bh=hwpDaKWSDHJ2P36LukNL+0xtVFpRjTz2H9WP7hWrNvk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hXV/QHwBd4GZunjJN8mjN6APs+XBVXvnZQ69x7VU51o6UvOd8ss2H3EgfkVIBs4HrZpTr+8WenqAQH6yP8SfmVqoEkR0PS7/8IeD7E61528S2Oxr1vPQTSeaT5UoVGnOyf8heSViSRZauc3tTJAuqFTuZRfM0V7ZQimb+ImMsLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ED1jUKaM; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764058201; x=1795594201;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=hwpDaKWSDHJ2P36LukNL+0xtVFpRjTz2H9WP7hWrNvk=;
+  b=ED1jUKaMDu9GD3iAILS/U8oNLxZt5+IrpKCnKRvsuDEy30eVHVHMjIto
+   wH+3TJ9DYzcxIx5KDFOVJKjIJbrBB6zI8U5bMCSr1MnqlRVZYRx8APDQB
+   wm6kU/FEPr7TMmmBasKvpRiQ3+7ijPFLpHSf1kjeum7O8wbGcmMVeG9si
+   SUGUAWcNl3pGS8kPeuBe3PQQYh7p2sAdfBwcjNrD1ZT7vyj6O92Kd5NNB
+   1UYLMpXvNgT8HNggZCc0Ay4p6RDpNdHsiMOVkKPyGnNN/BMhXGIHl9sWy
+   +8D4AqkQ50dyx3pkW+R4B/wbqa5AS9XOVD0NCr5SjqttZJrDKFEtYTmjb
+   Q==;
+X-CSE-ConnectionGUID: qUUXqi1lQJqnEHVd2LYu8A==
+X-CSE-MsgGUID: 4BaBUyq3S/evqmhTNDk56A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11623"; a="66024293"
+X-IronPort-AV: E=Sophos;i="6.20,224,1758610800"; 
+   d="scan'208";a="66024293"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 00:10:01 -0800
+X-CSE-ConnectionGUID: f1yzQwdhQkqM3HQS9JkInw==
+X-CSE-MsgGUID: sO+iD+y6R62C1FCxq50Rgg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,224,1758610800"; 
+   d="scan'208";a="192571594"
+Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 00:09:56 -0800
+Message-ID: <12144256-b71a-4331-8309-2e805dc120d1@linux.intel.com>
+Date: Tue, 25 Nov 2025 16:09:53 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251125-s390-kvm-xfer-to-guest-work-v1-3-091281a34611@linux.ibm.com>
-References: <20251125-s390-kvm-xfer-to-guest-work-v1-0-091281a34611@linux.ibm.com>
-In-Reply-To: <20251125-s390-kvm-xfer-to-guest-work-v1-0-091281a34611@linux.ibm.com>
-To: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Cc: Nicholas Miehlbradt <nicholas@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        David Hildenbrand <david@kernel.org>
-X-Mailer: b4 0.14.2
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIyMDAxNiBTYWx0ZWRfX00daICIbwvWJ
- V8ecsC7YYveyP4xYB7WWjYlaHAG1DIK8wf/KAiFs3F6obdP76S683to4ct5pG2MfRrEQ+k9RWSf
- UbODdeaQfIQZfReUxa0YhueaJqI7Scxt/YLvY7RtL51QyjMH1hBVMESpFJuS+g531n/yQN2jdXx
- xOVVW2/Sw13c59Cg49resFGugxsGBAo1iQsjyTiQOyZdwt75m+AHCC/pqH+4XbYDyLK7pl3fJod
- gkIOhTbh7XFdOmc5daK22N++DaogxF/IdoLswgG3QSODtvQrqtAFT04SJ4U0KkeLWbepj9HdmoR
- tstUCUztsx2Ka5dhA1Qb0QJ8Sb2DRJol4TtMTLxHMREI0cArYXCs2lBj9Rw8iy4gabBxUE3tpN9
- 5eCEnS4xT6XdMT2xoLOhzihjnhUTvg==
-X-Proofpoint-ORIG-GUID: h3-qIqpxB78b35zH-XeSy5HvJ96MUbzq
-X-Authority-Analysis: v=2.4 cv=CcYFJbrl c=1 sm=1 tr=0 ts=69255ee4 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=1US_Z202mYDpc0AvFX8A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: h3-qIqpxB78b35zH-XeSy5HvJ96MUbzq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-25_02,2025-11-24_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 clxscore=1015 adultscore=0 spamscore=0
- phishscore=0 priorityscore=1501 bulkscore=0 impostorscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
- definitions=main-2511220016
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 07/16] x86/virt/tdx: Add tdx_alloc/free_page() helpers
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: bp@alien8.de, chao.gao@intel.com, dave.hansen@intel.com,
+ isaku.yamahata@intel.com, kai.huang@intel.com, kas@kernel.org,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+ seanjc@google.com, tglx@linutronix.de, vannapurve@google.com,
+ x86@kernel.org, yan.y.zhao@intel.com, xiaoyao.li@intel.com,
+ binbin.wu@intel.com
+References: <20251121005125.417831-1-rick.p.edgecombe@intel.com>
+ <20251121005125.417831-8-rick.p.edgecombe@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20251121005125.417831-8-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Switch to using the generic infrastructure to check for and handle pending
-work before transitioning into guest mode.
 
-xfer_to_guest_mode_handle_work() does a few more things than the current
-code does when deciding whether or not to exit the __vcpu_run() loop. The
-exittime tests from kvm-unit-tests, in my tests, were +/-3% compared to
-before this series, which is within noise tolerance.
 
-Co-developed-by: Heiko Carstens <hca@linux.ibm.com>
-Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
-Signed-off-by: Andrew Donnellan <ajd@linux.ibm.com>
----
-The way I've implemented this, I do the check between vcpu_pre_run() and
-entering the guest, and bail out of the loop if
-kvm_xfer_to_guest_mode_handle_work() returns nonzero, without calling
-vcpu_post_run(). My impression is that this is safe, but it does mean
-there is an sie_enter vcpu event and trace event which isn't matched with
-corresponding exit events. Is this a problem?
----
- arch/s390/kvm/Kconfig    |  1 +
- arch/s390/kvm/kvm-s390.c | 25 ++++++++++++++++++-------
- arch/s390/kvm/vsie.c     | 17 ++++++++++++-----
- 3 files changed, 31 insertions(+), 12 deletions(-)
+On 11/21/2025 8:51 AM, Rick Edgecombe wrote:
+[...]
+>   
+> +/* Number PAMT pages to be provided to TDX module per 2M region of PA */
+           ^                                             ^
+           of                                           2MB
+> +static int tdx_dpamt_entry_pages(void)
+> +{
+> +	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
+> +		return 0;
+> +
+> +	return tdx_sysinfo.tdmr.pamt_4k_entry_size * PTRS_PER_PTE / PAGE_SIZE;
+> +}
+> +
+> +/*
+> + * The TDX spec treats the registers like an array, as they are ordered
+> + * in the struct. The array size is limited by the number or registers,
+> + * so define the max size it could be for worst case allocations and sanity
+> + * checking.
+> + */
+> +#define MAX_TDX_ARG_SIZE(reg) (sizeof(struct tdx_module_args) - \
+> +			       offsetof(struct tdx_module_args, reg))
 
-diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
-index cae908d645501ef7eb4edbe87b8431f6499370a4..0ca9d6587243c98034d086c0ebd4ef085e504faf 100644
---- a/arch/s390/kvm/Kconfig
-+++ b/arch/s390/kvm/Kconfig
-@@ -30,6 +30,7 @@ config KVM
- 	select HAVE_KVM_NO_POLL
- 	select KVM_VFIO
- 	select MMU_NOTIFIER
-+	select VIRT_XFER_TO_GUEST_WORK
- 	help
- 	  Support hosting paravirtualized guest machines using the SIE
- 	  virtualization capability on the mainframe. This should work
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 3cad08662b3d80aaf6f5f8891fc08b383c3c44d4..759158695bcdbb7c96c9708b2c7529d6e4484304 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -14,6 +14,7 @@
- #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
- 
- #include <linux/compiler.h>
-+#include <linux/entry-virt.h>
- #include <linux/export.h>
- #include <linux/err.h>
- #include <linux/fs.h>
-@@ -4788,9 +4789,6 @@ static int vcpu_pre_run(struct kvm_vcpu *vcpu)
- 	vcpu->arch.sie_block->gg14 = vcpu->run->s.regs.gprs[14];
- 	vcpu->arch.sie_block->gg15 = vcpu->run->s.regs.gprs[15];
- 
--	if (need_resched())
--		schedule();
--
- 	if (!kvm_is_ucontrol(vcpu->kvm)) {
- 		rc = kvm_s390_deliver_pending_interrupts(vcpu);
- 		if (rc || guestdbg_exit_pending(vcpu))
-@@ -5095,12 +5093,12 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	kvm_vcpu_srcu_read_lock(vcpu);
- 
--	do {
-+	while (true) {
- 		rc = vcpu_pre_run(vcpu);
-+		kvm_vcpu_srcu_read_unlock(vcpu);
- 		if (rc || guestdbg_exit_pending(vcpu))
- 			break;
- 
--		kvm_vcpu_srcu_read_unlock(vcpu);
- 		/*
- 		 * As PF_VCPU will be used in fault handler, between
- 		 * guest_timing_enter_irqoff and guest_timing_exit_irqoff
-@@ -5113,6 +5111,16 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
- 		}
- 
- 		local_irq_disable();
-+
-+		xfer_to_guest_mode_prepare();
-+		if (xfer_to_guest_mode_work_pending()) {
-+			local_irq_enable();
-+			rc = kvm_xfer_to_guest_mode_handle_work(vcpu);
-+			if (rc)
-+				break;
-+			local_irq_disable();
-+		}
-+
- 		guest_timing_enter_irqoff();
- 		__disable_cpu_timer_accounting(vcpu);
- 
-@@ -5142,9 +5150,12 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
- 		kvm_vcpu_srcu_read_lock(vcpu);
- 
- 		rc = vcpu_post_run(vcpu, exit_reason);
--	} while (!signal_pending(current) && !guestdbg_exit_pending(vcpu) && !rc);
-+		if (rc || guestdbg_exit_pending(vcpu)) {
-+			kvm_vcpu_srcu_read_unlock(vcpu);
-+			break;
-+		}
-+	};
- 
--	kvm_vcpu_srcu_read_unlock(vcpu);
- 	return rc;
- }
- 
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index 347268f89f2f186bea623a3adff7376cabc305b2..3a5219d0587343c2d0ea17adff356ad3284a5f33 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -1181,11 +1181,21 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 	barrier();
- 	if (!kvm_s390_vcpu_sie_inhibited(vcpu)) {
- 		local_irq_disable();
-+		xfer_to_guest_mode_prepare();
-+		if (xfer_to_guest_mode_work_pending()) {
-+			local_irq_enable();
-+			rc = kvm_xfer_to_guest_mode_handle_work(vcpu);
-+			if (rc)
-+				goto skip_sie;
-+			local_irq_disable();
-+		}
- 		guest_timing_enter_irqoff();
- 		rc = kvm_s390_enter_exit_sie(scb_s, vcpu->run->s.regs.gprs, vsie_page->gmap->asce);
- 		guest_timing_exit_irqoff();
- 		local_irq_enable();
- 	}
-+
-+skip_sie:
- 	barrier();
- 	vcpu->arch.sie_block->prog0c &= ~PROG_IN_SIE;
- 
-@@ -1345,13 +1355,11 @@ static int vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 		 * but rewind the PSW to re-enter SIE once that's completed
- 		 * instead of passing a "no action" intercept to the guest.
- 		 */
--		if (signal_pending(current) ||
--		    kvm_s390_vcpu_has_irq(vcpu, 0) ||
-+		if (kvm_s390_vcpu_has_irq(vcpu, 0) ||
- 		    kvm_s390_vcpu_sie_inhibited(vcpu)) {
- 			kvm_s390_rewind_psw(vcpu, 4);
- 			break;
- 		}
--		cond_resched();
- 	}
- 
- 	if (rc == -EFAULT) {
-@@ -1483,8 +1491,7 @@ int kvm_s390_handle_vsie(struct kvm_vcpu *vcpu)
- 	if (unlikely(scb_addr & 0x1ffUL))
- 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
- 
--	if (signal_pending(current) || kvm_s390_vcpu_has_irq(vcpu, 0) ||
--	    kvm_s390_vcpu_sie_inhibited(vcpu)) {
-+	if (kvm_s390_vcpu_has_irq(vcpu, 0) || kvm_s390_vcpu_sie_inhibited(vcpu)) {
- 		kvm_s390_rewind_psw(vcpu, 4);
- 		return 0;
- 	}
+This should be the maximum number of registers could be used to pass the
+addresses of the pages (or other information), it needs to be divided by sizeof(u64).
 
--- 
-2.52.0
+Also, "SIZE" in the name could be confusing.
 
+> +#define TDX_ARG_INDEX(reg) (offsetof(struct tdx_module_args, reg) / \
+> +			    sizeof(u64))
+> +
+> +/*
+> + * Treat struct the registers like an array that starts at RDX, per
+> + * TDX spec. Do some sanitychecks, and return an indexable type.
+sanitychecks -> sanity checks
+
+> + */
+[...]
+> +/* Serializes adding/removing PAMT memory */
+> +static DEFINE_SPINLOCK(pamt_lock);
+> +
+> +/* Bump PAMT refcount for the given page and allocate PAMT memory if needed */
+> +int tdx_pamt_get(struct page *page)
+> +{
+> +	u64 pamt_pa_array[MAX_TDX_ARG_SIZE(rdx)];
+> +	atomic_t *pamt_refcount;
+> +	u64 tdx_status;
+> +	int ret;
+> +
+> +	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
+> +		return 0;
+> +
+> +	ret = alloc_pamt_array(pamt_pa_array);
+> +	if (ret)
+> +		goto out_free;
+> +
+> +	pamt_refcount = tdx_find_pamt_refcount(page_to_pfn(page));
+> +
+> +	scoped_guard(spinlock, &pamt_lock) {
+> +		/*
+> +		 * If the pamt page is already added (i.e. refcount >= 1),
+> +		 * then just increment the refcount.
+> +		 */
+> +		if (atomic_read(pamt_refcount)) {
+> +			atomic_inc(pamt_refcount);
+
+So far, all atomic operations are inside the spinlock.
+May be better to add some info in the change log that atomic is needed due to
+the optimization in the later patch?
+
+> +			goto out_free;
+> +		}
+> +
+> +		/* Try to add the pamt page and take the refcount 0->1. */
+> +
+> +		tdx_status = tdh_phymem_pamt_add(page, pamt_pa_array);
+> +		if (!IS_TDX_SUCCESS(tdx_status)) {
+> +			pr_err("TDH_PHYMEM_PAMT_ADD failed: %#llx\n", tdx_status);
+
+Can use pr_tdx_error().
+
+Aslo, so for in this patch, when this SEAMCALL failed, does it indicate a bug?
+
+> +			goto out_free;
+> +		}
+> +
+> +		atomic_inc(pamt_refcount);
+> +	}
+> +
+> +	return ret;
+
+Maybe just return 0 here since all error paths must be directed to out_free.
+
+> +out_free:
+> +	/*
+> +	 * pamt_pa_array is populated or zeroed up to tdx_dpamt_entry_pages()
+> +	 * above. free_pamt_array() can handle either case.
+> +	 */
+> +	free_pamt_array(pamt_pa_array);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_pamt_get);
+> +
+>
+[...]
 
