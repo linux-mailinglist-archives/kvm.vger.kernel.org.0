@@ -1,136 +1,187 @@
-Return-Path: <kvm+bounces-64490-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64491-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AAEAC849EE
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 12:04:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAA39C84B16
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 12:17:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59EB83AC243
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 11:04:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C3403A9EC2
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 11:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A63F315D3C;
-	Tue, 25 Nov 2025 11:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89443314D16;
+	Tue, 25 Nov 2025 11:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GlfFe7j5";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JnNmbrh9"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="siNE5s4f"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7351C314B9D
-	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 11:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005E929B795;
+	Tue, 25 Nov 2025 11:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764068644; cv=none; b=KbWiB4PIOoopvfN+fZhpN/elhT3sUqFns3Aj/qnT9erNFPmAR8QFt9XNWi8VEw2SoNsbbQPjBE3UXohAs2k8+Ozi8Jc5eb2kJ7S9tFDa4SRGUbVKsaReVtbqhBSsJUo53KFQdZ8IZ08DbnQIhYeP46LMssK7xZm99UCax0QVrKA=
+	t=1764069411; cv=none; b=U8H0sjFUfMrc21Idk56RsJ9zHIg34s5A7SuEcy/TbWW/7/WAWn/Y57Bfdi/s02ZsyJXO+XctLIKrXCCSQoSDoNGe0Q9foXLDBZYE0zE8otwubMULklQ0qX/R5m9uIdKuNRpxRL9RA6k2GPgTCRpI8wegvmQOKvGNU1WCtkf4WRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764068644; c=relaxed/simple;
-	bh=iXKpiuNQlb6X68ZweO+BOUjOZ+bKXmHmii0jmBG3APg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Orhyewt6BIBTD94tBQMjBll/KV0RPJT+Mo6yp6cIuv7u6Hzt7n8svM+3Q1/JsoydmzUqDnRvKRG/mO3DCkz9TKw+XR+W5slcSuLmQ6zE2wRMrfGqXsMRf2qOE5Adu/adCwMRj7w+dieNrpS/hSwJizUQyjfowJxQk8jAnfjBawY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GlfFe7j5; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JnNmbrh9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764068641;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2jX8nyV/wRTc5eESPtXjGF1WJi21h6fkrbY07+2SJ7E=;
-	b=GlfFe7j5djGvVcy5VW0Sui70GxQPjxkbErEyTM+pumYgABPILRXlWSeBeoHN2gJKQGAa+C
-	4vwIBqPBMo2s8VRLvCrqeTx4z1Lkc7U8pjvqvXTOSXdgylAuuRRKyEmdp2hsQIDIudkel/
-	CtKD5XVscwEXji6USgdHSaeDS1ebf4c=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-141-QQuhdzWVPo2UMDfy1WXz0g-1; Tue, 25 Nov 2025 06:04:00 -0500
-X-MC-Unique: QQuhdzWVPo2UMDfy1WXz0g-1
-X-Mimecast-MFC-AGG-ID: QQuhdzWVPo2UMDfy1WXz0g_1764068639
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42b2ffbba05so2678670f8f.0
-        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 03:03:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764068639; x=1764673439; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2jX8nyV/wRTc5eESPtXjGF1WJi21h6fkrbY07+2SJ7E=;
-        b=JnNmbrh93ftx8BdFQsVOSeTNa3xDgm4vsIofeBTmYMVNOko/s/WTU8FsMaI9+K9sl5
-         jYrmttgbG/dyUBGsAMOL1h43rWiBQ6DXytgaKs/dbf82kNClvGSWO8LHfZKMoWjlT3xv
-         peBf+2K670Uw6eJLX6uw8rnHxF8k6v+TAs1VJrqJ+JX6+4Vtysv8Ex/fM59ceg2Q1Mga
-         cnENbzexJP1n4DGSOWEJyjLycj4PJg6YT7Qsn0Hr7M1c/OZbfscCeeU2V2XF3ALyfiZn
-         KNhqaxMaOxYORsGr1yV6YcMPzW9jf9TVIohkllshsm8Rnuhl18oR/PTVUi/xW66uPtAc
-         EebQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764068639; x=1764673439;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2jX8nyV/wRTc5eESPtXjGF1WJi21h6fkrbY07+2SJ7E=;
-        b=Y6vhbeYqw0AdzfMzREnoJAiySBfBTtdDeR6sHI3j4sDNpjEYf9n9fp9I/Et692PsI2
-         OHFxkbDcF230cd4qxokURayy5YJRG68utFXaVtX/UH3KCCszFr/kyzN9f5VZEDzBrvvJ
-         ch79De9Kn0F2qvQBX9FSkMIgd5NIKK2fgpYSfbIy98Pxq499TLi0nfbelBKwIYcfSqin
-         Y5acvKqa3XF8Vsyw34k7z01Fv7Hgy8xz26ocuYcyEotMjq7uxvguuXFbm/buLKZ7Baro
-         qDX7zvVF4K4rehglLNeP+xDAf1dNc5rHZheUuqB6/Eq1dA+FB4kXxKMzUxTudwEyIw2l
-         7SZQ==
-X-Gm-Message-State: AOJu0YzS8GpLoU5qH4bGP/geKw3FP7WKlSx0TIBEsI3/n2lYx7XyH6Lg
-	3uc4homPjuCK8j2j8IBaDFh9+yX3wOK7Z2hoTHGrmFNkxDMt3fh9AIjjTF+jTlnWjT4K13VAB/t
-	EVJwS1ialU0mxYRG9XLaycGzXnEgwTSPNVIIxYbJbPFydyOBtWvrObA==
-X-Gm-Gg: ASbGncueKTQjD08NCC08J5roDbsH+w0DgfgEY50WM/VLINRpSV+eLYq+ueD83sY3OH/
-	6XYsAEn3NVcq4HinddiNRme5NXW1gP+TWjSLRw6bB38oNeq5ioc38Ctc5tiJqTGdW1iKM0y9f1T
-	WLYPebueMTmV42/7BmuYOoay5A+xiwJYbneK9V73pYOX5jxxcms04SPUygQxFQRKB1wTKY5epaH
-	YOrrr/lGJBXUgcnEqAfSS07gECNswDtgTmSJsdSZCK4o+KLUpkZF314VQTvT0purG+2DxF69cVa
-	+AMggZLKXYPJipSO2HLAfhpGkaAL2F4BKelRYrAPw0DrZwfrMABtQYUadqALGRu5wkeXL0LKh6y
-	6Y2a+gOZWi3Ckig==
-X-Received: by 2002:a05:600c:1547:b0:46f:d682:3c3d with SMTP id 5b1f17b1804b1-47904adff1cmr19046355e9.13.1764068638808;
-        Tue, 25 Nov 2025 03:03:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFoT6Pfw7CHSt37IswgwvDmurDiD6Zw/XOCayfoPPARGoD0QI10X//Yl97sd3GIIuQ+9cHtCg==
-X-Received: by 2002:a05:600c:1547:b0:46f:d682:3c3d with SMTP id 5b1f17b1804b1-47904adff1cmr19046025e9.13.1764068638268;
-        Tue, 25 Nov 2025 03:03:58 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.231])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf22ea00sm246531145e9.14.2025.11.25.03.03.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Nov 2025 03:03:55 -0800 (PST)
-Message-ID: <323a8b07-6df3-4cc4-960a-994649fb03e3@redhat.com>
-Date: Tue, 25 Nov 2025 12:03:54 +0100
+	s=arc-20240116; t=1764069411; c=relaxed/simple;
+	bh=IWawuzqG+2NV1QobnSFkgHOEywGckk9oKebW7gd1Qmw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AjDND7nkJOpcc+D9nWtw16xbp1M1pRzrS+ErVi+qUecGSgRX1YstcEMp45Bj0I0/5g3RoricKrmKTUTWijGJ097XlmoV+DkxKY6qs0RWUcXRAzhf88Pf9UR1r32UwqZpM6cn6jaXXNzg4fk8i4XySN+jhvZKPa2JxvF8cUMGK/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=siNE5s4f; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AP80ZuG003341;
+	Tue, 25 Nov 2025 11:16:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=yBK0rSdQ+Tmt9dIIgOSx96whnlK9kL
+	+IoST1r0RrPwI=; b=siNE5s4fvC4tpRqK7AwuvA3bWYcedhYm2iX/oEvVKMe8ys
+	FRhlW6a2rIttieRNHkWI5lgVLr/csLiR9grcsDr1n8fXPJg09WoxK3FYb9DGc0/n
+	sPizbVQFocFHRYZPcifoPuTGWSJzV+9lGsC/fLbl0uUyDazYWKU/nWWvdHKWIY3M
+	44N3vAgHhrS9Inffz/dLRTgQDfrb/VAuVsnpfgcIOq21I62mAzw5q+IGEkJmFWOR
+	fjtE1NvKBYQkXZxMO1ACOpy1CbOzsWKKynZFYyRVeqs1DEfXu8gle/IuO2otL3jJ
+	kyXttyQC5fQcUNuKmcHn9RwFX0R0bNX5iJnxQX8Q==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak4u1ve7u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Nov 2025 11:16:25 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5APAYHlq019023;
+	Tue, 25 Nov 2025 11:16:24 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aksqjk415-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Nov 2025 11:16:24 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5APBGKIx30998976
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 25 Nov 2025 11:16:20 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 814BF20043;
+	Tue, 25 Nov 2025 11:16:20 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 074DF20040;
+	Tue, 25 Nov 2025 11:16:20 +0000 (GMT)
+Received: from osiris (unknown [9.155.211.25])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 25 Nov 2025 11:16:19 +0000 (GMT)
+Date: Tue, 25 Nov 2025 12:16:18 +0100
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Andrew Donnellan <ajd@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Nicholas Miehlbradt <nicholas@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        David Hildenbrand <david@kernel.org>
+Subject: Re: [PATCH 3/3] KVM: s390: Use generic VIRT_XFER_TO_GUEST_WORK
+ functions
+Message-ID: <20251125111618.10410Fa0-hca@linux.ibm.com>
+References: <20251125-s390-kvm-xfer-to-guest-work-v1-0-091281a34611@linux.ibm.com>
+ <20251125-s390-kvm-xfer-to-guest-work-v1-3-091281a34611@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] virtio_net: enhance wake/stop tx queue statistics
- accounting
-To: liming.wu@jaguarmicro.com, "Michael S . Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
- netdev@vger.kernel.org, angus.chen@jaguarmicro.com
-References: <20251120015320.1418-1-liming.wu@jaguarmicro.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251120015320.1418-1-liming.wu@jaguarmicro.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251125-s390-kvm-xfer-to-guest-work-v1-3-091281a34611@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIyMDAyMSBTYWx0ZWRfX7tNP2tBxAgd7
+ QjZ/cl9mM1HrRM01HDDVMGWXX2gFqWJ5ICVG+Hy2ioGnXscq7uu7HRl81/GfvLMd5pMpASzqnb7
+ I28erhp8dqNeCQzliIjpXUmIfx+Cc0s9HSfYjkKGaTIWutqJoWYWjC7M+gDYdra5QxRfdsQsUHh
+ k1dxCWL9H9QTiaZyqUszlz1xjBWrzOOL+yO3U9pAsX9jY9hWh5Qcrm23QHBXiM3daThHWBC0/ME
+ XScU/QXVtW2MQNETWZSoEqjegWF+F14ujHKl+YU5i3jSSPMzhLmhJ2Qb54c9WZrYbvU1K0DRo7P
+ hlxv9tlrdA6xFrs/efAizM8r8RaC0d3anwmt4Phhg640/gp/QM22GoV8xFkDgQYii6QUnUsiZTa
+ vCmmh5Sw9SWnop+dJKsemjeWF8AYPA==
+X-Authority-Analysis: v=2.4 cv=SuidKfO0 c=1 sm=1 tr=0 ts=69259009 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Ldvqa60LikrQ3swS9-UA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: ANGSFDJNVT9Sw5sXetchXIiaviJvshW7
+X-Proofpoint-GUID: ANGSFDJNVT9Sw5sXetchXIiaviJvshW7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-25_02,2025-11-24_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 lowpriorityscore=0 clxscore=1011 impostorscore=0
+ malwarescore=0 spamscore=0 suspectscore=0 phishscore=0 adultscore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2511220021
 
-On 11/20/25 2:53 AM, liming.wu@jaguarmicro.com wrote:
-> @@ -3521,6 +3526,9 @@ static void virtnet_tx_pause(struct virtnet_info *vi, struct send_queue *sq)
->  
->  	/* Prevent the upper layer from trying to send packets. */
->  	netif_stop_subqueue(vi->dev, qindex);
-> +	u64_stats_update_begin(&sq->stats.syncp);
-> +	u64_stats_inc(&sq->stats.stop);
-> +	u64_stats_update_end(&sq->stats.syncp);
+On Tue, Nov 25, 2025 at 06:45:54PM +1100, Andrew Donnellan wrote:
+> Switch to using the generic infrastructure to check for and handle pending
+> work before transitioning into guest mode.
+> 
+> xfer_to_guest_mode_handle_work() does a few more things than the current
+> code does when deciding whether or not to exit the __vcpu_run() loop. The
+> exittime tests from kvm-unit-tests, in my tests, were +/-3% compared to
+> before this series, which is within noise tolerance.
 
-Minor non blocking nit: possibly use an helper even for this increment.
+...
 
-@Michael, Jason, Xuan, Eugenio: looks good?
+>  		local_irq_disable();
+> +
+> +		xfer_to_guest_mode_prepare();
+> +		if (xfer_to_guest_mode_work_pending()) {
+> +			local_irq_enable();
+> +			rc = kvm_xfer_to_guest_mode_handle_work(vcpu);
+> +			if (rc)
+> +				break;
+> +			local_irq_disable();
+> +		}
+> +
+>  		guest_timing_enter_irqoff();
+>  		__disable_cpu_timer_accounting(vcpu);
 
-Thanks,
+This looks racy: kvm_xfer_to_guest_mode_handle_work() returns with
+interrupts enabled and before interrupts are disabled again more work
+might have been become pending. But that is ignored and guest state is
+entered instead. Why not change the above simply to something like
+this to avoid this:
 
-Paolo
+again:
+	local_irq_disable();
+		xfer_to_guest_mode_prepare();
+		if (xfer_to_guest_mode_work_pending()) {
+			local_irq_enable();
+			rc = kvm_xfer_to_guest_mode_handle_work(vcpu);
+			if (rc)
+				break;
+			goto again;
+		}
 
+		guest_timing_enter_irqoff();
+		__disable_cpu_timer_accounting(vcpu);
+
+But maybe I'm missing something?
+
+> @@ -1181,11 +1181,21 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>  	barrier();
+>  	if (!kvm_s390_vcpu_sie_inhibited(vcpu)) {
+>  		local_irq_disable();
+> +		xfer_to_guest_mode_prepare();
+> +		if (xfer_to_guest_mode_work_pending()) {
+> +			local_irq_enable();
+> +			rc = kvm_xfer_to_guest_mode_handle_work(vcpu);
+> +			if (rc)
+> +				goto skip_sie;
+> +			local_irq_disable();
+> +		}
+>  		guest_timing_enter_irqoff();
+>  		rc = kvm_s390_enter_exit_sie(scb_s, vcpu->run->s.regs.gprs, vsie_page->gmap->asce);
+
+Same here.
 
