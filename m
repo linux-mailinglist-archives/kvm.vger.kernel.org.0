@@ -1,40 +1,50 @@
-Return-Path: <kvm+bounces-64515-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64516-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0C8AC85DF7
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 17:08:03 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20314C85E6C
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 17:14:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 27124350D86
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 16:08:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5727E4EA367
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 16:14:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE0C225779;
-	Tue, 25 Nov 2025 16:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175FE267AF6;
+	Tue, 25 Nov 2025 16:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="ebIH6JJ8"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B0F20A5F3
-	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 16:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A436223E25B;
+	Tue, 25 Nov 2025 16:12:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764086876; cv=none; b=glo7vZih+FP1kPXhs32F6R1iXomZBUzlEwtHwbIc33/FYPdHzvymBCdFFNmzvwUKQH3zl2Fv2UBt0gw/3lfzM0W9a4xHbsis6MyJB5V55W5OfpgEx6k4edIpvMkXg0x42E9tJY3VzHYBYnSm2tr60XZUSCxHAfrGPOdD38/3dF4=
+	t=1764087173; cv=none; b=OA849cmkfX7NQHYGiXYTFY608kpF6hcjCViH3kIDgsM5VznCIeYYPkj4HAq5TqmYM6H/LRj4xPBTieVE+AC19WQbqLeueHNec8NRkfGabIsgulMCtqFm834G8U+UKJqmsdD0z8UsonqyAWozkVuUzpFZdPB+UQtqv0TuQQP7rGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764086876; c=relaxed/simple;
-	bh=uXZEsbRH4ootT51fZGGwUeSG599PUM1FDESs9g5qi+8=;
+	s=arc-20240116; t=1764087173; c=relaxed/simple;
+	bh=ZGjxfZY1T4WtOL0dofyXFExRpRAOlIYSMFqncdvu0is=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e/S/gOhAyXWI2qxU9UFauChcK9NNytQ9twX+BqTwSJQgQ7UNdk7QkPBr/2ehdgzhklHamxN8mQb/4QsxbTAKMRkV6649bXQI2E4QLC5jt8xpewu/IwUExcwc/vADxefm9MHVVJ3zx+wdEWyMqXpxA0Cw3KkEMx0+uy2nOqEewrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 36089168F;
-	Tue, 25 Nov 2025 08:07:41 -0800 (PST)
-Received: from [10.57.74.181] (unknown [10.57.74.181])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F5C83F6A8;
-	Tue, 25 Nov 2025 08:07:47 -0800 (PST)
-Message-ID: <39801881-0e48-4daf-a195-4af0603a5bf9@arm.com>
-Date: Tue, 25 Nov 2025 16:07:45 +0000
+	 In-Reply-To:Content-Type; b=i/+/Y10rNfNUCtJVstyH+LP2JxyuYmGnGgJi95d36GvUSJ53cfMF0H1Ute+cqsItUX/Y7AThi5CYoSttO3D+OI/DuJDL2sazojmxQVWigdCVXA6gI10j4nm3Ejy70LsSaMEQoTKuizWBa99hsodS+nk9+ALesvuV0IzyiD4UfME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=ebIH6JJ8; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.248] ([129.217.186.248])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5APGCZCE009708
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 25 Nov 2025 17:12:36 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1764087156;
+	bh=ZGjxfZY1T4WtOL0dofyXFExRpRAOlIYSMFqncdvu0is=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=ebIH6JJ8Kw29xdqIAjIYB7wz6imBtZ6DEcQ9GdgbKlhikr6uFCLzwIKoDaM5Hgccs
+	 btqPaCkabwVfS5mCfG9dujRcPYNqIm8ytOQLC3lF6rphlsrLEqeMz9MA5OxaZxfHFj
+	 GJ8ajOFDQxzk+qwAUrEMT2cx0ORfQ+wJKsjFj4/w=
+Message-ID: <ce371d19-e69a-4d8e-a9a0-f3e20439a094@tu-dortmund.de>
+Date: Tue, 25 Nov 2025 17:12:35 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,69 +52,106 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: arm64: Convert ICH_HCR_EL2_TDIR cap to
- EARLY_LOCAL_CPU_FEATURE
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>, Oliver Upton <oupton@kernel.org>,
- Zenghui Yu <yuzenghui@huawei.com>
-References: <20251125160144.1086511-1-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20251125160144.1086511-1-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [PATCH net-next v6 2/8] ptr_ring: add helper to check if consume
+ created space
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+        jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
+ <20251120152914.1127975-3-simon.schippers@tu-dortmund.de>
+ <20251125095650-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20251125095650-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 25/11/2025 16:01, Marc Zyngier wrote:
-> Suzuki notices that making the ICH_HCR_EL2_TDIR capability a system
-> one isn't a very good idea, should we end-up with CPUs that have
-> asymmetric TDIR support (somehow unlikely, but you never know what
-> level of stupidity vendors are up to). For this hypothetical setup,
-> making this an "EARLY_LOCAL_CPU_FEATURE" is a much better option.
+On 11/25/25 16:01, Michael S. Tsirkin wrote:
+> On Thu, Nov 20, 2025 at 04:29:07PM +0100, Simon Schippers wrote:
+>> Add __ptr_ring_consume_created_space() to check whether the previous
+>> __ptr_ring_consume() call successfully consumed an element and created
+>> space in the ring buffer. This enables callers to conditionally notify
+>> producers when space becomes available.
+>>
+>> The function is only valid immediately after a single consume operation
+>> and should not be used after calling __ptr_ring_consume_batched().
+>>
+>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Co-developed by: Jon Kohler <jon@nutanix.com>
+>> Signed-off-by: Jon Kohler <jon@nutanix.com>
+>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>> ---
+>>  include/linux/ptr_ring.h | 17 +++++++++++++++++
+>>  1 file changed, 17 insertions(+)
+>>
+>> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+>> index da141cc8b075..76d6840b45a3 100644
+>> --- a/include/linux/ptr_ring.h
+>> +++ b/include/linux/ptr_ring.h
+>> @@ -453,6 +453,23 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
+>>  	return ret;
+>>  }
+>>  
+>> +/*
+>> + * Check if the previous consume operation created space
 > 
-> This is actually consistent with what we already do with GICv5
-> legacy interface, so flip the capability over.
+> space?
 > 
-> Reported-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Fixes: 2a28810cbb8b2 ("KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping")
-> Link: https://lore.kerenl.org/r/5df713d4-8b79-4456-8fd1-707ca89a61b6@arm.com
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-> ---
->   arch/arm64/kernel/cpufeature.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+> what does this mean?
 > 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 5de51cb1b8fe2..75fb9a0efcc8e 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2325,14 +2325,14 @@ static bool can_trap_icv_dir_el1(const struct arm64_cpu_capabilities *entry,
->   
->   	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV3_CPUIF);
->   	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV5_LEGACY);
-> -	if (!cpus_have_cap(ARM64_HAS_GICV3_CPUIF) &&
-> +	if (!this_cpu_has_cap(ARM64_HAS_GICV3_CPUIF) &&
->   	    !is_midr_in_range_list(has_vgic_v3))
->   		return false;
->   
->   	if (!is_hyp_mode_available())
->   		return false;
->   
-> -	if (cpus_have_cap(ARM64_HAS_GICV5_LEGACY))
-> +	if (this_cpu_has_cap(ARM64_HAS_GICV5_LEGACY))
->   		return true;
->   
->   	if (is_kernel_in_hyp_mode())
-> @@ -2863,7 +2863,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->   		 */
->   		.desc = "ICV_DIR_EL1 trapping",
->   		.capability = ARM64_HAS_ICH_HCR_EL2_TDIR,
-> -		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.type = ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE,
->   		.matches = can_trap_icv_dir_el1,
->   	},
->   #ifdef CONFIG_ARM64_E0PD
+>> + *
+>> + * Returns true if the last call to __ptr_ring_consume() has created
+>> + * space in the ring buffer (i.e., an element was consumed).
+>> + *
+>> + * Note: This function is only valid immediately after a single call to
+>> + * __ptr_ring_consume(). If multiple calls to ptr_ring_consume*() have
+>> + * been made, this check must be performed after each call individually.
+>> + * Likewise, do not use this function after calling
+>> + * __ptr_ring_consume_batched().
+> 
+> API-wise, it is a really weird function.  So is 
+> 
+> {
+> 	p = __ptr_ring_consume
+> 
+> 	return !!p
+> }
+> 
+> guaranteed to be equivalent to 
+> 
+> {
+> 	p = __ptr_ring_consume
+> 
+> 	return !!__ptr_ring_consume_created_space
+> }
 
+I am a bit confused. You were the one recommending this function to me,
+see [1].
+
+Maybe the comments need rework here, but the function should be fine.
+
+Thanks
+
+[1] Link: https://lore.kernel.org/netdev/20250922221553.47802-1-simon.schippers@tu-dortmund.de/T/#mb722e8ae4ceb5df24f74305c6145561883d4e987
+
+> 
+> 
+> 
+>> + */
+>> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r)
+>> +{
+>> +	return r->consumer_tail >= r->consumer_head;
+>> +}
+>> +
+>>  /* Cast to structure type and call a function without discarding from FIFO.
+>>   * Function must return a value.
+>>   * Callers must take consumer_lock.
+>> -- 
+>> 2.43.0
+> 
 
