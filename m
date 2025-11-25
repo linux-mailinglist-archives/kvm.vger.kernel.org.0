@@ -1,337 +1,166 @@
-Return-Path: <kvm+bounces-64450-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64451-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A9BCC83082
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 02:35:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 739B1C830A6
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 02:48:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D234F344E64
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 01:35:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AE0E54E3497
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 01:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 553B6279918;
-	Tue, 25 Nov 2025 01:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432511A275;
+	Tue, 25 Nov 2025 01:48:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZN3FzWFu";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="U5N3bUgO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IHOn9LvZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664501E5B7A
-	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 01:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8BBE1BC4E
+	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 01:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764034507; cv=none; b=u012Y1Q/gGIxGM0qZJc58O0PNAhZTi4KGp39QkjehZ5LbgFJgjTHhwWLStoVMNLn5dqqMi0toUUwuBSBlVoMOs+VHxrbTO8ZpxiOJth/9yCGNqv1I3BOyDPTjcfpOdM/eR/wQlfasojxGuIKI9/dJg6fFvnjg7Dj8x/JFCXWuiE=
+	t=1764035317; cv=none; b=qmG1auWegfnp3taLlcfKCNEdccJl42zuEqK2HfPzmBxmW9g+4L3FgZMwzS7cOxG34E5WvJl2l3lKdv8OOa93Befs0h0azN4ptqByI4geLVmM9URKuRJXyHUkHPD+/OhX98toERlvMacUXhybOkSWjJ8B1QfOIf15jf2vYD0SB08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764034507; c=relaxed/simple;
-	bh=ckot/qGzEsr3y/bUI/Jn66JGbROGHjRMWN0c36mSTIs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cn/oRCi8zIdrW5RN4qAwtoGGlDB+kjOzpvM/ndQDUyBEZil1Dg0uL+ddv7p+3fAeWaOQVA0aAUqIfNysUxDu4ZKff4Ou3wyDYmQspmSd7DQahmVWwDQfIvCd6p/wlNU7O5+dAXPjjM1wfaef2dlQC6MTidgDkE95PV5TmkJoHIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZN3FzWFu; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=U5N3bUgO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764034504;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9kEJDvqjrIdXsU1IPiVaYED9aR2EYcU0zBZ2650wkuI=;
-	b=ZN3FzWFuuss4upTwa7EOWZa2xzhFIBGMCe+y8uzghxCRk+UNSP9NTmpdtB1BWFotIMANmQ
-	GL+hmAkfQLmKIZe6YUkwqK+3x9UfGV2WGLzmDeGW5d0d6Q/jRT085yfqSoV7QWo9NdPYSX
-	VxLUgjOGeUx6gcAotZR2MT8KcmHb44o=
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
- [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-150-77I5eYtEMJeND0dN3aZkXA-1; Mon, 24 Nov 2025 20:35:02 -0500
-X-MC-Unique: 77I5eYtEMJeND0dN3aZkXA-1
-X-Mimecast-MFC-AGG-ID: 77I5eYtEMJeND0dN3aZkXA_1764034502
-Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-5dbcb1740daso1745195137.2
-        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 17:35:02 -0800 (PST)
+	s=arc-20240116; t=1764035317; c=relaxed/simple;
+	bh=lFQY39DQ0sZ3/1CBs/5a9Gc/Z7HqjZGV9ub0E6byxfg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Content-Type; b=fzEu4jvS9IO95ErzrSLLZMD+6YnmIy9jWIYR1QIoWarRAI+m/6b/WWycqttKA7Ld52uEiZNMm0TaVpvwj3X7IWMMVsmSPH17aECWh9odI/71SgcDHSmgZwBUrSRlEODYiIe5AuTuMwCyCiU5sUEt7dYNgjZGVdvO373zGdXA8NA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IHOn9LvZ; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340ad9349b3so10240273a91.1
+        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 17:48:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764034502; x=1764639302; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9kEJDvqjrIdXsU1IPiVaYED9aR2EYcU0zBZ2650wkuI=;
-        b=U5N3bUgOlPYriTEJV5kLypc5R7bY3NNUrIwSxKXXjAHjmOIKTjGb1+CpXfN14mo+b8
-         PeHjQJx30HqgVMbsKPaD3HcHBkgTC4CzhypudW72fGg9Bhpy0LjoNXC2wQoP4QtWgRnT
-         73eZz/DyR1skmEvy4e3RMXfDIIHNpKN08egofjs6aghOVPhm6CQaNB5+PIoSx4uE1Wxi
-         Q2c40rcNFmWvEBSi+FDS5ZLgLfZiPWeHww1nP8CT3Baf0w2O1sGlSpDDFjrGnXJR2dSy
-         0jeleA9Sdhk+Wl0r4UHzJz0Q0/7wQDlUQ34smCl7lK2DW2f4hlYjKTlMGRlD7Qw8xsHQ
-         emzA==
+        d=google.com; s=20230601; t=1764035314; x=1764640114; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pxECKAH71uYUFlk1OLSRLVGsdtXKfBuiVH3qX5Bq1JE=;
+        b=IHOn9LvZ5ruN4WXJfYa6XrAOBbmnRCg479IO3EiNissMGF4F4FqYSktpzj4BRMNA0k
+         36acquoO7D8bgvtUEaK1NJ4/ujc7oJPuF9lez+1DZ3OUqOf+5Ld2AbNy8G01Fj/owcjM
+         RFE3YHoYGo3ya/JTJp2nfuzXAwDZ7bOwEFZF2Pmd+TQhtQLXeX5jnIydfan/6WAywBx7
+         m86DeyAgmmGZZyMxUWg8jbNYLzouBbE3hbWt0lUauMw9/u9gF0mjwVR8U+H+CISCNm7C
+         IRHXC3806ctU50cfi+4ZbMau3W1sBnEHnA3PUmmMU7CPTRZ7ePl/qzQAoSQu7An3Hv73
+         g3YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764034502; x=1764639302;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9kEJDvqjrIdXsU1IPiVaYED9aR2EYcU0zBZ2650wkuI=;
-        b=L3QcnNhQOTj0S10uf1Rxasd2BOD8K9jLuBQDu+8VP+ynbtuBQiKfdaYNK020V1DM+C
-         9x8XhNEN22XwooMsaEaAUaUjCoP8H/5ifTLyMvzXICcXm6VheZz5b2zlMaG84UM6JLCC
-         6C0QmNYMi25No6cY51fqiW0TurNJ0KxSqMStYb83eFNmhEkfP9lnPXngErQAZTX+TXa6
-         sTPHYKD0kNtDnjYGd2+XzEhcT+FbtDp9b8l+OAE6FvccpalCQjbwenjxJp2zxsHPZt6g
-         J8Iyx7jFCCBv+UIM2f2YzjdhFZLGIVhEj83AGo8UxWJCcG0WaqQuVl+LoWGF6wVu3rYh
-         a+fw==
-X-Forwarded-Encrypted: i=1; AJvYcCVivy21a2ba4HZ4ATW9w4QdQE7cGBI3sUl/NymBtsOEJCylGthWNmZD5U6BWr06IkhAbAA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yybtp+Nm1jpOepZUflfOLuEFhBuJxHcER5zKfxAtKaNbtQIDPNb
-	YnvT3m11kGa+EQXKesJ4fPoobYYb6wVjHVBon7D4WhSU7iFX5/8G/jQT8QpzHD76LYbK5gKI0Sn
-	SMa8p5FKO1oBslUlIOoYJLkZk/hM5r9+CCJfqWnINAhkhQLfdPdcQhLFYBgQUX9Gi81nVtexcEB
-	hK/WtWRk10GWaBMwrzoY/M6ItcjqAm
-X-Gm-Gg: ASbGncsriUsV/EcRTietVUwYWF2HmF/lL/NeYDVbxUc+zairtN15PhB/SfnulsxyhRq
-	NCMLKA/sc5YkNhR7/8RKVx2XeZU+4qwEMVk6ujtcLtN9V4iWg64qDcANvmP2/4YOLL1+ViWs1bB
-	wJLUAKHv12wL4nEdKqJiWRL5pRSiNG6dS/eggsodpPWcGEVig6zYiDvPa5xdOMrzUjj7g=
-X-Received: by 2002:a05:6102:2906:b0:5df:c15b:4feb with SMTP id ada2fe7eead31-5e1de3443camr4044484137.26.1764034502069;
-        Mon, 24 Nov 2025 17:35:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG9YM4D6RF10K5EcFy4iLXgvqD+APcqwC0xD89qRbqzgoKauqLYJ6rVCEmpB17XvI/3ApsYGDHQiC298XyfAew=
-X-Received: by 2002:a05:6102:2906:b0:5df:c15b:4feb with SMTP id
- ada2fe7eead31-5e1de3443camr4044480137.26.1764034501590; Mon, 24 Nov 2025
- 17:35:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764035314; x=1764640114;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pxECKAH71uYUFlk1OLSRLVGsdtXKfBuiVH3qX5Bq1JE=;
+        b=PJ+EeMs5s7rK0OlXcvim1k9zX6/zmYhsdve191KIIP9cYGBrlp40O35FsJQzhkGUY/
+         Ec7ovyKdrbyM6V+sPngkXX+8lMoB+39PhuVLR5nsXplJd5XZZarUMNC9/kDMdwIA2gRA
+         FYp+XAloYcs0Dgaubp4SY01rq+k1ET3zWVYk5FI9uR7h7/ne+7gV74od6Z1uuAmg5Kmr
+         Z5ns9O4/Q4W9l/cWzpB1FQAYmj135rj2V403lC/ssV+iwV1SWNkW0sLzzq8zLRmcLhU+
+         IqkJzaoEJVAxmzXKoAkueNBv2b1yskq4nDAamWUDJ29xYwBK3ogLsFhi7rsZIuFdHxYU
+         JERw==
+X-Forwarded-Encrypted: i=1; AJvYcCVRKPo/78ZxLn9+daHNCZdrQWTOBsBKEPdr5Z7upal8eChdbFF3ROyI2yxw3Vsk4FaCbkc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPYnFEJeiTsiDJPAbm+la/an/oEyj0mnoql7EyYCiBRltiPb3P
+	/UhgOslP2HGA9kGKaVaZCBam4SgeAwJCJE3cI9zNQlPBb+yW17sv94tuEZe18JrPP5LENA+fADY
+	hTUKWPw==
+X-Google-Smtp-Source: AGHT+IGw7n/WkVQTGzwbQxQ9VV1HAFWO+WUionAVci6QFcq9BhvaMpdHuGTmwsKZi9fkk+aykjevdAFNlrA=
+X-Received: from pjvb14.prod.google.com ([2002:a17:90a:d88e:b0:341:8ac7:27a9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:164a:b0:340:c261:f9db
+ with SMTP id 98e67ed59e1d1-34733e60944mr13320658a91.10.1764035314194; Mon, 24
+ Nov 2025 17:48:34 -0800 (PST)
+Date: Mon, 24 Nov 2025 17:48:32 -0800
+In-Reply-To: <20250806195706.1650976-29-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
- <CACGkMEuboys8sCJFUTGxHUeouPFnVqVLGQBefvmxYDe4ooLfLg@mail.gmail.com>
- <b9fff8e1-fb96-4b1f-9767-9d89adf31060@tu-dortmund.de> <CACGkMEufNLjXj37NBVCW4xdSuVLLV4ZS4WTuRzdaBV-nYgKs8w@mail.gmail.com>
- <ebb431f9-fdd3-4db3-bfd5-70af703ef9b5@tu-dortmund.de>
-In-Reply-To: <ebb431f9-fdd3-4db3-bfd5-70af703ef9b5@tu-dortmund.de>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 25 Nov 2025 09:34:48 +0800
-X-Gm-Features: AWmQ_bkk0DtFTGOvKavrVP7oP-GeqBsUpf0HhfMPTzbDQm7y-NWEOZmLDbWnymM
-Message-ID: <CACGkMEt_Z0a3kidmmjXcajU2EVi-B6mi832weeumPfZzmLoEPA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 0/8] tun/tap & vhost-net: netdev queue flow
- control to avoid ptr_ring tail drop
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mst@redhat.com, eperezma@redhat.com, jon@nutanix.com, 
-	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250806195706.1650976-1-seanjc@google.com> <20250806195706.1650976-29-seanjc@google.com>
+Message-ID: <aSUK8FuWT4lpMP3F@google.com>
+Subject: Re: [PATCH v5 28/44] KVM: x86/pmu: Load/save GLOBAL_CTRL via
+ entry/exit fields for mediated PMU
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>, 
+	Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
+	Sandipan Das <sandipan.das@amd.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Nov 24, 2025 at 5:20=E2=80=AFPM Simon Schippers
-<simon.schippers@tu-dortmund.de> wrote:
->
-> On 11/24/25 02:04, Jason Wang wrote:
-> > On Fri, Nov 21, 2025 at 5:23=E2=80=AFPM Simon Schippers
-> > <simon.schippers@tu-dortmund.de> wrote:
-> >>
-> >> On 11/21/25 07:19, Jason Wang wrote:
-> >>> On Thu, Nov 20, 2025 at 11:30=E2=80=AFPM Simon Schippers
-> >>> <simon.schippers@tu-dortmund.de> wrote:
-> >>>>
-> >>>> This patch series deals with tun/tap and vhost-net which drop incomi=
-ng
-> >>>> SKBs whenever their internal ptr_ring buffer is full. Instead, with =
-this
-> >>>> patch series, the associated netdev queue is stopped before this hap=
-pens.
-> >>>> This allows the connected qdisc to function correctly as reported by=
- [1]
-> >>>> and improves application-layer performance, see our paper [2]. Meanw=
-hile
-> >>>> the theoretical performance differs only slightly:
-> >>>>
-> >>>> +--------------------------------+-----------+----------+
-> >>>> | pktgen benchmarks to Debian VM | Stock     | Patched  |
-> >>>> | i5 6300HQ, 20M packets         |           |          |
-> >>>> +-----------------+--------------+-----------+----------+
-> >>>> | TAP             | Transmitted  | 195 Kpps  | 183 Kpps |
-> >>>> |                 +--------------+-----------+----------+
-> >>>> |                 | Lost         | 1615 Kpps | 0 pps    |
-> >>>> +-----------------+--------------+-----------+----------+
-> >>>> | TAP+vhost_net   | Transmitted  | 589 Kpps  | 588 Kpps |
-> >>>> |                 +--------------+-----------+----------+
-> >>>> |                 | Lost         | 1164 Kpps | 0 pps    |
-> >>>> +-----------------+--------------+-----------+----------+
-> >>>
-> >>
-> >> Hi Jason,
-> >>
-> >> thank you for your reply!
-> >>
-> >>> PPS drops somehow for TAP, any reason for that?
-> >>
-> >> I have no explicit explanation for that except general overheads comin=
-g
-> >> with this implementation.
-> >
-> > It would be better to fix that.
-> >
-> >>
-> >>>
-> >>> Btw, I had some questions:
-> >>>
-> >>> 1) most of the patches in this series would introduce non-trivial
-> >>> impact on the performance, we probably need to benchmark each or spli=
-t
-> >>> the series. What's more we need to run TCP benchmark
-> >>> (throughput/latency) as well as pktgen see the real impact
-> >>
-> >> What could be done, IMO, is to activate tun_ring_consume() /
-> >> tap_ring_consume() before enabling tun_ring_produce(). Then we could s=
-ee
-> >> if this alone drops performance.
-> >>
-> >> For TCP benchmarks, you mean userspace performance like iperf3 between=
- a
-> >> host and a guest system?
-> >
-> > Yes,
-> >
-> >>
-> >>>
-> >>> 2) I see this:
-> >>>
-> >>>         if (unlikely(tun_ring_produce(&tfile->tx_ring, queue, skb))) =
-{
-> >>>                 drop_reason =3D SKB_DROP_REASON_FULL_RING;
-> >>>                 goto drop;
-> >>>         }
-> >>>
-> >>> So there could still be packet drop? Or is this related to the XDP pa=
-th?
-> >>
-> >> Yes, there can be packet drops after a ptr_ring resize or a ptr_ring
-> >> unconsume. Since those two happen so rarely, I figured we should just
-> >> drop in this case.
-> >>
-> >>>
-> >>> 3) The LLTX change would have performance implications, but the
-> >>> benmark doesn't cover the case where multiple transmission is done in
-> >>> parallel
-> >>
-> >> Do you mean multiple applications that produce traffic and potentially
-> >> run on different CPUs?
-> >
-> > Yes.
-> >
-> >>
-> >>>
-> >>> 4) After the LLTX change, it seems we've lost the synchronization wit=
-h
-> >>> the XDP_TX and XDP_REDIRECT path?
-> >>
-> >> I must admit I did not take a look at XDP and cannot really judge if/h=
-ow
-> >> lltx has an impact on XDP. But from my point of view, __netif_tx_lock(=
-)
-> >> instead of __netif_tx_acquire(), is executed before the tun_net_xmit()
-> >> call and I do not see the impact for XDP, which calls its own methods.
-> >
-> > Without LLTX tun_net_xmit is protected by tx lock but it is not the
-> > case of tun_xdp_xmit. This is because, unlike other devices, tun
-> > doesn't have a dedicated TX queue for XDP, so the queue is shared by
-> > both XDP and skb. So XDP xmit path needs to be protected with tx lock
-> > as well, and since we don't have queue discipline for XDP, it means we
-> > could still drop packets when XDP is enabled. I'm not sure this would
-> > defeat the whole idea or not.
->
-> Good point.
->
-> >
-> >>>
-> >>> 5) The series introduces various ptr_ring helpers with lots of
-> >>> ordering stuff which is complicated, I wonder if we first have a
-> >>> simple patch to implement the zero packet loss
-> >>
-> >> I personally don't see how a simpler patch is possible without using
-> >> discouraged practices like returning NETDEV_TX_BUSY in tun_net_xmit or
-> >> spin locking between producer and consumer. But I am open for
-> >> suggestions :)
-> >
-> > I see NETDEV_TX_BUSY is used by veth:
-> >
-> > static int veth_xdp_rx(struct veth_rq *rq, struct sk_buff *skb)
-> > {
-> >         if (unlikely(ptr_ring_produce(&rq->xdp_ring, skb)))
-> >                 return NETDEV_TX_BUSY; /* signal qdisc layer */
-> >
-> >         return NET_RX_SUCCESS; /* same as NETDEV_TX_OK */
-> > }
-> >
-> > Maybe it would be simpler to start from that (probably with a new tun->=
-flags?).
-> >
-> > Thanks
->
-> Do you mean that this patchset could be implemented using the same
-> approach that was used for veth in [1]?
-> This could then also fix the XDP path.
+On Wed, Aug 06, 2025, Sean Christopherson wrote:
+> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> 
+> When running a guest with a mediated PMU, context switch PERF_GLOBAL_CTRL
+> via the dedicated VMCS fields for both host and guest.  For the host,
+> always zero GLOBAL_CTRL on exit as the guest's state will still be loaded
+> in hardware (KVM will context switch the bulk of PMU state outside of the
+> inner run loop).  For the guest, use the dedicated fields to atomically
+> load and save PERF_GLOBAL_CTRL on all entry/exits.
+> 
+> Note, VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL was introduced by Sapphire
+> Rapids, and is expected to be supported on all CPUs with PMU v4+.  WARN if
+> that expectation is not met.  Alternatively, KVM could manually save
+> PERF_GLOBAL_CTRL via the MSR save list, but the associated complexity and
+> runtime overhead is unjustified given that the feature should always be
+> available on relevant CPUs.
 
-I think so.
+This is wrong, PMU v4 has been supported since Skylake.
 
->
-> But is returning NETDEV_TX_BUSY fine in our case?
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 7ab35ef4a3b1..98f7b45ea391 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -787,7 +787,23 @@ static bool intel_pmu_is_mediated_pmu_supported(struct x86_pmu_capability *host_
+>  	 * Require v4+ for MSR_CORE_PERF_GLOBAL_STATUS_SET, and full-width
+>  	 * writes so that KVM can precisely load guest counter values.
+>  	 */
+> -	return host_pmu->version >= 4 && host_perf_cap & PERF_CAP_FW_WRITES;
+> +	if (host_pmu->version < 4 || !(host_perf_cap & PERF_CAP_FW_WRITES))
+> +		return false;
+> +
+> +	/*
+> +	 * All CPUs that support a mediated PMU are expected to support loading
+> +	 * and saving PERF_GLOBAL_CTRL via dedicated VMCS fields.
+> +	 */
+> +	if (WARN_ON_ONCE(!cpu_has_load_perf_global_ctrl() ||
+> +			 !cpu_has_save_perf_global_ctrl()))
+> +		return false;
 
-If it helps to avoid packet drop. But I'm not sure if qdisc is a must
-in your case.
+And so this WARN fires due to cpu_has_save_perf_global_ctrl() being false.  The
+bad changelog is mine, but the code isn't entirely my fault.  I did suggest the
+WARN in v3[1], probably because I forgot when PMU v4 was introduced and no one
+corrected me.
 
->
-> Do you mean a flag that enables or disables the no-drop behavior?
+v4 of the series[2] then made cpu_has_save_perf_global_ctrl() a hard requirement,
+based on my miguided feedback.
 
-Yes, via a new flags that could be set via TUNSETIFF.
+   * Only support GLOBAL_CTRL save/restore with VMCS exec_ctrl, drop the MSR
+     save/retore list support for GLOBAL_CTRL, thus the support of mediated
+     vPMU is constrained to SapphireRapids and later CPUs on Intel side.
 
-Thanks
+Doubly frustrating is that this was discussed in the original RFC, where Jim
+pointed out[3] that requiring VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL would prevent
+enabling the mediated PMU on Skylake+, and I completely forgot that conversation
+by the time v3 of the series rolled around :-(
 
->
-> Thanks!
->
-> [1] Link: https://lore.kernel.org/netdev/174559288731.827981.874825783997=
-1869213.stgit@firesoul/T/#u
->
-> >
-> >>
-> >>>
-> >>>>
-> >>>> This patch series includes tun/tap, and vhost-net because they share
-> >>>> logic. Adjusting only one of them would break the others. Therefore,=
- the
-> >>>> patch series is structured as follows:
-> >>>> 1+2: new ptr_ring helpers for 3
-> >>>> 3: tun/tap: tun/tap: add synchronized ring produce/consume with queu=
-e
-> >>>> management
-> >>>> 4+5+6: tun/tap: ptr_ring wrappers and other helpers to be called by
-> >>>> vhost-net
-> >>>> 7: tun/tap & vhost-net: only now use the previous implemented functi=
-ons to
-> >>>> not break git bisect
-> >>>> 8: tun/tap: drop get ring exports (not used anymore)
-> >>>>
-> >>>> Possible future work:
-> >>>> - Introduction of Byte Queue Limits as suggested by Stephen Hemminge=
-r
-> >>>
-> >>> This seems to be not easy. The tx completion depends on the userspace=
- behaviour.
-> >>
-> >> I agree, but I really would like to reduce the buffer bloat caused by =
-the
-> >> default 500 TUN / 1000 TAP packet queue without losing performance.
-> >>
-> >>>
-> >>>> - Adaption of the netdev queue flow control for ipvtap & macvtap
-> >>>>
-> >>>> [1] Link: https://unix.stackexchange.com/questions/762935/traffic-sh=
-aping-ineffective-on-tun-device
-> >>>> [2] Link: https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Resear=
-ch/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersio=
-n.pdf
-> >>>>
-> >>>
-> >>> Thanks
-> >>>
-> >>
-> >> Thanks! :)
-> >>
-> >
->
+As mentioned in the discussion with Jim, _if_ PMU v4 was introduced with ICX (or
+later), then I'd be in favor of making VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL a hard
+requirement.  But losing supporting Skylake+ is a bit much.
 
+There are a few warts with nVMX's use of the auto-store list that need to be
+cleaned up, but on the plus side it's also a good excuse to clean up
+{add,clear}_atomic_switch_msr(), which have accumulated some cruft and quite a
+bit of duplicate code.  And while I still dislike using the auto-store list, the
+code isn't as ugly as it was back in v3 because we _can_ make the "load" VMCS
+controls mandatory without losing support for any CPUs (they predate PMU v4).
+
+[1] https://lore.kernel.org/all/ZzyWKTMdNi5YjvEM@google.com
+[2] https://lore.kernel.org/all/20250324173121.1275209-1-mizhang@google.com
+[3] https://lore.kernel.org/all/CALMp9eQ+-wcj8QMmFR07zvxFF22-bWwQgV-PZvD04ruQ=0NBBA@mail.gmail.com
 
