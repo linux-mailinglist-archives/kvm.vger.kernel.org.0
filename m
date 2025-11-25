@@ -1,94 +1,97 @@
-Return-Path: <kvm+bounces-64566-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64564-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02691C872AF
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 21:53:48 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C0BFC872A3
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 21:53:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FC8F3B3422
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 20:53:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2ECE24E2C29
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 20:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE062E6CCC;
-	Tue, 25 Nov 2025 20:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895CE2E22A3;
+	Tue, 25 Nov 2025 20:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="BmwpJ2LT";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jxhkkSny"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="GsFLdyR0";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="JclA67F1"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
+Received: from flow-b3-smtp.messagingengine.com (flow-b3-smtp.messagingengine.com [202.12.124.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A422E4266;
-	Tue, 25 Nov 2025 20:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517E82629D;
+	Tue, 25 Nov 2025 20:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764103985; cv=none; b=rHwbZsHyJRiU68TRBaUMfR5kO9GzSsx6pSxkP9HR3hTG2m0jAhuv334z5uaiIid7intqNWVpebDEqSGaqtQJiawPIMqcgyldu086Gk4Z1acdqkEEy2Px013LZoiLrw5/932m7xbOOzeXCGXz+1JvVfVnMdFv4pgSiyn0X7V4IDQ=
+	t=1764103980; cv=none; b=Osajm5yB48ObPqqU0bHw0U5FAPxD5D/mnDLvH+l/xLNHCTwzqyDtuYtEnNdbHmoD1R3plOuVTipvxcz6RmpquyMeNoIdxAbkp9bu5xY2sCJ74+mggtIegfqBTwt48cjx830aqwwiJCkhV+JsByg4YF7tYaaRTzxTTIqzfKdQOcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764103985; c=relaxed/simple;
-	bh=mAEnaBp/QiF9yhx2kcAu/ucfNK/V+FsCtLv4DtJ1G/Q=;
+	s=arc-20240116; t=1764103980; c=relaxed/simple;
+	bh=8IKE6SSTxQqpU9qQGqOjLnXK9tbkj55XV2dPDdpB35k=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DS/qSdI76VwBZ611ccMj0HbDM2sZ1QjrbpuypebYrMd36Hj1of+rM4MQLlbL2YzRax5DRcYc1ktBND47FgFc92+DVvYe870Wgj5/Lvhm2oR3lqazJZYA3D/1lt6DLhZnKN29MS0tSTpqdWCe93c6bNzWCnqExLx1LM2qS4HzriA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=BmwpJ2LT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jxhkkSny; arc=none smtp.client-ip=202.12.124.148
+	 MIME-Version:Content-Type; b=onhpVZqJpOP1AuKu4LTa1fk8CuQaFUbZ9wC2Lx1IiTMznyXuV4PMoEsIPVfOffpgMpMcaXJ9stdk+fDIA0+3/7B5lclAizlkGZGooPSSaXRQNb2BczXubsYxDlILKWQDEX+VFAfd81t4fPooYOzqCpW9llfSXpD/pl4eqoGAY/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=GsFLdyR0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=JclA67F1; arc=none smtp.client-ip=202.12.124.138
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfout.stl.internal (Postfix) with ESMTP id D2EC01D0014A;
-	Tue, 25 Nov 2025 15:53:01 -0500 (EST)
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailflow.stl.internal (Postfix) with ESMTP id B5FFC13000E7;
+	Tue, 25 Nov 2025 15:52:55 -0500 (EST)
 Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Tue, 25 Nov 2025 15:53:02 -0500
+  by phl-compute-01.internal (MEProxy); Tue, 25 Nov 2025 15:52:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1764103981;
-	 x=1764190381; bh=zaNzre1R539onAJiUi+ocHKnpXTu30cdWFnNlClQYWQ=; b=
-	BmwpJ2LTzuTD3ddYVkfqchCYrthyxUCpbExJ0VackNZWNmpJmwC3NSXvCNNx2OsA
-	FD7Avx8/Lhe4ggdZ11H0JkHNmsaZ8HS43Wd3AimaiVgtxNn9ZS2NHSyx/Q5x+EXx
-	lW1GHfI/XdwEh3ntZlsB11W1ZKABIljEv4HM59GxAvQhwcFvTld+aL99wlzbGeDe
-	8ewvyMrkLIqIuVasWGOILmivBPuf2jivyT2IrBN12RQ2CovkQoBHB7lgkCG0bWXQ
-	jdeZrkr7vCsCKBC8+yS6RpDhrLSymC/Z1NJrqJAVQt/O0kgbOxQtq1y092vqLkU5
-	s86szB4rp3JtrGH7C73UEA==
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1764103975;
+	 x=1764111175; bh=GbjNBYV6afh08yAggHVzX0VbMxJYkjGe1dH//Duydtc=; b=
+	GsFLdyR0QQnfjXuTkn9yq9MQCHTM9LvL0Gi1vDpRxbmzclcujpjHaYnFlLt72/Xc
+	uHo63r2pDjpfzP880TI6mOC2Kf5Sza2NPZFN7hv4FjoCzVZt0LDmC0y2muTJcos2
+	FIclg/2hnwPxgL7AG4MgFU67UnhslmKC3CTXpG7gdAQm0Ox+5jIPabNTUz6pAahQ
+	ZU1Ap1T8aKTi9w8BiH5ltkAXECevPHEW0pj7SWNFubpEMiryfF5V0A1YMVcQ920v
+	tc30jrTWuRsRPeSHgOcHB9X5+mbH7WALwwl3OTl/VEIeoNLj31nPxMS+SxrZ5yiK
+	3tQkCkqapTqFqRWqsqSsZw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1764103981; x=
-	1764190381; bh=zaNzre1R539onAJiUi+ocHKnpXTu30cdWFnNlClQYWQ=; b=j
-	xhkkSnycmzj0kOceI37OhMcvDrlbbtrTGJpsbFlJ/eVYz6fzTW7+3M2b+grdmKOg
-	MFVS/wDSvKIJJkxEZiPTm82xhlb3MccSPrTiseLDjCW1GS2L5w2erc4/NJIYSkpv
-	BXS9qGuy08ZlyGAIpHICe3DChVAxYjZhzWcw8RRXvan/JYlLc27DoGp+jHYAqA2o
-	jTZF1rBnRCeF3RvkcsBRnVq4WCOvz9aMkiZcyKQnTYCO9ZHFW9tT8XdbcVCxD0C9
-	6lCH1j+VJ90uLnXfo3XhnWRcHSv2ISOHndN668LO56T5LnqAk+reZGjJ79Qb4DLD
-	gmcFaxa8Mw9Yr6v6jnKSQ==
-X-ME-Sender: <xms:LRcmaUmbKuI4WMSWiopv6WIafMsJDwZXo4pXs9ZlJS8cigbZQxxOmg>
-    <xme:LRcmae3Ez3r9W7_NwYJO_1h8UNeW0sthJ5R2sC_EGKg9fiFazFYyY9Mw-ixDIr6Yh
-    3qWnOoCOqQnc3FkjNv0ZenF_KX6gUIQ1BwRTf1ZEzzektNsvnMboQ>
-X-ME-Received: <xmr:LRcmaZQZqNQiNEaHAj_yuSunGcKEqmnMgSy3fR1YC4BabOdThMqw6GEc>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1764103975; x=
+	1764111175; bh=GbjNBYV6afh08yAggHVzX0VbMxJYkjGe1dH//Duydtc=; b=J
+	clA67F1m+oeZIKx+pom4dIDw77+ND0fEUimtBp5zRQEis/+1DyCUj5BiZ/cTburm
+	mtt7y1Q9fyS/vvAn3r7AqbtK9Wjh3ciZCdky1sPHr4rGJm4GPFLbdgJHfCyy28xw
+	KDhArDr7HS85aRNnwcN6sfb4nL2NnuMBv6z5vhzuFZ2X1/dt8ZqJ/HhEO4/RINcz
+	7JloIPNvmy8l3NleI71FKLksHBhx0Ew5yEOM4tr1PqZaVcD4IjUHMKQYLoyCaQnE
+	2JZ1lkiuYhbmk/BYTUC7QzZ+3p2uWKYi97RkuivgL8GNg0JV9fFOmo4FjxbZtmFF
+	VoAe7HfRoTtwNEdxBuR+Q==
+X-ME-Sender: <xms:JhcmaR00paTIAAr82asV-wUPdswrFbkt06TXpqK7wap81bMJWcwmdg>
+    <xme:JhcmaTFPwSnuvwvImO-ITDR-GGKoGpciKRLYiEbbDpNT2LINxJY15rZt0nCcPkWft
+    oBI0JXN_pbpPh-z9D3KqGauSbqRIwtAPRy0SrkFYZQjaizHSR0f>
+X-ME-Received: <xmr:JhcmaYgQacLjzk2MqkkS2_kYokcC3dlW_d_GLs_JDbMUoQswcZip19sY>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgedvgeejucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhggtgfgsehtjeertd
-    dttddvnecuhfhrohhmpeetlhgvgicuhghilhhlihgrmhhsohhnuceorghlvgigsehshhgr
-    iigsohhtrdhorhhgqeenucggtffrrghtthgvrhhnpeetteduleegkeeigedugeeluedvff
-    egheeliedvtdefkedtkeekheffhedutefhhfenucevlhhushhtvghrufhiiigvpedtnecu
-    rfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgspg
-    hrtghpthhtohepvdehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhkihht
-    rgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtg
-    hpthhtohephihishhhrghihhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepshhkohhl
-    ohhthhhumhhthhhosehnvhhiughirgdrtghomhdprhgtphhtthhopehkvghvihhnrdhtih
-    grnhesihhnthgvlhdrtghomhdprhgtphhtthhopegrnhhikhgvthgrsehnvhhiughirgdr
-    tghomhdprhgtphhtthhopehvshgvthhhihesnhhvihguihgrrdgtohhmpdhrtghpthhtoh
-    epmhhotghhshesnhhvihguihgrrdgtohhmpdhrtghpthhtohephihunhigihgrnhhgrdhl
-    ihesrghmugdrtghomh
-X-ME-Proxy: <xmx:LRcmaePtRn6YG0qnzvwsV4SZKKVNy235qs_ySrkRArPjzusNSF7ITQ>
-    <xmx:LRcmadhhIvXvox5C4OMtbYCizuMYDknNSKrI9aD4xNMcW7UMyNiYLA>
-    <xmx:LRcmaeLnTR90zAViv-UdpmW3j0xxZrjmmOq7ssfI8DcxRXeRPMECaQ>
-    <xmx:LRcmaY4TIzs2EvxztrGf5JLKw-0-TORrnfAZOU3975t8XCKYGmINqg>
-    <xmx:LRcmaehxzCtKZkdiOQF_ACOhbEL-L3fP7hDIur7jN7vwTwaFiQKqRj7q>
+    rghilhhouhhtmecufedttdenucgoufhprghmfghrlhculdeftddtmdenucfjughrpeffhf
+    fvvefukfgjfhggtgfgsehtjeertddttddvnecuhfhrohhmpeetlhgvgicuhghilhhlihgr
+    mhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrghtthgvrhhnpe
+    ehvddtueevjeduffejfeduhfeufeejvdetgffftdeiieduhfejjefhhfefueevudenucff
+    ohhmrghinhepkhgvrhhnvghlrdhorhhgnecuufhprghmfghrlhephhhtthhpshemsddslh
+    horhgvrdhkvghrnhgvlhdrohhrghdsrghllhdstdegieejkeduiedtjeehheefjeeirdef
+    leeguddvkeejqdefqdhpvghtvghrgiesnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgt
+    phhtthhopedvhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnkhhithgrse
+    hnvhhiughirgdrtghomhdprhgtphhtthhopehjghhgseiiihgvphgvrdgtrgdprhgtphht
+    thhopeihihhshhgrihhhsehnvhhiughirgdrtghomhdprhgtphhtthhopehskhholhhoth
+    hhuhhmthhhohesnhhvihguihgrrdgtohhmpdhrtghpthhtohepkhgvvhhinhdrthhirghn
+    sehinhhtvghlrdgtohhmpdhrtghpthhtoheprghnihhkvghtrgesnhhvihguihgrrdgtoh
+    hmpdhrtghpthhtohepvhhsvghthhhisehnvhhiughirgdrtghomhdprhgtphhtthhopehm
+    ohgthhhssehnvhhiughirgdrtghomhdprhgtphhtthhopeihuhhngihirghnghdrlhhise
+    grmhgurdgtohhm
+X-ME-Proxy: <xmx:JxcmacdLP1g4SUY4RIlfI3aEqIZmJFhz6Sza4a7M4jrDwwrOomjPJQ>
+    <xmx:JxcmaewzbS7_F8qW86SibW2WS3E_E9mX12okB9Aaqsz3chiq-oUBxQ>
+    <xmx:JxcmaWZSV7_sMnex-Jk9S-cgw4vDw4G5TvAK-bMEYKXUFP5RsGEQlw>
+    <xmx:JxcmacIFiH5IF50A4p_lPKVD0YBIshpMYSgAgHNti5f2TFCOT7vsRw>
+    <xmx:JxcmacFohCEUkwM99s3xwmmMbwM7OxD81uLkAdXO0wyNYNF2-qTM3CZ1>
 Feedback-ID: i03f14258:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 25 Nov 2025 15:52:59 -0500 (EST)
-Date: Tue, 25 Nov 2025 13:52:16 -0700
+ 25 Nov 2025 15:52:53 -0500 (EST)
+Date: Tue, 25 Nov 2025 13:52:23 -0700
 From: Alex Williamson <alex@shazbot.org>
 To: <ankita@nvidia.com>
 Cc: <jgg@ziepe.ca>, <yishaih@nvidia.com>, <skolothumtho@nvidia.com>,
@@ -100,11 +103,11 @@ Cc: <jgg@ziepe.ca>, <yishaih@nvidia.com>, <skolothumtho@nvidia.com>,
  <linux-kernel@vger.kernel.org>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
  <targupta@nvidia.com>, <zhiw@nvidia.com>, <danw@nvidia.com>,
  <dnigam@nvidia.com>, <kjaju@nvidia.com>
-Subject: Re: [PATCH v6 1/6] vfio: export function to map the VMA
-Message-ID: <20251125135216.5c18c311.alex@shazbot.org>
-In-Reply-To: <20251125173013.39511-2-ankita@nvidia.com>
+Subject: Re: [PATCH v6 2/6] vfio/nvgrace-gpu: Add support for huge pfnmap
+Message-ID: <20251125135223.4d932b5b.alex@shazbot.org>
+In-Reply-To: <20251125173013.39511-3-ankita@nvidia.com>
 References: <20251125173013.39511-1-ankita@nvidia.com>
-	<20251125173013.39511-2-ankita@nvidia.com>
+	<20251125173013.39511-3-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -114,129 +117,168 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 25 Nov 2025 17:30:08 +0000
+On Tue, 25 Nov 2025 17:30:09 +0000
 <ankita@nvidia.com> wrote:
 
 > From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> Take out the implementation to map the VMA to the PTE/PMD/PUD
-> as a separate function.
+> NVIDIA's Grace based systems have large device memory. The device
+> memory is mapped as VM_PFNMAP in the VMM VMA. The nvgrace-gpu
+> module could make use of the huge PFNMAP support added in mm [1].
 > 
-> Export the function to be used by nvgrace-gpu module.
+> To make use of the huge pfnmap support, fault/huge_fault ops
+> based mapping mechanism needs to be implemented. Currently nvgrace-gpu
+> module relies on remap_pfn_range to do the mapping during VM bootup.
+> Replace it to instead rely on fault and use vfio_pci_vmf_insert_pfn
+> to setup the mapping.
+> 
+> Moreover to enable huge pfnmap, nvgrace-gpu module is updated by
+> adding huge_fault ops implementation. The implementation establishes
+> mapping according to the order request. Note that if the PFN or the
+> VMA address is unaligned to the order, the mapping fallbacks to
+> the PTE level.
+> 
+> Link: https://lore.kernel.org/all/20240826204353.2228736-1-peterx@redhat.com/ [1]
 > 
 > cc: Shameer Kolothum <skolothumtho@nvidia.com>
 > cc: Alex Williamson <alex@shazbot.org>
 > cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Reviewed-by: Shameer Kolothum <skolothumtho@nvidia.com>
+> cc: Vikram Sethi <vsethi@nvidia.com>
 > Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 > ---
->  drivers/vfio/pci/vfio_pci_core.c | 50 ++++++++++++++++++++------------
->  include/linux/vfio_pci_core.h    |  3 ++
->  2 files changed, 34 insertions(+), 19 deletions(-)
+>  drivers/vfio/pci/nvgrace-gpu/main.c | 84 +++++++++++++++++++++--------
+>  1 file changed, 62 insertions(+), 22 deletions(-)
 > 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 7dcf5439dedc..c445a53ee12e 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1640,31 +1640,21 @@ static unsigned long vma_to_pfn(struct vm_area_struct *vma)
->  	return (pci_resource_start(vdev->pdev, index) >> PAGE_SHIFT) + pgoff;
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+> index e346392b72f6..8a982310b188 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
+> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+> @@ -130,6 +130,62 @@ static void nvgrace_gpu_close_device(struct vfio_device *core_vdev)
+>  	vfio_pci_core_close_device(core_vdev);
 >  }
 >  
-> -static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
-> -					   unsigned int order)
-> +vm_fault_t vfio_pci_vmf_insert_pfn(struct vfio_pci_core_device *vdev,
-> +				   struct vm_fault *vmf,
-> +				   unsigned long pfn,
-> +				   unsigned int order)
->  {
-> -	struct vm_area_struct *vma = vmf->vma;
-> -	struct vfio_pci_core_device *vdev = vma->vm_private_data;
-> -	unsigned long addr = vmf->address & ~((PAGE_SIZE << order) - 1);
-> -	unsigned long pgoff = (addr - vma->vm_start) >> PAGE_SHIFT;
-> -	unsigned long pfn = vma_to_pfn(vma) + pgoff;
-> -	vm_fault_t ret = VM_FAULT_SIGBUS;
-> +	vm_fault_t ret;
->  
-> -	if (order && (addr < vma->vm_start ||
-> -		      addr + (PAGE_SIZE << order) > vma->vm_end ||
-> -		      pfn & ((1 << order) - 1))) {
-> -		ret = VM_FAULT_FALLBACK;
-> -		goto out;
-> -	}
-> -
-> -	down_read(&vdev->memory_lock);
-> +	lockdep_assert_held_read(&vdev->memory_lock);
->  
->  	if (vdev->pm_runtime_engaged || !__vfio_pci_memory_enabled(vdev))
-> -		goto out_unlock;
-> +		return VM_FAULT_SIGBUS;
->  
->  	switch (order) {
->  	case 0:
-> -		ret = vmf_insert_pfn(vma, vmf->address, pfn);
-> +		ret = vmf_insert_pfn(vmf->vma, vmf->address, pfn);
->  		break;
->  #ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
->  	case PMD_ORDER:
-> @@ -1680,7 +1670,29 @@ static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
->  		ret = VM_FAULT_FALLBACK;
->  	}
->  
-> -out_unlock:
-> +	return ret;
-> +}
-
-At this point we no longer need @ret, we can return directly in all
-cases.
-
-> +EXPORT_SYMBOL_GPL(vfio_pci_vmf_insert_pfn);
+> +static unsigned long addr_to_pgoff(struct vm_area_struct *vma,
+> +				   unsigned long addr)
+> +{
+> +	u64 pgoff = vma->vm_pgoff &
+> +		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
 > +
-> +static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
-> +					   unsigned int order)
+> +	return ((addr - vma->vm_start) >> PAGE_SHIFT) + pgoff;
+> +}
+> +
+> +static vm_fault_t nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
+> +						  unsigned int order)
 > +{
 > +	struct vm_area_struct *vma = vmf->vma;
-> +	struct vfio_pci_core_device *vdev = vma->vm_private_data;
-> +	unsigned long addr = vmf->address & ~((PAGE_SIZE << order) - 1);
-> +	unsigned long pgoff = (addr - vma->vm_start) >> PAGE_SHIFT;
-> +	unsigned long pfn = vma_to_pfn(vma) + pgoff;
+> +	struct nvgrace_gpu_pci_core_device *nvdev = vma->vm_private_data;
+> +	struct vfio_pci_core_device *vdev = &nvdev->core_device;
+> +	unsigned int index =
+> +		vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
 > +	vm_fault_t ret = VM_FAULT_SIGBUS;
-
-The only use case of this initialization is now in the new function.
-
+> +	struct mem_region *memregion;
+> +	unsigned long pfn, addr;
+> +
+> +	memregion = nvgrace_gpu_memregion(index, nvdev);
+> +	if (!memregion)
+> +		return ret;
+> +
+> +	addr = vmf->address & ~((PAGE_SIZE << order) - 1);
+> +	pfn = PHYS_PFN(memregion->memphys) + addr_to_pgoff(vma, addr);
 > +
 > +	if (order && (addr < vma->vm_start ||
 > +		      addr + (PAGE_SIZE << order) > vma->vm_end ||
-> +		      pfn & ((1 << order) - 1))) {
-> +		ret = VM_FAULT_FALLBACK;
-> +		goto out;
-> +	}
+> +		      pfn & ((1 << order) - 1)))
+> +		return VM_FAULT_FALLBACK;
 
-Should we make a static inline in a vfio header for the above to avoid
-the duplicate implementation in the next patch?  Also we might as well
-use an else branch rather than goto with the bulk of the code moved
-now.  Maybe also just convert to a scoped_guard as well.  Thanks,
+The dev_dbg misses this fallback this way.  Thanks,
 
 Alex
 
 > +
-> +	down_read(&vdev->memory_lock);
-> +	ret = vfio_pci_vmf_insert_pfn(vdev, vmf, pfn, order);
->  	up_read(&vdev->memory_lock);
->  out:
->  	dev_dbg_ratelimited(&vdev->pdev->dev,
-> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> index f541044e42a2..6f7c6c0d4278 100644
-> --- a/include/linux/vfio_pci_core.h
-> +++ b/include/linux/vfio_pci_core.h
-> @@ -119,6 +119,9 @@ ssize_t vfio_pci_core_read(struct vfio_device *core_vdev, char __user *buf,
->  		size_t count, loff_t *ppos);
->  ssize_t vfio_pci_core_write(struct vfio_device *core_vdev, const char __user *buf,
->  		size_t count, loff_t *ppos);
-> +vm_fault_t vfio_pci_vmf_insert_pfn(struct vfio_pci_core_device *vdev,
-> +				   struct vm_fault *vmf, unsigned long pfn,
-> +				   unsigned int order);
->  int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma);
->  void vfio_pci_core_request(struct vfio_device *core_vdev, unsigned int count);
->  int vfio_pci_core_match(struct vfio_device *core_vdev, char *buf);
+> +	scoped_guard(rwsem_read, &vdev->memory_lock)
+> +		ret = vfio_pci_vmf_insert_pfn(vdev, vmf, pfn, order);
+> +
+> +	dev_dbg_ratelimited(&vdev->pdev->dev,
+> +			    "%s order = %d pfn 0x%lx: 0x%x\n",
+> +			    __func__, order, pfn,
+> +			    (unsigned int)ret);
+> +
+> +	return ret;
+> +}
+> +
+> +static vm_fault_t nvgrace_gpu_vfio_pci_fault(struct vm_fault *vmf)
+> +{
+> +	return nvgrace_gpu_vfio_pci_huge_fault(vmf, 0);
+> +}
+> +
+> +static const struct vm_operations_struct nvgrace_gpu_vfio_pci_mmap_ops = {
+> +	.fault = nvgrace_gpu_vfio_pci_fault,
+> +#ifdef CONFIG_ARCH_SUPPORTS_HUGE_PFNMAP
+> +	.huge_fault = nvgrace_gpu_vfio_pci_huge_fault,
+> +#endif
+> +};
+> +
+>  static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
+>  			    struct vm_area_struct *vma)
+>  {
+> @@ -137,10 +193,8 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
+>  		container_of(core_vdev, struct nvgrace_gpu_pci_core_device,
+>  			     core_device.vdev);
+>  	struct mem_region *memregion;
+> -	unsigned long start_pfn;
+>  	u64 req_len, pgoff, end;
+>  	unsigned int index;
+> -	int ret = 0;
+>  
+>  	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+>  
+> @@ -157,17 +211,18 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
+>  		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+>  
+>  	if (check_sub_overflow(vma->vm_end, vma->vm_start, &req_len) ||
+> -	    check_add_overflow(PHYS_PFN(memregion->memphys), pgoff, &start_pfn) ||
+>  	    check_add_overflow(PFN_PHYS(pgoff), req_len, &end))
+>  		return -EOVERFLOW;
+>  
+>  	/*
+> -	 * Check that the mapping request does not go beyond available device
+> -	 * memory size
+> +	 * Check that the mapping request does not go beyond the exposed
+> +	 * device memory size.
+>  	 */
+>  	if (end > memregion->memlength)
+>  		return -EINVAL;
+>  
+> +	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
+> +
+>  	/*
+>  	 * The carved out region of the device memory needs the NORMAL_NC
+>  	 * property. Communicate as such to the hypervisor.
+> @@ -184,23 +239,8 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
+>  		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
+>  	}
+>  
+> -	/*
+> -	 * Perform a PFN map to the memory and back the device BAR by the
+> -	 * GPU memory.
+> -	 *
+> -	 * The available GPU memory size may not be power-of-2 aligned. The
+> -	 * remainder is only backed by vfio_device_ops read/write handlers.
+> -	 *
+> -	 * During device reset, the GPU is safely disconnected to the CPU
+> -	 * and access to the BAR will be immediately returned preventing
+> -	 * machine check.
+> -	 */
+> -	ret = remap_pfn_range(vma, vma->vm_start, start_pfn,
+> -			      req_len, vma->vm_page_prot);
+> -	if (ret)
+> -		return ret;
+> -
+> -	vma->vm_pgoff = start_pfn;
+> +	vma->vm_ops = &nvgrace_gpu_vfio_pci_mmap_ops;
+> +	vma->vm_private_data = nvdev;
+>  
+>  	return 0;
+>  }
 
 
