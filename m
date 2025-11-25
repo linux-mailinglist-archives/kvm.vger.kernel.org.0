@@ -1,176 +1,233 @@
-Return-Path: <kvm+bounces-64520-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64522-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C036FC86274
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 18:11:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5185C862ED
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 18:19:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3773D4EC963
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 17:08:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A26D3B5D00
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 17:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A0B329E6B;
-	Tue, 25 Nov 2025 17:08:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E05632ABCF;
+	Tue, 25 Nov 2025 17:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hyEz2jcm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQQy0ZMY";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="esSiQknh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8638329C59
-	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 17:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2ED932AAAC
+	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 17:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764090500; cv=none; b=ZVuli82nlzXnu5fhd+T0v2fE6eb8+pEv1Um0N3vPZvjZmByY4+9B5hZSxyTmuAtR3LFUoSLFSosAXOaWn30t03c4FUz7LjRCKjXx7NiIMIRllApOZcv+dlpjgRMuWT3KT3NzlTY8mn11fDYG+xYwUMmW5l+VvX9XKIYXaFiu50I=
+	t=1764091146; cv=none; b=OzPCY4XCeyso9ossrb4lwuV25kyN3FJ+TEYy+B0K2HkgZIpRHH6SfI59m0Z/M8d4BTnfgwLhR8HDLMVpEESnKZr1NuH3GgSj/+qehPtayif+2melxg1evGrVW6n/MzWswxhd+0dOz/LP9aCof5+vcsyXh7elYgBDOxuOibIb1tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764090500; c=relaxed/simple;
-	bh=Ws/YNKakph/oNkC8T2Z0oK5lQ8Qe0+L4yEIQYy1pOV8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=R3TjgTs1eihXV4LbaYFXTwwM/kylU4GpsxSiQ+g2I1KKq+IWmbNJcH4ucMBC6mk8RabWxdxHlCec61LssMFn+cr9RvfJZC3UTlJqhMO0JZ9+FVnSEz/lclex8GE1iqDze4x+KS+hI5eO+d9HW/vaKbkRUpS+EaZSSLjM+EeVNk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hyEz2jcm; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34377900dbcso12698282a91.2
-        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 09:08:18 -0800 (PST)
+	s=arc-20240116; t=1764091146; c=relaxed/simple;
+	bh=ZPhuaik0VAApbpX38pTQnqYDsCZCeVuWDwCiA5Naac0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cUsDgVKV1R1vygK3eb5Nj0AeEP0+NZ2SiBE0AtgjN6eRlwCa6ratidnT1eNO/3ehBz1aAFhc/46jpWxSPG86NuZPx06DGTwESqwILNEy6uesoYgJO2s865cMHT0l5YAszYGYrkYgxTRW0NpIm2KPZpSbdr7F/eeefEIFSvcTgxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LQQy0ZMY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=esSiQknh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764091142;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QTDXgrG1WH/0PGWngFbUewy7r2hDyrl7ob2LIaTylyw=;
+	b=LQQy0ZMYHvT/ZbenPjcmtU9iJHml6lPCz7u4cJlXPG942lNf4kRAf8eQmUswFYVhgToWii
+	YolQWKLppjQJMcTRpF/fqtt32nMkqZAajIPrE8ozG7ahrtdQkhqa7N+KkvXI64asSgrDCh
+	U9uXsqlwAIG6a0mq9eZs3N3a479Wm60=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-26-5K8gNOZSMJK79kuBFPTCLQ-1; Tue, 25 Nov 2025 12:18:59 -0500
+X-MC-Unique: 5K8gNOZSMJK79kuBFPTCLQ-1
+X-Mimecast-MFC-AGG-ID: 5K8gNOZSMJK79kuBFPTCLQ_1764091137
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-429ca3e7245so2839168f8f.3
+        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 09:18:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764090498; x=1764695298; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y4ndUQJXblyMVIEo31GQ2aPBJsTj4kLS2trQiSNmxdk=;
-        b=hyEz2jcmDG2VZ0SowrKZ1f5pZ//OeUIlgQGcTulUikVnNnF9oimfdIYuuQ8isRblV9
-         uZGZOMxYsRwtRNXgEXYGXTQw3yTFxWDX43viymf507u157LsbHuAklGaWSyEu3g8DHAc
-         usxaUz3Q8CzdMWkxbGpaAa7Q1UcSjyQkvOnB64zhiQihP2FcGEXsraebkPXnaDN3sNX9
-         EfUcOxWEjX60n3P3ODo9JGA+7SjDWJuzMxFos8cSf5iHGVLE1/QPWXw/Wn3Z2AvsmXKG
-         zmogkg2e3zLt1swH02vuKUSJrp+gjOHIJ4RhR19A5JXFkd9M9R4JQbbKEta888+07ko6
-         5WXw==
+        d=redhat.com; s=google; t=1764091135; x=1764695935; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QTDXgrG1WH/0PGWngFbUewy7r2hDyrl7ob2LIaTylyw=;
+        b=esSiQknhwwgSIxH9h576nP+e3IdyPqKvNk6TgDZ3TruRZLZAnBpjaedxhfIEn2EJRU
+         ykeM4nzQQMjsPI+Uwb2Hb3gwJ+lLOfl67oXdL4sIhag4xwJiqBr/4XA+7zCeGUH7Lq4w
+         utYileQ9cYRnvOsksG5PcTIi2EAIrRI8OE0xTYTWNGNFcyq+tuLD7eX4rg47qboDNEEz
+         DA8ca9igTMgz0gyfDukrHjz/w8HU+pUugX10d+MqScE6JeFyz5BJbC1Vdkw2QPzP1ddc
+         LzoiVS9JoVrFqgz4CVW6wM4PhwJo90uA09sW4RooldqP2vjzFce8Pdf3Gq0cyqdT8huh
+         qdMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764090498; x=1764695298;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y4ndUQJXblyMVIEo31GQ2aPBJsTj4kLS2trQiSNmxdk=;
-        b=uP5RrP6hgbsyIZ9mEcZsiZRy0Y6uij5VJQk1qpIdVbRZTYs5kH2z7mivmClbyXn4L1
-         DUe8x5j5xBPyBVIA4Qq5i4GzJipXElYotza4QUQ4kJfa/AXw1O69k3JZffR1OqUedS+K
-         XnmZ93h4uHLyUlNqBe0cdjKxXgW0TtvCwec/B1qDBomnYXO3sqfAdepiZXZMO19N19Gk
-         e6y7iAJyApo43c/G1ApkCrH1+ajhpFETmCKlCHD7GpWMLcxcwjCOI5RcbAo9LXIvOR2q
-         EfiQQj/KV2nPRJqt7ZYR6YVli92vEX2BzMrocxJYfIbkfjPSGsP8GBJ9oFlkxTVV180P
-         fIJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWlS00tQ/HdKVdPTmfb7SgY9+Hg49Zekgjv0YLGh9zAkZ2121uNZQMmr26ZfLMKiqMBQC4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy502jkQdXMRT+/djJWXmj56QoNoYF+joRjFBNKMi8sHzh72+WC
-	7O+4aWSRWqTgEdT0YqZ03YA/1W5RVUplr2j2RhX86nAn8FlB35vjwjzEvh0pfl5iQ+7X9enBD8t
-	HgqeR2g==
-X-Google-Smtp-Source: AGHT+IFzDAUOZTDNFOssfEjC4490DRPTOVZZ7CJwR5gD19Yg3yMCKcUxEwLwt1d5WA+HAajf5nh9jS9CJiQ=
-X-Received: from pjbpw1.prod.google.com ([2002:a17:90b:2781:b0:33b:c211:1fa9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:384f:b0:341:8c8e:38b5
- with SMTP id 98e67ed59e1d1-34733f3e483mr14061440a91.25.1764090498218; Tue, 25
- Nov 2025 09:08:18 -0800 (PST)
-Date: Tue, 25 Nov 2025 09:08:16 -0800
-In-Reply-To: <83067602-325a-4655-a1b7-e6bd6a31eed4@linux.intel.com>
+        d=1e100.net; s=20230601; t=1764091135; x=1764695935;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QTDXgrG1WH/0PGWngFbUewy7r2hDyrl7ob2LIaTylyw=;
+        b=YbuwsunqG4I/WklWhkVyPsxgGOL9bY2sDZu1jdlUweC8SFTvVNONaW0sazreVFsnYe
+         JhdA1GKkGwPGtkWCKCvtTaxyomhxDos4UwtNqNrZcO+B6jNM9Aumm0VPfvusnoFrmvY1
+         rga6sL+5TXxQUP8P84XLFnppPUKnv4Evc0hxTUP7SPkCUi0swv2a+JNHUijGoFJbjCKN
+         r/dhaG0nLnehCXbmV+qMWiRQUBEDdlBegi2hLcVta7JO/QtV819riVKrmawuC1WqV9QN
+         F+5pzAUE0vHtxCXbHL4SPShZHqo5VH1RZBheDKb378zh+Ps9HLq0r663zICDhyCUxoOk
+         DQQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUpqnBaUEnNJ4wHxE78yYxXMAca9PUFW4hGS50fJXxZ1Ckb1BR3zlurkM394bHy4upsjN4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAKR7X2n0TPC8aXEQhMHO4jZbheaddAAFgqu/3EnMLnoOTbVMA
+	AsIPcr0l1qxmsyUSIb6otf9M9vtEa/BOFIVmhuKMcDC0WOvhHGYpjUQvZ9O0Ga6WnJGK98o28xO
+	EkBUONbqNuPbColfDYW2DJRHNVRa2DjLZlxekwuAvt60T0NkJdnUDyg==
+X-Gm-Gg: ASbGncvPaz0jkpD0UvnDpa9rXLaYpTnAL6NbT5ujM3mh4V/BWjlN7S5uHseckaWdWem
+	UUtJ/IWrP8vPsHNoWIZbH0XFpXgoUlVcJ/5xGXo/qGadU8UZ03P/7luQuL1H/DJLe+WBOH26JN+
+	128Fx4HaKjPrxczo7u295fJEsZsc5kCB9gzN20rhkxqmDbQzMvPfzv9DuxVj74yZa2GYV6yKXff
+	DCUSCjsBbMmUBT6ZbnMsCAAkaSZQFEJbyeYUH0OBKyjtEPnFbw6dw/SibWhh8kmgZIxKbY+1ABC
+	nRvtaHoo+fM0V3NDq1SpgKrMUg9kVZl9hDAFKLIwPScHAa9Lfq0H5OdjY6lJlGFRiYrE2TB374X
+	N41zllyYpciJhNpY=
+X-Received: by 2002:a05:6000:1863:b0:42b:4267:83c2 with SMTP id ffacd0b85a97d-42cc1cbd18dmr16972095f8f.16.1764091135224;
+        Tue, 25 Nov 2025 09:18:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGDwBcpmQPbHfHTQwxxY5Q+qsOpgYiD3CvZ3WNNO7Ii75RTIrUMAIH9/jzA1J2eiQuQn7dHrw==
+X-Received: by 2002:a05:6000:1863:b0:42b:4267:83c2 with SMTP id ffacd0b85a97d-42cc1cbd18dmr16972058f8f.16.1764091134693;
+        Tue, 25 Nov 2025 09:18:54 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fa3592sm34039004f8f.21.2025.11.25.09.18.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Nov 2025 09:18:54 -0800 (PST)
+Date: Tue, 25 Nov 2025 12:18:51 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v6 2/8] ptr_ring: add helper to check if consume
+ created space
+Message-ID: <20251125120122-mutt-send-email-mst@kernel.org>
+References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
+ <20251120152914.1127975-3-simon.schippers@tu-dortmund.de>
+ <20251125095650-mutt-send-email-mst@kernel.org>
+ <ce371d19-e69a-4d8e-a9a0-f3e20439a094@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250806195706.1650976-1-seanjc@google.com> <20250806195706.1650976-29-seanjc@google.com>
- <aSUK8FuWT4lpMP3F@google.com> <83067602-325a-4655-a1b7-e6bd6a31eed4@linux.intel.com>
-Message-ID: <aSXigAQznhuxZmy7@google.com>
-Subject: Re: [PATCH v5 28/44] KVM: x86/pmu: Load/save GLOBAL_CTRL via
- entry/exit fields for mediated PMU
-From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>, 
-	Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
-	Sandipan Das <sandipan.das@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ce371d19-e69a-4d8e-a9a0-f3e20439a094@tu-dortmund.de>
 
-On Tue, Nov 25, 2025, Dapeng Mi wrote:
-> On 11/25/2025 9:48 AM, Sean Christopherson wrote:
-> >> +	if (host_pmu->version < 4 || !(host_perf_cap & PERF_CAP_FW_WRITES))
-> >> +		return false;
+On Tue, Nov 25, 2025 at 05:12:35PM +0100, Simon Schippers wrote:
+> On 11/25/25 16:01, Michael S. Tsirkin wrote:
+> > On Thu, Nov 20, 2025 at 04:29:07PM +0100, Simon Schippers wrote:
+> >> Add __ptr_ring_consume_created_space() to check whether the previous
+> >> __ptr_ring_consume() call successfully consumed an element and created
+> >> space in the ring buffer. This enables callers to conditionally notify
+> >> producers when space becomes available.
+> >>
+> >> The function is only valid immediately after a single consume operation
+> >> and should not be used after calling __ptr_ring_consume_batched().
+> >>
+> >> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >> Co-developed by: Jon Kohler <jon@nutanix.com>
+> >> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> >> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> >> ---
+> >>  include/linux/ptr_ring.h | 17 +++++++++++++++++
+> >>  1 file changed, 17 insertions(+)
+> >>
+> >> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+> >> index da141cc8b075..76d6840b45a3 100644
+> >> --- a/include/linux/ptr_ring.h
+> >> +++ b/include/linux/ptr_ring.h
+> >> @@ -453,6 +453,23 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
+> >>  	return ret;
+> >>  }
+> >>  
+> >> +/*
+> >> + * Check if the previous consume operation created space
+> > 
+> > space?
+> > 
+> > what does this mean?
+> > 
+> >> + *
+> >> + * Returns true if the last call to __ptr_ring_consume() has created
+> >> + * space in the ring buffer (i.e., an element was consumed).
+> >> + *
+> >> + * Note: This function is only valid immediately after a single call to
+> >> + * __ptr_ring_consume(). If multiple calls to ptr_ring_consume*() have
+> >> + * been made, this check must be performed after each call individually.
+> >> + * Likewise, do not use this function after calling
+> >> + * __ptr_ring_consume_batched().
+> > 
+> > API-wise, it is a really weird function.  So is 
+> > 
+> > {
+> > 	p = __ptr_ring_consume
+> > 
+> > 	return !!p
+> > }
+> > 
+> > guaranteed to be equivalent to 
+> > 
+> > {
+> > 	p = __ptr_ring_consume
+> > 
+> > 	return !!__ptr_ring_consume_created_space
+> > }
+> 
+> I am a bit confused. You were the one recommending this function to me,
+> see [1].
+> 
+> Maybe the comments need rework here, but the function should be fine.
+> 
+> Thanks
+> 
+> [1] Link: https://lore.kernel.org/netdev/20250922221553.47802-1-simon.schippers@tu-dortmund.de/T/#mb722e8ae4ceb5df24f74305c6145561883d4e987
+
+
+I see, (an element was consumed) part confused, instead of clarifying.
+That is not the question - it was consumed.
+
+
+
+Let me try:
+
+Returns true if the last call to __ptr_ring_consume() has created
+space in the ring buffer (i.e., a new element can be produced).
+
+
+Note: Because of batching, a successful call to __ptr_ring_consume
+does not guarantee that the next call to __ptr_ring_produce
+will succeed.
+
+Note2: This function is only valid immediately after a single call to
+__ptr_ring_consume(). If multiple calls to ptr_ring_consume*() have
+been made, and you want to know whether any of them created space,
+it is not enough to call this after the last __ptr_ring_consume -
+instead, this check must be performed after each call individually.
+Likewise, do not use this function after calling
+__ptr_ring_consume_batched().
+
+
+
+
+> > 
+> > 
+> > 
+> >> + */
+> >> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r)
+> >> +{
+> >> +	return r->consumer_tail >= r->consumer_head;
+> >> +}
 > >> +
-> >> +	/*
-> >> +	 * All CPUs that support a mediated PMU are expected to support loading
-> >> +	 * and saving PERF_GLOBAL_CTRL via dedicated VMCS fields.
-> >> +	 */
-> >> +	if (WARN_ON_ONCE(!cpu_has_load_perf_global_ctrl() ||
-> >> +			 !cpu_has_save_perf_global_ctrl()))
-> >> +		return false;
-> > And so this WARN fires due to cpu_has_save_perf_global_ctrl() being false.  The
-> > bad changelog is mine, but the code isn't entirely my fault.  I did suggest the
-> > WARN in v3[1], probably because I forgot when PMU v4 was introduced and no one
-> > corrected me.
-> >
-> > v4 of the series[2] then made cpu_has_save_perf_global_ctrl() a hard requirement,
-> > based on my miguided feedback.
-> >
-> >    * Only support GLOBAL_CTRL save/restore with VMCS exec_ctrl, drop the MSR
-> >      save/retore list support for GLOBAL_CTRL, thus the support of mediated
-> >      vPMU is constrained to SapphireRapids and later CPUs on Intel side.
-> >
-> > Doubly frustrating is that this was discussed in the original RFC, where Jim
-> > pointed out[3] that requiring VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL would prevent
-> > enabling the mediated PMU on Skylake+, and I completely forgot that conversation
-> > by the time v3 of the series rolled around :-(
-> 
-> VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL is introduced from SPR and later. I
-> remember the original requirements includes to support Skylake and Icelake,
-> but I ever thought there were some offline sync and the requirement changed...
+> >>  /* Cast to structure type and call a function without discarding from FIFO.
+> >>   * Function must return a value.
+> >>   * Callers must take consumer_lock.
+> >> -- 
+> >> 2.43.0
+> > 
 
-Two things:
-
- 1) Upstream's "requirements" are not the same as Google's requirements (or those
-    of any company/individual).  Upstream most definitely is influenced by the
-    needs and desires of end users, but ultimately the decision to do something
-    (or not) is one that needs to be made by the upstream community.
-
- 2) Decisions made off-list need to be summarized and communicated on-list,
-    especially in cases like this where it's a relatively minor detail in a
-    large series/feature, and thus easy to overlook.
-
-I'll follow-up internally to make sure these points are well-understood by Google
-folks as well (at least, those working on KVM).
-
-> My bad,
-
-Eh, this was a group "effort".  I'm as much to blame as anyone else.
-
-> I should double confirm this at then.
-
-No need, as above, Google's requirements (assuming the requirements you're referring
-to are coming from Google people) are effectively just one data point.  At this
-point, I want to drive the decision to support Sylake+ (or not) purely through
-discussion of upstream patches.
-
-> > As mentioned in the discussion with Jim, _if_ PMU v4 was introduced with ICX (or
-> > later), then I'd be in favor of making VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL a hard
-> > requirement.  But losing supporting Skylake+ is a bit much.
-> >
-> > There are a few warts with nVMX's use of the auto-store list that need to be
-> > cleaned up, but on the plus side it's also a good excuse to clean up
-> > {add,clear}_atomic_switch_msr(), which have accumulated some cruft and quite a
-> > bit of duplicate code.  And while I still dislike using the auto-store list, the
-> > code isn't as ugly as it was back in v3 because we _can_ make the "load" VMCS
-> > controls mandatory without losing support for any CPUs (they predate PMU v4).
-> 
-> Yes, xxx_atomic_switch_msr() helpers need to be cleaned up and optimized. I
-> suppose we can have an independent patch-set to clean up and support
-> global_ctrl with auto-store list for Skylake and Icelake.
-
-I have the code written (I wanted to see how much complexity it would add before
-re-opening this discussion).  My plan is to put the Skylake+ support at the end
-of the series, not a separate series, so that it can be reviewed in one shot.
-E.g. if we can make a change in the "main" series that would simplify Skylake+
-support, then I'd prefer to find and implement any such change right away.
 
