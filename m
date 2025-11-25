@@ -1,209 +1,853 @@
-Return-Path: <kvm+bounces-64555-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64556-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0272DC86E94
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 21:05:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E57DC86F51
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 21:12:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 723DE4E97A0
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 20:05:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3DE2A4EB4BA
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 20:11:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECCDC337B9A;
-	Tue, 25 Nov 2025 20:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B97EA33CE95;
+	Tue, 25 Nov 2025 20:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="V0uiwL7v"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="2CPM9Eqq";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="rn5f9DmC"
 X-Original-To: kvm@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012055.outbound.protection.outlook.com [52.101.43.55])
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE7227991E;
-	Tue, 25 Nov 2025 20:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764101118; cv=fail; b=QWMDd2MnrRmpL5ZXwESLnqGoK8cBhfflxsDPi+Y4p7qeHagzgMVfKTxK14nM4+/x238LV9uPPzcZAmsOEFNLI3ONOFiEn6peb+iAPB+z9jGIUA/meMazzUcYq53nipnyvF7fhdkdfYdvMWuONNosGkj18nsFYtPbeqaGi3x9jMI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764101118; c=relaxed/simple;
-	bh=2wtD6JQ4Y4fMeOSqv+S3O3zwdjhgI2nFQcn4jj3+lOw=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IH/zQOM2d9fr8np9C/MlDAxqc4GS97MOMQZe9xoFSgpDsv/z0gKEwkr/+41c38ATX9GTbVdzSy41EjxoCKQoGhif0o5ey+6lkQD0X5PMgecb29e09BBjHeGmuoLFjFcQShpQlP+6OYtuVWGNOpRZOnDB9qHxhNdFx1wOc1a1R1U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=V0uiwL7v; arc=fail smtp.client-ip=52.101.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hzE4994bRgCdQRfM0XyEqo1YwW+VHie7YRpHiWSP1Hu0KQrFpF7mcN/3sfOtI6nj+2R+MW9hK/rkdAIQYDbPiOARO1lBhu6T5h0jXaZ1fx41EK6QT5ttbp88i/z+OOeGFHphVZNdP02ptmWwiHO2rjwz8tc41pdpo7QP0gAfK6UYVdi5dIuMQcsTaARY/jp6YCnRU5peu5qDzl5yHcY52f/DjmkMjm9DRlNGO0dQuvj25qAewNFoQB4EGUgUF8vv+O90RR77vD0cCjSVOlLCnTtyPPkQMCNXNYemugyxq9Q3/65muu6NsJEiWcdf/dV6k/Cj2scDeWGQ3vwG+hidsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rgg3Xw3lgWoqcisv9Y0Z34eSL9XxDYU9M+X0flyd61Q=;
- b=kSuzeh/XP9BR+GVsH9wS+0Hkq8SbDfkW4kSEkghfKSrTXjSAG2HTD4XVErYdnzxJfW7Kz6yDqHsD79toZ1GqRlzYCZ8QcxdyJB/8cqB4oCX8XeokC1MnpoqqW1aykz56ohpwkCdjPMyWUnqsTV/8bILMOdi5HH4lORvaXpYFd5mGAv0yIGKloEjwJvDZAjYNFs53VePAw/gS9578lwC51IhuQVJbj7agdLLYgVB6sqj1PUs2v3/LG3ROSf0GSGQ7QgspkfzVHO0teS9R4dP1cwtohacQnd0XMzphF+dfZ7xq5DTE42qwOAHvKUpMwkZjcEGBqjzZQ5qjYgNxo5bKxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rgg3Xw3lgWoqcisv9Y0Z34eSL9XxDYU9M+X0flyd61Q=;
- b=V0uiwL7vucVzo34jH3BppC0vNzYWUy8QaA2JsIweTEQOn37Blger42wLiKbNKX5eEew8wz6vmxDif2mI5wKegdTuHLXrucssFOrqDgmaQHbZ4AN6V5ryMJRjSzW1ZBRPFhhH3k8kbkaCvitM89reXC9Y1qwu2eSyGA6ynNymOr8cqOi52z4pRNRbUb7gA2wjEEp0PonfST4bTtdA64Ri6g+i+ZGBpPOa40Ious1VI6/sb7gW5VwohaSTPkWQQVvhpdN2tmBbsLMYdsb4MJXeLTOHAGDkX6e4Rr3juROF5MM4ssBXlWRif3L/kLJvs3M6j8opHvjIm7jN/ofIGZcZOw==
-Received: from PH7P221CA0062.NAMP221.PROD.OUTLOOK.COM (2603:10b6:510:328::6)
- by DM4PR12MB6469.namprd12.prod.outlook.com (2603:10b6:8:b6::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9366.11; Tue, 25 Nov 2025 20:05:13 +0000
-Received: from SN1PEPF00036F43.namprd05.prod.outlook.com
- (2603:10b6:510:328:cafe::d9) by PH7P221CA0062.outlook.office365.com
- (2603:10b6:510:328::6) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.12 via Frontend Transport; Tue,
- 25 Nov 2025 20:05:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF00036F43.mail.protection.outlook.com (10.167.248.27) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9366.7 via Frontend Transport; Tue, 25 Nov 2025 20:05:13 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 25 Nov
- 2025 12:04:54 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 25 Nov
- 2025 12:04:54 -0800
-Received: from inno-thin-client (10.127.8.10) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Tue, 25
- Nov 2025 12:04:46 -0800
-Date: Tue, 25 Nov 2025 22:04:45 +0200
-From: Zhi Wang <zhiw@nvidia.com>
-To: <ankita@nvidia.com>
-CC: <jgg@ziepe.ca>, <yishaih@nvidia.com>, <skolothumtho@nvidia.com>,
-	<kevin.tian@intel.com>, <alex@shazbot.org>, <aniketa@nvidia.com>,
-	<vsethi@nvidia.com>, <mochs@nvidia.com>, <Yunxiang.Li@amd.com>,
-	<yi.l.liu@intel.com>, <zhangdongdong@eswincomputing.com>,
-	<avihaih@nvidia.com>, <bhelgaas@google.com>, <peterx@redhat.com>,
-	<pstanner@redhat.com>, <apopple@nvidia.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
-	<targupta@nvidia.com>, <danw@nvidia.com>, <dnigam@nvidia.com>,
-	<kjaju@nvidia.com>
-Subject: Re: [PATCH v6 3/6] vfio: use vfio_pci_core_setup_barmap to map bar
- in mmap
-Message-ID: <20251125220445.02a72453.zhiw@nvidia.com>
-In-Reply-To: <20251125173013.39511-4-ankita@nvidia.com>
-References: <20251125173013.39511-1-ankita@nvidia.com>
-	<20251125173013.39511-4-ankita@nvidia.com>
-Organization: NVIDIA
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE1E33BBA1;
+	Tue, 25 Nov 2025 20:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764101303; cv=none; b=fAKCdQ1djmHDzB0E/9FGSeJU/gnXbPzyKDU0JZCbT1TEpcw+foCD4sfOnRJsKndcYlpUm3YI7s9dc1P0S/iaIR28B/EKD3a4dqrFT5nh4hX1U4tngy7sRMwMMpS0cRIIi55C5ZH/zpTajawa0zV8qYsvzhYKHkaWZOL2ve2OVUA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764101303; c=relaxed/simple;
+	bh=aDZr9GhdD8Ua6dB/OuD/gV+jagsvQH8OaVmz5ib/eLM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pPX0LXn+RCWs5Lyoz6gW5TvwAxMv8BxnMA3TybvqFG20cYAFnSXwJgnpS5zdIIHVePxX9ev7Y0Zbs079+tuRahGdfu4aHVtA/QmNWaEwGFW8vRzVD0MobAUjltYyRDNlxaxhgA95tBVJRjc/F2dUgDvxDxLXtvTLIC2dO+nAMN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=2CPM9Eqq; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=rn5f9DmC; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.stl.internal (Postfix) with ESMTP id 5FA291D00137;
+	Tue, 25 Nov 2025 15:08:18 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Tue, 25 Nov 2025 15:08:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1764101298;
+	 x=1764187698; bh=6XU0yQ0I1CKC+Y4TnTi5C9J9xm3SSaQ4u7Y7QHFJglE=; b=
+	2CPM9EqqX6w79SHpS3MKYmcSZHMb0iAs59+2o5yo9RsqAERBb1GqntQYCo3WEVnR
+	DFLBuikbPw2AiSIrRx6n+MdRoiyI1+oDAjxq25r2okWA581Drkb943w0tfLI8VpA
+	GLJR8nGf5gCDBwOPUG9RphFlvQxtkMmL89e+O60aaYaJpA+pyhrVHTN9EkIZew/9
+	cEuTHqAicccv6zgOYsr3ShWtMBwlodcOrHC0n7ZmCJsXJza+agve8a3zCkLJJE8s
+	zQum/AjH2iIIjXN8gWthGPpvwpBR9sKkneVnL6tO9PxmJ4JG7MfRzAzVHCefquTF
+	znnb1ZgJ7sB3OelbwaOJbA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1764101298; x=
+	1764187698; bh=6XU0yQ0I1CKC+Y4TnTi5C9J9xm3SSaQ4u7Y7QHFJglE=; b=r
+	n5f9DmCI1LLN2q0FGUEgB+klxx96hVe5ZlbND5N1pvfTUMhtzGC11YD5+Q5clCox
+	NwVQ/HwpLd0kTATIGqQ6G1ZudGeEymhGr+tdpdWTH+IUuu/LonCNRwglSYrg2adC
+	S5NjojyDfiHSaf/e1PXNVx+wpCEQNfcnSCDB/5UGjiTN2JRuzL8DY0SMlgrf6VAO
+	MHcPRdbEy9b1/xIa9Q8ZyReGwgLIqq6djzSTMwB7rHJ/Jv4t9CkCpooRj+GEwAd7
+	fuYnPIAGTyDyktAWJu3Sp7Zp5iR3JsHZwevYuG1IN7XRGg68SRckXLTjijhwtRr6
+	Tv9p23GFIhTSIQ3FLavsg==
+X-ME-Sender: <xms:sQwmaUIZ9Yd873OFsZFH4azhECyKeukg4Pn4yRhrWQcIMGCpnn-NSA>
+    <xme:sQwmaUnUUbj1u_0oOeDO-eFhW4hfop4ZT6e2R2O1WLkbk_sqDzIKh9lOU3srzrOO7
+    XVsyD0vH60zLU-Yi__BReWDO8GHk5u-eSLp8_1frKTL8RxGpWMKlQ>
+X-ME-Received: <xmr:sQwmaaI8m9UfhAi9Jsf_PQpWZuNHK90PnwlV7cEbq2Xd2SMV3O1zhaU8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgedvfeelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfgggtgfesthhqredttddtjeenucfhrhhomheptehlvgigucgh
+    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
+    htvghrnhepgfffvdefjeejueevfeetudfhgeetfeeuheetfeekjedvuddvueehffdtgeej
+    keetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopedvuddpmhhouggvpehs
+    mhhtphhouhhtpdhrtghpthhtohepmhhitghhrghlrdifihhnihgrrhhskhhisehinhhtvg
+    hlrdgtohhmpdhrtghpthhtoheplhhutggrshdruggvmhgrrhgthhhisehinhhtvghlrdgt
+    ohhmpdhrtghpthhtohepthhhohhmrghsrdhhvghllhhsthhrohhmsehlihhnuhigrdhinh
+    htvghlrdgtohhmpdhrtghpthhtoheprhhoughrihhgohdrvhhivhhisehinhhtvghlrdgt
+    ohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtghpthhtohephihishhhrg
+    hihhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepkhgvvhhinhdrthhirghnsehinhht
+    vghlrdgtohhmpdhrtghpthhtohepshhkohhlohhthhhumhhthhhosehnvhhiughirgdrtg
+    homhdprhgtphhtthhopehinhhtvghlqdigvgeslhhishhtshdrfhhrvggvuggvshhkthho
+    phdrohhrgh
+X-ME-Proxy: <xmx:sQwmafWzIuM7zERfKYLATL0v6x4NCFOq0iGpMnTqdZcQa6AwZZs2wQ>
+    <xmx:sQwmafM1CDfg98ovBvFe8JvsvxC1yQo3Ct81vh-8j6n_pY2rCeD32g>
+    <xmx:sQwmablRxFpwm5pCUsABOrWYhYQRd7GqMDmoKIsaNXm4XSfIRIIwNg>
+    <xmx:sQwmaSXnUDJhgkXZCGs4LuqQECtIeH8km0hroH8yDbwfUyaP6Ssq4g>
+    <xmx:sgwmaZsN1YCDwjTRI8Qwof1VAVKaazz-co1f44po75q5PmVUbRVqE2Jv>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 25 Nov 2025 15:08:15 -0500 (EST)
+Date: Tue, 25 Nov 2025 13:08:14 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: =?UTF-8?B?TWljaGHFgg==?= Winiarski <michal.winiarski@intel.com>
+Cc: Lucas De Marchi <lucas.demarchi@intel.com>, Thomas =?UTF-8?B?SGVsbHN0?=
+ =?UTF-8?B?csO2bQ==?= <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi
+ <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas
+ <yishaih@nvidia.com>, Kevin Tian <kevin.tian@intel.com>, Shameer Kolothum
+ <skolothumtho@nvidia.com>, <intel-xe@lists.freedesktop.org>,
+ <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
+ <matthew.brost@intel.com>, "Michal Wajdeczko" <michal.wajdeczko@intel.com>,
+ <dri-devel@lists.freedesktop.org>, Jani Nikula
+ <jani.nikula@linux.intel.com>, Joonas Lahtinen
+ <joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
+ Laguna" <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v6 4/4] vfio/xe: Add device specific vfio_pci driver
+ variant for Intel graphics
+Message-ID: <20251125130814.1c0bb7e3.alex@shazbot.org>
+In-Reply-To: <20251124230841.613894-5-michal.winiarski@intel.com>
+References: <20251124230841.613894-1-michal.winiarski@intel.com>
+	<20251124230841.613894-5-michal.winiarski@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F43:EE_|DM4PR12MB6469:EE_
-X-MS-Office365-Filtering-Correlation-Id: bc2273ef-5132-4b20-f6ae-08de2c5df202
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|82310400026|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?DoYSdK7gKGY2vGhdP1Of5DZz8ZDRadgGDl9MhYcw1RbPzH5kIHFXbt9xPdV/?=
- =?us-ascii?Q?xYvuIBoh8nbWAwbBnrnN1W096EZ9Iel7dW+zguans26gOcMM5EAXZ60ORu58?=
- =?us-ascii?Q?w1jk1d/JN1A3yczBVuPbQ7PNFE/lUm6NuG67k1tY2h2Z/NV62zN28k5FOzfh?=
- =?us-ascii?Q?8tt7puMlpnHH2qRLGH5QXkB3Pqc5XBXacZWCcNTfHwOsztCfBXB0T0mcA42f?=
- =?us-ascii?Q?AekSaaI468cltKrcXLYZHF9CSWA8P9ZY+7dEMc4R3bmMgFJthLXKfS/kG9N7?=
- =?us-ascii?Q?+/10GjAy/VnNe0yTdVj54YIpYLFP5Sx5EY6l2SQ8Jv7HBzB6sjq7kvspLLdZ?=
- =?us-ascii?Q?8uaM4idu8+rbICiELAcX/4UH9WsGo/jRc38KoIkADvP6xQs8I9MzL+Lw+1Rx?=
- =?us-ascii?Q?pL5WSwOAunxVa0Tb/wpw3O7l4EC33L4GIIqKtJgemehF6mKjh0hCbSkKgT0X?=
- =?us-ascii?Q?qfxC+liAYvd6w424PMxfj+urrkaLNKshWfDwYKOSycFK8qrGT302sh27m/9V?=
- =?us-ascii?Q?AS0Caiupuv6moprxFi7Iqv2sxv0VDP6rw1eIFA0Xzy8NUCaGZWjo6yUgogjy?=
- =?us-ascii?Q?+3KYip1dDSIViohYwZ9LmHgG/sVdiC/9z6pFzcK/mcZLMFOr/+3PugZSHOJ+?=
- =?us-ascii?Q?P3AZI7VENxDGaAkCWwI/s1tkAl2NlvZOEr8D2Eopu7XW9f9V6ZnmjM4JRayi?=
- =?us-ascii?Q?UyKzq0FgJ7TaORuaBGnqZ/MEgdJ5OfxJxWWr4gISdxAFAjvivSwdTuR2+ixb?=
- =?us-ascii?Q?itcxGdCAHpFMiGiSylUP8zjRNOODoqPmJ47akbwX/xnLdG5HUtA3qYQkZ+Ut?=
- =?us-ascii?Q?Tm3meLpxQXwdQJ2Pt363eEfWgjpmXuAMLsqkdFBIbYvWlMb4BRvN3w8Rzyz2?=
- =?us-ascii?Q?jV8M59dVGf/LHAj1GLbZP8sNB5Jdl8MSbS1fcKC5rfHKM5lqAQ6KvBl1V3jY?=
- =?us-ascii?Q?FNfOoVJXB95YSgUiHwSUL5joq3SdS3j/2+2YO35MMHdsq+7kLoIXCfJTHm/J?=
- =?us-ascii?Q?amH1MDpxrUXzTwDHist4xy/IscP4kxqJ/IfkJisCvHJM2HVo6XTLWEcgEgn4?=
- =?us-ascii?Q?GnlvAg4IdTPgr7sDb0/cQILtN/8vozszVJmi3LhMBMBhSLUUHScoDMzMRlYC?=
- =?us-ascii?Q?EX/zDGiHxOx0lWFSXETTfssYHgO87G7yhWtbOuP4FxFXWyQjLuIKBYVCLPgr?=
- =?us-ascii?Q?r2lnE+63BBdbw6yroX2F9OeRiUl23GJuQUk6VVMFxCgZr4Pfb2DV2c0EI5bo?=
- =?us-ascii?Q?7OvDEd7Iu65rqPIdolqeCj4FKdhRPYI23+7HKBOvEm9SK7ILQdh81DycoLxZ?=
- =?us-ascii?Q?jD59zpFx8uCLf6TQHnHKjdcFaEGThWrAJzzOwlX6kGDugn5Gp6OmTvf7vj8n?=
- =?us-ascii?Q?8O086he7qKT7VvFFjAXhnjt/9NcMJKSn399pJxvTLUwm0jYz9HHsai50wTzI?=
- =?us-ascii?Q?3uzTD0Lttr/WsSE2BFa4L6MjTJlGIug/zYNM1CImrccPjqha7EFwca3UTeTj?=
- =?us-ascii?Q?iMpvEpljASh24aTtg5A760gPqBQMB3bhiebi1SPQpLTQx5YC5BkKk5A8cDpt?=
- =?us-ascii?Q?UQoJ5p9LVqx2rboeYq0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2025 20:05:13.6187
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc2273ef-5132-4b20-f6ae-08de2c5df202
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00036F43.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6469
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 25 Nov 2025 17:30:10 +0000
-<ankita@nvidia.com> wrote:
+On Tue, 25 Nov 2025 00:08:41 +0100
+Micha=C5=82 Winiarski <michal.winiarski@intel.com> wrote:
 
-LGTM.
-
-Reviewed-by: Zhi Wang <zhiw@nvidia.com>
-
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> Remove code duplication in vfio_pci_core_mmap by calling
-> vfio_pci_core_setup_barmap to perform the bar mapping.
-> 
-> cc: Donald Dutile <ddutile@redhat.com>
-> Reviewed-by: Shameer Kolothum <skolothumtho@nvidia.com>
-> Suggested-by: Alex Williamson <alex@shazbot.org>
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> In addition to generic VFIO PCI functionality, the driver implements
+> VFIO migration uAPI, allowing userspace to enable migration for Intel
+> Graphics SR-IOV Virtual Functions.
+> The driver binds to VF device and uses API exposed by Xe driver to
+> transfer the VF migration data under the control of PF device.
+>=20
+> Signed-off-by: Micha=C5=82 Winiarski <michal.winiarski@intel.com>
+> Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 > ---
->  drivers/vfio/pci/vfio_pci_core.c | 15 +++------------
->  1 file changed, 3 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c
-> b/drivers/vfio/pci/vfio_pci_core.c index c445a53ee12e..3cc799eb75ea
-> 100644 --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1761,18 +1761,9 @@ int vfio_pci_core_mmap(struct vfio_device
-> *core_vdev, struct vm_area_struct *vma
->  	 * Even though we don't make use of the barmap for the mmap,
->  	 * we need to request the region and the barmap tracks that.
->  	 */
-> -	if (!vdev->barmap[index]) {
-> -		ret = pci_request_selected_regions(pdev,
-> -						   1 << index,
-> "vfio-pci");
-> -		if (ret)
-> -			return ret;
-> -
-> -		vdev->barmap[index] = pci_iomap(pdev, index, 0);
-> -		if (!vdev->barmap[index]) {
-> -			pci_release_selected_regions(pdev, 1 <<
-> index);
-> -			return -ENOMEM;
-> -		}
-> -	}
-> +	ret = vfio_pci_core_setup_barmap(vdev, index);
+>  MAINTAINERS                  |   7 +
+>  drivers/vfio/pci/Kconfig     |   2 +
+>  drivers/vfio/pci/Makefile    |   2 +
+>  drivers/vfio/pci/xe/Kconfig  |  12 +
+>  drivers/vfio/pci/xe/Makefile |   3 +
+>  drivers/vfio/pci/xe/main.c   | 568 +++++++++++++++++++++++++++++++++++
+>  6 files changed, 594 insertions(+)
+>  create mode 100644 drivers/vfio/pci/xe/Kconfig
+>  create mode 100644 drivers/vfio/pci/xe/Makefile
+>  create mode 100644 drivers/vfio/pci/xe/main.c
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index acc951f122eaf..adb5aa9cd29e9 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -27025,6 +27025,13 @@ L:	virtualization@lists.linux.dev
+>  S:	Maintained
+>  F:	drivers/vfio/pci/virtio
+> =20
+> +VFIO XE PCI DRIVER
+> +M:	Micha=C5=82 Winiarski <michal.winiarski@intel.com>
+> +L:	kvm@vger.kernel.org
+> +L:	intel-xe@lists.freedesktop.org
+> +S:	Supported
+> +F:	drivers/vfio/pci/xe
+> +
+>  VGA_SWITCHEROO
+>  R:	Lukas Wunner <lukas@wunner.de>
+>  S:	Maintained
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index 2b0172f546652..c100f0ab87f2d 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -67,4 +67,6 @@ source "drivers/vfio/pci/nvgrace-gpu/Kconfig"
+> =20
+>  source "drivers/vfio/pci/qat/Kconfig"
+> =20
+> +source "drivers/vfio/pci/xe/Kconfig"
+> +
+>  endmenu
+> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+> index cf00c0a7e55c8..f5d46aa9347b9 100644
+> --- a/drivers/vfio/pci/Makefile
+> +++ b/drivers/vfio/pci/Makefile
+> @@ -19,3 +19,5 @@ obj-$(CONFIG_VIRTIO_VFIO_PCI) +=3D virtio/
+>  obj-$(CONFIG_NVGRACE_GPU_VFIO_PCI) +=3D nvgrace-gpu/
+> =20
+>  obj-$(CONFIG_QAT_VFIO_PCI) +=3D qat/
+> +
+> +obj-$(CONFIG_XE_VFIO_PCI) +=3D xe/
+> diff --git a/drivers/vfio/pci/xe/Kconfig b/drivers/vfio/pci/xe/Kconfig
+> new file mode 100644
+> index 0000000000000..4253f2a86ca1f
+> --- /dev/null
+> +++ b/drivers/vfio/pci/xe/Kconfig
+> @@ -0,0 +1,12 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +config XE_VFIO_PCI
+> +	tristate "VFIO support for Intel Graphics"
+> +	depends on DRM_XE
+> +	select VFIO_PCI_CORE
+> +	help
+> +	  This option enables device specific VFIO driver variant for Intel Gra=
+phics.
+> +	  In addition to generic VFIO PCI functionality, it implements VFIO
+> +	  migration uAPI allowing userspace to enable migration for
+> +	  Intel Graphics SR-IOV Virtual Functions supported by the Xe driver.
+> +
+> +	  If you don't know what to do here, say N.
+> diff --git a/drivers/vfio/pci/xe/Makefile b/drivers/vfio/pci/xe/Makefile
+> new file mode 100644
+> index 0000000000000..13aa0fd192cd4
+> --- /dev/null
+> +++ b/drivers/vfio/pci/xe/Makefile
+> @@ -0,0 +1,3 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +obj-$(CONFIG_XE_VFIO_PCI) +=3D xe-vfio-pci.o
+> +xe-vfio-pci-y :=3D main.o
+> diff --git a/drivers/vfio/pci/xe/main.c b/drivers/vfio/pci/xe/main.c
+> new file mode 100644
+> index 0000000000000..ce0ed82ee4d31
+> --- /dev/null
+> +++ b/drivers/vfio/pci/xe/main.c
+> @@ -0,0 +1,568 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright =C2=A9 2025 Intel Corporation
+> + */
+> +
+> +#include <linux/anon_inodes.h>
+> +#include <linux/delay.h>
+> +#include <linux/file.h>
+> +#include <linux/module.h>
+> +#include <linux/pci.h>
+> +#include <linux/sizes.h>
+> +#include <linux/types.h>
+> +#include <linux/vfio.h>
+> +#include <linux/vfio_pci_core.h>
+> +
+> +#include <drm/intel/xe_sriov_vfio.h>
+> +#include <drm/intel/pciids.h>
+> +
+> +struct xe_vfio_pci_migration_file {
+> +	struct file *filp;
+> +	/* serializes accesses to migration data */
+> +	struct mutex lock;
+> +	bool disabled;
+
+Move to the end to avoid a hole?  Unless you know mutex leaves a gap.
+Maybe also use a bitfield u8 for consistency to flags in below struct.
+
+> +	struct xe_vfio_pci_core_device *xe_vdev;
+> +};
+> +
+> +struct xe_vfio_pci_core_device {
+> +	struct vfio_pci_core_device core_device;
+> +	struct xe_device *xe;
+> +	/* PF internal control uses vfid index starting from 1 */
+> +	unsigned int vfid;
+> +	u8 migrate_cap:1;
+> +	u8 deferred_reset:1;
+> +	/* protects migration state */
+> +	struct mutex state_mutex;
+> +	enum vfio_device_mig_state mig_state;
+> +	/* protects the reset_done flow */
+> +	spinlock_t reset_lock;
+> +	struct xe_vfio_pci_migration_file *migf;
+> +};
+> +
+> +#define xe_vdev_to_dev(xe_vdev) (&(xe_vdev)->core_device.pdev->dev)
+> +
+> +static void xe_vfio_pci_disable_file(struct xe_vfio_pci_migration_file *=
+migf)
+> +{
+> +	mutex_lock(&migf->lock);
+> +	migf->disabled =3D true;
+> +	mutex_unlock(&migf->lock);
+> +}
+> +
+> +static void xe_vfio_pci_put_file(struct xe_vfio_pci_core_device *xe_vdev)
+> +{
+> +	xe_vfio_pci_disable_file(xe_vdev->migf);
+> +	fput(xe_vdev->migf->filp);
+> +	xe_vdev->migf =3D NULL;
+> +}
+> +
+> +static void xe_vfio_pci_reset(struct xe_vfio_pci_core_device *xe_vdev)
+> +{
+> +	if (xe_vdev->migf)
+> +		xe_vfio_pci_put_file(xe_vdev);
+> +
+> +	xe_vdev->mig_state =3D VFIO_DEVICE_STATE_RUNNING;
+> +}
+> +
+> +static void xe_vfio_pci_state_mutex_lock(struct xe_vfio_pci_core_device =
+*xe_vdev)
+> +{
+> +	mutex_lock(&xe_vdev->state_mutex);
+> +}
+> +
+> +/*
+> + * This function is called in all state_mutex unlock cases to
+> + * handle a 'deferred_reset' if exists.
+> + */
+> +static void xe_vfio_pci_state_mutex_unlock(struct xe_vfio_pci_core_devic=
+e *xe_vdev)
+> +{
+> +again:
+> +	spin_lock(&xe_vdev->reset_lock);
+> +	if (xe_vdev->deferred_reset) {
+> +		xe_vdev->deferred_reset =3D false;
+> +		spin_unlock(&xe_vdev->reset_lock);
+> +		xe_vfio_pci_reset(xe_vdev);
+> +		goto again;
+> +	}
+> +	mutex_unlock(&xe_vdev->state_mutex);
+> +	spin_unlock(&xe_vdev->reset_lock);
+> +}
+> +
+> +static void xe_vfio_pci_reset_done(struct pci_dev *pdev)
+> +{
+> +	struct xe_vfio_pci_core_device *xe_vdev =3D pci_get_drvdata(pdev);
+> +	int ret;
+> +
+> +	if (!xe_vdev->vfid)
+> +		return;
+> +
+> +	/*
+> +	 * VF FLR requires additional processing done by PF driver.
+> +	 * The processing is done after FLR is already finished from PCIe
+> +	 * perspective.
+> +	 * In order to avoid a scenario where VF is used while PF processing
+> +	 * is still in progress, additional synchronization point is needed.
+> +	 */
+> +	ret =3D xe_sriov_vfio_wait_flr_done(xe_vdev->xe, xe_vdev->vfid);
+> +	if (ret)
+> +		dev_err(&pdev->dev, "Failed to wait for FLR: %d\n", ret);
+> +
+> +	if (!xe_vdev->migrate_cap)
+> +		return;
+
+It seems like the above is intended to cause a stall for all VFs,
+regardless of migration support, but vfid and xe are only set for VFs
+supporting migration.  Maybe that much needs to be pulled out of
+migration_init into init_dev, which then gives the migrate_cap flag
+purpose where it otherwise seems redundant to testing xe or vfid.
+
+> +
+> +	/*
+> +	 * As the higher VFIO layers are holding locks across reset and using
+> +	 * those same locks with the mm_lock we need to prevent ABBA deadlock
+> +	 * with the state_mutex and mm_lock.
+> +	 * In case the state_mutex was taken already we defer the cleanup work
+> +	 * to the unlock flow of the other running context.
+> +	 */
+> +	spin_lock(&xe_vdev->reset_lock);
+> +	xe_vdev->deferred_reset =3D true;
+> +	if (!mutex_trylock(&xe_vdev->state_mutex)) {
+> +		spin_unlock(&xe_vdev->reset_lock);
+> +		return;
+> +	}
+> +	spin_unlock(&xe_vdev->reset_lock);
+> +	xe_vfio_pci_state_mutex_unlock(xe_vdev);
+> +
+> +	xe_vfio_pci_reset(xe_vdev);
+> +}
+> +
+> +static const struct pci_error_handlers xe_vfio_pci_err_handlers =3D {
+> +	.reset_done =3D xe_vfio_pci_reset_done,
+> +	.error_detected =3D vfio_pci_core_aer_err_detected,
+> +};
+> +
+> +static int xe_vfio_pci_open_device(struct vfio_device *core_vdev)
+> +{
+> +	struct xe_vfio_pci_core_device *xe_vdev =3D
+> +		container_of(core_vdev, struct xe_vfio_pci_core_device, core_device.vd=
+ev);
+> +	struct vfio_pci_core_device *vdev =3D &xe_vdev->core_device;
+> +	int ret;
+> +
+> +	ret =3D vfio_pci_core_enable(vdev);
 > +	if (ret)
 > +		return ret;
->  
->  	vma->vm_private_data = vdev;
->  	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> +
+> +	vfio_pci_core_finish_enable(vdev);
+> +
+> +	return 0;
+> +}
+
+Typically migration drivers are setting the initial RUNNING mig_state
+in their open_device function, are we implicitly relying on the
+reset_done callback for this instead?
+
+> +
+> +static int xe_vfio_pci_release_file(struct inode *inode, struct file *fi=
+lp)
+> +{
+> +	struct xe_vfio_pci_migration_file *migf =3D filp->private_data;
+> +
+> +	xe_vfio_pci_disable_file(migf);
+
+What does calling the above accomplish?  If something is racing access,
+setting disabled immediately before we destroy the lock and free the
+object isn't going to solve anything.
+
+> +	mutex_destroy(&migf->lock);
+> +	kfree(migf);
+> +
+> +	return 0;
+> +}
+> +
+> +static ssize_t xe_vfio_pci_save_read(struct file *filp, char __user *buf=
+, size_t len, loff_t *pos)
+> +{
+> +	struct xe_vfio_pci_migration_file *migf =3D filp->private_data;
+> +	ssize_t ret;
+> +
+> +	if (pos)
+> +		return -ESPIPE;
+> +
+> +	mutex_lock(&migf->lock);
+> +	if (migf->disabled) {
+> +		mutex_unlock(&migf->lock);
+> +		return -ENODEV;
+> +	}
+> +
+> +	ret =3D xe_sriov_vfio_data_read(migf->xe_vdev->xe, migf->xe_vdev->vfid,=
+ buf, len);
+> +	mutex_unlock(&migf->lock);
+> +
+> +	return ret;
+> +}
+> +
+> +static const struct file_operations xe_vfio_pci_save_fops =3D {
+> +	.owner =3D THIS_MODULE,
+> +	.read =3D xe_vfio_pci_save_read,
+> +	.release =3D xe_vfio_pci_release_file,
+> +	.llseek =3D noop_llseek,
+> +};
+> +
+> +static ssize_t xe_vfio_pci_resume_write(struct file *filp, const char __=
+user *buf,
+> +					size_t len, loff_t *pos)
+> +{
+> +	struct xe_vfio_pci_migration_file *migf =3D filp->private_data;
+> +	ssize_t ret;
+> +
+> +	if (pos)
+> +		return -ESPIPE;
+> +
+> +	mutex_lock(&migf->lock);
+> +	if (migf->disabled) {
+> +		mutex_unlock(&migf->lock);
+> +		return -ENODEV;
+> +	}
+> +
+> +	ret =3D xe_sriov_vfio_data_write(migf->xe_vdev->xe, migf->xe_vdev->vfid=
+, buf, len);
+> +	mutex_unlock(&migf->lock);
+> +
+> +	return ret;
+> +}
+> +
+> +static const struct file_operations xe_vfio_pci_resume_fops =3D {
+> +	.owner =3D THIS_MODULE,
+> +	.write =3D xe_vfio_pci_resume_write,
+> +	.release =3D xe_vfio_pci_release_file,
+> +	.llseek =3D noop_llseek,
+> +};
+> +
+> +static const char *vfio_dev_state_str(u32 state)
+> +{
+> +	switch (state) {
+> +	case VFIO_DEVICE_STATE_RUNNING: return "running";
+> +	case VFIO_DEVICE_STATE_RUNNING_P2P: return "running_p2p";
+> +	case VFIO_DEVICE_STATE_STOP_COPY: return "stopcopy";
+> +	case VFIO_DEVICE_STATE_STOP: return "stop";
+> +	case VFIO_DEVICE_STATE_RESUMING: return "resuming";
+> +	case VFIO_DEVICE_STATE_ERROR: return "error";
+> +	default: return "";
+> +	}
+> +}
+> +
+> +enum xe_vfio_pci_file_type {
+> +	XE_VFIO_FILE_SAVE =3D 0,
+> +	XE_VFIO_FILE_RESUME,
+> +};
+> +
+> +static struct xe_vfio_pci_migration_file *
+> +xe_vfio_pci_alloc_file(struct xe_vfio_pci_core_device *xe_vdev,
+> +		       enum xe_vfio_pci_file_type type)
+> +{
+> +	struct xe_vfio_pci_migration_file *migf;
+> +	const struct file_operations *fops;
+> +	int flags;
+> +
+> +	migf =3D kzalloc(sizeof(*migf), GFP_KERNEL);
+
+GFP_KERNEL_ACCOUNT
+
+> +	if (!migf)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	fops =3D type =3D=3D XE_VFIO_FILE_SAVE ? &xe_vfio_pci_save_fops : &xe_v=
+fio_pci_resume_fops;
+> +	flags =3D type =3D=3D XE_VFIO_FILE_SAVE ? O_RDONLY : O_WRONLY;
+> +	migf->filp =3D anon_inode_getfile("xe_vfio_mig", fops, migf, flags);
+> +	if (IS_ERR(migf->filp)) {
+> +		kfree(migf);
+> +		return ERR_CAST(migf->filp);
+> +	}
+> +
+> +	mutex_init(&migf->lock);
+> +	migf->xe_vdev =3D xe_vdev;
+> +	xe_vdev->migf =3D migf;
+> +
+> +	stream_open(migf->filp->f_inode, migf->filp);
+> +
+> +	return migf;
+> +}
+> +
+> +static struct file *
+> +xe_vfio_set_state(struct xe_vfio_pci_core_device *xe_vdev, u32 new)
+> +{
+> +	u32 cur =3D xe_vdev->mig_state;
+> +	int ret;
+> +
+> +	dev_dbg(xe_vdev_to_dev(xe_vdev),
+> +		"state: %s->%s\n", vfio_dev_state_str(cur), vfio_dev_state_str(new));
+> +
+> +	/*
+> +	 * "STOP" handling is reused for "RUNNING_P2P", as the device doesn't
+> +	 * have the capability to selectively block outgoing p2p DMA transfers.
+> +	 * While the device is allowing BAR accesses when the VF is stopped, it
+> +	 * is not processing any new workload requests, effectively stopping
+> +	 * any outgoing DMA transfers (not just p2p).
+> +	 * Any VRAM / MMIO accesses occurring during "RUNNING_P2P" are kept and
+> +	 * will be migrated to target VF during stop-copy.
+> +	 */
+> +	if (cur =3D=3D VFIO_DEVICE_STATE_RUNNING && new =3D=3D VFIO_DEVICE_STAT=
+E_RUNNING_P2P) {
+> +		ret =3D xe_sriov_vfio_suspend_device(xe_vdev->xe, xe_vdev->vfid);
+> +		if (ret)
+> +			goto err;
+> +
+> +		return NULL;
+> +	}
+> +
+> +	if ((cur =3D=3D VFIO_DEVICE_STATE_RUNNING_P2P && new =3D=3D VFIO_DEVICE=
+_STATE_STOP) ||
+> +	    (cur =3D=3D VFIO_DEVICE_STATE_STOP && new =3D=3D VFIO_DEVICE_STATE_=
+RUNNING_P2P))
+> +		return NULL;
+> +
+> +	if (cur =3D=3D VFIO_DEVICE_STATE_RUNNING_P2P && new =3D=3D VFIO_DEVICE_=
+STATE_RUNNING) {
+> +		ret =3D xe_sriov_vfio_resume_device(xe_vdev->xe, xe_vdev->vfid);
+> +		if (ret)
+> +			goto err;
+> +
+> +		return NULL;
+> +	}
+> +
+> +	if (cur =3D=3D VFIO_DEVICE_STATE_STOP && new =3D=3D VFIO_DEVICE_STATE_S=
+TOP_COPY) {
+> +		struct xe_vfio_pci_migration_file *migf;
+> +
+> +		migf =3D xe_vfio_pci_alloc_file(xe_vdev, XE_VFIO_FILE_SAVE);
+> +		if (IS_ERR(migf)) {
+> +			ret =3D PTR_ERR(migf);
+> +			goto err;
+> +		}
+> +		get_file(migf->filp);
+> +
+> +		ret =3D xe_sriov_vfio_stop_copy_enter(xe_vdev->xe, xe_vdev->vfid);
+> +		if (ret) {
+> +			fput(migf->filp);
+> +			goto err;
+> +		}
+> +
+> +		return migf->filp;
+> +	}
+> +
+> +	if (cur =3D=3D VFIO_DEVICE_STATE_STOP_COPY && new =3D=3D VFIO_DEVICE_ST=
+ATE_STOP) {
+> +		if (xe_vdev->migf)
+> +			xe_vfio_pci_put_file(xe_vdev);
+> +
+> +		ret =3D xe_sriov_vfio_stop_copy_exit(xe_vdev->xe, xe_vdev->vfid);
+> +		if (ret)
+> +			goto err;
+> +
+> +		return NULL;
+> +	}
+> +
+> +	if (cur =3D=3D VFIO_DEVICE_STATE_STOP && new =3D=3D VFIO_DEVICE_STATE_R=
+ESUMING) {
+> +		struct xe_vfio_pci_migration_file *migf;
+> +
+> +		migf =3D xe_vfio_pci_alloc_file(xe_vdev, XE_VFIO_FILE_RESUME);
+> +		if (IS_ERR(migf)) {
+> +			ret =3D PTR_ERR(migf);
+> +			goto err;
+> +		}
+> +		get_file(migf->filp);
+> +
+> +		ret =3D xe_sriov_vfio_resume_data_enter(xe_vdev->xe, xe_vdev->vfid);
+> +		if (ret) {
+> +			fput(migf->filp);
+> +			goto err;
+> +		}
+> +
+> +		return migf->filp;
+> +	}
+> +
+> +	if (cur =3D=3D VFIO_DEVICE_STATE_RESUMING && new =3D=3D VFIO_DEVICE_STA=
+TE_STOP) {
+> +		if (xe_vdev->migf)
+> +			xe_vfio_pci_put_file(xe_vdev);
+> +
+> +		ret =3D xe_sriov_vfio_resume_data_exit(xe_vdev->xe, xe_vdev->vfid);
+> +		if (ret)
+> +			goto err;
+> +
+> +		return NULL;
+> +	}
+> +
+> +	WARN(true, "Unknown state transition %d->%d", cur, new);
+> +	return ERR_PTR(-EINVAL);
+> +
+> +err:
+> +	dev_dbg(xe_vdev_to_dev(xe_vdev),
+> +		"Failed to transition state: %s->%s err=3D%d\n",
+> +		vfio_dev_state_str(cur), vfio_dev_state_str(new), ret);
+> +	return ERR_PTR(ret);
+> +}
+> +
+> +static struct file *
+> +xe_vfio_pci_set_device_state(struct vfio_device *core_vdev,
+> +			     enum vfio_device_mig_state new_state)
+> +{
+> +	struct xe_vfio_pci_core_device *xe_vdev =3D
+> +		container_of(core_vdev, struct xe_vfio_pci_core_device, core_device.vd=
+ev);
+> +	enum vfio_device_mig_state next_state;
+> +	struct file *f =3D NULL;
+> +	int ret;
+> +
+> +	xe_vfio_pci_state_mutex_lock(xe_vdev);
+> +	while (new_state !=3D xe_vdev->mig_state) {
+> +		ret =3D vfio_mig_get_next_state(core_vdev, xe_vdev->mig_state,
+> +					      new_state, &next_state);
+> +		if (ret) {
+> +			xe_sriov_vfio_error(xe_vdev->xe, xe_vdev->vfid);
+> +			f =3D ERR_PTR(ret);
+> +			break;
+> +		}
+> +		f =3D xe_vfio_set_state(xe_vdev, next_state);
+> +		if (IS_ERR(f))
+> +			break;
+> +
+> +		xe_vdev->mig_state =3D next_state;
+> +
+> +		/* Multiple state transitions with non-NULL file in the middle */
+> +		if (f && new_state !=3D xe_vdev->mig_state) {
+> +			fput(f);
+> +			f =3D ERR_PTR(-EINVAL);
+> +			break;
+> +		}
+> +	}
+> +	xe_vfio_pci_state_mutex_unlock(xe_vdev);
+> +
+> +	return f;
+> +}
+> +
+> +static int xe_vfio_pci_get_device_state(struct vfio_device *core_vdev,
+> +					enum vfio_device_mig_state *curr_state)
+> +{
+> +	struct xe_vfio_pci_core_device *xe_vdev =3D
+> +		container_of(core_vdev, struct xe_vfio_pci_core_device, core_device.vd=
+ev);
+> +
+> +	xe_vfio_pci_state_mutex_lock(xe_vdev);
+> +	*curr_state =3D xe_vdev->mig_state;
+> +	xe_vfio_pci_state_mutex_unlock(xe_vdev);
+> +
+> +	return 0;
+> +}
+> +
+> +static int xe_vfio_pci_get_data_size(struct vfio_device *vdev,
+> +				     unsigned long *stop_copy_length)
+> +{
+> +	struct xe_vfio_pci_core_device *xe_vdev =3D
+> +		container_of(vdev, struct xe_vfio_pci_core_device, core_device.vdev);
+> +
+> +	xe_vfio_pci_state_mutex_lock(xe_vdev);
+> +	*stop_copy_length =3D xe_sriov_vfio_stop_copy_size(xe_vdev->xe, xe_vdev=
+->vfid);
+> +	xe_vfio_pci_state_mutex_unlock(xe_vdev);
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct vfio_migration_ops xe_vfio_pci_migration_ops =3D {
+> +	.migration_set_state =3D xe_vfio_pci_set_device_state,
+> +	.migration_get_state =3D xe_vfio_pci_get_device_state,
+> +	.migration_get_data_size =3D xe_vfio_pci_get_data_size,
+> +};
+> +
+> +static void xe_vfio_pci_migration_init(struct xe_vfio_pci_core_device *x=
+e_vdev)
+> +{
+> +	struct vfio_device *core_vdev =3D &xe_vdev->core_device.vdev;
+> +	struct pci_dev *pdev =3D to_pci_dev(core_vdev->dev);
+> +	struct xe_device *xe =3D xe_sriov_vfio_get_pf(pdev);
+> +	int ret;
+> +
+> +	if (!xe)
+> +		return;
+> +	if (!xe_sriov_vfio_migration_supported(xe))
+> +		return;
+
+As above, ordering here seems wrong if FLR is expecting vfid and xe set
+independent of support migration.
+
+> +
+> +	ret =3D pci_iov_vf_id(pdev);
+> +	if (ret < 0)
+> +		return;
+
+Maybe this is just defensive, but @xe being non-NULL verifies @pdev is
+a VF bound to &xe_pci_driver, so we could pretty safely just use
+'pci_iov_vf_id(pdev) + 1' below.  Thanks,
+
+Alex
+
+> +
+> +	mutex_init(&xe_vdev->state_mutex);
+> +	spin_lock_init(&xe_vdev->reset_lock);
+> +
+> +	/* PF internal control uses vfid index starting from 1 */
+> +	xe_vdev->vfid =3D ret + 1;
+> +	xe_vdev->xe =3D xe;
+> +	xe_vdev->migrate_cap =3D true;
+> +
+> +	core_vdev->migration_flags =3D VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATIO=
+N_P2P;
+> +	core_vdev->mig_ops =3D &xe_vfio_pci_migration_ops;
+> +}
+> +
+> +static void xe_vfio_pci_migration_fini(struct xe_vfio_pci_core_device *x=
+e_vdev)
+> +{
+> +	if (!xe_vdev->migrate_cap)
+> +		return;
+> +
+> +	mutex_destroy(&xe_vdev->state_mutex);
+> +}
+> +
+> +static int xe_vfio_pci_init_dev(struct vfio_device *core_vdev)
+> +{
+> +	struct xe_vfio_pci_core_device *xe_vdev =3D
+> +		container_of(core_vdev, struct xe_vfio_pci_core_device, core_device.vd=
+ev);
+> +
+> +	xe_vfio_pci_migration_init(xe_vdev);
+> +
+> +	return vfio_pci_core_init_dev(core_vdev);
+> +}
+> +
+> +static void xe_vfio_pci_release_dev(struct vfio_device *core_vdev)
+> +{
+> +	struct xe_vfio_pci_core_device *xe_vdev =3D
+> +		container_of(core_vdev, struct xe_vfio_pci_core_device, core_device.vd=
+ev);
+> +
+> +	xe_vfio_pci_migration_fini(xe_vdev);
+> +}
+> +
+> +static const struct vfio_device_ops xe_vfio_pci_ops =3D {
+> +	.name =3D "xe-vfio-pci",
+> +	.init =3D xe_vfio_pci_init_dev,
+> +	.release =3D xe_vfio_pci_release_dev,
+> +	.open_device =3D xe_vfio_pci_open_device,
+> +	.close_device =3D vfio_pci_core_close_device,
+> +	.ioctl =3D vfio_pci_core_ioctl,
+> +	.device_feature =3D vfio_pci_core_ioctl_feature,
+> +	.read =3D vfio_pci_core_read,
+> +	.write =3D vfio_pci_core_write,
+> +	.mmap =3D vfio_pci_core_mmap,
+> +	.request =3D vfio_pci_core_request,
+> +	.match =3D vfio_pci_core_match,
+> +	.match_token_uuid =3D vfio_pci_core_match_token_uuid,
+> +	.bind_iommufd =3D vfio_iommufd_physical_bind,
+> +	.unbind_iommufd =3D vfio_iommufd_physical_unbind,
+> +	.attach_ioas =3D vfio_iommufd_physical_attach_ioas,
+> +	.detach_ioas =3D vfio_iommufd_physical_detach_ioas,
+> +};
+> +
+> +static int xe_vfio_pci_probe(struct pci_dev *pdev, const struct pci_devi=
+ce_id *id)
+> +{
+> +	struct xe_vfio_pci_core_device *xe_vdev;
+> +	int ret;
+> +
+> +	xe_vdev =3D vfio_alloc_device(xe_vfio_pci_core_device, core_device.vdev=
+, &pdev->dev,
+> +				    &xe_vfio_pci_ops);
+> +	if (IS_ERR(xe_vdev))
+> +		return PTR_ERR(xe_vdev);
+> +
+> +	dev_set_drvdata(&pdev->dev, &xe_vdev->core_device);
+> +
+> +	ret =3D vfio_pci_core_register_device(&xe_vdev->core_device);
+> +	if (ret) {
+> +		vfio_put_device(&xe_vdev->core_device.vdev);
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void xe_vfio_pci_remove(struct pci_dev *pdev)
+> +{
+> +	struct xe_vfio_pci_core_device *xe_vdev =3D pci_get_drvdata(pdev);
+> +
+> +	vfio_pci_core_unregister_device(&xe_vdev->core_device);
+> +	vfio_put_device(&xe_vdev->core_device.vdev);
+> +}
+> +
+> +#define INTEL_PCI_VFIO_DEVICE(_id) { \
+> +	PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, (_id)) \
+> +}
+> +
+> +static const struct pci_device_id xe_vfio_pci_table[] =3D {
+> +	INTEL_PTL_IDS(INTEL_PCI_VFIO_DEVICE),
+> +	INTEL_WCL_IDS(INTEL_PCI_VFIO_DEVICE),
+> +	INTEL_BMG_IDS(INTEL_PCI_VFIO_DEVICE),
+> +	{}
+> +};
+> +MODULE_DEVICE_TABLE(pci, xe_vfio_pci_table);
+> +
+> +static struct pci_driver xe_vfio_pci_driver =3D {
+> +	.name =3D "xe-vfio-pci",
+> +	.id_table =3D xe_vfio_pci_table,
+> +	.probe =3D xe_vfio_pci_probe,
+> +	.remove =3D xe_vfio_pci_remove,
+> +	.err_handler =3D &xe_vfio_pci_err_handlers,
+> +	.driver_managed_dma =3D true,
+> +};
+> +module_pci_driver(xe_vfio_pci_driver);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Micha=C5=82 Winiarski <michal.winiarski@intel.com>");
+> +MODULE_DESCRIPTION("VFIO PCI driver with migration support for Intel Gra=
+phics");
 
 
