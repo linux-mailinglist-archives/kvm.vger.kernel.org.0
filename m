@@ -1,89 +1,88 @@
-Return-Path: <kvm+bounces-64531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D24AC863EA
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 18:39:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EAB4C86414
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 18:40:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A76894EA412
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 17:38:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97D013B87DD
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 17:39:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B64032B9BA;
-	Tue, 25 Nov 2025 17:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B5E32AAC5;
+	Tue, 25 Nov 2025 17:39:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mvWH/Y6a"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DW7CYnxR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC72329C57
-	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 17:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833CA32824A
+	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 17:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764092267; cv=none; b=XYNj5VQEhQHUbbAyZWoA9gMAH1PrAMpTG9RIxw6XUsucBL5v1oPm9jFe3yqX5fDoh2/Il85O5I9gOg2xWhj46yx1YEO1IOp79aCgd3xgppjhoV7iqzOSKP/nWjnqH5cNTtV4zEXDGAdPzYopLr8AHAoyk08i2HVnwe1VL5XG5oo=
+	t=1764092344; cv=none; b=EqBxb9bbp/Nd5BtJTocnStb0Qjrznegtot8+d5v3Wfa7SACxm0qSfAlSG62l28k5aoNkdNBtP6PiRWzibpxSFJkL7WsiWwCYODeyk16R/HU8ozzkSAl/sYZhTsd0U88BF/1qS2HWqIpxbtQ37++FprRw12u0GUtKHblmkickuXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764092267; c=relaxed/simple;
-	bh=Ejku2oAgTG0MLuTVF5tg29vzUgVV+nOFGngep+HFdYA=;
+	s=arc-20240116; t=1764092344; c=relaxed/simple;
+	bh=hYpKuwg+6qk4P1s0BVsJWxLzFkie37j9EJGGxbty2O4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lkKL1CWzCgF406jgarQovIsgtjkmo9w9z6NLU33zyRAysYrQaGLrGpJ/fsqKuLy5bh2ZH9y2VtGABxpiEo2BGBArq5WkboLdNbdkXnZM/vTf1o+1ijXHSXdRKyFusmx2XOWuPVVNaBxqwOxLmRNAU1vsP/tb1PXHl++I7tBGznw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mvWH/Y6a; arc=none smtp.client-ip=209.85.167.49
+	 To:Cc:Content-Type; b=flT91Q/Pglufcu4BwX54Gralkt+i9y9qZbsoatYpbWRWhugndqjgqDxtpH4hwLDONcLy6IfzhEsb3e6O1K7kglyoy2tLdRMBW8xdu9xBi3CabpsF6fb4BHWww8XdhzIFSYD0l7A83oX2g+GZ1+VerFN06g4IDD0sBefXE9SpreM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DW7CYnxR; arc=none smtp.client-ip=209.85.208.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-59428d2d975so6147146e87.3
-        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 09:37:45 -0800 (PST)
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-37cef3ccb82so22964701fa.2
+        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 09:39:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764092264; x=1764697064; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1764092341; x=1764697141; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=okuVuEMd31Qt38di8puew2SNgGFFbYVoFM6SMy0UZTM=;
-        b=mvWH/Y6a0gOX72i6jbzraxSdj+3VNfQ3NTamm8f38en5UJzj3HO74sPtezSQPCyYY8
-         eddkgtKG2BGrE2tOcrznnH8jUlQvClIjuB5I3xR+r+Hn9+ei1pUe8bl5rTzS18ZQZG+D
-         zXjfoaRLkMq0QfjFdS8YOS5dTJA0tC0K5fc38nWDOzafYEKcK1BkaVAhvocVzqfjxfaN
-         CXssgDARPE82kPMBkl76AZWSQnz387BsvSC6E9FG2w7wn4RpUVrkxZakntsagcMNSWuC
-         EF5YTI3pvOqAUikxBpBVuI42k7HF26gwVvg7jMQPyr/+YQRNsdW1ORAMNCQ87t7TM5lo
-         Yz8Q==
+        bh=hYpKuwg+6qk4P1s0BVsJWxLzFkie37j9EJGGxbty2O4=;
+        b=DW7CYnxRNDbpyakHdtjoLBg1YOyAMn2KKBGzKdzTpfQz7B0e28llGf2GO2xej2ocTc
+         tYd55PteEgoj6BeTV/vzzu8dMj/Z3nWaHbXB+CzNpk5XMdFwO60ndxNMsWrW68Ms+vD5
+         lZzNusKARXfjGm+FfViVefDbCo6XAjlu3Ld1SvRSoHMcCOCYdRaveCoat8khQBByI2PQ
+         uQgsRfMmFKeQugdokJTMVgOQmMTaB3D7LPeo2sYnHUUasUxlqCeFWrfL+HJjssrHZzIr
+         ELj1HStCz5kAbBGRLeYSogq6TSKmukp6Zh2V7gaXl8cPEr/rBc94omH79fkPtSnXqhSr
+         XWzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764092264; x=1764697064;
+        d=1e100.net; s=20230601; t=1764092341; x=1764697141;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=okuVuEMd31Qt38di8puew2SNgGFFbYVoFM6SMy0UZTM=;
-        b=J4Qe/ytB21MXrJxLkxqXPSUAME5ZxgBvlCVkKRbf5/PZ9mwPO480firR34skO9N51P
-         5vIN1fBTgJ5KZA8D2jny+jHvqU30NXLjpx/esfMaIfY5UXRc+AftEX8jd5CP0VOGUiAI
-         iXo80pUlwDsFNEDsmbTm2Og5HS4MOvcXRCTSt8ygIDpW01se/t8TFxFxj9A0gp41Fkug
-         +wHJ5d5syn40rJd27kKW2o+TB24QUydBM1RpizMA7uoVW3VD0MjAsPHkQA7zNeDw53wX
-         cj788QuUzaPN22K7S2UZT6xbNdPN/JFPR14RTbPHEh9oHZPW+Q5/oujg6Mk9WLPmjqZb
-         IOHw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrF8OOwnz2RzdrxC2vOOh6h2tiBqk8+RnRjiJcAqOEjvVlBX59auREcFkStEGg2LZGACc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXOqFnEQV4EHRZ/Caxq4pcPfdC6K4bBBDPkjMhaLLcNlkSR+ew
-	uPcurKD86QT7t4yslDjbtazv73nUIHwm8L1nyhyWNOaNVI4oTpkW+g6aNV6v2cJkGJXR60Bwaor
-	X52UUXmtm7IQIZGfHsAbArZAwMmkgKYQ0fhC/eWwL
-X-Gm-Gg: ASbGnctXQWyRahKQWd/5HkapX5DLGJ4bp96vB4D5F5CDQBv75nXS+C20OWMcOoq5UOl
-	fivqFMDyMNYUaOVUJRdJpjS/nCDePxQu31FDPrsKebMC1a36RHuYVLfFegHQ4L2bSsi+aOBK2lT
-	QG9Ovro62O+uElwkScHMjkSd323tVJ0cQWcliqeAa8k/ETlk8EfQ+Ygx8JOLPMXERnbGh1zsDOF
-	PujOyCoVxB7V/ZJk6LXpbH5Tr2DEdwy5A6YreL7xVYJoBwU6NYUCEQ0GENnGQnrlDLFTh0=
-X-Google-Smtp-Source: AGHT+IEvpHau791IAO0dltg1a3e0hjW7a5btTqdQz225JT89zGJmvQWbORKrFwH0dVFgXeulmu9pimYSiYV6QIzPdaM=
-X-Received: by 2002:a05:6512:12c7:b0:594:cb92:b377 with SMTP id
- 2adb3069b0e04-596b52909b2mr1546440e87.42.1764092263437; Tue, 25 Nov 2025
- 09:37:43 -0800 (PST)
+        bh=hYpKuwg+6qk4P1s0BVsJWxLzFkie37j9EJGGxbty2O4=;
+        b=xOCHn/DyPzloiaqoFZBgchBEhA9Gn8ZmR0/eK7U1IeasmhM2oLfePHvrGY9Arsm/pc
+         SzsjTodhabOKAVs0FjG+Damu90Z4s5P9haeZtobKEZTV3by9M3xc21UEs2ShXXiNZwv/
+         smls1UZshsUb93N4lra4mH4tq+NnnDqBrR4pUVLYEWP6ZvW4NfUiM/QfaKrtr2ORNyZz
+         LmPfx4n4thrk8txle9q1DPVsslgoVk8hvl6vLWQFzK/GAD+ExOa2SxLCLdQwyxkrRfCL
+         O3gZotktYWLWiaLr5WEf3r5odGFmBCVnkHDiHPg6LnB07+tOX1yPvcJUwo6mESfvaDPl
+         3s2w==
+X-Forwarded-Encrypted: i=1; AJvYcCVZfxjBC56scdlKniilLkOET71wRYVoGiX0/MqCiO5FWe/D4SSUB/cskeBKPRpCYLgP93w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuY2fPhEQiIIt1ha2kXaCLvAvqLcpmldsZ6oQCgVKqZayT9YRu
+	K9MQyCneKeEhpmBJAOCN4HUqWbQ2UqaFoJxrR+k6lPZ1tX0H9Eak0xFokJ3YUR8OgyYslEtNPu7
+	b2nvcjk/MnB+zwTD1EYYjnmUDu2SR6yazn8B+D8r4
+X-Gm-Gg: ASbGnctKMrHr0ipchZKFOAkBE76RzUL5vb+Y8Nk5v5YDAKp5uztbvPeKywiUZIGPoSw
+	fvjMu8bRnHVZzdSy1javPKxrpIJg7rUT3gm0uOtvPMflFXzLtmt1MkA799XmrhLhmAsBXmvQBQx
+	5BgOb8OLV/HA7dfmKhl9y4KzOMA5L7XmmhQx8KH2ctvczH9m0sutD1KCPkaK0FyYSmLDcA/3Jw9
+	M+ZshxVdOQ7QZ2TFkCd33HrP13Ijdg7q+7yyifIFAz77DBccNd8aYqCWjzPztGM0PINQwhH7Wwk
+	m13aOg==
+X-Google-Smtp-Source: AGHT+IFq+pkA9wUXo6O1YuyXrs06FlYpW+bNX4EgX0RqVurgQxcjqXf5OCpjt4Cav6Vv/IGQxFOOMXQu/61PgqQPYgY=
+X-Received: by 2002:a05:6512:2398:b0:594:2654:5e65 with SMTP id
+ 2adb3069b0e04-596a3edac23mr5617787e87.26.1764092340301; Tue, 25 Nov 2025
+ 09:39:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121181429.1421717-1-dmatlack@google.com> <20251121181429.1421717-7-dmatlack@google.com>
- <CAJHc60zW+FzOfUQzZYCStmFJ_d8Gr2mi-nN297b=gU+26mt1BQ@mail.gmail.com>
-In-Reply-To: <CAJHc60zW+FzOfUQzZYCStmFJ_d8Gr2mi-nN297b=gU+26mt1BQ@mail.gmail.com>
+References: <20251121181429.1421717-1-dmatlack@google.com> <CAJHc60zkNOrWtzEPr00a6=fHpcW1KmGRu7Txcohe=LHnS6OL_Q@mail.gmail.com>
+In-Reply-To: <CAJHc60zkNOrWtzEPr00a6=fHpcW1KmGRu7Txcohe=LHnS6OL_Q@mail.gmail.com>
 From: David Matlack <dmatlack@google.com>
-Date: Tue, 25 Nov 2025 09:37:15 -0800
-X-Gm-Features: AWmQ_blXo2R832vAXskZpPadEWRx5jQ3IoP9HQvzSngDu_3AkgqN5_Y8TmlJRuQ
-Message-ID: <CALzav=fseMCyQEvBsJa+J+_V=1S3MX_7sArEksGYUQAey==70g@mail.gmail.com>
-Subject: Re: [PATCH v3 06/18] vfio: selftests: Support multiple devices in the
- same container/iommufd
+Date: Tue, 25 Nov 2025 09:38:33 -0800
+X-Gm-Features: AWmQ_bk-F6GfHzkfFixwREJH6feckFCzraz_YXkqd1eUKsaSXAISX2Opcpq0vY0
+Message-ID: <CALzav=dMsiA+a3ZKcQmrYhV+nZvFVUTKifEs2U7hsxVmVWrL3g@mail.gmail.com>
+Subject: Re: [PATCH v3 00/18] vfio: selftests: Support for multi-device tests
 To: Raghavendra Rao Ananta <rananta@google.com>
 Cc: Alex Williamson <alex@shazbot.org>, Alex Mastro <amastro@fb.com>, Jason Gunthorpe <jgg@nvidia.com>, 
 	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -91,40 +90,23 @@ Cc: Alex Williamson <alex@shazbot.org>, Alex Mastro <amastro@fb.com>, Jason Gunt
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 24, 2025 at 3:17=E2=80=AFAM Raghavendra Rao Ananta
+On Mon, Nov 24, 2025 at 3:20=E2=80=AFAM Raghavendra Rao Ananta
 <rananta@google.com> wrote:
+>
 > On Fri, Nov 21, 2025 at 11:44=E2=80=AFPM David Matlack <dmatlack@google.c=
 om> wrote:
-> > +struct vfio_pci_device *vfio_pci_device_init(const char *bdf, struct i=
-ommu *iommu)
-> >  {
-> >         struct vfio_pci_device *device;
 > >
-> >         device =3D calloc(1, sizeof(*device));
-> >         VFIO_ASSERT_NOT_NULL(device);
+> > This series adds support for tests that use multiple devices, and adds
+> > one new test, vfio_pci_device_init_perf_test, which measures parallel
+> > device initialization time to demonstrate the improvement from commit
+> > e908f58b6beb ("vfio/pci: Separate SR-IOV VF dev_set").
 > >
-> > -       device->iommu =3D calloc(1, sizeof(*device->iommu));
-> > -       VFIO_ASSERT_NOT_NULL(device->iommu);
-> > -
-> > -       INIT_LIST_HEAD(&device->iommu->dma_regions);
-> > -
-> > -       device->iommu->mode =3D lookup_iommu_mode(iommu_mode);
-> > +       device->iommu =3D iommu;
-> nit: Since we now depend on the caller to follow the right order,
-> should we have a VFIO_ASSERT_NOT_NULL(iommu), or something along the
-> lines of 'Is iommu initialized?" before this function starts using it,
-> and fail with an appropriate error message?
+> Apart from a couple of minor nits in patch-6:
+> Reviewed-by: Raghavendra Rao Ananta <rananta@google.com>
 
-I think the compiler and type system largely enforce the order now.
-The compiler will complain if a user passes in an uninitialized struct
-iommu *. And the only way to initialize it is with iommu_init(). I
-guess someone could pass in NULL, so having an explicit assert for
-non-null would be easier to debug than a SIGSEGV. I'll add that in v4.
+Thanks Raghu!
 
->
-> >
-> >         if (device->iommu->mode->container_path)
-> minor nit: if there's a v4, simply use iommu->mode->container_path.
-
-Yes, thanks, will do!
+I'll send a v4 addressing your comments and the kernel-test-robot
+issues on riscv and i386. And then hopefully we can get this into
+6.19.
 
