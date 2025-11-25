@@ -1,166 +1,157 @@
-Return-Path: <kvm+bounces-64451-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64452-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 739B1C830A6
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 02:48:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47CE4C830C7
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 02:50:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AE0E54E3497
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 01:48:47 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6389134A9F6
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 01:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432511A275;
-	Tue, 25 Nov 2025 01:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CAFD19F48D;
+	Tue, 25 Nov 2025 01:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IHOn9LvZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K20rhK46"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8BBE1BC4E
-	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 01:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EAB17A586;
+	Tue, 25 Nov 2025 01:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764035317; cv=none; b=qmG1auWegfnp3taLlcfKCNEdccJl42zuEqK2HfPzmBxmW9g+4L3FgZMwzS7cOxG34E5WvJl2l3lKdv8OOa93Befs0h0azN4ptqByI4geLVmM9URKuRJXyHUkHPD+/OhX98toERlvMacUXhybOkSWjJ8B1QfOIf15jf2vYD0SB08=
+	t=1764035424; cv=none; b=mOCJP1O7ZCY9iVnZuFNS+eNaPufAhKFrO8n96juEW/SIkSHfKlGGlVz7BrgYTaR0mq7jMTy5msVoOjcF5WGtaWm/99F6RukIUHmXo1DWT2x8CS1WNluBmfYnm62MwYKm7fllYQ/tjW+FdrN2tEKLcd6QIs/vkuJPTS9QeuXluwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764035317; c=relaxed/simple;
-	bh=lFQY39DQ0sZ3/1CBs/5a9Gc/Z7HqjZGV9ub0E6byxfg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=fzEu4jvS9IO95ErzrSLLZMD+6YnmIy9jWIYR1QIoWarRAI+m/6b/WWycqttKA7Ld52uEiZNMm0TaVpvwj3X7IWMMVsmSPH17aECWh9odI/71SgcDHSmgZwBUrSRlEODYiIe5AuTuMwCyCiU5sUEt7dYNgjZGVdvO373zGdXA8NA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IHOn9LvZ; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340ad9349b3so10240273a91.1
-        for <kvm@vger.kernel.org>; Mon, 24 Nov 2025 17:48:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764035314; x=1764640114; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pxECKAH71uYUFlk1OLSRLVGsdtXKfBuiVH3qX5Bq1JE=;
-        b=IHOn9LvZ5ruN4WXJfYa6XrAOBbmnRCg479IO3EiNissMGF4F4FqYSktpzj4BRMNA0k
-         36acquoO7D8bgvtUEaK1NJ4/ujc7oJPuF9lez+1DZ3OUqOf+5Ld2AbNy8G01Fj/owcjM
-         RFE3YHoYGo3ya/JTJp2nfuzXAwDZ7bOwEFZF2Pmd+TQhtQLXeX5jnIydfan/6WAywBx7
-         m86DeyAgmmGZZyMxUWg8jbNYLzouBbE3hbWt0lUauMw9/u9gF0mjwVR8U+H+CISCNm7C
-         IRHXC3806ctU50cfi+4ZbMau3W1sBnEHnA3PUmmMU7CPTRZ7ePl/qzQAoSQu7An3Hv73
-         g3YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764035314; x=1764640114;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pxECKAH71uYUFlk1OLSRLVGsdtXKfBuiVH3qX5Bq1JE=;
-        b=PJ+EeMs5s7rK0OlXcvim1k9zX6/zmYhsdve191KIIP9cYGBrlp40O35FsJQzhkGUY/
-         Ec7ovyKdrbyM6V+sPngkXX+8lMoB+39PhuVLR5nsXplJd5XZZarUMNC9/kDMdwIA2gRA
-         FYp+XAloYcs0Dgaubp4SY01rq+k1ET3zWVYk5FI9uR7h7/ne+7gV74od6Z1uuAmg5Kmr
-         Z5ns9O4/Q4W9l/cWzpB1FQAYmj135rj2V403lC/ssV+iwV1SWNkW0sLzzq8zLRmcLhU+
-         IqkJzaoEJVAxmzXKoAkueNBv2b1yskq4nDAamWUDJ29xYwBK3ogLsFhi7rsZIuFdHxYU
-         JERw==
-X-Forwarded-Encrypted: i=1; AJvYcCVRKPo/78ZxLn9+daHNCZdrQWTOBsBKEPdr5Z7upal8eChdbFF3ROyI2yxw3Vsk4FaCbkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPYnFEJeiTsiDJPAbm+la/an/oEyj0mnoql7EyYCiBRltiPb3P
-	/UhgOslP2HGA9kGKaVaZCBam4SgeAwJCJE3cI9zNQlPBb+yW17sv94tuEZe18JrPP5LENA+fADY
-	hTUKWPw==
-X-Google-Smtp-Source: AGHT+IGw7n/WkVQTGzwbQxQ9VV1HAFWO+WUionAVci6QFcq9BhvaMpdHuGTmwsKZi9fkk+aykjevdAFNlrA=
-X-Received: from pjvb14.prod.google.com ([2002:a17:90a:d88e:b0:341:8ac7:27a9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:164a:b0:340:c261:f9db
- with SMTP id 98e67ed59e1d1-34733e60944mr13320658a91.10.1764035314194; Mon, 24
- Nov 2025 17:48:34 -0800 (PST)
-Date: Mon, 24 Nov 2025 17:48:32 -0800
-In-Reply-To: <20250806195706.1650976-29-seanjc@google.com>
+	s=arc-20240116; t=1764035424; c=relaxed/simple;
+	bh=UDRu0hzZEvxvPSW9YvleBJsVvQ54Ad1fInxtjRIFpM4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YEztAkrkHaCixTZDQhBzdEytb8EyrUC5ih3tc5K541noJdZbI7zrDUD/HzGzCavhxWM562y0YZ/vaewQr1Ij5BDbGD+PzLmVI40GIGQxOyv4sWiRp2r64yKCZ1f93QVjP0rhZf+9j+CNX0snj/2v4/DP8VND+kxgrx9kpKzblrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K20rhK46; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764035422; x=1795571422;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=UDRu0hzZEvxvPSW9YvleBJsVvQ54Ad1fInxtjRIFpM4=;
+  b=K20rhK46iKbiYI3Qhq+g1T2hapm3GT/PVFGXc/KNSooDnN9Pe3o4tAmV
+   8iMDssTL6eoNFJcYEp0M7nZTOeqdcaDWD6Cncr5fgJTWJNl5oVRKWEGUB
+   GV7L8htYR89LPjIapd8HYWBzYOHiohdTIz4tV6j0ji1SwMiBRc21EkVRH
+   oFW9UCWji8Z7lJ4yz5cpIXqxk5KVhiLyg7f8E3gRBVDMehGarE15yc00U
+   pUPL1YedRYGWtkJz+IkZJFIrchgs7SR3M8pJDlEvdGDHx65LnWzauWcwU
+   P/GPQYW3lkMaMLoqz+tfsoVbiLw7d2xL0MWRscfXTP+ZaURMlI9Pp85EW
+   w==;
+X-CSE-ConnectionGUID: 6U/pbfZmTCSGh1XDipvDCQ==
+X-CSE-MsgGUID: 5y5I9sUzQMOI1mrDzaiiDA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11623"; a="65992913"
+X-IronPort-AV: E=Sophos;i="6.20,224,1758610800"; 
+   d="scan'208";a="65992913"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 17:50:22 -0800
+X-CSE-ConnectionGUID: 7wwxNJRZRXStGBx0pX5fqA==
+X-CSE-MsgGUID: ERzQqdnoSBKbzPXqnxvzPQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,224,1758610800"; 
+   d="scan'208";a="192306348"
+Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 17:50:18 -0800
+Message-ID: <51dc2009-ff3e-4419-9dab-b46db7b2e15d@linux.intel.com>
+Date: Tue, 25 Nov 2025 09:50:15 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250806195706.1650976-1-seanjc@google.com> <20250806195706.1650976-29-seanjc@google.com>
-Message-ID: <aSUK8FuWT4lpMP3F@google.com>
-Subject: Re: [PATCH v5 28/44] KVM: x86/pmu: Load/save GLOBAL_CTRL via
- entry/exit fields for mediated PMU
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>, 
-	Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 04/16] x86/virt/tdx: Allocate page bitmap for Dynamic
+ PAMT
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: bp@alien8.de, chao.gao@intel.com, dave.hansen@intel.com,
+ isaku.yamahata@intel.com, kai.huang@intel.com, kas@kernel.org,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+ seanjc@google.com, tglx@linutronix.de, vannapurve@google.com,
+ x86@kernel.org, yan.y.zhao@intel.com, xiaoyao.li@intel.com,
+ binbin.wu@intel.com
+References: <20251121005125.417831-1-rick.p.edgecombe@intel.com>
+ <20251121005125.417831-5-rick.p.edgecombe@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20251121005125.417831-5-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 06, 2025, Sean Christopherson wrote:
-> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> 
-> When running a guest with a mediated PMU, context switch PERF_GLOBAL_CTRL
-> via the dedicated VMCS fields for both host and guest.  For the host,
-> always zero GLOBAL_CTRL on exit as the guest's state will still be loaded
-> in hardware (KVM will context switch the bulk of PMU state outside of the
-> inner run loop).  For the guest, use the dedicated fields to atomically
-> load and save PERF_GLOBAL_CTRL on all entry/exits.
-> 
-> Note, VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL was introduced by Sapphire
-> Rapids, and is expected to be supported on all CPUs with PMU v4+.  WARN if
-> that expectation is not met.  Alternatively, KVM could manually save
-> PERF_GLOBAL_CTRL via the MSR save list, but the associated complexity and
-> runtime overhead is unjustified given that the feature should always be
-> available on relevant CPUs.
 
-This is wrong, PMU v4 has been supported since Skylake.
 
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 7ab35ef4a3b1..98f7b45ea391 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -787,7 +787,23 @@ static bool intel_pmu_is_mediated_pmu_supported(struct x86_pmu_capability *host_
->  	 * Require v4+ for MSR_CORE_PERF_GLOBAL_STATUS_SET, and full-width
->  	 * writes so that KVM can precisely load guest counter values.
->  	 */
-> -	return host_pmu->version >= 4 && host_perf_cap & PERF_CAP_FW_WRITES;
-> +	if (host_pmu->version < 4 || !(host_perf_cap & PERF_CAP_FW_WRITES))
-> +		return false;
-> +
+On 11/21/2025 8:51 AM, Rick Edgecombe wrote:
+> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+>
+> The Physical Address Metadata Table (PAMT) holds TDX metadata for physical
+> memory and must be allocated by the kernel during TDX module
+> initialization.
+>
+> The exact size of the required PAMT memory is determined by the TDX module
+> and may vary between TDX module versions. Currently it is approximately
+> 0.4% of the system memory. This is a significant commitment, especially if
+> it is not known upfront whether the machine will run any TDX guests.
+>
+> For normal PAMT, each memory region that the TDX module might use (TDMR)
+> needs three separate PAMT allocations. One for each supported page size
+> (1GB, 2MB, 4KB).
+>
+> At a high level, Dynamic PAMT still has the 1GB and 2MB levels allocated
+> on TDX module initialization, but the 4KB level allocated dynamically at
+> TD runtime. However, in the details, the TDX module still needs some per
+> 4KB page data. The TDX module exposed how many bits per page need to be
+> allocated (currently it is 1). The bits-per-page value can then be used to
+> calculate the size to pass in place of the 4KB allocations in the TDMR,
+> which TDX specs call "PAMT_PAGE_BITMAP".
+>
+> So in effect, Dynamic PAMT just needs a different (smaller) size
+> allocation for the 4KB level part of the allocation. Although it is
+> functionally something different, it is passed in the same way the 4KB page
+> size PAMT allocation is.
+>
+> Begin to implement Dynamic PAMT in the kernel by reading the bits-per-page
+> needed for Dynamic PAMT. Calculate the size needed for the bitmap,
+> and use it instead of the 4KB size determined for normal PAMT, in the case
+> of Dynamic PAMT. In doing so, reduce the static allocations to
+> approximately 0.004%, a 100x improvement.
+>
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> [Enhanced log]
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
+One nit below.
+
+[...]
+> diff --git a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
+> index 13ad2663488b..00ab0e550636 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
+> @@ -33,6 +33,13 @@ static int get_tdx_sys_info_tdmr(struct tdx_sys_info_tdmr *sysinfo_tdmr)
+>   		sysinfo_tdmr->pamt_2m_entry_size = val;
+>   	if (!ret && !(ret = read_sys_metadata_field(0x9100000100000012, &val)))
+>   		sysinfo_tdmr->pamt_1g_entry_size = val;
 > +	/*
-> +	 * All CPUs that support a mediated PMU are expected to support loading
-> +	 * and saving PERF_GLOBAL_CTRL via dedicated VMCS fields.
+> +	 * Don't fail here if tdx_supports_dynamic_pamt() isn't supported. The
+
+A bit weird to say "if tdx_supports_dynamic_pamt() isn't supported", how about
+using "if dynamic PAMT isn't supported"?
+
+> +	 * TDX code can fallback to normal PAMT if it's not supported.
 > +	 */
-> +	if (WARN_ON_ONCE(!cpu_has_load_perf_global_ctrl() ||
-> +			 !cpu_has_save_perf_global_ctrl()))
-> +		return false;
+> +	if (!ret && tdx_supports_dynamic_pamt(&tdx_sysinfo) &&
+> +	    !(ret = read_sys_metadata_field(0x9100000100000013, &val)))
+> +		sysinfo_tdmr->pamt_page_bitmap_entry_bits = val;
+>   
+>   	return ret;
+>   }
 
-And so this WARN fires due to cpu_has_save_perf_global_ctrl() being false.  The
-bad changelog is mine, but the code isn't entirely my fault.  I did suggest the
-WARN in v3[1], probably because I forgot when PMU v4 was introduced and no one
-corrected me.
-
-v4 of the series[2] then made cpu_has_save_perf_global_ctrl() a hard requirement,
-based on my miguided feedback.
-
-   * Only support GLOBAL_CTRL save/restore with VMCS exec_ctrl, drop the MSR
-     save/retore list support for GLOBAL_CTRL, thus the support of mediated
-     vPMU is constrained to SapphireRapids and later CPUs on Intel side.
-
-Doubly frustrating is that this was discussed in the original RFC, where Jim
-pointed out[3] that requiring VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL would prevent
-enabling the mediated PMU on Skylake+, and I completely forgot that conversation
-by the time v3 of the series rolled around :-(
-
-As mentioned in the discussion with Jim, _if_ PMU v4 was introduced with ICX (or
-later), then I'd be in favor of making VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL a hard
-requirement.  But losing supporting Skylake+ is a bit much.
-
-There are a few warts with nVMX's use of the auto-store list that need to be
-cleaned up, but on the plus side it's also a good excuse to clean up
-{add,clear}_atomic_switch_msr(), which have accumulated some cruft and quite a
-bit of duplicate code.  And while I still dislike using the auto-store list, the
-code isn't as ugly as it was back in v3 because we _can_ make the "load" VMCS
-controls mandatory without losing support for any CPUs (they predate PMU v4).
-
-[1] https://lore.kernel.org/all/ZzyWKTMdNi5YjvEM@google.com
-[2] https://lore.kernel.org/all/20250324173121.1275209-1-mizhang@google.com
-[3] https://lore.kernel.org/all/CALMp9eQ+-wcj8QMmFR07zvxFF22-bWwQgV-PZvD04ruQ=0NBBA@mail.gmail.com
 
