@@ -1,98 +1,117 @@
-Return-Path: <kvm+bounces-64475-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64476-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54CA7C840C2
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 09:47:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C16CC841F1
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 10:02:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A87494E8573
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 08:46:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 930163A1FDE
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 09:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91612FF676;
-	Tue, 25 Nov 2025 08:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07597287511;
+	Tue, 25 Nov 2025 09:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K5L2Msyl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAA92E540C
-	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 08:46:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5BC18A93F
+	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 09:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764060391; cv=none; b=IAdBrh/t/nHChJhkwL1HAb3zUS3qJF+6UKxQvo0q99ceDINTvJ4GXRj6hE65YqUuGO4ufBD9uBqL3+StSUNyG/Fnbi3NzIDoQNrSaeuvHl42UUr4fZ7qlAxoEHxix2QvQI6/xXomX/NL38EiBnENLEpjPHvRstliryl7rO9SvU0=
+	t=1764061315; cv=none; b=FpwgaMQMXjueV9+EQPfE1DKQlmKjlDugGkOnmFRZZJb+pzuq4trBKpcpmFdGBqc+oHobfkdviR8wKv/0KeRL6tKLP2BDNIjX9QoQiQlZOQ6uXQjeHIVGqwIhjFtjQCXHpI7CklortOCXo0PIPfK8o9+2JNXZJUuO2v+rmE6tfa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764060391; c=relaxed/simple;
-	bh=kd22nJv4RvgANmmKQj00hg71Ln3DNYCz/RxBRQMSssw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=VdXNWbW3xElixr9La6sCQ6rqtn7MRTCVskYtKSaB/Oua695/ZYBlBM+rpxIlHtdX7ILzAgnTiD7oCHo3cCxWSZg8eezQfZmX4Iksg0GB4epWk69MhPOQ4YUtgrQ53lAsKGyoYiMaxZxVnS6xwLcpovzaTfLCQwkSLRTx1TAcEtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-433770ba913so53808445ab.1
-        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 00:46:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764060387; x=1764665187;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nh9GgnteYYIjUrmRY6HUXJtHNCaI6IhhcPFadschZ3g=;
-        b=kBt5f0mB8eY102SqHABoJ1t915nhv0sY0aZ4rScUp+JtplNepk4tQ+rw68YEbflNma
-         68yGN6tQIpWkNP1ZKW0qz9YzZ2Y8rzjuv5R9KWhMlRhYGNFJYoHTL+itq99aex1+a4+m
-         qzRawIyis1VJHCzY55s9STulAlxYIn9JwLl7cDOb0kEtsH9+K09HQG64k97nbipDAeLr
-         FH5vFTdCA6iETVYOYQ9JWWTnv0zm/lYtrJByVg7iG8wuc5XNAGc1Cv2CFF9pr3M32aJH
-         DOcKB8/SiAOwQGGKZjEHdRwi/Rm47nB6pN9idLOkgE8K+NVaM6dj43a7DaeaCn4FLXy2
-         7p5g==
-X-Gm-Message-State: AOJu0YzIqHmat4IkaOKnbCQnTAQcrWZyttG4qR8KK/7br3l6kEKIWlrq
-	Wwo0Q/rGCdQdesVl1V8e/rEaa2cwXDvQYNd/kYau0BXIz5pOwCsyc6SZaj1/C87IrNOnmw4+cIE
-	+PGa9Kc1Ga3D9uVz38S7qquA3Kbls+KN4ISq0XoNTj/XIJZcyYaZbINBFqBw=
-X-Google-Smtp-Source: AGHT+IEcbliIlvmSCIwZ0PAQ5+Jhtw97hQ/Xd0Vk0n0D0qdy2Cy55kxB3IJL5xMjv4NLj6BgTt5Z8lugB99rnBOaIszzl/uVWLMh
+	s=arc-20240116; t=1764061315; c=relaxed/simple;
+	bh=ifvlK1RA27Q/ZvBeyjlL3l6Va/e0AUWEJtNbozytgos=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LtOFJd1KX1vjpucKB+nbzzgJUxPyY2V/2YtBj3yMZNzATZIU/3BNjQZFAwo8TDxBvhtXOKhYEMdvGcxLqVaA7Z32UTkzbOxt4ARQsuI43znMTa9tbTLFOJXhCgb4B2FGlgQk5bdSlAFAkJpOpGytJeyvYDp2RUrT0zSqN8LYYZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K5L2Msyl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764061312;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gP8zW91eMMdParUS51W1dDdLU/a1x//SHEkUd9rpKx8=;
+	b=K5L2MsylUuomeo61AyRvw1/i7zBiM0Amb4e7xtmFFEbCezXNf6YpMPrHW/lSRIeABFw8XZ
+	mxxi2yrMbTdBmHCYb8MnwCvQJzQIPIhvBmXwGvltFeqWIBf2CAWB9xrLYy8wvQcJM9Mozc
+	v5QSADS2AMIj3xxIW70465Fc4k8pHrA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-86-SHih0t5eOj2vw_T57L6asg-1; Tue,
+ 25 Nov 2025 04:01:50 -0500
+X-MC-Unique: SHih0t5eOj2vw_T57L6asg-1
+X-Mimecast-MFC-AGG-ID: SHih0t5eOj2vw_T57L6asg_1764061309
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 897AA1954B0B;
+	Tue, 25 Nov 2025 09:01:49 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.45.242.3])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4875F1800451;
+	Tue, 25 Nov 2025 09:01:49 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id A78DE21E6A27; Tue, 25 Nov 2025 10:01:46 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com,
+	kvm@vger.kernel.org,
+	eesposit@redhat.com
+Subject: [PATCH] kvm: Don't assume accel_ioctl_end() preserves @errno
+Date: Tue, 25 Nov 2025 10:01:46 +0100
+Message-ID: <20251125090146.2370735-1-armbru@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:258d:b0:433:810c:db1 with SMTP id
- e9e14a558f8ab-435b8eb43f6mr101540875ab.20.1764060387593; Tue, 25 Nov 2025
- 00:46:27 -0800 (PST)
-Date: Tue, 25 Nov 2025 00:46:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69256ce3.a70a0220.d98e3.00a3.GAE@google.com>
-Subject: [syzbot] Monthly kvm-x86 report (Nov 2025)
-From: syzbot <syzbot+listf5f7430ac4c1a68133d2@syzkaller.appspotmail.com>
-To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
-	seanjc@google.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hello kvm-x86 maintainers/developers,
+Retrieve the @errno set by ioctl() before we call accel_ioctl_end()
+instead of afterwards, so it works whether accel_ioctl_end() preserves
+@errno or not.
 
-This is a 31-day syzbot report for the kvm-x86 subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/kvm-x86
-
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 4 issues are still open and 76 have already been fixed.
-
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 658     Yes   WARNING: locking bug in kvm_xen_set_evtchn_fast
-                  https://syzkaller.appspot.com/bug?extid=919877893c9d28162dc2
-<2> 190     Yes   WARNING in handle_exception_nmi (2)
-                  https://syzkaller.appspot.com/bug?extid=4688c50a9c8e68e7aaa1
-<3> 25      Yes   WARNING in vcpu_run
-                  https://syzkaller.appspot.com/bug?extid=1522459a74d26b0ac33a
-
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ accel/kvm/kvm-all.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index f9254ae654..28006d73c5 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -3373,10 +3373,10 @@ int kvm_vm_ioctl(KVMState *s, unsigned long type, ...)
+     trace_kvm_vm_ioctl(type, arg);
+     accel_ioctl_begin();
+     ret = ioctl(s->vmfd, type, arg);
+-    accel_ioctl_end();
+     if (ret == -1) {
+         ret = -errno;
+     }
++    accel_ioctl_end();
+     return ret;
+ }
+ 
+@@ -3413,10 +3413,10 @@ int kvm_device_ioctl(int fd, unsigned long type, ...)
+     trace_kvm_device_ioctl(fd, type, arg);
+     accel_ioctl_begin();
+     ret = ioctl(fd, type, arg);
+-    accel_ioctl_end();
+     if (ret == -1) {
+         ret = -errno;
+     }
++    accel_ioctl_end();
+     return ret;
+ }
+ 
+-- 
+2.49.0
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
