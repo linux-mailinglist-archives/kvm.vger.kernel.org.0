@@ -1,50 +1,40 @@
-Return-Path: <kvm+bounces-64497-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64498-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0948C8551E
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 15:06:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D9E1C8557E
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 15:14:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BEF43A5F51
-	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 14:05:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B68953B2A68
+	for <lists+kvm@lfdr.de>; Tue, 25 Nov 2025 14:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7915E32471E;
-	Tue, 25 Nov 2025 14:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="VKT4ImuO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA18324B0A;
+	Tue, 25 Nov 2025 14:14:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A33322C99;
-	Tue, 25 Nov 2025 14:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B6D3246FE
+	for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 14:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764079507; cv=none; b=UoQwF4W4TGNlQaqXg2SGWXosSy93gEatg4xh2wLHsa3jSrrnv5ig2Pm+Okx4JBrFZh7yHomz736zCq3km0KBta2iaymgrHTmA3un5turl1+yKJOz9tuvJjpCqUhqalg4JdZf4DIp69JVock5pK+QnAc+lIdvEFiJbdycwZT2Gck=
+	t=1764080070; cv=none; b=UtMA+o4tBG1zPRyC7JYal1cluxp0ijG7+0421vbI1AKLmsYDgJ+ZoKbEkw3NVJqUZgwPVcqHBE87SFhUFavWCoPjZQSy76ZnayYptEQib3Gb1XMIa/hQMur+rcAAzREX8hbQAToP/rdX89wsEkKYn7A8eo6GtCQsXXpCDiY3yLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764079507; c=relaxed/simple;
-	bh=3dV4P1rod3HWCV2qsj7M+/1jXpEH4ENT9lMlEQN7fCg=;
+	s=arc-20240116; t=1764080070; c=relaxed/simple;
+	bh=5WPAAEAVbcWlB/llxwu+yBT/5JsRuhtT4pi9J/qzp+k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YsrV4R+yBgILmPcFF1Gsf6S6ZK8MzkFpiY9mVP3OlXauBb/nCxPOgds9Fi1sya7WqSQ9u/OEbkb0+4s68DVCoarynPWFGDa6n0JJ1TjCeqnmofe2voMJlTzQEPX6JFUe6zjeMbZh+dbMxTu3btbo9Yy/V/Cegv6yib5MqD0Pmtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=VKT4ImuO; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.248] ([129.217.186.248])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5APE4i1p027790
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 25 Nov 2025 15:04:44 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1764079485;
-	bh=3dV4P1rod3HWCV2qsj7M+/1jXpEH4ENT9lMlEQN7fCg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=VKT4ImuOfpAJCMfaVzOAF/Xjj7yTnj5zOdJQ4TPLhwKEfHPIzpzwo1zOk39oBya18
-	 hg+pyMKmcvEX+NO1Ehds2HpmyfwH8pS0y1JgwJ7CBTIcy2swua/Nwm4EXrmhuI233t
-	 LJALx6BJBNIoeJLpe2XmOCbAnVzsdPpbFqaf/KPg=
-Message-ID: <9e586a3b-d7fa-4bba-b8d1-39f002e20913@tu-dortmund.de>
-Date: Tue, 25 Nov 2025 15:04:44 +0100
+	 In-Reply-To:Content-Type; b=RnKIdn1X0lRRT3B4/4GDPO57C3KCGirCr+8nMfI0pr1siqVdK0X33E4g5CmcVlJSFVLieHxVh3Q5H8rgXj4mxIdWdB0K9lEyIpRkGt9h8AToYYRIQtxEYXXsdHV9lIqRnVTOhQFwSILED5kuZFMAuXbsQOeUbB5YhqBKhY9EoZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8B82B168F;
+	Tue, 25 Nov 2025 06:14:20 -0800 (PST)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B6D883F86F;
+	Tue, 25 Nov 2025 06:14:26 -0800 (PST)
+Message-ID: <e67decb6-20a5-4659-8401-8534049f9229@arm.com>
+Date: Tue, 25 Nov 2025 14:14:25 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -52,237 +42,166 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v6 0/8] tun/tap & vhost-net: netdev queue flow
- control to avoid ptr_ring tail drop
-To: Jason Wang <jasowang@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
-        jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
- <CACGkMEuboys8sCJFUTGxHUeouPFnVqVLGQBefvmxYDe4ooLfLg@mail.gmail.com>
- <b9fff8e1-fb96-4b1f-9767-9d89adf31060@tu-dortmund.de>
- <CACGkMEufNLjXj37NBVCW4xdSuVLLV4ZS4WTuRzdaBV-nYgKs8w@mail.gmail.com>
- <ebb431f9-fdd3-4db3-bfd5-70af703ef9b5@tu-dortmund.de>
- <CACGkMEt_Z0a3kidmmjXcajU2EVi-B6mi832weeumPfZzmLoEPA@mail.gmail.com>
+Subject: Re: [PATCH v4 06/49] KVM: arm64: GICv3: Detect and work around the
+ lack of ICV_DIR_EL1 trapping
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ Mark Brown <broonie@kernel.org>
+References: <20251120172540.2267180-1-maz@kernel.org>
+ <20251120172540.2267180-7-maz@kernel.org>
+ <5df713d4-8b79-4456-8fd1-707ca89a61b6@arm.com> <86h5uiql4b.wl-maz@kernel.org>
 Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CACGkMEt_Z0a3kidmmjXcajU2EVi-B6mi832weeumPfZzmLoEPA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <86h5uiql4b.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 11/25/25 02:34, Jason Wang wrote:
-> On Mon, Nov 24, 2025 at 5:20 PM Simon Schippers
-> <simon.schippers@tu-dortmund.de> wrote:
+On 25/11/2025 13:48, Marc Zyngier wrote:
+> On Tue, 25 Nov 2025 11:26:10 +0000,
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 >>
->> On 11/24/25 02:04, Jason Wang wrote:
->>> On Fri, Nov 21, 2025 at 5:23 PM Simon Schippers
->>> <simon.schippers@tu-dortmund.de> wrote:
->>>>
->>>> On 11/21/25 07:19, Jason Wang wrote:
->>>>> On Thu, Nov 20, 2025 at 11:30 PM Simon Schippers
->>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>
->>>>>> This patch series deals with tun/tap and vhost-net which drop incoming
->>>>>> SKBs whenever their internal ptr_ring buffer is full. Instead, with this
->>>>>> patch series, the associated netdev queue is stopped before this happens.
->>>>>> This allows the connected qdisc to function correctly as reported by [1]
->>>>>> and improves application-layer performance, see our paper [2]. Meanwhile
->>>>>> the theoretical performance differs only slightly:
->>>>>>
->>>>>> +--------------------------------+-----------+----------+
->>>>>> | pktgen benchmarks to Debian VM | Stock     | Patched  |
->>>>>> | i5 6300HQ, 20M packets         |           |          |
->>>>>> +-----------------+--------------+-----------+----------+
->>>>>> | TAP             | Transmitted  | 195 Kpps  | 183 Kpps |
->>>>>> |                 +--------------+-----------+----------+
->>>>>> |                 | Lost         | 1615 Kpps | 0 pps    |
->>>>>> +-----------------+--------------+-----------+----------+
->>>>>> | TAP+vhost_net   | Transmitted  | 589 Kpps  | 588 Kpps |
->>>>>> |                 +--------------+-----------+----------+
->>>>>> |                 | Lost         | 1164 Kpps | 0 pps    |
->>>>>> +-----------------+--------------+-----------+----------+
->>>>>
->>>>
->>>> Hi Jason,
->>>>
->>>> thank you for your reply!
->>>>
->>>>> PPS drops somehow for TAP, any reason for that?
->>>>
->>>> I have no explicit explanation for that except general overheads coming
->>>> with this implementation.
+>> On 20/11/2025 17:24, Marc Zyngier wrote:
+>>> A long time ago, an unsuspecting architect forgot to add a trap
+>>> bit for ICV_DIR_EL1 in ICH_HCR_EL2. Which was unfortunate, but
+>>> what's a bit of spec between friends? Thankfully, this was fixed
+>>> in a later revision, and ARM "deprecates" the lack of trapping
+>>> ability.
 >>>
->>> It would be better to fix that.
+>>> Unfortuantely, a few (billion) CPUs went out with that defect,
+>>> anything ARMv8.0 from ARM, give or take. And on these CPUs,
+>>> you can't trap DIR on its own, full stop.
 >>>
->>>>
->>>>>
->>>>> Btw, I had some questions:
->>>>>
->>>>> 1) most of the patches in this series would introduce non-trivial
->>>>> impact on the performance, we probably need to benchmark each or split
->>>>> the series. What's more we need to run TCP benchmark
->>>>> (throughput/latency) as well as pktgen see the real impact
->>>>
->>>> What could be done, IMO, is to activate tun_ring_consume() /
->>>> tap_ring_consume() before enabling tun_ring_produce(). Then we could see
->>>> if this alone drops performance.
->>>>
->>>> For TCP benchmarks, you mean userspace performance like iperf3 between a
->>>> host and a guest system?
+>>> As the next best thing, we can trap everything in the common group,
+>>> which is a tad expensive, but hey ho, that's what you get. You can
+>>> otherwise recycle the HW in the neaby bin.
 >>>
->>> Yes,
+>>> Tested-by: Fuad Tabba <tabba@google.com>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>    arch/arm64/include/asm/virt.h  |  7 ++++-
+>>>    arch/arm64/kernel/cpufeature.c | 52 ++++++++++++++++++++++++++++++++++
+>>>    arch/arm64/kernel/hyp-stub.S   |  5 ++++
+>>>    arch/arm64/kvm/vgic/vgic-v3.c  |  3 ++
+>>>    arch/arm64/tools/cpucaps       |  1 +
+>>>    5 files changed, 67 insertions(+), 1 deletion(-)
 >>>
->>>>
->>>>>
->>>>> 2) I see this:
->>>>>
->>>>>         if (unlikely(tun_ring_produce(&tfile->tx_ring, queue, skb))) {
->>>>>                 drop_reason = SKB_DROP_REASON_FULL_RING;
->>>>>                 goto drop;
->>>>>         }
->>>>>
->>>>> So there could still be packet drop? Or is this related to the XDP path?
->>>>
->>>> Yes, there can be packet drops after a ptr_ring resize or a ptr_ring
->>>> unconsume. Since those two happen so rarely, I figured we should just
->>>> drop in this case.
->>>>
->>>>>
->>>>> 3) The LLTX change would have performance implications, but the
->>>>> benmark doesn't cover the case where multiple transmission is done in
->>>>> parallel
->>>>
->>>> Do you mean multiple applications that produce traffic and potentially
->>>> run on different CPUs?
->>>
->>> Yes.
->>>
->>>>
->>>>>
->>>>> 4) After the LLTX change, it seems we've lost the synchronization with
->>>>> the XDP_TX and XDP_REDIRECT path?
->>>>
->>>> I must admit I did not take a look at XDP and cannot really judge if/how
->>>> lltx has an impact on XDP. But from my point of view, __netif_tx_lock()
->>>> instead of __netif_tx_acquire(), is executed before the tun_net_xmit()
->>>> call and I do not see the impact for XDP, which calls its own methods.
->>>
->>> Without LLTX tun_net_xmit is protected by tx lock but it is not the
->>> case of tun_xdp_xmit. This is because, unlike other devices, tun
->>> doesn't have a dedicated TX queue for XDP, so the queue is shared by
->>> both XDP and skb. So XDP xmit path needs to be protected with tx lock
->>> as well, and since we don't have queue discipline for XDP, it means we
->>> could still drop packets when XDP is enabled. I'm not sure this would
->>> defeat the whole idea or not.
+>>> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+>>> index aa280f356b96a..8eb63d3294974 100644
+>>> --- a/arch/arm64/include/asm/virt.h
+>>> +++ b/arch/arm64/include/asm/virt.h
+>>> @@ -40,8 +40,13 @@
+>>>     */
+>>>    #define HVC_FINALISE_EL2	3
+>>>    +/*
+>>> + * HVC_GET_ICH_VTR_EL2 - Retrieve the ICH_VTR_EL2 value
+>>> + */
+>>> +#define HVC_GET_ICH_VTR_EL2	4
+>>> +
+>>>    /* Max number of HYP stub hypercalls */
+>>> -#define HVC_STUB_HCALL_NR 4
+>>> +#define HVC_STUB_HCALL_NR 5
+>>>      /* Error returned when an invalid stub number is passed into x0
+>>> */
+>>>    #define HVC_STUB_ERR	0xbadca11
+>>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>>> index 5ed401ff79e3e..5de51cb1b8fe2 100644
+>>> --- a/arch/arm64/kernel/cpufeature.c
+>>> +++ b/arch/arm64/kernel/cpufeature.c
+>>> @@ -2303,6 +2303,49 @@ static bool has_gic_prio_relaxed_sync(const struct arm64_cpu_capabilities *entry
+>>>    }
+>>>    #endif
+>>>    +static bool can_trap_icv_dir_el1(const struct
+>>> arm64_cpu_capabilities *entry,
+>>> +				 int scope)
+>>> +{
+>>> +	static const struct midr_range has_vgic_v3[] = {
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM),
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM),
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_PRO),
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_PRO),
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_MAX),
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_MAX),
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_PRO),
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
+>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
+>>> +		{},
+>>> +	};
+>>> +	struct arm_smccc_res res = {};
+>>> +
+>>> +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV3_CPUIF);
+>>> +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV5_LEGACY);
+>>> +	if (!cpus_have_cap(ARM64_HAS_GICV3_CPUIF) &&
+>>> +	    !is_midr_in_range_list(has_vgic_v3))
+>>> +		return false;
+>>> +
+>>> +	if (!is_hyp_mode_available())
+>>> +		return false;
+>>> +
+>>> +	if (cpus_have_cap(ARM64_HAS_GICV5_LEGACY))
+>>> +		return true;
+>>> +
+>>> +	if (is_kernel_in_hyp_mode())
+>>> +		res.a1 = read_sysreg_s(SYS_ICH_VTR_EL2);
+>>> +	else
+>>> +		arm_smccc_1_1_hvc(HVC_GET_ICH_VTR_EL2, &res);
 >>
->> Good point.
->>
->>>
->>>>>
->>>>> 5) The series introduces various ptr_ring helpers with lots of
->>>>> ordering stuff which is complicated, I wonder if we first have a
->>>>> simple patch to implement the zero packet loss
->>>>
->>>> I personally don't see how a simpler patch is possible without using
->>>> discouraged practices like returning NETDEV_TX_BUSY in tun_net_xmit or
->>>> spin locking between producer and consumer. But I am open for
->>>> suggestions :)
->>>
->>> I see NETDEV_TX_BUSY is used by veth:
->>>
->>> static int veth_xdp_rx(struct veth_rq *rq, struct sk_buff *skb)
->>> {
->>>         if (unlikely(ptr_ring_produce(&rq->xdp_ring, skb)))
->>>                 return NETDEV_TX_BUSY; /* signal qdisc layer */
->>>
->>>         return NET_RX_SUCCESS; /* same as NETDEV_TX_OK */
->>> }
->>>
->>> Maybe it would be simpler to start from that (probably with a new tun->flags?).
->>>
->>> Thanks
->>
->> Do you mean that this patchset could be implemented using the same
->> approach that was used for veth in [1]?
->> This could then also fix the XDP path.
+>> We are reading the register on the current CPU and this capability,
+>> being a SYSTEM_FEATURE, relies on the "probing CPU". If there CPUs
+>> with differing values (which I don't think is practical, but hey,
+>> never say..). This is would better be a
+>> ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE, which would run through all
+>> boot CPUs and would set the capability when it matches.
 > 
-> I think so.
+> While I agree that SYSTEM_FEATURE is most probably the wrong thing, I
+> can't help but notice that
+> 
+> - ARM64_HAS_GICV3_CPUIF,
+> - ARM64_HAS_GIC_PRIO_MASKING
+> - ARM64_HAS_GIC_PRIO_RELAXED_SYNC
+> 
+> are all ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE.
 
-Okay, I will do so and submit a v7 when net-next opens again for 6.19.
+Which means, if GICV3_CPUIF is set any booting CPU must have them.
 
 > 
->>
->> But is returning NETDEV_TX_BUSY fine in our case?
+> On the other ARM64_HAS_GICV5_LEGACY is ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE.
 > 
-> If it helps to avoid packet drop. But I'm not sure if qdisc is a must
-> in your case.
+> Given that ARM64_HAS_ICH_HCR_EL2_TDIR is dependent on both
+> ARM64_HAS_GICV3_CPUIF and ARM64_HAS_GICV5_LEGACY, shouldn't these two
+> (and their dependencies) be aligned to have the same behaviour?
 
-I will try to avoid returning it.
+Yes, but it also depends on how you are detecting the feature.
 
-When no qdisc is connected, I will just drop like veth does.
+BOOT_CPU_FEATURES are finalized with BOOT CPU and thusanything that 
+boots up later must have it. So it is fine, as long
+as a SYSTEM cap depends on it and can do its own additional checks
+in a system wide safe manner.
+
+But in your case, we a have SYSTEM cap, which only performs the check
+on the "running CPU" and not considering a system wide safe value for
+ICH_VTR_EL2_TDS. In order to do this, we need to switch to something
+like the GICV5_LEGACY cap, which chooses to perform the check on all
+booting CPUs (as we don't keep the system wide safe value for the
+bit it is looking for).
+
+e.g., your cap may be incorrectly SET, when the BOOT cpu (which
+mostly runs the SYSTEM scope), but another CPU didn't have the
+ICH_VTR_EL2_TDS.
+
+Does that help ?
+
+Suzuki
 
 > 
->>
->> Do you mean a flag that enables or disables the no-drop behavior?
+> Thanks,
 > 
-> Yes, via a new flags that could be set via TUNSETIFF.
+> 	M.
 > 
-> Thanks
 
-I am not a fan of that, since I can not imagine a use case where
-dropping packets is desired. veth does not introduce a flag either.
-
-Of course, if there is a major performance degradation, it makes sense.
-But I will benchmark it, and we will see.
-
-Thank you!
-
-> 
->>
->> Thanks!
->>
->> [1] Link: https://lore.kernel.org/netdev/174559288731.827981.8748257839971869213.stgit@firesoul/T/#u
->>
->>>
->>>>
->>>>>
->>>>>>
->>>>>> This patch series includes tun/tap, and vhost-net because they share
->>>>>> logic. Adjusting only one of them would break the others. Therefore, the
->>>>>> patch series is structured as follows:
->>>>>> 1+2: new ptr_ring helpers for 3
->>>>>> 3: tun/tap: tun/tap: add synchronized ring produce/consume with queue
->>>>>> management
->>>>>> 4+5+6: tun/tap: ptr_ring wrappers and other helpers to be called by
->>>>>> vhost-net
->>>>>> 7: tun/tap & vhost-net: only now use the previous implemented functions to
->>>>>> not break git bisect
->>>>>> 8: tun/tap: drop get ring exports (not used anymore)
->>>>>>
->>>>>> Possible future work:
->>>>>> - Introduction of Byte Queue Limits as suggested by Stephen Hemminger
->>>>>
->>>>> This seems to be not easy. The tx completion depends on the userspace behaviour.
->>>>
->>>> I agree, but I really would like to reduce the buffer bloat caused by the
->>>> default 500 TUN / 1000 TAP packet queue without losing performance.
->>>>
->>>>>
->>>>>> - Adaption of the netdev queue flow control for ipvtap & macvtap
->>>>>>
->>>>>> [1] Link: https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
->>>>>> [2] Link: https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
->>>>>>
->>>>>
->>>>> Thanks
->>>>>
->>>>
->>>> Thanks! :)
->>>>
->>>
->>
-> 
 
