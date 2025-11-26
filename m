@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-64670-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64674-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80939C8A9C9
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 16:24:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6806BC8A9DE
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 16:25:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1FCD14E5423
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 15:24:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62D0F3AE507
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 15:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31513328EC;
-	Wed, 26 Nov 2025 15:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A380332911;
+	Wed, 26 Nov 2025 15:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="TJmkqhEJ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Fo3vjtry"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="RpsHXPAg";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="neptXDVX"
 X-Original-To: kvm@vger.kernel.org
 Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9594B3321BA;
-	Wed, 26 Nov 2025 15:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F659331A41;
+	Wed, 26 Nov 2025 15:24:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764170651; cv=none; b=Z3qVmN33uivVNtjrb4p+6ynaz4wNTkTzLvevy3YIQGMCXnuAgIh7vhxLPlesM49vYqb4P4LR/Z7EXMqbgH6SMZ3T6w5w+5ptfbUFaaisALOjpsRUCiof9NLSD1/keSbzYYChNFf55O8J3/ASsN6LoROEKm2BWADaFRsVZ+XuTTo=
+	t=1764170655; cv=none; b=rZ0ixFHhfxgfYvHzQ/k9KAMbmTCwZxiWCXJiYYuXOuA+mQ+rceigSLG/QzpP2388SxlDymJpPOHOZYzJ77AxnAx1yFQKmOVCIy7kKhyfrDeGDMJKUD3jY4CqDJvXVhYOFJH7MP2h3cRczudpO13jBnLpjoekwdsLAZT4Lu3XFNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764170651; c=relaxed/simple;
-	bh=w/WkVcZ7JeI2n4dkA4fvLLpjsmEO7tNErzXkXUl3uUY=;
+	s=arc-20240116; t=1764170655; c=relaxed/simple;
+	bh=PC2Baaa0HTihiivIFGDkF1SV5nsQ2DJWHLWnmQhhnGE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ewrLIa3BKb5xZ6ryMrUgY2hAloOTzL53GSmJ6i5vFA3XfuN7LiuE5guxZ2uYU7XGbjGmtafat1bBFnSDquxRaHuTrJFyHTT/C5oKJzG/HF8x3MqZhi+bh6bueL6/bpQySGCrJCxX3m7yrZjrh3M6/KRIf46TLXmYP0WchhyuWN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=TJmkqhEJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Fo3vjtry; arc=none smtp.client-ip=103.168.172.151
+	 MIME-Version:Content-Type; b=I4WX4ZcLhsfGEQTJVnoMcl9xHKfvNkBr1g1ABD0n8DWovVVeY/3IIAgpf6R9DcyYHGMcHqMYXJ1DDH4qt2gThCwDr8o/yhkVqI+HuU5hbnEGiUmbe4bay36i8X7PepCApgsbi+zuklrEXTnYj3+l6s8COLmqG0zS7vWhRELQPWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=RpsHXPAg; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=neptXDVX; arc=none smtp.client-ip=103.168.172.151
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id 4FCEAEC000A;
-	Wed, 26 Nov 2025 10:24:05 -0500 (EST)
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 7868DEC000A;
+	Wed, 26 Nov 2025 10:24:12 -0500 (EST)
 Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Wed, 26 Nov 2025 10:24:05 -0500
+  by phl-compute-02.internal (MEProxy); Wed, 26 Nov 2025 10:24:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1764170645;
-	 x=1764257045; bh=iS1FFUWVwkCVU/m/hCrPC1kfzwe7lCdTSspMufCVAfQ=; b=
-	TJmkqhEJfWdsdw4NUcWUKIAblRv5PfW8EVSJDPHqh5ufiCf+/tc5TiNmJmh1nWoF
-	RtyBoi6W097PQIM/466mrGsRsiIkSUD71WRjP0f7+WZhoaeFxFkXHm+m8HJ8P8TN
-	gaqTBpiWKcLGLk7oue6rp6tdvRDzaYZpS92rbVf85bYxpOwrkky+8pLPnWqCn445
-	F2ek8lLU9Z2aZwjfRdN4gnEujBtUQBEiuf2YL8fKMv7J++GKUuu0CneU9CTtlfA8
-	uK07MCwZqG6XArw5AyLhGLNAuwrjccq8WvwPAsyjfM18PSNeavXOVM1w40bDSO1X
-	43m477E//5YCvjZquTTy1A==
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1764170652;
+	 x=1764257052; bh=4Hxx5Ns+2Syi3mQOWFbGcezq1+3byMGKKrsFtU+p4m0=; b=
+	RpsHXPAgQnAv/79/LxFZuHz/kVuVy+ez5rOalpoGt8TapyUbRHp71HtlNcINM8WZ
+	tqgKDujOcIj096JCSD5ZAAQU9jsk0o3+r5KcTbI4vwwn5I/rYtUbjEmUCVoyxcUA
+	bqsQUZZbi35mbADqEwCv2MvX+VcuqPnJkBdxtJSJSGlmMctyWVCYzNAuCAfRcok/
+	tbAAVsAcWXbU0Cp+FdWKKibMTY+xIO2+T+u4607pG09tsuna6siWTa2ojy+pTvud
+	KRjc8wm4+K8zBY95sqwyaieU34piGWqeIzUyjjlbL3kmEjeJyFm/wrmOPsHyBwCo
+	A4//kWZa9a9N/9yliR5yBA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1764170645; x=
-	1764257045; bh=iS1FFUWVwkCVU/m/hCrPC1kfzwe7lCdTSspMufCVAfQ=; b=F
-	o3vjtryfAYLesjgMOU9wJvdLA2UGPZ2OPKGuGe+cFnoMXSzYG4mGQzXp8ZeIYlLJ
-	nPLibk4jXQ/AgWig1Wg4yRCGMnxAaidsdWOA3xBikilLQgy3ZjOLRY6ffd7vvzKA
-	ruTHI/LWSH0IxnaDSof6uZljh/F10DlvgzN/xJXygDC8V2OiyRKzA/So6gaTqoSs
-	zMWPEngHM42npy3iB+ys5SSU5B39Lqca4Sw4d2qjXow7naHIaPu739SEVT2a5dCs
-	YDynz0q883/pScYT69w+9QFgGeG1eATeE7luKKb+7P38ZlBpn41kMEaiKVoN8o5Z
-	vuk7AAL4wiEbZBN9Qw1Lg==
-X-ME-Sender: <xms:lBsnaW37snuHyk8FBTrT4fEujedaLiKiBTGdNNHBSI2ReDzgy45JsA>
-    <xme:lBsnaUEMcTl4Jn-p5_Uf23QEdn8OxcO4b9h20uJwI5-vCGmWQ_QsD9yRu8TZqn30C
-    6LHjlPZC5bGPzlSuK0bpRcf0R_Ey3UlxfaeyA4aPpv_0abERbqp2A>
-X-ME-Received: <xmr:lBsnaVjw2H6PpArMNdPCM5DKcfWMV-_IyFW-UAtkOrWyzyI3ST-i8S9X>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgeegjedtucetufdoteggodetrf
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1764170652; x=
+	1764257052; bh=4Hxx5Ns+2Syi3mQOWFbGcezq1+3byMGKKrsFtU+p4m0=; b=n
+	eptXDVXKnuwNc/1nTzFmHOV0ofAx9Zu1aJ1D58O0/UGw4MHD9nsGKFDUDjWf5pWi
+	PiReMTRxmOr8cdhFuYVHI2MN0QEClniCkIyQl6KQbWBkvVsZ2VnBR8hqPXEuSqED
+	7wmj1syFRdcvPMbIl2iHaPbcVlVMJXw83aHWJ4rOItAkX3pSrCScvtFc3L4wcanL
+	4ckAIir9Kf0YuUQ9ixsntygAx4ebJCJ8Af/Ie5XtrJYYxdiVRdpcy7C+gSowRUdJ
+	WDvRt69BVAhaR3gsAe9cbj3hLXQYp6br931Zj4hte4TQqQtyJtp/urf1qn0gJltu
+	w1d3IT+cPKNpSXlBQq7TA==
+X-ME-Sender: <xms:nBsnaYY-ItdFjVApVu9duOhaaikSaP9nsHITUpSt38hc4yzYZnoDmA>
+    <xme:nBsnaeYTJafBpNMHOsKP1Y4w4v1Ex1oibVt0Qz3T5sGEoantg4oTmlmFfYUD0H6qE
+    -idv3zKcnFzXAP2dc7uK_bCPYUHbPOdbW46T01P5pdZWR2T8C7f>
+X-ME-Received: <xmr:nBsnaZlvehX7lvIxwqwOkHz1QLrZh2-IRxzu1F7dkSl6Vzvy3Jvfwlo2>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgeegieelucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhggtgfgsehtjeertd
     dttddvnecuhfhrohhmpeetlhgvgicuhghilhhlihgrmhhsohhnuceorghlvgigsehshhgr
@@ -80,15 +80,15 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgeegjedtucetufdote
     tghomhdprhgtphhtthhopehvshgvthhhihesnhhvihguihgrrdgtohhmpdhrtghpthhtoh
     epmhhotghhshesnhhvihguihgrrdgtohhmpdhrtghpthhtohephihunhigihgrnhhgrdhl
     ihesrghmugdrtghomh
-X-ME-Proxy: <xmx:lBsnaVd3tsqA2hpKzRVPfIRFSSI663lxN33DUlSYEq_ptSCuhO1t8g>
-    <xmx:lBsnaTwgDgUUK7u68KiGhN3zu76uJqDsFfdUlgDIOkHLfRn36HZT4g>
-    <xmx:lBsnaXbQ6---vXlPrO5gn2ptGPDxYq_2NG2WimQ4PIRVwou0OrlDdQ>
-    <xmx:lBsnaZISxK0hTG7MEfgD7wGsxABI1q9t0DgXlEM6mRpe5uQDu3yqqw>
-    <xmx:lRsnaXwPPek7B4-_njDSyFMjufvAY60ZSBsHGLUia-tkV088wr7l9gII>
+X-ME-Proxy: <xmx:nBsnaQQMurNxuG1veeG8zKSLUr5cCyyM-nwTxN-WSiEccXC3f7Fz6g>
+    <xmx:nBsnaeXbo4h-oeZwsBeuVTIZVrDVnTWG6yIJMDoomayR0FDXpc_RxQ>
+    <xmx:nBsnaWuNEgsKkmJb8rhYFA60K-m1MHytMmZ8md4C1zsfreC6y4Ie4g>
+    <xmx:nBsnaeOk4rIci-69sBtJGR46Z-875MFYI9xEEH-bXhDpKAFbzunmxA>
+    <xmx:nBsnaQs658lMFUwP_5-jGn-H7g0OQakWcEwylZ-DvJn9jhUAgkv9DteP>
 Feedback-ID: i03f14258:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 26 Nov 2025 10:24:03 -0500 (EST)
-Date: Wed, 26 Nov 2025 08:22:54 -0700
+ 26 Nov 2025 10:24:10 -0500 (EST)
+Date: Wed, 26 Nov 2025 08:23:00 -0700
 From: Alex Williamson <alex@shazbot.org>
 To: <ankita@nvidia.com>
 Cc: <jgg@ziepe.ca>, <yishaih@nvidia.com>, <skolothumtho@nvidia.com>,
@@ -100,12 +100,12 @@ Cc: <jgg@ziepe.ca>, <yishaih@nvidia.com>, <skolothumtho@nvidia.com>,
  <linux-kernel@vger.kernel.org>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
  <targupta@nvidia.com>, <zhiw@nvidia.com>, <danw@nvidia.com>,
  <dnigam@nvidia.com>, <kjaju@nvidia.com>
-Subject: Re: [PATCH v7 4/6] vfio/nvgrace-gpu: split the code to wait for GPU
- ready
-Message-ID: <20251126082254.70d4a7b5.alex@shazbot.org>
-In-Reply-To: <20251126052627.43335-5-ankita@nvidia.com>
+Subject: Re: [PATCH v7 5/6] vfio/nvgrace-gpu: Inform devmem unmapped after
+ reset
+Message-ID: <20251126082300.09e3503a.alex@shazbot.org>
+In-Reply-To: <20251126052627.43335-6-ankita@nvidia.com>
 References: <20251126052627.43335-1-ankita@nvidia.com>
-	<20251126052627.43335-5-ankita@nvidia.com>
+	<20251126052627.43335-6-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -115,98 +115,85 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 26 Nov 2025 05:26:25 +0000
+On Wed, 26 Nov 2025 05:26:26 +0000
 <ankita@nvidia.com> wrote:
 
 > From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> Split the function that check for the GPU device being ready on
-> the probe.
+> Introduce a new flag reset_done to notify that the GPU has just
+> been reset and the mapping to the GPU memory is zapped.
 > 
-> Move the code to wait for the GPU to be ready through BAR0 register
-> reads to a separate function. This would help reuse the code.
+> Implement the reset_done handler to set this new variable. It
+> will be used later in the patches to wait for the GPU memory
+> to be ready before doing any mapping or access.
 > 
-> This also fixes a bug where the return status in case of timeout
-> gets overridden by return from pci_enable_device. With the fix,
-> a timeout generate an error as initially intended.
-> 
-> Fixes: d85f69d520e6 ("vfio/nvgrace-gpu: Check the HBM training and C2C link status")
-> 
-> Reviewed-by: Zhi Wang <zhiw@nvidia.com>
-> Reviewed-by: Shameer Kolothum <skolothumtho@nvidia.com>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Suggested-by: Alex Williamson <alex@shazbot.org>
 > Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 > ---
->  drivers/vfio/pci/nvgrace-gpu/main.c | 29 +++++++++++++++++------------
->  1 file changed, 17 insertions(+), 12 deletions(-)
+>  drivers/vfio/pci/nvgrace-gpu/main.c | 26 +++++++++++++++++++++++++-
+>  1 file changed, 25 insertions(+), 1 deletion(-)
 > 
 > diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-> index ac9551b9e4b6..f691deb8e43c 100644
+> index f691deb8e43c..b46984e76be7 100644
 > --- a/drivers/vfio/pci/nvgrace-gpu/main.c
 > +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-> @@ -130,6 +130,20 @@ static void nvgrace_gpu_close_device(struct vfio_device *core_vdev)
->  	vfio_pci_core_close_device(core_vdev);
->  }
+> @@ -58,6 +58,8 @@ struct nvgrace_gpu_pci_core_device {
+>  	/* Lock to control device memory kernel mapping */
+>  	struct mutex remap_lock;
+>  	bool has_mig_hw_bug;
+> +	/* GPU has just been reset */
+> +	bool reset_done;
+>  };
 >  
-> +static int nvgrace_gpu_wait_device_ready(void __iomem *io)
-> +{
-> +	unsigned long timeout = jiffies + msecs_to_jiffies(POLL_TIMEOUT_MS);
-> +
-> +	do {
-> +		if ((ioread32(io + C2C_LINK_BAR0_OFFSET) == STATUS_READY) &&
-> +		    (ioread32(io + HBM_TRAINING_BAR0_OFFSET) == STATUS_READY))
-> +			return 0;
-> +		msleep(POLL_QUANTUM_MS);
-> +	} while (!time_after(jiffies, timeout));
-> +
-> +	return -ETIME;
-> +}
-> +
->  static unsigned long addr_to_pgoff(struct vm_area_struct *vma,
->  				   unsigned long addr)
->  {
-> @@ -934,9 +948,8 @@ static bool nvgrace_gpu_has_mig_hw_bug(struct pci_dev *pdev)
->   * Ensure that the BAR0 region is enabled before accessing the
->   * registers.
->   */
-> -static int nvgrace_gpu_wait_device_ready(struct pci_dev *pdev)
-> +static int nvgrace_gpu_probe_check_device_ready(struct pci_dev *pdev)
->  {
-> -	unsigned long timeout = jiffies + msecs_to_jiffies(POLL_TIMEOUT_MS);
->  	void __iomem *io;
->  	int ret = -ETIME;
+>  static void nvgrace_gpu_init_fake_bar_emu_regs(struct vfio_device *core_vdev)
+> @@ -1048,12 +1050,34 @@ static const struct pci_device_id nvgrace_gpu_vfio_pci_table[] = {
+>  
+>  MODULE_DEVICE_TABLE(pci, nvgrace_gpu_vfio_pci_table);
+>  
+> +/*
+> + * The GPU reset is required to be serialized against the *first* mapping
+> + * faults and read/writes accesses to prevent potential RAS events logging.
+> + *
+> + * The reset_done implementation is triggered on every reset and is used
+> + * set the reset_done variable that assists in achieving the serialization.
 
-ret initialization is not needed, it's immediately clobbered.  Thanks,
+I can't parse this last sentence, "used _to_ set"?.  Maybe something as
+simple as:
 
+/*
+ * First fault or access after a reset needs to poll device readiness,
+ * flag that a reset has occurred.
+ */
+
+Thanks,
 Alex
 
-
->  
-> @@ -954,16 +967,8 @@ static int nvgrace_gpu_wait_device_ready(struct pci_dev *pdev)
->  		goto iomap_exit;
->  	}
->  
-> -	do {
-> -		if ((ioread32(io + C2C_LINK_BAR0_OFFSET) == STATUS_READY) &&
-> -		    (ioread32(io + HBM_TRAINING_BAR0_OFFSET) == STATUS_READY)) {
-> -			ret = 0;
-> -			goto reg_check_exit;
-> -		}
-> -		msleep(POLL_QUANTUM_MS);
-> -	} while (!time_after(jiffies, timeout));
-> +	ret = nvgrace_gpu_wait_device_ready(io);
->  
-> -reg_check_exit:
->  	pci_iounmap(pdev, io);
->  iomap_exit:
->  	pci_release_selected_regions(pdev, 1 << 0);
-> @@ -980,7 +985,7 @@ static int nvgrace_gpu_probe(struct pci_dev *pdev,
->  	u64 memphys, memlength;
->  	int ret;
->  
-> -	ret = nvgrace_gpu_wait_device_ready(pdev);
-> +	ret = nvgrace_gpu_probe_check_device_ready(pdev);
->  	if (ret)
->  		return ret;
+> + */
+> +static void nvgrace_gpu_vfio_pci_reset_done(struct pci_dev *pdev)
+> +{
+> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(&pdev->dev);
+> +	struct nvgrace_gpu_pci_core_device *nvdev =
+> +		container_of(core_device, struct nvgrace_gpu_pci_core_device,
+> +			     core_device);
+> +
+> +	nvdev->reset_done = true;
+> +}
+> +
+> +static const struct pci_error_handlers nvgrace_gpu_vfio_pci_err_handlers = {
+> +	.reset_done = nvgrace_gpu_vfio_pci_reset_done,
+> +	.error_detected = vfio_pci_core_aer_err_detected,
+> +};
+> +
+>  static struct pci_driver nvgrace_gpu_vfio_pci_driver = {
+>  	.name = KBUILD_MODNAME,
+>  	.id_table = nvgrace_gpu_vfio_pci_table,
+>  	.probe = nvgrace_gpu_probe,
+>  	.remove = nvgrace_gpu_remove,
+> -	.err_handler = &vfio_pci_core_err_handlers,
+> +	.err_handler = &nvgrace_gpu_vfio_pci_err_handlers,
+>  	.driver_managed_dma = true,
+>  };
 >  
 
 
