@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-64760-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64761-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 448D0C8C2B1
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 23:15:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25228C8C2B7
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 23:15:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B06333B34AD
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 22:15:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A7BD3B49DA
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 22:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6F7A342523;
-	Wed, 26 Nov 2025 22:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D78313293;
+	Wed, 26 Nov 2025 22:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YTzOuSZN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MrfVT1xo"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79D2335553;
-	Wed, 26 Nov 2025 22:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A98A2D77E9;
+	Wed, 26 Nov 2025 22:15:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764195313; cv=none; b=PmRLynxvD4+H8UqBo8NHMUROT+bt6k7rYFdlkAhlbG3VySUSiAo/DDmbqP5eFzdm08JC+JZaEo/iPW3d1AqjJqcw2kCDluNC011o1bdz3iqyYTDVMTUq8zSwg8oSY3rsQkIywqG/pI1iUFQ8ND004mPXZnCh1swi4IHyYk2tqMM=
+	t=1764195328; cv=none; b=ITrnKP/kdyNgCjKVMvPJLmXWhxvuj4hYIVDMOxVzfmT9NoFmDS4HvbqaIreSQegvQdVJte3qaLpiaK+fEVBE4mdTK9V0U4PkOfJXYLCp0lqPdvJjc7wpfwk74Z+VTtH1o/Exs5AYZiTiGRyohknHw1NURRUjKfb1yVRovVlb7h8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764195313; c=relaxed/simple;
-	bh=uvnGpQRlH4kUe+UMY9Z7043UmlnpQaipVyk2PoJ88MY=;
+	s=arc-20240116; t=1764195328; c=relaxed/simple;
+	bh=2kDP/h5XKk2d311MudSRurGHQf2qIocU+MeMeTbQRcE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U40PzXfOsoZVBpOMUi7uurO1hTRYxIKsejC8FeKPT56872JrCRkckYddJ3e/QB9WN+7tz3L5xIdgVrCBSk15jjdFXh1udvujLf3/x+5n2/Jdna7ZxD+OQfM2a7/Kh6Hs3xmbbKOL2z9zgNoFpZYZP2wQnFHKD/2nhngp3g+SNw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YTzOuSZN; arc=none smtp.client-ip=198.175.65.15
+	 Content-Type:Content-Disposition:In-Reply-To; b=I+Cn6Fbv3+wQjBytuov4BQq454pJll/zYKYOadmbZeFzFwmX5XoGqfuFc1GkDXleYTb2jKpXncrVw3wU5vG7JnyaSJtokmI8yJH5FARgtBIyagzpx1vnd1UHRg+QgFnQ/tFLGsbJzyhoIQDvSqw/5hmKiEkjRGgLrMn5syrRDZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MrfVT1xo; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764195311; x=1795731311;
+  t=1764195326; x=1795731326;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=uvnGpQRlH4kUe+UMY9Z7043UmlnpQaipVyk2PoJ88MY=;
-  b=YTzOuSZNz0pyMas8n7CMK2TBGe3uQ9OKxhDmCYYN24TTGVnB1qZLftpO
-   wWKcRgkGVelZZ3r3jW07kxmIh0JOH1SqgMlrSWeBqvnxYCl+BQi4xyZUU
-   jZPS6mZWdd00ONEw3fKt7/7nLb6dhPAafebCyY7Zv0KTVNIr0EldZDDCI
-   epqHTwIxJUbxt5Pm4cyi61/r7QL5AmOWSe9LX5MSNgA/2TgWKIqEXECoB
-   kqHkQesXeDaHoVobv2cVQX/pwS2SCFslo6zQgmNpHMgOnAASRFECFP3Ez
-   Xignm6b4/66dC4ygGC5cCS8rlvcSw3zFyOcLyL2ykCwcqpGo8wNQqudVc
-   w==;
-X-CSE-ConnectionGUID: zUroRF/qQAC/Uk4lkIoBiQ==
-X-CSE-MsgGUID: cB6XhBzSRpGYFtP1aw7cng==
-X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="69865142"
+  bh=2kDP/h5XKk2d311MudSRurGHQf2qIocU+MeMeTbQRcE=;
+  b=MrfVT1xo5yxdbf4hUx3lHJOF5ytFIiQPNscsz3KYBmQi1A9ObRkySG7B
+   /ib153xnwjYKid2Af3oAa/VUTKFDNF7RfYxUsIi5988ZihPOliuIQ91sR
+   aiz8aQ2uz8omASxh+XmoMcOxCQMDdtdKX0RCcd1ThWf/+ylEX4fWHchtw
+   RrqbmNi9K4rZdK4m2mBlDi/XMNsYE7//aoGPGc/ZgtXliU9Krg/PUkklx
+   lEbzs4eEXeoFRFET8TXFUJJ+sddBbVsq3x6CuAGazwhM9e41nxtrA8S7u
+   n0af7p/UKTFJFAk9+H7IR0ltmKsjQ9eAajj71AC1HpA13eYgU1Ap8KatP
+   g==;
+X-CSE-ConnectionGUID: OrT8JYiITxWPlzfQ6AoCRg==
+X-CSE-MsgGUID: m3sQHjZVT0Cwyk9EaUO+Nw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="69865169"
 X-IronPort-AV: E=Sophos;i="6.20,229,1758610800"; 
-   d="scan'208";a="69865142"
+   d="scan'208";a="69865169"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 14:15:10 -0800
-X-CSE-ConnectionGUID: SBhnNyY9RNa/PelLOXwkaQ==
-X-CSE-MsgGUID: a82UF0RmRASvyd4aSApCRQ==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 14:15:25 -0800
+X-CSE-ConnectionGUID: jeU2CXFcTHC6T0aYhG6lGw==
+X-CSE-MsgGUID: L8RxFyNwSbycRF8DYrK+xA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,229,1758610800"; 
-   d="scan'208";a="197217948"
+   d="scan'208";a="197218079"
 Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 14:15:10 -0800
-Date: Wed, 26 Nov 2025 14:15:10 -0800
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 14:15:25 -0800
+Date: Wed, 26 Nov 2025 14:15:25 -0800
 From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 To: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
 	Nikolay Borisov <nik.borisov@suse.com>,
@@ -70,8 +70,9 @@ To: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Asit Mallick <asit.k.mallick@intel.com>,
 	Tao Zhang <tao1.zhang@intel.com>
-Subject: [PATCH v5 2/9] x86/bhi: Make clear_bhb_loop() effective on newer CPUs
-Message-ID: <20251126-vmscape-bhb-v5-2-02d66e423b00@linux.intel.com>
+Subject: [PATCH v5 3/9] x86/vmscape: Rename x86_ibpb_exit_to_user to
+ x86_predictor_flush_exit_to_user
+Message-ID: <20251126-vmscape-bhb-v5-3-02d66e423b00@linux.intel.com>
 X-Mailer: b4 0.14.2
 References: <20251126-vmscape-bhb-v5-0-02d66e423b00@linux.intel.com>
 Precedence: bulk
@@ -84,54 +85,79 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20251126-vmscape-bhb-v5-0-02d66e423b00@linux.intel.com>
 
-As a mitigation for BHI, clear_bhb_loop() executes branches that overwrites
-the Branch History Buffer (BHB). On Alder Lake and newer parts this
-sequence is not sufficient because it doesn't clear enough entries. This
-was not an issue because these CPUs have a hardware control (BHI_DIS_S)
-that mitigates BHI in kernel.
+With the upcoming changes x86_ibpb_exit_to_user will also be used when BHB
+clearing sequence is used. Rename it cover both the cases.
 
-BHI variant of VMSCAPE requires isolating branch history between guests and
-userspace. Note that there is no equivalent hardware control for userspace.
-To effectively isolate branch history on newer CPUs, clear_bhb_loop()
-should execute sufficient number of branches to clear a larger BHB.
+No functional change.
 
-Dynamically set the loop count of clear_bhb_loop() such that it is
-effective on newer CPUs too. Use the hardware control enumeration
-X86_FEATURE_BHI_CTRL to select the appropriate loop count.
-
-Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
-Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
 Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 ---
- arch/x86/entry/entry_64.S | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/entry-common.h  | 6 +++---
+ arch/x86/include/asm/nospec-branch.h | 2 +-
+ arch/x86/kernel/cpu/bugs.c           | 4 ++--
+ arch/x86/kvm/x86.c                   | 2 +-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-index 886f86790b4467347031bc27d3d761d5cc286da1..e4863d6d32178f628d994edc06ed6d591916b390 100644
---- a/arch/x86/entry/entry_64.S
-+++ b/arch/x86/entry/entry_64.S
-@@ -1536,7 +1536,11 @@ SYM_FUNC_START(clear_bhb_loop)
- 	ANNOTATE_NOENDBR
- 	push	%rbp
- 	mov	%rsp, %rbp
--	movl	$5, %ecx
-+
-+	/* loop count differs based on BHI_CTRL, see Intel's BHI guidance */
-+	ALTERNATIVE "movl $5,  %ecx; movl $5, %edx;",	\
-+		    "movl $12, %ecx; movl $7, %edx;", X86_FEATURE_BHI_CTRL
-+
- 	ANNOTATE_INTRA_FUNCTION_CALL
- 	call	1f
- 	jmp	5f
-@@ -1557,7 +1561,7 @@ SYM_FUNC_START(clear_bhb_loop)
- 	 * but some Clang versions (e.g. 18) don't like this.
+diff --git a/arch/x86/include/asm/entry-common.h b/arch/x86/include/asm/entry-common.h
+index ce3eb6d5fdf9f2dba59b7bad24afbfafc8c36918..c45858db16c92fc1364fb818185fba7657840991 100644
+--- a/arch/x86/include/asm/entry-common.h
++++ b/arch/x86/include/asm/entry-common.h
+@@ -94,11 +94,11 @@ static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
  	 */
- 	.skip 32 - 18, 0xcc
--2:	movl	$5, %eax
-+2:	movl	%edx, %eax
- 3:	jmp	4f
- 	nop
- 4:	sub	$1, %eax
+ 	choose_random_kstack_offset(rdtsc());
+ 
+-	/* Avoid unnecessary reads of 'x86_ibpb_exit_to_user' */
++	/* Avoid unnecessary reads of 'x86_predictor_flush_exit_to_user' */
+ 	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER) &&
+-	    this_cpu_read(x86_ibpb_exit_to_user)) {
++	    this_cpu_read(x86_predictor_flush_exit_to_user)) {
+ 		indirect_branch_prediction_barrier();
+-		this_cpu_write(x86_ibpb_exit_to_user, false);
++		this_cpu_write(x86_predictor_flush_exit_to_user, false);
+ 	}
+ }
+ #define arch_exit_to_user_mode_prepare arch_exit_to_user_mode_prepare
+diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+index ec5ebf96dbb9e240f402f39efc6929ae45ec8f0b..df60f9cf51b84e5b75e5db70713188d2e6ad0f5d 100644
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -531,7 +531,7 @@ void alternative_msr_write(unsigned int msr, u64 val, unsigned int feature)
+ 		: "memory");
+ }
+ 
+-DECLARE_PER_CPU(bool, x86_ibpb_exit_to_user);
++DECLARE_PER_CPU(bool, x86_predictor_flush_exit_to_user);
+ 
+ static inline void indirect_branch_prediction_barrier(void)
+ {
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index d7fa03bf51b4517c12cc68e7c441f7589a4983d1..1e9b11198db0fe2483bd17b1327bcfd44a2c1dbf 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -113,8 +113,8 @@ EXPORT_PER_CPU_SYMBOL_GPL(x86_spec_ctrl_current);
+  * be needed to before running userspace. That IBPB will flush the branch
+  * predictor content.
+  */
+-DEFINE_PER_CPU(bool, x86_ibpb_exit_to_user);
+-EXPORT_PER_CPU_SYMBOL_GPL(x86_ibpb_exit_to_user);
++DEFINE_PER_CPU(bool, x86_predictor_flush_exit_to_user);
++EXPORT_PER_CPU_SYMBOL_GPL(x86_predictor_flush_exit_to_user);
+ 
+ u64 x86_pred_cmd __ro_after_init = PRED_CMD_IBPB;
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c9c2aa6f4705e1ae257bf94572967a5724a940a7..60123568fba85c8a445f9220d3f4a1d11fd0eb77 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11397,7 +11397,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	 * may migrate to.
+ 	 */
+ 	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
+-		this_cpu_write(x86_ibpb_exit_to_user, true);
++		this_cpu_write(x86_predictor_flush_exit_to_user, true);
+ 
+ 	/*
+ 	 * Consume any pending interrupts, including the possible source of
 
 -- 
 2.34.1
