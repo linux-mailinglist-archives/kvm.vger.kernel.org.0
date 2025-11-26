@@ -1,106 +1,106 @@
-Return-Path: <kvm+bounces-64628-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64629-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 670B4C88C3F
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 09:53:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D607C88C61
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 09:55:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8DCCB4EC187
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 08:53:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 140483B7F03
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 08:53:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E976831BCA7;
-	Wed, 26 Nov 2025 08:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8BE31E0EF;
+	Wed, 26 Nov 2025 08:52:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8N1NCG/";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5LWZV4I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LMS6vo0v";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PHjkUBji"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1F231A56C
-	for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 08:51:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B2631CA54
+	for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 08:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764147111; cv=none; b=fsxux9c8S0ZIAAjMZIQp9iLP6ttOFGJ9TnDzvWhl1BBMwXZ/A51PeNsvUoBegJisEGO9WyPFreYzRTJZ4zCrR+lOjoIrNwSiq6TMiYbpERwNM4VhFTU/Rx4r+N9AZsBMDM9bIlcQ6nshcVFO3UhOhagSoVOIQjbHtGM9+XM1DU4=
+	t=1764147136; cv=none; b=gghIIHE90hvDbNvwbvXsGPhjuCwketLnkGeDTzFXh3jJfIft/EMQvGtnHPvAGJFx7Mt/L5zBAM+RlF1Kp6CoMJlwXIrwbFsD60EAZ494nVuPvupERlgpsPeXIsovIBiVPXQe7F8rO5S7+NvEMp6gcJzLS7mnVgJJq7lQEXUkYjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764147111; c=relaxed/simple;
-	bh=NWIXXAd0AsCq8D/Bf6rVqiEuxucumLs8aLQgOHznb4g=;
+	s=arc-20240116; t=1764147136; c=relaxed/simple;
+	bh=+4mJTbIpcsjlI4fVYTZgbf/cGRMoiBvPvo8dfrQNyY0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QpcuYF0DPxYkf2p61WpgucJ4QkEwQDc0TkK+wN5irAx8VoGbAhJc8JUatD7OXLDNQ6ZsG+kn/phfoFhwYutyN5QhXt8LZouZ7teQm8UY1vquzzY4484cQwrl6mdQY117sCV5/Z+r3AmsKQxmlCQ3EKaD5ZzoQHEb/DuiehkGbaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U8N1NCG/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=E5LWZV4I; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=QC74V9ec7Ut6eqUxudmKxK9fBd5/kHE3UUiVI6gXJ8WWf0W2H3ZkBX48GXP59t/0ta9yBVnMFIR0fDg/hplADq9MNkezrz6LV/FChOkUYFE83d8VGbE1btVUoft/2IvifgkLgn/i6Qq+VIljXvoHf908DD5F1dEoKTM/5qa9eH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LMS6vo0v; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PHjkUBji; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764147108;
+	s=mimecast20190719; t=1764147133;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SOyvoqkk9UFppQOun6ompHVRWctQkRb5nZd6ey6j320=;
-	b=U8N1NCG/x+Z63sd1cxLT+LNXxTtk8UmowuMko4ZrfCCFpbQMj3+CGCIra3MMyNepFFcV45
-	Wq3kZPxyjYHpzXGzbXAlppmJwgXcDPBiMkNE8cQtKRB8tCysNQwIPfXebnWp4W0TFJnmI7
-	dXbhoOXZTUyABONtLNL4Qy2xPizYpHc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=/XweevMyZ/FZh1UTL4StmJpSLmRzyhgm8NOhokJOi2o=;
+	b=LMS6vo0vlSRptTk/gt5tPc5p8pq6AD1mWNPSWT4E7OphDA+azk/dPaxhltAwH4EHIy+PUm
+	5PtDqYRLtlKnksnQjhv8U3RAPNhj39elEATpNFpcjaO1oVj99t2CGUArYSPm7IW08eSiLz
+	HVxEh49EaIPXdvX9+7Ckg7KR2dfNozQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-541-Bj19XWeaNwW36z-Qf-vjvg-1; Wed, 26 Nov 2025 03:51:43 -0500
-X-MC-Unique: Bj19XWeaNwW36z-Qf-vjvg-1
-X-Mimecast-MFC-AGG-ID: Bj19XWeaNwW36z-Qf-vjvg_1764147102
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42b2e448bd9so5309169f8f.1
-        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 00:51:43 -0800 (PST)
+ us-mta-542-t_HwRm_COdWmkTKugnmEJA-1; Wed, 26 Nov 2025 03:52:01 -0500
+X-MC-Unique: t_HwRm_COdWmkTKugnmEJA-1
+X-Mimecast-MFC-AGG-ID: t_HwRm_COdWmkTKugnmEJA_1764147120
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477bf8c1413so38989915e9.1
+        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 00:52:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764147102; x=1764751902; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1764147119; x=1764751919; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SOyvoqkk9UFppQOun6ompHVRWctQkRb5nZd6ey6j320=;
-        b=E5LWZV4IMN3H4JxzUySEFpneY7BYGeT3hwZv/AdWJdn7gmM7Ai9oCNQjKiAATGAfyG
-         N17NQh2si4fvAKWzEriu1vHMZbO7VxL6VHElitVS7T8O57KcZkq1s62p7U+kUsHDt7xW
-         BVxbK3Y5OWbPDWlsfkzUtpnWV0LaFsMWVINzXJ62d7IoZy2qWclUUvssCUm8zIWgwxRk
-         tk5pTGDH26orsGzH+9T7FUD8aIC3SOd1pSS550JrCUyfnqtejkgJNbHkDWgQfwaxDJpB
-         jaAz3XZE9RR6a5ZzQ+hae59c9FoCgq+YzbYBN5Gniua6VyPReoYqtEJBbfKLwko3mRez
-         iY4A==
+        bh=/XweevMyZ/FZh1UTL4StmJpSLmRzyhgm8NOhokJOi2o=;
+        b=PHjkUBjig7GKrU0Vstuq6HCQ/qKVcaibXvcOmcmTG2BaEzSOEY2XPcOUu6Nu2DnpKA
+         Gv+PCy/RU5Vic0dFXpUOf9N5pyqbDaD4BvRFlWeOLjwTs1OTNuAuVq39xPGTnZizjFOE
+         9BxL8LlCSxj/b/slRH1De+J2ALuOqsQAUW0osK/cWxlQX1CxywLOS3BGr+fuB63uxwyT
+         kVtb2N5vfHSyX7PSrezZfoNN/HwSiNVdIy7AOsfR6mMq7iSJJlEkiOmBV6o1g3pPNhw4
+         mzE8/dwLQOZKEWpJLIp+MahMItysqxJ8zwppa8F0h4ib8TXyXN1BML39HPOqNj91Chmt
+         egCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764147102; x=1764751902;
+        d=1e100.net; s=20230601; t=1764147119; x=1764751919;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=SOyvoqkk9UFppQOun6ompHVRWctQkRb5nZd6ey6j320=;
-        b=ECkmb11G6yJx16liE7RwD31DlHoCrENQwIHdWQIDgiyFv/LQ/3QTpPeupO0fhwSFQ6
-         zvc7tKadZGTQZn6HE66f1mIog/M86DaRnrCwvetVTt4qfLuC2mSSslvpax6OX69eTPqm
-         3PXlvZqWzhsi6eXglFGPwYtDMBarzfrAGYmWKmIlXK371mgbc5ReBHoCoGT9WSgYLzJl
-         MX21xHJHIyIbUV6VTwBERc4CQAu6t7GH2l1TUcMyu+C1NX1yTlUHZEtdiDnPvDoC+YY8
-         wBTs049h8/v577IVQRxrNtNFclkY8iGHpVPJeK9grkCY7f2J1I1LxzXjtWlrRqLhvg5A
-         Iy1A==
-X-Gm-Message-State: AOJu0YznUqZfhaiH3t79VnGe4WWq4tppeI1aiH1oBf3/grm7nyaCBIwM
-	gui7MJSrC4dKBkVB9hDmISEuW4obZDgnF3ebcMIHFQn1v93/GJzMxe+SEvrde4bjfu1EhYerXlF
-	wcJR/hF1rmW6uHPoV4METr9OTZtJQpEzfZCpDlXgdD+3umwrOFk7boMA5aCig3z70apN+Orpoay
-	/Ha9afK1pvXh5UpJEpLwdNTzOvyyMC
-X-Gm-Gg: ASbGncvIDDnWmRMzGdNp2IKALUZ2oKlIFleNliWrOBXHIAtnK1Zvm9RhGuHHgLpLuZ5
-	Ym1uNJ64Kb/5I1LhroyTZLg4Sf+ZCygkgbJrJYCwoQkfbgifpcdE5f/X08greD65Yl4Yl9Ftfab
-	KAJa48AFD8w9XOGi1iyKdMiXlaWmH0k/qiWmrmLMcANzFEl+IiI9BB2xlcOPf+DkUxd5RRXuNUc
-	9bNSGwuhBUTE0H9o1NBDtqKxDUK1YGz2KNc85uA/egQ+2r5TcGIrE6yFxTY2ziee0ysK24=
-X-Received: by 2002:a05:6000:1889:b0:42b:3ab7:b8b9 with SMTP id ffacd0b85a97d-42e0f21e8c6mr6288662f8f.20.1764147102114;
-        Wed, 26 Nov 2025 00:51:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE9bsjrAIAdt2de4p4PYRXMAhzhDmsnAr9c1eHWXz1kC2WCjpRhNZ8ZGhWdZTsTcB2P3zkGMcD0lywMAtW+sUE=
-X-Received: by 2002:a05:6000:1889:b0:42b:3ab7:b8b9 with SMTP id
- ffacd0b85a97d-42e0f21e8c6mr6288635f8f.20.1764147101684; Wed, 26 Nov 2025
- 00:51:41 -0800 (PST)
+        bh=/XweevMyZ/FZh1UTL4StmJpSLmRzyhgm8NOhokJOi2o=;
+        b=u5B1rq9AOKvyuYaQNv2ZyHEEJFh7oNxj7PqUhjDNDNxCyZ2Uz8orC5iNdez7gAxmVm
+         ieNkd8oqokaBIsIHkk3zKfOlM0rdT9DDihXcvjRXIr+ak16M+1q7rNwD1S6a772vums2
+         FojX60Sz6qHKovg3nkeqqv3y/7nduk45ioznuEHeCbL5g4T72vgzjhQVwmwL+wncOpyr
+         YNu6EANvBKySZtVN6xurpDythbh2hIVE7ex4z+QPZKlryBa7aCW6DJ0+h+bYur6Qkqy5
+         G40LUsq0uauHL9rToduGoXnhkVar48vCBTVdYMq1EjY16cZb0YwXID/XCZWc8J+u5xJD
+         /Pcg==
+X-Gm-Message-State: AOJu0Yz67ybb+t/r4BFJmyHjQqzbKIBNWdl42U7Ww+WXv+zor4jIWYxu
+	E4W3sEwdYfqiYyTogZy/gN4F5cIeOJ9H2oKH0utAE/yzysc8XPREXh8KENkV8Knc38pXNKni8eK
+	txF8WRhmopkPpCQW1vJTLojv7v2fv7/cYyazSxCJ1RsKuAyDM9TqhadfgCKHai9kBhP++eQcwM/
+	/NkhxW+YR83VcNATKTMHuAM3+H6JWlWysCTjeq
+X-Gm-Gg: ASbGncvcvsbCrPnNCT1AMWztcNELhL+XDxF0saZajL3EDMJH5/DZLpdwxWEVs0y/QQn
+	2NLxAwBd1PqHLwNlRfuEq2V4NYXG0HjuP3V4PoSbtIe3jVYmWy0RZmEeFtVJONZWbUKen3Xx64D
+	xXO45pevzWhLQfr3Vh1CL3Ahs8iAydw5UUDttso3iwKPX/mPknSAV1U7EdZ0j3pLwHuktIlSNla
+	3OnMh0JnKEmFGNp1cRcv3/vfdjoem1/vdgzgVHs65J/K1m/R5/4BXOtX2Weh3Q7n5B6FRA=
+X-Received: by 2002:a05:600c:4fcc:b0:471:9da:5252 with SMTP id 5b1f17b1804b1-477c01ebe2amr180373975e9.29.1764147119358;
+        Wed, 26 Nov 2025 00:51:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGlkL2k4Nse/tJwSLeYPcYWkcsGytRvIIZBEJ0M/+QqV9ZfQcGhjR0b1yzszAro5qHYea+Fh4eJvKulRcvj0Iw=
+X-Received: by 2002:a05:600c:4fcc:b0:471:9da:5252 with SMTP id
+ 5b1f17b1804b1-477c01ebe2amr180373835e9.29.1764147118981; Wed, 26 Nov 2025
+ 00:51:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251126014455.788131-1-seanjc@google.com> <20251126014455.788131-6-seanjc@google.com>
-In-Reply-To: <20251126014455.788131-6-seanjc@google.com>
+References: <20251126014455.788131-1-seanjc@google.com> <20251126014455.788131-8-seanjc@google.com>
+In-Reply-To: <20251126014455.788131-8-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 26 Nov 2025 09:51:29 +0100
-X-Gm-Features: AWmQ_blkEpEspDd74Pq8URMu41Mld6_5OicZsgsXr_eU4nvR7G0dfBeBx7wP5Sk
-Message-ID: <CABgObfa+cVCi=+++BCY9cYXJtXZgXBG3FnzHH47aPuHP_uhMEw@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: x86: Selftests changes for 6.19
+Date: Wed, 26 Nov 2025 09:51:47 +0100
+X-Gm-Features: AWmQ_bl26uyZrMHkNTaLyHfoNc23kGBi_E1KmkVtYLVxnXdNLqPaqbR9bwKp7yo
+Message-ID: <CABgObfa-O0zma=ShnCdXJiLwm81OJq+oer0zCFJsmiPoufzo3g@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM: x86: TDX changes for 6.19
 To: Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -109,112 +109,149 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Nov 26, 2025 at 2:45=E2=80=AFAM Sean Christopherson <seanjc@google.=
 com> wrote:
 >
-> The highlights are Jim's LA57 nested VMX test, and Yosry's many changes t=
-o
-> extend nested VMX tests to also cover nested SVM.
+> Please pull a large overhaul of lock-related TDX code (particularly in th=
+e
+> S-EPT and mirror SPTE code), along with a few fixes and cleanups.
 >
-> The following changes since commit 211ddde0823f1442e4ad052a2f30f050145cca=
-da:
+> *Huge* kudos to Rick, Yan, Binbin, Ira, and Kai (hopefully I didn't forge=
+t
+> anyone) for their meticulous reviews, testing and debug, clever testcases=
+,
+> and help determining exactly what scenarios KVM needs to deal with in ter=
+ms
+> of avoiding lock contention in the TDX Module.
 >
->   Linux 6.18-rc2 (2025-10-19 15:19:16 -1000)
+> P.S. There are few one-off TDX changes in the "vmx" pull request.  I don'=
+t
+>      expect to have a dedicated TDX pull request for most releases, I cre=
+ated
+>      one this time around because of the scope of the overhaul.
+>
+> The following changes since commit 6146a0f1dfae5d37442a9ddcba012add260bce=
+b0:
+>
+>   Linux 6.18-rc4 (2025-11-02 11:28:02 -0800)
 >
 > are available in the Git repository at:
 >
->   https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.19
+>   https://github.com/kvm-x86/linux.git tags/kvm-x86-tdx-6.19
 >
-> for you to fetch changes up to d2e50389ab44acfa05e72604d701a70b234f9938:
+> for you to fetch changes up to 398180f93cf3c7bb0ee3f512b139ad01843f3ddf:
 >
->   KVM: selftests: Make sure vm->vpages_mapped is always up-to-date (2025-=
-11-21 10:17:05 -0800)
+>   KVM: TDX: Use struct_size to simplify tdx_get_capabilities() (2025-11-1=
+3 08:30:07 -0800)
 
 Pulled, thanks.
 
 Paolo
 
 > ----------------------------------------------------------------
-> KVM selftests changes for 6.19:
+> KVM TDX changes for 6.19:
 >
->  - Fix a math goof in mmu_stress_test when running on a single-CPU system=
-/VM.
+>  - Overhaul the TDX code to address systemic races where KVM (acting on b=
+ehalf
+>    of userspace) could inadvertantly trigger lock contention in the TDX-M=
+odule,
+>    which KVM was either working around in weird, ugly ways, or was simply
+>    oblivious to (as proven by Yan tripping several KVM_BUG_ON()s with cle=
+ver
+>    selftests).
 >
->  - Forcefully override ARCH from x86_64 to x86 to play nice with specifyi=
-ng
->    ARCH=3Dx86_64 on the command line.
+>  - Fix a bug where KVM could corrupt a vCPU's cpu_list when freeing a vCP=
+U if
+>    creating said vCPU failed partway through.
 >
->  - Extend a bunch of nested VMX to validate nested SVM as well.
+>  - Fix a few sparse warnings (bad annotation, 0 !=3D NULL).
 >
->  - Add support for LA57 in the core VM_MODE_xxx macro, and add a test to
->    verify KVM can save/restore nested VMX state when L1 is using 5-level
->    paging, but L2 is not.
->
->  - Clean up the guest paging code in anticipation of sharing the core log=
-ic for
->    nested EPT and nested NPT.
+>  - Use struct_size() to simplify copying capabilities to userspace.
 >
 > ----------------------------------------------------------------
-> Brendan Jackman (1):
->       KVM: selftests: Don't fall over in mmu_stress_test when only one CP=
-U is present
+> Dave Hansen (2):
+>       KVM: TDX: Remove __user annotation from kernel pointer
+>       KVM: TDX: Fix sparse warnings from using 0 for NULL
 >
-> Jim Mattson (4):
->       KVM: selftests: Use a loop to create guest page tables
->       KVM: selftests: Use a loop to walk guest page tables
->       KVM: selftests: Change VM_MODE_PXXV48_4K to VM_MODE_PXXVYY_4K
->       KVM: selftests: Add a VMX test for LA57 nested state
+> Rick Edgecombe (1):
+>       KVM: TDX: Take MMU lock around tdh_vp_init()
 >
-> Sean Christopherson (2):
->       KVM: selftests: Forcefully override ARCH from x86_64 to x86
->       KVM: selftests: Use "gpa" and "gva" for local variable names in pre=
--fault test
+> Sean Christopherson (27):
+>       KVM: Make support for kvm_arch_vcpu_async_ioctl() mandatory
+>       KVM: Rename kvm_arch_vcpu_async_ioctl() to kvm_arch_vcpu_unlocked_i=
+octl()
+>       KVM: TDX: Drop PROVE_MMU=3Dy sanity check on to-be-populated mappin=
+gs
+>       KVM: x86/mmu: Add dedicated API to map guest_memfd pfn into TDP MMU
+>       KVM: x86/mmu: WARN if KVM attempts to map into an invalid TDP MMU r=
+oot
+>       Revert "KVM: x86/tdp_mmu: Add a helper function to walk down the TD=
+P MMU"
+>       KVM: x86/mmu: Rename kvm_tdp_map_page() to kvm_tdp_page_prefault()
+>       KVM: TDX: Return -EIO, not -EINVAL, on a KVM_BUG_ON() condition
+>       KVM: TDX: Fold tdx_sept_drop_private_spte() into tdx_sept_remove_pr=
+ivate_spte()
+>       KVM: x86/mmu: Drop the return code from kvm_x86_ops.remove_external=
+_spte()
+>       KVM: TDX: WARN if mirror SPTE doesn't have full RWX when creating S=
+-EPT mapping
+>       KVM: TDX: Avoid a double-KVM_BUG_ON() in tdx_sept_zap_private_spte(=
+)
+>       KVM: TDX: Use atomic64_dec_return() instead of a poor equivalent
+>       KVM: TDX: Fold tdx_mem_page_record_premap_cnt() into its sole calle=
+r
+>       KVM: TDX: ADD pages to the TD image while populating mirror EPT ent=
+ries
+>       KVM: TDX: Fold tdx_sept_zap_private_spte() into tdx_sept_remove_pri=
+vate_spte()
+>       KVM: TDX: Combine KVM_BUG_ON + pr_tdx_error() into TDX_BUG_ON()
+>       KVM: TDX: Derive error argument names from the local variable names
+>       KVM: TDX: Assert that mmu_lock is held for write when removing S-EP=
+T entries
+>       KVM: TDX: Add macro to retry SEAMCALLs when forcing vCPUs out of gu=
+est
+>       KVM: TDX: Add tdx_get_cmd() helper to get and validate sub-ioctl co=
+mmand
+>       KVM: TDX: Convert INIT_MEM_REGION and INIT_VCPU to "unlocked" vCPU =
+ioctl
+>       KVM: TDX: Use guard() to acquire kvm->lock in tdx_vm_ioctl()
+>       KVM: TDX: Don't copy "cmd" back to userspace for KVM_TDX_CAPABILITI=
+ES
+>       KVM: TDX: Guard VM state transitions with "all" the locks
+>       KVM: TDX: Bug the VM if extending the initial measurement fails
+>       KVM: TDX: Use struct_size to simplify tdx_get_capabilities()
 >
-> Yosry Ahmed (9):
->       KVM: selftests: Extend vmx_close_while_nested_test to cover SVM
->       KVM: selftests: Extend vmx_nested_tsc_scaling_test to cover SVM
->       KVM: selftests: Move nested invalid CR3 check to its own test
->       KVM: selftests: Extend nested_invalid_cr3_test to cover SVM
->       KVM: selftests: Extend vmx_tsc_adjust_test to cover SVM
->       KVM: selftests: Stop hardcoding PAGE_SIZE in x86 selftests
->       KVM: selftests: Remove the unused argument to prepare_eptp()
->       KVM: selftests: Stop using __virt_pg_map() directly in tests
->       KVM: selftests: Make sure vm->vpages_mapped is always up-to-date
+> Thorsten Blum (1):
+>       KVM: TDX: Check size of user's kvm_tdx_capabilities array before al=
+locating
 >
->  tools/testing/selftests/kvm/Makefile               |   2 +-
->  tools/testing/selftests/kvm/Makefile.kvm           |   8 +-
->  tools/testing/selftests/kvm/include/kvm_util.h     |   5 +-
->  .../testing/selftests/kvm/include/x86/processor.h  |   2 +-
->  tools/testing/selftests/kvm/include/x86/vmx.h      |   3 +-
->  tools/testing/selftests/kvm/lib/arm64/processor.c  |   2 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c         |  33 +++---
->  tools/testing/selftests/kvm/lib/x86/memstress.c    |   2 +-
->  tools/testing/selftests/kvm/lib/x86/processor.c    |  84 ++++++-------
->  tools/testing/selftests/kvm/lib/x86/vmx.c          |   9 +-
->  tools/testing/selftests/kvm/mmu_stress_test.c      |  10 +-
->  .../testing/selftests/kvm/pre_fault_memory_test.c  |  32 +++--
->  tools/testing/selftests/kvm/x86/hyperv_features.c  |   2 +-
->  tools/testing/selftests/kvm/x86/hyperv_ipi.c       |  18 +--
->  tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c |   2 +-
->  ...while_nested_test.c =3D> nested_close_kvm_test.c} |  42 +++++--
->  .../selftests/kvm/x86/nested_invalid_cr3_test.c    | 116 +++++++++++++++=
-+++
->  ..._tsc_adjust_test.c =3D> nested_tsc_adjust_test.c} |  73 +++++++-----
->  ...sc_scaling_test.c =3D> nested_tsc_scaling_test.c} |  48 +++++++-
->  tools/testing/selftests/kvm/x86/sev_smoke_test.c   |   2 +-
->  tools/testing/selftests/kvm/x86/state_test.c       |   2 +-
->  .../testing/selftests/kvm/x86/userspace_io_test.c  |   2 +-
->  .../testing/selftests/kvm/x86/vmx_dirty_log_test.c |  12 +-
->  .../selftests/kvm/x86/vmx_nested_la57_state_test.c | 132 +++++++++++++++=
-++++++
->  24 files changed, 479 insertions(+), 164 deletions(-)
->  rename tools/testing/selftests/kvm/x86/{vmx_close_while_nested_test.c =
-=3D> nested_close_kvm_test.c} (64%)
->  create mode 100644 tools/testing/selftests/kvm/x86/nested_invalid_cr3_te=
-st.c
->  rename tools/testing/selftests/kvm/x86/{vmx_tsc_adjust_test.c =3D> neste=
-d_tsc_adjust_test.c} (61%)
->  rename tools/testing/selftests/kvm/x86/{vmx_nested_tsc_scaling_test.c =
-=3D> nested_tsc_scaling_test.c} (83%)
->  create mode 100644 tools/testing/selftests/kvm/x86/vmx_nested_la57_state=
-_test.c
+> Yan Zhao (2):
+>       KVM: TDX: Drop superfluous page pinning in S-EPT management
+>       KVM: TDX: Fix list_add corruption during vcpu_load()
+>
+>  arch/arm64/kvm/arm.c               |   6 +
+>  arch/loongarch/kvm/Kconfig         |   1 -
+>  arch/loongarch/kvm/vcpu.c          |   4 +-
+>  arch/mips/kvm/Kconfig              |   1 -
+>  arch/mips/kvm/mips.c               |   4 +-
+>  arch/powerpc/kvm/Kconfig           |   1 -
+>  arch/powerpc/kvm/powerpc.c         |   4 +-
+>  arch/riscv/kvm/Kconfig             |   1 -
+>  arch/riscv/kvm/vcpu.c              |   4 +-
+>  arch/s390/kvm/Kconfig              |   1 -
+>  arch/s390/kvm/kvm-s390.c           |   4 +-
+>  arch/x86/include/asm/kvm-x86-ops.h |   1 +
+>  arch/x86/include/asm/kvm_host.h    |   7 +-
+>  arch/x86/kvm/mmu.h                 |   3 +-
+>  arch/x86/kvm/mmu/mmu.c             |  87 ++++-
+>  arch/x86/kvm/mmu/tdp_mmu.c         |  50 +--
+>  arch/x86/kvm/vmx/main.c            |   9 +
+>  arch/x86/kvm/vmx/tdx.c             | 712 ++++++++++++++++++-------------=
+------
+>  arch/x86/kvm/vmx/tdx.h             |   8 +-
+>  arch/x86/kvm/vmx/x86_ops.h         |   1 +
+>  arch/x86/kvm/x86.c                 |  13 +
+>  include/linux/kvm_host.h           |  14 +-
+>  virt/kvm/Kconfig                   |   3 -
+>  virt/kvm/kvm_main.c                |   6 +-
+>  24 files changed, 496 insertions(+), 449 deletions(-)
 >
 
 
