@@ -1,218 +1,182 @@
-Return-Path: <kvm+bounces-64577-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64578-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7CA9C87929
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 01:19:16 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 103E0C8794D
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 01:23:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 87837353807
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 00:19:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EBFE14E12CB
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 00:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC571DE3DB;
-	Wed, 26 Nov 2025 00:18:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFFEA1DD877;
+	Wed, 26 Nov 2025 00:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="W+AKvPIc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XniS5A0m"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7273595D;
-	Wed, 26 Nov 2025 00:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A65148850;
+	Wed, 26 Nov 2025 00:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764116337; cv=none; b=X0UpguotiXezDmp1gJAbu4PiLqw1tpt6O1y5L5piMnCIoBZeXXR2U5ZwpjbejDpeO+dYSJuEocwDQ6+yHpQdvOgDfnXcLDwhu0iuoEETujVdRHoA+1RsLHXww81YzRwTUPDewR1bMl+WazLlaeSzWrpgZhTnq95vw+Quv4RfMKQ=
+	t=1764116600; cv=none; b=Y3JHcwwyW797L8wA1kqrJ6I4ifw3jP/7sKbiXAtHy4wegVCd96k2aVRcjFdm8KrqmxMrXEprV4AJ4d0rJkFgjs/dItiP3YLLdBDbY5DB8BibEou07IWck+kqfXb88i6AU9IUrU0dgFSRFKqzNXH2Hhs2d4/jdXgYoMP9VKa0tFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764116337; c=relaxed/simple;
-	bh=gwii+iVdBVKbWCyCdr/+zthLuTAXebNs8mhXSw/5DRY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uhYN7UrKDcWDvpjp3/K6SAxCcl3yX/XEguV7lgNTb0Fr4ebsDBAg6PNiZk+xVTk3UXFgimlzxhqG/fKj6G2A/ek4ZguPF4BBbrFvIz9N5VzLKXzRhxF/UU9Kk+42wJiA8cFfu6OABwK7jrDi5nUJ/3P6e02n/McHdMWOpKATu9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=W+AKvPIc; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5APKA97n1087396;
-	Tue, 25 Nov 2025 16:18:10 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=qGBFfom64ubwAcHLmi0kGY4idgptPgMMsGDiFpmxSnI=; b=W+AKvPIcq+Gs
-	i3tYYc6MNSXntK0NmrX6mDMiJh2f1He+waI1tJUFw9eep8toqFOiXcXgv1d9N8HG
-	PGdbn6/fGl6qS46R20vtpCyrMHLj0wH4JK9pXWvIXkrNgijhiczlYtlomrwOthSj
-	zml1ieuFYLYIUzuWZ91PR3D7DWCyaUSc0LCurvPCQxAzzat402xRMP4oyeWdz0ty
-	1EYyma4UMfnDB7SWN7UNyv49rng7qo94JM/vlLrbdULgh6NjCeHD1lakMZtk49rg
-	EGdIyMsuzoL8EN2ERVeIEmaZ0+aXHHcjPKQINfA5NEORkyA0TfReyUgtpSsOkjBL
-	M3cSvkYsxQ==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ank8qsk46-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 25 Nov 2025 16:18:10 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Wed, 26 Nov 2025 00:18:08 +0000
-Date: Tue, 25 Nov 2025 16:18:03 -0800
-From: Alex Mastro <amastro@fb.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Bjorn Helgaas <bhelgaas@google.com>,
-        Logan Gunthorpe
-	<logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
-        Robin Murphy
-	<robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-        Will Deacon
-	<will@kernel.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Jason
- Gunthorpe <jgg@ziepe.ca>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jonathan
- Corbet <corbet@lwn.net>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Christian
- =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        Kees Cook
-	<kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Ankit
- Agrawal <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
-        Shameer
- Kolothum <skolothumtho@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>, Alex
- Williamson <alex@shazbot.org>,
-        Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs
-	<mochs@nvidia.com>,
-        <linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <iommu@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-doc@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-        <linaro-mm-sig@lists.linaro.org>, <kvm@vger.kernel.org>,
-        <linux-hardening@vger.kernel.org>, Nicolin Chen <nicolinc@nvidia.com>,
-        Jason
- Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v9 06/11] dma-buf: provide phys_vec to scatter-gather
- mapping routine
-Message-ID: <aSZHO6otK0Heh+Qj@devgpu015.cco6.facebook.com>
-References: <20251120-dmabuf-vfio-v9-0-d7f71607f371@nvidia.com>
- <20251120-dmabuf-vfio-v9-6-d7f71607f371@nvidia.com>
+	s=arc-20240116; t=1764116600; c=relaxed/simple;
+	bh=jNSFdQCLhdJyzqyDdBupTSBjX5ORPHs5VM+yw2SDmzU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RmmA5JxOizc0dceo65XDGbT++U+17zmdFFPoFg2PEK1YqpljpnMFKetgFUoMC9TegfpJ+TuxWpHUNRIH8ALshf8pwgyPe7G6AKwadG+OnTM+qUAnP57M9FEV9ZcsHSkV1G+4OyEFph+PNlPr1UqQjlNXR92GKU6DiqZOyAqei1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XniS5A0m; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764116598; x=1795652598;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=jNSFdQCLhdJyzqyDdBupTSBjX5ORPHs5VM+yw2SDmzU=;
+  b=XniS5A0m35sAoMkpgcRsVzbaWgJstJyq6FA5G0/CwHZnnjlZP2B9ga5G
+   LEItvKO6gljXG2QX/k+njdhzg+ANLaFx0vD76ur1QIYXFJopUBmNhYjd8
+   TSEYXQc8zD5onNRxgVlwTGH/HPzsKYt2iFEOOW/5mdwZgM984JprLMKO/
+   IMkbdthdzWf2IlGaq7u7YWrLrPk+LGtgYCqaBdYlJQ2LqChzaaqQOnkJH
+   hAFT4zR/2yZF1qEVg2XiF6/bYYqMJTpgp8MDBZoLv5vBvKCBZymMhzX66
+   Gy2zs15YriofLwx0+I98Js8VglDqewmVvh1twG035VwsUTK0ynlOaZaXG
+   g==;
+X-CSE-ConnectionGUID: ucAPYeJ+Qg+H0kr2PqHh6A==
+X-CSE-MsgGUID: LfCaZAxoQKS/qWsfrr7jpA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="66306976"
+X-IronPort-AV: E=Sophos;i="6.20,227,1758610800"; 
+   d="scan'208";a="66306976"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 16:23:18 -0800
+X-CSE-ConnectionGUID: W+654JrHR0i0NNZKwcIPrQ==
+X-CSE-MsgGUID: g62AlCY3TmyGnusI1wnrTg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,227,1758610800"; 
+   d="scan'208";a="197267661"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.213]) ([10.124.240.213])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 16:23:10 -0800
+Message-ID: <f7a84eb0-eb64-4cdf-801d-088bbdbce0b4@linux.intel.com>
+Date: Wed, 26 Nov 2025 08:23:07 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251120-dmabuf-vfio-v9-6-d7f71607f371@nvidia.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI2MDAwMCBTYWx0ZWRfX4aU+4yoxvGRI
- fn5uIgo4phoyJLcsXRpkIiEbPHjmDvXjee+0hL5hZTnMf7KiIbVFpuPgNNxmzJnPoXlqYrYFVCb
- EPyFD9HoNuq9bFWOWGD9jm+tH6jYX1bWvVVFfP7wmtxUCfM6nyWp9RhEW4F3WyT2gvOl06d0Lit
- II5EZrklZ4kZ6ZccZ6uI5fnA2fhf1sXF7BU/xkJ1DrQkkrbuth2BkU2ET85sZ92FJE5mmeSgTwT
- 8QOBncjhE4/DUMlusLJDyljY4I1YOkD69BDnY6LZhPAqbK1Ws3OXJ/OhGSqPOvK63g6mktQG9A/
- 4TjZvhvYG6pYNypXlNsc0JrFDrM/97nZlDYVEtn7wlUXLxFDOXnHdS+vQBslO6M76Dlb+/Whxi6
- 97TQYdVHP7oL0xprhG3cL4XfcOc0nA==
-X-Proofpoint-ORIG-GUID: 5DCeEKEPh0Lq0c0QeLIVINEpDK6-Nmfl
-X-Proofpoint-GUID: 5DCeEKEPh0Lq0c0QeLIVINEpDK6-Nmfl
-X-Authority-Analysis: v=2.4 cv=VfT6/Vp9 c=1 sm=1 tr=0 ts=69264742 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=3j4BkbkPAAAA:8 a=qThf3vN7FU90BnacfoAA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-25_02,2025-11-25_01,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 28/44] KVM: x86/pmu: Load/save GLOBAL_CTRL via
+ entry/exit fields for mediated PMU
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>,
+ Mingwei Zhang <mizhang@google.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+ Sandipan Das <sandipan.das@amd.com>
+References: <20250806195706.1650976-1-seanjc@google.com>
+ <20250806195706.1650976-29-seanjc@google.com> <aSUK8FuWT4lpMP3F@google.com>
+ <83067602-325a-4655-a1b7-e6bd6a31eed4@linux.intel.com>
+ <aSXigAQznhuxZmy7@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <aSXigAQznhuxZmy7@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 20, 2025 at 11:28:25AM +0200, Leon Romanovsky wrote:
-> +static struct scatterlist *fill_sg_entry(struct scatterlist *sgl, size_t length,
-> +					 dma_addr_t addr)
-> +{
-> +	unsigned int len, nents;
-> +	int i;
-> +
-> +	nents = DIV_ROUND_UP(length, UINT_MAX);
-> +	for (i = 0; i < nents; i++) {
-> +		len = min_t(size_t, length, UINT_MAX);
-> +		length -= len;
-> +		/*
-> +		 * DMABUF abuses scatterlist to create a scatterlist
-> +		 * that does not have any CPU list, only the DMA list.
-> +		 * Always set the page related values to NULL to ensure
-> +		 * importers can't use it. The phys_addr based DMA API
-> +		 * does not require the CPU list for mapping or unmapping.
-> +		 */
-> +		sg_set_page(sgl, NULL, 0, 0);
-> +		sg_dma_address(sgl) = addr + i * UINT_MAX;
 
-(i * UINT_MAX) happens in 32-bit before being promoted to dma_addr_t for
-addition with addr. Overflows for i >=2 when length >= 8 GiB. Needs a cast:
+On 11/26/2025 1:08 AM, Sean Christopherson wrote:
+> On Tue, Nov 25, 2025, Dapeng Mi wrote:
+>> On 11/25/2025 9:48 AM, Sean Christopherson wrote:
+>>>> +	if (host_pmu->version < 4 || !(host_perf_cap & PERF_CAP_FW_WRITES))
+>>>> +		return false;
+>>>> +
+>>>> +	/*
+>>>> +	 * All CPUs that support a mediated PMU are expected to support loading
+>>>> +	 * and saving PERF_GLOBAL_CTRL via dedicated VMCS fields.
+>>>> +	 */
+>>>> +	if (WARN_ON_ONCE(!cpu_has_load_perf_global_ctrl() ||
+>>>> +			 !cpu_has_save_perf_global_ctrl()))
+>>>> +		return false;
+>>> And so this WARN fires due to cpu_has_save_perf_global_ctrl() being false.  The
+>>> bad changelog is mine, but the code isn't entirely my fault.  I did suggest the
+>>> WARN in v3[1], probably because I forgot when PMU v4 was introduced and no one
+>>> corrected me.
+>>>
+>>> v4 of the series[2] then made cpu_has_save_perf_global_ctrl() a hard requirement,
+>>> based on my miguided feedback.
+>>>
+>>>    * Only support GLOBAL_CTRL save/restore with VMCS exec_ctrl, drop the MSR
+>>>      save/retore list support for GLOBAL_CTRL, thus the support of mediated
+>>>      vPMU is constrained to SapphireRapids and later CPUs on Intel side.
+>>>
+>>> Doubly frustrating is that this was discussed in the original RFC, where Jim
+>>> pointed out[3] that requiring VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL would prevent
+>>> enabling the mediated PMU on Skylake+, and I completely forgot that conversation
+>>> by the time v3 of the series rolled around :-(
+>> VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL is introduced from SPR and later. I
+>> remember the original requirements includes to support Skylake and Icelake,
+>> but I ever thought there were some offline sync and the requirement changed...
+> Two things:
+>
+>  1) Upstream's "requirements" are not the same as Google's requirements (or those
+>     of any company/individual).  Upstream most definitely is influenced by the
+>     needs and desires of end users, but ultimately the decision to do something
+>     (or not) is one that needs to be made by the upstream community.
+>
+>  2) Decisions made off-list need to be summarized and communicated on-list,
+>     especially in cases like this where it's a relatively minor detail in a
+>     large series/feature, and thus easy to overlook.
+>
+> I'll follow-up internally to make sure these points are well-understood by Google
+> folks as well (at least, those working on KVM).
 
-		sg_dma_address(sgl) = addr + (dma_addr_t)i * UINT_MAX;
+Understood and would follow.
 
-Discovered this while debugging why dma-buf import was failing for
-an 8 GiB dma-buf using my earlier toy program [1]. It was surfaced by
-ib_umem_find_best_pgsz() returning 0 due to malformed scatterlist, which bubbles
-up as an EINVAL.
 
-$ ./test_dmabuf 0000:05:00.0 3 4 0 0x200000000
-opening 0000:05:00.0 via /dev/vfio/56
-allocating dma_buf bar_idx=4, bar_offset=0x0, size=0x200000000
-allocated dma_buf fd=6
-discovered 4 ibv devices: mlx5_0 mlx5_1 mlx5_2 mlx5_3
-opened ibv device 3: mlx5_3
-test_dmabuf.c:154 Condition failed: 'mr' (errno=22: Invalid argument)
+>
+>> My bad,
+> Eh, this was a group "effort".  I'm as much to blame as anyone else.
+>
+>> I should double confirm this at then.
+> No need, as above, Google's requirements (assuming the requirements you're referring
+> to are coming from Google people) are effectively just one data point.  At this
+> point, I want to drive the decision to support Sylake+ (or not) purely through
+> discussion of upstream patches.
+>
+>>> As mentioned in the discussion with Jim, _if_ PMU v4 was introduced with ICX (or
+>>> later), then I'd be in favor of making VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL a hard
+>>> requirement.  But losing supporting Skylake+ is a bit much.
+>>>
+>>> There are a few warts with nVMX's use of the auto-store list that need to be
+>>> cleaned up, but on the plus side it's also a good excuse to clean up
+>>> {add,clear}_atomic_switch_msr(), which have accumulated some cruft and quite a
+>>> bit of duplicate code.  And while I still dislike using the auto-store list, the
+>>> code isn't as ugly as it was back in v3 because we _can_ make the "load" VMCS
+>>> controls mandatory without losing support for any CPUs (they predate PMU v4).
+>> Yes, xxx_atomic_switch_msr() helpers need to be cleaned up and optimized. I
+>> suppose we can have an independent patch-set to clean up and support
+>> global_ctrl with auto-store list for Skylake and Icelake.
+> I have the code written (I wanted to see how much complexity it would add before
+> re-opening this discussion).  My plan is to put the Skylake+ support at the end
+> of the series, not a separate series, so that it can be reviewed in one shot.
+> E.g. if we can make a change in the "main" series that would simplify Skylake+
+> support, then I'd prefer to find and implement any such change right away.
 
-$ sudo retsnoop -e mlx5_ib_reg_user_mr_dmabuf -a 'mlx5*' -a 'ib_umem*' -a '*umr*' -a 'vfio_pci*' -a 'dma_buf_*' -x EINVAL -T
-Receiving data...
-13:56:22.257907 -> 13:56:22.258275 TID/PID 948895/948895 (test_dmabuf/test_dmabuf):
-FUNCTION CALLS                                 RESULT                 DURATION
---------------------------------------------   --------------------  ---------
-→ mlx5_ib_reg_user_mr_dmabuf
-    ↔ mlx5r_umr_resource_init                  [0]                     2.224us
-    → ib_umem_dmabuf_get
-        → ib_umem_dmabuf_get_with_dma_device
-            ↔ dma_buf_get                      [0xff11012a6a098c00]    0.972us
-            → dma_buf_dynamic_attach
-                ↔ vfio_pci_dma_buf_attach      [0]                     2.003us
-            ← dma_buf_dynamic_attach           [0xff1100012793e400]   10.566us
-        ← ib_umem_dmabuf_get_with_dma_device   [0xff110127a6c74480]   15.794us
-    ← ib_umem_dmabuf_get                       [0xff110127a6c74480]   25.258us
-    → mlx5_ib_init_dmabuf_mr
-        → ib_umem_dmabuf_map_pages
-            → dma_buf_map_attachment
-                → vfio_pci_dma_buf_map
-                    ↔ dma_buf_map              [0xff1100012977f700]    4.918us
-                ← vfio_pci_dma_buf_map         [0xff1100012977f700]    8.362us
-            ← dma_buf_map_attachment           [0xff1100012977f700]   10.956us
-        ← ib_umem_dmabuf_map_pages             [0]                    17.336us
-        ↔ ib_umem_find_best_pgsz               [0]                     6.280us
-        → ib_umem_dmabuf_unmap_pages
-            → dma_buf_unmap_attachment
-                → vfio_pci_dma_buf_unmap
-                    ↔ dma_buf_unmap            [void]                  2.023us
-                ← vfio_pci_dma_buf_unmap       [void]                  6.700us
-            ← dma_buf_unmap_attachment         [void]                  8.142us
-        ← ib_umem_dmabuf_unmap_pages           [void]                 14.953us
-    ← mlx5_ib_init_dmabuf_mr                   [-EINVAL]              67.272us
-    → mlx5r_umr_revoke_mr
-        → mlx5r_umr_post_send_wait
-            → mlx5r_umr_post_send
-                ↔ mlx5r_begin_wqe              [0]                     1.703us
-                ↔ mlx5r_finish_wqe             [void]                  1.633us
-                ↔ mlx5r_ring_db                [void]                  1.312us
-            ← mlx5r_umr_post_send              [0]                    27.451us
-        ← mlx5r_umr_post_send_wait             [0]                   126.541us
-    ← mlx5r_umr_revoke_mr                      [0]                   141.925us
-    → ib_umem_release
-        → ib_umem_dmabuf_release
-            ↔ ib_umem_dmabuf_revoke            [void]                  1.582us
-            ↔ dma_buf_detach                   [void]                  3.765us
-            ↔ dma_buf_put                      [void]                  0.531us
-        ← ib_umem_dmabuf_release               [void]                 23.315us
-    ← ib_umem_release                          [void]                 40.301us
-← mlx5_ib_reg_user_mr_dmabuf                   [-EINVAL]             363.280us
+Sure. Thanks.
 
-[1] https://lore.kernel.org/all/aQkLcAxEn4qmF3c4@devgpu015.cco6.facebook.com/
 
-Alex
 
