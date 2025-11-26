@@ -1,150 +1,110 @@
-Return-Path: <kvm+bounces-64596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AB50C881B9
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 05:56:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BE05C8823F
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 06:21:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B43AE4ECA72
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 04:55:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29E2C3B2808
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 05:21:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6F627056F;
-	Wed, 26 Nov 2025 04:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8DC31281F;
+	Wed, 26 Nov 2025 05:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="PCkl2Z3n";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="adgDSPtZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SiJfwWbx"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D2F212564;
-	Wed, 26 Nov 2025 04:54:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3735D274B58;
+	Wed, 26 Nov 2025 05:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764132853; cv=none; b=rpXqlSKGDErV1t7HQh508Jh8quG7HMpDi//ZfWCuHOmeHW52AwcmnnIqkYLiUnH0d5rA1vrqpBSN6Z+ZEjfG4mxwp1G/HjGGqzd+RkDeZ7eLLnrJyepXHD5UQPobFHYkreGXUOZ1vUAZ9VxPYRJ+r0jbZr9mFzrfF6QiNXkILYM=
+	t=1764134506; cv=none; b=kGrJOCW8ciYMImPjYkxsp4ui8pMLpDhuJ+taeT0keUP+5RLevwCYHvK/V2Yi4ZH2JCfUMiiqpUfaXXhp5Zxe2YdISmsS01q9OUNN+MJZDTqLmGYHtUHxi6h0/Vjk+yzb0i4k2DUAzov1www4oSb1ux2ID85IPB4G99jIfCM8KVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764132853; c=relaxed/simple;
-	bh=azYVioa3PoS1KXDSbFJDNPE7YhRu7rDG6dcHIl5e1jU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NpL/7NJfsiNrMWXRrAvu9s1mZjTvJa7+KoUTb9R40Az+gQVBWDQdLZTQInJdv6+iijs7O7oQaTfHvxw0/VqRswciikO3PEeu/egHnpAZG2ohQbacFLYScKkY21o9167suSYgMdcxSQ0pulMcrWSFfg2n4w55PRiIRHRaHVQh0HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=PCkl2Z3n; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=adgDSPtZ; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id BEEC4140026A;
-	Tue, 25 Nov 2025 23:54:07 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Tue, 25 Nov 2025 23:54:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1764132847;
-	 x=1764219247; bh=OJapMed/C+yKNoaqUK0e+pVkzZmShWWGBcRCvt+tEqw=; b=
-	PCkl2Z3nrmBIvFDwtTdC1Ab2kugXko8LUJMCqpCKfZsmYha+3hUvTcYSSQ60Yh5B
-	I+RtYHz9LpMDX9hGE9Z+VAxLxPddaZVjC6GwcWEFYOp0vOmqolg92oMxc+AB9vuC
-	u9ukKOJlAJL9c0iniSwQpUWQCtJ0VCwSFk2VnBnkB12fOGi+u9CXCTZCTo3p1Ssh
-	jtuo/vBnOS0TbtZ+hTsG6k1JAeiGuyoOMK/xCbo4iYfxu+Vgaqm0EoJiFg5Qb/WL
-	pKJiXjbq3hcj6OLBvJW8FEddBhlaE2pkP64GTos5PixzEx9lhzGDgGM0Ag7GlsOv
-	PToxTSOpEpJZsu07oYTbHg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1764132847; x=
-	1764219247; bh=OJapMed/C+yKNoaqUK0e+pVkzZmShWWGBcRCvt+tEqw=; b=a
-	dgDSPtZs6ph4YK5E+5pMvWuEkBmrm3PhcZXMbiopnn0wG7OFGNWOqZRANODGjjml
-	RZJioK1OWNMi4/ps2cvNyGXSFhbrZE3OzgFJnZwaUv6CLhuwMb52A7hDrF66wQck
-	Qj09pCagupdhYN/py1enXKqlifPhg924EGZal8BuQROsEwUj58xISmiw63taSlzq
-	sMKQGJcMq2CXysrkNAXLmfiAj+KNTweBw0dh4rcwuLuIQqaM1lBrWs5dMrThaNlB
-	tqn62jyzRo4+x8vwpfOyG+5s+1TLTf/k7JAC4uhYfgWePa2Tt2wQodFNKL9eY21F
-	VIK4cZGHhET1KAQjn54ig==
-X-ME-Sender: <xms:74cmaX6va6Irg8iN8JkG_xVUV1o6-QUobWlFCMW1Yoxjl-NIezvgeQ>
-    <xme:74cmaX79iGWrL-qzll8sQHh9KCIhvfRlG0Dhg9IwiDG4bY_7EfghzdvrNgKa6MCxs
-    ryuV8n6kGabRzUPyxfGTMmUEKFHcM0F96Et6oBQ3irHtQW_maH3eA>
-X-ME-Received: <xmr:74cmaVF1AxLEtRr_0ZSEwdK7gkGr1GVeuK13HkANanx6WwpcGko9pCGbivY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgeefgeefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfgggtgfesthhqredttddtjeenucfhrhhomheptehlvgigucgh
-    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
-    htvghrnhepgfffvdefjeejueevfeetudfhgeetfeeuheetfeekjedvuddvueehffdtgeej
-    keetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopedvhedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtoheprghnkhhithgrsehnvhhiughirgdrtghomhdprhgtph
-    htthhopehjghhgseiiihgvphgvrdgtrgdprhgtphhtthhopeihihhshhgrihhhsehnvhhi
-    ughirgdrtghomhdprhgtphhtthhopehskhholhhothhhuhhmthhhohesnhhvihguihgrrd
-    gtohhmpdhrtghpthhtohepkhgvvhhinhdrthhirghnsehinhhtvghlrdgtohhmpdhrtghp
-    thhtoheprghnihhkvghtrgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepvhhsvghthh
-    hisehnvhhiughirgdrtghomhdprhgtphhtthhopehmohgthhhssehnvhhiughirgdrtgho
-    mhdprhgtphhtthhopeihuhhngihirghnghdrlhhisegrmhgurdgtohhm
-X-ME-Proxy: <xmx:74cmaVzL1CpYrx01Dx9DazvOHoLzUqiRRMuTmLLHOYEdeJWSSv-t3A>
-    <xmx:74cmaV1kEPygFLjEp2gn4wpSecgn_oaht_oeuDL7MXZm0Pb48B4GRg>
-    <xmx:74cmaYN4hJFvsHt8BEp-obgEDOtGaOyshS5lkCN3ZXEXPmVBls3dYA>
-    <xmx:74cmaRtOu9R_P4JSUJKiG9i-A1JpkhCoVi1VuTPJyXf_FiY45u_dLg>
-    <xmx:74cmacn-9bqHDCcQD6Dq_FNYFC7EMR89QK4br8mN-ddT2spwWqtSnMTa>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 25 Nov 2025 23:54:05 -0500 (EST)
-Date: Tue, 25 Nov 2025 21:54:04 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Ankit Agrawal <ankita@nvidia.com>
-Cc: "jgg@ziepe.ca" <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <skolothumtho@nvidia.com>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>,
- Aniket Agashe <aniketa@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>,
- Matt Ochs <mochs@nvidia.com>,
- "Yunxiang.Li@amd.com" <Yunxiang.Li@amd.com>,
- "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
- "zhangdongdong@eswincomputing.com" <zhangdongdong@eswincomputing.com>,
- Avihai Horon <avihaih@nvidia.com>,
- "bhelgaas@google.com" <bhelgaas@google.com>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "pstanner@redhat.com" <pstanner@redhat.com>,
- Alistair Popple <apopple@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Neo Jia <cjia@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>,
- "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>, Zhi Wang <zhiw@nvidia.com>,
- Dan Williams <danw@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
- Krishnakant Jaju <kjaju@nvidia.com>
-Subject: Re: [PATCH v6 5/6] vfio/nvgrace-gpu: Inform devmem unmapped after
- reset
-Message-ID: <20251125215404.14c969be@shazbot.org>
-In-Reply-To: <SA1PR12MB7199DF7032D570B5C610FD60B0DEA@SA1PR12MB7199.namprd12.prod.outlook.com>
-References: <20251125173013.39511-1-ankita@nvidia.com>
-	<20251125173013.39511-6-ankita@nvidia.com>
-	<20251125135247.62878956.alex@shazbot.org>
-	<SA1PR12MB7199DF7032D570B5C610FD60B0DEA@SA1PR12MB7199.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1764134506; c=relaxed/simple;
+	bh=V34EkMlx5730oKCbGsZ8UnN8wqaCpact9cdZChfm4Ok=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=HZA8VKsyFGT8VLIIMmQJrirxztkDEM2ntnC9Nn+XCRDygDuVkclgXUtzbBNkmhlnbVT3sEsXGy+/fmRqs4uCzOi3vBQDi9P5Rx2sY57u1Z5Rsg/YmCbSLyEhcs9xaWErPSXZ0xA2uQXfuKSB6uovrVoQdaNZFZme3rXsmcoVc5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SiJfwWbx; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764134503; x=1795670503;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=V34EkMlx5730oKCbGsZ8UnN8wqaCpact9cdZChfm4Ok=;
+  b=SiJfwWbxgYj2xRsgHCO/nug3dZB983t82oBvf0QkRKkuPsrUPBA8KW8O
+   vTJxpLBA0wf9ZPSH8/jgplKGJRazJYw2i+bq8dePk6lTVsrjMnMWEiOry
+   YmkPASWLefe7BDvsww1+x56yfsZ1awECJ1dzkVFCd+H+aAmF5uys3Madx
+   XSkh/eXmOtAezOOGdefMTIDNTgYmH/feA9RTVqrOAiqcerHVYN0EitaPL
+   lfZRSIwUUL78Zh+l6NHWFEZCuaO3CP61kKZ7pd2P6KAr0uKJo2GS9MeAo
+   gJ93R+R1DZOIVe61tfP+rf3jlAPUSnNhhUdB+Sz9Q2hcZycrP8fFMx7I/
+   Q==;
+X-CSE-ConnectionGUID: 0LXRNBjlT/SFe+mp77D4aA==
+X-CSE-MsgGUID: v2fwvRSNTouw5lviBAcB7w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="76844966"
+X-IronPort-AV: E=Sophos;i="6.20,227,1758610800"; 
+   d="scan'208";a="76844966"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 21:21:42 -0800
+X-CSE-ConnectionGUID: IQJLDWK2TBmAYVm94bJPjg==
+X-CSE-MsgGUID: Zx0Kr9htSVOu9c/mICPSuQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,227,1758610800"; 
+   d="scan'208";a="192631997"
+Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 21:21:37 -0800
+Message-ID: <e6ecd387-e57d-4bfa-b4f7-38662a39a50b@linux.intel.com>
+Date: Wed, 26 Nov 2025 13:21:35 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 12/16] x86/virt/tdx: Add helpers to allow for
+ pre-allocating pages
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: bp@alien8.de, chao.gao@intel.com, dave.hansen@intel.com,
+ isaku.yamahata@intel.com, kai.huang@intel.com, kas@kernel.org,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+ seanjc@google.com, tglx@linutronix.de, vannapurve@google.com,
+ x86@kernel.org, yan.y.zhao@intel.com, xiaoyao.li@intel.com,
+ binbin.wu@intel.com
+References: <20251121005125.417831-1-rick.p.edgecombe@intel.com>
+ <20251121005125.417831-13-rick.p.edgecombe@intel.com>
+ <7a6f5b4e-ad7b-4ad0-95fd-e1698f9b4e06@linux.intel.com>
+Content-Language: en-US
+In-Reply-To: <7a6f5b4e-ad7b-4ad0-95fd-e1698f9b4e06@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, 26 Nov 2025 03:26:54 +0000
-Ankit Agrawal <ankita@nvidia.com> wrote:
 
-> >>=C2=A0 MODULE_DEVICE_TABLE(pci, nvgrace_gpu_vfio_pci_table);
-> >> =20
-> > /*
-> > =C2=A0* Comment explaining why this can't use lockdep_assert_held_write=
- but
-> > =C2=A0* in vfio use cases relies on this for serialization against faul=
-ts and
-> > =C2=A0* read/write.
-> > =C2=A0*/
-> > =20
->=20
-> In this patch or the next where we actually do the serialization with
-> memory_lock?
 
-When the interaction is added would make more sense.  Thanks,
+On 11/26/2025 11:40 AM, Binbin Wu wrote:
+>> index 260bb0e6eb44..61a058a8f159 100644
+>> --- a/arch/x86/kvm/vmx/tdx.c
+>> +++ b/arch/x86/kvm/vmx/tdx.c
+>> @@ -1644,23 +1644,34 @@ static int tdx_mem_page_add(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+>>     static void *tdx_alloc_external_fault_cache(struct kvm_vcpu *vcpu)
+>>   {
+>> -    struct vcpu_tdx *tdx = to_tdx(vcpu);
+>> +    struct page *page = get_tdx_prealloc_page(&to_tdx(vcpu)->prealloc);
+>>   -    return kvm_mmu_memory_cache_alloc(&tdx->mmu_external_spt_cache);
+>> +    if (WARN_ON_ONCE(!page))
+>> +        return (void *)__get_free_page(GFP_ATOMIC | __GFP_ACCOUNT);
+>
+> kvm_mmu_memory_cache_alloc() calls BUG_ON() if the atomic allocation failed.
+> Do we want to follow?
+>
+>
+Please ignore this one.
 
-Alex
 
