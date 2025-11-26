@@ -1,133 +1,116 @@
-Return-Path: <kvm+bounces-64643-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64644-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E451C89344
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 11:12:59 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC83CC893FF
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 11:21:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2DA7F4E3F2C
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 10:12:58 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4FC52358A3C
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 10:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75CC2FB99D;
-	Wed, 26 Nov 2025 10:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A6A304BD0;
+	Wed, 26 Nov 2025 10:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TICKB7jl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aVwJbqF5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B223016F6;
-	Wed, 26 Nov 2025 10:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5056D2DF137;
+	Wed, 26 Nov 2025 10:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764151945; cv=none; b=bICtkifmGGKTFIb9rxyrFytOBnIwiKRh9X69A1TvLOXXFFAaVItPd342REelzSUZXZKjy/2eOTVdTAuq2ZMKavtqAZBwc8sobCKmT9U0nFPUgOqYtRyGbW1phzOBsnsRoPB8zOp/skqN+zI7t/UlT6CXjyZp9szopC9YI8X3W98=
+	t=1764152378; cv=none; b=Wlz978wAPqsejYg1cgy+6j7DZml011BVcloCIb/C3acuY1Bk2H9jX8kBJYtqn+CIhCX1EB/S7u7OQkFLoeF02B8xQr2MReoT08Z0KgKV8oJ5NI6VSTFigwmEeU9/LIHzuQtFfYPLrC5rRJrSu4LH6lkIYxfXi7c+9vTC7BJ/zAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764151945; c=relaxed/simple;
-	bh=wYfnSJce/d68AkC3D5gkG5TdhGF5sx8GseHqKuyPJ3k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KG4TcPeD7wHxhMJp/zHzklF0XjvhYAbL4nGwxcNG1W3wHL2ZkkUXj3dNuj3NhMaxb79JxEDwOUAcEPo6TFOPAuwfqznkzBZXvHtTJgymaUIKsNeMh8JucXfWeHz68I9FSlmF122ufMHq5f6WAhcPNhcb7at8Lz5aRzo2RH/tkr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TICKB7jl; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764151943; x=1795687943;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wYfnSJce/d68AkC3D5gkG5TdhGF5sx8GseHqKuyPJ3k=;
-  b=TICKB7jl6Om1ByGYO7cfokx8AF1sA4bUNnPc0CH8bmZqBC9uUn73Ycpz
-   qWtcLZ3LTryW3/dDD/UIWJGwCKkV1zDqpDH5WbNKRKmPepibz1Mv9zZBx
-   /WrxHKl4MRuiRaCjLCqt4PcMp/lzl5qgDdyXi+W/cOeYXCpe3EpeM5vOh
-   A4PLIvubktYqYdAzfLkxVSJN8yTq6OWuakZF9iP1NBrJiZyNahTpMAJob
-   RH9sqXAjksNWLEBuv5OjFjLobRr3jaoT3o4JGzmoglak990f0RaspInyx
-   akVQAOfa/llbh9OIMWCCz890XOTDMgSgat983wBGH2pY6P+8T4X8R+5OE
-   w==;
-X-CSE-ConnectionGUID: cbJmFiSXSCCmop3iImraZQ==
-X-CSE-MsgGUID: p+kpR0FqRYWIEB8CEkMpgQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="70048244"
-X-IronPort-AV: E=Sophos;i="6.20,228,1758610800"; 
-   d="scan'208";a="70048244"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 02:12:23 -0800
-X-CSE-ConnectionGUID: MinKU0NPQlaZPSL3+hTk9g==
-X-CSE-MsgGUID: xvoBGOAyThuJ90AHUjTW0A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,228,1758610800"; 
-   d="scan'208";a="223623661"
-Received: from lxy-clx-4s.sh.intel.com ([10.239.48.22])
-  by orviesa002.jf.intel.com with ESMTP; 26 Nov 2025 02:12:20 -0800
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-To: Dave Hansen <dave.hansen@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Kiryl Shutsemau <kas@kernel.org>
-Cc: x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	linux-kernel@vger.kernel.org,
-	linux-coco@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>,
-	chao.p.peng@intel.com,
-	xiaoyao.li@intel.com
-Subject: [PATCH 2/2] x86/split_lock: Describe #AC handling in TDX guest kernel log
-Date: Wed, 26 Nov 2025 18:02:04 +0800
-Message-ID: <20251126100205.1729391-3-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251126100205.1729391-1-xiaoyao.li@intel.com>
-References: <20251126100205.1729391-1-xiaoyao.li@intel.com>
+	s=arc-20240116; t=1764152378; c=relaxed/simple;
+	bh=e9FOp73QbX/qH1ICAIHKKQ91Oue3tJPhRgVdlzZS0s0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aJH6LPexQCqjrtKwdAa58+cF9npqWAo026vpKhGwLAMR3nFcIu7xsiK5vRdasUDq4cFvuY5qJgJGKLAjtY6eX9WLi7kKHoNEk7Y805YESpHubm6gR47+KjtuqqoTrU998BVLF3UF46V8MFmc0QGbUrlnVo59vqBp5348ibU2Cmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aVwJbqF5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA3A2C113D0;
+	Wed, 26 Nov 2025 10:19:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764152377;
+	bh=e9FOp73QbX/qH1ICAIHKKQ91Oue3tJPhRgVdlzZS0s0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aVwJbqF5LwtL/GBKSUM5lJlYOc5Cq82JW3QAUHKZUy6XidPIAMiJBSP3E4lH2cDHG
+	 X2Ly6ckgxDIJj4VnA4AZ02oTyXeySLUkMQ51x4rI1m7tbW8hdSz8VLQAYDgA3yquMO
+	 u6becA6wo00CKuOCaiqLIYWeKbFktTC6jhiALlraSWGCnAx/bKsccS7Y0ipgbUSIUc
+	 6ZhvqjZbMYnY+1beJ3/ghajKkAq2PTzStQyj+UpyKGe4FR6G4z6+y4u+49klpKMLqS
+	 nFA73WD+j0GyBzg6b8/ljzsvszZFDzmfMTUq/CQKql4wVXnHk3ariH1xzaNjIjwGu0
+	 Gux6LkgjkAB3Q==
+Message-ID: <de66cef2-de14-4503-bbc6-21467e0e3e29@kernel.org>
+Date: Wed, 26 Nov 2025 11:19:30 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/5] mm: introduce VM_FAULT_UFFD_MINOR fault reason
+To: Mike Rapoport <rppt@kernel.org>, linux-mm@kvack.org
+Cc: Andrea Arcangeli <aarcange@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Axel Rasmussen <axelrasmussen@google.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>, Hugh Dickins
+ <hughd@google.com>, James Houghton <jthoughton@google.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Michal Hocko
+ <mhocko@suse.com>, Nikita Kalyazin <kalyazin@amazon.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20251125183840.2368510-1-rppt@kernel.org>
+ <20251125183840.2368510-4-rppt@kernel.org>
+From: "David Hildenbrand (Red Hat)" <david@kernel.org>
+Content-Language: en-US
+In-Reply-To: <20251125183840.2368510-4-rppt@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-X86_FEATURE_HYPERVISOR and X86_FEATURE_BUS_LOCK_DETECT are always
-enumerated in a TDX guest because the corresponding CPUID values are
-fixed to 1 by the TDX module. Similar to a normal guest, a TDX guest
-never enumerates X86_FEATURE_SPLIT_LOCK_DETECT.
+> @@ -1564,7 +1571,8 @@ enum vm_fault_reason {
+>   	{ VM_FAULT_FALLBACK,            "FALLBACK" },	\
+>   	{ VM_FAULT_DONE_COW,            "DONE_COW" },	\
+>   	{ VM_FAULT_NEEDDSYNC,           "NEEDDSYNC" },	\
+> -	{ VM_FAULT_COMPLETED,           "COMPLETED" }
+> +	{ VM_FAULT_COMPLETED,           "COMPLETED" },	\
+> +	{ VM_FAULT_UFFD_MINOR,		"UFFD_MINOR" },	\
+>   
+>   struct vm_special_mapping {
+>   	const char *name;	/* The name, e.g. "[vdso]". */
+> diff --git a/mm/memory.c b/mm/memory.c
+> index b59ae7ce42eb..94acbac8cefb 100644
+> --- a/mm/memory.c
+> +++ b/mm/memory.c
+> @@ -5279,6 +5279,8 @@ static vm_fault_t __do_fault(struct vm_fault *vmf)
+>   	}
+>   
+>   	ret = vma->vm_ops->fault(vmf);
+> +	if (unlikely(ret & VM_FAULT_UFFD_MINOR))
+> +		return handle_userfault(vmf, VM_UFFD_MINOR);
+>   	if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY |
+>   			    VM_FAULT_DONE_COW)))
 
-When "split_lock_detect=off", the TDX guest kernel log shows:
+If we want to reduce the overhead on the fast path, we can simply do
 
-  x86/split lock detection: disabled
+if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY |
+		    VM_FAULT_DONE_COW | VM_FAULT_UFFD_MINOR))) {
+	if (unlikely(ret & VM_FAULT_UFFD_MINOR))
+		return handle_userfault(vmf, VM_UFFD_MINOR);
+	return ret;
+}
 
-and with other settings, it shows:
+Maybe the compiler already does that to improve the likely case.
 
-  x86/split lock detection: #DB: ...
+LGTM
 
-However, if the host enables split lock detection, a TDX guest receives
- #AC regardless of its own "split_lock_detect" configuration. The actual
-behavior does not match what the kernel log claims.
-
-Call out the possible #AC behavior on TDX and highlight that this behavior
-depends on the host's enabling of split lock detection.
-
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
----
- arch/x86/kernel/cpu/bus_lock.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/arch/x86/kernel/cpu/bus_lock.c b/arch/x86/kernel/cpu/bus_lock.c
-index f278e4ea3dd4..18695214d214 100644
---- a/arch/x86/kernel/cpu/bus_lock.c
-+++ b/arch/x86/kernel/cpu/bus_lock.c
-@@ -437,6 +437,9 @@ static void sld_state_show(void)
- 			pr_info("#DB: setting system wide bus lock rate limit to %u/sec\n", bld_ratelimit.burst);
- 		break;
- 	}
-+
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		pr_info("tdx: #AC depends on host configuration: crashing the kernel on kernel split_locks and sending SIGBUS on user-space split_locks\n");
- }
- 
- void __init sld_setup(struct cpuinfo_x86 *c)
 -- 
-2.43.0
+Cheers
 
+David
 
