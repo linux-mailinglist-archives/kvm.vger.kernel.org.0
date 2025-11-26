@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-64587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACFA3C87BD0
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 02:46:38 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD5B5C87BD9
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 02:47:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 677DE3B5459
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 01:46:37 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C0EE6355057
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 01:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C79C30BB88;
-	Wed, 26 Nov 2025 01:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248763081BB;
+	Wed, 26 Nov 2025 01:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3L2AaAgR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A0fHz4aP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB18630AD11
-	for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 01:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129FB30C611
+	for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 01:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764121509; cv=none; b=nmflgeZB9JltO+yQHW0n3JBJ5ThSxk3UMPPe6LXMzbrPogin3d7mIeT3od7WemHk0I972igY4aB/2brdeLVWzfdXl6PHyLkKt++hx2KATtUzlFnE1Clnox6YEST0vIDBmgT45l3UMr8078PrUdFsUloo/F0c5H8ptaHfj5p0ZTw=
+	t=1764121511; cv=none; b=MkarcNEvKKDL8yymrWog3nC/YzPVPW7siWbhCuTptz1u9C/f5+4tUo010HMkaFxTpXRfPvczj/PpPS22ZOtkiMRL05QbMCENrOlxorkB7+HnOmWfcJ51WTh8h8OtXfF26KbX86LvlJOrxnCyX8mLyiKCs8ZxP2YpxkmAxdC+PjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764121509; c=relaxed/simple;
-	bh=AzMraleJ+53k5LhSGFh8jsmpITt4ELeO9gJGnd50RdU=;
+	s=arc-20240116; t=1764121511; c=relaxed/simple;
+	bh=nYEPUwYKbmW5mhrrMXVBJvAXAe8WHFbP6znh2Px5NDk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GhpOVfO4WHrjHeowDOpC2WesmYi/FrJTIesqY+TJoXuslRO9TwNLoNVJ0uQOqGqnXFLFR05NXch+whllcr6fFNZWmT9tpGPrJrwSi4JJ17CqMFw5TGJZij0GLiLU+16w44nVpKGK7kUOrzEvW0sPSzpCx87Lb6ezpa13p8WtLKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3L2AaAgR; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=Npz/LxBgjCJHFOIfhk+GVM3yMYHxAjHg8AaW2klHwOM/2bZ0MnI7HcmfGe0LGDSH7vyZE7HjglJqprG6ooreoCEOk5KsncFr1udwzgutMmYjtVD493GUr0NTae/AVIuvWI+WZM2mN4DDpLmHMgtZrdW2a2mMjPUebFs0DZL0dfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A0fHz4aP; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-29557f43d56so77788405ad.3
-        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 17:45:07 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-343806688cbso14750048a91.3
+        for <kvm@vger.kernel.org>; Tue, 25 Nov 2025 17:45:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764121507; x=1764726307; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1764121508; x=1764726308; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=BZ3rLemZWs+TokChe5w7eM4LkWhkRpugMrVw9gqlWlU=;
-        b=3L2AaAgRRiufGoTvqsJJiNBMKHEiLzXri7UtEOIF1hNLI10dcEgQ1zkSDGYGtrUxSY
-         cFG19Sr4ME5aoZaSRB8lB7eLgoWrCMKNkmhTrIYIMphSgMHU75dSUQrAueCNvIfBuNJk
-         hkE+osKHfB/OXimeCMmnx8cVCLmhRC8nv6KjKvCusR1klSZKjoaIHqr4ykHwD6DS3Oov
-         oukq5mTjIXWPmwp1UyBHHroncFGXrZC1kU2qOEAA7qG7optLUMMiL9WQgMqwtqaGR0Kw
-         cXHu/waaAw5BXAngX070ZHC/Heray7TWmLmDVfdFCbblbpGCLq0Wr/A+aZ9d3R8/SmUq
-         rQ5g==
+        bh=07656lNFj5BO3ugrp3q49Gq1eNlpiz3jhqhcx9bHDIo=;
+        b=A0fHz4aPVSL5guCcmkW87xZp4G0HHWvL+3k66CLFrhrbq/DW0jO+d18IEq8HmvruuM
+         7JIEJVL3ou9aGR3+IKfujV74SywoY01Iejwh+MDywemri7nf7zz6EDqP7CA8m+Ky4fpx
+         8vuoWW6xEAiK2HAP7wJoHDAZig4eeOPMKKI+DsmWd8i5qy0PFLSHIuCDXlrV0uDq/jiP
+         UzeOxhhfYduYCbTf4wpjTxQ0PkCzmThhnCxzlUZ7HVxEslbrSL2nQI15C/H/5lHEyFWs
+         /lowVT2vj0h1yrMc7zExasISe1kg41VCyWLP8oye+86EdKlMziioWa5NtdyejmOwaAnZ
+         PrqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764121507; x=1764726307;
+        d=1e100.net; s=20230601; t=1764121508; x=1764726308;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BZ3rLemZWs+TokChe5w7eM4LkWhkRpugMrVw9gqlWlU=;
-        b=e0yoUOL+wskcx+cPrTZEfktkSpLDUGYnu/cOzgSVb6oci7noACitmMKf8F16RkSUed
-         3rdmk3PZSfPT4gV+NirJbVKeWXBdICh36p455PpX8fBdJKI0uKVRUKOCSHsUH9mcw+gn
-         6w95VdI9xwmepB9GC0Hp6x+dbIvkWDECp7rMiaa5KE+5DdCWi68iv1ssYM5SDs4UgvxJ
-         9pvqrYbh6NIEuBeDqwX12Iv6FgiTjYBiJ1ztHpxLje326EqXGpt8py24oH+Xutq6fCtS
-         CTbfuj2Wg0E01SvDClBpTWX8aFz4NIBa4oX/NuN0tU/f4pTRrdHaZW247+9HZW6Q8cO4
-         04Qg==
-X-Gm-Message-State: AOJu0YwbdQCi0TjUXf/9y2wQZGKV1zfbg+E/d1QG/kAlNm6SOP4P6iGb
-	JHX+X0+IDHHFxj7EaVGgjVHU4TJQPThdqMcxDc1MNDnKzZSbhzfPrRTsq8DTZ+VCFFBm0dJIFmk
-	b6NJCVA==
-X-Google-Smtp-Source: AGHT+IH04eUXQ/g6fDZpkb12mVYLQ4RIWFpoBwEaUlK2DwBjLlmq72LWHCxfidUBjIBVishW5r438HAvt1Y=
-X-Received: from pgbl34.prod.google.com ([2002:a63:5722:0:b0:bc4:233b:be04])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:fc84:b0:295:f508:9d32
- with SMTP id d9443c01a7336-29bab149b90mr56928645ad.37.1764121506889; Tue, 25
- Nov 2025 17:45:06 -0800 (PST)
+        bh=07656lNFj5BO3ugrp3q49Gq1eNlpiz3jhqhcx9bHDIo=;
+        b=vpbijPNLM8dLIXEiOAHkpEQ0I4kpKeXFs2LvJ+VKILomxJGGQP/CqEF5FfpNDhiIWz
+         S/zfO2XwWhyYRaKEil/QzzbfJTKEmozTpugSVLzp71F+H73L71NmOdtiIMqVMtgyFaWL
+         34AsZaR5uH+E+XqdCBUx1Sbh9qkBdo7SggWOPoYOmMDGEgHodsvIFVO4uLGkt97WyKoP
+         fyoyCnr8li7myZfcMGuA4sloQFSTuI9i2A0Gjv5IYLgWeMTefYFMd1ZjxorVb927XtBU
+         dVILk6zC3QGVl1I4ZYHh12YsY8+guRwUVKT1HbZ56Gr4ftIYYDcKAMVG1FJnPKNGl/R1
+         8s2A==
+X-Gm-Message-State: AOJu0Yy719X7mfyWT6LK9TRoiQsUwa70UYUEi0zSrg3abcpNnLJbYjPZ
+	ImMYeMo/PiCBlUspJtZGOUIj5KZiEUTRGekDNJ7vjbZ37i7HLcLC2e4i9AJqfbE5i1wOfCcd3s+
+	CS5Uw/A==
+X-Google-Smtp-Source: AGHT+IGY5pV2285RONiSnvxkAS6NF2VyiuRamyd9V0BN6bwFCHdx9j2lFgPRRcozQQ27yIqlZagU8UjThSs=
+X-Received: from pjbdw12.prod.google.com ([2002:a17:90b:94c:b0:343:4a54:8435])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d2d0:b0:340:bb51:17eb
+ with SMTP id 98e67ed59e1d1-34733e94f50mr17985222a91.15.1764121508388; Tue, 25
+ Nov 2025 17:45:08 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 25 Nov 2025 17:44:52 -0800
+Date: Tue, 25 Nov 2025 17:44:53 -0800
 In-Reply-To: <20251126014455.788131-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,99 +75,147 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251126014455.788131-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.487.g5c8c507ade-goog
-Message-ID: <20251126014455.788131-6-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: Selftests changes for 6.19
+Message-ID: <20251126014455.788131-7-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: SVM changes for 6.19
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The highlights are Jim's LA57 nested VMX test, and Yosry's many changes to
-extend nested VMX tests to also cover nested SVM.
+A handful of lowish priority nSVM fixes, AVIC support for 4k vCPUs, and new
+uAPI to advertise SNP policy bits to userspace.
 
-The following changes since commit 211ddde0823f1442e4ad052a2f30f050145ccada:
+Side topic, this pull request is finally proof that I don't just merge my own
+stuff :-D
 
-  Linux 6.18-rc2 (2025-10-19 15:19:16 -1000)
+There's a minor conflict in svm.h due to the removal of the
+avic_ga_log_notifier() declaration in kvm/master:
+
+diff --cc arch/x86/kvm/svm/svm.h
+index dd78e6402345,a9f6c1ece63d..9e151dbdef25
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@@ -806,7 -802,8 +803,8 @@@ extern struct kvm_x86_nested_ops svm_ne
+  )
+  
+  bool __init avic_hardware_setup(void);
+ -int avic_ga_log_notifier(u32 ga_tag);
+ +void avic_hardware_unsetup(void);
++ int avic_alloc_physical_id_table(struct kvm *kvm);
+  void avic_vm_destroy(struct kvm *kvm);
+  int avic_vm_init(struct kvm *kvm);
+  void avic_init_vmcb(struct vcpu_svm *svm, struct vmcb *vmcb);
+
+And a conflict in cpufeatures.h with the "misc" pull request.  This (and the
+change from "misc") will also conflict with new features being added via the
+tip-tree.  Boris is aware and presumably will give Linus a heads up.  Merging
+on top of "misc":
+
+diff --cc arch/x86/include/asm/cpufeatures.h
+index fc5698844a0b,7129eb44adad..646d2a77a2e2
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@@ -499,11 -500,7 +500,12 @@@
+  #define X86_FEATURE_IBPB_EXIT_TO_USER (21*32+14) /* Use IBPB on exit-to-userspace, see VMSCAPE bug */
+  #define X86_FEATURE_ABMC              (21*32+15) /* Assignable Bandwidth Monitoring Counters */
+  #define X86_FEATURE_MSR_IMM           (21*32+16) /* MSR immediate form instructions */
+- #define X86_FEATURE_CLEAR_CPU_BUF_VM_MMIO (21*32+17) /*
++ #define X86_FEATURE_X2AVIC_EXT                (21*32+17) /* AMD SVM x2AVIC support for 4k vCPUs */
+++#define X86_FEATURE_CLEAR_CPU_BUF_VM_MMIO (21*32+18) /*
+ +                                                    * Clear CPU buffers before VM-Enter if the vCPU
+ +                                                    * can access host MMIO (ignored for all intents
+ +                                                    * and purposes if CLEAR_CPU_BUF_VM is set).
+ +                                                    */
+  
+  /*
+   * BUG word(s)
+
+
+The following changes since commit 3a8660878839faadb4f1a6dd72c3179c1df56787:
+
+  Linux 6.18-rc1 (2025-10-12 13:42:36 -0700)
 
 are available in the Git repository at:
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.19
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-svm-6.19
 
-for you to fetch changes up to d2e50389ab44acfa05e72604d701a70b234f9938:
+for you to fetch changes up to 275d6d1189e6d5f8e7c1da43ffd4b09d7089f174:
 
-  KVM: selftests: Make sure vm->vpages_mapped is always up-to-date (2025-11-21 10:17:05 -0800)
-
-----------------------------------------------------------------
-KVM selftests changes for 6.19:
-
- - Fix a math goof in mmu_stress_test when running on a single-CPU system/VM.
-
- - Forcefully override ARCH from x86_64 to x86 to play nice with specifying
-   ARCH=x86_64 on the command line.
-
- - Extend a bunch of nested VMX to validate nested SVM as well.
-
- - Add support for LA57 in the core VM_MODE_xxx macro, and add a test to
-   verify KVM can save/restore nested VMX state when L1 is using 5-level
-   paging, but L2 is not.
-
- - Clean up the guest paging code in anticipation of sharing the core logic for
-   nested EPT and nested NPT.
+  KVM: SEV: Add known supported SEV-SNP policy bits (2025-11-14 10:30:12 -0800)
 
 ----------------------------------------------------------------
-Brendan Jackman (1):
-      KVM: selftests: Don't fall over in mmu_stress_test when only one CPU is present
+KVM SVM changes for 6.19:
 
+ - Fix a few missing "VMCB dirty" bugs.
+
+ - Fix the worst of KVM's lack of EFER.LMSLE emulation.
+
+ - Add AVIC support for addressing 4k vCPUs in x2AVIC mode.
+
+ - Fix incorrect handling of selective CR0 writes when checking intercepts
+   during emulation of L2 instructions.
+
+ - Fix a currently-benign bug where KVM would clobber SPEC_CTRL[63:32] on
+   VMRUN and #VMEXIT.
+
+ - Fix a bug where KVM corrupt the guest code stream when re-injecting a soft
+   interrupt if the guest patched the underlying code after the VM-Exit, e.g.
+   when Linux patches code with a temporary INT3.
+
+ - Add KVM_X86_SNP_POLICY_BITS to advertise supported SNP policy bits to
+   userspace, and extend KVM "support" to all policy bits that don't require
+   any actual support from KVM.
+
+----------------------------------------------------------------
 Jim Mattson (4):
-      KVM: selftests: Use a loop to create guest page tables
-      KVM: selftests: Use a loop to walk guest page tables
-      KVM: selftests: Change VM_MODE_PXXV48_4K to VM_MODE_PXXVYY_4K
-      KVM: selftests: Add a VMX test for LA57 nested state
+      KVM: SVM: Mark VMCB_PERM_MAP as dirty on nested VMRUN
+      KVM: SVM: Mark VMCB_NPT as dirty on nested VMRUN
+      KVM: x86: Advertise EferLmsleUnsupported to userspace
+      KVM: SVM: Disallow EFER.LMSLE when not supported by hardware
 
-Sean Christopherson (2):
-      KVM: selftests: Forcefully override ARCH from x86_64 to x86
-      KVM: selftests: Use "gpa" and "gva" for local variable names in pre-fault test
+Naveen N Rao (7):
+      KVM: SVM: Limit AVIC physical max index based on configured max_vcpu_ids
+      KVM: SVM: Add a helper to look up the max physical ID for AVIC
+      KVM: SVM: Replace hard-coded value 0x1FF with the corresponding macro
+      KVM: SVM: Expand AVIC_PHYSICAL_MAX_INDEX_MASK to be a 12-bit field
+      KVM: SVM: Move AVIC Physical ID table allocation to vcpu_precreate()
+      x86/cpufeatures: Add X86_FEATURE_X2AVIC_EXT
+      KVM: SVM: Add AVIC support for 4k vCPUs in x2AVIC mode
 
-Yosry Ahmed (9):
-      KVM: selftests: Extend vmx_close_while_nested_test to cover SVM
-      KVM: selftests: Extend vmx_nested_tsc_scaling_test to cover SVM
-      KVM: selftests: Move nested invalid CR3 check to its own test
-      KVM: selftests: Extend nested_invalid_cr3_test to cover SVM
-      KVM: selftests: Extend vmx_tsc_adjust_test to cover SVM
-      KVM: selftests: Stop hardcoding PAGE_SIZE in x86 selftests
-      KVM: selftests: Remove the unused argument to prepare_eptp()
-      KVM: selftests: Stop using __virt_pg_map() directly in tests
-      KVM: selftests: Make sure vm->vpages_mapped is always up-to-date
+Omar Sandoval (1):
+      KVM: SVM: Don't skip unrelated instruction if INT3/INTO is replaced
 
- tools/testing/selftests/kvm/Makefile               |   2 +-
- tools/testing/selftests/kvm/Makefile.kvm           |   8 +-
- tools/testing/selftests/kvm/include/kvm_util.h     |   5 +-
- .../testing/selftests/kvm/include/x86/processor.h  |   2 +-
- tools/testing/selftests/kvm/include/x86/vmx.h      |   3 +-
- tools/testing/selftests/kvm/lib/arm64/processor.c  |   2 +-
- tools/testing/selftests/kvm/lib/kvm_util.c         |  33 +++---
- tools/testing/selftests/kvm/lib/x86/memstress.c    |   2 +-
- tools/testing/selftests/kvm/lib/x86/processor.c    |  84 ++++++-------
- tools/testing/selftests/kvm/lib/x86/vmx.c          |   9 +-
- tools/testing/selftests/kvm/mmu_stress_test.c      |  10 +-
- .../testing/selftests/kvm/pre_fault_memory_test.c  |  32 +++--
- tools/testing/selftests/kvm/x86/hyperv_features.c  |   2 +-
- tools/testing/selftests/kvm/x86/hyperv_ipi.c       |  18 +--
- tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c |   2 +-
- ...while_nested_test.c => nested_close_kvm_test.c} |  42 +++++--
- .../selftests/kvm/x86/nested_invalid_cr3_test.c    | 116 ++++++++++++++++++
- ..._tsc_adjust_test.c => nested_tsc_adjust_test.c} |  73 +++++++-----
- ...sc_scaling_test.c => nested_tsc_scaling_test.c} |  48 +++++++-
- tools/testing/selftests/kvm/x86/sev_smoke_test.c   |   2 +-
- tools/testing/selftests/kvm/x86/state_test.c       |   2 +-
- .../testing/selftests/kvm/x86/userspace_io_test.c  |   2 +-
- .../testing/selftests/kvm/x86/vmx_dirty_log_test.c |  12 +-
- .../selftests/kvm/x86/vmx_nested_la57_state_test.c | 132 +++++++++++++++++++++
- 24 files changed, 479 insertions(+), 164 deletions(-)
- rename tools/testing/selftests/kvm/x86/{vmx_close_while_nested_test.c => nested_close_kvm_test.c} (64%)
- create mode 100644 tools/testing/selftests/kvm/x86/nested_invalid_cr3_test.c
- rename tools/testing/selftests/kvm/x86/{vmx_tsc_adjust_test.c => nested_tsc_adjust_test.c} (61%)
- rename tools/testing/selftests/kvm/x86/{vmx_nested_tsc_scaling_test.c => nested_tsc_scaling_test.c} (83%)
- create mode 100644 tools/testing/selftests/kvm/x86/vmx_nested_la57_state_test.c
+Tom Lendacky (4):
+      KVM: SEV: Consolidate the SEV policy bits in a single header file
+      crypto: ccp - Add an API to return the supported SEV-SNP policy bits
+      KVM: SEV: Publish supported SEV-SNP policy bits
+      KVM: SEV: Add known supported SEV-SNP policy bits
+
+Uros Bizjak (1):
+      KVM: SVM: Ensure SPEC_CTRL[63:32] is context switched between guest and host
+
+Yosry Ahmed (4):
+      KVM: nSVM: Remove redundant cases in nested_svm_intercept()
+      KVM: nSVM: Propagate SVM_EXIT_CR0_SEL_WRITE correctly for LMSW emulation
+      KVM: nSVM: Avoid incorrect injection of SVM_EXIT_CR0_SEL_WRITE
+      KVM: x86: Document a virtualization gap for GIF on AMD CPUs
+
+ Documentation/virt/kvm/x86/errata.rst |  9 +++-
+ arch/x86/include/asm/cpufeatures.h    |  2 +
+ arch/x86/include/asm/kvm_host.h       |  9 ++++
+ arch/x86/include/asm/svm.h            |  5 +-
+ arch/x86/include/uapi/asm/kvm.h       |  1 +
+ arch/x86/kernel/cpu/scattered.c       |  1 +
+ arch/x86/kvm/cpuid.c                  |  1 +
+ arch/x86/kvm/svm/avic.c               | 86 ++++++++++++++++++++++++++++-------
+ arch/x86/kvm/svm/nested.c             | 12 +----
+ arch/x86/kvm/svm/sev.c                | 45 +++++++++++-------
+ arch/x86/kvm/svm/svm.c                | 78 ++++++++++++++++++++-----------
+ arch/x86/kvm/svm/svm.h                |  4 +-
+ arch/x86/kvm/svm/vmenter.S            | 47 +++++++++++++++----
+ arch/x86/kvm/x86.c                    | 21 +++++++++
+ drivers/crypto/ccp/sev-dev.c          | 37 +++++++++++++++
+ include/linux/psp-sev.h               | 37 +++++++++++++++
+ 16 files changed, 310 insertions(+), 85 deletions(-)
 
