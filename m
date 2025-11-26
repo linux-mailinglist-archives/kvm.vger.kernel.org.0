@@ -1,172 +1,143 @@
-Return-Path: <kvm+bounces-64713-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64714-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1826C8B8C3
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 20:17:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D36BC8B8FF
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 20:23:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5580335BBF9
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 19:17:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C68CA3B4CDE
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 19:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0717833FE0C;
-	Wed, 26 Nov 2025 19:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D84533FE34;
+	Wed, 26 Nov 2025 19:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x5zNNvzU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Wo8/FkTJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A551833F8D2
-	for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 19:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD7E314A82;
+	Wed, 26 Nov 2025 19:23:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764184661; cv=none; b=O40h6q7Tm0dDXuj4T2V06mEnOx/HBh+TMV8aPuFtt2wKDYBEZ07YstOQR3vgZfsFiKoaoFOdifbnwmhvYl6K8MBWyUu7kwhgRF134lazxIgoAE8om7EWCz9OzUppAF//cgjA1MhAYFH7TDUO8Ol1LinweC5GUG2auvIkkkXB5u4=
+	t=1764185017; cv=none; b=sy6eFVNFpwGjFoM4t3hSgefm9iFCObzzhJz6z8M1oCqxGESjSBOFlLuxMVkFAiPUeMgRSGlGz8aiuC5D0wIgy9I3AyhSrQGlwBJOn3ikLj+xsnLtLWowopCPdehmlxSuZ7IxBI0jJsHik31oraRMnj2/gXEYiXSuByT7q8lyzns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764184661; c=relaxed/simple;
-	bh=C5xbA9tyL0ZrFW18BGDh5IBT8BCzFIVZqeg2c00AXnc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Osyyzt8IxEJICmHvIi9qUf5sAHh3O7CohW/7hFhoojyUg5Ei+rF/mKSIfNJwanuMVtBqNfAK92wm0dug+34lKYgC2ascr1KT5S8SXiCgHFVhDV3GtZ2ElRqAyGWakg5mRLXNk7spYMOLKXnDswhWvZSE7tQB0GObV5d7DuI+J+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x5zNNvzU; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3418ad76023so133019a91.0
-        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 11:17:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764184659; x=1764789459; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iNYA6X16t1KQImSYTKJgBNPOrPlPV0jyF3Cmsma79vQ=;
-        b=x5zNNvzUbu6doqub/1ebwa2DWVkgWnfQJvE3Q7/9wMh/kb8Wxfae7I0eSIPX23PVP8
-         0oRn6FbXRr9/Wko7nx9WVAUJ0bQJU+WYNPgg8ttsfGzzQtlV6+khdYoL9tJp9CRUo/GP
-         YqDxaUsTo+NjLtD2SbEQch2Zj/A2JTsCLpJK0jHuLNmc7S66mt62SXZ1JjP4oGYChv6v
-         89snBBW3Sctz9TXzBrzyjrKE05vrHETjfVBxZzYZz+AfsgXPXv/0E3nuHirTrTnEx3Si
-         mbksTK4H6hLMYyZqAC4vR+mKlTZSLoAqWidK9GypEGkY2NwDpd9j4CUkryusi7n8e5/+
-         hQ9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764184659; x=1764789459;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iNYA6X16t1KQImSYTKJgBNPOrPlPV0jyF3Cmsma79vQ=;
-        b=kymaU50ryMJ1fvJIFxxgORbrKhaKqnySvcoabJkaGeK1TYBzmsJzks9C4xBZMTrWJ5
-         xD5njUoZeMcTY8if94lSrFyh5nq2Ib2My2hc6TYt/bhTAn0hXx00cjZKlmSEnOVPBK1k
-         HtSMYXkxwtJLZA8rN4uB/LEL2zG68CYZzR70FSN8RyF0XdKVgpx/YDUwk+LgWEVLRzEU
-         GpsGJGwDfBnjcCcLsU3UYKeKrxGhNRBh+WBWAffwWOjs1qUjSby/JovR/bviZaqQvViC
-         NwY/w5oZEYYAUl0vJEmB62J8TArC7yBhUiMhWxGYSCwKWg9HRVJ8Sk7o/T9z6zJv+YeL
-         qCUA==
-X-Gm-Message-State: AOJu0Yw0uDTnHQCHDAtUjRMt9/ru/D6vL9bytW4ia67qd2voGQj6I0Su
-	/pGR6ylfznr2uHWuLiH66ady66sRVzW8ySJbO3G12RQ9e6r0GUxFrbbqNWmQ+mqL1L4/SdOBThz
-	IitBUGg==
-X-Google-Smtp-Source: AGHT+IFs63sKEJ9O8o+/4f4IqxlHZOhBFAM0KjlVJcpvop4czNTrhKBZ7tHx88mHqVL3VGf2pV8SWheE1nI=
-X-Received: from pjot10.prod.google.com ([2002:a17:90a:950a:b0:341:8ac7:27a9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:164a:b0:340:c261:f9db
- with SMTP id 98e67ed59e1d1-34733e60944mr19788764a91.10.1764184658805; Wed, 26
- Nov 2025 11:17:38 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 26 Nov 2025 11:17:36 -0800
+	s=arc-20240116; t=1764185017; c=relaxed/simple;
+	bh=3Q9w0sIA8gEEJk9hlgzi1H2/rNq1oYnLzxXTwDrqOJw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gV3oI/yBEOzxKOEYUF6QF6MGG4rYO8stOKIWBSKwWom6gSdLHH0nZp3nRFEQvwn90hwMbUvE/HLxCmMlPbWdLTFUSZ76n9A5xlroLBayhX6Ry3CexKKEVUulLPtngPgCyFEdbBbGotmsQhH/9sX3t4qDBjoM93mxMI5TUIAi268=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Wo8/FkTJ; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764185016; x=1795721016;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3Q9w0sIA8gEEJk9hlgzi1H2/rNq1oYnLzxXTwDrqOJw=;
+  b=Wo8/FkTJQDhQSD7rATH2TZYYNd8PKfewVqZpCVqVlYH3N3qgQIO+T33g
+   K75u+EoLhHSaKzJXh0f2PF/m38XrEDgh4+iC5RQ0ej6rO7ZyZomlKAZ/+
+   9hIz5LNImqXokRjE6kwu4NVBALzrN5eCsnCJXwt80WWwDHJVYaUvSc3JB
+   lAjqPsMggkqQau4V5s2AoQZ3gYaGAQNA1AstkVP9SCL4b06HekGtVLtAx
+   mdL1tACtYhAdfvpW+DxZdDvkQ+ui3OUHTNGBJilvRWLBwZ1Pozr+uEftD
+   fSAZYrk4dQ1M8HJ/jXNpccQXTQGYcSw4gtYQLLKtxlouockEE+mFbbFGW
+   w==;
+X-CSE-ConnectionGUID: BS666jLJQB+S4cxP5gUUEg==
+X-CSE-MsgGUID: XghqogrXShix6+q3mJKLWg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="88877087"
+X-IronPort-AV: E=Sophos;i="6.20,229,1758610800"; 
+   d="scan'208";a="88877087"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 11:23:35 -0800
+X-CSE-ConnectionGUID: FyDoqD2uSymlZQOerWXn4w==
+X-CSE-MsgGUID: S+0LMvxDRvGXNKL8+imG6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,229,1758610800"; 
+   d="scan'208";a="193479200"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 11:23:35 -0800
+Date: Wed, 26 Nov 2025 11:23:27 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v4 04/11] x86/bhi: Make clear_bhb_loop() effective on
+ newer CPUs
+Message-ID: <20251126192327.4rclrdguxeripnow@desk>
+References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
+ <20251119-vmscape-bhb-v4-4-1adad4e69ddc@linux.intel.com>
+ <4ed6763b-1a88-4254-b063-be652176d1af@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.487.g5c8c507ade-goog
-Message-ID: <20251126191736.907963-1-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH] x86/debug: Fix macro definitions for DR7
- local/global enable bits
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4ed6763b-1a88-4254-b063-be652176d1af@intel.com>
 
-Fix the shifts for the DR7 local/global enable bits.  As called out by the
-comment, the local/global enable bits have a stride of 2, i.e. use every
-other bit.
+On Fri, Nov 21, 2025 at 08:40:44AM -0800, Dave Hansen wrote:
+> On 11/19/25 22:18, Pawan Gupta wrote:
+> > -	CLEAR_BHB_LOOP_SEQ 5, 5
+> > +	/* loop count differs based on CPU-gen, see Intel's BHI guidance */
+> > +	ALTERNATIVE (CLEAR_BHB_LOOP_SEQ 5, 5),  \
+> > +		    __stringify(CLEAR_BHB_LOOP_SEQ 12, 7), X86_FEATURE_BHI_CTRL
+> 
+> There are a million ways to skin this cat. But I'm not sure I really
+> like the end result here. It seems a little overkill to use ALTERNATIVE
+> to rewrite a whole sequence just to patch two constants in there.
+> 
+> What if the CLEAR_BHB_LOOP_SEQ just took its inner and outer loop counts
+> as register arguments? Then this would look more like:
+> 
+> 	ALTERNATIVE "mov  $5, %rdi; mov $5, %rsi",
+> 		    "mov $12, %rdi; mov $7, %rsi",
+> 	...
+> 
+> 	CLEAR_BHB_LOOP_SEQ
 
-Use DR2 instead of DR0 in the debug test to create a data breakpoint to
-demonstrate that using something other than DR0 actually works.
+Following this idea, loop count can be set via ALTERNATIVE within
+clear_bhb_loop() itself. The outer count %ecx is already set outside the
+loops. The only change to the sequence would be to also store inner count
+in a register, and reload %eax from it.
 
-Fixes: f1dcfd54 ("x86: Overhaul definitions for DR6 and DR7 bits")
-Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/asm/debugreg.h |  5 +++--
- x86/debug.c            | 22 +++++++++++++---------
- 2 files changed, 16 insertions(+), 11 deletions(-)
-
-diff --git a/lib/x86/asm/debugreg.h b/lib/x86/asm/debugreg.h
-index a30f9493..47c90ebf 100644
---- a/lib/x86/asm/debugreg.h
-+++ b/lib/x86/asm/debugreg.h
-@@ -37,8 +37,9 @@
-  * by the CPU on task switch), bits 1, 3, 5, and 7 are global enable bits
-  * (never cleared by the CPU).
-  */
--#define DR7_LOCAL_ENABLE_DRx(x)		(BIT(0) << (x))
--#define DR7_GLOBAL_ENABLE_DRx(x)	(BIT(1) << (x))
-+#define DR7_LOCAL_ENABLE_DRx(x)		(BIT(0) << ((x) * 2))
-+#define DR7_GLOBAL_ENABLE_DRx(x)	(BIT(1) << ((x) * 2))
+diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+index 886f86790b44..e4863d6d3217 100644
+--- a/arch/x86/entry/entry_64.S
++++ b/arch/x86/entry/entry_64.S
+@@ -1536,7 +1536,11 @@ SYM_FUNC_START(clear_bhb_loop)
+ 	ANNOTATE_NOENDBR
+ 	push	%rbp
+ 	mov	%rsp, %rbp
+-	movl	$5, %ecx
 +
- #define DR7_ENABLE_DRx(x) \
- 	(DR7_LOCAL_ENABLE_DRx(x) | DR7_GLOBAL_ENABLE_DRx(x))
- 
-diff --git a/x86/debug.c b/x86/debug.c
-index 09f06ef5..1a4ee5c8 100644
---- a/x86/debug.c
-+++ b/x86/debug.c
-@@ -38,7 +38,7 @@ static void handle_db(struct ex_regs *regs)
- 	db_addr[n] = regs->rip;
- 	dr6[n] = read_dr6();
- 
--	if (dr6[n] & 0x1)
-+	if (dr6[n] & DR6_TRAP2)
- 		regs->rflags |= X86_EFLAGS_RF;
- 
- 	if (++n >= 10) {
-@@ -488,29 +488,33 @@ int main(int ac, char **av)
- 	 * The CPU sets/clears bits 0-3 (trap bits for DR0-3) on #DB based on
- 	 * whether or not the corresponding DR0-3 got a match.  All other bits
- 	 * in DR6 are set if and only if their associated breakpoint condition
--	 * is active, and are never cleared by the CPU.  Verify a match on DR0
-+	 * is active, and are never cleared by the CPU.  Verify a match on DR2
- 	 * is reported correctly, and that DR6.BS is not set when single-step
- 	 * breakpoints are disabled, but is left set (if set by software).
++	/* loop count differs based on BHI_CTRL, see Intel's BHI guidance */
++	ALTERNATIVE "movl $5,  %ecx; movl $5, %edx;",	\
++		    "movl $12, %ecx; movl $7, %edx;", X86_FEATURE_BHI_CTRL
++
+ 	ANNOTATE_INTRA_FUNCTION_CALL
+ 	call	1f
+ 	jmp	5f
+@@ -1557,7 +1561,7 @@ SYM_FUNC_START(clear_bhb_loop)
+ 	 * but some Clang versions (e.g. 18) don't like this.
  	 */
- 	n = 0;
- 	extern unsigned char hw_bp1;
--	write_dr0(&hw_bp1);
--	write_dr7(DR7_FIXED_1 | DR7_GLOBAL_ENABLE_DR0);
-+	write_dr2(&hw_bp1);
-+	write_dr7(DR7_FIXED_1 | DR7_GLOBAL_ENABLE_DR2);
- 	asm volatile("hw_bp1: nop");
- 	report(n == 1 &&
- 	       db_addr[0] == ((unsigned long)&hw_bp1) &&
--	       dr6[0] == (DR6_ACTIVE_LOW | DR6_TRAP0),
--	       "hw breakpoint (test that dr6.BS is not set)");
-+	       dr6[0] == (DR6_ACTIVE_LOW | DR6_TRAP2),
-+	       "Wanted #DB on 0x%lx w/ DR6 = 0x%lx, got %u #DBs, addr[0] = 0x%lx, DR6 = 0x%lx",
-+	       ((unsigned long)&hw_bp1), DR6_ACTIVE_LOW | DR6_TRAP2,
-+	       n, db_addr[0], dr6[0]);
- 
- 	n = 0;
- 	extern unsigned char hw_bp2;
--	write_dr0(&hw_bp2);
-+	write_dr2(&hw_bp2);
- 	write_dr6(DR6_BS | DR6_TRAP1);
- 	asm volatile("hw_bp2: nop");
- 	report(n == 1 &&
- 	       db_addr[0] == ((unsigned long)&hw_bp2) &&
--	       dr6[0] == (DR6_ACTIVE_LOW | DR6_BS | DR6_TRAP0),
--	       "hw breakpoint (test that dr6.BS is not cleared)");
-+	       dr6[0] == (DR6_ACTIVE_LOW | DR6_BS | DR6_TRAP2),
-+	       "Wanted #DB on 0x%lx w/ DR6 = 0x%lx, got %u #DBs, addr[0] = 0x%lx, DR6 = 0x%lx",
-+	       ((unsigned long)&hw_bp1), DR6_ACTIVE_LOW | DR6_BS | DR6_TRAP2,
-+	       n, db_addr[0], dr6[0]);
- 
- 	run_ss_db_test(singlestep_basic);
- 	run_ss_db_test(singlestep_emulated_instructions);
-
-base-commit: d2dc9294e25a34110feffb497a29c10f7e2a8ceb
--- 
-2.52.0.487.g5c8c507ade-goog
-
+ 	.skip 32 - 18, 0xcc
+-2:	movl	$5, %eax
++2:	movl	%edx, %eax
+ 3:	jmp	4f
+ 	nop
+ 4:	sub	$1, %eax
 
