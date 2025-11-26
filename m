@@ -1,182 +1,144 @@
-Return-Path: <kvm+bounces-64578-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64579-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 103E0C8794D
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 01:23:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E016C87A86
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 02:12:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EBFE14E12CB
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 00:23:31 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8EB18354F9F
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 01:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFFEA1DD877;
-	Wed, 26 Nov 2025 00:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E522F6923;
+	Wed, 26 Nov 2025 01:12:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XniS5A0m"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="4zYeDp57"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A65148850;
-	Wed, 26 Nov 2025 00:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2854207A;
+	Wed, 26 Nov 2025 01:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764116600; cv=none; b=Y3JHcwwyW797L8wA1kqrJ6I4ifw3jP/7sKbiXAtHy4wegVCd96k2aVRcjFdm8KrqmxMrXEprV4AJ4d0rJkFgjs/dItiP3YLLdBDbY5DB8BibEou07IWck+kqfXb88i6AU9IUrU0dgFSRFKqzNXH2Hhs2d4/jdXgYoMP9VKa0tFc=
+	t=1764119550; cv=none; b=r560oGEbkCH4a0U2rDTalPejLfonjI/cVBjF15tZJYCW/92QJwA4TDNkZFmVb90bohs6qQH2hRYtsdIbQtxfUK9NW+sEQZpuNag2Xyvn9Z/wWpS5D+Jp6aQo/eECgDz7PwDix77jIJWpruy7GuGyMPrXu1q4iqw3hsHBH07aVs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764116600; c=relaxed/simple;
-	bh=jNSFdQCLhdJyzqyDdBupTSBjX5ORPHs5VM+yw2SDmzU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RmmA5JxOizc0dceo65XDGbT++U+17zmdFFPoFg2PEK1YqpljpnMFKetgFUoMC9TegfpJ+TuxWpHUNRIH8ALshf8pwgyPe7G6AKwadG+OnTM+qUAnP57M9FEV9ZcsHSkV1G+4OyEFph+PNlPr1UqQjlNXR92GKU6DiqZOyAqei1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XniS5A0m; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764116598; x=1795652598;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=jNSFdQCLhdJyzqyDdBupTSBjX5ORPHs5VM+yw2SDmzU=;
-  b=XniS5A0m35sAoMkpgcRsVzbaWgJstJyq6FA5G0/CwHZnnjlZP2B9ga5G
-   LEItvKO6gljXG2QX/k+njdhzg+ANLaFx0vD76ur1QIYXFJopUBmNhYjd8
-   TSEYXQc8zD5onNRxgVlwTGH/HPzsKYt2iFEOOW/5mdwZgM984JprLMKO/
-   IMkbdthdzWf2IlGaq7u7YWrLrPk+LGtgYCqaBdYlJQ2LqChzaaqQOnkJH
-   hAFT4zR/2yZF1qEVg2XiF6/bYYqMJTpgp8MDBZoLv5vBvKCBZymMhzX66
-   Gy2zs15YriofLwx0+I98Js8VglDqewmVvh1twG035VwsUTK0ynlOaZaXG
-   g==;
-X-CSE-ConnectionGUID: ucAPYeJ+Qg+H0kr2PqHh6A==
-X-CSE-MsgGUID: LfCaZAxoQKS/qWsfrr7jpA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="66306976"
-X-IronPort-AV: E=Sophos;i="6.20,227,1758610800"; 
-   d="scan'208";a="66306976"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 16:23:18 -0800
-X-CSE-ConnectionGUID: W+654JrHR0i0NNZKwcIPrQ==
-X-CSE-MsgGUID: g62AlCY3TmyGnusI1wnrTg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,227,1758610800"; 
-   d="scan'208";a="197267661"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.213]) ([10.124.240.213])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 16:23:10 -0800
-Message-ID: <f7a84eb0-eb64-4cdf-801d-088bbdbce0b4@linux.intel.com>
-Date: Wed, 26 Nov 2025 08:23:07 +0800
+	s=arc-20240116; t=1764119550; c=relaxed/simple;
+	bh=O0ZRBT+tVwwcKhGWyDE1V1whGqdO4aZFHE3C/lLgvHg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=D8ifmSwwnB87RNn3MV7pghmml9rgdaJXtsmlCC8TDPT0c0eLqnRXmszfa7EQp1cDihhk89KPEpOzFAGVtE6oP0pyJ8IMYHL5F7bKHf0aJ60g1YmBn7Saofv2E3ccTOykSgy6EioyjRgwYO866WQ03nJ4QCTeFUTtfmLhzxmddWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=4zYeDp57; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5APHf2Rl786424;
+	Tue, 25 Nov 2025 17:11:46 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=0pwajfJmeTimpc9k6J
+	HG6Zxex5YoS5wwfaShFryGPJI=; b=4zYeDp57KcBNA3YeNGWPs58Hr8F7AQ0S/M
+	guQ76Y3JV9xYiMROhiaa817hfCV7iah8M71gcbf35S/NXnYg3AiQBM3Mm+Zg3yVO
+	xfg5dib7uqc1olS565bn5kqgusWa3r85wtIwhl7aRo6RrHaLc1Vc26C5oGu/2jv/
+	XiXojQgpd9QOguDmMTSOK5gm0PU3RXcSSu37RfgnP/G1488nkJ9X+G4SMGqkJMb2
+	/VWvDOV8A/+2bad6jxLLYGc6mmAYvSVYFSkP5dV7PtfS1XnpTfQRIAdH4LNGySIL
+	7EaxjdVBqexlz7GHB27foLAX/SlZIUmyxttekMDCWppghDaCvReQ==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4anh2qu47c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 25 Nov 2025 17:11:46 -0800 (PST)
+Received: from devgpu015.cco6.facebook.com (2620:10d:c0a8:1c::1b) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Wed, 26 Nov 2025 01:11:45 +0000
+From: Alex Mastro <amastro@fb.com>
+Date: Tue, 25 Nov 2025 17:11:18 -0800
+Subject: [PATCH] dma-buf: fix integer overflow in fill_sg_entry() for
+ buffers >= 8GiB
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 28/44] KVM: x86/pmu: Load/save GLOBAL_CTRL via
- entry/exit fields for mediated PMU
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>,
- Mingwei Zhang <mizhang@google.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Sandipan Das <sandipan.das@amd.com>
-References: <20250806195706.1650976-1-seanjc@google.com>
- <20250806195706.1650976-29-seanjc@google.com> <aSUK8FuWT4lpMP3F@google.com>
- <83067602-325a-4655-a1b7-e6bd6a31eed4@linux.intel.com>
- <aSXigAQznhuxZmy7@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <aSXigAQznhuxZmy7@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-ID: <20251125-dma-buf-overflow-v1-1-b70ea1e6c4ba@fb.com>
+X-B4-Tracking: v=1; b=H4sIALVTJmkC/x3MwQmEMBAF0FaGf3bAJEQkrSweXJ3ogJolQV0Qe
+ xd8BbwLRbJKQaALWQ4tmjYEMhVhmPttEtYRgWBr642xnse15+8eOR2S45JOFme9i6ZuxTWoCL8
+ sUf9v+enu+wHmIfnEYgAAAA==
+X-Change-ID: 20251125-dma-buf-overflow-e3253f108e36
+To: Sumit Semwal <sumit.semwal@linaro.org>,
+        =?utf-8?q?Christian_K=C3=B6nig?=
+	<christian.koenig@amd.com>,
+        Alex Williamson <alex@shazbot.org>
+CC: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        "Kevin
+ Tian" <kevin.tian@intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>, <linux-media@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <linaro-mm-sig@lists.linaro.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Ankit Agrawal <ankita@nvidia.com>, Alex Mastro
+	<amastro@fb.com>
+X-Mailer: b4 0.14.3
+X-Proofpoint-GUID: q8INm3I2xOg6cx0iIU4Kc3VRApXBjpn6
+X-Proofpoint-ORIG-GUID: q8INm3I2xOg6cx0iIU4Kc3VRApXBjpn6
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI2MDAwNyBTYWx0ZWRfX3XhekP/4jYMT
+ h3vlGZOu7PIVj0MxvIyAWPxvb0dUEReVbwEsSMmKyToaIx2aOj91g42tgfrXUib6UyLFSWNr8qf
+ 7ODlUPowzwVsbZKHSPxA1Cit7LdE9nHT2mTRsi8mItZ6+MoE3NRow2svUKQY+gt6NBjPQ/KyOdY
+ I450z/LaPqbAkuP6NwG8DWeOHoVdX/TXt9ZC9SX7f/j6vz/doHk2l4DLH+uLL8q0bal5fz65EAD
+ J99aaYXO7w5uv3R5kPgOS9OxKZHevVk1EL5T/fU+nAci7mPyq62sruU+NWuQy4FTLziGRoAkvq7
+ o++VYVWmnJ/baF8BRLlL+SGtwCJSJVVR7QJOv+dSVhTPlam+v2x3cWVV0kurbTljtP6emOpAsa2
+ iLJVjmJp80u6z0mI7C31SW+LSuiglg==
+X-Authority-Analysis: v=2.4 cv=F9dat6hN c=1 sm=1 tr=0 ts=692653d2 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=3j4BkbkPAAAA:8 a=Ikd4Dj_1AAAA:8 a=FOH2dFAWAAAA:8
+ a=UiN8ms7W_JB_tl96y0MA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-25_02,2025-11-25_01,2025-10-01_01
 
+fill_sg_entry() splits large DMA buffers into multiple scatter-gather
+entries, each holding up to UINT_MAX bytes. When calculating the DMA
+address for entries beyond the second one, the expression (i * UINT_MAX)
+causes integer overflow due to 32-bit arithmetic.
 
-On 11/26/2025 1:08 AM, Sean Christopherson wrote:
-> On Tue, Nov 25, 2025, Dapeng Mi wrote:
->> On 11/25/2025 9:48 AM, Sean Christopherson wrote:
->>>> +	if (host_pmu->version < 4 || !(host_perf_cap & PERF_CAP_FW_WRITES))
->>>> +		return false;
->>>> +
->>>> +	/*
->>>> +	 * All CPUs that support a mediated PMU are expected to support loading
->>>> +	 * and saving PERF_GLOBAL_CTRL via dedicated VMCS fields.
->>>> +	 */
->>>> +	if (WARN_ON_ONCE(!cpu_has_load_perf_global_ctrl() ||
->>>> +			 !cpu_has_save_perf_global_ctrl()))
->>>> +		return false;
->>> And so this WARN fires due to cpu_has_save_perf_global_ctrl() being false.  The
->>> bad changelog is mine, but the code isn't entirely my fault.  I did suggest the
->>> WARN in v3[1], probably because I forgot when PMU v4 was introduced and no one
->>> corrected me.
->>>
->>> v4 of the series[2] then made cpu_has_save_perf_global_ctrl() a hard requirement,
->>> based on my miguided feedback.
->>>
->>>    * Only support GLOBAL_CTRL save/restore with VMCS exec_ctrl, drop the MSR
->>>      save/retore list support for GLOBAL_CTRL, thus the support of mediated
->>>      vPMU is constrained to SapphireRapids and later CPUs on Intel side.
->>>
->>> Doubly frustrating is that this was discussed in the original RFC, where Jim
->>> pointed out[3] that requiring VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL would prevent
->>> enabling the mediated PMU on Skylake+, and I completely forgot that conversation
->>> by the time v3 of the series rolled around :-(
->> VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL is introduced from SPR and later. I
->> remember the original requirements includes to support Skylake and Icelake,
->> but I ever thought there were some offline sync and the requirement changed...
-> Two things:
->
->  1) Upstream's "requirements" are not the same as Google's requirements (or those
->     of any company/individual).  Upstream most definitely is influenced by the
->     needs and desires of end users, but ultimately the decision to do something
->     (or not) is one that needs to be made by the upstream community.
->
->  2) Decisions made off-list need to be summarized and communicated on-list,
->     especially in cases like this where it's a relatively minor detail in a
->     large series/feature, and thus easy to overlook.
->
-> I'll follow-up internally to make sure these points are well-understood by Google
-> folks as well (at least, those working on KVM).
+This manifests when the input arg length >= 8 GiB results in looping for
+i >= 2.
 
-Understood and would follow.
+Fix by casting i to dma_addr_t before multiplication.
 
+Fixes: 3aa31a8bb11e ("dma-buf: provide phys_vec to scatter-gather mapping routine")
+Signed-off-by: Alex Mastro <amastro@fb.com>
+---
+More color about how I discovered this in [1] for the commit at [2]:
 
->
->> My bad,
-> Eh, this was a group "effort".  I'm as much to blame as anyone else.
->
->> I should double confirm this at then.
-> No need, as above, Google's requirements (assuming the requirements you're referring
-> to are coming from Google people) are effectively just one data point.  At this
-> point, I want to drive the decision to support Sylake+ (or not) purely through
-> discussion of upstream patches.
->
->>> As mentioned in the discussion with Jim, _if_ PMU v4 was introduced with ICX (or
->>> later), then I'd be in favor of making VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL a hard
->>> requirement.  But losing supporting Skylake+ is a bit much.
->>>
->>> There are a few warts with nVMX's use of the auto-store list that need to be
->>> cleaned up, but on the plus side it's also a good excuse to clean up
->>> {add,clear}_atomic_switch_msr(), which have accumulated some cruft and quite a
->>> bit of duplicate code.  And while I still dislike using the auto-store list, the
->>> code isn't as ugly as it was back in v3 because we _can_ make the "load" VMCS
->>> controls mandatory without losing support for any CPUs (they predate PMU v4).
->> Yes, xxx_atomic_switch_msr() helpers need to be cleaned up and optimized. I
->> suppose we can have an independent patch-set to clean up and support
->> global_ctrl with auto-store list for Skylake and Icelake.
-> I have the code written (I wanted to see how much complexity it would add before
-> re-opening this discussion).  My plan is to put the Skylake+ support at the end
-> of the series, not a separate series, so that it can be reviewed in one shot.
-> E.g. if we can make a change in the "main" series that would simplify Skylake+
-> support, then I'd prefer to find and implement any such change right away.
+[1] https://lore.kernel.org/all/aSZHO6otK0Heh+Qj@devgpu015.cco6.facebook.com
+[2] https://lore.kernel.org/all/20251120-dmabuf-vfio-v9-6-d7f71607f371@nvidia.com
+---
+ drivers/dma-buf/dma-buf-mapping.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Sure. Thanks.
+diff --git a/drivers/dma-buf/dma-buf-mapping.c b/drivers/dma-buf/dma-buf-mapping.c
+index b4819811a64a..b7352e609fbd 100644
+--- a/drivers/dma-buf/dma-buf-mapping.c
++++ b/drivers/dma-buf/dma-buf-mapping.c
+@@ -24,7 +24,7 @@ static struct scatterlist *fill_sg_entry(struct scatterlist *sgl, size_t length,
+ 		 * does not require the CPU list for mapping or unmapping.
+ 		 */
+ 		sg_set_page(sgl, NULL, 0, 0);
+-		sg_dma_address(sgl) = addr + i * UINT_MAX;
++		sg_dma_address(sgl) = addr + (dma_addr_t)i * UINT_MAX;
+ 		sg_dma_len(sgl) = len;
+ 		sgl = sg_next(sgl);
+ 	}
 
+---
+base-commit: 5415d887db0e059920cb5673a32cc4d66daa280f
+change-id: 20251125-dma-buf-overflow-e3253f108e36
+
+Best regards,
+-- 
+Alex Mastro <amastro@fb.com>
 
 
