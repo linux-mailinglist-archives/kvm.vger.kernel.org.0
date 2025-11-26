@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-64741-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64742-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A32BEC8BA3B
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 20:41:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB237C8BADC
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 20:47:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CDD50359C4B
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 19:41:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DCA73BA1E0
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 19:41:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6696134DB4E;
-	Wed, 26 Nov 2025 19:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC6634DCC9;
+	Wed, 26 Nov 2025 19:36:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pHWrfcrC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mk7cMxbX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB40B34CFDC
-	for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 19:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3255134D3B5
+	for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 19:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764185804; cv=none; b=cDWRE9WtNVGy5h+dhfeWlTEa45/wYE3UwZqKecsTtGwBLoW2UxdggcSpZQANu18ordQFy+nBpGCuPM1hphlRNtZj6eljsOCd4RUeGLeUH0d9vNk810iLDByHr+h9uNaC7ApRue+nrKROG7piiwmMbwGekaTSh9yMdZZJRXkzNY4=
+	t=1764185805; cv=none; b=nYcIR0UDLeMJd4REIz8CIQlIfM8iqy3VNfC13kxAk4H75nE/egeZF6pxBEafgbOklerHvy2iifOcaL+56jXQA7QDWtqHm6d090sl6KxcTiv26hOjLLgoAJwGNeRM76xBnrpERrYaZCKF7HkP3+hWEmsV8HNuVGxzQzsfSqq8o2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764185804; c=relaxed/simple;
-	bh=pY5ouGUCyRUEJXsQXzAc3UxouobBtC66I9KMuiV6pDg=;
+	s=arc-20240116; t=1764185805; c=relaxed/simple;
+	bh=AKg0E0qnouOBnaL90KIbwoCnCOQpIGGOxs9nH2+RlA4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Of0ig7ghJj5GEHB9+S2BLfRtRb6BW7tf/tqR8vgKQcZIK9VR3xvLNhvIsOE7ghhV/PeaiSn8DhwIDE1ovTZ54P21PjQ1yzDZI22yf1RRMFYncpbRAiGlT/uBoeehZfFTM8q5ydiQTrKhtuv0CeBhTlQqRY2pl3HCqtileRYit5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pHWrfcrC; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=dgbxkS88WLZ/ZIMzJ4BRLloCVk1RdnFuGY7efpkF6bXmIAAWF8gUTxOT49MgIUKQ+0m1aAf4bAnyjjOrT1m0MuWuKR0oqThjEZuXmfoElkEExSadqAKmfFv3DR7C9PlC14IaFxv9ED/ZEsUG3rJhAgvcrSZ3ntDauOcHcRSDVn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mk7cMxbX; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-bbcf3bd4c8fso78481a12.0
-        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 11:36:41 -0800 (PST)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7c7957d978aso62291b3a.1
+        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 11:36:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764185801; x=1764790601; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1764185803; x=1764790603; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m959yfvIsSxpy5q7Eg0smleSkVURLFC+s19Qeh/qusk=;
-        b=pHWrfcrCCPVOmeBv0AXoHItMQ/DNkudESfPMrswO4cgI7+NRV6hU8l70LGFfSBEiSv
-         DQ1eDgKOBEOZ+pEuwwiF9w32FfooK6K/YzdbjHXqLEVkQn/mtJfQ6uxX7E6zbu07vrik
-         DyJGx8pT2BcATAp/Cz23dNdsj8/bYIq8Fd90/r3jG2SlNhuazdk+l8wv2HqiejJ1NAcI
-         LuMQZq14+6JUYV2ZgpCxnKz0GcKO0qEttdSRwvrMIjYyV5tIB2djsJ4lRvE0nljBIqtN
-         ydXJEHYteKOmGd3bYg6P55iZsCBP/Bhafhfa+Cr8Cwtk0mY9m4oWt9mva+yblU/LWBbK
-         U8PQ==
+        bh=2mMhadFzAEncdROdPe4thGWEZeQry8cuGMCxEDY4Otw=;
+        b=Mk7cMxbXLvjHycUbk+yGO+lx4g0Rp90S77qZcZed7HSDZVtbNy+Bg6WbU3PrT7Et3+
+         /sl2RqW9TDxBvcqUGvqA2aa1ZzgPZKh8QoVbop0w6i0nWEcuu0emi1+fViNhaQKT+vNz
+         2XZl/42BBvSoCrSY8FK2NDGKAhlDfet0SCQs9p9CXthktdSy4xHa5VHVwvi1dEvE2Nxy
+         99t0wEaEQya1qQBhU5LT5RRYOeOLhWfRyy9GjecfuvDKSXL3MDMO68TH8YTELD/6/FgL
+         Rg13Pj0nrYKOZEDsBwOrdQeg0BxPJUViz1EtrpLbfa0o2xVwDkSPERny40htaNYMeogA
+         dkbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764185801; x=1764790601;
+        d=1e100.net; s=20230601; t=1764185803; x=1764790603;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m959yfvIsSxpy5q7Eg0smleSkVURLFC+s19Qeh/qusk=;
-        b=lUKnH0iWRw8hlsvMBda/h7t/isYih3p6pzwUTJ10oBLrGlU5URf80+s1Nr7NVaXoBk
-         /2Se5YO0L3zDG0fitE8LyeMJUc8+eftkkVyZdk2CiHQF5otIg8fyd/RvEwwlUV+7BUbr
-         keRHJXhd/7JaYHwquF8Dm+oc7zbgaO9+iW7VOpWI9rpfiV/KUxH5jXnSzRK+7/HDemJH
-         RrlpaLM3q33AaPZcRm91WFWlt29gD+C1y4qmm6fAyPlv5LxuwTMEbyPlLWYPtB2TQafO
-         FpuxZWkGD8w5sKuLJJ04rSyU8BQT1EcLpNSIRcUnyKKXSIsSJdYqpc6+2Y2LTfti4tZt
-         tbJw==
-X-Forwarded-Encrypted: i=1; AJvYcCVwfzfxTmYvsDV3ncJXrKVn5b0pam3YO9LZEld5iI9rxlPHKIWXLUi8XvEfQZrTOw18vH8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJXODQBJyO3AngmXeGyE6I2AJ/KdQWoYVpORsH7KYr7QKit+/I
-	qeqgnoFyK+YwfEnYO4TepCpEledc2ceqrG2w7uUOTbBoyQGZng5HbUNvY1AtMiPtJMwElyYQxJF
-	cSeCu89yB5x3tOA==
-X-Google-Smtp-Source: AGHT+IFHEidLnQkcHmYLLGmMjLxzA1O3bNZ0x68Qy0dH/iUpCs9DOSGGUEyYCq/FUTYeONv/KIiX9w+sQ3BkIA==
-X-Received: from pfcs3.prod.google.com ([2002:a05:6a00:6fc3:b0:7b8:8099:b70b])
+        bh=2mMhadFzAEncdROdPe4thGWEZeQry8cuGMCxEDY4Otw=;
+        b=uiW5Zz7UPWuwcvT+0FdvC2QdeimTXjGQex6CNySg3xBLtWVT8YcaA0K07vSow5N/je
+         2+q6/RfHUh2ekVdRJnMyTErxC98Q2xQCzvlneFo2BlIxPTRjLiMK7TZLpxQ1pgNHzC9A
+         UkWgxRB4P4WbbdyrJYC0+Tpke+ZqbPHCwA8ZZZICmq7eMUkmx0r1zHVCHL8qf6BaJsaU
+         xcKw87+P2lY1R2Dgh8H6jJXiNQercl+57rp2BeYHZSWKlZyGSHVbqeLKjE0R+pmWyqz7
+         UCrjVLkFbvIumCX4VStuZxJ0Rvtnorh0yTW3ephvNGoUG95RnBq9/r/VNnhaRURIvdKd
+         b7zg==
+X-Forwarded-Encrypted: i=1; AJvYcCU2ZB89OZ2zNTOsukTUkllDbOLmunJUzqgzky1754OcXsSnRpBsXF7e/t++1aA57gswl6E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7vfQHskz38SAwVVSu7Ktp7Hku3mfD/CILcDh+GB0R9bobKlCc
+	1ifvLQ9F8nQnXPTlK7RPsjsD0TRk+XVls5gXXHQU3eUjneDRBL3xolrFQjqQbCMghf0sheeUKA0
+	dkekDoopQYNH0Dw==
+X-Google-Smtp-Source: AGHT+IG0nWsINIf/GruvQ2HPIp2jBBinQeZ2Mfu1D9y30mRN7EoyzQVebfADvYhxmegugqK6CpozEorpQsDNYQ==
+X-Received: from pfbcw14.prod.google.com ([2002:a05:6a00:450e:b0:7ba:8e7:5499])
  (user=dmatlack job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:2590:b0:35d:1bcd:687f with SMTP id adf61e73a8af0-3614f2550a8mr23300680637.9.1764185800837;
- Wed, 26 Nov 2025 11:36:40 -0800 (PST)
-Date: Wed, 26 Nov 2025 19:36:06 +0000
+ 2002:a05:6a21:32a2:b0:340:db9b:cfe8 with SMTP id adf61e73a8af0-36150e1fc11mr23324744637.12.1764185802504;
+ Wed, 26 Nov 2025 11:36:42 -0800 (PST)
+Date: Wed, 26 Nov 2025 19:36:07 +0000
 In-Reply-To: <20251126193608.2678510-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251126193608.2678510-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.52.0.487.g5c8c507ade-goog
-Message-ID: <20251126193608.2678510-20-dmatlack@google.com>
-Subject: [PATCH 19/21] vfio: selftests: Expose low-level helper routines for
- setting up struct vfio_pci_device
+Message-ID: <20251126193608.2678510-21-dmatlack@google.com>
+Subject: [PATCH 20/21] vfio: selftests: Verify that opening VFIO device fails
+ during Live Update
 From: David Matlack <dmatlack@google.com>
 To: Alex Williamson <alex@shazbot.org>
 Cc: Adithya Jayachandran <ajayachandra@nvidia.com>, Alex Mastro <amastro@fb.com>, 
@@ -96,117 +96,73 @@ Cc: Adithya Jayachandran <ajayachandra@nvidia.com>, Alex Mastro <amastro@fb.com>
 	Zhu Yanjun <yanjun.zhu@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 
-Expose a few low-level helper routings for setting up vfio_pci_device
-structs. These routines will be used in a subsequent commit to assert
-that VFIO_GROUP_GET_DEVICE_FD fails under certain conditions.
+Verify that opening a VFIO device through its cdev file and via
+VFIO_GROUP_GET_DEVICE_FD both fail with -EBUSY if the device was
+preserved across a Live Update. When a device file is preserve across a
+Live Update, the file must be retrieved from /dev/liveupdate, not from
+VFIO directly.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- .../lib/include/libvfio/vfio_pci_device.h     |  5 +++
- .../selftests/vfio/lib/vfio_pci_device.c      | 33 +++++++++++++------
- 2 files changed, 28 insertions(+), 10 deletions(-)
+ .../vfio/vfio_pci_liveupdate_kexec_test.c     | 38 +++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-index 896dfde88118..2389c7698335 100644
---- a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-+++ b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-@@ -125,4 +125,9 @@ static inline bool vfio_pci_device_match(struct vfio_pci_device *device,
- 
- const char *vfio_pci_get_cdev_path(const char *bdf);
- 
-+/* Low-level routines for setting up a struct vfio_pci_device */
-+struct vfio_pci_device *vfio_pci_device_alloc(const char *bdf, struct iommu *iommu);
-+void vfio_pci_group_setup(struct vfio_pci_device *device);
-+void vfio_pci_iommu_setup(struct vfio_pci_device *device);
-+
- #endif /* SELFTESTS_VFIO_LIB_INCLUDE_LIBVFIO_VFIO_PCI_DEVICE_H */
-diff --git a/tools/testing/selftests/vfio/lib/vfio_pci_device.c b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-index e9423dc3864a..c1a3886dee30 100644
---- a/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-+++ b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-@@ -199,7 +199,7 @@ static unsigned int vfio_pci_get_group_from_dev(const char *bdf)
- 	return group;
+diff --git a/tools/testing/selftests/vfio/vfio_pci_liveupdate_kexec_test.c b/tools/testing/selftests/vfio/vfio_pci_liveupdate_kexec_test.c
+index 95644c3bd2d3..925c5fc30d56 100644
+--- a/tools/testing/selftests/vfio/vfio_pci_liveupdate_kexec_test.c
++++ b/tools/testing/selftests/vfio/vfio_pci_liveupdate_kexec_test.c
+@@ -36,6 +36,42 @@ static void before_kexec(int luo_fd)
+ 	daemonize_and_wait();
  }
  
--static void vfio_pci_group_setup(struct vfio_pci_device *device, const char *bdf)
-+void vfio_pci_group_setup(struct vfio_pci_device *device)
- {
- 	struct vfio_group_status group_status = {
- 		.argsz = sizeof(group_status),
-@@ -207,7 +207,7 @@ static void vfio_pci_group_setup(struct vfio_pci_device *device, const char *bdf
- 	char group_path[32];
- 	int group;
- 
--	group = vfio_pci_get_group_from_dev(bdf);
-+	group = vfio_pci_get_group_from_dev(device->bdf);
- 	snprintf(group_path, sizeof(group_path), "/dev/vfio/%d", group);
- 
- 	device->group_fd = open(group_path, O_RDWR);
-@@ -219,14 +219,12 @@ static void vfio_pci_group_setup(struct vfio_pci_device *device, const char *bdf
- 	ioctl_assert(device->group_fd, VFIO_GROUP_SET_CONTAINER, &device->iommu->container_fd);
- }
- 
--static void vfio_pci_container_setup(struct vfio_pci_device *device, const char *bdf)
-+void vfio_pci_iommu_setup(struct vfio_pci_device *device)
- {
- 	struct iommu *iommu = device->iommu;
- 	unsigned long iommu_type = iommu->mode->iommu_type;
- 	int ret;
- 
--	vfio_pci_group_setup(device, bdf);
--
- 	ret = ioctl(iommu->container_fd, VFIO_CHECK_EXTENSION, iommu_type);
- 	VFIO_ASSERT_GT(ret, 0, "VFIO IOMMU type %lu not supported\n", iommu_type);
- 
-@@ -236,8 +234,14 @@ static void vfio_pci_container_setup(struct vfio_pci_device *device, const char
- 	 * because the IOMMU type is already set.
- 	 */
- 	(void)ioctl(iommu->container_fd, VFIO_SET_IOMMU, (void *)iommu_type);
-+}
- 
--	device->fd = ioctl(device->group_fd, VFIO_GROUP_GET_DEVICE_FD, bdf);
-+static void vfio_pci_container_setup(struct vfio_pci_device *device)
++static void check_open_vfio_device_fails(void)
 +{
-+	vfio_pci_group_setup(device);
-+	vfio_pci_iommu_setup(device);
++	const char *cdev_path = vfio_pci_get_cdev_path(device_bdf);
++	struct vfio_pci_device *device;
++	struct iommu *iommu;
++	int ret, i;
 +
-+	device->fd = ioctl(device->group_fd, VFIO_GROUP_GET_DEVICE_FD, device->bdf);
- 	VFIO_ASSERT_GE(device->fd, 0);
- }
- 
-@@ -337,9 +341,7 @@ static void vfio_pci_iommufd_setup(struct vfio_pci_device *device,
- 	vfio_device_attach_iommufd_pt(device->fd, device->iommu->ioas_id);
- }
- 
--struct vfio_pci_device *__vfio_pci_device_init(const char *bdf,
--					       struct iommu *iommu,
--					       int device_fd)
-+struct vfio_pci_device *vfio_pci_device_alloc(const char *bdf, struct iommu *iommu)
++	printf("Checking open(%s) fails\n", cdev_path);
++	ret = open(cdev_path, O_RDWR);
++	VFIO_ASSERT_EQ(ret, -1);
++	VFIO_ASSERT_EQ(errno, EBUSY);
++	free((void *)cdev_path);
++
++	for (i = 0; i < nr_iommu_modes; i++) {
++		if (!iommu_modes[i].container_path)
++			continue;
++
++		iommu = iommu_init(iommu_modes[i].name);
++
++		device = vfio_pci_device_alloc(device_bdf, iommu);
++		vfio_pci_group_setup(device);
++		vfio_pci_iommu_setup(device);
++
++		printf("Checking ioctl(group_fd, VFIO_GROUP_GET_DEVICE_FD, \"%s\") fails (%s)\n",
++		       device_bdf, iommu_modes[i].name);
++
++		ret = ioctl(device->group_fd, VFIO_GROUP_GET_DEVICE_FD, device->bdf);
++		VFIO_ASSERT_EQ(ret, -1);
++		VFIO_ASSERT_EQ(errno, EBUSY);
++
++		close(device->group_fd);
++		free(device);
++		iommu_cleanup(iommu);
++	}
++}
++
+ static void after_kexec(int luo_fd, int state_session_fd)
  {
  	struct vfio_pci_device *device;
+@@ -44,6 +80,8 @@ static void after_kexec(int luo_fd, int state_session_fd)
+ 	int device_fd;
+ 	int stage;
  
-@@ -349,9 +351,20 @@ struct vfio_pci_device *__vfio_pci_device_init(const char *bdf,
- 	device->bdf = bdf;
- 	device->iommu = iommu;
++	check_open_vfio_device_fails();
++
+ 	restore_and_read_stage(state_session_fd, STATE_TOKEN, &stage);
+ 	VFIO_ASSERT_EQ(stage, 2);
  
-+	return device;
-+}
-+
-+struct vfio_pci_device *__vfio_pci_device_init(const char *bdf,
-+					       struct iommu *iommu,
-+					       int device_fd)
-+{
-+	struct vfio_pci_device *device;
-+
-+	device = vfio_pci_device_alloc(bdf, iommu);
-+
- 	if (device->iommu->mode->container_path) {
- 		VFIO_ASSERT_EQ(device_fd, -1);
--		vfio_pci_container_setup(device, bdf);
-+		vfio_pci_container_setup(device);
- 	} else {
- 		vfio_pci_iommufd_setup(device, bdf, device_fd);
- 	}
 -- 
 2.52.0.487.g5c8c507ade-goog
 
