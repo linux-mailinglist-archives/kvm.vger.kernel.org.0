@@ -1,75 +1,75 @@
-Return-Path: <kvm+bounces-64656-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64657-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFD02C89BFB
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 13:24:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C711FC89C88
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 13:33:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AF02C4E3892
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 12:24:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A3AB34ED282
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 12:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 316FC327201;
-	Wed, 26 Nov 2025 12:24:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F897327214;
+	Wed, 26 Nov 2025 12:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tqznRrsW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PE4bVLYr"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFAEE302CA2;
-	Wed, 26 Nov 2025 12:24:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D68531195B;
+	Wed, 26 Nov 2025 12:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764159857; cv=none; b=Ki3AOMJLHqkDOYA3yHQko3b0U22W9HWDRrWLaZORLT5b4e/7/QnIKJv41CCpT/Tpz7k2vCFakvDjeP7LMKkR9Aq3YSQq1KRYMaNwCAdaKWZgz6N7S/lKBZnxZhsbG9XbQ3wChH1Mzt7fnZyxft0STTU/Hg+lnFJC6kGZfcaF3pU=
+	t=1764160314; cv=none; b=r0A7sYhjM8Y5ZTREOU1NQOk7JWyVsDK+eFdReLHNwQuR7NNh+HfzKRr4/rHGmaXRbAgUIufj3rEslWaPFgXq25J5ZVsmlILZQ6ExsNwnUK/fbBs/I+W5rwrU0/+eMSTQdw1zr3ZDDDmajk0Z000LL6937qngRvcNvGPx92J/fDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764159857; c=relaxed/simple;
-	bh=oYYQp+l8aIiP8kEj/KfY/GxLglDJdYfR9qjKsiJjPiM=;
+	s=arc-20240116; t=1764160314; c=relaxed/simple;
+	bh=p+GBjkaSpWnHadaVNmoqW3obGAcDGpHJ5DR8QphrQjI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q/5C8jcG5N03eYxXBFcemaVP7Ek2+zZot5EAIXkpMwOz4EbF09vRJy08L5JuRzheJH4sGiUox4jamKQDwgS55pZ9h+2pmKnEoDW/U6AYK7nfS14KRX83H0gI8V2lig3zVjRkAqK9jVfVBP0NsU+bOxsXAiesP47aKx4Fx3/PN6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tqznRrsW; arc=none smtp.client-ip=148.163.156.1
+	 In-Reply-To:Content-Type; b=ls4LN+HgG3sjNpxR9gMIM6VDOxdcXsGoO8vJcP4UrLnO7dwC7QLyghjlJINKgWmAs+jJeOBR/iu0oWwHjhxDm6/4KCb8TSkgwSC/mhMB5pEgXAcpMn83j8Wwj+Ck3R4ThWHV9MLwEX9vZtljxRBDK1OctNkC3o8lKdSqTz/uXLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PE4bVLYr; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AQ1aCpE002832;
-	Wed, 26 Nov 2025 12:23:53 GMT
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AQ2pVgR019516;
+	Wed, 26 Nov 2025 12:31:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=lvovGF
-	cDVl+Ftj4QmZm1ewkJ4R0ThN853kgDcodv5Ew=; b=tqznRrsWotcuDD6E2w5gjA
-	oXRJvz8M1c0DyUXv2tmDxJ1j+nGU7aCqn53IphWqtIl2hlEAcOWz4wDu8M3Nd3qD
-	SRLJLvBFej0NE2LBsoYGRRJ+bDZgcv/ZCFzqkLcJQ0fq60gPnrU9qHOOAjgQh+VO
-	TK9renqFr2qC6BHRW38JvPq3qI/onpCUu7L9zokWetiA/E2xGMsJ8vUqFf2pdwxJ
-	R4IZ+DDpicBFwWkbwUxNRG2NbpG9fTBRCAHkSnrxFIFTGKBLwCyIF6z+ZZ3SKy/g
-	Lmq+F/6tgvJs4ox1y95BHwVKc4lWKFI9XbkmklqqcesAqB5tjYSRwtZXnfoaU+fg
+	:message-id:mime-version:references:subject:to; s=pp1; bh=X7isIC
+	BlGRh2WtLNyBuUcYq9+0hXV9ozBuin60w+mWw=; b=PE4bVLYrp7jzRHgYNJ/5qm
+	BsrbF5mJGrFeIlMBEGhm1iitXQQCewGHu6cgfhUo3O3Rm0DAQggHw79rDHlHBxdM
+	pHSxcuvTYXlfWXHYNXqEjr32memGElN5G3uRJVW+hOQTxgHETocwVKcsJEeN70h0
+	fSlsv3MGVsZxT6NtnxBmslW1Ev1aharUukn1EGOiFyd/8Try72BB0a51ePt0SuIi
+	NSSd+SKhlzqnI9tfzRTNQXkHGnTZmwi+VRsGN/S3A0o+YMj/6B58JA1tBMcI8i5x
+	/1EDRotFZHHcTr9Y9+3rdDFpepPXH1yNlui4Y5LiyIBhMWAyYRjKVm9JvKOkNE0A
 	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak4uvc14s-1
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak4w9m2v0-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Nov 2025 12:23:53 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AQBVNt6013839;
-	Wed, 26 Nov 2025 12:23:52 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4akrgnaapd-1
+	Wed, 26 Nov 2025 12:31:38 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AQC7vUo016418;
+	Wed, 26 Nov 2025 12:31:37 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4aks0ka9d7-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Nov 2025 12:23:51 +0000
+	Wed, 26 Nov 2025 12:31:37 +0000
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AQCNmeS51905008
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AQCVX1Q43057606
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 26 Nov 2025 12:23:48 GMT
+	Wed, 26 Nov 2025 12:31:33 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EEAE020043;
-	Wed, 26 Nov 2025 12:23:47 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 3B71120040;
+	Wed, 26 Nov 2025 12:31:33 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 526BD20040;
-	Wed, 26 Nov 2025 12:23:47 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 8C2562004B;
+	Wed, 26 Nov 2025 12:31:30 +0000 (GMT)
 Received: from [9.111.66.134] (unknown [9.111.66.134])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 26 Nov 2025 12:23:47 +0000 (GMT)
-Message-ID: <1c3ac2d9-d26d-44de-8d39-a33fbdcbc450@linux.ibm.com>
-Date: Wed, 26 Nov 2025 13:23:46 +0100
+	Wed, 26 Nov 2025 12:31:30 +0000 (GMT)
+Message-ID: <6a717d9b-3771-41f2-9964-442fb6f68fb2@linux.ibm.com>
+Date: Wed, 26 Nov 2025 13:31:30 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,7 +77,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] KVM: s390: Add signal_exits counter
+Subject: Re: [PATCH v2 2/3] KVM: s390: Enable and disable interrupts in entry
+ code
 To: Andrew Donnellan <ajd@linux.ibm.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -92,7 +93,7 @@ Cc: Nicholas Miehlbradt <nicholas@linux.ibm.com>,
         Andy Lutomirski <luto@kernel.org>,
         David Hildenbrand <david@kernel.org>
 References: <20251126-s390-kvm-xfer-to-guest-work-v2-0-1b8767879235@linux.ibm.com>
- <20251126-s390-kvm-xfer-to-guest-work-v2-1-1b8767879235@linux.ibm.com>
+ <20251126-s390-kvm-xfer-to-guest-work-v2-2-1b8767879235@linux.ibm.com>
 Content-Language: en-US
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
@@ -137,81 +138,122 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20251126-s390-kvm-xfer-to-guest-work-v2-1-1b8767879235@linux.ibm.com>
+In-Reply-To: <20251126-s390-kvm-xfer-to-guest-work-v2-2-1b8767879235@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIyMDAyMSBTYWx0ZWRfXx+bYbFaWErAX
- kDY1HqbWmuQEZg+A1WsDWfsltwaJfxa3nmnplOYBeE/IRArD4+gtNmlxoVzs2EjlsA9OHC+BrSx
- 1DDSTy/DHB221/HfTRZF1+bJ7TI0XqRAWdLB5macnXJ3ZViQD/QjNPWnuMbB6gfXHDJQs/BZn8m
- aJPJt7166kOS3Z3Pe0GQ4X99RHCovlAbeRvsuHYVQMyBvk1IFNO8bC+T8N4BX8bGyH7jfX9AADa
- 1sCMeJr+47xmfV+x8HRomJF29H19oL6iVRhY2UTK5ZHRv21UQXWmc/BsBAuI+JxEMD7zjk5bJfM
- ODpPLxZfnMOq0cf+/rl51G7ljlrOlw24cafkO4GYPyWMRP1giSmrgiXveIA/BCDFonPhbKKCU6i
- JKLl73UvUcbVw8pZabYNm41eE9WFYw==
-X-Authority-Analysis: v=2.4 cv=PLoCOPqC c=1 sm=1 tr=0 ts=6926f159 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIyMDAyMSBTYWx0ZWRfX6qZGY5Tc65O6
+ lKKoMc+fLrGUPx7g969+lRiB8hWb0xGwVUbMHLWN8Dhzwnv5+GEJIWVpRwKyRULjunKsFc8kNKY
+ wKB/0L0Mio/HzDCS5uS9F6FjqFec9zzGRwti3mZuZGPAARIXSiG830eZo8qGJMTLKRXM1V9vy8Z
+ XPplbQEtmA/z3cWca+HwTQLkakJz96kvRz8Q9ZzTMU1CNj1oH8LvAQze+vTcrAAaHcWupyfwvIV
+ ZxYObCbslgsa/ACnzfy1iuyFMTqmtMwTG9xXxXXWGCYvpkImdVBxyrfdDSbhik3Ol8VeQblccLe
+ syGXZl9sRE7Trl5cr9uFfZMJF/O7J9/WHbBNHaa0W99cDju96LakRn2i767FP25ry3JHa9nIdqA
+ zN4Uc+clYmH1/Wdp2tkTI0x7q8vZhA==
+X-Proofpoint-ORIG-GUID: 46FxQu0SCT_BAl1SthDUfVaTmYPp2ZXg
+X-Proofpoint-GUID: 46FxQu0SCT_BAl1SthDUfVaTmYPp2ZXg
+X-Authority-Analysis: v=2.4 cv=TMJIilla c=1 sm=1 tr=0 ts=6926f32d cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
  a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=YUu20nazvxTi-Hh7WqoA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 9qm5Xbmby-zEaPmW-3BBCxHKF7BCo_Gv
-X-Proofpoint-GUID: 9qm5Xbmby-zEaPmW-3BBCxHKF7BCo_Gv
+ a=VnNF1IyMAAAA:8 a=5oxjjmwJqIIfr6gTb_cA:9 a=QEXdDO2ut3YA:10
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-25_02,2025-11-25_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 spamscore=0 adultscore=0 impostorscore=0
- priorityscore=1501 bulkscore=0 malwarescore=0 clxscore=1015 suspectscore=0
+ priorityscore=1501 spamscore=0 phishscore=0 impostorscore=0 clxscore=1015
+ adultscore=0 bulkscore=0 suspectscore=0 malwarescore=0 lowpriorityscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511220021
 
 On 11/26/25 06:33, Andrew Donnellan wrote:
-> Add a signal_exits counter for s390, as exists on arm64, loongarch, mips,
-> powerpc, riscv and x86.
+> From: Heiko Carstens <hca@linux.ibm.com>
 > 
-> This is used by kvm_handle_signal_exit(), which we will use when we
-> later enable CONFIG_VIRT_XFER_TO_GUEST_WORK.
+> Move enabling and disabling of interrupts around the SIE instruction to
+> entry code. Enabling interrupts only after the __TI_sie flag has been set
+> guarantees that the SIE instruction is not executed if an interrupt happens
+> between enabling interrupts and the execution of the SIE instruction.
+> Interrupt handlers and machine check handler forward the PSW to the
+> sie_exit label in such cases.
 > 
+> This is a prerequisite for VIRT_XFER_TO_GUEST_WORK to prevent that guest
+> context is entered when e.g. a scheduler IPI, indicating that a reschedule
+> is required, happens right before the SIE instruction, which could lead to
+> long delays.
+> 
+> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+> Tested-by: Andrew Donnellan <ajd@linux.ibm.com>
 > Signed-off-by: Andrew Donnellan <ajd@linux.ibm.com>
+
 
 Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
 > ---
->   arch/s390/include/asm/kvm_host.h | 1 +
->   arch/s390/kvm/kvm-s390.c         | 4 +++-
->   2 files changed, 4 insertions(+), 1 deletion(-)
+>   arch/s390/include/asm/stacktrace.h | 1 +
+>   arch/s390/kernel/asm-offsets.c     | 1 +
+>   arch/s390/kernel/entry.S           | 2 ++
+>   arch/s390/kvm/kvm-s390.c           | 5 -----
+>   4 files changed, 4 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index c2ba3d4398c5371526ddfd53b43607c00abc35a1..1b08a250fb341f7bd2d19810392c1c6e21673b64 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -146,6 +146,7 @@ struct kvm_vcpu_stat {
->   	u64 instruction_diagnose_500;
->   	u64 instruction_diagnose_other;
->   	u64 pfault_sync;
-> +	u64 signal_exits;
->   };
->   
->   #define PGM_OPERATION			0x01
+> diff --git a/arch/s390/include/asm/stacktrace.h b/arch/s390/include/asm/stacktrace.h
+> index 810a6b9d96280f73311de873ad180c59a0cfbd5f..c9ae680a28af910c4703eee179be4db6c1ec9ad1 100644
+> --- a/arch/s390/include/asm/stacktrace.h
+> +++ b/arch/s390/include/asm/stacktrace.h
+> @@ -66,6 +66,7 @@ struct stack_frame {
+>   			unsigned long sie_flags;
+>   			unsigned long sie_control_block_phys;
+>   			unsigned long sie_guest_asce;
+> +			unsigned long sie_irq;
+>   		};
+>   	};
+>   	unsigned long gprs[10];
+> diff --git a/arch/s390/kernel/asm-offsets.c b/arch/s390/kernel/asm-offsets.c
+> index a8915663e917faed4551276b64013ee073662cc9..730449f464aff25761264b00d63d92e907f17f78 100644
+> --- a/arch/s390/kernel/asm-offsets.c
+> +++ b/arch/s390/kernel/asm-offsets.c
+> @@ -64,6 +64,7 @@ int main(void)
+>   	OFFSET(__SF_SIE_FLAGS, stack_frame, sie_flags);
+>   	OFFSET(__SF_SIE_CONTROL_PHYS, stack_frame, sie_control_block_phys);
+>   	OFFSET(__SF_SIE_GUEST_ASCE, stack_frame, sie_guest_asce);
+> +	OFFSET(__SF_SIE_IRQ, stack_frame, sie_irq);
+>   	DEFINE(STACK_FRAME_OVERHEAD, sizeof(struct stack_frame));
+>   	BLANK();
+>   	OFFSET(__SFUSER_BACKCHAIN, stack_frame_user, back_chain);
+> diff --git a/arch/s390/kernel/entry.S b/arch/s390/kernel/entry.S
+> index 75b0fbb236d05f420b20cac6bac925e8ac36fa68..e906f4ab6cf35e53061a27192911629c10c347ed 100644
+> --- a/arch/s390/kernel/entry.S
+> +++ b/arch/s390/kernel/entry.S
+> @@ -189,6 +189,7 @@ SYM_FUNC_START(__sie64a)
+>   	mvc	__SF_SIE_FLAGS(8,%r15),__TI_flags(%r14) # copy thread flags
+>   	lmg	%r0,%r13,0(%r4)			# load guest gprs 0-13
+>   	mvi	__TI_sie(%r14),1
+> +	stosm	__SF_SIE_IRQ(%r15),0x03		# enable interrupts
+>   	lctlg	%c1,%c1,__SF_SIE_GUEST_ASCE(%r15) # load primary asce
+>   	lg	%r14,__SF_SIE_CONTROL(%r15)	# get control block pointer
+>   	oi	__SIE_PROG0C+3(%r14),1		# we are going into SIE now
+> @@ -212,6 +213,7 @@ SYM_FUNC_START(__sie64a)
+>   	lg	%r14,__LC_CURRENT(%r14)
+>   	mvi	__TI_sie(%r14),0
+>   SYM_INNER_LABEL(sie_exit, SYM_L_GLOBAL)
+> +	stnsm	__SF_SIE_IRQ(%r15),0xfc		# disable interrupts
+>   	lg	%r14,__SF_SIE_SAVEAREA(%r15)	# load guest register save area
+>   	stmg	%r0,%r13,0(%r14)		# save guest gprs 0-13
+>   	xgr	%r0,%r0				# clear guest registers to
 > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 16ba04062854a99ab7d48ac427b690006ea8e7eb..fa6b5150ca31e4d9f0bdafabc1fb1d90ef3f3d0d 100644
+> index fa6b5150ca31e4d9f0bdafabc1fb1d90ef3f3d0d..3cad08662b3d80aaf6f5f8891fc08b383c3c44d4 100644
 > --- a/arch/s390/kvm/kvm-s390.c
 > +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -185,7 +185,8 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
->   	STATS_DESC_COUNTER(VCPU, instruction_diagnose_308),
->   	STATS_DESC_COUNTER(VCPU, instruction_diagnose_500),
->   	STATS_DESC_COUNTER(VCPU, instruction_diagnose_other),
-> -	STATS_DESC_COUNTER(VCPU, pfault_sync)
-> +	STATS_DESC_COUNTER(VCPU, pfault_sync),
-> +	STATS_DESC_COUNTER(VCPU, signal_exits)
->   };
+> @@ -5075,13 +5075,8 @@ int noinstr kvm_s390_enter_exit_sie(struct kvm_s390_sie_block *scb,
+>   	 * The guest_state_{enter,exit}_irqoff() functions inform lockdep and
+>   	 * tracing that entry to the guest will enable host IRQs, and exit from
+>   	 * the guest will disable host IRQs.
+> -	 *
+> -	 * We must not use lockdep/tracing/RCU in this critical section, so we
+> -	 * use the low-level arch_local_irq_*() helpers to enable/disable IRQs.
+>   	 */
+> -	arch_local_irq_enable();
+>   	ret = sie64a(scb, gprs, gasce);
+> -	arch_local_irq_disable();
 >   
->   const struct kvm_stats_header kvm_vcpu_stats_header = {
-> @@ -5364,6 +5365,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->   
->   	if (signal_pending(current) && !rc) {
->   		kvm_run->exit_reason = KVM_EXIT_INTR;
-> +		vcpu->stat.signal_exits++;
->   		rc = -EINTR;
->   	}
+>   	guest_state_exit_irqoff();
 >   
 > 
 
