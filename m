@@ -1,75 +1,80 @@
-Return-Path: <kvm+bounces-64657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C711FC89C88
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 13:33:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A960EC89E11
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 13:56:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A3AB34ED282
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 12:32:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E2153AA4D5
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 12:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F897327214;
-	Wed, 26 Nov 2025 12:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482E3329C58;
+	Wed, 26 Nov 2025 12:55:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PE4bVLYr"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BMYuePZR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010031.outbound.protection.outlook.com [52.101.193.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D68531195B;
-	Wed, 26 Nov 2025 12:31:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764160314; cv=none; b=r0A7sYhjM8Y5ZTREOU1NQOk7JWyVsDK+eFdReLHNwQuR7NNh+HfzKRr4/rHGmaXRbAgUIufj3rEslWaPFgXq25J5ZVsmlILZQ6ExsNwnUK/fbBs/I+W5rwrU0/+eMSTQdw1zr3ZDDDmajk0Z000LL6937qngRvcNvGPx92J/fDU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764160314; c=relaxed/simple;
-	bh=p+GBjkaSpWnHadaVNmoqW3obGAcDGpHJ5DR8QphrQjI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ls4LN+HgG3sjNpxR9gMIM6VDOxdcXsGoO8vJcP4UrLnO7dwC7QLyghjlJINKgWmAs+jJeOBR/iu0oWwHjhxDm6/4KCb8TSkgwSC/mhMB5pEgXAcpMn83j8Wwj+Ck3R4ThWHV9MLwEX9vZtljxRBDK1OctNkC3o8lKdSqTz/uXLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PE4bVLYr; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AQ2pVgR019516;
-	Wed, 26 Nov 2025 12:31:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=X7isIC
-	BlGRh2WtLNyBuUcYq9+0hXV9ozBuin60w+mWw=; b=PE4bVLYrp7jzRHgYNJ/5qm
-	BsrbF5mJGrFeIlMBEGhm1iitXQQCewGHu6cgfhUo3O3Rm0DAQggHw79rDHlHBxdM
-	pHSxcuvTYXlfWXHYNXqEjr32memGElN5G3uRJVW+hOQTxgHETocwVKcsJEeN70h0
-	fSlsv3MGVsZxT6NtnxBmslW1Ev1aharUukn1EGOiFyd/8Try72BB0a51ePt0SuIi
-	NSSd+SKhlzqnI9tfzRTNQXkHGnTZmwi+VRsGN/S3A0o+YMj/6B58JA1tBMcI8i5x
-	/1EDRotFZHHcTr9Y9+3rdDFpepPXH1yNlui4Y5LiyIBhMWAyYRjKVm9JvKOkNE0A
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak4w9m2v0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Nov 2025 12:31:38 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AQC7vUo016418;
-	Wed, 26 Nov 2025 12:31:37 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4aks0ka9d7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Nov 2025 12:31:37 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AQCVX1Q43057606
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 26 Nov 2025 12:31:33 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3B71120040;
-	Wed, 26 Nov 2025 12:31:33 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8C2562004B;
-	Wed, 26 Nov 2025 12:31:30 +0000 (GMT)
-Received: from [9.111.66.134] (unknown [9.111.66.134])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 26 Nov 2025 12:31:30 +0000 (GMT)
-Message-ID: <6a717d9b-3771-41f2-9964-442fb6f68fb2@linux.ibm.com>
-Date: Wed, 26 Nov 2025 13:31:30 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841C3328B54;
+	Wed, 26 Nov 2025 12:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.31
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764161749; cv=fail; b=kYJfL1E8Dtb1SJi4jyMavRth/VUbCJaY8VBZfGCH+1ixZlmMH2xIv2d/WrT918kg2y0yKQiqqvFGVO7QX8d2UcNgJo9L4B8gosr9raWOGeS5GIAqm0QQIpBv9plSaRwKW7eTdJiafdcfUBY80bNkmgsYSMp55Mx0nfZNBs2wV/8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764161749; c=relaxed/simple;
+	bh=VCtlqcnHQLbKsZTS/w3g0Azg1oIMjc8zUiG6lqqQyIY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=BXo9DbOI0LJQ+y52xc+aOkQ+IBRVuA52uMzTrEnruX+pMpenfjPHnsIaWrchCE1cqob6Lj23YT6dJL8VT8C8icdYJNnWf1dQBvIsitUyMgn6GbYBTdcgb3ghWpuugUZtCkiD3YkrowZkhVKxOjk7eu9JsCJ0XrEfGUCxB/+PAU8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=BMYuePZR; arc=fail smtp.client-ip=52.101.193.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yEogWjZXqSXsNWuVqgRu29Y0+TKJmRdTrimnZuyKRO8x2F02gWXZB2hgugjAyd48KfjXE002dFgtrCp5NrSE3qUjUhN+KyLoO82Ag5OFs8kv9yWyYRK53TjpEgjxEAqi2JqktKtI0fepPYR6GhJDVMTowjpgdIbto26Y02SGyaIHwuI7jSdZAdwDgAQA0k15LqSvqGCXBT7vBs26Y6awGNO3nmUUt20lFik1P2ro07Ar9ZFT58Jhb7McFMTVTGy+9ULXgh/Qf2ZfhAvkNmnvETBo/hmtHU11YdGUa0PrNhNE6sDvx8cZ9DPpAuZ/LqaDXy9vQIhDHkvk2z4urg2/6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OOLbz5T6j9f0/FMeiqQGZRnFda1JEt/ver6zFmLEIHI=;
+ b=ngk6Ilz4zFP/55Xp6b0MT2iJQAzHFhkYixsTAwB0qQGxRW+ZZF9NItlzqX6TIxGPvT/+WgIrdgV+FyFobtKBZbHS/Q+O/BUFvGFn9hjer3oEAUeEk7+kDkc2bW9UjMWbQeUil6aWx9HBpbP9LIbz954VUZwNup0Qk4CxBz6jfowliX26CgQWK4s9hpG8RzMg9/2SorOoVIRi/QXoXMuRDime9atzgIJYLS0iOOvZuRt9p6NdBrVDwp5C1zla9RhvuL57WWqcrPpqH/S/4SYsksYjvDWUCMhuLnojoowcumzhE3TQJcsDLjq7WTPwOxNSNyn99HvIAerVpaizx1BRjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=nvidia.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OOLbz5T6j9f0/FMeiqQGZRnFda1JEt/ver6zFmLEIHI=;
+ b=BMYuePZR4M6LFsU+hgQN1T0bUORVbyt19mMLgDnw/nDFr3by+LEfTW5CwffB5J8TvHSEaBn6RqSp+lr5Csf+a1KNJqooowVkQYRM+iIRQ4PurwEx/8bRHqWZajOdGEaI73YzaZJjZ18ejdIp7dyDTmcVmiqVvaPiQWKfjkyoByw=
+Received: from SJ0PR03CA0204.namprd03.prod.outlook.com (2603:10b6:a03:2ef::29)
+ by DM6PR12MB4300.namprd12.prod.outlook.com (2603:10b6:5:21a::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.12; Wed, 26 Nov
+ 2025 12:55:41 +0000
+Received: from SJ1PEPF00001CE1.namprd05.prod.outlook.com
+ (2603:10b6:a03:2ef:cafe::5d) by SJ0PR03CA0204.outlook.office365.com
+ (2603:10b6:a03:2ef::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.11 via Frontend Transport; Wed,
+ 26 Nov 2025 12:55:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SJ1PEPF00001CE1.mail.protection.outlook.com (10.167.242.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9366.7 via Frontend Transport; Wed, 26 Nov 2025 12:55:40 +0000
+Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 26 Nov
+ 2025 06:55:40 -0600
+Received: from [10.252.200.251] (10.180.168.240) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Wed, 26 Nov 2025 04:55:34 -0800
+Message-ID: <1f65de37-db9f-4807-a3ff-6cd377c855a5@amd.com>
+Date: Wed, 26 Nov 2025 18:25:34 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,184 +82,141 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/3] KVM: s390: Enable and disable interrupts in entry
- code
-To: Andrew Donnellan <ajd@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Cc: Nicholas Miehlbradt <nicholas@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        David Hildenbrand <david@kernel.org>
-References: <20251126-s390-kvm-xfer-to-guest-work-v2-0-1b8767879235@linux.ibm.com>
- <20251126-s390-kvm-xfer-to-guest-work-v2-2-1b8767879235@linux.ibm.com>
+Subject: Re: [PATCH v7 1/5] iommu: Lock group->mutex in
+ iommu_deferred_attach()
+To: Nicolin Chen <nicolinc@nvidia.com>, <joro@8bytes.org>, <afael@kernel.org>,
+	<bhelgaas@google.com>, <alex@shazbot.org>, <jgg@nvidia.com>
+CC: <will@kernel.org>, <robin.murphy@arm.com>, <lenb@kernel.org>,
+	<kevin.tian@intel.com>, <baolu.lu@linux.intel.com>,
+	<linux-arm-kernel@lists.infradead.org>, <iommu@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <linux-acpi@vger.kernel.org>,
+	<linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<patches@lists.linux.dev>, <pjaroszynski@nvidia.com>, <vsethi@nvidia.com>,
+	<helgaas@kernel.org>, <etzhao1900@gmail.com>
+References: <cover.1763775108.git.nicolinc@nvidia.com>
+ <a7ebae88c78e81e7ff0d14788ddff2e6a9fcecd3.1763775108.git.nicolinc@nvidia.com>
 Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
- qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
- 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
- zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
- lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
- Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
- 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
- cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
- Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
- HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABzSVKYW5vc2NoIEZy
- YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+wsF3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
- CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
- AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
- bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
- eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
- CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
- EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
- rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
- UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
- RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
- dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
- jJbazsFNBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
- cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
- JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
- iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
- tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
- 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
- v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
- HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
- 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
- gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABwsFfBBgBCAAJ
- BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
- 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
- jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
- IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
- katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
- dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
- FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
- DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
- Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
- phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20251126-s390-kvm-xfer-to-guest-work-v2-2-1b8767879235@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: "Srivastava, Dheeraj Kumar" <dhsrivas@amd.com>
+In-Reply-To: <a7ebae88c78e81e7ff0d14788ddff2e6a9fcecd3.1763775108.git.nicolinc@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIyMDAyMSBTYWx0ZWRfX6qZGY5Tc65O6
- lKKoMc+fLrGUPx7g969+lRiB8hWb0xGwVUbMHLWN8Dhzwnv5+GEJIWVpRwKyRULjunKsFc8kNKY
- wKB/0L0Mio/HzDCS5uS9F6FjqFec9zzGRwti3mZuZGPAARIXSiG830eZo8qGJMTLKRXM1V9vy8Z
- XPplbQEtmA/z3cWca+HwTQLkakJz96kvRz8Q9ZzTMU1CNj1oH8LvAQze+vTcrAAaHcWupyfwvIV
- ZxYObCbslgsa/ACnzfy1iuyFMTqmtMwTG9xXxXXWGCYvpkImdVBxyrfdDSbhik3Ol8VeQblccLe
- syGXZl9sRE7Trl5cr9uFfZMJF/O7J9/WHbBNHaa0W99cDju96LakRn2i767FP25ry3JHa9nIdqA
- zN4Uc+clYmH1/Wdp2tkTI0x7q8vZhA==
-X-Proofpoint-ORIG-GUID: 46FxQu0SCT_BAl1SthDUfVaTmYPp2ZXg
-X-Proofpoint-GUID: 46FxQu0SCT_BAl1SthDUfVaTmYPp2ZXg
-X-Authority-Analysis: v=2.4 cv=TMJIilla c=1 sm=1 tr=0 ts=6926f32d cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=5oxjjmwJqIIfr6gTb_cA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-25_02,2025-11-25_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 spamscore=0 phishscore=0 impostorscore=0 clxscore=1015
- adultscore=0 bulkscore=0 suspectscore=0 malwarescore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511220021
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE1:EE_|DM6PR12MB4300:EE_
+X-MS-Office365-Filtering-Correlation-Id: 25291961-492c-4892-72e5-08de2ceb1ab3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|82310400026|36860700013|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Zm1hSWY2S0w2ejhWT1NHOFZMdXJWdC94S041c1VBS3lLWGJ3a2lodXhuc2tu?=
+ =?utf-8?B?anNNSndzN0N0T3ZIZVV5NWY0eU1oVURrSUZkR0JkVWtxOGpsdHlsTjZxcy9V?=
+ =?utf-8?B?dWp2YlJtN1Y3bVZwcWVSRlUwcEYvek1BM0d3Y09JY0RPREwzQWQwbHhudWVm?=
+ =?utf-8?B?RExUckFjL0tjREhTTjY5ZUNlYUl0WGFMcVdUdXpRMDN6TURoaGtMN2p5cmNi?=
+ =?utf-8?B?THVQRTJJNEV4Y3VPbTdkdDVDZFZWdkN3dkJWWEszWUlyM3N5bG1yTURhdnFh?=
+ =?utf-8?B?endRNjAyU3NWUXlzcFV5b1Rhb0JrRDdadUxlN1dzMkJZUDNKUkpzVjZsa3JK?=
+ =?utf-8?B?ZFZ5d3poZmRDN0pIa0lBaTVMdm91VFFsNXFydFZBcXRuVlc5b2dvU3NNQ3gz?=
+ =?utf-8?B?RUNIdUFwR29MaGlQc3U2T2llWGtFVEZDd1NLUHVKYW5sWHRIS2VsTTJORjdy?=
+ =?utf-8?B?NVN5UWloZFlKVkRqNnl1MGhMU3gyc1BNM3JxZjlKY3VUZ0VOblUvelNtTkJL?=
+ =?utf-8?B?Ukw4ejgvVmNYQ3dhaXphL3ZEai9vbmdhaDg1eGFPSklHbzBibEJaeWhZd01I?=
+ =?utf-8?B?anlML0dMMnVocTAvckNvZzQzY1VjQmxPaVNEd1V2OERvWmxja3JHZWo0dDVv?=
+ =?utf-8?B?bVRTRFg4Qkx3VnhQclBsQk9adEt1R1ZYdmt5Y2ZHVUpSTnhQT2dyZ3QvRVht?=
+ =?utf-8?B?Z1FKSkJPTXRUWElzTlZ0MzhoVjYvblNHVkdaczZIcGNBQUJIS1puamJRdVRP?=
+ =?utf-8?B?VERYamVlTkdNRzI2MjVuckhMczI3UWFQVFlxOElFRzlsMVJQcHcvcitmTnp5?=
+ =?utf-8?B?MzVqbS9uNHBRUzFMZ0M1SVF0cndxUERvdTltenpxNWdZNDV5NU8wTURPSHJk?=
+ =?utf-8?B?SFBEVHorMFA2MWlpSmQ2dkJyMVg5Y1dyV0lXbXhVcUYvOEF5ODlTc0NlRHVH?=
+ =?utf-8?B?QjFYdk5zdWV2U1EvOW5vVTRCMkIzS0drN2huZkVBbkw0QW02WTE4YjNSUU5O?=
+ =?utf-8?B?QXZXSVhoVSsvR0xZTDgvV1RoZDY1NDVTZGk3b1NXaVRoZDI0UEM2RzZMZ1E5?=
+ =?utf-8?B?Q0lIWVVsS3BtSFdKalFia2tVR0xyVHRXY1NFT01aaldsQUNxbWhCZEZvcElV?=
+ =?utf-8?B?MlpQazdlazhkRlhScWlKekt6QTZ0RXZSWTFEbEJZRFprclMwdThhUmJ6dTkr?=
+ =?utf-8?B?VllHMlhGRmxCK01sT205am5tM01ab2VpYzhDbFhuS0ppdTY2R01oYlJWSUxR?=
+ =?utf-8?B?eFJGZ2lLWmg0NG95dzRNalRHY2xCWFd3QjIwd0R1dUhpckZvUEFJRk1MQ0hH?=
+ =?utf-8?B?c09GTnNHcmpuWWV0TWVlVlFOcVl6VllGM013NGcwcHB2UU5ZUk5MQXA0UnNu?=
+ =?utf-8?B?YlFVRUQ3QXhDT2JXSm93RnlXd0tLeC9KMWE4cmpmWU1waWVJV1BrN0xkcldq?=
+ =?utf-8?B?VUpFTWh0MG45eEkyQ1NIVkNvRkI1alRnQXB0NDNkaWo3OWZod3hOT2xwTjdD?=
+ =?utf-8?B?V3BMZU81T2ZLZGhockVRbmJEOHU3QVp1MDVvREhwZ1J2VXdxM21JNGhuNXdn?=
+ =?utf-8?B?Q2JZWWNSSm5XQ2owZEJwM3ZlWjJneVp2cDdPZjJXa2Rpak1qSUUwK3htZU5Y?=
+ =?utf-8?B?TCt1NkFMN3h3U01nRDQvRU5FOXJNZkFSemNKSlpZcTdaVWk3WWVIc2lRTWpH?=
+ =?utf-8?B?TUFnWXRNUk1LZGRnMGdESjJEdCt1VUdXeTZ3ZktDMnoxTFNpMDM5cHU5c3Bq?=
+ =?utf-8?B?TU1ka2R1LzZZNVhna244R1c2V01iY2M5M1ExMGFkTU9pZHpBOXI4SHlLS3JC?=
+ =?utf-8?B?azdtMHBsdUlaVXVTeUF0enFrQldHS2tlUVVza3gvVDE1K09uNHRDVkM1TE84?=
+ =?utf-8?B?cDdKd2I5MGFOdEFkeS9PeEZzQ0RJeThUUDg3UW5ScXlDOVRrVFBDSHE1Tktv?=
+ =?utf-8?B?LzlaVjVrQTdOYmo4NFJjb1h5OHlpUjNsSXhnZG15b05acWtwWEJqQ1BIK1hI?=
+ =?utf-8?B?YnJvMDdIczJ3bk42T0Y3STRaNWxnbzBjSHRRU1AzNXYvdVdLYU9id29kUkNj?=
+ =?utf-8?B?OVdWMjBpZWdJZjI4VERkeGMvTG1GUStuK3dyZWRicmlEdmZBOHMrQklMWUQ4?=
+ =?utf-8?Q?7QbY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(36860700013)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2025 12:55:40.8724
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 25291961-492c-4892-72e5-08de2ceb1ab3
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CE1.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4300
 
-On 11/26/25 06:33, Andrew Donnellan wrote:
-> From: Heiko Carstens <hca@linux.ibm.com>
+Hi,
+
+On 11/22/2025 7:27 AM, Nicolin Chen wrote:
+> The iommu_deferred_attach() function invokes __iommu_attach_device(), but
+> doesn't hold the group->mutex like other __iommu_attach_device() callers.
 > 
-> Move enabling and disabling of interrupts around the SIE instruction to
-> entry code. Enabling interrupts only after the __TI_sie flag has been set
-> guarantees that the SIE instruction is not executed if an interrupt happens
-> between enabling interrupts and the execution of the SIE instruction.
-> Interrupt handlers and machine check handler forward the PSW to the
-> sie_exit label in such cases.
+> Though there is no pratical bug being triggered so far, it would be better
+> to apply the same locking to this __iommu_attach_device(), since the IOMMU
+> drivers nowaday are more aware of the group->mutex -- some of them use the
+> iommu_group_mutex_assert() function that could be potentially in the path
+> of an attach_dev callback function invoked by the __iommu_attach_device().
 > 
-> This is a prerequisite for VIRT_XFER_TO_GUEST_WORK to prevent that guest
-> context is entered when e.g. a scheduler IPI, indicating that a reschedule
-> is required, happens right before the SIE instruction, which could lead to
-> long delays.
+> Worth mentioning that the iommu_deferred_attach() will soon need to check
+> group->resetting_domain that must be locked also.
 > 
-> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
-> Tested-by: Andrew Donnellan <ajd@linux.ibm.com>
-> Signed-off-by: Andrew Donnellan <ajd@linux.ibm.com>
+> Thus, grab the mutex to guard __iommu_attach_device() like other callers.
+> 
 
+Tested the series with PCI reset on PFs and VFs, including device 
+pass-through to a Linux guest. All scenarios worked as expected.
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Tested-by: Dheeraj Kumar Srivastava <dheerajkumar.srivastava@amd.com>
 
+Thanks
+Dheeraj
+
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 > ---
->   arch/s390/include/asm/stacktrace.h | 1 +
->   arch/s390/kernel/asm-offsets.c     | 1 +
->   arch/s390/kernel/entry.S           | 2 ++
->   arch/s390/kvm/kvm-s390.c           | 5 -----
->   4 files changed, 4 insertions(+), 5 deletions(-)
+>   drivers/iommu/iommu.c | 13 ++++++++++---
+>   1 file changed, 10 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/s390/include/asm/stacktrace.h b/arch/s390/include/asm/stacktrace.h
-> index 810a6b9d96280f73311de873ad180c59a0cfbd5f..c9ae680a28af910c4703eee179be4db6c1ec9ad1 100644
-> --- a/arch/s390/include/asm/stacktrace.h
-> +++ b/arch/s390/include/asm/stacktrace.h
-> @@ -66,6 +66,7 @@ struct stack_frame {
->   			unsigned long sie_flags;
->   			unsigned long sie_control_block_phys;
->   			unsigned long sie_guest_asce;
-> +			unsigned long sie_irq;
->   		};
->   	};
->   	unsigned long gprs[10];
-> diff --git a/arch/s390/kernel/asm-offsets.c b/arch/s390/kernel/asm-offsets.c
-> index a8915663e917faed4551276b64013ee073662cc9..730449f464aff25761264b00d63d92e907f17f78 100644
-> --- a/arch/s390/kernel/asm-offsets.c
-> +++ b/arch/s390/kernel/asm-offsets.c
-> @@ -64,6 +64,7 @@ int main(void)
->   	OFFSET(__SF_SIE_FLAGS, stack_frame, sie_flags);
->   	OFFSET(__SF_SIE_CONTROL_PHYS, stack_frame, sie_control_block_phys);
->   	OFFSET(__SF_SIE_GUEST_ASCE, stack_frame, sie_guest_asce);
-> +	OFFSET(__SF_SIE_IRQ, stack_frame, sie_irq);
->   	DEFINE(STACK_FRAME_OVERHEAD, sizeof(struct stack_frame));
->   	BLANK();
->   	OFFSET(__SFUSER_BACKCHAIN, stack_frame_user, back_chain);
-> diff --git a/arch/s390/kernel/entry.S b/arch/s390/kernel/entry.S
-> index 75b0fbb236d05f420b20cac6bac925e8ac36fa68..e906f4ab6cf35e53061a27192911629c10c347ed 100644
-> --- a/arch/s390/kernel/entry.S
-> +++ b/arch/s390/kernel/entry.S
-> @@ -189,6 +189,7 @@ SYM_FUNC_START(__sie64a)
->   	mvc	__SF_SIE_FLAGS(8,%r15),__TI_flags(%r14) # copy thread flags
->   	lmg	%r0,%r13,0(%r4)			# load guest gprs 0-13
->   	mvi	__TI_sie(%r14),1
-> +	stosm	__SF_SIE_IRQ(%r15),0x03		# enable interrupts
->   	lctlg	%c1,%c1,__SF_SIE_GUEST_ASCE(%r15) # load primary asce
->   	lg	%r14,__SF_SIE_CONTROL(%r15)	# get control block pointer
->   	oi	__SIE_PROG0C+3(%r14),1		# we are going into SIE now
-> @@ -212,6 +213,7 @@ SYM_FUNC_START(__sie64a)
->   	lg	%r14,__LC_CURRENT(%r14)
->   	mvi	__TI_sie(%r14),0
->   SYM_INNER_LABEL(sie_exit, SYM_L_GLOBAL)
-> +	stnsm	__SF_SIE_IRQ(%r15),0xfc		# disable interrupts
->   	lg	%r14,__SF_SIE_SAVEAREA(%r15)	# load guest register save area
->   	stmg	%r0,%r13,0(%r14)		# save guest gprs 0-13
->   	xgr	%r0,%r0				# clear guest registers to
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index fa6b5150ca31e4d9f0bdafabc1fb1d90ef3f3d0d..3cad08662b3d80aaf6f5f8891fc08b383c3c44d4 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -5075,13 +5075,8 @@ int noinstr kvm_s390_enter_exit_sie(struct kvm_s390_sie_block *scb,
->   	 * The guest_state_{enter,exit}_irqoff() functions inform lockdep and
->   	 * tracing that entry to the guest will enable host IRQs, and exit from
->   	 * the guest will disable host IRQs.
-> -	 *
-> -	 * We must not use lockdep/tracing/RCU in this critical section, so we
-> -	 * use the low-level arch_local_irq_*() helpers to enable/disable IRQs.
->   	 */
-> -	arch_local_irq_enable();
->   	ret = sie64a(scb, gprs, gasce);
-> -	arch_local_irq_disable();
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 2ca990dfbb884..170e522b5bda4 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2185,10 +2185,17 @@ EXPORT_SYMBOL_GPL(iommu_attach_device);
 >   
->   	guest_state_exit_irqoff();
+>   int iommu_deferred_attach(struct device *dev, struct iommu_domain *domain)
+>   {
+> -	if (dev->iommu && dev->iommu->attach_deferred)
+> -		return __iommu_attach_device(domain, dev, NULL);
+> +	/*
+> +	 * This is called on the dma mapping fast path so avoid locking. This is
+> +	 * racy, but we have an expectation that the driver will setup its DMAs
+> +	 * inside probe while being single threaded to avoid racing.
+> +	 */
+> +	if (!dev->iommu || !dev->iommu->attach_deferred)
+> +		return 0;
 >   
-> 
+> -	return 0;
+> +	guard(mutex)(&dev->iommu_group->mutex);
+> +
+> +	return __iommu_attach_device(domain, dev, NULL);
+>   }
+>   
+>   void iommu_detach_device(struct iommu_domain *domain, struct device *dev)
 
 
