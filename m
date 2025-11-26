@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-64662-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64663-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30553C8A128
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 14:42:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C81EC8A13A
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 14:42:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 70CC34E6727
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 13:42:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D39F83AFA0E
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 13:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A26328263;
-	Wed, 26 Nov 2025 13:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB77316915;
+	Wed, 26 Nov 2025 13:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FhsgN7sG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zwmer1qX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4D3302CA2
-	for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 13:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BB531DD97
+	for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 13:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764164513; cv=none; b=hf3kSW45omTicnfyhdsl1Q3e0S/mEVRy9GLMqoLGDNI1Y4C+bfn3Jitvx96ZCgaWsp7Y6QSkOP/WUss9hu/pETPFQWRc+cylAyRyOQgmnYlViq7uySRFTMsHl2aq6d/19rbehkb54oq8Mgr1UGSiaLUkjwGZe2GTR6Navr89W0E=
+	t=1764164525; cv=none; b=Vs3Dre97+U9jqQScLKJ2nF1tfr8m2Kwq1R3uFD001v8UNpV/Eliv5CFiwr4+qoH2vaqx9W+6dV3UICXQkPkpaqpSI5dwxZDtXNVMhplIYQqJ8tCNwldpp3tOfIH1bs2UJEUXzTe5t62XYktg+J2kSdPXoAlTaAfSloGcXcQCee4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764164513; c=relaxed/simple;
-	bh=WgG4G612okA/IrrFfVRuQox4FcXq4MPJFHUChDN4aEY=;
+	s=arc-20240116; t=1764164525; c=relaxed/simple;
+	bh=Yu94GZno9rV0tcqXvRpi31LC93AOQQi8lcsIxgVQN1w=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FopKPw2fhZak0fIkRKK7rI6MFwK1qCIkUlCe3QCZlKxQCFaEaqzn6Yw+rNPWOvmJwBHYPKbUaVGlbm5x9D8qpS014foWOBgV7RpyNZaHOWLwyCRNRScLpTPgHTFhfb90lRUU201G7ZsTkgHggDqlNlZfgFYZNEaY2FKkTv7Vybk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FhsgN7sG; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=nbqLsLjrIL5mR0dmuVuVFXNo1W3VNTaqQcr1tmcZR7DsG81jZwjOjDt3c3e2B+62xvSb3b7QG+wYzAnAENKyszY7fup+GGMHHyLqaBIuhlfQvxq3I9RTb1Gr6dqwfr+g9tMS/SMfdKZ3LztaQQlu85JYMwlW9AO2hYFwqJLn2b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zwmer1qX; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-295952a4dd6so10667425ad.1
-        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 05:41:51 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3437f0760daso14790626a91.1
+        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 05:42:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764164511; x=1764769311; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1764164523; x=1764769323; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Itoz/CLxpOQAfqPA/mNhaSenu9h0By9pP88eUnqr5LY=;
-        b=FhsgN7sGCPlM03fSENMPrOSKZ6PJC4DOABA97MvZp7SW9Q52uwoGPvfoDXQknH2mqc
-         AAAASFoXmFf6MrfHFSJxR1aoWaooIDDnHPcrKWW/22zIoBn0+JY0yHSjfFJQarCSXkga
-         LG/gyVfgfMPSaoYcV/fYneUZKMeP9Mr5EIMy/oHqwd8BoF4vX8ROLvGH23uHdTihQk00
-         CQQ8UymsYhkDytNjnRkDe/QT0W560hcA/rrsAzoRI07vqOZfaj+6VBoFV7u6AXQ5l2wZ
-         fOxucXx3EtWFOwyW8wIwV+/z7hmI7AMMQ5W8iqwyVd/uHLURizcKWd1scOD9by5nD9HO
-         wonw==
+        bh=Hi7pYVwY94FRC9osXq/z4z/CUVsDJubPaw0GvUGSXyM=;
+        b=zwmer1qXxxud7CHrft8xUGxeIvE9DfX3o8m7DPTG1QtjUtD6ARVyggOW75m8o2ZGRz
+         QjTTKWFopvsHJ+WKdp/rtYwcv6EBiNJAvV/+CDnWPrJDnOqREtAMKF7FVRhCMWvoXwFE
+         xnzZFB3ISxd82OCIsLFoEQ+7nOGziSZlmKvmGEray7Pbjv86oBtyYlcMJPHJVDs3HtXm
+         SM628olkkrQ9yqMQ/jElXeG0oWI5pI4LXSTpt01z1jVaqBoHd4qO44bDTpiOAms8it2H
+         rMELZ+3VeQu9GANc2G5bejaRoazqqd1N/7ANcKx4eXey2gcGIFWiw2vV61ooDf5tDgPq
+         C4nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764164511; x=1764769311;
+        d=1e100.net; s=20230601; t=1764164523; x=1764769323;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=Itoz/CLxpOQAfqPA/mNhaSenu9h0By9pP88eUnqr5LY=;
-        b=jeYqxMqJV2eSMDyTXB7yeK06a6oN27debEFt8U9cyTgvFWQdFT8X9dApm9yJ0ZNJd9
-         8J6H1DkrWucthwn7U21CAKKgGnOkSlAcW2/Cb4BgB43+K1cvqWKR6enwVLFvlSliSwPy
-         flJh0Ge0E1rVtwu7hQqfqxbIJ90IC0v8GFRfCmAeHmf4y++awZcd790lz74/kEO0SpYg
-         i0pWuLTyXj0abbt0mDKw0p8WHnLKIdRZBngGSKdOwq+mQ/95Z6Uf/AP1KwwWLWksDKmr
-         SPBpU8wZrnnF5ySL5HU9CKysJqMsb+PX6yzSooCBlu/qeCWJL5R0FTId3iWmXSQwnG+y
-         L3Sg==
-X-Gm-Message-State: AOJu0Yx94y9Emc9ISECs9XdmN5q2qfjOcF1sGt7KGh1SFPsS6n7et+HS
-	CjgpJzleT/LWntx+jmNLtecWmSQ1Wa+KreTVBCEndMTOJ4O+x9J2lm6k/2bSRTrZb1OaTEH1bSA
-	64KYfNw==
-X-Google-Smtp-Source: AGHT+IHHwe7R13Fp4/fUKL5PM20qMy00dL2WfXfoZDUWGrFscjdryM+q0yvMC7uapzB6p+IvVGEThta+SXQ=
-X-Received: from plps24.prod.google.com ([2002:a17:902:9898:b0:290:b136:4f08])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c94d:b0:298:45e5:54a4
- with SMTP id d9443c01a7336-29b6beecc76mr208043215ad.1.1764164511382; Wed, 26
- Nov 2025 05:41:51 -0800 (PST)
-Date: Wed, 26 Nov 2025 05:41:48 -0800
-In-Reply-To: <CABgObfbU8kXE3xKzYg3HETFw+FURXj3MjXmDnhoL=qA+OLO-CQ@mail.gmail.com>
+        bh=Hi7pYVwY94FRC9osXq/z4z/CUVsDJubPaw0GvUGSXyM=;
+        b=thRiwFRZ9l+gtAVDvzx3ZqpPThw11g53F6AQPLmwWi0+YBguU0giQPmKyrX1TToZ7A
+         2MhVh0xx4kDXZAOOr30MPZ1GMht5W+A3A0JMiTQMN9IOzi7qdz/dgSzMyohCK9v/LADk
+         iiMdAr0uhW5tq//JsrTbuxz3vvPXVNxH19pCT+QPVKqHKa0fxXCFrL2A8Iq6XOQrGfDv
+         etn/7AQePuZPWo9XyFjyN8Db834FKNwElvV8cf/O1LtT4Knuf39uAvhhHj/DjyNvxi6J
+         2FwAfsf280U4pNM5/rlABQM8RVp4UnlCFcNZQageLp/SavOKKp2rBKpMsdXD2koF0H31
+         Xslw==
+X-Gm-Message-State: AOJu0YwX5oRnnXHwSAhndGrDVYt7fcx+Bn5G2wl/eXxCX1AIOfN5ajV2
+	bsQcrUrjEcNskPbqOrsA4czChDRZlJDBgPKlkXicr0Ro9ETlzPP+YXo9gnCemrG7Q5ICYUdf+eD
+	BknMRHQ==
+X-Google-Smtp-Source: AGHT+IGs8Sar/JTWmmANWx2dsWeSKEBetRk0lKEtzZZxdcHE3TgWw8IDsf3Vs1YNSJYpBVta6YPRhNuCEPE=
+X-Received: from pjblt24.prod.google.com ([2002:a17:90b:3558:b0:340:b14b:de78])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3502:b0:32e:a5ae:d00
+ with SMTP id 98e67ed59e1d1-34733e72350mr18844586a91.13.1764164523417; Wed, 26
+ Nov 2025 05:42:03 -0800 (PST)
+Date: Wed, 26 Nov 2025 05:42:00 -0800
+In-Reply-To: <CABgObfbvYC9mGL8x1JSQwmq7BT9j7gwf11nmHsumOumd4P0abg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251126014455.788131-1-seanjc@google.com> <20251126014455.788131-7-seanjc@google.com>
- <CABgObfbU8kXE3xKzYg3HETFw+FURXj3MjXmDnhoL=qA+OLO-CQ@mail.gmail.com>
-Message-ID: <aScDnAYCtGYXG2S1@google.com>
-Subject: Re: [GIT PULL] KVM: x86: SVM changes for 6.19
+References: <20251126014455.788131-1-seanjc@google.com> <20251126014455.788131-9-seanjc@google.com>
+ <CABgObfbvYC9mGL8x1JSQwmq7BT9j7gwf11nmHsumOumd4P0abg@mail.gmail.com>
+Message-ID: <aScDqIjHMGHJBQ7M@google.com>
+Subject: Re: [GIT PULL] KVM: x86: VMX changes for 6.19
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -87,17 +87,31 @@ On Wed, Nov 26, 2025, Paolo Bonzini wrote:
 > On Wed, Nov 26, 2025 at 2:45=E2=80=AFAM Sean Christopherson <seanjc@googl=
 e.com> wrote:
 > >
-> > A handful of lowish priority nSVM fixes, AVIC support for 4k vCPUs, and=
- new
-> > uAPI to advertise SNP policy bits to userspace.
+> > The highlight is EPTP construction cleanup that's worthwhile on its own=
+, but
+> > is also a step toward eliding the EPT flushes that KVM does on pCPU mig=
+ration,
+> > which are especially costly when running nested:
 > >
-> > Side topic, this pull request is finally proof that I don't just merge =
-my own
-> > stuff :-D
+> > https://lore.kernel.org/all/aJKW9gTeyh0-pvcg@google.com
+> >
+> > The following changes since commit 3a8660878839faadb4f1a6dd72c3179c1df5=
+6787:
+> >
+> >   Linux 6.18-rc1 (2025-10-12 13:42:36 -0700)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/kvm-x86/linux.git tags/kvm-x86-vmx-6.19
+> >
+> > for you to fetch changes up to dfd1572a64c90770a2bddfab9bbb69932217b1da=
+:
+> >
+> >   KVM: VMX: Make loaded_vmcs_clear() static in vmx.c (2025-11-11 07:41:=
+16 -0800)
 >=20
-> What do you mean? Is there anything you want me to review?
+> Pulled; there was another minor conflict due to the introduction of
+> kvm_request_l1tf_flush_l1d().
 
-Oh, it was purely a joke.  I don't have any commits in this particular pull=
- request,
-and that caught my eye when looking at the shortlog.
+Shoot, sorry, forgot about that one (obviously).
 
