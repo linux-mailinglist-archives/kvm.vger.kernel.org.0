@@ -1,244 +1,201 @@
-Return-Path: <kvm+bounces-64676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64677-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAD13C8AA15
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 16:27:59 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E5B7C8AB41
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 16:40:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B57614E67C8
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 15:27:24 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 859C134ECB0
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 15:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6885C331A7C;
-	Wed, 26 Nov 2025 15:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DCAB33A016;
+	Wed, 26 Nov 2025 15:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AVmbCXjz";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CrFKSehg"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="IGzLePBW";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WX5AmDMi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E353321AD
-	for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 15:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA0830F53B;
+	Wed, 26 Nov 2025 15:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764170756; cv=none; b=GXpfagPendobMaGz3NyqK0qzm8ew1S8hnrZG6nJILvroZyljgQiL/zgMghHIDD2YVYeDjYHGDL6Smkem7hefimWUq9ehf3JEu4dbahK1W9N1evJTfW6ouCUmF3EaJmoYePzLPgZHuxOztH3CmQAmq41/CG+4aibUb/21r4UYuRM=
+	t=1764171631; cv=none; b=YJawQgkH13jHr/rtQcITEPtVHpzkvA8qty4d3FZT8d4kYNgu+QrSj5jOjFBZuNDcDeq0/UaFdMXyS25HVBhchxiu+bQdCGevG+m/W/hqy1NZvkjhczlFnGoPJ7GEW6j2AvRT3HroX1zj3NmupQ+f5glZxgMDpExX+su1aTjQF+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764170756; c=relaxed/simple;
-	bh=MlNy/atfOJbZCeA0q/MGoSHM0JWfj9pD6YlEmXsdmCA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rMmqHDeJHXsG4BugT8wFUsGrs+igbHJMgaURXKvuVPDbIdvnwJeuwm6p59666PlZTLEZBLnDce7NZcqQLWrIhH8gAbCCLmuWphOakSaFKhggmCBc9yPfJpXPET5BHVuTELpl/2HJYPW0OP5Rt6F4rnIHVxUuZDoKXsLtpmsdmbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AVmbCXjz; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CrFKSehg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764170753;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IdOd/whsaB5ha6Xltts70lCb5PGc5f2tglKc7q062f4=;
-	b=AVmbCXjzydvNmn1c7t0JhKY3pkumBZdQb4lF+A6FRqFbpjf32ufR8lZXmK4hZeKEzRlmzs
-	F/Rya2/PDPpPy9Mhm7JpBpDW2SE/ofthb3ti+YD6rf/VkvxRSe9u3Kj5HUx64Co8D5cfL1
-	JO2Fl17NiK6Z5gTSpQxt7cylT1DCROU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-4U0ymmfxO26ncOa2tDv3Sg-1; Wed, 26 Nov 2025 10:25:52 -0500
-X-MC-Unique: 4U0ymmfxO26ncOa2tDv3Sg-1
-X-Mimecast-MFC-AGG-ID: 4U0ymmfxO26ncOa2tDv3Sg_1764170751
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42b3c965ce5so6246776f8f.2
-        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 07:25:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764170749; x=1764775549; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IdOd/whsaB5ha6Xltts70lCb5PGc5f2tglKc7q062f4=;
-        b=CrFKSehgTVATz5ItZ3SW5aIMvHYoe8RmV8ykOb+wphhtyd6jYk3JwjvcVP5LpU/vBV
-         6vf6/+SmcGGExXk67kp1vuUIyCPFL3MR7wNn3jvH2x17yiML7NFG5VmZzq0AHG7BN3TL
-         /+3zXLS2qaOFDMsqaqBzFLAhPBlTYz/EM99xszc598B/fuZzM9ea9qj79L+xjNISad5r
-         eUxB8HtW4ZxYHccmBzymAOywYtFcurY6gOaBaFcRyAkdsI4Ly8UBzFVgKO/zJT6Ulyy2
-         IYstD/lFXO3B5HowxI3AlwJq/DA3kbNY3ay8z7xxU+rYmg1PD8UPLUGvdnh/ylL8xY2d
-         8ypQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764170749; x=1764775549;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IdOd/whsaB5ha6Xltts70lCb5PGc5f2tglKc7q062f4=;
-        b=az8PxlZPqrgMtXjmTsZHLyMh5dwsh77RqjzZdFVGEDUyji8foRd6MFJZl4fcnJFtZB
-         ZeQ8wladauZAYWW/yIxupre/19SRpwEq190JRQ3MjQ5B5hg2EYoZk7YqAD8vJwsvKv2y
-         r4iwm1FPtaendNUAEf9NER39oT1VJzap6MNGE2LSUd641e1v+0R0yjWQUjClmsTcXe0h
-         Cq7Vrz+jRg3+YXiVjKGdiCZrhGrT/nDQkff5OUYzfGbwfiFTUTC2Y4nKoG7P7L31XGw/
-         OUBrJI9iZjLOHHFuygBppbmN9ZNeshZIlU7jT8zNacz3E3CFcbh1b8auXDo4cSkbIVHe
-         BuWA==
-X-Forwarded-Encrypted: i=1; AJvYcCVfxw34Hh870EkjF0OAhN656Ua9br0y+eRNrxRh+nI8C6rI/+ZhUOWAmyIxgG5mIbzzfBg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuQTfQStnFnC+7mgDDzYvQuk/v8nZL9O7XZKu9Odlqb9VVzobb
-	LTD2AIYkjrJqgmaiPBU7pN8F2nFzpS6ZGOHDz1vV/HpUgic5kWtxTHSgMoUF5+l7bMuedOozMaN
-	eN4Hw+LeoqiJD5+RsK2lOcFzV6aNxSdZVN2AVh6PNx6iwPvKsw7KGQg==
-X-Gm-Gg: ASbGnctJ4NcI/9qY9S3souNyiip81YCW7K0iYi/s6nBlikhfcMm4XddezqtnxHrlCFx
-	WhRZ380mZWkTNrfXsWrSZU4I1LiJHWRXCdjbdVkNcwiZjNGbah1qeX/zCRCnRjaWyM/4YEjKicK
-	gQBzC0DuMzMELgXqBX0SMnT1Vmv07SsrFgcmPWQb2XNWyeMOc29hrYAkSlUEJUqLD0f87OC9b5z
-	GaNMMMKvZgDyDVd2CADQd4ERKTWg+bI/8gJE5USsHes6R/MSybSX4ZLLltP4s4ij6lrcBBFls82
-	1gKvTLEMYhz1h5ETWOPeF8IeLNeUbDF2Uyvo9rg7O4+ViSFJT7Oiyx3w1fvQfBQrdLPjkBGB6dE
-	wh2BWoREB0IOMXrt3UjtAlHNrpYSIOw==
-X-Received: by 2002:a05:6000:2489:b0:42b:3a84:1ee6 with SMTP id ffacd0b85a97d-42e0f22a2c8mr8023534f8f.24.1764170748932;
-        Wed, 26 Nov 2025 07:25:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG+KQvLghlDUQh9afZD+PVNCo1iNTuBYw29hyUe/fgigkK4QndBh9YrGoJcdMGDn9uA+ZGhNA==
-X-Received: by 2002:a05:6000:2489:b0:42b:3a84:1ee6 with SMTP id ffacd0b85a97d-42e0f22a2c8mr8023493f8f.24.1764170748385;
-        Wed, 26 Nov 2025 07:25:48 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f2e581sm38903906f8f.8.2025.11.26.07.25.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 07:25:47 -0800 (PST)
-Date: Wed, 26 Nov 2025 10:25:44 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-	jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v6 3/8] tun/tap: add synchronized ring
- produce/consume with queue management
-Message-ID: <20251126100007-mutt-send-email-mst@kernel.org>
-References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
- <20251120152914.1127975-4-simon.schippers@tu-dortmund.de>
- <20251125100655-mutt-send-email-mst@kernel.org>
- <4db234bd-ebd7-4325-9157-e74eccb58616@tu-dortmund.de>
+	s=arc-20240116; t=1764171631; c=relaxed/simple;
+	bh=uA2yLzOCUKtSE6cp7GuVgmRgv0ZqGNBxvscHXc9Uxs4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JszU8KTemKVQ1kLNJ7WE+h1YzBvbTYCJrmhQoIZYgm03wQixazx++EOL39kFTcdzagyhRPCSdl57tr2T42hV1bWnqTdZGzEM7CyxBXt9GTVA4+GGjkzdz7ZsnFbh8WhngCT3UEclJpfQlbYWegfdqYa8aQrheN0vcqwdXoXMzH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=IGzLePBW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WX5AmDMi; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 2928414001FA;
+	Wed, 26 Nov 2025 10:40:27 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Wed, 26 Nov 2025 10:40:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1764171627;
+	 x=1764258027; bh=j8H6BE/mt4Q5DzO9R2uk9Mx3M08YNaiarQ6u7tGcrnA=; b=
+	IGzLePBW0zd07K3IIjaxXdywNrcCAlly/DixIiFkLk3K7BfApgpmRBzJC8koF/vB
+	3AJ+9Pyu2sqnxqFo2GZAW1Rtr/L7YjMUab3DgIhpo2kXXxm9OweCGQCCVCh7c/KT
+	XVJGZmwtNIXDx6W6/niOD7Z2f7b1GWVlk6BdEGOysBmvJsCwNFfXl4GkXQcHJRqj
+	BaWc7828+xBEeZfb+GbbEs5hrc8XMmE5sNVuXZNwR1BoWTIqRRa9VRVYvFkwNm1N
+	4ykHV77oYtTaV3Xp3aw4YktTh1a8XQMkcGRJkxXBH5ys2VTVmx63WI/cklw5lPAT
+	uN09bIS56LahdELZplfe+g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1764171627; x=
+	1764258027; bh=j8H6BE/mt4Q5DzO9R2uk9Mx3M08YNaiarQ6u7tGcrnA=; b=W
+	X5AmDMifsEM8W/QezAN5uzj6cWYqGbfaq9ihRQ5CN5Ej61g9eymlq6khjSM8/SWg
+	tZJeAp/rNagQN8Ir7VHIJ4N7kkjAgVF6vbCUOPIrg6clLzvVBE1L6o1yakZvgQV0
+	jOPYaNoCE1SCHu+FRJ3/AunVmI5R65Zgv0EQ+TuAOEQdc/nx0QMf+dWEGuoz/Rlm
+	rZ6Q+/rpnyuqImBZUYX4RlKE7a5Nw780gIgLLZN7U2b7AU+of8rBcSZyZdunMr2i
+	PbRVm3MYKgI/RoCVP54TAzTCeD2hv2n9fURrTe6CKV4EO1HIX0uee0ef6DbeoOIs
+	2Ecb+3YgxHesCcLHLvDHg==
+X-ME-Sender: <xms:aR8nafdCe95_hmcsyv9G9lnpiBo1UrB1EC-Fqusq3x4orG4_pXs9Tg>
+    <xme:aR8naVo0xoFU0a_QNQBvnB84tPHssyj5uozunslECEr8l_a1yqWKK9EHP37apuxf3
+    fw7ZswYMJBDUkhZiwavZHncNvooxiSprT69eRKpKjH6qCwtucu->
+X-ME-Received: <xmr:aR8nad9pI3gQSUythgXzTGZneOfZCoqitRlp2H5qBSy_ZEgRCbce5Skt>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgeegjedvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfgggtgfesthhqredttddtjeenucfhrhhomheptehlvgigucgh
+    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
+    htvghrnhepgffggfegffffhffhhefftdeikedtueefkefghfehledtkedvvddtieehveej
+    fffgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdp
+    nhgspghrtghpthhtohepvddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehmih
+    gthhgrlhdrfihinhhirghrshhkihesihhnthgvlhdrtghomhdprhgtphhtthhopehthhho
+    mhgrshdrhhgvlhhlshhtrhhomheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtth
+    hopehmrghtthhhvgifrdgsrhhoshhtsehinhhtvghlrdgtohhmpdhrtghpthhtoheplhhu
+    tggrshdruggvmhgrrhgthhhisehinhhtvghlrdgtohhmpdhrtghpthhtoheprhhoughrih
+    hgohdrvhhivhhisehinhhtvghlrdgtohhmpdhrtghpthhtohepjhhgghesiihivghpvgdr
+    tggrpdhrtghpthhtohephihishhhrghihhesnhhvihguihgrrdgtohhmpdhrtghpthhtoh
+    epkhgvvhhinhdrthhirghnsehinhhtvghlrdgtohhmpdhrtghpthhtohepshhkohhlohht
+    hhhumhhthhhosehnvhhiughirgdrtghomh
+X-ME-Proxy: <xmx:aR8nae7E_gnYeEsp9TOtFtmNZ3cmKciY5M9qSALORYPDu4QdZrfUYA>
+    <xmx:aR8nafglhw287NcdCItRsudbE6ORgNGk7yvuhsyL1r2mfLp9ACexfg>
+    <xmx:aR8nadoBEVUCUnSx7xp5pxxKb8eUlaBE-JKTewbT9LkMHUE8eD4bVg>
+    <xmx:aR8naTKLoacGbQLoO78fiJktYq5T-yVAzowUmX9b8JCgwYlwanV9GQ>
+    <xmx:ax8naUSQMLkt1zzlNthcDvhVX-1gRfAdg1FJ4OVuonPp3UkB7D9IN-4b>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 26 Nov 2025 10:40:24 -0500 (EST)
+Date: Wed, 26 Nov 2025 08:40:23 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: =?UTF-8?B?TWljaGHFgg==?= Winiarski <michal.winiarski@intel.com>
+Cc: Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?= <thomas.hellstrom@linux.intel.com>,
+ Matthew Brost <matthew.brost@intel.com>, Lucas De Marchi
+ <lucas.demarchi@intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
+ <kevin.tian@intel.com>, Shameer Kolothum <skolothumtho@nvidia.com>,
+ <intel-xe@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
+ <kvm@vger.kernel.org>, Michal Wajdeczko <michal.wajdeczko@intel.com>,
+ <dri-devel@lists.freedesktop.org>, Jani Nikula
+ <jani.nikula@linux.intel.com>, Joonas Lahtinen
+ <joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
+ Laguna" <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v6 0/4] vfio/xe: Add driver variant for Xe VF migration
+Message-ID: <20251126084023.705ebca1.alex@shazbot.org>
+In-Reply-To: <nsiqp2nv73cegxwmnqkxw66zfy4efl4k3zxidt23ljyry3u7b5@buufaqzja7sb>
+References: <20251124230841.613894-1-michal.winiarski@intel.com>
+	<20251125131315.60aa0614.alex@shazbot.org>
+	<aSZVybx3cgPw6HQh@lstrano-desk.jf.intel.com>
+	<c5f1344daeec43e5b5d9e6536c8c8b8a13323f7a.camel@linux.intel.com>
+	<nsiqp2nv73cegxwmnqkxw66zfy4efl4k3zxidt23ljyry3u7b5@buufaqzja7sb>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4db234bd-ebd7-4325-9157-e74eccb58616@tu-dortmund.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 26, 2025 at 10:23:50AM +0100, Simon Schippers wrote:
-> On 11/25/25 17:54, Michael S. Tsirkin wrote:
-> > On Thu, Nov 20, 2025 at 04:29:08PM +0100, Simon Schippers wrote:
-> >> Implement new ring buffer produce and consume functions for tun and tap
-> >> drivers that provide lockless producer-consumer synchronization and
-> >> netdev queue management to prevent ptr_ring tail drop and permanent
-> >> starvation.
-> >>
-> >> - tun_ring_produce(): Produces packets to the ptr_ring with proper memory
-> >>   barriers and proactively stops the netdev queue when the ring is about
-> >>   to become full.
-> >>
-> >> - __tun_ring_consume() / __tap_ring_consume(): Internal consume functions
-> >>   that check if the netdev queue was stopped due to a full ring, and wake
-> >>   it when space becomes available. Uses memory barriers to ensure proper
-> >>   ordering between producer and consumer.
-> >>
-> >> - tun_ring_consume() / tap_ring_consume(): Wrapper functions that acquire
-> >>   the consumer lock before calling the internal consume functions.
-> >>
-> >> Key features:
-> >> - Proactive queue stopping using __ptr_ring_full_next() to stop the queue
-> >>   before it becomes completely full.
-> >> - Not stopping the queue when the ptr_ring is full already, because if
-> >>   the consumer empties all entries in the meantime, stopping the queue
-> >>   would cause permanent starvation.
-> > 
-> > what is permanent starvation? this comment seems to answer this
-> > question:
-> > 
-> > 
-> > 	/* Do not stop the netdev queue if the ptr_ring is full already.
-> > 	 * The consumer could empty out the ptr_ring in the meantime
-> > 	 * without noticing the stopped netdev queue, resulting in a
-> > 	 * stopped netdev queue and an empty ptr_ring. In this case the
-> > 	 * netdev queue would stay stopped forever.
-> > 	 */
-> > 
-> > 
-> > why having a single entry in
-> > the ring we never use helpful to address this?
-> > 
-> > 
-> > 
-> > 
-> > In fact, all your patch does to solve it, is check
-> > netif_tx_queue_stopped on every consumed packet.
-> > 
-> > 
-> > I already proposed:
-> > 
-> > static inline int __ptr_ring_peek_producer(struct ptr_ring *r)
-> > {
-> >         if (unlikely(!r->size) || r->queue[r->producer])
-> >                 return -ENOSPC;
-> >         return 0;
-> > }
-> > 
-> > And with that, why isn't avoiding the race as simple as
-> > just rechecking after stopping the queue?
->  
-> I think you are right and that is quite similar to what veth [1] does.
-> However, there are two differences:
-> 
-> - Your approach avoids returning NETDEV_TX_BUSY by already stopping
->   when the ring becomes full (and not when the ring is full already)
-> - ...and the recheck of the producer wakes on !full instead of empty.
-> 
-> I like both aspects better than the veth implementation.
+On Wed, 26 Nov 2025 15:46:43 +0100
+Micha=C5=82 Winiarski <michal.winiarski@intel.com> wrote:
 
-Right.
+> On Wed, Nov 26, 2025 at 12:38:34PM +0100, Thomas Hellstr=C3=B6m wrote:
+> > On Tue, 2025-11-25 at 17:20 -0800, Matthew Brost wrote: =20
+> > > On Tue, Nov 25, 2025 at 01:13:15PM -0700, Alex Williamson wrote: =20
+> > > > On Tue, 25 Nov 2025 00:08:37 +0100
+> > > > Micha=C5=82 Winiarski <michal.winiarski@intel.com> wrote:
+> > > >  =20
+> > > > > Hi,
+> > > > >=20
+> > > > > We're now at v6, thanks for all the review feedback.
+> > > > >=20
+> > > > > First 24 patches are now already merged through drm-tip tree, and
+> > > > > I hope
+> > > > > we can get the remaining ones through the VFIO tree. =20
+> > > >=20
+> > > > Are all those dependencies in a topic branch somewhere?=C2=A0 Other=
+wise
+> > > > to
+> > > > go in through vfio would mean we need to rebase our next branch
+> > > > after
+> > > > drm is merged.=C2=A0 LPC is happening during this merge window, so =
+we
+> > > > may
+> > > > not be able to achieve that leniency in ordering.=C2=A0 Is the bett=
+er
+> > > > approach to get acks on the variant driver and funnel the whole
+> > > > thing
+> > > > through the drm tree?=C2=A0 Thanks, =20
+> > >=20
+> > > +1 on merging through drm if VFIO maintainers are ok with this. I've
+> > > done this for various drm external changes in the past with
+> > > maintainers
+> > > acks.
+> > >=20
+> > > Matt =20
+> >=20
+> > @Michal Winiarski
+> >=20
+> > Are these patches depending on any other VFIO changes that are queued
+> > for 6.19?  =20
+>=20
+> No, there's a series that I'm working on in parallel:
+> https://lore.kernel.org/lkml/20251120123647.3522082-1-michal.winiarski@in=
+tel.com/
+>=20
+> Which will potentially change the VFIO driver that's part of this
+> series.
+> But I believe that this could go through fixes, after we have all the
+> pieces in place as part of 6.19-rc release.
 
-Though frankly, someone should just fix NETDEV_TX_BUSY already
-at least with the most popular qdiscs.
+6.19-rc or 6.19+1, depends on to what extent we decide the other
+variant drivers have this same problem.  This driver has worked around
+it in the traditional way though and I don't think it needs to be
+delayed for a universal helper.
 
-It is a common situation and it is just annoying that every driver has
-to come up with its own scheme.
+> > If not and with proper VFIO acks, I could ask Dave / Sima to allow this
+> > for drm-xe-next-fixes pull. Then I also would need a strong
+> > justification for it being in 6.19 rather in 7.0.
+> >=20
+> > Otherwise we'd need to have the VFIO changes it depends on in a topic
+> > branch, or target this for 7.0 and hold off the merge until we can
+> > backmerge 6.9-rc1. =20
+>=20
+> Unless Alex has a different opinion, I think the justification would be
+> that this is just a matter of logistics - merging through DRM would just
+> be a simpler process than merging through VFIO. End result would be the
+> same.
 
+Yes, the result is the same, logistics of waiting for the drm-next
+merge, rebasing, and sending a 2nd vfio pull request is the overhead.
+The easier route through drm still depends on getting full acks on this
+and whether drm will take it.  Thanks,
 
-
-
-
-> Just one thing: like the veth implementation, we probably need a
-> smp_mb__after_atomic() after netif_tx_stop_queue() as they also discussed
-> in their v6 [2].
-
-yea makes sense.
-
-> 
-> On the consumer side, I would then just do:
-> 
-> __ptr_ring_consume();
-> if (unlikely(__ptr_ring_consume_created_space()))
->     netif_tx_wake_queue(txq);
-> 
-> Right?
-> 
-> And for the batched consume method, I would just call this in a loop.
-
-Well tun does not use batched consume does it?
-
-
-> Thank you!
-> 
-> [1] Link: https://lore.kernel.org/netdev/174559288731.827981.8748257839971869213.stgit@firesoul/T/#m2582fcc48901e2e845b20b89e0e7196951484e5f
-> [2] Link: https://lore.kernel.org/all/174549933665.608169.392044991754158047.stgit@firesoul/T/#m63f2deb86ffbd9ff3a27e1232077a3775606c14d
-> 
-> > 
-> > __ptr_ring_produce();
-> > if (__ptr_ring_peek_producer())
-> > 	netif_tx_stop_queue
-> 
-> smp_mb__after_atomic(); // Right here
-> 
-> > 	if (!__ptr_ring_peek_producer())
-> > 		netif_tx_wake_queue(txq);
-> > 
-> > 
-> > 
-> > 
-> > 
-> > 
-> > 
-
+Alex
 
