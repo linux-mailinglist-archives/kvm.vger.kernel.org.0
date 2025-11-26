@@ -1,225 +1,211 @@
-Return-Path: <kvm+bounces-64681-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64684-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59946C8ACC6
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 17:02:28 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0676BC8AD11
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 17:06:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CE043B901F
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 16:00:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 84C504ED957
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 16:04:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E0233C1AE;
-	Wed, 26 Nov 2025 16:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39DE33D6C6;
+	Wed, 26 Nov 2025 16:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jghNOWdw"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="IRFNm+rG"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C370733B96F;
-	Wed, 26 Nov 2025 16:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D732C13B;
+	Wed, 26 Nov 2025 16:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764172801; cv=none; b=tjm9PNtLdKw7qXEIjkRiAW0csm0YNKpPsstrCdAmCQbbviK8AEroZQudfIvef4aIdQfWBLFezWgD25D5dUsFHSAncLNOutvaKDcz5PDFpDQiWCxdytRXi3DhBuEq8taCtZUeTG9EhRs3Zb8SOn0y7ON9DUhAKq8mi23NmZQDzxg=
+	t=1764173088; cv=none; b=DGDCcwHzHbeIuj6zWCG2eSYFEkbe9dvptpiomAkuyXHnPPX3hccoUL7i4lwGRtrTuzk9eXerjjxIMogduAyzO9BmRtdkXFT521HGZTVkEeRZKg+1uXIhPmLVEYlGTYIH94fhMk4YZp/arZXFHyailMDcOcnakkX3sw5CX557sQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764172801; c=relaxed/simple;
-	bh=0HAJBmXE+rJLYXs5hMQhZFeGzkrf7YieZyrcWFUBa8g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kmb7Bk7u51/mvGGXQQJIhFYytcbgXEFPiO+pjazdnDY8W9pKkwrb4NJH8ltC/ZFIIPutVyz01qySsyNkrReooaVi++edowSKX1doq08iMmdjQiMABYkokKc7YUyYs0sADcyf59UcQ5qztjH+2itDmzaiTEnL8uo7uRpsSCljXr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jghNOWdw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E8D1C4AF09;
-	Wed, 26 Nov 2025 16:00:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764172801;
-	bh=0HAJBmXE+rJLYXs5hMQhZFeGzkrf7YieZyrcWFUBa8g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jghNOWdwoJdAoDEZo7hf5KMUvnNzUpAdlgMNgUpqcoIXj4Qff16+iZEipNSNf3mzF
-	 6Dw8zojl6RmpsPUfVjfqiTpkKBXTOyWAIZ+8Xr4aDGrYR5KMn5qaDepCMhq17qJOvL
-	 4VijWrIdAzcj1UAfaS/UtG6qn2A6sgg25hgUUNfqZ8d+i6eAd/qUWDZMmMvCAW6UQs
-	 g2mJYkwKOAsZUXgtUYeT5cBdP9naMffLbniJgleIQQNERPK7t20yYae227N0+Xs/C5
-	 lOaYhOgRggEQbadVmXIFdn3Hgq1TrxP/ZGBpFwwbWCf4Lwl/QLQcBwHA+JQNnTWEb7
-	 Ws6t33RlhaGkA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vOHvz-00000008WrH-1qSX;
-	Wed, 26 Nov 2025 15:59:59 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH v2 5/5] KVM: arm64: selftests: Add a test for FEAT_IDST
-Date: Wed, 26 Nov 2025 15:59:51 +0000
-Message-ID: <20251126155951.1146317-6-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251126155951.1146317-1-maz@kernel.org>
-References: <20251126155951.1146317-1-maz@kernel.org>
+	s=arc-20240116; t=1764173088; c=relaxed/simple;
+	bh=ScIjvDQM0tIm6p0ZsQW1B/rH8dMtLMvsxViZMEtoW9c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rvVOj/gNzqRVAgJjhSv0MngfxbX4S5CJTdYo6zWGc5/IsIXhv5MDFC71hl7xnwsdrSqjmIyJa96LEGbMg3KCj7JmVcV8wrH0bbKu7wgNpXXutABKNxPsZ9hlZPoBNwG5Jh8UPySnzdI3P27MrKuluQv/Ngl5I53M/ZiXuOVNAL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=IRFNm+rG; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [172.31.100.153] ([172.31.100.153])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.15/8.18.1.15) with ESMTPSA id 5AQG4PN6025014
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 26 Nov 2025 17:04:25 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1764173067;
+	bh=ScIjvDQM0tIm6p0ZsQW1B/rH8dMtLMvsxViZMEtoW9c=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=IRFNm+rGytp+ISpV6CwIJ0zuac9Fx7rM/wcTaCHG6iyk8fB4h+sVjqAdxFtXNRcwX
+	 3fFQHh2LO62L+bfs0b8PCAAHroG1ebAPhXYeHdO7gMKWqxt1ZEY8p04wa6i9gIWgIT
+	 zsDLB597xk77JyQCo2MmXyFyzM4L1PDrta5Ns8gQ=
+Message-ID: <c0fc512a-5bee-48da-9dfb-2b8101f3dec6@tu-dortmund.de>
+Date: Wed, 26 Nov 2025 17:04:25 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, ben.horgan@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 3/8] tun/tap: add synchronized ring
+ produce/consume with queue management
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+        jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
+ <20251120152914.1127975-4-simon.schippers@tu-dortmund.de>
+ <20251125100655-mutt-send-email-mst@kernel.org>
+ <4db234bd-ebd7-4325-9157-e74eccb58616@tu-dortmund.de>
+ <20251126100007-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20251126100007-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add a very basic test checking that FEAT_IDST actually works for
-the {GMID,SMIDR,CSSIDR2}_EL1 registers.
+On 11/26/25 16:25, Michael S. Tsirkin wrote:
+> On Wed, Nov 26, 2025 at 10:23:50AM +0100, Simon Schippers wrote:
+>> On 11/25/25 17:54, Michael S. Tsirkin wrote:
+>>> On Thu, Nov 20, 2025 at 04:29:08PM +0100, Simon Schippers wrote:
+>>>> Implement new ring buffer produce and consume functions for tun and tap
+>>>> drivers that provide lockless producer-consumer synchronization and
+>>>> netdev queue management to prevent ptr_ring tail drop and permanent
+>>>> starvation.
+>>>>
+>>>> - tun_ring_produce(): Produces packets to the ptr_ring with proper memory
+>>>>   barriers and proactively stops the netdev queue when the ring is about
+>>>>   to become full.
+>>>>
+>>>> - __tun_ring_consume() / __tap_ring_consume(): Internal consume functions
+>>>>   that check if the netdev queue was stopped due to a full ring, and wake
+>>>>   it when space becomes available. Uses memory barriers to ensure proper
+>>>>   ordering between producer and consumer.
+>>>>
+>>>> - tun_ring_consume() / tap_ring_consume(): Wrapper functions that acquire
+>>>>   the consumer lock before calling the internal consume functions.
+>>>>
+>>>> Key features:
+>>>> - Proactive queue stopping using __ptr_ring_full_next() to stop the queue
+>>>>   before it becomes completely full.
+>>>> - Not stopping the queue when the ptr_ring is full already, because if
+>>>>   the consumer empties all entries in the meantime, stopping the queue
+>>>>   would cause permanent starvation.
+>>>
+>>> what is permanent starvation? this comment seems to answer this
+>>> question:
+>>>
+>>>
+>>> 	/* Do not stop the netdev queue if the ptr_ring is full already.
+>>> 	 * The consumer could empty out the ptr_ring in the meantime
+>>> 	 * without noticing the stopped netdev queue, resulting in a
+>>> 	 * stopped netdev queue and an empty ptr_ring. In this case the
+>>> 	 * netdev queue would stay stopped forever.
+>>> 	 */
+>>>
+>>>
+>>> why having a single entry in
+>>> the ring we never use helpful to address this?
+>>>
+>>>
+>>>
+>>>
+>>> In fact, all your patch does to solve it, is check
+>>> netif_tx_queue_stopped on every consumed packet.
+>>>
+>>>
+>>> I already proposed:
+>>>
+>>> static inline int __ptr_ring_peek_producer(struct ptr_ring *r)
+>>> {
+>>>         if (unlikely(!r->size) || r->queue[r->producer])
+>>>                 return -ENOSPC;
+>>>         return 0;
+>>> }
+>>>
+>>> And with that, why isn't avoiding the race as simple as
+>>> just rechecking after stopping the queue?
+>>  
+>> I think you are right and that is quite similar to what veth [1] does.
+>> However, there are two differences:
+>>
+>> - Your approach avoids returning NETDEV_TX_BUSY by already stopping
+>>   when the ring becomes full (and not when the ring is full already)
+>> - ...and the recheck of the producer wakes on !full instead of empty.
+>>
+>> I like both aspects better than the veth implementation.
+> 
+> Right.
+> 
+> Though frankly, someone should just fix NETDEV_TX_BUSY already
+> at least with the most popular qdiscs.
+> 
+> It is a common situation and it is just annoying that every driver has
+> to come up with its own scheme.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../testing/selftests/kvm/arm64/idreg-idst.c  | 117 ++++++++++++++++++
- 2 files changed, 118 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/idreg-idst.c
+I can not judge it, but yes, it would have made this patchset way
+simpler.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 148d427ff24be..fa44e6d9afc35 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -171,6 +171,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
- TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
- TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
- TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
-+TEST_GEN_PROGS_arm64 += arm64/idreg-idst
- TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
- TEST_GEN_PROGS_arm64 += access_tracking_perf_test
- TEST_GEN_PROGS_arm64 += arch_timer
-diff --git a/tools/testing/selftests/kvm/arm64/idreg-idst.c b/tools/testing/selftests/kvm/arm64/idreg-idst.c
-new file mode 100644
-index 0000000000000..9ca9f125abdb7
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/idreg-idst.c
-@@ -0,0 +1,117 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/*
-+ * Access all FEAT_IDST-handled registers that depend on more than
-+ * just FEAT_AA64, and fail if we don't get an a trap with an 0x18 EC.
-+ */
-+
-+#include <test_util.h>
-+#include <kvm_util.h>
-+#include <processor.h>
-+
-+static volatile bool sys64, undef;
-+
-+#define __check_sr_read(r)					\
-+	({							\
-+		uint64_t val;					\
-+								\
-+		sys64 = false;					\
-+		undef = false;					\
-+		dsb(sy);					\
-+		val = read_sysreg_s(SYS_ ## r);			\
-+		val;						\
-+	})
-+
-+/* Fatal checks */
-+#define check_sr_read(r)					\
-+	do {							\
-+		__check_sr_read(r);				\
-+		__GUEST_ASSERT(!undef, #r " unexpected UNDEF");	\
-+		__GUEST_ASSERT(sys64, #r " didn't trap");	\
-+	} while(0)
-+
-+
-+static void guest_code(void)
-+{
-+	check_sr_read(CCSIDR2_EL1);
-+	check_sr_read(SMIDR_EL1);
-+	check_sr_read(GMID_EL1);
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_sys64_handler(struct ex_regs *regs)
-+{
-+	sys64 = true;
-+	undef = false;
-+	regs->pc += 4;
-+}
-+
-+static void guest_undef_handler(struct ex_regs *regs)
-+{
-+	sys64 = false;
-+	undef = true;
-+	regs->pc += 4;
-+}
-+
-+static void test_run_vcpu(struct kvm_vcpu *vcpu)
-+{
-+	struct ucall uc;
-+
-+	do {
-+		vcpu_run(vcpu);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_PRINTF:
-+			printf("%s", uc.buffer);
-+			break;
-+		case UCALL_DONE:
-+			break;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	} while (uc.cmd != UCALL_DONE);
-+}
-+
-+static void test_guest_feat_idst(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	/* This VM has no MTE, no SME, no CCIDX */
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_ELx_EC_SYS64, guest_sys64_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_ELx_EC_UNKNOWN, guest_undef_handler);
-+
-+	test_run_vcpu(vcpu);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	uint64_t mmfr2;
-+
-+	test_disable_default_vgic();
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, NULL);
-+	mmfr2 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR2_EL1));
-+	__TEST_REQUIRE(FIELD_GET(ID_AA64MMFR2_EL1_IDS, mmfr2) > 0,
-+		       "FEAT_IDST not supported");
-+	kvm_vm_free(vm);
-+
-+	test_guest_feat_idst();
-+
-+	return 0;
-+}
--- 
-2.47.3
+> 
+> 
+> 
+> 
+> 
+>> Just one thing: like the veth implementation, we probably need a
+>> smp_mb__after_atomic() after netif_tx_stop_queue() as they also discussed
+>> in their v6 [2].
+> 
+> yea makes sense.
+> 
+>>
+>> On the consumer side, I would then just do:
+>>
+>> __ptr_ring_consume();
+>> if (unlikely(__ptr_ring_consume_created_space()))
+>>     netif_tx_wake_queue(txq);
+>>
+>> Right?
+>>
+>> And for the batched consume method, I would just call this in a loop.
+> 
+> Well tun does not use batched consume does it?
 
+tun does not but vhost-net does.
+
+Since vhost-net also uses tun_net_xmit() as its ndo_start_xmit in a
+tap+vhost-net setup, its consumer must also be changed. Else
+tun_net_xmit() would stop the queue, but it would never be woken again.
+
+> 
+> 
+>> Thank you!
+>>
+>> [1] Link: https://lore.kernel.org/netdev/174559288731.827981.8748257839971869213.stgit@firesoul/T/#m2582fcc48901e2e845b20b89e0e7196951484e5f
+>> [2] Link: https://lore.kernel.org/all/174549933665.608169.392044991754158047.stgit@firesoul/T/#m63f2deb86ffbd9ff3a27e1232077a3775606c14d
+>>
+>>>
+>>> __ptr_ring_produce();
+>>> if (__ptr_ring_peek_producer())
+>>> 	netif_tx_stop_queue
+>>
+>> smp_mb__after_atomic(); // Right here
+>>
+>>> 	if (!__ptr_ring_peek_producer())
+>>> 		netif_tx_wake_queue(txq);
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>
+> 
 
