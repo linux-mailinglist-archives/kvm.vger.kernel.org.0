@@ -1,359 +1,129 @@
-Return-Path: <kvm+bounces-64751-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64753-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C85E0C8C113
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 22:43:25 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5E42C8C149
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 22:46:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3C92435AF12
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 21:43:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 85B344E71AF
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 21:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF3A3161BC;
-	Wed, 26 Nov 2025 21:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CFEF2FB0B9;
+	Wed, 26 Nov 2025 21:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bFwMcNF8"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="gg81uigJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E50FF3064B9;
-	Wed, 26 Nov 2025 21:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9862D8393
+	for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 21:46:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764193395; cv=none; b=FC01PlUEqdkeXCzj0ZLitX3HDPy997GvgPXqEQDodHOWX74FLIh9yyV03KOi1hFanNU3X1j9Hw2zUaEqpwvbw1UUWCYUYIdmAv8Gr1TqJ4tXaY6XzP7fwoq62G33lFOCMGpZ7/79r4rIxeiqf/Zb0eeAw8oX3uLh75LmAb5qdEs=
+	t=1764193569; cv=none; b=bGfHhZYs4aiDT8kIhV0GxULnx2H0YKiwglggJn12J18AQo9dJogqpvLle4iTXNfoR+rcPgRmYNeO2E6QLYO6KJFnyq2QE0/x/j2zy5kR90ATFFDDX65Gvn2T0YsW+H0/Ef1BAwtMoO/CFWUa9NnwHWDXbo3u1S4KqveKZk4wXcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764193395; c=relaxed/simple;
-	bh=hOrNQuqwLs9HpX+NGhQcIxOyOPGBm6qzJkrnYzen8Og=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=XwAR+0QvbNSqQlM1L/VVngx4kMqUCTnmbZZ7WJ9XE293alqjv9M9S5yoegzUcPBTjuVcJlcFEBNouPXJP/O2rD4KcdJ/3YlszAOvOQHwu3rBBT9IutniY/FLsUQxKvMrTo+sOVdi+Wi9mjMFqH0xNvya18CxMxUun3RocFgPqtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bFwMcNF8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49EC8C4CEF7;
-	Wed, 26 Nov 2025 21:43:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764193394;
-	bh=hOrNQuqwLs9HpX+NGhQcIxOyOPGBm6qzJkrnYzen8Og=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=bFwMcNF8c8nXGrBt3lcqVsIh2ehDocCqEmlgsB8lulGtp94yxvlaZ2Gt4SVPFboKq
-	 69UnISVTzS2U/kEnkW/e0HZrNaWLlpH/9ymwdvitsRSAKNg4QT56jbXgX4Pvbw8ebA
-	 IfjATCYR0ZvcFExeeMrqn2f7TdmVnkhMZgtTZs0udr6rrceW67a22ElrKOnO0uEqSz
-	 xdWImBogihWMXmZ9hfbg0sfJWMh1JXnE2i/js1nHnEbO8uDXNSJeqF0ZFzUZCd9SMt
-	 7am8IwxDK5149+afLj34cdw56KIplcfLBedPT4jChFtvFxBlZJh9qZgSRMesgF5VH5
-	 cwe1Ac4VDJCxg==
-Date: Wed, 26 Nov 2025 15:43:13 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: joro@8bytes.org, rafael@kernel.org, bhelgaas@google.com,
-	alex@shazbot.org, jgg@nvidia.com, will@kernel.org,
-	robin.murphy@arm.com, lenb@kernel.org, kevin.tian@intel.com,
-	baolu.lu@linux.intel.com, linux-arm-kernel@lists.infradead.org,
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-acpi@vger.kernel.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, patches@lists.linux.dev,
-	pjaroszynski@nvidia.com, vsethi@nvidia.com, etzhao1900@gmail.com
-Subject: Re: [PATCH v7 5/5] PCI: Suspend iommu function prior to resetting a
- device
-Message-ID: <20251126213204.GA2852059@bhelgaas>
+	s=arc-20240116; t=1764193569; c=relaxed/simple;
+	bh=eHQD5ZWYTKJ5pBQ2l+KQFGoT1AEPijvyxf4X4cwZ+8g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TDRIgFaQIKgyO0/4uq/dP66r4vHN8rn2GApnRJgdLV23OqJIEgCtYgpDE5D1cRPPsZ0BmC8HZ3mJrPOh1ScQham4Hkd4N9qIVtqjEYSRhcuyJ5H/zoZdufVgbdsjmtqIWj8pCZgo+5ADbLtDI9olNpVP8Ub6fEwVt11eBNRFD/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=gg81uigJ; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b737502f77bso37998766b.2
+        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 13:46:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1764193565; x=1764798365; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DR4A76Dv8qf/+6WmZVEh6koqxlO2WxAmz56oNgGMFDY=;
+        b=gg81uigJukUZgFx4FvmiB0bv6phOBtZXCOc1OZOI1Sw0Kyh17cNG6dSYyM4q9oexY3
+         jb5DUOq1AuaiPZCkee2vJIKTQqW9bS1sTI1T0eVshE87LRyjmyKR1yLFvP3ESy2pFnTe
+         tCnKqBnmXCSj3OqG75M1AGnWdkLsBIkhg3EIU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764193565; x=1764798365;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=DR4A76Dv8qf/+6WmZVEh6koqxlO2WxAmz56oNgGMFDY=;
+        b=fbehLCBD868GAKWelVXXtJiwc9mlEGm0qTpgoEq5IvzwY7Oq+6Ea8QEpl2+Pntqg69
+         cLXG2+ADlWVZbxCzVHvYhH5pGOnYSqKEku9ifbPd4SHEavyUDFqeuRfFO1rzR/OFFUUu
+         Ye7iaN58MrpHtQhvuD2ryp3Sq7+0UzXszupbENg+wpFyQfTsi77loGMDXrR0BSDmaEw7
+         Yn92xH4hhiTGsQfM9zcnYfKBSGKy3LOFJOziEAFdZMU8MTKyPdfdxxhIXWNw0xVKG+vd
+         pfIJnnS8hKoNMi2Te0Nrw1EHzfmqEAfw2gBPz80bxNhZC+maogz0gxXMkpNiLgEnVu6g
+         HpKA==
+X-Forwarded-Encrypted: i=1; AJvYcCUnKbCLqBfHus3HCKfryj7Vi53hnyOAaKCeJwcCZDxl9wgWyrB95tXMKxHtskujkgVvOcE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNZ1AKBc7iybxvmUxj4UHgmh16S8o9U85XDx+A45gLaObAGN+G
+	xfM6adV9k4kOICdToRe1GkVSkVPuAwQuc2sHTZLfyuI9oqZryg0wao1urThfRCVBRY0YYlsx8Yi
+	TWgbiYIpAcA==
+X-Gm-Gg: ASbGnctR7ccQTRbKWnCtUDwgLnG7iVJv7otj+UaQFJjk048231uSFCTosmsrqJZ/zzN
+	NMYkQVoqnIt3a3FXlTRq0058PibyB3QWy3y8iRjQdcSXszbvxeyxoFBe4bzqUXy7ZIYMVwl6Vpg
+	rx1Q8b4M5ava9qp7Aj2C3Qucm1CiUyhlx06pGr1Ncj1kYG47wtAa5hEV5/u8P3116veTaZtcn11
+	hYAOfTCley6bfDUlLPP2CchcNoKVEpgZ8vyktg5naJdE4lhWGqWgbyvQw6oIE1E0p1mLG2JcT3k
+	exCS/GbndfKTiyFXS6trZ1XVSY9FuIYP2OdgjwfkBkRFq7AEQzAUl/OwpXTLPhovJYpoIanv6mO
+	NMp06rjfBAt4mnvVLq+TJ9ao6EBMJhvXkK2ytEEh6KGyUKJFx4T/iCC9ZNmhEJj7E+pMSK5+Q6R
+	Lctv5FoVLp+PogLOB/CEOAdjsHWfFZI2cr3f3JlNS1NaP/3c5X8kWNODar+s3j
+X-Google-Smtp-Source: AGHT+IHW7xuKelLdvj6qoSni3E0TzjQ5qNryQTM95xBtLbSJ5fSztXFkRB2L6gCGUUzw1AG/8m5tBQ==
+X-Received: by 2002:a17:907:6d12:b0:b6d:7288:973d with SMTP id a640c23a62f3a-b76c558fdb6mr896235766b.56.1764193565187;
+        Wed, 26 Nov 2025 13:46:05 -0800 (PST)
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com. [209.85.208.42])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654cf0435sm1976227166b.4.2025.11.26.13.46.02
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Nov 2025 13:46:02 -0800 (PST)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6408f9cb1dcso412793a12.3
+        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 13:46:02 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVIZg6gqxAxHG8toYICnBzWKXfkBpAHz3r1ozH91K44qHgD6+qTNph+VdGiHvviemBJbmc=@vger.kernel.org
+X-Received: by 2002:a05:6402:13cb:b0:640:c454:e8 with SMTP id
+ 4fb4d7f45d1cf-645eb2b7f7emr8102794a12.30.1764193562184; Wed, 26 Nov 2025
+ 13:46:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4d2444cc52cf3885bfd5c8d86d5eeea8a5f67df8.1763775108.git.nicolinc@nvidia.com>
+References: <20251113005529.2494066-1-jon@nutanix.com> <CACGkMEtQZ3M-sERT2P8WV=82BuXCbBHeJX+zgxx+9X7OUTqi4g@mail.gmail.com>
+ <E1226897-C6D1-439C-AB3B-012F8C4A72DF@nutanix.com> <CACGkMEuPK4=Tf3x-k0ZHY1rqL=2rg60-qdON8UJmQZTqpUryTQ@mail.gmail.com>
+ <A0AFD371-1FA3-48F7-A259-6503A6F052E5@nutanix.com> <CACGkMEvD16y2rt+cXupZ-aEcPZ=nvU7+xYSYBkUj7tH=ER3f-A@mail.gmail.com>
+ <121ABD73-9400-4657-997C-6AEA578864C5@nutanix.com> <CACGkMEtk7veKToaJO9rwo7UeJkN+reaoG9_XcPG-dKAho1dV+A@mail.gmail.com>
+ <61102cff-bb35-4fe4-af61-9fc31e3c65e0@app.fastmail.com> <02B0FDF1-41D4-4A7D-A57E-089D2B69CEF2@nutanix.com>
+ <32530984-cbaa-49e8-9c1e-34f04271538d@app.fastmail.com> <0D4EA459-C3E5-4557-97EB-17ABB4F817E5@nutanix.com>
+In-Reply-To: <0D4EA459-C3E5-4557-97EB-17ABB4F817E5@nutanix.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 26 Nov 2025 13:45:45 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wiEg3yO5znyPD+soCkVi_emP=wHrRZk2sv4VS768S3a2g@mail.gmail.com>
+X-Gm-Features: AWmQ_bkSLlyCoqZg3bYaZu1P_V2VILWs6lgJjJBJnYgDxxhAqc51xHDCsThFNYo
+Message-ID: <CAHk-=wiEg3yO5znyPD+soCkVi_emP=wHrRZk2sv4VS768S3a2g@mail.gmail.com>
+Subject: Re: [PATCH net-next] vhost: use "checked" versions of get_user() and put_user()
+To: Jon Kohler <jon@nutanix.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Jason Wang <jasowang@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, Netdev <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>, 
+	Sean Christopherson <seanjc@google.com>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <linux@armlinux.org.uk>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Krzysztof Kozlowski <krzk@kernel.org>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Drew Fustini <fustini@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 21, 2025 at 05:57:32PM -0800, Nicolin Chen wrote:
-> PCIe permits a device to ignore ATS invalidation TLPs while processing a
-> reset. This creates a problem visible to the OS where an ATS invalidation
-> command will time out: e.g. an SVA domain will have no coordination with a
-> reset event and can racily issue ATS invalidations to a resetting device.
-> 
-> The PCIe r6.0, sec 10.3.1 IMPLEMENTATION NOTE recommends SW to disable and
-> block ATS before initiating a Function Level Reset. It also mentions that
-> other reset methods could have the same vulnerability as well.
-> 
-> The IOMMU subsystem provides pci_dev_reset_iommu_prepare/done() callback
-> helpers for this matter. Use them in all the existing reset functions.
-> 
-> This will attach the device to its iommu_group->blocking_domain during the
-> device reset, so as to allow IOMMU driver to:
->  - invoke pci_disable_ats() and pci_enable_ats(), if necessary
->  - wait for all ATS invalidations to complete
->  - stop issuing new ATS invalidations
->  - fence any incoming ATS queries
-> 
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+On Wed, 26 Nov 2025 at 13:43, Jon Kohler <jon@nutanix.com> wrote:
+>
+> Linus mentioned he might get into the mix and do a bulk
+> change and kill the whole thing once and for all, so I=E2=80=99m
+> simply trying to help knock an incremental amount of work
+> off the pile in advance of that (and reap some performance
+> benefits at the same time, at least on the x86 side).
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+So I'm definitely going to do some bulk conversion at some point, but
+honestly, I'll be a lot happier if most users already self-converted
+before that, and I only end up doing a "convert unmaintained old code
+that nobody really cares about".
 
-> ---
->  drivers/pci/pci-acpi.c | 13 +++++++--
->  drivers/pci/pci.c      | 65 +++++++++++++++++++++++++++++++++++++-----
->  drivers/pci/quirks.c   | 19 +++++++++++-
->  3 files changed, 87 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/pci/pci-acpi.c b/drivers/pci/pci-acpi.c
-> index 9369377725fa0..651d9b5561fff 100644
-> --- a/drivers/pci/pci-acpi.c
-> +++ b/drivers/pci/pci-acpi.c
-> @@ -9,6 +9,7 @@
->  
->  #include <linux/delay.h>
->  #include <linux/init.h>
-> +#include <linux/iommu.h>
->  #include <linux/irqdomain.h>
->  #include <linux/pci.h>
->  #include <linux/msi.h>
-> @@ -971,6 +972,7 @@ void pci_set_acpi_fwnode(struct pci_dev *dev)
->  int pci_dev_acpi_reset(struct pci_dev *dev, bool probe)
->  {
->  	acpi_handle handle = ACPI_HANDLE(&dev->dev);
-> +	int ret;
->  
->  	if (!handle || !acpi_has_method(handle, "_RST"))
->  		return -ENOTTY;
-> @@ -978,12 +980,19 @@ int pci_dev_acpi_reset(struct pci_dev *dev, bool probe)
->  	if (probe)
->  		return 0;
->  
-> +	ret = pci_dev_reset_iommu_prepare(dev);
-> +	if (ret) {
-> +		pci_err(dev, "failed to stop IOMMU for a PCI reset: %d\n", ret);
-> +		return ret;
-> +	}
-> +
->  	if (ACPI_FAILURE(acpi_evaluate_object(handle, "_RST", NULL, NULL))) {
->  		pci_warn(dev, "ACPI _RST failed\n");
-> -		return -ENOTTY;
-> +		ret = -ENOTTY;
->  	}
->  
-> -	return 0;
-> +	pci_dev_reset_iommu_done(dev);
-> +	return ret;
->  }
->  
->  bool acpi_pci_power_manageable(struct pci_dev *dev)
-> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> index b14dd064006cc..da0cf0f041516 100644
-> --- a/drivers/pci/pci.c
-> +++ b/drivers/pci/pci.c
-> @@ -13,6 +13,7 @@
->  #include <linux/delay.h>
->  #include <linux/dmi.h>
->  #include <linux/init.h>
-> +#include <linux/iommu.h>
->  #include <linux/msi.h>
->  #include <linux/of.h>
->  #include <linux/pci.h>
-> @@ -25,6 +26,7 @@
->  #include <linux/logic_pio.h>
->  #include <linux/device.h>
->  #include <linux/pm_runtime.h>
-> +#include <linux/pci-ats.h>
->  #include <linux/pci_hotplug.h>
->  #include <linux/vmalloc.h>
->  #include <asm/dma.h>
-> @@ -4478,13 +4480,22 @@ EXPORT_SYMBOL(pci_wait_for_pending_transaction);
->   */
->  int pcie_flr(struct pci_dev *dev)
->  {
-> +	int ret;
-> +
->  	if (!pci_wait_for_pending_transaction(dev))
->  		pci_err(dev, "timed out waiting for pending transaction; performing function level reset anyway\n");
->  
-> +	/* Have to call it after waiting for pending DMA transaction */
-> +	ret = pci_dev_reset_iommu_prepare(dev);
-> +	if (ret) {
-> +		pci_err(dev, "failed to stop IOMMU for a PCI reset: %d\n", ret);
-> +		return ret;
-> +	}
-> +
->  	pcie_capability_set_word(dev, PCI_EXP_DEVCTL, PCI_EXP_DEVCTL_BCR_FLR);
->  
->  	if (dev->imm_ready)
-> -		return 0;
-> +		goto done;
->  
->  	/*
->  	 * Per PCIe r4.0, sec 6.6.2, a device must complete an FLR within
-> @@ -4493,7 +4504,10 @@ int pcie_flr(struct pci_dev *dev)
->  	 */
->  	msleep(100);
->  
-> -	return pci_dev_wait(dev, "FLR", PCIE_RESET_READY_POLL_MS);
-> +	ret = pci_dev_wait(dev, "FLR", PCIE_RESET_READY_POLL_MS);
-> +done:
-> +	pci_dev_reset_iommu_done(dev);
-> +	return ret;
->  }
->  EXPORT_SYMBOL_GPL(pcie_flr);
->  
-> @@ -4521,6 +4535,7 @@ EXPORT_SYMBOL_GPL(pcie_reset_flr);
->  
->  static int pci_af_flr(struct pci_dev *dev, bool probe)
->  {
-> +	int ret;
->  	int pos;
->  	u8 cap;
->  
-> @@ -4547,10 +4562,17 @@ static int pci_af_flr(struct pci_dev *dev, bool probe)
->  				 PCI_AF_STATUS_TP << 8))
->  		pci_err(dev, "timed out waiting for pending transaction; performing AF function level reset anyway\n");
->  
-> +	/* Have to call it after waiting for pending DMA transaction */
-> +	ret = pci_dev_reset_iommu_prepare(dev);
-> +	if (ret) {
-> +		pci_err(dev, "failed to stop IOMMU for a PCI reset: %d\n", ret);
-> +		return ret;
-> +	}
-> +
->  	pci_write_config_byte(dev, pos + PCI_AF_CTRL, PCI_AF_CTRL_FLR);
->  
->  	if (dev->imm_ready)
-> -		return 0;
-> +		goto done;
->  
->  	/*
->  	 * Per Advanced Capabilities for Conventional PCI ECN, 13 April 2006,
-> @@ -4560,7 +4582,10 @@ static int pci_af_flr(struct pci_dev *dev, bool probe)
->  	 */
->  	msleep(100);
->  
-> -	return pci_dev_wait(dev, "AF_FLR", PCIE_RESET_READY_POLL_MS);
-> +	ret = pci_dev_wait(dev, "AF_FLR", PCIE_RESET_READY_POLL_MS);
-> +done:
-> +	pci_dev_reset_iommu_done(dev);
-> +	return ret;
->  }
->  
->  /**
-> @@ -4581,6 +4606,7 @@ static int pci_af_flr(struct pci_dev *dev, bool probe)
->  static int pci_pm_reset(struct pci_dev *dev, bool probe)
->  {
->  	u16 csr;
-> +	int ret;
->  
->  	if (!dev->pm_cap || dev->dev_flags & PCI_DEV_FLAGS_NO_PM_RESET)
->  		return -ENOTTY;
-> @@ -4595,6 +4621,12 @@ static int pci_pm_reset(struct pci_dev *dev, bool probe)
->  	if (dev->current_state != PCI_D0)
->  		return -EINVAL;
->  
-> +	ret = pci_dev_reset_iommu_prepare(dev);
-> +	if (ret) {
-> +		pci_err(dev, "failed to stop IOMMU for a PCI reset: %d\n", ret);
-> +		return ret;
-> +	}
-> +
->  	csr &= ~PCI_PM_CTRL_STATE_MASK;
->  	csr |= PCI_D3hot;
->  	pci_write_config_word(dev, dev->pm_cap + PCI_PM_CTRL, csr);
-> @@ -4605,7 +4637,9 @@ static int pci_pm_reset(struct pci_dev *dev, bool probe)
->  	pci_write_config_word(dev, dev->pm_cap + PCI_PM_CTRL, csr);
->  	pci_dev_d3_sleep(dev);
->  
-> -	return pci_dev_wait(dev, "PM D3hot->D0", PCIE_RESET_READY_POLL_MS);
-> +	ret = pci_dev_wait(dev, "PM D3hot->D0", PCIE_RESET_READY_POLL_MS);
-> +	pci_dev_reset_iommu_done(dev);
-> +	return ret;
->  }
->  
->  /**
-> @@ -5033,10 +5067,20 @@ static int pci_reset_bus_function(struct pci_dev *dev, bool probe)
->  		return -ENOTTY;
->  	}
->  
-> +	rc = pci_dev_reset_iommu_prepare(dev);
-> +	if (rc) {
-> +		pci_err(dev, "failed to stop IOMMU for a PCI reset: %d\n", rc);
-> +		return rc;
-> +	}
-> +
->  	rc = pci_dev_reset_slot_function(dev, probe);
->  	if (rc != -ENOTTY)
-> -		return rc;
-> -	return pci_parent_bus_reset(dev, probe);
-> +		goto done;
-> +
-> +	rc = pci_parent_bus_reset(dev, probe);
-> +done:
-> +	pci_dev_reset_iommu_done(dev);
-> +	return rc;
->  }
->  
->  static int cxl_reset_bus_function(struct pci_dev *dev, bool probe)
-> @@ -5060,6 +5104,12 @@ static int cxl_reset_bus_function(struct pci_dev *dev, bool probe)
->  	if (rc)
->  		return -ENOTTY;
->  
-> +	rc = pci_dev_reset_iommu_prepare(dev);
-> +	if (rc) {
-> +		pci_err(dev, "failed to stop IOMMU for a PCI reset: %d\n", rc);
-> +		return rc;
-> +	}
-> +
->  	if (reg & PCI_DVSEC_CXL_PORT_CTL_UNMASK_SBR) {
->  		val = reg;
->  	} else {
-> @@ -5074,6 +5124,7 @@ static int cxl_reset_bus_function(struct pci_dev *dev, bool probe)
->  		pci_write_config_word(bridge, dvsec + PCI_DVSEC_CXL_PORT_CTL,
->  				      reg);
->  
-> +	pci_dev_reset_iommu_done(dev);
->  	return rc;
->  }
->  
-> diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
-> index b9c252aa6fe08..c6b999045c70a 100644
-> --- a/drivers/pci/quirks.c
-> +++ b/drivers/pci/quirks.c
-> @@ -21,6 +21,7 @@
->  #include <linux/pci.h>
->  #include <linux/isa-dma.h> /* isa_dma_bridge_buggy */
->  #include <linux/init.h>
-> +#include <linux/iommu.h>
->  #include <linux/delay.h>
->  #include <linux/acpi.h>
->  #include <linux/dmi.h>
-> @@ -4228,6 +4229,22 @@ static const struct pci_dev_reset_methods pci_dev_reset_methods[] = {
->  	{ 0 }
->  };
->  
-> +static int __pci_dev_specific_reset(struct pci_dev *dev, bool probe,
-> +				    const struct pci_dev_reset_methods *i)
-> +{
-> +	int ret;
-> +
-> +	ret = pci_dev_reset_iommu_prepare(dev);
-> +	if (ret) {
-> +		pci_err(dev, "failed to stop IOMMU for a PCI reset: %d\n", ret);
-> +		return ret;
-> +	}
-> +
-> +	ret = i->reset(dev, probe);
-> +	pci_dev_reset_iommu_done(dev);
-> +	return ret;
-> +}
-> +
->  /*
->   * These device-specific reset methods are here rather than in a driver
->   * because when a host assigns a device to a guest VM, the host may need
-> @@ -4242,7 +4259,7 @@ int pci_dev_specific_reset(struct pci_dev *dev, bool probe)
->  		     i->vendor == (u16)PCI_ANY_ID) &&
->  		    (i->device == dev->device ||
->  		     i->device == (u16)PCI_ANY_ID))
-> -			return i->reset(dev, probe);
-> +			return __pci_dev_specific_reset(dev, probe, i);
->  	}
->  
->  	return -ENOTTY;
-> -- 
-> 2.43.0
-> 
+                  Linus
 
