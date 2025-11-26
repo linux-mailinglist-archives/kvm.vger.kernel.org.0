@@ -1,310 +1,275 @@
-Return-Path: <kvm+bounces-64669-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64675-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32906C8A9A8
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 16:22:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 155D5C8A9E3
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 16:25:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9EE1C4E05FE
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 15:22:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDF113AE2DD
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 15:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA39C331A41;
-	Wed, 26 Nov 2025 15:22:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428FA333728;
+	Wed, 26 Nov 2025 15:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="b/QDx2Tj";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="TEq4yzwT"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="k3P6E3qW";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MwcixTV8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DAC1F8AC5;
-	Wed, 26 Nov 2025 15:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764170568; cv=fail; b=QGqToTh0MILWSr/3FdPV+szTQrQuTTc9UQd8UsFiQShij+G7UWLwIykZedgOk5Ol+QZdzdhVn+xmZHeA8R81r298ejkNizbcX+Dly0I+UR7cxKcFWFWLSfCAjqZJWjG4dkn/Wa6B/4yF9Ebxz7d8TLCvggvLKft4yrK8rr8Lxr8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764170568; c=relaxed/simple;
-	bh=R9T+Uom49TR/P3ci0Bs3wHhaB+P0s7M2vDwpmPr94Cs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=db1HFh1oTlGdHy3LGbNgdfKE9zv4dRtBsX6weGr0bDtnWn4ujYHgerXC/vNgLXMUFIXoMOyjz6XUbfhuDjU+Tgp/FkguGHVFeqvN3gEapJVF5h1gLHbNL0is8mZzF52S6XDylF06wM/PxWNGKr7+vqJ7DcxMKV8aw6Ey2E8GxQ8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=b/QDx2Tj; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=TEq4yzwT; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AQEuCoZ2463592;
-	Wed, 26 Nov 2025 15:22:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2025-04-25; bh=BuefghzGGqRGDy525C
-	QBV3aYGbHdDw7QQci0p8gvqsA=; b=b/QDx2Tjy8IkauW6ZE1fUIvN5WX3tFwU4e
-	1tkge3Fe956XoY1YNgBE3EffTFEPQcBOwOiZUhb8GbyBUKB1e3LO5jmfzG9SaKbH
-	LQQdefht+PlQGl1H3odfuuLiObnSLgdRONFLPTAWs5O7mWkaSNqPDNz88/ncGYOp
-	BqmGG/Ff8pKDA6357MStMI4C5f+rR+Qyxu9E8TYwMgV5cs37V/4cCIAPbfp8TlA2
-	a3eVMSgKN9nssEuKmVxSAdhWWQwISyN8UijZaKoACzpJ3u5vK5dC2N03jfpPaZ8w
-	qZUut+yo17x+6kDwj3SLYy264HbgU+Uvz7WWH02bPhunvP17QjIQ==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4ak8fkmj6x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 26 Nov 2025 15:22:24 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AQEhFGx018874;
-	Wed, 26 Nov 2025 15:22:23 GMT
-Received: from ch1pr05cu001.outbound.protection.outlook.com (mail-northcentralusazon11010042.outbound.protection.outlook.com [52.101.193.42])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4ak3mb4523-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 26 Nov 2025 15:22:23 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=clIq2B+XcYnEa9iHQQ6waPTZ+9hj0QtaYl4DT8KdfF5m1MP3fPlHYM+noxi6IgAo2Sl6DV7LqyypmDgc5dksLvbi4+Z9NxWWcMr2HJinl/wdGgRbJG/6U0lnjqLqnpXlwXneMghOXxRRQSphM9K7N3ylLfEUiA+cih1txzYfh7FovhkY0CMAapLboDxj2BShfDXmDZckGht+t6+zNbOdAZ7711mQr9Qayo6Vpgib7Tc8TUwfei2XOfRyAhdSfSxhKyMts4vY+/1FF9oMtVKi4FW6+kBShg25pBM5EBD1tE3rif2/kDS74FKp6ajHE8qWgvnLo/I/jjjvyEeTYYg/Xw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BuefghzGGqRGDy525CQBV3aYGbHdDw7QQci0p8gvqsA=;
- b=iP21px/xvWdMN8LpcISSikKv7FOXQfxhPbHUf5naKYr/t0frU9bcd5FePLqj9OUT4G4qZsmyQfVBK9Qk7m44xHpoEEjO1QNqgBGSVw7Rnp3grXlprP9sKBJ0eK0lvyMQBIe31rBTNW2Ky5qyuGiiyZL3zsMmx9hqL44VxWjlAsD3CHUk5Vf3nNq8PR3ibJkdpKTwQztqWxLg41Gof390RuYAQae7gRnT84ApMhDFBtF2ooISQI4SHTADAjyuCFtPYlD/dWzlXHjhHpMBDmUNGpBBpVBdW+kbfwDz7/52zUA9EqaHYFaa4p6GAw1P9kEaTXYbwwrEDFHkkKji1GDfQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BuefghzGGqRGDy525CQBV3aYGbHdDw7QQci0p8gvqsA=;
- b=TEq4yzwTHD5RXi62z28kE0SqweX973HlJwj3BgCxdW/CTGJ76x3fx+OpZ1LIKBJtJcN73SLO3Z3Ezs57KdkDhCxWEhEw0Ht/UaHbsEVlswzaLi/GavVhV/+XuF0y2AlJKj/I62CFecHSuipxXRsDEP1w5HcDxZYG3bHFOdxYu6o=
-Received: from PH0PR10MB5777.namprd10.prod.outlook.com (2603:10b6:510:128::16)
- by CH0PR10MB5001.namprd10.prod.outlook.com (2603:10b6:610:c2::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.13; Wed, 26 Nov
- 2025 15:22:21 +0000
-Received: from PH0PR10MB5777.namprd10.prod.outlook.com
- ([fe80::75a8:21cc:f343:f68c]) by PH0PR10MB5777.namprd10.prod.outlook.com
- ([fe80::75a8:21cc:f343:f68c%5]) with mapi id 15.20.9366.009; Wed, 26 Nov 2025
- 15:22:20 +0000
-Date: Wed, 26 Nov 2025 10:22:16 -0500
-From: "Liam R. Howlett" <Liam.Howlett@oracle.com>
-To: Mike Rapoport <rppt@kernel.org>
-Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Baolin Wang <baolin.wang@linux.alibaba.com>,
-        David Hildenbrand <david@redhat.com>, Hugh Dickins <hughd@google.com>,
-        James Houghton <jthoughton@google.com>,
-        Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-        Michal Hocko <mhocko@suse.com>, Nikita Kalyazin <kalyazin@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 4/5] guest_memfd: add support for userfaultfd minor
- mode
-Message-ID: <4pjmnp7rvgftqg2l3icju2sduqfwun53ugbkw2pabbegpshvu4@uto2h4so2rgs>
-Mail-Followup-To: "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Mike Rapoport <rppt@kernel.org>, linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, David Hildenbrand <david@redhat.com>, 
-	Hugh Dickins <hughd@google.com>, James Houghton <jthoughton@google.com>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Michal Hocko <mhocko@suse.com>, 
-	Nikita Kalyazin <kalyazin@amazon.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Peter Xu <peterx@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Shuah Khan <shuah@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
-	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-References: <20251125183840.2368510-1-rppt@kernel.org>
- <20251125183840.2368510-5-rppt@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251125183840.2368510-5-rppt@kernel.org>
-User-Agent: NeoMutt/20250905
-X-ClientProxiedBy: MW4PR02CA0028.namprd02.prod.outlook.com
- (2603:10b6:303:16d::7) To PH0PR10MB5777.namprd10.prod.outlook.com
- (2603:10b6:510:128::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28DD332EAD;
+	Wed, 26 Nov 2025 15:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764170658; cv=none; b=PRIRBijrLufqH6mrr5AAJfjW73NItKVZwzpC8fEvzjt1z1w7mJdA3KNsaR93Ma/b2yDsyd3jit/Frj9ldICtWwotocz0eL0hvBHFB/lDzkU/Irv8tG1rbBtgVKStBUsixKpwakmnZ1kTRMvpskbfhEFL8QMlncnjwjwOYm0P+NA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764170658; c=relaxed/simple;
+	bh=AzhzpAIugeRffXjXI7tbB1YjBWe+OkWiUb9Mm5gxeVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gwGuXWPxGHlYChNmqYB1ril07otzliUvQKW2k658V0ejt/f/di15f0leRDg2Q9hR32NfWCoBcekC2x/RjKwCYvFXPubmi/bKfEvbsj+6LbJpEIDWWUM9PTeK0UNuOF3ubJ1V4s8VovJDlOmaU3RGj303e4kfjuDJEG9mpfy3bIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=k3P6E3qW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MwcixTV8; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id E1D53EC01E5;
+	Wed, 26 Nov 2025 10:24:14 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Wed, 26 Nov 2025 10:24:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1764170654;
+	 x=1764257054; bh=Xmwqn12bY3OMRLTnJpQ3xcxGDFxiCK7G7qPUg2ggkNQ=; b=
+	k3P6E3qWxE6Eu+Y0vJAZEwZw7sdvQ6azRj7QtC+CbD0OMd79vihW/23vVrIBKPxS
+	TuHi+gtuPIQZlVTWllB7chzsstqgHtqXTIBY3VHkN714Uamzuy03bCWGqMRHPSX7
+	wX3czTsQjlOG+yd3XKC7UuRCpc3nqwh+o3EQOH08er7e3tVNfa1KtRIYnFRyeuFs
+	gPZhgjNuMjPmIVb+O/+QSGKZtX3knxW3Qm98HJhRkSxA/KqZTwhhvI0CdM04wog9
+	NQPDfnLuUCvacskU15nIvqZ0erwLmJ6IWn66V6MceJqmWf+2pWEnq2DupnsA3+7T
+	8dwh8iBbUNY1dLbzig+4Vg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1764170654; x=
+	1764257054; bh=Xmwqn12bY3OMRLTnJpQ3xcxGDFxiCK7G7qPUg2ggkNQ=; b=M
+	wcixTV86GybKiVSX1oJ/88GZ9ed0FJfvvIvegOPbTZh490xEfVUnYJopJ5aSPr06
+	E8zELhekUPtVNrOmD3hD7i4+EUn/D2yEAHRxEG0nHNZvg3q2PI/nWJTRBbYEE8MI
+	Ny4sHIMdawGt6thTmKvuh0LIKGulSzjRXAN3H0y4nNo1b4Q7TQ8z5BMDDER88q+2
+	gwqPX5tQX1k41wq8f9sIOU358hs/EXATGCBxj8x3IT44eROl/JkLq8mAot60ON5x
+	+OW7IZ/Z9+6H6YgP75890lcynV+1v1Y4VnIH0AAg5LnbJxd+6Hy44CUFcXntu3Hn
+	fld2EFDWzZFC25LA0LMeA==
+X-ME-Sender: <xms:nhsnaSnXjwSGVm9gY9d9L2zTsxhgXsni8utzVqLzybMmeQyjyqM-vg>
+    <xme:nhsnaU2DNYaH7zl7isRDKSA2MIbwvYFQbpWn4uisaroo9CdfgMTeSBpx8RtnWaQYO
+    oq1gSHn_fTfbJK1G6-APYGlwyP7Zb9UUm_2aB8Z8v7DnxnyJzRxeg>
+X-ME-Received: <xmr:nhsnaXRohNh0v5mKfcjJTr8V98ce-RkRsBE2DNEF2u9njNS8pezXGpxU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgeegjedtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhggtgfgsehtjeertd
+    dttddvnecuhfhrohhmpeetlhgvgicuhghilhhlihgrmhhsohhnuceorghlvgigsehshhgr
+    iigsohhtrdhorhhgqeenucggtffrrghtthgvrhhnpeetteduleegkeeigedugeeluedvff
+    egheeliedvtdefkedtkeekheffhedutefhhfenucevlhhushhtvghrufhiiigvpedtnecu
+    rfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgspg
+    hrtghpthhtohepvdehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhkihht
+    rgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtg
+    hpthhtohephihishhhrghihhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepshhkohhl
+    ohhthhhumhhthhhosehnvhhiughirgdrtghomhdprhgtphhtthhopehkvghvihhnrdhtih
+    grnhesihhnthgvlhdrtghomhdprhgtphhtthhopegrnhhikhgvthgrsehnvhhiughirgdr
+    tghomhdprhgtphhtthhopehvshgvthhhihesnhhvihguihgrrdgtohhmpdhrtghpthhtoh
+    epmhhotghhshesnhhvihguihgrrdgtohhmpdhrtghpthhtohephihunhigihgrnhhgrdhl
+    ihesrghmugdrtghomh
+X-ME-Proxy: <xmx:nhsnaUPDcQjWsh06dz-0lNxb9EJCzKcgc51W_p5dS9h8S7ug9uwghA>
+    <xmx:nhsnabh7kznK6soCE5YFauXZHQBZmCFyORKx9OxUF50wEedYAFOBeA>
+    <xmx:nhsnaUIsNfstWNYnks7j2TungUJBPQ1SHA9AincSZQETughUoIvUXQ>
+    <xmx:nhsnaW5wiex6vgqYkeu_0c-Xqz2mj4OXcbX_80BZVNpWWc0RIfiMmw>
+    <xmx:nhsnaUhOtKWQNQL0PdDuSGj94QCerUMJ9h2JjJ0iwO0mRlIXpMJxG9EY>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 26 Nov 2025 10:24:12 -0500 (EST)
+Date: Wed, 26 Nov 2025 08:22:35 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: <ankita@nvidia.com>
+Cc: <jgg@ziepe.ca>, <yishaih@nvidia.com>, <skolothumtho@nvidia.com>,
+ <kevin.tian@intel.com>, <aniketa@nvidia.com>, <vsethi@nvidia.com>,
+ <mochs@nvidia.com>, <Yunxiang.Li@amd.com>, <yi.l.liu@intel.com>,
+ <zhangdongdong@eswincomputing.com>, <avihaih@nvidia.com>,
+ <bhelgaas@google.com>, <peterx@redhat.com>, <pstanner@redhat.com>,
+ <apopple@nvidia.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
+ <targupta@nvidia.com>, <zhiw@nvidia.com>, <danw@nvidia.com>,
+ <dnigam@nvidia.com>, <kjaju@nvidia.com>
+Subject: Re: [PATCH v7 1/6] vfio: refactor vfio_pci_mmap_huge_fault function
+Message-ID: <20251126082235.49edd6d7.alex@shazbot.org>
+In-Reply-To: <20251126052627.43335-2-ankita@nvidia.com>
+References: <20251126052627.43335-1-ankita@nvidia.com>
+	<20251126052627.43335-2-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR10MB5777:EE_|CH0PR10MB5001:EE_
-X-MS-Office365-Filtering-Correlation-Id: 361be666-8cdd-4869-480d-08de2cff97c6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?WDPg8sQJiPrVSKVjtYoJxQzLs69aa1o9D6vcBk3nflD8uYbyc85flxj/Ysy3?=
- =?us-ascii?Q?haIegFBo/qJZ5rX8EeWU0+qZ0fgXtjkLC1659Yrswzqs5IyYoQU7rUNbscVi?=
- =?us-ascii?Q?70l1UHS8z7yt+rVN/2pKnN3/EYmt3fuGalc1oNzh1HrO1EnESZjqeq0WOp5m?=
- =?us-ascii?Q?ZZzMNaXp8nFv3n7v7jCb/QC+3VzqWf7A79vgMxHV4eqb0LgsuNOckeHuZucb?=
- =?us-ascii?Q?r3zPzFmTju9RCxxAJScPQI497bzgnzRunO75TxMuj1GLBkO31oeooJ5ViC/V?=
- =?us-ascii?Q?guMqmxZwHbG1w0I5eoc8WHz4noXxVr4NKMPHT0gaiV2B/NypBp6d/a8lBvHN?=
- =?us-ascii?Q?vBaVI6MqPuAhNBRD03v3fruUd1/eYNKUVQX4RbGkFv6jQKtefZ3oXdDj0fMS?=
- =?us-ascii?Q?5SxBBX8JQ2/I7cFqTLSPopjOaRhwbzAWJaDnzTcVr0iYC3tXLdTl4rXe9juT?=
- =?us-ascii?Q?UGFVo8cQV++dlHxzQuOKLh1xfET0biOhVnYFffYkrkFrq5HhxgAzYepkneMp?=
- =?us-ascii?Q?HxI48rovk5mpydbKiwiCEVf/mrohZIxl/8tb35jMSBWPGTAF+NTjc9sQpbOz?=
- =?us-ascii?Q?y3gsS7NlCkZaaDQ9UIareQH2cEvi9pxvu4BgrBtUXlzatjE61urcySoW0zf5?=
- =?us-ascii?Q?uRDhiAc3j1gN3gugSGe9zbAnCTTUv/TMvPDCGZ9UoRJ92jdNm65bQYsoflIP?=
- =?us-ascii?Q?pHs5935fqK6mYMP74/q2tXCIkdPRQr0lVb2BKQg6oRVkK6n+o7COZmzGRjLx?=
- =?us-ascii?Q?hDMKQJrZtjBTqDP3ZPX439O7snoELhkYDF3LqhrcZVqIhx4kjNSYTApYqfJy?=
- =?us-ascii?Q?8miSbDhQs6ZObqOzXNsWmPnNPMWYtWzl8steq4POAe2fcHm1qKJaVKxyKpQa?=
- =?us-ascii?Q?/qNaqLxlWw9DFcX5Gx4Fumd/C/8YHtFWSECNr6JF3UbTD9zX6udAjjAzCXGs?=
- =?us-ascii?Q?lpKlf7nllgOi7wdSEv6irXh7eh/7t0TeXemNu49p9mFyidfjk+mPoFfDoIrA?=
- =?us-ascii?Q?VwLLWFrRo0k7OOz9dWUW8j8kTULxbV55pbPO1pz2YvuskjPN6iDi8WxaVA7i?=
- =?us-ascii?Q?qd3Mh9+rpAwlvxtt5tLxe8UCa8VeT07gDaYgFfrE81GPhXGuwktL099Xl/D8?=
- =?us-ascii?Q?DZiGjKyIq9jGMe1lfsQ+hp3ki4R+xfjDWDvfO+Vv2Vdep5BKRE5THcpCYq3g?=
- =?us-ascii?Q?bsQhpisRMSGoBkYDuA8mOgwAIdl/cip1tDIN6zOBQZpGKtmjOYiU+7m2LAZV?=
- =?us-ascii?Q?70/3S97x6di1dmrR2iaiOc7HZdYd2iLLWFe3lzg0ozeEM7CFMM88Mf5LWdIi?=
- =?us-ascii?Q?so+8jBCNwQubH7hfzKs18j48Zjflsml+JPYyXVEymtWB/U+8BLVKu/6kJf29?=
- =?us-ascii?Q?ylnxc4SVH/+eVqW7DL9ALX7MKeJeeXiznr/apEiw3VQHEHKdjyAGP2n7o7Sy?=
- =?us-ascii?Q?HGlZKPNt8wPbb/qg7r/bDwbXaD0SueQk?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5777.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?xqsVIiKmRvjL0nkjVy+QaL1aR7M5ZeBj3/qZXtxOqniIxxtGkBziBqTHz4/w?=
- =?us-ascii?Q?vp6XNjQn/PFaAxIT6P0OlklB/j1o/PZW3yED8VlqQaWcA2wF7viyknmaNytc?=
- =?us-ascii?Q?QujhMAq05OFliR/ZqDFEtjEzYteptqWDqcC2lXtBpzZlNjB3oc4tH3ERQL5T?=
- =?us-ascii?Q?fDpunWcpopSZxRoQpndscVLQznEEjb4ysv3cCrsXT72gqB5C1aR2Ed0WgBEZ?=
- =?us-ascii?Q?yZjCUUIn7dw/XPCaHW5UJubl6z+kwrUDmqO6FqrvYmq03NknT9vA4sBvXH1V?=
- =?us-ascii?Q?5LTefE6oLj2qL588/Es+QrIuc/a2hfv5DI63sNO2drbekhEgksPxVTnKttmp?=
- =?us-ascii?Q?b/ocHfhVbnhVUTB92ZOy7TRc+38cEmlX5oC6Pji2jRbP2CHOksvZ66F5hXQf?=
- =?us-ascii?Q?fR59EY7RJdWz36GIbldt3IDXB9pgNEtz1/GVLz5Cb0C2kiAVgX7zwqN9f5wm?=
- =?us-ascii?Q?ECf/EXZmOAxMWrsW6v2lnZftXau16pQ2n9bYThL1s6iKNMkvbc26fIBErzMX?=
- =?us-ascii?Q?o+ZlAslMkA06YfxTV8JrhdzWGq9wdORBx1IjchmK5MwoDygIzpP9fQWXMVSD?=
- =?us-ascii?Q?bzFjhwfippnLrQ9PlMprbcPtfpUx3/gJxHgv1otYlR57EpDnOjyczOPjy10X?=
- =?us-ascii?Q?npDzLRg49/ci8Z97V1UCpLNyfVdq4DR9BD9LTMOLPy68t6bMDgK/pD2HL+ls?=
- =?us-ascii?Q?TgCzampGVrFbRuKiFd1Vof4Z0JKEOnLql/ctKlwzpeghRn75silWxE66HUlt?=
- =?us-ascii?Q?hfUARcUPUnR6Tr/joYptOrdYJKdKpYI7fqX/BrTRXRoFSA5FKpkd6hcUnEgN?=
- =?us-ascii?Q?61JVKgPgNsK/NTOXvTmK4soLLgF1wXPO9ni3G3068us3Bl+cgjnSnu+IM4Yh?=
- =?us-ascii?Q?ALsWOadA0opVBhAp4VZB98iMt5AyJ4gU84JTVxuaUz+4OivzYTfBqX47KKA7?=
- =?us-ascii?Q?pCo3g76ypHhyyEX8segp3fQJIjbntDS9kTpcuj+AjhV4dhAvFEQ6U5uqMWxI?=
- =?us-ascii?Q?IrJ2j8JX+0xyNhNU5ZNqb+mUFYkjK20j7FQMrrDo8LPjlnX4S2kNpiRJqq1t?=
- =?us-ascii?Q?5WBPYPjH8UTcXH5lxmWY5ACdtDdY3mPjblQxANnceKTwFDTNoDImvYJPwcqO?=
- =?us-ascii?Q?xE2XOd0o3TvHzWOHgUX3GAkYkYl4nqlGvpzV9kxcshLDbzy0iUNA9Q5kF8sB?=
- =?us-ascii?Q?1poZbI6MOIDFXmqDbAZc7TyscrK8Au5FelzApWI3K/jslybSc5CYQXDyw0tG?=
- =?us-ascii?Q?o66otqmDJD+t+jQaEh/TcjfF6Z0NLeOvq3kM4UFANVd5TrohLTGrBBoiTCAE?=
- =?us-ascii?Q?2iLPyZPqMMEc9/8CVK7ujAUmu5Q55MiaZblA5lo11vJDSHa40HoqJbZ8krz1?=
- =?us-ascii?Q?/z1FvNb2yMX1hN+qrXAwXqoOmDEsx98SVpYwk5Me1NtKtB0+c2g/xZeJaJe7?=
- =?us-ascii?Q?ZragH8jmaQWWh7epqKSkqnBDu4kO94q0fyBqELkNcH7+djdJaB4DvnryapQ8?=
- =?us-ascii?Q?vN7djZjipbqZ9C1eJlLujSujKqsNYfJldc2lna5lUpl7/PXPZS04rEpvPvi6?=
- =?us-ascii?Q?B2MuDmrZpyOEm4lUHXu0y9XGfY1qYtGC6NmhELxt?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	NS60t1y+bpHMtqbuojaurJPy1Ant/1Fnmz5J8M2Jk2GaRSGxLPrj8CxXZ1XBvuoewAVKQeucjTqvL/BYpdyVcoVXYdRNXdz6zNclVskgNrUZV2zUqxSRGxnG9kO8ijTYv0CKrAd9cqYH0P2pr0Z0rCobjInmZNgEWNgGi8ryktK2Hk9jSLbWM13g0x4wkJuOQ1HRNHP4OH1UjTqYQdclPH+v7HWT/hKeKZj4xK4QtfC5cXU4g8SW2FbiKS/CJOmtKixUkD5yLZ2lm8h0oKMATzySaV4e9qURzBJm4JUmoIW4y5rMkRHHlLBoit6O1CSN0fjg16J826r8BcosleIYIS2f3SyyfMsyUbchWDR6T39/qiCkMlYdGomu33DW1ADSi/U7kLNreMjlmi6Ch+PBJHa9sBFl/6NkFbzB4LLOIiLIyc+XGkz2FKvjq1WogH2WTx7ylZaCle+dvFxc2HXuo9iUh6azGk+hcayoDX/TVIYpTq5gDLGXYasBwTssx7p9WTbST73u0Nfv3CDym1OV6VY2wl/kxkbSqthj4LxAzX1NaGX7jl3A+lxI4RD3u7nH+iVXAfV73PTeo+RiF6SvHcGPjkrytdyesDQxcc8g0Z8=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 361be666-8cdd-4869-480d-08de2cff97c6
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5777.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2025 15:22:20.8866
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oduTkOBofeymtkPie0r8NeZhAFqpH8GQU9dyrbMDnqhNGC2V94bEPibT9LYqM/t+AS/M3B1QYytz8uneZ+axLA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB5001
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-25_02,2025-11-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0 spamscore=0
- bulkscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
- definitions=main-2511260125
-X-Authority-Analysis: v=2.4 cv=f4RFxeyM c=1 sm=1 tr=0 ts=69271b30 cx=c_pps
- a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=6UeiqGixMTsA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=G_F5KXMsGXWNx_v0snEA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI2MDEyNiBTYWx0ZWRfX8d2ZHXxEmUQ2
- BpQTOMsaFtwKLtQoBo/ax7Sld4uHAU+0OPKqCJcz+H/LYK5oVJ1fiO+HMC0M5ygja9u7oqKSvd5
- UN0VxDz5N2BIRvMExwCIyG7CJ7XFD7qEAEQSbUjMdDVbM6kZFm/UwisffTj8RNHI7ty0oFNRW27
- zf7RPEOO2LnTNgkpyJggEiWLHd7O1RT7sDeSJnG+4+6zs5ETM1rpBRDvNyvbwm8oRY28tpbSW3x
- +u4xBGe3FjzsP59v6kpj5ZOsY83o7CRaelEbeshUMV40cqMW796dV150wjM6Fe8jpMoc1cAxkF6
- 9n3baRlPdVTlIzM0h7h4Xg/3MIKkaAwFuXwSInKS8AUONjepR1lpdfRuQtjB0EEFAtMleBlp718
- YYCJXhm6JiHqbr6GvaotzCyXvnVGIw==
-X-Proofpoint-ORIG-GUID: PhFrvzIzMt2Q_GTSonXKT9oM6ut_cOoX
-X-Proofpoint-GUID: PhFrvzIzMt2Q_GTSonXKT9oM6ut_cOoX
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-* Mike Rapoport <rppt@kernel.org> [251125 13:39]:
-> From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
-> 
-> userfaultfd notifications about minor page faults used for live migration
-> and snapshotting of VMs with memory backed by shared hugetlbfs or tmpfs
-> mappings as described in detail in commit 7677f7fd8be7 ("userfaultfd: add
-> minor fault registration mode").
-> 
-> To use the same mechanism for VMs that use guest_memfd to map their memory,
-> guest_memfd should support userfaultfd minor mode.
-> 
-> Extend ->fault() method of guest_memfd with ability to notify core page
-> fault handler that a page fault requires handle_userfault(VM_UFFD_MINOR) to
-> complete and add implementation of ->get_shared_folio() to guest_memfd
-> vm_ops.
-> 
-> Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+On Wed, 26 Nov 2025 05:26:22 +0000
+<ankita@nvidia.com> wrote:
 
-Reviewed-by: Liam R. Howlett <Liam.Howlett@oracle.com>
-
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> Refactor vfio_pci_mmap_huge_fault to take out the implementation
+> to map the VMA to the PTE/PMD/PUD as a separate function.
+> 
+> Export the new function to be used by nvgrace-gpu module.
+> 
+> No functional change is intended.
+> 
+> Cc: Shameer Kolothum <skolothumtho@nvidia.com>
+> Cc: Alex Williamson <alex@shazbot.org>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Reviewed-by: Shameer Kolothum <skolothumtho@nvidia.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 > ---
->  virt/kvm/guest_memfd.c | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
+>  drivers/vfio/pci/vfio_pci_core.c | 54 +++++++++++++++++---------------
+>  include/linux/vfio_pci_core.h    | 16 ++++++++++
+>  2 files changed, 45 insertions(+), 25 deletions(-)
 > 
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index ffadc5ee8e04..2a2b076293f9 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -4,6 +4,7 @@
->  #include <linux/kvm_host.h>
->  #include <linux/pagemap.h>
->  #include <linux/anon_inodes.h>
-> +#include <linux/userfaultfd_k.h>
->  
->  #include "kvm_mm.h"
->  
-> @@ -369,6 +370,12 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
->  		return vmf_error(err);
->  	}
->  
-> +	if (userfaultfd_minor(vmf->vma)) {
-> +		folio_unlock(folio);
-> +		folio_put(folio);
-> +		return VM_FAULT_UFFD_MINOR;
-> +	}
-> +
->  	if (WARN_ON_ONCE(folio_test_large(folio))) {
->  		ret = VM_FAULT_SIGBUS;
->  		goto out_folio;
-> @@ -390,8 +397,29 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
->  	return ret;
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 7dcf5439dedc..52e3a10d776b 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1640,48 +1640,52 @@ static unsigned long vma_to_pfn(struct vm_area_struct *vma)
+>  	return (pci_resource_start(vdev->pdev, index) >> PAGE_SHIFT) + pgoff;
 >  }
 >  
-> +#ifdef CONFIG_USERFAULTFD
-> +static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t pgoff)
-> +{
-> +	struct folio *folio;
-> +
-> +	folio = kvm_gmem_get_folio(inode, pgoff);
-> +	if (IS_ERR_OR_NULL(folio))
-> +		return folio;
-> +
-> +	if (!folio_test_uptodate(folio)) {
-> +		clear_highpage(folio_page(folio, 0));
-> +		kvm_gmem_mark_prepared(folio);
-> +	}
-> +
-> +	return folio;
-> +}
-> +#endif
-> +
->  static const struct vm_operations_struct kvm_gmem_vm_ops = {
->  	.fault = kvm_gmem_fault_user_mapping,
-> +#ifdef CONFIG_USERFAULTFD
-> +	.get_folio	= kvm_gmem_get_folio,
-> +#endif
->  };
+> -static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
+> -					   unsigned int order)
+> +vm_fault_t vfio_pci_vmf_insert_pfn(struct vfio_pci_core_device *vdev,
+> +				   struct vm_fault *vmf,
+> +				   unsigned long pfn,
+> +				   unsigned int order)
+>  {
+> -	struct vm_area_struct *vma = vmf->vma;
+> -	struct vfio_pci_core_device *vdev = vma->vm_private_data;
+> -	unsigned long addr = vmf->address & ~((PAGE_SIZE << order) - 1);
+> -	unsigned long pgoff = (addr - vma->vm_start) >> PAGE_SHIFT;
+> -	unsigned long pfn = vma_to_pfn(vma) + pgoff;
+> -	vm_fault_t ret = VM_FAULT_SIGBUS;
+> -
+> -	if (order && (addr < vma->vm_start ||
+> -		      addr + (PAGE_SIZE << order) > vma->vm_end ||
+> -		      pfn & ((1 << order) - 1))) {
+> -		ret = VM_FAULT_FALLBACK;
+> -		goto out;
+> -	}
+> -
+> -	down_read(&vdev->memory_lock);
+> +	lockdep_assert_held_read(&vdev->memory_lock);
 >  
->  static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
-> -- 
-> 2.50.1
-> 
+>  	if (vdev->pm_runtime_engaged || !__vfio_pci_memory_enabled(vdev))
+> -		goto out_unlock;
+> +		return VM_FAULT_SIGBUS;
+>  
+>  	switch (order) {
+>  	case 0:
+> -		ret = vmf_insert_pfn(vma, vmf->address, pfn);
+> -		break;
+> +		return vmf_insert_pfn(vmf->vma, vmf->address, pfn);
+>  #ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
+>  	case PMD_ORDER:
+> -		ret = vmf_insert_pfn_pmd(vmf, pfn, false);
+> -		break;
+> +		return vmf_insert_pfn_pmd(vmf, pfn, false);
+>  #endif
+>  #ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
+>  	case PUD_ORDER:
+> -		ret = vmf_insert_pfn_pud(vmf, pfn, false);
+> +		return vmf_insert_pfn_pud(vmf, pfn, false);
+>  		break;
+>  #endif
+>  	default:
+> +		return VM_FAULT_FALLBACK;
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(vfio_pci_vmf_insert_pfn);
+> +
+> +static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
+> +					   unsigned int order)
+> +{
+> +	struct vm_area_struct *vma = vmf->vma;
+> +	struct vfio_pci_core_device *vdev = vma->vm_private_data;
+> +	unsigned long addr = vmf->address & ~((PAGE_SIZE << order) - 1);
+> +	unsigned long pgoff = (addr - vma->vm_start) >> PAGE_SHIFT;
+> +	unsigned long pfn = vma_to_pfn(vma) + pgoff;
+> +	vm_fault_t ret;
+> +
+> +	if (unmappable_for_order(vma, addr, pfn, order)) {
+>  		ret = VM_FAULT_FALLBACK;
+> +		goto out;
+>  	}
+>  
+> -out_unlock:
+> -	up_read(&vdev->memory_lock);
+> +	scoped_guard(rwsem_read, &vdev->memory_lock)
+> +		ret = vfio_pci_vmf_insert_pfn(vdev, vmf, pfn, order);
+> +
+>  out:
+
+We really don't need a goto to jump over this tiny section of code.
+With the naming/polarity change below this can just be:
+
+	vm_fault_t ret = VM_FAULT_FALLBACK;
+
+	if (is_aligned_for_order(vma, addr, pfn, order)) {
+		scoped_guard(rwsem_read, &vdev->memory_lock)
+			ret = vfio_pci_vmf_insert_pfn(vdev, vmf, pfn, order);
+	}
+
+
+>  	dev_dbg_ratelimited(&vdev->pdev->dev,
+>  			   "%s(,order = %d) BAR %ld page offset 0x%lx: 0x%x\n",
+> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+> index f541044e42a2..1d457216ce4d 100644
+> --- a/include/linux/vfio_pci_core.h
+> +++ b/include/linux/vfio_pci_core.h
+> @@ -119,6 +119,9 @@ ssize_t vfio_pci_core_read(struct vfio_device *core_vdev, char __user *buf,
+>  		size_t count, loff_t *ppos);
+>  ssize_t vfio_pci_core_write(struct vfio_device *core_vdev, const char __user *buf,
+>  		size_t count, loff_t *ppos);
+> +vm_fault_t vfio_pci_vmf_insert_pfn(struct vfio_pci_core_device *vdev,
+> +				   struct vm_fault *vmf, unsigned long pfn,
+> +				   unsigned int order);
+>  int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma);
+>  void vfio_pci_core_request(struct vfio_device *core_vdev, unsigned int count);
+>  int vfio_pci_core_match(struct vfio_device *core_vdev, char *buf);
+> @@ -161,4 +164,17 @@ VFIO_IOREAD_DECLARATION(32)
+>  VFIO_IOREAD_DECLARATION(64)
+>  #endif
+>  
+> +static inline bool unmappable_for_order(struct vm_area_struct *vma,
+> +					unsigned long addr,
+> +					unsigned long pfn,
+> +					unsigned int order)
+> +{
+> +	if (order && (addr < vma->vm_start ||
+> +		      addr + (PAGE_SIZE << order) > vma->vm_end ||
+> +		      !IS_ALIGNED(pfn, 1 << order)))
+> +		return true;
+> +
+> +	return false;
+> +}
+
+
+Change polarity and rename to is_aligned_for_order()?  No need for
+branched return.
+
+	return !(order && (addr < vma->vm_start ||
+			   addr + (PAGE_SIZE << order) > vma->vm_end ||
+			   !IS_ALIGNED(pfn, 1 << order)));
+
+Describe this change in the commit log.  Thanks,
+
+Alex
 
