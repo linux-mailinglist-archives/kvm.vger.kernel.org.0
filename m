@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-64602-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64604-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7326AC88261
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 06:28:22 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65C58C88267
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 06:28:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59EFE3B53C1
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 05:27:55 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6E2CC352D91
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 05:28:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B493195FC;
-	Wed, 26 Nov 2025 05:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E75C31A55B;
+	Wed, 26 Nov 2025 05:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jeRa/acd"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="B45V8xAZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012070.outbound.protection.outlook.com [40.107.200.70])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011007.outbound.protection.outlook.com [52.101.52.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB9C31690E;
-	Wed, 26 Nov 2025 05:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D21D3191D4;
+	Wed, 26 Nov 2025 05:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.7
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764134808; cv=fail; b=Coq1eV25CO5Ua2CExUvpAjajyX5xWm5pR5Zib5p0RSawi+dK+CiJch9AYyWr9SYaCEsljs23+xFoi79Olx+GyFRwfKj3sYfxZaFrdZbCuOCxltCAeepFj/IKU4U+tGGnoHdAWC0l1Ilq9jmf5q+YVuN5hSpkMAurstre7FaZWnA=
+	t=1764134810; cv=fail; b=bGM+wHe/ou1kBJxl9iKYihPKXvXYHYIDI1o/KuE14zakXHq4hyGlfWSy2MZAvTz1HeuNaU8ImxhrYOaVK7lRD5un0ONBwFCAFYDhzKzaNOYrVXtpgcXhURHtm80o9n+W0kiNxoZKm89S6XWGfOQZIh/6J+56bUwzGZmqe2os6s0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764134808; c=relaxed/simple;
-	bh=un7F5tqJ9y+GixGbNE+XnaPeFGQuuCMG8Jn76uuHSyg=;
+	s=arc-20240116; t=1764134810; c=relaxed/simple;
+	bh=XCdoaUzYjYSyr3389H8ZdQR2wG7GK/6V/9Cn6h6CZ2E=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KXucV+NOcxanzgluRjQAHiFxW/bRjkILkfSKrUB6/e/UYf2y+X5DQm9CqBwdExJdsIaqlV+Ay2q/OmjVONkjXzN+V5ApWJ0JqXLqtl1kR6tSuJjgTeD90qUY+3pgL8Q+fW8B81EXoYUrHWYexzviq44M/u5XTYuhonzcsldU9m0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=jeRa/acd; arc=fail smtp.client-ip=40.107.200.70
+	 MIME-Version:Content-Type; b=UbjVISyDNohhRP3kmWLuaHVuV2db53QtsJdBRd/XqgFWkfgC5yBRpcv/8cC7+I8jKTf7VweTx20hv4N0TssDDMBoRK4qVcWEgvj0+nvG0C+KqJgZ0iWH3z6pn9HNrQE1bVGu//WxdzjJDh8xRH8CaHxRLOV9sVYiiZjnHtqMqDs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=B45V8xAZ; arc=fail smtp.client-ip=52.101.52.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=knDMqxMXNVwIYIZjKPvbJdZSczfTg37i12bH1ZfxanSOj6GYoqa0u6/cEXoMua15vzG1AAXB1O8Xl8P2sOqwLYw56GdKNPEI4zL6atekSH0hNrz1UhfyRxoUm0RbmnhxIsuNC/T5w8BGSA9XfuFd50M8hfYuvaiLxJ6DwwcDE4zlZKQDzArhRS7QMVf+oyNk/qUF2vg5z599dzehABVd6tVRBmpD707UR+bPPlkTfxc7yEZ0AXcirIw8pabU/2KBx66rA9N7EkKGvKLElthy4zIofiZSDh8RKEvr+r7inbYN3Uamli97XQKdWtJdMJdwQkQl94ojdJX9NtIsLnI5ww==
+ b=bgtlRogPn2XoOTXwmD0PLmtIWHbAb6eK/eCUuyF6dMSUmPI3hjf0YRX7rxVZb0e38k0tmY6wOttwZpfIxUZXpwRc7NTPSjbHglRqrxUlKmokSESwqgi80c4HvA1vHGGooWWbDCq0M35LXOyHAG0O76mJjjg9JT/pZoMhO0KaV5clmDn9VMhJ2kivDIzoMubbVVh6Etv8SoliTdGNR1K7Ie5IIl/hScIhypi4vtqKeuNZNDuy8dKRKG7gAiNJSYJtrRfvKeNLJ6SmjKmZNDpZASdYGGii0d/QqY/ahQY1g56yEyFaUB+QmfeUa/l/UZImYViFcmDk9UWTgveC/PJJug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e34IgOv5EC8e8+si/b+QVFRQs/uJawYIjvvOOpHLfE4=;
- b=T7QkaT+gODhV9+PNZXt9nmcbATpWoi/v2Jj5+i2x9RpWp2DG7SKQcU+4yKBvRy0QvHMGLNaqNeyB9z0T4VaXd01m4te8jENeKnZeC0Uhv/hgaicRALJenJrACNhf+Z1GU2Lmrf7FGA/uucXv+HQo0c7312zrnzqF4k1NG8Hh65cw88aIO42jJVRDtXh2oWd3Y0Bk5U5zuN1j4Ov6JROqc0gOu2SgxZkVc8bHQnlmO15WaI8hADAYei1ERdePR/3wJzs1Drl/vKWdxwVdklXCuU+IE/XlAJk5lJN07ZkN4t8XaudallkESHEOmltIJUVEOMWRI5sttF8CfDxakxx0fA==
+ bh=gqbjvAXQhuvsJ3DrV+oSMMzZIY0AUMYu7FtsyzJ1CwY=;
+ b=ntBBRjAb3MeQ7FEs/M6gyjdHNO+hXRBNIOVdlyjUujw49MSPDBNc4vpAS6i5jqEidoeSi9ItKZkOsKbueWGw3lKDol4nfKiQPK35xqJzldGSfHxosV22Hx5EfqRelo5I2WDPpHDG/lf/GSDgqQFe37Cq65Bgzi3QGZFc/1/N9zZBWJV7lIR3Eg2MO/KYMuoH+gN0zFXhf7lrge2P5xMWcu8fWqgcOJuKazUdxTsUFhNUiCRx4hVSrBp8jJkPSFx1IkfNLdLmb4irm5JxtW2FKZs69PXjbpQy/1a6iBdtU0ABrqq28pybp1mGlk994pbkSzQxTKeZhOjzYlmXrOh6fg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e34IgOv5EC8e8+si/b+QVFRQs/uJawYIjvvOOpHLfE4=;
- b=jeRa/acdImCjpW7JRT5vBuNH1hPNPnJQWbuugu2ZRsEXqLPbUiSIaU7dYzhwe0RZQtcvJ8zEBoJu3w98l++vdF59BugSU7YvGJVfsNDNry09YsP6YgOOLyxr5SgPz7m2GqSUZ0TCbstR2I4L6nzz2cVHowUtlQQFqd7VEqWiGnwugY6k0AcfIadH3bowIkYGMCEB6YCDYI7TbNp0XQ2eLBx4kLMPcs2qsKz+hK7eDps9xk4Gv19sfG+CHamnx8aGdVyxHyjng7Owv2vKyLYsmcepC2z72t0aA6Cng0IXmJVLfNByYGyRwL2iEi0twX6ttBXZuPetH/85sqsrhgZ/iw==
-Received: from SJ0PR13CA0054.namprd13.prod.outlook.com (2603:10b6:a03:2c2::29)
- by BL3PR12MB6644.namprd12.prod.outlook.com (2603:10b6:208:3b1::14) with
+ bh=gqbjvAXQhuvsJ3DrV+oSMMzZIY0AUMYu7FtsyzJ1CwY=;
+ b=B45V8xAZAb0yHE0Iel0wvjZqp6JbIKLqInovlr5+RPXg9ebAEXHUOulZ9swECf98+24lXNg6UA1DNgNONVcmPVn4T9sOyHybJ+prirdYDSLBlyOGmVcKZJYrcjk5D5fA8N6Nj6FhEbO2rpZ3nhQofqHqGW0suxX+FS4PNebao8FFcPa/KIzNR0Gxmld/dwJuD+GPLL0ODhhhcpPStBBBQ+e63TNP0faSTrGLsVReZPNRSC80CrNTLRIfuheV6qoA0A2ogAHEnFezxAx4/XZcENJ+ALSOFWSAEOpvHp5J1zph4Y4kjsay4D3mt7p7ReFesFlVA1XEc4vLkjCZcISsvA==
+Received: from SN6PR08CA0016.namprd08.prod.outlook.com (2603:10b6:805:66::29)
+ by CH1PR12MB9720.namprd12.prod.outlook.com (2603:10b6:610:2b2::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.12; Wed, 26 Nov
- 2025 05:26:40 +0000
-Received: from BY1PEPF0001AE17.namprd04.prod.outlook.com
- (2603:10b6:a03:2c2:cafe::1d) by SJ0PR13CA0054.outlook.office365.com
- (2603:10b6:a03:2c2::29) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.11 via Frontend Transport; Wed,
- 26 Nov 2025 05:26:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.11; Wed, 26 Nov
+ 2025 05:26:44 +0000
+Received: from SA2PEPF000015C9.namprd03.prod.outlook.com
+ (2603:10b6:805:66:cafe::ad) by SN6PR08CA0016.outlook.office365.com
+ (2603:10b6:805:66::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.13 via Frontend Transport; Wed,
+ 26 Nov 2025 05:26:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BY1PEPF0001AE17.mail.protection.outlook.com (10.167.242.107) with Microsoft
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ SA2PEPF000015C9.mail.protection.outlook.com (10.167.241.199) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9366.7 via Frontend Transport; Wed, 26 Nov 2025 05:26:40 +0000
+ 15.20.9366.7 via Frontend Transport; Wed, 26 Nov 2025 05:26:44 +0000
 Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 25 Nov
- 2025 21:26:29 -0800
+ 2025 21:26:30 -0800
 Received: from drhqmail203.nvidia.com (10.126.190.182) by
  drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -90,9 +90,9 @@ CC: <Yunxiang.Li@amd.com>, <yi.l.liu@intel.com>,
 	<apopple@nvidia.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<cjia@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
 	<zhiw@nvidia.com>, <danw@nvidia.com>, <dnigam@nvidia.com>, <kjaju@nvidia.com>
-Subject: [PATCH v7 5/6] vfio/nvgrace-gpu: Inform devmem unmapped after reset
-Date: Wed, 26 Nov 2025 05:26:26 +0000
-Message-ID: <20251126052627.43335-6-ankita@nvidia.com>
+Subject: [PATCH v7 6/6] vfio/nvgrace-gpu: wait for the GPU mem to be ready
+Date: Wed, 26 Nov 2025 05:26:27 +0000
+Message-ID: <20251126052627.43335-7-ankita@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251126052627.43335-1-ankita@nvidia.com>
 References: <20251126052627.43335-1-ankita@nvidia.com>
@@ -107,119 +107,226 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY1PEPF0001AE17:EE_|BL3PR12MB6644:EE_
-X-MS-Office365-Filtering-Correlation-Id: da328c88-db5b-44fd-3154-08de2cac60b3
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015C9:EE_|CH1PR12MB9720:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7e1a5e45-48eb-4d1f-0a0f-08de2cac6323
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|7416014|376014|1800799024;
+	BCL:0;ARA:13230040|1800799024|82310400026|376014|7416014|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?2w8XS0DboTNz1QPpjOBMB2ze0Ps2rUmgz34DUAnN5+H9rCT7zWTlL6ozfxyA?=
- =?us-ascii?Q?EeMkLrWGdHhjWO6/ZWS2sZTfMGuLbALZbDiPaQpRWmT3DhUal6bagQf61hoE?=
- =?us-ascii?Q?M8ZK9CaWwvviVsFLAaXYVbTn1xrFxBpQqmen8h0cbP/HqisgsrSiPaeMN3Fm?=
- =?us-ascii?Q?RH+YPE1YKLq1HOxUFHx3vD0VgFEqHVUk/7W8/f8uLCiLHWzL94YvPSUJyq+I?=
- =?us-ascii?Q?+kjXLUXJiwDcceP2vQEUMOwViYg0AT8PHzmynrHaBP+lst62YulkKBDrKwk0?=
- =?us-ascii?Q?sMXymuwhdKOOz2mv6zt2U8MrKF7Unf+dof63Un5g84bQFhfkgZQOoYf5yRyG?=
- =?us-ascii?Q?yQf5nALsqT1d4E8jpFROUhjBWPYTlhMFh7ECtTNNdJP89vvGMF/2IpG37Wmd?=
- =?us-ascii?Q?qoKQnMlFxDk08cYX7Fs+MaByG0BESvMZEKAXG5eHAQBRRmJAt1YuAmLEUoq8?=
- =?us-ascii?Q?Y/bD4V39+qNxAihWNjHuWhUfiiN8xaGBu+RpiU3heGl9ZG7WkCy006lUDm2N?=
- =?us-ascii?Q?FPDcKvoutryJyPigECjs3Gw3bsvdzMwuO80cDRsLlN1mXnpIvFBSfqcpPCH+?=
- =?us-ascii?Q?1aqgoauCG/TDvfreq3LFNYXUFSRPytslhX6lRZGAQ4mXobkgWJZyn3+pijRp?=
- =?us-ascii?Q?Y5CNolVEwTBpaPyxiLkwn68I0A1Th+KuiO7aPBFEaKyzVzQi2To22ssQyv75?=
- =?us-ascii?Q?x524aaA9tdDSVuCCpUVZSM+rmPM+Q+upWlK+zjD4iKKxnRiNDXtGuVdZ4vxm?=
- =?us-ascii?Q?G+JGSVANdjEQ5XIeYjJaU/k00NAalcey4Wo2Aageem8UZddaVpJj5EXeoL3E?=
- =?us-ascii?Q?IJrEIs2DPESZwPR64z2Z7cn3TJFNUQIouXhLo3+5V4tkPN2DaDeH1TfdW0r+?=
- =?us-ascii?Q?+ss/MV8gjUJI57yiSVh7Uex3WtNTVwPlM24fpswup+xgwWr7u9x0M0A/1bIp?=
- =?us-ascii?Q?6up/zY9V0lS7U1ttCBSNA+lnQY7rj5aFTpCTx4wfzUOxJz+hb08akZ5nkLOU?=
- =?us-ascii?Q?+JRUCapV0rZiEneoTXHPsbBPeyi7OpSUYahBAEG7156uroosdA8vqtLJAbcl?=
- =?us-ascii?Q?vMqg7/rDb6FxNH0GMf+ljm+RRcZNOXuYgKTBkj+3JTiUpT+WSgszp1fKcicg?=
- =?us-ascii?Q?7xhj7D0yer6Yu2SnX9ts1nlOIvlPzxB0/IVJg5+dzLjBMu+QzqofXUWi82tv?=
- =?us-ascii?Q?qTF1xxLzkcs15x2S/DZfjb6raha3i0Y6obWhf0kOPaLS/gtsFZ5/ONyuqxUJ?=
- =?us-ascii?Q?Np9l858UP5L9lNilcF1Y78upR3fjQx3ehbo7DKD82o2M8XOgp99YmcADfZJG?=
- =?us-ascii?Q?9PZDKy1nXCDCtHHUrIzMa3eIE74AWcB5Qbvc7IWfY7WCgyNj4K3YnhklGzMd?=
- =?us-ascii?Q?Y2TBYp5LSadnEF5cMIxsql4p4qP89qRhePEB2dNQK69pwfcDIRDLyFaT2tzu?=
- =?us-ascii?Q?5sk+S+5Om0juvEpv69NLLMNmZPK0qSA3zZ0VMgIruNqw3bwUlEL2lOQCL2pf?=
- =?us-ascii?Q?zuKWQM9T3arcHmlEKcKz5PlNKSb/8+Szp4zBkYH186lFC+TD+Mbt6Goyx0Ih?=
- =?us-ascii?Q?8t/dTvmTcVR8bMa8SrY=3D?=
+	=?us-ascii?Q?ZoN0ThS5UYhwtQj1PeOf0sGpQFtsqpFpRPpj+dmA5Sm++nlY9uy0xUPvnLos?=
+ =?us-ascii?Q?QGxE+oSurhAsRYlwrKPt/VVyo1ihjwLjXb+4/1vnW1+XCF7Ued5TToPbkOWT?=
+ =?us-ascii?Q?7MzLpdnxT6N0LtURzyLJ5uWyjMmOrn30wAqk7yWMA0jlLxSA4SHw6WNQUzVd?=
+ =?us-ascii?Q?22ArJFm7mEvtwV/BTXG6wbOr1E7ZV/THWAzRBkfSc/ctQRgWIIeYhEzau0/w?=
+ =?us-ascii?Q?DEqKbCGjRZItK3KWwysSJ6HJXlWUmxl3M7Oc0SdwIp7/QDT9ZM9FxdIE+YNU?=
+ =?us-ascii?Q?WOg6mD0aF2T0Y61fQajmfXpAlr3l19bnLBFw4PJO7QrZaeZPiwt9SI1Yx4dI?=
+ =?us-ascii?Q?2j/k8mqMnBeeQpNRNd/x6wnlfh0PkMQAme7/qWIGv4fSCTmwsDNDhpZX0vsf?=
+ =?us-ascii?Q?FVXtdh2i1EARupHgh9CC7soKzlZNfMc1m/vpBy0heMwYfD7kc6a2Jg4vBYys?=
+ =?us-ascii?Q?XyOjymufbjBcVmFupZMFxwaF5Sz7w7JaRisQJrOZuZyac64hBR10sETVPTD5?=
+ =?us-ascii?Q?um3ZngLTgj6eorEfMwmLscBWFHj3YwJvMlhpN8lV0N9STOt/pvrkRtvZZxtR?=
+ =?us-ascii?Q?41cuE9/b/Nt5FLDW2SYuYP1JaR1y0S1prFuxL/f8a459UUVr2TzIa+4DXc19?=
+ =?us-ascii?Q?55ngqT8bD/K3m6IKrMUfogs6DWMwLq618c8+5Ux99AcFttEaL/b9rK2GE2Vd?=
+ =?us-ascii?Q?4mkJ89/MJYrbW/txcIUfECg291Nqib4geG1z2ij6jlLusx4ezjPOR/x/phE0?=
+ =?us-ascii?Q?zj41wd8f8RqYAwBQjbSn2Adrhx8QO0vs9Ev0YOYqfSwlE1vB2HXs6WiLun/W?=
+ =?us-ascii?Q?/bSYJuYnA3SyndM5UlMP+BoUeEYG9VHlYgsPB9jlan01pF2MMlDtmDKSlHqm?=
+ =?us-ascii?Q?LFj1AxH9Y58GcGgQgRzefp532V5Fn12n0csrQZc3YiwVaigY7ianFWciyTut?=
+ =?us-ascii?Q?L241m56Wri6niS4Jfc63cMSSccDAVPVI9QSOftYc9XbAM5fdA5kNnNKcKL/+?=
+ =?us-ascii?Q?APha6PTrI9rKpU75BgaRu1GGNTxC5DsO7OMUZY2TLV69nBcOZEI9lXjXu07/?=
+ =?us-ascii?Q?485349tvqfYYcUBntMQsHdx8EcmQUhCSWvuHUuLksy/WfXfG7sndh9p8HyRy?=
+ =?us-ascii?Q?14RD28TT8nV8OSF9Y186FcGrqmZHIoh+ZGBeKzwIbUNrjK5ZewibNKAX4sVB?=
+ =?us-ascii?Q?+dG8ZxYGOyvgEKKE7p38przu0QtM3iM4UFHGjSpQ7ucIb6g50ZwHrXsICBxG?=
+ =?us-ascii?Q?f+258cuofyVR2GxVkgS3MuHPjFd9PhCRGOGs8WWDH2mQxfJVLYz8alz4m0v3?=
+ =?us-ascii?Q?k8MH0/zpQ/vujNdiahtIpP772gVP+ToOfXQhFBYOVjSBP7Zi5kmMetEIReUA?=
+ =?us-ascii?Q?Y09KLqiXQwj9RGYmIQLH32RWrkifPYlH/sxweQCq4I/wJwaTsf4EW+M0aZEU?=
+ =?us-ascii?Q?TVZyUCs8GdTfyaHjdYZSWDAKszpNsa7u9N/nWRrwx8QV95JOgNBvtlRyPojl?=
+ =?us-ascii?Q?q0QQzHcO6LOxDHSbtUlIyAGwvhYvOI/3yf+i5rAi2UpwHMGGJlqaXGyeEumc?=
+ =?us-ascii?Q?+6L/yWS9mPU/BjNQfeM=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(7416014)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2025 05:26:40.1368
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2025 05:26:44.0857
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: da328c88-db5b-44fd-3154-08de2cac60b3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e1a5e45-48eb-4d1f-0a0f-08de2cac6323
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BY1PEPF0001AE17.namprd04.prod.outlook.com
+	SA2PEPF000015C9.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6644
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PR12MB9720
 
 From: Ankit Agrawal <ankita@nvidia.com>
 
-Introduce a new flag reset_done to notify that the GPU has just
-been reset and the mapping to the GPU memory is zapped.
+Speculative prefetches from CPU to GPU memory until the GPU is
+ready after reset can cause harmless corrected RAS events to
+be logged on Grace systems. It is thus preferred that the
+mapping not be re-established until the GPU is ready post reset.
 
-Implement the reset_done handler to set this new variable. It
-will be used later in the patches to wait for the GPU memory
-to be ready before doing any mapping or access.
+The GPU readiness can be checked through BAR0 registers similar
+to the checking at the time of device probe.
 
+It can take several seconds for the GPU to be ready. So it is
+desirable that the time overlaps as much of the VM startup as
+possible to reduce impact on the VM bootup time. The GPU
+readiness state is thus checked on the first fault/huge_fault
+request or read/write access which amortizes the GPU readiness
+time.
+
+The first fault and read/write checks the GPU state when the
+reset_done flag - which denotes whether the GPU has just been
+reset. The memory_lock is taken across map/access to avoid
+races with GPU reset.
+
+Cc: Shameer Kolothum <skolothumtho@nvidia.com>
+Cc: Alex Williamson <alex@shazbot.org>
 Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Vikram Sethi <vsethi@nvidia.com>
 Suggested-by: Alex Williamson <alex@shazbot.org>
 Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 ---
- drivers/vfio/pci/nvgrace-gpu/main.c | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+ drivers/vfio/pci/nvgrace-gpu/main.c | 81 +++++++++++++++++++++++++----
+ 1 file changed, 72 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-index f691deb8e43c..b46984e76be7 100644
+index b46984e76be7..3064f8aca858 100644
 --- a/drivers/vfio/pci/nvgrace-gpu/main.c
 +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-@@ -58,6 +58,8 @@ struct nvgrace_gpu_pci_core_device {
- 	/* Lock to control device memory kernel mapping */
- 	struct mutex remap_lock;
- 	bool has_mig_hw_bug;
-+	/* GPU has just been reset */
-+	bool reset_done;
- };
+@@ -104,6 +104,17 @@ static int nvgrace_gpu_open_device(struct vfio_device *core_vdev)
+ 		mutex_init(&nvdev->remap_lock);
+ 	}
  
- static void nvgrace_gpu_init_fake_bar_emu_regs(struct vfio_device *core_vdev)
-@@ -1048,12 +1050,34 @@ static const struct pci_device_id nvgrace_gpu_vfio_pci_table[] = {
++	/*
++	 * GPU readiness is checked by reading the BAR0 registers.
++	 *
++	 * ioremap BAR0 to ensure that the BAR0 mapping is present before
++	 * register reads on first fault before establishing any GPU
++	 * memory mapping.
++	 */
++	ret = vfio_pci_core_setup_barmap(vdev, 0);
++	if (ret)
++		return ret;
++
+ 	vfio_pci_core_finish_enable(vdev);
  
- MODULE_DEVICE_TABLE(pci, nvgrace_gpu_vfio_pci_table);
+ 	return 0;
+@@ -146,6 +157,31 @@ static int nvgrace_gpu_wait_device_ready(void __iomem *io)
+ 	return -ETIME;
+ }
  
 +/*
-+ * The GPU reset is required to be serialized against the *first* mapping
-+ * faults and read/writes accesses to prevent potential RAS events logging.
-+ *
-+ * The reset_done implementation is triggered on every reset and is used
-+ * set the reset_done variable that assists in achieving the serialization.
++ * If the GPU memory is accessed by the CPU while the GPU is not ready
++ * after reset, it can cause harmless corrected RAS events to be logged.
++ * Make sure the GPU is ready before establishing the mappings.
 + */
-+static void nvgrace_gpu_vfio_pci_reset_done(struct pci_dev *pdev)
++static int
++nvgrace_gpu_check_device_ready(struct nvgrace_gpu_pci_core_device *nvdev)
 +{
-+	struct vfio_pci_core_device *core_device = dev_get_drvdata(&pdev->dev);
-+	struct nvgrace_gpu_pci_core_device *nvdev =
-+		container_of(core_device, struct nvgrace_gpu_pci_core_device,
-+			     core_device);
++	struct vfio_pci_core_device *vdev = &nvdev->core_device;
++	int ret;
 +
-+	nvdev->reset_done = true;
++	lockdep_assert_held_read(&vdev->memory_lock);
++
++	if (!nvdev->reset_done)
++		return 0;
++
++	ret = nvgrace_gpu_wait_device_ready(vdev->barmap[0]);
++	if (ret)
++		return ret;
++
++	nvdev->reset_done = false;
++
++	return 0;
 +}
 +
-+static const struct pci_error_handlers nvgrace_gpu_vfio_pci_err_handlers = {
-+	.reset_done = nvgrace_gpu_vfio_pci_reset_done,
-+	.error_detected = vfio_pci_core_aer_err_detected,
-+};
-+
- static struct pci_driver nvgrace_gpu_vfio_pci_driver = {
- 	.name = KBUILD_MODNAME,
- 	.id_table = nvgrace_gpu_vfio_pci_table,
- 	.probe = nvgrace_gpu_probe,
- 	.remove = nvgrace_gpu_remove,
--	.err_handler = &vfio_pci_core_err_handlers,
-+	.err_handler = &nvgrace_gpu_vfio_pci_err_handlers,
- 	.driver_managed_dma = true,
- };
+ static unsigned long addr_to_pgoff(struct vm_area_struct *vma,
+ 				   unsigned long addr)
+ {
+@@ -163,13 +199,13 @@ static vm_fault_t nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
+ 	struct vfio_pci_core_device *vdev = &nvdev->core_device;
+ 	unsigned int index =
+ 		vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+-	vm_fault_t ret = VM_FAULT_SIGBUS;
++	vm_fault_t ret;
+ 	struct mem_region *memregion;
+ 	unsigned long pfn, addr;
  
+ 	memregion = nvgrace_gpu_memregion(index, nvdev);
+ 	if (!memregion)
+-		return ret;
++		return VM_FAULT_SIGBUS;
+ 
+ 	addr = ALIGN_DOWN(vmf->address, PAGE_SIZE << order);
+ 	pfn = PHYS_PFN(memregion->memphys) + addr_to_pgoff(vma, addr);
+@@ -179,8 +215,14 @@ static vm_fault_t nvgrace_gpu_vfio_pci_huge_fault(struct vm_fault *vmf,
+ 		goto out;
+ 	}
+ 
+-	scoped_guard(rwsem_read, &vdev->memory_lock)
++	scoped_guard(rwsem_read, &vdev->memory_lock) {
++		if (nvgrace_gpu_check_device_ready(nvdev)) {
++			ret = VM_FAULT_SIGBUS;
++			goto out;
++		}
++
+ 		ret = vfio_pci_vmf_insert_pfn(vdev, vmf, pfn, order);
++	}
+ 
+ out:
+ 	dev_dbg_ratelimited(&vdev->pdev->dev,
+@@ -593,9 +635,15 @@ nvgrace_gpu_read_mem(struct nvgrace_gpu_pci_core_device *nvdev,
+ 	else
+ 		mem_count = min(count, memregion->memlength - (size_t)offset);
+ 
+-	ret = nvgrace_gpu_map_and_read(nvdev, buf, mem_count, ppos);
+-	if (ret)
+-		return ret;
++	scoped_guard(rwsem_read, &nvdev->core_device.memory_lock) {
++		ret = nvgrace_gpu_check_device_ready(nvdev);
++		if (ret)
++			return ret;
++
++		ret = nvgrace_gpu_map_and_read(nvdev, buf, mem_count, ppos);
++		if (ret)
++			return ret;
++	}
+ 
+ 	/*
+ 	 * Only the device memory present on the hardware is mapped, which may
+@@ -713,9 +761,15 @@ nvgrace_gpu_write_mem(struct nvgrace_gpu_pci_core_device *nvdev,
+ 	 */
+ 	mem_count = min(count, memregion->memlength - (size_t)offset);
+ 
+-	ret = nvgrace_gpu_map_and_write(nvdev, buf, mem_count, ppos);
+-	if (ret)
+-		return ret;
++	scoped_guard(rwsem_read, &nvdev->core_device.memory_lock) {
++		ret = nvgrace_gpu_check_device_ready(nvdev);
++		if (ret)
++			return ret;
++
++		ret = nvgrace_gpu_map_and_write(nvdev, buf, mem_count, ppos);
++		if (ret)
++			return ret;
++	}
+ 
+ exitfn:
+ 	*ppos += count;
+@@ -1056,6 +1110,15 @@ MODULE_DEVICE_TABLE(pci, nvgrace_gpu_vfio_pci_table);
+  *
+  * The reset_done implementation is triggered on every reset and is used
+  * set the reset_done variable that assists in achieving the serialization.
++ *
++ * The writer memory_lock is held during reset through ioctl and FLR, while
++ * the reader is held in the fault and access code.
++ *
++ * The lock is however not taken during reset called through
++ * vfio_pci_core_enable during open. Whilst a serialization is not
++ * required at that early stage, it still prevents from putting
++ * lockdep_assert_held_write in this function.
++ *
+  */
+ static void nvgrace_gpu_vfio_pci_reset_done(struct pci_dev *pdev)
+ {
 -- 
 2.34.1
 
