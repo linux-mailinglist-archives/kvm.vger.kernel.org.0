@@ -1,50 +1,50 @@
-Return-Path: <kvm+bounces-64636-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64637-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAEBAC88EA6
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 10:24:54 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1B5DC88EF9
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 10:26:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C47814E3368
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 09:24:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0DAED355C20
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 09:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7325305978;
-	Wed, 26 Nov 2025 09:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3995431B838;
+	Wed, 26 Nov 2025 09:24:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="LHoq75Ht"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="aASOKI8k"
 X-Original-To: kvm@vger.kernel.org
 Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C55C315D27;
-	Wed, 26 Nov 2025 09:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927BB31AF3F;
+	Wed, 26 Nov 2025 09:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764149048; cv=none; b=jS56GuAMDkcHR3+gXWMJkXeTTuuUo/lXPMml6Mu92sn8vqBMkC/1SU5+tYSVYfc2KrfVRPW/iI7Y/KPKsowLcgqhNWzdRKDuefC7jI4kBzTmBhiJ2vokShfYoCk8nv7+6OISK9J9RUGYc3ctHQcuqV61rEjicKui+mxlNeNsytQ=
+	t=1764149094; cv=none; b=esB7ZJUjR7WOdw9EMa/nbA5wExMWcePemP8oQaupAilnSjiIJMx1igk4+GcHt1+1bIWe+wYGsfJCEzmfGdqGly+8szPTMSaeqPEN0J+4bWorN31KyOZqHSEN2bx1voFafaaiSZP9mBQ3kS8p6vnQJGCS5DG9AWpukGHLSvix724=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764149048; c=relaxed/simple;
-	bh=ZXF2bsn6ti6NQHGgfac5Uuc6LvMltMsfT1EUIa1r7uA=;
+	s=arc-20240116; t=1764149094; c=relaxed/simple;
+	bh=7VTWCzte1EfKGKmLVq1yaZwVoVRWDe1aGMmitEojN7M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=El45Q08K8P8TOexinT8ia1z7g30vMlSMTS4lhk1Q/TwkXUlVD1rD8qH/A5X0K5HEd0sKmbqtV9XPhn1bl+LBfNNzIyYUSySZp39Q+R4SupzJb5aTbIlkp5heZLquUNPJ/fMpfiITxr5Zs420EAwCcbRgjZMbQme0vRGh7yMTbpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=LHoq75Ht; arc=none smtp.client-ip=129.217.128.51
+	 In-Reply-To:Content-Type; b=iSuAmQqKSz/XaRgMit++efXmM5lXFhJiLtHUvV7PVObERIrL1g1RApIlnWDnLaJrP8E+ClOgud+XAkzUnylIVEUQ/NOm9/164ajZhqRqAdKi1sJsfAMan2z8YqyI0bHZ4jI7BHqxAHlo+p/Eq5DZB7YCI0rfTFqeIDloQsfQprM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=aASOKI8k; arc=none smtp.client-ip=129.217.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
 Received: from [129.217.186.248] ([129.217.186.248])
 	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5AQ9No8W002898
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5AQ9OhSB003998
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 26 Nov 2025 10:23:50 +0100 (CET)
+	Wed, 26 Nov 2025 10:24:43 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1764149032;
-	bh=ZXF2bsn6ti6NQHGgfac5Uuc6LvMltMsfT1EUIa1r7uA=;
+	s=unimail; t=1764149083;
+	bh=7VTWCzte1EfKGKmLVq1yaZwVoVRWDe1aGMmitEojN7M=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=LHoq75Htd4PXjBNRN6sr3JQxC6qqIywes9L/jp9O1V4iSYuEaTCSuK+boIDKT4wsB
-	 /08RFO6WaaFvFShqWULlLpxvkyZmGTlhohI9QvAGuNgfdEhXc4HOy9zZgyv6/zC9+a
-	 spGfo0kQEnlYKLNPXWPIczPL0gB6rtCRnDrQ4620=
-Message-ID: <4db234bd-ebd7-4325-9157-e74eccb58616@tu-dortmund.de>
-Date: Wed, 26 Nov 2025 10:23:50 +0100
+	b=aASOKI8kUL2H9I+qMmTsEud3+WUWpK7Ir9IKspC1KOdkD/FxWUsqCPamTD7SILa49
+	 fnM//TGAQXNPKrxiq0bVC+jEtyGWnyBH4VBwSajHO6ovInJklAVuA/S+jSl8IlG1jN
+	 A96YYepdNeyqsGuhzmo9EbHHG9sb5LsVdN5SogDM=
+Message-ID: <2bc56d3e-f4da-41d5-ab63-29c63525eb30@tu-dortmund.de>
+Date: Wed, 26 Nov 2025 10:24:42 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -52,127 +52,39 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v6 3/8] tun/tap: add synchronized ring
- produce/consume with queue management
+Subject: [PATCH net-next v6 0/8] tun/tap & vhost-net: netdev queue flow
+ control to avoid ptr_ring tail drop
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+Cc: Jason Wang <jasowang@redhat.com>, willemdebruijn.kernel@gmail.com,
         andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
         kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
         jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux.dev
 References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
- <20251120152914.1127975-4-simon.schippers@tu-dortmund.de>
- <20251125100655-mutt-send-email-mst@kernel.org>
+ <CACGkMEuboys8sCJFUTGxHUeouPFnVqVLGQBefvmxYDe4ooLfLg@mail.gmail.com>
+ <b9fff8e1-fb96-4b1f-9767-9d89adf31060@tu-dortmund.de>
+ <20251126021327-mutt-send-email-mst@kernel.org>
 Content-Language: en-US
 From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <20251125100655-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20251126021327-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/25/25 17:54, Michael S. Tsirkin wrote:
-> On Thu, Nov 20, 2025 at 04:29:08PM +0100, Simon Schippers wrote:
->> Implement new ring buffer produce and consume functions for tun and tap
->> drivers that provide lockless producer-consumer synchronization and
->> netdev queue management to prevent ptr_ring tail drop and permanent
->> starvation.
->>
->> - tun_ring_produce(): Produces packets to the ptr_ring with proper memory
->>   barriers and proactively stops the netdev queue when the ring is about
->>   to become full.
->>
->> - __tun_ring_consume() / __tap_ring_consume(): Internal consume functions
->>   that check if the netdev queue was stopped due to a full ring, and wake
->>   it when space becomes available. Uses memory barriers to ensure proper
->>   ordering between producer and consumer.
->>
->> - tun_ring_consume() / tap_ring_consume(): Wrapper functions that acquire
->>   the consumer lock before calling the internal consume functions.
->>
->> Key features:
->> - Proactive queue stopping using __ptr_ring_full_next() to stop the queue
->>   before it becomes completely full.
->> - Not stopping the queue when the ptr_ring is full already, because if
->>   the consumer empties all entries in the meantime, stopping the queue
->>   would cause permanent starvation.
+On 11/26/25 08:15, Michael S. Tsirkin wrote:
+> On Fri, Nov 21, 2025 at 10:22:54AM +0100, Simon Schippers wrote:
+>> I agree, but I really would like to reduce the buffer bloat caused by the
+>> default 500 TUN / 1000 TAP packet queue without losing performance.
 > 
-> what is permanent starvation? this comment seems to answer this
-> question:
+> that default is part of the userspace API and can't be changed.
+> just change whatever userspace is creating your device.
 > 
-> 
-> 	/* Do not stop the netdev queue if the ptr_ring is full already.
-> 	 * The consumer could empty out the ptr_ring in the meantime
-> 	 * without noticing the stopped netdev queue, resulting in a
-> 	 * stopped netdev queue and an empty ptr_ring. In this case the
-> 	 * netdev queue would stay stopped forever.
-> 	 */
-> 
-> 
-> why having a single entry in
-> the ring we never use helpful to address this?
-> 
-> 
-> 
-> 
-> In fact, all your patch does to solve it, is check
-> netif_tx_queue_stopped on every consumed packet.
-> 
-> 
-> I already proposed:
-> 
-> static inline int __ptr_ring_peek_producer(struct ptr_ring *r)
-> {
->         if (unlikely(!r->size) || r->queue[r->producer])
->                 return -ENOSPC;
->         return 0;
-> }
-> 
-> And with that, why isn't avoiding the race as simple as
-> just rechecking after stopping the queue?
- 
-I think you are right and that is quite similar to what veth [1] does.
-However, there are two differences:
 
-- Your approach avoids returning NETDEV_TX_BUSY by already stopping
-  when the ring becomes full (and not when the ring is full already)
-- ...and the recheck of the producer wakes on !full instead of empty.
+Yes, but I’m thinking about introducing a new interface flag like
+IFF_BQL. However, as noted earlier, there are significant implementation
+challenges.
 
-I like both aspects better than the veth implementation.
-
-Just one thing: like the veth implementation, we probably need a
-smp_mb__after_atomic() after netif_tx_stop_queue() as they also discussed
-in their v6 [2].
-
-
-On the consumer side, I would then just do:
-
-__ptr_ring_consume();
-if (unlikely(__ptr_ring_consume_created_space()))
-    netif_tx_wake_queue(txq);
-
-Right?
-
-And for the batched consume method, I would just call this in a loop.
-
-Thank you!
-
-[1] Link: https://lore.kernel.org/netdev/174559288731.827981.8748257839971869213.stgit@firesoul/T/#m2582fcc48901e2e845b20b89e0e7196951484e5f
-[2] Link: https://lore.kernel.org/all/174549933665.608169.392044991754158047.stgit@firesoul/T/#m63f2deb86ffbd9ff3a27e1232077a3775606c14d
-
-> 
-> __ptr_ring_produce();
-> if (__ptr_ring_peek_producer())
-> 	netif_tx_stop_queue
-
-smp_mb__after_atomic(); // Right here
-
-> 	if (!__ptr_ring_peek_producer())
-> 		netif_tx_wake_queue(txq);
-> 
-> 
-> 
-> 
-> 
-> 
-> 
+I think there can be advantages to something like VPN's on mobile
+devices where the throughput varies between a few Mbit/s (small TUN/TAP
+queue is fine) and multiple Gbit/s (need a bigger queue).
 
