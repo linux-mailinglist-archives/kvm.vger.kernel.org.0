@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-64683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64681-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71455C8ACCF
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 17:02:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59946C8ACC6
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 17:02:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16E8D3B8BF7
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 16:00:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CE043B901F
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 16:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B84331A6C;
-	Wed, 26 Nov 2025 16:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E0233C1AE;
+	Wed, 26 Nov 2025 16:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tsHZeA3D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jghNOWdw"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFF13054DF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C370733B96F;
 	Wed, 26 Nov 2025 16:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764172802; cv=none; b=EDgnUqKpaec64WyvmMb9f40KfNjHRsDK5hDoVBxxk4r26uyI+QpwmBng+IauXPZWoVfO5zguKUZs4Yg2SmKiJUub3RS/VriP3CD+4sttvmwIQtNaBOxdC7sZvsD/8xAcQlXcgaBcOWURQ5Nxoy9u6ttHIVeRY73whSsSRUwk4U4=
+	t=1764172801; cv=none; b=tjm9PNtLdKw7qXEIjkRiAW0csm0YNKpPsstrCdAmCQbbviK8AEroZQudfIvef4aIdQfWBLFezWgD25D5dUsFHSAncLNOutvaKDcz5PDFpDQiWCxdytRXi3DhBuEq8taCtZUeTG9EhRs3Zb8SOn0y7ON9DUhAKq8mi23NmZQDzxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764172802; c=relaxed/simple;
-	bh=lG82/RXgkPqZWZ9aTc82QWQFUkM4bvI4ZqnGwoup1FM=;
+	s=arc-20240116; t=1764172801; c=relaxed/simple;
+	bh=0HAJBmXE+rJLYXs5hMQhZFeGzkrf7YieZyrcWFUBa8g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=URC3GV0lSegj6lSWVuQoi30vpL99/Kt/xAqEmPdwvzRsiHlxHuD0QLBh8bi79I7nDQ//rzupNbFAg/ShtOPuAx22BP2QrYpUp9z+uk7nV9RAoiioF7dPU7mvdF3O9DNna7tfyppYlOAsHphZ+Ticxmn4KiL3MCQtpzT46XEutiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tsHZeA3D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60AEEC4CEF8;
+	 MIME-Version; b=kmb7Bk7u51/mvGGXQQJIhFYytcbgXEFPiO+pjazdnDY8W9pKkwrb4NJH8ltC/ZFIIPutVyz01qySsyNkrReooaVi++edowSKX1doq08iMmdjQiMABYkokKc7YUyYs0sADcyf59UcQ5qztjH+2itDmzaiTEnL8uo7uRpsSCljXr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jghNOWdw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E8D1C4AF09;
 	Wed, 26 Nov 2025 16:00:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1764172801;
-	bh=lG82/RXgkPqZWZ9aTc82QWQFUkM4bvI4ZqnGwoup1FM=;
+	bh=0HAJBmXE+rJLYXs5hMQhZFeGzkrf7YieZyrcWFUBa8g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tsHZeA3DuZqbjciM77jiElM91agDFeS851U5NSeB1UqRqSVMsvpzz3hLdtwAEVMAX
-	 JTQTNmdNELRr6ZAWia7dtpfCy9fRbgtOqKcS/ID+/AuxzwyRm9GFr/sVjbDV6zU9Hj
-	 XO4LQS/HhcYIO0O8CB+HupwfvSwgL6Uwm5A5oY9cUmXC9LLOd1j62m7zXQ2nPOu6/A
-	 oqmgGz/rn780uUSXLMBmHgoE2llN6wwXFHxu/1b9DKyDa1BGCwS66A8MpvrH1tN8uH
-	 dPqIZNcS5WBs2Y/o1jbCz4iJAaHliZNd+w4tYk8qUtrJXdGZv7KiXsHTVMbIoWZmmb
-	 IdiAAGD/32Nog==
+	b=jghNOWdwoJdAoDEZo7hf5KMUvnNzUpAdlgMNgUpqcoIXj4Qff16+iZEipNSNf3mzF
+	 6Dw8zojl6RmpsPUfVjfqiTpkKBXTOyWAIZ+8Xr4aDGrYR5KMn5qaDepCMhq17qJOvL
+	 4VijWrIdAzcj1UAfaS/UtG6qn2A6sgg25hgUUNfqZ8d+i6eAd/qUWDZMmMvCAW6UQs
+	 g2mJYkwKOAsZUXgtUYeT5cBdP9naMffLbniJgleIQQNERPK7t20yYae227N0+Xs/C5
+	 lOaYhOgRggEQbadVmXIFdn3Hgq1TrxP/ZGBpFwwbWCf4Lwl/QLQcBwHA+JQNnTWEb7
+	 Ws6t33RlhaGkA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vOHvz-00000008WrH-0wRD;
+	id 1vOHvz-00000008WrH-1qSX;
 	Wed, 26 Nov 2025 15:59:59 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -56,9 +56,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH v2 4/5] KVM: arm64: Report optional ID register traps with a 0x18 syndrome
-Date: Wed, 26 Nov 2025 15:59:50 +0000
-Message-ID: <20251126155951.1146317-5-maz@kernel.org>
+Subject: [PATCH v2 5/5] KVM: arm64: selftests: Add a test for FEAT_IDST
+Date: Wed, 26 Nov 2025 15:59:51 +0000
+Message-ID: <20251126155951.1146317-6-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251126155951.1146317-1-maz@kernel.org>
 References: <20251126155951.1146317-1-maz@kernel.org>
@@ -74,58 +74,151 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-With FEAT_IDST, unimplemented system registers in the feature ID space
-must be reported using EC=0x18 at the closest handling EL, rather than
-with an UNDEF.
-
-Most of these system registers are always implemented thanks to their
-dependency on FEAT_AA64, except for a set of (currently) three registers:
-GMID_EL1 (depending on MTE2), CCSIDR2_EL1 (depending on FEAT_CCIDX),
-and SMIDR_EL1 (depending on SME).
-
-For these three registers, report their trap as EC=0x18 if they
-end-up trapping into KVM and that FEAT_IDST is not implemented in the
-guest. Otherwise, just make them UNDEF.
+Add a very basic test checking that FEAT_IDST actually works for
+the {GMID,SMIDR,CSSIDR2}_EL1 registers.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/arm64/idreg-idst.c  | 117 ++++++++++++++++++
+ 2 files changed, 118 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/idreg-idst.c
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2ca6862e935b5..7705f703e7c6d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -82,6 +82,16 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
- 			"sys_reg write to read-only register");
- }
- 
-+static bool idst_access(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			const struct sys_reg_desc *r)
-+{
-+	if (kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, IDS, 0x0))
-+		return undef_access(vcpu, p, r);
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 148d427ff24be..fa44e6d9afc35 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -171,6 +171,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
+ TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
+ TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
+ TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
++TEST_GEN_PROGS_arm64 += arm64/idreg-idst
+ TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
+ TEST_GEN_PROGS_arm64 += access_tracking_perf_test
+ TEST_GEN_PROGS_arm64 += arch_timer
+diff --git a/tools/testing/selftests/kvm/arm64/idreg-idst.c b/tools/testing/selftests/kvm/arm64/idreg-idst.c
+new file mode 100644
+index 0000000000000..9ca9f125abdb7
+--- /dev/null
++++ b/tools/testing/selftests/kvm/arm64/idreg-idst.c
+@@ -0,0 +1,117 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+	kvm_inject_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+	return false;
++/*
++ * Access all FEAT_IDST-handled registers that depend on more than
++ * just FEAT_AA64, and fail if we don't get an a trap with an 0x18 EC.
++ */
++
++#include <test_util.h>
++#include <kvm_util.h>
++#include <processor.h>
++
++static volatile bool sys64, undef;
++
++#define __check_sr_read(r)					\
++	({							\
++		uint64_t val;					\
++								\
++		sys64 = false;					\
++		undef = false;					\
++		dsb(sy);					\
++		val = read_sysreg_s(SYS_ ## r);			\
++		val;						\
++	})
++
++/* Fatal checks */
++#define check_sr_read(r)					\
++	do {							\
++		__check_sr_read(r);				\
++		__GUEST_ASSERT(!undef, #r " unexpected UNDEF");	\
++		__GUEST_ASSERT(sys64, #r " didn't trap");	\
++	} while(0)
++
++
++static void guest_code(void)
++{
++	check_sr_read(CCSIDR2_EL1);
++	check_sr_read(SMIDR_EL1);
++	check_sr_read(GMID_EL1);
++
++	GUEST_DONE();
 +}
 +
- enum sr_loc_attr {
- 	SR_LOC_MEMORY	= 0,	  /* Register definitely in memory */
- 	SR_LOC_LOADED	= BIT(0), /* Register on CPU, unless it cannot */
-@@ -3399,9 +3409,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
- 	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr, reset_clidr, CLIDR_EL1,
- 	  .set_user = set_clidr, .val = ~CLIDR_EL1_RES0 },
--	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
--	{ SYS_DESC(SYS_GMID_EL1), undef_access },
--	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
-+	{ SYS_DESC(SYS_CCSIDR2_EL1), idst_access },
-+	{ SYS_DESC(SYS_GMID_EL1), idst_access },
-+	{ SYS_DESC(SYS_SMIDR_EL1), idst_access },
- 	IMPLEMENTATION_ID(AIDR_EL1, GENMASK_ULL(63, 0)),
- 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
- 	ID_FILTERED(CTR_EL0, ctr_el0,
++static void guest_sys64_handler(struct ex_regs *regs)
++{
++	sys64 = true;
++	undef = false;
++	regs->pc += 4;
++}
++
++static void guest_undef_handler(struct ex_regs *regs)
++{
++	sys64 = false;
++	undef = true;
++	regs->pc += 4;
++}
++
++static void test_run_vcpu(struct kvm_vcpu *vcpu)
++{
++	struct ucall uc;
++
++	do {
++		vcpu_run(vcpu);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			break;
++		case UCALL_PRINTF:
++			printf("%s", uc.buffer);
++			break;
++		case UCALL_DONE:
++			break;
++		default:
++			TEST_FAIL("Unknown ucall %lu", uc.cmd);
++		}
++	} while (uc.cmd != UCALL_DONE);
++}
++
++static void test_guest_feat_idst(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	/* This VM has no MTE, no SME, no CCIDX */
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vcpu);
++
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
++				ESR_ELx_EC_SYS64, guest_sys64_handler);
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
++				ESR_ELx_EC_UNKNOWN, guest_undef_handler);
++
++	test_run_vcpu(vcpu);
++
++	kvm_vm_free(vm);
++}
++
++int main(int argc, char *argv[])
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	uint64_t mmfr2;
++
++	test_disable_default_vgic();
++
++	vm = vm_create_with_one_vcpu(&vcpu, NULL);
++	mmfr2 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR2_EL1));
++	__TEST_REQUIRE(FIELD_GET(ID_AA64MMFR2_EL1_IDS, mmfr2) > 0,
++		       "FEAT_IDST not supported");
++	kvm_vm_free(vm);
++
++	test_guest_feat_idst();
++
++	return 0;
++}
 -- 
 2.47.3
 
