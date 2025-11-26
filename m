@@ -1,73 +1,97 @@
-Return-Path: <kvm+bounces-64594-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64595-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91859C87FB7
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 04:42:20 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB54BC88029
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 05:02:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EF90B354A14
-	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 03:42:18 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 633B83556F1
+	for <lists+kvm@lfdr.de>; Wed, 26 Nov 2025 04:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F14830E0EF;
-	Wed, 26 Nov 2025 03:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27049311975;
+	Wed, 26 Nov 2025 04:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIWNg9td"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Le8gsF2f"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDE71A239A;
-	Wed, 26 Nov 2025 03:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4681F3112DB;
+	Wed, 26 Nov 2025 04:01:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764128523; cv=none; b=M3K3osor0nXjzPwPnz8aKB6ATzACMHV+AIE6LjOUdBFdm3H95MgMfTtjkXHw5ew/P/HhcLJPp7iMwOJatuHBm20HX1Pl00eJBtj0XJvNrbt0PylnNekiQH4rsoBj8EdewpctimLhWsP6/OAg7hIfgA6J3WQYMTNdkJXv1Um44gU=
+	t=1764129665; cv=none; b=O5D/3dCsfr+3do8YiMEq49KsXAYx56Ebo989ozhpjghDlUyrN0JYjsu0qI9wazK/QWAbqY+qJUsIAM1O6eMMB4w9b+zDErVOwMGs5QwviyVYnZt5bGBww2KuwarKrd+WaSz6r1pW3SoXTIy1Fy0puIpFg475VxsigPRW+too/04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764128523; c=relaxed/simple;
-	bh=SPhDWiVuKzziBw2o3C4xt5XVjmfNUbxZ3JzyYL3Em5A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TmJo09xVw8Jo4QYVmF8gynAVAZqx/i5PqKhoM/k4RxDvw5xYVmHNAVaP9tQrzjGl+dD26iT70nP1k3Wv09NVtxlUcHRjWtnKjKg3LMj1pLMndWHhM3KGhi6iD2HzW9+9APM1/OOOjKbYdZ8d+krOE+bCBTJBPyIHzHe9wzptOsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MIWNg9td; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D688DC113D0;
-	Wed, 26 Nov 2025 03:42:02 +0000 (UTC)
+	s=arc-20240116; t=1764129665; c=relaxed/simple;
+	bh=e66W30nBm93lSeox4A0GZFfHktSjddRZJws2hous++Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=c3liPkIqu/Vmqi7CtjRBZ5nEe2QNHDvakcCynFez0KuToOVpfRtVFFQ49kDvTKTNwgITJm9W4XLzxUu7bTioJwC9yfQGWP+PR4tt4M3r3F0p1A7ANqxa81uoyzsfcGmJDcAI3ZTxWdx9aRhP0oiqbrGEUKELCg2w5kZcrwYjR0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Le8gsF2f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA401C116C6;
+	Wed, 26 Nov 2025 04:01:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764128523;
-	bh=SPhDWiVuKzziBw2o3C4xt5XVjmfNUbxZ3JzyYL3Em5A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MIWNg9td3BiW0Z7Usiz++cJ9SRk/lxsb++rUCQBR2RfSEbTRkuSe7HUw0VEczpz+l
-	 d2edplT3b4actAc2EIHebBxGTcDtCUBvB4nROW63F2EhZj/PONcjcLfaPNgSheKWJY
-	 RG+nlpktN8CZi2LCDEavK4s0KVwJJOfPYbuGhsS4yjwg8dcWmHprjAd+P8GHwpDx9n
-	 nDVX5RsvRW7DstMDdnhl7yF8F7ZXp6xc93WA/Qrc9ewCsMnb+ZVUEv0kODEhHQWdFs
-	 5mH97aTsVE8+OfF+BI6ODlCVckqwiOCnxe/HfZJ0EHoq7flBzo7sSu7OYxbv3QZYWv
-	 OOyYgSl0x5Log==
-Date: Tue, 25 Nov 2025 19:42:02 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Wang <jasowang@redhat.com>, mst@redhat.com
-Cc: eperezma@redhat.com, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH net V2] vhost: rewind next_avail_head while discarding
- descriptors
-Message-ID: <20251125194202.49e0eec7@kernel.org>
-In-Reply-To: <20251120022950.10117-1-jasowang@redhat.com>
-References: <20251120022950.10117-1-jasowang@redhat.com>
+	s=k20201202; t=1764129664;
+	bh=e66W30nBm93lSeox4A0GZFfHktSjddRZJws2hous++Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Le8gsF2f2odt9z3fNK9mprG0lWvNfxD3cW4POqW7GXP4b01gf/v7c3NAocSYOd94k
+	 v1xh7p8tCFaD0czlXv1X4qTCoR6A+bwg+GebAbRf0bslvjooA79fq+ORbzpi0njNMc
+	 YdNQbqu2pSIOIBZ0NLyfpaAmAD/0hYqP0tBSIpj5IJNianCyqBvNYdqykOlLh3I6VX
+	 +PEGQ8YdJSR6oxhoh3Dp01MCoi+/sfMrUQ8L4s2nPhxqKHWc627QcP7mMaphAxDeYj
+	 1gx7zinW0cJi9MHyYCXEVTYimfFoMFrLvxzh/Uhyqg4cucPvIfB5ea4psiKh3LZ/C/
+	 deh1LZD9RuQOQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D5F380AA73;
+	Wed, 26 Nov 2025 04:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] virtio_net: enhance wake/stop tx queue statistics
+ accounting
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176412962675.1513924.17474261080340416413.git-patchwork-notify@kernel.org>
+Date: Wed, 26 Nov 2025 04:00:26 +0000
+References: <20251120015320.1418-1-liming.wu@jaguarmicro.com>
+In-Reply-To: <20251120015320.1418-1-liming.wu@jaguarmicro.com>
+To: Liming Wu <liming.wu@jaguarmicro.com>
+Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+ eperezma@redhat.com, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ angus.chen@jaguarmicro.com
 
-On Thu, 20 Nov 2025 10:29:50 +0800 Jason Wang wrote:
-> Subject: [PATCH net V2] vhost: rewind next_avail_head while discarding descriptors
+Hello:
 
->  drivers/vhost/net.c   | 53 ++++++++++++++++++------------
->  drivers/vhost/vhost.c | 76 +++++++++++++++++++++++++++++++++++--------
->  drivers/vhost/vhost.h | 10 +++++-
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Hm, is this targeting net because Michael is not planning any more PRs
-for the 6.18 season?
+On Thu, 20 Nov 2025 09:53:20 +0800 you wrote:
+> From: Liming Wu <liming.wu@jaguarmicro.com>
+> 
+> This patch refines and strengthens the statistics collection of TX queue
+> wake/stop events introduced by commit c39add9b2423 ("virtio_net: Add TX
+> stopped and wake counters").
+> 
+> Previously, the driver only recorded partial wake/stop statistics
+> for TX queues. Some wake events triggered by 'skb_xmit_done()' or resume
+> operations were not counted, which made the per-queue metrics incomplete.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2] virtio_net: enhance wake/stop tx queue statistics accounting
+    https://git.kernel.org/netdev/net-next/c/cfeb7cd80f40
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
