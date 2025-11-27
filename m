@@ -1,48 +1,55 @@
-Return-Path: <kvm+bounces-64867-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64868-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92211C8E0B3
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 12:27:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33E65C8E192
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 12:49:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6515D349D17
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 11:27:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDF0B3ABEB3
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 11:48:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA7F32863F;
-	Thu, 27 Nov 2025 11:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F0932E12C;
+	Thu, 27 Nov 2025 11:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b21RDsDx"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="XWTtN5L7"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A0332B987;
-	Thu, 27 Nov 2025 11:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F7F32A3C5;
+	Thu, 27 Nov 2025 11:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764242844; cv=none; b=jesHwd1+ZuPkU9obm1uK03LtvmYUZNKP2ppGlDLjmo7aNnsUsAL1aItkiSE/mUEDGRDpvhhxpeKYYVngJBRb55zd0tJSFX2RZxcM75eNwvgIjIPX5NkAyNQGZGx2HjgmcPslDImaRRMv9MvPse9MGR9LYOzdcnlmRnNsMJJ3dAE=
+	t=1764244130; cv=none; b=pB4NXVMK0kz9XgFZ9mvLYCLOA+HXj8i69Ep1V4Nqj7D4gVt9xjHOkKg/PArfcoxqk+M88pihDi2aX8xb6r1/Opw7jXhwv086cMiOcuIe70O/enEiO83/G15yCEtmQBDeK+gKppHWfB1J2Aidfoeu0yZJHVNcb4BfSew87iR7v+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764242844; c=relaxed/simple;
-	bh=muetvljUY3Nkik/PobN2fmNoxtVaO6scpEpns09bMHs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dNgqrNCZQYmTqjQwTGVH9jIx17kUCGOvF9Z0V2xHET1VXyCkM1l46jJLEzA04sryWXBJkhqtIrELZ0aSu4qRklM6vNSZLJ3khNFyhByUTni8s1arLgYzN98tid9uqSnNcEcWsqWAzmw99WpnR9AxqSwoLEoWDRkWJfCqP/81lLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b21RDsDx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A317C4CEF8;
-	Thu, 27 Nov 2025 11:27:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764242843;
-	bh=muetvljUY3Nkik/PobN2fmNoxtVaO6scpEpns09bMHs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=b21RDsDxdy85ey8AfYrH0yNpETemOuc8/zJEIQrhlSIr1zrzEHVNWmb9xrVmYGYGA
-	 umX8lU3bIw6mNbLZKK3YDmJPuIP/LArzTepOUMLLfqIS6TKKqu5RVtrzP4fqgtE6VH
-	 YJlQlMLRoyR9Ly8y5VCfCu6iVe1CRYLZwqh3jvDsM6rGz0a70MuTDOIPtwJ0QM/UDz
-	 TYvDohZpmz9VYMobH5ImBRZM7tZrMt7/n103jYmaupkbNrAEbhDzoTSKGbXaMd5ELB
-	 9L6WSZDtSb3tBzCVGJwsiN5MtPG3rlRjraE1yQ+FGv6pocryFVju3v+p1o2zfCPU07
-	 KgLYSETML2Cfw==
-Message-ID: <35f8ca1b-b5ea-420d-af3a-ba9acc7b39c7@kernel.org>
-Date: Thu, 27 Nov 2025 12:27:15 +0100
+	s=arc-20240116; t=1764244130; c=relaxed/simple;
+	bh=Kmy6fbm4AVNE0igIM0FCeD2lcq4jABrCROTkwk52m3w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MAejgp5rl+l8NmdrLJDKD5wdVCwflwB7chs0dWH3LX9NE3kFIk0M2DbccDwLINKyhrOqyqg9qILof7+7tAAkePJ/rOrnU7Mro5K0CCMW0RuxhpAX+C5sW9GDNPoytAao/8Nv23caL8uQfwDK07jMIDGpSv5TsKC/0oVwU+Pp/gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=XWTtN5L7; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Dw31ylgTw5lVkOHJ0GjXBHniTQtPSmoq+7esHDkGbVw=;
+	b=XWTtN5L7zPwfC0KqbuHtes1A/mmqYWRuONQsCEL6DCH3mFXhGME9j5wthhQnM0qC+Zl4U0HD2
+	A92Y/JUbpG8MX5P7KuhPOd6V4u9tYnk12FGAqW3P2OfgoM7gvrdlRUBIGm7kqBGCxxQ7KkmJrmL
+	Rp4BQuZcRuDEgxiHbEZ+R1c=
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dHF5w4WDwznTY0;
+	Thu, 27 Nov 2025 19:47:16 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9687A140135;
+	Thu, 27 Nov 2025 19:48:39 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Thu, 27 Nov 2025 19:48:38 +0800
+Message-ID: <54558610-1062-4632-a44c-d06443bdc736@huawei.com>
+Date: Thu, 27 Nov 2025 19:48:38 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -50,54 +57,75 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/5] guest_memfd: add support for userfaultfd minor
- mode
-To: Mike Rapoport <rppt@kernel.org>, Nikita Kalyazin <kalyazin@amazon.com>
-Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Axel Rasmussen <axelrasmussen@google.com>,
- Baolin Wang <baolin.wang@linux.alibaba.com>, Hugh Dickins
- <hughd@google.com>, James Houghton <jthoughton@google.com>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Michal Hocko
- <mhocko@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Peter Xu <peterx@redhat.com>, Sean Christopherson <seanjc@google.com>,
- Shuah Khan <shuah@kernel.org>, Suren Baghdasaryan <surenb@google.com>,
- Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20251125183840.2368510-1-rppt@kernel.org>
- <20251125183840.2368510-5-rppt@kernel.org>
- <bafb0c9e-9ce6-4294-b1d6-e32c41635add@amazon.com>
- <aSgpo1_ZSmxf84-p@kernel.org>
-From: "David Hildenbrand (Red Hat)" <david@kernel.org>
-Content-Language: en-US
-In-Reply-To: <aSgpo1_ZSmxf84-p@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register
+ information
+To: Marc Zyngier <maz@kernel.org>, Tian Zheng <zhengtian10@huawei.com>
+CC: <oliver.upton@linux.dev>, <catalin.marinas@arm.com>, <corbet@lwn.net>,
+	<pbonzini@redhat.com>, <will@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yezhenyu2@huawei.com>,
+	<xiexiangyou@huawei.com>, <zhengchuan@huawei.com>, <joey.gouly@arm.com>,
+	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
+	<suzuki.poulose@arm.com>
+References: <20251121092342.3393318-1-zhengtian10@huawei.com>
+ <20251121092342.3393318-2-zhengtian10@huawei.com>
+ <86wm3iqlz8.wl-maz@kernel.org>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <86wm3iqlz8.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-On 11/27/25 11:36, Mike Rapoport wrote:
-> On Wed, Nov 26, 2025 at 04:49:31PM +0000, Nikita Kalyazin wrote:
->> On 25/11/2025 18:38, Mike Rapoport wrote:
->>> From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
->>>
->>> +#ifdef CONFIG_USERFAULTFD
->>> +static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t pgoff)
+
+
+On 2025/11/22 20:40, Marc Zyngier wrote:
+> On Fri, 21 Nov 2025 09:23:38 +0000,
+> Tian Zheng <zhengtian10@huawei.com> wrote:
 >>
->> We have to name it differently, otherwise it clashes with the existing one
->> in this file.
+>> From: eillon <yezhenyu2@huawei.com>
+>>
+>> The ARM architecture added the HDBSS feature and descriptions of
+>> related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
+>> add them to Linux.
+>>
+>> Signed-off-by: eillon <yezhenyu2@huawei.com>
+>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+>> ---
+>>   arch/arm64/include/asm/esr.h     |  2 ++
+>>   arch/arm64/include/asm/kvm_arm.h |  1 +
+>>   arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
+>>   3 files changed, 31 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+>> index e1deed824464..a6f3cf0b9b86 100644
+>> --- a/arch/arm64/include/asm/esr.h
+>> +++ b/arch/arm64/include/asm/esr.h
+>> @@ -159,6 +159,8 @@
+>>   #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+>>
+>>   /* ISS2 field definitions for Data Aborts */
+>> +#define ESR_ELx_HDBSSF_SHIFT	(11)
+>> +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
+>>   #define ESR_ELx_TnD_SHIFT	(10)
+>>   #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
+>>   #define ESR_ELx_TagAccess_SHIFT	(9)
+>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+>> index 1da290aeedce..b71122680a03 100644
+>> --- a/arch/arm64/include/asm/kvm_arm.h
+>> +++ b/arch/arm64/include/asm/kvm_arm.h
+>> @@ -124,6 +124,7 @@
+>>   			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+>>
+>>   /* VTCR_EL2 Registers bits */
+>> +#define VTCR_EL2_HDBSS		(1UL << 45)
 > 
-> It's all David's fault! ;-P
+> I think it is time to convert VTCR_EL2 to the sysreg infrastructure
+> instead of adding extra bits here.
+> 
+Sure, I will move VTCR_EL2_HDBSS into the sysreg description file
+alongside VTCR_EL2.
+> 	M.
 
-As usual :)
 
-> How about kvm_gmem_get_prepared_folio() ?
-
-Or maybe just spell out that it is for vm_ops
-
-kvm_gmem_vm_ops_get_folio()
-
--- 
-Cheers
-
-David
 
