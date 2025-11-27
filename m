@@ -1,67 +1,69 @@
-Return-Path: <kvm+bounces-64873-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64874-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B942C8EB42
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 15:08:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7910CC8EB69
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 15:11:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F4133A46AA
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 14:04:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FEDF3AAA5F
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 14:09:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738D0331A72;
-	Thu, 27 Nov 2025 14:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4ACB3328E5;
+	Thu, 27 Nov 2025 14:09:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SDKb/RE4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="izx21jyj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930593321BD
-	for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 14:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EA41A9F97
+	for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 14:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764252242; cv=none; b=OY0dw2ufI31Xf+dyjMnHok/YChTusYvSm73+YqdXnLXwdwIFmI6jyeiyVT+vdZ1V74TmY2POagndJXbgo2aUkK82tkWMaHJ9cwT21JUApx2yeJN5JTccw7DGYW9Uvvh46VsZmqT0hfsXxDjaBIcsC//KkOyP43U1eG4/6A9igcI=
+	t=1764252591; cv=none; b=DoWtgE/fF1wCsaOQI924m8RmvsWJlLInlIOdymkPc0LBuUK/+yNRbR8dHoYEae7mnZo7r6foO5ifKbpMdSougevtf05uoLou9J8QeV1I24i53+1f7RuUt7TGFyems/YdpvFD2JeDCAD0DBtmYzP/a1LKSXS0yssY6+r3xeufuxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764252242; c=relaxed/simple;
-	bh=wbIpXOHrAhUYTz4YKeYSdJQ6eJC9BtOYzZPt+wa1Bpo=;
+	s=arc-20240116; t=1764252591; c=relaxed/simple;
+	bh=bQdYilWGa9Wi2rdUzt6QN0o4fezK94Yfgc3qXyRYmE0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kjb7F1kUB33LEJOlQVcrq/viEM6G5pCsDlhOa30BzeXCBusPg5C5V+zuIx6/UyGaV+EC8kdUVRHg3w4Yj8f80ItV6LkU6alZJ8lll+s3sESPH7KThF9eu8p59DQ7xZFl09UEPL7OpuzZBK5AyBxqs6VWRIIJRY7paebTZgTyz3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SDKb/RE4; arc=none smtp.client-ip=192.198.163.9
+	 Content-Type:Content-Disposition:In-Reply-To; b=F+bZcHHh8CCrP73opyVyPvzJZCBrPFXMc1VuuSSTRNdVLH+fAh2wft8ohFvDXv8dFwTuWsJqKoMI8kTA9VHOfmlh2xNQ3FniYnacFfXfOeoeM3wrjVM/ndh+pjymanOLSzF1S7Re5/8DzwEM9w0QhW22p3x2n5dwivg1gL6zZoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=izx21jyj; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764252238; x=1795788238;
+  t=1764252590; x=1795788590;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:content-transfer-encoding:in-reply-to;
-  bh=wbIpXOHrAhUYTz4YKeYSdJQ6eJC9BtOYzZPt+wa1Bpo=;
-  b=SDKb/RE4THB9X5QVOLrV1gje9eFa/vwMPfB21sy+TfC5otUvlO4mAteu
-   n13JVfFXsAUaQqrAwvWqxkhRvYGXZORGMQSOgItyTc6bsO1kpFOpcrW80
-   NYPiqf1DQlhtOJ0VlvD+xNh7/atdtxi/sInsL++WXvPFTX6VPBoGd0Dcd
-   KLBddReql6gzd9ZCdZfzTslMoqkR+WdRv88pnvJPOy1glqQeYo/rXRgTa
-   /ce1dercpO/up4RjuP0VcOJcWnNX5zGYkb2Kenaxyq128nb3glQXRRIIZ
-   SyPjFP6bE73zyLn5w1vz0cUWMTIpIoBkrVxhVwWqOa6SwXcsLIXAqL0BH
-   w==;
-X-CSE-ConnectionGUID: 0AIKdir2QpyaD4p6jxd4Sw==
-X-CSE-MsgGUID: 2teBK7kCRZqzNLwIt08O/A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="76988042"
+  bh=bQdYilWGa9Wi2rdUzt6QN0o4fezK94Yfgc3qXyRYmE0=;
+  b=izx21jyjQnneM965um7Fv/WopYJjNO/WZD2VH+feHnvf4Q1FkD7vlcIC
+   SiYBRfcyAad5uYphQF9dzMxfnk1bfIaQgAgsnJ4qt9ZavUBbh4xeBdX+c
+   zjIdhf+tlimTmH+KrMrxrfaXwk08oWnMC34kf84sl+xH/HKJZdjfS5B0A
+   nZ8zpyahKrZe7IFdaFD2uf6+QszANFCwch4Gvmmd2rkDzD5/duUfKLnXI
+   B8AHBiXgQJipdWN6dlLFqaUzbN8X+Ng6eRxq1wgSSK3yaFLsm1Qvy62i2
+   AzkBn4+V0LzFQponMXZlwDqn/SqBxffzHjozf9Btaen97Rox59zPwkkPM
+   A==;
+X-CSE-ConnectionGUID: 4RpmdYv3RJevwY8y2MwGmw==
+X-CSE-MsgGUID: 6CPZ4Am/RQeAkIne8E6gpw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="77402708"
 X-IronPort-AV: E=Sophos;i="6.20,231,1758610800"; 
-   d="scan'208";a="76988042"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2025 06:03:56 -0800
-X-CSE-ConnectionGUID: ZiYc/Z/CSz60FVKebjEsIQ==
-X-CSE-MsgGUID: ybI2bXHdSTGszpa08vP/ow==
+   d="scan'208";a="77402708"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2025 06:09:49 -0800
+X-CSE-ConnectionGUID: H8ufkZXVQg67BZP6Ctky/g==
+X-CSE-MsgGUID: 2bH9/39aR9GF4XcDljhEyA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,231,1758610800"; 
-   d="scan'208";a="216594607"
+   d="scan'208";a="193042281"
 Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa002.fm.intel.com with ESMTP; 27 Nov 2025 06:03:48 -0800
-Date: Thu, 27 Nov 2025 22:28:28 +0800
+  by orviesa009.jf.intel.com with ESMTP; 27 Nov 2025 06:09:42 -0800
+Date: Thu, 27 Nov 2025 22:34:22 +0800
 From: Zhao Liu <zhao1.liu@intel.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	qemu-devel@nongnu.org,
+	Richard Henderson <richard.henderson@linaro.org>,
 	kvm@vger.kernel.org, Sergio Lopez <slp@redhat.com>,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Peter Maydell <peter.maydell@linaro.org>,
@@ -76,21 +78,19 @@ Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
 	Weiwei Li <liwei1518@gmail.com>, Amit Shah <amit@kernel.org>,
 	Yanan Wang <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>,
 	Palmer Dabbelt <palmer@dabbelt.com>,
-	Ani Sinha <anisinha@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Fabiano Rosas <farosas@suse.de>,
+	Ani Sinha <anisinha@redhat.com>, Fabiano Rosas <farosas@suse.de>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
 	=?iso-8859-1?Q?Cl=E9ment?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
 	qemu-arm@nongnu.org,
 	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
 	Huacai Chen <chenhuacai@kernel.org>,
-	Jason Wang <jasowang@redhat.com>, Zhao Liu <zhao1.liu@intel.com>
-Subject: Re: [PATCH v4 09/27] hw/nvram/fw_cfg: Remove
- fw_cfg_io_properties::dma_enabled
-Message-ID: <aShgDDow//CQsMhF@intel.com>
+	Jason Wang <jasowang@redhat.com>, Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v4 10/27] hw/i386/pc: Remove linuxboot.bin
+Message-ID: <aShhbuuW/CVsoLvP@intel.com>
 References: <20250508133550.81391-1-philmd@linaro.org>
- <20250508133550.81391-10-philmd@linaro.org>
+ <20250508133550.81391-11-philmd@linaro.org>
+ <20250509180411.10f6e683@imammedo.users.ipa.redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -100,60 +100,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250508133550.81391-10-philmd@linaro.org>
+In-Reply-To: <20250509180411.10f6e683@imammedo.users.ipa.redhat.com>
 
-On Thu, May 08, 2025 at 03:35:32PM +0200, Philippe Mathieu-Daudé wrote:
-> Date: Thu,  8 May 2025 15:35:32 +0200
-> From: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Subject: [PATCH v4 09/27] hw/nvram/fw_cfg: Remove
->  fw_cfg_io_properties::dma_enabled
-> X-Mailer: git-send-email 2.47.1
+On Fri, May 09, 2025 at 06:04:11PM +0200, Igor Mammedov wrote:
+> Date: Fri, 9 May 2025 18:04:11 +0200
+> From: Igor Mammedov <imammedo@redhat.com>
+> Subject: Re: [PATCH v4 10/27] hw/i386/pc: Remove linuxboot.bin
+> X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 > 
-> Now than all calls to fw_cfg_init_io_dma() pass DMA arguments,
+> On Thu,  8 May 2025 15:35:33 +0200
+> Philippe Mathieu-Daudé <philmd@linaro.org> wrote:
+> 
+> > All PC machines now use the linuxboot_dma.bin binary,
+> > we can remove the non-DMA version (linuxboot.bin).
+> > 
+> > Suggested-by: Thomas Huth <thuth@redhat.com>
+> > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> > ---
+> >  hw/i386/pc.c                  |   3 +-
+ 
+(After a long interval, more of a note.)
 
-Yes,
+> linuxboot.bin is referenced in a few more files:
+> 
+> hw/i386/x86-common.c:    option_rom[nb_option_roms].name = "linuxboot.bin";
 
-> the 'dma_enabled' of the TYPE_FW_CFG_IO type is not used anymore.
-> Remove it, simplifying fw_cfg_init_io_dma() and fw_cfg_io_realize().
+this case is removed in previous patch (which considerred x86 machines
+all have DMA enabled).
 
-but the 'dma_enabled' of the TYPE_FW_CFG_IO type is still used in
-hw/sparc64/sun4u.c:
+> hw/nvram/fw_cfg.c:    { "genroms/linuxboot.bin", 60 },
 
-    dev = qdev_new(TYPE_FW_CFG_IO);
-    qdev_prop_set_bit(dev, "dma_enabled", false);
-
-The creation of TYPE_FW_CFG_IO is similar to fw_cfg_init_io_dma(), but
-it still has little difference so I find sun4uv can't use
-fw_cfg_init_io_dma() directly for now, or it may require more careful
-clarification that it can use fw_cfg_init_io_dma().
-
-So, at least we have to keep "dma_enabled" property in
-fw_cfg_io_properties[].
-
-...
-
-> diff --git a/hw/i386/x86-common.c b/hw/i386/x86-common.c
-> index 27254a0e9f1..ee594364415 100644
-> --- a/hw/i386/x86-common.c
-> +++ b/hw/i386/x86-common.c
-> @@ -991,10 +991,7 @@ void x86_load_linux(X86MachineState *x86ms,
->      }
->  
->      option_rom[nb_option_roms].bootindex = 0;
-> -    option_rom[nb_option_roms].name = "linuxboot.bin";
-> -    if (fw_cfg_dma_enabled(fw_cfg)) {
-> -        option_rom[nb_option_roms].name = "linuxboot_dma.bin";
-> -    }
-> +    option_rom[nb_option_roms].name = "linuxboot_dma.bin";
->      nb_option_roms++;
->  }
-
-But now all x86 machines have enabled dma, so it's still possible to
-drop "linuxboot.bin".
-
-For this, I think we could add a DMA check in the x86 common code to
-guarantee DMA is enabled and then we won't need to constantly check
-DMA enable in every corner.
+this case is removed in commit 6160ce208419 ("hw/nvram/fw_cfg: Remove
+legacy FW_CFG_ORDER_OVERRIDE").
 
 Regards,
 Zhao
