@@ -1,132 +1,158 @@
-Return-Path: <kvm+bounces-64797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0A76C8C690
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 01:11:57 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A590CC8C7F7
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 02:05:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 43CD834E178
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 00:11:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3467B4E5B97
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 01:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3B87D098;
-	Thu, 27 Nov 2025 00:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E2A29346F;
+	Thu, 27 Nov 2025 01:05:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zb2sdPql"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YQ0v8MEa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E7122083
-	for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 00:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17702773F4;
+	Thu, 27 Nov 2025 01:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764202307; cv=none; b=DsBltyYUX4zB9PeXff6zAKMmJB9Mj+gGFp2mrdnMJARAiIUCDrfN2NXLC1SmdB7ZuGq+MJjawL35dJlvSpVD0ef+wVQE8cHFUmmPqlthF+DNtqlZlMVDNOV7PeZ46tki3gOVus1/0Tw6LMzQ7c/fld6ZhsyeuHcSVWzxJLPZhBs=
+	t=1764205539; cv=none; b=P2lik7yZjL35o7LlCHDVpXaEcfA6bJJv1rMLISDj/W+jyANoHcC1oKAh09yY69oUmD5wSWtsZcEoVlhQAsx/ku1yDWIHYQF/CgOAYVqvAREHU6FKXMUc/oYBJJMLWsruDdPEuO5qFZJ3UZQJxiE17UuWcAIXsOVT4ldAn+Rzjyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764202307; c=relaxed/simple;
-	bh=U/Qt0fwjclNcK05dUhaILvGCRr9iYZXeQ5XH9CgeTa4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IiEFVWVAtASat0gTvgAhn3gNEI5Ru03mk53BzdOmqsyf4m9yY1V8lCf5B7aHfjsB3Hx+jJyz9tg/FuGVfQJbfZ5o0XUYxyPCUJQLncPLgTeioKxnt/0/X8eFx1AHtenvTgIn8C+aX3/3vbpS9590yyr31epKxoBhVZEOYF/WWOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zb2sdPql; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4779a637712so1431565e9.1
-        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 16:11:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764202304; x=1764807104; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Npjor9zv99QfGBBPEe2AIBP/GoEg83/ki3BWEuhSPRU=;
-        b=Zb2sdPqlx6Gf9ieMKb0TEUN+rBWJ2Or1Mgff4ydNYIBa8EFhBeAoKdRAtw7NLtxAhC
-         QE1wJ46J/HawHjPlZJBtAQdPBJmiKdbzFBpJVZ6G0ZnGuz2SPJaB7C1oeFrpV5zF3plv
-         ZKDva1m3lGXZevKUrENEmnklhitb8tmGLgQ89e7dgK6xCw8I6aUZPNQUPfR4/yHFzfDr
-         wKHK6qFFM7uSUN6TvStccpJGkunQ06Qbz2EvltXS3DqU6KGa9yant2tE1qhONW0QpOp6
-         z1yABfy/WUrmgrchntkuZBXLr33+xOWlKCTYW3AhP6Dkc5GR6Uk+YaeYziINAYfLnUnF
-         dRKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764202304; x=1764807104;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Npjor9zv99QfGBBPEe2AIBP/GoEg83/ki3BWEuhSPRU=;
-        b=q9Ga+xWlvgnWf/g1BExXqCGvhYTptoO8hSVhpX6E1NcjCFRlWqnuvmmUPKnfNWDOws
-         f2yN9nxJYqn7vOBGPFCoNBfOd5rHB7wDVJoez3pxLle2sPekYtDi5ZRw/SXbGGHDHP2C
-         gdgWClhUTrbEOf2F1S+MIsNrbpWI+EdwthKpsv43D/yXhxQq4AmbUL+6uDrGy+TTP/LX
-         o5JadGcyNFPkJVZUrCLidSsQuwUt332rJKmNK2YAf4Rg5JefMmNQY+Op4kV6iAlBSiC1
-         h5qsr4Zbhif9AKjcVk6f8tJAuVIjq0bJND93XEzyK9775hcbCPYmxW/48LIXf55miaJb
-         4xUw==
-X-Gm-Message-State: AOJu0YzE44C2fu/K01oYSbyvmFMqqmhzC2jk2Bj2/q/2OEz5FA5HYdCH
-	/cS8EyHvi3rp+CjKjEz4pFJOAxzNSX/qK9l76nc3HaQSSBTHu/MZ7T/z
-X-Gm-Gg: ASbGnct7GhadLfm7ds5g/mhTmy/W8yhHgG6jLtWTvthyRpEA5QIlgMG1MjCY0d7Lj55
-	q121EydihQI0auw5KV0kXG9ACU23XjxLi7OAdM6NJ/3qd3erJNjCBA9LPgp6JiR1BW4X2ZF5CvJ
-	qS8/F7OW+aP7Pd3WstZkUTRyL7bKlQY6tpBLrXGe7D4YSs1fOPi93LJ/qu+xkv+yZn1cM8yMmqP
-	hemTi7efINnHbbKe+tuBOocNbTUird6To1OcQngoxCcwa8WjjsaExjnBjtk3trIvWgP01a/Sga2
-	ZbF5EJJroG0VZy9lwLErW8dhSKniRyABXfZxUSQUoxG3j2MrwbfZlNbA+ikgVVVM2p6xG/LAyoN
-	a+Xtm9YElHFwpofx8iecRNdkj0QrV1LE36AvSfZCX3foQV9CFYdbOjbC2chYCXshhS0I2dDjieJ
-	MgFNr6EM1dvfthlyh2w8uB8kzM9h/w07mUkoVPJMtRe2exUSCRcLz2afhpyGpYT1QASZfTJz+P
-X-Google-Smtp-Source: AGHT+IFfNXdmYVNGq0Jx4N8NyOWnTBj4yEXNWpHEsVPE37ptyjckjYJVFSpElqvAAd7D1yUotu9bSQ==
-X-Received: by 2002:a05:600c:4e87:b0:46d:a04:50c6 with SMTP id 5b1f17b1804b1-477c01ebc76mr206612645e9.30.1764202304263;
-        Wed, 26 Nov 2025 16:11:44 -0800 (PST)
-Received: from localhost.localdomain ([197.153.73.32])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4790b0cc1d6sm65937725e9.12.2025.11.26.16.11.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 16:11:43 -0800 (PST)
-From: redacherkaoui <redacherkaoui67@gmail.com>
-To: pbonzini@redhat.com
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	redahack12-glitch <redahack12@gmail.com>,
-	REDA CHERKAOUI <redacherkaoui67@gmail.com>
-Subject: [PATCH] KVM: coalesced_mmio: Fix out-of-bounds write in coalesced_mmio_write()
-Date: Thu, 27 Nov 2025 01:11:32 +0100
-Message-ID: <20251127001132.13704-1-redacherkaoui67@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1764205539; c=relaxed/simple;
+	bh=WZ0WKykRJQw4J/W4spMQxkjY/MdBH3bIVjZr9mxhDN0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WG0o0tpxsm9VqGfoWwxwb45XcJSCjIVihpSPnV3zUuHe3pQ1bJ7xtrviczHfR9xbLCKAmnhsQuYFgUncRnzGtWIUwIvNeihaWuUHKqJohXGWc46j1witm2NTruHXbGU1FkYMRXe/bzDjryeq7DcDVK8xJyQAG2XffWtkqEsE9n4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YQ0v8MEa; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764205537; x=1795741537;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WZ0WKykRJQw4J/W4spMQxkjY/MdBH3bIVjZr9mxhDN0=;
+  b=YQ0v8MEaLaOaRLxcBYjuEHszovxBY2NZi06TQral/SbmKV1RLkpH5uQ1
+   P2ZLSPpaw/LM0ixdkvi7cKaOESN8xF+q4JJgzOU9nQs0/VIKCNB4jAFGv
+   H6Zuh2t9/eDU4sN2zjFDPffteT1IzdLX9WR58remBbeK8NP6HzVTr+eOm
+   1Dtv6EH3atMhFXSTbDoCQskOaD7Lx6zg4sDJMS3ZhFjWIGYvQY4YcGCN+
+   IP273va71umIm+CNr+YWvD+w5gDfzh4cmABVEBoeXM8UOuifOuNkOfvL/
+   IeBEHqla2Q52v7DWicjg8CDWyREfhVK5tocoRo1OlOK0JG3wN/ahT12pl
+   Q==;
+X-CSE-ConnectionGUID: vR43UL65ThmgIWqXxOa2RA==
+X-CSE-MsgGUID: qrWNMXgHTBqT2tAGdv2XTg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="70112306"
+X-IronPort-AV: E=Sophos;i="6.20,229,1758610800"; 
+   d="scan'208";a="70112306"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 17:05:37 -0800
+X-CSE-ConnectionGUID: ymgDICuaTi+tFFCtw1/gvw==
+X-CSE-MsgGUID: Gh5MCfipTmWFGtvG6Dg4aw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,229,1758610800"; 
+   d="scan'208";a="224047470"
+Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 26 Nov 2025 17:05:32 -0800
+Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vOQRt-000000003WX-3mtV;
+	Thu, 27 Nov 2025 01:05:29 +0000
+Date: Thu, 27 Nov 2025 09:04:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
+	David Kaplan <david.kaplan@amd.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>
+Subject: Re: [PATCH v5 4/9] x86/vmscape: Move mitigation selection to a
+ switch()
+Message-ID: <202511270829.xMEXUXCW-lkp@intel.com>
+References: <20251126-vmscape-bhb-v5-4-02d66e423b00@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251126-vmscape-bhb-v5-4-02d66e423b00@linux.intel.com>
 
-From: redahack12-glitch <redahack12@gmail.com>
+Hi Pawan,
 
-The coalesced MMIO ring stores each entry's MMIO payload in an 8-byte
-fixed-size buffer (data[8]). However, coalesced_mmio_write() copies
-the payload using memcpy(..., len) without verifying that 'len' does not
-exceed the buffer size.
+kernel test robot noticed the following build warnings:
 
-A malicious or buggy caller could therefore trigger a write past the end
-of the data[] array and corrupt adjacent kernel memory inside the ring
-page.
+[auto build test WARNING on 6a23ae0a96a600d1d12557add110e0bb6e32730c]
 
-Add a bounds check to reject writes where len > sizeof(data).
+url:    https://github.com/intel-lab-lkp/linux/commits/Pawan-Gupta/x86-bhi-x86-vmscape-Move-LFENCE-out-of-clear_bhb_loop/20251127-061843
+base:   6a23ae0a96a600d1d12557add110e0bb6e32730c
+patch link:    https://lore.kernel.org/r/20251126-vmscape-bhb-v5-4-02d66e423b00%40linux.intel.com
+patch subject: [PATCH v5 4/9] x86/vmscape: Move mitigation selection to a switch()
+config: x86_64-allnoconfig (https://download.01.org/0day-ci/archive/20251127/202511270829.xMEXUXCW-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251127/202511270829.xMEXUXCW-lkp@intel.com/reproduce)
 
-Signed-off-by: REDA CHERKAOUI <redacherkaoui67@gmail.com>
----
- virt/kvm/coalesced_mmio.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511270829.xMEXUXCW-lkp@intel.com/
 
-diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-index 375d6285475e..4f302713de9e 100644
---- a/virt/kvm/coalesced_mmio.c
-+++ b/virt/kvm/coalesced_mmio.c
-@@ -68,6 +68,14 @@ static int coalesced_mmio_write(struct kvm_vcpu *vcpu,
- 
- 	/* copy data in first free entry of the ring */
- 
-+	/* Prevent overflow of the fixed 8-byte data[] field */
-+	if (len > sizeof(ring->coalesced_mmio[insert].data)) {
-+		spin_unlock(&dev->kvm->ring_lock);
-+		pr_warn_ratelimited("KVM: coalesced MMIO write too large (%d > %zu)\n",
-+				    len, sizeof(ring->coalesced_mmio[insert].data));
-+		return -E2BIG;
-+	}
-+
- 	ring->coalesced_mmio[insert].phys_addr = addr;
- 	ring->coalesced_mmio[insert].len = len;
- 	memcpy(ring->coalesced_mmio[insert].data, val, len);
+All warnings (new ones prefixed by >>):
+
+>> arch/x86/kernel/cpu/bugs.c:3260:2: warning: label at end of compound statement is a C23 extension [-Wc23-extensions]
+    3260 |         }
+         |         ^
+   1 warning generated.
+
+
+vim +3260 arch/x86/kernel/cpu/bugs.c
+
+556c1ad666ad90 Pawan Gupta  2025-08-14  3231  
+556c1ad666ad90 Pawan Gupta  2025-08-14  3232  static void __init vmscape_select_mitigation(void)
+556c1ad666ad90 Pawan Gupta  2025-08-14  3233  {
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3234  	if (!boot_cpu_has_bug(X86_BUG_VMSCAPE)) {
+556c1ad666ad90 Pawan Gupta  2025-08-14  3235  		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+556c1ad666ad90 Pawan Gupta  2025-08-14  3236  		return;
+556c1ad666ad90 Pawan Gupta  2025-08-14  3237  	}
+556c1ad666ad90 Pawan Gupta  2025-08-14  3238  
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3239  	if ((vmscape_mitigation == VMSCAPE_MITIGATION_AUTO) &&
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3240  	    !should_mitigate_vuln(X86_BUG_VMSCAPE))
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3241  		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3242  
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3243  	switch (vmscape_mitigation) {
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3244  	case VMSCAPE_MITIGATION_NONE:
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3245  		break;
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3246  
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3247  	case VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER:
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3248  		if (!boot_cpu_has(X86_FEATURE_IBPB))
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3249  			vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3250  		break;
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3251  
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3252  	case VMSCAPE_MITIGATION_AUTO:
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3253  		if (boot_cpu_has(X86_FEATURE_IBPB))
+556c1ad666ad90 Pawan Gupta  2025-08-14  3254  			vmscape_mitigation = VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER;
+5799d5d8a6c877 David Kaplan 2025-09-12  3255  		else
+5799d5d8a6c877 David Kaplan 2025-09-12  3256  			vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3257  		break;
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3258  
+0091dd36e9ee51 Pawan Gupta  2025-11-26  3259  	default:
+5799d5d8a6c877 David Kaplan 2025-09-12 @3260  	}
+556c1ad666ad90 Pawan Gupta  2025-08-14  3261  }
+556c1ad666ad90 Pawan Gupta  2025-08-14  3262  
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
