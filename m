@@ -1,89 +1,95 @@
-Return-Path: <kvm+bounces-64904-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64905-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15BD8C8F99B
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 18:09:51 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 701B5C8F9E0
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 18:12:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C937A3AAD09
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 17:09:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C41D54E2864
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 17:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15CC72DECB9;
-	Thu, 27 Nov 2025 17:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E7E2DF714;
+	Thu, 27 Nov 2025 17:12:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QOYw7Tmd"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="tcF2zkRY";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="5PP4P/Da";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="tcF2zkRY";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="5PP4P/Da"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F24D2DEA87
-	for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 17:09:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF2942DF3CC
+	for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 17:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764263347; cv=none; b=rtQTqrfbeORSQRYYnnLOIhD342TJZSwu8xRE/R0fTi3eXNOoeHNPziLnPeXJcNJUu743slCAMDImfAInLCghTHVyH2+1ke7W6Uns02AsQ3Io6ydyk5CUIeiEcTXG7qctgcIxUtPO5HlnVGbcFrsdY+5tZsv8ndoBO/EDjMin/jE=
+	t=1764263556; cv=none; b=lQTH7ZnMu0q+jnNgFofNY8dwK9Iao9hrg2DWoEpxIE6r4kcQLpRwhRD5RwBn75bdv24STCvjG3KfajKtg2gLYWuyeNKFDLt3fOwgqutEFBmJmBxN8kzJE+WqEDi/2h4mf/4l0SMPTeXw/UGRhjN4LHGrUChAVjamQCitD/blS5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764263347; c=relaxed/simple;
-	bh=vBvIKRWfPaQXkjoG7SlBmbYLMxL8M3S+eVL65Atr1dM=;
+	s=arc-20240116; t=1764263556; c=relaxed/simple;
+	bh=pc7Epk54iBlH886XDam9+xhG2ZeBCkLWW5qgOyrHYrc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hoQBqPTf6kR5rQoUx0LrfwIuloM0OB+gSEjnBvEcAJTahXz0hBgGCBxDT8EFhHevl/TTIsOAE+ixvFip3or7uo77tdXmhQ0J1xGgUMgu1eUiNl67XWlESWqRrXjqeekscTAF0jKMB89EvoD8pDpWeApM5NYcBF9WeWwR6ukMVqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QOYw7Tmd; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764263344;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
+	 In-Reply-To:Content-Type; b=WyPl8GRlt8E2NR5o4nKzmsuxhUWbouhNjKG+RTrtMosBBpHeLogE+9LEjxG/9F5N0BjPxIRuhLaa9sNS/7lwuB69ooX9Udy8xyECX+Kk9/PYuAZz6CafdqLITUtXANi1+kg0kuIn0gSLg1o32lAty3QL6SgHRIn0J+6/RkJ+bno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=tcF2zkRY; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=5PP4P/Da; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=tcF2zkRY; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=5PP4P/Da; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 02D2D5BCC1;
+	Thu, 27 Nov 2025 17:12:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1764263553; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OAb16FdwyMSYNIxUJ299HViLFfqQavTjzCEBKiggKc8=;
-	b=QOYw7TmdCAniMlUqjpshWtwGI2nb+vbp6hXILqJriq9vJe/tB0uqW9iixLuMgtgfXiSxoR
-	raTE4vmLLXsbnfxHGnbdwce8rKIVAT09+hi+FNRNm9L13fuVCd6rBkCMW6RF1LgRP7RiUz
-	qpbo9VU4rfpR1+/K3EMwxLsJDPLCDqI=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-84-QqmSd-B6PoiliJElTm9wcA-1; Thu, 27 Nov 2025 12:09:02 -0500
-X-MC-Unique: QqmSd-B6PoiliJElTm9wcA-1
-X-Mimecast-MFC-AGG-ID: QqmSd-B6PoiliJElTm9wcA_1764263342
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4ed82af96faso17916931cf.1
-        for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 09:09:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764263342; x=1764868142;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OAb16FdwyMSYNIxUJ299HViLFfqQavTjzCEBKiggKc8=;
-        b=B6m4/wpCRokRDDn8P/qtntlWVGAWQ1Yc/3uKB2lpZDPMVI6MeExYRFPsGhqpU4RhkZ
-         N84d2ZdMlxUuKv2zDedG180aKiVmlXObrVyCLbpw2F3cO3rSZn5KOwsPsjxTHqlddmgh
-         Xrs4LSS1FzwmolkcFc/c0eRwV5PitQwhVMajk+sNjX/Hx+NMEVpX28apIW1mrjPJfTt3
-         Kue16vCvlZPRITDdLcOjFelUKzFj4tEk7aLjqR79W9sQqMQihpSmJrX0fMT/5v/ThQdj
-         N3KFVtvSJaT9ejDcrQ75TjCD20/NnWxMoco+ewkA5/U7N35lk1xtonUDVjTMTrkJoDZw
-         msVw==
-X-Forwarded-Encrypted: i=1; AJvYcCVx73JBoIzPjrZlf1CJrSOFoSMqhpHvctiZ8gDoIDBUZZeWSWyaSuNbKXMWWEIj5ulM3TQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywey3kWXsXgXHuUBXkCuTH3fUucMrXxk675gFi3/zEIxp5aWBtm
-	jixdH6z2U1nDnQGVwarsedAiVOkALSDROIMUSMs3uCmMd/BFuUpn5OmZXcxGHYhMqo9nDC8P/OL
-	FCzWPLx/nuH2VJct4RsnQ89jqqESbGn6et3m8unnwxM0HutrinraxuQ==
-X-Gm-Gg: ASbGnctTjjYmN0gOKlvWbeW/utnOgU5aTDrTsJwfWGa/CZJWhBsuv/PQF+3U69xE7jS
-	vL93Gy688Y6rbQOMNOJoDsmJ5zAw3Ma3g3Jh2uyKBCaDQywq57rnwhV41IY/Hc+6JcUzyXZQLtl
-	p94Qv9kMiP5FeQ2Wqq82VklCFe6P368dwVgUfB5WkwECuoQ0nUizxOaPsbJ8+DN0PzacGpVVfGk
-	HMDTbT9bjr7wPCNoqTGaOz/GCxCUFGZl8JzpQ666Dnlub0oj0HrdsMzHEzb1Ex7cgkMJ5m+qvA5
-	l3og9qREqkYa4n89FCoSvbeQlantlx8Fo+V++iFcow3gH2rVL0tj8NdI3sziVAViuQ4MHw9o/Bl
-	yMw/7XqQADTIQTT4JEYATW1SLwrIAq8T1Vg9CLG9Lbb6FpQA26yvCjQij9A==
-X-Received: by 2002:a05:622a:294:b0:4ee:19f2:9f1b with SMTP id d75a77b69052e-4ee58a79321mr379318161cf.37.1764263342279;
-        Thu, 27 Nov 2025 09:09:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE7SDD1pz2kq89q4lSRs0L5SYetYPSbwxZB+UZXIRwmEKamSd3OD+efib0aN3YltOkmWfBspw==
-X-Received: by 2002:a05:622a:294:b0:4ee:19f2:9f1b with SMTP id d75a77b69052e-4ee58a79321mr379317591cf.37.1764263341908;
-        Thu, 27 Nov 2025 09:09:01 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-886524e5cfcsm13407616d6.19.2025.11.27.09.08.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Nov 2025 09:09:00 -0800 (PST)
-Message-ID: <042f890a-cee4-4a87-a13e-f9fcca4381c9@redhat.com>
-Date: Thu, 27 Nov 2025 18:08:58 +0100
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=muXdCPO0hjEgv1mSmTtKeYXc4kibJAl1WAR2F5e/B8M=;
+	b=tcF2zkRYl/USlxiTOLnx4ezPZm5abgALyOtNcW+Clv5TsS/mok4YlZSUOMXmxizM0phxBj
+	YRpNlgBIvwq06/RKvr8Vh+miSWk3seJtuUATyv66zM+MiintsU1zHi++wxB9iXXDv/wy21
+	Kng3/P5AnLp9b258ocpi48OfZ/+WWVU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1764263553;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=muXdCPO0hjEgv1mSmTtKeYXc4kibJAl1WAR2F5e/B8M=;
+	b=5PP4P/DauP7TF2V79v6nom1eiGVrP5sM5vFIkeUcBMF6xWkbRGiGAWGaECl8FLkiTD8qAv
+	nNgcZEszTaiQ0pCA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1764263553; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=muXdCPO0hjEgv1mSmTtKeYXc4kibJAl1WAR2F5e/B8M=;
+	b=tcF2zkRYl/USlxiTOLnx4ezPZm5abgALyOtNcW+Clv5TsS/mok4YlZSUOMXmxizM0phxBj
+	YRpNlgBIvwq06/RKvr8Vh+miSWk3seJtuUATyv66zM+MiintsU1zHi++wxB9iXXDv/wy21
+	Kng3/P5AnLp9b258ocpi48OfZ/+WWVU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1764263553;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=muXdCPO0hjEgv1mSmTtKeYXc4kibJAl1WAR2F5e/B8M=;
+	b=5PP4P/DauP7TF2V79v6nom1eiGVrP5sM5vFIkeUcBMF6xWkbRGiGAWGaECl8FLkiTD8qAv
+	nNgcZEszTaiQ0pCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 842B63EA63;
+	Thu, 27 Nov 2025 17:12:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 9PCSHoCGKGlQLQAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Thu, 27 Nov 2025 17:12:32 +0000
+Message-ID: <73d414c1-8cdf-4d61-baa0-e4d689b3973b@suse.cz>
+Date: Thu, 27 Nov 2025 18:12:31 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,77 +97,169 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 03/10] arm64: efi: initialise the EL
+Subject: Re: [PATCH v3 13/16] mm: remove non_swap_entry() and use softleaf
+ helpers instead
 Content-Language: en-US
-To: Joey Gouly <joey.gouly@arm.com>, kvm@vger.kernel.org
-Cc: alexandru.elisei@arm.com, andrew.jones@linux.dev, kvmarm@lists.linux.dev,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-References: <20250925141958.468311-1-joey.gouly@arm.com>
- <20250925141958.468311-4-joey.gouly@arm.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20250925141958.468311-4-joey.gouly@arm.com>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache
+ <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+ Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>,
+ Oscar Salvador <osalvador@suse.de>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Matthew Brost <matthew.brost@intel.com>,
+ Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+ Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
+ Ying Huang <ying.huang@linux.alibaba.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
+ Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
+ Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+ Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+ SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
+ Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+ Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
+ Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
+References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
+ <2562093f37f4a9cffea0447058014485eb50aaaf.1762812360.git.lorenzo.stoakes@oracle.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <2562093f37f4a9cffea0447058014485eb50aaaf.1762812360.git.lorenzo.stoakes@oracle.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TAGGED_RCPT(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[linux.ibm.com,redhat.com,zeniv.linux.org.uk,kernel.org,suse.cz,arndb.de,nvidia.com,linux.alibaba.com,oracle.com,arm.com,linux.dev,suse.de,google.com,suse.com,intel.com,gmail.com,sk.com,gourry.net,huaweicloud.com,tencent.com,infradead.org,ziepe.ca,zte.com.cn,huawei.com,soleen.com,surriel.com,vger.kernel.org,kvack.org,lists.linux.dev];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[65];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:mid,suse.cz:email,oracle.com:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Level: 
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
+On 11/10/25 23:21, Lorenzo Stoakes wrote:
+> There is simply no need for the hugely confusing concept of 'non-swap' swap
+> entries now we have the concept of softleaf entries and relevant
+> softleaf_xxx() helpers.
+> 
+> Adjust all callers to use these instead and remove non_swap_entry()
+> altogether.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
+Nice!
 
-On 9/25/25 4:19 PM, Joey Gouly wrote:
-> Initialise the exception level, which may include dropping to EL1 from EL2, if
-> VHE is not supported.
->
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
 
-Eric
-> ---
->  arm/efi/crt0-efi-aarch64.S | 5 +++++
->  lib/arm/asm/setup.h        | 2 ++
->  lib/arm/setup.c            | 1 +
->  3 files changed, 8 insertions(+)
->
-> diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
-> index 71ce2794..5632fee0 100644
-> --- a/arm/efi/crt0-efi-aarch64.S
-> +++ b/arm/efi/crt0-efi-aarch64.S
-> @@ -147,6 +147,11 @@ _start:
->  0:	ldp		x29, x30, [sp], #32
->  	ret
+> @@ -1430,19 +1429,20 @@ static long move_pages_ptes(struct mm_struct *mm, pmd_t *dst_pmd, pmd_t *src_pmd
+>  					orig_dst_pte, orig_src_pte, dst_pmd,
+>  					dst_pmdval, dst_ptl, src_ptl, &src_folio,
+>  					len);
+> -	} else {
+> +	} else { /* !pte_present() */
+>  		struct folio *folio = NULL;
+> +		const softleaf_t entry = softleaf_from_pte(orig_src_pte);
 >  
-> +.globl do_init_el
-> +do_init_el:
-> +	init_el x16
-> +	ret
+> -		entry = pte_to_swp_entry(orig_src_pte);
+> -		if (non_swap_entry(entry)) {
+> -			if (is_migration_entry(entry)) {
+> -				pte_unmap(src_pte);
+> -				pte_unmap(dst_pte);
+> -				src_pte = dst_pte = NULL;
+> -				migration_entry_wait(mm, src_pmd, src_addr);
+> -				ret = -EAGAIN;
+> -			} else
+> -				ret = -EFAULT;
+
+Eww, good to get rid of this.
+
+> +		if (softleaf_is_migration(entry)) {
+> +			pte_unmap(src_pte);
+> +			pte_unmap(dst_pte);
+> +			src_pte = dst_pte = NULL;
+> +			migration_entry_wait(mm, src_pmd, src_addr);
 > +
->  	.section	.data
->  
->  .balign 65536
-> diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-> index 4e60d552..bf05ffbb 100644
-> --- a/lib/arm/asm/setup.h
-> +++ b/lib/arm/asm/setup.h
-> @@ -29,8 +29,10 @@ void setup(const void *fdt, phys_addr_t freemem_start);
->  #include <efi.h>
->  
->  #ifdef __aarch64__
-> +void do_init_el(void);
->  void setup_efi_sctlr(void);
->  #else
-> +static inline void do_init_el(void) {}
->  static inline void setup_efi_sctlr(void) {}
->  #endif
->  
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index 0aaa1d3a..5ff40b54 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -349,6 +349,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
->  {
->  	efi_status_t status;
->  
-> +	do_init_el();
->  
->  	setup_efi_sctlr();
+> +			ret = -EAGAIN;
+> +			goto out;
+> +		} else if (!softleaf_is_swap(entry)) {
+> +			ret = -EFAULT;
+>  			goto out;
+>  		}
 >  
 
 
