@@ -1,202 +1,406 @@
-Return-Path: <kvm+bounces-64853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6814EC8D876
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 10:25:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 055E0C8D973
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 10:40:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 77898346600
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 09:25:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B7EDA34B64D
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 09:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2C426F2AD;
-	Thu, 27 Nov 2025 09:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C33432939C;
+	Thu, 27 Nov 2025 09:39:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c4e16URe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FZJ0SBwz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE53E328B68;
-	Thu, 27 Nov 2025 09:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764235521; cv=none; b=SYWKHCFTBy23T7E0KQGuFOf8JP1FtDC5pYTbmYAatGGSPi/ALpM/QffzfqlMuvDILrbt3tzn89p03tm3kWlKQxM4nK1ykDytxbPGKX9+FLfyp5Olzx/goDn2ZufT0gikQtsbYeuVuucHpUUTeJ3Wl51Hx33KtG93lWMQtX0teEk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764235521; c=relaxed/simple;
-	bh=dKVw7WCI669xYparOitpzs+aXbeQn7xNAtOzxdtNdjc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lXHrV5U96XGFtp2fxvAMSuRANckVG3f//OaknH4hjJeGur3y+JkPUJMJaa1TRVN6rERUAHhX3LauIz3R1OB+vDVq8V3acjb+XU9jzEmPVFvtLUh6X/HxEUGXWpiaqbzUhAEI1xcwh7Bx7ZtZwmPNknwoYC9kHSVb81ldeymanB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c4e16URe; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE1E2356A4;
+	Thu, 27 Nov 2025 09:39:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764236394; cv=fail; b=MOWFjHhyv+Da5zTWyGbAPkOnpRu0ckb/IRkqeINnN63aGCBbJ/r6qaLrRUls3hIZjg64G41ooFCmXAe5j+ok4F/iDgjeZbcl/OzT4mIiVryIBVWQF8+wmK3GCrDPDodt6jngkoTxWwMfIKGcoSGRjR0oIorIEsAa99tiNblIohM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764236394; c=relaxed/simple;
+	bh=Ld+BCAlhDUNisOmrNSLGIuNpZDz8pVTs5DdAFJLQwCs=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=urRcc0EOKXChuPi4SzLIjrs+KCIk96YZDYQmaAK8T1H2m58UKtMSFAM58mIbvuoUm3/ff5pa5PCIchZdPW5uC+EG5Cbyf64pB6TIb4chCW1gRbc9c9iDkZo8NDKPgQkR1FQMVxnkqLrFSyhnbBT+3B7xFhKkvIGWT1zWvwsWflc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FZJ0SBwz; arc=fail smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764235519; x=1795771519;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dKVw7WCI669xYparOitpzs+aXbeQn7xNAtOzxdtNdjc=;
-  b=c4e16URe+4KwjJbrvqDt+/jlu+qDpluOWG/5i18+Rn1ZzXOcplal0x0o
-   XtCOGT7AUnNDEW1tEBpGbNkA448Ktx+OLvKgOCFsgiRCzhbUT7eCwuydm
-   AWLODxfhVfYaJS4Kf3PNX420pq7wHbLCHoYVGg6/7x8r00bKT59omI63k
-   S5DrkCvmQR/rU/oBWIw0MgIrFhXrLcnIORBkQROVoaxPkahduqoiqP7MT
-   1bYvuM4deDUno+1cIy5rEzolHBVeUIKeKsiCYRJ9985MmIId4N+JXyz4Y
-   Vs0o1LrGo1J6uz36abJ5CzFzEC+FRcOQ8UNBvOoYMyVzfW85Qz0d8cNF6
-   w==;
-X-CSE-ConnectionGUID: sTfybrIPQKOkX7+CCfGpVg==
-X-CSE-MsgGUID: +uY72ZRoT5isL3cXbTGCMA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="66226421"
+  t=1764236393; x=1795772393;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=Ld+BCAlhDUNisOmrNSLGIuNpZDz8pVTs5DdAFJLQwCs=;
+  b=FZJ0SBwz4kKxMIB5zGcmiRqq/EVk4ymDkoeUSdtFh+++m7Tm9WG0qI1/
+   KAmtWxzBrnH4HDUHghNjwV4TjAzzCtwdUkoYA3Csd1Uy/XPH6VZKBqDhF
+   vgiVhLZFaQOEaeWqDWpuqcJCABkzfsm2k0Rs7x1RHkNJlNFp1diKbvDNB
+   cFuRVmLEHSsX3jw7XraKvtj1mu+it/HqNBC7KesFoqBRyzPT2mBAqpkRT
+   z3kLCkNoBRS3YA/Z8hdzXVQ6WhAGuyiaDx4oSzMST7lZXRE+NREFeXaVX
+   j1flbmG4LbyW4vD4UD9xTpGkJNAaQg05mDArJXYtzVkwE4Vy3qSmgNfKU
+   Q==;
+X-CSE-ConnectionGUID: 0zoLcGl9RRyZ+hQgrPdyHw==
+X-CSE-MsgGUID: JivG5srLTW2nJBOkReluFg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="76970923"
 X-IronPort-AV: E=Sophos;i="6.20,230,1758610800"; 
-   d="scan'208";a="66226421"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2025 01:25:17 -0800
-X-CSE-ConnectionGUID: qnUhwLQBRx2i3D9EMh7ltA==
-X-CSE-MsgGUID: wTQgJDKGRmC9eSaGlBaXGQ==
+   d="scan'208";a="76970923"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2025 01:39:52 -0800
+X-CSE-ConnectionGUID: B//fbV/sTbu8ZS0JEdTZ9g==
+X-CSE-MsgGUID: 0ijZCRYfR9OVRW9aM04p5g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,230,1758610800"; 
-   d="scan'208";a="193000719"
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 27 Nov 2025 01:25:10 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vOYFP-000000004CQ-2yB2;
-	Thu, 27 Nov 2025 09:25:07 +0000
-Date: Thu, 27 Nov 2025 17:24:20 +0800
-From: kernel test robot <lkp@intel.com>
-To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
-	x86@kernel.org, linux-hyperv@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Juergen Gross <jgross@suse.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v4 21/21] x86/pvlocks: Move paravirt spinlock functions
- into own header
-Message-ID: <202511271704.MdDOB4pB-lkp@intel.com>
-References: <20251127070844.21919-22-jgross@suse.com>
+   d="scan'208";a="197343742"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2025 01:39:52 -0800
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 27 Nov 2025 01:39:51 -0800
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Thu, 27 Nov 2025 01:39:51 -0800
+Received: from CH4PR04CU002.outbound.protection.outlook.com (40.107.201.58) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 27 Nov 2025 01:39:50 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PV7UQGksjJdVwxiuWZ697+9gEySEUDrPWGeZgJx1ek+6a7KeaF/hubqIq7WFmE+8HGy6E082yTP5mfofAn0SYt4xT1yBd+a8js3iYMkjkeLcTKJWq/QTxkqsiMS50+PcCl83/4z4jXNFGqTItDLZ9RSN4hbfnHZwAq4OIUMpxNFNPxgfPTjyQSnIKZRMm4VYHfoqeN7aS02u/e8tq9U8re5VB0p3Ocx7RnQhCUKSjRDw2ck/5/hA64TXZC00Tqp4brPiujHTC93eDiqylvZPpVUWkSMKLHqSw/022MdIoLLFi9VT1DsoFYmPW4K+Br2lbGEovvF93IzAFAp6xGq5MQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v47eD1+LhShl78xbcEY+pODxIHY2U7TgELoOb457T68=;
+ b=Xzn7Fc8OwjV9HnqX3kpTuh5fFintWORVQXYHB2ffod5wI7QFpGMAn/I4qCI3WZTemYrmMwyKeQwtn9eAvshJTG+pfIeIlv9FaBYmFKDelrJMAzXtqBS9PUxfeQx64uBeOxuTKfP6rVuVdIQ9z/0POilMUki9dP5PQYUmkZ9vt4R99E9L3ekFnQNezUFXb6Brpjpsi8N2zS6SNx0oRhAV55FSiesAeuhcs+Y4rCKfPHN3nowmwA7AmEZaoB5IwjAb4mr4NRF++sNl9I386vO1OH66Yh7+b+3VzOkCcU2IfUM6VBjXBdurxZc+fO3C3qW9R9ErR/L2AgBboOVJ3nTiKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB5373.namprd11.prod.outlook.com (2603:10b6:5:394::7) by
+ BL1PR11MB5980.namprd11.prod.outlook.com (2603:10b6:208:387::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.11; Thu, 27 Nov
+ 2025 09:39:42 +0000
+Received: from DM4PR11MB5373.namprd11.prod.outlook.com
+ ([fe80::927a:9c08:26f7:5b39]) by DM4PR11MB5373.namprd11.prod.outlook.com
+ ([fe80::927a:9c08:26f7:5b39%5]) with mapi id 15.20.9366.012; Thu, 27 Nov 2025
+ 09:39:41 +0000
+From: =?UTF-8?q?Micha=C5=82=20Winiarski?= <michal.winiarski@intel.com>
+To: Alex Williamson <alex@shazbot.org>, Lucas De Marchi
+	<lucas.demarchi@intel.com>, =?UTF-8?q?Thomas=20Hellstr=C3=B6m?=
+	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
+	<kevin.tian@intel.com>, Shameer Kolothum <skolothumtho@nvidia.com>,
+	<intel-xe@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, Matthew Brost <matthew.brost@intel.com>, "Michal
+ Wajdeczko" <michal.wajdeczko@intel.com>
+CC: <dri-devel@lists.freedesktop.org>, Jani Nikula
+	<jani.nikula@linux.intel.com>, Joonas Lahtinen
+	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
+ Laguna" <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>,
+	=?UTF-8?q?Micha=C5=82=20Winiarski?= <michal.winiarski@intel.com>
+Subject: [PATCH v7 0/4] vfio/xe: Add driver variant for Xe VF migration
+Date: Thu, 27 Nov 2025 10:39:30 +0100
+Message-ID: <20251127093934.1462188-1-michal.winiarski@intel.com>
+X-Mailer: git-send-email 2.51.2
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: VI1PR09CA0175.eurprd09.prod.outlook.com
+ (2603:10a6:800:120::29) To DM4PR11MB5373.namprd11.prod.outlook.com
+ (2603:10b6:5:394::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251127070844.21919-22-jgross@suse.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5373:EE_|BL1PR11MB5980:EE_
+X-MS-Office365-Filtering-Correlation-Id: ba513e5f-56d8-40f9-7c9a-08de2d98e388
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?WlF0YzlxUzVqdjk4RFlLcXpKYzVYN201bEtTbGlzaUlBNW9OaDNlWnBVaFpL?=
+ =?utf-8?B?bWVkNzh6UXIweG9WNjM1NEF6U3gzNk9NNWE4dUl1YUl2Z2ZMQ3VNVS9TMTBo?=
+ =?utf-8?B?dFJhNGR3RVAwTnVyZFhMYlFiSkUvd1l2L29kNkpIV3QvZTZQSjB1bmpuYUpW?=
+ =?utf-8?B?dWdhd3F6YUVrc1pkWGZ2L084VU91NzBvZzR2UFBGVGV0WDZlczZWRm5MREZo?=
+ =?utf-8?B?ZzFKYzEwdnk2b29uUmNJbzhpR3lySmthUkVZbytpYXBSZUowMkQ2amt2L0pq?=
+ =?utf-8?B?N3IzL2lLMDBmQ09CK0VBTkxybGgrS1NudTR5K2xxcDRZeTliOVBINHFZVmFK?=
+ =?utf-8?B?UVRzM21FZllPemI1UW5hMi9LeVBRVGk4d1JYWXo3TTVWOXpTeGNpYnI3VThh?=
+ =?utf-8?B?ODRGYUhNalZwU1lMRjVvQnlGVE41NFd3NEJwMjI1MkMyZUtxTHNsSm83cEg2?=
+ =?utf-8?B?UVdkTE5DL3ZleGVYbDc5SjhySjV0bHpnS3FvOHdHeDZyR0JkSVZ3ZDN0YWpz?=
+ =?utf-8?B?a3ZOY2xkbEdxWURFNk5Id2xSdm9KYnBES05qZWRUMGZuVFZrVlBIbmlTYWdZ?=
+ =?utf-8?B?alFzOG82QWlLeEV3ZUZRcTBMUVJOQ0tHRHhjVm5oQW94MlhxbkFVMnpXb2dR?=
+ =?utf-8?B?RlRLVmJLYUw1TnpXV0VqemlmY1laVnBJMkI3OWUwUFZwM2V0MkZBbGlYS2lq?=
+ =?utf-8?B?TnRsOHI0TXFqVmVwQVdoY3UwTXNXZHh1Z3NJQ2xNK2ttaVh4T1YreWJScEor?=
+ =?utf-8?B?SHJCMXFjTm9mMTdvN3IrQUQ5eFRuUk5ueFBZZGFQY0dQaHdpdCtiK1daTG14?=
+ =?utf-8?B?eVNRQlUwNTl5WUYwRVFxZ3VibmZhNExTN2U5M1R3MTMwQVpRdjFLS2N6OHFh?=
+ =?utf-8?B?bmcvTGJvSXM0YWNRTmRvSlU4RzA4bnNVOUZ3d2tpMTlCWnAwREJBdm1MZ1kx?=
+ =?utf-8?B?Y3dxSlhlTlFzRTFyRTFka0NqaGVNN1RudGw0T0xxdlllbmtiSUZDVS9EcTJo?=
+ =?utf-8?B?b1FQNk5qMjVwcnl4SXZBNXpteDErTkp5U1c1dHpNL0N0L09EOGRuQUR0OTlh?=
+ =?utf-8?B?TlVwR0wrR29LaUxaWXdRQVpncHBtaGczMGNHbk0xOUN3YUJJTk1tc2RXMmts?=
+ =?utf-8?B?SVUvYmFwalg3dHFDSVlRZFVBTW1Nc0g5UmY2VzVSRWdFRzB5WG82ODFzYTZ4?=
+ =?utf-8?B?WXdHMHNrRnhUUVR6cWkrYTFFc0NBRVFMdEFkbHVtZUgwTkhSd01WaE91WDRk?=
+ =?utf-8?B?UlYzaDNvVlFCNGhWanZEUi95QVJENGIrNldqOW9IbHpCMVhwcmNhckpBNWZw?=
+ =?utf-8?B?RXZPeHp5VU16cy9XUHZvUE1aMXpPeWJzYXVxdUNyd2piaXR1N0lPVWNVYWZj?=
+ =?utf-8?B?a2trY0pCWG1FMXJvaE5qZ1R6b0MwMFNDcStJaGc3UUtIS3dBSDRyTytHYW5y?=
+ =?utf-8?B?dldEc2YrdHliTzF1a1FPWmVrVzhlTWE3VFVZMklVenVGMURRQWVLNGY4Q1hL?=
+ =?utf-8?B?T3JxbENtaVIrak0rMDAvdE96dXZVUGpHT1lLckZRVnYrWnM5WmQ0N2x4OVN6?=
+ =?utf-8?B?RVY1dU5NRi9RUjlYMlRYMzFkNnNjVkpyRlprT0pYdUUwSUhjc09LN1N2VUhO?=
+ =?utf-8?B?ZkEwS1A3aHdnUWV3aGdXQjkzVlFFYnNyMEtaUFlHbEhCblp2dy8vemV0Njgz?=
+ =?utf-8?B?bXdMb1ppcmlpNzlWYXBpd09VWW02VHFnSWhjZURlcjBNSVpKUzRmR0lVUWFh?=
+ =?utf-8?B?N0tPUUVGRnEzeWNmRngrOVJ6d2xBdmtCQXFRa2N0VUpBZkpmV1FMdU1kTTkr?=
+ =?utf-8?B?djZzdG1GbDVLdkRobHB5ODR6OXU1UWxweC9FMVZNSHRHaG1FTEZRNUlHNVUw?=
+ =?utf-8?B?NmZjSk15eld2YWszSFlLN09yNE5vYVgzWkRBNWhmYUpLTzdGVWdJQ2UrNFhu?=
+ =?utf-8?B?dzIrSmc0Z29nSW5iOTlXTlpsWW9MYUMxcldYK2kxbnd1RWx0elo0Q0xWaGNu?=
+ =?utf-8?B?eWhac1pKOTdhMm83eHBqSFdHN3I2RFZCdWIxb05hRGsvbjZzZnpsZnlESWhV?=
+ =?utf-8?Q?bCRQ1q?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b3k1dWNTZ3U0SFNjWm9QdldMQnpkeTF3aEVNeHUrQlgyRmcweG0zWk9TbVZQ?=
+ =?utf-8?B?MEdaWmU4NzROd1hKK3F5bEJteE1OYWxORFRoWHlVYkREVVJOc0VNclB0VDNm?=
+ =?utf-8?B?RTFSRWpqcVpwM1JpVW1ZbWtrMXh1bDlHdWJCSUtJUUs0T0NLdG1YTzdlKzhL?=
+ =?utf-8?B?OFlESCtLdnFETVFyQnRrRWpqU0lka0dUZnZTNTY2MlN5NXRheWpvc2FSaTZs?=
+ =?utf-8?B?dHBnazhNaFhiWHovSVIxOGh0WVhmRzZzNU5jdThpL0htaURtaHZuWDJvYXV0?=
+ =?utf-8?B?aEFWOUg2L2RVeHZ6MnRydml3dHBMQkR6TVF5cEJFb1Jnc3ZGZzRwRzhEREFD?=
+ =?utf-8?B?Z0NXb2p2Ylk2bDlxcSthNkp3MDM5ZlAvMWNWNG81dUN2c0EyajdYK25qV0g1?=
+ =?utf-8?B?RmZWN05rdnY4dFd2SWo4L2RiRitzNlJtVXcvaXl1ajczWW1lOWZWdDNvWE5l?=
+ =?utf-8?B?Q2ZvNDhPUkhBUk16QlFWaE9tTHJoazh0ZlJEMG5JeEpra21VTERrclBCUWpa?=
+ =?utf-8?B?Qy95NktXTHFhcGt0MSs1WDhkMENoMHlsYzkwa1NqYWVQRDRhWU00NEE2a1dZ?=
+ =?utf-8?B?ajI4NGxtMVRGSlQ2dWNOd2xHNVUxQjdUVTFZVE5sMUZrZFlNMHF5SjIyeDBN?=
+ =?utf-8?B?MTNlUTlHNHJHR1VpV2x6VmZHalJEYnNrM1dMdTBLaWpwdkZDL3N3UkZWcFFN?=
+ =?utf-8?B?cnV2Y3VmSjk5THYwRW9md003aU5xQnk1aFU3UU85YmFubHVEaUcxL2xjd0E0?=
+ =?utf-8?B?Mys2YXNhMHhMTGdSVWRRQnVPQ00xVmdETjE0ZUxNOGRUcDIwUzhhT1lLSEY3?=
+ =?utf-8?B?aUtmNEpBbXN5UXVzZnVEcXdYTVZkQnVEdTFlc2wvMXg5MFlBMEN3ZjVTOGxr?=
+ =?utf-8?B?N01MMkYrSEFldGcyUms1V0tSRWd3KzhNT0NJTXRTWEdIeWlsbUJJREk2UHdT?=
+ =?utf-8?B?NkdhbjFzTTlEdk42ODlvQXZxY2V3TUNJaUp3YVZSSUl5UHJJNGNKcEZDczgw?=
+ =?utf-8?B?R3gxVFVkYnYzT3UvWllYZzBwSXBONm5LbzhLV2dTcFdhRXJwUkpvd1BOOWVB?=
+ =?utf-8?B?enQzZVUrUWJzU3ArUmNtQWh1cDlEcm1QR3dUL3VqNWpNTDl5YXJuVmw4ZEVv?=
+ =?utf-8?B?bEFlS1h1cGhucmtEMDFqVC9nTjhJc24vT2hVVVVWWGY3SVRleHAreno1OUxS?=
+ =?utf-8?B?ZVIwUXhVVXFmTmltamhndGh0c0FITXpYVHo4NXFOd1RoZzIwREp2R1RjeUxF?=
+ =?utf-8?B?QzdzR0NJWHJlOTViR1Z6anpqcndITXNLMjZDWjdTMHhiWjVVL21NRzRuZS83?=
+ =?utf-8?B?bzNpR0tjUXpQMHQwd1BjNDF0VXNhYTlKczVOVDhkUk1sampNL3RRcTA4eUZF?=
+ =?utf-8?B?Q25NZjRSblo0YmY3OU1CRW8vdGxHaTZkcndobU11L3ExaWR5WnpNb2JPNk1R?=
+ =?utf-8?B?Mm9iTzR2Z0hNNXNqY3VtNWxRTG5LNVFCUTlqTjJtcDhHU1A1bDhic2h1dHBL?=
+ =?utf-8?B?bkVEdkhIKy93SjJLWm9kaEVhRlIvd05kODRlSVBybVNEakF1SVZjR1hRTXRP?=
+ =?utf-8?B?TW5ZNXhjTlZNWE9ZZkdUT3RRaHd2ZmYwUVc0cXhyTWdKa3FOZnozVWJmT081?=
+ =?utf-8?B?RkhjajJxQUVodDExdkplckt4bXUrQ0FsQUVvNnY2SkpsQzBzQks4MlVMOE1o?=
+ =?utf-8?B?U2x3dG85VnVJRUF1SFJtTnRVQWdYaXRTYmpJU2NCZlE3V3JiSG9idUpPUmZL?=
+ =?utf-8?B?eElUcjVDR3lNRXNLNnlpU0hFUEI4YVdPaFl3enlZOGhEWFcvRXpFMWxFaitE?=
+ =?utf-8?B?Q2xvRUROSkV5NHNKb092ZzhhbEF2UVVpSXFyYkxDd2hFeUFwVEpnZThtbXNo?=
+ =?utf-8?B?TUwyUXcwYWRkekY3YjhvNmhiYXFKK2dMWmozT3lDWFgrTnNiTFo2ZGUrSUZB?=
+ =?utf-8?B?dUFmbEUxQzI5clVNWFlzcDdHMlE4M3hHZDdXK0RBbXQvRHU4WEhYaHc1WkJz?=
+ =?utf-8?B?UWpqZnMzYlZaNTZHaDMyQ2NmS28zYjNyVFFxNmZBSnlJZ0Vic3ZOK1JZMHRQ?=
+ =?utf-8?B?dEZJN05tMTZ6MnFzWnFJQmRpVS9vVDZFeHBSRHArczZGQ1BNaHF6U0hCTFB2?=
+ =?utf-8?B?OGtiKzdYYUd3elNWZ01NeGpVK1lHckgrQnNOQ2JtODdDdFJNdjdDQmFSSkRz?=
+ =?utf-8?B?Ymc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba513e5f-56d8-40f9-7c9a-08de2d98e388
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5373.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2025 09:39:41.8576
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +IyCylEKIIJhJwiS0s2eEbRIO747OXHIroOh3LjYKklhR5+5K4YcbvzaQLdj8o1Wjwk70CetrvKPfamJ7T7RyLQ9TYaSsMzJ+XfbGQhgZCg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5980
+X-OriginatorOrg: intel.com
 
-Hi Juergen,
+Hi,
 
-kernel test robot noticed the following build errors:
+This is the v7 of series introducing xe-vfio-pci driver variant
+supporting migration. Thanks for all the review feedback.
 
-[auto build test ERROR on tip/x86/core]
-[also build test ERROR on tip/sched/core kvm/queue kvm/next linus/master v6.18-rc7]
-[cannot apply to kvm/linux-next next-20251127]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+It looks like all the r-b's are in place and we need a final ack from
+Alex.
+We also got a confirmation that DRM will be able to take the series once
+everything is ready.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Juergen-Gross/x86-paravirt-Remove-not-needed-includes-of-paravirt-h/20251127-152054
-base:   tip/x86/core
-patch link:    https://lore.kernel.org/r/20251127070844.21919-22-jgross%40suse.com
-patch subject: [PATCH v4 21/21] x86/pvlocks: Move paravirt spinlock functions into own header
-config: i386-allnoconfig (https://download.01.org/0day-ci/archive/20251127/202511271704.MdDOB4pB-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251127/202511271704.MdDOB4pB-lkp@intel.com/reproduce)
+The biggest changes in this revision are:
+generating VFIO helpers using a macro, addition of XE_VFIO_PCI build
+dependency on PCI_IOV, and a bug fix for the issue where we would skip
+calling xe_sriov_vfio_wait_flr_done() if the VF doesn't support
+migration.
+Also, note that GuC v70.54.0 is now available in linux-firmware:
+https://gitlab.com/kernel-firmware/linux-firmware/-/commit/23568a4b942079631c9378011aa0a9b29de19370
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511271704.MdDOB4pB-lkp@intel.com/
+Full changelog, including URLs to previous revisions can be found below.
 
-All errors (new ones prefixed by >>):
+Cover letter from the previous revision:
 
-   arch/x86/kernel/alternative.c: In function 'alternative_instructions':
->> arch/x86/kernel/alternative.c:2373:9: error: implicit declaration of function 'paravirt_set_cap'; did you mean 'paravirt_ret0'? [-Wimplicit-function-declaration]
-    2373 |         paravirt_set_cap();
-         |         ^~~~~~~~~~~~~~~~
-         |         paravirt_ret0
+Xe is a DRM driver supporting Intel GPUs and for SR-IOV capable
+devices, it enables the creation of SR-IOV VFs.
+This series adds xe-vfio-pci driver variant that interacts with Xe
+driver to control VF device state and read/write migration data,
+allowing it to extend regular vfio-pci functionality with VFIO migration
+capability.
+The driver doesn't expose PRE_COPY support, as currently supported
+hardware lacks the capability to track dirty pages.
 
+While Xe driver already had the capability to manage VF device state,
+management of migration data was something that needed to be implemented
+and constitutes the majority of the series.
 
-vim +2373 arch/x86/kernel/alternative.c
+The migration data is processed asynchronously by the Xe driver, and is
+organized into multiple migration data packet types representing the
+hardware interfaces of the device (GGTT / MMIO / GuC FW / VRAM).
+Since the VRAM can potentially be larger than available system memory,
+it is copied in multiple chunks. The metadata needed for migration
+compatibility decisions is added as part of descriptor packet (currently
+limited to PCI device ID / revision).
+Xe driver abstracts away the internals of packet processing and takes
+care of tracking the position within individual packets.
+The API exported to VFIO is similar to API exported by VFIO to
+userspace, a simple .read()/.write().
 
-270a69c4485d7d0 arch/x86/kernel/alternative.c  Peter Zijlstra            2023-02-08  2344  
-9a0b5817ad97bb7 arch/i386/kernel/alternative.c Gerd Hoffmann             2006-03-23  2345  void __init alternative_instructions(void)
-9a0b5817ad97bb7 arch/i386/kernel/alternative.c Gerd Hoffmann             2006-03-23  2346  {
-ebebe30794d38c5 arch/x86/kernel/alternative.c  Pawan Gupta               2025-05-03  2347  	u64 ibt;
-ebebe30794d38c5 arch/x86/kernel/alternative.c  Pawan Gupta               2025-05-03  2348  
-7457c0da024b181 arch/x86/kernel/alternative.c  Peter Zijlstra            2019-05-03  2349  	int3_selftest();
-7457c0da024b181 arch/x86/kernel/alternative.c  Peter Zijlstra            2019-05-03  2350  
-7457c0da024b181 arch/x86/kernel/alternative.c  Peter Zijlstra            2019-05-03  2351  	/*
-7457c0da024b181 arch/x86/kernel/alternative.c  Peter Zijlstra            2019-05-03  2352  	 * The patching is not fully atomic, so try to avoid local
-7457c0da024b181 arch/x86/kernel/alternative.c  Peter Zijlstra            2019-05-03  2353  	 * interruptions that might execute the to be patched code.
-7457c0da024b181 arch/x86/kernel/alternative.c  Peter Zijlstra            2019-05-03  2354  	 * Other CPUs are not running.
-7457c0da024b181 arch/x86/kernel/alternative.c  Peter Zijlstra            2019-05-03  2355  	 */
-8f4e956b313dccc arch/i386/kernel/alternative.c Andi Kleen                2007-07-22  2356  	stop_nmi();
-123aa76ec0cab5d arch/x86/kernel/alternative.c  Andi Kleen                2009-02-12  2357  
-123aa76ec0cab5d arch/x86/kernel/alternative.c  Andi Kleen                2009-02-12  2358  	/*
-123aa76ec0cab5d arch/x86/kernel/alternative.c  Andi Kleen                2009-02-12  2359  	 * Don't stop machine check exceptions while patching.
-123aa76ec0cab5d arch/x86/kernel/alternative.c  Andi Kleen                2009-02-12  2360  	 * MCEs only happen when something got corrupted and in this
-123aa76ec0cab5d arch/x86/kernel/alternative.c  Andi Kleen                2009-02-12  2361  	 * case we must do something about the corruption.
-32b1cbe380417f2 arch/x86/kernel/alternative.c  Marco Ammon               2019-09-02  2362  	 * Ignoring it is worse than an unlikely patching race.
-123aa76ec0cab5d arch/x86/kernel/alternative.c  Andi Kleen                2009-02-12  2363  	 * Also machine checks tend to be broadcast and if one CPU
-123aa76ec0cab5d arch/x86/kernel/alternative.c  Andi Kleen                2009-02-12  2364  	 * goes into machine check the others follow quickly, so we don't
-123aa76ec0cab5d arch/x86/kernel/alternative.c  Andi Kleen                2009-02-12  2365  	 * expect a machine check to cause undue problems during to code
-123aa76ec0cab5d arch/x86/kernel/alternative.c  Andi Kleen                2009-02-12  2366  	 * patching.
-123aa76ec0cab5d arch/x86/kernel/alternative.c  Andi Kleen                2009-02-12  2367  	 */
-8f4e956b313dccc arch/i386/kernel/alternative.c Andi Kleen                2007-07-22  2368  
-4e6292114c74122 arch/x86/kernel/alternative.c  Juergen Gross             2021-03-11  2369  	/*
-f7af6977621a416 arch/x86/kernel/alternative.c  Juergen Gross             2023-12-10  2370  	 * Make sure to set (artificial) features depending on used paravirt
-f7af6977621a416 arch/x86/kernel/alternative.c  Juergen Gross             2023-12-10  2371  	 * functions which can later influence alternative patching.
-4e6292114c74122 arch/x86/kernel/alternative.c  Juergen Gross             2021-03-11  2372  	 */
-4e6292114c74122 arch/x86/kernel/alternative.c  Juergen Gross             2021-03-11 @2373  	paravirt_set_cap();
-4e6292114c74122 arch/x86/kernel/alternative.c  Juergen Gross             2021-03-11  2374  
-ebebe30794d38c5 arch/x86/kernel/alternative.c  Pawan Gupta               2025-05-03  2375  	/* Keep CET-IBT disabled until caller/callee are patched */
-ebebe30794d38c5 arch/x86/kernel/alternative.c  Pawan Gupta               2025-05-03  2376  	ibt = ibt_save(/*disable*/ true);
-ebebe30794d38c5 arch/x86/kernel/alternative.c  Pawan Gupta               2025-05-03  2377  
-931ab63664f02b1 arch/x86/kernel/alternative.c  Peter Zijlstra            2022-10-27  2378  	__apply_fineibt(__retpoline_sites, __retpoline_sites_end,
-1d7e707af446134 arch/x86/kernel/alternative.c  Mike Rapoport (Microsoft  2025-01-26  2379) 			__cfi_sites, __cfi_sites_end, true);
-026211c40b05548 arch/x86/kernel/alternative.c  Kees Cook                 2025-09-03  2380  	cfi_debug = false;
-931ab63664f02b1 arch/x86/kernel/alternative.c  Peter Zijlstra            2022-10-27  2381  
-7508500900814d1 arch/x86/kernel/alternative.c  Peter Zijlstra            2021-10-26  2382  	/*
-7508500900814d1 arch/x86/kernel/alternative.c  Peter Zijlstra            2021-10-26  2383  	 * Rewrite the retpolines, must be done before alternatives since
-7508500900814d1 arch/x86/kernel/alternative.c  Peter Zijlstra            2021-10-26  2384  	 * those can rewrite the retpoline thunks.
-7508500900814d1 arch/x86/kernel/alternative.c  Peter Zijlstra            2021-10-26  2385  	 */
-1d7e707af446134 arch/x86/kernel/alternative.c  Mike Rapoport (Microsoft  2025-01-26  2386) 	apply_retpolines(__retpoline_sites, __retpoline_sites_end);
-1d7e707af446134 arch/x86/kernel/alternative.c  Mike Rapoport (Microsoft  2025-01-26  2387) 	apply_returns(__return_sites, __return_sites_end);
-7508500900814d1 arch/x86/kernel/alternative.c  Peter Zijlstra            2021-10-26  2388  
-a82b26451de126a arch/x86/kernel/alternative.c  Peter Zijlstra (Intel     2025-06-03  2389) 	its_fini_core();
-a82b26451de126a arch/x86/kernel/alternative.c  Peter Zijlstra (Intel     2025-06-03  2390) 
-e81dc127ef69887 arch/x86/kernel/alternative.c  Thomas Gleixner           2022-09-15  2391  	/*
-ab9fea59487d8b5 arch/x86/kernel/alternative.c  Peter Zijlstra            2025-02-07  2392  	 * Adjust all CALL instructions to point to func()-10, including
-ab9fea59487d8b5 arch/x86/kernel/alternative.c  Peter Zijlstra            2025-02-07  2393  	 * those in .altinstr_replacement.
-e81dc127ef69887 arch/x86/kernel/alternative.c  Thomas Gleixner           2022-09-15  2394  	 */
-e81dc127ef69887 arch/x86/kernel/alternative.c  Thomas Gleixner           2022-09-15  2395  	callthunks_patch_builtin_calls();
-e81dc127ef69887 arch/x86/kernel/alternative.c  Thomas Gleixner           2022-09-15  2396  
-ab9fea59487d8b5 arch/x86/kernel/alternative.c  Peter Zijlstra            2025-02-07  2397  	apply_alternatives(__alt_instructions, __alt_instructions_end);
-ab9fea59487d8b5 arch/x86/kernel/alternative.c  Peter Zijlstra            2025-02-07  2398  
-be0fffa5ca894a9 arch/x86/kernel/alternative.c  Peter Zijlstra            2023-06-22  2399  	/*
-be0fffa5ca894a9 arch/x86/kernel/alternative.c  Peter Zijlstra            2023-06-22  2400  	 * Seal all functions that do not have their address taken.
-be0fffa5ca894a9 arch/x86/kernel/alternative.c  Peter Zijlstra            2023-06-22  2401  	 */
-1d7e707af446134 arch/x86/kernel/alternative.c  Mike Rapoport (Microsoft  2025-01-26  2402) 	apply_seal_endbr(__ibt_endbr_seal, __ibt_endbr_seal_end);
-ed53a0d971926e4 arch/x86/kernel/alternative.c  Peter Zijlstra            2022-03-08  2403  
-ebebe30794d38c5 arch/x86/kernel/alternative.c  Pawan Gupta               2025-05-03  2404  	ibt_restore(ibt);
-ebebe30794d38c5 arch/x86/kernel/alternative.c  Pawan Gupta               2025-05-03  2405  
+Note that some of the VF resources are not virtualized (e.g. GGTT - the
+GFX device global virtual address space). This means that the VF driver
+needs to be aware that migration has occurred in order to properly
+relocate (patching or reemiting data that contains references to GGTT
+addresses) before resuming operation.
+The code to handle that is already present in upstream Linux and in
+production VF drivers for other OSes.
+
+Links to previous revisions for reference.
+v1:
+https://lore.kernel.org/lkml/20251011193847.1836454-1-michal.winiarski@intel.com/
+v2:
+https://lore.kernel.org/lkml/20251021224133.577765-1-michal.winiarski@intel.com/
+v3:
+https://lore.kernel.org/lkml/20251030203135.337696-1-michal.winiarski@intel.com/
+v4:
+https://lore.kernel.org/lkml/20251105151027.540712-1-michal.winiarski@intel.com/
+v5:
+https://lore.kernel.org/lkml/20251111010439.347045-1-michal.winiarski@intel.com/
+v6:
+https://lore.kernel.org/lkml/20251124230841.613894-1-michal.winiarski@intel.com/
+
+v6 -> v7:
+* Update commit msg with details on debug flag behavior (Michał)
+* Generate VFIO migration helpers with a macro (Alex)
+* Depend on PCI_IOV (Michał)
+* Reorder migration file struct members (Alex)
+* Fix xe_sriov_vfio_wait_flr_done() behavior (Alex)
+* Set state in .open_device() / .close_device() (Alex)
+* Remove redundant "disable_file" in release_file (Alex)
+* Use GFP_KERNEL_ACCOUNT alloc flag (Alex)
+* Use pci_iov_vf_id() directly in vdev->vfid assignment (Alex)
+
+v5 -> v6:
+* Exclude the patches already merged through drm-tip
+* Add logging when migration is enabled in debug mode (Michał)
+* Rename the xe_pf_get_pf helper (Michał)
+* Don't use "vendor specific" (yet again) (Michał)
+* Kerneldoc tweaks (Michał)
+* Use guard(xe_pm_runtime_noresume) instead of assert (Michał)
+* Check for num_vfs rather than total_vfs (Michał)
+
+v4 -> v5:
+* Require GuC version >= 70.54.0
+* Fix VFIO migration migf disable
+* Fix null-ptr-deref on save_read error
+* Don't use "vendor specific" (again) (Kevin)
+* Introduce xe_sriov_packet_types.h (Michał)
+* Kernel-doc fixes (Michał)
+* Use tile_id / gt_id instead of tile / gt in packet header (Michał)
+* Don't use struct_group() in packet (Michał)
+* And other, more minor changes
+
+v3 -> v4:
+* Add error handling on data_read / data_write path
+* Don't match on PCI class, use PCI_DRIVER_OVERRIDE_DEVICE_VFIO helper
+  instead (Lucas De Marchi)
+* Use proper node VMA size inside GGTT save / restore helper (Michał)
+* Improve data tracking set_bit / clear_bit wrapper names (Michał)
+* Improve packet dump helper (Michał)
+* Use drmm for migration mutex init (Michał)
+* Rename the pf_device access helper (Michał)
+* Use non-interruptible sleep in VRAM copy (Matt)
+* Rename xe_sriov_migration_data to xe_sriov_packet along with relevant
+  functions (Michał)
+* Rename per-vf device-level data to xe_sriov_migration_state (Michał)
+* Use struct name that matches component name instead of anonymous
+  struct (Michał)
+* Don't add XE_GT_SRIOV_STATE_MAX to state enum, use a helper macro
+  instead (Michał)
+* Kernel-doc fixes (Michał)
+
+v2 -> v3:
+* Bind xe-vfio-pci to specific devices instead of using vendor and
+  class (Christoph Hellwig / Jason Gunthorpe)
+* Don't refer to the driver as "vendor specific" (Christoph)
+* Use pci_iov_get_pf_drvdata and change the interface to take xe_device
+  (Jason)
+* Update the RUNNING_P2P comment (Jason / Kevin Tian)
+* Add state_mutex to protect device state transitions (Kevin)
+* Implement .error_detected (Kevin)
+* Drop redundant comments (Kevin)
+* Explain 1-based indexing and wait_flr_done (Kevin)
+* Add a missing get_file() (Kevin)
+* Drop redundant state transitions when p2p is supported (Kevin)
+* Update run/stop naming to match other drivers (Kevin)
+* Fix error state handling (Kevin)
+* Fix SAVE state diagram rendering (Michał Wajdeczko)
+* Control state machine flipping PROCESS / WAIT logic (Michał Wajdeczko)
+* Drop GUC / GGTT / MMIO / VRAM from SAVE control state machine
+* Use devm instead of drmm for migration-related allocations (Michał)
+* Use GGTT node for size calculations (Michał)
+* Use mutex guards consistently (Michał)
+* Fix build break on 32-bit (lkp)
+* Kernel-doc updates (Michał)
+* And other, more minor changes
+
+v1 -> v2:
+* Do not require debug flag to support migration on PTL/BMG
+* Fix PCI class match on VFIO side
+* Reorganized PF Control state machine (Michał Wajdeczko)
+* Kerneldoc tidying (Michał Wajdeczko)
+* Return NULL instead of -ENODATA for produce/consume (Michał Wajdeczko)
+* guc_buf s/sync/sync_read (Matt Brost)
+* Squash patch 03 (Matt Brost)
+* Assert on PM ref instead of taking it (Matt Brost)
+* Remove CCS completely (Matt Brost)
+* Return ptr on guc_buf_sync_read (Michał Wajdeczko)
+* Define default guc_buf size (Michał Wajdeczko)
+* Drop CONFIG_PCI_IOV=n stubs where not needed (Michał Wajdeczko)
+* And other, more minor changes
+
+Michał Winiarski (4):
+  drm/xe/pf: Enable SR-IOV VF migration
+  drm/xe/pci: Introduce a helper to allow VF access to PF xe_device
+  drm/xe/pf: Export helpers for VFIO
+  vfio/xe: Add device specific vfio_pci driver variant for Intel
+    graphics
+
+ MAINTAINERS                                   |   7 +
+ drivers/gpu/drm/xe/Makefile                   |   4 +
+ drivers/gpu/drm/xe/xe_gt_sriov_pf_migration.c |   9 +
+ drivers/gpu/drm/xe/xe_pci.c                   |  17 +
+ drivers/gpu/drm/xe/xe_pci.h                   |   3 +
+ drivers/gpu/drm/xe/xe_sriov_pf_migration.c    |  35 +-
+ drivers/gpu/drm/xe/xe_sriov_pf_migration.h    |   1 +
+ .../gpu/drm/xe/xe_sriov_pf_migration_types.h  |   4 +-
+ drivers/gpu/drm/xe/xe_sriov_vfio.c            |  80 +++
+ drivers/vfio/pci/Kconfig                      |   2 +
+ drivers/vfio/pci/Makefile                     |   2 +
+ drivers/vfio/pci/xe/Kconfig                   |  12 +
+ drivers/vfio/pci/xe/Makefile                  |   3 +
+ drivers/vfio/pci/xe/main.c                    | 573 ++++++++++++++++++
+ include/drm/intel/xe_sriov_vfio.h             | 143 +++++
+ 15 files changed, 888 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/gpu/drm/xe/xe_sriov_vfio.c
+ create mode 100644 drivers/vfio/pci/xe/Kconfig
+ create mode 100644 drivers/vfio/pci/xe/Makefile
+ create mode 100644 drivers/vfio/pci/xe/main.c
+ create mode 100644 include/drm/intel/xe_sriov_vfio.h
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.51.2
+
 
