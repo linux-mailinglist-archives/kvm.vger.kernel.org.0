@@ -1,284 +1,265 @@
-Return-Path: <kvm+bounces-64850-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64851-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3F3FC8D3C7
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 08:52:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FF0EC8D692
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 09:52:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9C19D34C424
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 07:51:56 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 53DDF34D4FC
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 08:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 808B332C336;
-	Thu, 27 Nov 2025 07:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eYchrPpl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4523D3242A7;
+	Thu, 27 Nov 2025 08:52:14 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4BC328253
-	for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 07:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A84D2D3237;
+	Thu, 27 Nov 2025 08:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764229682; cv=none; b=GwcE28fgBsJyUNPwZrXA2i7IAtSg68wacXXki9Z/NsPm1IKuerXSB+erj4QG/o9wz71eqq/Sw1fSiF2/3E/XWehEjF1MY4/1Z834xOcleTUPu3gB5OIhUWEd6HLCaqDEt+0h3JwPEZNDBsFHbAinw3yI4FA/TJrXCF4RHcbbfdc=
+	t=1764233533; cv=none; b=IH5UDkcIPwx6/QUBH718BQOJiNtsL5Kfqff+eNjq5KtRm7K6Urn6bUCGM/6F0ruFoVRXugDznrxpCk6POPS+aZ6cSLOWPTsL2JN18lMo7d9I9ULPOLc6GHcY4tCsXfJQkWLVnOqoAk0Rnc/6K4tMguq/pPL3RRv3jpT8J1F4w5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764229682; c=relaxed/simple;
-	bh=/Awk+ZNAUSYj37xQmP8u5lLIpYhs6f3jnk3Fa/B/6hw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GenWWuU0V1XiSu5TEjnAxyv3TC0Y37WWR7p4y/BNFP3NSNzAiL6mfJVA1cZyd7CTMRUnlaSRFsLuwB+uO55wNWTJgFOakOl2iYBHmsxmrEID4+mvlAbacHxgXlqAT9uFUxQEjwH0Xn9Tf0i73Z+OAjHIouaDxCwnWN+skCieWEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eYchrPpl; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-297d4a56f97so8825585ad.1
-        for <kvm@vger.kernel.org>; Wed, 26 Nov 2025 23:47:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764229674; x=1764834474; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mwxY3RrBqHReoCCTc0CExP42GtobWyxbXrcCgf7a+Ec=;
-        b=eYchrPplPehlVONV2tShm8syxQbikMDbK31X02qr1WFUKIamsItRPtI1KoJAMlc+WK
-         7hhzsked/rE8gwmwya2BNTeLRguSm5P4ImkNaSpJVXSuVVTzC4K83TlhFwtGtAnkcUSu
-         KR6GbGGdsG4BTCLNMEXJv6bm3TxC/ll1u7RtDkI0FL3LzOJtJoDs/na1zCutCzGiM7o7
-         W4mzH2UoC+esSVmi5JGiCIPtS+krXRcdby0KC/3iG3wdQ8kvcyuFDqdjSFAVJQuPnV/v
-         NVk11bWY2PFyMOivvcFx4xKmGJaVMcFDDVQMqd7IYNwgePqkKdngzobjcTWUgH7/OQGw
-         Uv5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764229674; x=1764834474;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mwxY3RrBqHReoCCTc0CExP42GtobWyxbXrcCgf7a+Ec=;
-        b=GM1VlesIWlmf4CGWjld4kijBygu9S2YaQ0+B+X/Gg4PR538E2o4rn4uCF1mTqtFfy7
-         l4wRIr5xSTIKqYkbUW3puCpWa3RcQcKvTkwhRg/wcdoisCcF0LS/BI4oOC/jWSnq/3Jh
-         +cs+5ltxMo6qlq01tljwmstCm+X4GwLoQetckI3Sou6GMlhIqDVjlfltFc/1huVfbntw
-         OUwjqYdGkcfUHxeo6vQHZyZBWt7p5Yn9TwB0MNB4SQWu38BWEGAvqtuXuw0oXoWX8mTd
-         6WNt55e1SEJSlRkxAHkKtwThZXDPWLMqYC9L3bNw3dbAow4vq6A/2nQ7N40tJmRs8G5i
-         zkww==
-X-Forwarded-Encrypted: i=1; AJvYcCWAcTz6w0VwCa4Ah4lErXb2xJ/Q2cejgNDe+6L7k51KHDsZoFLqqjb32nk9ortvJF/c0Hw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3ryIS4AqNa8HX50tHTzNtdursZ1Hm07LlCb4ybWhp6iayAEgT
-	/uuuKt+hLvs4qmg5ACoZzVAKP6GjWRZ6CDmaH+1FrxnUNzZ72ezTQBhh
-X-Gm-Gg: ASbGncuppnqLN0S4zEW4BF4Tyiu3aXuhEOA3xiIAZxGwgDOxSSKvTT2zJo+nBvrW0Ao
-	P3H/3oN5vmyOlfdzqy55qECk13EPp/FrBee7nPWQFgqOgMLUK2LKIGVAVG2lALORzjLT5UF7nZk
-	Ax++bGd0813t1pg0J6ju/m20ATNFzBayqxwXlpt1O/pC/uEgUAfPwNFaoYRYvK6GIAFRR/qcWNO
-	xfdRVwNMPVlTbyTopMQMHjqrC1uNxbzF8AVi8C9BzHpw8bdTct24Fp/ZOwm2/e1sjgEdw5IsF/4
-	Pnis0YJOBXRthRgaQ5j38CBVQUdeLN8eet6LobYnC5mkNjJO2yaC6VqfAWhMeOHgfX5EA9KB0ER
-	pv7FoWqhZHgBJ3pgGLAvCL+qSnPaF2lu9yZILrWWzY8zk8ZlVbDGh4BBiUlaqO83Ag44fHZNIHe
-	9QfS5Xmmefwwfri0cDVLa9
-X-Google-Smtp-Source: AGHT+IHIlqze70ddD15adUvv30WNku5JRlVK0eu6g7d4TW5+OfNZ6dSJWF3hfK+35WHjCJXw8EQ6FQ==
-X-Received: by 2002:a17:903:b86:b0:295:4d97:8503 with SMTP id d9443c01a7336-29b6c575180mr257859795ad.30.1764229674412;
-        Wed, 26 Nov 2025 23:47:54 -0800 (PST)
-Received: from localhost ([2a03:2880:2ff:73::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bce477e94sm8648415ad.43.2025.11.26.23.47.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 23:47:54 -0800 (PST)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Wed, 26 Nov 2025 23:47:41 -0800
-Subject: [PATCH net-next v12 12/12] selftests/vsock: add tests for
- namespace deletion and mode changes
+	s=arc-20240116; t=1764233533; c=relaxed/simple;
+	bh=OJFe4uir1r8fdPJo8g8dyTsjCzmwNS8H/eu98Y/hL7k=;
+	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=dwhfE/VjofxBUqa+vyDNFLc+F3nk+nqi+nuGKBtZ11TGtSY/ms5+VuMsoBW+y4BAiHxZyY4cVXhYKafjZLdT9SfoNi9tle6egyNYun+Fw/0dLqR56lClBBwhVFr4qqboGRak8t/kc1jCp3V+bEQpAGqRmtxmcw4CkOTEaU7POkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4dH9Cq08M0z6FyC3;
+	Thu, 27 Nov 2025 16:52:07 +0800 (CST)
+Received: from xaxapp05.zte.com.cn ([10.99.98.109])
+	by mse-fl1.zte.com.cn with SMTP id 5AR8pZos089303;
+	Thu, 27 Nov 2025 16:51:35 +0800 (+08)
+	(envelope-from liu.xuemei1@zte.com.cn)
+Received: from mapi (xaxapp04[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Thu, 27 Nov 2025 16:51:37 +0800 (CST)
+Date: Thu, 27 Nov 2025 16:51:37 +0800 (CST)
+X-Zmail-TransId: 2afb692811196d6-335c2
+X-Mailer: Zmail v1.0
+Message-ID: <20251127165137780QbUOVPKPAfWSGAFl5qtRy@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251126-vsock-vmtest-v12-12-257ee21cd5de@meta.com>
-References: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
-In-Reply-To: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- "K. Y. Srinivasan" <kys@microsoft.com>, 
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
- Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
- Vishnu Dasa <vishnu.dasa@broadcom.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, berrange@redhat.com, 
- Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@gmail.com>, 
- Bobby Eshleman <bobbyeshleman@meta.com>
-X-Mailer: b4 0.14.3
+Mime-Version: 1.0
+From: <liu.xuemei1@zte.com.cn>
+To: <atish.patra@linux.dev>, <alex@ghiti.fr>, <anup@brainfault.org>
+Cc: <pjw@kernel.org>, <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>,
+        <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
+        <inux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIIHY0XSBSSVNDLVY6IEtWTTogVHJhbnNwYXJlbnQgaHVnZSBwYWdlIHN1cHBvcnQ=?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 5AR8pZos089303
+X-TLS: YES
+X-SPF-DOMAIN: zte.com.cn
+X-ENVELOPE-SENDER: liu.xuemei1@zte.com.cn
+X-SPF: None
+X-SOURCE-IP: 10.5.228.132 unknown Thu, 27 Nov 2025 16:52:07 +0800
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 69281137.000/4dH9Cq08M0z6FyC3
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
+From: Jessica Liu <liu.xuemei1@zte.com.cn>
 
-Add tests that validate vsock sockets are resilient to deleting
-namespaces or changing namespace modes from global to local. The vsock
-sockets should still function normally.
+Use block mapping if backed by a THP, as implemented in architectures
+like ARM and x86_64.
 
-The function check_ns_changes_dont_break_connection() is added to re-use
-the step-by-step logic of 1) setup connections, 2) do something that
-would maybe break the connections, 3) check that the connections are
-still ok.
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+Signed-off-by: Jessica Liu <liu.xuemei1@zte.com.cn>
 ---
-Changes in v11:
-- remove pipefile (Stefano)
+Changes in v4:
+- Substituted kvm_riscv_gstage_get_mapping_size with get_hva_mapping_size
 
-Changes in v9:
-- more consistent shell style
-- clarify -u usage comment for pipefile
----
- tools/testing/selftests/vsock/vmtest.sh | 119 ++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
+ arch/riscv/kvm/mmu.c    | 140 ++++++++++++++++++++++++++++++++++++++++
+ arch/riscv/mm/pgtable.c |   2 +
+ 2 files changed, 142 insertions(+)
 
-diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
-index da9198dc8ab5..a903a0bf66c4 100755
---- a/tools/testing/selftests/vsock/vmtest.sh
-+++ b/tools/testing/selftests/vsock/vmtest.sh
-@@ -68,6 +68,12 @@ readonly TEST_NAMES=(
- 	ns_same_local_loopback_ok
- 	ns_same_local_host_connect_to_local_vm_ok
- 	ns_same_local_vm_connect_to_local_host_ok
-+	ns_mode_change_connection_continue_vm_ok
-+	ns_mode_change_connection_continue_host_ok
-+	ns_mode_change_connection_continue_both_ok
-+	ns_delete_vm_ok
-+	ns_delete_host_ok
-+	ns_delete_both_ok
- )
- readonly TEST_DESCS=(
- 	# vm_server_host_client
-@@ -135,6 +141,24 @@ readonly TEST_DESCS=(
- 
- 	# ns_same_local_vm_connect_to_local_host_ok
- 	"Run vsock_test client in VM in a local ns with server in same ns."
-+
-+	# ns_mode_change_connection_continue_vm_ok
-+	"Check that changing NS mode of VM namespace from global to local after a connection is established doesn't break the connection"
-+
-+	# ns_mode_change_connection_continue_host_ok
-+	"Check that changing NS mode of host namespace from global to local after a connection is established doesn't break the connection"
-+
-+	# ns_mode_change_connection_continue_both_ok
-+	"Check that changing NS mode of host and VM namespaces from global to local after a connection is established doesn't break the connection"
-+
-+	# ns_delete_vm_ok
-+	"Check that deleting the VM's namespace does not break the socket connection"
-+
-+	# ns_delete_host_ok
-+	"Check that deleting the host's namespace does not break the socket connection"
-+
-+	# ns_delete_both_ok
-+	"Check that deleting the VM and host's namespaces does not break the socket connection"
- )
- 
- readonly USE_SHARED_VM=(
-@@ -1274,6 +1298,101 @@ test_vm_loopback() {
- 	return "${KSFT_PASS}"
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index 58f5f3536ffd..38816c5895fe 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -302,6 +302,142 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return pte_young(ptep_get(ptep));
  }
- 
-+check_ns_changes_dont_break_connection() {
-+	local pipefile pidfile outfile
-+	local ns0="global0"
-+	local ns1="global1"
-+	local port=12345
-+	local pids=()
-+	local rc=0
-+
-+	init_namespaces
-+
-+	pidfile="$(create_pidfile)"
-+	if ! vm_start "${pidfile}" "${ns0}"; then
-+		return "${KSFT_FAIL}"
-+	fi
-+	vm_wait_for_ssh "${ns0}"
-+
-+	outfile=$(mktemp)
-+	vm_ssh "${ns0}" -- \
-+		socat VSOCK-LISTEN:"${port}",fork STDOUT > "${outfile}" 2>/dev/null &
-+	pids+=($!)
-+	vm_wait_for_listener "${ns0}" "${port}" "vsock"
-+
-+	# We use a pipe here so that we can echo into the pipe instead of using
-+	# socat and a unix socket file. We just need a name for the pipe (not a
-+	# regular file) so use -u.
-+	pipefile=$(mktemp -u /tmp/vmtest_pipe_XXXX)
-+	ip netns exec "${ns1}" \
-+		socat PIPE:"${pipefile}" VSOCK-CONNECT:"${VSOCK_CID}":"${port}" &
-+	pids+=($!)
-+
-+	timeout "${WAIT_PERIOD}" \
-+		bash -c 'while [[ ! -e '"${pipefile}"' ]]; do sleep 1; done; exit 0'
-+
-+	if [[ $2 == "delete" ]]; then
-+		if [[ "$1" == "vm" ]]; then
-+			ip netns del "${ns0}"
-+		elif [[ "$1" == "host" ]]; then
-+			ip netns del "${ns1}"
-+		elif [[ "$1" == "both" ]]; then
-+			ip netns del "${ns0}"
-+			ip netns del "${ns1}"
-+		fi
-+	elif [[ $2 == "change_mode" ]]; then
-+		if [[ "$1" == "vm" ]]; then
-+			ns_set_mode "${ns0}" "local"
-+		elif [[ "$1" == "host" ]]; then
-+			ns_set_mode "${ns1}" "local"
-+		elif [[ "$1" == "both" ]]; then
-+			ns_set_mode "${ns0}" "local"
-+			ns_set_mode "${ns1}" "local"
-+		fi
-+	fi
-+
-+	echo "TEST" > "${pipefile}"
-+
-+	timeout "${WAIT_PERIOD}" \
-+		bash -c 'while [[ ! -s '"${outfile}"' ]]; do sleep 1; done; exit 0'
-+
-+	if grep -q "TEST" "${outfile}"; then
-+		rc="${KSFT_PASS}"
-+	else
-+		rc="${KSFT_FAIL}"
-+	fi
-+
-+	terminate_pidfiles "${pidfile}"
-+	terminate_pids "${pids[@]}"
-+	rm -f "${outfile}" "${pipefile}"
-+
-+	return "${rc}"
-+}
-+
-+test_ns_mode_change_connection_continue_vm_ok() {
-+	check_ns_changes_dont_break_connection "vm" "change_mode"
-+}
-+
-+test_ns_mode_change_connection_continue_host_ok() {
-+	check_ns_changes_dont_break_connection "host" "change_mode"
-+}
-+
-+test_ns_mode_change_connection_continue_both_ok() {
-+	check_ns_changes_dont_break_connection "both" "change_mode"
-+}
-+
-+test_ns_delete_vm_ok() {
-+	check_ns_changes_dont_break_connection "vm" "delete"
-+}
-+
-+test_ns_delete_host_ok() {
-+	check_ns_changes_dont_break_connection "host" "delete"
-+}
-+
-+test_ns_delete_both_ok() {
-+	check_ns_changes_dont_break_connection "both" "delete"
-+}
-+
- shared_vm_test() {
- 	local tname
- 
 
++static bool fault_supports_gstage_huge_mapping(struct kvm_memory_slot *memslot,
++					       unsigned long hva)
++{
++	hva_t uaddr_start, uaddr_end;
++	gpa_t gpa_start;
++	size_t size;
++
++	size = memslot->npages * PAGE_SIZE;
++	uaddr_start = memslot->userspace_addr;
++	uaddr_end = uaddr_start + size;
++
++	gpa_start = memslot->base_gfn << PAGE_SHIFT;
++
++	/*
++	 * Pages belonging to memslots that don't have the same alignment
++	 * within a PMD for userspace and GPA cannot be mapped with g-stage
++	 * PMD entries, because we'll end up mapping the wrong pages.
++	 *
++	 * Consider a layout like the following:
++	 *
++	 *    memslot->userspace_addr:
++	 *    +-----+--------------------+--------------------+---+
++	 *    |abcde|fgh  vs-stage block  |    vs-stage block tv|xyz|
++	 *    +-----+--------------------+--------------------+---+
++	 *
++	 *    memslot->base_gfn << PAGE_SHIFT:
++	 *      +---+--------------------+--------------------+-----+
++	 *      |abc|def  g-stage block  |    g-stage block   |tvxyz|
++	 *      +---+--------------------+--------------------+-----+
++	 *
++	 * If we create those g-stage blocks, we'll end up with this incorrect
++	 * mapping:
++	 *   d -> f
++	 *   e -> g
++	 *   f -> h
++	 */
++	if ((gpa_start & (PMD_SIZE - 1)) != (uaddr_start & (PMD_SIZE - 1)))
++		return false;
++
++	/*
++	 * Next, let's make sure we're not trying to map anything not covered
++	 * by the memslot. This means we have to prohibit block size mappings
++	 * for the beginning and end of a non-block aligned and non-block sized
++	 * memory slot (illustrated by the head and tail parts of the
++	 * userspace view above containing pages 'abcde' and 'xyz',
++	 * respectively).
++	 *
++	 * Note that it doesn't matter if we do the check using the
++	 * userspace_addr or the base_gfn, as both are equally aligned (per
++	 * the check above) and equally sized.
++	 */
++	return (hva >= ALIGN(uaddr_start, PMD_SIZE)) && (hva < ALIGN_DOWN(uaddr_end, PMD_SIZE));
++}
++
++static int get_hva_mapping_size(struct kvm *kvm,
++				unsigned long hva)
++{
++	int size = PAGE_SIZE;
++	unsigned long flags;
++	pgd_t pgd;
++	p4d_t p4d;
++	pud_t pud;
++	pmd_t pmd;
++
++	/*
++	 * Disable IRQs to prevent concurrent tear down of host page tables,
++	 * e.g. if the primary MMU promotes a P*D to a huge page and then frees
++	 * the original page table.
++	 */
++	local_irq_save(flags);
++
++	/*
++	 * Read each entry once.  As above, a non-leaf entry can be promoted to
++	 * a huge page _during_ this walk.  Re-reading the entry could send the
++	 * walk into the weeks, e.g. p*d_leaf() returns false (sees the old
++	 * value) and then p*d_offset() walks into the target huge page instead
++	 * of the old page table (sees the new value).
++	 */
++	pgd = pgdp_get(pgd_offset(kvm->mm, hva));
++	if (pgd_none(pgd))
++		goto out;
++
++	p4d = p4dp_get(p4d_offset(&pgd, hva));
++	if (p4d_none(p4d) || !p4d_present(p4d))
++		goto out;
++
++	pud = pudp_get(pud_offset(&p4d, hva));
++	if (pud_none(pud) || !pud_present(pud))
++		goto out;
++
++	if (pud_leaf(pud)) {
++		size = PUD_SIZE;
++		goto out;
++	}
++
++	pmd = pmdp_get(pmd_offset(&pud, hva));
++	if (pmd_none(pmd) || !pmd_present(pmd))
++		goto out;
++
++	if (pmd_leaf(pmd))
++		size = PMD_SIZE;
++
++out:
++	local_irq_restore(flags);
++	return size;
++}
++
++static unsigned long transparent_hugepage_adjust(struct kvm *kvm,
++						 struct kvm_memory_slot *memslot,
++						 unsigned long hva,
++						 kvm_pfn_t *hfnp, gpa_t *gpa)
++{
++	kvm_pfn_t hfn = *hfnp;
++
++	/*
++	 * Make sure the adjustment is done only for THP pages. Also make
++	 * sure that the HVA and GPA are sufficiently aligned and that the
++	 * block map is contained within the memslot.
++	 */
++	if (fault_supports_gstage_huge_mapping(memslot, hva)) {
++		int sz;
++
++		sz = get_hva_mapping_size(kvm, hva);
++		if (sz < PMD_SIZE)
++			return sz;
++
++		*gpa &= PMD_MASK;
++		hfn &= ~(PTRS_PER_PMD - 1);
++		*hfnp = hfn;
++
++		return PMD_SIZE;
++	}
++
++	return PAGE_SIZE;
++}
++
+ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct kvm_memory_slot *memslot,
+ 		      gpa_t gpa, unsigned long hva, bool is_write,
+ 		      struct kvm_gstage_mapping *out_map)
+@@ -395,6 +531,10 @@ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct kvm_memory_slot *memslot,
+ 	if (mmu_invalidate_retry(kvm, mmu_seq))
+ 		goto out_unlock;
+
++	/* check if we are backed by a THP and thus use block mapping if possible */
++	if (vma_pagesize == PAGE_SIZE)
++		vma_pagesize = transparent_hugepage_adjust(kvm, memslot, hva, &hfn, &gpa);
++
+ 	if (writable) {
+ 		mark_page_dirty_in_slot(kvm, memslot, gfn);
+ 		ret = kvm_riscv_gstage_map_page(&gstage, pcache, gpa, hfn << PAGE_SHIFT,
+diff --git a/arch/riscv/mm/pgtable.c b/arch/riscv/mm/pgtable.c
+index 8b6c0a112a8d..fe776f03cc12 100644
+--- a/arch/riscv/mm/pgtable.c
++++ b/arch/riscv/mm/pgtable.c
+@@ -49,6 +49,7 @@ pud_t *pud_offset(p4d_t *p4d, unsigned long address)
+
+ 	return (pud_t *)p4d;
+ }
++EXPORT_SYMBOL_GPL(pud_offset);
+
+ p4d_t *p4d_offset(pgd_t *pgd, unsigned long address)
+ {
+@@ -57,6 +58,7 @@ p4d_t *p4d_offset(pgd_t *pgd, unsigned long address)
+
+ 	return (p4d_t *)pgd;
+ }
++EXPORT_SYMBOL_GPL(p4d_offset);
+ #endif
+
+ #ifdef CONFIG_HAVE_ARCH_HUGE_VMAP
 -- 
-2.47.3
-
+2.27.0
 
