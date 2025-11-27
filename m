@@ -1,124 +1,139 @@
-Return-Path: <kvm+bounces-64865-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64866-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A7D2C8DF67
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 12:20:15 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C11DC8DF82
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 12:20:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7724D4E7888
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 11:18:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BEF7034EBD4
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 11:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 629F930DECA;
-	Thu, 27 Nov 2025 11:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE8832E15A;
+	Thu, 27 Nov 2025 11:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HnqFtZWD"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="eZjPoS2V"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.178.132.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D2D32B9B4;
-	Thu, 27 Nov 2025 11:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2D232E13E;
+	Thu, 27 Nov 2025 11:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.178.132.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764242302; cv=none; b=BHWeVAb48jLTxJFL6ndwRhnBKYt3lsu8Z/vewDBtSBVZnWws2k6VSrA5iM9vaPG95TnVNByUwJCZacam2zpfGeHwiFwr6C4vQZi2VnSkOtBeiLQiIaWZ2T4nMVEa4kPQyZkVEo2+hr69ZTCcLYmYTcWn+VEsa1V5VQNIOEa5mps=
+	t=1764242405; cv=none; b=rE5zgdJhRYQXisHLqCeOgkZ0SPCIZqKKsvl/RhHyU/vQZCivoi6gSCPdDwb7CbU+suCzeNuP7xCAp8z1Ztm7orURQwt8n9ftLNv1R6SKZ07A42GIEzAFXTYPjLo6APcGLVyRtP8PhARhIMVT5HrSMf32si38DciUzSmehbDdkDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764242302; c=relaxed/simple;
-	bh=LGIVtxajxKFoRcUUjJf+GTVcZh6OJXHRfbkkB9FrCW4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HrXyAmnunZ6jF/dEuiNDo5KX2sWrHduYCDVaFzVKII1UJ2MdzIH0DtHOc1fXOS/4Li9Khnqwn+IZGSMfBPuwGnvrSmgqbTPFqiiFGd04p3prYcULsek0/VdPh06YdpgruNpvqNtWWkZaM3aTimXV7IJeTC5JwlSWWnwcjYERY/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HnqFtZWD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BAA0C4CEF8;
-	Thu, 27 Nov 2025 11:18:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764242301;
-	bh=LGIVtxajxKFoRcUUjJf+GTVcZh6OJXHRfbkkB9FrCW4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HnqFtZWDotDk1h+8DKJczwnhvfeDRKlb5rj1/zSdBmYiKSz8nz78NxKpSyPtHeUdu
-	 4n8L4Zd2gwlN/B7LPcFoZyS/zWBZXIv9OMpMIFYn71ZaER/U5xSNynksfK0sM/XxgB
-	 YgehyVIJixQt0yYyutGkCdsw9Zd17a00okzKK4aj7IPBjRy0905NjNYpwyleZGqwYa
-	 M4Dbkn+DHnFDyZ1VC9l2lWarWa6HrCoitN/w/rxXyKDjrYuxWaWBrZGdly1ctiDQMR
-	 xF8qUP8fHzba9Df2M7ahFMZ3bMHUXoIpUZpDd3OPmk2ndqD0XUMvJBopJIapbLfyIE
-	 BeUlxurO7d9Rw==
-Date: Thu, 27 Nov 2025 13:18:10 +0200
-From: Mike Rapoport <rppt@kernel.org>
-To: Peter Xu <peterx@redhat.com>
-Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	David Hildenbrand <david@redhat.com>,
-	Hugh Dickins <hughd@google.com>,
-	James Houghton <jthoughton@google.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Nikita Kalyazin <kalyazin@amazon.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	"David Hildenbrand (Red Hat)" <david@kernel.org>
-Subject: Re: [PATCH v2 3/5] mm: introduce VM_FAULT_UFFD_MINOR fault reason
-Message-ID: <aSgzcpFP1qBda5ef@kernel.org>
-References: <20251125183840.2368510-1-rppt@kernel.org>
- <20251125183840.2368510-4-rppt@kernel.org>
- <aSYBrH_xfMfs6yDW@x1.local>
+	s=arc-20240116; t=1764242405; c=relaxed/simple;
+	bh=EVAUMDD+9PtvbCzAu8DAyYzmBCBcMdH1XaG8zBfI1ww=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=E1WIQY1uqVrObIBOWJpRBZjYBShvONX65rgkRD8vrAtco6b4Dr1O+qhecDY844cRCsjkndEHLcbyHA9YMLQs+T4HomdNV8V14wJJUjPV/C6KZALtY1+Bi9LE5J0gULdo6fBmvN8FanefRQTrVMKFReb4vxQsaONI6X9XFVZYhIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=eZjPoS2V; arc=none smtp.client-ip=63.178.132.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1764242403; x=1795778403;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=+H64Ah6mYGxHQfE73KQcSigtJh1K4kxYLJX7clH3BEI=;
+  b=eZjPoS2VPN4tbKai6MD1kvmBKmpZnx4nGypVuqzcSJZ/cU8Rxi2hl/7A
+   9DNziPhT2Fs+vCbPSpY2TYF/Dl+jtWQuzOny9WFGHxmEbL1DOOQ4CKxrf
+   jvypK0KMjdNM3gICl16NAXQJQ8WmyQLWPPFedI1sECWvlmrl6gnRgfGCE
+   3Ia81QAlw/6mEbLAxpooo+0X4jwnkb96J4as0EtAjMuIJ906vTXuBzQ7t
+   zKUmSgEPsBK2tkjYeEEpf7BQ4PyozZSyIE83v5DBSDyuS/ZuV1e0PCLU9
+   FZ84+P2YRkXMZ3voy6f1zB0rE929e2oi2Zzl3wTQ9tOgykRvIYWbPxAcj
+   g==;
+X-CSE-ConnectionGUID: D+oseAjuS/CfvMD+9yRiZQ==
+X-CSE-MsgGUID: 2qf8pyqtR5OsfOhqRXaxyg==
+X-IronPort-AV: E=Sophos;i="6.20,231,1758585600"; 
+   d="scan'208";a="5780819"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2025 11:19:44 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.224:29782]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.46.211:2525] with esmtp (Farcaster)
+ id 162dbd5c-9963-4950-b318-3a7250b738d9; Thu, 27 Nov 2025 11:19:44 +0000 (UTC)
+X-Farcaster-Flow-ID: 162dbd5c-9963-4950-b318-3a7250b738d9
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Thu, 27 Nov 2025 11:19:37 +0000
+Received: from [192.168.18.64] (10.106.82.32) by EX19D005EUB003.ant.amazon.com
+ (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Thu, 27 Nov 2025
+ 11:19:36 +0000
+Message-ID: <13d3a7a4-5cf8-4fbe-8dba-d565525a71c6@amazon.com>
+Date: Thu, 27 Nov 2025 11:19:35 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aSYBrH_xfMfs6yDW@x1.local>
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v2 4/5] guest_memfd: add support for userfaultfd minor
+ mode
+To: Mike Rapoport <rppt@kernel.org>
+CC: <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>, "Andrew
+ Morton" <akpm@linux-foundation.org>, Axel Rasmussen
+	<axelrasmussen@google.com>, Baolin Wang <baolin.wang@linux.alibaba.com>,
+	David Hildenbrand <david@redhat.com>, Hugh Dickins <hughd@google.com>, "James
+ Houghton" <jthoughton@google.com>, "Liam R. Howlett"
+	<Liam.Howlett@oracle.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu
+	<peterx@redhat.com>, Sean Christopherson <seanjc@google.com>, Shuah Khan
+	<shuah@kernel.org>, Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka
+	<vbabka@suse.cz>, <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20251125183840.2368510-1-rppt@kernel.org>
+ <20251125183840.2368510-5-rppt@kernel.org>
+ <bafb0c9e-9ce6-4294-b1d6-e32c41635add@amazon.com>
+ <aSgpo1_ZSmxf84-p@kernel.org>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <aSgpo1_ZSmxf84-p@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D010EUC004.ant.amazon.com (10.252.51.178) To
+ EX19D005EUB003.ant.amazon.com (10.252.51.31)
 
-On Tue, Nov 25, 2025 at 02:21:16PM -0500, Peter Xu wrote:
-> Hi, Mike,
+
+
+On 27/11/2025 10:36, Mike Rapoport wrote:
+> On Wed, Nov 26, 2025 at 04:49:31PM +0000, Nikita Kalyazin wrote:
+>> On 25/11/2025 18:38, Mike Rapoport wrote:
+>>> From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
+>>>
+>>> +#ifdef CONFIG_USERFAULTFD
+>>> +static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t pgoff)
+>>
+>> We have to name it differently, otherwise it clashes with the existing one
+>> in this file.
 > 
-> On Tue, Nov 25, 2025 at 08:38:38PM +0200, Mike Rapoport wrote:
-> > From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
-> > 
-> > When a VMA is registered with userfaulfd in minor mode, its ->fault()
-> > method should check if a folio exists in the page cache and if yes
-> > ->fault() should call handle_userfault(VM_UFFD_MISSING).
+> It's all David's fault! ;-P
+> How about kvm_gmem_get_prepared_folio() ?
+
+I'm afraid it may not be ideal due to preparedness tracking being 
+removed from guest_memfd at some point [1].  Would it be too bad to add 
+an indication to userfaultfd in the name somehow given that it's already 
+guarded by the config?
+
+[1] 
+https://lore.kernel.org/linux-coco/20251113230759.1562024-1-michael.roth@amd.com
+
 > 
-> s/MISSING/MINOR/
+> --
+> Sincerely yours,
+> Mike.
 
-Thanks, fixed. 
-
-> > new VM_FAULT_UFFD_MINOR there instead.
-> 
-> Personally I'd keep the fault path as simple as possible, because that's
-> the more frequently used path (rather than when userfaultfd is armed). I
-> also see it slightly a pity that even with flags introduced, it only solves
-> the MINOR problem, not MISSING.
-
-With David's suggestion the likely path remains unchanged.
-
-As for MISSING, let's take it baby steps. We have enough space in
-vm_fault_reason for UFFD_MISSING if we'd want to pull handle_userfault()
-from shmem and hugetlb.
- 
-> If it's me, I'd simply export handle_userfault()..  I confess I still don't
-> know why exporting it is a problem, but maybe I missed something.
-
-It's not only about export, it's also about not requiring ->fault()
-methods for pte-mapped memory call handle_userfault().
-
-> Only my two cents.  Feel free to go with whatever way you prefer.
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
-> 
-
--- 
-Sincerely yours,
-Mike.
 
