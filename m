@@ -1,264 +1,231 @@
-Return-Path: <kvm+bounces-64872-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64875-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FB9BC8E737
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 14:25:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B26AC8EB78
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 15:11:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 12FB534E43D
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 13:25:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7503E3AD3D9
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 14:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A5E826E6F5;
-	Thu, 27 Nov 2025 13:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F02332914;
+	Thu, 27 Nov 2025 14:11:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="YL5fV4xE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K9NUfQJz";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xthc4qiL"
 X-Original-To: kvm@vger.kernel.org
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7A7257830;
-	Thu, 27 Nov 2025 13:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1D2221D9E
+	for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 14:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764249898; cv=none; b=HupOVs7jo73JTkUTI22vd93NaPVarmXc9XJeFXa6Mt2CGTyX6SCaVV66Er9Gsg7JKjnDvY5IbJyZDE1Hg/OfPfSqzwYp/q+pETZQwiHtiraVHIyMvvmvj89T5ffHaVtDuG18PJVIdOoJlp4lgvOSgcPnFPo1rOQZFZT9cmavsfA=
+	t=1764252666; cv=none; b=dy0finLTXWOMQfR07WrzFOEJVIULS/IUHeV402jAQB1nAGm1HZ1Bn+UQd7VpM4f4C4vIw4xr1Vh2madZyvulayBemc5GVLrxsl1J8SRDGOWfnshWNV8GuNet8IvVOpAFBSSJTW4oFwjOl8BYUrdl2V+HD5cPo9lUHYwBYw/UHqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764249898; c=relaxed/simple;
-	bh=T22MT9sNX0B7VhOc3iByahuQoPBWnd3sIX3AcLzNiq4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=B9fDSMKl3JgcaSzu9KaP3ibMe3crkPAWNnvsEWSezPiyXgnudjFDR4VG8gU+nOdYiHnOevmK5zvcpw9twHP0X60pD+YaxmKT1mmXlvPvAbue5zeqnuAlfZc8lb+Lc8M1ZPgmUC/xiCXRkv2m37aQTDFEfwOgsM3ALDGkzuOncj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=YL5fV4xE; arc=none smtp.client-ip=113.46.200.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=Cr+5Rr5BPGPR1wepA4s78G0eot3R+UDHLBx6NzzwIjI=;
-	b=YL5fV4xE2L/eeoILrrBxV1N7dJlTDocQg0tVtTBqhVHiGJrFZMev0VDQVSkZDLhAl5URyZjV6
-	VQCw6nI6aUOb4X9C0BIMdUaw/4AdNcInkYZSSv1Kdl5IBbQh+bdShVt+y1tS1SvduD4FKY51aMv
-	3Z8zAxjGW7zojq71QEmAais=
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dHHDQ5hXhzKm4J;
-	Thu, 27 Nov 2025 21:23:02 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1009E1401F4;
-	Thu, 27 Nov 2025 21:24:52 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Thu, 27 Nov 2025 21:24:51 +0800
-Message-ID: <694b6f79-8306-46fb-9f4b-c30afd114210@huawei.com>
-Date: Thu, 27 Nov 2025 21:24:50 +0800
+	s=arc-20240116; t=1764252666; c=relaxed/simple;
+	bh=2RVh9tE5pYxS6ovcyK+Et0Fi45QfZBrWmtYdpxtheco=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KUNZtZ88lUyKGFRuXrTz6kLR5K+XmEUO2NgXVgcTQ/insVAVyH5U9IC06YmSHLmwIzqLto/DX37hgbCzF1zKIZoAsnOtnF0m0SegVX9HecD0nNsqkOUKgXQQV2UbIrDi9RyXVA/5ChJEKjcCo4z8deZUZA1eE1WY272Iqa2Q4MA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K9NUfQJz; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xthc4qiL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764252662;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XR64ry2ScNCGM4bs1WMW5J43Vq5AKcKTg9WAzYYBca8=;
+	b=K9NUfQJzBGLkhVJ5AvexvTFrzetrp8x8cchsqX/8/M/zgeqjDNTuppIzUu/EB3WyHHj2ZM
+	jUKLwPRLCCdxPcSbinK5HwurrwWfAFBIiHsVJgWhy++YZDl4h508dasEMe6AKcHYBoMlz8
+	fAy4jCg54cuYn7+dFWxPVKgJFZv2o+c=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-453-hU3wJDstOkyX6h3DuuJngw-1; Thu, 27 Nov 2025 09:11:01 -0500
+X-MC-Unique: hU3wJDstOkyX6h3DuuJngw-1
+X-Mimecast-MFC-AGG-ID: hU3wJDstOkyX6h3DuuJngw_1764252660
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-88050bdc2abso22448906d6.2
+        for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 06:11:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764252660; x=1764857460; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XR64ry2ScNCGM4bs1WMW5J43Vq5AKcKTg9WAzYYBca8=;
+        b=Xthc4qiLmJ/TJudULPOMWQESsp4ttDUTwrl8c3gDYtkf4hEvwQL7UkOEh4WI3moKrv
+         /q8g/6K3BVgKNq6hFk7ZYxg5v6CIdZ/eYkJrfAdnXI21WxCL4ZWYxyWb1z464VEqWh2h
+         t3xeG7ETesPe1/4235D7nTy8gvmwwbcw6nzFpsOyOMa9DURPCbiu5yX44dtacb5qkD0i
+         KiZh7ROSvzo7OS4Z0z20T60TFe/juk77WHE+HYKWKC35IEDzxDPLDmFIcQNVgDkB0C1F
+         mYYZQaNsk+KZvUhYxcoNlveRz+driGOk4YaBUfKzFQCsTVt+RhUfFPYSrJlW0CDSJT5W
+         a+bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764252660; x=1764857460;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XR64ry2ScNCGM4bs1WMW5J43Vq5AKcKTg9WAzYYBca8=;
+        b=Z9Vpdk9QE5+gujQGJGu7DOtoUsfNQV7ch6mVVfV/a6J19fiVbDGdvB+UfOYBE5Encj
+         MEL7TO6+sf28XA+ODJJDNVt2J3iH7HR38zP6f/2fT9Dm/HnD1dK2qq/fYUxw6lM2bvuM
+         4OTIy2J8FpKiy3HhYRtiTeALqwMMgrrT8hs2Q9rVIkgCXJWdFNUewn43SjUgcz3Yr05Q
+         7luWXNTt2qSpB0r2bRL8v/foKMltc2vgAgDyojow0fzDH++gQCSBC14aO4Q/vvYhwKJV
+         GWTg4M0VfDe7a8talIEl6NRXFVlY8p6J4ZrEyx5wAPEkMe+wUe1H6Ivtc8VhO2/uWYQ5
+         mUsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXonxbdcOFeefZc5yQn2VviQji9bEp7V/Z8E8J1rfi+EUgmYPlN3F6fH2EdAzZAro3onJQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCdo04g03esH97UAO4AuJvKu79EqgpvdLhidpR47zbCJTfpaiT
+	hjHiaMGycKkKg5BJeoEO+igAPyueCgcPEKbQSPLTY6Sc0o7/HI/SCxxZ4sMakx/DVgsFDRAQRIQ
+	lH7gZHyLI7iDUm1JmKnFw+jZGk/dS8+IIH1EAvPWdXhSCmKiw58xQhw==
+X-Gm-Gg: ASbGncsmLkVVmD39RQG7zjH5WH/p/JbnBB3HyQBjJ6RyR0a1TFep+cluXCpTeuc86Nt
+	ya6ao1wGHqy4zx72iBS0rfhmozxCaUB7QkFskpR+Dztvd8eecGsrf/T+kKvyAk6ebsWqycbc7sy
+	S/6IPNr7Ljbrsg6iU4BP2zYVGLFmv1aEJ9/BlcSiJmFTn8KGY7sFmtkfLt3kkOOyXwsJa1CIq2c
+	VjUGceo1JJbhr0nwV5gottYDOXDuV86OGmTqu+zKbtUeWXr38Kpg9mD9zxvs97NWAhkbX5Kp/ns
+	fgqaIaDXv31hwqkrhCCbkhfx/F2E33BzZ9iu6K88i8ESy3RMzId4p2ZLRY9KQPHR4wgkISWcn/1
+	qVGM=
+X-Received: by 2002:a05:6214:5b0a:b0:87b:f43b:89bf with SMTP id 6a1803df08f44-8863aff433bmr130936896d6.65.1764252660236;
+        Thu, 27 Nov 2025 06:11:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHVVojIJxBSUg6Ma99iaPFcSP2N+G6I7KWSD+e0Pql+38krJCo4yqt0i+13ziPHCggkJGRQFQ==
+X-Received: by 2002:a05:6214:5b0a:b0:87b:f43b:89bf with SMTP id 6a1803df08f44-8863aff433bmr130936256d6.65.1764252659699;
+        Thu, 27 Nov 2025 06:10:59 -0800 (PST)
+Received: from x1.local ([142.188.210.156])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88652b8fcb2sm9879206d6.52.2025.11.27.06.10.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Nov 2025 06:10:59 -0800 (PST)
+Date: Thu, 27 Nov 2025 09:10:56 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	David Hildenbrand <david@redhat.com>,
+	Hugh Dickins <hughd@google.com>,
+	James Houghton <jthoughton@google.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David Hildenbrand (Red Hat)" <david@kernel.org>
+Subject: Re: [PATCH v2 3/5] mm: introduce VM_FAULT_UFFD_MINOR fault reason
+Message-ID: <aShb8J18BaRrsA-u@x1.local>
+References: <20251125183840.2368510-1-rppt@kernel.org>
+ <20251125183840.2368510-4-rppt@kernel.org>
+ <aSYBrH_xfMfs6yDW@x1.local>
+ <aSgzcpFP1qBda5ef@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] KVM: arm64: Add support for FEAT_HDBSS
-To: Marc Zyngier <maz@kernel.org>, Tian Zheng <zhengtian10@huawei.com>
-CC: <oliver.upton@linux.dev>, <catalin.marinas@arm.com>, <corbet@lwn.net>,
-	<pbonzini@redhat.com>, <will@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yezhenyu2@huawei.com>,
-	<xiexiangyou@huawei.com>, <zhengchuan@huawei.com>, <joey.gouly@arm.com>,
-	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
-	<suzuki.poulose@arm.com>
-References: <20251121092342.3393318-1-zhengtian10@huawei.com>
- <20251121092342.3393318-4-zhengtian10@huawei.com>
- <86tsymqjwb.wl-maz@kernel.org>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <86tsymqjwb.wl-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aSgzcpFP1qBda5ef@kernel.org>
 
+On Thu, Nov 27, 2025 at 01:18:10PM +0200, Mike Rapoport wrote:
+> On Tue, Nov 25, 2025 at 02:21:16PM -0500, Peter Xu wrote:
+> > Hi, Mike,
+> > 
+> > On Tue, Nov 25, 2025 at 08:38:38PM +0200, Mike Rapoport wrote:
+> > > From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
+> > > 
+> > > When a VMA is registered with userfaulfd in minor mode, its ->fault()
+> > > method should check if a folio exists in the page cache and if yes
+> > > ->fault() should call handle_userfault(VM_UFFD_MISSING).
+> > 
+> > s/MISSING/MINOR/
+> 
+> Thanks, fixed. 
+> 
+> > > new VM_FAULT_UFFD_MINOR there instead.
+> > 
+> > Personally I'd keep the fault path as simple as possible, because that's
+> > the more frequently used path (rather than when userfaultfd is armed). I
+> > also see it slightly a pity that even with flags introduced, it only solves
+> > the MINOR problem, not MISSING.
+> 
+> With David's suggestion the likely path remains unchanged.
 
+It is not about the likely, it's about introducing flags into core path
+that makes the core path harder to follow, when it's not strictly required.
 
-On 2025/11/22 21:25, Marc Zyngier wrote:
-> On Fri, 21 Nov 2025 09:23:40 +0000,
-> Tian Zheng <zhengtian10@huawei.com> wrote:
->>
->> From: eillon <yezhenyu2@huawei.com>
->>
->> Armv9.5 introduces the Hardware Dirty Bit State Structure (HDBSS) feature,
->> indicated by ID_AA64MMFR1_EL1.HAFDBS == 0b0100.
->>
->> Add the Kconfig for FEAT_HDBSS and support detecting and enabling the
->> feature. A CPU capability is added to notify the user of the feature.
->>
->> Add KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl and basic framework for
->> ARM64 HDBSS support. Since the HDBSS buffer size is configurable and
->> cannot be determined at KVM initialization, an IOCTL interface is
->> required.
->>
->> Actually exposing the new capability to user space happens in a later
->> patch.
->>
->> Signed-off-by: eillon <yezhenyu2@huawei.com>
->> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
->> ---
->>   arch/arm64/Kconfig                  | 14 ++++++++++++++
->>   arch/arm64/include/asm/cpucaps.h    |  2 ++
->>   arch/arm64/include/asm/cpufeature.h |  5 +++++
->>   arch/arm64/include/asm/kvm_host.h   |  4 ++++
->>   arch/arm64/include/asm/sysreg.h     | 12 ++++++++++++
->>   arch/arm64/kernel/cpufeature.c      |  9 +++++++++
->>   arch/arm64/tools/cpucaps            |  1 +
->>   include/uapi/linux/kvm.h            |  1 +
->>   tools/include/uapi/linux/kvm.h      |  1 +
->>   9 files changed, 49 insertions(+)
->>
->> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
->> index 6663ffd23f25..1edf75888a09 100644
->> --- a/arch/arm64/Kconfig
->> +++ b/arch/arm64/Kconfig
->> @@ -2201,6 +2201,20 @@ config ARM64_GCS
->>
->>   endmenu # "ARMv9.4 architectural features"
->>
->> +menu "ARMv9.5 architectural features"
->> +
->> +config ARM64_HDBSS
->> +	bool "Enable support for Hardware Dirty state tracking Structure (HDBSS)"
->> +	help
->> +	  Hardware Dirty state tracking Structure(HDBSS) enhances tracking
->> +	  translation table descriptors' dirty state to reduce the cost of
->> +	  surveying for dirtied granules.
->> +
->> +	  The feature introduces new assembly registers (HDBSSBR_EL2 and
->> +	  HDBSSPROD_EL2), which are accessed via generated register accessors.
-> 
-> This last but means nothing to most people.
-> 
-> But more importantly, I really don't want to see this as a config
-> option. KVM comes with "battery included", and all features should be
-> available at all times.
-HDBSS is only designed for KVM, and I agree that it shouldn't be
-controlled by a config option. I will remove it.
+Meanwhile, personally I'm also not sure if we should have "unlikely" here..
+My gut feeling is in reality we will only have two major use cases:
 
-By the way, I would like to ask for your advice. I have been a bit
-confused about when exactly it is necessary to add a config option in
-Kconfig for a feature.
+  (a) when userfaultfd minor isn't in the picture
+
+  (b) when userfaultfd minor registered and actively being used (e.g. in a
+      postcopy process)
+
+Then without likely, IIUC the hardware should optimize path selected hence
+both a+b performs almost equally well.
+
+My guessing is after adding unlikely, (a) works well, but (b) works badly.
+We may need to measure it, IIUC it's part of the reason why we sometimes do
+not encourage "likely/unlikely".  But that's only my guess, some numbers
+would be more helpful.
+
+One thing we can try is if we add "unlikely" then compare a sequential
+MINOR fault trapping on shmem and measure the time it takes, we need to
+better make sure we don't regress perf there.  I wonder if James / Axel
+would care about it - QEMU doesn't yet support minor, but will soon, and we
+will also prefer better perf since the start.
+
 > 
->> +
->> +endmenu # "ARMv9.5 architectural features"
->> +
->>   config ARM64_SVE
->>   	bool "ARM Scalable Vector Extension support"
->>   	default y
->> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
->> index 9d769291a306..5e5a26f28dec 100644
->> --- a/arch/arm64/include/asm/cpucaps.h
->> +++ b/arch/arm64/include/asm/cpucaps.h
->> @@ -48,6 +48,8 @@ cpucap_is_possible(const unsigned int cap)
->>   		return IS_ENABLED(CONFIG_ARM64_GCS);
->>   	case ARM64_HAFT:
->>   		return IS_ENABLED(CONFIG_ARM64_HAFT);
->> +	case ARM64_HAS_HDBSS:
->> +		return IS_ENABLED(CONFIG_ARM64_HDBSS);
->>   	case ARM64_UNMAP_KERNEL_AT_EL0:
->>   		return IS_ENABLED(CONFIG_UNMAP_KERNEL_AT_EL0);
->>   	case ARM64_WORKAROUND_843419:
->> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
->> index e223cbf350e4..b231415a2b76 100644
->> --- a/arch/arm64/include/asm/cpufeature.h
->> +++ b/arch/arm64/include/asm/cpufeature.h
->> @@ -856,6 +856,11 @@ static inline bool system_supports_haft(void)
->>   	return cpus_have_final_cap(ARM64_HAFT);
->>   }
->>
->> +static inline bool system_supports_hdbss(void)
->> +{
->> +	return cpus_have_final_cap(ARM64_HAS_HDBSS);
->> +}
->> +
->>   static __always_inline bool system_supports_mpam(void)
->>   {
->>   	return alternative_has_cap_unlikely(ARM64_MPAM);
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 64302c438355..d962932f0e5f 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -60,6 +60,10 @@
->>
->>   #define KVM_HAVE_MMU_RWLOCK
->>
->> +/* HDBSS entry field definitions */
->> +#define HDBSS_ENTRY_VALID BIT(0)
->> +#define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
->> +
+> As for MISSING, let's take it baby steps. We have enough space in
+> vm_fault_reason for UFFD_MISSING if we'd want to pull handle_userfault()
+> from shmem and hugetlb.
+
+Yep.
+
+>  
+> > If it's me, I'd simply export handle_userfault()..  I confess I still don't
+> > know why exporting it is a problem, but maybe I missed something.
 > 
-> None of this is used here. Move it to the patch where it belongs.
-I will move HDBSS_ENTRY_VALID and HDBSS_ENTRY_IPA to next patch.
-> 
->>   /*
->>    * Mode of operation configurable with kvm-arm.mode early param.
->>    * See Documentation/admin-guide/kernel-parameters.txt for more information.
->> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
->> index c231d2a3e515..3511edea1fbc 100644
->> --- a/arch/arm64/include/asm/sysreg.h
->> +++ b/arch/arm64/include/asm/sysreg.h
->> @@ -1129,6 +1129,18 @@
->>   #define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
->>   #define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
->>
->> +/*
->> + * Definitions for the HDBSS feature
->> + */
->> +#define HDBSS_MAX_SIZE		HDBSSBR_EL2_SZ_2MB
->> +
->> +#define HDBSSBR_EL2(baddr, sz)	(((baddr) & GENMASK(55, 12 + sz)) | \
->> +				 FIELD_PREP(HDBSSBR_EL2_SZ_MASK, sz))
->> +#define HDBSSBR_BADDR(br)	((br) & GENMASK(55, (12 + HDBSSBR_SZ(br))))
->> +#define HDBSSBR_SZ(br)		FIELD_GET(HDBSSBR_EL2_SZ_MASK, br)
-> 
-> This is a bit backward. When would you need to read-back and mask
-> random bits off the register?
-I will delete the definitions of HDBSSBR_BADDR and HDBSSBR_SZ.
-> 
->> +
->> +#define HDBSSPROD_IDX(prod)	FIELD_GET(HDBSSPROD_EL2_INDEX_MASK, prod)
->> +
-> 
-> As previously said, these definitions don't serve any purpose here,
-> and would be better in the following patch.
-I will move all the HDBSS definitions to the next patch where they
-are actually used.
-> 
->>   #define ARM64_FEATURE_FIELD_BITS	4
->>
->>   #ifdef __ASSEMBLY__
->> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->> index e25b0f84a22d..f39973b68bdb 100644
->> --- a/arch/arm64/kernel/cpufeature.c
->> +++ b/arch/arm64/kernel/cpufeature.c
->> @@ -2710,6 +2710,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->>   		.matches = has_cpuid_feature,
->>   		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HAFT)
->>   	},
->> +#endif
->> +#ifdef CONFIG_ARM64_HDBSS
->> +	{
->> +		.desc = "Hardware Dirty state tracking structure (HDBSS)",
->> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
->> +		.capability = ARM64_HAS_HDBSS,
->> +		.matches = has_cpuid_feature,
->> +		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HDBSS)
->> +	},
-> 
-> I think this is one of the features we should restrict to VHE. I don't
-> imagine pKVM ever making use of this, and no non-VHE HW will ever
-> build this.
-> 
-> Thanks,
-I will add a new helper function that checks both VHE and the CPUID
-feature, and use it in place of has_cpuid_feature in the .matches field.
-> 
-> 	M.
-> 
+> It's not only about export, it's also about not requiring ->fault()
+> methods for pte-mapped memory call handle_userfault().
+
+I also don't see it a problem.. as what shmem used to do.  Maybe it's a
+personal preference?  If so, I don't have a strong opinion.
+
+Just to mention, if we want, I think we have at least one more option to do
+the same thing, but without even introducing a new flag to ->fault()
+retval.
+
+That is, when we have get_folio() around, we can essentially do two faults
+in sequence, one lighter then the real one, only for minor vmas, something
+like (I didn't think deeper, so only a rough idea shown):
+
+__do_fault():
+  if (uffd_minor(vma)) {
+    ...
+    folio = vma->get_folio(...);
+    if (folio)
+       return handle_userfault(vmf, VM_UFFD_MINOR);
+    // fallthrough, which imply a cache miss
+  }
+  ret = vma->vm_ops->fault(vmf);
+  ...
+
+The risk of above is also perf-wise, but it's another angle where it might
+slow down page cache miss case where MINOR is registered only (hence, when
+cache missing we'll need to call both get_folio() and fault() now).
+However that's likely a less critical case than the unlikely, and I'm also
+guessing due to the shared code of get_folio() / fault(), codes will be
+preheated and it may not be measureable even if we write it like that.
+
+Then maybe we can avoid this new flag completely but also achieve the same
+goal.
+
+Thanks,
+
+-- 
+Peter Xu
 
 
