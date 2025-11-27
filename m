@@ -1,70 +1,66 @@
-Return-Path: <kvm+bounces-64890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68BB3C8F873
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 17:35:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BA9AC8F88E
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 17:38:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28FA33AC323
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 16:35:21 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A20023457E2
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 16:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 436F42D876F;
-	Thu, 27 Nov 2025 16:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1247F2D9EDA;
+	Thu, 27 Nov 2025 16:38:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H/yIzEHB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WsAiDcPO"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506142D7D2F;
-	Thu, 27 Nov 2025 16:35:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E633D2D94B2;
+	Thu, 27 Nov 2025 16:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764261306; cv=none; b=F8O6MAZ+BFqqz7iBLBVvUj+qGkYD/weNG3h2FIEe38j3qQR3hQgfWYdmKnhQh7FCnvnha1HpJYvQHBgZQfAtlBB/gHPJtcTF7iV2IfwbLpC1NJ9FAF5luYsT7yVDuWu+4QULLoSFcBevjOGlj+GYCX/ooNHjq7Odau2SoQZqzp8=
+	t=1764261518; cv=none; b=Mn6OaNmesv58OgA0icYP9hovXAXeEi8/yBPhfq97pj/I/NSsXWS1dYU2kvMfoh6QIDJlm0gzfS16BnP6UTSOvv+f62YVPvn7g7HbFg+muxs5kfH6ca3G+bJsr36mAk4nYwuQac89nyg3T/cfmAnJKTDO8YB1GbROXDa5mfG9RUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764261306; c=relaxed/simple;
-	bh=pcPnY+ycw5GanEcyc3wlmZfHh6vRFdVFnRa3R9CCU84=;
+	s=arc-20240116; t=1764261518; c=relaxed/simple;
+	bh=KbmAovPW7NQWTvYbrFMMlfWlRV/+WdW1rESMqn+8NHs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XxZLhRa+ZEsAvPU9pfqoZB12+bjeOTIvmi2So/8tUrV2TRWh4vP5CDf6QfsY2FFNcd84CfFYpHH8oHYUKJLJzVkP8yNEt7hQgujAqoqjkmPFkVfSaTtK7Kkg5s6ppF0ba58sErSUZ8yrMvh1xUIxSD03/8VkweZLcyxr0MOG/Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H/yIzEHB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D5BC4CEF8;
-	Thu, 27 Nov 2025 16:35:04 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TtKiorqB51WtZiXvliYqlShSVXDCScys8iAIzf5cTCLA150YaJBjCSBnuBQVUOZDkF2ysIB0RKpIZ9/pSVE1G9vx4ySSMHc6Agln7Zsc4+yUHoQ29eXhLXcg4wHXZhP0MJK/SWsC2vZXILdY0kXcGtlYg3y8BXZYPwI35lKUizk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WsAiDcPO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75181C4CEF8;
+	Thu, 27 Nov 2025 16:38:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764261304;
-	bh=pcPnY+ycw5GanEcyc3wlmZfHh6vRFdVFnRa3R9CCU84=;
+	s=k20201202; t=1764261517;
+	bh=KbmAovPW7NQWTvYbrFMMlfWlRV/+WdW1rESMqn+8NHs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H/yIzEHB6lHfOKelYR+OmrHt20LA1UPyz9B+YAichkI/S8UCd0LRRfNMeqlYH/Mou
-	 nr4RO+wmNtXEPDiwUL9OETfNIHDwoTukxNfK3yDcgei9YnWQeM6uz7vxc/SgkZNwR4
-	 88pvBiNaBE7716+Lh+qqxU6knFvsbvbG+oQI+BF6Da0Q9aae2BdzhzQo17Kkz9rQ5F
-	 uZsuTiPao6s+ka2gmKUxGAvIfYqiCadNiybcAL2HqIhEHpyZfCspUBx0M3++DzbuCe
-	 NZPdgdALx9Mq50Iv5/VjzxUjcoZbLHRYRXqebfp1+15SslqYQqCEcdXSu+8cTxaT+6
-	 Ln0eSlJa7Yncw==
+	b=WsAiDcPOO4FIOb14VhhEGIB50XdJvbCLmbPd35/OPwREufanSEr51f1qjWCpKKqNT
+	 47JLTP6HCvTw9QHmDm6o1CSdAoHMijlB4tIgKxy3XqBp8fUsTdTWnxP4lYzJeN64W+
+	 q64zShkrBuqBFuKfPmXMCPAZlGlK3EtSzh5LOZWxeITg+eZMJwv0FMW6cl82N/WnL6
+	 EjMHl7LhYTq1EpNJbZ4zHt9w+C4WCgJgXhk0057Nqd9wzRUfipnqvCsTnHkb7hwlbK
+	 l4I7qymtKdrq3rAZt4JG/B8Tg66DcHCTblo3aaL2U99KpIJJvpPI351Oj9vCt7XtYC
+	 YErMvBDsBZF+g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vOexS-00000008qt8-2eTc;
-	Thu, 27 Nov 2025 16:35:02 +0000
-Date: Thu, 27 Nov 2025 16:35:02 +0000
-Message-ID: <86zf87ph6x.wl-maz@kernel.org>
+	id 1vOf0t-00000008qxk-1IgN;
+	Thu, 27 Nov 2025 16:38:35 +0000
+Date: Thu, 27 Nov 2025 16:38:34 +0000
+Message-ID: <86y0nrph11.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Yao Yuan <yaoyuan@linux.alibaba.com>,
-	kvmarm@lists.linux.dev,
+To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Ben Horgan <ben.horgan@arm.com>
-Subject: Re: [PATCH v2 4/5] KVM: arm64: Report optional ID register traps with a 0x18 syndrome
-In-Reply-To: <aSfzJxBfdI17pyPD@kernel.org>
+Subject: Re: [PATCH v2 0/5] KVM: arm64: Add support for FEAT_IDST
+In-Reply-To: <20251126155951.1146317-1-maz@kernel.org>
 References: <20251126155951.1146317-1-maz@kernel.org>
-	<20251126155951.1146317-5-maz@kernel.org>
-	<dk6bwi72nwfty6qpbh2eaeubznqt74gjffas2rclrrwjn5tr6j@mjitrla3p3d7>
-	<aSfzJxBfdI17pyPD@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,60 +72,28 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, yaoyuan@linux.alibaba.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ben.horgan@arm.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, ben.horgan@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 27 Nov 2025 06:43:51 +0000,
-Oliver Upton <oupton@kernel.org> wrote:
+On Wed, 26 Nov 2025 15:59:46 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> On Thu, Nov 27, 2025 at 02:07:08PM +0800, Yao Yuan wrote:
-> > On Wed, Nov 26, 2025 at 03:59:50PM +0800, Marc Zyngier wrote:
-> > > With FEAT_IDST, unimplemented system registers in the feature ID space
-> > > must be reported using EC=0x18 at the closest handling EL, rather than
-> > > with an UNDEF.
-> > >
-> > > Most of these system registers are always implemented thanks to their
-> > > dependency on FEAT_AA64, except for a set of (currently) three registers:
-> > > GMID_EL1 (depending on MTE2), CCSIDR2_EL1 (depending on FEAT_CCIDX),
-> > > and SMIDR_EL1 (depending on SME).
-> > >
-> > > For these three registers, report their trap as EC=0x18 if they
-> > > end-up trapping into KVM and that FEAT_IDST is not implemented in the
-> > > guest. Otherwise, just make them UNDEF.
-> > >
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/sys_regs.c | 16 +++++++++++++---
-> > >  1 file changed, 13 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index 2ca6862e935b5..7705f703e7c6d 100644
-> > > --- a/arch/arm64/kvm/sys_regs.c
-> > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -82,6 +82,16 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
-> > >  			"sys_reg write to read-only register");
-> > >  }
-> > >
-> > > +static bool idst_access(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> > > +			const struct sys_reg_desc *r)
-> > > +{
-> > > +	if (kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, IDS, 0x0))
-> > 
-> > Hi Marc,
-> > 
-> > Minor: maybe beter readability if use NI instead of 0x0, just like
-> > things in feat_nv2() below, but depends on you.
+> FEAT_IDST appeared in ARMv8.4, and allows ID registers to be trapped
+> if they are not implemented. This only concerns 3 registers (GMID_EL1,
+> CCSIDR2_EL1 and SMIDR_EL1), which are part of features that may not be
+> exposed to the guest even if present on the host.
 > 
-> +1, using the ESR value as an identifier in the sysreg tables is just
-> terrible. This reads like a literal.
+> For these registers, the HW should report them with EC=0x18, even if
+> the feature isn't implemented.
+> 
+> Add support for this feature by handling these registers in a specific
+> way and implementing GMID_EL1 support in the process. A very basic
+> selftest checks that these registers behave as expected.
 
-Yeah, I was a bit shocked when I found how it was encoded in the
-sysreg file, but kept it as is. Since there is a consensus that this
-is pretty lame, I'll add a patch repainting it using the usual NI/IMP
-identifiers.
-
-Thanks,
+Except that said selftest indicates that pKVM doesn't do the right
+thing and requires similar rework. I now have some patches to address
+it, and will repost the series sometime next week.
 
 	M.
 
