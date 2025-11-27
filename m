@@ -1,79 +1,95 @@
-Return-Path: <kvm+bounces-64893-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64894-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A695C8F8E9
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 17:55:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8043C8F93A
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 18:00:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7C01E34441D
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 16:55:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8AAE74E19C0
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 17:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A083385B9;
-	Thu, 27 Nov 2025 16:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896DC2DC341;
+	Thu, 27 Nov 2025 17:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="ZD8DZort"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ERSHELQl";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="mQ3Y28wU";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ERSHELQl";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="mQ3Y28wU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6C925332E
-	for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 16:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B9F2D027E
+	for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 17:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764262532; cv=none; b=kRxbXnTmojButsgYUY4pefdBQNcZpR/0eDBWsqkJBNAmE/hpn2JaLCojarn5fWl6zFX0thhZqfJ7vw31waKsAg1VaSij8ITSRVbKu6piPLLNtu1Z4BBDqsworwIWcHlSaXexxrbDgg5c2cT5KYgGFSNBrjRE1KZv+kCXpBJhUGU=
+	t=1764262823; cv=none; b=AoYvnNbtztEmNGRur3gHnjmUuefGYVCTbTabaOTe0AicmHhabSb1OpB+ab+GS8QCfugfTgJsGuSWvWkYT4ESkR6QzZgzP/M6grAKT51HFZeQ+JgXSwq0/K1id8rSMMNtu9qi/iv3gCxKU2vgwl3bBxp8G/Uixw24S5MTCOC1rfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764262532; c=relaxed/simple;
-	bh=IeJtPHg77YUC6PRv69OZcOoEvbzlzVHFg4enDQEEKAw=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=I8PYZEAHpXBzmM1JqkKZwZnfoIC+xIqlQOa6thFhs8fU2mGfhxFuL5+Hu1dJwvcxTKVWtkcZvP7UsS9uSdq3LK/IsmIR07RT32TRMyNPT5AxgdrmYKtL+FKesgCEcW+8e5cTlqeJudif2ZPHZv2yjRx1v+VD8pxdGRkrNwZttM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=citrix.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=ZD8DZort; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=citrix.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-477b1cc8fb4so6082385e9.1
-        for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 08:55:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=citrix.com; s=google; t=1764262529; x=1764867329; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:subject:references:cc:to:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=IeJtPHg77YUC6PRv69OZcOoEvbzlzVHFg4enDQEEKAw=;
-        b=ZD8DZortgSKH9k8526fMPvGkY8LKo4aia8Py8fFPIz2h/RnWtEOj5Mft+aJwJSqfEg
-         lVQcHCGR9x60b4q6rJO7JkaV5A+SGhesyxRjz/FbJ9DU11ImUqBQO9/z6Ur29eNyFCSA
-         ai4xQWQ+fszjCqQM2Amqy/ZpoW2LAyAl2o6yU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764262529; x=1764867329;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:subject:references:cc:to:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IeJtPHg77YUC6PRv69OZcOoEvbzlzVHFg4enDQEEKAw=;
-        b=D9JpQFqQSck1dZAIV5MpL10oQ1nuxEF8XmZJwPorGq7lFZEXDxQZdbr3MOdZxuab0M
-         NblcvNDxN+ITaGcUWip0gWxVXy6z7h9LUnFD0b71UkkmLtGAYydw5zR4db/JJtALoU9N
-         zmFkYUXt/H+h435VuUvmAGHoE059dc9dB1cs9hHy0Q/qADni+gEG2L/ljWfzKgnMVKzP
-         Zua5wFTv0On4tM/00w21nSaVRFhwxBvt5RClQkRnuoc4UsuyK2Tu53S8AcY9XvU6atz1
-         vRBZb73Z7JZ49mmUMcAoZkT5gn4IclB+DxQZ9q3nFixwr6B7nBzJMQHXknu8z8pRez9R
-         egXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDdSleJCJLEglXuaYbdBlSxy35IkKzvgVNddbVXfP0k8B8CRb9e5Z0XNfrlECT6xvhjKo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxwjk9o1xX2PFlcp7mB4NcOiLNulmJTvDB8XMUB0IgjTiETO7Uw
-	bjbcKHOaOLDXmAPngi3iIS2dn6reAzkhlpi7jJF1d8oGbmk1bSCgvivF++muTmiK8vo=
-X-Gm-Gg: ASbGnctyzcGGELFuzCGeEJc5UUdUw8l/ds9jt2qPC96+bXRE/8KF+2RGIUiYKcTf7t1
-	RXxm7xmLeRWdhSYhYw5rGCr/C+KSw+c8EmY507prLyeUTxX//gWZmFHN1f5fRFkMB0vulMwEgkc
-	Wgbe+CN4AGpRr8z582q+vKUpBVnFPWpDvh3yI6ZXvbyLWxDjVjeklvXhBRJkl9683369YjcGvWB
-	mayeMbw7d4JF30bXkbWTNQyWEweSH5pmV9UtuFbsJvLoKzZSUlurbTb11432x628OfGAiSOs6Ge
-	cv0B0wtA5E+UgdzwS2hDjYhiDAXTPXnotU064DWnTto7O8yyH2zdk5TTFCrTVaxcPHKAMuHk+Rb
-	1c9GBCAvDtvBIZreEhVQhS8dRcTgEqSQKMfdFPy2YyV5RXlV3Arjsx3nSzoCgdpMxek1KJyjI1E
-	O7OaOzVZ/IdINUf/5UdQFZoQpVzxTRWFLb6vBo9l7lfiSb1nWFdBQ5
-X-Google-Smtp-Source: AGHT+IFqLmk3E13nTcdaR5/YH8vHx+R6IrCKP0URG1h1SzYYVaO5JZAy86O9ETe+kCquQNS6YUPBjQ==
-X-Received: by 2002:a05:600c:4ed3:b0:477:b734:8c22 with SMTP id 5b1f17b1804b1-47904ad05bbmr111716425e9.8.1764262528611;
-        Thu, 27 Nov 2025 08:55:28 -0800 (PST)
-Received: from [192.168.1.37] (host-92-29-237-183.as13285.net. [92.29.237.183])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-479052def4bsm69390685e9.13.2025.11.27.08.55.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Nov 2025 08:55:28 -0800 (PST)
-Message-ID: <4676722f-98a3-4217-a357-068440dc6e14@citrix.com>
-Date: Thu, 27 Nov 2025 16:55:27 +0000
+	s=arc-20240116; t=1764262823; c=relaxed/simple;
+	bh=+hnO4TY9T+nASXSErYan2fnxZNfKsWigWvdgMEPcEEA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NJ1NEGzW1cVFi3po3whbd27uTXlIQxUG5R5afd4KXxAnc5BC0xhVElNu35OqpEl783D7y6zMxhurkpwZPPZuDm21RRa4te2LotTA2fDDH3Wr0rZGFisQsch7XgAfueibyMJszyPcQilOm9pT8eFDIDVokg2H5Vzrg/9tbsTaZ1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ERSHELQl; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=mQ3Y28wU; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ERSHELQl; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=mQ3Y28wU; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 0A45C219DE;
+	Thu, 27 Nov 2025 17:00:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1764262819; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=c67LjBa5JtjIC6K1nDTL3mxFIcVdzFmTVEnOKZiAqm0=;
+	b=ERSHELQlwm+nOrI/ThkX2ZfyikTLfFaEdEBlYZL621PydLzMEqLue3TNr21gxrJa9xFsuT
+	vzvjbbUfU5FiOyhTT19/BR48mkipPX+vKodF9hyy/tMS0ujzic2icA1Mm0q12YMZM+0D92
+	ttl1KAljZYswsKkIiBKic2Nq98Qg38A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1764262819;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=c67LjBa5JtjIC6K1nDTL3mxFIcVdzFmTVEnOKZiAqm0=;
+	b=mQ3Y28wUbEcgjAao8nV4G4bYlJDbYfrr5KCqwBi0QG2NpYPSoc9TbbJW/FzojbY4sE81RN
+	AwnCSb9k9hWR7UCQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1764262819; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=c67LjBa5JtjIC6K1nDTL3mxFIcVdzFmTVEnOKZiAqm0=;
+	b=ERSHELQlwm+nOrI/ThkX2ZfyikTLfFaEdEBlYZL621PydLzMEqLue3TNr21gxrJa9xFsuT
+	vzvjbbUfU5FiOyhTT19/BR48mkipPX+vKodF9hyy/tMS0ujzic2icA1Mm0q12YMZM+0D92
+	ttl1KAljZYswsKkIiBKic2Nq98Qg38A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1764262819;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=c67LjBa5JtjIC6K1nDTL3mxFIcVdzFmTVEnOKZiAqm0=;
+	b=mQ3Y28wUbEcgjAao8nV4G4bYlJDbYfrr5KCqwBi0QG2NpYPSoc9TbbJW/FzojbY4sE81RN
+	AwnCSb9k9hWR7UCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 82D643EA63;
+	Thu, 27 Nov 2025 17:00:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ujPmHqKDKGm3IQAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Thu, 27 Nov 2025 17:00:18 +0000
+Message-ID: <67da7b44-6975-44c2-b37d-9fadf7dceff8@suse.cz>
+Date: Thu, 27 Nov 2025 18:00:18 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,99 +97,143 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: kas@kernel.org
-Cc: bp@alien8.de, chao.p.peng@intel.com, chenyi.qiang@intel.com,
- dave.hansen@linux.intel.com, hpa@zytor.com, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, mingo@redhat.com,
- reinette.chatre@intel.com, rick.p.edgecombe@intel.com, tglx@linutronix.de,
- x86@kernel.org, xiaoyao.li@intel.com,
- Andrew Cooper <andrew.cooper3@citrix.com>
-References: <f2hkqt5xtmej7cfnuytigcfszr3qja4l6ywww4qrqxjbqmlko2@r75b6deae2hd>
-Subject: Re: [PATCH 1/2] x86/split_lock: Don't try to handle user split lock
- in TDX guest
-Content-Language: en-GB
-From: Andrew Cooper <andrew.cooper3@citrix.com>
-Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
- 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
- 6+ahAA==
-In-Reply-To: <f2hkqt5xtmej7cfnuytigcfszr3qja4l6ywww4qrqxjbqmlko2@r75b6deae2hd>
+Subject: Re: [PATCH v3 11/16] mm: introduce pmd_is_huge() and use where
+ appropriate
+Content-Language: en-US
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Arnd Bergmann <arnd@arndb.de>, Zi Yan <ziy@nvidia.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache
+ <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+ Lance Yang <lance.yang@linux.dev>, Muchun Song <muchun.song@linux.dev>,
+ Oscar Salvador <osalvador@suse.de>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Matthew Brost <matthew.brost@intel.com>,
+ Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+ Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
+ Ying Huang <ying.huang@linux.alibaba.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
+ Wei Xu <weixugc@google.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
+ Kairui Song <kasong@tencent.com>, Nhat Pham <nphamcs@gmail.com>,
+ Baoquan He <bhe@redhat.com>, Chris Li <chrisl@kernel.org>,
+ SeongJae Park <sj@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
+ Jann Horn <jannh@google.com>, Miaohe Lin <linmiaohe@huawei.com>,
+ Naoya Horiguchi <nao.horiguchi@gmail.com>, Pedro Falcato <pfalcato@suse.de>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, Rik van Riel <riel@surriel.com>,
+ Harry Yoo <harry.yoo@oracle.com>, Hugh Dickins <hughd@google.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-arch@vger.kernel.org, damon@lists.linux.dev
+References: <cover.1762812360.git.lorenzo.stoakes@oracle.com>
+ <00f79db3b15293cac8f7040a48d69c52d00117e4.1762812360.git.lorenzo.stoakes@oracle.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <00f79db3b15293cac8f7040a48d69c52d00117e4.1762812360.git.lorenzo.stoakes@oracle.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	TAGGED_RCPT(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[linux.ibm.com,redhat.com,zeniv.linux.org.uk,kernel.org,suse.cz,arndb.de,nvidia.com,linux.alibaba.com,oracle.com,arm.com,linux.dev,suse.de,google.com,suse.com,intel.com,gmail.com,sk.com,gourry.net,huaweicloud.com,tencent.com,infradead.org,ziepe.ca,zte.com.cn,huawei.com,soleen.com,surriel.com,vger.kernel.org,kvack.org,lists.linux.dev];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[65];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:mid,suse.cz:email]
+X-Spam-Level: 
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
-> I am not sure. Leaving it as produces produces false messages which is
-> not good, but not critical.
->
-> Maybe just clear X86_FEATURE_BUS_LOCK_DETECT and stop pretending we
-> control split-lock behaviour from the guest?
+On 11/10/25 23:21, Lorenzo Stoakes wrote:
+> The leaf entry PMD case is confusing as only migration entries and
+> device private entries are valid at PMD level, not true swap entries.
+> 
+> We repeatedly perform checks of the form is_swap_pmd() || pmd_trans_huge()
+> which is itself confusing - it implies that leaf entries at PMD level exist
+> and are different from huge entries.
+> 
+> Address this confusion by introduced pmd_is_huge() which checks for either
+> case. Sadly due to header dependency issues (huge_mm.h is included very
+> early on in headers and cannot really rely on much else) we cannot use
+> pmd_is_valid_softleaf() here.
+> 
+> However since these are the only valid, handled cases the function is still
+> achieving what it intends to do.
+> 
+> We then replace all instances of is_swap_pmd() || pmd_trans_huge() with
+> pmd_is_huge() invocations and adjust logic accordingly to accommodate
+> this.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
-(Having just played with this mess for another task) you're talking
-about two different things.
+Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
 
-Sapphire Rapids has an architectural BUS_LOCK_DETECT (trap semantics,
-#DB or VMExit), and a model-specific BUS_LOCK_DISABLE.
-
-It's BUS_LOCK_DISABLE which generates #AC, with fault semantics,
-preventing forward progress.  It also means the Bus Lock didn't happen,
-and there's nothing to trigger the BUS_LOCK_DETECT (trap) behaviour.
-
-Given that TDX is enabling BUS_LOCK_DISABLE, it's probably also enabling
-UC_LOCK_DISABLE (causes #GP) too.
-
-Looking at the backtrace:
-
-  x86/split lock detection: #AC: split_lock/1176 took a split_lock trap at address: 0x5630b30921f9
-  unchecked MSR access error: WRMSR to 0x33 (tried to write 0x0000000000000000) at rIP: 0xffffffff812a061f (native_write_msr+0xf/0x30)
-
-
-First, "took a split_lock trap" is wrong.  It's a fault, not a trap.
-
-Second, because the attempt to disable BUS_LOCK_DISABLE was blocked,
-simply retrying the instruction will generate a new #AC and livelock. 
-Linux probably ought to raise SIGSEGV with userspace, for want of
-anything better to do.
-
-It looks like software in a TDX VM will simply have to accept that it
-cannot cause a bus lock.
-
-~Andrew
 
