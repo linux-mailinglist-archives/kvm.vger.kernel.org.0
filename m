@@ -1,71 +1,50 @@
-Return-Path: <kvm+bounces-64862-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64863-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B03DC8DD04
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 11:39:21 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1A9AC8DD16
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 11:41:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D16AF3A9BE9
-	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 10:39:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 27F6D34534E
+	for <lists+kvm@lfdr.de>; Thu, 27 Nov 2025 10:41:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E51032A3F0;
-	Thu, 27 Nov 2025 10:39:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tdrDspf9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EACF329E4F;
+	Thu, 27 Nov 2025 10:41:09 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3911F79DA;
-	Thu, 27 Nov 2025 10:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2315379DA
+	for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 10:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764239949; cv=none; b=NeozrHycz+6xbcRbU6kGyNkz6OiYEECuA4dQKkJ2mzSJD89/+BOOctsLf6domJEBYbjOB2W6MM2D+xN6LoKdIyFeoO0kwQQvw0kCd90Pz84WvWuo76dxTgr5hrZwDvheLP0MPO4duJVpzhw/x7h7H7EtePWcnxmcUa7sGBl92r0=
+	t=1764240069; cv=none; b=NUIoKA52JAjYdT7x2kKpnSEVoUQI9Un0jVHaQiB5PmHy+nazPL5gAjdyLGh2pGAVu3zHsLWuKk0GiGJCrQVlkVnFAToKPEHIZLX8xEWtK1IG9JSyPzp2PfFC7Ae87AqtW2kagKrRZPIImTLvn0MR5BSnMXOBX+IdFbr1UEj39Z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764239949; c=relaxed/simple;
-	bh=9o1jZ8Oj1DOfr27ZVVqlDJBNXIj4fytpgJFoLZErDXI=;
+	s=arc-20240116; t=1764240069; c=relaxed/simple;
+	bh=L8S7X2ILcrEGd7YmC0JEf3ASiZy8DsNlBWR/cTWH2ro=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o4PEI6KZxDT/d889ZtcWKTszqMQ969k8GBM/TxQ6mHbweU+pUUZ56Rx8QpxA9WvGYMbRu/gqj6ycsGo4INaSLyxrzFQKF7HLOJM8soEGwhqDAYsckFvz/azl8QVXYOIMX0z1DJh2F/H/8aRhoAUsrUr6lw12bT7J31QZeJ6s5fI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tdrDspf9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 645DAC4CEF8;
-	Thu, 27 Nov 2025 10:39:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764239948;
-	bh=9o1jZ8Oj1DOfr27ZVVqlDJBNXIj4fytpgJFoLZErDXI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tdrDspf9sqnTmBIOYvod/rDMAzZHXGCJUoTEMVvCLFgKmKUvLHn5KthSzXHbY6DSN
-	 28Z3u+Vwg+5o4ehdfQ103R8cHF9GtKLFVGP3pS75Ki8zXd01n0cFocmT5blduWNEqw
-	 0bR+FC4GR0WFX1oXAPfY8krmw/qKdRuLUL3CUfAD1z6hW1ZUpG775MHQOHRUKm41fR
-	 7CJ0N5WxfPiUUWCb64he8prtusjo1bMXC/oZpGVl8c8xzIiZLmEsQCGXI09cjE3Aws
-	 4VoXilNuLmNFvFDSP9LZXia/IMiIXD+vMwsGwgYo0kXizRa9fcc+HbTNbuM1MHskpK
-	 xZ52bPX4oQM9Q==
-Date: Thu, 27 Nov 2025 12:39:00 +0200
-From: Mike Rapoport <rppt@kernel.org>
-To: Nikita Kalyazin <kalyazin@amazon.com>
-Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	David Hildenbrand <david@redhat.com>,
-	Hugh Dickins <hughd@google.com>,
-	James Houghton <jthoughton@google.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Michal Hocko <mhocko@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Peter Xu <peterx@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 5/5] KVM: selftests: test userfaultfd minor for
- guest_memfd
-Message-ID: <aSgqRAF6Ih8u6fdP@kernel.org>
-References: <20251125183840.2368510-1-rppt@kernel.org>
- <20251125183840.2368510-6-rppt@kernel.org>
- <18b4cddb-3e04-4272-9f04-6857cea70ff5@amazon.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z+OyrVHo3BjRuhlAuMU5OA7ayZPN5XYiAVGgBQbhun791XBE+tUvjF5M01TJM3c7zkuGixQoUyaFyIk57CM8Jq1TC/wqz7QFLrtKm9Cy0CZmqiHOrweZ6ev7cY/hmsJXAwvRKkIiac++bSdlPArzkisGlo1QD76c3OyKQwR9ey4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 074D81477;
+	Thu, 27 Nov 2025 02:40:59 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 313993F6A8;
+	Thu, 27 Nov 2025 02:41:05 -0800 (PST)
+Date: Thu, 27 Nov 2025 10:40:59 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, andrew.jones@linux.dev,
+	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v3 10/10] arm64: add EL2 environment
+ variable
+Message-ID: <20251127104059.GA3237269@e124191.cambridge.arm.com>
+References: <20250925141958.468311-1-joey.gouly@arm.com>
+ <20250925141958.468311-11-joey.gouly@arm.com>
+ <6e735f02-dbd6-4807-95b3-4043049d4557@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -74,26 +53,58 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <18b4cddb-3e04-4272-9f04-6857cea70ff5@amazon.com>
+In-Reply-To: <6e735f02-dbd6-4807-95b3-4043049d4557@redhat.com>
 
-On Wed, Nov 26, 2025 at 04:49:46PM +0000, Nikita Kalyazin wrote:
-> On 25/11/2025 18:38, Mike Rapoport wrote:
-> > From: Nikita Kalyazin <kalyazin@amazon.com>
-> > 
-> > +static void test_uffd_minor(int fd, size_t total_size)
-> > +{
-> > +       struct uffdio_api uffdio_api = {
-> > +               .api = UFFD_API,
-> > +               .features = UFFD_FEATURE_MINOR_GENERIC,
+On Thu, Nov 27, 2025 at 11:34:56AM +0100, Eric Auger wrote:
+> Hi Joey,
 > 
-> Should it be UFFD_FEATURE_MINOR_SHMEM instead? UFFD_FEATURE_MINOR_GENERIC
-> was removed in the v1.
+> On 9/25/25 4:19 PM, Joey Gouly wrote:
+> > This variable when set to 1 will cause QEMU/kvmtool to start at EL2.
+> 
+> Misses the Sob.
 
-I'll drop .features completely, the checks in UFFDIO_REGISTER are
-sufficient.
- 
+If this counts:
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 
--- 
-Sincerely yours,
-Mike.
+I have fixed kvm-unit-tests to add that automatically to my commits now, thanks.
+
+> 
+> Besides Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks,
+Joey
+
+> 
+> Eric
+> 
+> > ---
+> >  arm/run | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> >
+> > diff --git a/arm/run b/arm/run
+> > index 858333fc..2a9c0de0 100755
+> > --- a/arm/run
+> > +++ b/arm/run
+> > @@ -59,6 +59,10 @@ function arch_run_qemu()
+> >  		M+=",highmem=off"
+> >  	fi
+> >  
+> > +	if [ "$EL2" = "1" ]; then
+> > +		M+=",virtualization=on"
+> > +	fi
+> > +
+> >  	if ! $qemu $M -device '?' | grep -q virtconsole; then
+> >  		echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
+> >  		exit 2
+> > @@ -116,6 +120,9 @@ function arch_run_kvmtool()
+> >  	fi
+> >  
+> >  	command="$(timeout_cmd) $kvmtool run"
+> > +	if [ "$EL2" = "1" ]; then
+> > +		command+=" --nested"
+> > +	fi
+> >  	if [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ]; then
+> >  		run_test_status $command --kernel "$@" --aarch32
+> >  	else
+> 
 
