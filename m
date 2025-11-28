@@ -1,252 +1,344 @@
-Return-Path: <kvm+bounces-64919-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64920-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53048C90CF6
-	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 04:59:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2CC6C90DBA
+	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 05:56:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5F59D3508EE
-	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 03:59:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8037F3AAB40
+	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 04:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849A72D3220;
-	Fri, 28 Nov 2025 03:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E806129BD8C;
+	Fri, 28 Nov 2025 04:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rbHVlZ0y"
 X-Original-To: kvm@vger.kernel.org
-Received: from Atcsqr.andestech.com (60-248-80-70.hinet-ip.hinet.net [60.248.80.70])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D1E149C6F
-	for <kvm@vger.kernel.org>; Fri, 28 Nov 2025 03:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.248.80.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A538B3A1DB
+	for <kvm@vger.kernel.org>; Fri, 28 Nov 2025 04:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764302369; cv=none; b=ATK/WDlyKUwi2QL5Yu9NYGW4LuYv4m7955Zw/3ROkUHfBaaEspEmd2IeXcVm+JnKWu+FHyDxLZp1+Jj978OYvHLrNROveBC7SQdZ65o2Q/XzPSmj4EvYn6bbkItaIlBDQtcBp8XXQGCA8kvKuUbrlm3V5V4b0mZfZ6xcWdLhMIQ=
+	t=1764305792; cv=none; b=GYljflOFAkGlObCf3n5GZYH8YlVu1n85RdX5dJM3SrHvElLkgcij99FnlsIHZCK28MNTaBg3ASzRRX7FlDPm7WZhChyt9eUNvTckwfkqtOkRtvojEMbY7B5MrtELR3wmvd/38CKE72AbBjkKj0SWrzScKMmTL8HVtG9W/6UKYZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764302369; c=relaxed/simple;
-	bh=aK+gMIALIsYPO0/tFUUhubGLbcujlJSnNwTTeG3p3W4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K5IHBKdEULbQjL8OHlE6hfvsWm0twGFf+EHnOW97OgOwT6Df4NBUfR1rsVQrEcNE5spFyJ5wYv3qlrI1eTg5oxKArPrV9ivh3RanQmBTtGH96Rn9xDGQKdcIhiS3s8h9FDvl2I/ry5qnYJo3UjFBnnIdAeEYQhmYe4E13XhonAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=andestech.com; spf=pass smtp.mailfrom=andestech.com; arc=none smtp.client-ip=60.248.80.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=andestech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=andestech.com
-Received: from mail.andestech.com (ATCPCS34.andestech.com [10.0.1.134])
-	by Atcsqr.andestech.com with ESMTPS id 5AS3xEpv039276
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=OK);
-	Fri, 28 Nov 2025 11:59:14 +0800 (+08)
-	(envelope-from minachou@andestech.com)
-Received: from atcsi01.andestech.com (10.0.15.32) by ATCPCS34.andestech.com
- (10.0.1.134) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 28 Nov
- 2025 11:59:14 +0800
-Date: Fri, 28 Nov 2025 11:59:10 +0800
-From: Mina Chou <minachou@andestech.com>
-To: Anup Patel <anup@brainfault.org>
-CC: <atish.patra@linux.dev>, <pjw@kernel.org>, <palmer@dabbelt.com>,
-        <aou@eecs.berkeley.edu>, <alex@ghiti.fr>, <kvm@vger.kernel.org>,
-        <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <tim609@andestech.com>,
-        <ben717@andestech.com>, <az70021@gmail.com>,
-        <rkrcmar@ventanamicro.com>, <nutty.liu@hotmail.com>
-Subject: Re: [PATCH v4] RISC-V: KVM: Flush VS-stage TLB after VCPU migration
- for split two-stage TLBs
-Message-ID: <aSkdyHo0T6BYPF7A@atcsi01.andestech.com>
-References: <20251117084555.157642-1-minachou@andestech.com>
- <CAAhSdy0mS++Oqp6jB8vf5n5Q8EYbFUDYceYxj1R6eH67=X2RZg@mail.gmail.com>
+	s=arc-20240116; t=1764305792; c=relaxed/simple;
+	bh=A4tEGFUsOB0gOg41WwTxn+4fX53errqkR5fTg410RkY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rnm/cpMQ4A6TDllTg4ry8bNMW2b/SmN4gZ/pWf8IwI6uhJudIYRHlalilWQCzLm2J5VIOLVYRezmSFob/rlvZNLpFath5dJS6i1GKC0yhiPAkskI4MYMx8IaZvSazKm+a6Uzqeo86VQTDkWWInullwiB6O3S25KHr0OjW+jixeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rbHVlZ0y; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <dadaeeb9-4008-4450-8b61-e147a2af38b2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764305777;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9ebe88bfWoc62+PfzelpNg5aEt1ZBEBssiBk/kK4cFg=;
+	b=rbHVlZ0yroFH/DlKqTUNzmLAn9D6nHCb5fndBzDYy8StGkcuVE3gEQcwO+ZVD34IAg+6pA
+	u2HA+GUMN/MLGuZyrghkL62KCSQw1gqW4QvWfIHMUTzCmEZNdn4erRb3wQX29hWTVAA31X
+	JyjBSnQuoePAK8gtOh/Imk7G3j+X3no=
+Date: Thu, 27 Nov 2025 20:56:06 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAAhSdy0mS++Oqp6jB8vf5n5Q8EYbFUDYceYxj1R6eH67=X2RZg@mail.gmail.com>
-User-Agent: Mutt/2.2.15 (2025-10-02)
-X-ClientProxiedBy: ATCPCS33.andestech.com (10.0.1.100) To
- ATCPCS34.andestech.com (10.0.1.134)
-X-DKIM-Results: atcpcs34.andestech.com; dkim=none;
-X-DNSRBL: 
-X-SPAM-SOURCE-CHECK: pass
-X-MAIL:Atcsqr.andestech.com 5AS3xEpv039276
+Subject: Re: [PATCH 00/21] vfio/pci: Base support to preserve a VFIO device
+ file across Live Update
+To: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>
+Cc: Adithya Jayachandran <ajayachandra@nvidia.com>,
+ Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>,
+ David Rientjes <rientjes@google.com>,
+ Jacob Pan <jacob.pan@linux.microsoft.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Josh Hilke <jrhilke@google.com>,
+ Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+ Leon Romanovsky <leonro@nvidia.com>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-pci@vger.kernel.org,
+ Lukas Wunner <lukas@wunner.de>, Mike Rapoport <rppt@kernel.org>,
+ Parav Pandit <parav@nvidia.com>, Pasha Tatashin <pasha.tatashin@soleen.com>,
+ Philipp Stanner <pstanner@redhat.com>, Pratyush Yadav <pratyush@kernel.org>,
+ Saeed Mahameed <saeedm@nvidia.com>, Samiullah Khawaja <skhawaja@google.com>,
+ Shuah Khan <shuah@kernel.org>, Tomita Moeko <tomitamoeko@gmail.com>,
+ Vipin Sharma <vipinsh@google.com>, William Tu <witu@nvidia.com>,
+ Yi Liu <yi.l.liu@intel.com>, Yunxiang Li <Yunxiang.Li@amd.com>
+References: <20251126193608.2678510-1-dmatlack@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20251126193608.2678510-1-dmatlack@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sun, Nov 23, 2025 at 11:34:28AM +0530, Anup Patel wrote:
-> [EXTERNAL MAIL]
-> 
-> A shorter patch subject can be:
-> "RISC-V: KVM: Flush VS-stage TLB after VCPU migration for Andes cores"
-> 
-> On Mon, Nov 17, 2025 at 2:19???PM Hui Min Mina Chou
-> <minachou@andestech.com> wrote:
-> >
-> > Most implementations cache the combined result of two-stage
-> > translation, but some, like Andes cores, use split TLBs that
-> > store VS-stage and G-stage entries separately.
-> >
-> > On such systems, when a VCPU migrates to another CPU, an additional
-> > HFENCE.VVMA is required to avoid using stale VS-stage entries, which
-> > could otherwise cause guest faults.
-> >
-> > Introduce a static key to identify CPUs with split two-stage TLBs.
-> > When enabled, KVM issues an extra HFENCE.VVMA on VCPU migration to
-> > prevent stale VS-stage mappings.
-> >
-> > Signed-off-by: Hui Min Mina Chou <minachou@andestech.com>
-> > Signed-off-by: Ben Zong-You Xie <ben717@andestech.com>
-> > Reviewed-by: Radim Kr??m???? <rkrcmar@ventanamicro.com>
-> > ---
-> > Changelog:
-> >
-> > v4:
-> >  - Rename the patch subject
-> >  - Remove the Fixes tag
-> >  - Add a static key so that HFENCE.VVMA is issued only on CPUs with
-> >    split two-stage TLBs
-> >  - Add kvm_riscv_setup_vendor_features() to detect mvendorid/marchid
-> >    and enable the key when required
-> >
-> > v3:
-> >  - Resolved build warning; updated header declaration and call side to
-> >    kvm_riscv_local_tlb_sanitize
-> >  - Add Radim Kr??m????'s Reviewed-by tag
-> >  (https://lore.kernel.org/all/20251023032517.2527193-1-minachou@andestech.com/)
-> >
-> > v2:
-> >  - Updated Fixes commit to 92e450507d56
-> >  - Renamed function to kvm_riscv_local_tlb_sanitize
-> >  (https://lore.kernel.org/all/20251021083105.4029305-1-minachou@andestech.com/)
-> > ---
-> >  arch/riscv/include/asm/kvm_host.h |  2 ++
-> >  arch/riscv/include/asm/kvm_vmid.h |  2 +-
-> >  arch/riscv/kvm/main.c             | 14 ++++++++++++++
-> >  arch/riscv/kvm/vcpu.c             |  2 +-
-> >  arch/riscv/kvm/vmid.c             |  6 +++++-
-> >  5 files changed, 23 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> > index d71d3299a335..21abac2f804e 100644
-> > --- a/arch/riscv/include/asm/kvm_host.h
-> > +++ b/arch/riscv/include/asm/kvm_host.h
-> > @@ -323,4 +323,6 @@ bool kvm_riscv_vcpu_stopped(struct kvm_vcpu *vcpu);
-> >
-> >  void kvm_riscv_vcpu_record_steal_time(struct kvm_vcpu *vcpu);
-> >
-> > +DECLARE_STATIC_KEY_FALSE(kvm_riscv_tlb_split_mode);
-> > +
-> 
-> "kvm_riscv_vsstage_tlb_no_gpa" is a better name for the static key.
-> 
-> >  #endif /* __RISCV_KVM_HOST_H__ */
-> > diff --git a/arch/riscv/include/asm/kvm_vmid.h b/arch/riscv/include/asm/kvm_vmid.h
-> > index ab98e1434fb7..75fb6e872ccd 100644
-> > --- a/arch/riscv/include/asm/kvm_vmid.h
-> > +++ b/arch/riscv/include/asm/kvm_vmid.h
-> > @@ -22,6 +22,6 @@ unsigned long kvm_riscv_gstage_vmid_bits(void);
-> >  int kvm_riscv_gstage_vmid_init(struct kvm *kvm);
-> >  bool kvm_riscv_gstage_vmid_ver_changed(struct kvm_vmid *vmid);
-> >  void kvm_riscv_gstage_vmid_update(struct kvm_vcpu *vcpu);
-> > -void kvm_riscv_gstage_vmid_sanitize(struct kvm_vcpu *vcpu);
-> > +void kvm_riscv_local_tlb_sanitize(struct kvm_vcpu *vcpu);
-> 
-> kvm_riscv_local_tlb_sanitize() must be declared in kvm_tlb.h
-> 
-> >
-> >  #endif
-> > diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-> > index 67c876de74ef..bf0e4f1abe0f 100644
-> > --- a/arch/riscv/kvm/main.c
-> > +++ b/arch/riscv/kvm/main.c
-> > @@ -15,6 +15,18 @@
-> >  #include <asm/kvm_nacl.h>
-> >  #include <asm/sbi.h>
-> >
-> > +DEFINE_STATIC_KEY_FALSE(kvm_riscv_tlb_split_mode);
-> > +
-> > +static void kvm_riscv_setup_vendor_features(void)
-> > +{
-> > +       /* Andes AX66: split two-stage TLBs */
-> > +       if (riscv_cached_mvendorid(0) == ANDES_VENDOR_ID &&
-> > +           (riscv_cached_marchid(0) & 0xFFFF) == 0x8A66) {
-> > +               static_branch_enable(&kvm_riscv_tlb_split_mode);
-> > +               kvm_info("using split two-stage TLBs requiring extra HFENCE.VVMA\n");
-> 
-> I think the "VS-stage TLB does not cache guest physical addresses
-> and VMID" message is more clear.
-> 
-> > +       }
-> > +}
-> > +
-> >  long kvm_arch_dev_ioctl(struct file *filp,
-> >                         unsigned int ioctl, unsigned long arg)
-> >  {
-> > @@ -159,6 +171,8 @@ static int __init riscv_kvm_init(void)
-> >                 kvm_info("AIA available with %d guest external interrupts\n",
-> >                          kvm_riscv_aia_nr_hgei);
-> >
-> > +       kvm_riscv_setup_vendor_features();
-> > +
-> >         kvm_register_perf_callbacks(NULL);
-> >
-> >         rc = kvm_init(sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > index 3ebcfffaa978..796218e4a462 100644
-> > --- a/arch/riscv/kvm/vcpu.c
-> > +++ b/arch/riscv/kvm/vcpu.c
-> > @@ -968,7 +968,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> >                  * Note: This should be done after G-stage VMID has been
-> >                  * updated using kvm_riscv_gstage_vmid_ver_changed()
-> >                  */
-> > -               kvm_riscv_gstage_vmid_sanitize(vcpu);
-> > +               kvm_riscv_local_tlb_sanitize(vcpu);
-> >
-> >                 trace_kvm_entry(vcpu);
-> >
-> > diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
-> > index 3b426c800480..1dbd50c67a88 100644
-> > --- a/arch/riscv/kvm/vmid.c
-> > +++ b/arch/riscv/kvm/vmid.c
-> > @@ -125,7 +125,7 @@ void kvm_riscv_gstage_vmid_update(struct kvm_vcpu *vcpu)
-> >                 kvm_make_request(KVM_REQ_UPDATE_HGATP, v);
-> >  }
-> >
-> > -void kvm_riscv_gstage_vmid_sanitize(struct kvm_vcpu *vcpu)
-> > +void kvm_riscv_local_tlb_sanitize(struct kvm_vcpu *vcpu)
-> >  {
-> >         unsigned long vmid;
-> >
-> > @@ -146,4 +146,8 @@ void kvm_riscv_gstage_vmid_sanitize(struct kvm_vcpu *vcpu)
-> >
-> >         vmid = READ_ONCE(vcpu->kvm->arch.vmid.vmid);
-> >         kvm_riscv_local_hfence_gvma_vmid_all(vmid);
-> > +
-> > +       /* For split TLB designs, flush VS-stage entries also */
-> > +       if (static_branch_unlikely(&kvm_riscv_tlb_split_mode))
-> > +               kvm_riscv_local_hfence_vvma_all(vmid);
-> >  }
-> 
-> kvm_riscv_local_tlb_sanitize() implementation must be
-> moved to kvm/tlb.c
-> 
-> > --
-> > 2.34.1
-> >
-> 
-> I will take care of the above comments at the time of merging
-> this patch. If any further changes are required then I can squash
-> changes before the end of next week.
-> 
-> Queued this patch for Linux-6.19.
-> 
-> Thanks,
-> Anup
 
-Hi Anup,
+在 2025/11/26 11:35, David Matlack 写道:
+> This series adds the base support to preserve a VFIO device file across
+> a Live Update. "Base support" means that this allows userspace to
+> safetly preserve a VFIO device file with LIVEUPDATE_SESSION_PRESERVE_FD
+> and retrieve a preserved VFIO device file with
+> LIVEUPDATE_SESSION_RETRIEVE_FD, but the device itself is not preserved
+> in a fully running state across Live Update.
+>
+> This series unblocks 2 parallel but related streams of work:
+>
+>   - iommufd preservation across Live Update. This work spans iommufd,
+>     the IOMMU subsystem, and IOMMU drivers [1]
+>
+>   - Preservation of VFIO device state across Live Update (config space,
+>     BAR addresses, power state, SR-IOV state, etc.). This work spans both
+>     VFIO and the core PCI subsystem.
+>
+> While we need all of the above to fully preserve a VFIO device across a
+> Live Update without disrupting the workload on the device, this series
+> aims to be functional and safe enough to merge as the first incremental
+> step toward that goal.
+>
+> Areas for Discussion
+> --------------------
+>
+> BDF Stability across Live Update
+>
+>    The PCI support for tracking preserved devices across a Live Update to
+>    prevent auto-probing relies on PCI segment numbers and BDFs remaining
+>    stable. For now I have disallowed VFs, as the BDFs assigned to VFs can
+>    vary depending on how the kernel chooses to allocate bus numbers. For
+>    non-VFs I am wondering if there is any more needed to ensure BDF
+>    stability across Live Update.
+>
+>    While we would like to support many different systems and
+>    configurations in due time (including preserving VFs), I'd like to
+>    keep this first serses constrained to simple use-cases.
+>
+> FLB Locking
+>
+>    I don't see a way to properly synchronize pci_flb_finish() with
+>    pci_liveupdate_incoming_is_preserved() since the incoming FLB mutex is
+>    dropped by liveupdate_flb_get_incoming() when it returns the pointer
+>    to the object, and taking pci_flb_incoming_lock in pci_flb_finish()
+>    could result in a deadlock due to reversing the lock ordering.
+>
+> FLB Retrieving
+>
+>    The first patch of this series includes a fix to prevent an FLB from
+>    being retrieved again it is finished. I am wondering if this is the
+>    right approach or if subsystems are expected to stop calling
+>    liveupdate_flb_get_incoming() after an FLB is finished.
+>
+> Testing
+> -------
+>
+> The patches at the end of this series provide comprehensive selftests
+> for the new code added by this series. The selftests have been validated
+> in both a VM environment using a virtio-net PCIe device, and in a
+> baremetal environment on an Intel EMR server with an Intel DSA device.
+>
+> Here is an example of how to run the new selftests:
 
-I won't be making any further changes to this patch. Thanks a lot
-for your help and suggestions!
-Regarding Nutty's comment about using a macro for ANDES_ARCH_ID,
-we'll clean up the Andes CPU-related defines and update that part
-in a future patch. Thanks also to Nutty for the suggestion!
+Hi, David
 
-Thanks again!
-Mina
+ERROR: modpost: "liveupdate_register_file_handler" 
+[drivers/vfio/pci/vfio-pci-core.ko] undefined!
+
+ERROR: modpost: "vfio_pci_ops" [drivers/vfio/pci/vfio-pci-core.ko] 
+undefined!
+ERROR: modpost: "liveupdate_enabled" [drivers/vfio/pci/vfio-pci-core.ko] 
+undefined!
+ERROR: modpost: "liveupdate_unregister_file_handler" 
+[drivers/vfio/pci/vfio-pci-core.ko] undefined!
+ERROR: modpost: "vfio_device_fops" [drivers/vfio/pci/vfio-pci-core.ko] 
+undefined!
+ERROR: modpost: "vfio_pci_is_intel_display" 
+[drivers/vfio/pci/vfio-pci-core.ko] undefined!
+ERROR: modpost: "vfio_pci_liveupdate_init" 
+[drivers/vfio/pci/vfio-pci.ko] undefined!
+ERROR: modpost: "vfio_pci_liveupdate_cleanup" 
+[drivers/vfio/pci/vfio-pci.ko] undefined!
+make[4]: *** [scripts/Makefile.modpost:147: Module.symvers] Error 1
+make[3]: *** [Makefile:1960: modpost] Error 2
+
+After I git clone the source code from the link 
+https://github.com/dmatlack/linux/tree/liveupdate/vfio/cdev/v1,
+
+I found the above errors when I built the source code.
+
+Perhaps the above errors can be solved by EXPORT_SYMBOL.
+
+But I am not sure if a better solution can solve the above problems or not.
+
+Thanks,
+
+Yanjun.Zhu
+
+>
+> vfio_pci_liveupdate_uapi_test:
+>
+>    $ tools/testing/selftests/vfio/scripts/setup.sh 0000:00:04.0
+>    $ tools/testing/selftests/vfio/vfio_pci_liveupdate_uapi_test 0000:00:04.0
+>    $ tools/testing/selftests/vfio/scripts/cleanup.sh
+>
+> vfio_pci_liveupdate_kexec_test:
+>
+>    $ tools/testing/selftests/vfio/scripts/setup.sh 0000:00:04.0
+>    $ tools/testing/selftests/vfio/vfio_pci_liveupdate_kexec_test --stage 1 0000:00:04.0
+>    $ kexec [...]  # NOTE: distro-dependent
+>
+>    $ tools/testing/selftests/vfio/scripts/setup.sh 0000:00:04.0
+>    $ tools/testing/selftests/vfio/vfio_pci_liveupdate_kexec_test --stage 2 0000:00:04.0
+>    $ tools/testing/selftests/vfio/scripts/cleanup.sh
+>
+> Dependencies
+> ------------
+>
+> This series was constructed on top of several in-flight series and on
+> top of mm-nonmm-unstable [2].
+>
+>    +-- This series
+>    |
+>    +-- [PATCH v2 00/18] vfio: selftests: Support for multi-device tests
+>    |    https://lore.kernel.org/kvm/20251112192232.442761-1-dmatlack@google.com/
+>    |
+>    +-- [PATCH v3 0/4] vfio: selftests: update DMA mapping tests to use queried IOVA ranges
+>    |   https://lore.kernel.org/kvm/20251111-iova-ranges-v3-0-7960244642c5@fb.com/
+>    |
+>    +-- [PATCH v8 0/2] Live Update: File-Lifecycle-Bound (FLB) State
+>    |   https://lore.kernel.org/linux-mm/20251125225006.3722394-1-pasha.tatashin@soleen.com/
+>    |
+>    +-- [PATCH v8 00/18] Live Update Orchestrator
+>    |   https://lore.kernel.org/linux-mm/20251125165850.3389713-1-pasha.tatashin@soleen.com/
+>    |
+>
+> To simplify checking out the code, this series can be found on GitHub:
+>
+>    https://github.com/dmatlack/linux/tree/liveupdate/vfio/cdev/v1
+>
+> Changelog
+> ---------
+>
+> v1:
+>   - Rebase series on top of LUOv8 and VFIO selftests improvements
+>   - Drop commits to preserve config space fields across Live Update.
+>     These changes require changes to the PCI layer. For exmaple,
+>     preserving rbars could lead to an inconsistent device state until
+>     device BARs addresses are preserved across Live Update.
+>   - Drop commits to preserve Bus Master Enable on the device. There's no
+>     reason to preserve this until iommufd preservation is fully working.
+>     Furthermore, preserving Bus Master Enable could lead to memory
+>     corruption when the device if the device is bound to the default
+>     identity-map domain after Live Update.
+>   - Drop commits to preserve saved PCI state. This work is not needed
+>     until we are ready to preserve the device's config space, and
+>     requires more thought to make the PCI state data layout ABI-friendly.
+>   - Add support to skip auto-probing devices that are preserved by VFIO
+>     to avoid them getting bound to a different driver by the next kernel.
+>   - Restrict device preservation further (no VFs, no intel-graphics).
+>   - Various refactoring and small edits to improve readability and
+>     eliminate code duplication.
+>
+> rfc: https://lore.kernel.org/kvm/20251018000713.677779-1-vipinsh@google.com/
+>
+> Cc: Saeed Mahameed <saeedm@nvidia.com>
+> Cc: Adithya Jayachandran <ajayachandra@nvidia.com>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Parav Pandit <parav@nvidia.com>
+> Cc: Leon Romanovsky <leonro@nvidia.com>
+> Cc: William Tu <witu@nvidia.com>
+> Cc: Jacob Pan <jacob.pan@linux.microsoft.com>
+> Cc: Lukas Wunner <lukas@wunner.de>
+> Cc: Pasha Tatashin <pasha.tatashin@soleen.com>
+> Cc: Mike Rapoport <rppt@kernel.org>
+> Cc: Pratyush Yadav <pratyush@kernel.org>
+> Cc: Samiullah Khawaja <skhawaja@google.com>
+> Cc: Chris Li <chrisl@kernel.org>
+> Cc: Josh Hilke <jrhilke@google.com>
+> Cc: David Rientjes <rientjes@google.com>
+>
+> [1] https://lore.kernel.org/linux-iommu/20250928190624.3735830-1-skhawaja@google.com/
+> [2] https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git/log/?h=mm-nonmm-unstable
+>
+> David Matlack (12):
+>    liveupdate: luo_flb: Prevent retrieve() after finish()
+>    PCI: Add API to track PCI devices preserved across Live Update
+>    PCI: Require driver_override for incoming Live Update preserved
+>      devices
+>    vfio/pci: Notify PCI subsystem about devices preserved across Live
+>      Update
+>    vfio: Enforce preserved devices are retrieved via
+>      LIVEUPDATE_SESSION_RETRIEVE_FD
+>    vfio/pci: Store Live Update state in struct vfio_pci_core_device
+>    vfio: selftests: Add Makefile support for TEST_GEN_PROGS_EXTENDED
+>    vfio: selftests: Add vfio_pci_liveupdate_uapi_test
+>    vfio: selftests: Expose iommu_modes to tests
+>    vfio: selftests: Expose low-level helper routines for setting up
+>      struct vfio_pci_device
+>    vfio: selftests: Verify that opening VFIO device fails during Live
+>      Update
+>    vfio: selftests: Add continuous DMA to vfio_pci_liveupdate_kexec_test
+>
+> Vipin Sharma (9):
+>    vfio/pci: Register a file handler with Live Update Orchestrator
+>    vfio/pci: Preserve vfio-pci device files across Live Update
+>    vfio/pci: Retrieve preserved device files after Live Update
+>    vfio/pci: Skip reset of preserved device after Live Update
+>    selftests/liveupdate: Move luo_test_utils.* into a reusable library
+>    selftests/liveupdate: Add helpers to preserve/retrieve FDs
+>    vfio: selftests: Build liveupdate library in VFIO selftests
+>    vfio: selftests: Initialize vfio_pci_device using a VFIO cdev FD
+>    vfio: selftests: Add vfio_pci_liveupdate_kexec_test
+>
+>   MAINTAINERS                                   |   1 +
+>   drivers/pci/Makefile                          |   1 +
+>   drivers/pci/liveupdate.c                      | 248 ++++++++++++++++
+>   drivers/pci/pci-driver.c                      |  12 +-
+>   drivers/vfio/device_cdev.c                    |  25 +-
+>   drivers/vfio/group.c                          |   9 +
+>   drivers/vfio/pci/Makefile                     |   1 +
+>   drivers/vfio/pci/vfio_pci.c                   |  11 +-
+>   drivers/vfio/pci/vfio_pci_core.c              |  23 +-
+>   drivers/vfio/pci/vfio_pci_liveupdate.c        | 278 ++++++++++++++++++
+>   drivers/vfio/pci/vfio_pci_priv.h              |  16 +
+>   drivers/vfio/vfio.h                           |  13 -
+>   drivers/vfio/vfio_main.c                      |  22 +-
+>   include/linux/kho/abi/pci.h                   |  53 ++++
+>   include/linux/kho/abi/vfio_pci.h              |  45 +++
+>   include/linux/liveupdate.h                    |   3 +
+>   include/linux/pci.h                           |  38 +++
+>   include/linux/vfio.h                          |  51 ++++
+>   include/linux/vfio_pci_core.h                 |   7 +
+>   kernel/liveupdate/luo_flb.c                   |   4 +
+>   tools/testing/selftests/liveupdate/.gitignore |   1 +
+>   tools/testing/selftests/liveupdate/Makefile   |  14 +-
+>   .../include/libliveupdate.h}                  |  11 +-
+>   .../selftests/liveupdate/lib/libliveupdate.mk |  20 ++
+>   .../{luo_test_utils.c => lib/liveupdate.c}    |  43 ++-
+>   .../selftests/liveupdate/luo_kexec_simple.c   |   2 +-
+>   .../selftests/liveupdate/luo_multi_session.c  |   2 +-
+>   tools/testing/selftests/vfio/Makefile         |  23 +-
+>   .../vfio/lib/include/libvfio/iommu.h          |   2 +
+>   .../lib/include/libvfio/vfio_pci_device.h     |   8 +
+>   tools/testing/selftests/vfio/lib/iommu.c      |   4 +-
+>   .../selftests/vfio/lib/vfio_pci_device.c      |  60 +++-
+>   .../vfio/vfio_pci_liveupdate_kexec_test.c     | 255 ++++++++++++++++
+>   .../vfio/vfio_pci_liveupdate_uapi_test.c      |  93 ++++++
+>   34 files changed, 1313 insertions(+), 86 deletions(-)
+>   create mode 100644 drivers/pci/liveupdate.c
+>   create mode 100644 drivers/vfio/pci/vfio_pci_liveupdate.c
+>   create mode 100644 include/linux/kho/abi/pci.h
+>   create mode 100644 include/linux/kho/abi/vfio_pci.h
+>   rename tools/testing/selftests/liveupdate/{luo_test_utils.h => lib/include/libliveupdate.h} (80%)
+>   create mode 100644 tools/testing/selftests/liveupdate/lib/libliveupdate.mk
+>   rename tools/testing/selftests/liveupdate/{luo_test_utils.c => lib/liveupdate.c} (89%)
+>   create mode 100644 tools/testing/selftests/vfio/vfio_pci_liveupdate_kexec_test.c
+>   create mode 100644 tools/testing/selftests/vfio/vfio_pci_liveupdate_uapi_test.c
+>
+-- 
+Best Regards,
+Yanjun.Zhu
+
 
