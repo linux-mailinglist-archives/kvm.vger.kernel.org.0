@@ -1,198 +1,217 @@
-Return-Path: <kvm+bounces-64916-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64917-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D538EC90A2A
-	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 03:28:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C125C90A4B
+	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 03:40:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F1347348389
-	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 02:28:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E27114E3229
+	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 02:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3865427AC31;
-	Fri, 28 Nov 2025 02:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE51427F19F;
+	Fri, 28 Nov 2025 02:40:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kQp2X6+B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dtp8CLyy";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WUBPBups"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903A61E7C18;
-	Fri, 28 Nov 2025 02:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D1415B971
+	for <kvm@vger.kernel.org>; Fri, 28 Nov 2025 02:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764296918; cv=none; b=pSWxZbfksSsHWW0ODy7SbmzeA1/iuxjVCtMg1cVQy3yf9mvt4q5RdHcWBT2GugQcTVkWpnCaOstMT3EGLMUikQBhsV0jLbrQVf3+3Ei22er5XgyqEd4eTrVtA0OMVB6pYBAp/hviq29b7cuAXhBn0JNiTrz7FECdRoZv9UWCEIQ=
+	t=1764297614; cv=none; b=OIItQQF7kkGXSQQeK6J8ibFsUONyvBL2SP2AxPGntk3SD/gLt4I/+fAUZX1Q7aZL0IFcDsXPWY7Z2nh1eqhCXpRe4uz3m4p1IcATIVAjmMtu4iPnLXf/kbjpihnQtDvePf0h9fvrxFySvV7z+9OBcyj2u3JmuAk4RVi3DEpbvVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764296918; c=relaxed/simple;
-	bh=/HjtqXfCqsAKCoCv0qEGUunf0cxzQvr9PqFXd/cNbk0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pe43x63P90j0sNULSU8oBup4/JukzZEsqLkIJEFSFw7oH9gYm3vfS6jHZn1rAMcTGTexMh8xhHRNb1gxR8kEYsxtvVPHmI4+zaTSoCEFWVFoRJRgNvI8bGGPO107NI8qGJNodldqQbKA+1QSF5qWetiHUcVv51JqbQh19syDB/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kQp2X6+B; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764296916; x=1795832916;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=/HjtqXfCqsAKCoCv0qEGUunf0cxzQvr9PqFXd/cNbk0=;
-  b=kQp2X6+B8msFaycgFbXmhztVJXtKIWGj4fzvUxN7bFpIcEwWBk2ZAt6C
-   bsBX4H6WJ3/NMbH2/FDloiIHl+VFkg6QezTPHLuAbPtYi30vokRxcsNu4
-   c6qZIeAqMr7mzokMDDgesPYTqmNglrxbqFLByzzh7XQE8RM3d7IE2c7Mx
-   GEkDYxC6HFwcyDidxA/OxcIGEaK0FaIDUPsgRryCYHeqzZUOZXRiYSGuX
-   KtdZwSPu9tE9RG63iSLH5cvrY8dU3UinMNIHGLzqA9hFl2HBehoZx4HEr
-   h+ZE7epujaZxYeeI2P1Uw2kzeJ3u6Kzp6s1S+ssmmUWR6c9mkfDHeKLRc
-   A==;
-X-CSE-ConnectionGUID: JitPDHNWRR+BPdPGbH6Krg==
-X-CSE-MsgGUID: /P3S0XJiQfGBlfEEhUnzTg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11626"; a="66229577"
-X-IronPort-AV: E=Sophos;i="6.20,232,1758610800"; 
-   d="scan'208";a="66229577"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2025 18:28:35 -0800
-X-CSE-ConnectionGUID: 2mwpRCyfQ5ifeiejOB6g7A==
-X-CSE-MsgGUID: dJmRNK0tR3+2b7I4YZBuEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,232,1758610800"; 
-   d="scan'208";a="193156307"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.240.173]) ([10.124.240.173])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2025 18:28:30 -0800
-Message-ID: <2d50eba2-c308-45a2-90ec-e0c3bcbb4db0@intel.com>
-Date: Fri, 28 Nov 2025 10:28:26 +0800
+	s=arc-20240116; t=1764297614; c=relaxed/simple;
+	bh=nqBlYAzg6qxQEMzgk9fJKhYVwAMlfJjMd6zbIrDkIsA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PRkrBOlLUqhSPE3OGyyXc9Oafdr8G6VB2YDQjEeqztWMKiqozeHwnZ4mbxLD24viFeU8b/inAuMLaEd+0hbuxAujjfhXb9k7Km+gq5TOLkjxOLOpYkakZwDspKHu3xpyzrVB+GqtetR1eJCti6NLOiKfSn591z2CAvJuz4mbgPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dtp8CLyy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WUBPBups; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764297612;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sgfHeihlC+8u1mHu0tUzhZgmVFrgBxrrACIpxiuhkOQ=;
+	b=dtp8CLyyKRQXNaHy2h0DqYw002b993NEL55QQeWV650jqOXn/5yWY5CI5MbL8LBtmFodyp
+	pq7cx9JjQhy2f+MKYCehG9YDx95BGkECU2k3Cgpk6dGNfxqmmSenBr3uzHNqbfSjYbtALH
+	BEp9G6iFQhHlD/bFiaf/xgTmGz+yf94=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-364-6tOnD2ppMli-SAeAicW6PA-1; Thu, 27 Nov 2025 21:40:10 -0500
+X-MC-Unique: 6tOnD2ppMli-SAeAicW6PA-1
+X-Mimecast-MFC-AGG-ID: 6tOnD2ppMli-SAeAicW6PA_1764297609
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-342701608e2so1350756a91.1
+        for <kvm@vger.kernel.org>; Thu, 27 Nov 2025 18:40:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764297609; x=1764902409; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sgfHeihlC+8u1mHu0tUzhZgmVFrgBxrrACIpxiuhkOQ=;
+        b=WUBPBupsLTGwrL4ustwHzBDcKuoNA5oKsMOehyx9mLuhCOA2lb6TQjmjkb0d4Dasif
+         7aoYs5ij7ruDxYXAr+4ESxWkbxoDIFpmAaB0aLI9W8/vSBQd4wMnQNh+YDhkx1KvVT4e
+         98iVKMpju8aNiaVHDShGYm0+K5a3d4+0b7CE8mFdYRe5TzX4x/zv+BcWJfzgysFydcRe
+         5DnU9CgH9Npy9KoqWusAbN4at0lgC/ao05wD3jNHVaOD2Rr0NLWhyU8qmNGrQxyXxlZO
+         d5ZKTlN+lOWgA80obEltLPpimpWBV8oorkYlOmJM9r2yrwMyx9KoyvgBuMlCWpfUvi5M
+         rrwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764297609; x=1764902409;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sgfHeihlC+8u1mHu0tUzhZgmVFrgBxrrACIpxiuhkOQ=;
+        b=RF+EJHXSYHzBeu1oaPz4Ledw32LiNOMCTuZhO6ADxEr/rHURC612aKhI5GYMsa3IDD
+         0tE+jD0jSBKdmX5MVNlW6PvAj4ffjCHo3JN9XPIamU1rrlhbnLotciyzZvvLigaIw6K2
+         pmLiKWhtaj7orwucU0hp5asNBw8Mj68l7QCMPFHJAjlEILqd17y47DXBXKy9drZjCyJD
+         UOJiz0GZ8gblAJVDVyqcl/dlqYdYynudYrcl6A4JlS0kC7clDGYP8lr9ms+Dn2vNG98l
+         6W4NNE2lkyt+lSZfFODeNms27tStKf2CWPdm7vB6JL32TypJMgoWzmAxSYww8mYTr6t2
+         00+w==
+X-Forwarded-Encrypted: i=1; AJvYcCUipsahP2h0CYU0ALPKjE2RYl/fSKaWQvwdKYA+WjMqFafQvnYHpCZEPXlnhQnODsuaBXw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxJ4dLP/TkdK5Z/BrY7rXLHi0BdubsDPsM8MNbrjj38oLYJdjq
+	sb1xiYognKWQYE7ZdNsqAaCrUG6F8ldi/szKYg5GWXOAu25kC9f1XvOorfdQ14SUenHkPR6IvG5
+	a0XB6hb6avQaIjZjkGKxewmd70g+yudxCo6i6c6tT+A9oPufm+2vVkdg579Wkof54YBLmva/KB8
+	TWklISH3wXnCA//MlDpqZIe6nffn4X
+X-Gm-Gg: ASbGncsaXt7NsiH1xbhHagIjGD0i0cRze/t8lEl5EQLdJwx9Atk92SltC3V4Un+Ub38
+	ag22qNhObS49f0SDCMmsyIV6BRnjGmw0N9hiBEDp520sEfjVuoswqxSqhU4EM9Wbr5YCADnc101
+	gDxmy7iq0evbUSGa+UrAyBDC9Iy5z9wqgr6QTGahuJouAlIgM2fpU/WXxNkeZ+usOX
+X-Received: by 2002:a17:90b:1c04:b0:340:dd2c:a3da with SMTP id 98e67ed59e1d1-3475ebe6a55mr11921901a91.8.1764297609150;
+        Thu, 27 Nov 2025 18:40:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG4wo+b8mDxiFvbp2FfPvxTIFKnSoRJlDC8td/QTiw0D2SXKZ1egJpMpwXj6ItWG1NiPOtXpEz0QFH1u2tvrDA=
+X-Received: by 2002:a17:90b:1c04:b0:340:dd2c:a3da with SMTP id
+ 98e67ed59e1d1-3475ebe6a55mr11921862a91.8.1764297608647; Thu, 27 Nov 2025
+ 18:40:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] x86/split_lock: Don't try to handle user split lock
- in TDX guest
-To: Kiryl Shutsemau <kas@kernel.org>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, Rick Edgecombe
- <rick.p.edgecombe@intel.com>, linux-kernel@vger.kernel.org,
- linux-coco@lists.linux.dev, kvm@vger.kernel.org,
- Reinette Chatre <reinette.chatre@intel.com>,
- Chenyi Qiang <chenyi.qiang@intel.com>, chao.p.peng@intel.com
-References: <20251126100205.1729391-1-xiaoyao.li@intel.com>
- <20251126100205.1729391-2-xiaoyao.li@intel.com>
- <lvobu4gpfsjg63syubgy2jwcja72folflrst7bu2eqv6rhaqre@ttbkykphu32f>
- <33fe9716-ef3b-42f3-9806-4bd23fed6949@intel.com>
- <qvsi3xht4kn3iwkx5xw2p7zsq4cvpg4xhq3ra52fe34xjpixfo@fsgchsobc343>
- <0f8983e9-0e23-4a05-8015-de6e2218d8a5@intel.com>
- <f2hkqt5xtmej7cfnuytigcfszr3qja4l6ywww4qrqxjbqmlko2@r75b6deae2hd>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <f2hkqt5xtmej7cfnuytigcfszr3qja4l6ywww4qrqxjbqmlko2@r75b6deae2hd>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <cover.1764225384.git.mst@redhat.com> <637e182e139980e5930d50b928ba5ac072d628a9.1764225384.git.mst@redhat.com>
+In-Reply-To: <637e182e139980e5930d50b928ba5ac072d628a9.1764225384.git.mst@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 28 Nov 2025 10:39:57 +0800
+X-Gm-Features: AWmQ_bm__a-YRsaDl414Cee-_MAMOHTjKQ-R-ohBFRIeA6P5kRzykoXAUMexjlk
+Message-ID: <CACGkMEsw7mgQdJieHz6CT3p5Pew=vH1qp5H2BSag_55w+q9Vnw@mail.gmail.com>
+Subject: Re: [PATCH v6 3/3] vhost: switch to arrays of feature bits
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
+	Paolo Abeni <pabeni@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, Mike Christie <michael.christie@oracle.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/28/2025 12:16 AM, Kiryl Shutsemau wrote:
-> On Thu, Nov 27, 2025 at 10:00:58AM +0800, Xiaoyao Li wrote:
->> On 11/26/2025 9:35 PM, Kiryl Shutsemau wrote:
->>> On Wed, Nov 26, 2025 at 08:17:18PM +0800, Xiaoyao Li wrote:
->>>> On 11/26/2025 7:25 PM, Kiryl Shutsemau wrote:
->>>>> On Wed, Nov 26, 2025 at 06:02:03PM +0800, Xiaoyao Li wrote:
->>>>>> When the host enables split lock detection feature, the split lock from
->>>>>> guests (normal or TDX) triggers #AC. The #AC caused by split lock access
->>>>>> within a normal guest triggers a VM Exit and is handled in the host.
->>>>>> The #AC caused by split lock access within a TDX guest does not trigger
->>>>>> a VM Exit and instead it's delivered to the guest self.
->>>>>>
->>>>>> The default "warning" mode of handling split lock depends on being able
->>>>>> to temporarily disable detection to recover from the split lock event.
->>>>>> But the MSR that disables detection is not accessible to a guest.
->>>>>>
->>>>>> This means that TDX guests today can not disable the feature or use
->>>>>> the "warning" mode (which is the default). But, they can use the "fatal"
->>>>>> mode.
->>>>>>
->>>>>> Force TDX guests to use the "fatal" mode.
->>>>>>
->>>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>>>>> ---
->>>>>>     arch/x86/kernel/cpu/bus_lock.c | 17 ++++++++++++++++-
->>>>>>     1 file changed, 16 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/arch/x86/kernel/cpu/bus_lock.c b/arch/x86/kernel/cpu/bus_lock.c
->>>>>> index 981f8b1f0792..f278e4ea3dd4 100644
->>>>>> --- a/arch/x86/kernel/cpu/bus_lock.c
->>>>>> +++ b/arch/x86/kernel/cpu/bus_lock.c
->>>>>> @@ -315,9 +315,24 @@ void bus_lock_init(void)
->>>>>>     	wrmsrq(MSR_IA32_DEBUGCTLMSR, val);
->>>>>>     }
->>>>>> +static bool split_lock_fatal(void)
->>>>>> +{
->>>>>> +	if (sld_state == sld_fatal)
->>>>>> +		return true;
->>>>>> +
->>>>>> +	/*
->>>>>> +	 * TDX guests can not disable split lock detection.
->>>>>> +	 * Force them into the fatal behavior.
->>>>>> +	 */
->>>>>> +	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
->>>>>> +		return true;
->>>>>> +
->>>>>> +	return false;
->>>>>> +}
->>>>>> +
->>>>>>     bool handle_user_split_lock(struct pt_regs *regs, long error_code)
->>>>>>     {
->>>>>> -	if ((regs->flags & X86_EFLAGS_AC) || sld_state == sld_fatal)
->>>>>> +	if ((regs->flags & X86_EFLAGS_AC) || split_lock_fatal())
->>>>>>     		return false;
->>>>>
->>>>> Maybe it would be cleaner to make it conditional on
->>>>> cpu_model_supports_sld instead of special-casing TDX guest?
->>>>>
->>>>> #AC on any platfrom when we didn't asked for it suppose to be fatal, no?
->>>>
->>>> But TDX is the only one has such special non-architectural behavior.
->>>>
->>>> For example, for normal VMs under KVM, the behavior is x86 architectural.
->>>> MSR_TEST_CTRL is not accessible to normal VMs, and no split lock #AC will be
->>>> delivered to the normal VMs because it's handled by KVM.
->>>
->>> How does it contradict what I suggested?
->>>
->>> For both normal VMs and TDX guest, cpu_model_supports_sld will not be
->>> set to true. So check for cpu_model_supports_sld here is going to be
->>> NOP, unless #AC actually delivered, like we have in TDX case. Handling
->>> it as fatal is sane behaviour in such case regardless if it TDX.
->>>
->>> And we don't need to make the check explicitly about TDX guest.
->>
->> Well, it depends on how defensive we would like to be, and whether to
->> specialize or commonize the issue.
->>
->> Either can work. If the preference and agreement are to commonize the issue,
->> I can do it in v2. And in this direction, what should we do with the patch
->> 2? just drop it since it's specialized for TDX ?
-> 
-> I am not sure. Leaving it as produces produces false messages which is
-> not good, but not critical.
-> 
-> Maybe just clear X86_FEATURE_BUS_LOCK_DETECT and stop pretending we
-> control split-lock behaviour from the guest?
+On Thu, Nov 27, 2025 at 2:40=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> The current interface where caller has to know in which 64 bit chunk
+> each bit is, is inelegant and fragile.
+> Let's simply use arrays of bits.
+> By using unroll macros text size grows only slightly.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/vhost/net.c   | 19 ++++++++++---------
+>  drivers/vhost/scsi.c  |  9 ++++++---
+>  drivers/vhost/test.c  |  6 +++++-
+>  drivers/vhost/vhost.h | 42 ++++++++++++++++++++++++++++++++++--------
+>  drivers/vhost/vsock.c | 10 ++++++----
+>  5 files changed, 61 insertions(+), 25 deletions(-)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index d057ea55f5ad..f8ed39337f56 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -69,15 +69,15 @@ MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero C=
+opy TX;"
+>
+>  #define VHOST_DMA_IS_DONE(len) ((__force u32)(len) >=3D (__force u32)VHO=
+ST_DMA_DONE_LEN)
+>
+> -static const u64 vhost_net_features[VIRTIO_FEATURES_U64S] =3D {
+> -       VHOST_FEATURES |
+> -       (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
+> -       (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
+> -       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+> -       (1ULL << VIRTIO_F_RING_RESET) |
+> -       (1ULL << VIRTIO_F_IN_ORDER),
+> -       VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
+> -       VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
+> +static const int vhost_net_bits[] =3D {
+> +       VHOST_FEATURES,
+> +       VHOST_NET_F_VIRTIO_NET_HDR,
+> +       VIRTIO_NET_F_MRG_RXBUF,
+> +       VIRTIO_F_ACCESS_PLATFORM,
+> +       VIRTIO_F_RING_RESET,
+> +       VIRTIO_F_IN_ORDER,
+> +       VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO,
+> +       VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO
+>  };
+>
+>  enum {
+> @@ -1720,6 +1720,7 @@ static long vhost_net_set_owner(struct vhost_net *n=
+)
+>  static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+>                             unsigned long arg)
+>  {
+> +       const DEFINE_VHOST_FEATURES_ARRAY(vhost_net_features, vhost_net_b=
+its);
+>         u64 all_features[VIRTIO_FEATURES_U64S];
+>         struct vhost_net *n =3D f->private_data;
+>         void __user *argp =3D (void __user *)arg;
+> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+> index 98e4f68f4e3c..f43c1fe9fad9 100644
+> --- a/drivers/vhost/scsi.c
+> +++ b/drivers/vhost/scsi.c
+> @@ -197,11 +197,14 @@ enum {
+>  };
+>
+>  /* Note: can't set VIRTIO_F_VERSION_1 yet, since that implies ANY_LAYOUT=
+. */
+> -enum {
+> -       VHOST_SCSI_FEATURES =3D VHOST_FEATURES | (1ULL << VIRTIO_SCSI_F_H=
+OTPLUG) |
+> -                                              (1ULL << VIRTIO_SCSI_F_T10=
+_PI)
+> +static const int vhost_scsi_bits[] =3D {
+> +       VHOST_FEATURES,
+> +       VIRTIO_SCSI_F_HOTPLUG,
+> +       VIRTIO_SCSI_F_T10_PI
+>  };
+>
+> +#define VHOST_SCSI_FEATURES VHOST_FEATURES_U64(vhost_scsi_bits, 0)
+> +
+>  #define VHOST_SCSI_MAX_TARGET  256
+>  #define VHOST_SCSI_MAX_IO_VQ   1024
+>  #define VHOST_SCSI_MAX_EVENT   128
+> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> index 94cd09f36f59..f592b2f548e8 100644
+> --- a/drivers/vhost/test.c
+> +++ b/drivers/vhost/test.c
+> @@ -28,7 +28,11 @@
+>   */
+>  #define VHOST_TEST_PKT_WEIGHT 256
+>
+> -#define VHOST_TEST_FEATURES VHOST_FEATURES
+> +static const int vhost_test_bits[] =3D {
+> +       VHOST_FEATURES
+> +};
+> +
+> +#define VHOST_TEST_FEATURES VHOST_FEATURES_U64(vhost_test_features, 0)
 
-By clearing X86_FEATURE_BUS_LOCK_DETECT, the TDX guest log doens't print 
-anything about split lock detection. But the TDX guest is still possible 
-to get #AC on split locks, which seems no good as well.
+Did you mean vhost_test_bits actually?
 
-More, it's overkill to clear X86_FEATURE_BUS_LOCK_DETECT. Clearing it 
-means TDX guest cannot use X86_FEATURE_BUS_LOCK_DETECT to detect the bus 
-lock happens from the guest userspace, even when the host doesn't enable 
-split lock detection. For example, on cloud environment, if the 
-customers want to run their legacy workload that can generate split 
-locks, the CSP would have to disable slit lock detection in the host but 
-use bus lock VM exit to catch the bus lock in the TDX guest. In this 
-case, TDX guest is free to use X86_FEATURE_BUS_LOCK_DETECT and it works 
-as expected.
-
-
+Thanks
 
 
