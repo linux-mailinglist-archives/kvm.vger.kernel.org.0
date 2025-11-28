@@ -1,136 +1,152 @@
-Return-Path: <kvm+bounces-64946-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64949-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B148C930BC
-	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 20:45:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8B57C930EC
+	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 20:53:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9357434A416
-	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 19:45:29 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BD96D349AE4
+	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 19:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B1333436C;
-	Fri, 28 Nov 2025 19:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C578C2D248D;
+	Fri, 28 Nov 2025 19:53:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="X/W4zJ4a";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="km8V7Piy"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="tTlVitIK";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="p8UTVkvq"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0163C27587E;
-	Fri, 28 Nov 2025 19:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5D429BD8C;
+	Fri, 28 Nov 2025 19:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764359100; cv=none; b=FPyxDpDvVPcrdeeNxxV/guQGKZDTpv2+3yNZxR2cDL3afvaNGbJowy0gvFjQVy+28qT32zPxMH1Q8grviaV0W2frnzaM41pmkcKNsjBnh9tv5jyCNfavZamxxRJq+TKJaV33uEN3hie+V4NJ25l36cRyfaqoYR1/NXyW6f6hiuo=
+	t=1764359610; cv=none; b=cS8w229MzSoABR/ltrrylSsv36ZByVPHzMlZ7rQe1UZmsf2Tb7S4yc+DDhhFGkB7zIroyLdtST01pRUsWoXZHxGMSuqs5CFHnLz8fA3/o51CsiV3uuzhLqxYmZaIsQFmGSjFPZt4ubpK+WLCWlp+dvEbUsU7fNlM8QD+excZU1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764359100; c=relaxed/simple;
-	bh=C9i7awpzYDU/ou8oDCf3F4sKL9eNqr+aOvKa80iZkvk=;
+	s=arc-20240116; t=1764359610; c=relaxed/simple;
+	bh=Ok0lIH1SR+J4sZFtNBBFMTphxWrTCZeUm+TGqp/ibfU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EPH6w+cMQyyTfOJy2Sl3ZY3f+uX//duBitG+pGr79X9PSwaU2/7RK6rerPY6RU3/tl5NLwWqmBjCn10sB+3QXc7T+cfcOWSqycPM5EyY2Z2IZzcUIqPqUlPi+jgavs04lLguH76ewxurROVWGq50nQGNv6UCZi17ZIcJm8n1qAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=X/W4zJ4a; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=km8V7Piy; arc=none smtp.client-ip=202.12.124.144
+	 MIME-Version:Content-Type; b=sARV5+3Q5W1IkRPvVfAdZFpAPvAjWuy/TRm7Ne/4UIgsisTWcphSITPxtqjcKsV3DRrMdoUFYOBybLRLyRVcmh+AiYtzOIRx87hiyeg8mvdGhW4SQoXPSq+GEXLWtqZCVdkdRgFW7rp079E4qXmeYM+RacBUxJa9/XfstuLwucA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=tTlVitIK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=p8UTVkvq; arc=none smtp.client-ip=202.12.124.152
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
 Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.stl.internal (Postfix) with ESMTP id 115D71D0072E;
-	Fri, 28 Nov 2025 14:44:57 -0500 (EST)
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 9B2937A0848;
+	Fri, 28 Nov 2025 14:53:26 -0500 (EST)
 Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Fri, 28 Nov 2025 14:44:57 -0500
+  by phl-compute-02.internal (MEProxy); Fri, 28 Nov 2025 14:53:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1764359096;
-	 x=1764445496; bh=4O1Anyo7QeOiltfx0oBC8JHG7P4eCCuZHh1FdGOKm3Y=; b=
-	X/W4zJ4aTasE/9/y+3S5whAkYD7EU7Hv3RzDmwseMFN4Ezel58Q03KAI2eOiVA7S
-	dmaOZPD++0+25TxxuuM6OupWJuTSKd/eDCKT1rMY6ZiEEVIkIP8PQNqPfSwtysyP
-	EfLcpweFVPxq9GSbawEXq0emAb7Ntn3rkVq5PbbUKBU9Xnew56aLlELn6/yyNOqN
-	fgxCPYe48JvkvasCfjF0GMn1Bx5P2TaMxZyBarrSUh8JzeHlucDKQbj4xUJSE7tC
-	12bzByWqUKfYfMlADCHlqv/qJLw5SlYSwiNoEgpGsn4t+2Lx4iS0i6+QGcTLu5Oy
-	sDWXFRbqQft5SzehlVlLDw==
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1764359606;
+	 x=1764446006; bh=E/M1A9g+tzfu51whtk6ETtuXS4dKP2Z9OkNprWYeCNY=; b=
+	tTlVitIKSELuFlIuIldmN/jM765oWmW/3YvZZKVeyvQMGDBt9V1fHU9TKPaA4Ad7
+	qsP8i1xlM73b88dpavbLZpjB3jfXeWYMPE2iykLm0pdytbmi4fIm5YKKJ2Zj0wF1
+	gmXvue8pczRsxySanqWNYs7/yVMMB+Qpg4o13P+i0+XYe3UprfG3eJNBonNxsjB0
+	q+MAmMQ+7DkTjDnv3ByZ11RoEyz++QzleKxdPAe0B+4gtZQV9ncNcwfe2RHiqdz1
+	O749eIZjml6RDJFEP2YJHjIzsmX1VLDvf+tY4VMhuMt07Q/rGj3xOCl6klkXkus+
+	MDV2gz08o+xq15T7hxEsuw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1764359096; x=
-	1764445496; bh=4O1Anyo7QeOiltfx0oBC8JHG7P4eCCuZHh1FdGOKm3Y=; b=k
-	m8V7Piy93qQy9IvtDufhNpUlxzl1l4giy2QDv7MhsKtf7fRxI9flsO03k9PQMgJL
-	A5uEvw6QnR3qR8XC20sWgpu0WPJAPFuHa4e1dVxP+d72U1FfOfLU/I79BHNLlYi5
-	bV0IX/ZsgdQ+Kg3kXQX9n9EqsUH++gK3weAUscqxM6netcrPGvpdHcMI5cDF+jB1
-	DAgfyfTB/oJFj2/sBK4DcIrNXClwt3cbd7i2evnn18nVvj7YPFrXRaaQUJIwxUVR
-	jLvCIRyc8QJzQar7nJbGd4dkIiCg4EvgbtJpw+8GQIhTrTOlCY4voKD95KKZt7nE
-	7r4DF3TForwpiS2c9xVAA==
-X-ME-Sender: <xms:uPspaQ8ThisG_B22jbKylJgSviNTpkkUbEgL_tv0hGIybayk1i1q5A>
-    <xme:uPspaaPBqhYjcjvZqVGKkcQwd282ffxDvhE_QYEdupLb584ZzBZR4woKEDRz8o5XH
-    FVgXXvcAODRj4KKu2_fomB3FXxYod4pnQ34GXeE-eaO41Hc_knm6Q>
-X-ME-Received: <xmr:uPspaWGhBiJyYW9Trefk1OKK4TLLjkODcthBHVgb5RFpWN9VDG49-DnE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvhedtjeehucetufdoteggodetrf
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1764359606; x=
+	1764446006; bh=E/M1A9g+tzfu51whtk6ETtuXS4dKP2Z9OkNprWYeCNY=; b=p
+	8UTVkvqc3s8yQa/I/qApMU/3+QEV07IFWmEogPBP8kUdHB45zW825ufQBnotw6WR
+	HumlJ5qtUM+In+bGOM+AEH7YK7+Drw/legqKiMtVOkWlHYj2RejBM6we32sz2Q7w
+	4fK2DrluT/ICsARZudwAKkL/YcJYR0x0LHgeYPWW92vz1kh7d+9adCFmf07gQsEW
+	zCtkS7m3aycIAdRHC3X0nLf7kEos6mrqF7wLQ8U98UsVtS8wkwJHMKC0VWn89NZh
+	oszi0kMFeKinwNI++V7mb0flPlQ0L8n0/2SZTl91Kp5UlxWyUksO1WNo4eCu1erg
+	pIr5NalyzWckYqbJqe+Zg==
+X-ME-Sender: <xms:tP0paYqp8QJDiRMtBbEN7ItLhBsGKMz3Bad_YFeSvoMAb_UhF2k7eA>
+    <xme:tP0paU9vLSteN9eZB5YQg9Wemn7aEONJ2qjDkUZCgpjI5eFVw0DtZRI2Rcx9zYEhw
+    4x00taHYFzJFwQ3RwB5xigZVQRl1qU9Ikaeip5hFI3CuKngZTXO8Xw>
+X-ME-Received: <xmr:tP0paZ61ZWm-vR4A2FBDLEZyT5IY2GeV_cAo5S9LeLwfDS3HUyOnBdfp>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvhedtjeeiucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucgoteeftdduqddtudculdduhedmnecujfgurhepfffhvf
-    evuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucghihhllhhirghm
-    shhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrthhtvghrnhepte
-    etudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudethffhnecuvehl
-    uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghlvgigsehshh
-    griigsohhtrdhorhhgpdhnsggprhgtphhtthhopeehpdhmohguvgepshhmthhpohhuthdp
-    rhgtphhtthhopegrlhgvgiesshhhrgiisghothdrohhrghdprhgtphhtthhopehkvhhmse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhgghesiihivghpvgdrtggr
-    pdhrtghpthhtohepkhgvvhhinhdrthhirghnsehinhhtvghlrdgtohhmpdhrtghpthhtoh
-    eplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:uPspaQQ2OFmr21Qthg4S5ytLDjRaRzYZy_ptSCZI4k2xMupE1ajQjQ>
-    <xmx:uPspabvfXxfU5lgAFiISQtjX7O_iKGSSUwsqVxAXD0XaqnMrIPajFQ>
-    <xmx:uPspaQKGqXjNn9CN4Ecmh1u5D7Ghr-LUzk8Gp2JCnWU_UQzaIYKaRw>
-    <xmx:uPspaYk1Lz2eobB7JCgJ_0diQ_AvC6C4wGAr4rYcp0g3PGtyKVp84w>
-    <xmx:uPspaTL2Mz4LKDAlQFLotxWJ-7SfCSPEdyGFa7JQCWidwbwZF4EEPMle>
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfgggtgfesthhqredttddtjeenucfhrhhomheptehlvgigucgh
+    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
+    htvghrnhepgfffvdefjeejueevfeetudfhgeetfeeuheetfeekjedvuddvueehffdtgeej
+    keetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopedvuddpmhhouggvpehs
+    mhhtphhouhhtpdhrtghpthhtohepmhhitghhrghlrdifihhnihgrrhhskhhisehinhhtvg
+    hlrdgtohhmpdhrtghpthhtoheplhhutggrshdruggvmhgrrhgthhhisehinhhtvghlrdgt
+    ohhmpdhrtghpthhtohepthhhohhmrghsrdhhvghllhhsthhrohhmsehlihhnuhigrdhinh
+    htvghlrdgtohhmpdhrtghpthhtoheprhhoughrihhgohdrvhhivhhisehinhhtvghlrdgt
+    ohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtghpthhtohephihishhhrg
+    hihhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepkhgvvhhinhdrthhirghnsehinhht
+    vghlrdgtohhmpdhrtghpthhtohepshhkohhlohhthhhumhhthhhosehnvhhiughirgdrtg
+    homhdprhgtphhtthhopehinhhtvghlqdigvgeslhhishhtshdrfhhrvggvuggvshhkthho
+    phdrohhrgh
+X-ME-Proxy: <xmx:tP0paejA2arawQL2tW7aJBMgRhoJ3cxaKnM_sMn6sVthAU3MrEh6VA>
+    <xmx:tP0paQqasH0lWNj-7AJAwoNtct6Nfyn81YdROwycgrBJIhFnUeTMpg>
+    <xmx:tP0paaJ3kEJJRAsl6kuyfx1dclLaa1Hvek7jfXLBFzrQrG9Za8Z-xA>
+    <xmx:tP0padsiaK5H7roIkIloK5l1KoqqQdAvSkDRazoByVqIf8fUp7jZuw>
+    <xmx:tv0paQmaOVeIca7ACmTx7-urEuW6tun3Ol_1ctTi4f5rnRAdXMHzNYdG>
 Feedback-ID: i03f14258:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 28 Nov 2025 14:44:55 -0500 (EST)
-Date: Fri, 28 Nov 2025 12:44:49 -0700
+ 28 Nov 2025 14:53:23 -0500 (EST)
+Date: Fri, 28 Nov 2025 12:53:22 -0700
 From: Alex Williamson <alex@shazbot.org>
-To: alex@shazbot.org
-Cc: kvm@vger.kernel.org, jgg@ziepe.ca, kevin.tian@intel.com,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio/pci: Use RCU for error/request triggers to avoid
- circular locking
-Message-ID: <20251128124449.37a27d86.alex@shazbot.org>
-In-Reply-To: <20251124223623.2770706-1-alex@shazbot.org>
-References: <20251124223623.2770706-1-alex@shazbot.org>
+To: =?UTF-8?B?TWljaGHFgg==?= Winiarski <michal.winiarski@intel.com>
+Cc: Lucas De Marchi <lucas.demarchi@intel.com>, Thomas =?UTF-8?B?SGVsbHN0?=
+ =?UTF-8?B?csO2bQ==?= <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi
+ <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas
+ <yishaih@nvidia.com>, Kevin Tian <kevin.tian@intel.com>, Shameer Kolothum
+ <skolothumtho@nvidia.com>, <intel-xe@lists.freedesktop.org>,
+ <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
+ <matthew.brost@intel.com>, "Michal Wajdeczko" <michal.wajdeczko@intel.com>,
+ <dri-devel@lists.freedesktop.org>, Jani Nikula
+ <jani.nikula@linux.intel.com>, Joonas Lahtinen
+ <joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
+ Laguna" <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v7 4/4] vfio/xe: Add device specific vfio_pci driver
+ variant for Intel graphics
+Message-ID: <20251128125322.34edbeaf.alex@shazbot.org>
+In-Reply-To: <20251127093934.1462188-5-michal.winiarski@intel.com>
+References: <20251127093934.1462188-1-michal.winiarski@intel.com>
+	<20251127093934.1462188-5-michal.winiarski@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 24 Nov 2025 15:36:22 -0700
-Alex Williamson <alex@shazbot.org> wrote:
+On Thu, 27 Nov 2025 10:39:34 +0100
+Micha=C5=82 Winiarski <michal.winiarski@intel.com> wrote:
 
-> From: Alex Williamson <alex.williamson@nvidia.com>
-> 
-> Thanks to a device generating an ACS violation during bus reset,
-> lockdep reported the following circular locking issue:
-> 
-> CPU0: SET_IRQS (MSI/X): holds igate, acquires memory_lock
-> CPU1: HOT_RESET: holds memory_lock, acquires pci_bus_sem
-> CPU2: AER: holds pci_bus_sem, acquires igate
-> 
-> This results in a potential 3-way deadlock.
-> 
-> Remove the pci_bus_sem->igate leg of the triangle by using RCU
-> to peek at the eventfd rather than locking it with igate.
-> 
-> Fixes: 3be3a074cf5b ("vfio-pci: Don't use device_lock around AER interrupt setup")
-> Signed-off-by: Alex Williamson <alex.williamson@nvidia.com>
+> In addition to generic VFIO PCI functionality, the driver implements
+> VFIO migration uAPI, allowing userspace to enable migration for Intel
+> Graphics SR-IOV Virtual Functions.
+> The driver binds to VF device and uses API exposed by Xe driver to
+> transfer the VF migration data under the control of PF device.
+>=20
+> Signed-off-by: Micha=C5=82 Winiarski <michal.winiarski@intel.com>
+> Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 > ---
->  drivers/vfio/pci/vfio_pci_core.c  | 68 ++++++++++++++++++++++---------
->  drivers/vfio/pci/vfio_pci_intrs.c | 52 ++++++++++++++---------
->  drivers/vfio/pci/vfio_pci_priv.h  |  4 ++
->  include/linux/vfio_pci_core.h     | 10 ++++-
->  4 files changed, 93 insertions(+), 41 deletions(-)
+>  MAINTAINERS                  |   7 +
+>  drivers/vfio/pci/Kconfig     |   2 +
+>  drivers/vfio/pci/Makefile    |   2 +
+>  drivers/vfio/pci/xe/Kconfig  |  12 +
+>  drivers/vfio/pci/xe/Makefile |   3 +
+>  drivers/vfio/pci/xe/main.c   | 573 +++++++++++++++++++++++++++++++++++
+>  6 files changed, 599 insertions(+)
+>  create mode 100644 drivers/vfio/pci/xe/Kconfig
+>  create mode 100644 drivers/vfio/pci/xe/Makefile
+>  create mode 100644 drivers/vfio/pci/xe/main.c
 
-Applied to vfio next branch for v6.19.  Thanks,
+Reviewed-by: Alex Williamson <alex@shazbot.org>
+
+Hopefully this can still go in via the drm window this cycle.  Thanks,
 
 Alex
 
