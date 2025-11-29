@@ -1,120 +1,115 @@
-Return-Path: <kvm+bounces-64951-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64952-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EE38C93B55
-	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 10:25:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46BADC93C18
+	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 11:35:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8DCC3A8377
-	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 09:25:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C9CD3A832B
+	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 10:35:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146C9272E63;
-	Sat, 29 Nov 2025 09:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="oIvkaFC6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E142773E3;
+	Sat, 29 Nov 2025 10:34:56 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80711A073F;
-	Sat, 29 Nov 2025 09:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C409823DD;
+	Sat, 29 Nov 2025 10:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764408342; cv=none; b=M9I5TnkilXMG6jWFoS61PaLFcR6sxe/8A4ad1lmPEea1O9s7vysR9gB/huoy3X3it9/VMLqCi5WCkIH6R3NbVaFgT4++R28Dsbf9uC1F2rOPQ+nnKoLIMsqmVMS1I43r7VxWAOGafAVKUtm4UF2pZDiiwPwswt4WJv2H0zXbHoI=
+	t=1764412496; cv=none; b=N1TLyk8ID2dJ9Mr5wPFgLNOLJQVd/FGE4oCu/i242j3jAQSTs/JW1tsFthv4erW9SUM4Q3nt72gj3lHJY5cYyhCPd8qGf3g/kuzAXALHSfGCclXhjgSisw3L3Jc18hn2c1rpjpP1ihnNs1M2UKUGpQjIJYD2h0cL7Ty6aytIa5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764408342; c=relaxed/simple;
-	bh=18rum/pY9Ed+XYcJLfQetzjeK0JKcDWxc6EMLCywlk8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UEOzrrndHtyRbPtkSuSV2s/NMFWzHIn1QB7NFhHYgcjVvg+CTkbR2ozKwOk2t5e2y64tOjCun4bKId2PdHDjbObO+cbN4svIiad+Fphz/+TdPjs492bHw84jVnbqjaGSlTNgQ1zl/qt/aNv5OJNX6fEqzJFHOyDDx7u0VFRSjsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=oIvkaFC6; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1764408330; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
-	bh=18rum/pY9Ed+XYcJLfQetzjeK0JKcDWxc6EMLCywlk8=;
-	b=oIvkaFC6P3cJ8yIeY+9JaisFJzWRWq+Dpx6Rp2B3If29Nbzo7jK4iOxdJkWurFcSJ3fLHpWG7tdvuhXhQGwYx28tXGKUivGwlZvDx2HEfUWRDiiSfdYmXk0hYvLCk1lVut06zKF/RV2dyWDlU5bEdpHYnnzni78vkd1XH3zrmpM=
-Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0Wtew5QK_1764408328 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sat, 29 Nov 2025 17:25:29 +0800
-From: fangyu.yu@linux.alibaba.com
-To: rkrcmar@ventanamicro.com
-Cc: ajones@ventanamicro.com,
-	alex@ghiti.fr,
-	anup@brainfault.org,
-	aou@eecs.berkeley.edu,
-	atish.patra@linux.dev,
-	fangyu.yu@linux.alibaba.com,
-	guoren@kernel.org,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv-bounces@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	palmer@dabbelt.com,
-	pjw@kernel.org
-Subject: Re: [PATCH] RISC-V: KVM: Allow to downgrade HGATP mode via SATP mode
-Date: Sat, 29 Nov 2025 17:25:27 +0800
-Message-Id: <20251129092527.7502-1-fangyu.yu@linux.alibaba.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <DEHZBIAB842A.1AUCJS0OR923@ventanamicro.com>
-References: <DEHZBIAB842A.1AUCJS0OR923@ventanamicro.com>
+	s=arc-20240116; t=1764412496; c=relaxed/simple;
+	bh=4VBKIZuWXDx1MDvdRM8G7YkqDLM6/dRzHL3lX6iqbzI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tJOzY4ei5kST/MtG0fnPFbdvbMdx1jCLd85ov/qlQq613ZTmGCOBE4YkxUDesQO67jrLlmiZIE0ihXJ7VqFn95lXi84L0ife4npdzRH3U+SsSM7mSg+wFB6M5aW3uEW719Wf7W606uRkWMWJmwBD5VpYZWprmn5EFTMhBLA3Bf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384
+	 client-signature ECDSA (secp384r1) client-digest SHA384)
+	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 9320E2C0759F;
+	Sat, 29 Nov 2025 11:34:49 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 778E01E09F; Sat, 29 Nov 2025 11:34:49 +0100 (CET)
+Date: Sat, 29 Nov 2025 11:34:49 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>,
+	Adithya Jayachandran <ajayachandra@nvidia.com>,
+	Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Jacob Pan <jacob.pan@linux.microsoft.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>,
+	kvm@vger.kernel.org, Leon Romanovsky <leonro@nvidia.com>,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-pci@vger.kernel.org, Mike Rapoport <rppt@kernel.org>,
+	Parav Pandit <parav@nvidia.com>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Shuah Khan <shuah@kernel.org>, Tomita Moeko <tomitamoeko@gmail.com>,
+	Vipin Sharma <vipinsh@google.com>, William Tu <witu@nvidia.com>,
+	Yi Liu <yi.l.liu@intel.com>, Yunxiang Li <Yunxiang.Li@amd.com>,
+	Zhu Yanjun <yanjun.zhu@linux.dev>
+Subject: Re: [PATCH 02/21] PCI: Add API to track PCI devices preserved across
+ Live Update
+Message-ID: <aSrMSRd8RJn2IKF4@wunner.de>
+References: <20251126193608.2678510-1-dmatlack@google.com>
+ <20251126193608.2678510-3-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251126193608.2678510-3-dmatlack@google.com>
 
->>>> On Sat, Nov 22, 2025 at 3:50 PM <fangyu.yu@linux.alibaba.com> wrote:
->>>> >
->>>> > From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
->>>> >
->>>> > Currently, HGATP mode uses the maximum value detected by the hardware
->>>> > but often such a wide GPA is unnecessary, just as a host sometimes
->>>> > doesn't need sv57.
->>>> > It's likely that no additional parameters (like no5lvl and no4lvl) are
->>>> > needed, aligning HGATP mode to SATP mode should meet the requirements
->>>> > of most scenarios.
->>>> Yes, no5/4lvl is not clear about satp or hgatp. So, covering HGPATP is
->>>> reasonable.
->>>
->>>The documentation should be improved, but I don't think we want to state
->>>that these parameters apply to both s- and g-stage. If we need parameters
->>>to dictate KVM behavior (g-stage management), then we should add KVM
->>>module parameters.
->>
->> Right, adding new parameters for g-stage management is clear.
->>
->> Or we could discuss this topic, from a virtual machine perspective,
->> it may not be necessary to provide all hardware configuration
->> combinations. For example, when SATP is configured as sv48,
->> configuring HGATP as sv57*4 is not very meaningful, Because the
->> VM cannot actually use more than 48 bits of GPA range.
->
->The choice of hgatp mode depends on how users configure guest's memory
->map, regardless of what satp or vsatp modes are.
->(All RV64 SvXY modes map XY bit VA to 56 bit PA.)
->
->If the machine model maps memory with set bit 55, then KVM needs to
->configure Sv57x4, and if nothing is mapped above 2 TiB, then KVM is
->completely fine with Sv39x4.
->
->A module parameter works, but I think it would be nicer to set the hgatp
->mode per-VM, because most VMs could use the efficient Sv39x4, while it's
->not a good idea to pick it as the default.
->I think KVM has enough information to do it automatically (and without
->too much complexity) by starting with Sv39x4, and expanding as needed.
->
+On Wed, Nov 26, 2025 at 07:35:49PM +0000, David Matlack wrote:
+> Add an API to enable the PCI subsystem to track all devices that are
+> preserved across a Live Update, including both incoming devices (passed
+> from the previous kernel) and outgoing devices (passed to the next
+> kernel).
+> 
+> Use PCI segment number and BDF to keep track of devices across Live
+> Update. This means the kernel must keep both identifiers constant across
+> a Live Update for any preserved device.
 
-It does seem more reasonable to select the HGATP mode for each VM based
-on the actual required GPA range.
-I will send an updated patch based on this suggestion.
+While bus numbers will *usually* stay the same across next and previous
+kernel, there are exceptions.  E.g. if "pci=assign-busses" is specified
+on the command line, the kernel will re-assign bus numbers on every boot.
+
+The most portable way to identify PCI devices across kernels is to
+store their path from the root down the hierarchy.  Because the bus
+number might change but the device/function number on each bus stays
+the same.
+
+This is what EFI does with device paths:
+https://uefi.org/specs/UEFI/2.10/10_Protocols_Device_Path_Protocol.html
+
+Example:
+Acpi(PNP0A03,0)/Pci(1E|0)/Pci(0|0)
+
+Source:
+https://raw.githubusercontent.com/tianocore-docs/edk2-UefiDriverWritersGuide/main/3_foundation/39_uefi_device_paths/README.9.md
+
+We've got a device path *parser* in drivers/firmware/efi/dev-path-parser.c,
+but we don't have a *generator* for device paths in the kernel yet.
 
 Thanks,
-Fangyu
+
+Lukas
 
