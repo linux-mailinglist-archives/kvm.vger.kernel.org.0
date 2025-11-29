@@ -1,152 +1,86 @@
-Return-Path: <kvm+bounces-64949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8B57C930EC
-	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 20:53:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A451EC938C7
+	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 08:07:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BD96D349AE4
-	for <lists+kvm@lfdr.de>; Fri, 28 Nov 2025 19:53:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B836D3A8BEE
+	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 07:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C578C2D248D;
-	Fri, 28 Nov 2025 19:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6486B2609E3;
+	Sat, 29 Nov 2025 07:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="tTlVitIK";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="p8UTVkvq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Axk6Wptp"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5D429BD8C;
-	Fri, 28 Nov 2025 19:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19AB36D51F
+	for <kvm@vger.kernel.org>; Sat, 29 Nov 2025 07:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764359610; cv=none; b=cS8w229MzSoABR/ltrrylSsv36ZByVPHzMlZ7rQe1UZmsf2Tb7S4yc+DDhhFGkB7zIroyLdtST01pRUsWoXZHxGMSuqs5CFHnLz8fA3/o51CsiV3uuzhLqxYmZaIsQFmGSjFPZt4ubpK+WLCWlp+dvEbUsU7fNlM8QD+excZU1M=
+	t=1764400024; cv=none; b=MPUqhiVWsdlSyStJa7fOr1BLRMAOT2VWq6kMQZabTsvZ/T/+P3RHGTJDW8byg+qsZ7urMB+Ds+K2oT4dxgipCXWchIiG57gvFqqZDBLfwwJnCfhMcUjHBuc5nyMmE27FzfYedLcnNl+bs7G4TS8ANx8Ozt1Vy/WCjB8P/f60OaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764359610; c=relaxed/simple;
-	bh=Ok0lIH1SR+J4sZFtNBBFMTphxWrTCZeUm+TGqp/ibfU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sARV5+3Q5W1IkRPvVfAdZFpAPvAjWuy/TRm7Ne/4UIgsisTWcphSITPxtqjcKsV3DRrMdoUFYOBybLRLyRVcmh+AiYtzOIRx87hiyeg8mvdGhW4SQoXPSq+GEXLWtqZCVdkdRgFW7rp079E4qXmeYM+RacBUxJa9/XfstuLwucA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=tTlVitIK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=p8UTVkvq; arc=none smtp.client-ip=202.12.124.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 9B2937A0848;
-	Fri, 28 Nov 2025 14:53:26 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Fri, 28 Nov 2025 14:53:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1764359606;
-	 x=1764446006; bh=E/M1A9g+tzfu51whtk6ETtuXS4dKP2Z9OkNprWYeCNY=; b=
-	tTlVitIKSELuFlIuIldmN/jM765oWmW/3YvZZKVeyvQMGDBt9V1fHU9TKPaA4Ad7
-	qsP8i1xlM73b88dpavbLZpjB3jfXeWYMPE2iykLm0pdytbmi4fIm5YKKJ2Zj0wF1
-	gmXvue8pczRsxySanqWNYs7/yVMMB+Qpg4o13P+i0+XYe3UprfG3eJNBonNxsjB0
-	q+MAmMQ+7DkTjDnv3ByZ11RoEyz++QzleKxdPAe0B+4gtZQV9ncNcwfe2RHiqdz1
-	O749eIZjml6RDJFEP2YJHjIzsmX1VLDvf+tY4VMhuMt07Q/rGj3xOCl6klkXkus+
-	MDV2gz08o+xq15T7hxEsuw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1764359606; x=
-	1764446006; bh=E/M1A9g+tzfu51whtk6ETtuXS4dKP2Z9OkNprWYeCNY=; b=p
-	8UTVkvqc3s8yQa/I/qApMU/3+QEV07IFWmEogPBP8kUdHB45zW825ufQBnotw6WR
-	HumlJ5qtUM+In+bGOM+AEH7YK7+Drw/legqKiMtVOkWlHYj2RejBM6we32sz2Q7w
-	4fK2DrluT/ICsARZudwAKkL/YcJYR0x0LHgeYPWW92vz1kh7d+9adCFmf07gQsEW
-	zCtkS7m3aycIAdRHC3X0nLf7kEos6mrqF7wLQ8U98UsVtS8wkwJHMKC0VWn89NZh
-	oszi0kMFeKinwNI++V7mb0flPlQ0L8n0/2SZTl91Kp5UlxWyUksO1WNo4eCu1erg
-	pIr5NalyzWckYqbJqe+Zg==
-X-ME-Sender: <xms:tP0paYqp8QJDiRMtBbEN7ItLhBsGKMz3Bad_YFeSvoMAb_UhF2k7eA>
-    <xme:tP0paU9vLSteN9eZB5YQg9Wemn7aEONJ2qjDkUZCgpjI5eFVw0DtZRI2Rcx9zYEhw
-    4x00taHYFzJFwQ3RwB5xigZVQRl1qU9Ikaeip5hFI3CuKngZTXO8Xw>
-X-ME-Received: <xmr:tP0paZ61ZWm-vR4A2FBDLEZyT5IY2GeV_cAo5S9LeLwfDS3HUyOnBdfp>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvhedtjeeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfgggtgfesthhqredttddtjeenucfhrhhomheptehlvgigucgh
-    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
-    htvghrnhepgfffvdefjeejueevfeetudfhgeetfeeuheetfeekjedvuddvueehffdtgeej
-    keetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopedvuddpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtohepmhhitghhrghlrdifihhnihgrrhhskhhisehinhhtvg
-    hlrdgtohhmpdhrtghpthhtoheplhhutggrshdruggvmhgrrhgthhhisehinhhtvghlrdgt
-    ohhmpdhrtghpthhtohepthhhohhmrghsrdhhvghllhhsthhrohhmsehlihhnuhigrdhinh
-    htvghlrdgtohhmpdhrtghpthhtoheprhhoughrihhgohdrvhhivhhisehinhhtvghlrdgt
-    ohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtghpthhtohephihishhhrg
-    hihhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepkhgvvhhinhdrthhirghnsehinhht
-    vghlrdgtohhmpdhrtghpthhtohepshhkohhlohhthhhumhhthhhosehnvhhiughirgdrtg
-    homhdprhgtphhtthhopehinhhtvghlqdigvgeslhhishhtshdrfhhrvggvuggvshhkthho
-    phdrohhrgh
-X-ME-Proxy: <xmx:tP0paejA2arawQL2tW7aJBMgRhoJ3cxaKnM_sMn6sVthAU3MrEh6VA>
-    <xmx:tP0paQqasH0lWNj-7AJAwoNtct6Nfyn81YdROwycgrBJIhFnUeTMpg>
-    <xmx:tP0paaJ3kEJJRAsl6kuyfx1dclLaa1Hvek7jfXLBFzrQrG9Za8Z-xA>
-    <xmx:tP0padsiaK5H7roIkIloK5l1KoqqQdAvSkDRazoByVqIf8fUp7jZuw>
-    <xmx:tv0paQmaOVeIca7ACmTx7-urEuW6tun3Ol_1ctTi4f5rnRAdXMHzNYdG>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 28 Nov 2025 14:53:23 -0500 (EST)
-Date: Fri, 28 Nov 2025 12:53:22 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: =?UTF-8?B?TWljaGHFgg==?= Winiarski <michal.winiarski@intel.com>
-Cc: Lucas De Marchi <lucas.demarchi@intel.com>, Thomas =?UTF-8?B?SGVsbHN0?=
- =?UTF-8?B?csO2bQ==?= <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi
- <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas
- <yishaih@nvidia.com>, Kevin Tian <kevin.tian@intel.com>, Shameer Kolothum
- <skolothumtho@nvidia.com>, <intel-xe@lists.freedesktop.org>,
- <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
- <matthew.brost@intel.com>, "Michal Wajdeczko" <michal.wajdeczko@intel.com>,
- <dri-devel@lists.freedesktop.org>, Jani Nikula
- <jani.nikula@linux.intel.com>, Joonas Lahtinen
- <joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
- Laguna" <lukasz.laguna@intel.com>, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v7 4/4] vfio/xe: Add device specific vfio_pci driver
- variant for Intel graphics
-Message-ID: <20251128125322.34edbeaf.alex@shazbot.org>
-In-Reply-To: <20251127093934.1462188-5-michal.winiarski@intel.com>
-References: <20251127093934.1462188-1-michal.winiarski@intel.com>
-	<20251127093934.1462188-5-michal.winiarski@intel.com>
+	s=arc-20240116; t=1764400024; c=relaxed/simple;
+	bh=u/yobGlLoD+iF8ZGuj6LFsJNNxcnFr2fwWoOL2xD4fc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=UWJapIE/BTcrO90zAYPR/Z7uHHIQ5WOSrlt+eeTus6s4DgyXARfmRzK+Zmt/3uhTBbBZOijIhDz1fbpSEqw2DFjzzan0xv/fe4li2myLk4d998+DyJUu6cUs1116Q1vi25T6yaalhnZwSk/5hADq/E8n8mLO4k/M/1tPN0eV8w0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Axk6Wptp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764400021;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u/yobGlLoD+iF8ZGuj6LFsJNNxcnFr2fwWoOL2xD4fc=;
+	b=Axk6Wptpn4hSmE98yzPqoaYi1fNAXxFiL6lGdSaBoKl/GvOY/y9yFjPEVh6GYsZfot5N90
+	9FjdHCQWQ4LYTgO2Dz1K7McrPtno2daHM0sOCao6XDMrceeY5vemoFpSPx6nfFd/PWppI8
+	OXorXem82kI0L15qSk23gwNAi9giKL0=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-379-REa04DDtP4aHm6GplPcSGQ-1; Sat,
+ 29 Nov 2025 02:06:59 -0500
+X-MC-Unique: REa04DDtP4aHm6GplPcSGQ-1
+X-Mimecast-MFC-AGG-ID: REa04DDtP4aHm6GplPcSGQ_1764400019
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A61241956088;
+	Sat, 29 Nov 2025 07:06:58 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.45.242.7])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1F31C1800451;
+	Sat, 29 Nov 2025 07:06:58 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 7892E21E6A27; Sat, 29 Nov 2025 08:06:55 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com,  kvm@vger.kernel.org,  eesposit@redhat.com
+Subject: Re: [PATCH] kvm: Don't assume accel_ioctl_end() preserves @errno
+In-Reply-To: <20251125090146.2370735-1-armbru@redhat.com> (Markus Armbruster's
+	message of "Tue, 25 Nov 2025 10:01:46 +0100")
+References: <20251125090146.2370735-1-armbru@redhat.com>
+Date: Sat, 29 Nov 2025 08:06:55 +0100
+Message-ID: <878qfpz59s.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Thu, 27 Nov 2025 10:39:34 +0100
-Micha=C5=82 Winiarski <michal.winiarski@intel.com> wrote:
+Superseded by
 
-> In addition to generic VFIO PCI functionality, the driver implements
-> VFIO migration uAPI, allowing userspace to enable migration for Intel
-> Graphics SR-IOV Virtual Functions.
-> The driver binds to VF device and uses API exposed by Xe driver to
-> transfer the VF migration data under the control of PF device.
->=20
-> Signed-off-by: Micha=C5=82 Winiarski <michal.winiarski@intel.com>
-> Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> ---
->  MAINTAINERS                  |   7 +
->  drivers/vfio/pci/Kconfig     |   2 +
->  drivers/vfio/pci/Makefile    |   2 +
->  drivers/vfio/pci/xe/Kconfig  |  12 +
->  drivers/vfio/pci/xe/Makefile |   3 +
->  drivers/vfio/pci/xe/main.c   | 573 +++++++++++++++++++++++++++++++++++
->  6 files changed, 599 insertions(+)
->  create mode 100644 drivers/vfio/pci/xe/Kconfig
->  create mode 100644 drivers/vfio/pci/xe/Makefile
->  create mode 100644 drivers/vfio/pci/xe/main.c
+Subject: [PATCH v2] kvm: Fix kvm_vm_ioctl() and kvm_device_ioctl() return value
+Date: Fri, 28 Nov 2025 16:20:50 +0100
+Message-ID: <20251128152050.3417834-1-armbru@redhat.com>
 
-Reviewed-by: Alex Williamson <alex@shazbot.org>
-
-Hopefully this can still go in via the drm window this cycle.  Thanks,
-
-Alex
 
