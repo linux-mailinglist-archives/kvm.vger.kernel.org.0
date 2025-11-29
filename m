@@ -1,50 +1,51 @@
-Return-Path: <kvm+bounces-64954-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48970C93FFC
-	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 15:45:49 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58463C93FF9
+	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 15:45:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CA553A6382
-	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 14:45:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3F7E74E1E61
+	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 14:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D3B30FC37;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8DB830FC38;
 	Sat, 29 Nov 2025 14:45:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xwjdl5Ey"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s5yIymrv"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094D11B4224;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0947079CF;
 	Sat, 29 Nov 2025 14:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764427531; cv=none; b=MVLojYyh/seEA3/pe4uF/ea+kGqmzyENEM3uEIdlRpQr1MxB1TPYufnWUZti8OX9WGFVdECiAXTU6NH5ITHKfQEjVPyLYYVjwRPcruWmnDTJc305Imzdmg+vGZHEzHVIRYrWnOqUbCQKgJ0eNJfwn9JM0QQNdS/0wngVXo6TeXg=
+	t=1764427531; cv=none; b=s1FOGtw+xScTVEr/og7ILf656Mb3uUJAFVQGTja9jmFzctgI8RJYB3yVijNNiBy+2touxV0JAozsR+82QpPdyZk/X1hotXvinfZ0iJqwWMPSfJV6NDGuaev20YX0hLycuz8t+i62SZKFB3wppDw5Hlpwn89rVz+KYTRFto2TFxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764427531; c=relaxed/simple;
-	bh=7tC7op/J6rZJJxjSeQrwuiT/WKqfCsxg4T0/eT/3V3w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tkGshztADZVOrzw1cKgFqmTAdEtv8m8wa/FzRKKVXkJqoFqc5MPOE6hI50otbNQZ0Me48K8GZlpqWe8SMLYUkO8a1/noskXHC+5Ei1bUgsHDC2PEIeR376upUBgjuw+yBJ5SO0Rgstr4rxfJ6N5oW3oObllFGWgO+GFgHcv9g4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xwjdl5Ey; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E051C4AF0B;
+	bh=J8YgpBDKoIkE30i8e29RJl8Adbc8Y+aT9MBBTzbD6IU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JvwfFncFd6Eep3GUnNLXOa8+CxB+6HUTU2LBdAYZCtejR57AzW2yUx5o8zmMn5lq2MPNv7Rt3TDoZU4peeazD7znyKsv//C1tdaSsXuLLt1RQyp0c8HSdJmzMpOxk1uMhMW8A4klPUDLxTEWDuOhbVA/40JjpHN24SpTA5ugyNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s5yIymrv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C086C113D0;
 	Sat, 29 Nov 2025 14:45:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1764427530;
-	bh=7tC7op/J6rZJJxjSeQrwuiT/WKqfCsxg4T0/eT/3V3w=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Xwjdl5EyjbRBMY8k6J8fOB0VOKULwD7uBLYx5dibgztz6l5wo1AYAfMx/y3nk3Noa
-	 eV9rdA28P2qWeOnQI4mX5trNfM2QOAwZp2mC+JVNXDIWmO4nWKyAnCDJGkS4S7WXLI
-	 +865rIi2o597uELMkfbM3zf50KODmH89OZislubOkVaDzkYSoJzn4Em38YHQYuXCsL
-	 XBZfI5+3CWT8D5DKOOgcNcCDXXVYsUmIVF62BlJXW0DM9FWtqNUV2WDDKDjf3e/CYs
-	 qFwGt9I3KqyQr+Cl0SYMevJMCnBTQWGvCnDKOoQalvdPbybItKrBAEudZHw2VYS0Hv
-	 hy3eYAPLt12TQ==
+	bh=J8YgpBDKoIkE30i8e29RJl8Adbc8Y+aT9MBBTzbD6IU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=s5yIymrvlmrVZV10Kyo9oayMygRW0E5mnnRK13jq4+/1dlZaKWyhRghI6fcQF1AUh
+	 gIg70MuCIQXTFu48m61Iu4UQzzuklOVsdvjttpsHFr5h9+zACeGEKgr8EE3u35qsuV
+	 RwGhNeRVYqxXaXfZQJKelZyG4atkiLifG4OJToXb9dxMfux6OQPeuSnfK6hErz3LDx
+	 xF2eDDrL/oycQAR0Mpiu3IF9S8kQOAnjRUiyWi23d0Lgbhd8ifRMy9syzqEjtNqWv0
+	 ccDx0jUjvgjVGAR9B5+0bs5yBxVqyU+yOkIMujGSYIsdx6UseN7OHZCZjXrcTzDT5L
+	 aE8NNQfziCHng==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vPMCW-00000009HnQ-14Nf;
+	id 1vPMCW-00000009HnQ-26an;
 	Sat, 29 Nov 2025 14:45:28 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -55,10 +56,12 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH 0/4] KVM: arm64: VTCR_EL2 conversion to feature dependency framework
-Date: Sat, 29 Nov 2025 14:45:21 +0000
-Message-ID: <20251129144525.2609207-1-maz@kernel.org>
+Subject: [PATCH 1/4] arm64: Convert ID_AA64MMFR0_EL1.TGRAN{4,16,64}_2 to UnsignedEnum
+Date: Sat, 29 Nov 2025 14:45:22 +0000
+Message-ID: <20251129144525.2609207-2-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251129144525.2609207-1-maz@kernel.org>
+References: <20251129144525.2609207-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,36 +74,54 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Alexandru recently pointed out [0] that the RES0 handling of VTCR_EL2
-was broken now that we have some support for stage-2 AF.
+ID_AA64MMFR0_EL1.TGRAN{4,16,64}_2 are currently represented as unordered
+enumerations. However, the architecture treats them as Unsigned,
+as hinted to by the MRS data:
 
-Instead of addressing this piecemeal as Alexandru was suggesting in
-his series, I've taken the approach to do a full-blown conversion,
-including moving VTCR_EL2 to the sysreg file (the latter resulting in
-a bit of churn in the page table code, both canonical and nested).
+(FEAT_S2TGran4K <=> (((UInt(ID_AA64MMFR0_EL1.TGran4_2) == 0) &&
+		       FEAT_TGran4K) ||
+		     (UInt(ID_AA64MMFR0_EL1.TGran4_2) >= 2))))
 
-The result is, as usual, on the larger side of things, but mostly made
-of generated stuff, though the definition for FEAT_LPA2 is horrific,
-and required some adjustments to the way we define TGRAN*_2.
+and similar descriptions exist for 16 and 64k.
 
-Lightly tested on M2.
+This is also confirmed by D24.1.3.3 ("Alternative ID scheme used for
+ID_AA64MMFR0_EL1 stage 2 granule sizes") in the L.b revision of
+the ARM ARM.
 
-[0] https://lore.kernel.org/r/20251128100946.74210-1-alexandru.elisei@arm.com
+Turn these fields into UnsignedEnum so that we can use the above
+description more or less literally.
 
-Marc Zyngier (4):
-  arm64: Convert ID_AA64MMFR0_EL1.TGRAN{4,16,64}_2 to UnsignedEnum
-  arm64: Convert VTCR_EL2 to sysreg infratructure
-  KVM: arm64: Account for RES1 bits in DECLARE_FEAT_MAP()
-  KVM: arm64: Convert VTCR_EL2 to config-driven sanitisation
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/tools/sysreg | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
- arch/arm64/include/asm/kvm_arm.h | 52 ++++++-----------------
- arch/arm64/include/asm/sysreg.h  |  1 -
- arch/arm64/kvm/config.c          | 72 +++++++++++++++++++++++++++++++-
- arch/arm64/kvm/hyp/pgtable.c     |  8 ++--
- arch/arm64/kvm/nested.c          | 11 +++--
- arch/arm64/tools/sysreg          | 63 ++++++++++++++++++++++++++--
- 6 files changed, 151 insertions(+), 56 deletions(-)
-
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 1c6cdf9d54bba..9d388f87d9a13 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2098,18 +2098,18 @@ UnsignedEnum	47:44	EXS
+ 	0b0000	NI
+ 	0b0001	IMP
+ EndEnum
+-Enum	43:40	TGRAN4_2
++UnsignedEnum	43:40	TGRAN4_2
+ 	0b0000	TGRAN4
+ 	0b0001	NI
+ 	0b0010	IMP
+ 	0b0011	52_BIT
+ EndEnum
+-Enum	39:36	TGRAN64_2
++UnsignedEnum	39:36	TGRAN64_2
+ 	0b0000	TGRAN64
+ 	0b0001	NI
+ 	0b0010	IMP
+ EndEnum
+-Enum	35:32	TGRAN16_2
++UnsignedEnum	35:32	TGRAN16_2
+ 	0b0000	TGRAN16
+ 	0b0001	NI
+ 	0b0010	IMP
 -- 
 2.47.3
 
