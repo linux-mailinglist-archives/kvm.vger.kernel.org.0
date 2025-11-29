@@ -1,86 +1,120 @@
-Return-Path: <kvm+bounces-64950-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64951-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A451EC938C7
-	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 08:07:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EE38C93B55
+	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 10:25:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B836D3A8BEE
-	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 07:07:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8DCC3A8377
+	for <lists+kvm@lfdr.de>; Sat, 29 Nov 2025 09:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6486B2609E3;
-	Sat, 29 Nov 2025 07:07:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146C9272E63;
+	Sat, 29 Nov 2025 09:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Axk6Wptp"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="oIvkaFC6"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19AB36D51F
-	for <kvm@vger.kernel.org>; Sat, 29 Nov 2025 07:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80711A073F;
+	Sat, 29 Nov 2025 09:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764400024; cv=none; b=MPUqhiVWsdlSyStJa7fOr1BLRMAOT2VWq6kMQZabTsvZ/T/+P3RHGTJDW8byg+qsZ7urMB+Ds+K2oT4dxgipCXWchIiG57gvFqqZDBLfwwJnCfhMcUjHBuc5nyMmE27FzfYedLcnNl+bs7G4TS8ANx8Ozt1Vy/WCjB8P/f60OaA=
+	t=1764408342; cv=none; b=M9I5TnkilXMG6jWFoS61PaLFcR6sxe/8A4ad1lmPEea1O9s7vysR9gB/huoy3X3it9/VMLqCi5WCkIH6R3NbVaFgT4++R28Dsbf9uC1F2rOPQ+nnKoLIMsqmVMS1I43r7VxWAOGafAVKUtm4UF2pZDiiwPwswt4WJv2H0zXbHoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764400024; c=relaxed/simple;
-	bh=u/yobGlLoD+iF8ZGuj6LFsJNNxcnFr2fwWoOL2xD4fc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=UWJapIE/BTcrO90zAYPR/Z7uHHIQ5WOSrlt+eeTus6s4DgyXARfmRzK+Zmt/3uhTBbBZOijIhDz1fbpSEqw2DFjzzan0xv/fe4li2myLk4d998+DyJUu6cUs1116Q1vi25T6yaalhnZwSk/5hADq/E8n8mLO4k/M/1tPN0eV8w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Axk6Wptp; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764400021;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=u/yobGlLoD+iF8ZGuj6LFsJNNxcnFr2fwWoOL2xD4fc=;
-	b=Axk6Wptpn4hSmE98yzPqoaYi1fNAXxFiL6lGdSaBoKl/GvOY/y9yFjPEVh6GYsZfot5N90
-	9FjdHCQWQ4LYTgO2Dz1K7McrPtno2daHM0sOCao6XDMrceeY5vemoFpSPx6nfFd/PWppI8
-	OXorXem82kI0L15qSk23gwNAi9giKL0=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-379-REa04DDtP4aHm6GplPcSGQ-1; Sat,
- 29 Nov 2025 02:06:59 -0500
-X-MC-Unique: REa04DDtP4aHm6GplPcSGQ-1
-X-Mimecast-MFC-AGG-ID: REa04DDtP4aHm6GplPcSGQ_1764400019
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A61241956088;
-	Sat, 29 Nov 2025 07:06:58 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.45.242.7])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1F31C1800451;
-	Sat, 29 Nov 2025 07:06:58 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 7892E21E6A27; Sat, 29 Nov 2025 08:06:55 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com,  kvm@vger.kernel.org,  eesposit@redhat.com
-Subject: Re: [PATCH] kvm: Don't assume accel_ioctl_end() preserves @errno
-In-Reply-To: <20251125090146.2370735-1-armbru@redhat.com> (Markus Armbruster's
-	message of "Tue, 25 Nov 2025 10:01:46 +0100")
-References: <20251125090146.2370735-1-armbru@redhat.com>
-Date: Sat, 29 Nov 2025 08:06:55 +0100
-Message-ID: <878qfpz59s.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1764408342; c=relaxed/simple;
+	bh=18rum/pY9Ed+XYcJLfQetzjeK0JKcDWxc6EMLCywlk8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UEOzrrndHtyRbPtkSuSV2s/NMFWzHIn1QB7NFhHYgcjVvg+CTkbR2ozKwOk2t5e2y64tOjCun4bKId2PdHDjbObO+cbN4svIiad+Fphz/+TdPjs492bHw84jVnbqjaGSlTNgQ1zl/qt/aNv5OJNX6fEqzJFHOyDDx7u0VFRSjsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=oIvkaFC6; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1764408330; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
+	bh=18rum/pY9Ed+XYcJLfQetzjeK0JKcDWxc6EMLCywlk8=;
+	b=oIvkaFC6P3cJ8yIeY+9JaisFJzWRWq+Dpx6Rp2B3If29Nbzo7jK4iOxdJkWurFcSJ3fLHpWG7tdvuhXhQGwYx28tXGKUivGwlZvDx2HEfUWRDiiSfdYmXk0hYvLCk1lVut06zKF/RV2dyWDlU5bEdpHYnnzni78vkd1XH3zrmpM=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0Wtew5QK_1764408328 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sat, 29 Nov 2025 17:25:29 +0800
+From: fangyu.yu@linux.alibaba.com
+To: rkrcmar@ventanamicro.com
+Cc: ajones@ventanamicro.com,
+	alex@ghiti.fr,
+	anup@brainfault.org,
+	aou@eecs.berkeley.edu,
+	atish.patra@linux.dev,
+	fangyu.yu@linux.alibaba.com,
+	guoren@kernel.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv-bounces@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	palmer@dabbelt.com,
+	pjw@kernel.org
+Subject: Re: [PATCH] RISC-V: KVM: Allow to downgrade HGATP mode via SATP mode
+Date: Sat, 29 Nov 2025 17:25:27 +0800
+Message-Id: <20251129092527.7502-1-fangyu.yu@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+In-Reply-To: <DEHZBIAB842A.1AUCJS0OR923@ventanamicro.com>
+References: <DEHZBIAB842A.1AUCJS0OR923@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Superseded by
+>>>> On Sat, Nov 22, 2025 at 3:50 PM <fangyu.yu@linux.alibaba.com> wrote:
+>>>> >
+>>>> > From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>>>> >
+>>>> > Currently, HGATP mode uses the maximum value detected by the hardware
+>>>> > but often such a wide GPA is unnecessary, just as a host sometimes
+>>>> > doesn't need sv57.
+>>>> > It's likely that no additional parameters (like no5lvl and no4lvl) are
+>>>> > needed, aligning HGATP mode to SATP mode should meet the requirements
+>>>> > of most scenarios.
+>>>> Yes, no5/4lvl is not clear about satp or hgatp. So, covering HGPATP is
+>>>> reasonable.
+>>>
+>>>The documentation should be improved, but I don't think we want to state
+>>>that these parameters apply to both s- and g-stage. If we need parameters
+>>>to dictate KVM behavior (g-stage management), then we should add KVM
+>>>module parameters.
+>>
+>> Right, adding new parameters for g-stage management is clear.
+>>
+>> Or we could discuss this topic, from a virtual machine perspective,
+>> it may not be necessary to provide all hardware configuration
+>> combinations. For example, when SATP is configured as sv48,
+>> configuring HGATP as sv57*4 is not very meaningful, Because the
+>> VM cannot actually use more than 48 bits of GPA range.
+>
+>The choice of hgatp mode depends on how users configure guest's memory
+>map, regardless of what satp or vsatp modes are.
+>(All RV64 SvXY modes map XY bit VA to 56 bit PA.)
+>
+>If the machine model maps memory with set bit 55, then KVM needs to
+>configure Sv57x4, and if nothing is mapped above 2 TiB, then KVM is
+>completely fine with Sv39x4.
+>
+>A module parameter works, but I think it would be nicer to set the hgatp
+>mode per-VM, because most VMs could use the efficient Sv39x4, while it's
+>not a good idea to pick it as the default.
+>I think KVM has enough information to do it automatically (and without
+>too much complexity) by starting with Sv39x4, and expanding as needed.
+>
 
-Subject: [PATCH v2] kvm: Fix kvm_vm_ioctl() and kvm_device_ioctl() return value
-Date: Fri, 28 Nov 2025 16:20:50 +0100
-Message-ID: <20251128152050.3417834-1-armbru@redhat.com>
+It does seem more reasonable to select the HGATP mode for each VM based
+on the actual required GPA range.
+I will send an updated patch based on this suggestion.
 
+Thanks,
+Fangyu
 
