@@ -1,144 +1,167 @@
-Return-Path: <kvm+bounces-64962-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64963-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8059CC94A1E
-	for <lists+kvm@lfdr.de>; Sun, 30 Nov 2025 02:21:27 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E277FC94EBE
+	for <lists+kvm@lfdr.de>; Sun, 30 Nov 2025 12:05:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 64099346A63
-	for <lists+kvm@lfdr.de>; Sun, 30 Nov 2025 01:21:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D15624E1A43
+	for <lists+kvm@lfdr.de>; Sun, 30 Nov 2025 11:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA652223702;
-	Sun, 30 Nov 2025 01:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359D62798F8;
+	Sun, 30 Nov 2025 11:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="VqWJ3r3O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BTGISrlJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBE21E5B95
-	for <kvm@vger.kernel.org>; Sun, 30 Nov 2025 01:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BCDA4A23;
+	Sun, 30 Nov 2025 11:05:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764465674; cv=none; b=iPfDMZ3AZs2w4rnWJTA89d/52Bzhj60rt3JLFfX+jtyxBdwoUlkicHDJyJMbRrF5C3krtm4OK+DtGgerP9r1+biBoaOM11AyXUISOKM+JgPfp6YtlwTBT2EIqa4EG+T+tAAv+pxVfbkG/vN6NDgzsBpMDwj9VIWDjpK5eIRjagc=
+	t=1764500716; cv=none; b=ONr9fMMI3M6KBYpaDhRRQVkUANQZIZAkMoHS1Vsv9CZBy3DbPfiS2nI3hHt5JjGIU4a9yfg57UtYrNZLAgovBUD80i1heuRhxQsD1XwNr5mULFUe2Qb8M7+sL48/0mhFFMnI/XAZEA+koMKIUOwOBiPfg34op/tsXISdJ2HfylU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764465674; c=relaxed/simple;
-	bh=jAhYjdaKuYSZjBr3rUm2bCg6GZ1D33HJLbxkB+qPEuk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gR45Mukot/F/BKweqsNH8L56d6YrdSo4deLkqp5HW2SUjhw2PIPE3L0/U2HQXM0TMOsNhgdnjr91r9iYnaflGbq0uJd25GhUyU4045U96OyxeAGG7xnkb1kqzD7GTkcEhMC0yRcIqbKEgLnpFA1EkaMMgOHXa93S3mav85bJiV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com; spf=pass smtp.mailfrom=soleen.com; dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b=VqWJ3r3O; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-640c6577120so5473342a12.1
-        for <kvm@vger.kernel.org>; Sat, 29 Nov 2025 17:21:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1764465671; x=1765070471; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7E6fYjyrHrj8FHDr7BSv9EzmTP9fSPz38dXVeQSmbss=;
-        b=VqWJ3r3OV199kgmWWd4B68VywP+BhnnLiCdocCvjXG/gnMFSD1bFiG9jS8tN2BbW9h
-         THrqDBGcJM9nMdqoLNvq93kNR2dLFXodP7TjzVU8p9fTvWnnirrJVk5/UWwwFNNr8NNV
-         FUvsTCSuTi4WvObu+0T60al3CGnp72BoAcH7r75sxqYhYkcp9CDj59Avb9B/j6NqiZXv
-         H4igEIDZGOK55pCcFF5DdXe0ZzGKZov9SnCru8TRent00f++6DyDBB/IYwgFc6lYispX
-         cacaasgXhnR1GkCFZpWbC8w/YItucwEw3qeYBtel1nsAxs2h1mZbiMb3KB7hov90GvHL
-         sdCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764465671; x=1765070471;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7E6fYjyrHrj8FHDr7BSv9EzmTP9fSPz38dXVeQSmbss=;
-        b=gBOPta2do0YOzsCzbjiZP/ifEKT2M2+TY8Shkk3gyRrKhnPVdRC8v0Bapm0PW2iMga
-         1tbFElhJ+kB5tusAtuYFcvNu3KjTGNxudcj1wjspC1AT8HOeDJUo2jL40NAirx8hsEy4
-         SFpgX14E4mLEAHn785QbCjQ3+Piy4APGMH+XyPbgqO1bnLXoFozn9VXhw5eeTH1wLUV9
-         Dy01fGGg9GkwGQ+6T6cAigQzUtxb5jRSumRLDVXGJ/UgOg1b0yXQejGw4T6Cn3vwhp3A
-         Mp0PBXQp+DdlpVoUeDL+Z+Zvr94pKSFvaDg+Av+PINbcq4EMdNzRNqMxJ/pZfuvp2zN6
-         Hm1g==
-X-Forwarded-Encrypted: i=1; AJvYcCXV7WtAEUEHrzF5TiiBjVN5c/S/iu3G8T0nFNwyuF52makKNqWdwIfnmtGF9Dyo2EvnjVA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxM48aidWAz1iXHj9sfjavv6dEST+zpQNHxAy2ihHX+CJf2eh5P
-	OUZfWmNJBRB+RnPi1e6cgWHKpKct39iOmENuTKTejs6QLXLJWra5EhWLgvw5rF9xwxMvrHGootU
-	dsE1h47tcvXCNjvGlerbto6/WaHDe0UC1Fio5tz8yng==
-X-Gm-Gg: ASbGncu/f4yAhbi33xNx9Gd9wsMbmgckPx7iM7auZ8St3IT/ftIrEyVRkoyl1N3dnPk
-	Dosbg6NIFP/OyCH5kdwcenFOigaFe922l7TgOWXjAKtQNzhX0DSkuG1MrYnTIRgAUmyIp4/Q7kP
-	vuMqj7y5UzpgtDOj0Aq7A//cPI9hW+NtzRiAfj1NCCF9huBtFKKsnRqUwa+GL18owrjpHOIUOCQ
-	AZw3y+zoZGwriv6FzxHyM9XeKQ92KwMNns45qcfhVyc1G7RFGRdILBCVhdEzLcr3xvL
-X-Google-Smtp-Source: AGHT+IEVrWVW0MSDEofN7HKOGJ5FYge7stDIhKBoTb11CcnSv0VSQnPuBhKj+NsQY8Xozbru60feKYwF32lJK34nCfo=
-X-Received: by 2002:a05:6402:1ed6:b0:640:9aed:6ab6 with SMTP id
- 4fb4d7f45d1cf-6455468d38amr27395965a12.24.1764465671412; Sat, 29 Nov 2025
- 17:21:11 -0800 (PST)
+	s=arc-20240116; t=1764500716; c=relaxed/simple;
+	bh=WgF209hVGnuhzCWEOErtx6btmHGTsEcP7tri0M2RCX4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IMKJVcmngJtyaZ6Oa/yhpD/lsCorDdm4Sqfzyeeet0yyfMPWH3csv5TwtsvKWMWcJp6RSr1ZnVwY7x4XK8XWiPHyCDkBR8E3DQPtDsOWz/VubrQgywaQbYHbbIcrElvifJnv5E3FFIbQ675jX9MKYNxFkaUQ/Kau8Vqx5Akkmwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BTGISrlJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2718C4CEF8;
+	Sun, 30 Nov 2025 11:05:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764500714;
+	bh=WgF209hVGnuhzCWEOErtx6btmHGTsEcP7tri0M2RCX4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BTGISrlJ0lGzN7zs3GC7hlj8AU+zkROh5RBFD2dy9dKebTpAxzlGMxMFOPBSIaPc4
+	 m1iH9EYA5JkkCr+RLJKhgtF0R8Ku+BHjMP8sEulJDHVGYL1IWaZLxmBl4zHvYOE+Rv
+	 1l50sLIlMgdXYqaVooXB3EhlUMY8VgKqKzlXy/kgHjnMhBjSfy1QatN6CaF4c5FlVf
+	 viwMzE7w1Wvyo38nJ3Djrc+BfCyX8sJvB1wmqREVXwUigN0CpHRsby7Am+hiAbJS+A
+	 8SqzUXKncccjYNK7DYX/ZjnZAs+cd/6Q4Nr5P7HSa50WSyTg0RIxQMgX4q01fmIFos
+	 l4Hz5zEDcRLGA==
+Date: Sun, 30 Nov 2025 13:05:04 +0200
+From: Mike Rapoport <rppt@kernel.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	David Hildenbrand <david@redhat.com>,
+	Hugh Dickins <hughd@google.com>,
+	James Houghton <jthoughton@google.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David Hildenbrand (Red Hat)" <david@kernel.org>
+Subject: Re: [PATCH v2 3/5] mm: introduce VM_FAULT_UFFD_MINOR fault reason
+Message-ID: <aSwk4IGY7zdb0cwd@kernel.org>
+References: <20251125183840.2368510-1-rppt@kernel.org>
+ <20251125183840.2368510-4-rppt@kernel.org>
+ <aSYBrH_xfMfs6yDW@x1.local>
+ <aSgzcpFP1qBda5ef@kernel.org>
+ <aShb8J18BaRrsA-u@x1.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251126193608.2678510-1-dmatlack@google.com> <20251126193608.2678510-3-dmatlack@google.com>
- <aSrMSRd8RJn2IKF4@wunner.de> <20251130005113.GB760268@nvidia.com>
-In-Reply-To: <20251130005113.GB760268@nvidia.com>
-From: Pasha Tatashin <pasha.tatashin@soleen.com>
-Date: Sat, 29 Nov 2025 20:20:34 -0500
-X-Gm-Features: AWmQ_bn87weFbkyc-Mkm1TN7PwvGfMaEQTTGstPfXUIJUeSyXtPiICJqz9kg5cs
-Message-ID: <CA+CK2bB0V9jdmrcNjgsmWHmSFQpSpxdVahf1pb3Bz2WA3rKcng@mail.gmail.com>
-Subject: Re: [PATCH 02/21] PCI: Add API to track PCI devices preserved across
- Live Update
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Lukas Wunner <lukas@wunner.de>, David Matlack <dmatlack@google.com>, 
-	Alex Williamson <alex@shazbot.org>, Adithya Jayachandran <ajayachandra@nvidia.com>, Alex Mastro <amastro@fb.com>, 
-	Alistair Popple <apopple@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>, 
-	David Rientjes <rientjes@google.com>, Jacob Pan <jacob.pan@linux.microsoft.com>, 
-	Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
-	Leon Romanovsky <leonro@nvidia.com>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-pci@vger.kernel.org, 
-	Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>, 
-	Philipp Stanner <pstanner@redhat.com>, Pratyush Yadav <pratyush@kernel.org>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Samiullah Khawaja <skhawaja@google.com>, Shuah Khan <shuah@kernel.org>, 
-	Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>, William Tu <witu@nvidia.com>, 
-	Yi Liu <yi.l.liu@intel.com>, Yunxiang Li <Yunxiang.Li@amd.com>, 
-	Zhu Yanjun <yanjun.zhu@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aShb8J18BaRrsA-u@x1.local>
 
-On Sat, Nov 29, 2025 at 7:51=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
-ote:
->
-> On Sat, Nov 29, 2025 at 11:34:49AM +0100, Lukas Wunner wrote:
-> > On Wed, Nov 26, 2025 at 07:35:49PM +0000, David Matlack wrote:
-> > > Add an API to enable the PCI subsystem to track all devices that are
-> > > preserved across a Live Update, including both incoming devices (pass=
-ed
-> > > from the previous kernel) and outgoing devices (passed to the next
-> > > kernel).
-> > >
-> > > Use PCI segment number and BDF to keep track of devices across Live
-> > > Update. This means the kernel must keep both identifiers constant acr=
-oss
-> > > a Live Update for any preserved device.
-> >
-> > While bus numbers will *usually* stay the same across next and previous
-> > kernel, there are exceptions.  E.g. if "pci=3Dassign-busses" is specifi=
-ed
-> > on the command line, the kernel will re-assign bus numbers on every boo=
-t.
->
-> Stuff like this has to be disabled for this live update stuff, if the
-> bus numbers are changed it will break the active use of the iommu
-> across the kexec.
->
-> So while what you say is all technically true, I'm not sure this is
-> necessary.
+On Thu, Nov 27, 2025 at 09:10:56AM -0500, Peter Xu wrote:
+> On Thu, Nov 27, 2025 at 01:18:10PM +0200, Mike Rapoport wrote:
+> > On Tue, Nov 25, 2025 at 02:21:16PM -0500, Peter Xu wrote:
+> > > Hi, Mike,
+> > > 
+> > > On Tue, Nov 25, 2025 at 08:38:38PM +0200, Mike Rapoport wrote:
+> > > > From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
+> > > > 
+> > > > When a VMA is registered with userfaulfd in minor mode, its ->fault()
+> > > > method should check if a folio exists in the page cache and if yes
+> > > > ->fault() should call handle_userfault(VM_UFFD_MISSING).
+> > > 
+> > > s/MISSING/MINOR/
+> > 
+> > Thanks, fixed. 
+> > 
+> > > > new VM_FAULT_UFFD_MINOR there instead.
+> > > 
+> > > Personally I'd keep the fault path as simple as possible, because that's
+> > > the more frequently used path (rather than when userfaultfd is armed). I
+> > > also see it slightly a pity that even with flags introduced, it only solves
+> > > the MINOR problem, not MISSING.
+> > 
+> > With David's suggestion the likely path remains unchanged.
+> 
+> It is not about the likely, it's about introducing flags into core path
+> that makes the core path harder to follow, when it's not strictly required.
+ 
+	ret = vma->vm_ops->fault(vmf);
+	if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY |
+			    VM_FAULT_DONE_COW | VM_FAULT_UFFD_MINOR))) {
+		if (ret & VM_FAULT_UFFD_MINOR)
+			return handle_userfault(vmf, VM_UFFD_MINOR);
+		return ret;
+	}
 
-I agree. However, Lukas's comment made me wonder about the future: if
-we eventually need to preserve non-PCI devices (like a TPM), should we
-be designing a common identification mechanism for all buses now? Or
-should we settle on BDF for PCI and invent stable identifiers for
-other bus types as they become necessary?
+isn't hard to follow and it's cleaner than adding EXPORT_SYMBOL that is not
+strictly required.
 
-Pasha
+> Meanwhile, personally I'm also not sure if we should have "unlikely" here..
+> My gut feeling is in reality we will only have two major use cases:
+> 
+>   (a) when userfaultfd minor isn't in the picture
+> 
+>   (b) when userfaultfd minor registered and actively being used (e.g. in a
+>       postcopy process)
+> 
+> Then without likely, IIUC the hardware should optimize path selected hence
+> both a+b performs almost equally well.
 
->
-> Jason
+unlikely() adds a branch that hardware will predict correctly if
+UFFD_MINOR is actively used.
+
+But even misspredicted branch is nothing compared to putting a task on a
+wait queue and waiting for userspace to react to the fault notification
+before handle_userfault() returns the control to the fault handler.
+ 
+> Just to mention, if we want, I think we have at least one more option to do
+> the same thing, but without even introducing a new flag to ->fault()
+> retval.
+> 
+> That is, when we have get_folio() around, we can essentially do two faults
+> in sequence, one lighter then the real one, only for minor vmas, something
+> like (I didn't think deeper, so only a rough idea shown):
+> 
+> __do_fault():
+>   if (uffd_minor(vma)) {
+>     ...
+>     folio = vma->get_folio(...);
+>     if (folio)
+>        return handle_userfault(vmf, VM_UFFD_MINOR);
+>     // fallthrough, which imply a cache miss
+>   }
+>   ret = vma->vm_ops->fault(vmf);
+
+That's something to consider for the future, especially if we'd be able to
+pull out MISSING handling as well from ->fault() handlers.
+
+> Thanks,
+> -- 
+> Peter Xu
+
+-- 
+Sincerely yours,
+Mike.
 
