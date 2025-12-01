@@ -1,211 +1,237 @@
-Return-Path: <kvm+bounces-65037-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65038-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31D13C991CF
-	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 22:00:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F12AC9920E
+	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 22:03:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 560C04E4C1C
-	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 20:58:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2622E3A4716
+	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 21:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9528127E05E;
-	Mon,  1 Dec 2025 20:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D856A2620E5;
+	Mon,  1 Dec 2025 21:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YCyeykkI";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HYy+il8B"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="B+itDq5D"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013025.outbound.protection.outlook.com [40.93.201.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5E6283C8E
-	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 20:58:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764622689; cv=none; b=pHyJGk6HiKFMjkW2sFr9SZEyhsSuv6SAYS7V6Zwehs886NN/dAEnps5KToIxJ8daciTWAXuzGm+UgR8pS3qyNJKBmUb5trSNae0cR6H6/blY3NIHT1y/08Apr0uQUVdF9KpwL821zjncGXwgOpgSnBcuH9AxsQsWUIqdSyxbruA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764622689; c=relaxed/simple;
-	bh=vsZAi3omBycoWUJakELYM68CvQJgslx/EVgOEpPXSrw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LNxLhkfPgCU/QASNFIeI/JD04XjJVQCED+sQChurHjjEISOvbDXrRvlzteb2rWK5oAFWmTiaS1abqZsPHfUbyxOG5gv39RBVVt5WONB5mqZcTU6RQp8ltQqqDM3r3k4dDkbqhmdrAIhkU4VL1MW9X0Bdbr1LviFLhG6GAUY+g98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YCyeykkI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HYy+il8B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764622684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cn3VhpmwVa+pbYhgAkE98mZ/JbvIwEHKcTRbeRu2cf4=;
-	b=YCyeykkIMpbfcmTWVxj/TW9YWcLCrOXVc9o9I1EP9d7pKAwyTe5r1tFzh5W2rViaA63Voy
-	yCeSElZVtMlYDtsNGUuGcyXkrFMY5P3h7ZbX2jpt/96hmGhWUOrj9TVNXjsQdxs6uqzMUx
-	56kG2gssWVhFa3gLv0dXq6OJ3p0Q+mE=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-103-qwVHpA_HMKORbsriS-G4Jg-1; Mon, 01 Dec 2025 15:57:59 -0500
-X-MC-Unique: qwVHpA_HMKORbsriS-G4Jg-1
-X-Mimecast-MFC-AGG-ID: qwVHpA_HMKORbsriS-G4Jg_1764622679
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4ee25cd2da3so75734601cf.2
-        for <kvm@vger.kernel.org>; Mon, 01 Dec 2025 12:57:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764622679; x=1765227479; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cn3VhpmwVa+pbYhgAkE98mZ/JbvIwEHKcTRbeRu2cf4=;
-        b=HYy+il8BRM6OuS/S6jKN4CsK8hqz7O5fgdFb2ofNZA4F0ycR7LmJJP+1HFCogn1o1x
-         8nhCZbC5C7weDoKS+R+o0Dkibzr3FTOjCXvK5ju8UMjo9yPoZlIfTRhsSqWtpJGjSjDK
-         74KOjhuZ6l5K1y0wdQfdYDqO7vfoA4GssB6X+TXtc7+HcjJdgnhsUithHBs3i0aGN4zp
-         XWFiGmPHHuTc6sESE9l/k2UQn1OELa9mAwuC8iB1R9uaesUDywJ02eNb3DT2EX/fetyI
-         2o1LwnLDaKJ5fp+3Wf54SugJCHAjeupMrNsTkzUlXbG79LoIl1H9Y8fRaEIzIQBMNZlS
-         HADA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764622679; x=1765227479;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Cn3VhpmwVa+pbYhgAkE98mZ/JbvIwEHKcTRbeRu2cf4=;
-        b=uHe8s7bDEE59XPuJ/66IZr7jQ2L8lgQEbx2TmfARZk9QzQtyr/9aRWMXTDNVZTM4q4
-         xwlvy/5tR7hfol37M6pbk1n3ApwL7AxZX7VDu/Uxx+BDL7EOrvrvtSymheFs7p8PeYvP
-         oQ/wx/QgkU0hArFGestqNLD0Q3sRrAVn7zdeIB1ZKSN+EbdrviMeaO5wxiFy0hDLKlE/
-         sDv1rN3oOfKGhAGNkzaRl7p2X4NzeG0brFQCuAfwCM6/wSKi6+v0zT/uGKS7CE3uT5oP
-         3sihHfA/uE3OktX6f08lRIChXn1gkkXuRg8GYK5LEr7QF8chu0YTp7hCr0cxHOAEkiyH
-         khEw==
-X-Forwarded-Encrypted: i=1; AJvYcCVDrF+H165EnJ3BclqvHGzeo+K3rtp7gclnitFqJafTmk1jDpMUN1rpuEuo5GMp9Vc8mkE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznfD1ncbsYUYtCYsp4D6LK73j1goWkPTyn+66qJ6J6O2+HTpsf
-	FejssiEx0K4GTSYjT7P156gJSqnSR3JN3a2ymYy20PVC1NqvoScw1gpl8GLVEEiFRvit5rLJjZg
-	+kUC9HeyFEkczwU6LXgmK+SNT6V8ttBk/0sgg2AGE9KQg0mwvALBmcQ==
-X-Gm-Gg: ASbGncu0r0XddEykR1v0VHL8BdcFultUBdTmtO2G8dlVC2m4l3QvZ6A0GN5NyjbcI43
-	P808p9HoW4nq0GJ2BlZlm6rGVwOurvcHJugU8+5Sh7Q2YEkUuOdNkjJCQ0DudmxNqWHqico76Z6
-	+OMb2FHAuEtgLgMCJkDRFRAz+Ee++BKX6QW1X7IKOjKt0CY9YpzXwCSWFO4lqPya4D1L3SXVGbc
-	KQwSiuqVanzE3oboEhBQT92DoBRyMa0DhGDbkYJpF/JnaP/dq7AHkoNUMH8DokDWLERudbYy28P
-	eFlB3QGPj7NPU+LK6FzH07Yyandy2EltcxpbJemyLT1EXfnUjM37041uUZRh5t9NJcvgtWaSV1L
-	nDG0=
-X-Received: by 2002:a05:622a:88:b0:4ec:a568:7b1c with SMTP id d75a77b69052e-4efbda33ba1mr388432461cf.21.1764622678844;
-        Mon, 01 Dec 2025 12:57:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHWk8T36NyEMOMD2WZTIhi05/ouYbVdGm/+oj1BADCz5jW4gqg2t7CwJF5ZBQ/vmsijc1KTvQ==
-X-Received: by 2002:a05:622a:88:b0:4ec:a568:7b1c with SMTP id d75a77b69052e-4efbda33ba1mr388431931cf.21.1764622678340;
-        Mon, 01 Dec 2025 12:57:58 -0800 (PST)
-Received: from x1.local ([142.188.210.156])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4efd2fbb8d1sm82384891cf.9.2025.12.01.12.57.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 12:57:57 -0800 (PST)
-Date: Mon, 1 Dec 2025 15:57:56 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Nikita Kalyazin <kalyazin@amazon.com>
-Cc: "David Hildenbrand (Red Hat)" <david@kernel.org>,
-	Mike Rapoport <rppt@kernel.org>, linux-mm@kvack.org,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Hugh Dickins <hughd@google.com>,
-	James Houghton <jthoughton@google.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Michal Hocko <mhocko@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v3 4/5] guest_memfd: add support for userfaultfd minor
- mode
-Message-ID: <aS4BVC42JiUT51rS@x1.local>
-References: <20251130111812.699259-1-rppt@kernel.org>
- <20251130111812.699259-5-rppt@kernel.org>
- <652578cc-eeff-4996-8c80-e26682a57e6d@amazon.com>
- <2d98c597-0789-4251-843d-bfe36de25bd2@kernel.org>
- <553c64e8-d224-4764-9057-84289257cac9@amazon.com>
- <aS3f_PlxWLb-6NmR@x1.local>
- <76e3d5bf-df73-4293-84f6-0d6ddabd0fd7@amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5190C78F4A;
+	Mon,  1 Dec 2025 21:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764623016; cv=fail; b=Nlp94aAadWC+kPaZi2LzQZuRdfzmRcaPsUuMKJ02DKedX0upSHqFDObqLdpE67ZUqx8H/uaIfyzb8ILi2oeAVcfqtR/YeG3y/51bxjSP634yKyD4pSQ4DP1cWDI79SNdQKnFc8w5wKNFob6d6n7xg+NDX0VWE6gQzsT3AJyVMDU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764623016; c=relaxed/simple;
+	bh=vsnOFd+tPNa3h4GyeCL6bsIEJOWZDzM10R0kP85IG1c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lo9M0x0L7WCmG/134GO2b8kaK/cPk5MUdazMWdasBCzRMWFGIqoHjE2cm4hFqNYa3gpbKvaHA+xb8tONgmF8nqdOPknZcNrq2PG6Iyy2AJOySu46J/llhQZPxvXPxugRDQcpmtHRQ591kswBdx6YXMkjX3M1MhcKJ6pEYiDrKUM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=B+itDq5D; arc=fail smtp.client-ip=40.93.201.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=B4Va79mUu0vythjY7XwCdwQi25/wbL7ZpYFtQKZvvOaRdBcuIkMI8peprLVHcAG1r/ZGnkUccrB5vhssxTxc3FxplXJbwckP31Q5fGRcWaePT5VYj3iIXWB5bjuhTKy+VrkfsbOjZz7z0npc/2e3Vqzs+pBgyhxK1ceoc2yeGFYkZXHY6kGHRlwoxSggtyot9u6xoY7IHGOxd1L3smSQ7gFoJobplq0a8jcx+ZuI3fXvo+G++ojoGXONuBFntPkrJ9aDPHynv2bc7YZSkW+llfUHyFyxWH7MCiFOeNbn3Uyt4yqLcf3EFyB6bALFmly8Cvb5ycWuE6LNR2VLlPPBQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qHZ52JgkXukyMZHpaZBkGdFsNuZsgHpy82LUPkqDxx0=;
+ b=VUAsJhcN1qUXkgthlsphceqOs8HCrvYhPX5h5RRG+Ow7KuovzTvovRhlk6lqGTmVJZTqHjYlDclvaoF3UJVgkkg2FQzFIrn5jluOSj9x6enythni3PjwwBA0pWREtQXso+/OCoF5RilnELa0seKMtuI2VeD2wjbOZw5Qw9tjDFTdGMZ13WLI5Zt6Mq83XoUmwAEKomi2KzRolUEpWlZnxky/KmRMCTzE5HY/FRUjev9z/8lepWPzov6hLP2q0NLqvHej29XQD6qCON7LaDiOql7zP5S+POqtF/mL+r9w/+Lt4UbVXsfiCs5aT0KsC36Etgi6/iy11HraIfXlI8KqgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qHZ52JgkXukyMZHpaZBkGdFsNuZsgHpy82LUPkqDxx0=;
+ b=B+itDq5DVVoH/FZcjavhuvN8qtWMfO2ezKVt2uY2LoC0TzqMc86dNDVqdf4cpEv7Y41haxjF/PpZPGlkHDQpl41JMFrNlhs9qphnCGkpRtpef/mYRlO/w1UJEAXequ7iRiOaYpMjlZaI1L61iZHT3jQvTsAdzFi0Imx1eTb5Wx4=
+Received: from BN9PR03CA0339.namprd03.prod.outlook.com (2603:10b6:408:f6::14)
+ by CYXPR12MB9278.namprd12.prod.outlook.com (2603:10b6:930:e5::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Mon, 1 Dec
+ 2025 21:03:29 +0000
+Received: from BL6PEPF00022570.namprd02.prod.outlook.com
+ (2603:10b6:408:f6:cafe::47) by BN9PR03CA0339.outlook.office365.com
+ (2603:10b6:408:f6::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.17 via Frontend Transport; Mon,
+ 1 Dec 2025 21:03:17 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BL6PEPF00022570.mail.protection.outlook.com (10.167.249.38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9388.8 via Frontend Transport; Mon, 1 Dec 2025 21:03:29 +0000
+Received: from localhost (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 1 Dec
+ 2025 15:03:29 -0600
+Date: Mon, 1 Dec 2025 15:03:08 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Vishal Annapurve <vannapurve@google.com>
+CC: Yan Zhao <yan.y.zhao@intel.com>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-kernel@vger.kernel.org>, <thomas.lendacky@amd.com>,
+	<pbonzini@redhat.com>, <seanjc@google.com>, <vbabka@suse.cz>,
+	<ashish.kalra@amd.com>, <liam.merwick@oracle.com>, <david@redhat.com>,
+	<ackerleytng@google.com>, <aik@amd.com>, <ira.weiny@intel.com>
+Subject: Re: [PATCH 3/3] KVM: guest_memfd: GUP source pages prior to
+ populating guest memory
+Message-ID: <20251201210308.2hlrt5m4gzo62j35@amd.com>
+References: <20251113230759.1562024-1-michael.roth@amd.com>
+ <20251113230759.1562024-4-michael.roth@amd.com>
+ <aR7bVKzM7rH/FSVh@yzhao56-desk.sh.intel.com>
+ <20251121130144.u7eeaafonhcqf2bd@amd.com>
+ <aSQmAuxGK7+MUfRW@yzhao56-desk.sh.intel.com>
+ <CAGtprH9_yo4P+oTaGzhHkC3gSdFPTYkvwHkwN66gQhQXX9fhRQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <76e3d5bf-df73-4293-84f6-0d6ddabd0fd7@amazon.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGtprH9_yo4P+oTaGzhHkC3gSdFPTYkvwHkwN66gQhQXX9fhRQ@mail.gmail.com>
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF00022570:EE_|CYXPR12MB9278:EE_
+X-MS-Office365-Filtering-Correlation-Id: 370dcafd-f408-4f49-211b-08de311d13fe
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|7416014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?V1o4TmNVRzhNeVVkQm94TkdFSmRlR0N4TUhZSUp0QnF3YVNHWTI1dXNJcmJX?=
+ =?utf-8?B?NjlGMnFZakZueG1ZbzQvMmxEb2ZrbnhTWWllSmRkaUhGdlBqVWl3dWlROS83?=
+ =?utf-8?B?R3kvNXVFL1FpU1J6aHNXbm8xTDNoVG56bFhmamZ1Qys0YU5LRy9HOFhpME9k?=
+ =?utf-8?B?WjFkbCtLUUM1TzYxdlZ1N0tFUitLNW5hRzdQNnZBYUtQejdwNWovb29kd2Q0?=
+ =?utf-8?B?eC9ORHR6SEZvSkF0aGxnRkV1S2IzeWFnSnRDWXF5R1BEREJYeENYdldSMTZj?=
+ =?utf-8?B?U0dCUmJPRzNZR3VudkErcEh3MzJZODdHMXJkVWl1aEYvN2haNUtjWE14MUtV?=
+ =?utf-8?B?RGdvemU1QnVjSHByUWR1REFjM2daZDRoNW5sc1U0VnE4VjJxdUM3U2VNUU16?=
+ =?utf-8?B?MGtzUzVsMXY4MEJJZ0U5K2d0N2paakZtVTFBbkd0dGEyUFdEc1pYRFhPaXFF?=
+ =?utf-8?B?U0M5OHhMSHp5czNyRTFlaG4zbG1teE1aL0xzSEZoNm9FaWl3SGtsNEQ4ZnRz?=
+ =?utf-8?B?MnRtczBlKzBhaHRVNU1CSnUxVG9JWVViSVoxSWhhODg3OVlhbjhMZjc1YnRu?=
+ =?utf-8?B?L2NvYU5RMFQyV0pUdzYvWWV5Y1FvazFFU0hRTS85Z25adnIxa3dzMGdvL2Ew?=
+ =?utf-8?B?WWRDR2ZOUWxNNTZqSVg1UnRSZjU4aTA0R1l2YStvL05raGUxQ1NlbUtqQlFV?=
+ =?utf-8?B?cVMvd3RkU01aaVR1YkFvaUlLZVNDYUN1Yk80djZrTDZJWWdTT016Ny9Vc0NJ?=
+ =?utf-8?B?VVM2K0pSQSt5czZnMi9sWWdNaDFROGhEcnByUytxckZ2SDI0QTV1a2NXSVlJ?=
+ =?utf-8?B?cFJDR0NzRzM5ZXVXMUxoT2t0cEQvd202MUdiV1BOWS90VklxU1lYeFBRaWJ0?=
+ =?utf-8?B?YkEwT09oREJrdnNYdDBBdkFhYVUrR1dscjhKUTZZU3NaU0l6aFBOZElDQU9m?=
+ =?utf-8?B?bzJ3Tk5VOTJ1eXdScHhQUnprazAvbFhVL2ZPTjZNL0ppcXFZMHVldkM5QjQv?=
+ =?utf-8?B?R096TTVGYmZUT2ZQc1FyOVZUQTd5b0x0enF0MGR2Q2FoM2w0MHdTREttSGgx?=
+ =?utf-8?B?cDNERUV2MnE3b2dmeVZTWUQycXZoK2d4YVMxTjdXRXI2aXU3ZW16cUR3RWlL?=
+ =?utf-8?B?ZlhnZDFZZHA1RS9oOE5JWkc5Y3ZCZDJMOEZabTlldjVKbzB4WEhzSk14c3JO?=
+ =?utf-8?B?bHMxV0wxVHhYWVA5S3ZxVnlHRTdoTmFOVDhoMzBmS1NHR3dEWjlxUWVDM2FE?=
+ =?utf-8?B?T3dHWkJ0VXh6MkV6Vy81ekpodWlMODNCMjNzTmxvNEloYUE4bTA1NHEvOG1M?=
+ =?utf-8?B?MzdsTTI5TkhnSTkyRXA5TFB5azJib3dCcHRPT2V4OTRnU2dqNUtDL0pwVUZB?=
+ =?utf-8?B?OElkRC9qUGdJd1ZKYXJpZEczeFR6MUFoM0RtWlhRTlA0Qk11SnVCd1BxYVpa?=
+ =?utf-8?B?eGdRWFF4V05QK05TK3BLRS9sTGJ6TG45VVR0eE5UaGJ4TUZxUTV0eTFXb3JS?=
+ =?utf-8?B?aStGeEIxN0xidlAyQ2RFVDJXRkd1ZWN1dm1LTDl3RVU4N2d5S1JEYlFtMlQ5?=
+ =?utf-8?B?L1I3Y0dqOUVqb3dwVVRvY2xIVUc4VzlTWFVqRFhRR1IzcWxnUkE5Umlldmkz?=
+ =?utf-8?B?SlA1WTNuaGozcDQrUWMzVGp6cklweFNqZGIvOUYrZmhqNEVmU3crMnkzMExR?=
+ =?utf-8?B?MTNSNHc4RXVaUHdpRDVGV09wNVlrczlpTVNPQU85OEthT3FHTjJHaUNudGNE?=
+ =?utf-8?B?Nmc5aWRRTHUxZjlraGFnRlg0NDQwcStRa1U2eTQ2MXNqU3BLOWtSUWsxTFpi?=
+ =?utf-8?B?Z3JDVHJwNWsvZlhFR25jeFFDT2lEQmR2L3ZzdXNQdmtkb3oraFNrekJ2V3ho?=
+ =?utf-8?B?WEJtNVc5WTR2TytYd3NEQmV1ZFJsSmI1RzM1VkpicGtHSWplSGN3SWhJUTVS?=
+ =?utf-8?B?emRXcHJ4MUJVYnFLdTFreEVLMWFpc1pvWUs2andEejNUNDh5NG80eGlMUVhI?=
+ =?utf-8?B?bjBYejNKVGloZWgrUDlqaXJpL0V3WUFhVkdBdVpOUHJkaTFtdlVOUGhrenVI?=
+ =?utf-8?B?Si9Kd3QwVW9Ed2s0TlZtWnRDSkNzdnJtdlc1U3FJV3NTVDUvaHhLQ2ZrdTlN?=
+ =?utf-8?Q?3SII=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(7416014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2025 21:03:29.1978
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 370dcafd-f408-4f49-211b-08de311d13fe
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF00022570.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9278
 
-On Mon, Dec 01, 2025 at 08:12:38PM +0000, Nikita Kalyazin wrote:
+On Sun, Nov 30, 2025 at 05:47:37PM -0800, Vishal Annapurve wrote:
+> On Mon, Nov 24, 2025 at 1:34 AM Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >
+> > > > > +                 if (src_offset) {
+> > > > > +                         src_vaddr = kmap_local_pfn(page_to_pfn(src_pages[i + 1]));
+> > > > > +
+> > > > > +                         memcpy(dst_vaddr + PAGE_SIZE - src_offset, src_vaddr, src_offset);
+> > > > > +                         kunmap_local(src_vaddr);
+> > > > IIUC, src_offset is the src's offset from the first page. e.g.,
+> > > > src could be 0x7fea82684100, with src_offset=0x100, while npages could be 512.
+> > > >
+> > > > Then it looks like the two memcpy() calls here only work when npages == 1 ?
+> > >
+> > > src_offset ends up being the offset into the pair of src pages that we
+> > > are using to fully populate a single dest page with each iteration. So
+> > > if we start at src_offset, read a page worth of data, then we are now at
+> > > src_offset in the next src page and the loop continues that way even if
+> > > npages > 1.
+> > >
+> > > If src_offset is 0 we never have to bother with straddling 2 src pages so
+> > > the 2nd memcpy is skipped on every iteration.
+> > >
+> > > That's the intent at least. Is there a flaw in the code/reasoning that I
+> > > missed?
+> > Oh, I got you. SNP expects a single src_offset applies for each src page.
+> >
+> > So if npages = 2, there're 4 memcpy() calls.
+> >
+> > src:  |---------|---------|---------|  (VA contiguous)
+> >           ^         ^         ^
+> >           |         |         |
+> > dst:      |---------|---------|   (PA contiguous)
+> >
+> >
+> > I previously incorrectly thought kvm_gmem_populate() should pass in src_offset
+> > as 0 for the 2nd src page.
+> >
+> > Would you consider checking if params.uaddr is PAGE_ALIGNED() in
+> > snp_launch_update() to simplify the design?
+> >
 > 
-> 
-> On 01/12/2025 18:35, Peter Xu wrote:
-> > On Mon, Dec 01, 2025 at 04:48:22PM +0000, Nikita Kalyazin wrote:
-> > > I believe I found the precise point where we convinced ourselves that minor
-> > > support was sufficient: [1].  If at this moment we don't find that reasoning
-> > > valid anymore, then indeed implementing missing is the only option.
-> > > 
-> > > [1] https://lore.kernel.org/kvm/Z9GsIDVYWoV8d8-C@x1.local
-> > 
-> > Now after I re-read the discussion, I may have made a wrong statement
-> > there, sorry.  I could have got slightly confused on when the write()
-> > syscall can be involved.
-> > 
-> > I agree if you want to get an event when cache missed with the current uffd
-> > definitions and when pre-population is forbidden, then MISSING trap is
-> > required.  That is, with/without the need of UFFDIO_COPY being available.
-> > 
-> > Do I understand it right that UFFDIO_COPY is not allowed in your case, but
-> > only write()?
-> 
-> No, UFFDIO_COPY would work perfectly fine.  We will still use write()
-> whenever we resolve stage-2 faults as they aren't visible to UFFD.  When a
-> userfault occurs at an offset that already has a page in the cache, we will
-> have to keep using UFFDIO_CONTINUE so it looks like both will be required:
-> 
->  - user mapping major fault -> UFFDIO_COPY (fills the cache and sets up
-> userspace PT)
->  - user mapping minor fault -> UFFDIO_CONTINUE (only sets up userspace PT)
->  - stage-2 fault -> write() (only fills the cache)
+> IIUC, this ship has sailed, as asserting this would break existing
+> userspace which can pass unaligned userspace buffers.
 
-Is stage-2 fault about KVM_MEMORY_EXIT_FLAG_USERFAULT, per James's series?
+Actually, on the PUCK call before I sent this patchset Sean/Paolo seemed
+to be okay with the prospect of enforcing that params.uaddr is
+PAGE_ALIGNED(), since all *known* userspace implementations do use a
+page-aligned params.uaddr and this would be highly unlikely to have any
+serious fallout.
 
-It looks fine indeed, but it looks slightly weird then, as you'll have two
-ways to populate the page cache.  Logically here atomicity is indeed not
-needed when you trap both MISSING + MINOR.
+However, it was suggested that I post the RFC with non-page-aligned
+handling intact so we can have some further discussion about it. That
+would be one of the 3 approaches listed under (A) in the cover letter.
+(Sean proposed another option that he might still advocate for, also
+listed in the cover letter under (A), but wanted to see what this looked
+like first).
 
-> 
-> > 
-> > One way that might work this around, is introducing a new UFFD_FEATURE bit
-> > allowing the MINOR registration to trap all pgtable faults, which will
-> > change the MINOR fault semantics.
-> 
-> This would equally work for us.  I suppose this MINOR+MAJOR semantics would
-> be more intrusive from the API point of view though.
+Personally, I'm fine with forcing params.uaddr to. But there is still some
+slight risk that some VMM out there flying under the radar will surface
+this userspace breakage and that won't be fun to deal with.
 
-Yes it is, it's just that I don't know whether it'll be harder when you
-want to completely support UFFDIO_COPY here, per previous discussions.
+IMO, if an implementation wants to enforce page alignment, they
+can simply assert(src_offset == 0) in the post-populate callback and
+just treat src_pages[0] as if it was the only src input, like what
+was done in the tdx_post_populate() callback here. The overall changes
+seemed trivial enough that I don't see it being a headache for platforms
+that enforce that src pointer is PAGE-ALIGNED. And for platforms like
+SNP that don't, it does not seem like a huge headache to straddle 2 src
+pages for each PFN we're populating.
 
-After a 2nd thought, such UFFD_FEATURE is probably not a good design,
-because it essentially means that feature bit will functionally overlap
-with what MISSING trap was trying to do, however duplicating that concept
-in a VMA that was registered as MINOR only.
+Maybe some better comments/documentation around kvm_gmem_populate()
+would more effectively alleviate potential confusion from new users
+of the proposed interface.
 
-Maybe it's possible instead if we allow a module to support MISSING trap,
-but without supporting UFFDIO_COPY ioctl.
-
-That is, the MISSING events will be properly generated if MISSING traps are
-supported, however the module needs to provide its own way to resolve it if
-UFFDIO_COPY ioctl isn't available.  Gmem is fine in this case as long as
-it'll always be registered with both MISSING+MINOR traps, then resolving
-using write()s would work.
-
-Such would be possible when with something like my v3 previously:
-
-https://lore.kernel.org/all/20250926211650.525109-1-peterx@redhat.com/#t
-
-Then gmem needs to declare VM_UFFD_MISSING + VM_UFFD_MINOR in
-uffd_features, but _UFFDIO_CONTINUE only (without _UFFDIO_COPY) in
-uffd_ioctls.
-
-Since Mike already took this series over, I'll leave that to you all to
-decide.
-
--- 
-Peter Xu
-
+-Mike
 
