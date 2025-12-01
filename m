@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-64976-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64977-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7B00C95745
-	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 01:31:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F67C95754
+	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 01:32:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 30319341B54
-	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 00:31:51 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0F0E2341C7C
+	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 00:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6776819E7F7;
-	Mon,  1 Dec 2025 00:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2A013635C;
+	Mon,  1 Dec 2025 00:31:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FcmqzLxE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WRlMEhOk"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B031917F1;
-	Mon,  1 Dec 2025 00:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496FD8635D;
+	Mon,  1 Dec 2025 00:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764549070; cv=none; b=qXT6wKxbTKAqXn/UrgCNlvyFXs4SU+cAR8hgwcfMbx8VZr/aGAzFvYX8R/uP5maZ2Icchpolj9pDg4fpnJR1wkJs05MBlD7N00M+dQnXyf251IzAeprDTUisqLmXAtksmsXkmBgMRJJJBq8GS3YWiFCufw1/WZaQEjBg/JPmU64=
+	t=1764549073; cv=none; b=F24psNuxnJqvRwiSqh9x4kskwDn7y21IsdIf0QKDY1HDKHi5jwzuJjst1zRAEGYIX3w9Xj6Rme29xoZArwqXm1wiK0o+pgbOfqu9YCgJKKiu2A7enwolgsz9AAXXuWTnFL9nu7UWnhNCUcZDkqV+Zge+EhYjWcTKBdrlFGDDMRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764549070; c=relaxed/simple;
-	bh=eFfeaKnYfm7T1fmmBnN98nZcN0oQn69S6tmyVQbI8DM=;
+	s=arc-20240116; t=1764549073; c=relaxed/simple;
+	bh=ExgV75nN3+zv3C0lmBXc1FgUeJ7EJlAF0HXaBV/VLSQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RaqUkmwn25Spnj5VaLmprO5LMmOqSVA0mgsqXfbvgzCEUGxdpoJGY3gLp8SDMhIzr1nxe5jrcH6/u4h9uB7CfzFd7FE0or8rgMM+nnKyD907ilE9MhtlZsJmqSKdS7WbEo5oU8vE79CEVult0wv9TSGHNtOHfktzy+to160BGQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FcmqzLxE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B333C16AAE;
-	Mon,  1 Dec 2025 00:31:06 +0000 (UTC)
+	 MIME-Version; b=a8sb7tv0emGojFfmPW6XX5UUsKWfknpiyjCd+FIJO2WY5q7g50qo0ZeFtGF9PixryXaOI/d/ChHxGlgD2LUpQ6ttcYA5XW27qZBGDj9LTBTzag/nZR+LT/CsWpV99rjpYdA2JcX4sUppAw0eidlLoyhLwtvv3tBY7DP7AYJwm8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WRlMEhOk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6688BC19422;
+	Mon,  1 Dec 2025 00:31:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764549069;
-	bh=eFfeaKnYfm7T1fmmBnN98nZcN0oQn69S6tmyVQbI8DM=;
+	s=k20201202; t=1764549071;
+	bh=ExgV75nN3+zv3C0lmBXc1FgUeJ7EJlAF0HXaBV/VLSQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FcmqzLxETUROMfc8jbqXaPM0gH9POPPVrtpiBUGfStfpl0nbP11BICLIghFUZD49G
-	 TZb6wvBXWXjiSLwNWAJq64QtW00oo7MpqxZ6hgwBO8eqiMmTql0lwz3zDN/8CSeOIj
-	 TwP1OcUqgoZqA9mchRBFxO36Npm/SBxSII+rYVkBHWjG/7IFbTGChq2RpxTF5EFru3
-	 MUJtcDnw8QaxRqgLNuTy4RLzVFoXZ076T/e72ggrN4YROu9akJ6wTVu0fyxw7sOu6P
-	 qvVj8Mb7yO7QNn3WqwT0Su69XBcXeisi3jw4TkxrQQ4lSqyXcKMMtQ/wQ4VcQKGBWN
-	 nKSt2lmxh05Mw==
+	b=WRlMEhOkXtNcgdDnQeCE/H0D5KvPjMdvoVc+5Hdr8d0LGfeTeZsV7CrDnuBMVBeNK
+	 kP4v7nUGX8y/nweeRQIhOlaRuRnyi2+IN+5XS5MQ+TKsGoqBQD8VfaBq0Ts/n47Sac
+	 BwXOL6F/WHVFKt8y1+1wSnqmf4M9YzXl8P2K5Q2RdTLYmJJA+He9tZSKhn7tPpSOC2
+	 mD0nS4Zv/mz4YpU4B5QZNO9uvI0c+aNqnASu7EhlgHsi4vBwTyEoM8NRn7ci8HiNQX
+	 Oid7psTHyZfkwMzvRiyxCnakpobJXI+ir7RenVlRxkWRUA1NGgLLzRPvbTxItAivsk
+	 veXMqAEaJgqiw==
 From: guoren@kernel.org
 To: paul.walmsley@sifive.com,
 	palmer@dabbelt.com,
@@ -55,9 +55,9 @@ Cc: linux-riscv@lists.infradead.org,
 	kvm-riscv@lists.infradead.org,
 	kvm@vger.kernel.org,
 	linux-doc@vger.kernel.org
-Subject: [RFC PATCH V3 3/4] RISC-V: paravirt: pvqspinlock: Add trace point for pv_kick/wait
-Date: Sun, 30 Nov 2025 19:30:40 -0500
-Message-Id: <20251201003041.695081-4-guoren@kernel.org>
+Subject: [RFC PATCH V3 4/4] RISC-V: paravirt: Support nopvspin to disable PARAVIRT_SPINLOCKS
+Date: Sun, 30 Nov 2025 19:30:41 -0500
+Message-Id: <20251201003041.695081-5-guoren@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20251201003041.695081-1-guoren@kernel.org>
 References: <20251201003041.695081-1-guoren@kernel.org>
@@ -71,146 +71,103 @@ Content-Transfer-Encoding: 8bit
 
 From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
 
-Add trace point for pv_kick&wait, here is the output:
+The VM guests should fall back to a Test-and-Set spinlock when
+PARAVIRT_SPINLOCKS disabled, because fair locks have horrible lock
+'holder' preemption issues. The virt_spin_lock_key would shortcut for
+the queued_spin_lock_- slowpath() function that allow virt_spin_lock
+to hijack it. ref: 43b3f02899f7 ("locking/qspinlock/x86: Fix
+performance regression under unaccelerated VMs").
 
-ls /sys/kernel/debug/tracing/events/paravirt/
- enable   filter   pv_kick  pv_wait
+Add a static key controlling whether virt_spin_lock() should be
+called or not. Add nopvspin support as x86.
 
-cat /sys/kernel/debug/tracing/trace
- entries-in-buffer/entries-written: 33927/33927   #P:12
-
-                                _-----=> irqs-off/BH-disabled
-                               / _----=> need-resched
-                              | / _---=> hardirq/softirq
-                              || / _--=> preempt-depth
-                              ||| / _-=> migrate-disable
-                              |||| /     delay
-           TASK-PID     CPU#  |||||  TIMESTAMP  FUNCTION
-              | |         |   |||||     |         |
-             sh-100     [001] d..2.    28.312294: pv_wait: cpu 1 out of wfi
-         <idle>-0       [000] d.h4.    28.322030: pv_kick: cpu 0 kick target cpu 1
-             sh-100     [001] d..2.    30.982631: pv_wait: cpu 1 out of wfi
-         <idle>-0       [000] d.h4.    30.993289: pv_kick: cpu 0 kick target cpu 1
-             sh-100     [002] d..2.    44.987573: pv_wait: cpu 2 out of wfi
-         <idle>-0       [000] d.h4.    44.989000: pv_kick: cpu 0 kick target cpu 2
-         <idle>-0       [003] d.s3.    51.593978: pv_kick: cpu 3 kick target cpu 4
-      rcu_sched-15      [004] d..2.    51.595192: pv_wait: cpu 4 out of wfi
-lock_torture_wr-115     [004] ...2.    52.656482: pv_kick: cpu 4 kick target cpu 2
-lock_torture_wr-113     [002] d..2.    52.659146: pv_wait: cpu 2 out of wfi
-lock_torture_wr-114     [008] d..2.    52.659507: pv_wait: cpu 8 out of wfi
-lock_torture_wr-114     [008] d..2.    52.663503: pv_wait: cpu 8 out of wfi
-lock_torture_wr-113     [002] ...2.    52.666128: pv_kick: cpu 2 kick target cpu 8
-lock_torture_wr-114     [008] d..2.    52.667261: pv_wait: cpu 8 out of wfi
-lock_torture_wr-114     [009] .n.2.    53.141515: pv_kick: cpu 9 kick target cpu 11
-lock_torture_wr-113     [002] d..2.    53.143339: pv_wait: cpu 2 out of wfi
-lock_torture_wr-116     [007] d..2.    53.143412: pv_wait: cpu 7 out of wfi
-lock_torture_wr-118     [000] d..2.    53.143457: pv_wait: cpu 0 out of wfi
-lock_torture_wr-115     [008] d..2.    53.143481: pv_wait: cpu 8 out of wfi
-lock_torture_wr-117     [011] d..2.    53.143522: pv_wait: cpu 11 out of wfi
-lock_torture_wr-117     [011] ...2.    53.143987: pv_kick: cpu 11 kick target cpu 8
-lock_torture_wr-115     [008] ...2.    53.144269: pv_kick: cpu 8 kick target cpu 7
-
-Reviewed-by: Leonardo Bras <leobras@redhat.com>
 Signed-off-by: Guo Ren (Alibaba DAMO Academy) <guoren@kernel.org>
 ---
- arch/riscv/kernel/qspinlock_paravirt.c        |  7 +++
- .../kernel/trace_events_filter_paravirt.h     | 60 +++++++++++++++++++
- 2 files changed, 67 insertions(+)
- create mode 100644 arch/riscv/kernel/trace_events_filter_paravirt.h
+ .../admin-guide/kernel-parameters.txt         |  2 +-
+ arch/riscv/include/asm/qspinlock.h            | 24 +++++++++++++++++++
+ arch/riscv/kernel/qspinlock_paravirt.c        |  8 +++++++
+ 3 files changed, 33 insertions(+), 1 deletion(-)
 
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 6c42061ca20e..9e895e9ca655 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -4393,7 +4393,7 @@
+ 			as generic guest with no PV drivers. Currently support
+ 			XEN HVM, KVM, HYPER_V and VMWARE guest.
+ 
+-	nopvspin	[X86,XEN,KVM,EARLY]
++	nopvspin	[X86,RISCV,XEN,KVM,EARLY]
+ 			Disables the qspinlock slow path using PV optimizations
+ 			which allow the hypervisor to 'idle' the guest on lock
+ 			contention.
+diff --git a/arch/riscv/include/asm/qspinlock.h b/arch/riscv/include/asm/qspinlock.h
+index b39f23415ec1..70ad7679fce0 100644
+--- a/arch/riscv/include/asm/qspinlock.h
++++ b/arch/riscv/include/asm/qspinlock.h
+@@ -14,6 +14,8 @@
+ /* How long a lock should spin before we consider blocking */
+ #define SPIN_THRESHOLD		(1 << 15)
+ 
++extern bool nopvspin;
++
+ void native_queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
+ void __pv_init_lock_hash(void);
+ void __pv_queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
+@@ -31,5 +33,27 @@ static inline void queued_spin_unlock(struct qspinlock *lock)
+ #endif /* CONFIG_PARAVIRT_SPINLOCKS */
+ 
+ #include <asm-generic/qspinlock.h>
++#include <asm/jump_label.h>
++
++/*
++ * The KVM guests fall back to a Test-and-Set spinlock, because fair locks
++ * have horrible lock 'holder' preemption issues. The test_and_set_spinlock_key
++ * would shortcut for the queued_spin_lock_slowpath() function that allow
++ * virt_spin_lock to hijack it.
++ */
++DECLARE_STATIC_KEY_FALSE(virt_spin_lock_key);
++
++#define virt_spin_lock rv_virt_spin_lock
++static inline bool rv_virt_spin_lock(struct qspinlock *lock)
++{
++	if (!static_branch_likely(&virt_spin_lock_key))
++		return false;
++
++	do {
++		smp_cond_load_relaxed((s32 *)&lock->val, VAL == 0);
++	} while (atomic_cmpxchg(&lock->val, 0, _Q_LOCKED_VAL) != 0);
++
++	return true;
++}
+ 
+ #endif /* _ASM_RISCV_QSPINLOCK_H */
 diff --git a/arch/riscv/kernel/qspinlock_paravirt.c b/arch/riscv/kernel/qspinlock_paravirt.c
-index 299dddaa14b8..cae991139abe 100644
+index cae991139abe..b89f13d0d6e8 100644
 --- a/arch/riscv/kernel/qspinlock_paravirt.c
 +++ b/arch/riscv/kernel/qspinlock_paravirt.c
-@@ -9,8 +9,13 @@
- #include <asm/qspinlock_paravirt.h>
- #include <asm/sbi.h>
+@@ -50,6 +50,8 @@ EXPORT_STATIC_CALL(pv_queued_spin_lock_slowpath);
+ DEFINE_STATIC_CALL(pv_queued_spin_unlock, native_queued_spin_unlock);
+ EXPORT_STATIC_CALL(pv_queued_spin_unlock);
  
-+#define CREATE_TRACE_POINTS
-+#include "trace_events_filter_paravirt.h"
++DEFINE_STATIC_KEY_FALSE(virt_spin_lock_key);
 +
- void pv_kick(int cpu)
+ bool __init pv_qspinlock_init(void)
  {
-+	trace_pv_kick(smp_processor_id(), cpu);
-+
- 	sbi_ecall(SBI_EXT_PVLOCK, SBI_EXT_PVLOCK_KICK_CPU,
- 		  cpuid_to_hartid_map(cpu), 0, 0, 0, 0, 0);
- 	return;
-@@ -28,6 +33,8 @@ void pv_wait(u8 *ptr, u8 val)
- 		goto out;
+ 	if (num_possible_cpus() == 1)
+@@ -58,6 +60,12 @@ bool __init pv_qspinlock_init(void)
+ 	if (!sbi_probe_extension(SBI_EXT_PVLOCK))
+ 		return false;
  
- 	wait_for_interrupt();
++	if (nopvspin) {
++		static_branch_enable(&virt_spin_lock_key);
++		pr_info("virt_spin_lock enabled by nopvspin\n");
++		return true;
++	}
 +
-+	trace_pv_wait(smp_processor_id());
- out:
- 	local_irq_restore(flags);
- }
-diff --git a/arch/riscv/kernel/trace_events_filter_paravirt.h b/arch/riscv/kernel/trace_events_filter_paravirt.h
-new file mode 100644
-index 000000000000..db5e702a1f12
---- /dev/null
-+++ b/arch/riscv/kernel/trace_events_filter_paravirt.h
-@@ -0,0 +1,60 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (c), 2025 Alibaba Damo Academy
-+ * Authors:
-+ *	Guo Ren <guoren@kernel.org>
-+ */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM paravirt
-+
-+#if !defined(_TRACE_PARAVIRT_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_PARAVIRT_H
-+
-+#include <linux/tracepoint.h>
-+
-+TRACE_EVENT(pv_kick,
-+	TP_PROTO(int cpu, int target),
-+	TP_ARGS(cpu, target),
-+
-+	TP_STRUCT__entry(
-+		__field(int, cpu)
-+		__field(int, target)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->cpu = cpu;
-+		__entry->target = target;
-+	),
-+
-+	TP_printk("cpu %d pv_kick target cpu %d",
-+		__entry->cpu,
-+		__entry->target
-+	)
-+);
-+
-+TRACE_EVENT(pv_wait,
-+	TP_PROTO(int cpu),
-+	TP_ARGS(cpu),
-+
-+	TP_STRUCT__entry(
-+		__field(int, cpu)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->cpu = cpu;
-+	),
-+
-+	TP_printk("cpu %d out of wfi",
-+		__entry->cpu
-+	)
-+);
-+
-+#endif /* _TRACE_PARAVIRT_H || TRACE_HEADER_MULTI_READ */
-+
-+#undef TRACE_INCLUDE_PATH
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_PATH ../../../arch/riscv/kernel/
-+#define TRACE_INCLUDE_FILE trace_events_filter_paravirt
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
+ 	pr_info("PV qspinlocks enabled\n");
+ 	__pv_init_lock_hash();
+ 
 -- 
 2.40.1
 
