@@ -1,275 +1,103 @@
-Return-Path: <kvm+bounces-65028-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65029-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E23C3C98C6D
-	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 19:54:29 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F9CDC98CCB
+	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 20:04:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 645123432CC
-	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 18:54:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4CD4E4E32AC
+	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 19:03:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D5F0239E9B;
-	Mon,  1 Dec 2025 18:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B66F2459DD;
+	Mon,  1 Dec 2025 19:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rJrdc4my"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bxqbAsGX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02878219E8C
-	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 18:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37A423C39A
+	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 19:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764615259; cv=none; b=swFQULJl6Fxx5w07I/5abeE7H2SZBhkE9SrKWBj9RsJ4cjSVT2vSr8WeyOQ7ZFY4kvZ6vccA7y+bgNTjNzNHGl4x27P22HIKZO4ILXcN7KoLo4H0iHvc59ddY2n9HMQwW39pQd3C1G89gZbvvH31GeUMcjPputhNzOvnnT/Qx4w=
+	t=1764615801; cv=none; b=fJkdj8UiJp35Wq0HoMUQygkpZqxOMIMeMvzCBFoHzW2dgHsBGoJTJOPOih8/f/BRNjR/BgsIJ1+u90FS2PJRJ7wfUo81R0h9In0u96DDLqM3FaZHa/W5ICDeu21YlWSBaeAj+dAiyhovXXxe86hMeN+2w7r1VG9e3V26rPUeuFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764615259; c=relaxed/simple;
-	bh=xdQFSPwBDitJJbj4YFqv8oX69ifcmN2sMzq3HiUxFog=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eXazZe1GK3pt+3OKxr5EeWTF09gr0EDp/J3aMk6gsJfDlakEatYUBUjGC/QowZfSauHV9ZRcBTOzSLkgVj6RD+3CuPIq/FCEbnVPGa3p5NR8NEr7wp2WGL5kKazp74p9ciIp7DD72QRy85nz97K9uvVIp4rbvfVi9aDjV6uXs3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rJrdc4my; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1764615801; c=relaxed/simple;
+	bh=A02pUgeAmvGHdrkD+rUE9fzxwZ0ZdB/gJLE7NQl0bKg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gNicjmSGdhVy+NXRCLzy4qN03aZ2N5B6PN4BqjBZC2J0Zs/ZGNczjUE3F4gdvPGnXIzhi9dyB8+Kwgpnrf9X91h7YsE6d8YJdN0kdi8lHRGl63plGVp5UeBx/8WJ1udIFbg4X0QGu7bqYcrmxWJrRYCp32t6149zL3KrSZt4jkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bxqbAsGX; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-299d40b0845so75240355ad.3
-        for <kvm@vger.kernel.org>; Mon, 01 Dec 2025 10:54:17 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340c0604e3dso4853478a91.2
+        for <kvm@vger.kernel.org>; Mon, 01 Dec 2025 11:03:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764615257; x=1765220057; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NZR7hK5x4THTBId2vxyDYOqgCYL0BSheMqFuUmlt+Jw=;
-        b=rJrdc4myLwh5sTna1PuJYPc/KOILdlLOmqy97IzQq1WNI+gRSTu77M/5mUVqJe26pv
-         Vxb029p44Gag8/bWe00oXbZS+Ftp8ymQhnMHBs0Mgc0eWQR8LrXlvW2YHAB6ppq9lKwb
-         IOPkaCW2XSW5iDBk2JJ9IZ6iPoGc5oHjY2G3qx45Nd5gl+h0yGZtsXoiFIZ7LnF00WyA
-         gH6sz/VIsim6SU9HLb3wzF66lBxUhWTAcLkW+wVKIzwkTCJPKgaHFQ/FDahBRzZqhE8k
-         2YzM19tyU6JMfTgzRM6MM41Q8wMrQbaQ+z52Glxjqs4v2dLDivW/WfQ3JViz9u7AuU3u
-         wLJg==
+        d=google.com; s=20230601; t=1764615799; x=1765220599; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pu1GzNXnswxxTsLftEUw+XLhracJ2MXZoaDjvhLvKc0=;
+        b=bxqbAsGXoSmU1foLPf/desLtCh0SKDf9lh7Qt197ng36cFe2XPUvRKSUymsVvIXR7l
+         AVABiGVIeWhhweZQgz5pW0/VILfBSPqFS61/eGu8GHI9M74+7+C9Pn3HG8Nuv2VpMR/Z
+         CjRncz8rx+wqFmV9o5jox6HZ7iPfNbUCe/+nBdEXqeBIscHYDUpqrZOvzrq84J+UoxjT
+         vM2rHCObnZwUwUpf3Eh2lFd5dyK8hJToMTj/uxNoVM7xJo4arNG9oKtEZG3LW0nt6yOV
+         FkO6pjmjfE6I/MZV6d5n9rtYgq7uu6rGm0jVPF8hJPVoYnNyAzbSlFh5LfQHMIfJlyDk
+         Qwsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764615257; x=1765220057;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NZR7hK5x4THTBId2vxyDYOqgCYL0BSheMqFuUmlt+Jw=;
-        b=DyoXafXyz06E80S70uL6E8i3zU5Z77Rj/LPq26iJlQWpIB3EKyeIfVa17N/auoTStc
-         bSuI39PLp/Nyihf6luPebZDizdr5/ILg+JbRwNNAv0fzOusHYMKd9YxwwhIyF6YwYnqV
-         1xFJDP6Ny3m9sPhzdMO/JhsiYVBNxx5w5j1RfD3HcgVCYZnCyIeRrv6vm9IPE1ZVC6p5
-         r7LSmZSeapz/w/KRlvqAc4LA3ngg6zTYs1sxlaenL8cQJpq9K6S0aXgGLXRt8I269pG0
-         hr/oi1D/zxjgS0lwEt7CQCraKJcSMqBGXuWV6+Lm4t9SD7KhPx3NOI0mb/ZXcmF/rDE5
-         uZKw==
-X-Forwarded-Encrypted: i=1; AJvYcCVQpIaDT+Mwe3ONqDyFt8Ezny6odMaL1O26tQNSxHdPXbvs1OXVXAw+pukV7D0bdiybcis=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxY/8PUnfEx1vswt7ffDauc2A7Ux7aGWAaR2bEemWRqvMARLV+Q
-	PscbAs+lwwuZUMiqLpy0sGYrs3okYN+MpS9IWO4/DGSrDLLzd0bcivirrep496uiNA==
-X-Gm-Gg: ASbGncv3aKhmVWPOcXYXPfz3nWQR+DWGUJbW5MQgRvvUAaRnZRgQzfHgqRvpmDIT031
-	gH9SXjrwE0i0UTxhcwj7PEpIfsihpnwuknuPK+1MtXZAuUC9qW/XTMyB/H7jaCYNIj+o3Eo9kch
-	fRbBQVrCS8gd1uvgF2lUsUIMENQFpx7PdeTrohmpqXmGHqlW+jO3K+PiEVtbjQH61rph9NBG30W
-	ENttPTxEw3aDIulio4hW1RthFRgr88AViof5etIkvaQRMp+XmD0a8B6Yc0jDoQTVC6OODJgON2v
-	XIjTKvJ5cRgv4q49LnJ+332O2/I0FaIbFb5kbAn44G5562VuuQf4UDH0Qs80ukdH48vL+npid3R
-	5wTQQRJaS37lQxlv+oLJOuWQquOsyImAGqlQDUSWsXS+YnXlW8bK0flIzGQaNhRvQD4MpT0FoDF
-	uUd7tqrGGz7mz0gvJG1OBaXOxwPu5DhzpAttJhj1jSVZYTqxU=
-X-Google-Smtp-Source: AGHT+IEiFxvWkfPP9po3hvukZ9ksCP0VDwl+C6gb0NjWaMPZyH9tph+K1Sdl9eUHW9tCV4/voZXr4g==
-X-Received: by 2002:a17:90b:53c3:b0:33f:ebc2:634 with SMTP id 98e67ed59e1d1-3475ebe8173mr23598831a91.9.1764615256953;
-        Mon, 01 Dec 2025 10:54:16 -0800 (PST)
-Received: from google.com (28.29.230.35.bc.googleusercontent.com. [35.230.29.28])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3475e952efbsm8216852a91.1.2025.12.01.10.54.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 10:54:16 -0800 (PST)
-Date: Mon, 1 Dec 2025 18:54:11 +0000
-From: David Matlack <dmatlack@google.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Lukas Wunner <lukas@wunner.de>, Alex Williamson <alex@shazbot.org>,
-	Adithya Jayachandran <ajayachandra@nvidia.com>,
-	Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>,
-	David Rientjes <rientjes@google.com>,
-	Jacob Pan <jacob.pan@linux.microsoft.com>,
-	Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>,
-	kvm@vger.kernel.org, Leon Romanovsky <leonro@nvidia.com>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-pci@vger.kernel.org, Mike Rapoport <rppt@kernel.org>,
-	Parav Pandit <parav@nvidia.com>,
-	Philipp Stanner <pstanner@redhat.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Shuah Khan <shuah@kernel.org>, Tomita Moeko <tomitamoeko@gmail.com>,
-	Vipin Sharma <vipinsh@google.com>, William Tu <witu@nvidia.com>,
-	Yi Liu <yi.l.liu@intel.com>, Yunxiang Li <Yunxiang.Li@amd.com>,
-	Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: Re: [PATCH 02/21] PCI: Add API to track PCI devices preserved across
- Live Update
-Message-ID: <aS3kUwlVV_WGT66w@google.com>
-References: <20251126193608.2678510-1-dmatlack@google.com>
- <20251126193608.2678510-3-dmatlack@google.com>
- <aSrMSRd8RJn2IKF4@wunner.de>
- <20251130005113.GB760268@nvidia.com>
- <CA+CK2bB0V9jdmrcNjgsmWHmSFQpSpxdVahf1pb3Bz2WA3rKcng@mail.gmail.com>
- <20251201132934.GA1075897@nvidia.com>
+        d=1e100.net; s=20230601; t=1764615799; x=1765220599;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pu1GzNXnswxxTsLftEUw+XLhracJ2MXZoaDjvhLvKc0=;
+        b=ufWL/5GeH+ycQgGZ++dAui5HG6nRZ8/I2Gi9+PLNnCwxDAUR24T0YtPFUDWNLU4Fta
+         gnwnWEGvCbtv34zcx26cKMsUWbfv1yRywtjTgf/9dWqZ5FN8emCcQHISGS1ULKkCuHtw
+         vAlbzE/qIk86oMho4DP/B+5VRJcKZqD9P/SOoMMq4ZIz6Oen1IyWsSRZ2jgTWKLwD9dq
+         CcrvgCP6JSeV7qoCNwkpUMCzvZ2nT5SRlyAN9c13P7wBanZ5OcFrt2rSwpnsH4Z5wKsN
+         r38tJjOBgLYFTJnKVCz1PJg1stNeb/tStJdNEll/vyDoW1Bu/nCQVE53UwS2gLgH1cli
+         jlzg==
+X-Forwarded-Encrypted: i=1; AJvYcCVegMvZCqIjxzzzx6L0oJRIOXvLk0XlemdkpRDoK/NmTiGsjDWiWGQhFJqzHR4XDtZDKbA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0KlqUb+4Xq18AxouvO0vYSS6OFOYFIieYQIBfE3B5iAayzYwu
+	4BTohEtgq8yp4pLbTFTtQNB4dRRWW+cRbUxB+EUAaiIflrsAYT0QlaqpneY3u2h/JjqDCQGQZIA
+	H2ajwpg==
+X-Google-Smtp-Source: AGHT+IHw9VmBXKW6XOZT+mg91gy7vtZGKPdp6G91jlZ3D2sj3sZdSq0tnxgxwv4nwAIngjMF9zWWrrDYxko=
+X-Received: from pjst20.prod.google.com ([2002:a17:90b:194:b0:347:2e36:e379])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:578c:b0:341:2141:df76
+ with SMTP id 98e67ed59e1d1-34733e734f9mr34267712a91.13.1764615799118; Mon, 01
+ Dec 2025 11:03:19 -0800 (PST)
+Date: Mon, 1 Dec 2025 11:03:17 -0800
+In-Reply-To: <20251127001132.13704-1-redacherkaoui67@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251201132934.GA1075897@nvidia.com>
+Mime-Version: 1.0
+References: <20251127001132.13704-1-redacherkaoui67@gmail.com>
+Message-ID: <aS3mdTKmTFIpc3ye@google.com>
+Subject: Re: [PATCH] KVM: coalesced_mmio: Fix out-of-bounds write in coalesced_mmio_write()
+From: Sean Christopherson <seanjc@google.com>
+To: redacherkaoui <redacherkaoui67@gmail.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	redahack12-glitch <redahack12@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 2025-12-01 09:29 AM, Jason Gunthorpe wrote:
-> On Sat, Nov 29, 2025 at 08:20:34PM -0500, Pasha Tatashin wrote:
-> > On Sat, Nov 29, 2025 at 7:51 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > >
-> > > On Sat, Nov 29, 2025 at 11:34:49AM +0100, Lukas Wunner wrote:
-> > > > On Wed, Nov 26, 2025 at 07:35:49PM +0000, David Matlack wrote:
-> > > > > Add an API to enable the PCI subsystem to track all devices that are
-> > > > > preserved across a Live Update, including both incoming devices (passed
-> > > > > from the previous kernel) and outgoing devices (passed to the next
-> > > > > kernel).
-> > > > >
-> > > > > Use PCI segment number and BDF to keep track of devices across Live
-> > > > > Update. This means the kernel must keep both identifiers constant across
-> > > > > a Live Update for any preserved device.
-> > > >
-> > > > While bus numbers will *usually* stay the same across next and previous
-> > > > kernel, there are exceptions.  E.g. if "pci=assign-busses" is specified
-> > > > on the command line, the kernel will re-assign bus numbers on every boot.
-> > >
-> > > Stuff like this has to be disabled for this live update stuff, if the
-> > > bus numbers are changed it will break the active use of the iommu
-> > > across the kexec.
-> > >
-> > > So while what you say is all technically true, I'm not sure this is
-> > > necessary.
-> > 
-> > I agree. However, Lukas's comment made me wonder about the future: if
-> > we eventually need to preserve non-PCI devices (like a TPM), should we
-> > be designing a common identification mechanism for all buses now? Or
-> > should we settle on BDF for PCI and invent stable identifiers for
-> > other bus types as they become necessary?
+On Thu, Nov 27, 2025, redacherkaoui wrote:
+> From: redahack12-glitch <redahack12@gmail.com>
 > 
-> Well, at least PCI subsystem should use BDF..
+> The coalesced MMIO ring stores each entry's MMIO payload in an 8-byte
+> fixed-size buffer (data[8]). However, coalesced_mmio_write() copies
+> the payload using memcpy(..., len) without verifying that 'len' does not
+> exceed the buffer size.
 > 
-> You are probably right that the matching of preserved data to a struct
-> device should be more general though.
+> A malicious
 
-Lukas' suggestion would also make it more reliable to detect bus numbers
-changing during a Live Update. We can play whack-a-mole with things like
-assign-busses, but there will be a risk that we miss something or
-something changes in the future.
+KVM controls all callers.
 
-Perhaps it would make sense to rely on BDF in the PCI subsystem in the
-short term and enforce bus number stability manually (e.g. see patch at
-the bottom), and then explore stable device paths as a future
-improvement to make PCI device preservation more reliable and also to
-enable other bus types?
+> or buggy caller could therefore trigger a write past the end of the data[]
+> array and corrupt adjacent kernel memory inside the ring page.
 
-To handle pci=assign-busses, perhaps something like this? Are there any
-other places where the kernel could change busses?
-
-diff --git a/drivers/pci/probe.c b/drivers/pci/probe.c
-index 0ce98e18b5a8..2e1e1aa385a8 100644
---- a/drivers/pci/probe.c
-+++ b/drivers/pci/probe.c
-@@ -1331,6 +1331,20 @@ static bool pci_ea_fixed_busnrs(struct pci_dev *dev, u8 *sec, u8 *sub)
- 	return true;
- }
- 
-+static bool pci_assign_all_busses(void)
-+{
-+	/*
-+	 * During a Live Update, do not assign new bus numbers. Use bus numbers
-+	 * assigned by the firmware and the previous kernel. Bus numbers must
-+	 * remain constant so that devices preserved across the Live Update can
-+	 * use the IOMMU uninterrupted.
-+	 */
-+	if (liveupdate_count())
-+		return false;
-+
-+	return pcibios_assign_all_busses();
-+}
-+
- /*
-  * pci_scan_bridge_extend() - Scan buses behind a bridge
-  * @bus: Parent bus the bridge is on
-@@ -1404,7 +1418,7 @@ static int pci_scan_bridge_extend(struct pci_bus *bus, struct pci_dev *dev,
- 	pci_write_config_word(dev, PCI_BRIDGE_CONTROL,
- 			      bctl & ~PCI_BRIDGE_CTL_MASTER_ABORT);
- 
--	if ((secondary || subordinate) && !pcibios_assign_all_busses() &&
-+	if ((secondary || subordinate) && !pci_assign_all_busses() &&
- 	    !is_cardbus && !broken) {
- 		unsigned int cmax, buses;
- 
-@@ -1441,13 +1455,16 @@ static int pci_scan_bridge_extend(struct pci_bus *bus, struct pci_dev *dev,
- 		if (subordinate > max)
- 			max = subordinate;
- 	} else {
-+		pci_WARN_ONCE(dev, liveupdate_count(),
-+			      "Assigning new bus numbers during a Live Update! [%u %u %u %u]\n",
-+			      secondary, subordinate, is_cardbus, broken);
- 
- 		/*
- 		 * We need to assign a number to this bus which we always
- 		 * do in the second pass.
- 		 */
- 		if (!pass) {
--			if (pcibios_assign_all_busses() || broken || is_cardbus)
-+			if (pci_assign_all_busses() || broken || is_cardbus)
- 
- 				/*
- 				 * Temporarily disable forwarding of the
-@@ -1522,7 +1539,7 @@ static int pci_scan_bridge_extend(struct pci_bus *bus, struct pci_dev *dev,
- 							max+i+1))
- 					break;
- 				while (parent->parent) {
--					if ((!pcibios_assign_all_busses()) &&
-+					if ((!pci_assign_all_busses()) &&
- 					    (parent->busn_res.end > max) &&
- 					    (parent->busn_res.end <= max+i)) {
- 						j = 1;
-diff --git a/include/linux/liveupdate.h b/include/linux/liveupdate.h
-index b913d63eab5f..87a4982d0eb1 100644
---- a/include/linux/liveupdate.h
-+++ b/include/linux/liveupdate.h
-@@ -219,6 +219,7 @@ struct liveupdate_flb {
- 
- /* Return true if live update orchestrator is enabled */
- bool liveupdate_enabled(void);
-+int liveupdate_count(void);
- 
- /* Called during kexec to tell LUO that entered into reboot */
- int liveupdate_reboot(void);
-@@ -241,6 +242,11 @@ static inline bool liveupdate_enabled(void)
- 	return false;
- }
- 
-+static inline int liveupdate_count(void)
-+{
-+	return 0;
-+}
-+
- static inline int liveupdate_reboot(void)
- {
- 	return 0;
-diff --git a/kernel/liveupdate/luo_core.c b/kernel/liveupdate/luo_core.c
-index 69298d82f404..2f273397bd41 100644
---- a/kernel/liveupdate/luo_core.c
-+++ b/kernel/liveupdate/luo_core.c
-@@ -256,6 +256,13 @@ bool liveupdate_enabled(void)
- {
- 	return luo_global.enabled;
- }
-+EXPORT_SYMBOL_GPL(liveupdate_enabled);
-+
-+int liveupdate_count(void)
-+{
-+	return luo_global.liveupdate_num;
-+}
-+EXPORT_SYMBOL_GPL(liveupdate_count);
- 
- /**
-  * DOC: LUO ioctl Interface
+True, but if a caller is buggy, KVM likely has bigger problems because KVM relies
+on MMIO (and PIO) accesses being no larger than 8 in a number of locations.  If
+we want to harden KVM, kvm_iodevice_{read,write}() would be a better place for a
+sanity check.
 
