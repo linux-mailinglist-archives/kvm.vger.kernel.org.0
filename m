@@ -1,126 +1,222 @@
-Return-Path: <kvm+bounces-65022-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65023-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22E4EC98A7F
-	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 19:08:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75ADCC98B29
+	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 19:20:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9B146345052
-	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 18:08:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA6633A45D3
+	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 18:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6886338917;
-	Mon,  1 Dec 2025 18:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF2933890A;
+	Mon,  1 Dec 2025 18:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PzQLz69l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gEa8KddT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3725B337BA1
-	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 18:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CEC338925
+	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 18:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764612479; cv=none; b=nS2FF/3Ylk9+qtSKzit6UMYwhZUZM0psdSfFypCB7o/VZ3Cpepph9qAlgVK79jWCF3gRFUniDJXhqj32catIT/NIqZi7XEi8WA6EHwpkH73KKrFMoDxo6UkiZt2PSDgqMqLvz2RXKhYIc5vQSFNRJ7oWRQHVUc/6NrntXo9j028=
+	t=1764613200; cv=none; b=UDsxFJmS5qokeOYzLtSBUBSV3RF6UYbvhPPQdssccSx07LD866mTe8NIdLPT2w/Vy63p1r/rsnaFjiRgXwT24+E8xG1bko9p9+cSy2dOQaKUFNgfOPDX7rXhIaMuDp2IWG5dRgvw24ByuUR6UxBy5t8Q/+pKFA1XMCCOxJSLOAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764612479; c=relaxed/simple;
-	bh=8rsROMn92J41TVNBjy3cP4TH9efYQIu1NyuM3KAZho4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YW4YSjwdqnAhFLyP0yRc6wvLi/V5yKzXQ8uFAjNZcmSuo1k4t4fB3P06TgWxfZXUwlwCXS228I4EATEyI9Hv6mkUjmD+XTQzS20L1ZfGo8vdJALv5FxA96DhtK4Ny+DlMRY8cab4qewhoasrz7epCtzXkvHUhNn5MuzzNik7sE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PzQLz69l; arc=none smtp.client-ip=209.85.208.171
+	s=arc-20240116; t=1764613200; c=relaxed/simple;
+	bh=R4zb8QVEWFPgzNvZ5CPpwj0EBVH9ubdWaSW2XoDwoY0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OHD5RLh3qhJgaFlYou6+B0iRKvIaQVJJ1yh8Ebp7ve1m7pCgxFSXhrK/h5pk/2kegt47lk1DJT3CORM1D8J4XKib0EnrNUDkhZ/PpraB/VTbFrqRyXPhjeDqQFxl+hZwS9skeYl5d5TR+Cc4QAmkzmOlavx0Ncd0HiFQJqsHP8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gEa8KddT; arc=none smtp.client-ip=209.85.218.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-37b935df7bfso42626011fa.2
-        for <kvm@vger.kernel.org>; Mon, 01 Dec 2025 10:07:58 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b70caafad59so436695966b.0
+        for <kvm@vger.kernel.org>; Mon, 01 Dec 2025 10:19:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764612476; x=1765217276; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kHR2b1tdnReLGK2rMPeAJ5tNK3FsFx1mTEmh9YttTBY=;
-        b=PzQLz69l264KeGRPYi4nVtOpPUD9jsr4xmYhrLrWSRbV9lp/1tkgftFWRJ56qUlzIB
-         Wy8LCIk++bvz4pR7djsRXLfcHu6I+e/h8a06OqdLl8pdBPb+lUYMN/s3CG6kYEEgseCD
-         vr3Y87lc7HKoyEoeLWv/mK0m6yI9Skj/p1SDfGEdScwMSycLGUcQtwIM74wmDVno31H4
-         Pk7/uKtzI0WlFBvJlQUhco9DKmWPRk29wZ5ecYJfPiOFBxZlJIyhxhdbG8m17LfS6YPV
-         KywnXwEtK5iVkxDTpKpqx0rc9Z3wvvaI6d8SiTLAZFwCAQPcGp/ziTSR3iVGclBQjyXf
-         nB/Q==
+        d=google.com; s=20230601; t=1764613197; x=1765217997; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R2ky1g7vqxE0dSxSYlDayHPkG662KZ7f5gS2hZCCGuQ=;
+        b=gEa8KddTUkmX/DWdwx+KjhGa+x5kX46ytu6NtGMSD8XPi5gsiLEWscWckua0KU04NO
+         MLX/HFSAEUgdssvqwr9I559AfXx/reuWJwdNwNdQEF8PZG/F5W1FcQoCa3ShpOkwM1my
+         9i6O9qrqyQcfsuKzG2OrUmp6WviOsi1NTSIpPHjAW1FegYJC0RwcO8GLvq/JS4nC/PPL
+         pFLeimN3PXDk/70f95lvaY/Ceqvq7mgopl3bTciYFbr3FRv1zKkgXYMXR5odI76vRUj+
+         fDArLz5VhUOx7N4WCCFLFOhaj10mK0tI/gdUoYnytixE6u3Lx2Esm6WSDVat714Zpz9/
+         ELUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764612476; x=1765217276;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kHR2b1tdnReLGK2rMPeAJ5tNK3FsFx1mTEmh9YttTBY=;
-        b=VhRI7c9HCFXvYGiEWVvkJxjM3mSEHwJ7wZVUKC0mCH8NgMt0XYcGJ2Th3YSYP5ikvQ
-         mYAxxcbVBeub1ltZh4ah2ZXuwEt18MXZVKoTMif7YACI9dfvDm21wl5+yZ/qdXNy4tNN
-         4lflqox1gLGp75Fpd4XyuYK2xT9PCdkLLlZ8ZIT5vZnWHBZz0lAxUAO4MurR2HH8uClT
-         +9XO2N4w8OtHuaQL64PTfGePzhPqFVpltp9Zz2fP/F87YPO1qPc3aUDal1e4T+WWNNfS
-         C+ZjVaQXUH9YKDcdreXC1fzCTvwhCZPF1apIButeEbr5ToFXBxIIX44/FkzqQe6BYpFi
-         o9qw==
-X-Forwarded-Encrypted: i=1; AJvYcCVVD/TL5TeNmwpLJeh791vyG+ZzIAPtHdWipLx0yQEfL22OXPD9B1AjWlFrrIFC1AGQEMY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6rbZZv59ylsG8b++jzwh9vzZ1dh/ttGKSSt9vNvJoVr8chbhk
-	chrTzSyrJ62CpiCdDvseIhIjBtnJC/xMI9+A+2UPV/TecNo2klNVpHb8S31SBR//+zQfyrNPCTR
-	A1lZwe8lrdhB1qzFTSU9tUtAOtwW3qcER7zm6PB9H
-X-Gm-Gg: ASbGncviYE7XWrNv7KlaEuNlJyaJYh5w3y37Yjgvf0lSiERmwthK5JmdBwsBloESPYk
-	lQvsIl0hyygHR/HipPcAKDKzO0Hsdejqr3zXfTxJtVkMDbLfSzIARPzAF7v9QrGucX/oE3Kv9rc
-	086zM+KqBHOIg1l0cOcn6M3CHyb9Uu3/wlEe350I06mVAle5JssHE4+sMkI+dRYMcVdoX69chnG
-	UfgPkuDkDkx1uPR3Wtm5R+XmBYOzaZ7ioES5EmUwVYjEXZqiOw639OrbTzA18WCvknzfq7Z
-X-Google-Smtp-Source: AGHT+IEN3e+8GrhdE9mAKq6M6O36EXV0rwfuSn04+F/nQOmCWX8I0XUdBirEHvrMIu0J0E0PqjGTqNWM7KtX/bHjIWU=
-X-Received: by 2002:a2e:87c9:0:b0:37b:ba96:ce07 with SMTP id
- 38308e7fff4ca-37cd91b6896mr84496801fa.15.1764612476135; Mon, 01 Dec 2025
- 10:07:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764613197; x=1765217997;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R2ky1g7vqxE0dSxSYlDayHPkG662KZ7f5gS2hZCCGuQ=;
+        b=uq8jvJOkVvpAxt5BxL1ht/zzUdoJzRIa1rVVJqz7Kz0ogfYKgGu4PtXjHUUw7+94Yp
+         iiQpg+2Mz6Xjf0ayrP+g03zQWcTlVeYrtDWh40U1SLtT9zlkR0R4oV309cMqENMIHVjH
+         dl3HXDsVaRcLzILVrJvzSyq7N3vewN3yxbA9ksU1BDM1yKV1CpD5u67aEwr3oXFp2HB2
+         20wYD6oe54O+FL18Y6/qyoGplZo5jVDqk0j3+yZZigkqzTuWCSEYrXFja1pR49bKcWkM
+         HbTb1rfCEs/VVpViX2FeNWDl/MIomHV5IpRCx75EZJPpfcoHNiIpEPksUyCvuM8n+kO+
+         B9Kw==
+X-Gm-Message-State: AOJu0YyYdVP+9Ya7XJX8qtuyI5NisTq79UIVBItnun0QW/MBP5pZejWv
+	5dblfGYvkbGitxJX/pe3OJDV3HfyZrHaQJjyo/suNyt5Xo5WBxR5+XeIbfy6eT8BUaIBb30Q11F
+	xnc4uIkWUuzfurEID3NwYVEKHhGxx6UfdoQRXiv/vIDldN004EYIi40SvHXVJdfTQUgj1DKNWsN
+	X8i9jWlDsNFLlEpaCmorzQYUDYMvc=
+X-Google-Smtp-Source: AGHT+IG0rnfQOBcsGBc89nGQ7P5SqEhx394iLm0A9p+JH2UauaQ7PKGIBjoXKOQU6ONzPdt2vT+TuR01CA==
+X-Received: from ejdcu3.prod.google.com ([2002:a17:906:ba83:b0:b73:2695:dbc5])
+ (user=ptosi job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:6d13:b0:b77:18a0:3c8b
+ with SMTP id a640c23a62f3a-b7718a03cd2mr1308264966b.1.1764613196560; Mon, 01
+ Dec 2025 10:19:56 -0800 (PST)
+Date: Mon, 01 Dec 2025 18:19:52 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251126193608.2678510-1-dmatlack@google.com> <20251126193608.2678510-3-dmatlack@google.com>
- <CA+CK2bDhr-ymK7mKxYpA-_XJ9t4jEr3dMQH-5c8=jbtwVvNSKQ@mail.gmail.com>
-In-Reply-To: <CA+CK2bDhr-ymK7mKxYpA-_XJ9t4jEr3dMQH-5c8=jbtwVvNSKQ@mail.gmail.com>
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 1 Dec 2025 10:07:28 -0800
-X-Gm-Features: AWmQ_bkomNF3J9A1FiK-AgqV8WToT7JD_nfz6VIh1V5NsvSQRYZQicK6wnjcmD4
-Message-ID: <CALzav=evA12+-4mOjUMLin=E=STKSW9JCpT12poyvW=N8jh8Cg@mail.gmail.com>
-Subject: Re: [PATCH 02/21] PCI: Add API to track PCI devices preserved across
- Live Update
-To: Pasha Tatashin <pasha.tatashin@soleen.com>
-Cc: Alex Williamson <alex@shazbot.org>, Adithya Jayachandran <ajayachandra@nvidia.com>, 
-	Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>, 
-	Jacob Pan <jacob.pan@linux.microsoft.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>, 
-	kvm@vger.kernel.org, Leon Romanovsky <leonro@nvidia.com>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-pci@vger.kernel.org, 
-	Lukas Wunner <lukas@wunner.de>, Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>, 
-	Philipp Stanner <pstanner@redhat.com>, Pratyush Yadav <pratyush@kernel.org>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Samiullah Khawaja <skhawaja@google.com>, Shuah Khan <shuah@kernel.org>, 
-	Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>, William Tu <witu@nvidia.com>, 
-	Yi Liu <yi.l.liu@intel.com>, Yunxiang Li <Yunxiang.Li@amd.com>, 
-	Zhu Yanjun <yanjun.zhu@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAEjcLWkC/x3MQQqAIBBA0avIrBN0QpCuEi1KxxooC40IxLsnL
+ d/i/wKZElOGQRRI9HDmMzboToDb5riSZN8MqNBoVFrmwzknA+83JWms9T5oXHpjoCVXosDvvxu nWj8ivT43XgAAAA==
+X-Change-Id: 20251201-smccc-filter-588ddf12b355
+X-Mailer: b4 0.14.2
+Message-ID: <20251201-smccc-filter-v1-1-b4831416f8a3@google.com>
+Subject: [PATCH] KVM: arm64: Prevent FWD_TO_USER of SMCCC to pKVM
+From: "=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com>
+To: kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev
+Cc: Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	"=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 29, 2025 at 12:15=E2=80=AFPM Pasha Tatashin
-<pasha.tatashin@soleen.com> wrote:
->
-> > +static void pci_flb_unpreserve(struct liveupdate_flb_op_args *args)
-> > +{
-> > +       struct pci_ser *ser =3D args->obj;
-> > +       struct folio *folio =3D virt_to_folio(ser);
-> > +
-> > +       WARN_ON_ONCE(ser->nr_devices);
-> > +       kho_unpreserve_folio(folio);
-> > +       folio_put(folio);
->
-> Here, and in other places in this series, I would use:
-> https://lore.kernel.org/all/20251114190002.3311679-4-pasha.tatashin@solee=
-n.com
->
-> kho_alloc_preserve(size_t size)
-> kho_unpreserve_free(void *mem)
-> kho_restore_free(void *mem)
+With protected VMs, forwarding guest HVC/SMCs happens at two interfaces:
 
-Will do, thanks for the suggestion.
+     pKVM [EL2] <--> KVM [EL1] <--> VMM [EL0]
+
+so it might be possible for EL0 to successfully register with EL1 to
+handle guest SMCCC calls but never see the KVM_EXIT_HYPERCALL, even if
+the calls are properly issued by the guest, due to EL2 handling them so
+that (host) EL1 never gets a chance to exit to EL0.
+
+Instead, avoid that confusing situation and make userspace fail early by
+disallowing KVM_ARM_VM_SMCCC_FILTER-ing calls from protected guests in
+the KVM FID range (which pKVM re-uses).
+
+DEN0028 defines 65536 "Vendor Specific Hypervisor Service Calls":
+
+- the first ARM_SMCCC_KVM_NUM_FUNCS (128) can be custom-defined
+- the following 3 are currently standardized
+- the rest is "reserved for future expansion"
+
+so reserve them all, like commit 821d935c87bc ("KVM: arm64: Introduce
+support for userspace SMCCC filtering") with the Arm Architecture Calls.
+
+Alternatively, we could have only reserved the ARM_SMCCC_KVM_NUM_FUNCS
+(or even a subset of it) and the "Call UID Query" but that would have
+risked future conflicts between that uAPI and an extension of the SMCCC
+or of the pKVM ABI.
+
+Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
+---
+ Documentation/virt/kvm/devices/vm.rst | 11 ++++++++++
+ arch/arm64/kvm/hypercalls.c           | 39 +++++++++++++++++++++++++++++++=
+++++
+ 2 files changed, 50 insertions(+)
+
+diff --git a/Documentation/virt/kvm/devices/vm.rst b/Documentation/virt/kvm=
+/devices/vm.rst
+index a4d39fa1b0834b090318250db3b670b0b3174259..9ed4b7afe022023346d4835d33a=
+901e557fc4765 100644
+--- a/Documentation/virt/kvm/devices/vm.rst
++++ b/Documentation/virt/kvm/devices/vm.rst
+@@ -400,3 +400,14 @@ will reject attempts to define a filter for any portio=
+n of these ranges:
+         0x8000_0000 0x8000_FFFF
+         0xC000_0000 0xC000_FFFF
+         =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
++
++Protected KVM (pKVM) reserves the 'Vendor Specific Hypervisor Service Call=
+s'
++range of function IDs and will reject attempts to define a filter for any
++portion of these ranges for a protected VM (``KVM_VM_TYPE_ARM_PROTECTED``)=
+:
++
++        =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
++        Start       End (inclusive)
++        =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
++        0x8600_0000 0x8600_FFFF
++        0xC600_0000 0xC600_FFFF
++        =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 58c5fe7d757274d9079606fcc378485980c6c0f8..5ddcdd70a6b280914048e7683da=
+fb778d0f24658 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -135,6 +135,21 @@ static bool kvm_smccc_test_fw_bmap(struct kvm_vcpu *vc=
+pu, u32 func_id)
+ 						   ARM_SMCCC_SMC_64,		\
+ 						   0, ARM_SMCCC_FUNC_MASK)
+=20
++#define SMC32_VHYP_RANGE_BEGIN	ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID
++#define SMC32_VHYP_RANGE_END	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
++						   ARM_SMCCC_SMC_32,		\
++						   ARM_SMCCC_OWNER_VENDOR_HYP,	\
++						   ARM_SMCCC_FUNC_MASK)
++
++#define SMC64_VHYP_RANGE_BEGIN	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
++						   ARM_SMCCC_SMC_64,		\
++						   ARM_SMCCC_OWNER_VENDOR_HYP,	\
++						   0)
++#define SMC64_VHYP_RANGE_END	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
++						   ARM_SMCCC_SMC_64,		\
++						   ARM_SMCCC_OWNER_VENDOR_HYP,	\
++						   ARM_SMCCC_FUNC_MASK)
++
+ static int kvm_smccc_filter_insert_reserved(struct kvm *kvm)
+ {
+ 	int r;
+@@ -158,6 +173,30 @@ static int kvm_smccc_filter_insert_reserved(struct kvm=
+ *kvm)
+ 	if (r)
+ 		goto out_destroy;
+=20
++	/*
++	 * Prevent userspace from registering to handle any SMCCC call in the
++	 * vendor hypervisor range for pVMs, avoiding the confusion of guest
++	 * calls seemingly not resulting in KVM_RUN exits because pKVM handles
++	 * them without ever returning to the host. This is NOT for security.
++	 */
++	if (kvm_vm_is_protected(kvm)) {
++		r =3D mtree_insert_range(&kvm->arch.smccc_filter,
++				       SMC32_VHYP_RANGE_BEGIN,
++				       SMC32_VHYP_RANGE_END,
++				       xa_mk_value(KVM_SMCCC_FILTER_HANDLE),
++				       GFP_KERNEL_ACCOUNT);
++		if (r)
++			goto out_destroy;
++
++		r =3D mtree_insert_range(&kvm->arch.smccc_filter,
++				       SMC64_VHYP_RANGE_BEGIN,
++				       SMC64_VHYP_RANGE_END,
++				       xa_mk_value(KVM_SMCCC_FILTER_HANDLE),
++				       GFP_KERNEL_ACCOUNT);
++		if (r)
++			goto out_destroy;
++	}
++
+ 	return 0;
+ out_destroy:
+ 	mtree_destroy(&kvm->arch.smccc_filter);
+
+---
+base-commit: 7d0a66e4bb9081d75c82ec4957c50034cb0ea449
+change-id: 20251201-smccc-filter-588ddf12b355
+
+Best regards,
+--=20
+Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
+
 
