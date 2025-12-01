@@ -1,301 +1,164 @@
-Return-Path: <kvm+bounces-65034-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65035-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25AE6C98F78
-	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 21:11:04 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16185C98F87
+	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 21:13:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5A6743452FF
-	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 20:11:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D04B94E1D3E
+	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 20:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6A825D209;
-	Mon,  1 Dec 2025 20:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BEDF261B92;
+	Mon,  1 Dec 2025 20:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OpoGnI7p"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="IUBqYe6z"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.176.194.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31C9248F6A;
-	Mon,  1 Dec 2025 20:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCEC22578D;
+	Mon,  1 Dec 2025 20:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.176.194.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764619857; cv=none; b=qU6kILpmOjdsiOtfs9MScrQCaPeO1wg7pztYNjhY8pvVxOlHmgDe8PHYiyz0AoCb6yNMKvVsK89aTUTWQ9JtnoX8qGrTGSyWnVCqWazh+j6Owyv40BGz1ACep32+GEXwboqr2sFQVkmgwC2RrTBy3xPlXrSGfBmIHF9V+1RlyOE=
+	t=1764619990; cv=none; b=uiMHpb/3msmnniiUWWCwBs5tomBKrVNYnoa80crTgBFQsIX1cvWPRI8NIEJI21o/B+sMDHJu5HlUZhn9AzpnVOep7BrxbJNxRymOstJP41jr0FoSiiFYxYUABdig//+UPZiF6CJyqK1J0Q8vi0ZfXz5AXiiFw+Rcymv789cC8+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764619857; c=relaxed/simple;
-	bh=rY4efxw1ZxhhV5xEW4DI/gzUAdUFghbdjtNe8WA+b1U=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=SnQ5AxS3J3QI5aXsmoJGFk8H7SL0FVRdPtrbJfmdSwwpcNLD/QDmtI8QU0GNsTAOIu+AcoEKTvKbU96mswDSTi9vSVNs3j698u9MW6s27EvF5OKHWJyc2blPzPxDh83JCMksoLSJ0UyUwrzq705wHnC7oRSdjCpw6ECnDREJ+nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OpoGnI7p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 345AEC4CEF1;
-	Mon,  1 Dec 2025 20:10:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764619857;
-	bh=rY4efxw1ZxhhV5xEW4DI/gzUAdUFghbdjtNe8WA+b1U=;
-	h=Date:From:To:Cc:Subject:From;
-	b=OpoGnI7pZDVa02dbu+O/wuCGRNlTbliW1qjSbosj95dSGS8vsEBj6tNHFdRpvbTyg
-	 HI6P2K7CiaDWoLWvdiiXUcvwgbSJt8nsTP3suAFE9MaWWWAF6MIoFkm0YNUFbUA5TS
-	 Ga/MLoMsARWOURMgpfTOKL4CUlomdd2GyUla8CtcgIFnV92N3p4xF2uTBJwE5wOdph
-	 kakoBsp3Fi2K5V3keXV6i92UDsaaJgrGJE6F0cYvhLty71Sr4UEQ2cQlzI0cyXTE1A
-	 am1u0EYwLHrnHmxeae9SJQLIOm8YKkrK1IU2Pg5hLd9/dNxuaI7Xh9bVsuLP0yrYrC
-	 8KfRA4mxr9QCw==
-Date: Mon, 1 Dec 2025 12:10:55 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 updates for 6.19
-Message-ID: <aS32T_UxeEfbeJx6@kernel.org>
+	s=arc-20240116; t=1764619990; c=relaxed/simple;
+	bh=MQ3eyor86sxRhc8CBbfLCATRlrWCo8STd8YRj2Xb6hI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=hJO91UgCGtoBa+uTC0F1TZ2iZ5whg1T1RrTr1fW0HK/MhzcCfP0mV853rI1+xhXpzu76+bLNiGRdH5+RAZtYGQoVeZhDrKv20e6Z/mPsOnt6y3+f/Sha2vGLpdm+xi9twU47k5JKkxLxlD+P1wHw6GVxhsoVTHqQDYHoifs3Shs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=IUBqYe6z; arc=none smtp.client-ip=63.176.194.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1764619988; x=1796155988;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=jw7sf18yjrGUxi5LoRiNzSqIdVAlpc8gStzOjw+D3GE=;
+  b=IUBqYe6zTHL7cKDCv4tcAZl7nis9A77QJp5hMP46JZ12ligi0QMw2cFL
+   uGgKzb3E2CmGbiKiDAZJ4nworwGOG6DLToFIWvY7CPo9abHfgcj5VGP7p
+   ozMK4mP0/AxpSYY6kiINk8EJaJiY7Vb70vSe4oqde28e3eMi2IxhXbXyV
+   MSi8qCRgXsDNGxUR+q6quYpEgZHkpVa13MlUFGbFPueKR28rcGT4GSQgZ
+   piU7EwzqjFx5h4YdVJR3Foyttft6/EtjwJ+a7rWZsTIZrmv9Eaod9ElRt
+   zBoINUcquJza4EG1KujnyPIZempEituVdKgNOiR3sP7BxjpA4QrFY371Y
+   A==;
+X-CSE-ConnectionGUID: UBre7cQ1R7asxuwwMHYSog==
+X-CSE-MsgGUID: Awp7RMVESxm3JxgQeF7zFw==
+X-IronPort-AV: E=Sophos;i="6.20,241,1758585600"; 
+   d="scan'208";a="6082826"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2025 20:12:48 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:2863]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.10.60:2525] with esmtp (Farcaster)
+ id 72a6fd31-2cc3-4330-9bca-5a8a723d3114; Mon, 1 Dec 2025 20:12:48 +0000 (UTC)
+X-Farcaster-Flow-ID: 72a6fd31-2cc3-4330-9bca-5a8a723d3114
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Mon, 1 Dec 2025 20:12:40 +0000
+Received: from [192.168.8.132] (10.106.82.12) by EX19D005EUB003.ant.amazon.com
+ (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Mon, 1 Dec 2025
+ 20:12:39 +0000
+Message-ID: <76e3d5bf-df73-4293-84f6-0d6ddabd0fd7@amazon.com>
+Date: Mon, 1 Dec 2025 20:12:38 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v3 4/5] guest_memfd: add support for userfaultfd minor
+ mode
+To: Peter Xu <peterx@redhat.com>
+CC: "David Hildenbrand (Red Hat)" <david@kernel.org>, Mike Rapoport
+	<rppt@kernel.org>, <linux-mm@kvack.org>, Andrea Arcangeli
+	<aarcange@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, "Axel
+ Rasmussen" <axelrasmussen@google.com>, Baolin Wang
+	<baolin.wang@linux.alibaba.com>, Hugh Dickins <hughd@google.com>, "James
+ Houghton" <jthoughton@google.com>, "Liam R. Howlett"
+	<Liam.Howlett@oracle.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, "Sean
+ Christopherson" <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, "Suren
+ Baghdasaryan" <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20251130111812.699259-1-rppt@kernel.org>
+ <20251130111812.699259-5-rppt@kernel.org>
+ <652578cc-eeff-4996-8c80-e26682a57e6d@amazon.com>
+ <2d98c597-0789-4251-843d-bfe36de25bd2@kernel.org>
+ <553c64e8-d224-4764-9057-84289257cac9@amazon.com> <aS3f_PlxWLb-6NmR@x1.local>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <aS3f_PlxWLb-6NmR@x1.local>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D008EUA003.ant.amazon.com (10.252.50.155) To
+ EX19D005EUB003.ant.amazon.com (10.252.51.31)
 
-Hi Paolo,
 
-Now that I'm back from the holiday, here's the bulk of the 6.19 content. The
-MMU changes look a little newer than they actually are (have been sitting in -next
-for more than a week) because I squashed a fixup to avoid introducing bisection
-issues.
 
-As always, details can be found in the tag. There's an extremely minor conflict with
-fixes that Marc queued in 6.18, my resolution is included at the end. Sorry about the
-wrinkle, will try to avoid next time.
+On 01/12/2025 18:35, Peter Xu wrote:
+> On Mon, Dec 01, 2025 at 04:48:22PM +0000, Nikita Kalyazin wrote:
+>> I believe I found the precise point where we convinced ourselves that minor
+>> support was sufficient: [1].  If at this moment we don't find that reasoning
+>> valid anymore, then indeed implementing missing is the only option.
+>>
+>> [1] https://lore.kernel.org/kvm/Z9GsIDVYWoV8d8-C@x1.local
+> 
+> Now after I re-read the discussion, I may have made a wrong statement
+> there, sorry.  I could have got slightly confused on when the write()
+> syscall can be involved.
+> 
+> I agree if you want to get an event when cache missed with the current uffd
+> definitions and when pre-population is forbidden, then MISSING trap is
+> required.  That is, with/without the need of UFFDIO_COPY being available.
+> 
+> Do I understand it right that UFFDIO_COPY is not allowed in your case, but
+> only write()?
 
-Please pull.
+No, UFFDIO_COPY would work perfectly fine.  We will still use write() 
+whenever we resolve stage-2 faults as they aren't visible to UFFD.  When 
+a userfault occurs at an offset that already has a page in the cache, we 
+will have to keep using UFFDIO_CONTINUE so it looks like both will be 
+required:
 
-Thanks,
-Oliver
+  - user mapping major fault -> UFFDIO_COPY (fills the cache and sets up 
+userspace PT)
+  - user mapping minor fault -> UFFDIO_CONTINUE (only sets up userspace PT)
+  - stage-2 fault -> write() (only fills the cache)
 
-The following changes since commit dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa:
+> 
+> One way that might work this around, is introducing a new UFFD_FEATURE bit
+> allowing the MINOR registration to trap all pgtable faults, which will
+> change the MINOR fault semantics.
 
-  Linux 6.18-rc3 (2025-10-26 15:59:49 -0700)
+This would equally work for us.  I suppose this MINOR+MAJOR semantics 
+would be more intrusive from the API point of view though.
 
-are available in the Git repository at:
+> 
+> That'll need some further thoughts, meanwhile we may also want to make sure
+> the old shmem/hugetlbfs semantics are kept (e.g. they should fail MINOR
+> registers if the new feature bit is enabled in the ctx somehow; or support
+> them properly in the codebase).
+> 
+> Thanks,
+> 
+> --
+> Peter Xu
+> 
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-6.19
-
-for you to fetch changes up to 3eef0c83c3f3e58933e98e678ddf4e95457d4d14:
-
-  Merge branch 'kvm-arm64/nv-xnx-haf' into kvmarm/next (2025-12-01 00:47:41 -0800)
-
-----------------------------------------------------------------
-KVM/arm64 updates for 6.19
-
- - Support for userspace handling of synchronous external aborts (SEAs),
-   allowing the VMM to potentially handle the abort in a non-fatal
-   manner.
-
- - Large rework of the VGIC's list register handling with the goal of
-   supporting more active/pending IRQs than available list registers in
-   hardware. In addition, the VGIC now supports EOImode==1 style
-   deactivations for IRQs which may occur on a separate vCPU than the
-   one that acked the IRQ.
-
- - Support for FEAT_XNX (user / privileged execute permissions) and
-   FEAT_HAF (hardware update to the Access Flag) in the software page
-   table walkers and shadow MMU.
-
- - Allow page table destruction to reschedule, fixing long need_resched
-   latencies observed when destroying a large VM.
-
- - Minor fixes to KVM and selftests
-
-----------------------------------------------------------------
-Alexandru Elisei (3):
-      KVM: arm64: Document KVM_PGTABLE_PROT_{UX,PX}
-      KVM: arm64: at: Use correct HA bit in TCR_EL2 when regime is EL2
-      KVM: arm64: at: Update AF on software walk only if VM has FEAT_HAFDBS
-
-Colin Ian King (1):
-      KVM: arm64: Fix spelling mistake "Unexpeced" -> "Unexpected"
-
-Jiaqi Yan (3):
-      KVM: arm64: VM exit to userspace to handle SEA
-      KVM: selftests: Test for KVM_EXIT_ARM_SEA
-      Documentation: kvm: new UAPI for handling SEA
-
-Marc Zyngier (51):
-      irqchip/gic: Add missing GICH_HCR control bits
-      irqchip/gic: Expose CPU interface VA to KVM
-      irqchip/apple-aic: Spit out ICH_MISR_EL2 value on spurious vGIC MI
-      KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
-      KVM: arm64: vgic-v3: Fix GICv3 trapping in protected mode
-      KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
-      KVM: arm64: Repack struct vgic_irq fields
-      KVM: arm64: Add tracking of vgic_irq being present in a LR
-      KVM: arm64: Add LR overflow handling documentation
-      KVM: arm64: GICv3: Drop LPI active state when folding LRs
-      KVM: arm64: GICv3: Preserve EOIcount on exit
-      KVM: arm64: GICv3: Decouple ICH_HCR_EL2 programming from LRs
-      KVM: arm64: GICv3: Extract LR folding primitive
-      KVM: arm64: GICv3: Extract LR computing primitive
-      KVM: arm64: GICv2: Preserve EOIcount on exit
-      KVM: arm64: GICv2: Decouple GICH_HCR programming from LRs being loaded
-      KVM: arm64: GICv2: Extract LR folding primitive
-      KVM: arm64: GICv2: Extract LR computing primitive
-      KVM: arm64: Compute vgic state irrespective of the number of interrupts
-      KVM: arm64: Eagerly save VMCR on exit
-      KVM: arm64: Revamp vgic maintenance interrupt configuration
-      KVM: arm64: Turn kvm_vgic_vcpu_enable() into kvm_vgic_vcpu_reset()
-      KVM: arm64: Make vgic_target_oracle() globally available
-      KVM: arm64: Invert ap_list sorting to push active interrupts out
-      KVM: arm64: Move undeliverable interrupts to the end of ap_list
-      KVM: arm64: Use MI to detect groups being enabled/disabled
-      KVM: arm64: GICv3: Handle LR overflow when EOImode==0
-      KVM: arm64: GICv3: Handle deactivation via ICV_DIR_EL1 traps
-      KVM: arm64: GICv3: Add GICv2 SGI handling to deactivation primitive
-      KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
-      KVM: arm64: GICv3: Add SPI tracking to handle asymmetric deactivation
-      KVM: arm64: GICv3: Handle in-LR deactivation when possible
-      KVM: arm64: GICv3: Avoid broadcast kick on CPUs lacking TDIR
-      KVM: arm64: GICv3: nv: Resync LRs/VMCR/HCR early for better MI emulation
-      KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive
-      KVM: arm64: GICv3: Force exit to sync ICH_HCR_EL2.En
-      KVM: arm64: GICv2: Handle LR overflow when EOImode==0
-      KVM: arm64: GICv2: Handle deactivation via GICV_DIR traps
-      KVM: arm64: GICv2: Always trap GICV_DIR register
-      KVM: arm64: selftests: gic_v3: Add irq group setting helper
-      KVM: arm64: selftests: gic_v3: Disable Group-0 interrupts by default
-      KVM: arm64: selftests: vgic_irq: Fix GUEST_ASSERT_IAR_EMPTY() helper
-      KVM: arm64: selftests: vgic_irq: Change configuration before enabling interrupt
-      KVM: arm64: selftests: vgic_irq: Exclude timer-controlled interrupts
-      KVM: arm64: selftests: vgic_irq: Remove LR-bound limitation
-      KVM: arm64: selftests: vgic_irq: Perform EOImode==1 deactivation in ack order
-      KVM: arm64: selftests: vgic_irq: Add asymmetric SPI deaectivation test
-      KVM: arm64: selftests: vgic_irq: Add Group-0 enable test
-      KVM: arm64: selftests: vgic_irq: Add timer deactivation test
-      KVM: arm64: Convert ICH_HCR_EL2_TDIR cap to EARLY_LOCAL_CPU_FEATURE
-      KVM: arm64: Add endian casting to kvm_swap_s[12]_desc()
-
-Maximilian Dittgen (2):
-      KVM: selftests: Assert GICR_TYPER.Processor_Number matches selftest CPU number
-      KVM: selftests: SYNC after guest ITS setup in vgic_lpi_stress
-
-Nathan Chancellor (1):
-      KVM: arm64: Add break to default case in kvm_pgtable_stage2_pte_prot()
-
-Oliver Upton (23):
-      KVM: arm64: Drop useless __GFP_HIGHMEM from kvm struct allocation
-      KVM: arm64: Use kvzalloc() for kvm struct allocation
-      KVM: arm64: Only drop references on empty tables in stage2_free_walker
-      arm64: Detect FEAT_XNX
-      KVM: arm64: Add support for FEAT_XNX stage-2 permissions
-      KVM: arm64: nv: Forward FEAT_XNX permissions to the shadow stage-2
-      KVM: arm64: Teach ptdump about FEAT_XNX permissions
-      KVM: arm64: nv: Advertise support for FEAT_XNX
-      KVM: arm64: Call helper for reading descriptors directly
-      KVM: arm64: nv: Stop passing vCPU through void ptr in S2 PTW
-      KVM: arm64: Handle endianness in read helper for emulated PTW
-      KVM: arm64: nv: Use pgtable definitions in stage-2 walk
-      KVM: arm64: Add helper for swapping guest descriptor
-      KVM: arm64: Propagate PTW errors up to AT emulation
-      KVM: arm64: Implement HW access flag management in stage-1 SW PTW
-      KVM: arm64: nv: Implement HW access flag management in stage-2 SW PTW
-      KVM: arm64: nv: Expose hardware access flag management to NV guests
-      KVM: arm64: selftests: Add test for AT emulation
-      KVM: arm64: Fix compilation when CONFIG_ARM64_USE_LSE_ATOMICS=n
-      Merge branch 'kvm-arm64/misc' into kvmarm/next
-      Merge branch 'kvm-arm64/sea-user' into kvmarm/next
-      Merge branch 'kvm-arm64/vgic-lr-overflow' into kvmarm/next
-      Merge branch 'kvm-arm64/nv-xnx-haf' into kvmarm/next
-
-Raghavendra Rao Ananta (2):
-      KVM: arm64: Split kvm_pgtable_stage2_destroy()
-      KVM: arm64: Reschedule as needed when destroying the stage-2 page-tables
-
- Documentation/virt/kvm/api.rst                     |  47 +++
- arch/arm64/include/asm/kvm_arm.h                   |   1 +
- arch/arm64/include/asm/kvm_asm.h                   |   8 +-
- arch/arm64/include/asm/kvm_host.h                  |   3 +
- arch/arm64/include/asm/kvm_hyp.h                   |   3 +-
- arch/arm64/include/asm/kvm_nested.h                |  40 +-
- arch/arm64/include/asm/kvm_pgtable.h               |  49 ++-
- arch/arm64/include/asm/kvm_pkvm.h                  |   4 +-
- arch/arm64/include/asm/virt.h                      |   7 +-
- arch/arm64/kernel/cpufeature.c                     |  59 +++
- arch/arm64/kernel/hyp-stub.S                       |   5 +
- arch/arm64/kernel/image-vars.h                     |   1 +
- arch/arm64/kvm/arm.c                               |  14 +-
- arch/arm64/kvm/at.c                                | 196 +++++++++-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |   7 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                     |   3 +
- arch/arm64/kvm/hyp/nvhe/sys_regs.c                 |   5 +
- arch/arm64/kvm/hyp/pgtable.c                       | 122 +++++-
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c           |   4 +
- arch/arm64/kvm/hyp/vgic-v3-sr.c                    |  96 +++--
- arch/arm64/kvm/mmu.c                               | 132 ++++++-
- arch/arm64/kvm/nested.c                            | 123 ++++--
- arch/arm64/kvm/pkvm.c                              |  11 +-
- arch/arm64/kvm/ptdump.c                            |  35 +-
- arch/arm64/kvm/sys_regs.c                          |  28 +-
- arch/arm64/kvm/vgic/vgic-init.c                    |   9 +-
- arch/arm64/kvm/vgic/vgic-mmio-v2.c                 |  24 ++
- arch/arm64/kvm/vgic/vgic-mmio.h                    |   1 +
- arch/arm64/kvm/vgic/vgic-v2.c                      | 291 ++++++++++----
- arch/arm64/kvm/vgic/vgic-v3-nested.c               | 104 ++---
- arch/arm64/kvm/vgic/vgic-v3.c                      | 426 ++++++++++++++++-----
- arch/arm64/kvm/vgic/vgic-v4.c                      |   5 +-
- arch/arm64/kvm/vgic/vgic.c                         | 298 ++++++++------
- arch/arm64/kvm/vgic/vgic.h                         |  43 ++-
- arch/arm64/tools/cpucaps                           |   2 +
- drivers/irqchip/irq-apple-aic.c                    |   7 +-
- drivers/irqchip/irq-gic.c                          |   3 +
- include/kvm/arm_vgic.h                             |  29 +-
- include/linux/irqchip/arm-gic.h                    |   6 +
- include/linux/irqchip/arm-vgic-info.h              |   2 +
- include/uapi/linux/kvm.h                           |  10 +
- tools/arch/arm64/include/asm/esr.h                 |   2 +
- tools/testing/selftests/kvm/Makefile.kvm           |   2 +
- tools/testing/selftests/kvm/arm64/at.c             | 166 ++++++++
- tools/testing/selftests/kvm/arm64/sea_to_user.c    | 331 ++++++++++++++++
- tools/testing/selftests/kvm/arm64/vgic_irq.c       | 285 ++++++++++++--
- .../testing/selftests/kvm/arm64/vgic_lpi_stress.c  |   4 +
- tools/testing/selftests/kvm/include/arm64/gic.h    |   1 +
- .../selftests/kvm/include/arm64/gic_v3_its.h       |   1 +
- tools/testing/selftests/kvm/include/kvm_util.h     |   1 +
- tools/testing/selftests/kvm/lib/arm64/gic.c        |   6 +
- .../testing/selftests/kvm/lib/arm64/gic_private.h  |   1 +
- tools/testing/selftests/kvm/lib/arm64/gic_v3.c     |  22 ++
- tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c |  10 +
- tools/testing/selftests/kvm/lib/kvm_util.c         |  11 +
- 55 files changed, 2575 insertions(+), 531 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/arm64/at.c
- create mode 100644 tools/testing/selftests/kvm/arm64/sea_to_user.ca
-
--- 
-diff --cc arch/arm64/kvm/vgic/vgic-v3.c
-index 968aa9d89be6,2f75ef14d339..1d6dd1b545bd
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@@ -507,9 -301,21 +507,10 @@@ void vcpu_set_ich_hcr(struct kvm_vcpu *
-                return;
-  
-        /* Hide GICv3 sysreg if necessary */
--       if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
-+       if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2 ||
- -          !irqchip_in_kernel(vcpu->kvm)) {
-++          !irqchip_in_kernel(vcpu->kvm))
-                vgic_v3->vgic_hcr |= (ICH_HCR_EL2_TALL0 | ICH_HCR_EL2_TALL1 |
-                                      ICH_HCR_EL2_TC);
- -              return;
- -      }
- -
- -      if (group0_trap)
- -              vgic_v3->vgic_hcr |= ICH_HCR_EL2_TALL0;
- -      if (group1_trap)
- -              vgic_v3->vgic_hcr |= ICH_HCR_EL2_TALL1;
- -      if (common_trap)
- -              vgic_v3->vgic_hcr |= ICH_HCR_EL2_TC;
- -      if (dir_trap)
- -              vgic_v3->vgic_hcr |= ICH_HCR_EL2_TDIR;
-  }
-  
-  int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
 
