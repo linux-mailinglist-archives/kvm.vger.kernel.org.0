@@ -1,142 +1,137 @@
-Return-Path: <kvm+bounces-65011-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65012-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 065C6C9822D
-	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 16:55:16 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94E24C9823F
+	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 16:56:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A97B83437C7
-	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 15:55:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A0EF24E2184
+	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 15:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0F133345D;
-	Mon,  1 Dec 2025 15:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE962333433;
+	Mon,  1 Dec 2025 15:55:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="smsBE6HJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ye6IveXn"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02DD33343E;
-	Mon,  1 Dec 2025 15:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27F2332ED0
+	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 15:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764604502; cv=none; b=g1ZC+gpy1W8qMJ9vifvAc31KAW3IP9EEXefBf9YtBJoyYMlYwKhbrFaHBM0x0pV7QG+mfbrB3FZLkvyVnj6z3preDhpS4JK+00bhMIuMfOUO5L9Cll1sAgs1FG/eXUjvF+TvYtw4EApGnApk8Jz9OwWsb7ip21cSKiwlbg2Rcy8=
+	t=1764604548; cv=none; b=F8fm/u5Zk5AxXLcJ2oUjlNtaL/EMxpYtnHveBaW8/QTpMYO6Uh4OPEuffaYf4c8kG6qP4Ak5poKppaY9Sjojhb6Fw4vx2BsV94rpxnwrmy0p1aVSvrswH0WvSvccJ24/BUJraaQEAIAAgVpjNHHgN/27YZAqc4URh/HXxya5tn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764604502; c=relaxed/simple;
-	bh=A2bhAHCrw29Gn04uGgzYEmynbjTQgb8sVC7Kb2YAar8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xmlfhs/oADOVZtA9Y9UiHQ0DXJKsuEGgSJcO9bR63/NNS90qcvYkiUahwaE58Mov8D78m1+wenmdlSuaxEP2mtx/swvMYT1V3L41iMv4sSFSKbue+hn+vTQ7WJ6s8nduFvIDtcWYF2gspAdKA/+P9tBR8v12Wx6dNFPJ5ezsIUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=smsBE6HJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C437C16AAE;
-	Mon,  1 Dec 2025 15:54:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764604502;
-	bh=A2bhAHCrw29Gn04uGgzYEmynbjTQgb8sVC7Kb2YAar8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=smsBE6HJo57XGVHY+R3/NXxGlT70EutobA9ZHAG37qQxBteEMSs8iiALqNACEX/lB
-	 XM7cw6uALYdyYimZ8qeDw0ti+SXt6eAnuEjN6SvfvTYp3ESDQgupwedvasAnNiQUl4
-	 +Npr5UTXMcsXdRIUwu3ai2+NT8nzskfHozuTM0ppbeKZ1pFUqJxCYy7Ny1dprih60S
-	 N/62Te0hf+IYLcy0r57iuQ2JF83dZ7VSvxhxhz7sWll4bZQoCfnRn+mAgDtRUM77o7
-	 CvoBXRLv6TUmA2VLchO0nOpDYR6aE0/lzDhe/x8N/SAcWa44PbwXiUQY67ZYhBrZNn
-	 EMxobJQMv5d9w==
-Message-ID: <2d98c597-0789-4251-843d-bfe36de25bd2@kernel.org>
-Date: Mon, 1 Dec 2025 16:54:54 +0100
+	s=arc-20240116; t=1764604548; c=relaxed/simple;
+	bh=dYdbGSq1hyaFcK0Vbnfam/5HkvnPvCtpmqz5zFQEQRU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gjeG6JIVrw811fELlyHX8ba8kcUc+biPRBaSF0DItZwu1ECdI6q7CxesOxI8P3hbPr07XAx+hjBljFl6MHa6oAuZXQRdedl2fy0u+AcJ6c3EKdH3tavreyEc6sENMOxGf25q6fywj2hMX53HbhrQchUIphgaEp/PARxcquJFHqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ye6IveXn; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7c240728e2aso7879425b3a.3
+        for <kvm@vger.kernel.org>; Mon, 01 Dec 2025 07:55:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1764604546; x=1765209346; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Ojq6WP276k7ulL9n/nH2NWkQuA4BiAIh8qTVVTbn9M=;
+        b=ye6IveXnVs4CDuLtYir996MjXQ1yd1ff9QWu5neXcsTrnPO/K1Y2kSzolPhPP7hOw6
+         JXZGx5X8BYRQPfJ/AazJQNOGA8/VwUUTnvNE0tREShUsJPKQqsxeFHbNoIys83MJ8lhw
+         uWhOGMBY1RqmTTNsehAzAoOGFiIMLK8dHy9bhoFAp9uS6O5UnDl76+SJi7+K3FT1KCkH
+         X4JAsmBLfmAaXwb4rQx5/nZF6aqBoDftR6mTyhNaCzZfdWTBwLAAaS4wPhPu++dF3Cnb
+         M2IxQIuVpfk63Ju9U6Ww1oqIRKkEUUNWmffIpIWfUsH7u+aRHNlIMWIE72K89WsstD4E
+         OvoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764604546; x=1765209346;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Ojq6WP276k7ulL9n/nH2NWkQuA4BiAIh8qTVVTbn9M=;
+        b=GNDmMfjhrgQmBsgi7FY4ggpIwXApg6xJFRXyg5p9LWV5ZJNGTUKLHD8WZbGClYx1uD
+         gBZ4W22ERUfavTttNkoReceH9UALeYcTkKV33XHlhhRlhxjvhmW1DXiSz6D13cfiQIqD
+         Flj4yP+DVJUM1kEazl/JKW4a4jY4bnsfqxIyXK8/sziMDHq/zGVpC4zQrmVIcDKKI4IH
+         YeTcw8XmOy3eerAb2+uMb0GBkeLtNHEe6rN5ak1RvNU3bqloa1veP7w47OpxGeKbpTZF
+         AQatdMcLXnqiGuFrvjEn0T27AcfSJIyS0b4HNEM1jZEQbOtcYbL9xCUZZlEX9uSLBJZK
+         OjzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVG9RXZec6X1hYCha4gb63kwLRDk97jrZ3VIvs8Myhx47NDedJw43qS460trAMAknn9ENU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvuYfMtKkmCK+ZDyyArzeopr68z1y2Uc3riEjQnrb5Dijg2b4L
+	Phw6gsBNZB/QUBH0RANt4Mic+o20Ye/N2B86nPxs/S4Fn/505l/e8P/IppimctRPL54IEsMHyxn
+	yW23yBw==
+X-Google-Smtp-Source: AGHT+IHYlsnd6krdSCI3OWnVJ7V1appZkU6hmkhgHr+N2fGX/9NSiltXr3T5N0gnEQ22pw551C85ykj99i0=
+X-Received: from pgve25.prod.google.com ([2002:a65:6499:0:b0:bc3:cbd2:e0a1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6da3:b0:34f:a16f:15ad
+ with SMTP id adf61e73a8af0-3614edd99bemr45418160637.53.1764604545930; Mon, 01
+ Dec 2025 07:55:45 -0800 (PST)
+Date: Mon, 1 Dec 2025 07:55:44 -0800
+In-Reply-To: <20251128123202.68424a95@imammedo>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/5] guest_memfd: add support for userfaultfd minor
- mode
-To: kalyazin@amazon.com, Mike Rapoport <rppt@kernel.org>, linux-mm@kvack.org
-Cc: Andrea Arcangeli <aarcange@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Axel Rasmussen <axelrasmussen@google.com>,
- Baolin Wang <baolin.wang@linux.alibaba.com>, Hugh Dickins
- <hughd@google.com>, James Houghton <jthoughton@google.com>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Michal Hocko
- <mhocko@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Peter Xu <peterx@redhat.com>, Sean Christopherson <seanjc@google.com>,
- Shuah Khan <shuah@kernel.org>, Suren Baghdasaryan <surenb@google.com>,
- Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20251130111812.699259-1-rppt@kernel.org>
- <20251130111812.699259-5-rppt@kernel.org>
- <652578cc-eeff-4996-8c80-e26682a57e6d@amazon.com>
-From: "David Hildenbrand (Red Hat)" <david@kernel.org>
-Content-Language: en-US
-In-Reply-To: <652578cc-eeff-4996-8c80-e26682a57e6d@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241211013302.1347853-1-seanjc@google.com> <20241211013302.1347853-6-seanjc@google.com>
+ <20251128123202.68424a95@imammedo>
+Message-ID: <aS26gBXQnHjgSDW5@google.com>
+Subject: Re: [PATCH 5/5] KVM: x86: Defer runtime updates of dynamic CPUID bits
+ until CPUID emulation
+From: Sean Christopherson <seanjc@google.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>, mlevitsk@redhat.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 12/1/25 14:39, Nikita Kalyazin wrote:
+On Fri, Nov 28, 2025, Igor Mammedov wrote:
+> On Tue, 10 Dec 2024 17:33:02 -0800
+> Sean Christopherson <seanjc@google.com> wrote:
 > 
+> Sean,
 > 
-> On 30/11/2025 11:18, Mike Rapoport wrote:
->> From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
->>
->> userfaultfd notifications about minor page faults used for live migration
->> and snapshotting of VMs with memory backed by shared hugetlbfs or tmpfs
->> mappings as described in detail in commit 7677f7fd8be7 ("userfaultfd: add
->> minor fault registration mode").
->>
->> To use the same mechanism for VMs that use guest_memfd to map their memory,
->> guest_memfd should support userfaultfd minor mode.
->>
->> Extend ->fault() method of guest_memfd with ability to notify core page
->> fault handler that a page fault requires handle_userfault(VM_UFFD_MINOR) to
->> complete and add implementation of ->get_folio_noalloc() to guest_memfd
->> vm_ops.
->>
->> Reviewed-by: Liam R. Howlett <Liam.Howlett@oracle.com>
->> Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
->> ---
->>    virt/kvm/guest_memfd.c | 33 ++++++++++++++++++++++++++++++++-
->>    1 file changed, 32 insertions(+), 1 deletion(-)
->>
->> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
->> index ffadc5ee8e04..dca6e373937b 100644
->> --- a/virt/kvm/guest_memfd.c
->> +++ b/virt/kvm/guest_memfd.c
->> @@ -4,6 +4,7 @@
->>    #include <linux/kvm_host.h>
->>    #include <linux/pagemap.h>
->>    #include <linux/anon_inodes.h>
->> +#include <linux/userfaultfd_k.h>
->>
->>    #include "kvm_mm.h"
->>
->> @@ -359,7 +360,15 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
->>           if (!((u64)inode->i_private & GUEST_MEMFD_FLAG_INIT_SHARED))
->>                   return VM_FAULT_SIGBUS;
->>
->> -       folio = kvm_gmem_get_folio(inode, vmf->pgoff);
->> +       folio = filemap_lock_folio(inode->i_mapping, vmf->pgoff);
->> +       if (!IS_ERR_OR_NULL(folio) && userfaultfd_minor(vmf->vma)) {
->> +               ret = VM_FAULT_UFFD_MINOR;
->> +               goto out_folio;
->> +       }
+> this patch broke vCPU hotplug (still broken with current master),
+> after repeated plug/unplug of the same vCPU in a loop, QEMU exits
+> due to error in vcpu initialization:
 > 
-> I realised that I might have been wrong in [1] saying that the noalloc
-> get folio was ok for our use case.  Unfortunately we rely on a minor
-> fault to get generated even when the page is being allocated.  Peter and
-> I discussed it originally in [2].  Since we want to populate guest
-> memory with the content supplied by userspace on demand, we have to be
-> able to intercept the very first access, meaning we either need a minor
-> or major UFFD event for that.  We decided to make use of the minor at
-> the time.  If we have to preserve the shmem semantics, it forces us to
-> implement support for major/UFFDIO_COPY.
+>     r = kvm_vcpu_ioctl(cs, KVM_SET_CPUID2, &cpuid_data);                         
+>     if (r) {                                                                     
+>         goto fail;                                                               
+>     }
+> 
+> Reproducer (host in question is Haswell but it's been seen on other hosts as well):
+> for it to trigger the issue it must be Q35 machine with UEFI firmware
+> (the rest doesn't seem to matter)
 
-If we want missing semantics then likely we should be adding ... missing 
-support? :)
+Gah, sorry.  I managed to handle KVM_GET_CPUID2, so I suspect I thought the update
+in kvm_cpuid_check_equal() would take care of things, but that only operates on
+the new entries.
 
--- 
-Cheers
+Can you test the below?  In the meantime, I'll see if I can enhance the CPUID
+selftest to detect the issue and verify the fix.
 
-David
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index d563a948318b..dd6534419074 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -509,11 +509,18 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+        u32 vcpu_caps[NR_KVM_CPU_CAPS];
+        int r;
+ 
++       /*
++        * Apply pending runtime CPUID updates to the current CPUID entries to
++        * avoid false positives due mismatches on KVM-owned feature flags.
++        */
++       if (vcpu->arch.cpuid_dynamic_bits_dirty)
++               kvm_update_cpuid_runtime(vcpu);
++
+        /*
+         * Swap the existing (old) entries with the incoming (new) entries in
+         * order to massage the new entries, e.g. to account for dynamic bits
+-        * that KVM controls, without clobbering the current guest CPUID, which
+-        * KVM needs to preserve in order to unwind on failure.
++        * that KVM controls, without losing the current guest CPUID, which KVM
++        * needs to preserve in order to unwind on failure.
+         *
+         * Similarly, save the vCPU's current cpu_caps so that the capabilities
+         * can be updated alongside the CPUID entries when performing runtime
 
