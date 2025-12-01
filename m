@@ -1,137 +1,275 @@
-Return-Path: <kvm+bounces-65027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02553C98C2E
-	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 19:49:10 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E23C3C98C6D
+	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 19:54:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B581D3A468A
-	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 18:49:08 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 645123432CC
+	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 18:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46B423C39A;
-	Mon,  1 Dec 2025 18:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D5F0239E9B;
+	Mon,  1 Dec 2025 18:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qonL8Ofb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rJrdc4my"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0DA36D513;
-	Mon,  1 Dec 2025 18:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02878219E8C
+	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 18:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764614932; cv=none; b=c6I6HT/jPN3nYrNM2SUl+md0+ACzPUkniRGmthnC1Um5xF2v7jNRSPLU9gDJf10IaTfJhoXJ7FnMyqMhwKK5ZfbNcgItkvIx23i44gJyOG+BsYo2mMRdJunnqD5mZxYp0pP7PqdZ/VSgBx7MoLtDy6W0QyAcp/x9w7WP5gLAxuk=
+	t=1764615259; cv=none; b=swFQULJl6Fxx5w07I/5abeE7H2SZBhkE9SrKWBj9RsJ4cjSVT2vSr8WeyOQ7ZFY4kvZ6vccA7y+bgNTjNzNHGl4x27P22HIKZO4ILXcN7KoLo4H0iHvc59ddY2n9HMQwW39pQd3C1G89gZbvvH31GeUMcjPputhNzOvnnT/Qx4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764614932; c=relaxed/simple;
-	bh=8mPq8nOkd7GYclNEqbPcyQdNSK5b0Ogy59muydnaThI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nG9J5mDVJqjm4MRsFbOhAWh36I4l3WlAgLTTH1VgjS/QvRaADe6sEU+koEz1iWyLnxEa/pVLmIlEd96H+l9mpfc4iidie3rimHJHmNSIsLIXC1PHR7WPdvU/BWltB7UupQcRc24LjVwHVuwmLzZV8ebOXRGDYXPuJSeupF9+bIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qonL8Ofb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6045CC4CEF1;
-	Mon,  1 Dec 2025 18:48:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764614931;
-	bh=8mPq8nOkd7GYclNEqbPcyQdNSK5b0Ogy59muydnaThI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qonL8OfbUvIgnf+p/t9uJtgN1AGc6Xl4nvqXi+pQB70+la1/q/J2DoHgNwzPP0qZ6
-	 xpU/O2CUhzcGThb8zC3RHiy3dTIB/Y2+5NOSKlyfx2QIvY+OCHlxYNUnweXP43fwd/
-	 Cu0YXRibhJLEuuvX1HDSog7pYS/f5/BSBwBwaRXp8XX4dYRFdFwiSHdeKbAjMWftEM
-	 ehNFa/3T/V+n8F0IrfjPXuE8A9BRfJYYBcAg39iU529V7/v5nebMFnEgQmXasCTp8p
-	 r1GPbR6YKzONufYvcPWDcuhUIcWRPla8yzqbM08s0BZoCGFDp8iWMqhvoED7X0HliX
-	 7B3jkWm/9Exfg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vQ8x6-00000009hAi-48rX;
-	Mon, 01 Dec 2025 18:48:49 +0000
-Date: Mon, 01 Dec 2025 18:48:48 +0000
-Message-ID: <86ms42ox67.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com>
-Cc: kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Prevent FWD_TO_USER of SMCCC to pKVM
-In-Reply-To: <20251201-smccc-filter-v1-1-b4831416f8a3@google.com>
-References: <20251201-smccc-filter-v1-1-b4831416f8a3@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1764615259; c=relaxed/simple;
+	bh=xdQFSPwBDitJJbj4YFqv8oX69ifcmN2sMzq3HiUxFog=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eXazZe1GK3pt+3OKxr5EeWTF09gr0EDp/J3aMk6gsJfDlakEatYUBUjGC/QowZfSauHV9ZRcBTOzSLkgVj6RD+3CuPIq/FCEbnVPGa3p5NR8NEr7wp2WGL5kKazp74p9ciIp7DD72QRy85nz97K9uvVIp4rbvfVi9aDjV6uXs3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rJrdc4my; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-299d40b0845so75240355ad.3
+        for <kvm@vger.kernel.org>; Mon, 01 Dec 2025 10:54:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1764615257; x=1765220057; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=NZR7hK5x4THTBId2vxyDYOqgCYL0BSheMqFuUmlt+Jw=;
+        b=rJrdc4myLwh5sTna1PuJYPc/KOILdlLOmqy97IzQq1WNI+gRSTu77M/5mUVqJe26pv
+         Vxb029p44Gag8/bWe00oXbZS+Ftp8ymQhnMHBs0Mgc0eWQR8LrXlvW2YHAB6ppq9lKwb
+         IOPkaCW2XSW5iDBk2JJ9IZ6iPoGc5oHjY2G3qx45Nd5gl+h0yGZtsXoiFIZ7LnF00WyA
+         gH6sz/VIsim6SU9HLb3wzF66lBxUhWTAcLkW+wVKIzwkTCJPKgaHFQ/FDahBRzZqhE8k
+         2YzM19tyU6JMfTgzRM6MM41Q8wMrQbaQ+z52Glxjqs4v2dLDivW/WfQ3JViz9u7AuU3u
+         wLJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764615257; x=1765220057;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NZR7hK5x4THTBId2vxyDYOqgCYL0BSheMqFuUmlt+Jw=;
+        b=DyoXafXyz06E80S70uL6E8i3zU5Z77Rj/LPq26iJlQWpIB3EKyeIfVa17N/auoTStc
+         bSuI39PLp/Nyihf6luPebZDizdr5/ILg+JbRwNNAv0fzOusHYMKd9YxwwhIyF6YwYnqV
+         1xFJDP6Ny3m9sPhzdMO/JhsiYVBNxx5w5j1RfD3HcgVCYZnCyIeRrv6vm9IPE1ZVC6p5
+         r7LSmZSeapz/w/KRlvqAc4LA3ngg6zTYs1sxlaenL8cQJpq9K6S0aXgGLXRt8I269pG0
+         hr/oi1D/zxjgS0lwEt7CQCraKJcSMqBGXuWV6+Lm4t9SD7KhPx3NOI0mb/ZXcmF/rDE5
+         uZKw==
+X-Forwarded-Encrypted: i=1; AJvYcCVQpIaDT+Mwe3ONqDyFt8Ezny6odMaL1O26tQNSxHdPXbvs1OXVXAw+pukV7D0bdiybcis=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxY/8PUnfEx1vswt7ffDauc2A7Ux7aGWAaR2bEemWRqvMARLV+Q
+	PscbAs+lwwuZUMiqLpy0sGYrs3okYN+MpS9IWO4/DGSrDLLzd0bcivirrep496uiNA==
+X-Gm-Gg: ASbGncv3aKhmVWPOcXYXPfz3nWQR+DWGUJbW5MQgRvvUAaRnZRgQzfHgqRvpmDIT031
+	gH9SXjrwE0i0UTxhcwj7PEpIfsihpnwuknuPK+1MtXZAuUC9qW/XTMyB/H7jaCYNIj+o3Eo9kch
+	fRbBQVrCS8gd1uvgF2lUsUIMENQFpx7PdeTrohmpqXmGHqlW+jO3K+PiEVtbjQH61rph9NBG30W
+	ENttPTxEw3aDIulio4hW1RthFRgr88AViof5etIkvaQRMp+XmD0a8B6Yc0jDoQTVC6OODJgON2v
+	XIjTKvJ5cRgv4q49LnJ+332O2/I0FaIbFb5kbAn44G5562VuuQf4UDH0Qs80ukdH48vL+npid3R
+	5wTQQRJaS37lQxlv+oLJOuWQquOsyImAGqlQDUSWsXS+YnXlW8bK0flIzGQaNhRvQD4MpT0FoDF
+	uUd7tqrGGz7mz0gvJG1OBaXOxwPu5DhzpAttJhj1jSVZYTqxU=
+X-Google-Smtp-Source: AGHT+IEiFxvWkfPP9po3hvukZ9ksCP0VDwl+C6gb0NjWaMPZyH9tph+K1Sdl9eUHW9tCV4/voZXr4g==
+X-Received: by 2002:a17:90b:53c3:b0:33f:ebc2:634 with SMTP id 98e67ed59e1d1-3475ebe8173mr23598831a91.9.1764615256953;
+        Mon, 01 Dec 2025 10:54:16 -0800 (PST)
+Received: from google.com (28.29.230.35.bc.googleusercontent.com. [35.230.29.28])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3475e952efbsm8216852a91.1.2025.12.01.10.54.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Dec 2025 10:54:16 -0800 (PST)
+Date: Mon, 1 Dec 2025 18:54:11 +0000
+From: David Matlack <dmatlack@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Lukas Wunner <lukas@wunner.de>, Alex Williamson <alex@shazbot.org>,
+	Adithya Jayachandran <ajayachandra@nvidia.com>,
+	Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Jacob Pan <jacob.pan@linux.microsoft.com>,
+	Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>,
+	kvm@vger.kernel.org, Leon Romanovsky <leonro@nvidia.com>,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-pci@vger.kernel.org, Mike Rapoport <rppt@kernel.org>,
+	Parav Pandit <parav@nvidia.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Shuah Khan <shuah@kernel.org>, Tomita Moeko <tomitamoeko@gmail.com>,
+	Vipin Sharma <vipinsh@google.com>, William Tu <witu@nvidia.com>,
+	Yi Liu <yi.l.liu@intel.com>, Yunxiang Li <Yunxiang.Li@amd.com>,
+	Zhu Yanjun <yanjun.zhu@linux.dev>
+Subject: Re: [PATCH 02/21] PCI: Add API to track PCI devices preserved across
+ Live Update
+Message-ID: <aS3kUwlVV_WGT66w@google.com>
+References: <20251126193608.2678510-1-dmatlack@google.com>
+ <20251126193608.2678510-3-dmatlack@google.com>
+ <aSrMSRd8RJn2IKF4@wunner.de>
+ <20251130005113.GB760268@nvidia.com>
+ <CA+CK2bB0V9jdmrcNjgsmWHmSFQpSpxdVahf1pb3Bz2WA3rKcng@mail.gmail.com>
+ <20251201132934.GA1075897@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ptosi@google.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, oupton@kernel.org, suzuki.poulose@arm.com, vdonnefort@google.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251201132934.GA1075897@nvidia.com>
 
-On Mon, 01 Dec 2025 18:19:52 +0000,
-"=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com> wrote:
+On 2025-12-01 09:29 AM, Jason Gunthorpe wrote:
+> On Sat, Nov 29, 2025 at 08:20:34PM -0500, Pasha Tatashin wrote:
+> > On Sat, Nov 29, 2025 at 7:51 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > >
+> > > On Sat, Nov 29, 2025 at 11:34:49AM +0100, Lukas Wunner wrote:
+> > > > On Wed, Nov 26, 2025 at 07:35:49PM +0000, David Matlack wrote:
+> > > > > Add an API to enable the PCI subsystem to track all devices that are
+> > > > > preserved across a Live Update, including both incoming devices (passed
+> > > > > from the previous kernel) and outgoing devices (passed to the next
+> > > > > kernel).
+> > > > >
+> > > > > Use PCI segment number and BDF to keep track of devices across Live
+> > > > > Update. This means the kernel must keep both identifiers constant across
+> > > > > a Live Update for any preserved device.
+> > > >
+> > > > While bus numbers will *usually* stay the same across next and previous
+> > > > kernel, there are exceptions.  E.g. if "pci=assign-busses" is specified
+> > > > on the command line, the kernel will re-assign bus numbers on every boot.
+> > >
+> > > Stuff like this has to be disabled for this live update stuff, if the
+> > > bus numbers are changed it will break the active use of the iommu
+> > > across the kexec.
+> > >
+> > > So while what you say is all technically true, I'm not sure this is
+> > > necessary.
+> > 
+> > I agree. However, Lukas's comment made me wonder about the future: if
+> > we eventually need to preserve non-PCI devices (like a TPM), should we
+> > be designing a common identification mechanism for all buses now? Or
+> > should we settle on BDF for PCI and invent stable identifiers for
+> > other bus types as they become necessary?
 > 
-> With protected VMs, forwarding guest HVC/SMCs happens at two interfaces:
+> Well, at least PCI subsystem should use BDF..
 > 
->      pKVM [EL2] <--> KVM [EL1] <--> VMM [EL0]
-> 
-> so it might be possible for EL0 to successfully register with EL1 to
-> handle guest SMCCC calls but never see the KVM_EXIT_HYPERCALL, even if
-> the calls are properly issued by the guest, due to EL2 handling them so
-> that (host) EL1 never gets a chance to exit to EL0.
-> 
-> Instead, avoid that confusing situation and make userspace fail early by
-> disallowing KVM_ARM_VM_SMCCC_FILTER-ing calls from protected guests in
-> the KVM FID range (which pKVM re-uses).
-> 
-> DEN0028 defines 65536 "Vendor Specific Hypervisor Service Calls":
-> 
-> - the first ARM_SMCCC_KVM_NUM_FUNCS (128) can be custom-defined
-> - the following 3 are currently standardized
-> - the rest is "reserved for future expansion"
-> 
-> so reserve them all, like commit 821d935c87bc ("KVM: arm64: Introduce
-> support for userspace SMCCC filtering") with the Arm Architecture Calls.
+> You are probably right that the matching of preserved data to a struct
+> device should be more general though.
 
-I don't think preventing all hypercalls from reaching userspace is
-acceptable from an API perspective. For example, it is highly expected
-that the hypercall that exposes the various MIDR/REVIDR/AIDR that the
-guest can be expected to run on is handled in userspace.
+Lukas' suggestion would also make it more reliable to detect bus numbers
+changing during a Live Update. We can play whack-a-mole with things like
+assign-busses, but there will be a risk that we miss something or
+something changes in the future.
 
-Given that this hypercall is critical to the correct behaviour of a
-guest in an asymmetric system, you can't really forbid it. If you
-don't want it, that's fine -- don't implement it in your VMM.
+Perhaps it would make sense to rely on BDF in the PCI subsystem in the
+short term and enforce bus number stability manually (e.g. see patch at
+the bottom), and then explore stable device paths as a future
+improvement to make PCI device preservation more reliable and also to
+enable other bus types?
 
-But I fully expect pKVM to inherit the existing APIs by virtue of
-being a KVM backend.
+To handle pci=assign-busses, perhaps something like this? Are there any
+other places where the kernel could change busses?
 
-> Alternatively, we could have only reserved the ARM_SMCCC_KVM_NUM_FUNCS
-> (or even a subset of it) and the "Call UID Query" but that would have
-> risked future conflicts between that uAPI and an extension of the SMCCC
-> or of the pKVM ABI.
-
-I disagree. The only ones you can legitimately block are the ones that
-are earmarked for pKVM itself (2-63), and only these. Everything else
-should make it to userspace if the guest and the VMM agree to do so.
-
-This is part of the KVM ABI, and pKVM should be fixed.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+diff --git a/drivers/pci/probe.c b/drivers/pci/probe.c
+index 0ce98e18b5a8..2e1e1aa385a8 100644
+--- a/drivers/pci/probe.c
++++ b/drivers/pci/probe.c
+@@ -1331,6 +1331,20 @@ static bool pci_ea_fixed_busnrs(struct pci_dev *dev, u8 *sec, u8 *sub)
+ 	return true;
+ }
+ 
++static bool pci_assign_all_busses(void)
++{
++	/*
++	 * During a Live Update, do not assign new bus numbers. Use bus numbers
++	 * assigned by the firmware and the previous kernel. Bus numbers must
++	 * remain constant so that devices preserved across the Live Update can
++	 * use the IOMMU uninterrupted.
++	 */
++	if (liveupdate_count())
++		return false;
++
++	return pcibios_assign_all_busses();
++}
++
+ /*
+  * pci_scan_bridge_extend() - Scan buses behind a bridge
+  * @bus: Parent bus the bridge is on
+@@ -1404,7 +1418,7 @@ static int pci_scan_bridge_extend(struct pci_bus *bus, struct pci_dev *dev,
+ 	pci_write_config_word(dev, PCI_BRIDGE_CONTROL,
+ 			      bctl & ~PCI_BRIDGE_CTL_MASTER_ABORT);
+ 
+-	if ((secondary || subordinate) && !pcibios_assign_all_busses() &&
++	if ((secondary || subordinate) && !pci_assign_all_busses() &&
+ 	    !is_cardbus && !broken) {
+ 		unsigned int cmax, buses;
+ 
+@@ -1441,13 +1455,16 @@ static int pci_scan_bridge_extend(struct pci_bus *bus, struct pci_dev *dev,
+ 		if (subordinate > max)
+ 			max = subordinate;
+ 	} else {
++		pci_WARN_ONCE(dev, liveupdate_count(),
++			      "Assigning new bus numbers during a Live Update! [%u %u %u %u]\n",
++			      secondary, subordinate, is_cardbus, broken);
+ 
+ 		/*
+ 		 * We need to assign a number to this bus which we always
+ 		 * do in the second pass.
+ 		 */
+ 		if (!pass) {
+-			if (pcibios_assign_all_busses() || broken || is_cardbus)
++			if (pci_assign_all_busses() || broken || is_cardbus)
+ 
+ 				/*
+ 				 * Temporarily disable forwarding of the
+@@ -1522,7 +1539,7 @@ static int pci_scan_bridge_extend(struct pci_bus *bus, struct pci_dev *dev,
+ 							max+i+1))
+ 					break;
+ 				while (parent->parent) {
+-					if ((!pcibios_assign_all_busses()) &&
++					if ((!pci_assign_all_busses()) &&
+ 					    (parent->busn_res.end > max) &&
+ 					    (parent->busn_res.end <= max+i)) {
+ 						j = 1;
+diff --git a/include/linux/liveupdate.h b/include/linux/liveupdate.h
+index b913d63eab5f..87a4982d0eb1 100644
+--- a/include/linux/liveupdate.h
++++ b/include/linux/liveupdate.h
+@@ -219,6 +219,7 @@ struct liveupdate_flb {
+ 
+ /* Return true if live update orchestrator is enabled */
+ bool liveupdate_enabled(void);
++int liveupdate_count(void);
+ 
+ /* Called during kexec to tell LUO that entered into reboot */
+ int liveupdate_reboot(void);
+@@ -241,6 +242,11 @@ static inline bool liveupdate_enabled(void)
+ 	return false;
+ }
+ 
++static inline int liveupdate_count(void)
++{
++	return 0;
++}
++
+ static inline int liveupdate_reboot(void)
+ {
+ 	return 0;
+diff --git a/kernel/liveupdate/luo_core.c b/kernel/liveupdate/luo_core.c
+index 69298d82f404..2f273397bd41 100644
+--- a/kernel/liveupdate/luo_core.c
++++ b/kernel/liveupdate/luo_core.c
+@@ -256,6 +256,13 @@ bool liveupdate_enabled(void)
+ {
+ 	return luo_global.enabled;
+ }
++EXPORT_SYMBOL_GPL(liveupdate_enabled);
++
++int liveupdate_count(void)
++{
++	return luo_global.liveupdate_num;
++}
++EXPORT_SYMBOL_GPL(liveupdate_count);
+ 
+ /**
+  * DOC: LUO ioctl Interface
 
