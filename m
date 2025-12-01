@@ -1,138 +1,193 @@
-Return-Path: <kvm+bounces-64993-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64996-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D03C9732F
-	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 13:19:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 011C5C9767D
+	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 13:55:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 53BB34E1619
-	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 12:19:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4C1D64E8270
+	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 12:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BF830BB8F;
-	Mon,  1 Dec 2025 12:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AC8313297;
+	Mon,  1 Dec 2025 12:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OMeJrqfW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RBAHVGHn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709362556E;
-	Mon,  1 Dec 2025 12:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE8D312819;
+	Mon,  1 Dec 2025 12:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764591537; cv=none; b=VboCXOCoqhk5zJDwFEYJQP+5iaquicB8W1lNYgQ3aUOBKQaDiL3SXON/A3QZzEBfTBVonMeZ+3Qrco9kn7ISAopIoapd8msjqs8niohdsQ1byAB2HO4Wneb4sQwLCdKolRkrAgtVheDGwb6/1bvwBE1QFbAWPEMCB8iF+nOZklg=
+	t=1764593118; cv=none; b=rh1fBWBhkK4X/sQtuiJYyYIlU5QNHXTdbmmxEiykLoWSOYWd8E2LY/URg5e0b54LOrv0eOkj849Te0dDpV6HriJVGpNLbV/rBLKougA6P36BKZN+NNvuPwcskIs/+OLJCC9BbkMkBZyotf50egW+ViPTKB5lpHpxEaBiwtg1PR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764591537; c=relaxed/simple;
-	bh=36GWoyOiBWKUseEdU0FZPUtWqcXD22lEp7PWmJNpUQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RFGQM9Mu6oupLQ8+829cjtNCot4JefdfJB2kHPu689M3F1muCno7qr3VsIne5+RnBPP93fNX3Whyw63INT+sglefNM5xbfWwFNOk/z2kWERz63dl5HvHvZ9SYLmhUtLvXPGOoasHUwI/v09ugv+fvOsIwARBc8GK7BoULPkjfvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OMeJrqfW; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764591535; x=1796127535;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=36GWoyOiBWKUseEdU0FZPUtWqcXD22lEp7PWmJNpUQw=;
-  b=OMeJrqfW+OETXdx2pQcEjKAqpmmOmMkYPp8EJPxnL0jeYaE6lDM8jnsI
-   ubWcxUSlVLgsLWue034A5uVjLSHyygFdgEUc/YFV8XPvA/eBEdNA8/mIB
-   SwBnQ+WrVn7MKI3m4lybQqqfUtPPp2G7opIRqLGFbyRryI5Ki4s+yH9AE
-   5hLKs3yGHlJB2GvoLO1xbmrjgsnc+3gaOpSEjjLXMKhH3gVNCogW1Zpyl
-   eqQSrgdWSjO7ZWjqWRel7xyTCi1AhxQJd0J7QrGtaChAKZ3CinPyoNc15
-   //0M3yxo/IpLErooZHV5t5j72GsE408zuf8IsYJFaM1iVDtL8mEqVXV43
-   g==;
-X-CSE-ConnectionGUID: X/LOOWkgSc+V9AQnLGLV+Q==
-X-CSE-MsgGUID: UWXqufeiRMKLXwxCSKM7aw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11629"; a="54082125"
-X-IronPort-AV: E=Sophos;i="6.20,240,1758610800"; 
-   d="scan'208";a="54082125"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2025 04:18:54 -0800
-X-CSE-ConnectionGUID: UTJe9RRyRDud+yaZrLBE5g==
-X-CSE-MsgGUID: aVH4haoiRmyqIqR0NXHY5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,240,1758610800"; 
-   d="scan'208";a="198265338"
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 01 Dec 2025 04:18:52 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vQ2ri-000000008kP-1AbL;
-	Mon, 01 Dec 2025 12:18:50 +0000
-Date: Mon, 1 Dec 2025 20:18:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: Song Gao <gaosong@loongson.cn>, maobibo@loongson.cn,
-	chenhuacai@kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kvm@vger.kernel.org, loongarch@lists.linux.dev, kernel@xen0n.name,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/4] LongArch: KVM: Add DINTC device support
-Message-ID: <202512011848.uhe7LBBn-lkp@intel.com>
-References: <20251128091125.2720148-3-gaosong@loongson.cn>
+	s=arc-20240116; t=1764593118; c=relaxed/simple;
+	bh=ucg+hH/U3M60XXW/V6lE+Z9CZIdDXyOABO3v0iUBp3k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bYFprUVTzD7NwLn8D+OhSMGmUamk6p2+c46P2ZmKyEOtgIc5gPgr0UxLtHwy1NWTtncth0T9hT8jwaohs4easYQ8LUGiOohK6odzBWZmyllG2s3JlpLpz3uOXtX55NOGH+Y7BAGpHthMTV65DUShBLmJhQylNH41v1ypIFjWp/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RBAHVGHn; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5B1BuiB0010934;
+	Mon, 1 Dec 2025 12:45:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=/xJpoFLLYBYOq+l3ncAyQdio4HBk5rEyIGxPy9S/Y
+	N8=; b=RBAHVGHnBbdzl7chhn2zvaRs2w0WlWsa3bBrYGtzxiI6UkZlXK8Ujp7BM
+	Ubs7S/rMcKbm8ElrbWfywbyTgja0HfS4gDUPy8HfYY+dYvZlE7nYiwb4XnSYZzji
+	SuSN17AisZVIP1yId0jRQXP0LD0rPN7akxUfT/CGAoa5K8LxRdYkt8dqyItRKtHU
+	ze8/N+udaC+04vtJMmCTACpEn/T5AiRe/UcKJkFQwIAZw497QAhxWE3IIUKi67Ti
+	mZoq5m3HyqxNxRa4A4YFPtc3XcJbahMlEItucsfBx21i6ELfB84LTti4vQOscvz0
+	3pDe4XIfMmEW3LkTyWSz5k3n1AJqw==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aqrj9f3sj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Dec 2025 12:45:13 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5B19lgUl010284;
+	Mon, 1 Dec 2025 12:45:12 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4arcnjxa8q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Dec 2025 12:45:11 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5B1Cj8kc54395164
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 1 Dec 2025 12:45:08 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1EFB520043;
+	Mon,  1 Dec 2025 12:45:08 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AE42420040;
+	Mon,  1 Dec 2025 12:45:07 +0000 (GMT)
+Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com.com (unknown [9.111.74.48])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  1 Dec 2025 12:45:07 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: pbonzini@redhat.com
+Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        borntraeger@linux.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, hca@linux.ibm.com
+Subject: [GIT PULL 00/10] KVM: s390: Changes for v6.19
+Date: Mon,  1 Dec 2025 13:33:42 +0100
+Message-ID: <20251201124334.110483-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251128091125.2720148-3-gaosong@loongson.cn>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: nr0UszBXQDwk81LIPrfzl5zG5h2HKLRi
+X-Proofpoint-ORIG-GUID: nr0UszBXQDwk81LIPrfzl5zG5h2HKLRi
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI5MDAyMCBTYWx0ZWRfXxmq4XdSW1YCe
+ m5y1/ecE1TVG20vWSXZaumURqXepDb1k2Q3Rk54cZNU7v6vO1ojEef/p5qfmfwZgUHxb0dTw4iZ
+ S/cFL61A/RfX0kwktuD0W1V/JBpwfAR0iPXtwuMZFIxORUVKgFG4v1LZg5yFhNwnrA6fQ5Jldq2
+ wHbsxTphlH7b7kipbbNIw3gTN7sEcGTTXZOKfMDA72bZc10s8M0AmLlej58vICcnyMRZnKzxJVy
+ kc717KnC7Jmb35IEdtleG6wA59hXax8siwjAbRFvyWaDoIepda40TZgqfJbw7H5jCYzAoNVEgcw
+ U2rYW2FG7foE7ks9PpIj0qq8rHnaekbM8BzmRhhDuNERHM/3lC7OWCwztfREPo/A+uyMbShgV2X
+ GiF3js537auuXt+odG5Hb49mjXQlJA==
+X-Authority-Analysis: v=2.4 cv=dYGNHHXe c=1 sm=1 tr=0 ts=692d8dd9 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8
+ a=ZejKs9g8C-3ACH4PFbQA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-28_08,2025-11-27_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0 suspectscore=0 clxscore=1015 adultscore=0
+ lowpriorityscore=0 bulkscore=0 phishscore=0 priorityscore=1501
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2511290020
 
-Hi Song,
+Hi Paolo,
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on next-20251128]
-[also build test WARNING on v6.18]
-[cannot apply to kvm/queue kvm/next tip/irq/core mst-vhost/linux-next linus/master kvm/linux-next v6.18-rc7 v6.18-rc6 v6.18-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Song-Gao/LongArch-KVM-Add-some-maccros-for-AVEC/20251128-173944
-base:   next-20251128
-patch link:    https://lore.kernel.org/r/20251128091125.2720148-3-gaosong%40loongson.cn
-patch subject: [PATCH v2 2/4] LongArch: KVM: Add DINTC device support
-config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20251201/202512011848.uhe7LBBn-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251201/202512011848.uhe7LBBn-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512011848.uhe7LBBn-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> arch/loongarch/kvm/intc/dintc.c:93:14: warning: unused variable 'kvm' [-Wunused-variable]
-      93 |         struct kvm *kvm;
-         |                     ^~~
->> arch/loongarch/kvm/intc/dintc.c:94:26: warning: unused variable 'dintc' [-Wunused-variable]
-      94 |         struct loongarch_dintc *dintc;
-         |                                 ^~~~~
-   2 warnings generated.
+here are the s390 changes for 6.19:
+- SCA rework
+- VIRT_XFER_TO_GUEST_WORK support
+- Operation exception forwarding support
+- Cleanups
 
 
-vim +/kvm +93 arch/loongarch/kvm/intc/dintc.c
+The operation exception forward patch had a conflict because of
+capability numbering. The VIRT_XFER_TO_GUEST_WORK may or may not have
+a conflict with the s390 repo because the kvm-s390.c imports are
+changed in close proximity. Both conflicts are trivial and the
+resolution for the capability numbering is already in next.
 
-    90	
-    91	static void kvm_dintc_destroy(struct kvm_device *dev)
-    92	{
-  > 93		struct kvm *kvm;
-  > 94		struct loongarch_dintc *dintc;
-    95	
-    96		if (!dev || !dev->kvm || !dev->kvm->arch.dintc)
-    97			return;
-    98	
-    99		kfree(dev->kvm->arch.dintc);
-   100	}
-   101	
+
+Please pull.
+
+Cheers,
+Janosch
+
+The following changes since commit 211ddde0823f1442e4ad052a2f30f050145ccada:
+
+  Linux 6.18-rc2 (2025-10-19 15:19:16 -1000)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-next-6.19-1
+
+for you to fetch changes up to 2bd1337a1295e012e60008ee21a64375e5234e12:
+
+  KVM: s390: Use generic VIRT_XFER_TO_GUEST_WORK functions (2025-11-28 10:11:14 +0100)
+
+----------------------------------------------------------------
+- SCA rework
+- VIRT_XFER_TO_GUEST_WORK support
+- Operation exception forwarding support
+- Cleanups
+----------------------------------------------------------------
+Andrew Donnellan (2):
+      KVM: s390: Add signal_exits counter
+      KVM: s390: Use generic VIRT_XFER_TO_GUEST_WORK functions
+
+Christoph Schlameuss (2):
+      KVM: s390: Use ESCA instead of BSCA at VM init
+      KVM: S390: Remove sca_lock
+
+Eric Farman (1):
+      KVM: s390: vsie: Check alignment of BSCA header
+
+Heiko Carstens (1):
+      KVM: s390: Enable and disable interrupts in entry code
+
+Janosch Frank (2):
+      Documentation: kvm: Fix ordering
+      KVM: s390: Add capability that forwards operation exceptions
+
+Josephine Pfeiffer (1):
+      KVM: s390: Replace sprintf with snprintf for buffer safety
+
+Thorsten Blum (1):
+      KVM: s390: Remove unused return variable in kvm_arch_vcpu_ioctl_set_fpu
+
+ Documentation/virt/kvm/api.rst                   |  19 ++++++++-
+ arch/s390/include/asm/kvm_host.h                 |   8 ++--
+ arch/s390/include/asm/stacktrace.h               |   1 +
+ arch/s390/kernel/asm-offsets.c                   |   1 +
+ arch/s390/kernel/entry.S                         |   2 +
+ arch/s390/kvm/Kconfig                            |   1 +
+ arch/s390/kvm/gaccess.c                          |  27 +++---------
+ arch/s390/kvm/intercept.c                        |   3 ++
+ arch/s390/kvm/interrupt.c                        |  80 ++++++++---------------------------
+ arch/s390/kvm/kvm-s390.c                         | 229 +++++++++++++++++++++++++++------------------------------------------------------------------------
+ arch/s390/kvm/kvm-s390.h                         |   9 +---
+ arch/s390/kvm/vsie.c                             |  20 ++++++---
+ include/uapi/linux/kvm.h                         |   1 +
+ tools/testing/selftests/kvm/Makefile.kvm         |   1 +
+ tools/testing/selftests/kvm/s390/user_operexec.c | 140 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 15 files changed, 271 insertions(+), 271 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/s390/user_operexec.c
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.52.0
+
 
