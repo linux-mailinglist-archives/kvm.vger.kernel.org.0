@@ -1,151 +1,68 @@
-Return-Path: <kvm+bounces-64990-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-64991-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C05FBC9656B
-	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 10:12:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAAE0C96724
+	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 10:46:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F6193A30B5
-	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 09:12:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6BD604E24A7
+	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 09:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C04A3002CB;
-	Mon,  1 Dec 2025 09:12:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O8zdSJ62"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EFC1303A38;
+	Mon,  1 Dec 2025 09:45:09 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538CD2FFF9D;
-	Mon,  1 Dec 2025 09:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from elvis.franken.de (elvis.franken.de [193.175.24.41])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31DB93016FD;
+	Mon,  1 Dec 2025 09:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.175.24.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764580367; cv=none; b=Q9QKpyZpG9R3bYRqrEZwzag2YV1jMn0/m7QbRguBhZi2hajp4N7fnX3/UXRviljhrB666dE7wV5bZADLyGjky2WnVFUex1byf5XLMAaxzDuvYXp3NuvE4C5stwl3hv9ynqLcybUkSr/dA2r+lyyAFNim7j5qk+JOENmHvzkS2OI=
+	t=1764582308; cv=none; b=ftArw/nSpytJe+QpMeSaz9jfj6nMdeuWTHSD+fuekY6q1Sd84lprXc0z9nKCCeoXtTNYhSFWRpTW7EIAjekotlv3Ir4mua//cjBcLYHigoSWuULp/K8hsM2SwWJrnDBJv8unvyO6FkWlp4kzyVi+4TOduAFdt2rREM7ZJB7N3hI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764580367; c=relaxed/simple;
-	bh=InzzoRi4sMwF5UAjcjxn8h6bfGO56WHUkwSr4ysFVAs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fm+9ecieEDOPJdmZtmUZfbCLYI9rv/SPk6qM3pEnlPVnOmTSyIJu/t/xl/m3iYVmHYXLBE31x1O35ig9BiJYwsNxLWjTh0aR7pFvfbne2ggKY8/9LjHmKLX8ZbxiIHVsuO4BfGsgMOGE/IOTc1e7QQQe/uy7wXMDJAChVgXqRkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O8zdSJ62; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48C80C4CEF1;
-	Mon,  1 Dec 2025 09:12:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764580366;
-	bh=InzzoRi4sMwF5UAjcjxn8h6bfGO56WHUkwSr4ysFVAs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=O8zdSJ62lsZX1UqcRK56slWK1In8AZrXMfXAd2VdEbVk2Xgn+zXW6pigE42wp/BLx
-	 JOgSmGg2QpEtSdamdFLOsSOfx81Oh6q5uN4Wae0Mjs6thxYpfTIeR1AVP3hycf2kCk
-	 HhTGTeO+roQo6HTCW4AqTK+xOJtDMo+4GtudAnmSze9y0se0WAFD8eNAf/tW1lAxDT
-	 JEjoGXoJDZuHIKqwfVbjHImB2pJTw+MCNlFms74PVN1SX5QUUl0DXX53ZSg8d8nXJ1
-	 6YPGx/UbSwjz1j4BmMeZJI59h4wO09tf7mo0KjfzD/30bvjTjfmavRhdSfcsb7aUqz
-	 R01CkzAKLSo9g==
-Message-ID: <c3ae6036-df95-4874-ad7a-6077a30ae726@kernel.org>
-Date: Mon, 1 Dec 2025 10:12:38 +0100
+	s=arc-20240116; t=1764582308; c=relaxed/simple;
+	bh=rdtCxxB5s1rRp0qlqZHRr7DJ+FojzBoesEnYtkJmFIM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JcDHu9Gg9IN27yB+RsPLcThUJtOtyQMOJoKcV9iOPpBwajI957HFOI+pqW3Ia3xfyKieqlbZajmJLHtSmlNKck6jWIqbf4GfVYcHPup5fNAPK8q7rj28cWBtsnuLdyokHKwfXqa6vjWx50vSse88fRl0sGaHV6MOMOqRwNFvJQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpha.franken.de; spf=pass smtp.mailfrom=alpha.franken.de; arc=none smtp.client-ip=193.175.24.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpha.franken.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alpha.franken.de
+Received: from uucp by elvis.franken.de with local-rmail (Exim 3.36 #1)
+	id 1vQ0Sn-0002g6-00; Mon, 01 Dec 2025 10:44:57 +0100
+Received: by alpha.franken.de (Postfix, from userid 1000)
+	id 50392C088F; Mon,  1 Dec 2025 10:43:53 +0100 (CET)
+Date: Mon, 1 Dec 2025 10:43:53 +0100
+From: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Huacai Chen <chenhuacai@kernel.org>, linux-mips@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] mips: kvm: simplify kvm_mips_deliver_interrupts()
+Message-ID: <aS1jWTUu9SDEoF2g@alpha.franken.de>
+References: <20250716172918.26468-1-yury.norov@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/5] guest_memfd: add support for userfaultfd minor
- mode
-To: Mike Rapoport <rppt@kernel.org>, linux-mm@kvack.org
-Cc: Andrea Arcangeli <aarcange@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Axel Rasmussen <axelrasmussen@google.com>,
- Baolin Wang <baolin.wang@linux.alibaba.com>, Hugh Dickins
- <hughd@google.com>, James Houghton <jthoughton@google.com>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Michal Hocko
- <mhocko@suse.com>, Nikita Kalyazin <kalyazin@amazon.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20251130111812.699259-1-rppt@kernel.org>
- <20251130111812.699259-5-rppt@kernel.org>
-From: "David Hildenbrand (Red Hat)" <david@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20251130111812.699259-5-rppt@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250716172918.26468-1-yury.norov@gmail.com>
 
-On 11/30/25 12:18, Mike Rapoport wrote:
-> From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
+On Wed, Jul 16, 2025 at 01:29:17PM -0400, Yury Norov wrote:
+> The function opencodes for_each_set_bit() macro, which makes it bulky.
+> Using the proper API makes all the housekeeping code go away.
 > 
-> userfaultfd notifications about minor page faults used for live migration
-> and snapshotting of VMs with memory backed by shared hugetlbfs or tmpfs
-> mappings as described in detail in commit 7677f7fd8be7 ("userfaultfd: add
-> minor fault registration mode").
-> 
-> To use the same mechanism for VMs that use guest_memfd to map their memory,
-> guest_memfd should support userfaultfd minor mode.
-> 
-> Extend ->fault() method of guest_memfd with ability to notify core page
-> fault handler that a page fault requires handle_userfault(VM_UFFD_MINOR) to
-> complete and add implementation of ->get_folio_noalloc() to guest_memfd
-> vm_ops.
-> 
-> Reviewed-by: Liam R. Howlett <Liam.Howlett@oracle.com>
-> Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+> Signed-off-by: Yury Norov <yury.norov@gmail.com>
 > ---
->   virt/kvm/guest_memfd.c | 33 ++++++++++++++++++++++++++++++++-
->   1 file changed, 32 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index ffadc5ee8e04..dca6e373937b 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -4,6 +4,7 @@
->   #include <linux/kvm_host.h>
->   #include <linux/pagemap.h>
->   #include <linux/anon_inodes.h>
-> +#include <linux/userfaultfd_k.h>
->   
->   #include "kvm_mm.h"
->   
-> @@ -359,7 +360,15 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
->   	if (!((u64)inode->i_private & GUEST_MEMFD_FLAG_INIT_SHARED))
->   		return VM_FAULT_SIGBUS;
->   
-> -	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-> +	folio = filemap_lock_folio(inode->i_mapping, vmf->pgoff);
-> +	if (!IS_ERR_OR_NULL(folio) && userfaultfd_minor(vmf->vma)) {
+>  arch/mips/kvm/interrupt.c | 20 ++------------------
+>  1 file changed, 2 insertions(+), 18 deletions(-)
 
-Can we ever get NULL here?
+applied to mips-next.
 
-> +		ret = VM_FAULT_UFFD_MINOR;
-> +		goto out_folio;
-> +	}
-> +
-> +	if (PTR_ERR(folio) == -ENOENT)
-> +		folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-
-Was briefly wondering what the performance impact of that two-step 
-approach is (two lookups in case we have to create it IIUC)
-
-Wouldn't it be better to limit it to the userfaultfd_minor(vmf->vma) case?
-
-
-if (userfaultfd_minor(vmf->vma)) {
-	folio = filemap_lock_folio(inode->i_mapping, vmf->pgoff);
-	if (!IS_ERR(folio)) {
-		ret = VM_FAULT_UFFD_MINOR;
-		goto out_folio;
-	}
-} else {
-	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-}
-
-if (IS_ERR(folio)) {
-...
+Thomas.
 
 -- 
-Cheers
-
-David
+Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
+good idea.                                                [ RFC1925, 2.3 ]
 
