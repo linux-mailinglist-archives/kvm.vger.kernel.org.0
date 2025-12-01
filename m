@@ -1,298 +1,376 @@
-Return-Path: <kvm+bounces-65009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65010-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FB20C9804D
-	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 16:21:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F335EC981AC
+	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 16:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63EA43A3519
-	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 15:20:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8AAF3A1D44
+	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 15:50:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 557E6328617;
-	Mon,  1 Dec 2025 15:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4678D333422;
+	Mon,  1 Dec 2025 15:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="WzZy7JhE";
-	dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b="NEiSECSq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pbCZG1NE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail132-20.atl131.mandrillapp.com (mail132-20.atl131.mandrillapp.com [198.2.132.20])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA4C3242C8
-	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 15:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.2.132.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BBD332EAB
+	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 15:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764602408; cv=none; b=Jkn8T07Qs1aMZ7ML8kpjCxOjm4pgZCh4waqRVRXGwse7/LrySK3abhmsKRd5zAMGkQ4svlvCqOPj3FS3vN92XL+/YxhtetZjprMjPrZz3lyUw6LvvmG037S4wPxQgzdSFHDF3s7N8jVNKIK20Xem0DHp/vK1Z8GZw1j4Jw8+5kQ=
+	t=1764604211; cv=none; b=oKC7WmIzbb6dEKylYECltwqB1nO1ik+1cFIvDMakPgT04Wqwt83AtGJzzEKsMoKCqZ4n0QZoTvqHo9Sqqmje/B8nNCDhCLDTATsSDnVrlSsZGe68szPDY8mXM9mXxoJidRJItmigXba8SarI2LSL1oKltXAgRvnJIeJ4aF7QT2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764602408; c=relaxed/simple;
-	bh=7yvqcvgNr7Df/OcCol2acvZnPK406CxxXI3ldV7wZNA=;
-	h=From:Subject:To:Cc:Message-Id:Date:MIME-Version:Content-Type; b=kns+QpMZogvr4+q0b8hnSp8YfPkWHcLzR6fCUI2yxv3c+ng4G/Fjcn8hUKjlpySBpbh7pjeBuxNkP9EGnp+KmWlBf9JoCn1LP4i72iecXfT+mCXB2Sog526IjxgFZHsKv9/yu9gDj/UT3GZkgUy5PpQjEIVwCGDoCg4uu+0LYm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=WzZy7JhE; dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b=NEiSECSq; arc=none smtp.client-ip=198.2.132.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
-	s=mte1; t=1764602393; x=1764872393;
-	bh=HlyIaZmMukCXUcketAQUXKxv3ZBzSqoS/mCFII2RnyU=;
-	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
-	b=WzZy7JhEDOlabFhhlc4t4EV4y5rn6IXerAOc1Mcac8uyoEUA2vWcdqhPJIZqGzJkt
-	 b8Lr7oDmysBqJgzsQ5vr85y1Xjis3cj+5d1XxwcSwNhvRUU4imhFbPP/ZXckd5MxjM
-	 RNs7A/9P4B/RdB4+KwUYPD06oPuWTKDovMf+dostKGGSfLGVFePT50bmlChXj961v7
-	 8IcMAwSXmmp1ddyzOG1pooyuqjS7j33uJ8phyEQl2VS/VG8zMo9KuPJVAnVQu5Zf7A
-	 dF+hJwK5S4ZVXXnP1jjARUVrsbOGqRzfWwRwcNI3BKnj3f5641D0jaJD5JDb/P8fq8
-	 mFmz0KzvwQJiQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
-	t=1764602393; x=1764862893; i=thomas.courrege@vates.tech;
-	bh=HlyIaZmMukCXUcketAQUXKxv3ZBzSqoS/mCFII2RnyU=;
-	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
-	b=NEiSECSqLRSVJe2wSXXCqs2+w78UMndMqyYNwsE1reKkjNE3uYm3+g9O2sc9kODDh
-	 VRpmZw8UgNDbemXZ29xZNO83EfefDKKHo8IoWuX8ky099rQCbEofAan9T23kBrq2x/
-	 m3mSPJ2672YxrrP7ZytX0YjsvMjCChn5Vc4mz7XjfDRuitXaRnEw3GykqAnXIB3nmj
-	 ZOtZHqmvSj89eFqS4mKgnjE5hV3IIaY8S3DbLr9T0sMhtsMLtz/1X+dCS+yP8lmCdF
-	 iklwxWZtjLYBoNbZeJpiJAi3yvZYD3Q5dh0er2ecqCTnXF7oELC7M49GzaUc0JC/ny
-	 8HWCEDlsJ0Leg==
-Received: from pmta09.mandrill.prod.atl01.rsglab.com (localhost [127.0.0.1])
-	by mail132-20.atl131.mandrillapp.com (Mailchimp) with ESMTP id 4dKndP2WMfzFCWg1B
-	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 15:19:53 +0000 (GMT)
-From: "Thomas Courrege" <thomas.courrege@vates.tech>
-Subject: =?utf-8?Q?[PATCH=20v2]=20KVM:=20SEV:=20Add=20KVM=5FSEV=5FSNP=5FHV=5FREPORT=5FREQ=20command?=
-Received: from [37.26.189.201] by mandrillapp.com id 7a1ccb47ab0e43a38062ff9369baf756; Mon, 01 Dec 2025 15:19:53 +0000
-X-Mailer: git-send-email 2.52.0
-X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
-X-Bm-Transport-Timestamp: 1764602390868
-To: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, ashish.kalra@amd.com, thomas.lendacky@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au, nikunj@amd.com
-Cc: thomas.courrege@vates.tech, x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Message-Id: <20251201151940.172521-1-thomas.courrege@vates.tech>
-X-Native-Encoded: 1
-X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.7a1ccb47ab0e43a38062ff9369baf756?=
-X-Mandrill-User: md_30504962
-Feedback-ID: 30504962:30504962.20251201:md
-Date: Mon, 01 Dec 2025 15:19:53 +0000
+	s=arc-20240116; t=1764604211; c=relaxed/simple;
+	bh=v01Qvgga6OXteBWDw+kls9otNx1pMqsvpx7DRGBLwMQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=lEqqSRKoL6q2C47+so/0eLO9yqPrHghtAO4wZyhYksreuMn7Idlup8Inq7+7W9nQawibYcK05OHugbHYSuOza2W69sQyy4gLypzAlY1Hg1fbuNKQc7lb7ERUqFyxa1I1JBa9wg22zMIBx8IAcaga3W81SeFkOshF6GBNwzl8PC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pbCZG1NE; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <46bbdad1-486d-4cb1-915f-577b00de827f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764604196;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iNdyhBHo3D4OnRy1wZmBFCIJGMu0S5cEULbP0D0MVr8=;
+	b=pbCZG1NEEjsbYbkE1CbqudioNGhnvbma1ChEsab4zS+H8FQlOiStnLQb39eH1bDpbZYxiV
+	17+7DEo2zCD+nD0KNs/ENeveVXuZyguJPfXwSacm/3fSmBi6WgwAVQ9QKAvG/gCPslQ3cU
+	4XcEqh+dxAdNWPXFjLavbNjrgkONm2E=
+Date: Mon, 1 Dec 2025 07:49:44 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 00/21] vfio/pci: Base support to preserve a VFIO device
+ file across Live Update
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+To: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>
+Cc: Adithya Jayachandran <ajayachandra@nvidia.com>,
+ Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>,
+ David Rientjes <rientjes@google.com>,
+ Jacob Pan <jacob.pan@linux.microsoft.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Josh Hilke <jrhilke@google.com>,
+ Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+ Leon Romanovsky <leonro@nvidia.com>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-pci@vger.kernel.org,
+ Lukas Wunner <lukas@wunner.de>, Mike Rapoport <rppt@kernel.org>,
+ Parav Pandit <parav@nvidia.com>, Pasha Tatashin <pasha.tatashin@soleen.com>,
+ Philipp Stanner <pstanner@redhat.com>, Pratyush Yadav <pratyush@kernel.org>,
+ Saeed Mahameed <saeedm@nvidia.com>, Samiullah Khawaja <skhawaja@google.com>,
+ Shuah Khan <shuah@kernel.org>, Tomita Moeko <tomitamoeko@gmail.com>,
+ Vipin Sharma <vipinsh@google.com>, William Tu <witu@nvidia.com>,
+ Yi Liu <yi.l.liu@intel.com>, Yunxiang Li <Yunxiang.Li@amd.com>
+References: <20251126193608.2678510-1-dmatlack@google.com>
+ <dadaeeb9-4008-4450-8b61-e147a2af38b2@linux.dev>
+In-Reply-To: <dadaeeb9-4008-4450-8b61-e147a2af38b2@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Add support for retrieving the SEV-SNP attestation report via the
-SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
-ioctl for SNP guests.
 
-Signed-off-by: Thomas Courrege <thomas.courrege@vates.tech>
----
- .../virt/kvm/x86/amd-memory-encryption.rst    | 25 ++++++++
- arch/x86/include/uapi/asm/kvm.h               |  7 +++
- arch/x86/kvm/svm/sev.c                        | 61 +++++++++++++++++++
- drivers/crypto/ccp/sev-dev.c                  |  1 +
- include/linux/psp-sev.h                       | 31 ++++++++++
- 5 files changed, 125 insertions(+)
 
-diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-index 1ddb6a86ce7f..b3ee25718938 100644
---- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-+++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-@@ -572,6 +572,31 @@ Returns: 0 on success, -negative on error
- See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
- details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
- 
-+21. KVM_SEV_SNP_HV_REPORT_REQ
-+-----------------------------
-+
-+The KVM_SEV_SNP_HV_REPORT_REQ command requests the hypervisor-generated
-+SNP attestation report. This report is produced by the PSP using the
-+HV-SIGNED key selected by the caller.
-+
-+The ``key_sel`` field indicates which key the platform will use to sign the
-+report:
-+  * ``0``: If VLEK is installed, sign with VLEK. Otherwise, sign with VCEK.
-+  * ``1``: Sign with VCEK.
-+  * ``2``: Sign with VLEK.
-+  * Other values are reserved.
-+
-+Parameters (in): struct kvm_sev_snp_hv_report_req
-+
-+Returns:  0 on success, -negative on error
-+
-+::
-+        struct kvm_sev_snp_hv_report_req {
-+                __u8 key_sel;
-+                __u64 report_uaddr;
-+                __u64 report_len;
-+        };
-+
- Device attribute API
- ====================
- 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index d420c9c066d4..ff034668cac4 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -742,6 +742,7 @@ enum sev_cmd_id {
- 	KVM_SEV_SNP_LAUNCH_START = 100,
- 	KVM_SEV_SNP_LAUNCH_UPDATE,
- 	KVM_SEV_SNP_LAUNCH_FINISH,
-+	KVM_SEV_SNP_HV_REPORT_REQ,
- 
- 	KVM_SEV_NR_MAX,
- };
-@@ -870,6 +871,12 @@ struct kvm_sev_receive_update_data {
- 	__u32 pad2;
- };
- 
-+struct kvm_sev_snp_hv_report_req {
-+	__u8 key_sel;
-+	__u64 report_uaddr;
-+	__u64 report_len;
-+};
-+
- struct kvm_sev_snp_launch_start {
- 	__u64 policy;
- 	__u8 gosvw[16];
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 0835c664fbfd..62f17f4eab42 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2253,6 +2253,64 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	return rc;
- }
- 
-+static int sev_snp_hv_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
-+{
-+	struct sev_data_snp_msg_report_rsp *report_rsp = NULL;
-+	struct sev_data_snp_hv_report_req data;
-+	struct kvm_sev_snp_hv_report_req params;
-+	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
-+	void __user *u_report;
-+	void __user *u_params = u64_to_user_ptr(argp->data);
-+	int ret;
-+
-+	if (!sev_snp_guest(kvm))
-+		return -ENOTTY;
-+
-+	if (copy_from_user(&params, u_params, sizeof(params)))
-+		return -EFAULT;
-+
-+	if (params.report_len < SEV_SNP_ATTESTATION_REPORT_SIZE)
-+		return -ENOSPC;
-+
-+	memset(&data, 0, sizeof(data));
-+
-+	u_report = u64_to_user_ptr(params.report_uaddr);
-+	if (!u_report)
-+		return -EINVAL;
-+
-+	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+	if (!report_rsp)
-+		return -ENOMEM;
-+
-+	data.len = sizeof(data);
-+	data.hv_report_paddr = __psp_pa(report_rsp);
-+	data.key_sel = params.key_sel;
-+
-+	data.gctx_addr = __psp_pa(sev->snp_context);
-+	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
-+			    &argp->error);
-+
-+	if (ret)
-+		goto e_free_rsp;
-+
-+	params.report_len = report_rsp->report_size;
-+	if (copy_to_user(u_params, &params, sizeof(params)))
-+		ret = -EFAULT;
-+
-+	if (params.report_len < report_rsp->report_size) {
-+		ret = -ENOSPC;
-+	} else if (copy_to_user(u_report, report_rsp + 1, report_rsp->report_size)) {
-+		/* report is located right after rsp */
-+		ret = -EFAULT;
-+	}
-+
-+e_free_rsp:
-+	/* contains sensitive data */
-+	memzero_explicit(report_rsp, PAGE_SIZE);
-+	snp_free_firmware_page(report_rsp);
-+	return ret;
-+}
-+
- struct sev_gmem_populate_args {
- 	__u8 type;
- 	int sev_fd;
-@@ -2664,6 +2722,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
- 	case KVM_SEV_SNP_LAUNCH_FINISH:
- 		r = snp_launch_finish(kvm, &sev_cmd);
- 		break;
-+	case KVM_SEV_SNP_HV_REPORT_REQ:
-+		r = sev_snp_hv_report_request(kvm, &sev_cmd);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		goto out;
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 0d13d47c164b..5236d5ee19ac 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -251,6 +251,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
- 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
- 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
-+	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
- 	default:				return 0;
- 	}
- 
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index e0dbcb4b4fd9..0e635feb7671 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -91,6 +91,7 @@ enum sev_cmd {
- 	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
- 	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
- 	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
-+	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
- 	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
- 	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
- 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
-@@ -554,6 +555,36 @@ struct sev_data_attestation_report {
- 	u32 len;				/* In/Out */
- } __packed;
- 
-+/**
-+ * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
-+ *
-+ * @len: length of the command buffer in bytes
-+ * @key_sel: Selects which key to use for generating the signature.
-+ * @gctx_addr: System physical address of guest context page
-+ * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
-+ */
-+struct sev_data_snp_hv_report_req {
-+	u32 len;		/* In */
-+	u32 key_sel:2;		/* In */
-+	u32 rsvd:30;
-+	u64 gctx_addr;		/* In */
-+	u64 hv_report_paddr;	/* In */
-+} __packed;
-+
-+#define SEV_SNP_ATTESTATION_REPORT_SIZE 1184
-+
-+/**
-+ * struct sev_data_snp_msg_export_rsp
-+ *
-+ * @status: Status : 0h: Success. 16h: Invalid parameters.
-+ * @report_size: Size in bytes of the attestation report
-+ */
-+struct sev_data_snp_msg_report_rsp {
-+	u32 status;			/* Out */
-+	u32 report_size;		/* Out */
-+	u8 rsvd[24];
-+} __packed;
-+
- /**
-  * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
-  *
+在 2025/11/27 20:56, Zhu Yanjun 写道:
+> 
+> 在 2025/11/26 11:35, David Matlack 写道:
+>> This series adds the base support to preserve a VFIO device file across
+>> a Live Update. "Base support" means that this allows userspace to
+>> safetly preserve a VFIO device file with LIVEUPDATE_SESSION_PRESERVE_FD
+>> and retrieve a preserved VFIO device file with
+>> LIVEUPDATE_SESSION_RETRIEVE_FD, but the device itself is not preserved
+>> in a fully running state across Live Update.
+>>
+>> This series unblocks 2 parallel but related streams of work:
+>>
+>>   - iommufd preservation across Live Update. This work spans iommufd,
+>>     the IOMMU subsystem, and IOMMU drivers [1]
+>>
+>>   - Preservation of VFIO device state across Live Update (config space,
+>>     BAR addresses, power state, SR-IOV state, etc.). This work spans both
+>>     VFIO and the core PCI subsystem.
+>>
+>> While we need all of the above to fully preserve a VFIO device across a
+>> Live Update without disrupting the workload on the device, this series
+>> aims to be functional and safe enough to merge as the first incremental
+>> step toward that goal.
+>>
+>> Areas for Discussion
+>> --------------------
+>>
+>> BDF Stability across Live Update
+>>
+>>    The PCI support for tracking preserved devices across a Live Update to
+>>    prevent auto-probing relies on PCI segment numbers and BDFs remaining
+>>    stable. For now I have disallowed VFs, as the BDFs assigned to VFs can
+>>    vary depending on how the kernel chooses to allocate bus numbers. For
+>>    non-VFs I am wondering if there is any more needed to ensure BDF
+>>    stability across Live Update.
+>>
+>>    While we would like to support many different systems and
+>>    configurations in due time (including preserving VFs), I'd like to
+>>    keep this first serses constrained to simple use-cases.
+>>
+>> FLB Locking
+>>
+>>    I don't see a way to properly synchronize pci_flb_finish() with
+>>    pci_liveupdate_incoming_is_preserved() since the incoming FLB mutex is
+>>    dropped by liveupdate_flb_get_incoming() when it returns the pointer
+>>    to the object, and taking pci_flb_incoming_lock in pci_flb_finish()
+>>    could result in a deadlock due to reversing the lock ordering.
+>>
+>> FLB Retrieving
+>>
+>>    The first patch of this series includes a fix to prevent an FLB from
+>>    being retrieved again it is finished. I am wondering if this is the
+>>    right approach or if subsystems are expected to stop calling
+>>    liveupdate_flb_get_incoming() after an FLB is finished.
+>>
+>> Testing
+>> -------
+>>
+>> The patches at the end of this series provide comprehensive selftests
+>> for the new code added by this series. The selftests have been validated
+>> in both a VM environment using a virtio-net PCIe device, and in a
+>> baremetal environment on an Intel EMR server with an Intel DSA device.
+>>
+>> Here is an example of how to run the new selftests:
+> 
+> Hi, David
+> 
+> ERROR: modpost: "liveupdate_register_file_handler" [drivers/vfio/pci/ 
+> vfio-pci-core.ko] undefined!
+> 
+> ERROR: modpost: "vfio_pci_ops" [drivers/vfio/pci/vfio-pci-core.ko] 
+> undefined!
+> ERROR: modpost: "liveupdate_enabled" [drivers/vfio/pci/vfio-pci-core.ko] 
+> undefined!
+> ERROR: modpost: "liveupdate_unregister_file_handler" [drivers/vfio/pci/ 
+> vfio-pci-core.ko] undefined!
+> ERROR: modpost: "vfio_device_fops" [drivers/vfio/pci/vfio-pci-core.ko] 
+> undefined!
+> ERROR: modpost: "vfio_pci_is_intel_display" [drivers/vfio/pci/vfio-pci- 
+> core.ko] undefined!
+> ERROR: modpost: "vfio_pci_liveupdate_init" [drivers/vfio/pci/vfio- 
+> pci.ko] undefined!
+> ERROR: modpost: "vfio_pci_liveupdate_cleanup" [drivers/vfio/pci/vfio- 
+> pci.ko] undefined!
+> make[4]: *** [scripts/Makefile.modpost:147: Module.symvers] Error 1
+> make[3]: *** [Makefile:1960: modpost] Error 2
+> 
+> After I git clone the source code from the link https://github.com/ 
+> dmatlack/linux/tree/liveupdate/vfio/cdev/v1,
+> 
+> I found the above errors when I built the source code.
+> 
+> Perhaps the above errors can be solved by EXPORT_SYMBOL.
+> 
+> But I am not sure if a better solution can solve the above problems or not.
+
+I reviewed this patch series in detail. If I’m understanding it 
+correctly, there appears to be a cyclic dependency issue. Specifically, 
+some functions in kernel module A depend on kernel module B, while at 
+the same time certain functions in module B depend on module A.
+
+I’m not entirely sure whether this constitutes a real problem or if it’s 
+intentional design.
+
+Yanjun.Zhu
+
+> 
+> Thanks,
+> 
+> Yanjun.Zhu
+> 
+>>
+>> vfio_pci_liveupdate_uapi_test:
+>>
+>>    $ tools/testing/selftests/vfio/scripts/setup.sh 0000:00:04.0
+>>    $ tools/testing/selftests/vfio/vfio_pci_liveupdate_uapi_test 
+>> 0000:00:04.0
+>>    $ tools/testing/selftests/vfio/scripts/cleanup.sh
+>>
+>> vfio_pci_liveupdate_kexec_test:
+>>
+>>    $ tools/testing/selftests/vfio/scripts/setup.sh 0000:00:04.0
+>>    $ tools/testing/selftests/vfio/vfio_pci_liveupdate_kexec_test -- 
+>> stage 1 0000:00:04.0
+>>    $ kexec [...]  # NOTE: distro-dependent
+>>
+>>    $ tools/testing/selftests/vfio/scripts/setup.sh 0000:00:04.0
+>>    $ tools/testing/selftests/vfio/vfio_pci_liveupdate_kexec_test -- 
+>> stage 2 0000:00:04.0
+>>    $ tools/testing/selftests/vfio/scripts/cleanup.sh
+>>
+>> Dependencies
+>> ------------
+>>
+>> This series was constructed on top of several in-flight series and on
+>> top of mm-nonmm-unstable [2].
+>>
+>>    +-- This series
+>>    |
+>>    +-- [PATCH v2 00/18] vfio: selftests: Support for multi-device tests
+>>    |    https://lore.kernel.org/kvm/20251112192232.442761-1- 
+>> dmatlack@google.com/
+>>    |
+>>    +-- [PATCH v3 0/4] vfio: selftests: update DMA mapping tests to use 
+>> queried IOVA ranges
+>>    |   https://lore.kernel.org/kvm/20251111-iova-ranges- 
+>> v3-0-7960244642c5@fb.com/
+>>    |
+>>    +-- [PATCH v8 0/2] Live Update: File-Lifecycle-Bound (FLB) State
+>>    |   https://lore.kernel.org/linux-mm/20251125225006.3722394-1- 
+>> pasha.tatashin@soleen.com/
+>>    |
+>>    +-- [PATCH v8 00/18] Live Update Orchestrator
+>>    |   https://lore.kernel.org/linux-mm/20251125165850.3389713-1- 
+>> pasha.tatashin@soleen.com/
+>>    |
+>>
+>> To simplify checking out the code, this series can be found on GitHub:
+>>
+>>    https://github.com/dmatlack/linux/tree/liveupdate/vfio/cdev/v1
+>>
+>> Changelog
+>> ---------
+>>
+>> v1:
+>>   - Rebase series on top of LUOv8 and VFIO selftests improvements
+>>   - Drop commits to preserve config space fields across Live Update.
+>>     These changes require changes to the PCI layer. For exmaple,
+>>     preserving rbars could lead to an inconsistent device state until
+>>     device BARs addresses are preserved across Live Update.
+>>   - Drop commits to preserve Bus Master Enable on the device. There's no
+>>     reason to preserve this until iommufd preservation is fully working.
+>>     Furthermore, preserving Bus Master Enable could lead to memory
+>>     corruption when the device if the device is bound to the default
+>>     identity-map domain after Live Update.
+>>   - Drop commits to preserve saved PCI state. This work is not needed
+>>     until we are ready to preserve the device's config space, and
+>>     requires more thought to make the PCI state data layout ABI-friendly.
+>>   - Add support to skip auto-probing devices that are preserved by VFIO
+>>     to avoid them getting bound to a different driver by the next kernel.
+>>   - Restrict device preservation further (no VFs, no intel-graphics).
+>>   - Various refactoring and small edits to improve readability and
+>>     eliminate code duplication.
+>>
+>> rfc: https://lore.kernel.org/kvm/20251018000713.677779-1- 
+>> vipinsh@google.com/
+>>
+>> Cc: Saeed Mahameed <saeedm@nvidia.com>
+>> Cc: Adithya Jayachandran <ajayachandra@nvidia.com>
+>> Cc: Jason Gunthorpe <jgg@nvidia.com>
+>> Cc: Parav Pandit <parav@nvidia.com>
+>> Cc: Leon Romanovsky <leonro@nvidia.com>
+>> Cc: William Tu <witu@nvidia.com>
+>> Cc: Jacob Pan <jacob.pan@linux.microsoft.com>
+>> Cc: Lukas Wunner <lukas@wunner.de>
+>> Cc: Pasha Tatashin <pasha.tatashin@soleen.com>
+>> Cc: Mike Rapoport <rppt@kernel.org>
+>> Cc: Pratyush Yadav <pratyush@kernel.org>
+>> Cc: Samiullah Khawaja <skhawaja@google.com>
+>> Cc: Chris Li <chrisl@kernel.org>
+>> Cc: Josh Hilke <jrhilke@google.com>
+>> Cc: David Rientjes <rientjes@google.com>
+>>
+>> [1] https://lore.kernel.org/linux-iommu/20250928190624.3735830-1- 
+>> skhawaja@google.com/
+>> [2] https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git/log/? 
+>> h=mm-nonmm-unstable
+>>
+>> David Matlack (12):
+>>    liveupdate: luo_flb: Prevent retrieve() after finish()
+>>    PCI: Add API to track PCI devices preserved across Live Update
+>>    PCI: Require driver_override for incoming Live Update preserved
+>>      devices
+>>    vfio/pci: Notify PCI subsystem about devices preserved across Live
+>>      Update
+>>    vfio: Enforce preserved devices are retrieved via
+>>      LIVEUPDATE_SESSION_RETRIEVE_FD
+>>    vfio/pci: Store Live Update state in struct vfio_pci_core_device
+>>    vfio: selftests: Add Makefile support for TEST_GEN_PROGS_EXTENDED
+>>    vfio: selftests: Add vfio_pci_liveupdate_uapi_test
+>>    vfio: selftests: Expose iommu_modes to tests
+>>    vfio: selftests: Expose low-level helper routines for setting up
+>>      struct vfio_pci_device
+>>    vfio: selftests: Verify that opening VFIO device fails during Live
+>>      Update
+>>    vfio: selftests: Add continuous DMA to vfio_pci_liveupdate_kexec_test
+>>
+>> Vipin Sharma (9):
+>>    vfio/pci: Register a file handler with Live Update Orchestrator
+>>    vfio/pci: Preserve vfio-pci device files across Live Update
+>>    vfio/pci: Retrieve preserved device files after Live Update
+>>    vfio/pci: Skip reset of preserved device after Live Update
+>>    selftests/liveupdate: Move luo_test_utils.* into a reusable library
+>>    selftests/liveupdate: Add helpers to preserve/retrieve FDs
+>>    vfio: selftests: Build liveupdate library in VFIO selftests
+>>    vfio: selftests: Initialize vfio_pci_device using a VFIO cdev FD
+>>    vfio: selftests: Add vfio_pci_liveupdate_kexec_test
+>>
+>>   MAINTAINERS                                   |   1 +
+>>   drivers/pci/Makefile                          |   1 +
+>>   drivers/pci/liveupdate.c                      | 248 ++++++++++++++++
+>>   drivers/pci/pci-driver.c                      |  12 +-
+>>   drivers/vfio/device_cdev.c                    |  25 +-
+>>   drivers/vfio/group.c                          |   9 +
+>>   drivers/vfio/pci/Makefile                     |   1 +
+>>   drivers/vfio/pci/vfio_pci.c                   |  11 +-
+>>   drivers/vfio/pci/vfio_pci_core.c              |  23 +-
+>>   drivers/vfio/pci/vfio_pci_liveupdate.c        | 278 ++++++++++++++++++
+>>   drivers/vfio/pci/vfio_pci_priv.h              |  16 +
+>>   drivers/vfio/vfio.h                           |  13 -
+>>   drivers/vfio/vfio_main.c                      |  22 +-
+>>   include/linux/kho/abi/pci.h                   |  53 ++++
+>>   include/linux/kho/abi/vfio_pci.h              |  45 +++
+>>   include/linux/liveupdate.h                    |   3 +
+>>   include/linux/pci.h                           |  38 +++
+>>   include/linux/vfio.h                          |  51 ++++
+>>   include/linux/vfio_pci_core.h                 |   7 +
+>>   kernel/liveupdate/luo_flb.c                   |   4 +
+>>   tools/testing/selftests/liveupdate/.gitignore |   1 +
+>>   tools/testing/selftests/liveupdate/Makefile   |  14 +-
+>>   .../include/libliveupdate.h}                  |  11 +-
+>>   .../selftests/liveupdate/lib/libliveupdate.mk |  20 ++
+>>   .../{luo_test_utils.c => lib/liveupdate.c}    |  43 ++-
+>>   .../selftests/liveupdate/luo_kexec_simple.c   |   2 +-
+>>   .../selftests/liveupdate/luo_multi_session.c  |   2 +-
+>>   tools/testing/selftests/vfio/Makefile         |  23 +-
+>>   .../vfio/lib/include/libvfio/iommu.h          |   2 +
+>>   .../lib/include/libvfio/vfio_pci_device.h     |   8 +
+>>   tools/testing/selftests/vfio/lib/iommu.c      |   4 +-
+>>   .../selftests/vfio/lib/vfio_pci_device.c      |  60 +++-
+>>   .../vfio/vfio_pci_liveupdate_kexec_test.c     | 255 ++++++++++++++++
+>>   .../vfio/vfio_pci_liveupdate_uapi_test.c      |  93 ++++++
+>>   34 files changed, 1313 insertions(+), 86 deletions(-)
+>>   create mode 100644 drivers/pci/liveupdate.c
+>>   create mode 100644 drivers/vfio/pci/vfio_pci_liveupdate.c
+>>   create mode 100644 include/linux/kho/abi/pci.h
+>>   create mode 100644 include/linux/kho/abi/vfio_pci.h
+>>   rename tools/testing/selftests/liveupdate/{luo_test_utils.h => lib/ 
+>> include/libliveupdate.h} (80%)
+>>   create mode 100644 tools/testing/selftests/liveupdate/lib/ 
+>> libliveupdate.mk
+>>   rename tools/testing/selftests/liveupdate/{luo_test_utils.c => lib/ 
+>> liveupdate.c} (89%)
+>>   create mode 100644 tools/testing/selftests/vfio/ 
+>> vfio_pci_liveupdate_kexec_test.c
+>>   create mode 100644 tools/testing/selftests/vfio/ 
+>> vfio_pci_liveupdate_uapi_test.c
+>>
+
 -- 
-2.52.0
+Best Regards,
+Yanjun.Zhu
+
 
