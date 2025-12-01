@@ -1,265 +1,298 @@
-Return-Path: <kvm+bounces-65008-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65009-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81EA1C97E44
-	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 15:45:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FB20C9804D
+	for <lists+kvm@lfdr.de>; Mon, 01 Dec 2025 16:21:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 323FB3A385D
-	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 14:45:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63EA43A3519
+	for <lists+kvm@lfdr.de>; Mon,  1 Dec 2025 15:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82E931ED77;
-	Mon,  1 Dec 2025 14:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 557E6328617;
+	Mon,  1 Dec 2025 15:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="WhL8pCv7"
+	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="WzZy7JhE";
+	dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b="NEiSECSq"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com [35.158.23.94])
+Received: from mail132-20.atl131.mandrillapp.com (mail132-20.atl131.mandrillapp.com [198.2.132.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7869C319847;
-	Mon,  1 Dec 2025 14:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.158.23.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA4C3242C8
+	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 15:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.2.132.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764600325; cv=none; b=rZBVYEPY/WV95551ql4W5UXW/4i+9EejZcPJ7lzA07QiNKuW94g8JOJuf1u5dMGZEU++dyJ5e5KMLb0ei6OCC7g0smw5gXRC+Z2F6UMVA/Ukgt5Lge7QfIpq4BwLGTrnwCNothkKlGMDgfibbAMR+LTX6X4SfdG/u9I5Ju4bK9w=
+	t=1764602408; cv=none; b=Jkn8T07Qs1aMZ7ML8kpjCxOjm4pgZCh4waqRVRXGwse7/LrySK3abhmsKRd5zAMGkQ4svlvCqOPj3FS3vN92XL+/YxhtetZjprMjPrZz3lyUw6LvvmG037S4wPxQgzdSFHDF3s7N8jVNKIK20Xem0DHp/vK1Z8GZw1j4Jw8+5kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764600325; c=relaxed/simple;
-	bh=UVDg1Guy9p2UufxCecABsSiNaOF6TmJ+4fooO+Q3umg=;
-	h=Content-Type:MIME-Version:From:To:CC:Subject:Date:Message-ID:
-	 References:In-Reply-To:MIME-Version; b=E7xlS8hA7e7qpuG+N9JxGtkf1BraVjBYhB2Ad8AoybhGf4iKcno5aaKoyT4klSjZnmhfAMivy0JQPsal5L8n1jk0nh/jQ+l/TTBgFon9HZ/zYoaY0vf3sd9CoTm66pCwUZUvuIJlSWX4P0i+2Tenvju1Rb3qbDb97lzqjU4czAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=WhL8pCv7; arc=none smtp.client-ip=35.158.23.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazoncorp2; t=1764600323; x=1796136323;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to;
-  bh=9HHszQ8uLB9Nvtsv/IwkKoL+lxIQrnvS8+HyJWF9b8g=;
-  b=WhL8pCv7cLFlKLg+FBhrPe6vEJ6UUbJ7amS93DIc4SFxnEYM3Iw43+u3
-   lwPftbn0qYDzPydZ+ZqnDGem9gOkROiSDHg3v3J5hEwAhQr32pmQCZhLB
-   0+OwpJc+zM7F8RDnJjvBoNF/ncHkEO4/WsV9lPbSKvBTDw94UbVgdK7eZ
-   wYATcYa/MaEqeC2uR6PTvR8hRZQCW0brL4xwBeG/fj/UwXr4LkBvADEGq
-   JwVK8MANI69INhg2oDfVYGQrN9fjpeL+iehM8Dty/sCR3D7OgUyqU0QKE
-   Oi6mn24wpVEEFjznGg/zzsJ3D8Qlt4IqLJXh3e5UYFiS70nyz1lMl/FxX
-   Q==;
-X-CSE-ConnectionGUID: 4Eg1OA0cSqaz6jGMyfVPNQ==
-X-CSE-MsgGUID: Kc6OAJ51ROutevJSH+oJ2A==
-X-Amazon-filename: smime.p7s
-X-IronPort-AV: E=Sophos;i="6.20,240,1758585600"; 
-   d="p7s'346?scan'346,208,346";a="6064819"
-Content-Type: multipart/mixed; boundary="===============5292545290439379605=="
+	s=arc-20240116; t=1764602408; c=relaxed/simple;
+	bh=7yvqcvgNr7Df/OcCol2acvZnPK406CxxXI3ldV7wZNA=;
+	h=From:Subject:To:Cc:Message-Id:Date:MIME-Version:Content-Type; b=kns+QpMZogvr4+q0b8hnSp8YfPkWHcLzR6fCUI2yxv3c+ng4G/Fjcn8hUKjlpySBpbh7pjeBuxNkP9EGnp+KmWlBf9JoCn1LP4i72iecXfT+mCXB2Sog526IjxgFZHsKv9/yu9gDj/UT3GZkgUy5PpQjEIVwCGDoCg4uu+0LYm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=WzZy7JhE; dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b=NEiSECSq; arc=none smtp.client-ip=198.2.132.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
+	s=mte1; t=1764602393; x=1764872393;
+	bh=HlyIaZmMukCXUcketAQUXKxv3ZBzSqoS/mCFII2RnyU=;
+	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
+	b=WzZy7JhEDOlabFhhlc4t4EV4y5rn6IXerAOc1Mcac8uyoEUA2vWcdqhPJIZqGzJkt
+	 b8Lr7oDmysBqJgzsQ5vr85y1Xjis3cj+5d1XxwcSwNhvRUU4imhFbPP/ZXckd5MxjM
+	 RNs7A/9P4B/RdB4+KwUYPD06oPuWTKDovMf+dostKGGSfLGVFePT50bmlChXj961v7
+	 8IcMAwSXmmp1ddyzOG1pooyuqjS7j33uJ8phyEQl2VS/VG8zMo9KuPJVAnVQu5Zf7A
+	 dF+hJwK5S4ZVXXnP1jjARUVrsbOGqRzfWwRwcNI3BKnj3f5641D0jaJD5JDb/P8fq8
+	 mFmz0KzvwQJiQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
+	t=1764602393; x=1764862893; i=thomas.courrege@vates.tech;
+	bh=HlyIaZmMukCXUcketAQUXKxv3ZBzSqoS/mCFII2RnyU=;
+	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
+	b=NEiSECSqLRSVJe2wSXXCqs2+w78UMndMqyYNwsE1reKkjNE3uYm3+g9O2sc9kODDh
+	 VRpmZw8UgNDbemXZ29xZNO83EfefDKKHo8IoWuX8ky099rQCbEofAan9T23kBrq2x/
+	 m3mSPJ2672YxrrP7ZytX0YjsvMjCChn5Vc4mz7XjfDRuitXaRnEw3GykqAnXIB3nmj
+	 ZOtZHqmvSj89eFqS4mKgnjE5hV3IIaY8S3DbLr9T0sMhtsMLtz/1X+dCS+yP8lmCdF
+	 iklwxWZtjLYBoNbZeJpiJAi3yvZYD3Q5dh0er2ecqCTnXF7oELC7M49GzaUc0JC/ny
+	 8HWCEDlsJ0Leg==
+Received: from pmta09.mandrill.prod.atl01.rsglab.com (localhost [127.0.0.1])
+	by mail132-20.atl131.mandrillapp.com (Mailchimp) with ESMTP id 4dKndP2WMfzFCWg1B
+	for <kvm@vger.kernel.org>; Mon,  1 Dec 2025 15:19:53 +0000 (GMT)
+From: "Thomas Courrege" <thomas.courrege@vates.tech>
+Subject: =?utf-8?Q?[PATCH=20v2]=20KVM:=20SEV:=20Add=20KVM=5FSEV=5FSNP=5FHV=5FREPORT=5FREQ=20command?=
+Received: from [37.26.189.201] by mandrillapp.com id 7a1ccb47ab0e43a38062ff9369baf756; Mon, 01 Dec 2025 15:19:53 +0000
+X-Mailer: git-send-email 2.52.0
+X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
+X-Bm-Transport-Timestamp: 1764602390868
+To: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, ashish.kalra@amd.com, thomas.lendacky@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au, nikunj@amd.com
+Cc: thomas.courrege@vates.tech, x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Message-Id: <20251201151940.172521-1-thomas.courrege@vates.tech>
+X-Native-Encoded: 1
+X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.7a1ccb47ab0e43a38062ff9369baf756?=
+X-Mandrill-User: md_30504962
+Feedback-ID: 30504962:30504962.20251201:md
+Date: Mon, 01 Dec 2025 15:19:53 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
-  by internal-fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2025 14:45:04 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.232:17436]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.31.35:2525] with esmtp (Farcaster)
- id a47c10cd-14e2-4fc5-9e7c-0778affee4d5; Mon, 1 Dec 2025 14:45:04 +0000 (UTC)
-X-Farcaster-Flow-ID: a47c10cd-14e2-4fc5-9e7c-0778affee4d5
-Received: from EX19D005EUA004.ant.amazon.com (10.252.50.241) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Mon, 1 Dec 2025 14:45:03 +0000
-Received: from EX19D001UEB002.ant.amazon.com (10.252.135.17) by
- EX19D005EUA004.ant.amazon.com (10.252.50.241) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Mon, 1 Dec 2025 14:45:03 +0000
-Received: from EX19D001UEB002.ant.amazon.com ([fe80::19d6:e954:f18:6292]) by
- EX19D001UEB002.ant.amazon.com ([fe80::19d6:e954:f18:6292%3]) with mapi id
- 15.02.2562.029; Mon, 1 Dec 2025 14:45:02 +0000
-From: "Woodhouse, David" <dwmw@amazon.co.uk>
-To: "Sieber, Fernand" <sieberf@amazon.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "seanjc@google.com" <seanjc@google.com>,
-	"peterz@infradead.org" <peterz@infradead.org>
-CC: "Saenz Julienne, Nicolas" <nsaenz@amazon.es>, "Busse, Anselm"
-	<abusse@amazon.de>, "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de"
-	<bp@alien8.de>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"hpa@zytor.com" <hpa@zytor.com>, "mingo@redhat.com" <mingo@redhat.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "dave.hansen@linux.intel.com"
-	<dave.hansen@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	=?utf-8?B?U2Now7ZuaGVyciwgSmFuIEgu?= <jschoenh@amazon.de>, "Borghorst,
- Hendrik" <hborghor@amazon.de>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "nh-open-source@amazon.com"
-	<nh-open-source@amazon.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Do not accidentally create BTS events
-Thread-Topic: [PATCH] KVM: x86/pmu: Do not accidentally create BTS events
-Thread-Index: AQHcYs40OjRv5LDqzEukxebtznpJ0bUM3IWA
-Date: Mon, 1 Dec 2025 14:45:01 +0000
-Message-ID: <0ce1757e3267df037912b303f60c662c45d0a6e6.camel@amazon.co.uk>
-References: <20251201142359.344741-1-sieberf@amazon.com>
-In-Reply-To: <20251201142359.344741-1-sieberf@amazon.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
---===============5292545290439379605==
-Content-Language: en-US
-Content-Type: multipart/signed; micalg=sha-256;
-	protocol="application/pkcs7-signature"; boundary="=-STgedMsGNI3h0h+/AFyg"
+Add support for retrieving the SEV-SNP attestation report via the
+SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
+ioctl for SNP guests.
 
---=-STgedMsGNI3h0h+/AFyg
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Thomas Courrege <thomas.courrege@vates.tech>
+---
+ .../virt/kvm/x86/amd-memory-encryption.rst    | 25 ++++++++
+ arch/x86/include/uapi/asm/kvm.h               |  7 +++
+ arch/x86/kvm/svm/sev.c                        | 61 +++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.c                  |  1 +
+ include/linux/psp-sev.h                       | 31 ++++++++++
+ 5 files changed, 125 insertions(+)
 
-On Mon, 2025-12-01 at 16:23 +0200, Fernand Sieber wrote
-> Perf considers the combination of PERF_COUNT_HW_BRANCH_INSTRUCTIONS with
-> a sample_period of 1 a special case and handles this as a BTS event (see
-> intel_pmu_has_bts_period()) -- a deviation from the usual semantic,
-> where the sample_period represents the amount of branch instructions to
-> encounter before the overflow handler is invoked.
-
-That's kind of awful, and seems to be the real underlying cause of the KVM
-issue. Can we kill it with fire? Peter?
-
---=-STgedMsGNI3h0h+/AFyg
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkYw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhUwggT9oAMCAQICEFQru/eJkU7BxeS7T6sWKmYwDQYJKoZIhvcN
-AQELBQAwgZYxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNV
-BAcTB1NhbGZvcmQxGDAWBgNVBAoTD1NlY3RpZ28gTGltaXRlZDE+MDwGA1UEAxM1U2VjdGlnbyBS
-U0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMjQxMjE1MDAw
-MDAwWhcNMjYxMjE1MjM1OTU5WjAiMSAwHgYJKoZIhvcNAQkBFhFkd213QGFtYXpvbi5jby51azCC
-AiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBANhjs6T4tJ0lcw4+6sawEn2FowmhunUBsnSV
-ccB+aA7s3Zd9PZV46CU6phAlCWpKk1yFVcD1Rnc4ux17o4LbUgFXiKrORS0jiF/5Oa0rXG3FISG1
-Xdjt8oPKIq+9Z1s2e7Ipi5WWj4AG/xlkH/YMMctL9O8CCRHSrhiChbE/gR57x9PAnt5aeZZ2YWza
-GOOeceaZe+u6vHCHITRmknSAnAX/aNoNJNsQCGcfrE83y9iHmP8BFrSRZqajBKlKq8tyJd5FnSwP
-H3kSUcQlHOwiIfCRFXP4rpXSZ7nKOEZr3SXH06ADY9gZtrSpwBbuzKWDPGWMRuRnz8ogj/Y6DeU4
-2zB/ZAIi5b0BzWf4u0rBEQD5xtpOCxYHc2nXQaFSWu36kP1JaNqElE51OQ92EyVKfW3N6qZcKiBr
-VijXY2EtR+/5W9ixRFnEs4nIeb94Sf92UMEeG9ew2yVvcYXXNPaicGnrkESNC19/a8YXxQEZfrmB
-eAPT9viQJhn3O+sD4pP0Ss3SjVZc6EO7vfoP07bt2n9YE08XSPkxcyb1J/4t/+AskkKeYFBGdpjg
-xd+iLFxjSwBytZuh3+7DuHUfg876WA44ieQDrhHSjuvuAZ1Wb8WUsrpzrcLoYjqFmb/bf6/yyoxl
-t31mdgPC+FLc+Yu1BQwXC3JMbrvbFBVTtn5X2EKDAgMBAAGjggHQMIIBzDAfBgNVHSMEGDAWgBQJ
-wPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUWvtA1XsSV8xjgfFQL/DUTNIbJu4wDgYDVR0P
-AQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwEwYDVR0lBAwwCgYIKwYBBQUHAwQwUAYDVR0gBEkwRzA6
-BgwrBgEEAbIxAQIBCgIwKjAoBggrBgEFBQcCARYcaHR0cHM6Ly9zZWN0aWdvLmNvbS9TTUlNRUNQ
-UzAJBgdngQwBBQEDMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2Vj
-dGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUF
-BwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xp
-ZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDov
-L29jc3Auc2VjdGlnby5jb20wHAYDVR0RBBUwE4ERZHdtd0BhbWF6b24uY28udWswDQYJKoZIhvcN
-AQELBQADggEBAED6T+rfP2XPdLfHoCd5n1iGIcYauWfPHRdZN2Tw7a7NEXIkm2yZNizOSpp3NrMi
-WOBN13XgqnYLsqdpxJhbjwKczKX50/qfhhkOHtrQ0GRkucybK447Aaul80cZT8T3WG9U9dhl3Ct/
-MuyKBWQg3MYlbUT6u4kC9Pk8rd+cR14ttYRUWDKTS2BrL7e8jpNmtCoEakDkMY4MrpoMwM1f4ANV
-qZ8cnDntwXq5ormZIksN2DqxsKLmrFyVAONhqSST72ImBfIVWhFRTCF9tTcI5wE/0Skl25FZmSsB
-B2LUgecgK7MZyw9Do/b0sYS+8YmA/ujUCqNb0fPJBE/B9vBomhswggYVMIIE/aADAgECAhBUK7v3
-iZFOwcXku0+rFipmMA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTI0MTIxNTAwMDAwMFoXDTI2MTIxNTIzNTk1OVowIjEgMB4GCSqGSIb3DQEJ
-ARYRZHdtd0BhbWF6b24uY28udWswggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQDYY7Ok
-+LSdJXMOPurGsBJ9haMJobp1AbJ0lXHAfmgO7N2XfT2VeOglOqYQJQlqSpNchVXA9UZ3OLsde6OC
-21IBV4iqzkUtI4hf+TmtK1xtxSEhtV3Y7fKDyiKvvWdbNnuyKYuVlo+ABv8ZZB/2DDHLS/TvAgkR
-0q4YgoWxP4Eee8fTwJ7eWnmWdmFs2hjjnnHmmXvrurxwhyE0ZpJ0gJwF/2jaDSTbEAhnH6xPN8vY
-h5j/ARa0kWamowSpSqvLciXeRZ0sDx95ElHEJRzsIiHwkRVz+K6V0me5yjhGa90lx9OgA2PYGba0
-qcAW7sylgzxljEbkZ8/KII/2Og3lONswf2QCIuW9Ac1n+LtKwREA+cbaTgsWB3Np10GhUlrt+pD9
-SWjahJROdTkPdhMlSn1tzeqmXCoga1Yo12NhLUfv+VvYsURZxLOJyHm/eEn/dlDBHhvXsNslb3GF
-1zT2onBp65BEjQtff2vGF8UBGX65gXgD0/b4kCYZ9zvrA+KT9ErN0o1WXOhDu736D9O27dp/WBNP
-F0j5MXMm9Sf+Lf/gLJJCnmBQRnaY4MXfoixcY0sAcrWbod/uw7h1H4PO+lgOOInkA64R0o7r7gGd
-Vm/FlLK6c63C6GI6hZm/23+v8sqMZbd9ZnYDwvhS3PmLtQUMFwtyTG672xQVU7Z+V9hCgwIDAQAB
-o4IB0DCCAcwwHwYDVR0jBBgwFoAUCcDy/AvalNtf/ivfqJlCz8ngrQAwHQYDVR0OBBYEFFr7QNV7
-ElfMY4HxUC/w1EzSGybuMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMBMGA1UdJQQMMAoG
-CCsGAQUFBwMEMFAGA1UdIARJMEcwOgYMKwYBBAGyMQECAQoCMCowKAYIKwYBBQUHAgEWHGh0dHBz
-Oi8vc2VjdGlnby5jb20vU01JTUVDUFMwCQYHZ4EMAQUBAzBaBgNVHR8EUzBRME+gTaBLhklodHRw
-Oi8vY3JsLnNlY3RpZ28uY29tL1NlY3RpZ29SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3Vy
-ZUVtYWlsQ0EuY3JsMIGKBggrBgEFBQcBAQR+MHwwVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuc2Vj
-dGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5j
-cnQwIwYIKwYBBQUHMAGGF2h0dHA6Ly9vY3NwLnNlY3RpZ28uY29tMBwGA1UdEQQVMBOBEWR3bXdA
-YW1hem9uLmNvLnVrMA0GCSqGSIb3DQEBCwUAA4IBAQBA+k/q3z9lz3S3x6AneZ9YhiHGGrlnzx0X
-WTdk8O2uzRFyJJtsmTYszkqadzazIljgTdd14Kp2C7KnacSYW48CnMyl+dP6n4YZDh7a0NBkZLnM
-myuOOwGrpfNHGU/E91hvVPXYZdwrfzLsigVkINzGJW1E+ruJAvT5PK3fnEdeLbWEVFgyk0tgay+3
-vI6TZrQqBGpA5DGODK6aDMDNX+ADVamfHJw57cF6uaK5mSJLDdg6sbCi5qxclQDjYakkk+9iJgXy
-FVoRUUwhfbU3COcBP9EpJduRWZkrAQdi1IHnICuzGcsPQ6P29LGEvvGJgP7o1AqjW9HzyQRPwfbw
-aJobMYIExDCCBMACAQEwgaswgZYxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNo
-ZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGDAWBgNVBAoTD1NlY3RpZ28gTGltaXRlZDE+MDwGA1UE
-AxM1U2VjdGlnbyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EC
-EFQru/eJkU7BxeS7T6sWKmYwDQYJYIZIAWUDBAIBBQCgggHpMBgGCSqGSIb3DQEJAzELBgkqhkiG
-9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MTIwMTE0NDQ1OVowLwYJKoZIhvcNAQkEMSIEIJrH/AT9
-F70Hd7ffDDnndW5PLOBxF6cJBAv57+v3vFX8MIG8BgkrBgEEAYI3EAQxga4wgaswgZYxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGDAW
-BgNVBAoTD1NlY3RpZ28gTGltaXRlZDE+MDwGA1UEAxM1U2VjdGlnbyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEFQru/eJkU7BxeS7T6sWKmYwgb4GCyqGSIb3
-DQEJEAILMYGuoIGrMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhBUK7v3
-iZFOwcXku0+rFipmMA0GCSqGSIb3DQEBAQUABIICAJ1lQkvA2INWEEGOUXLvGHzSdAQsWc8ySiYC
-/kTlT95Hwws/Wg1UD2kDEoNMELPw+a2zBMbfj9s3fDDjmWEziqKDo7MsNaKWu+CIP0za9NEe7XEF
-HDcYchxEyVrl6JSJHVPdOyMmXk2nmIRJdDtrg8+Um91qYSm0cvFA8ochrLIaMZ5nIOXQMi1lWiRp
-8mt06VFm1ATSsGXS7V8RX3nTNxqmkFgDbvFCBBtaFG0xYmSBcPZMUkCiPsf5xcniEQ2i/rxGQD2i
-iYgguKe7ldIpYiWomNvcrOyu/8m2NXiabLsYQAzYo4u6V+jGxecVPKYTXSZCmwnwoDe7yz+BCKSS
-ENFbzxqH8DvwgT2SsIcKZuky1KHOyJuOODFlbSbs8BZDHGDxmG+y8cU1g4Q0IlafecJ3/2lTHaFT
-Sz2NJvDA+LJKlmLDcRn0VxXAAkEicvg2T8NBTZVmhJGg0UGd4ncha1Besxi6f48Wf7n8l/H+v+KX
-NGe1RiYlU4eL1YtkRD/+kzRTyyZghvtQysBhJN1RTJNuNKnVkKbUcChH1mcDumhjh0QP8oIMIgm7
-dtz7uId8/eHu8O3g1cKmBo7gw4DNCSws0Nfhqgp+oJ6Sj3BkbZwzieM/DFfv3PQjrtziv2Dwwzk3
-z8T4HFnDbzDDi4yMtyq+YFz5a4//l4JqF/81qTa4AAAAAAAA
-
-
---=-STgedMsGNI3h0h+/AFyg--
-
---===============5292545290439379605==
-Content-Type: multipart/alternative; boundary="===============6592948740844980269=="
-MIME-Version: 1.0
-Content-Disposition: inline
-
---===============6592948740844980269==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-
-
-
-
-Amazon Development Centre (London) Ltd. Registered in England and Wales wit=
-h registration number 04543232 with its registered office at 1 Principal Pl=
-ace, Worship Street, London EC2A 2FA, United Kingdom.
-
-
-
---===============6592948740844980269==
-Content-Type: text/html; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-
-<br><br><br>Amazon Development Centre (London) Ltd.Registered in England an=
-d Wales with registration number 04543232 with its registered office at 1 P=
-rincipal Place, Worship Street, London EC2A 2FA, United Kingdom.<br><br><br>
-
---===============6592948740844980269==--
---===============5292545290439379605==--
+diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+index 1ddb6a86ce7f..b3ee25718938 100644
+--- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+@@ -572,6 +572,31 @@ Returns: 0 on success, -negative on error
+ See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
+ details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
+ 
++21. KVM_SEV_SNP_HV_REPORT_REQ
++-----------------------------
++
++The KVM_SEV_SNP_HV_REPORT_REQ command requests the hypervisor-generated
++SNP attestation report. This report is produced by the PSP using the
++HV-SIGNED key selected by the caller.
++
++The ``key_sel`` field indicates which key the platform will use to sign the
++report:
++  * ``0``: If VLEK is installed, sign with VLEK. Otherwise, sign with VCEK.
++  * ``1``: Sign with VCEK.
++  * ``2``: Sign with VLEK.
++  * Other values are reserved.
++
++Parameters (in): struct kvm_sev_snp_hv_report_req
++
++Returns:  0 on success, -negative on error
++
++::
++        struct kvm_sev_snp_hv_report_req {
++                __u8 key_sel;
++                __u64 report_uaddr;
++                __u64 report_len;
++        };
++
+ Device attribute API
+ ====================
+ 
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index d420c9c066d4..ff034668cac4 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -742,6 +742,7 @@ enum sev_cmd_id {
+ 	KVM_SEV_SNP_LAUNCH_START = 100,
+ 	KVM_SEV_SNP_LAUNCH_UPDATE,
+ 	KVM_SEV_SNP_LAUNCH_FINISH,
++	KVM_SEV_SNP_HV_REPORT_REQ,
+ 
+ 	KVM_SEV_NR_MAX,
+ };
+@@ -870,6 +871,12 @@ struct kvm_sev_receive_update_data {
+ 	__u32 pad2;
+ };
+ 
++struct kvm_sev_snp_hv_report_req {
++	__u8 key_sel;
++	__u64 report_uaddr;
++	__u64 report_len;
++};
++
+ struct kvm_sev_snp_launch_start {
+ 	__u64 policy;
+ 	__u8 gosvw[16];
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 0835c664fbfd..62f17f4eab42 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2253,6 +2253,64 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	return rc;
+ }
+ 
++static int sev_snp_hv_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	struct sev_data_snp_msg_report_rsp *report_rsp = NULL;
++	struct sev_data_snp_hv_report_req data;
++	struct kvm_sev_snp_hv_report_req params;
++	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
++	void __user *u_report;
++	void __user *u_params = u64_to_user_ptr(argp->data);
++	int ret;
++
++	if (!sev_snp_guest(kvm))
++		return -ENOTTY;
++
++	if (copy_from_user(&params, u_params, sizeof(params)))
++		return -EFAULT;
++
++	if (params.report_len < SEV_SNP_ATTESTATION_REPORT_SIZE)
++		return -ENOSPC;
++
++	memset(&data, 0, sizeof(data));
++
++	u_report = u64_to_user_ptr(params.report_uaddr);
++	if (!u_report)
++		return -EINVAL;
++
++	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	if (!report_rsp)
++		return -ENOMEM;
++
++	data.len = sizeof(data);
++	data.hv_report_paddr = __psp_pa(report_rsp);
++	data.key_sel = params.key_sel;
++
++	data.gctx_addr = __psp_pa(sev->snp_context);
++	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
++			    &argp->error);
++
++	if (ret)
++		goto e_free_rsp;
++
++	params.report_len = report_rsp->report_size;
++	if (copy_to_user(u_params, &params, sizeof(params)))
++		ret = -EFAULT;
++
++	if (params.report_len < report_rsp->report_size) {
++		ret = -ENOSPC;
++	} else if (copy_to_user(u_report, report_rsp + 1, report_rsp->report_size)) {
++		/* report is located right after rsp */
++		ret = -EFAULT;
++	}
++
++e_free_rsp:
++	/* contains sensitive data */
++	memzero_explicit(report_rsp, PAGE_SIZE);
++	snp_free_firmware_page(report_rsp);
++	return ret;
++}
++
+ struct sev_gmem_populate_args {
+ 	__u8 type;
+ 	int sev_fd;
+@@ -2664,6 +2722,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_SNP_LAUNCH_FINISH:
+ 		r = snp_launch_finish(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SNP_HV_REPORT_REQ:
++		r = sev_snp_hv_report_request(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		goto out;
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 0d13d47c164b..5236d5ee19ac 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -251,6 +251,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
+ 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
+ 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
++	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
+ 	default:				return 0;
+ 	}
+ 
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index e0dbcb4b4fd9..0e635feb7671 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -91,6 +91,7 @@ enum sev_cmd {
+ 	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
+ 	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
+ 	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
++	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
+ 	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
+ 	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
+ 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
+@@ -554,6 +555,36 @@ struct sev_data_attestation_report {
+ 	u32 len;				/* In/Out */
+ } __packed;
+ 
++/**
++ * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
++ *
++ * @len: length of the command buffer in bytes
++ * @key_sel: Selects which key to use for generating the signature.
++ * @gctx_addr: System physical address of guest context page
++ * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
++ */
++struct sev_data_snp_hv_report_req {
++	u32 len;		/* In */
++	u32 key_sel:2;		/* In */
++	u32 rsvd:30;
++	u64 gctx_addr;		/* In */
++	u64 hv_report_paddr;	/* In */
++} __packed;
++
++#define SEV_SNP_ATTESTATION_REPORT_SIZE 1184
++
++/**
++ * struct sev_data_snp_msg_export_rsp
++ *
++ * @status: Status : 0h: Success. 16h: Invalid parameters.
++ * @report_size: Size in bytes of the attestation report
++ */
++struct sev_data_snp_msg_report_rsp {
++	u32 status;			/* Out */
++	u32 report_size;		/* Out */
++	u8 rsvd[24];
++} __packed;
++
+ /**
+  * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
+  *
+-- 
+2.52.0
 
