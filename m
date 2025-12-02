@@ -1,170 +1,123 @@
-Return-Path: <kvm+bounces-65121-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65122-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C996C9C10F
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:00:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEEE3C9C133
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:03:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BB46A4E2ED4
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:00:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 754F73A4C14
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938D3325716;
-	Tue,  2 Dec 2025 16:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A712727F5;
+	Tue,  2 Dec 2025 16:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="XJUfuIIf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="masZH/aq"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.74.81.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF482255F2D;
-	Tue,  2 Dec 2025 16:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.74.81.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866DF263F52
+	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764691217; cv=none; b=V2t/7i45c3jVdy1mPNEgLSsfde/3pFtXt77N1DpIUsmK8mJhGhIuNcKziXL3Kzv2g1MN3XMzmHA2xBBUfiAzc89+Q0LiO0dcdQ41Qbkyo0q4cokDiPsvAbKIE+xH8MtI2VV+gBUcXrG77Z587WZN2IAxHBcdSSh/eiHDj5zGbOQ=
+	t=1764691410; cv=none; b=e8d8JDEn/8sLrkJFqxgGDTcrc+m+diPONX/vjhUMR6VwzyOoCNI3uko0pfuo2ZAkZfebrHipXCZkufkL+DG8P3ZA8vfo4afA/Wr+RgbS/Y+0GGI4mcX+kK++kMM4zxpZP/s3LB1Oh1bhw0l+GI8HiIff1Ma6Blsh11skDiOo3bU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764691217; c=relaxed/simple;
-	bh=8vYCw390JYTGildBHzbP/DkGIQWGrIEJ0YigK1Hi8jU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WMA1alogmRXSEdcx/BXnj+WSJkeEp6TMX1Ipnkuzy+yfaRyemCCePG+O2Rb16bs9K9suWnIExNpITTA3THMjjUFHueWiLF7Z6q5a8VlCaI48l09Na++XMpNrUxH1j3U/wbPl3u75aIP7/yZUflGXVbwAqnIA0CRoEo+cOwoQljM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=XJUfuIIf; arc=none smtp.client-ip=3.74.81.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1764691410; c=relaxed/simple;
+	bh=qRYb2UuLMho7adIKiGqSJm3f0QgiMpUF9tCgxUcb1ls=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EUwHuEu0IrQruwPL9cjU8jkPgKfqgP/vlWV4fXoLihYQlsLxR93/r5HiMY3M7XtmyoWa81dsNHODt75ha/s3xzPxGrXHIn0gcrbjGZYVogs76PbgZyMlsLANOhq+O55MRmakNPLPCx0R8VJwW2YYZVzAEDq3D1eCw7Z2opSsNx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=masZH/aq; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3438b1220bcso5620534a91.2
+        for <kvm@vger.kernel.org>; Tue, 02 Dec 2025 08:03:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1764691213; x=1796227213;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=at/judjHhIUd9hK8QdYJp4ATA/L1ojrlyu29FEks1XQ=;
-  b=XJUfuIIf8stA12jESFJrbVbuPhtXmL2BnwIcxoMWQO/fzm+2M/3pWiQS
-   PLGtIz/ghiQrzX5DK4quCYotuVCmPSr/6DEZ6Y+1upx0PU+F8YnhTdzuz
-   S90TCWRoVvQGJ8ptmlvbW5glwqIQ4De7gZ/h8Xo8d6GiyiqeRm+7nrmuU
-   5a46N9K5qMPkr8gwPndxjLxg9mAodX2JjzEo1017s+1NVFVpEz5Jy7sQY
-   L5K0yFR5JjRVPyh3BnvHFHgn2CpEme4hNCwHswkGy1Fx4iXKR4zstBouU
-   G3t2DpnEdZrotFRlDUFS3nS2r2rmoqXuOnrjJzNbvSyiqsyJ0+siE5+cg
-   A==;
-X-CSE-ConnectionGUID: 59VtwPqHT+qpAYmOgDwhIQ==
-X-CSE-MsgGUID: W+eHlDOAQLWZbrDLalx6Og==
-X-IronPort-AV: E=Sophos;i="6.20,243,1758585600"; 
-   d="scan'208";a="6139170"
-Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
-  by internal-fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 15:59:54 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [54.240.197.228:25931]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.33.168:2525] with esmtp (Farcaster)
- id 3129eee9-83fd-4b7f-9c72-6442127ab572; Tue, 2 Dec 2025 15:59:54 +0000 (UTC)
-X-Farcaster-Flow-ID: 3129eee9-83fd-4b7f-9c72-6442127ab572
-Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Tue, 2 Dec 2025 15:59:51 +0000
-Received: from [192.168.12.25] (10.106.83.17) by EX19D005EUB003.ant.amazon.com
- (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Tue, 2 Dec 2025
- 15:59:50 +0000
-Message-ID: <cd354fc0-e500-472d-ac33-0bc43c0d898f@amazon.com>
-Date: Tue, 2 Dec 2025 15:59:49 +0000
+        d=google.com; s=20230601; t=1764691408; x=1765296208; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7h65javEKiZCilvi53EqrbcCyqwHMbAxO5ZzdpYHZ2Q=;
+        b=masZH/aqlMEUaLDkXB46XPz6/Tw58M9bfX7tPa37CMc35hdprpAhQH8fi2syvRE2CH
+         Rmo30Tag66rhRj8cwfXYrKKJS0DXuI3b3pYpVAHJgWeOa/7ihsaqQqOIVmbJzZuHZ99f
+         IEYLqNa+VZpHtdl58LrkXcHm0KHD2bYqNEjsZd5U2hc3G1Q0FVWWCOHl1UahzlkFrl1C
+         7dniGt15KRjnQBnpvyVp5Z3gRhszx/Lco2f6mU3cTmsIfGMlC9dBiTMhDq1SF54H0W6z
+         0HscIHluBmCaiBJyIk7kL3x11yepDNgxtR/i7QB1UWi9dsvff/w9R8o5/E8gP5l51wQ5
+         Fk9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764691408; x=1765296208;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7h65javEKiZCilvi53EqrbcCyqwHMbAxO5ZzdpYHZ2Q=;
+        b=JZXrP7lEMFWxN4st5cbB8Rklmu2eGLT/EgnJu3QTP1cB2fifR3rZLxKJiJcWg2Y0bD
+         bBUvQXkqd/rgPdprOzXt/9ZdLNcDBq+Lj/S2NwXWHQqYP00nU0oqc5fCLTIfPX8vcX+L
+         ynPpbd4/Vn6OTTKVPEUscUVFH3Z7M8xr+7B6AJTXPSxnoFkwY7Ygje75XFJOLt7mX4XC
+         X6uP8lprE+ag7JukzHtSCG9VNmiRc+4AUekSAFQ8t9hqQfkQv1vrDxHKXiNRJiEOLJWq
+         WCFpiUSGffft6XQOHvlFv6TT+ZSSysc0ZzzdNJdmxMxw2jRQZ8WyRyn9ehfHSMDU9wI9
+         JKAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXWuCwc1yoj61ZYuel4a60enwT2uSfnruqFeZeyZqsIdl5OWDr07vuBLBoJTmE7+BV/qo0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzw7DSD/prsn5xVCmhE/lFAXnA1EYVpxMswZZMrxCaR6DdKOXfr
+	D4TXafb4vMGTkObclfQPw+sEsq6JyD5ujKqWNpO5gSIkychqUAHlFrAyMCAuam5P0lpy2gUVFrp
+	yHfGmog==
+X-Google-Smtp-Source: AGHT+IHgZDUiSW6QxjIjcAOYgkuyQjls1DupsHMaqWae+TriC3tvVF94Ipa05PoU8Re45MZOfysmDED4NVs=
+X-Received: from pjbca18.prod.google.com ([2002:a17:90a:f312:b0:32b:ae4c:196c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5605:b0:340:bc27:97bd
+ with SMTP id 98e67ed59e1d1-3475ebf93b2mr25169788a91.9.1764691407827; Tue, 02
+ Dec 2025 08:03:27 -0800 (PST)
+Date: Tue, 2 Dec 2025 08:03:26 -0800
+In-Reply-To: <20251202124423.GC2458571@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v3 4/5] guest_memfd: add support for userfaultfd minor
- mode
-To: Peter Xu <peterx@redhat.com>
-CC: "David Hildenbrand (Red Hat)" <david@kernel.org>, Mike Rapoport
-	<rppt@kernel.org>, <linux-mm@kvack.org>, Andrea Arcangeli
-	<aarcange@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, "Axel
- Rasmussen" <axelrasmussen@google.com>, Baolin Wang
-	<baolin.wang@linux.alibaba.com>, Hugh Dickins <hughd@google.com>, "James
- Houghton" <jthoughton@google.com>, "Liam R. Howlett"
-	<Liam.Howlett@oracle.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Michal Hocko <mhocko@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, "Sean
- Christopherson" <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, "Suren
- Baghdasaryan" <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-References: <20251130111812.699259-1-rppt@kernel.org>
- <20251130111812.699259-5-rppt@kernel.org>
- <652578cc-eeff-4996-8c80-e26682a57e6d@amazon.com>
- <2d98c597-0789-4251-843d-bfe36de25bd2@kernel.org>
- <553c64e8-d224-4764-9057-84289257cac9@amazon.com> <aS3f_PlxWLb-6NmR@x1.local>
- <76e3d5bf-df73-4293-84f6-0d6ddabd0fd7@amazon.com> <aS4BVC42JiUT51rS@x1.local>
- <415a5956-1dec-4f10-be36-85f6d4d8f4b4@amazon.com> <aS8HaDX5Pg9h_nkl@x1.local>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <aS8HaDX5Pg9h_nkl@x1.local>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D011EUA001.ant.amazon.com (10.252.50.114) To
- EX19D005EUB003.ant.amazon.com (10.252.51.31)
+Mime-Version: 1.0
+References: <20251201142359.344741-1-sieberf@amazon.com> <20251202100311.GB2458571@noisy.programming.kicks-ass.net>
+ <20251202124423.GC2458571@noisy.programming.kicks-ass.net>
+Message-ID: <aS8Nzomxsy5S4AQ-@google.com>
+Subject: Re: [PATCH] KVM: x86/pmu: Do not accidentally create BTS events
+From: Sean Christopherson <seanjc@google.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Fernand Sieber <sieberf@amazon.com>, pbonzini@redhat.com, 
+	"Jan =?utf-8?Q?H=2E_Sch=C3=B6nherr?=" <jschoenh@amazon.de>, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, dwmw@amazon.co.uk, 
+	hborghor@amazon.de, nh-open-source@amazon.com, abusse@amazon.de, 
+	nsaenz@amazon.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-
-
-
-On 02/12/2025 15:36, Peter Xu wrote:
-> On Tue, Dec 02, 2025 at 11:50:31AM +0000, Nikita Kalyazin wrote:
->>> It looks fine indeed, but it looks slightly weird then, as you'll have two
->>> ways to populate the page cache.  Logically here atomicity is indeed not
->>> needed when you trap both MISSING + MINOR.
->>
->> I reran the test based on the UFFDIO_COPY prototype I had using your series
->> [2], and UFFDIO_COPY is slower than write() to populate 512 MiB: 237 vs 202
->> ms (+17%).  Even though UFFDIO_COPY alone is functionally sufficient, I
->> would prefer to have an option to use write() where possible and only
->> falling back to UFFDIO_COPY for userspace faults to have better performance.
+On Tue, Dec 02, 2025, Peter Zijlstra wrote:
+> Does something like so work? It is still terrible, but perhaps slightly
+> less so.
 > 
-> Yes, write() should be fine.
-> 
-> Especially to gmem, I guess write() support is needed when VMAs cannot be
-> mapped at all in strict CoCo context, so it needs to be available one way
-> or another.
+> diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
+> index 2b969386dcdd..493e6ba51e06 100644
+> --- a/arch/x86/events/perf_event.h
+> +++ b/arch/x86/events/perf_event.h
+> @@ -1558,13 +1558,22 @@ static inline bool intel_pmu_has_bts_period(struct perf_event *event, u64 period
+>  	struct hw_perf_event *hwc = &event->hw;
+>  	unsigned int hw_event, bts_event;
+>  
+> -	if (event->attr.freq)
+> +	/*
+> +	 * Only use BTS for fixed rate period==1 events.
+> +	 */
+> +	if (event->attr.freq || period != 1)
+> +		return false;
+> +
+> +	/*
+> +	 * BTS doesn't virtualize.
+> +	 */
+> +	if (event->attr.exclude_host)
 
-write() is supposed to be supported only for shared memory, ie 
-accessible to the host.  AFAIK private memory should be populated via 
-other mechanisms.
+Ya, this seems like the right fix.  Pulling in the original bug report:
 
-> 
-> IIUC it's because UFFDIO_COPY (or memcpy(), I recall you used to test that
-> instead) will involve pgtable operations.
-Yes, for memcpy() it's even worse because it triggers VMA faults for 
-every page.  UFFDIO_COPY's overhead is lower because the only extra 
-thing it does compared to write() is installing user PTs.
+  When BTS is enabled, it leads to general host performance degradation to both
+  VMs and host.
 
-> instead) will involve pgtable operations.  So I wonder if the VMA mapping
-> the gmem will still be accessed at some point later (either private->share
-> convertable ones for device DMAs for CoCo, or fully shared non-CoCo use
-> case), then the pgtable overhead will happen later for a write()-styled
-> fault resolution.
-
-At least in Firecracker use case, only pages that are related to PV 
-devices are going to get accessed by the VMM via user PTs (such as 
-virtio queues and buffers).  The majority of pages are only touched by 
-vCPUs via stage-2 mappings and are never accessed via user PTs.
-
-> 
->  From that POV, above number makes sense.
-> 
-> Thanks for the extra testing results.
-> 
->>
->> [2]
->> https://lore.kernel.org/all/7666ee96-6f09-4dc1-8cb2-002a2d2a29cf@amazon.com
-> 
-> --
-> Peter Xu
-> 
-
+I assume the underlying problem is that intel_pmu_enable_bts() is called even
+when the event isn't enabled in the host, and BTS doesn't discrimate once it's
+enable and bogs down the host (but presumably not the guest, at least not directly,
+since KVM should prevent setting BTS in vmcs.GUEST_IA32_DEBUGCTL).  Enabling BTS
+for exclude-host events simply can't work, even if the event came from host userspace.
 
