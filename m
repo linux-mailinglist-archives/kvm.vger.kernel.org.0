@@ -1,129 +1,82 @@
-Return-Path: <kvm+bounces-65113-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65115-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB3EC9BBA0
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 15:11:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F503C9BC22
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 15:22:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9610D4E429F
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 14:10:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C77883A64EB
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 14:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E5B3218DD;
-	Tue,  2 Dec 2025 14:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nLaikgA4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8903B13A3F7;
+	Tue,  2 Dec 2025 14:22:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB5D322C78;
-	Tue,  2 Dec 2025 14:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96AD2153D3
+	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 14:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764684638; cv=none; b=DdYX9qHGPOz2qwBshWDc3NNvfT7JdBO2ptQ7RzIiaKdMrRSv9QVZnaQkb9zZZwKm1mchJKkdWkVmkAZUH+JZ4b/GLVzavSr+u0kDs82Ius/EKVXEinFRGhoXnUKa+skoh2Q3MKtDmYyay7KpRSEwJLsy1ARMewkdDHJPTyeuRMw=
+	t=1764685352; cv=none; b=P3ZijF2kLlD1flTe/XdYji3jxI8YnvO0Wf3ym2nUprJkCX874KQveqE8cuShDpSGO/2mbj2jxZjlxh+mEkmC567OABsBD9VswTuj1mnwEQ1/k8Vep77oycL5ZOYuFtlGQFNWxZl46WYQQGTSPyB45wr3uFma9Bbp+Zo4tAnxg5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764684638; c=relaxed/simple;
-	bh=URgri6CpO3X9jzw1OjvEtPKkg18tROknUFwKrRlIq9g=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=K09ZZqYMtF+6c3KN3J62zdFNZnfuGyc5E15WLI0d7yYorvps2xxOE58jj54NFYQUitQmMqzc7b/OUOfSdBOJcxkgF0N4u26W68jFuheDuBtoCv9RAPUJFYg+qR3yC3Uy/hmIulP20jyprtt0BiEkE0OTs1c+2cCkovX9bpkhVD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nLaikgA4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A04C3C4CEF1;
-	Tue,  2 Dec 2025 14:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764684637;
-	bh=URgri6CpO3X9jzw1OjvEtPKkg18tROknUFwKrRlIq9g=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=nLaikgA4ve9G0uBvuQ4SatN4sb2/QXUllDdM2zFEpUhvaHeWT33INaJ6IDcpVOobG
-	 ei/R654EgJu8W5YLITv/04Fej0voEK6nOjxgUpgOpaNGSOsBXUWdzNppcIrMZjJjym
-	 +itzE8FFx8zEZSyqNtWpQc5jba7Qy8P1QahZkA/1Er6RMBJPdlCZhiZ9e2s2fSbrCf
-	 6gk9q5BXnJyiVPYsHvRs8cl4ITbRzWngVQ/sDmc8R4k5BxXpzCNl6u6EtToX6xoV30
-	 FzLqDjvFPKH3LSSMJmO3AMDb7QsRdTZT3q1XJ5c4G04yvDumKt6C9FNVyiOKZsD4IT
-	 s7TNnLPp478KQ==
-From: Pratyush Yadav <pratyush@kernel.org>
-To: Pasha Tatashin <pasha.tatashin@soleen.com>
-Cc: David Matlack <dmatlack@google.com>,  Alex Williamson
- <alex@shazbot.org>,  Adithya Jayachandran <ajayachandra@nvidia.com>,  Alex
- Mastro <amastro@fb.com>,  Alistair Popple <apopple@nvidia.com>,  Andrew
- Morton <akpm@linux-foundation.org>,  Bjorn Helgaas <bhelgaas@google.com>,
-  Chris Li <chrisl@kernel.org>,  David Rientjes <rientjes@google.com>,
-  Jacob Pan <jacob.pan@linux.microsoft.com>,  Jason Gunthorpe
- <jgg@nvidia.com>,  Jason Gunthorpe <jgg@ziepe.ca>,  Josh Hilke
- <jrhilke@google.com>,  Kevin Tian <kevin.tian@intel.com>,
-  kvm@vger.kernel.org,  Leon Romanovsky <leonro@nvidia.com>,
-  linux-kernel@vger.kernel.org,  linux-kselftest@vger.kernel.org,
-  linux-pci@vger.kernel.org,  Lukas Wunner <lukas@wunner.de>,  Mike
- Rapoport <rppt@kernel.org>,  Parav Pandit <parav@nvidia.com>,  Philipp
- Stanner <pstanner@redhat.com>,  Pratyush Yadav <pratyush@kernel.org>,
-  Saeed Mahameed <saeedm@nvidia.com>,  Samiullah Khawaja
- <skhawaja@google.com>,  Shuah Khan <shuah@kernel.org>,  Tomita Moeko
- <tomitamoeko@gmail.com>,  Vipin Sharma <vipinsh@google.com>,  William Tu
- <witu@nvidia.com>,  Yi Liu <yi.l.liu@intel.com>,  Yunxiang Li
- <Yunxiang.Li@amd.com>,  Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: Re: [PATCH 00/21] vfio/pci: Base support to preserve a VFIO device
- file across Live Update
-In-Reply-To: <CA+CK2bC3EgL5r7myENVgJ9Hq2P9Gz0axnNqy3e6E_YKVRM=-ng@mail.gmail.com>
-	(Pasha Tatashin's message of "Mon, 1 Dec 2025 16:59:23 -0500")
-References: <20251126193608.2678510-1-dmatlack@google.com>
-	<CA+CK2bC3EgL5r7myENVgJ9Hq2P9Gz0axnNqy3e6E_YKVRM=-ng@mail.gmail.com>
-Date: Tue, 02 Dec 2025 15:10:26 +0100
-Message-ID: <86bjkhm0tp.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1764685352; c=relaxed/simple;
+	bh=Z9J/YtwD6T45cE5M8a97Dj+fqTKHg477jT5R5TDYDZg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z9PQ48BhE2SJ7HGswVulgRBGH79TWUtJiShrRwDywZnmMnvdJlRav5MUsGrfvf60iKJ9ultN+eQJccx7fQksYNrsBmC2FzjzVssWx0EWQjKXU+T7J+avf/1VP1P6MR++R0Qbwp6Dpu7z8lBAXJnonlZjfkf5sZZGCpRXtV5spGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B00561477;
+	Tue,  2 Dec 2025 06:22:22 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C35DC3F73B;
+	Tue,  2 Dec 2025 06:22:28 -0800 (PST)
+Date: Tue, 2 Dec 2025 14:22:26 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+	alexandru.elisei@arm.com, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm64: EL2 support
+Message-ID: <20251202142226.GB3921791@e124191.cambridge.arm.com>
+References: <20250925141958.468311-1-joey.gouly@arm.com>
+ <44fac47f-1df1-4119-8bf0-1db96cda18ef@redhat.com>
+ <20251127110832.GA3240191@e124191.cambridge.arm.com>
+ <3a39738e-ed33-49fa-9f1c-0bbba6979038@redhat.com>
+ <20251127145207.GA3265987@e124191.cambridge.arm.com>
+ <20251201-2ae3e986e3c1242e7bafc247@orel>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251201-2ae3e986e3c1242e7bafc247@orel>
 
-On Mon, Dec 01 2025, Pasha Tatashin wrote:
+On Mon, Dec 01, 2025 at 05:16:40PM -0600, Andrew Jones wrote:
+> On Thu, Nov 27, 2025 at 02:52:07PM +0000, Joey Gouly wrote:
+> ...
+> > I will send out a new version with this fix, missing sob/reviews/acks, after you've had a look!
+> >
+> 
+> Also please run checkpatch on the series if you haven't already. I think
+> it should have complained about the C++ comments, for example. And, in
+> any case, please change the C++ comments to C comments and generally use
+> the kernel's coding style.
 
-> On Wed, Nov 26, 2025 at 2:36=E2=80=AFPM David Matlack <dmatlack@google.co=
-m> wrote:
-[...]
->> FLB Locking
->>
->>   I don't see a way to properly synchronize pci_flb_finish() with
->>   pci_liveupdate_incoming_is_preserved() since the incoming FLB mutex is
->>   dropped by liveupdate_flb_get_incoming() when it returns the pointer
->>   to the object, and taking pci_flb_incoming_lock in pci_flb_finish()
->>   could result in a deadlock due to reversing the lock ordering.
+I hadn't run it, have done so now, and fixed some style issues.
 
-My mental model for FLB is that it is a dependency for files, so it
-should always be created (aka prepare) before _any_ of the files, and
-always destroyed (aka finish) after _all_ of the files.
+checkpatch doesn't actually complain about those C++/C99 comments, I guess at
+some point Linux started to allow them. If you run with `--ignore
+C99_COMMENT_TOLERANCE` it does complain.
 
-By the time the FLB is being finished, all the files for that FLB should
-also be finished, so there should no longer be a user of the FLB.
+I will change the one place I used them to the multiline style anyway.
 
-Once all of the files are finished, it should be LUO's responsibility to
-make sure liveupdate_flb_get_incoming() returns an error _before_ it
-starts doing the FLB finish. And in FLB finish you should not be needing
-to take any locks.
-
-Why do you want to use the FLB when it is being finished?
-
->
-> I will re-introduce _lock/_unlock API to solve this issue.
->
->>
->> FLB Retrieving
->>
->>   The first patch of this series includes a fix to prevent an FLB from
->>   being retrieved again it is finished. I am wondering if this is the
->>   right approach or if subsystems are expected to stop calling
->>   liveupdate_flb_get_incoming() after an FLB is finished.
-
-IMO once the FLB is finished, LUO should make sure it cannot be
-retrieved, mainly so subsystem code is simpler and less bug-prone.
-
->
-> Thanks, I will include this fix in the next version of FLB.
-
---=20
-Regards,
-Pratyush Yadav
+Thanks,
+Joey
 
