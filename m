@@ -1,193 +1,320 @@
-Return-Path: <kvm+bounces-65152-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65156-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3713C9C211
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:10:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 092F7C9C39B
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:36:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CA7E04E471B
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:09:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B69753A415A
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4949B29BDAB;
-	Tue,  2 Dec 2025 16:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7DBD290DBB;
+	Tue,  2 Dec 2025 16:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f22qVNom"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AapMLOC3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0108D29B77C
-	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665D227AC57
+	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764691704; cv=none; b=dz1HZsuC2L0gfJFWzM68H5qKYWg1ekBr/Wqv81dZAPDQA2Y+Ex6gGVc8UwDNVXX+pt4g8nVhP81S4vxPqMe+KfUdQ3mxwkaBGnUcpZYEpUOXAZ0nJdz13ON5y7kuLWgKvd8TVMyMyC7m+20GgFRI5/HtKTyqXQj9R4qixfogPeU=
+	t=1764693386; cv=none; b=HRB8G4JmPDx+htX7CWTn58VCWrHP6qGN3VlV7ohJC8f+VVK4nzNn1s0zcf25UrvEOysenINzEm1hloN9V4zMjivSzkJngUBwwE/M4ZWY8RCUqRH9DgG9h+m8eOXzmHufZrUpCN3v+cD4wbPHQNSMHbAO+qT7vKswTYORxrBv11s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764691704; c=relaxed/simple;
-	bh=jqtFvxj+10vNXec+3ARQzdivBUizNnzSIyg2+TGZekw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NdN2/KQCw7CgefzuzAMC9we8ZhSgM/y9Kn4QTTwZykjafOvEY5wQVZYoHGNATu3t8+qyeLu31i0TitpK62VQxHbO33xb443Dr3e0/aHOXvZDk9tI2pW6yer7TScylsNtC0/eDeIWWo7tJ4+w52hvqEGjqEEphXzGqCfaR9wQ0DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f22qVNom; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764691703; x=1796227703;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jqtFvxj+10vNXec+3ARQzdivBUizNnzSIyg2+TGZekw=;
-  b=f22qVNomdN8Rgi1DliL3AfDj7xht9qAZ0sWJVxF7mdJefwBAvzaOgwQJ
-   uT5qGBPjCwCyVTBH/Jy3ajXh9S+Rj+4wXeXkuyC8zoehNk+wKy2IDnOaw
-   5eaKNwrDsFcUC+pql13BjhOiYwY6sFYb+/gEXrbKi2Xxia1r0OE+LrF8i
-   R8RAT0cAaGwcVth8BXxWDEg9sgQ2W6TRdOqbr1/N27lGC6e56CrsMl4Uo
-   1KXM8mGTUR+0j2ekpU3KgvusGjue+brcFE/FX5jhuEwrjETFZzwWXqGbP
-   0psth6LtH9LMY4cXvcUY4/f0U48sypz5BHqSceiEDtkEnkVUHlRsNwudY
-   A==;
-X-CSE-ConnectionGUID: ZRhPpdFZThCoazhwXfaWgA==
-X-CSE-MsgGUID: NEXHMma7QMyeqJiTTZrW5w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="92143172"
-X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="92143172"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 08:08:22 -0800
-X-CSE-ConnectionGUID: SjU4LmDdQTiDLSlfpBYPSQ==
-X-CSE-MsgGUID: ZAw4+8F8SNSUfxJX7KFWXA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="199538081"
-Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa005.jf.intel.com with ESMTP; 02 Dec 2025 08:08:13 -0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org,
-	devel@lists.libvirt.org,
-	kvm@vger.kernel.org,
-	qemu-riscv@nongnu.org,
-	qemu-arm@nongnu.org,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Sergio Lopez <slp@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>,
-	Yi Liu <yi.l.liu@intel.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Weiwei Li <liwei1518@gmail.com>,
-	Amit Shah <amit@kernel.org>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	Helge Deller <deller@gmx.de>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	Ani Sinha <anisinha@redhat.com>,
-	Fabiano Rosas <farosas@suse.de>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	=?UTF-8?q?Cl=C3=A9ment=20Mathieu--Drif?= <clement.mathieu--drif@eviden.com>,
-	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Jason Wang <jasowang@redhat.com>,
-	Mark Cave-Ayland <mark.caveayland@nutanix.com>,
-	BALATON Zoltan <balaton@eik.bme.hu>,
-	Peter Krempa <pkrempa@redhat.com>,
-	Jiri Denemark <jdenemar@redhat.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v5 28/28] hw/char/virtio-serial: Do not expose the 'emergency-write' property
-Date: Wed,  3 Dec 2025 00:28:35 +0800
-Message-Id: <20251202162835.3227894-29-zhao1.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251202162835.3227894-1-zhao1.liu@intel.com>
-References: <20251202162835.3227894-1-zhao1.liu@intel.com>
+	s=arc-20240116; t=1764693386; c=relaxed/simple;
+	bh=J2FY91mBA+7qsoG5Zmdf/X1yNE61LDROrDP1UQKCDsM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eUDkeCz/6kBczGmPmvs45fjmEpLeyuLFcuP2dP8ym5brogh1+nqtCCnajIfXjZIvY5UtTJfWTH48eRFsMKpKzc8iv/eYg8C4V4EOBldVXAGBoyKrABPrXx626gDXbhYZISgsFkffd36nTv8eXVNyPzi1SuoVJ397IX7LdBiD27A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AapMLOC3; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7c240728e2aso10157597b3a.3
+        for <kvm@vger.kernel.org>; Tue, 02 Dec 2025 08:36:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1764693383; x=1765298183; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g1PCQjqHUImrfnuMWQSbY1q1fWBmYQzMPADITESwpfg=;
+        b=AapMLOC35Wo5zxnizizAKlCVnt5UUoMZi4dU2xSZEa8WpQK3ZAyJgjyH6fFWLHjWCo
+         hFv/W4HUneMKxjUUjWLj9DAnwJ+uRx1FAmRmAz1+RSIVWxvBwi7R/X9j7U3JWwYNjUXd
+         wqHeAvm8bCRpfhwjPxptfWexoyktWLH2e0HkN8KTPqpRvUQU4ATSvEhpakjnXIL71J80
+         LRW3XakZnAkUKcKdG1se9E5/rd0qdsgcA5pRTG8wVEmx/4e4QRXcwFMqzRPdRObQGMQh
+         3VEddrL+v77IykZJ4jBe4GrXLNrzNBpuDlAtLs/vE/Q8pS8gb6MW2ES2Pe7RVVfh+1jc
+         Tugw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764693383; x=1765298183;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=g1PCQjqHUImrfnuMWQSbY1q1fWBmYQzMPADITESwpfg=;
+        b=N3EL5Re0tnxUq7ntZ/N/o2n0xcl1zX57SXsg23FHdaXm2ukwgttP5LaFK5qkz7JRm4
+         gAsqndFwLFfi9j5vZY4JLdEUGjbW8jo7c9sMI7vxiyGb7GmE2gDSjkQbiiZn24EjIUmT
+         SF9eVpkZPqP52Z7MD6rfZqdneBfEr6aVXqZtepAOBnaE1QQlw0PXJXq1L8a5RJQlXv8t
+         x+pemCrCRv1BacWadU2/qWZHlrkESHzw8cBoRIRhepclmy2q5Al6dpuNkqDXSzj5V7P0
+         m/zb+G8qAagYOhALBuecSS2Ci57mgk19Na8VtBXuq3fhom6tUTwEaVx6Ry0YUcBrj/yt
+         QGJw==
+X-Forwarded-Encrypted: i=1; AJvYcCXdG0+Z5eb6/zwdMT4LCEc38WynTOhAfU3ZDTSX5hKsOOQ9R3ROO3SgJfqYvB0BQNvoLvo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhOvI7JqGwUELLzsB6MS79B8+YY/eacj6yzZTKc0znuYA3M74s
+	mFLM9d+858baUcByVnuvX+0QENajlCPYQVvOJKLOaFuoTVbirQO2Kq0dLCLTOZXN4+kvvNpxR9h
+	VDlBrHQ==
+X-Google-Smtp-Source: AGHT+IHbpjzBbXCvAd9URDI1HhG7vj8KOeHDgurtn5SRw54GzVw6VxJbQiZhVN8zm3l6wh3j7PJMUAxrNXU=
+X-Received: from pglg15.prod.google.com ([2002:a63:110f:0:b0:bac:6acd:817f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7d8b:b0:33b:625:36be
+ with SMTP id adf61e73a8af0-3614ed3e82amr49170495637.38.1764693383200; Tue, 02
+ Dec 2025 08:36:23 -0800 (PST)
+Date: Tue, 2 Dec 2025 08:36:21 -0800
+In-Reply-To: <68ad817529c6661085ff0524472933ba9f69fd47.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20251125180557.2022311-1-khushit.shah@nutanix.com>
+ <6353f43f3493b436064068e6a7f55543a2cd7ae1.camel@infradead.org>
+ <A922DCC2-4CB4-4DE8-82FA-95B502B3FCD4@nutanix.com> <118998075677b696104dcbbcda8d51ab7f1ffdfd.camel@infradead.org>
+ <aS8I6T3WtM1pvPNl@google.com> <68ad817529c6661085ff0524472933ba9f69fd47.camel@infradead.org>
+Message-ID: <aS8Vhb66UViQmY_Q@google.com>
+Subject: Re: [PATCH v3] KVM: x86: Add x2APIC "features" to control EOI
+ broadcast suppression
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Khushit Shah <khushit.shah@nutanix.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"kai.huang@intel.com" <kai.huang@intel.com>, "mingo@redhat.com" <mingo@redhat.com>, 
+	"x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	Jon Kohler <jon@nutanix.com>, Shaju Abraham <shaju.abraham@nutanix.com>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Philippe Mathieu-Daudé <philmd@linaro.org>
+On Tue, Dec 02, 2025, David Woodhouse wrote:
+> On Tue, 2025-12-02 at 07:42 -0800, Sean Christopherson wrote:
+> > On Tue, Dec 02, 2025, David Woodhouse wrote:
+> > > On Tue, 2025-12-02 at 12:58 +0000, Khushit Shah wrote:
+> > > > Thanks for the review!
+> > > >=20
+> > > > > On 2 Dec 2025, at 2:43=E2=80=AFPM, David Woodhouse <dwmw2@infrade=
+ad.org> wrote:
+> > > > >=20
+> > > > > Firstly, excellent work debugging and diagnosing that!
+> > > > >=20
+> > > > > On Tue, 2025-11-25 at 18:05 +0000, Khushit Shah wrote:
+> > > > > >=20
+> > > > > > --- a/Documentation/virt/kvm/api.rst
+> > > > > > +++ b/Documentation/virt/kvm/api.rst
+> > > > > > @@ -7800,8 +7800,10 @@ Will return -EBUSY if a VCPU has already=
+ been created.
+> > > > > > =C2=A0
+> > > > > > =C2=A0Valid feature flags in args[0] are::
+> > > > > > =C2=A0
+> > > > > > -=C2=A0 #define KVM_X2APIC_API_USE_32BIT_IDS=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << 0)
+> > > > > > -=C2=A0 #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK=C2=A0 (1=
+ULL << 1)
+> > > > > > +=C2=A0 #define KVM_X2APIC_API_USE_32BIT_IDS=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 (1ULL << 0)
+> > > > > > +=C2=A0 #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << 1)
+> > > > > > +=C2=A0 #define KVM_X2APIC_API_DISABLE_IGNORE_SUPPRESS_EOI_BROA=
+DCAST_QUIRK (1ULL << 2)
+> > > > > > +=C2=A0 #define KVM_X2APIC_API_DISABLE_SUPPRESS_EOI_BROADCAST=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 (1ULL << 3)
+> > > > > >=20
+> > > > >=20
+> > > > > I kind of hate these names. This part right here is what we leave
+> > > > > behind for future generations, to understand the weird behaviour =
+of
+> > > > > KVM. To have "IGNORE" "SUPPRESS" "QUIRK" all in the same flag, qu=
+ite
+> > > > > apart from the length of the token, makes my brain hurt.
+> >=20
+> > ...
+> >=20
+> > > > > Could we perhaps call them 'ENABLE_SUPPRESS_EOI_BROADCAST' and
+> > > > > 'DISABLE_SUPPRESS_EOI_BROADCAST', with a note saying that modern =
+VMMs
+> > > > > should always explicitly enable one or the other, because for
+> > > > > historical reasons KVM only *pretends* to support it by default b=
+ut it
+> > > > > doesn't actually work correctly?
+> >=20
+> > I don't disagree on the names being painful, but ENABLE_SUPPRESS_EOI_BR=
+OADCAST
+> > vs. DISABLE_SUPPRESS_EOI_BROADCAST won't work, and is even more confusi=
+ng IMO.
+>=20
+> I dunno, KVM never actually *did* suppress the EOI broadcast anyway,
+> did it? This fix really *does* enable it =E2=80=94 as opposed to just
+> pretending to?
+>=20
+> I was thinking along the lines of ...
+>=20
+>=20
+> Setting KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST causes KVM to
+> advertise and correctly implement the Directed EOI feature in the local
+> APIC, suppressing broadcast EOI when the feature is enabled by the
+> guest.
+>=20
+> Setting KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST causes KVM not to
+> advertise the Directed EOI feature in the local APIC.
+>=20
+> Userspace should explicitly either enable or disable the EOI broadcast
+> using one of the two flags above. For historical compatibility reasons,
+> if neither flag is set then KVM will advertise the feature but will not
+> actually suppress the EOI broadcast, leading to potential IRQ storms in
+> some guest configurations.
 
-The VIRTIO_CONSOLE_F_EMERG_WRITE feature bit was only set
-in the hw_compat_2_7[] array, via the 'emergency-write=off'
-property. We removed all machines using that array, lets remove
-that property. All instances have this feature bit set and
-it can not be disabled. VirtIOSerial::host_features mask is
-now unused, remove it.
+Hmm, I suppose that could work for uAPI.  Having both an ENABLE and a DISAB=
+LE
+is obviously a bit odd, but slowing down the reader might actually be a goo=
+d
+thing in this case.  And the documentation should be easy enough to write.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+I was worried that having ENABLE and DISABLE controls would lead to confusi=
+ng code
+internally, but there's no reason KVM's internal tracking needs to match uA=
+PI.
+
+How about this?
+
 ---
- hw/char/virtio-serial-bus.c       | 9 +++------
- include/hw/virtio/virtio-serial.h | 2 --
- 2 files changed, 3 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  7 +++++++
+ arch/x86/include/uapi/asm/kvm.h |  6 ++++--
+ arch/x86/kvm/lapic.c            | 16 +++++++++++++++-
+ arch/x86/kvm/x86.c              | 15 ++++++++++++---
+ 4 files changed, 38 insertions(+), 6 deletions(-)
 
-diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
-index 673c50f0be08..7abb7b5e31bf 100644
---- a/hw/char/virtio-serial-bus.c
-+++ b/hw/char/virtio-serial-bus.c
-@@ -557,7 +557,7 @@ static uint64_t get_features(VirtIODevice *vdev, uint64_t features,
- 
-     vser = VIRTIO_SERIAL(vdev);
- 
--    features |= vser->host_features;
-+    features |= BIT_ULL(VIRTIO_CONSOLE_F_EMERG_WRITE);
-     if (vser->bus.max_nr_ports > 1) {
-         virtio_add_feature(&features, VIRTIO_CONSOLE_F_MULTIPORT);
-     }
-@@ -587,8 +587,7 @@ static void set_config(VirtIODevice *vdev, const uint8_t *config_data)
-     VirtIOSerialPortClass *vsc;
-     uint8_t emerg_wr_lo;
- 
--    if (!virtio_has_feature(vser->host_features,
--        VIRTIO_CONSOLE_F_EMERG_WRITE) || !config->emerg_wr) {
-+    if (!config->emerg_wr) {
-         return;
-     }
- 
-@@ -1040,7 +1039,7 @@ static void virtio_serial_device_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    if (!virtio_has_feature(vser->host_features,
-+    if (!virtio_has_feature(vdev->host_features,
-                             VIRTIO_CONSOLE_F_EMERG_WRITE)) {
-         config_size = offsetof(struct virtio_console_config, emerg_wr);
-     }
-@@ -1156,8 +1155,6 @@ static const VMStateDescription vmstate_virtio_console = {
- static const Property virtio_serial_properties[] = {
-     DEFINE_PROP_UINT32("max_ports", VirtIOSerial, serial.max_virtserial_ports,
-                                                   31),
--    DEFINE_PROP_BIT64("emergency-write", VirtIOSerial, host_features,
--                      VIRTIO_CONSOLE_F_EMERG_WRITE, true),
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_hos=
+t.h
+index 5a3bfa293e8b..b4c41255f01d 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1226,6 +1226,12 @@ enum kvm_irqchip_mode {
+ 	KVM_IRQCHIP_SPLIT,        /* created with KVM_CAP_SPLIT_IRQCHIP */
  };
- 
- static void virtio_serial_class_init(ObjectClass *klass, const void *data)
-diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
-index 60641860bf83..da0c91e1a403 100644
---- a/include/hw/virtio/virtio-serial.h
-+++ b/include/hw/virtio/virtio-serial.h
-@@ -186,8 +186,6 @@ struct VirtIOSerial {
-     struct VirtIOSerialPostLoad *post_load;
- 
-     virtio_serial_conf serial;
+=20
++enum kvm_suppress_eoi_broadcast_mode {
++	KVM_SUPPRESS_EOI_QUIRKED,
++	KVM_SUPPRESS_EOI_ENABLED,
++	KVM_SUPPRESS_EOI_DISABLED,
++};
++
+ struct kvm_x86_msr_filter {
+ 	u8 count;
+ 	bool default_allow:1;
+@@ -1475,6 +1481,7 @@ struct kvm_arch {
+=20
+ 	bool x2apic_format;
+ 	bool x2apic_broadcast_quirk_disabled;
++	enum kvm_suppress_eoi_broadcast_mode suppress_eoi_broadcast;
+=20
+ 	bool has_mapped_host_mmio;
+ 	bool guest_can_read_msr_platform_info;
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kv=
+m.h
+index 7ceff6583652..bd51596001f8 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -914,8 +914,10 @@ struct kvm_sev_snp_launch_finish {
+ 	__u64 pad1[4];
+ };
+=20
+-#define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+-#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
++#define KVM_X2APIC_API_USE_32BIT_IDS			(_BITULL(0))
++#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK		(_BITULL(1))
++#define KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST	(_BITULL(2))
++#define KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST	(_BITULL(3))
+=20
+ struct kvm_hyperv_eventfd {
+ 	__u32 conn_id;
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 1597dd0b0cc6..3f00c9640785 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -562,7 +562,8 @@ void kvm_apic_set_version(struct kvm_vcpu *vcpu)
+ 	 * IOAPIC.
+ 	 */
+ 	if (guest_cpu_cap_has(vcpu, X86_FEATURE_X2APIC) &&
+-	    !ioapic_in_kernel(vcpu->kvm))
++	    !ioapic_in_kernel(vcpu->kvm) &&
++	    vcpu->kvm->arch.suppress_eoi_broadcast !=3D KVM_SUPPRESS_EOI_DISABLED=
+)
+ 		v |=3D APIC_LVR_DIRECTED_EOI;
+ 	kvm_lapic_set_reg(apic, APIC_LVR, v);
+ }
+@@ -1517,6 +1518,19 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *ap=
+ic, int vector)
+=20
+ 	/* Request a KVM exit to inform the userspace IOAPIC. */
+ 	if (irqchip_split(apic->vcpu->kvm)) {
++		/*
++		 * Don't exit to userspace if the guest has enabled Directed
++		 * EOI, a.k.a. Suppress EOI Broadcasts, in which case the local
++		 * APIC doesn't broadcast EOIs (the guest must EOI the target
++		 * I/O APIC(s) directly).  Ignore the suppression if userspace
++		 * has not explictly enabled support (KVM's historical quirky
++		 * behavior is to advertise support for Suppress EOI Broadcasts
++		 * without actually suppressing EOIs).
++		 */
++		if ((kvm_lapic_get_reg(apic, APIC_SPIV) & APIC_SPIV_DIRECTED_EOI) &&
++		    apic->vcpu->kvm->arch.suppress_eoi_broadcast !=3D KVM_SUPPRESS_EOI_Q=
+UIRKED)
++			return;
++
+ 		apic->vcpu->arch.pending_ioapic_eoi =3D vector;
+ 		kvm_make_request(KVM_REQ_IOAPIC_EOI_EXIT, apic->vcpu);
+ 		return;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0c6d899d53dd..b36e048c7862 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -121,8 +121,10 @@ static u64 __read_mostly efer_reserved_bits =3D ~((u64=
+)EFER_SCE);
+=20
+ #define KVM_CAP_PMU_VALID_MASK KVM_PMU_CAP_DISABLE
+=20
+-#define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS | \
+-                                    KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK=
+)
++#define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS |		\
++				    KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK |	\
++				    KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST |	\
++				    KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST)
+=20
+ static void update_cr8_intercept(struct kvm_vcpu *vcpu);
+ static void process_nmi(struct kvm_vcpu *vcpu);
+@@ -6739,11 +6741,18 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		if (cap->args[0] & ~KVM_X2APIC_API_VALID_FLAGS)
+ 			break;
+=20
++		if (cap->args[0] & KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST &&
++		    cap->args[0] & KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST)
++			break;
++
+ 		if (cap->args[0] & KVM_X2APIC_API_USE_32BIT_IDS)
+ 			kvm->arch.x2apic_format =3D true;
+ 		if (cap->args[0] & KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK)
+ 			kvm->arch.x2apic_broadcast_quirk_disabled =3D true;
 -
--    uint64_t host_features;
- };
- 
- /* Interface to the virtio-serial bus */
--- 
-2.34.1
++		if (cap->args[0] & KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST)
++			kvm->arch.suppress_eoi_broadcast =3D KVM_SUPPRESS_EOI_ENABLED;
++		if (cap->args[0] & KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST)
++			kvm->arch.suppress_eoi_broadcast =3D KVM_SUPPRESS_EOI_DISABLED;
+ 		r =3D 0;
+ 		break;
+ 	case KVM_CAP_X86_DISABLE_EXITS:
 
+base-commit: 6c3373b26189853230552bd3932b3edba5883423
+--
 
