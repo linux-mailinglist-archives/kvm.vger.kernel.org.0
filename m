@@ -1,218 +1,192 @@
-Return-Path: <kvm+bounces-65178-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65179-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45C0AC9D226
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 23:01:36 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FC57C9D350
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 23:26:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC1673A7ADD
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 22:01:27 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CBF7C349B72
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 22:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8A52FB601;
-	Tue,  2 Dec 2025 22:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E492FB61C;
+	Tue,  2 Dec 2025 22:26:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OZdwtHGo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kAhPPj+H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25DF2F49FE
-	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 22:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFBAB2F9D8C
+	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 22:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764712870; cv=none; b=WgHjf9UMfSbcOD47Xp3255h8UchcrnixCPhEyzUlgBnEuBZ9QkoHTH+1KFmXJcdYdM+oEG5s2lU2rq2WYoyWfovYvS7LJlVfgqCexelomLuBNCpm0Xbe0b/v/oFtPKbogYGen6ig7r+5WpJGx/nZ1SOABMP1UQHh5U3BuIfDQf8=
+	t=1764714400; cv=none; b=MSMZ8Q9Tk2l4qNe+SDAMuarp+VzXsHsGjtagspTfe1boE9idLZBqYpFCs8rDeT4orme9hF4cViv2Lhu9cJy4FWiW5BYKaN1mWjfBZsY9isaO8VUzoZ9rC9kj0kNYbSN8HyOzzEPwiKyl6Jlo3lpYXOC30A62fgM9dN/p34doYaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764712870; c=relaxed/simple;
-	bh=Mqnyzq/dHBpiYdG/Xt/TKvJXJMP8zWCEKc3fUG6Hw0E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cN6R0q2Swx819ddCqFixNwJwHLsTl9wi8lpPydX+saZAFgAd4Ryz9u5RAqOgI6LP7GhZpmUR4vsGVEKF3AhFVeeu4ogJ68aH8rttZd85YMIgIlbgvIB6fEyFC8cYe1XFUq+/ipn+RjChjgavZ2r691LmEvwqVJ+vwN5AiFIQFKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OZdwtHGo; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-78802ac2296so54764007b3.3
-        for <kvm@vger.kernel.org>; Tue, 02 Dec 2025 14:01:08 -0800 (PST)
+	s=arc-20240116; t=1764714400; c=relaxed/simple;
+	bh=rHwN2/sAdchfHT7Zb5HAP3imgxuZsM9T/sqYZAk/6WU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Py2zJbZaIYCcb8FYfIfPkzhGjlJmmnI1vZm7sWEYdcQz21Qc6bKa3M4Jjh2Ct/i21BprIx/4kX/57B+mCrcuyX/1iBwHy+mZor9CHZhLW3OLkoT4t5lGIWSXsPKGhiNevddm1i11CW0Xwxiu1LH3L0kIdqG3BFqlsh9bTtmuLoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kAhPPj+H; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7a9fb6fcc78so4352460b3a.3
+        for <kvm@vger.kernel.org>; Tue, 02 Dec 2025 14:26:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764712867; x=1765317667; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xNqIfgM/6Ycxql9GvTaW4xpHm2HTdtIqMIBvJdvraLU=;
-        b=OZdwtHGonB3nfffkr6VAZVqTIoL0VKHhfYC1cJqS0rCeHHRluRmORfZVjQF/E0Bl8B
-         juTo9aHbJQD6Z6xYYDtXvIrZ1KnlWq+hwurM/QVZXIwILYNpOJ+RnjyUQPZ9pKT2VG8j
-         q3i1E6ktebX+xrSHYTvMS8kiIXOjRBmOfrAsVoyRy4Uoz/Gcf+HV4+pv5WGZb7w/rIZh
-         Z7WhLAzWkGHmsY+zruBZ3j23y8vxHGrsKrz5C9z5I5sjtlWzZRXIDXqUKsurQftDMKMo
-         wRufIxC/i/+ldxbYSsAv9iyUCNXvLjDXXN12gqkqHSnnA6tbI8z6kFBr8ctD5V7bleYF
-         BUXw==
+        d=google.com; s=20230601; t=1764714398; x=1765319198; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z+lZwWACySoeFUTre/rpZS/RF15vQtVnd6re+B4HeIE=;
+        b=kAhPPj+HwejeC1fBp+kmjXHGC5jFMeRWxGDZkKpbqIss8ZM9BPgqu8RC5bn7wAc2hp
+         Rpyh4nPDAtyLnCw7OLBHRpyG7lwZZlXor6zqfZXklszpaOGH5U+40JJBCOJ44GzPSe1u
+         EExawkpvG6P5brkx6XbmrvouOQONL0UcX4mf4XHdT8l5qKk2s5BX3CYNfBMe93pbxsLY
+         DyNGnQoQWkp/SM60kIL67JbBCI/9dhkS4VIbjvf6X5OWf/2zAxZrsUNrbE0kgE2nEd7h
+         mCVcYTu0DC93TAC6+VDSPQVskogB75gzjtvlKrKeruYQhlAaJTcv4KvEiBt9XFs9NsgF
+         FLaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764712867; x=1765317667;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xNqIfgM/6Ycxql9GvTaW4xpHm2HTdtIqMIBvJdvraLU=;
-        b=XLfStLR4M3yK/y1h9cIVWjHYVDduspKmb2jFa4HHDHXIiDFiIS3fROeDG+POqdOuwZ
-         h92lffiEX28sIF40W4lriWoZBJHgDd3SnrAIk+pTErlqhP4ypOVFmge42Zv5zgGYcW4+
-         RdaSrZSGutsJXNuYLVvqEoepcfXaxjbOAssZrO+p9I1NniV1JDQ7lbXk09u0IxHUwBO8
-         ymdtpOL76WC1Yj5GwonIAWVmpHTNhTOtDdboxUBVFEG7mC84sihE547EgBZ73yWQih93
-         wLAx10upnN5fTWNtoLJZnVvOMYHlXGgLG65ESu6DG93IIpqhaD9B5yG+46mdHGbEyuqR
-         OR2A==
-X-Forwarded-Encrypted: i=1; AJvYcCUVohO1+8+VRyVEz5jSUhFUngShWKEgnkgbexNqyE9m88IcYuEbbZz+GLNkw3pXKwKDHP8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwV5j8ztQ5u0o5iyiDD4xvvzAu6FXwR/cJMnbTjQy9Jb1KJQces
-	E8bEQ3sL2YlCZ5ubfFBUDwk2mGyjAC2NWELJeE1kR4fHZiFWMQwMZaVf
-X-Gm-Gg: ASbGncsyUDs91piWfoVV3Wrw6ttiPNdN8FDvrqCrYVbfbSWKc5CZk8+G2Bm8VJCBBNf
-	mT0fbOnbB/qcbIKQprMEvyb6VIw/63wqi7/CGztkNPRwCYy9Pm1h4U4omqrZB/4ie0UqT1HUtlz
-	JrzgoRcDlL4r4AKTc6SbTuFcaRRrQzXZp5L23jKzXJbmxQ7OjtJdg7tXo+3QE1xiBPZ/m6s4AmU
-	C6pq1+uS/QtU8v7npZYlaWX+aobli+WVuC4VJjD5E7eobJC7x107unM6j2PBUUlFGe3sVHXn95U
-	MFdTdN0vCBqZ5KkgJjSQYLcA/m4JYKBe0AzqjQwaHAeY451J5CqoKO0fqTJfPGASEmK6/LiIUkt
-	dzZcAWewXs5TB/zuqWIts16pleEEEPPN10dbHpku7Vwzg4fTgapgeix4LEMICgDtXlTibiCSTyZ
-	bWZIUfXEueO4Q66NhKAkicW6Os5l+9n9bggZZTZTU0JC2b4GI=
-X-Google-Smtp-Source: AGHT+IFKkR9nJxuAswYbUkRmscuBgN9zjQIp6HaO2rufMd5Ab/1ylKT04Hn5ts4J77BDYWjQzLjRWg==
-X-Received: by 2002:a05:690c:6206:b0:788:e74:b281 with SMTP id 00721157ae682-78c0beafabamr1238977b3.13.1764712866608;
-        Tue, 02 Dec 2025 14:01:06 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:5d::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78ad0d3f5a1sm67446487b3.12.2025.12.02.14.01.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Dec 2025 14:01:06 -0800 (PST)
-Date: Tue, 2 Dec 2025 14:01:04 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, berrange@redhat.com,
-	Sargun Dhillon <sargun@sargun.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v12 04/12] vsock: add netns support to virtio
- transports
-Message-ID: <aS9hoOKb7yA5Qgod@devvm11784.nha0.facebook.com>
-References: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
- <20251126-vsock-vmtest-v12-4-257ee21cd5de@meta.com>
- <6cef5a68-375a-4bb6-84f8-fccc00cf7162@redhat.com>
- <aS8oMqafpJxkRKW5@devvm11784.nha0.facebook.com>
- <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
+        d=1e100.net; s=20230601; t=1764714398; x=1765319198;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=z+lZwWACySoeFUTre/rpZS/RF15vQtVnd6re+B4HeIE=;
+        b=FQo/vo9VjmzgZshp8QKpZP9X5uY9LY9GZx1U2wzt7/doBL2k+8JlqouNJCD+lglvJ6
+         vvV0xeJOiU85dNbhRiUkGtpRIJTcqvY5ZDBbbN/8tZgCrobllZb4ZVSFcWC4maytTFjx
+         8z4AmOPXLyjFSnOQYIrSWtH5q8NgmXb9K2shDK/pUs1YQTy3awOpia3759idrFnSxmoN
+         +p9FA4YZTwYgQ0eF5U8WjCMr6nvcI7u+xmO/EQP+6fWrqn5dFhhiYmnaM2FK6vzVTC94
+         0+pRNCUMZt3oyuKP6IJwC+b4XfAzNUJwLOqmJKGgmyxHNyoLfK/EjI0vnZwApAxxzXwt
+         2/uw==
+X-Forwarded-Encrypted: i=1; AJvYcCUvvhS0FsMnubY1XLiPJPRdiWjN+K1C1ixbKnUwelFPZx2sB7qHz8kI9Ii3AkdPA7rTZzY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOUJYjeBWi1rXE1e+phlDSVc3rsXIcnjhp1ZxYPOBOFYL+AjWm
+	Of6JRi+IQz1MeFxQmaQ6kC3sZqqAC0GwlemIO6LLGkcO+ducEudFNaHmrsHfL/16Oh8uSrd+Zfy
+	UZfEVvg==
+X-Google-Smtp-Source: AGHT+IE1BvPtitsWzBS6Ac1tWd884WiXjHWVm75ZLNM3IZD9rkoEJZ62MBJVcyofgFVYw2C6GLmN7Xerad0=
+X-Received: from pgaq5.prod.google.com ([2002:a63:4305:0:b0:bac:6acd:8181])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9148:b0:35d:d477:a7ea
+ with SMTP id adf61e73a8af0-363f5d4b09cmr428731637.19.1764714397963; Tue, 02
+ Dec 2025 14:26:37 -0800 (PST)
+Date: Tue, 2 Dec 2025 14:26:36 -0800
+In-Reply-To: <fac971fe6625456f3c9ad69d859008117e35826a.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
+Mime-Version: 1.0
+References: <20251125180557.2022311-1-khushit.shah@nutanix.com>
+ <6353f43f3493b436064068e6a7f55543a2cd7ae1.camel@infradead.org>
+ <A922DCC2-4CB4-4DE8-82FA-95B502B3FCD4@nutanix.com> <118998075677b696104dcbbcda8d51ab7f1ffdfd.camel@infradead.org>
+ <aS8I6T3WtM1pvPNl@google.com> <68ad817529c6661085ff0524472933ba9f69fd47.camel@infradead.org>
+ <aS8Vhb66UViQmY_Q@google.com> <fac971fe6625456f3c9ad69d859008117e35826a.camel@infradead.org>
+Message-ID: <aS9ng741Osi91O_v@google.com>
+Subject: Re: [PATCH v3] KVM: x86: Add x2APIC "features" to control EOI
+ broadcast suppression
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Khushit Shah <khushit.shah@nutanix.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"kai.huang@intel.com" <kai.huang@intel.com>, "mingo@redhat.com" <mingo@redhat.com>, 
+	"x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	Jon Kohler <jon@nutanix.com>, Shaju Abraham <shaju.abraham@nutanix.com>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 02, 2025 at 09:47:19PM +0100, Paolo Abeni wrote:
-> On 12/2/25 6:56 PM, Bobby Eshleman wrote:
-> > On Tue, Dec 02, 2025 at 11:18:14AM +0100, Paolo Abeni wrote:
-> >> On 11/27/25 8:47 AM, Bobby Eshleman wrote:
-> >>> @@ -674,6 +689,17 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
-> >>>  		goto out;
-> >>>  	}
-> >>>  
-> >>> +	net = current->nsproxy->net_ns;
-> >>> +	vsock->net = get_net_track(net, &vsock->ns_tracker, GFP_KERNEL);
-> >>> +
-> >>> +	/* Store the mode of the namespace at the time of creation. If this
-> >>> +	 * namespace later changes from "global" to "local", we want this vsock
-> >>> +	 * to continue operating normally and not suddenly break. For that
-> >>> +	 * reason, we save the mode here and later use it when performing
-> >>> +	 * socket lookups with vsock_net_check_mode() (see vhost_vsock_get()).
-> >>> +	 */
-> >>> +	vsock->net_mode = vsock_net_mode(net);
-> >>
-> >> I'm sorry for the very late feedback. I think that at very least the
-> >> user-space needs a way to query if the given transport is in local or
-> >> global mode, as AFAICS there is no way to tell that when socket creation
-> >> races with mode change.
-> > 
-> > Are you thinking something along the lines of sockopt?
-> 
-> I'd like to see a way for the user-space to query the socket 'namespace
-> mode'.
-> 
-> sockopt could be an option; a possibly better one could be sock_diag. Or
-> you could do both using dumping the info with a shared helper invoked by
-> both code paths, alike what TCP is doing.
-> >> Also I'm a bit uneasy with the model implemented here, as 'local' socket
-> >> may cross netns boundaris and connect to 'local' socket in other netns
-> >> (if I read correctly patch 2/12). That in turns AFAICS break the netns
-> >> isolation.
-> > 
-> > Local mode sockets are unable to communicate with local mode (and global
-> > mode too) sockets that are in other namespaces. The key piece of code
-> > for that is vsock_net_check_mode(), where if either modes is local the
-> > namespaces must be the same.
-> 
-> Sorry, I likely misread the large comment in patch 2:
-> 
-> https://lore.kernel.org/netdev/20251126-vsock-vmtest-v12-2-257ee21cd5de@meta.com/
-> 
-> >> Have you considered instead a slightly different model, where the
-> >> local/global model is set in stone at netns creation time - alike what
-> >> /proc/sys/net/ipv4/tcp_child_ehash_entries is doing[1] - and
-> >> inter-netns connectivity is explicitly granted by the admin (I guess
-> >> you will need new transport operations for that)?
-> >>
-> >> /P
-> >>
-> >> [1] tcp allows using per-netns established socket lookup tables - as
-> >> opposed to the default global lookup table (even if match always takes
-> >> in account the netns obviously). The mentioned sysctl specify such
-> >> configuration for the children namespaces, if any.
-> > 
-> > I'll save this discussion if the above doesn't resolve your concerns.
-> I still have some concern WRT the dynamic mode change after netns
-> creation. I fear some 'unsolvable' (or very hard to solve) race I can't
-> see now. A tcp_child_ehash_entries-like model will avoid completely the
-> issue, but I understand it would be a significant change over the
-> current status.
-> 
-> "Luckily" the merge window is on us and we have some time to discuss. Do
-> you have a specific use-case for the ability to change the netns mode
-> after creation?
-> 
-> /P
+On Tue, Dec 02, 2025, David Woodhouse wrote:
+> On Tue, 2025-12-02 at 08:36 -0800, Sean Christopherson wrote:
+> >=20
+> > Hmm, I suppose that could work for uAPI.=C2=A0 Having both an ENABLE an=
+d a DISABLE
+> > is obviously a bit odd, but slowing down the reader might actually be a=
+ good
+> > thing in this case.=C2=A0 And the documentation should be easy enough t=
+o write.
+> >=20
+> > I was worried that having ENABLE and DISABLE controls would lead to con=
+fusing code
+> > internally, but there's no reason KVM's internal tracking needs to matc=
+h uAPI.
+> >=20
+> > How about this?
+> >=20
+> > ---
+> > =C2=A0arch/x86/include/asm/kvm_host.h |=C2=A0 7 +++++++
+> > =C2=A0arch/x86/include/uapi/asm/kvm.h |=C2=A0 6 ++++--
+> > =C2=A0arch/x86/kvm/lapic.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 | 16 +++++++++++++++-
+> > =C2=A0arch/x86/kvm/x86.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 15 ++++++++++++---
+> > =C2=A04 files changed, 38 insertions(+), 6 deletions(-)
+> >=20
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
+_host.h
+> > index 5a3bfa293e8b..b4c41255f01d 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1226,6 +1226,12 @@ enum kvm_irqchip_mode {
+> > =C2=A0	KVM_IRQCHIP_SPLIT,=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* =
+created with KVM_CAP_SPLIT_IRQCHIP */
+> > =C2=A0};
+> > =C2=A0
+> > +enum kvm_suppress_eoi_broadcast_mode {
+> > +	KVM_SUPPRESS_EOI_QUIRKED,
+> > +	KVM_SUPPRESS_EOI_ENABLED,
+> > +	KVM_SUPPRESS_EOI_DISABLED,
+> > +};
+> > +
+>=20
+> Looks good. I'd probably call it KVM_SUPPRESS_EOI_LEGACY though?
 
-I don't think there is a hard requirement that the mode be change-able
-after creation. Though I'd love to avoid such a big change... or at
-least leave unchanged as much of what we've already reviewed as
-possible.
+Why legacy?  "Quirk" has specific meaning in KVM: technically broken behavi=
+or
+that is retained as the default for backwards compatibility.  "Legacy" does=
+ not,
+outside of a few outliers like HPET crud.
 
-In the scheme of defining the mode at creation and following the
-tcp_child_ehash_entries-ish model, what I'm imagining is:
-- /proc/sys/net/vsock/child_ns_mode can be set to "local" or "global"
-- /proc/sys/net/vsock/child_ns_mode is not immutable, can change any
-  number of times
+> And just for clarity I wouldn't embed the explicit checks against e.g
+> arch.suppress_eoi_broadcast !=3D KVM_SUPPRESS_EOI_LEGACY. I'd make static
+> inline functions like
 
-- when a netns is created, the new netns mode is inherited from
-  child_ns_mode, being assigned using something like:
+Ya, definitely no objection,
+=20
+> static inline bool kvm_lapic_advertise_directed_eoi(kvm)
 
-	  net->vsock.ns_mode =
-		get_net_ns_by_pid(current->pid)->child_ns_mode
+s/directed_eoi/suppress_eoi_broadcast.  I want to provide as clear of split=
+ as
+possible between the local APIC feature and the I/O APIC feature.
 
-- /proc/sys/net/vsock/ns_mode queries the current mode, returning
-  "local" or "global", returning value of net->vsock.ns_mode
-- /proc/sys/net/vsock/ns_mode and net->vsock.ns_mode are immutable and
-  reject writes
+> {
+> 	/* Legacy behaviour was to advertise this feature but it
+> didn't=20
+> 	 * actually work. */
+> 	return kvm->arch.suppress_eoi_broadcast !=3D KVM_SUPPRESS_EOI_DISABLED;
+> }
+>=20
+> static inline bool kvm_lapic_suppress_directed_eoi(kvm)
 
-Does that align with what you have in mind?
+Too close to "suppress EOI broadcast", e.g. it would be easy to read this a=
+s
+"suppress EOIs" and invert the polarity.  It's wordy, but I think
+kvm_lapic_ignore_suppress_eoi_broadcast() is the least awful name.
 
-Stefano, what are your thoughts?
+> {
+> 	/* Legacy behaviour advertised this feature but didn't
+> actually
+> 	 * suppress the EOI. */
+> 	return kvm->arch.suppress_eoi_broadcast =3D=3D KVM_SUPPRESS_EOI_ENABLED;
+> }
+>=20
+> Because it keeps the batshittery in one place and clearly documented?
+>=20
+> I note your version did actually suppress the broadcast even in the
+> DISABLED case if the guest had managed to set that bit in SPIV, but I
+> don't think it *can* so that difference doesn't matter anyway, right?
 
-Best,
-Bobby
+Right.  If we want to be paranoid, we could WARN_ON_ONCE() in whatever the =
+"ignore
+broadcast" accessor is called, because it should only be used if the bit is=
+ enabled
+in the local APIC.
 
