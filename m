@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-65141-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65142-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8B44C9C1C0
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:08:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507B1C9C1F3
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:09:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0C7EE349C18
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:07:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AF183AA28B
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:07:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73DA4280A51;
-	Tue,  2 Dec 2025 16:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0D7280018;
+	Tue,  2 Dec 2025 16:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HM5G0QNY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I5mhfguy"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB62279907
-	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3FCC25FA10
+	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764691603; cv=none; b=gNHw8fPbaliMWJ9vPM9hZg+7hskrXXZtLI4VJ/pleGFDTUpC2gbppds4Psi3Zs9Pl4nZiF+8XmNuXZ/9GVFeW662r5/CqDGQZbX5rzTeP7+/P1uGy8sf2uzwrWICVKsAdPiehLqJky9GAZ0udmo98kMg4FOMj8XUYrDriq9akyE=
+	t=1764691612; cv=none; b=edwmyiRo/XTNfV2JjKFa8IDNaz4QJQiRWpKM9xH8oG0UcxwP+1yFYR0uxq3pnh4gpag0SRoh833pf6uffrf5zs+vBOikWDbNN5J5Jwoj3YoQXUVmQq0ggiG6DKev9WAiDRn90i53N+XjFzLkBv1ggpQlvkSa6W8XodT2DAuUixc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764691603; c=relaxed/simple;
-	bh=z9VLCU2KIJ73gEsKU4uszkkYOzFWVjXDHPrGQQWvjSM=;
+	s=arc-20240116; t=1764691612; c=relaxed/simple;
+	bh=/n0ftya4A99iHjWPZUr3WDol3H8mQTwBUoAVwDtk6y4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bLfY6VCnLrc6gqE+scjM7BbNp50PCzNmTl2H+kQbBTt5ASEljpBRVsFBpRDieByypgN41wSVh5WvyFSLhhGNGJz+8OB4lJFnG85RzVz7YntDM/kS2n0nyQHV/ZFM2dbeDkvg9cyajUpQvd+NhCljbZsTSXp2aL/TzAMPu+UETU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HM5G0QNY; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version:Content-Type; b=OIBEchSb89ux+CHrD4gY1ufZx4pRa1+EhARd5m+2zaeynULkSResRb1y0Z6KRBSpyw+yNeUf8dsuEAx/K95s48nPr8WJ0gzu6EnszEDeznWzJgbwxN2tB4zj2vSJfBTNv3LD7zs5OKL6tjxWfmUxaceLqypRRRiy1tPBetrpToY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I5mhfguy; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764691602; x=1796227602;
+  t=1764691611; x=1796227611;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=z9VLCU2KIJ73gEsKU4uszkkYOzFWVjXDHPrGQQWvjSM=;
-  b=HM5G0QNYZJ7HWzXvG8ikpjWIqwDgPLdDMjj8rwHFs+OvsfjrCO1IwpaC
-   a5CMbhv/JRdc/UBmNroYmfiO3E5Ip3nAaNiirmVN0QIq4ZE8TDI11Qsca
-   sGacKc0zAhANLljyst14LC+gRTxJaCW/siDKlWJ0hkSg/dv8h9UtYmOna
-   U/eDAIAGYLwDwVTRdh64v/fMzD8882kjniw9C5ftIbsRvLsevvvm/Oqr4
-   JI9yXeUCt4x2HjPuM9DT7NRiuTYtDw79WK+yCC6lUAoL/cyUJ9W4UKKNe
-   MESIaRA8vfZVjnBxLIaNAJt4e3zhzB3ZXtqov6yq3ik4jCotDPbv4Xjam
+  bh=/n0ftya4A99iHjWPZUr3WDol3H8mQTwBUoAVwDtk6y4=;
+  b=I5mhfguyVf1WWWIsWMmJOu9PXLjOMDdGEdO2fZO2JqXwA+8G+Kt6ACHQ
+   IAGM9W+Zq5lBJR5KetAiaSC+nKjSmgQ66TPSvmhoJBrPH5ZKL53TSv2oe
+   IuBJsAfIKtR61tNNBo/QqpaPP68GGima+Cdt5uq7ipUWZ2Qa6GtL52iIO
+   l2q+pEmkPEh/hqJp0LrCc+l8G3Hefa46lNBPzURj9P5oms7gRZoTAHACm
+   t6n9fXrTsmCqFrkJLDUwO/QjWgRmWpS+C+RMkcC4V7io9JojjviAsOnox
+   V+FL0furXQyQi3tcAofTDMDyG3uNHYT2DP/3ubK69egovjF0VpMeyDI7n
    A==;
-X-CSE-ConnectionGUID: /zKHTI3dSuqZRnupg6nMEA==
-X-CSE-MsgGUID: aCbBW6A3SO26c8BbENYb7A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="92142782"
+X-CSE-ConnectionGUID: G7m5nWALQc6JD5TJJPoGAA==
+X-CSE-MsgGUID: 0QrhqGoKSayWNahHAlANhw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="92142794"
 X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="92142782"
+   d="scan'208";a="92142794"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 08:06:42 -0800
-X-CSE-ConnectionGUID: 2j5JuVBZTAeRDCmPvwAmpA==
-X-CSE-MsgGUID: hNxNIjIcTkud57qFIj5A1Q==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 08:06:50 -0800
+X-CSE-ConnectionGUID: H0vus8aaRLakTXdaogt3nQ==
+X-CSE-MsgGUID: TEFPBB7vSquCrbpUZ8eS+A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="199537677"
+   d="scan'208";a="199537727"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa005.jf.intel.com with ESMTP; 02 Dec 2025 08:06:32 -0800
+  by orviesa005.jf.intel.com with ESMTP; 02 Dec 2025 08:06:41 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
@@ -100,9 +100,9 @@ Cc: qemu-devel@nongnu.org,
 	Peter Krempa <pkrempa@redhat.com>,
 	Jiri Denemark <jdenemar@redhat.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v5 17/28] hw/i386/pc: Remove pc_compat_2_6[] array
-Date: Wed,  3 Dec 2025 00:28:24 +0800
-Message-Id: <20251202162835.3227894-18-zhao1.liu@intel.com>
+Subject: [PATCH v5 18/28] hw/intc/apic: Remove APICCommonState::legacy_instance_id field
+Date: Wed,  3 Dec 2025 00:28:25 +0800
+Message-Id: <20251202162835.3227894-19-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251202162835.3227894-1-zhao1.liu@intel.com>
 References: <20251202162835.3227894-1-zhao1.liu@intel.com>
@@ -117,52 +117,60 @@ Content-Transfer-Encoding: 8bit
 
 From: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-The pc_compat_2_6[] array was only used by the pc-q35-2.6
-and pc-i440fx-2.6 machines, which got removed. Remove it.
+The APICCommonState::legacy_instance_id boolean was only set
+in the pc_compat_2_6[] array, via the 'legacy-instance-id=on'
+property. We removed all machines using that array, lets remove
+that property, simplifying apic_common_realize().
+
+Because instance_id is initialized as initial_apic_id, we can
+not register vmstate_apic_common directly via dc->vmsd.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/i386/pc.c         | 8 --------
- include/hw/i386/pc.h | 3 ---
- 2 files changed, 11 deletions(-)
+ hw/intc/apic_common.c           | 5 -----
+ include/hw/i386/apic_internal.h | 1 -
+ 2 files changed, 6 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2e315414aeaf..85d12f8d0389 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -263,14 +263,6 @@ GlobalProperty pc_compat_2_7[] = {
+diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+index ec9e978b0b40..69a7b1bd5d3e 100644
+--- a/hw/intc/apic_common.c
++++ b/hw/intc/apic_common.c
+@@ -276,9 +276,6 @@ static void apic_common_realize(DeviceState *dev, Error **errp)
+         info->enable_tpr_reporting(s, true);
+     }
+ 
+-    if (s->legacy_instance_id) {
+-        instance_id = VMSTATE_INSTANCE_ID_ANY;
+-    }
+     vmstate_register_with_alias_id(NULL, instance_id, &vmstate_apic_common,
+                                    s, -1, 0, NULL);
+ 
+@@ -395,8 +392,6 @@ static const Property apic_properties_common[] = {
+     DEFINE_PROP_UINT8("version", APICCommonState, version, 0x14),
+     DEFINE_PROP_BIT("vapic", APICCommonState, vapic_control, VAPIC_ENABLE_BIT,
+                     true),
+-    DEFINE_PROP_BOOL("legacy-instance-id", APICCommonState, legacy_instance_id,
+-                     false),
  };
- const size_t pc_compat_2_7_len = G_N_ELEMENTS(pc_compat_2_7);
  
--GlobalProperty pc_compat_2_6[] = {
--    { TYPE_X86_CPU, "cpuid-0xb", "off" },
--    { "vmxnet3", "romfile", "" },
--    { TYPE_X86_CPU, "fill-mtrr-mask", "off" },
--    { "apic-common", "legacy-instance-id", "on", }
--};
--const size_t pc_compat_2_6_len = G_N_ELEMENTS(pc_compat_2_6);
--
- /*
-  * @PC_FW_DATA:
-  * Size of the chunk of memory at the top of RAM for the BIOS ACPI tables
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 698e3fb84af0..f8f317aee197 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -295,9 +295,6 @@ extern const size_t pc_compat_2_8_len;
- extern GlobalProperty pc_compat_2_7[];
- extern const size_t pc_compat_2_7_len;
+ static void apic_common_get_id(Object *obj, Visitor *v, const char *name,
+diff --git a/include/hw/i386/apic_internal.h b/include/hw/i386/apic_internal.h
+index 4a62fdceb4ea..0cb06bbc76c9 100644
+--- a/include/hw/i386/apic_internal.h
++++ b/include/hw/i386/apic_internal.h
+@@ -187,7 +187,6 @@ struct APICCommonState {
+     uint32_t vapic_control;
+     DeviceState *vapic;
+     hwaddr vapic_paddr; /* note: persistence via kvmvapic */
+-    bool legacy_instance_id;
+     uint32_t extended_log_dest;
+ };
  
--extern GlobalProperty pc_compat_2_6[];
--extern const size_t pc_compat_2_6_len;
--
- #define DEFINE_PC_MACHINE(suffix, namestr, initfn, optsfn) \
-     static void pc_machine_##suffix##_class_init(ObjectClass *oc, \
-                                                  const void *data) \
 -- 
 2.34.1
 
