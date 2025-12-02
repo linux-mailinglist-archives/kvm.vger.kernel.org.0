@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-65147-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65148-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16F43C9C1C3
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:08:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D5E8C9C220
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:11:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1C0214E446F
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:07:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46EC13AC280
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFB527BF7D;
-	Tue,  2 Dec 2025 16:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F5825FA10;
+	Tue,  2 Dec 2025 16:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bbj4R0Lq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QfNcNkY9"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D53E25FA10
-	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8045279DCE
+	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:07:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764691658; cv=none; b=XnxAIM3qqC3nM0CJgpaeizdRJCFhN1pkmAtt3IvxVXZhjw22fy9ErnfKRhQEw2lT2oxUc2aeDtxs9dWowN887sNFewSuGUkRLxjc9xu5C02/+XPxcLu4QYNleOsav/xPHJV2OreX9HGO3BvHkho4/xtfmQoKO38FfJ7QDgdFAyo=
+	t=1764691669; cv=none; b=CN5xlWo5fHbgSUqm0EPrg0SZyHndIiMUfhzUfYPPqyP3FcA8BW0zd0s9x4HF7Udoy9peuD2jvMift923FXclwhmXsnCwz9IpIpuUYIxVDOElFO0zp+3RL51iOW0OsKhhTaTQv+ke5HiJ/uuUTWGcH9YYFd0qZZcH5jDQEUDX4n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764691658; c=relaxed/simple;
-	bh=xbQmgoe2IOU9HSvyb9lb+wg4Nep+wx7DJvs7Fx9TRRo=;
+	s=arc-20240116; t=1764691669; c=relaxed/simple;
+	bh=x4x9GwtVyQN/1zu2eRKA2AyFq1QUrStlsY8oJcIM534=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gp6ITyGuvd2g6utPBzOOhbJD/XdvrePLq7IPGBI66vknvY7B56zYnQOlsww8hJeHMAVpCFCRvjdq0SJUTfAiGTYjq5m2yfWIyyqGKDEtpDxaTLE5b48cRJsv7QtKpGqXO2IQPdw3wpslscIQYkM1OceCyNDP930KnzWgi+5UAkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bbj4R0Lq; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version:Content-Type; b=sRHa7LRZc7fIC6PlbRmtB3WnjpZgcT3MGcC604l2pSw7dbEPUSlkdfbu+BTdl7cWJNezxxTPfO7xycpvWuEGPZa8C+bPU8nPohqUulEITKu9+Teg50Dgp4Bsr05YHxSTq3eQeMN52K/hov7ANdbLq/5pPQU8mGyVsrZ7YdAALv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QfNcNkY9; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764691656; x=1796227656;
+  t=1764691667; x=1796227667;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=xbQmgoe2IOU9HSvyb9lb+wg4Nep+wx7DJvs7Fx9TRRo=;
-  b=bbj4R0LqZKFKF948IKtcKnnYQtLsLtuONwh6v+LkroV+c+WoqFZWgETP
-   20ywK3wPEV+8BeXkSLL3Kh41oa1VanbzvLICn3LeOGuYBhLQgJxjLPf8N
-   R+NAYcJNr4rlANaF4oLYWz+ljM6FIuplTKu1MFmeYjUvfD+HsIjpmPvZ4
-   uoYpYTv55eiDGJa3sQqXlIlGhtx0V7Fx+Sa75JZ4ydgzc4+FFEHACqOiS
-   ka7x9ajg0oIJRCPjEkjTjwEHkg5gj5OAn37Fxy7GttfP9kyi1SObbrdcU
-   MBsrujVcMwPNiL05WvTlFvmhQ7OWysLic15NMZBKoRODuUk0wLZ9iU4Po
-   g==;
-X-CSE-ConnectionGUID: qMvDQFT6RZGM5DfEiom3xQ==
-X-CSE-MsgGUID: Hl09kR7hREqFOZVVH5aK0g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="92142971"
+  bh=x4x9GwtVyQN/1zu2eRKA2AyFq1QUrStlsY8oJcIM534=;
+  b=QfNcNkY9SUlQZgvzi3VpvE53xzBSMtV7U1Sl2sKA8AMZ5kiGjVwP4Vcw
+   Y64owVpD0D772DC3qoefEHgAkIKzyjrTfwx3joGOvqbohmDF82Ds9SLYO
+   nQOrynmbdY9cY0VO8fAisWKm9m0YXqqS/m6Yus/k56l0RtKTYXzGd/gvt
+   MiaaVwTSykOhK5GVHzoc8pHFxRKk66gkK7bXyzRG6hvR5OEzXmA/4Owhj
+   7uDBq1WCVQJWbLWHsLbBPUxNCDEIiWfL7Uzd7wrCPmkNVuzO82aTV4I9G
+   /Mk88X9oB9Ny8ZZv4+AmqPxMbabfDqGXuWinfiXuBc8p5ItaOE+0cUG0t
+   Q==;
+X-CSE-ConnectionGUID: blBOu3EZRzKLQjk2I9LLzw==
+X-CSE-MsgGUID: UYrmHaWPSYm0cbj2+GtfpQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="92143020"
 X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="92142971"
+   d="scan'208";a="92143020"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 08:07:36 -0800
-X-CSE-ConnectionGUID: K6boL9nXQgOc2bG5wpxHdg==
-X-CSE-MsgGUID: bP0+wkBRQX+2cM0IZVd8Aw==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 08:07:46 -0800
+X-CSE-ConnectionGUID: Z/3e7+YlTk+4rCCHob2SYQ==
+X-CSE-MsgGUID: enPvPe20R5WSzqdBXTM8yA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="199537874"
+   d="scan'208";a="199537921"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa005.jf.intel.com with ESMTP; 02 Dec 2025 08:07:26 -0800
+  by orviesa005.jf.intel.com with ESMTP; 02 Dec 2025 08:07:36 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
@@ -100,9 +100,9 @@ Cc: qemu-devel@nongnu.org,
 	Peter Krempa <pkrempa@redhat.com>,
 	Jiri Denemark <jdenemar@redhat.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v5 23/28] target/i386/cpu: Remove CPUX86State::full_cpuid_auto_level field
-Date: Wed,  3 Dec 2025 00:28:30 +0800
-Message-Id: <20251202162835.3227894-24-zhao1.liu@intel.com>
+Subject: [PATCH v5 24/28] hw/audio/pcspk: Remove PCSpkState::migrate field
+Date: Wed,  3 Dec 2025 00:28:31 +0800
+Message-Id: <20251202162835.3227894-25-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251202162835.3227894-1-zhao1.liu@intel.com>
 References: <20251202162835.3227894-1-zhao1.liu@intel.com>
@@ -117,174 +117,60 @@ Content-Transfer-Encoding: 8bit
 
 From: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-The CPUX86State::full_cpuid_auto_level boolean was only
-disabled for the pc-q35-2.7 and pc-i440fx-2.7 machines,
-which got removed. Being now always %true, we can remove
-it and simplify x86_cpu_expand_features().
+The PCSpkState::migrate boolean was only set in the
+pc_compat_2_7[] array, via the 'migrate=off' property.
+We removed all machines using that array, lets remove
+that property, simplifying vmstate_spk[].
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-Note, although libvirt still uses this property in its test cases, it
-was confirmed this property is not exposed to user directly [*].
+ hw/audio/pcspk.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-[*]: https://lore.kernel.org/qemu-devel/aDmphSY1MSxu7L9R@orkuz.int.mamuti.net/
----
- target/i386/cpu.c | 111 ++++++++++++++++++++++------------------------
- target/i386/cpu.h |   3 --
- 2 files changed, 54 insertions(+), 60 deletions(-)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 641777578637..72c69ba81c1b 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -9019,69 +9019,67 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
+index 916c56fa4c0a..0b01544941cb 100644
+--- a/hw/audio/pcspk.c
++++ b/hw/audio/pcspk.c
+@@ -57,7 +57,6 @@ struct PCSpkState {
+     unsigned int play_pos;
+     uint8_t data_on;
+     uint8_t dummy_refresh_clock;
+-    bool migrate;
+ };
  
-     /* CPUID[EAX=7,ECX=0].EBX always increased level automatically: */
-     x86_cpu_adjust_feat_level(cpu, FEAT_7_0_EBX);
--    if (cpu->full_cpuid_auto_level) {
--        x86_cpu_adjust_feat_level(cpu, FEAT_1_EDX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_1_ECX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_6_EAX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_7_0_ECX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EAX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_7_1_ECX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EDX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_7_2_EDX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_EDX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_ECX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_8000_0007_EDX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_8000_0008_EBX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
--        x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
--        x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
--
--        /* Intel Processor Trace requires CPUID[0x14] */
--        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT)) {
--            if (cpu->intel_pt_auto_level) {
--                x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
--            } else if (cpu->env.cpuid_min_level < 0x14) {
--                mark_unavailable_features(cpu, FEAT_7_0_EBX,
--                    CPUID_7_0_EBX_INTEL_PT,
--                    "Intel PT need CPUID leaf 0x14, please set by \"-cpu ...,intel-pt=on,min-level=0x14\"");
--            }
-+    x86_cpu_adjust_feat_level(cpu, FEAT_1_EDX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_1_ECX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_6_EAX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_7_0_ECX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EAX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_7_1_ECX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EDX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_7_2_EDX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_EDX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_ECX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_8000_0007_EDX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_8000_0008_EBX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
-+    x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
-+
-+    /* Intel Processor Trace requires CPUID[0x14] */
-+    if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT)) {
-+        if (cpu->intel_pt_auto_level) {
-+            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
-+        } else if (cpu->env.cpuid_min_level < 0x14) {
-+            mark_unavailable_features(cpu, FEAT_7_0_EBX,
-+                CPUID_7_0_EBX_INTEL_PT,
-+                "Intel PT need CPUID leaf 0x14, please set by \"-cpu ...,intel-pt=on,min-level=0x14\"");
-         }
-+    }
- 
--        /*
--         * Intel CPU topology with multi-dies support requires CPUID[0x1F].
--         * For AMD Rome/Milan, cpuid level is 0x10, and guest OS should detect
--         * extended toplogy by leaf 0xB. Only adjust it for Intel CPU, unless
--         * cpu->vendor_cpuid_only has been unset for compatibility with older
--         * machine types.
--         */
--        if (x86_has_cpuid_0x1f(cpu) &&
--            (IS_INTEL_CPU(env) || !cpu->vendor_cpuid_only)) {
--            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
--        }
-+    /*
-+     * Intel CPU topology with multi-dies support requires CPUID[0x1F].
-+     * For AMD Rome/Milan, cpuid level is 0x10, and guest OS should detect
-+     * extended toplogy by leaf 0xB. Only adjust it for Intel CPU, unless
-+     * cpu->vendor_cpuid_only has been unset for compatibility with older
-+     * machine types.
-+     */
-+    if (x86_has_cpuid_0x1f(cpu) &&
-+        (IS_INTEL_CPU(env) || !cpu->vendor_cpuid_only)) {
-+        x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
-+    }
- 
--        /* Advanced Vector Extensions 10 (AVX10) requires CPUID[0x24] */
--        if (env->features[FEAT_7_1_EDX] & CPUID_7_1_EDX_AVX10) {
--            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x24);
--        }
-+    /* Advanced Vector Extensions 10 (AVX10) requires CPUID[0x24] */
-+    if (env->features[FEAT_7_1_EDX] & CPUID_7_1_EDX_AVX10) {
-+        x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x24);
-+    }
- 
--        /* SVM requires CPUID[0x8000000A] */
--        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
--            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
--        }
-+    /* SVM requires CPUID[0x8000000A] */
-+    if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
-+        x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
-+    }
- 
--        /* SEV requires CPUID[0x8000001F] */
--        if (sev_enabled()) {
--            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
--        }
-+    /* SEV requires CPUID[0x8000001F] */
-+    if (sev_enabled()) {
-+        x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
-+    }
- 
--        if (env->features[FEAT_8000_0021_EAX]) {
--            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x80000021);
--        }
-+    if (env->features[FEAT_8000_0021_EAX]) {
-+        x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x80000021);
-+    }
- 
--        /* SGX requires CPUID[0x12] for EPC enumeration */
--        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_SGX) {
--            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x12);
--        }
-+    /* SGX requires CPUID[0x12] for EPC enumeration */
-+    if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_SGX) {
-+        x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x12);
+ static const char *s_spk = "pcspk";
+@@ -202,18 +201,10 @@ static void pcspk_realizefn(DeviceState *dev, Error **errp)
      }
+ }
  
-     /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
-@@ -10010,7 +10008,6 @@ static const Property x86_cpu_properties[] = {
-     DEFINE_PROP_UINT32("min-xlevel2", X86CPU, env.cpuid_min_xlevel2, 0),
-     DEFINE_PROP_UINT8("avx10-version", X86CPU, env.avx10_version, 0),
-     DEFINE_PROP_UINT64("ucode-rev", X86CPU, ucode_rev, 0),
--    DEFINE_PROP_BOOL("full-cpuid-auto-level", X86CPU, full_cpuid_auto_level, true),
-     DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor),
-     DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
-     DEFINE_PROP_BOOL("x-vendor-cpuid-only", X86CPU, vendor_cpuid_only, true),
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index cee1f692a1c3..8c3eb86fa0c7 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -2292,9 +2292,6 @@ struct ArchCPU {
-     /* Force to enable cpuid 0x1f */
-     bool force_cpuid_0x1f;
- 
--    /* Enable auto level-increase for all CPUID leaves */
--    bool full_cpuid_auto_level;
+-static bool migrate_needed(void *opaque)
+-{
+-    PCSpkState *s = opaque;
 -
-     /*
-      * Compatibility bits for old machine types (PC machine v6.0 and older).
-      * Only advertise CPUID leaves defined by the vendor.
+-    return s->migrate;
+-}
+-
+ static const VMStateDescription vmstate_spk = {
+     .name = "pcspk",
+     .version_id = 1,
+     .minimum_version_id = 1,
+-    .needed = migrate_needed,
+     .fields = (const VMStateField[]) {
+         VMSTATE_UINT8(data_on, PCSpkState),
+         VMSTATE_UINT8(dummy_refresh_clock, PCSpkState),
+@@ -224,7 +215,6 @@ static const VMStateDescription vmstate_spk = {
+ static const Property pcspk_properties[] = {
+     DEFINE_AUDIO_PROPERTIES(PCSpkState, audio_be),
+     DEFINE_PROP_UINT32("iobase", PCSpkState, iobase,  0x61),
+-    DEFINE_PROP_BOOL("migrate", PCSpkState, migrate,  true),
+     DEFINE_PROP_LINK("pit", PCSpkState, pit, TYPE_PIT_COMMON, PITCommonState *),
+ };
+ 
 -- 
 2.34.1
 
