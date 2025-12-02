@@ -1,77 +1,74 @@
-Return-Path: <kvm+bounces-65112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65113-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C969EC9BA3C
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 14:42:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB3EC9BBA0
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 15:11:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 40FF94E3531
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 13:42:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9610D4E429F
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 14:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8CB315D27;
-	Tue,  2 Dec 2025 13:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E5B3218DD;
+	Tue,  2 Dec 2025 14:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUFg599T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nLaikgA4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0612BE020
-	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 13:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB5D322C78;
+	Tue,  2 Dec 2025 14:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764682958; cv=none; b=Ih2S+PQQgjJKQOXDaliqYcQmpAKCIzwrieZdvPkE1esoCatlR7Q38i+PW7hxPrJLS0z1GIj9Dtgp+TvvI9wkdiXRtj7tIXwdsMxtDqYMDx8MWSw4XzToPGIZrVGkQCF/t0cECCO5+jnpqmmFtcNXFFAoXj4U4FztNwBbn5JJv4g=
+	t=1764684638; cv=none; b=DdYX9qHGPOz2qwBshWDc3NNvfT7JdBO2ptQ7RzIiaKdMrRSv9QVZnaQkb9zZZwKm1mchJKkdWkVmkAZUH+JZ4b/GLVzavSr+u0kDs82Ius/EKVXEinFRGhoXnUKa+skoh2Q3MKtDmYyay7KpRSEwJLsy1ARMewkdDHJPTyeuRMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764682958; c=relaxed/simple;
-	bh=9lcmb+WsEAUHsi7py9Vhr4ds7fe6Uj9/26ejxJ8nxdk=;
+	s=arc-20240116; t=1764684638; c=relaxed/simple;
+	bh=URgri6CpO3X9jzw1OjvEtPKkg18tROknUFwKrRlIq9g=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LnovryJpwVEOuCY6IISQQS1f8JYpRFGtje3byQighAAUeirLQggel0UHxFsLYz36y+nLWc4FFDFnRe8knwdZaJRhSL/c/n0Zb6vGAWOT/5bmJjQxIp7/BGyVf1oJbXiL8kkvcyajbO0L7bi2F5QNCn0IqzzpMfMW9NOJz9QRf/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DUFg599T; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764682955;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LN3ZRhlR55DAhXGZZfrNPYhGZ9yXyiDQHCZwNpQSxaQ=;
-	b=DUFg599ThPAaKBN7y807Idjp5QhaTfpw0yDk55p8pjpRqod3SnWGZPTSNGOlC+ub7fxNrC
-	uyYTznBeRzLPYU83z42teJzYinOfsbA5RikhscWUnuGCdTr9fvHQywWmnccwcAWPLsL4yr
-	EFjvEFDwkHL2/HuKIOk/YLed8KMDKkU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-528-V1al1FhNMyeFRg-VXnlFSw-1; Tue,
- 02 Dec 2025 08:42:32 -0500
-X-MC-Unique: V1al1FhNMyeFRg-VXnlFSw-1
-X-Mimecast-MFC-AGG-ID: V1al1FhNMyeFRg-VXnlFSw_1764682951
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 828C71956080;
-	Tue,  2 Dec 2025 13:42:30 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.45.242.7])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3732C180047F;
-	Tue,  2 Dec 2025 13:42:29 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 89B4221E6A27; Tue, 02 Dec 2025 14:42:26 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: qemu-devel@nongnu.org,  pbonzini@redhat.com,  kvm@vger.kernel.org,
-  eesposit@redhat.com,  philmd@linaro.org,  qemu-stable
- <qemu-stable@nongnu.org>
-Subject: Re: [PATCH v2] kvm: Fix kvm_vm_ioctl() and kvm_device_ioctl()
- return value
-In-Reply-To: <db4b64b3-d40e-456f-b76a-bf8228e91946@tls.msk.ru> (Michael
-	Tokarev's message of "Tue, 2 Dec 2025 16:14:56 +0300")
-References: <20251128152050.3417834-1-armbru@redhat.com>
-	<db4b64b3-d40e-456f-b76a-bf8228e91946@tls.msk.ru>
-Date: Tue, 02 Dec 2025 14:42:26 +0100
-Message-ID: <871pldt2yl.fsf@pond.sub.org>
+	 MIME-Version:Content-Type; b=K09ZZqYMtF+6c3KN3J62zdFNZnfuGyc5E15WLI0d7yYorvps2xxOE58jj54NFYQUitQmMqzc7b/OUOfSdBOJcxkgF0N4u26W68jFuheDuBtoCv9RAPUJFYg+qR3yC3Uy/hmIulP20jyprtt0BiEkE0OTs1c+2cCkovX9bpkhVD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nLaikgA4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A04C3C4CEF1;
+	Tue,  2 Dec 2025 14:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764684637;
+	bh=URgri6CpO3X9jzw1OjvEtPKkg18tROknUFwKrRlIq9g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=nLaikgA4ve9G0uBvuQ4SatN4sb2/QXUllDdM2zFEpUhvaHeWT33INaJ6IDcpVOobG
+	 ei/R654EgJu8W5YLITv/04Fej0voEK6nOjxgUpgOpaNGSOsBXUWdzNppcIrMZjJjym
+	 +itzE8FFx8zEZSyqNtWpQc5jba7Qy8P1QahZkA/1Er6RMBJPdlCZhiZ9e2s2fSbrCf
+	 6gk9q5BXnJyiVPYsHvRs8cl4ITbRzWngVQ/sDmc8R4k5BxXpzCNl6u6EtToX6xoV30
+	 FzLqDjvFPKH3LSSMJmO3AMDb7QsRdTZT3q1XJ5c4G04yvDumKt6C9FNVyiOKZsD4IT
+	 s7TNnLPp478KQ==
+From: Pratyush Yadav <pratyush@kernel.org>
+To: Pasha Tatashin <pasha.tatashin@soleen.com>
+Cc: David Matlack <dmatlack@google.com>,  Alex Williamson
+ <alex@shazbot.org>,  Adithya Jayachandran <ajayachandra@nvidia.com>,  Alex
+ Mastro <amastro@fb.com>,  Alistair Popple <apopple@nvidia.com>,  Andrew
+ Morton <akpm@linux-foundation.org>,  Bjorn Helgaas <bhelgaas@google.com>,
+  Chris Li <chrisl@kernel.org>,  David Rientjes <rientjes@google.com>,
+  Jacob Pan <jacob.pan@linux.microsoft.com>,  Jason Gunthorpe
+ <jgg@nvidia.com>,  Jason Gunthorpe <jgg@ziepe.ca>,  Josh Hilke
+ <jrhilke@google.com>,  Kevin Tian <kevin.tian@intel.com>,
+  kvm@vger.kernel.org,  Leon Romanovsky <leonro@nvidia.com>,
+  linux-kernel@vger.kernel.org,  linux-kselftest@vger.kernel.org,
+  linux-pci@vger.kernel.org,  Lukas Wunner <lukas@wunner.de>,  Mike
+ Rapoport <rppt@kernel.org>,  Parav Pandit <parav@nvidia.com>,  Philipp
+ Stanner <pstanner@redhat.com>,  Pratyush Yadav <pratyush@kernel.org>,
+  Saeed Mahameed <saeedm@nvidia.com>,  Samiullah Khawaja
+ <skhawaja@google.com>,  Shuah Khan <shuah@kernel.org>,  Tomita Moeko
+ <tomitamoeko@gmail.com>,  Vipin Sharma <vipinsh@google.com>,  William Tu
+ <witu@nvidia.com>,  Yi Liu <yi.l.liu@intel.com>,  Yunxiang Li
+ <Yunxiang.Li@amd.com>,  Zhu Yanjun <yanjun.zhu@linux.dev>
+Subject: Re: [PATCH 00/21] vfio/pci: Base support to preserve a VFIO device
+ file across Live Update
+In-Reply-To: <CA+CK2bC3EgL5r7myENVgJ9Hq2P9Gz0axnNqy3e6E_YKVRM=-ng@mail.gmail.com>
+	(Pasha Tatashin's message of "Mon, 1 Dec 2025 16:59:23 -0500")
+References: <20251126193608.2678510-1-dmatlack@google.com>
+	<CA+CK2bC3EgL5r7myENVgJ9Hq2P9Gz0axnNqy3e6E_YKVRM=-ng@mail.gmail.com>
+Date: Tue, 02 Dec 2025 15:10:26 +0100
+Message-ID: <86bjkhm0tp.fsf@kernel.org>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -81,27 +78,52 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Michael Tokarev <mjt@tls.msk.ru> writes:
+On Mon, Dec 01 2025, Pasha Tatashin wrote:
 
-> On 11/28/25 18:20, Markus Armbruster wrote:
->> These functions wrap ioctl().  When ioctl() fails, it sets @errno.
->> The wrappers then return that @errno negated.
+> On Wed, Nov 26, 2025 at 2:36=E2=80=AFPM David Matlack <dmatlack@google.co=
+m> wrote:
+[...]
+>> FLB Locking
 >>
->> Except they call accel_ioctl_end() between calling ioctl() and reading
->> @errno.  accel_ioctl_end() can clobber @errno, e.g. when a futex()
->> system call fails.  Seems unlikely, but it's a bug all the same.
->>
->> Fix by retrieving @errno before calling accel_ioctl_end().
->>
->> Fixes: a27dd2de68f3 (KVM: keep track of running ioctls)
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+>>   I don't see a way to properly synchronize pci_flb_finish() with
+>>   pci_liveupdate_incoming_is_preserved() since the incoming FLB mutex is
+>>   dropped by liveupdate_flb_get_incoming() when it returns the pointer
+>>   to the object, and taking pci_flb_incoming_lock in pci_flb_finish()
+>>   could result in a deadlock due to reversing the lock ordering.
+
+My mental model for FLB is that it is a dependency for files, so it
+should always be created (aka prepare) before _any_ of the files, and
+always destroyed (aka finish) after _all_ of the files.
+
+By the time the FLB is being finished, all the files for that FLB should
+also be finished, so there should no longer be a user of the FLB.
+
+Once all of the files are finished, it should be LUO's responsibility to
+make sure liveupdate_flb_get_incoming() returns an error _before_ it
+starts doing the FLB finish. And in FLB finish you should not be needing
+to take any locks.
+
+Why do you want to use the FLB when it is being finished?
+
 >
-> Isn't this a qemu-stable material?
+> I will re-introduce _lock/_unlock API to solve this issue.
+>
+>>
+>> FLB Retrieving
+>>
+>>   The first patch of this series includes a fix to prevent an FLB from
+>>   being retrieved again it is finished. I am wondering if this is the
+>>   right approach or if subsystems are expected to stop calling
+>>   liveupdate_flb_get_incoming() after an FLB is finished.
 
-I think it is.  I should've thought of adding Cc: qemu-stable.  My
-apologies!
+IMO once the FLB is finished, LUO should make sure it cannot be
+retrieved, mainly so subsystem code is simpler and less bug-prone.
 
+>
+> Thanks, I will include this fix in the next version of FLB.
+
+--=20
+Regards,
+Pratyush Yadav
 
