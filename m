@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-65146-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65147-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9D5CC9C1CF
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:08:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16F43C9C1C3
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:08:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3043D34A3EF
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:07:40 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1C0214E446F
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0F8274B4D;
-	Tue,  2 Dec 2025 16:07:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFB527BF7D;
+	Tue,  2 Dec 2025 16:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T02AikvO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bbj4R0Lq"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF92274FDF
-	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D53E25FA10
+	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:07:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764691647; cv=none; b=TysAKZb/u9fmGwYcXb4VJpa4gEFowzaJ0Mv1ySB6STUzFqrdO/wZ/bFtZgnHEO5V8rp/JChqTS/9Zd5Mx+G8264S1YLxGDbuWcUAKah8jMTwG/vP4aQujRxRb/etLOoiyiQCF2cdDuRr+hybRatjAVBgeMJwQV96ub90E6i0UC0=
+	t=1764691658; cv=none; b=XnxAIM3qqC3nM0CJgpaeizdRJCFhN1pkmAtt3IvxVXZhjw22fy9ErnfKRhQEw2lT2oxUc2aeDtxs9dWowN887sNFewSuGUkRLxjc9xu5C02/+XPxcLu4QYNleOsav/xPHJV2OreX9HGO3BvHkho4/xtfmQoKO38FfJ7QDgdFAyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764691647; c=relaxed/simple;
-	bh=9MQ564lwxpG6Oxxv/mdUg6vGcM3PGFMBsD8Z/3CykmQ=;
+	s=arc-20240116; t=1764691658; c=relaxed/simple;
+	bh=xbQmgoe2IOU9HSvyb9lb+wg4Nep+wx7DJvs7Fx9TRRo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G6rPlc4mBj05KWGvAEYLIlBtukNiHYl/fDo2vBZUPS6xKlER/D7ShFawVSL+8vEqDd+VPUHyNPxsegTrP0oPGuDwsefcby2VLcmJg4JF/SMZWXZiIezrilzV3NlaruYl47VN05pEMNGBivHoarA2qNzGCK0DfFdh0/61fzrDVsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T02AikvO; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version:Content-Type; b=Gp6ITyGuvd2g6utPBzOOhbJD/XdvrePLq7IPGBI66vknvY7B56zYnQOlsww8hJeHMAVpCFCRvjdq0SJUTfAiGTYjq5m2yfWIyyqGKDEtpDxaTLE5b48cRJsv7QtKpGqXO2IQPdw3wpslscIQYkM1OceCyNDP930KnzWgi+5UAkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bbj4R0Lq; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764691647; x=1796227647;
+  t=1764691656; x=1796227656;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9MQ564lwxpG6Oxxv/mdUg6vGcM3PGFMBsD8Z/3CykmQ=;
-  b=T02AikvOH7kWQKPmt3yTnhEFMRBNOf+qSI3hpmklTi8DuWmkRLLTzS2W
-   HX6RY9hn3Yyx/WJc+5seSNe92vG3kBsruJI8nR5aZq5ya1vMt/7l1+1eD
-   Lm/u3tJyuyWZBWsxrVT9R/zOQcLvrZO6fLkYRvUV1M/zlv+JB+47rAz9b
-   CMXakJZ84D9sp+E5218Or3tjY2LeV/bYr6HuKWABRHfyAWYAadgDC7VPd
-   xT7NWS7jm6X1vzGQ+wG8P6FUZe/esrID2NvxNAqav85+53HZMi7snj9Fj
-   CKsIDGdIMZO11GCfFsJrtD37F6CeJw2n56oA/ZMGg6VN5eSTC3bBHGonq
-   Q==;
-X-CSE-ConnectionGUID: A6lRuFZ4SyWt5Qu5dj1WVw==
-X-CSE-MsgGUID: pT2prfpsQH6HZe3bV6YJFQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="92142916"
+  bh=xbQmgoe2IOU9HSvyb9lb+wg4Nep+wx7DJvs7Fx9TRRo=;
+  b=bbj4R0LqZKFKF948IKtcKnnYQtLsLtuONwh6v+LkroV+c+WoqFZWgETP
+   20ywK3wPEV+8BeXkSLL3Kh41oa1VanbzvLICn3LeOGuYBhLQgJxjLPf8N
+   R+NAYcJNr4rlANaF4oLYWz+ljM6FIuplTKu1MFmeYjUvfD+HsIjpmPvZ4
+   uoYpYTv55eiDGJa3sQqXlIlGhtx0V7Fx+Sa75JZ4ydgzc4+FFEHACqOiS
+   ka7x9ajg0oIJRCPjEkjTjwEHkg5gj5OAn37Fxy7GttfP9kyi1SObbrdcU
+   MBsrujVcMwPNiL05WvTlFvmhQ7OWysLic15NMZBKoRODuUk0wLZ9iU4Po
+   g==;
+X-CSE-ConnectionGUID: qMvDQFT6RZGM5DfEiom3xQ==
+X-CSE-MsgGUID: Hl09kR7hREqFOZVVH5aK0g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="92142971"
 X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="92142916"
+   d="scan'208";a="92142971"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 08:07:26 -0800
-X-CSE-ConnectionGUID: BZzKIC5GRUewhmRb2+GGNg==
-X-CSE-MsgGUID: +DrUXJVsTFOXx4l0ZMbwfA==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 08:07:36 -0800
+X-CSE-ConnectionGUID: K6boL9nXQgOc2bG5wpxHdg==
+X-CSE-MsgGUID: bP0+wkBRQX+2cM0IZVd8Aw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="199537860"
+   d="scan'208";a="199537874"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa005.jf.intel.com with ESMTP; 02 Dec 2025 08:07:17 -0800
+  by orviesa005.jf.intel.com with ESMTP; 02 Dec 2025 08:07:26 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
@@ -100,9 +100,9 @@ Cc: qemu-devel@nongnu.org,
 	Peter Krempa <pkrempa@redhat.com>,
 	Jiri Denemark <jdenemar@redhat.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v5 22/28] hw/i386/pc: Remove pc_compat_2_7[] array
-Date: Wed,  3 Dec 2025 00:28:29 +0800
-Message-Id: <20251202162835.3227894-23-zhao1.liu@intel.com>
+Subject: [PATCH v5 23/28] target/i386/cpu: Remove CPUX86State::full_cpuid_auto_level field
+Date: Wed,  3 Dec 2025 00:28:30 +0800
+Message-Id: <20251202162835.3227894-24-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251202162835.3227894-1-zhao1.liu@intel.com>
 References: <20251202162835.3227894-1-zhao1.liu@intel.com>
@@ -117,54 +117,174 @@ Content-Transfer-Encoding: 8bit
 
 From: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-The pc_compat_2_7[] array was only used by the pc-q35-2.7
-and pc-i440fx-2.7 machines, which got removed. Remove it.
+The CPUX86State::full_cpuid_auto_level boolean was only
+disabled for the pc-q35-2.7 and pc-i440fx-2.7 machines,
+which got removed. Being now always %true, we can remove
+it and simplify x86_cpu_expand_features().
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/i386/pc.c         | 10 ----------
- include/hw/i386/pc.h |  3 ---
- 2 files changed, 13 deletions(-)
+Note, although libvirt still uses this property in its test cases, it
+was confirmed this property is not exposed to user directly [*].
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 85d12f8d0389..b88030bf50d0 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -253,16 +253,6 @@ GlobalProperty pc_compat_2_8[] = {
- };
- const size_t pc_compat_2_8_len = G_N_ELEMENTS(pc_compat_2_8);
+[*]: https://lore.kernel.org/qemu-devel/aDmphSY1MSxu7L9R@orkuz.int.mamuti.net/
+---
+ target/i386/cpu.c | 111 ++++++++++++++++++++++------------------------
+ target/i386/cpu.h |   3 --
+ 2 files changed, 54 insertions(+), 60 deletions(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 641777578637..72c69ba81c1b 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -9019,69 +9019,67 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
  
--GlobalProperty pc_compat_2_7[] = {
--    { TYPE_X86_CPU, "l3-cache", "off" },
--    { TYPE_X86_CPU, "full-cpuid-auto-level", "off" },
--    { "Opteron_G3" "-" TYPE_X86_CPU, "family", "15" },
--    { "Opteron_G3" "-" TYPE_X86_CPU, "model", "6" },
--    { "Opteron_G3" "-" TYPE_X86_CPU, "stepping", "1" },
--    { "isa-pcspk", "migrate", "off" },
--};
--const size_t pc_compat_2_7_len = G_N_ELEMENTS(pc_compat_2_7);
+     /* CPUID[EAX=7,ECX=0].EBX always increased level automatically: */
+     x86_cpu_adjust_feat_level(cpu, FEAT_7_0_EBX);
+-    if (cpu->full_cpuid_auto_level) {
+-        x86_cpu_adjust_feat_level(cpu, FEAT_1_EDX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_1_ECX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_6_EAX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_7_0_ECX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EAX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_7_1_ECX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EDX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_7_2_EDX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_EDX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_ECX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_8000_0007_EDX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_8000_0008_EBX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+-        x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
 -
- /*
-  * @PC_FW_DATA:
-  * Size of the chunk of memory at the top of RAM for the BIOS ACPI tables
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index f8f317aee197..accd08cb666b 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -292,9 +292,6 @@ extern const size_t pc_compat_2_9_len;
- extern GlobalProperty pc_compat_2_8[];
- extern const size_t pc_compat_2_8_len;
+-        /* Intel Processor Trace requires CPUID[0x14] */
+-        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT)) {
+-            if (cpu->intel_pt_auto_level) {
+-                x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
+-            } else if (cpu->env.cpuid_min_level < 0x14) {
+-                mark_unavailable_features(cpu, FEAT_7_0_EBX,
+-                    CPUID_7_0_EBX_INTEL_PT,
+-                    "Intel PT need CPUID leaf 0x14, please set by \"-cpu ...,intel-pt=on,min-level=0x14\"");
+-            }
++    x86_cpu_adjust_feat_level(cpu, FEAT_1_EDX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_1_ECX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_6_EAX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_7_0_ECX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EAX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_7_1_ECX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EDX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_7_2_EDX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_EDX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_ECX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_8000_0007_EDX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_8000_0008_EBX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
++    x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
++    x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
++
++    /* Intel Processor Trace requires CPUID[0x14] */
++    if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT)) {
++        if (cpu->intel_pt_auto_level) {
++            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
++        } else if (cpu->env.cpuid_min_level < 0x14) {
++            mark_unavailable_features(cpu, FEAT_7_0_EBX,
++                CPUID_7_0_EBX_INTEL_PT,
++                "Intel PT need CPUID leaf 0x14, please set by \"-cpu ...,intel-pt=on,min-level=0x14\"");
+         }
++    }
  
--extern GlobalProperty pc_compat_2_7[];
--extern const size_t pc_compat_2_7_len;
+-        /*
+-         * Intel CPU topology with multi-dies support requires CPUID[0x1F].
+-         * For AMD Rome/Milan, cpuid level is 0x10, and guest OS should detect
+-         * extended toplogy by leaf 0xB. Only adjust it for Intel CPU, unless
+-         * cpu->vendor_cpuid_only has been unset for compatibility with older
+-         * machine types.
+-         */
+-        if (x86_has_cpuid_0x1f(cpu) &&
+-            (IS_INTEL_CPU(env) || !cpu->vendor_cpuid_only)) {
+-            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
+-        }
++    /*
++     * Intel CPU topology with multi-dies support requires CPUID[0x1F].
++     * For AMD Rome/Milan, cpuid level is 0x10, and guest OS should detect
++     * extended toplogy by leaf 0xB. Only adjust it for Intel CPU, unless
++     * cpu->vendor_cpuid_only has been unset for compatibility with older
++     * machine types.
++     */
++    if (x86_has_cpuid_0x1f(cpu) &&
++        (IS_INTEL_CPU(env) || !cpu->vendor_cpuid_only)) {
++        x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
++    }
+ 
+-        /* Advanced Vector Extensions 10 (AVX10) requires CPUID[0x24] */
+-        if (env->features[FEAT_7_1_EDX] & CPUID_7_1_EDX_AVX10) {
+-            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x24);
+-        }
++    /* Advanced Vector Extensions 10 (AVX10) requires CPUID[0x24] */
++    if (env->features[FEAT_7_1_EDX] & CPUID_7_1_EDX_AVX10) {
++        x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x24);
++    }
+ 
+-        /* SVM requires CPUID[0x8000000A] */
+-        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+-            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
+-        }
++    /* SVM requires CPUID[0x8000000A] */
++    if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
++        x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
++    }
+ 
+-        /* SEV requires CPUID[0x8000001F] */
+-        if (sev_enabled()) {
+-            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
+-        }
++    /* SEV requires CPUID[0x8000001F] */
++    if (sev_enabled()) {
++        x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
++    }
+ 
+-        if (env->features[FEAT_8000_0021_EAX]) {
+-            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x80000021);
+-        }
++    if (env->features[FEAT_8000_0021_EAX]) {
++        x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x80000021);
++    }
+ 
+-        /* SGX requires CPUID[0x12] for EPC enumeration */
+-        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_SGX) {
+-            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x12);
+-        }
++    /* SGX requires CPUID[0x12] for EPC enumeration */
++    if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_SGX) {
++        x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x12);
+     }
+ 
+     /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
+@@ -10010,7 +10008,6 @@ static const Property x86_cpu_properties[] = {
+     DEFINE_PROP_UINT32("min-xlevel2", X86CPU, env.cpuid_min_xlevel2, 0),
+     DEFINE_PROP_UINT8("avx10-version", X86CPU, env.avx10_version, 0),
+     DEFINE_PROP_UINT64("ucode-rev", X86CPU, ucode_rev, 0),
+-    DEFINE_PROP_BOOL("full-cpuid-auto-level", X86CPU, full_cpuid_auto_level, true),
+     DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor),
+     DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
+     DEFINE_PROP_BOOL("x-vendor-cpuid-only", X86CPU, vendor_cpuid_only, true),
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index cee1f692a1c3..8c3eb86fa0c7 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -2292,9 +2292,6 @@ struct ArchCPU {
+     /* Force to enable cpuid 0x1f */
+     bool force_cpuid_0x1f;
+ 
+-    /* Enable auto level-increase for all CPUID leaves */
+-    bool full_cpuid_auto_level;
 -
- #define DEFINE_PC_MACHINE(suffix, namestr, initfn, optsfn) \
-     static void pc_machine_##suffix##_class_init(ObjectClass *oc, \
-                                                  const void *data) \
+     /*
+      * Compatibility bits for old machine types (PC machine v6.0 and older).
+      * Only advertise CPUID leaves defined by the vendor.
 -- 
 2.34.1
 
