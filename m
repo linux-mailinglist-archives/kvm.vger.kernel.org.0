@@ -1,261 +1,170 @@
-Return-Path: <kvm+bounces-65120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F106C9C073
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 16:51:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C996C9C10F
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:00:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 074CF346A19
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 15:51:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BB46A4E2ED4
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD913322C89;
-	Tue,  2 Dec 2025 15:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938D3325716;
+	Tue,  2 Dec 2025 16:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="i5TzJDOr"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="XJUfuIIf"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.74.81.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD7F30F7F3;
-	Tue,  2 Dec 2025 15:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF482255F2D;
+	Tue,  2 Dec 2025 16:00:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.74.81.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764690695; cv=none; b=CsWWCG0xuJc+WqBHC75m7lEZAztNzdatn4Fm6rRBguH/HqkxH+bUXgafmUrl5s8DLl1YjhkTKagoGxZ8mF9vq/mqTI2Kk/1EAbkPbWRcTP3okvCmItjwSIDkUF2GH27UZuEZ1b4waVSavivfNiMZst2cElZ8uiH0UboMK9FxPig=
+	t=1764691217; cv=none; b=V2t/7i45c3jVdy1mPNEgLSsfde/3pFtXt77N1DpIUsmK8mJhGhIuNcKziXL3Kzv2g1MN3XMzmHA2xBBUfiAzc89+Q0LiO0dcdQ41Qbkyo0q4cokDiPsvAbKIE+xH8MtI2VV+gBUcXrG77Z587WZN2IAxHBcdSSh/eiHDj5zGbOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764690695; c=relaxed/simple;
-	bh=Y+xm6yYMrbdfnsC+GQwhjANva6p2Tor455oEmPHnI78=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=E5FjMSnHj7mBDmCoMDUEgT4qzZQdlSe3QWxr8BeGvIG7QeRkIbn1Ns2iupD1+eXBVpVQGVMrbK+CEDTWBhb0U5T4RXDcAGea6hz+zlwYKj/Yur6NcJyVieGXgLV1Wmkj/ze5bqRpR5Q61tOHyLm4lelhKNHlocjfDTRL9KeZcVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=i5TzJDOr; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Y+xm6yYMrbdfnsC+GQwhjANva6p2Tor455oEmPHnI78=; b=i5TzJDOr8krplaRoM1BctyhRiL
-	W7JJ2uMuQ14gy0K7M0o/4j7CUJThWQ3pxcnYD9nsd6/p4jH+Cs+gfGV0h+ar/eEupe9AaEXL7I8zB
-	+ecenOpsq09JNm4q5b6qvXjdC+skk04ndCtxxUYKw2G4bTQOkvoCwcRQWEqNWwoJnQBfcybOeAnPQ
-	lxLZeIe/YGjcDf5gz+Klumu8mChs8lSieO58jwSNzz+dmV9uXeZQYJvDXWiYcy1K5thlpLny8RW8T
-	jNKEi/8N7UDoPD2cQTixZkL9b1SXKLiDfqgMuvfueaHsKbF3/xOyjvj6vUUiEuOCLu2aVTE1tjtg+
-	lnQHgKlA==;
-Received: from [172.31.31.148] (helo=u09cd745991455d.ant.amazon.com)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vQRnN-00000000aYi-0tRx;
-	Tue, 02 Dec 2025 14:56:01 +0000
-Message-ID: <68ad817529c6661085ff0524472933ba9f69fd47.camel@infradead.org>
-Subject: Re: [PATCH v3] KVM: x86: Add x2APIC "features" to control EOI
- broadcast suppression
-From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Khushit Shah <khushit.shah@nutanix.com>, "pbonzini@redhat.com"
- <pbonzini@redhat.com>, "kai.huang@intel.com" <kai.huang@intel.com>, 
- "mingo@redhat.com" <mingo@redhat.com>, "x86@kernel.org" <x86@kernel.org>,
- "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,  "dave.hansen@linux.intel.com"
- <dave.hansen@linux.intel.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
- Jon Kohler <jon@nutanix.com>, Shaju Abraham <shaju.abraham@nutanix.com>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>
-Date: Tue, 02 Dec 2025 15:51:21 +0000
-In-Reply-To: <aS8I6T3WtM1pvPNl@google.com>
-References: <20251125180557.2022311-1-khushit.shah@nutanix.com>
-	 <6353f43f3493b436064068e6a7f55543a2cd7ae1.camel@infradead.org>
-	 <A922DCC2-4CB4-4DE8-82FA-95B502B3FCD4@nutanix.com>
-	 <118998075677b696104dcbbcda8d51ab7f1ffdfd.camel@infradead.org>
-	 <aS8I6T3WtM1pvPNl@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-NvBv7oJ3LkT4+2EwtJHj"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1764691217; c=relaxed/simple;
+	bh=8vYCw390JYTGildBHzbP/DkGIQWGrIEJ0YigK1Hi8jU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=WMA1alogmRXSEdcx/BXnj+WSJkeEp6TMX1Ipnkuzy+yfaRyemCCePG+O2Rb16bs9K9suWnIExNpITTA3THMjjUFHueWiLF7Z6q5a8VlCaI48l09Na++XMpNrUxH1j3U/wbPl3u75aIP7/yZUflGXVbwAqnIA0CRoEo+cOwoQljM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=XJUfuIIf; arc=none smtp.client-ip=3.74.81.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1764691213; x=1796227213;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=at/judjHhIUd9hK8QdYJp4ATA/L1ojrlyu29FEks1XQ=;
+  b=XJUfuIIf8stA12jESFJrbVbuPhtXmL2BnwIcxoMWQO/fzm+2M/3pWiQS
+   PLGtIz/ghiQrzX5DK4quCYotuVCmPSr/6DEZ6Y+1upx0PU+F8YnhTdzuz
+   S90TCWRoVvQGJ8ptmlvbW5glwqIQ4De7gZ/h8Xo8d6GiyiqeRm+7nrmuU
+   5a46N9K5qMPkr8gwPndxjLxg9mAodX2JjzEo1017s+1NVFVpEz5Jy7sQY
+   L5K0yFR5JjRVPyh3BnvHFHgn2CpEme4hNCwHswkGy1Fx4iXKR4zstBouU
+   G3t2DpnEdZrotFRlDUFS3nS2r2rmoqXuOnrjJzNbvSyiqsyJ0+siE5+cg
+   A==;
+X-CSE-ConnectionGUID: 59VtwPqHT+qpAYmOgDwhIQ==
+X-CSE-MsgGUID: W+eHlDOAQLWZbrDLalx6Og==
+X-IronPort-AV: E=Sophos;i="6.20,243,1758585600"; 
+   d="scan'208";a="6139170"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 15:59:54 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [54.240.197.228:25931]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.33.168:2525] with esmtp (Farcaster)
+ id 3129eee9-83fd-4b7f-9c72-6442127ab572; Tue, 2 Dec 2025 15:59:54 +0000 (UTC)
+X-Farcaster-Flow-ID: 3129eee9-83fd-4b7f-9c72-6442127ab572
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Tue, 2 Dec 2025 15:59:51 +0000
+Received: from [192.168.12.25] (10.106.83.17) by EX19D005EUB003.ant.amazon.com
+ (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Tue, 2 Dec 2025
+ 15:59:50 +0000
+Message-ID: <cd354fc0-e500-472d-ac33-0bc43c0d898f@amazon.com>
+Date: Tue, 2 Dec 2025 15:59:49 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v3 4/5] guest_memfd: add support for userfaultfd minor
+ mode
+To: Peter Xu <peterx@redhat.com>
+CC: "David Hildenbrand (Red Hat)" <david@kernel.org>, Mike Rapoport
+	<rppt@kernel.org>, <linux-mm@kvack.org>, Andrea Arcangeli
+	<aarcange@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, "Axel
+ Rasmussen" <axelrasmussen@google.com>, Baolin Wang
+	<baolin.wang@linux.alibaba.com>, Hugh Dickins <hughd@google.com>, "James
+ Houghton" <jthoughton@google.com>, "Liam R. Howlett"
+	<Liam.Howlett@oracle.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, "Sean
+ Christopherson" <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, "Suren
+ Baghdasaryan" <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20251130111812.699259-1-rppt@kernel.org>
+ <20251130111812.699259-5-rppt@kernel.org>
+ <652578cc-eeff-4996-8c80-e26682a57e6d@amazon.com>
+ <2d98c597-0789-4251-843d-bfe36de25bd2@kernel.org>
+ <553c64e8-d224-4764-9057-84289257cac9@amazon.com> <aS3f_PlxWLb-6NmR@x1.local>
+ <76e3d5bf-df73-4293-84f6-0d6ddabd0fd7@amazon.com> <aS4BVC42JiUT51rS@x1.local>
+ <415a5956-1dec-4f10-be36-85f6d4d8f4b4@amazon.com> <aS8HaDX5Pg9h_nkl@x1.local>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <aS8HaDX5Pg9h_nkl@x1.local>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D011EUA001.ant.amazon.com (10.252.50.114) To
+ EX19D005EUB003.ant.amazon.com (10.252.51.31)
 
 
---=-NvBv7oJ3LkT4+2EwtJHj
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, 2025-12-02 at 07:42 -0800, Sean Christopherson wrote:
-> On Tue, Dec 02, 2025, David Woodhouse wrote:
-> > On Tue, 2025-12-02 at 12:58 +0000, Khushit Shah wrote:
-> > > Thanks for the review!
-> > >=20
-> > > > On 2 Dec 2025, at 2:43=E2=80=AFPM, David Woodhouse <dwmw2@infradead=
-.org> wrote:
-> > > >=20
-> > > > Firstly, excellent work debugging and diagnosing that!
-> > > >=20
-> > > > On Tue, 2025-11-25 at 18:05 +0000, Khushit Shah wrote:
-> > > > >=20
-> > > > > --- a/Documentation/virt/kvm/api.rst
-> > > > > +++ b/Documentation/virt/kvm/api.rst
-> > > > > @@ -7800,8 +7800,10 @@ Will return -EBUSY if a VCPU has already b=
-een created.
-> > > > > =C2=A0
-> > > > > =C2=A0Valid feature flags in args[0] are::
-> > > > > =C2=A0
-> > > > > -=C2=A0 #define KVM_X2APIC_API_USE_32BIT_IDS=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << 0)
-> > > > > -=C2=A0 #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK=C2=A0 (1UL=
-L << 1)
-> > > > > +=C2=A0 #define KVM_X2APIC_API_USE_32BIT_IDS=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 (1ULL << 0)
-> > > > > +=C2=A0 #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << 1)
-> > > > > +=C2=A0 #define KVM_X2APIC_API_DISABLE_IGNORE_SUPPRESS_EOI_BROADC=
-AST_QUIRK (1ULL << 2)
-> > > > > +=C2=A0 #define KVM_X2APIC_API_DISABLE_SUPPRESS_EOI_BROADCAST=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- (1ULL << 3)
-> > > > >=20
-> > > >=20
-> > > > I kind of hate these names. This part right here is what we leave
-> > > > behind for future generations, to understand the weird behaviour of
-> > > > KVM. To have "IGNORE" "SUPPRESS" "QUIRK" all in the same flag, quit=
-e
-> > > > apart from the length of the token, makes my brain hurt.
->=20
-> ...
->=20
-> > > > Could we perhaps call them 'ENABLE_SUPPRESS_EOI_BROADCAST' and
-> > > > 'DISABLE_SUPPRESS_EOI_BROADCAST', with a note saying that modern VM=
-Ms
-> > > > should always explicitly enable one or the other, because for
-> > > > historical reasons KVM only *pretends* to support it by default but=
- it
-> > > > doesn't actually work correctly?
->=20
-> I don't disagree on the names being painful, but ENABLE_SUPPRESS_EOI_BROA=
-DCAST
-> vs. DISABLE_SUPPRESS_EOI_BROADCAST won't work, and is even more confusing=
- IMO.
-
-I dunno, KVM never actually *did* suppress the EOI broadcast anyway,
-did it? This fix really *does* enable it =E2=80=94 as opposed to just
-pretending to?
-
-I was thinking along the lines of ...
 
 
-Setting KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST causes KVM to
-advertise and correctly implement the Directed EOI feature in the local
-APIC, suppressing broadcast EOI when the feature is enabled by the
-guest.
+On 02/12/2025 15:36, Peter Xu wrote:
+> On Tue, Dec 02, 2025 at 11:50:31AM +0000, Nikita Kalyazin wrote:
+>>> It looks fine indeed, but it looks slightly weird then, as you'll have two
+>>> ways to populate the page cache.  Logically here atomicity is indeed not
+>>> needed when you trap both MISSING + MINOR.
+>>
+>> I reran the test based on the UFFDIO_COPY prototype I had using your series
+>> [2], and UFFDIO_COPY is slower than write() to populate 512 MiB: 237 vs 202
+>> ms (+17%).  Even though UFFDIO_COPY alone is functionally sufficient, I
+>> would prefer to have an option to use write() where possible and only
+>> falling back to UFFDIO_COPY for userspace faults to have better performance.
+> 
+> Yes, write() should be fine.
+> 
+> Especially to gmem, I guess write() support is needed when VMAs cannot be
+> mapped at all in strict CoCo context, so it needs to be available one way
+> or another.
 
-Setting KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST causes KVM not to
-advertise the Directed EOI feature in the local APIC.
+write() is supposed to be supported only for shared memory, ie 
+accessible to the host.  AFAIK private memory should be populated via 
+other mechanisms.
 
-Userspace should explicitly either enable or disable the EOI broadcast
-using one of the two flags above. For historical compatibility reasons,
-if neither flag is set then KVM will advertise the feature but will not
-actually suppress the EOI broadcast, leading to potential IRQ storms in
-some guest configurations.
+> 
+> IIUC it's because UFFDIO_COPY (or memcpy(), I recall you used to test that
+> instead) will involve pgtable operations.
+Yes, for memcpy() it's even worse because it triggers VMA faults for 
+every page.  UFFDIO_COPY's overhead is lower because the only extra 
+thing it does compared to write() is installing user PTs.
 
---=-NvBv7oJ3LkT4+2EwtJHj
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+> instead) will involve pgtable operations.  So I wonder if the VMA mapping
+> the gmem will still be accessed at some point later (either private->share
+> convertable ones for device DMAs for CoCo, or fully shared non-CoCo use
+> case), then the pgtable overhead will happen later for a write()-styled
+> fault resolution.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MTIwMjE1NTEy
-MVowLwYJKoZIhvcNAQkEMSIEILXPtpPWnKec2VjNP5ZypOPfj9uHNZjTXoyHkrRvtDqQMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIALD6p76R6sJsm
-FQ3VP3ZjCdehUjk4hzyKMiiVwwf0s0XlJEw8G/nux+dVBs15vBc/gFXFz8XqMsPFGO0pqitjLYpR
-b/xFjOAQLHO4eB7rPMDavFNevoNbN96WReeFI6hQ5gMj6dScz4CNCMlizXXXSVGKbSfx6zcmebfw
-0tFciXJp2viD1eQwiawlZ5J/rK2h+Iq/kPR76wmdIA8xxg6GUNvg4ytCfxJr8W6+gzPAYe+y5aBv
-iyr5ZEj80rxTW8JZ8jW7YkTvEZ7U4JXn4o5NR6ZMJYfgRz3ASXqao3eF0jjZKG2K5rFWZ/lt+Piz
-63pVKR+5EOUnbCNvTA1KYCFKaVx4q4p4oAk6AKnSwiHJYz/Q4S7peBbiZjgmNUZA0u1x+27L3795
-W3CNnAYml9tUaFi/ntCo8nIMAuANx+Mtn8+l0CIBstCyzHP8mNmjky7aYsJkVl4/pCJHQImv9Dhr
-XFE9Qhqy05i+jFH61/BMGGrPbYecpX3LC2w0cRS1eXVdo4faeZ+wtCw4smYwuzyjiqcA26ov3BrQ
-lc8b/rMQcq513YPxpOxPSpUu4j+bdmGD/+DQ6OZhJIr1Q4xbiJpL6k5eosRNsxIn90hahhR/XUlc
-Lwhl6hfD27AL0lkAZ20SuGBD4NsUDzs51J8WWC338Kxs+xyx8fvrhOCzKky198kAAAAAAAA=
+At least in Firecracker use case, only pages that are related to PV 
+devices are going to get accessed by the VMM via user PTs (such as 
+virtio queues and buffers).  The majority of pages are only touched by 
+vCPUs via stage-2 mappings and are never accessed via user PTs.
 
+> 
+>  From that POV, above number makes sense.
+> 
+> Thanks for the extra testing results.
+> 
+>>
+>> [2]
+>> https://lore.kernel.org/all/7666ee96-6f09-4dc1-8cb2-002a2d2a29cf@amazon.com
+> 
+> --
+> Peter Xu
+> 
 
---=-NvBv7oJ3LkT4+2EwtJHj--
 
