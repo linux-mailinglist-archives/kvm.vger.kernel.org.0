@@ -1,258 +1,170 @@
-Return-Path: <kvm+bounces-65117-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65118-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58C02C9BEFF
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 16:27:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21A37C9BF9D
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 16:36:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 82BAC4E3532
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 15:27:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55F813A8F77
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 15:36:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C50425EFBE;
-	Tue,  2 Dec 2025 15:27:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2432676DE;
+	Tue,  2 Dec 2025 15:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K3wuuAXp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTFs57X9";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bXNttpwi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E514F252292
-	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 15:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5F423BD02
+	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 15:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764689234; cv=none; b=RWWYTjnIfjP9Gy7JOJmxQZ99ij8W8U6tF7V6ExtYjkCxxXQzXGwp8RNnSTJs2KefilwPP2xvPWHL5AIoF29+EAbUNg1/jvBbAUeLA5FON3hu3FQwuJyi9lpdJDFDrctUqE2/GLFHrbdkGEtQqTbhzLe0bEr1aYpVpnfhE9rIpyg=
+	t=1764689776; cv=none; b=gJx1PxEwOE+luxTo4K4ULFLg/ijJ6XVdgCtMoxTfJb4SnHliL7u/SCZfxEcMTTJCzGCZ4BvtyaTriN/j7HIN9ktqdlrqsXBTmmVc8Xoqatge9nhP6DcIdCGyaDDr+AaaUpzMcxofTJFwxVaTh0NQso45cegxTcCSOwWAuca6eFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764689234; c=relaxed/simple;
-	bh=H+rBOGQRY8iwXaLnmYSjB3wNuaemUT2VNQocG5svCK0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=U77GY5whCpGh4ItDkWWJBajRYRCIde09+j9spcz17hi+LeZB8eWuv37VRn1HkzPZLIlXTzyDLvrTMYRYFhVx7kn94Xye3AIWJePFbavX92pV6MsAL6tLl4He7RdD4dLiJCTFzfEKAo7/XKI1f/rrgC9Su+QeTMgEcNVNdfTG1GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K3wuuAXp; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-341aec498fdso6554850a91.2
-        for <kvm@vger.kernel.org>; Tue, 02 Dec 2025 07:27:12 -0800 (PST)
+	s=arc-20240116; t=1764689776; c=relaxed/simple;
+	bh=i3C3bUlfDJDSJz+UEgqncbzEDCMJ04lynUCqoI5h7Ac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aakAkqTmNvl1KeiGFZINH6qhucoUdyXFCyq0cM58TYzKHT1THa7Ak52SpZwRKbcD9tREs1OjJh2uzu9mc63NyTQU88N/WChddgLMgxv2lMFUbSwilHm82zUWlSIwea/eM60fBq5LAGJ1K0fFmHujVIpO3ja22RuEin5M+Ilzwd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WTFs57X9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bXNttpwi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764689774;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YeUhnIQnNrHzJpcHAzDpdS8MH/0dybZ954xw+b5apLM=;
+	b=WTFs57X9AdPDzKYIOZdKJkcWNCjIBeO9kN6T6Vb+RH/5S4HoZSkbZQfypdGoLQjeszKCv+
+	tBiYKP4ZX0pP3cQrKwoafynYFiecHftHgNgFQfmPdt9KsHyXBVZidAwmJPlrzRDnsXPhQD
+	X0CkXFroCZrtkjDsvw1kRWh3ZVW891Q=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-6-iSFues1jPt2fZELwCoa3iA-1; Tue, 02 Dec 2025 10:36:13 -0500
+X-MC-Unique: iSFues1jPt2fZELwCoa3iA-1
+X-Mimecast-MFC-AGG-ID: iSFues1jPt2fZELwCoa3iA_1764689772
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4ee0995fa85so135190461cf.1
+        for <kvm@vger.kernel.org>; Tue, 02 Dec 2025 07:36:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764689232; x=1765294032; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Orny64yCul+MV1Pms4wehlYly0YZEji2U1uJ3NC+LQ8=;
-        b=K3wuuAXpZ/s04O1Q56EncQcVmX+v1mnED0CECG9mg9VRJlbCeQZQwq4yn61T0rbTnf
-         ChQTnGLwgQ5FwJW5ZeUpMnIZ02KgBuyNaQo0ZmwvxhzoOkBoXgyZ0Dtn0HBHAjhMC1Po
-         stSoMrrDKGRwg289RdroeETmRSqZTKtIumL4If6kIlbS+7ipUcc9J3/MFndZFybpxcFB
-         mOxGS7Wserq0J3qn655HhH690Q5AmWrxpoNi5WURrK3dYNZuvYifZmDdepdAOijvoEmn
-         yRjqlV/NMUI46VB0jFr2YQIm2SvOsOIvr1bh8owpcyNCfH3kjZDgrRMqeRqYm2ht6fTA
-         GmfQ==
+        d=redhat.com; s=google; t=1764689772; x=1765294572; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YeUhnIQnNrHzJpcHAzDpdS8MH/0dybZ954xw+b5apLM=;
+        b=bXNttpwic51dPVpgUGsg7JohE924HeWKXleYn93pdrvXRmKPqZdN4GD9mAqOaCnKpX
+         8O149A6cFJgWkIjk/uPvps0ThD5WUMIFN3C8EiZFaZhI4NXODZQVhZoKD+bmJ/PEWYIS
+         v9JIW+BVBcUZJSlpu34opG+lrww3TJEqIuOm48Us9Eb0jMWXJ201jT3LduSIVQZbtVYT
+         B4flYcAvSqaRq+MZNQqh9apOl8MhiV9dpGoedSqJwDUf/zJ2oN+8hR2MVXVf8f+zfQOV
+         aMpNTx1GZeJShYby59mb99irnAkxXpfHXzsyeCQORx4RGkBBWNCGoKSeA4AWZcTYjnRa
+         zv6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764689232; x=1765294032;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Orny64yCul+MV1Pms4wehlYly0YZEji2U1uJ3NC+LQ8=;
-        b=NRTA/ZO8S6Z7fY/z8gaOJ0b43vReUJGYkRZ+v7OnVR3Qt3HqUl2FPeQomDj9uSjMqS
-         7X/I99RfEjz0eleNhY0mz8opIH2YNLjhS24jllCmH9STEy7vSMGpflPOBHTwa7iFqRp0
-         gWBIQxSKJjzBWaFNEvRGnA0iJvG/8W5sOewA4CZAZ60g5jWYEPYH4rSu+YSX8SBnp31e
-         SgmYGvWe67Vf0cj4de6aTzecpMn/R7DSwnOh3iooS4h4dhP+yjrGg3faSVYC9MFosd0L
-         RXa6X6z8X/REp0BEMFmAV9xCa89aCTlvjYVQDLNdDtG4Lvg3PGJ1eDWVmOLCgSVGAzLl
-         v11g==
-X-Forwarded-Encrypted: i=1; AJvYcCUDJC9u/QkeQfS/k6pYBfZHuY7l6nPL5GBNiEmoFrjo5GnEsCxkLdudjMGna0uqviiqgSg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxqi9eTjUsxHRkZdBUsKvpvsxnSQ97l6HmUAcsLUKx4I/XtLrdv
-	nC6PEGfuwyoTZZcFc4GqiHrrhrqezrX9Ik4x0sbGyz+nxucPg32dru7clZFFTtQPFE4u78qARgr
-	cFo4ENw==
-X-Google-Smtp-Source: AGHT+IGQgBm2f7MBgeNPNiOST5+5uXlbW4GbuouSx+idpH0+WuLL2SiEYxWcT+xKLnx1WXLgUzDyjncR9+A=
-X-Received: from pjbgk19.prod.google.com ([2002:a17:90b:1193:b0:347:76e2:5ff6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f88:b0:341:8c15:959e
- with SMTP id 98e67ed59e1d1-34733f305bfmr44774155a91.17.1764689232200; Tue, 02
- Dec 2025 07:27:12 -0800 (PST)
-Date: Tue, 2 Dec 2025 07:27:10 -0800
-In-Reply-To: <20251202020334.1171351-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1764689772; x=1765294572;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YeUhnIQnNrHzJpcHAzDpdS8MH/0dybZ954xw+b5apLM=;
+        b=hBXHig50jaQHohn0+Q3poKrLHStoVayBa9cxxBQMQNkvJItWsyVLJWCj9Y4mo2SKma
+         AcrDzTfO4PGYyodsWxanu8NB6Xj2BOTH4KOyA+8qGl3P3Fnv1EnPz9kE/7U24EARpxSq
+         Dazgc3IL1Hnl8mlQKPMXwyN/wx+kke6J6IgmEqCrN0nIH6BaVaFTl6r5TmlukcXjO47+
+         xnEQ/u2wCKWvtwKDkexTl3PMRZ9ZSRi1C60hNLO0676vyftNkgAVXULWQ3ExFAq8WCHJ
+         dU7TOJp06BCU4U+f0tjgwoYMN57Nn048dxx0emVdeTCgweNSWQ6S95gLe+leQATSe2Rk
+         4oyw==
+X-Forwarded-Encrypted: i=1; AJvYcCWkiq9CeT7dWV63fyjxLVwqaGsUoRI+zLNU/sHqbcmixMOBaJLJ8e2Y/COQN9uIrfCLH+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXb13jzUsPvhlNiXk1aaYDBR5wYamj9bIo80btJCdnqT81TKcE
+	sMvRxEcODbwUYX8XGt6Q4svbnqt+ysHkQeCNrnic1J7NSZXJZTefUNtDT9xU1kXi1as3WnpO+wr
+	Bu2gBklNolmmv3k3onxH6ZJx0l5jTflFkftw7gTOG4TDD38W/+BhS7+qzdNXE7g==
+X-Gm-Gg: ASbGncvfMVIsSLYFhuCv/6Bp66dWNgqkmlrT7CLe6gg6Wik1TsMe1T4qv2Kp9bj/GCc
+	y1WfkkdomNr+fnYs5FFOV/rR83NHBkvJw6ObR3dn9jpWGf5SMVmjaQFzl+YFbipVWzlKc4vh6Wl
+	UwnogKDrayaP0HL4XzN8i12q6rh8ASRauuP6CqawX5A+WJR+Tb0ymJfVPZI2nGf6ADz6IebRAfR
+	K6TNvDAHk0BgTaYT0jeOmqlJ3Wc8APsSCbzorbmxFNoZmhLZDRjGtuku3ARfwhd0a57xpQuDUFZ
+	3xdWOz8f59TyN6shkVn9cz3+JlXX4Dmhc3jy6V5VQ+9PPuwfnRV2naAlTVAXYYFaJ2Uq7uifw9m
+	gVpM=
+X-Received: by 2002:ac8:5a49:0:b0:4ee:41b2:91a6 with SMTP id d75a77b69052e-4ee58b066b0mr583360601cf.82.1764689771723;
+        Tue, 02 Dec 2025 07:36:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGLXfWGfXaBCM5txXHiaHxg/MnHqIkbYXvhInhcx15cakUIHeqTAWdqvhhC3SSFQ3wIt4nqmQ==
+X-Received: by 2002:ac8:5a49:0:b0:4ee:41b2:91a6 with SMTP id d75a77b69052e-4ee58b066b0mr583359971cf.82.1764689771231;
+        Tue, 02 Dec 2025 07:36:11 -0800 (PST)
+Received: from x1.local ([142.188.210.156])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4efd2edcebcsm95292531cf.0.2025.12.02.07.36.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Dec 2025 07:36:10 -0800 (PST)
+Date: Tue, 2 Dec 2025 10:36:08 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Nikita Kalyazin <kalyazin@amazon.com>
+Cc: "David Hildenbrand (Red Hat)" <david@kernel.org>,
+	Mike Rapoport <rppt@kernel.org>, linux-mm@kvack.org,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Hugh Dickins <hughd@google.com>,
+	James Houghton <jthoughton@google.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 4/5] guest_memfd: add support for userfaultfd minor
+ mode
+Message-ID: <aS8HaDX5Pg9h_nkl@x1.local>
+References: <20251130111812.699259-1-rppt@kernel.org>
+ <20251130111812.699259-5-rppt@kernel.org>
+ <652578cc-eeff-4996-8c80-e26682a57e6d@amazon.com>
+ <2d98c597-0789-4251-843d-bfe36de25bd2@kernel.org>
+ <553c64e8-d224-4764-9057-84289257cac9@amazon.com>
+ <aS3f_PlxWLb-6NmR@x1.local>
+ <76e3d5bf-df73-4293-84f6-0d6ddabd0fd7@amazon.com>
+ <aS4BVC42JiUT51rS@x1.local>
+ <415a5956-1dec-4f10-be36-85f6d4d8f4b4@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251202020334.1171351-1-seanjc@google.com>
-Message-ID: <aS8FTggpT_7cY3cr@google.com>
-Subject: Re: [PATCH 0/2] KVM: Fix a guest_memfd memslot UAF
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Alexander Potapenko <glider@google.com>
-Content-Type: multipart/mixed; charset="UTF-8"; boundary="2/MWZxQFC6AlmTv/"
-
-
---2/MWZxQFC6AlmTv/
-Content-Type: text/plain; charset=us-ascii
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <415a5956-1dec-4f10-be36-85f6d4d8f4b4@amazon.com>
 
-On Mon, Dec 01, 2025, Sean Christopherson wrote:
-> Fix a UAF due to leaving a dangling guest_memfd memslot binding by
-> disallowing clearing KVM_MEM_GUEST_MEMFD on a memslot.  The intent was
-> that guest_memfd memslots would be immutable (could only be deleted),
-> but somewhat ironically we missed the case where KVM_MEM_GUEST_MEMFD
-> itself is the only flag that's toggled.
+On Tue, Dec 02, 2025 at 11:50:31AM +0000, Nikita Kalyazin wrote:
+> > It looks fine indeed, but it looks slightly weird then, as you'll have two
+> > ways to populate the page cache.  Logically here atomicity is indeed not
+> > needed when you trap both MISSING + MINOR.
 > 
-> This is an ABI change, but I can't imagine anyone was relying on
-> disappearing a guest_memfd memslot.
+> I reran the test based on the UFFDIO_COPY prototype I had using your series
+> [2], and UFFDIO_COPY is slower than write() to populate 512 MiB: 237 vs 202
+> ms (+17%).  Even though UFFDIO_COPY alone is functionally sufficient, I
+> would prefer to have an option to use write() where possible and only
+> falling back to UFFDIO_COPY for userspace faults to have better performance.
+
+Yes, write() should be fine.
+
+Especially to gmem, I guess write() support is needed when VMAs cannot be
+mapped at all in strict CoCo context, so it needs to be available one way
+or another.
+
+IIUC it's because UFFDIO_COPY (or memcpy(), I recall you used to test that
+instead) will involve pgtable operations.  So I wonder if the VMA mapping
+the gmem will still be accessed at some point later (either private->share
+convertable ones for device DMAs for CoCo, or fully shared non-CoCo use
+case), then the pgtable overhead will happen later for a write()-styled
+fault resolution.
+
+From that POV, above number makes sense.
+
+Thanks for the extra testing results.
+
 > 
-> Patch 2 hardens against the UAF, and prepares for allowing FLAGS_ONLY
-> changes on guest_memfd memslots.  Sooner or later, we're going to allow
-> dirty logging on guest_memfd, so I think it makes sense to guard against
-> that so that whoever adds dirty logging support doesn't forget to unbind
-> on a FLAGS_ONLY change.
-> 
-> I'll respond with the syzkaller reproducer (it's comically simple).
+> [2]
+> https://lore.kernel.org/all/7666ee96-6f09-4dc1-8cb2-002a2d2a29cf@amazon.com
 
-And almost forgot...
+-- 
+Peter Xu
 
---2/MWZxQFC6AlmTv/
-Content-Type: text/x-csrc; charset=us-ascii
-Content-Disposition: attachment; filename="reproducer.c"
-
-// autogenerated by syzkaller (https://github.com/google/syzkaller)
-
-#define _GNU_SOURCE
-
-#include <endian.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-uint64_t r[3] = {0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff};
-
-int main(void)
-{
-  syscall(__NR_mmap, /*addr=*/0x1ffffffff000ul, /*len=*/0x1000ul, /*prot=*/0ul,
-          /*flags=MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE*/ 0x32ul,
-          /*fd=*/(intptr_t)-1, /*offset=*/0ul);
-  syscall(__NR_mmap, /*addr=*/0x200000000000ul, /*len=*/0x1000000ul,
-          /*prot=PROT_WRITE|PROT_READ|PROT_EXEC*/ 7ul,
-          /*flags=MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE*/ 0x32ul,
-          /*fd=*/(intptr_t)-1, /*offset=*/0ul);
-  syscall(__NR_mmap, /*addr=*/0x200001000000ul, /*len=*/0x1000ul, /*prot=*/0ul,
-          /*flags=MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE*/ 0x32ul,
-          /*fd=*/(intptr_t)-1, /*offset=*/0ul);
-  const char* reason;
-  (void)reason;
-  intptr_t res = 0;
-  if (write(1, "executing program\n", sizeof("executing program\n") - 1)) {
-  }
-  //  openat$kvm arguments: [
-  //    fd: const = 0xffffffffffffff9c (8 bytes)
-  //    file: ptr[in, buffer] {
-  //      buffer: {2f 64 65 76 2f 6b 76 6d 00} (length 0x9)
-  //    }
-  //    flags: open_flags = 0x0 (4 bytes)
-  //    mode: const = 0x0 (2 bytes)
-  //  ]
-  //  returns fd_kvm
-  memcpy((void*)0x200000000000, "/dev/kvm\000", 9);
-  res = syscall(__NR_openat, /*fd=*/0xffffffffffffff9cul,
-                /*file=*/0x200000000000ul, /*flags=*/0, /*mode=*/0);
-  if (res != -1)
-    r[0] = res;
-  //  ioctl$KVM_CREATE_VM arguments: [
-  //    fd: fd_kvm (resource)
-  //    cmd: const = 0xae01 (4 bytes)
-  //    type: intptr = 0x0 (8 bytes)
-  //  ]
-  //  returns fd_kvmvm
-  res = syscall(__NR_ioctl, /*fd=*/r[0], /*cmd=*/0xae01, /*type=*/0ul);
-  if (res != -1)
-    r[1] = res;
-  //  ioctl$KVM_CREATE_GUEST_MEMFD arguments: [
-  //    fd: fd_kvmvm (resource)
-  //    cmd: const = 0xc040aed4 (4 bytes)
-  //    arg: ptr[in, kvm_create_guest_memfd] {
-  //      kvm_create_guest_memfd {
-  //        size: int64 = 0x200001fe0000 (8 bytes)
-  //        flags: int64 = 0x0 (8 bytes)
-  //        reserved: buffer: {00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00 00 00 00 00 00 00 00} (length 0x30)
-  //      }
-  //    }
-  //  ]
-  //  returns fd_kvm_guest_memfd
-  *(uint64_t*)0x2000000001c0 = 0x200001fe0000;
-  *(uint64_t*)0x2000000001c8 = 0;
-  memset((void*)0x2000000001d0, 0, 48);
-  res = syscall(__NR_ioctl, /*fd=*/r[1], /*cmd=*/0xc040aed4,
-                /*arg=*/0x2000000001c0ul);
-  if (res != -1)
-    r[2] = res;
-  //  ioctl$KVM_SET_USER_MEMORY_REGION2 arguments: [
-  //    fd: fd_kvmvm (resource)
-  //    cmd: const = 0x40a0ae49 (4 bytes)
-  //    arg: ptr[in, kvm_userspace_memory_region2] {
-  //      kvm_userspace_memory_region2 {
-  //        slot: kvm_mem_slots = 0x4 (4 bytes)
-  //        flags: kvm_mem_region_flags = 0x4 (4 bytes)
-  //        paddr: kvm_guest_addrs = 0x80a0000 (8 bytes)
-  //        size: len = 0x2000 (8 bytes)
-  //        addr: VMA[0x2000]
-  //        guest_memfd_offset: int64 = 0x4000 (8 bytes)
-  //        guest_memfd: fd_kvm_guest_memfd (resource)
-  //        pad1: const = 0x0 (4 bytes)
-  //        pad2: buffer: {00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00} (length 0x70)
-  //      }
-  //    }
-  //  ]
-  *(uint32_t*)0x200000000180 = 4;
-  *(uint32_t*)0x200000000184 = 4;
-  *(uint64_t*)0x200000000188 = 0x80a0000;
-  *(uint64_t*)0x200000000190 = 0x2000;
-  *(uint64_t*)0x200000000198 = 0x200000ffc000;
-  *(uint64_t*)0x2000000001a0 = 0x4000;
-  *(uint32_t*)0x2000000001a8 = r[2];
-  *(uint32_t*)0x2000000001ac = 0;
-  memset((void*)0x2000000001b0, 0, 112);
-  syscall(__NR_ioctl, /*fd=*/r[1], /*cmd=*/0x40a0ae49,
-          /*arg=*/0x200000000180ul);
-  //  ioctl$KVM_SET_USER_MEMORY_REGION2 arguments: [
-  //    fd: fd_kvmvm (resource)
-  //    cmd: const = 0x40a0ae49 (4 bytes)
-  //    arg: ptr[in, kvm_userspace_memory_region2] {
-  //      kvm_userspace_memory_region2 {
-  //        slot: kvm_mem_slots = 0x4 (4 bytes)
-  //        flags: kvm_mem_region_flags = 0x1 (4 bytes)
-  //        paddr: kvm_guest_addrs = 0xffff1000 (8 bytes)
-  //        size: len = 0x2000 (8 bytes)
-  //        addr: VMA[0x2000]
-  //        guest_memfd_offset: int64 = 0x8 (8 bytes)
-  //        guest_memfd: fd_kvm_guest_memfd (resource)
-  //        pad1: const = 0x0 (4 bytes)
-  //        pad2: buffer: {00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  //        00 00} (length 0x70)
-  //      }
-  //    }
-  //  ]
-  *(uint32_t*)0x200000000240 = 4;
-  *(uint32_t*)0x200000000244 = 1;
-  *(uint64_t*)0x200000000248 = 0xffff1000;
-  *(uint64_t*)0x200000000250 = 0x2000;
-  *(uint64_t*)0x200000000258 = 0x200000ffc000;
-  *(uint64_t*)0x200000000260 = 8;
-  *(uint32_t*)0x200000000268 = r[2];
-  *(uint32_t*)0x20000000026c = 0;
-  memset((void*)0x200000000270, 0, 112);
-  syscall(__NR_ioctl, /*fd=*/r[1], /*cmd=*/0x40a0ae49,
-          /*arg=*/0x200000000240ul);
-  return 0;
-}
-
---2/MWZxQFC6AlmTv/--
 
