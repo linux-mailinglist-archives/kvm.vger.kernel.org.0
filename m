@@ -1,89 +1,69 @@
-Return-Path: <kvm+bounces-65102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF614C9B2FF
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 11:37:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3795C9B5DA
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 12:51:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B39333A706F
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 10:35:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A17A74E38E7
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 11:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B8230C371;
-	Tue,  2 Dec 2025 10:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0394312805;
+	Tue,  2 Dec 2025 11:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJekQqn4"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="oRWBLFKl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.178.132.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAE4303A08
-	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 10:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAB5280309;
+	Tue,  2 Dec 2025 11:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.178.132.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764671733; cv=none; b=QrXwnfPPmVt+EuPr2yayECkJB52E9us35eiMLGixeS4X1ZNX1IIc363zoKwDMtceeB8SWWLb1ix/SUZYrxhi0r2+jVDsnqvcOeDhSQM7xdHpcqkNZU4FOEGqZ4ByNXamHkHkjFoXYIq8MCDkzFQ5zSUOPebuto4AEFXDMWCbRW8=
+	t=1764676266; cv=none; b=JVJ3nBg6lS3qvJzHeKY4sCMwZ0luBBPXOUkUpbfQkHXaGyyj3KBlnyLGJLN5NkVvlR9krpGrIXouJMnqVGDp5KYmtl1lyfXEHGF6yx/32B9TP2ydogNrOSld/5ELdfI+tqr0MjHdul1hV5zz0P8kRqXP4gEI6R62HKO3M22nO+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764671733; c=relaxed/simple;
-	bh=8ehwieRgME29YittKX3I6p8D8uoKGas4AaSH/vNw+ck=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZW9P6G0IhkBZuLB/8go0M/dqCKYGK+M1ZvENIfdNN8IFTZKn2e86FS2QdBTKYi7RqtIDCQNnKhOu7JlGfuSKQa4RoMCNx9As5Ken1+oF/kIRnZDoCo1LiJLPLQEsIczw4nIXnD9arziS5C4BLR3XhIwSvBRQi+ixchO3jX11F0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iJekQqn4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764671731;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nVckf801EzlHLt3eBGX4mHh0JO99LKIAjAwFPbJ7PrM=;
-	b=iJekQqn4Q34Np/7PbLsUMb2Pzp8Tmu2ccaJKCeop9tmM9xnITGq6dA32M0C4VvLE2LEyQ7
-	YqCesUU7Bd7Wdz8FhkD/+3D5rsc6SK7Oh8opHdKgpDRnfX07qiX7HQemoZB/EZX+kGoOQn
-	kwcU/ve3wBSts0lfTf0SyqgzFAocyXI=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-400-b8pORS3PNcqloVmjClprxQ-1; Tue, 02 Dec 2025 05:35:29 -0500
-X-MC-Unique: b8pORS3PNcqloVmjClprxQ-1
-X-Mimecast-MFC-AGG-ID: b8pORS3PNcqloVmjClprxQ_1764671729
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-88237204cc8so141640076d6.2
-        for <kvm@vger.kernel.org>; Tue, 02 Dec 2025 02:35:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764671729; x=1765276529;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nVckf801EzlHLt3eBGX4mHh0JO99LKIAjAwFPbJ7PrM=;
-        b=pr3Khl0q/DmzeEC7wP+s8dfiulkDoThx9xswUUgoJx5N08Ur3QK847TgjdON+hCBVH
-         FK3R+Ud81wAIk2rfJ7yWKYnmi1OLlwk2755RoEkUpI9VhTonKGaYoj/aNwv+mxD2HzDJ
-         fbzCisyMpZM+cpphk0q4wiSK0PXZ9LbnD6FlOYrSaq8JLQeCPvI/ZOAXZQNn9tJAbdAq
-         iSwHYaSR34E70ItwLxIhQBh1M+vii0vs4swgEEiDowQAG3kWxxL8PGeCRW3iAols/gSs
-         LydChqviWIhQm9ANWsf53BojVJKgNos+pl3bMAF2y8HXgfRPtUQlqtzOnaNL2IdsmrDN
-         azEA==
-X-Forwarded-Encrypted: i=1; AJvYcCVrs77JYsw2d7/Iseu7m7T1uFwGItlCmqj15mNCcGyX3NcHrKgGqGv3ihcmET1amNWpAIw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy93a5lbHdvrm7xsof+Oi8q95EqZqKjQtkxrl0g2OxWWr3zklY2
-	H4Er1GohVQ1BW/WK93jXBTBB5PQxeyD56LwBLiMEHhebvsRXsPKCmHYjyX+WnhINLkkEZIeyPxC
-	6jhdi03jR15AlTcOJM/aq5MrpabAsZg6WNXWPzmEXgCuHc6xAph8YTA==
-X-Gm-Gg: ASbGncvB/j2DwgWNSm6NQheyRB3oSK//QlfdyYAiaKSNEm3DrSihV2T3/KHveIuBBJy
-	6UOlT5uuhtjU1m2IInCFsgFYcDMvZhXyJO0+pFQpT1ifznf9GQlAqc/gtsr36PXHqIepTeY7KpN
-	GuHDkjCF7adGStFiC1zTB3AvcZ78a346+tXiBHT6m3w8OxDMwp7Z8JsaVb5tt0xdMVxNoCivefs
-	rvEeO2AujCCDb9KOsB4RYOjROmgfIfqy7qdzGu27Ks6fAbRC7g8NZso4yZYAHwxP7j6mGL4Rddp
-	AokwQjBGaj2viWOTnadhMZmLrbqhBYCYumDFqf+roeNrpC6JE3KGdCsDAYp4LkoocYJqzJ9GhU2
-	OT6nqyliU0cbu6p7M1z34HWhZKpkGN+GKO7GjmfRwzyPCS/1ZfhKQyZBuDg==
-X-Received: by 2002:a05:6214:212b:b0:7f7:777e:39c5 with SMTP id 6a1803df08f44-8863af15e51mr447369506d6.25.1764671728783;
-        Tue, 02 Dec 2025 02:35:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHGEbGb2r6oAFr49aUac0U3SAzN0PPLJROZTPCjIXcuNk6VSBXpQXplvBnfUNVbCdUK5fRCMw==
-X-Received: by 2002:a05:6214:212b:b0:7f7:777e:39c5 with SMTP id 6a1803df08f44-8863af15e51mr447369246d6.25.1764671728422;
-        Tue, 02 Dec 2025 02:35:28 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:fa3:e4b0:95dc:ab11:92db:6f9e? ([2a01:e0a:fa3:e4b0:95dc:ab11:92db:6f9e])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88652b6851dsm100885856d6.42.2025.12.02.02.35.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Dec 2025 02:35:27 -0800 (PST)
-Message-ID: <0ceb3518-6eb2-4d0d-95c5-f926cce313ca@redhat.com>
-Date: Tue, 2 Dec 2025 11:35:25 +0100
+	s=arc-20240116; t=1764676266; c=relaxed/simple;
+	bh=lgksDGV3VJRcya5McuA/e8Esq2KIX/Dc3eb4iph/8P4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=F+X4Awj8SQSer861RavStvX78YvgJY9EGf3vGHEXk6L39zoSkg4uVHp50MlDO4Q74KjsBv3ZK3FVRqHGz2+EERj9qRhF6+yFVNj7X2GgAqkm4mgM04G21L4uhPIewYu76YpbDn734A9pckl1VM5e+MS9q92ECqDupPWrn1CRUuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=oRWBLFKl; arc=none smtp.client-ip=63.178.132.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1764676265; x=1796212265;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=KFJG4v1V23XNGxr101Iy6bR88wmMiiVy8jZ4JavjKdg=;
+  b=oRWBLFKltBtOvwOpM/9ktlnXk9sF22t+4jJzcvk2YDXbaf7pz11sPUi0
+   blfbiEobGffgCHeZ5GzqLay+alGgcQokdBuHf7YMaY3BKDLfbLtpzg9NM
+   uaRTr2ePydIZ+5joY05s2hqiRkoRRyqLRT+unJqhzmYfZ659ByljfyhAI
+   6IipIwf1Rk6OMQakvkS2JGe4KDWJMqM9ouygIK9Trf7OgHL9oT9gwwT5F
+   +xfdnPXsUnrEorgoDi4WGnhgr24GcNc4pbLyWX/CS9G4Hb2soL4jG41r9
+   JAboE897bOuhtToVnytmeFe7gxew+MCl573jKYbYeOrvtgObkRlnquYY9
+   w==;
+X-CSE-ConnectionGUID: ZfUcYgzQQUuMfJ3SHdBYRg==
+X-CSE-MsgGUID: vFh6YIAsTW6Teg9ZRJZHPA==
+X-IronPort-AV: E=Sophos;i="6.20,242,1758585600"; 
+   d="scan'208";a="6004691"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 11:50:45 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.225:1507]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.33.168:2525] with esmtp (Farcaster)
+ id 8ae9055c-a10c-49bd-84a1-a1fa87042f96; Tue, 2 Dec 2025 11:50:45 +0000 (UTC)
+X-Farcaster-Flow-ID: 8ae9055c-a10c-49bd-84a1-a1fa87042f96
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Tue, 2 Dec 2025 11:50:37 +0000
+Received: from [192.168.12.25] (10.106.83.17) by EX19D005EUB003.ant.amazon.com
+ (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Tue, 2 Dec 2025
+ 11:50:36 +0000
+Message-ID: <415a5956-1dec-4f10-be36-85f6d4d8f4b4@amazon.com>
+Date: Tue, 2 Dec 2025 11:50:31 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,102 +71,151 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 09/10] arm64: run at EL2 if supported
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v3 4/5] guest_memfd: add support for userfaultfd minor
+ mode
+To: Peter Xu <peterx@redhat.com>
+CC: "David Hildenbrand (Red Hat)" <david@kernel.org>, Mike Rapoport
+	<rppt@kernel.org>, <linux-mm@kvack.org>, Andrea Arcangeli
+	<aarcange@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, "Axel
+ Rasmussen" <axelrasmussen@google.com>, Baolin Wang
+	<baolin.wang@linux.alibaba.com>, Hugh Dickins <hughd@google.com>, "James
+ Houghton" <jthoughton@google.com>, "Liam R. Howlett"
+	<Liam.Howlett@oracle.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, "Sean
+ Christopherson" <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, "Suren
+ Baghdasaryan" <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20251130111812.699259-1-rppt@kernel.org>
+ <20251130111812.699259-5-rppt@kernel.org>
+ <652578cc-eeff-4996-8c80-e26682a57e6d@amazon.com>
+ <2d98c597-0789-4251-843d-bfe36de25bd2@kernel.org>
+ <553c64e8-d224-4764-9057-84289257cac9@amazon.com> <aS3f_PlxWLb-6NmR@x1.local>
+ <76e3d5bf-df73-4293-84f6-0d6ddabd0fd7@amazon.com> <aS4BVC42JiUT51rS@x1.local>
 Content-Language: en-US
-To: Joey Gouly <joey.gouly@arm.com>, kvm@vger.kernel.org
-Cc: alexandru.elisei@arm.com, andrew.jones@linux.dev, kvmarm@lists.linux.dev,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-References: <20250925141958.468311-1-joey.gouly@arm.com>
- <20250925141958.468311-10-joey.gouly@arm.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20250925141958.468311-10-joey.gouly@arm.com>
-Content-Type: text/plain; charset=UTF-8
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <aS4BVC42JiUT51rS@x1.local>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D015EUA002.ant.amazon.com (10.252.50.219) To
+ EX19D005EUB003.ant.amazon.com (10.252.51.31)
 
 
 
-On 9/25/25 4:19 PM, Joey Gouly wrote:
-> If VHE is supported, continue booting at EL2, otherwise continue booting at
-> EL1.
->
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+On 01/12/2025 20:57, Peter Xu wrote:
+> On Mon, Dec 01, 2025 at 08:12:38PM +0000, Nikita Kalyazin wrote:
+>>
+>>
+>> On 01/12/2025 18:35, Peter Xu wrote:
+>>> On Mon, Dec 01, 2025 at 04:48:22PM +0000, Nikita Kalyazin wrote:
+>>>> I believe I found the precise point where we convinced ourselves that minor
+>>>> support was sufficient: [1].  If at this moment we don't find that reasoning
+>>>> valid anymore, then indeed implementing missing is the only option.
+>>>>
+>>>> [1] https://lore.kernel.org/kvm/Z9GsIDVYWoV8d8-C@x1.local
+>>>
+>>> Now after I re-read the discussion, I may have made a wrong statement
+>>> there, sorry.  I could have got slightly confused on when the write()
+>>> syscall can be involved.
+>>>
+>>> I agree if you want to get an event when cache missed with the current uffd
+>>> definitions and when pre-population is forbidden, then MISSING trap is
+>>> required.  That is, with/without the need of UFFDIO_COPY being available.
+>>>
+>>> Do I understand it right that UFFDIO_COPY is not allowed in your case, but
+>>> only write()?
+>>
+>> No, UFFDIO_COPY would work perfectly fine.  We will still use write()
+>> whenever we resolve stage-2 faults as they aren't visible to UFFD.  When a
+>> userfault occurs at an offset that already has a page in the cache, we will
+>> have to keep using UFFDIO_CONTINUE so it looks like both will be required:
+>>
+>>   - user mapping major fault -> UFFDIO_COPY (fills the cache and sets up
+>> userspace PT)
+>>   - user mapping minor fault -> UFFDIO_CONTINUE (only sets up userspace PT)
+>>   - stage-2 fault -> write() (only fills the cache)
+> 
+> Is stage-2 fault about KVM_MEMORY_EXIT_FLAG_USERFAULT, per James's series?
 
-Eric
-> ---
->  arm/cstart64.S         | 17 +++++++++++++----
->  lib/arm64/asm/sysreg.h |  5 +++++
->  2 files changed, 18 insertions(+), 4 deletions(-)
->
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index 79b93dd4..af7c81c1 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -18,7 +18,7 @@
->  .macro init_el, tmp
->  	mrs	\tmp, CurrentEL
->  	cmp	\tmp, CurrentEL_EL2
-> -	b.ne	1f
-> +	b.ne	2f
->  	/* EL2 setup */
->  	mrs	\tmp, mpidr_el1
->  	msr	vmpidr_el2, \tmp
-> @@ -41,17 +41,26 @@
->  	msr_s	SYS_HFGWTR2_EL2, \tmp
->  	msr_s	SYS_HFGITR2_EL2, \tmp
->  .Lskip_fgt_\@:
-> +	/* check VHE is supported */
-> +	mrs	\tmp, ID_AA64MMFR1_EL1
-> +	ubfx	\tmp, \tmp, ID_AA64MMFR1_EL1_VH_SHIFT, #4
-> +	cbz	\tmp, 1f
-> +	ldr	\tmp, =(INIT_HCR_EL2)
-> +	msr	hcr_el2, \tmp
-> +	isb
-> +	b	2f
-> +1:
->  	mov	\tmp, #0
->  	msr	cptr_el2, \tmp
->  	ldr	\tmp, =(INIT_HCR_EL2_EL1_ONLY)
->  	msr	hcr_el2, \tmp
->  	mov	\tmp, PSR_MODE_EL1t
->  	msr	spsr_el2, \tmp
-> -	adrp	\tmp, 1f
-> -	add	\tmp, \tmp, :lo12:1f
-> +	adrp	\tmp, 2f
-> +	add	\tmp, \tmp, :lo12:2f
->  	msr	elr_el2, \tmp
->  	eret
-> -1:
-> +2:
->  .endm
->  
->  
-> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-> index ed776716..f2d05018 100644
-> --- a/lib/arm64/asm/sysreg.h
-> +++ b/lib/arm64/asm/sysreg.h
-> @@ -80,6 +80,8 @@ asm(
->  #define ID_AA64MMFR0_EL1_FGT_SHIFT	56
->  #define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
->  
-> +#define ID_AA64MMFR1_EL1_VH_SHIFT	8
-> +
->  #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
->  #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
->  #define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
-> @@ -116,9 +118,12 @@ asm(
->  #define SCTLR_EL1_TCF0_SHIFT	38
->  #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
->  
-> +#define HCR_EL2_TGE		_BITULL(27)
->  #define HCR_EL2_RW		_BITULL(31)
-> +#define HCR_EL2_E2H		_BITULL(34)
->  
->  #define INIT_HCR_EL2_EL1_ONLY	(HCR_EL2_RW)
-> +#define INIT_HCR_EL2		(HCR_EL2_TGE | HCR_EL2_E2H | HCR_EL2_RW)
->  
->  #define SYS_HFGRTR_EL2		sys_reg(3, 4, 1, 1, 4)
->  #define SYS_HFGWTR_EL2		sys_reg(3, 4, 1, 1, 5)
+Yes, that's the one ([1]).
+
+[1] 
+https://lore.kernel.org/kvm/20250618042424.330664-1-jthoughton@google.com
+
+> 
+> It looks fine indeed, but it looks slightly weird then, as you'll have two
+> ways to populate the page cache.  Logically here atomicity is indeed not
+> needed when you trap both MISSING + MINOR.
+
+I reran the test based on the UFFDIO_COPY prototype I had using your 
+series [2], and UFFDIO_COPY is slower than write() to populate 512 MiB: 
+237 vs 202 ms (+17%).  Even though UFFDIO_COPY alone is functionally 
+sufficient, I would prefer to have an option to use write() where 
+possible and only falling back to UFFDIO_COPY for userspace faults to 
+have better performance.
+
+[2] 
+https://lore.kernel.org/all/7666ee96-6f09-4dc1-8cb2-002a2d2a29cf@amazon.com
+
+> 
+>>
+>>>
+>>> One way that might work this around, is introducing a new UFFD_FEATURE bit
+>>> allowing the MINOR registration to trap all pgtable faults, which will
+>>> change the MINOR fault semantics.
+>>
+>> This would equally work for us.  I suppose this MINOR+MAJOR semantics would
+>> be more intrusive from the API point of view though.
+> 
+> Yes it is, it's just that I don't know whether it'll be harder when you
+> want to completely support UFFDIO_COPY here, per previous discussions.
+> 
+> After a 2nd thought, such UFFD_FEATURE is probably not a good design,
+> because it essentially means that feature bit will functionally overlap
+> with what MISSING trap was trying to do, however duplicating that concept
+> in a VMA that was registered as MINOR only.
+> 
+> Maybe it's possible instead if we allow a module to support MISSING trap,
+> but without supporting UFFDIO_COPY ioctl.
+> 
+> That is, the MISSING events will be properly generated if MISSING traps are
+> supported, however the module needs to provide its own way to resolve it if
+> UFFDIO_COPY ioctl isn't available.  Gmem is fine in this case as long as
+> it'll always be registered with both MISSING+MINOR traps, then resolving
+> using write()s would work.
+
+Yes, this would also work for me.  This is almost how it was 
+(accidentally) working until this version of the patches.  If this is a 
+lighter undertaking compared to implementing UFFDIO_COPY, I'd be happy 
+with it too.
+
+> 
+> Such would be possible when with something like my v3 previously:
+> 
+> https://lore.kernel.org/all/20250926211650.525109-1-peterx@redhat.com/#t
+> 
+> Then gmem needs to declare VM_UFFD_MISSING + VM_UFFD_MINOR in
+> uffd_features, but _UFFDIO_CONTINUE only (without _UFFDIO_COPY) in
+> uffd_ioctls.
+> 
+> Since Mike already took this series over, I'll leave that to you all to
+> decide.
+
+Thanks for you input, Peter.
+
+> 
+> --
+> Peter Xu
+> 
 
 
