@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-65125-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65126-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 044C5C9C148
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:04:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6749C9C14E
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:05:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84E5D3A80F2
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:04:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9879B3A9740
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222682820A4;
-	Tue,  2 Dec 2025 16:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04561274FDF;
+	Tue,  2 Dec 2025 16:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B5i9IucO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BN1iLS5f"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FF72765C4
-	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688CD248896
+	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764691459; cv=none; b=ZPowLO/X/aVN7li+mUG3DeyBt9v5zllRvgUUCggbHkWed60Fc/QuoFokp5w2LBzmV9FaESkPvbtG5cFydKf56C9fr3FXFdsQK06RT5zHxoiVjPmUw4Odhy/vhG0JKsW+AsnN/Vmw2YYuOxS/3I9sAZmqIeKPinf2JP5Y6BjKaDk=
+	t=1764691468; cv=none; b=DZ4u7xpj+4PhsXdPNSN0NsjALjIV+Gm7XZqWP6b5gFhjtbOUiUgw4350XCrvNXxaEZoXz27ngPK8iD/sqi7GFOxAU5cP/Kpk2qJm1wKzr2WMCYcCIX0VMDrYZzU5OUJ8lxBqAY3BY/Ch/ttA4/pJilZ6H+4WW6HUP5tbuBPeBwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764691459; c=relaxed/simple;
-	bh=FRrmV+SoZHgUnSI+cKxq36vwXjmiwjc/fhyRjGjnn8o=;
+	s=arc-20240116; t=1764691468; c=relaxed/simple;
+	bh=e4mdg7MHTyp2siZ7qIaL0Pyfd9suhc4f/nJUY1HSAmA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m95awz+Lsro+SjPmc1B2rCsH5TgAzjdhuz+S+UKFs/f7NxovUS9JtEu0mcOKoUL90DnZq04WHasIFqsnfhNKEbqPUywRpfEKH4q7yZuj7xWq+CMMzDz+Wkz5NnKMR+pFp6D6OXysB42fGbAY1WxbTmUBxZd/uBtMSHdaOxJL6xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B5i9IucO; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=dmF1MUfPEqvpzfFcb3EKLU8F3YOfd0tpP7eHGA2f0JnHdtpUUOy8taFtGyhepNdi6RLj1YhzFJ7yGBqlGiQo8u3AarkC3VncPGEIEep+7W6jqDejcHslCtCH7fzRlqq7HJ8fKCB01leYVlHaQq0qX26vfJK1oqci30qYl+er85w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BN1iLS5f; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764691458; x=1796227458;
+  t=1764691467; x=1796227467;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=FRrmV+SoZHgUnSI+cKxq36vwXjmiwjc/fhyRjGjnn8o=;
-  b=B5i9IucOQ7TrWImHsgexaE9gALd3vN85E2NbFayNJxo+8JqPEYNd/wZg
-   N+QmZgNreI39nWcRayprkYcRqP4mTkLMLE2CUgjfHKpQNg6T1e1GZ3Mqc
-   RNwWZZ7cuhxJGQvU2DEwz2R74HBOVidxmmS07oI7vESmLJx8mDQJ5PesH
-   jOyG161TYAxZsplZG61UP+mctp2HXZq6FanJciBiNJcxqp3D31W2Nnvg+
-   oKSf7iRKH9g5cClt0okXxQi0XDhvIP5dJ7sQb1ymA4tlgalar8axPWNOg
-   yr4hBm1W/2Pv24dHlGdHJwZrHpINQrKLDiR86QI5gbNjl9+1UR2O/99JR
-   g==;
-X-CSE-ConnectionGUID: +HksNYPsTt+KTkQKMxZDhQ==
-X-CSE-MsgGUID: MUHK1cpNTzSxt41Q6Z29MQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="92142230"
+  bh=e4mdg7MHTyp2siZ7qIaL0Pyfd9suhc4f/nJUY1HSAmA=;
+  b=BN1iLS5fuJVzPrRxDkZYtqW6F54+GPyi+OEOIX8UzJPdCV1koLIEe+Pt
+   Etbl/vhcOLi1XqVlceWcFcFG+iginCwlH1cAa/ZW6LZ6lrC6kHYyWHyCi
+   9gRQxz0w1vhktq8Vddc0+wEahevOi9Oy35IoT9o5wk8TnZlm3MNbZhoyt
+   KY6HENMvjBaRdT6UqHxVaGlUXFbLd0dU0JcaXmTEalhIdQo/Z6kcakv+0
+   axmAJyFgVjDodmemYJ08ZoXHSizq6bVw1dax3a6+XwMlkt+65WubZ1/P7
+   RC8gjCnxM7G+D/Sgj2DClJE/e1NTv/vlXyGJWrnjH2GCLOLi8Z4RZs/v8
+   A==;
+X-CSE-ConnectionGUID: i0F/WV/uQ1avau8W9ylmIw==
+X-CSE-MsgGUID: 6rriEPqtSgCHtQAyRYRcWQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="92142268"
 X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="92142230"
+   d="scan'208";a="92142268"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 08:04:17 -0800
-X-CSE-ConnectionGUID: 0S0hPeOORAazOXg5pbjX5w==
-X-CSE-MsgGUID: 5BNztvnKSCiMJIGY7vHGmw==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 08:04:26 -0800
+X-CSE-ConnectionGUID: UuxHKMjhRFmkTkj/MwEgmQ==
+X-CSE-MsgGUID: Ws8UnzFvTwONA3cAGiGF4Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="199536907"
+   d="scan'208";a="199536935"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa005.jf.intel.com with ESMTP; 02 Dec 2025 08:04:08 -0800
+  by orviesa005.jf.intel.com with ESMTP; 02 Dec 2025 08:04:17 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
@@ -100,9 +100,9 @@ Cc: qemu-devel@nongnu.org,
 	Peter Krempa <pkrempa@redhat.com>,
 	Jiri Denemark <jdenemar@redhat.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v5 01/28] hw/i386/pc: Remove deprecated pc-q35-2.6 and pc-i440fx-2.6 machines
-Date: Wed,  3 Dec 2025 00:28:08 +0800
-Message-Id: <20251202162835.3227894-2-zhao1.liu@intel.com>
+Subject: [PATCH v5 02/28] tests/acpi: Allow DSDT table change for x86 machines
+Date: Wed,  3 Dec 2025 00:28:09 +0800
+Message-Id: <20251202162835.3227894-3-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251202162835.3227894-1-zhao1.liu@intel.com>
 References: <20251202162835.3227894-1-zhao1.liu@intel.com>
@@ -112,73 +112,72 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Philippe Mathieu-Daudé <philmd@linaro.org>
+From: Igor Mammedov <imammedo@redhat.com>
 
-These machines has been supported for a period of more than 6 years.
-According to our versioned machine support policy (see commit
-ce80c4fa6ff "docs: document special exception for machine type
-deprecation & removal") they can now be removed.
+Before dropping legacy CPU hotplug code, mark and allow the affected
+ACPI tables, to avoid breaking ACPI table testing.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/i386/pc_piix.c | 14 --------------
- hw/i386/pc_q35.c  | 14 --------------
- 2 files changed, 28 deletions(-)
+Changes since v4:
+ * New patch split off from Igor's v5 [*].
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 7b3611e973cd..4628d491d5b5 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -733,20 +733,6 @@ static void pc_i440fx_machine_2_7_options(MachineClass *m)
- 
- DEFINE_I440FX_MACHINE(2, 7);
- 
--static void pc_i440fx_machine_2_6_options(MachineClass *m)
--{
--    X86MachineClass *x86mc = X86_MACHINE_CLASS(m);
--    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
--
--    pc_i440fx_machine_2_7_options(m);
--    pcmc->legacy_cpu_hotplug = true;
--    x86mc->fwcfg_dma_enabled = false;
--    compat_props_add(m->compat_props, hw_compat_2_6, hw_compat_2_6_len);
--    compat_props_add(m->compat_props, pc_compat_2_6, pc_compat_2_6_len);
--}
--
--DEFINE_I440FX_MACHINE(2, 6);
--
- #ifdef CONFIG_XEN
- static void xenfv_machine_4_2_options(MachineClass *m)
- {
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 6015e639d7bc..0ae19eb9f1e4 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -681,17 +681,3 @@ static void pc_q35_machine_2_7_options(MachineClass *m)
- }
- 
- DEFINE_Q35_MACHINE(2, 7);
--
--static void pc_q35_machine_2_6_options(MachineClass *m)
--{
--    X86MachineClass *x86mc = X86_MACHINE_CLASS(m);
--    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
--
--    pc_q35_machine_2_7_options(m);
--    pcmc->legacy_cpu_hotplug = true;
--    x86mc->fwcfg_dma_enabled = false;
--    compat_props_add(m->compat_props, hw_compat_2_6, hw_compat_2_6_len);
--    compat_props_add(m->compat_props, pc_compat_2_6, pc_compat_2_6_len);
--}
--
--DEFINE_Q35_MACHINE(2, 6);
+[*]: https://lore.kernel.org/qemu-devel/20251031142825.179239-1-imammedo@redhat.com/
+---
+ tests/qtest/bios-tables-test-allowed-diff.h | 42 +++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8bf4..eed8ded69335 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,43 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/x86/pc/DSDT",
++"tests/data/acpi/x86/pc/DSDT.bridge",
++"tests/data/acpi/x86/pc/DSDT.ipmikcs",
++"tests/data/acpi/x86/pc/DSDT.cphp",
++"tests/data/acpi/x86/pc/DSDT.numamem",
++"tests/data/acpi/x86/pc/DSDT.nohpet",
++"tests/data/acpi/x86/pc/DSDT.memhp",
++"tests/data/acpi/x86/pc/DSDT.dimmpxm",
++"tests/data/acpi/x86/pc/DSDT.acpihmat",
++"tests/data/acpi/x86/pc/DSDT.acpierst",
++"tests/data/acpi/x86/pc/DSDT.roothp",
++"tests/data/acpi/x86/pc/DSDT.hpbridge",
++"tests/data/acpi/x86/pc/DSDT.hpbrroot",
++"tests/data/acpi/x86/q35/DSDT",
++"tests/data/acpi/x86/q35/DSDT.tis.tpm2",
++"tests/data/acpi/x86/q35/DSDT.tis.tpm12",
++"tests/data/acpi/x86/q35/DSDT.bridge",
++"tests/data/acpi/x86/q35/DSDT.noacpihp",
++"tests/data/acpi/x86/q35/DSDT.multi-bridge",
++"tests/data/acpi/x86/q35/DSDT.ipmibt",
++"tests/data/acpi/x86/q35/DSDT.cphp",
++"tests/data/acpi/x86/q35/DSDT.numamem",
++"tests/data/acpi/x86/q35/DSDT.nohpet",
++"tests/data/acpi/x86/q35/DSDT.acpihmat-noinitiator",
++"tests/data/acpi/x86/q35/DSDT.acpihmat-generic-x",
++"tests/data/acpi/x86/q35/DSDT.memhp",
++"tests/data/acpi/x86/q35/DSDT.dimmpxm",
++"tests/data/acpi/x86/q35/DSDT.acpihmat",
++"tests/data/acpi/x86/q35/DSDT.mmio64",
++"tests/data/acpi/x86/q35/DSDT.acpierst",
++"tests/data/acpi/x86/q35/DSDT.applesmc",
++"tests/data/acpi/x86/q35/DSDT.pvpanic-isa",
++"tests/data/acpi/x86/q35/DSDT.ivrs",
++"tests/data/acpi/x86/q35/DSDT.type4-count",
++"tests/data/acpi/x86/q35/DSDT.core-count",
++"tests/data/acpi/x86/q35/DSDT.core-count2",
++"tests/data/acpi/x86/q35/DSDT.thread-count",
++"tests/data/acpi/x86/q35/DSDT.thread-count2",
++"tests/data/acpi/x86/q35/DSDT.viot",
++"tests/data/acpi/x86/q35/DSDT.cxl",
++"tests/data/acpi/x86/q35/DSDT.ipmismbus",
++"tests/data/acpi/x86/q35/DSDT.xapic",
 -- 
 2.34.1
 
