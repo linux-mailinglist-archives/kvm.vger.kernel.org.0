@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-65145-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65146-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE0B6C9C20B
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:10:44 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D5CC9C1CF
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 17:08:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B883B3AB8CE
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:07:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3043D34A3EF
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 16:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1198B27BF7D;
-	Tue,  2 Dec 2025 16:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0F8274B4D;
+	Tue,  2 Dec 2025 16:07:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hYDv1UEP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T02AikvO"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C080B274B4D
-	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF92274FDF
+	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 16:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764691639; cv=none; b=n5RylbmZapUdzrE9M2tHzlGpLmGBGgMumw0SLZxm83Q8g5jI/Y2+0K1xT/pBKOBwDTWy8Kbou9o3sI9smDB2cjZWJoOdqPcVrmfRghSr5A8tSpLgFhBRa7LX4GId2zZHC9rYArt6jr0In+h7Efivy7NZcBaGEr2BBCPD/dhabt0=
+	t=1764691647; cv=none; b=TysAKZb/u9fmGwYcXb4VJpa4gEFowzaJ0Mv1ySB6STUzFqrdO/wZ/bFtZgnHEO5V8rp/JChqTS/9Zd5Mx+G8264S1YLxGDbuWcUAKah8jMTwG/vP4aQujRxRb/etLOoiyiQCF2cdDuRr+hybRatjAVBgeMJwQV96ub90E6i0UC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764691639; c=relaxed/simple;
-	bh=k8INMRrzuyLQQp4oMJ+9rmpApu+HgUvEkADnGJpgMhs=;
+	s=arc-20240116; t=1764691647; c=relaxed/simple;
+	bh=9MQ564lwxpG6Oxxv/mdUg6vGcM3PGFMBsD8Z/3CykmQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RDWVeo8XuVuNW688IsnIS8jHa/QNfoz2VFjrsfqOBkZrEAW3xGVGzGjB+6yycfZadZiexd8qePT4OIJfeu5fEb/JO+Zrhom7H6NTTCNM3FrYnE0exb0OA2S7bQ1Alm9sWnshp+GKzICmtycVHRs36Jqg29EysAwPfgzv+fc8I6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hYDv1UEP; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version:Content-Type; b=G6rPlc4mBj05KWGvAEYLIlBtukNiHYl/fDo2vBZUPS6xKlER/D7ShFawVSL+8vEqDd+VPUHyNPxsegTrP0oPGuDwsefcby2VLcmJg4JF/SMZWXZiIezrilzV3NlaruYl47VN05pEMNGBivHoarA2qNzGCK0DfFdh0/61fzrDVsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T02AikvO; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764691638; x=1796227638;
+  t=1764691647; x=1796227647;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=k8INMRrzuyLQQp4oMJ+9rmpApu+HgUvEkADnGJpgMhs=;
-  b=hYDv1UEPOCAOnyNJWrlAW5Zg32fivtzx7cLp3rAZdLuRRv3ILF77Uv+s
-   YtmCvRUeubX3skePQoz1nvpeFboWHPbfNcv9eTUf4oGq15FtGQyu+1CwL
-   9UUvaWflfFCLaY9UIR25Q5luCbl9iHOYt60Isn/n6ExcRnQ6wkGmKGzR7
-   +AneoFax8pubcI74ioBdY4S+cDbG+NjIWRj8+i0MHYfN5S4YXuZqbbzLJ
-   cnQMiYp6ZfKimcNV28iOJ0JyG0G2FM6DLhgUpeYwOVaqYz7cJpufpbyNH
-   j9I0Iibs7LNXG+b32IhcizWdRZ7irlVBh46uW+g5DO4Ph2j7tRBtDTSWS
-   g==;
-X-CSE-ConnectionGUID: ZU8bZqlESyGHNxFAij7omw==
-X-CSE-MsgGUID: 5hyW1JuaQq+juAO6rKehFw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="92142893"
+  bh=9MQ564lwxpG6Oxxv/mdUg6vGcM3PGFMBsD8Z/3CykmQ=;
+  b=T02AikvOH7kWQKPmt3yTnhEFMRBNOf+qSI3hpmklTi8DuWmkRLLTzS2W
+   HX6RY9hn3Yyx/WJc+5seSNe92vG3kBsruJI8nR5aZq5ya1vMt/7l1+1eD
+   Lm/u3tJyuyWZBWsxrVT9R/zOQcLvrZO6fLkYRvUV1M/zlv+JB+47rAz9b
+   CMXakJZ84D9sp+E5218Or3tjY2LeV/bYr6HuKWABRHfyAWYAadgDC7VPd
+   xT7NWS7jm6X1vzGQ+wG8P6FUZe/esrID2NvxNAqav85+53HZMi7snj9Fj
+   CKsIDGdIMZO11GCfFsJrtD37F6CeJw2n56oA/ZMGg6VN5eSTC3bBHGonq
+   Q==;
+X-CSE-ConnectionGUID: A6lRuFZ4SyWt5Qu5dj1WVw==
+X-CSE-MsgGUID: pT2prfpsQH6HZe3bV6YJFQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="92142916"
 X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="92142893"
+   d="scan'208";a="92142916"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 08:07:17 -0800
-X-CSE-ConnectionGUID: PMSeMG/eQA2gc5j1hByEJQ==
-X-CSE-MsgGUID: CTkbDNKCTweaY3GljCvsug==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 08:07:26 -0800
+X-CSE-ConnectionGUID: BZzKIC5GRUewhmRb2+GGNg==
+X-CSE-MsgGUID: +DrUXJVsTFOXx4l0ZMbwfA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="199537825"
+   d="scan'208";a="199537860"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa005.jf.intel.com with ESMTP; 02 Dec 2025 08:07:08 -0800
+  by orviesa005.jf.intel.com with ESMTP; 02 Dec 2025 08:07:17 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
@@ -100,9 +100,9 @@ Cc: qemu-devel@nongnu.org,
 	Peter Krempa <pkrempa@redhat.com>,
 	Jiri Denemark <jdenemar@redhat.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v5 21/28] hw/i386/pc: Remove deprecated pc-q35-2.7 and pc-i440fx-2.7 machines
-Date: Wed,  3 Dec 2025 00:28:28 +0800
-Message-Id: <20251202162835.3227894-22-zhao1.liu@intel.com>
+Subject: [PATCH v5 22/28] hw/i386/pc: Remove pc_compat_2_7[] array
+Date: Wed,  3 Dec 2025 00:28:29 +0800
+Message-Id: <20251202162835.3227894-23-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251202162835.3227894-1-zhao1.liu@intel.com>
 References: <20251202162835.3227894-1-zhao1.liu@intel.com>
@@ -117,84 +117,54 @@ Content-Transfer-Encoding: 8bit
 
 From: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-These machines has been supported for a period of more than 6 years.
-According to our versioned machine support policy (see commit
-ce80c4fa6ff "docs: document special exception for machine type
-deprecation & removal") they can now be removed.  Remove the qtest
-in test-x86-cpuid-compat.c file.
+The pc_compat_2_7[] array was only used by the pc-q35-2.7
+and pc-i440fx-2.7 machines, which got removed. Remove it.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/i386/pc_piix.c                   |  9 ---------
- hw/i386/pc_q35.c                    | 10 ----------
- tests/qtest/test-x86-cpuid-compat.c | 11 -----------
- 3 files changed, 30 deletions(-)
+ hw/i386/pc.c         | 10 ----------
+ include/hw/i386/pc.h |  3 ---
+ 2 files changed, 13 deletions(-)
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 4628d491d5b5..6b3bfb679a38 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -724,15 +724,6 @@ static void pc_i440fx_machine_2_8_options(MachineClass *m)
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 85d12f8d0389..b88030bf50d0 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -253,16 +253,6 @@ GlobalProperty pc_compat_2_8[] = {
+ };
+ const size_t pc_compat_2_8_len = G_N_ELEMENTS(pc_compat_2_8);
  
- DEFINE_I440FX_MACHINE(2, 8);
+-GlobalProperty pc_compat_2_7[] = {
+-    { TYPE_X86_CPU, "l3-cache", "off" },
+-    { TYPE_X86_CPU, "full-cpuid-auto-level", "off" },
+-    { "Opteron_G3" "-" TYPE_X86_CPU, "family", "15" },
+-    { "Opteron_G3" "-" TYPE_X86_CPU, "model", "6" },
+-    { "Opteron_G3" "-" TYPE_X86_CPU, "stepping", "1" },
+-    { "isa-pcspk", "migrate", "off" },
+-};
+-const size_t pc_compat_2_7_len = G_N_ELEMENTS(pc_compat_2_7);
+-
+ /*
+  * @PC_FW_DATA:
+  * Size of the chunk of memory at the top of RAM for the BIOS ACPI tables
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index f8f317aee197..accd08cb666b 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -292,9 +292,6 @@ extern const size_t pc_compat_2_9_len;
+ extern GlobalProperty pc_compat_2_8[];
+ extern const size_t pc_compat_2_8_len;
  
--static void pc_i440fx_machine_2_7_options(MachineClass *m)
--{
--    pc_i440fx_machine_2_8_options(m);
--    compat_props_add(m->compat_props, hw_compat_2_7, hw_compat_2_7_len);
--    compat_props_add(m->compat_props, pc_compat_2_7, pc_compat_2_7_len);
--}
+-extern GlobalProperty pc_compat_2_7[];
+-extern const size_t pc_compat_2_7_len;
 -
--DEFINE_I440FX_MACHINE(2, 7);
--
- #ifdef CONFIG_XEN
- static void xenfv_machine_4_2_options(MachineClass *m)
- {
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 0ae19eb9f1e4..0de8305308a1 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -671,13 +671,3 @@ static void pc_q35_machine_2_8_options(MachineClass *m)
- }
- 
- DEFINE_Q35_MACHINE(2, 8);
--
--static void pc_q35_machine_2_7_options(MachineClass *m)
--{
--    pc_q35_machine_2_8_options(m);
--    m->max_cpus = 255;
--    compat_props_add(m->compat_props, hw_compat_2_7, hw_compat_2_7_len);
--    compat_props_add(m->compat_props, pc_compat_2_7, pc_compat_2_7_len);
--}
--
--DEFINE_Q35_MACHINE(2, 7);
-diff --git a/tests/qtest/test-x86-cpuid-compat.c b/tests/qtest/test-x86-cpuid-compat.c
-index 456e2af66572..5e0547e81b7b 100644
---- a/tests/qtest/test-x86-cpuid-compat.c
-+++ b/tests/qtest/test-x86-cpuid-compat.c
-@@ -345,17 +345,6 @@ int main(int argc, char **argv)
- 
-     /* Check compatibility of old machine-types that didn't
-      * auto-increase level/xlevel/xlevel2: */
--    if (qtest_has_machine("pc-i440fx-2.7")) {
--        add_cpuid_test("x86/cpuid/auto-level/pc-2.7",
--                       "486", "arat=on,avx512vbmi=on,xsaveopt=on",
--                       "pc-i440fx-2.7", "level", 1);
--        add_cpuid_test("x86/cpuid/auto-xlevel/pc-2.7",
--                       "486", "3dnow=on,sse4a=on,invtsc=on,npt=on,svm=on",
--                       "pc-i440fx-2.7", "xlevel", 0);
--        add_cpuid_test("x86/cpuid/auto-xlevel2/pc-2.7",
--                       "486", "xstore=on", "pc-i440fx-2.7",
--                       "xlevel2", 0);
--    }
-     if (qtest_has_machine("pc-i440fx-2.9")) {
-         add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-2.9/off",
-                        "Conroe", NULL, "pc-i440fx-2.9",
+ #define DEFINE_PC_MACHINE(suffix, namestr, initfn, optsfn) \
+     static void pc_machine_##suffix##_class_init(ObjectClass *oc, \
+                                                  const void *data) \
 -- 
 2.34.1
 
