@@ -1,125 +1,218 @@
-Return-Path: <kvm+bounces-65177-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65178-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81419C9D1C3
-	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 22:42:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C0AC9D226
+	for <lists+kvm@lfdr.de>; Tue, 02 Dec 2025 23:01:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2B112348870
-	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 21:42:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC1673A7ADD
+	for <lists+kvm@lfdr.de>; Tue,  2 Dec 2025 22:01:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49312F90CD;
-	Tue,  2 Dec 2025 21:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8A52FB601;
+	Tue,  2 Dec 2025 22:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="Op5VRHid"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OZdwtHGo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D4E2EC086
-	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 21:41:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25DF2F49FE
+	for <kvm@vger.kernel.org>; Tue,  2 Dec 2025 22:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764711716; cv=none; b=FwOwb8yuvcTocD+70n1sRJ9g8XJEar7yHToVclSV0WzU7m7CgriYuJQXJC70AFvtaNiAjnZH/knXWCth/BgJuby/0m406Z5rIHPv9k7H08TkkflZrZhpacTwGf25UeAoFdEnPO5h7fmO8xHlUWeblcukNYqXz/xyCuuvlQ4HMNw=
+	t=1764712870; cv=none; b=WgHjf9UMfSbcOD47Xp3255h8UchcrnixCPhEyzUlgBnEuBZ9QkoHTH+1KFmXJcdYdM+oEG5s2lU2rq2WYoyWfovYvS7LJlVfgqCexelomLuBNCpm0Xbe0b/v/oFtPKbogYGen6ig7r+5WpJGx/nZ1SOABMP1UQHh5U3BuIfDQf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764711716; c=relaxed/simple;
-	bh=bK1bgqioLqPqNCUbFDzXCG7JyoMoUTbDQKJcABIxh2w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XlpL576HEMDNGvT/7dz1lfY+NWbrk5tf4KkRy5QzuTmfzjGYVpOlY8TKqJgophBKrJaJttFwMPyHhBL5HqJ4FtaewtEPNrS6KiBiPzpA0gsF9Y3Gfb1gZqA4WI8vlwxAeDuaD+yhcp4FJFaNNd18jtYXGJqwPyyZJScJDDDGNrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com; spf=pass smtp.mailfrom=soleen.com; dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b=Op5VRHid; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-640c1fda178so11261652a12.1
-        for <kvm@vger.kernel.org>; Tue, 02 Dec 2025 13:41:54 -0800 (PST)
+	s=arc-20240116; t=1764712870; c=relaxed/simple;
+	bh=Mqnyzq/dHBpiYdG/Xt/TKvJXJMP8zWCEKc3fUG6Hw0E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cN6R0q2Swx819ddCqFixNwJwHLsTl9wi8lpPydX+saZAFgAd4Ryz9u5RAqOgI6LP7GhZpmUR4vsGVEKF3AhFVeeu4ogJ68aH8rttZd85YMIgIlbgvIB6fEyFC8cYe1XFUq+/ipn+RjChjgavZ2r691LmEvwqVJ+vwN5AiFIQFKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OZdwtHGo; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-78802ac2296so54764007b3.3
+        for <kvm@vger.kernel.org>; Tue, 02 Dec 2025 14:01:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1764711713; x=1765316513; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BBy8J1XDJHjmvX+Es4TFPSfzkazm1BSKmXhHEtk+CP0=;
-        b=Op5VRHid8eH8ab8VEX0QPXgsFu0URtp8bXZp/H8ljdQMHABjoPeqMIU6h/A5GYp09O
-         KZ5CJiq1zG2ZcYTiSuZL8G0HA7ePok6V34mVi4UsUQK1mZxHsBufcTh95QTs0z2ihO9K
-         tul2bvvQ5hdy8L1+JKgxMlJ+AOV2OxXlnOLcOjQ+85y1ot0k98PVhHPZiiqQMk6K08n6
-         WNGL8ukYm6/qJrI6EynDO9OHFaoqeIRrK7YKnrvMut71cFGvIs9qYblyM7l6+yODBLjJ
-         f+kzAAZBOXpVBv2JJwnoBkpwjQTpeE7PG0BVbxTnw1VjhZV5e9z3joJfWgH9xun4FFo2
-         zWYg==
+        d=gmail.com; s=20230601; t=1764712867; x=1765317667; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xNqIfgM/6Ycxql9GvTaW4xpHm2HTdtIqMIBvJdvraLU=;
+        b=OZdwtHGonB3nfffkr6VAZVqTIoL0VKHhfYC1cJqS0rCeHHRluRmORfZVjQF/E0Bl8B
+         juTo9aHbJQD6Z6xYYDtXvIrZ1KnlWq+hwurM/QVZXIwILYNpOJ+RnjyUQPZ9pKT2VG8j
+         q3i1E6ktebX+xrSHYTvMS8kiIXOjRBmOfrAsVoyRy4Uoz/Gcf+HV4+pv5WGZb7w/rIZh
+         Z7WhLAzWkGHmsY+zruBZ3j23y8vxHGrsKrz5C9z5I5sjtlWzZRXIDXqUKsurQftDMKMo
+         wRufIxC/i/+ldxbYSsAv9iyUCNXvLjDXXN12gqkqHSnnA6tbI8z6kFBr8ctD5V7bleYF
+         BUXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764711713; x=1765316513;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BBy8J1XDJHjmvX+Es4TFPSfzkazm1BSKmXhHEtk+CP0=;
-        b=kYBG4nBfdmvaDqDRNtObtYMw+0X+w7mkbdz1PUZ8s1PQLkZ9GidKMgVpTUsFGZdojg
-         kqL15FV7i+JART7U0PRPb/ty2xxw6P6y2JEYGdxzzKfilm0DNHJwuN36Wfkb671cqoMi
-         TawCyzFN1PaB91Fmiqx5hXZNu/O8W5Pjjh94VgMu9MYkdorxkqEZYejkcrkEajNmRrf+
-         c55YZGoR/P4Tb8D4H7Jdih2380I92mR6OJ+f540UZl1t++FraaXWDshCIugWZcOti7JK
-         7BKjOfgyJbHDXKIt02ck6jsdbl6zz6xYILvUdLGegvDCjgLLW3K5HL0BglylgtGwWuJX
-         2PNw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhQem8JITVmp46VLjCnNR2sfYe873FUC4FPPZgCmBHshD9h+TzW/UbA0tLw0y3mt/gP/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1Y8CQps1xYLXUvmGNjDJaOChpORtL3Ktu4b7NeGYdyYe+3eu+
-	otfR9LTNYmhe6eudblyxCdVyH3fBNisEzd7HQ8PbRI6vpkuljk+1fnJZD9z3qAfW0Iaaxo3vEj6
-	F5vsmdejGf3MxCXdb0Fhs6Q05KhCGY6l9yrpyMFp7Qw==
-X-Gm-Gg: ASbGncs80OJaM32znCFAsxq1q8w3V4c0bDpTPj8eFX6V/Ax31Dcv17L3lu6E9n6Bxeq
-	wfRxcgwUeSrZDFjYaNFv6bdJqKuJ9MeiGfI4uTL6DS3hIgMK5VEB2yeI8oiPSlsATI9jCQCddb3
-	svZWozpmYMOykyYiVnceJbjiW7YFUhrhQeTiyZe5hX2kSu7wZ2HzMKMiD0EQNz9jrMF4hPEMaTn
-	7fyo3vcUDZsEBWT+3sfqjp8KfBQYVey+z31Xr4Uf9pFZ5IhqAAC/6q3MpvGcuURZe846V1KEcvE
-	AnQ=
-X-Google-Smtp-Source: AGHT+IHWLpn7rUj8mxZXJ9rMfRKD6U7DeusV73jTTRLFZkQI3y5z61JVyECIWb2QWdSzz1X1Lv1zjhKD+XOAMt/wgfo=
-X-Received: by 2002:a05:6402:455b:b0:643:129f:9d8e with SMTP id
- 4fb4d7f45d1cf-64794f33cc3mr841742a12.8.1764711712986; Tue, 02 Dec 2025
- 13:41:52 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764712867; x=1765317667;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xNqIfgM/6Ycxql9GvTaW4xpHm2HTdtIqMIBvJdvraLU=;
+        b=XLfStLR4M3yK/y1h9cIVWjHYVDduspKmb2jFa4HHDHXIiDFiIS3fROeDG+POqdOuwZ
+         h92lffiEX28sIF40W4lriWoZBJHgDd3SnrAIk+pTErlqhP4ypOVFmge42Zv5zgGYcW4+
+         RdaSrZSGutsJXNuYLVvqEoepcfXaxjbOAssZrO+p9I1NniV1JDQ7lbXk09u0IxHUwBO8
+         ymdtpOL76WC1Yj5GwonIAWVmpHTNhTOtDdboxUBVFEG7mC84sihE547EgBZ73yWQih93
+         wLAx10upnN5fTWNtoLJZnVvOMYHlXGgLG65ESu6DG93IIpqhaD9B5yG+46mdHGbEyuqR
+         OR2A==
+X-Forwarded-Encrypted: i=1; AJvYcCUVohO1+8+VRyVEz5jSUhFUngShWKEgnkgbexNqyE9m88IcYuEbbZz+GLNkw3pXKwKDHP8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwV5j8ztQ5u0o5iyiDD4xvvzAu6FXwR/cJMnbTjQy9Jb1KJQces
+	E8bEQ3sL2YlCZ5ubfFBUDwk2mGyjAC2NWELJeE1kR4fHZiFWMQwMZaVf
+X-Gm-Gg: ASbGncsyUDs91piWfoVV3Wrw6ttiPNdN8FDvrqCrYVbfbSWKc5CZk8+G2Bm8VJCBBNf
+	mT0fbOnbB/qcbIKQprMEvyb6VIw/63wqi7/CGztkNPRwCYy9Pm1h4U4omqrZB/4ie0UqT1HUtlz
+	JrzgoRcDlL4r4AKTc6SbTuFcaRRrQzXZp5L23jKzXJbmxQ7OjtJdg7tXo+3QE1xiBPZ/m6s4AmU
+	C6pq1+uS/QtU8v7npZYlaWX+aobli+WVuC4VJjD5E7eobJC7x107unM6j2PBUUlFGe3sVHXn95U
+	MFdTdN0vCBqZ5KkgJjSQYLcA/m4JYKBe0AzqjQwaHAeY451J5CqoKO0fqTJfPGASEmK6/LiIUkt
+	dzZcAWewXs5TB/zuqWIts16pleEEEPPN10dbHpku7Vwzg4fTgapgeix4LEMICgDtXlTibiCSTyZ
+	bWZIUfXEueO4Q66NhKAkicW6Os5l+9n9bggZZTZTU0JC2b4GI=
+X-Google-Smtp-Source: AGHT+IFKkR9nJxuAswYbUkRmscuBgN9zjQIp6HaO2rufMd5Ab/1ylKT04Hn5ts4J77BDYWjQzLjRWg==
+X-Received: by 2002:a05:690c:6206:b0:788:e74:b281 with SMTP id 00721157ae682-78c0beafabamr1238977b3.13.1764712866608;
+        Tue, 02 Dec 2025 14:01:06 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:5d::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78ad0d3f5a1sm67446487b3.12.2025.12.02.14.01.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Dec 2025 14:01:06 -0800 (PST)
+Date: Tue, 2 Dec 2025 14:01:04 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, berrange@redhat.com,
+	Sargun Dhillon <sargun@sargun.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v12 04/12] vsock: add netns support to virtio
+ transports
+Message-ID: <aS9hoOKb7yA5Qgod@devvm11784.nha0.facebook.com>
+References: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
+ <20251126-vsock-vmtest-v12-4-257ee21cd5de@meta.com>
+ <6cef5a68-375a-4bb6-84f8-fccc00cf7162@redhat.com>
+ <aS8oMqafpJxkRKW5@devvm11784.nha0.facebook.com>
+ <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251126193608.2678510-1-dmatlack@google.com> <CA+CK2bC3EgL5r7myENVgJ9Hq2P9Gz0axnNqy3e6E_YKVRM=-ng@mail.gmail.com>
- <86bjkhm0tp.fsf@kernel.org> <CALzav=es=RKMsRUdpX03m+2Eq4SVxPZSZuy1fLXV+dv=rhDhaw@mail.gmail.com>
-In-Reply-To: <CALzav=es=RKMsRUdpX03m+2Eq4SVxPZSZuy1fLXV+dv=rhDhaw@mail.gmail.com>
-From: Pasha Tatashin <pasha.tatashin@soleen.com>
-Date: Tue, 2 Dec 2025 16:41:15 -0500
-X-Gm-Features: AWmQ_bnrPyeCqV6AbWIFTsaIoktB-kTeS5xKZG_PhpHyIHste-GfTWjRKtK6tnk
-Message-ID: <CA+CK2bBWB_+SOf6EgFm0nfovQd0-KPHQCRkqbWWTq4Yx2wAL7A@mail.gmail.com>
-Subject: Re: [PATCH 00/21] vfio/pci: Base support to preserve a VFIO device
- file across Live Update
-To: David Matlack <dmatlack@google.com>
-Cc: Pratyush Yadav <pratyush@kernel.org>, Alex Williamson <alex@shazbot.org>, 
-	Adithya Jayachandran <ajayachandra@nvidia.com>, Alex Mastro <amastro@fb.com>, 
-	Alistair Popple <apopple@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>, 
-	David Rientjes <rientjes@google.com>, Jacob Pan <jacob.pan@linux.microsoft.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Josh Hilke <jrhilke@google.com>, 
-	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
-	Leon Romanovsky <leonro@nvidia.com>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-pci@vger.kernel.org, 
-	Lukas Wunner <lukas@wunner.de>, Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>, 
-	Philipp Stanner <pstanner@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, Shuah Khan <shuah@kernel.org>, 
-	Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>, William Tu <witu@nvidia.com>, 
-	Yi Liu <yi.l.liu@intel.com>, Yunxiang Li <Yunxiang.Li@amd.com>, 
-	Zhu Yanjun <yanjun.zhu@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
 
-> > >> FLB Retrieving
-> > >>
-> > >>   The first patch of this series includes a fix to prevent an FLB from
-> > >>   being retrieved again it is finished. I am wondering if this is the
-> > >>   right approach or if subsystems are expected to stop calling
-> > >>   liveupdate_flb_get_incoming() after an FLB is finished.
-> >
-> > IMO once the FLB is finished, LUO should make sure it cannot be
-> > retrieved, mainly so subsystem code is simpler and less bug-prone.
->
-> +1, and I think Pasha is going to do that in the next version of FLB.
+On Tue, Dec 02, 2025 at 09:47:19PM +0100, Paolo Abeni wrote:
+> On 12/2/25 6:56 PM, Bobby Eshleman wrote:
+> > On Tue, Dec 02, 2025 at 11:18:14AM +0100, Paolo Abeni wrote:
+> >> On 11/27/25 8:47 AM, Bobby Eshleman wrote:
+> >>> @@ -674,6 +689,17 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
+> >>>  		goto out;
+> >>>  	}
+> >>>  
+> >>> +	net = current->nsproxy->net_ns;
+> >>> +	vsock->net = get_net_track(net, &vsock->ns_tracker, GFP_KERNEL);
+> >>> +
+> >>> +	/* Store the mode of the namespace at the time of creation. If this
+> >>> +	 * namespace later changes from "global" to "local", we want this vsock
+> >>> +	 * to continue operating normally and not suddenly break. For that
+> >>> +	 * reason, we save the mode here and later use it when performing
+> >>> +	 * socket lookups with vsock_net_check_mode() (see vhost_vsock_get()).
+> >>> +	 */
+> >>> +	vsock->net_mode = vsock_net_mode(net);
+> >>
+> >> I'm sorry for the very late feedback. I think that at very least the
+> >> user-space needs a way to query if the given transport is in local or
+> >> global mode, as AFAICS there is no way to tell that when socket creation
+> >> races with mode change.
+> > 
+> > Are you thinking something along the lines of sockopt?
+> 
+> I'd like to see a way for the user-space to query the socket 'namespace
+> mode'.
+> 
+> sockopt could be an option; a possibly better one could be sock_diag. Or
+> you could do both using dumping the info with a shared helper invoked by
+> both code paths, alike what TCP is doing.
+> >> Also I'm a bit uneasy with the model implemented here, as 'local' socket
+> >> may cross netns boundaris and connect to 'local' socket in other netns
+> >> (if I read correctly patch 2/12). That in turns AFAICS break the netns
+> >> isolation.
+> > 
+> > Local mode sockets are unable to communicate with local mode (and global
+> > mode too) sockets that are in other namespaces. The key piece of code
+> > for that is vsock_net_check_mode(), where if either modes is local the
+> > namespaces must be the same.
+> 
+> Sorry, I likely misread the large comment in patch 2:
+> 
+> https://lore.kernel.org/netdev/20251126-vsock-vmtest-v12-2-257ee21cd5de@meta.com/
+> 
+> >> Have you considered instead a slightly different model, where the
+> >> local/global model is set in stone at netns creation time - alike what
+> >> /proc/sys/net/ipv4/tcp_child_ehash_entries is doing[1] - and
+> >> inter-netns connectivity is explicitly granted by the admin (I guess
+> >> you will need new transport operations for that)?
+> >>
+> >> /P
+> >>
+> >> [1] tcp allows using per-netns established socket lookup tables - as
+> >> opposed to the default global lookup table (even if match always takes
+> >> in account the netns obviously). The mentioned sysctl specify such
+> >> configuration for the children namespaces, if any.
+> > 
+> > I'll save this discussion if the above doesn't resolve your concerns.
+> I still have some concern WRT the dynamic mode change after netns
+> creation. I fear some 'unsolvable' (or very hard to solve) race I can't
+> see now. A tcp_child_ehash_entries-like model will avoid completely the
+> issue, but I understand it would be a significant change over the
+> current status.
+> 
+> "Luckily" the merge window is on us and we have some time to discuss. Do
+> you have a specific use-case for the ability to change the netns mode
+> after creation?
+> 
+> /P
 
-Yes, I will add this change in the next version of FLB; however, I
-will send the next version of FLB only once list_private.h [1] is
-added to linux-next, so I can replace luo_list_for_each_private() with
-list_private_for_each_entry().
+I don't think there is a hard requirement that the mode be change-able
+after creation. Though I'd love to avoid such a big change... or at
+least leave unchanged as much of what we've already reviewed as
+possible.
 
-Pasha
+In the scheme of defining the mode at creation and following the
+tcp_child_ehash_entries-ish model, what I'm imagining is:
+- /proc/sys/net/vsock/child_ns_mode can be set to "local" or "global"
+- /proc/sys/net/vsock/child_ns_mode is not immutable, can change any
+  number of times
 
-[1] https://lore.kernel.org/all/20251126185725.4164769-1-pasha.tatashin@soleen.com
+- when a netns is created, the new netns mode is inherited from
+  child_ns_mode, being assigned using something like:
+
+	  net->vsock.ns_mode =
+		get_net_ns_by_pid(current->pid)->child_ns_mode
+
+- /proc/sys/net/vsock/ns_mode queries the current mode, returning
+  "local" or "global", returning value of net->vsock.ns_mode
+- /proc/sys/net/vsock/ns_mode and net->vsock.ns_mode are immutable and
+  reject writes
+
+Does that align with what you have in mind?
+
+Stefano, what are your thoughts?
+
+Best,
+Bobby
 
