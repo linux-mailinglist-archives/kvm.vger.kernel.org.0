@@ -1,152 +1,138 @@
-Return-Path: <kvm+bounces-65248-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65249-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D398CA1B22
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 22:41:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C35FECA1BD6
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 22:55:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EBE413020CC1
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 21:40:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4954307DC5B
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 21:51:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B932D77FE;
-	Wed,  3 Dec 2025 21:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD432DC788;
+	Wed,  3 Dec 2025 21:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g9LZAaY3"
+	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="a2+R7bKC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B1C2D7D47;
-	Wed,  3 Dec 2025 21:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA89C2D8762
+	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 21:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764798030; cv=none; b=bTcPlIPAHgwlLCH7JeeeUckXxkjC2aDBppzIKNtD8eIjiOf2hGZjYIPf07eeKH4SuLNNKKpTiNHXIIxRpk34xygCmUp+4Qprm7M89Cep86cQOtVASvUFwCduaW663EFOrd6GeST27GoJQubkqpFXUL/L060qH2rWw30I8MzJ+sQ=
+	t=1764798658; cv=none; b=YqyJbrEZbTOy3lU/DTiUjfLcHUgdIyjOXN+O02cRktiKXZGLGhIhb4eH44ceorfv/Nq4lfBiYEXD/MXP/HdSrZ3+NvRdYkOYZrHXpJBT2ZuvUbRmNpLMDXGGDidri1gp3BhYSrDvff8JVe/jtsfG6k1KMbz8kww7tVJRTx7NbFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764798030; c=relaxed/simple;
-	bh=BhVnoOOBjOVBBGAI2ZkpumpyNOfaQV5FHSLyoRKf6uU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sN7Xzu/prK4YhkAgIKzG3DUIioZejzqgYkuYaYoOqAJLhmcaRem1PzMKjA6eL2D6wqcnmOo02mhw56QcKqUcqJsGNGC3gNO3l2ic4tFPDQHWINGARd+NbZgaEBmLiT6BYROfghnK34IzPNc49YFzqib4Cr0SoZDL4LX0PZ2mQxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g9LZAaY3; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764798029; x=1796334029;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=BhVnoOOBjOVBBGAI2ZkpumpyNOfaQV5FHSLyoRKf6uU=;
-  b=g9LZAaY3TV5B8RsUllUX6RzA0JcizaglnHjFrNl+aGhpUb0bZ39j3s7v
-   cGJhkMjGqiUEGDEg77hhS6V/VmzyWCqgSWfnd0NentFO2KuxDl2tKxwdr
-   3Baz8yv/+yQ+MofUV4SsyIE6Xn1iSbynbzQRJPA9e1//rhduRB9Rjs9T6
-   /OU+ghAwTF0i4OXOuSbYZpwRer7aXXHgbcZxFPVtDNW0Xc2F4JfOlm0gN
-   a9tEkrgk7yEGkABC/ZsJXUCpsgMxh4N4xo2cf8PV5GWDKr71y5MMg4Ihg
-   pQzM1eZfzuXmQNU+4KwZREoQSPFjn+Mh5SscQvvm2xfEqabGc0iM5weKb
-   w==;
-X-CSE-ConnectionGUID: 6oPZivpzQJCL9BEJ3/964Q==
-X-CSE-MsgGUID: Lxesmo4hTv6fEcIH8NzEsQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11631"; a="78159086"
-X-IronPort-AV: E=Sophos;i="6.20,247,1758610800"; 
-   d="scan'208";a="78159086"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2025 13:40:28 -0800
-X-CSE-ConnectionGUID: fRTiVnv2S5+D/TDRPPu0NA==
-X-CSE-MsgGUID: Yo39SRYhT1qIukOxsXtt1Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,247,1758610800"; 
-   d="scan'208";a="199926982"
-Received: from tslove-mobl4.amr.corp.intel.com (HELO [10.125.108.18]) ([10.125.108.18])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2025 13:40:27 -0800
-Message-ID: <da3701ea-08ea-45c9-94a8-355205a45f8e@intel.com>
-Date: Wed, 3 Dec 2025 13:40:27 -0800
+	s=arc-20240116; t=1764798658; c=relaxed/simple;
+	bh=JHGfDUlew2CsaKlG5OfBOmRmtuZxeRpVwjd7Xi1XEPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TnMLny6ERNOFCpoXJfVdyFjGvH2IrvulrUj90Sw1ho4tEgzopf8vKiPYpepId1MzXkyKnnjFFnmqOprVzb2inkGfjIORsUjo7WCNk9bDajr/brQjjsA/qyprOm6UuOVg6rbzVSakEdu0Z/mSq6xxA58cBiODR/aLWhTTGSFHtkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=a2+R7bKC; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-88059c28da1so1703676d6.2
+        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 13:50:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gourry.net; s=google; t=1764798656; x=1765403456; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=u1L7bCsctlFH/rlCsw/yhcu41+Ux43nXuWYzbJSS1oM=;
+        b=a2+R7bKCE2nkA0crp7a03nbUvz5d3llE3TTDCihjXmuS61A5e7v7n5UNdxjRpJpAXt
+         8b4DYiHNkteYuPQFi21IQXV/LtwfRt9GjP4pAyziFNJ4CyneBdidNhwlwHWXK3I50efF
+         dW+eyibzpUBjKs7jPAycoFXgSbYFGGuyxrHdi56IagSmIkho6Fa5TQhXA579ztB1lvk4
+         L3u4rRwLbyy9qUUCy6J9vQUGFfecLnTTaHln/6kuJcCeaoFcuNTNjj+e4NNX3BtI9iRc
+         x5vgZSQ/UVaCd19kv44jPMdkMMb93mVx1dJsI6HSy41WsGVnNNMf1YguOlyN67jFRvLB
+         Cx7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764798656; x=1765403456;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u1L7bCsctlFH/rlCsw/yhcu41+Ux43nXuWYzbJSS1oM=;
+        b=KB2LyEj6XmMb8ciG+WSlB9DkgPADGJqse8ZxyNnMespYkYfiEk2EdtZmjvDN38uHd7
+         tWB0mmG+qlYzBT6z8ubics4fA3u3XEEnkUmgVwd9vArxg3Foc3akS9+1Y9II/EtNULUY
+         JmXj5sDmAc7iYDJqix4pm9dw9SV+HFzfWzT74/MqU/gA7CB9CCSqSMhaJQnq1rBinBm/
+         9d2ELTSsueAaGbrVI69lA6yv+vVbaCU1cxYPJjWEKyzR5z/zsT3d7Cb/0vLxLCk5bAeQ
+         ZbM5fbIIqDtU9pvZtEweW0i6o8Vsj+EMuBeu8Kpsd2+fqtavmTxv/swEjsxa55y7Xp6t
+         bsBg==
+X-Forwarded-Encrypted: i=1; AJvYcCV5osy5D8obQJq58TJWm2LC/g5ZK3NdplsNk+WCR+ecpfhwIscI1tPgntUCkzQ60GjAXPE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzI0ajxpOzxKEgHWET8xekXMo/Zc+r4kUT1xTs4TFcKL/wmceXQ
+	JMMskQ+cQFReSrigErHJJ8DOR9snlTatOnJLXkHmc0bkDSS1WOU8DlC0oICWS6ucDuw=
+X-Gm-Gg: ASbGncswmb4BfZ/HWR+/76ZE4JMPlhSFH7HzlcZ236HyDmsxAY+T4TCwti0JNxLqVxL
+	D/dSChzJWBo6tTrQmoFSFReBbM3GtzRqHAo74S4/1Lf+vo3f2LWJUIi283BI93JxS+7cTpJpoYy
+	KTdVLFEM5YOD+maIwT9aP712vBIxAbdo60BljGnR6FqCMNSa1VuXlnb4l6QBowKfJGr5M4OROkn
+	oMBodAIbysFznkCDQpS/qHtrDXuZUbqhOWNCR1Rvf4qGj26JAavAtKotoe0Cg2ogeB7BmCl+rC8
+	42WmqNoTr/UlNLZfK2YbDnkjt7/v4k7wD1Lbwget7zCqd46ai+ptCSb4A1v06fc4g1hiDC3MvFp
+	fkrZGQZlkqDOJWKyPM05ucDBZeomhK8A7gJBpomIz6ZXdk7/BI4pjtDqBJgHs3qxw0kTN2TTVX4
+	NOqX66WG/C5bEhDmTUMSp8Zf7T7g0=
+X-Google-Smtp-Source: AGHT+IEwceVsLeU5TI95jujZXB37aK5lP0n1gzmGLbDcAQSJh4iH2YFhpUVYfybMssUZm1JTFXzafQ==
+X-Received: by 2002:a05:6214:500d:b0:880:5389:a77a with SMTP id 6a1803df08f44-888195726c6mr64755976d6.63.1764798655692;
+        Wed, 03 Dec 2025 13:50:55 -0800 (PST)
+Received: from gourry-fedora-PF4VCD3F (pool-96-255-20-138.washdc.ftas.verizon.net. [96.255.20.138])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-886524fd33fsm134692766d6.24.2025.12.03.13.50.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Dec 2025 13:50:53 -0800 (PST)
+Date: Wed, 3 Dec 2025 16:50:52 -0500
+From: Gregory Price <gourry@gourry.net>
+To: "David Hildenbrand (Red Hat)" <david@kernel.org>
+Cc: Frank van der Linden <fvdl@google.com>,
+	Johannes Weiner <hannes@cmpxchg.org>, linux-mm@kvack.org,
+	kernel-team@meta.com, linux-kernel@vger.kernel.org,
+	akpm@linux-foundation.org, vbabka@suse.cz, surenb@google.com,
+	mhocko@suse.com, jackmanb@google.com, ziy@nvidia.com,
+	kas@kernel.org, dave.hansen@linux.intel.com,
+	rick.p.edgecombe@intel.com, muchun.song@linux.dev,
+	osalvador@suse.de, x86@kernel.org, linux-coco@lists.linux.dev,
+	kvm@vger.kernel.org, Wei Yang <richard.weiyang@gmail.com>,
+	David Rientjes <rientjes@google.com>,
+	Joshua Hahn <joshua.hahnjy@gmail.com>
+Subject: Re: [PATCH v4] page_alloc: allow migration of smaller hugepages
+ during contig_alloc
+Message-ID: <aTCwvKRoVGs89BVX@gourry-fedora-PF4VCD3F>
+References: <20251203063004.185182-1-gourry@gourry.net>
+ <20251203173209.GA478168@cmpxchg.org>
+ <aTB5CJ0oFfPjavGx@gourry-fedora-PF4VCD3F>
+ <CAPTztWar1KqLyUOknkf0XVnO9JOBbMxov6pHZjEm4Ou0wtSJTA@mail.gmail.com>
+ <b5a925c5-523e-41e1-a3ce-0bb51ce0e995@kernel.org>
+ <aTCZEcJqcgGv8Zir@gourry-fedora-PF4VCD3F>
+ <f6b159c1-e07c-489e-ab9b-4d77551877f0@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 07/16] x86/virt/tdx: Add tdx_alloc/free_page() helpers
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "nik.borisov@suse.com" <nik.borisov@suse.com>,
- "kas@kernel.org" <kas@kernel.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Li, Xiaoyao" <xiaoyao.li@intel.com>, "Huang, Kai" <kai.huang@intel.com>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "Zhao, Yan Y" <yan.y.zhao@intel.com>, "Wu, Binbin" <binbin.wu@intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "seanjc@google.com" <seanjc@google.com>, "mingo@redhat.com"
- <mingo@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "Annapurve, Vishal" <vannapurve@google.com>, "Gao, Chao"
- <chao.gao@intel.com>, "bp@alien8.de" <bp@alien8.de>,
- "x86@kernel.org" <x86@kernel.org>
-References: <20251121005125.417831-1-rick.p.edgecombe@intel.com>
- <20251121005125.417831-8-rick.p.edgecombe@intel.com>
- <dde56556-7611-4adf-9015-5bdf1a016786@suse.com>
- <730de4be289ed7e3550d40170ea7d67e5d37458f.camel@intel.com>
- <f080efe3-6bf4-4631-9018-2dbf546c25fb@suse.com>
- <0274cee22d90cbfd2b26c52b864cde6dba04fc60.camel@intel.com>
- <7xbqq2uplwkc36q6jyorxe6u3fboka3snwar6parado5ysz25o@qrstyzh3okgh>
- <89d5876f-625b-43a6-bcad-d8caa4cbda2b@suse.com>
- <04c51f1d-b79b-4ff8-b141-5888407a318e@intel.com>
- <bb174006cbe969fc71fe71a3e12003ab9052213c.camel@intel.com>
- <474f5ace-e237-4c01-b0bc-d3e68ecc937b@intel.com>
- <8bd4850b0c74fbed531232a4a69603882a5562a1.camel@intel.com>
- <408079db-c488-492e-b6e7-063dea3cb861@intel.com>
- <e0eb7ab13b715c7509a310bbc043f78898002442.camel@intel.com>
-Content-Language: en-US
-From: Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <e0eb7ab13b715c7509a310bbc043f78898002442.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f6b159c1-e07c-489e-ab9b-4d77551877f0@kernel.org>
 
-On 12/3/25 13:39, Edgecombe, Rick P wrote:
-> So I take it you are ok to leave the general approach, but worth trying to
-> remove the dynamic sizing.
+On Wed, Dec 03, 2025 at 09:14:44PM +0100, David Hildenbrand (Red Hat) wrote:
+> On 12/3/25 21:09, Gregory Price wrote:
+> > On Wed, Dec 03, 2025 at 08:43:29PM +0100, David Hildenbrand (Red Hat) wrote:
+> > > On 12/3/25 19:01, Frank van der Linden wrote:
+> > 
+> > Worth noting that because this check really only applies to gigantic
+> > page *reservation* (not faulting), this isn't necessarily incurred in a
+> > time critical path.  So, maybe i'm biased here, the reliability increase
+> > feels like a win even if the operation can take a very long time under
+> > memory pressure scenarios (which seems like an outliar anyway).
+> 
+> Not sure I understand correctly. I think the fix from Mel was the right
+> thing to do.
+> 
+> It does not make sense to try migrating a 1GB page when allocating a 1GB
+> page. Ever.
+> 
 
-Yeah, that sounds fine.
+Oh yeah I agree, this patch doesn't allow that either.
+
+I was just saying his patch's restriction of omitting all HugeTLB
+(including 2MB) was more aggressive than needed.
+
+I.e. allowing movement of 2MB pages to increase reliability is (arguably)
+worth the potential long-runtime that doing so may produce (because we no
+longer filter out regions with 2MB pages).
+
+tl;dr: just re-iterating the theory of this patch.
+
+~Gregory
 
