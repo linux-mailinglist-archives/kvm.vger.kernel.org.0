@@ -1,175 +1,225 @@
-Return-Path: <kvm+bounces-65225-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65226-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E08C9FDAF
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 17:15:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B821C9FF6D
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 17:29:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5CD183008041
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 16:15:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0A4B300DA4D
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 16:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD283431E3;
-	Wed,  3 Dec 2025 16:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="QbyG//lT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D203557FA;
+	Wed,  3 Dec 2025 16:17:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A85342146;
-	Wed,  3 Dec 2025 16:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B1B3451DC
+	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 16:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764777838; cv=none; b=TPt5IbLRSEhyE18tBa4y1+px6tUo5CDsvnfELxHNffhjALEG8WCnKESTyD1lbkm3Vs39msFVMCm0CBXhblPaSv8i07uh6rw5LceZV/4qu1JOgml/krvygkdsW6V/uJl4EkJRxVo00mN8/0SSGTNbpFi3A8KrZtwQrm+9HdxhEtA=
+	t=1764778644; cv=none; b=POoW/6KMnOfumdT07v+Wr4tnZsN8V9QXBiWrfJVgGcczeJXXhdPsL7sRVG/aAmbQTlFm8FxI4heWYXNWoncQVAkGXvjN81EINa3eWnvKntTFz+6h2is0tfaAW0d/9nierAt/8K0IilkTr/PM22MW2+2hKcQxGtZor+KDFBK/gCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764777838; c=relaxed/simple;
-	bh=44aWoO0xgrbCYwAvNjJ2HHKTl5rnXStHKGkAwNTZeOE=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=RmoVYI5qjg6+QA0uoA29qi5lGL3ZpGpFk46K2PDFhKkife5+piXELcBpLRQl7WHunnRuguqC12ieXEe97yDiq5ydyBLOjosAZUUIV4gn2kcr1fzPwh9wV1ZoQzrngNLrah9P/xr/xBc0so++CTJXav7wX76ZEwWpGorECEYd8zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=QbyG//lT; arc=none smtp.client-ip=162.62.57.252
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1764777825; bh=e1cr7cB9gHoKGVQYhIC4CvFypTqIWDD1zmvqi8c+6Rc=;
-	h=From:To:Cc:Subject:Date;
-	b=QbyG//lTMa/9UlMzl/F1rT2VpRekrhDi140zrwXsEFxSKLzxa82XPIV0xdSy1JvuV
-	 bO5FZCFlHkFc9agzjEY451ZKMoNH3jguHqx6tQpBDlF0SaZg+fFDzz43GdFxpasXEX
-	 pr8ot8bgWs+Vjuy0jUeOXEqaABpgHX7sV7wKiFX4=
-Received: from lxu-ped-host.. ([111.201.7.117])
-	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
-	id E81C8F7; Thu, 04 Dec 2025 00:03:40 +0800
-X-QQ-mid: xmsmtpt1764777820t4qo7i2do
-Message-ID: <tencent_3C86DFD37A0374496263BE24483777D76305@qq.com>
-X-QQ-XMAILINFO: Mm3lGEhJcF5GES4dJXmrXXeRjVFRK9xLrz1OHc0rxpoLA+afC7a9iXoooZhjj4
-	 toWUN1AVx0njlGItEE030M4WPQN5zD05g7mji1EtYEXqIvgYiceXGF7lBPga5KuJop7VY/csunpw
-	 n2LJ/6GtcJRCEpr823xHzkTC6Q5RgZC1XWtWOS6H0jtRkvL3ay52VuS+u4wJ1S435fLZVVv/7Mu/
-	 cVhsURbGNz7iuExHYBBmYMG25EpCXsjX2UpzDnxXWEOLJTOtIEEULHxbFD+H7pu4fhzAoUop9GUH
-	 yDkzV3exGXX3+LiywTimz3dNggCqva4d87NBkzSVKBgWR8LP3n4SoOjBLEYU6omP1gYGBmyl0Kvz
-	 NLVhxD5q0/3u71Xezsrzc0XJXTvv+dtLfMayITb+kDdRQkr/fS8ZTHh8QqrG34Pcbae0IuyYwmpS
-	 08HRuFluYAN2RXO0pBFXowJAU34Jil1EICUaAXnJwQi080+5duxZgAkamoW4WHevkyLr6rsSZSnL
-	 lc+SvJdMxm5DPavd5Pf2N6MoZX1zneLIggVimp2Gomd3CM+liSpm4muW8dkIwFe3u4e3B4ePg12A
-	 gE/6BZ96kh7bLL3UVSZwsIRDHg+RpQVcaijqYDUnK4bxwXxLPXhwWKS/YCscJnrG21XjLv4fIS8i
-	 EBA94xZpH6iX590So0Y8/Mnoj2GJAmNQ+b+z68xoheAu8OfCEA7daMTs/iQsEdeRtI3xtaUF1dBF
-	 aQmpYmLNBLFUqmeh1JOd5joAXAY+oJfOZqIN4lO/bFQtOotbtKa+gUYdm6HEg5okqsNs6IZflCSN
-	 Jq2E7ATchHPTHBPck3p//zYnyrK2cTommDsZ+jZq60vDXSxpaWTesZ04UouE5JNA5fjMfivzJo1a
-	 aGwIl6CAvj4v2Rz0MP0F97iZRP13Id7lZpkJg3CVlZlQLHpqWceqXuECwPiap7kKbWUeE8HSqdNu
-	 53Uud1bGVJ0H7r3jI9zBhdEG7Nkvv3WmQrwMfJ+D8Ru1LJMeI/Xo65X7eiXSinrZSKl+tdfAazZ8
-	 KPIbRkZQ==
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-From: Edward Adam Davis <eadavis@qq.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	eadavis@qq.com,
-	edumazet@google.com,
-	eperezma@redhat.com,
-	horms@kernel.org,
-	jasowang@redhat.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	sgarzare@redhat.com,
-	stefanha@redhat.com,
-	syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com,
-	syzbot@lists.linux.dev,
-	syzbot@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com,
-	virtualization@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com
-Subject: [PATCH net-next V3] net: restore the iterator to its original state when an error occurs
-Date: Thu,  4 Dec 2025 00:03:39 +0800
-X-OQ-MSGID: <20251203160339.303720-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1764778644; c=relaxed/simple;
+	bh=ZgDtOVPSWZyP+Yt2Ga3r9KRjbu/RrjqzEbQ1CwGz8Ew=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qeORuEE7DOy12Uwp3gD1MgN05PKRbTpLdw7EWf99xHuRt53cEr9fIOBZU0TBfguSq9tq7TnX/0N1no5fK8AaymaaLzwhBjsZVd2l3M7hpy8DLZ2iahiziQnTQC0+xcu/N9gonFHcNuJ6C/4PrNChRLeiaPrw/r9uAlzoPJnL9eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB3D9339;
+	Wed,  3 Dec 2025 08:17:14 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B99F93F66E;
+	Wed,  3 Dec 2025 08:17:20 -0800 (PST)
+Date: Wed, 3 Dec 2025 16:17:15 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: Convert VTCR_EL2 to config-driven
+ sanitisation
+Message-ID: <20251203161715.GA4187196@e124191.cambridge.arm.com>
+References: <20251129144525.2609207-1-maz@kernel.org>
+ <20251129144525.2609207-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251129144525.2609207-5-maz@kernel.org>
 
-In zerocopy_fill_skb_from_iter(), if two copy operations are performed
-and the first one succeeds while the second one fails, it returns a
-failure but the count in iterator has already been decremented due to
-the first successful copy. This ultimately affects the local variable
-rest_len in virtio_transport_send_pkt_info(), causing the remaining
-count in rest_len to be greater than the actual iterator count. As a
-result, packet sending operations continue even when the iterator count
-is zero, which further leads to skb->len being 0 and triggers the warning
-reported by syzbot [1].
+Hi!
 
-Therefore, if the zerocopy operation fails, we should revert the iterator
-to its original state.
+On Sat, Nov 29, 2025 at 02:45:25PM +0000, Marc Zyngier wrote:
+> Describe all the VTCR_EL2 fields and their respective configurations,
+> making sure that we correctly ignore the bits that are not defined
+> for a given guest configuration.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/config.c | 69 +++++++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/nested.c |  3 +-
+>  2 files changed, 70 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index a02c28d6a61c9..c36e133c51912 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -141,6 +141,7 @@ struct reg_feat_map_desc {
+>  #define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
+>  #define FEAT_AA64EL2		ID_AA64PFR0_EL1, EL2, IMP
+>  #define FEAT_AA64EL3		ID_AA64PFR0_EL1, EL3, IMP
+> +#define FEAT_SEL2		ID_AA64PFR0_EL1, SEL2, IMP
+>  #define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
+>  #define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
+>  #define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
+> @@ -202,6 +203,8 @@ struct reg_feat_map_desc {
+>  #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
+>  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
+>  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
+> +#define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
+> +#define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
+>  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
+>  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
+>  #define FEAT_IESB		ID_AA64MMFR2_EL1, IESB, IMP
+> @@ -219,6 +222,7 @@ struct reg_feat_map_desc {
+>  #define FEAT_FGT2		ID_AA64MMFR0_EL1, FGT, FGT2
+>  #define FEAT_MTPMU		ID_AA64DFR0_EL1, MTPMU, IMP
+>  #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
+> +#define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
+>  
+>  static bool not_feat_aa64el3(struct kvm *kvm)
+>  {
+> @@ -362,6 +366,28 @@ static bool feat_pmuv3p9(struct kvm *kvm)
+>  	return check_pmu_revision(kvm, V3P9);
+>  }
+>  
+> +#define has_feat_s2tgran(k, s)						\
+> +  ((kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, TGRAN##s) && \
+> +    !kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s, NI))	     ||	\
+> +   kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, IMP))
+> +
+> +static bool feat_lpa2(struct kvm *kvm)
+> +{
+> +	return ((kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT)    ||
+> +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP))	&&
+> +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT)   ||
+> +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP))	&&
+> +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, 52_BIT)  ||
+> +		 !has_feat_s2tgran(kvm, 4))				&&
+> +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, 52_BIT) ||
+> +		 !has_feat_s2tgran(kvm, 16)));
+> +}
+> +
+> +static bool feat_vmid16(struct kvm *kvm)
+> +{
+> +	return kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16);
+> +}
+> +
+>  static bool compute_hcr_rw(struct kvm *kvm, u64 *bits)
+>  {
+>  	/* This is purely academic: AArch32 and NV are mutually exclusive */
+> @@ -1168,6 +1194,44 @@ static const struct reg_bits_to_feat_map mdcr_el2_feat_map[] = {
+>  static const DECLARE_FEAT_MAP(mdcr_el2_desc, MDCR_EL2,
+>  			      mdcr_el2_feat_map, FEAT_AA64EL2);
+>  
+> +static const struct reg_bits_to_feat_map vtcr_el2_feat_map[] = {
+> +	NEEDS_FEAT(VTCR_EL2_HDBSS, FEAT_HDBSS),
+> +	NEEDS_FEAT(VTCR_EL2_HAFT, FEAT_HAFT),
+> +	NEEDS_FEAT(VTCR_EL2_TL0		|
+> +		   VTCR_EL2_TL1		|
+> +		   VTCR_EL2_AssuredOnly	|
+> +		   VTCR_EL2_GCSH,
+> +		   FEAT_THE),
 
-The iov_iter_revert() in skb_zerocopy_iter_stream() is no longer needed
-and has been removed.
+The text for VTCR_EL2.AssuredOnly says:
 
-[1]
-'send_pkt()' returns 0, but 4096 expected
-WARNING: net/vmw_vsock/virtio_transport_common.c:430 at virtio_transport_send_pkt_info+0xd1e/0xef0 net/vmw_vsock/virtio_transport_common.c:428, CPU#1: syz.0.17/5986
-Call Trace:
- virtio_transport_stream_enqueue net/vmw_vsock/virtio_transport_common.c:1113 [inline]
- virtio_transport_seqpacket_enqueue+0x143/0x1c0 net/vmw_vsock/virtio_transport_common.c:841
- vsock_connectible_sendmsg+0xabf/0x1040 net/vmw_vsock/af_vsock.c:2158
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:746
+	This field is RES0 when VTCR_EL2.D128 is 1.
 
-Reported-by: syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=28e5f3d207b14bae122a
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
-v3:
-  - fix test tcp_zerocopy_maxfrags timeout
-v2: https://lore.kernel.org/all/tencent_BA768766163C533724966E36344AAE754709@qq.com/
-  - Remove iov_iter_revert() in skb_zerocopy_iter_stream()
-v1: https://lore.kernel.org/all/tencent_387517772566B03DBD365896C036264AA809@qq.com/
+> +	NEEDS_FEAT(VTCR_EL2_D128, FEAT_D128),
+> +	NEEDS_FEAT(VTCR_EL2_S2POE, FEAT_S2POE),
+> +	NEEDS_FEAT(VTCR_EL2_S2PIE, FEAT_S2PIE),
 
- net/core/datagram.c | 9 ++++++++-
- net/core/skbuff.c   | 1 -
- 2 files changed, 8 insertions(+), 2 deletions(-)
+The text for VTCR_EL2.S2PIE says:
 
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index c285c6465923..3a612ebbbe80 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -748,9 +748,13 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
- 			    size_t length,
- 			    struct net_devmem_dmabuf_binding *binding)
- {
-+	struct iov_iter_state state;
- 	unsigned long orig_size = skb->truesize;
- 	unsigned long truesize;
--	int ret;
-+	int ret, orig_len;
-+
-+	iov_iter_save_state(from, &state);
-+	orig_len = skb->len;
- 
- 	if (msg && msg->msg_ubuf && msg->sg_from_iter)
- 		ret = msg->sg_from_iter(skb, from, length);
-@@ -759,6 +763,9 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
- 	else
- 		ret = zerocopy_fill_skb_from_iter(skb, from, length);
- 
-+	if (ret == -EFAULT || (ret == -EMSGSIZE && skb->len == orig_len))
-+		iov_iter_restore(from, &state);
-+
- 	truesize = skb->truesize - orig_size;
- 	if (sk && sk->sk_type == SOCK_STREAM) {
- 		sk_wmem_queued_add(sk, truesize);
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index a00808f7be6a..7b8836f668b7 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -1908,7 +1908,6 @@ int skb_zerocopy_iter_stream(struct sock *sk, struct sk_buff *skb,
- 		struct sock *save_sk = skb->sk;
- 
- 		/* Streams do not free skb on error. Reset to prev state. */
--		iov_iter_revert(&msg->msg_iter, skb->len - orig_len);
- 		skb->sk = sk;
- 		___pskb_trim(skb, orig_len);
- 		skb->sk = save_sk;
--- 
-2.43.0
+	This field is RES1 when VTCR_EL2.D128 is set.
 
+
+Are these cases that need to be handled here somehow?
+
+Thanks,
+Joey
+
+
+> +	NEEDS_FEAT(VTCR_EL2_SL2		|
+> +		   VTCR_EL2_DS,
+> +		   feat_lpa2),
+> +	NEEDS_FEAT(VTCR_EL2_NSA		|
+> +		   VTCR_EL2_NSW,
+> +		   FEAT_SEL2),
+> +	NEEDS_FEAT(VTCR_EL2_HWU62	|
+> +		   VTCR_EL2_HWU61	|
+> +		   VTCR_EL2_HWU60	|
+> +		   VTCR_EL2_HWU59,
+> +		   FEAT_HPDS2),
+> +	NEEDS_FEAT(VTCR_EL2_HD, ID_AA64MMFR1_EL1, HAFDBS, DBM),
+> +	NEEDS_FEAT(VTCR_EL2_HA, ID_AA64MMFR1_EL1, HAFDBS, AF),
+> +	NEEDS_FEAT(VTCR_EL2_VS, feat_vmid16),
+> +	NEEDS_FEAT(VTCR_EL2_PS		|
+> +		   VTCR_EL2_TG0		|
+> +		   VTCR_EL2_SH0		|
+> +		   VTCR_EL2_ORGN0	|
+> +		   VTCR_EL2_IRGN0	|
+> +		   VTCR_EL2_SL0		|
+> +		   VTCR_EL2_T0SZ,
+> +		   FEAT_AA64EL1),
+> +};
+> +
+> +static const DECLARE_FEAT_MAP(vtcr_el2_desc, VTCR_EL2,
+> +			      vtcr_el2_feat_map, FEAT_AA64EL2);
+> +
+>  static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
+>  				  int map_size, u64 res0, const char *str)
+>  {
+> @@ -1211,6 +1275,7 @@ void __init check_feature_map(void)
+>  	check_reg_desc(&tcr2_el2_desc);
+>  	check_reg_desc(&sctlr_el1_desc);
+>  	check_reg_desc(&mdcr_el2_desc);
+> +	check_reg_desc(&vtcr_el2_desc);
+>  }
+>  
+>  static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map *map)
+> @@ -1425,6 +1490,10 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
+>  		*res0 = compute_reg_res0_bits(kvm, &mdcr_el2_desc, 0, 0);
+>  		*res1 = MDCR_EL2_RES1;
+>  		break;
+> +	case VTCR_EL2:
+> +		*res0 = compute_reg_res0_bits(kvm, &vtcr_el2_desc, 0, 0);
+> +		*res1 = VTCR_EL2_RES1;
+> +		break;
+>  	default:
+>  		WARN_ON_ONCE(1);
+>  		*res0 = *res1 = 0;
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index e1ef8930c97b3..606cebcaa7c09 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1719,8 +1719,7 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+>  	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
+>  
+>  	/* VTCR_EL2 */
+> -	res0 = GENMASK(63, 32) | GENMASK(30, 20);
+> -	res1 = BIT(31);
+> +	get_reg_fixed_bits(kvm, VTCR_EL2, &res0, &res1);
+>  	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
+>  
+>  	/* VMPIDR_EL2 */
+> -- 
+> 2.47.3
+> 
 
