@@ -1,168 +1,159 @@
-Return-Path: <kvm+bounces-65187-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65188-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B2DC9DE39
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 07:10:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43611C9DE5A
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 07:11:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A88DA34AF44
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 06:09:25 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9BF1934384F
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 06:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A002857F1;
-	Wed,  3 Dec 2025 06:09:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0614257AD1;
+	Wed,  3 Dec 2025 06:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="VbcJCb6G"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hDGSifjc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0550231A41
-	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 06:09:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56463222565
+	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 06:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764742152; cv=none; b=OuUr6bqMVTdpHQWIUdlRe8jOWKhaFgJ/yHqrfWzrCbNnsQFx3If+RuBAFIANyedkT656q602JgQD6vGMxYYw6vzeGKsjoq9JS/TucrvdHMErYg3pXRnB1xUsFEzSHORGuLaPIFbDcmUAgNrBxzc+ajJIN0W7WggHnK0/SS2R0GQ=
+	t=1764742303; cv=none; b=eZ/GGkcZmNZ3MRz4BzQ3uA/WExnyo282XFWoFJVHR2LJNOegctuF7uKHTAPWoqG2oBUqu23eXp2GNOWsu8w4JYR/OF+gALkYT421JLe0u0oGYI8ll0WWfKG8an7nGOFzVe88Syv7lXY1nNPDRpqeBR10bWvmC+j0uZrwT3m5jdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764742152; c=relaxed/simple;
-	bh=ZYSjCRC/hHI1H3gb+cN7itSUSjyZ/eJu080H8ZPljqA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YtZJ1bco4fvVqlj+GC+1Rlf4qY53/RDtIjoawCirlKrrouDczNONXBIPLP2JnA4nPtODQDLIvZ84I4A/snn9FrEKvaSPcxLL+KuchERAM+1688LvXrOIwdJ1P1G6e4PFgg/+FLjR70MzxVbRa06+JfQsTphkFNjsS0TJSQEXabA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=VbcJCb6G; arc=none smtp.client-ip=209.85.161.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-65745a436f7so2827909eaf.3
-        for <kvm@vger.kernel.org>; Tue, 02 Dec 2025 22:09:09 -0800 (PST)
+	s=arc-20240116; t=1764742303; c=relaxed/simple;
+	bh=UgWNLt8d7MI9k9Zx+0y19NakKiz9CHnhq2aM+baCkjc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IMkv7p92o9Pb7hcZa84e/Q/jIVjU3sDjoLRzcgLy3qf/rRbBOPVNKv24qDwB91kIWFHo//j3/LjP6yVgPSZEEnokwGuye/cKQUF+SmOt4L5cIBLhyBS1z+sqXVCzLTuvvyu4c3XEwD4ymQj1nNa9WNtSbc9aVOQw5Ef0OYGaPVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hDGSifjc; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-42b3669ca3dso2759282f8f.0
+        for <kvm@vger.kernel.org>; Tue, 02 Dec 2025 22:11:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1764742149; x=1765346949; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZYSjCRC/hHI1H3gb+cN7itSUSjyZ/eJu080H8ZPljqA=;
-        b=VbcJCb6GwyfnAsIxXxho6msFXc1dSfFTYzu911YkQABYEobASZf7trbZSJ0rSHw6W9
-         QhDdatAXP8lBCtrnFxfOt58Hyh8Klf3Pt72FEIIB5nTNz2sUdW0skhd9EG7KSYr8YgPN
-         GQnKrO3LXCPY5wz0MlpTwiSprzwkIsaqrozxX2WwO6SX2VGGZuN5nJpQmxg+WVQ6e4Zn
-         beKsciFJ3FkkbYLiDDjAg+zw1QcOfrXUKcVuvA1L4Xor8eZp8eXNEv6korFJz2VaJ0Vg
-         w+8LObRl2f9gDyzMET+WjNmB80dl7OkiVpD6RV8qLYGg4qrzaZpIl9BGv/9dL6SUIIF+
-         SKig==
+        d=linaro.org; s=google; t=1764742299; x=1765347099; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dlyYuqrBIco0T5Nx+vrsokniVf0Y0mIPJ5rNnrQW6jE=;
+        b=hDGSifjcdKegxM3pnwlfC0l2GwQdXJ/28HEMmzPBSR9kL1g9L+mLpLcsf2JUdrOaIi
+         oqCY0CqYm4lcka4084KpyGJgnlHeNJOvUefAE1wqnCtgO6a+yz6DNcemr70p3nUfb+Ox
+         QH54sp9zRqJnDEsIk9gt9Bmiay9NMaJUa+eZI75cz6DvNvSBCKV9F3A3w+DnqR7AMuqt
+         UsdYlDWbLoY39uEdINI/oC8unYmDMrmuVb0nzwarCKGld3evtzMDTmp43n+g095u2lC+
+         RgNnEN9k9T2gmWS+JYMbE6SQm0/so1ETWjgl3zAwNzeUCcMftswom2Gxm0pYKE6vYiO2
+         qDCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764742149; x=1765346949;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZYSjCRC/hHI1H3gb+cN7itSUSjyZ/eJu080H8ZPljqA=;
-        b=ReV5TVIbDiby4ZaAR0aygPA48eXci2eStK3yFrwR3zd9gjA/bGcT2Agmw8qLOQCvWo
-         q7DckAHDZmkMt6IfF3tlBfowZCoR776FVsacVWN4CBAnU2pNX645DCrP524F85AtEQ+Q
-         jG1b0HfU8eK55Y/Kzqp0g/8msWjLteA4hxRN1vsQJw6UUDuiM3Ke5Blga2Hq9h8wjvDV
-         Q/s3RV/ft2q0hoALy+5yJq4ZyL9ha7sk0iUCJiRdkUtJx1ioMEtMGX+8rG327jBrduRU
-         T0+0ADb70jzWH90JF/QWkDoDvajC+EYPF0yf7tK8rtC3tlZDGzZXxfn6YFE/1d9BvTZ7
-         xoiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0m6VYeV54zDVMkpj9ZPNlmZG0VnULX0cSwR1LyxTzgUIXten81biPCITw/EqJ6AHJpp8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4K3Dfyxsi4XUZ5gOTJkxmbasTRy4cVtlmN81nI1Tn7mU06gbu
-	/28AOyT5c4WMeu5+YtjxC9CT8KCVC4rWGrS6hhQ03mRSmZNCbicdVSVXBXdOCKKB1S7Yk+cwcLF
-	UxbeJ+QbVa5TT7X2tByZv8Q+JZ6lch7rmy2bt0O86jiCV+/86wLJCpNk=
-X-Gm-Gg: ASbGnctqrmCJS8DLCypa9PxBX07dVC4oM5qlYPaIMnhaROnnx4tmsspcs6au71fhEX4
-	V3mD10wvmfhC1zLDBL86iU/o8VUaLZF30eeFjI+QC/5s7jpWVvrpa4U2l3fpKze6O60uzPvCObw
-	aZhzAobCSFJxU7CCo6PEl2SRdn4Am+HzYG8pBXAZIZ6bT2KSFRAFuS/9TGM2gHNn09ZkukdH0pu
-	hoUTigr2m9lHXXuT+rPjZVS2OPnv4lHFh6riYw5jvjxfczXdLnwV9O1XDnTKAH2rv2jqQ==
-X-Google-Smtp-Source: AGHT+IEcOy75SVKzhqsvQgDX25DVxTD0tJpPOKTQLPBYv2km9cUYBIeJ/z3VSk/G5Ocsrz0txeVer6yWZkrnr5El9wQ=
-X-Received: by 2002:a05:6808:c3eb:b0:44d:a4d3:b6a6 with SMTP id
- 5614622812f47-4536e4f2683mr653938b6e.35.1764742148683; Tue, 02 Dec 2025
- 22:09:08 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764742299; x=1765347099;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dlyYuqrBIco0T5Nx+vrsokniVf0Y0mIPJ5rNnrQW6jE=;
+        b=O3euO7lCklOjogS/02riRF2MmOtZcoVIsQnMkLtTintxg9fGALKwPJzj1tbvsVsPRT
+         z41YQKLVggbJL2MLNxpJTn5J2FKqPWtKdLTXZHWCakPNFC/T3jktrarMOx83CndECn5+
+         yS2g4YqFf4xNMmKnrAcMyUoG4VrSfgfBpLlaHSUTiv/T/2Cb5vtsvKrXOjzEp0poipFN
+         nTz3UbeNG7B3SgzHoIzETUteLVMTh3WNKeWZJLyWGw7595+sDilONjkc07zlpkFH5bx/
+         KKpKJWvY5/98VdL4qXoPR8dwHy8m8EswmTpjR8JxR5B1T1OyrfG4E8Q52YNllmZ8P0AP
+         Ytrg==
+X-Forwarded-Encrypted: i=1; AJvYcCVQVQ/PYGSiutPAabl/s9aIOHD1ZmEcGP3iP7uNbSWObRKiApT+hCPgzxwIv8wAD3JdRZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxByPX9fzEz/ZmyM5dMiWAFQm5OGEY9LurYg/jgBiceKfpvq3ut
+	b3CUnnHsyvsk4G7ytmy7nxHdO1WGcJWIMYeOTmcx59y02E/jYr7aVXa2nhOYsFZE8b8=
+X-Gm-Gg: ASbGncsccMPMavCSMe7AJssYEHBWbkmd69vJNDHaZs59pT3EkS1IADvQg9iZFea30vi
+	9+SNn8ZxT44aonF7NX4UKa1T39U8D6L/Nmnxn9icfziUfOB0BDHRmOeRljqLpl5u25VMuQIxqgK
+	PJIRYHMlKa14EUwXFreterCVgCNIjx8h3dVlgxOUJE4lMIZARSAcseu0n+BEy77z+dM6Onl5Xq+
+	K3ZDZyTpQxdrVauhuCOvkoYX++2PmdwM9+LS6N8SfUly6rB5jXLXOI1mbX17RioXpTWNz9q+58A
+	9SMeTXLAgH270Xs1FM98GMrsvlf/eHdaC+DTLwCBANj2VKkYYbVej9WiR7971X9uwfBWB4H/DRd
+	TjA40ffA891Dx9OwFY7K1x+aYQl+tQCbVbhLGK9jF7TFXhzKWQwB4a2jt2EzfSs839wXWmDhxha
+	9LrDM0ef8LXda4jJAkl3wath2MjLV9nCpXsP4dJx8uxjRwaotNR7zQRjKGp07Eo6ol
+X-Google-Smtp-Source: AGHT+IHvIQmfDwnTD8drf7tdAaJELXEvl7wBw+FoUcPNb0LeOYFoiFRBKneLkS5TxZ8trSwEw5E/YQ==
+X-Received: by 2002:a05:6000:1ac9:b0:42b:2fc8:186 with SMTP id ffacd0b85a97d-42f731bc03amr722215f8f.46.1764742299461;
+        Tue, 02 Dec 2025 22:11:39 -0800 (PST)
+Received: from [192.168.69.213] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1caa86d0sm35622115f8f.39.2025.12.02.22.11.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Dec 2025 22:11:38 -0800 (PST)
+Message-ID: <3991ece0-b49a-4c09-9309-ed0c50ce2a24@linaro.org>
+Date: Wed, 3 Dec 2025 07:11:36 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251124-4ecf1b6b91b8f0688b762698@orel> <20251125141811.39964-1-fangyu.yu@linux.alibaba.com>
- <DEHZBIAB842A.1AUCJS0OR923@ventanamicro.com> <CAJF2gTTYwsG4Q6n3JWi8S4brOA_mh7OdpquMU-eJYAEHwDeSdw@mail.gmail.com>
-In-Reply-To: <CAJF2gTTYwsG4Q6n3JWi8S4brOA_mh7OdpquMU-eJYAEHwDeSdw@mail.gmail.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Wed, 3 Dec 2025 11:38:57 +0530
-X-Gm-Features: AWmQ_bkb6N-7dICbNGOMVSKlH7NSygl6xNkVh8uyiwaa2kv1hzcn9J09Zs9Fkdk
-Message-ID: <CAAhSdy0SU86SeAN+NHoYKUubfG8Z3nonge86kzvfdupWWc4-qA@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: Allow to downgrade HGATP mode via SATP mode
-To: Guo Ren <guoren@kernel.org>
-Cc: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>, 
-	fangyu.yu@linux.alibaba.com, ajones@ventanamicro.com, alex@ghiti.fr, 
-	aou@eecs.berkeley.edu, atish.patra@linux.dev, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, palmer@dabbelt.com, pjw@kernel.org, 
-	linux-riscv <linux-riscv-bounces@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 15/28] hw/i386: Assume fw_cfg DMA is always enabled
+Content-Language: en-US
+To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, devel@lists.libvirt.org, kvm@vger.kernel.org,
+ qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Sergio Lopez <slp@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier
+ <lvivier@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Yi Liu <yi.l.liu@intel.com>, Eduardo Habkost <eduardo@habkost.net>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Weiwei Li <liwei1518@gmail.com>,
+ Amit Shah <amit@kernel.org>, Xiaoyao Li <xiaoyao.li@intel.com>,
+ Yanan Wang <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Ani Sinha <anisinha@redhat.com>, Fabiano Rosas <farosas@suse.de>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ =?UTF-8?Q?Cl=C3=A9ment_Mathieu--Drif?= <clement.mathieu--drif@eviden.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Huacai Chen <chenhuacai@kernel.org>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.caveayland@nutanix.com>,
+ BALATON Zoltan <balaton@eik.bme.hu>, Peter Krempa <pkrempa@redhat.com>,
+ Jiri Denemark <jdenemar@redhat.com>
+References: <20251202162835.3227894-1-zhao1.liu@intel.com>
+ <20251202162835.3227894-16-zhao1.liu@intel.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20251202162835.3227894-16-zhao1.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 27, 2025 at 7:09=E2=80=AFAM Guo Ren <guoren@kernel.org> wrote:
->
->
->
-> On Wed, Nov 26, 2025 at 2:16=E2=80=AFAM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrc=
-mar@ventanamicro.com> wrote:
->>
->> 2025-11-25T22:18:11+08:00, <fangyu.yu@linux.alibaba.com>:
->> >>> On Sat, Nov 22, 2025 at 3:50=E2=80=AFPM <fangyu.yu@linux.alibaba.com=
-> wrote:
->> >>> >
->> >>> > From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
->> >>> >
->> >>> > Currently, HGATP mode uses the maximum value detected by the hardw=
-are
->> >>> > but often such a wide GPA is unnecessary, just as a host sometimes
->> >>> > doesn't need sv57.
->> >>> > It's likely that no additional parameters (like no5lvl and no4lvl)=
- are
->> >>> > needed, aligning HGATP mode to SATP mode should meet the requireme=
-nts
->> >>> > of most scenarios.
->> >>> Yes, no5/4lvl is not clear about satp or hgatp. So, covering HGPATP =
-is
->> >>> reasonable.
->> >>
->> >>The documentation should be improved, but I don't think we want to sta=
-te
->> >>that these parameters apply to both s- and g-stage. If we need paramet=
-ers
->> >>to dictate KVM behavior (g-stage management), then we should add KVM
->> >>module parameters.
->> >
->> > Right, adding new parameters for g-stage management is clear.
->> >
->> > Or we could discuss this topic, from a virtual machine perspective,
->> > it may not be necessary to provide all hardware configuration
->> > combinations. For example, when SATP is configured as sv48,
->> > configuring HGATP as sv57*4 is not very meaningful, Because the
->> > VM cannot actually use more than 48 bits of GPA range.
->>
->> The choice of hgatp mode depends on how users configure guest's memory
->> map, regardless of what satp or vsatp modes are.
->> (All RV64 SvXY modes map XY bit VA to 56 bit PA.)
->>
->> If the machine model maps memory with set bit 55, then KVM needs to
->> configure Sv57x4, and if nothing is mapped above 2 TiB, then KVM is
->> completely fine with Sv39x4.
->>
->> A module parameter works, but I think it would be nicer to set the hgatp
->> mode per-VM, because most VMs could use the efficient Sv39x4, while it's
->> not a good idea to pick it as the default.
->> I think KVM has enough information to do it automatically (and without
->> too much complexity) by starting with Sv39x4, and expanding as needed.
->
-> Good point; if only a 128GB GPA memory region is needed, there is no need=
- for Sv57x4, which costs PTW cycles.
->
-> So, the detection should start from Sv39x4 to Sv57x4 with the guest memor=
-y size.
->
+On 2/12/25 17:28, Zhao Liu wrote:
+> From: Philippe Mathieu-Daudé <philmd@linaro.org>
+> 
+> Now all calls of x86 machines to fw_cfg_init_io_dma() pass DMA
+> arguments, so the FWCfgState (FWCfgIoState) created by x86 machines
+> enables DMA by default.
+> 
+> Although other callers of fw_cfg_init_io_dma() besides x86 also pass
+> DMA arguments to create DMA-enabled FwCfgIoState, the "dma_enabled"
+> property of FwCfgIoState cannot yet be removed, because Sun4u and Sun4v
+> still create DMA-disabled FwCfgIoState (bypass fw_cfg_init_io_dma()) in
+> sun4uv_init() (hw/sparc64/sun4u.c).
+> 
+> Maybe reusing fw_cfg_init_io_dma() for them would be a better choice, or
+> adding fw_cfg_init_io_nodma(). However, before that, first simplify the
+> handling of FwCfgState in x86.
 
-NACK to the approach of detecting backwards.
+I answered these concerns here:
+https://lore.kernel.org/qemu-devel/20251203060942.57851-1-philmd@linaro.org/
 
-HGATP mode is a per-VM attribute hence it makes sense
-to define a VM-level KVM_CAP_RISC_xyz for this purpose.
-The default behaviour should be use highest HGATP mode
-unless KVM user-space changes the KVM_CAP_RISC_xyz
-setting.
+> Considering that FwCfgIoState in x86 enables DMA by default, remove the
+> handling for DMA-disabled cases and replace DMA checks with assertions
+> to ensure that the default DMA-enabled setting is not broken.
+> 
+> Then 'linuxboot.bin' isn't used anymore, and it will be removed in the
+> next commit.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> ---
+> Changes since v4:
+>   * Keep "dma_enabled" property in fw_cfg_io_properties[].
+>   * Replace DMA checks with assertions for x86 machines.
+> ---
+>   hw/i386/fw_cfg.c     | 16 ++++++++--------
+>   hw/i386/x86-common.c |  6 ++----
+>   2 files changed, 10 insertions(+), 12 deletions(-)
 
----
-Anup
 
