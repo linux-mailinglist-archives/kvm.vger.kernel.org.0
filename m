@@ -1,201 +1,241 @@
-Return-Path: <kvm+bounces-65218-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65219-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AFA2C9F552
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 15:42:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0491EC9F633
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 15:58:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sto.lore.kernel.org (Postfix) with ESMTPS id 8BF103000B13
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 14:42:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 0D3F8300114C
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 14:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB02E3002A9;
-	Wed,  3 Dec 2025 14:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753B8304985;
+	Wed,  3 Dec 2025 14:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="Sa83EOV4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ms/BIW2T"
 X-Original-To: kvm@vger.kernel.org
-Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC3D2FB98D
-	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 14:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.34.181.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CCF43ABC;
+	Wed,  3 Dec 2025 14:58:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764772942; cv=none; b=o9JlZXwWwteOD0vFbaB8m9gDPpOplnH1hZtEUJ6zlF5W+qwPaSaK5OWLC8YBacwydJrMO9vfX5xUCqpzLtWw39oRxZ1Z5pN6ow5Tnle2P+1iDdXQ74X5hD2yTqSct/o++H1TQWTbx9HqixtESqWnGvqBInokUyQGN6z3vmUuBqk=
+	t=1764773896; cv=none; b=sbl1yRWdHxW+wjcHMxEoVrgKfkNE/IJ6aRuPPzOemrEj3r6MFmRkLjMwslvexuIBMkMWs1j/oqNFhCKkz2WZOq8aaKiO7X87rQ0oKp0Mird37RJOMLdip7qWsj/BHIKuiVS+cNIGSpiUHcaainm7GLUW0ZAJYWZeATVFCeG4zeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764772942; c=relaxed/simple;
-	bh=VBVOYMNu7wQPHk0cdGsQc1sfQFI3uJV2R4AH85YUTd4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UZhyahv0bc/Y5Y/RVvcQnTbLE6vUVcwldI0v9T4BikuCBStSKEqrid7WV56dqp9050UPKnPLMXjqDADI/ucejDawMYaCHbY7guS8AG88Kba0M2mQGUhoC8D23fuOH8lD2zBNa++urtTe5NQIcpKnU/XYfTMZoUm/4ZeWDNIIoJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=Sa83EOV4; arc=none smtp.client-ip=52.34.181.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1764772941; x=1796308941;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2yU7GhsrzYKyIg9t6c+2Jr/967yoOw56UVwzZM5U8PU=;
-  b=Sa83EOV4EOo5b88K6ijRFBhFdJ+UV/q/84kingMkHmgGls2sAdBBUAqr
-   TMd4HoQNLGMEInIPIP7PXjFQRwVy5HzRfS40bBIWQ91JNn807F76vuqr1
-   BN5KQcFeaEZ0ethO7Pg2e3c/Ahssr4Ndhkis9B3eYgNdY/8V+0LIwbG2U
-   BoDupNXtN5A8OEnwv33bRTZdMK/E8o2A4KzVhNCm1M1yS73quZUSqOsmT
-   Psn2bfUpyUNcLXpBUhcjjUbHxPT/bgibpoAxwTddqEPBonXKazqhjrsMF
-   wDMGMVy4CwYtYIXcp4PzOKdnKzbYLYfbyt7QUenrP5xF7zplfhUBleT88
-   w==;
-X-CSE-ConnectionGUID: a+DIFNiKT2e3iG29gxKzKA==
-X-CSE-MsgGUID: ENucAAs+S4KdtZyQ0JGpmA==
-X-IronPort-AV: E=Sophos;i="6.20,246,1758585600"; 
-   d="scan'208";a="8334966"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2025 14:42:18 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.234:27999]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.237:2525] with esmtp (Farcaster)
- id b516f777-0690-4732-8da9-47f4621b8e5d; Wed, 3 Dec 2025 14:42:18 +0000 (UTC)
-X-Farcaster-Flow-ID: b516f777-0690-4732-8da9-47f4621b8e5d
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Wed, 3 Dec 2025 14:42:17 +0000
-Received: from dev-dsk-itazur-1b-11e7fc0f.eu-west-1.amazon.com (172.19.66.53)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Wed, 3 Dec 2025 14:42:15 +0000
-From: Takahiro Itazuri <itazur@amazon.com>
-To: <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
-CC: Sean Christopherson <seanjc@google.com>, Vitaly Kuznetsov
-	<vkuznets@redhat.com>, Fuad Tabba <tabba@google.com>, Brendan Jackman
-	<jackmanb@google.com>, David Hildenbrand <david@kernel.org>, David Woodhouse
-	<dwmw2@infradead.org>, Paul Durrant <pdurrant@amazon.com>, Nikita Kalyazin
-	<kalyazin@amazon.com>, Patrick Roy <patrick.roy@campus.lmu.de>, "Takahiro
- Itazuri" <zulinx86@gmail.com>
-Subject: [RFC PATCH 2/2] KVM: pfncache: Use vmap() for guest_memfd pages without direct map
-Date: Wed, 3 Dec 2025 14:41:47 +0000
-Message-ID: <20251203144159.6131-3-itazur@amazon.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251203144159.6131-1-itazur@amazon.com>
-References: <20251203144159.6131-1-itazur@amazon.com>
+	s=arc-20240116; t=1764773896; c=relaxed/simple;
+	bh=q6xtpA3Ne2GVQqviQ2yAHz9kGWrU02LdKiLnietBFIE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q0lUr/zuBHx1I/67aKDmlmTIMrp0iH+hTJLAJQiDkzEhSGXkuBftAx3O9Ces1eIAmNKoSVn+DObEmeYB+imgFa3JkBc7GHW0rgkihv/W9QcfP1RX52WiWDLq7ewBiSOBYw0Xx+NyNzQ61Cdy42oagyb9GPRFFfr/XGR3Qcl+5Vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ms/BIW2T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D61C4CEF5;
+	Wed,  3 Dec 2025 14:58:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764773896;
+	bh=q6xtpA3Ne2GVQqviQ2yAHz9kGWrU02LdKiLnietBFIE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ms/BIW2TEXNMnkHQTbPaWXCYSz3tauK7A+HNvqrzAb6MzYchMz0KqwBFZB1QwFFJW
+	 9h65GWCFVSGruHbIZJwHnLlfLjKs7Yz43XR6mgRw9r1mHNQMIKU9EkwVCLuQjAQjGX
+	 tnYE3bjlantv4+044UjudWVA0KJkiEe5naRmuKHvUXfl+aeY5EQuip2Nue4q2R2cSH
+	 Fr/tmaF+3bFxMInlQ8gDb5If0+LnHbPD4+spZ02YOgpywW/tm4oxT9bLDEDhkXOsf/
+	 TVrCP0JomwlN26c+cGx5K4G8gGf85/3uZ/xOJDEgEii+NjWZP35lRYbQvjuf5j7rOz
+	 KRyUzlbnhul8g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vQoJ3-0000000AD00-3BQL;
+	Wed, 03 Dec 2025 14:58:13 +0000
+Date: Wed, 03 Dec 2025 14:58:13 +0000
+Message-ID: <86h5u7pq7u.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: Convert VTCR_EL2 to config-driven sanitisation
+In-Reply-To: <aTBDRx1oeGDs2SFl@raptor>
+References: <20251129144525.2609207-1-maz@kernel.org>
+	<20251129144525.2609207-5-maz@kernel.org>
+	<aTAijieCI8055FL0@raptor>
+	<86ikenpvna.wl-maz@kernel.org>
+	<aTBDRx1oeGDs2SFl@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWA004.ant.amazon.com (10.13.139.56) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-gfn_to_pfn_cache currently maps RAM PFNs with kmap(), which relies on
-the direct map.  guest_memfd created with GUEST_MEMFD_FLAG_NO_DIRECT_MAP
-disable their direct-map PTEs via set_direct_map_valid_noflush(), so the
-linear address returned by kmap()/page_address() will fault if
-dereferenced.
+On Wed, 03 Dec 2025 14:03:51 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Wed, Dec 03, 2025 at 01:00:57PM +0000, Marc Zyngier wrote:
+> > On Wed, 03 Dec 2025 11:44:14 +0000,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > Hi Marc,
+> > > 
+> > > On Sat, Nov 29, 2025 at 02:45:25PM +0000, Marc Zyngier wrote:
+> > > > Describe all the VTCR_EL2 fields and their respective configurations,
+> > > > making sure that we correctly ignore the bits that are not defined
+> > > > for a given guest configuration.
+> > > > 
+> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > > ---
+> > > >  arch/arm64/kvm/config.c | 69 +++++++++++++++++++++++++++++++++++++++++
+> > > >  arch/arm64/kvm/nested.c |  3 +-
+> > > >  2 files changed, 70 insertions(+), 2 deletions(-)
+> > > > 
+> > > > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> > > > index a02c28d6a61c9..c36e133c51912 100644
+> > > > --- a/arch/arm64/kvm/config.c
+> > > > +++ b/arch/arm64/kvm/config.c
+> > > > @@ -141,6 +141,7 @@ struct reg_feat_map_desc {
+> > > >  #define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
+> > > >  #define FEAT_AA64EL2		ID_AA64PFR0_EL1, EL2, IMP
+> > > >  #define FEAT_AA64EL3		ID_AA64PFR0_EL1, EL3, IMP
+> > > > +#define FEAT_SEL2		ID_AA64PFR0_EL1, SEL2, IMP
+> > > >  #define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
+> > > >  #define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
+> > > >  #define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
+> > > > @@ -202,6 +203,8 @@ struct reg_feat_map_desc {
+> > > >  #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
+> > > >  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
+> > > >  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
+> > > > +#define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
+> > > > +#define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
+> > > >  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
+> > > >  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
+> > > >  #define FEAT_IESB		ID_AA64MMFR2_EL1, IESB, IMP
+> > > > @@ -219,6 +222,7 @@ struct reg_feat_map_desc {
+> > > >  #define FEAT_FGT2		ID_AA64MMFR0_EL1, FGT, FGT2
+> > > >  #define FEAT_MTPMU		ID_AA64DFR0_EL1, MTPMU, IMP
+> > > >  #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
+> > > > +#define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
+> > > >  
+> > > >  static bool not_feat_aa64el3(struct kvm *kvm)
+> > > >  {
+> > > > @@ -362,6 +366,28 @@ static bool feat_pmuv3p9(struct kvm *kvm)
+> > > >  	return check_pmu_revision(kvm, V3P9);
+> > > >  }
+> > > >  
+> > > > +#define has_feat_s2tgran(k, s)						\
+> > > > +  ((kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, TGRAN##s) && \
+> > > > +    !kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s, NI))	     ||	\
+> > > 
+> > > Wouldn't that read better as kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s, IMP)?
+> > > I think that would also be correct.
+> > 
+> > Sure, I don't mind either way,
+> > 
+> > > 
+> > > > +   kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, IMP))
+> > > 
+> > > A bit unexpected to treat the same field first as an enum, then as an integer,
+> > > but it saves one line.
+> > 
+> > It potentially saves more if the encoding grows over time. I don't
+> > think it matters.
+> 
+> Doesn't, was just aestethics and saves someone having to check the values to
+> make sure it wasn't an error.
+> 
+> > 
+> > > 
+> > > > +
+> > > > +static bool feat_lpa2(struct kvm *kvm)
+> > > > +{
+> > > > +	return ((kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT)    ||
+> > > > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP))	&&
+> > > > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT)   ||
+> > > > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP))	&&
+> > > > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, 52_BIT)  ||
+> > > > +		 !has_feat_s2tgran(kvm, 4))				&&
+> > > > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, 52_BIT) ||
+> > > > +		 !has_feat_s2tgran(kvm, 16)));
+> > > > +}
+> > > 
+> > > That was a doozy, but looks correct to me if the intention was to have the check
+> > > as relaxed as possible - i.e, a VM can advertise 52 bit support for one granule,
+> > > but not the other (same for stage 1 and stage 2).
+> > 
+> > Not quite. The intent is that, for all the possible granules, at all
+> > the possible stages, either the granule size isn't implemented at all,
+> > or it supports 52 bits. I think this covers it, but as you said, this
+> > is a bit of a bran fsck.
+> 
+> Hm... this sounds like something that should be sanitised in
+> set_id_aa64mmfr0_el1(). Sorry, but I just can't tell if TGran{4,16,64} are
+> writable by userspace.
 
-In some cases, gfn_to_pfn_cache dereferences the cached kernel host
-virtual address (khva) from atomic contexts where page faults cannot be
-tolerated.  Therefore khva must always refer to a fault-free kernel
-mapping.  Since mapping and unmapping happen exclusively in the refresh
-path, which may sleep, using vmap()/vunmap() for these pages is safe and
-sufficient.
+Everything in ID_AA64MMFR0_EL1 is writable, except for ASIDBITS.
 
-Introduce kvm_slot_no_direct_map() to detect guest_memfd slots without
-the direct map, and make gpc_map()/gpc_unmap() use vmap()/vunmap() for
-such pages.
+> 
+> > 
+> > This is essentially a transliteration of the MRS:
+> > 
+> > (FEAT_LPA2 && FEAT_S2TGran4K) <=> (UInt(ID_AA64MMFR0_EL1.TGran4_2) >= 3))
+> > (FEAT_LPA2 && FEAT_S2TGran16K) <=> (UInt(ID_AA64MMFR0_EL1.TGran16_2) >= 3))
+> > (FEAT_LPA2 && FEAT_TGran4K) <=> (SInt(ID_AA64MMFR0_EL1.TGran4) >= 1))
+> > (FEAT_LPA2 && FEAT_TGran16K) <=> (UInt(ID_AA64MMFR0_EL1.TGran16) >= 2))
+> > FEAT_S2TGran4K <=> (((UInt(ID_AA64MMFR0_EL1.TGran4_2) == 0) && FEAT_TGran4K) || (UInt(ID_AA64MMFR0_EL1.TGran4_2) >= 2))
+> > FEAT_S2TGran16K <=> (((UInt(ID_AA64MMFR0_EL1.TGran16_2) == 0) && FEAT_TGran16K) || (UInt(ID_AA64MMFR0_EL1.TGran16_2) >= 2))
+> > FEAT_TGran4K <=> (SInt(ID_AA64MMFR0_EL1.TGran4) >= 0)
+> > FEAT_TGran16K <=> (UInt(ID_AA64MMFR0_EL1.TGran16) >= 1)
+> 
+> How about (untested):
+> 
+> static bool feat_lpas2(struct kvm *kvm)
+> {
+> 	if (kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP) ||
+> 	    kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP) ||
+> 	    kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, IMP) ||
+> 	    kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, IMP))
+> 		return false;
+> 
+> 	return true;
+> }
 
-This allows the features based on gfn_to_pfn_cache (e.g. kvm-clock) to
-work correctly with guest_memfd regardless of whether its direct-map
-PTEs are valid.
+The combination (TGRAN4=NI, TGRAN2_4=TGRAN4, TGRAN16=52_BIT,
+TGRAN16_2=52_BIT) is a valid LPA2 configuration, which the test above
+rejects.
 
-Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
----
- include/linux/kvm_host.h |  7 +++++++
- virt/kvm/pfncache.c      | 26 ++++++++++++++++++++------
- 2 files changed, 27 insertions(+), 6 deletions(-)
+> where, in case there's not something similar already and I just don't know about
+> it:
+> 
+> #define kvm_has_feat_exact(kvm, id, fld, val)			\
+> 	kvm_cmp_feat(kvm, id, fld, =, val)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 70e6a5210ceb..793d98f97928 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -15,6 +15,7 @@
- #include <linux/minmax.h>
- #include <linux/mm.h>
- #include <linux/mmu_notifier.h>
-+#include <linux/pagemap.h>
- #include <linux/preempt.h>
- #include <linux/msi.h>
- #include <linux/slab.h>
-@@ -628,6 +629,12 @@ static inline bool kvm_slot_dirty_track_enabled(const struct kvm_memory_slot *sl
- 	return slot->flags & KVM_MEM_LOG_DIRTY_PAGES;
- }
- 
-+static inline bool kvm_slot_no_direct_map(const struct kvm_memory_slot *slot)
-+{
-+	return slot && kvm_slot_has_gmem(slot) &&
-+	       mapping_no_direct_map(slot->gmem.file->f_mapping);
-+}
-+
- static inline unsigned long kvm_dirty_bitmap_bytes(struct kvm_memory_slot *memslot)
- {
- 	return ALIGN(memslot->npages, BITS_PER_LONG) / 8;
-diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index bf8d6090e283..87167d7f3feb 100644
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -96,10 +96,16 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigned long len)
- 	return true;
- }
- 
--static void *gpc_map(kvm_pfn_t pfn)
-+static void *gpc_map(struct gfn_to_pfn_cache *gpc, kvm_pfn_t pfn)
- {
--	if (pfn_valid(pfn))
--		return kmap(pfn_to_page(pfn));
-+	if (pfn_valid(pfn)) {
-+		struct page *page = pfn_to_page(pfn);
-+
-+		if (kvm_slot_no_direct_map(gpc->memslot))
-+			return vmap(&page, 1, VM_MAP, PAGE_KERNEL);
-+
-+		return kmap(page);
-+	}
- 
- #ifdef CONFIG_HAS_IOMEM
- 	return memremap(pfn_to_hpa(pfn), PAGE_SIZE, MEMREMAP_WB);
-@@ -115,6 +121,11 @@ static void gpc_unmap(kvm_pfn_t pfn, void *khva)
- 		return;
- 
- 	if (pfn_valid(pfn)) {
-+		if (is_vmalloc_addr(khva)) {
-+			vunmap(khva);
-+			return;
-+		}
-+
- 		kunmap(pfn_to_page(pfn));
- 		return;
- 	}
-@@ -224,13 +235,16 @@ static kvm_pfn_t gpc_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
- 
- 		/*
- 		 * Obtain a new kernel mapping if KVM itself will access the
--		 * pfn.  Note, kmap() and memremap() can both sleep, so this
--		 * too must be done outside of gpc->lock!
-+		 * pfn.  Note, kmap(), vmap() and memremap() can sleep, so this
-+		 * too must be done outside of gpc->lock! Note that even though
-+		 * the rwlock is dropped, it's still fine to read gpc->pfn and
-+		 * other fields because gpc->fresh_lock mutex prevents those
-+		 * from being changed.
- 		 */
- 		if (new_pfn == gpc->pfn)
- 			new_khva = old_khva;
- 		else
--			new_khva = gpc_map(new_pfn);
-+			new_khva = gpc_map(gpc, new_pfn);
- 
- 		if (!new_khva) {
- 			kvm_release_page_unused(page);
+#define __kvm_has_feat_enum(kvm, id, fld, val)				\
+	kvm_cmp_feat_unsigned(kvm, id, fld, ==, val)
+
+#define kvm_has_feat_enum(kvm, ...) __kvm_has_feat_enum(kvm, __VA_ARGS__)
+
+> The idea being that if one of the granules does not support 52 bit, then it's
+> not supported by any of the other granules.
+
+See above why I think your proposal doesn't work.
+
+Thanks,
+
+	M.
+
 -- 
-2.50.1
-
+Without deviation from the norm, progress is not possible.
 
