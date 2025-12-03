@@ -1,260 +1,197 @@
-Return-Path: <kvm+bounces-65227-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65228-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 158E5CA058C
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 18:20:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70932CA0473
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 18:11:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 275D73281CBF
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 17:06:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE0F730A5129
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 16:59:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDDAD357A43;
-	Wed,  3 Dec 2025 16:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7ED030649A;
+	Wed,  3 Dec 2025 16:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BOygVmMn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CA29AkXS"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7851035772A
-	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 16:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38A135FF66;
+	Wed,  3 Dec 2025 16:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764779753; cv=none; b=gI4BxbjMaBWksrwcZ7VzuKzh/mD8I7pyN6Rwhx3/DFVlRmhfbLrTClPmP/RsXmSBPHeQRmYH2dMz6c2iZxyekODazFaicJ11rsqRpMFqTm66+1wqsqGWtTELLrpd3EtqpI/43Vi+o8B+tayRpoIUbndvYm19mQBFBQ9mlpuI2oE=
+	t=1764780214; cv=none; b=m7VCBCbf0IxNZUeOsak7W1oWXIobxpZkwkx2RLpe689dOqPpilLaG2qu9CiE4Kr/ED+z+e8SnjIKxVoff3C/Y8vw2IJ5knxAbCam3j6zI5+rbLj3asoOBQF8bdx8CVRCSBXSq0QubBRjUCTrS5BiQdeTyBMxfbq8O1yseeHHT98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764779753; c=relaxed/simple;
-	bh=LLhpC28SXmi+NalNLofeVxm0yN/BI/eqb2ZIDUpweZg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Hjr+weG3qC9qKC96lF23unBzh5kmpUa6OSW/ndN2cpSGkAaqcoyaWA00h1EQVLYG5hruR/XoG/jUKkvU9QmdVitaeYWxnNIW5cwBwTZfKql31+HABSEpYqkelrGKoJCDwbG1ShcRn5bPgQsoa/ijTvbk6YxUp+plvyhP8XQfjyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BOygVmMn; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=LLhpC28SXmi+NalNLofeVxm0yN/BI/eqb2ZIDUpweZg=; b=BOygVmMni5ZSE3IelFKh/1yfBa
-	4zcLUSggjpN/c0zk81AgBgn8y7o5w6bxV4t/3InV2TD+CIcwGtMXOH1HcwMWfpDHeDW2rGMHINqty
-	tJZBj3TgCPWy6LufwUULW+OOynNvEIVLIh+Kyw6R/4n6d0nQfVTGvRMYqp6XngrZ3TCL8TBdAG46w
-	GP+vGoDF8CA+vpWEUTdPLAkWdRxQqDa4kuMK9+UAtYATXmZFuofC3MQx1ywgAysClApsaMUveaJ0b
-	ii02F89fN+sGB0Y6s+1TAsypE3ZNovbcTUBbbh5uPhLwJKOpVJ7HlokWmdE6JCx+e1JvBlNliRPzp
-	blLNZDfw==;
-Received: from [172.31.31.148] (helo=u09cd745991455d.lumleys.internal)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vQoxt-00000002Wq7-21I8;
-	Wed, 03 Dec 2025 15:40:25 +0000
-Message-ID: <a07a6edf549cfed840c9ead3db61978c951b15e4.camel@infradead.org>
-Subject: Re: [RFC PATCH 0/2] KVM: pfncache: Support guest_memfd without
- direct map
-From: David Woodhouse <dwmw2@infradead.org>
-To: Brendan Jackman <jackmanb@google.com>, Takahiro Itazuri
- <itazur@amazon.com>,  kvm@vger.kernel.org, Paolo Bonzini
- <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, Vitaly Kuznetsov
-	 <vkuznets@redhat.com>, Fuad Tabba <tabba@google.com>, David Hildenbrand
-	 <david@kernel.org>, Paul Durrant <pdurrant@amazon.com>, Nikita Kalyazin
-	 <kalyazin@amazon.com>, Patrick Roy <patrick.roy@campus.lmu.de>, Takahiro
- Itazuri <zulinx86@gmail.com>
-Date: Wed, 03 Dec 2025 16:35:45 +0000
-In-Reply-To: <DEOPHISOX8MK.2YEMZ8XKLQGMC@google.com>
-References: <20251203144159.6131-1-itazur@amazon.com>
-	 <DEOPHISOX8MK.2YEMZ8XKLQGMC@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-AUP9HmdhBUAZ/Cd9yatg"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1764780214; c=relaxed/simple;
+	bh=iyflUZchaw873FTzogwUNqRT8cclH8+Swqz8EPmoL5w=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r+tiaLudl1lwYLLeqEEivueA2L55gE3p688ZKED0dNWEI8F6F+qXDJ2b+Wz+ZAVlMEdDwxifh7idGazcOvaEYiwwZIOEuZHauenXIRbonb1IniZqmeigkuSGPHX190xiJnY+QYFaYABXIaxVuwcD0Omn7YOA8vDUJs4MW9FsFZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CA29AkXS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 230B0C4CEF5;
+	Wed,  3 Dec 2025 16:43:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764780214;
+	bh=iyflUZchaw873FTzogwUNqRT8cclH8+Swqz8EPmoL5w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CA29AkXSlTUEp4TCKC8TjYGZYOKPd7DJierroBKco/xQli3ma3HoMF9l3c6PHRdya
+	 jn0FuRwOgU8vlGAA18fWSxmbb2JYp0V60Fo9NO6UZRgRDpPNnObaaSjXFUenWstB4d
+	 RX9+AEOh0SUG7hMiiXnCgLzluYqH8tFVr06KHaiSlQyA4UTxM6Ft85SKI7nY+rPW63
+	 wxzUaIGBLxg62Z3EMxd/SKSHs5niGm/vb/7o/fSh1hGblzPKepAHg1nijjeYC6oWbR
+	 vyi7w+lsxnnkZuvJ6eWUpI8PNTOuU+Y7kdL3QaREIITPtwOpY29PZE59u62LJOVeAv
+	 ooqXhHdtZoEXA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vQpwx-0000000AEDg-38lh;
+	Wed, 03 Dec 2025 16:43:31 +0000
+Date: Wed, 03 Dec 2025 16:43:31 +0000
+Message-ID: <86fr9rplcc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: Convert VTCR_EL2 to config-driven sanitisation
+In-Reply-To: <20251203161715.GA4187196@e124191.cambridge.arm.com>
+References: <20251129144525.2609207-1-maz@kernel.org>
+	<20251129144525.2609207-5-maz@kernel.org>
+	<20251203161715.GA4187196@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 03 Dec 2025 16:17:15 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> Hi!
+> 
+> On Sat, Nov 29, 2025 at 02:45:25PM +0000, Marc Zyngier wrote:
+> > Describe all the VTCR_EL2 fields and their respective configurations,
+> > making sure that we correctly ignore the bits that are not defined
+> > for a given guest configuration.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/config.c | 69 +++++++++++++++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/nested.c |  3 +-
+> >  2 files changed, 70 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> > index a02c28d6a61c9..c36e133c51912 100644
+> > --- a/arch/arm64/kvm/config.c
+> > +++ b/arch/arm64/kvm/config.c
+> > @@ -141,6 +141,7 @@ struct reg_feat_map_desc {
+> >  #define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
+> >  #define FEAT_AA64EL2		ID_AA64PFR0_EL1, EL2, IMP
+> >  #define FEAT_AA64EL3		ID_AA64PFR0_EL1, EL3, IMP
+> > +#define FEAT_SEL2		ID_AA64PFR0_EL1, SEL2, IMP
+> >  #define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
+> >  #define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
+> >  #define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
+> > @@ -202,6 +203,8 @@ struct reg_feat_map_desc {
+> >  #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
+> >  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
+> >  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
+> > +#define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
+> > +#define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
+> >  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
+> >  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
+> >  #define FEAT_IESB		ID_AA64MMFR2_EL1, IESB, IMP
+> > @@ -219,6 +222,7 @@ struct reg_feat_map_desc {
+> >  #define FEAT_FGT2		ID_AA64MMFR0_EL1, FGT, FGT2
+> >  #define FEAT_MTPMU		ID_AA64DFR0_EL1, MTPMU, IMP
+> >  #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
+> > +#define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
+> >  
+> >  static bool not_feat_aa64el3(struct kvm *kvm)
+> >  {
+> > @@ -362,6 +366,28 @@ static bool feat_pmuv3p9(struct kvm *kvm)
+> >  	return check_pmu_revision(kvm, V3P9);
+> >  }
+> >  
+> > +#define has_feat_s2tgran(k, s)						\
+> > +  ((kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, TGRAN##s) && \
+> > +    !kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s, NI))	     ||	\
+> > +   kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, IMP))
+> > +
+> > +static bool feat_lpa2(struct kvm *kvm)
+> > +{
+> > +	return ((kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT)    ||
+> > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP))	&&
+> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT)   ||
+> > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP))	&&
+> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, 52_BIT)  ||
+> > +		 !has_feat_s2tgran(kvm, 4))				&&
+> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, 52_BIT) ||
+> > +		 !has_feat_s2tgran(kvm, 16)));
+> > +}
+> > +
+> > +static bool feat_vmid16(struct kvm *kvm)
+> > +{
+> > +	return kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16);
+> > +}
+> > +
+> >  static bool compute_hcr_rw(struct kvm *kvm, u64 *bits)
+> >  {
+> >  	/* This is purely academic: AArch32 and NV are mutually exclusive */
+> > @@ -1168,6 +1194,44 @@ static const struct reg_bits_to_feat_map mdcr_el2_feat_map[] = {
+> >  static const DECLARE_FEAT_MAP(mdcr_el2_desc, MDCR_EL2,
+> >  			      mdcr_el2_feat_map, FEAT_AA64EL2);
+> >  
+> > +static const struct reg_bits_to_feat_map vtcr_el2_feat_map[] = {
+> > +	NEEDS_FEAT(VTCR_EL2_HDBSS, FEAT_HDBSS),
+> > +	NEEDS_FEAT(VTCR_EL2_HAFT, FEAT_HAFT),
+> > +	NEEDS_FEAT(VTCR_EL2_TL0		|
+> > +		   VTCR_EL2_TL1		|
+> > +		   VTCR_EL2_AssuredOnly	|
+> > +		   VTCR_EL2_GCSH,
+> > +		   FEAT_THE),
+> 
+> The text for VTCR_EL2.AssuredOnly says:
+> 
+> 	This field is RES0 when VTCR_EL2.D128 is 1.
+> 
+> > +	NEEDS_FEAT(VTCR_EL2_D128, FEAT_D128),
+> > +	NEEDS_FEAT(VTCR_EL2_S2POE, FEAT_S2POE),
+> > +	NEEDS_FEAT(VTCR_EL2_S2PIE, FEAT_S2PIE),
+> 
+> The text for VTCR_EL2.S2PIE says:
+> 
+> 	This field is RES1 when VTCR_EL2.D128 is set.
+> 
+> 
+> Are these cases that need to be handled here somehow?
 
---=-AUP9HmdhBUAZ/Cd9yatg
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+These are not static configurations. They are dynamic behaviours
+depending on other control bits.
 
-On Wed, 2025-12-03 at 16:01 +0000, Brendan Jackman wrote:
-> On Wed Dec 3, 2025 at 2:41 PM UTC, Takahiro Itazuri wrote:
-> > [ based on kvm/next with [1] ]
-> >=20
-> > Recent work on guest_memfd [1] is introducing support for removing gues=
-t
-> > memory from the kernel direct map (Note that this work has not yet been
-> > merged, which is why this patch series is labelled RFC). The feature is
-> > useful for non-CoCo VMs to prevent the host kernel from accidentally or
-> > speculatively accessing guest memory as a general safety improvement.
-> > Pages for guest_memfd created with GUEST_MEMFD_FLAG_NO_DIRECT_MAP have
-> > their direct-map PTEs explicitly disabled, and thus cannot rely on the
-> > direct map.
-> >=20
-> > This breaks the features that use gfn_to_pfn_cache, including kvm-clock=
-.
-> > gfn_to_pfn_cache caches the pfn and kernel host virtual address (khva)
-> > for a given gfn so that KVM can repeatedly access the corresponding
-> > guest page.=C2=A0 The cached khva may later be dereferenced from atomic
-> > contexts in some cases.=C2=A0 Such contexts cannot tolerate sleep or pa=
-ge
-> > faults, and therefore cannot use the userspace mapping (uhva), as those
-> > mappings may fault at any time.=C2=A0 As a result, gfn_to_pfn_cache req=
-uires
-> > a stable, fault-free kernel virtual address for the backing pages,
-> > independent of the userspace mapping.
-> >=20
-> > This small patch series enables gfn_to_pfn_cache to work correctly when
-> > a memslot is backed by guest_memfd with GUEST_MEMFD_FLAG_NO_DIRECT_MAP.
-> > The first patch teaches gfn_to_pfn_cache to obtain pfn for guest_memfd-
-> > backed memslots via kvm_gmem_get_pfn() instead of GUP (hva_to_pfn()).
-> > The second patch makes gfn_to_pfn_cache use vmap()/vunmap() to create a
-> > fault-free kernel address for such pages.=C2=A0 We believe that establi=
-shing
-> > such mapping for paravirtual guest/host communication is acceptable as
-> > such pages do not contain sensitive data.
-> >=20
-> > Another considered idea was to use memremap() instead of vmap(), since
-> > gpc_map() already falls back to memremap() if pfn_valid() is false.
-> > However, vmap() was chosen for the following reason.=C2=A0 memremap() w=
-ith
-> > MEMREMAP_WB first attempts to use the direct map via try_ram_remap(),
-> > and then falls back to arch_memremap_wb(), which explicitly refuses to
-> > map system RAM.=C2=A0 It would be possible to relax this restriction, b=
-ut the
-> > side effects are unclear because memremap() is widely used throughout
-> > the kernel.=C2=A0 Changing memremap() to support system RAM without the
-> > direct map solely for gfn_to_pfn_cache feels disproportionate.=C2=A0 If
-> > additional users appear that need to map system RAM without the direct
-> > map, revisiting and generalizing memremap() might make sense.=C2=A0 For=
- now,
-> > vmap()/vunmap() provides a contained and predictable solution.
-> >=20
-> > A possible approach in the future is to use the "ephmap" (or proclocal)
-> > proposed in [2], but it is not yet clear when that work will be merged.
->=20
-> (Nobody knows how to pronounce "ephmap" aloud and when you do know how
-> to say it, it sounds like you are sayhing "fmap" which is very
-> confusing. So next time I post it I plan to call it "mermap" instead:
-> EPHemeral -> epheMERal).
->=20
-> Apologies for my ignorance of the context here, I may be missing
-> insights that are obvious, but with that caveat...
->=20
-> The point of the mermap (formerly "ephmap") is to be able to efficiently
-> map on demand then immediately unmap without the cost of a TLB
-> shootdown. Is there any reason we'd need to do that here? If we can get
-> away with a stable vmapping then that seems superior to the mermap
-> anyway.
->=20
-> Putting it in an mm-local region would be nice (you say there shouldn't
-> be sensitive data in there, but I guess there's still some potential for
-> risk? Bounding that to the VMM process seems like a good idea to me)
-> but that seems nonblocking, could easily be added later. Also note it
-> doesn't depend on mermap, we could just have an mm-local region of the
-> vmalloc area. Mermap requires mm-local but not the other-way around.
+D128 code, if it ever exists, will have to *interpret* these bits as
+RES0 (resp. RES1) when evaluating the page tables.
 
-Right. It's really the mm-local part which we might want to support in
-the gfn_to_pfn_cache, not ephmap/mermap per se.
+If you want a similar example in existing code, look at the way we
+handle TCR_EL1.HPDn in the S1 PTW. They are treated as RES1 if
+TCR2_EL1.PIE is set, as per R_JHSVW.
 
-As things stand, we're taking guest pages which were taken out of the
-global directmap for a *reason*... and mapping them right back in
-globally. Making the new mapping of those pages mm-local where possible
-is going to be very desirable.
+Thanks,
 
---=-AUP9HmdhBUAZ/Cd9yatg
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+	M.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MTIwMzE2MzU0
-NVowLwYJKoZIhvcNAQkEMSIEIGyNwuCzyMBew0epWkgGZEIOSwK4BhTuHc4RGeP1tt+XMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAm5+Wxdu4WQNt
-B7oomDzCrnwtt8Ijojg2KwDjNFzPuoScOLDo/PO1QRXCFQoK8X3xREK6OykCAKqnfj8IrzD93cJ2
-Wer+NOAADzt0ksheJl58bVHxwC6Xd4pybEBpkrtByfr8KBIaAt8HZCOR+lU8vdStD+W6NezusNWm
-b4rd+hqVohUSDzzGu69yNHEbUE33qyfw5ulYmMe/4zn3SkjfB0+2NYkdi98uPDMyqbv1WqW3/J/m
-jE5CimAhkIeIQZssHm1b1k07fQRb1hLEhL6qRfoPuKbrVOKaYuO/8HdkbXRgW/QvD78jRRhXX2J0
-OZh5TzzFm1bgoOh1lRPNW8LVgMRNaNxssjr6ThUctO5PZlmendfAFeK7H6nb7bBq9RJNjkotSXFW
-lS3Qeq2blFEqPmUHsWXB4d90lFtQWR9550/2YDyUnzkib1j/UINSHNOhOXCQ04yiT1qQo6TSPXUx
-A8HU/7jBVlsJiwV9xuApWZr7OztaR5mb5a8CZO2hmxiMEdxpovEVupjx9LWMiiTujZde2AKeQJLu
-TaXo+wA0VWd4A+jmqtSunO3jmeaoP6iesZ2UXsztf/RNoxNjumfcJJNspQySGVZI0ecLVnTZwrcM
-xrE7U0ZYc5SALKbFb38M4dwMj/4QXfYoHl+nxsYQmX1/sza18aFNqI3ZWG9xdXoAAAAAAAA=
-
-
---=-AUP9HmdhBUAZ/Cd9yatg--
+-- 
+Without deviation from the norm, progress is not possible.
 
