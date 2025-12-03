@@ -1,241 +1,115 @@
-Return-Path: <kvm+bounces-65185-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65186-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68BADC9DC8D
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 06:10:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DF44C9DD0A
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 06:44:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 502CC3A688B
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 05:10:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAB033A82C2
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 05:44:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F11284662;
-	Wed,  3 Dec 2025 05:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="AHebzQJd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA1002882CE;
+	Wed,  3 Dec 2025 05:44:40 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from omta036.useast.a.cloudfilter.net (omta036.useast.a.cloudfilter.net [44.202.169.35])
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B91279DAE
-	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 05:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D86D2765C0;
+	Wed,  3 Dec 2025 05:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764738636; cv=none; b=iwcaBU4OoU/A1m205dTiZi8LqrqGoK/2L5kfDU2stY2+EvJ6jEO4VswYrBuo6dQ+9Ny3a912xv+LAUFCS5RikkTZm+H0/iqN7F2M1oHqLWCIYnxvGc7yFEPClwSeJr6puhznuJ8BuNCAyHYwH5uBu4s419BvywR0wKGmxfAZywY=
+	t=1764740680; cv=none; b=FI0jQVHWZjUjNtaPLCRSF/z7mqFhwrRXft/Vi0uBreqGQ08YWeLT2N89CemQswyvOAE5z+jopdZoFyl/n5SRb1ZxrEhSB6DW/pBFEsWpQwjJqr1cdVCZnIijsNaOIkPXGVj5D9d0xtGoHkGK7YKmjqHDGDkL6snfS98oUWkH5i8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764738636; c=relaxed/simple;
-	bh=EZco+88Y78IvWrfrJZkr11uVXgBLNbqBKW/cA9HQDdw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CIHQ96SRq1291t2lCIsh4IivbkwLQpDXYHGRpk6TxfqVO3hmqzfhXdP6GyvC+ZbI/94k3tBd7IwFhs4WhFvPi3kY2RglGhg6zLpXszxxpUsuTfeZIigKhg2Ba6Qtt8kvM1lIfIEKMIeN4brcZ9KLwk6EcvEDeWlIMFHhnNB5s/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=AHebzQJd; arc=none smtp.client-ip=44.202.169.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-6002b.ext.cloudfilter.net ([10.0.30.203])
-	by cmsmtp with ESMTPS
-	id QWBOv0zuMKXDJQf8GvXtYd; Wed, 03 Dec 2025 05:10:28 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id Qf8Fvtbxkfjs1Qf8GvF6Hn; Wed, 03 Dec 2025 05:10:28 +0000
-X-Authority-Analysis: v=2.4 cv=So+Q6OO0 c=1 sm=1 tr=0 ts=692fc644
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=ujWNxKVE5dX343uAl30YYw==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=7T7KSl7uo7wA:10 a=VwQbUJbxAAAA:8
- a=SYA4UEjrzyP_W4GMUF8A:9 a=QEXdDO2ut3YA:10 a=1ugCHEcPnPZfhCUW74ct:22
- a=xYX6OU9JNrHFPr8prv8u:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EiJ/gpk8T6f2b1RgxrOw36SaHQRodGlXDyE2RAmZZ+M=; b=AHebzQJd7gj3ibRnOveD9UBu6L
-	eC22TZiO2ZS/2m4nkeX0yfBXkc1xb8XFF/qW51fq4k5g25RslWJvOzWYb46o+TZ1HcFHJAbWJx8Br
-	QW8rYAQmU092HZ9CT0FMim45Tdr92ox1z5nnTJDyJlXQwGPskqDrQ6tET8IgbNK1omJ+3c//IxOZm
-	HC8UM1iLEVgG0A/UFgFmjSk9RNtdYffv8YHMfyrtJ7NYMXknmb4EtZu0rpV/Oha61lCc86B+dBK2f
-	YUYpVXv8aKt0wXorZTBSpR55Nl+OXXscgq6oLgYpN6XE9N+BmwXVHl9CUubaXewcA1IMu17UNjhw2
-	MyMdu6hA==;
-Received: from i118-18-233-1.s41.a027.ap.plala.or.jp ([118.18.233.1]:60879 helo=[10.83.24.44])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.98.1)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1vQf8F-00000001b6i-1OkI;
-	Tue, 02 Dec 2025 23:10:27 -0600
-Message-ID: <127bd529-45a0-47bd-8364-5e99144cb773@embeddedor.com>
-Date: Wed, 3 Dec 2025 14:10:19 +0900
+	s=arc-20240116; t=1764740680; c=relaxed/simple;
+	bh=i8GA9MGKyu5KlGw7/hRpTII7Pz2+m+XaC8ABn6+xGkA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K71KPoBwC2HA3xq8b0+TzgjMTkzQ7hJq72M8M6rkvjJj7hXJhashZYs5jbtkuqG8bj1m4DMySlAifLmhpIujBC/BerLJwomfAcHU0zINSI8SYzK+1wW/WBTyN7/MInbbDzmGAfhcPuMjI1+W7NFOHEAx5puYtPPqTf40/PPiZiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384
+	 client-signature ECDSA (secp384r1) client-digest SHA384)
+	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
+	by bmailout2.hostsharing.net (Postfix) with ESMTPS id E10B42007F8C;
+	Wed,  3 Dec 2025 06:44:34 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id BF3A61E6E2; Wed,  3 Dec 2025 06:44:34 +0100 (CET)
+Date: Wed, 3 Dec 2025 06:44:34 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Chris Li <chrisl@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, David Matlack <dmatlack@google.com>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Adithya Jayachandran <ajayachandra@nvidia.com>,
+	Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	David Rientjes <rientjes@google.com>,
+	Jacob Pan <jacob.pan@linux.microsoft.com>,
+	Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>,
+	kvm@vger.kernel.org, Leon Romanovsky <leonro@nvidia.com>,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-pci@vger.kernel.org, Mike Rapoport <rppt@kernel.org>,
+	Parav Pandit <parav@nvidia.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Shuah Khan <shuah@kernel.org>, Tomita Moeko <tomitamoeko@gmail.com>,
+	Vipin Sharma <vipinsh@google.com>, William Tu <witu@nvidia.com>,
+	Yi Liu <yi.l.liu@intel.com>, Yunxiang Li <Yunxiang.Li@amd.com>,
+	Zhu Yanjun <yanjun.zhu@linux.dev>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Subject: Re: [PATCH 02/21] PCI: Add API to track PCI devices preserved across
+ Live Update
+Message-ID: <aS_OQoYKmFBaOHSx@wunner.de>
+References: <20251126193608.2678510-1-dmatlack@google.com>
+ <20251126193608.2678510-3-dmatlack@google.com>
+ <aSrMSRd8RJn2IKF4@wunner.de>
+ <20251130005113.GB760268@nvidia.com>
+ <CA+CK2bB0V9jdmrcNjgsmWHmSFQpSpxdVahf1pb3Bz2WA3rKcng@mail.gmail.com>
+ <20251201132934.GA1075897@nvidia.com>
+ <aS3kUwlVV_WGT66w@google.com>
+ <aS6FJz0725VRLF00@wunner.de>
+ <20251202145925.GC1075897@nvidia.com>
+ <CACePvbVDqc+DN+=9m1qScw6vYEMYbLvfBPwFVsZwMhd71Db2=A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH][next] KVM: Avoid a few dozen
- -Wflex-array-member-not-at-end warnings
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <aPfNKRpLfhmhYqfP@kspp>
-Content-Language: en-US
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <aPfNKRpLfhmhYqfP@kspp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 118.18.233.1
-X-Source-L: No
-X-Exim-ID: 1vQf8F-00000001b6i-1OkI
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: i118-18-233-1.s41.a027.ap.plala.or.jp ([10.83.24.44]) [118.18.233.1]:60879
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 3
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfBtTB2eYo7XMiB8hvQq7795lWw/+Ltp967Uf51wxgVXG8tbo6hSQ8fIOcgwOzeYLhhSRSizTX7Ry93IEoOGnTtPkzywvw0hMMB48xIVYbq8Y4EFntRrc
- ncD0pYC6Ao6/zWkaI2tCN/rFk4sPUFryt4qTnPG/+1ycnqNHqn83NqaVgrM9claOcr2r62eK9GFl7Cl/mwKBL2T9HMygIZe3WqU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACePvbVDqc+DN+=9m1qScw6vYEMYbLvfBPwFVsZwMhd71Db2=A@mail.gmail.com>
 
-Hi all,
+On Tue, Dec 02, 2025 at 08:36:53PM +0400, Chris Li wrote:
+> On Tue, Dec 2, 2025 at 6:59 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > The device is active
+> > during KHO, you CAN NOT do any resource reassignment, not bus numbers,
+> > not mmio. It must be fully disabled.
+> 
+> I agree with Jason. The bus number is used in the low level hardware
+> to do the DMA transfer. The bus number can not change for a device
+> during livedupate with pending DMA transfer. The BDF MUST remain the
+> same as the liveupdate with DMA transfer requirement.
 
-Friendly ping: who can take this, please? :)
+Thank you both for the explanation.
 
-Thanks!
--Gustavo
+> Another point is that, on the same machine it can have multiple PCI
+> host bridges. Each PCI host bridge bus number is acquired from the
+> ACPI table walk. I am not aware of any way to get the slot number of
+> the PCI host bridge. Lukas, do you know how to get the PCI host bridge
+> slot number to form a path?
 
-On 10/22/25 03:12, Gustavo A. R. Silva wrote:
-> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-> getting ready to enable it, globally.
-> 
-> So, in order to avoid ending up with a flexible-array member in the
-> middle of multiple other structs, we use the `__struct_group()` helper
-> to separate the flexible array from the rest of the members in the
-> flexible structure, and use the tagged `struct kvm_stats_desc_hdr`
-> instead of `struct kvm_stats_desc`.
-> 
-> So, with these changes, fix 51 instances of the following type of
-> warning:
-> 
-> 49 ./include/linux/kvm_host.h:1923:31: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> 1 .../include/linux/kvm_host.h:1923:31: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> 1 +./include/linux/kvm_host.h:1923:31: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> 
-> Notice that, before and after the changes, struct sizes and member offsets
-> remain unchanged:
-> 
-> BEFORE
-> 
-> struct kvm_stats_desc {
->          __u32                      flags;                /*     0     4 */
->          __s16                      exponent;             /*     4     2 */
->          __u16                      size;                 /*     6     2 */
->          __u32                      offset;               /*     8     4 */
->          __u32                      bucket_size;          /*    12     4 */
->          char                       name[];               /*    16     0 */
-> 
->          /* size: 16, cachelines: 1, members: 6 */
->          /* last cacheline: 16 bytes */
-> };
-> 
-> struct _kvm_stats_desc {
->          struct kvm_stats_desc      desc;                 /*     0    16 */
->          char                       name[48];             /*    16    48 */
-> 
->          /* size: 64, cachelines: 1, members: 2 */
-> };
-> 
-> AFTER:
-> 
-> struct kvm_stats_desc {
->          union {
->                  struct {
->                          __u32      flags;                /*     0     4 */
->                          __s16      exponent;             /*     4     2 */
->                          __u16      size;                 /*     6     2 */
->                          __u32      offset;               /*     8     4 */
->                          __u32      bucket_size;          /*    12     4 */
->                  };                                       /*     0    16 */
->                  struct kvm_stats_desc_hdr __hdr;         /*     0    16 */
->          };                                               /*     0    16 */
->          char                       name[];               /*    16     0 */
-> 
->          /* size: 16, cachelines: 1, members: 2 */
->          /* last cacheline: 16 bytes */
-> };
-> 
-> struct _kvm_stats_desc {
->          struct kvm_stats_desc_hdr  desc;                 /*     0    16 */
->          char                       name[48];             /*    16    48 */
-> 
->          /* size: 64, cachelines: 1, members: 2 */
-> };
-> 
-> 
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
->   include/uapi/linux/kvm.h | 21 ++++++++++++++++-----
->   include/linux/kvm_host.h |  2 +-
->   2 files changed, 17 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 6efa98a57ec1..99d13ebc5e82 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -14,6 +14,12 @@
->   #include <linux/ioctl.h>
->   #include <asm/kvm.h>
->   
-> +#ifdef __KERNEL__
-> +#include <linux/stddef.h>       /* for offsetof */
-> +#else
-> +#include <stddef.h>             /* for offsetof */
-> +#endif
-> +
->   #define KVM_API_VERSION 12
->   
->   /*
-> @@ -1563,13 +1569,18 @@ struct kvm_stats_header {
->    *        &kvm_stats_header->name_size.
->    */
->   struct kvm_stats_desc {
-> -	__u32 flags;
-> -	__s16 exponent;
-> -	__u16 size;
-> -	__u32 offset;
-> -	__u32 bucket_size;
-> +	/* New members MUST be added within the __struct_group() macro below. */
-> +	__struct_group(kvm_stats_desc_hdr, __hdr, /* no attrs */,
-> +		__u32 flags;
-> +		__s16 exponent;
-> +		__u16 size;
-> +		__u32 offset;
-> +		__u32 bucket_size;
-> +	);
->   	char name[];
->   };
-> +_Static_assert(offsetof(struct kvm_stats_desc, name) == sizeof(struct kvm_stats_desc_hdr),
-> +	       "struct member likely outside of __struct_group()");
->   
->   #define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
->   
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index fa36e70df088..c630991f72be 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1920,7 +1920,7 @@ struct kvm_stat_data {
->   };
->   
->   struct _kvm_stats_desc {
-> -	struct kvm_stats_desc desc;
-> +	struct kvm_stats_desc_hdr desc;
->   	char name[KVM_STATS_NAME_SIZE];
->   };
->   
+Host bridges are identified by the segment number.  On ACPI-based systems,
+it's retrieved by acpi_pci_root_add() through invocation of the _SEG method.
 
+Thanks,
+
+Lukas
 
