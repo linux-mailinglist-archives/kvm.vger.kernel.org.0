@@ -1,153 +1,176 @@
-Return-Path: <kvm+bounces-65232-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65233-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEACFCA105C
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 19:35:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A45CA1161
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 19:43:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C55B353CA66
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 17:34:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6957D31A08D6
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 17:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D2B314B89;
-	Wed,  3 Dec 2025 17:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0729234320D;
+	Wed,  3 Dec 2025 17:32:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e05Yi1Na"
+	dkim=pass (2048-bit key) header.d=cmpxchg.org header.i=@cmpxchg.org header.b="qD+4N+8n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824EE280014
-	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 17:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0704D342538
+	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 17:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764783001; cv=none; b=I8ZMVlqEu2wE+Qw0Du0Ia3ittiJ1l8VdJIuidk0fgRNxMMdzjjTMlUgt7xke7BGF4dat+J2MA3IG2iOw2iciL9WMbXVMfq6djMtR4uTs0+DDzzH6d3cQECAIbDDdG3tjg8OcXjpcVRUSp5OLtCn7ahchCLoXEKNr8Vn9R70O0Ns=
+	t=1764783140; cv=none; b=ALnoM4culnM43B6hIGom7S7t8qegBOWz0taIjzrqjXnr6aX40iR8JBtNm2uutALslOWx5XunCHpSkY3SdKmIIiR8W4w2G+EHt09vZtWGwcJ1d/Y6z4qGcYBsDXR4DtjQodQPkb+Y+FZMC3RNux7ZoQys2mKXJVjDiHVpW3sl/30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764783001; c=relaxed/simple;
-	bh=yhp8ueLBj5nMHyuDgH/VoEo8DFq7np5eB5KjSi/CnnE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IWwnaC6H2aCft/nF/ZRStQ8UFUSvP5oXcsnfhC34Id7ZyBGChkn4bEyE06q46hANDIPiKaBSKVA68ixRSkTVEEFkN232o1uyglv+oAdS7e0EUPVue2Pcm+nvVuN5a30p5SgY0qHrJsUOof7zHFc4GAt7akap1qIZfb+mJeRaHGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e05Yi1Na; arc=none smtp.client-ip=209.85.217.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-5de23ddba5eso28344137.3
-        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 09:29:59 -0800 (PST)
+	s=arc-20240116; t=1764783140; c=relaxed/simple;
+	bh=N7OKcRPraIwwOO+e5acnIG0+6lKUBkn3zohe7EwnngU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mjgtX362i1q9QSnOis7s3sXDakIBM9ZySFNiTa4Ge0z1qDzGYHAXDu4rEBMSnnrL00TmHwmb6FvcPxCudtjUGYWYmokZZDX0s0E85bcgfu5Ql0oisq8GjOkt+aa7OBN6y4QM8epXkj1CB5HKeAhkhuIf9Qzd62ACcWTWE/AZM/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org; spf=pass smtp.mailfrom=cmpxchg.org; dkim=pass (2048-bit key) header.d=cmpxchg.org header.i=@cmpxchg.org header.b=qD+4N+8n; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmpxchg.org
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4ee1fca7a16so158191cf.3
+        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 09:32:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764782998; x=1765387798; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0ymOu3D/5TCeHMIJLeG6oQI7EFVuJhBKpf9gV9hN/6k=;
-        b=e05Yi1NaNRV8feWkf1J/QH59rCYoZQ6JkcAy9gnt899o6YqCHo5nSZelPOvenVle9X
-         UIsyKuPLD+6BQkm1vr2+9GH3MooHpBxU+avgmntqcW/XZqF1KBFjvkGTts7mQqEwZT8Y
-         QZQfx8rTTAM9ZJwbXpSNjt2pgocSxD29eG83aKeappBCinu50F2x3L5nzhK33JfQ0JKh
-         dWtAn6t6o0RKDdmDUkYtpJI9xO69c892LrgsCFI3oJKgTLTQ9pXauxKpzbnt4uozrzOu
-         EMML3pzMNu9unwBx7P4KfxAZeRhrjA/xMAEbImSWDPuBoYBr0PipXWXD8iOievzLFFBp
-         5JXg==
+        d=cmpxchg.org; s=google; t=1764783136; x=1765387936; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RXfrLUBUUNxWrlXQZfRVAlemBKM14MYadMSOQJLP4KM=;
+        b=qD+4N+8nu7V2osgG54omKoBtT0PTDrL9uvpxfa4ns7cVn+JrSeNaV+ozkwbACovtNc
+         1WkCPyviGYgk9ZKH6M/7J9/RxBjKAhA+wSWePA/m8GBwhG41JJeWwZdeK8C9fgOmWppi
+         wHQvK2NSXzreqWQcdcoG+EVEHWPQU62pj1vvWhaeMNuARDugeMyyrXizvDn2iUCwmes6
+         4yjAfcwghpMBQlREVqNKZE0alADOsDZRv4qioZrJvf3UyTKA9Q0utz2Gz5Dvh68NR9Ft
+         TW93iw7hE3BjeXXxk8uWtJDX7ydwiwfXPg863wyLAnM8fLYlqOTQbjX0Gs9iLB5mJt8v
+         fLbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764782998; x=1765387798;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0ymOu3D/5TCeHMIJLeG6oQI7EFVuJhBKpf9gV9hN/6k=;
-        b=mWwgLD35sz/OBBE7n4kg6o1VZ2+tAp3S2uF4Lndd9aGjnH2FgJAnrwjN7VyGqksmXQ
-         bVk7uQwXgFTmEI8kcR3QYEN3gdBT6wGHCYfbf+drTzZG5o/ia7nIFivRefgC/Fav+0Bj
-         Luc+Mw5YyZpNkCUEHqEfAq1WV2Fw+awC6//Cdj4N3L0sC9ofpoXyMH9kXrFkXyzA245S
-         YWVH+KYYij1u2CilGO2K9U6F5lP4u2vy6qu0HoPgHQPzMXwsSeMyZzBl/SZoYLeDyTZ0
-         bxhZbK0BHSxaZS7QGeUA/u6jyrZXBf/vJyh2h2Eqe6PyqmAmerT6L2WCysf19cb0bfeR
-         gJmw==
-X-Forwarded-Encrypted: i=1; AJvYcCW2xHB4tHXKOcp7SFwn3jT0VLN/wHd35QraprDG25/72BRJNzxn8WSlOnbf9le/CU+sC10=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+PQS4bYRUyGNbl/iSHIxoCvyT34m/qym+iUe2rwU6A7hPWgV1
-	/XW4WRFYhkLIMrsmXh/YyaJEhE7cu1h/3AIOLfuLZxkspquwtNNyRSexqWzZlqpNFJDXX+rZRGw
-	3my3KK7jz8f08Pc7dQgvUNnG5SfTTeu3G1IX9hibV
-X-Gm-Gg: ASbGncuxH7e1dMtyGlmqMnPUDcYThJ4SMgG0PC2UORPQPwcuHg8P/CpKxzPhZCkOYNI
-	CFAoEGkxBzw8l6y40/9U6kQx0BmhaRzGxaRVYpijcbPI0i40q3XmarAAJMirvrfgJVDjAVVA/vi
-	bG8Xi6LW7ABb46plCh9iWsG1AwZomOGnSkXyCRqJrntHVlh0AbmF90QE97jYom3PSyJ77wTeiPb
-	lkYSc/b2z/0UVgdfGA3BKgXoPfVjSntYOVR4OFwk0M8sybNQs5Lteuf9+3aDAEJCuitUCY7
-X-Google-Smtp-Source: AGHT+IEKqmK3kDwhNospqoV4M7zNXECVKB1pEuoEfSUxYUNClHBKew01QVDNB+pfOa2oWX8T4XdL5cKkx6qlappJfPQ=
-X-Received: by 2002:a05:6102:162a:b0:5db:f5d1:5799 with SMTP id
- ada2fe7eead31-5e48e36e069mr1205132137.33.1764782998176; Wed, 03 Dec 2025
- 09:29:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764783136; x=1765387936;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RXfrLUBUUNxWrlXQZfRVAlemBKM14MYadMSOQJLP4KM=;
+        b=Qee41XyGX7kqhF0s4BDl8Z1/ZwffTPo/XWNy9u55MPvjol/4dL7GQ81XYwqCEkAdj0
+         1Q4WdibEXUShZsDF28+gy/4BRQoyuVq4HzDjfomVQx374x8rnf4IcojZ51DkcMM0Jj38
+         qWZpWvx30syDjWS3haYXkO7Wtt1dv22TyYN0yM+bSQawuJKlnSAWx8A+L3FkjFU/mJMu
+         979YZG5bKY/Op2RU1Ig5oEHxDBf0xm0KLJT5OGZkn6C2oZShhDDl9rxQn6AbXRa8y8jP
+         /NwEq6mKtY6LETxSK5lreOPgVBCxD2UxpW8mW81QgHORv1cqdxmD6ts5C6ADlhSndPXw
+         vVmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXqmH9gnfp7M+c1hw+FVYuGeVCiqWTN9ku5WXIRypfmOjhGRrLzxWcypMH/BV2zeWBAhDo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwapYAjh8TuFE15EHCBl9CLj4RMFez47gl7HuobRV/Jm1U9FLki
+	r/GY04bsW5J1W6PsC+3wVCExBNIHPRn8ObZK9Dah523XZWlhjgEM74+8egHCRIuE8pY=
+X-Gm-Gg: ASbGncsgncoj4bcVeCpzsv+OondwKpLGRuK3am47WEj+OXBjOp03rGSzclWqfM3fF5F
+	L3qw+RBnPsXBtO+VleMwhCkpaF+zn6CuTe6Ui4ZKjuZTalJc4xfh8P/PNRdNPtvVZQRd1uwWE43
+	RSu+85SLYODXR21aCBweRDwR0wu+2OT6vlpV5HbBhsrWyTEQiUNlPqu4huWVsNdE5L8kPD8JwKG
+	neY6Yw68zituHyDOv6QoJZZTBVZgfJ8BTpDf9caD6tmumk7Bme9uxSwq2bFmqjIchzsdtfLixU0
+	bQAmPJ2PfAjCsOmNLae87qWbQQ/UbcKE52JRXyRCHUZzoBq6W8ea8UeePenipVfhH5i67LE5Dj5
+	lriAoGDJ1fPp4fUh5DnJG8sC9aecP8jjLjVhUM1vSj9u9w6GHkz5KjiJJikojG95SASiicSVCkb
+	Xv5DVj9sZ6xA==
+X-Google-Smtp-Source: AGHT+IHjhRSsYojqPIH4nCotrtO7/FPORpmU3S+uq1yOdc4D+I4pkxVbp8jOs/i2z+ku8NQQIlusKQ==
+X-Received: by 2002:a05:622a:1489:b0:4ed:a744:adc with SMTP id d75a77b69052e-4f01757f2e8mr38710771cf.10.1764783135284;
+        Wed, 03 Dec 2025 09:32:15 -0800 (PST)
+Received: from localhost ([2603:7000:c01:2716:929a:4aff:fe16:c778])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4efd341f2f8sm115763391cf.22.2025.12.03.09.32.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Dec 2025 09:32:14 -0800 (PST)
+Date: Wed, 3 Dec 2025 12:32:09 -0500
+From: Johannes Weiner <hannes@cmpxchg.org>
+To: Gregory Price <gourry@gourry.net>
+Cc: linux-mm@kvack.org, kernel-team@meta.com, linux-kernel@vger.kernel.org,
+	akpm@linux-foundation.org, vbabka@suse.cz, surenb@google.com,
+	mhocko@suse.com, jackmanb@google.com, ziy@nvidia.com,
+	kas@kernel.org, dave.hansen@linux.intel.com,
+	rick.p.edgecombe@intel.com, muchun.song@linux.dev,
+	osalvador@suse.de, david@redhat.com, x86@kernel.org,
+	linux-coco@lists.linux.dev, kvm@vger.kernel.org,
+	Wei Yang <richard.weiyang@gmail.com>,
+	David Rientjes <rientjes@google.com>,
+	Joshua Hahn <joshua.hahnjy@gmail.com>
+Subject: Re: [PATCH v4] page_alloc: allow migration of smaller hugepages
+ during contig_alloc
+Message-ID: <20251203173209.GA478168@cmpxchg.org>
+References: <20251203063004.185182-1-gourry@gourry.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251126193608.2678510-1-dmatlack@google.com> <20251126193608.2678510-7-dmatlack@google.com>
- <aTAzMUa7Gcm+7j9D@devgpu015.cco6.facebook.com> <CA+CK2bDbOQ=aGPZVP4L-eYobUyR0bQA0Ro6Q7pwQ_84UxVHnEw@mail.gmail.com>
-In-Reply-To: <CA+CK2bDbOQ=aGPZVP4L-eYobUyR0bQA0Ro6Q7pwQ_84UxVHnEw@mail.gmail.com>
-From: David Matlack <dmatlack@google.com>
-Date: Wed, 3 Dec 2025 09:29:27 -0800
-X-Gm-Features: AWmQ_blKPsDeMnCOujpZmsX70hbna-86oi6Hxpla3VI0D7Ue5d4-IEmochk7nSM
-Message-ID: <CALzav=ciz4kV+u3B5bMzZzVY+cMs-G=q9c5O-jKPz+E4LUdx7g@mail.gmail.com>
-Subject: Re: [PATCH 06/21] vfio/pci: Retrieve preserved device files after
- Live Update
-To: Pasha Tatashin <pasha.tatashin@soleen.com>
-Cc: Alex Mastro <amastro@fb.com>, Alex Williamson <alex@shazbot.org>, 
-	Adithya Jayachandran <ajayachandra@nvidia.com>, Alistair Popple <apopple@nvidia.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>, 
-	Jacob Pan <jacob.pan@linux.microsoft.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>, 
-	kvm@vger.kernel.org, Leon Romanovsky <leonro@nvidia.com>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-pci@vger.kernel.org, 
-	Lukas Wunner <lukas@wunner.de>, Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>, 
-	Philipp Stanner <pstanner@redhat.com>, Pratyush Yadav <pratyush@kernel.org>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Samiullah Khawaja <skhawaja@google.com>, Shuah Khan <shuah@kernel.org>, 
-	Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>, William Tu <witu@nvidia.com>, 
-	Yi Liu <yi.l.liu@intel.com>, Yunxiang Li <Yunxiang.Li@amd.com>, 
-	Zhu Yanjun <yanjun.zhu@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251203063004.185182-1-gourry@gourry.net>
 
-On Wed, Dec 3, 2025 at 7:46=E2=80=AFAM Pasha Tatashin <pasha.tatashin@solee=
-n.com> wrote:
->
-> On Wed, Dec 3, 2025 at 7:55=E2=80=AFAM Alex Mastro <amastro@fb.com> wrote=
-:
-> >
-> > On Wed, Nov 26, 2025 at 07:35:53PM +0000, David Matlack wrote:
-> > > From: Vipin Sharma <vipinsh@google.com>
-> > >  static int vfio_pci_liveupdate_retrieve(struct liveupdate_file_op_ar=
-gs *args)
-> > >  {
-> > > -     return -EOPNOTSUPP;
-> > > +     struct vfio_pci_core_device_ser *ser;
-> > > +     struct vfio_device *device;
-> > > +     struct folio *folio;
-> > > +     struct file *file;
-> > > +     int ret;
-> > > +
-> > > +     folio =3D kho_restore_folio(args->serialized_data);
-> > > +     if (!folio)
-> > > +             return -ENOENT;
-> >
-> > Should this be consistent with the behavior of pci_flb_retrieve() which=
- panics
-> > on failure? The short circuit failure paths which follow leak the folio=
-,
+On Wed, Dec 03, 2025 at 01:30:04AM -0500, Gregory Price wrote:
+> We presently skip regions with hugepages entirely when trying to do
+> contiguous page allocation.  This will cause otherwise-movable
+> 2MB HugeTLB pages to be considered unmovable, and will make 1GB
+> hugepages more difficult to allocate on systems utilizing both.
+> 
+> Instead, if hugepage migration is enabled, consider regions with
+> hugepages smaller than the target contiguous allocation request
+> as valid targets for allocation.
+> 
+> isolate_migrate_pages_block() has similar logic, and the hugetlb code
+> does a migratable check in folio_isolate_hugetlb() during isolation.
+> So the code servicing the subsequent allocaiton and migration already
+> supports this exact use case (it's just unreachable).
+> 
+> To test, allocate a bunch of 2MB HugeTLB pages (in this case 48GB)
+> and then attempt to allocate some 1G HugeTLB pages (in this case 4GB)
+> (Scale to your machine's memory capacity).
+> 
+> echo 24576 > .../hugepages-2048kB/nr_hugepages
+> echo 4 > .../hugepages-1048576kB/nr_hugepages
+> 
+> Prior to this patch, the 1GB page allocation can fail if no contiguous
+> 1GB pages remain.  After this patch, the kernel will try to move 2MB
+> pages and successfully allocate the 1GB pages (assuming overall
+> sufficient memory is available).
+> 
+> folio_alloc_gigantic() is the primary user of alloc_contig_pages(),
+> other users are debug or init-time allocations and largely unaffected.
+> - ppc/memtrace is a debugfs interface
+> - x86/tdx memory allocation occurs once on module-init
+> - kfence/core happens once on module (late) init
+> - THP uses it in debug_vm_pgtable_alloc_huge_page at __init time
+> 
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Link: https://lore.kernel.org/linux-mm/6fe3562d-49b2-4975-aa86-e139c535ad00@redhat.com/
+> Signed-off-by: Gregory Price <gourry@gourry.net>
+> Reviewed-by: Zi Yan <ziy@nvidia.com>
+> Reviewed-by: Wei Yang <richard.weiyang@gmail.com>
+> Reviewed-by: Oscar Salvador <osalvador@suse.de>
+> Acked-by: David Rientjes <rientjes@google.com>
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Tested-by: Joshua Hahn <joshua.hahnjy@gmail.com>
+> ---
+>  mm/page_alloc.c | 23 +++++++++++++++++++++--
+>  1 file changed, 21 insertions(+), 2 deletions(-)
+> 
+> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> index 95d8b812efd0..8ca3273f734a 100644
+> --- a/mm/page_alloc.c
+> +++ b/mm/page_alloc.c
+> @@ -7069,8 +7069,27 @@ static bool pfn_range_valid_contig(struct zone *z, unsigned long start_pfn,
+>  		if (PageReserved(page))
+>  			return false;
+>  
+> -		if (PageHuge(page))
+> -			return false;
+> +		/*
+> +		 * Only consider ranges containing hugepages if those pages are
+> +		 * smaller than the requested contiguous region.  e.g.:
+> +		 *     Move 2MB pages to free up a 1GB range.
 
-Thanks for catching the leaked folio. I'll fix that in the next version.
+This one makes sense to me.
 
-> > which seems like a hygiene issue, but the practical significance is moo=
-t if
-> > vfio_pci_liveupdate_retrieve() failure is catastrophic anyways?
->
-> pci_flb_retrieve() is used during boot. If it fails, we risk DMA
-> corrupting any memory region, so a panic makes sense. In contrast,
-> this retrieval happens once we are already in userspace, allowing the
-> user to decide how to handle the failure to recover the preserved
-> cdev.
+> +		 *     Don't move 1GB pages to free up a 2MB range.
 
-This is what I was thinking as well. vfio_pci_liveupdate_retrieve()
-runs in the context of the ioctl LIVEUPDATE_SESSION_RETRIEVE_FD, so we
-can just return an error up to userspace if anything goes wrong and
-let userspace initiate the reboot to recover the device if/when it's
-ready.
+This one I might be missing something. We don't use cma for 2M pages,
+so I don't see how we can end up in this path for 2M allocations.
 
-OTOH, pci_flb_retrieve() gets called by the kernel during early boot
-to determine what devices the previous kernel preserved. If the kernel
-can't determine which devices were preserved by the previous kernel
-and once the kernel starts preserving I/O page tables, that could lead
-to corruption, so panicking is warranted.
+The reason I'm bringing this up is because this function overall looks
+kind of unnecessary. Page isolation checks all of these conditions
+already, and arbitrates huge pages on hugepage_migration_supported() -
+which seems to be the semantics you also desire here.
+
+Would it make sense to just remove pfn_range_valid_contig()?
 
