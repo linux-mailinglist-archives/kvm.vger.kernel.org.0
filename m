@@ -1,196 +1,211 @@
-Return-Path: <kvm+bounces-65203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DED56C9F133
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 14:10:54 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 490CEC9F1D6
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 14:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C88F94E0F56
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 13:10:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 63C77345C3E
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 13:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6ACB2F3C1D;
-	Wed,  3 Dec 2025 13:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83B62F746C;
+	Wed,  3 Dec 2025 13:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fbdNMCKW";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BF9aK5EO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KKBDNM+D";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3bUEzLl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0879D2DA76B
-	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 13:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF172F6914
+	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 13:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764767444; cv=none; b=u2faKPMdJPimCUZhjF21e/WVsvgEdbuebMjlwGxIdHr1CxBCun3AW/6rOID65tCbqGufoD42BIskEnV0woO1K/YJJ+fEjjBrXPF4bbN8hqTdYrFk1x8N1cld1bJpC7sXxwMsJHABhYYWYgf6waLYdfKjaSSgXbnWdzpGXxNSoWE=
+	t=1764768258; cv=none; b=bJ5F+Q6yjsN4QjrWPx2K8AwMCTQmBLhSV2xYI1XV3JlI/hCnwpWTO4KCs/7ylm0XblSFbpfRQajdWVYsh4sOdLi1gl4oXhZyJ7BSX0YhjGkM6DP/KWiuCYCAcBhNYGisM5B2EK40V/YyJC1PF0SSgYKsXVw0gl5GM3Boq0XJeP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764767444; c=relaxed/simple;
-	bh=VL1b6qM5tnDMA9tezK5Rtk2DqKNTgi5puNqAkwa8uCU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tUwH4RvZywmaoB6PHihdNCyl5ds5+ag2iX8pDw/p2sAZn58dhrw7LnTnbre0rZPm8+VvW6Je7vS1ttwGylIcSES8OKEmXQC7H3A5NTZa0IOfzLfWcpVO3mFLu81LYF1npLwwszm1051NjEgyaOhJ6Ia1/cvE5D/te9djMl59WeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fbdNMCKW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BF9aK5EO; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1764768258; c=relaxed/simple;
+	bh=vYbwrKiuy/nqRHww2lZyrm0K8+XZvOpvTaTp/vfjgjU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=FfqudEHUXhezoPAE3kwvFRr4+TEfXePEAxRdDtFS6BPBEbXsel17m5SOcpfKY/L/2w0D133lzXS+qQgptJ0wU0lcBOflngVFJVYn7CVsf9RjmriqloJOdVJjd+2Z5eilfRQUgV/bzN+juM+PeYisJPfo8GVNTtCWF0lW/xMLuV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KKBDNM+D; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=N3bUEzLl; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764767442;
+	s=mimecast20190719; t=1764768255;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VaK8gNVnnLXvI7IlxmSXzCdCZI80rI+Rz8uERiiIxZE=;
-	b=fbdNMCKW19m4wlJBqYgzC/iBkUPc85spDSf5p4YiSqmDVQ8LSruikFqDd6Hsuz1cI9Ryih
-	7To6dKWSRkj7QCIlgty+0kxn+U4/jexDNpDmc/d9s5QA634I6ETJItGaZHahnKaW+YZ7P8
-	Q+H656remKL5fyjjPKVW9pcWkYWaQdE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=9vREb+ITR5XR/PgvDVqxuLRZqNTAuz/fXzGrnGKDL5s=;
+	b=KKBDNM+D1SxSV1BNg2lOhQo3jm33NKg9Jlrg12v846pb4wIxpSZ7u0buid9CI9XZ9v01HW
+	GRmpYVTIUcgO19CITHYE12Q3qbrwLaZmeBGiqcJtgKY/n20FP12lnv7atVIG15qRMIgyoz
+	n6N2m58Ox4Z+bDPcnlyq/2e7USRr8Og=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-583-Mr-iEcBqPWSr6YSd1LSBUQ-1; Wed, 03 Dec 2025 08:10:41 -0500
-X-MC-Unique: Mr-iEcBqPWSr6YSd1LSBUQ-1
-X-Mimecast-MFC-AGG-ID: Mr-iEcBqPWSr6YSd1LSBUQ_1764767440
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4776079ada3so58846825e9.1
-        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 05:10:40 -0800 (PST)
+ us-mta-640-zlgXh10UNamAdwqiANkvrw-1; Wed, 03 Dec 2025 08:24:14 -0500
+X-MC-Unique: zlgXh10UNamAdwqiANkvrw-1
+X-Mimecast-MFC-AGG-ID: zlgXh10UNamAdwqiANkvrw_1764768253
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42b3155274eso3477104f8f.0
+        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 05:24:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764767440; x=1765372240; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VaK8gNVnnLXvI7IlxmSXzCdCZI80rI+Rz8uERiiIxZE=;
-        b=BF9aK5EOEiePQlU8IsB9MR9iQNZfHX0P0g3tTKrdTTaVIDebE5gimJzI72REjleQwH
-         PN5JZPaPeDRiX6qUaKWWU/QiYkVVKuVJl0ZlbRT+zuMgGwQ6YQkaej7LAPnvq2is/Scy
-         aH1qH54cGdu4CIrplj7epeJ/kLOIdD8VAkwm/gz52bq7QsmHdyBa468jjKibyEGYuoLc
-         eLc5hCas7m50bmLZYAFyiOwFblajAvvZHpexx7iFnvTf9w9iBzNaxdtJgTMZfvZ30Z4M
-         uDbeghiAgR1nTV5hB3T+istJjMH8HWffa+ATeu8ZYyEOWc1Dg0gcFwYFNyld5AgKkuQI
-         yJsQ==
+        d=redhat.com; s=google; t=1764768253; x=1765373053; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9vREb+ITR5XR/PgvDVqxuLRZqNTAuz/fXzGrnGKDL5s=;
+        b=N3bUEzLlPkzCxeoKNAV9HDKZUrRlUbn/mR0zOMVas88rsG1w19rZbqJWmKlPNoJWWi
+         Wri2oOPnwt7GS5vvrIye4UV45o6jrFike+Ongd6a93nm739+WZrucmsVvOLpOQEPxKck
+         abcN/lMe9RZ7LOkxbYj2tZMRo6qXbYacgWt/dmm9GfqlsraePRXXQFFHz0JL4uyPkrB0
+         rzIQvZM1gHnDX3ysRzjl4WBewCJn1TAdEc0Wn+CRvyi0Z0Fo3tM6tcYCnZ3ABkY4P62c
+         Wm69GWQk9hkz3svCjy1zUbkGraf3PlQ62E1fdaBKqGm9kg4AfO/g5pA4yPfGeaD/o/hQ
+         /Q7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764767440; x=1765372240;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=VaK8gNVnnLXvI7IlxmSXzCdCZI80rI+Rz8uERiiIxZE=;
-        b=Dcb+x2GoduYJLX9WqajlHgFxzBapTAo232Mh2H+HsyqZCNTwbhcW/q683gJyyIxVoO
-         S+3cHUY5MTuhBsfWoDSCnIFTec8uvfCIOAcLYYCEQ+vQr38HGbYmnySWF9Nfgl59VrvB
-         rr2SC1l5fc57mmf2i9LhXVnwUS1DtMssjAm6gIwM9mviOeHdNlD2LcCba6ti/rcpSdgv
-         fGs9E0s7/o2XVdYBWreGGcv4+F6lraRpvLvT1WJSz4jIyO5m56MU3HdRYk5vaSV/+Z2z
-         EfWG5ygl+Ir//28W0fnMeFZ/3PDugUU4lxNbupmdEKzINCvrp9DVI4oZgBOLwtkQ8Zll
-         9Pzw==
-X-Forwarded-Encrypted: i=1; AJvYcCWKIO0KPEYfFRfVqCY35rAa2Qx7FkoaPQb4wX0EUhLH7v8XNe8jjOWb4RO1MMIPMESPoQU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSkf88vV02H9dcX/Ju1TTfStZyFZ1T6932GB5hqBm2PJU/VgPI
-	tUIWJvuc7Qy0fzjVJv+ypZM3Xgdj1C/m+C7vIafxouG00rgSknFS8O5qWHLIA3E+exDPE1ekwfD
-	tpRtRcLRjtwFLKmbr64C4RUz8qdnWElDp61Hxd+4Qvs80NMtCApNbq5yfJsdRafMr5ipuVF/rlU
-	gLnDDL/kqEOfTdAejNPWCYUB/pfEEF
-X-Gm-Gg: ASbGnct3tYjzloe0tAiwzuI5c5clCpuPh6yO4yOwUAEncM7MnXpuI1XHJHZ09L6mvl8
-	CJXho2qCrDgFSV/BQkehewDE+jFDa4OyoUeTAk51Yh3pJ/irRP5P34DRrlJnPclC/ilDyeBfBEj
-	Y99tUJ7yY4bAxe+H+a6QnoPQyfsSj8wcno9nKcjzWJOPJXhv7YRPUG4fsjz27JkGbY9BEbGiYZn
-	X2pLJQbOUIHUhN+vfbCwUB5LEYWnSxqy/0vLFf2G/H8ZKTNmHyyxbRwEvpTuVaQ8zjRbno=
-X-Received: by 2002:a05:6000:2689:b0:42b:32f5:ad18 with SMTP id ffacd0b85a97d-42f73180f9dmr2597701f8f.9.1764767439736;
-        Wed, 03 Dec 2025 05:10:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHgj3s8W8vwuMl7G5t3fm3GBqzlmfmjEzVSIi7i5l/GlACVq9dghbhMIm5ZQkzBpYHH8aphJQPlHspidUR5DmQ=
-X-Received: by 2002:a05:6000:2689:b0:42b:32f5:ad18 with SMTP id
- ffacd0b85a97d-42f73180f9dmr2597663f8f.9.1764767439296; Wed, 03 Dec 2025
- 05:10:39 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764768253; x=1765373053;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9vREb+ITR5XR/PgvDVqxuLRZqNTAuz/fXzGrnGKDL5s=;
+        b=Y96F9aRjUQ2Jmr118DxzFcB1dRcy1Y2tutG6ZL687fvn0krDJLN2FGTHyMej6KP3zR
+         drodGKjPfPzH9E05hANcW+zQK6bI8Xo7tZMXI0pmBkOCX17IKwn1u2uiloyUcC29hj76
+         AMH1m5oSqHTkV7tYD/Bpfmf3czd63xG31vw3Vunze0xjuXBb2I6u5WkhbBTYbAeegUL2
+         /3szpOSzzGszv9OTwktFwPln6K7uqDP0ByWm8xH834VH3J3d3VHx1p/TW3OkpLo2jjul
+         3I4BDLzDuThfOCXjUV3GiXt3/cC3sy2AiQCyBCRZY3bAPlXLsan6Nc+VxFFyUIZyGUXe
+         AWtg==
+X-Forwarded-Encrypted: i=1; AJvYcCXPoGXs/PrqfL2mBl2jaa19Lh1DQBBvt2oJHnWwJPmrpIoyMPEygnRCg4WFULidTO6e1KA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/IEanpnESMctqS2Sco7Uu4tMWs0vfMTdduPytn6kCxQH/W6FA
+	LZZ33XdL5BZqbObeg9mI7lbLHkXqF4AjE0TilQTJlQJHCDOP05MhoMJPQgKVEPi/zFmuLb7b9bx
+	LbZdgwUNrTUdVlUYvVfQvDJ+HH9z8l5CGh7h99ijBJchVag2216wYUqvESEIWzA==
+X-Gm-Gg: ASbGncvrOTxKsfU2bq3Dd5JKhc7hTv5GEi3rfwbQqHz24O7A9GutOUDABoOthY1E6vp
+	sRPAIaAs1MKcAulT0P+MD63bqL30ItvpKuen0I0W9udlInKX7XbbISQBtgEZX+MxCF11fab1dq6
+	Us/3oAdV/5BP9aRgxcAnaZ8DhKbmdREnO752rZ5uskZOa/+EmrF0ljhBp7yWdWeP5INcehqU0cF
+	HhwSIhIJB0/aREtOpQMq/qVBUD8IT/5Wm6ghL1YSx44yYQTx/GLexnwje9Pi512CJblZas/DLWc
+	gfz6P3Ymb6MSJCkcsl1JOSU5KcYru1y0ztLX2wgvBw4EbmWnX9bQekmoxH+uqxqsyNJkGV6K/GW
+	tnHc0Fg==
+X-Received: by 2002:a05:6000:1785:b0:42b:3b8a:3090 with SMTP id ffacd0b85a97d-42f731795e4mr2101847f8f.23.1764768253384;
+        Wed, 03 Dec 2025 05:24:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFTisZSQWjiFpFJ+4ztc6Q4evV6afH6I/PNjUh5d9NriJFXnm03EZSq4BU+p0zusnXG8gtNIw==
+X-Received: by 2002:a05:6000:1785:b0:42b:3b8a:3090 with SMTP id ffacd0b85a97d-42f731795e4mr2101820f8f.23.1764768252955;
+        Wed, 03 Dec 2025 05:24:12 -0800 (PST)
+Received: from fedora (g3.ign.cz. [91.219.240.17])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1caa5d02sm40052483f8f.36.2025.12.03.05.24.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Dec 2025 05:24:12 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Ryosuke Yasuoka <ryasuoka@redhat.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, hpa@zytor.com
+Subject: Re: [PATCH] x86/kvm: Avoid freeing stack-allocated node in
+ kvm_async_pf_queue_task
+In-Reply-To: <20251122090828.1416464-1-ryasuoka@redhat.com>
+References: <20251122090828.1416464-1-ryasuoka@redhat.com>
+Date: Wed, 03 Dec 2025 14:24:11 +0100
+Message-ID: <87cy4vlmv8.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251125180557.2022311-1-khushit.shah@nutanix.com>
- <6353f43f3493b436064068e6a7f55543a2cd7ae1.camel@infradead.org>
- <A922DCC2-4CB4-4DE8-82FA-95B502B3FCD4@nutanix.com> <118998075677b696104dcbbcda8d51ab7f1ffdfd.camel@infradead.org>
- <aS8I6T3WtM1pvPNl@google.com> <68ad817529c6661085ff0524472933ba9f69fd47.camel@infradead.org>
- <aS8Vhb66UViQmY_Q@google.com> <352e189ec40fae044206b48ca6e68d77df7dced1.camel@intel.com>
- <d3b8fd036f05e9819f654c18853ff79a255c919d.camel@infradead.org>
-In-Reply-To: <d3b8fd036f05e9819f654c18853ff79a255c919d.camel@infradead.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 3 Dec 2025 14:10:26 +0100
-X-Gm-Features: AWmQ_bkXG6zGUGLk1doAMHJxgzoMJ2DUg4jVyEHzZHJl2BaaKFz0PWxqK9MC6fM
-Message-ID: <CABgObfa3wNsQBjAwWuBhWQbw4FuO7TGePuNzfqAYS1CzRFP6DQ@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: x86: Add x2APIC "features" to control EOI
- broadcast suppression
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: "Huang, Kai" <kai.huang@intel.com>, "seanjc@google.com" <seanjc@google.com>, 
-	"shaju.abraham@nutanix.com" <shaju.abraham@nutanix.com>, 
-	"khushit.shah@nutanix.com" <khushit.shah@nutanix.com>, "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "mingo@redhat.com" <mingo@redhat.com>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"Kohler, Jon" <jon@nutanix.com>, "tglx@linutronix.de" <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Wed, Dec 3, 2025 at 1:26=E2=80=AFPM David Woodhouse <dwmw2@infradead.org=
-> wrote:
+Ryosuke Yasuoka <ryasuoka@redhat.com> writes:
+
+> kvm_async_pf_queue_task() can incorrectly remove a node allocated on the
+> stack of kvm_async_pf_task_wait_schedule(). This occurs when a task
+> request a PF while another task's PF request with the same token is
+> still pending. 
+
+The important missing part here is what the 'token' is. exc_page_fault()
+sets it to (u32)read_cr2() so indeed I see possibilities that two
+different tasks will generate the same token.
+
+> Currently, kvm_async_pf_queue_task() assumes that any
+> entry in the list is a dummy entry and tries to kfree(). To fix this,
+> add a dummy flag to the node structure and the function should check
+> this flag and kfree() only if it is a dummy entry.
 >
-> On Wed, 2025-12-03 at 00:50 +0000, Huang, Kai wrote:
-> >
-> > > -#define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
-> > > -#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
-> > > +#define KVM_X2APIC_API_USE_32BIT_IDS                       (_BITULL(=
-0))
-> > > +#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK             (_BITULL(=
-1))
-> > > +#define KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST   (_BITULL(2))
-> > > +#define KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST  (_BITULL(3))
-> >
-> > I hate to say, but wants to ask again:
-> >
-> > Since it's uAPI, are we expecting the two flags to have impact on in-ke=
-rnel
-> > ioapic?
-> >
-> > I think there should no harm to make the two also apply to in-kernel io=
-apic.
-> >
-> > E.g., for now we can reject KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST fl=
-ag for
-> > in-kernel ioapic.  In the future, we might add EOI register support to =
-in-kernel
-> > ioapic and report supporting suppress EOI broadcast, then we can in-ker=
-nel
-> > ioapic to honor these two flags too.
+> Signed-off-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
+> ---
+>  arch/x86/kernel/kvm.c | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
 >
-> I don't think we should leave that to the unspecified 'future'. Let's
-> fix the kernel I/O APIC to support the directed EOI at the same time,
-> rather than having an interim version of KVM which supports the
-> broadcast suppression but *not* the explicit EOI that replaces it.
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index b67d7c59dca0..2c92ec528379 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -88,6 +88,7 @@ struct kvm_task_sleep_node {
+>  	struct swait_queue_head wq;
+>  	u32 token;
+>  	int cpu;
+> +	bool dummy;
+>  };
+>  
+>  static struct kvm_task_sleep_head {
+> @@ -119,10 +120,17 @@ static bool kvm_async_pf_queue_task(u32 token, struct kvm_task_sleep_node *n)
+>  	raw_spin_lock(&b->lock);
+>  	e = _find_apf_task(b, token);
+>  	if (e) {
+> +		struct kvm_task_sleep_node *dummy = NULL;
+> +
+>  		/* dummy entry exist -> wake up was delivered ahead of PF */
+> -		hlist_del(&e->link);
+> +		/* Otherwise it should not be freed here. */
+
+I think we can merge these two comments together and write something
+better, e.g.
+	/* 
+         * The entry can either be a 'dummy' entry (which is put on the
+         * list when wake-up happens ahead of APF handling completion)
+         * or a token from another task which should not be touched.
+         */
+
+> +		if (e->dummy) {
+> +			hlist_del(&e->link);
+> +			dummy = e;
+> +		}
+> +
+>  		raw_spin_unlock(&b->lock);
+> -		kfree(e);
+> +		kfree(dummy);
+>  		return false;
+>  	}
+
+
+I think you also need to do 
+
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index b67d7c59dca0..0a84a3100e72 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -128,6 +128,7 @@ static bool kvm_async_pf_queue_task(u32 token, struct kvm_task_sleep_node *n)
+ 
+        n->token = token;
+        n->cpu = smp_processor_id();
++       n->dummy = false;
+        init_swait_queue_head(&n->wq);
+        hlist_add_head(&n->link, &b->list);
+        raw_spin_unlock(&b->lock);
+
+now as kvm_async_pf_task_wait_schedule() allocates struct
+kvm_task_sleep_node() on the stack and thus 'n->dummy' can be anything.
+
+>  
+> @@ -230,6 +238,7 @@ static void kvm_async_pf_task_wake(u32 token)
+>  		}
+>  		dummy->token = token;
+>  		dummy->cpu = smp_processor_id();
+> +		dummy->dummy = true;
+>  		init_swait_queue_head(&dummy->wq);
+>  		hlist_add_head(&dummy->link, &b->list);
+>  		dummy = NULL;
 >
-> Since I happened to have the I/O APIC PDFs in my recent history for
-> other reasons, and implemented these extra registers for version 0x20
-> in another userspace VMM within living memory, I figured I could try to
-> help with the actual implementation (untested, below).
->
-> There is some bikeshedding to be done on precisely *how* ->version_id
-> should be set. Maybe we shouldn't have the ->version_id field, and
-> should just check kvm->arch.suppress_eoi_broadcast to see which version
-> to report?
+> base-commit: 2eba5e05d9bcf4cdea995ed51b0f07ba0275794a
 
-That would make it impossible to use the fixed implementation on the
-local APIC side, without changing the way the IOAPIC appears to the
-guest.
+Sorry for delayed reply!
 
-There are no parameters that you can use in KVM_CREATE_IRQCHIP,
-unfortunately, and no checks that (for example) kvm_irqchip.pad or
-kvm_ioapic_state.pad are zero.
-
-The best possibility that I can think of, is to model it like KVM_CAP_XSAVE=
-2
-
-1) Add a capability KVM_CAP_IRQCHIP2 (x86 only)
-
-2) If reported, kvm_irqchip.pad becomes "flags" (a set of flag bits)
-and kvm_ioapic_state.pad becomes version_id when returned from
-KVM_GET_IRQCHIP. Using an anonymous union allows adding the synonyms.
-
-3) On top of this, KVM_SET_IRQCHIP2 is added which checks that
-kvm_irqchip.flags is zero and that kvm_ioapic_state.version_id is
-either 0x11 or 0x20.
-
-4) Leave the default to 0x11 for backwards compatibility.
-
-The alternative is to add KVM_ENABLE_CAP(KVM_CAP_IRQCHIP2) but I
-dislike adding another stateful API.
-
-Paolo
+-- 
+Vitaly
 
 
