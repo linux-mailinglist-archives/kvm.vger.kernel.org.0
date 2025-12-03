@@ -1,206 +1,186 @@
-Return-Path: <kvm+bounces-65229-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65230-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB57FCA0595
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 18:20:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64AA6CA0AD2
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 18:52:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BEC51300644E
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 17:20:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 400113083328
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 17:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4A2314A9F;
-	Wed,  3 Dec 2025 17:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B743161A9;
+	Wed,  3 Dec 2025 17:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="euvZDA3g"
+	dkim=pass (2048-bit key) header.d=rivosinc.com header.i=@rivosinc.com header.b="Hjgg+62H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D74F30B51F
-	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 17:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E3D274658
+	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 17:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764781593; cv=none; b=BkZkH5Kq4JMypqwiNLZmZ6N8va+ceR1SMV3mR9F9vyhI/4OkrAD2bd19Jj4gBTshFgQ1iUpZAD6SXsgJrFQuMiKOHw7M+ciq3kEdW3JAJY+asCOUJlpX7w8cgYK0QHbtVFwZHCB8IWcJVlZxwQ/FOw81oRDJAAwYn60ckKKk7Ew=
+	t=1764782377; cv=none; b=fzLnZ52ZGDNfVtEvn9G24lenYsu/S1XnzjKCggB8mfVSHeITslOy0LOBxA/Bq65eV1ldYhM+AFBm8/8W4NiBj6H0AgL24trszSWzW3lbEQ1s1ty5AV24ujFkXTA2c8PWUVs5+oagjt0wO5Hrg0Nli31HPrdyKWpCeHiwlvBoSpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764781593; c=relaxed/simple;
-	bh=zclxRqTX87lo6NObPUZVkOA86FA3wZclw9ZSgjUJblQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=quLKX9grD/ua1EeKjOPLOolB1xJa1IwzFaI1GZzEsgrSGueGUoRTQWGulxgu9/shHvnaSUOcNHKqQzVSNcP5BX6QviZRSiyBYGtv3nDfOQyUP9sLPP4wwOwMAqdeV7SftKbX7j17+Nn4fbhcsU/svKVWme0W3t44nO0Rc5Guc/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=euvZDA3g; arc=none smtp.client-ip=209.85.218.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b735400de44so581043566b.0
-        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 09:06:30 -0800 (PST)
+	s=arc-20240116; t=1764782377; c=relaxed/simple;
+	bh=CwA9Ys5uCmBjSmMP2RcG9FxDi2vRp38nNCScDl7Ne4w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gKxUqVccXOwdwYwlIFwSf2JoqktfmHJoj/gfzTScsZkSs9dY8/NcgLSqqF2YT/yBGcgHNRwbL9R+1HV8IiNmz1CbYRbVlsp0HUH0aD+fK5JNFPtT0hoJlRHGRQAd6qQvTUPLwkwMUYcBJ+BsX++wnYwP6Cw1uXaS/oJCvO8RIRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc.com header.i=@rivosinc.com header.b=Hjgg+62H; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-297f35be2ffso106380755ad.2
+        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 09:19:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764781589; x=1765386389; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zclxRqTX87lo6NObPUZVkOA86FA3wZclw9ZSgjUJblQ=;
-        b=euvZDA3gsh2vDB6cHQK9Z58fYc1UBAu4y7x4gVk4NChicPo792y/+sDC281DTpRTZp
-         HoL3xMZgMY/oH4JScWoeVAiU7oL/gyRL7G9A4DZsRPzW52a+JViA6slU8iynIrZ1wCjg
-         G9OGBYtpvaGcE3WsvteE4T1cnfZZGOz0ZqXM1TXQdoDGgRrdKNP/BVduuOfyXYCfqlWW
-         qKP6jU1dI9w4YTJZUdcCk2QSB18MXEZy9MY+EFSDNKuz1aTLHApWXkflsrNbNkgIuw5S
-         517O0U5qJx7asZghQMhPc7S0kSmT7XVmfuI3eWIPb49R++17lCUo9WHEuiVz5oLPI3h6
-         4sZg==
+        d=rivosinc.com; s=google; t=1764782374; x=1765387174; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ntk4xZMcJdx9GyxuuhaDbNEO4dKaRG4g/4/eVizjmMk=;
+        b=Hjgg+62HKTnyEzu5kmSlofkEsioAgC0rAc0wXBtDMFckRRzbLlJxkTEN1phMy14VVU
+         JgF6tGBxauZZLfJe43QCqkuFbavS4MqSAo5AthVF9H2T9BNW1wmlY3WYq99ZJ5idA9f9
+         FKHSCpdICyCjoDjXBTpnNXS/d0CcGfNpseDV48PUJnJ+cJo/2uX4IbADyYvFS87gWYNz
+         TN28JBFiO85Wm15B7vQRpmdnbEY2+++Ch8kLvf1Li+TMsVQJ0nCOdyWLF9T/cf6VHmVV
+         PDIREze8ZBjhT7C2o+5+8SQZ8xhFsiKYyCSefn4m9kusRc2NShwYg8bZKiAVlDT3/2/T
+         eI5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764781589; x=1765386389;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=zclxRqTX87lo6NObPUZVkOA86FA3wZclw9ZSgjUJblQ=;
-        b=u0X4dLvzdIGMh7Stqdyqf/cpVGGCnpib/bmGhcouC5OL5BAlrEcLi7fbzm8ipf8nKY
-         rFU34tKmH0ht5pIV3jpd5UKRFQ8t8xDBgckxMRidnQqAIckfxeTG7f0xCi0asFumzMb0
-         /2zgtRqw/wpNfOPwNMLKBow2qifKsi8V49Kw9HXwdgUioF4Bs1XPX8C4D2vXpUiYgg/t
-         vPWXfOb7uuVPYx+rovtFFeN5QTG1AVMQO/NabartldRjTXlDvMKLLJ5r6NY84AV3Idcp
-         L4psx5BYWodU/MNKAE2+psKc3zqvm3kZIs9Ux5lrqNt1D/AiAugj+3P+6o+kPjGxgTO1
-         ww4w==
-X-Forwarded-Encrypted: i=1; AJvYcCV0hlJ5eNRlzh3POfPPj9UZ5OrjHkuPnpFZ7nlQx8FxaJtS6FoV7S0xFwQ6IvdfuDlHbZk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyufueWk6vNQaZPvfzuf1L2VCKsBYhvjpmVwKvsAf8bwTHB5qCM
-	HS2iOBbmSYyvZY3m27zojRMsD6/sRfYEbwdNLEkodcV3DDB0zjnyaEg7Oq6aoUZlETbZJDStSja
-	GjM45qXCIDaOKCA==
-X-Google-Smtp-Source: AGHT+IHKl+ne4cXalSTX1K0FA6u1LEjh1lNftHtIoQk113eCBpyJMXtzjghC720I66Wtq6HftdFEeSNvQybHkg==
-X-Received: from ejcrl22.prod.google.com ([2002:a17:907:6c16:b0:b73:8e73:a920])
- (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:907:6d1c:b0:b6d:2c70:4542 with SMTP id a640c23a62f3a-b79dc51d95amr270641666b.30.1764781589331;
- Wed, 03 Dec 2025 09:06:29 -0800 (PST)
-Date: Wed, 03 Dec 2025 17:06:28 +0000
-In-Reply-To: <a07a6edf549cfed840c9ead3db61978c951b15e4.camel@infradead.org>
+        d=1e100.net; s=20230601; t=1764782374; x=1765387174;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ntk4xZMcJdx9GyxuuhaDbNEO4dKaRG4g/4/eVizjmMk=;
+        b=ndZk9V8Wk1g+wIv4/aPuWjf67GFzx8nDchaAOOKr4i6cqjqozzIKu2gahypt8m+bp2
+         i6wteWikc04ZyvUVU0BmGF7xfrkZxiNQ4/dJRMse9YnTZT6hWU5nkLl7EKh3Wxn3xGUS
+         YJSI5lkQa5IWog39e2f211IRlKy3C0N/IhAhv0+E3iQVZQ+T393M4sU+kCAh5n++cMIj
+         0/G4KEpRY6tAGi5WiiobocQplOoJ1h7uhL3soZrAGZK9pY31/ihXUIkDYDG2m6MFAAbc
+         RZPc52mFWe/eIv359a3TAHMqoixzY9hZElZiTk+31gcV9neB4pOowLyoSlc8q7YWay1v
+         cGaA==
+X-Forwarded-Encrypted: i=1; AJvYcCUj12vVfYImWuGXNTqwu+vfodX9LIbyAsxeGCcoX6VPBAhcyB0Zhqsa54wA/slIQ6zHEgI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYK5APx8wYdnMfnrIOyFbV7lGkmcaKwu8w310fRntHGxeYKyL6
+	IZIc7hbc5iZNpJlxUX8c9JEutTT6PaAb+61mAxQaCCSRESxs/ZM7SMSSwXx80oINAQM=
+X-Gm-Gg: ASbGncufHndNfI6utdy5yhRgk2P+a8dpnrJRVUGPRYIo/V9QACF7pR8XtgdSjUNELeg
+	lI65geFtWrKN7kGE1uKNG6ml8d7Z28dZ0o1F/T2/GhHpg0XWm+kBnw+dJu7bbYRmm1qxzUqc2xW
+	g4iBUQjYBjUIXqoqkU4Ymq5te/sDqwFZcBy18on0tgWYki6h4uTIjjop9VT2xwrMOqHZJIs4VPh
+	eIbnnepLM99fv856dSyigXoiWgUfs52Z50xIfP/7z0uKKUWLADdNTm1Kqjg/14MRUBztwHvTh0v
+	jql3cK4Yd+YaueMKmLCoJS5Pc11u+OAtxSX0Dn18vqf4mMqpbigBZ1PE6g7Vw6QY1a3KyfhIlc6
+	p65bYrTy062zZcxSxzsfkizezkCzYq9yAmmD7hbzDZQGdm9g9hI1ms5IqZ8QguxqVukbMfbNoHl
+	0vUrZwU6zTd+ciNA9g3Fj2
+X-Google-Smtp-Source: AGHT+IEJ2Iti/5YvIxdDWKb+Z7naCD/zlmjgrBAtvofU3TTuAmsOEg1X1az1RgMcBWVQzA1qII+ZbQ==
+X-Received: by 2002:a17:903:40cf:b0:29d:65ed:f481 with SMTP id d9443c01a7336-29d681418femr39682905ad.0.1764782373529;
+        Wed, 03 Dec 2025 09:19:33 -0800 (PST)
+Received: from debug.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bce442691sm188814395ad.28.2025.12.03.09.19.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Dec 2025 09:19:33 -0800 (PST)
+Date: Wed, 3 Dec 2025 09:19:28 -0800
+From: Deepak Gupta <debug@rivosinc.com>
+To: zhouquan@iscas.ac.cn
+Cc: anup@brainfault.org, ajones@ventanamicro.com, atishp@atishpatra.org,
+	paul.walmsley@sifive.com, palmer@dabbelt.com,
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH 1/4] RISC-V: KVM: Allow zicfiss/zicfilp exts for Guest/VM
+Message-ID: <aTBxIBZ0Jwn67OcV@debug.ba.rivosinc.com>
+References: <cover.1764509485.git.zhouquan@iscas.ac.cn>
+ <103e156ea1f2201db52034e370a907f46edafb83.1764509485.git.zhouquan@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251203144159.6131-1-itazur@amazon.com> <DEOPHISOX8MK.2YEMZ8XKLQGMC@google.com>
- <a07a6edf549cfed840c9ead3db61978c951b15e4.camel@infradead.org>
-X-Mailer: aerc 0.21.0
-Message-ID: <DEOQV1GRUTUX.1KJUWG1JTF1JJ@google.com>
-Subject: Re: [RFC PATCH 0/2] KVM: pfncache: Support guest_memfd without direct map
-From: Brendan Jackman <jackmanb@google.com>
-To: David Woodhouse <dwmw2@infradead.org>, Brendan Jackman <jackmanb@google.com>, 
-	Takahiro Itazuri <itazur@amazon.com>, <kvm@vger.kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Fuad Tabba <tabba@google.com>, David Hildenbrand <david@kernel.org>, 
-	Paul Durrant <pdurrant@amazon.com>, Nikita Kalyazin <kalyazin@amazon.com>, 
-	Patrick Roy <patrick.roy@campus.lmu.de>, Takahiro Itazuri <zulinx86@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <103e156ea1f2201db52034e370a907f46edafb83.1764509485.git.zhouquan@iscas.ac.cn>
 
-On Wed Dec 3, 2025 at 4:35 PM UTC, David Woodhouse wrote:
-> On Wed, 2025-12-03 at 16:01 +0000, Brendan Jackman wrote:
->> On Wed Dec 3, 2025 at 2:41 PM UTC, Takahiro Itazuri wrote:
->> > [ based on kvm/next with [1] ]
->> >=20
->> > Recent work on guest_memfd [1] is introducing support for removing gue=
-st
->> > memory from the kernel direct map (Note that this work has not yet bee=
-n
->> > merged, which is why this patch series is labelled RFC). The feature i=
-s
->> > useful for non-CoCo VMs to prevent the host kernel from accidentally o=
-r
->> > speculatively accessing guest memory as a general safety improvement.
->> > Pages for guest_memfd created with GUEST_MEMFD_FLAG_NO_DIRECT_MAP have
->> > their direct-map PTEs explicitly disabled, and thus cannot rely on the
->> > direct map.
->> >=20
->> > This breaks the features that use gfn_to_pfn_cache, including kvm-cloc=
-k.
->> > gfn_to_pfn_cache caches the pfn and kernel host virtual address (khva)
->> > for a given gfn so that KVM can repeatedly access the corresponding
->> > guest page.=C2=A0 The cached khva may later be dereferenced from atomi=
-c
->> > contexts in some cases.=C2=A0 Such contexts cannot tolerate sleep or p=
-age
->> > faults, and therefore cannot use the userspace mapping (uhva), as thos=
-e
->> > mappings may fault at any time.=C2=A0 As a result, gfn_to_pfn_cache re=
-quires
->> > a stable, fault-free kernel virtual address for the backing pages,
->> > independent of the userspace mapping.
->> >=20
->> > This small patch series enables gfn_to_pfn_cache to work correctly whe=
-n
->> > a memslot is backed by guest_memfd with GUEST_MEMFD_FLAG_NO_DIRECT_MAP=
-.
->> > The first patch teaches gfn_to_pfn_cache to obtain pfn for guest_memfd=
--
->> > backed memslots via kvm_gmem_get_pfn() instead of GUP (hva_to_pfn()).
->> > The second patch makes gfn_to_pfn_cache use vmap()/vunmap() to create =
-a
->> > fault-free kernel address for such pages.=C2=A0 We believe that establ=
-ishing
->> > such mapping for paravirtual guest/host communication is acceptable as
->> > such pages do not contain sensitive data.
->> >=20
->> > Another considered idea was to use memremap() instead of vmap(), since
->> > gpc_map() already falls back to memremap() if pfn_valid() is false.
->> > However, vmap() was chosen for the following reason.=C2=A0 memremap() =
-with
->> > MEMREMAP_WB first attempts to use the direct map via try_ram_remap(),
->> > and then falls back to arch_memremap_wb(), which explicitly refuses to
->> > map system RAM.=C2=A0 It would be possible to relax this restriction, =
-but the
->> > side effects are unclear because memremap() is widely used throughout
->> > the kernel.=C2=A0 Changing memremap() to support system RAM without th=
-e
->> > direct map solely for gfn_to_pfn_cache feels disproportionate.=C2=A0 I=
-f
->> > additional users appear that need to map system RAM without the direct
->> > map, revisiting and generalizing memremap() might make sense.=C2=A0 Fo=
-r now,
->> > vmap()/vunmap() provides a contained and predictable solution.
->> >=20
->> > A possible approach in the future is to use the "ephmap" (or proclocal=
-)
->> > proposed in [2], but it is not yet clear when that work will be merged=
-.
->>=20
->> (Nobody knows how to pronounce "ephmap" aloud and when you do know how
->> to say it, it sounds like you are sayhing "fmap" which is very
->> confusing. So next time I post it I plan to call it "mermap" instead:
->> EPHemeral -> epheMERal).
->>=20
->> Apologies for my ignorance of the context here, I may be missing
->> insights that are obvious, but with that caveat...
->>=20
->> The point of the mermap (formerly "ephmap") is to be able to efficiently
->> map on demand then immediately unmap without the cost of a TLB
->> shootdown. Is there any reason we'd need to do that here? If we can get
->> away with a stable vmapping then that seems superior to the mermap
->> anyway.
->>=20
->> Putting it in an mm-local region would be nice (you say there shouldn't
->> be sensitive data in there, but I guess there's still some potential for
->> risk? Bounding that to the VMM process seems like a good idea to me)
->> but that seems nonblocking, could easily be added later. Also note it
->> doesn't depend on mermap, we could just have an mm-local region of the
->> vmalloc area. Mermap requires mm-local but not the other-way around.
+On Mon, Dec 01, 2025 at 09:28:25AM +0800, zhouquan@iscas.ac.cn wrote:
+>From: Quan Zhou <zhouquan@iscas.ac.cn>
 >
-> Right. It's really the mm-local part which we might want to support in
-> the gfn_to_pfn_cache, not ephmap/mermap per se.
+>Extend the KVM ISA extension ONE_REG interface to allow KVM user
+>space to detect and enable zicfiss/zicfilp exts for Guest/VM,
+>the rules defined in the spec [1] are as follows:
+>---
+>1) Zicfiss extension introduces the SSE field (bit 3) in henvcfg.
+>If the SSE field is set to 1, the Zicfiss extension is activated
+>in VS-mode. When the SSE field is 0, the Zicfiss extension remains
+>inactive in VS-mode.
 >
-> As things stand, we're taking guest pages which were taken out of the
-> global directmap for a *reason*... and mapping them right back in
-> globally. Making the new mapping of those pages mm-local where possible
-> is going to be very desirable.
+>2) Zicfilp extension introduces the LPE field (bit 2) in henvcfg.
+>When the LPE field is set to 1, the Zicfilp extension is enabled
+>in VS-mode. When the LPE field is 0, the Zicfilp extension is not
+>enabled in VS-mode.
+>
+>[1] - https://github.com/riscv/riscv-cfi
+>
+>Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
+>---
+> arch/riscv/include/uapi/asm/kvm.h | 2 ++
+> arch/riscv/kvm/vcpu.c             | 6 ++++++
+> arch/riscv/kvm/vcpu_onereg.c      | 2 ++
+> 3 files changed, 10 insertions(+)
+>
+>diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+>index 759a4852c09a..7ca087848a43 100644
+>--- a/arch/riscv/include/uapi/asm/kvm.h
+>+++ b/arch/riscv/include/uapi/asm/kvm.h
+>@@ -190,6 +190,8 @@ enum KVM_RISCV_ISA_EXT_ID {
+> 	KVM_RISCV_ISA_EXT_ZFBFMIN,
+> 	KVM_RISCV_ISA_EXT_ZVFBFMIN,
+> 	KVM_RISCV_ISA_EXT_ZVFBFWMA,
+>+	KVM_RISCV_ISA_EXT_ZICFILP,
+>+	KVM_RISCV_ISA_EXT_ZICFISS,
+> 	KVM_RISCV_ISA_EXT_MAX,
+> };
+>
+>diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+>index 5ce35aba6069..098d77f9a886 100644
+>--- a/arch/riscv/kvm/vcpu.c
+>+++ b/arch/riscv/kvm/vcpu.c
+>@@ -557,6 +557,12 @@ static void kvm_riscv_vcpu_setup_config(struct kvm_vcpu *vcpu)
+> 	if (riscv_isa_extension_available(isa, ZICBOZ))
+> 		cfg->henvcfg |= ENVCFG_CBZE;
+>
+>+	if (riscv_isa_extension_available(isa, ZICFILP))
+>+		cfg->henvcfg |= ENVCFG_LPE;
 
-Makes sense. I didn't properly explore if there are any challenges with
-making vmalloc aware of it, but assuming there are no issues there I
-don't think setting up an mm-local region is very challinging [1]. I
-have the impression the main reason there isn't already an mm-local
-region is just that the right usecase hasn't come along yet? So maybe
-that could just be included in this series (assuming the mermap doesn't
-get merged first).
+Blindly enabling landing pad enforcement on guest kernel will lead to issues
+(a guest kernel might not be ready and compiled with landing pad enforcement).
+It must be done via a SSE interface where enable is requested by guest kernel.
 
-Aside from vmalloc integration the topic I just ignored when prototyping
-[0] it was that it obviously has some per-arch element. So I guess for
-users of it we do need to look at whether we are OK to gate the
-depending feature on arch support.
+>+
+>+	if (riscv_isa_extension_available(isa, ZICFISS))
+>+		cfg->henvcfg |= ENVCFG_SSE;
 
-[0] https://github.com/torvalds/linux/commit/4290b4ffb35bc73ce0ac9ae590f3e9=
-d4d27b6397
-[1] https://xcancel.com/pinboard/status/761656824202276864
+Same comment on shadow stack enable. While usually shadow stack usage is optin
+where explicityl sspush/sspopchk/ssamoswap has to be part of codegen to use the
+extension and not modifying existing instruction behavior (like zicfilp does on
+`jalr`)
+There is a situaion during early boot of kernel where shadow stack permissions
+for init shadow stack might not have been configured (or satp == BARE at that
+time), in those cases `sspush/sspopchk` in guest kernel will start faulting.
+
+So enabling shadow stack should also be done via SSE interface.
+
+That's how user cfi patchsets also do.
+
+>+
+> 	if (riscv_isa_extension_available(isa, SVADU) &&
+> 	    !riscv_isa_extension_available(isa, SVADE))
+> 		cfg->henvcfg |= ENVCFG_ADUE;
+>diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+>index 865dae903aa0..3d05a4bafd9b 100644
+>--- a/arch/riscv/kvm/vcpu_onereg.c
+>+++ b/arch/riscv/kvm/vcpu_onereg.c
+>@@ -72,6 +72,8 @@ static const unsigned long kvm_isa_ext_arr[] = {
+> 	KVM_ISA_EXT_ARR(ZICBOP),
+> 	KVM_ISA_EXT_ARR(ZICBOZ),
+> 	KVM_ISA_EXT_ARR(ZICCRSE),
+>+	KVM_ISA_EXT_ARR(ZICFILP),
+>+	KVM_ISA_EXT_ARR(ZICFISS),
+> 	KVM_ISA_EXT_ARR(ZICNTR),
+> 	KVM_ISA_EXT_ARR(ZICOND),
+> 	KVM_ISA_EXT_ARR(ZICSR),
+>-- 
+>2.34.1
+>
+>
 
