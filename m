@@ -1,197 +1,206 @@
-Return-Path: <kvm+bounces-65228-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65229-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70932CA0473
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 18:11:44 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB57FCA0595
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 18:20:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DE0F730A5129
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 16:59:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BEC51300644E
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 17:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7ED030649A;
-	Wed,  3 Dec 2025 16:43:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4A2314A9F;
+	Wed,  3 Dec 2025 17:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CA29AkXS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="euvZDA3g"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38A135FF66;
-	Wed,  3 Dec 2025 16:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D74F30B51F
+	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 17:06:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764780214; cv=none; b=m7VCBCbf0IxNZUeOsak7W1oWXIobxpZkwkx2RLpe689dOqPpilLaG2qu9CiE4Kr/ED+z+e8SnjIKxVoff3C/Y8vw2IJ5knxAbCam3j6zI5+rbLj3asoOBQF8bdx8CVRCSBXSq0QubBRjUCTrS5BiQdeTyBMxfbq8O1yseeHHT98=
+	t=1764781593; cv=none; b=BkZkH5Kq4JMypqwiNLZmZ6N8va+ceR1SMV3mR9F9vyhI/4OkrAD2bd19Jj4gBTshFgQ1iUpZAD6SXsgJrFQuMiKOHw7M+ciq3kEdW3JAJY+asCOUJlpX7w8cgYK0QHbtVFwZHCB8IWcJVlZxwQ/FOw81oRDJAAwYn60ckKKk7Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764780214; c=relaxed/simple;
-	bh=iyflUZchaw873FTzogwUNqRT8cclH8+Swqz8EPmoL5w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r+tiaLudl1lwYLLeqEEivueA2L55gE3p688ZKED0dNWEI8F6F+qXDJ2b+Wz+ZAVlMEdDwxifh7idGazcOvaEYiwwZIOEuZHauenXIRbonb1IniZqmeigkuSGPHX190xiJnY+QYFaYABXIaxVuwcD0Omn7YOA8vDUJs4MW9FsFZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CA29AkXS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 230B0C4CEF5;
-	Wed,  3 Dec 2025 16:43:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764780214;
-	bh=iyflUZchaw873FTzogwUNqRT8cclH8+Swqz8EPmoL5w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CA29AkXSlTUEp4TCKC8TjYGZYOKPd7DJierroBKco/xQli3ma3HoMF9l3c6PHRdya
-	 jn0FuRwOgU8vlGAA18fWSxmbb2JYp0V60Fo9NO6UZRgRDpPNnObaaSjXFUenWstB4d
-	 RX9+AEOh0SUG7hMiiXnCgLzluYqH8tFVr06KHaiSlQyA4UTxM6Ft85SKI7nY+rPW63
-	 wxzUaIGBLxg62Z3EMxd/SKSHs5niGm/vb/7o/fSh1hGblzPKepAHg1nijjeYC6oWbR
-	 vyi7w+lsxnnkZuvJ6eWUpI8PNTOuU+Y7kdL3QaREIITPtwOpY29PZE59u62LJOVeAv
-	 ooqXhHdtZoEXA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vQpwx-0000000AEDg-38lh;
-	Wed, 03 Dec 2025 16:43:31 +0000
-Date: Wed, 03 Dec 2025 16:43:31 +0000
-Message-ID: <86fr9rplcc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 4/4] KVM: arm64: Convert VTCR_EL2 to config-driven sanitisation
-In-Reply-To: <20251203161715.GA4187196@e124191.cambridge.arm.com>
-References: <20251129144525.2609207-1-maz@kernel.org>
-	<20251129144525.2609207-5-maz@kernel.org>
-	<20251203161715.GA4187196@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1764781593; c=relaxed/simple;
+	bh=zclxRqTX87lo6NObPUZVkOA86FA3wZclw9ZSgjUJblQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=quLKX9grD/ua1EeKjOPLOolB1xJa1IwzFaI1GZzEsgrSGueGUoRTQWGulxgu9/shHvnaSUOcNHKqQzVSNcP5BX6QviZRSiyBYGtv3nDfOQyUP9sLPP4wwOwMAqdeV7SftKbX7j17+Nn4fbhcsU/svKVWme0W3t44nO0Rc5Guc/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=euvZDA3g; arc=none smtp.client-ip=209.85.218.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b735400de44so581043566b.0
+        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 09:06:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1764781589; x=1765386389; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zclxRqTX87lo6NObPUZVkOA86FA3wZclw9ZSgjUJblQ=;
+        b=euvZDA3gsh2vDB6cHQK9Z58fYc1UBAu4y7x4gVk4NChicPo792y/+sDC281DTpRTZp
+         HoL3xMZgMY/oH4JScWoeVAiU7oL/gyRL7G9A4DZsRPzW52a+JViA6slU8iynIrZ1wCjg
+         G9OGBYtpvaGcE3WsvteE4T1cnfZZGOz0ZqXM1TXQdoDGgRrdKNP/BVduuOfyXYCfqlWW
+         qKP6jU1dI9w4YTJZUdcCk2QSB18MXEZy9MY+EFSDNKuz1aTLHApWXkflsrNbNkgIuw5S
+         517O0U5qJx7asZghQMhPc7S0kSmT7XVmfuI3eWIPb49R++17lCUo9WHEuiVz5oLPI3h6
+         4sZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764781589; x=1765386389;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zclxRqTX87lo6NObPUZVkOA86FA3wZclw9ZSgjUJblQ=;
+        b=u0X4dLvzdIGMh7Stqdyqf/cpVGGCnpib/bmGhcouC5OL5BAlrEcLi7fbzm8ipf8nKY
+         rFU34tKmH0ht5pIV3jpd5UKRFQ8t8xDBgckxMRidnQqAIckfxeTG7f0xCi0asFumzMb0
+         /2zgtRqw/wpNfOPwNMLKBow2qifKsi8V49Kw9HXwdgUioF4Bs1XPX8C4D2vXpUiYgg/t
+         vPWXfOb7uuVPYx+rovtFFeN5QTG1AVMQO/NabartldRjTXlDvMKLLJ5r6NY84AV3Idcp
+         L4psx5BYWodU/MNKAE2+psKc3zqvm3kZIs9Ux5lrqNt1D/AiAugj+3P+6o+kPjGxgTO1
+         ww4w==
+X-Forwarded-Encrypted: i=1; AJvYcCV0hlJ5eNRlzh3POfPPj9UZ5OrjHkuPnpFZ7nlQx8FxaJtS6FoV7S0xFwQ6IvdfuDlHbZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyufueWk6vNQaZPvfzuf1L2VCKsBYhvjpmVwKvsAf8bwTHB5qCM
+	HS2iOBbmSYyvZY3m27zojRMsD6/sRfYEbwdNLEkodcV3DDB0zjnyaEg7Oq6aoUZlETbZJDStSja
+	GjM45qXCIDaOKCA==
+X-Google-Smtp-Source: AGHT+IHKl+ne4cXalSTX1K0FA6u1LEjh1lNftHtIoQk113eCBpyJMXtzjghC720I66Wtq6HftdFEeSNvQybHkg==
+X-Received: from ejcrl22.prod.google.com ([2002:a17:907:6c16:b0:b73:8e73:a920])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:907:6d1c:b0:b6d:2c70:4542 with SMTP id a640c23a62f3a-b79dc51d95amr270641666b.30.1764781589331;
+ Wed, 03 Dec 2025 09:06:29 -0800 (PST)
+Date: Wed, 03 Dec 2025 17:06:28 +0000
+In-Reply-To: <a07a6edf549cfed840c9ead3db61978c951b15e4.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20251203144159.6131-1-itazur@amazon.com> <DEOPHISOX8MK.2YEMZ8XKLQGMC@google.com>
+ <a07a6edf549cfed840c9ead3db61978c951b15e4.camel@infradead.org>
+X-Mailer: aerc 0.21.0
+Message-ID: <DEOQV1GRUTUX.1KJUWG1JTF1JJ@google.com>
+Subject: Re: [RFC PATCH 0/2] KVM: pfncache: Support guest_memfd without direct map
+From: Brendan Jackman <jackmanb@google.com>
+To: David Woodhouse <dwmw2@infradead.org>, Brendan Jackman <jackmanb@google.com>, 
+	Takahiro Itazuri <itazur@amazon.com>, <kvm@vger.kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Fuad Tabba <tabba@google.com>, David Hildenbrand <david@kernel.org>, 
+	Paul Durrant <pdurrant@amazon.com>, Nikita Kalyazin <kalyazin@amazon.com>, 
+	Patrick Roy <patrick.roy@campus.lmu.de>, Takahiro Itazuri <zulinx86@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 03 Dec 2025 16:17:15 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Hi!
-> 
-> On Sat, Nov 29, 2025 at 02:45:25PM +0000, Marc Zyngier wrote:
-> > Describe all the VTCR_EL2 fields and their respective configurations,
-> > making sure that we correctly ignore the bits that are not defined
-> > for a given guest configuration.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/config.c | 69 +++++++++++++++++++++++++++++++++++++++++
-> >  arch/arm64/kvm/nested.c |  3 +-
-> >  2 files changed, 70 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> > index a02c28d6a61c9..c36e133c51912 100644
-> > --- a/arch/arm64/kvm/config.c
-> > +++ b/arch/arm64/kvm/config.c
-> > @@ -141,6 +141,7 @@ struct reg_feat_map_desc {
-> >  #define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
-> >  #define FEAT_AA64EL2		ID_AA64PFR0_EL1, EL2, IMP
-> >  #define FEAT_AA64EL3		ID_AA64PFR0_EL1, EL3, IMP
-> > +#define FEAT_SEL2		ID_AA64PFR0_EL1, SEL2, IMP
-> >  #define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
-> >  #define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
-> >  #define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
-> > @@ -202,6 +203,8 @@ struct reg_feat_map_desc {
-> >  #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
-> >  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
-> >  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
-> > +#define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
-> > +#define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
-> >  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
-> >  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
-> >  #define FEAT_IESB		ID_AA64MMFR2_EL1, IESB, IMP
-> > @@ -219,6 +222,7 @@ struct reg_feat_map_desc {
-> >  #define FEAT_FGT2		ID_AA64MMFR0_EL1, FGT, FGT2
-> >  #define FEAT_MTPMU		ID_AA64DFR0_EL1, MTPMU, IMP
-> >  #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
-> > +#define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
-> >  
-> >  static bool not_feat_aa64el3(struct kvm *kvm)
-> >  {
-> > @@ -362,6 +366,28 @@ static bool feat_pmuv3p9(struct kvm *kvm)
-> >  	return check_pmu_revision(kvm, V3P9);
-> >  }
-> >  
-> > +#define has_feat_s2tgran(k, s)						\
-> > +  ((kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, TGRAN##s) && \
-> > +    !kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s, NI))	     ||	\
-> > +   kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, IMP))
-> > +
-> > +static bool feat_lpa2(struct kvm *kvm)
-> > +{
-> > +	return ((kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT)    ||
-> > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP))	&&
-> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT)   ||
-> > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP))	&&
-> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, 52_BIT)  ||
-> > +		 !has_feat_s2tgran(kvm, 4))				&&
-> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, 52_BIT) ||
-> > +		 !has_feat_s2tgran(kvm, 16)));
-> > +}
-> > +
-> > +static bool feat_vmid16(struct kvm *kvm)
-> > +{
-> > +	return kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16);
-> > +}
-> > +
-> >  static bool compute_hcr_rw(struct kvm *kvm, u64 *bits)
-> >  {
-> >  	/* This is purely academic: AArch32 and NV are mutually exclusive */
-> > @@ -1168,6 +1194,44 @@ static const struct reg_bits_to_feat_map mdcr_el2_feat_map[] = {
-> >  static const DECLARE_FEAT_MAP(mdcr_el2_desc, MDCR_EL2,
-> >  			      mdcr_el2_feat_map, FEAT_AA64EL2);
-> >  
-> > +static const struct reg_bits_to_feat_map vtcr_el2_feat_map[] = {
-> > +	NEEDS_FEAT(VTCR_EL2_HDBSS, FEAT_HDBSS),
-> > +	NEEDS_FEAT(VTCR_EL2_HAFT, FEAT_HAFT),
-> > +	NEEDS_FEAT(VTCR_EL2_TL0		|
-> > +		   VTCR_EL2_TL1		|
-> > +		   VTCR_EL2_AssuredOnly	|
-> > +		   VTCR_EL2_GCSH,
-> > +		   FEAT_THE),
-> 
-> The text for VTCR_EL2.AssuredOnly says:
-> 
-> 	This field is RES0 when VTCR_EL2.D128 is 1.
-> 
-> > +	NEEDS_FEAT(VTCR_EL2_D128, FEAT_D128),
-> > +	NEEDS_FEAT(VTCR_EL2_S2POE, FEAT_S2POE),
-> > +	NEEDS_FEAT(VTCR_EL2_S2PIE, FEAT_S2PIE),
-> 
-> The text for VTCR_EL2.S2PIE says:
-> 
-> 	This field is RES1 when VTCR_EL2.D128 is set.
-> 
-> 
-> Are these cases that need to be handled here somehow?
+On Wed Dec 3, 2025 at 4:35 PM UTC, David Woodhouse wrote:
+> On Wed, 2025-12-03 at 16:01 +0000, Brendan Jackman wrote:
+>> On Wed Dec 3, 2025 at 2:41 PM UTC, Takahiro Itazuri wrote:
+>> > [ based on kvm/next with [1] ]
+>> >=20
+>> > Recent work on guest_memfd [1] is introducing support for removing gue=
+st
+>> > memory from the kernel direct map (Note that this work has not yet bee=
+n
+>> > merged, which is why this patch series is labelled RFC). The feature i=
+s
+>> > useful for non-CoCo VMs to prevent the host kernel from accidentally o=
+r
+>> > speculatively accessing guest memory as a general safety improvement.
+>> > Pages for guest_memfd created with GUEST_MEMFD_FLAG_NO_DIRECT_MAP have
+>> > their direct-map PTEs explicitly disabled, and thus cannot rely on the
+>> > direct map.
+>> >=20
+>> > This breaks the features that use gfn_to_pfn_cache, including kvm-cloc=
+k.
+>> > gfn_to_pfn_cache caches the pfn and kernel host virtual address (khva)
+>> > for a given gfn so that KVM can repeatedly access the corresponding
+>> > guest page.=C2=A0 The cached khva may later be dereferenced from atomi=
+c
+>> > contexts in some cases.=C2=A0 Such contexts cannot tolerate sleep or p=
+age
+>> > faults, and therefore cannot use the userspace mapping (uhva), as thos=
+e
+>> > mappings may fault at any time.=C2=A0 As a result, gfn_to_pfn_cache re=
+quires
+>> > a stable, fault-free kernel virtual address for the backing pages,
+>> > independent of the userspace mapping.
+>> >=20
+>> > This small patch series enables gfn_to_pfn_cache to work correctly whe=
+n
+>> > a memslot is backed by guest_memfd with GUEST_MEMFD_FLAG_NO_DIRECT_MAP=
+.
+>> > The first patch teaches gfn_to_pfn_cache to obtain pfn for guest_memfd=
+-
+>> > backed memslots via kvm_gmem_get_pfn() instead of GUP (hva_to_pfn()).
+>> > The second patch makes gfn_to_pfn_cache use vmap()/vunmap() to create =
+a
+>> > fault-free kernel address for such pages.=C2=A0 We believe that establ=
+ishing
+>> > such mapping for paravirtual guest/host communication is acceptable as
+>> > such pages do not contain sensitive data.
+>> >=20
+>> > Another considered idea was to use memremap() instead of vmap(), since
+>> > gpc_map() already falls back to memremap() if pfn_valid() is false.
+>> > However, vmap() was chosen for the following reason.=C2=A0 memremap() =
+with
+>> > MEMREMAP_WB first attempts to use the direct map via try_ram_remap(),
+>> > and then falls back to arch_memremap_wb(), which explicitly refuses to
+>> > map system RAM.=C2=A0 It would be possible to relax this restriction, =
+but the
+>> > side effects are unclear because memremap() is widely used throughout
+>> > the kernel.=C2=A0 Changing memremap() to support system RAM without th=
+e
+>> > direct map solely for gfn_to_pfn_cache feels disproportionate.=C2=A0 I=
+f
+>> > additional users appear that need to map system RAM without the direct
+>> > map, revisiting and generalizing memremap() might make sense.=C2=A0 Fo=
+r now,
+>> > vmap()/vunmap() provides a contained and predictable solution.
+>> >=20
+>> > A possible approach in the future is to use the "ephmap" (or proclocal=
+)
+>> > proposed in [2], but it is not yet clear when that work will be merged=
+.
+>>=20
+>> (Nobody knows how to pronounce "ephmap" aloud and when you do know how
+>> to say it, it sounds like you are sayhing "fmap" which is very
+>> confusing. So next time I post it I plan to call it "mermap" instead:
+>> EPHemeral -> epheMERal).
+>>=20
+>> Apologies for my ignorance of the context here, I may be missing
+>> insights that are obvious, but with that caveat...
+>>=20
+>> The point of the mermap (formerly "ephmap") is to be able to efficiently
+>> map on demand then immediately unmap without the cost of a TLB
+>> shootdown. Is there any reason we'd need to do that here? If we can get
+>> away with a stable vmapping then that seems superior to the mermap
+>> anyway.
+>>=20
+>> Putting it in an mm-local region would be nice (you say there shouldn't
+>> be sensitive data in there, but I guess there's still some potential for
+>> risk? Bounding that to the VMM process seems like a good idea to me)
+>> but that seems nonblocking, could easily be added later. Also note it
+>> doesn't depend on mermap, we could just have an mm-local region of the
+>> vmalloc area. Mermap requires mm-local but not the other-way around.
+>
+> Right. It's really the mm-local part which we might want to support in
+> the gfn_to_pfn_cache, not ephmap/mermap per se.
+>
+> As things stand, we're taking guest pages which were taken out of the
+> global directmap for a *reason*... and mapping them right back in
+> globally. Making the new mapping of those pages mm-local where possible
+> is going to be very desirable.
 
-These are not static configurations. They are dynamic behaviours
-depending on other control bits.
+Makes sense. I didn't properly explore if there are any challenges with
+making vmalloc aware of it, but assuming there are no issues there I
+don't think setting up an mm-local region is very challinging [1]. I
+have the impression the main reason there isn't already an mm-local
+region is just that the right usecase hasn't come along yet? So maybe
+that could just be included in this series (assuming the mermap doesn't
+get merged first).
 
-D128 code, if it ever exists, will have to *interpret* these bits as
-RES0 (resp. RES1) when evaluating the page tables.
+Aside from vmalloc integration the topic I just ignored when prototyping
+[0] it was that it obviously has some per-arch element. So I guess for
+users of it we do need to look at whether we are OK to gate the
+depending feature on arch support.
 
-If you want a similar example in existing code, look at the way we
-handle TCR_EL1.HPDn in the S1 PTW. They are treated as RES1 if
-TCR2_EL1.PIE is set, as per R_JHSVW.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+[0] https://github.com/torvalds/linux/commit/4290b4ffb35bc73ce0ac9ae590f3e9=
+d4d27b6397
+[1] https://xcancel.com/pinboard/status/761656824202276864
 
