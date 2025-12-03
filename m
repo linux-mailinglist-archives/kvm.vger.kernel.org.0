@@ -1,209 +1,207 @@
-Return-Path: <kvm+bounces-65194-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65195-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CBA9C9EA0E
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 11:03:50 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60310C9EC6B
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 11:54:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8A0664E038F
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 10:03:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2060734B67E
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 10:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55FB2E7622;
-	Wed,  3 Dec 2025 10:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797892F12B6;
+	Wed,  3 Dec 2025 10:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="LH1lhcmq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tjbjn/qB"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.156.205.64])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CE72E11BC;
-	Wed,  3 Dec 2025 10:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.156.205.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F3E2F1FF1;
+	Wed,  3 Dec 2025 10:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764756218; cv=none; b=hpoBs4q/Ze43JhbPQ1bfxRpEWURW7CZRt9zbPVYlHXI9sxvu30CSCchw3WBuw6rDeEPewTi03Cp/TzphqP+YwkLBfOcPS2aF8EaoelsnL5LcOmJC44GKHgwzjq6gRIwaygjV4zTzlEzY0HEKiXNccSEE714aMaac44zYkVnbaiU=
+	t=1764759218; cv=none; b=OahBzRVN7zcsbtY49BZVSsFF18oNvqaSymumXawQhEZb7YzQhTCqkiQXH6P1KnY9/W+U/PSRz8jznB0SD4WKEBInOxAZjPN3a5mR1OH5lPf3h5iykmTGXwzX2GwWAg8xByA9g/5KD26dkkzCgLmbkWuJQGuKYa7HDNGcmEsiwco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764756218; c=relaxed/simple;
-	bh=WkESfGO5MviN8fnvT23ujzkSPr3QHo9ZG/Z45XTcDio=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=erWJ8g/Ahx8GDReJH6q75Q2NZwnogoSDJip2xEK8hI9crAZkSaxSagyU64SKBW7OXQTH7F7Qf8/GwXIQdglDmb/mjTdqh3Q0aLGQd5R3pSjNit4A5vTQ5FbWDGyz74g/oWv5F8rIwFk+9H7ajmhmRKW7m2hwZ/KAePJJi9JnapU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=LH1lhcmq; arc=none smtp.client-ip=18.156.205.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1764756217; x=1796292217;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=s7odRi39//eUzQHPeI9r1ot7neXJJbQK2cDuxp8n8TI=;
-  b=LH1lhcmqF2M17HU4+PzuIW3/m/rYzi3seBaSCa7K91ezROB56szRgJKK
-   SCeZKbW9HrCUucKghTu1rIz5R6GA2JBMjphCAZwrGvDhxwCnPaasutQH0
-   VpOsVV8J5GlcvQ+ct1hYDjG/+2QAbl+pdMB25+awUPJftZ5Bx/Ke2rqJp
-   mVieiWh+D9FZW3HY6uliO3jk2g9V924ohVpvEq8UBlYN5c78hSQS03HJb
-   tlqZemYqFmLIEe1kltKKWolXEEH3YZOcKqHT8idAkcLrPKps3Dclj16kP
-   ebTi8oghD0wvvsBjd7EJAhBpc8cDmc6XR6p3FPEfi6qq07xCHSjQQRcvB
-   Q==;
-X-CSE-ConnectionGUID: y+zHd3gVTkuBmjeZewQSHw==
-X-CSE-MsgGUID: co2givXqS36NxzqAzRiVyg==
-X-IronPort-AV: E=Sophos;i="6.20,245,1758585600"; 
-   d="scan'208";a="5853166"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2025 10:03:19 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:6533]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.44.247:2525] with esmtp (Farcaster)
- id 082a07bd-3f7a-43be-a7c1-2fe7936d9f9f; Wed, 3 Dec 2025 10:03:19 +0000 (UTC)
-X-Farcaster-Flow-ID: 082a07bd-3f7a-43be-a7c1-2fe7936d9f9f
-Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Wed, 3 Dec 2025 10:03:18 +0000
-Received: from [192.168.6.49] (10.106.82.29) by EX19D005EUB003.ant.amazon.com
- (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Wed, 3 Dec 2025
- 10:03:17 +0000
-Message-ID: <6b21d20c-447f-4059-8cbd-76a8eeebe834@amazon.com>
-Date: Wed, 3 Dec 2025 10:03:16 +0000
+	s=arc-20240116; t=1764759218; c=relaxed/simple;
+	bh=/lMt6d6wt5EpklsqUXRg85Drw1rS3QE+lNt8vHdf2Do=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cWqNKoQWzNRVmTr1bccwqrqbrMOQuZTRpFV/rclvb2ec44Ad7xnCxmINSpPma9EvPwhljlQdKM54xeqG4kd8ALQPD0DjBoK+oDoF5kMrfNcemNpMZllq0FSaWgJ5da+A+m+oNR74RQQlRytg+F0++VNVwNVlxScnFIxauOTTg84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tjbjn/qB; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764759216; x=1796295216;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/lMt6d6wt5EpklsqUXRg85Drw1rS3QE+lNt8vHdf2Do=;
+  b=Tjbjn/qB5OJK9aeow/T5m+oW4TXZ2L3ZAp5zjOfZwL8qDU197+4c1Wbx
+   YfCechgTgOpy56g5l24FmiO9fME6YiOC+nbvR2hTb3Q7TMnhQZY2EKeOl
+   3r1Yvzjpe3GRSGtl47pjkVFbH5GrMbE/eOdyrNrZUnbKhuWaecZEipUJ+
+   9eYrYFT2hrFOa/JIQdJc+hKxcG9pqjAG/2a7CGAePfQF1jd0FOrHyRi0F
+   xzNdx4eFeDor/gL3sNDPwonqtHOJFBIOIMSr7qZMkLGmwH3PHzWpTd8/X
+   xz+cLbO+7/bN0KuoBvqp/0WIz2gaKKJL60aQHaYiENv4+wJsDTkLDyydN
+   A==;
+X-CSE-ConnectionGUID: cdGUb6DfQe2gp0O3mW2jmA==
+X-CSE-MsgGUID: a9pKkTjBR/qGjITjMIZdgw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11631"; a="77428987"
+X-IronPort-AV: E=Sophos;i="6.20,245,1758610800"; 
+   d="scan'208";a="77428987"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2025 02:53:35 -0800
+X-CSE-ConnectionGUID: m/uL1YpIQeaVmK5xAQXRYg==
+X-CSE-MsgGUID: D0vFuoSVTtCTr+d7xR1F3w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,245,1758610800"; 
+   d="scan'208";a="231989776"
+Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 03 Dec 2025 02:53:31 -0800
+Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vQkUC-00000000AtZ-3diz;
+	Wed, 03 Dec 2025 10:53:28 +0000
+Date: Wed, 3 Dec 2025 18:52:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: zhouquan@iscas.ac.cn, anup@brainfault.org, ajones@ventanamicro.com,
+	atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com
+Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, Quan Zhou <zhouquan@iscas.ac.cn>
+Subject: Re: [PATCH 3/4] RISC-V: KVM: Add suuport for zicfiss/zicfilp/svadu
+ FWFT features
+Message-ID: <202512031835.rfeAWiCJ-lkp@intel.com>
+References: <1793aa636969da0a09d27c9c12f6d5f8f0d1cd21.1764509485.git.zhouquan@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v3 4/5] guest_memfd: add support for userfaultfd minor
- mode
-To: "David Hildenbrand (Red Hat)" <david@kernel.org>, Peter Xu
-	<peterx@redhat.com>
-CC: Mike Rapoport <rppt@kernel.org>, <linux-mm@kvack.org>, Andrea Arcangeli
-	<aarcange@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, "Axel
- Rasmussen" <axelrasmussen@google.com>, Baolin Wang
-	<baolin.wang@linux.alibaba.com>, Hugh Dickins <hughd@google.com>, "James
- Houghton" <jthoughton@google.com>, "Liam R. Howlett"
-	<Liam.Howlett@oracle.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Michal Hocko <mhocko@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, "Sean
- Christopherson" <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, "Suren
- Baghdasaryan" <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-References: <20251130111812.699259-1-rppt@kernel.org>
- <20251130111812.699259-5-rppt@kernel.org>
- <652578cc-eeff-4996-8c80-e26682a57e6d@amazon.com>
- <2d98c597-0789-4251-843d-bfe36de25bd2@kernel.org>
- <553c64e8-d224-4764-9057-84289257cac9@amazon.com> <aS3f_PlxWLb-6NmR@x1.local>
- <76e3d5bf-df73-4293-84f6-0d6ddabd0fd7@amazon.com> <aS4BVC42JiUT51rS@x1.local>
- <415a5956-1dec-4f10-be36-85f6d4d8f4b4@amazon.com>
- <69bfdffd-8aa3-4375-9caf-b3311ff72448@kernel.org>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <69bfdffd-8aa3-4375-9caf-b3311ff72448@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D001EUB003.ant.amazon.com (10.252.51.38) To
- EX19D005EUB003.ant.amazon.com (10.252.51.31)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1793aa636969da0a09d27c9c12f6d5f8f0d1cd21.1764509485.git.zhouquan@iscas.ac.cn>
+
+Hi,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on kvm/queue]
+[also build test ERROR on kvm/next linus/master v6.18 next-20251203]
+[cannot apply to kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/zhouquan-iscas-ac-cn/RISC-V-KVM-Allow-zicfiss-zicfilp-exts-for-Guest-VM/20251201-094857
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/1793aa636969da0a09d27c9c12f6d5f8f0d1cd21.1764509485.git.zhouquan%40iscas.ac.cn
+patch subject: [PATCH 3/4] RISC-V: KVM: Add suuport for zicfiss/zicfilp/svadu FWFT features
+config: riscv-randconfig-001-20251203 (https://download.01.org/0day-ci/archive/20251203/202512031835.rfeAWiCJ-lkp@intel.com/config)
+compiler: riscv32-linux-gcc (GCC) 14.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251203/202512031835.rfeAWiCJ-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512031835.rfeAWiCJ-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:345:30: error: 'kvm_sbi_fwft_landing_pad_supported' undeclared here (not in a function)
+     345 |                 .supported = kvm_sbi_fwft_landing_pad_supported,
+         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:346:26: error: 'kvm_sbi_fwft_reset_landing_pad' undeclared here (not in a function)
+     346 |                 .reset = kvm_sbi_fwft_reset_landing_pad,
+         |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:347:24: error: 'kvm_sbi_fwft_set_landing_pad' undeclared here (not in a function)
+     347 |                 .set = kvm_sbi_fwft_set_landing_pad,
+         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:348:24: error: 'kvm_sbi_fwft_get_landing_pad' undeclared here (not in a function)
+     348 |                 .get = kvm_sbi_fwft_get_landing_pad,
+         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:354:30: error: 'kvm_sbi_fwft_shadow_stack_supported' undeclared here (not in a function)
+     354 |                 .supported = kvm_sbi_fwft_shadow_stack_supported,
+         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:355:26: error: 'kvm_sbi_fwft_reset_shadow_stack' undeclared here (not in a function)
+     355 |                 .reset = kvm_sbi_fwft_reset_shadow_stack,
+         |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:356:24: error: 'kvm_sbi_fwft_set_shadow_stack' undeclared here (not in a function)
+     356 |                 .set = kvm_sbi_fwft_set_shadow_stack,
+         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:357:24: error: 'kvm_sbi_fwft_get_shadow_stack' undeclared here (not in a function)
+     357 |                 .get = kvm_sbi_fwft_get_shadow_stack,
+         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:363:30: error: 'kvm_sbi_fwft_pte_ad_hw_updating_supported' undeclared here (not in a function)
+     363 |                 .supported = kvm_sbi_fwft_pte_ad_hw_updating_supported,
+         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:364:26: error: 'kvm_sbi_fwft_reset_pte_ad_hw_updating' undeclared here (not in a function)
+     364 |                 .reset = kvm_sbi_fwft_reset_pte_ad_hw_updating,
+         |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:365:24: error: 'kvm_sbi_fwft_set_pte_ad_hw_updating' undeclared here (not in a function)
+     365 |                 .set = kvm_sbi_fwft_set_pte_ad_hw_updating,
+         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/riscv/kvm/vcpu_sbi_fwft.c:366:24: error: 'kvm_sbi_fwft_get_pte_ad_hw_updating' undeclared here (not in a function)
+     366 |                 .get = kvm_sbi_fwft_get_pte_ad_hw_updating,
+         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+vim +/kvm_sbi_fwft_landing_pad_supported +345 arch/riscv/kvm/vcpu_sbi_fwft.c
 
-On 03/12/2025 09:23, David Hildenbrand (Red Hat) wrote:
-> On 12/2/25 12:50, Nikita Kalyazin wrote:
->>
->>
->> On 01/12/2025 20:57, Peter Xu wrote:
->>> On Mon, Dec 01, 2025 at 08:12:38PM +0000, Nikita Kalyazin wrote:
->>>>
->>>>
->>>> On 01/12/2025 18:35, Peter Xu wrote:
->>>>> On Mon, Dec 01, 2025 at 04:48:22PM +0000, Nikita Kalyazin wrote:
->>>>>> I believe I found the precise point where we convinced ourselves 
->>>>>> that minor
->>>>>> support was sufficient: [1].  If at this moment we don't find that 
->>>>>> reasoning
->>>>>> valid anymore, then indeed implementing missing is the only option.
->>>>>>
->>>>>> [1] https://lore.kernel.org/kvm/Z9GsIDVYWoV8d8-C@x1.local
->>>>>
->>>>> Now after I re-read the discussion, I may have made a wrong statement
->>>>> there, sorry.  I could have got slightly confused on when the write()
->>>>> syscall can be involved.
->>>>>
->>>>> I agree if you want to get an event when cache missed with the 
->>>>> current uffd
->>>>> definitions and when pre-population is forbidden, then MISSING trap is
->>>>> required.  That is, with/without the need of UFFDIO_COPY being 
->>>>> available.
->>>>>
->>>>> Do I understand it right that UFFDIO_COPY is not allowed in your 
->>>>> case, but
->>>>> only write()?
->>>>
->>>> No, UFFDIO_COPY would work perfectly fine.  We will still use write()
->>>> whenever we resolve stage-2 faults as they aren't visible to UFFD.  
->>>> When a
->>>> userfault occurs at an offset that already has a page in the cache, 
->>>> we will
->>>> have to keep using UFFDIO_CONTINUE so it looks like both will be 
->>>> required:
->>>>
->>>>    - user mapping major fault -> UFFDIO_COPY (fills the cache and 
->>>> sets up
->>>> userspace PT)
->>>>    - user mapping minor fault -> UFFDIO_CONTINUE (only sets up 
->>>> userspace PT)
->>>>    - stage-2 fault -> write() (only fills the cache)
->>>
->>> Is stage-2 fault about KVM_MEMORY_EXIT_FLAG_USERFAULT, per James's 
->>> series?
->>
->> Yes, that's the one ([1]).
->>
->> [1]
->> https://lore.kernel.org/kvm/20250618042424.330664-1-jthoughton@google.com
->>
->>>
->>> It looks fine indeed, but it looks slightly weird then, as you'll 
->>> have two
->>> ways to populate the page cache.  Logically here atomicity is indeed not
->>> needed when you trap both MISSING + MINOR.
->>
->> I reran the test based on the UFFDIO_COPY prototype I had using your
->> series [2], and UFFDIO_COPY is slower than write() to populate 512 MiB:
->> 237 vs 202 ms (+17%).  Even though UFFDIO_COPY alone is functionally
->> sufficient, I would prefer to have an option to use write() where
->> possible and only falling back to UFFDIO_COPY for userspace faults to
->> have better performance.
-> 
-> Just so I understand correctly: we could even do without UFFDIO_COPY for
-> that scenario by using write() + minor faults?
+   319	
+   320	static const struct kvm_sbi_fwft_feature features[] = {
+   321		{
+   322			.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
+   323			.first_reg_num = offsetof(struct kvm_riscv_sbi_fwft, misaligned_deleg.enable) /
+   324					 sizeof(unsigned long),
+   325			.supported = kvm_sbi_fwft_misaligned_delegation_supported,
+   326			.reset = kvm_sbi_fwft_reset_misaligned_delegation,
+   327			.set = kvm_sbi_fwft_set_misaligned_delegation,
+   328			.get = kvm_sbi_fwft_get_misaligned_delegation,
+   329		},
+   330	#ifndef CONFIG_32BIT
+   331		{
+   332			.id = SBI_FWFT_POINTER_MASKING_PMLEN,
+   333			.first_reg_num = offsetof(struct kvm_riscv_sbi_fwft, pointer_masking.enable) /
+   334					 sizeof(unsigned long),
+   335			.supported = kvm_sbi_fwft_pointer_masking_pmlen_supported,
+   336			.reset = kvm_sbi_fwft_reset_pointer_masking_pmlen,
+   337			.set = kvm_sbi_fwft_set_pointer_masking_pmlen,
+   338			.get = kvm_sbi_fwft_get_pointer_masking_pmlen,
+   339		},
+   340	#endif
+   341		{
+   342			.id = SBI_FWFT_LANDING_PAD,
+   343			.first_reg_num = offsetof(struct kvm_riscv_sbi_fwft, landing_pad.enable) /
+   344					 sizeof(unsigned long),
+ > 345			.supported = kvm_sbi_fwft_landing_pad_supported,
+ > 346			.reset = kvm_sbi_fwft_reset_landing_pad,
+ > 347			.set = kvm_sbi_fwft_set_landing_pad,
+ > 348			.get = kvm_sbi_fwft_get_landing_pad,
+   349		},
+   350		{
+   351			.id = SBI_FWFT_SHADOW_STACK,
+   352			.first_reg_num = offsetof(struct kvm_riscv_sbi_fwft, shadow_stack.enable) /
+   353					 sizeof(unsigned long),
+ > 354			.supported = kvm_sbi_fwft_shadow_stack_supported,
+ > 355			.reset = kvm_sbi_fwft_reset_shadow_stack,
+ > 356			.set = kvm_sbi_fwft_set_shadow_stack,
+ > 357			.get = kvm_sbi_fwft_get_shadow_stack,
+   358		},
+   359		{
+   360			.id = SBI_FWFT_PTE_AD_HW_UPDATING,
+   361			.first_reg_num = offsetof(struct kvm_riscv_sbi_fwft, pte_ad_hw_updating.enable) /
+   362					 sizeof(unsigned long),
+ > 363			.supported = kvm_sbi_fwft_pte_ad_hw_updating_supported,
+ > 364			.reset = kvm_sbi_fwft_reset_pte_ad_hw_updating,
+ > 365			.set = kvm_sbi_fwft_set_pte_ad_hw_updating,
+ > 366			.get = kvm_sbi_fwft_get_pte_ad_hw_updating,
+   367		},
+   368	};
+   369	
 
-We still need major fault notifications as well (which we were 
-accidentally generating until this version).  But we can resolve them 
-with write() + UFFDIO_CONTINUE instead of UFFDIO_COPY.
-
-> 
-> But what you are saying is that there might be a performance benefit in
-> using UFFDIO_COPY for userspace faults, to avoid the write()+minor fault
-> overhead?
-
-UFFDIO_COPY _may_ be faster to resolve userspace faults because it's a 
-single syscall instead of two, but the amount of userspace faults, at 
-least in our scenario, is negligible compared to the amount of stage-2 
-faults, so I wouldn't use it as an argument for supporting UFFDIO_COPY 
-if it can be avoided.
-
-> 
-> -- 
-> Cheers
-> 
-> David
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
