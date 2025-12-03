@@ -1,165 +1,196 @@
-Return-Path: <kvm+bounces-65202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65203-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D9A1C9F100
-	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 14:07:45 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DED56C9F133
+	for <lists+kvm@lfdr.de>; Wed, 03 Dec 2025 14:10:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0EC333471D7
-	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 13:07:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C88F94E0F56
+	for <lists+kvm@lfdr.de>; Wed,  3 Dec 2025 13:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFD92EFD9C;
-	Wed,  3 Dec 2025 13:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6ACB2F3C1D;
+	Wed,  3 Dec 2025 13:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nghZQGWr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fbdNMCKW";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BF9aK5EO"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838062D7388;
-	Wed,  3 Dec 2025 13:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0879D2DA76B
+	for <kvm@vger.kernel.org>; Wed,  3 Dec 2025 13:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764767254; cv=none; b=aaPx9SEPG625sHPYURDaDL4RvFdWepXVdWjJuPenLaiveIjzfYg9Umk97swqwEkeMkdlcE+fU0ucc+UkcusCGVnAG5dWavFEsFABPz3EvP+hP/WTZCZCmgZn7SHChEd05Tg9sphX60V2owUOvOBhPYScUZ76tyURFKKJ3kihOBY=
+	t=1764767444; cv=none; b=u2faKPMdJPimCUZhjF21e/WVsvgEdbuebMjlwGxIdHr1CxBCun3AW/6rOID65tCbqGufoD42BIskEnV0woO1K/YJJ+fEjjBrXPF4bbN8hqTdYrFk1x8N1cld1bJpC7sXxwMsJHABhYYWYgf6waLYdfKjaSSgXbnWdzpGXxNSoWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764767254; c=relaxed/simple;
-	bh=koIqVoPCNoSSBELSuKez6+jsD0Huo5gXJNd6cEO+SQU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bM/siW2TZsO1ulLgOfAEtqh5PD7JyR4E6DGvDEmGFdTp+KG3Ung6xQo0vjWR7FqbeDNVXiIw4EdxeeqJ5VdpTXp84tYydeNP+VO6f8/8F/v6TiC/iVb3tlDHQ23PfDClgYjrfv7japx1cEcjfRZixowXX9rgA10P93OdDrLeWfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nghZQGWr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FB54C4CEFB;
-	Wed,  3 Dec 2025 13:07:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764767254;
-	bh=koIqVoPCNoSSBELSuKez6+jsD0Huo5gXJNd6cEO+SQU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nghZQGWrVfRJDfhj52HGuxi1cpXSY3rAPbzxCPNLT94Rn87O16TS+Fyh9b3p8uj+P
-	 gntB3TxDuWFQH6Mn3UMOhVrZz5KUZN3H7zfqP8ZdVIz1Jzxf4s6YEMeQ4yDfVFs737
-	 o/ILkJhghS3cCRexsWwHwgja84Zo785bxowNq77UO6X/JGtTsbgI600Y1GAADOAbmR
-	 3RfppgE95PQMOWfAh1AQkmA50Ij00u+SZNksSmFsT+njoekRqg9tqN53eiwW0hdyK2
-	 6fYqbNSborzZuz6pbtZ8Xm8i2LPU0onopDp9SQ/hlcSVbyNzCdLMFXjYH1YToKSkIM
-	 e4GGUBM8uJfJA==
-Date: Wed, 3 Dec 2025 18:34:29 +0530
-From: Naveen N Rao <naveen@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerly Tng <ackerleytng@google.com>, Nikunj A Dadhania <nikunj@amd.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 01/22] KVM: x86: Disallow read-only memslots for SEV-ES
- and SEV-SNP (and TDX)
-Message-ID: <fcqjl5a7m27f2mfpblnhgmozbipdjmvpdyk3m5hhzwcenp4cpg@m2ooa7ykrcvs>
-References: <20240809190319.1710470-1-seanjc@google.com>
- <20240809190319.1710470-2-seanjc@google.com>
+	s=arc-20240116; t=1764767444; c=relaxed/simple;
+	bh=VL1b6qM5tnDMA9tezK5Rtk2DqKNTgi5puNqAkwa8uCU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tUwH4RvZywmaoB6PHihdNCyl5ds5+ag2iX8pDw/p2sAZn58dhrw7LnTnbre0rZPm8+VvW6Je7vS1ttwGylIcSES8OKEmXQC7H3A5NTZa0IOfzLfWcpVO3mFLu81LYF1npLwwszm1051NjEgyaOhJ6Ia1/cvE5D/te9djMl59WeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fbdNMCKW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BF9aK5EO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764767442;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VaK8gNVnnLXvI7IlxmSXzCdCZI80rI+Rz8uERiiIxZE=;
+	b=fbdNMCKW19m4wlJBqYgzC/iBkUPc85spDSf5p4YiSqmDVQ8LSruikFqDd6Hsuz1cI9Ryih
+	7To6dKWSRkj7QCIlgty+0kxn+U4/jexDNpDmc/d9s5QA634I6ETJItGaZHahnKaW+YZ7P8
+	Q+H656remKL5fyjjPKVW9pcWkYWaQdE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-583-Mr-iEcBqPWSr6YSd1LSBUQ-1; Wed, 03 Dec 2025 08:10:41 -0500
+X-MC-Unique: Mr-iEcBqPWSr6YSd1LSBUQ-1
+X-Mimecast-MFC-AGG-ID: Mr-iEcBqPWSr6YSd1LSBUQ_1764767440
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4776079ada3so58846825e9.1
+        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 05:10:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764767440; x=1765372240; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VaK8gNVnnLXvI7IlxmSXzCdCZI80rI+Rz8uERiiIxZE=;
+        b=BF9aK5EOEiePQlU8IsB9MR9iQNZfHX0P0g3tTKrdTTaVIDebE5gimJzI72REjleQwH
+         PN5JZPaPeDRiX6qUaKWWU/QiYkVVKuVJl0ZlbRT+zuMgGwQ6YQkaej7LAPnvq2is/Scy
+         aH1qH54cGdu4CIrplj7epeJ/kLOIdD8VAkwm/gz52bq7QsmHdyBa468jjKibyEGYuoLc
+         eLc5hCas7m50bmLZYAFyiOwFblajAvvZHpexx7iFnvTf9w9iBzNaxdtJgTMZfvZ30Z4M
+         uDbeghiAgR1nTV5hB3T+istJjMH8HWffa+ATeu8ZYyEOWc1Dg0gcFwYFNyld5AgKkuQI
+         yJsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764767440; x=1765372240;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=VaK8gNVnnLXvI7IlxmSXzCdCZI80rI+Rz8uERiiIxZE=;
+        b=Dcb+x2GoduYJLX9WqajlHgFxzBapTAo232Mh2H+HsyqZCNTwbhcW/q683gJyyIxVoO
+         S+3cHUY5MTuhBsfWoDSCnIFTec8uvfCIOAcLYYCEQ+vQr38HGbYmnySWF9Nfgl59VrvB
+         rr2SC1l5fc57mmf2i9LhXVnwUS1DtMssjAm6gIwM9mviOeHdNlD2LcCba6ti/rcpSdgv
+         fGs9E0s7/o2XVdYBWreGGcv4+F6lraRpvLvT1WJSz4jIyO5m56MU3HdRYk5vaSV/+Z2z
+         EfWG5ygl+Ir//28W0fnMeFZ/3PDugUU4lxNbupmdEKzINCvrp9DVI4oZgBOLwtkQ8Zll
+         9Pzw==
+X-Forwarded-Encrypted: i=1; AJvYcCWKIO0KPEYfFRfVqCY35rAa2Qx7FkoaPQb4wX0EUhLH7v8XNe8jjOWb4RO1MMIPMESPoQU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSkf88vV02H9dcX/Ju1TTfStZyFZ1T6932GB5hqBm2PJU/VgPI
+	tUIWJvuc7Qy0fzjVJv+ypZM3Xgdj1C/m+C7vIafxouG00rgSknFS8O5qWHLIA3E+exDPE1ekwfD
+	tpRtRcLRjtwFLKmbr64C4RUz8qdnWElDp61Hxd+4Qvs80NMtCApNbq5yfJsdRafMr5ipuVF/rlU
+	gLnDDL/kqEOfTdAejNPWCYUB/pfEEF
+X-Gm-Gg: ASbGnct3tYjzloe0tAiwzuI5c5clCpuPh6yO4yOwUAEncM7MnXpuI1XHJHZ09L6mvl8
+	CJXho2qCrDgFSV/BQkehewDE+jFDa4OyoUeTAk51Yh3pJ/irRP5P34DRrlJnPclC/ilDyeBfBEj
+	Y99tUJ7yY4bAxe+H+a6QnoPQyfsSj8wcno9nKcjzWJOPJXhv7YRPUG4fsjz27JkGbY9BEbGiYZn
+	X2pLJQbOUIHUhN+vfbCwUB5LEYWnSxqy/0vLFf2G/H8ZKTNmHyyxbRwEvpTuVaQ8zjRbno=
+X-Received: by 2002:a05:6000:2689:b0:42b:32f5:ad18 with SMTP id ffacd0b85a97d-42f73180f9dmr2597701f8f.9.1764767439736;
+        Wed, 03 Dec 2025 05:10:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHgj3s8W8vwuMl7G5t3fm3GBqzlmfmjEzVSIi7i5l/GlACVq9dghbhMIm5ZQkzBpYHH8aphJQPlHspidUR5DmQ=
+X-Received: by 2002:a05:6000:2689:b0:42b:32f5:ad18 with SMTP id
+ ffacd0b85a97d-42f73180f9dmr2597663f8f.9.1764767439296; Wed, 03 Dec 2025
+ 05:10:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240809190319.1710470-2-seanjc@google.com>
+References: <20251125180557.2022311-1-khushit.shah@nutanix.com>
+ <6353f43f3493b436064068e6a7f55543a2cd7ae1.camel@infradead.org>
+ <A922DCC2-4CB4-4DE8-82FA-95B502B3FCD4@nutanix.com> <118998075677b696104dcbbcda8d51ab7f1ffdfd.camel@infradead.org>
+ <aS8I6T3WtM1pvPNl@google.com> <68ad817529c6661085ff0524472933ba9f69fd47.camel@infradead.org>
+ <aS8Vhb66UViQmY_Q@google.com> <352e189ec40fae044206b48ca6e68d77df7dced1.camel@intel.com>
+ <d3b8fd036f05e9819f654c18853ff79a255c919d.camel@infradead.org>
+In-Reply-To: <d3b8fd036f05e9819f654c18853ff79a255c919d.camel@infradead.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 3 Dec 2025 14:10:26 +0100
+X-Gm-Features: AWmQ_bkXG6zGUGLk1doAMHJxgzoMJ2DUg4jVyEHzZHJl2BaaKFz0PWxqK9MC6fM
+Message-ID: <CABgObfa3wNsQBjAwWuBhWQbw4FuO7TGePuNzfqAYS1CzRFP6DQ@mail.gmail.com>
+Subject: Re: [PATCH v3] KVM: x86: Add x2APIC "features" to control EOI
+ broadcast suppression
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: "Huang, Kai" <kai.huang@intel.com>, "seanjc@google.com" <seanjc@google.com>, 
+	"shaju.abraham@nutanix.com" <shaju.abraham@nutanix.com>, 
+	"khushit.shah@nutanix.com" <khushit.shah@nutanix.com>, "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "mingo@redhat.com" <mingo@redhat.com>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"Kohler, Jon" <jon@nutanix.com>, "tglx@linutronix.de" <tglx@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Sean,
+On Wed, Dec 3, 2025 at 1:26=E2=80=AFPM David Woodhouse <dwmw2@infradead.org=
+> wrote:
+>
+> On Wed, 2025-12-03 at 00:50 +0000, Huang, Kai wrote:
+> >
+> > > -#define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+> > > -#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
+> > > +#define KVM_X2APIC_API_USE_32BIT_IDS                       (_BITULL(=
+0))
+> > > +#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK             (_BITULL(=
+1))
+> > > +#define KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST   (_BITULL(2))
+> > > +#define KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST  (_BITULL(3))
+> >
+> > I hate to say, but wants to ask again:
+> >
+> > Since it's uAPI, are we expecting the two flags to have impact on in-ke=
+rnel
+> > ioapic?
+> >
+> > I think there should no harm to make the two also apply to in-kernel io=
+apic.
+> >
+> > E.g., for now we can reject KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST fl=
+ag for
+> > in-kernel ioapic.  In the future, we might add EOI register support to =
+in-kernel
+> > ioapic and report supporting suppress EOI broadcast, then we can in-ker=
+nel
+> > ioapic to honor these two flags too.
+>
+> I don't think we should leave that to the unspecified 'future'. Let's
+> fix the kernel I/O APIC to support the directed EOI at the same time,
+> rather than having an interim version of KVM which supports the
+> broadcast suppression but *not* the explicit EOI that replaces it.
+>
+> Since I happened to have the I/O APIC PDFs in my recent history for
+> other reasons, and implemented these extra registers for version 0x20
+> in another userspace VMM within living memory, I figured I could try to
+> help with the actual implementation (untested, below).
+>
+> There is some bikeshedding to be done on precisely *how* ->version_id
+> should be set. Maybe we shouldn't have the ->version_id field, and
+> should just check kvm->arch.suppress_eoi_broadcast to see which version
+> to report?
 
-On Fri, Aug 09, 2024 at 12:02:58PM -0700, Sean Christopherson wrote:
-> Disallow read-only memslots for SEV-{ES,SNP} VM types, as KVM can't
-> directly emulate instructions for ES/SNP, and instead the guest must
-> explicitly request emulation.  Unless the guest explicitly requests
-> emulation without accessing memory, ES/SNP relies on KVM creating an MMIO
-> SPTE, with the subsequent #NPF being reflected into the guest as a #VC.
-> 
-> But for read-only memslots, KVM deliberately doesn't create MMIO SPTEs,
-> because except for ES/SNP, doing so requires setting reserved bits in the
-> SPTE, i.e. the SPTE can't be readable while also generating a #VC on
-> writes.  Because KVM never creates MMIO SPTEs and jumps directly to
-> emulation, the guest never gets a #VC.  And since KVM simply resumes the
-> guest if ES/SNP guests trigger emulation, KVM effectively puts the vCPU
-> into an infinite #NPF loop if the vCPU attempts to write read-only memory.
-> 
-> Disallow read-only memory for all VMs with protected state, i.e. for
-> upcoming TDX VMs as well as ES/SNP VMs.  For TDX, it's actually possible
-> to support read-only memory, as TDX uses EPT Violation #VE to reflect the
-> fault into the guest, e.g. KVM could configure read-only SPTEs with RX
-> protections and SUPPRESS_VE=0.  But there is no strong use case for
-> supporting read-only memslots on TDX, e.g. the main historical usage is
-> to emulate option ROMs, but TDX disallows executing from shared memory.
-> And if someone comes along with a legitimate, strong use case, the
-> restriction can always be lifted for TDX.
-> 
-> Don't bother trying to retroactively apply the restriction to SEV-ES
-> VMs that are created as type KVM_X86_DEFAULT_VM.  Read-only memslots can't
-> possibly work for SEV-ES, i.e. disallowing such memslots is really just
-> means reporting an error to userspace instead of silently hanging vCPUs.
-> Trying to deal with the ordering between KVM_SEV_INIT and memslot creation
-> isn't worth the marginal benefit it would provide userspace.
-> 
-> Fixes: 26c44aa9e076 ("KVM: SEV: define VM types for SEV and SEV-ES")
-> Fixes: 1dfe571c12cf ("KVM: SEV: Add initial SEV-SNP support")
-> Cc: Peter Gonda <pgonda@google.com>
-> Cc: Michael Roth <michael.roth@amd.com>
-> Cc: Vishal Annapurve <vannapurve@google.com>
-> Cc: Ackerly Tng <ackerleytng@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 2 ++
->  include/linux/kvm_host.h        | 7 +++++++
->  virt/kvm/kvm_main.c             | 5 ++---
->  3 files changed, 11 insertions(+), 3 deletions(-)
+That would make it impossible to use the fixed implementation on the
+local APIC side, without changing the way the IOAPIC appears to the
+guest.
 
-As discussed in one of the previous PUCK calls, this is causing Qemu to 
-throw an error when trying to enable debug-swap for a SEV-ES guest when 
-using a pflash drive for OVMF. Sample qemu invocation (*):
-  qemu-system-x86_64 ... \
-    -drive if=pflash,format=raw,unit=0,file=/path/to/OVMF_CODE.fd,readonly=on \
-    -drive if=pflash,format=raw,unit=1,file=/path/to/OVMF_VARS.fd \
-    -machine q35,confidential-guest-support=sev0 \
-    -object sev-guest,id=sev0,policy=0x5,cbitpos=51,reduced-phys-bits=1,debug-swap=on
+There are no parameters that you can use in KVM_CREATE_IRQCHIP,
+unfortunately, and no checks that (for example) kvm_irqchip.pad or
+kvm_ioapic_state.pad are zero.
 
-This is expected since enabling debug-swap requires use of 
-KVM_SEV_INIT2, which implies a VM type of KVM_X86_SEV_ES_VM. However, 
-SEV-ES VMs that do not enable any VMSA SEV features (and are hence 
-KVM_X86_DEFAULT_VM type) are allowed to continue to launch though they 
-are also susceptible to this issue.
+The best possibility that I can think of, is to model it like KVM_CAP_XSAVE=
+2
 
-One of the suggestions in the call was to consider returning an error to 
-userspace instead. Is this close to what you had in mind:
+1) Add a capability KVM_CAP_IRQCHIP2 (x86 only)
 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 73cdcbccc89e..19e27ed27e17 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -387,8 +387,10 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-         * they can fix it by changing memory to shared, or they can
-         * provide a better error.
-         */
--       if (r == RET_PF_EMULATE && fault.is_private) {
--               pr_warn_ratelimited("kvm: unexpected emulation request on private memory\n");
-+       if (r == RET_PF_EMULATE && (fault.is_private ||
-+           (!fault.map_writable && fault.write && vcpu->arch.guest_state_protected))) {
-+               if (fault.is_private)
-+                       pr_warn_ratelimited("kvm: unexpected emulation request on private memory\n");
-                kvm_mmu_prepare_memory_fault_exit(vcpu, &fault);
-                return -EFAULT;
-        }
+2) If reported, kvm_irqchip.pad becomes "flags" (a set of flag bits)
+and kvm_ioapic_state.pad becomes version_id when returned from
+KVM_GET_IRQCHIP. Using an anonymous union allows adding the synonyms.
 
-This seems to work though Qemu seems to think we are asking it to 
-convert the memory to shared (so we probably need to signal this error 
-some other way?):
-  qemu-system-x86_64: Convert non guest_memfd backed memory region (0xf0000 ,+ 0x1000) to shared
+3) On top of this, KVM_SET_IRQCHIP2 is added which checks that
+kvm_irqchip.flags is zero and that kvm_ioapic_state.version_id is
+either 0x11 or 0x20.
 
-Thoughts?
+4) Leave the default to 0x11 for backwards compatibility.
 
+The alternative is to add KVM_ENABLE_CAP(KVM_CAP_IRQCHIP2) but I
+dislike adding another stateful API.
 
-Thanks,
-Naveen
-
---
-(*) This requires below patches for Qemu, unless using IGVM:
-https://lore.kernel.org/qemu-devel/cover.1761648149.git.naveen@kernel.org/
+Paolo
 
 
