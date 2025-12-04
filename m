@@ -1,163 +1,162 @@
-Return-Path: <kvm+bounces-65254-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65255-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2E04CA21C6
-	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 02:33:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED6C1CA21E4
+	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 02:41:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CAED7302A3B0
-	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 01:33:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8AD33302C4E8
+	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 01:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998B7243951;
-	Thu,  4 Dec 2025 01:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB3224468B;
+	Thu,  4 Dec 2025 01:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nrfLeL/c"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JShxxfsR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685F0A945
-	for <kvm@vger.kernel.org>; Thu,  4 Dec 2025 01:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D2C136672;
+	Thu,  4 Dec 2025 01:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764812012; cv=none; b=fOcJo6Jzt6vh1MYiXSUJMspXiSljS6KtE+tfBsGYsTWQ+LvD984Q8IZJJxw59JyEnxEsgDMe2hG2UC8MTh+GwdDGkFUKoW+m/tsNShp3A/s8Cz/s43zU98gm0bWkAdwWcqUOePAWXO+eaFxQHahtJyWiE89QQ3NFQAsbsTtVeZI=
+	t=1764812435; cv=none; b=VTkG9WVhqytZLdA6V2AOiKTSxlVB6OC+Tu+et/5WTjnoq6Q8CEVRFlCPN3l6omAwKVZcx863SMl6rnDKfVD6BK1NFoGI17wIJM3ttNosc27Uz17o75k382hoGsuCp+AG9Rx/Vgi6ycifak8U8+UmriEznPiUmtJEX4wdOIW72lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764812012; c=relaxed/simple;
-	bh=xQEchCyS/SDzra4Ea9JG9KXn1RKa+px7wYeOBNUrWJA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=feKMDNgrn38CCOHtMHj27BEJeTI6CUWX+eyjrVe/DocQg+AwtbDVfhFhWnB4p0x+2sgAg8CAppjnfNEQaLDyvTHErV/MT3O2YvbpkTqJZX3QSr0x+eM+wOQxWfcki9it3cLgGnVubRqXp4345H9mpPQ6ICqO3wmEyeApmyGR/Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nrfLeL/c; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-29555415c5fso5167925ad.1
-        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 17:33:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764812011; x=1765416811; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1OLjEC1FU02v8o2+aL765z3ax4u9Wn8i4cyPIqv2NWg=;
-        b=nrfLeL/c5wd6vYAIBlU6lisqNesZ540v0bB2z1KeCVkIxGmUMJ9TpGlNFRfroGO6rJ
-         0Fdka5I4+upGA+rQ5sChFYZPTEYghHO+FfIUrAL4NvkB5NuaAKz13pND6Kbl7Y8joLpF
-         fSKIpaXr5Jkx6ehB3t+F8qY8tRVRm1lZ2ADCrTujFBd9YZJyFo3tv4QfEZ+DEUmZy6a7
-         deBFyQR0UySwbz04yuncepGpMcQGNk8HEBLuRADAE040zGUJmixIyZv0sKEP/QsQ5WAO
-         ZAUEJzlt05SWYAzkfhAlG43Wvab9b+euDue30ccbE4EUnEfxEHc3iQ82yO1pFFgRnxDT
-         Xiuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764812011; x=1765416811;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1OLjEC1FU02v8o2+aL765z3ax4u9Wn8i4cyPIqv2NWg=;
-        b=eqAyZT2uWedpHMdJ9XTfGZhIbp+on8PE88UaU/4Hq6DAzKUMVuDiawheEgYEdEhX4k
-         jUrll/q9yoLq0BE885EqY9rgyR9c47dF9+0U/Vcp4iktlvjh72TmFCc5FTut0tqmH/0a
-         zrI5y9Beu1IlxMMxx3L3DEH7X0GDlCGW2a+kM6TUilsPIsGWfVlcCjHecgIEuXuglWOc
-         TKG2i4kuFa4reL6Z1WBKCgOMqnNTmQT/TMBDZ4L2CM2MlFpZn009PS8dR/VUC1AzZmti
-         1G7dVYgBRjSWh+HOeelEtAknwDff85w+L2or4xV0rpkvCwtV+TAQJVtUhlDosfhrwQcd
-         DPng==
-X-Forwarded-Encrypted: i=1; AJvYcCXjM9vOgNIFX1GZHB7DAQveLYqbuZf5u9PrWZeu/Aqcpd+5SrdixpsgFMvNf0sd9PP5kIo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzD3GDnwdF03tzPyojJgbcILjd4hzLwsT4clOrjRkTKbFwWT+lB
-	atLwoYtb7H1UfDL54utKqHxIhJrhxDichlwC5wRKx3S8z+4613PdNOex
-X-Gm-Gg: ASbGncugzXbnznv9laYhuhgtIn1SlhWyHu7Hljm7aN8a8xZ01kCX1EAB6DbSmaRlvEb
-	E/tTjVTPtlNUFcG3rPomY+RtLS2xtDS0AdbRGBQOucfoXoTpqu6hSbSBi8BqZnZ49TL14UwPoNf
-	ekF5sDNANk3KITW78mJ1izZc6LLpA0E8JDwxFQ8H8QXqx3eCAuLssZKCHU8qlYCoLnFd0n3eF5I
-	Z8nJ6SRto/mWaW1oOhJZjb93eOymTPt1aDi5u1uj9R1vNq5ERpXmAJ2X+pl7Apr+l+BJrP97yjC
-	G30/RlUZHoBS9UlM6AGbnqbID7JWYkbv8X0ACSiw+9mM6ajeOv1ivYl1x8e8/GnK+c6kUePO5Wn
-	bfPnsBAaVsG19ayaY222oMRF7dno3ukj5kopjhhX0xu83OkGOn2gpihcwx15vgdxvFAR9PGXiwQ
-	5gA5kdabjLeWfo0luSpvvpl5ks3I26xD9i76QBt8xaHnNAhA==
-X-Google-Smtp-Source: AGHT+IE8Rvg94sCmcdZ3rOlKWQaPxgdUe5bYjXp+akgFFnSeqWM9ehkwCxofj9csZW166RntHbw50g==
-X-Received: by 2002:a17:903:19e4:b0:295:8c80:fb94 with SMTP id d9443c01a7336-29d683e1cacmr50148045ad.59.1764812010639;
-        Wed, 03 Dec 2025 17:33:30 -0800 (PST)
-Received: from ?IPV6:2601:1c0:5102:8330:1273:9a5a:e6fa:1903? ([2601:1c0:5102:8330:1273:9a5a:e6fa:1903])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29dae4cf98bsm1860585ad.36.2025.12.03.17.33.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Dec 2025 17:33:30 -0800 (PST)
-Message-ID: <d37d6ca4-9b95-44ab-9147-5c0dff4bedc9@gmail.com>
-Date: Wed, 3 Dec 2025 17:33:26 -0800
+	s=arc-20240116; t=1764812435; c=relaxed/simple;
+	bh=5Lx9qbC/zGM3s7a6W/37VXabwbyKKLBCTbhV98JjIxs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hwg3eEmkU+kh2P6c8I/RUBU2RcLMGufC8qRBsqpE1SNfTcdnxvakTb20/tXJsjpoYxRjCCV6/jl4Jd1Bm4VEU1ox91vB3gVd6mFQ0JiAB13oFNmt/Qn0nZKs1kYj2GZQ0Si5mXiEyBXJMMQNSEbH138QJnspQPmJtRireZP7pjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JShxxfsR; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764812433; x=1796348433;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5Lx9qbC/zGM3s7a6W/37VXabwbyKKLBCTbhV98JjIxs=;
+  b=JShxxfsRaPh+7kWLckUrQh2vmEG7IwrKwzPdbHSrUsofPKEOYqLH9+MQ
+   dfk/kGB1t9IkV4NTrSehcefl2nerTZDoTNrvIBMPtSHe8bpMPTQj1VF2j
+   tetb1DlR6Qv5uv/9X3CHOkUkrOSz2fUlJxmxwdPQC0osHRKgAApu2KJc/
+   cmg72/+CGSkPdtkZe1SC7gK6vkc5ocXxB2PT4Uc4+6AkQMDGVvIbtB2nA
+   RD9AjqKs1loj5EmAGCU6mcFpf1cacl7tn7rW7oDoBEtR7/1OWRUrlOPiY
+   2+CrUNXJHig4KExmktzrbVf8Zi+KccVJLLcpHfuVKJ8dM0qmyNSI/9DzB
+   g==;
+X-CSE-ConnectionGUID: SW3wQ3c4TkGpovqVDlaIWw==
+X-CSE-MsgGUID: HLQK3WMIQ+aX1bQUEkpO2g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11631"; a="66785261"
+X-IronPort-AV: E=Sophos;i="6.20,247,1758610800"; 
+   d="scan'208";a="66785261"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2025 17:40:32 -0800
+X-CSE-ConnectionGUID: oPnbOD6qQ1+rTdngMoWc4g==
+X-CSE-MsgGUID: XEYEFZCrRp2cMJ7EJuNHDw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,247,1758610800"; 
+   d="scan'208";a="225796883"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2025 17:40:32 -0800
+Date: Wed, 3 Dec 2025 17:40:26 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: david laight <david.laight@runbox.com>
+Cc: Dave Hansen <dave.hansen@intel.com>,
+	Nikolay Borisov <nik.borisov@suse.com>, x86@kernel.org,
+	David Kaplan <david.kaplan@amd.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v4 04/11] x86/bhi: Make clear_bhb_loop() effective on
+ newer CPUs
+Message-ID: <20251204014026.v5huyriswsqu3jat@desk>
+References: <20251119-vmscape-bhb-v4-4-1adad4e69ddc@linux.intel.com>
+ <4ed6763b-1a88-4254-b063-be652176d1af@intel.com>
+ <e9678dd1-7989-4201-8549-f06f6636274b@suse.com>
+ <f7442dc7-be8d-43f8-b307-2004bd149910@intel.com>
+ <20251121181632.czfwnfzkkebvgbye@desk>
+ <e99150f3-62d4-4155-a323-2d81c1d6d47d@intel.com>
+ <20251121212627.6vweba7aehs4cc3h@desk>
+ <20251122110558.64455a8d@pumpkin>
+ <20251124193126.sdmrhk6dw4jgf5ql@desk>
+ <20251125113407.7b241b59@pumpkin>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 4/4] vfio/xe: Add device specific vfio_pci driver
- variant for Intel graphics
-To: =?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>,
- Alex Williamson <alex@shazbot.org>,
- Lucas De Marchi <lucas.demarchi@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Yishai Hadas <yishaih@nvidia.com>, Kevin Tian <kevin.tian@intel.com>,
- Shameer Kolothum <skolothumtho@nvidia.com>, intel-xe@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Matthew Brost <matthew.brost@intel.com>,
- Michal Wajdeczko <michal.wajdeczko@intel.com>
-Cc: dri-devel@lists.freedesktop.org, Jani Nikula
- <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
- Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Lukasz Laguna <lukasz.laguna@intel.com>,
- Christoph Hellwig <hch@infradead.org>
-References: <20251127093934.1462188-1-michal.winiarski@intel.com>
- <20251127093934.1462188-5-michal.winiarski@intel.com>
-Content-Language: en-US
-From: Angela <angelagbtt1@gmail.com>
-In-Reply-To: <20251127093934.1462188-5-michal.winiarski@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251125113407.7b241b59@pumpkin>
 
-On 11/27/25 01:39, Michał Winiarski wrote:
-[snip]
-> +static void xe_vfio_pci_reset_done(struct pci_dev *pdev)
-> +{
-> +	struct xe_vfio_pci_core_device *xe_vdev = pci_get_drvdata(pdev);
-> +	int ret;
-> +
-> +	if (!pdev->is_virtfn)
-> +		return;
-> +
-> +	/*
-> +	 * VF FLR requires additional processing done by PF driver.
-> +	 * The processing is done after FLR is already finished from PCIe
-> +	 * perspective.
-> +	 * In order to avoid a scenario where VF is used while PF processing
-> +	 * is still in progress, additional synchronization point is needed.
-> +	 */
-> +	ret = xe_sriov_vfio_wait_flr_done(xe_vdev->xe, xe_vdev->vfid);
-> +	if (ret)
-> +		dev_err(&pdev->dev, "Failed to wait for FLR: %d\n", ret);
-> +
-> +	if (!xe_vdev->vfid)
-> +		return;
-> +
-> +	/*
-> +	 * As the higher VFIO layers are holding locks across reset and using
-> +	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-> +	 * with the state_mutex and mm_lock.
-> +	 * In case the state_mutex was taken already we defer the cleanup work
-> +	 * to the unlock flow of the other running context.
-> +	 */
-> +	spin_lock(&xe_vdev->reset_lock);
-> +	xe_vdev->deferred_reset = true;
-> +	if (!mutex_trylock(&xe_vdev->state_mutex)) {
-> +		spin_unlock(&xe_vdev->reset_lock);
-> +		return;
-> +	}
-> +	spin_unlock(&xe_vdev->reset_lock);
-> +	xe_vfio_pci_state_mutex_unlock(xe_vdev);
-> +
-> +	xe_vfio_pci_reset(xe_vdev);
-> +}
-[snip]
+On Tue, Nov 25, 2025 at 11:34:07AM +0000, david laight wrote:
+> On Mon, 24 Nov 2025 11:31:26 -0800
+> Pawan Gupta <pawan.kumar.gupta@linux.intel.com> wrote:
+> 
+> > On Sat, Nov 22, 2025 at 11:05:58AM +0000, david laight wrote:
+> ...
+> > > For subtle reasons one of the mitigations that slows kernel entry caused
+> > > a doubling of the execution time of a largely single-threaded task that
+> > > spends almost all its time in userspace!
+> > > (I thought I'd disabled it at compile time - but the config option
+> > > changed underneath me...)  
+> > 
+> > That is surprising. If its okay, could you please share more details about
+> > this application? Or any other way I can reproduce this?
+> 
+> The 'trigger' program is a multi-threaded program that wakes up every 10ms
+> to process RTP and TDM audio data.
+> So we have a low RT priority process with one thread per cpu.
+> Since they are RT they usually get scheduled on the same cpu as last lime.
+> I think this simple program will have the desired effect:
+> A main process that does:
+> 	syscall(SYS_clock_gettime, CLOCK_MONOTONIC, &start_time);
+> 	start_time += 1sec;
+> 	for (n = 1; n < num_cpu; n++)
+> 		pthread_create(thread_code, start_time);
+> 	thread_code(start_time);
+> with:
+> thread_code(ts)
+> {
+> 	for (;;) {
+> 		ts += 10ms;
+> 		syscall(SYS_clock_nanosleep, CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL);
+> 		do_work();
+> 	}
+> 
+> So all the threads wake up at exactly the same time every 10ms.
+> (You need to use syscall(), don't look at what glibc does.)
+> 
+> On my system the program wasn't doing anything, so do_work() was empty.
+> What matters is whether all the threads end up running at the same time.
+> I managed that using pthread_broadcast(), but the clock code above
+> ought to be worse (and I've since changed the daemon to work that way
+> to avoid all this issues with pthread_broadcast() being sequential
+> and threads not running because the target cpu is running an ISR or
+> just looping in kernel).
+> 
+> The process that gets 'hit' is anything cpu bound.
+> Even a shell loop (eg while :; do ;: done) but with a counter will do.
+> 
+> Without the 'trigger' program, it will (mostly) sit on one cpu and the
+> clock frequency of that cpu will increase to (say) 3GHz while the other
+> all run at 800Mhz.
+> But the 'trigger' program runs threads on all the cpu at the same time.
+> So the 'hit' program is pre-empted and is later rescheduled on a
+> different cpu - running at 800MHz.
+> The cpu speed increases, but 10ms later it gets bounced again.
 
-My first KVM review :)
+Sorry I haven't tried creating this test yet.
 
-I think xe_vfio_pci_reset(xe_vdev) need be protected by state_mutex. So,
-we should move xe_vfio_pci_state_mutex_unlock(xe_vdev) after
-xe_vfio_pci_reset(xe_vdev). Thoughts?
+> The real issue is that the cpu speed is associated with the cpu, not
+> the process running on it.
 
-Thanks,
-Angela
+So if the 'hit' program gets scheduled to a CPU that is running at 3GHz
+then we don't expect a dramatic performance drop? Setting scaling_governor
+to "performance" would be an interesting test.
 
