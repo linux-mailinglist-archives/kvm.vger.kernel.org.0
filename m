@@ -1,99 +1,107 @@
-Return-Path: <kvm+bounces-65278-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65279-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2D2FCA3C74
-	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 14:22:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61C8ECA4009
+	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 15:27:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D445E3042512
-	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 13:21:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ED8FE303EF69
+	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 14:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4784344020;
-	Thu,  4 Dec 2025 13:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="Ee1T/aH+";
-	dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b="kvdKcFKJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2A633ADAB;
+	Thu,  4 Dec 2025 14:23:48 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail132-20.atl131.mandrillapp.com (mail132-20.atl131.mandrillapp.com [198.2.132.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD932D3EEE
-	for <kvm@vger.kernel.org>; Thu,  4 Dec 2025 13:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.2.132.20
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56DD123EA95
+	for <kvm@vger.kernel.org>; Thu,  4 Dec 2025 14:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764854514; cv=none; b=EHknENb+1SVGiRcjd7Yt/2IP6g1XgOluC7f+rrH/qQ+fmmxORI0cx+ta9W2zr1KqvIJYvb5wCUxNXuizdgpPnkHobukKblLFCiwEjiTDnt6xLYBq9IaB7X7LJCY6mVLWz8tD9uzqM5mZcPQ08Y9wZx6yHIWVTqadTlcggaDw6rE=
+	t=1764858228; cv=none; b=a+43AheD+ujgdRabeva9dRmzK9AUZZg3PTFBnu348AUxbfAY0j+N09IRkNClDXjjHEUNsVfUwmiov7vVOOWqbBrP2ydf42ALCy2qSMGj+ilonxpbeTDPzlVpDXXKjHWDs1sHWOkbwM6804Ged/Dr8Zwlf2EzLASp56AD8eehEcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764854514; c=relaxed/simple;
-	bh=l1zpHWlZIk8v4kklrfJoj2bNMah8TNBHN/gHU2C/bR4=;
-	h=From:Subject:Message-Id:To:Cc:References:In-Reply-To:Date:
-	 MIME-Version:Content-Type; b=NFzHHNDKIfcD7LKIkEtDGQdl7RiuBphbTFonz3koxwouhLUBxpwf/wrVCh9uCf8DYgwnK82rWoFPPEI27u3FXULEbIsezACFxyrB2GBFkYUQ3AKvghtkl9AJ6vrPlvrHVatTFyEEJm8A8kJoQVDecFDqvyOh9F4K723/5DiiFT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=Ee1T/aH+; dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b=kvdKcFKJ; arc=none smtp.client-ip=198.2.132.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
-	s=mte1; t=1764854511; x=1765124511;
-	bh=zPGLgI2YEBNoVTVWQEvF7b9V1uJmU+fj5TGVDfV1Cis=;
-	h=From:Subject:Message-Id:To:Cc:References:In-Reply-To:Feedback-ID:
-	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
-	 Subject:From;
-	b=Ee1T/aH+wxVhvlfM1Tnghs5LZNF9vZlrqaKBA26BLlKybPcjeruy3xY7egUjMURRd
-	 eMW0KgSA80RNzNPpoz0c5vRjbYC6Dw9yKwvdNMXqh6FQ4CDCMixL0k4+1M+M8F+3Q0
-	 PCJc8ROOktJkk5xHapP6NhWuRIoiaO7evCg0u/plBc25p9xbqEJMa4fKJg9bXNEZUp
-	 m3EwNodxsq5ksz44eBQziNWC8197ahx0LfPx+956tFhTPyjTGFqVHGvPki/h1aX52y
-	 h2BQYc8FzbJyIIR7i51nUkaanA5dbCtrxh+aO2VE4b8xnlcwdU5Fm3/uQGtAtOcf7D
-	 UmSl9faR9JQxQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
-	t=1764854511; x=1765115011; i=thomas.courrege@vates.tech;
-	bh=zPGLgI2YEBNoVTVWQEvF7b9V1uJmU+fj5TGVDfV1Cis=;
-	h=From:Subject:Message-Id:To:Cc:References:In-Reply-To:Feedback-ID:
-	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
-	 Subject:From;
-	b=kvdKcFKJMZceSrb09fP1Lo75HQiv6q5fVwgHEuVizWVhRLLBsL2OV8Wr3xFQAHO2d
-	 qe7VGc/MYPXnM3Axsu9SubT0zm2lRXjXpWgaUHDyw+PwWQxsBexVdGSy/QNqMfePbs
-	 ZSLABdllY9hoGqJQWkrEGaZ7K2cxTp7lC1zmRt9fXknqTPKVI48bGUyJj7IbZZHdCz
-	 UZ25Y+viVuX9pgxytJ8leOjQKnkPTxhBnNSIMiu5bzdAFZBV9JTdG3U1afdWsr+m6I
-	 4hizZJZ8lAkVb6F4N3f8lqJIdSXoMevDbhkBWLKjMokYZr9V2EnKEIoM0sjjzBUTIF
-	 6ecee583A/ETA==
-Received: from pmta09.mandrill.prod.atl01.rsglab.com (localhost [127.0.0.1])
-	by mail132-20.atl131.mandrillapp.com (Mailchimp) with ESMTP id 4dMZsq2qhGzFCWlKv
-	for <kvm@vger.kernel.org>; Thu,  4 Dec 2025 13:21:51 +0000 (GMT)
-From: "Thomas Courrege" <thomas.courrege@vates.tech>
-Subject: =?utf-8?Q?Re:=20[PATCH=20v2]=20KVM:=20SEV:=20Add=20KVM=5FSEV=5FSNP=5FHV=5FREPORT=5FREQ=20command?=
-Received: from [37.26.189.201] by mandrillapp.com id 05fd0cceacfe4ab990a23d6214c91a76; Thu, 04 Dec 2025 13:21:51 +0000
-X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
-X-Bm-Transport-Timestamp: 1764854509149
-Message-Id: <85baa45b-0fb9-43fb-9f87-9b0036e08f56@vates.tech>
-To: "Tom Lendacky" <thomas.lendacky@amd.com>, pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, ashish.kalra@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au, nikunj@amd.com
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <20251201151940.172521-1-thomas.courrege@vates.tech> <30242a68-25f5-4e92-b776-f3eb6f137c31@amd.com>
-In-Reply-To: <30242a68-25f5-4e92-b776-f3eb6f137c31@amd.com>
-X-Native-Encoded: 1
-X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.05fd0cceacfe4ab990a23d6214c91a76?=
-X-Mandrill-User: md_30504962
-Feedback-ID: 30504962:30504962.20251204:md
-Date: Thu, 04 Dec 2025 13:21:51 +0000
+	s=arc-20240116; t=1764858228; c=relaxed/simple;
+	bh=m5GLaNwrwFBOJDR8QSiMFVr/SOD8N0Ngf95FjAD/KIc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UAGp9sqlEueuTwz638XklStvH3eXGQ7Zz5Ing6g0hb8hFiOMOAdEeTE3wfplkE3xBL8dF3OrAPg+YG46m/Oa88y3riVPhJDvlo7fOoLRG5ukJ8Wc7D6IOMkIZrNNJlAjp9EbEM9iSRmsZyLBFecvbzXh0qCOQgfRuJpt2UY+rsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43543339;
+	Thu,  4 Dec 2025 06:23:38 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 27E663F73B;
+	Thu,  4 Dec 2025 06:23:44 -0800 (PST)
+From: Joey Gouly <joey.gouly@arm.com>
+To: kvm@vger.kernel.org
+Cc: alexandru.elisei@arm.com,
+	eric.auger@redhat.com,
+	joey.gouly@arm.com,
+	maz@kernel.org,
+	andrew.jones@linux.dev,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [kvm-unit-tests PATCH v4 00/11] arm64: EL2 support
+Date: Thu,  4 Dec 2025 14:23:27 +0000
+Message-Id: <20251204142338.132483-1-joey.gouly@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/2/25 8:29 PM, Tom Lendacky wrote:
+Hi all,
 
->> +
->> +e_free_rsp:
->> +	/* contains sensitive data */
->> +	memzero_explicit(report_rsp, PAGE_SIZE);
-> Does it? What is sensitive that needs to be cleared?
+This series is for adding support to running the kvm-unit-tests at EL2.
 
-Combine with others reports, it could allow to do an inventory of the guests,
-which ones share the same author, measurement, policy...
-It is not needed, but generating a report is not a common operation so
-performance is not an issue here. What do you think is the best to do ?
+Changes since v3[1]:
+	- Added rb/acks, thanks!
+	- Fixed checkpatch.pl issues
+	- Changed EL2=1 env var to EL2=y or EL2=Y
+	- Couldn't make the change as suggested in [2] since those tests are
+	  also run at EL0, where CurrentEL is UNDEFINED. So I have left the
+	  #ifdef.
+	- Fixed SCTLR_ELx initialisation on secondary cores.
 
-Regards,
-Thomas
+Thanks,
+Joey
+
+[1] https://lore.kernel.org/kvmarm/20250925141958.468311-1-joey.gouly@arm.com/
+[2] https://lore.kernel.org/kvmarm/20251202122115.GA3921791@e124191.cambridge.arm.com/
+
+Alexandru Elisei (2):
+  arm64: micro-bench: use smc when at EL2
+  arm64: selftest: update test for running at EL2
+
+Joey Gouly (9):
+  arm64: set SCTLR_EL1 to a known value for secondary cores
+  arm64: drop to EL1 if booted at EL2
+  arm64: efi: initialise SCTLR_ELx fully
+  arm64: efi: initialise the EL
+  arm64: timer: use hypervisor timers when at EL2
+  arm64: micro-bench: fix timer IRQ
+  arm64: pmu: count EL2 cycles
+  arm64: run at EL2 if supported
+  arm64: add EL2 environment variable
+
+ arm/cstart64.S             | 66 ++++++++++++++++++++++++++++++++++++--
+ arm/efi/crt0-efi-aarch64.S |  5 +++
+ arm/micro-bench.c          | 26 +++++++++++++--
+ arm/pmu.c                  | 13 +++++---
+ arm/run                    |  7 ++++
+ arm/selftest.c             | 18 ++++++++---
+ arm/timer.c                | 12 +++++--
+ lib/acpi.h                 |  2 ++
+ lib/arm/asm/setup.h        |  8 +++++
+ lib/arm/asm/timer.h        | 11 +++++++
+ lib/arm/setup.c            |  4 +++
+ lib/arm/timer.c            | 19 +++++++++--
+ lib/arm64/asm/sysreg.h     | 19 +++++++++++
+ lib/arm64/processor.c      | 14 ++++++++
+ 14 files changed, 204 insertions(+), 20 deletions(-)
+
+-- 
+2.25.1
+
 
