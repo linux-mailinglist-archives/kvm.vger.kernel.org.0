@@ -1,141 +1,99 @@
-Return-Path: <kvm+bounces-65277-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65278-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00EAECA3894
-	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 13:06:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D2FCA3C74
+	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 14:22:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C556B304A7DA
-	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 12:06:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D445E3042512
+	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 13:21:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D8433D6E5;
-	Thu,  4 Dec 2025 12:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4784344020;
+	Thu,  4 Dec 2025 13:21:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cTw9PFvu"
+	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="Ee1T/aH+";
+	dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b="kvdKcFKJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail132-20.atl131.mandrillapp.com (mail132-20.atl131.mandrillapp.com [198.2.132.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954242E7637;
-	Thu,  4 Dec 2025 12:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD932D3EEE
+	for <kvm@vger.kernel.org>; Thu,  4 Dec 2025 13:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.2.132.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764849967; cv=none; b=ast7rJtnDO1+UpoJ7s5sTMe80hZ+HB/Rid700Hr9xBQe21U/Azj93t8e61U8q97q9MYn6z2NK5TWB/AT9Ts8M3sZtgBq5ogq70yYWJJejS/ypR2zm1WEKct+GGStv+nW99DyXz4vhT9F1Or977IR0a6OrmWZJJg1SvKW1TjoyYU=
+	t=1764854514; cv=none; b=EHknENb+1SVGiRcjd7Yt/2IP6g1XgOluC7f+rrH/qQ+fmmxORI0cx+ta9W2zr1KqvIJYvb5wCUxNXuizdgpPnkHobukKblLFCiwEjiTDnt6xLYBq9IaB7X7LJCY6mVLWz8tD9uzqM5mZcPQ08Y9wZx6yHIWVTqadTlcggaDw6rE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764849967; c=relaxed/simple;
-	bh=KAwt9YmF0MdTkjuXPCwrEtTOnMnIeg8UKwNlBdD09n8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EM3W9vUgGtACSRT6HITToS3PLCfdNu6FY460+eHJ8ndPnvT0v3sErQ5Y/VyhfVwbeAyp1WKvouOoS9RQytg8DJ9pyn1sN73IedVS4Usf2q1JYYxl2Rh5Qj9RX3mxY5N+ezP5jdGYkcPHJBhpaCu+YBFBHcaiixAXa/g9udfvdtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cTw9PFvu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26991C4CEFB;
-	Thu,  4 Dec 2025 12:06:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764849967;
-	bh=KAwt9YmF0MdTkjuXPCwrEtTOnMnIeg8UKwNlBdD09n8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cTw9PFvuwgMzOOX7mPdw/vBRFALpKrgH9twL2OEnXhVu4Xn8XzaBM2RUad5E7kr1f
-	 dtaDqRucDcpvV98fiYSrOgjge8Y2BiTV50+xk8KkrvmOao4NTmg0tA2UmbyZ2t4UY7
-	 WKwzefQgC0RnZnxlg6yQpIUhitxJo38eT2VyO5b23nX1AjDrXUBEiH99h7yrU+NUY8
-	 bNyg6KjVNlm+p7wGhFz5W28xBkZ7h6sVOfnaKyYWJZc8wzomUx7f+nWav7X2cKl5fV
-	 6zy1KdXB7FtadE4oWQv+QB+0fUqD4bjD0PFch1bfEhxxNRiRxPn0+Z3SwdbpD2jIwT
-	 wpGWbsshwbgHg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vR861-0000000ARGn-0147;
-	Thu, 04 Dec 2025 12:06:05 +0000
-Date: Thu, 04 Dec 2025 12:06:04 +0000
-Message-ID: <86a4zypi37.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose
- <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v3 8/9] KVM: arm64: pkvm: Report optional ID register traps with a 0x18 syndrome
-In-Reply-To: <7f853a85-f1da-4e6f-ab3f-63507731f8ee@arm.com>
-References: <20251204094806.3846619-1-maz@kernel.org>
-	<20251204094806.3846619-9-maz@kernel.org>
-	<7f853a85-f1da-4e6f-ab3f-63507731f8ee@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1764854514; c=relaxed/simple;
+	bh=l1zpHWlZIk8v4kklrfJoj2bNMah8TNBHN/gHU2C/bR4=;
+	h=From:Subject:Message-Id:To:Cc:References:In-Reply-To:Date:
+	 MIME-Version:Content-Type; b=NFzHHNDKIfcD7LKIkEtDGQdl7RiuBphbTFonz3koxwouhLUBxpwf/wrVCh9uCf8DYgwnK82rWoFPPEI27u3FXULEbIsezACFxyrB2GBFkYUQ3AKvghtkl9AJ6vrPlvrHVatTFyEEJm8A8kJoQVDecFDqvyOh9F4K723/5DiiFT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=Ee1T/aH+; dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b=kvdKcFKJ; arc=none smtp.client-ip=198.2.132.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
+	s=mte1; t=1764854511; x=1765124511;
+	bh=zPGLgI2YEBNoVTVWQEvF7b9V1uJmU+fj5TGVDfV1Cis=;
+	h=From:Subject:Message-Id:To:Cc:References:In-Reply-To:Feedback-ID:
+	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
+	 Subject:From;
+	b=Ee1T/aH+wxVhvlfM1Tnghs5LZNF9vZlrqaKBA26BLlKybPcjeruy3xY7egUjMURRd
+	 eMW0KgSA80RNzNPpoz0c5vRjbYC6Dw9yKwvdNMXqh6FQ4CDCMixL0k4+1M+M8F+3Q0
+	 PCJc8ROOktJkk5xHapP6NhWuRIoiaO7evCg0u/plBc25p9xbqEJMa4fKJg9bXNEZUp
+	 m3EwNodxsq5ksz44eBQziNWC8197ahx0LfPx+956tFhTPyjTGFqVHGvPki/h1aX52y
+	 h2BQYc8FzbJyIIR7i51nUkaanA5dbCtrxh+aO2VE4b8xnlcwdU5Fm3/uQGtAtOcf7D
+	 UmSl9faR9JQxQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
+	t=1764854511; x=1765115011; i=thomas.courrege@vates.tech;
+	bh=zPGLgI2YEBNoVTVWQEvF7b9V1uJmU+fj5TGVDfV1Cis=;
+	h=From:Subject:Message-Id:To:Cc:References:In-Reply-To:Feedback-ID:
+	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
+	 Subject:From;
+	b=kvdKcFKJMZceSrb09fP1Lo75HQiv6q5fVwgHEuVizWVhRLLBsL2OV8Wr3xFQAHO2d
+	 qe7VGc/MYPXnM3Axsu9SubT0zm2lRXjXpWgaUHDyw+PwWQxsBexVdGSy/QNqMfePbs
+	 ZSLABdllY9hoGqJQWkrEGaZ7K2cxTp7lC1zmRt9fXknqTPKVI48bGUyJj7IbZZHdCz
+	 UZ25Y+viVuX9pgxytJ8leOjQKnkPTxhBnNSIMiu5bzdAFZBV9JTdG3U1afdWsr+m6I
+	 4hizZJZ8lAkVb6F4N3f8lqJIdSXoMevDbhkBWLKjMokYZr9V2EnKEIoM0sjjzBUTIF
+	 6ecee583A/ETA==
+Received: from pmta09.mandrill.prod.atl01.rsglab.com (localhost [127.0.0.1])
+	by mail132-20.atl131.mandrillapp.com (Mailchimp) with ESMTP id 4dMZsq2qhGzFCWlKv
+	for <kvm@vger.kernel.org>; Thu,  4 Dec 2025 13:21:51 +0000 (GMT)
+From: "Thomas Courrege" <thomas.courrege@vates.tech>
+Subject: =?utf-8?Q?Re:=20[PATCH=20v2]=20KVM:=20SEV:=20Add=20KVM=5FSEV=5FSNP=5FHV=5FREPORT=5FREQ=20command?=
+Received: from [37.26.189.201] by mandrillapp.com id 05fd0cceacfe4ab990a23d6214c91a76; Thu, 04 Dec 2025 13:21:51 +0000
+X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
+X-Bm-Transport-Timestamp: 1764854509149
+Message-Id: <85baa45b-0fb9-43fb-9f87-9b0036e08f56@vates.tech>
+To: "Tom Lendacky" <thomas.lendacky@amd.com>, pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, ashish.kalra@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au, nikunj@amd.com
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20251201151940.172521-1-thomas.courrege@vates.tech> <30242a68-25f5-4e92-b776-f3eb6f137c31@amd.com>
+In-Reply-To: <30242a68-25f5-4e92-b776-f3eb6f137c31@amd.com>
+X-Native-Encoded: 1
+X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.05fd0cceacfe4ab990a23d6214c91a76?=
+X-Mandrill-User: md_30504962
+Feedback-ID: 30504962:30504962.20251204:md
+Date: Thu, 04 Dec 2025 13:21:51 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ben.horgan@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 04 Dec 2025 10:51:19 +0000,
-Ben Horgan <ben.horgan@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 12/4/25 09:48, Marc Zyngier wrote:
-> > With FEAT_IDST, unimplemented system registers in the feature ID space
-> > must be reported using EC=0x18 at the closest handling EL, rather than
-> > with an UNDEF.
-> > 
-> > Most of these system registers are always implemented thanks to their
-> > dependency on FEAT_AA64, except for a set of (currently) three registers:
-> > GMID_EL1 (depending on MTE2), CCSIDR2_EL1 (depending on FEAT_CCIDX),
-> > and SMIDR_EL1 (depending on SME).
-> > 
-> > For these three registers, report their trap as EC=0x18 if they
-> > end-up trapping into KVM and that FEAT_IDST is implemented in the guest.
-> > Otherwise, just make them UNDEF.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 15 +++++++++++++++
-> >  1 file changed, 15 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > index 876b36d3d4788..efc36645f4b5a 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > @@ -347,6 +347,18 @@ static bool pvm_gic_read_sre(struct kvm_vcpu *vcpu,
-> >  	return true;
-> >  }
-> >  
-> > +static bool pvm_idst_access(struct kvm_vcpu *vcpu,
-> > +			    struct sys_reg_params *p,
-> > +			    const struct sys_reg_desc *r)
-> > +{
-> > +	if (kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, IDS, NI))
-> > +		inject_undef64(vcpu);
-> > +	else
-> > +		inject_sync64(vcpu, kvm_vcpu_get_esr(vcpu));
-> > +
-> > +	return false;
-> > +}
-> > +
-> 
-> Just wondering, why is the pkvm version register specific? You changed
-> the non-pkvm from register specific to generic.
+On 12/2/25 8:29 PM, Tom Lendacky wrote:
 
-Because pKVM relies on a full enumeration of the registers as a design
-principle, and refrains from having wide-casting nets as a catch-all.
+>> +
+>> +e_free_rsp:
+>> +	/* contains sensitive data */
+>> +	memzero_explicit(report_rsp, PAGE_SIZE);
+> Does it? What is sensitive that needs to be cleared?
 
-That's to ensure that there is a "surprise trap" always results in an
-UNDEF. Different model from the rest of KVM.
+Combine with others reports, it could allow to do an inventory of the guests,
+which ones share the same author, measurement, policy...
+It is not needed, but generating a report is not a common operation so
+performance is not an issue here. What do you think is the best to do ?
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Regards,
+Thomas
 
