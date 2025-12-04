@@ -1,69 +1,68 @@
-Return-Path: <kvm+bounces-65276-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65277-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 020C4CA3867
-	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 13:02:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00EAECA3894
+	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 13:06:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 01D3E30287DC
-	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 12:02:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C556B304A7DA
+	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 12:06:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C3F30EF92;
-	Thu,  4 Dec 2025 12:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D8433D6E5;
+	Thu,  4 Dec 2025 12:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u4oXrp0o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cTw9PFvu"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B5D2DF6EA;
-	Thu,  4 Dec 2025 12:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954242E7637;
+	Thu,  4 Dec 2025 12:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764849768; cv=none; b=NGUr6lYjXrlzpnbJz2K0BX6IfawJZatRwPRoH0TpMjZgV3XjvSIE6TH3WYiuCEqPubdLl4apa1TQWNlko5GYLqBLSsDA5tDU/kGOLGx5IBAO2A1oh1ImvvkXg/4V7SKYfzY8Ucww6CvxwVLa2LtPrXPUMyT7sV3NzBmqSy3xM/I=
+	t=1764849967; cv=none; b=ast7rJtnDO1+UpoJ7s5sTMe80hZ+HB/Rid700Hr9xBQe21U/Azj93t8e61U8q97q9MYn6z2NK5TWB/AT9Ts8M3sZtgBq5ogq70yYWJJejS/ypR2zm1WEKct+GGStv+nW99DyXz4vhT9F1Or977IR0a6OrmWZJJg1SvKW1TjoyYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764849768; c=relaxed/simple;
-	bh=qAFev/ZMR+BvH9bpLAKRlFmk+BNmyUPl+SRKdAw5gt0=;
+	s=arc-20240116; t=1764849967; c=relaxed/simple;
+	bh=KAwt9YmF0MdTkjuXPCwrEtTOnMnIeg8UKwNlBdD09n8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KLvp6pzAERq1Lv5ISoUZrneeQdFvIfoK2RhhsjcVcvmetOUWTdJHvxvXQXHaA74T5qC/cmeGfelIVgYPvHcWzwT1Yg1xQ9j8n0b5y1loBIzwrSBsfnLBbFQLtyJiwfFwsJdNMNKGhJpFMxr/oOn8/wH1dVC9kETHK0Qa15OZQm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u4oXrp0o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93C1DC4CEFB;
-	Thu,  4 Dec 2025 12:02:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EM3W9vUgGtACSRT6HITToS3PLCfdNu6FY460+eHJ8ndPnvT0v3sErQ5Y/VyhfVwbeAyp1WKvouOoS9RQytg8DJ9pyn1sN73IedVS4Usf2q1JYYxl2Rh5Qj9RX3mxY5N+ezP5jdGYkcPHJBhpaCu+YBFBHcaiixAXa/g9udfvdtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cTw9PFvu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26991C4CEFB;
+	Thu,  4 Dec 2025 12:06:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764849768;
-	bh=qAFev/ZMR+BvH9bpLAKRlFmk+BNmyUPl+SRKdAw5gt0=;
+	s=k20201202; t=1764849967;
+	bh=KAwt9YmF0MdTkjuXPCwrEtTOnMnIeg8UKwNlBdD09n8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u4oXrp0oVv3YCP/h84RVudsXPgHYL9O+cuZOsBm6sWa2kINAWtlbOj7Dhd//xmaxJ
-	 n/6ZiWpgpFuNfYS4e/SUD8ar9kBTjFl39et6B24yBU5Lf7W2E2RD5xQspYizIeLUQG
-	 Oh7aDlymvfpO25RAxAbLOjdPVUF1zW/cDn4a4xjDhYfY/ZNMkL1QEZQTtuQ4+8Ix//
-	 RU3810sBs92AONbLrwu1mKyWT541HNLyEZQRjfqwneoHzaG/gIJrOAzNk0LClIGRLy
-	 LD7ZcSDZsf8pxbrI8IeLCvS8qDrVtQZ+SYuVr28vCR2FdB8iVRiRTO1LrwZIN4iYjt
-	 KrlJd+OS8ErZg==
+	b=cTw9PFvuwgMzOOX7mPdw/vBRFALpKrgH9twL2OEnXhVu4Xn8XzaBM2RUad5E7kr1f
+	 dtaDqRucDcpvV98fiYSrOgjge8Y2BiTV50+xk8KkrvmOao4NTmg0tA2UmbyZ2t4UY7
+	 WKwzefQgC0RnZnxlg6yQpIUhitxJo38eT2VyO5b23nX1AjDrXUBEiH99h7yrU+NUY8
+	 bNyg6KjVNlm+p7wGhFz5W28xBkZ7h6sVOfnaKyYWJZc8wzomUx7f+nWav7X2cKl5fV
+	 6zy1KdXB7FtadE4oWQv+QB+0fUqD4bjD0PFch1bfEhxxNRiRxPn0+Z3SwdbpD2jIwT
+	 wpGWbsshwbgHg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vR82o-0000000ARD4-1xKl;
-	Thu, 04 Dec 2025 12:02:46 +0000
-Date: Thu, 04 Dec 2025 12:02:46 +0000
-Message-ID: <86bjkepi8p.wl-maz@kernel.org>
+	id 1vR861-0000000ARGn-0147;
+	Thu, 04 Dec 2025 12:06:05 +0000
+Date: Thu, 04 Dec 2025 12:06:04 +0000
+Message-ID: <86a4zypi37.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ben Horgan <ben.horgan@arm.com>
 Cc: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Suzuki K Poulose
+ <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v3 1/9] arm64: Repaint ID_AA64MMFR2_EL1.IDS description
-In-Reply-To: <d546725b-e96f-461e-887d-8679cf747c7d@arm.com>
+Subject: Re: [PATCH v3 8/9] KVM: arm64: pkvm: Report optional ID register traps with a 0x18 syndrome
+In-Reply-To: <7f853a85-f1da-4e6f-ab3f-63507731f8ee@arm.com>
 References: <20251204094806.3846619-1-maz@kernel.org>
-	<20251204094806.3846619-2-maz@kernel.org>
-	<b98c154a-1658-4501-bfa5-a93303aa5b3f@arm.com>
-	<86cy4uplo5.wl-maz@kernel.org>
-	<d546725b-e96f-461e-887d-8679cf747c7d@arm.com>
+	<20251204094806.3846619-9-maz@kernel.org>
+	<7f853a85-f1da-4e6f-ab3f-63507731f8ee@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,66 +78,59 @@ X-SA-Exim-Rcpt-To: ben.horgan@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.o
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 04 Dec 2025 11:13:41 +0000,
+On Thu, 04 Dec 2025 10:51:19 +0000,
 Ben Horgan <ben.horgan@arm.com> wrote:
 > 
 > Hi Marc,
 > 
-> On 12/4/25 10:48, Marc Zyngier wrote:
-> > On Thu, 04 Dec 2025 10:36:54 +0000,
-> > Ben Horgan <ben.horgan@arm.com> wrote:
-> >>
-> >> Hi Marc,
-> >>
-> >> On 12/4/25 09:47, Marc Zyngier wrote:
-> >>> ID_AA64MMFR2_EL1.IDS, as described in the sysreg file, is pretty horrible
-> >>> as it diesctly give the ESR value. Repaint it using the usual NI/IMP
-> >>> identifiers to describe the absence/presence of FEAT_IDST.
-> >>>
-> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> >>> ---
-> >>>  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 2 +-
-> >>>  arch/arm64/tools/sysreg            | 4 ++--
-> >>>  2 files changed, 3 insertions(+), 3 deletions(-)
-> >>>
-> >>> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> >>> index 82da9b03692d4..107d62921b168 100644
-> >>> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> >>> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> >>> @@ -134,7 +134,7 @@ static const struct pvm_ftr_bits pvmid_aa64mmfr2[] = {
-> >>>  	MAX_FEAT(ID_AA64MMFR2_EL1, UAO, IMP),
-> >>>  	MAX_FEAT(ID_AA64MMFR2_EL1, IESB, IMP),
-> >>>  	MAX_FEAT(ID_AA64MMFR2_EL1, AT, IMP),
-> >>> -	MAX_FEAT_ENUM(ID_AA64MMFR2_EL1, IDS, 0x18),
-> >>> +	MAX_FEAT_ENUM(ID_AA64MMFR2_EL1, IDS, IMP),
-> >>>  	MAX_FEAT(ID_AA64MMFR2_EL1, TTL, IMP),
-> >>>  	MAX_FEAT(ID_AA64MMFR2_EL1, BBM, 2),
-> >>>  	MAX_FEAT(ID_AA64MMFR2_EL1, E0PD, IMP),
-> >>> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> >>> index 1c6cdf9d54bba..3261e8791ac03 100644
-> >>> --- a/arch/arm64/tools/sysreg
-> >>> +++ b/arch/arm64/tools/sysreg
-> >>> @@ -2257,8 +2257,8 @@ UnsignedEnum	43:40	FWB
-> >>>  	0b0001	IMP
-> >>>  EndEnum
-> >>>  Enum	39:36	IDS
-> >>
-> >> Should this also be changed to an UnsignedEnum?
+> On 12/4/25 09:48, Marc Zyngier wrote:
+> > With FEAT_IDST, unimplemented system registers in the feature ID space
+> > must be reported using EC=0x18 at the closest handling EL, rather than
+> > with an UNDEF.
 > > 
-> > I'm not sure this brings much when you only have two values. If IDS
-> > was growing a third value, and that there was an actual order in the
-> > numbering scheme, then yes, that'd be useful.
+> > Most of these system registers are always implemented thanks to their
+> > dependency on FEAT_AA64, except for a set of (currently) three registers:
+> > GMID_EL1 (depending on MTE2), CCSIDR2_EL1 (depending on FEAT_CCIDX),
+> > and SMIDR_EL1 (depending on SME).
+> > 
+> > For these three registers, report their trap as EC=0x18 if they
+> > end-up trapping into KVM and that FEAT_IDST is implemented in the guest.
+> > Otherwise, just make them UNDEF.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 15 +++++++++++++++
+> >  1 file changed, 15 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > index 876b36d3d4788..efc36645f4b5a 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > @@ -347,6 +347,18 @@ static bool pvm_gic_read_sre(struct kvm_vcpu *vcpu,
+> >  	return true;
+> >  }
+> >  
+> > +static bool pvm_idst_access(struct kvm_vcpu *vcpu,
+> > +			    struct sys_reg_params *p,
+> > +			    const struct sys_reg_desc *r)
+> > +{
+> > +	if (kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, IDS, NI))
+> > +		inject_undef64(vcpu);
+> > +	else
+> > +		inject_sync64(vcpu, kvm_vcpu_get_esr(vcpu));
+> > +
+> > +	return false;
+> > +}
+> > +
 > 
-> Joey just pointed out to me that there is a new third field. Not in the
-> arm reference manual yet, but mentioned in the xml. I'm unsure if it's
-> necessary to consider this at the moment though.
-> 
-> https://developer.arm.com/documentation/ddi0601/2025-09/AArch64-Registers/ID-AA64MMFR2-EL1--AArch64-Memory-Model-Feature-Register-2?lang=en
+> Just wondering, why is the pkvm version register specific? You changed
+> the non-pkvm from register specific to generic.
 
-Ah, nice catch. In which case I agree that this should become
-UnsignedEnum, as the new EL3 feature is a strict superset of 0b0001.
+Because pKVM relies on a full enumeration of the registers as a design
+principle, and refrains from having wide-casting nets as a catch-all.
 
-I'll add fix for that on top.
+That's to ensure that there is a "surprise trap" always results in an
+UNDEF. Different model from the rest of KVM.
 
 Thanks,
 
