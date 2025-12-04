@@ -1,274 +1,209 @@
-Return-Path: <kvm+bounces-65303-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65304-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 461AECA4EF0
-	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 19:27:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CD50CA5915
+	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 22:56:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 05B643069E2E
-	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 18:27:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C9B53091CF2
+	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 21:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A8F3451CB;
-	Thu,  4 Dec 2025 18:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19552EC563;
+	Thu,  4 Dec 2025 21:56:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hQQxvYEX";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VViG+k1N"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aegVw1OL"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AE1345732
-	for <kvm@vger.kernel.org>; Thu,  4 Dec 2025 18:16:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1729025742F;
+	Thu,  4 Dec 2025 21:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764872222; cv=none; b=i2jDhTujohULZUiq5NjnseeOlxSAMht8FWZAs+EkBCJynaq2wZb8t/ymIXVR6O5YSNBZromjm0kGsjmVqZMeieq7N+uhybuMp8cN4404VWJM3e3ObQeDdzQyAynHYFA1kw5J8xcaAzCvzxPCg/lzG0Jz0/ireKECIsLD51tyBFw=
+	t=1764885367; cv=none; b=jZkqp7nZV0uwrQ5ICUYqJcx2DjQ+8BJ5KZK2MSWOQro/AsefwyMonAaZllSCLiwxEWi4gmJtipbBVXfwUmdk82an7w+CBgAruJEBJqPFD3q8cMb+nKeEuYoJ//ea7bHkQid7KKy8Mvr83xfuiUcQOZn2JqbqfF2+zg24eqba5Fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764872222; c=relaxed/simple;
-	bh=+Cf+AdkktDXW6fhzmlgmL/2n672nbfxqLsKE7gA5OUg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dwgcfcTkMeBG/pr+Us4+GM605455eS3cDwONDHIH53f7tm6BlILYrKlm/0+olvbQ8CXqePpatYpRRvfFEBWOrMdUbcAIxH3h93CsfDbk3jsqkBX3N9opWb3qDG6wb2hwAHH1IiHenrwSdnZJie9AyB5BD3pH9E5obv9cKauHt7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hQQxvYEX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VViG+k1N; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764872218;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=eirtc4OeV7lF+HDc34TcziSlprrtqsjl7v9RehYvcZU=;
-	b=hQQxvYEXzA6mUrhWRNOnMhk/gc1gNE5/PQ4Ssbe10VRcuHiVDBadvF7ZFktKN03y9OkmtP
-	hRpruSvlDNG6hmMgPkK8z3wp7V8n0EF3yOuD2s9ZFFtT4qhi41wElKNOGcLgVvE3NrNYte
-	93wIXnJYZwskF/0iwk+jGUoRjbRsmqk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-3-WQwQlfZQMYyBYVmY4KY_hw-1; Thu, 04 Dec 2025 13:16:57 -0500
-X-MC-Unique: WQwQlfZQMYyBYVmY4KY_hw-1
-X-Mimecast-MFC-AGG-ID: WQwQlfZQMYyBYVmY4KY_hw_1764872216
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42e2e3c2cccso823008f8f.3
-        for <kvm@vger.kernel.org>; Thu, 04 Dec 2025 10:16:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764872216; x=1765477016; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=eirtc4OeV7lF+HDc34TcziSlprrtqsjl7v9RehYvcZU=;
-        b=VViG+k1NwORalTviBdoccCXllklpjvueayOquPztqqYe5DsnfwDSC3X2YAuR4h6rDQ
-         Q2mUBSKbBlsArCCWkoM5+kgzU5Gxd+ItPDjXeG5H9vBO5IS3hltW//YM8N8ST4sfEBok
-         MwZhF9LKbtF2aQxPU9d/kTJAkmbmCrBJC0RMD0pOfQTQyU+qrAuHiERFNzumXy4FAZjC
-         13tgjAnWEBe43lAFGS8/GwfNkqR7/2R0nUy2kdISc0RE5PWNYsQzk4XdlFj1JjrjeZhN
-         zmlRWorQzEQg4MKIcpOAbliBdGaIbQN0btN1e8Rc9cGKQY9jXGOdjLo8KUy95gyhtrKY
-         uuCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764872216; x=1765477016;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eirtc4OeV7lF+HDc34TcziSlprrtqsjl7v9RehYvcZU=;
-        b=FAhkvUt0/x9+f9vpblt+qJvx3b1YojcKOKhd3LpBWdRTS5VzWoVAm3TXI9QKf1LKmJ
-         Dh+3vraR1+NFgu9jqmP18jWC98n+E6GxhGzW4qaLSQKWpyi7IFMiDLwv8Tzb0nrzSCBv
-         1qHMqaWVV6Z7IXiK75eYWPtp56kTA66SEcSfdFiAoATXFhclbo4aZNTgqbNKB1Jfvtct
-         exZtNr0xxkcEHk0cJqLy9aQxYiE7vOiz6lxW0saK3+LXkdFsGAL2N82AQmo+w5YyCd14
-         BVvIR9Dp891kR1Uv5osHRwp+1gw5xHe6TNgA97YsezeqBJ/CWo8bSc2mvabVlwFN6uv2
-         tJHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfRVdP6S22Mh8QZYZ1KZrYxwo+beKOs+9lrYPP0WThJVHadsxPT8P/DcvMv69IDNRhsGQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzopZztDcizzDYYa2o2nwCUby9AGLgCFHYdAXRH0vDJZ4jnrXz
-	McZ3spqDqiu4miwfUoirIGygx4tJykNrZRhF6Hj83/mEXThlIsSf8rYstfOl+lDXxjCQHo2WPhb
-	YY9MuwPIa+Isf7rX8iIGyegzN3j9w6y09RqQ+ww0UvftYq4rRL1FoEA==
-X-Gm-Gg: ASbGncvnlGWQU7NCzKDT5uQQb3+v6Qprt2EqCPL9lnOTnDuSwVedneYLMIy8DNryT0N
-	oMlKor6HrdalQJuHAqt722VTln/YnwjrlQrBdYvlMo8oSvOVOqfsRZcg8w3vR4IDGzIMhlMpoC7
-	BMZa3i8ywW2cfw1hPD86ZhTivAzyBzuKVyhnsLu8XNtQm/frUXrA1XgccY71x47YLHLElWbxq4X
-	UVgTAa735r/9Yr8Hmw5CTp2RV9Ih3ejK/+REDU6WkVRYq14k9aNHonCe7h0A+T/U8oR8WvaHXcC
-	nabM7ul1uvfW6AoCeKbtZUcwtQohnGtq8uMmh5bOBGV6wpjb4NVxmSsGUie1lfjgHIOBnVH8m50
-	pG5FUWcV2e0B+JverO5ULy6299RAEz5bjSdHeXd9kkJhks5j1
-X-Received: by 2002:a05:6000:40cb:b0:429:ca7f:8d70 with SMTP id ffacd0b85a97d-42f731728cbmr7553708f8f.15.1764872216025;
-        Thu, 04 Dec 2025 10:16:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHHsNa2uHt8wNcyB2Wb02dOnnMd8Uiu88xRl/KelRrPJiBftSyGR+BDd3v8V9I+wEeIzVFlXA==
-X-Received: by 2002:a05:6000:40cb:b0:429:ca7f:8d70 with SMTP id ffacd0b85a97d-42f731728cbmr7553657f8f.15.1764872215452;
-        Thu, 04 Dec 2025 10:16:55 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7cbe9032sm4052320f8f.1.2025.12.04.10.16.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Dec 2025 10:16:54 -0800 (PST)
-Message-ID: <e2033095-9bf1-4d9c-9a5b-01148eaffc30@redhat.com>
-Date: Thu, 4 Dec 2025 19:16:54 +0100
+	s=arc-20240116; t=1764885367; c=relaxed/simple;
+	bh=iVJpYeZX3MOItli+/aGTjrcrH74T0/oy3f2nKK8xIvk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hZBwY8p2Lv8bDqs4az6XZR7kbM0VQNZxqqfL0S7DBq/DkTlxrDgu5o/Y9wvTm7HQXNSV3lUva1N8LTd5LuY5PMCPS1trDLCJI2Xp/Zj/MNAFioBmHtccIbM/oiSxyxKswzMMUx59KVkCTX6PE7YVs2MftMryxSz8O0WzKcRaZ64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aegVw1OL; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764885365; x=1796421365;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=iVJpYeZX3MOItli+/aGTjrcrH74T0/oy3f2nKK8xIvk=;
+  b=aegVw1OLcywX2gEyhLe4ySA/RC/912mh0IYDtPcDWmweTm1IHnrlkRZv
+   axUx2m1er6mgq3eWYeS6rfWq9gq3w0c2qBwIHjSX6yJ89bpQ21hq3wN7a
+   cg+wsK3FaRiNGGRM4SxsKSeT1lmtH4GyYJCMxcIPuXgWw4DpyUViEtHZj
+   nKlnJj4x+8bjPcb1JUN8EsA3z/xQh51EZfuWT6bEHEQ9nQoA1B+DcNhoC
+   1rsyTO1U0QkC9wlHjUiYhm5rbPwbb0gD+52XkoqFbH8Ad5oL1ZvfQ6fYo
+   eY/x5GoMgt0eDHJWlqTS+rpEX3PhZjnuuYHQ+sVfuPuEwVgo3yVw+ST91
+   g==;
+X-CSE-ConnectionGUID: i/+lo48MQjGGDZj3P9En0w==
+X-CSE-MsgGUID: LBnZSSkpQEG8yYYR3lz0uQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11632"; a="66810341"
+X-IronPort-AV: E=Sophos;i="6.20,250,1758610800"; 
+   d="scan'208";a="66810341"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2025 13:56:04 -0800
+X-CSE-ConnectionGUID: yf9ibuwsQvKS3bV5HVJJWg==
+X-CSE-MsgGUID: hqG07uTCSnWk7eKIwWfXZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,250,1758610800"; 
+   d="scan'208";a="195131447"
+Received: from unknown (HELO windy) ([10.241.226.132])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2025 13:56:04 -0800
+Date: Thu, 4 Dec 2025 13:56:02 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: david laight <david.laight@runbox.com>
+Cc: Dave Hansen <dave.hansen@intel.com>, 
+	Nikolay Borisov <nik.borisov@suse.com>, x86@kernel.org, David Kaplan <david.kaplan@amd.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>, 
+	Tao Zhang <tao1.zhang@intel.com>, Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v4 04/11] x86/bhi: Make clear_bhb_loop() effective on
+ newer CPUs
+Message-ID: <smt7yrupcypkjsfrtlwp6kznol3mrgrer63plubwfp2hcunoul@yi5rbq5r3w5j>
+References: <e9678dd1-7989-4201-8549-f06f6636274b@suse.com>
+ <f7442dc7-be8d-43f8-b307-2004bd149910@intel.com>
+ <20251121181632.czfwnfzkkebvgbye@desk>
+ <e99150f3-62d4-4155-a323-2d81c1d6d47d@intel.com>
+ <20251121212627.6vweba7aehs4cc3h@desk>
+ <20251122110558.64455a8d@pumpkin>
+ <20251124193126.sdmrhk6dw4jgf5ql@desk>
+ <20251125113407.7b241b59@pumpkin>
+ <20251204014026.v5huyriswsqu3jat@desk>
+ <20251204091511.757ea777@pumpkin>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/4] mm/vfio: huge pfnmaps with !MAP_FIXED mappings
-To: Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Nico Pache <npache@redhat.com>,
- Zi Yan <ziy@nvidia.com>, Alex Mastro <amastro@fb.com>,
- David Hildenbrand <david@redhat.com>, Alex Williamson <alex@shazbot.org>,
- Zhi Wang <zhiw@nvidia.com>, David Laight <david.laight.linux@gmail.com>,
- Yi Liu <yi.l.liu@intel.com>, Ankit Agrawal <ankita@nvidia.com>,
- Kevin Tian <kevin.tian@intel.com>, Andrew Morton <akpm@linux-foundation.org>
-References: <20251204151003.171039-1-peterx@redhat.com>
-From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
-Content-Language: en-US, fr
-Autocrypt: addr=clg@redhat.com; keydata=
- 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
- uVKe8BVz4atMOoktmt0GWTOC8P4=
-In-Reply-To: <20251204151003.171039-1-peterx@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251204091511.757ea777@pumpkin>
 
-On 12/4/25 16:09, Peter Xu wrote:
-> This series is based on v6.18.  It allows mmap(!MAP_FIXED) to work with
-> huge pfnmaps with best effort.  Meanwhile, it enables it for vfio-pci as
-> the first user.
+On Thu, Dec 04, 2025 at 09:15:11AM +0000, david laight wrote:
+> On Wed, 3 Dec 2025 17:40:26 -0800
+> Pawan Gupta <pawan.kumar.gupta@linux.intel.com> wrote:
 > 
-> v1: https://lore.kernel.org/r/20250613134111.469884-1-peterx@redhat.com
+> > On Tue, Nov 25, 2025 at 11:34:07AM +0000, david laight wrote:
+> > > On Mon, 24 Nov 2025 11:31:26 -0800
+> > > Pawan Gupta <pawan.kumar.gupta@linux.intel.com> wrote:
+> > >   
+> > > > On Sat, Nov 22, 2025 at 11:05:58AM +0000, david laight wrote:  
+> > > ...  
+> > > > > For subtle reasons one of the mitigations that slows kernel entry caused
+> > > > > a doubling of the execution time of a largely single-threaded task that
+> > > > > spends almost all its time in userspace!
+> > > > > (I thought I'd disabled it at compile time - but the config option
+> > > > > changed underneath me...)    
+> > > > 
+> > > > That is surprising. If its okay, could you please share more details about
+> > > > this application? Or any other way I can reproduce this?  
+> > > 
+> > > The 'trigger' program is a multi-threaded program that wakes up every 10ms
+> > > to process RTP and TDM audio data.
+> > > So we have a low RT priority process with one thread per cpu.
+> > > Since they are RT they usually get scheduled on the same cpu as last lime.
+> > > I think this simple program will have the desired effect:
+> > > A main process that does:
+> > > 	syscall(SYS_clock_gettime, CLOCK_MONOTONIC, &start_time);
+> > > 	start_time += 1sec;
+> > > 	for (n = 1; n < num_cpu; n++)
+> > > 		pthread_create(thread_code, start_time);
+> > > 	thread_code(start_time);
+> > > with:
+> > > thread_code(ts)
+> > > {
+> > > 	for (;;) {
+> > > 		ts += 10ms;
+> > > 		syscall(SYS_clock_nanosleep, CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL);
+> > > 		do_work();
+> > > 	}
+> > > 
+> > > So all the threads wake up at exactly the same time every 10ms.
+> > > (You need to use syscall(), don't look at what glibc does.)
+> > > 
+> > > On my system the program wasn't doing anything, so do_work() was empty.
+> > > What matters is whether all the threads end up running at the same time.
+> > > I managed that using pthread_broadcast(), but the clock code above
+> > > ought to be worse (and I've since changed the daemon to work that way
+> > > to avoid all this issues with pthread_broadcast() being sequential
+> > > and threads not running because the target cpu is running an ISR or
+> > > just looping in kernel).
+> > > 
+> > > The process that gets 'hit' is anything cpu bound.
+> > > Even a shell loop (eg while :; do ;: done) but with a counter will do.
+> > > 
+> > > Without the 'trigger' program, it will (mostly) sit on one cpu and the
+> > > clock frequency of that cpu will increase to (say) 3GHz while the other
+> > > all run at 800Mhz.
+> > > But the 'trigger' program runs threads on all the cpu at the same time.
+> > > So the 'hit' program is pre-empted and is later rescheduled on a
+> > > different cpu - running at 800MHz.
+> > > The cpu speed increases, but 10ms later it gets bounced again.  
+> > 
+> > Sorry I haven't tried creating this test yet.
+> > 
+> > > The real issue is that the cpu speed is associated with the cpu, not
+> > > the process running on it.  
+> > 
+> > So if the 'hit' program gets scheduled to a CPU that is running at 3GHz
+> > then we don't expect a dramatic performance drop? Setting scaling_governor
+> > to "performance" would be an interesting test.
 > 
-> A changelog may not apply because all the patches were rewrote based on a
-> new interface this v2 introduced.  Hence omitted.
-> 
-> In this version, a new file operation, get_mapping_order(), is introduced
-> (based on discussion with Jason on v1) to minimize the code needed for
-> drivers to implement this.  It also helps avoid exporting any mm functions.
-> One can refer to the discussion in v1 for more information.
-> 
-> Currently, get_mapping_order() API is define as:
-> 
->    int (*get_mapping_order)(struct file *file, unsigned long pgoff, size_t len);
-> 
-> The first argument is the file pointer, the 2nd+3rd are the pgoff+len
-> specified from a mmap() request.  The driver can use this interface to
-> opt-in providing mapping order hints to core mm on VA allocations for the
-> range of the file specified.  I kept the interface as simple for now, so
-> that core mm will always do the alignment with pgoff assuming that would
-> always work.  The driver can only report the order from pgoff+len, which
-> will be used to do the alignment.
-> 
-> Before this series, an userapp in most cases need to be modified to benefit
-> from huge mappings to provide huge size aligned VA using MAP_FIXED.  After
-> this series, the userapp can benefit from huge pfnmap automatically after
-> the kernel upgrades, with no userspace modifications.
-> 
-> It's still best-effort, because the auto-alignment will require a larger VA
-> range to be allocated via the per-arch allocator, hence if the huge-mapping
-> aligned VA cannot be allocated then it'll still fallback to small mappings
-> like before.  However that's from theory POV: in reality I don't yet know
-> when it'll fail especially when on a 64bits system.
-> 
-> So far, only vfio-pci is supported.  But the logic should be applicable to
-> all the drivers that support or will support huge pfnmaps.  I've copied
-> some more people in this version too from hardware perspective.
-> 
-> For testings:
-> 
-> - checkpatch.pl
-> - cross build harness
-> - unit test that I got from Alex [1], checking mmap() alignments on a QEMU
->    instance with an 128MB bar.
-> 
-> Checking the alignments look all sane with mmap(!MAP_FIXED), and huge
-> mappings properly installed.  I didn't observe anything wrong.
-> 
-> I currently lack larger bars to test PUD sizes.  Please kindly report if
-> one can run this with 1G+ bars and hit issues.
+> I failed to find a way to lock the cpu frequency (for other testing) on
+> that system an i7-7xxx - and the system will start thermally throttling
+> if you aren't careful.
 
-LGTM, with a 32G BAR :
+i7-7xxx would be Kaby Lake gen, those shouldn't need to deploy BHB clear
+mitigation. I am guessing it is the legacy-IBRS mitigation in your case.
 
-Using device 0000:02:00.0 in IOMMU group 27
-Device 0000:02:00.0 supports 9 regions, 5 irqs
-[BAR0]: size 0x1000000, order 24, offset 0x0, flags 0xf
-Testing BAR0, require at least 21 bit alignment
-[PASS] Minimum alignment 21
-Testing random offset
-[PASS] Random offset
-Testing random size
-[PASS] Random size
-[BAR1]: size 0x800000000, order 35, offset 0x10000000000, flags 0x7
-Testing BAR1, require at least 30 bit alignment
-[PASS] Minimum alignment 31
-Testing random offset
-[PASS] Random offset
-Testing random size
-[PASS] Random size
-[BAR3]: size 0x2000000, order 25, offset 0x30000000000, flags 0x7
-Testing BAR3, require at least 21 bit alignment
-[PASS] Minimum alignment 21
-Testing random offset
-[PASS] Random offset
-Testing random size
-[PASS] Random size
+What you described looks very similar to the issue fixed by commit:
 
+  aa1567a7e644 ("intel_idle: Add ibrs_off module parameter to force-disable IBRS")
 
-C.
+    Commit bf5835bcdb96 ("intel_idle: Disable IBRS during long idle")
+    disables IBRS when the cstate is 6 or lower. However, there are
+    some use cases where a customer may want to use max_cstate=1 to
+    lower latency. Such use cases will suffer from the performance
+    degradation caused by the enabling of IBRS in the sibling idle thread.
+    Add a "ibrs_off" module parameter to force disable IBRS and the
+    CPUIDLE_FLAG_IRQ_ENABLE flag if set.
 
-> 
-> Alex Mastro: thanks for the testing offered in v1, but since this series
-> was rewritten, a re-test will be needed.  I hence didn't collect the T-b.
-> 
-> Comments welcomed, thanks.
-> 
-> [1] https://github.com/awilliam/tests/blob/vfio-pci-device-map-alignment/vfio-pci-device-map-alignment.c
-> 
-> Peter Xu (4):
->    mm/thp: Allow thp_get_unmapped_area_vmflags() to take alignment
->    mm: Add file_operations.get_mapping_order()
->    vfio: Introduce vfio_device_ops.get_mapping_order hook
->    vfio-pci: Best-effort huge pfnmaps with !MAP_FIXED mappings
-> 
->   Documentation/filesystems/vfs.rst |  4 +++
->   drivers/vfio/pci/vfio_pci.c       |  1 +
->   drivers/vfio/pci/vfio_pci_core.c  | 49 ++++++++++++++++++++++++++
->   drivers/vfio/vfio_main.c          | 14 ++++++++
->   include/linux/fs.h                |  1 +
->   include/linux/huge_mm.h           |  5 +--
->   include/linux/vfio.h              |  5 +++
->   include/linux/vfio_pci_core.h     |  2 ++
->   mm/huge_memory.c                  |  7 ++--
->   mm/mmap.c                         | 58 +++++++++++++++++++++++++++----
->   10 files changed, 135 insertions(+), 11 deletions(-)
-> 
+    In the case of a Skylake server with max_cstate=1, this new ibrs_off
+    option will likely increase the IRQ response latency as IRQ will now
+    be disabled.
 
+    When running SPECjbb2015 with cstates set to C1 on a Skylake system.
+
+    First test when the kernel is booted with: "intel_idle.ibrs_off":
+
+      max-jOPS = 117828, critical-jOPS = 66047
+
+    Then retest when the kernel is booted without the "intel_idle.ibrs_off"
+    added:
+
+      max-jOPS = 116408, critical-jOPS = 58958
+
+    That means booting with "intel_idle.ibrs_off" improves performance by:
+
+      max-jOPS:      +1.2%, which could be considered noise range.
+      critical-jOPS: +12%,  which is definitely a solid improvement.
+
+> ISTR that the hardware does most of the work.
+> So I'm not sure what difference "performance" makes (and can't remember what
+> might be set for that system - could set set anyway.)
+
+> We did have to disable some of the low power states, waking the cpu from those
+> just takes far too long.
+
+Seems like you have a workaround in place already.
 
