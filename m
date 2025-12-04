@@ -1,162 +1,164 @@
-Return-Path: <kvm+bounces-65255-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65256-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED6C1CA21E4
-	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 02:41:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66EFACA2654
+	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 06:11:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8AD33302C4E8
-	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 01:40:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4989830263C1
+	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 05:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB3224468B;
-	Thu,  4 Dec 2025 01:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1121305E0C;
+	Thu,  4 Dec 2025 05:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JShxxfsR"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Ih//AM08"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D2C136672;
-	Thu,  4 Dec 2025 01:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AD92D5936;
+	Thu,  4 Dec 2025 05:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764812435; cv=none; b=VTkG9WVhqytZLdA6V2AOiKTSxlVB6OC+Tu+et/5WTjnoq6Q8CEVRFlCPN3l6omAwKVZcx863SMl6rnDKfVD6BK1NFoGI17wIJM3ttNosc27Uz17o75k382hoGsuCp+AG9Rx/Vgi6ycifak8U8+UmriEznPiUmtJEX4wdOIW72lU=
+	t=1764825070; cv=none; b=C59hBNZv7X25sgxJzXwgtU31E5rY7st5q1reEwXh/hHKG91aGf4jJyu7EePGNoaQ0WVke7A0pY0/3sp9TBYI0elfJZ2MTlXOVxU6Z3W1DbvTrS4MiOJFALt0r5by4/oI0RTconEMcWboWK7rrsIKr81UktQ9WA6N4XfS0QbUpMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764812435; c=relaxed/simple;
-	bh=5Lx9qbC/zGM3s7a6W/37VXabwbyKKLBCTbhV98JjIxs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hwg3eEmkU+kh2P6c8I/RUBU2RcLMGufC8qRBsqpE1SNfTcdnxvakTb20/tXJsjpoYxRjCCV6/jl4Jd1Bm4VEU1ox91vB3gVd6mFQ0JiAB13oFNmt/Qn0nZKs1kYj2GZQ0Si5mXiEyBXJMMQNSEbH138QJnspQPmJtRireZP7pjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JShxxfsR; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764812433; x=1796348433;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5Lx9qbC/zGM3s7a6W/37VXabwbyKKLBCTbhV98JjIxs=;
-  b=JShxxfsRaPh+7kWLckUrQh2vmEG7IwrKwzPdbHSrUsofPKEOYqLH9+MQ
-   dfk/kGB1t9IkV4NTrSehcefl2nerTZDoTNrvIBMPtSHe8bpMPTQj1VF2j
-   tetb1DlR6Qv5uv/9X3CHOkUkrOSz2fUlJxmxwdPQC0osHRKgAApu2KJc/
-   cmg72/+CGSkPdtkZe1SC7gK6vkc5ocXxB2PT4Uc4+6AkQMDGVvIbtB2nA
-   RD9AjqKs1loj5EmAGCU6mcFpf1cacl7tn7rW7oDoBEtR7/1OWRUrlOPiY
-   2+CrUNXJHig4KExmktzrbVf8Zi+KccVJLLcpHfuVKJ8dM0qmyNSI/9DzB
-   g==;
-X-CSE-ConnectionGUID: SW3wQ3c4TkGpovqVDlaIWw==
-X-CSE-MsgGUID: HLQK3WMIQ+aX1bQUEkpO2g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11631"; a="66785261"
-X-IronPort-AV: E=Sophos;i="6.20,247,1758610800"; 
-   d="scan'208";a="66785261"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2025 17:40:32 -0800
-X-CSE-ConnectionGUID: oPnbOD6qQ1+rTdngMoWc4g==
-X-CSE-MsgGUID: XEYEFZCrRp2cMJ7EJuNHDw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,247,1758610800"; 
-   d="scan'208";a="225796883"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2025 17:40:32 -0800
-Date: Wed, 3 Dec 2025 17:40:26 -0800
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: david laight <david.laight@runbox.com>
-Cc: Dave Hansen <dave.hansen@intel.com>,
-	Nikolay Borisov <nik.borisov@suse.com>, x86@kernel.org,
-	David Kaplan <david.kaplan@amd.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>,
-	Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v4 04/11] x86/bhi: Make clear_bhb_loop() effective on
- newer CPUs
-Message-ID: <20251204014026.v5huyriswsqu3jat@desk>
-References: <20251119-vmscape-bhb-v4-4-1adad4e69ddc@linux.intel.com>
- <4ed6763b-1a88-4254-b063-be652176d1af@intel.com>
- <e9678dd1-7989-4201-8549-f06f6636274b@suse.com>
- <f7442dc7-be8d-43f8-b307-2004bd149910@intel.com>
- <20251121181632.czfwnfzkkebvgbye@desk>
- <e99150f3-62d4-4155-a323-2d81c1d6d47d@intel.com>
- <20251121212627.6vweba7aehs4cc3h@desk>
- <20251122110558.64455a8d@pumpkin>
- <20251124193126.sdmrhk6dw4jgf5ql@desk>
- <20251125113407.7b241b59@pumpkin>
+	s=arc-20240116; t=1764825070; c=relaxed/simple;
+	bh=raE1n6aHvpPE/BqH7V5O/ukjjUc39LJXpaXiCigSCmQ=;
+	h=Date:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fm7W7QDK3bqEiXZM9GQGSvmwsBPJvJ+cgY9ZIPIllo7BV2rNLQRcOVzZdP2Ve7z0dVmN2/dx9OlfxoBN6xPM1DsF24v1UKaZxW9g2ZFklcEKn1kbg+d5xHXZR25mqqyxKZuZRbp3hL5KZbQq35pUIVJf840Pzj3N0s3KMOrdrgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Ih//AM08; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1764825061;
+	bh=kT8QF29+xj9Av+QqCECDWufefm28EVgkxRDqz07AdsY=;
+	h=Date:From:Cc:Subject:In-Reply-To:References:From;
+	b=Ih//AM08TZUG5Fdy7LmikIbszJpsgWvsMqIiD3YAZh22PjEce1S8gi2pwOKy7wO6W
+	 KlOlnxyMnRgzdggPxHtx5WYDD+zYa3KJGTRUtOGBX6CNka+1rMw6r8m9hVBdTVjE9n
+	 /Lj58nykUPL5Wg00Dr5ucMqTmvF9HduEvxTaMvqHvuReWQ5qx3Gr17hrHhypeDhJSr
+	 6MdfI+z2qzdb07RncgHoCwvejfkSHcypdKPNrb1gu4W6c2asV23bxFdqgI4xgvpZtR
+	 xRhunld8YJoiJLNPJpKP2cryl0smf6jK63flmpi5tuJk0uNh4/i4Dgl+jgvfjDphoT
+	 Yf5qlLYQ+nlYg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dMMzR0Y1Bz4w0Q;
+	Thu, 04 Dec 2025 16:10:58 +1100 (AEDT)
+Date: Thu, 4 Dec 2025 16:10:58 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Sean Christopherson <seanjc@google.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, "H. Peter Anvin"
+ <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, Babu Moger
+ <babu.moger@amd.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, Elena Reshetova <elena.reshetova@intel.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>, "Naveen N Rao (AMD)"
+ <naveen@kernel.org>, Borislav Petkov <bp@alien8.de>, Paolo Bonzini
+ <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the kvm-x86 tree with the tip tree
+Message-ID: <20251204161058.137028db@canb.auug.org.au>
+In-Reply-To: <20251125155953.01b486f2@canb.auug.org.au>
+References: <20251125155953.01b486f2@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251125113407.7b241b59@pumpkin>
+Content-Type: multipart/signed; boundary="Sig_/.zn7zffts7T_xquH9AIsFQ0";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Tue, Nov 25, 2025 at 11:34:07AM +0000, david laight wrote:
-> On Mon, 24 Nov 2025 11:31:26 -0800
-> Pawan Gupta <pawan.kumar.gupta@linux.intel.com> wrote:
-> 
-> > On Sat, Nov 22, 2025 at 11:05:58AM +0000, david laight wrote:
-> ...
-> > > For subtle reasons one of the mitigations that slows kernel entry caused
-> > > a doubling of the execution time of a largely single-threaded task that
-> > > spends almost all its time in userspace!
-> > > (I thought I'd disabled it at compile time - but the config option
-> > > changed underneath me...)  
-> > 
-> > That is surprising. If its okay, could you please share more details about
-> > this application? Or any other way I can reproduce this?
-> 
-> The 'trigger' program is a multi-threaded program that wakes up every 10ms
-> to process RTP and TDM audio data.
-> So we have a low RT priority process with one thread per cpu.
-> Since they are RT they usually get scheduled on the same cpu as last lime.
-> I think this simple program will have the desired effect:
-> A main process that does:
-> 	syscall(SYS_clock_gettime, CLOCK_MONOTONIC, &start_time);
-> 	start_time += 1sec;
-> 	for (n = 1; n < num_cpu; n++)
-> 		pthread_create(thread_code, start_time);
-> 	thread_code(start_time);
-> with:
-> thread_code(ts)
-> {
-> 	for (;;) {
-> 		ts += 10ms;
-> 		syscall(SYS_clock_nanosleep, CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL);
-> 		do_work();
-> 	}
-> 
-> So all the threads wake up at exactly the same time every 10ms.
-> (You need to use syscall(), don't look at what glibc does.)
-> 
-> On my system the program wasn't doing anything, so do_work() was empty.
-> What matters is whether all the threads end up running at the same time.
-> I managed that using pthread_broadcast(), but the clock code above
-> ought to be worse (and I've since changed the daemon to work that way
-> to avoid all this issues with pthread_broadcast() being sequential
-> and threads not running because the target cpu is running an ISR or
-> just looping in kernel).
-> 
-> The process that gets 'hit' is anything cpu bound.
-> Even a shell loop (eg while :; do ;: done) but with a counter will do.
-> 
-> Without the 'trigger' program, it will (mostly) sit on one cpu and the
-> clock frequency of that cpu will increase to (say) 3GHz while the other
-> all run at 800Mhz.
-> But the 'trigger' program runs threads on all the cpu at the same time.
-> So the 'hit' program is pre-empted and is later rescheduled on a
-> different cpu - running at 800MHz.
-> The cpu speed increases, but 10ms later it gets bounced again.
+--Sig_/.zn7zffts7T_xquH9AIsFQ0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Sorry I haven't tried creating this test yet.
+Hi all,
 
-> The real issue is that the cpu speed is associated with the cpu, not
-> the process running on it.
+On Tue, 25 Nov 2025 15:59:53 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> Today's linux-next merge of the kvm-x86 tree got a conflict in:
+>=20
+>   arch/x86/include/asm/cpufeatures.h
+>=20
+> between commits:
+>=20
+>   6ffdb49101f0 ("x86/cpufeatures: Add X86_FEATURE_SGX_EUPDATESVN feature =
+flag")
+>   3767def18f4c ("x86/cpufeatures: Add support for L3 Smart Data Cache Inj=
+ection Allocation Enforcement")
+>=20
+> from the tip tree and commits:
+>=20
+>   5d0316e25def ("x86/cpufeatures: Add X86_FEATURE_X2AVIC_EXT")
+>   f6106d41ec84 ("x86/bugs: Use an x86 feature to track the MMIO Stale Dat=
+a mitigation")
+>=20
+> from the kvm-x86 tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+> --=20
+> Cheers,
+> Stephen Rothwell
+>=20
+> diff --cc arch/x86/include/asm/cpufeatures.h
+> index d90ce601917c,646d2a77a2e2..000000000000
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@@ -503,9 -500,12 +504,15 @@@
+>   #define X86_FEATURE_IBPB_EXIT_TO_USER	(21*32+14) /* Use IBPB on exit-to=
+-userspace, see VMSCAPE bug */
+>   #define X86_FEATURE_ABMC		(21*32+15) /* Assignable Bandwidth Monitoring=
+ Counters */
+>   #define X86_FEATURE_MSR_IMM		(21*32+16) /* MSR immediate form instructi=
+ons */
+>  -#define X86_FEATURE_X2AVIC_EXT		(21*32+17) /* AMD SVM x2AVIC support fo=
+r 4k vCPUs */
+>  -#define X86_FEATURE_CLEAR_CPU_BUF_VM_MMIO (21*32+18) /*
+>  +#define X86_FEATURE_SGX_EUPDATESVN	(21*32+17) /* Support for ENCLS[EUPD=
+ATESVN] instruction */
+>  +
+>  +#define X86_FEATURE_SDCIAE		(21*32+18) /* L3 Smart Data Cache Injection=
+ Allocation Enforcement */
+> ++#define X86_FEATURE_X2AVIC_EXT		(21*32+19) /* AMD SVM x2AVIC support fo=
+r 4k vCPUs */
+> ++#define X86_FEATURE_CLEAR_CPU_BUF_VM_MMIO (21*32+20) /*
+> + 						      * Clear CPU buffers before VM-Enter if the vCPU
+> + 						      * can access host MMIO (ignored for all intents
+> + 						      * and purposes if CLEAR_CPU_BUF_VM is set).
+> + 						      */
+>  =20
+>   /*
+>    * BUG word(s)
 
-So if the 'hit' program gets scheduled to a CPU that is running at 3GHz
-then we don't expect a dramatic performance drop? Setting scaling_governor
-to "performance" would be an interesting test.
+This is now a conflict between the kvm tree and Linus' tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/.zn7zffts7T_xquH9AIsFQ0
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmkxF+IACgkQAVBC80lX
+0Gwi9wgAg2/y5O7M5ClPB53nvv98mx39hI9rnNEl+M6AWwMtYmRBKCXKPet0U3F6
+uGMaMdQDa43gEV13OjQSlA5tCYtW/d1p+eo2Im0hNPFB5mrWe4M5PjjOWcQHdc0Z
+st1HV1Ip4wF+9y1unlppJwq6SRFZK4FF1inpTSbQNLm6J/y/x38ZlHASk0136vWH
+GcqAZCwBsARmQ0CMTcSMkgQvv1PWMACGjHexH5OVYBQY8Ji2izdHj0ta8F+8/7GI
+yXeiYYkn4mu9H34YWdDHEuYWGXYcX0qMDf3kwC5uiC0qp4di9XtJGP7hJ2mbsZuv
+bS97ZMRSILT0kXWZxPuCoFhopzjr+w==
+=b3tP
+-----END PGP SIGNATURE-----
+
+--Sig_/.zn7zffts7T_xquH9AIsFQ0--
 
