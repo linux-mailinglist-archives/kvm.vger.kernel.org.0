@@ -1,162 +1,163 @@
-Return-Path: <kvm+bounces-65253-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65254-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EB8CCA2035
-	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 01:05:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2E04CA21C6
+	for <lists+kvm@lfdr.de>; Thu, 04 Dec 2025 02:33:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4B24F300A877
-	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 00:05:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CAED7302A3B0
+	for <lists+kvm@lfdr.de>; Thu,  4 Dec 2025 01:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128E3A95E;
-	Thu,  4 Dec 2025 00:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998B7243951;
+	Thu,  4 Dec 2025 01:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VxKlo3bA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nrfLeL/c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD1C1C01
-	for <kvm@vger.kernel.org>; Thu,  4 Dec 2025 00:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685F0A945
+	for <kvm@vger.kernel.org>; Thu,  4 Dec 2025 01:33:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764806719; cv=none; b=rtdxeM29Jq6n4ECktiemSh+AG6bBG1iNReTjXhPZkrS3lWdvH4cQsnURkeSe3++iGJGVueGhmtckyjv2SSpJ5DoySdnA3k7kll/pdm0udMX5WwP2vySfHvUMsEUh/SFryUbkTd4XbWJBsM8K6BHmzgnwQ5lagjETjLNIwXparno=
+	t=1764812012; cv=none; b=fOcJo6Jzt6vh1MYiXSUJMspXiSljS6KtE+tfBsGYsTWQ+LvD984Q8IZJJxw59JyEnxEsgDMe2hG2UC8MTh+GwdDGkFUKoW+m/tsNShp3A/s8Cz/s43zU98gm0bWkAdwWcqUOePAWXO+eaFxQHahtJyWiE89QQ3NFQAsbsTtVeZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764806719; c=relaxed/simple;
-	bh=x5mBtF42C9vuyDFwHE+YA3ZE08rnQOGA8Etyfdi9gMY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=My2ZTQra5mO+XJJX3Je1nJPKjYs8Y4NeOwr7bCLGjGIVC7u6uO5b4xAgRwqbKqg9lNqT99TgV/yZm3Sonk7Kv654SdVJ2Nv4SUTqXS+cpOSrJbY45bU47q/CzBCXvdEaP/fYAg3npb8H6UBI1wvYvamrJNM/yZyCI2z3ooBIYhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VxKlo3bA; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5942a631c2dso492626e87.2
-        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 16:05:17 -0800 (PST)
+	s=arc-20240116; t=1764812012; c=relaxed/simple;
+	bh=xQEchCyS/SDzra4Ea9JG9KXn1RKa+px7wYeOBNUrWJA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=feKMDNgrn38CCOHtMHj27BEJeTI6CUWX+eyjrVe/DocQg+AwtbDVfhFhWnB4p0x+2sgAg8CAppjnfNEQaLDyvTHErV/MT3O2YvbpkTqJZX3QSr0x+eM+wOQxWfcki9it3cLgGnVubRqXp4345H9mpPQ6ICqO3wmEyeApmyGR/Wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nrfLeL/c; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-29555415c5fso5167925ad.1
+        for <kvm@vger.kernel.org>; Wed, 03 Dec 2025 17:33:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764806716; x=1765411516; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zd9WoFQTvNfYXS0FutJkOHLRDDNZG45Z8fkn2eFEtfA=;
-        b=VxKlo3bAnMBMTcaMzjjibtBVyNDq49O5+aRyDG8IPwQK5pOKYmtfHwCGTopdHj4Qr3
-         clVhLWIB5S8x0eEOIU1y/lld8DVG3UlhtIelIPYrRlvZHJgl5pdyAHVc8U1/b6SYCM8I
-         tDnuHZ/uEAk7/y2kYTrs/+9N2E2zQwHgw2Zj0fzpL+e/zBqNfh4KmN5kIYigml2WO0b5
-         MYEX58NC5OXdYECAuaveJIdxjmD/8v8Lt1VfRSYJ9Q9syvret/oFaDGywQQ55wsMQ5VT
-         dDWnKPobqsOpPy5vZ8o+pCe+dCuKgttJ5poqPG2sLg3f2Mz01YnYA/hiJsz/0BNbYr2x
-         e+yw==
+        d=gmail.com; s=20230601; t=1764812011; x=1765416811; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1OLjEC1FU02v8o2+aL765z3ax4u9Wn8i4cyPIqv2NWg=;
+        b=nrfLeL/c5wd6vYAIBlU6lisqNesZ540v0bB2z1KeCVkIxGmUMJ9TpGlNFRfroGO6rJ
+         0Fdka5I4+upGA+rQ5sChFYZPTEYghHO+FfIUrAL4NvkB5NuaAKz13pND6Kbl7Y8joLpF
+         fSKIpaXr5Jkx6ehB3t+F8qY8tRVRm1lZ2ADCrTujFBd9YZJyFo3tv4QfEZ+DEUmZy6a7
+         deBFyQR0UySwbz04yuncepGpMcQGNk8HEBLuRADAE040zGUJmixIyZv0sKEP/QsQ5WAO
+         ZAUEJzlt05SWYAzkfhAlG43Wvab9b+euDue30ccbE4EUnEfxEHc3iQ82yO1pFFgRnxDT
+         Xiuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764806716; x=1765411516;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Zd9WoFQTvNfYXS0FutJkOHLRDDNZG45Z8fkn2eFEtfA=;
-        b=qBNlCXR7i06rkph7f0T7pX2n1gIonH5qqL96oztDEPC4FpRY9Ei5Za6tki58uHCP8O
-         VKXkQTi99WslT7njMS/JSTSvL0GXDP/HL6lz4SvLL7pENsY2A2AiNMdhSDoC1VSb9wT5
-         FSpQg7NSBvKzUkiokgKqVK21e7OtMEDkXqwaK/thrtzkT4r+g/r7QZ/mY8kGcXcuiOli
-         CWbJPMcOnpdmgMRSv3L4IZKhUUUdqeAFp3G8PbRNL3+B4rfsRLS+F2KqSey/LtS1p+sb
-         Vtk5NNw4ZYiYpX0//RZa/962vEH6AUITMw4CEIsJHuz/NMCf1Tmm/Xnnax8l9gQsHDvi
-         ik9g==
-X-Forwarded-Encrypted: i=1; AJvYcCV5KDL/PB/AP+FV5rCB3Nw6/V1OXm1UUZWf+D85EULFhePP139Kc/5iFtHaJCnDXG9ZDCk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEWqgoSb4i5XfDxBvC2Cd2qEZGvyuwDImcZ6I9o154fg5HT41B
-	NTxKtZyS9hovgQBIkkVM3xQdqore7N2GUNeVfFxlS8J7rAFWrcnY+OM9PtiNQ9neJxS/2VBVRVX
-	V/4b79V9WpbXs2DmUDOsHKUIRMRQV0zHrx611ESAs
-X-Gm-Gg: ASbGncuv/aLLvlfN9T5LZrWL/UU6k483bu7S9+qymtSVQMAvnIVGuRUGHoVevMi5QYM
-	rlqzxNlt4a2IQCV0SDcJ3dSp/XIUkF1e0ZZg+KJ4mJFIDq9kp+8W5Xu30pLUpIbidRS9mIvlOVv
-	NeW124UScYytHlxxAW+mnlMYVTtFD9JvT7CuWsoYsQFgwKQwZAd1peKVOqeBNMwKOgbBJIIh5jz
-	uL7X/ZGsA39TYmwRD3W9GLXSSiYYv4vWvf/5fFbpAKRp97OaEabQpwMlB+Yh+MtHf8lSOpX
-X-Google-Smtp-Source: AGHT+IF4CyNFKv3NT4Ky0XeOn1TQzX5YXD6kxpQuevTbiLqvfi0Z1H0r6mqBjI/VHgPS5RUsjZgaT368W08YU9UmgDU=
-X-Received: by 2002:a05:6512:12c4:b0:578:ed03:7b5f with SMTP id
- 2adb3069b0e04-597d3f7b821mr1673675e87.26.1764806715139; Wed, 03 Dec 2025
- 16:05:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764812011; x=1765416811;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1OLjEC1FU02v8o2+aL765z3ax4u9Wn8i4cyPIqv2NWg=;
+        b=eqAyZT2uWedpHMdJ9XTfGZhIbp+on8PE88UaU/4Hq6DAzKUMVuDiawheEgYEdEhX4k
+         jUrll/q9yoLq0BE885EqY9rgyR9c47dF9+0U/Vcp4iktlvjh72TmFCc5FTut0tqmH/0a
+         zrI5y9Beu1IlxMMxx3L3DEH7X0GDlCGW2a+kM6TUilsPIsGWfVlcCjHecgIEuXuglWOc
+         TKG2i4kuFa4reL6Z1WBKCgOMqnNTmQT/TMBDZ4L2CM2MlFpZn009PS8dR/VUC1AzZmti
+         1G7dVYgBRjSWh+HOeelEtAknwDff85w+L2or4xV0rpkvCwtV+TAQJVtUhlDosfhrwQcd
+         DPng==
+X-Forwarded-Encrypted: i=1; AJvYcCXjM9vOgNIFX1GZHB7DAQveLYqbuZf5u9PrWZeu/Aqcpd+5SrdixpsgFMvNf0sd9PP5kIo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD3GDnwdF03tzPyojJgbcILjd4hzLwsT4clOrjRkTKbFwWT+lB
+	atLwoYtb7H1UfDL54utKqHxIhJrhxDichlwC5wRKx3S8z+4613PdNOex
+X-Gm-Gg: ASbGncugzXbnznv9laYhuhgtIn1SlhWyHu7Hljm7aN8a8xZ01kCX1EAB6DbSmaRlvEb
+	E/tTjVTPtlNUFcG3rPomY+RtLS2xtDS0AdbRGBQOucfoXoTpqu6hSbSBi8BqZnZ49TL14UwPoNf
+	ekF5sDNANk3KITW78mJ1izZc6LLpA0E8JDwxFQ8H8QXqx3eCAuLssZKCHU8qlYCoLnFd0n3eF5I
+	Z8nJ6SRto/mWaW1oOhJZjb93eOymTPt1aDi5u1uj9R1vNq5ERpXmAJ2X+pl7Apr+l+BJrP97yjC
+	G30/RlUZHoBS9UlM6AGbnqbID7JWYkbv8X0ACSiw+9mM6ajeOv1ivYl1x8e8/GnK+c6kUePO5Wn
+	bfPnsBAaVsG19ayaY222oMRF7dno3ukj5kopjhhX0xu83OkGOn2gpihcwx15vgdxvFAR9PGXiwQ
+	5gA5kdabjLeWfo0luSpvvpl5ks3I26xD9i76QBt8xaHnNAhA==
+X-Google-Smtp-Source: AGHT+IE8Rvg94sCmcdZ3rOlKWQaPxgdUe5bYjXp+akgFFnSeqWM9ehkwCxofj9csZW166RntHbw50g==
+X-Received: by 2002:a17:903:19e4:b0:295:8c80:fb94 with SMTP id d9443c01a7336-29d683e1cacmr50148045ad.59.1764812010639;
+        Wed, 03 Dec 2025 17:33:30 -0800 (PST)
+Received: from ?IPV6:2601:1c0:5102:8330:1273:9a5a:e6fa:1903? ([2601:1c0:5102:8330:1273:9a5a:e6fa:1903])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29dae4cf98bsm1860585ad.36.2025.12.03.17.33.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Dec 2025 17:33:30 -0800 (PST)
+Message-ID: <d37d6ca4-9b95-44ab-9147-5c0dff4bedc9@gmail.com>
+Date: Wed, 3 Dec 2025 17:33:26 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250501183304.2433192-1-dmatlack@google.com> <aBPhs39MJz-rt_Ob@google.com>
- <CALzav=eqv0Fh9pzaBgjZ-fehwFbD4YscoLQz0=o0TKQT_zLTwQ@mail.gmail.com> <aRZ9SQ_G2lsmXtur@google.com>
-In-Reply-To: <aRZ9SQ_G2lsmXtur@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Wed, 3 Dec 2025 16:04:47 -0800
-X-Gm-Features: AWmQ_blvUOA-vJuP7PArgXkGtxVwcyZaljS6okCvAjRlV-VnKxXpsCQN-Lg9GyA
-Message-ID: <CALzav=fN4FpZsfzwbdLeNSj4nx4OpRkwHvKiZNVgP8S-zsUvJA@mail.gmail.com>
-Subject: Re: [PATCH 00/10] KVM: selftests: Convert to kernel-style types
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Eric Auger <eric.auger@redhat.com>, 
-	James Houghton <jthoughton@google.com>, Colin Ian King <colin.i.king@gmail.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 4/4] vfio/xe: Add device specific vfio_pci driver
+ variant for Intel graphics
+To: =?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>,
+ Alex Williamson <alex@shazbot.org>,
+ Lucas De Marchi <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yishai Hadas <yishaih@nvidia.com>, Kevin Tian <kevin.tian@intel.com>,
+ Shameer Kolothum <skolothumtho@nvidia.com>, intel-xe@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Matthew Brost <matthew.brost@intel.com>,
+ Michal Wajdeczko <michal.wajdeczko@intel.com>
+Cc: dri-devel@lists.freedesktop.org, Jani Nikula
+ <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Lukasz Laguna <lukasz.laguna@intel.com>,
+ Christoph Hellwig <hch@infradead.org>
+References: <20251127093934.1462188-1-michal.winiarski@intel.com>
+ <20251127093934.1462188-5-michal.winiarski@intel.com>
+Content-Language: en-US
+From: Angela <angelagbtt1@gmail.com>
+In-Reply-To: <20251127093934.1462188-5-michal.winiarski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 13, 2025 at 4:52=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, Oct 17, 2025, David Matlack wrote:
-> > On Thu, May 1, 2025 at 2:03=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > > On Thu, May 01, 2025, David Matlack wrote:
-> > > > This series renames types across all KVM selftests to more align wi=
-th
-> > > > types used in the kernel:
-> > > >
-> > > >   vm_vaddr_t -> gva_t
-> > > >   vm_paddr_t -> gpa_t
-> > >
-> > > 10000% on these.
-> > >
-> > > >   uint64_t -> u64
-> > > >   uint32_t -> u32
-> > > >   uint16_t -> u16
-> > > >   uint8_t  -> u8
-> > > >
-> > > >   int64_t -> s64
-> > > >   int32_t -> s32
-> > > >   int16_t -> s16
-> > > >   int8_t  -> s8
-> > >
-> > > I'm definitely in favor of these renames.  I thought I was the only o=
-ne that
-> > > tripped over the uintNN_t stuff; at this point, I've probably lost ho=
-urs of my
-> > > life trying to type those things out.
-> >
-> > What should the next step be here? I'd be happy to spin a new version
-> > whenever on whatever base commit you prefer.
->
-> Sorry for the slow reply, I've had this window sitting open for something=
- like
-> two weeks.
+On 11/27/25 01:39, Michał Winiarski wrote:
+[snip]
+> +static void xe_vfio_pci_reset_done(struct pci_dev *pdev)
+> +{
+> +	struct xe_vfio_pci_core_device *xe_vdev = pci_get_drvdata(pdev);
+> +	int ret;
+> +
+> +	if (!pdev->is_virtfn)
+> +		return;
+> +
+> +	/*
+> +	 * VF FLR requires additional processing done by PF driver.
+> +	 * The processing is done after FLR is already finished from PCIe
+> +	 * perspective.
+> +	 * In order to avoid a scenario where VF is used while PF processing
+> +	 * is still in progress, additional synchronization point is needed.
+> +	 */
+> +	ret = xe_sriov_vfio_wait_flr_done(xe_vdev->xe, xe_vdev->vfid);
+> +	if (ret)
+> +		dev_err(&pdev->dev, "Failed to wait for FLR: %d\n", ret);
+> +
+> +	if (!xe_vdev->vfid)
+> +		return;
+> +
+> +	/*
+> +	 * As the higher VFIO layers are holding locks across reset and using
+> +	 * those same locks with the mm_lock we need to prevent ABBA deadlock
+> +	 * with the state_mutex and mm_lock.
+> +	 * In case the state_mutex was taken already we defer the cleanup work
+> +	 * to the unlock flow of the other running context.
+> +	 */
+> +	spin_lock(&xe_vdev->reset_lock);
+> +	xe_vdev->deferred_reset = true;
+> +	if (!mutex_trylock(&xe_vdev->state_mutex)) {
+> +		spin_unlock(&xe_vdev->reset_lock);
+> +		return;
+> +	}
+> +	spin_unlock(&xe_vdev->reset_lock);
+> +	xe_vfio_pci_state_mutex_unlock(xe_vdev);
+> +
+> +	xe_vfio_pci_reset(xe_vdev);
+> +}
+[snip]
 
-No worries, thanks for taking a look :)
+My first KVM review :)
 
->
-> My slowness is largely because I'm not sure how to land/approach this.  I=
-'m 100%
-> in favor of the renames, it's the timing and coordination I'm unsure of.
->
-> In hindsight, it probably would have best to squeeze it into 6.18, so at =
-least
-> the most recent LTS wouldn't generate conflicts all over the place.  The =
-next
-> best option would probably be to spin a new version, bribe Paolo to apply=
- it at
-> the end of the next merge window, and tag the whole thing for stable@ (ma=
-ybe
-> limited to 6.18+?) to minimize downstream pain.
+I think xe_vfio_pci_reset(xe_vdev) need be protected by state_mutex. So,
+we should move xe_vfio_pci_state_mutex_unlock(xe_vdev) after
+xe_vfio_pci_reset(xe_vdev). Thoughts?
 
-With LPC coming up I won't have cycles to post a new version before
-the 6.19 merge window closes.
-
-I'm tempted to say let's just wait for the next LTS release and merge
-it in then. This is low priorit, so I'm fine with waiting.
+Thanks,
+Angela
 
