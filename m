@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-65383-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65384-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C45DCA99AE
-	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 00:20:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3696BCA99B4
+	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 00:20:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5AA8D302ABDE
-	for <lists+kvm@lfdr.de>; Fri,  5 Dec 2025 23:19:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ABC14303939F
+	for <lists+kvm@lfdr.de>; Fri,  5 Dec 2025 23:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0AD12F9DB0;
-	Fri,  5 Dec 2025 23:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EFC930103B;
+	Fri,  5 Dec 2025 23:19:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q/1uz9Xi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NDy9MtUd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B08B2FFDEB
-	for <kvm@vger.kernel.org>; Fri,  5 Dec 2025 23:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3172FFF95
+	for <kvm@vger.kernel.org>; Fri,  5 Dec 2025 23:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764976766; cv=none; b=dIbRwA/gcE4fAlqetiArLtQUkjUBhkQomQTeBT/SJ/DKtm3gUlV1wJCJZ5QaxRMpr5A1n5RFbKH99aoUvddA3VHlSQ7JkRWiyJgXham1+Uw5EAFu0F7jA6TyrjehVgvRnQYsQFYNK9NKhsRbYmFgROCcOiprkp4qTy1USUOx5eA=
+	t=1764976767; cv=none; b=NqkOchxTieB/lhD/yNYh3bFzLvPvPjLaF/Jp5hwuqSI27orG5KO14pjPzKEMqhVCkNvOdL/HNdbeeHisaFezIAm34Np2noanP3Ea/mDgG4kaWYnkRDJYqiGV+mJ9xaIcYwe80iaH4KC0Mv5WJej2OFl7Nbev6nIdNPyO/M7E+G0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764976766; c=relaxed/simple;
-	bh=exo09ceDmXypfTxtCerCEjZOA8vfVIz2MO3bU0BfyqM=;
+	s=arc-20240116; t=1764976767; c=relaxed/simple;
+	bh=4Fex+pgpP3q+w5hfQVpkoaW6L1kXWK3VkJDR6p+t18Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BRK5b643m0u7+ek/yqCxX/Q9KH1vgAf3GZh7iaPeGTo96fOK9S9nMF4yyad6iwb53dLuX73vc+4PKrUYMJ/b5f23Arc5soCxoUmv2AbDAzHgkSW0ewHttVI7R+8BfOynTB0k6+CzY8nsaaxkFnWLfTHc/yqX3ShkBZF2vXuEES4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q/1uz9Xi; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=ZVS5oQs0xb2YBKpUgyET7jvSe2lK2T82luuZQTKBTWN1hy6cUnge+kuatC0CZz1xk2VpayZ8u2cUU37p3UOm1G4DFPCNXfVds59wYEoPC8Om509TfxoMvS2s14qx88CSTXl0JeVJeFRtPfU3LvVmLXSQDVKTHAD/yNACdTgH8XQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NDy9MtUd; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7b9090d9f2eso4850566b3a.0
-        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 15:19:23 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-349a2f509acso307142a91.1
+        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 15:19:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764976761; x=1765581561; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1764976763; x=1765581563; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZcJtGX0VmRX2lzBpy3LVmAgEJDoeGm/VKWbOEKmvPbc=;
-        b=Q/1uz9XivDHtxidfZatlGz3AlOkrPxeNxWEOD8cuNTAKLc+PmwMHG0/1tldCQ54uQn
-         gkIKuLpntMG766ZSjv0NhaNv5t7QfuvIoobCwaaMjunWUoWGOBr9CUmltTeo/RY9bd3M
-         m/uHmzl4pGkM8f1K0jcaxE1XVEGz87MBvWx2c/hYWwhucBEfpuk1pHJayz0K9nfz10AI
-         pwUDhSHVpj5Tu94Ulh+bfqmIacP4l2vBsNAXw1i0g003jKMyueZx/GqyGnT/Km8oC7IA
-         cj8TsGWWR0TaIwj9BF/c+fpC/kf/KocyC486MOKFOCfmHdJRiGpMtRXHMUCsARtnzZT/
-         IlVw==
+        bh=qE7acRBvhgKVAvezYXIFc6q852EVZn4fTd5PsAQBmnY=;
+        b=NDy9MtUd0gOXkDF+VoxVC8I+f9mvqPkBc0VsN5w7mROH0y8qijcbYBmmfUo8qFqION
+         GYLREFKv5D95G6gdFsfR3HyvRoozRLsjrJbB0XidOL0ZdRky4BcSBwSC46lyWXgIXEkn
+         3+ruiWYRB+l49/wSQYOKklYSxSeFhzwWokiaD4HgK0pmvUoKJF509pHLnnr5+ha+kjGI
+         ZxKQV3+LzGoXhS7aX4/c1hiRJoJISD3/ZOhIB+c7v6HZeO3AEDO8WRBJ9DUPehHriRP5
+         HXqvZ37MfYn0eufdSwOOhRqMAL3caGd31bAw+5QeodH+3zZme8d+As07s0NySaWFQXRp
+         Q28A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764976761; x=1765581561;
+        d=1e100.net; s=20230601; t=1764976763; x=1765581563;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ZcJtGX0VmRX2lzBpy3LVmAgEJDoeGm/VKWbOEKmvPbc=;
-        b=fA8XXX2Vunft5Lr4HJ1P55PPpVsl+IS4a6USD5iTEyouazz/UHU9sydnDUx3PQHPwd
-         bTjSS4jg0ZYDiOYHpj886aB3G92tMmvndMhWDhmxCjnFp4hxpzduNe2PzD1ZlzSJScVJ
-         2YoTASgwS2Y8QrsfdXGkT3A7BlwgSzuYgl9yE0cUVMcbPFf0fhHtREElnA3SBI0eA2r6
-         +UpwuSY+9p56YBMNuS/zQ0oEnmpxBIUonL8TEGmRou/0LKjWEqKzbtBiE0qq4pvy/wZg
-         8MsOpXodUy2uvJOewoZTZ23zFdd8/ED1m6efhQgjxaRRNgCkOtDED01SBJLg4wVnVUwV
-         1CTw==
-X-Gm-Message-State: AOJu0YxMjdAAYKsfwQva4CxmGfsrGTh1ZMj37N2GhnqQR4uxYCeabKqq
-	yi3YeBNsdJzIZAAtq4W1u5uwOA51UuB2JLel8KIjtLhHEO+OJmVnh+SE4Hds6WxQhOr03KPQjle
-	PLOAeew==
-X-Google-Smtp-Source: AGHT+IH0SYz00lEf7HVPssFZvqoZIZN/mMz1YTgzQllfd0G4FhVaPgZKdiRo2+ZPkMMERZPCk7sSwMWCPk4=
-X-Received: from pgam21.prod.google.com ([2002:a05:6a02:2b55:b0:bc1:99a7:3f1b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:e211:b0:366:14af:9bb8
- with SMTP id adf61e73a8af0-36618017e9cmr908273637.66.1764976761202; Fri, 05
- Dec 2025 15:19:21 -0800 (PST)
+        bh=qE7acRBvhgKVAvezYXIFc6q852EVZn4fTd5PsAQBmnY=;
+        b=NERcC+oFevrWrOrAEenotUxjYE5bpie2aI6MXCVZgmO0ycdUkYAshcqkO/ED5QDjcT
+         1TvoJ8fCKhmNlrvzeC8pcH7NJ+Is9n+oNr7CHD0vh+loqjurvXeQzaL6drWKCP2zW/n3
+         P6QpU0bHlxkqF/pcvQ69K3GVkkg8CXhA7AsN5udOu6pNebln+mKVFZX9qcZpcGayChdA
+         fiyBxUHPjt4R3Imp/+QtJFZDnv3+izWbrnuOxGx081o4S+yryAh3K6bEBJZQFHO2J+Za
+         2/lhNsiF8Q2eXeiktrxSuAc27hDI923IIDK7uv+Qjxa03fQh5QDqjYOn27NUmZrMq+h3
+         lruQ==
+X-Gm-Message-State: AOJu0Yx0ZBuFQTG17BrMALdnAO1eKsK+q8bMktZBvP8o7MTApRWDdNhZ
+	KUEgEzUv0qhz4JsZMb8A8UD8NytMTP0sTBbXu5VFATYutXlj+4r+y636/AtxBri9BPyKfNE/shD
+	qi3jTng==
+X-Google-Smtp-Source: AGHT+IF8s0h1mmxocVPZHPd28nJzW0w+Qv5m/PrzhL2RdH7GTDs1Qpw6V6jl3Fd5c6lEV/iFc4ugbJdTgKI=
+X-Received: from pjbsb13.prod.google.com ([2002:a17:90b:50cd:b0:340:c0e9:24b6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:388b:b0:349:30b4:6367
+ with SMTP id 98e67ed59e1d1-349a25e5544mr580362a91.30.1764976762698; Fri, 05
+ Dec 2025 15:19:22 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  5 Dec 2025 15:19:05 -0800
+Date: Fri,  5 Dec 2025 15:19:06 -0800
 In-Reply-To: <20251205231913.441872-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -73,81 +73,248 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251205231913.441872-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251205231913.441872-3-seanjc@google.com>
-Subject: [PATCH v3 02/10] KVM: nVMX: Immediately refresh APICv controls as
- needed on nested VM-Exit
+Message-ID: <20251205231913.441872-4-seanjc@google.com>
+Subject: [PATCH v3 03/10] KVM: selftests: Add a test to verify APICv updates
+ (while L2 is active)
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Dongli Zhang <dongli.zhang@oracle.com>, Chao Gao <chao.gao@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Dongli Zhang <dongli.zhang@oracle.com>
+Add a test to verify KVM correctly handles a variety of edge cases related
+to APICv updates, and in particular updates that are triggered while L2 is
+actively running.
 
-If an APICv status updated was pended while L2 was active, immediately
-refresh vmcs01's controls instead of pending KVM_REQ_APICV_UPDATE as
-kvm_vcpu_update_apicv() only calls into vendor code if a change is
-necessary.
-
-E.g. if APICv is inhibited, and then activated while L2 is running:
-
-  kvm_vcpu_update_apicv()
-  |
-  -> __kvm_vcpu_update_apicv()
-     |
-     -> apic->apicv_active = true
-      |
-      -> vmx_refresh_apicv_exec_ctrl()
-         |
-         -> vmx->nested.update_vmcs01_apicv_status = true
-          |
-          -> return
-
-Then L2 exits to L1:
-
-  __nested_vmx_vmexit()
-  |
-  -> kvm_make_request(KVM_REQ_APICV_UPDATE)
-
-  vcpu_enter_guest(): KVM_REQ_APICV_UPDATE
-  -> kvm_vcpu_update_apicv()
-     |
-     -> __kvm_vcpu_update_apicv()
-        |
-        -> return // because if (apic->apicv_active == activate)
-
-Reported-by: Chao Gao <chao.gao@intel.com>
-Closes: https://lore.kernel.org/all/aQ2jmnN8wUYVEawF@intel.com
-Fixes: 7c69661e225c ("KVM: nVMX: Defer APICv updates while L2 is active until L1 is active")
-Cc: stable@vger.kernel.org
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-[sean: write changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/include/x86/apic.h  |   4 +
+ .../kvm/x86/vmx_apicv_updates_test.c          | 181 ++++++++++++++++++
+ 3 files changed, 186 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86/vmx_apicv_updates_test.c
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 40777278eabb..6137e5307d0f 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -19,6 +19,7 @@
- #include "trace.h"
- #include "vmx.h"
- #include "smm.h"
-+#include "x86_ops.h"
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index ba5c2b643efa..6f00bd8271c2 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -115,6 +115,7 @@ TEST_GEN_PROGS_x86 += x86/ucna_injection_test
+ TEST_GEN_PROGS_x86 += x86/userspace_io_test
+ TEST_GEN_PROGS_x86 += x86/userspace_msr_exit_test
+ TEST_GEN_PROGS_x86 += x86/vmx_apic_access_test
++TEST_GEN_PROGS_x86 += x86/vmx_apicv_updates_test
+ TEST_GEN_PROGS_x86 += x86/vmx_dirty_log_test
+ TEST_GEN_PROGS_x86 += x86/vmx_exception_with_invalid_guest_state
+ TEST_GEN_PROGS_x86 += x86/vmx_msrs_test
+diff --git a/tools/testing/selftests/kvm/include/x86/apic.h b/tools/testing/selftests/kvm/include/x86/apic.h
+index 80fe9f69b38d..d42a0998d868 100644
+--- a/tools/testing/selftests/kvm/include/x86/apic.h
++++ b/tools/testing/selftests/kvm/include/x86/apic.h
+@@ -32,6 +32,7 @@
+ #define	APIC_SPIV	0xF0
+ #define		APIC_SPIV_FOCUS_DISABLED	(1 << 9)
+ #define		APIC_SPIV_APIC_ENABLED		(1 << 8)
++#define	APIC_ISR	0x100
+ #define APIC_IRR	0x200
+ #define	APIC_ICR	0x300
+ #define	APIC_LVTCMCI	0x2f0
+@@ -68,6 +69,9 @@
+ #define	APIC_TMCCT	0x390
+ #define	APIC_TDCR	0x3E0
  
- static bool __read_mostly enable_shadow_vmcs = 1;
- module_param_named(enable_shadow_vmcs, enable_shadow_vmcs, bool, S_IRUGO);
-@@ -5165,7 +5166,7 @@ void __nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 
- 	if (vmx->nested.update_vmcs01_apicv_status) {
- 		vmx->nested.update_vmcs01_apicv_status = false;
--		kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
-+		vmx_refresh_apicv_exec_ctrl(vcpu);
- 	}
- 
- 	if (vmx->nested.update_vmcs01_hwapic_isr) {
++#define APIC_VECTOR_TO_BIT_NUMBER(v) ((unsigned int)(v) % 32)
++#define APIC_VECTOR_TO_REG_OFFSET(v) ((unsigned int)(v) / 32 * 0x10)
++
+ void apic_disable(void);
+ void xapic_enable(void);
+ void x2apic_enable(void);
+diff --git a/tools/testing/selftests/kvm/x86/vmx_apicv_updates_test.c b/tools/testing/selftests/kvm/x86/vmx_apicv_updates_test.c
+new file mode 100644
+index 000000000000..907d226fd0fd
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86/vmx_apicv_updates_test.c
+@@ -0,0 +1,181 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include "test_util.h"
++#include "kvm_util.h"
++#include "processor.h"
++#include "vmx.h"
++
++#define GOOD_IPI_VECTOR 0xe0
++#define BAD_IPI_VECTOR 0xf0
++
++static volatile int good_ipis_received;
++
++static void good_ipi_handler(struct ex_regs *regs)
++{
++	good_ipis_received++;
++}
++
++static void bad_ipi_handler(struct ex_regs *regs)
++{
++	TEST_FAIL("Received \"bad\" IPI; ICR MMIO write should have been ignored");
++}
++
++static void l2_vmcall(void)
++{
++	/*
++	 * Exit to L1.  Assume all registers may be clobbered as selftests's
++	 * VM-Enter code doesn't preserve L2 GPRs.
++	 */
++	asm volatile("push %%rbp\n\t"
++		     "push %%r15\n\t"
++		     "push %%r14\n\t"
++		     "push %%r13\n\t"
++		     "push %%r12\n\t"
++		     "push %%rbx\n\t"
++		     "push %%rdx\n\t"
++		     "push %%rdi\n\t"
++		     "vmcall\n\t"
++		     "pop %%rdi\n\t"
++		     "pop %%rdx\n\t"
++		     "pop %%rbx\n\t"
++		     "pop %%r12\n\t"
++		     "pop %%r13\n\t"
++		     "pop %%r14\n\t"
++		     "pop %%r15\n\t"
++		     "pop %%rbp\n\t"
++		::: "rax", "rcx", "rdx", "rsi", "rdx", "r8", "r9", "r10", "r11", "memory");
++}
++
++static void l2_guest_code(void)
++{
++	x2apic_enable();
++	l2_vmcall();
++
++	xapic_enable();
++	xapic_write_reg(APIC_ID, 1 << 24);
++	l2_vmcall();
++}
++
++static void l1_guest_code(struct vmx_pages *vmx_pages)
++{
++#define L2_GUEST_STACK_SIZE 64
++	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++	uint32_t control;
++
++	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
++	GUEST_ASSERT(load_vmcs(vmx_pages));
++
++	/* Prepare the VMCS for L2 execution. */
++	prepare_vmcs(vmx_pages, l2_guest_code, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++	control = vmreadz(CPU_BASED_VM_EXEC_CONTROL);
++	control |= CPU_BASED_USE_MSR_BITMAPS;
++	vmwrite(CPU_BASED_VM_EXEC_CONTROL, control);
++
++	/* Modify APIC ID to coerce KVM into inhibiting APICv. */
++	xapic_enable();
++	xapic_write_reg(APIC_ID, 1 << 24);
++
++	/*
++	 * Generate+receive an IRQ without doing EOI to get an IRQ set in vISR
++	 * but not SVI.  APICv should be inhibited due to running with a
++	 * modified APIC ID.
++	 */
++	xapic_write_reg(APIC_ICR, APIC_DEST_SELF | APIC_DM_FIXED | GOOD_IPI_VECTOR);
++	GUEST_ASSERT_EQ(xapic_read_reg(APIC_ID), 1 << 24);
++
++	/* Enable IRQs and verify the IRQ was received. */
++	sti_nop();
++	GUEST_ASSERT_EQ(good_ipis_received, 1);
++
++	/*
++	 * Run L2 to switch to x2APIC mode, which in turn will uninhibit APICv,
++	 * as KVM should force the APIC ID back to its default.
++	 */
++	GUEST_ASSERT(!vmlaunch());
++	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
++	vmwrite(GUEST_RIP, vmreadz(GUEST_RIP) + vmreadz(VM_EXIT_INSTRUCTION_LEN));
++	GUEST_ASSERT(rdmsr(MSR_IA32_APICBASE) & MSR_IA32_APICBASE_EXTD);
++
++	/*
++	 * Scribble the APIC access page to verify KVM disabled xAPIC
++	 * virtualization in vmcs01, and to verify that KVM flushes L1's TLB
++	 * when L2 switches back to accelerated xAPIC mode.
++	 */
++	xapic_write_reg(APIC_ICR2, 0xdeadbeefu);
++	xapic_write_reg(APIC_ICR, APIC_DEST_SELF | APIC_DM_FIXED | BAD_IPI_VECTOR);
++
++	/*
++	 * Verify the IRQ is still in-service and emit an EOI to verify KVM
++	 * propagates the highest vISR vector to SVI when APICv is activated
++	 * (and does so even if APICv was uninhibited while L2 was active).
++	 */
++	GUEST_ASSERT_EQ(x2apic_read_reg(APIC_ISR + APIC_VECTOR_TO_REG_OFFSET(GOOD_IPI_VECTOR)),
++			BIT(APIC_VECTOR_TO_BIT_NUMBER(GOOD_IPI_VECTOR)));
++	x2apic_write_reg(APIC_EOI, 0);
++	GUEST_ASSERT_EQ(x2apic_read_reg(APIC_ISR + APIC_VECTOR_TO_REG_OFFSET(GOOD_IPI_VECTOR)), 0);
++
++	/*
++	 * Run L2 one more time to switch back to xAPIC mode to verify that KVM
++	 * handles the x2APIC => xAPIC transition and inhibits APICv while L2
++	 * is active.
++	 */
++	GUEST_ASSERT(!vmresume());
++	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
++	GUEST_ASSERT(!(rdmsr(MSR_IA32_APICBASE) & MSR_IA32_APICBASE_EXTD));
++
++	xapic_write_reg(APIC_ICR, APIC_DEST_SELF | APIC_DM_FIXED | GOOD_IPI_VECTOR);
++	/* Re-enable IRQs, as VM-Exit clears RFLAGS.IF. */
++	sti_nop();
++	GUEST_ASSERT_EQ(good_ipis_received, 2);
++
++	GUEST_ASSERT_EQ(xapic_read_reg(APIC_ISR + APIC_VECTOR_TO_REG_OFFSET(GOOD_IPI_VECTOR)),
++			BIT(APIC_VECTOR_TO_BIT_NUMBER(GOOD_IPI_VECTOR)));
++	xapic_write_reg(APIC_EOI, 0);
++	GUEST_ASSERT_EQ(xapic_read_reg(APIC_ISR + APIC_VECTOR_TO_REG_OFFSET(GOOD_IPI_VECTOR)), 0);
++	GUEST_DONE();
++}
++
++int main(int argc, char *argv[])
++{
++	vm_vaddr_t vmx_pages_gva;
++	struct vmx_pages *vmx;
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	struct ucall uc;
++
++	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
++
++	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
++
++	vmx = vcpu_alloc_vmx(vm, &vmx_pages_gva);
++	prepare_virtualize_apic_accesses(vmx, vm);
++	vcpu_args_set(vcpu, 2, vmx_pages_gva);
++
++	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
++	vm_install_exception_handler(vm, BAD_IPI_VECTOR, bad_ipi_handler);
++	vm_install_exception_handler(vm, GOOD_IPI_VECTOR, good_ipi_handler);
++
++	vcpu_run(vcpu);
++	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
++
++	switch (get_ucall(vcpu, &uc)) {
++	case UCALL_ABORT:
++		REPORT_GUEST_ASSERT(uc);
++		/* NOT REACHED */
++	case UCALL_DONE:
++		break;
++	default:
++		TEST_FAIL("Unexpected ucall %lu", uc.cmd);
++	}
++
++	/*
++	 * Verify at least two IRQs were injected.  Unfortunately, KVM counts
++	 * re-injected IRQs (e.g. if delivering the IRQ hits an EPT violation),
++	 * so being more precise isn't possible given the current stats.
++	 */
++	TEST_ASSERT(vcpu_get_stat(vcpu, irq_injections) >= 2,
++		    "Wanted at least 2 IRQ injections, got %lu\n",
++		    vcpu_get_stat(vcpu, irq_injections));
++
++	kvm_vm_free(vm);
++	return 0;
++}
 -- 
 2.52.0.223.gf5cc29aaa4-goog
 
