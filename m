@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-65339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65338-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F06B1CA706E
-	for <lists+kvm@lfdr.de>; Fri, 05 Dec 2025 10:56:38 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B22F4CA7068
+	for <lists+kvm@lfdr.de>; Fri, 05 Dec 2025 10:56:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CD4D139A9232
-	for <lists+kvm@lfdr.de>; Fri,  5 Dec 2025 08:40:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 840C939A810E
+	for <lists+kvm@lfdr.de>; Fri,  5 Dec 2025 08:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BBF732860E;
-	Fri,  5 Dec 2025 08:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081E332860A;
+	Fri,  5 Dec 2025 08:15:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KMhpbnK1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pTiZ6x5+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72CE1D5CEA
-	for <kvm@vger.kernel.org>; Fri,  5 Dec 2025 08:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644C62BEFFB
+	for <kvm@vger.kernel.org>; Fri,  5 Dec 2025 08:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764922512; cv=none; b=iB0d32+eDx6is2MmxuHbDxlAT28JkkeyoBW3fQhcn1Rpn1fMNG1VcMizqSTQivI8M1v/LBMJjZoeTHtvFinAcaQ0gWOrfIgkZ7zVhcoC6YUNazyex1vmH7Ac4EHhWLbyqUpr7fiMzdHorOjWx20iEk5rwqcCiq6da03fgg2g3vA=
+	t=1764922510; cv=none; b=djOwvuj6Yv7DDE4Ok8Ctd4P5XXCtxYDeh0v0YPuKj3rhRCyo02hJ8qMK4oyTphHU30+HXyTu1da9EfjUA0/uI0px0xIE93dcmNezgxrBCJYSquQxhhPGz9eEqdgX3+I8afy8vstZVpS5R6ecTxgkbTsp3B5VCSHx1j3F9UjEXpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764922512; c=relaxed/simple;
-	bh=Igfr9FW+KmyTlZ9iAwlpuwagrbjJS3n7xHM51/mhOTo=;
+	s=arc-20240116; t=1764922510; c=relaxed/simple;
+	bh=bxsSbO9CejoAq5ITGojN6dsguFM7NyPkmnWZkCb8YLY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hA1Rwt8T+Jj8LNK48CLLqoEsGWvuSvqTcK43cpNlEOXBgnSt19Jtfz7p3lT6xne0UwrCFLg8c1gwkX6TFzcwYM03/08HgHZOzcvJ8M8h4x7Ki/4fZ4Xyd4RD4kT+9bEBGMLRQ3xcGwcxwmfMD3SCi9TpqibH3fr6oOjmo0eC1yQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KMhpbnK1; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=qJqzds/8HzMffl/yBLJ1H3rgr/m4ANURstjXcPmGbEM3LP3TjUsT9QHfSxv+YuP0k+79oG582bdykDz7hllnKpfLYMUp9+MeKkfHMYnOiMR7cdLCKxVVcfmmPfz6c+LU6waVibsiJBDvvKmGuw/XWxgqVI6brdBgeoZ65RoxQow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pTiZ6x5+; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3438744f12fso4703344a91.2
-        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 00:14:56 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-298535ef0ccso24515055ad.3
+        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 00:14:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764922493; x=1765527293; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1764922495; x=1765527295; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IUvvvCBHNNoC1LgckOuWigEL11VxlQY1p2ZyqITLXPM=;
-        b=KMhpbnK1EzGFosVujbmIK+kdrjDdfRToxOmc5r84a4kRl8xWWMexnUeiFqLSzDstoc
-         IsZCUEzNoeL5k3Dfhs8GbzqRafqTVflIBJy4Og1J4EGPidVh3x8Ih/igS/br3HBGDDTf
-         +aPsZNJ8aYjnGmvhzVlNccAyeQkAHVRK79h+d4NAJ169k9sXXWVhA45KMffyKhNspMtZ
-         +tcNnJOcrut59wY4YIqihWeAQagfAH37Ibfxr1/pxAeFHnBWVgs9bJmXLyUIrvue4hHX
-         bJ4LZJ80Jeiy39JY35lphPNc8lS3/6S9AkrAtQw6LuoI9a2/mZmKWr7BaMnqu+GJ1RBT
-         /hxA==
+        bh=VfBC4L0W4+2xgM5lrvsI6u556ehImIGcx3NQ/mn6oQQ=;
+        b=pTiZ6x5+BjNhKW60g0W0p0Cz9mXxdqXC6iEIrR54QQawq8w2lN6hEK0UHnLaDP85v5
+         DE8mCBjMVlLAP2XqZZ++wCDvcNV/oZoJcSqjcj4+CrsDQI2MmKMcR0AleOYfGGoSoTF3
+         6dh4Po5CySCBfhUJbDXAO4Fz/FQq4s5chuZK+cEy7yK2TGWCuRs4oU8flk/HnBQlL2CL
+         rgiCXL/edHAUT+XdID+O9O/V+Gq/H891hHT9c9kzPQJKMzphctGPr4Od2M8x4r7c6nuO
+         kmInuo8CHID3viYmq4hdF9bqsv/zsjD/OCdncwAwttghDO5UTuuZFbFvaJxHeJUQ4SXu
+         +plQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764922493; x=1765527293;
+        d=1e100.net; s=20230601; t=1764922495; x=1765527295;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IUvvvCBHNNoC1LgckOuWigEL11VxlQY1p2ZyqITLXPM=;
-        b=ty4waEc7d9zoWvhjE5UiGnltRyIyX6SHwbYC4W3UHY+P03HDZrYPaEFOp1yTZQonnj
-         h/5IObZYvQFtljYLJ4QUn6tT5g5RnVnLV8vXOQaV16yFZYAmu5qjh+F6tvZfY8OGDzgZ
-         NDh3Dha2q4PfhJCaTI3VFYj/Fy78AKusc5g1pwkzgyG9WBmOALe3O6MCsiS9Hprtc+QV
-         yyNBcE8Y6x/jeq3AeJsbR9ZIgyIkBtr+TxSOmbdHvXwWNl01MB7k238suytnJs8IvH1e
-         1FpNLCcjvwi6ck5o0fR+O0v0u74hMNKFlh6P65kmg2HTRm6YE/YL6GlAyUE4+6K1KsAA
-         XmCw==
-X-Gm-Message-State: AOJu0Yzsvp8IbaE9fVnOURvmAIjdJAkr3HDXX86WN0KkxP1UK4Art74v
-	ivqtRrPYauorvl6fhKEqHWcRmlPXJHIWe/9hEmWhsyiHNwcMvVMRDlnl2JHJRvYZ0fvFcMqVO6K
-	ANAEBLi2akyfr2KmERZK/uyJcn6LcRokQUv5Zwb5QL49+AwhdQO7gMUOPH7lQKwACHMULJusJ1w
-	9lZWUR+35HcXqwUzzwP+v2/Z6Pxwq8rIJVslCiQNARLPE=
-X-Google-Smtp-Source: AGHT+IELNGiiAxvTyAKqtuxUPNS5jOotHIdXjBp3cnhLzYURkdjEfRAzndlBCfFaY8uYQVEXF0sLVcVpn50Ekw==
-X-Received: from pjoo5.prod.google.com ([2002:a17:90b:5825:b0:340:bc7b:2b2f])
+        bh=VfBC4L0W4+2xgM5lrvsI6u556ehImIGcx3NQ/mn6oQQ=;
+        b=CH49DPLr3tLBZqY06S93HoIQ+11RsAAFG9/f/BTPHXXA+8mzahhfmLTIzGDPrF1Qe8
+         3paTta2e6yvY/jBmXPySeqUYYsnyJqMP28+lvw1MRQpbwwaT4i/3GZf+MFTImiwD5ZlK
+         StKYRQqeGaGzTLzw5N+dcNfFHnOMseWHBZAOlHZPsoS/ah9hS2PJhvBuBUp76klfZVZL
+         S4zYALYMsA841aXK3HyNSC264psTnO4OYnN7XmHa5TkVFvGhMr0fj9cmD+cf5gyptB9O
+         cp1kcJTiRmPRmhs3gAWcIjCPL65zBZATCyLVH/BihDvayvxrXMMc79yrcKGtpiY4PqfZ
+         7g0A==
+X-Gm-Message-State: AOJu0YwX1YvZR4URFii+xJ3lEWgIOoq0jpYTw/ctEVp26hT5RUTYtm+t
+	PSGrJtnQt6L8yqUWx6VwTtbkUifiRGbD4T5KJhF90JwSMIwNeRp+Dv3mgdK/a8XYv18oGr6llTL
+	Amo3/e6Zb3rgDbROX2aogqyngOq4MNHFDGLaQue06M+GE/ykM3s0KBC1C9KrWqQAFTIfDK52iHC
+	ZgxhDeRsfQFtFkk6L+uKBGAmmyq7lwd6zRR5qtvSYTMOk=
+X-Google-Smtp-Source: AGHT+IHXrIs0Irim3/IjdiMp0zpT/Vx6bPvklnrD6fWXxggh9McJ+ANSuauSKLwkcynEnEK+ub8+QIBtdC39KA==
+X-Received: from plbv11.prod.google.com ([2002:a17:903:44cb:b0:297:eb04:dff7])
  (user=chengkev job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:4c0a:b0:340:e517:4e05 with SMTP id 98e67ed59e1d1-34947d88b0bmr7030775a91.12.1764922492841;
- Fri, 05 Dec 2025 00:14:52 -0800 (PST)
-Date: Fri,  5 Dec 2025 08:14:47 +0000
+ 2002:a17:903:228c:b0:295:24ab:fb06 with SMTP id d9443c01a7336-29d9fb7005dmr59631915ad.22.1764922494869;
+ Fri, 05 Dec 2025 00:14:54 -0800 (PST)
+Date: Fri,  5 Dec 2025 08:14:48 +0000
 In-Reply-To: <20251205081448.4062096-1-chengkev@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -72,581 +72,162 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251205081448.4062096-1-chengkev@google.com>
 X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251205081448.4062096-2-chengkev@google.com>
-Subject: [kvm-unit-tests PATCH 1/2] x86/svm: Add missing svm intercepts
+Message-ID: <20251205081448.4062096-3-chengkev@google.com>
+Subject: [kvm-unit-tests PATCH 2/2] x86/svm: Add unsupported instruction
+ intercept test
 From: Kevin Cheng <chengkev@google.com>
 To: kvm@vger.kernel.org
 Cc: yosryahmed@google.com, andrew.jones@linux.dev, thuth@redhat.com, 
 	pbonzini@redhat.com, seanjc@google.com, Kevin Cheng <chengkev@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Some intercepts are missing from the KUT svm testing. Add all missing
-intercepts and reorganize the svm intercept definition/setting/clearing.
+Add tests that expect a nested vm exit, due to an unsupported
+instruction, to be handled by L0 even if L1 intercepts are set for that
+instruction.
+
+The new test exercises bug fixed by:
+https://lore.kernel.org/all/20251205070630.4013452-1-chengkev@google.com/
 
 Signed-off-by: Kevin Cheng <chengkev@google.com>
 ---
- x86/svm.c       |   6 +--
- x86/svm.h       |  82 +++++++++++++++++++++++++++++++----
- x86/svm_tests.c | 111 ++++++++++++++++++++++++------------------------
- 3 files changed, 131 insertions(+), 68 deletions(-)
+ x86/svm.h         |  5 +++-
+ x86/svm_tests.c   | 75 +++++++++++++++++++++++++++++++++++++++++++++++
+ x86/unittests.cfg |  9 +++++-
+ 3 files changed, 87 insertions(+), 2 deletions(-)
 
-diff --git a/x86/svm.c b/x86/svm.c
-index de9eb19443caa..9a4c14e368cd4 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -193,9 +193,9 @@ void vmcb_ident(struct vmcb *vmcb)
- 	save->cr2 = read_cr2();
- 	save->g_pat = rdmsr(MSR_IA32_CR_PAT);
- 	save->dbgctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
--	ctrl->intercept = (1ULL << INTERCEPT_VMRUN) |
--		(1ULL << INTERCEPT_VMMCALL) |
--		(1ULL << INTERCEPT_SHUTDOWN);
-+	vmcb_set_intercept(INTERCEPT_VMRUN);
-+	vmcb_set_intercept(INTERCEPT_VMMCALL);
-+	vmcb_set_intercept(INTERCEPT_SHUTDOWN);
- 	ctrl->iopm_base_pa = virt_to_phys(io_bitmap);
- 	ctrl->msrpm_base_pa = virt_to_phys(msr_bitmap);
- 
 diff --git a/x86/svm.h b/x86/svm.h
-index 264583a6547ef..93ef6f772c6ee 100644
+index 93ef6f772c6ee..86d58c3100275 100644
 --- a/x86/svm.h
 +++ b/x86/svm.h
-@@ -2,9 +2,49 @@
- #define X86_SVM_H
+@@ -406,7 +406,10 @@ struct __attribute__ ((__packed__)) vmcb {
+ #define SVM_EXIT_MONITOR	0x08a
+ #define SVM_EXIT_MWAIT		0x08b
+ #define SVM_EXIT_MWAIT_COND	0x08c
+-#define SVM_EXIT_NPF  		0x400
++#define SVM_EXIT_XSETBV		0x08d
++#define SVM_EXIT_RDPRU		0x08e
++#define SVM_EXIT_INVPCID	0x0a2
++#define SVM_EXIT_NPF		0x400
  
- #include "libcflat.h"
-+#include "bitops.h"
-+
-+enum intercept_words {
-+	INTERCEPT_CR = 0,
-+	INTERCEPT_DR,
-+	INTERCEPT_EXCEPTION,
-+	INTERCEPT_WORD3,
-+	INTERCEPT_WORD4,
-+	INTERCEPT_WORD5,
-+	MAX_INTERCEPT,
-+};
+ #define SVM_EXIT_ERR		-1
  
- enum {
--	INTERCEPT_INTR,
-+	/* Byte offset 000h (word 0) */
-+	INTERCEPT_CR0_READ = 0,
-+	INTERCEPT_CR3_READ = 3,
-+	INTERCEPT_CR4_READ = 4,
-+	INTERCEPT_CR8_READ = 8,
-+	INTERCEPT_CR0_WRITE = 16,
-+	INTERCEPT_CR3_WRITE = 16 + 3,
-+	INTERCEPT_CR4_WRITE = 16 + 4,
-+	INTERCEPT_CR8_WRITE = 16 + 8,
-+	/* Byte offset 004h (word 1) */
-+	INTERCEPT_DR0_READ = 32,
-+	INTERCEPT_DR1_READ,
-+	INTERCEPT_DR2_READ,
-+	INTERCEPT_DR3_READ,
-+	INTERCEPT_DR4_READ,
-+	INTERCEPT_DR5_READ,
-+	INTERCEPT_DR6_READ,
-+	INTERCEPT_DR7_READ,
-+	INTERCEPT_DR0_WRITE = 48,
-+	INTERCEPT_DR1_WRITE,
-+	INTERCEPT_DR2_WRITE,
-+	INTERCEPT_DR3_WRITE,
-+	INTERCEPT_DR4_WRITE,
-+	INTERCEPT_DR5_WRITE,
-+	INTERCEPT_DR6_WRITE,
-+	INTERCEPT_DR7_WRITE,
-+	/* Byte offset 008h (word 2) */
-+	INTERCEPT_EXCEPTION_OFFSET = 64,
-+	/* Byte offset 00Ch (word 3) */
-+	INTERCEPT_INTR = 96,
- 	INTERCEPT_NMI,
- 	INTERCEPT_SMI,
- 	INTERCEPT_INIT,
-@@ -36,7 +76,8 @@ enum {
- 	INTERCEPT_TASK_SWITCH,
- 	INTERCEPT_FERR_FREEZE,
- 	INTERCEPT_SHUTDOWN,
--	INTERCEPT_VMRUN,
-+	/* Byte offset 010h (word 4) */
-+	INTERCEPT_VMRUN = 128,
- 	INTERCEPT_VMMCALL,
- 	INTERCEPT_VMLOAD,
- 	INTERCEPT_VMSAVE,
-@@ -49,6 +90,24 @@ enum {
- 	INTERCEPT_MONITOR,
- 	INTERCEPT_MWAIT,
- 	INTERCEPT_MWAIT_COND,
-+	INTERCEPT_XSETBV,
-+	INTERCEPT_RDPRU,
-+	TRAP_EFER_WRITE,
-+	TRAP_CR0_WRITE,
-+	TRAP_CR1_WRITE,
-+	TRAP_CR2_WRITE,
-+	TRAP_CR3_WRITE,
-+	TRAP_CR4_WRITE,
-+	TRAP_CR5_WRITE,
-+	TRAP_CR6_WRITE,
-+	TRAP_CR7_WRITE,
-+	TRAP_CR8_WRITE,
-+	/* Byte offset 014h (word 5) */
-+	INTERCEPT_INVLPGB = 160,
-+	INTERCEPT_INVLPGB_ILLEGAL,
-+	INTERCEPT_INVPCID,
-+	INTERCEPT_MCOMMIT,
-+	INTERCEPT_TLBSYNC,
- };
- 
- enum {
-@@ -69,13 +128,8 @@ enum {
- };
- 
- struct __attribute__ ((__packed__)) vmcb_control_area {
--	u16 intercept_cr_read;
--	u16 intercept_cr_write;
--	u16 intercept_dr_read;
--	u16 intercept_dr_write;
--	u32 intercept_exceptions;
--	u64 intercept;
--	u8 reserved_1[40];
-+	u32 intercept[MAX_INTERCEPT];
-+	u8 reserved_1[36];
- 	u16 pause_filter_thresh;
- 	u16 pause_filter_count;
- 	u64 iopm_base_pa;
-@@ -441,6 +495,16 @@ void test_set_guest(test_guest_func func);
- 
- extern struct vmcb *vmcb;
- 
-+static inline void vmcb_set_intercept(u64 val)
-+{
-+	__set_bit(val, vmcb->control.intercept);
-+}
-+
-+static inline void vmcb_clear_intercept(u64 val)
-+{
-+	__clear_bit(val, vmcb->control.intercept);
-+}
-+
- static inline void stgi(void)
- {
-     asm volatile ("stgi");
 diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 3761647642542..ccc89d45d4db9 100644
+index ccc89d45d4db9..cea8865787545 100644
 --- a/x86/svm_tests.c
 +++ b/x86/svm_tests.c
-@@ -63,7 +63,7 @@ static bool null_check(struct svm_test *test)
- 
- static void prepare_no_vmrun_int(struct svm_test *test)
- {
--	vmcb->control.intercept &= ~(1ULL << INTERCEPT_VMRUN);
-+	vmcb_clear_intercept(INTERCEPT_VMRUN);
- }
- 
- static bool check_no_vmrun_int(struct svm_test *test)
-@@ -84,8 +84,8 @@ static bool check_vmrun(struct svm_test *test)
- static void prepare_rsm_intercept(struct svm_test *test)
- {
- 	default_prepare(test);
--	vmcb->control.intercept |= 1 << INTERCEPT_RSM;
--	vmcb->control.intercept_exceptions |= (1ULL << UD_VECTOR);
-+	vmcb_set_intercept(INTERCEPT_RSM);
-+	vmcb_set_intercept(INTERCEPT_EXCEPTION_OFFSET + UD_VECTOR);
- }
- 
- static void test_rsm_intercept(struct svm_test *test)
-@@ -107,7 +107,7 @@ static bool finished_rsm_intercept(struct svm_test *test)
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
--		vmcb->control.intercept &= ~(1 << INTERCEPT_RSM);
-+		vmcb_clear_intercept(INTERCEPT_RSM);
- 		inc_test_stage(test);
- 		break;
- 
-@@ -132,7 +132,7 @@ static void prepare_sel_cr0_intercept(struct svm_test *test)
- 	/* Clear CR0.MP and CR0.CD as the tests will set either of them */
- 	vmcb->save.cr0 &= ~X86_CR0_MP;
- 	vmcb->save.cr0 &= ~X86_CR0_CD;
--	vmcb->control.intercept |= (1ULL << INTERCEPT_SELECTIVE_CR0);
-+	vmcb_set_intercept(INTERCEPT_SELECTIVE_CR0);
- }
- 
- static void prepare_sel_nonsel_cr0_intercepts(struct svm_test *test)
-@@ -140,8 +140,8 @@ static void prepare_sel_nonsel_cr0_intercepts(struct svm_test *test)
- 	/* Clear CR0.MP and CR0.CD as the tests will set either of them */
- 	vmcb->save.cr0 &= ~X86_CR0_MP;
- 	vmcb->save.cr0 &= ~X86_CR0_CD;
--	vmcb->control.intercept_cr_write |= (1ULL << 0);
--	vmcb->control.intercept |= (1ULL << INTERCEPT_SELECTIVE_CR0);
-+	vmcb_set_intercept(INTERCEPT_CR0_WRITE);
-+	vmcb_set_intercept(INTERCEPT_SELECTIVE_CR0);
- }
- 
- static void __test_cr0_write_bit(struct svm_test *test, unsigned long bit,
-@@ -218,7 +218,7 @@ static bool check_cr0_nointercept(struct svm_test *test)
- static void prepare_cr3_intercept(struct svm_test *test)
- {
- 	default_prepare(test);
--	vmcb->control.intercept_cr_read |= 1 << 3;
-+	vmcb_set_intercept(INTERCEPT_CR3_READ);
- }
- 
- static void test_cr3_intercept(struct svm_test *test)
-@@ -252,7 +252,7 @@ static void corrupt_cr3_intercept_bypass(void *_test)
- static void prepare_cr3_intercept_bypass(struct svm_test *test)
- {
- 	default_prepare(test);
--	vmcb->control.intercept_cr_read |= 1 << 3;
-+	vmcb_set_intercept(INTERCEPT_CR3_READ);
- 	on_cpu_async(1, corrupt_cr3_intercept_bypass, test);
- }
- 
-@@ -272,8 +272,7 @@ static void test_cr3_intercept_bypass(struct svm_test *test)
- static void prepare_dr_intercept(struct svm_test *test)
- {
- 	default_prepare(test);
--	vmcb->control.intercept_dr_read = 0xff;
--	vmcb->control.intercept_dr_write = 0xff;
-+	vmcb->control.intercept[INTERCEPT_DR] = 0xff00ff;
- }
- 
- static void test_dr_intercept(struct svm_test *test)
-@@ -390,7 +389,7 @@ static bool next_rip_supported(void)
- 
- static void prepare_next_rip(struct svm_test *test)
- {
--	vmcb->control.intercept |= (1ULL << INTERCEPT_RDTSC);
-+	vmcb_set_intercept(INTERCEPT_RDTSC);
- }
- 
- 
-@@ -416,7 +415,7 @@ static bool is_x2apic;
- static void prepare_msr_intercept(struct svm_test *test)
- {
- 	default_prepare(test);
--	vmcb->control.intercept |= (1ULL << INTERCEPT_MSR_PROT);
-+	vmcb_set_intercept(INTERCEPT_MSR_PROT);
- 
- 	memset(msr_bitmap, 0, MSR_BITMAP_SIZE);
- 
-@@ -663,10 +662,10 @@ static bool check_msr_intercept(struct svm_test *test)
- 
- static void prepare_mode_switch(struct svm_test *test)
- {
--	vmcb->control.intercept_exceptions |= (1ULL << GP_VECTOR)
--		|  (1ULL << UD_VECTOR)
--		|  (1ULL << DF_VECTOR)
--		|  (1ULL << PF_VECTOR);
-+	vmcb_set_intercept(INTERCEPT_EXCEPTION_OFFSET + GP_VECTOR);
-+	vmcb_set_intercept(INTERCEPT_EXCEPTION_OFFSET + UD_VECTOR);
-+	vmcb_set_intercept(INTERCEPT_EXCEPTION_OFFSET + DF_VECTOR);
-+	vmcb_set_intercept(INTERCEPT_EXCEPTION_OFFSET + DF_VECTOR);
- 	test->scratch = 0;
- }
- 
-@@ -773,7 +772,7 @@ extern u8 *io_bitmap;
- 
- static void prepare_ioio(struct svm_test *test)
- {
--	vmcb->control.intercept |= (1ULL << INTERCEPT_IOIO_PROT);
-+	vmcb_set_intercept(INTERCEPT_IOIO_PROT);
- 	test->scratch = 0;
- 	memset(io_bitmap, 0, 8192);
- 	io_bitmap[8192] = 0xFF;
-@@ -1171,7 +1170,7 @@ static void pending_event_prepare(struct svm_test *test)
- 
- 	pending_event_guest_run = false;
- 
--	vmcb->control.intercept |= (1ULL << INTERCEPT_INTR);
-+	vmcb_set_intercept(INTERCEPT_INTR);
- 	vmcb->control.int_ctl |= V_INTR_MASKING_MASK;
- 
- 	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL |
-@@ -1195,7 +1194,7 @@ static bool pending_event_finished(struct svm_test *test)
- 			return true;
- 		}
- 
--		vmcb->control.intercept &= ~(1ULL << INTERCEPT_INTR);
-+		vmcb_clear_intercept(INTERCEPT_INTR);
- 		vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
- 
- 		if (pending_event_guest_run) {
-@@ -1400,7 +1399,7 @@ static bool interrupt_finished(struct svm_test *test)
- 		}
- 		vmcb->save.rip += 3;
- 
--		vmcb->control.intercept |= (1ULL << INTERCEPT_INTR);
-+		vmcb_set_intercept(INTERCEPT_INTR);
- 		vmcb->control.int_ctl |= V_INTR_MASKING_MASK;
- 		break;
- 
-@@ -1414,7 +1413,7 @@ static bool interrupt_finished(struct svm_test *test)
- 
- 		sti_nop_cli();
- 
--		vmcb->control.intercept &= ~(1ULL << INTERCEPT_INTR);
-+		vmcb_clear_intercept(INTERCEPT_INTR);
- 		vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
- 		break;
- 
-@@ -1476,7 +1475,7 @@ static bool nmi_finished(struct svm_test *test)
- 		}
- 		vmcb->save.rip += 3;
- 
--		vmcb->control.intercept |= (1ULL << INTERCEPT_NMI);
-+		vmcb_set_intercept(INTERCEPT_NMI);
- 		break;
- 
- 	case 1:
-@@ -1569,7 +1568,7 @@ static bool nmi_hlt_finished(struct svm_test *test)
- 		}
- 		vmcb->save.rip += 3;
- 
--		vmcb->control.intercept |= (1ULL << INTERCEPT_NMI);
-+		vmcb_set_intercept(INTERCEPT_NMI);
- 		break;
- 
- 	case 2:
-@@ -1605,7 +1604,7 @@ static void vnmi_prepare(struct svm_test *test)
- 	 * Disable NMI interception to start.  Enabling vNMI without
- 	 * intercepting "real" NMIs should result in an ERR VM-Exit.
- 	 */
--	vmcb->control.intercept &= ~(1ULL << INTERCEPT_NMI);
-+	vmcb_clear_intercept(INTERCEPT_NMI);
- 	vmcb->control.int_ctl = V_NMI_ENABLE_MASK;
- 	vmcb->control.int_vector = NMI_VECTOR;
- }
-@@ -1629,7 +1628,7 @@ static bool vnmi_finished(struct svm_test *test)
- 			return true;
- 		}
- 		report(!nmi_fired, "vNMI enabled but NMI_INTERCEPT unset!");
--		vmcb->control.intercept |= (1ULL << INTERCEPT_NMI);
-+		vmcb_set_intercept(INTERCEPT_NMI);
- 		vmcb->save.rip += 3;
- 		break;
- 
-@@ -1804,7 +1803,7 @@ static bool virq_inject_finished(struct svm_test *test)
- 			return true;
- 		}
- 		virq_fired = false;
--		vmcb->control.intercept |= (1ULL << INTERCEPT_VINTR);
-+		vmcb_set_intercept(INTERCEPT_VINTR);
- 		vmcb->control.int_ctl = V_INTR_MASKING_MASK | V_IRQ_MASK |
- 			(0x0f << V_INTR_PRIO_SHIFT);
- 		break;
-@@ -1819,7 +1818,7 @@ static bool virq_inject_finished(struct svm_test *test)
- 			report_fail("V_IRQ fired before SVM_EXIT_VINTR");
- 			return true;
- 		}
--		vmcb->control.intercept &= ~(1ULL << INTERCEPT_VINTR);
-+		vmcb_clear_intercept(INTERCEPT_VINTR);
- 		break;
- 
- 	case 2:
-@@ -1842,7 +1841,7 @@ static bool virq_inject_finished(struct svm_test *test)
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
--		vmcb->control.intercept |= (1ULL << INTERCEPT_VINTR);
-+		vmcb_set_intercept(INTERCEPT_VINTR);
- 		break;
- 
- 	case 4:
-@@ -1943,7 +1942,7 @@ static void reg_corruption_prepare(struct svm_test *test)
- 	set_test_stage(test, 0);
- 
- 	vmcb->control.int_ctl = V_INTR_MASKING_MASK;
--	vmcb->control.intercept |= (1ULL << INTERCEPT_INTR);
-+	vmcb_set_intercept(INTERCEPT_INTR);
- 
- 	handle_irq(TIMER_VECTOR, reg_corruption_isr);
- 
-@@ -2050,7 +2049,7 @@ static volatile bool init_intercept;
- static void init_intercept_prepare(struct svm_test *test)
- {
- 	init_intercept = false;
--	vmcb->control.intercept |= (1ULL << INTERCEPT_INIT);
-+	vmcb_set_intercept(INTERCEPT_INIT);
- }
- 
- static void init_intercept_test(struct svm_test *test)
-@@ -2547,7 +2546,7 @@ static void test_dr(void)
- /* TODO: verify if high 32-bits are sign- or zero-extended on bare metal */
- #define	TEST_BITMAP_ADDR(save_intercept, type, addr, exit_code,		\
- 			 msg) {						\
--		vmcb->control.intercept = saved_intercept | 1ULL << type; \
-+		vmcb_set_intercept(type); \
- 		if (type == INTERCEPT_MSR_PROT)				\
- 			vmcb->control.msrpm_base_pa = addr;		\
- 		else							\
-@@ -2574,7 +2573,7 @@ static void test_dr(void)
-  */
- static void test_msrpm_iopm_bitmap_addrs(void)
- {
--	u64 saved_intercept = vmcb->control.intercept;
-+	u32 saved_intercept = vmcb->control.intercept[INTERCEPT_WORD3];
- 	u64 addr_beyond_limit = 1ull << cpuid_maxphyaddr();
- 	u64 addr = virt_to_phys(msr_bitmap) & (~((1ull << 12) - 1));
- 
-@@ -2615,7 +2614,7 @@ static void test_msrpm_iopm_bitmap_addrs(void)
- 	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_IOIO_PROT, addr,
- 			 SVM_EXIT_VMMCALL, "IOPM");
- 
--	vmcb->control.intercept = saved_intercept;
-+	vmcb->control.intercept[INTERCEPT_WORD3] = saved_intercept;
- }
- 
- /*
-@@ -2811,7 +2810,7 @@ static void vmload_vmsave_guest_main(struct svm_test *test)
- 
- static void svm_vmload_vmsave(void)
- {
--	u32 intercept_saved = vmcb->control.intercept;
-+	u32 intercept_saved = vmcb->control.intercept[INTERCEPT_WORD4];
- 
- 	test_set_guest(vmload_vmsave_guest_main);
- 
-@@ -2819,8 +2818,8 @@ static void svm_vmload_vmsave(void)
- 	 * Disabling intercept for VMLOAD and VMSAVE doesn't cause
- 	 * respective #VMEXIT to host
- 	 */
--	vmcb->control.intercept &= ~(1ULL << INTERCEPT_VMLOAD);
--	vmcb->control.intercept &= ~(1ULL << INTERCEPT_VMSAVE);
-+	vmcb_clear_intercept(INTERCEPT_VMLOAD);
-+	vmcb_clear_intercept(INTERCEPT_VMSAVE);
- 	svm_vmrun();
- 	report(vmcb->control.exit_code == SVM_EXIT_VMMCALL, "Test "
- 	       "VMLOAD/VMSAVE intercept: Expected VMMCALL #VMEXIT");
-@@ -2829,39 +2828,39 @@ static void svm_vmload_vmsave(void)
- 	 * Enabling intercept for VMLOAD and VMSAVE causes respective
- 	 * #VMEXIT to host
- 	 */
--	vmcb->control.intercept |= (1ULL << INTERCEPT_VMLOAD);
-+	vmcb_set_intercept(INTERCEPT_VMLOAD);
- 	svm_vmrun();
- 	report(vmcb->control.exit_code == SVM_EXIT_VMLOAD, "Test "
- 	       "VMLOAD/VMSAVE intercept: Expected VMLOAD #VMEXIT");
--	vmcb->control.intercept &= ~(1ULL << INTERCEPT_VMLOAD);
--	vmcb->control.intercept |= (1ULL << INTERCEPT_VMSAVE);
-+	vmcb_clear_intercept(INTERCEPT_VMLOAD);
-+	vmcb_set_intercept(INTERCEPT_VMSAVE);
- 	svm_vmrun();
- 	report(vmcb->control.exit_code == SVM_EXIT_VMSAVE, "Test "
- 	       "VMLOAD/VMSAVE intercept: Expected VMSAVE #VMEXIT");
--	vmcb->control.intercept &= ~(1ULL << INTERCEPT_VMSAVE);
-+	vmcb_clear_intercept(INTERCEPT_VMSAVE);
- 	svm_vmrun();
- 	report(vmcb->control.exit_code == SVM_EXIT_VMMCALL, "Test "
- 	       "VMLOAD/VMSAVE intercept: Expected VMMCALL #VMEXIT");
- 
--	vmcb->control.intercept |= (1ULL << INTERCEPT_VMLOAD);
-+	vmcb_set_intercept(INTERCEPT_VMLOAD);
- 	svm_vmrun();
- 	report(vmcb->control.exit_code == SVM_EXIT_VMLOAD, "Test "
- 	       "VMLOAD/VMSAVE intercept: Expected VMLOAD #VMEXIT");
--	vmcb->control.intercept &= ~(1ULL << INTERCEPT_VMLOAD);
-+	vmcb_clear_intercept(INTERCEPT_VMLOAD);
- 	svm_vmrun();
- 	report(vmcb->control.exit_code == SVM_EXIT_VMMCALL, "Test "
- 	       "VMLOAD/VMSAVE intercept: Expected VMMCALL #VMEXIT");
- 
--	vmcb->control.intercept |= (1ULL << INTERCEPT_VMSAVE);
-+	vmcb_set_intercept(INTERCEPT_VMSAVE);
- 	svm_vmrun();
- 	report(vmcb->control.exit_code == SVM_EXIT_VMSAVE, "Test "
- 	       "VMLOAD/VMSAVE intercept: Expected VMSAVE #VMEXIT");
--	vmcb->control.intercept &= ~(1ULL << INTERCEPT_VMSAVE);
-+	vmcb_clear_intercept(INTERCEPT_VMSAVE);
- 	svm_vmrun();
- 	report(vmcb->control.exit_code == SVM_EXIT_VMMCALL, "Test "
- 	       "VMLOAD/VMSAVE intercept: Expected VMMCALL #VMEXIT");
- 
--	vmcb->control.intercept = intercept_saved;
-+	vmcb->control.intercept[INTERCEPT_WORD4] = intercept_saved;
- }
- 
- static void prepare_vgif_enabled(struct svm_test *test)
-@@ -2974,7 +2973,7 @@ static void pause_filter_test(void)
- 		return;
- 	}
- 
--	vmcb->control.intercept |= (1 << INTERCEPT_PAUSE);
-+	vmcb_set_intercept(INTERCEPT_PAUSE);
- 
- 	// filter count more that pause count - no VMexit
- 	pause_filter_run_test(10, 9, 0, 0);
-@@ -3356,7 +3355,7 @@ static void svm_intr_intercept_mix_if(void)
- 	// make a physical interrupt to be pending
- 	handle_irq(0x55, dummy_isr);
- 
--	vmcb->control.intercept |= (1 << INTERCEPT_INTR);
-+	vmcb_set_intercept(INTERCEPT_INTR);
- 	vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
- 	vmcb->save.rflags &= ~X86_EFLAGS_IF;
- 
-@@ -3389,7 +3388,7 @@ static void svm_intr_intercept_mix_gif(void)
- {
- 	handle_irq(0x55, dummy_isr);
- 
--	vmcb->control.intercept |= (1 << INTERCEPT_INTR);
-+	vmcb_set_intercept(INTERCEPT_INTR);
- 	vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
- 	vmcb->save.rflags &= ~X86_EFLAGS_IF;
- 
-@@ -3419,7 +3418,7 @@ static void svm_intr_intercept_mix_gif2(void)
- {
- 	handle_irq(0x55, dummy_isr);
- 
--	vmcb->control.intercept |= (1 << INTERCEPT_INTR);
-+	vmcb_set_intercept(INTERCEPT_INTR);
- 	vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
- 	vmcb->save.rflags |= X86_EFLAGS_IF;
- 
-@@ -3448,7 +3447,7 @@ static void svm_intr_intercept_mix_nmi(void)
- {
- 	handle_exception(2, dummy_nmi_handler);
- 
--	vmcb->control.intercept |= (1 << INTERCEPT_NMI);
-+	vmcb_set_intercept(INTERCEPT_NMI);
- 	vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
- 	vmcb->save.rflags |= X86_EFLAGS_IF;
- 
-@@ -3472,7 +3471,7 @@ static void svm_intr_intercept_mix_smi_guest(struct svm_test *test)
- 
- static void svm_intr_intercept_mix_smi(void)
- {
--	vmcb->control.intercept |= (1 << INTERCEPT_SMI);
-+	vmcb_set_intercept(INTERCEPT_SMI);
- 	vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
- 	test_set_guest(svm_intr_intercept_mix_smi_guest);
- 	svm_intr_intercept_mix_run_guest(NULL, SVM_EXIT_SMI);
-@@ -3530,14 +3529,14 @@ static void handle_exception_in_l2(u8 vector)
- 
- static void handle_exception_in_l1(u32 vector)
- {
--	u32 old_ie = vmcb->control.intercept_exceptions;
-+	u32 old_ie = vmcb->control.intercept[INTERCEPT_EXCEPTION];
- 
--	vmcb->control.intercept_exceptions |= (1ULL << vector);
-+	vmcb_set_intercept(INTERCEPT_EXCEPTION_OFFSET + vector);
- 
- 	report(svm_vmrun() == (SVM_EXIT_EXCP_BASE + vector),
- 		"%s handled by L1",  exception_mnemonic(vector));
- 
--	vmcb->control.intercept_exceptions = old_ie;
-+	vmcb->control.intercept[INTERCEPT_EXCEPTION] = old_ie;
- }
- 
- static void svm_exception_test(void)
-@@ -3568,7 +3567,7 @@ static void svm_shutdown_intercept_test(void)
- {
- 	test_set_guest(shutdown_intercept_test_guest);
- 	vmcb->save.idtr.base = (u64)alloc_vpage();
--	vmcb->control.intercept |= (1ULL << INTERCEPT_SHUTDOWN);
-+	vmcb_set_intercept(INTERCEPT_SHUTDOWN);
- 	svm_vmrun();
+@@ -3572,6 +3572,80 @@ static void svm_shutdown_intercept_test(void)
  	report(vmcb->control.exit_code == SVM_EXIT_SHUTDOWN, "shutdown test passed");
  }
+ 
++struct InvpcidDesc {
++	uint64_t pcid : 12;
++	uint64_t reserved : 52;
++	uint64_t addr;
++};
++
++static void insn_invpcid(struct svm_test *test)
++{
++	struct InvpcidDesc desc = {0};
++	unsigned long type = 0;
++
++	__asm__ volatile (
++		"invpcid %1, %0"
++		:
++		: "r" (type), "m" (desc)
++		: "memory"
++	);
++}
++
++asm(
++	"insn_rdtscp: rdtscp;ret\n\t"
++	"insn_skinit: skinit;ret\n\t"
++	"insn_xsetbv: xor %eax, %eax; xor %edx, %edx; xor %ecx, %ecx; xsetbv;ret\n\t"
++	"insn_rdpru: xor %ecx, %ecx; rdpru;ret\n\t"
++);
++
++extern void insn_rdtscp(struct svm_test *test);
++extern void insn_skinit(struct svm_test *test);
++extern void insn_xsetbv(struct svm_test *test);
++extern void insn_rdpru(struct svm_test *test);
++
++struct insn_table {
++	const char *name;
++	u64 intercept;
++	void (*insn_func)(struct svm_test *test);
++	u32 reason;
++};
++
++static struct insn_table insn_table[] = {
++	{ "RDTSCP", INTERCEPT_RDTSCP, insn_rdtscp, SVM_EXIT_RDTSCP},
++	{ "SKINIT", INTERCEPT_SKINIT, insn_skinit, SVM_EXIT_SKINIT},
++	{ "XSETBV", INTERCEPT_XSETBV, insn_xsetbv, SVM_EXIT_XSETBV},
++	{ "RDPRU", INTERCEPT_RDPRU, insn_rdpru, SVM_EXIT_RDPRU},
++	{ "INVPCID", INTERCEPT_INVPCID, insn_invpcid, SVM_EXIT_INVPCID},
++	{ NULL },
++};
++
++/*
++ * Test that L1 does not intercept instructions that are not advertised in
++ * guest CPUID.
++ */
++static void svm_unsupported_instruction_intercept_test(void)
++{
++	u32 cur_insn;
++	u32 exit_code;
++
++	vmcb_set_intercept(INTERCEPT_EXCEPTION_OFFSET + UD_VECTOR);
++
++	for (cur_insn = 0; insn_table[cur_insn].name != NULL; ++cur_insn) {
++		test_set_guest(insn_table[cur_insn].insn_func);
++		vmcb_set_intercept(insn_table[cur_insn].intercept);
++		svm_vmrun();
++		exit_code = vmcb->control.exit_code;
++
++		if (exit_code == SVM_EXIT_EXCP_BASE + UD_VECTOR)
++			report_pass("UD Exception injected");
++		else if (exit_code == insn_table[cur_insn].reason)
++			report_fail("L1 should not intercept %s when instruction is not advertised in guest CPUID",
++				    insn_table[cur_insn].name);
++		else
++			report_fail("Unknown exit reason, 0x%x", exit_code);
++	}
++}
++
+ struct svm_test svm_tests[] = {
+ 	{ "null", default_supported, default_prepare,
+ 	  default_prepare_gif_clear, null_test,
+@@ -3713,6 +3787,7 @@ struct svm_test svm_tests[] = {
+ 	TEST(svm_tsc_scale_test),
+ 	TEST(pause_filter_test),
+ 	TEST(svm_shutdown_intercept_test),
++	TEST(svm_unsupported_instruction_intercept_test),
+ 	{ NULL, NULL, NULL, NULL, NULL, NULL, NULL }
+ };
+ 
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 522318d32bf68..ec456d779b35c 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -253,11 +253,18 @@ arch = x86_64
+ [svm]
+ file = svm.flat
+ smp = 2
+-test_args = "-pause_filter_test"
++test_args = "-pause_filter_test -svm_unsupported_instruction_intercept_test"
+ qemu_params = -cpu max,+svm -m 4g
+ arch = x86_64
+ groups = svm
+ 
++[svm_unsupported_instruction_intercept_test]
++file = svm.flat
++test_args = "svm_unsupported_instruction_intercept_test"
++qemu_params = -cpu max,+svm,-rdtscp,-xsave,-invpcid
++arch = x86_64
++groups = svm
++
+ [svm_pause_filter]
+ file = svm.flat
+ test_args = pause_filter_test
 -- 
 2.52.0.223.gf5cc29aaa4-goog
 
