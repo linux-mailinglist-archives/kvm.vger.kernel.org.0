@@ -1,36 +1,36 @@
-Return-Path: <kvm+bounces-65462-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65463-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EA32CAA24D
-	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 08:14:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F23C8CAA235
+	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 08:12:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B32D831E259E
-	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 07:11:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F25FE302219F
+	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 07:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E6A2DFF3F;
-	Sat,  6 Dec 2025 07:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B662E0B6D;
+	Sat,  6 Dec 2025 07:11:45 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275672E03F0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0D5211706;
 	Sat,  6 Dec 2025 07:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765005100; cv=none; b=YexuQoX2Szi058J2sDU+hRvBTgiVIl6ZzBk1J6lBaR8FMvZZhniv14yuCLdgpeUEIA7WT+5PE+KxkjhvAi80T1nFynKkAQKwqWXlpoQRNdxqnjUVImKBhXLmLdVdNjte8adXFnztZdYrWB4KEapJnMb2srhJLhsl5IDBhEh03j0=
+	t=1765005104; cv=none; b=VBsn2iurfVYTZUUioRvV0Wq+J1zjRqIIyl45fu4go1Mw9GQSckVEwAUrVeOFfEQctAFWiKpuLKESrXl2m8sJBC8NLdtFkkfo3oR2/O/SWrPAbA39gjPJClAG1GmIibzsdNq+BHGc1mp8KvoMGQdOZ9VMG2AR9NWXqp/jS7KG/qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765005100; c=relaxed/simple;
-	bh=0bkBUmx97QCJuRrNjTkHuif5W//TZyFWDqBdkm9fmcM=;
+	s=arc-20240116; t=1765005104; c=relaxed/simple;
+	bh=3jBNKRHQ6xntwLGLOvX7f92XGHP6wsjW/6pwDpMXsYo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Md0i99I/m3aEsLdqad2gwkX0BJj2RlPgEQgoByrBdt28p9AIeEu6LW8d1ZnEaO3xQ08e4oJWpZznyFw9P8m41FOzeHPARdIw9QDaKhhfO3ME9Rf4lq416zir6na06H7Ho/J3C4/MwNAG0axuhv7Peut+Odo8X0rP4l6BrbMTiv8=
+	 MIME-Version; b=MH+EmNdGCfh1Kuu5BxwyElQqrb4hyHL81fcO6Ld9tV4RRkFrW0oIauPEp57rRopUO0sBhd02P7d0ha5ENUu783xsNVedXhuujFpgJrBwW/TfgOgsWBuWHoJtydqGnb5R26o+fvkZV7M9pJ7o9ZHY5E4PAOmmJL0jvfVktOtL9Z4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [10.2.5.185])
-	by gateway (Coremail) with SMTP id _____8BxF9Eb1zNp8LMrAA--.28768S3;
-	Sat, 06 Dec 2025 15:11:23 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8AxytEc1zNp9LMrAA--.23607S3;
+	Sat, 06 Dec 2025 15:11:24 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-	by front1 (Coremail) with SMTP id qMiowJCx2sAX1zNpmFZGAQ--.33246S3;
-	Sat, 06 Dec 2025 15:11:22 +0800 (CST)
+	by front1 (Coremail) with SMTP id qMiowJCx2sAX1zNpmFZGAQ--.33246S4;
+	Sat, 06 Dec 2025 15:11:23 +0800 (CST)
 From: Song Gao <gaosong@loongson.cn>
 To: maobibo@loongson.cn,
 	chenhuacai@kernel.org
@@ -39,9 +39,9 @@ Cc: kvm@vger.kernel.org,
 	kernel@xen0n.name,
 	linux-kernel@vger.kernel.org,
 	lixianglai@loongson.cn
-Subject: [PATCH v3 1/4] LongArch: KVM: Add some maccros for AVEC
-Date: Sat,  6 Dec 2025 14:46:55 +0800
-Message-Id: <20251206064658.714100-2-gaosong@loongson.cn>
+Subject: [PATCH v3 2/4] LongArch: KVM: Add DINTC device support
+Date: Sat,  6 Dec 2025 14:46:56 +0800
+Message-Id: <20251206064658.714100-3-gaosong@loongson.cn>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20251206064658.714100-1-gaosong@loongson.cn>
 References: <20251206064658.714100-1-gaosong@loongson.cn>
@@ -52,55 +52,253 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJCx2sAX1zNpmFZGAQ--.33246S3
+X-CM-TRANSID:qMiowJCx2sAX1zNpmFZGAQ--.33246S4
 X-CM-SenderInfo: 5jdr20tqj6z05rqj20fqof0/
 X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
 	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
 	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Add some maccros for AVEC interrupt controller, so the dintc can use
-those maccros.
+Add device model for AVEC interrupt controller, implement basic
+create/destroy/set_attr interfaces, and register device model to kvm
+device table.
 
 Signed-off-by: Song Gao <gaosong@loongson.cn>
 ---
- arch/loongarch/include/asm/irq.h     | 8 ++++++++
- drivers/irqchip/irq-loongarch-avec.c | 5 +++--
- 2 files changed, 11 insertions(+), 2 deletions(-)
+ arch/loongarch/include/asm/kvm_dintc.h |  21 +++++
+ arch/loongarch/include/asm/kvm_host.h  |   3 +
+ arch/loongarch/include/uapi/asm/kvm.h  |   4 +
+ arch/loongarch/kvm/Makefile            |   1 +
+ arch/loongarch/kvm/intc/dintc.c        | 110 +++++++++++++++++++++++++
+ arch/loongarch/kvm/main.c              |   5 ++
+ include/uapi/linux/kvm.h               |   2 +
+ 7 files changed, 146 insertions(+)
+ create mode 100644 arch/loongarch/include/asm/kvm_dintc.h
+ create mode 100644 arch/loongarch/kvm/intc/dintc.c
 
-diff --git a/arch/loongarch/include/asm/irq.h b/arch/loongarch/include/asm/irq.h
-index 12bd15578c33..aaa022fcb9e3 100644
---- a/arch/loongarch/include/asm/irq.h
-+++ b/arch/loongarch/include/asm/irq.h
-@@ -50,6 +50,14 @@ void spurious_interrupt(void);
- #define NR_LEGACY_VECTORS	16
- #define IRQ_MATRIX_BITS		NR_VECTORS
- 
-+#define AVEC_VIRQ_SHIFT		4
-+#define AVEC_VIRQ_BIT		8
-+#define AVEC_VIRQ_MASK		GENMASK(AVEC_VIRQ_BIT - 1, 0)
-+#define AVEC_CPU_SHIFT		12
-+#define AVEC_CPU_BIT		16
-+#define AVEC_CPU_MASK		GENMASK(AVEC_CPU_BIT - 1, 0)
+diff --git a/arch/loongarch/include/asm/kvm_dintc.h b/arch/loongarch/include/asm/kvm_dintc.h
+new file mode 100644
+index 000000000000..d980d39c0344
+--- /dev/null
++++ b/arch/loongarch/include/asm/kvm_dintc.h
+@@ -0,0 +1,21 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2025 Loongson Technology Corporation Limited
++ */
++
++#ifndef __ASM_KVM_DINTC_H
++#define __ASM_KVM_DINTC_H
 +
 +
- #define arch_trigger_cpumask_backtrace arch_trigger_cpumask_backtrace
- void arch_trigger_cpumask_backtrace(const struct cpumask *mask, int exclude_cpu);
++struct loongarch_dintc  {
++	struct kvm *kvm;
++	uint64_t msg_addr_base;
++	uint64_t msg_addr_size;
++};
++
++struct dintc_state {
++	atomic64_t  vector_map[4];
++};
++
++int kvm_loongarch_register_dintc_device(void);
++#endif
+diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+index e4fe5b8e8149..26a90f4146ac 100644
+--- a/arch/loongarch/include/asm/kvm_host.h
++++ b/arch/loongarch/include/asm/kvm_host.h
+@@ -22,6 +22,7 @@
+ #include <asm/kvm_ipi.h>
+ #include <asm/kvm_eiointc.h>
+ #include <asm/kvm_pch_pic.h>
++#include <asm/kvm_dintc.h>
+ #include <asm/loongarch.h>
  
-diff --git a/drivers/irqchip/irq-loongarch-avec.c b/drivers/irqchip/irq-loongarch-avec.c
-index bf52dc8345f5..f0118cfd4363 100644
---- a/drivers/irqchip/irq-loongarch-avec.c
-+++ b/drivers/irqchip/irq-loongarch-avec.c
-@@ -209,8 +209,9 @@ static void avecintc_compose_msi_msg(struct irq_data *d, struct msi_msg *msg)
- 	struct avecintc_data *adata = irq_data_get_irq_chip_data(d);
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+@@ -134,6 +135,7 @@ struct kvm_arch {
+ 	struct loongarch_ipi *ipi;
+ 	struct loongarch_eiointc *eiointc;
+ 	struct loongarch_pch_pic *pch_pic;
++	struct loongarch_dintc *dintc;
+ };
  
- 	msg->address_hi = 0x0;
--	msg->address_lo = (loongarch_avec.msi_base_addr | (adata->vec & 0xff) << 4)
--			  | ((cpu_logical_map(adata->cpu & 0xffff)) << 12);
-+	msg->address_lo = (loongarch_avec.msi_base_addr |
-+			(adata->vec & AVEC_VIRQ_MASK) << AVEC_VIRQ_SHIFT) |
-+			((cpu_logical_map(adata->cpu & AVEC_CPU_MASK)) << AVEC_CPU_SHIFT);
- 	msg->data = 0x0;
+ #define CSR_MAX_NUMS		0x800
+@@ -244,6 +246,7 @@ struct kvm_vcpu_arch {
+ 	struct kvm_mp_state mp_state;
+ 	/* ipi state */
+ 	struct ipi_state ipi_state;
++	struct dintc_state dintc_state;
+ 	/* cpucfg */
+ 	u32 cpucfg[KVM_MAX_CPUCFG_REGS];
+ 
+diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
+index de6c3f18e40a..07da84f7002c 100644
+--- a/arch/loongarch/include/uapi/asm/kvm.h
++++ b/arch/loongarch/include/uapi/asm/kvm.h
+@@ -154,4 +154,8 @@ struct kvm_iocsr_entry {
+ #define KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL	        0x40000006
+ #define KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT	        0
+ 
++#define KVM_DEV_LOONGARCH_DINTC_CTRL			0x40000007
++#define KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_BASE		0x0
++#define KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_SIZE		0x1
++
+ #endif /* __UAPI_ASM_LOONGARCH_KVM_H */
+diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
+index cb41d9265662..fe984bf1cbdb 100644
+--- a/arch/loongarch/kvm/Makefile
++++ b/arch/loongarch/kvm/Makefile
+@@ -19,6 +19,7 @@ kvm-y += vm.o
+ kvm-y += intc/ipi.o
+ kvm-y += intc/eiointc.o
+ kvm-y += intc/pch_pic.o
++kvm-y += intc/dintc.o
+ kvm-y += irqfd.o
+ 
+ CFLAGS_exit.o	+= $(call cc-disable-warning, override-init)
+diff --git a/arch/loongarch/kvm/intc/dintc.c b/arch/loongarch/kvm/intc/dintc.c
+new file mode 100644
+index 000000000000..cd6cc9392adc
+--- /dev/null
++++ b/arch/loongarch/kvm/intc/dintc.c
+@@ -0,0 +1,110 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2025 Loongson Technology Corporation Limited
++ */
++
++#include <linux/kvm_host.h>
++#include <asm/kvm_dintc.h>
++#include <asm/kvm_vcpu.h>
++
++static int kvm_dintc_ctrl_access(struct kvm_device *dev,
++				struct kvm_device_attr *attr,
++				bool is_write)
++{
++	int addr = attr->attr;
++	void __user *data;
++	struct loongarch_dintc *s = dev->kvm->arch.dintc;
++	u64 tmp;
++
++	data = (void __user *)attr->addr;
++	switch (addr) {
++	case KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_BASE:
++		if (is_write) {
++			if (copy_from_user(&tmp, data, sizeof(s->msg_addr_base)))
++				return -EFAULT;
++			if (s->msg_addr_base) {
++				/* Duplicate setting are not allowed. */
++				return -EFAULT;
++			}
++			if (tmp > (1UL << AVEC_CPU_SHIFT))
++				s->msg_addr_base = tmp;
++			else
++				return  -EFAULT;
++		}
++		break;
++	case KVM_DEV_LOONGARCH_DINTC_MSG_ADDR_SIZE:
++		if (is_write) {
++			if (copy_from_user(&tmp, data, sizeof(s->msg_addr_size)))
++				return -EFAULT;
++			if (s->msg_addr_size) {
++				/*Duplicate setting are not allowed. */
++				return -EFAULT;
++			}
++			s->msg_addr_size = tmp;
++		}
++		break;
++	default:
++		kvm_err("%s: unknown dintc register, addr = %d\n", __func__, addr);
++		return -ENXIO;
++	}
++
++	return 0;
++}
++
++static int kvm_dintc_set_attr(struct kvm_device *dev,
++			struct kvm_device_attr *attr)
++{
++	switch (attr->group) {
++	case KVM_DEV_LOONGARCH_DINTC_CTRL:
++		return kvm_dintc_ctrl_access(dev, attr, true);
++	default:
++		kvm_err("%s: unknown group (%d)\n", __func__, attr->group);
++		return -EINVAL;
++	}
++}
++
++static int kvm_dintc_create(struct kvm_device *dev, u32 type)
++{
++	struct kvm *kvm;
++	struct loongarch_dintc *s;
++
++	if (!dev) {
++		kvm_err("%s: kvm_device ptr is invalid!\n", __func__);
++		return -EINVAL;
++	}
++
++	kvm = dev->kvm;
++	if (kvm->arch.dintc) {
++		kvm_err("%s: LoongArch DINTC has already been created!\n", __func__);
++		return -EINVAL;
++	}
++
++	s = kzalloc(sizeof(struct loongarch_dintc), GFP_KERNEL);
++	if (!s)
++		return -ENOMEM;
++
++	s->kvm = kvm;
++	kvm->arch.dintc = s;
++	return 0;
++}
++
++static void kvm_dintc_destroy(struct kvm_device *dev)
++{
++
++	if (!dev || !dev->kvm || !dev->kvm->arch.dintc)
++		return;
++
++	kfree(dev->kvm->arch.dintc);
++}
++
++static struct kvm_device_ops kvm_dintc_dev_ops = {
++	.name = "kvm-loongarch-dintc",
++	.create = kvm_dintc_create,
++	.destroy = kvm_dintc_destroy,
++	.set_attr = kvm_dintc_set_attr,
++};
++
++int kvm_loongarch_register_dintc_device(void)
++{
++	return kvm_register_device_ops(&kvm_dintc_dev_ops, KVM_DEV_TYPE_LOONGARCH_DINTC);
++}
+diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+index 80ea63d465b8..d18d9f4d485c 100644
+--- a/arch/loongarch/kvm/main.c
++++ b/arch/loongarch/kvm/main.c
+@@ -408,6 +408,11 @@ static int kvm_loongarch_env_init(void)
+ 
+ 	/* Register LoongArch PCH-PIC interrupt controller interface. */
+ 	ret = kvm_loongarch_register_pch_pic_device();
++	if (ret)
++		return ret;
++
++	/* Register LoongArch DINTC interrupt contrroller interface */
++	ret = kvm_loongarch_register_dintc_device();
+ 
+ 	return ret;
  }
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index dddb781b0507..ebf86a65eef1 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1209,6 +1209,8 @@ enum kvm_device_type {
+ #define KVM_DEV_TYPE_LOONGARCH_EIOINTC	KVM_DEV_TYPE_LOONGARCH_EIOINTC
+ 	KVM_DEV_TYPE_LOONGARCH_PCHPIC,
+ #define KVM_DEV_TYPE_LOONGARCH_PCHPIC	KVM_DEV_TYPE_LOONGARCH_PCHPIC
++	KVM_DEV_TYPE_LOONGARCH_DINTC,
++#define KVM_DEV_TYPE_LOONGARCH_DINTC   KVM_DEV_TYPE_LOONGARCH_DINTC
+ 
+ 	KVM_DEV_TYPE_MAX,
  
 -- 
 2.39.3
