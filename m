@@ -1,177 +1,77 @@
-Return-Path: <kvm+bounces-65455-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65456-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39543CA9D19
-	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 02:13:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 334BACA9DBB
+	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 02:37:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9D5BF302349D
-	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 01:12:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E3B9C327095A
+	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 01:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABA52C15A5;
-	Sat,  6 Dec 2025 01:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378B327A907;
+	Sat,  6 Dec 2025 01:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lodkx/V+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQF2fFHF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03EC285073
-	for <kvm@vger.kernel.org>; Sat,  6 Dec 2025 01:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314F42773C1;
+	Sat,  6 Dec 2025 01:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764983483; cv=none; b=jyoJ1qhgBky55E9zmoJZxR6LCi+hH9TC3Nk4GmPKHbdouYl4Fr4zsWToWrhVeO7pq2kT62SKv3mzbgNwoCEjkM9AOZawCx82+p10ScSu7nm1GU7xxwjeco7k9y5d5L05tck+Q+q2Y7+ryQt80a+qa7hBwqNzHs8I6s0co8Nv+kk=
+	t=1764984242; cv=none; b=Yg8aKcGonBWz7mB6B1BiHt+Xxv47D1TUgm1g3vyJR2wylLX/yblLSwJ//fW3qdX/GHsrpa6PgyP04MWV1AcHBwPV4sn1LzHxdNAon+GtdTjwNpCCpV62bepAaVqd9wzFwWrhsIctx80SOhWoUPaJylECNE2wTz1/ofyVzFuiIFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764983483; c=relaxed/simple;
-	bh=bkTcXhbD0K+GaH8lROgSlwAp7KEAKH17Wyu0+TXtIrs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CauT94yT99TuYIgBeuVrrbuF3gqJ9jKCKnT9wuDwauzPAuDbSCgNUfjXp18ArwutRQ5VOzKL3fiWEc0BzA2yfmkPbzlo1t/qE0idwZ9prGcKmfqCWUq7u+rAqZ+BcHL+e1XDUZyd/1FpWcKoYtPA21j6SLKLKPeEYuNIX3l0b7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lodkx/V+; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3418ad76023so4790295a91.0
-        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 17:11:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764983481; x=1765588281; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=VkOwSpZnzzGFCGAjywqik6ZsByr3pLNa/lziUDNxQoA=;
-        b=lodkx/V+B/DOn30DfIr1aL1Hq8F2dbs8/M5TEUWJMw+Mgdj5ABSjt7nePgtZqwoSyx
-         w2F7tZXrHsDL9O4MDxZ7lWtsEltBbCS7oV+AahT1jzO6Yofz32I9YGhvLtfSkckgKkCX
-         V5xV75qyWSGsEUrOJw2dGGTSw4NhCMTqnp54qIF0Ee8pXcHM+M83xig7l+q2I26clfdy
-         DFu011FY/c4LwtgcCbXKxr5xR/9ojL6mQjGM1uV87g2LFwiQ433lvTmorknsdlsD7HyR
-         TNx/ChM00ROaPYVYwAI2faKHJarbrCOwKElxYxxmyRWtcqtLHDC8jaUNQlDRlFoeLIh/
-         ioDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764983481; x=1765588281;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VkOwSpZnzzGFCGAjywqik6ZsByr3pLNa/lziUDNxQoA=;
-        b=SXSH7oY8cOl1YHdinlTm7mMd2bvVKTA8dAWf4vSefWUMbol2Ohe7TCPzbtTcW+yL49
-         vQSRX+/jWXN6NICIRkm8TZtIVvnuySoi8WgSwC/fz0HI0BrXafWlI5ayfn9IcvtK1yBj
-         kg990QOPWiOoQytDR5ATjDNNOn0v1VPQSfI3PO90ZTmxrSIoZIikmODrPdxzDaXxnHaw
-         dpmUxXG6j+z0TbdVBk/6qSQ87Ms1WqvASHbB7jBWxOSe8F8haX8cgR8DpOt+lkO/BYoZ
-         rla/q6EeYswVfY+cddVGPDuCSbtWPwp4LsUv5Rh+yJLEG/DtCxyCodgod9TtCDS9jXuv
-         swNA==
-X-Forwarded-Encrypted: i=1; AJvYcCXFBUESm9Injwg6AYkS9x9AtinnxflEUKCDEJzNcMxiUb7iR5Rr3AcUYkcP0OgedWZAcgE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYfIpS50538ea4KqIO2GNVntYxIop9yYi93wKd72W193BAYOmo
-	RmC2+nuzp/c1jOn9pF0ekC/4eWpEc55B/Gnk/ubyExV030AP4PsY0c4YXjWrOutuvs28ycBQQw6
-	+kjo/9g==
-X-Google-Smtp-Source: AGHT+IFWR4uQiL6EU4wkVoYXTg3vRHDDsenTnV3mWzHCmctEhaBhx5JH5zxDIa3kq4f+/zZVRo4jq1+s238=
-X-Received: from pjbin12.prod.google.com ([2002:a17:90b:438c:b0:33f:e888:4aad])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ecd:b0:340:a1a8:eb87
- with SMTP id 98e67ed59e1d1-349a260d6b8mr829195a91.35.1764983481038; Fri, 05
- Dec 2025 17:11:21 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  5 Dec 2025 17:10:54 -0800
-In-Reply-To: <20251206011054.494190-1-seanjc@google.com>
+	s=arc-20240116; t=1764984242; c=relaxed/simple;
+	bh=4ALYMcdYVWjJ89muLHhLx9JXWYdCU3S0+p+u5ETg7pc=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=mxBgTeib95f0109RpBB8D86NN5k2AnkF5U6ONCRRyZSxYoefXLwPeR+NV3AIo4jeO2eSZJD7acvlKxvfXudrLiPHoLsFuoESELZ6gLd8d8SJtzwVPeG5HSj5bidz13xA4BcNWzukJiRwrJPVD/dRHp/ZqeSkru3pK9WPjCYw9QQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQF2fFHF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10B4DC116B1;
+	Sat,  6 Dec 2025 01:24:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764984242;
+	bh=4ALYMcdYVWjJ89muLHhLx9JXWYdCU3S0+p+u5ETg7pc=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=gQF2fFHFpMtg901jOMOcnNzhuA4cjZRGcnmNUxh4rN835o8nxlaEfvoQszW/h3rLE
+	 CgPHsQiuL/Ei8A4uvPcO+6kgl9HB9l6i47zvN08VBmJCFN8v28fCDUbXD7jAjiwk6z
+	 iVPeaHLiEyq2K+XzHeOvA06KPRmVSp5lKe9BtHx+heud/Ztrm+e8XCWEjC2Ear//nr
+	 Hsaa49Ri6JctOYMK4jz9SXiPaOIdbZKvK9Npj6PRXUj5qARezKr6/LepqmK7Po21qW
+	 HAANTkEFT4CBQSTTbmDmo8H7/4aqetJEmfXmBB/oAT0SUh2PHtQha/blFyoxancomJ
+	 tNUYiq9Z6qVuQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B5F413808200;
+	Sat,  6 Dec 2025 01:21:00 +0000 (UTC)
+Subject: Re: [GIT PULL] KVM changes for Linux 6.19-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20251204180619.33800-1-pbonzini@redhat.com>
+References: <20251204180619.33800-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20251204180619.33800-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: e0c26d47def7382d7dbd9cad58bc653aed75737a
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 51d90a15fedf8366cb96ef68d0ea2d0bf15417d2
+Message-Id: <176498405947.1907434.6810124774195869303.pr-tracker-bot@kernel.org>
+Date: Sat, 06 Dec 2025 01:20:59 +0000
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251206011054.494190-1-seanjc@google.com>
-X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251206011054.494190-8-seanjc@google.com>
-Subject: [PATCH v2 7/7] KVM: Bury kvm_{en,dis}able_virtualization() in
- kvm_main.c once more
-From: Sean Christopherson <seanjc@google.com>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Kiryl Shutsemau <kas@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev, 
-	kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>, 
-	Dan Williams <dan.j.williams@intel.com>
-Content-Type: text/plain; charset="UTF-8"
 
-Now that TDX handles doing VMXON without KVM's involvement, bury the
-top-level APIs to enable and disable virtualization back in kvm_main.c.
+The pull request you sent on Thu,  4 Dec 2025 19:06:19 +0100:
 
-No functional change intended.
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- include/linux/kvm_host.h |  8 --------
- virt/kvm/kvm_main.c      | 17 +++++++++++++----
- 2 files changed, 13 insertions(+), 12 deletions(-)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/51d90a15fedf8366cb96ef68d0ea2d0bf15417d2
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index a453fe6ce05a..ac9332104793 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2596,12 +2596,4 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
- 				    struct kvm_pre_fault_memory *range);
- #endif
- 
--#ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
--int kvm_enable_virtualization(void);
--void kvm_disable_virtualization(void);
--#else
--static inline int kvm_enable_virtualization(void) { return 0; }
--static inline void kvm_disable_virtualization(void) { }
--#endif
--
- #endif
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 3278ee9381bd..ac2633e9cd80 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1111,6 +1111,9 @@ static inline struct kvm_io_bus *kvm_get_bus_for_destruction(struct kvm *kvm,
- 					 !refcount_read(&kvm->users_count));
- }
- 
-+static int kvm_enable_virtualization(void);
-+static void kvm_disable_virtualization(void);
-+
- static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
- {
- 	struct kvm *kvm = kvm_arch_alloc_vm();
-@@ -5693,7 +5696,7 @@ static struct syscore_ops kvm_syscore_ops = {
- 	.shutdown = kvm_shutdown,
- };
- 
--int kvm_enable_virtualization(void)
-+static int kvm_enable_virtualization(void)
- {
- 	int r;
- 
-@@ -5738,9 +5741,8 @@ int kvm_enable_virtualization(void)
- 	--kvm_usage_count;
- 	return r;
- }
--EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_enable_virtualization);
- 
--void kvm_disable_virtualization(void)
-+static void kvm_disable_virtualization(void)
- {
- 	guard(mutex)(&kvm_usage_lock);
- 
-@@ -5751,7 +5753,6 @@ void kvm_disable_virtualization(void)
- 	cpuhp_remove_state(CPUHP_AP_KVM_ONLINE);
- 	kvm_arch_disable_virtualization();
- }
--EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_disable_virtualization);
- 
- static int kvm_init_virtualization(void)
- {
-@@ -5767,6 +5768,14 @@ static void kvm_uninit_virtualization(void)
- 		kvm_disable_virtualization();
- }
- #else /* CONFIG_KVM_GENERIC_HARDWARE_ENABLING */
-+static int kvm_enable_virtualization(void)
-+{
-+	return 0;
-+}
-+static void kvm_disable_virtualization(void)
-+{
-+
-+}
- static int kvm_init_virtualization(void)
- {
- 	return 0;
+Thank you!
+
 -- 
-2.52.0.223.gf5cc29aaa4-goog
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
