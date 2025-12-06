@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-65431-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65432-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A7E7CA9C03
-	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 01:41:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF33CA9B82
+	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 01:32:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6D44B315E3D7
-	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 00:36:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 31A5832344FA
+	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 00:28:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D3B3081D8;
-	Sat,  6 Dec 2025 00:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4E03090EA;
+	Sat,  6 Dec 2025 00:18:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gPbqaZJy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sj3VHSDj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51C6305068
-	for <kvm@vger.kernel.org>; Sat,  6 Dec 2025 00:18:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891043064B2
+	for <kvm@vger.kernel.org>; Sat,  6 Dec 2025 00:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764980327; cv=none; b=KDkITCUs4C1cPOmLKfnvRdxR5WcuFGw7hAn+aPVedSyzoKZKSDj8cyM6Ex+nO2eGcU1+0w1KtSvt9wrIYkxv1d9bpi4ld5hq5pcRPXZyH3ZjBsyST5+35qKpSBasL+WYLd/KuBMY/0ToN6rot4IEw0KJQzplgyb9ljxXJb5A+XE=
+	t=1764980328; cv=none; b=p1cLdcJOJScyANuu/ghAG3qrll7XlMIByFMRjDqivgAF+3xDtiMarZeNg8cb0O+bcO1jW2DR0pO4/U5OBeKcP19e0Vi/QU6TGyECyo3gcw/m5aaUrfdwxFHf8CUyvHfeAL7r6gOOJWslNxAiScPzYjn7er+D0vat+Hx6V7GHIH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764980327; c=relaxed/simple;
-	bh=NbkrBG3duMpaol6d8oG4nabrvUXIXCsgan8nKAy9HYc=;
+	s=arc-20240116; t=1764980328; c=relaxed/simple;
+	bh=l5LewAY0/XP6khVEVySmdxm/awcqBbBDupO1XKWMwzw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TelNb3R2x3e61h5VdKqb1ZOTB70sfAnGb69MhvQbX0p+pzpqdYiTQmlbXcC237+/N1c7MBjWyfmcsV/rv+6kqtHGRBACfBh8sajhFuGhsUfOFujhDT96lrN+05GxS7pWZ03jHaIejYlAzsbF5Qkw9hX75Ke3LIgRfaTw+LcqWgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gPbqaZJy; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=ZycEWoOkqYxbokUgQqEYY68tDOLnIM5Uv2E/LWXPdQEgwbNWd0joRDBbWlmnCJ8z9J1glakDqcrZzXVsq16HqFa+0UD8bLQfcD5z9g0AFRzVRAvk/DeKxgUcTaR5nsEwxaYfisr2iRH7PLNDSPgoPRnwBJthQhXdG9S0m8LDgcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sj3VHSDj; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7be94e1a073so4966248b3a.2
-        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 16:18:44 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-340c0604e3dso3052646a91.2
+        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 16:18:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764980324; x=1765585124; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1764980326; x=1765585126; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=0alQNA5MnRougM8104k8mY12SAXvJNUdA/VqOuM31LI=;
-        b=gPbqaZJy8VbXYC4ud3kXmQdUa2VIcdS334VR5E5WhizmFlnP6MZar84aPvNckNhtXc
-         TrRt0jmVdvIi+pTxkenCupOe3XE5DThLzOuUNVeod/Gl9JRuZ9wkOrEhBy4ZD3cKsTL9
-         psZKtOdPfmSKVk0om6dvC64o2k8QJJfntq6qemfo2vKrXUDvNIiTEIGKA1b26mMy3BqG
-         PqJh11awL5EPWBQr5AqUP63nnw6TLdWaey/C8m4xPLTd/Ds9AXp64y5f38iCZKRmmvP4
-         tbyjRS24TZRt6hPoLAkqMBCnlr+wRN/AYV/sbiVF/j6m3A8hdlHQJdiYRiUKDIfB8saD
-         R4nw==
+        bh=OETTgwJdKjLOXcIOe9hfqxKY+IkrMGSVX3FLBG1neIA=;
+        b=sj3VHSDjoVOqfHTm75gcjLiZ2g5ImZzrOY+bEHkeUX5GF1e/PnPa7Mag0CMbGlhqJN
+         lbadaBXTOiucejd0oFmg1RbH47IDtn9slLfgCRmv+fl6PcRACsE6DWYqtx38nKBsfRnA
+         pDLn2OcqfiVhfrNmPq6pu9NmxgSQkXlbeXjVJWag2bgkxjV58Lx+5SWSuXGNFlJiSw1X
+         BYpumfnfnUdtwi/h6PwgVFrRbasqDtwYbSK7NbDyP/pQJzdVlPyzwtTsuxw0B5+QdO5E
+         8Ia+cNEbkOiEpsrd3kudpJB7bh4LZNPOPlUMBSVYOiWzXhHOY8l4HyFd27HxLZzGpKeh
+         kEdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764980324; x=1765585124;
+        d=1e100.net; s=20230601; t=1764980326; x=1765585126;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=0alQNA5MnRougM8104k8mY12SAXvJNUdA/VqOuM31LI=;
-        b=HIvhIunboo5ourgKiPeaEjbTbtXLqxzxlHG4wFtEQY1TO93+9QEuVUcxCucYGMfraD
-         znPaSxDRdE/v8TatU6/7I/Ds9FTlLgUaknvZqaYqB2Ui8mMAmzcYxq1+bglliMi7ntNg
-         uM2n3CpU/CtVHIXL6g7hJxdwBljLNWynZe2282sPEG91t3cPpF3soeap8pNRYGv1/mQ4
-         LnCbY2/miJFnC4saufZjtWqlvro87kMZBMv2JMvLMcTjgkmveWnEuXSM8xwfyIwDpUT2
-         r7uDA71b7xkscAUNuX/7nsvOyd2CSI6TXqIPIu1JWQR+wexKcvQwGI/891hhEAB4XTRj
-         IvDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUGGFY/gtzZDhR8M5CzxX+ybziXsnQzqqFCVnkanremeobyYl+IQSDMyqtBG/EpSxerJR4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOBLA7lc/jyFWT2aX0UO2PCI1FZ6V5Py4uwCUUdXh6tnl+4b9i
-	JLNyX3RYIn+3pJbsYjWNS0+8Jf3hJQ3t4aRBEWrIHWdUOZ2WzFVpRYUNG5mjTDxUoNgQfB3iaMC
-	51McGHQ==
-X-Google-Smtp-Source: AGHT+IE9VOcwrfHydwxf79golQ2o2etTa7qJp+DbC2tY99Fupcp+X66ru5yHSbM1504AJSJDzZlYcA1+Jcw=
-X-Received: from pgdc11.prod.google.com ([2002:a05:6a02:510b:b0:bd9:6028:d18c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:4ed2:10b0:361:4ca3:e17d
- with SMTP id adf61e73a8af0-36617e37b3fmr739726637.13.1764980324070; Fri, 05
- Dec 2025 16:18:44 -0800 (PST)
+        bh=OETTgwJdKjLOXcIOe9hfqxKY+IkrMGSVX3FLBG1neIA=;
+        b=A/sLsoA1DSwcC6JqGdQYwbj/xThBzYcNONuyQQfmpOPzj6Jgsesz3PxBe8vSbfo6hL
+         dvHlRWqqj0lN0wNbhXAYNkYGNwEN+yrAFix/MyVi0etb3TQaVOtLTz9rq7MvHtm1Oh8E
+         KASGpWETg22ipXxFolEG3Chlr9WJf5wFBAIVKvY7XPt/fixWco0DGfgp2UWNCQOf0eRw
+         krzy7EyGi5KtBhcJ6Y1M1mzTLYwR4PiLVaaDVCfJKlshSvD7l2SC23nspZ5jhpUrKHJ/
+         UqtONHSzlkcUxkaA1q5+inA1Fbxib4FrOL74DJcnD+AVWs+hFMSeq4u4I4nZFh7R1vv5
+         d8Tw==
+X-Forwarded-Encrypted: i=1; AJvYcCU+qEVY5yyNNP7UzM4+kwMfyArudyqFekXxZgb9i4WlyJKVmcSd93bwS7AuEpHUn/WoD7M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3Hm7OtK7TzfjblGXQVUclh+nixfwGALu7F74YDN3UcVfqpMPT
+	5rx3L0fSaxtRy2tjoa+Y7zMCO7bmlFokrBr6UGV5pkn9jfdCDmlqS3tRaZfGt0bw08uUB8qDZGu
+	2LWNaFQ==
+X-Google-Smtp-Source: AGHT+IEhe1pZpq0MW23HxJ1d0U2ymT/Zcg6wxeHV4r8IvmytRP6tpgYpoHJSoQtNjxepJopTb3+TB9OPRJk=
+X-Received: from pjis4.prod.google.com ([2002:a17:90a:5d04:b0:340:b1b5:eb5e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3ecd:b0:340:f05a:3ec2
+ with SMTP id 98e67ed59e1d1-349a25fb8c0mr658162a91.17.1764980325670; Fri, 05
+ Dec 2025 16:18:45 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  5 Dec 2025 16:17:14 -0800
+Date: Fri,  5 Dec 2025 16:17:15 -0800
 In-Reply-To: <20251206001720.468579-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251206001720.468579-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251206001720.468579-39-seanjc@google.com>
-Subject: [PATCH v6 38/44] KVM: VMX: Drop unused @entry_only param from add_atomic_switch_msr()
+Message-ID: <20251206001720.468579-40-seanjc@google.com>
+Subject: [PATCH v6 39/44] KVM: VMX: Bug the VM if either MSR auto-load list is full
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -94,91 +94,48 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop the "on VM-Enter only" parameter from add_atomic_switch_msr() as it
-is no longer used, and for all intents and purposes was never used.  The
-functionality was added, under embargo, by commit 989e3992d2ec
-("x86/KVM/VMX: Extend add_atomic_switch_msr() to allow VMENTER only MSRs"),
-and then ripped out by commit 2f055947ae5e ("x86/kvm: Drop L1TF MSR list
-approach") just a few commits later.
-
-  2f055947ae5e x86/kvm: Drop L1TF MSR list approach
-  72c6d2db64fa x86/litf: Introduce vmx status variable
-  215af5499d9e cpu/hotplug: Online siblings when SMT control is turned on
-  390d975e0c4e x86/KVM/VMX: Use MSR save list for IA32_FLUSH_CMD if required
-  989e3992d2ec x86/KVM/VMX: Extend add_atomic_switch_msr() to allow VMENTER only MSRs
-
-Furthermore, it's extremely unlikely KVM will ever _need_ to load an MSR
-value via the auto-load lists only on VM-Enter.  MSRs writes via the lists
-aren't optimized in any way, and so the only reason to use the lists
-instead of a WRMSR are for cases where the MSR _must_ be load atomically
-with respect to VM-Enter (and/or VM-Exit).  While one could argue that
-command MSRs, e.g. IA32_FLUSH_CMD, "need" to be done exact at VM-Enter, in
-practice doing such flushes within a few instructons of VM-Enter is more
-than sufficient.
-
-Note, the shortlog and changelog for commit 390d975e0c4e ("x86/KVM/VMX: Use
-MSR save list for IA32_FLUSH_CMD if required") are misleading and wrong.
-That commit added MSR_IA32_FLUSH_CMD to the VM-Enter _load_ list, not the
-VM-Enter save list (which doesn't exist, only VM-Exit has a store/save
-list).
+WARN and bug the VM if either MSR auto-load list is full when adding an
+MSR to the lists, as the set of MSRs that KVM loads via the lists is
+finite and entirely KVM controlled, i.e. overflowing the lists shouldn't
+be possible in a fully released version of KVM.  Terminate the VM as the
+core KVM infrastructure has no insight as to _why_ an MSR is being added
+to the list, and failure to load an MSR on VM-Enter and/or VM-Exit could
+be fatal to the host.  E.g. running the host with a guest-controlled PEBS
+MSR could generate unexpected writes to the DS buffer and crash the host.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a51f66d1b201..38491962b2c1 100644
+index 38491962b2c1..2c50ebf4ff1b 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1094,7 +1094,7 @@ static __always_inline void add_atomic_switch_msr_special(struct vcpu_vmx *vmx,
- }
- 
- static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
--				  u64 guest_val, u64 host_val, bool entry_only)
-+				  u64 guest_val, u64 host_val)
+@@ -1098,6 +1098,7 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
  {
  	int i, j = 0;
  	struct msr_autoload *m = &vmx->msr_autoload;
-@@ -1132,8 +1132,7 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
- 	}
++	struct kvm *kvm = vmx->vcpu.kvm;
  
+ 	switch (msr) {
+ 	case MSR_EFER:
+@@ -1134,12 +1135,10 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
  	i = vmx_find_loadstore_msr_slot(&m->guest, msr);
--	if (!entry_only)
--		j = vmx_find_loadstore_msr_slot(&m->host, msr);
-+	j = vmx_find_loadstore_msr_slot(&m->host, msr);
+ 	j = vmx_find_loadstore_msr_slot(&m->host, msr);
  
- 	if ((i < 0 && m->guest.nr == MAX_NR_LOADSTORE_MSRS) ||
- 	    (j < 0 &&  m->host.nr == MAX_NR_LOADSTORE_MSRS)) {
-@@ -1148,9 +1147,6 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
- 	m->guest.val[i].index = msr;
- 	m->guest.val[i].value = guest_val;
- 
--	if (entry_only)
--		return;
--
- 	if (j < 0) {
- 		j = m->host.nr++;
- 		vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, m->host.nr);
-@@ -1190,8 +1186,7 @@ static bool update_transition_efer(struct vcpu_vmx *vmx)
- 		if (!(guest_efer & EFER_LMA))
- 			guest_efer &= ~EFER_LME;
- 		if (guest_efer != kvm_host.efer)
--			add_atomic_switch_msr(vmx, MSR_EFER,
--					      guest_efer, kvm_host.efer, false);
-+			add_atomic_switch_msr(vmx, MSR_EFER, guest_efer, kvm_host.efer);
- 		else
- 			clear_atomic_switch_msr(vmx, MSR_EFER);
- 		return false;
-@@ -7350,7 +7345,7 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
- 			clear_atomic_switch_msr(vmx, msrs[i].msr);
- 		else
- 			add_atomic_switch_msr(vmx, msrs[i].msr, msrs[i].guest,
--					msrs[i].host, false);
-+					      msrs[i].host);
- }
- 
- static void vmx_update_hv_timer(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+-	if ((i < 0 && m->guest.nr == MAX_NR_LOADSTORE_MSRS) ||
+-	    (j < 0 &&  m->host.nr == MAX_NR_LOADSTORE_MSRS)) {
+-		printk_once(KERN_WARNING "Not enough msr switch entries. "
+-				"Can't add msr %x\n", msr);
++	if (KVM_BUG_ON(i < 0 && m->guest.nr == MAX_NR_LOADSTORE_MSRS, kvm) ||
++	    KVM_BUG_ON(j < 0 &&  m->host.nr == MAX_NR_LOADSTORE_MSRS, kvm))
+ 		return;
+-	}
++
+ 	if (i < 0) {
+ 		i = m->guest.nr++;
+ 		vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, m->guest.nr);
 -- 
 2.52.0.223.gf5cc29aaa4-goog
 
