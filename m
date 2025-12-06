@@ -1,108 +1,164 @@
-Return-Path: <kvm+bounces-65447-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65448-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77154CA9C36
-	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 01:45:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B033CA9D36
+	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 02:15:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DF3E9302E13A
-	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 00:45:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 691BB3082789
+	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 01:11:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F45131A807;
-	Sat,  6 Dec 2025 00:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE3223BF9B;
+	Sat,  6 Dec 2025 01:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qDPc6Aiq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WJf4CXQN"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A750731A06F
-	for <kvm@vger.kernel.org>; Sat,  6 Dec 2025 00:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346B01DFE26
+	for <kvm@vger.kernel.org>; Sat,  6 Dec 2025 01:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764981815; cv=none; b=LLSckq/hsfYaELwsLDWfaep2D5PzfE/p+a+Rr/PCo7J+jMvjn0RcTiLrRZnbhYU1lnvxn0V0ugyBKctGU4sh64LYwwti+Dz782E1m5x0zPvvMhu7/7Eoc7I0pIQyUK2VC5TW0AiDiYV3U9455XPHY+G0M4EH5eoO750fteuYjw4=
+	t=1764983469; cv=none; b=MwEq4Iq1j17s3JKJ1jMsw0YuKvWlr7cgurO84L/HWI0d87Kae/IJNp6E3p2VkNFN+/X6qlnLDbWeY+E4nujw5eS8m2NnLW6vizwgFTheDwh+ftbuEiBBn3Vkjz5I1JSEOPIV7udvSAw8n8qCdPrMHfE01B2EVVvNdzWZOyD2+FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764981815; c=relaxed/simple;
-	bh=PweGGT8dcZgxuINZD4eC15xtjEWtlEQ43EHnvSh8rlk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lhz0KzV8Z9QdiMFQBzQu7gtIUj5ZcfBVcygDGldT8HcsoEJxkDHlA9kp+F0HZEZJlwd0LNoD+iHVlhsPbDbvYcym+1hjSxrl3MXK3lv2puPl0b+G4guiYOfzqpG6a2Q3n8TTz0T4QTZF7aYxcwJKG9nxg1iYFPEWPcxO/gJ/oLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qDPc6Aiq; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1764983469; c=relaxed/simple;
+	bh=ahpjv/o9LrVp9tjCTCe6MlNPXkZFpq6fmTPCM0Tk8Bc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CQ5uUNm93s7n67W2eyU5+bh34vDfDmOLqzVSEAMhYypgikPQo9CquuZOlgrgdpX1ZK0v6AcgMZwMbt0uFKqLL0vu3EQTF1NKikPrxAzo2VGroKccY9H/IuL0PCI0XS0/H/J+simPpQytZTZi33EEgsFfb6XuR25YjpdsSro0n/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WJf4CXQN; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-340d3b1baafso3714381a91.3
-        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 16:43:33 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-343daf0f38aso3058356a91.3
+        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 17:11:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764981813; x=1765586613; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=iwA/2R3/erTvUP5/JcSpQX87XH1JoU7paa3KDPV68VY=;
-        b=qDPc6AiqBsKhp8XvxLYfKlnbI1FMzih3kqr2bgYOLFShA7nnnf0zKIYXhXLFAaBrKA
-         DpjJA9gMHrcu2bjh+o66drac0w4h42QHYls++T+ADIoC3wPiLXRC1vDAB6vENVDTkt4/
-         5eoHkttIOTwdWCUUzm8yF12O8ucA8+p+jkijaSnVCPAH4jnbzM8bBzQpgQ3Z7qdnvMto
-         jc+Shmb3OEq72heedOO48YAGn1jTwJJPJ//JD8qHZstETb1rp9Fx26A4qaNpNIvpx1rb
-         Rl7cGHYR7sDuqsmqugL6/gvYOwhDRMvGh3MFvyiGx2zdz58RBZkBwGJeySYkImr0HGaj
-         1iGQ==
+        d=google.com; s=20230601; t=1764983466; x=1765588266; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V7l6e5405bVH1DspNVosbrsco7TeBvKPRawRHDQ4cDw=;
+        b=WJf4CXQNt5/ot22SCIJVyN+KQECWZdiNgKS08nJnStdQCec/Zb8GMxHISIrwWGBja1
+         rQPV4ftXAb8NETOeGv64VYN9QpIbng7TcQbqXfvC1xcJlcbnywzp4Smz1mQ7EmmXDh72
+         h4y/i/i8aXQXvbMJzeIUxa8AN1PSJCNw0ACe6M6X0C+YB9L4gUAsv4OJWJQUbY+89jpU
+         gp9Wr05z4GZ2Lg/Dn9Mu31QlRG3N+BaXBzHCSC97rHKK6sCa4RBAnxZweZSkcHaOnNYI
+         0y6f+s7PAfRR5LgiY7x6i2Stj/M7oV7lUzX+M7HXlah3EZHeZcBVYobR5GwegRYS9YHq
+         eu0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764981813; x=1765586613;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iwA/2R3/erTvUP5/JcSpQX87XH1JoU7paa3KDPV68VY=;
-        b=O7vorQXFNsyQfksFiBt+JhXZDsKRGWcpHPFbKa/RfIsBzm93D+Q6xlZGvEruYHhy7J
-         8HtVHmKju4fZ6Xsoq4CElJnYipQhlUIMUviWrYoPHsVUFEZ+5uqDVc8MYJH+QvRCYLxP
-         G8+6gRssuiJaKzW+Y4/9XjsFlI+z5I0vql6cFwfS6TdzxFgfabSf2owAWxrFbc24vVPD
-         HhVvvGcahmlKG3aif6I9aZSgqaHjYW12tV1dJPb1b8eB6JtjEpAfA/re0ZWYY8a5bfiU
-         pFaGvzziv8PCSEkhOsRJoeW8sMDdyWxxa71S4qHphmVLhHr7fBzaB1xfAfkQQ5P0dXSn
-         wrKQ==
-X-Gm-Message-State: AOJu0YzQHf9jtyekSIUsPAJOl5UQrQKOgoBmY+ovTDZ7u6roG+Qy6Cf8
-	7OMYZgYPxmcopUU6/e4VZL8/Uc4skE6AhX9amWy4WTiSxDBDKyJcqhSPuNr8HYa4a29KOPm2jNi
-	s3F1Neg==
-X-Google-Smtp-Source: AGHT+IF1wlLw5tKP2MahScWnqNYKosVf7VJShq5yWFU+gWkqFVQfBU7CnHJcvzoWX84E13Jq/9xcqgql1Os=
-X-Received: from pjbhl15.prod.google.com ([2002:a17:90b:134f:b0:340:9a37:91a4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:164d:b0:340:48f2:5e2d
- with SMTP id 98e67ed59e1d1-349a24e3b3emr720458a91.9.1764981812967; Fri, 05
- Dec 2025 16:43:32 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764983466; x=1765588266;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V7l6e5405bVH1DspNVosbrsco7TeBvKPRawRHDQ4cDw=;
+        b=KTM7ueTcQILW+9LnTtiDvWewA8dIqXTN2HxVrtHSAi5NZ8ywkA1kAEz5mmRwSgkTHB
+         E68F65arwsengwwvaSJ/PnY8wl8Eb0+BHDrpg4HhhQSiUbiQuFanu7pwxYCnKRvFwTdg
+         2dyaU9+7l8d6+HUUTgmOZE9ZSgrAPgtdXAiN7Wu3OUWkDZYA4sGHpr/brt/RELk2Z1AF
+         wtsZDioEefDu2Q5EQ8mK9MY0e8neoXFT7UX+/WvFDVIcr24OIv0KARYQTNCnYFla3vmF
+         kxuV09/DKCfU7tLLPLC7hpV/JaJyYSd3gmQF6CpU6meyr/+HSc0WfqKC5/7kHIeTP7zb
+         h/5w==
+X-Forwarded-Encrypted: i=1; AJvYcCXltwFJA65ypgN6sqSJpo75YzzP/jiBJnauVhyQPTSHRh8q1h2RhvIFj+oHVk+e7cVbD7g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+yfRus6pju2G5SKXUJtwAXVyDZnMIA03ZtSnAbDi+RI1LgbP1
+	Ap4e70fCSSGhqEpznsbCMfpHEfktK+Vj9DaH+fx0GOkU7rLR1gsjqiY/iYkRaetC59+T9XFYv6/
+	5G0hIQw==
+X-Google-Smtp-Source: AGHT+IFC7xAn4XWvDZa+DWts2bu6U/q9MiuD8NVhGGMYnj7mARmR4s5Pdj0x5XwVYr8qoFGThh9Rt5tHVUE=
+X-Received: from pjuw7.prod.google.com ([2002:a17:90a:d607:b0:32d:e4c6:7410])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:164d:b0:343:684c:f8ad
+ with SMTP id 98e67ed59e1d1-349a24dd178mr797804a91.4.1764983466486; Fri, 05
+ Dec 2025 17:11:06 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  5 Dec 2025 16:43:11 -0800
-In-Reply-To: <20251206004311.479939-1-seanjc@google.com>
+Date: Fri,  5 Dec 2025 17:10:47 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251206004311.479939-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251206004311.479939-10-seanjc@google.com>
-Subject: [PATCH 9/9] KVM: x86: Hide KVM_IRQCHIP_KERNEL behind CONFIG_KVM_IOAPIC=y
+Message-ID: <20251206011054.494190-1-seanjc@google.com>
+Subject: [PATCH v2 0/7] KVM: x86/tdx: Have TDX handle VMXON during bringup
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Kiryl Shutsemau <kas@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev, 
+	kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>, 
+	Dan Williams <dan.j.williams@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Enumerate KVM_IRQCHIP_KERNEL if and only if support for an in-kernel I/O
-APIC is enabled, as all usage is likewise guarded by CONFIG_KVM_IOAPIC=y.
+The idea here is to extract _only_ VMXON+VMXOFF and EFER.SVME toggling.  AFAIK
+there's no second user of SVM, i.e. no equivalent to TDX, but I wanted to keep
+things as symmetrical as possible.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h | 2 ++
- 1 file changed, 2 insertions(+)
+TDX isn't a hypervisor, and isn't trying to be a hypervisor. Specifically, TDX
+should _never_ have it's own VMCSes (that are visible to the host; the
+TDX-Module has it's own VMCSes to do SEAMCALL/SEAMRET), and so there is simply
+no reason to move that functionality out of KVM.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5a3bfa293e8b..8a979c389bc0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1222,7 +1222,9 @@ struct kvm_xen {
- 
- enum kvm_irqchip_mode {
- 	KVM_IRQCHIP_NONE,
-+#ifdef CONFIG_KVM_IOAPIC
- 	KVM_IRQCHIP_KERNEL,       /* created with KVM_CREATE_IRQCHIP */
-+#endif
- 	KVM_IRQCHIP_SPLIT,        /* created with KVM_CAP_SPLIT_IRQCHIP */
- };
- 
+With that out of the way, dealing with VMXON/VMXOFF and EFER.SVME is a fairly
+simple refcounting game.
+
+Decently tested, and it seems like the core idea is sound, so I dropped the
+RFC.  But the side of things definitely needs testing.
+
+Note, this is based on kvm-x86/next, which doesn't have
+EXPORT_SYMBOL_FOR_KVM(), and so the virt/hw.c exports need to be fixed up.
+I'm sending now instead of waiting for -rc1 because I'm assuming I'll need to
+spin at least v3 anyways :-)
+
+v2:
+ - Initialize the TDX-Module via subsys initcall instead of during
+   tdx_init(). [Rick]
+ - Isolate the __init and __ro_after_init changes. [Rick]
+ - Use ida_is_empty() instead of manually tracking HKID usage. [Dan]
+ - Don't do weird things with the refcounts when virt_rebooting is
+   true. [Chao]
+ - Drop unnecessary setting of virt_rebooting in KVM code. [Chao]
+ - Rework things to have less X86_FEATURE_FOO code. [Rick]
+ - Consolidate the CPU hotplug callbacks. [Chao]
+
+v1 (RFC):
+ - https://lore.kernel.org/all/20251010220403.987927-1-seanjc@google.com
+
+Chao Gao (1):
+  x86/virt/tdx: KVM: Consolidate TDX CPU hotplug handling
+
+Sean Christopherson (6):
+  KVM: x86: Move kvm_rebooting to x86
+  KVM: x86: Extract VMXON and EFER.SVME enablement to kernel
+  KVM: x86/tdx: Do VMXON and TDX-Module initialization during subsys
+    init
+  x86/virt/tdx: Tag a pile of functions as __init, and globals as
+    __ro_after_init
+  x86/virt/tdx: Use ida_is_empty() to detect if any TDs may be running
+  KVM: Bury kvm_{en,dis}able_virtualization() in kvm_main.c once more
+
+ Documentation/arch/x86/tdx.rst              |  26 --
+ arch/x86/events/intel/pt.c                  |   1 -
+ arch/x86/include/asm/kvm_host.h             |   3 +-
+ arch/x86/include/asm/reboot.h               |  11 -
+ arch/x86/include/asm/tdx.h                  |   4 -
+ arch/x86/include/asm/virt.h                 |  26 ++
+ arch/x86/include/asm/vmx.h                  |  11 +
+ arch/x86/kernel/cpu/common.c                |   2 +
+ arch/x86/kernel/crash.c                     |   3 +-
+ arch/x86/kernel/reboot.c                    |  63 +---
+ arch/x86/kernel/smp.c                       |   5 +-
+ arch/x86/kvm/svm/svm.c                      |  34 +-
+ arch/x86/kvm/svm/vmenter.S                  |  10 +-
+ arch/x86/kvm/vmx/tdx.c                      | 209 ++----------
+ arch/x86/kvm/vmx/vmcs.h                     |  11 -
+ arch/x86/kvm/vmx/vmenter.S                  |   2 +-
+ arch/x86/kvm/vmx/vmx.c                      | 127 +-------
+ arch/x86/kvm/x86.c                          |  20 +-
+ arch/x86/virt/Makefile                      |   2 +
+ arch/x86/virt/hw.c                          | 340 ++++++++++++++++++++
+ arch/x86/virt/vmx/tdx/tdx.c                 | 315 ++++++++++--------
+ arch/x86/virt/vmx/tdx/tdx.h                 |   8 -
+ arch/x86/virt/vmx/tdx/tdx_global_metadata.c |  10 +-
+ include/linux/kvm_host.h                    |  10 +-
+ virt/kvm/kvm_main.c                         |  31 +-
+ 25 files changed, 657 insertions(+), 627 deletions(-)
+ create mode 100644 arch/x86/include/asm/virt.h
+ create mode 100644 arch/x86/virt/hw.c
+
+
+base-commit: 5d3e2d9ba9ed68576c70c127e4f7446d896f2af2
 -- 
 2.52.0.223.gf5cc29aaa4-goog
 
