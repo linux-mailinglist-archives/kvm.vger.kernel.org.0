@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-65454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63A1DCA9D4F
-	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 02:17:49 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39543CA9D19
+	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 02:13:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E257F32082EB
-	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 01:12:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9D5BF302349D
+	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 01:12:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E12E28CF7C;
-	Sat,  6 Dec 2025 01:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABA52C15A5;
+	Sat,  6 Dec 2025 01:11:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gp/Cgt9X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lodkx/V+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729EE26E6E1
-	for <kvm@vger.kernel.org>; Sat,  6 Dec 2025 01:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03EC285073
+	for <kvm@vger.kernel.org>; Sat,  6 Dec 2025 01:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764983481; cv=none; b=gpxjE7FTkwXe+d3dmXLheYKBDiatzhZ2NqCslHJoCIbXWpgN0Yj41yCdQ6NVFIw0VX+drUN6++o6eP9D9+6znViimOcsGyLIvn/QIhfzrfJjxkvhXgrzRdi30wUOJ/HL6RAjOo5Y/kiFLN3+fq5/qLlhapGOO+UU36YCiUBjdtI=
+	t=1764983483; cv=none; b=jyoJ1qhgBky55E9zmoJZxR6LCi+hH9TC3Nk4GmPKHbdouYl4Fr4zsWToWrhVeO7pq2kT62SKv3mzbgNwoCEjkM9AOZawCx82+p10ScSu7nm1GU7xxwjeco7k9y5d5L05tck+Q+q2Y7+ryQt80a+qa7hBwqNzHs8I6s0co8Nv+kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764983481; c=relaxed/simple;
-	bh=dD0zdMBxcirbZcOCLQPI4IDX7thvsilC04qKPz4Ct6Y=;
+	s=arc-20240116; t=1764983483; c=relaxed/simple;
+	bh=bkTcXhbD0K+GaH8lROgSlwAp7KEAKH17Wyu0+TXtIrs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=j/OcARz7YIeQYOwh345oBCmrokYUaU6QS7u6G1HsiYvXynl4mWbAwi0lo6SwEx99bkWpLljJhB3K9cU1T7gCFbbnoNDi+O3vIm9HP6+0C1kIy3OqtWuO3p0sLBB9u5g9CpVJR0BlmbS81GJhwJrKkRyI7Qu1VBl6QGC/bOBiIf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gp/Cgt9X; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=CauT94yT99TuYIgBeuVrrbuF3gqJ9jKCKnT9wuDwauzPAuDbSCgNUfjXp18ArwutRQ5VOzKL3fiWEc0BzA2yfmkPbzlo1t/qE0idwZ9prGcKmfqCWUq7u+rAqZ+BcHL+e1XDUZyd/1FpWcKoYtPA21j6SLKLKPeEYuNIX3l0b7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lodkx/V+; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3438744f12fso6721649a91.2
-        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 17:11:19 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3418ad76023so4790295a91.0
+        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 17:11:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764983479; x=1765588279; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1764983481; x=1765588281; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=rVtJBDhchDrLagfgGom7nKilzuyDMEWeeU45x47h0PI=;
-        b=Gp/Cgt9XPNKT3gYaJlFTPCgPX5qxP0Zee1SlEuQ2NP/wIR5QTdhxXgWjqKj3FJZjZ5
-         aevEP9M2jTsduiQFyyaa90J54F5r0XWx3vsK5RItojEvrjXLe9IO/zOe0TijsyaNpzxX
-         lH5HYdRbSS1Ek7xqdRpIz/NfpYNFM19Nantxyd1QwuOUdu79AkRqjEwWCqB4MMMMkN9n
-         9W6C8+z0z49J/k6HZ1Tzh28UNstxNyfzBk+QW+20CjeWlXe2Butuo4xitNzNZxXobJrp
-         1KXjvsj8/tt9jU0tUZx4zskTb4ew5NJNrb+ex0yv7cMcc/0WQN6TvIbMwQmULIPg1GfP
-         4gtQ==
+        bh=VkOwSpZnzzGFCGAjywqik6ZsByr3pLNa/lziUDNxQoA=;
+        b=lodkx/V+B/DOn30DfIr1aL1Hq8F2dbs8/M5TEUWJMw+Mgdj5ABSjt7nePgtZqwoSyx
+         w2F7tZXrHsDL9O4MDxZ7lWtsEltBbCS7oV+AahT1jzO6Yofz32I9YGhvLtfSkckgKkCX
+         V5xV75qyWSGsEUrOJw2dGGTSw4NhCMTqnp54qIF0Ee8pXcHM+M83xig7l+q2I26clfdy
+         DFu011FY/c4LwtgcCbXKxr5xR/9ojL6mQjGM1uV87g2LFwiQ433lvTmorknsdlsD7HyR
+         TNx/ChM00ROaPYVYwAI2faKHJarbrCOwKElxYxxmyRWtcqtLHDC8jaUNQlDRlFoeLIh/
+         ioDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764983479; x=1765588279;
+        d=1e100.net; s=20230601; t=1764983481; x=1765588281;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rVtJBDhchDrLagfgGom7nKilzuyDMEWeeU45x47h0PI=;
-        b=K0RDUnCVjFlyhF6N75WtSupZV+7crcFgt8dih60GoTkYgi1IYGbgNB1Xe3XxC8Nv6t
-         CcFu0dGDKezhEGeAd8Xjc/vdS+5JTYvqTL2r4JnPNOn1f2yTEDI2tZlbsDeIyEPGoX5A
-         YVSjYYcGK3OwZvPO98S2/INKjni1HFV6y6VR4hRb0exFlptPT4GfEg77EoXIGR0lW7pG
-         EJd6sr1Ho25wUUGrjxZMgaVKcQG0nZTlzMy1ll8y1V5mLee/kopYmIJRHDK/5DdaD+xk
-         XgnpnqLM1YNaRp/OoE3FZPmqB3ksXgzaw/200a4aJ7V9WYF7L2QuBOcG2av7DNBr24OK
-         woUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX2p1j6GtAYKoiYqos+XzEjRZoy23yXjf3ac3ERtMTOWZ7m1WQLQ64LifL/sWOYbfwEuog=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWNHd7JPB6tRqIPmbZ5Acp505QOOHL955y2dW3ucrtDRMFoSy8
-	i2ZTx8OduIf3KS9lGn66WvoLI0ADEcql+9ADjNRvqU7TwaXX68dvZGSJ2eu69SBXCNNub/xamKc
-	Pvw4zmQ==
-X-Google-Smtp-Source: AGHT+IERf67I/KSjwUV4VBGzOV5LWpvLTz4kgH2qJZnW3MJYfCI+Tp3EG4cQDFHBfXE9LirgMVmyzwQKLSk=
-X-Received: from pjbfz21.prod.google.com ([2002:a17:90b:255:b0:340:4910:738f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2f08:b0:339:ec9c:b275
- with SMTP id 98e67ed59e1d1-349a253dc8emr794762a91.6.1764983478902; Fri, 05
- Dec 2025 17:11:18 -0800 (PST)
+        bh=VkOwSpZnzzGFCGAjywqik6ZsByr3pLNa/lziUDNxQoA=;
+        b=SXSH7oY8cOl1YHdinlTm7mMd2bvVKTA8dAWf4vSefWUMbol2Ohe7TCPzbtTcW+yL49
+         vQSRX+/jWXN6NICIRkm8TZtIVvnuySoi8WgSwC/fz0HI0BrXafWlI5ayfn9IcvtK1yBj
+         kg990QOPWiOoQytDR5ATjDNNOn0v1VPQSfI3PO90ZTmxrSIoZIikmODrPdxzDaXxnHaw
+         dpmUxXG6j+z0TbdVBk/6qSQ87Ms1WqvASHbB7jBWxOSe8F8haX8cgR8DpOt+lkO/BYoZ
+         rla/q6EeYswVfY+cddVGPDuCSbtWPwp4LsUv5Rh+yJLEG/DtCxyCodgod9TtCDS9jXuv
+         swNA==
+X-Forwarded-Encrypted: i=1; AJvYcCXFBUESm9Injwg6AYkS9x9AtinnxflEUKCDEJzNcMxiUb7iR5Rr3AcUYkcP0OgedWZAcgE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYfIpS50538ea4KqIO2GNVntYxIop9yYi93wKd72W193BAYOmo
+	RmC2+nuzp/c1jOn9pF0ekC/4eWpEc55B/Gnk/ubyExV030AP4PsY0c4YXjWrOutuvs28ycBQQw6
+	+kjo/9g==
+X-Google-Smtp-Source: AGHT+IFWR4uQiL6EU4wkVoYXTg3vRHDDsenTnV3mWzHCmctEhaBhx5JH5zxDIa3kq4f+/zZVRo4jq1+s238=
+X-Received: from pjbin12.prod.google.com ([2002:a17:90b:438c:b0:33f:e888:4aad])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ecd:b0:340:a1a8:eb87
+ with SMTP id 98e67ed59e1d1-349a260d6b8mr829195a91.35.1764983481038; Fri, 05
+ Dec 2025 17:11:21 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  5 Dec 2025 17:10:53 -0800
+Date: Fri,  5 Dec 2025 17:10:54 -0800
 In-Reply-To: <20251206011054.494190-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251206011054.494190-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251206011054.494190-7-seanjc@google.com>
-Subject: [PATCH v2 6/7] x86/virt/tdx: Use ida_is_empty() to detect if any TDs
- may be running
+Message-ID: <20251206011054.494190-8-seanjc@google.com>
+Subject: [PATCH v2 7/7] KVM: Bury kvm_{en,dis}able_virtualization() in
+ kvm_main.c once more
 From: Sean Christopherson <seanjc@google.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -86,63 +86,91 @@ Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
 	Dan Williams <dan.j.williams@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop nr_configured_hkid and instead use ida_is_empty() to detect if any
-HKIDs have been allocated/configured.
+Now that TDX handles doing VMXON without KVM's involvement, bury the
+top-level APIs to enable and disable virtualization back in kvm_main.c.
 
-Suggested-by: Dan Williams <dan.j.williams@intel.com>
+No functional change intended.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 17 ++++-------------
- 1 file changed, 4 insertions(+), 13 deletions(-)
+ include/linux/kvm_host.h |  8 --------
+ virt/kvm/kvm_main.c      | 17 +++++++++++++----
+ 2 files changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 5cf008bffa94..ef77135ec373 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -58,8 +58,6 @@ static LIST_HEAD(tdx_memlist);
- static struct tdx_sys_info tdx_sysinfo __ro_after_init;
- static bool tdx_module_initialized __ro_after_init;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index a453fe6ce05a..ac9332104793 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2596,12 +2596,4 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+ 				    struct kvm_pre_fault_memory *range);
+ #endif
  
--static atomic_t nr_configured_hkid;
+-#ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
+-int kvm_enable_virtualization(void);
+-void kvm_disable_virtualization(void);
+-#else
+-static inline int kvm_enable_virtualization(void) { return 0; }
+-static inline void kvm_disable_virtualization(void) { }
+-#endif
 -
- typedef void (*sc_err_func_t)(u64 fn, u64 err, struct tdx_module_args *args);
- 
- static inline void seamcall_err(u64 fn, u64 err, struct tdx_module_args *args)
-@@ -195,7 +193,7 @@ static int tdx_offline_cpu(unsigned int cpu)
- 	int i;
- 
- 	/* No TD is running.  Allow any cpu to be offline. */
--	if (!atomic_read(&nr_configured_hkid))
-+	if (ida_is_empty(&tdx_guest_keyid_pool))
- 		goto done;
- 
- 	/*
-@@ -1542,22 +1540,15 @@ EXPORT_SYMBOL_GPL(tdx_get_nr_guest_keyids);
- 
- int tdx_guest_keyid_alloc(void)
- {
--	int ret;
--
--	ret = ida_alloc_range(&tdx_guest_keyid_pool, tdx_guest_keyid_start,
--			      tdx_guest_keyid_start + tdx_nr_guest_keyids - 1,
--			      GFP_KERNEL);
--	if (ret >= 0)
--		atomic_inc(&nr_configured_hkid);
--
--	return ret;
-+	return ida_alloc_range(&tdx_guest_keyid_pool, tdx_guest_keyid_start,
-+			       tdx_guest_keyid_start + tdx_nr_guest_keyids - 1,
-+			       GFP_KERNEL);
+ #endif
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 3278ee9381bd..ac2633e9cd80 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1111,6 +1111,9 @@ static inline struct kvm_io_bus *kvm_get_bus_for_destruction(struct kvm *kvm,
+ 					 !refcount_read(&kvm->users_count));
  }
- EXPORT_SYMBOL_GPL(tdx_guest_keyid_alloc);
  
- void tdx_guest_keyid_free(unsigned int keyid)
++static int kvm_enable_virtualization(void);
++static void kvm_disable_virtualization(void);
++
+ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
  {
- 	ida_free(&tdx_guest_keyid_pool, keyid);
--	atomic_dec(&nr_configured_hkid);
- }
- EXPORT_SYMBOL_GPL(tdx_guest_keyid_free);
+ 	struct kvm *kvm = kvm_arch_alloc_vm();
+@@ -5693,7 +5696,7 @@ static struct syscore_ops kvm_syscore_ops = {
+ 	.shutdown = kvm_shutdown,
+ };
  
+-int kvm_enable_virtualization(void)
++static int kvm_enable_virtualization(void)
+ {
+ 	int r;
+ 
+@@ -5738,9 +5741,8 @@ int kvm_enable_virtualization(void)
+ 	--kvm_usage_count;
+ 	return r;
+ }
+-EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_enable_virtualization);
+ 
+-void kvm_disable_virtualization(void)
++static void kvm_disable_virtualization(void)
+ {
+ 	guard(mutex)(&kvm_usage_lock);
+ 
+@@ -5751,7 +5753,6 @@ void kvm_disable_virtualization(void)
+ 	cpuhp_remove_state(CPUHP_AP_KVM_ONLINE);
+ 	kvm_arch_disable_virtualization();
+ }
+-EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_disable_virtualization);
+ 
+ static int kvm_init_virtualization(void)
+ {
+@@ -5767,6 +5768,14 @@ static void kvm_uninit_virtualization(void)
+ 		kvm_disable_virtualization();
+ }
+ #else /* CONFIG_KVM_GENERIC_HARDWARE_ENABLING */
++static int kvm_enable_virtualization(void)
++{
++	return 0;
++}
++static void kvm_disable_virtualization(void)
++{
++
++}
+ static int kvm_init_virtualization(void)
+ {
+ 	return 0;
 -- 
 2.52.0.223.gf5cc29aaa4-goog
 
