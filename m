@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-65426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65427-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1E62CA9BEB
-	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 01:38:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2DCACA9B7F
+	for <lists+kvm@lfdr.de>; Sat, 06 Dec 2025 01:32:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 705E73252B07
-	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 00:33:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC595322EB45
+	for <lists+kvm@lfdr.de>; Sat,  6 Dec 2025 00:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6953016E0;
-	Sat,  6 Dec 2025 00:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C16CC302151;
+	Sat,  6 Dec 2025 00:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WdnciM7a"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=google.com header.i=@google.com header.b="RoABzGP+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A2C3002B6
-	for <kvm@vger.kernel.org>; Sat,  6 Dec 2025 00:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8F62F9C3D
+	for <kvm@vger.kernel.org>; Sat,  6 Dec 2025 00:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764980315; cv=none; b=qVu9YfH4BVo/AQ6Z6W81rTWuug7CBY28tWYW2ToIT92PlDHizxxTj7RW+T5EElbDMET9YDBjwmQwMFZFtm0D+zP0sauxCkAptwXT7F5HE707T2WDOyLzzTwgoNt962K/lwozM+FpjFC3F3XZcksdY7yyKUyzzCMQPA8Foqklbpo=
+	t=1764980317; cv=none; b=VhEGrSHZYHe2vHeZ/pdDqd8EwHj0NP+PbAB35mFSlZJvednE4dWzmFUsJuTqxl5H+XRIC8ee+1ArKWHC/0x4hqXRihe4vxcaW4yrKC/dFbXBV7wlGl55uW9vINTbJUFYziD/mblTGdTBiOEZB+bCdq6bT3XPrqWWWRw2lOaf2NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764980315; c=relaxed/simple;
-	bh=dDJu5oLi1PjxkU6HXADJID7cFgoQLWGm6y/UNcHsMk8=;
+	s=arc-20240116; t=1764980317; c=relaxed/simple;
+	bh=bVIn0sl64UFZr8WJm9qTaFNmU6IY7pnSUpqJCc//7XM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=g+gvdm9x289jMrm8TIj2BDyIhuFHF/7tHYzIyjufpeT3k+ypbFnqyJxsLj+8C+sO7jJDfuDrnOMb7qMsZY5h3NmGqxLfdSdN10L4biKEmoaZCb8jNI2kfc+grB1cg+9KRtpxgwqliPMRFYtsjyHMVhxzkYhc6CUKDXmOaXFWk5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=fail (0-bit key) header.d=google.com header.i=@google.com header.b=WdnciM7a reason="key not found in DNS"; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=A8nVVY+fD7WgcMM3M37rwCa6TOxz1oXIRl04gWPbfL+fBlU1Q8Qnd5tKhmXnY7RkWFrJGSyQwFaJUvPuWu+k89SKiQ26tL4LQ8g4V174zMGDDV8uDVi/KDLj1yCK4UuIEwEjVCHJV0WScjtqEGxO2+mL3Kqc7THGZqUfYaTiqwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RoABzGP+; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340c261fb38so4316383a91.0
-        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 16:18:33 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3418ad76023so4735139a91.0
+        for <kvm@vger.kernel.org>; Fri, 05 Dec 2025 16:18:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764980312; x=1765585112; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1764980315; x=1765585115; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=DfpzWNiupf9oyWVJGMgXVTAvVfysSBzo629ptknGMjs=;
-        b=WdnciM7aRLE3dqITw1ih2vsVwFRX/KgJG/Qi7v3ON6h23DMqPY0LWbZnkNTznwVo6c
-         cKYBtx/JaniY8nr3iIn9PRAsr4lBODlW6jTGYiti5N6FMCpR7jl72zOIrDroLtdNjeXh
-         1dQ7bgKl9EnPV9TMJiaYWrZyBXNKgb/l5S+OeVi5M1DzxS59pn5SHWjpFrM7k03Klrph
-         GzR5oDtGyJho8GxnKG+JY0nptkK+dgWV3qotthyz3zdYF8Yb5qqNIeKeJuMdvJzcggXW
-         OQz01Zgr3OSIDHkExp0HM8HAU8Led5BzStLY6uXuwZqC9d5RkkmnoAmHjxiUk7q7Ei8i
-         kAjg==
+        bh=YVw2IrEv6dj1lN2Egcfs+/+7XHiKcsFRJtntJAtFFMc=;
+        b=RoABzGP+UBpFV9s0OwCFx+9KD0W8YqoEdZ19ykGLLvCGhum4htOXC7WShw581iwNVk
+         +5N9h64+y23pIHG7j244zid9DVpNOAjJoTFbphQTaMmsF1PBPjx7kUuIxa+0VmQpENfj
+         w5CX0WQgY5FumteWOFchGWs6uGuJ0pQmzpecXfqMaMlNmq9hgMNphiH3MK8fxc2Xajlo
+         GnFlAv14CnLjBy20nyZg2ndwMZWYTg/b9JSvWNQHhfS5sO7IBlJHXJGSgXUWUjL8wysr
+         igSDPgQ+W5V7Va4lkVsrXwaNPedaTi3NSvC2yG8yJRA5YfxwG4SS+/mUh8XPQ7k8Tj4e
+         7woA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764980312; x=1765585112;
+        d=1e100.net; s=20230601; t=1764980315; x=1765585115;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DfpzWNiupf9oyWVJGMgXVTAvVfysSBzo629ptknGMjs=;
-        b=ZWpH3TghYXavtocWn7vs2hFZFeTDfN1Z9OxX9hAb/3j4j00k46WsNynI52bsHPMRLK
-         v28ea9wzpGg/qH5vRpkn2NGLJY6OlXMpBKGmzru2Fb8lf8hAlcyKf/bnw7Idk51jyNUr
-         82YhpW4lKvADvs/+6gnvtv5trw/rxPx8Xj+2F79jIMo2H37dGR5ri3MKaRCRx2XpLMPs
-         5j3QW5zJvh2yAoWILKe7oUQ2Ab1mcriRmsD3tguGMpZYIR4V7w5cSwqusfjUKJHJ3Cz4
-         ZY1i9bVK60X3rwVsXPHha2Tymw8FLK8BEJRnejauwmeSjMf23WwQlegHzV7+cUjJw05r
-         0nKA==
-X-Forwarded-Encrypted: i=1; AJvYcCXOHNF3bV4uT/1a3kMnqozZVUwFTEA3bkcgkWzL1YM19beh6K091ydM508N9hAIi2BaHFM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQxIxgigTwK+ShQGSJhbO9+kdwKteRInZlcjBWnbNY+rVGCWBX
-	AbmcmcM7uO3gXmB2k4x+nUCO+MT4qx6OJ6LiGMi17aoyLuevpvcY1bxuLEhl+CbxosRUITUoAUc
-	+wRNBIQ==
-X-Google-Smtp-Source: AGHT+IECzGPhAX0jAKjnbhpxSt8tw9U2yWj2g1X4v/o1b69MxFOOkQezmGTBDbALh6waJ5b9ZWPa3i4t9I0=
-X-Received: from pjbsb13.prod.google.com ([2002:a17:90b:50cd:b0:340:c0e9:24b6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:55c4:b0:341:8adc:76d2
- with SMTP id 98e67ed59e1d1-349a2518ceamr601732a91.16.1764980312307; Fri, 05
- Dec 2025 16:18:32 -0800 (PST)
+        bh=YVw2IrEv6dj1lN2Egcfs+/+7XHiKcsFRJtntJAtFFMc=;
+        b=f0eGCyBoW84DAue3iU/2o4g8oFWpW1btofqRlZbfBJikB83XIK7kHIfTok3YbS73KF
+         wO3Bct8cnJas5d6uZl7OM37wT9BRuJzNAh0ixv6EehjRdD7GNxcKicr1TbiEMipxz+95
+         QSCE1eCQuxxtUuWvhv4w4TetVlKV/qG5Q3Imp0Ko7ispclXikwfMSEJAnz+ZLmedSBmw
+         7JtyM+fnkQ1/SPlB4cVWT4b2RGoSXJmPdkVnCpYgodLyl0c9Rj6vhPsFkVYTWxbr0TZ7
+         B5o8f3evOf0smhKFxVQRWTe+cZ7H21rFggcvLMoFs2+accC6OhgE6AvZjsOQhtI86nDq
+         P/TA==
+X-Forwarded-Encrypted: i=1; AJvYcCWy6rG9j2f0vd2BaC8zvJkPikkj8j41NsN4jgnpcUtrRACln399jS3zTnGSITypdgNoGMI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyCARCFvJS7gARyUl7HXfVdLvyrDfr5ea6DQoT9xx9sl0LRIZ7
+	Mf9d+stfW8KZqPWkfsfUoYxZaX3ckQKxyRw9CIc4UJvM+jQdsmhOLfVF7Lg0sXghFP2c6l5C0Ui
+	tk3lldQ==
+X-Google-Smtp-Source: AGHT+IH5qbAxlC2vbzunodq4KUrEtCHMXaoxZK4q8nETSOlwObwaBJfEq5OV6dsDt0Oyzwdbj6cNRcmYmOA=
+X-Received: from pjbfs2.prod.google.com ([2002:a17:90a:f282:b0:334:1843:ee45])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3ec7:b0:349:9d63:8511
+ with SMTP id 98e67ed59e1d1-349a25e3b79mr670940a91.25.1764980315199; Fri, 05
+ Dec 2025 16:18:35 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  5 Dec 2025 16:17:09 -0800
+Date: Fri,  5 Dec 2025 16:17:10 -0800
 In-Reply-To: <20251206001720.468579-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251206001720.468579-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251206001720.468579-34-seanjc@google.com>
-Subject: [PATCH v6 33/44] KVM: x86/pmu: Expose enable_mediated_pmu parameter
- to user space
+Message-ID: <20251206001720.468579-35-seanjc@google.com>
+Subject: [PATCH v6 34/44] KVM: x86/pmu: Elide WRMSRs when loading guest PMCs
+ if values already match
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -95,119 +95,46 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+When loading a mediated PMU state, elide the WRMSRs to load PMCs with the
+guest's value if the value in hardware already matches the guest's value.
+For the relatively common case where neither the guest nor the host is
+actively using the PMU, i.e. when all/many counters are '0', eliding the
+WRMSRs reduces the latency of handling VM-Exit by a measurable amount
+(WRMSR is significantly more expensive than RDPMC).
 
-Expose enable_mediated_pmu parameter to user space, i.e. allow userspace
-to enable/disable mediated vPMU support.
+As measured by KVM-Unit-Tests' CPUID VM-Exit testcase, this provides a
+a ~25% reduction in latency (4k => 3k cycles) on Intel Emerald Rapids,
+and a ~13% reduction (6.2k => 5.3k cycles) on AMD Turin.
 
-Document the mediated versus perf-based behavior as part of the
-kernel-parameters.txt entry, and opportunistically add an entry for the
-core enable_pmu param as well.
-
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
+Cc: Manali Shukla <manali.shukla@amd.com>
 Tested-by: Xudong Hao <xudong.hao@intel.com>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../admin-guide/kernel-parameters.txt         | 49 +++++++++++++++++++
- arch/x86/kvm/svm/svm.c                        |  2 +
- arch/x86/kvm/vmx/vmx.c                        |  2 +
- 3 files changed, 53 insertions(+)
+ arch/x86/kvm/pmu.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 6c42061ca20e..ed6f2ed94756 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2926,6 +2926,26 @@
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index cb07d9b62bee..fdf1df3100eb 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -1314,13 +1314,15 @@ static void kvm_pmu_load_guest_pmcs(struct kvm_vcpu *vcpu)
+ 	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
+ 		pmc = &pmu->gp_counters[i];
  
- 			Default is Y (on).
+-		wrmsrl(gp_counter_msr(i), pmc->counter);
++		if (pmc->counter != rdpmc(i))
++			wrmsrl(gp_counter_msr(i), pmc->counter);
+ 		wrmsrl(gp_eventsel_msr(i), pmc->eventsel_hw);
+ 	}
+ 	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+ 		pmc = &pmu->fixed_counters[i];
  
-+	kvm.enable_pmu=[KVM,X86]
-+			If enabled, KVM will virtualize PMU functionality based
-+			on the virtual CPU model defined by userspace.  This
-+			can be overridden on a per-VM basis via
-+			KVM_CAP_PMU_CAPABILITY.
-+
-+			If disabled, KVM will not virtualize PMU functionality,
-+			e.g. MSRs, PMCs, PMIs, etc., even if userspace defines
-+			a virtual CPU model that contains PMU assets.
-+
-+			Note, KVM's vPMU support implicitly requires running
-+			with an in-kernel local APIC, e.g. to deliver PMIs to
-+			the guest.  Running without an in-kernel local APIC is
-+			not supported, though KVM will allow such a combination
-+			(with severely degraded functionality).
-+
-+			See also enable_mediated_pmu.
-+
-+			Default is Y (on).
-+
- 	kvm.enable_virt_at_load=[KVM,ARM64,LOONGARCH,MIPS,RISCV,X86]
- 			If enabled, KVM will enable virtualization in hardware
- 			when KVM is loaded, and disable virtualization when KVM
-@@ -2972,6 +2992,35 @@
- 			If the value is 0 (the default), KVM will pick a period based
- 			on the ratio, such that a page is zapped after 1 hour on average.
+-		wrmsrl(fixed_counter_msr(i), pmc->counter);
++		if (pmc->counter != rdpmc(INTEL_PMC_FIXED_RDPMC_BASE | i))
++			wrmsrl(fixed_counter_msr(i), pmc->counter);
+ 	}
+ }
  
-+	kvm-{amd,intel}.enable_mediated_pmu=[KVM,AMD,INTEL]
-+			If enabled, KVM will provide a mediated virtual PMU,
-+			instead of the default perf-based virtual PMU (if
-+			kvm.enable_pmu is true and PMU is enumerated via the
-+			virtual CPU model).
-+
-+			With a perf-based vPMU, KVM operates as a user of perf,
-+			i.e. emulates guest PMU counters using perf events.
-+			KVM-created perf events are managed by perf as regular
-+			(guest-only) events, e.g. are scheduled in/out, contend
-+			for hardware resources, etc.  Using a perf-based vPMU
-+			allows guest and host usage of the PMU to co-exist, but
-+			incurs non-trivial overhead and can result in silently
-+			dropped guest events (due to resource contention).
-+
-+			With a mediated vPMU, hardware PMU state is context
-+			switched around the world switch to/from the guest.
-+			KVM mediates which events the guest can utilize, but
-+			gives the guest direct access to all other PMU assets
-+			when possible (KVM may intercept some accesses if the
-+			virtual CPU model provides a subset of hardware PMU
-+			functionality).  Using a mediated vPMU significantly
-+			reduces PMU virtualization overhead and eliminates lost
-+			guest events, but is mutually exclusive with using perf
-+			to profile KVM guests and adds latency to most VM-Exits
-+			(to context switch PMU state).
-+
-+			Default is N (off).
-+
- 	kvm-amd.nested=	[KVM,AMD] Control nested virtualization feature in
- 			KVM/SVM. Default is 1 (enabled).
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index cbebd3a18918..20fb7c38bf75 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -170,6 +170,8 @@ module_param(intercept_smi, bool, 0444);
- bool vnmi = true;
- module_param(vnmi, bool, 0444);
- 
-+module_param(enable_mediated_pmu, bool, 0444);
-+
- static bool svm_gp_erratum_intercept = true;
- 
- static u8 rsm_ins_bytes[] = "\x0f\xaa";
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f0a20ff2a941..62ba2a2b9e98 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -150,6 +150,8 @@ module_param_named(preemption_timer, enable_preemption_timer, bool, S_IRUGO);
- extern bool __read_mostly allow_smaller_maxphyaddr;
- module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
- 
-+module_param(enable_mediated_pmu, bool, 0444);
-+
- #define KVM_VM_CR0_ALWAYS_OFF (X86_CR0_NW | X86_CR0_CD)
- #define KVM_VM_CR0_ALWAYS_ON_UNRESTRICTED_GUEST X86_CR0_NE
- #define KVM_VM_CR0_ALWAYS_ON				\
 -- 
 2.52.0.223.gf5cc29aaa4-goog
 
