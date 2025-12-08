@@ -1,105 +1,129 @@
-Return-Path: <kvm+bounces-65476-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65477-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE1D4CABEEA
-	for <lists+kvm@lfdr.de>; Mon, 08 Dec 2025 04:11:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EECEFCABFB1
+	for <lists+kvm@lfdr.de>; Mon, 08 Dec 2025 04:48:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 518BF3005092
-	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 03:11:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0DBF030274CF
+	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 03:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A782FC897;
-	Mon,  8 Dec 2025 03:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="hqaPaYjA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7631E24DFF3;
+	Mon,  8 Dec 2025 03:48:34 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBD92853EF;
-	Mon,  8 Dec 2025 03:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF9C8C1F;
+	Mon,  8 Dec 2025 03:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765163506; cv=none; b=fcZB6/va6vPQ9H6L0r1kfRZEn3AW+fbXg5A2V3Eg/mg8Y+U1vwdtVwS2jyJInjzRCqIYVG9m0xm2jc6vCa+fD//9hqvnKzjoda430uOwmH/W75nVKfdzRDwQd2k/yQ/uGPWYPyM7KAzCzgnjr1hcgtHUwB/wuGORJc/7cHKd3FA=
+	t=1765165714; cv=none; b=FsqF+nBeHGnRYpSxmP+Zn1gkLLklWlpB8LDZl1vDu7IaF7B37LQdKHh0ulQ+WFZZbD6SyK1NamDc0BhAzGe2EPGSeo1fSNa7SJ14P9hmIR2gxszOr3D2eBmiykL6/MiuJ80IKGw2RBYZz1Ob2vVPdDpkNpeLJU+SzVMBoIgyMA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765163506; c=relaxed/simple;
-	bh=PWVkiDEC87gkl3WeqYtJOi1H9NKFiIafL6d70O9h9dk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NF7UFh4weqCkFZZK0ky6TqX8dxbJgSjX1SVEV/nsHl706ChVjhgPk+oMauqg66T9c1pAsDbnOx46Ae2MugAkVnm+BU8XLoQnesEULFiPVnCt6lxY10xrW79jBCwXoY0pWMel7lw8MLd3Oa9xCJ0NgplMJPx6yBrTMifObFntzw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=hqaPaYjA; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B7NFkRA217946;
-	Sun, 7 Dec 2025 19:11:33 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=Vd6Iz1i7itJ92zcgMPFF
-	3i5AUH9Px70FcbBba7Gfk6M=; b=hqaPaYjAlt9ijhOTPQmQOTzQj2qeNXJost3q
-	DWaewwUgsDwIXC70YkMc5vZywxyQN0xQD86SElBn4yASIJ8WF57OIOUvVH6QJ1x7
-	Vl/SDrGoD9IngZwCcS6Cxxp52ACtYW2WQHLtPAxnhgaw/m/kY2LlZc25fgks8YR3
-	gm/RDHmQ9Su5vI0mbZJ5ilGszdfwRPGbEjiCZDJaueckzMrSPUoh7902mxi6pj7o
-	+MBNXQEodgp/gc9RrzVNUlj4+pbHwGAtx+FTgBk2jnvau3lpocBy5nOEL981sz+g
-	JJI3ORqZpPjkk0q04u0KWOfhzWkMdvj+vFAJ52/rP5VMe5aiFA==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4avhd5784v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Sun, 07 Dec 2025 19:11:32 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c0a8:1b::30) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Mon, 8 Dec 2025 03:11:30 +0000
-Date: Sun, 7 Dec 2025 19:11:25 -0800
-From: Alex Mastro <amastro@fb.com>
-To: Peter Xu <peterx@redhat.com>
-CC: <kvm@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-kernel@vger.kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
-        Nico Pache
-	<npache@redhat.com>, Zi Yan <ziy@nvidia.com>,
-        David Hildenbrand
-	<david@redhat.com>,
-        Alex Williamson <alex@shazbot.org>, Zhi Wang
-	<zhiw@nvidia.com>,
-        David Laight <david.laight.linux@gmail.com>,
-        Yi Liu
-	<yi.l.liu@intel.com>, Ankit Agrawal <ankita@nvidia.com>,
-        Kevin Tian
-	<kevin.tian@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v2 4/4] vfio-pci: Best-effort huge pfnmaps with
- !MAP_FIXED mappings
-Message-ID: <aTZB3VFArpJJMKMN@devgpu015.cco6.facebook.com>
-References: <20251204151003.171039-1-peterx@redhat.com>
- <20251204151003.171039-5-peterx@redhat.com>
+	s=arc-20240116; t=1765165714; c=relaxed/simple;
+	bh=nCRj2GBnUGFZOywSBOroAQamrdEwQ1IGFW62r5tyLvE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=IM1Gn/j4Jt+Cs6G/z0LkPUhFBTfhJlShDSWgp7Wz4t2k54/TCGUDZmtMm7uc0T29H+nTiiX5KGQ3tYxtvOG24YRgBMlHGWY2dlEGvpQVLg5bEJeHNe80Phv9yreTfGPzRW+x8aoUBe2YRBVuM6KLk6xfTPjLlaySMXwxsTPFG5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Dxb_CFSjZpricsAA--.30613S3;
+	Mon, 08 Dec 2025 11:48:21 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJDxqcCDSjZpYuVGAQ--.34286S3;
+	Mon, 08 Dec 2025 11:48:21 +0800 (CST)
+Subject: Re: [PATCH v3 1/4] LongArch: KVM: Add some maccros for AVEC
+To: Song Gao <gaosong@loongson.cn>, chenhuacai@kernel.org
+Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev, kernel@xen0n.name,
+ linux-kernel@vger.kernel.org, lixianglai@loongson.cn
+References: <20251206064658.714100-1-gaosong@loongson.cn>
+ <20251206064658.714100-2-gaosong@loongson.cn>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <894a4c72-af10-2662-1c31-f008a0d7d2f2@loongson.cn>
+Date: Mon, 8 Dec 2025 11:45:49 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251204151003.171039-5-peterx@redhat.com>
-X-Authority-Analysis: v=2.4 cv=ZIPaWH7b c=1 sm=1 tr=0 ts=693641e4 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=cCa_CVtDXYSc011Sr6sA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: i1OkR2zPIMdJjvRRdpVqF_xjZi1juKv5
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjA4MDAyNSBTYWx0ZWRfX5nK+Tc/ZJJsi
- QhadGeGPvSVp4T22yoZpnRWgwVPvXIObvTMLv/q5HpmzEZ9aAbwzhIqHBWCp/QIGaBmDfuJref1
- M6e9US7i0Zap/5ba16bT8drdORPBRsp/ijkfkWcc5kVe+sQuSyp7A2LKKuSfwpcSCuVawQq5MCa
- cwnUKALCjyJ+dSlOXUDnI0/jANwfFjarErArnOQO+TLf/kOmDc7ARoHladPfiZz9rdvpcCR0lGM
- lvnPrmVJVz7jIL8OOrcfy903DNdunbEWn4fshx8Rmr/ZQElJ2wr4+QiixNQwJlbQizQVabQdg64
- giEypRJBLACssjRlqeyqwLJxcAO8c5eg5pui/UiNtIPW1Cq0pRmmM5URPCRLBA+7C8j680Pqthb
- GPfaVMG4dr5wOYy0nxktuOJmRrneUQ==
-X-Proofpoint-ORIG-GUID: i1OkR2zPIMdJjvRRdpVqF_xjZi1juKv5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-06_02,2025-12-04_04,2025-10-01_01
+In-Reply-To: <20251206064658.714100-2-gaosong@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJDxqcCDSjZpYuVGAQ--.34286S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW7Zr4xZFWDZw1DAw1kKF1kXrc_yoW8uF48pF
+	ZrAFZYgr48KryxJw43tws0vr13Aws7Gr42ga4jgFyavr98Ww1kWr18K3s3ZFy0gan7Gaya
+	qr1FqFy3Wan8twcCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
+	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE
+	14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
+	AE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8C
+	rVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtw
+	CIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x02
+	67AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr
+	0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUrNtx
+	DUUUU
 
-On Thu, Dec 04, 2025 at 10:10:03AM -0500, Peter Xu wrote:
-> To achieve that, a custom vfio_device's get_mapping_hint() for vfio-pci
-> devices is needed.
 
-nit get_mapping_order() 
+
+On 2025/12/6 下午2:46, Song Gao wrote:
+> Add some maccros for AVEC interrupt controller, so the dintc can use
+> those maccros.
+> 
+> Signed-off-by: Song Gao <gaosong@loongson.cn>
+> ---
+>   arch/loongarch/include/asm/irq.h     | 8 ++++++++
+>   drivers/irqchip/irq-loongarch-avec.c | 5 +++--
+>   2 files changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/loongarch/include/asm/irq.h b/arch/loongarch/include/asm/irq.h
+> index 12bd15578c33..aaa022fcb9e3 100644
+> --- a/arch/loongarch/include/asm/irq.h
+> +++ b/arch/loongarch/include/asm/irq.h
+> @@ -50,6 +50,14 @@ void spurious_interrupt(void);
+>   #define NR_LEGACY_VECTORS	16
+>   #define IRQ_MATRIX_BITS		NR_VECTORS
+>   
+> +#define AVEC_VIRQ_SHIFT		4
+> +#define AVEC_VIRQ_BIT		8
+> +#define AVEC_VIRQ_MASK		GENMASK(AVEC_VIRQ_BIT - 1, 0)
+> +#define AVEC_CPU_SHIFT		12
+(AVEC_VIRQ_SHIFT + AVEC_VIRQ_BIT) compared with hard coded 12 ?
+
+> +#define AVEC_CPU_BIT		16
+> +#define AVEC_CPU_MASK		GENMASK(AVEC_CPU_BIT - 1, 0)
+> +
+> +
+one more unnecessary space line, otherwise it looks good to me.
+
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+>   #define arch_trigger_cpumask_backtrace arch_trigger_cpumask_backtrace
+>   void arch_trigger_cpumask_backtrace(const struct cpumask *mask, int exclude_cpu);
+>   
+> diff --git a/drivers/irqchip/irq-loongarch-avec.c b/drivers/irqchip/irq-loongarch-avec.c
+> index bf52dc8345f5..f0118cfd4363 100644
+> --- a/drivers/irqchip/irq-loongarch-avec.c
+> +++ b/drivers/irqchip/irq-loongarch-avec.c
+> @@ -209,8 +209,9 @@ static void avecintc_compose_msi_msg(struct irq_data *d, struct msi_msg *msg)
+>   	struct avecintc_data *adata = irq_data_get_irq_chip_data(d);
+>   
+>   	msg->address_hi = 0x0;
+> -	msg->address_lo = (loongarch_avec.msi_base_addr | (adata->vec & 0xff) << 4)
+> -			  | ((cpu_logical_map(adata->cpu & 0xffff)) << 12);
+> +	msg->address_lo = (loongarch_avec.msi_base_addr |
+> +			(adata->vec & AVEC_VIRQ_MASK) << AVEC_VIRQ_SHIFT) |
+> +			((cpu_logical_map(adata->cpu & AVEC_CPU_MASK)) << AVEC_CPU_SHIFT);
+>   	msg->data = 0x0;
+>   }
+>   
+> 
+
 
