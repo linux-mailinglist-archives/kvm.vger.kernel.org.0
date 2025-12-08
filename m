@@ -1,141 +1,267 @@
-Return-Path: <kvm+bounces-65514-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65513-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30867CAE501
-	for <lists+kvm@lfdr.de>; Mon, 08 Dec 2025 23:20:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01330CAE4AC
+	for <lists+kvm@lfdr.de>; Mon, 08 Dec 2025 23:11:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A749E300C527
-	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 22:20:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0804430BBA79
+	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 22:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34C22EA156;
-	Mon,  8 Dec 2025 22:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7462E54A1;
+	Mon,  8 Dec 2025 22:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZTf5L65X"
 X-Original-To: kvm@vger.kernel.org
-Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010034.outbound.protection.outlook.com [40.93.198.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B3C22A7E4;
-	Mon,  8 Dec 2025 22:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765232406; cv=none; b=j8AG5iMkL9brDOmCauGyYS2EhwlrPh7PxsoUwBuECACOEmafW84+B8lEgqPhbhSnjjCmJDPauM44M4U68WqdmIKE/XXWen4Ggsg86JIPVWwVkz6V4QaE6ttEPkZM0MlX9M5GrrZEH1K7XGgREbOwSqfsRNxvEEc2sspHMnUJYyk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765232406; c=relaxed/simple;
-	bh=oTaYZImrLezcosMsMcaD9A0RqpBM2fF9nmvY886XfmE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JPi1231JsBY3OipO/d+rP/3ohInOntmOnduw7mqs3Y5iRFsNfKw5XPxEgCFmHGzQxQf98KE0+JzmS/pe7WfI31oNU79gX9gpgYbRMRjIcRN1Cgq5GeVfunHWt6XkoUt4VprFnNy+ZwSFrhHJMUtE5GX5ZIOqymZroTXBpVgvvfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
-Received: from MUA
-	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.98.2)
-	(envelope-from <mhej@vps-ovh.mhejs.net>)
-	id 1vSiWU-0000000574w-40Zk;
-	Mon, 08 Dec 2025 22:11:58 +0100
-Message-ID: <83f2685c-c683-4b6c-8af4-ca450a34fe51@maciej.szmigiero.name>
-Date: Mon, 8 Dec 2025 22:11:53 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10AD72E3B15
+	for <kvm@vger.kernel.org>; Mon,  8 Dec 2025 22:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.34
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765231780; cv=fail; b=ZnmmZzPyDe3DRyxcreHCeaF/tQg0YxIXqXs7mb2BkZ/MnacEDJKb8OkBA2mvJY/dBIAzRaHK2/6aMl3r/L9dSlO2tM9yBRZFhJDiSIRI/geah6kCm0KB02CDT+0mkVrZytC4kba9QvmqSXxpy07XCpa7S/iMTIAmVPYmdV/chgc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765231780; c=relaxed/simple;
+	bh=MEbBxmUoXNnj8I+fkEsS1E6h5/op8IAm4vue6CGZRc4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i2i24ZYjXFLZfqWHsr9GR9FlalGYNVE+r1NhseYTO+FEGHvlxnvY1OH2/HewM5Xmi7tinVgc9aUVHgu9EBIEjW0l0tbH1F0IQ519xvaiAFQv3m91sn0UdaWckDp04kmKZ4zFjppcmyuNAWa1xySEBz9pWBHlevpLPEtcgfszF/Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZTf5L65X; arc=fail smtp.client-ip=40.93.198.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JlWIUdvfH50B5wdHijKV9smkr8Dki005p9OB3peGkPa8BlYg6Zvmev6oTf+t54C0xGXstEyuWMHlFpXEj4+nxCcNTCAN+BtsNM/KBJw95xhVyG89vOAutJmCG04QjJ7sBjtrtVyy9HqZbcUaU9g68JTZy9BqwDOPzx8+lum7ou8KWbBVQIVB3/xWk/MQ9+373iyR8FkEVwnjRoAgrNmAlpquPkCZyW7C4Wn7hQvht1UndgrlT392o2Q440os/8DTGb6UZHzEEFfEpCNuXE0up1jdeMlRhJcum8N/NbB3aZfB+eU9MXtP7TIm99KcDKGpuya1+EiLaTmqEA9EelJ/Eg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H1Kk+0GWk1XzyEPpxyQZUVTiWRp2++zF0+PW1XUHpRs=;
+ b=AIqriOhLTtlu0q7aHhFH+fDIdFyH3BFAopjsIFLg0LMAVhNc6cNI/llmIjNrMnN1Eytp0BU6K7Bj9dYtJrDgjcETAUVr6xUkqpHBvCCvpL7inccfhVz9pI7O2ttwVtGEatA3oopwnktNokoCn0rMcxP5AvlgvilCb7WQPl8tyQt5L40GkvOeQz0hhe0hexLe2CviAz2ZkCtUGYjSwnvpwsD63qHgp7uXJxdT6Y5KcCU/cM7x+700Qb3nQoDdYjtnEbSiTGUOunBY8Sw2M9M0/+xo8UOZCx2hDgEewjMOmm4UKQPS4cxIy4Qlih+u5uqcZZ9drjLcpVVgGPr26G5gpw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H1Kk+0GWk1XzyEPpxyQZUVTiWRp2++zF0+PW1XUHpRs=;
+ b=ZTf5L65X7KaLOooI/hfN81o+h9Hld1kW1o59ugclTrpqvKmuW9VTs8CXdlywGc9p+EYBT1w0gca/Zn7YJqKkIyOzoDWcYuKEZe77Z3Fjj36LDKoP26d/zVzlocPSr5M8Wd0PvAUTBFpLpzJEYTXJEXnDE35JiZm/hBpjSXap5hG1GpvU6LfNsgQL6N7F1kXRlIOA+iHIJXwuAhw38+ZpfkVFgwojS88BFFEoitcvJb23NP7xcTOeUHGaQCX4iq7HRwksZ72Q/M3hVrJS9S15nSKoe7YkXiN4UZ2JT42/vM6/DUiWoDTAYTvyaM8rekzogM9LEpMXcbb13ABbRc2xYg==
+Received: from PH0PR07CA0075.namprd07.prod.outlook.com (2603:10b6:510:f::20)
+ by DS7PR12MB8420.namprd12.prod.outlook.com (2603:10b6:8:e9::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.14; Mon, 8 Dec
+ 2025 22:09:31 +0000
+Received: from CY4PEPF0000EDD6.namprd03.prod.outlook.com
+ (2603:10b6:510:f:cafe::63) by PH0PR07CA0075.outlook.office365.com
+ (2603:10b6:510:f::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9388.14 via Frontend Transport; Mon,
+ 8 Dec 2025 22:08:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000EDD6.mail.protection.outlook.com (10.167.241.202) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9388.8 via Frontend Transport; Mon, 8 Dec 2025 22:09:30 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 8 Dec
+ 2025 14:09:12 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 8 Dec
+ 2025 14:09:12 -0800
+Received: from r-arch-stor03.mtr.nbulabs.nvidia.com (10.127.8.14) by
+ mail.nvidia.com (10.129.68.7) with Microsoft SMTP Server id 15.2.2562.20 via
+ Frontend Transport; Mon, 8 Dec 2025 14:09:09 -0800
+From: Max Gurtovoy <mgurtovoy@nvidia.com>
+To: <mst@redhat.com>, <stefanha@redhat.com>, <sgarzare@redhat.com>,
+	<virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>
+CC: <oren@nvidia.com>, <aevdaev@nvidia.com>, <aaptel@nvidia.com>, Max Gurtovoy
+	<mgurtovoy@nvidia.com>
+Subject: [PATCH v2 1/1] virtio: add driver_override support
+Date: Tue, 9 Dec 2025 00:09:08 +0200
+Message-ID: <20251208220908.9250-1-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.18.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] KVM: selftests: Test TPR / CR8 sync and interrupt
- masking
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- linux-kernel@vger.kernel.org, Naveen N Rao <naveen@kernel.org>
-References: <20251205224937.428122-1-seanjc@google.com>
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Content-Language: en-US, pl-PL
-Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
- 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
-Disposition-Notification-To: "Maciej S. Szmigiero"
- <mail@maciej.szmigiero.name>
-In-Reply-To: <20251205224937.428122-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Sender: mhej@vps-ovh.mhejs.net
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD6:EE_|DS7PR12MB8420:EE_
+X-MS-Office365-Filtering-Correlation-Id: 22045151-f8c3-4e6f-7d98-08de36a6764e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?jtK2El3EoEL9tw5FhVi5LBOmzA25GgQGy0AUkO5lU8iOjRgbxfWP8WSzHnzU?=
+ =?us-ascii?Q?zojySzGn72p0EkSSrGtROpgh0s7waz6voRp2vHewKvqfXi9uwmtYR/cwP4cI?=
+ =?us-ascii?Q?5Kw5vxE6eUzbrIjaZs7uv6PibWsMsHCfSizc2CJlALfcB6+faSGWjx3BbaMx?=
+ =?us-ascii?Q?r2vn5SFsWvXl6RLhOyWb/PCTYk9b8viLWEYM8vveiD9SYmwPREUMdOMOrawJ?=
+ =?us-ascii?Q?s25rYMhoTdw1dsG11AY4efcr8sQzvZN3MTjDohmZKN/3f72k9PmDu52HAx05?=
+ =?us-ascii?Q?+uivYgQV4DMB3QVvIGyUE3+RX1+Rzh7A02IqvMc7jfwIRNdSZgX9AxoNGeGH?=
+ =?us-ascii?Q?/0m2R/nXz9yvuS+H6uRqWsQc/NlDV1Vavf9ZthUpoirm4OWIoS0MpDURstGK?=
+ =?us-ascii?Q?d6wirvZ1EnKQ6vBxEzE3nMlakJ7xDHcfbIeMs99zcBP19H9eBMdNklWgK4K+?=
+ =?us-ascii?Q?8Ytf/VrIPVKmsvok5Qo5bmzezTAfRn2QSA6izyYQS/XtJqpheTvV9xqJUl1u?=
+ =?us-ascii?Q?fRWlL/aK76Mf1ZuISKjOhVzHYtgU6AFv2tN3tuI33A1BUgl2kf+kneQcB4NU?=
+ =?us-ascii?Q?A79G2ld6zsLPqpkPo7ZhkOwnTXCbhhx7ORs4bGBmG2+KVwa5XZTsxo/CGIqb?=
+ =?us-ascii?Q?btrv6OnbdMFRlvrWiBAglEolpjGPtbnk7ZHsFM//3GadJ7eWS2bGE1lRnnph?=
+ =?us-ascii?Q?49EkldhhJUGhYPFa8peqkASQFUpA8PCodQj4KMQhTWVkNGZHQGfb3P3UtFfq?=
+ =?us-ascii?Q?IVQZpc3A0wOinjuZwXgtUGUK17xVaRI3FK4EL0LKB4HkRVrdT+5nnalZXQ/9?=
+ =?us-ascii?Q?icVjBZEsYW6re367xRJP1TdUiAAD+DgAGgOE9JejqwSo08BbcNpg82dQ0KrW?=
+ =?us-ascii?Q?ijBHNLg2jQTaz98UNCpu4m2jph1s/5nq513qskEo8T9a8Q8zIvsakLoGNWdB?=
+ =?us-ascii?Q?HTdYeek7uoqKWiE5A4Yu4KYgHcXhk+2KFsP0275E5gHgzVc1M3QKrE34nUqk?=
+ =?us-ascii?Q?EkzuDKQRb2v8EsVuox5tTQ9hkvvlCIyqNYuVQFtJ4ofj9lUMdWTHKR50SIUA?=
+ =?us-ascii?Q?2phcJNwN+ikpaQC/c+UgD48FwjLTSShi79QfIJLHXKYX37wigrsIhYF9e72A?=
+ =?us-ascii?Q?6Y+/dHHY3jJcL40Zgvewsk+pCCARIkISveTJqC3bJX6C1oUHOs4ozUzcGGWm?=
+ =?us-ascii?Q?MVRzXiAMaQgL1wj+VmmxuV6XoGyHV/nWxi8DE9ZXC0RiqHB+sNWJuy2/4u8R?=
+ =?us-ascii?Q?3+ICVI3cn6eof7ALwB6zZYmgPFjiWfa69xvkqYhbuBS9murByVs13HjAIWmC?=
+ =?us-ascii?Q?gnvFW7G1zq8B9nf9mL/bi4g6vles/m5VAT3T40ncetGMbDPKDMfUX4IwMO8R?=
+ =?us-ascii?Q?3vFGvdSFZIkAcxgfPkxOI4M6WlpxAGN4hLrJbVVjpNxd2eye8+wPkBPXm5t3?=
+ =?us-ascii?Q?kKqm9j8xNrFx0r69v2qN4H5PL+mox6i1Iex9ltCq1dXisDMazzE0SiDFXzQS?=
+ =?us-ascii?Q?yg/J0VlP7/+lBs6PPoh2beK6J8j6PORpDqlmMLh6EzpAtMf2NcSkx3lBvZuh?=
+ =?us-ascii?Q?SKkD6ELOoADFQf/odgU=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2025 22:09:30.9358
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22045151-f8c3-4e6f-7d98-08de36a6764e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EDD6.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8420
 
-On 5.12.2025 23:49, Sean Christopherson wrote:
-> From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> 
-> Add a few extra TPR / CR8 tests to x86's xapic_state_test to see if:
->    * TPR is 0 on reset,
->    * TPR, PPR and CR8 are equal inside the guest,
->    * TPR and CR8 read equal by the host after a VMExit
->    * TPR borderline values set by the host correctly mask interrupts in the
->      guest.
-> 
-> These hopefully will catch the most obvious cases of improper TPR sync or
-> interrupt masking.
-> 
-> Do these tests both in x2APIC and xAPIC modes.
-> The x2APIC mode uses SELF_IPI register to trigger interrupts to give it a
-> bit of exercise too.
-> 
-> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> Acked-by: Naveen N Rao (AMD) <naveen@kernel.org>
-> [sean: put code in separate test]
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-> 
-> Maciej's TPR test.  The only change relative to v3 (well, the only intended
-> change :-D) is to move the testcase to its own test.  IMO, it's cleaner for
-> both this test and the existing xapic_state_test (which I plan on splitting
-> up at some point).
-> 
-Thanks Sean for the updated test.
+Add support for the 'driver_override' attribute to Virtio devices. This
+allows users to control which Virtio bus driver binds to a given Virtio
+device.
 
-I see that besides the TPR testcase being separated into its own test some
-things were renamed and also GUEST_SYNC() parameter meaning was inverted.
+If 'driver_override' is not set, the existing behavior is preserved and
+devices will continue to auto-bind to the first matching Virtio bus
+driver.
 
-Anyway, I re-tested the separated test (including on a kernel that's un-fixed
-with respect to the AVIC TPR sync to make it fail) and the test still seems
-to do its job properly.
+Tested with virtio blk device (virtio core and pci drivers are loaded):
 
-Thanks,
-Maciej
+  $ modprobe my_virtio_blk
+
+  # automatically unbind from virtio_blk driver and override + bind to
+  # my_virtio_blk driver.
+  $ driverctl -v -b virtio set-override virtio0 my_virtio_blk
+
+In addition, driverctl saves the configuration persistently under
+/etc/driverctl.d/.
+
+Signed-off-by: Avraham Evdaev <aevdaev@nvidia.com>
+Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+---
+
+changes from v1:
+ - use !strcmp() to compare strings (MST)
+ - extend commit msg with example (MST)
+
+---
+ drivers/virtio/virtio.c | 34 ++++++++++++++++++++++++++++++++++
+ include/linux/virtio.h  |  4 ++++
+ 2 files changed, 38 insertions(+)
+
+diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+index a09eb4d62f82..993dc928be49 100644
+--- a/drivers/virtio/virtio.c
++++ b/drivers/virtio/virtio.c
+@@ -61,12 +61,41 @@ static ssize_t features_show(struct device *_d,
+ }
+ static DEVICE_ATTR_RO(features);
+ 
++static ssize_t driver_override_store(struct device *_d,
++				     struct device_attribute *attr,
++				     const char *buf, size_t count)
++{
++	struct virtio_device *dev = dev_to_virtio(_d);
++	int ret;
++
++	ret = driver_set_override(_d, &dev->driver_override, buf, count);
++	if (ret)
++		return ret;
++
++	return count;
++}
++
++static ssize_t driver_override_show(struct device *_d,
++				    struct device_attribute *attr, char *buf)
++{
++	struct virtio_device *dev = dev_to_virtio(_d);
++	ssize_t len;
++
++	device_lock(_d);
++	len = sysfs_emit(buf, "%s\n", dev->driver_override);
++	device_unlock(_d);
++
++	return len;
++}
++static DEVICE_ATTR_RW(driver_override);
++
+ static struct attribute *virtio_dev_attrs[] = {
+ 	&dev_attr_device.attr,
+ 	&dev_attr_vendor.attr,
+ 	&dev_attr_status.attr,
+ 	&dev_attr_modalias.attr,
+ 	&dev_attr_features.attr,
++	&dev_attr_driver_override.attr,
+ 	NULL,
+ };
+ ATTRIBUTE_GROUPS(virtio_dev);
+@@ -88,6 +117,10 @@ static int virtio_dev_match(struct device *_dv, const struct device_driver *_dr)
+ 	struct virtio_device *dev = dev_to_virtio(_dv);
+ 	const struct virtio_device_id *ids;
+ 
++	/* Check override first, and if set, only use the named driver */
++	if (dev->driver_override)
++		return !strcmp(dev->driver_override, _dr->name);
++
+ 	ids = drv_to_virtio(_dr)->id_table;
+ 	for (i = 0; ids[i].device; i++)
+ 		if (virtio_id_match(dev, &ids[i]))
+@@ -582,6 +615,7 @@ void unregister_virtio_device(struct virtio_device *dev)
+ {
+ 	int index = dev->index; /* save for after device release */
+ 
++	kfree(dev->driver_override);
+ 	device_unregister(&dev->dev);
+ 	virtio_debug_device_exit(dev);
+ 	ida_free(&virtio_index_ida, index);
+diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+index db31fc6f4f1f..418bb490bdc6 100644
+--- a/include/linux/virtio.h
++++ b/include/linux/virtio.h
+@@ -138,6 +138,9 @@ struct virtio_admin_cmd {
+  * @config_lock: protects configuration change reporting
+  * @vqs_list_lock: protects @vqs.
+  * @dev: underlying device.
++ * @driver_override: driver name to force a match; do not set directly,
++ *                   because core frees it; use driver_set_override() to
++ *                   set or clear it.
+  * @id: the device type identification (used to match it with a driver).
+  * @config: the configuration ops for this device.
+  * @vringh_config: configuration ops for host vrings.
+@@ -158,6 +161,7 @@ struct virtio_device {
+ 	spinlock_t config_lock;
+ 	spinlock_t vqs_list_lock;
+ 	struct device dev;
++	const char *driver_override;
+ 	struct virtio_device_id id;
+ 	const struct virtio_config_ops *config;
+ 	const struct vringh_config_ops *vringh_config;
+-- 
+2.18.1
 
 
