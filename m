@@ -1,118 +1,131 @@
-Return-Path: <kvm+bounces-65509-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65510-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C8B4CAD9D8
-	for <lists+kvm@lfdr.de>; Mon, 08 Dec 2025 16:38:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F509CADB16
+	for <lists+kvm@lfdr.de>; Mon, 08 Dec 2025 17:05:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B937304ACAD
-	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 15:37:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A34530B3FC5
+	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 16:02:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60BDD2D73BD;
-	Mon,  8 Dec 2025 15:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8882EFD9F;
+	Mon,  8 Dec 2025 15:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OoWG4ome"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gui9wHS6"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EABB25783A;
-	Mon,  8 Dec 2025 15:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595AA2EDD5F;
+	Mon,  8 Dec 2025 15:53:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765208270; cv=none; b=U43r0aQNADzf7iO2i+o94bY/DNtG8g7tdAVB+SOuYqWkSvfm9ikEJQj4ikAZXvQw9VKUwPAhAqP6B7Mekbevlpgv0GJO6qNS0YOIjLk/IfxLdWo6++C0IEhm5jrVdbeRbOFF33FKf3sT/XG4K8c174v9hx8sh5fsg5CVNrFxO2s=
+	t=1765209224; cv=none; b=JxfAVroMVgOZdcSLoA5ivRgPNTaFYgrE9M8+aBoQjQtcYmBoaobD8iD3uTu5k7Tp2zs1nj+M2I31N11s464hq8LddZa49NurOMdQqiK5Q3N/CPARHJirlHX7kpfW6HfFoupi8TVE3FDUW/S8Bz/CnaQZUCzHMyaEzHegB7hdUqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765208270; c=relaxed/simple;
-	bh=vCpKXfUIiz82eezbrdqJXe2AFXKcg1TqwZvez0QABgU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EKwEXRTSePWUUXmevxoM1ZbSgjH+NOTgq7LdIC2dgD78zy9g0Uckzziw0DHUCw7oZLQKQOZS8o1HdEXKfQB2oFX39uhGC+ZDlSmXP7s5UkObgh3455srVJF3PIetjpEP3O9eUZqLdD+1blEiAEY8lti+i22VW9nylWquHpVey+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=OoWG4ome; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=wLn9Pj1RYBBe/ROihmPM3KswK8Z51Ugeg99R/pQhOhA=; b=OoWG4omeqgaxvUh8FgADNqjaaC
-	juvgaLiAq5Ppq+sfIu8suggncnKgHn/WlW24ff8tjGhqnjjN334+IwwvaC920xcolbeImVxUh9kSO
-	CyUgYV+zi6CeSG3tfhCi8pp5tjZQJ8Wu4pkseeK7UUuoy0SM3kJDM1L2svoJHUY0EdcDpdx+naGGm
-	XrolU+XPp5CzvMG+WRw4XNArwKR6g3xoi8uZ0vGdE28D1RzEXp04ygB8Sd3PimzpthY+PAfkgzS3h
-	eg+s9IvZgwFCOaH3wVz9RVWaw3Hwv4+L3Li68zpDe4K2DrcryVF8Qam+F59SRS5lRRfOsSzf3ifOv
-	M6PIb97w==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vScRR-0000000AQUo-1xw8;
-	Mon, 08 Dec 2025 14:42:21 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 95ACC30301A; Mon, 08 Dec 2025 16:37:38 +0100 (CET)
-Date: Mon, 8 Dec 2025 16:37:38 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, loongarch@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	Mingwei Zhang <mizhang@google.com>,
-	Xudong Hao <xudong.hao@intel.com>,
-	Sandipan Das <sandipan.das@amd.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Xiong Zhang <xiong.y.zhang@linux.intel.com>,
-	Manali Shukla <manali.shukla@amd.com>,
-	Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v6 00/44] KVM: x86: Add support for mediated vPMUs
-Message-ID: <20251208153738.GC3707837@noisy.programming.kicks-ass.net>
-References: <20251206001720.468579-1-seanjc@google.com>
+	s=arc-20240116; t=1765209224; c=relaxed/simple;
+	bh=PeN2WcDmHftDTMUpG2Ud91xaY7ZkgIzrihs/0CEqsGQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OSgoErFfJ9D6x1ew7JVt99l2bGpnJZR3fOsrmLrszFkt8zcmMo8bHu9E2j7U6j0KirObcMT+u32c9YTY0gvv3Y7icCeWbh5E+IjGnvtmuGmYDwVp2dj3oLcima633cOzz7atRjjFhRc9YIWtbF90ix64tBYyfMfnJBmV8c7pl5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gui9wHS6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 249EAC4CEF1;
+	Mon,  8 Dec 2025 15:53:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765209224;
+	bh=PeN2WcDmHftDTMUpG2Ud91xaY7ZkgIzrihs/0CEqsGQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Gui9wHS61ATIYFX8UqryuTy+ofUhdvEbUyS68iMpYr1LpqJbs7DehwC63TVjVTLlK
+	 rjE5q7Fe0kpNzAcRw3vwac/WP+VWw+kD8M+9IC8tjvYcdMJTyEj3QA5jDlsrXjPhdD
+	 fHayVAfkyotuPPwgj5rmquhvqUjCpP2KrUa2Iev548nysLHbDX1BV0WRlM0ncWGhyb
+	 f8zWA0kXxBXmdMcPYQlbWD7WrvpW61aXIpqgUU6rXPcuhqpSJHzmh/Nx8PxnQ5HLJr
+	 QxBD/PfeQBoTpC3TQ9KBUDYFnTV6GaEeN0JyDiVplRbNDgYhJKxXyMha/Giy8jyY49
+	 vb+ZpSqeFbtbg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vSdYT-0000000BJjQ-49Qa;
+	Mon, 08 Dec 2025 15:53:42 +0000
+Date: Mon, 08 Dec 2025 15:53:41 +0000
+Message-ID: <864iq1otq2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "sascha.bischoff@googlemail.com" <sascha.bischoff@googlemail.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org"
+	<will@kernel.org>
+Subject: Re: [PATCH 0/2] Enable GICv5 Legacy CPUIF trapping & fix TDIR cap test
+In-Reply-To: <20251208152724.3637157-1-sascha.bischoff@arm.com>
+References: <20251208152724.3637157-1-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251206001720.468579-1-seanjc@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, sascha.bischoff@googlemail.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Dec 05, 2025 at 04:16:36PM -0800, Sean Christopherson wrote:
-> My hope/plan is that the perf changes will go through the tip tree with a
-> stable tag/branch, and the KVM changes will go the kvm-x86 tree.
-
-> Kan Liang (7):
->   perf: Skip pmu_ctx based on event_type
->   perf: Add generic exclude_guest support
->   perf: Add APIs to create/release mediated guest vPMUs
->   perf: Clean up perf ctx time
->   perf: Add a EVENT_GUEST flag
->   perf: Add APIs to load/put guest mediated PMU context
->   perf/x86/intel: Support PERF_PMU_CAP_MEDIATED_VPMU
+On Mon, 08 Dec 2025 15:28:22 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> Mingwei Zhang (3):
->   perf/x86/core: Plumb mediated PMU capability from x86_pmu to
->     x86_pmu_cap
->
-> Sandipan Das (3):
->   perf/x86/core: Do not set bit width for unavailable counters
->   perf/x86/amd: Support PERF_PMU_CAP_MEDIATED_VPMU for AMD host
+> These changes address two trapping-related issues when running legacy
+> (i.e. GICv3) guests on GICv5 hosts.
 > 
-> Sean Christopherson (19):
->   perf: Move security_perf_event_free() call to __free_event()
->   perf/x86/core: Register a new vector for handling mediated guest PMIs
->   perf/x86/core: Add APIs to switch to/from mediated PMI vector (for
->     KVM)
+> The first change enables the vgic_v3_cpuif_trap static branch on GICv5
+> hosts with legacy support, if trapping is required. The missing enable
+> was caught as part of debugging why UNDEFs were being injected into
+> guests when the ICH_HCR_EL2.TC bit was set - the expected bahaviour
+> was that KVM should handle the trapped accesses, with the guest
+> remaining blissfully unaware.
+> 
+> The second change fixes the specific cause of the TC bit being set in
+> the first place. The test for the ICH_HCR_EL2_TDIR cap was checking
+> for GICv3 CPUIF support and returning false prior to checking for
+> GICv5 Legacy support. The result was that on GICv5 hosts, the test
+> always returned false, and therefore the TC bit was being set. The
+> issue is fixed by reordering the checks to check for GICv5 Legacy
+> support first.
+> 
+> These changes are based against kvmarm/next.
+> 
+> Thanks,
+> Sascha
+> 
+> Sascha Bischoff (2):
+>   KVM: arm64: gic: Enable GICv3 CPUIF trapping on GICv5 hosts if
+>     required
+>   KVM: arm64: Correct test for ICH_HCR_EL2_TDIR cap for GICv5 hosts
+> 
+>  arch/arm64/kernel/cpufeature.c |  8 ++++----
+>  arch/arm64/kvm/vgic/vgic-v3.c  | 25 +++++++++++++++----------
+>  arch/arm64/kvm/vgic/vgic-v5.c  |  2 ++
+>  arch/arm64/kvm/vgic/vgic.h     |  1 +
+>  4 files changed, 22 insertions(+), 14 deletions(-)
 
-That all looks to be in decent shape; lets go get this merged. There is
-the nit on patch 4 and I think a number of the exports want to be
-EXPORT_SYMBOL_FOR_KVM() instead, but we can do that on top.
+Thanks for the debugging, and putting this together!
 
-I'll queue these patches after rc1.
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
