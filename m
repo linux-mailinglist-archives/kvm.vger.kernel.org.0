@@ -1,79 +1,78 @@
-Return-Path: <kvm+bounces-65516-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65517-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D43FCAE5C5
-	for <lists+kvm@lfdr.de>; Mon, 08 Dec 2025 23:49:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FDF5CAE5DC
+	for <lists+kvm@lfdr.de>; Mon, 08 Dec 2025 23:51:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B01B530BF365
-	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 22:49:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0CF223097049
+	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 22:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ACEC2DEA94;
-	Mon,  8 Dec 2025 22:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C425E2FDC5C;
+	Mon,  8 Dec 2025 22:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mF1ASN28"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tovEVNG1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7502882A9
-	for <kvm@vger.kernel.org>; Mon,  8 Dec 2025 22:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2262BDC14
+	for <kvm@vger.kernel.org>; Mon,  8 Dec 2025 22:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765234158; cv=none; b=o5oPWTdU7JnYbHlNSSrHgD49u94GylAxeV3iWlA8tpAwRQbU7a3OJr9XDqIQcNj8rQhuxmjP9BYCRMcD/wSXJ+FK94zS32E6493HlRSIUFKf16Bz3yd5HQ5GBXkbMN4dZPTd34JjSkBp+JtrEKRRglgaM0nIZsrvQwl5eaPe+X4=
+	t=1765234289; cv=none; b=AglO/W8qK+YMHzD0YubUMkIOfmoylZcdkw9AAOV19Z8pEvvWK6a36tfDoLudptQw3EZ5uHtrkDusRbYbtyBkDc9lKjtZsJ+QE1SmEIKrduPIGlNPAAIdpKNFbdPwRBhpzq5yh6O1QHDXReNiqGoCufeTp2324jRWT8I6svRPRYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765234158; c=relaxed/simple;
-	bh=RuG+hqFKqvdPB8GRWvH6QWB2lc3R18bCQJRZoRfcUnQ=;
+	s=arc-20240116; t=1765234289; c=relaxed/simple;
+	bh=qjmDIUr7bv/8MlXiYHic60rQazzDSarrPtGhZ8cIUVU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CDFiTig6gV5vA5I6eW67SorW37+DnAMBSraxj/nfCLgm6uJtsz4ozyg5jmlUxYJ7uXt2Sjt6xzxIujlrfXAIoNQV63Wns0zd8FPvM/l0I5ObV/bu8pdsU3Fc5OHB9HpkB09HnHk++vlI5Jo22HMpgBXoNE/7GrWnDJU4InZLAno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mF1ASN28; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=KbYKThsvXYWYoJMGJkO9ToKhtl2F1S7wGbTUpFZ+96G8T0fuPIVJUWMewX0HbsfHexwxIK2ejdUmK3CYiB8lxOVSuC7rSkj0xnMTjMC+76lgr8+BoRNFnjSOmKU9Q6jaqXGDGOcnfaHhZu3qGPAtEoN8foTZ1g8ZX+GKZDpiY3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tovEVNG1; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-297e5a18652so58449865ad.1
-        for <kvm@vger.kernel.org>; Mon, 08 Dec 2025 14:49:15 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2955f0b8895so49655755ad.0
+        for <kvm@vger.kernel.org>; Mon, 08 Dec 2025 14:51:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765234155; x=1765838955; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765234287; x=1765839087; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RQtNhp91RwMmmDtOT/Iz2jw2/TI3xMlSl3Ff8p3Yeh4=;
-        b=mF1ASN28NnMgVOmlzhk9LfH5tGWYEMaFl1nnB3JZrv1Uskx3UOHdz0vUOs/lu2VA4n
-         +GUigcZiGF6ZZrtNaxykjwGvCYjGH6m1N4HwD/c8I7fXSMiCDLbpj8ZxGIQC1YAKU6HO
-         /BH2m5HkOIDQaE1lQajku9274Q1UiK4x5D8aeG7yykcUeVY/Nnwwyc1GUrhCZ2SYZEfm
-         Kyyf9rkNe+nozaCjnUBFWLif+MwYXZi4NCXpqt+Lb1KkoVYP7jnFnUIvkYiMUtZsE3CR
-         xwPjrYK5oVrd8vQVdtXIg/Zp5aTyFL+e0hno7U4O0Es02Aheh55dJOv+nxwO7MXH5/io
-         Fnyw==
+        bh=bMAAjR6VSRUkIkVe3cxiUyYcIygwozSwS6Y8S/RiuY4=;
+        b=tovEVNG1AMGbPzBg2bvlnfLW9h9wvrShRggwDnpEItmjcIEUL0zloNZa5gLONM+hcW
+         AqIyk1yuwicjH5bAheTSFSyzOCatvoDGaeJ4Pv/ndRIjA8btphklF/IaA5MT5AxjEDTE
+         chUod8ZeIbEoAjNcPRi1tIW8zUhmPneOyUVFZU3vnppn//BloULj5Dihb0noLepC1uof
+         FUdXErh5yt9ePTBXSrABZOEgH0H0lyIAQxIsJ8IHXKxzn4UPmuI/pK0YU0WPiaVUlzaX
+         q9f/miyRe2EjAJofRJh1fl/CjnyoyPIDi2uQidOKC3fKFTy9UTKJUI7Y3fg2hFdZeWR+
+         qVKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765234155; x=1765838955;
+        d=1e100.net; s=20230601; t=1765234287; x=1765839087;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RQtNhp91RwMmmDtOT/Iz2jw2/TI3xMlSl3Ff8p3Yeh4=;
-        b=vlplmkENOeGCdKYG96ivi7tyjCweCR1443HcAa3bWOnlvmU6lV6JRQ7GrJAzcTrivz
-         CXps9tLg9hu9fHFGc2IlvF7OcQ6hVeUy/Xxb4OiEEibywB2G/AiBV0mSnG48jsrSH8tB
-         8/dg6SjsMPZDt7PjPoaF+eePeuuibXk2+mstKW4Nf+dPmc8DEW3Nhim0tnen6lM4QEUc
-         He5cLWqe2cY0Um3Wd8iIzwtMBPMwuXmbNYV1WD0a9+FS4sPnad1C9vIqZpFkuyQztjyl
-         gdGtfot42gcRBe5K7zseIJnCDGSgg7P7Wfz0M4HJl5pU78u8Y5EEPTHiLUrtFoGlc7TQ
-         DcHA==
-X-Forwarded-Encrypted: i=1; AJvYcCWZ7YvkM/udezdLok0zqsGGZFq9dKoVktibqeYebfnXslk4qV1uVSNECXnUh/q+5UBMqPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxxl3AGXGjweEmQ2XkFILmqBQ4zDowestgsTD6ML+Px7eR0jMba
-	GVsWt86ADgZhK6t4pIz0DV1R7i2I2lisFTYBtheZ8RhlexbsrsMd0DskgDjbtlMxwZTtCZfGCX+
-	R44tmyw==
-X-Google-Smtp-Source: AGHT+IGV//7skv54QJLySBQbcFRbAbxGPOTct1X0PIO4Gnw4f9XxHcSKjMzEc+bVcrJZMyBaZbfJYke7ZAw=
-X-Received: from pjbsu8.prod.google.com ([2002:a17:90b:5348:b0:343:5c2:dd74])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3fc4:b0:330:bca5:13d9
- with SMTP id 98e67ed59e1d1-349a2636261mr7005185a91.32.1765234155348; Mon, 08
- Dec 2025 14:49:15 -0800 (PST)
-Date: Mon, 8 Dec 2025 14:49:13 -0800
-In-Reply-To: <20251026201911.505204-22-xin@zytor.com>
+        bh=bMAAjR6VSRUkIkVe3cxiUyYcIygwozSwS6Y8S/RiuY4=;
+        b=a8y3MXAkoAeCRChbm07x/ljrPwnQ359u/NBTCtLn/bCWSDb+j7K2KKY5jQgmsfSdjT
+         sOxMErtcidFyZ1fooZnJGF9Jv3KSpvONTh0JRhcm4JuEnnKy30Vrp7P6b3Sfv3gNlixH
+         7Walbbknfc38kElXzvVJ90huhOo4UfEtM7lYGfs4EXn4HisYiiOOUHRtQWryf+qToc9x
+         6KZuPQYa6tAbrw7+2V4n16ewwpzHFagMVpM4zBHCzH94V6674Sg2hYS7ytA2D1Dedzyi
+         Umx+xZbfXMW/n5fZijvpDL3cqpP1T9AOZsi+0OMUufIyxj3LKfF3VCcbG8ZOIRVo0Mlc
+         DqkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWdOlsonLbKEZHkm+cKDp+4QhmBp/WE6t20PUu5v5ix23HNKyBdAKwF3sZuOqps4wv1/QA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0kptUzi7gHErh6c3Xrd2KCVU+y877Q/utNLb2bxm5Q337jKY+
+	X0KIGC+tA+vVWmesQEFGEMnXBSnqbafrQ0K9ScHwtzD78aBZTAmVGzNTWPL37I9qd011DBQh4CN
+	dmbj6Iw==
+X-Google-Smtp-Source: AGHT+IHY3/qn5h8d0ukv8qSmDKpwSSJQmHgReCnf0gw8vGmknvsoJJAz6bSiVI7oQ2P/wnp7Dg54VZ/fQYM=
+X-Received: from pjaa15.prod.google.com ([2002:a17:90a:8f:b0:340:66e4:4269])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:28c8:b0:343:cfa1:c458
+ with SMTP id 98e67ed59e1d1-34a45027d31mr887944a91.18.1765234287242; Mon, 08
+ Dec 2025 14:51:27 -0800 (PST)
+Date: Mon, 8 Dec 2025 14:51:25 -0800
+In-Reply-To: <20251026201911.505204-1-xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251026201911.505204-1-xin@zytor.com> <20251026201911.505204-22-xin@zytor.com>
-Message-ID: <aTdV6bX14SGz_JWZ@google.com>
-Subject: Re: [PATCH v9 21/22] KVM: nVMX: Guard SHADOW_FIELD_R[OW] macros with
- VMX feature checks
+References: <20251026201911.505204-1-xin@zytor.com>
+Message-ID: <aTdWbayU8BbR6eFu@google.com>
+Subject: Re: [PATCH v9 00/22] Enable FRED with KVM VMX
 From: Sean Christopherson <seanjc@google.com>
 To: "Xin Li (Intel)" <xin@zytor.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
@@ -81,81 +80,36 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
 	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org, 
 	peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com, 
-	hch@infradead.org, sohil.mehta@intel.com, Yosry Ahmed <yosry.ahmed@linux.dev>
+	hch@infradead.org, sohil.mehta@intel.com
 Content-Type: text/plain; charset="us-ascii"
 
-+Yosry
-
 On Sun, Oct 26, 2025, Xin Li (Intel) wrote:
-> From: Xin Li <xin3.li@intel.com>
+> Xin Li (18):
+>   KVM: VMX: Enable support for secondary VM exit controls
+>   KVM: VMX: Initialize VM entry/exit FRED controls in vmcs_config
+>   KVM: VMX: Disable FRED if FRED consistency checks fail
+>   KVM: VMX: Initialize VMCS FRED fields
+>   KVM: VMX: Set FRED MSR intercepts
+>   KVM: VMX: Save/restore guest FRED RSP0
+>   KVM: VMX: Add support for saving and restoring FRED MSRs
+>   KVM: x86: Add a helper to detect if FRED is enabled for a vCPU
+>   KVM: VMX: Virtualize FRED event_data
+>   KVM: VMX: Virtualize FRED nested exception tracking
+>   KVM: x86: Mark CR4.FRED as not reserved
+>   KVM: VMX: Dump FRED context in dump_vmcs()
+>   KVM: x86: Advertise support for FRED
+>   KVM: nVMX: Enable support for secondary VM exit controls
+>   KVM: nVMX: Handle FRED VMCS fields in nested VMX context
+>   KVM: nVMX: Validate FRED-related VMCS fields
+>   KVM: nVMX: Guard SHADOW_FIELD_R[OW] macros with VMX feature checks
+>   KVM: nVMX: Enable VMX FRED controls
 > 
-> Add VMX feature checks to the SHADOW_FIELD_R[OW] macros to prevent access
-> to VMCS fields that may be unsupported on some CPUs.
-> 
-> Functions like copy_shadow_to_vmcs12() and copy_vmcs12_to_shadow() access
-> VMCS fields that may not exist on certain hardware, such as
-> INJECTED_EVENT_DATA.  To avoid VMREAD/VMWRITE warnings, skip syncing fields
-> tied to unsupported VMX features.
-> 
-> Signed-off-by: Xin Li <xin3.li@intel.com>
-> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
-> Tested-by: Shan Kang <shan.kang@intel.com>
-> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
-> ---
-> 
-> Change in v5:
-> * Add TB from Xuelian Guo.
-> 
-> Change since v2:
-> * Add __SHADOW_FIELD_R[OW] for better readability or maintability (Sean).
+> Xin Li (Intel) (4):
 
-Coming back to this with fresh eyes, handling fields that conditionally exist
-_only_ for VMCS shadowing is somewhat ridiculous.  For PML and the VMX preemption
-timer, the special case handling makes sense because the fields are emulated by
-KVM irrespective of hardware suport.  But for fields that KVM doesn't emulate in
-software, e.g. GUEST_INTR_STATUS and the FRED fields, allowing accesses through
-emulated VMREAD/VMWRITE and then filtering out VMCS shadowing accesses is just us
-being stubborn.
+I'm guessing the two different "names" isn't intended?
 
-I still 100% think that not restricting based on the virtual CPU model defined by
-userspace is the way to go[*], because that'd require an absurd amount of effort,
-complexity, and memory to solve a problem no one actually cares about.  But
-updating KVM's array of vmcs12 fields once during kvm-intel.ko load isn't difficult,
-and would make KVM suck a little less when running on old hardware.
-
-E.g. running the test_vmwrite_vmread KUT subtest on CPUs without TSC scaling still
-fails with the wonderful:
-
-  FAIL: VMX_VMCS_ENUM.MAX_INDEX expected: 19, actual: 17
-
-due to QEMU (sanely) setting the max index to 17 (VMX preemption timer) when the
-virtual CPU model doesn't support TSC scaling.
-
-And looking forward, we're going to have the same mess with FRED due QEMU (again,
-sanely) basing its 
-
-    if (f[FEAT_7_1_EAX] & CPUID_7_1_EAX_FRED) {
-        /* FRED injected-event data (0x2052).  */
-        kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM, 0x52);
-    } else if (f[FEAT_VMX_EXIT_CTLS] &
-               VMX_VM_EXIT_ACTIVATE_SECONDARY_CONTROLS) {
-        /* Secondary VM-exit controls (0x2044).  */
-        kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM, 0x44);
-    } else if (f[FEAT_VMX_SECONDARY_CTLS] & VMX_SECONDARY_EXEC_TSC_SCALING) {
-        /* TSC multiplier (0x2032).  */
-        kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM, 0x32);
-    } else {
-        /* Preemption timer (0x482E).  */
-        kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM, 0x2E);
-    }
-
-KVM will still have virtualization holes, e.g. if userspace hides TSC scaling when
-running on hardware+KVM that supports TSC scaling, but as above I don't think that's
-a problem worth solving.
-
-I'll post a patch (just need to test on bare metal) to sanitize vmcs12 fields,
-at which point FRED nVMX support shouldn't have to do anything special beyond
-noting the depending, i.e. it should only take a few lines of code.
-
-[*] https://lore.kernel.org/all/YR2Tf9WPNEzrE7Xg@google.com
+>   x86/cea: Prefix event stack names with ESTACK_
+>   x86/cea: Use array indexing to simplify exception stack access
+>   x86/cea: Export __this_cpu_ist_top_va() to KVM
+>   KVM: x86: Save/restore the nested flag of an exception
 
