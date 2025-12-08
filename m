@@ -1,122 +1,140 @@
-Return-Path: <kvm+bounces-65518-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65519-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D524FCAE65B
-	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 00:17:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2340CAE6A0
+	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 00:39:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E158C3020836
-	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 23:17:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B8EF5301DE07
+	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 23:39:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3F12EA749;
-	Mon,  8 Dec 2025 23:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B67E2C21C0;
+	Mon,  8 Dec 2025 23:39:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jCS22SA7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vgl7U9KT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC07242D9D
-	for <kvm@vger.kernel.org>; Mon,  8 Dec 2025 23:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA112E65D
+	for <kvm@vger.kernel.org>; Mon,  8 Dec 2025 23:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765235848; cv=none; b=h5q/3o846dl+VSkNxIYa4y6JJwZj7Sb4g0x7CbvoULg4Ffn8XRQ0mcErJpfUxvjdCEl831LJh/nv2WxAMRUT8UB5gyaWNWbnkjWfptCATD+WjI994zWk4lIiuE1aQOf9Ed0r2d/XqbFJsJxJyhInXARE/DXZvVhLrqWGmtAdLoc=
+	t=1765237159; cv=none; b=lWNexL1P6Ipqo6WbB28g5SqMAAyuiZcoldHg4QGBmKO5A9VICIOn6YL8g/peFEyxmsot4WSFMc0hOz7gscYbNw/+4YUw42HwH2aJ1CN0CZMfNXbfRRjOBWha74CQ4ACL/z+vsrNf0+Xq/SDeT4UyGA1/BciDGtJMUSgBNG0nCdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765235848; c=relaxed/simple;
-	bh=hzoqkn8DRtGSQ9n26ZR8ioB/6vuZTI8jo81s+SZD2C4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=csayp6QrsWmRGC0xZmo/70JwJPcIrBmaPL3tmpFk8lWlSfoEYJMueMiDXCBRm6EQsEyzwRGG6M/zMRO+B2dZKk5mANaaZ058wmozgt9C4plxfRu/sYmewYlSg5tGwZfTnVprmvfTtXwu3Rb0IURTb5Iic6ZNELatZZuAGknAI4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jCS22SA7; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3438b1220bcso5498529a91.2
-        for <kvm@vger.kernel.org>; Mon, 08 Dec 2025 15:17:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765235846; x=1765840646; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cni1OkdWwZPVVj0qFxlPetCrrcs1VWExpXG1dqivn9Y=;
-        b=jCS22SA7hCDa6LczIsObShGOOa1o9wj/ETuSySWGxzmcFVz4xxUht3oZBdhXqXR0r5
-         ao0PsKcknDJq42cEkv45DIdPPJb3TEDQmKeYdr0QQkgWcpjg8pWnRmNdaKdeL5ZTLqPP
-         JyrlPIsBqiJ2iXhE+AchhNlaHe96qyXuqaUBlxL9wQEcSx6fCV9VIy1uCpxNptVRKVDr
-         F+xmiisnjVQ6mXDWZ+P9i6TJXAdi4AbKViEX3ksyvBKljvOOVw7i9zRjlYayWs43vf2f
-         gCOcVCrSNHfMNxAOlTIbqlDDrZbbqI+87ZijeUPf39YtoPmhEP9DY/Ok6Pe+4JW1xgwi
-         DWZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765235846; x=1765840646;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cni1OkdWwZPVVj0qFxlPetCrrcs1VWExpXG1dqivn9Y=;
-        b=MnEF/fUT2GIExIx5Mb6soskj8eOjkzBBEspYR3vnbsEZp4KOmesjyBvTGF8pX0siKW
-         jIZyvnOygFkFps9PAFEpfylTmxbffjGBe1WPgDrBlaMu5BTgoYzfqtrZxOHuei+5nFzz
-         315352gxuNXVrnyhfQeL/xkoHBwQg5+6X0w3+zptpWNtukeVuAXd/WcS4KPGfCno5ROl
-         qgeosrAjkR/AefV5s+hdO61oDORRIJXqxCVagPx7xdADcB6lploFEZ7/cqQianNUlRaF
-         yZZrNlvr2UnapStlqSHyAeHhd3S2dwMltoEXPvOIbRTq133HbeM2d8EJpsaoK+pk3Q/1
-         RWyA==
-X-Forwarded-Encrypted: i=1; AJvYcCXM0Zo0exNqSlVvQB3EwWuskSA7pMZdfmUujokcNYliBMXL0PzsuG36ukoud4mgKYorWgE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxfF3nQ1vX91BRfsA5SQECje4hk6JK6aY3m42PXTS7j17nkI+4
-	fAmHDMlBWW7ZnFWQykGgw0NPzpyrpBY0E5YE7zz+tYOlRr+A1/kgzT65QfSKbiOWJ2qO/ihOlWj
-	6fNy+4A==
-X-Google-Smtp-Source: AGHT+IHYtV9vc8av3yAHVyltMiSRqwP42w4ShmJsUWRWz6grAusj1twmP1ZR9qBB2t+PhOWUdJlv/v86tXY=
-X-Received: from pjbgi22.prod.google.com ([2002:a17:90b:1116:b0:34a:49b2:8d33])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:558b:b0:341:124f:474f
- with SMTP id 98e67ed59e1d1-349a26c129dmr7076756a91.32.1765235846478; Mon, 08
- Dec 2025 15:17:26 -0800 (PST)
-Date: Mon, 8 Dec 2025 15:17:25 -0800
-In-Reply-To: <69352bd044fdb_1b2e10033@dwillia2-mobl4.notmuch>
+	s=arc-20240116; t=1765237159; c=relaxed/simple;
+	bh=oRw4Re4H9dvB9c+b16Oal3wCU4/sTXQVv0peqCVPmvU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O7mH9AoFCYUbmrbw5b767doSTcE3iYyyiWGrRO55CI+jnBKz0HbY0zNefmmWutgbpB9zW6FQR6fi38YpM3w5xM8mGV+V0sk+8nfs6s7MSDSbnMo3U9kYZsGhlCxWvLJGH5DqE6p7y9uL9KBqeZz65UXFWQaw8VNzs/0GrVp7a0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vgl7U9KT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765237156;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DJY22PlWPInOrqvKpe/PiGa8UkRjvS7h9lqqZGwwD7g=;
+	b=Vgl7U9KToc6FfgeW4Lc6sL+Q45NOOOargS6md6xfJcj170kdOzfTBK7q47CVZauT3yEhTe
+	tTtYFHz0wk8IcE302os5LFScnYf/1C358BCPcQs60qTE9uVgU0CJK+muy+oRMI7mgvSbrQ
+	DGNWeHb8CPLt4Bdz3pGBYlwW81yBYWA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-624-qMPD2mBON22YQoiT6unC5A-1; Mon,
+ 08 Dec 2025 18:39:13 -0500
+X-MC-Unique: qMPD2mBON22YQoiT6unC5A-1
+X-Mimecast-MFC-AGG-ID: qMPD2mBON22YQoiT6unC5A_1765237152
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C08518005A4;
+	Mon,  8 Dec 2025 23:39:12 +0000 (UTC)
+Received: from intellaptop.redhat.com (unknown [10.22.65.246])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8212F18004D4;
+	Mon,  8 Dec 2025 23:39:11 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: kvm@vger.kernel.org
+Cc: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [kvm-unit-tests PATCH] Skip PMU portion of vmware_backdoors test if PMU is not enabled.
+Date: Mon,  8 Dec 2025 18:39:10 -0500
+Message-ID: <20251208233910.1000465-1-mlevitsk@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251206011054.494190-1-seanjc@google.com> <20251206011054.494190-4-seanjc@google.com>
- <69352bd044fdb_1b2e10033@dwillia2-mobl4.notmuch>
-Message-ID: <aTdchSmOBo60vbZT@google.com>
-Subject: Re: [PATCH v2 3/7] KVM: x86/tdx: Do VMXON and TDX-Module
- initialization during subsys init
-From: Sean Christopherson <seanjc@google.com>
-To: dan.j.williams@intel.com
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Kiryl Shutsemau <kas@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
-	Chao Gao <chao.gao@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Sat, Dec 06, 2025, dan.j.williams@intel.com wrote:
-> Sean Christopherson wrote:
-> Given this routine now has nothing to do...
-> 
-> > +	 * TDX-specific cpuhp callback to disallow offlining the last CPU in a
-> > +	 * packing while KVM is running one or more TDs.  Reclaiming HKIDs
-> > +	 * requires doing PAGE.WBINVD on every package, i.e. offlining all CPUs
-> > +	 * of a package would prevent reclaiming the HKID.
-> >  	 */
-> > +	r = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "kvm/cpu/tdx:online",
-> > +			      tdx_online_cpu, tdx_offline_cpu);
-> 
-> ...the @startup param can be NULL. That also saves some grep pain no
-> more multiple implementations of a "tdx_online_cpu".
-> 
-> Along those lines, should tdx_offline_cpu() become
-> kvm_tdx_offline_cpu()?
-> 
-> [..]
-> >  /*
-> >   * Add a memory region as a TDX memory block.  The caller must make sure
-> > @@ -1156,67 +1194,50 @@ static int init_tdx_module(void)
-> >  	goto out_put_tdxmem;
-> >  }
-> >  
-> > -static int __tdx_enable(void)
-> > +static int tdx_enable(void)
-> 
-> Almost commented about this being able to be __init now, but then I see
-> you have a combo patch for that later.
-> 
-> With or without the additional tdx_{on,off}line_cpu fixups:
+Since 2019, KVM has an explicit check that if guest's PMC is disabled,
+then VMware backdoor via RDPCM is disabled as well.
 
-I think the fixups you're looking for are in patch 5, "/virt/tdx: KVM: Consolidate
-TDX CPU hotplug handling", or did I misunderstand?
+ commit 672ff6cff80ca43bf3258410d2b887036969df5f
+ Author: Liran Alon <liran.alon@oracle.com>
+ Date:   Mon Mar 25 21:10:17 2019 +0200
+ KVM: x86: Raise #GP when guest vCPU do not support PMU
+
+Fix the test failure by checking if PMU is enabled first.
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ x86/vmware_backdoors.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/x86/vmware_backdoors.c b/x86/vmware_backdoors.c
+index f8cf7ecb150b..c18f0bf86356 100644
+--- a/x86/vmware_backdoors.c
++++ b/x86/vmware_backdoors.c
+@@ -1,5 +1,6 @@
+ 
+ #include "x86/msr.h"
++#include "x86/pmu.h"
+ #include "x86/processor.h"
+ #include "x86/apic-defs.h"
+ #include "x86/apic.h"
+@@ -101,7 +102,7 @@ static uint64_t vmware_backdoor_port(uint64_t vmport, uint64_t vmport_magic,
+ 		PORT_ARG(a, b, c, m, sf))
+ 
+ 
+-struct fault_test vmware_backdoor_tests[] = {
++struct fault_test vmware_backdoor_tests_rdpcm[] = {
+ 	RDPMC_TEST("HOST_TSC kernel", VMWARE_BACKDOOR_PMC_HOST_TSC,
+ 			KERNEL_MODE, NO_FAULT),
+ 	RDPMC_TEST("REAL_TIME kernel", VMWARE_BACKDOOR_PMC_REAL_TIME,
+@@ -116,6 +117,10 @@ struct fault_test vmware_backdoor_tests[] = {
+ 			USER_MODE, NO_FAULT),
+ 	RDPMC_TEST("RANDOM PMC user", 0xfff, USER_MODE, FAULT),
+ 
++	{ NULL },
++};
++
++struct fault_test vmware_backdoor_tests_ioport[] = {
+ 	PORT_TEST("CMD_GETVERSION user", VMWARE_BACKDOOR_PORT, VMWARE_MAGIC,
+ 			VMPORT_CMD_GETVERSION, USER_MODE, NO_FAULT),
+ 	PORT_TEST("CMD_GETVERSION kernel", VMWARE_BACKDOOR_PORT, VMWARE_MAGIC,
+@@ -165,8 +170,15 @@ static void check_vmware_backdoors(void)
+ 
+ 	report_prefix_push("vmware_backdoors");
+ 
+-	for (i = 0; vmware_backdoor_tests[i].name != NULL; i++)
+-		test_run(&vmware_backdoor_tests[i]);
++	if (this_cpu_has_pmu()) {
++		for (i = 0; vmware_backdoor_tests_rdpcm[i].name != NULL; i++)
++			test_run(&vmware_backdoor_tests_rdpcm[i]);
++	} else {
++		report_skip("Skipping VMWARE pseudo RDPCM tests, PMU not enabled");
++	}
++
++	for (i = 0; vmware_backdoor_tests_ioport[i].name != NULL; i++)
++		test_run(&vmware_backdoor_tests_ioport[i]);
+ 
+ 	report_prefix_pop();
+ }
+-- 
+2.49.0
+
 
